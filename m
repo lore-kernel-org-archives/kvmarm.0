@@ -2,93 +2,85 @@ Return-Path: <SRS0=1Hfd=EL=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC57FC00A89
-	for <kvmarm@archiver.kernel.org>; Thu,  5 Nov 2020 11:05:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAA04C00A89
+	for <kvmarm@archiver.kernel.org>; Thu,  5 Nov 2020 11:08:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id EA5C020782
-	for <kvmarm@archiver.kernel.org>; Thu,  5 Nov 2020 11:04:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0325820756
+	for <kvmarm@archiver.kernel.org>; Thu,  5 Nov 2020 11:08:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="AYd2XxNy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA5C020782
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="s0/mPv6J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0325820756
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2EAFA4B7FC;
-	Thu,  5 Nov 2020 06:04:59 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 433804B502;
+	Thu,  5 Nov 2020 06:08:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id HMDCMFrsGrQo; Thu,  5 Nov 2020 06:04:58 -0500 (EST)
+	with ESMTP id fAXbeVsETNPS; Thu,  5 Nov 2020 06:08:48 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4368F4B7E6;
-	Thu,  5 Nov 2020 06:04:58 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B34D54B55A;
+	Thu,  5 Nov 2020 06:08:48 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EA4384B722
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Nov 2020 06:04:56 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BAA774B55A
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Nov 2020 06:08:46 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qAM6hCSjaaEs for <kvmarm@lists.cs.columbia.edu>;
- Thu,  5 Nov 2020 06:04:55 -0500 (EST)
-Received: from mail-wm1-f67.google.com (mail-wm1-f67.google.com
- [209.85.128.67])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BA54F4B71F
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Nov 2020 06:04:55 -0500 (EST)
-Received: by mail-wm1-f67.google.com with SMTP id h22so1175909wmb.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 05 Nov 2020 03:04:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=122idc9ISzYUVyUTZxvj63kGf6qbL9E93JAVHSUYL5E=;
- b=AYd2XxNy9cevjTd5a9GWeI6c3UkIp+hfXlb81qU3LLyhlfpYBMPQeFuUFrRxGJiE/b
- hbzJiB1uhqyhYBuvVxRMQoz84h3qrKYEiUi8EQE1p9xbmZmf1cUK0oJglUKfEpDOPVTG
- UlJRyY5W+PhXM0/UUU0jUWEkA03sZMtCXRn1RmieN1Qid7ucRGZR2sxYXmVLa37b8APn
- t9uCN3tklmqFYC1u4TJLK7BW4hiQvmGuU891iKbJIhv/Z+5zwNY9Kr0Q//kuZRMJDXEL
- hB/NzXHCY44H5EDVI+GyC5OrXgWssnWs0Z3iT4+JAqYK4Z8jqVe3e1zUDlzHH1KKjIlJ
- oGSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=122idc9ISzYUVyUTZxvj63kGf6qbL9E93JAVHSUYL5E=;
- b=m+iZ0wpimdIGVyOr/PPXJ1gUmvGCz3v/tYyge2PS/Aa6Kzo+9dt0SGcSIiZ8aCRlVc
- DR7v+dcGp+v6WRJB75aM5XLHF8CPebw3ANcrfPKaCD/GUriOYLKZR+VZDeAAhRmwxLOV
- qIDzpl4O2CWK2jKByrv4sgLWmsRBArtJMWydDySoNFa28AO8lP0nPKYx4vADTY+uPEpy
- V4mDFde31TrcbfDkoaU5YQ7IaNR6PeKCSGtDuprqvsjglNaLL663r8++h8P8w0aTLXe5
- RdQS0xREQSD7DQQdI2XHUVGoMBhCTEEs8K/gQIDAhBcODv9xvO/KAVqYxDXrnBJ6sSmX
- cyNw==
-X-Gm-Message-State: AOAM533fJMUJ3AOlKYasKqc+EQFbbvCCnFqcvlFG8H80wMC04x/MJppj
- i7hcifgt+CL2AGSXVsUnKLzYnA==
-X-Google-Smtp-Source: ABdhPJwDkxXA6NnnBuUAc9HIvD0y2HJ2+YaH0fpN0/rXlsl/uP2RFH5TYMmqQ4jC+tOsJPAgxuY5wQ==
-X-Received: by 2002:a1c:e087:: with SMTP id x129mr2090930wmg.2.1604574294545; 
- Thu, 05 Nov 2020 03:04:54 -0800 (PST)
-Received: from google.com ([2a01:4b00:8523:2d03:64da:f1d0:8ee7:66f5])
- by smtp.gmail.com with ESMTPSA id y185sm2168277wmb.29.2020.11.05.03.04.52
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 05 Nov 2020 03:04:53 -0800 (PST)
-Date: Thu, 5 Nov 2020 11:04:52 +0000
-From: David Brazdil <dbrazdil@google.com>
-To: Andrew Walbran <qwandor@google.com>
-Subject: Re: [RFC PATCH 23/26] kvm: arm64: Intercept host's CPU_SUSPEND PSCI
- SMCs
-Message-ID: <20201105110452.3ulxvaywgbqa6ilx@google.com>
-References: <20201104183630.27513-1-dbrazdil@google.com>
- <20201104183630.27513-24-dbrazdil@google.com>
- <CA+_y_2GgF7W8f=_3Y+-Nyb+JWTCqCvtE7OT=kabAqxnp6vLnOw@mail.gmail.com>
+ with ESMTP id oBx5wGK-EqqO for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  5 Nov 2020 06:08:45 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6F59E4B502
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Nov 2020 06:08:45 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id DC76D2072E;
+ Thu,  5 Nov 2020 11:08:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1604574524;
+ bh=3sUQ3ja2rj2uStC3OQabrdR0ZZMO2xkmRDD9nGypmls=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=s0/mPv6J5efk5VAAfbAzqZuUY+XMg/dc72UvmDXwVjd9/FXUVkSlXtaIh9i4EewIR
+ xAboT+rU3ASTmQrXuEAmx1nJANjGc89lVfxmnu3rYnpMdRc7mrtvUXnlT2wYBGQI26
+ /bwE1BpoOzqDmHpWu5EvDo7L24La7KLz43g5vQhQ=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
+ TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1kad8B-007oEK-0r; Thu, 05 Nov 2020 11:08:41 +0000
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <CA+_y_2GgF7W8f=_3Y+-Nyb+JWTCqCvtE7OT=kabAqxnp6vLnOw@mail.gmail.com>
-Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
- Android Kernel Team <kernel-team@android.com>, Marc Zyngier <maz@kernel.org>,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Catalin Marinas <catalin.marinas@arm.com>, Tejun Heo <tj@kernel.org>,
+Date: Thu, 05 Nov 2020 11:08:38 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: David Brazdil <dbrazdil@google.com>
+Subject: Re: [RFC PATCH 12/26] kvm: arm64: Add SMC handler in nVHE EL2
+In-Reply-To: <20201104183630.27513-13-dbrazdil@google.com>
+References: <20201104183630.27513-1-dbrazdil@google.com>
+ <20201104183630.27513-13-dbrazdil@google.com>
+User-Agent: Roundcube Webmail/1.4.9
+Message-ID: <35d054aa819034831a04aa3332aceec2@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: dbrazdil@google.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+ catalin.marinas@arm.com, will@kernel.org, dennis@kernel.org, tj@kernel.org,
+ cl@linux.com, mark.rutland@arm.com, lorenzo.pieralisi@arm.com,
+ qperret@google.com, ascull@google.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, kernel-team@android.com,
+ Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, Tejun Heo <tj@kernel.org>,
  Dennis Zhou <dennis@kernel.org>, Christoph Lameter <cl@linux.com>,
  Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -102,17 +94,88 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-> > Add a handler of CPU_SUSPEND host PSCI SMCs. When invoked, it determines
-> > whether the requested power state loses context, ie. whether it is
-> > indistinguishable from a WHI or whether it is a deeper sleep state that
-> Do you mean WFI?
-Of course, sorry, just a typo.
+On 2020-11-04 18:36, David Brazdil wrote:
+> Add handler of host SMCs in KVM nVHE trap handler. Forward all SMCs to
+> EL3 and propagate the result back to EL1. This is done in preparation
+> for validating host SMCs.
+> 
+> Signed-off-by: David Brazdil <dbrazdil@google.com>
+> ---
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 36 ++++++++++++++++++++++++++++++
+>  1 file changed, 36 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> index 19332c20fcde..fffc2dc09a1f 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> @@ -106,6 +106,38 @@ static void handle_host_hcall(struct
+> kvm_cpu_context *host_ctxt)
+>  	host_ctxt->regs.regs[1] = ret;
+>  }
+> 
+> +static void skip_host_instruction(void)
+> +{
+> +	write_sysreg_el2(read_sysreg_el2(SYS_ELR) + 4, SYS_ELR);
+> +}
+> +
+> +static void forward_host_smc(struct kvm_cpu_context *host_ctxt)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_smc(host_ctxt->regs.regs[0], host_ctxt->regs.regs[1],
+> +			  host_ctxt->regs.regs[2], host_ctxt->regs.regs[3],
+> +			  host_ctxt->regs.regs[4], host_ctxt->regs.regs[5],
+> +			  host_ctxt->regs.regs[6], host_ctxt->regs.regs[7],
+> +			  &res);
+> +	host_ctxt->regs.regs[0] = res.a0;
+> +	host_ctxt->regs.regs[1] = res.a1;
+> +	host_ctxt->regs.regs[2] = res.a2;
+> +	host_ctxt->regs.regs[3] = res.a3;
+> +}
+> +
+> +static void handle_host_smc(struct kvm_cpu_context *host_ctxt)
+> +{
+> +	/*
+> +	 * Unlike HVC, the return address of an SMC is the instruction's PC.
+> +	 * Move the return address past the instruction.
+> +	 */
+> +	skip_host_instruction();
+> +
+> +	/* Forward SMC not handled in EL2 to EL3. */
+> +	forward_host_smc(host_ctxt);
+> +}
+> +
+>  void handle_trap(struct kvm_cpu_context *host_ctxt)
+>  {
+>  	u64 esr = read_sysreg_el2(SYS_ESR);
+> @@ -114,6 +146,10 @@ void handle_trap(struct kvm_cpu_context 
+> *host_ctxt)
+>  	case ESR_ELx_EC_HVC64:
+>  		handle_host_hcall(host_ctxt);
+>  		break;
+> +	case ESR_ELx_EC_SMC32:
 
+How is that even possible? Host EL1 is strictly 64bit, so SMC32 cannot 
+occur.
+
+> +	case ESR_ELx_EC_SMC64:
+> +		handle_host_smc(host_ctxt);
+> +		break;
+>  	default:
+>  		hyp_panic();
+>  	}
+
+Thanks,
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
