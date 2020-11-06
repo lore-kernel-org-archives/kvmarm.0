@@ -2,70 +2,68 @@ Return-Path: <SRS0=uq+A=EM=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	RCVD_DOTEDU_SUSP,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CB72C56201
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03F9DC55ABD
 	for <kvmarm@archiver.kernel.org>; Fri,  6 Nov 2020 16:44:44 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C409822243
+	by mail.kernel.org (Postfix) with ESMTP id 4B8DF22227
 	for <kvmarm@archiver.kernel.org>; Fri,  6 Nov 2020 16:44:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ola4f9kK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C409822243
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ks7WKJLl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B8DF22227
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 47D674B8AA;
-	Fri,  6 Nov 2020 11:44:43 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 90A134B8A6;
+	Fri,  6 Nov 2020 11:44:42 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 21jzwpDcxvrA; Fri,  6 Nov 2020 11:44:42 -0500 (EST)
+	with ESMTP id 2EtZIW3sFqMG; Fri,  6 Nov 2020 11:44:41 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 353F24B8BA;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1613E4B8B3;
 	Fri,  6 Nov 2020 11:44:41 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 37A3B4B8A7
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 29C634B8B0
  for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Nov 2020 11:44:40 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CtZeB0D8DduK for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id athumGX32x5n for <kvmarm@lists.cs.columbia.edu>;
  Fri,  6 Nov 2020 11:44:39 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 068944B8A6
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Nov 2020 11:44:38 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3B0E94B8A7
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Nov 2020 11:44:39 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id DFEF821556;
+ by mail.kernel.org (Postfix) with ESMTPSA id A6EC12151B;
  Fri,  6 Nov 2020 16:44:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1604681078;
- bh=T36IPLbT9cJ/XPnSJhoaXKK5mtHaqKLZC6nvg9TC1Ek=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=Ola4f9kKMahL1JQDf/UuLWtvgFviVPCONE9o/bIL9H3q8cKIg6gYkQ29h7DoGfk0A
- wT+LXaTpsF6jSgvlZ+29oDAbVIsJVUmo2D6MqUKgTwd1I6R/SdTGPqsiz6RsRNWP6J
- sGDWKgyrpAFGVN0VWI3FqJ4Hs3vIs+jORoCJfLqU=
+ s=default; t=1604681077;
+ bh=9iUTO9V9vPdMlxcyJuoPtkCPdy41zNPPUWFKgP7BkOw=;
+ h=From:To:Cc:Subject:Date:From;
+ b=Ks7WKJLle02cLYsQQgyk9w62RINaerwNRmf10+VjBh95ZlWfrm9S5PwzeMdxzqy6b
+ MkiAzpGRo7AaPEc+d0tTlsaq5nniQCwhRlvZRK+H1ZqVn8LHC5NALxTs+qMSMA7kTl
+ 2QIL16ALCeSJKNm50eH6Dn714OpONcvRV/WdPuOw=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1kb4qq-008FYW-3X; Fri, 06 Nov 2020 16:44:36 +0000
+ id 1kb4qp-008FYW-Fr; Fri, 06 Nov 2020 16:44:35 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH 1/5] KVM: arm64: Fix build error in user_mem_abort()
-Date: Fri,  6 Nov 2020 16:44:12 +0000
-Message-Id: <20201106164416.326787-2-maz@kernel.org>
+Subject: [GIT PULL] KVM/arm64 fixes for 5.10, take #2
+Date: Fri,  6 Nov 2020 16:44:11 +0000
+Message-Id: <20201106164416.326787-1-maz@kernel.org>
 X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20201106164416.326787-1-maz@kernel.org>
-References: <20201106164416.326787-1-maz@kernel.org>
 MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 62.31.163.78
 X-SA-Exim-Rcpt-To: pbonzini@redhat.com, drjones@redhat.com,
@@ -90,38 +88,55 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-RnJvbTogR2F2aW4gU2hhbiA8Z3NoYW5AcmVkaGF0LmNvbT4KClRoZSBQVUQgYW5kIFBNRCBhcmUg
-Zm9sZGVkIGludG8gUEdEIHdoZW4gdGhlIGZvbGxvd2luZyBvcHRpb25zIGFyZQplbmFibGVkLiBJ
-biB0aGF0IGNhc2UsIFBVRF9TSElGVCBpcyBlcXVhbCB0byBQTURfU0hJRlQgYW5kIHdlIGZhaWwK
-dG8gYnVpbGQgd2l0aCB0aGUgaW5kaWNhdGVkIGVycm9yczoKCiAgIENPTkZJR19BUk02NF9WQV9C
-SVRTXzQyPXkKICAgQ09ORklHX0FSTTY0X1BBR0VfU0hJRlQ9MTYKICAgQ09ORklHX1BHVEFCTEVf
-TEVWRUxTPTMKCiAgIGFyY2gvYXJtNjQva3ZtL21tdS5jOiBJbiBmdW5jdGlvbiDigJh1c2VyX21l
-bV9hYm9ydOKAmToKICAgYXJjaC9hcm02NC9rdm0vbW11LmM6Nzk4OjI6IGVycm9yOiBkdXBsaWNh
-dGUgY2FzZSB2YWx1ZQogICAgIGNhc2UgUE1EX1NISUZUOgogICAgIF5+fn4KICAgYXJjaC9hcm02
-NC9rdm0vbW11LmM6NzkxOjI6IG5vdGU6IHByZXZpb3VzbHkgdXNlZCBoZXJlCiAgICAgY2FzZSBQ
-VURfU0hJRlQ6CiAgICAgXn5+fgoKVGhpcyBmaXhlcyB0aGUgaXNzdWUgYnkgc2tpcHBpbmcgdGhl
-IGNoZWNrIG9uIFBVRCBodWdlIHBhZ2Ugd2hlbiBQVUQKYW5kIFBNRCBhcmUgZm9sZGVkIGludG8g
-UEdELgoKRml4ZXM6IDJmNDBjNDYwMjFiYmIgKCJLVk06IGFybTY0OiBVc2UgZmFsbGJhY2sgbWFw
-cGluZyBzaXplcyBmb3IgY29udGlndW91cyBodWdlIHBhZ2Ugc2l6ZXMiKQpSZXBvcnRlZC1ieTog
-RXJpYyBBdWdlciA8ZXJpYy5hdWdlckByZWRoYXQuY29tPgpTaWduZWQtb2ZmLWJ5OiBHYXZpbiBT
-aGFuIDxnc2hhbkByZWRoYXQuY29tPgpTaWduZWQtb2ZmLWJ5OiBNYXJjIFp5bmdpZXIgPG1hekBr
-ZXJuZWwub3JnPgpMaW5rOiBodHRwczovL2xvcmUua2VybmVsLm9yZy9yLzIwMjAxMTAzMDAzMDA5
-LjMyOTU1LTEtZ3NoYW5AcmVkaGF0LmNvbQotLS0KIGFyY2gvYXJtNjQva3ZtL21tdS5jIHwgMiAr
-KwogMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKQoKZGlmZiAtLWdpdCBhL2FyY2gvYXJt
-NjQva3ZtL21tdS5jIGIvYXJjaC9hcm02NC9rdm0vbW11LmMKaW5kZXggYzdjNmRmNjMwOWQ1Li5h
-MTA5YzUwMDE4MjcgMTAwNjQ0Ci0tLSBhL2FyY2gvYXJtNjQva3ZtL21tdS5jCisrKyBiL2FyY2gv
-YXJtNjQva3ZtL21tdS5jCkBAIC03ODgsMTAgKzc4OCwxMiBAQCBzdGF0aWMgaW50IHVzZXJfbWVt
-X2Fib3J0KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgcGh5c19hZGRyX3QgZmF1bHRfaXBhLAogCX0K
-IAogCXN3aXRjaCAodm1hX3NoaWZ0KSB7CisjaWZuZGVmIF9fUEFHRVRBQkxFX1BNRF9GT0xERUQK
-IAljYXNlIFBVRF9TSElGVDoKIAkJaWYgKGZhdWx0X3N1cHBvcnRzX3N0YWdlMl9odWdlX21hcHBp
-bmcobWVtc2xvdCwgaHZhLCBQVURfU0laRSkpCiAJCQlicmVhazsKIAkJZmFsbHRocm91Z2g7Cisj
-ZW5kaWYKIAljYXNlIENPTlRfUE1EX1NISUZUOgogCQl2bWFfc2hpZnQgPSBQTURfU0hJRlQ7CiAJ
-CWZhbGx0aHJvdWdoOwotLSAKMi4yOC4wCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1
-bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9r
-dm1hcm0K
+Hi Paolo,
+
+Here's the second set of fixes for 5.10. A compilation fix for
+non-48bit VA builds and a live migration regressions are on the menu
+this time. I have another set of regression fixes brewing, but in the
+meantime this will fit nicely in mainline.
+
+Please pull,
+
+	M.
+
+The following changes since commit 22f553842b14a1289c088a79a67fb479d3fa2a4e:
+
+  KVM: arm64: Handle Asymmetric AArch32 systems (2020-10-30 16:06:22 +0000)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.10-2
+
+for you to fetch changes up to c512298eed0360923d0cbc4a1f30bc0509af0d50:
+
+  KVM: arm64: Remove AA64ZFR0_EL1 accessors (2020-11-06 16:00:29 +0000)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for v5.10, take #2
+
+- Fix compilation error when PMD and PUD are folded
+- Fix regresssion of the RAZ behaviour of ID_AA64ZFR0_EL1
+
+----------------------------------------------------------------
+Andrew Jones (4):
+      KVM: arm64: Don't hide ID registers from userspace
+      KVM: arm64: Consolidate REG_HIDDEN_GUEST/USER
+      KVM: arm64: Check RAZ visibility in ID register accessors
+      KVM: arm64: Remove AA64ZFR0_EL1 accessors
+
+Gavin Shan (1):
+      KVM: arm64: Fix build error in user_mem_abort()
+
+ arch/arm64/kvm/mmu.c      |   2 +
+ arch/arm64/kvm/sys_regs.c | 108 ++++++++++++++--------------------------------
+ arch/arm64/kvm/sys_regs.h |  16 +++----
+ 3 files changed, 43 insertions(+), 83 deletions(-)
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
