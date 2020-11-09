@@ -7,78 +7,77 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36EA1C56202
-	for <kvmarm@archiver.kernel.org>; Mon,  9 Nov 2020 11:32:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5537C2D0A3
+	for <kvmarm@archiver.kernel.org>; Mon,  9 Nov 2020 11:32:51 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B319820731
-	for <kvmarm@archiver.kernel.org>; Mon,  9 Nov 2020 11:32:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 387A2206A4
+	for <kvmarm@archiver.kernel.org>; Mon,  9 Nov 2020 11:32:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="tKDv7a9R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B319820731
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="KiIaN07L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 387A2206A4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3FC7C4B757;
-	Mon,  9 Nov 2020 06:32:48 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B7AF74B60F;
+	Mon,  9 Nov 2020 06:32:50 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id LVcT4IzkZqw6; Mon,  9 Nov 2020 06:32:47 -0500 (EST)
+	with ESMTP id enb9z1vFxonA; Mon,  9 Nov 2020 06:32:50 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 36A7A4B76B;
-	Mon,  9 Nov 2020 06:32:47 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 54F3B4B761;
+	Mon,  9 Nov 2020 06:32:49 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F1E94B741
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Nov 2020 06:32:46 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5016F4B74F
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Nov 2020 06:32:48 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dt4YYdPktzTx for <kvmarm@lists.cs.columbia.edu>;
- Mon,  9 Nov 2020 06:32:45 -0500 (EST)
-Received: from mail-wm1-f65.google.com (mail-wm1-f65.google.com
- [209.85.128.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3811F4B759
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Nov 2020 06:32:45 -0500 (EST)
-Received: by mail-wm1-f65.google.com with SMTP id h2so7655908wmm.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 09 Nov 2020 03:32:45 -0800 (PST)
+ with ESMTP id amhqg5h+PdOw for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  9 Nov 2020 06:32:47 -0500 (EST)
+Received: from mail-wr1-f68.google.com (mail-wr1-f68.google.com
+ [209.85.221.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3EB6A4B772
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Nov 2020 06:32:47 -0500 (EST)
+Received: by mail-wr1-f68.google.com with SMTP id l1so3906270wrb.9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 09 Nov 2020 03:32:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=f226i52yIUjNH4HBJOMzOEDrBWriDTS35aJrFSCy+Ic=;
- b=tKDv7a9REysuwMcfZXBWv7HtDLUfJLSTc25Wz4yG+dYB9FiY+ZSpS20+jeI7ruPf4I
- /fRs+zUVAIUMH1v15ddDDay1fvfPcrhZMC5kpfB1XWwITdN/8S2pMA+But30yQSNFNB8
- jXgP2h4bzV7gV3d+faa8zOcxytIQ75QP4e6KxzkSUI0fLT1OOhTj4AvNRjPQ6XdKxesG
- ND6CsW+tx1PrW/9Sz/H3LHqnbchMyHOUycxmZIOc1N/2GLN4ul752VNg35nnWTjEXdVH
- EK3JO5SzqaS0OeDrJpetOM5SGKT+6ZRfLDHKcoyYlwBds01zZYnphO02pxAGc+J+wzvK
- hRJw==
+ bh=9OHqVwmdHbsEbVYkhzfrXC3pmS5HWpDM4H+UgWkOTQ0=;
+ b=KiIaN07Lql/jsar+Pt0YQtblLh2tpYdnoBcMlX29cx4cFAvQMzXKXI+pjxYH3unmqQ
+ B+zG3cP1r+fCsNjx8DeGaHDo8SboteYbmIYfeUizmQMZYo3cUYcCibjZvKN/CLLT+zDq
+ aKmyD15Ykq4sM0Shfe+MpPiQuhryzEAul/E++NLOoq2+NdMg1H5kTt1jdgL5Iw2CCCl5
+ 3wAxMjWaTyo1od7ojAO3Q599m4BH9FRsMUHGtqQza1xEDXjT4Un/SuuyGuroklXuacGI
+ gXj7WBqwBRoBphWrGfXGFX1zCd7zDb/0rhYJ+C2fuz932FB5h14Dh/1Vxl+/opRVXRqN
+ +hKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=f226i52yIUjNH4HBJOMzOEDrBWriDTS35aJrFSCy+Ic=;
- b=nWjiltfYwMSNCpU3ztfuCiuLmKSeiM61isC4UUXSwKEqlQujwx3nLFkFa0J+1HQeAO
- Q44fYewWKP522QWVjgt0j4HGHtZyDWsPLvhcDKclULwAPjHmvL4j5aZiEnzncdCJz+Jb
- Ako8EgCtEQu/uDCzlshJsMMw7U2FamdCHg+drb5CMp3P5Vsf6XpK54JsWN0HREJhPcJi
- 2A+J1FqZ+VFOvANNbuoUFz58VisXwIDVJxkprlBFRH+Ke3pm+JFbmXpOm3d7lJeQC/Pp
- 1Jt0Mo2aZiroPJ/7+Ed0DQRCK6C2MtjGiwA24jtKBWapwFhXjDq5hnP+v9tw5qCn+IgF
- DuFw==
-X-Gm-Message-State: AOAM532qtmOeMqXYFv+Np7E4j75/kPLwWIZAHRDpROZ/M2Jk4ra6QOPy
- QvXLGXa5XwXE4gVqntqK5rKxuRz44MIJZYm3
-X-Google-Smtp-Source: ABdhPJwoENuVGCK5XFTaDJ8MaIk0VaZFOfs2tSaTvsARZ9sJi9l+ITqvhV3gCNpUzPG+TP47XhXsRw==
-X-Received: by 2002:a1c:7dc8:: with SMTP id
- y191mr14412755wmc.118.1604921563823; 
- Mon, 09 Nov 2020 03:32:43 -0800 (PST)
+ bh=9OHqVwmdHbsEbVYkhzfrXC3pmS5HWpDM4H+UgWkOTQ0=;
+ b=M1x1n0AUH3FgWkG04nk5gH8bCmyF9/OolM5EHzLjwSTYvE1+2VH7vK8G7mqrn2Zsyk
+ Svj3BWLPsjXvnZhVXJn5S5GZDk1q4jUvANW0KpA8TC1pok36UiE9ZDnjJG7kycRnkJ85
+ aGE9my+gvkIGk6m9yZFxAEtqLNIeT1DcOxbTWdEVCG+8KBbA9Uvrb8+PRvjtTmlaaafm
+ DCZJdHQLxj7Rz6xgMKrsKhBoQXxJmzvAfkW3JAok9fIi4c/u7OUX8+68csDA9dkNjb6N
+ u3LxezXgpBwmLtx6WsDc77VZmikxmud9H4Vcm9Y1z2otTDUEW8kOb+Mzqz7+9XgmBDnN
+ AA/w==
+X-Gm-Message-State: AOAM531i00FU0bIsUauBvRpEjCJhrVIbSMSe7TvCotckUuCDZuOZoyS+
+ OikOd4e0Hd3zvTTzNJj1MA+7G1JLR9Iaof/Y
+X-Google-Smtp-Source: ABdhPJy9YbQLl6FOlXdSqqJeLuvcE3K3eiWcMuLImPT2P8noAXyO9kqewE+UUaL2JJaCpFto5lJFdQ==
+X-Received: by 2002:adf:804b:: with SMTP id 69mr17407493wrk.274.1604921565923; 
+ Mon, 09 Nov 2020 03:32:45 -0800 (PST)
 Received: from localhost ([2a01:4b00:8523:2d03:209d:10b7:c480:3e1f])
- by smtp.gmail.com with ESMTPSA id h4sm12847197wrp.52.2020.11.09.03.32.42
+ by smtp.gmail.com with ESMTPSA id v6sm14976826wrb.53.2020.11.09.03.32.44
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 09 Nov 2020 03:32:42 -0800 (PST)
+ Mon, 09 Nov 2020 03:32:45 -0800 (PST)
 From: David Brazdil <dbrazdil@google.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v1 02/24] psci: Accessor for configured PSCI function IDs
-Date: Mon,  9 Nov 2020 11:32:11 +0000
-Message-Id: <20201109113233.9012-3-dbrazdil@google.com>
+Subject: [PATCH v1 03/24] arm64: Move MAIR_EL1_SET to asm/memory.h
+Date: Mon,  9 Nov 2020 11:32:12 +0000
+Message-Id: <20201109113233.9012-4-dbrazdil@google.com>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201109113233.9012-1-dbrazdil@google.com>
 References: <20201109113233.9012-1-dbrazdil@google.com>
@@ -105,64 +104,64 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Function IDs used by PSCI are configurable for v0.1 via DT/APCI. If the
-host is using PSCI v0.1, KVM's host PSCI proxy needs to use the same IDs.
-Expose the array holding the information with a read-only accessor.
+KVM currently initializes MAIR_EL2 to the value of MAIR_EL1. In
+preparation for initializing MAIR_EL2 before MAIR_EL1, move the constant
+into a shared header file.
 
 Signed-off-by: David Brazdil <dbrazdil@google.com>
 ---
- drivers/firmware/psci/psci.c | 14 ++++++--------
- include/linux/psci.h         | 10 ++++++++++
- 2 files changed, 16 insertions(+), 8 deletions(-)
+ arch/arm64/include/asm/memory.h | 13 +++++++++++++
+ arch/arm64/mm/proc.S            | 13 -------------
+ 2 files changed, 13 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/firmware/psci/psci.c b/drivers/firmware/psci/psci.c
-index bc1b2d60fdbf..b67b2ba8a084 100644
---- a/drivers/firmware/psci/psci.c
-+++ b/drivers/firmware/psci/psci.c
-@@ -65,16 +65,14 @@ typedef unsigned long (psci_fn)(unsigned long, unsigned long,
- 				unsigned long, unsigned long);
- static psci_fn *invoke_psci_fn;
+diff --git a/arch/arm64/include/asm/memory.h b/arch/arm64/include/asm/memory.h
+index cd61239bae8c..aca00737e771 100644
+--- a/arch/arm64/include/asm/memory.h
++++ b/arch/arm64/include/asm/memory.h
+@@ -152,6 +152,19 @@
+ #define MT_S2_FWB_NORMAL	6
+ #define MT_S2_FWB_DEVICE_nGnRE	1
  
--enum psci_function {
--	PSCI_FN_CPU_SUSPEND,
--	PSCI_FN_CPU_ON,
--	PSCI_FN_CPU_OFF,
--	PSCI_FN_MIGRATE,
--	PSCI_FN_MAX,
--};
++/*
++ * Default MAIR_EL1. MT_NORMAL_TAGGED is initially mapped as Normal memory and
++ * changed during __cpu_setup to Normal Tagged if the system supports MTE.
++ */
++#define MAIR_EL1_SET							\
++	(MAIR_ATTRIDX(MAIR_ATTR_DEVICE_nGnRnE, MT_DEVICE_nGnRnE) |	\
++	 MAIR_ATTRIDX(MAIR_ATTR_DEVICE_nGnRE, MT_DEVICE_nGnRE) |	\
++	 MAIR_ATTRIDX(MAIR_ATTR_DEVICE_GRE, MT_DEVICE_GRE) |		\
++	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL_NC, MT_NORMAL_NC) |		\
++	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL, MT_NORMAL) |			\
++	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL_WT, MT_NORMAL_WT) |		\
++	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL, MT_NORMAL_TAGGED))
++
+ #ifdef CONFIG_ARM64_4K_PAGES
+ #define IOREMAP_MAX_ORDER	(PUD_SHIFT)
+ #else
+diff --git a/arch/arm64/mm/proc.S b/arch/arm64/mm/proc.S
+index 23c326a06b2d..25ff21b3a1c6 100644
+--- a/arch/arm64/mm/proc.S
++++ b/arch/arm64/mm/proc.S
+@@ -45,19 +45,6 @@
+ #define TCR_KASAN_FLAGS 0
+ #endif
+ 
+-/*
+- * Default MAIR_EL1. MT_NORMAL_TAGGED is initially mapped as Normal memory and
+- * changed during __cpu_setup to Normal Tagged if the system supports MTE.
+- */
+-#define MAIR_EL1_SET							\
+-	(MAIR_ATTRIDX(MAIR_ATTR_DEVICE_nGnRnE, MT_DEVICE_nGnRnE) |	\
+-	 MAIR_ATTRIDX(MAIR_ATTR_DEVICE_nGnRE, MT_DEVICE_nGnRE) |	\
+-	 MAIR_ATTRIDX(MAIR_ATTR_DEVICE_GRE, MT_DEVICE_GRE) |		\
+-	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL_NC, MT_NORMAL_NC) |		\
+-	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL, MT_NORMAL) |			\
+-	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL_WT, MT_NORMAL_WT) |		\
+-	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL, MT_NORMAL_TAGGED))
 -
- static u32 psci_function_id[PSCI_FN_MAX];
- 
-+u32 psci_get_function_id(enum psci_function fn)
-+{
-+	WARN_ON(fn >= PSCI_FN_MAX);
-+	return psci_function_id[fn];
-+}
-+
- #define PSCI_0_2_POWER_STATE_MASK		\
- 				(PSCI_0_2_POWER_STATE_ID_MASK | \
- 				PSCI_0_2_POWER_STATE_TYPE_MASK | \
-diff --git a/include/linux/psci.h b/include/linux/psci.h
-index 5b5dcf176aa6..8fe681a7b43d 100644
---- a/include/linux/psci.h
-+++ b/include/linux/psci.h
-@@ -29,6 +29,16 @@ bool psci_has_osi_support(void);
-  */
- int psci_driver_version(void);
- 
-+enum psci_function {
-+	PSCI_FN_CPU_SUSPEND,
-+	PSCI_FN_CPU_ON,
-+	PSCI_FN_CPU_OFF,
-+	PSCI_FN_MIGRATE,
-+	PSCI_FN_MAX,
-+};
-+
-+u32 psci_get_function_id(enum psci_function fn);
-+
- struct psci_operations {
- 	u32 (*get_version)(void);
- 	int (*cpu_suspend)(u32 state, unsigned long entry_point);
+ #ifdef CONFIG_CPU_PM
+ /**
+  * cpu_do_suspend - save CPU registers context
 -- 
 2.29.2.222.g5d2a92d10f8-goog
 
