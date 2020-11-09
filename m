@@ -2,90 +2,65 @@ Return-Path: <SRS0=1ake=EP=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14434C2D0A3
-	for <kvmarm@archiver.kernel.org>; Mon,  9 Nov 2020 18:10:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EB6AC5517A
+	for <kvmarm@archiver.kernel.org>; Mon,  9 Nov 2020 21:47:50 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4404820678
-	for <kvmarm@archiver.kernel.org>; Mon,  9 Nov 2020 18:10:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 96C0A21D7F
+	for <kvmarm@archiver.kernel.org>; Mon,  9 Nov 2020 21:47:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="KUtZu1Rn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4404820678
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="fuztUsKn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96C0A21D7F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CA90E4B767;
-	Mon,  9 Nov 2020 13:10:11 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E5E7E4BA3D;
+	Mon,  9 Nov 2020 16:47:48 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id h2Iny0DDtw3S; Mon,  9 Nov 2020 13:10:10 -0500 (EST)
+	with ESMTP id fhrKMvBSxZVu; Mon,  9 Nov 2020 16:47:47 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BFE3A4B97E;
-	Mon,  9 Nov 2020 13:10:10 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F7E14BA29;
+	Mon,  9 Nov 2020 16:47:47 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 594D04B6DA
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Nov 2020 13:10:10 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E050A4BA28
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Nov 2020 16:47:45 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id I5zaUMsJO9es for <kvmarm@lists.cs.columbia.edu>;
- Mon,  9 Nov 2020 13:10:09 -0500 (EST)
+ with ESMTP id 5CHa68fLuCNR for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  9 Nov 2020 16:47:44 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3725A4B619
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Nov 2020 13:10:09 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C5CB24B47A
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Nov 2020 16:47:44 -0500 (EST)
+Received: from localhost.localdomain (236.31.169.217.in-addr.arpa
+ [217.169.31.236])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id E735F20678;
- Mon,  9 Nov 2020 18:10:07 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 2FC34206CB;
+ Mon,  9 Nov 2020 21:47:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1604945408;
- bh=nYCGURReaUreeGBHrXbl9iNHp3A/C4AwY6eb8qAExsQ=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=KUtZu1RnUQqSxMBLI3fAWGVI5lMwBSpHUy5touvUvB0NURtA38bMOPugtz9BGhOQy
- vb35Fbvo9bPZjR3ZxgiiFfPdpk/Rha9GnYZk8knuTKFTryuOAjbfrxWFBSytOqzZZC
- sXJIhflIuW0amm+u+oHEvdGvGrD89NPunTQZb7cY=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
- TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
- (envelope-from <maz@kernel.org>)
- id 1kcBcD-009BeV-RM; Mon, 09 Nov 2020 18:10:05 +0000
+ s=default; t=1604958463;
+ bh=fLsn8jMVnIW2C1S+T/0flKyelVZfEjX4Jj6ebm5Z7jo=;
+ h=From:To:Cc:Subject:Date:From;
+ b=fuztUsKnwt8ytQ95KU9Q7gQwIQl6ksShQSxKyKZLDmw53PUPntmPb8KN3MmXQCviF
+ LqIukT+wuA/n+tYy90glgS7P+a3bTCTWT4mBzaRQSEY9tSwX/g3DpSVcg1tzzmGXSv
+ OBrBQUSqqgYWTZUnIyLk5DWgK/+V604uIpEvDy1M=
+From: Will Deacon <will@kernel.org>
+To: kvmarm@lists.cs.columbia.edu
+Subject: [PATCH v2 0/9] Rework hyp vector handling
+Date: Mon,  9 Nov 2020 21:47:17 +0000
+Message-Id: <20201109214726.15276-1-will@kernel.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Date: Mon, 09 Nov 2020 18:10:05 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Quentin Perret <qperret@google.com>
-Subject: Re: [PATCH v1 17/24] kvm: arm64: Add __hyp_pa_symbol helper macro
-In-Reply-To: <20201109165933.GA447754@google.com>
-References: <20201109113233.9012-1-dbrazdil@google.com>
- <20201109113233.9012-18-dbrazdil@google.com>
- <20201109165933.GA447754@google.com>
-User-Agent: Roundcube Webmail/1.4.9
-Message-ID: <1951645a457232caeca323bec2af5408@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: qperret@google.com, dbrazdil@google.com,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, james.morse@arm.com,
- julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, catalin.marinas@arm.com,
- will@kernel.org, dennis@kernel.org, tj@kernel.org, cl@linux.com,
- mark.rutland@arm.com, lorenzo.pieralisi@arm.com, ascull@google.com,
- qwandor@google.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kernel-team@android.com, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
- Andrew Walbran <qwandor@google.com>, Catalin Marinas <catalin.marinas@arm.com>,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Tejun Heo <tj@kernel.org>, Dennis Zhou <dennis@kernel.org>,
- Christoph Lameter <cl@linux.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+Cc: catalin.marinas@arm.com, kernel-team@android.com,
+ Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -97,57 +72,58 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2020-11-09 16:59, Quentin Perret wrote:
-> Hey David,
-> 
-> On Monday 09 Nov 2020 at 11:32:26 (+0000), David Brazdil wrote:
->> Add helper macro for computing the PA of a kernel symbol in nVHE hyp
->> code. This will be useful for computing the PA of a PSCI CPU_ON entry
->> point.
->> 
->> Signed-off-by: David Brazdil <dbrazdil@google.com>
->> ---
->>  arch/arm64/kvm/hyp/nvhe/psci.c | 10 ++++++++++
->>  1 file changed, 10 insertions(+)
->> 
->> diff --git a/arch/arm64/kvm/hyp/nvhe/psci.c 
->> b/arch/arm64/kvm/hyp/nvhe/psci.c
->> index b0b5df590ba5..7510b9e174e9 100644
->> --- a/arch/arm64/kvm/hyp/nvhe/psci.c
->> +++ b/arch/arm64/kvm/hyp/nvhe/psci.c
->> @@ -20,6 +20,16 @@ s64 hyp_physvirt_offset;
->> 
->>  #define __hyp_pa(x) ((phys_addr_t)((x)) + hyp_physvirt_offset)
->> 
->> +#define __hyp_pa_symbol(sym)					\
->> +	({							\
->> +		extern char sym[];				\
->> +		unsigned long kern_va;				\
->> +								\
->> +		asm volatile("ldr %0, =%1" : "=r" (kern_va)	\
->> +					   : "S" (sym));	\
->> +		kern_va - kimage_voffset;			\
->> +	})
->> +
-> 
-> Could this be simplified to __hyp_pa(hyp_symbol_addr(sym))? That would
-> avoid the dependency on kimage_voffset.
+Hi folks,
 
-I'm going to move away from evaluating kimage_voffset at runtime anyway,
-see [1].
+This is version two of the patches I previously posted here:
 
-Thanks,
+https://lore.kernel.org/r/20201026155833.24847-1-will@kernel.org
 
-         M.
+All I've done since then is rebase and retest against -rc3.
 
-[1] https://lore.kernel.org/r/20201109175923.445945-1-maz@kernel.org
+Cheers,
+
+Will
+
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Quentin Perret <qperret@google.com>
+
+--->8
+
+Will Deacon (9):
+  KVM: arm64: Remove redundant Spectre-v2 code from kvm_map_vector()
+  KVM: arm64: Tidy up kvm_map_vector()
+  KVM: arm64: Move kvm_get_hyp_vector() out of header file
+  KVM: arm64: Make BP hardening globals static instead
+  KVM: arm64: Move BP hardening helpers into spectre.h
+  KVM: arm64: Re-jig logic when patching hardened hyp vectors
+  KVM: arm64: Allocate hyp vectors statically
+  arm64: spectre: Rename ARM64_HARDEN_EL2_VECTORS to ARM64_SPECTRE_V3A
+  arm64: spectre: Consolidate spectre-v3a detection
+
+ Documentation/arm64/memory.rst   |  2 +-
+ arch/arm64/include/asm/cpucaps.h |  2 +-
+ arch/arm64/include/asm/kvm_asm.h |  5 --
+ arch/arm64/include/asm/kvm_mmu.h | 46 -----------------
+ arch/arm64/include/asm/mmu.h     | 29 -----------
+ arch/arm64/include/asm/spectre.h | 63 +++++++++++++++++++++++
+ arch/arm64/kernel/cpu_errata.c   | 19 +++----
+ arch/arm64/kernel/proton-pack.c  | 84 ++++++++++++------------------
+ arch/arm64/kvm/arm.c             | 87 ++++++++++++++++++++------------
+ arch/arm64/kvm/hyp/Makefile      |  2 +-
+ arch/arm64/kvm/hyp/hyp-entry.S   | 72 ++++++++++++++------------
+ arch/arm64/kvm/hyp/smccc_wa.S    | 32 ------------
+ arch/arm64/kvm/va_layout.c       | 23 +--------
+ 13 files changed, 204 insertions(+), 262 deletions(-)
+ delete mode 100644 arch/arm64/kvm/hyp/smccc_wa.S
+
 -- 
-Jazz is not dead. It just smells funny...
+2.29.2.222.g5d2a92d10f8-goog
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
