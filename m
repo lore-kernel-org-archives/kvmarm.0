@@ -3,72 +3,72 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90CF4C4741F
-	for <kvmarm@archiver.kernel.org>; Tue, 10 Nov 2020 10:01:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C660C388F7
+	for <kvmarm@archiver.kernel.org>; Tue, 10 Nov 2020 10:14:11 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A6D50205CA
-	for <kvmarm@archiver.kernel.org>; Tue, 10 Nov 2020 10:01:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3DA54207BB
+	for <kvmarm@archiver.kernel.org>; Tue, 10 Nov 2020 10:14:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="U/y1gcA/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6D50205CA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="AH5Au2n/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DA54207BB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DC84F4B368;
-	Tue, 10 Nov 2020 05:01:31 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B44F44B6ED;
+	Tue, 10 Nov 2020 05:14:09 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JySdBCPZqpUI; Tue, 10 Nov 2020 05:01:22 -0500 (EST)
+	with ESMTP id TXxNaU6Juopv; Tue, 10 Nov 2020 05:14:08 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D55B4B7B5;
-	Tue, 10 Nov 2020 05:01:22 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 558D44B70D;
+	Tue, 10 Nov 2020 05:14:08 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F0C94B741
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Nov 2020 05:01:21 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 098BF4B70D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Nov 2020 05:14:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id u+FckugWBVzj for <kvmarm@lists.cs.columbia.edu>;
- Tue, 10 Nov 2020 05:01:20 -0500 (EST)
+ with ESMTP id 2K7p2kVmndjy for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 10 Nov 2020 05:14:06 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F2A044B73F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Nov 2020 05:01:19 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CFCE44B6ED
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Nov 2020 05:14:05 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id A6BA9205CA;
- Tue, 10 Nov 2020 10:01:18 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 5116620797;
+ Tue, 10 Nov 2020 10:14:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1605002478;
- bh=MpYOqpfrkwMeRZHEzlIP04lGoaO0Nbgm2RSKublJQ1I=;
+ s=default; t=1605003244;
+ bh=oiJduJ6dIM4xNThorZ5/RiydXGO4yrO5KxVvhHyptiQ=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=U/y1gcA/cMKkNo7E7KkcZpSJMwUYIzi72RorNUsPfOlEtHUk71qt+xVWr0H9C7Zcg
- 2bpClkgIUABwQH2O8KyHqgjv+mbxUOXpheziOOtyJWE1AO9AdMv26yLNzHyizQGdpL
- Og/S97nF8WVcHsPZhOvGZhCaxE7o4YLGp0iNmFPk=
+ b=AH5Au2n/A0Yz7YVrSjo4FFX9ASh+3wqIKP+XbCvsyYtlvIzTPCKvJeh28LZwaCqm2
+ XTnHvlm5TxGhbQXaks3vXf0w20abUha2ETN64x8534dxYivipgw/FV1sjOfUNQG8g8
+ rknEH5xZYUyUULE/vkzI3IotOTINjEJtDdAr5EY4=
 Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
  by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
  TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1kcQSi-009PMa-8c; Tue, 10 Nov 2020 10:01:16 +0000
+ id 1kcQf4-009Pd8-B0; Tue, 10 Nov 2020 10:14:02 +0000
 MIME-Version: 1.0
-Date: Tue, 10 Nov 2020 10:01:16 +0000
+Date: Tue, 10 Nov 2020 10:14:02 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH 1/8] KVM: arm64: Move AArch32 exceptions over to AArch64
+Subject: Re: [PATCH 3/8] KVM: arm64: Map AArch32 cp15 register to AArch64
  sysregs
-In-Reply-To: <58942c6b-9cf2-a0d7-3ba5-2fc42aeef779@arm.com>
+In-Reply-To: <b6628cea-520a-90bd-3c42-82ed2863c4af@arm.com>
 References: <20201102191609.265711-1-maz@kernel.org>
- <20201102191609.265711-2-maz@kernel.org>
- <58942c6b-9cf2-a0d7-3ba5-2fc42aeef779@arm.com>
+ <20201102191609.265711-4-maz@kernel.org>
+ <b6628cea-520a-90bd-3c42-82ed2863c4af@arm.com>
 User-Agent: Roundcube Webmail/1.4.9
-Message-ID: <99e4733efb9ec810b52662597e61b92b@kernel.org>
+Message-ID: <256242247e00a3dba3ab281c3a06c1dc@kernel.org>
 X-Sender: maz@kernel.org
 X-SA-Exim-Connect-IP: 51.254.78.96
 X-SA-Exim-Rcpt-To: james.morse@arm.com, kvm@vger.kernel.org,
@@ -99,51 +99,101 @@ On 2020-11-03 18:29, James Morse wrote:
 > Hi Marc,
 > 
 > On 02/11/2020 19:16, Marc Zyngier wrote:
->> The use of the AArch32-specific accessors have always been a bit
->> annoying on 64bit, and it is time for a change.
->> 
->> Let's move the AArch32 exception injection over to the AArch64 
->> encoding,
->> which requires us to split the two halves of FAR_EL1 into DFAR and 
->> IFAR.
->> This enables us to drop the preempt_disable() games on VHE, and to 
->> kill
->> the last user of the vcpu_cp15() macro.
+>> Move all the cp15 registers over to their AArch64 counterpart.
+>> This requires the annotation of a few of them (such as the usual
+>> DFAR/IFAR vs FAR_EL1), and a new helper that generates mask/shift
+>> pairs for the various configurations.
 > 
-> Hurrah!
-> 
-> 
->> diff --git a/arch/arm64/kvm/inject_fault.c 
->> b/arch/arm64/kvm/inject_fault.c
->> index e2a2e48ca371..975f65ba6a8b 100644
->> --- a/arch/arm64/kvm/inject_fault.c
->> +++ b/arch/arm64/kvm/inject_fault.c
->> @@ -100,39 +81,36 @@ static void inject_undef32(struct kvm_vcpu *vcpu)
->>   * Modelled after TakeDataAbortException() and 
->> TakePrefetchAbortException
->>   * pseudocode.
->>   */
->> -static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt,
->> -			 unsigned long addr)
->> +static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt, u32 
->> addr)
+>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+>> index 26c7c25f8a6d..137818793a4a 100644
+>> --- a/arch/arm64/kvm/sys_regs.c
+>> +++ b/arch/arm64/kvm/sys_regs.c
+>> @@ -138,26 +156,16 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
+>>  			  const struct sys_reg_desc *r)
 >>  {
->> -	u32 *far, *fsr;
->> -	bool is_lpae;
->> -	bool loaded;
->> +	u64 far;
->> +	u32 fsr;
+>>  	bool was_enabled = vcpu_has_cache_enabled(vcpu);
+>> -	u64 val;
+>> -	int reg = r->reg;
+>> +	u64 val, mask, shift;
+>> 
+>>  	BUG_ON(!p->is_write);
+>> 
+>> -	/* See the 32bit mapping in kvm_host.h */
+>> -	if (p->is_aarch32)
+>> -		reg = r->reg / 2;
+>> +	get_access_mask(r, &mask, &shift);
+>> 
+>> -	if (!p->is_aarch32 || !p->is_32bit) {
+>> -		val = p->regval;
+>> -	} else {
+>> -		val = vcpu_read_sys_reg(vcpu, reg);
+>> -		if (r->reg % 2)
+>> -			val = (p->regval << 32) | (u64)lower_32_bits(val);
+>> -		else
+>> -			val = ((u64)upper_32_bits(val) << 32) |
+>> -				lower_32_bits(p->regval);
+>> -	}
+>> -	vcpu_write_sys_reg(vcpu, val, reg);
 > 
+>> +	val = vcpu_read_sys_reg(vcpu, r->reg);
+>> +	val &= ~mask;
+>> +	val |= (p->regval & (mask >> shift)) << shift;
+>> +	vcpu_write_sys_reg(vcpu, val, r->reg);
 > 
->> +	/* Give the guest an IMPLEMENTATION DEFINED exception */
->> +	if (__vcpu_sys_reg(vcpu, TCR_EL1) & TTBCR_EAE) {
+> I can't tell if the compiler has worked out ithat it can skip the
+> sys_read most of the
+> time... Won't some of these trap for a nested VHE hypervisor?
 > 
-> With VHE, won't __vcpu_sys_reg() read the potentially stale copy in
-> the sys_reg array?
-> 
-> vcpu_read_sys_reg()?
+> | if (~mask) {
+> |	val = vcpu_read_sys_reg(vcpu, r->reg);
+> |	val &= ~mask;
+> | }
 
-Of course you are right. Now fixed.
+Seems like a good call. I'm happy to fold that in.
+
+> 
+> 
+> But, as the sys_reg arrays already have indirection for this function, 
+> why does
+> access_vm_reg() have to deal with this at all? Its not even needed for
+> all the aarch32 registers...
+> 
+> 
+> | { AA32(LO), Op1( 0), CRn(10), CRm( 2), Op2( 0),
+> access_aarch32_alias, NULL, MAIR_EL1 },
+> 
+> Where access_aarch32_alias() does the shift+mask and read_modify-write
+> on the sys_reg?
+
+
+I don't really like the idea of separate handlers. The whole point is to
+unify the two view, and I feel like having yet another indirection makes
+it harder to maintain.
+
+> 
+>>  	kvm_toggle_cache(vcpu, was_enabled);
+>>  	return true;
+> 
+>> @@ -1919,19 +1919,24 @@ static const struct sys_reg_desc 
+>> cp14_64_regs[] = {
+>>   */
+>>  static const struct sys_reg_desc cp15_regs[] = {
+> 
+>> -	{ Op1( 0), CRn( 2), CRm( 0), Op2( 2), access_vm_reg, NULL, c2_TTBCR 
+>> },
+> 
+>> +	{ Op1( 0), CRn( 2), CRm( 0), Op2( 2), access_vm_reg, NULL, TCR_EL1 
+>> },
+> 
+> Don't look now ... TTBRCR2 means this one is a LO/HI job.
+
+That's the problem with AArch32. You stop looking for a couple of years,
+and it decides to throw a new sysreg at you without any notice. WTF?
+
+> (I'm guessing that should be fixed before this series to make the 
+> backport easy)
+
+I'll work something out as a prologue to this series.
 
 Thanks,
 
