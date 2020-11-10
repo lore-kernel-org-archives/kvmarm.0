@@ -2,80 +2,78 @@ Return-Path: <SRS0=+U1N=EQ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,MAILING_LIST_MULTI,RCVD_DOTEDU_SUSP,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D255EC56201
-	for <kvmarm@archiver.kernel.org>; Tue, 10 Nov 2020 13:36:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 913D3C4742C
+	for <kvmarm@archiver.kernel.org>; Tue, 10 Nov 2020 14:13:22 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 577D420797
-	for <kvmarm@archiver.kernel.org>; Tue, 10 Nov 2020 13:36:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C0BB620797
+	for <kvmarm@archiver.kernel.org>; Tue, 10 Nov 2020 14:13:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="O6qbaBQ8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 577D420797
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="eevBjJdx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0BB620797
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0129D4B99F;
-	Tue, 10 Nov 2020 08:36:47 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1ABE44B8BC;
+	Tue, 10 Nov 2020 09:13:21 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JMwjK34TYPqx; Tue, 10 Nov 2020 08:36:45 -0500 (EST)
+	with ESMTP id 5hTDzCvsMkgf; Tue, 10 Nov 2020 09:13:18 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C08DB4B9E3;
-	Tue, 10 Nov 2020 08:36:43 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D689B4B902;
+	Tue, 10 Nov 2020 09:13:18 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 41E3B4B9AC
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Nov 2020 08:36:42 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 214024B93C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Nov 2020 09:13:17 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FupQVGwbGH33 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 10 Nov 2020 08:36:41 -0500 (EST)
+ with ESMTP id jJ-Z6aaU5Y0D for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 10 Nov 2020 09:13:16 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BF7FD4B9EF
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Nov 2020 08:36:35 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2277F4B8D0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Nov 2020 09:13:16 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id AD8B620809;
- Tue, 10 Nov 2020 13:36:34 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id BB782207E8;
+ Tue, 10 Nov 2020 14:13:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1605015394;
- bh=2eV54eTlv+uuoGYKqX4qrJwamNweELI+6T+g/GLxlC0=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=O6qbaBQ8vM6K283bJ1c6a47YjptftEey1kzn0LEGjagjtEOeQkpWkB/V79EbbaKqT
- SQwcCZd+hViS4I/dt/sGA/qE0xcSWtircuKQgLXETv4lhkpXw1E5hrUVu4+pfb1ca1
- B1dV5HOJuoD1IcpAB/Wv/N92gDAGzGhOQUUbmRCM=
+ s=default; t=1605017594;
+ bh=JIJiOB88U7qGpDmmoxCMenpTc0s/h87h3MJM7Q4ZwqA=;
+ h=From:To:Cc:Subject:Date:From;
+ b=eevBjJdxE5ATVifFoMcdFwRvrDrdPcf5A4Uq/2knK9AMjrV+rWkfyxDhEH01yIWef
+ 3klarVSpE4HXbH9ai0o4gTWeHp9jseRMkfwBjO6DSQaRxmLxSG8piSTXfX81nNjkn0
+ bj3yquDDsN6Py/6sLS8LytdTTa4yjRyN7GGPZc8U=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1kcTp2-009SZy-Qv; Tue, 10 Nov 2020 13:36:33 +0000
+ id 1kcUOW-009T8Q-Da; Tue, 10 Nov 2020 14:13:12 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v2 9/9] KVM: arm64: Drop kvm_coproc.h
-Date: Tue, 10 Nov 2020 13:36:19 +0000
-Message-Id: <20201110133619.451157-10-maz@kernel.org>
+Subject: [PATCH v2 0/3] KVM: arm64: Another set of CSV2-related fixes
+Date: Tue, 10 Nov 2020 14:13:05 +0000
+Message-Id: <20201110141308.451654-1-maz@kernel.org>
 X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20201110133619.451157-1-maz@kernel.org>
-References: <20201110133619.451157-1-maz@kernel.org>
 MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 62.31.163.78
 X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
- julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kernel-team@android.com
+ linux-arm-kernel@lists.infradead.org, liangpeng10@huawei.com, will@kernel.org,
+ james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+ kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kernel-team@android.com
+Cc: Will Deacon <will@kernel.org>, kernel-team@android.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,171 +90,32 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-kvm_coproc.h used to serve as a compatibility layer for the files
-shared between the 32 and 64 bit ports.
+This small series addresses a couple of Spectre-v2 related issues:
 
-Another one bites the dust...
+- Fix a live migration regression introduced with the setting of CSV2
+  on systems that are not affected by Spectre-v2, but that don't
+  directly expose it in ID_AA64PFR0_EL1
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/kvm_coproc.h | 38 -----------------------------
- arch/arm64/include/asm/kvm_host.h   | 17 +++++++++++++
- arch/arm64/kvm/arm.c                |  3 +--
- arch/arm64/kvm/guest.c              |  1 -
- arch/arm64/kvm/handle_exit.c        |  1 -
- arch/arm64/kvm/reset.c              |  1 -
- arch/arm64/kvm/sys_regs.c           |  1 -
- 7 files changed, 18 insertions(+), 44 deletions(-)
- delete mode 100644 arch/arm64/include/asm/kvm_coproc.h
+- Inject an UNDEF exception if the guest tries to access any of
+  SCXTNUM_ELx, as we don't advertise it to guests.
 
-diff --git a/arch/arm64/include/asm/kvm_coproc.h b/arch/arm64/include/asm/kvm_coproc.h
-deleted file mode 100644
-index d6bb40122fdb..000000000000
---- a/arch/arm64/include/asm/kvm_coproc.h
-+++ /dev/null
-@@ -1,38 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0-only */
--/*
-- * Copyright (C) 2012,2013 - ARM Ltd
-- * Author: Marc Zyngier <marc.zyngier@arm.com>
-- *
-- * Derived from arch/arm/include/asm/kvm_coproc.h
-- * Copyright (C) 2012 Rusty Russell IBM Corporation
-- */
--
--#ifndef __ARM64_KVM_COPROC_H__
--#define __ARM64_KVM_COPROC_H__
--
--#include <linux/kvm_host.h>
--
--void kvm_reset_sys_regs(struct kvm_vcpu *vcpu);
--
--struct kvm_sys_reg_table {
--	const struct sys_reg_desc *table;
--	size_t num;
--};
--
--int kvm_handle_cp14_load_store(struct kvm_vcpu *vcpu);
--int kvm_handle_cp14_32(struct kvm_vcpu *vcpu);
--int kvm_handle_cp14_64(struct kvm_vcpu *vcpu);
--int kvm_handle_cp15_32(struct kvm_vcpu *vcpu);
--int kvm_handle_cp15_64(struct kvm_vcpu *vcpu);
--int kvm_handle_sys_reg(struct kvm_vcpu *vcpu);
--
--#define kvm_coproc_table_init kvm_sys_reg_table_init
--void kvm_sys_reg_table_init(void);
--
--struct kvm_one_reg;
--int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices);
--int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *);
--int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *);
--unsigned long kvm_arm_num_sys_reg_descs(struct kvm_vcpu *vcpu);
--
--#endif /* __ARM64_KVM_COPROC_H__ */
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index c527f9567713..709f892f7a14 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -533,6 +533,12 @@ unsigned long kvm_arm_num_regs(struct kvm_vcpu *vcpu);
- int kvm_arm_copy_reg_indices(struct kvm_vcpu *vcpu, u64 __user *indices);
- int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
- int kvm_arm_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
-+
-+unsigned long kvm_arm_num_sys_reg_descs(struct kvm_vcpu *vcpu);
-+int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices);
-+int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *);
-+int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *);
-+
- int __kvm_arm_vcpu_get_events(struct kvm_vcpu *vcpu,
- 			      struct kvm_vcpu_events *events);
- 
-@@ -595,6 +601,17 @@ void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot);
- int handle_exit(struct kvm_vcpu *vcpu, int exception_index);
- void handle_exit_early(struct kvm_vcpu *vcpu, int exception_index);
- 
-+int kvm_handle_cp14_load_store(struct kvm_vcpu *vcpu);
-+int kvm_handle_cp14_32(struct kvm_vcpu *vcpu);
-+int kvm_handle_cp14_64(struct kvm_vcpu *vcpu);
-+int kvm_handle_cp15_32(struct kvm_vcpu *vcpu);
-+int kvm_handle_cp15_64(struct kvm_vcpu *vcpu);
-+int kvm_handle_sys_reg(struct kvm_vcpu *vcpu);
-+
-+void kvm_reset_sys_regs(struct kvm_vcpu *vcpu);
-+
-+void kvm_sys_reg_table_init(void);
-+
- /* MMIO helpers */
- void kvm_mmio_write_buf(void *buf, unsigned int len, unsigned long data);
- unsigned long kvm_mmio_read_buf(const void *buf, unsigned int len);
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 5750ec34960e..9d69d2bf6943 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -35,7 +35,6 @@
- #include <asm/kvm_asm.h>
- #include <asm/kvm_mmu.h>
- #include <asm/kvm_emulate.h>
--#include <asm/kvm_coproc.h>
- #include <asm/sections.h>
- 
- #include <kvm/arm_hypercalls.h>
-@@ -1525,7 +1524,7 @@ static int init_subsystems(void)
- 		goto out;
- 
- 	kvm_perf_init();
--	kvm_coproc_table_init();
-+	kvm_sys_reg_table_init();
- 
- out:
- 	on_each_cpu(_kvm_arch_hardware_disable, NULL, 1);
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 3f23f7478d2a..9bbd30e62799 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -24,7 +24,6 @@
- #include <asm/fpsimd.h>
- #include <asm/kvm.h>
- #include <asm/kvm_emulate.h>
--#include <asm/kvm_coproc.h>
- #include <asm/sigcontext.h>
- 
- #include "trace.h"
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index f79137ee4274..cebe39f3b1b6 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -14,7 +14,6 @@
- #include <asm/esr.h>
- #include <asm/exception.h>
- #include <asm/kvm_asm.h>
--#include <asm/kvm_coproc.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_mmu.h>
- #include <asm/debug-monitors.h>
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index f32490229a4c..74ce92a4988c 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -25,7 +25,6 @@
- #include <asm/ptrace.h>
- #include <asm/kvm_arm.h>
- #include <asm/kvm_asm.h>
--#include <asm/kvm_coproc.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_mmu.h>
- #include <asm/virt.h>
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 64fdfb64d791..d2e1d745f067 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -20,7 +20,6 @@
- #include <asm/debug-monitors.h>
- #include <asm/esr.h>
- #include <asm/kvm_arm.h>
--#include <asm/kvm_coproc.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_hyp.h>
- #include <asm/kvm_mmu.h>
+Patches on top of 5.10-rc2.
+
+* From v1:
+  - Only register a new value for CSV2 on a valid write to ID_AA64PFR0_EL1
+  - Delete even more code in patch #2
+
+Marc Zyngier (3):
+  KVM: arm64: Allow setting of ID_AA64PFR0_EL1.CSV2 from userspace
+  KVM: arm64: Unify trap handlers injecting an UNDEF
+  KVM: arm64: Handle SCXTNUM_ELx traps
+
+ arch/arm64/include/asm/kvm_host.h |   2 +
+ arch/arm64/include/asm/sysreg.h   |   4 ++
+ arch/arm64/kvm/arm.c              |  16 +++++
+ arch/arm64/kvm/sys_regs.c         | 111 ++++++++++++++++++------------
+ 4 files changed, 89 insertions(+), 44 deletions(-)
+
 -- 
 2.28.0
 
