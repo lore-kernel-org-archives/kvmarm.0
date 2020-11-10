@@ -7,63 +7,64 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11629C55ABD
-	for <kvmarm@archiver.kernel.org>; Tue, 10 Nov 2020 14:13:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E497C55ABD
+	for <kvmarm@archiver.kernel.org>; Tue, 10 Nov 2020 14:13:27 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5E9EC216C4
-	for <kvmarm@archiver.kernel.org>; Tue, 10 Nov 2020 14:13:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4BAA820797
+	for <kvmarm@archiver.kernel.org>; Tue, 10 Nov 2020 14:13:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="O98f5jh1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E9EC216C4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="0vxWZ+z3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BAA820797
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ED5864B934;
-	Tue, 10 Nov 2020 09:13:22 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E28284B8BC;
+	Tue, 10 Nov 2020 09:13:25 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id G39hUBW7T2fm; Tue, 10 Nov 2020 09:13:21 -0500 (EST)
+	with ESMTP id gvLFo-xEWt+v; Tue, 10 Nov 2020 09:13:23 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 26B5C4B9B5;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DF314B9BE;
 	Tue, 10 Nov 2020 09:13:19 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A7F74B8F4
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B84F14B8F4
  for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Nov 2020 09:13:18 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AarLNTvoRs3A for <kvmarm@lists.cs.columbia.edu>;
- Tue, 10 Nov 2020 09:13:17 -0500 (EST)
+ with ESMTP id Aw1tAFBGHt8D for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 10 Nov 2020 09:13:16 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D8A484B912
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 227524B8BC
  for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Nov 2020 09:13:16 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id DBDF820825;
- Tue, 10 Nov 2020 14:13:15 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id CB7C520809;
+ Tue, 10 Nov 2020 14:13:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1605017596;
- bh=AaEmnUUc/m5rPRgMVUlzTP7zCIYmOa/6NPk0n9WQRZ8=;
+ s=default; t=1605017595;
+ bh=bd+IPKZMKInt675zofeivrm7fgS7ZAV/NpMGLLlvmlA=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=O98f5jh1Su6JXXdAGghUyHG0fOZH1I2o62/Xm2L1HPFoGa9kSv62a5uD+DYYFn73v
- z2TLFhkZ1qfHgsXRJeBcuyQS3ljXJtj8fUTLJ4k0GZbncv8RIz/MzeX+mdhoQJmd2y
- jGIvZ+gxhqVvmzV9V18jLh6FgoNOXZRa/avwPq+4=
+ b=0vxWZ+z3r9DnuELPB4xuG6Se1eozAlangS+aLw5Tbkq8CLq/KsnqDaPp+nmWUlkeA
+ ZG1GRxrz0S0/jfK20JbWVh/fR54qVfpgc8dZUkNanSm7799ZftvkVZdK17vndyESf7
+ n04PUOyzhtT7voe7z8Mn83FD4nQAPN+Mqa0dj4hQ=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1kcUOY-009T8Q-29; Tue, 10 Nov 2020 14:13:14 +0000
+ id 1kcUOW-009T8Q-W5; Tue, 10 Nov 2020 14:13:13 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v2 3/3] KVM: arm64: Handle SCXTNUM_ELx traps
-Date: Tue, 10 Nov 2020 14:13:08 +0000
-Message-Id: <20201110141308.451654-4-maz@kernel.org>
+Subject: [PATCH v2 1/3] KVM: arm64: Allow setting of ID_AA64PFR0_EL1.CSV2 from
+ userspace
+Date: Tue, 10 Nov 2020 14:13:06 +0000
+Message-Id: <20201110141308.451654-2-maz@kernel.org>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201110141308.451654-1-maz@kernel.org>
 References: <20201110141308.451654-1-maz@kernel.org>
@@ -93,62 +94,143 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-As the kernel never sets HCR_EL2.EnSCXT, accesses to SCXTNUM_ELx
-will trap to EL2. Let's handle that as gracefully as possible
-by injecting an UNDEF exception into the guest. This is consistent
-with the guest's view of ID_AA64PFR0_EL1.CSV2 being at most 1.
+We now expose ID_AA64PFR0_EL1.CSV2=1 to guests running on hosts
+that are immune to Spectre-v2, but that don't have this field set,
+most likely because they predate the specification.
 
-Acked-by: Will Deacon <will@kernel.org>
+However, this prevents the migration of guests that have started on
+a host the doesn't fake this CSV2 setting to one that does, as KVM
+rejects the write to ID_AA64PFR0_EL2 on the grounds that it isn't
+what is already there.
+
+In order to fix this, allow userspace to set this field as long as
+this doesn't result in a promising more than what is already there
+(setting CSV2 to 0 is acceptable, but setting it to 1 when it is
+already set to 0 isn't).
+
+Fixes: e1026237f9067 ("KVM: arm64: Set CSV2 for guests on hardware unaffected by Spectre-v2")
+Reported-by: Peng Liang <liangpeng10@huawei.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/sysreg.h | 4 ++++
- arch/arm64/kvm/sys_regs.c       | 4 ++++
- 2 files changed, 8 insertions(+)
+ arch/arm64/include/asm/kvm_host.h |  2 ++
+ arch/arm64/kvm/arm.c              | 16 ++++++++++++
+ arch/arm64/kvm/sys_regs.c         | 42 ++++++++++++++++++++++++++++---
+ 3 files changed, 56 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 174817ba119c..e2ef4c2edf06 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -372,6 +372,8 @@
- #define SYS_CONTEXTIDR_EL1		sys_reg(3, 0, 13, 0, 1)
- #define SYS_TPIDR_EL1			sys_reg(3, 0, 13, 0, 4)
- 
-+#define SYS_SCXTNUM_EL1			sys_reg(3, 0, 13, 0, 7)
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 781d029b8aa8..0cd9f0f75c13 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -118,6 +118,8 @@ struct kvm_arch {
+ 	 */
+ 	unsigned long *pmu_filter;
+ 	unsigned int pmuver;
 +
- #define SYS_CNTKCTL_EL1			sys_reg(3, 0, 14, 1, 0)
++	u8 pfr0_csv2;
+ };
  
- #define SYS_CCSIDR_EL1			sys_reg(3, 1, 0, 0, 0)
-@@ -404,6 +406,8 @@
- #define SYS_TPIDR_EL0			sys_reg(3, 3, 13, 0, 2)
- #define SYS_TPIDRRO_EL0			sys_reg(3, 3, 13, 0, 3)
+ struct kvm_vcpu_fault_info {
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 5750ec34960e..c0ffb019ca8b 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -102,6 +102,20 @@ static int kvm_arm_default_max_vcpus(void)
+ 	return vgic_present ? kvm_vgic_get_max_vcpus() : KVM_MAX_VCPUS;
+ }
  
-+#define SYS_SCXTNUM_EL0			sys_reg(3, 3, 13, 0, 7)
++static void set_default_csv2(struct kvm *kvm)
++{
++	/*
++	 * The default is to expose CSV2 == 1 if the HW isn't affected.
++	 * Although this is a per-CPU feature, we make it global because
++	 * asymmetric systems are just a nuisance.
++	 *
++	 * Userspace can override this as long as it doesn't promise
++	 * the impossible.
++	 */
++	if (arm64_get_spectre_v2_state() == SPECTRE_UNAFFECTED)
++		kvm->arch.pfr0_csv2 = 1;
++}
 +
- /* Definitions for system register interface to AMU for ARMv8.4 onwards */
- #define SYS_AM_EL0(crm, op2)		sys_reg(3, 3, 13, (crm), (op2))
- #define SYS_AMCR_EL0			SYS_AM_EL0(2, 0)
+ /**
+  * kvm_arch_init_vm - initializes a VM data structure
+  * @kvm:	pointer to the KVM struct
+@@ -127,6 +141,8 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 	/* The maximum number of VCPUs is limited by the host's GIC model */
+ 	kvm->arch.max_vcpus = kvm_arm_default_max_vcpus();
+ 
++	set_default_csv2(kvm);
++
+ 	return ret;
+ out_free_stage2_pgd:
+ 	kvm_free_stage2_pgd(&kvm->arch.mmu);
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 6155285b2f9b..ea1ef71c1394 100644
+index fb12d3ef423a..24fdb6b9b6d3 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -1640,6 +1640,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_CONTEXTIDR_EL1), access_vm_reg, reset_val, CONTEXTIDR_EL1, 0 },
- 	{ SYS_DESC(SYS_TPIDR_EL1), NULL, reset_unknown, TPIDR_EL1 },
+@@ -1128,9 +1128,8 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+ 		if (!vcpu_has_sve(vcpu))
+ 			val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
+ 		val &= ~(0xfUL << ID_AA64PFR0_AMU_SHIFT);
+-		if (!(val & (0xfUL << ID_AA64PFR0_CSV2_SHIFT)) &&
+-		    arm64_get_spectre_v2_state() == SPECTRE_UNAFFECTED)
+-			val |= (1UL << ID_AA64PFR0_CSV2_SHIFT);
++		val &= ~(0xfUL << ID_AA64PFR0_CSV2_SHIFT);
++		val |= ((u64)vcpu->kvm->arch.pfr0_csv2 << ID_AA64PFR0_CSV2_SHIFT);
+ 	} else if (id == SYS_ID_AA64PFR1_EL1) {
+ 		val &= ~(0xfUL << ID_AA64PFR1_MTE_SHIFT);
+ 	} else if (id == SYS_ID_AA64ISAR1_EL1 && !vcpu_has_ptrauth(vcpu)) {
+@@ -1260,6 +1259,40 @@ static int set_id_aa64zfr0_el1(struct kvm_vcpu *vcpu,
+ 	return 0;
+ }
  
-+	{ SYS_DESC(SYS_SCXTNUM_EL1), undef_access },
++static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
++			       const struct sys_reg_desc *rd,
++			       const struct kvm_one_reg *reg, void __user *uaddr)
++{
++	const u64 id = sys_reg_to_index(rd);
++	int err;
++	u64 val;
++	u8 csv2;
 +
- 	{ SYS_DESC(SYS_CNTKCTL_EL1), NULL, reset_val, CNTKCTL_EL1, 0},
- 
- 	{ SYS_DESC(SYS_CCSIDR_EL1), access_ccsidr },
-@@ -1668,6 +1670,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_TPIDR_EL0), NULL, reset_unknown, TPIDR_EL0 },
- 	{ SYS_DESC(SYS_TPIDRRO_EL0), NULL, reset_unknown, TPIDRRO_EL0 },
- 
-+	{ SYS_DESC(SYS_SCXTNUM_EL0), undef_access },
++	err = reg_from_user(&val, uaddr, id);
++	if (err)
++		return err;
 +
- 	{ SYS_DESC(SYS_AMCR_EL0), undef_access },
- 	{ SYS_DESC(SYS_AMCFGR_EL0), undef_access },
- 	{ SYS_DESC(SYS_AMCGCR_EL0), undef_access },
++	/*
++	 * Allow AA64PFR0_EL1.CSV2 to be set from userspace as long as
++	 * it doesn't promise more than what is actually provided (the
++	 * guest could otherwise be covered in ectoplasmic residue).
++	 */
++	csv2 = cpuid_feature_extract_unsigned_field(val, ID_AA64PFR0_CSV2_SHIFT);
++	if (csv2 > 1 ||
++	    (csv2 && arm64_get_spectre_v2_state() != SPECTRE_UNAFFECTED))
++		return -EINVAL;
++
++	/* We can only differ with CSV2, and anything else is an error */
++	val ^= read_id_reg(vcpu, rd, false);
++	val &= ~(0xFUL << ID_AA64PFR0_CSV2_SHIFT);
++	if (val)
++		return -EINVAL;
++
++	vcpu->kvm->arch.pfr0_csv2 = csv2;
++
++	return 0;
++}
++
+ /*
+  * cpufeature ID register user accessors
+  *
+@@ -1514,7 +1547,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 
+ 	/* AArch64 ID registers */
+ 	/* CRm=4 */
+-	ID_SANITISED(ID_AA64PFR0_EL1),
++	{ SYS_DESC(SYS_ID_AA64PFR0_EL1), .access = access_id_reg,
++	  .get_user = get_id_reg, .set_user = set_id_aa64pfr0_el1, },
+ 	ID_SANITISED(ID_AA64PFR1_EL1),
+ 	ID_UNALLOCATED(4,2),
+ 	ID_UNALLOCATED(4,3),
 -- 
 2.28.0
 
