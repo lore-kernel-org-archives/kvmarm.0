@@ -2,68 +2,72 @@ Return-Path: <SRS0=+U1N=EQ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,MAILING_LIST_MULTI,RCVD_DOTEDU_SUSP,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29337C388F7
-	for <kvmarm@archiver.kernel.org>; Tue, 10 Nov 2020 13:36:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F790C55ABD
+	for <kvmarm@archiver.kernel.org>; Tue, 10 Nov 2020 13:36:38 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9580E21D40
-	for <kvmarm@archiver.kernel.org>; Tue, 10 Nov 2020 13:36:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6AC9021D46
+	for <kvmarm@archiver.kernel.org>; Tue, 10 Nov 2020 13:36:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="HyF962h6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9580E21D40
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="k5AvbH5Z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AC9021D46
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 030F54B997;
-	Tue, 10 Nov 2020 08:36:36 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 07DAB4B988;
+	Tue, 10 Nov 2020 08:36:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 8e89vhAafTNO; Tue, 10 Nov 2020 08:36:34 -0500 (EST)
+	with ESMTP id MfEu6tSgFfxZ; Tue, 10 Nov 2020 08:36:35 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CC33A4B98A;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EB37F4B9A7;
 	Tue, 10 Nov 2020 08:36:33 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5387C4B869
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 990034B767
  for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Nov 2020 08:36:32 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vmn9x2NItOGJ for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id deqb8czJ+knD for <kvmarm@lists.cs.columbia.edu>;
  Tue, 10 Nov 2020 08:36:31 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 23BCB4B767
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 77E824B985
  for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Nov 2020 08:36:31 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 9C630206B6;
- Tue, 10 Nov 2020 13:36:29 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 6C2D2207D3;
+ Tue, 10 Nov 2020 13:36:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1605015389;
- bh=lkIGiFv1b4/nNPUJbCd5QdY105G4U0sOjAEfhYSdOOg=;
- h=From:To:Cc:Subject:Date:From;
- b=HyF962h6OGyVJupnay/O799NbeCbLjWLLerrcTm01Bq3Ed3G1mELngwKqPdT/rzmi
- 7s36TYAhcC7CMPWPKJR4tCOoiwt3fxA5pHxQXUzkKRuTL2bMD6hTInN861ZCJsfwfK
- ym6lKaCPjED6+ITuU66O4anrwC4m6gVRhYb5FrCs=
+ s=default; t=1605015390;
+ bh=Q2FlY7BpvXcPTtmcmTGIhO77yAmIF8KMzHMNzz1Yytc=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=k5AvbH5Zu4GW3Z4wi4oIRrBT8/+FHAWKZuORpG7CSUbXc/W/BIB6l5e5mlx88I96G
+ z31q+p0MHNa4x7jqGYSdhKvWlUFvhmQTWL0fI9OeLGZw0o2Y/rIgbAT2JAfzYbtupp
+ 0/9pdRwjmXSV+PYVyIUYS0NrDuHn9gxtkk9Uztao=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1kcTox-009SZy-Cm; Tue, 10 Nov 2020 13:36:27 +0000
+ id 1kcToy-009SZy-Jh; Tue, 10 Nov 2020 13:36:28 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v2 0/9] KVM: arm64: Kill the copro array
-Date: Tue, 10 Nov 2020 13:36:10 +0000
-Message-Id: <20201110133619.451157-1-maz@kernel.org>
+Subject: [PATCH v2 2/9] KVM: arm64: Move AArch32 exceptions over to AArch64
+ sysregs
+Date: Tue, 10 Nov 2020 13:36:12 +0000
+Message-Id: <20201110133619.451157-3-maz@kernel.org>
 X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20201110133619.451157-1-maz@kernel.org>
+References: <20201110133619.451157-1-maz@kernel.org>
 MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 62.31.163.78
 X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
@@ -89,59 +93,123 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Since the very beginning of KVM/arm64, we represented the system
-register file using a dual view: on one side the AArch64 state, on the
-other a bizarre mapping of the AArch32 state onto the Aarch64
-registers.
+The use of the AArch32-specific accessors have always been a bit
+annoying on 64bit, and it is time for a change.
 
-It was nice at the time as it allowed us to share some code with the
-32bit port, and to come up with some creative bugs. But is was always
-a hack, and we are now in a position to simplify the whole thing.
+Let's move the AArch32 exception injection over to the AArch64 encoding,
+which requires us to split the two halves of FAR_EL1 into DFAR and IFAR.
+This enables us to drop the preempt_disable() games on VHE, and to kill
+the last user of the vcpu_cp15() macro.
 
-This series goes through the whole of the AArch32 cp14/15 register
-file, and point each of them directly at their 64bit equivalent. For
-the few cases where two 32bit registers share a 64bit counterpart, we
-define which half of the register they map.
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/include/asm/kvm_host.h |  1 -
+ arch/arm64/kvm/inject_fault.c     | 62 ++++++++++---------------------
+ 2 files changed, 20 insertions(+), 43 deletions(-)
 
-Finally, we drop a large number of definitions and state that have
-become useless.
-
-This series applies on top of the exception injection rework
-previously posted [2].
-
-* From v1 [1]:
-  - Added initial patch to deal with TTBCR2
-  - Fixed TCR_EL1 handling in inject_abt32()
-  - Optimise for 64bit handling of sysreg access
-  - Make most 32bit cp14 registers access the full 64bit register
-
-[1] https://lore.kernel.org/r/20201102191609.265711-1-maz@kernel.org
-[2] https://lore.kernel.org/r/20201102164045.264512-1-maz@kernel.org
-
-Marc Zyngier (9):
-  KVM: arm64: Introduce handling of AArch32 TTBCR2 traps
-  KVM: arm64: Move AArch32 exceptions over to AArch64 sysregs
-  KVM: arm64: Add AArch32 mapping annotation
-  KVM: arm64: Map AArch32 cp15 register to AArch64 sysregs
-  KVM: arm64: Map AArch32 cp14 register to AArch64 sysregs
-  KVM: arm64: Drop is_32bit trap attribute
-  KVM: arm64: Drop is_aarch32 trap attribute
-  KVM: arm64: Drop legacy copro shadow register
-  KVM: arm64: Drop kvm_coproc.h
-
- arch/arm64/include/asm/kvm_coproc.h |  38 -----
- arch/arm64/include/asm/kvm_host.h   |  73 +++------
- arch/arm64/kvm/arm.c                |   3 +-
- arch/arm64/kvm/guest.c              |   1 -
- arch/arm64/kvm/handle_exit.c        |   1 -
- arch/arm64/kvm/inject_fault.c       |  62 +++-----
- arch/arm64/kvm/reset.c              |   1 -
- arch/arm64/kvm/sys_regs.c           | 233 +++++++++++++---------------
- arch/arm64/kvm/sys_regs.h           |   9 +-
- arch/arm64/kvm/vgic-sys-reg-v3.c    |   4 -
- 10 files changed, 151 insertions(+), 274 deletions(-)
- delete mode 100644 arch/arm64/include/asm/kvm_coproc.h
-
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 803cb2427b54..c905c3fcaaa0 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -562,7 +562,6 @@ static inline bool __vcpu_write_sys_reg_to_cpu(u64 val, int reg)
+ #define CPx_BIAS		IS_ENABLED(CONFIG_CPU_BIG_ENDIAN)
+ 
+ #define vcpu_cp14(v,r)		((v)->arch.ctxt.copro[(r) ^ CPx_BIAS])
+-#define vcpu_cp15(v,r)		((v)->arch.ctxt.copro[(r) ^ CPx_BIAS])
+ 
+ struct kvm_vm_stat {
+ 	ulong remote_tlb_flush;
+diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+index e2a2e48ca371..b47df73e98d7 100644
+--- a/arch/arm64/kvm/inject_fault.c
++++ b/arch/arm64/kvm/inject_fault.c
+@@ -69,26 +69,7 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
+ #define DFSR_FSC_EXTABT_LPAE	0x10
+ #define DFSR_FSC_EXTABT_nLPAE	0x08
+ #define DFSR_LPAE		BIT(9)
+-
+-static bool pre_fault_synchronize(struct kvm_vcpu *vcpu)
+-{
+-	preempt_disable();
+-	if (vcpu->arch.sysregs_loaded_on_cpu) {
+-		kvm_arch_vcpu_put(vcpu);
+-		return true;
+-	}
+-
+-	preempt_enable();
+-	return false;
+-}
+-
+-static void post_fault_synchronize(struct kvm_vcpu *vcpu, bool loaded)
+-{
+-	if (loaded) {
+-		kvm_arch_vcpu_load(vcpu, smp_processor_id());
+-		preempt_enable();
+-	}
+-}
++#define TTBCR_EAE		BIT(31)
+ 
+ static void inject_undef32(struct kvm_vcpu *vcpu)
+ {
+@@ -100,39 +81,36 @@ static void inject_undef32(struct kvm_vcpu *vcpu)
+  * Modelled after TakeDataAbortException() and TakePrefetchAbortException
+  * pseudocode.
+  */
+-static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt,
+-			 unsigned long addr)
++static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt, u32 addr)
+ {
+-	u32 *far, *fsr;
+-	bool is_lpae;
+-	bool loaded;
++	u64 far;
++	u32 fsr;
++
++	/* Give the guest an IMPLEMENTATION DEFINED exception */
++	if (vcpu_read_sys_reg(vcpu, TCR_EL1) & TTBCR_EAE) {
++		fsr = DFSR_LPAE | DFSR_FSC_EXTABT_LPAE;
++	} else {
++		/* no need to shuffle FS[4] into DFSR[10] as its 0 */
++		fsr = DFSR_FSC_EXTABT_nLPAE;
++	}
+ 
+-	loaded = pre_fault_synchronize(vcpu);
++	far = vcpu_read_sys_reg(vcpu, FAR_EL1);
+ 
+ 	if (is_pabt) {
+ 		vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA32_IABT |
+ 				     KVM_ARM64_PENDING_EXCEPTION);
+-		far = &vcpu_cp15(vcpu, c6_IFAR);
+-		fsr = &vcpu_cp15(vcpu, c5_IFSR);
++		far &= GENMASK(31, 0);
++		far |= (u64)addr << 32;
++		vcpu_write_sys_reg(vcpu, fsr, IFSR32_EL2);
+ 	} else { /* !iabt */
+ 		vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA32_DABT |
+ 				     KVM_ARM64_PENDING_EXCEPTION);
+-		far = &vcpu_cp15(vcpu, c6_DFAR);
+-		fsr = &vcpu_cp15(vcpu, c5_DFSR);
+-	}
+-
+-	*far = addr;
+-
+-	/* Give the guest an IMPLEMENTATION DEFINED exception */
+-	is_lpae = (vcpu_cp15(vcpu, c2_TTBCR) >> 31);
+-	if (is_lpae) {
+-		*fsr = DFSR_LPAE | DFSR_FSC_EXTABT_LPAE;
+-	} else {
+-		/* no need to shuffle FS[4] into DFSR[10] as its 0 */
+-		*fsr = DFSR_FSC_EXTABT_nLPAE;
++		far &= GENMASK(63, 32);
++		far |= addr;
++		vcpu_write_sys_reg(vcpu, fsr, ESR_EL1);
+ 	}
+ 
+-	post_fault_synchronize(vcpu, loaded);
++	vcpu_write_sys_reg(vcpu, far, FAR_EL1);
+ }
+ 
+ /**
 -- 
 2.28.0
 
