@@ -6,67 +6,67 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13585C55ABD
-	for <kvmarm@archiver.kernel.org>; Tue, 10 Nov 2020 14:49:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F495C388F7
+	for <kvmarm@archiver.kernel.org>; Tue, 10 Nov 2020 15:09:03 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 54A0D206B2
-	for <kvmarm@archiver.kernel.org>; Tue, 10 Nov 2020 14:49:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4413020825
+	for <kvmarm@archiver.kernel.org>; Tue, 10 Nov 2020 15:09:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="i3wkBgX9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54A0D206B2
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="kUctPFeB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4413020825
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A27624B97C;
-	Tue, 10 Nov 2020 09:49:42 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B15E64BA02;
+	Tue, 10 Nov 2020 10:09:01 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id BKg9H99+E2Ln; Tue, 10 Nov 2020 09:49:41 -0500 (EST)
+	with ESMTP id xB8QOCK2uvTX; Tue, 10 Nov 2020 10:08:59 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 743A94B9EA;
-	Tue, 10 Nov 2020 09:49:41 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CD6804BA07;
+	Tue, 10 Nov 2020 10:08:59 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EC0D24B97C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Nov 2020 09:49:39 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5481A4B9FE
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Nov 2020 10:08:59 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rn0Nxbklozlr for <kvmarm@lists.cs.columbia.edu>;
- Tue, 10 Nov 2020 09:49:39 -0500 (EST)
+ with ESMTP id XGrJR0PGSaBI for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 10 Nov 2020 10:08:58 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D6B944B903
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Nov 2020 09:49:38 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0D27F4B9E5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Nov 2020 10:08:58 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 8D11E20797;
- Tue, 10 Nov 2020 14:49:37 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id BB1F5207D3;
+ Tue, 10 Nov 2020 15:08:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1605019777;
- bh=tAjZEoiovmaTc2l6i9NJyRkLG1+GRlxocckY4h/5Yxg=;
+ s=default; t=1605020936;
+ bh=CPiYtm+F0PANfE4kt6eHA760IlM+FG8ncMfDp1SQZhE=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=i3wkBgX9iavxZDnXWDNhXzMixHokeOy4gBqgZDdpKaCxGcI2nLdzs7BjRwjsniCVy
- gCu50ZbuVFLlxrxB6QHr6tcSZsyjkiYs76wXIhyfH6ddB4BEbZrrOKgGh+8khiNoDl
- Az+pEBY+tLQCa6zvQwHZSZ8OkUzJDpK/Qi6MHQfg=
+ b=kUctPFeBbk6qRT8XhV4xsPWX6VjAMNmYFFA7gj47eHtq/4GPeXccydN0GL2VE3lIa
+ GY1uZippUCabAH40dyYYpq72OTRUI5zg1FwLjV+TKkKovKqNnD6XpCBehvkWHHvFUR
+ 2LNet+aXc6xr04+8kz/EWe67veC8a9gTZBSpvjX8=
 Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
  by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
  TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1kcUxj-009TgL-CD; Tue, 10 Nov 2020 14:49:35 +0000
+ id 1kcVGQ-009TzB-Qc; Tue, 10 Nov 2020 15:08:54 +0000
 MIME-Version: 1.0
-Date: Tue, 10 Nov 2020 14:49:35 +0000
+Date: Tue, 10 Nov 2020 15:08:54 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: David Brazdil <dbrazdil@google.com>
-Subject: Re: [PATCH v1 03/24] arm64: Move MAIR_EL1_SET to asm/memory.h
-In-Reply-To: <20201109113233.9012-4-dbrazdil@google.com>
+Subject: Re: [PATCH v1 06/24] kvm: arm64: Support per_cpu_ptr in nVHE hyp code
+In-Reply-To: <20201109113233.9012-7-dbrazdil@google.com>
 References: <20201109113233.9012-1-dbrazdil@google.com>
- <20201109113233.9012-4-dbrazdil@google.com>
+ <20201109113233.9012-7-dbrazdil@google.com>
 User-Agent: Roundcube Webmail/1.4.9
-Message-ID: <d28d29b91804d97a643bd02c5d1cec95@kernel.org>
+Message-ID: <f28c9a67759cb04157e888b3a71b2ce2@kernel.org>
 X-Sender: maz@kernel.org
 X-SA-Exim-Connect-IP: 51.254.78.96
 X-SA-Exim-Rcpt-To: dbrazdil@google.com, kvmarm@lists.cs.columbia.edu,
@@ -102,82 +102,116 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On 2020-11-09 11:32, David Brazdil wrote:
-> KVM currently initializes MAIR_EL2 to the value of MAIR_EL1. In
-> preparation for initializing MAIR_EL2 before MAIR_EL1, move the 
-> constant
-> into a shared header file.
+> When compiling with __KVM_NVHE_HYPERVISOR__ redefine per_cpu_offset() 
+> to
+> __hyp_per_cpu_offset() which looks up the base of the nVHE per-CPU
+> region of the given cpu and computes its offset from the
+> .hyp.data..percpu section.
+> 
+> This enables use of per_cpu_ptr() helpers in nVHE hyp code. Until now
+> only this_cpu_ptr() was supported by setting TPIDR_EL2.
 > 
 > Signed-off-by: David Brazdil <dbrazdil@google.com>
 > ---
->  arch/arm64/include/asm/memory.h | 13 +++++++++++++
->  arch/arm64/mm/proc.S            | 13 -------------
->  2 files changed, 13 insertions(+), 13 deletions(-)
+>  arch/arm64/include/asm/percpu.h  |  6 ++++++
+>  arch/arm64/kernel/image-vars.h   |  3 +++
+>  arch/arm64/kvm/hyp/nvhe/Makefile |  3 ++-
+>  arch/arm64/kvm/hyp/nvhe/percpu.c | 22 ++++++++++++++++++++++
+>  4 files changed, 33 insertions(+), 1 deletion(-)
+>  create mode 100644 arch/arm64/kvm/hyp/nvhe/percpu.c
 > 
-> diff --git a/arch/arm64/include/asm/memory.h 
-> b/arch/arm64/include/asm/memory.h
-> index cd61239bae8c..aca00737e771 100644
-> --- a/arch/arm64/include/asm/memory.h
-> +++ b/arch/arm64/include/asm/memory.h
-> @@ -152,6 +152,19 @@
->  #define MT_S2_FWB_NORMAL	6
->  #define MT_S2_FWB_DEVICE_nGnRE	1
+> diff --git a/arch/arm64/include/asm/percpu.h 
+> b/arch/arm64/include/asm/percpu.h
+> index 1599e17379d8..8f1661603b78 100644
+> --- a/arch/arm64/include/asm/percpu.h
+> +++ b/arch/arm64/include/asm/percpu.h
+> @@ -239,6 +239,12 @@ PERCPU_RET_OP(add, add, ldadd)
+>  #define this_cpu_cmpxchg_8(pcp, o, n)	\
+>  	_pcp_protect_return(cmpxchg_relaxed, pcp, o, n)
 > 
-> +/*
-> + * Default MAIR_EL1. MT_NORMAL_TAGGED is initially mapped as Normal 
-> memory and
-> + * changed during __cpu_setup to Normal Tagged if the system supports 
-> MTE.
-> + */
-> +#define MAIR_EL1_SET							\
-
-If we are going to use this at EL2 directly, consider renaming it to
-MAIR_ELx_SET, as we do for other constants that are shared across 
-exception
-levels.
-
-> +	(MAIR_ATTRIDX(MAIR_ATTR_DEVICE_nGnRnE, MT_DEVICE_nGnRnE) |	\
-
-This creates an implicit dependency between sysreg.h and memory.h.
-Consider including asm/sysreg.h, assuming this doesn't create any 
-circular
-dependency, or even move it to sysreg.h altogether.
-
-> +	 MAIR_ATTRIDX(MAIR_ATTR_DEVICE_nGnRE, MT_DEVICE_nGnRE) |	\
-> +	 MAIR_ATTRIDX(MAIR_ATTR_DEVICE_GRE, MT_DEVICE_GRE) |		\
-> +	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL_NC, MT_NORMAL_NC) |		\
-> +	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL, MT_NORMAL) |			\
-> +	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL_WT, MT_NORMAL_WT) |		\
-> +	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL, MT_NORMAL_TAGGED))
+> +#ifdef __KVM_NVHE_HYPERVISOR__
+> +extern unsigned long __hyp_per_cpu_offset(unsigned int cpu);
+> +#define __per_cpu_offset
+> +#define per_cpu_offset(cpu)	__hyp_per_cpu_offset((cpu))
+> +#endif
 > +
->  #ifdef CONFIG_ARM64_4K_PAGES
->  #define IOREMAP_MAX_ORDER	(PUD_SHIFT)
->  #else
-> diff --git a/arch/arm64/mm/proc.S b/arch/arm64/mm/proc.S
-> index 23c326a06b2d..25ff21b3a1c6 100644
-> --- a/arch/arm64/mm/proc.S
-> +++ b/arch/arm64/mm/proc.S
-> @@ -45,19 +45,6 @@
->  #define TCR_KASAN_FLAGS 0
->  #endif
+>  #include <asm-generic/percpu.h>
 > 
-> -/*
-> - * Default MAIR_EL1. MT_NORMAL_TAGGED is initially mapped as Normal 
-> memory and
-> - * changed during __cpu_setup to Normal Tagged if the system supports 
-> MTE.
-> - */
-> -#define MAIR_EL1_SET							\
-> -	(MAIR_ATTRIDX(MAIR_ATTR_DEVICE_nGnRnE, MT_DEVICE_nGnRnE) |	\
-> -	 MAIR_ATTRIDX(MAIR_ATTR_DEVICE_nGnRE, MT_DEVICE_nGnRE) |	\
-> -	 MAIR_ATTRIDX(MAIR_ATTR_DEVICE_GRE, MT_DEVICE_GRE) |		\
-> -	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL_NC, MT_NORMAL_NC) |		\
-> -	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL, MT_NORMAL) |			\
-> -	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL_WT, MT_NORMAL_WT) |		\
-> -	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL, MT_NORMAL_TAGGED))
-> -
->  #ifdef CONFIG_CPU_PM
->  /**
->   * cpu_do_suspend - save CPU registers context
+>  /* Redefine macros for nVHE hyp under DEBUG_PREEMPT to avoid its
+> dependencies. */
+> diff --git a/arch/arm64/kernel/image-vars.h 
+> b/arch/arm64/kernel/image-vars.h
+> index c615b285ff5b..78a42a7cdb72 100644
+> --- a/arch/arm64/kernel/image-vars.h
+> +++ b/arch/arm64/kernel/image-vars.h
+> @@ -103,6 +103,9 @@ KVM_NVHE_ALIAS(gic_nonsecure_priorities);
+>  KVM_NVHE_ALIAS(__start___kvm_ex_table);
+>  KVM_NVHE_ALIAS(__stop___kvm_ex_table);
+> 
+> +/* Array containing bases of nVHE per-CPU memory regions. */
+> +KVM_NVHE_ALIAS(kvm_arm_hyp_percpu_base);
+> +
+>  #endif /* CONFIG_KVM */
+> 
+>  #endif /* __ARM64_KERNEL_IMAGE_VARS_H */
+> diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile 
+> b/arch/arm64/kvm/hyp/nvhe/Makefile
+> index ddde15fe85f2..c45f440cce51 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/Makefile
+> +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+> @@ -6,7 +6,8 @@
+>  asflags-y := -D__KVM_NVHE_HYPERVISOR__
+>  ccflags-y := -D__KVM_NVHE_HYPERVISOR__
+> 
+> -obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o
+> host.o hyp-main.o
+> +obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o 
+> host.o \
+> +	 hyp-main.o percpu.o
+>  obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o 
+> ../entry.o \
+>  	 ../fpsimd.o ../hyp-entry.o
+> 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/percpu.c 
+> b/arch/arm64/kvm/hyp/nvhe/percpu.c
+> new file mode 100644
+> index 000000000000..5fd0c5696907
+> --- /dev/null
+> +++ b/arch/arm64/kvm/hyp/nvhe/percpu.c
+> @@ -0,0 +1,22 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (C) 2020 - Google LLC
+> + * Author: David Brazdil <dbrazdil@google.com>
+> + */
+> +
+> +#include <asm/kvm_asm.h>
+> +#include <asm/kvm_hyp.h>
+> +#include <asm/kvm_mmu.h>
+> +
+> +unsigned long __hyp_per_cpu_offset(unsigned int cpu)
+> +{
+> +	unsigned long *cpu_base_array;
+> +	unsigned long this_cpu_base;
+> +
+> +	if (cpu >= ARRAY_SIZE(kvm_arm_hyp_percpu_base))
+> +		hyp_panic();
+> +
+> +	cpu_base_array = kern_hyp_va(&kvm_arm_hyp_percpu_base[0]);
+
+There is no guarantee that this will not generate a PC relative
+addressing, resulting in kern_hyp_va() being applied twice.
+
+Consider using hyp_symbol_addr() instead, which always does the right
+by forcing a PC relative addressing and not subsequently mangling
+the address.
+
+> +	this_cpu_base = kern_hyp_va(cpu_base_array[cpu]);
+> +	return this_cpu_base - (unsigned long)&__per_cpu_start;
+
+And this is the opposite case: if the compiler generates an absolute
+address, you're toast. Yes, this is just as unlikely, but hey...
+Same remedy should apply.
 
 Thanks,
 
