@@ -7,51 +7,51 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 632EDC55ABD
-	for <kvmarm@archiver.kernel.org>; Wed, 11 Nov 2020 06:23:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B168DC56201
+	for <kvmarm@archiver.kernel.org>; Wed, 11 Nov 2020 06:23:21 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id EA02E20797
-	for <kvmarm@archiver.kernel.org>; Wed, 11 Nov 2020 06:23:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA02E20797
+	by mail.kernel.org (Postfix) with ESMTP id 2B18A20825
+	for <kvmarm@archiver.kernel.org>; Wed, 11 Nov 2020 06:23:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B18A20825
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 802B44BA1C;
-	Wed, 11 Nov 2020 01:23:14 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C2E054BA0D;
+	Wed, 11 Nov 2020 01:23:20 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id lkxZ5+MiK9mE; Wed, 11 Nov 2020 01:23:13 -0500 (EST)
+	with ESMTP id uBfonYSgYrFF; Wed, 11 Nov 2020 01:23:19 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7476D4B9A7;
-	Wed, 11 Nov 2020 01:23:13 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CAEC4BA19;
+	Wed, 11 Nov 2020 01:23:19 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 91D1E4B953
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Nov 2020 01:23:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F7DA4B63F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Nov 2020 01:23:18 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1WMRMRGs009p for <kvmarm@lists.cs.columbia.edu>;
- Wed, 11 Nov 2020 01:23:10 -0500 (EST)
+ with ESMTP id mizkTfdBGktI for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 11 Nov 2020 01:23:17 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8143C4B88C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Nov 2020 01:23:10 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 467B74B953
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Nov 2020 01:23:17 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2126E1476;
- Tue, 10 Nov 2020 22:23:10 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 01C901477;
+ Tue, 10 Nov 2020 22:23:17 -0800 (PST)
 Received: from localhost.localdomain (entos-thunderx2-desktop.shanghai.arm.com
  [10.169.212.215])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id C62AE3F6CF;
- Tue, 10 Nov 2020 22:23:03 -0800 (PST)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id A707C3F6CF;
+ Tue, 10 Nov 2020 22:23:10 -0800 (PST)
 From: Jianyong Wu <jianyong.wu@arm.com>
 To: netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
  tglx@linutronix.de, pbonzini@redhat.com, sean.j.christopherson@intel.com,
  maz@kernel.org, richardcochran@gmail.com, Mark.Rutland@arm.com,
  will@kernel.org, suzuki.poulose@arm.com, Andre.Przywara@arm.com,
  steven.price@arm.com
-Subject: [PATCH v15 5/9] clocksource: Add clocksource id for arm arch counter
-Date: Wed, 11 Nov 2020 14:22:07 +0800
-Message-Id: <20201111062211.33144-6-jianyong.wu@arm.com>
+Subject: [PATCH v15 6/9] arm64/kvm: Add hypercall service for kvm ptp.
+Date: Wed, 11 Nov 2020 14:22:08 +0800
+Message-Id: <20201111062211.33144-7-jianyong.wu@arm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20201111062211.33144-1-jianyong.wu@arm.com>
 References: <20201111062211.33144-1-jianyong.wu@arm.com>
@@ -74,47 +74,131 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add clocksource id for arm arch counter to let it be identified easily and
-elegantly in ptp_kvm implementation for arm.
+ptp_kvm will get this service through SMCC call.
+The service offers wall time and cycle count of host to guest.
+The caller must specify whether they want the host cycle count
+or the difference between host cycle count and cntvoff.
 
 Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
 ---
- drivers/clocksource/arm_arch_timer.c | 2 ++
- include/linux/clocksource_ids.h      | 1 +
- 2 files changed, 3 insertions(+)
+ arch/arm64/kvm/hypercalls.c | 61 +++++++++++++++++++++++++++++++++++++
+ include/linux/arm-smccc.h   | 17 +++++++++++
+ 2 files changed, 78 insertions(+)
 
-diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
-index 6c3e84180146..d55acffb0b90 100644
---- a/drivers/clocksource/arm_arch_timer.c
-+++ b/drivers/clocksource/arm_arch_timer.c
-@@ -16,6 +16,7 @@
- #include <linux/cpu_pm.h>
- #include <linux/clockchips.h>
- #include <linux/clocksource.h>
-+#include <linux/clocksource_ids.h>
- #include <linux/interrupt.h>
- #include <linux/of_irq.h>
- #include <linux/of_address.h>
-@@ -191,6 +192,7 @@ static u64 arch_counter_read_cc(const struct cyclecounter *cc)
+diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+index b9d8607083eb..f7d189563f3d 100644
+--- a/arch/arm64/kvm/hypercalls.c
++++ b/arch/arm64/kvm/hypercalls.c
+@@ -9,6 +9,51 @@
+ #include <kvm/arm_hypercalls.h>
+ #include <kvm/arm_psci.h>
  
- static struct clocksource clocksource_counter = {
- 	.name	= "arch_sys_counter",
-+	.id	= CSID_ARM_ARCH_COUNTER,
- 	.rating	= 400,
- 	.read	= arch_counter_read,
- 	.mask	= CLOCKSOURCE_MASK(56),
-diff --git a/include/linux/clocksource_ids.h b/include/linux/clocksource_ids.h
-index 4d8e19e05328..16775d7d8f8d 100644
---- a/include/linux/clocksource_ids.h
-+++ b/include/linux/clocksource_ids.h
-@@ -5,6 +5,7 @@
- /* Enum to give clocksources a unique identifier */
- enum clocksource_ids {
- 	CSID_GENERIC		= 0,
-+	CSID_ARM_ARCH_COUNTER,
- 	CSID_MAX,
- };
++static void kvm_ptp_get_time(struct kvm_vcpu *vcpu, u64 *val)
++{
++	struct system_time_snapshot systime_snapshot;
++	u64 cycles = ~0UL;
++	u32 feature;
++
++	/*
++	 * system time and counter value must captured in the same
++	 * time to keep consistency and precision.
++	 */
++	ktime_get_snapshot(&systime_snapshot);
++
++	// binding ptp_kvm clocksource to arm_arch_counter
++	if (systime_snapshot.cs_id != CSID_ARM_ARCH_COUNTER)
++		return;
++
++	val[0] = upper_32_bits(systime_snapshot.real);
++	val[1] = lower_32_bits(systime_snapshot.real);
++
++	/*
++	 * which of virtual counter or physical counter being
++	 * asked for is decided by the r1 value of SMCCC
++	 * call. If no invalid r1 value offered, default cycle
++	 * value(-1) will be returned.
++	 * Note: keep in mind that feature is u32 and smccc_get_arg1
++	 * will return u64, so need auto cast here.
++	 */
++	feature = smccc_get_arg1(vcpu);
++	switch (feature) {
++	case ARM_PTP_VIRT_COUNTER:
++		cycles = systime_snapshot.cycles - vcpu_read_sys_reg(vcpu, CNTVOFF_EL2);
++		break;
++	case ARM_PTP_PHY_COUNTER:
++		cycles = systime_snapshot.cycles;
++		break;
++	case ARM_PTP_NONE_COUNTER:
++		break;
++	default:
++		val[0] = SMCCC_RET_NOT_SUPPORTED;
++		break;
++	}
++	val[2] = upper_32_bits(cycles);
++	val[3] = lower_32_bits(cycles);
++}
++
+ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+ {
+ 	u32 func_id = smccc_get_function(vcpu);
+@@ -79,6 +124,22 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+ 		break;
+ 	case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
+ 		val[0] = BIT(ARM_SMCCC_KVM_FUNC_FEATURES);
++		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_KVM_PTP);
++		break;
++	/*
++	 * This serves virtual kvm_ptp.
++	 * Four values will be passed back.
++	 * reg0 stores high 32-bits of host ktime;
++	 * reg1 stores low 32-bits of host ktime;
++	 * For ARM_PTP_VIRT_COUNTER:
++	 * reg2 stores high 32-bits of difference of host cycles and cntvoff;
++	 * reg3 stores low 32-bits of difference of host cycles and cntvoff.
++	 * For ARM_PTP_PHY_COUNTER:
++	 * reg2 stores the high 32-bits of host cycles;
++	 * reg3 stores the low 32-bits of host cycles.
++	 */
++	case ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID:
++		kvm_ptp_get_time(vcpu, val);
+ 		break;
+ 	default:
+ 		return kvm_psci_call(vcpu);
+diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
+index d75408141137..a03c5dd409d3 100644
+--- a/include/linux/arm-smccc.h
++++ b/include/linux/arm-smccc.h
+@@ -103,6 +103,7 @@
  
+ /* KVM "vendor specific" services */
+ #define ARM_SMCCC_KVM_FUNC_FEATURES		0
++#define ARM_SMCCC_KVM_FUNC_KVM_PTP		1
+ #define ARM_SMCCC_KVM_FUNC_FEATURES_2		127
+ #define ARM_SMCCC_KVM_NUM_FUNCS			128
+ 
+@@ -114,6 +115,22 @@
+ 
+ #define SMCCC_ARCH_WORKAROUND_RET_UNAFFECTED	1
+ 
++/*
++ * ptp_kvm is a feature used for time sync between vm and host.
++ * ptp_kvm module in guest kernel will get service from host using
++ * this hypercall ID.
++ */
++#define ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID				\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
++			   ARM_SMCCC_SMC_32,				\
++			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
++			   ARM_SMCCC_KVM_FUNC_KVM_PTP)
++
++/* ptp_kvm counter type ID */
++#define ARM_PTP_VIRT_COUNTER			0
++#define ARM_PTP_PHY_COUNTER			1
++#define ARM_PTP_NONE_COUNTER			2
++
+ /* Paravirtualised time calls (defined by ARM DEN0057A) */
+ #define ARM_SMCCC_HV_PV_TIME_FEATURES				\
+ 	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
 -- 
 2.17.1
 
