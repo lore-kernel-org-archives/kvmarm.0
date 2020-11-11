@@ -2,72 +2,75 @@ Return-Path: <SRS0=x+jN=ER=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42741C388F9
-	for <kvmarm@archiver.kernel.org>; Wed, 11 Nov 2020 13:47:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14D32C388F9
+	for <kvmarm@archiver.kernel.org>; Wed, 11 Nov 2020 13:52:17 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 754032074B
-	for <kvmarm@archiver.kernel.org>; Wed, 11 Nov 2020 13:47:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 234622072C
+	for <kvmarm@archiver.kernel.org>; Wed, 11 Nov 2020 13:52:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="s6qdkedV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 754032074B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="WvD1Kt0r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 234622072C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C049D4B70C;
-	Wed, 11 Nov 2020 08:47:35 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A6C64B9DD;
+	Wed, 11 Nov 2020 08:52:15 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id k45sfdjwEazD; Wed, 11 Nov 2020 08:47:34 -0500 (EST)
+	with ESMTP id LO0a9rXN6HTh; Wed, 11 Nov 2020 08:52:13 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9ED354B91D;
-	Wed, 11 Nov 2020 08:47:34 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 83A3E4B9D6;
+	Wed, 11 Nov 2020 08:52:13 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 55C024B85B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Nov 2020 08:47:33 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 766DA4B9C8
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Nov 2020 08:52:11 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cUOSHbhBDuec for <kvmarm@lists.cs.columbia.edu>;
- Wed, 11 Nov 2020 08:47:32 -0500 (EST)
+ with ESMTP id gz0vnq6I-scd for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 11 Nov 2020 08:52:10 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3BBF64B70C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Nov 2020 08:47:32 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 661714B9C6
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Nov 2020 08:52:10 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id D74222072C;
- Wed, 11 Nov 2020 13:47:30 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id B6D702072C;
+ Wed, 11 Nov 2020 13:52:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1605102451;
- bh=O75Cb/oSTOVEsh2cfT+C7Cb6UuFAt0jwxEEIDWUu0Yk=;
+ s=default; t=1605102728;
+ bh=vpzQhD31kZiz0Ds3ndWnHcNtFHrzT9rX+xjSS3L2qxs=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=s6qdkedV3+4fsv9ewvPeAiOR1c16RxhYCj1bxqVcF8hYBi4cakLSoT6XUMMqSTaN4
- CXEY3k1jZuMLQuGBUBc+i5/+4MQxW2NWjIkXf7oYbmQMiG7ZoybazDCyw0dRCQBTjz
- bk5cbgxOFOFRrOJSG862TzA8ZbBF3FvDVdFJCC+4=
+ b=WvD1Kt0rYFg9LPKQES5pJcwfYvw83ZpPUhh0NWExD5onFN9DyY3DuF/q61lUKfdpD
+ CIoap2gAK2Q2fSkijiMy5U01a8voRmPb8f4kaqvbDtPWP8k/1FphdUqx4VNzfHAkiK
+ WxDnceLo/UM3VrVCveroTBou4ju2eMynmawPEs5E=
 Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
  by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
  TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1kcqTA-009mCw-Hm; Wed, 11 Nov 2020 13:47:28 +0000
+ id 1kcqXe-009mGl-JM; Wed, 11 Nov 2020 13:52:06 +0000
 MIME-Version: 1.0
-Date: Wed, 11 Nov 2020 13:47:28 +0000
+Date: Wed, 11 Nov 2020 13:52:06 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: David Brazdil <dbrazdil@google.com>
-Subject: Re: [PATCH v1 16/24] kvm: arm64: Add offset for hyp VA <-> PA
- conversion
-In-Reply-To: <20201109113233.9012-17-dbrazdil@google.com>
+Subject: Re: [PATCH v1 07/24] kvm: arm64: Create nVHE copy of cpu_logical_map
+In-Reply-To: <20201111134527.ygzf5cm6qpdpcroo@google.com>
 References: <20201109113233.9012-1-dbrazdil@google.com>
- <20201109113233.9012-17-dbrazdil@google.com>
+ <20201109113233.9012-8-dbrazdil@google.com>
+ <d473fd26e5314f2407b70242488f33de@kernel.org>
+ <20201111130321.qalrzfabdonrwvsz@google.com>
+ <15a580e6ac06294ead8859fba8f51deb@kernel.org>
+ <20201111134527.ygzf5cm6qpdpcroo@google.com>
 User-Agent: Roundcube Webmail/1.4.9
-Message-ID: <ded6b623ea8ddc43f7dcabd0ec59d4b5@kernel.org>
+Message-ID: <3ed604d7837fa64ec7c4fe5920c57382@kernel.org>
 X-Sender: maz@kernel.org
 X-SA-Exim-Connect-IP: 51.254.78.96
 X-SA-Exim-Rcpt-To: dbrazdil@google.com, kvmarm@lists.cs.columbia.edu,
@@ -102,76 +105,47 @@ Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2020-11-09 11:32, David Brazdil wrote:
-> Add a host-initialized constant to KVM nVHE hyp code for converting
-> between EL2 linear map virtual addresses and physical addresses.
-> Also add `__hyp_pa` macro that performs the conversion.
+On 2020-11-11 13:45, David Brazdil wrote:
+> On Wed, Nov 11, 2020 at 01:29:29PM +0000, Marc Zyngier wrote:
+>> On 2020-11-11 13:03, David Brazdil wrote:
+>> > > > +/*
+>> > > > + * nVHE copy of data structures tracking available CPU cores.
+>> > > > + * Only entries for CPUs that were online at KVM init are populated.
+>> > > > + * Other CPUs should not be allowed to boot because their features were
+>> > > > + * not checked against the finalized system capabilities.
+>> > > > + */
+>> > > > +u64 __ro_after_init __cpu_logical_map[NR_CPUS] = { [0 ... NR_CPUS-1]
+>> > > > = INVALID_HWID };
+>> > >
+>> > > I'm not sure what __ro_after_init means once we get S2 isolation.
+>> >
+>> > It is stretching the definition of 'init' a bit, I know, but I don't see
+>> > what
+>> > your worry is about S2? The intention is to mark this read-only for
+>> > .hyp.text
+>> > at runtime. With S2, the host won't be able to write to it after KVM
+>> > init.
+>> > Obviously that's currently not the case.
+>> 
+>> More importantly, EL2 can write to it at any time, which is the bit 
+>> I'm
+>> worried
+>> about, as it makes the annotation misleading.
 > 
-> Signed-off-by: David Brazdil <dbrazdil@google.com>
-> ---
->  arch/arm64/kvm/arm.c           | 15 +++++++++++++++
->  arch/arm64/kvm/hyp/nvhe/psci.c |  3 +++
->  2 files changed, 18 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 28e3bc056225..dc7d43d7785a 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -1484,6 +1484,20 @@ static inline void hyp_cpu_pm_exit(void)
->  }
->  #endif
-> 
-> +static void init_hyp_physvirt_offset(void)
-> +{
-> +	extern s64 kvm_nvhe_sym(hyp_physvirt_offset);
-> +	unsigned long kern_vaddr, hyp_vaddr, paddr;
-> +
-> +	/* Check that kvm_arm_hyp_percpu_base has been set. */
-> +	BUG_ON(kvm_arm_hyp_percpu_base[0] == 0);
+> EL2 can't, at least not accidentally. The hyp memory mapping is 
+> PAGE_HYP_RO
+> (see patch 05).
 
-Why is this dependent on the percpu base? Or is that just a convenient
-symbol?
+Ah, I obviously overlooked that. Thanks for setting me straight.
 
-> +
-> +	kern_vaddr = kvm_arm_hyp_percpu_base[0];
-> +	hyp_vaddr = kern_hyp_va(kern_vaddr);
-> +	paddr = __pa(kern_vaddr);
-> +	CHOOSE_NVHE_SYM(hyp_physvirt_offset) = (s64)paddr - (s64)hyp_vaddr;
-> +}
+> Shouldn't clash with include files. Where fixing the kernel might clash 
+> is
+> all the users of for_each_*_cpu that use an int for the iterator var.
 
-It feels like this offset could be set at the point where we compute
-the hyp_va offset in va_layout.c, couldn't it? It would have the
-advantage of keeping all the ugly VA hacks together.
-
-> +
->  static void init_cpu_logical_map(void)
->  {
->  	extern u64 kvm_nvhe_sym(__cpu_logical_map)[NR_CPUS];
-> @@ -1688,6 +1702,7 @@ static int init_hyp_mode(void)
->  		}
->  	}
-> 
-> +	init_hyp_physvirt_offset();
->  	init_cpu_logical_map();
->  	init_psci();
-> 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/psci.c 
-> b/arch/arm64/kvm/hyp/nvhe/psci.c
-> index 82d3b2c89658..b0b5df590ba5 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/psci.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/psci.c
-> @@ -16,6 +16,9 @@
->  /* Config options set by the host. */
->  u32 kvm_host_psci_version = PSCI_VERSION(0, 0);
->  u32 kvm_host_psci_function_id[PSCI_FN_MAX];
-> +s64 hyp_physvirt_offset;
-> +
-> +#define __hyp_pa(x) ((phys_addr_t)((x)) + hyp_physvirt_offset)
-> 
->  static u64 get_psci_func_id(struct kvm_cpu_context *host_ctxt)
->  {
-
-Thanks,
+I don't think that's a problem (nobody expects that many CPUs). But if 
+you
+are confident that we don't have a problem, no need to change the kernel
+itself.
 
          M.
 -- 
