@@ -2,112 +2,80 @@ Return-Path: <SRS0=fMed=ES=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BCBFC2D0A3
-	for <kvmarm@archiver.kernel.org>; Thu, 12 Nov 2020 16:03:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E561C2D0E4
+	for <kvmarm@archiver.kernel.org>; Thu, 12 Nov 2020 22:22:44 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6DC4020759
-	for <kvmarm@archiver.kernel.org>; Thu, 12 Nov 2020 16:03:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DC4020759
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id C193522201
+	for <kvmarm@archiver.kernel.org>; Thu, 12 Nov 2020 22:22:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="PzAwW5y5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C193522201
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9173D4BAF1;
-	Thu, 12 Nov 2020 11:03:26 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F34204BC9E;
+	Thu, 12 Nov 2020 17:22:42 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Mqp0Eg5Hn93U; Thu, 12 Nov 2020 11:03:25 -0500 (EST)
+	with ESMTP id JW1T31gqDrIZ; Thu, 12 Nov 2020 17:22:41 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A17C4BAD9;
-	Thu, 12 Nov 2020 11:03:25 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D90604BCA1;
+	Thu, 12 Nov 2020 17:22:41 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B247C4BA7F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Nov 2020 11:03:23 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 850114BCA0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Nov 2020 17:22:40 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id oACqMcLuH5aq for <kvmarm@lists.cs.columbia.edu>;
- Thu, 12 Nov 2020 11:03:22 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4524D4B876
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Nov 2020 11:03:22 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A90FD142F;
- Thu, 12 Nov 2020 08:03:21 -0800 (PST)
-Received: from [192.168.2.22] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3EACD3F73C;
- Thu, 12 Nov 2020 08:03:19 -0800 (PST)
-Subject: Re: [PATCH v2 4/5] arm64: Add support for SMCCC TRNG entropy source
-To: Mark Rutland <mark.rutland@arm.com>, Mark Brown <broonie@kernel.org>
-References: <20201105125656.25259-1-andre.przywara@arm.com>
- <20201105125656.25259-5-andre.przywara@arm.com>
- <20201105134142.GA4856@sirena.org.uk>
- <20201105140322.GH82102@C02TD0UTHF1T.local>
- <20201105142949.GB4856@sirena.org.uk>
- <20201105143852.GJ82102@C02TD0UTHF1T.local>
-From: =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
-Autocrypt: addr=andre.przywara@arm.com; prefer-encrypt=mutual; keydata=
- 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
- i4aIXCH3Wv6K
-Organization: ARM Ltd.
-Message-ID: <08049298-6d07-55ba-70ef-be3c8c017bf5@arm.com>
-Date: Thu, 12 Nov 2020 16:03:08 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+ with ESMTP id YlcFXjrzNGHt for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 12 Nov 2020 17:22:39 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5E5EC4BCA5
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Nov 2020 17:22:39 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id DB7C9206C0;
+ Thu, 12 Nov 2020 22:22:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1605219758;
+ bh=UQUwiBq8tWwyGEtWdZsI4uMA1qJTbHpjR+jMnbG5eV0=;
+ h=From:To:Cc:Subject:Date:From;
+ b=PzAwW5y5g8PIPo7brxJe6bZfQKtV0doSsNjkQ5xD82Gpf5Z9mCx5pDt7ErnHxy3T+
+ YpMPKR7/PowNZS0MkKQV5FpyEUTPk86H4dcUFT9tL3xSVAFUeNfmUIkRY9AKnt+J1c
+ SG1wrRYXJ8PO37cjjC0VfyRvgIN8R4teHCwlygos=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1kdKzD-00ABHn-Np; Thu, 12 Nov 2020 22:22:35 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PATCH 0/3] KVM/arm64 fixes for 5.10, take #3
+Date: Thu, 12 Nov 2020 22:21:36 +0000
+Message-Id: <20201112222139.466204-1-maz@kernel.org>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-In-Reply-To: <20201105143852.GJ82102@C02TD0UTHF1T.local>
-Content-Language: en-GB
-Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, linux-kernel@vger.kernel.org,
- Catalin Marinas <catalin.marinas@arm.com>,
- Linus Walleij <linus.walleij@linaro.org>, Russell King <linux@armlinux.org.uk>,
- Ard Biesheuvel <ardb@kernel.org>, Sudeep Holla <sudeep.holla@arm.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, liangpeng10@huawei.com, will@kernel.org,
+ james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+ kernel-team@android.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -124,81 +92,45 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 05/11/2020 14:38, Mark Rutland wrote:
+Paolo,
 
-Hi,
+Here's another small set of fixes for 5.10, this time fixing some
+corner cases of the Spectre mitigation rework. Note that I had to pull
+5.10-rc1 into kvmarm/next in order to avoid some annoying conflicts.
 
-> On Thu, Nov 05, 2020 at 02:29:49PM +0000, Mark Brown wrote:
->> On Thu, Nov 05, 2020 at 02:03:22PM +0000, Mark Rutland wrote:
->>> On Thu, Nov 05, 2020 at 01:41:42PM +0000, Mark Brown wrote:
->>
->>>> It isn't obvious to me why we don't fall through to trying the SMCCC
->>>> TRNG here if for some reason the v8.5-RNG didn't give us something.
->>>> Definitely an obscure possibility but still...
->>
->>> I think it's better to assume that if we have a HW RNG and it's not
->>> giving us entropy, it's not worthwhile trapping to the host, which might
->>> encounter the exact same issue.
->>
->> There's definitely a good argument for that, but OTOH it's possible the
->> SMCCC implementation is doing something else (it'd be an interesting
->> implementation decision but...).  That said I don't really mind, I think
->> my comment was more that if we're doing this the code should be explicit
->> about what the intent is since right now it isn't obvious.  Either a
->> comment or having an explicit "what method are we choosing" thing.
->>
->>> That said, I'm not sure it's great to plumb this under the
->>> arch_get_random*() interfaces, e.g. given this measn that
->>> add_interrupt_randomness() will end up trapping to the host all the time
->>> when it calls arch_get_random_seed_long().
->>
->>> Is there an existing interface for "slow" runtime entropy that we can
->>> plumb this into instead?
->>
->> Yeah, I was wondering about this myself - it seems like a better fit for
->> hwrng rather than the arch interfaces but that's not used until
->> userspace comes up, the arch stuff is all expected to be quick.  I
->> suppose we could implement the SMCCC stuff for the early variants of the
->> API you added so it gets used for bootstrapping purposes and then we
->> rely on userspace keeping things topped up by fetching entropy through
->> hwrng or otherwise but that feels confused so I have a hard time getting
->> enthusiastic about it.
-> 
-> I'm perfectly happy for the early functions to call this, or for us to
-> add something new firmwware_get_random_*() functions that we can call
-> early (and potentially at runtime, but less often than
-> arch_get_random_*()).
-> 
-> I suspect the easy thing to do for now is plumb this into the existing
-> early arch functions and hwrng.
+Please pull,
 
-So coming back to this: With Ard's patch to remove arch_get_random from
-add_interrupt_randomness(), I see this called much less often: basically
-once at early boot, then 16 longs every 5 minutes or so, from the
-periodic crng reseed.
-The only exception would be the KVM code now, so we are at the grace of
-a guest to not swamp us with seed requests. Alternatively we could
-remove the direct arch_get_random call from the KVM code, relying on the
-general kernel pool instead.
+	M.
 
-Is this new situation now good enough to keep the SMCCC calls in this
-interface here?
+The following changes since commit 4f6b838c378a52ea3ae0b15f12ca8a20849072fa:
 
-I have the hwrng driver ready, which could coexist with the arch_random
-implementation. But if the only purpose of /dev/hwrng is to let rngd
-feed this entropy back into the kernel, it would be pointless.
-I found the driver useful to debug and test the firmware implementation
-and to assess the random number quality (by feeding the raw stream into
-rngtest or dieharder), but that might not justify a merge.
+  Merge tag 'v5.10-rc1' into kvmarm-master/next (2020-11-12 21:20:43 +0000)
 
-Ard objected against the driver, I guess to keep things simple and
-architectural.
+are available in the Git repository at:
 
-So what is the plan here? Shall I post a v3 with or without the hwrng
-driver? And do we keep the SMCCC arch_random implementation?
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.10-3
 
-Cheers,
-Andre
+for you to fetch changes up to ed4ffaf49bf9ce1002b516d8c6aa04937b7950bc:
+
+  KVM: arm64: Handle SCXTNUM_ELx traps (2020-11-12 21:22:46 +0000)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for v5.10, take #3
+
+- Allow userspace to downgrade ID_AA64PFR0_EL1.CSV2
+- Inject UNDEF on SCXTNUM_ELx access
+
+----------------------------------------------------------------
+Marc Zyngier (3):
+      KVM: arm64: Allow setting of ID_AA64PFR0_EL1.CSV2 from userspace
+      KVM: arm64: Unify trap handlers injecting an UNDEF
+      KVM: arm64: Handle SCXTNUM_ELx traps
+
+ arch/arm64/include/asm/kvm_host.h |   2 +
+ arch/arm64/include/asm/sysreg.h   |   4 ++
+ arch/arm64/kvm/arm.c              |  16 ++++++
+ arch/arm64/kvm/sys_regs.c         | 111 +++++++++++++++++++++++---------------
+ 4 files changed, 89 insertions(+), 44 deletions(-)
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
