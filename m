@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA25CC63697
-	for <kvmarm@archiver.kernel.org>; Fri, 13 Nov 2020 18:26:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDC6CC55ABD
+	for <kvmarm@archiver.kernel.org>; Fri, 13 Nov 2020 18:26:30 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 290182074B
-	for <kvmarm@archiver.kernel.org>; Fri, 13 Nov 2020 18:26:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 80C7C206E0
+	for <kvmarm@archiver.kernel.org>; Fri, 13 Nov 2020 18:26:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="qyKSf+mo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 290182074B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="H4LYJiFN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80C7C206E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C57F64BA10;
-	Fri, 13 Nov 2020 13:26:28 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5BB724B8AB;
+	Fri, 13 Nov 2020 13:26:30 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id iZzAPvVHufUm; Fri, 13 Nov 2020 13:26:27 -0500 (EST)
+	with ESMTP id XCdhWk6Iea7t; Fri, 13 Nov 2020 13:26:29 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 30A664BA9A;
-	Fri, 13 Nov 2020 13:26:25 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 57BC64BBC0;
+	Fri, 13 Nov 2020 13:26:26 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BE924B715
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Nov 2020 13:26:23 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B4A14B9DB
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Nov 2020 13:26:25 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id X4hI+cDyRI8z for <kvmarm@lists.cs.columbia.edu>;
- Fri, 13 Nov 2020 13:26:22 -0500 (EST)
+ with ESMTP id 2-oyo83-dzRo for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 13 Nov 2020 13:26:24 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 924AE4B7A0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Nov 2020 13:26:21 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 98FC34B5EC
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Nov 2020 13:26:22 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id B273B20759;
- Fri, 13 Nov 2020 18:26:20 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id BB39D206FB;
+ Fri, 13 Nov 2020 18:26:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1605291980;
- bh=gY/VRsiPzRuoQjrUpaFkSuVWs50kFr+mHGg8iLcn3xs=;
+ s=default; t=1605291981;
+ bh=Gw5jS1fVKa0k38+ciCyXKBNN4xGCb2jxxfZxp9akaxw=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=qyKSf+moAYGtWWDjfKeEo01OP2lMgRMqd2zIk6o456bvQfCX/WSbUERqz+SMN47/D
- RlSSOh0yn1eghW3QeAKqezJufFDz3k8jBmmkRUBJHLj5hMi1Binku54KLIXI+P4mmB
- 2Fp56zja5vdZ7cduoj88ICsT8ignDc3S1F//WnEM=
+ b=H4LYJiFNh7lEDt35mIZL2a3do2WVbL5iI8kOeL50vrKZQr6e9T5geRlxgUwRF8V3Y
+ xVCz0E6YfgG1mwe8LHYZ37OGdXBYYXsZDv55Nzni4+m3esO2eS8HoJ4ZvAEscYjN1W
+ AdEozIjd//FsRJ1jaueMHoghL/PAJaKfKPYeueIE=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1kddm6-00APrY-Uk; Fri, 13 Nov 2020 18:26:19 +0000
+ id 1kddm7-00APrY-ED; Fri, 13 Nov 2020 18:26:20 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH 7/8] KVM: arm64: Gate kvm_pmu_update_state() on the PMU feature
-Date: Fri, 13 Nov 2020 18:26:01 +0000
-Message-Id: <20201113182602.471776-8-maz@kernel.org>
+Subject: [PATCH 8/8] KVM: arm64: Get rid of the PMU ready state
+Date: Fri, 13 Nov 2020 18:26:02 +0000
+Message-Id: <20201113182602.471776-9-maz@kernel.org>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201113182602.471776-1-maz@kernel.org>
 References: <20201113182602.471776-1-maz@kernel.org>
@@ -93,32 +93,52 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-We currently gate the update of the PMU state on the PMU being "ready".
-The "ready" state is only set to true when the first vcpu run is
-successful, and if it isn't, we never reach the update code.
-
-So the "ready" state is never the right thing to check for, and it
-should instead be the presence of the PMU feature, which makes
-a bit more sense.
+The PMU ready state has no user left. Goodbye.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/pmu-emul.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm64/kvm/pmu-emul.c | 1 -
+ include/kvm/arm_pmu.h     | 3 ---
+ 2 files changed, 4 deletions(-)
 
 diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 200f2a0d8d17..8806fdc85e8a 100644
+index 8806fdc85e8a..643cf819f3c0 100644
 --- a/arch/arm64/kvm/pmu-emul.c
 +++ b/arch/arm64/kvm/pmu-emul.c
-@@ -384,7 +384,7 @@ static void kvm_pmu_update_state(struct kvm_vcpu *vcpu)
- 	struct kvm_pmu *pmu = &vcpu->arch.pmu;
- 	bool overflow;
+@@ -851,7 +851,6 @@ int kvm_arm_pmu_v3_enable(struct kvm_vcpu *vcpu)
+ 	}
  
--	if (!kvm_arm_pmu_v3_ready(vcpu))
-+	if (!kvm_vcpu_has_pmu(vcpu))
- 		return;
+ 	kvm_pmu_vcpu_reset(vcpu);
+-	vcpu->arch.pmu.ready = true;
  
- 	overflow = !!kvm_pmu_overflow_status(vcpu);
+ 	return 0;
+ }
+diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+index 1d94acd0bc85..fc85f50fa0e9 100644
+--- a/include/kvm/arm_pmu.h
++++ b/include/kvm/arm_pmu.h
+@@ -24,13 +24,11 @@ struct kvm_pmu {
+ 	int irq_num;
+ 	struct kvm_pmc pmc[ARMV8_PMU_MAX_COUNTERS];
+ 	DECLARE_BITMAP(chained, ARMV8_PMU_MAX_COUNTER_PAIRS);
+-	bool ready;
+ 	bool created;
+ 	bool irq_level;
+ 	struct irq_work overflow_work;
+ };
+ 
+-#define kvm_arm_pmu_v3_ready(v)		((v)->arch.pmu.ready)
+ #define kvm_arm_pmu_irq_initialized(v)	((v)->arch.pmu.irq_num >= VGIC_NR_SGIS)
+ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx);
+ void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val);
+@@ -61,7 +59,6 @@ int kvm_arm_pmu_v3_enable(struct kvm_vcpu *vcpu);
+ struct kvm_pmu {
+ };
+ 
+-#define kvm_arm_pmu_v3_ready(v)		(false)
+ #define kvm_arm_pmu_irq_initialized(v)	(false)
+ static inline u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu,
+ 					    u64 select_idx)
 -- 
 2.28.0
 
