@@ -7,64 +7,64 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ECFEC6369E
-	for <kvmarm@archiver.kernel.org>; Fri, 13 Nov 2020 18:26:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA5E6C61DD8
+	for <kvmarm@archiver.kernel.org>; Fri, 13 Nov 2020 18:26:24 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 03EB422226
-	for <kvmarm@archiver.kernel.org>; Fri, 13 Nov 2020 18:26:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 56FE7206F9
+	for <kvmarm@archiver.kernel.org>; Fri, 13 Nov 2020 18:26:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="riZ/QyU+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03EB422226
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="dDLBjuEN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56FE7206F9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A07894B626;
-	Fri, 13 Nov 2020 13:26:22 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DAD4D4B67A;
+	Fri, 13 Nov 2020 13:26:23 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Ma2TZDW4Fuvm; Fri, 13 Nov 2020 13:26:21 -0500 (EST)
+	with ESMTP id abi-Et-a7fJT; Fri, 13 Nov 2020 13:26:22 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 90BCF4B8E9;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A82974B880;
 	Fri, 13 Nov 2020 13:26:21 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 355224B614
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B2F894B728
  for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Nov 2020 13:26:20 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EpJndkjLKbo2 for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id UfsJdlpPFZ3l for <kvmarm@lists.cs.columbia.edu>;
  Fri, 13 Nov 2020 13:26:19 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 48A3E4B60C
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BBE2D4B622
  for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Nov 2020 13:26:19 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 4A10D2074B;
+ by mail.kernel.org (Postfix) with ESMTPSA id B7514208D5;
  Fri, 13 Nov 2020 18:26:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
  s=default; t=1605291978;
- bh=yeLt3nqD1e41ZnMR7XCTopnao0wO6yUaD1zjpERGPFg=;
+ bh=8exQ+RJWp7s5beIsrjhtie2H7PoVpSHVfotFblRbfkU=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=riZ/QyU++0GCZfImskdEDD1g5xZEAsgyBKPpbHX8INDflaVbu4TWHBkJGT8wFQrcS
- OKHFi1pIO+TS1YAlfDlPmVV6Cxqs4ZMX4xaSrjHcODLaBMBwr5E33vjp10Py2Aachn
- lUId5tI+2N6O8se/g9z90oT0DVT+48ALpzd+MIDM=
+ b=dDLBjuENH33jZ3V2szqs+b5y1JFD/XbFnnokFDScqJq9ZtTHUXGQkpad2zj8Al0HA
+ XVRXvTM6pt4tUUjEebMQ7806QzfHE/OOlfazeu6GY77KPA20YQLlKevtZior7upkkU
+ fetX7Q2OrTX8RkQaLXGxZYdEP2mS7d0pCHKM+bHE=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1kddm4-00APrY-Gt; Fri, 13 Nov 2020 18:26:16 +0000
+ id 1kddm4-00APrY-Vy; Fri, 13 Nov 2020 18:26:17 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH 2/8] KVM: arm64: Set ID_AA64DFR0_EL1.PMUVer to 0 when no PMU
- support
-Date: Fri, 13 Nov 2020 18:25:56 +0000
-Message-Id: <20201113182602.471776-3-maz@kernel.org>
+Subject: [PATCH 3/8] KVM: arm64: Refuse illegal KVM_ARM_VCPU_PMU_V3 at reset
+ time
+Date: Fri, 13 Nov 2020 18:25:57 +0000
+Message-Id: <20201113182602.471776-4-maz@kernel.org>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201113182602.471776-1-maz@kernel.org>
 References: <20201113182602.471776-1-maz@kernel.org>
@@ -94,39 +94,58 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-We always expose the HW view of PMU in ID_AA64FDR0_EL1.PMUver,
-even when the PMU feature is disabled, while the architecture
-says that FEAT_PMUv3 not being implemented should result in this
-field being zero.
+We accept to configure a PMU when a vcpu is created, even if the
+HW (or the host) doesn't support it. This results in failures
+when attributes get set, which is a bit odd as we should have
+failed the vcpu creation the first place.
 
-Let's follow the architecture's guidance.
+Move the check to the point where we check the vcpu feature set,
+and fail early if we cannot support a PMU. This further simplifies
+the attribute handling.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/pmu-emul.c | 4 ++--
+ arch/arm64/kvm/reset.c    | 4 ++++
+ 2 files changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index d2e1d745f067..6629cfde2838 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1070,10 +1070,15 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
- 			 (0xfUL << ID_AA64ISAR1_GPA_SHIFT) |
- 			 (0xfUL << ID_AA64ISAR1_GPI_SHIFT));
- 	} else if (id == SYS_ID_AA64DFR0_EL1) {
-+		u64 cap = 0;
-+
- 		/* Limit guests to PMUv3 for ARMv8.1 */
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index e7e3b4629864..200f2a0d8d17 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -913,7 +913,7 @@ static bool pmu_irq_is_valid(struct kvm *kvm, int irq)
+ 
+ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ {
+-	if (!kvm_arm_support_pmu_v3() || !kvm_vcpu_has_pmu(vcpu))
++	if (!kvm_vcpu_has_pmu(vcpu))
+ 		return -ENODEV;
+ 
+ 	if (vcpu->arch.pmu.created)
+@@ -1034,7 +1034,7 @@ int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ 	case KVM_ARM_VCPU_PMU_V3_IRQ:
+ 	case KVM_ARM_VCPU_PMU_V3_INIT:
+ 	case KVM_ARM_VCPU_PMU_V3_FILTER:
+-		if (kvm_arm_support_pmu_v3() && kvm_vcpu_has_pmu(vcpu))
 +		if (kvm_vcpu_has_pmu(vcpu))
-+			cap = ID_AA64DFR0_PMUVER_8_1;
-+
- 		val = cpuid_feature_cap_perfmon_field(val,
- 						ID_AA64DFR0_PMUVER_SHIFT,
--						ID_AA64DFR0_PMUVER_8_1);
-+						cap);
- 	} else if (id == SYS_ID_DFR0_EL1) {
- 		/* Limit guests to PMUv3 for ARMv8.1 */
- 		val = cpuid_feature_cap_perfmon_field(val,
+ 			return 0;
+ 	}
+ 
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index 74ce92a4988c..3e772ea4e066 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -285,6 +285,10 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+ 			pstate = VCPU_RESET_PSTATE_EL1;
+ 		}
+ 
++		if (kvm_vcpu_has_pmu(vcpu) && !kvm_arm_support_pmu_v3()) {
++			ret = -EINVAL;
++			goto out;
++		}
+ 		break;
+ 	}
+ 
 -- 
 2.28.0
 
