@@ -2,87 +2,58 @@ Return-Path: <SRS0=E56M=ET=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84BE9C55ABD
-	for <kvmarm@archiver.kernel.org>; Fri, 13 Nov 2020 16:12:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E846C61DD8
+	for <kvmarm@archiver.kernel.org>; Fri, 13 Nov 2020 18:24:49 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id EFBCF208D5
-	for <kvmarm@archiver.kernel.org>; Fri, 13 Nov 2020 16:12:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CvQfm1/T"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFBCF208D5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 667B6206F9
+	for <kvmarm@archiver.kernel.org>; Fri, 13 Nov 2020 18:24:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 667B6206F9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C7AC4BC59;
-	Fri, 13 Nov 2020 11:12:31 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A1A2D4B851;
+	Fri, 13 Nov 2020 13:24:47 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id oR7EmzJPlYje; Fri, 13 Nov 2020 11:12:29 -0500 (EST)
+	with ESMTP id SFqpBT6qzE8m; Fri, 13 Nov 2020 13:24:46 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DD7974BBE3;
-	Fri, 13 Nov 2020 11:12:29 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7477A4B7AD;
+	Fri, 13 Nov 2020 13:24:46 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 175994BBDD
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Nov 2020 11:12:29 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 13C9A4B780
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Nov 2020 13:24:45 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7b98DEWrW0U3 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 13 Nov 2020 11:12:28 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F02B34B7C7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Nov 2020 11:12:27 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1605283947;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=UlZi9/27auJjCr1Tgxx7qj+mGMxuNnCzu/j/Vclt8i8=;
- b=CvQfm1/TpmfKpTDm9DijDMrLMikfgif9aKZwEYRUGXIZvlBjtHpUk4Yc/sHCBzPmbBHbLT
- QDnhjHVCv+ShWCrkh2miON+/0M3+C4IkAxmcxOxiwztnYir0E7Mt59ftpe3+ebVgXXFnje
- DpwOFjUBN+1VL350AIqA5UsVTXc+dSU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-445-HAvqfqvIOlyRQwMuwz0ylQ-1; Fri, 13 Nov 2020 11:12:23 -0500
-X-MC-Unique: HAvqfqvIOlyRQwMuwz0ylQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AE3476A299;
- Fri, 13 Nov 2020 16:12:21 +0000 (UTC)
-Received: from [10.36.114.125] (ovpn-114-125.ams2.redhat.com [10.36.114.125])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B3FCD5B4A7;
- Fri, 13 Nov 2020 16:12:15 +0000 (UTC)
-Subject: Re: [PATCH v10 04/11] vfio/pci: Add VFIO_REGION_TYPE_NESTED region
- type
-To: Zenghui Yu <yuzenghui@huawei.com>, eric.auger.pro@gmail.com,
- iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org,
- alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com,
- yi.l.liu@intel.com, robin.murphy@arm.com
-References: <20200320161911.27494-1-eric.auger@redhat.com>
- <20200320161911.27494-5-eric.auger@redhat.com>
- <d21e74e5-00a7-79f9-24d2-c9385409cc05@huawei.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <ce21ef1e-5ffd-586c-0925-d3a59eb0c30d@redhat.com>
-Date: Fri, 13 Nov 2020 17:12:14 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <d21e74e5-00a7-79f9-24d2-c9385409cc05@huawei.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+ with ESMTP id T9Oak90ny2QJ for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 13 Nov 2020 13:24:43 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 437374B77E
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Nov 2020 13:24:43 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8B74B1042;
+ Fri, 13 Nov 2020 10:24:42 -0800 (PST)
+Received: from donnerap.arm.com (donnerap.cambridge.arm.com [10.1.195.35])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A28763F718;
+ Fri, 13 Nov 2020 10:24:40 -0800 (PST)
+From: Andre Przywara <andre.przywara@arm.com>
+To: Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
+ Ard Biesheuvel <ardb@kernel.org>, Russell King <linux@armlinux.org.uk>,
+ Marc Zyngier <maz@kernel.org>
+Subject: [PATCH v3 0/5] ARM: arm64: Add SMCCC TRNG entropy service
+Date: Fri, 13 Nov 2020 18:24:30 +0000
+Message-Id: <20201113182435.64015-1-andre.przywara@arm.com>
+X-Mailer: git-send-email 2.17.1
+Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+ Theodore Ts'o <tytso@mit.edu>, Linus Walleij <linus.walleij@linaro.org>,
+ linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>,
+ Sudeep Holla <sudeep.holla@arm.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -94,150 +65,106 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SGkgWmVuZ2h1aSwKT24gOS8yNC8yMCAxMDoyMyBBTSwgWmVuZ2h1aSBZdSB3cm90ZToKPiBIaSBF
-cmljLAo+IAo+IE9uIDIwMjAvMy8yMSAwOjE5LCBFcmljIEF1Z2VyIHdyb3RlOgo+PiBBZGQgYSBu
-ZXcgc3BlY2lmaWMgRE1BX0ZBVUxUIHJlZ2lvbiBhaW1pbmcgdG8gZXhwb3NlZCBuZXN0ZWQgbW9k
-ZQo+PiB0cmFuc2xhdGlvbiBmYXVsdHMuCj4+Cj4+IFRoZSByZWdpb24gaGFzIGEgcmluZyBidWZm
-ZXIgdGhhdCBjb250YWlucyB0aGUgYWN0dWFsIGZhdWx0Cj4+IHJlY29yZHMgcGx1cyBhIGhlYWRl
-ciBhbGxvd2luZyB0byBoYW5kbGUgaXQgKHRhaWwvaGVhZCBpbmRpY2VzLAo+PiBtYXggY2FwYWNp
-dHksIGVudHJ5IHNpemUpLiBBdCB0aGUgbW9tZW50IHRoZSByZWdpb24gaXMgZGltZW5zaW9ubmVk
-Cj4+IGZvciA1MTIgZmF1bHQgcmVjb3Jkcy4KPj4KPj4gU2lnbmVkLW9mZi1ieTogRXJpYyBBdWdl
-ciA8ZXJpYy5hdWdlckByZWRoYXQuY29tPgo+IAo+IFsuLi5dCj4gCj4+IGRpZmYgLS1naXQgYS9k
-cml2ZXJzL3ZmaW8vcGNpL3ZmaW9fcGNpLmMgYi9kcml2ZXJzL3ZmaW8vcGNpL3ZmaW9fcGNpLmMK
-Pj4gaW5kZXggMzc5YTAyYzM2ZTM3Li41ODZiODlkZWJlZDUgMTAwNjQ0Cj4+IC0tLSBhL2RyaXZl
-cnMvdmZpby9wY2kvdmZpb19wY2kuYwo+PiArKysgYi9kcml2ZXJzL3ZmaW8vcGNpL3ZmaW9fcGNp
-LmMKPj4gQEAgLTI2MCw2ICsyNjAsNjkgQEAgaW50IHZmaW9fcGNpX3NldF9wb3dlcl9zdGF0ZShz
-dHJ1Y3QKPj4gdmZpb19wY2lfZGV2aWNlICp2ZGV2LCBwY2lfcG93ZXJfdCBzdGF0ZSkKPj4gwqDC
-oMKgwqDCoCByZXR1cm4gcmV0Owo+PiDCoCB9Cj4+IMKgICtzdGF0aWMgdm9pZCB2ZmlvX3BjaV9k
-bWFfZmF1bHRfcmVsZWFzZShzdHJ1Y3QgdmZpb19wY2lfZGV2aWNlICp2ZGV2LAo+PiArwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgc3RydWN0IHZmaW9fcGNpX3Jl
-Z2lvbiAqcmVnaW9uKQo+PiArewo+PiArfQo+PiArCj4+ICtzdGF0aWMgaW50IHZmaW9fcGNpX2Rt
-YV9mYXVsdF9hZGRfY2FwYWJpbGl0eShzdHJ1Y3QgdmZpb19wY2lfZGV2aWNlCj4+ICp2ZGV2LAo+
-PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHN0cnVj
-dCB2ZmlvX3BjaV9yZWdpb24gKnJlZ2lvbiwKPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBzdHJ1Y3QgdmZpb19pbmZvX2NhcCAqY2FwcykKPj4gK3sK
-Pj4gK8KgwqDCoCBzdHJ1Y3QgdmZpb19yZWdpb25faW5mb19jYXBfZmF1bHQgY2FwID0gewo+PiAr
-wqDCoMKgwqDCoMKgwqAgLmhlYWRlci5pZCA9IFZGSU9fUkVHSU9OX0lORk9fQ0FQX0RNQV9GQVVM
-VCwKPj4gK8KgwqDCoMKgwqDCoMKgIC5oZWFkZXIudmVyc2lvbiA9IDEsCj4+ICvCoMKgwqDCoMKg
-wqDCoCAudmVyc2lvbiA9IDEsCj4+ICvCoMKgwqAgfTsKPj4gK8KgwqDCoCByZXR1cm4gdmZpb19p
-bmZvX2FkZF9jYXBhYmlsaXR5KGNhcHMsICZjYXAuaGVhZGVyLCBzaXplb2YoY2FwKSk7Cj4+ICt9
-Cj4+ICsKPj4gK3N0YXRpYyBjb25zdCBzdHJ1Y3QgdmZpb19wY2lfcmVnb3BzIHZmaW9fcGNpX2Rt
-YV9mYXVsdF9yZWdvcHMgPSB7Cj4+ICvCoMKgwqAgLnJ3wqDCoMKgwqDCoMKgwqAgPSB2ZmlvX3Bj
-aV9kbWFfZmF1bHRfcncsCj4+ICvCoMKgwqAgLnJlbGVhc2XCoMKgwqAgPSB2ZmlvX3BjaV9kbWFf
-ZmF1bHRfcmVsZWFzZSwKPj4gK8KgwqDCoCAuYWRkX2NhcGFiaWxpdHkgPSB2ZmlvX3BjaV9kbWFf
-ZmF1bHRfYWRkX2NhcGFiaWxpdHksCj4+ICt9Owo+PiArCj4+ICsjZGVmaW5lIERNQV9GQVVMVF9S
-SU5HX0xFTkdUSCA1MTIKPj4gKwo+PiArc3RhdGljIGludCB2ZmlvX3BjaV9pbml0X2RtYV9mYXVs
-dF9yZWdpb24oc3RydWN0IHZmaW9fcGNpX2RldmljZSAqdmRldikKPj4gK3sKPj4gK8KgwqDCoCBz
-dHJ1Y3QgdmZpb19yZWdpb25fZG1hX2ZhdWx0ICpoZWFkZXI7Cj4+ICvCoMKgwqAgc2l6ZV90IHNp
-emU7Cj4+ICvCoMKgwqAgaW50IHJldDsKPj4gKwo+PiArwqDCoMKgIG11dGV4X2luaXQoJnZkZXYt
-PmZhdWx0X3F1ZXVlX2xvY2spOwo+PiArCj4+ICvCoMKgwqAgLyoKPj4gK8KgwqDCoMKgICogV2Ug
-cHJvdmlzaW9uIDEgcGFnZSBmb3IgdGhlIGhlYWRlciBhbmQgc3BhY2UgZm9yCj4+ICvCoMKgwqDC
-oCAqIERNQV9GQVVMVF9SSU5HX0xFTkdUSCBmYXVsdCByZWNvcmRzIGluIHRoZSByaW5nIGJ1ZmZl
-ci4KPj4gK8KgwqDCoMKgICovCj4+ICvCoMKgwqAgc2l6ZSA9IEFMSUdOKHNpemVvZihzdHJ1Y3Qg
-aW9tbXVfZmF1bHQpICoKPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBETUFfRkFVTFRfUklO
-R19MRU5HVEgsIFBBR0VfU0laRSkgKyBQQUdFX1NJWkU7Cj4+ICsKPj4gK8KgwqDCoCB2ZGV2LT5m
-YXVsdF9wYWdlcyA9IGt6YWxsb2Moc2l6ZSwgR0ZQX0tFUk5FTCk7Cj4+ICvCoMKgwqAgaWYgKCF2
-ZGV2LT5mYXVsdF9wYWdlcykKPj4gK8KgwqDCoMKgwqDCoMKgIHJldHVybiAtRU5PTUVNOwo+PiAr
-Cj4+ICvCoMKgwqAgcmV0ID0gdmZpb19wY2lfcmVnaXN0ZXJfZGV2X3JlZ2lvbih2ZGV2LAo+PiAr
-wqDCoMKgwqDCoMKgwqAgVkZJT19SRUdJT05fVFlQRV9ORVNURUQsCj4+ICvCoMKgwqDCoMKgwqDC
-oCBWRklPX1JFR0lPTl9TVUJUWVBFX05FU1RFRF9ETUFfRkFVTFQsCj4+ICvCoMKgwqDCoMKgwqDC
-oCAmdmZpb19wY2lfZG1hX2ZhdWx0X3JlZ29wcywgc2l6ZSwKPj4gK8KgwqDCoMKgwqDCoMKgIFZG
-SU9fUkVHSU9OX0lORk9fRkxBR19SRUFEIHwgVkZJT19SRUdJT05fSU5GT19GTEFHX1dSSVRFLAo+
-PiArwqDCoMKgwqDCoMKgwqAgdmRldi0+ZmF1bHRfcGFnZXMpOwo+PiArwqDCoMKgIGlmIChyZXQp
-Cj4+ICvCoMKgwqDCoMKgwqDCoCBnb3RvIG91dDsKPj4gKwo+PiArwqDCoMKgIGhlYWRlciA9IChz
-dHJ1Y3QgdmZpb19yZWdpb25fZG1hX2ZhdWx0ICopdmRldi0+ZmF1bHRfcGFnZXM7Cj4+ICvCoMKg
-wqAgaGVhZGVyLT5lbnRyeV9zaXplID0gc2l6ZW9mKHN0cnVjdCBpb21tdV9mYXVsdCk7Cj4+ICvC
-oMKgwqAgaGVhZGVyLT5uYl9lbnRyaWVzID0gRE1BX0ZBVUxUX1JJTkdfTEVOR1RIOwo+PiArwqDC
-oMKgIGhlYWRlci0+b2Zmc2V0ID0gc2l6ZW9mKHN0cnVjdCB2ZmlvX3JlZ2lvbl9kbWFfZmF1bHQp
-Owo+PiArwqDCoMKgIHJldHVybiAwOwo+PiArb3V0Ogo+PiArwqDCoMKgIGtmcmVlKHZkZXYtPmZh
-dWx0X3BhZ2VzKTsKPj4gK8KgwqDCoCByZXR1cm4gcmV0Owo+PiArfQo+PiArCj4+IMKgIHN0YXRp
-YyBpbnQgdmZpb19wY2lfZW5hYmxlKHN0cnVjdCB2ZmlvX3BjaV9kZXZpY2UgKnZkZXYpCj4+IMKg
-IHsKPj4gwqDCoMKgwqDCoCBzdHJ1Y3QgcGNpX2RldiAqcGRldiA9IHZkZXYtPnBkZXY7Cj4+IEBA
-IC0zNTgsNiArNDIxLDEwIEBAIHN0YXRpYyBpbnQgdmZpb19wY2lfZW5hYmxlKHN0cnVjdCB2Zmlv
-X3BjaV9kZXZpY2UKPj4gKnZkZXYpCj4+IMKgwqDCoMKgwqDCoMKgwqDCoCB9Cj4+IMKgwqDCoMKg
-wqAgfQo+PiDCoCArwqDCoMKgIHJldCA9IHZmaW9fcGNpX2luaXRfZG1hX2ZhdWx0X3JlZ2lvbih2
-ZGV2KTsKPj4gK8KgwqDCoCBpZiAocmV0KQo+PiArwqDCoMKgwqDCoMKgwqAgZ290byBkaXNhYmxl
-X2V4aXQ7Cj4+ICsKPj4gwqDCoMKgwqDCoCB2ZmlvX3BjaV9wcm9iZV9tbWFwcyh2ZGV2KTsKPj4g
-wqAgwqDCoMKgwqDCoCByZXR1cm4gMDsKPj4gQEAgLTEzODMsNiArMTQ1MCw3IEBAIHN0YXRpYyB2
-b2lkIHZmaW9fcGNpX3JlbW92ZShzdHJ1Y3QgcGNpX2RldiAqcGRldikKPj4gwqAgwqDCoMKgwqDC
-oCB2ZmlvX2lvbW11X2dyb3VwX3B1dChwZGV2LT5kZXYuaW9tbXVfZ3JvdXAsICZwZGV2LT5kZXYp
-Owo+PiDCoMKgwqDCoMKgIGtmcmVlKHZkZXYtPnJlZ2lvbik7Cj4+ICvCoMKgwqAga2ZyZWUodmRl
-di0+ZmF1bHRfcGFnZXMpOwo+PiDCoMKgwqDCoMKgIG11dGV4X2Rlc3Ryb3koJnZkZXYtPmlvZXZl
-bnRmZHNfbG9jayk7Cj4+IMKgIMKgwqDCoMKgwqAgaWYgKCFkaXNhYmxlX2lkbGVfZDMpCj4+IGRp
-ZmYgLS1naXQgYS9kcml2ZXJzL3ZmaW8vcGNpL3ZmaW9fcGNpX3ByaXZhdGUuaAo+PiBiL2RyaXZl
-cnMvdmZpby9wY2kvdmZpb19wY2lfcHJpdmF0ZS5oCj4+IGluZGV4IDhhMmM3NjA3ZDUxMy4uYTM5
-MmY1MGUzYTk5IDEwMDY0NAo+PiAtLS0gYS9kcml2ZXJzL3ZmaW8vcGNpL3ZmaW9fcGNpX3ByaXZh
-dGUuaAo+PiArKysgYi9kcml2ZXJzL3ZmaW8vcGNpL3ZmaW9fcGNpX3ByaXZhdGUuaAo+PiBAQCAt
-MTE5LDYgKzExOSw4IEBAIHN0cnVjdCB2ZmlvX3BjaV9kZXZpY2Ugewo+PiDCoMKgwqDCoMKgIGlu
-dMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgaW9ldmVudGZkc19ucjsKPj4gwqDCoMKgwqDCoCBzdHJ1
-Y3QgZXZlbnRmZF9jdHjCoMKgwqAgKmVycl90cmlnZ2VyOwo+PiDCoMKgwqDCoMKgIHN0cnVjdCBl
-dmVudGZkX2N0eMKgwqDCoCAqcmVxX3RyaWdnZXI7Cj4+ICvCoMKgwqAgdTjCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgICpmYXVsdF9wYWdlczsKPiAKPiBXaGF0J3MgdGhlIHJlYXNvbiB0byB1c2UgJ3U4
-Jz8gSXQgZG9lc24ndCBtYXRjaCB0aGUgdHlwZSBvZiBoZWFkZXIsIG5vcgo+IHRoZSB0eXBlIG9m
-IHJpbmcgYnVmZmVyLgphY3R1YWxseSBpdCBtYXRjaGVzCgl1OCAgICAgICAgICAgICAgICAgICAg
-ICAqcGNpX2NvbmZpZ19tYXA7CiAgICAgICAgdTggICAgICAgICAgICAgICAgICAgICAgKnZjb25m
-aWc7CgpmYXVsdF9wYWdlcyBpcyB0aGUgdmEgb2YgdGhlIHJpbmcgYnVmZmVyLiBJbiB0aGUgaGVh
-ZGVyLCBvZmZzZXQgaXMgdGhlCm9mZnNldCBvZiB0aGUgcmluZyB3cnQgc3RhcnQgb2YgdGhlIHJl
-Z2lvbi4KCj4gCj4+ICvCoMKgwqAgc3RydWN0IG11dGV4wqDCoMKgwqDCoMKgwqAgZmF1bHRfcXVl
-dWVfbG9jazsKPj4gwqDCoMKgwqDCoCBzdHJ1Y3QgbGlzdF9oZWFkwqDCoMKgIGR1bW15X3Jlc291
-cmNlc19saXN0Owo+PiDCoMKgwqDCoMKgIHN0cnVjdCBtdXRleMKgwqDCoMKgwqDCoMKgIGlvZXZl
-bnRmZHNfbG9jazsKPj4gwqDCoMKgwqDCoCBzdHJ1Y3QgbGlzdF9oZWFkwqDCoMKgIGlvZXZlbnRm
-ZHNfbGlzdDsKPj4gQEAgLTE1MCw2ICsxNTIsMTQgQEAgZXh0ZXJuIHNzaXplX3QgdmZpb19wY2lf
-dmdhX3J3KHN0cnVjdAo+PiB2ZmlvX3BjaV9kZXZpY2UgKnZkZXYsIGNoYXIgX191c2VyICpidWYs
-Cj4+IMKgIGV4dGVybiBsb25nIHZmaW9fcGNpX2lvZXZlbnRmZChzdHJ1Y3QgdmZpb19wY2lfZGV2
-aWNlICp2ZGV2LCBsb2ZmX3QKPj4gb2Zmc2V0LAo+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgIHVpbnQ2NF90IGRhdGEsIGludCBjb3VudCwgaW50IGZkKTsKPj4gwqAg
-K3N0cnVjdCB2ZmlvX3BjaV9mYXVsdF9hYmkgewo+PiArwqDCoMKgIHUzMiBlbnRyeV9zaXplOwo+
-PiArfTsKPiAKPiBUaGlzIGlzIG5vdCB1c2VkIGJ5IHRoaXMgcGF0Y2ggKGFuZCB0aGUgd2hvbGUg
-c2VyaWVzKS4KcmVtb3ZlZAo+IAo+PiArCj4+ICtleHRlcm4gc2l6ZV90IHZmaW9fcGNpX2RtYV9m
-YXVsdF9ydyhzdHJ1Y3QgdmZpb19wY2lfZGV2aWNlICp2ZGV2LAo+PiArwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgY2hhciBfX3VzZXIgKmJ1Ziwgc2l6ZV90IGNvdW50LAo+
-PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgbG9mZl90ICpwcG9zLCBi
-b29sIGlzd3JpdGUpOwo+PiArCj4+IMKgIGV4dGVybiBpbnQgdmZpb19wY2lfaW5pdF9wZXJtX2Jp
-dHModm9pZCk7Cj4+IMKgIGV4dGVybiB2b2lkIHZmaW9fcGNpX3VuaW5pdF9wZXJtX2JpdHModm9p
-ZCk7Cj4+IMKgIGRpZmYgLS1naXQgYS9kcml2ZXJzL3ZmaW8vcGNpL3ZmaW9fcGNpX3Jkd3IuYwo+
-PiBiL2RyaXZlcnMvdmZpby9wY2kvdmZpb19wY2lfcmR3ci5jCj4+IGluZGV4IGE4Nzk5Mjg5MmE5
-Zi4uNDAwNGFiOGNhZDBlIDEwMDY0NAo+PiAtLS0gYS9kcml2ZXJzL3ZmaW8vcGNpL3ZmaW9fcGNp
-X3Jkd3IuYwo+PiArKysgYi9kcml2ZXJzL3ZmaW8vcGNpL3ZmaW9fcGNpX3Jkd3IuYwo+PiBAQCAt
-Mjc0LDYgKzI3NCw1MSBAQCBzc2l6ZV90IHZmaW9fcGNpX3ZnYV9ydyhzdHJ1Y3QgdmZpb19wY2lf
-ZGV2aWNlCj4+ICp2ZGV2LCBjaGFyIF9fdXNlciAqYnVmLAo+PiDCoMKgwqDCoMKgIHJldHVybiBk
-b25lOwo+PiDCoCB9Cj4+IMKgICtzaXplX3QgdmZpb19wY2lfZG1hX2ZhdWx0X3J3KHN0cnVjdCB2
-ZmlvX3BjaV9kZXZpY2UgKnZkZXYsIGNoYXIKPj4gX191c2VyICpidWYsCj4+ICvCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBzaXplX3QgY291bnQsIGxvZmZfdCAqcHBvcywgYm9vbCBp
-c3dyaXRlKQo+PiArewo+PiArwqDCoMKgIHVuc2lnbmVkIGludCBpID0gVkZJT19QQ0lfT0ZGU0VU
-X1RPX0lOREVYKCpwcG9zKSAtCj4+IFZGSU9fUENJX05VTV9SRUdJT05TOwo+PiArwqDCoMKgIGxv
-ZmZfdCBwb3MgPSAqcHBvcyAmIFZGSU9fUENJX09GRlNFVF9NQVNLOwo+PiArwqDCoMKgIHZvaWQg
-KmJhc2UgPSB2ZGV2LT5yZWdpb25baV0uZGF0YTsKPj4gK8KgwqDCoCBpbnQgcmV0ID0gLUVGQVVM
-VDsKPj4gKwo+PiArwqDCoMKgIGlmIChwb3MgPj0gdmRldi0+cmVnaW9uW2ldLnNpemUpCj4+ICvC
-oMKgwqDCoMKgwqDCoCByZXR1cm4gLUVJTlZBTDsKPj4gKwo+PiArwqDCoMKgIGNvdW50ID0gbWlu
-KGNvdW50LCAoc2l6ZV90KSh2ZGV2LT5yZWdpb25baV0uc2l6ZSAtIHBvcykpOwo+PiArCj4+ICvC
-oMKgwqAgbXV0ZXhfbG9jaygmdmRldi0+ZmF1bHRfcXVldWVfbG9jayk7Cj4+ICsKPj4gK8KgwqDC
-oCBpZiAoaXN3cml0ZSkgewo+PiArwqDCoMKgwqDCoMKgwqAgc3RydWN0IHZmaW9fcmVnaW9uX2Rt
-YV9mYXVsdCAqaGVhZGVyID0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAgKHN0cnVjdCB2Zmlv
-X3JlZ2lvbl9kbWFfZmF1bHQgKiliYXNlOwo+PiArwqDCoMKgwqDCoMKgwqAgdTMyIG5ld190YWls
-Owo+PiArCj4+ICvCoMKgwqDCoMKgwqDCoCBpZiAocG9zICE9IDAgfHwgY291bnQgIT0gNCkgewo+
-PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCByZXQgPSAtRUlOVkFMOwo+PiArwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoCBnb3RvIHVubG9jazsKPj4gK8KgwqDCoMKgwqDCoMKgIH0KPj4gKwo+PiArwqDC
-oMKgwqDCoMKgwqAgaWYgKGNvcHlfZnJvbV91c2VyKCh2b2lkICopJm5ld190YWlsLCBidWYsIGNv
-dW50KSkKPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAgZ290byB1bmxvY2s7Cj4+ICsKPj4gK8Kg
-wqDCoMKgwqDCoMKgIGlmIChuZXdfdGFpbCA+IGhlYWRlci0+bmJfZW50cmllcykgewo+IAo+IE1h
-eWJlCj4gCj4gbmV3X3RhaWwgPj0gaGVhZGVyLT5uYl9lbnRyaWVzID8Kc3VyZQoKVGhhbmtzCgpF
-cmljCj4gCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHJldCA9IC1FSU5WQUw7Cj4+ICvCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgIGdvdG8gdW5sb2NrOwo+PiArwqDCoMKgwqDCoMKgwqAgfQo+PiAr
-wqDCoMKgwqDCoMKgwqAgaGVhZGVyLT50YWlsID0gbmV3X3RhaWw7Cj4+ICvCoMKgwqAgfSBlbHNl
-IHsKPj4gK8KgwqDCoMKgwqDCoMKgIGlmIChjb3B5X3RvX3VzZXIoYnVmLCBiYXNlICsgcG9zLCBj
-b3VudCkpCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGdvdG8gdW5sb2NrOwo+PiArwqDCoMKg
-IH0KPj4gK8KgwqDCoCAqcHBvcyArPSBjb3VudDsKPj4gK8KgwqDCoCByZXQgPSBjb3VudDsKPj4g
-K3VubG9jazoKPj4gK8KgwqDCoCBtdXRleF91bmxvY2soJnZkZXYtPmZhdWx0X3F1ZXVlX2xvY2sp
-Owo+PiArwqDCoMKgIHJldHVybiByZXQ7Cj4+ICt9Cj4+ICsKPj4gKwo+PiDCoCBzdGF0aWMgaW50
-IHZmaW9fcGNpX2lvZXZlbnRmZF9oYW5kbGVyKHZvaWQgKm9wYXF1ZSwgdm9pZCAqdW51c2VkKQo+
-PiDCoCB7Cj4+IMKgwqDCoMKgwqAgc3RydWN0IHZmaW9fcGNpX2lvZXZlbnRmZCAqaW9ldmVudGZk
-ID0gb3BhcXVlOwo+IAo+IAo+IFRoYW5rcywKPiBaZW5naHVpCj4gCgpfX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFy
-bUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFp
-bG1hbi9saXN0aW5mby9rdm1hcm0K
+Hi,
+
+an update to v2 with some fixes and a few tweaks. Ard's patch [1] should
+significantly reduce the frequency of arch_get_random_seed_long() calls,
+not sure if that is enough the appease the concerns about the
+potentially long latency of SMC calls. I also dropped the direct
+arch_get_random() call in KVM for the same reason. An alternative could
+be to just use the SMC in the _early() versions, but then we would lose
+the SMCCC entropy source for the periodic reseeds. This could be mitigated
+by using a hwrng driver [2] and rngd.
+The only other non-minor change to v2 is the addition of using the SMCCC
+call in the _early() variant. For a changelog see below.
+
+Sudeep: patch 1/5 is a prerequisite for all other patches, which
+themselves could be considered separate and need to go via different trees.
+If we could agree on that one now and get that merged, it would help the
+handling of the other patches going forward.
+
+Cheers,
+Andre
+==============================
+
+The ARM architected TRNG firmware interface, described in ARM spec
+DEN0098[3], defines an ARM SMCCC based interface to a true random number
+generator, provided by firmware.
+
+This series collects all the patches implementing this in various
+places: as a user feeding into the ARCH_RANDOM pool, both for ARM and
+arm64, and as a service provider for KVM guests.
+
+Patch 1 introduces the interface definition used by all three entities.
+Patch 2 prepares the Arm SMCCC firmware driver to probe for the
+interface. This patch is needed to avoid a later dependency on *two*
+patches (there might be a better solution to this problem).
+
+Patch 3 implements the ARM part, patch 4 is the arm64 version.
+The final patch 5 adds support to provide random numbers to KVM guests.
+
+This was tested on:
+- QEMU -kernel (no SMCCC, regression test)
+- Juno w/ prototype of the h/w Trusted RNG support
+- mainline KVM (SMCCC, but no TRNG: regression test)
+- ARM and arm64 KVM guests, using the KVM service in patch 5/5
+
+Based on v5.10-rc3, please let me know if I should rebased on something
+else. A git repo is accessible at:
+https://gitlab.arm.com/linux-arm/linux-ap/-/commits/smccc-trng/v3/
+
+Cheers,
+Andre
+
+[1] http://lists.infradead.org/pipermail/linux-arm-kernel/2020-November/615446.html
+[2] https://gitlab.arm.com/linux-arm/linux-ap/-/commit/87e3722f437
+[3] https://developer.arm.com/documentation/den0098/latest/
+
+Changelog v2 ... v3:
+- ARM: fix compilation with randconfig
+- arm64: use SMCCC call also in arch_get_random_seed_long_early()
+- KVM: comment on return value usage
+- KVM: use more interesting UUID (enjoy, Marc!)
+- KVM: use bitmaps instead of open coded long arrays
+- KVM: drop direct usage of arch_get_random() interface
+
+Changelog "v1" ... v2:
+- trigger ARCH_RANDOM initialisation from the SMCCC firmware driver
+- use a single bool in smccc.c to hold the initialisation state for arm64
+- handle endianess correctly in the KVM provider
+
+Andre Przywara (2):
+  firmware: smccc: Introduce SMCCC TRNG framework
+  arm64: Add support for SMCCC TRNG entropy source
+
+Ard Biesheuvel (3):
+  firmware: smccc: Add SMCCC TRNG function call IDs
+  ARM: implement support for SMCCC TRNG entropy source
+  KVM: arm64: implement the TRNG hypervisor call
+
+ arch/arm/Kconfig                    |  4 ++
+ arch/arm/include/asm/archrandom.h   | 74 +++++++++++++++++++++++++
+ arch/arm64/include/asm/archrandom.h | 79 +++++++++++++++++++++++----
+ arch/arm64/include/asm/kvm_host.h   |  2 +
+ arch/arm64/kvm/Makefile             |  2 +-
+ arch/arm64/kvm/hypercalls.c         |  6 ++
+ arch/arm64/kvm/trng.c               | 85 +++++++++++++++++++++++++++++
+ drivers/firmware/smccc/smccc.c      |  5 ++
+ include/linux/arm-smccc.h           | 31 +++++++++++
+ 9 files changed, 277 insertions(+), 11 deletions(-)
+ create mode 100644 arch/arm/include/asm/archrandom.h
+ create mode 100644 arch/arm64/kvm/trng.c
+
+-- 
+2.17.1
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
