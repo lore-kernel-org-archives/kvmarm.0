@@ -7,57 +7,58 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EAC7C388F7
-	for <kvmarm@archiver.kernel.org>; Fri, 13 Nov 2020 11:39:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42585C56202
+	for <kvmarm@archiver.kernel.org>; Fri, 13 Nov 2020 11:39:10 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DFAB722253
-	for <kvmarm@archiver.kernel.org>; Fri, 13 Nov 2020 11:39:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A8D612137B
+	for <kvmarm@archiver.kernel.org>; Fri, 13 Nov 2020 11:39:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="0WdRtEDR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFAB722253
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="FEueT7cx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8D612137B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 802384BCB9;
-	Fri, 13 Nov 2020 06:39:06 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 48C724BCC2;
+	Fri, 13 Nov 2020 06:39:09 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9x-JVT5tbI1m; Fri, 13 Nov 2020 06:39:05 -0500 (EST)
+	with ESMTP id 9M06EHRIRxI6; Fri, 13 Nov 2020 06:39:07 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 309564BCFD;
-	Fri, 13 Nov 2020 06:39:04 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5320D4BD71;
+	Fri, 13 Nov 2020 06:39:07 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3942A4BCC1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Nov 2020 06:39:03 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E6034BCB9
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Nov 2020 06:39:06 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MzeprFV0zGA6 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 13 Nov 2020 06:39:02 -0500 (EST)
+ with ESMTP id 9WZLsXBNlt4a for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 13 Nov 2020 06:39:05 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F07A94BD11
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Nov 2020 06:39:01 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AC33A4BCB6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Nov 2020 06:39:03 -0500 (EST)
 Received: from localhost.localdomain (236.31.169.217.in-addr.arpa
  [217.169.31.236])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id D2A602224F;
- Fri, 13 Nov 2020 11:38:59 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 83A77207DE;
+ Fri, 13 Nov 2020 11:39:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1605267541;
- bh=0EYYv1krMY9/OWn3wIVl6dQcMqvbyxJiIPItZGREqjE=;
+ s=default; t=1605267542;
+ bh=CXFWhEYw7GtHb1221lOgY2A7PwohlC7DyjOHpoesNjo=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=0WdRtEDRi4qG4D93FpKXIEcZvFePJQLrB6jFLcptkdJA1fkxcVqS56MkwYgQdGVZr
- lnzmhXBZoYd89H/Uhr9Kc4nre99hyhXzmn4LfoEcbGfpqeFWLv31h5t/Mz6uRz+xxF
- ewH3qUsFk5wiTapRUXCCvctCDGqWnPVENvMrLAMc=
+ b=FEueT7cxKlddRtgml20SKmF8QGI/+cXB5YdE8S9wOUJpBncZBS8FuUcT2bHS5DDZ9
+ Pgd0PG4swtzAtFDW0cWx/0Gi4Bkmu2bjMYGUZNR7GoRw2iQ6q88MGWQKbAzezb1ntH
+ iYra12XbtOGiWp1XMS6lo1kVOS4Rbijqqj3tZfF8=
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v3 05/10] KVM: arm64: Move BP hardening helpers into spectre.h
-Date: Fri, 13 Nov 2020 11:38:42 +0000
-Message-Id: <20201113113847.21619-6-will@kernel.org>
+Subject: [PATCH v3 06/10] KVM: arm64: Re-jig logic when patching hardened hyp
+ vectors
+Date: Fri, 13 Nov 2020 11:38:43 +0000
+Message-Id: <20201113113847.21619-7-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20201113113847.21619-1-will@kernel.org>
 References: <20201113113847.21619-1-will@kernel.org>
@@ -80,146 +81,34 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The BP hardening helpers are an integral part of the Spectre-v2
-mitigation, so move them into asm/spectre.h and inline the
-arm64_get_bp_hardening_data() function at the same time.
+The hardened hyp vectors are not used on systems running with VHE or CPUs
+without the ARM64_HARDEN_EL2_VECTORS capability.
+
+Re-jig the checking logic slightly in kvm_patch_vector_branch() so that
+it's a bit clearer what we're looking for. This is purely cosmetic.
 
 Cc: Marc Zyngier <maz@kernel.org>
 Cc: Quentin Perret <qperret@google.com>
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/include/asm/mmu.h     | 29 -----------------------------
- arch/arm64/include/asm/spectre.h | 30 ++++++++++++++++++++++++++++++
- arch/arm64/kvm/arm.c             |  2 +-
- arch/arm64/kvm/hyp/hyp-entry.S   |  1 +
- 4 files changed, 32 insertions(+), 30 deletions(-)
+ arch/arm64/kvm/va_layout.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/include/asm/mmu.h b/arch/arm64/include/asm/mmu.h
-index b2e91c187e2a..75beffe2ee8a 100644
---- a/arch/arm64/include/asm/mmu.h
-+++ b/arch/arm64/include/asm/mmu.h
-@@ -12,9 +12,6 @@
- #define USER_ASID_FLAG	(UL(1) << USER_ASID_BIT)
- #define TTBR_ASID_MASK	(UL(0xffff) << 48)
+diff --git a/arch/arm64/kvm/va_layout.c b/arch/arm64/kvm/va_layout.c
+index d1195c288c9f..760db2c84b9b 100644
+--- a/arch/arm64/kvm/va_layout.c
++++ b/arch/arm64/kvm/va_layout.c
+@@ -139,8 +139,8 @@ void kvm_patch_vector_branch(struct alt_instr *alt,
  
--#define BP_HARDEN_EL2_SLOTS 4
--#define __BP_HARDEN_HYP_VECS_SZ (BP_HARDEN_EL2_SLOTS * SZ_2K)
--
- #ifndef __ASSEMBLY__
+ 	BUG_ON(nr_inst != 5);
  
- #include <linux/refcount.h>
-@@ -41,32 +38,6 @@ static inline bool arm64_kernel_unmapped_at_el0(void)
- 	return cpus_have_const_cap(ARM64_UNMAP_KERNEL_AT_EL0);
- }
+-	if (has_vhe() || !cpus_have_const_cap(ARM64_HARDEN_EL2_VECTORS)) {
+-		WARN_ON_ONCE(cpus_have_const_cap(ARM64_HARDEN_EL2_VECTORS));
++	if (!cpus_have_const_cap(ARM64_HARDEN_EL2_VECTORS) ||
++	    WARN_ON_ONCE(has_vhe())) {
+ 		return;
+ 	}
  
--typedef void (*bp_hardening_cb_t)(void);
--
--struct bp_hardening_data {
--	int			hyp_vectors_slot;
--	bp_hardening_cb_t	fn;
--};
--
--DECLARE_PER_CPU_READ_MOSTLY(struct bp_hardening_data, bp_hardening_data);
--
--static inline struct bp_hardening_data *arm64_get_bp_hardening_data(void)
--{
--	return this_cpu_ptr(&bp_hardening_data);
--}
--
--static inline void arm64_apply_bp_hardening(void)
--{
--	struct bp_hardening_data *d;
--
--	if (!cpus_have_const_cap(ARM64_SPECTRE_V2))
--		return;
--
--	d = arm64_get_bp_hardening_data();
--	if (d->fn)
--		d->fn();
--}
--
- extern void arm64_memblock_init(void);
- extern void paging_init(void);
- extern void bootmem_init(void);
-diff --git a/arch/arm64/include/asm/spectre.h b/arch/arm64/include/asm/spectre.h
-index fcdfbce302bd..d22f8b7d9c50 100644
---- a/arch/arm64/include/asm/spectre.h
-+++ b/arch/arm64/include/asm/spectre.h
-@@ -9,7 +9,15 @@
- #ifndef __ASM_SPECTRE_H
- #define __ASM_SPECTRE_H
- 
-+#define BP_HARDEN_EL2_SLOTS 4
-+#define __BP_HARDEN_HYP_VECS_SZ (BP_HARDEN_EL2_SLOTS * SZ_2K)
-+
-+#ifndef __ASSEMBLY__
-+
-+#include <linux/percpu.h>
-+
- #include <asm/cpufeature.h>
-+#include <asm/virt.h>
- 
- /* Watch out, ordering is important here. */
- enum mitigation_state {
-@@ -20,6 +28,27 @@ enum mitigation_state {
- 
- struct task_struct;
- 
-+typedef void (*bp_hardening_cb_t)(void);
-+
-+struct bp_hardening_data {
-+	int			hyp_vectors_slot;
-+	bp_hardening_cb_t	fn;
-+};
-+
-+DECLARE_PER_CPU_READ_MOSTLY(struct bp_hardening_data, bp_hardening_data);
-+
-+static inline void arm64_apply_bp_hardening(void)
-+{
-+	struct bp_hardening_data *d;
-+
-+	if (!cpus_have_const_cap(ARM64_SPECTRE_V2))
-+		return;
-+
-+	d = this_cpu_ptr(&bp_hardening_data);
-+	if (d->fn)
-+		d->fn();
-+}
-+
- enum mitigation_state arm64_get_spectre_v2_state(void);
- bool has_spectre_v2(const struct arm64_cpu_capabilities *cap, int scope);
- void spectre_v2_enable_mitigation(const struct arm64_cpu_capabilities *__unused);
-@@ -29,4 +58,5 @@ bool has_spectre_v4(const struct arm64_cpu_capabilities *cap, int scope);
- void spectre_v4_enable_mitigation(const struct arm64_cpu_capabilities *__unused);
- void spectre_v4_enable_task_mitigation(struct task_struct *tsk);
- 
-+#endif	/* __ASSEMBLY__ */
- #endif	/* __ASM_SPECTRE_H */
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 3262c16f0449..044c5fc81f90 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1405,7 +1405,7 @@ static void cpu_hyp_reset(void)
-  */
- static void cpu_set_hyp_vector(void)
- {
--	struct bp_hardening_data *data = arm64_get_bp_hardening_data();
-+	struct bp_hardening_data *data = this_cpu_ptr(&bp_hardening_data);
- 	void *vect = kern_hyp_va(kvm_ksym_ref(__kvm_hyp_vector));
- 	int slot = -1;
- 
-diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-index 0a5b36eb54b3..874eacdabc64 100644
---- a/arch/arm64/kvm/hyp/hyp-entry.S
-+++ b/arch/arm64/kvm/hyp/hyp-entry.S
-@@ -13,6 +13,7 @@
- #include <asm/kvm_arm.h>
- #include <asm/kvm_asm.h>
- #include <asm/mmu.h>
-+#include <asm/spectre.h>
- 
- .macro save_caller_saved_regs_vect
- 	/* x0 and x1 were saved in the vector entry */
 -- 
 2.29.2.299.gdc1121823c-goog
 
