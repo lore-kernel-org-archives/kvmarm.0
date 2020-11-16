@@ -2,68 +2,80 @@ Return-Path: <SRS0=JeL3=EW=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72AA9C63697
-	for <kvmarm@archiver.kernel.org>; Mon, 16 Nov 2020 09:42:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C950C5519F
+	for <kvmarm@archiver.kernel.org>; Mon, 16 Nov 2020 10:43:44 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C0A6520782
-	for <kvmarm@archiver.kernel.org>; Mon, 16 Nov 2020 09:42:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0A6520782
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 60A6B222B9
+	for <kvmarm@archiver.kernel.org>; Mon, 16 Nov 2020 10:43:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OyvZcUve"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60A6B222B9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D2EFB4C107;
-	Mon, 16 Nov 2020 04:42:50 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F4C74C14C;
+	Mon, 16 Nov 2020 05:43:42 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id h52g4ELElDCX; Mon, 16 Nov 2020 04:42:48 -0500 (EST)
+	with ESMTP id UV26knIkE6dh; Mon, 16 Nov 2020 05:43:41 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C810F4C0F4;
-	Mon, 16 Nov 2020 04:42:48 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 69B254BF91;
+	Mon, 16 Nov 2020 05:43:41 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 250824BFF1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2020 02:23:03 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D09ED4B822
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2020 05:43:39 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VC-4T1dcuAhk for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Nov 2020 02:23:00 -0500 (EST)
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 10D314C059
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2020 02:23:00 -0500 (EST)
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
- by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4CZLBZ1jQfzhbcL;
- Mon, 16 Nov 2020 15:22:46 +0800 (CST)
-Received: from [10.174.187.179] (10.174.187.179) by
- DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
- 14.3.487.0; Mon, 16 Nov 2020 15:22:47 +0800
-Subject: Re: [PATCH] irqchip/gic-v4.1: Optimize the wait for the completion of
- the analysis of the VPT
-To: Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>, 
- Marc Zyngier <maz@kernel.org>, <linux-kernel@vger.kernel.org>,
- <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.cs.columbia.edu>,
- <kvm@vger.kernel.org>, James Morse <james.morse@arm.com>, Julien Thierry
- <julien.thierry.kdev@gmail.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Eric Auger <eric.auger@redhat.com>, Christoffer Dall
- <christoffer.dall@arm.com>
-References: <20200923063543.1920-1-lushenming@huawei.com>
-From: Shenming Lu <lushenming@huawei.com>
-Message-ID: <5e09e050-071d-5a74-ec2b-aa6afd1480b9@huawei.com>
-Date: Mon, 16 Nov 2020 15:22:46 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.2.2
+ with ESMTP id pp4O1FAhYRq0 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 Nov 2020 05:43:38 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [63.128.21.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 88E854B77C
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2020 05:43:38 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1605523418;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=uXqx5Ho/BGflxGNGIUa2LXehbjyeIn4bhOsfc7gDmnk=;
+ b=OyvZcUve3fwiEbUVcrvSQC42ZWYOtzk2gKWGjqVfWTuNy8J0xq1tXvXhu1hz0VrL+AxtHb
+ 7VEK/NnJV97jORdSadJJtzap5nCKBVCC7lCMuVEXiY2oMQsMFo5SiA7X6aMVP5EXddYuhH
+ Y5Gy1spmjj9HjWuiaQUzRBc5wZioXIU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-528-RCDH81_pM9Slp_IaylvHhg-1; Mon, 16 Nov 2020 05:43:32 -0500
+X-MC-Unique: RCDH81_pM9Slp_IaylvHhg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 49FF78030D1;
+ Mon, 16 Nov 2020 10:43:30 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-113-230.ams2.redhat.com [10.36.113.230])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 267A15C5AF;
+ Mon, 16 Nov 2020 10:43:18 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com,
+ iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, will@kernel.org,
+ joro@8bytes.org, maz@kernel.org, robin.murphy@arm.com
+Subject: [PATCH v12 00/15] SMMUv3 Nested Stage Setup (IOMMU part)
+Date: Mon, 16 Nov 2020 11:43:01 +0100
+Message-Id: <20201116104316.31816-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200923063543.1920-1-lushenming@huawei.com>
-Content-Language: en-US
-X-Originating-IP: [10.174.187.179]
-X-CFilter-Loop: Reflected
-X-Mailman-Approved-At: Mon, 16 Nov 2020 04:42:47 -0500
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Cc: jean-philippe@linaro.org, jacob.jun.pan@linux.intel.com,
+ nicoleotsuka@gmail.com, vivek.gautam@arm.com, alex.williamson@redhat.com,
+ yi.l.liu@intel.com, zhangfei.gao@linaro.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -80,213 +92,145 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+This series brings the IOMMU part of HW nested paging support
+in the SMMUv3. The VFIO part is submitted separately.
 
-Friendly ping, it is some time since I sent this patch according to your last advice...
+The IOMMU API is extended to support 2 new API functionalities:
+1) pass the guest stage 1 configuration
+2) pass stage 1 MSI bindings
 
-Besides, recently we found that the mmio delay on GICv4.1 system is about 10 times higher
-than that on GICv4.0 system in kvm-unit-tests (the specific data is as follows). By the
-way, HiSilicon GICv4.1 has already been implemented and will be released with our
-next-generation server, which is almost the only implementation of GICv4.1 at present.
+Then those capabilities gets implemented in the SMMUv3 driver.
 
-                        |   GICv4.1 emulator   |  GICv4.0 emulator
-mmio_read_user (ns)     |        12811         |        1598
+The virtualizer passes information through the VFIO user API
+which cascades them to the iommu subsystem. This allows the guest
+to own stage 1 tables and context descriptors (so-called PASID
+table) while the host owns stage 2 tables and main configuration
+structures (STE).
 
-After analysis, this is mainly caused by the 10 us delay in its_wait_vpt_parse_complete()
-(the above difference is just about 10 us)...
+Best Regards
 
-What's your opinion about this?
+Eric
 
-Thanks,
-Shenming
+This series can be found at:
+https://github.com/eauger/linux/tree/5.10-rc4-2stage-v12
+(including the VFIO part)
 
-On 2020/9/23 14:35, Shenming Lu wrote:
-> Right after a vPE is made resident, the code starts polling the
-> GICR_VPENDBASER.Dirty bit until it becomes 0, where the delay_us
-> is set to 10. But in our measurement, it takes only hundreds of
-> nanoseconds, or 1~2 microseconds, to finish parsing the VPT in most
-> cases. And we also measured the time from vcpu_load() (include it)
-> to __guest_enter() on Kunpeng 920. On average, it takes 2.55 microseconds
-> (not first run && the VPT is empty). So 10 microseconds delay might
-> really hurt performance.
-> 
-> To avoid this, we can set the delay_us to 1, which is more appropriate
-> in this situation and universal. Besides, we can delay the execution
-> of its_wait_vpt_parse_complete() (call it from kvm_vgic_flush_hwstate()
-> corresponding to vPE resident), giving the GIC a chance to work in
-> parallel with the CPU on the entry path.
-> 
-> Signed-off-by: Shenming Lu <lushenming@huawei.com>
-> ---
->  arch/arm64/kvm/vgic/vgic-v4.c      | 18 ++++++++++++++++++
->  arch/arm64/kvm/vgic/vgic.c         |  2 ++
->  drivers/irqchip/irq-gic-v3-its.c   | 14 +++++++++++---
->  drivers/irqchip/irq-gic-v4.c       | 11 +++++++++++
->  include/kvm/arm_vgic.h             |  3 +++
->  include/linux/irqchip/arm-gic-v4.h |  4 ++++
->  6 files changed, 49 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
-> index b5fa73c9fd35..1d5d2d6894d3 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v4.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v4.c
-> @@ -353,6 +353,24 @@ int vgic_v4_load(struct kvm_vcpu *vcpu)
->  	return err;
->  }
->  
-> +void vgic_v4_wait_vpt(struct kvm_vcpu *vcpu)
-> +{
-> +	struct its_vpe *vpe;
-> +
-> +	if (kvm_vgic_global_state.type == VGIC_V2 || !vgic_supports_direct_msis(vcpu->kvm))
-> +		return;
-> +
-> +	vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
-> +
-> +	if (vpe->vpt_ready)
-> +		return;
-> +
-> +	if (its_wait_vpt(vpe))
-> +		return;
-> +
-> +	vpe->vpt_ready = true;
-> +}
-> +
->  static struct vgic_its *vgic_get_its(struct kvm *kvm,
->  				     struct kvm_kernel_irq_routing_entry *irq_entry)
->  {
-> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-> index c3643b7f101b..ed810a80cda2 100644
-> --- a/arch/arm64/kvm/vgic/vgic.c
-> +++ b/arch/arm64/kvm/vgic/vgic.c
-> @@ -915,6 +915,8 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
->  
->  	if (can_access_vgic_from_kernel())
->  		vgic_restore_state(vcpu);
-> +
-> +	vgic_v4_wait_vpt(vcpu);
->  }
->  
->  void kvm_vgic_load(struct kvm_vcpu *vcpu)
-> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-> index 548de7538632..b7cbc9bcab9d 100644
-> --- a/drivers/irqchip/irq-gic-v3-its.c
-> +++ b/drivers/irqchip/irq-gic-v3-its.c
-> @@ -3803,7 +3803,7 @@ static void its_wait_vpt_parse_complete(void)
->  	WARN_ON_ONCE(readq_relaxed_poll_timeout_atomic(vlpi_base + GICR_VPENDBASER,
->  						       val,
->  						       !(val & GICR_VPENDBASER_Dirty),
-> -						       10, 500));
-> +						       1, 500));
->  }
->  
->  static void its_vpe_schedule(struct its_vpe *vpe)
-> @@ -3837,7 +3837,7 @@ static void its_vpe_schedule(struct its_vpe *vpe)
->  	val |= GICR_VPENDBASER_Valid;
->  	gicr_write_vpendbaser(val, vlpi_base + GICR_VPENDBASER);
->  
-> -	its_wait_vpt_parse_complete();
-> +	vpe->vpt_ready = false;
->  }
->  
->  static void its_vpe_deschedule(struct its_vpe *vpe)
-> @@ -3881,6 +3881,10 @@ static int its_vpe_set_vcpu_affinity(struct irq_data *d, void *vcpu_info)
->  		its_vpe_schedule(vpe);
->  		return 0;
->  
-> +	case WAIT_VPT:
-> +		its_wait_vpt_parse_complete();
-> +		return 0;
-> +
->  	case DESCHEDULE_VPE:
->  		its_vpe_deschedule(vpe);
->  		return 0;
-> @@ -4047,7 +4051,7 @@ static void its_vpe_4_1_schedule(struct its_vpe *vpe,
->  
->  	gicr_write_vpendbaser(val, vlpi_base + GICR_VPENDBASER);
->  
-> -	its_wait_vpt_parse_complete();
-> +	vpe->vpt_ready = false;
->  }
->  
->  static void its_vpe_4_1_deschedule(struct its_vpe *vpe,
-> @@ -4118,6 +4122,10 @@ static int its_vpe_4_1_set_vcpu_affinity(struct irq_data *d, void *vcpu_info)
->  		its_vpe_4_1_schedule(vpe, info);
->  		return 0;
->  
-> +	case WAIT_VPT:
-> +		its_wait_vpt_parse_complete();
-> +		return 0;
-> +
->  	case DESCHEDULE_VPE:
->  		its_vpe_4_1_deschedule(vpe, info);
->  		return 0;
-> diff --git a/drivers/irqchip/irq-gic-v4.c b/drivers/irqchip/irq-gic-v4.c
-> index 0c18714ae13e..36be42569872 100644
-> --- a/drivers/irqchip/irq-gic-v4.c
-> +++ b/drivers/irqchip/irq-gic-v4.c
-> @@ -258,6 +258,17 @@ int its_make_vpe_resident(struct its_vpe *vpe, bool g0en, bool g1en)
->  	return ret;
->  }
->  
-> +int its_wait_vpt(struct its_vpe *vpe)
-> +{
-> +	struct its_cmd_info info = { };
-> +
-> +	WARN_ON(preemptible());
-> +
-> +	info.cmd_type = WAIT_VPT;
-> +
-> +	return its_send_vpe_cmd(vpe, &info);
-> +}
-> +
->  int its_invall_vpe(struct its_vpe *vpe)
->  {
->  	struct its_cmd_info info = {
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index a8d8fdcd3723..b55a835d28a8 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -402,6 +402,9 @@ int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int irq,
->  				 struct kvm_kernel_irq_routing_entry *irq_entry);
->  
->  int vgic_v4_load(struct kvm_vcpu *vcpu);
-> +
-> +void vgic_v4_wait_vpt(struct kvm_vcpu *vcpu);
-> +
->  int vgic_v4_put(struct kvm_vcpu *vcpu, bool need_db);
->  
->  #endif /* __KVM_ARM_VGIC_H */
-> diff --git a/include/linux/irqchip/arm-gic-v4.h b/include/linux/irqchip/arm-gic-v4.h
-> index 6976b8331b60..68ac2b7b9309 100644
-> --- a/include/linux/irqchip/arm-gic-v4.h
-> +++ b/include/linux/irqchip/arm-gic-v4.h
-> @@ -75,6 +75,8 @@ struct its_vpe {
->  	u16			vpe_id;
->  	/* Pending VLPIs on schedule out? */
->  	bool			pending_last;
-> +	/* VPT parse complete */
-> +	bool			vpt_ready;
->  };
->  
->  /*
-> @@ -103,6 +105,7 @@ enum its_vcpu_info_cmd_type {
->  	PROP_UPDATE_VLPI,
->  	PROP_UPDATE_AND_INV_VLPI,
->  	SCHEDULE_VPE,
-> +	WAIT_VPT,
->  	DESCHEDULE_VPE,
->  	INVALL_VPE,
->  	PROP_UPDATE_VSGI,
-> @@ -128,6 +131,7 @@ struct its_cmd_info {
->  int its_alloc_vcpu_irqs(struct its_vm *vm);
->  void its_free_vcpu_irqs(struct its_vm *vm);
->  int its_make_vpe_resident(struct its_vpe *vpe, bool g0en, bool g1en);
-> +int its_wait_vpt(struct its_vpe *vpe);
->  int its_make_vpe_non_resident(struct its_vpe *vpe, bool db);
->  int its_invall_vpe(struct its_vpe *vpe);
->  int its_map_vlpi(int irq, struct its_vlpi_map *map);
-> 
+The series includes a patch from Jean-Philippe. It is better to
+review the original patch:
+[PATCH v8 2/9] iommu/arm-smmu-v3: Maintain a SID->device structure
+
+The VFIO series is sent separately.
+
+History:
+
+v11 -> v12:
+- rebase on top of v5.10-rc4
+
+Two new patches paving the way for vSVA/ARM (Shameer's input)
+- iommu/smmuv3: Accept configs with more than one context descriptor
+- iommu/smmuv3: Add PASID cache invalidation per PASID
+
+v10 -> v11:
+- S2TTB reset when S2 is off
+- fix compil issue when CONFIG_IOMMU_DMA is not set
+
+v9 -> v10:
+- rebase on top of 5.6.0-rc3
+
+v8 -> v9:
+- rebase on 5.3
+- split iommu/vfio parts
+
+v6 -> v8:
+- Implement VFIO-PCI device specific interrupt framework
+
+v7 -> v8:
+- rebase on top of v5.2-rc1 and especially
+  8be39a1a04c1  iommu/arm-smmu-v3: Add a master->domain pointer
+- dynamic alloc of s1_cfg/s2_cfg
+- __arm_smmu_tlb_inv_asid/s1_range_nosync
+- check there is no HW MSI regions
+- asid invalidation using pasid extended struct (change in the uapi)
+- add s1_live/s2_live checks
+- move check about support of nested stages in domain finalise
+- fixes in error reporting according to the discussion with Robin
+- reordered the patches to have first iommu/smmuv3 patches and then
+  VFIO patches
+
+v6 -> v7:
+- removed device handle from bind/unbind_guest_msi
+- added "iommu/smmuv3: Nested mode single MSI doorbell per domain
+  enforcement"
+- added few uapi comments as suggested by Jean, Jacop and Alex
+
+v5 -> v6:
+- Fix compilation issue when CONFIG_IOMMU_API is unset
+
+v4 -> v5:
+- fix bug reported by Vincent: fault handler unregistration now happens in
+  vfio_pci_release
+- IOMMU_FAULT_PERM_* moved outside of struct definition + small
+  uapi changes suggested by Kean-Philippe (except fetch_addr)
+- iommu: introduce device fault report API: removed the PRI part.
+- see individual logs for more details
+- reset the ste abort flag on detach
+
+v3 -> v4:
+- took into account Alex, jean-Philippe and Robin's comments on v3
+- rework of the smmuv3 driver integration
+- add tear down ops for msi binding and PASID table binding
+- fix S1 fault propagation
+- put fault reporting patches at the beginning of the series following
+  Jean-Philippe's request
+- update of the cache invalidate and fault API uapis
+- VFIO fault reporting rework with 2 separate regions and one mmappable
+  segment for the fault queue
+- moved to PATCH
+
+v2 -> v3:
+- When registering the S1 MSI binding we now store the device handle. This
+  addresses Robin's comment about discimination of devices beonging to
+  different S1 groups and using different physical MSI doorbells.
+- Change the fault reporting API: use VFIO_PCI_DMA_FAULT_IRQ_INDEX to
+  set the eventfd and expose the faults through an mmappable fault region
+
+v1 -> v2:
+- Added the fault reporting capability
+- asid properly passed on invalidation (fix assignment of multiple
+  devices)
+- see individual change logs for more info
+
+
+Eric Auger (15):
+  iommu: Introduce attach/detach_pasid_table API
+  iommu: Introduce bind/unbind_guest_msi
+  iommu/arm-smmu-v3: Maintain a SID->device structure
+  iommu/smmuv3: Dynamically allocate s1_cfg and s2_cfg
+  iommu/smmuv3: Get prepared for nested stage support
+  iommu/smmuv3: Implement attach/detach_pasid_table
+  iommu/smmuv3: Allow stage 1 invalidation with unmanaged ASIDs
+  iommu/smmuv3: Implement cache_invalidate
+  dma-iommu: Implement NESTED_MSI cookie
+  iommu/smmuv3: Nested mode single MSI doorbell per domain enforcement
+  iommu/smmuv3: Enforce incompatibility between nested mode and HW MSI
+    regions
+  iommu/smmuv3: Implement bind/unbind_guest_msi
+  iommu/smmuv3: Report non recoverable faults
+  iommu/smmuv3: Accept configs with more than one context descriptor
+  iommu/smmuv3: Add PASID cache invalidation per PASID
+
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 650 ++++++++++++++++++--
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h |  98 ++-
+ drivers/iommu/dma-iommu.c                   | 142 ++++-
+ drivers/iommu/iommu.c                       | 104 ++++
+ include/linux/dma-iommu.h                   |  16 +
+ include/linux/iommu.h                       |  41 ++
+ include/uapi/linux/iommu.h                  |  54 ++
+ 7 files changed, 1035 insertions(+), 70 deletions(-)
+
+-- 
+2.21.3
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
