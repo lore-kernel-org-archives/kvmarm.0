@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EC10C4742C
-	for <kvmarm@archiver.kernel.org>; Mon, 16 Nov 2020 20:43:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C87AAC4742C
+	for <kvmarm@archiver.kernel.org>; Mon, 16 Nov 2020 20:43:48 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 84DC32223D
-	for <kvmarm@archiver.kernel.org>; Mon, 16 Nov 2020 20:43:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6180B2223D
+	for <kvmarm@archiver.kernel.org>; Mon, 16 Nov 2020 20:43:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="AjQCgpzw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84DC32223D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="m5ieAtIS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6180B2223D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 274034C24B;
-	Mon, 16 Nov 2020 15:43:44 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D748B4C1EF;
+	Mon, 16 Nov 2020 15:43:47 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id wyx+t7xGxkXF; Mon, 16 Nov 2020 15:43:42 -0500 (EST)
+	with ESMTP id SlKIVrLQPl6N; Mon, 16 Nov 2020 15:43:46 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ECAB24C24F;
-	Mon, 16 Nov 2020 15:43:42 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A61E4C262;
+	Mon, 16 Nov 2020 15:43:45 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F13B4C228
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2020 15:43:42 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 93CA74C24E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2020 15:43:44 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5oAZkVeOhEki for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Nov 2020 15:43:41 -0500 (EST)
-Received: from mail-wm1-f67.google.com (mail-wm1-f67.google.com
- [209.85.128.67])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6EFA94C24F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2020 15:43:41 -0500 (EST)
-Received: by mail-wm1-f67.google.com with SMTP id p22so593347wmg.3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2020 12:43:41 -0800 (PST)
+ with ESMTP id h8u5MOjQ2VVY for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 Nov 2020 15:43:43 -0500 (EST)
+Received: from mail-wm1-f66.google.com (mail-wm1-f66.google.com
+ [209.85.128.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8D0F34C226
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2020 15:43:43 -0500 (EST)
+Received: by mail-wm1-f66.google.com with SMTP id m125so578299wmm.3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2020 12:43:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=vhNNUDRNWLolF9X/BNiqAa9sQtbg1yNfQgpeLP8CpL8=;
- b=AjQCgpzwB7upMi2bhD5FEdm5oBzMrdG1EqiZA29adsCIyhJ5kg2kBmwLY9kTrIU5Y9
- Cvskk/ELHGvgyg0p3Z81q1cUnW6e5owkv8bTXqRXAdakh3ydKT4uyUIZlbKYq988lYVb
- 4e+T3m4CKr7dHF0Z0mGi2QceuVtfQ0eezmaW3ww4QSXAcg6JsFBSRes4WJCKwimfbrxT
- thYGudU6wwJ3Mi/6ymuWAFcM7/xBWSR/sUmtHzlTDWEgG9mH1H+Xr6UFV6cnRBy1DrIY
- bJWgfAVKFE2Y4i9x+qzdKpj/it9JPSW1/wYkZ3LfTSq4DYrWec5bLCtVLqJ5tNqcjWwq
- oImQ==
+ bh=/xSxQ6wMrJch4MkdpKs1AkVDK65s53fUsfBxRtXSdJ0=;
+ b=m5ieAtISL0bm/LUKttamwfLlzhs+j8pVtTzSWO66zpxkqSyqcI9qGCjmMZEITUAsRh
+ yqdiGq+w6rI0GCGo50z0jh68U/2ypSU/r5sGtiGWJw2pmO5VyM0KMM0SeNdtc5WgZzsM
+ hirMis8efojxuO/J5IlkDJ+y9wXS3qa/89kQ2mq7YV6N570irqpYEX257aEHd/E/wn5A
+ v7VtE91FuEp2YqQTS9U57cMquhdQFIHh9s21Z+didm2rlYVIGVYX5gAtB31/xEBm/fTe
+ 5F49guosSVTnCZftqO+UK+EX3tg5d0FaLtNe7b9IcgkySeAZDQRoqZnRIiBAutOTssIs
+ cSWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=vhNNUDRNWLolF9X/BNiqAa9sQtbg1yNfQgpeLP8CpL8=;
- b=AaFiwYGgqiph7iANkgNeNTOyQ2OYvRQOyu4wPJiCX5oFk/uvP29FXcfGQggpbnBurD
- MIiuptJ2Lc9lp0G/3bpPQXztqMTIL1shY0HoQIAi45AH3VM8H/PVKLgoLTzD6iWBu8pF
- 7FKOyfMeOgivfyz2u/JwKQMab0Y7prlizrz6wallmPVBg3VwhmDwe2GLOyLLxYTGfItv
- VUTnAYIjm5HuEb+InjR5rkCuu9GKRs6WdDlcDQQ3JJ062G8HBd8maPMnv7T3y4DFnTB+
- IlupV3aCDd8p5FQ7WIkvzlMVQicolDxXpW1vDBR1LzAxaLvPx7NoqC4tQq8GQ/r2Psjz
- cm3A==
-X-Gm-Message-State: AOAM5317neZn6w1V8B36AnWOvEh8FGch55nKofJQCxi4ng+xVWAXiwlB
- U+AbadXb2/4kfpsX8USBFgOd6ngC3/cAmtoPFfA=
-X-Google-Smtp-Source: ABdhPJx/ACVuZVlLM8jprNldFukYuBbBqcWgl8oJWqwhavCewWZd3bKxh25HsPT4zSX+nPVpBpe87g==
-X-Received: by 2002:a1c:e442:: with SMTP id b63mr790926wmh.10.1605559420043;
- Mon, 16 Nov 2020 12:43:40 -0800 (PST)
+ bh=/xSxQ6wMrJch4MkdpKs1AkVDK65s53fUsfBxRtXSdJ0=;
+ b=YKnOgJl40JLMVVpHe/alFeMuBR3MV+o8/16ctbVDtneaxMaf3gFM+YnJ1nWRjrXh8J
+ DVWXkhxhoYqbhDJp16HJ6G0D2YoPsQIdMQpowUYPYm0rp3dehLk0KJ2fNkgWsontX+LC
+ XrtaxTKxaPzKM4R65xiRuAI+t2A6IQntIBTOYNRSbWFa/5LqP0ZINqL1xp1cBs6aH502
+ oJAxFCAtGpirPRaJEoaDIWRLAxAOZScSLsiRhrDgKK9UcHJQesX9ORR67VUqyQdSIRAg
+ wWUxAXWPdKlrSB/Hf8e+ya5DKKo7pqrIptmLd1AeSBndGv6v0re0FuTsMSPQahC7VdEZ
+ EbUg==
+X-Gm-Message-State: AOAM531QGYU5dZbSMWSeBzCWPKXZGuJlOZFRahN1ad0Qr5e8Z+zx2g+W
+ 5IUmBgXyO0nC/XpNK7m6Wnk7uHi9GHuvXBUQfbc=
+X-Google-Smtp-Source: ABdhPJyS/aNgHssSQvEMalBMF7PxZKqg/8avV0om5DEzGM0leU4FRM/z71yVKcNzG/Z5aqFD0OtZdA==
+X-Received: by 2002:a1c:44d4:: with SMTP id r203mr743633wma.60.1605559422223; 
+ Mon, 16 Nov 2020 12:43:42 -0800 (PST)
 Received: from localhost ([2a01:4b00:8523:2d03:bc40:bd71:373a:1b33])
- by smtp.gmail.com with ESMTPSA id b14sm24646282wrx.35.2020.11.16.12.43.38
+ by smtp.gmail.com with ESMTPSA id i10sm24457621wrs.22.2020.11.16.12.43.40
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 16 Nov 2020 12:43:39 -0800 (PST)
+ Mon, 16 Nov 2020 12:43:41 -0800 (PST)
 From: David Brazdil <dbrazdil@google.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v2 08/24] kvm: arm64: Add SMC handler in nVHE EL2
-Date: Mon, 16 Nov 2020 20:43:02 +0000
-Message-Id: <20201116204318.63987-9-dbrazdil@google.com>
+Subject: [PATCH v2 09/24] kvm: arm64: Add .hyp.data..ro_after_init ELF section
+Date: Mon, 16 Nov 2020 20:43:03 +0000
+Message-Id: <20201116204318.63987-10-dbrazdil@google.com>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201116204318.63987-1-dbrazdil@google.com>
 References: <20201116204318.63987-1-dbrazdil@google.com>
@@ -104,117 +104,98 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add handler of host SMCs in KVM nVHE trap handler. Forward all SMCs to
-EL3 and propagate the result back to EL1. This is done in preparation
-for validating host SMCs in KVM nVHE protected mode.
+Add rules for renaming the .data..ro_after_init ELF section in KVM nVHE
+object files to .hyp.data..ro_after_init, linking it into the kernel
+and mapping it in hyp at runtime.
 
-The implementation assumes that firmware uses SMCCC v1.2 or older. That
-means x0-x17 can be used both for arguments and results, other GPRs are
-preserved.
+The section is RW to the host, then mapped RO in hyp. The expectation is
+that the host populates the variables in the section and they are never
+changed by hyp afterwards.
 
 Signed-off-by: David Brazdil <dbrazdil@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/host.S     | 38 ++++++++++++++++++++++++++++++
- arch/arm64/kvm/hyp/nvhe/hyp-main.c | 26 ++++++++++++++++++++
- 2 files changed, 64 insertions(+)
+ arch/arm64/include/asm/sections.h |  1 +
+ arch/arm64/kernel/vmlinux.lds.S   | 10 ++++++++++
+ arch/arm64/kvm/arm.c              |  8 ++++++++
+ arch/arm64/kvm/hyp/nvhe/hyp.lds.S |  1 +
+ 4 files changed, 20 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
-index ed27f06a31ba..52dae5cd5a28 100644
---- a/arch/arm64/kvm/hyp/nvhe/host.S
-+++ b/arch/arm64/kvm/hyp/nvhe/host.S
-@@ -183,3 +183,41 @@ SYM_CODE_START(__kvm_hyp_host_vector)
- 	invalid_host_el1_vect			// FIQ 32-bit EL1
- 	invalid_host_el1_vect			// Error 32-bit EL1
- SYM_CODE_END(__kvm_hyp_host_vector)
-+
-+/*
-+ * Forward SMC with arguments in struct kvm_cpu_context, and
-+ * store the result into the same struct. Assumes SMCCC 1.2 or older.
-+ *
-+ * x0: struct kvm_cpu_context*
-+ */
-+SYM_CODE_START(__kvm_hyp_host_forward_smc)
-+	/*
-+	 * Use x18 to keep a pointer to the host context because x18
-+	 * is callee-saved SMCCC but not in AAPCS64.
-+	 */
-+	mov	x18, x0
-+
-+	ldp	x0, x1,   [x18, #CPU_XREG_OFFSET(0)]
-+	ldp	x2, x3,   [x18, #CPU_XREG_OFFSET(2)]
-+	ldp	x4, x5,   [x18, #CPU_XREG_OFFSET(4)]
-+	ldp	x6, x7,   [x18, #CPU_XREG_OFFSET(6)]
-+	ldp	x8, x9,   [x18, #CPU_XREG_OFFSET(8)]
-+	ldp	x10, x11, [x18, #CPU_XREG_OFFSET(10)]
-+	ldp	x12, x13, [x18, #CPU_XREG_OFFSET(12)]
-+	ldp	x14, x15, [x18, #CPU_XREG_OFFSET(14)]
-+	ldp	x16, x17, [x18, #CPU_XREG_OFFSET(16)]
-+
-+	smc	#0
-+
-+	stp	x0, x1,   [x18, #CPU_XREG_OFFSET(0)]
-+	stp	x2, x3,   [x18, #CPU_XREG_OFFSET(2)]
-+	stp	x4, x5,   [x18, #CPU_XREG_OFFSET(4)]
-+	stp	x6, x7,   [x18, #CPU_XREG_OFFSET(6)]
-+	stp	x8, x9,   [x18, #CPU_XREG_OFFSET(8)]
-+	stp	x10, x11, [x18, #CPU_XREG_OFFSET(10)]
-+	stp	x12, x13, [x18, #CPU_XREG_OFFSET(12)]
-+	stp	x14, x15, [x18, #CPU_XREG_OFFSET(14)]
-+	stp	x16, x17, [x18, #CPU_XREG_OFFSET(16)]
-+
-+	ret
-+SYM_CODE_END(__kvm_hyp_host_forward_smc)
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 19332c20fcde..71a17af05953 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -16,6 +16,8 @@
+diff --git a/arch/arm64/include/asm/sections.h b/arch/arm64/include/asm/sections.h
+index 3994169985ef..8ff579361731 100644
+--- a/arch/arm64/include/asm/sections.h
++++ b/arch/arm64/include/asm/sections.h
+@@ -11,6 +11,7 @@ extern char __alt_instructions[], __alt_instructions_end[];
+ extern char __hibernate_exit_text_start[], __hibernate_exit_text_end[];
+ extern char __hyp_idmap_text_start[], __hyp_idmap_text_end[];
+ extern char __hyp_text_start[], __hyp_text_end[];
++extern char __hyp_data_ro_after_init_start[], __hyp_data_ro_after_init_end[];
+ extern char __idmap_text_start[], __idmap_text_end[];
+ extern char __initdata_begin[], __initdata_end[];
+ extern char __inittext_begin[], __inittext_end[];
+diff --git a/arch/arm64/kernel/vmlinux.lds.S b/arch/arm64/kernel/vmlinux.lds.S
+index 1bda604f4c70..4382b5d0645d 100644
+--- a/arch/arm64/kernel/vmlinux.lds.S
++++ b/arch/arm64/kernel/vmlinux.lds.S
+@@ -30,6 +30,13 @@ jiffies = jiffies_64;
+ 	*(__kvm_ex_table)					\
+ 	__stop___kvm_ex_table = .;
  
- DEFINE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
- 
-+extern void __kvm_hyp_host_forward_smc(struct kvm_cpu_context *host_ctxt);
++#define HYPERVISOR_DATA_SECTIONS				\
++	HYP_SECTION_NAME(.data..ro_after_init) : {		\
++		__hyp_data_ro_after_init_start = .;		\
++		*(HYP_SECTION_NAME(.data..ro_after_init))	\
++		__hyp_data_ro_after_init_end = .;		\
++	}
 +
- static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
- {
- 	unsigned long func_id = host_ctxt->regs.regs[0];
-@@ -106,6 +108,27 @@ static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
- 	host_ctxt->regs.regs[1] = ret;
- }
- 
-+static void default_host_smc_handler(struct kvm_cpu_context *host_ctxt)
-+{
-+	__kvm_hyp_host_forward_smc(host_ctxt);
-+}
-+
-+static void skip_host_instruction(void)
-+{
-+	write_sysreg_el2(read_sysreg_el2(SYS_ELR) + 4, SYS_ELR);
-+}
-+
-+static void handle_host_smc(struct kvm_cpu_context *host_ctxt)
-+{
-+	default_host_smc_handler(host_ctxt);
-+
-+	/*
-+	 * Unlike HVC, the return address of an SMC is the instruction's PC.
-+	 * Move the return address past the instruction.
-+	 */
-+	skip_host_instruction();
-+}
-+
- void handle_trap(struct kvm_cpu_context *host_ctxt)
- {
- 	u64 esr = read_sysreg_el2(SYS_ESR);
-@@ -114,6 +137,9 @@ void handle_trap(struct kvm_cpu_context *host_ctxt)
- 	case ESR_ELx_EC_HVC64:
- 		handle_host_hcall(host_ctxt);
- 		break;
-+	case ESR_ELx_EC_SMC64:
-+		handle_host_smc(host_ctxt);
-+		break;
- 	default:
- 		hyp_panic();
+ #define HYPERVISOR_PERCPU_SECTION				\
+ 	. = ALIGN(PAGE_SIZE);					\
+ 	HYP_SECTION_NAME(.data..percpu) : {			\
+@@ -37,6 +44,7 @@ jiffies = jiffies_64;
  	}
+ #else /* CONFIG_KVM */
+ #define HYPERVISOR_EXTABLE
++#define HYPERVISOR_DATA_SECTIONS
+ #define HYPERVISOR_PERCPU_SECTION
+ #endif
+ 
+@@ -234,6 +242,8 @@ SECTIONS
+ 	_sdata = .;
+ 	RW_DATA(L1_CACHE_BYTES, PAGE_SIZE, THREAD_ALIGN)
+ 
++	HYPERVISOR_DATA_SECTIONS
++
+ 	/*
+ 	 * Data written with the MMU off but read with the MMU on requires
+ 	 * cache lines to be invalidated, discarding up to a Cache Writeback
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 4838556920fb..97af6c285f84 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1620,6 +1620,14 @@ static int init_hyp_mode(void)
+ 		goto out_err;
+ 	}
+ 
++	err = create_hyp_mappings(kvm_ksym_ref(__hyp_data_ro_after_init_start),
++				  kvm_ksym_ref(__hyp_data_ro_after_init_end),
++				  PAGE_HYP_RO);
++	if (err) {
++		kvm_err("Cannot map .hyp.data..ro_after_init section\n");
++		goto out_err;
++	}
++
+ 	err = create_hyp_mappings(kvm_ksym_ref(__start_rodata),
+ 				  kvm_ksym_ref(__end_rodata), PAGE_HYP_RO);
+ 	if (err) {
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp.lds.S b/arch/arm64/kvm/hyp/nvhe/hyp.lds.S
+index bb2d986ff696..5d76ff2ba63e 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp.lds.S
++++ b/arch/arm64/kvm/hyp/nvhe/hyp.lds.S
+@@ -16,4 +16,5 @@ SECTIONS {
+ 	HYP_SECTION_NAME(.data..percpu) : {
+ 		PERCPU_INPUT(L1_CACHE_BYTES)
+ 	}
++	HYP_SECTION(.data..ro_after_init)
+ }
 -- 
 2.29.2.299.gdc1121823c-goog
 
