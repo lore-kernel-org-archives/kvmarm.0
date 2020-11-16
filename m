@@ -7,69 +7,70 @@ X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD928C6369E
-	for <kvmarm@archiver.kernel.org>; Mon, 16 Nov 2020 15:14:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D9CEC5519F
+	for <kvmarm@archiver.kernel.org>; Mon, 16 Nov 2020 16:26:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 090CF204FD
-	for <kvmarm@archiver.kernel.org>; Mon, 16 Nov 2020 15:14:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 090CF204FD
+	by mail.kernel.org (Postfix) with ESMTP id 8E9D2222EC
+	for <kvmarm@archiver.kernel.org>; Mon, 16 Nov 2020 16:26:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E9D2222EC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 697DE4C170;
-	Mon, 16 Nov 2020 10:14:57 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D5C564C0D8;
+	Mon, 16 Nov 2020 11:25:59 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id nReKpG527fpi; Mon, 16 Nov 2020 10:14:56 -0500 (EST)
+	with ESMTP id Lo3a0o6cgFbp; Mon, 16 Nov 2020 11:25:58 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A07F4C179;
-	Mon, 16 Nov 2020 10:14:56 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 74ADF4BC44;
+	Mon, 16 Nov 2020 11:25:58 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 590E74C16F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2020 10:14:54 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 847434BA29
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2020 11:25:57 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yeNN24Yvebzt for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Nov 2020 10:14:52 -0500 (EST)
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1135D4C16A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2020 10:14:51 -0500 (EST)
-IronPort-SDR: o2l3Y9C8lPiokoiRGivJRZyMNrTfdqhBh9pNk7r7zXklIgjx+IQWNbO6+J+b/U/3TOu8jLWV22
- sxi4FdIr4j+Q==
-X-IronPort-AV: E=McAfee;i="6000,8403,9807"; a="255470467"
-X-IronPort-AV: E=Sophos;i="5.77,482,1596524400"; 
- d="gz'50?scan'50,208,50";a="255470467"
+ with ESMTP id clwAQuZ2h1Fy for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 Nov 2020 11:25:55 -0500 (EST)
+Received: from mga06.intel.com (mga06.intel.com [134.134.136.31])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8F8E24B98F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2020 11:25:55 -0500 (EST)
+IronPort-SDR: AwOA96u+ezdYbJ2ab7LbP+KpBEABR1gNrfqi+SFNqEyXXFnPiVVPbfXi+FpCMopUjwmtuAzJfL
+ kWli5haVxTHg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9807"; a="232387625"
+X-IronPort-AV: E=Sophos;i="5.77,483,1596524400"; 
+ d="gz'50?scan'50,208,50";a="232387625"
 X-Amp-Result: UNKNOWN
 X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
- by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 16 Nov 2020 07:14:49 -0800
-IronPort-SDR: XJ3akWbxF00vJt3U+AGjD2JDDWvP/j7cydU4+6mFox35/Ouv4iRteoiBFncvCBpBiMZtlwVudA
- eGyzaudlZLkg==
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+ by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 16 Nov 2020 08:25:53 -0800
+IronPort-SDR: oAfmAwf3iANuem22Yeh1PofJ1XEHyxDAG0pBx/nfga7TXXMsK3tuOEoT+vHKthFD2GYp+I+VIT
+ 2ohWdhRjJtxA==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.77,482,1596524400"; 
- d="gz'50?scan'50,208,50";a="310413789"
+X-IronPort-AV: E=Sophos;i="5.77,483,1596524400"; 
+ d="gz'50?scan'50,208,50";a="358516910"
 Received: from lkp-server01.sh.intel.com (HELO fb398427a497) ([10.239.97.150])
- by fmsmga007.fm.intel.com with ESMTP; 16 Nov 2020 07:14:45 -0800
+ by fmsmga004.fm.intel.com with ESMTP; 16 Nov 2020 08:25:50 -0800
 Received: from kbuild by fb398427a497 with local (Exim 4.92)
  (envelope-from <lkp@intel.com>)
- id 1kegDM-00007l-E8; Mon, 16 Nov 2020 15:14:44 +0000
-Date: Mon, 16 Nov 2020 23:14:34 +0800
+ id 1kehK9-00008v-Qs; Mon, 16 Nov 2020 16:25:49 +0000
+Date: Tue, 17 Nov 2020 00:24:53 +0800
 From: kernel test robot <lkp@intel.com>
 To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
  iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
  kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, will@kernel.org,
  joro@8bytes.org, maz@kernel.org, robin.murphy@arm.com
-Subject: Re: [PATCH v12 01/15] iommu: Introduce attach/detach_pasid_table API
-Message-ID: <202011162350.aO1ZjJHe-lkp@intel.com>
-References: <20201116104316.31816-2-eric.auger@redhat.com>
+Subject: Re: [PATCH v12 15/15] iommu/smmuv3: Add PASID cache invalidation per
+ PASID
+Message-ID: <202011170009.aEQOJf2k-lkp@intel.com>
+References: <20201116104316.31816-16-eric.auger@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="X1bOJ3K7DJ5YkBrT"
+Content-Type: multipart/mixed; boundary="GvXjxJ+pjyke8COw"
 Content-Disposition: inline
-In-Reply-To: <20201116104316.31816-2-eric.auger@redhat.com>
+In-Reply-To: <20201116104316.31816-16-eric.auger@redhat.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Cc: clang-built-linux@googlegroups.com, kbuild-all@lists.01.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -87,7 +88,7 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 
---X1bOJ3K7DJ5YkBrT
+--GvXjxJ+pjyke8COw
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
@@ -110,10 +111,10 @@ reproduce (this is a W=1 build):
         chmod +x ~/bin/make.cross
         # install arm64 cross compiling tool for clang build
         # apt-get install binutils-aarch64-linux-gnu
-        # https://github.com/0day-ci/linux/commit/54be9a9e014a566f9c7640da201c24cfb1eda06e
+        # https://github.com/0day-ci/linux/commit/95e4ccc61b7a7c06e1e0c6c01f362d590136ad3c
         git remote add linux-review https://github.com/0day-ci/linux
         git fetch --no-tags linux-review Eric-Auger/SMMUv3-Nested-Stage-Setup-IOMMU-part/20201116-185039
-        git checkout 54be9a9e014a566f9c7640da201c24cfb1eda06e
+        git checkout 95e4ccc61b7a7c06e1e0c6c01f362d590136ad3c
         # save the attached .config to linux build tree
         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross ARCH=arm64 
 
@@ -122,74 +123,95 @@ Reported-by: kernel test robot <lkp@intel.com>
 
 All warnings (new ones prefixed by >>):
 
->> drivers/iommu/iommu.c:2225:34: warning: overlapping comparisons always evaluate to false [-Wtautological-overlap-compare]
-           if (pasid_table_data.config < 1 && pasid_table_data.config > 3)
-               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c:3010:8: warning: logical not is only applied to the left hand side of this bitwise operator [-Wlogical-not-parentheses]
+                           if (!info->flags & IOMMU_INV_PASID_FLAGS_PASID)
+                               ^            ~
+   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c:3010:8: note: add parentheses after the '!' to evaluate the bitwise operator first
+                           if (!info->flags & IOMMU_INV_PASID_FLAGS_PASID)
+                               ^
+                                (                                        )
+   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c:3010:8: note: add parentheses around left hand side expression to silence this warning
+                           if (!info->flags & IOMMU_INV_PASID_FLAGS_PASID)
+                               ^
+                               (           )
    1 warning generated.
 
-vim +2225 drivers/iommu/iommu.c
+vim +3010 drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
 
-  2182	
-  2183	int iommu_uapi_attach_pasid_table(struct iommu_domain *domain,
-  2184					  void __user *uinfo)
-  2185	{
-  2186		struct iommu_pasid_table_config pasid_table_data = { 0 };
-  2187		u32 minsz;
-  2188	
-  2189		if (unlikely(!domain->ops->attach_pasid_table))
-  2190			return -ENODEV;
-  2191	
-  2192		/*
-  2193		 * No new spaces can be added before the variable sized union, the
-  2194		 * minimum size is the offset to the union.
-  2195		 */
-  2196		minsz = offsetof(struct iommu_pasid_table_config, vendor_data);
-  2197	
-  2198		/* Copy minsz from user to get flags and argsz */
-  2199		if (copy_from_user(&pasid_table_data, uinfo, minsz))
-  2200			return -EFAULT;
-  2201	
-  2202		/* Fields before the variable size union are mandatory */
-  2203		if (pasid_table_data.argsz < minsz)
-  2204			return -EINVAL;
-  2205	
-  2206		/* PASID and address granu require additional info beyond minsz */
-  2207		if (pasid_table_data.version != PASID_TABLE_CFG_VERSION_1)
-  2208			return -EINVAL;
-  2209		if (pasid_table_data.format == IOMMU_PASID_FORMAT_SMMUV3 &&
-  2210		    pasid_table_data.argsz <
-  2211			offsetofend(struct iommu_pasid_table_config, vendor_data.smmuv3))
-  2212			return -EINVAL;
-  2213	
-  2214		/*
-  2215		 * User might be using a newer UAPI header which has a larger data
-  2216		 * size, we shall support the existing flags within the current
-  2217		 * size. Copy the remaining user data _after_ minsz but not more
-  2218		 * than the current kernel supported size.
-  2219		 */
-  2220		if (copy_from_user((void *)&pasid_table_data + minsz, uinfo + minsz,
-  2221				   min_t(u32, pasid_table_data.argsz, sizeof(pasid_table_data)) - minsz))
-  2222			return -EFAULT;
-  2223	
-  2224		/* Now the argsz is validated, check the content */
-> 2225		if (pasid_table_data.config < 1 && pasid_table_data.config > 3)
-  2226			return -EINVAL;
-  2227	
-  2228		return domain->ops->attach_pasid_table(domain, &pasid_table_data);
-  2229	}
-  2230	EXPORT_SYMBOL_GPL(iommu_uapi_attach_pasid_table);
-  2231	
+  2960	
+  2961	static int
+  2962	arm_smmu_cache_invalidate(struct iommu_domain *domain, struct device *dev,
+  2963				  struct iommu_cache_invalidate_info *inv_info)
+  2964	{
+  2965		struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
+  2966		struct arm_smmu_device *smmu = smmu_domain->smmu;
+  2967	
+  2968		if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
+  2969			return -EINVAL;
+  2970	
+  2971		if (!smmu)
+  2972			return -EINVAL;
+  2973	
+  2974		if (inv_info->version != IOMMU_CACHE_INVALIDATE_INFO_VERSION_1)
+  2975			return -EINVAL;
+  2976	
+  2977		if (inv_info->cache & IOMMU_CACHE_INV_TYPE_IOTLB) {
+  2978			if (inv_info->granularity == IOMMU_INV_GRANU_PASID) {
+  2979				struct iommu_inv_pasid_info *info =
+  2980					&inv_info->granu.pasid_info;
+  2981	
+  2982				if (!(info->flags & IOMMU_INV_PASID_FLAGS_ARCHID) ||
+  2983				     (info->flags & IOMMU_INV_PASID_FLAGS_PASID))
+  2984					return -EINVAL;
+  2985	
+  2986				__arm_smmu_tlb_inv_context(smmu_domain, info->archid);
+  2987	
+  2988			} else if (inv_info->granularity == IOMMU_INV_GRANU_ADDR) {
+  2989				struct iommu_inv_addr_info *info = &inv_info->granu.addr_info;
+  2990				size_t size = info->nb_granules * info->granule_size;
+  2991				bool leaf = info->flags & IOMMU_INV_ADDR_FLAGS_LEAF;
+  2992	
+  2993				if (!(info->flags & IOMMU_INV_ADDR_FLAGS_ARCHID) ||
+  2994				     (info->flags & IOMMU_INV_ADDR_FLAGS_PASID))
+  2995					return -EINVAL;
+  2996	
+  2997				__arm_smmu_tlb_inv_range(info->addr, size,
+  2998							 info->granule_size, leaf,
+  2999							  smmu_domain, info->archid);
+  3000	
+  3001				arm_smmu_cmdq_issue_sync(smmu);
+  3002			} else {
+  3003				return -EINVAL;
+  3004			}
+  3005		} else if (inv_info->cache & IOMMU_CACHE_INV_TYPE_PASID) {
+  3006			if (inv_info->granularity == IOMMU_INV_GRANU_PASID) {
+  3007				struct iommu_inv_pasid_info *info =
+  3008					&inv_info->granu.pasid_info;
+  3009	
+> 3010				if (!info->flags & IOMMU_INV_PASID_FLAGS_PASID)
+  3011					return -EINVAL;
+  3012	
+  3013				arm_smmu_sync_cd(smmu_domain, info->pasid, true);
+  3014			} else {
+  3015				return -ENOENT;
+  3016			}
+  3017		} else { /* IOMMU_CACHE_INV_TYPE_DEV_IOTLB */
+  3018			return -ENOENT;
+  3019		}
+  3020		return 0;
+  3021	}
+  3022	
 
 ---
 0-DAY CI Kernel Test Service, Intel Corporation
 https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
 
---X1bOJ3K7DJ5YkBrT
+--GvXjxJ+pjyke8COw
 Content-Type: application/gzip
 Content-Disposition: attachment; filename=".config.gz"
 Content-Transfer-Encoding: base64
 
-H4sICPl8sl8AAy5jb25maWcAnDzZduO2ku/5Cp3OS+5D0tosu2eOHyASlBBxMwBKtl9wFDfd
+H4sICOeasl8AAy5jb25maWcAnDzZduO2ku/5Cp3OS+5D0tosu2eOHyASlBBxMwBKtl9wFDfd
 8VwvfWW5k/z9VAFcABKUPZNzktioAlgoFGqHf/7p5xF5O7487Y8Pd/vHx39G38rn8rA/ll9H
 9w+P5X+PwmyUZnJEQyZ/A+T44fnt78/7w9NiPjr7bTL+bfzr4W462pSH5/JxFLw83z98e4P5
 Dy/PP/38U5ClEVupIFBbygXLUiXptbz8dPe4f/42+lEeXgFvNJn+BuuMfvn2cPyvz5/hv08P
@@ -921,7 +943,7 @@ a5t56vSAGCEmBR7mfV6jZYK52z56jRmxyNQ4GYuAPluNLi5oOT4r+l9s8rFNbrqGls56a7td
 mVdpUJS2S1qWWiHE7Y1UFjE2o53DKbnMRb3yCk1lnYN8l/jDGycZfbWxs6tdo10fcbNbkjwS
 MI/BatHGS7IJ2g0fjNz8TatwNZvoa24mk9EUjkc5feA0ax5r/g8G0tAWgm8CAA==
 
---X1bOJ3K7DJ5YkBrT
+--GvXjxJ+pjyke8COw
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -932,4 +954,4 @@ kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 
---X1bOJ3K7DJ5YkBrT--
+--GvXjxJ+pjyke8COw--
