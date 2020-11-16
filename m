@@ -2,96 +2,104 @@ Return-Path: <SRS0=JeL3=EW=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.4 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED3CCC2D0A3
-	for <kvmarm@archiver.kernel.org>; Mon, 16 Nov 2020 17:56:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DADBCC2D0A3
+	for <kvmarm@archiver.kernel.org>; Mon, 16 Nov 2020 18:22:18 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DDEE520B80
-	for <kvmarm@archiver.kernel.org>; Mon, 16 Nov 2020 17:56:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2938A208C7
+	for <kvmarm@archiver.kernel.org>; Mon, 16 Nov 2020 18:22:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="sdIhKOXd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDEE520B80
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fig8gqSZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2938A208C7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E93B4B9A3;
-	Mon, 16 Nov 2020 12:56:42 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C4E44BDFB;
+	Mon, 16 Nov 2020 13:22:17 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Ct4FZqQizHmL; Mon, 16 Nov 2020 12:56:41 -0500 (EST)
+	with ESMTP id VetgA2POk1OK; Mon, 16 Nov 2020 13:22:16 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3662C4B9B5;
-	Mon, 16 Nov 2020 12:56:41 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 29F024C139;
+	Mon, 16 Nov 2020 13:22:16 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 608584B99C
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2020 12:56:40 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EDE284C074
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2020 13:22:14 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wbHABbcd8ows for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Nov 2020 12:56:39 -0500 (EST)
-Received: from mail-wm1-f67.google.com (mail-wm1-f67.google.com
- [209.85.128.67])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 620AE4B98A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2020 12:56:39 -0500 (EST)
-Received: by mail-wm1-f67.google.com with SMTP id c9so109434wml.5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2020 09:56:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=xaNTxNoQPnXnoUb4r3iV3mkFKbHJuRiufvKdd63kC7I=;
- b=sdIhKOXdzOYUd+0zNv8c0adHbCQpoXeesxkjDLAWcVsQPMNDpfluCLKkFw4WfVYV2U
- T4Lz4ZqbN1XalTec7vHfSnyzVHrGMdF7wclbYRmO3LLQfhJopfg2xSZxPgYaf+i2tjPY
- V2TKzLtaYd0cs8iOJ3X1mjjRUUpt+mng4ZKIpkfQ+qHCFS29msT7SFYYx4p7lHs9wOl5
- fv1KQionDArngXPYQxG9i/TfiCd3A2uIbWu9nzce8vKzKcgc9mPpxL8avcoVPIZDkLL7
- QC/2UIKH/WrfxI3/ZMXY/zKHjO5bVHqehzf6TdSeb0koVcSwzq+7la8pSEjEQ6PlwYUr
- DiKg==
+ with ESMTP id DGC+Sl7ozUL1 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 Nov 2020 13:22:13 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [63.128.21.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E9C084C139
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2020 13:22:13 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1605550933;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=WTH8Zd5sAmskzAYo30mvhMBg66bSsnSUzhU1/p/F/PA=;
+ b=fig8gqSZMioPRjk1gTW8MI1tXJmRNW0bBeyYa8X4p/DgXGH5q9e+4Z8Z/jXB2SInziLNIl
+ 7j0tivGrER4dBlrxjdG4PI9+mV2Sclh/0wxFwJNbN08aOX86jjHqhPN86v/91/vdBh+7/l
+ +1SOzQHbveAhgPEuRXyy+Os8G1T66pM=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-42-DsoziD3lPLmPja9cVbSurg-1; Mon, 16 Nov 2020 13:22:11 -0500
+X-MC-Unique: DsoziD3lPLmPja9cVbSurg-1
+Received: by mail-wm1-f72.google.com with SMTP id h2so91962wmm.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2020 10:22:10 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=xaNTxNoQPnXnoUb4r3iV3mkFKbHJuRiufvKdd63kC7I=;
- b=TiEHLmA++u2tmqLfVhsz69lCtAWcA3IOPwloG7yewMqm+ZqRZMx5ZzlkGJ7cgbePmO
- a8zfaLTWt8J/wuK/a0j7DC5B74oHDLzgtquXFQlEz9O5FEOjoE5q3kjGN/9eYwfWAzeT
- eyk0U53QLOdHU6q9s3NRM8O4w43k+sKX06qW/hliZclJcT9Z9pR919c9hz+esyQ6XI4+
- UU64+xkuYRT+V8sy1FJEC2uqYRka3cyQdBFIrvRpwjShWs09I2IiBhy1WkcEck14OVAa
- 2gjf2oguA5veRDmeY5t8aJmA0r+D2W+AELWAZVrahG+qG6mqBB5t42cHHrFugbgSGVpj
- nnGg==
-X-Gm-Message-State: AOAM533YBDvxCvmUbd8U9jLEmCcv9eDXUJ8QrQ+KanKnpNjneGjAD4b2
- i9iuKAMd1L8B1JrAzmBoZc21yA==
-X-Google-Smtp-Source: ABdhPJzq+YhoQ9FGcQcT1hEJKNYAgJc8ZImY4yxRsCLZhalfs1c7PQkN19eo6JoF/FMRMs7CfUQDxw==
-X-Received: by 2002:a05:600c:2202:: with SMTP id
- z2mr43648wml.115.1605549398247; 
- Mon, 16 Nov 2020 09:56:38 -0800 (PST)
-Received: from google.com ([2a01:4b00:8523:2d03:58a8:7836:6672:a072])
- by smtp.gmail.com with ESMTPSA id z189sm69814wme.23.2020.11.16.09.56.36
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 16 Nov 2020 09:56:37 -0800 (PST)
-Date: Mon, 16 Nov 2020 17:56:36 +0000
-From: David Brazdil <dbrazdil@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v1 10/24] kvm: arm64: Extract parts of el2_setup into a
- macro
-Message-ID: <20201116175636.qmp5iws6gq7a7syi@google.com>
-References: <20201109113233.9012-1-dbrazdil@google.com>
- <20201109113233.9012-11-dbrazdil@google.com>
- <a6f5d318eb7e7adde2106df068121b48@kernel.org>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=WTH8Zd5sAmskzAYo30mvhMBg66bSsnSUzhU1/p/F/PA=;
+ b=dIOo3Cll1wARbNRQu68h0EnGx4y3CmIq6O1wdF99L6Tj9dEx+K/Ah6mOoqorxBHsR0
+ /Kbmh2TtWdBpagvVJPKzx28y5ehEYxXx3/nmkYTrG7Q0Gl2vDhZdIGEs0QDlpj5QZILk
+ 3IFA6sM+aZvgwwOSM/Kz1HWz4NJz/u1XDny+miS0IKFyHwZXI/cNYLSjPOnjftY2mFHk
+ fve4P+LKqVes8LZYMSj8BiKTv69WVbRTdfxv7F/G7FU+J4fyoIQMyPwguWVVncEAkfnR
+ xZPSYUEegmNHcWrLQdxSzRDV5ZuRT8uGm1fmfGPLNG06TAgzLnNqNmbhQgpm3AprMcqe
+ gsCw==
+X-Gm-Message-State: AOAM5324z/M+UINXqWXsNyTt5KNBfk8mc8ms/TnJfM2kmAw5vMYP/NBu
+ WPGscU/JFewhAycHukwcKCnf7M3G77gf6aNLhDIwXETFHc/Azpq2yGLdTrljSIUDx/oHtDcfb1n
+ vo9u/ZS+sqbZubagHsp6V9l/q
+X-Received: by 2002:a5d:5222:: with SMTP id i2mr21960370wra.247.1605550929825; 
+ Mon, 16 Nov 2020 10:22:09 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzygKN/jKZPOR2Tp8R1RkidCe1Eg2IUxg/VtBLvORkfaFPUmdDs+xVTr36C8G5FbkcJI0uy0Q==
+X-Received: by 2002:a5d:5222:: with SMTP id i2mr21960352wra.247.1605550929645; 
+ Mon, 16 Nov 2020 10:22:09 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
+ ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+ by smtp.gmail.com with ESMTPSA id p10sm24465695wre.2.2020.11.16.10.22.08
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 16 Nov 2020 10:22:08 -0800 (PST)
+Subject: Re: [PATCH] memory: Skip dirty tracking for un-migratable memory
+ regions
+To: Zenghui Yu <yuzenghui@huawei.com>, qemu-devel@nongnu.org
+References: <20201116132210.1730-1-yuzenghui@huawei.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <5f5cc5a8-c5e4-4a69-5fdd-7020459d9d17@redhat.com>
+Date: Mon, 16 Nov 2020 19:22:07 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <a6f5d318eb7e7adde2106df068121b48@kernel.org>
-Cc: kernel-team@android.com, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
- Andrew Walbran <qwandor@google.com>, Catalin Marinas <catalin.marinas@arm.com>,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Tejun Heo <tj@kernel.org>, Dennis Zhou <dennis@kernel.org>,
- Christoph Lameter <cl@linux.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20201116132210.1730-1-yuzenghui@huawei.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Cc: cohuck@redhat.com, kwankhede@nvidia.com, alex.williamson@redhat.com,
+ qemu-arm@nongnu.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -103,43 +111,48 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
-
-> > +	 * Check for VHE being present. x2 being non-zero indicates that we
-> > +	 * do have VHE, and that the kernel is intended to run at EL2.
-> >  	 */
-> >  	mrs	x2, id_aa64mmfr1_el1
-> >  	ubfx	x2, x2, #ID_AA64MMFR1_VHE_SHIFT, #4
-> > -#else
-> > -	mov	x2, xzr
-> > -#endif
-> > +	cbz	x2, el2_setup_nvhe
+On 16/11/20 14:22, Zenghui Yu wrote:
+> It makes no sense to track dirty pages for those un-migratable memory
+> regions (e.g., Memory BAR region of the VFIO PCI device) and doing so
+> will potentially lead to some unpleasant issues during migration [1].
 > 
-> What initialises x2 to zero when CONFIG_VHE is disabled?
+> Skip dirty tracking for those regions by evaluating if the region is
+> migratable before setting dirty_log_mask (DIRTY_MEMORY_MIGRATION).
+> 
+> [1] https://lists.gnu.org/archive/html/qemu-devel/2020-11/msg03757.html
+> 
+> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+> ---
+>   softmmu/memory.c | 5 ++++-
+>   1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/softmmu/memory.c b/softmmu/memory.c
+> index 71951fe4dc..aa393f1bb0 100644
+> --- a/softmmu/memory.c
+> +++ b/softmmu/memory.c
+> @@ -1806,7 +1806,10 @@ bool memory_region_is_ram_device(MemoryRegion *mr)
+>   uint8_t memory_region_get_dirty_log_mask(MemoryRegion *mr)
+>   {
+>       uint8_t mask = mr->dirty_log_mask;
+> -    if (global_dirty_log && (mr->ram_block || memory_region_is_iommu(mr))) {
+> +    RAMBlock *rb = mr->ram_block;
+> +
+> +    if (global_dirty_log && ((rb && qemu_ram_is_migratable(rb)) ||
+> +                             memory_region_is_iommu(mr))) {
+>           mask |= (1 << DIRTY_MEMORY_MIGRATION);
+>       }
+>       return mask;
+> 
 
-There is no need for x2 anymore, the nVHE code just falls through. Basically:
+Queued, thanks.
 
-	el2_setup:
-		< check CurrentEL >
-		b.eq	1f
-		ret
-	1:
-	#ifdef CONFIG_VHE
-		< check has VHE >
-		cbz	el2_setup_nvhe
-		< VHE setup >
-		ret
-	#endif
-	el2_setup_nvhe:
-		< nVHE setup >
-		eret
+Paolo
 
--David
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
