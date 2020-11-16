@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44C89C55ABD
-	for <kvmarm@archiver.kernel.org>; Mon, 16 Nov 2020 20:43:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41A3BC4742C
+	for <kvmarm@archiver.kernel.org>; Mon, 16 Nov 2020 20:43:32 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9558E2224B
-	for <kvmarm@archiver.kernel.org>; Mon, 16 Nov 2020 20:43:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A25492224F
+	for <kvmarm@archiver.kernel.org>; Mon, 16 Nov 2020 20:43:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="t+iNX/pa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9558E2224B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="LpPgLYJo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A25492224F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 21BE14C247;
-	Mon, 16 Nov 2020 15:43:29 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B9BA4C24B;
+	Mon, 16 Nov 2020 15:43:31 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 1qqlaanmxS-n; Mon, 16 Nov 2020 15:43:28 -0500 (EST)
+	with ESMTP id WRWjFBxpa2DM; Mon, 16 Nov 2020 15:43:31 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D6F24C249;
-	Mon, 16 Nov 2020 15:43:28 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 33D354C1E0;
+	Mon, 16 Nov 2020 15:43:30 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A1D74C23D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2020 15:43:27 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A331A4C19D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2020 15:43:29 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HyYrSimWwg5o for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Nov 2020 15:43:26 -0500 (EST)
-Received: from mail-wm1-f67.google.com (mail-wm1-f67.google.com
- [209.85.128.67])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6B5C04C16F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2020 15:43:26 -0500 (EST)
-Received: by mail-wm1-f67.google.com with SMTP id a3so563927wmb.5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2020 12:43:26 -0800 (PST)
+ with ESMTP id 5vAPySG1hCIV for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 Nov 2020 15:43:28 -0500 (EST)
+Received: from mail-wr1-f65.google.com (mail-wr1-f65.google.com
+ [209.85.221.65])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A24A94C252
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2020 15:43:28 -0500 (EST)
+Received: by mail-wr1-f65.google.com with SMTP id p8so20290979wrx.5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2020 12:43:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=zcAUCdpGWiuobZn7klovZm7k+zA43w4wed6QHZHKZWs=;
- b=t+iNX/paL9tpslCZ4CFA0oCR9xlgnZt6fxJdREt7U7vuSjqq/X58AyBogeLhmb/FgA
- seqQtQzK3lsKx2bZbh9uTqgCQ8BiJKQM1Kkc2l5gBGbgIEIK4ZvLY57zj9qQ575CVNiG
- 32YGidIbqGAxwSRCkoTBCJTX6Ck5M4kMXTeTIydXYbK7dk4aWmkCMhjTFoM2M1q438vQ
- eZPIRHbbCtKMUQOnso8i7X8CQ1A5SRPmJh6MDrhmCxrglK8LbcDnHBisKHia+Y65TAWA
- aK5vNo0NXNX1qC+rBXjlsbA88aDmZKhEObSRb3tTXOeFer1H+YDQ8lWIe+INsuGEW9RO
- E6ng==
+ bh=HBK5eZkVMoQritbd0wCyBeq8n+u1kTTgyjfghI2qI2A=;
+ b=LpPgLYJoCTv1oHKKJjTShTeJ0/jzOj8483R1CyGe1/2yiVHw7V+amuY2dvDpQHINYo
+ B71XuITyMBPai4U5C6bwKeUbWwMyZoqtuG+ktdinJPefMIYT5OKiw4TZp1VA2qnS0Y7i
+ qNcxpiT4Yiep08Ci0LKvyduGtf9H/28dn9zw9DWwG8kr7EwA668DtdnfK4Mnx7PrfUdl
+ D2iNXtKU2gxvyT50AqnyqkyBUsEGaZHkJ6nfWFso5KbSeHu4i5iIOb/OtoKv+e4Nf+oI
+ vzovOiJ+Q4vTPXfsSSvudXA8WMmsl8qtUik5L4t7/Oc1UtHytqTGpUI4dciQJHhRjFre
+ TEjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=zcAUCdpGWiuobZn7klovZm7k+zA43w4wed6QHZHKZWs=;
- b=r0cFBSp/0yWNPrza/05vrKzDunyKNcblObooVuH6yCMDNVkjm6CxXXQzJT184XazaT
- inUc62soLNT9DPIDwWxgx9uq0qnB8AxSQiRD1hhTqMrOyxCQ/5NuSPAboOVmvRLSHvA3
- zJSJiXi6yymAlh2ujUTl1z17hnSojTKLUcVuFCK7ZqZ8jElzXsCrjgV5fGxnbjUcG/lV
- vyToMdeTtJhQNOqt79kUXcm/jV3HUoxK9hcK/yVLtrhIFaJXs8zuhEAHHuOVNuKYVVUE
- h0rcWn+XZ/VtW16NlOhrP/52HltnlgMWykyHyfng3qt1aomsdCaB0Gx57J1HytnC+h0g
- VkHA==
-X-Gm-Message-State: AOAM5330qb6LWJyCEiXd+2iKPg7kxjH4yOXB8dxnP9jUiH/L0AqOqIZ9
- ptfRP3BB/Iw9FJVrNfhOuboFLK4fGPcu1qhYLgI=
-X-Google-Smtp-Source: ABdhPJzgqCTBEHgC/iMbT8zNTaAzAp+KaRl3xN6yFoQabpnmMr3bPo14Jz09qy86PvkRyrjoS3SOvg==
-X-Received: by 2002:a1c:4485:: with SMTP id r127mr684535wma.177.1605559405139; 
- Mon, 16 Nov 2020 12:43:25 -0800 (PST)
+ bh=HBK5eZkVMoQritbd0wCyBeq8n+u1kTTgyjfghI2qI2A=;
+ b=uWZVTy+pJ82ccscBboCeHj/uN4SM4tWGUI9h+UcY+wssx2jBUfvpr7MymhY3DeyLB1
+ OJboyZU57g3gJvgeD7ATGlJgxdgJCpuy8Fp8j9H3sbA9g2Hydnp6aKGYUNo208dW+Pin
+ MvXWzHvvlgBRcAJiPAaWgFIKJcGr7bgBnpOFg2feYfPMZoZzNfnY7mAh+TiYxmvQLRa1
+ gaNydjHE9XmVigiGyIy4OniBD1xZY8/rbz1yep8589XATTIRaKWDNOhMIT/A1mWEK+FF
+ FOO90cWe4hx5AwR/5ZTsPd0/69Lf0Y1kw8JWiDJO/ays4nuj5P+KJo9Q3jZg7d2Bbjl5
+ W0Uw==
+X-Gm-Message-State: AOAM530bIGBU3x/o738tyberhjORl3jgJRWDTk9Gq1XIMzhbLwYpCwsp
+ aZl321z89xDeA9IqFbAnxg2BFtFw2MxKapusZ0M=
+X-Google-Smtp-Source: ABdhPJw6INFk2z1GcoyqqnoLQUKmvHq4aEzJ1qjQiEeW2TjsoBHTbzNVv6avTC1esSkrC1mwnL7QGg==
+X-Received: by 2002:adf:a40c:: with SMTP id d12mr21800321wra.154.1605559407257; 
+ Mon, 16 Nov 2020 12:43:27 -0800 (PST)
 Received: from localhost ([2a01:4b00:8523:2d03:bc40:bd71:373a:1b33])
- by smtp.gmail.com with ESMTPSA id p4sm623902wmc.46.2020.11.16.12.43.23
+ by smtp.gmail.com with ESMTPSA id o10sm516959wma.47.2020.11.16.12.43.25
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 16 Nov 2020 12:43:24 -0800 (PST)
+ Mon, 16 Nov 2020 12:43:26 -0800 (PST)
 From: David Brazdil <dbrazdil@google.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v2 01/24] psci: Support psci_ops.get_version for v0.1
-Date: Mon, 16 Nov 2020 20:42:55 +0000
-Message-Id: <20201116204318.63987-2-dbrazdil@google.com>
+Subject: [PATCH v2 02/24] psci: Accessor for configured PSCI function IDs
+Date: Mon, 16 Nov 2020 20:42:56 +0000
+Message-Id: <20201116204318.63987-3-dbrazdil@google.com>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201116204318.63987-1-dbrazdil@google.com>
 References: <20201116204318.63987-1-dbrazdil@google.com>
@@ -104,45 +104,64 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-KVM's host PSCI SMC filter needs to be aware of the PSCI version of the
-system but currently it is impossible to distinguish between v0.1 and
-PSCI disabled because both have get_version == NULL.
-
-Populate get_version for v0.1 with a function that returns a constant.
-
-psci_opt.get_version is currently unused so this has no effect on
-existing functionality.
+Function IDs used by PSCI are configurable for v0.1 via DT/APCI. If the
+host is using PSCI v0.1, KVM's host PSCI proxy needs to use the same IDs.
+Expose the array holding the information with a read-only accessor.
 
 Signed-off-by: David Brazdil <dbrazdil@google.com>
 ---
- drivers/firmware/psci/psci.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ drivers/firmware/psci/psci.c | 14 ++++++--------
+ include/linux/psci.h         | 10 ++++++++++
+ 2 files changed, 16 insertions(+), 8 deletions(-)
 
 diff --git a/drivers/firmware/psci/psci.c b/drivers/firmware/psci/psci.c
-index 00af99b6f97c..213c68418a65 100644
+index 213c68418a65..d835f3d8b121 100644
 --- a/drivers/firmware/psci/psci.c
 +++ b/drivers/firmware/psci/psci.c
-@@ -146,6 +146,11 @@ static int psci_to_linux_errno(int errno)
- 	return -EINVAL;
- }
+@@ -58,16 +58,14 @@ typedef unsigned long (psci_fn)(unsigned long, unsigned long,
+ 				unsigned long, unsigned long);
+ static psci_fn *invoke_psci_fn;
  
-+static u32 psci_get_version_0_1(void)
+-enum psci_function {
+-	PSCI_FN_CPU_SUSPEND,
+-	PSCI_FN_CPU_ON,
+-	PSCI_FN_CPU_OFF,
+-	PSCI_FN_MIGRATE,
+-	PSCI_FN_MAX,
+-};
+-
+ static u32 psci_function_id[PSCI_FN_MAX];
+ 
++u32 psci_get_function_id(enum psci_function fn)
 +{
-+	return PSCI_VERSION(0, 1);
++	WARN_ON(fn >= PSCI_FN_MAX);
++	return psci_function_id[fn];
 +}
 +
- static u32 psci_get_version(void)
- {
- 	return invoke_psci_fn(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
-@@ -514,6 +519,8 @@ static int __init psci_0_1_init(struct device_node *np)
+ #define PSCI_0_2_POWER_STATE_MASK		\
+ 				(PSCI_0_2_POWER_STATE_ID_MASK | \
+ 				PSCI_0_2_POWER_STATE_TYPE_MASK | \
+diff --git a/include/linux/psci.h b/include/linux/psci.h
+index 2a1bfb890e58..5b49a5c82d6f 100644
+--- a/include/linux/psci.h
++++ b/include/linux/psci.h
+@@ -21,6 +21,16 @@ bool psci_power_state_is_valid(u32 state);
+ int psci_set_osi_mode(bool enable);
+ bool psci_has_osi_support(void);
  
- 	pr_info("Using PSCI v0.1 Function IDs from DT\n");
- 
-+	psci_ops.get_version = psci_get_version_0_1;
++enum psci_function {
++	PSCI_FN_CPU_SUSPEND,
++	PSCI_FN_CPU_ON,
++	PSCI_FN_CPU_OFF,
++	PSCI_FN_MIGRATE,
++	PSCI_FN_MAX,
++};
 +
- 	if (!of_property_read_u32(np, "cpu_suspend", &id)) {
- 		psci_function_id[PSCI_FN_CPU_SUSPEND] = id;
- 		psci_ops.cpu_suspend = psci_cpu_suspend;
++u32 psci_get_function_id(enum psci_function fn);
++
+ struct psci_operations {
+ 	u32 (*get_version)(void);
+ 	int (*cpu_suspend)(u32 state, unsigned long entry_point);
 -- 
 2.29.2.299.gdc1121823c-goog
 
