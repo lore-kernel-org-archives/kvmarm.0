@@ -2,90 +2,63 @@ Return-Path: <SRS0=JeL3=EW=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2227C8B4E1
-	for <kvmarm@archiver.kernel.org>; Mon, 16 Nov 2020 12:40:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F894C4742C
+	for <kvmarm@archiver.kernel.org>; Mon, 16 Nov 2020 13:10:15 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 50CD820855
-	for <kvmarm@archiver.kernel.org>; Mon, 16 Nov 2020 12:40:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="C+oCIIJG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50CD820855
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 8884722240
+	for <kvmarm@archiver.kernel.org>; Mon, 16 Nov 2020 13:10:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8884722240
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A27934BF7E;
-	Mon, 16 Nov 2020 07:40:42 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 81E704C084;
+	Mon, 16 Nov 2020 08:10:11 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id q1e2yiBWeFLZ; Mon, 16 Nov 2020 07:40:41 -0500 (EST)
+	with ESMTP id ispkSCY4qQAk; Mon, 16 Nov 2020 08:10:10 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C87C4B81A;
-	Mon, 16 Nov 2020 07:40:41 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CFB14C145;
+	Mon, 16 Nov 2020 08:10:10 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A2AC4B718
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2020 07:40:40 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CB9814BF9E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2020 08:10:09 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UiKgX0ik749s for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Nov 2020 07:40:38 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2F0534B6DC
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2020 07:40:38 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id D0D1020855;
- Mon, 16 Nov 2020 12:40:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1605530437;
- bh=bnRBIAdk2TK++2iHRYZosXliTCu3OhJv4rdoa2NVmfc=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=C+oCIIJGqLI68KPl/ac6T0nLWv4BxqB2Qz8BM1c0poeVLdfo9EQ45dutdqrK6+SEW
- PcGUDLNaPuo5rzZfBnu89Gj8a0GA6dDFBXUezlABZ318hrbzUg5UwJurDquQrfeagG
- IHXngfRu+tLaihN9baJrEjNYH+UZjNZ6J+rWOHUg=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
- TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
- (envelope-from <maz@kernel.org>)
- id 1kedoA-00B0ja-Od; Mon, 16 Nov 2020 12:40:34 +0000
+ with ESMTP id 4ToS2u-sie8P for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 Nov 2020 08:10:07 -0500 (EST)
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 808324BC91
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2020 08:10:07 -0500 (EST)
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
+ by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4CZTv61v1dzhbp6;
+ Mon, 16 Nov 2020 21:09:54 +0800 (CST)
+Received: from [10.174.185.179] (10.174.185.179) by
+ DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
+ 14.3.487.0; Mon, 16 Nov 2020 21:09:53 +0800
+Subject: Re: [PATCH 1/2] KVM: arm64: vgic: Forbid invalid userspace
+ Redistributor accesses
+To: Marc Zyngier <maz@kernel.org>
+References: <20201113142801.1659-1-yuzenghui@huawei.com>
+ <20201113142801.1659-2-yuzenghui@huawei.com>
+ <724c43702b52aac0d3c9beb9604d1bfb@kernel.org>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <584b7ff1-ecf2-b0ec-cea3-ccc29902f43a@huawei.com>
+Date: Mon, 16 Nov 2020 21:09:52 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Date: Mon, 16 Nov 2020 12:40:34 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: David Brazdil <dbrazdil@google.com>
-Subject: Re: [PATCH v1 13/24] kvm: arm64: Add CPU entry point in nVHE hyp
-In-Reply-To: <20201116114952.ybj24wx44lofqs25@google.com>
-References: <20201109113233.9012-1-dbrazdil@google.com>
- <20201109113233.9012-14-dbrazdil@google.com>
- <7b8f9dec846f172c2919e1d3f3c65245@kernel.org>
- <20201116114952.ybj24wx44lofqs25@google.com>
-User-Agent: Roundcube Webmail/1.4.9
-Message-ID: <549d918182c28d88550d27c068b772be@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: dbrazdil@google.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
- catalin.marinas@arm.com, will@kernel.org, dennis@kernel.org, tj@kernel.org,
- cl@linux.com, mark.rutland@arm.com, lorenzo.pieralisi@arm.com,
- qperret@google.com, ascull@google.com, qwandor@google.com,
- kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kernel-team@android.com, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
- Andrew Walbran <qwandor@google.com>, Catalin Marinas <catalin.marinas@arm.com>,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Tejun Heo <tj@kernel.org>, Dennis Zhou <dennis@kernel.org>,
- Christoph Lameter <cl@linux.com>, Will Deacon <will@kernel.org>,
+In-Reply-To: <724c43702b52aac0d3c9beb9604d1bfb@kernel.org>
+Content-Language: en-US
+X-Originating-IP: [10.174.185.179]
+X-CFilter-Loop: Reflected
+Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
  kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -98,52 +71,51 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2020-11-16 11:49, David Brazdil wrote:
->> >  #ifdef CONFIG_CPU_PM
->> >    DEFINE(CPU_CTX_SP,		offsetof(struct cpu_suspend_ctx, sp));
->> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
->> > b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
->> > index 1697d25756e9..f999a35b2c8c 100644
->> > --- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
->> > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
->> > @@ -6,6 +6,7 @@
->> >
->> >  #include <linux/arm-smccc.h>
->> >  #include <linux/linkage.h>
->> > +#include <linux/irqchip/arm-gic-v3.h>
->> 
->> This should probably be included from the file that provides 
->> init_el2_state.
-> 
-> Agreed. This is a workaround for the fact that the arm-gic* headers 
-> don't play
-> nice with each other (define the same constants).
-
-Ah, that...
-
-> Including arm-gic-v3.h in
-> kvm_asm.h will trigger macro redefine warnings in vgic*-v2.c because 
-> they
-> include arm-gic.h.
-
-Boo.
-
-> Another option is to create a header just for el2 init. Would that be
-> preferable? Other ideas?
-
-Having an asm/el2_setup.h file feels like a better option. After all, it
-is in no way KVM specific, and having the macros hanging around in
-asm/kvm_asm.h feels odd.
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgTWFyYywKCk9uIDIwMjAvMTEvMTYgMTowNCwgTWFyYyBaeW5naWVyIHdyb3RlOgo+IEhpIFpl
+bmdodWksCj4gCj4gT24gMjAyMC0xMS0xMyAxNDoyOCwgWmVuZ2h1aSBZdSB3cm90ZToKPj4gSXQn
+cyBleHBlY3RlZCB0aGF0IHVzZXJzIHdpbGwgYWNjZXNzIHJlZ2lzdGVycyBpbiB0aGUgcmVkaXN0
+cmlidXRvciAqaWYqCj4+IHRoZSBSRCBoYXMgYmVlbiBpbml0aWFsaXplZCBwcm9wZXJseS4gVW5m
+b3J0dW5hdGVseSB1c2Vyc3BhY2UgY2FuIGJlIAo+PiBib2d1cwo+PiBlbm91Z2ggdG8gYWNjZXNz
+IHJlZ2lzdGVycyBiZWZvcmUgc2V0dGluZyB0aGUgUkQgYmFzZSBhZGRyZXNzLCBhbmQgS1ZNCj4+
+IGltcGxpY2l0bHkgYWxsb3dzIGl0ICh3ZSBoYW5kbGUgdGhlIGFjY2VzcyBhbnl3YXksIHJlZ2Fy
+ZGxlc3Mgb2Ygd2hldGhlcgo+PiB0aGUgYmFzZSBhZGRyZXNzIGlzIHNldCkuCj4+Cj4+IEJhZCB0
+aGluZyBoYXBwZW5zIHdoZW4gd2UncmUgaGFuZGxpbmcgdGhlIHVzZXIgcmVhZCBvZiBHSUNSX1RZ
+UEVSLiBXZSBlbmQKPj4gdXAgd2l0aCBhbiBvb3BzIHdoZW4gZGVmZXJlbmNpbmcgdGhlIHVuc2V0
+IHJkcmVnLi4uCj4+Cj4+IMKgwqDCoMKgZ3BhX3QgbGFzdF9yZGlzdF90eXBlciA9IHJkcmVnLT5i
+YXNlICsgR0lDUl9UWVBFUiArCj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgKHJkcmVnLT5mcmVl
+X2luZGV4IC0gMSkgKiBLVk1fVkdJQ19WM19SRURJU1RfU0laRTsKPj4KPj4gRml4IHRoaXMgaXNz
+dWUgYnkgaW5mb3JtaW5nIHVzZXJzcGFjZSB3aGF0IGhhZCBnb25lIHdyb25nICgtRU5YSU8pLgo+
+IAo+IEknbSB3b3JyaWVkIGFib3V0IHRoZSAiaW1wbGljaXQiIGFzcGVjdCBvZiB0aGUgYWNjZXNz
+IHRoYXQgdGhpcyBwYXRjaAo+IG5vdyBmb3JiaWRzLgo+IAo+IFRoZSBwcm9ibGVtIGlzIHRoYXQg
+dGhlIGV4aXN0aW5nIGRvY3VtZW50YXRpb24gZG9lc24ndCBjb3ZlciB0aGlzIGNhc2UsID4gYW5k
+IC1FTlhJTydzICJHZXR0aW5nIG9yIHNldHRpbmcgdGhpcyByZWdpc3RlciBpcyBub3QgeWV0IHN1
+cHBvcnRlZCIKPiBpcyB3YXkgdG9vIHZhZ3VlLgoKSW5kZWVkLiBIb3cgYWJvdXQgY2hhbmdpbmcg
+dG8KCiAgICAgLUVOWElPICBHZXR0aW5nIG9yIHNldHRpbmcgdGhpcyByZWdpc3RlciBpcyBub3Qg
+eWV0IHN1cHBvcnRlZAogICAgICAgICAgICAgb3IgVkdJQyBub3QgcHJvcGVybHkgY29uZmlndXJl
+ZCAoZS5nLiwgW1JlXURpc3RyaWJ1dG9yIGJhc2UKICAgICAgICAgICAgIGFkZHJlc3MgaXMgdW5r
+bm93bikKCj4gVGhlcmUgaXMgYSBwcmVjZWRlbnQgd2l0aCB0aGUgSVRTLCBidXQgdGhhdCdzIAo+
+IHVuZG9jdW1lbnRlZAo+IGFzIHdlbGwuIEFsc28sIGhvdyBhYm91dCB2Mj8gSWYgdGhhdCdzIHRo
+ZSB3YXN5IHdlIGFyZSBnb2luZyB0byBmaXggdGhpcywKPiB3ZSBhbHNvIG5uZWQgdG8gYmVlZiB1
+cCB0aGUgZG9jdW1lbnRhdGlvbi4KClN1cmUsIEkgcGxhbiB0byBkbyBzbyBhbmQgaG9wZSBpdCB3
+b24ndCBicmVhayB0aGUgZXhpc3RpbmcgdXNlcnNwYWNlLgoKPiBPZiBjb3Vyc2UsIHRoZSBvdGhl
+ciBob3JyaWJsZSB3YXkgdG8gYWRkcmVzcyB0aGUgaXNzdWUgaXMgdG8gcmV0dXJuIGEgdmFsdWUK
+PiB0aGF0IGRvZXNuJ3QgaGF2ZSB0aGUgTGFzdCBiaXQgc2V0LCBzaW5jZSB3ZSBjYW4ndCBzeW50
+aGV0aXNlIGl0LiBJdCAKPiBkb2Vzbid0Cj4gY2hhbmdlIHRoZSB1c2Vyc3BhY2UgQVBJLCBhbmQg
+SSBjYW4gZXZlbiBmaW5kIHNvbWUgKGFkbWl0dGVkbHnCoCB0d2lzdGVkKQo+IGxvZ2ljIHRvIGl0
+IChzaW5jZSB0aGVyZSBpcyBubyBiYXNlIGFkZHJlc3MsIHRoZXJlIGlzIG5vIGxhc3QgUkQuLi4p
+LgoKSSdtIGZpbmUgd2l0aCBpdC4gQnV0IEknbSBhZnJhaWQgdGhhdCB0aGVyZSBtaWdodCBiZSBv
+dGhlciBpc3N1ZXMgZHVlIHRvCnRoZSAidW5leHBlY3RlZCIgYWNjZXNzZXMgc2luY2UgSSBoYXZl
+bid0IHRlc3RlZCB3aXRoIGFsbCByZWdpc3RlcnMgZnJvbQp1c2Vyc3BhY2UuCgpNeSB0YWtlIGlz
+IHRoYXQgb25seSBpZiB0aGUgIltSZV1EaXN0cmlidXRvciBiYXNlIGFkZHJlc3MiIGlzIHNwZWNp
+ZmllZAppbiB0aGUgc3lzdGVtIG1lbW9yeSBtYXAsIHdpbGwgdGhlIHVzZXItcHJvdmlkZWQga3Zt
+X2RldmljZV9hdHRyLm9mZnNldAptYWtlIHNlbnNlLiBBbmQgd2UgY2FuIHRoZW4gaGFuZGxlIHRo
+ZSBhY2Nlc3MgdG8gdGhlIHJlZ2lzdGVyIHdoaWNoIGlzCmRlZmluZWQgYnkgImJhc2UgYWRkcmVz
+cyArIG9mZnNldCIuCgoKVGhhbmtzLApaZW5naHVpCl9fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNz
+LmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3Rp
+bmZvL2t2bWFybQo=
