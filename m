@@ -2,60 +2,83 @@ Return-Path: <SRS0=VcQF=EX=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C02AC5519F
-	for <kvmarm@archiver.kernel.org>; Tue, 17 Nov 2020 16:08:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B47DCC2D0E4
+	for <kvmarm@archiver.kernel.org>; Tue, 17 Nov 2020 17:30:05 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8926F2468D
-	for <kvmarm@archiver.kernel.org>; Tue, 17 Nov 2020 16:08:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8926F2468D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id EF36F24654
+	for <kvmarm@archiver.kernel.org>; Tue, 17 Nov 2020 17:30:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NqWJyVHo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF36F24654
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CA03E4B821;
-	Tue, 17 Nov 2020 11:07:59 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 213574B87C;
+	Tue, 17 Nov 2020 12:30:04 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id rhZz3lC8lqav; Tue, 17 Nov 2020 11:07:57 -0500 (EST)
+	with ESMTP id bUjSoFiRpio8; Tue, 17 Nov 2020 12:30:03 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DC78E4B874;
-	Tue, 17 Nov 2020 11:07:57 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C52F4B810;
+	Tue, 17 Nov 2020 12:30:03 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 96D574B832
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Nov 2020 11:07:56 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 86F034B808
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Nov 2020 12:30:02 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IB66Ytx0XMrY for <kvmarm@lists.cs.columbia.edu>;
- Tue, 17 Nov 2020 11:07:55 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7C5034B821
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Nov 2020 11:07:55 -0500 (EST)
-Received: from trantor (unknown [2.26.170.190])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ with ESMTP id Qy5IjiM0Y4wk for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 17 Nov 2020 12:30:01 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 63FA54B7F3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Nov 2020 12:30:01 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1605634201;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Vro1buifvm686BzsfyYs3/2N9XyBtnxtRecQ5TGBeE8=;
+ b=NqWJyVHoXO7A4N5DhC/cOx9e1Ugd35cYKLj2+i2DqjmGzw8e6mWgPOy5DwZdHFWn7qLhWt
+ LqnjDT3RNkWElHIaMWycqMg2VUqcCnN89otY7YtM4lZq6bwi1IHNyerYw9MfhbN4kiCATo
+ EUds5dyAlR5zCHKH64GSQn++U+XhyMs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-117-Ewue8X--PqmxoBXd4NNcFg-1; Tue, 17 Nov 2020 12:29:56 -0500
+X-MC-Unique: Ewue8X--PqmxoBXd4NNcFg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 1E8D7241A7;
- Tue, 17 Nov 2020 16:07:50 +0000 (UTC)
-Date: Tue, 17 Nov 2020 16:07:48 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Steven Price <steven.price@arm.com>
-Subject: Re: [PATCH v4 2/2] arm64: kvm: Introduce MTE VCPU feature
-Message-ID: <X7P1VLZhBh045tsr@trantor>
-References: <20201026155727.36685-1-steven.price@arm.com>
- <20201026155727.36685-3-steven.price@arm.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BAEEFF6CF5;
+ Tue, 17 Nov 2020 17:29:54 +0000 (UTC)
+Received: from [10.36.115.104] (ovpn-115-104.ams2.redhat.com [10.36.115.104])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1E65B10013C4;
+ Tue, 17 Nov 2020 17:29:51 +0000 (UTC)
+Subject: Re: [PATCH] KVM: arm64: vgic-v3: Drop the reporting of
+ GICR_TYPER.Last for userspace
+To: Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.cs.columbia.edu,
+ maz@kernel.org
+References: <20201117151629.1738-1-yuzenghui@huawei.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <4c9c10f9-fc6d-2725-168e-db6442b74574@redhat.com>
+Date: Tue, 17 Nov 2020 18:29:50 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20201026155727.36685-3-steven.price@arm.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
- Marc Zyngier <maz@kernel.org>, Juan Quintela <quintela@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
- Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org,
- Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20201117151629.1738-1-yuzenghui@huawei.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -72,45 +95,91 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Steven,
+Hi Zenghui,
 
-On Mon, Oct 26, 2020 at 03:57:27PM +0000, Steven Price wrote:
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 19aacc7d64de..38fe25310ca1 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -862,6 +862,26 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	if (vma_pagesize == PAGE_SIZE && !force_pte)
->  		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
->  							   &pfn, &fault_ipa);
+On 11/17/20 4:16 PM, Zenghui Yu wrote:
+> It was recently reported that if GICR_TYPER is accessed before the RD base
+> address is set, we'll suffer from the unset @rdreg dereferencing. Oops...
+> 
+> 	gpa_t last_rdist_typer = rdreg->base + GICR_TYPER +
+> 			(rdreg->free_index - 1) * KVM_VGIC_V3_REDIST_SIZE;
+> 
+> It's "expected" that users will access registers in the redistributor if
+> the RD has been properly configured (e.g., the RD base address is set). But
+> it hasn't yet been covered by the existing documentation.
+> 
+> Per discussion on the list [1], the reporting of the GICR_TYPER.Last bit
+> for userspace never actually worked. And it's difficult for us to emulate
+> it correctly given that userspace has the flexibility to access it any
+> time. Let's just drop the reporting of the Last bit for userspace for now
+> (userspace should have full knowledge about it anyway) and it at least
+> prevents kernel from panic ;-)
+> 
+> [1] https://lore.kernel.org/kvmarm/c20865a267e44d1e2c0d52ce4e012263@kernel.org/
+> 
+> Fixes: ba7b3f1275fd ("KVM: arm/arm64: Revisit Redistributor TYPER last bit computation")
+> Reported-by: Keqian Zhu <zhukeqian1@huawei.com>
+> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+Given the state of last bit, it looks sensible atm.
+
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+
+Thanks
+
+Eric
+
+
+> ---
+> 
+> This may be the easiest way to fix the issue and to get the fix backported
+> to stable tree. There is still some work can be done since (at least) we
+> have code duplicates between the MMIO and uaccess callbacks.
+> 
+>  arch/arm64/kvm/vgic/vgic-mmio-v3.c | 22 ++++++++++++++++++++--
+>  1 file changed, 20 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> index 52d6f24f65dc..15a6c98ee92f 100644
+> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> @@ -273,6 +273,23 @@ static unsigned long vgic_mmio_read_v3r_typer(struct kvm_vcpu *vcpu,
+>  	return extract_bytes(value, addr & 7, len);
+>  }
+>  
+> +static unsigned long vgic_uaccess_read_v3r_typer(struct kvm_vcpu *vcpu,
+> +						 gpa_t addr, unsigned int len)
+> +{
+> +	unsigned long mpidr = kvm_vcpu_get_mpidr_aff(vcpu);
+> +	int target_vcpu_id = vcpu->vcpu_id;
+> +	u64 value;
 > +
-> +	/*
-> +	 * The otherwise redundant test for system_supports_mte() allows the
-> +	 * code to be compiled out when CONFIG_ARM64_MTE is not present.
-> +	 */
-> +	if (system_supports_mte() && kvm->arch.mte_enabled && pfn_valid(pfn)) {
-> +		/*
-> +		 * VM will be able to see the page's tags, so we must ensure
-> +		 * they have been initialised.
-> +		 */
-> +		struct page *page = pfn_to_page(pfn);
-> +		long i, nr_pages = compound_nr(page);
+> +	value = (u64)(mpidr & GENMASK(23, 0)) << 32;
+> +	value |= ((target_vcpu_id & 0xffff) << 8);
 > +
-> +		/* if PG_mte_tagged is set, tags have already been initialised */
-> +		for (i = 0; i < nr_pages; i++, page++) {
-> +			if (!test_and_set_bit(PG_mte_tagged, &page->flags))
-> +				mte_clear_page_tags(page_address(page));
-> +		}
-> +	}
+> +	if (vgic_has_its(vcpu->kvm))
+> +		value |= GICR_TYPER_PLPIS;
+> +
+> +	/* reporting of the Last bit is not supported for userspace */
+> +	return extract_bytes(value, addr & 7, len);
+> +}
+> +
+>  static unsigned long vgic_mmio_read_v3r_iidr(struct kvm_vcpu *vcpu,
+>  					     gpa_t addr, unsigned int len)
+>  {
+> @@ -593,8 +610,9 @@ static const struct vgic_register_region vgic_v3_rd_registers[] = {
+>  	REGISTER_DESC_WITH_LENGTH(GICR_IIDR,
+>  		vgic_mmio_read_v3r_iidr, vgic_mmio_write_wi, 4,
+>  		VGIC_ACCESS_32bit),
+> -	REGISTER_DESC_WITH_LENGTH(GICR_TYPER,
+> -		vgic_mmio_read_v3r_typer, vgic_mmio_write_wi, 8,
+> +	REGISTER_DESC_WITH_LENGTH_UACCESS(GICR_TYPER,
+> +		vgic_mmio_read_v3r_typer, vgic_mmio_write_wi,
+> +		vgic_uaccess_read_v3r_typer, vgic_mmio_uaccess_write_wi, 8,
+>  		VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
+>  	REGISTER_DESC_WITH_LENGTH(GICR_WAKER,
+>  		vgic_mmio_read_raz, vgic_mmio_write_wi, 4,
+> 
 
-If this page was swapped out and mapped back in, where does the
-restoring from swap happen?
-
-I may have asked in the past, is user_mem_abort() the only path for
-mapping Normal pages into stage 2?
-
--- 
-Catalin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
