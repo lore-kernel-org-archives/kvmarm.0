@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C2EAC2D0E4
-	for <kvmarm@archiver.kernel.org>; Tue, 17 Nov 2020 18:17:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7434C5519F
+	for <kvmarm@archiver.kernel.org>; Tue, 17 Nov 2020 18:17:23 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 08D912465E
-	for <kvmarm@archiver.kernel.org>; Tue, 17 Nov 2020 18:17:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 48D822467D
+	for <kvmarm@archiver.kernel.org>; Tue, 17 Nov 2020 18:17:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="OEoAZqf/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08D912465E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="BwMpHLzz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48D822467D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B455F4B8EE;
-	Tue, 17 Nov 2020 13:17:21 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F25544B8F0;
+	Tue, 17 Nov 2020 13:17:22 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id zTpRylYV1C6n; Tue, 17 Nov 2020 13:17:20 -0500 (EST)
+	with ESMTP id 3RhYVwr2wp1E; Tue, 17 Nov 2020 13:17:21 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B7924B8ED;
-	Tue, 17 Nov 2020 13:17:20 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C3ECA4B8F7;
+	Tue, 17 Nov 2020 13:17:21 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3BAD54B7DC
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Nov 2020 13:17:19 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D18454B559
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Nov 2020 13:17:20 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fCEc0Wdo+CTV for <kvmarm@lists.cs.columbia.edu>;
- Tue, 17 Nov 2020 13:17:18 -0500 (EST)
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com
- [209.85.128.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1B7BB4B60C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Nov 2020 13:17:18 -0500 (EST)
-Received: by mail-wm1-f73.google.com with SMTP id k128so2127694wme.7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Nov 2020 10:17:18 -0800 (PST)
+ with ESMTP id MtBpOs2rzrsM for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 17 Nov 2020 13:17:19 -0500 (EST)
+Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com
+ [209.85.160.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CDD2A4B79D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Nov 2020 13:17:19 -0500 (EST)
+Received: by mail-qt1-f202.google.com with SMTP id m17so11855809qtu.11
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Nov 2020 10:17:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=sender:date:in-reply-to:message-id:mime-version:references:subject
- :from:to:cc; bh=U9buW3EkB/K6NinBuCPzqj4JKuwVqT/SXDU0SZ8bieQ=;
- b=OEoAZqf/nKz8y4wwbNx4ce9JZPHSdATgOxmylZEZ63UUl4SLy8rF5lv+5jh8HRhWHV
- l3jGcsZVeScg2fnHeX8O1ZoHr2neKk6P/nYD6Urly0tw8n40b2B5togib9oJ6S8u3J2G
- DFJzS6t4+o1+m2Wrt+X107G2mNv5796ZBQ3LThG4GqG3MHwAyh/szE5NsseL5rxg6NbE
- jradhxYJAJ+gyWiQzQs70x7NpeqFztQHGIra3pXzLaVk+w+fYaQrxiIKC6MLVCNPhS1a
- WAn/iamjzPdbSB5+T9yPzgX/YFXLTSRG0UxqXOOA97dB1iR3N49f6Pd3LVxRUZ/1Iq49
- GbaA==
+ :from:to:cc; bh=E22eq9BAxEe+AO1nuitRnkTYq4b0+jwZ2QqbOY4WjS4=;
+ b=BwMpHLzzaf2zH+ej4IZ+ZkIk/2jWr7L+FHUmN9hGsyCqOGOmdabExESKfOLgOuQEMx
+ NHx/9YL1ICL/V6NTINPSEuafCnh+jEpymTyAt+ffdheOuo7jOJ8vS/yeL41NvksNjLOE
+ x8t+7P7Bm81+jxi2AQWLRtbYG98F660Av+2v6E1SVR18iUDIbjud6M7WtnnUxBYtf4yg
+ aCkEG1Nbb7InqizJzHfB0W0Noq7MOQtxHUbyYkRV8CEDKX/4SUjh+2KgSkkYcs5KTcOv
+ 9gcPbPB/EtvtRoo0fWhkrwKl79dMwsmHYYo8KVVxYYexbKJ9YZA/vmIK3+v8nlSTkUDs
+ TWaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=U9buW3EkB/K6NinBuCPzqj4JKuwVqT/SXDU0SZ8bieQ=;
- b=o3QxAZbGoR/KK0Cud0RPF1dlNHCelcVW5iRb7zVe5T8YzvGtt0aD0F8jHc3lLZ3NOy
- EyMPEsIo5i75WuG9rKxw54cg2rqHv17SakFFTlfDzLTLcc/8IDC6QTcKSQts/c4XXVFZ
- styILQSqpmuAQJFxLpiw6zdbd5IgGjNCsU+QOqjd/5wMs5L6c7WtyEn2lMh4FC/BKNfY
- 1HhBt4gaTj+bAwkcn4k/HqL/LK1NDuy2bos1v/1Vxbd+2GWwXpg9yZi7v212xtEkr/YV
- i49xYmiNKHGzGmdlLfGCFIpstRNneYuEPLY31n+QkbwyPYhGX5qklCFQi8jCQBRVLhMt
- xmtA==
-X-Gm-Message-State: AOAM5316TZYR8zTpOYnmVfThiTPacM5sUmqudkqB+Ax5zTHpXqh2wdVy
- Awvs4+p+/RC0f7wzMadQ+vFK/4QyPBd4
-X-Google-Smtp-Source: ABdhPJxdY+lqNlpPzdnmipW4jOsekrda/kjR1w92gZ+51XZgmNLFCJj9D0pJqUaOPEVX/Dsw6fZ/dN80t1P3
+ bh=E22eq9BAxEe+AO1nuitRnkTYq4b0+jwZ2QqbOY4WjS4=;
+ b=cUT6kTFc1NESR7yp4oeeteeTHAiu1ENVyOeTLt7iudZQ/P12WL2HQK3DA1PqXwTO7M
+ nDzfrNzm08ztbKbxglQYFV1SdTloYOmJBqoX6XLziEl/0Kj6EubIQaW+j2xAz0LPmm/H
+ Sv7/KEDc68s6cbq2LJKunxzQA3gdiLVf6DnxZNdumGgwlICeIhCbmxoggRwJ8ba/KkbO
+ 070lHnwChyiZDicS+SER/BIDVKO76G9jR1bluaqTa7RSGAybQrOLXt8l+dhq0ALWby+w
+ 5k1Z7f+8stWxrch4F6zelyeG/5rxl5HIgHpaF/nkWVNIqKTxOBZ6T64S4etw5DgYJuqK
+ 80eQ==
+X-Gm-Message-State: AOAM531528jaaTegPDzPRv85j0ruFKVJ8WgH43HX7QIpCCOkHpiyNLGC
+ JziiE2NohbJfxPcrGE5yoslRjeTo7ltH
+X-Google-Smtp-Source: ABdhPJz/mVc1v+qYJqOE8yeahxM0e0LR02PFTS4Ofl1niXl14opy+AyQuh/+jpD0RcsQFfuxJf4epmdjTYs2
 X-Received: from luke.lon.corp.google.com
  ([2a00:79e0:d:210:f693:9fff:fef4:a7ef])
- (user=qperret job=sendgmr) by 2002:adf:a3ca:: with SMTP id
- m10mr842044wrb.228.1605637037211; Tue, 17 Nov 2020 10:17:17 -0800 (PST)
-Date: Tue, 17 Nov 2020 18:16:05 +0000
+ (user=qperret job=sendgmr) by 2002:ad4:53c8:: with SMTP id
+ k8mr531726qvv.40.1605637039404; Tue, 17 Nov 2020 10:17:19 -0800 (PST)
+Date: Tue, 17 Nov 2020 18:16:06 +0000
 In-Reply-To: <20201117181607.1761516-1-qperret@google.com>
-Message-Id: <20201117181607.1761516-26-qperret@google.com>
+Message-Id: <20201117181607.1761516-27-qperret@google.com>
 Mime-Version: 1.0
 References: <20201117181607.1761516-1-qperret@google.com>
 X-Mailer: git-send-email 2.29.2.299.gdc1121823c-goog
-Subject: [RFC PATCH 25/27] KVM: arm64: Reserve memory for host stage 2
+Subject: [RFC PATCH 26/27] KVM: arm64: Sort the memblock regions list
 From: Quentin Perret <qperret@google.com>
 To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
  Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
@@ -106,124 +106,78 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Extend the memory pool allocated for the hypervisor to include enough
-pages to map all of memory at page granularity for the host stage 2.
-While at it, also reserve some memory for device mappings.
+The hypervisor will need the list of memblock regions sorted by
+increasing start address to make look-ups more efficient. Make the
+host do the hard work early while it is still trusted to avoid the need
+for a sorting library at EL2.
 
 Signed-off-by: Quentin Perret <qperret@google.com>
 ---
- arch/arm64/kvm/hyp/include/nvhe/mm.h | 36 ++++++++++++++++++++++++----
- arch/arm64/kvm/hyp/nvhe/setup.c      | 12 ++++++++++
- arch/arm64/kvm/hyp/reserved_mem.c    |  2 ++
- 3 files changed, 46 insertions(+), 4 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |  1 +
+ arch/arm64/kvm/arm.c              |  1 +
+ arch/arm64/kvm/hyp/reserved_mem.c | 18 ++++++++++++++++++
+ 3 files changed, 20 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/mm.h b/arch/arm64/kvm/hyp/include/nvhe/mm.h
-index 5a3ad6f4e5bc..b79be2580164 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/mm.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/mm.h
-@@ -52,15 +52,12 @@ static inline unsigned long __hyp_pgtable_max_pages(unsigned long nr_pages)
- 	return total;
- }
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 53b01d25e7d9..ec304a5c728b 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -746,6 +746,7 @@ bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
+ extern phys_addr_t hyp_mem_base;
+ extern phys_addr_t hyp_mem_size;
+ void __init reserve_kvm_hyp(void);
++void kvm_sort_memblock_regions(void);
+ #else
+ static inline void reserve_kvm_hyp(void) { }
+ #endif
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index e06c95a10dba..8160a0d12a58 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1685,6 +1685,7 @@ static int kvm_hyp_enable_protection(void)
+ 		return ret;
  
--static inline unsigned long hyp_s1_pgtable_size(void)
-+static inline unsigned long __hyp_pgtable_total_size(void)
- {
- 	struct hyp_memblock_region *reg;
- 	unsigned long nr_pages, res = 0;
- 	int i;
- 
--	if (kvm_nvhe_sym(hyp_memblock_nr) <= 0)
--		return 0;
--
- 	for (i = 0; i < kvm_nvhe_sym(hyp_memblock_nr); i++) {
- 		reg = &kvm_nvhe_sym(hyp_memory)[i];
- 		nr_pages = (reg->end - reg->start) >> PAGE_SHIFT;
-@@ -68,6 +65,18 @@ static inline unsigned long hyp_s1_pgtable_size(void)
- 		res += nr_pages << PAGE_SHIFT;
- 	}
- 
-+	return res;
-+}
-+
-+static inline unsigned long hyp_s1_pgtable_size(void)
-+{
-+	unsigned long res, nr_pages;
-+
-+	if (kvm_nvhe_sym(hyp_memblock_nr) <= 0)
-+		return 0;
-+
-+	res = __hyp_pgtable_total_size();
-+
- 	/* Allow 1 GiB for private mappings */
- 	nr_pages = (1 << 30) >> PAGE_SHIFT;
- 	nr_pages = __hyp_pgtable_max_pages(nr_pages);
-@@ -76,4 +85,23 @@ static inline unsigned long hyp_s1_pgtable_size(void)
- 	return res;
- }
- 
-+static inline unsigned long host_s2_mem_pgtable_size(void)
-+{
-+	unsigned long max_pgd_sz = 16 << PAGE_SHIFT;
-+
-+	if (kvm_nvhe_sym(hyp_memblock_nr) <= 0)
-+		return 0;
-+
-+	return __hyp_pgtable_total_size() + max_pgd_sz;
-+}
-+
-+static inline unsigned long host_s2_dev_pgtable_size(void)
-+{
-+	if (kvm_nvhe_sym(hyp_memblock_nr) <= 0)
-+		return 0;
-+
-+	/* Allow 1 GiB for private mappings */
-+	return __hyp_pgtable_max_pages((1 << 30) >> PAGE_SHIFT) << PAGE_SHIFT;
-+}
-+
- #endif /* __KVM_HYP_MM_H */
-diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-index 9679c97b875b..b73e6b08cfba 100644
---- a/arch/arm64/kvm/hyp/nvhe/setup.c
-+++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-@@ -24,6 +24,8 @@ unsigned long hyp_nr_cpus;
- static void *stacks_base;
- static void *vmemmap_base;
- static void *hyp_pgt_base;
-+static void *host_s2_mem_pgt_base;
-+static void *host_s2_dev_pgt_base;
- 
- static int divide_memory_pool(void *virt, unsigned long size)
- {
-@@ -46,6 +48,16 @@ static int divide_memory_pool(void *virt, unsigned long size)
- 	if (!hyp_pgt_base)
- 		return -ENOMEM;
- 
-+	nr_pages = host_s2_mem_pgtable_size() >> PAGE_SHIFT;
-+	host_s2_mem_pgt_base = hyp_early_alloc_contig(nr_pages);
-+	if (!host_s2_mem_pgt_base)
-+		return -ENOMEM;
-+
-+	nr_pages = host_s2_dev_pgtable_size() >> PAGE_SHIFT;
-+	host_s2_dev_pgt_base = hyp_early_alloc_contig(nr_pages);
-+	if (!host_s2_dev_pgt_base)
-+		return -ENOMEM;
-+
- 	return 0;
- }
- 
+ 	kvm_set_hyp_vector();
++	kvm_sort_memblock_regions();
+ 	ret = kvm_call_hyp_nvhe(__kvm_hyp_protect, hyp_mem_base, hyp_mem_size,
+ 				num_possible_cpus(), kern_hyp_va(per_cpu_base));
+ 	if (ret)
 diff --git a/arch/arm64/kvm/hyp/reserved_mem.c b/arch/arm64/kvm/hyp/reserved_mem.c
-index 02b0b18006f5..c2c0484b6211 100644
+index c2c0484b6211..7da8e2915c1c 100644
 --- a/arch/arm64/kvm/hyp/reserved_mem.c
 +++ b/arch/arm64/kvm/hyp/reserved_mem.c
-@@ -47,6 +47,8 @@ void __init reserve_kvm_hyp(void)
+@@ -6,6 +6,7 @@
  
- 	hyp_mem_size += num_possible_cpus() << PAGE_SHIFT;
- 	hyp_mem_size += hyp_s1_pgtable_size();
-+	hyp_mem_size += host_s2_mem_pgtable_size();
-+	hyp_mem_size += host_s2_dev_pgtable_size();
+ #include <linux/kvm_host.h>
+ #include <linux/memblock.h>
++#include <linux/sort.h>
  
- 	/*
- 	 * The hyp_vmemmap needs to be backed by pages, but these pages
+ #include <asm/kvm_host.h>
+ 
+@@ -31,6 +32,23 @@ void __init early_init_dt_add_memory_hyp(u64 base, u64 size)
+ 	kvm_nvhe_sym(hyp_memblock_nr)++;
+ }
+ 
++static int cmp_hyp_memblock(const void *p1, const void *p2)
++{
++	const struct hyp_memblock_region *r1 = p1;
++	const struct hyp_memblock_region *r2 = p2;
++
++	return r1->start < r2->start ? -1 : (r1->start > r2->start);
++}
++
++void kvm_sort_memblock_regions(void)
++{
++	sort(kvm_nvhe_sym(hyp_memory),
++	     kvm_nvhe_sym(hyp_memblock_nr),
++	     sizeof(struct hyp_memblock_region),
++	     cmp_hyp_memblock,
++	     NULL);
++}
++
+ extern bool enable_protected_kvm;
+ void __init reserve_kvm_hyp(void)
+ {
 -- 
 2.29.2.299.gdc1121823c-goog
 
