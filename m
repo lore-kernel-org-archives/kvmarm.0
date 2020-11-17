@@ -2,90 +2,88 @@ Return-Path: <SRS0=VcQF=EX=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06E84C2D0E4
-	for <kvmarm@archiver.kernel.org>; Tue, 17 Nov 2020 10:51:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4CBFC5519F
+	for <kvmarm@archiver.kernel.org>; Tue, 17 Nov 2020 11:39:16 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2ED1C241A7
-	for <kvmarm@archiver.kernel.org>; Tue, 17 Nov 2020 10:51:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="hJb1EcqJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2ED1C241A7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 42BFF2225E
+	for <kvmarm@archiver.kernel.org>; Tue, 17 Nov 2020 11:39:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42BFF2225E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 759F44B6F1;
-	Tue, 17 Nov 2020 05:51:16 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4BD354B70F;
+	Tue, 17 Nov 2020 06:39:15 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id d-9mX599dQlm; Tue, 17 Nov 2020 05:51:15 -0500 (EST)
+	with ESMTP id wdVI0tlbGAaK; Tue, 17 Nov 2020 06:39:13 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5049F4B732;
-	Tue, 17 Nov 2020 05:51:15 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F4424B720;
+	Tue, 17 Nov 2020 06:39:13 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5473C4B71E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Nov 2020 05:51:14 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C2CB4B71F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Nov 2020 06:39:12 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 33DrlUbBZ5k4 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 17 Nov 2020 05:51:13 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 36F1D4B6F1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Nov 2020 05:51:13 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id DF07A22447;
- Tue, 17 Nov 2020 10:51:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1605610272;
- bh=M9flKwRDRr9z64KmcbSgnOXXghPG2KQsLqY0zyac1Pc=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=hJb1EcqJN7y1+EllTk1nrvx7ql2HD2xrFheKYg8a5Qe1xK4dx+bbBZuRQE43nJsgP
- cLIg109k/Xs+axWgm62EusuYdb1mhlnsy5YoJwfluMJ9qupSxhcu4yXO2J0KinRL6h
- 6YzGxnDuj0ANEfmFcJ7Quv/pVpImxgKmhNcqZMsc=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
- TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
- (envelope-from <maz@kernel.org>)
- id 1keyZp-00BIq8-MW; Tue, 17 Nov 2020 10:51:09 +0000
+ with ESMTP id aYpuVHklbwq4 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 17 Nov 2020 06:39:09 -0500 (EST)
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com
+ [185.176.79.56])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E987E4B705
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Nov 2020 06:39:08 -0500 (EST)
+Received: from fraeml712-chm.china.huawei.com (unknown [172.18.147.226])
+ by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Cb3p54gljz67DZ2;
+ Tue, 17 Nov 2020 19:37:33 +0800 (CST)
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ fraeml712-chm.china.huawei.com (10.206.15.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1913.5; Tue, 17 Nov 2020 12:39:06 +0100
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ lhreml710-chm.china.huawei.com (10.201.108.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1913.5; Tue, 17 Nov 2020 11:39:06 +0000
+Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
+ lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
+ 15.01.1913.007; Tue, 17 Nov 2020 11:39:06 +0000
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To: Eric Auger <eric.auger@redhat.com>, "eric.auger.pro@gmail.com"
+ <eric.auger.pro@gmail.com>, "iommu@lists.linux-foundation.org"
+ <iommu@lists.linux-foundation.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+ "will@kernel.org" <will@kernel.org>, "joro@8bytes.org" <joro@8bytes.org>,
+ "maz@kernel.org" <maz@kernel.org>, "robin.murphy@arm.com"
+ <robin.murphy@arm.com>
+Subject: RE: [PATCH v12 04/15] iommu/smmuv3: Dynamically allocate s1_cfg and
+ s2_cfg
+Thread-Topic: [PATCH v12 04/15] iommu/smmuv3: Dynamically allocate s1_cfg and
+ s2_cfg
+Thread-Index: AQHWvAWCBAR6HyUG4kmYcGJ553yHvqnMLPVw
+Date: Tue, 17 Nov 2020 11:39:05 +0000
+Message-ID: <166d9bfb655b44c4990bade987a49860@huawei.com>
+References: <20201116104316.31816-1-eric.auger@redhat.com>
+ <20201116104316.31816-5-eric.auger@redhat.com>
+In-Reply-To: <20201116104316.31816-5-eric.auger@redhat.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.47.11.163]
 MIME-Version: 1.0
-Date: Tue, 17 Nov 2020 10:51:09 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH 1/2] KVM: arm64: vgic: Forbid invalid userspace
- Redistributor accesses
-In-Reply-To: <5ba4a98e-276b-2462-0580-fe0e007e9b38@redhat.com>
-References: <20201113142801.1659-1-yuzenghui@huawei.com>
- <20201113142801.1659-2-yuzenghui@huawei.com>
- <724c43702b52aac0d3c9beb9604d1bfb@kernel.org>
- <584b7ff1-ecf2-b0ec-cea3-ccc29902f43a@huawei.com>
- <cc45285fe491aff5c28a24f94c124508@kernel.org>
- <7e58200c-814e-3598-155a-9a7e6cc24374@huawei.com>
- <c20865a267e44d1e2c0d52ce4e012263@kernel.org>
- <5ba4a98e-276b-2462-0580-fe0e007e9b38@redhat.com>
-User-Agent: Roundcube Webmail/1.4.9
-Message-ID: <6f4312dbedd6c1d8fa88dc0fc5adcb5d@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: eric.auger@redhat.com, yuzenghui@huawei.com,
- suzuki.poulose@arm.com, linux-kernel@vger.kernel.org, james.morse@arm.com,
- linux-arm-kernel@lists.infradead.org, wanghaibin.wang@huawei.com,
- zhukeqian1@huawei.com, kvmarm@lists.cs.columbia.edu,
- julien.thierry.kdev@gmail.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+X-CFilter-Loop: Reflected
+Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+ "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+ "nicoleotsuka@gmail.com" <nicoleotsuka@gmail.com>,
+ "vivek.gautam@arm.com" <vivek.gautam@arm.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "yi.l.liu@intel.com" <yi.l.liu@intel.com>,
+ "zhangfei.gao@linaro.org" <zhangfei.gao@linaro.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -97,53 +95,296 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gMjAyMC0xMS0xNyAwOTo1OSwgQXVnZXIgRXJpYyB3cm90ZToKPiBIaSBNYXJjLAo+IAo+IE9u
-IDExLzE3LzIwIDk6NDkgQU0sIE1hcmMgWnluZ2llciB3cm90ZToKPj4gSGkgWmVuZ2h1aSwKPj4g
-Cj4+IE9uIDIwMjAtMTEtMTYgMTQ6NTcsIFplbmdodWkgWXUgd3JvdGU6Cj4+PiBIaSBNYXJjLAo+
-Pj4gCj4+PiBPbiAyMDIwLzExLzE2IDIyOjEwLCBNYXJjIFp5bmdpZXIgd3JvdGU6Cj4+Pj4+IE15
-IHRha2UgaXMgdGhhdCBvbmx5IGlmIHRoZSAiW1JlXURpc3RyaWJ1dG9yIGJhc2UgYWRkcmVzcyIg
-aXMgCj4+Pj4+IHNwZWNpZmllZAo+Pj4+PiBpbiB0aGUgc3lzdGVtIG1lbW9yeSBtYXAsIHdpbGwg
-dGhlIHVzZXItcHJvdmlkZWQgCj4+Pj4+IGt2bV9kZXZpY2VfYXR0ci5vZmZzZXQKPj4+Pj4gbWFr
-ZSBzZW5zZS4gQW5kIHdlIGNhbiB0aGVuIGhhbmRsZSB0aGUgYWNjZXNzIHRvIHRoZSByZWdpc3Rl
-ciB3aGljaCAKPj4+Pj4gaXMKPj4+Pj4gZGVmaW5lZCBieSAiYmFzZSBhZGRyZXNzICsgb2Zmc2V0
-Ii4KPj4+PiAKPj4+PiBJJ2QgdGVuZCB0byBhZ3JlZSwgYnV0IGl0IGlzIGp1c3QgdGhhdCB0aGlz
-IGlzIGEgbGFyZ2UgY2hhbmdlIGF0IAo+Pj4+IC1yYzQuCj4+Pj4gSSdkIHJhdGhlciBoYXZlIGEg
-cXVpY2sgZml4IGZvciA1LjEwLCBhbmQgYSBtb3JlIGludmFzaXZlIGNoYW5nZSBmb3IKPj4+PiA1
-LjExLAo+Pj4+IHNwYW5uaW5nIGFsbCB0aGUgcG9zc2libGUgdmdpYyBkZXZpY2VzLgo+Pj4gCj4+
-PiBTbyB5b3UgcHJlZmVyIGZpeGluZyBpdCBieSAicmV0dXJuIGEgdmFsdWUgdGhhdCBkb2Vzbid0
-IGhhdmUgdGhlIExhc3QKPj4+IGJpdCBzZXQiIGZvciB2NS4xMD8gSSdtIG9rIHdpdGggaXQgYW5k
-IGNhbiBzZW5kIHYyIGZvciBpdC4KPj4gCj4+IENvb2wuIFRoYW5rcyBmb3IgdGhhdC4KPj4gCj4+
-PiBCdHcsIGxvb2tpbmcgYWdhaW4gYXQgdGhlIHdheSB3ZSBoYW5kbGUgdGhlIHVzZXItcmVhZGlu
-ZyBvZiAKPj4+IEdJQ1JfVFlQRVIKPj4+IAo+Pj4gwqDCoMKgwqB2Z2ljX21taW9fcmVhZF92M3Jf
-dHlwZXIodmNwdSwgYWRkciwgbGVuKQo+Pj4gCj4+PiBpdCBzZWVtcyB0aGF0IEBhZGRyIGlzIGFj
-dHVhbGx5IHRoZSAqb2Zmc2V0KiBvZiBHSUNSX1RZUEVSICgweDAwMDgpIAo+Pj4gYW5kCj4+PiBA
-YWRkciBpcyB1bmxpa2VseSB0byBiZSBlcXVhbCB0byBsYXN0X3JkaXN0X3R5cGVyLCB3aGljaCBp
-cyB0aGUgKkdQQSogCj4+PiBvZgo+Pj4gdGhlIGxhc3QgUkQuIExvb2tzIGxpa2UgdGhlIHVzZXIt
-cmVhZGluZyBvZiBHSUNSX1RZUEVSLkxhc3QgaXMgYWx3YXlzCj4+PiBicm9rZW4/Cj4+IAo+PiBJ
-IHRoaW5rIHlvdSBhcmUgcmlnaHQuIFNvbWVob3csIHdlIGRvbid0IHNlZW0gdG8gdHJhY2sgdGhl
-IGluZGV4IG9mCj4+IHRoZSBSRCBpbiB0aGUgcmVnaW9uLCBzbyB3ZSBjYW4gbmV2ZXIgY29tcHV0
-ZSB0aGUgYWRkcmVzcyBvZiB0aGUgUkQKPj4gZXZlbiBpZiB0aGUgYmFzZSBhZGRyZXNzIGlzIHNl
-dC4KPj4gCj4+IExldCdzIGRyb3AgdGhlIHJlcG9ydGluZyBvZiBMYXN0IGZvciB1c2Vyc3BhY2Ug
-Zm9yIG5vdywgYXMgaXQgbmV2ZXIKPj4gd29ya2VkLiBJZiB5b3UgcG9zdCBhIHBhdGNoIGFkZHJl
-c3NpbmcgdGhhdCBxdWlja2x5LCBJJ2xsIGdldCBpdCB0bwo+PiBQYW9sbyBieSB0aGUgZW5kIG9m
-IHRoZSB3ZWVrICh0aGVyZSdzIGFub3RoZXIgZml4IHRoYXQgbmVlZHMgbWVyZ2luZykuCj4+IAo+
-PiBFcmljOiBkbyB3ZSBoYXZlIGFueSB0ZXN0IGNvdmVyaW5nIHRoZSB1c2Vyc3BhY2UgQVBJPwo+
-IAo+IFNvIGFzIHRoaXMgaXNzdWUgc2VlbXMgcmVsYXRlZCB0byB0aGUgY2hhbmdlcyBtYWRlIHdo
-ZW4gaW1wbGVtZW50aW5nIAo+IHRoZQo+IG11bHRpcGxlIFJESVNUIHJlZ2lvbnMsIEkgdm9sdW50
-ZWVyIHRvIHdyaXRlIHRob3NlIEtWTSBzZWxmdGVzdHMgOi0pCgpZb3UncmUgb24hIDpECgpNb3Jl
-IHNlcmlvdXNseSwgdGhlcmUgaXMgc2NvcGUgZm9yIGZ1enppbmcgdGhlIGRldmljZSBzYXZlL3Jl
-c3RvcmUgQVBJLAphcyB3ZSBmaW5kIGJ1Z3MgZXZlcnkgdGltZSBzb21lb25lIGNoYW5nZSB0aGUg
-Imtub3duIGdvb2QiIG9yZGVyaW5nIHRoYXQKaXMgaW1wbGVtZW50ZWQgaW4gUUVNVS4KCk1heWJl
-IGl0IG1lYW5zIGdldHRpbmcgcmlkIG9mIHNvbWUgdW5uZWNlc3NhcnkgZmxleGliaWxpdHksIGFz
-IHByb3Bvc2VkCmJ5IFplbmdodWksIGlmIHdlIGFyZSBjb25maWRlbnQgdGhhdCBubyB1c2Vyc3Bh
-Y2UgbWFrZXMgdXNlIG9mIGl0LgpBbmQgaW4gdGhlIGZ1dHVyZSwgbWFraW5nIHN1cmUgdGhhdCBu
-ZXcgQVBJcyBhcmUgcmlnaWQgZW5vdWdoIHRvIGF2b2lkIApzdWNoCmJ1Z3MuCgpUaGFua3MsCgog
-ICAgICAgICBNLgotLSAKSmF6eiBpcyBub3QgZGVhZC4gSXQganVzdCBzbWVsbHMgZnVubnkuLi4K
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1h
-aWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3Mu
-Y29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+Hi Eric,
+
+> -----Original Message-----
+> From: Eric Auger [mailto:eric.auger@redhat.com]
+> Sent: 16 November 2020 10:43
+> To: eric.auger.pro@gmail.com; eric.auger@redhat.com;
+> iommu@lists.linux-foundation.org; linux-kernel@vger.kernel.org;
+> kvm@vger.kernel.org; kvmarm@lists.cs.columbia.edu; will@kernel.org;
+> joro@8bytes.org; maz@kernel.org; robin.murphy@arm.com
+> Cc: jean-philippe@linaro.org; zhangfei.gao@linaro.org;
+> zhangfei.gao@gmail.com; vivek.gautam@arm.com; Shameerali Kolothum
+> Thodi <shameerali.kolothum.thodi@huawei.com>;
+> alex.williamson@redhat.com; jacob.jun.pan@linux.intel.com;
+> yi.l.liu@intel.com; tn@semihalf.com; nicoleotsuka@gmail.com
+> Subject: [PATCH v12 04/15] iommu/smmuv3: Dynamically allocate s1_cfg and
+> s2_cfg
+> 
+> In preparation for the introduction of nested stages
+> let's turn s1_cfg and s2_cfg fields into pointers which are
+> dynamically allocated depending on the smmu_domain stage.
+
+This will break compile if we have CONFIG_ARM_SMMU_V3_SVA
+because ,
+https://github.com/eauger/linux/blob/5.10-rc4-2stage-v12/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c#L40
+
+Do we really need to make these pointers?
+
+Thanks,
+Shameer
+ 
+> In nested mode, both stages will coexist and s1_cfg will
+> be allocated when the guest configuration gets passed.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> ---
+>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 83 ++++++++++++---------
+>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h |  6 +-
+>  2 files changed, 48 insertions(+), 41 deletions(-)
+> 
+> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> index d828d6cbeb0e..4baf9fafe462 100644
+> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> @@ -953,9 +953,9 @@ static __le64 *arm_smmu_get_cd_ptr(struct
+> arm_smmu_domain *smmu_domain,
+>  	unsigned int idx;
+>  	struct arm_smmu_l1_ctx_desc *l1_desc;
+>  	struct arm_smmu_device *smmu = smmu_domain->smmu;
+> -	struct arm_smmu_ctx_desc_cfg *cdcfg = &smmu_domain->s1_cfg.cdcfg;
+> +	struct arm_smmu_ctx_desc_cfg *cdcfg =
+> &smmu_domain->s1_cfg->cdcfg;
+> 
+> -	if (smmu_domain->s1_cfg.s1fmt == STRTAB_STE_0_S1FMT_LINEAR)
+> +	if (smmu_domain->s1_cfg->s1fmt == STRTAB_STE_0_S1FMT_LINEAR)
+>  		return cdcfg->cdtab + ssid * CTXDESC_CD_DWORDS;
+> 
+>  	idx = ssid >> CTXDESC_SPLIT;
+> @@ -990,7 +990,7 @@ int arm_smmu_write_ctx_desc(struct
+> arm_smmu_domain *smmu_domain, int ssid,
+>  	__le64 *cdptr;
+>  	struct arm_smmu_device *smmu = smmu_domain->smmu;
+> 
+> -	if (WARN_ON(ssid >= (1 << smmu_domain->s1_cfg.s1cdmax)))
+> +	if (WARN_ON(ssid >= (1 << smmu_domain->s1_cfg->s1cdmax)))
+>  		return -E2BIG;
+> 
+>  	cdptr = arm_smmu_get_cd_ptr(smmu_domain, ssid);
+> @@ -1056,7 +1056,7 @@ static int arm_smmu_alloc_cd_tables(struct
+> arm_smmu_domain *smmu_domain)
+>  	size_t l1size;
+>  	size_t max_contexts;
+>  	struct arm_smmu_device *smmu = smmu_domain->smmu;
+> -	struct arm_smmu_s1_cfg *cfg = &smmu_domain->s1_cfg;
+> +	struct arm_smmu_s1_cfg *cfg = smmu_domain->s1_cfg;
+>  	struct arm_smmu_ctx_desc_cfg *cdcfg = &cfg->cdcfg;
+> 
+>  	max_contexts = 1 << cfg->s1cdmax;
+> @@ -1104,7 +1104,7 @@ static void arm_smmu_free_cd_tables(struct
+> arm_smmu_domain *smmu_domain)
+>  	int i;
+>  	size_t size, l1size;
+>  	struct arm_smmu_device *smmu = smmu_domain->smmu;
+> -	struct arm_smmu_ctx_desc_cfg *cdcfg = &smmu_domain->s1_cfg.cdcfg;
+> +	struct arm_smmu_ctx_desc_cfg *cdcfg =
+> &smmu_domain->s1_cfg->cdcfg;
+> 
+>  	if (cdcfg->l1_desc) {
+>  		size = CTXDESC_L2_ENTRIES * (CTXDESC_CD_DWORDS << 3);
+> @@ -1211,17 +1211,8 @@ static void arm_smmu_write_strtab_ent(struct
+> arm_smmu_master *master, u32 sid,
+>  	}
+> 
+>  	if (smmu_domain) {
+> -		switch (smmu_domain->stage) {
+> -		case ARM_SMMU_DOMAIN_S1:
+> -			s1_cfg = &smmu_domain->s1_cfg;
+> -			break;
+> -		case ARM_SMMU_DOMAIN_S2:
+> -		case ARM_SMMU_DOMAIN_NESTED:
+> -			s2_cfg = &smmu_domain->s2_cfg;
+> -			break;
+> -		default:
+> -			break;
+> -		}
+> +		s1_cfg = smmu_domain->s1_cfg;
+> +		s2_cfg = smmu_domain->s2_cfg;
+>  	}
+> 
+>  	if (val & STRTAB_STE_0_V) {
+> @@ -1664,10 +1655,10 @@ static void arm_smmu_tlb_inv_context(void
+> *cookie)
+>  	 * careful, 007.
+>  	 */
+>  	if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+> -		arm_smmu_tlb_inv_asid(smmu, smmu_domain->s1_cfg.cd.asid);
+> +		arm_smmu_tlb_inv_asid(smmu, smmu_domain->s1_cfg->cd.asid);
+>  	} else {
+>  		cmd.opcode	= CMDQ_OP_TLBI_S12_VMALL;
+> -		cmd.tlbi.vmid	= smmu_domain->s2_cfg.vmid;
+> +		cmd.tlbi.vmid	= smmu_domain->s2_cfg->vmid;
+>  		arm_smmu_cmdq_issue_cmd(smmu, &cmd);
+>  		arm_smmu_cmdq_issue_sync(smmu);
+>  	}
+> @@ -1693,10 +1684,10 @@ static void arm_smmu_tlb_inv_range(unsigned
+> long iova, size_t size,
+> 
+>  	if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+>  		cmd.opcode	= CMDQ_OP_TLBI_NH_VA;
+> -		cmd.tlbi.asid	= smmu_domain->s1_cfg.cd.asid;
+> +		cmd.tlbi.asid	= smmu_domain->s1_cfg->cd.asid;
+>  	} else {
+>  		cmd.opcode	= CMDQ_OP_TLBI_S2_IPA;
+> -		cmd.tlbi.vmid	= smmu_domain->s2_cfg.vmid;
+> +		cmd.tlbi.vmid	= smmu_domain->s2_cfg->vmid;
+>  	}
+> 
+>  	if (smmu->features & ARM_SMMU_FEAT_RANGE_INV) {
+> @@ -1846,24 +1837,25 @@ static void arm_smmu_domain_free(struct
+> iommu_domain *domain)
+>  {
+>  	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
+>  	struct arm_smmu_device *smmu = smmu_domain->smmu;
+> +	struct arm_smmu_s1_cfg *s1_cfg = smmu_domain->s1_cfg;
+> +	struct arm_smmu_s2_cfg *s2_cfg = smmu_domain->s2_cfg;
+> 
+>  	iommu_put_dma_cookie(domain);
+>  	free_io_pgtable_ops(smmu_domain->pgtbl_ops);
+> 
+>  	/* Free the CD and ASID, if we allocated them */
+> -	if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+> -		struct arm_smmu_s1_cfg *cfg = &smmu_domain->s1_cfg;
+> -
+> -		/* Prevent SVA from touching the CD while we're freeing it */
+> +	if (s1_cfg) {
+>  		mutex_lock(&arm_smmu_asid_lock);
+> -		if (cfg->cdcfg.cdtab)
+> +		/* Prevent SVA from touching the CD while we're freeing it */
+> +		if (s1_cfg->cdcfg.cdtab)
+>  			arm_smmu_free_cd_tables(smmu_domain);
+> -		arm_smmu_free_asid(&cfg->cd);
+> +		arm_smmu_free_asid(&s1_cfg->cd);
+>  		mutex_unlock(&arm_smmu_asid_lock);
+> -	} else {
+> -		struct arm_smmu_s2_cfg *cfg = &smmu_domain->s2_cfg;
+> -		if (cfg->vmid)
+> -			arm_smmu_bitmap_free(smmu->vmid_map, cfg->vmid);
+> +	}
+> +	if (s2_cfg) {
+> +		if (s2_cfg->vmid)
+> +			arm_smmu_bitmap_free(smmu->vmid_map, s2_cfg->vmid);
+> +		kfree(s2_cfg);
+>  	}
+> 
+>  	kfree(smmu_domain);
+> @@ -1876,8 +1868,11 @@ static int arm_smmu_domain_finalise_s1(struct
+> arm_smmu_domain *smmu_domain,
+>  	int ret;
+>  	u32 asid;
+>  	struct arm_smmu_device *smmu = smmu_domain->smmu;
+> -	struct arm_smmu_s1_cfg *cfg = &smmu_domain->s1_cfg;
+>  	typeof(&pgtbl_cfg->arm_lpae_s1_cfg.tcr) tcr =
+> &pgtbl_cfg->arm_lpae_s1_cfg.tcr;
+> +	struct arm_smmu_s1_cfg *cfg = kzalloc(sizeof(*cfg), GFP_KERNEL);
+> +
+> +	if (!cfg)
+> +		return -ENOMEM;
+> 
+>  	refcount_set(&cfg->cd.refs, 1);
+> 
+> @@ -1890,6 +1885,8 @@ static int arm_smmu_domain_finalise_s1(struct
+> arm_smmu_domain *smmu_domain,
+> 
+>  	cfg->s1cdmax = master->ssid_bits;
+> 
+> +	smmu_domain->s1_cfg = cfg;
+> +
+>  	ret = arm_smmu_alloc_cd_tables(smmu_domain);
+>  	if (ret)
+>  		goto out_free_asid;
+> @@ -1922,6 +1919,8 @@ static int arm_smmu_domain_finalise_s1(struct
+> arm_smmu_domain *smmu_domain,
+>  out_free_asid:
+>  	arm_smmu_free_asid(&cfg->cd);
+>  out_unlock:
+> +	kfree(cfg);
+> +	smmu_domain->s1_cfg = NULL;
+>  	mutex_unlock(&arm_smmu_asid_lock);
+>  	return ret;
+>  }
+> @@ -1930,14 +1929,19 @@ static int arm_smmu_domain_finalise_s2(struct
+> arm_smmu_domain *smmu_domain,
+>  				       struct arm_smmu_master *master,
+>  				       struct io_pgtable_cfg *pgtbl_cfg)
+>  {
+> -	int vmid;
+> +	int vmid, ret;
+>  	struct arm_smmu_device *smmu = smmu_domain->smmu;
+> -	struct arm_smmu_s2_cfg *cfg = &smmu_domain->s2_cfg;
+> +	struct arm_smmu_s2_cfg *cfg = kzalloc(sizeof(*cfg), GFP_KERNEL);
+>  	typeof(&pgtbl_cfg->arm_lpae_s2_cfg.vtcr) vtcr;
+> 
+> +	if (!cfg)
+> +		return -ENOMEM;
+> +
+>  	vmid = arm_smmu_bitmap_alloc(smmu->vmid_map, smmu->vmid_bits);
+> -	if (vmid < 0)
+> -		return vmid;
+> +	if (vmid < 0) {
+> +		ret = vmid;
+> +		goto out_free_cfg;
+> +	}
+> 
+>  	vtcr = &pgtbl_cfg->arm_lpae_s2_cfg.vtcr;
+>  	cfg->vmid	= (u16)vmid;
+> @@ -1949,7 +1953,12 @@ static int arm_smmu_domain_finalise_s2(struct
+> arm_smmu_domain *smmu_domain,
+>  			  FIELD_PREP(STRTAB_STE_2_VTCR_S2SH0, vtcr->sh) |
+>  			  FIELD_PREP(STRTAB_STE_2_VTCR_S2TG, vtcr->tg) |
+>  			  FIELD_PREP(STRTAB_STE_2_VTCR_S2PS, vtcr->ps);
+> +	smmu_domain->s2_cfg = cfg;
+>  	return 0;
+> +
+> +out_free_cfg:
+> +	kfree(cfg);
+> +	return ret;
+>  }
+> 
+>  static int arm_smmu_domain_finalise(struct iommu_domain *domain,
+> @@ -2231,10 +2240,10 @@ static int arm_smmu_attach_dev(struct
+> iommu_domain *domain, struct device *dev)
+>  		ret = -ENXIO;
+>  		goto out_unlock;
+>  	} else if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1 &&
+> -		   master->ssid_bits != smmu_domain->s1_cfg.s1cdmax) {
+> +		   master->ssid_bits != smmu_domain->s1_cfg->s1cdmax) {
+>  		dev_err(dev,
+>  			"cannot attach to incompatible domain (%u SSID bits != %u)\n",
+> -			smmu_domain->s1_cfg.s1cdmax, master->ssid_bits);
+> +			smmu_domain->s1_cfg->s1cdmax, master->ssid_bits);
+>  		ret = -EINVAL;
+>  		goto out_unlock;
+>  	}
+> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+> b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+> index 2944beb1571b..6fdc35b32dbf 100644
+> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+> @@ -679,10 +679,8 @@ struct arm_smmu_domain {
+>  	atomic_t			nr_ats_masters;
+> 
+>  	enum arm_smmu_domain_stage	stage;
+> -	union {
+> -		struct arm_smmu_s1_cfg	s1_cfg;
+> -		struct arm_smmu_s2_cfg	s2_cfg;
+> -	};
+> +	struct arm_smmu_s1_cfg	*s1_cfg;
+> +	struct arm_smmu_s2_cfg	*s2_cfg;
+> 
+>  	struct iommu_domain		domain;
+> 
+> --
+> 2.21.3
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
