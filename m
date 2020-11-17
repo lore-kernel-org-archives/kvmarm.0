@@ -7,76 +7,77 @@ X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBE7AC6379F
-	for <kvmarm@archiver.kernel.org>; Tue, 17 Nov 2020 18:17:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C50DCC8300A
+	for <kvmarm@archiver.kernel.org>; Tue, 17 Nov 2020 18:17:11 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 81DEC2468E
-	for <kvmarm@archiver.kernel.org>; Tue, 17 Nov 2020 18:17:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 60CC72468D
+	for <kvmarm@archiver.kernel.org>; Tue, 17 Nov 2020 18:17:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="N1TibN9j"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81DEC2468E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="QOvLP7+8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60CC72468D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D3C34B8C4;
-	Tue, 17 Nov 2020 13:17:09 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 08E654B8CA;
+	Tue, 17 Nov 2020 13:17:11 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 8h1jUBscecQX; Tue, 17 Nov 2020 13:17:07 -0500 (EST)
+	with ESMTP id 6RHZK8RIvfCH; Tue, 17 Nov 2020 13:17:09 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B77BE4B8CC;
-	Tue, 17 Nov 2020 13:17:07 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DBC704B8A6;
+	Tue, 17 Nov 2020 13:17:09 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C59A4B559
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Nov 2020 13:17:06 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 585254B559
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Nov 2020 13:17:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZV0oQORQRgWi for <kvmarm@lists.cs.columbia.edu>;
- Tue, 17 Nov 2020 13:17:05 -0500 (EST)
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com
- [209.85.221.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4EB064B874
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Nov 2020 13:17:04 -0500 (EST)
-Received: by mail-wr1-f74.google.com with SMTP id u1so13428811wri.6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Nov 2020 10:17:04 -0800 (PST)
+ with ESMTP id gCFbymaaZXbb for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 17 Nov 2020 13:17:06 -0500 (EST)
+Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com
+ [209.85.219.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 285224B8C4
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Nov 2020 13:17:06 -0500 (EST)
+Received: by mail-qv1-f74.google.com with SMTP id bl3so6027282qvb.8
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Nov 2020 10:17:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=sender:date:in-reply-to:message-id:mime-version:references:subject
- :from:to:cc; bh=nDg4Q5UW5VyG5A48tL8468KlneKnyHjdeOZ0CSmRGUk=;
- b=N1TibN9j6rqyDAz7w2MvN4SO5GZxQitBMjo5jrhjQsL+CqRT6cSgzwpG8/qIi2cqKl
- QupXDJkW94uUSAHQ/Avd20xRPPX5Qshr8JcXWEIpweKRZChjRI+YU7261YvmSIgucGbb
- YGbidLKp2mBFY77m2LsC5eN7onLPhV6anYgipS2Wbz8yGdVJ5EkVuUBY24a4Oo3WPnkf
- WvgYp/NvweM/l3FStseFKS26JKS9j8Idghu6U/AclJSNJVmYb5G6lNg8AiDGCVrU6TVx
- AGBetFJ2Kvmc3d57+t1arZwyoK4CzoIJCeQ7BEGcY2Uf29V1bO3LFUb4jjqch68AkY8Y
- GtOg==
+ :from:to:cc; bh=uWTirSBGllb/UnC1/gfuRUGVZCQysfGVvtfYpfqhwps=;
+ b=QOvLP7+8rJSTpw6cIxRDKU37M+xX2BsqlE+SSoroXw4nil7j3KIE5nlZL9QPhOUnV2
+ neKN1A7pQ+x+SQWyzb6lI+RG4t3CdSbNFNKbHjPSf/y2Cy7OdeGY+IEdNMjcuceKN2L0
+ T1sJRvfMBIkD++hzeifuRpVg7u3ErEumK8vjo1uj0nq8BIvfiQAko56WeOPhqZZMID8+
+ SHUSt/rtqPXiPAZnsC7EX97B/GMHUi2XVojFSZHDFVU95enBs0xE3vp9oc+pprUh9dxA
+ 0RVD59xrq8RJdccXUEgST+e87cFbujgI/4HZeyYKmtJHEk87BTRvkL+2Jbca91yf6Bx+
+ Bx1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=nDg4Q5UW5VyG5A48tL8468KlneKnyHjdeOZ0CSmRGUk=;
- b=IZKT1P+B0IPHYPnQVVm/n3d1Cy9K8L0UMEv07j4ctXaDlQdqT8b07eoQkzQwDHkOUA
- 5xHKKzUro6l0KlFgwpketaUP59j2w2XGM8qLsBfsz8aSWIzyC2HtmE0Om18BrkmgZbIm
- QhgDAx0YfH6SHRvFbArD+7XuX9cEv8cGrrRojX29W/tuEjSvf7lQYY7Shvx99szQh1oZ
- vlcAdw7+g/ULFGdrDbiSEZnXTuZbVM1MkgE7AQygmpPe3O/H6dEfyJvJ3Ung/DU/74Wr
- ex/3ewW7MMpv7SfidUQaBe3RNmoF5vqLle3FZ8mIfGSgEZnhXOqVnTZ21W9NRKVEZkgF
- 7auA==
-X-Gm-Message-State: AOAM533odDpWPpWPi8tP9mUfyzuwV3qHtMjIGYqDbxXgS5OTit9L1add
- p7YgFokjlvP+g1n0o72lTwTK8jIsuWFd
-X-Google-Smtp-Source: ABdhPJzBZwi9tCgTF9ABdJKEIr3LviF1NVAku/55zJOf5XT/50xgW9YDis8O5ppDeir1CJBxP84GEo3WRJol
+ bh=uWTirSBGllb/UnC1/gfuRUGVZCQysfGVvtfYpfqhwps=;
+ b=FKQRFYulwYJJg91fyYGP9XBnmxOUyOVohWhQJnkyTPdVy7AUxRqwAisyxBQ9F7ER+c
+ NVHCTxNPMRGNboACLJAo0RacN9fEjC4Kae4bGZIlrlrRhOlirdb0COtKFP/sLmhNDmA4
+ q/ZJt3hu+t72N4K3Uzb6EuPdqCuRy4v3GciDyn+RnabRPDXNi3YHUr+HZysX1DmjGS0H
+ ZTKnS5Y/K+1PP2vJskmHvkQD1qNQ/pR1WE/3CLhnTlSR5x54pphJMKE+AvlSOPP34k0u
+ dxcokp4cNUydAdaoEXD0eIpTgGJb8tjiC82WEtIhKpEWMZ5fqD6HrzsU26a5mpPcMqKJ
+ hPlQ==
+X-Gm-Message-State: AOAM532YHoKuzZnJACoRSupSrgRtTKtzOxCNxq66e5ydCVncz9LoEGdy
+ IRNUGckLJAT5uLztnE0ExpryI1+Nhz4i
+X-Google-Smtp-Source: ABdhPJwdF2Gg54bc1EmlvAWDzl41GijC84V6agc2skK4FVwntGHb1cSvCccXppxqfrsHcQ1LZjG1wvbDZQfU
 X-Received: from luke.lon.corp.google.com
  ([2a00:79e0:d:210:f693:9fff:fef4:a7ef])
- (user=qperret job=sendgmr) by 2002:a1c:e442:: with SMTP id
- b63mr418225wmh.10.1605637023474; Tue, 17 Nov 2020 10:17:03 -0800 (PST)
-Date: Tue, 17 Nov 2020 18:15:59 +0000
+ (user=qperret job=sendgmr) by 2002:a0c:db11:: with SMTP id
+ d17mr513281qvk.39.1605637025659; Tue, 17 Nov 2020 10:17:05 -0800 (PST)
+Date: Tue, 17 Nov 2020 18:16:00 +0000
 In-Reply-To: <20201117181607.1761516-1-qperret@google.com>
-Message-Id: <20201117181607.1761516-20-qperret@google.com>
+Message-Id: <20201117181607.1761516-21-qperret@google.com>
 Mime-Version: 1.0
 References: <20201117181607.1761516-1-qperret@google.com>
 X-Mailer: git-send-email 2.29.2.299.gdc1121823c-goog
-Subject: [RFC PATCH 19/27] KVM: arm64: Use kvm_arch in kvm_s2_mmu
+Subject: [RFC PATCH 20/27] KVM: arm64: Set host stage 2 using
+ kvm_nvhe_init_params
 From: Quentin Perret <qperret@google.com>
 To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
  Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
@@ -106,94 +107,99 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In order to make use of the stage 2 pgtable code for the host stage 2,
-change kvm_s2_mmu to use a kvm_arch pointer in lieu of the kvm pointer,
-as the host will have the former but not the latter.
+Move the registers relevant to host stage 2 enablement to
+kvm_nvhe_init_params to prepare the ground for enabling it in later
+patches.
 
 Signed-off-by: Quentin Perret <qperret@google.com>
 ---
- arch/arm64/include/asm/kvm_host.h | 2 +-
- arch/arm64/include/asm/kvm_mmu.h  | 7 ++++++-
- arch/arm64/kvm/mmu.c              | 8 ++++----
- 3 files changed, 11 insertions(+), 6 deletions(-)
+ arch/arm64/include/asm/kvm_asm.h   | 3 +++
+ arch/arm64/kernel/asm-offsets.c    | 3 +++
+ arch/arm64/kvm/arm.c               | 5 +++++
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S | 9 +++++++++
+ arch/arm64/kvm/hyp/nvhe/switch.c   | 5 +----
+ 5 files changed, 21 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index ee8bb8021637..53b01d25e7d9 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -86,7 +86,7 @@ struct kvm_s2_mmu {
- 	/* The last vcpu id that ran on each physical CPU */
- 	int __percpu *last_vcpu_ran;
- 
--	struct kvm *kvm;
-+	struct kvm_arch *arch;
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index 9266b17f8ba9..089eea6e54fc 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -158,6 +158,9 @@ struct kvm_nvhe_init_params {
+ 	unsigned long stack_hyp_va;
+ 	unsigned long entry_hyp_va;
+ 	phys_addr_t pgd_pa;
++	unsigned long hcr_el2;
++	unsigned long vttbr;
++	unsigned long vtcr;
  };
  
- struct kvm_arch {
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index bb756757b51c..714357ebd278 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -275,7 +275,7 @@ static __always_inline u64 kvm_get_vttbr(struct kvm_s2_mmu *mmu)
-  */
- static __always_inline void __load_guest_stage2(struct kvm_s2_mmu *mmu)
- {
--	write_sysreg(kern_hyp_va(mmu->kvm)->arch.vtcr, vtcr_el2);
-+	write_sysreg(kern_hyp_va(mmu->arch)->vtcr, vtcr_el2);
- 	write_sysreg(kvm_get_vttbr(mmu), vttbr_el2);
+ /* Translate a kernel address @ptr into its equivalent linear mapping */
+diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
+index 9752100bf01f..2c3813bff6ea 100644
+--- a/arch/arm64/kernel/asm-offsets.c
++++ b/arch/arm64/kernel/asm-offsets.c
+@@ -115,6 +115,9 @@ int main(void)
+   DEFINE(NVHE_INIT_STACK_HYP_VA,	offsetof(struct kvm_nvhe_init_params, stack_hyp_va));
+   DEFINE(NVHE_INIT_ENTRY_HYP_VA,	offsetof(struct kvm_nvhe_init_params, entry_hyp_va));
+   DEFINE(NVHE_INIT_PGD_PA,	offsetof(struct kvm_nvhe_init_params, pgd_pa));
++  DEFINE(NVHE_INIT_HCR_EL2,	offsetof(struct kvm_nvhe_init_params, hcr_el2));
++  DEFINE(NVHE_INIT_VTTBR,	offsetof(struct kvm_nvhe_init_params, vttbr));
++  DEFINE(NVHE_INIT_VTCR,	offsetof(struct kvm_nvhe_init_params, vtcr));
+ #endif
+ #ifdef CONFIG_CPU_PM
+   DEFINE(CPU_CTX_SP,		offsetof(struct cpu_suspend_ctx, sp));
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index cfe5cc55b425..e06c95a10dba 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1365,6 +1365,11 @@ static void cpu_prepare_hyp_mode(int cpu)
+ 	params->stack_hyp_va = kern_hyp_va(per_cpu(kvm_arm_hyp_stack_page, cpu) + PAGE_SIZE);
+ 	params->entry_hyp_va = kern_hyp_va((unsigned long)kvm_ksym_ref_nvhe(__kvm_hyp_psci_cpu_entry));
+ 	params->pgd_pa = kvm_mmu_get_httbr();
++	if (is_protected_kvm_enabled())
++		params->hcr_el2 = HCR_HOST_NVHE_PROTECTED_FLAGS;
++	else
++		params->hcr_el2 = HCR_HOST_NVHE_FLAGS;
++	params->vttbr = params->vtcr = 0;
  
  	/*
-@@ -285,5 +285,10 @@ static __always_inline void __load_guest_stage2(struct kvm_s2_mmu *mmu)
- 	 */
- 	asm(ALTERNATIVE("nop", "isb", ARM64_WORKAROUND_SPECULATIVE_AT));
- }
+ 	 * Flush the init params from the data cache because the struct will
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+index e2d62297edfe..9f3f3098670a 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+@@ -103,6 +103,15 @@ alternative_else_nop_endif
+ 	ldr	x1, [x0, #NVHE_INIT_STACK_HYP_VA]
+ 	mov	sp, x1
+ 
++	ldr	x1, [x0, #NVHE_INIT_HCR_EL2]
++	msr	hcr_el2, x1
 +
-+static inline struct kvm *kvm_s2_mmu_to_kvm(struct kvm_s2_mmu *mmu)
-+{
-+	return container_of(mmu->arch, struct kvm, arch);
-+}
- #endif /* __ASSEMBLY__ */
- #endif /* __ARM64_KVM_MMU_H__ */
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 384f2acc0115..3b1c53e754ee 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -169,7 +169,7 @@ static void *kvm_host_va(phys_addr_t phys)
- static void __unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size,
- 				 bool may_block)
- {
--	struct kvm *kvm = mmu->kvm;
-+	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
- 	phys_addr_t end = start + size;
++	ldr	x1, [x0, #NVHE_INIT_VTTBR]
++	msr	vttbr_el2, x1
++
++	ldr	x1, [x0, #NVHE_INIT_VTCR]
++	msr	vtcr_el2, x1
++
+ 	ldr	x1, [x0, #NVHE_INIT_PGD_PA]
+ 	phys_to_ttbr x0, x1
+ alternative_if ARM64_HAS_CNP
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index f3d0e9eca56c..979a76cdf9fb 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -97,10 +97,7 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
+ 	mdcr_el2 |= MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT;
  
- 	assert_spin_locked(&kvm->mmu_lock);
-@@ -474,7 +474,7 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
- 	for_each_possible_cpu(cpu)
- 		*per_cpu_ptr(mmu->last_vcpu_ran, cpu) = -1;
- 
--	mmu->kvm = kvm;
-+	mmu->arch = &kvm->arch;
- 	mmu->pgt = pgt;
- 	mmu->pgd_phys = __pa(pgt->pgd);
- 	mmu->vmid.vmid_gen = 0;
-@@ -556,7 +556,7 @@ void stage2_unmap_vm(struct kvm *kvm)
- 
- void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
- {
--	struct kvm *kvm = mmu->kvm;
-+	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
- 	struct kvm_pgtable *pgt = NULL;
- 
- 	spin_lock(&kvm->mmu_lock);
-@@ -625,7 +625,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
-  */
- static void stage2_wp_range(struct kvm_s2_mmu *mmu, phys_addr_t addr, phys_addr_t end)
- {
--	struct kvm *kvm = mmu->kvm;
-+	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
- 	stage2_apply_range_resched(kvm, addr, end, kvm_pgtable_stage2_wrprotect);
+ 	write_sysreg(mdcr_el2, mdcr_el2);
+-	if (is_protected_kvm_enabled())
+-		write_sysreg(HCR_HOST_NVHE_PROTECTED_FLAGS, hcr_el2);
+-	else
+-		write_sysreg(HCR_HOST_NVHE_FLAGS, hcr_el2);
++	write_sysreg(this_cpu_ptr(&kvm_init_params)->hcr_el2, hcr_el2);
+ 	write_sysreg(CPTR_EL2_DEFAULT, cptr_el2);
+ 	write_sysreg(__kvm_hyp_host_vector, vbar_el2);
  }
- 
 -- 
 2.29.2.299.gdc1121823c-goog
 
