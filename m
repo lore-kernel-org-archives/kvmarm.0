@@ -2,86 +2,81 @@ Return-Path: <SRS0=VMV7=EY=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBDC6C63777
-	for <kvmarm@archiver.kernel.org>; Wed, 18 Nov 2020 10:39:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF1C4C56202
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Nov 2020 11:22:21 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2BBF420782
-	for <kvmarm@archiver.kernel.org>; Wed, 18 Nov 2020 10:39:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EFF1D24199
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Nov 2020 11:22:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="uzOYWmAF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BBF420782
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a8BsEnMr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFF1D24199
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E64A4B5AD;
-	Wed, 18 Nov 2020 05:39:25 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 09A8B4B7DC;
+	Wed, 18 Nov 2020 06:22:20 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id t3QQVNomoDuW; Wed, 18 Nov 2020 05:39:24 -0500 (EST)
+	with ESMTP id ARJAnGIpeEyt; Wed, 18 Nov 2020 06:22:18 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2FD2F4B79D;
-	Wed, 18 Nov 2020 05:39:24 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C8BCC4B7E1;
+	Wed, 18 Nov 2020 06:22:18 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 49FF44B759
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Nov 2020 14:45:08 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DE58F4B7D9
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Nov 2020 06:22:16 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qjXSIBLi+5JL for <kvmarm@lists.cs.columbia.edu>;
- Tue, 17 Nov 2020 14:45:07 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2AC974B6A7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Nov 2020 14:45:07 -0500 (EST)
-Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com
- [209.85.210.52])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ with ESMTP id 16FknRBGwBYl for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 18 Nov 2020 06:22:14 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D649F4B7B1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Nov 2020 06:22:14 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1605698534;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=JkykavBXCXxc/Cc+EpSfpWb6eYs51ekKp9L7LE1iLx4=;
+ b=a8BsEnMrTFyehj4YOzyc9yRHvyjaqCcSy99J1KOH5D+kQTKyU06NIAh63y7fpaDhAuitlK
+ pEP3hDkFk3Ehda7zWcdEU+ZC2VM99Yc1CkU9bN4hv1DZdR/4ww0jRwFxnbfz5IJV3+JyZR
+ nbdXOhGS8s4IpkduF1+nXEHBAPqJFVA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-11-XmM7ArIhOz2XA7mA8hwAKw-1; Wed, 18 Nov 2020 06:22:10 -0500
+X-MC-Unique: XmM7ArIhOz2XA7mA8hwAKw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id E3FB32465E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Nov 2020 19:45:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1605642306;
- bh=qNozKMsilVGHcKuDFqYgNc1oR4jJ69WTtekuHemKsA4=;
- h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
- b=uzOYWmAFsp5u8A1goye7laB+uln8gqXV99XauIwSEYwYTGXnrkndJ1sdA0QPbsHW/
- uXFPVcvnzkLe+GYCOMvNnDStRP9jwZYNOFkt+AwKP1ltA3sG4bxugT2gpWZQD9Krqq
- 7zwau8mE4xSeZENQKfIlP12S23rRKNZejLI/7ECQ=
-Received: by mail-ot1-f52.google.com with SMTP id k3so20597653otp.12
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Nov 2020 11:45:05 -0800 (PST)
-X-Gm-Message-State: AOAM530T4gU9PzjpcbL0pTGcVW8lAbbkX4/doKQjMPC5tgOeeAtR2taR
- kuSQJv2Lze5Me0ELbrByImw+a1Qpuq5lO4Xw7A==
-X-Google-Smtp-Source: ABdhPJw7Y8/Ws5bUvi26+LLUZzk81vYwcXh6i4hVHe44wC1JXmPPzqpT+2F4tA2/k2KaDRk1Kh11f9DUxexOONIhShQ=
-X-Received: by 2002:a05:6830:2259:: with SMTP id
- t25mr4284277otd.192.1605642305060; 
- Tue, 17 Nov 2020 11:45:05 -0800 (PST)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A11DC873079;
+ Wed, 18 Nov 2020 11:22:07 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-115-104.ams2.redhat.com [10.36.115.104])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 46D9F51512;
+ Wed, 18 Nov 2020 11:21:54 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com,
+ iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, will@kernel.org,
+ joro@8bytes.org, maz@kernel.org, robin.murphy@arm.com,
+ alex.williamson@redhat.com
+Subject: [PATCH v13 00/15] SMMUv3 Nested Stage Setup (IOMMU part)
+Date: Wed, 18 Nov 2020 12:21:36 +0100
+Message-Id: <20201118112151.25412-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-References: <20201117181607.1761516-1-qperret@google.com>
- <20201117181607.1761516-16-qperret@google.com>
-In-Reply-To: <20201117181607.1761516-16-qperret@google.com>
-From: Rob Herring <robh+dt@kernel.org>
-Date: Tue, 17 Nov 2020 13:44:53 -0600
-X-Gmail-Original-Message-ID: <CAL_Jsq+xAy9+HjH6vqfmaAEKBe9MMm+wWvUtiz5dFnHmMneqNw@mail.gmail.com>
-Message-ID: <CAL_Jsq+xAy9+HjH6vqfmaAEKBe9MMm+wWvUtiz5dFnHmMneqNw@mail.gmail.com>
-Subject: Re: [RFC PATCH 15/27] of/fdt: Introduce early_init_dt_add_memory_hyp()
-To: Quentin Perret <qperret@google.com>
-X-Mailman-Approved-At: Wed, 18 Nov 2020 05:39:23 -0500
-Cc: "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE"
- <devicetree@vger.kernel.org>, Android Kernel Team <kernel-team@android.com>,
- Frank Rowand <frowand.list@gmail.com>, android-kvm@google.com,
- Catalin Marinas <catalin.marinas@arm.com>,
- open list <linux-kernel@vger.kernel.org>,
- "moderated list:ARM64 PORT \(AARCH64 ARCHITECTURE\)"
- <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>,
- "open list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
- <kvmarm@lists.cs.columbia.edu>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Cc: jean-philippe@linaro.org, jacob.jun.pan@linux.intel.com,
+ nicoleotsuka@gmail.com, vivek.gautam@arm.com, yi.l.liu@intel.com,
+ zhangfei.gao@linaro.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -98,52 +93,82 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Nov 17, 2020 at 12:16 PM Quentin Perret <qperret@google.com> wrote:
->
-> Introduce early_init_dt_add_memory_hyp() to allow KVM to conserve a copy
-> of the memory regions parsed from DT. This will be needed in the context
-> of the protected nVHE feature of KVM/arm64 where the code running at EL2
-> will be cleanly separated from the host kernel during boot, and will
-> need its own representation of memory.
->
-> Signed-off-by: Quentin Perret <qperret@google.com>
-> ---
->  drivers/of/fdt.c | 5 +++++
->  1 file changed, 5 insertions(+)
->
-> diff --git a/drivers/of/fdt.c b/drivers/of/fdt.c
-> index 4602e467ca8b..af2b5a09c5b4 100644
-> --- a/drivers/of/fdt.c
-> +++ b/drivers/of/fdt.c
-> @@ -1099,6 +1099,10 @@ int __init early_init_dt_scan_chosen(unsigned long node, const char *uname,
->  #define MAX_MEMBLOCK_ADDR      ((phys_addr_t)~0)
->  #endif
->
-> +void __init __weak early_init_dt_add_memory_hyp(u64 base, u64 size)
-> +{
-> +}
-> +
->  void __init __weak early_init_dt_add_memory_arch(u64 base, u64 size)
->  {
->         const u64 phys_offset = MIN_MEMBLOCK_ADDR;
-> @@ -1139,6 +1143,7 @@ void __init __weak early_init_dt_add_memory_arch(u64 base, u64 size)
->                 base = phys_offset;
->         }
->         memblock_add(base, size);
-> +       early_init_dt_add_memory_hyp(base, size);
+This series brings the IOMMU part of HW nested paging support
+in the SMMUv3. The VFIO part is submitted separately.
 
-Can this be done right after we add all the memblocks using the
-memblock API? I thought EFI would also need to be handled, but looks
-like it just calls early_init_dt_add_memory_arch(). That's odd
-especially for ACPI systems...
+The IOMMU API is extended to support 2 new API functionalities:
+1) pass the guest stage 1 configuration
+2) pass stage 1 MSI bindings
 
-I don't really like putting what looks like an arm64 only hook here,
-but then I don't want an arm64 version of
-early_init_dt_add_memory_arch() either. We're almost to the point of
-getting rid of the arch specific ones. But I don't have a better
-suggestion currently.
+Then those capabilities gets implemented in the SMMUv3 driver.
 
-Rob
+The virtualizer passes information through the VFIO user API
+which cascades them to the iommu subsystem. This allows the guest
+to own stage 1 tables and context descriptors (so-called PASID
+table) while the host owns stage 2 tables and main configuration
+structures (STE).
+
+Best Regards
+
+Eric
+
+This series can be found at:
+https://github.com/eauger/linux/tree/5.10-rc4-2stage-v13
+(including the VFIO part in his last version: v11)
+
+The series includes a patch from Jean-Philippe. It is better to
+review the original patch:
+[PATCH v8 2/9] iommu/arm-smmu-v3: Maintain a SID->device structure
+
+The VFIO series is sent separately.
+
+History:
+
+v12 -> v13:
+- fixed compilation issue with CONFIG_ARM_SMMU_V3_SVA
+  reported by Shameer. This urged me to revisit patch 4 into
+  iommu/smmuv3: Allow s1 and s2 configs to coexist where
+  s1_cfg and s2_cfg are not dynamically allocated anymore.
+  Instead I use a new set field in existing structs
+- fixed 2 others config checks
+- Updated "iommu/arm-smmu-v3: Maintain a SID->device structure"
+  according to the last version
+
+v11 -> v12:
+- rebase on top of v5.10-rc4
+
+Eric Auger (14):
+  iommu: Introduce attach/detach_pasid_table API
+  iommu: Introduce bind/unbind_guest_msi
+  iommu/smmuv3: Allow s1 and s2 configs to coexist
+  iommu/smmuv3: Get prepared for nested stage support
+  iommu/smmuv3: Implement attach/detach_pasid_table
+  iommu/smmuv3: Allow stage 1 invalidation with unmanaged ASIDs
+  iommu/smmuv3: Implement cache_invalidate
+  dma-iommu: Implement NESTED_MSI cookie
+  iommu/smmuv3: Nested mode single MSI doorbell per domain enforcement
+  iommu/smmuv3: Enforce incompatibility between nested mode and HW MSI
+    regions
+  iommu/smmuv3: Implement bind/unbind_guest_msi
+  iommu/smmuv3: Report non recoverable faults
+  iommu/smmuv3: Accept configs with more than one context descriptor
+  iommu/smmuv3: Add PASID cache invalidation per PASID
+
+Jean-Philippe Brucker (1):
+  iommu/arm-smmu-v3: Maintain a SID->device structure
+
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 659 ++++++++++++++++++--
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h | 103 ++-
+ drivers/iommu/dma-iommu.c                   | 142 ++++-
+ drivers/iommu/iommu.c                       | 105 ++++
+ include/linux/dma-iommu.h                   |  16 +
+ include/linux/iommu.h                       |  41 ++
+ include/uapi/linux/iommu.h                  |  54 ++
+ 7 files changed, 1042 insertions(+), 78 deletions(-)
+
+-- 
+2.21.3
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
