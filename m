@@ -4,75 +4,76 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF56FC5519F
-	for <kvmarm@archiver.kernel.org>; Wed, 18 Nov 2020 11:23:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D5D7C63777
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Nov 2020 11:23:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 42B6F241A6
-	for <kvmarm@archiver.kernel.org>; Wed, 18 Nov 2020 11:23:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 89D55241A6
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Nov 2020 11:23:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZLkNNph3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42B6F241A6
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YXFqhUQl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89D55241A6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CFA454B7DC;
-	Wed, 18 Nov 2020 06:23:01 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A8534B801;
+	Wed, 18 Nov 2020 06:23:05 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id geKcoqULjWZ7; Wed, 18 Nov 2020 06:23:00 -0500 (EST)
+	with ESMTP id xekBIPczn8On; Wed, 18 Nov 2020 06:23:03 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BBC104B7CB;
-	Wed, 18 Nov 2020 06:23:00 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DEA054B7C4;
+	Wed, 18 Nov 2020 06:23:03 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0DFAF4B6FE
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Nov 2020 06:22:59 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BD2C24B74C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Nov 2020 06:23:02 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Tc9rpwlw7gY9 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 18 Nov 2020 06:22:58 -0500 (EST)
+ with ESMTP id w50HgBiGatBA for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 18 Nov 2020 06:23:01 -0500 (EST)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [63.128.21.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 229B24B7E1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Nov 2020 06:22:57 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6925A4B7E1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Nov 2020 06:23:01 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1605698577;
+ s=mimecast20190719; t=1605698581;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=sdZPdY7xzQ0DxBSFBQSmPitPcicaqsAR5GrcablMUaA=;
- b=ZLkNNph30Mppzq3VTDo+hp0SD0ks9KdL7qym1y+RjIQHRxZMwu+xjFuCRb+aALaBb2UefF
- r6qHM+iSM42U5CKHRDAtManRpgmXuUUrIlE3SB/fZBFQBH893uwNNjUkZqAmtwGgCPVhHW
- y4ZzjtFxetO/RpnTIj20mHjaWPynpHQ=
+ bh=qnUjJ97DJwtxIYzbchtIblFBVD2ckX7sYbjAKmnKixA=;
+ b=YXFqhUQl16nbdk5efFKzQT1hhPL09CF32vGsWUlLgR2l5tIXJg9JB4QmT56Blc0IhKmMoJ
+ MlRd3U6zo0maQrNrR7INV65jmp48j1WxgmFKQlgjk0Lq6bFPRVf8vDImhlPaWrHpNdlQZn
+ dl3fB8nEuJI/oshMHEEKRRFDoMpyLbk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-22-0ukNpFPoMQGiwSlRdBxDdw-1; Wed, 18 Nov 2020 06:22:55 -0500
-X-MC-Unique: 0ukNpFPoMQGiwSlRdBxDdw-1
+ us-mta-340-B-FK26WGOg6Aq1J214rPtw-1; Wed, 18 Nov 2020 06:22:59 -0500
+X-MC-Unique: B-FK26WGOg6Aq1J214rPtw-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8B495801ABA;
- Wed, 18 Nov 2020 11:22:52 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7C8AE8A8F01;
+ Wed, 18 Nov 2020 11:22:57 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-115-104.ams2.redhat.com [10.36.115.104])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 071B951512;
- Wed, 18 Nov 2020 11:22:47 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E435F51512;
+ Wed, 18 Nov 2020 11:22:52 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com,
  iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
  kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, will@kernel.org,
  joro@8bytes.org, maz@kernel.org, robin.murphy@arm.com,
  alex.williamson@redhat.com
-Subject: [PATCH v13 06/15] iommu/smmuv3: Implement attach/detach_pasid_table
-Date: Wed, 18 Nov 2020 12:21:42 +0100
-Message-Id: <20201118112151.25412-7-eric.auger@redhat.com>
+Subject: [PATCH v13 07/15] iommu/smmuv3: Allow stage 1 invalidation with
+ unmanaged ASIDs
+Date: Wed, 18 Nov 2020 12:21:43 +0100
+Message-Id: <20201118112151.25412-8-eric.auger@redhat.com>
 In-Reply-To: <20201118112151.25412-1-eric.auger@redhat.com>
 References: <20201118112151.25412-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -96,143 +97,92 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On attach_pasid_table() we program STE S1 related info set
-by the guest into the actual physical STEs. At minimum
-we need to program the context descriptor GPA and compute
-whether the stage1 is translated/bypassed or aborted.
+With nested stage support, soon we will need to invalidate
+S1 contexts and ranges tagged with an unmanaged asid, this
+latter being managed by the guest. So let's introduce 2 helpers
+that allow to invalidate with externally managed ASIDs
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-
 ---
-v7 -> v8:
-- remove smmu->features check, now done on domain finalize
-
-v6 -> v7:
-- check versions and comment the fact we don't need to take
-  into account s1dss and s1fmt
-v3 -> v4:
-- adapt to changes in iommu_pasid_table_config
-- different programming convention at s1_cfg/s2_cfg/ste.abort
-
-v2 -> v3:
-- callback now is named set_pasid_table and struct fields
-  are laid out differently.
-
-v1 -> v2:
-- invalidate the STE before changing them
-- hold init_mutex
-- handle new fields
----
- drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 89 +++++++++++++++++++++
- 1 file changed, 89 insertions(+)
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 35 +++++++++++++++++----
+ 1 file changed, 29 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-index 412ea1bafa50..805acdc18a3a 100644
+index 805acdc18a3a..fdecc9f17b36 100644
 --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
 +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-@@ -2661,6 +2661,93 @@ static void arm_smmu_get_resv_regions(struct device *dev,
- 	iommu_dma_get_resv_regions(dev, head);
+@@ -1697,9 +1697,9 @@ static int arm_smmu_atc_inv_domain(struct arm_smmu_domain *smmu_domain,
  }
  
-+static int arm_smmu_attach_pasid_table(struct iommu_domain *domain,
-+				       struct iommu_pasid_table_config *cfg)
-+{
-+	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
-+	struct arm_smmu_master *master;
-+	struct arm_smmu_device *smmu;
-+	unsigned long flags;
-+	int ret = -EINVAL;
-+
-+	if (cfg->format != IOMMU_PASID_FORMAT_SMMUV3)
-+		return -EINVAL;
-+
-+	if (cfg->version != PASID_TABLE_CFG_VERSION_1 ||
-+	    cfg->vendor_data.smmuv3.version != PASID_TABLE_SMMUV3_CFG_VERSION_1)
-+		return -EINVAL;
-+
-+	mutex_lock(&smmu_domain->init_mutex);
-+
-+	smmu = smmu_domain->smmu;
-+
-+	if (!smmu)
-+		goto out;
-+
-+	if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
-+		goto out;
-+
-+	switch (cfg->config) {
-+	case IOMMU_PASID_CONFIG_ABORT:
-+		smmu_domain->s1_cfg.set = false;
-+		smmu_domain->abort = true;
-+		break;
-+	case IOMMU_PASID_CONFIG_BYPASS:
-+		smmu_domain->s1_cfg.set = false;
-+		smmu_domain->abort = false;
-+		break;
-+	case IOMMU_PASID_CONFIG_TRANSLATE:
-+		/* we do not support S1 <-> S1 transitions */
-+		if (smmu_domain->s1_cfg.set)
-+			goto out;
-+
-+		/*
-+		 * we currently support a single CD so s1fmt and s1dss
-+		 * fields are also ignored
-+		 */
-+		if (cfg->pasid_bits)
-+			goto out;
-+
-+		smmu_domain->s1_cfg.cdcfg.cdtab_dma = cfg->base_ptr;
-+		smmu_domain->s1_cfg.set = true;
-+		smmu_domain->abort = false;
-+		break;
-+	default:
-+		goto out;
-+	}
-+	spin_lock_irqsave(&smmu_domain->devices_lock, flags);
-+	list_for_each_entry(master, &smmu_domain->devices, domain_head)
-+		arm_smmu_install_ste_for_dev(master);
-+	spin_unlock_irqrestore(&smmu_domain->devices_lock, flags);
-+	ret = 0;
-+out:
-+	mutex_unlock(&smmu_domain->init_mutex);
-+	return ret;
-+}
-+
-+static void arm_smmu_detach_pasid_table(struct iommu_domain *domain)
-+{
-+	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
-+	struct arm_smmu_master *master;
-+	unsigned long flags;
-+
-+	mutex_lock(&smmu_domain->init_mutex);
-+
-+	if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
-+		goto unlock;
-+
-+	smmu_domain->s1_cfg.set = false;
-+	smmu_domain->abort = true;
-+
-+	spin_lock_irqsave(&smmu_domain->devices_lock, flags);
-+	list_for_each_entry(master, &smmu_domain->devices, domain_head)
-+		arm_smmu_install_ste_for_dev(master);
-+	spin_unlock_irqrestore(&smmu_domain->devices_lock, flags);
-+
-+unlock:
-+	mutex_unlock(&smmu_domain->init_mutex);
-+}
-+
- static bool arm_smmu_dev_has_feature(struct device *dev,
- 				     enum iommu_dev_features feat)
+ /* IO_PGTABLE API */
+-static void arm_smmu_tlb_inv_context(void *cookie)
++static void __arm_smmu_tlb_inv_context(struct arm_smmu_domain *smmu_domain,
++				       int ext_asid)
  {
-@@ -2742,6 +2829,8 @@ static struct iommu_ops arm_smmu_ops = {
- 	.of_xlate		= arm_smmu_of_xlate,
- 	.get_resv_regions	= arm_smmu_get_resv_regions,
- 	.put_resv_regions	= generic_iommu_put_resv_regions,
-+	.attach_pasid_table	= arm_smmu_attach_pasid_table,
-+	.detach_pasid_table	= arm_smmu_detach_pasid_table,
- 	.dev_has_feat		= arm_smmu_dev_has_feature,
- 	.dev_feat_enabled	= arm_smmu_dev_feature_enabled,
- 	.dev_enable_feat	= arm_smmu_dev_enable_feature,
+-	struct arm_smmu_domain *smmu_domain = cookie;
+ 	struct arm_smmu_device *smmu = smmu_domain->smmu;
+ 	struct arm_smmu_cmdq_ent cmd;
+ 
+@@ -1710,7 +1710,11 @@ static void arm_smmu_tlb_inv_context(void *cookie)
+ 	 * insertion to guarantee those are observed before the TLBI. Do be
+ 	 * careful, 007.
+ 	 */
+-	if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
++	if (ext_asid >= 0) { /* guest stage 1 invalidation */
++		cmd.opcode	= CMDQ_OP_TLBI_NH_ASID;
++		cmd.tlbi.asid	= ext_asid;
++		cmd.tlbi.vmid	= smmu_domain->s2_cfg.vmid;
++	} else if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+ 		arm_smmu_tlb_inv_asid(smmu, smmu_domain->s1_cfg.cd.asid);
+ 	} else {
+ 		cmd.opcode	= CMDQ_OP_TLBI_S12_VMALL;
+@@ -1721,9 +1725,17 @@ static void arm_smmu_tlb_inv_context(void *cookie)
+ 	arm_smmu_atc_inv_domain(smmu_domain, 0, 0, 0);
+ }
+ 
+-static void arm_smmu_tlb_inv_range(unsigned long iova, size_t size,
++static void arm_smmu_tlb_inv_context(void *cookie)
++{
++	struct arm_smmu_domain *smmu_domain = cookie;
++
++	__arm_smmu_tlb_inv_context(smmu_domain, -1);
++}
++
++static void __arm_smmu_tlb_inv_range(unsigned long iova, size_t size,
+ 				   size_t granule, bool leaf,
+-				   struct arm_smmu_domain *smmu_domain)
++				   struct arm_smmu_domain *smmu_domain,
++				   int ext_asid)
+ {
+ 	struct arm_smmu_device *smmu = smmu_domain->smmu;
+ 	unsigned long start = iova, end = iova + size, num_pages = 0, tg = 0;
+@@ -1738,7 +1750,11 @@ static void arm_smmu_tlb_inv_range(unsigned long iova, size_t size,
+ 	if (!size)
+ 		return;
+ 
+-	if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
++	if (ext_asid >= 0) {  /* guest stage 1 invalidation */
++		cmd.opcode	= CMDQ_OP_TLBI_NH_VA;
++		cmd.tlbi.asid	= ext_asid;
++		cmd.tlbi.vmid	= smmu_domain->s2_cfg.vmid;
++	} else if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+ 		cmd.opcode	= CMDQ_OP_TLBI_NH_VA;
+ 		cmd.tlbi.asid	= smmu_domain->s1_cfg.cd.asid;
+ 	} else {
+@@ -1798,6 +1814,13 @@ static void arm_smmu_tlb_inv_range(unsigned long iova, size_t size,
+ 	arm_smmu_atc_inv_domain(smmu_domain, 0, start, size);
+ }
+ 
++static void arm_smmu_tlb_inv_range(unsigned long iova, size_t size,
++				   size_t granule, bool leaf,
++				   struct arm_smmu_domain *smmu_domain)
++{
++	__arm_smmu_tlb_inv_range(iova, size, granule, leaf, smmu_domain, -1);
++}
++
+ static void arm_smmu_tlb_inv_page_nosync(struct iommu_iotlb_gather *gather,
+ 					 unsigned long iova, size_t granule,
+ 					 void *cookie)
 -- 
 2.21.3
 
