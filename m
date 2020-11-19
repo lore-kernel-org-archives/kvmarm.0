@@ -2,91 +2,67 @@ Return-Path: <SRS0=Ckwh=EZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEB8BC2D0E4
-	for <kvmarm@archiver.kernel.org>; Thu, 19 Nov 2020 11:15:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28490C2D0E4
+	for <kvmarm@archiver.kernel.org>; Thu, 19 Nov 2020 12:46:02 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0616E2083B
-	for <kvmarm@archiver.kernel.org>; Thu, 19 Nov 2020 11:15:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="uyZKU41r"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0616E2083B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 67ED7246F1
+	for <kvmarm@archiver.kernel.org>; Thu, 19 Nov 2020 12:46:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67ED7246F1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 25F1D4B48F;
-	Thu, 19 Nov 2020 06:15:01 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 893304B3DD;
+	Thu, 19 Nov 2020 07:46:00 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id lYx1sw5EsIM6; Thu, 19 Nov 2020 06:15:00 -0500 (EST)
+	with ESMTP id mj81j+y2D89R; Thu, 19 Nov 2020 07:45:59 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 33EF04B330;
-	Thu, 19 Nov 2020 06:15:00 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 53D274B3DC;
+	Thu, 19 Nov 2020 07:45:59 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D5224B32C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2020 06:14:59 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D6D4D4B3DC
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2020 07:45:57 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VAMApbX2OMQV for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 Nov 2020 06:14:57 -0500 (EST)
-Received: from mail-wm1-f68.google.com (mail-wm1-f68.google.com
- [209.85.128.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D04214B32F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2020 06:14:57 -0500 (EST)
-Received: by mail-wm1-f68.google.com with SMTP id w24so6390930wmi.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2020 03:14:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=AT6vz2m42JXc7lrJwjmpvEMB8s7HSthxy8G6z45TFw8=;
- b=uyZKU41rSPFAFtLcohcLT9M2PYocUNVHWJWTf53IFCaNw7mcYBQ/OV5mF+Z9pUbtfJ
- pdGu30hiumiwL19aJe2aDPkmVcdpTz5KoWexqw70c9y9oBC49pNNsde7osvyz+XO6v51
- rxLO0OtV9yAmrJsEQRwQduDZyGZzh0/tJXDAFuP3Dkx3uNnotD3KgqM5ZYL58mtpgG8g
- 41MOobefny3kFsPuCQY7AYFsMiN7wk2fscZESRIZd6slXTGiOo3U6S/OMJU8YKhwc1eO
- +mcuricEPz+YrRLiUnP9AvGQ/imaM0YwAZgi92o8A7PM6dcH1Gq5syyb3fl9WETdoAlZ
- Scaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=AT6vz2m42JXc7lrJwjmpvEMB8s7HSthxy8G6z45TFw8=;
- b=giEvwzLVFFWRRB+om444LvjCFrsg9QGe5IbhTarIDwthlZcPjzxJ0agVcS1sugNdeQ
- zUal8QfJIHYr1xZ8CxjyF8bAMGkw71S7Q19qcCeuwqV9zijuMC8lXYuzQp0Y3Oyc76bi
- AGGlsZZ5f+1zrovIMvn/8a082de/New3+SeuMyhptFdCgWfr0obpRO7l0OmMhZICWygW
- zLaveDNhAoxSZw47dXjqY8IGIbdTH4A+ziCYXO9XVVhOpvbFpp/95kvDNxCCcbu6pLAF
- VkagDKcyVpd5UXKyvKH8fXj+s8g063kaLl9JPWbA9V9+Y4LFnMzwyJRSwGQWMeEJuLUS
- sUeA==
-X-Gm-Message-State: AOAM530gKi6tnYxWTXkmWGSPH06qlw9KAk5tDCUbSKF94HxTLqtOwq/F
- Jn2lf3MCpIoH1W8Xi+dxeTIhtQ==
-X-Google-Smtp-Source: ABdhPJyhjWDduxIBws3Ul6EHk3OG2nFzeTTtIhTcNveUaPVZ7P2RuGx59RiEB/hStDd4b5hulEmX3w==
-X-Received: by 2002:a1c:7704:: with SMTP id t4mr4065727wmi.48.1605784496615;
- Thu, 19 Nov 2020 03:14:56 -0800 (PST)
-Received: from google.com ([2a01:4b00:8523:2d03:9843:cd3f:f36b:d55c])
- by smtp.gmail.com with ESMTPSA id b124sm9245409wmh.13.2020.11.19.03.14.55
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 19 Nov 2020 03:14:55 -0800 (PST)
-Date: Thu, 19 Nov 2020 11:14:54 +0000
-From: David Brazdil <dbrazdil@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v2 3/5] KVM: arm64: Patch kimage_voffset instead of
- loading the EL1 value
-Message-ID: <20201119111454.vrbogriragp7zukk@google.com>
-References: <20201109175923.445945-1-maz@kernel.org>
- <20201109175923.445945-4-maz@kernel.org>
+ with ESMTP id pu-gEvvvtLgd for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 Nov 2020 07:45:56 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 80A574B3D9
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2020 07:45:56 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0ED1A1396;
+ Thu, 19 Nov 2020 04:45:56 -0800 (PST)
+Received: from [192.168.1.179] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8FFD83F718;
+ Thu, 19 Nov 2020 04:45:53 -0800 (PST)
+Subject: Re: [PATCH v4 2/2] arm64: kvm: Introduce MTE VCPU feature
+To: Andrew Jones <drjones@redhat.com>,
+ Catalin Marinas <catalin.marinas@arm.com>
+References: <20201026155727.36685-1-steven.price@arm.com>
+ <20201026155727.36685-3-steven.price@arm.com> <X7P1VLZhBh045tsr@trantor>
+ <f34b3d16-8bc7-af9d-c0e0-fb114d2465aa@arm.com> <X7VQua7YO4isMFPU@trantor>
+ <20201118170552.cuczyylf34ows5jd@kamzik.brq.redhat.com>
+From: Steven Price <steven.price@arm.com>
+Message-ID: <f4f7073c-a0d5-f259-8fbc-514c0c5ddbed@arm.com>
+Date: Thu, 19 Nov 2020 12:45:52 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20201109175923.445945-4-maz@kernel.org>
-Cc: kernel-team@android.com, kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
- ndesaulniers@google.com, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20201118170552.cuczyylf34ows5jd@kamzik.brq.redhat.com>
+Content-Language: en-GB
+Cc: Marc Zyngier <maz@kernel.org>, Juan Quintela <quintela@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+ Dave Martin <Dave.Martin@arm.com>, linux-kernel@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -98,33 +74,95 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hey Marc,
+On 18/11/2020 17:05, Andrew Jones wrote:
+> On Wed, Nov 18, 2020 at 04:50:01PM +0000, Catalin Marinas wrote:
+>> On Wed, Nov 18, 2020 at 04:01:20PM +0000, Steven Price wrote:
+>>> On 17/11/2020 16:07, Catalin Marinas wrote:
+>>>> On Mon, Oct 26, 2020 at 03:57:27PM +0000, Steven Price wrote:
+>>>>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>>>>> index 19aacc7d64de..38fe25310ca1 100644
+>>>>> --- a/arch/arm64/kvm/mmu.c
+>>>>> +++ b/arch/arm64/kvm/mmu.c
+>>>>> @@ -862,6 +862,26 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>>>>>    	if (vma_pagesize == PAGE_SIZE && !force_pte)
+>>>>>    		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
+>>>>>    							   &pfn, &fault_ipa);
+>>>>> +
+>>>>> +	/*
+>>>>> +	 * The otherwise redundant test for system_supports_mte() allows the
+>>>>> +	 * code to be compiled out when CONFIG_ARM64_MTE is not present.
+>>>>> +	 */
+>>>>> +	if (system_supports_mte() && kvm->arch.mte_enabled && pfn_valid(pfn)) {
+>>>>> +		/*
+>>>>> +		 * VM will be able to see the page's tags, so we must ensure
+>>>>> +		 * they have been initialised.
+>>>>> +		 */
+>>>>> +		struct page *page = pfn_to_page(pfn);
+>>>>> +		long i, nr_pages = compound_nr(page);
+>>>>> +
+>>>>> +		/* if PG_mte_tagged is set, tags have already been initialised */
+>>>>> +		for (i = 0; i < nr_pages; i++, page++) {
+>>>>> +			if (!test_and_set_bit(PG_mte_tagged, &page->flags))
+>>>>> +				mte_clear_page_tags(page_address(page));
+>>>>> +		}
+>>>>> +	}
+>>>>
+>>>> If this page was swapped out and mapped back in, where does the
+>>>> restoring from swap happen?
+>>>
+>>> Restoring from swap happens above this in the call to gfn_to_pfn_prot()
+>>
+>> Looking at the call chain, gfn_to_pfn_prot() ends up with
+>> get_user_pages() using the current->mm (the VMM) and that does a
+>> set_pte_at(), presumably restoring the tags. Does this mean that all
+>> memory mapped by the VMM in user space should have PROT_MTE set?
+>> Otherwise we don't take the mte_sync_tags() path in set_pte_at() and no
+>> tags restored from swap (we do save them since when they were mapped,
+>> PG_mte_tagged was set).
+>>
+>> So I think the code above should be similar to mte_sync_tags(), even
+>> calling a common function, but I'm not sure where to get the swap pte
+>> from.
 
-Just noticed in kvmarm/queue that the whitespacing in this patch is off.
+You're right - the code is broken as it stands. I've just been able to 
+reproduce the loss of tags due to swap.
 
-> +.macro kimg_pa reg, tmp
-> +alternative_cb kvm_get_kimage_voffset
-> +       movz    \tmp, #0
-> +       movk    \tmp, #0, lsl #16
-> +       movk    \tmp, #0, lsl #32
-> +       movk    \tmp, #0, lsl #48
-> +alternative_cb_end
-> +
-> +       /* reg = __pa(reg) */
-> +       sub     \reg, \reg, \tmp
-> +.endm
-This uses spaces instead of tabs.
+The problem is that we also don't have a suitable pte to do the restore 
+from swap from. So either set_pte_at() would have to unconditionally 
+check for MTE tags for all previous swap entries as you suggest below. I 
+had a quick go at testing this and hit issues with the idle task getting 
+killed during boot - I fear there are some fun issues regarding 
+initialisation order here.
 
-> +	 
->  #else
-This added empty line actually has a tab in it.
+Or we enforce PROT_MTE...
 
--David
+>> An alternative is to only enable HCR_EL2.ATA and MTE in guest if the vmm
+>> mapped the memory with PROT_MTE.
+> 
+> This is a very reasonable alternative. The VMM must be aware of whether
+> the guest may use MTE anyway. Asking it to map the memory with PROT_MTE
+> when it wants to offer the guest that option is a reasonable requirement.
+> If the memory is not mapped as such, then the host kernel shouldn't assume
+> MTE may be used by the guest, and it should even enforce that it is not
+> (by not enabling the feature).
+
+The main issue with this is that the VMM can change the mappings while 
+the guest is running, so the only place we can reliably check this is 
+during user_mem_abort(). So we can't just downgrade HCR_EL2.ATA. This 
+makes the error reporting not so great as the memory access is simply 
+faulted. However I do have this working and it's actually (slightly) 
+less code.
+
+Another drawback is that the VMM needs to be more careful with the tags 
+- e.g. for virtualised devices the VMM can't simply have a non-PROT_MTE 
+mapping and ignore what the guest is doing with tags.
+
+Steve
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
