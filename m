@@ -2,82 +2,59 @@ Return-Path: <SRS0=Ckwh=EZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70003C63697
-	for <kvmarm@archiver.kernel.org>; Thu, 19 Nov 2020 13:41:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18172C63697
+	for <kvmarm@archiver.kernel.org>; Thu, 19 Nov 2020 15:39:16 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8CC1E22255
-	for <kvmarm@archiver.kernel.org>; Thu, 19 Nov 2020 13:41:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="qfy27wPY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CC1E22255
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 78AD8246A7
+	for <kvmarm@archiver.kernel.org>; Thu, 19 Nov 2020 15:39:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78AD8246A7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C7C2F4B3BC;
-	Thu, 19 Nov 2020 08:41:52 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 93FC64B506;
+	Thu, 19 Nov 2020 10:39:14 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id oFL+OfTKWL61; Thu, 19 Nov 2020 08:41:51 -0500 (EST)
+	with ESMTP id beGPzZkcX8yz; Thu, 19 Nov 2020 10:39:13 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B5504B450;
-	Thu, 19 Nov 2020 08:41:51 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 787DC4B4F4;
+	Thu, 19 Nov 2020 10:39:13 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 99FAA4B403
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2020 08:41:49 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AB1CA4B3E2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2020 10:39:11 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3oue3eMj11t6 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 Nov 2020 08:41:48 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 460714B3BC
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2020 08:41:48 -0500 (EST)
-Received: from mail-oi1-f180.google.com (mail-oi1-f180.google.com
- [209.85.167.180])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id EE8D8246D3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2020 13:41:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1605793307;
- bh=9O8JPvEoprFeeaXOpqPUadNdKTFI9oBlMrMXK00ChI8=;
- h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
- b=qfy27wPYWLgm4Zy3VvVfpA+DGsIjLvnT8P8fWTBqtwSFIeKZ4RZoybqgch8UF7DzU
- aj51T3m18bx7BflqHH00KWHpEEuBwbPuNa+yKOdp0eqr6u1LWj+a9cv0/q4sEksdRp
- xtd3L2090Q0Yuuxg7rHjBR2LVo3UD5EATNlKYxiA=
-Received: by mail-oi1-f180.google.com with SMTP id s18so5188277oih.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2020 05:41:46 -0800 (PST)
-X-Gm-Message-State: AOAM533t3TxW4j2WRhswt9wwzLnvS9nii1KoR98QrsudiT69io7PsA8p
- pNqfMew+XJnr1DHEnX5IqCiS1TBzy+aSiLg2uYk=
-X-Google-Smtp-Source: ABdhPJzlk8WOe6gGnaue7l6s6kAkAYGjtGZxJ1XCUSxUCtC/5rRnyw1ofeqtfdLzfQMS6GFudb+FtXtrfjOXBPZ0QoQ=
-X-Received: by 2002:aca:5c82:: with SMTP id q124mr2876715oib.33.1605793306082; 
- Thu, 19 Nov 2020 05:41:46 -0800 (PST)
+ with ESMTP id WJpBr3hzFdMa for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 Nov 2020 10:39:10 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3AFF84B3BB
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2020 10:39:10 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A59AC1478;
+ Thu, 19 Nov 2020 07:39:09 -0800 (PST)
+Received: from e112269-lin.arm.com (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 03C5E3F719;
+ Thu, 19 Nov 2020 07:39:06 -0800 (PST)
+From: Steven Price <steven.price@arm.com>
+To: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>
+Subject: [PATCH v5 0/2] MTE support for KVM guest
+Date: Thu, 19 Nov 2020 15:38:59 +0000
+Message-Id: <20201119153901.53705-1-steven.price@arm.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-References: <20201113182435.64015-1-andre.przywara@arm.com>
- <20201113182435.64015-5-andre.przywara@arm.com>
-In-Reply-To: <20201113182435.64015-5-andre.przywara@arm.com>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Thu, 19 Nov 2020 14:41:34 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXFMzSKO7yMRSz55Au_kRr=zLT_2tZA_+JNDfJ+osfjkKg@mail.gmail.com>
-Message-ID: <CAMj1kXFMzSKO7yMRSz55Au_kRr=zLT_2tZA_+JNDfJ+osfjkKg@mail.gmail.com>
-Subject: Re: [PATCH v3 4/5] arm64: Add support for SMCCC TRNG entropy source
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Marc Zyngier <maz@kernel.org>,
- Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Theodore Ts'o <tytso@mit.edu>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Linus Walleij <linus.walleij@linaro.org>, Russell King <linux@armlinux.org.uk>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Mark Brown <broonie@kernel.org>, Sudeep Holla <sudeep.holla@arm.com>,
- Will Deacon <will@kernel.org>, kvmarm <kvmarm@lists.cs.columbia.edu>,
- Linux ARM <linux-arm-kernel@lists.infradead.org>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
+ Dave Martin <Dave.Martin@arm.com>, Juan Quintela <quintela@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
+ Steven Price <steven.price@arm.com>, Thomas Gleixner <tglx@linutronix.de>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -94,188 +71,53 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 13 Nov 2020 at 19:24, Andre Przywara <andre.przywara@arm.com> wrote:
->
-> The ARM architected TRNG firmware interface, described in ARM spec
-> DEN0098, defines an ARM SMCCC based interface to a true random number
-> generator, provided by firmware.
-> This can be discovered via the SMCCC >=v1.1 interface, and provides
-> up to 192 bits of entropy per call.
->
-> Hook this SMC call into arm64's arch_get_random_*() implementation,
-> coming to the rescue when the CPU does not implement the ARM v8.5 RNG
-> system registers.
->
-> For the detection, we piggy back on the PSCI/SMCCC discovery (which gives
-> us the conduit to use (hvc/smc)), then try to call the
-> ARM_SMCCC_TRNG_VERSION function, which returns -1 if this interface is
-> not implemented.
->
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
->  arch/arm64/include/asm/archrandom.h | 69 ++++++++++++++++++++++++-----
->  1 file changed, 58 insertions(+), 11 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/archrandom.h b/arch/arm64/include/asm/archrandom.h
-> index abe07c21da8e..fe34bfd30caa 100644
-> --- a/arch/arm64/include/asm/archrandom.h
-> +++ b/arch/arm64/include/asm/archrandom.h
-> @@ -4,13 +4,24 @@
->
->  #ifdef CONFIG_ARCH_RANDOM
->
-> +#include <linux/arm-smccc.h>
->  #include <linux/bug.h>
->  #include <linux/kernel.h>
->  #include <asm/cpufeature.h>
->
-> +#define ARM_SMCCC_TRNG_MIN_VERSION     0x10000UL
-> +
-> +extern bool smccc_trng_available;
-> +
->  static inline bool __init smccc_probe_trng(void)
->  {
-> -       return false;
-> +       struct arm_smccc_res res;
-> +
-> +       arm_smccc_1_1_invoke(ARM_SMCCC_TRNG_VERSION, &res);
-> +       if ((s32)res.a0 < 0)
-> +               return false;
-> +
-> +       return res.a0 >= ARM_SMCCC_TRNG_MIN_VERSION;
->  }
->
->  static inline bool __arm64_rndr(unsigned long *v)
-> @@ -43,26 +54,52 @@ static inline bool __must_check arch_get_random_int(unsigned int *v)
->
->  static inline bool __must_check arch_get_random_seed_long(unsigned long *v)
->  {
-> +       struct arm_smccc_res res;
-> +
->         /*
->          * Only support the generic interface after we have detected
->          * the system wide capability, avoiding complexity with the
->          * cpufeature code and with potential scheduling between CPUs
->          * with and without the feature.
->          */
-> -       if (!cpus_have_const_cap(ARM64_HAS_RNG))
-> -               return false;
-> +       if (cpus_have_const_cap(ARM64_HAS_RNG))
-> +               return __arm64_rndr(v);
->
-> -       return __arm64_rndr(v);
-> -}
-> +       if (smccc_trng_available) {
-> +               arm_smccc_1_1_invoke(ARM_SMCCC_TRNG_RND64, 64, &res);
-> +               if ((int)res.a0 < 0)
-> +                       return false;
->
-> +               *v = res.a3;
-> +               return true;
-> +       }
-> +
-> +       return false;
-> +}
->
+This series adds support for Arm's Memory Tagging Extension (MTE) to
+KVM, allowing KVM guests to make use of it. This builds on the existing
+user space support already in v5.10-rc1, see [1] for an overview.
 
-I think we should be more rigorous here in how we map the concepts of
-random seeds and random numbers onto the various sources.
+[1] https://lwn.net/Articles/834289/
 
-First of all, assuming my patch dropping the call to
-arch_get_random_seed_long() from add_interrupt_randomness() gets
-accepted, we should switch to RNDRRS here, and implement the non-seed
-variants using RNDR.
+Changes since v4[2]:
 
-However, this is still semantically inaccurate: RNDRRS does not return
-a random *seed*, it returns a number drawn from a freshly seeded
-pseudo-random sequence. This means that the TRNG interface, if
-implemented, is a better choice, and so we should try it first. Note
-that on platforms that don't implement both, only one of these will be
-available in the first place. But on platforms that *do* implement
-both, the firmware interface may actually be less wasteful in terms of
-resources: the TRNG interface returns every bit drawn from the
-underlying entropy source, whereas RNDRRS uses ~500 bits of entropy to
-reseed a DRBG that gets used only once to draw a single 64-bit number.
-And the cost of the SMCCC call in terms of CPU time is charged to the
-caller, which is appropriate here.
+ * Rebased on v5.10-rc4.
 
-Then, I don't think we should ever return false without even trying if
-RNDRRS is available if the SMCCC invocation fails.
+ * Require the VMM to map all guest memory PROT_MTE if MTE is enabled
+   for the guest.
 
-Something like this perhaps?
+ * Add a kvm_has_mte() accessor.
 
-if (smccc_trng_available) {
-  arm_smccc_1_1_invoke(ARM_SMCCC_TRNG_RND64, 64, &res);
-  if ((int)res.a0 >= 0) {
-    *v = res.a3;
-    return true;
-  }
-}
+[2] http://lkml.kernel.org/r/20201026155727.36685-1-steven.price%40arm.com
 
-if (cpus_have_const_cap(ARM64_HAS_RNG))
-   return __arm64_rndrrs(v);
+The change to require the VMM to map all guest memory PROT_MTE is
+significant as it means that the VMM has to deal with the MTE tags even
+if it doesn't care about them (e.g. for virtual devices or if the VMM
+doesn't support migration). Also unfortunately because the VMM can
+change the memory layout at any time the check for PROT_MTE/VM_MTE has
+to be done very late (at the point of faulting pages into stage 2).
 
-return false;
+The alternative would be to modify the set_pte_at() handler to always
+check if there is MTE data relating to a swap page even if the PTE
+doesn't have the MTE bit set. I haven't initially done this because of
+ordering issues during early boot, but could investigate further if the
+above VMM requirement is too strict.
 
-(and something similar 2x below)
+Steven Price (2):
+  arm64: kvm: Save/restore MTE registers
+  arm64: kvm: Introduce MTE VCPU feature
 
+ arch/arm64/include/asm/kvm_emulate.h       |  3 +++
+ arch/arm64/include/asm/kvm_host.h          |  8 ++++++++
+ arch/arm64/include/asm/sysreg.h            |  3 ++-
+ arch/arm64/kvm/arm.c                       |  9 +++++++++
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 14 ++++++++++++++
+ arch/arm64/kvm/mmu.c                       |  6 ++++++
+ arch/arm64/kvm/sys_regs.c                  | 20 +++++++++++++++-----
+ include/uapi/linux/kvm.h                   |  1 +
+ 8 files changed, 58 insertions(+), 6 deletions(-)
 
->  static inline bool __must_check arch_get_random_seed_int(unsigned int *v)
->  {
-> +       struct arm_smccc_res res;
->         unsigned long val;
-> -       bool ok = arch_get_random_seed_long(&val);
->
-> -       *v = val;
-> -       return ok;
-> +       if (cpus_have_const_cap(ARM64_HAS_RNG)) {
-> +               if (arch_get_random_seed_long(&val)) {
-> +                       *v = val;
-> +                       return true;
-> +               }
-> +               return false;
-> +       }
-> +
-> +       if (smccc_trng_available) {
-> +               arm_smccc_1_1_invoke(ARM_SMCCC_TRNG_RND64, 32, &res);
-> +               if ((int)res.a0 < 0)
-> +                       return false;
-> +
-> +               *v = res.a3 & GENMASK(31, 0);
-> +               return true;
-> +       }
-> +
-> +       return false;
->  }
->
->  static inline bool __init __early_cpu_has_rndr(void)
-> @@ -77,10 +114,20 @@ arch_get_random_seed_long_early(unsigned long *v)
->  {
->         WARN_ON(system_state != SYSTEM_BOOTING);
->
-> -       if (!__early_cpu_has_rndr())
-> -               return false;
-> +       if (__early_cpu_has_rndr())
-> +               return __arm64_rndr(v);
-> +
-> +       if (smccc_trng_available) {
-> +               struct arm_smccc_res res;
->
-> -       return __arm64_rndr(v);
-> +               arm_smccc_1_1_invoke(ARM_SMCCC_TRNG_RND64, 64, &res);
-> +               if ((int)res.a0 >= 0) {
-> +                       *v = res.a3;
-> +                       return true;
-> +               }
-> +       }
-> +
-> +       return false;
->  }
->  #define arch_get_random_seed_long_early arch_get_random_seed_long_early
->
-> --
-> 2.17.1
->
+-- 
+2.20.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
