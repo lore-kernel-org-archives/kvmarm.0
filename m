@@ -2,67 +2,89 @@ Return-Path: <SRS0=Ckwh=EZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E592BC63697
-	for <kvmarm@archiver.kernel.org>; Thu, 19 Nov 2020 16:24:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6991CC63697
+	for <kvmarm@archiver.kernel.org>; Thu, 19 Nov 2020 16:25:54 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3990A22261
-	for <kvmarm@archiver.kernel.org>; Thu, 19 Nov 2020 16:24:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3990A22261
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 8D3A022261
+	for <kvmarm@archiver.kernel.org>; Thu, 19 Nov 2020 16:25:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="HNhCr9vU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D3A022261
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C3F24B520;
-	Thu, 19 Nov 2020 11:24:22 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B6B3D4B45E;
+	Thu, 19 Nov 2020 11:25:52 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 0UkQMt-lqnFD; Thu, 19 Nov 2020 11:24:19 -0500 (EST)
+	with ESMTP id RmCqLQ30ZuQy; Thu, 19 Nov 2020 11:25:51 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EC1F84B530;
-	Thu, 19 Nov 2020 11:24:19 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 523924B3D9;
+	Thu, 19 Nov 2020 11:25:51 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ED5E64B521
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2020 11:24:18 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 671AE4B3D9
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2020 11:25:50 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LIg0RDuVEB4D for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 Nov 2020 11:24:17 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8AF314B520
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2020 11:24:17 -0500 (EST)
-Received: from gaia (unknown [2.26.170.190])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 0FA2622264;
- Thu, 19 Nov 2020 16:24:12 +0000 (UTC)
-Date: Thu, 19 Nov 2020 16:24:10 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Steven Price <steven.price@arm.com>
-Subject: Re: [PATCH v4 2/2] arm64: kvm: Introduce MTE VCPU feature
-Message-ID: <20201119162409.GC4376@gaia>
-References: <20201026155727.36685-1-steven.price@arm.com>
- <20201026155727.36685-3-steven.price@arm.com>
- <X7P1VLZhBh045tsr@trantor>
- <f34b3d16-8bc7-af9d-c0e0-fb114d2465aa@arm.com>
- <X7VQua7YO4isMFPU@trantor>
- <20201118170552.cuczyylf34ows5jd@kamzik.brq.redhat.com>
- <f4f7073c-a0d5-f259-8fbc-514c0c5ddbed@arm.com>
+ with ESMTP id yL0BWy8xLfvb for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 Nov 2020 11:25:49 -0500 (EST)
+Received: from mail-ej1-f65.google.com (mail-ej1-f65.google.com
+ [209.85.218.65])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 385254B2EC
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2020 11:25:49 -0500 (EST)
+Received: by mail-ej1-f65.google.com with SMTP id f23so8776406ejk.2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2020 08:25:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=2GruhQdqr+wzWu7YIuTjo4e/TRyXrwSpjT/ODeg/Yqc=;
+ b=HNhCr9vU0ISFuiHpPTfBE/dnSa1k1AQmT5a5owhc4HAvKKm3lmsYZp8SXMp+lTOqLJ
+ oA3puTIhotxShLQBAg0rlM4WDEQkkC69CqcXEaiU9EAiBKKxtasmjjIbIeazLFtic2MI
+ fLz07UvbuvQYFFiUzTKn15TR5mxfbYbxOQpkI5/9WHICtRExdl10ClVPeje4PwMD++Sp
+ 5gJtKtlsgxdEDaopQgVhEbsCfANljY7EtRJZz+x93MNooDxOX9ReqlU+WdfT/OoDCbh6
+ DZ4+nKQgm0TMuhm7MKG6SISpKF0WEI9VVfoZtlPQUmeHaXi/qPVmsTWyh3Hr2yUJQNso
+ SF0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=2GruhQdqr+wzWu7YIuTjo4e/TRyXrwSpjT/ODeg/Yqc=;
+ b=E6b8GRNMKTB2Xgn3Uf88T5vNnWC7nmgEKqwvzmRtBTUdNcrn5TvG+Bmnn5OhWOqKBH
+ UQ0Dd5mR7Jt47cWrR3iBGTY7Nb0x6nqgFEBWxYJ3S41pvG0R84eHBiDSM0q2BB4P2pWU
+ Hnanjl0akPZWPdjjfuTI0Agb6y07TT3D7ipr3WTgg7wFq1LghA6BTOVhoXKuH39tPfYn
+ R7DazjereXuRmoP2cvEm7n1aw8/RIQah9eX4it7Xbpegodwyr4aHItW47CiUP3GWuUrq
+ kzwFQq5mu+m8/EL0cRvotLSyk/V0tuQfTKy7gRU5kqfqrlo227LyYYPuCNp50j4hK+H/
+ EWwA==
+X-Gm-Message-State: AOAM532W0jDdssWE7rziQImgwwZXcleJH2AebOOyyWbe21/rxp6pTcDk
+ KgiKtOpQXd+OKZPDlHuUsgdGZE94FxtRIA==
+X-Google-Smtp-Source: ABdhPJx5kfoZrvZqP/Uo4FFewwoV/LxEuk0ZaZ0aeXlkfVXWjL868auf9G7gfWTXVZ0FB7pclJWrVQ==
+X-Received: by 2002:a17:906:3ec8:: with SMTP id
+ d8mr29647604ejj.32.1605803147524; 
+ Thu, 19 Nov 2020 08:25:47 -0800 (PST)
+Received: from localhost ([2a01:4b00:8523:2d03:9843:cd3f:f36b:d55c])
+ by smtp.gmail.com with ESMTPSA id 2sm66968ejw.65.2020.11.19.08.25.46
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 19 Nov 2020 08:25:46 -0800 (PST)
+From: David Brazdil <dbrazdil@google.com>
+To: kvmarm@lists.cs.columbia.edu
+Subject: [RFC PATCH 0/6] kvm: arm64: Fix up hyp relocations
+Date: Thu, 19 Nov 2020 16:25:37 +0000
+Message-Id: <20201119162543.78001-1-dbrazdil@google.com>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <f4f7073c-a0d5-f259-8fbc-514c0c5ddbed@arm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: Marc Zyngier <maz@kernel.org>, Juan Quintela <quintela@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
- Dave Martin <Dave.Martin@arm.com>, linux-kernel@vger.kernel.org
+Cc: kernel-team@android.com, Marc Zyngier <maz@kernel.org>,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Ard Biesheuvel <ardb@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -79,126 +101,58 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Nov 19, 2020 at 12:45:52PM +0000, Steven Price wrote:
-> On 18/11/2020 17:05, Andrew Jones wrote:
-> > On Wed, Nov 18, 2020 at 04:50:01PM +0000, Catalin Marinas wrote:
-> > > On Wed, Nov 18, 2020 at 04:01:20PM +0000, Steven Price wrote:
-> > > > On 17/11/2020 16:07, Catalin Marinas wrote:
-> > > > > On Mon, Oct 26, 2020 at 03:57:27PM +0000, Steven Price wrote:
-> > > > > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > > > > > index 19aacc7d64de..38fe25310ca1 100644
-> > > > > > --- a/arch/arm64/kvm/mmu.c
-> > > > > > +++ b/arch/arm64/kvm/mmu.c
-> > > > > > @@ -862,6 +862,26 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> > > > > >    	if (vma_pagesize == PAGE_SIZE && !force_pte)
-> > > > > >    		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
-> > > > > >    							   &pfn, &fault_ipa);
-> > > > > > +
-> > > > > > +	/*
-> > > > > > +	 * The otherwise redundant test for system_supports_mte() allows the
-> > > > > > +	 * code to be compiled out when CONFIG_ARM64_MTE is not present.
-> > > > > > +	 */
-> > > > > > +	if (system_supports_mte() && kvm->arch.mte_enabled && pfn_valid(pfn)) {
-> > > > > > +		/*
-> > > > > > +		 * VM will be able to see the page's tags, so we must ensure
-> > > > > > +		 * they have been initialised.
-> > > > > > +		 */
-> > > > > > +		struct page *page = pfn_to_page(pfn);
-> > > > > > +		long i, nr_pages = compound_nr(page);
-> > > > > > +
-> > > > > > +		/* if PG_mte_tagged is set, tags have already been initialised */
-> > > > > > +		for (i = 0; i < nr_pages; i++, page++) {
-> > > > > > +			if (!test_and_set_bit(PG_mte_tagged, &page->flags))
-> > > > > > +				mte_clear_page_tags(page_address(page));
-> > > > > > +		}
-> > > > > > +	}
-> > > > > 
-> > > > > If this page was swapped out and mapped back in, where does the
-> > > > > restoring from swap happen?
-> > > > 
-> > > > Restoring from swap happens above this in the call to gfn_to_pfn_prot()
-> > > 
-> > > Looking at the call chain, gfn_to_pfn_prot() ends up with
-> > > get_user_pages() using the current->mm (the VMM) and that does a
-> > > set_pte_at(), presumably restoring the tags. Does this mean that all
-> > > memory mapped by the VMM in user space should have PROT_MTE set?
-> > > Otherwise we don't take the mte_sync_tags() path in set_pte_at() and no
-> > > tags restored from swap (we do save them since when they were mapped,
-> > > PG_mte_tagged was set).
-> > > 
-> > > So I think the code above should be similar to mte_sync_tags(), even
-> > > calling a common function, but I'm not sure where to get the swap pte
-> > > from.
-> 
-> You're right - the code is broken as it stands. I've just been able to
-> reproduce the loss of tags due to swap.
-> 
-> The problem is that we also don't have a suitable pte to do the restore from
-> swap from. So either set_pte_at() would have to unconditionally check for
-> MTE tags for all previous swap entries as you suggest below. I had a quick
-> go at testing this and hit issues with the idle task getting killed during
-> boot - I fear there are some fun issues regarding initialisation order here.
+Hi,
 
-My attempt here but not fully tested (just booted, no swap support):
+KVM nVHE hyp code runs under different VA mapping than the kernel, which
+meant that .hyp.text code had to use PC-relative addressing because
+relocations would produce a kernel VA. Programmers had to be extremely
+careful with C semantics to not break this fragile setup. See
+hyp_symbol_addr comments for details.
 
-diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
-index b35833259f08..27d7fd336a16 100644
---- a/arch/arm64/include/asm/pgtable.h
-+++ b/arch/arm64/include/asm/pgtable.h
-@@ -304,7 +304,7 @@ static inline void set_pte_at(struct mm_struct *mm, unsigned long addr,
- 		__sync_icache_dcache(pte);
- 
- 	if (system_supports_mte() &&
--	    pte_present(pte) && pte_tagged(pte) && !pte_special(pte))
-+	    pte_present(pte) && pte_valid_user(pte) && !pte_special(pte))
- 		mte_sync_tags(ptep, pte);
- 
- 	__check_racy_pte_update(mm, ptep, pte);
-diff --git a/arch/arm64/kernel/mte.c b/arch/arm64/kernel/mte.c
-index 52a0638ed967..bbd6c56d33d9 100644
---- a/arch/arm64/kernel/mte.c
-+++ b/arch/arm64/kernel/mte.c
-@@ -20,18 +20,24 @@
- #include <asm/ptrace.h>
- #include <asm/sysreg.h>
- 
--static void mte_sync_page_tags(struct page *page, pte_t *ptep, bool check_swap)
-+static void mte_sync_page_tags(struct page *page, pte_t *ptep, pte_t pte,
-+			       bool check_swap)
- {
- 	pte_t old_pte = READ_ONCE(*ptep);
- 
- 	if (check_swap && is_swap_pte(old_pte)) {
- 		swp_entry_t entry = pte_to_swp_entry(old_pte);
- 
--		if (!non_swap_entry(entry) && mte_restore_tags(entry, page))
-+		if (!non_swap_entry(entry) && mte_restore_tags(entry, page)) {
-+			set_bit(PG_mte_tagged, &page->flags);
- 			return;
-+		}
- 	}
- 
--	mte_clear_page_tags(page_address(page));
-+	if (pte_tagged(pte)) {
-+		mte_clear_page_tags(page_address(page));
-+		set_bit(PG_mte_tagged, &page->flags);
-+	}
- }
- 
- void mte_sync_tags(pte_t *ptep, pte_t pte)
-@@ -42,8 +48,8 @@ void mte_sync_tags(pte_t *ptep, pte_t pte)
- 
- 	/* if PG_mte_tagged is set, tags have already been initialised */
- 	for (i = 0; i < nr_pages; i++, page++) {
--		if (!test_and_set_bit(PG_mte_tagged, &page->flags))
--			mte_sync_page_tags(page, ptep, check_swap);
-+		if (!test_bit(PG_mte_tagged, &page->flags))
-+			mte_sync_page_tags(page, ptep, pte, check_swap);
- 	}
- }
+Now that we're moving to all nVHE hyp code/data being in separate ELF
+sections from the rest of the kernel, it is becoming possible to revisit
+relocations during early boot, filter those used by nVHE hyp and
+converting those (already relocated) kern VAs to hyp VAs.
+
+Sending this as an RFC, mainly to get feedback but also because it's
+only lightly tested. It still feels hacky but much more robust than the
+existing approach. The one place where I see somebody breaking this is
+the list of ELF sections owned by ELF. That list is currently evolving
+but should stabilize over time.
+
+The patches are based on kvmarm/queue (with Marc's "Host EL2 entry
+improvements") and my "Opt-in always-on nVHE hypervisor" v2 series.
+
+-David
+
+David Brazdil (6):
+  kvm: arm64: Set up .hyp.rodata ELF section
+  kvm: arm64: Fix up RELA relocations in hyp code/data
+  kvm: arm64: Fix up RELR relocation in hyp code/data
+  kvm: arm64: Remove patching of fn pointers in hyp
+  kvm: arm64: Fix constant-pool users in hyp
+  kvm: arm64: Remove hyp_symbol_addr
+
+ arch/arm64/include/asm/kvm_asm.h         |  20 ----
+ arch/arm64/include/asm/kvm_mmu.h         |  48 ++++-----
+ arch/arm64/include/asm/sections.h        |   2 +-
+ arch/arm64/kernel/image-vars.h           |   1 -
+ arch/arm64/kernel/smp.c                  |   4 +-
+ arch/arm64/kernel/vmlinux.lds.S          |   7 +-
+ arch/arm64/kvm/arm.c                     |   7 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h  |   4 +-
+ arch/arm64/kvm/hyp/nvhe/host.S           |  29 +++---
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c       |  11 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-smp.c        |   4 +-
+ arch/arm64/kvm/hyp/nvhe/hyp.lds.S        |   1 +
+ arch/arm64/kvm/hyp/nvhe/psci-relay.c     |   4 +-
+ arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c |   2 +-
+ arch/arm64/kvm/va_layout.c               | 123 +++++++++++++++++++++--
+ 15 files changed, 175 insertions(+), 92 deletions(-)
 
 -- 
-Catalin
+2.29.2.299.gdc1121823c-goog
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
