@@ -7,62 +7,61 @@ X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28490C2D0E4
-	for <kvmarm@archiver.kernel.org>; Thu, 19 Nov 2020 12:46:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 355B5C2D0E4
+	for <kvmarm@archiver.kernel.org>; Thu, 19 Nov 2020 12:46:37 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 67ED7246F1
-	for <kvmarm@archiver.kernel.org>; Thu, 19 Nov 2020 12:46:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67ED7246F1
+	by mail.kernel.org (Postfix) with ESMTP id 71D11246B8
+	for <kvmarm@archiver.kernel.org>; Thu, 19 Nov 2020 12:46:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71D11246B8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 893304B3DD;
-	Thu, 19 Nov 2020 07:46:00 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B86384B488;
+	Thu, 19 Nov 2020 07:46:35 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id mj81j+y2D89R; Thu, 19 Nov 2020 07:45:59 -0500 (EST)
+	with ESMTP id YVx4TwkjY66I; Thu, 19 Nov 2020 07:46:34 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 53D274B3DC;
-	Thu, 19 Nov 2020 07:45:59 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 84EF64B47F;
+	Thu, 19 Nov 2020 07:46:34 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D6D4D4B3DC
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2020 07:45:57 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E38164B406
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2020 07:46:33 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pu-gEvvvtLgd for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 Nov 2020 07:45:56 -0500 (EST)
+ with ESMTP id PMkME5GlqPBU for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 Nov 2020 07:46:28 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 80A574B3D9
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2020 07:45:56 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B39C04B3E3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2020 07:46:28 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0ED1A1396;
- Thu, 19 Nov 2020 04:45:56 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6039A1396;
+ Thu, 19 Nov 2020 04:46:28 -0800 (PST)
 Received: from [192.168.1.179] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8FFD83F718;
- Thu, 19 Nov 2020 04:45:53 -0800 (PST)
-Subject: Re: [PATCH v4 2/2] arm64: kvm: Introduce MTE VCPU feature
-To: Andrew Jones <drjones@redhat.com>,
- Catalin Marinas <catalin.marinas@arm.com>
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EFEED3F718;
+ Thu, 19 Nov 2020 04:46:25 -0800 (PST)
+Subject: Re: [PATCH v4 1/2] arm64: kvm: Save/restore MTE registers
+To: Catalin Marinas <catalin.marinas@arm.com>
 References: <20201026155727.36685-1-steven.price@arm.com>
- <20201026155727.36685-3-steven.price@arm.com> <X7P1VLZhBh045tsr@trantor>
- <f34b3d16-8bc7-af9d-c0e0-fb114d2465aa@arm.com> <X7VQua7YO4isMFPU@trantor>
- <20201118170552.cuczyylf34ows5jd@kamzik.brq.redhat.com>
+ <20201026155727.36685-2-steven.price@arm.com>
+ <b8f2fe15e0cab5c24094915b8c000930@kernel.org>
+ <98eaa539-0ae8-ce4c-8886-3040542ede80@arm.com> <X7VTsaO/7+Izqm8/@trantor>
 From: Steven Price <steven.price@arm.com>
-Message-ID: <f4f7073c-a0d5-f259-8fbc-514c0c5ddbed@arm.com>
-Date: Thu, 19 Nov 2020 12:45:52 +0000
+Message-ID: <f5e9fe3a-2147-4326-5e78-5eaf88c72789@arm.com>
+Date: Thu, 19 Nov 2020 12:45:54 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20201118170552.cuczyylf34ows5jd@kamzik.brq.redhat.com>
+In-Reply-To: <X7VTsaO/7+Izqm8/@trantor>
 Content-Language: en-GB
-Cc: Marc Zyngier <maz@kernel.org>, Juan Quintela <quintela@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
+ Marc Zyngier <maz@kernel.org>, Juan Quintela <quintela@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
+ Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org,
  Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
- Dave Martin <Dave.Martin@arm.com>, linux-kernel@vger.kernel.org
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -74,96 +73,73 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 18/11/2020 17:05, Andrew Jones wrote:
-> On Wed, Nov 18, 2020 at 04:50:01PM +0000, Catalin Marinas wrote:
->> On Wed, Nov 18, 2020 at 04:01:20PM +0000, Steven Price wrote:
->>> On 17/11/2020 16:07, Catalin Marinas wrote:
->>>> On Mon, Oct 26, 2020 at 03:57:27PM +0000, Steven Price wrote:
->>>>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
->>>>> index 19aacc7d64de..38fe25310ca1 100644
->>>>> --- a/arch/arm64/kvm/mmu.c
->>>>> +++ b/arch/arm64/kvm/mmu.c
->>>>> @@ -862,6 +862,26 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->>>>>    	if (vma_pagesize == PAGE_SIZE && !force_pte)
->>>>>    		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
->>>>>    							   &pfn, &fault_ipa);
->>>>> +
->>>>> +	/*
->>>>> +	 * The otherwise redundant test for system_supports_mte() allows the
->>>>> +	 * code to be compiled out when CONFIG_ARM64_MTE is not present.
->>>>> +	 */
->>>>> +	if (system_supports_mte() && kvm->arch.mte_enabled && pfn_valid(pfn)) {
->>>>> +		/*
->>>>> +		 * VM will be able to see the page's tags, so we must ensure
->>>>> +		 * they have been initialised.
->>>>> +		 */
->>>>> +		struct page *page = pfn_to_page(pfn);
->>>>> +		long i, nr_pages = compound_nr(page);
->>>>> +
->>>>> +		/* if PG_mte_tagged is set, tags have already been initialised */
->>>>> +		for (i = 0; i < nr_pages; i++, page++) {
->>>>> +			if (!test_and_set_bit(PG_mte_tagged, &page->flags))
->>>>> +				mte_clear_page_tags(page_address(page));
->>>>> +		}
->>>>> +	}
->>>>
->>>> If this page was swapped out and mapped back in, where does the
->>>> restoring from swap happen?
->>>
->>> Restoring from swap happens above this in the call to gfn_to_pfn_prot()
->>
->> Looking at the call chain, gfn_to_pfn_prot() ends up with
->> get_user_pages() using the current->mm (the VMM) and that does a
->> set_pte_at(), presumably restoring the tags. Does this mean that all
->> memory mapped by the VMM in user space should have PROT_MTE set?
->> Otherwise we don't take the mte_sync_tags() path in set_pte_at() and no
->> tags restored from swap (we do save them since when they were mapped,
->> PG_mte_tagged was set).
->>
->> So I think the code above should be similar to mte_sync_tags(), even
->> calling a common function, but I'm not sure where to get the swap pte
->> from.
-
-You're right - the code is broken as it stands. I've just been able to 
-reproduce the loss of tags due to swap.
-
-The problem is that we also don't have a suitable pte to do the restore 
-from swap from. So either set_pte_at() would have to unconditionally 
-check for MTE tags for all previous swap entries as you suggest below. I 
-had a quick go at testing this and hit issues with the idle task getting 
-killed during boot - I fear there are some fun issues regarding 
-initialisation order here.
-
-Or we enforce PROT_MTE...
-
->> An alternative is to only enable HCR_EL2.ATA and MTE in guest if the vmm
->> mapped the memory with PROT_MTE.
-> 
-> This is a very reasonable alternative. The VMM must be aware of whether
-> the guest may use MTE anyway. Asking it to map the memory with PROT_MTE
-> when it wants to offer the guest that option is a reasonable requirement.
-> If the memory is not mapped as such, then the host kernel shouldn't assume
-> MTE may be used by the guest, and it should even enforce that it is not
-> (by not enabling the feature).
-
-The main issue with this is that the VMM can change the mappings while 
-the guest is running, so the only place we can reliably check this is 
-during user_mem_abort(). So we can't just downgrade HCR_EL2.ATA. This 
-makes the error reporting not so great as the memory access is simply 
-faulted. However I do have this working and it's actually (slightly) 
-less code.
-
-Another drawback is that the VMM needs to be more careful with the tags 
-- e.g. for virtualised devices the VMM can't simply have a non-PROT_MTE 
-mapping and ignore what the guest is doing with tags.
-
-Steve
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gMTgvMTEvMjAyMCAxNzowMiwgQ2F0YWxpbiBNYXJpbmFzIHdyb3RlOgo+IE9uIFdlZCwgTm92
+IDE4LCAyMDIwIGF0IDA0OjAxOjE4UE0gKzAwMDAsIFN0ZXZlbiBQcmljZSB3cm90ZToKPj4gT24g
+MTcvMTEvMjAyMCAxOToyMCwgTWFyYyBaeW5naWVyIHdyb3RlOgo+Pj4gT24gMjAyMC0xMC0yNiAx
+NTo1NywgU3RldmVuIFByaWNlIHdyb3RlOgo+Pj4+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2lu
+Y2x1ZGUvYXNtL3N5c3JlZy5oCj4+Pj4gYi9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL3N5c3JlZy5o
+Cj4+Pj4gaW5kZXggZDUyYzFiM2NlNTg5Li43NzI3ZGYwYmMwOWQgMTAwNjQ0Cj4+Pj4gLS0tIGEv
+YXJjaC9hcm02NC9pbmNsdWRlL2FzbS9zeXNyZWcuaAo+Pj4+ICsrKyBiL2FyY2gvYXJtNjQvaW5j
+bHVkZS9hc20vc3lzcmVnLmgKPj4+PiBAQCAtNTY1LDcgKzU2NSw4IEBACj4+Pj4gw6/Cv8K9I2Rl
+ZmluZSBTQ1RMUl9FTHhfTcOvwr/CvcOvwr/CvcOvwr/CvSAoQklUKDApKQo+Pj4+Cj4+Pj4gw6/C
+v8K9I2RlZmluZSBTQ1RMUl9FTHhfRkxBR1PDr8K/wr3Dr8K/wr3Dr8K/wr0gKFNDVExSX0VMeF9N
+w6/Cv8K9IHwgU0NUTFJfRUx4X0EgfCBTQ1RMUl9FTHhfQyB8IFwKPj4+PiAtw6/Cv8K9w6/Cv8K9
+w6/Cv8K9w6/Cv8K9w6/Cv8K9w6/Cv8K9w6/Cv8K9w6/Cv8K9w6/Cv8K9w6/Cv8K9w6/Cv8K9w6/C
+v8K9IFNDVExSX0VMeF9TQSB8IFNDVExSX0VMeF9JIHwgU0NUTFJfRUx4X0lFU0IpCj4+Pj4gK8Ov
+wr/CvcOvwr/CvcOvwr/CvcOvwr/CvcOvwr/CvcOvwr/CvcOvwr/CvcOvwr/CvcOvwr/CvcOvwr/C
+vcOvwr/CvcOvwr/CvSBTQ1RMUl9FTHhfU0EgfCBTQ1RMUl9FTHhfSSB8IFNDVExSX0VMeF9JRVNC
+IHwgXAo+Pj4+ICvDr8K/wr3Dr8K/wr3Dr8K/wr3Dr8K/wr3Dr8K/wr3Dr8K/wr3Dr8K/wr3Dr8K/
+wr3Dr8K/wr3Dr8K/wr3Dr8K/wr3Dr8K/wr0gU0NUTFJfRUx4X0lURlNCKQo+Pj4+Cj4+Pj4gw6/C
+v8K9LyogU0NUTFJfRUwyIHNwZWNpZmljIGZsYWdzLiAqLwo+Pj4+IMOvwr/CvSNkZWZpbmUgU0NU
+TFJfRUwyX1JFUzHDr8K/wr3Dr8K/wr3Dr8K/wr0gKChCSVQoNCkpw6/Cv8K9IHwgKEJJVCg1KSnD
+r8K/wr0gfCAoQklUKDExKSkgfAo+Pj4+IChCSVQoMTYpKSB8IFwKPj4+PiBkaWZmIC0tZ2l0IGEv
+YXJjaC9hcm02NC9rdm0vaHlwL2luY2x1ZGUvaHlwL3N5c3JlZy1zci5oCj4+Pj4gYi9hcmNoL2Fy
+bTY0L2t2bS9oeXAvaW5jbHVkZS9oeXAvc3lzcmVnLXNyLmgKPj4+PiBpbmRleCA3YTk4NjAzMDE0
+NWYuLmExMjRmZmE0OWJhMyAxMDA2NDQKPj4+PiAtLS0gYS9hcmNoL2FybTY0L2t2bS9oeXAvaW5j
+bHVkZS9oeXAvc3lzcmVnLXNyLmgKPj4+PiArKysgYi9hcmNoL2FybTY0L2t2bS9oeXAvaW5jbHVk
+ZS9oeXAvc3lzcmVnLXNyLmgKPj4+PiBAQCAtMTgsNiArMTgsMTEgQEAKPj4+PiDDr8K/wr1zdGF0
+aWMgaW5saW5lIHZvaWQgX19zeXNyZWdfc2F2ZV9jb21tb25fc3RhdGUoc3RydWN0Cj4+Pj4ga3Zt
+X2NwdV9jb250ZXh0ICpjdHh0KQo+Pj4+IMOvwr/CvXsKPj4+PiDDr8K/wr3Dr8K/wr3Dr8K/wr3D
+r8K/wr0gY3R4dF9zeXNfcmVnKGN0eHQsIE1EU0NSX0VMMSnDr8K/wr3Dr8K/wr3Dr8K/wr0gPSBy
+ZWFkX3N5c3JlZyhtZHNjcl9lbDEpOwo+Pj4+ICvDr8K/wr3Dr8K/wr3Dr8K/wr0gaWYgKHN5c3Rl
+bV9zdXBwb3J0c19tdGUoKSkgewo+Pj4+ICvDr8K/wr3Dr8K/wr3Dr8K/wr3Dr8K/wr3Dr8K/wr3D
+r8K/wr3Dr8K/wr0gY3R4dF9zeXNfcmVnKGN0eHQsIFJHU1JfRUwxKcOvwr/CvcOvwr/CvcOvwr/C
+vSA9IHJlYWRfc3lzcmVnX3MoU1lTX1JHU1JfRUwxKTsKPj4+PiArw6/Cv8K9w6/Cv8K9w6/Cv8K9
+w6/Cv8K9w6/Cv8K9w6/Cv8K9w6/Cv8K9IGN0eHRfc3lzX3JlZyhjdHh0LCBHQ1JfRUwxKcOvwr/C
+vcOvwr/CvcOvwr/CvSA9IHJlYWRfc3lzcmVnX3MoU1lTX0dDUl9FTDEpOwo+Pj4+ICvDr8K/wr3D
+r8K/wr3Dr8K/wr3Dr8K/wr3Dr8K/wr3Dr8K/wr3Dr8K/wr0gY3R4dF9zeXNfcmVnKGN0eHQsIFRG
+U1JFMF9FTDEpw6/Cv8K9w6/Cv8K9w6/Cv8K9ID0KPj4+PiByZWFkX3N5c3JlZ19zKFNZU19URlNS
+RTBfRUwxKTsKPj4+Cj4+PiBBcyBmYXIgYXMgSSBjYW4gdGVsbCwgSENSX0VMMi5BVEEgaXMgc3Rp
+bGwgY2xlYXIgd2hlbiBydW5uaW5nIGEgZ3Vlc3QuCj4+PiBTbyB3aHksIGRvIHdlIHNhdmUvcmVz
+dG9yZSB0aGlzIHN0YXRlIHlldD8KPj4+Cj4+PiBBbHNvLCBJIHdvbmRlciB3aGV0aGVyIHdlIHNo
+b3VsZCBrZWVwIHRoZXNlIGluIHRoZSBDIGNvZGUuIElmIG9uZSBkYXkKPj4+IHdlIGVuYWJsZSBN
+VEUgaW4gdGhlIGtlcm5lbCwgd2Ugd2lsbCBoYXZlIHRvIG1vdmUgdGhlbSB0byB0aGUgYXNzZW1i
+bHkKPj4+IHBhcnQsIG11Y2ggbGlrZSB3ZSBkbyBmb3IgUEF1dGguIEFuZCBJIGZlYXIgdGhhdCAi
+b25lIGRheSIgaXMgcHJldHR5Cj4+PiBzb29uOgo+Pj4KPj4+IGh0dHBzOi8vbG9yZS5rZXJuZWwu
+b3JnL2xpbnV4LWFybS1rZXJuZWwvY292ZXIuMTYwNTA0NjE5Mi5naXQuYW5kcmV5a252bEBnb29n
+bGUuY29tLwo+Pgo+PiBHb29kIHBvaW50LiBBbHRob3VnaCBmb3IgTVRFIHdlIGRvIGhhdmUgdGhl
+IG9wdGlvbiBvZiBzZXR0aW5nIFRDTyBpbiBQU1RBVEUKPj4gc28gdGhpcyBjb3VsZCByZW1haW4g
+aW4gQyBpZiB3ZSdyZSBub3QgYm90aGVyZWQgYWJvdXQgdGhlICdnYXAnIGluIEtBU0FOCj4+IGNv
+dmVyYWdlLiBJIGhhdmVuJ3QgeWV0IGdvdCBteSBoZWFkIGFyb3VuZCBob3cgKG9yIGluZGVlZCBp
+ZikgdGhhdCBzZXJpZXMKPj4gaGFuZGxlcyBndWVzdHMuCj4gCj4gSSB0aGluayB3ZSBzaG91bGQg
+YmUgZmluZSB3aXRoIHRoZSBjdXJyZW50bHkgcHJvcG9zZWQgaW4ta2VybmVsIE1URQo+IHN1cHBv
+cnQuIEhvd2V2ZXIsIHNldHRpbmcgR0NSX0VMMSBjYW4gZ2V0IGluIHRoZSB3YXkgaWYgc3RhY2sg
+dGFnZ2luZyBpcwo+IGV2ZXIgZW5hYmxlZCAoaXQgYnJlYWtzIHNpbmdsZSBpbWFnZSkuIFRoZSBj
+b21waWxlciB1c2VzIEdDUl9FTDEgdG8KPiBnZW5lcmF0ZSBkaWZmZXJlbnQgY29sb3VycyBmb3Ig
+dmFyaWFibGVzIG9uIHRoZSBzdGFjayBhbmQgY2hhbmdpbmcgaXQgaW4KPiB0aGUgbWlkZGxlIG9m
+IGEgZnVuY3Rpb24gbWF5IGNhdXNlIGNvbmZ1c2lvbi4gWW91J2QgaGF2ZSB0byBzZXQKPiBQU1RB
+VEUuVENPIGZvciB0aGUgd2hvbGUgZnVuY3Rpb24sIGVpdGhlciBmcm9tIHRoZSBjYWxsZXIgb3Is
+IGlmIHRoZQo+IGNvbXBpbGVyIGdldHMgc21hcnRlciwgc29tZSBmdW5jdGlvbiBhdHRyaWJ1dGUu
+Cj4gCgpJZiB0aGUgY29tcGlsZXIgbWlnaHQgc3RhcnQgcGxheWluZyB3aXRoIFRDTyB0aGVuIHRo
+aXMgY291bGQgYWxzbyBiZSBhbiAKaXNzdWUgZm9yIFZNTXMgd2hpY2ggd2lsbCAoYXQgbGVhc3Qg
+d2l0aCB0aGUgY3VycmVudCBkZXNpZ24pIG5lZWQgdG8gdXNlIApUQ08gdG8gc2FmZWx5IGFjY2Vz
+cyBndWVzdCBtZW1vcnkuIEVzcGVjaWFsbHkgaWYgd2UgZW5mb3JjZSBQUk9UX01URSAKbWFwcGlu
+Z3MgZm9yIHRoZSBWTU0uCgpTdGV2ZQpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJp
+YS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1h
+cm0K
