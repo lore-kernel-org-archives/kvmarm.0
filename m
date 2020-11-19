@@ -2,66 +2,82 @@ Return-Path: <SRS0=Ckwh=EZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 355B5C2D0E4
-	for <kvmarm@archiver.kernel.org>; Thu, 19 Nov 2020 12:46:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70003C63697
+	for <kvmarm@archiver.kernel.org>; Thu, 19 Nov 2020 13:41:54 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 71D11246B8
-	for <kvmarm@archiver.kernel.org>; Thu, 19 Nov 2020 12:46:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71D11246B8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 8CC1E22255
+	for <kvmarm@archiver.kernel.org>; Thu, 19 Nov 2020 13:41:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="qfy27wPY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CC1E22255
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B86384B488;
-	Thu, 19 Nov 2020 07:46:35 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C7C2F4B3BC;
+	Thu, 19 Nov 2020 08:41:52 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id YVx4TwkjY66I; Thu, 19 Nov 2020 07:46:34 -0500 (EST)
+	with ESMTP id oFL+OfTKWL61; Thu, 19 Nov 2020 08:41:51 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 84EF64B47F;
-	Thu, 19 Nov 2020 07:46:34 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B5504B450;
+	Thu, 19 Nov 2020 08:41:51 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E38164B406
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2020 07:46:33 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 99FAA4B403
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2020 08:41:49 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PMkME5GlqPBU for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 Nov 2020 07:46:28 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B39C04B3E3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2020 07:46:28 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6039A1396;
- Thu, 19 Nov 2020 04:46:28 -0800 (PST)
-Received: from [192.168.1.179] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EFEED3F718;
- Thu, 19 Nov 2020 04:46:25 -0800 (PST)
-Subject: Re: [PATCH v4 1/2] arm64: kvm: Save/restore MTE registers
-To: Catalin Marinas <catalin.marinas@arm.com>
-References: <20201026155727.36685-1-steven.price@arm.com>
- <20201026155727.36685-2-steven.price@arm.com>
- <b8f2fe15e0cab5c24094915b8c000930@kernel.org>
- <98eaa539-0ae8-ce4c-8886-3040542ede80@arm.com> <X7VTsaO/7+Izqm8/@trantor>
-From: Steven Price <steven.price@arm.com>
-Message-ID: <f5e9fe3a-2147-4326-5e78-5eaf88c72789@arm.com>
-Date: Thu, 19 Nov 2020 12:45:54 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ with ESMTP id 3oue3eMj11t6 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 Nov 2020 08:41:48 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 460714B3BC
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2020 08:41:48 -0500 (EST)
+Received: from mail-oi1-f180.google.com (mail-oi1-f180.google.com
+ [209.85.167.180])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id EE8D8246D3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2020 13:41:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1605793307;
+ bh=9O8JPvEoprFeeaXOpqPUadNdKTFI9oBlMrMXK00ChI8=;
+ h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+ b=qfy27wPYWLgm4Zy3VvVfpA+DGsIjLvnT8P8fWTBqtwSFIeKZ4RZoybqgch8UF7DzU
+ aj51T3m18bx7BflqHH00KWHpEEuBwbPuNa+yKOdp0eqr6u1LWj+a9cv0/q4sEksdRp
+ xtd3L2090Q0Yuuxg7rHjBR2LVo3UD5EATNlKYxiA=
+Received: by mail-oi1-f180.google.com with SMTP id s18so5188277oih.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2020 05:41:46 -0800 (PST)
+X-Gm-Message-State: AOAM533t3TxW4j2WRhswt9wwzLnvS9nii1KoR98QrsudiT69io7PsA8p
+ pNqfMew+XJnr1DHEnX5IqCiS1TBzy+aSiLg2uYk=
+X-Google-Smtp-Source: ABdhPJzlk8WOe6gGnaue7l6s6kAkAYGjtGZxJ1XCUSxUCtC/5rRnyw1ofeqtfdLzfQMS6GFudb+FtXtrfjOXBPZ0QoQ=
+X-Received: by 2002:aca:5c82:: with SMTP id q124mr2876715oib.33.1605793306082; 
+ Thu, 19 Nov 2020 05:41:46 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <X7VTsaO/7+Izqm8/@trantor>
-Content-Language: en-GB
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
- Marc Zyngier <maz@kernel.org>, Juan Quintela <quintela@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
- Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org,
- Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+References: <20201113182435.64015-1-andre.przywara@arm.com>
+ <20201113182435.64015-5-andre.przywara@arm.com>
+In-Reply-To: <20201113182435.64015-5-andre.przywara@arm.com>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Thu, 19 Nov 2020 14:41:34 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXFMzSKO7yMRSz55Au_kRr=zLT_2tZA_+JNDfJ+osfjkKg@mail.gmail.com>
+Message-ID: <CAMj1kXFMzSKO7yMRSz55Au_kRr=zLT_2tZA_+JNDfJ+osfjkKg@mail.gmail.com>
+Subject: Re: [PATCH v3 4/5] arm64: Add support for SMCCC TRNG entropy source
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>,
+ Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Theodore Ts'o <tytso@mit.edu>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Linus Walleij <linus.walleij@linaro.org>, Russell King <linux@armlinux.org.uk>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Mark Brown <broonie@kernel.org>, Sudeep Holla <sudeep.holla@arm.com>,
+ Will Deacon <will@kernel.org>, kvmarm <kvmarm@lists.cs.columbia.edu>,
+ Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,73 +89,194 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gMTgvMTEvMjAyMCAxNzowMiwgQ2F0YWxpbiBNYXJpbmFzIHdyb3RlOgo+IE9uIFdlZCwgTm92
-IDE4LCAyMDIwIGF0IDA0OjAxOjE4UE0gKzAwMDAsIFN0ZXZlbiBQcmljZSB3cm90ZToKPj4gT24g
-MTcvMTEvMjAyMCAxOToyMCwgTWFyYyBaeW5naWVyIHdyb3RlOgo+Pj4gT24gMjAyMC0xMC0yNiAx
-NTo1NywgU3RldmVuIFByaWNlIHdyb3RlOgo+Pj4+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2lu
-Y2x1ZGUvYXNtL3N5c3JlZy5oCj4+Pj4gYi9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL3N5c3JlZy5o
-Cj4+Pj4gaW5kZXggZDUyYzFiM2NlNTg5Li43NzI3ZGYwYmMwOWQgMTAwNjQ0Cj4+Pj4gLS0tIGEv
-YXJjaC9hcm02NC9pbmNsdWRlL2FzbS9zeXNyZWcuaAo+Pj4+ICsrKyBiL2FyY2gvYXJtNjQvaW5j
-bHVkZS9hc20vc3lzcmVnLmgKPj4+PiBAQCAtNTY1LDcgKzU2NSw4IEBACj4+Pj4gw6/Cv8K9I2Rl
-ZmluZSBTQ1RMUl9FTHhfTcOvwr/CvcOvwr/CvcOvwr/CvSAoQklUKDApKQo+Pj4+Cj4+Pj4gw6/C
-v8K9I2RlZmluZSBTQ1RMUl9FTHhfRkxBR1PDr8K/wr3Dr8K/wr3Dr8K/wr0gKFNDVExSX0VMeF9N
-w6/Cv8K9IHwgU0NUTFJfRUx4X0EgfCBTQ1RMUl9FTHhfQyB8IFwKPj4+PiAtw6/Cv8K9w6/Cv8K9
-w6/Cv8K9w6/Cv8K9w6/Cv8K9w6/Cv8K9w6/Cv8K9w6/Cv8K9w6/Cv8K9w6/Cv8K9w6/Cv8K9w6/C
-v8K9IFNDVExSX0VMeF9TQSB8IFNDVExSX0VMeF9JIHwgU0NUTFJfRUx4X0lFU0IpCj4+Pj4gK8Ov
-wr/CvcOvwr/CvcOvwr/CvcOvwr/CvcOvwr/CvcOvwr/CvcOvwr/CvcOvwr/CvcOvwr/CvcOvwr/C
-vcOvwr/CvcOvwr/CvSBTQ1RMUl9FTHhfU0EgfCBTQ1RMUl9FTHhfSSB8IFNDVExSX0VMeF9JRVNC
-IHwgXAo+Pj4+ICvDr8K/wr3Dr8K/wr3Dr8K/wr3Dr8K/wr3Dr8K/wr3Dr8K/wr3Dr8K/wr3Dr8K/
-wr3Dr8K/wr3Dr8K/wr3Dr8K/wr3Dr8K/wr0gU0NUTFJfRUx4X0lURlNCKQo+Pj4+Cj4+Pj4gw6/C
-v8K9LyogU0NUTFJfRUwyIHNwZWNpZmljIGZsYWdzLiAqLwo+Pj4+IMOvwr/CvSNkZWZpbmUgU0NU
-TFJfRUwyX1JFUzHDr8K/wr3Dr8K/wr3Dr8K/wr0gKChCSVQoNCkpw6/Cv8K9IHwgKEJJVCg1KSnD
-r8K/wr0gfCAoQklUKDExKSkgfAo+Pj4+IChCSVQoMTYpKSB8IFwKPj4+PiBkaWZmIC0tZ2l0IGEv
-YXJjaC9hcm02NC9rdm0vaHlwL2luY2x1ZGUvaHlwL3N5c3JlZy1zci5oCj4+Pj4gYi9hcmNoL2Fy
-bTY0L2t2bS9oeXAvaW5jbHVkZS9oeXAvc3lzcmVnLXNyLmgKPj4+PiBpbmRleCA3YTk4NjAzMDE0
-NWYuLmExMjRmZmE0OWJhMyAxMDA2NDQKPj4+PiAtLS0gYS9hcmNoL2FybTY0L2t2bS9oeXAvaW5j
-bHVkZS9oeXAvc3lzcmVnLXNyLmgKPj4+PiArKysgYi9hcmNoL2FybTY0L2t2bS9oeXAvaW5jbHVk
-ZS9oeXAvc3lzcmVnLXNyLmgKPj4+PiBAQCAtMTgsNiArMTgsMTEgQEAKPj4+PiDDr8K/wr1zdGF0
-aWMgaW5saW5lIHZvaWQgX19zeXNyZWdfc2F2ZV9jb21tb25fc3RhdGUoc3RydWN0Cj4+Pj4ga3Zt
-X2NwdV9jb250ZXh0ICpjdHh0KQo+Pj4+IMOvwr/CvXsKPj4+PiDDr8K/wr3Dr8K/wr3Dr8K/wr3D
-r8K/wr0gY3R4dF9zeXNfcmVnKGN0eHQsIE1EU0NSX0VMMSnDr8K/wr3Dr8K/wr3Dr8K/wr0gPSBy
-ZWFkX3N5c3JlZyhtZHNjcl9lbDEpOwo+Pj4+ICvDr8K/wr3Dr8K/wr3Dr8K/wr0gaWYgKHN5c3Rl
-bV9zdXBwb3J0c19tdGUoKSkgewo+Pj4+ICvDr8K/wr3Dr8K/wr3Dr8K/wr3Dr8K/wr3Dr8K/wr3D
-r8K/wr3Dr8K/wr0gY3R4dF9zeXNfcmVnKGN0eHQsIFJHU1JfRUwxKcOvwr/CvcOvwr/CvcOvwr/C
-vSA9IHJlYWRfc3lzcmVnX3MoU1lTX1JHU1JfRUwxKTsKPj4+PiArw6/Cv8K9w6/Cv8K9w6/Cv8K9
-w6/Cv8K9w6/Cv8K9w6/Cv8K9w6/Cv8K9IGN0eHRfc3lzX3JlZyhjdHh0LCBHQ1JfRUwxKcOvwr/C
-vcOvwr/CvcOvwr/CvSA9IHJlYWRfc3lzcmVnX3MoU1lTX0dDUl9FTDEpOwo+Pj4+ICvDr8K/wr3D
-r8K/wr3Dr8K/wr3Dr8K/wr3Dr8K/wr3Dr8K/wr3Dr8K/wr0gY3R4dF9zeXNfcmVnKGN0eHQsIFRG
-U1JFMF9FTDEpw6/Cv8K9w6/Cv8K9w6/Cv8K9ID0KPj4+PiByZWFkX3N5c3JlZ19zKFNZU19URlNS
-RTBfRUwxKTsKPj4+Cj4+PiBBcyBmYXIgYXMgSSBjYW4gdGVsbCwgSENSX0VMMi5BVEEgaXMgc3Rp
-bGwgY2xlYXIgd2hlbiBydW5uaW5nIGEgZ3Vlc3QuCj4+PiBTbyB3aHksIGRvIHdlIHNhdmUvcmVz
-dG9yZSB0aGlzIHN0YXRlIHlldD8KPj4+Cj4+PiBBbHNvLCBJIHdvbmRlciB3aGV0aGVyIHdlIHNo
-b3VsZCBrZWVwIHRoZXNlIGluIHRoZSBDIGNvZGUuIElmIG9uZSBkYXkKPj4+IHdlIGVuYWJsZSBN
-VEUgaW4gdGhlIGtlcm5lbCwgd2Ugd2lsbCBoYXZlIHRvIG1vdmUgdGhlbSB0byB0aGUgYXNzZW1i
-bHkKPj4+IHBhcnQsIG11Y2ggbGlrZSB3ZSBkbyBmb3IgUEF1dGguIEFuZCBJIGZlYXIgdGhhdCAi
-b25lIGRheSIgaXMgcHJldHR5Cj4+PiBzb29uOgo+Pj4KPj4+IGh0dHBzOi8vbG9yZS5rZXJuZWwu
-b3JnL2xpbnV4LWFybS1rZXJuZWwvY292ZXIuMTYwNTA0NjE5Mi5naXQuYW5kcmV5a252bEBnb29n
-bGUuY29tLwo+Pgo+PiBHb29kIHBvaW50LiBBbHRob3VnaCBmb3IgTVRFIHdlIGRvIGhhdmUgdGhl
-IG9wdGlvbiBvZiBzZXR0aW5nIFRDTyBpbiBQU1RBVEUKPj4gc28gdGhpcyBjb3VsZCByZW1haW4g
-aW4gQyBpZiB3ZSdyZSBub3QgYm90aGVyZWQgYWJvdXQgdGhlICdnYXAnIGluIEtBU0FOCj4+IGNv
-dmVyYWdlLiBJIGhhdmVuJ3QgeWV0IGdvdCBteSBoZWFkIGFyb3VuZCBob3cgKG9yIGluZGVlZCBp
-ZikgdGhhdCBzZXJpZXMKPj4gaGFuZGxlcyBndWVzdHMuCj4gCj4gSSB0aGluayB3ZSBzaG91bGQg
-YmUgZmluZSB3aXRoIHRoZSBjdXJyZW50bHkgcHJvcG9zZWQgaW4ta2VybmVsIE1URQo+IHN1cHBv
-cnQuIEhvd2V2ZXIsIHNldHRpbmcgR0NSX0VMMSBjYW4gZ2V0IGluIHRoZSB3YXkgaWYgc3RhY2sg
-dGFnZ2luZyBpcwo+IGV2ZXIgZW5hYmxlZCAoaXQgYnJlYWtzIHNpbmdsZSBpbWFnZSkuIFRoZSBj
-b21waWxlciB1c2VzIEdDUl9FTDEgdG8KPiBnZW5lcmF0ZSBkaWZmZXJlbnQgY29sb3VycyBmb3Ig
-dmFyaWFibGVzIG9uIHRoZSBzdGFjayBhbmQgY2hhbmdpbmcgaXQgaW4KPiB0aGUgbWlkZGxlIG9m
-IGEgZnVuY3Rpb24gbWF5IGNhdXNlIGNvbmZ1c2lvbi4gWW91J2QgaGF2ZSB0byBzZXQKPiBQU1RB
-VEUuVENPIGZvciB0aGUgd2hvbGUgZnVuY3Rpb24sIGVpdGhlciBmcm9tIHRoZSBjYWxsZXIgb3Is
-IGlmIHRoZQo+IGNvbXBpbGVyIGdldHMgc21hcnRlciwgc29tZSBmdW5jdGlvbiBhdHRyaWJ1dGUu
-Cj4gCgpJZiB0aGUgY29tcGlsZXIgbWlnaHQgc3RhcnQgcGxheWluZyB3aXRoIFRDTyB0aGVuIHRo
-aXMgY291bGQgYWxzbyBiZSBhbiAKaXNzdWUgZm9yIFZNTXMgd2hpY2ggd2lsbCAoYXQgbGVhc3Qg
-d2l0aCB0aGUgY3VycmVudCBkZXNpZ24pIG5lZWQgdG8gdXNlIApUQ08gdG8gc2FmZWx5IGFjY2Vz
-cyBndWVzdCBtZW1vcnkuIEVzcGVjaWFsbHkgaWYgd2UgZW5mb3JjZSBQUk9UX01URSAKbWFwcGlu
-Z3MgZm9yIHRoZSBWTU0uCgpTdGV2ZQpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJp
-YS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1h
-cm0K
+On Fri, 13 Nov 2020 at 19:24, Andre Przywara <andre.przywara@arm.com> wrote:
+>
+> The ARM architected TRNG firmware interface, described in ARM spec
+> DEN0098, defines an ARM SMCCC based interface to a true random number
+> generator, provided by firmware.
+> This can be discovered via the SMCCC >=v1.1 interface, and provides
+> up to 192 bits of entropy per call.
+>
+> Hook this SMC call into arm64's arch_get_random_*() implementation,
+> coming to the rescue when the CPU does not implement the ARM v8.5 RNG
+> system registers.
+>
+> For the detection, we piggy back on the PSCI/SMCCC discovery (which gives
+> us the conduit to use (hvc/smc)), then try to call the
+> ARM_SMCCC_TRNG_VERSION function, which returns -1 if this interface is
+> not implemented.
+>
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+>  arch/arm64/include/asm/archrandom.h | 69 ++++++++++++++++++++++++-----
+>  1 file changed, 58 insertions(+), 11 deletions(-)
+>
+> diff --git a/arch/arm64/include/asm/archrandom.h b/arch/arm64/include/asm/archrandom.h
+> index abe07c21da8e..fe34bfd30caa 100644
+> --- a/arch/arm64/include/asm/archrandom.h
+> +++ b/arch/arm64/include/asm/archrandom.h
+> @@ -4,13 +4,24 @@
+>
+>  #ifdef CONFIG_ARCH_RANDOM
+>
+> +#include <linux/arm-smccc.h>
+>  #include <linux/bug.h>
+>  #include <linux/kernel.h>
+>  #include <asm/cpufeature.h>
+>
+> +#define ARM_SMCCC_TRNG_MIN_VERSION     0x10000UL
+> +
+> +extern bool smccc_trng_available;
+> +
+>  static inline bool __init smccc_probe_trng(void)
+>  {
+> -       return false;
+> +       struct arm_smccc_res res;
+> +
+> +       arm_smccc_1_1_invoke(ARM_SMCCC_TRNG_VERSION, &res);
+> +       if ((s32)res.a0 < 0)
+> +               return false;
+> +
+> +       return res.a0 >= ARM_SMCCC_TRNG_MIN_VERSION;
+>  }
+>
+>  static inline bool __arm64_rndr(unsigned long *v)
+> @@ -43,26 +54,52 @@ static inline bool __must_check arch_get_random_int(unsigned int *v)
+>
+>  static inline bool __must_check arch_get_random_seed_long(unsigned long *v)
+>  {
+> +       struct arm_smccc_res res;
+> +
+>         /*
+>          * Only support the generic interface after we have detected
+>          * the system wide capability, avoiding complexity with the
+>          * cpufeature code and with potential scheduling between CPUs
+>          * with and without the feature.
+>          */
+> -       if (!cpus_have_const_cap(ARM64_HAS_RNG))
+> -               return false;
+> +       if (cpus_have_const_cap(ARM64_HAS_RNG))
+> +               return __arm64_rndr(v);
+>
+> -       return __arm64_rndr(v);
+> -}
+> +       if (smccc_trng_available) {
+> +               arm_smccc_1_1_invoke(ARM_SMCCC_TRNG_RND64, 64, &res);
+> +               if ((int)res.a0 < 0)
+> +                       return false;
+>
+> +               *v = res.a3;
+> +               return true;
+> +       }
+> +
+> +       return false;
+> +}
+>
+
+I think we should be more rigorous here in how we map the concepts of
+random seeds and random numbers onto the various sources.
+
+First of all, assuming my patch dropping the call to
+arch_get_random_seed_long() from add_interrupt_randomness() gets
+accepted, we should switch to RNDRRS here, and implement the non-seed
+variants using RNDR.
+
+However, this is still semantically inaccurate: RNDRRS does not return
+a random *seed*, it returns a number drawn from a freshly seeded
+pseudo-random sequence. This means that the TRNG interface, if
+implemented, is a better choice, and so we should try it first. Note
+that on platforms that don't implement both, only one of these will be
+available in the first place. But on platforms that *do* implement
+both, the firmware interface may actually be less wasteful in terms of
+resources: the TRNG interface returns every bit drawn from the
+underlying entropy source, whereas RNDRRS uses ~500 bits of entropy to
+reseed a DRBG that gets used only once to draw a single 64-bit number.
+And the cost of the SMCCC call in terms of CPU time is charged to the
+caller, which is appropriate here.
+
+Then, I don't think we should ever return false without even trying if
+RNDRRS is available if the SMCCC invocation fails.
+
+Something like this perhaps?
+
+if (smccc_trng_available) {
+  arm_smccc_1_1_invoke(ARM_SMCCC_TRNG_RND64, 64, &res);
+  if ((int)res.a0 >= 0) {
+    *v = res.a3;
+    return true;
+  }
+}
+
+if (cpus_have_const_cap(ARM64_HAS_RNG))
+   return __arm64_rndrrs(v);
+
+return false;
+
+(and something similar 2x below)
+
+
+>  static inline bool __must_check arch_get_random_seed_int(unsigned int *v)
+>  {
+> +       struct arm_smccc_res res;
+>         unsigned long val;
+> -       bool ok = arch_get_random_seed_long(&val);
+>
+> -       *v = val;
+> -       return ok;
+> +       if (cpus_have_const_cap(ARM64_HAS_RNG)) {
+> +               if (arch_get_random_seed_long(&val)) {
+> +                       *v = val;
+> +                       return true;
+> +               }
+> +               return false;
+> +       }
+> +
+> +       if (smccc_trng_available) {
+> +               arm_smccc_1_1_invoke(ARM_SMCCC_TRNG_RND64, 32, &res);
+> +               if ((int)res.a0 < 0)
+> +                       return false;
+> +
+> +               *v = res.a3 & GENMASK(31, 0);
+> +               return true;
+> +       }
+> +
+> +       return false;
+>  }
+>
+>  static inline bool __init __early_cpu_has_rndr(void)
+> @@ -77,10 +114,20 @@ arch_get_random_seed_long_early(unsigned long *v)
+>  {
+>         WARN_ON(system_state != SYSTEM_BOOTING);
+>
+> -       if (!__early_cpu_has_rndr())
+> -               return false;
+> +       if (__early_cpu_has_rndr())
+> +               return __arm64_rndr(v);
+> +
+> +       if (smccc_trng_available) {
+> +               struct arm_smccc_res res;
+>
+> -       return __arm64_rndr(v);
+> +               arm_smccc_1_1_invoke(ARM_SMCCC_TRNG_RND64, 64, &res);
+> +               if ((int)res.a0 >= 0) {
+> +                       *v = res.a3;
+> +                       return true;
+> +               }
+> +       }
+> +
+> +       return false;
+>  }
+>  #define arch_get_random_seed_long_early arch_get_random_seed_long_early
+>
+> --
+> 2.17.1
+>
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
