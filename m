@@ -2,61 +2,89 @@ Return-Path: <SRS0=Ckwh=EZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A533C56201
-	for <kvmarm@archiver.kernel.org>; Thu, 19 Nov 2020 15:39:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A46C1C56201
+	for <kvmarm@archiver.kernel.org>; Thu, 19 Nov 2020 15:45:58 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8600F24698
-	for <kvmarm@archiver.kernel.org>; Thu, 19 Nov 2020 15:39:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8600F24698
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 9BDC72224A
+	for <kvmarm@archiver.kernel.org>; Thu, 19 Nov 2020 15:45:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yd+dDD5s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BDC72224A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 08EC64B3BB;
-	Thu, 19 Nov 2020 10:39:21 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 065714B30D;
+	Thu, 19 Nov 2020 10:45:57 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6Iz72GkJnqrP; Thu, 19 Nov 2020 10:39:19 -0500 (EST)
+	with ESMTP id 9X7R6Omfaoc8; Thu, 19 Nov 2020 10:45:55 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BED8A4B502;
-	Thu, 19 Nov 2020 10:39:19 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CE0C14B31F;
+	Thu, 19 Nov 2020 10:45:55 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 30C9A4B4FC
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2020 10:39:18 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 962144B30E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2020 10:45:54 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CzHS9bnla64S for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 Nov 2020 10:39:16 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A68D24B51E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2020 10:39:15 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5B25015A2;
- Thu, 19 Nov 2020 07:39:15 -0800 (PST)
-Received: from e112269-lin.arm.com (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B721D3F719;
- Thu, 19 Nov 2020 07:39:12 -0800 (PST)
-From: Steven Price <steven.price@arm.com>
-To: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>
-Subject: [PATCH v5 2/2] arm64: kvm: Introduce MTE VCPU feature
-Date: Thu, 19 Nov 2020 15:39:01 +0000
-Message-Id: <20201119153901.53705-3-steven.price@arm.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20201119153901.53705-1-steven.price@arm.com>
-References: <20201119153901.53705-1-steven.price@arm.com>
+ with ESMTP id UWzEUx9PVxRU for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 Nov 2020 10:45:53 -0500 (EST)
+Received: from mail-ej1-f68.google.com (mail-ej1-f68.google.com
+ [209.85.218.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3C7344B30D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2020 10:45:53 -0500 (EST)
+Received: by mail-ej1-f68.google.com with SMTP id oq3so8545595ejb.7
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2020 07:45:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=45e0VgNBbvYnn00UZUV/75YCSw3FH7awq7f1yZmGnIA=;
+ b=yd+dDD5sCyrZHocr/ApiPlXl8Vodq1TGFhwOHBFO8f6IhOtQwsioH35yKK7UONHdH5
+ TitQsHK6lA8fYRer+u4YnGR1szOVLD1j7PQF214pS7Ce6d2fyplN4xEO63Z0fMf+eo5F
+ +D7s7HaiYkc1/gXas5BwAL1r0YHLx3mzjYUBJ3VVkquNN71MOzWoSStwN2EHOedXyFIr
+ Ro9F1WQY4P81qMbCgNbC/Ev/imG/WmHAd4i9hs/qUPN2WgCzFgjiXtJGT7k0K/b08nuD
+ 3c0yMqnN3mBXKuySRziRYw0DuO4lMXk7AGWqZHMjPIhhmOGjOj8ao0ADRhK4NexKY+xa
+ jw1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=45e0VgNBbvYnn00UZUV/75YCSw3FH7awq7f1yZmGnIA=;
+ b=Y0FiG8rBNDD5lOERI3tYnR4fxQsCUdMo7nj7/f/p4YveVW2MS94yKVg/L3G9xrCAtp
+ k1f/Ip15bIDZIIfpv0lAKgSaTFdvzjl9+5jPxtmQQd/q2Rk4mK/G9wBdnykyS7eCKiST
+ r4OHWZKdQv610gwpQgplWHU8SXrvuXg9AqHcyb+sB4N54QCpCc++97GmPDWfb1cGG8DU
+ j2l0QFxye5r5M88fXPnKm390HfDYgVJWoVYtda9MGilQGF1Bmil8T496wKfL+uDMyJtg
+ hwH3csF9WKPEbRySFLKa5wI3K68L5ZjeJtfWqEh13XtHq+tV/XTM3AQtdLWIcjXJ0oPf
+ Qr6Q==
+X-Gm-Message-State: AOAM531sgh3XduIBhF8cz4s+6ozWWCLCbzacezOor8UnO2CROLYsxbVW
+ zJSc/TZgauuDTol1OMZLZghBqqfEhgd7hquRr2iUuQ==
+X-Google-Smtp-Source: ABdhPJwerYJJayn5lWpV2YdXL6eFXH1urcMvWimgMV3daCqtLlvmtu4pEM2RJAtpVko5A8pZi6+uXKrICI4dBfpc4FU=
+X-Received: by 2002:a17:906:6896:: with SMTP id
+ n22mr30365553ejr.56.1605800751989; 
+ Thu, 19 Nov 2020 07:45:51 -0800 (PST)
 MIME-Version: 1.0
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
- Dave Martin <Dave.Martin@arm.com>, Juan Quintela <quintela@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
- Steven Price <steven.price@arm.com>, Thomas Gleixner <tglx@linutronix.de>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+References: <20201119153901.53705-1-steven.price@arm.com>
+In-Reply-To: <20201119153901.53705-1-steven.price@arm.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 19 Nov 2020 15:45:40 +0000
+Message-ID: <CAFEAcA85fiqA206FuFANKbV_3GkfY1F8Gv7MP58BgTT81bs9kA@mail.gmail.com>
+Subject: Re: [PATCH v5 0/2] MTE support for KVM guest
+To: Steven Price <steven.price@arm.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Juan Quintela <quintela@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Dave Martin <Dave.Martin@arm.com>,
+ arm-mail-list <linux-arm-kernel@lists.infradead.org>,
+ Marc Zyngier <maz@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+ Will Deacon <will@kernel.org>, kvmarm <kvmarm@lists.cs.columbia.edu>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,139 +101,26 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add a new VM feature 'KVM_ARM_CAP_MTE' which enables memory tagging
-for a VM. This exposes the feature to the guest and requires the VMM to
-have set PROT_MTE on all mappings exposed to the guest. This ensures
-that the guest cannot see stale tags, and that the tags are correctly
-saved/restored across swap.
+On Thu, 19 Nov 2020 at 15:39, Steven Price <steven.price@arm.com> wrote:
+> This series adds support for Arm's Memory Tagging Extension (MTE) to
+> KVM, allowing KVM guests to make use of it. This builds on the existing
+> user space support already in v5.10-rc1, see [1] for an overview.
 
-Signed-off-by: Steven Price <steven.price@arm.com>
----
- arch/arm64/include/asm/kvm_emulate.h | 3 +++
- arch/arm64/include/asm/kvm_host.h    | 4 ++++
- arch/arm64/kvm/arm.c                 | 9 +++++++++
- arch/arm64/kvm/mmu.c                 | 6 ++++++
- arch/arm64/kvm/sys_regs.c            | 6 +++++-
- include/uapi/linux/kvm.h             | 1 +
- 6 files changed, 28 insertions(+), 1 deletion(-)
+> The change to require the VMM to map all guest memory PROT_MTE is
+> significant as it means that the VMM has to deal with the MTE tags even
+> if it doesn't care about them (e.g. for virtual devices or if the VMM
+> doesn't support migration). Also unfortunately because the VMM can
+> change the memory layout at any time the check for PROT_MTE/VM_MTE has
+> to be done very late (at the point of faulting pages into stage 2).
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 5ef2669ccd6c..7791ef044b7f 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -79,6 +79,9 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
- 	if (cpus_have_const_cap(ARM64_MISMATCHED_CACHE_TYPE) ||
- 	    vcpu_el1_is_32bit(vcpu))
- 		vcpu->arch.hcr_el2 |= HCR_TID2;
-+
-+	if (kvm_has_mte(vcpu->kvm))
-+		vcpu->arch.hcr_el2 |= HCR_ATA;
- }
- 
- static inline unsigned long *vcpu_hcr(struct kvm_vcpu *vcpu)
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index d3e136343468..aeff10bc5b31 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -120,6 +120,8 @@ struct kvm_arch {
- 	unsigned int pmuver;
- 
- 	u8 pfr0_csv2;
-+	/* Memory Tagging Extension enabled for the guest */
-+	bool mte_enabled;
- };
- 
- struct kvm_vcpu_fault_info {
-@@ -658,4 +660,6 @@ bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
- #define kvm_arm_vcpu_sve_finalized(vcpu) \
- 	((vcpu)->arch.flags & KVM_ARM64_VCPU_SVE_FINALIZED)
- 
-+#define kvm_has_mte(kvm) (system_supports_mte() && (kvm)->arch.mte_enabled)
-+
- #endif /* __ARM64_KVM_HOST_H__ */
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index c0ffb019ca8b..da4aeba1855c 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -89,6 +89,12 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 		r = 0;
- 		kvm->arch.return_nisv_io_abort_to_user = true;
- 		break;
-+	case KVM_CAP_ARM_MTE:
-+		if (!system_supports_mte() || kvm->created_vcpus)
-+			return -EINVAL;
-+		r = 0;
-+		kvm->arch.mte_enabled = true;
-+		break;
- 	default:
- 		r = -EINVAL;
- 		break;
-@@ -226,6 +232,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		 */
- 		r = 1;
- 		break;
-+	case KVM_CAP_ARM_MTE:
-+		r = system_supports_mte();
-+		break;
- 	case KVM_CAP_STEAL_TIME:
- 		r = kvm_arm_pvtime_supported();
- 		break;
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 1a01da9fdc99..f804d2109b8c 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -815,6 +815,12 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (vma_pagesize == PMD_SIZE || vma_pagesize == PUD_SIZE)
- 		fault_ipa &= ~(vma_pagesize - 1);
- 
-+	/* VMA regions must be mapped with PROT_MTE when VM has MTE enabled */
-+	if (kvm_has_mte(kvm) && !(vma->vm_flags & VM_MTE)) {
-+		pr_err_ratelimited("Page not mapped VM_MTE in MTE guest\n");
-+		return -EFAULT;
-+	}
-+
- 	gfn = fault_ipa >> PAGE_SHIFT;
- 	mmap_read_unlock(current->mm);
- 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 4792d5249f07..469b0ef3eb07 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1123,7 +1123,8 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
- 		val &= ~(0xfUL << ID_AA64PFR0_CSV2_SHIFT);
- 		val |= ((u64)vcpu->kvm->arch.pfr0_csv2 << ID_AA64PFR0_CSV2_SHIFT);
- 	} else if (id == SYS_ID_AA64PFR1_EL1) {
--		val &= ~(0xfUL << ID_AA64PFR1_MTE_SHIFT);
-+		if (!kvm_has_mte(vcpu->kvm))
-+			val &= ~(0xfUL << ID_AA64PFR1_MTE_SHIFT);
- 	} else if (id == SYS_ID_AA64ISAR1_EL1 && !vcpu_has_ptrauth(vcpu)) {
- 		val &= ~((0xfUL << ID_AA64ISAR1_APA_SHIFT) |
- 			 (0xfUL << ID_AA64ISAR1_API_SHIFT) |
-@@ -1369,6 +1370,9 @@ static bool access_ccsidr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- static unsigned int mte_visibility(const struct kvm_vcpu *vcpu,
- 				   const struct sys_reg_desc *rd)
- {
-+	if (kvm_has_mte(vcpu->kvm))
-+		return 0;
-+
- 	return REG_HIDDEN;
- }
- 
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index ca41220b40b8..3e6fb5b580a9 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1053,6 +1053,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_X86_USER_SPACE_MSR 188
- #define KVM_CAP_X86_MSR_FILTER 189
- #define KVM_CAP_ENFORCE_PV_FEATURE_CPUID 190
-+#define KVM_CAP_ARM_MTE 191
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
--- 
-2.20.1
+I'm a bit dubious about requring the VMM to map the guest memory
+PROT_MTE unless somebody's done at least a sketch of the design
+for how this would work on the QEMU side. Currently QEMU just
+assumes the guest memory is guest memory and it can access it
+without special precautions...
 
+thanks
+-- PMM
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
