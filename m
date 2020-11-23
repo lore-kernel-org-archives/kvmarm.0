@@ -2,99 +2,92 @@ Return-Path: <SRS0=PaY3=E5=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61875C388F9
-	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 13:52:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 612CAC388F9
+	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 13:53:05 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7EB1A20729
-	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 13:52:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B771820729
+	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 13:53:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="BgBnJ8EK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EB1A20729
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="1DmGyMg9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B771820729
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CFDB04BB61;
-	Mon, 23 Nov 2020 08:51:59 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 532834BB4C;
+	Mon, 23 Nov 2020 08:53:04 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QwZ6EJu+c-0M; Mon, 23 Nov 2020 08:51:58 -0500 (EST)
+	with ESMTP id Gmn3A9aZ0vTK; Mon, 23 Nov 2020 08:53:02 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D4C94BB56;
-	Mon, 23 Nov 2020 08:51:58 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B87FB4BB5E;
+	Mon, 23 Nov 2020 08:53:02 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 43DC64BB4C
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 08:51:57 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 98C3F4BB4E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 08:53:01 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Av23S3O1X4fT for <kvmarm@lists.cs.columbia.edu>;
- Mon, 23 Nov 2020 08:51:56 -0500 (EST)
-Received: from mail-wm1-f65.google.com (mail-wm1-f65.google.com
- [209.85.128.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3BE714BB4A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 08:51:56 -0500 (EST)
-Received: by mail-wm1-f65.google.com with SMTP id a3so17309256wmb.5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 05:51:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=iaau9hhA1KFwy2KDmDsX/sn+tVvl77lzzmCiDGToHck=;
- b=BgBnJ8EK3bza/181q05p8iQXYs1RFznPl/Ry+CtkBEqrhmo0cDH+CdGkp84Kl7VtoZ
- 0MXDjoCuJ9ewJWRWvmxbHgQGAzkgtkHlr0ywKiw8rXqDO0ze1p7PzKWkFWH79bhxAqUI
- 6jIltWFyRts2sRBAUNyMtgisXoiwq3Nx0b7Lw2MIuZ2EflVqv6tUs2im41Nm2pDDGSjA
- Fa+wRpnl6JOqv2tiJ1BvZ3rfyLWW9eUD9WZ5Wyj/7MzePo1L4f3PEMUWioqIy/BYO5Nd
- 5RqoRi/8HhqjyyjHjaUmEyFGBFS2N9lGzNc7Zf9YgR/Viuf5HTyCR9maRGJ/6GB2ZKIh
- Jygw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=iaau9hhA1KFwy2KDmDsX/sn+tVvl77lzzmCiDGToHck=;
- b=uDUW/9DWRe1JqBlcImy0vLIZwei2Y1owdQ9OboKUhK+Ypkxw8pO43+2/rcx2TwSewT
- hPHh/06sHPkk8Y6FVgrxyWa9jvTdLuZQfPM/zhNCTvB8MCgaqM8uAyM7Wx3MA6PSnOKe
- F7CN0OlRqby0am/rrl6cf6iIY45L+WaTBJV4rX8SRcSBcq+/a+GEtulROigd/AqkXKSV
- ZwNK2yF1UwRXC3xpbeeZf6dDmwWpl6XayZeamkqioTjEU3Luy3VioU9Y8g+03gbYJMee
- Z6LAtDmDVEWg+36VAtv8UlSKOOZL8zwSESwAyyX5BBPeoQbervyLUV8pZCUOxUyC2tKv
- PiKA==
-X-Gm-Message-State: AOAM530W1V9oDcdsubgzJtZOlMm9KBcA6eBRw97o3IpnCJeGo7V3+/eD
- FGnCLnmDF8FqxuR2zxLpdaGKrw==
-X-Google-Smtp-Source: ABdhPJw2S0g7xc5LX0mjnROVXQEjQ1dcwMwqbjEh95H+sw1EIksGKfdkdpqjbz7CHSJ0dqI/brkrGw==
-X-Received: by 2002:a7b:c0cc:: with SMTP id s12mr23506422wmh.41.1606139515051; 
- Mon, 23 Nov 2020 05:51:55 -0800 (PST)
-Received: from google.com ([2a00:79e0:d:210:f693:9fff:fef4:a7ef])
- by smtp.gmail.com with ESMTPSA id j71sm17278653wmj.10.2020.11.23.05.51.54
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 23 Nov 2020 05:51:54 -0800 (PST)
-Date: Mon, 23 Nov 2020 13:51:51 +0000
-From: Quentin Perret <qperret@google.com>
-To: Fuad Tabba <tabba@google.com>
-Subject: Re: [RFC PATCH 13/27] KVM: arm64: Enable access to sanitized CPU
- features at EL2
-Message-ID: <20201123135151.GA490744@google.com>
-References: <20201117181607.1761516-1-qperret@google.com>
- <20201117181607.1761516-14-qperret@google.com>
- <CA+EHjTwebfoJLpure-mHNzCnmLwnNEi6yh66OLFGrhH_+ysExA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <CA+EHjTwebfoJLpure-mHNzCnmLwnNEi6yh66OLFGrhH_+ysExA@mail.gmail.com>
-Cc: "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE"
- <devicetree@vger.kernel.org>, kernel-team@android.com,
- Frank Rowand <frowand.list@gmail.com>, Android KVM <android-kvm@google.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- open list <linux-kernel@vger.kernel.org>, Rob Herring <robh+dt@kernel.org>,
- "moderated list:ARM64 PORT \(AARCH64 ARCHITECTURE\)"
- <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>,
- "open list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
- <kvmarm@lists.cs.columbia.edu>
+ with ESMTP id Qyb+bO1FnQGZ for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 23 Nov 2020 08:53:00 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 003D94BB4C
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 08:52:59 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id A6EBE206F1;
+ Mon, 23 Nov 2020 13:52:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1606139578;
+ bh=oUMhhreD7ORSVrrrxM5Yp8Xa1lT9bZsNE1HGqNx/qbI=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=1DmGyMg9eMalGYHoQw6TtxoithgNF2WCrrlalkPjTDIThefRks1IY2/MCE5C84fCn
+ UjCt0DR0TwRmheSneb3LDTFout9MOCchOC/G4VcMluASR3m91xpKn/QPgNQRr6rtu4
+ UunLVdT99666+RRSOwxISTl8mX8C5i2wWx6VcAYk=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1khCH1-00Cxvt-Is; Mon, 23 Nov 2020 13:52:56 +0000
+Date: Mon, 23 Nov 2020 13:52:54 +0000
+Message-ID: <87mtz85geh.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: David Brazdil <dbrazdil@google.com>
+Subject: Re: [PATCH v2 04/24] arm64: Move MAIR_EL1_SET to asm/memory.h
+In-Reply-To: <20201116204318.63987-5-dbrazdil@google.com>
+References: <20201116204318.63987-1-dbrazdil@google.com>
+ <20201116204318.63987-5-dbrazdil@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: dbrazdil@google.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+ catalin.marinas@arm.com, will@kernel.org, dennis@kernel.org, tj@kernel.org,
+ cl@linux.com, mark.rutland@arm.com, lorenzo.pieralisi@arm.com,
+ qperret@google.com, ascull@google.com, qwandor@google.com,
+ kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+ Andrew Walbran <qwandor@google.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ Tejun Heo <tj@kernel.org>, Dennis Zhou <dennis@kernel.org>,
+ Christoph Lameter <cl@linux.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -111,28 +104,177 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Monday 23 Nov 2020 at 10:55:20 (+0000), Fuad Tabba wrote:
-> > diff --git a/arch/arm64/include/asm/kvm_cpufeature.h b/arch/arm64/include/asm/kvm_cpufeature.h
-> > new file mode 100644
-> > index 000000000000..d34f85cba358
-> > --- /dev/null
-> > +++ b/arch/arm64/include/asm/kvm_cpufeature.h
-> > @@ -0,0 +1,17 @@
-> > +/* SPDX-License-Identifier: GPL-2.0-only */
-> > +/*
-> > + * Copyright (C) 2020 - Google LLC
-> > + * Author: Quentin Perret <qperret@google.com>
-> > + */
+On Mon, 16 Nov 2020 20:42:58 +0000,
+David Brazdil <dbrazdil@google.com> wrote:
 > 
-> Missing include guard.
+> KVM currently initializes MAIR_EL2 to the value of MAIR_EL1. In
+> preparation for initializing MAIR_EL2 before MAIR_EL1, move the constant
+> into a shared header file. Since it is used for EL1 and EL2, rename to
+> MAIR_ELx_SET.
+> 
+> Signed-off-by: David Brazdil <dbrazdil@google.com>
+> ---
+>  arch/arm64/include/asm/memory.h | 29 ++++++++++++++---------------
+>  arch/arm64/include/asm/sysreg.h | 30 ++++++++++++++++++++++++++++++
+>  arch/arm64/mm/proc.S            | 15 +--------------
+>  3 files changed, 45 insertions(+), 29 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/memory.h b/arch/arm64/include/asm/memory.h
+> index cd61239bae8c..8ae8fd883a0c 100644
+> --- a/arch/arm64/include/asm/memory.h
+> +++ b/arch/arm64/include/asm/memory.h
+> @@ -13,6 +13,7 @@
+>  #include <linux/const.h>
+>  #include <linux/sizes.h>
+>  #include <asm/page-def.h>
+> +#include <asm/sysreg.h>
+>  
+>  /*
+>   * Size of the PCI I/O space. This must remain a power of two so that
+> @@ -124,21 +125,6 @@
+>   */
+>  #define SEGMENT_ALIGN		SZ_64K
+>  
+> -/*
+> - * Memory types available.
+> - *
+> - * IMPORTANT: MT_NORMAL must be index 0 since vm_get_page_prot() may 'or' in
+> - *	      the MT_NORMAL_TAGGED memory type for PROT_MTE mappings. Note
+> - *	      that protection_map[] only contains MT_NORMAL attributes.
+> - */
+> -#define MT_NORMAL		0
+> -#define MT_NORMAL_TAGGED	1
+> -#define MT_NORMAL_NC		2
+> -#define MT_NORMAL_WT		3
+> -#define MT_DEVICE_nGnRnE	4
+> -#define MT_DEVICE_nGnRE		5
+> -#define MT_DEVICE_GRE		6
+> -
+>  /*
+>   * Memory types for Stage-2 translation
+>   */
+> @@ -152,6 +138,19 @@
+>  #define MT_S2_FWB_NORMAL	6
+>  #define MT_S2_FWB_DEVICE_nGnRE	1
+>  
+> +/*
+> + * Default MAIR_EL1. MT_NORMAL_TAGGED is initially mapped as Normal memory and
+> + * changed during __cpu_setup to Normal Tagged if the system supports MTE.
+> + */
+> +#define MAIR_ELx_SET							\
+> +	(MAIR_ATTRIDX(MAIR_ATTR_DEVICE_nGnRnE, MT_DEVICE_nGnRnE) |	\
+> +	 MAIR_ATTRIDX(MAIR_ATTR_DEVICE_nGnRE, MT_DEVICE_nGnRE) |	\
+> +	 MAIR_ATTRIDX(MAIR_ATTR_DEVICE_GRE, MT_DEVICE_GRE) |		\
+> +	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL_NC, MT_NORMAL_NC) |		\
+> +	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL, MT_NORMAL) |			\
+> +	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL_WT, MT_NORMAL_WT) |		\
+> +	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL, MT_NORMAL_TAGGED))
+> +
+>  #ifdef CONFIG_ARM64_4K_PAGES
+>  #define IOREMAP_MAX_ORDER	(PUD_SHIFT)
+>  #else
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index e2ef4c2edf06..24e773414cb4 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -635,6 +635,34 @@
+>  /* Position the attr at the correct index */
+>  #define MAIR_ATTRIDX(attr, idx)		((attr) << ((idx) * 8))
+>  
+> +/*
+> + * Memory types available.
+> + *
+> + * IMPORTANT: MT_NORMAL must be index 0 since vm_get_page_prot() may 'or' in
+> + *	      the MT_NORMAL_TAGGED memory type for PROT_MTE mappings. Note
+> + *	      that protection_map[] only contains MT_NORMAL attributes.
+> + */
+> +#define MT_NORMAL		0
+> +#define MT_NORMAL_TAGGED	1
+> +#define MT_NORMAL_NC		2
+> +#define MT_NORMAL_WT		3
+> +#define MT_DEVICE_nGnRnE	4
+> +#define MT_DEVICE_nGnRE		5
+> +#define MT_DEVICE_GRE		6
+> +
+> +/*
+> + * Default MAIR_ELx. MT_NORMAL_TAGGED is initially mapped as Normal memory and
+> + * changed during __cpu_setup to Normal Tagged if the system supports MTE.
+> + */
+> +#define MAIR_ELx_SET							\
+> +	(MAIR_ATTRIDX(MAIR_ATTR_DEVICE_nGnRnE, MT_DEVICE_nGnRnE) |	\
+> +	 MAIR_ATTRIDX(MAIR_ATTR_DEVICE_nGnRE, MT_DEVICE_nGnRE) |	\
+> +	 MAIR_ATTRIDX(MAIR_ATTR_DEVICE_GRE, MT_DEVICE_GRE) |		\
+> +	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL_NC, MT_NORMAL_NC) |		\
+> +	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL, MT_NORMAL) |			\
+> +	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL_WT, MT_NORMAL_WT) |		\
+> +	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL, MT_NORMAL_TAGGED))
+> +
+>  /* id_aa64isar0 */
+>  #define ID_AA64ISAR0_RNDR_SHIFT		60
+>  #define ID_AA64ISAR0_TLB_SHIFT		56
+> @@ -992,6 +1020,7 @@
+>  /* Safe value for MPIDR_EL1: Bit31:RES1, Bit30:U:0, Bit24:MT:0 */
+>  #define SYS_MPIDR_SAFE_VAL	(BIT(31))
+>  
+> +#ifndef LINKER_SCRIPT
 
-Right, but on purpose :)
+This is terribly ugly. Why is this included by the linker script? Does
+it actually define __ASSEMBLY__?
 
-See how arm.c includes this header twice with different definitions of
-KVM_HYP_CPU_FTR_REG for instance.
+>  #ifdef __ASSEMBLY__
+>  
+>  	.irp	num,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30
+> @@ -1109,5 +1138,6 @@
+>  })
+>  
+>  #endif
+> +#endif	/* LINKER_SCRIPT */
+>  
+>  #endif	/* __ASM_SYSREG_H */
+> diff --git a/arch/arm64/mm/proc.S b/arch/arm64/mm/proc.S
+> index 23c326a06b2d..e3b9aa372b96 100644
+> --- a/arch/arm64/mm/proc.S
+> +++ b/arch/arm64/mm/proc.S
+> @@ -45,19 +45,6 @@
+>  #define TCR_KASAN_FLAGS 0
+>  #endif
+>  
+> -/*
+> - * Default MAIR_EL1. MT_NORMAL_TAGGED is initially mapped as Normal memory and
+> - * changed during __cpu_setup to Normal Tagged if the system supports MTE.
+> - */
+> -#define MAIR_EL1_SET							\
+> -	(MAIR_ATTRIDX(MAIR_ATTR_DEVICE_nGnRnE, MT_DEVICE_nGnRnE) |	\
+> -	 MAIR_ATTRIDX(MAIR_ATTR_DEVICE_nGnRE, MT_DEVICE_nGnRE) |	\
+> -	 MAIR_ATTRIDX(MAIR_ATTR_DEVICE_GRE, MT_DEVICE_GRE) |		\
+> -	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL_NC, MT_NORMAL_NC) |		\
+> -	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL, MT_NORMAL) |			\
+> -	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL_WT, MT_NORMAL_WT) |		\
+> -	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL, MT_NORMAL_TAGGED))
+> -
+>  #ifdef CONFIG_CPU_PM
+>  /**
+>   * cpu_do_suspend - save CPU registers context
+> @@ -425,7 +412,7 @@ SYM_FUNC_START(__cpu_setup)
+>  	/*
+>  	 * Memory region attributes
+>  	 */
+> -	mov_q	x5, MAIR_EL1_SET
+> +	mov_q	x5, MAIR_ELx_SET
+>  #ifdef CONFIG_ARM64_MTE
+>  	/*
+>  	 * Update MAIR_EL1, GCR_EL1 and TFSR*_EL1 if MTE is supported
+> -- 
+> 2.29.2.299.gdc1121823c-goog
+> 
+> 
 
 Thanks,
-Quentin
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
