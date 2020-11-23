@@ -7,67 +7,66 @@ X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C2F7C2D0E4
-	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 17:55:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36645C63697
+	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 18:01:00 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A637B20758
-	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 17:55:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 61FF1206B2
+	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 18:00:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="MyGoDeE9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A637B20758
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="1D4tJXE6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61FF1206B2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EC01E4BBBE;
-	Mon, 23 Nov 2020 12:55:30 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 969834B916;
+	Mon, 23 Nov 2020 13:00:58 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jvNE0nGjtiyf; Mon, 23 Nov 2020 12:55:29 -0500 (EST)
+	with ESMTP id U90ID9A4WS03; Mon, 23 Nov 2020 13:00:57 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9814D4BBB0;
-	Mon, 23 Nov 2020 12:55:29 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6EE9C4B759;
+	Mon, 23 Nov 2020 13:00:57 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EAE824BBAC
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 12:55:27 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 59ED54B727
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 13:00:56 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4SpW65eKj08a for <kvmarm@lists.cs.columbia.edu>;
- Mon, 23 Nov 2020 12:55:26 -0500 (EST)
+ with ESMTP id w26TaYd6NOHF for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 23 Nov 2020 13:00:55 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 769374BBAA
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 12:55:26 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 19CC74B634
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 13:00:55 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 1CCE820758;
- Mon, 23 Nov 2020 17:55:25 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id BC15D20758;
+ Mon, 23 Nov 2020 18:00:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1606154125;
- bh=qpL2f9sT7xzn5bt7AxFkYrpasWopOpy+BMt6mJNfUdE=;
+ s=default; t=1606154453;
+ bh=OgBMsLtKiZ+xCEA9AnmfuQ94yiu816Qd03DhHewUrCs=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=MyGoDeE9Xb5w0Rb1rp40aIH1W3SfLalyE0hoPHRvdaBD9q4AvRwLZdkKf5dKD79/V
- RrHWMtlp/SRjl9XIKcv3hJgdpA3BGUyL0wMfnyxUtasH03ex+8/qjFsIIluYN/7K+r
- BPBUP8q+VZGOPlmw0/ZG25s7hrbPWZlT0A2P5H4I=
+ b=1D4tJXE6sEFGBsF8kVA3HlliXj3KgnEXEawHA6/WRHrqSQcRMITUw7OZbH6sCVLfD
+ rPiVP6tdn5sbUDLgeIOOfi70Z5rLKo3c1dkasSbpR8jRYbTy62yE6c6gY0vD/ubEjm
+ kRsCwfswlmyX19Ebx9RlhZ7tPtXJYGh6CZ+sgZ1g=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1khG3e-00D1UR-UK; Mon, 23 Nov 2020 17:55:23 +0000
-Date: Mon, 23 Nov 2020 17:55:21 +0000
-Message-ID: <87blfo556e.wl-maz@kernel.org>
+ id 1khG8x-00D1ci-Hq; Mon, 23 Nov 2020 18:00:51 +0000
+Date: Mon, 23 Nov 2020 18:00:50 +0000
+Message-ID: <87a6v854x9.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: David Brazdil <dbrazdil@google.com>
-Subject: Re: [PATCH v2 12/24] kvm: arm64: Bootstrap PSCI SMC handler in nVHE
- EL2
-In-Reply-To: <20201116204318.63987-13-dbrazdil@google.com>
+Subject: Re: [PATCH v2 08/24] kvm: arm64: Add SMC handler in nVHE EL2
+In-Reply-To: <20201116204318.63987-9-dbrazdil@google.com>
 References: <20201116204318.63987-1-dbrazdil@google.com>
- <20201116204318.63987-13-dbrazdil@google.com>
+ <20201116204318.63987-9-dbrazdil@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -105,241 +104,75 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 16 Nov 2020 20:43:06 +0000,
+On Mon, 16 Nov 2020 20:43:02 +0000,
 David Brazdil <dbrazdil@google.com> wrote:
 > 
-> Add a handler of PSCI SMCs in nVHE hyp code. The handler is initialized
-> with the version used by the host's PSCI driver and the function IDs it
-> was configured with. If the SMC function ID matches one of the
-> configured PSCI calls (for v0.1) or falls into the PSCI function ID
-> range (for v0.2+), the SMC is handled by the PSCI handler. For now, all
-> SMCs return PSCI_RET_NOT_SUPPORTED.
+> Add handler of host SMCs in KVM nVHE trap handler. Forward all SMCs to
+> EL3 and propagate the result back to EL1. This is done in preparation
+> for validating host SMCs in KVM nVHE protected mode.
+> 
+> The implementation assumes that firmware uses SMCCC v1.2 or older. That
+> means x0-x17 can be used both for arguments and results, other GPRs are
+> preserved.
 > 
 > Signed-off-by: David Brazdil <dbrazdil@google.com>
 > ---
->  arch/arm64/include/asm/kvm_hyp.h     |   4 ++
->  arch/arm64/kvm/arm.c                 |  14 ++++
->  arch/arm64/kvm/hyp/nvhe/Makefile     |   2 +-
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c   |   6 +-
->  arch/arm64/kvm/hyp/nvhe/psci-relay.c | 104 +++++++++++++++++++++++++++
->  5 files changed, 128 insertions(+), 2 deletions(-)
->  create mode 100644 arch/arm64/kvm/hyp/nvhe/psci-relay.c
+>  arch/arm64/kvm/hyp/nvhe/host.S     | 38 ++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 26 ++++++++++++++++++++
+>  2 files changed, 64 insertions(+)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-> index a3289071f3d8..95a2bbbcc7e1 100644
-> --- a/arch/arm64/include/asm/kvm_hyp.h
-> +++ b/arch/arm64/include/asm/kvm_hyp.h
-> @@ -96,6 +96,10 @@ void deactivate_traps_vhe_put(void);
->  
->  u64 __guest_enter(struct kvm_vcpu *vcpu);
->  
-> +#ifdef __KVM_NVHE_HYPERVISOR__
-> +bool kvm_host_psci_handler(struct kvm_cpu_context *host_ctxt);
-> +#endif
+> diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
+> index ed27f06a31ba..52dae5cd5a28 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/host.S
+> +++ b/arch/arm64/kvm/hyp/nvhe/host.S
+> @@ -183,3 +183,41 @@ SYM_CODE_START(__kvm_hyp_host_vector)
+>  	invalid_host_el1_vect			// FIQ 32-bit EL1
+>  	invalid_host_el1_vect			// Error 32-bit EL1
+>  SYM_CODE_END(__kvm_hyp_host_vector)
 > +
->  void __noreturn hyp_panic(void);
->  #ifdef __KVM_NVHE_HYPERVISOR__
->  void __noreturn __hyp_do_panic(bool restore_host, u64 spsr, u64 elr, u64 par);
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index cdd7981ea560..7d2270eeecfb 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -19,6 +19,7 @@
->  #include <linux/kvm_irqfd.h>
->  #include <linux/irqbypass.h>
->  #include <linux/sched/stat.h>
-> +#include <linux/psci.h>
->  #include <trace/events/kvm.h>
->  
->  #define CREATE_TRACE_POINTS
-> @@ -1514,6 +1515,18 @@ static void init_cpu_logical_map(void)
->  		CHOOSE_NVHE_SYM(__cpu_logical_map)[cpu] = cpu_logical_map(cpu);
->  }
->  
-> +static void init_psci_relay(void)
-> +{
-> +	extern u32 kvm_nvhe_sym(kvm_host_psci_version);
-> +	extern u32 kvm_nvhe_sym(kvm_host_psci_function_id)[PSCI_FN_MAX];
-
-nit: I'd rather have these outside of the function body.
-
-> +	int i;
-> +
-> +	CHOOSE_NVHE_SYM(kvm_host_psci_version) = psci_ops.get_version
-> +		? psci_ops.get_version() : PSCI_VERSION(0, 0);
-
-nit: please write this with an if/else construct, it will read a lot
-better.
-
-> +	for (i = 0; i < PSCI_FN_MAX; ++i)
-> +		CHOOSE_NVHE_SYM(kvm_host_psci_function_id)[i] = psci_get_function_id(i);
-
-Either pick kvm_nvhe_sym(), or CHOOSE_NVHE_SYM(). Having both used
-together is just an annoyance (and in this case there is nothing to
-choose, really).
-
-> +}
-> +
->  static int init_common_resources(void)
->  {
->  	return kvm_set_ipa_limit();
-> @@ -1693,6 +1706,7 @@ static int init_hyp_mode(void)
->  	}
->  
->  	init_cpu_logical_map();
-> +	init_psci_relay();
->  
->  	return 0;
->  
-> diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-> index 2d842e009a40..bf62c8e42ab2 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/Makefile
-> +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-> @@ -7,7 +7,7 @@ asflags-y := -D__KVM_NVHE_HYPERVISOR__
->  ccflags-y := -D__KVM_NVHE_HYPERVISOR__
->  
->  obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o \
-> -	 hyp-main.o hyp-smp.o
-> +	 hyp-main.o hyp-smp.o psci-relay.o
->  obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
->  	 ../fpsimd.o ../hyp-entry.o
->  
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index 71a17af05953..df4acb40dd39 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -120,7 +120,11 @@ static void skip_host_instruction(void)
->  
->  static void handle_host_smc(struct kvm_cpu_context *host_ctxt)
->  {
-> -	default_host_smc_handler(host_ctxt);
-> +	bool handled;
-> +
-> +	handled = kvm_host_psci_handler(host_ctxt);
-> +	if (!handled)
-> +		default_host_smc_handler(host_ctxt);
->  
->  	/*
->  	 * Unlike HVC, the return address of an SMC is the instruction's PC.
-> diff --git a/arch/arm64/kvm/hyp/nvhe/psci-relay.c b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-> new file mode 100644
-> index 000000000000..d75d3f896bfd
-> --- /dev/null
-> +++ b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-> @@ -0,0 +1,104 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
 > +/*
-> + * Copyright (C) 2020 - Google LLC
-> + * Author: David Brazdil <dbrazdil@google.com>
+> + * Forward SMC with arguments in struct kvm_cpu_context, and
+> + * store the result into the same struct. Assumes SMCCC 1.2 or older.
+> + *
+> + * x0: struct kvm_cpu_context*
 > + */
+> +SYM_CODE_START(__kvm_hyp_host_forward_smc)
+> +	/*
+> +	 * Use x18 to keep a pointer to the host context because x18
+> +	 * is callee-saved SMCCC but not in AAPCS64.
+> +	 */
+> +	mov	x18, x0
 > +
-> +#include <asm/kvm_asm.h>
-> +#include <asm/kvm_hyp.h>
-> +#include <asm/kvm_mmu.h>
-> +#include <kvm/arm_hypercalls.h>
-> +#include <linux/arm-smccc.h>
-> +#include <linux/psci.h>
-> +#include <kvm/arm_psci.h>
-> +#include <uapi/linux/psci.h>
+> +	ldp	x0, x1,   [x18, #CPU_XREG_OFFSET(0)]
+> +	ldp	x2, x3,   [x18, #CPU_XREG_OFFSET(2)]
+> +	ldp	x4, x5,   [x18, #CPU_XREG_OFFSET(4)]
+> +	ldp	x6, x7,   [x18, #CPU_XREG_OFFSET(6)]
+> +	ldp	x8, x9,   [x18, #CPU_XREG_OFFSET(8)]
+> +	ldp	x10, x11, [x18, #CPU_XREG_OFFSET(10)]
+> +	ldp	x12, x13, [x18, #CPU_XREG_OFFSET(12)]
+> +	ldp	x14, x15, [x18, #CPU_XREG_OFFSET(14)]
+> +	ldp	x16, x17, [x18, #CPU_XREG_OFFSET(16)]
 > +
-> +/* Config options set by the host. */
-> +u32 __ro_after_init kvm_host_psci_version = PSCI_VERSION(0, 0);
-> +u32 __ro_after_init kvm_host_psci_function_id[PSCI_FN_MAX];
+> +	smc	#0
 > +
-> +static u64 get_psci_func_id(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	return host_ctxt->regs.regs[0];
-> +}
-> +
-> +static bool is_psci_0_1_call(u64 func_id)
-> +{
-> +	unsigned int i;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(kvm_host_psci_function_id); ++i) {
-> +		if (func_id == kvm_host_psci_function_id[i])
-> +			return true;
-> +	}
-> +	return false;
-> +}
-> +
-> +static bool is_psci_0_2_call(u64 func_id)
-> +{
-> +	/* SMCCC reserves IDs 0x00-1F with the given 32/64-bit base for PSCI. */
-> +	return (PSCI_0_2_FN(0) <= func_id && func_id <= PSCI_0_2_FN(31)) ||
-> +	       (PSCI_0_2_FN64(0) <= func_id && func_id <= PSCI_0_2_FN64(31));
-> +}
-> +
-> +static bool is_psci_call(u64 func_id)
-> +{
-> +	switch (kvm_host_psci_version) {
-> +	case PSCI_VERSION(0, 0):
-> +		return false;
-> +	case PSCI_VERSION(0, 1):
-> +		return is_psci_0_1_call(func_id);
-> +	default:
-> +		return is_psci_0_2_call(func_id);
-> +	}
-> +}
-> +
-> +static unsigned long psci_0_1_handler(u64 func_id, struct kvm_cpu_context *host_ctxt)
-> +{
-> +	return PSCI_RET_NOT_SUPPORTED;
-> +}
-> +
-> +static unsigned long psci_0_2_handler(u64 func_id, struct kvm_cpu_context *host_ctxt)
-> +{
-> +	switch (func_id) {
-> +	default:
-> +		return PSCI_RET_NOT_SUPPORTED;
-> +	}
-> +}
-> +
-> +static unsigned long psci_1_0_handler(u64 func_id, struct kvm_cpu_context *host_ctxt)
-> +{
-> +	switch (func_id) {
-> +	default:
-> +		return psci_0_2_handler(func_id, host_ctxt);
-> +	}
-> +}
-> +
-> +bool kvm_host_psci_handler(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	u64 func_id = get_psci_func_id(host_ctxt);
-> +	unsigned long ret;
-> +
-> +	if (!is_psci_call(func_id))
-> +		return false;
-> +
-> +	switch (kvm_host_psci_version) {
-> +	case PSCI_VERSION(0, 0):
-> +		ret = PSCI_RET_NOT_SUPPORTED;
+> +	stp	x0, x1,   [x18, #CPU_XREG_OFFSET(0)]
+> +	stp	x2, x3,   [x18, #CPU_XREG_OFFSET(2)]
+> +	stp	x4, x5,   [x18, #CPU_XREG_OFFSET(4)]
+> +	stp	x6, x7,   [x18, #CPU_XREG_OFFSET(6)]
+> +	stp	x8, x9,   [x18, #CPU_XREG_OFFSET(8)]
+> +	stp	x10, x11, [x18, #CPU_XREG_OFFSET(10)]
+> +	stp	x12, x13, [x18, #CPU_XREG_OFFSET(12)]
+> +	stp	x14, x15, [x18, #CPU_XREG_OFFSET(14)]
+> +	stp	x16, x17, [x18, #CPU_XREG_OFFSET(16)]
 
-But isn't that way too late? No PSCI means that we cannot control the
-way CPUs boot at all. I think we should completely fail the whole
-Protected KVM business if we don't have PSCI.
+This is going to be really good for CPUs that need to use ARCH_WA1 for
+their Spectre-v2 mitigation... :-( If that's too expensive, we may
+have to reduce the number of save/restored registers, but I'm worried
+the battle is already lost by the time we reach this (the host trap
+path is already a huge hammer).
 
-> +		break;
-> +	case PSCI_VERSION(0, 1):
-> +		ret = psci_0_1_handler(func_id, host_ctxt);
-> +		break;
-> +	case PSCI_VERSION(0, 2):
-> +		ret = psci_0_2_handler(func_id, host_ctxt);
-> +		break;
-> +	default:
-> +		ret = psci_1_0_handler(func_id, host_ctxt);
-> +		break;
-> +	}
-> +
-> +	host_ctxt->regs.regs[0] = ret;
-> +	host_ctxt->regs.regs[1] = 0;
-> +	host_ctxt->regs.regs[2] = 0;
-> +	host_ctxt->regs.regs[3] = 0;
-> +	return true;
-> +}
-> -- 
-> 2.29.2.299.gdc1121823c-goog
-> 
-> 
+Eventually, we'll have to insert the mitigation in the vectors anyway,
+just like we have on the guest exit path. Boo.
 
 Thanks,
 
