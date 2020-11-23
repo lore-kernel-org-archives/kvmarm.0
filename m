@@ -2,92 +2,99 @@ Return-Path: <SRS0=PaY3=E5=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 108BCC388F9
-	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 13:47:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61875C388F9
+	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 13:52:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5C632206F1
-	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 13:47:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7EB1A20729
+	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 13:52:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="mi0OYwcc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C632206F1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="BgBnJ8EK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EB1A20729
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AB0984B9C4;
-	Mon, 23 Nov 2020 08:47:20 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CFDB04BB61;
+	Mon, 23 Nov 2020 08:51:59 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Lcg0MKZH-dhH; Mon, 23 Nov 2020 08:47:15 -0500 (EST)
+	with ESMTP id QwZ6EJu+c-0M; Mon, 23 Nov 2020 08:51:58 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AB6D94B9D1;
-	Mon, 23 Nov 2020 08:47:15 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D4C94BB56;
+	Mon, 23 Nov 2020 08:51:58 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D76CC4B9C5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 08:47:13 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 43DC64BB4C
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 08:51:57 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9gZugGhMB+lN for <kvmarm@lists.cs.columbia.edu>;
- Mon, 23 Nov 2020 08:47:12 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C2D624B9C4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 08:47:12 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 8103E206F1;
- Mon, 23 Nov 2020 13:47:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1606139231;
- bh=80Rr48NihEeoN1SyHrOo/D+OnblcJZRgbQGwWtnsfX4=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=mi0OYwccnn2+NkOQIx3xnpCOr9lsqwjEIp3ELOufhIw5KhxHH3OIpvEMsqAsumuD5
- ZAku4nEPbrYRvW8qbZCvw+w1Rb+j0P7X0dGRoyNIXk2l37GjegzO7b7ErZdt9I4gF/
- azpRn9+K3f/XOtNGjaZpnuFS1aE4FWYZzCt0RXr8=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=wait-a-minute.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
- (envelope-from <maz@kernel.org>)
- id 1khCBR-00Cxpa-FP; Mon, 23 Nov 2020 13:47:09 +0000
-Date: Mon, 23 Nov 2020 13:47:08 +0000
-Message-ID: <87o8jo5go3.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: David Brazdil <dbrazdil@google.com>
-Subject: Re: [PATCH v2 02/24] psci: Accessor for configured PSCI function IDs
-In-Reply-To: <20201116204318.63987-3-dbrazdil@google.com>
-References: <20201116204318.63987-1-dbrazdil@google.com>
- <20201116204318.63987-3-dbrazdil@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: dbrazdil@google.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
- catalin.marinas@arm.com, will@kernel.org, dennis@kernel.org, tj@kernel.org,
- cl@linux.com, mark.rutland@arm.com, lorenzo.pieralisi@arm.com,
- qperret@google.com, ascull@google.com, qwandor@google.com,
- kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kernel-team@android.com, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
- Andrew Walbran <qwandor@google.com>, Catalin Marinas <catalin.marinas@arm.com>,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Tejun Heo <tj@kernel.org>, Dennis Zhou <dennis@kernel.org>,
- Christoph Lameter <cl@linux.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+ with ESMTP id Av23S3O1X4fT for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 23 Nov 2020 08:51:56 -0500 (EST)
+Received: from mail-wm1-f65.google.com (mail-wm1-f65.google.com
+ [209.85.128.65])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3BE714BB4A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 08:51:56 -0500 (EST)
+Received: by mail-wm1-f65.google.com with SMTP id a3so17309256wmb.5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 05:51:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=iaau9hhA1KFwy2KDmDsX/sn+tVvl77lzzmCiDGToHck=;
+ b=BgBnJ8EK3bza/181q05p8iQXYs1RFznPl/Ry+CtkBEqrhmo0cDH+CdGkp84Kl7VtoZ
+ 0MXDjoCuJ9ewJWRWvmxbHgQGAzkgtkHlr0ywKiw8rXqDO0ze1p7PzKWkFWH79bhxAqUI
+ 6jIltWFyRts2sRBAUNyMtgisXoiwq3Nx0b7Lw2MIuZ2EflVqv6tUs2im41Nm2pDDGSjA
+ Fa+wRpnl6JOqv2tiJ1BvZ3rfyLWW9eUD9WZ5Wyj/7MzePo1L4f3PEMUWioqIy/BYO5Nd
+ 5RqoRi/8HhqjyyjHjaUmEyFGBFS2N9lGzNc7Zf9YgR/Viuf5HTyCR9maRGJ/6GB2ZKIh
+ Jygw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=iaau9hhA1KFwy2KDmDsX/sn+tVvl77lzzmCiDGToHck=;
+ b=uDUW/9DWRe1JqBlcImy0vLIZwei2Y1owdQ9OboKUhK+Ypkxw8pO43+2/rcx2TwSewT
+ hPHh/06sHPkk8Y6FVgrxyWa9jvTdLuZQfPM/zhNCTvB8MCgaqM8uAyM7Wx3MA6PSnOKe
+ F7CN0OlRqby0am/rrl6cf6iIY45L+WaTBJV4rX8SRcSBcq+/a+GEtulROigd/AqkXKSV
+ ZwNK2yF1UwRXC3xpbeeZf6dDmwWpl6XayZeamkqioTjEU3Luy3VioU9Y8g+03gbYJMee
+ Z6LAtDmDVEWg+36VAtv8UlSKOOZL8zwSESwAyyX5BBPeoQbervyLUV8pZCUOxUyC2tKv
+ PiKA==
+X-Gm-Message-State: AOAM530W1V9oDcdsubgzJtZOlMm9KBcA6eBRw97o3IpnCJeGo7V3+/eD
+ FGnCLnmDF8FqxuR2zxLpdaGKrw==
+X-Google-Smtp-Source: ABdhPJw2S0g7xc5LX0mjnROVXQEjQ1dcwMwqbjEh95H+sw1EIksGKfdkdpqjbz7CHSJ0dqI/brkrGw==
+X-Received: by 2002:a7b:c0cc:: with SMTP id s12mr23506422wmh.41.1606139515051; 
+ Mon, 23 Nov 2020 05:51:55 -0800 (PST)
+Received: from google.com ([2a00:79e0:d:210:f693:9fff:fef4:a7ef])
+ by smtp.gmail.com with ESMTPSA id j71sm17278653wmj.10.2020.11.23.05.51.54
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 23 Nov 2020 05:51:54 -0800 (PST)
+Date: Mon, 23 Nov 2020 13:51:51 +0000
+From: Quentin Perret <qperret@google.com>
+To: Fuad Tabba <tabba@google.com>
+Subject: Re: [RFC PATCH 13/27] KVM: arm64: Enable access to sanitized CPU
+ features at EL2
+Message-ID: <20201123135151.GA490744@google.com>
+References: <20201117181607.1761516-1-qperret@google.com>
+ <20201117181607.1761516-14-qperret@google.com>
+ <CA+EHjTwebfoJLpure-mHNzCnmLwnNEi6yh66OLFGrhH_+ysExA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTwebfoJLpure-mHNzCnmLwnNEi6yh66OLFGrhH_+ysExA@mail.gmail.com>
+Cc: "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE"
+ <devicetree@vger.kernel.org>, kernel-team@android.com,
+ Frank Rowand <frowand.list@gmail.com>, Android KVM <android-kvm@google.com>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ open list <linux-kernel@vger.kernel.org>, Rob Herring <robh+dt@kernel.org>,
+ "moderated list:ARM64 PORT \(AARCH64 ARCHITECTURE\)"
+ <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>,
+ "open list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
+ <kvmarm@lists.cs.columbia.edu>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -104,83 +111,28 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 16 Nov 2020 20:42:56 +0000,
-David Brazdil <dbrazdil@google.com> wrote:
+On Monday 23 Nov 2020 at 10:55:20 (+0000), Fuad Tabba wrote:
+> > diff --git a/arch/arm64/include/asm/kvm_cpufeature.h b/arch/arm64/include/asm/kvm_cpufeature.h
+> > new file mode 100644
+> > index 000000000000..d34f85cba358
+> > --- /dev/null
+> > +++ b/arch/arm64/include/asm/kvm_cpufeature.h
+> > @@ -0,0 +1,17 @@
+> > +/* SPDX-License-Identifier: GPL-2.0-only */
+> > +/*
+> > + * Copyright (C) 2020 - Google LLC
+> > + * Author: Quentin Perret <qperret@google.com>
+> > + */
 > 
-> Function IDs used by PSCI are configurable for v0.1 via DT/APCI. If the
-> host is using PSCI v0.1, KVM's host PSCI proxy needs to use the same IDs.
-> Expose the array holding the information with a read-only accessor.
-> 
-> Signed-off-by: David Brazdil <dbrazdil@google.com>
-> ---
->  drivers/firmware/psci/psci.c | 14 ++++++--------
->  include/linux/psci.h         | 10 ++++++++++
->  2 files changed, 16 insertions(+), 8 deletions(-)
-> 
-> diff --git a/drivers/firmware/psci/psci.c b/drivers/firmware/psci/psci.c
-> index 213c68418a65..d835f3d8b121 100644
-> --- a/drivers/firmware/psci/psci.c
-> +++ b/drivers/firmware/psci/psci.c
-> @@ -58,16 +58,14 @@ typedef unsigned long (psci_fn)(unsigned long, unsigned long,
->  				unsigned long, unsigned long);
->  static psci_fn *invoke_psci_fn;
->  
-> -enum psci_function {
-> -	PSCI_FN_CPU_SUSPEND,
-> -	PSCI_FN_CPU_ON,
-> -	PSCI_FN_CPU_OFF,
-> -	PSCI_FN_MIGRATE,
-> -	PSCI_FN_MAX,
-> -};
-> -
->  static u32 psci_function_id[PSCI_FN_MAX];
->  
-> +u32 psci_get_function_id(enum psci_function fn)
-> +{
-> +	WARN_ON(fn >= PSCI_FN_MAX);
+> Missing include guard.
 
-If we are going to warn on something that is out of bounds, maybe we
-shouldn't perform the access at all? And maybe check for lower bound
-as well?
+Right, but on purpose :)
 
-> +	return psci_function_id[fn];
-> +}
-> +
->  #define PSCI_0_2_POWER_STATE_MASK		\
->  				(PSCI_0_2_POWER_STATE_ID_MASK | \
->  				PSCI_0_2_POWER_STATE_TYPE_MASK | \
-> diff --git a/include/linux/psci.h b/include/linux/psci.h
-> index 2a1bfb890e58..5b49a5c82d6f 100644
-> --- a/include/linux/psci.h
-> +++ b/include/linux/psci.h
-> @@ -21,6 +21,16 @@ bool psci_power_state_is_valid(u32 state);
->  int psci_set_osi_mode(bool enable);
->  bool psci_has_osi_support(void);
->  
-> +enum psci_function {
-> +	PSCI_FN_CPU_SUSPEND,
-> +	PSCI_FN_CPU_ON,
-> +	PSCI_FN_CPU_OFF,
-> +	PSCI_FN_MIGRATE,
-> +	PSCI_FN_MAX,
-> +};
-> +
-> +u32 psci_get_function_id(enum psci_function fn);
-> +
->  struct psci_operations {
->  	u32 (*get_version)(void);
->  	int (*cpu_suspend)(u32 state, unsigned long entry_point);
-> -- 
-> 2.29.2.299.gdc1121823c-goog
-> 
-> 
+See how arm.c includes this header twice with different definitions of
+KVM_HYP_CPU_FTR_REG for instance.
 
 Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Quentin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
