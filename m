@@ -2,78 +2,77 @@ Return-Path: <SRS0=PaY3=E5=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71E71C2D0E4
-	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 13:44:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 108BCC388F9
+	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 13:47:22 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8CBCE2075A
-	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 13:44:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5C632206F1
+	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 13:47:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="al1bRH4D"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CBCE2075A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="mi0OYwcc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C632206F1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A752F4BB42;
-	Mon, 23 Nov 2020 08:44:51 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AB0984B9C4;
+	Mon, 23 Nov 2020 08:47:20 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 3QDwzJ-RupFb; Mon, 23 Nov 2020 08:44:50 -0500 (EST)
+	with ESMTP id Lcg0MKZH-dhH; Mon, 23 Nov 2020 08:47:15 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 32B8E4BAE7;
-	Mon, 23 Nov 2020 08:44:50 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AB6D94B9D1;
+	Mon, 23 Nov 2020 08:47:15 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 379A24BAE7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 08:44:49 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D76CC4B9C5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 08:47:13 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dotaUVapMEWK for <kvmarm@lists.cs.columbia.edu>;
- Mon, 23 Nov 2020 08:44:48 -0500 (EST)
+ with ESMTP id 9gZugGhMB+lN for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 23 Nov 2020 08:47:12 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 03C824BAB1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 08:44:47 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C2D624B9C4
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 08:47:12 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id AF43320729;
- Mon, 23 Nov 2020 13:44:46 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 8103E206F1;
+ Mon, 23 Nov 2020 13:47:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1606139086;
- bh=/PwbI2azxdOOPyORsfavbiNovbcboiR/bBOFvrmG+KA=;
+ s=default; t=1606139231;
+ bh=80Rr48NihEeoN1SyHrOo/D+OnblcJZRgbQGwWtnsfX4=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=al1bRH4DG5NZGMxwVysWnXLnEekLczyJ4QYzkOD2tCTquLnO7xrA/Vd3n7xMepZMu
- qr/oD5VaOydPneTWxRqrL0GNRnIEBwplZrrRFmrN8mOTKrNHEYXEpObyTiuOfKBLhB
- K9Yc3FNN+C2MMlx2K1Wr1wcQAJpW1NPxSbt0Npko=
+ b=mi0OYwccnn2+NkOQIx3xnpCOr9lsqwjEIp3ELOufhIw5KhxHH3OIpvEMsqAsumuD5
+ ZAku4nEPbrYRvW8qbZCvw+w1Rb+j0P7X0dGRoyNIXk2l37GjegzO7b7ErZdt9I4gF/
+ azpRn9+K3f/XOtNGjaZpnuFS1aE4FWYZzCt0RXr8=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1khC96-00Cxm6-HH; Mon, 23 Nov 2020 13:44:44 +0000
-Date: Mon, 23 Nov 2020 13:44:38 +0000
-Message-ID: <87pn445gs9.wl-maz@kernel.org>
+ id 1khCBR-00Cxpa-FP; Mon, 23 Nov 2020 13:47:09 +0000
+Date: Mon, 23 Nov 2020 13:47:08 +0000
+Message-ID: <87o8jo5go3.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: David Brazdil <dbrazdil@google.com>,
- Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
- Sudeep Holla <sudeep.holla@arm.com>
-Subject: Re: [PATCH v2 00/24] Opt-in always-on nVHE hypervisor
-In-Reply-To: <20201116204318.63987-1-dbrazdil@google.com>
+To: David Brazdil <dbrazdil@google.com>
+Subject: Re: [PATCH v2 02/24] psci: Accessor for configured PSCI function IDs
+In-Reply-To: <20201116204318.63987-3-dbrazdil@google.com>
 References: <20201116204318.63987-1-dbrazdil@google.com>
+ <20201116204318.63987-3-dbrazdil@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: dbrazdil@google.com, lorenzo.pieralisi@arm.com,
- sudeep.holla@arm.com, kvmarm@lists.cs.columbia.edu,
+X-SA-Exim-Rcpt-To: dbrazdil@google.com, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
  james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
  catalin.marinas@arm.com, will@kernel.org, dennis@kernel.org, tj@kernel.org,
@@ -105,39 +104,76 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 16 Nov 2020 20:42:54 +0000,
+On Mon, 16 Nov 2020 20:42:56 +0000,
 David Brazdil <dbrazdil@google.com> wrote:
 > 
-> As we progress towards being able to keep guest state private to the
-> host running nVHE hypervisor, this series allows the hypervisor to
-> install itself on newly booted CPUs before the host is allowed to run
-> on them.
+> Function IDs used by PSCI are configurable for v0.1 via DT/APCI. If the
+> host is using PSCI v0.1, KVM's host PSCI proxy needs to use the same IDs.
+> Expose the array holding the information with a read-only accessor.
 > 
-> All functionality described below is opt-in, guarded by an early param
-> 'kvm-arm.protected'. Future patches specific to the new "protected" mode
-> should be hidden behind the same param.
+> Signed-off-by: David Brazdil <dbrazdil@google.com>
+> ---
+>  drivers/firmware/psci/psci.c | 14 ++++++--------
+>  include/linux/psci.h         | 10 ++++++++++
+>  2 files changed, 16 insertions(+), 8 deletions(-)
 > 
-> The hypervisor starts trapping host SMCs and intercepting host's PSCI
-> CPU_ON/SUSPEND calls. It replaces the host's entry point with its own,
-> initializes the EL2 state of the new CPU and installs the nVHE hyp vector
-> before ERETing to the host's entry point.
-> 
-> The kernel checks new cores' features against the finalized system
-> capabilities. To avoid the need to move this code/data to EL2, the
-> implementation only allows to boot cores that were online at the time of
-> KVM initialization and therefore had been checked already.
-> 
-> Other PSCI SMCs are forwarded to EL3, though only the known set of SMCs
-> implemented in the kernel is allowed. Non-PSCI SMCs are also forwarded
-> to EL3. Future changes will need to ensure the safety of all SMCs wrt.
-> private guests.
-> 
-> The host is still allowed to reset EL2 back to the stub vector, eg. for
-> hibernation or kexec, but will not disable nVHE when there are no VMs.
-> 
-> Tested on Rock Pi 4b, based on 5.10-rc4.
+> diff --git a/drivers/firmware/psci/psci.c b/drivers/firmware/psci/psci.c
+> index 213c68418a65..d835f3d8b121 100644
+> --- a/drivers/firmware/psci/psci.c
+> +++ b/drivers/firmware/psci/psci.c
+> @@ -58,16 +58,14 @@ typedef unsigned long (psci_fn)(unsigned long, unsigned long,
+>  				unsigned long, unsigned long);
+>  static psci_fn *invoke_psci_fn;
+>  
+> -enum psci_function {
+> -	PSCI_FN_CPU_SUSPEND,
+> -	PSCI_FN_CPU_ON,
+> -	PSCI_FN_CPU_OFF,
+> -	PSCI_FN_MIGRATE,
+> -	PSCI_FN_MAX,
+> -};
+> -
+>  static u32 psci_function_id[PSCI_FN_MAX];
+>  
+> +u32 psci_get_function_id(enum psci_function fn)
+> +{
+> +	WARN_ON(fn >= PSCI_FN_MAX);
 
-Adding Lorenzo and Sudeep for the PSCI side of things.
+If we are going to warn on something that is out of bounds, maybe we
+shouldn't perform the access at all? And maybe check for lower bound
+as well?
+
+> +	return psci_function_id[fn];
+> +}
+> +
+>  #define PSCI_0_2_POWER_STATE_MASK		\
+>  				(PSCI_0_2_POWER_STATE_ID_MASK | \
+>  				PSCI_0_2_POWER_STATE_TYPE_MASK | \
+> diff --git a/include/linux/psci.h b/include/linux/psci.h
+> index 2a1bfb890e58..5b49a5c82d6f 100644
+> --- a/include/linux/psci.h
+> +++ b/include/linux/psci.h
+> @@ -21,6 +21,16 @@ bool psci_power_state_is_valid(u32 state);
+>  int psci_set_osi_mode(bool enable);
+>  bool psci_has_osi_support(void);
+>  
+> +enum psci_function {
+> +	PSCI_FN_CPU_SUSPEND,
+> +	PSCI_FN_CPU_ON,
+> +	PSCI_FN_CPU_OFF,
+> +	PSCI_FN_MIGRATE,
+> +	PSCI_FN_MAX,
+> +};
+> +
+> +u32 psci_get_function_id(enum psci_function fn);
+> +
+>  struct psci_operations {
+>  	u32 (*get_version)(void);
+>  	int (*cpu_suspend)(u32 state, unsigned long entry_point);
+> -- 
+> 2.29.2.299.gdc1121823c-goog
+> 
+> 
 
 Thanks,
 
