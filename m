@@ -2,100 +2,93 @@ Return-Path: <SRS0=PaY3=E5=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7384C2D0E4
-	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 14:06:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D245AC388F9
+	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 14:20:17 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id F201D20782
-	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 14:06:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4833C20781
+	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 14:20:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="g1MeLxRc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F201D20782
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="1rORItQv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4833C20781
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5BB844B73D;
-	Mon, 23 Nov 2020 09:06:34 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 82B334BB69;
+	Mon, 23 Nov 2020 09:20:15 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id KT7xAjyah+xI; Mon, 23 Nov 2020 09:06:33 -0500 (EST)
+	with ESMTP id 1Ty4xvqgv2rJ; Mon, 23 Nov 2020 09:20:14 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 600974B876;
-	Mon, 23 Nov 2020 09:06:33 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4832C4BB5B;
+	Mon, 23 Nov 2020 09:20:14 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 403714B73D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 09:06:32 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DFA294BB5D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 09:20:12 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uryZiIljYDSP for <kvmarm@lists.cs.columbia.edu>;
- Mon, 23 Nov 2020 09:06:31 -0500 (EST)
-Received: from mail-wr1-f67.google.com (mail-wr1-f67.google.com
- [209.85.221.67])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3AA544B876
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 09:06:31 -0500 (EST)
-Received: by mail-wr1-f67.google.com with SMTP id 23so18680941wrc.8
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 06:06:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=IxKEwJIDkWFWdLOduLQqDMMWI7xU0QNpLG1mKFM02rs=;
- b=g1MeLxRcCLz0WGoi9c0wXjonCBJEJvpXP/SuuinED277DcmBiGSo2ylfvxgPK3Orb+
- IYbF3XUU1Ry9h065YjZh92o2p7ljYo7nRpGMl0NkF6iNLrOo4dNp7jFtk7+h1KYROio6
- dAxhhpaqX/xzThbEqRueM08mFje9M58Ra+GSHt65xzOt0bMHVh7G6P31qfA2PxqShp9b
- zSw6PaOQOTFPpyu3AqjyDhx68FUUk9vKOIWqA3xeHxHo6E4dgNZ0AHmDyBjYJYGmepqa
- wYx8HgdyBTzgzR766Br+hcqgXXDJPuosGuOfGsLkwPI8cC/s6Y4oOTMeBqv0VSEOgnNE
- LGBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=IxKEwJIDkWFWdLOduLQqDMMWI7xU0QNpLG1mKFM02rs=;
- b=VqEqmnqdkz/0mH8U1KRFuGd6dj4J5fKqsFJ0PcRVXil9A7DC4X5hhZrb5D7MrGWGYB
- QBmiTFRvFPiDXXXH1nvr9z3uBC4Wlmx4WvnkbDPidGeYgKh1wqO1dFraRd/+AURq3fTl
- kZ+UdrCfollAKQc2N7YT+eDYz6pgzuQ+FPRy/XnehCAljc8Byf7jWPxHBtzMhZUP0Esw
- JEozjDb9FbpVzBoUmT7ATlJqOzqIcEN0qbM6K6u8XL7SHqzuEFB0e20r1YKREDvJ+Qzc
- vomzG11wEgMQw6TjNhLDS67bN5zK2or2HR0mLuc5sMt3tn4yOx1Szvjs79IWWqoHYKiz
- EwxQ==
-X-Gm-Message-State: AOAM533/cJ5JQgKbNvWhptZZLyyAVJ6I1ih1P/fiRDg0tGigEg8m0VuN
- JturioQeWBXu5HOKY6uUPkauug==
-X-Google-Smtp-Source: ABdhPJyw1pQaZQIURVIYntzJptazAHx7LZxvhh9s3DKAS6T2mBaDh+IRdAi2bZY6JoIkWxVe9MjV5w==
-X-Received: by 2002:a05:6000:1292:: with SMTP id
- f18mr30790889wrx.196.1606140390020; 
- Mon, 23 Nov 2020 06:06:30 -0800 (PST)
-Received: from google.com ([2a00:79e0:d:210:f693:9fff:fef4:a7ef])
- by smtp.gmail.com with ESMTPSA id l14sm12976982wmi.33.2020.11.23.06.06.29
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 23 Nov 2020 06:06:29 -0800 (PST)
-Date: Mon, 23 Nov 2020 14:06:25 +0000
-From: Quentin Perret <qperret@google.com>
+ with ESMTP id mcpf+tkpCvCe for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 23 Nov 2020 09:20:11 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A3ECA4BB5C
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 09:20:11 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 62C2D20781;
+ Mon, 23 Nov 2020 14:20:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1606141210;
+ bh=xAdNybpsYh2E0+792QH2eMxvVzwUFSgdE96e/bSFE6c=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=1rORItQvoz/zaPOIkqicusx02B492b3DEaRv+XMYId8M2qBmmnkyk7/9BOnkKF9vZ
+ ZtvPJuhbsaeN6DJbOuDeZnzwo+y9/+24Mt8DWBFcXxLwVxIO8SPdKC28awNVXH9eAh
+ AswYJ7dWlspM5DPdwNUg9yPnDn64PkopIsvi9CKw=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1khChM-00CyLj-AO; Mon, 23 Nov 2020 14:20:08 +0000
+Date: Mon, 23 Nov 2020 14:20:07 +0000
+Message-ID: <87lfes5f54.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
 To: David Brazdil <dbrazdil@google.com>
-Subject: Re: [RFC PATCH 02/27] KVM: arm64: Link position-independent string
- routines into .hyp.text
-Message-ID: <20201123140625.GC490744@google.com>
-References: <20201117181607.1761516-1-qperret@google.com>
- <20201117181607.1761516-3-qperret@google.com>
- <20201123123425.uzfuk3pmwgzuijwn@google.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20201123123425.uzfuk3pmwgzuijwn@google.com>
-Cc: "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE"
- <devicetree@vger.kernel.org>, kernel-team@android.com,
- Frank Rowand <frowand.list@gmail.com>, android-kvm@google.com,
- Catalin Marinas <catalin.marinas@arm.com>,
- open list <linux-kernel@vger.kernel.org>, Rob Herring <robh+dt@kernel.org>,
- "moderated list:ARM64 PORT \(AARCH64 ARCHITECTURE\)"
- <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>,
- "open list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
- <kvmarm@lists.cs.columbia.edu>
+Subject: Re: [PATCH v2 06/24] kvm: arm64: Move hyp-init params to a per-CPU
+ struct
+In-Reply-To: <20201116204318.63987-7-dbrazdil@google.com>
+References: <20201116204318.63987-1-dbrazdil@google.com>
+ <20201116204318.63987-7-dbrazdil@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: dbrazdil@google.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+ catalin.marinas@arm.com, will@kernel.org, dennis@kernel.org, tj@kernel.org,
+ cl@linux.com, mark.rutland@arm.com, lorenzo.pieralisi@arm.com,
+ qperret@google.com, ascull@google.com, qwandor@google.com,
+ kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+ Andrew Walbran <qwandor@google.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ Tejun Heo <tj@kernel.org>, Dennis Zhou <dennis@kernel.org>,
+ Christoph Lameter <cl@linux.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -112,36 +105,142 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Monday 23 Nov 2020 at 12:34:25 (+0000), David Brazdil wrote:
-> On Tue, Nov 17, 2020 at 06:15:42PM +0000, 'Quentin Perret' via kernel-team wrote:
-> > diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
-> > index 8539f34d7538..dd8ccc9efb6a 100644
-> > --- a/arch/arm64/kernel/image-vars.h
-> > +++ b/arch/arm64/kernel/image-vars.h
-> > @@ -105,6 +105,17 @@ KVM_NVHE_ALIAS(__stop___kvm_ex_table);
-> >  /* Array containing bases of nVHE per-CPU memory regions. */
-> >  KVM_NVHE_ALIAS(kvm_arm_hyp_percpu_base);
-> >  
-> > +/* Position-independent library routines */
-> > +__kvm_nvhe_clear_page			= __kvm_nvhe___pi_clear_page;
-> > +__kvm_nvhe_copy_page			= __kvm_nvhe___pi_copy_page;
-> > +__kvm_nvhe_memcpy			= __kvm_nvhe___pi_memcpy;
-> > +__kvm_nvhe_memset			= __kvm_nvhe___pi_memset;
-> > +
-> > +#ifdef CONFIG_KASAN
-> > +__kvm_nvhe___memcpy			= __kvm_nvhe___pi_memcpy;
-> > +__kvm_nvhe___memset			= __kvm_nvhe___pi_memset;
-> > +#endif
-> > +
-> >  #endif /* CONFIG_KVM */
+On Mon, 16 Nov 2020 20:43:00 +0000,
+David Brazdil <dbrazdil@google.com> wrote:
 > 
-> Nit: Would be good to use the kvm_nvhe_sym() helper for the namespacing.
-> And feel free to define something like KVM_NVHE_ALIAS for PI in hyp-image.h.
+> Once we start initializing KVM on newly booted cores before the rest of
+> the kernel, parameters to __do_hyp_init will need to be provided by EL2
+> rather than EL1. At that point it will not be possible to pass its four
+> arguments directly because PSCI_CPU_ON only supports one context
+> argument.
+> 
+> Refactor __do_hyp_init to accept its parameters in a struct. This
+> prepares the code for KVM booting cores as well as removes any limits on
+> the number of __do_hyp_init arguments.
+> 
+> Signed-off-by: David Brazdil <dbrazdil@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_asm.h   |  7 +++++++
+>  arch/arm64/include/asm/kvm_hyp.h   |  4 ++++
+>  arch/arm64/kernel/asm-offsets.c    |  4 ++++
+>  arch/arm64/kvm/arm.c               | 26 ++++++++++++++------------
+>  arch/arm64/kvm/hyp/nvhe/hyp-init.S | 21 ++++++++++-----------
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c |  2 ++
+>  6 files changed, 41 insertions(+), 23 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index 54387ccd1ab2..01904e88cead 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -150,6 +150,13 @@ extern void *__vhe_undefined_symbol;
+>  
+>  #endif
+>  
+> +struct kvm_nvhe_init_params {
+> +	unsigned long tpidr_el2;
+> +	unsigned long vector_hyp_va;
+> +	unsigned long stack_hyp_va;
+> +	phys_addr_t pgd_pa;
+> +};
+> +
+>  /* Translate a kernel address @ptr into its equivalent linear mapping */
+>  #define kvm_ksym_ref(ptr)						\
+>  	({								\
+> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+> index 6b664de5ec1f..a3289071f3d8 100644
+> --- a/arch/arm64/include/asm/kvm_hyp.h
+> +++ b/arch/arm64/include/asm/kvm_hyp.h
+> @@ -15,6 +15,10 @@
+>  DECLARE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
+>  DECLARE_PER_CPU(unsigned long, kvm_hyp_vector);
+>  
+> +#ifdef __KVM_NVHE_HYPERVISOR__
+> +DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
+> +#endif
 
-Ack, that'd be much nicer, I'll fix it up for v2.
+I'm not sure we should bother with this #ifdefery. Having the
+declaration present at all times doesn't really hurt, since it is only
+defined in the HYP code. Cutting down on the conditionals would
+certainly help readability.
+
+> +
+>  #define read_sysreg_elx(r,nvh,vh)					\
+>  	({								\
+>  		u64 reg;						\
+> diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
+> index 7d32fc959b1a..4435ad8be938 100644
+> --- a/arch/arm64/kernel/asm-offsets.c
+> +++ b/arch/arm64/kernel/asm-offsets.c
+> @@ -110,6 +110,10 @@ int main(void)
+>    DEFINE(CPU_APGAKEYLO_EL1,	offsetof(struct kvm_cpu_context, sys_regs[APGAKEYLO_EL1]));
+>    DEFINE(HOST_CONTEXT_VCPU,	offsetof(struct kvm_cpu_context, __hyp_running_vcpu));
+>    DEFINE(HOST_DATA_CONTEXT,	offsetof(struct kvm_host_data, host_ctxt));
+> +  DEFINE(NVHE_INIT_TPIDR_EL2,	offsetof(struct kvm_nvhe_init_params, tpidr_el2));
+> +  DEFINE(NVHE_INIT_VECTOR_HYP_VA,	offsetof(struct kvm_nvhe_init_params, vector_hyp_va));
+> +  DEFINE(NVHE_INIT_STACK_HYP_VA,	offsetof(struct kvm_nvhe_init_params, stack_hyp_va));
+> +  DEFINE(NVHE_INIT_PGD_PA,	offsetof(struct kvm_nvhe_init_params, pgd_pa));
+>  #endif
+>  #ifdef CONFIG_CPU_PM
+>    DEFINE(CPU_CTX_SP,		offsetof(struct cpu_suspend_ctx, sp));
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index c0ffb019ca8b..4838556920fb 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -50,6 +50,7 @@ DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
+>  
+>  static DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_page);
+>  unsigned long kvm_arm_hyp_percpu_base[NR_CPUS];
+> +DECLARE_KVM_NVHE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
+>  
+>  /* The VMID used in the VTTBR */
+>  static atomic64_t kvm_vmid_gen = ATOMIC64_INIT(1);
+> @@ -1347,10 +1348,7 @@ static int kvm_map_vectors(void)
+>  
+>  static void cpu_init_hyp_mode(void)
+>  {
+> -	phys_addr_t pgd_ptr;
+> -	unsigned long hyp_stack_ptr;
+> -	unsigned long vector_ptr;
+> -	unsigned long tpidr_el2;
+> +	struct kvm_nvhe_init_params *params = this_cpu_ptr_nvhe_sym(kvm_init_params);
+>  	struct arm_smccc_res res;
+>  
+>  	/* Switch from the HYP stub to our own HYP init vector */
+> @@ -1361,13 +1359,18 @@ static void cpu_init_hyp_mode(void)
+>  	 * kernel's mapping to the linear mapping, and store it in tpidr_el2
+>  	 * so that we can use adr_l to access per-cpu variables in EL2.
+>  	 */
+> -	tpidr_el2 = (unsigned long)this_cpu_ptr_nvhe_sym(__per_cpu_start) -
+> -		    (unsigned long)kvm_ksym_ref(CHOOSE_NVHE_SYM(__per_cpu_start));
+> +	params->tpidr_el2 = (unsigned long)this_cpu_ptr_nvhe_sym(__per_cpu_start) -
+> +			    (unsigned long)kvm_ksym_ref(CHOOSE_NVHE_SYM(__per_cpu_start));
+>  
+> -	pgd_ptr = kvm_mmu_get_httbr();
+> -	hyp_stack_ptr = __this_cpu_read(kvm_arm_hyp_stack_page) + PAGE_SIZE;
+> -	hyp_stack_ptr = kern_hyp_va(hyp_stack_ptr);
+> -	vector_ptr = (unsigned long)kern_hyp_va(kvm_ksym_ref(__kvm_hyp_host_vector));
+> +	params->vector_hyp_va = (unsigned long)kern_hyp_va(kvm_ksym_ref(__kvm_hyp_host_vector));
+> +	params->stack_hyp_va = kern_hyp_va(__this_cpu_read(kvm_arm_hyp_stack_page) + PAGE_SIZE);
+> +	params->pgd_pa = kvm_mmu_get_httbr();
+
+Note to self: rename this to kvm_mmu_get_hyp_pgd() (another AArch32-ism).
+
+> +
+> +	/*
+> +	 * Flush the init params from the data cache because the struct will
+> +	 * be read while the MMU is off.
+> +	 */
+> +	__flush_dcache_area(params, sizeof(*params));
+
+nit: please use kvm_flush_dcache_to_poc(), as it clearly indicates to
+which point we are flushing.
 
 Thanks,
-Quentin
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
