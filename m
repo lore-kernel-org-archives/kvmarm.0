@@ -7,67 +7,66 @@ X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D245AC388F9
-	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 14:20:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAF81C56202
+	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 14:32:30 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4833C20781
-	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 14:20:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F164D2080A
+	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 14:32:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="1rORItQv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4833C20781
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="GpZ/3A6V"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F164D2080A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 82B334BB69;
-	Mon, 23 Nov 2020 09:20:15 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D1C14BA38;
+	Mon, 23 Nov 2020 09:32:29 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 1Ty4xvqgv2rJ; Mon, 23 Nov 2020 09:20:14 -0500 (EST)
+	with ESMTP id Qaxs6X1AVjt7; Mon, 23 Nov 2020 09:32:28 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4832C4BB5B;
-	Mon, 23 Nov 2020 09:20:14 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2CD604BAC1;
+	Mon, 23 Nov 2020 09:32:28 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DFA294BB5D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 09:20:12 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F19944BA38
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 09:32:26 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mcpf+tkpCvCe for <kvmarm@lists.cs.columbia.edu>;
- Mon, 23 Nov 2020 09:20:11 -0500 (EST)
+ with ESMTP id WtvB+gZTIuNm for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 23 Nov 2020 09:32:24 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A3ECA4BB5C
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 09:20:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C27CD4BA28
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 09:32:24 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 62C2D20781;
- Mon, 23 Nov 2020 14:20:10 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 7E1292083E;
+ Mon, 23 Nov 2020 14:32:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1606141210;
- bh=xAdNybpsYh2E0+792QH2eMxvVzwUFSgdE96e/bSFE6c=;
+ s=default; t=1606141943;
+ bh=lDofIwi2BtW6n3G9yyz3mKUtQ/dbkrPPmWz16CrGPi0=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=1rORItQvoz/zaPOIkqicusx02B492b3DEaRv+XMYId8M2qBmmnkyk7/9BOnkKF9vZ
- ZtvPJuhbsaeN6DJbOuDeZnzwo+y9/+24Mt8DWBFcXxLwVxIO8SPdKC28awNVXH9eAh
- AswYJ7dWlspM5DPdwNUg9yPnDn64PkopIsvi9CKw=
+ b=GpZ/3A6VL9vrcXWbAJ7FguzGnep2k7UBr7K5iTyCQKc76oA3A9XrwGdRmKY+lRWuE
+ Xf1jUB6+kgy8MCtw871AyjjXzjtXYFD3ZyRwIx8Y9y4TVuGYloOGFcTcl4dOeevuVd
+ 1wpFK4aJvsTBHW6U3613MGfSfdmVVXrMGx2MUh8I=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1khChM-00CyLj-AO; Mon, 23 Nov 2020 14:20:08 +0000
-Date: Mon, 23 Nov 2020 14:20:07 +0000
-Message-ID: <87lfes5f54.wl-maz@kernel.org>
+ id 1khCtB-00CyXO-Bu; Mon, 23 Nov 2020 14:32:21 +0000
+Date: Mon, 23 Nov 2020 14:32:20 +0000
+Message-ID: <87k0uc5ekr.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: David Brazdil <dbrazdil@google.com>
-Subject: Re: [PATCH v2 06/24] kvm: arm64: Move hyp-init params to a per-CPU
- struct
-In-Reply-To: <20201116204318.63987-7-dbrazdil@google.com>
+Subject: Re: [PATCH v2 07/24] kvm: arm64: Refactor handle_trap to use a switch
+In-Reply-To: <20201116204318.63987-8-dbrazdil@google.com>
 References: <20201116204318.63987-1-dbrazdil@google.com>
- <20201116204318.63987-7-dbrazdil@google.com>
+ <20201116204318.63987-8-dbrazdil@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -105,135 +104,58 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 16 Nov 2020 20:43:00 +0000,
+On Mon, 16 Nov 2020 20:43:01 +0000,
 David Brazdil <dbrazdil@google.com> wrote:
 > 
-> Once we start initializing KVM on newly booted cores before the rest of
-> the kernel, parameters to __do_hyp_init will need to be provided by EL2
-> rather than EL1. At that point it will not be possible to pass its four
-> arguments directly because PSCI_CPU_ON only supports one context
-> argument.
-> 
-> Refactor __do_hyp_init to accept its parameters in a struct. This
-> prepares the code for KVM booting cores as well as removes any limits on
-> the number of __do_hyp_init arguments.
-> 
+> Small refactor so that nVHE's handle_trap uses a switch on the Exception
+> Class value of ESR_EL2 in preparation for adding a handler of SMC32/64.
+
+nit: SMC32 seems to be a leftover from the previous version.
+
+>
 > Signed-off-by: David Brazdil <dbrazdil@google.com>
 > ---
->  arch/arm64/include/asm/kvm_asm.h   |  7 +++++++
->  arch/arm64/include/asm/kvm_hyp.h   |  4 ++++
->  arch/arm64/kernel/asm-offsets.c    |  4 ++++
->  arch/arm64/kvm/arm.c               | 26 ++++++++++++++------------
->  arch/arm64/kvm/hyp/nvhe/hyp-init.S | 21 ++++++++++-----------
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c |  2 ++
->  6 files changed, 41 insertions(+), 23 deletions(-)
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 15 ++++++++-------
+>  1 file changed, 8 insertions(+), 7 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index 54387ccd1ab2..01904e88cead 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -150,6 +150,13 @@ extern void *__vhe_undefined_symbol;
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> index 411b0f652417..19332c20fcde 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> @@ -16,9 +16,9 @@
 >  
->  #endif
+>  DEFINE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
 >  
-> +struct kvm_nvhe_init_params {
-> +	unsigned long tpidr_el2;
-> +	unsigned long vector_hyp_va;
-> +	unsigned long stack_hyp_va;
-> +	phys_addr_t pgd_pa;
-> +};
-> +
->  /* Translate a kernel address @ptr into its equivalent linear mapping */
->  #define kvm_ksym_ref(ptr)						\
->  	({								\
-> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-> index 6b664de5ec1f..a3289071f3d8 100644
-> --- a/arch/arm64/include/asm/kvm_hyp.h
-> +++ b/arch/arm64/include/asm/kvm_hyp.h
-> @@ -15,6 +15,10 @@
->  DECLARE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
->  DECLARE_PER_CPU(unsigned long, kvm_hyp_vector);
->  
-> +#ifdef __KVM_NVHE_HYPERVISOR__
-> +DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
-> +#endif
-
-I'm not sure we should bother with this #ifdefery. Having the
-declaration present at all times doesn't really hurt, since it is only
-defined in the HYP code. Cutting down on the conditionals would
-certainly help readability.
-
-> +
->  #define read_sysreg_elx(r,nvh,vh)					\
->  	({								\
->  		u64 reg;						\
-> diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
-> index 7d32fc959b1a..4435ad8be938 100644
-> --- a/arch/arm64/kernel/asm-offsets.c
-> +++ b/arch/arm64/kernel/asm-offsets.c
-> @@ -110,6 +110,10 @@ int main(void)
->    DEFINE(CPU_APGAKEYLO_EL1,	offsetof(struct kvm_cpu_context, sys_regs[APGAKEYLO_EL1]));
->    DEFINE(HOST_CONTEXT_VCPU,	offsetof(struct kvm_cpu_context, __hyp_running_vcpu));
->    DEFINE(HOST_DATA_CONTEXT,	offsetof(struct kvm_host_data, host_ctxt));
-> +  DEFINE(NVHE_INIT_TPIDR_EL2,	offsetof(struct kvm_nvhe_init_params, tpidr_el2));
-> +  DEFINE(NVHE_INIT_VECTOR_HYP_VA,	offsetof(struct kvm_nvhe_init_params, vector_hyp_va));
-> +  DEFINE(NVHE_INIT_STACK_HYP_VA,	offsetof(struct kvm_nvhe_init_params, stack_hyp_va));
-> +  DEFINE(NVHE_INIT_PGD_PA,	offsetof(struct kvm_nvhe_init_params, pgd_pa));
->  #endif
->  #ifdef CONFIG_CPU_PM
->    DEFINE(CPU_CTX_SP,		offsetof(struct cpu_suspend_ctx, sp));
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index c0ffb019ca8b..4838556920fb 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -50,6 +50,7 @@ DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
->  
->  static DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_page);
->  unsigned long kvm_arm_hyp_percpu_base[NR_CPUS];
-> +DECLARE_KVM_NVHE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
->  
->  /* The VMID used in the VTTBR */
->  static atomic64_t kvm_vmid_gen = ATOMIC64_INIT(1);
-> @@ -1347,10 +1348,7 @@ static int kvm_map_vectors(void)
->  
->  static void cpu_init_hyp_mode(void)
+> -static void handle_host_hcall(unsigned long func_id,
+> -			      struct kvm_cpu_context *host_ctxt)
+> +static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
 >  {
-> -	phys_addr_t pgd_ptr;
-> -	unsigned long hyp_stack_ptr;
-> -	unsigned long vector_ptr;
-> -	unsigned long tpidr_el2;
-> +	struct kvm_nvhe_init_params *params = this_cpu_ptr_nvhe_sym(kvm_init_params);
->  	struct arm_smccc_res res;
+> +	unsigned long func_id = host_ctxt->regs.regs[0];
+>  	unsigned long ret = 0;
 >  
->  	/* Switch from the HYP stub to our own HYP init vector */
-> @@ -1361,13 +1359,18 @@ static void cpu_init_hyp_mode(void)
->  	 * kernel's mapping to the linear mapping, and store it in tpidr_el2
->  	 * so that we can use adr_l to access per-cpu variables in EL2.
->  	 */
-> -	tpidr_el2 = (unsigned long)this_cpu_ptr_nvhe_sym(__per_cpu_start) -
-> -		    (unsigned long)kvm_ksym_ref(CHOOSE_NVHE_SYM(__per_cpu_start));
-> +	params->tpidr_el2 = (unsigned long)this_cpu_ptr_nvhe_sym(__per_cpu_start) -
-> +			    (unsigned long)kvm_ksym_ref(CHOOSE_NVHE_SYM(__per_cpu_start));
+>  	switch (func_id) {
+> @@ -109,11 +109,12 @@ static void handle_host_hcall(unsigned long func_id,
+>  void handle_trap(struct kvm_cpu_context *host_ctxt)
+>  {
+>  	u64 esr = read_sysreg_el2(SYS_ESR);
+> -	unsigned long func_id;
 >  
-> -	pgd_ptr = kvm_mmu_get_httbr();
-> -	hyp_stack_ptr = __this_cpu_read(kvm_arm_hyp_stack_page) + PAGE_SIZE;
-> -	hyp_stack_ptr = kern_hyp_va(hyp_stack_ptr);
-> -	vector_ptr = (unsigned long)kern_hyp_va(kvm_ksym_ref(__kvm_hyp_host_vector));
-> +	params->vector_hyp_va = (unsigned long)kern_hyp_va(kvm_ksym_ref(__kvm_hyp_host_vector));
-> +	params->stack_hyp_va = kern_hyp_va(__this_cpu_read(kvm_arm_hyp_stack_page) + PAGE_SIZE);
-> +	params->pgd_pa = kvm_mmu_get_httbr();
-
-Note to self: rename this to kvm_mmu_get_hyp_pgd() (another AArch32-ism).
-
-> +
-> +	/*
-> +	 * Flush the init params from the data cache because the struct will
-> +	 * be read while the MMU is off.
-> +	 */
-> +	__flush_dcache_area(params, sizeof(*params));
-
-nit: please use kvm_flush_dcache_to_poc(), as it clearly indicates to
-which point we are flushing.
+> -	if (ESR_ELx_EC(esr) != ESR_ELx_EC_HVC64)
+> +	switch (ESR_ELx_EC(esr)) {
+> +	case ESR_ELx_EC_HVC64:
+> +		handle_host_hcall(host_ctxt);
+> +		break;
+> +	default:
+>  		hyp_panic();
+> -
+> -	func_id = host_ctxt->regs.regs[0];
+> -	handle_host_hcall(func_id, host_ctxt);
+> +	}
+>  }
+> -- 
+> 2.29.2.299.gdc1121823c-goog
+> 
+> 
 
 Thanks,
 
