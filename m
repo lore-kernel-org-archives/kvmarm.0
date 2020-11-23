@@ -2,71 +2,69 @@ Return-Path: <SRS0=PaY3=E5=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36645C63697
-	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 18:01:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05913C6379D
+	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 18:01:23 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 61FF1206B2
-	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 18:00:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4A31B206B2
+	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 18:01:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="1D4tJXE6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61FF1206B2
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZTYQI9+c"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A31B206B2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 969834B916;
-	Mon, 23 Nov 2020 13:00:58 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C6D524BBBB;
+	Mon, 23 Nov 2020 13:01:21 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id U90ID9A4WS03; Mon, 23 Nov 2020 13:00:57 -0500 (EST)
+	with ESMTP id brMPtwf-Bvmg; Mon, 23 Nov 2020 13:01:20 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6EE9C4B759;
-	Mon, 23 Nov 2020 13:00:57 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9EA6A4BBB1;
+	Mon, 23 Nov 2020 13:01:20 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 59ED54B727
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 13:00:56 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F6C04BBB1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 13:01:19 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id w26TaYd6NOHF for <kvmarm@lists.cs.columbia.edu>;
- Mon, 23 Nov 2020 13:00:55 -0500 (EST)
+ with ESMTP id fKbYF8iei1TB for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 23 Nov 2020 13:01:18 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 19CC74B634
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 13:00:55 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 206334B634
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 13:01:18 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id BC15D20758;
- Mon, 23 Nov 2020 18:00:53 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id D71602076E;
+ Mon, 23 Nov 2020 18:01:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1606154453;
- bh=OgBMsLtKiZ+xCEA9AnmfuQ94yiu816Qd03DhHewUrCs=;
+ s=default; t=1606154477;
+ bh=3wL8o/sAyclefSUZKYXwlw4dgxvLRbLTCkeW8PWsIVE=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=1D4tJXE6sEFGBsF8kVA3HlliXj3KgnEXEawHA6/WRHrqSQcRMITUw7OZbH6sCVLfD
- rPiVP6tdn5sbUDLgeIOOfi70Z5rLKo3c1dkasSbpR8jRYbTy62yE6c6gY0vD/ubEjm
- kRsCwfswlmyX19Ebx9RlhZ7tPtXJYGh6CZ+sgZ1g=
+ b=ZTYQI9+cXGC/y3cGvqIakhRkkVPuznNguzbQF/2SB6u3mZDII2fU70ovFRzPF+JQm
+ MzXGVjXA+YLp1fVvhPTYOM3ShNkG3iVCoGueR0N6Sm3hoOQn09BhIMS4Arwy/oGAKi
+ pFjgRR4F+uhJ6oqMWBlbztyLF9F5bB4Gj3i6T2Cg=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1khG8x-00D1ci-Hq; Mon, 23 Nov 2020 18:00:51 +0000
-Date: Mon, 23 Nov 2020 18:00:50 +0000
-Message-ID: <87a6v854x9.wl-maz@kernel.org>
+ id 1khG9K-00D1dH-Fa; Mon, 23 Nov 2020 18:01:14 +0000
+Date: Mon, 23 Nov 2020 18:01:13 +0000
+Message-ID: <878sas54wm.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: David Brazdil <dbrazdil@google.com>
-Subject: Re: [PATCH v2 08/24] kvm: arm64: Add SMC handler in nVHE EL2
-In-Reply-To: <20201116204318.63987-9-dbrazdil@google.com>
+Subject: Re: [PATCH v2 00/24] Opt-in always-on nVHE hypervisor
+In-Reply-To: <20201116204318.63987-1-dbrazdil@google.com>
 References: <20201116204318.63987-1-dbrazdil@google.com>
- <20201116204318.63987-9-dbrazdil@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -78,16 +76,16 @@ X-SA-Exim-Rcpt-To: dbrazdil@google.com, kvmarm@lists.cs.columbia.edu,
  catalin.marinas@arm.com, will@kernel.org, dennis@kernel.org, tj@kernel.org,
  cl@linux.com, mark.rutland@arm.com, lorenzo.pieralisi@arm.com,
  qperret@google.com, ascull@google.com, qwandor@google.com,
- kernel-team@android.com
+ kernel-team@android.com, lorenzo.pieralisi@arm.com, sudeep.holla@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
 Cc: kernel-team@android.com, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
  Andrew Walbran <qwandor@google.com>, Catalin Marinas <catalin.marinas@arm.com>,
  linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Tejun Heo <tj@kernel.org>, Dennis Zhou <dennis@kernel.org>,
- Christoph Lameter <cl@linux.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+ Sudeep Holla <sudeep.holla@arm.com>, Tejun Heo <tj@kernel.org>,
+ Dennis Zhou <dennis@kernel.org>, Christoph Lameter <cl@linux.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -104,75 +102,49 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 16 Nov 2020 20:43:02 +0000,
+Hi David,
+
+On Mon, 16 Nov 2020 20:42:54 +0000,
 David Brazdil <dbrazdil@google.com> wrote:
 > 
-> Add handler of host SMCs in KVM nVHE trap handler. Forward all SMCs to
-> EL3 and propagate the result back to EL1. This is done in preparation
-> for validating host SMCs in KVM nVHE protected mode.
+> As we progress towards being able to keep guest state private to the
+> host running nVHE hypervisor, this series allows the hypervisor to
+> install itself on newly booted CPUs before the host is allowed to run
+> on them.
 > 
-> The implementation assumes that firmware uses SMCCC v1.2 or older. That
-> means x0-x17 can be used both for arguments and results, other GPRs are
-> preserved.
+> All functionality described below is opt-in, guarded by an early param
+> 'kvm-arm.protected'. Future patches specific to the new "protected" mode
+> should be hidden behind the same param.
 > 
-> Signed-off-by: David Brazdil <dbrazdil@google.com>
-> ---
->  arch/arm64/kvm/hyp/nvhe/host.S     | 38 ++++++++++++++++++++++++++++++
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 26 ++++++++++++++++++++
->  2 files changed, 64 insertions(+)
+> The hypervisor starts trapping host SMCs and intercepting host's PSCI
+> CPU_ON/SUSPEND calls. It replaces the host's entry point with its own,
+> initializes the EL2 state of the new CPU and installs the nVHE hyp vector
+> before ERETing to the host's entry point.
 > 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
-> index ed27f06a31ba..52dae5cd5a28 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/host.S
-> +++ b/arch/arm64/kvm/hyp/nvhe/host.S
-> @@ -183,3 +183,41 @@ SYM_CODE_START(__kvm_hyp_host_vector)
->  	invalid_host_el1_vect			// FIQ 32-bit EL1
->  	invalid_host_el1_vect			// Error 32-bit EL1
->  SYM_CODE_END(__kvm_hyp_host_vector)
-> +
-> +/*
-> + * Forward SMC with arguments in struct kvm_cpu_context, and
-> + * store the result into the same struct. Assumes SMCCC 1.2 or older.
-> + *
-> + * x0: struct kvm_cpu_context*
-> + */
-> +SYM_CODE_START(__kvm_hyp_host_forward_smc)
-> +	/*
-> +	 * Use x18 to keep a pointer to the host context because x18
-> +	 * is callee-saved SMCCC but not in AAPCS64.
-> +	 */
-> +	mov	x18, x0
-> +
-> +	ldp	x0, x1,   [x18, #CPU_XREG_OFFSET(0)]
-> +	ldp	x2, x3,   [x18, #CPU_XREG_OFFSET(2)]
-> +	ldp	x4, x5,   [x18, #CPU_XREG_OFFSET(4)]
-> +	ldp	x6, x7,   [x18, #CPU_XREG_OFFSET(6)]
-> +	ldp	x8, x9,   [x18, #CPU_XREG_OFFSET(8)]
-> +	ldp	x10, x11, [x18, #CPU_XREG_OFFSET(10)]
-> +	ldp	x12, x13, [x18, #CPU_XREG_OFFSET(12)]
-> +	ldp	x14, x15, [x18, #CPU_XREG_OFFSET(14)]
-> +	ldp	x16, x17, [x18, #CPU_XREG_OFFSET(16)]
-> +
-> +	smc	#0
-> +
-> +	stp	x0, x1,   [x18, #CPU_XREG_OFFSET(0)]
-> +	stp	x2, x3,   [x18, #CPU_XREG_OFFSET(2)]
-> +	stp	x4, x5,   [x18, #CPU_XREG_OFFSET(4)]
-> +	stp	x6, x7,   [x18, #CPU_XREG_OFFSET(6)]
-> +	stp	x8, x9,   [x18, #CPU_XREG_OFFSET(8)]
-> +	stp	x10, x11, [x18, #CPU_XREG_OFFSET(10)]
-> +	stp	x12, x13, [x18, #CPU_XREG_OFFSET(12)]
-> +	stp	x14, x15, [x18, #CPU_XREG_OFFSET(14)]
-> +	stp	x16, x17, [x18, #CPU_XREG_OFFSET(16)]
+> The kernel checks new cores' features against the finalized system
+> capabilities. To avoid the need to move this code/data to EL2, the
+> implementation only allows to boot cores that were online at the time of
+> KVM initialization and therefore had been checked already.
+> 
+> Other PSCI SMCs are forwarded to EL3, though only the known set of SMCs
+> implemented in the kernel is allowed. Non-PSCI SMCs are also forwarded
+> to EL3. Future changes will need to ensure the safety of all SMCs wrt.
+> private guests.
+> 
+> The host is still allowed to reset EL2 back to the stub vector, eg. for
+> hibernation or kexec, but will not disable nVHE when there are no VMs.
 
-This is going to be really good for CPUs that need to use ARCH_WA1 for
-their Spectre-v2 mitigation... :-( If that's too expensive, we may
-have to reduce the number of save/restored registers, but I'm worried
-the battle is already lost by the time we reach this (the host trap
-path is already a huge hammer).
+I have now been through the whole series, and I don't think there is
+anything really major (although I haven't tried it yet).
 
-Eventually, we'll have to insert the mitigation in the vectors anyway,
-just like we have on the guest exit path. Boo.
+I think it would benefit from being rebased on top of kvmarm/queue, as
+it'd give you the opportunity to replace a number of per-CPU state
+fields with global function pointers. Another thing is that we seem to
+have diverging interpretations of the PSCI spec when it comes to
+CPU_SUSPEND.
+
+Finally, please include the PSCI maintainers in your next posting, as
+I'll need their Ack to pick the first few patches.
 
 Thanks,
 
