@@ -2,92 +2,99 @@ Return-Path: <SRS0=PaY3=E5=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAF81C56202
-	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 14:32:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA30FC56202
+	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 14:40:04 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id F164D2080A
-	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 14:32:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3287220782
+	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 14:40:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="GpZ/3A6V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F164D2080A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="dDlg28P+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3287220782
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D1C14BA38;
-	Mon, 23 Nov 2020 09:32:29 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6340D4BB5D;
+	Mon, 23 Nov 2020 09:40:03 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Qaxs6X1AVjt7; Mon, 23 Nov 2020 09:32:28 -0500 (EST)
+	with ESMTP id X0lYrKKhOND7; Mon, 23 Nov 2020 09:40:02 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2CD604BAC1;
-	Mon, 23 Nov 2020 09:32:28 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D33F4BB0A;
+	Mon, 23 Nov 2020 09:40:02 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F19944BA38
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 09:32:26 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DDB104BB03
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 09:40:00 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WtvB+gZTIuNm for <kvmarm@lists.cs.columbia.edu>;
- Mon, 23 Nov 2020 09:32:24 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C27CD4BA28
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 09:32:24 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 7E1292083E;
- Mon, 23 Nov 2020 14:32:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1606141943;
- bh=lDofIwi2BtW6n3G9yyz3mKUtQ/dbkrPPmWz16CrGPi0=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=GpZ/3A6VL9vrcXWbAJ7FguzGnep2k7UBr7K5iTyCQKc76oA3A9XrwGdRmKY+lRWuE
- Xf1jUB6+kgy8MCtw871AyjjXzjtXYFD3ZyRwIx8Y9y4TVuGYloOGFcTcl4dOeevuVd
- 1wpFK4aJvsTBHW6U3613MGfSfdmVVXrMGx2MUh8I=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=wait-a-minute.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
- (envelope-from <maz@kernel.org>)
- id 1khCtB-00CyXO-Bu; Mon, 23 Nov 2020 14:32:21 +0000
-Date: Mon, 23 Nov 2020 14:32:20 +0000
-Message-ID: <87k0uc5ekr.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
+ with ESMTP id 2tvYyGPcr0em for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 23 Nov 2020 09:40:00 -0500 (EST)
+Received: from mail-wm1-f66.google.com (mail-wm1-f66.google.com
+ [209.85.128.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E71744B9E5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 09:39:59 -0500 (EST)
+Received: by mail-wm1-f66.google.com with SMTP id d142so18089730wmd.4
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 06:39:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=IA/qfqyOklQJ79pqoG5f5P3U9Ipwq6yHC17vWE58tNA=;
+ b=dDlg28P+Jh4WcUUlhAaq1JtPUuluHcfx65ApOfbVNU1dBa9Ao9nNN3oqUjtpo4n2RL
+ bs55n7JhmPAMJu5SsUcgF5jAQujYSTMh3gIGsli/knyqFXfi7M7MHR6GJcRTuLW1hAKj
+ oDL+sXKgB4ohn7ghXtJVILlso5bwoVTIprgaJOATeg0t+sdmnK259j0WIEcZaUoGG5zI
+ nGNhrjlStyWjlCeEriRzGA6e4f5MMBCusLNYE6yOnGB6KBQe2TBnq8tpOpBVz7OwN/0P
+ Xo/FufSf0lPAAyfrQoasy/ymA8ZPqtqL8xuT/eBCyPxzhzqP0QRTuj3y7WyhXwzCkLGN
+ 5XPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=IA/qfqyOklQJ79pqoG5f5P3U9Ipwq6yHC17vWE58tNA=;
+ b=NMdMbgRYG1qT2z3BMVuv6ozpEdJcNDlixMfrUKaUGP4OSRF9V2Udjl7+dgD40e6nUP
+ BSv1nxoHU9C+JRBP5xpuWy9fxKHAc+Azwoi2IGRGmPFNAgkD7m9smgPHnVigeG2ecRAV
+ vNNkHQb8MsXyKnHSi9ROhaAEjPCcT6TRDyWGBsm6n8ETp2DY53e9fw5wq6tnEE1X6He9
+ 3LC5VMy1VBKr8hj1WWJNltS2cG0nW71rPu/mLZjNEEi2vZNovSrRnJMTHd6LDVQxgvrl
+ MOQnuZ6pxH07yxgynmAa7D7R+eXpbTZpfihWBN2GazgEtlxT5afLvuPlkFIiNrJxhDEs
+ 96Vw==
+X-Gm-Message-State: AOAM533GxocU1NcUqOQZXmU725XcuHnBE6dWu3iKZeFi1Zsa73vrLXcc
+ dIpwMJmPEtQwgVt4SyPJVs6wMg==
+X-Google-Smtp-Source: ABdhPJzKkhqMWPHaBtD6XLWKHtSpwRHpjKsbcwlUiF4pqtF3mjusg9s7MoY8/c/6bW3rqWv2KFWqkg==
+X-Received: by 2002:a7b:c157:: with SMTP id z23mr23864861wmi.70.1606142398827; 
+ Mon, 23 Nov 2020 06:39:58 -0800 (PST)
+Received: from google.com ([2a00:79e0:d:210:f693:9fff:fef4:a7ef])
+ by smtp.gmail.com with ESMTPSA id f17sm17235287wmh.10.2020.11.23.06.39.57
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 23 Nov 2020 06:39:58 -0800 (PST)
+Date: Mon, 23 Nov 2020 14:39:54 +0000
+From: Quentin Perret <qperret@google.com>
 To: David Brazdil <dbrazdil@google.com>
-Subject: Re: [PATCH v2 07/24] kvm: arm64: Refactor handle_trap to use a switch
-In-Reply-To: <20201116204318.63987-8-dbrazdil@google.com>
-References: <20201116204318.63987-1-dbrazdil@google.com>
- <20201116204318.63987-8-dbrazdil@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: dbrazdil@google.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
- catalin.marinas@arm.com, will@kernel.org, dennis@kernel.org, tj@kernel.org,
- cl@linux.com, mark.rutland@arm.com, lorenzo.pieralisi@arm.com,
- qperret@google.com, ascull@google.com, qwandor@google.com,
- kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kernel-team@android.com, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
- Andrew Walbran <qwandor@google.com>, Catalin Marinas <catalin.marinas@arm.com>,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Tejun Heo <tj@kernel.org>, Dennis Zhou <dennis@kernel.org>,
- Christoph Lameter <cl@linux.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+Subject: Re: [RFC PATCH 13/27] KVM: arm64: Enable access to sanitized CPU
+ features at EL2
+Message-ID: <20201123143954.GA578849@google.com>
+References: <20201117181607.1761516-1-qperret@google.com>
+ <20201117181607.1761516-14-qperret@google.com>
+ <20201123132223.oohevce4izuoaqi3@google.com>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <20201123132223.oohevce4izuoaqi3@google.com>
+Cc: "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE"
+ <devicetree@vger.kernel.org>, kernel-team@android.com,
+ Frank Rowand <frowand.list@gmail.com>, android-kvm@google.com,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ open list <linux-kernel@vger.kernel.org>, Rob Herring <robh+dt@kernel.org>,
+ "moderated list:ARM64 PORT \(AARCH64 ARCHITECTURE\)"
+ <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>,
+ "open list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
+ <kvmarm@lists.cs.columbia.edu>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -104,65 +111,25 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 16 Nov 2020 20:43:01 +0000,
-David Brazdil <dbrazdil@google.com> wrote:
-> 
-> Small refactor so that nVHE's handle_trap uses a switch on the Exception
-> Class value of ESR_EL2 in preparation for adding a handler of SMC32/64.
+On Monday 23 Nov 2020 at 13:22:23 (+0000), David Brazdil wrote:
+> Could you help my understand why we need this?
+> * Why do we need PI routines in the first place? Would my series that fixes
+>   relocations in hyp code remove the need?
+> * You added these aliases for the string routines because you were worried
+>   somebody would change the implementation in arch/arm64/lib, right? But this
+>   cache flush function is defined in hyp/nvhe. So why do we need to point to
+>   the PI alias if we control the implementation?
 
-nit: SMC32 seems to be a leftover from the previous version.
+Right, in the specific case of the __flush_dcache_area() function none
+of the PI stuff is really needed I think. I did it this way to keep
+things as consistent as possible with the host-side implementation, but
+that is not required.
 
->
-> Signed-off-by: David Brazdil <dbrazdil@google.com>
-> ---
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 15 ++++++++-------
->  1 file changed, 8 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index 411b0f652417..19332c20fcde 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -16,9 +16,9 @@
->  
->  DEFINE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
->  
-> -static void handle_host_hcall(unsigned long func_id,
-> -			      struct kvm_cpu_context *host_ctxt)
-> +static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
->  {
-> +	unsigned long func_id = host_ctxt->regs.regs[0];
->  	unsigned long ret = 0;
->  
->  	switch (func_id) {
-> @@ -109,11 +109,12 @@ static void handle_host_hcall(unsigned long func_id,
->  void handle_trap(struct kvm_cpu_context *host_ctxt)
->  {
->  	u64 esr = read_sysreg_el2(SYS_ESR);
-> -	unsigned long func_id;
->  
-> -	if (ESR_ELx_EC(esr) != ESR_ELx_EC_HVC64)
-> +	switch (ESR_ELx_EC(esr)) {
-> +	case ESR_ELx_EC_HVC64:
-> +		handle_host_hcall(host_ctxt);
-> +		break;
-> +	default:
->  		hyp_panic();
-> -
-> -	func_id = host_ctxt->regs.regs[0];
-> -	handle_host_hcall(func_id, host_ctxt);
-> +	}
->  }
-> -- 
-> 2.29.2.299.gdc1121823c-goog
-> 
-> 
+I understand this can cause confusion, so yes, I'll simplify this for
+v2.
 
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Cheers,
+Quentin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
