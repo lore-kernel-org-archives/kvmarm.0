@@ -4,70 +4,69 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91429C2D0E4
-	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 17:30:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C301CC2D0E4
+	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 17:36:26 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C7E6120756
-	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 17:30:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 21BDF2078E
+	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 17:36:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="dyDnD2a0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7E6120756
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="xPEwZEJW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21BDF2078E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1915A4BBAF;
-	Mon, 23 Nov 2020 12:30:23 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 84D5D4B86B;
+	Mon, 23 Nov 2020 12:36:25 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 40gHWvHmfwIs; Mon, 23 Nov 2020 12:30:21 -0500 (EST)
+	with ESMTP id XD208KILJ4SH; Mon, 23 Nov 2020 12:36:24 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 44D754BBB0;
-	Mon, 23 Nov 2020 12:30:21 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5516B4B872;
+	Mon, 23 Nov 2020 12:36:24 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7DFB34BBAE
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 12:30:20 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 22EA94B841
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 12:36:23 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id T9iYD+fRePCy for <kvmarm@lists.cs.columbia.edu>;
- Mon, 23 Nov 2020 12:30:19 -0500 (EST)
+ with ESMTP id Zo3C2UFb2NTQ for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 23 Nov 2020 12:36:21 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 33BA74BB53
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 12:30:19 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B1A614B83F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 12:36:21 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id CD76E20758;
- Mon, 23 Nov 2020 17:30:17 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 50D2A2075A;
+ Mon, 23 Nov 2020 17:36:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1606152618;
- bh=oz9JmIWa3XvZOAzCbCMICe2nj2WJ7qbp9Ua7W1eEYYc=;
+ s=default; t=1606152980;
+ bh=72RRatZM1+/5lYRX4mU7xJg9Ys//lfez1nyUPZbbrYA=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=dyDnD2a0fu0SnFH9Caat93EMmFaB9b4qWf64Zh4wx7cGpP39t3pQS0MdiqJEyOz0b
- 7xT9bl5rfjXtO1H+SZob50e7UFUmV+TQVsM1BShiutxjA2cbnAAo8+TnB7sPMIFWa2
- 2p8CrxT6zuyljZtaQk0r0w6wYhsNtjk6HcvFC7Qw=
+ b=xPEwZEJWN7lkIGMrZ9gsZz5S8sQEWFFbhNlzIkp24L/GvwO8wQ6Ba5D9bzJMdICNb
+ s+MIIj1EoywpByO9j/hQKMd/+zNdwLqCZDPBAI4g7tU9d3Vw6p0xHyOeroOy318kGJ
+ 77i9RvP6gwzIkfSDGYgWGVNFP8PSzpwdnp7AZtnE=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1khFfL-00D18Q-JR; Mon, 23 Nov 2020 17:30:15 +0000
-Date: Mon, 23 Nov 2020 17:30:14 +0000
-Message-ID: <87eekk56c9.wl-maz@kernel.org>
+ id 1khFlB-00D1DY-RG; Mon, 23 Nov 2020 17:36:17 +0000
+Date: Mon, 23 Nov 2020 17:36:16 +0000
+Message-ID: <87d0045627.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: David Brazdil <dbrazdil@google.com>
-Subject: Re: [PATCH v2 21/24] kvm: arm64: Add kvm-arm.protected early kernel
- parameter
-In-Reply-To: <20201116204318.63987-22-dbrazdil@google.com>
+Subject: Re: [PATCH v2 23/24] kvm: arm64: Trap host SMCs in protected mode.
+In-Reply-To: <20201116204318.63987-24-dbrazdil@google.com>
 References: <20201116204318.63987-1-dbrazdil@google.com>
- <20201116204318.63987-22-dbrazdil@google.com>
+ <20201116204318.63987-24-dbrazdil@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -105,141 +104,90 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 16 Nov 2020 20:43:15 +0000,
+On Mon, 16 Nov 2020 20:43:17 +0000,
 David Brazdil <dbrazdil@google.com> wrote:
 > 
-> Add an early parameter that allows users to opt into protected KVM mode
-> when using the nVHE hypervisor. In this mode, guest state will be kept
-> private from the host. This will primarily involve enabling stage-2
-> address translation for the host, restricting DMA to host memory, and
-> filtering host SMCs.
+> While protected nVHE KVM is installed, start trapping all host SMCs.
+> By default, these are simply forwarded to EL3, but PSCI SMCs are
+> validated first.
 > 
-> Capability ARM64_PROTECTED_KVM is set if the param is passed, CONFIG_KVM
-> is enabled and the kernel was not booted with VHE.
+> Create new constant HCR_HOST_NVHE_PROTECTED_FLAGS with the new set of HCR
+> flags to use while the nVHE vector is installed when the kernel was
+> booted with the protected flag enabled. Switch back to the default HCR
+> flags when switching back to the stub vector.
 > 
 > Signed-off-by: David Brazdil <dbrazdil@google.com>
 > ---
->  arch/arm64/include/asm/cpucaps.h |  3 ++-
->  arch/arm64/include/asm/virt.h    |  8 ++++++++
->  arch/arm64/kernel/cpufeature.c   | 29 +++++++++++++++++++++++++++++
->  arch/arm64/kvm/arm.c             | 10 +++++++++-
->  4 files changed, 48 insertions(+), 2 deletions(-)
+>  arch/arm64/include/asm/kvm_arm.h   |  1 +
+>  arch/arm64/kvm/hyp/nvhe/hyp-init.S | 12 ++++++++++++
+>  arch/arm64/kvm/hyp/nvhe/switch.c   |  5 ++++-
+>  3 files changed, 17 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
-> index e7d98997c09c..ac075f70b2e4 100644
-> --- a/arch/arm64/include/asm/cpucaps.h
-> +++ b/arch/arm64/include/asm/cpucaps.h
-> @@ -66,7 +66,8 @@
->  #define ARM64_HAS_TLB_RANGE			56
->  #define ARM64_MTE				57
->  #define ARM64_WORKAROUND_1508412		58
-> +#define ARM64_PROTECTED_KVM			59
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index 64ce29378467..4e90c2debf70 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -80,6 +80,7 @@
+>  			 HCR_FMO | HCR_IMO | HCR_PTW )
+>  #define HCR_VIRT_EXCP_MASK (HCR_VSE | HCR_VI | HCR_VF)
+>  #define HCR_HOST_NVHE_FLAGS (HCR_RW | HCR_API | HCR_APK | HCR_ATA)
+> +#define HCR_HOST_NVHE_PROTECTED_FLAGS (HCR_HOST_NVHE_FLAGS | HCR_TSC)
+>  #define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
 >  
-> -#define ARM64_NCAPS				59
-> +#define ARM64_NCAPS				60
->  
->  #endif /* __ASM_CPUCAPS_H */
-> diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
-> index 6069be50baf9..2fde1186b962 100644
-> --- a/arch/arm64/include/asm/virt.h
-> +++ b/arch/arm64/include/asm/virt.h
-> @@ -97,6 +97,14 @@ static __always_inline bool has_vhe(void)
->  		return cpus_have_final_cap(ARM64_HAS_VIRT_HOST_EXTN);
->  }
->  
-> +static __always_inline bool is_protected_kvm_enabled(void)
-> +{
-> +	if (is_vhe_hyp_code())
-> +		return false;
-> +	else
-> +		return cpus_have_final_cap(ARM64_PROTECTED_KVM);
-> +}
-> +
->  #endif /* __ASSEMBLY__ */
->  
->  #endif /* ! __ASM__VIRT_H */
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index 6f36c4f62f69..dd5bc0f0cf0d 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -1709,6 +1709,29 @@ static void cpu_enable_mte(struct arm64_cpu_capabilities const *cap)
->  }
->  #endif /* CONFIG_ARM64_MTE */
->  
-> +#ifdef CONFIG_KVM
-> +static bool enable_protected_kvm;
-> +
-> +static bool has_protected_kvm(const struct arm64_cpu_capabilities *entry, int __unused)
-> +{
-> +	if (!enable_protected_kvm)
-> +		return false;
-> +
-> +	if (is_kernel_in_hyp_mode()) {
-> +		pr_warn("Protected KVM not available with VHE\n");
-> +		return false;
-> +	}
-> +
-> +	return true;
-> +}
-> +
-> +static int __init early_protected_kvm_cfg(char *buf)
-> +{
-> +	return strtobool(buf, &enable_protected_kvm);
-> +}
-> +early_param("kvm-arm.protected", early_protected_kvm_cfg);
+>  /* TCR_EL2 Registers bits */
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> index 6d8202d2bdfb..8f3602f320ac 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> @@ -88,6 +88,12 @@ SYM_CODE_END(__kvm_hyp_init)
+>   * x0: struct kvm_nvhe_init_params PA
+>   */
+>  SYM_CODE_START(___kvm_hyp_init)
+> +alternative_if ARM64_PROTECTED_KVM
+> +	mov_q	x1, HCR_HOST_NVHE_PROTECTED_FLAGS
+> +	msr	hcr_el2, x1
+> +	isb
 
-Please add some documentation to
-Documentation/admin-guide/kernel-parameters.txt.
+Why the ISB? For HCR_TSC to have any effect, you'll have to go via an
+ERET to EL1 first, which will have the required synchronisation effect.
 
-> +#endif /* CONFIG_KVM */
+> +alternative_else_nop_endif
 > +
->  /* Internal helper functions to match cpu capability type */
->  static bool
->  cpucap_late_cpu_optional(const struct arm64_cpu_capabilities *cap)
-> @@ -1822,6 +1845,12 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
->  		.field_pos = ID_AA64PFR0_EL1_SHIFT,
->  		.min_field_value = ID_AA64PFR0_EL1_32BIT_64BIT,
->  	},
-> +	{
-> +		.desc = "Protected KVM",
-> +		.capability = ARM64_PROTECTED_KVM,
-> +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-> +		.matches = has_protected_kvm,
-> +	},
->  #endif
->  	{
->  		.desc = "Kernel page table isolation (KPTI)",
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index c76a8e5bd19c..49d2474f2a80 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -1796,6 +1796,12 @@ int kvm_arch_init(void *opaque)
->  		return -ENODEV;
->  	}
+>  	ldr	x1, [x0, #NVHE_INIT_TPIDR_EL2]
+>  	msr	tpidr_el2, x1
 >  
-> +	/* The PROTECTED_KVM cap should not have been enabled for VHE. */
-> +	if (in_hyp_mode && is_protected_kvm_enabled()) {
-> +		kvm_pr_unimpl("VHE protected mode unsupported, not initializing\n");
-> +		return -ENODEV;
+> @@ -224,6 +230,12 @@ reset:
+>  	msr	sctlr_el2, x5
+>  	isb
+>  
+> +alternative_if ARM64_PROTECTED_KVM
+> +	mov_q	x5, HCR_HOST_NVHE_FLAGS
+> +	msr	hcr_el2, x5
+> +	isb
 
-How can this happen? Don't we already take care of this?
+Same thing here, I believe.
 
-> +	}
+> +alternative_else_nop_endif
 > +
->  	if (cpus_have_final_cap(ARM64_WORKAROUND_DEVICE_LOAD_ACQUIRE) ||
->  	    cpus_have_final_cap(ARM64_WORKAROUND_1508412))
->  		kvm_info("Guests without required CPU erratum workarounds can deadlock system!\n" \
-> @@ -1827,7 +1833,9 @@ int kvm_arch_init(void *opaque)
->  	if (err)
->  		goto out_hyp;
+>  	/* Install stub vectors */
+>  	adr_l	x5, __hyp_stub_vectors
+>  	msr	vbar_el2, x5
+> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+> index 8ae8160bc93a..e1f8e0797144 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+> @@ -96,7 +96,10 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
+>  	mdcr_el2 |= MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT;
 >  
-> -	if (in_hyp_mode)
+>  	write_sysreg(mdcr_el2, mdcr_el2);
+> -	write_sysreg(HCR_HOST_NVHE_FLAGS, hcr_el2);
 > +	if (is_protected_kvm_enabled())
-> +		kvm_info("Protected nVHE mode initialized successfully\n");
-> +	else if (in_hyp_mode)
->  		kvm_info("VHE mode initialized successfully\n");
->  	else
->  		kvm_info("Hyp mode initialized successfully\n");
+> +		write_sysreg(HCR_HOST_NVHE_PROTECTED_FLAGS, hcr_el2);
+> +	else
+> +		write_sysreg(HCR_HOST_NVHE_FLAGS, hcr_el2);
+>  	write_sysreg(CPTR_EL2_DEFAULT, cptr_el2);
+>  	write_sysreg(__kvm_hyp_host_vector, vbar_el2);
+>  }
 > -- 
 > 2.29.2.299.gdc1121823c-goog
 > 
