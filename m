@@ -7,83 +7,84 @@ X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2A3CC63777
-	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 09:27:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91DFEC56202
+	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 10:44:21 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E57D720781
-	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 09:27:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B206D2076E
+	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 10:44:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="OEHWSkSi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E57D720781
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="hTJmXcNr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B206D2076E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4BC064B8F6;
-	Mon, 23 Nov 2020 04:27:14 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 107474BAC3;
+	Mon, 23 Nov 2020 05:44:20 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id D00WIYkHpPAJ; Mon, 23 Nov 2020 04:27:13 -0500 (EST)
+	with ESMTP id 6nFGEaeHLTSz; Mon, 23 Nov 2020 05:44:18 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 30CB14B9A4;
-	Mon, 23 Nov 2020 04:27:13 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B14DD4BAB5;
+	Mon, 23 Nov 2020 05:44:18 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F3B0E4B930
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 04:27:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 09DC34BAAE
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 05:44:17 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UXaKbOFM62qg for <kvmarm@lists.cs.columbia.edu>;
- Mon, 23 Nov 2020 04:27:10 -0500 (EST)
+ with ESMTP id 1Hr0LRl6dr9z for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 23 Nov 2020 05:44:15 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BE75F4B8F6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 04:27:10 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BE6804BAAB
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 05:44:15 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 952B720773;
- Mon, 23 Nov 2020 09:27:09 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 691AB2076E;
+ Mon, 23 Nov 2020 10:44:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1606123629;
- bh=tKKya71aIfR/58bDPs9+LCebGD0IANotinwA5misRc8=;
+ s=default; t=1606128254;
+ bh=0i/Ni3kZzV5fbIzNzcjmFGKPO1GlWbvJIDpSsaZ7xz8=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=OEHWSkSi7cMWAlYqNXglNL846Y+HLs2L4s5husu6wOMdHlTXHEyan0J/Uz0I4zhHS
- lw+1zMzIfKEQYuRRaLy6ylaou1f7r50dYjm/3NaECxQlTIo+beNuw0O3YoMdBiVr49
- sDyUBmAzkajfLoNUb79ttjP07S61K1o8Uk3g0hY8=
+ b=hTJmXcNrqPN4TANS18R1jlGBzZajV2aUWLpzDTGH88XrxC87G+t/jopKrepNEeLwm
+ 0+rqIZem3eap2IfVbXVwyersh3veLjNERXei8VwYWymhk4/paAWd+W/p7rGHrkcnXm
+ +pjqXMdHX44U546hSqPOzry+sdpQiJe1afKpQhWs=
 Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
  by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
  TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1kh87n-00CruO-KX; Mon, 23 Nov 2020 09:27:07 +0000
+ id 1kh9KO-00Csxc-6S; Mon, 23 Nov 2020 10:44:12 +0000
 MIME-Version: 1.0
-Date: Mon, 23 Nov 2020 09:27:07 +0000
+Date: Mon, 23 Nov 2020 10:44:12 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Shenming Lu <lushenming@huawei.com>
-Subject: Re: [RFC PATCH v1 3/4] KVM: arm64: GICv4.1: Restore VLPI's pending
- state to physical side
-In-Reply-To: <20201123065410.1915-4-lushenming@huawei.com>
-References: <20201123065410.1915-1-lushenming@huawei.com>
- <20201123065410.1915-4-lushenming@huawei.com>
+To: Jianyong Wu <jianyong.wu@arm.com>
+Subject: Re: [PATCH v15 6/9] arm64/kvm: Add hypercall service for kvm ptp.
+In-Reply-To: <20201111062211.33144-7-jianyong.wu@arm.com>
+References: <20201111062211.33144-1-jianyong.wu@arm.com>
+ <20201111062211.33144-7-jianyong.wu@arm.com>
 User-Agent: Roundcube Webmail/1.4.9
-Message-ID: <5c724bb83730cdd5dcf7add9a812fa92@kernel.org>
+Message-ID: <d409aa1cb7cfcbf4351e6c5fc34d9c7e@kernel.org>
 X-Sender: maz@kernel.org
 X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: lushenming@huawei.com, james.morse@arm.com,
- julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, eric.auger@redhat.com,
+X-SA-Exim-Rcpt-To: jianyong.wu@arm.com, netdev@vger.kernel.org,
+ yangbo.lu@nxp.com, john.stultz@linaro.org, tglx@linutronix.de,
+ pbonzini@redhat.com, sean.j.christopherson@intel.com, richardcochran@gmail.com,
+ Mark.Rutland@arm.com, will@kernel.org, suzuki.poulose@arm.com,
+ Andre.Przywara@arm.com, steven.price@arm.com, linux-kernel@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org, christoffer.dall@arm.com,
- alex.williamson@redhat.com, kwankhede@nvidia.com, cohuck@redhat.com,
- cjia@nvidia.com, wanghaibin.wang@huawei.com, yuzenghui@huawei.com
+ kvm@vger.kernel.org, Steve.Capper@arm.com, justin.he@arm.com, nd@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: Neo Jia <cjia@nvidia.com>, kvm@vger.kernel.org,
- Cornelia Huck <cohuck@redhat.com>, linux-kernel@vger.kernel.org,
- Kirti Wankhede <kwankhede@nvidia.com>,
- Alex Williamson <alex.williamson@redhat.com>, kvmarm@lists.cs.columbia.edu,
+Cc: justin.he@arm.com, kvm@vger.kernel.org, netdev@vger.kernel.org,
+ richardcochran@gmail.com, linux-kernel@vger.kernel.org,
+ sean.j.christopherson@intel.com, steven.price@arm.com, Andre.Przywara@arm.com,
+ john.stultz@linaro.org, yangbo.lu@nxp.com, pbonzini@redhat.com,
+ tglx@linutronix.de, nd@arm.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -96,45 +97,162 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gMjAyMC0xMS0yMyAwNjo1NCwgU2hlbm1pbmcgTHUgd3JvdGU6Cj4gRnJvbTogWmVuZ2h1aSBZ
-dSA8eXV6ZW5naHVpQGh1YXdlaS5jb20+Cj4gCj4gV2hlbiBzZXR0aW5nIHRoZSBmb3J3YXJkaW5n
-IHBhdGggb2YgYSBWTFBJLCBpdCBpcyBtb3JlIGNvbnNpc3RlbnQgdG8KCkknbSBub3Qgc3VyZSBp
-dCBpcyBtb3JlIGNvbnNpc3RlbnQuIEl0IGlzIGEgKm5ldyogYmVoYXZpb3VyLCBiZWNhdXNlIGl0
-IApvbmx5Cm1hdHRlcnMgZm9yIG1pZ3JhdGlvbiwgd2hpY2ggaGFzIGJlZW4gc28gZmFyIHVuc3Vw
-cG9ydGVkLgoKPiBhbHNvIHRyYW5zZmVyIHRoZSBwZW5kaW5nIHN0YXRlIGZyb20gaXJxLT5wZW5k
-aW5nX2xhdGNoIHRvIFZQVCAKPiAoZXNwZWNpYWxseQo+IGluIG1pZ3JhdGlvbiwgdGhlIHBlbmRp
-bmcgc3RhdGVzIG9mIFZMUElzIGFyZSByZXN0b3JlZCBpbnRvIGt2beKAmXMgdmdpYwo+IGZpcnN0
-KS4gQW5kIHdlIGN1cnJlbnRseSBzZW5kICJJTlQrVlNZTkMiIHRvIHRyaWdnZXIgYSBWTFBJIHRv
-IHBlbmRpbmcuCj4gCj4gU2lnbmVkLW9mZi1ieTogWmVuZ2h1aSBZdSA8eXV6ZW5naHVpQGh1YXdl
-aS5jb20+Cj4gU2lnbmVkLW9mZi1ieTogU2hlbm1pbmcgTHUgPGx1c2hlbm1pbmdAaHVhd2VpLmNv
-bT4KPiAtLS0KPiAgYXJjaC9hcm02NC9rdm0vdmdpYy92Z2ljLXY0LmMgfCAxMiArKysrKysrKysr
-KysKPiAgMSBmaWxlIGNoYW5nZWQsIDEyIGluc2VydGlvbnMoKykKPiAKPiBkaWZmIC0tZ2l0IGEv
-YXJjaC9hcm02NC9rdm0vdmdpYy92Z2ljLXY0LmMgCj4gYi9hcmNoL2FybTY0L2t2bS92Z2ljL3Zn
-aWMtdjQuYwo+IGluZGV4IGI1ZmE3M2M5ZmQzNS4uY2MzYWI5Y2VhMTgyIDEwMDY0NAo+IC0tLSBh
-L2FyY2gvYXJtNjQva3ZtL3ZnaWMvdmdpYy12NC5jCj4gKysrIGIvYXJjaC9hcm02NC9rdm0vdmdp
-Yy92Z2ljLXY0LmMKPiBAQCAtNDE4LDYgKzQxOCwxOCBAQCBpbnQga3ZtX3ZnaWNfdjRfc2V0X2Zv
-cndhcmRpbmcoc3RydWN0IGt2bSAqa3ZtLCAKPiBpbnQgdmlycSwKPiAgCWlycS0+aG9zdF9pcnEJ
-PSB2aXJxOwo+ICAJYXRvbWljX2luYygmbWFwLnZwZS0+dmxwaV9jb3VudCk7Cj4gCj4gKwkvKiBU
-cmFuc2ZlciBwZW5kaW5nIHN0YXRlICovCj4gKwlyZXQgPSBpcnFfc2V0X2lycWNoaXBfc3RhdGUo
-aXJxLT5ob3N0X2lycSwKPiArCQkJCSAgICBJUlFDSElQX1NUQVRFX1BFTkRJTkcsCj4gKwkJCQkg
-ICAgaXJxLT5wZW5kaW5nX2xhdGNoKTsKPiArCVdBUk5fUkFURUxJTUlUKHJldCwgIklSUSAlZCIs
-IGlycS0+aG9zdF9pcnEpOwo+ICsKPiArCS8qCj4gKwkgKiBMZXQgaXQgYmUgcHJ1bmVkIGZyb20g
-YXBfbGlzdCBsYXRlciBhbmQgZG9uJ3QgYm90aGVyCj4gKwkgKiB0aGUgTGlzdCBSZWdpc3Rlci4K
-PiArCSAqLwo+ICsJaXJxLT5wZW5kaW5nX2xhdGNoID0gZmFsc2U7CgpJdCBvY2N1cnMgdG8gbWUg
-dGhhdCBjYWxsaW5nIGludG8gaXJxX3NldF9pcnFjaGlwX3N0YXRlKCkgZm9yIGEgbGFyZ2UKbnVt
-YmVyIG9mIGludGVycnVwdHMgY2FuIHRha2UgYSBzaWduaWZpY2FudCBhbW91bnQgb2YgdGltZS4g
-SXQgaXMgYWxzbwpvZGQgdGhhdCB5b3UgZHVtcCB0aGUgVlBUIHdpdGggdGhlIFZQRSB1bm1hcHBl
-ZCwgYnV0IHJlbHkgb24gdGhlIFZQRQpiZWluZyBtYXBwZWQgZm9yIHRoZSBvcHBvc2l0ZSBvcGVy
-YXRpb24uCgpTaG91bGRuJ3QgdGhlc2UgYmUgc3ltbWV0cmljLCBhbGwgcGVyZm9ybWVkIHdoaWxl
-IHRoZSBWUEUgaXMgdW5tYXBwZWQ/Ckl0IHdvdWxkIGFsc28gc2F2ZSBhIGxvdCBvZiBJVFMgdHJh
-ZmZpYy4KCj4gKwo+ICBvdXQ6Cj4gIAltdXRleF91bmxvY2soJml0cy0+aXRzX2xvY2spOwo+ICAJ
-cmV0dXJuIHJldDsKClRoYW5rcywKCiAgICAgICAgIE0uCi0tIApKYXp6IGlzIG5vdCBkZWFkLiBJ
-dCBqdXN0IHNtZWxscyBmdW5ueS4uLgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJp
-YS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1h
-cm0K
+On 2020-11-11 06:22, Jianyong Wu wrote:
+> ptp_kvm will get this service through SMCC call.
+> The service offers wall time and cycle count of host to guest.
+> The caller must specify whether they want the host cycle count
+> or the difference between host cycle count and cntvoff.
+> 
+> Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
+> ---
+>  arch/arm64/kvm/hypercalls.c | 61 +++++++++++++++++++++++++++++++++++++
+>  include/linux/arm-smccc.h   | 17 +++++++++++
+>  2 files changed, 78 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+> index b9d8607083eb..f7d189563f3d 100644
+> --- a/arch/arm64/kvm/hypercalls.c
+> +++ b/arch/arm64/kvm/hypercalls.c
+> @@ -9,6 +9,51 @@
+>  #include <kvm/arm_hypercalls.h>
+>  #include <kvm/arm_psci.h>
+> 
+> +static void kvm_ptp_get_time(struct kvm_vcpu *vcpu, u64 *val)
+> +{
+> +	struct system_time_snapshot systime_snapshot;
+> +	u64 cycles = ~0UL;
+> +	u32 feature;
+> +
+> +	/*
+> +	 * system time and counter value must captured in the same
+> +	 * time to keep consistency and precision.
+> +	 */
+> +	ktime_get_snapshot(&systime_snapshot);
+> +
+> +	// binding ptp_kvm clocksource to arm_arch_counter
+> +	if (systime_snapshot.cs_id != CSID_ARM_ARCH_COUNTER)
+> +		return;
+> +
+> +	val[0] = upper_32_bits(systime_snapshot.real);
+> +	val[1] = lower_32_bits(systime_snapshot.real);
+
+What is the endianness of these values? I can't see it defined
+anywhere, and this is likely not to work if guest and hypervisor
+don't align.
+
+> +
+> +	/*
+> +	 * which of virtual counter or physical counter being
+> +	 * asked for is decided by the r1 value of SMCCC
+> +	 * call. If no invalid r1 value offered, default cycle
+> +	 * value(-1) will be returned.
+> +	 * Note: keep in mind that feature is u32 and smccc_get_arg1
+> +	 * will return u64, so need auto cast here.
+> +	 */
+> +	feature = smccc_get_arg1(vcpu);
+> +	switch (feature) {
+> +	case ARM_PTP_VIRT_COUNTER:
+> +		cycles = systime_snapshot.cycles - vcpu_read_sys_reg(vcpu, 
+> CNTVOFF_EL2);
+> +		break;
+> +	case ARM_PTP_PHY_COUNTER:
+> +		cycles = systime_snapshot.cycles;
+> +		break;
+> +	case ARM_PTP_NONE_COUNTER:
+
+What is this "NONE" counter?
+
+> +		break;
+> +	default:
+> +		val[0] = SMCCC_RET_NOT_SUPPORTED;
+> +		break;
+> +	}
+> +	val[2] = upper_32_bits(cycles);
+> +	val[3] = lower_32_bits(cycles);
+
+Same problem as above.
+
+> +}
+> +
+>  int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+>  {
+>  	u32 func_id = smccc_get_function(vcpu);
+> @@ -79,6 +124,22 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+>  		break;
+>  	case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
+>  		val[0] = BIT(ARM_SMCCC_KVM_FUNC_FEATURES);
+> +		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_KVM_PTP);
+> +		break;
+> +	/*
+> +	 * This serves virtual kvm_ptp.
+> +	 * Four values will be passed back.
+> +	 * reg0 stores high 32-bits of host ktime;
+> +	 * reg1 stores low 32-bits of host ktime;
+> +	 * For ARM_PTP_VIRT_COUNTER:
+> +	 * reg2 stores high 32-bits of difference of host cycles and cntvoff;
+> +	 * reg3 stores low 32-bits of difference of host cycles and cntvoff.
+> +	 * For ARM_PTP_PHY_COUNTER:
+> +	 * reg2 stores the high 32-bits of host cycles;
+> +	 * reg3 stores the low 32-bits of host cycles.
+> +	 */
+> +	case ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID:
+> +		kvm_ptp_get_time(vcpu, val);
+>  		break;
+>  	default:
+>  		return kvm_psci_call(vcpu);
+> diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
+> index d75408141137..a03c5dd409d3 100644
+> --- a/include/linux/arm-smccc.h
+> +++ b/include/linux/arm-smccc.h
+> @@ -103,6 +103,7 @@
+> 
+>  /* KVM "vendor specific" services */
+>  #define ARM_SMCCC_KVM_FUNC_FEATURES		0
+> +#define ARM_SMCCC_KVM_FUNC_KVM_PTP		1
+
+I think having KVM once in the name is enough.
+
+>  #define ARM_SMCCC_KVM_FUNC_FEATURES_2		127
+>  #define ARM_SMCCC_KVM_NUM_FUNCS			128
+> 
+> @@ -114,6 +115,22 @@
+> 
+>  #define SMCCC_ARCH_WORKAROUND_RET_UNAFFECTED	1
+> 
+> +/*
+> + * ptp_kvm is a feature used for time sync between vm and host.
+> + * ptp_kvm module in guest kernel will get service from host using
+> + * this hypercall ID.
+> + */
+> +#define ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID				\
+> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
+> +			   ARM_SMCCC_SMC_32,				\
+> +			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
+> +			   ARM_SMCCC_KVM_FUNC_KVM_PTP)
+> +
+> +/* ptp_kvm counter type ID */
+> +#define ARM_PTP_VIRT_COUNTER			0
+> +#define ARM_PTP_PHY_COUNTER			1
+> +#define ARM_PTP_NONE_COUNTER			2
+
+The architecture definitely doesn't have this last counter.
+
+> +
+>  /* Paravirtualised time calls (defined by ARM DEN0057A) */
+>  #define ARM_SMCCC_HV_PV_TIME_FEATURES				\
+>  	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
+
+Thanks,
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
