@@ -1,91 +1,62 @@
-Return-Path: <SRS0=PaY3=E5=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=ECKt=E6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05913C6379D
-	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 18:01:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16DAEC2D0E4
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Nov 2020 03:19:27 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4A31B206B2
-	for <kvmarm@archiver.kernel.org>; Mon, 23 Nov 2020 18:01:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZTYQI9+c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A31B206B2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 2DC8220857
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Nov 2020 03:19:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DC8220857
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C6D524BBBB;
-	Mon, 23 Nov 2020 13:01:21 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 666904BCA7;
+	Mon, 23 Nov 2020 22:19:25 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id brMPtwf-Bvmg; Mon, 23 Nov 2020 13:01:20 -0500 (EST)
+	with ESMTP id w8xqMzaNVu9j; Mon, 23 Nov 2020 22:19:24 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9EA6A4BBB1;
-	Mon, 23 Nov 2020 13:01:20 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C13E4BCBF;
+	Mon, 23 Nov 2020 22:19:24 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F6C04BBB1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 13:01:19 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C52584BCBA
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 22:19:22 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fKbYF8iei1TB for <kvmarm@lists.cs.columbia.edu>;
- Mon, 23 Nov 2020 13:01:18 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 206334B634
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 13:01:18 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id D71602076E;
- Mon, 23 Nov 2020 18:01:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1606154477;
- bh=3wL8o/sAyclefSUZKYXwlw4dgxvLRbLTCkeW8PWsIVE=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=ZTYQI9+cXGC/y3cGvqIakhRkkVPuznNguzbQF/2SB6u3mZDII2fU70ovFRzPF+JQm
- MzXGVjXA+YLp1fVvhPTYOM3ShNkG3iVCoGueR0N6Sm3hoOQn09BhIMS4Arwy/oGAKi
- pFjgRR4F+uhJ6oqMWBlbztyLF9F5bB4Gj3i6T2Cg=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=wait-a-minute.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
- (envelope-from <maz@kernel.org>)
- id 1khG9K-00D1dH-Fa; Mon, 23 Nov 2020 18:01:14 +0000
-Date: Mon, 23 Nov 2020 18:01:13 +0000
-Message-ID: <878sas54wm.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: David Brazdil <dbrazdil@google.com>
-Subject: Re: [PATCH v2 00/24] Opt-in always-on nVHE hypervisor
-In-Reply-To: <20201116204318.63987-1-dbrazdil@google.com>
-References: <20201116204318.63987-1-dbrazdil@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: dbrazdil@google.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
- catalin.marinas@arm.com, will@kernel.org, dennis@kernel.org, tj@kernel.org,
- cl@linux.com, mark.rutland@arm.com, lorenzo.pieralisi@arm.com,
- qperret@google.com, ascull@google.com, qwandor@google.com,
- kernel-team@android.com, lorenzo.pieralisi@arm.com, sudeep.holla@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kernel-team@android.com, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
- Andrew Walbran <qwandor@google.com>, Catalin Marinas <catalin.marinas@arm.com>,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Sudeep Holla <sudeep.holla@arm.com>, Tejun Heo <tj@kernel.org>,
- Dennis Zhou <dennis@kernel.org>, Christoph Lameter <cl@linux.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
+ with ESMTP id tZ1LhtDNdbEq for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 23 Nov 2020 22:19:20 -0500 (EST)
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D54BD4BCA7
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Nov 2020 22:19:19 -0500 (EST)
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.60])
+ by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4Cg8PX6vM9z725D;
+ Tue, 24 Nov 2020 11:18:56 +0800 (CST)
+Received: from [10.174.187.69] (10.174.187.69) by
+ DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
+ 14.3.487.0; Tue, 24 Nov 2020 11:19:12 +0800
+Subject: Re: [RFC PATCH 0/4] Add support for ARMv8.6 TWED feature
+From: Jingyi Wang <wangjingyi11@huawei.com>
+To: <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
+ <linux-arm-kernel@lists.infradead.org>, <maz@kernel.org>
+References: <20200929091727.8692-1-wangjingyi11@huawei.com>
+ <9d341a2d-19f8-400c-6674-ef991ab78f62@huawei.com>
+Message-ID: <5647a73c-f05f-5c71-4ada-7837094f4999@huawei.com>
+Date: Tue, 24 Nov 2020 11:19:12 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
+MIME-Version: 1.0
+In-Reply-To: <9d341a2d-19f8-400c-6674-ef991ab78f62@huawei.com>
+Content-Language: en-US
+X-Originating-IP: [10.174.187.69]
+X-CFilter-Loop: Reflected
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -97,62 +68,69 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi David,
-
-On Mon, 16 Nov 2020 20:42:54 +0000,
-David Brazdil <dbrazdil@google.com> wrote:
-> 
-> As we progress towards being able to keep guest state private to the
-> host running nVHE hypervisor, this series allows the hypervisor to
-> install itself on newly booted CPUs before the host is allowed to run
-> on them.
-> 
-> All functionality described below is opt-in, guarded by an early param
-> 'kvm-arm.protected'. Future patches specific to the new "protected" mode
-> should be hidden behind the same param.
-> 
-> The hypervisor starts trapping host SMCs and intercepting host's PSCI
-> CPU_ON/SUSPEND calls. It replaces the host's entry point with its own,
-> initializes the EL2 state of the new CPU and installs the nVHE hyp vector
-> before ERETing to the host's entry point.
-> 
-> The kernel checks new cores' features against the finalized system
-> capabilities. To avoid the need to move this code/data to EL2, the
-> implementation only allows to boot cores that were online at the time of
-> KVM initialization and therefore had been checked already.
-> 
-> Other PSCI SMCs are forwarded to EL3, though only the known set of SMCs
-> implemented in the kernel is allowed. Non-PSCI SMCs are also forwarded
-> to EL3. Future changes will need to ensure the safety of all SMCs wrt.
-> private guests.
-> 
-> The host is still allowed to reset EL2 back to the stub vector, eg. for
-> hibernation or kexec, but will not disable nVHE when there are no VMs.
-
-I have now been through the whole series, and I don't think there is
-anything really major (although I haven't tried it yet).
-
-I think it would benefit from being rebased on top of kvmarm/queue, as
-it'd give you the opportunity to replace a number of per-CPU state
-fields with global function pointers. Another thing is that we seem to
-have diverging interpretations of the PSCI spec when it comes to
-CPU_SUSPEND.
-
-Finally, please include the PSCI maintainers in your next posting, as
-I'll need their Ack to pick the first few patches.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgTWFyYywKCkdlbnRsZSBwaW5nLCBjb3VsZCB5b3UgcGxlYXNlIGdpdmUgc29tZSBjb21tZW50
+cyBvbiB0aGlzIHBhdGNoIG9yIHRoZQpjdXJyZW50IHRlc3QgcmVzdWx0cz8gVGhhbmtzIGluIGFk
+dmFuY2UuCgpUaGFua3MsCkppbmd5aQoKT24gMTEvMTMvMjAyMCAzOjU0IFBNLCBKaW5neWkgV2Fu
+ZyB3cm90ZToKPiBIaSBhbGzvvIwKPiAKPiBTb3JyeSBmb3IgdGhlIGRlbGF5LiBJIGhhdmUgYmVl
+biB0ZXN0aW5nIHRoZSBUV0VEIGZlYXR1cmUgcGVyZm9ybWFuY2UKPiBsYXRlbHkuIFdlIHNlbGVj
+dCB1bml4YmVuY2ggYXMgdGhlIGJlbmNobWFyayBmb3Igc29tZSBpdGVtcyBvZiBpdCBpcyAKPiBs
+b2NrLWludGVuc2l2ZShmc3RpbWUvZnNidWZmZXIvZnNkaXNrKS4gV2UgcnVuIHVuaXhiZW5jaCBv
+biBhIDQtVkNQVQo+IFZNLCBhbmQgYmluZCBldmVyeSB0d28gVkNQVXMgb24gb25lIFBDUFUuIEZp
+eGVkIFRXRUQgdmFsdWUgaXMgdXNlZCBhbmQgCj4gaGVyZSBpcyB0aGUgcmVzdWx0Lgo+IAo+ICDC
+oMKgwqDCoCB0d2VkX3ZhbHVlICB8IGZzdGltZcKgwqDCoCAgfCBmc2J1ZmZlcsKgIHwgZnNkaXNr
+Cj4gIMKgwqDCoCAtLS0tLS0tLS0tLS0tLSstLS0tLS0tLS0tLS0tLS0rLS0tLS0tLS0tLS0tKy0t
+LS0tLS0tLS0tLQo+ICDCoMKgwqDCoCBkaXNhYmxlwqDCoCB8IDE2LjDCoMKgwqDCoCAgfCAxNC4x
+wqDCoMKgIHwgMTguMAo+ICDCoMKgwqDCoCAwwqDCoMKgwqDCoCB8IDE2LjPCoMKgwqDCoCAgfCAx
+My41wqDCoMKgIHwgMTcuMgo+ICDCoMKgwqDCoCAxwqDCoMKgwqDCoCB8IDE3LjXCoMKgwqDCoCAg
+fCAxNC43wqDCoMKgIHwgMTcuNAo+ICDCoMKgwqDCoCAywqDCoMKgwqDCoCB8IDE3LjPCoMKgwqDC
+oCAgfCAxNS4zwqDCoMKgIHwgMTguMAo+ICDCoMKgwqDCoCAzwqDCoMKgwqDCoCB8IDE3LjfCoMKg
+wqDCoCAgfCAxNS4ywqDCoMKgIHwgMTguOQo+ICDCoMKgwqDCoCA0wqDCoMKgwqDCoCB8IDE3LjnC
+oMKgwqDCoCAgfCAxNC4zwqDCoMKgIHwgMTguMgo+ICDCoMKgwqDCoCA1wqDCoMKgwqDCoCB8IDE3
+LjLCoMKgwqDCoCAgfCAxNC4xwqDCoMKgIHwgMTkuMAo+ICDCoMKgwqDCoCA2wqDCoMKgwqDCoCB8
+IDUuOMKgwqDCoMKgICAgfCA0LjLCoMKgwqAgIHwgNS43Cj4gIMKgwqDCoMKgIDfCoMKgwqDCoMKg
+IHwgNi4ywqDCoMKgwqDCoCB8IDUuNsKgwqDCoCAgfCAxMi44Cj4gCj4gTm90ZToKPiBmc3RpbWU6
+IEZpbGUgQ29weSAxMDI0IGJ1ZnNpemUgMjAwMCBtYXhibG9ja3MKPiBmc2J1ZmZlcjogRmlsZSBD
+b3B5IDI1NiBidWZzaXplIDUwMCBtYXhibG9ja3MKPiBmc2Rpc2s6IEZpbGUgQ29weSA0MDk2IGJ1
+ZnNpemUgODAwMCBtYXhibG9ja3MKPiBUaGUgaW5kZXggb2YgdW5peGJlbmNoLCBoaWdoZXIgaXMg
+YmV0dGVyLgo+IAo+IEl0IGlzIHNob3duIHRoYXQsIGNvbXBhcmVkIHRvIHRoZSBjaXJjdW1zdGFu
+Y2UgdGhhdCBUV0VEIGlzIGRpc2FibGVkLAo+IGxvY2staW50ZW5zaXZlIHRlc3RpbmcgaXRlbXMg
+aGF2ZSBiZXR0ZXIgcGVyZm9ybWFuY2UgaWYgYW4gYXBwcm9wcmlhdGUKPiBUV0VEIHZhbHVlIGlz
+IHNldCh1cCB0byA1LjYlfjExLjklKS4gTWVhbndoaWxlLCB0aGUgY29tcGxldGUgdW5peGJlbmNo
+Cj4gdGVzdCBpcyBydW4gdG8gcHJvdmUgdGhhdCBvdGhlciB0ZXN0aW5nIGl0ZW1zIGFyZSBub3Qg
+c2Vuc2l0aXZlIHRvIHRoaXMKPiBwYXJhbWV0ZXIuCj4gCj4gVGhhbmtzCj4gSmluZ3lpCj4gCj4g
+T24gOS8yOS8yMDIwIDU6MTcgUE0sIEppbmd5aSBXYW5nIHdyb3RlOgo+PiBUV0UgRGVsYXkgaXMg
+YW4gb3B0aW9uYWwgZmVhdHVyZSBpbiBBUk12OC42IEV4dGVudGlvbnMuIFRoZXJlIGlzIGEKPj4g
+cGVyZm9ybWFuY2UgYmVuZWZpdCBpbiB3YWl0aW5nIGZvciBhIHBlcmlvZCBvZiB0aW1lIGZvciBh
+biBldmVudCB0bwo+PiBhcnJpdmUgYmVmb3JlIHRha2luZyB0aGUgdHJhcCBhcyBpdCBpcyBjb21t
+b24gdGhhdCBldmVudCB3aWxsIGFycml2ZQo+PiDigJxxdWl0ZSBzb29u4oCdIGFmdGVyIGV4ZWN1
+dGluZyB0aGUgV0ZFIGluc3RydWN0aW9uLgo+Pgo+PiBUaGlzIHNlcmllcyBhZGRzIHN1cHBvcnQg
+Zm9yIFRXRUQgZmVhdHVyZSBhbmQgaW1wbGVtZW50cyBUV0UgZGVsYXkKPj4gdmFsdWUgZHluYW1p
+YyBhZGp1c3RtZW50Lgo+Pgo+PiBUaGFua3MgZm9yIFNoYW1lZXIncyBhZHZpY2Ugb24gdGhpcyBz
+ZXJpZXMuIFRoZSBmdW5jdGlvbiBvZiB0aGlzIHBhdGNoCj4+IGhhcyBiZWVuIHRlc3RlZCBvbiBU
+V0VEIHN1cHBvcnRlZCBoYXJkd2FyZSBhbmQgdGhlIHBlcmZvcm1hbmNlIG9mIGl0IGlzCj4+IHN0
+aWxsIG9uIHRlc3QsIGFueSBhZHZpY2Ugd2lsbCBiZSB3ZWxjb21lZC4KPj4KPj4gSmluZ3lpIFdh
+bmcgKDIpOgo+PiDCoMKgIEtWTTogYXJtNjQ6IE1ha2UgdXNlIG9mIFRXRUQgZmVhdHVyZQo+PiDC
+oMKgIEtWTTogYXJtNjQ6IFVzZSBkeW5hbWljIFRXRSBEZWxheSB2YWx1ZQo+Pgo+PiBaZW5ncnVh
+biBZZSAoMik6Cj4+IMKgwqAgYXJtNjQ6IGNwdWZlYXR1cmU6IFRXRUQgc3VwcG9ydCBkZXRlY3Rp
+b24KPj4gwqDCoCBLVk06IGFybTY0OiBBZGQgdHJhY2UgZm9yIFRXRUQgdXBkYXRlCj4+Cj4+IMKg
+IGFyY2gvYXJtNjQvS2NvbmZpZ8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8
+IDEwICsrKysrCj4+IMKgIGFyY2gvYXJtNjQvaW5jbHVkZS9hc20vY3B1Y2Fwcy5owqDCoMKgwqAg
+fMKgIDMgKy0KPj4gwqAgYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1fYXJtLmjCoMKgwqDCoCB8
+wqAgNSArKysKPj4gwqAgYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1fZW11bGF0ZS5oIHwgMzgg
+KysrKysrKysrKysrKysrKysrCj4+IMKgIGFyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3Qu
+aMKgwqDCoCB8IDE5ICsrKysrKysrLQo+PiDCoCBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL3ZpcnQu
+aMKgwqDCoMKgwqDCoMKgIHzCoCA4ICsrKysKPj4gwqAgYXJjaC9hcm02NC9rZXJuZWwvY3B1ZmVh
+dHVyZS5jwqDCoMKgwqDCoMKgIHwgMTIgKysrKysrCj4+IMKgIGFyY2gvYXJtNjQva3ZtL2FybS5j
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfCA1OCArKysrKysrKysrKysrKysrKysr
+KysrKysrKysrCj4+IMKgIGFyY2gvYXJtNjQva3ZtL2hhbmRsZV9leGl0LmPCoMKgwqDCoMKgwqDC
+oMKgIHzCoCAyICsKPj4gwqAgYXJjaC9hcm02NC9rdm0vdHJhY2VfYXJtLmjCoMKgwqDCoMKgwqDC
+oMKgwqDCoCB8IDIxICsrKysrKysrKysKPj4gwqAgMTAgZmlsZXMgY2hhbmdlZCwgMTc0IGluc2Vy
+dGlvbnMoKyksIDIgZGVsZXRpb25zKC0pCj4+Cl9fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNv
+bHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZv
+L2t2bWFybQo=
