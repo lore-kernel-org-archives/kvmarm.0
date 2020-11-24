@@ -7,69 +7,70 @@ X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 935A6C56201
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Nov 2020 13:35:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FB75C2D0E4
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Nov 2020 13:45:22 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E2124205ED
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Nov 2020 13:35:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A74BA2083E
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Nov 2020 13:45:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="c/IzzxHN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2124205ED
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="TUZkymM2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A74BA2083E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 351564B959;
-	Tue, 24 Nov 2020 08:35:54 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D5D664B93E;
+	Tue, 24 Nov 2020 08:45:20 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QDuYnUcCgTFp; Tue, 24 Nov 2020 08:35:53 -0500 (EST)
+	with ESMTP id 2v4Zg7BrqhMl; Tue, 24 Nov 2020 08:45:19 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 14AA14B873;
-	Tue, 24 Nov 2020 08:35:53 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9165C4BB79;
+	Tue, 24 Nov 2020 08:45:19 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C64724B873
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Nov 2020 08:35:51 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C2FD44B50E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Nov 2020 08:45:18 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BcdGA8+s4zQ2 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 24 Nov 2020 08:35:50 -0500 (EST)
+ with ESMTP id kll0v+uo8S+a for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 24 Nov 2020 08:45:17 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9CE0C4B86B
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Nov 2020 08:35:50 -0500 (EST)
-Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com
- [209.85.210.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7867F4B4B6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Nov 2020 08:45:17 -0500 (EST)
+Received: from mail-ot1-f48.google.com (mail-ot1-f48.google.com
+ [209.85.210.48])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 4D96A20888
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Nov 2020 13:35:49 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 4DCB22087D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Nov 2020 13:45:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1606224949;
- bh=av6mZG1ceIPJ1PjcHIA9oEIcJwL3MRA6RT952RIF28w=;
+ s=default; t=1606225516;
+ bh=mcAqjy1BYPHIo78PHi82FxCHHNnjpKdF8mXo2viVFy0=;
  h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
- b=c/IzzxHNo4IQziRbNPD5QALDAFqNgdMqL1sDFeZKsTStphv4sZn47vf6n15kAT6tf
- +fSTBu+idchdTXllYjG9vB0LcRua+cY1Sf+WhD5AHtCm0rpvHhonyROp8QPzbKCHxQ
- 5NcwTBCR83CMpEqQykiUIWZ13LtEFApL+OueGi2g=
-Received: by mail-ot1-f45.google.com with SMTP id 79so19301204otc.7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Nov 2020 05:35:49 -0800 (PST)
-X-Gm-Message-State: AOAM532RxhUJduworLmuQWFPfuUsGubytOmidIxGrgccE2bz9UkhXxai
- l2dVOeiO5dS7GVAHQCCy795R0fUM+VUR2KTnBS8=
-X-Google-Smtp-Source: ABdhPJx33kXMvm+DBUw5BfCj3VTH1jYG9tsjFADMXg3BJktWswRVhFUOrxgJyJAa205vDsgLOP1sCDq+YyxBDD38iCI=
-X-Received: by 2002:a05:6830:214c:: with SMTP id
- r12mr3115803otd.90.1606224948439; 
- Tue, 24 Nov 2020 05:35:48 -0800 (PST)
+ b=TUZkymM2pQgI9k3DphdmGGwQO5UDmPgtHstTZDlrYo+5Na22+Z6OCslKbUfdh5qyx
+ W7IlchkKQHw4tUzAn5tFcLAHjw67J4gJRj7Tyxs3/lbQJoKxKc28EsPaean3SR+mtS
+ gflNUxQpC3sle80/RDm1lTQVf5VbX2ZMqxzuIiM0=
+Received: by mail-ot1-f48.google.com with SMTP id n11so19347686ota.2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Nov 2020 05:45:16 -0800 (PST)
+X-Gm-Message-State: AOAM530SwL+IJFkelZIAqwGeeg78IHTUf+zvR4bq+PkVrtsLrJweFJ4d
+ vyoYRtiCIwwQhrghJ2pqHUDOmjvKMP75qoE5Esw=
+X-Google-Smtp-Source: ABdhPJzhTmarkZehtEJgEAnn4uEqtzXfGm9JkAaBVRC2uo5XrWhc4DTzOv+kSjfTADqj0CO30WGWj2L8WM++qgosUmI=
+X-Received: by 2002:a05:6830:3099:: with SMTP id
+ f25mr3488962ots.77.1606225515506; 
+ Tue, 24 Nov 2020 05:45:15 -0800 (PST)
 MIME-Version: 1.0
 References: <20201119162543.78001-1-dbrazdil@google.com>
- <20201119162543.78001-2-dbrazdil@google.com>
-In-Reply-To: <20201119162543.78001-2-dbrazdil@google.com>
+ <20201119162543.78001-3-dbrazdil@google.com>
+In-Reply-To: <20201119162543.78001-3-dbrazdil@google.com>
 From: Ard Biesheuvel <ardb@kernel.org>
-Date: Tue, 24 Nov 2020 14:35:37 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXGLy0no6pDU5QmFLjjuwVCt3MbqdetnFU8T4PMfOsy-9Q@mail.gmail.com>
-Message-ID: <CAMj1kXGLy0no6pDU5QmFLjjuwVCt3MbqdetnFU8T4PMfOsy-9Q@mail.gmail.com>
-Subject: Re: [RFC PATCH 1/6] kvm: arm64: Set up .hyp.rodata ELF section
+Date: Tue, 24 Nov 2020 14:45:04 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXFnTtAhs_d0EMsFhfZ=KGZJAsut-gtSEf-9dYC-XhB3Wg@mail.gmail.com>
+Message-ID: <CAMj1kXFnTtAhs_d0EMsFhfZ=KGZJAsut-gtSEf-9dYC-XhB3Wg@mail.gmail.com>
+Subject: Re: [RFC PATCH 2/6] kvm: arm64: Fix up RELA relocations in hyp
+ code/data
 To: David Brazdil <dbrazdil@google.com>
 Cc: Android Kernel Team <kernel-team@android.com>,
  Marc Zyngier <maz@kernel.org>,
@@ -95,89 +96,175 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On Thu, 19 Nov 2020 at 17:25, David Brazdil <dbrazdil@google.com> wrote:
 >
-> We will need to recognize pointers in .rodata specific to hyp,
-
-Why?
-
-> so
-> establish a .hyp.rodata ELF section. Merge it with the existing
-> .hyp.data..ro_after_init as they are treated the same at runtime.
+> KVM nVHE code runs under a different VA mapping than the kernel, hence
+> so far it relied only on PC-relative addressing to avoid accidentally
+> using a relocated kernel VA from a constant pool (see hyp_symbol_addr).
+>
+> So as to reduce the possibility of a programmer error, fixup the
+> relocated addresses instead. Let the kernel relocate them to kernel VA
+> first, but then iterate over them again, filter those that point to hyp
+> code/data and convert the kernel VA to hyp VA.
+>
+> This is done after kvm_compute_layout and before apply_alternatives.
 >
 
-Does this mean HYP .text, .rodata etc are all writable some time after
-the kernel .text/.rodata have been mapped read-only? That is not a
-problem per se, but it deserves being called out.
-
+If this is significant enough to call out, please include the reason for it.
 
 > Signed-off-by: David Brazdil <dbrazdil@google.com>
 > ---
->  arch/arm64/include/asm/sections.h | 2 +-
->  arch/arm64/kernel/vmlinux.lds.S   | 7 ++++---
->  arch/arm64/kvm/arm.c              | 7 +++----
->  arch/arm64/kvm/hyp/nvhe/hyp.lds.S | 1 +
->  4 files changed, 9 insertions(+), 8 deletions(-)
+>  arch/arm64/include/asm/kvm_mmu.h |  1 +
+>  arch/arm64/kernel/smp.c          |  4 +-
+>  arch/arm64/kvm/va_layout.c       | 76 ++++++++++++++++++++++++++++++++
+>  3 files changed, 80 insertions(+), 1 deletion(-)
 >
-> diff --git a/arch/arm64/include/asm/sections.h b/arch/arm64/include/asm/sections.h
-> index 8ff579361731..a6f3557d1ab2 100644
-> --- a/arch/arm64/include/asm/sections.h
-> +++ b/arch/arm64/include/asm/sections.h
-> @@ -11,7 +11,7 @@ extern char __alt_instructions[], __alt_instructions_end[];
->  extern char __hibernate_exit_text_start[], __hibernate_exit_text_end[];
->  extern char __hyp_idmap_text_start[], __hyp_idmap_text_end[];
->  extern char __hyp_text_start[], __hyp_text_end[];
-> -extern char __hyp_data_ro_after_init_start[], __hyp_data_ro_after_init_end[];
-> +extern char __hyp_rodata_start[], __hyp_rodata_end[];
->  extern char __idmap_text_start[], __idmap_text_end[];
->  extern char __initdata_begin[], __initdata_end[];
->  extern char __inittext_begin[], __inittext_end[];
-> diff --git a/arch/arm64/kernel/vmlinux.lds.S b/arch/arm64/kernel/vmlinux.lds.S
-> index 4382b5d0645d..6f2fd9734d63 100644
-> --- a/arch/arm64/kernel/vmlinux.lds.S
-> +++ b/arch/arm64/kernel/vmlinux.lds.S
-> @@ -31,10 +31,11 @@ jiffies = jiffies_64;
->         __stop___kvm_ex_table = .;
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index 5168a0c516ae..e5226f7e4732 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -105,6 +105,7 @@ alternative_cb_end
+>  void kvm_update_va_mask(struct alt_instr *alt,
+>                         __le32 *origptr, __le32 *updptr, int nr_inst);
+>  void kvm_compute_layout(void);
+> +void kvm_fixup_hyp_relocations(void);
 >
->  #define HYPERVISOR_DATA_SECTIONS                               \
-> -       HYP_SECTION_NAME(.data..ro_after_init) : {              \
-> -               __hyp_data_ro_after_init_start = .;             \
-> +       HYP_SECTION_NAME(.rodata) : {                           \
-> +               __hyp_rodata_start = .;                         \
->                 *(HYP_SECTION_NAME(.data..ro_after_init))       \
-> -               __hyp_data_ro_after_init_end = .;               \
-> +               *(HYP_SECTION_NAME(.rodata))                    \
-> +               __hyp_rodata_end = .;                           \
->         }
->
->  #define HYPERVISOR_PERCPU_SECTION                              \
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index d6d5211653b7..119c97e8900a 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -1688,11 +1688,10 @@ static int init_hyp_mode(void)
->                 goto out_err;
->         }
->
-> -       err = create_hyp_mappings(kvm_ksym_ref(__hyp_data_ro_after_init_start),
-> -                                 kvm_ksym_ref(__hyp_data_ro_after_init_end),
-> -                                 PAGE_HYP_RO);
-> +       err = create_hyp_mappings(kvm_ksym_ref(__hyp_rodata_start),
-> +                                 kvm_ksym_ref(__hyp_rodata_end), PAGE_HYP_RO);
->         if (err) {
-> -               kvm_err("Cannot map .hyp.data..ro_after_init section\n");
-> +               kvm_err("Cannot map .hyp.rodata section\n");
->                 goto out_err;
->         }
->
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp.lds.S b/arch/arm64/kvm/hyp/nvhe/hyp.lds.S
-> index 5d76ff2ba63e..b0789183d49d 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp.lds.S
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp.lds.S
-> @@ -17,4 +17,5 @@ SECTIONS {
->                 PERCPU_INPUT(L1_CACHE_BYTES)
->         }
->         HYP_SECTION(.data..ro_after_init)
-> +       HYP_SECTION(.rodata)
+>  static __always_inline unsigned long __kern_hyp_va(unsigned long v)
+>  {
+> diff --git a/arch/arm64/kernel/smp.c b/arch/arm64/kernel/smp.c
+> index 18e9727d3f64..30241afc2c93 100644
+> --- a/arch/arm64/kernel/smp.c
+> +++ b/arch/arm64/kernel/smp.c
+> @@ -434,8 +434,10 @@ static void __init hyp_mode_check(void)
+>                            "CPU: CPUs started in inconsistent modes");
+>         else
+>                 pr_info("CPU: All CPU(s) started at EL1\n");
+> -       if (IS_ENABLED(CONFIG_KVM))
+> +       if (IS_ENABLED(CONFIG_KVM)) {
+>                 kvm_compute_layout();
+> +               kvm_fixup_hyp_relocations();
+> +       }
 >  }
+>
+>  void __init smp_cpus_done(unsigned int max_cpus)
+> diff --git a/arch/arm64/kvm/va_layout.c b/arch/arm64/kvm/va_layout.c
+> index d8cc51bd60bf..b80fab974896 100644
+> --- a/arch/arm64/kvm/va_layout.c
+> +++ b/arch/arm64/kvm/va_layout.c
+> @@ -10,6 +10,7 @@
+>  #include <asm/alternative.h>
+>  #include <asm/debug-monitors.h>
+>  #include <asm/insn.h>
+> +#include <asm/kvm_asm.h>
+>  #include <asm/kvm_mmu.h>
+>  #include <asm/memory.h>
+>
+> @@ -82,6 +83,81 @@ __init void kvm_compute_layout(void)
+>         init_hyp_physvirt_offset();
+>  }
+>
+> +#define __load_elf_u64(s)                                      \
+> +       ({                                                      \
+> +               extern u64 s;                                   \
+> +               u64 val;                                        \
+> +                                                               \
+> +               asm ("ldr %0, =%1" : "=r"(val) : "S"(&s));      \
+> +               val;                                            \
+> +       })
+> +
+
+Do you need this to ensure that the reference is absolute? There may
+be more elegant ways to achieve that, using weak references for
+instance.
+
+Also, in the relocation startup code, I deliberately used a 32-bit
+quantity here, as it won't get confused for an absolute virtual
+address that needs relocation.
+
+
+> +static bool __is_within_bounds(u64 addr, char *start, char *end)
+> +{
+> +       return start <= (char*)addr && (char*)addr < end;
+> +}
+> +
+> +static bool __is_in_hyp_section(u64 addr)
+> +{
+> +       return __is_within_bounds(addr, __hyp_text_start, __hyp_text_end) ||
+> +              __is_within_bounds(addr, __hyp_rodata_start, __hyp_rodata_end) ||
+> +              __is_within_bounds(addr,
+> +                                 CHOOSE_NVHE_SYM(__per_cpu_start),
+> +                                 CHOOSE_NVHE_SYM(__per_cpu_end));
+> +}
+> +
+
+It is slightly disappointing that we need to filter these one by one
+like this, but I don't think there are any guarantees about the order
+in which the R_AARCH64_RELATIVE entries appear.
+
+> +static void __fixup_hyp_rel(u64 addr)
+
+__init ?
+
+> +{
+> +       u64 *ptr, kern_va, hyp_va;
+> +
+> +       /* Adjust the relocation address taken from ELF for KASLR. */
+> +       addr += kaslr_offset();
+> +
+> +       /* Skip addresses not in any of the hyp sections. */
+> +       if (!__is_in_hyp_section(addr))
+> +               return;
+> +
+> +       /* Get the LM alias of the relocation address. */
+> +       ptr = (u64*)kvm_ksym_ref((void*)addr);
+> +
+> +       /*
+> +        * Read the value at the relocation address. It has already been
+> +        * relocated to the actual kernel kimg VA.
+> +        */
+> +       kern_va = (u64)kvm_ksym_ref((void*)*ptr);
+> +
+> +       /* Convert to hyp VA. */
+> +       hyp_va = __early_kern_hyp_va(kern_va);
+> +
+> +       /* Store hyp VA at the relocation address. */
+> +       *ptr = __early_kern_hyp_va(kern_va);
+> +}
+> +
+> +static void __fixup_hyp_rela(void)
+
+__init ?
+
+> +{
+> +       Elf64_Rela *rel;
+> +       size_t i, n;
+> +
+> +       rel = (Elf64_Rela*)(kimage_vaddr + __load_elf_u64(__rela_offset));
+> +       n = __load_elf_u64(__rela_size) / sizeof(*rel);
+> +
+> +       for (i = 0; i < n; ++i)
+> +               __fixup_hyp_rel(rel[i].r_offset);
+> +}
+> +
+> +/*
+> + * The kernel relocated pointers to kernel VA. Iterate over relocations in
+> + * the hypervisor ELF sections and convert them to hyp VA. This avoids the
+> + * need to only use PC-relative addressing in hyp.
+> + */
+> +__init void kvm_fixup_hyp_relocations(void)
+
+It is more idiomatic to put the __init after the 'void', and someone
+is undoubtedly going to send a patch to 'fix' that if we merge it like
+this.
+
+> +{
+> +       if (!IS_ENABLED(CONFIG_RELOCATABLE) || has_vhe())
+> +               return;
+> +
+> +       __fixup_hyp_rela();
+> +}
+> +
+>  static u32 compute_instruction(int n, u32 rd, u32 rn)
+>  {
+>         u32 insn = AARCH64_BREAK_FAULT;
 > --
 > 2.29.2.299.gdc1121823c-goog
 >
