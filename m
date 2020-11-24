@@ -2,80 +2,68 @@ Return-Path: <SRS0=ECKt=E6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48AE0C2D0E4
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Nov 2020 14:09:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BC29C63798
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Nov 2020 14:49:20 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 71D7A206FB
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Nov 2020 14:09:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="XtDdcDt3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71D7A206FB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 7C33F2086A
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Nov 2020 14:49:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C33F2086A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 026A94BC06;
-	Tue, 24 Nov 2020 09:09:16 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D9984BDB5;
+	Tue, 24 Nov 2020 09:49:19 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id apPADjF8UIV5; Tue, 24 Nov 2020 09:09:14 -0500 (EST)
+	with ESMTP id H+JN4bRgoSOe; Tue, 24 Nov 2020 09:49:17 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8FC234BD61;
-	Tue, 24 Nov 2020 09:09:14 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 395D14BDA4;
+	Tue, 24 Nov 2020 09:49:15 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EBECB4BD55
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Nov 2020 09:09:13 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A6AA44BCE7
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Nov 2020 02:40:27 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id t-lF8-G5L7+5 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 24 Nov 2020 09:09:12 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AB6804B930
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Nov 2020 09:09:12 -0500 (EST)
-Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com
- [209.85.210.43])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 5FD94206FB
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Nov 2020 14:09:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1606226951;
- bh=xognvjsytGj3akJ5LEQ71E+KBAhbOlqmPPB8px69Qp0=;
- h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
- b=XtDdcDt3433O/UKIhEsFWGlwSsfAmOFPSWJ/CfXRQlwHQyD8QY5LDGcFDCWh6yI//
- opFvkJ4NaSKNE+XaOQFevNvdx9anLQPzZhGNbx7aYgzTzzN9fwBF9nJ4JkGyvy/ywa
- pUerazLkjbstIcnO0f7nCFlEtekdKgLvAYkYB43s=
-Received: by mail-ot1-f43.google.com with SMTP id l36so19438004ota.4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Nov 2020 06:09:11 -0800 (PST)
-X-Gm-Message-State: AOAM533EeLvmoaTMGzpOS0fpjzGPZU+J3/xvFlF6geA7e0En9h+buzmY
- XNMODNJ5oM9ibBGMuVww/+UC6i5RnnmhokFPPIo=
-X-Google-Smtp-Source: ABdhPJxP9c5r3xRR6eKId2+eDoJlAYjem8Qv3lNy8uEeC9FGwM2kxRA23AIDh6vAm0s0dGArxN0nZ3qovNeDMfX/qLI=
-X-Received: by 2002:a9d:62c1:: with SMTP id z1mr3391150otk.108.1606226950606; 
- Tue, 24 Nov 2020 06:09:10 -0800 (PST)
+ with ESMTP id MofRZkr452au for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 24 Nov 2020 02:40:26 -0500 (EST)
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EC8D94BC96
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Nov 2020 02:40:25 -0500 (EST)
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.60])
+ by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4CgGBp5scLz71kd;
+ Tue, 24 Nov 2020 15:40:02 +0800 (CST)
+Received: from [10.174.187.74] (10.174.187.74) by
+ DGGEMS410-HUB.china.huawei.com (10.3.19.210) with Microsoft SMTP Server id
+ 14.3.487.0; Tue, 24 Nov 2020 15:40:14 +0800
+Subject: Re: [RFC PATCH v1 2/4] KVM: arm64: GICv4.1: Try to save hw pending
+ state in save_pending_tables
+To: Marc Zyngier <maz@kernel.org>
+References: <20201123065410.1915-1-lushenming@huawei.com>
+ <20201123065410.1915-3-lushenming@huawei.com>
+ <f3ea1b24436bb86b5a5633f8ccc9b3d1@kernel.org>
+From: Shenming Lu <lushenming@huawei.com>
+Message-ID: <90f04f50-c1ba-55b2-0f93-1e755b40b487@huawei.com>
+Date: Tue, 24 Nov 2020 15:40:13 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.2.2
 MIME-Version: 1.0
-References: <20201119162543.78001-1-dbrazdil@google.com>
- <20201119162543.78001-7-dbrazdil@google.com>
-In-Reply-To: <20201119162543.78001-7-dbrazdil@google.com>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Tue, 24 Nov 2020 15:08:59 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXH8sPjU2C7E++J+yP8FnfWbgEVGtj4i-XXqOF7DGxiaOw@mail.gmail.com>
-Message-ID: <CAMj1kXH8sPjU2C7E++J+yP8FnfWbgEVGtj4i-XXqOF7DGxiaOw@mail.gmail.com>
-Subject: Re: [RFC PATCH 6/6] kvm: arm64: Remove hyp_symbol_addr
-To: David Brazdil <dbrazdil@google.com>
-Cc: Android Kernel Team <kernel-team@android.com>,
- Marc Zyngier <maz@kernel.org>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux ARM <linux-arm-kernel@lists.infradead.org>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- kvmarm <kvmarm@lists.cs.columbia.edu>
+In-Reply-To: <f3ea1b24436bb86b5a5633f8ccc9b3d1@kernel.org>
+Content-Language: en-US
+X-Originating-IP: [10.174.187.74]
+X-CFilter-Loop: Reflected
+X-Mailman-Approved-At: Tue, 24 Nov 2020 09:49:14 -0500
+Cc: Neo Jia <cjia@nvidia.com>, kvm@vger.kernel.org,
+ Cornelia Huck <cohuck@redhat.com>, linux-kernel@vger.kernel.org,
+ Kirti Wankhede <kwankhede@nvidia.com>,
+ Alex Williamson <alex.williamson@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,133 +75,112 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 19 Nov 2020 at 17:26, David Brazdil <dbrazdil@google.com> wrote:
->
-> The helper was used to force PC-relative addressing in hyp code because
-> absolute addressing via constant-pools used to generate kernel VAs. This
-> was cumbersome and required programmers to remember to use the helper
-> whenever they wanted to take a pointer.
->
-> Now that hyp relocations are fixed up, there is no need for the helper
-> any logner. Remove it.
->
-> Signed-off-by: David Brazdil <dbrazdil@google.com>
-
-Acked-by: Ard Biesheuvel <ardb@kernel.org>
-
-> ---
->  arch/arm64/include/asm/kvm_asm.h         | 20 --------------------
->  arch/arm64/kvm/hyp/include/hyp/switch.h  |  4 ++--
->  arch/arm64/kvm/hyp/nvhe/hyp-smp.c        |  4 ++--
->  arch/arm64/kvm/hyp/nvhe/psci-relay.c     |  4 ++--
->  arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c |  2 +-
->  5 files changed, 7 insertions(+), 27 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index 1a86581e581e..1961d23c0c40 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -203,26 +203,6 @@ extern void __vgic_v3_init_lrs(void);
->
->  extern u32 __kvm_get_mdcr_el2(void);
->
-> -/*
-> - * Obtain the PC-relative address of a kernel symbol
-> - * s: symbol
-> - *
-> - * The goal of this macro is to return a symbol's address based on a
-> - * PC-relative computation, as opposed to a loading the VA from a
-> - * constant pool or something similar. This works well for HYP, as an
-> - * absolute VA is guaranteed to be wrong. Only use this if trying to
-> - * obtain the address of a symbol (i.e. not something you obtained by
-> - * following a pointer).
-> - */
-> -#define hyp_symbol_addr(s)                                             \
-> -       ({                                                              \
-> -               typeof(s) *addr;                                        \
-> -               asm("adrp       %0, %1\n"                               \
-> -                   "add        %0, %0, :lo12:%1\n"                     \
-> -                   : "=r" (addr) : "S" (&s));                          \
-> -               addr;                                                   \
-> -       })
-> -
->  #define __KVM_EXTABLE(from, to)                                                \
->         "       .pushsection    __kvm_ex_table, \"a\"\n"                \
->         "       .align          3\n"                                    \
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index 84473574c2e7..54f4860cd87c 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -505,8 +505,8 @@ static inline void __kvm_unexpected_el2_exception(void)
->         struct exception_table_entry *entry, *end;
->         unsigned long elr_el2 = read_sysreg(elr_el2);
->
-> -       entry = hyp_symbol_addr(__start___kvm_ex_table);
-> -       end = hyp_symbol_addr(__stop___kvm_ex_table);
-> +       entry = &__start___kvm_ex_table;
-> +       end = &__stop___kvm_ex_table;
->
->         while (entry < end) {
->                 addr = (unsigned long)&entry->insn + entry->insn;
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-smp.c b/arch/arm64/kvm/hyp/nvhe/hyp-smp.c
-> index ceb427aabb91..6870d9f3d4b7 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-smp.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-smp.c
-> @@ -33,8 +33,8 @@ unsigned long __hyp_per_cpu_offset(unsigned int cpu)
->         if (cpu >= ARRAY_SIZE(kvm_arm_hyp_percpu_base))
->                 hyp_panic();
->
-> -       cpu_base_array = (unsigned long*)hyp_symbol_addr(kvm_arm_hyp_percpu_base);
-> +       cpu_base_array = (unsigned long*)(&kvm_arm_hyp_percpu_base[0]);
->         this_cpu_base = kern_hyp_va(cpu_base_array[cpu]);
-> -       elf_base = (unsigned long)hyp_symbol_addr(__per_cpu_start);
-> +       elf_base = (unsigned long)&__per_cpu_start;
->         return this_cpu_base - elf_base;
->  }
-> diff --git a/arch/arm64/kvm/hyp/nvhe/psci-relay.c b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-> index 313ef42f0eab..f64380a49a72 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-> @@ -147,7 +147,7 @@ static int psci_cpu_suspend(u64 func_id, struct kvm_cpu_context *host_ctxt)
->          * point if it is a deep sleep state.
->          */
->         ret = psci_call(func_id, power_state,
-> -                       __hyp_pa(hyp_symbol_addr(__kvm_hyp_cpu_entry)),
-> +                       __hyp_pa(__kvm_hyp_cpu_entry),
->                         __hyp_pa(cpu_params));
->
->         release_reset_state(cpu_state);
-> @@ -182,7 +182,7 @@ static int psci_cpu_on(u64 func_id, struct kvm_cpu_context *host_ctxt)
->                 return PSCI_RET_ALREADY_ON;
->
->         ret = psci_call(func_id, mpidr,
-> -                       __hyp_pa(hyp_symbol_addr(__kvm_hyp_cpu_entry)),
-> +                       __hyp_pa(__kvm_hyp_cpu_entry),
->                         __hyp_pa(cpu_params));
->
->         /*
-> diff --git a/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c b/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
-> index 8f0585640241..87a54375bd6e 100644
-> --- a/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
-> +++ b/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
-> @@ -64,7 +64,7 @@ int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu)
->         }
->
->         rd = kvm_vcpu_dabt_get_rd(vcpu);
-> -       addr  = hyp_symbol_addr(kvm_vgic_global_state)->vcpu_hyp_va;
-> +       addr  = kvm_vgic_global_state.vcpu_hyp_va;
->         addr += fault_ipa - vgic->vgic_cpu_base;
->
->         if (kvm_vcpu_dabt_iswrite(vcpu)) {
-> --
-> 2.29.2.299.gdc1121823c-goog
->
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gMjAyMC8xMS8yMyAxNzoxOCwgTWFyYyBaeW5naWVyIHdyb3RlOgo+IE9uIDIwMjAtMTEtMjMg
+MDY6NTQsIFNoZW5taW5nIEx1IHdyb3RlOgo+PiBBZnRlciBwYXVzaW5nIGFsbCB2Q1BVcyBhbmQg
+ZGV2aWNlcyBjYXBhYmxlIG9mIGludGVycnVwdGluZywgaW4gb3JkZXIKPiDCoMKgwqDCoMKgwqDC
+oCBeXl5eXl5eXl5eXl5eXl5eXgo+IFNlZSBteSBjb21tZW50IGJlbG93IGFib3V0IHRoaXMuCj4g
+Cj4+IHRvIHNhdmUgdGhlIGluZm9ybWF0aW9uIG9mIGFsbCBpbnRlcnJ1cHRzLCBiZXNpZGVzIGZs
+dXNoaW5nIHRoZSBwZW5kaW5nCj4+IHN0YXRlcyBpbiBrdm3igJlzIHZnaWMsIHdlIGFsc28gdHJ5
+IHRvIGZsdXNoIHRoZSBzdGF0ZXMgb2YgVkxQSXMgaW4gdGhlCj4+IHZpcnR1YWwgcGVuZGluZyB0
+YWJsZXMgaW50byBndWVzdCBSQU0sIGJ1dCB3ZSBuZWVkIHRvIGhhdmUgR0lDdjQuMSBhbmQKPj4g
+c2FmZWx5IHVubWFwIHRoZSB2UEVzIGZpcnN0Lgo+Pgo+PiBTaWduZWQtb2ZmLWJ5OiBTaGVubWlu
+ZyBMdSA8bHVzaGVubWluZ0BodWF3ZWkuY29tPgo+PiAtLS0KPj4gwqBhcmNoL2FybTY0L2t2bS92
+Z2ljL3ZnaWMtdjMuYyB8IDYyICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0tCj4+
+IMKgMSBmaWxlIGNoYW5nZWQsIDU2IGluc2VydGlvbnMoKyksIDYgZGVsZXRpb25zKC0pCj4+Cj4+
+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2t2bS92Z2ljL3ZnaWMtdjMuYyBiL2FyY2gvYXJtNjQv
+a3ZtL3ZnaWMvdmdpYy12My5jCj4+IGluZGV4IDljZGYzOWE5NGE2My4uZTFiM2FhNGIyYjEyIDEw
+MDY0NAo+PiAtLS0gYS9hcmNoL2FybTY0L2t2bS92Z2ljL3ZnaWMtdjMuYwo+PiArKysgYi9hcmNo
+L2FybTY0L2t2bS92Z2ljL3ZnaWMtdjMuYwo+PiBAQCAtMSw2ICsxLDggQEAKPj4gwqAvLyBTUERY
+LUxpY2Vuc2UtSWRlbnRpZmllcjogR1BMLTIuMC1vbmx5Cj4+Cj4+IMKgI2luY2x1ZGUgPGxpbnV4
+L2lycWNoaXAvYXJtLWdpYy12My5oPgo+PiArI2luY2x1ZGUgPGxpbnV4L2lycS5oPgo+PiArI2lu
+Y2x1ZGUgPGxpbnV4L2lycWRvbWFpbi5oPgo+PiDCoCNpbmNsdWRlIDxsaW51eC9rdm0uaD4KPj4g
+wqAjaW5jbHVkZSA8bGludXgva3ZtX2hvc3QuaD4KPj4gwqAjaW5jbHVkZSA8a3ZtL2FybV92Z2lj
+Lmg+Cj4+IEBAIC0zNTYsNiArMzU4LDM5IEBAIGludCB2Z2ljX3YzX2xwaV9zeW5jX3BlbmRpbmdf
+c3RhdHVzKHN0cnVjdCBrdm0KPj4gKmt2bSwgc3RydWN0IHZnaWNfaXJxICppcnEpCj4+IMKgwqDC
+oMKgIHJldHVybiAwOwo+PiDCoH0KPj4KPj4gKy8qCj4+ICsgKiBXaXRoIEdJQ3Y0LjEsIHdlIGNh
+biBnZXQgdGhlIFZMUEkncyBwZW5kaW5nIHN0YXRlIGFmdGVyIHVubWFwcGluZwo+PiArICogdGhl
+IHZQRS4gVGhlIGRlYWN0aXZhdGlvbiBvZiB0aGUgZG9vcmJlbGwgaW50ZXJydXB0IHdpbGwgdHJp
+Z2dlcgo+PiArICogdGhlIHVubWFwcGluZyBvZiB0aGUgYXNzb2NpYXRlZCB2UEUuCj4+ICsgKi8K
+Pj4gK3N0YXRpYyB2b2lkIGdldF92bHBpX3N0YXRlX3ByZShzdHJ1Y3QgdmdpY19kaXN0ICpkaXN0
+KQo+PiArewo+PiArwqDCoMKgIHN0cnVjdCBpcnFfZGVzYyAqZGVzYzsKPj4gK8KgwqDCoCBpbnQg
+aTsKPj4gKwo+PiArwqDCoMKgIGlmICgha3ZtX3ZnaWNfZ2xvYmFsX3N0YXRlLmhhc19naWN2NF8x
+KQo+PiArwqDCoMKgwqDCoMKgwqAgcmV0dXJuOwo+PiArCj4+ICvCoMKgwqAgZm9yIChpID0gMDsg
+aSA8IGRpc3QtPml0c192bS5ucl92cGVzOyBpKyspIHsKPj4gK8KgwqDCoMKgwqDCoMKgIGRlc2Mg
+PSBpcnFfdG9fZGVzYyhkaXN0LT5pdHNfdm0udnBlc1tpXS0+aXJxKTsKPj4gK8KgwqDCoMKgwqDC
+oMKgIGlycV9kb21haW5fZGVhY3RpdmF0ZV9pcnEoaXJxX2Rlc2NfZ2V0X2lycV9kYXRhKGRlc2Mp
+KTsKPj4gK8KgwqDCoCB9Cj4+ICt9Cj4+ICsKPj4gK3N0YXRpYyB2b2lkIGdldF92bHBpX3N0YXRl
+X3Bvc3Qoc3RydWN0IHZnaWNfZGlzdCAqZGlzdCkKPiAKPiBuaXQ6IHRoZSBuYW1pbmcgZmVlbHMg
+YSBiaXQuLi4gb2RkLiBQcmUvcG9zdCB3aGF0PwoKTXkgdW5kZXJzdGFuZGluZyBpcyB0aGF0IHRo
+ZSB1bm1hcHBpbmcgaXMgYSBwcmVwYXJhdGlvbiBmb3IgZ2V0X3ZscGlfc3RhdGUuLi4KTWF5YmUg
+anVzdCBjYWxsIGl0IHVubWFwL21hcF9hbGxfdnBlcz8KCj4gCj4+ICt7Cj4+ICvCoMKgwqAgc3Ry
+dWN0IGlycV9kZXNjICpkZXNjOwo+PiArwqDCoMKgIGludCBpOwo+PiArCj4+ICvCoMKgwqAgaWYg
+KCFrdm1fdmdpY19nbG9iYWxfc3RhdGUuaGFzX2dpY3Y0XzEpCj4+ICvCoMKgwqDCoMKgwqDCoCBy
+ZXR1cm47Cj4+ICsKPj4gK8KgwqDCoCBmb3IgKGkgPSAwOyBpIDwgZGlzdC0+aXRzX3ZtLm5yX3Zw
+ZXM7IGkrKykgewo+PiArwqDCoMKgwqDCoMKgwqAgZGVzYyA9IGlycV90b19kZXNjKGRpc3QtPml0
+c192bS52cGVzW2ldLT5pcnEpOwo+PiArwqDCoMKgwqDCoMKgwqAgaXJxX2RvbWFpbl9hY3RpdmF0
+ZV9pcnEoaXJxX2Rlc2NfZ2V0X2lycV9kYXRhKGRlc2MpLCBmYWxzZSk7Cj4+ICvCoMKgwqAgfQo+
+PiArfQo+PiArCj4+IMKgLyoqCj4+IMKgICogdmdpY192M19zYXZlX3BlbmRpbmdfdGFibGVzIC0g
+U2F2ZSB0aGUgcGVuZGluZyB0YWJsZXMgaW50byBndWVzdCBSQU0KPj4gwqAgKiBrdm0gbG9jayBh
+bmQgYWxsIHZjcHUgbG9jayBtdXN0IGJlIGhlbGQKPj4gQEAgLTM2NSwxNCArNDAwLDE3IEBAIGlu
+dCB2Z2ljX3YzX3NhdmVfcGVuZGluZ190YWJsZXMoc3RydWN0IGt2bSAqa3ZtKQo+PiDCoMKgwqDC
+oCBzdHJ1Y3QgdmdpY19kaXN0ICpkaXN0ID0gJmt2bS0+YXJjaC52Z2ljOwo+PiDCoMKgwqDCoCBz
+dHJ1Y3QgdmdpY19pcnEgKmlycTsKPj4gwqDCoMKgwqAgZ3BhX3QgbGFzdF9wdHIgPSB+KGdwYV90
+KTA7Cj4+IC3CoMKgwqAgaW50IHJldDsKPj4gK8KgwqDCoCBpbnQgcmV0ID0gMDsKPj4gwqDCoMKg
+wqAgdTggdmFsOwo+Pgo+PiArwqDCoMKgIGdldF92bHBpX3N0YXRlX3ByZShkaXN0KTsKPj4gKwo+
+PiDCoMKgwqDCoCBsaXN0X2Zvcl9lYWNoX2VudHJ5KGlycSwgJmRpc3QtPmxwaV9saXN0X2hlYWQs
+IGxwaV9saXN0KSB7Cj4+IMKgwqDCoMKgwqDCoMKgwqAgaW50IGJ5dGVfb2Zmc2V0LCBiaXRfbnI7
+Cj4+IMKgwqDCoMKgwqDCoMKgwqAgc3RydWN0IGt2bV92Y3B1ICp2Y3B1Owo+PiDCoMKgwqDCoMKg
+wqDCoMKgIGdwYV90IHBlbmRiYXNlLCBwdHI7Cj4+IMKgwqDCoMKgwqDCoMKgwqAgYm9vbCBzdG9y
+ZWQ7Cj4+ICvCoMKgwqDCoMKgwqDCoCBib29sIGlzX3BlbmRpbmcgPSBpcnEtPnBlbmRpbmdfbGF0
+Y2g7Cj4+Cj4+IMKgwqDCoMKgwqDCoMKgwqAgdmNwdSA9IGlycS0+dGFyZ2V0X3ZjcHU7Cj4+IMKg
+wqDCoMKgwqDCoMKgwqAgaWYgKCF2Y3B1KQo+PiBAQCAtMzg3LDI0ICs0MjUsMzYgQEAgaW50IHZn
+aWNfdjNfc2F2ZV9wZW5kaW5nX3RhYmxlcyhzdHJ1Y3Qga3ZtICprdm0pCj4+IMKgwqDCoMKgwqDC
+oMKgwqAgaWYgKHB0ciAhPSBsYXN0X3B0cikgewo+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAg
+cmV0ID0ga3ZtX3JlYWRfZ3Vlc3RfbG9jayhrdm0sIHB0ciwgJnZhbCwgMSk7Cj4+IMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoCBpZiAocmV0KQo+PiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgIHJldHVybiByZXQ7Cj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgZ290byBv
+dXQ7Cj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBsYXN0X3B0ciA9IHB0cjsKPj4gwqDCoMKg
+wqDCoMKgwqDCoCB9Cj4+Cj4+IMKgwqDCoMKgwqDCoMKgwqAgc3RvcmVkID0gdmFsICYgKDFVIDw8
+IGJpdF9ucik7Cj4+IC3CoMKgwqDCoMKgwqDCoCBpZiAoc3RvcmVkID09IGlycS0+cGVuZGluZ19s
+YXRjaCkKPj4gKwo+PiArwqDCoMKgwqDCoMKgwqAgLyogYWxzbyBmbHVzaCBodyBwZW5kaW5nIHN0
+YXRlICovCj4gCj4gVGhpcyBjb21tZW50IGxvb2tzIG91dCBvZiBwbGFjZSwgYXMgd2UgYXJlbid0
+IGZsdXNoaW5nIGFueXRoaW5nLgoKT2ssIEkgd2lsbCBjb3JyZWN0IGl0LgoKPiAKPj4gK8KgwqDC
+oMKgwqDCoMKgIGlmIChpcnEtPmh3KSB7Cj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIFdBUk5f
+UkFURUxJTUlUKGlycV9nZXRfaXJxY2hpcF9zdGF0ZShpcnEtPmhvc3RfaXJxLAo+PiArwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBJUlFDSElQX1NUQVRFX1BF
+TkRJTkcsICZpc19wZW5kaW5nKSwKPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgICJJUlEgJWQiLCBpcnEtPmhvc3RfaXJxKTsKPiAKPiBJc24ndCB0aGlzIGdv
+aW5nIHRvIHdhcm4gbGlrZSBtYWQgb24gYSBHSUN2NC4wIHN5c3RlbSB3aGVyZSB0aGlzLCBieSBk
+ZWZpbml0aW9uLAo+IHdpbGwgZ2VuZXJhdGUgYW4gZXJyb3I/CgpBcyB3ZSBoYXZlIHJldHVybmVk
+IGFuIGVycm9yIGluIHNhdmVfaXRzX3RhYmxlcyBpZiBodyAmJiAhaGFzX2dpY3Y0XzEsIHdlIGRv
+bid0CmhhdmUgdG8gd2FybiB0aGlzIGhlcmU/Cgo+IAo+PiArwqDCoMKgwqDCoMKgwqAgfQo+PiAr
+Cj4+ICvCoMKgwqDCoMKgwqDCoCBpZiAoc3RvcmVkID09IGlzX3BlbmRpbmcpCj4+IMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoCBjb250aW51ZTsKPj4KPj4gLcKgwqDCoMKgwqDCoMKgIGlmIChpcnEt
+PnBlbmRpbmdfbGF0Y2gpCj4+ICvCoMKgwqDCoMKgwqDCoCBpZiAoaXNfcGVuZGluZykKPj4gwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgIHZhbCB8PSAxIDw8IGJpdF9ucjsKPj4gwqDCoMKgwqDCoMKg
+wqDCoCBlbHNlCj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB2YWwgJj0gfigxIDw8IGJpdF9u
+cik7Cj4+Cj4+IMKgwqDCoMKgwqDCoMKgwqAgcmV0ID0ga3ZtX3dyaXRlX2d1ZXN0X2xvY2soa3Zt
+LCBwdHIsICZ2YWwsIDEpOwo+PiDCoMKgwqDCoMKgwqDCoMKgIGlmIChyZXQpCj4+IC3CoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgIHJldHVybiByZXQ7Cj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGdv
+dG8gb3V0Owo+PiDCoMKgwqDCoCB9Cj4+IC3CoMKgwqAgcmV0dXJuIDA7Cj4+ICsKPj4gK291dDoK
+Pj4gK8KgwqDCoCBnZXRfdmxwaV9zdGF0ZV9wb3N0KGRpc3QpOwo+IAo+IFRoaXMgYml0IHdvcnJp
+ZXMgbWU6IHlvdSBoYXZlIHVubWFwcGVkIHRoZSBWUEVzLCBzbyBhbnkgaW50ZXJydXB0IHRoYXQg
+aGFzIGJlZW4KPiBnZW5lcmF0ZWQgZHVyaW5nIHRoYXQgcGhhc2UgaXMgbm93IGZvcmV2ZXIgbG9z
+dCAodGhlIEdJQyBkb2Vzbid0IGhhdmUgb3duZXJzaGlwCj4gb2YgdGhlIHBlbmRpbmcgdGFibGVz
+KS4KCkluIG15IG9waW5pb24sIGR1cmluZyB0aGlzIHBoYXNlLCB0aGUgZGV2aWNlcyBjYXBhYmxl
+IG9mIGludGVycnVwdGluZyBzaG91bGQgaGF2ZQphbHJlYWR5IGJlZW4gcGF1c2VkIChwcmV2ZW50
+IGZyb20gc2VuZGluZyBpbnRlcnJ1cHRzKSwgc3VjaCBhcyBWRklPIG1pZ3JhdGlvbiBwcm90b2Nv
+bApoYXMgYWxyZWFkeSByZWFsaXplZCBpdC4KCj4gCj4gRG8geW91IHJlYWxseSBleHBlY3QgdGhl
+IFZNIHRvIGJlIHJlc3RhcnRhYmxlIGZyb20gdGhhdCBwb2ludD8gSSBkb24ndCBzZWUgaG93Cj4g
+dGhpcyBpcyBwb3NzaWJsZS4KPiAKCklmIHRoZSBtaWdyYXRpb24gaGFzIGVuY291bnRlcmVkIGFu
+IGVycm9yLCB0aGUgc3JjIFZNIG1pZ2h0IGJlIHJlc3RhcnRlZCwgc28gd2UgaGF2ZSB0bwptYXAg
+dGhlIHZQRXMgYmFjay4KCj4+ICsKPj4gK8KgwqDCoCByZXR1cm4gcmV0Owo+PiDCoH0KPj4KPj4g
+wqAvKioKPiAKPiBUaGFua3MsCj4gCj4gwqDCoMKgwqDCoMKgwqAgTS4KClRoYW5rcywKU2hlbm1p
+bmcKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJt
+IG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMu
+Y3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
