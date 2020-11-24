@@ -2,59 +2,84 @@ Return-Path: <SRS0=ECKt=E6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 470BBC2D0E4
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Nov 2020 17:27:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7644AC2D0E4
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Nov 2020 21:31:25 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8DD6A206E5
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Nov 2020 17:27:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DD6A206E5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id C1E14206E0
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Nov 2020 21:31:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E7IpIizI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1E14206E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AD76B4B68F;
-	Tue, 24 Nov 2020 12:27:15 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 16F344B6E3;
+	Tue, 24 Nov 2020 16:31:24 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id dRkfmZskZ+7H; Tue, 24 Nov 2020 12:27:14 -0500 (EST)
+	with ESMTP id L8pHnDdMlmUC; Tue, 24 Nov 2020 16:31:22 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 60AA84B692;
-	Tue, 24 Nov 2020 12:27:14 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DB0304B6E7;
+	Tue, 24 Nov 2020 16:31:22 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 097824B68D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Nov 2020 12:27:13 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 612CE4B6DC
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Nov 2020 16:31:21 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0PJIvYDJBJ9u for <kvmarm@lists.cs.columbia.edu>;
- Tue, 24 Nov 2020 12:27:11 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9AFEC4B678
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Nov 2020 12:27:11 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 18C011396;
- Tue, 24 Nov 2020 09:27:11 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6253F3F71F;
- Tue, 24 Nov 2020 09:27:10 -0800 (PST)
-Subject: Re: [PATCH 0/8] KVM: arm64: Disabled PMU handling
-To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-References: <20201113182602.471776-1-maz@kernel.org>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <750f5543-054a-f1aa-229f-2d41b8e233dd@arm.com>
-Date: Tue, 24 Nov 2020 17:28:30 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.3
+ with ESMTP id iyS-h8v9E4gn for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 24 Nov 2020 16:31:20 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [63.128.21.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 233A54B5C6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Nov 2020 16:31:20 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1606253479;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=SUFkTpZGndRNTlU23p0AoNkwlyXdbRb6zkOHCX3TCNA=;
+ b=E7IpIizI47cjbaJwKOY6Llk5BzXIQCl8IIY0CL51NXkib4z+69Q35xNVplnXFU39mB4Fgg
+ gZ7vjJRm9hHHPn8k1kVdAlMToGCr49jihS9SzviWRBfNNuwx924DY98MpGINjPKKWke34M
+ F2y6El8nm5S4lmuDIiynBGfvMmTFIrk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-280-ceXNeoYIOtaAUGOOi9YRkw-1; Tue, 24 Nov 2020 16:31:14 -0500
+X-MC-Unique: ceXNeoYIOtaAUGOOi9YRkw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9D9EF107B46A;
+ Tue, 24 Nov 2020 21:31:11 +0000 (UTC)
+Received: from w520.home (ovpn-112-213.phx2.redhat.com [10.3.112.213])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0E1825D9CA;
+ Tue, 24 Nov 2020 21:31:00 +0000 (UTC)
+Date: Tue, 24 Nov 2020 14:31:00 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Eric Auger <eric.auger@redhat.com>
+Subject: Re: [PATCH v11 01/13] vfio: VFIO_IOMMU_SET_PASID_TABLE
+Message-ID: <20201124143100.05380b0d@w520.home>
+In-Reply-To: <20201116110030.32335-2-eric.auger@redhat.com>
+References: <20201116110030.32335-1-eric.auger@redhat.com>
+ <20201116110030.32335-2-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201113182602.471776-1-maz@kernel.org>
-Content-Language: en-US
-Cc: kernel-team@android.com
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Cc: jean-philippe@linaro.org, jacob.jun.pan@linux.intel.com,
+ nicoleotsuka@gmail.com, kvm@vger.kernel.org, maz@kernel.org, joro@8bytes.org,
+ linux-kernel@vger.kernel.org, vivek.gautam@arm.com,
+ iommu@lists.linux-foundation.org, yi.l.liu@intel.com, zhangfei.gao@linaro.org,
+ robin.murphy@arm.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ eric.auger.pro@gmail.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -66,127 +91,218 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SGkgTWFyYywKCkkgYmVsaWV2ZSB0aGVyZSBpcyBzb21ldGhpbmcgbWlzc2luZyBmcm9tIHRoaXMg
-c2VyaWVzLgoKVGhlIG9yaWdpbmFsIGJlaGF2aW91ciwgd2hpY2ggdGhpcyBzZXJpZXMgY2hhbmdl
-cywgd2FzIG5vdCB0byBkbyByZWdpc3RlcgplbXVsYXRpb24gYW5kIFBNVSBzdGF0ZSB1cGRhdGUg
-aWYgdGhlIFBNVSB3YXNuJ3QgcmVhZHksIHdoZXJlIHZjcHUtPmFyY2gucG11LnJlYWR5CndhcyBz
-ZXQgdG8gdHJ1ZSBpZiB0aGUgUE1VIHdhcyBpbml0aWFsaXplZCBwcm9wZXJseSBpbiBrdm1fdmNw
-dV9maXJzdF9ydW5faW5pdCgpCi0+IGt2bV9hcm1fcG11X3YzX2VuYWJsZSgpLgoKVGhlIHNlcmll
-cyBjaGFuZ2VzIFBNVSBlbXVsYXRpb24gc3VjaCB0aGF0IHJlZ2lzdGVyIGVtdWxhdGlvbiBhbmQg
-cG11IHN0YXRlIHVwZGF0ZQppcyBnYXRlZCBvbmx5IG9uIHRoZSBWQ1BVIGZlYXR1cmUgYmVpbmcg
-c2V0LiBUaGlzIG1lYW5zIHRoYXQgbm93IHVzZXJzcGFjZSBjYW4gc2V0CnRoZSBWQ1BVIGZlYXR1
-cmUsIGRvbid0IGRvIGFueSBpbml0aWFsaXphdGlvbiwgYW5kIHJ1biBhIGd1ZXN0IHdoaWNoIGNh
-biBhY2Nlc3MKUE1VIHJlZ2lzdGVycy4gQWxzbyBrdm1fcG11X3VwZGF0ZV9zdGF0ZSgpIHdpbGwg
-bm93IGJlIGNhbGxlZCBiZWZvcmUgZWFjaCBWTQplbnRyeS4gSSdtIG5vdCBleGFjdGx5IHN1cmUg
-d2hhdCBoYXBwZW5zIGlmIHdlIGNhbGwga3ZtX3ZnaWNfaW5qZWN0X2lycSgpIGZvciBhbgppcnFf
-bnVtID0gMCBhbmQgbm90IG93bmVkIGJ5IHRoZSBQTVUgKHRoZSBvd25lciBpcyBzZXQgS1ZNX0FS
-TV9WQ1BVX1BNVV9WM19JTklUIC0+Cmt2bV9hcm1fcG11X3YzX2luaXQoKSksIGJ1dCBJIGRvbid0
-IHRoaW5rIHRoYXQncyBhbGxvd2VkLgoKSSB3YXMgYWxzbyBhYmxlIHRvIHRyaWdnZXIgdGhpcyB3
-YXJuaW5nIHdpdGggYSBtb2RpZmllZCB2ZXJzaW9uIG9mIGt2bXRvb2w6CgpbwqAgMTE4Ljk3MjE3
-NF0gLS0tLS0tLS0tLS0tWyBjdXQgaGVyZSBdLS0tLS0tLS0tLS0tClvCoCAxMTguOTc0MjEyXSBV
-bmtub3duIFBNVSB2ZXJzaW9uIDAKW8KgIDExOC45Nzc2MjJdIFdBUk5JTkc6IENQVTogMCBQSUQ6
-IDIzOCBhdCBhcmNoL2FybTY0L2t2bS9wbXUtZW11bC5jOjMzCmt2bV9wbXVfZXZlbnRfbWFzay5p
-c3JhLjArMHg2Yy8weDc0ClvCoCAxMTguOTg3MjcxXSBNb2R1bGVzIGxpbmtlZCBpbjoKW8KgIDEx
-OC45OTA0MTRdIENQVTogMCBQSUQ6IDIzOCBDb21tOiBrdm0tdmNwdS0wIE5vdCB0YWludGVkCjUu
-MTAuMC1yYzQtMDAwMDgtZ2M0Y2Q1MTg2ZmMyYSAjMzcKW8KgIDExOC45OTkwMDZdIEhhcmR3YXJl
-IG5hbWU6IEdsb2JhbHNjYWxlIE1hcnZlbGwgRVNQUkVTU09CaW4gQm9hcmQgKERUKQpbwqAgMTE5
-LjAwNTY0MV0gcHN0YXRlOiA0MDAwMDAwNSAoblpjdiBkYWlmIC1QQU4gLVVBTyAtVENPIEJUWVBF
-PS0tKQpbwqAgMTE5LjAxMTgyNV0gcGMgOiBrdm1fcG11X2V2ZW50X21hc2suaXNyYS4wKzB4NmMv
-MHg3NApbwqAgMTE5LjAxNjkyOV0gbHIgOiBrdm1fcG11X2V2ZW50X21hc2suaXNyYS4wKzB4NmMv
-MHg3NApbwqAgMTE5LjAyMjAzNF0gc3AgOiBmZmZmODAwMDEyNzRiYTQwClvCoCAxMTkuMDI1NDM4
-XSB4Mjk6IGZmZmY4MDAwMTI3NGJhNDAgeDI4OiBmZmZmMDAwMDA5MWM0NmEwClvCoCAxMTkuMDMw
-OTAzXSB4Mjc6IDAwMDAwMDAwMDAwMDAwMDAgeDI2OiBmZmZmODAwMDExZTE2ZWUwClvCoCAxMTku
-MDM2MzY4XSB4MjU6IGZmZmY4MDAwMTFlMTY2YzggeDI0OiBmZmZmMDAwMDA2ZTAwMDAwClvCoCAx
-MTkuMDQxODM0XSB4MjM6IDAwMDAwMDAwMDAwMDAwMDAgeDIyOiBmZmZmODAwMDEyNzRiYjIwClvC
-oCAxMTkuMDQ3MzAwXSB4MjE6IDAwMDAwMDAwMDAwMDAwMDAgeDIwOiAwMDAwMDAwMDAwMDAwMDFm
-ClvCoCAxMTkuMDUyNzY1XSB4MTk6IDAwMDAwMDAwMDAwMDAwMDAgeDE4OiAwMDAwMDAwMDAwMDAw
-MDMwClvCoCAxMTkuMDU4MjMxXSB4MTc6IDAwMDAwMDAwMDAwMDAwMDAgeDE2OiAwMDAwMDAwMDAw
-MDAwMDAwClvCoCAxMTkuMDYzNjk3XSB4MTU6IGZmZmYwMDAwMDIyY2FmMzAgeDE0OiBmZmZmZmZm
-ZmZmZmZmZmZmClvCoCAxMTkuMDY5MTYzXSB4MTM6IGZmZmY4MDAwMTFiNzI3MTggeDEyOiAwMDAw
-MDAwMDAwMDAwNDU2ClvCoCAxMTkuMDc0NjI3XSB4MTE6IDAwMDAwMDAwMDAwMDAxNzIgeDEwOiBm
-ZmZmODAwMDExYmNhNzE4ClvCoCAxMTkuMDgwMDk0XSB4OSA6IDAwMDAwMDAwZmZmZmYwMDAgeDgg
-OiBmZmZmODAwMDExYjcyNzE4ClvCoCAxMTkuMDg1NTU5XSB4NyA6IGZmZmY4MDAwMTFiY2E3MTgg
-eDYgOiAwMDAwMDAwMDAwMDAwMDAwClvCoCAxMTkuMDkxMDI1XSB4NSA6IDAwMDAwMDAwMDAwMDAw
-MDAgeDQgOiBmZmZmMDAwMDNkZGJlOTAwClvCoCAxMTkuMDk2NDkxXSB4MyA6IGZmZmYwMDAwM2Rk
-YzU3ZjAgeDIgOiBmZmZmMDAwMDNkZGJlOTAwClvCoCAxMTkuMTAxOTU2XSB4MSA6IDM0ZDBkNGIz
-MzIxYjkxMDAgeDAgOiAwMDAwMDAwMDAwMDAwMDAwClvCoCAxMTkuMTA3NDIyXSBDYWxsIHRyYWNl
-OgpbwqAgMTE5LjEwOTkzNV3CoCBrdm1fcG11X2V2ZW50X21hc2suaXNyYS4wKzB4NmMvMHg3NApb
-wqAgMTE5LjExNDY4NF3CoCBrdm1fcG11X3NldF9jb3VudGVyX2V2ZW50X3R5cGUrMHgyYy8weDgw
-ClvCoCAxMTkuMTE5ODgyXcKgIGFjY2Vzc19wbXVfZXZ0eXBlcisweDEyOC8weDE4MApbwqAgMTE5
-LjEyNDE4MV3CoCBwZXJmb3JtX2FjY2VzcysweDM0LzB4YjAKW8KgIDExOS4xMjc5NDJdwqAga3Zt
-X2hhbmRsZV9zeXNfcmVnKzB4YzgvMHgxNjAKW8KgIDExOS4xMzIxNTZdwqAgaGFuZGxlX2V4aXQr
-MHg2Yy8weDFmMApbwqAgMTE5LjEzNTczOF3CoCBrdm1fYXJjaF92Y3B1X2lvY3RsX3J1bisweDFl
-OC8weDczYwpbwqAgMTE5LjE0MDQ4OF3CoCBrdm1fdmNwdV9pb2N0bCsweDIzYy8weDU0NApbwqAg
-MTE5LjE0NDQzM13CoCBfX2FybTY0X3N5c19pb2N0bCsweGE4LzB4ZjAKW8KgIDExOS4xNDg0NjRd
-wqAgZWwwX3N2Y19jb21tb24uY29uc3Rwcm9wLjArMHg3OC8weDFhMApbwqAgMTE5LjE1MzM5MF3C
-oCBkb19lbDBfc3ZjKzB4MjQvMHg5MApbwqAgMTE5LjE1Njc5Nl3CoCBlbDBfc3luY19oYW5kbGVy
-KzB4MjU0LzB4MjYwClvCoCAxMTkuMTYwOTE1XcKgIGVsMF9zeW5jKzB4MTc0LzB4MTgwClvCoCAx
-MTkuMTY0MzE5XSAtLS1bIGVuZCB0cmFjZSBjMGMyZTZmMjk5ZDU4ODIzIF0tLS0KCkkgcmVtb3Zl
-ZCBhbGwgS1ZNX0FSTV9WQ1BVX1BNVV9WM19DVFJMIGlvY3RsIGNhbGxzIGZyb20ga3ZtdG9vbCdz
-IHBtdSBlbXVsYXRpb24sCmFuZCBJIHN0YXJ0ZWQgdGhlIHBtdSB0ZXN0IGZyb20ga3ZtLXVuaXQt
-dGVzdHM6CgokIC4vbGt2bS1wbXUgcnVuIC1jMSAtbTY0IC1mIGFybS9wbXUuZmxhdCAtLXBtdSAt
-cCBjeWNsZS1jb3VudGVyCgpUaGUgcmVhc29uIGZvciB0aGUgd2FybmluZyBpcyB0aGF0IHRoZSBj
-b3JyZWN0IHZhbHVlIGZvciBrdm0tPmFyY2gucG11dmVyIGlzIHNldAppbiBrdm1fYXJtX3BtdV92
-M19zZXRfYXR0cigpLCB3aGljaCBpcyBub3QgY2FsbGVkIGFueW1vcmUuCgpUaGlzIGRpZmYgc2Vl
-bXMgdG8gc29sdmUgdGhlIGlzc3VlOgoKZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL3BtdS1l
-bXVsLmMgYi9hcmNoL2FybTY0L2t2bS9wbXUtZW11bC5jCmluZGV4IDY0M2NmODE5ZjNjMC4uMTUw
-YjljYjBmNzQxIDEwMDY0NAotLS0gYS9hcmNoL2FybTY0L2t2bS9wbXUtZW11bC5jCisrKyBiL2Fy
-Y2gvYXJtNjQva3ZtL3BtdS1lbXVsLmMKQEAgLTgyNSw5ICs4MjUsMTIgQEAgYm9vbCBrdm1fYXJt
-X3N1cHBvcnRfcG11X3YzKHZvaWQpCsKgCsKgaW50IGt2bV9hcm1fcG11X3YzX2VuYWJsZShzdHJ1
-Y3Qga3ZtX3ZjcHUgKnZjcHUpCsKgewotwqDCoMKgwqDCoMKgIGlmICghdmNwdS0+YXJjaC5wbXUu
-Y3JlYXRlZCkKK8KgwqDCoMKgwqDCoCBpZiAoIWt2bV92Y3B1X2hhc19wbXUodmNwdSkpCsKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCByZXR1cm4gMDsKwqAKK8KgwqDCoMKgwqDCoCBpZiAo
-IXZjcHUtPmFyY2gucG11LmNyZWF0ZWQpCivCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHJl
-dHVybiAtRU5PRVhFQzsKKwrCoMKgwqDCoMKgwqDCoCAvKgrCoMKgwqDCoMKgwqDCoMKgICogQSB2
-YWxpZCBpbnRlcnJ1cHQgY29uZmlndXJhdGlvbiBmb3IgdGhlIFBNVSBpcyBlaXRoZXIgdG8gaGF2
-ZSBhCsKgwqDCoMKgwqDCoMKgwqAgKiBwcm9wZXJseSBjb25maWd1cmVkIGludGVycnVwdCBudW1i
-ZXIgYW5kIHVzaW5nIGFuIGluLWtlcm5lbAoKSWYgeW91IGFncmVlIHdpdGggdGhlIGZpeCwgSSBj
-YW4gc2VuZCBhIHByb3BlciBwYXRjaC4gdmNwdS0+YXJjaC5wbXUuY3JlYXRlZCBpcwpzZXQgaW4g
-a3ZtX2FybV9wbXVfdjNfaW5pdCgpLCB3aGljaCBjaGVja3MgaWYgdGhlIGludGVycnVwdCBJRCBo
-YXMgYmVlbiBzZXQuIEkKY2hvc2UgdG8gcmV0dXJuIC1FTk9FWEVDwqAgYmVjYXVzZSB0aGF0J3Mg
-d2hhdCBLVk1fUlVOIHJldHVybnMgaWYgdGhlIHZjcHUgaXNuJ3QKaW5pdGlhbGl6ZWQgaW4ga3Zt
-X2FyY2hfdmNwdV9pb2N0bF9ydW4oKS4KClRoYW5rcywKCkFsZXgKCk9uIDExLzEzLzIwIDY6MjUg
-UE0sIE1hcmMgWnluZ2llciB3cm90ZToKPiBJdCByZWNlbnRseSBkYXduZWQgb24gbWUgdGhhdCB0
-aGUgd2F5IHdlIGhhbmRsZSBQTVUgdHJhcHMgd2hlbiB0aGUgUE1VCj4gaXMgZGlzYWJsZWQgaXMg
-cGxhaW4gd3JvbmcuIFdlIGNvbnNpZGVyIHRoYXQgaGFuZGxpbmcgdGhlIHJlZ2lzdGVycyBhcwo+
-IFJBWi9XSSBpcyBhIGZpbmUgdGhpbmcgdG8gZG8sIHdoaWxlIHRoZSBBUk12OCBBUk0gaXMgcHJl
-dHR5IGNsZWFyIHRoYXQKPiB0aGF0J3Mgbm90IE9LIGFuZCB0aGF0IHN1Y2ggcmVnaXN0ZXJzIHNo
-b3VsZCBVTkRFRiB3aGVuIEZFQVRfUE1VdjMKPiBkb2Vzbid0IGV4aXN0LiBJIHdlbnQgYWxsIHRo
-ZSB3YXkgYmFjayB0byB0aGUgZmlyc3QgcHVibGljIHZlcnNpb24gb2YKPiB0aGUgc3BlYywgYW5k
-IGl0IHR1cm5zIG91dCB3ZSB3ZXJlICphbHdheXMqIHdyb25nLgo+Cj4gSXQgcHJvYmFibHkgY29t
-ZXMgZnJvbSB0aGUgZmFjdCB0aGF0IHdlIHVzZWQgbm90IHRvIHRyYXAgdGhlIElECj4gcmVnaXN0
-ZXJzLCBhbmQgdGh1cyB3ZXJlIHVuYWJsZSB0byBhZHZlcnRpc2UgdGhlIGxhY2sgb2YgUE1VLCBi
-dXQKPiB0aGF0J3MgaGFyZGx5IGFuIGV4Y3VzZS4gU28gbGV0J3MgZml4IHRoZSBkYW1uZWQgdGhp
-bmcuCj4KPiBUaGlzIHNlcmllcyBhZGRzIGFuIGV4dHJhIGNoZWNrIGluIHRoZSBoZWxwZXJzIHRo
-YXQgY2hlY2sgZm9yIHRoZQo+IHZhbGlkaXR5IG9mIHRoZSBQTVUgYWNjZXNzIChtb3N0IG9mIHRo
-ZSByZWdpc3RlcnMgaGF2ZSB0byBjaGVja2VkCj4gYWdhaW5zdCBzb21lIGVuYWJsZSBmbGFncyBh
-bmQvb3IgdGhlIGFjY2Vzc2luZyBleGNlcHRpb24gbGV2ZWwpLCBhbmQKPiByaWRzIHVzIG9mIHRo
-ZSBSQVovV0kgYmVoYXZpb3VyLgo+Cj4gVGhpcyBlbmFibGVzIHVzIHRvIG1ha2UgYWRkaXRpb25h
-bCBjbGVhbnVwcywgdG8gdGhlIHBvaW50IHdoZXJlIHdlIGNhbgo+IHJlbW92ZSB0aGUgUE1VICJy
-ZWFkeSIgc3RhdGUgdGhhdCBhbHdheXMgaGFkIHZlcnkgYml6YXJyZSBzZW1hbnRpY3MuCj4gQWxs
-IGluIGFsbCwgYSBuZWdhdGl2ZSBkaWZmc3RhdCwgYW5kIHNwZWMgY29tcGxpYW50IGJlaGF2aW91
-cnMuIFdoYXQncwo+IG5vdCB0byBsaWtlPwo+Cj4gSSd2ZSBydW4gYSBmZXcgZ3Vlc3RzIHdpdGgg
-YW5kIHdpdGhvdXQgUE1VcyBhcyB3ZWxsIGFzIEtVVCwgYW5kCj4gbm90aGluZyBjYXVnaHQgZmly
-ZS4gVGhlIHBhdGNoZXMgYXJlIG9uIHRvcCBvZiBrdm1hcm0vcXVldWUuCj4KPiBNYXJjIFp5bmdp
-ZXIgKDgpOgo+ICAgS1ZNOiBhcm02NDogQWRkIGt2bV92Y3B1X2hhc19wbXUoKSBoZWxwZXIKPiAg
-IEtWTTogYXJtNjQ6IFNldCBJRF9BQTY0REZSMF9FTDEuUE1VVmVyIHRvIDAgd2hlbiBubyBQTVUg
-c3VwcG9ydAo+ICAgS1ZNOiBhcm02NDogUmVmdXNlIGlsbGVnYWwgS1ZNX0FSTV9WQ1BVX1BNVV9W
-MyBhdCByZXNldCB0aW1lCj4gICBLVk06IGFybTY0OiBJbmplY3QgVU5ERUYgb24gUE1VIGFjY2Vz
-cyB3aGVuIG5vIFBNVSBjb25maWd1cmVkCj4gICBLVk06IGFybTY0OiBSZW1vdmUgUE1VIFJBWi9X
-SSBoYW5kbGluZwo+ICAgS1ZNOiBhcm02NDogUmVtb3ZlIGRlYWQgUE1VIHN5c3JlZyBkZWNvZGlu
-ZyBjb2RlCj4gICBLVk06IGFybTY0OiBHYXRlIGt2bV9wbXVfdXBkYXRlX3N0YXRlKCkgb24gdGhl
-IFBNVSBmZWF0dXJlCj4gICBLVk06IGFybTY0OiBHZXQgcmlkIG9mIHRoZSBQTVUgcmVhZHkgc3Rh
-dGUKPgo+ICBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmggfCAgMyArKwo+ICBhcmNo
-L2FybTY0L2t2bS9wbXUtZW11bC5jICAgICAgICAgfCAxMSArKystLS0tCj4gIGFyY2gvYXJtNjQv
-a3ZtL3Jlc2V0LmMgICAgICAgICAgICB8ICA0ICsrKwo+ICBhcmNoL2FybTY0L2t2bS9zeXNfcmVn
-cy5jICAgICAgICAgfCA1MSArKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCj4gIGluY2x1
-ZGUva3ZtL2FybV9wbXUuaCAgICAgICAgICAgICB8ICAzIC0tCj4gIDUgZmlsZXMgY2hhbmdlZCwg
-MjQgaW5zZXJ0aW9ucygrKSwgNDggZGVsZXRpb25zKC0pCj4KX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlz
-dHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4v
-bGlzdGluZm8va3ZtYXJtCg==
+On Mon, 16 Nov 2020 12:00:18 +0100
+Eric Auger <eric.auger@redhat.com> wrote:
+
+> From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
+> 
+> This patch adds an VFIO_IOMMU_SET_PASID_TABLE ioctl
+> which aims to pass the virtual iommu guest configuration
+> to the host. This latter takes the form of the so-called
+> PASID table.
+> 
+> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> ---
+> v11 -> v12:
+> - use iommu_uapi_set_pasid_table
+> - check SET and UNSET are not set simultaneously (Zenghui)
+> 
+> v8 -> v9:
+> - Merge VFIO_IOMMU_ATTACH/DETACH_PASID_TABLE into a single
+>   VFIO_IOMMU_SET_PASID_TABLE ioctl.
+> 
+> v6 -> v7:
+> - add a comment related to VFIO_IOMMU_DETACH_PASID_TABLE
+> 
+> v3 -> v4:
+> - restore ATTACH/DETACH
+> - add unwind on failure
+> 
+> v2 -> v3:
+> - s/BIND_PASID_TABLE/SET_PASID_TABLE
+> 
+> v1 -> v2:
+> - s/BIND_GUEST_STAGE/BIND_PASID_TABLE
+> - remove the struct device arg
+> ---
+>  drivers/vfio/vfio_iommu_type1.c | 65 +++++++++++++++++++++++++++++++++
+>  include/uapi/linux/vfio.h       | 19 ++++++++++
+>  2 files changed, 84 insertions(+)
+> 
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index 67e827638995..87ddd9e882dc 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -2587,6 +2587,41 @@ static int vfio_iommu_iova_build_caps(struct vfio_iommu *iommu,
+>  	return ret;
+>  }
+>  
+> +static void
+> +vfio_detach_pasid_table(struct vfio_iommu *iommu)
+> +{
+> +	struct vfio_domain *d;
+> +
+> +	mutex_lock(&iommu->lock);
+> +	list_for_each_entry(d, &iommu->domain_list, next)
+> +		iommu_detach_pasid_table(d->domain);
+> +
+> +	mutex_unlock(&iommu->lock);
+> +}
+> +
+> +static int
+> +vfio_attach_pasid_table(struct vfio_iommu *iommu, unsigned long arg)
+> +{
+> +	struct vfio_domain *d;
+> +	int ret = 0;
+> +
+> +	mutex_lock(&iommu->lock);
+> +
+> +	list_for_each_entry(d, &iommu->domain_list, next) {
+> +		ret = iommu_uapi_attach_pasid_table(d->domain, (void __user *)arg);
+> +		if (ret)
+> +			goto unwind;
+> +	}
+> +	goto unlock;
+> +unwind:
+> +	list_for_each_entry_continue_reverse(d, &iommu->domain_list, next) {
+> +		iommu_detach_pasid_table(d->domain);
+> +	}
+> +unlock:
+
+This goto leap frog could be avoided with just:
+
+list_for_each_entry(d, &iommu->domain_list, next) {
+	ret = iommu_uapi_attach_pasid_table(d->domain, (void __user *)arg);
+	if (ret) {
+		list_for_each_entry_continue_reverse(d, &iommu->domain_list, next) {
+			iommu_detach_pasid_table(d->domain);
+		}
+		break;
+	}
+}
+
+> +	mutex_unlock(&iommu->lock);
+> +	return ret;
+> +}
+> +
+>  static int vfio_iommu_migration_build_caps(struct vfio_iommu *iommu,
+>  					   struct vfio_info_cap *caps)
+>  {
+> @@ -2747,6 +2782,34 @@ static int vfio_iommu_type1_unmap_dma(struct vfio_iommu *iommu,
+>  			-EFAULT : 0;
+>  }
+>  
+> +static int vfio_iommu_type1_set_pasid_table(struct vfio_iommu *iommu,
+> +					    unsigned long arg)
+> +{
+> +	struct vfio_iommu_type1_set_pasid_table spt;
+> +	unsigned long minsz;
+> +	int ret = -EINVAL;
+> +
+> +	minsz = offsetofend(struct vfio_iommu_type1_set_pasid_table, flags);
+> +
+> +	if (copy_from_user(&spt, (void __user *)arg, minsz))
+> +		return -EFAULT;
+> +
+> +	if (spt.argsz < minsz)
+> +		return -EINVAL;
+> +
+> +	if (spt.flags & VFIO_PASID_TABLE_FLAG_SET &&
+> +	    spt.flags & VFIO_PASID_TABLE_FLAG_UNSET)
+> +		return -EINVAL;
+> +
+> +	if (spt.flags & VFIO_PASID_TABLE_FLAG_SET)
+> +		ret = vfio_attach_pasid_table(iommu, arg + minsz);
+> +	else if (spt.flags & VFIO_PASID_TABLE_FLAG_UNSET) {
+> +		vfio_detach_pasid_table(iommu);
+> +		ret = 0;
+> +	}
+
+This doesn't really validate that the other flag bits are zero, ex.
+user could pass flags = (1 << 8) | VFIO_PASID_TABLE_FLAG_SET and we'd
+just ignore the extra bit.  So this probably needs to be:
+
+if (spt.flags == VFIO_PASID_TABLE_FLAG_SET)
+	ret = vfio_attach_pasid_table(iommu, arg + minsz);
+else if (spt.flags == VFIO_PASID_TABLE_FLAG_UNSET)
+	vfio_detach_pasid_table(iommu);
+
+Or otherwise validate that none of the other bits are set.  It also
+seems cleaner to me to set the initial value of ret = 0 and end this
+with:
+
+else
+	ret = -EINVAL;
+
+
+> +	return ret;
+> +}
+> +
+>  static int vfio_iommu_type1_dirty_pages(struct vfio_iommu *iommu,
+>  					unsigned long arg)
+>  {
+> @@ -2867,6 +2930,8 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+>  		return vfio_iommu_type1_unmap_dma(iommu, arg);
+>  	case VFIO_IOMMU_DIRTY_PAGES:
+>  		return vfio_iommu_type1_dirty_pages(iommu, arg);
+> +	case VFIO_IOMMU_SET_PASID_TABLE:
+> +		return vfio_iommu_type1_set_pasid_table(iommu, arg);
+>  	default:
+>  		return -ENOTTY;
+>  	}
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index 2f313a238a8f..78ce3ce6c331 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -14,6 +14,7 @@
+>  
+>  #include <linux/types.h>
+>  #include <linux/ioctl.h>
+> +#include <linux/iommu.h>
+>  
+>  #define VFIO_API_VERSION	0
+>  
+> @@ -1180,6 +1181,24 @@ struct vfio_iommu_type1_dirty_bitmap_get {
+>  
+>  #define VFIO_IOMMU_DIRTY_PAGES             _IO(VFIO_TYPE, VFIO_BASE + 17)
+>  
+> +/*
+> + * VFIO_IOMMU_SET_PASID_TABLE - _IOWR(VFIO_TYPE, VFIO_BASE + 22,
+
+We already reuse ioctl indexes between type1 and spapr (ex. +17 is
+either VFIO_IOMMU_DIRTY_PAGES or VFIO_IOMMU_SPAPR_REGISTER_MEMORY
+depending on the iommu type).  I wonder if we should reuse +18 here
+instead.
+
+> + *			struct vfio_iommu_type1_set_pasid_table)
+> + *
+> + * The SET operation passes a PASID table to the host while the
+> + * UNSET operation detaches the one currently programmed. Setting
+> + * a table while another is already programmed replaces the old table.
+> + */
+> +struct vfio_iommu_type1_set_pasid_table {
+> +	__u32	argsz;
+> +	__u32	flags;
+> +#define VFIO_PASID_TABLE_FLAG_SET	(1 << 0)
+> +#define VFIO_PASID_TABLE_FLAG_UNSET	(1 << 1)
+> +	struct iommu_pasid_table_config config; /* used on SET */
+> +};
+> +
+> +#define VFIO_IOMMU_SET_PASID_TABLE	_IO(VFIO_TYPE, VFIO_BASE + 22)
+> +
+>  /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
+>  
+>  /*
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
