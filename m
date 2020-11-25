@@ -7,83 +7,84 @@ X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EDC1C5519F
-	for <kvmarm@archiver.kernel.org>; Wed, 25 Nov 2020 10:31:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A99DC5519F
+	for <kvmarm@archiver.kernel.org>; Wed, 25 Nov 2020 10:39:55 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 856B1206E0
-	for <kvmarm@archiver.kernel.org>; Wed, 25 Nov 2020 10:31:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9D56C20857
+	for <kvmarm@archiver.kernel.org>; Wed, 25 Nov 2020 10:39:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="j/qDLWHb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 856B1206E0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="A+RK8cDs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D56C20857
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B7B64B8D5;
-	Wed, 25 Nov 2020 05:31:44 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BAE3C4B8E0;
+	Wed, 25 Nov 2020 05:39:53 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 2T26L1dztEh2; Wed, 25 Nov 2020 05:31:43 -0500 (EST)
+	with ESMTP id pkECDKpERpfx; Wed, 25 Nov 2020 05:39:52 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F4574B916;
-	Wed, 25 Nov 2020 05:31:43 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E1B14B8E1;
+	Wed, 25 Nov 2020 05:39:52 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C1B3D4B8D5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Nov 2020 05:31:41 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5563D4B8DF
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Nov 2020 05:39:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id B6Gm6piYLlob for <kvmarm@lists.cs.columbia.edu>;
- Wed, 25 Nov 2020 05:31:40 -0500 (EST)
-Received: from mail-wr1-f67.google.com (mail-wr1-f67.google.com
- [209.85.221.67])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6AD234B8D3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Nov 2020 05:31:40 -0500 (EST)
-Received: by mail-wr1-f67.google.com with SMTP id t4so1349354wrr.12
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Nov 2020 02:31:40 -0800 (PST)
+ with ESMTP id p6XdQbmMpD-p for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 25 Nov 2020 05:39:50 -0500 (EST)
+Received: from mail-wm1-f65.google.com (mail-wm1-f65.google.com
+ [209.85.128.65])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EFE7E4B8DB
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Nov 2020 05:39:49 -0500 (EST)
+Received: by mail-wm1-f65.google.com with SMTP id a3so1659195wmb.5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Nov 2020 02:39:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=zh3V+1i6uSPWkNWJHyHSCAf9tka9NARqYpg6Ee1m2YQ=;
- b=j/qDLWHb/zpEgS4pLOSQN4BElGYwswDtuA6l8deiUGiABCBKzd2j1yTyFGFJmgdy+R
- HNPe4Mr8GrIhiwGJhDryWF+slOBmw04NBlWN3RL1HSTpmVwP0MXdGd/NLZ3y/r2UX3VY
- G+DgTAfhQn8S/wjZnHmN6dUwSsE+lbhFArcTA8IzFkcIH06K3JDw01przKfIDBJmOyPa
- lhvGa6i+7qXYaQxErCIoWnPSQWd5ZFr7nqvQ2U4j1hAx500Flg2nrQbcIFzahCg0nSZQ
- rhZB02sRdDC1NG5rjkM6YSLggoemP7xCLV8GzhsN5/JDXWTIGnOAYe3C4Mv2NWMIc2mL
- Cwdg==
+ bh=xjb50VmueVKvqfo83tIt6FtxJUt2q7MIPJuzBp9Cqbo=;
+ b=A+RK8cDsGXYGQGBcYpxEmIt9L6vCtE88Xe75D9UGls4BQT0srylt2atki0IdqYN+F8
+ KHVAparz7lzg+ll7G5+dQPzbmvVehE1E7oBEhWuRGFsPOltGxytLaqnvz/BacEvxAUiT
+ MG2fWNegQZKhzcVtfW8Zs0U6CWVtQKAETunMjnXfu3Q5BofAKBNo5jj3NJzalOOM7byV
+ gWY4Ue2+4EFNZDej3P+jOZ+G2d9eak0NJQ6ixAiaCJxGJhduroRDFMD3AeNeoYFhtyab
+ bCXUU6JLvPuBfP1epmbuGojXtVooYaP7r5MorXNy8vEFa1QFlmvP69u32JpithQ/LZ3J
+ 8L8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=zh3V+1i6uSPWkNWJHyHSCAf9tka9NARqYpg6Ee1m2YQ=;
- b=FegymljOToziSpGQDcIm5zF1FroboexG7Bj9VX7Yei2U08umqjGF9In9lMy9y6gsvn
- Q4aPiW/NVAl+GvQpAihqlx+J4zFGB0aFZgGjffrKSz2yLMJID9hNg/XKME+pQIpRVmsS
- SJBHvGOUIclk2T1yoJ6l1KFr6YCVytBQI/W33cwC2B9I3PeD5UO71BqPD1fzV14fjQXk
- /6Wri0rgMNBrmy7D8lkfZzjzvCrmNAt3b0YAO9APW7pmhoKOKOAhXkSIuz3cwDZ0I3fT
- RNVaBScbuUAf+JSZPBpa2/HuyP0BAb5wgVaPYwRGTIETMTWct2TMMTgAI06qGm93FiUd
- HGdg==
-X-Gm-Message-State: AOAM533d7w7nDXV33KJuL9tUs/dPiifJeeNbxKObH2o+sQdqCR6stXpE
- b5WMtduoldnSwyVTn58aenIGWg==
-X-Google-Smtp-Source: ABdhPJyY8RKpx8wQYYYX6vLZI3Qw2W7ac4/mkkzfKNrNDKkpW7MVrqAgoHDpbeJyJoR2AG8dYD0z6w==
-X-Received: by 2002:adf:f08e:: with SMTP id n14mr3200137wro.136.1606300299126; 
- Wed, 25 Nov 2020 02:31:39 -0800 (PST)
+ bh=xjb50VmueVKvqfo83tIt6FtxJUt2q7MIPJuzBp9Cqbo=;
+ b=RTLymqpRfzx11P3Zx+b28pC46VkqB8JrbxPbMFuqgtuhGgRKJIV7cNpBCI1FBe0pm8
+ CDVgY/gjqDim2PJq4h41qseFwaahFCGKMcPh4752Njq0JCrZoVv75aF4hAD4FRyklB5U
+ zY5MgMuQ1qFhd0O1A/10srhkAYorWE1boFngTbutf4/WcuYk3IjYvZ3u8DBl2t07GS1z
+ xFx3fIoJneQWRsg3bpr92kd185Xq1V4haVFrepWZBcqg9/9nZBUagPB0zQSwtuyl6IuG
+ HDHs9v/pmnl1lbYOfjNlYmJW53NeoMR8swBFo6kFDYMwej1tJFs5cGFV49iCj3iBvaAe
+ 8zNA==
+X-Gm-Message-State: AOAM5320LyasuYHuDPPf7Ce/W4+bpu7lw2Y+QRMdRlQlJCzgfP4IY4vH
+ o79RFvhVwk54/+/zqeBjTS1a/g==
+X-Google-Smtp-Source: ABdhPJxNbgpC4Qt2/Bi063B58JqJVa8ChBTVh7QS2nzzb1U4glQNyD2Yffl1fAQn/K9PsT2PTBviLA==
+X-Received: by 2002:a7b:c843:: with SMTP id c3mr3159938wml.100.1606300788652; 
+ Wed, 25 Nov 2020 02:39:48 -0800 (PST)
 Received: from google.com ([2a01:4b00:8523:2d03:38bf:5817:e665:9b9b])
- by smtp.gmail.com with ESMTPSA id 8sm3651496wmg.28.2020.11.25.02.31.37
+ by smtp.gmail.com with ESMTPSA id s4sm4093475wru.56.2020.11.25.02.39.47
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 25 Nov 2020 02:31:38 -0800 (PST)
-Date: Wed, 25 Nov 2020 10:31:37 +0000
+ Wed, 25 Nov 2020 02:39:47 -0800 (PST)
+Date: Wed, 25 Nov 2020 10:39:46 +0000
 From: David Brazdil <dbrazdil@google.com>
 To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v2 04/24] arm64: Move MAIR_EL1_SET to asm/memory.h
-Message-ID: <20201125103137.iml7mqpzhylldvqy@google.com>
+Subject: Re: [PATCH v2 06/24] kvm: arm64: Move hyp-init params to a per-CPU
+ struct
+Message-ID: <20201125103946.2unmclsdfqpr3eyk@google.com>
 References: <20201116204318.63987-1-dbrazdil@google.com>
- <20201116204318.63987-5-dbrazdil@google.com>
- <87mtz85geh.wl-maz@kernel.org>
+ <20201116204318.63987-7-dbrazdil@google.com>
+ <87lfes5f54.wl-maz@kernel.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <87mtz85geh.wl-maz@kernel.org>
+In-Reply-To: <87lfes5f54.wl-maz@kernel.org>
 Cc: kernel-team@android.com, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
  Andrew Walbran <qwandor@google.com>, Catalin Marinas <catalin.marinas@arm.com>,
  linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
@@ -106,183 +107,142 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Nov 23, 2020 at 01:52:54PM +0000, Marc Zyngier wrote:
-> On Mon, 16 Nov 2020 20:42:58 +0000,
+On Mon, Nov 23, 2020 at 02:20:07PM +0000, Marc Zyngier wrote:
+> On Mon, 16 Nov 2020 20:43:00 +0000,
 > David Brazdil <dbrazdil@google.com> wrote:
 > > 
-> > KVM currently initializes MAIR_EL2 to the value of MAIR_EL1. In
-> > preparation for initializing MAIR_EL2 before MAIR_EL1, move the constant
-> > into a shared header file. Since it is used for EL1 and EL2, rename to
-> > MAIR_ELx_SET.
+> > Once we start initializing KVM on newly booted cores before the rest of
+> > the kernel, parameters to __do_hyp_init will need to be provided by EL2
+> > rather than EL1. At that point it will not be possible to pass its four
+> > arguments directly because PSCI_CPU_ON only supports one context
+> > argument.
+> > 
+> > Refactor __do_hyp_init to accept its parameters in a struct. This
+> > prepares the code for KVM booting cores as well as removes any limits on
+> > the number of __do_hyp_init arguments.
 > > 
 > > Signed-off-by: David Brazdil <dbrazdil@google.com>
 > > ---
-> >  arch/arm64/include/asm/memory.h | 29 ++++++++++++++---------------
-> >  arch/arm64/include/asm/sysreg.h | 30 ++++++++++++++++++++++++++++++
-> >  arch/arm64/mm/proc.S            | 15 +--------------
-> >  3 files changed, 45 insertions(+), 29 deletions(-)
+> >  arch/arm64/include/asm/kvm_asm.h   |  7 +++++++
+> >  arch/arm64/include/asm/kvm_hyp.h   |  4 ++++
+> >  arch/arm64/kernel/asm-offsets.c    |  4 ++++
+> >  arch/arm64/kvm/arm.c               | 26 ++++++++++++++------------
+> >  arch/arm64/kvm/hyp/nvhe/hyp-init.S | 21 ++++++++++-----------
+> >  arch/arm64/kvm/hyp/nvhe/hyp-main.c |  2 ++
+> >  6 files changed, 41 insertions(+), 23 deletions(-)
 > > 
-> > diff --git a/arch/arm64/include/asm/memory.h b/arch/arm64/include/asm/memory.h
-> > index cd61239bae8c..8ae8fd883a0c 100644
-> > --- a/arch/arm64/include/asm/memory.h
-> > +++ b/arch/arm64/include/asm/memory.h
-> > @@ -13,6 +13,7 @@
-> >  #include <linux/const.h>
-> >  #include <linux/sizes.h>
-> >  #include <asm/page-def.h>
-> > +#include <asm/sysreg.h>
-> >  
-> >  /*
-> >   * Size of the PCI I/O space. This must remain a power of two so that
-> > @@ -124,21 +125,6 @@
-> >   */
-> >  #define SEGMENT_ALIGN		SZ_64K
-> >  
-> > -/*
-> > - * Memory types available.
-> > - *
-> > - * IMPORTANT: MT_NORMAL must be index 0 since vm_get_page_prot() may 'or' in
-> > - *	      the MT_NORMAL_TAGGED memory type for PROT_MTE mappings. Note
-> > - *	      that protection_map[] only contains MT_NORMAL attributes.
-> > - */
-> > -#define MT_NORMAL		0
-> > -#define MT_NORMAL_TAGGED	1
-> > -#define MT_NORMAL_NC		2
-> > -#define MT_NORMAL_WT		3
-> > -#define MT_DEVICE_nGnRnE	4
-> > -#define MT_DEVICE_nGnRE		5
-> > -#define MT_DEVICE_GRE		6
-> > -
-> >  /*
-> >   * Memory types for Stage-2 translation
-> >   */
-> > @@ -152,6 +138,19 @@
-> >  #define MT_S2_FWB_NORMAL	6
-> >  #define MT_S2_FWB_DEVICE_nGnRE	1
-> >  
-> > +/*
-> > + * Default MAIR_EL1. MT_NORMAL_TAGGED is initially mapped as Normal memory and
-> > + * changed during __cpu_setup to Normal Tagged if the system supports MTE.
-> > + */
-> > +#define MAIR_ELx_SET							\
-> > +	(MAIR_ATTRIDX(MAIR_ATTR_DEVICE_nGnRnE, MT_DEVICE_nGnRnE) |	\
-> > +	 MAIR_ATTRIDX(MAIR_ATTR_DEVICE_nGnRE, MT_DEVICE_nGnRE) |	\
-> > +	 MAIR_ATTRIDX(MAIR_ATTR_DEVICE_GRE, MT_DEVICE_GRE) |		\
-> > +	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL_NC, MT_NORMAL_NC) |		\
-> > +	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL, MT_NORMAL) |			\
-> > +	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL_WT, MT_NORMAL_WT) |		\
-> > +	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL, MT_NORMAL_TAGGED))
-> > +
-> >  #ifdef CONFIG_ARM64_4K_PAGES
-> >  #define IOREMAP_MAX_ORDER	(PUD_SHIFT)
-> >  #else
-> > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> > index e2ef4c2edf06..24e773414cb4 100644
-> > --- a/arch/arm64/include/asm/sysreg.h
-> > +++ b/arch/arm64/include/asm/sysreg.h
-> > @@ -635,6 +635,34 @@
-> >  /* Position the attr at the correct index */
-> >  #define MAIR_ATTRIDX(attr, idx)		((attr) << ((idx) * 8))
-> >  
-> > +/*
-> > + * Memory types available.
-> > + *
-> > + * IMPORTANT: MT_NORMAL must be index 0 since vm_get_page_prot() may 'or' in
-> > + *	      the MT_NORMAL_TAGGED memory type for PROT_MTE mappings. Note
-> > + *	      that protection_map[] only contains MT_NORMAL attributes.
-> > + */
-> > +#define MT_NORMAL		0
-> > +#define MT_NORMAL_TAGGED	1
-> > +#define MT_NORMAL_NC		2
-> > +#define MT_NORMAL_WT		3
-> > +#define MT_DEVICE_nGnRnE	4
-> > +#define MT_DEVICE_nGnRE		5
-> > +#define MT_DEVICE_GRE		6
-> > +
-> > +/*
-> > + * Default MAIR_ELx. MT_NORMAL_TAGGED is initially mapped as Normal memory and
-> > + * changed during __cpu_setup to Normal Tagged if the system supports MTE.
-> > + */
-> > +#define MAIR_ELx_SET							\
-> > +	(MAIR_ATTRIDX(MAIR_ATTR_DEVICE_nGnRnE, MT_DEVICE_nGnRnE) |	\
-> > +	 MAIR_ATTRIDX(MAIR_ATTR_DEVICE_nGnRE, MT_DEVICE_nGnRE) |	\
-> > +	 MAIR_ATTRIDX(MAIR_ATTR_DEVICE_GRE, MT_DEVICE_GRE) |		\
-> > +	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL_NC, MT_NORMAL_NC) |		\
-> > +	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL, MT_NORMAL) |			\
-> > +	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL_WT, MT_NORMAL_WT) |		\
-> > +	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL, MT_NORMAL_TAGGED))
-> > +
-> >  /* id_aa64isar0 */
-> >  #define ID_AA64ISAR0_RNDR_SHIFT		60
-> >  #define ID_AA64ISAR0_TLB_SHIFT		56
-> > @@ -992,6 +1020,7 @@
-> >  /* Safe value for MPIDR_EL1: Bit31:RES1, Bit30:U:0, Bit24:MT:0 */
-> >  #define SYS_MPIDR_SAFE_VAL	(BIT(31))
-> >  
-> > +#ifndef LINKER_SCRIPT
-> 
-> This is terribly ugly. Why is this included by the linker script? Does
-> it actually define __ASSEMBLY__?
-
-vmlinux.lds.S includes memory.h for PAGE_SIZE. And yes, linker scripts are
-built with this rule:
-
-      cmd_cpp_lds_S = $(CPP) $(cpp_flags) -P -U$(ARCH) \
-	                     -D__ASSEMBLY__ -DLINKER_SCRIPT -o $@ $<
-
-I tried a few things and wasn't completely happy with any of them. I think in
-the previous spin you suggested moving this constant to sysreg.h. That works
-too but sysreg.h seems to have only architecture constants, memory.h about a
-Linux-specific configuration, so I wanted to keep it here.
-
-> 
-> >  #ifdef __ASSEMBLY__
-> >  
-> >  	.irp	num,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30
-> > @@ -1109,5 +1138,6 @@
-> >  })
+> > diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> > index 54387ccd1ab2..01904e88cead 100644
+> > --- a/arch/arm64/include/asm/kvm_asm.h
+> > +++ b/arch/arm64/include/asm/kvm_asm.h
+> > @@ -150,6 +150,13 @@ extern void *__vhe_undefined_symbol;
 > >  
 > >  #endif
-> > +#endif	/* LINKER_SCRIPT */
 > >  
-> >  #endif	/* __ASM_SYSREG_H */
-> > diff --git a/arch/arm64/mm/proc.S b/arch/arm64/mm/proc.S
-> > index 23c326a06b2d..e3b9aa372b96 100644
-> > --- a/arch/arm64/mm/proc.S
-> > +++ b/arch/arm64/mm/proc.S
-> > @@ -45,19 +45,6 @@
-> >  #define TCR_KASAN_FLAGS 0
+> > +struct kvm_nvhe_init_params {
+> > +	unsigned long tpidr_el2;
+> > +	unsigned long vector_hyp_va;
+> > +	unsigned long stack_hyp_va;
+> > +	phys_addr_t pgd_pa;
+> > +};
+> > +
+> >  /* Translate a kernel address @ptr into its equivalent linear mapping */
+> >  #define kvm_ksym_ref(ptr)						\
+> >  	({								\
+> > diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+> > index 6b664de5ec1f..a3289071f3d8 100644
+> > --- a/arch/arm64/include/asm/kvm_hyp.h
+> > +++ b/arch/arm64/include/asm/kvm_hyp.h
+> > @@ -15,6 +15,10 @@
+> >  DECLARE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
+> >  DECLARE_PER_CPU(unsigned long, kvm_hyp_vector);
+> >  
+> > +#ifdef __KVM_NVHE_HYPERVISOR__
+> > +DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
+> > +#endif
+> 
+> I'm not sure we should bother with this #ifdefery. Having the
+> declaration present at all times doesn't really hurt, since it is only
+> defined in the HYP code. Cutting down on the conditionals would
+> certainly help readability.
+> 
+> > +
+> >  #define read_sysreg_elx(r,nvh,vh)					\
+> >  	({								\
+> >  		u64 reg;						\
+> > diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
+> > index 7d32fc959b1a..4435ad8be938 100644
+> > --- a/arch/arm64/kernel/asm-offsets.c
+> > +++ b/arch/arm64/kernel/asm-offsets.c
+> > @@ -110,6 +110,10 @@ int main(void)
+> >    DEFINE(CPU_APGAKEYLO_EL1,	offsetof(struct kvm_cpu_context, sys_regs[APGAKEYLO_EL1]));
+> >    DEFINE(HOST_CONTEXT_VCPU,	offsetof(struct kvm_cpu_context, __hyp_running_vcpu));
+> >    DEFINE(HOST_DATA_CONTEXT,	offsetof(struct kvm_host_data, host_ctxt));
+> > +  DEFINE(NVHE_INIT_TPIDR_EL2,	offsetof(struct kvm_nvhe_init_params, tpidr_el2));
+> > +  DEFINE(NVHE_INIT_VECTOR_HYP_VA,	offsetof(struct kvm_nvhe_init_params, vector_hyp_va));
+> > +  DEFINE(NVHE_INIT_STACK_HYP_VA,	offsetof(struct kvm_nvhe_init_params, stack_hyp_va));
+> > +  DEFINE(NVHE_INIT_PGD_PA,	offsetof(struct kvm_nvhe_init_params, pgd_pa));
 > >  #endif
-> >  
-> > -/*
-> > - * Default MAIR_EL1. MT_NORMAL_TAGGED is initially mapped as Normal memory and
-> > - * changed during __cpu_setup to Normal Tagged if the system supports MTE.
-> > - */
-> > -#define MAIR_EL1_SET							\
-> > -	(MAIR_ATTRIDX(MAIR_ATTR_DEVICE_nGnRnE, MT_DEVICE_nGnRnE) |	\
-> > -	 MAIR_ATTRIDX(MAIR_ATTR_DEVICE_nGnRE, MT_DEVICE_nGnRE) |	\
-> > -	 MAIR_ATTRIDX(MAIR_ATTR_DEVICE_GRE, MT_DEVICE_GRE) |		\
-> > -	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL_NC, MT_NORMAL_NC) |		\
-> > -	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL, MT_NORMAL) |			\
-> > -	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL_WT, MT_NORMAL_WT) |		\
-> > -	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL, MT_NORMAL_TAGGED))
-> > -
 > >  #ifdef CONFIG_CPU_PM
-> >  /**
-> >   * cpu_do_suspend - save CPU registers context
-> > @@ -425,7 +412,7 @@ SYM_FUNC_START(__cpu_setup)
-> >  	/*
-> >  	 * Memory region attributes
+> >    DEFINE(CPU_CTX_SP,		offsetof(struct cpu_suspend_ctx, sp));
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index c0ffb019ca8b..4838556920fb 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -50,6 +50,7 @@ DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
+> >  
+> >  static DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_page);
+> >  unsigned long kvm_arm_hyp_percpu_base[NR_CPUS];
+> > +DECLARE_KVM_NVHE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
+> >  
+> >  /* The VMID used in the VTTBR */
+> >  static atomic64_t kvm_vmid_gen = ATOMIC64_INIT(1);
+> > @@ -1347,10 +1348,7 @@ static int kvm_map_vectors(void)
+> >  
+> >  static void cpu_init_hyp_mode(void)
+> >  {
+> > -	phys_addr_t pgd_ptr;
+> > -	unsigned long hyp_stack_ptr;
+> > -	unsigned long vector_ptr;
+> > -	unsigned long tpidr_el2;
+> > +	struct kvm_nvhe_init_params *params = this_cpu_ptr_nvhe_sym(kvm_init_params);
+> >  	struct arm_smccc_res res;
+> >  
+> >  	/* Switch from the HYP stub to our own HYP init vector */
+> > @@ -1361,13 +1359,18 @@ static void cpu_init_hyp_mode(void)
+> >  	 * kernel's mapping to the linear mapping, and store it in tpidr_el2
+> >  	 * so that we can use adr_l to access per-cpu variables in EL2.
 > >  	 */
-> > -	mov_q	x5, MAIR_EL1_SET
-> > +	mov_q	x5, MAIR_ELx_SET
-> >  #ifdef CONFIG_ARM64_MTE
-> >  	/*
-> >  	 * Update MAIR_EL1, GCR_EL1 and TFSR*_EL1 if MTE is supported
-> > -- 
-> > 2.29.2.299.gdc1121823c-goog
-> > 
-> > 
+> > -	tpidr_el2 = (unsigned long)this_cpu_ptr_nvhe_sym(__per_cpu_start) -
+> > -		    (unsigned long)kvm_ksym_ref(CHOOSE_NVHE_SYM(__per_cpu_start));
+> > +	params->tpidr_el2 = (unsigned long)this_cpu_ptr_nvhe_sym(__per_cpu_start) -
+> > +			    (unsigned long)kvm_ksym_ref(CHOOSE_NVHE_SYM(__per_cpu_start));
+> >  
+> > -	pgd_ptr = kvm_mmu_get_httbr();
+> > -	hyp_stack_ptr = __this_cpu_read(kvm_arm_hyp_stack_page) + PAGE_SIZE;
+> > -	hyp_stack_ptr = kern_hyp_va(hyp_stack_ptr);
+> > -	vector_ptr = (unsigned long)kern_hyp_va(kvm_ksym_ref(__kvm_hyp_host_vector));
+> > +	params->vector_hyp_va = (unsigned long)kern_hyp_va(kvm_ksym_ref(__kvm_hyp_host_vector));
+> > +	params->stack_hyp_va = kern_hyp_va(__this_cpu_read(kvm_arm_hyp_stack_page) + PAGE_SIZE);
+> > +	params->pgd_pa = kvm_mmu_get_httbr();
+> 
+> Note to self: rename this to kvm_mmu_get_hyp_pgd() (another AArch32-ism).
+> 
+> > +
+> > +	/*
+> > +	 * Flush the init params from the data cache because the struct will
+> > +	 * be read while the MMU is off.
+> > +	 */
+> > +	__flush_dcache_area(params, sizeof(*params));
+> 
+> nit: please use kvm_flush_dcache_to_poc(), as it clearly indicates to
+> which point we are flushing.
+
+Will change, but out of curiosity - how is it different? AFAICT, it is just
+an alias with a single use in __clean_dcache_guest_page:
+
+  #define kvm_flush_dcache_to_poc(a,l)	__flush_dcache_area((a), (l))
+
 > 
 > Thanks,
 > 
