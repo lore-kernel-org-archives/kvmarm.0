@@ -7,49 +7,49 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7D9BC56202
-	for <kvmarm@archiver.kernel.org>; Wed, 25 Nov 2020 15:50:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 991C0C64E75
+	for <kvmarm@archiver.kernel.org>; Wed, 25 Nov 2020 15:50:11 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 42D40207BC
+	by mail.kernel.org (Postfix) with ESMTP id 0A6DC205CB
 	for <kvmarm@archiver.kernel.org>; Wed, 25 Nov 2020 15:50:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42D40207BC
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A6DC205CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AEC4A4B9E3;
-	Wed, 25 Nov 2020 10:50:09 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CA804BA15;
+	Wed, 25 Nov 2020 10:50:10 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id eeqyC3NqHvEb; Wed, 25 Nov 2020 10:50:08 -0500 (EST)
+	with ESMTP id nU2D4rRPUzJk; Wed, 25 Nov 2020 10:50:09 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A6A64B9D0;
-	Wed, 25 Nov 2020 10:50:07 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 79E264BA02;
+	Wed, 25 Nov 2020 10:50:09 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B8684B9C1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Nov 2020 10:50:05 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 993014B9C4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Nov 2020 10:50:06 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QbHKaOyqL8p9 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 25 Nov 2020 10:50:04 -0500 (EST)
+ with ESMTP id bYAQonVbBJQF for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 25 Nov 2020 10:50:05 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 31A984B9C3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Nov 2020 10:50:04 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 83C6F4B9C1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Nov 2020 10:50:05 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DA8FD11D4;
- Wed, 25 Nov 2020 07:50:03 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DF3B9106F;
+ Wed, 25 Nov 2020 07:50:04 -0800 (PST)
 Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1657E3F7BB;
- Wed, 25 Nov 2020 07:50:02 -0800 (PST)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1ABE13F7BB;
+ Wed, 25 Nov 2020 07:50:03 -0800 (PST)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.cs.columbia.edu,
 	drjones@redhat.com
-Subject: [kvm-unit-tests PATCH 01/10] lib: arm/arm64: gicv3: Add missing
+Subject: [kvm-unit-tests PATCH 02/10] lib: arm/arm64: gicv2: Add missing
  barrier when sending IPIs
-Date: Wed, 25 Nov 2020 15:51:04 +0000
-Message-Id: <20201125155113.192079-2-alexandru.elisei@arm.com>
+Date: Wed, 25 Nov 2020 15:51:05 +0000
+Message-Id: <20201125155113.192079-3-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201125155113.192079-1-alexandru.elisei@arm.com>
 References: <20201125155113.192079-1-alexandru.elisei@arm.com>
@@ -71,69 +71,66 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-One common usage for IPIs is for one CPU to write to a shared memory
-location, send the IPI to kick another CPU, and the receiver to read from
-the same location. Proper synchronization is needed to make sure that the
-IPI receiver reads the most recent value and not stale data (for example,
-the write from the sender CPU might still be in a store buffer).
+GICv2 generates IPIs with a MMIO write to the GICD_SGIR register. A common
+pattern for IPI usage is for the IPI receiver to read data written to
+memory by the sender. The armv7 and armv8 architectures implement a
+weakly-ordered memory model, which means that barriers are required to make
+sure that the expected values are observed.
 
-For GICv3, IPIs are generated with a write to the ICC_SGI1R_EL1 register.
-To make sure the memory stores are observable by other CPUs, we need a
-wmb() barrier (DSB ST), which waits for stores to complete.
+It turns out that because the receiver CPU must observe the write to memory
+that generated the IPI when reading the GICC_IAR MMIO register, we only
+need to ensure ordering of memory accesses, and not completion. Use a
+smp_wmb (DMB ISHST) barrier before sending the IPI.
 
-From the definition of DSB from ARM DDI 0487F.b, page B2-139:
-
-"In addition, no instruction that appears in program order after the DSB
-instruction can alter any state of the system or perform any part of its
-functionality until the DSB completes other than:
-
-- Being fetched from memory and decoded.
-- Reading the general-purpose, SIMD and floating-point, Special-purpose, or
-System registers that are directly or indirectly read without causing
-side-effects."
-
-Similar definition for armv7 (ARM DDI 0406C.d, page A3-150).
-
-The DSB instruction is enough to prevent reordering of the GIC register
-write which comes in program order after the memory access.
-
-This also matches what the Linux GICv3 irqchip driver does (commit
-21ec30c0ef52 ("irqchip/gic-v3: Use wmb() instead of smb_wmb() in
-gic_raise_softirq()")).
+This also matches what the Linux GICv2 irqchip driver does (more details
+in commit 8adbf57fc429 ("irqchip: gic: use dmb ishst instead of dsb when
+raising a softirq")).
 
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- lib/arm/gic-v3.c | 3 +++
+ lib/arm/gic-v2.c | 4 ++++
  arm/gic.c        | 2 ++
- 2 files changed, 5 insertions(+)
+ 2 files changed, 6 insertions(+)
 
-diff --git a/lib/arm/gic-v3.c b/lib/arm/gic-v3.c
-index a7e2cb819746..a6afa42d5fbe 100644
---- a/lib/arm/gic-v3.c
-+++ b/lib/arm/gic-v3.c
-@@ -77,6 +77,9 @@ void gicv3_ipi_send_mask(int irq, const cpumask_t *dest)
+diff --git a/lib/arm/gic-v2.c b/lib/arm/gic-v2.c
+index dc6a97c600ec..da244c82de34 100644
+--- a/lib/arm/gic-v2.c
++++ b/lib/arm/gic-v2.c
+@@ -45,6 +45,8 @@ void gicv2_ipi_send_single(int irq, int cpu)
+ {
+ 	assert(cpu < 8);
+ 	assert(irq < 16);
++
++	smp_wmb();
+ 	writel(1 << (cpu + 16) | irq, gicv2_dist_base() + GICD_SGIR);
+ }
+ 
+@@ -53,5 +55,7 @@ void gicv2_ipi_send_mask(int irq, const cpumask_t *dest)
+ 	u8 tlist = (u8)cpumask_bits(dest)[0];
  
  	assert(irq < 16);
- 
-+	/* Ensure stores are visible to other CPUs before sending the IPI */
-+	wmb();
 +
- 	/*
- 	 * For each cpu in the mask collect its peers, which are also in
- 	 * the mask, in order to form target lists.
++	smp_wmb();
+ 	writel(tlist << 16 | irq, gicv2_dist_base() + GICD_SGIR);
+ }
 diff --git a/arm/gic.c b/arm/gic.c
-index acb060585fae..512c83636a2e 100644
+index 512c83636a2e..401ffafe4299 100644
 --- a/arm/gic.c
 +++ b/arm/gic.c
-@@ -275,6 +275,8 @@ static void gicv3_ipi_send_self(void)
+@@ -260,11 +260,13 @@ static void check_lpi_hits(int *expected, const char *msg)
  
- static void gicv3_ipi_send_broadcast(void)
+ static void gicv2_ipi_send_self(void)
  {
-+	/* Ensure stores are visible to other CPUs before sending the IPI */
-+	wmb();
- 	gicv3_write_sgi1r(1ULL << 40 | IPI_IRQ << 24);
- 	isb();
++	smp_wmb();
+ 	writel(2 << 24 | IPI_IRQ, gicv2_dist_base() + GICD_SGIR);
  }
+ 
+ static void gicv2_ipi_send_broadcast(void)
+ {
++	smp_wmb();
+ 	writel(1 << 24 | IPI_IRQ, gicv2_dist_base() + GICD_SGIR);
+ }
+ 
 -- 
 2.29.2
 
