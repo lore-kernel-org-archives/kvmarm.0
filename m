@@ -5,79 +5,80 @@ X-Spam-Level:
 X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 372DFC56202
-	for <kvmarm@archiver.kernel.org>; Thu, 26 Nov 2020 15:55:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED0F7C63697
+	for <kvmarm@archiver.kernel.org>; Thu, 26 Nov 2020 15:55:08 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B5B3421D46
-	for <kvmarm@archiver.kernel.org>; Thu, 26 Nov 2020 15:55:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8C25E21D46
+	for <kvmarm@archiver.kernel.org>; Thu, 26 Nov 2020 15:55:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="G+ViC3wP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5B3421D46
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="pbb/yCmE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C25E21D46
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 20D5F4C0A4;
-	Thu, 26 Nov 2020 10:55:03 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 400444C013;
+	Thu, 26 Nov 2020 10:55:08 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id dcgjlOyYIB8m; Thu, 26 Nov 2020 10:55:02 -0500 (EST)
+	with ESMTP id nfrFvkWqgcJC; Thu, 26 Nov 2020 10:55:07 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 018C54C092;
-	Thu, 26 Nov 2020 10:55:02 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 44A274C0BE;
+	Thu, 26 Nov 2020 10:55:07 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 12A9E4C092
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Nov 2020 10:55:01 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 52ED84BA29
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Nov 2020 10:55:06 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Dc65aSW6YCg5 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 26 Nov 2020 10:55:00 -0500 (EST)
-Received: from mail-wr1-f66.google.com (mail-wr1-f66.google.com
- [209.85.221.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 085D54B9FA
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Nov 2020 10:55:00 -0500 (EST)
-Received: by mail-wr1-f66.google.com with SMTP id t4so2615008wrr.12
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Nov 2020 07:54:59 -0800 (PST)
+ with ESMTP id RORVZfX4fVtc for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 26 Nov 2020 10:55:05 -0500 (EST)
+Received: from mail-wr1-f67.google.com (mail-wr1-f67.google.com
+ [209.85.221.67])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BBF9B4C081
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Nov 2020 10:55:04 -0500 (EST)
+Received: by mail-wr1-f67.google.com with SMTP id 23so2636348wrc.8
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Nov 2020 07:55:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=irDOCaoxBC7rYFpDng3539rKfl5EDMRei9R6iacpt5Q=;
- b=G+ViC3wP1aisQEqSrtFyh4agtf+XRj/S5yCOQSPP+B9cEpF3CEG6DUz/bfIazuPr44
- ziINsQardil0WvZ7VvAzP+ViHc8X/aDnyhZgkBWKaSicVgTkjL4koXMMvnWUKwj6Tubf
- yy+Yx/hK3LwwE2ezmO7wOtcTtG/OXrSJrdAmCkUrUTDGlG25Xz7C8mTrmfItIjst/2Po
- ItFdY9jyph4RS42NCu18FEzXe2QYDp7fg8a3lGHm5/Bq0J2aPx0WhjJGBCWrdIlkvbXW
- PRBJQEM/Aw0vr3SF+JCrYwHFypXblFfnJAf0xiWqOkWB+uG+6muEhHq41S+AwQVN50o4
- /3AQ==
+ bh=Pb+ABw8dDs4PbD0OqVCMWkPKj8CiLKPB9XpZniqrrrk=;
+ b=pbb/yCmE0LnjVE/ExQ/pJl7w83OT3LzqwQppQ3HqidXv2SfAJ9Nb1cPbq9a8ZZI4YA
+ X5M/PUSmd0+3fpTDL/InmQ2mCDNpr9piPAuo7p6crV0IeKBHx/ZTIZOgH/esG4VTPy2J
+ vlfVzxrBEn8n6D2S5rPjeXvv6YodXNpHneVC8Nwje61zvBtJxL9jKl+VgVh2Lahc+ksZ
+ iHqtiBbtPHB1T5RFyjVg6EG7jdM6DUm23grUSANYdwjKev67RJFOYVUfOzyGvHvg8snO
+ dasZpwdSKPiXhpsLurhfNgNIsnFGj3Bo6vrCCFJGRdAo6Tb+BYMNEOrvmCeSdXjXLlsU
+ jk1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=irDOCaoxBC7rYFpDng3539rKfl5EDMRei9R6iacpt5Q=;
- b=MxEH+Xt/ZPtNNlU2lNJrWSZhO2G6rVcIg/4ByEdJKyTjbRi4ZyU8ynSIrt8XZHtnXh
- AF/QYDUHs9IfOy0x6mO3VlQm4ijN0dxN/DsQeFPA6s53EBBnfSIRYTQGnwOQd2k0CUg2
- sPWt1SnOS7Z7CgEDUeu7/UMArbkiTUgJ1ZW7x6M2kVhpOthxpWQZZoQQOG2uc//YYgrv
- 67FLpj1QsS0p9+iGkazbEd2jHFqS4n2hNM7GRj8xMsMMYgDP5Z+utTLbYC0mU+kz9+q6
- dvhfQrBaut6K3yfX4IETNqjodNdsNpdp0F4hy9V2VBwTsyIBITKxfUaQyx/pK2+fndc/
- fL4g==
-X-Gm-Message-State: AOAM530nV5zBcHMZ/ZNVwVID2wryqhyt2zMUFoIZUKuBXxOkvJnP25Mk
- BUbpuseEsHAr2M9sEnivST/99VlvqKehvb/0
-X-Google-Smtp-Source: ABdhPJy4MBFMpR4y7kRf/sEF0i4eAr3+bsyd1csD1SmT3e7E9ub9c+2WpUvSX9zSC44QRHTnVEfgpQ==
-X-Received: by 2002:adf:f102:: with SMTP id r2mr4652297wro.315.1606406098667; 
- Thu, 26 Nov 2020 07:54:58 -0800 (PST)
+ bh=Pb+ABw8dDs4PbD0OqVCMWkPKj8CiLKPB9XpZniqrrrk=;
+ b=LnM68mCL3YIn16GbVgaX28HXb8EG9H/6SANhKQVG01L6tl3xznLwrq1Rc6xNOlxa1f
+ tt3o78NFRiisPD1h+7zZO2fHenTOl3/LwZjQgIog4PabsYNOwg8+EAE0ky59QMWoazki
+ nfv779XfDopqJtCdO/ijRdYmFRRAJgRgYzu2zZ0US7THi/N28TKp+y/2+QWva5SDeOjj
+ Yg7WX6TAE5g9XTR8IshqKi96aSLYgUwnKT3f7RO06Jbg8jufEW87xfpjww1NdavCP1b2
+ owyZYX14ZWbthYxxJA8BKobcqvqztgicIZJCcVfngPVAfagPnEraGYsxNDl2dU0k6f+4
+ ImCw==
+X-Gm-Message-State: AOAM531e+E8P8Kgsawk6fjLwnz4BOkkrWE9JrJP7JzOxe7/kLnLS7j4y
+ IWHLfjTIp1SRZ0odvphAhTbGiMHC06dHoUzu
+X-Google-Smtp-Source: ABdhPJwxY6DWeyXDaTKzR9vlEHnJK1db+CbK/rNz4u0C73SsrWbM3UVGNV4lTxhZ1MSN5bqYaJbUug==
+X-Received: by 2002:adf:eb4d:: with SMTP id u13mr4757138wrn.146.1606406103382; 
+ Thu, 26 Nov 2020 07:55:03 -0800 (PST)
 Received: from localhost ([2a01:4b00:8523:2d03:f008:704d:8d4b:9951])
- by smtp.gmail.com with ESMTPSA id 35sm9328533wro.71.2020.11.26.07.54.57
+ by smtp.gmail.com with ESMTPSA id g25sm8706624wmk.5.2020.11.26.07.55.01
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 26 Nov 2020 07:54:57 -0800 (PST)
+ Thu, 26 Nov 2020 07:55:02 -0800 (PST)
 From: David Brazdil <dbrazdil@google.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v3 15/23] kvm: arm64: Add offset for hyp VA <-> PA conversion
-Date: Thu, 26 Nov 2020 15:54:13 +0000
-Message-Id: <20201126155421.14901-16-dbrazdil@google.com>
+Subject: [PATCH v3 17/23] kvm: arm64: Extract __do_hyp_init into a helper
+ function
+Date: Thu, 26 Nov 2020 15:54:15 +0000
+Message-Id: <20201126155421.14901-18-dbrazdil@google.com>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201126155421.14901-1-dbrazdil@google.com>
 References: <20201126155421.14901-1-dbrazdil@google.com>
@@ -105,85 +106,71 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add a host-initialized constant to KVM nVHE hyp code for converting
-between EL2 linear map virtual addresses and physical addresses.
-Also add `__hyp_pa` macro that performs the conversion.
+In preparation for adding a CPU entry point in nVHE hyp code, extract
+most of __do_hyp_init hypervisor initialization code into a common
+helper function. This will be invoked by the entry point to install KVM
+on the newly booted CPU.
 
 Signed-off-by: David Brazdil <dbrazdil@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/psci-relay.c |  3 +++
- arch/arm64/kvm/va_layout.c           | 30 +++++++++++++++++++++++++---
- 2 files changed, 30 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S | 35 ++++++++++++++++++++++--------
+ 1 file changed, 26 insertions(+), 9 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/psci-relay.c b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-index 44a9fb462d24..e7091d89f0fc 100644
---- a/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-+++ b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-@@ -18,6 +18,9 @@
- /* Config options set by the host. */
- u32 __ro_after_init kvm_host_psci_version;
- u32 __ro_after_init kvm_host_psci_function_id[PSCI_FN_MAX];
-+s64 __ro_after_init hyp_physvirt_offset;
-+
-+#define __hyp_pa(x) ((phys_addr_t)((x)) + hyp_physvirt_offset)
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+index 77c983aa90fa..98ce40e17b42 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+@@ -68,13 +68,32 @@ __do_hyp_init:
+ 	mov	x0, #SMCCC_RET_NOT_SUPPORTED
+ 	eret
  
- static u64 get_psci_func_id(struct kvm_cpu_context *host_ctxt)
- {
-diff --git a/arch/arm64/kvm/va_layout.c b/arch/arm64/kvm/va_layout.c
-index 4130b72e6891..d8cc51bd60bf 100644
---- a/arch/arm64/kvm/va_layout.c
-+++ b/arch/arm64/kvm/va_layout.c
-@@ -23,6 +23,30 @@ static u8 tag_lsb;
- static u64 tag_val;
- static u64 va_mask;
+-1:	ldr	x0, [x1, #NVHE_INIT_TPIDR_EL2]
+-	msr	tpidr_el2, x0
++1:	mov	x0, x1
++	mov	x4, lr
++	bl	___kvm_hyp_init
++	mov	lr, x4
  
-+/*
-+ * Compute HYP VA by using the same computation as kern_hyp_va().
-+ */
-+static u64 __early_kern_hyp_va(u64 addr)
-+{
-+	addr &= va_mask;
-+	addr |= tag_val << tag_lsb;
-+	return addr;
-+}
+-	ldr	x0, [x1, #NVHE_INIT_STACK_HYP_VA]
+-	mov	sp, x0
++	/* Hello, World! */
++	mov	x0, #SMCCC_RET_SUCCESS
++	eret
++SYM_CODE_END(__kvm_hyp_init)
 +
 +/*
-+ * Store a hyp VA <-> PA offset into a hyp-owned variable.
++ * Initialize the hypervisor in EL2.
++ *
++ * Only uses x0..x3 so as to not clobber callee-saved SMCCC registers
++ * and leave x4 for the caller.
++ *
++ * x0: struct kvm_nvhe_init_params PA
 + */
-+static void init_hyp_physvirt_offset(void)
-+{
-+	extern s64 kvm_nvhe_sym(hyp_physvirt_offset);
-+	u64 kern_va, hyp_va;
++SYM_CODE_START(___kvm_hyp_init)
++	ldr	x1, [x0, #NVHE_INIT_TPIDR_EL2]
++	msr	tpidr_el2, x1
 +
-+	/* Compute the offset from the hyp VA and PA of a random symbol. */
-+	kern_va = (u64)kvm_ksym_ref(__hyp_text_start);
-+	hyp_va = __early_kern_hyp_va(kern_va);
-+	CHOOSE_NVHE_SYM(hyp_physvirt_offset) = (s64)__pa(kern_va) - (s64)hyp_va;
-+}
-+
- /*
-  * We want to generate a hyp VA with the following format (with V ==
-  * vabits_actual):
-@@ -54,6 +78,8 @@ __init void kvm_compute_layout(void)
- 		tag_val |= get_random_long() & GENMASK_ULL(vabits_actual - 2, tag_lsb);
- 	}
- 	tag_val >>= tag_lsb;
-+
-+	init_hyp_physvirt_offset();
- }
++	ldr	x1, [x0, #NVHE_INIT_STACK_HYP_VA]
++	mov	sp, x1
  
- static u32 compute_instruction(int n, u32 rd, u32 rn)
-@@ -146,9 +172,7 @@ void kvm_patch_vector_branch(struct alt_instr *alt,
- 	/*
- 	 * Compute HYP VA by using the same computation as kern_hyp_va()
- 	 */
--	addr = (uintptr_t)kvm_ksym_ref(__kvm_hyp_vector);
--	addr &= va_mask;
--	addr |= tag_val << tag_lsb;
-+	addr = __early_kern_hyp_va((u64)kvm_ksym_ref(__kvm_hyp_vector));
+-	ldr	x1, [x1, #NVHE_INIT_PGD_PA]
++	ldr	x1, [x0, #NVHE_INIT_PGD_PA]
+ 	phys_to_ttbr x0, x1
+ alternative_if ARM64_HAS_CNP
+ 	orr	x0, x0, #TTBR_CNP_BIT
+@@ -139,10 +158,8 @@ alternative_else_nop_endif
+ 	kimg_hyp_va x0, x1
+ 	msr	vbar_el2, x0
  
- 	/* Use PC[10:7] to branch to the same vector in KVM */
- 	addr |= ((u64)origptr & GENMASK_ULL(10, 7));
+-	/* Hello, World! */
+-	mov	x0, #SMCCC_RET_SUCCESS
+-	eret
+-SYM_CODE_END(__kvm_hyp_init)
++	ret
++SYM_CODE_END(___kvm_hyp_init)
+ 
+ SYM_CODE_START(__kvm_handle_stub_hvc)
+ 	cmp	x0, #HVC_SOFT_RESTART
 -- 
 2.29.2.454.gaff20da3a2-goog
 
