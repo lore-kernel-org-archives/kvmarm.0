@@ -2,72 +2,76 @@ Return-Path: <SRS0=e8LN=FA=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31F7CC56202
-	for <kvmarm@archiver.kernel.org>; Thu, 26 Nov 2020 13:46:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13048C63697
+	for <kvmarm@archiver.kernel.org>; Thu, 26 Nov 2020 13:46:56 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6F2AD20644
-	for <kvmarm@archiver.kernel.org>; Thu, 26 Nov 2020 13:46:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5B113206C0
+	for <kvmarm@archiver.kernel.org>; Thu, 26 Nov 2020 13:46:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OxEnoGUF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F2AD20644
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RBM4d0d6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B113206C0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AABA64B6B1;
-	Thu, 26 Nov 2020 08:46:50 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E3B254B73D;
+	Thu, 26 Nov 2020 08:46:54 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id sontujATKELt; Thu, 26 Nov 2020 08:46:49 -0500 (EST)
+	with ESMTP id 4OhjzEQDXyON; Thu, 26 Nov 2020 08:46:53 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AABC74B765;
-	Thu, 26 Nov 2020 08:46:49 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CA0C94BD2D;
+	Thu, 26 Nov 2020 08:46:53 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D21264B747
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Nov 2020 08:46:48 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7919C4BD1F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Nov 2020 08:46:52 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HI0fUJpgYywY for <kvmarm@lists.cs.columbia.edu>;
- Thu, 26 Nov 2020 08:46:47 -0500 (EST)
+ with ESMTP id q9qi8SEdGVZ5 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 26 Nov 2020 08:46:51 -0500 (EST)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D434F4B6B1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Nov 2020 08:46:47 -0500 (EST)
+ (us-smtp-delivery-124.mimecast.com [63.128.21.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F4154BD0B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Nov 2020 08:46:51 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1606398407;
+ s=mimecast20190719; t=1606398411;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding;
- bh=jbEexOfgcLFYaQsECYOca5p/Nm1XbLoVmOwp9Ym00nY=;
- b=OxEnoGUFdpw0WcAr0cm9EkzOIEJPOi/Ol3DabfqV3XPhWNprEINjTl8ZV2JnSYA0tq1H33
- KxCI96RaG+wrChGUCmWTGoljHi9bEzyyBPth7qiWKfsenBw/qcbKBsKPdeMpmiLuk5UXwT
- 5qsF659//gRc+Fg7gDRp0XGHI5ZRCPs=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=qKc5aEKRgESznOyNqWAxSwkF4sfTwGCbJ8eNsRiWoLs=;
+ b=RBM4d0d6nbSScpIlH48QA9IGDDfk39fs8Bve3TtYOD9wGLEo2tdOhknp8Ey9q/FrFgikNR
+ DqT0oN87QSstk72AT/8xzhjUahCV9VIlbZEiOJ6hIdVyVjhtUiGWWPNSWeBcwJsRtwsvpf
+ IOc5MXhYP0Pg06mUFWKoFx8vifG03KM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-187-wUDATl2NOrmSlKJ4D_Pw6Q-1; Thu, 26 Nov 2020 08:46:45 -0500
-X-MC-Unique: wUDATl2NOrmSlKJ4D_Pw6Q-1
+ us-mta-476-SJKDpST2MqGnClnGXiWCAQ-1; Thu, 26 Nov 2020 08:46:49 -0500
+X-MC-Unique: SJKDpST2MqGnClnGXiWCAQ-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 73821805BFA;
- Thu, 26 Nov 2020 13:46:44 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 278161015C80;
+ Thu, 26 Nov 2020 13:46:48 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.40.192.141])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DF6B310016F7;
- Thu, 26 Nov 2020 13:46:42 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AC253100239A;
+ Thu, 26 Nov 2020 13:46:46 +0000 (UTC)
 From: Andrew Jones <drjones@redhat.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 0/2] KVM: arm64: Fix DEMUX register access
-Date: Thu, 26 Nov 2020 14:46:39 +0100
-Message-Id: <20201126134641.35231-1-drjones@redhat.com>
+Subject: [PATCH 2/2] KVM: selftests: Filter out DEMUX registers
+Date: Thu, 26 Nov 2020 14:46:41 +0100
+Message-Id: <20201126134641.35231-3-drjones@redhat.com>
+In-Reply-To: <20201126134641.35231-1-drjones@redhat.com>
+References: <20201126134641.35231-1-drjones@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Cc: maz@kernel.org, pbonzini@redhat.com
@@ -87,24 +91,121 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The first patch is a fix, but not one likely to ever truly be needed,
-as it's unlikely to find seven levels of cache. The bug was found
-while code reading. Writing the second patch was actually why I was
-reading the code. The issue being fixed for the get-reg-list test was
-found when running it on a different machine than what was used to
-develop it.
+DEMUX register presence depends on the host's hardware (the
+CLIDR_EL1 register to be precise). This means there's no set
+of them that we can bless and that it's possible to encounter
+new ones when running on different hardware (which would
+generate "Consider adding them ..." messages, but we'll never
+want to add them.)
 
-Thanks,
-drew
+Remove the ones we have in the blessed list and filter them
+out of the new list, but also provide a new command line switch
+to list them if one so desires.
 
-Andrew Jones (2):
-  KVM: arm64: CSSELR_EL1 max is 13
-  KVM: selftests: Filter out DEMUX registers
-
- arch/arm64/kvm/sys_regs.c                     |  2 +-
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+---
  .../selftests/kvm/aarch64/get-reg-list.c      | 39 ++++++++++++++-----
- 2 files changed, 31 insertions(+), 10 deletions(-)
+ 1 file changed, 30 insertions(+), 9 deletions(-)
 
+diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+index 33218a395d9f..486932164cf2 100644
+--- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
++++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+@@ -42,12 +42,16 @@
+ #define for_each_reg(i)								\
+ 	for ((i) = 0; (i) < reg_list->n; ++(i))
+ 
++#define for_each_reg_filtered(i)						\
++	for_each_reg(i)								\
++		if (!filter_reg(reg_list->reg[i]))
++
+ #define for_each_missing_reg(i)							\
+ 	for ((i) = 0; (i) < blessed_n; ++(i))					\
+ 		if (!find_reg(reg_list->reg, reg_list->n, blessed_reg[i]))
+ 
+ #define for_each_new_reg(i)							\
+-	for ((i) = 0; (i) < reg_list->n; ++(i))					\
++	for_each_reg_filtered(i)						\
+ 		if (!find_reg(blessed_reg, blessed_n, reg_list->reg[i]))
+ 
+ 
+@@ -57,6 +61,18 @@ static __u64 base_regs[], vregs[], sve_regs[], rejects_set[];
+ static __u64 base_regs_n, vregs_n, sve_regs_n, rejects_set_n;
+ static __u64 *blessed_reg, blessed_n;
+ 
++static bool filter_reg(__u64 reg)
++{
++	/*
++	 * DEMUX register presence depends on the host's CLIDR_EL1.
++	 * This means there's no set of them that we can bless.
++	 */
++	if ((reg & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_DEMUX)
++		return true;
++
++	return false;
++}
++
+ static bool find_reg(__u64 regs[], __u64 nr_regs, __u64 reg)
+ {
+ 	int i;
+@@ -325,7 +341,7 @@ int main(int ac, char **av)
+ 	struct kvm_vcpu_init init = { .target = -1, };
+ 	int new_regs = 0, missing_regs = 0, i;
+ 	int failed_get = 0, failed_set = 0, failed_reject = 0;
+-	bool print_list = false, fixup_core_regs = false;
++	bool print_list = false, print_filtered = false, fixup_core_regs = false;
+ 	struct kvm_vm *vm;
+ 	__u64 *vec_regs;
+ 
+@@ -336,8 +352,10 @@ int main(int ac, char **av)
+ 			fixup_core_regs = true;
+ 		else if (strcmp(av[i], "--list") == 0)
+ 			print_list = true;
++		else if (strcmp(av[i], "--list-filtered") == 0)
++			print_filtered = true;
+ 		else
+-			fprintf(stderr, "Ignoring unknown option: %s\n", av[i]);
++			TEST_FAIL("Unknown option: %s\n", av[i]);
+ 	}
+ 
+ 	vm = vm_create(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES, O_RDWR);
+@@ -350,10 +368,14 @@ int main(int ac, char **av)
+ 	if (fixup_core_regs)
+ 		core_reg_fixup();
+ 
+-	if (print_list) {
++	if (print_list || print_filtered) {
+ 		putchar('\n');
+-		for_each_reg(i)
+-			print_reg(reg_list->reg[i]);
++		for_each_reg(i) {
++			__u64 id = reg_list->reg[i];
++			if ((print_list && !filter_reg(id)) ||
++			    (print_filtered && filter_reg(id)))
++				print_reg(id);
++		}
+ 		putchar('\n');
+ 		return 0;
+ 	}
+@@ -458,6 +480,8 @@ int main(int ac, char **av)
+ /*
+  * The current blessed list was primed with the output of kernel version
+  * v4.15 with --core-reg-fixup and then later updated with new registers.
++ *
++ * The blessed list is up to date with kernel version v5.10-rc5
+  */
+ static __u64 base_regs[] = {
+ 	KVM_REG_ARM64 | KVM_REG_SIZE_U64 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(regs.regs[0]),
+@@ -736,9 +760,6 @@ static __u64 base_regs[] = {
+ 	ARM64_SYS_REG(3, 4, 3, 0, 0),	/* DACR32_EL2 */
+ 	ARM64_SYS_REG(3, 4, 5, 0, 1),	/* IFSR32_EL2 */
+ 	ARM64_SYS_REG(3, 4, 5, 3, 0),	/* FPEXC32_EL2 */
+-	KVM_REG_ARM64 | KVM_REG_SIZE_U32 | KVM_REG_ARM_DEMUX | KVM_REG_ARM_DEMUX_ID_CCSIDR | 0,
+-	KVM_REG_ARM64 | KVM_REG_SIZE_U32 | KVM_REG_ARM_DEMUX | KVM_REG_ARM_DEMUX_ID_CCSIDR | 1,
+-	KVM_REG_ARM64 | KVM_REG_SIZE_U32 | KVM_REG_ARM_DEMUX | KVM_REG_ARM_DEMUX_ID_CCSIDR | 2,
+ };
+ static __u64 base_regs_n = ARRAY_SIZE(base_regs);
+ 
 -- 
 2.26.2
 
