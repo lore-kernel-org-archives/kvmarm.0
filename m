@@ -2,93 +2,84 @@ Return-Path: <SRS0=e8LN=FA=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1428C63798
-	for <kvmarm@archiver.kernel.org>; Thu, 26 Nov 2020 15:55:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7F98C56202
+	for <kvmarm@archiver.kernel.org>; Thu, 26 Nov 2020 15:57:37 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 875B121D40
-	for <kvmarm@archiver.kernel.org>; Thu, 26 Nov 2020 15:55:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 16105221E2
+	for <kvmarm@archiver.kernel.org>; Thu, 26 Nov 2020 15:57:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="QM/rbtXw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 875B121D40
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="0FVOyftv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16105221E2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C5584BEA7;
-	Thu, 26 Nov 2020 10:55:22 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9789D4BB46;
+	Thu, 26 Nov 2020 10:57:36 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id qVB4O7UI4lVH; Thu, 26 Nov 2020 10:55:21 -0500 (EST)
+	with ESMTP id kJAjeYuALYsS; Thu, 26 Nov 2020 10:57:35 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DB924C030;
-	Thu, 26 Nov 2020 10:55:21 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D6784BB10;
+	Thu, 26 Nov 2020 10:57:35 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1403D4B9FA
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Nov 2020 10:55:20 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A9EA94BAF3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Nov 2020 10:57:34 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id avuBI4lWYWpS for <kvmarm@lists.cs.columbia.edu>;
- Thu, 26 Nov 2020 10:55:19 -0500 (EST)
-Received: from mail-wm1-f68.google.com (mail-wm1-f68.google.com
- [209.85.128.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4F7974C10E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Nov 2020 10:55:18 -0500 (EST)
-Received: by mail-wm1-f68.google.com with SMTP id 10so2566774wml.2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Nov 2020 07:55:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=aOLJOeUdUyn9Tp5EB3J9cYHwXErbIHpd/Aan89z6ZHs=;
- b=QM/rbtXwOgu6dblgPCWfx4ngm1/thgvoQ0YW4L2bPmt43izjfGp+feFlrQOkpQS9Om
- 6IyiMWQDM9+9UTy3hB+J5mL08+VjIOU0v7HHn2JQNnWZfWWWlGmxzXwQJ5YeUMP4URzL
- 1QtnGLr7B86YDgrOowd0eJ/ZlG7g90/JdTPeSBg4Np5jEsxeOF3riX5Aj+ZJnFB1nucH
- eGRGKeHAcqx9n6NEDtpKYSogxV+eRc23vpbWc9NRm5ShbBf3SY7zuFqqGKiDs+I9VeCG
- lbM65gvfMyzKPRVDcbtqP39F0X2J1baGFNxxaE1G/RusVZXby+KoCinFSOxt/dKolC8/
- f6PQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=aOLJOeUdUyn9Tp5EB3J9cYHwXErbIHpd/Aan89z6ZHs=;
- b=aLwYDoj50o/ixfbK++yjZ2wgCx/ybfQsEm5zNrFwA/PjdnAZ4ob5cO+IyKm2e7m98y
- zolpxjMFnLbse3nMK+hnI+aEufwYRsptkaNx7aA1wy4v3n3Cq59bcuNIVZr0dITDaP/z
- H7UgwLkpj9TO+q3ynVUeVyX0DcJiMb91MkMx+oJJNXpdVIIk5wVaWZvlgX3FxzRi6Xmj
- belATFqbUO9jDJfaJwxG4WIKxBxYGKl4UZPZvbWKIs7lCrTDxMfoaNSc4WT+2vvFeQ/r
- fqc8PLjXoQa9gcGAakCCByZiOtYh2lRgZvZlYs0IRItHaO/57yiAEYLjxt+GQVL1jrj2
- gjfw==
-X-Gm-Message-State: AOAM5305u6U3EaumgXLmpquJJXTEPW2bZU5m2JGOxlbESv8lYDYBe3o+
- sAerDZlOBW0j8k2tzDWeUycVYSG8OykfMk/f
-X-Google-Smtp-Source: ABdhPJxNaayzFy0JXM9EQDhPZc7SkErVTVeHwN5g49VsWueupWVWXJ57HuFtoPXgm7dm47oDpr8iqg==
-X-Received: by 2002:a1c:bd08:: with SMTP id n8mr4124459wmf.136.1606406116246; 
- Thu, 26 Nov 2020 07:55:16 -0800 (PST)
-Received: from localhost ([2a01:4b00:8523:2d03:f008:704d:8d4b:9951])
- by smtp.gmail.com with ESMTPSA id j4sm9290305wrn.83.2020.11.26.07.55.14
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 26 Nov 2020 07:55:15 -0800 (PST)
-From: David Brazdil <dbrazdil@google.com>
-To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v3 23/23] kvm: arm64: Fix EL2 mode availability checks
-Date: Thu, 26 Nov 2020 15:54:21 +0000
-Message-Id: <20201126155421.14901-24-dbrazdil@google.com>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20201126155421.14901-1-dbrazdil@google.com>
-References: <20201126155421.14901-1-dbrazdil@google.com>
+ with ESMTP id YeWpYv4AXaIU for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 26 Nov 2020 10:57:33 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A681E4BA4E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Nov 2020 10:57:33 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 673C921D40;
+ Thu, 26 Nov 2020 15:57:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1606406252;
+ bh=Cd+lqHcWQa2Lfyc0AEv5uFc3rl+QCTnok0WlZltox6w=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=0FVOyftviVxfR6AqRCei/O8Hs41Kog3LoDPsdsCmDt6oU1ivHYCbmBUSsz4E6M9Wc
+ NDpXx/YU/JpFSW6cOj+uixK+ZRAA3N2FsZGjgKGemNwXbuSv8mDU+puEQPdJmdQLSd
+ 30EGNrv0NA0x0nUxwCJUSC//Rha7BpNybub7M+E0=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
+ TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1kiJeE-00DqgV-CU; Thu, 26 Nov 2020 15:57:30 +0000
 MIME-Version: 1.0
-Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, kernel-team@android.com,
- Jonathan Corbet <corbet@lwn.net>, Catalin Marinas <catalin.marinas@arm.com>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- Sudeep Holla <sudeep.holla@arm.com>, linux-arm-kernel@lists.infradead.org,
- Marc Zyngier <maz@kernel.org>, Tejun Heo <tj@kernel.org>,
- Dennis Zhou <dennis@kernel.org>, Christoph Lameter <cl@linux.com>,
- Will Deacon <will@kernel.org>
+Date: Thu, 26 Nov 2020 15:57:30 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH 6/8] KVM: arm64: Remove dead PMU sysreg decoding code
+In-Reply-To: <b05e1334-e7d0-5c00-3442-d383d0358bcd@arm.com>
+References: <20201113182602.471776-1-maz@kernel.org>
+ <20201113182602.471776-7-maz@kernel.org>
+ <1ed6dfd6-4ace-a562-bc2f-054a5c853fa6@arm.com>
+ <3ae09ecc95b732129f71076b4b59c873@kernel.org>
+ <b05e1334-e7d0-5c00-3442-d383d0358bcd@arm.com>
+User-Agent: Roundcube Webmail/1.4.9
+Message-ID: <b16befcfa43b2d9d04140a2c3bd85302@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -100,107 +91,44 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-With protected nVHE hyp code interception host's PSCI CPU_ON/SUSPEND
-SMCs, the host starts seeing new CPUs boot in EL1 instead of EL2. The
-kernel logic that keeps track of the boot mode needs to be adjusted.
-
-Add a static key enabled if KVM protected nVHE initialization is
-successful.
-
-When the key is enabled, is_hyp_mode_available continues to report
-`true` because its users either treat it as a check whether KVM will be
-/ was initialized, or whether stub HVCs can be made (eg. hibernate).
-
-is_hyp_mode_mismatched is changed to report `false` when the key is
-enabled. That's because all cores' modes matched at the point of KVM
-init and KVM will not allow cores not present at init to boot. That
-said, the function is never used after KVM is initialized.
-
-Signed-off-by: David Brazdil <dbrazdil@google.com>
----
- arch/arm64/include/asm/virt.h | 18 ++++++++++++++++++
- arch/arm64/kvm/arm.c          | 10 +++++++---
- 2 files changed, 25 insertions(+), 3 deletions(-)
-
-diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
-index 2fde1186b962..f7cf3f0e5297 100644
---- a/arch/arm64/include/asm/virt.h
-+++ b/arch/arm64/include/asm/virt.h
-@@ -65,9 +65,19 @@ extern u32 __boot_cpu_mode[2];
- void __hyp_set_vectors(phys_addr_t phys_vector_base);
- void __hyp_reset_vectors(void);
- 
-+DECLARE_STATIC_KEY_FALSE(kvm_protected_mode_initialized);
-+
- /* Reports the availability of HYP mode */
- static inline bool is_hyp_mode_available(void)
- {
-+	/*
-+	 * If KVM protected mode is initialized, all CPUs must have been booted
-+	 * in EL2. Avoid checking __boot_cpu_mode as CPUs now come up in EL1.
-+	 */
-+	if (IS_ENABLED(CONFIG_KVM) &&
-+	    static_branch_likely(&kvm_protected_mode_initialized))
-+		return true;
-+
- 	return (__boot_cpu_mode[0] == BOOT_CPU_MODE_EL2 &&
- 		__boot_cpu_mode[1] == BOOT_CPU_MODE_EL2);
- }
-@@ -75,6 +85,14 @@ static inline bool is_hyp_mode_available(void)
- /* Check if the bootloader has booted CPUs in different modes */
- static inline bool is_hyp_mode_mismatched(void)
- {
-+	/*
-+	 * If KVM protected mode is initialized, all CPUs must have been booted
-+	 * in EL2. Avoid checking __boot_cpu_mode as CPUs now come up in EL1.
-+	 */
-+	if (IS_ENABLED(CONFIG_KVM) &&
-+	    static_branch_likely(&kvm_protected_mode_initialized))
-+		return false;
-+
- 	return __boot_cpu_mode[0] != __boot_cpu_mode[1];
- }
- 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 6ec8ddf74643..b153c08e50fa 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -46,6 +46,8 @@
- __asm__(".arch_extension	virt");
- #endif
- 
-+DEFINE_STATIC_KEY_FALSE(kvm_protected_mode_initialized);
-+
- DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
- 
- static DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_page);
-@@ -1877,12 +1879,14 @@ int kvm_arch_init(void *opaque)
- 	if (err)
- 		goto out_hyp;
- 
--	if (is_protected_kvm_enabled())
-+	if (is_protected_kvm_enabled()) {
-+		static_branch_enable(&kvm_protected_mode_initialized);
- 		kvm_info("Protected nVHE mode initialized successfully\n");
--	else if (in_hyp_mode)
-+	} else if (in_hyp_mode) {
- 		kvm_info("VHE mode initialized successfully\n");
--	else
-+	} else {
- 		kvm_info("Hyp mode initialized successfully\n");
-+	}
- 
- 	return 0;
- 
--- 
-2.29.2.454.gaff20da3a2-goog
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gMjAyMC0xMS0yNiAxNTo1NCwgQWxleGFuZHJ1IEVsaXNlaSB3cm90ZToKPiBIaSBNYXJjLAo+
+IAo+IE9uIDExLzI2LzIwIDM6MzQgUE0sIE1hcmMgWnluZ2llciB3cm90ZToKPj4gSGkgQWxleCwK
+Pj4gCj4+IE9uIDIwMjAtMTEtMjYgMTU6MTgsIEFsZXhhbmRydSBFbGlzZWkgd3JvdGU6Cj4+PiBI
+aSBNYXJjLAo+Pj4gCj4+PiBJIGNoZWNrZWQgYW5kIGluZGVlZCB0aGUgcmVtYWluaW5nIGNhc2Vz
+IGNvdmVyIGFsbCByZWdpc3RlcnMgdGhhdCB1c2UKPj4+IHRoaXMgYWNjZXNzb3IuCj4+PiAKPj4+
+IEhvd2V2ZXIsIEknbSBhIGJpdCB0b3JuIGhlcmUuIFRoZSB3YXJuaW5nIHRoYXQgSSBnb3Qgd2hl
+biB0cnlpbmcgdG8gCj4+PiBydW4gYSBndWVzdAo+Pj4gd2l0aCB0aGUgUE1VIGZlYXR1cmUgZmxh
+ZyBzZXQsIGJ1dCBub3QgaW5pdGlhbGl6ZWQgKHJlcG9ydGVkIGF0IFsxXSkKPj4+IHdhcyBhbHNv
+IG5vdAo+Pj4gc3VwcG9zZWQgdG8gZXZlciBiZSByZWFjaGVkOgo+Pj4gCj4+PiBzdGF0aWMgdTMy
+IGt2bV9wbXVfZXZlbnRfbWFzayhzdHJ1Y3Qga3ZtICprdm0pCj4+PiB7Cj4+PiDCoMKgwqAgc3dp
+dGNoIChrdm0tPmFyY2gucG11dmVyKSB7Cj4+PiDCoMKgwqAgY2FzZSAxOsKgwqDCoCDCoMKgwqAg
+wqDCoMKgIC8qIEFSTXY4LjAgKi8KPj4+IMKgwqDCoCDCoMKgwqAgcmV0dXJuIEdFTk1BU0soOSwg
+MCk7Cj4+PiDCoMKgwqAgY2FzZSA0OsKgwqDCoCDCoMKgwqAgwqDCoMKgIC8qIEFSTXY4LjEgKi8K
+Pj4+IMKgwqDCoCBjYXNlIDU6wqDCoMKgIMKgwqDCoCDCoMKgwqAgLyogQVJNdjguNCAqLwo+Pj4g
+wqDCoMKgIGNhc2UgNjrCoMKgwqAgwqDCoMKgIMKgwqDCoCAvKiBBUk12OC41ICovCj4+PiDCoMKg
+wqAgwqDCoMKgIHJldHVybiBHRU5NQVNLKDE1LCAwKTsKPj4+IMKgwqDCoCBkZWZhdWx0OsKgwqDC
+oCDCoMKgwqAgLyogU2hvdWxkbid0IGJlIGhlcmUsIGp1c3QgZm9yIHNhbml0eSAqLwo+Pj4gwqDC
+oMKgIMKgwqDCoCBXQVJOX09OQ0UoMSwgIlVua25vd24gUE1VIHZlcnNpb24gJWRcbiIsIGt2bS0+
+YXJjaC5wbXV2ZXIpOwo+Pj4gwqDCoMKgIMKgwqDCoCByZXR1cm4gMDsKPj4+IMKgwqDCoCB9Cj4+
+PiB9Cj4+PiAKPj4+IEkgcmVhbGl6ZSBpdCdzIG5vdCBleGFjdGx5IHRoZSBzYW1lIHRoaW5nIGFu
+ZCBJJ2xsIGxlYXZlIGl0IHVwIHRvIHlvdQo+Pj4gaWYgeW91IHdhbnQKPj4+IHRvIGFkZCBhIHdh
+cm5pbmcgZm9yIHRoZSBjYXNlcyB0aGF0IHNob3VsZCBuZXZlciBoYXBwZW4uIEknbSBmaW5lIAo+
+Pj4gZWl0aGVyIHdheToKPj4gCj4+IEkgYWxyZWFkeSBoYXZlIHF1ZXVlZCBzdWNoIGEgd2Fybmlu
+Z1sxXS4gSXQgdHVybnMgb3V0IHRoYXQgTExWTSB3YXJucwo+PiBpZHggY2FuIGJlIGxlZnQgdW5p
+bml0aWFsaXplZCwgYW5kIHNob3V0cy4gTGV0IG1lIGtub3cgaWYgdGhhdCB3b3Jrcwo+PiBmb3Ig
+eW91Lgo+IAo+IExvb2tzIGdvb2QgdG8gbWUsIHVuc2lnbmVkIGxvbmcgaXMgNjQgYml0cyBhbmQg
+aW5zdHJ1Y3Rpb25zIGFyZSAzMgo+IGJpdHMsIHNvIHdlJ2xsIG5ldmVyIHJ1biBpbnRvIGEgc2l0
+dWF0aW9uIHdoZXJlIGEgdmFsaWQgZW5jb2RpbmcgaXMgCj4gfjBVTC4KPiAKPiBZb3UgY2FuIGFk
+ZCBteSBSZXZpZXdlZC1ieSB0byB0aGlzIHBhdGNoIChhbmQgdG8gdGhlIG9uZSBhdCBbMV0gaWYg
+aXQncyAKPiBzdGlsbAo+IHBvc3NpYmxlKS4KCkl0J3MgYSBmaXh1cCwgc28gaXQgd2lsbCBnZXQg
+Zm9sZGVkIGludG8gdGhlIG9yaWdpbmFsIHBhdGNoLgoKVGhhbmtzIGZvciBzcGVuZGluZyB0aW1l
+IHJldmlld2luZyAoYW5kIGZpeGluZykgdGhpcyEKCiAgICAgICBNLgotLSAKSmF6eiBpcyBub3Qg
+ZGVhZC4gSXQganVzdCBzbWVsbHMgZnVubnkuLi4KX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3Mu
+Y29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGlu
+Zm8va3ZtYXJtCg==
