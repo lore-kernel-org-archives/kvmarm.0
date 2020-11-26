@@ -2,62 +2,93 @@ Return-Path: <SRS0=e8LN=FA=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CA9FC56202
-	for <kvmarm@archiver.kernel.org>; Thu, 26 Nov 2020 15:52:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74814C56202
+	for <kvmarm@archiver.kernel.org>; Thu, 26 Nov 2020 15:54:34 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 71795221E2
-	for <kvmarm@archiver.kernel.org>; Thu, 26 Nov 2020 15:52:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71795221E2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id B3684221E2
+	for <kvmarm@archiver.kernel.org>; Thu, 26 Nov 2020 15:54:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="q0DXHENI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3684221E2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CC50B4BEA8;
-	Thu, 26 Nov 2020 10:52:49 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2471A4C042;
+	Thu, 26 Nov 2020 10:54:33 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id rb-DXZi0XPrL; Thu, 26 Nov 2020 10:52:48 -0500 (EST)
+	with ESMTP id nLkH8eKSmV+h; Thu, 26 Nov 2020 10:54:32 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C56974B9FA;
-	Thu, 26 Nov 2020 10:52:48 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2199F4BCDF;
+	Thu, 26 Nov 2020 10:54:32 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 83C584B904
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Nov 2020 10:52:47 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E38EF4B914
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Nov 2020 10:54:30 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MN3st5bGG8VX for <kvmarm@lists.cs.columbia.edu>;
- Thu, 26 Nov 2020 10:52:46 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 625794B8FD
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Nov 2020 10:52:46 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ED0A731B;
- Thu, 26 Nov 2020 07:52:45 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4156A3F23F;
- Thu, 26 Nov 2020 07:52:45 -0800 (PST)
-Subject: Re: [PATCH 6/8] KVM: arm64: Remove dead PMU sysreg decoding code
-To: Marc Zyngier <maz@kernel.org>
-References: <20201113182602.471776-1-maz@kernel.org>
- <20201113182602.471776-7-maz@kernel.org>
- <1ed6dfd6-4ace-a562-bc2f-054a5c853fa6@arm.com>
- <3ae09ecc95b732129f71076b4b59c873@kernel.org>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <b05e1334-e7d0-5c00-3442-d383d0358bcd@arm.com>
-Date: Thu, 26 Nov 2020 15:54:09 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.3
+ with ESMTP id jKiTeC9oWS8P for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 26 Nov 2020 10:54:30 -0500 (EST)
+Received: from mail-wr1-f66.google.com (mail-wr1-f66.google.com
+ [209.85.221.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D6B094B747
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Nov 2020 10:54:29 -0500 (EST)
+Received: by mail-wr1-f66.google.com with SMTP id g14so2604027wrm.13
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Nov 2020 07:54:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=9eBkN6lmfdOZ6y3T4AeVQ2xEMCxfbxxoIUc76Qx59Gw=;
+ b=q0DXHENIOaqhJFnVso9J1kN3Eb61iVK8nd3AricHajirGlfnSXv+NmgwWHCMVIELoM
+ /xkucGICwySq83LXla7dhpUSyhhrYAX2WyLB2M0GSO+2LUD2XI2l+m2AypGqvHH1oZWj
+ ar44f6d4mUGekt4sM2d7YlccV/6w5dO+75q5vS8ABmkgJxt4nsK1E5YYxMSRXHZwtqRw
+ CgRzDUSpetP2+yE0F4UC58Vh56PRAdl/j8zQgvJ3gdi0B97IexPJS8ZDk2Z0gcqlwvRq
+ +6NN5jRL2/yL9KuYo3aGBfcKHp1j9xVMqkzoFKdL7JrD/vM8UlDrwr99kKCpPxKPalu6
+ 8LXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=9eBkN6lmfdOZ6y3T4AeVQ2xEMCxfbxxoIUc76Qx59Gw=;
+ b=C4yUlBo6Tx5/G/EAmB9Q4BwLtZys9xnXgIQwyCQumZf2556lUaganNGrMRV1dCo8RG
+ XifDi5gwU7N/5A5TUXXFzqM4rvzYymHrcCTCNc0IZfUpVaL+K3GrWAuk2mhaoMu5bY7T
+ In7j76pZJnCVKYdxh/+T19Kg9NRjSGf9aNYTzVJuDLuQdaWIfgyI1k/c27DkpjhEAoD+
+ +omfiyT/yHKuayphtpV90HSLeuKQglZV+H+bFVvoMNXQhJUnvyZleIDdwbl5d0kzt44U
+ GxweSZ46xf13k6bnLMpbipqDuNlc0u1XSBlVLtc10XQba9gJpgrysChqmvO7gZ2xJRhv
+ 9xig==
+X-Gm-Message-State: AOAM531FnRhCIJnOqxRoFxjFMmsNiTBW0gXmgUyMbjSTsNLB8QQZp9Ae
+ DdPEsxJIoOm0QgdKPgByXklHS+w0bUwGO/Am
+X-Google-Smtp-Source: ABdhPJw/lRW3PEMxi02nhLES66F/ltyrof/LoT+FjVRp6ybB+E4igrjSX8c/nxUUNknF9HL5GfidZA==
+X-Received: by 2002:a5d:5482:: with SMTP id h2mr4667449wrv.18.1606406068612;
+ Thu, 26 Nov 2020 07:54:28 -0800 (PST)
+Received: from localhost ([2a01:4b00:8523:2d03:f008:704d:8d4b:9951])
+ by smtp.gmail.com with ESMTPSA id v7sm2637615wma.26.2020.11.26.07.54.27
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 26 Nov 2020 07:54:27 -0800 (PST)
+From: David Brazdil <dbrazdil@google.com>
+To: kvmarm@lists.cs.columbia.edu
+Subject: [PATCH v3 01/23] psci: Support psci_ops.get_version for v0.1
+Date: Thu, 26 Nov 2020 15:53:59 +0000
+Message-Id: <20201126155421.14901-2-dbrazdil@google.com>
+X-Mailer: git-send-email 2.29.2
+In-Reply-To: <20201126155421.14901-1-dbrazdil@google.com>
+References: <20201126155421.14901-1-dbrazdil@google.com>
 MIME-Version: 1.0
-In-Reply-To: <3ae09ecc95b732129f71076b4b59c873@kernel.org>
-Content-Language: en-US
-Cc: kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, kernel-team@android.com,
+ Jonathan Corbet <corbet@lwn.net>, Catalin Marinas <catalin.marinas@arm.com>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Sudeep Holla <sudeep.holla@arm.com>, linux-arm-kernel@lists.infradead.org,
+ Marc Zyngier <maz@kernel.org>, Tejun Heo <tj@kernel.org>,
+ Dennis Zhou <dennis@kernel.org>, Christoph Lameter <cl@linux.com>,
+ Will Deacon <will@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -69,42 +100,54 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SGkgTWFyYywKCk9uIDExLzI2LzIwIDM6MzQgUE0sIE1hcmMgWnluZ2llciB3cm90ZToKPiBIaSBB
-bGV4LAo+Cj4gT24gMjAyMC0xMS0yNiAxNToxOCwgQWxleGFuZHJ1IEVsaXNlaSB3cm90ZToKPj4g
-SGkgTWFyYywKPj4KPj4gSSBjaGVja2VkIGFuZCBpbmRlZWQgdGhlIHJlbWFpbmluZyBjYXNlcyBj
-b3ZlciBhbGwgcmVnaXN0ZXJzIHRoYXQgdXNlCj4+IHRoaXMgYWNjZXNzb3IuCj4+Cj4+IEhvd2V2
-ZXIsIEknbSBhIGJpdCB0b3JuIGhlcmUuIFRoZSB3YXJuaW5nIHRoYXQgSSBnb3Qgd2hlbiB0cnlp
-bmcgdG8gcnVuIGEgZ3Vlc3QKPj4gd2l0aCB0aGUgUE1VIGZlYXR1cmUgZmxhZyBzZXQsIGJ1dCBu
-b3QgaW5pdGlhbGl6ZWQgKHJlcG9ydGVkIGF0IFsxXSkKPj4gd2FzIGFsc28gbm90Cj4+IHN1cHBv
-c2VkIHRvIGV2ZXIgYmUgcmVhY2hlZDoKPj4KPj4gc3RhdGljIHUzMiBrdm1fcG11X2V2ZW50X21h
-c2soc3RydWN0IGt2bSAqa3ZtKQo+PiB7Cj4+IMKgwqDCoCBzd2l0Y2ggKGt2bS0+YXJjaC5wbXV2
-ZXIpIHsKPj4gwqDCoMKgIGNhc2UgMTrCoMKgwqAgwqDCoMKgIMKgwqDCoCAvKiBBUk12OC4wICov
-Cj4+IMKgwqDCoCDCoMKgwqAgcmV0dXJuIEdFTk1BU0soOSwgMCk7Cj4+IMKgwqDCoCBjYXNlIDQ6
-wqDCoMKgIMKgwqDCoCDCoMKgwqAgLyogQVJNdjguMSAqLwo+PiDCoMKgwqAgY2FzZSA1OsKgwqDC
-oCDCoMKgwqAgwqDCoMKgIC8qIEFSTXY4LjQgKi8KPj4gwqDCoMKgIGNhc2UgNjrCoMKgwqAgwqDC
-oMKgIMKgwqDCoCAvKiBBUk12OC41ICovCj4+IMKgwqDCoCDCoMKgwqAgcmV0dXJuIEdFTk1BU0so
-MTUsIDApOwo+PiDCoMKgwqAgZGVmYXVsdDrCoMKgwqAgwqDCoMKgIC8qIFNob3VsZG4ndCBiZSBo
-ZXJlLCBqdXN0IGZvciBzYW5pdHkgKi8KPj4gwqDCoMKgIMKgwqDCoCBXQVJOX09OQ0UoMSwgIlVu
-a25vd24gUE1VIHZlcnNpb24gJWRcbiIsIGt2bS0+YXJjaC5wbXV2ZXIpOwo+PiDCoMKgwqAgwqDC
-oMKgIHJldHVybiAwOwo+PiDCoMKgwqAgfQo+PiB9Cj4+Cj4+IEkgcmVhbGl6ZSBpdCdzIG5vdCBl
-eGFjdGx5IHRoZSBzYW1lIHRoaW5nIGFuZCBJJ2xsIGxlYXZlIGl0IHVwIHRvIHlvdQo+PiBpZiB5
-b3Ugd2FudAo+PiB0byBhZGQgYSB3YXJuaW5nIGZvciB0aGUgY2FzZXMgdGhhdCBzaG91bGQgbmV2
-ZXIgaGFwcGVuLiBJJ20gZmluZSBlaXRoZXIgd2F5Ogo+Cj4gSSBhbHJlYWR5IGhhdmUgcXVldWVk
-IHN1Y2ggYSB3YXJuaW5nWzFdLiBJdCB0dXJucyBvdXQgdGhhdCBMTFZNIHdhcm5zCj4gaWR4IGNh
-biBiZSBsZWZ0IHVuaW5pdGlhbGl6ZWQsIGFuZCBzaG91dHMuIExldCBtZSBrbm93IGlmIHRoYXQg
-d29ya3MKPiBmb3IgeW91LgoKTG9va3MgZ29vZCB0byBtZSwgdW5zaWduZWQgbG9uZyBpcyA2NCBi
-aXRzIGFuZCBpbnN0cnVjdGlvbnMgYXJlIDMyIGJpdHMsIHNvIHdlJ2xsCm5ldmVyIHJ1biBpbnRv
-IGEgc2l0dWF0aW9uIHdoZXJlIGEgdmFsaWQgZW5jb2RpbmcgaXMgfjBVTC4KCllvdSBjYW4gYWRk
-IG15IFJldmlld2VkLWJ5IHRvIHRoaXMgcGF0Y2ggKGFuZCB0byB0aGUgb25lIGF0IFsxXSBpZiBp
-dCdzIHN0aWxsCnBvc3NpYmxlKS4KClRoYW5rcywKCkFsZXgKCj4KPiBUaGFua3MsCj4KPiDCoMKg
-wqDCoMKgwqDCoCBNLgo+Cj4gWzFdCj4gaHR0cHM6Ly9naXQua2VybmVsLm9yZy9wdWIvc2NtL2xp
-bnV4L2tlcm5lbC9naXQvbWF6L2FybS1wbGF0Zm9ybXMuZ2l0L2NvbW1pdC8/aD1rdm0tYXJtNjQv
-cG11LXVuZGVmJmlkPWFmN2VmZjcwZWFmOGYyODE3OTMzNGY1YWVhYmI3MGEzMDYyNDJjODMKX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxp
-bmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29s
-dW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+KVM's host PSCI SMC filter needs to be aware of the PSCI version of the
+system but currently it is impossible to distinguish between v0.1 and
+PSCI disabled because both have get_version == NULL.
+
+Populate get_version for v0.1 with a function that returns a constant.
+
+psci_opt.get_version is currently unused so this has no effect on
+existing functionality.
+
+Signed-off-by: David Brazdil <dbrazdil@google.com>
+---
+ drivers/firmware/psci/psci.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/drivers/firmware/psci/psci.c b/drivers/firmware/psci/psci.c
+index 00af99b6f97c..213c68418a65 100644
+--- a/drivers/firmware/psci/psci.c
++++ b/drivers/firmware/psci/psci.c
+@@ -146,6 +146,11 @@ static int psci_to_linux_errno(int errno)
+ 	return -EINVAL;
+ }
+ 
++static u32 psci_get_version_0_1(void)
++{
++	return PSCI_VERSION(0, 1);
++}
++
+ static u32 psci_get_version(void)
+ {
+ 	return invoke_psci_fn(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
+@@ -514,6 +519,8 @@ static int __init psci_0_1_init(struct device_node *np)
+ 
+ 	pr_info("Using PSCI v0.1 Function IDs from DT\n");
+ 
++	psci_ops.get_version = psci_get_version_0_1;
++
+ 	if (!of_property_read_u32(np, "cpu_suspend", &id)) {
+ 		psci_function_id[PSCI_FN_CPU_SUSPEND] = id;
+ 		psci_ops.cpu_suspend = psci_cpu_suspend;
+-- 
+2.29.2.454.gaff20da3a2-goog
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
