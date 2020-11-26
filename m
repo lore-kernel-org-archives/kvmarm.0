@@ -5,79 +5,79 @@ X-Spam-Level:
 X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BF84C63697
-	for <kvmarm@archiver.kernel.org>; Thu, 26 Nov 2020 15:54:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9CE1C56202
+	for <kvmarm@archiver.kernel.org>; Thu, 26 Nov 2020 15:54:41 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id EE87A21D46
-	for <kvmarm@archiver.kernel.org>; Thu, 26 Nov 2020 15:54:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4E3DC221EB
+	for <kvmarm@archiver.kernel.org>; Thu, 26 Nov 2020 15:54:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="WB708Y6Z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE87A21D46
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="OchURbw1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E3DC221EB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D4644C06D;
-	Thu, 26 Nov 2020 10:54:39 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DDD7E4C070;
+	Thu, 26 Nov 2020 10:54:40 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id DckPrMf+Ww5n; Thu, 26 Nov 2020 10:54:38 -0500 (EST)
+	with ESMTP id 5riS+arE8I8s; Thu, 26 Nov 2020 10:54:39 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 81AA14BEA8;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 929074BD3B;
 	Thu, 26 Nov 2020 10:54:38 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8480D4B747
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Nov 2020 10:54:35 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B77D4BD3B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Nov 2020 10:54:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7IRC+-8wom+u for <kvmarm@lists.cs.columbia.edu>;
- Thu, 26 Nov 2020 10:54:34 -0500 (EST)
-Received: from mail-wm1-f68.google.com (mail-wm1-f68.google.com
- [209.85.128.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 425B44C020
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Nov 2020 10:54:34 -0500 (EST)
-Received: by mail-wm1-f68.google.com with SMTP id 10so2564741wml.2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Nov 2020 07:54:34 -0800 (PST)
+ with ESMTP id QW7Iz1UnrWyE for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 26 Nov 2020 10:54:36 -0500 (EST)
+Received: from mail-wm1-f67.google.com (mail-wm1-f67.google.com
+ [209.85.128.67])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 74EFB4B5D3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Nov 2020 10:54:36 -0500 (EST)
+Received: by mail-wm1-f67.google.com with SMTP id a65so2872773wme.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Nov 2020 07:54:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=t3ZEYk2Uf0v1klDyIVNllC4hj8a8TzhOU5HlrW3d3XY=;
- b=WB708Y6ZQsVTnPDe3k8SGt1N+Zi1ArG5DNJ8Ikjx+GwIsVyKkyANitm+7v9D8STbCN
- 4sIx6XZ9WxtYX8XP7V/bVY64iZPta0oEQJhY5JctNUzEqp/siO8Mh7MOaSHI9jTKRX/G
- ba18CMjyRpguJUKBwLVRI8k5AHvlNVRnB1DKj5K2COahoTLJrC8pp74gWQmVJtRJ8ivp
- fJffW03dFEtg1jOc/x7+J4NtCy/6j6euZgUM7vcZ5okmBEc+hu9CLbAHOr83RhZZ7PAd
- Ya9qvceAHvZJLaq5R4L/3OTpAnWZot8Djf5EA45iNDBN22H7c4JKiI1EzSkX09tYRLsS
- Ahyg==
+ bh=HHdsvDKCV+y2T0WHPFGAdN0qhY1OjBTJULnU1VX59iA=;
+ b=OchURbw1mLwFNtApGpEjM6AKBpDfQt9A0SnaSO/IvElpZFNXclLui4HRql7+PGhPzu
+ w04fOAsLJg76P6WZjX/BoPa8t98z/zCXTtsh3+9RM29/ABXswF3vZehbRj8WIt/AgLtP
+ L1k4SXy6vkelZAc1vVbqeOd+r1oeZei7wOPlFer6IGR4IFM5MXaOg8/8g9/rQhagB3ka
+ dpXN3Srhy8SuzemOK5jvdLk4cjfBovVom/uweowmjaI38hHlgTpMbjl2MDXmVHPXSN/S
+ fbBM51yzh1M2Eluao4XM9cf6bSCqn1yHyxPe1V86PBl5py1rObz13Ko5gXZLpnmXc+U2
+ 2dpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=t3ZEYk2Uf0v1klDyIVNllC4hj8a8TzhOU5HlrW3d3XY=;
- b=ID5d3GtqWmwbv54gAT+JslF9MPyTjSWOQZbJQUmAgGwalG7WYgRli1gPlyvNUl9QA1
- mtbQpBbOneA7evjapYhWy5TknRRvcVqJR1iBuq63O93TPY2V3i4JOwCAxcdXcj1juczg
- gu4UUE8alHvmalfEnFahddC5hUwt61ftD1Rznd0xoBHsi+B7a/CHzLaorb4kBokIc2cU
- K1S4SLhRFe1AOcf/cnw1+Wg2/seSmyzgGdkMHFPQAazxBYErC314eOk/R1XWH5jlF7S2
- I6QEzpZskQrrviz6UJUQTpnZVl+6QoqsoJlx5fHwTdY1ZT+lZ9sMYDZAT3SjPdI44mo4
- rBHA==
-X-Gm-Message-State: AOAM532E8jt2YBarGL89QjxztBOPRqFr66PBqX0XPL16/i4B20tYcZBt
- U0Dk5kN8voucF8DgLwmfIGnHmICCcMlsHOoI
-X-Google-Smtp-Source: ABdhPJwqAqu5fiW6MkcfS54w+9X9od3V8YYUykJ0+y44LSiV/rX3jrG5iDECe1WB8DPMFJnBgkCsIA==
-X-Received: by 2002:a1c:3b07:: with SMTP id i7mr4113356wma.118.1606406072986; 
- Thu, 26 Nov 2020 07:54:32 -0800 (PST)
+ bh=HHdsvDKCV+y2T0WHPFGAdN0qhY1OjBTJULnU1VX59iA=;
+ b=BNo0F6/hjE/g1LFcGpIynSB6socqCC/njQg4LsxTGQxR3d2Qu1E+Ku6bIeOMyiZ6MY
+ t/xy3bYClFn3pSqisMbt++XFlrcgQvIGxvnSpPUjthEuNGsGXORwWrjXUUpwJXr5qXKD
+ ZBgocUFBfFomJtp9udGcrtYy8sImnxVgMcKFCSfOju5Uzmqq2IOaq7gw5KdniTXkF8um
+ viDAxQ10L95IaSRqsuFaRzjznfQbuYtQW3cytGJ31S0UiMB2vYfoe/uI/bhJktDuE/en
+ fjlPlxNErRL9a+p95qF35emSkll6c1KmOA6ozFK7deQuT5V/yL8ybEuoXNfvplRpA+8Z
+ tVFg==
+X-Gm-Message-State: AOAM530PvRUsu1tEOihtcnrwLRxEs32qDSL2Eu8MdMJ4NxNp8RaZkz+6
+ SNVpSum/XXqNu3iKRGjOmMHzfKWgFII46VmZ
+X-Google-Smtp-Source: ABdhPJxLdnrPvl0zzUmNu9CSpqRHeZvuF+rg/YRWgtrj7i//XJcOslWwSsG2VuZ6GKRjiQHqNZNJ7A==
+X-Received: by 2002:a7b:cb58:: with SMTP id v24mr4021372wmj.23.1606406075145; 
+ Thu, 26 Nov 2020 07:54:35 -0800 (PST)
 Received: from localhost ([2a01:4b00:8523:2d03:f008:704d:8d4b:9951])
- by smtp.gmail.com with ESMTPSA id d8sm8607196wmb.11.2020.11.26.07.54.31
+ by smtp.gmail.com with ESMTPSA id a144sm9761056wmd.47.2020.11.26.07.54.33
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 26 Nov 2020 07:54:32 -0800 (PST)
+ Thu, 26 Nov 2020 07:54:34 -0800 (PST)
 From: David Brazdil <dbrazdil@google.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v3 03/23] arm64: Make cpu_logical_map() take unsigned int
-Date: Thu, 26 Nov 2020 15:54:01 +0000
-Message-Id: <20201126155421.14901-4-dbrazdil@google.com>
+Subject: [PATCH v3 04/23] arm64: Move MAIR_EL1_SET to asm/memory.h
+Date: Thu, 26 Nov 2020 15:54:02 +0000
+Message-Id: <20201126155421.14901-5-dbrazdil@google.com>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201126155421.14901-1-dbrazdil@google.com>
 References: <20201126155421.14901-1-dbrazdil@google.com>
@@ -105,44 +105,74 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-CPU index should never be negative. Change the signature of
-(set_)cpu_logical_map to take an unsigned int.
+KVM currently initializes MAIR_EL2 to the value of MAIR_EL1. In
+preparation for initializing MAIR_EL2 before MAIR_EL1, move the constant
+into a shared header file. Since it is used for EL1 and EL2, rename to
+MAIR_ELx_SET.
 
 Signed-off-by: David Brazdil <dbrazdil@google.com>
 ---
- arch/arm64/include/asm/smp.h | 4 ++--
- arch/arm64/kernel/setup.c    | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ arch/arm64/include/asm/memory.h | 13 +++++++++++++
+ arch/arm64/mm/proc.S            | 15 +--------------
+ 2 files changed, 14 insertions(+), 14 deletions(-)
 
-diff --git a/arch/arm64/include/asm/smp.h b/arch/arm64/include/asm/smp.h
-index 2e7f529ec5a6..bcb01ca15325 100644
---- a/arch/arm64/include/asm/smp.h
-+++ b/arch/arm64/include/asm/smp.h
-@@ -46,9 +46,9 @@ DECLARE_PER_CPU_READ_MOSTLY(int, cpu_number);
-  * Logical CPU mapping.
-  */
- extern u64 __cpu_logical_map[NR_CPUS];
--extern u64 cpu_logical_map(int cpu);
-+extern u64 cpu_logical_map(unsigned int cpu);
+diff --git a/arch/arm64/include/asm/memory.h b/arch/arm64/include/asm/memory.h
+index cd61239bae8c..54a22cb5b17b 100644
+--- a/arch/arm64/include/asm/memory.h
++++ b/arch/arm64/include/asm/memory.h
+@@ -152,6 +152,19 @@
+ #define MT_S2_FWB_NORMAL	6
+ #define MT_S2_FWB_DEVICE_nGnRE	1
  
--static inline void set_cpu_logical_map(int cpu, u64 hwid)
-+static inline void set_cpu_logical_map(unsigned int cpu, u64 hwid)
- {
- 	__cpu_logical_map[cpu] = hwid;
- }
-diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
-index 133257ffd859..2f2973bc67c7 100644
---- a/arch/arm64/kernel/setup.c
-+++ b/arch/arm64/kernel/setup.c
-@@ -276,7 +276,7 @@ arch_initcall(reserve_memblock_reserved_regions);
++/*
++ * Default MAIR_ELx. MT_NORMAL_TAGGED is initially mapped as Normal memory and
++ * changed during __cpu_setup to Normal Tagged if the system supports MTE.
++ */
++#define MAIR_ELx_SET							\
++	(MAIR_ATTRIDX(MAIR_ATTR_DEVICE_nGnRnE, MT_DEVICE_nGnRnE) |	\
++	 MAIR_ATTRIDX(MAIR_ATTR_DEVICE_nGnRE, MT_DEVICE_nGnRE) |	\
++	 MAIR_ATTRIDX(MAIR_ATTR_DEVICE_GRE, MT_DEVICE_GRE) |		\
++	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL_NC, MT_NORMAL_NC) |		\
++	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL, MT_NORMAL) |			\
++	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL_WT, MT_NORMAL_WT) |		\
++	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL, MT_NORMAL_TAGGED))
++
+ #ifdef CONFIG_ARM64_4K_PAGES
+ #define IOREMAP_MAX_ORDER	(PUD_SHIFT)
+ #else
+diff --git a/arch/arm64/mm/proc.S b/arch/arm64/mm/proc.S
+index 23c326a06b2d..e3b9aa372b96 100644
+--- a/arch/arm64/mm/proc.S
++++ b/arch/arm64/mm/proc.S
+@@ -45,19 +45,6 @@
+ #define TCR_KASAN_FLAGS 0
+ #endif
  
- u64 __cpu_logical_map[NR_CPUS] = { [0 ... NR_CPUS-1] = INVALID_HWID };
- 
--u64 cpu_logical_map(int cpu)
-+u64 cpu_logical_map(unsigned int cpu)
- {
- 	return __cpu_logical_map[cpu];
- }
+-/*
+- * Default MAIR_EL1. MT_NORMAL_TAGGED is initially mapped as Normal memory and
+- * changed during __cpu_setup to Normal Tagged if the system supports MTE.
+- */
+-#define MAIR_EL1_SET							\
+-	(MAIR_ATTRIDX(MAIR_ATTR_DEVICE_nGnRnE, MT_DEVICE_nGnRnE) |	\
+-	 MAIR_ATTRIDX(MAIR_ATTR_DEVICE_nGnRE, MT_DEVICE_nGnRE) |	\
+-	 MAIR_ATTRIDX(MAIR_ATTR_DEVICE_GRE, MT_DEVICE_GRE) |		\
+-	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL_NC, MT_NORMAL_NC) |		\
+-	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL, MT_NORMAL) |			\
+-	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL_WT, MT_NORMAL_WT) |		\
+-	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL, MT_NORMAL_TAGGED))
+-
+ #ifdef CONFIG_CPU_PM
+ /**
+  * cpu_do_suspend - save CPU registers context
+@@ -425,7 +412,7 @@ SYM_FUNC_START(__cpu_setup)
+ 	/*
+ 	 * Memory region attributes
+ 	 */
+-	mov_q	x5, MAIR_EL1_SET
++	mov_q	x5, MAIR_ELx_SET
+ #ifdef CONFIG_ARM64_MTE
+ 	/*
+ 	 * Update MAIR_EL1, GCR_EL1 and TFSR*_EL1 if MTE is supported
 -- 
 2.29.2.454.gaff20da3a2-goog
 
