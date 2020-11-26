@@ -2,62 +2,75 @@ Return-Path: <SRS0=e8LN=FA=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE211C64E7D
-	for <kvmarm@archiver.kernel.org>; Thu, 26 Nov 2020 09:30:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31F7CC56202
+	for <kvmarm@archiver.kernel.org>; Thu, 26 Nov 2020 13:46:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 222BF21D93
-	for <kvmarm@archiver.kernel.org>; Thu, 26 Nov 2020 09:30:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 222BF21D93
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 6F2AD20644
+	for <kvmarm@archiver.kernel.org>; Thu, 26 Nov 2020 13:46:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OxEnoGUF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F2AD20644
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0EF844B42E;
-	Thu, 26 Nov 2020 04:30:51 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AABA64B6B1;
+	Thu, 26 Nov 2020 08:46:50 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id bL90rsB0Waz3; Thu, 26 Nov 2020 04:30:49 -0500 (EST)
+	with ESMTP id sontujATKELt; Thu, 26 Nov 2020 08:46:49 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E92FC4C26A;
-	Thu, 26 Nov 2020 04:30:49 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AABC74B765;
+	Thu, 26 Nov 2020 08:46:49 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 024B74C268
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Nov 2020 04:30:49 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D21264B747
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Nov 2020 08:46:48 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rsexnSFujRSg for <kvmarm@lists.cs.columbia.edu>;
- Thu, 26 Nov 2020 04:30:47 -0500 (EST)
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1A0884B704
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Nov 2020 04:30:47 -0500 (EST)
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.60])
- by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4ChXY95fs7z741P;
- Thu, 26 Nov 2020 17:30:21 +0800 (CST)
-Received: from [10.174.185.179] (10.174.185.179) by
- DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
- 14.3.487.0; Thu, 26 Nov 2020 17:30:31 +0800
-Subject: Re: [kvm-unit-tests PATCH 10/10] arm64: gic: Use IPI test checking
- for the LPI tests
-To: Alexandru Elisei <alexandru.elisei@arm.com>, <kvm@vger.kernel.org>,
- <kvmarm@lists.cs.columbia.edu>, <drjones@redhat.com>
-References: <20201125155113.192079-1-alexandru.elisei@arm.com>
- <20201125155113.192079-11-alexandru.elisei@arm.com>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <a7069b1d-ef11-7504-644c-8d341fa2aabc@huawei.com>
-Date: Thu, 26 Nov 2020 17:30:31 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ with ESMTP id HI0fUJpgYywY for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 26 Nov 2020 08:46:47 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D434F4B6B1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Nov 2020 08:46:47 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1606398407;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=jbEexOfgcLFYaQsECYOca5p/Nm1XbLoVmOwp9Ym00nY=;
+ b=OxEnoGUFdpw0WcAr0cm9EkzOIEJPOi/Ol3DabfqV3XPhWNprEINjTl8ZV2JnSYA0tq1H33
+ KxCI96RaG+wrChGUCmWTGoljHi9bEzyyBPth7qiWKfsenBw/qcbKBsKPdeMpmiLuk5UXwT
+ 5qsF659//gRc+Fg7gDRp0XGHI5ZRCPs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-187-wUDATl2NOrmSlKJ4D_Pw6Q-1; Thu, 26 Nov 2020 08:46:45 -0500
+X-MC-Unique: wUDATl2NOrmSlKJ4D_Pw6Q-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 73821805BFA;
+ Thu, 26 Nov 2020 13:46:44 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.141])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DF6B310016F7;
+ Thu, 26 Nov 2020 13:46:42 +0000 (UTC)
+From: Andrew Jones <drjones@redhat.com>
+To: kvm@vger.kernel.org,
+	kvmarm@lists.cs.columbia.edu
+Subject: [PATCH 0/2] KVM: arm64: Fix DEMUX register access
+Date: Thu, 26 Nov 2020 14:46:39 +0100
+Message-Id: <20201126134641.35231-1-drjones@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201125155113.192079-11-alexandru.elisei@arm.com>
-Content-Language: en-US
-X-Originating-IP: [10.174.185.179]
-X-CFilter-Loop: Reflected
-Cc: andre.przywara@arm.com
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Cc: maz@kernel.org, pbonzini@redhat.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -69,46 +82,32 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2020/11/25 23:51, Alexandru Elisei wrote:
-> The reason for the failure is that the test "dev2/eventid=20 now triggers
-> an LPI" triggers 2 LPIs, not one. This behavior was present before this
-> patch, but it was ignored because check_lpi_stats() wasn't looking at the
-> acked array.
-> 
-> I'm not familiar with the ITS so I'm not sure if this is expected, if the
-> test is incorrect or if there is something wrong with KVM emulation.
-
-I think this is expected, or not.
-
-Before INVALL, the LPI-8195 was already pending but disabled. On
-receiving INVALL, VGIC will reload configuration for all LPIs targeting
-collection-3 and deliver the now enabled LPI-8195. We'll therefore see
-and handle it before sending the following INT (which will set the
-LPI-8195 pending again).
-
-> Did some more testing on an Ampere eMAG (fast out-of-order cores) using
-> qemu and kvmtool and Linux v5.8, here's what I found:
-> 
-> - Using qemu and gic.flat built from*master*: error encountered 864 times
->    out of 1088 runs.
-> - Using qemu: error encountered 852 times out of 1027 runs.
-> - Using kvmtool: error encountered 8164 times out of 10602 runs.
-
-If vcpu-3 hadn't seen and handled LPI-8195 as quickly as possible (e.g.,
-vcpu-3 hadn't been scheduled), the following INT will set the already
-pending LPI-8195 pending again and we'll receive it *once* on vcpu-3.
-And we won't see the mentioned failure.
-
-I think we can just drop the (meaningless and confusing?) INT.
-
+The first patch is a fix, but not one likely to ever truly be needed,
+as it's unlikely to find seven levels of cache. The bug was found
+while code reading. Writing the second patch was actually why I was
+reading the code. The issue being fixed for the get-reg-list test was
+found when running it on a different machine than what was used to
+develop it.
 
 Thanks,
-Zenghui
+drew
+
+Andrew Jones (2):
+  KVM: arm64: CSSELR_EL1 max is 13
+  KVM: selftests: Filter out DEMUX registers
+
+ arch/arm64/kvm/sys_regs.c                     |  2 +-
+ .../selftests/kvm/aarch64/get-reg-list.c      | 39 ++++++++++++++-----
+ 2 files changed, 31 insertions(+), 10 deletions(-)
+
+-- 
+2.26.2
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
