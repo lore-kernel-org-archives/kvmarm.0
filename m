@@ -2,65 +2,83 @@ Return-Path: <SRS0=tVNh=FB=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 624F4C63777
-	for <kvmarm@archiver.kernel.org>; Fri, 27 Nov 2020 10:14:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5118C2D0E4
+	for <kvmarm@archiver.kernel.org>; Fri, 27 Nov 2020 11:21:29 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A6C46206C0
-	for <kvmarm@archiver.kernel.org>; Fri, 27 Nov 2020 10:14:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6C46206C0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 09EA921D7F
+	for <kvmarm@archiver.kernel.org>; Fri, 27 Nov 2020 11:21:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="CSdQ4/Si"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09EA921D7F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BB6044BFD1;
-	Fri, 27 Nov 2020 05:14:46 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DA854BE7D;
+	Fri, 27 Nov 2020 06:21:28 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 485GZuZ7pJ80; Fri, 27 Nov 2020 05:14:45 -0500 (EST)
+	with ESMTP id 9Ybt+lgiW9e7; Fri, 27 Nov 2020 06:21:27 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 71C044BFD2;
-	Fri, 27 Nov 2020 05:14:45 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EABB54BE88;
+	Fri, 27 Nov 2020 06:21:26 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 056F24BFD0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Nov 2020 05:14:44 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9090E4BE75
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Nov 2020 06:21:25 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id z2uUe4BS+34T for <kvmarm@lists.cs.columbia.edu>;
- Fri, 27 Nov 2020 05:14:42 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 863284BFA4
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Nov 2020 05:14:42 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D965E1516;
- Fri, 27 Nov 2020 02:14:41 -0800 (PST)
-Received: from e121166-lin.cambridge.arm.com (e121166-lin.cambridge.arm.com
- [10.1.196.255])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A809E3F71F;
- Fri, 27 Nov 2020 02:14:39 -0800 (PST)
-Date: Fri, 27 Nov 2020 10:14:33 +0000
-From: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>
-To: David Brazdil <dbrazdil@google.com>
-Subject: Re: [PATCH v3 16/23] kvm: arm64: Forward safe PSCI SMCs coming from
- host
-Message-ID: <20201127101433.GA1061@e121166-lin.cambridge.arm.com>
-References: <20201126155421.14901-1-dbrazdil@google.com>
- <20201126155421.14901-17-dbrazdil@google.com>
+ with ESMTP id xB0PztC880AD for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 27 Nov 2020 06:21:22 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 952FF4BE74
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Nov 2020 06:21:22 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 4B10A2222A;
+ Fri, 27 Nov 2020 11:21:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1606476081;
+ bh=uSWDwx9Mf1mz4a4sUj9aoF18Ki8K132MbX4ipSnTuaA=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=CSdQ4/SiMbCkHZxxf4Xs9Ns/mlpYP1T71glovqQ0NVcxhqtksVhVYpdTLzXNhgxZv
+ vxegoO+0yoZaQO+E1WUMzUy6gw3GLPoQWV/C2mTN1/jNxJWk44z60pdoSM8Y8O6IOi
+ Clu/4rn5Cy8XBMNSox/QlksFtx2LpU1VnU5t6Xvg=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1kiboV-00E2fR-EV; Fri, 27 Nov 2020 11:21:19 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PATCH 1/2] KVM: arm64: Correctly align nVHE percpu data
+Date: Fri, 27 Nov 2020 11:21:00 +0000
+Message-Id: <20201127112101.658224-2-maz@kernel.org>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20201127112101.658224-1-maz@kernel.org>
+References: <20201127112101.658224-1-maz@kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20201126155421.14901-17-dbrazdil@google.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-Cc: Sudeep Holla <sudeep.holla@arm.com>, kernel-team@android.com,
- Jonathan Corbet <corbet@lwn.net>, Catalin Marinas <catalin.marinas@arm.com>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
- Tejun Heo <tj@kernel.org>, Dennis Zhou <dennis@kernel.org>,
- Christoph Lameter <cl@linux.com>, Will Deacon <will@kernel.org>,
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, dbrazdil@google.com,
+ eric.auger@redhat.com, jamie@nuviainc.com, zhukeqian1@huawei.com,
+ will@kernel.org, yuzenghui@huawei.com, james.morse@arm.com,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kernel-team@android.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ Jamie Iles <jamie@nuviainc.com>, linux-arm-kernel@lists.infradead.org,
  kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -78,110 +96,67 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Nov 26, 2020 at 03:54:14PM +0000, David Brazdil wrote:
-> Forward the following PSCI SMCs issued by host to EL3 as they do not
-> require the hypervisor's intervention. This assumes that EL3 correctly
-> implements the PSCI specification.
-> 
-> Only function IDs implemented in Linux are included.
-> 
-> Where both 32-bit and 64-bit variants exist, it is assumed that the host
-> will always use the 64-bit variant.
-> 
->  * SMCs that only return information about the system
->    * PSCI_VERSION        - PSCI version implemented by EL3
->    * PSCI_FEATURES       - optional features supported by EL3
->    * AFFINITY_INFO       - power state of core/cluster
->    * MIGRATE_INFO_TYPE   - whether Trusted OS can be migrated
->    * MIGRATE_INFO_UP_CPU - resident core of Trusted OS
->  * operations which do not affect the hypervisor
->    * MIGRATE             - migrate Trusted OS to a different core
->    * SET_SUSPEND_MODE    - toggle OS-initiated mode
->  * system shutdown/reset
->    * SYSTEM_OFF
->    * SYSTEM_RESET
->    * SYSTEM_RESET2
+From: Jamie Iles <jamie@nuviainc.com>
 
-What about SYSTEM_SUSPEND ?
+The nVHE percpu data is partially linked but the nVHE linker script did
+not align the percpu section.  The PERCPU_INPUT macro would then align
+the data to a page boundary:
 
-Lorenzo
+  #define PERCPU_INPUT(cacheline)					\
+  	__per_cpu_start = .;						\
+  	*(.data..percpu..first)						\
+  	. = ALIGN(PAGE_SIZE);						\
+  	*(.data..percpu..page_aligned)					\
+  	. = ALIGN(cacheline);						\
+  	*(.data..percpu..read_mostly)					\
+  	. = ALIGN(cacheline);						\
+  	*(.data..percpu)						\
+  	*(.data..percpu..shared_aligned)				\
+  	PERCPU_DECRYPTED_SECTION					\
+  	__per_cpu_end = .;
 
-> Signed-off-by: David Brazdil <dbrazdil@google.com>
-> ---
->  arch/arm64/kvm/hyp/nvhe/psci-relay.c | 43 +++++++++++++++++++++++++++-
->  1 file changed, 42 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/psci-relay.c b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-> index e7091d89f0fc..7aa87ab7f5ce 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-> @@ -57,14 +57,51 @@ static bool is_psci_call(u64 func_id)
->  	}
->  }
->  
-> +static unsigned long psci_call(unsigned long fn, unsigned long arg0,
-> +			       unsigned long arg1, unsigned long arg2)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	arm_smccc_1_1_smc(fn, arg0, arg1, arg2, &res);
-> +	return res.a0;
-> +}
-> +
-> +static unsigned long psci_forward(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	return psci_call(cpu_reg(host_ctxt, 0), cpu_reg(host_ctxt, 1),
-> +			 cpu_reg(host_ctxt, 2), cpu_reg(host_ctxt, 3));
-> +}
-> +
-> +static __noreturn unsigned long psci_forward_noreturn(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	psci_forward(host_ctxt);
-> +	hyp_panic(); /* unreachable */
-> +}
-> +
->  static unsigned long psci_0_1_handler(u64 func_id, struct kvm_cpu_context *host_ctxt)
->  {
-> -	return PSCI_RET_NOT_SUPPORTED;
-> +	if (func_id == kvm_host_psci_function_id[PSCI_FN_CPU_OFF])
-> +		return psci_forward(host_ctxt);
-> +	else if (func_id == kvm_host_psci_function_id[PSCI_FN_MIGRATE])
-> +		return psci_forward(host_ctxt);
-> +	else
-> +		return PSCI_RET_NOT_SUPPORTED;
->  }
->  
->  static unsigned long psci_0_2_handler(u64 func_id, struct kvm_cpu_context *host_ctxt)
->  {
->  	switch (func_id) {
-> +	case PSCI_0_2_FN_PSCI_VERSION:
-> +	case PSCI_0_2_FN_CPU_OFF:
-> +	case PSCI_0_2_FN64_AFFINITY_INFO:
-> +	case PSCI_0_2_FN64_MIGRATE:
-> +	case PSCI_0_2_FN_MIGRATE_INFO_TYPE:
-> +	case PSCI_0_2_FN64_MIGRATE_INFO_UP_CPU:
-> +		return psci_forward(host_ctxt);
-> +	case PSCI_0_2_FN_SYSTEM_OFF:
-> +	case PSCI_0_2_FN_SYSTEM_RESET:
-> +		psci_forward_noreturn(host_ctxt);
-> +		unreachable();
->  	default:
->  		return PSCI_RET_NOT_SUPPORTED;
->  	}
-> @@ -73,6 +110,10 @@ static unsigned long psci_0_2_handler(u64 func_id, struct kvm_cpu_context *host_
->  static unsigned long psci_1_0_handler(u64 func_id, struct kvm_cpu_context *host_ctxt)
->  {
->  	switch (func_id) {
-> +	case PSCI_1_0_FN_PSCI_FEATURES:
-> +	case PSCI_1_0_FN_SET_SUSPEND_MODE:
-> +	case PSCI_1_1_FN64_SYSTEM_RESET2:
-> +		return psci_forward(host_ctxt);
->  	default:
->  		return psci_0_2_handler(func_id, host_ctxt);
->  	}
-> -- 
-> 2.29.2.454.gaff20da3a2-goog
-> 
+but then when the final vmlinux linking happens the hypervisor percpu
+data is included after page alignment and so the offsets potentially
+don't match.  On my build I saw that the .hyp.data..percpu section was
+at address 0x20 and then the percpu data would begin at 0x1000 (because
+of the page alignment in PERCPU_INPUT), but when linked into vmlinux,
+everything would be shifted down by 0x20 bytes.
+
+This manifests as one of the CPUs getting lost when running
+kvm-unit-tests or starting any VM and subsequent soft lockup on a Cortex
+A72 device.
+
+Fixes: 30c953911c43 ("kvm: arm64: Set up hyp percpu data for nVHE")
+Signed-off-by: Jamie Iles <jamie@nuviainc.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Acked-by: David Brazdil <dbrazdil@google.com>
+Cc: David Brazdil <dbrazdil@google.com>
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Will Deacon <will@kernel.org>
+Link: https://lore.kernel.org/r/20201113150406.14314-1-jamie@nuviainc.com
+---
+ arch/arm64/kvm/hyp/nvhe/hyp.lds.S | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp.lds.S b/arch/arm64/kvm/hyp/nvhe/hyp.lds.S
+index bb2d986ff696..a797abace13f 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp.lds.S
++++ b/arch/arm64/kvm/hyp/nvhe/hyp.lds.S
+@@ -13,6 +13,11 @@
+ 
+ SECTIONS {
+ 	HYP_SECTION(.text)
++	/*
++	 * .hyp..data..percpu needs to be page aligned to maintain the same
++	 * alignment for when linking into vmlinux.
++	 */
++	. = ALIGN(PAGE_SIZE);
+ 	HYP_SECTION_NAME(.data..percpu) : {
+ 		PERCPU_INPUT(L1_CACHE_BYTES)
+ 	}
+-- 
+2.28.0
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
