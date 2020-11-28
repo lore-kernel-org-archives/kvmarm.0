@@ -1,80 +1,93 @@
-Return-Path: <SRS0=tVNh=FB=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=AimU=FC=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6153C3E8C5
-	for <kvmarm@archiver.kernel.org>; Fri, 27 Nov 2020 19:47:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D31EC63697
+	for <kvmarm@archiver.kernel.org>; Sat, 28 Nov 2020 10:18:48 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2B8FA22275
-	for <kvmarm@archiver.kernel.org>; Fri, 27 Nov 2020 19:47:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A56DF222C2
+	for <kvmarm@archiver.kernel.org>; Sat, 28 Nov 2020 10:18:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="zLSL2n69"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B8FA22275
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="DX+4yz5L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A56DF222C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AE0AB4BD76;
-	Fri, 27 Nov 2020 14:47:40 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DA0AF4BAE0;
+	Sat, 28 Nov 2020 05:18:46 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, body has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id kxQzS6u-I5dR; Fri, 27 Nov 2020 14:47:39 -0500 (EST)
+	with ESMTP id 9zl-7cfIwlAG; Sat, 28 Nov 2020 05:18:45 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C634D4B882;
-	Fri, 27 Nov 2020 14:47:39 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F25B4BAE3;
+	Sat, 28 Nov 2020 05:18:45 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7365E4B79F
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Nov 2020 14:47:38 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 704C84BA7B
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 28 Nov 2020 05:18:44 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1we7j1jUeFwZ for <kvmarm@lists.cs.columbia.edu>;
- Fri, 27 Nov 2020 14:47:37 -0500 (EST)
+ with ESMTP id vnK1qCi6e3ZW for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 28 Nov 2020 05:18:43 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 86F3E4B704
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Nov 2020 14:47:37 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 330B34BA58
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 28 Nov 2020 05:18:43 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 4072420885;
- Fri, 27 Nov 2020 19:47:36 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id AEC472227F;
+ Sat, 28 Nov 2020 10:18:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1606506456;
- bh=E4Xw2UALw2gG/o50RD2ZdpFI8M+G0YGs2VL7UrXLG+U=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=zLSL2n69ZTVMec7aXivZFZwiWnc8hmiCL+kG42eiRgWS1zrtud7RU4tTe1g3x3F9i
- uXhRol7nuo+fyqG8fm9hKxDseEo6UxZIDEPoe023pfnneuj4LjmQJEaJlF8CjABilc
- DhlBv+8qnx0gkC0srhbKfErAkWpkmd0vj64PvreM=
+ s=default; t=1606558721;
+ bh=4K4X/pL32QVFFBl2rnovrBaaN+h/s2sY0/tghuUMP8s=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=DX+4yz5LojYRxgrgRN0cSxh4/25S2hC6Esddy5FCBbWqips6zrCKMUIGQS76mN3El
+ gGbArn+vgKWdh8etIgtLknJAexa6jZjCpFx0g0cmeiZFtbQP1w1CHqy8GVDbrw+WNU
+ yVl26lz/XrME1QvJHRvuMdChBRFxN70mgCCa5iRY=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=hot-poop.lan)
+ helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1kijiQ-00E9BK-B8; Fri, 27 Nov 2020 19:47:34 +0000
+ id 1kixJP-00EGFN-1l; Sat, 28 Nov 2020 10:18:39 +0000
+Date: Sat, 28 Nov 2020 10:18:38 +0000
+Message-ID: <875z5p6ayp.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Andrew Jones <drjones@redhat.com>, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org
-Subject: Re: [PATCH 0/2] KVM: arm64: Fix DEMUX register access
-Date: Fri, 27 Nov 2020 19:47:30 +0000
-Message-Id: <160650643709.6468.11593626862508119672.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20201126134641.35231-1-drjones@redhat.com>
-References: <20201126134641.35231-1-drjones@redhat.com>
-MIME-Version: 1.0
+To: luojiaxing <luojiaxing@huawei.com>
+Subject: Re: [RFC PATCH v1 1/4] irqchip/gic-v4.1: Plumb get_irqchip_state VLPI
+ callback
+In-Reply-To: <869dbc36-c510-fd00-407a-b05e068537c8@huawei.com>
+References: <20201123065410.1915-1-lushenming@huawei.com>
+ <20201123065410.1915-2-lushenming@huawei.com>
+ <869dbc36-c510-fd00-407a-b05e068537c8@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: drjones@redhat.com, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, pbonzini@redhat.com
+X-SA-Exim-Rcpt-To: luojiaxing@huawei.com, lushenming@huawei.com,
+ james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+ eric.auger@redhat.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, christoffer.dall@arm.com,
+ alex.williamson@redhat.com, kwankhede@nvidia.com, cohuck@redhat.com,
+ cjia@nvidia.com, wanghaibin.wang@huawei.com, yuzenghui@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: pbonzini@redhat.com
+Cc: Cornelia Huck <cohuck@redhat.com>, Neo Jia <cjia@nvidia.com>,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Kirti Wankhede <kwankhede@nvidia.com>, Shenming Lu <lushenming@huawei.com>,
+ Alex Williamson <alex.williamson@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,30 +104,94 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 26 Nov 2020 14:46:39 +0100, Andrew Jones wrote:
-> The first patch is a fix, but not one likely to ever truly be needed,
-> as it's unlikely to find seven levels of cache. The bug was found
-> while code reading. Writing the second patch was actually why I was
-> reading the code. The issue being fixed for the get-reg-list test was
-> found when running it on a different machine than what was used to
-> develop it.
+On Sat, 28 Nov 2020 07:19:48 +0000,
+luojiaxing <luojiaxing@huawei.com> wrote:
 > 
-> [...]
+> Hi, shenming
+> 
+> 
+> I got few questions about this patch.
+> 
+> Although it's a bit late and not very appropriate, I'd like to ask
+> before you send next version.
+> 
+> On 2020/11/23 14:54, Shenming Lu wrote:
+> > From: Zenghui Yu <yuzenghui@huawei.com>
+> > 
+> > Up to now, the irq_get_irqchip_state() callback of its_irq_chip
+> > leaves unimplemented since there is no architectural way to get
+> > the VLPI's pending state before GICv4.1. Yeah, there has one in
+> > v4.1 for VLPIs.
+> 
+> 
+> I checked the invoking scenario of irq_get_irqchip_state and found no
+> scenario related to vLPI.
+> 
+> For example, synchronize_irq(), it pass IRQCHIP_STATE_ACTIVE to which,
+> so in your patch, you will directly return and other is for vSGI,
+> GICD_ISPENDR, GICD_ICPENDR and so on.
 
-Applied to kvm-arm64/cache-demux, thanks!
+You do realise that LPIs have no active state, right? And that LPIs
+have a radically different programming interface to the rest of the GIC?
 
-[1/2] KVM: arm64: CSSELR_EL1 max is 13
-      commit: c73a44161776f6e60d933717f3b34084b0a0eba0
-[2/2] KVM: arm64: selftests: Filter out DEMUX registers
-      commit: c6232bd40b2eda3819d108e6e3f621ec604e15d8
+> The only one I am not sure is vgic_get_phys_line_level(), is it your
+> purpose to fill this callback, or some scenarios I don't know about
+> that use this callback.
 
-Cheers,
+LPIs only offer edge signalling, so the concept of "line level" means
+absolutely nothing.
+
+> 
+> 
+> > 
+> > With GICv4.1, after unmapping the vPE, which cleans and invalidates
+> > any caching of the VPT, we can get the VLPI's pending state by
+> > peeking at the VPT. So we implement the irq_get_irqchip_state()
+> > callback of its_irq_chip to do it.
+> > 
+> > Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+> > Signed-off-by: Shenming Lu <lushenming@huawei.com>
+> > ---
+> >   drivers/irqchip/irq-gic-v3-its.c | 38 ++++++++++++++++++++++++++++++++
+> >   1 file changed, 38 insertions(+)
+> > 
+> > diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+> > index 0fec31931e11..287003cacac7 100644
+> > --- a/drivers/irqchip/irq-gic-v3-its.c
+> > +++ b/drivers/irqchip/irq-gic-v3-its.c
+> > @@ -1695,6 +1695,43 @@ static void its_irq_compose_msi_msg(struct irq_data *d, struct msi_msg *msg)
+> >   	iommu_dma_compose_msi_msg(irq_data_get_msi_desc(d), msg);
+> >   }
+> >   +static bool its_peek_vpt(struct its_vpe *vpe, irq_hw_number_t
+> > hwirq)
+> > +{
+> > +	int mask = hwirq % BITS_PER_BYTE;
+> > +	void *va;
+> > +	u8 *pt;
+> > +
+> > +	va = page_address(vpe->vpt_page);
+> > +	pt = va + hwirq / BITS_PER_BYTE;
+> > +
+> > +	return !!(*pt & (1U << mask));
+> 
+> 
+> How can you confirm that the interrupt pending status is the latest?
+> Is it possible that the interrupt pending status is still cached in
+> the GICR but not synchronized to the memory.
+
+That's a consequence of the vPE having been unmapped:
+
+"A VMAPP with {V,Alloc}=={0,1} cleans and invalidates any caching of
+the Virtual Pending Table and Virtual Configuration Table associated
+with the vPEID held in the GIC."
+
+An implementation that wouldn't follow this simple rule would simply
+be totally broken, and unsupported.
 
 	M.
+
 -- 
 Without deviation from the norm, progress is not possible.
-
-
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
