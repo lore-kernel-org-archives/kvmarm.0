@@ -2,73 +2,75 @@ Return-Path: <SRS0=p1b3=FE=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02414C64E7B
-	for <kvmarm@archiver.kernel.org>; Mon, 30 Nov 2020 11:23:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CD5EC64E8A
+	for <kvmarm@archiver.kernel.org>; Mon, 30 Nov 2020 12:28:56 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 40B562084C
-	for <kvmarm@archiver.kernel.org>; Mon, 30 Nov 2020 11:23:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CA4D82074A
+	for <kvmarm@archiver.kernel.org>; Mon, 30 Nov 2020 12:28:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="SWqt3vc/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40B562084C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="wn/XGBQC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA4D82074A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 846434BC86;
-	Mon, 30 Nov 2020 06:23:04 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C0374B7C6;
+	Mon, 30 Nov 2020 07:28:55 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id emxobGm7StGR; Mon, 30 Nov 2020 06:23:03 -0500 (EST)
+	with ESMTP id PV3olKndSGbO; Mon, 30 Nov 2020 07:28:53 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5104C4BC94;
-	Mon, 30 Nov 2020 06:23:03 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CB93D4B7D1;
+	Mon, 30 Nov 2020 07:28:53 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D75B14BC86
- for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Nov 2020 06:23:01 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D65A04B7BD
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Nov 2020 07:28:52 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6wQ5GqEf+Ijb for <kvmarm@lists.cs.columbia.edu>;
- Mon, 30 Nov 2020 06:23:00 -0500 (EST)
+ with ESMTP id qVz4JQALZDpH for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 30 Nov 2020 07:28:51 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4B8B94BC78
- for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Nov 2020 06:23:00 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 793714B7B9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Nov 2020 07:28:51 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id D591A206C0;
- Mon, 30 Nov 2020 11:22:58 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id F27A4206D8;
+ Mon, 30 Nov 2020 12:28:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1606735379;
- bh=C/tX+/xIQfu/l2jRe/mauR07nHMptQk9G3sfbmqUn8c=;
+ s=default; t=1606739330;
+ bh=u0TyQoQgGspGRd/3I/gs0DRtmD9sJROd7+DPew7L9zk=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=SWqt3vc/2cb79JBviuv/tQctBHNF+l8ewM82n7RLPlThwl4d1/P1CH+bo0ypQO+82
- 8CvtbVDyF2V2NQ72uub1BXGMk/PzVqrXve5FTO2drRb6hisUQHAiDvpWVjcT3js/0s
- ThB8ZxfOC/I+RCflReXiFXtp4lF8G8Q7p/rI5O7g=
+ b=wn/XGBQCCJrKdejKCyGhHqtptY0ZuwTaFH2Fa2gu5WTGpXMieqd/uRhwhO6MISWq5
+ Xp+mFQhOsThg5/rm4vlDW1VM0cc7LBN9w6vbaViJSFSCbhJXHbldrO2KwPald4/vTG
+ Qp7qls6qh7K7jLQf58FIQYS93sq9PiJzyGkbrHSk=
 Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
  by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
  TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1kjhGi-00EfQ1-Jk; Mon, 30 Nov 2020 11:22:56 +0000
+ id 1kjiIR-00Egck-Ns; Mon, 30 Nov 2020 12:28:47 +0000
 MIME-Version: 1.0
-Date: Mon, 30 Nov 2020 11:22:56 +0000
+Date: Mon, 30 Nov 2020 12:28:47 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: Shenming Lu <lushenming@huawei.com>
 Subject: Re: [PATCH v2 2/2] KVM: arm64: Delay the execution of the polling on
  the GICR_VPENDBASER.Dirty bit
-In-Reply-To: <20201128141857.983-3-lushenming@huawei.com>
+In-Reply-To: <a65a79af-dc3e-bbac-c65e-c95b772135bd@huawei.com>
 References: <20201128141857.983-1-lushenming@huawei.com>
  <20201128141857.983-3-lushenming@huawei.com>
+ <b2387410a28f9c5d9ece45e12feead94@kernel.org>
+ <a65a79af-dc3e-bbac-c65e-c95b772135bd@huawei.com>
 User-Agent: Roundcube Webmail/1.4.9
-Message-ID: <b2387410a28f9c5d9ece45e12feead94@kernel.org>
+Message-ID: <577a322e14cadfa46174d6db78136743@kernel.org>
 X-Sender: maz@kernel.org
 X-SA-Exim-Connect-IP: 51.254.78.96
 X-SA-Exim-Rcpt-To: lushenming@huawei.com, tglx@linutronix.de,
@@ -95,236 +97,153 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2020-11-28 14:18, Shenming Lu wrote:
-> In order to further reduce the impact of the wait delay of the
-> VPT analysis, we can delay the execution of the polling on the
-> GICR_VPENDBASER.Dirty bit (call it from kvm_vgic_flush_hwstate()
-> corresponding to vPE resident), let the GIC and the CPU work in
-> parallel on the entry path.
-> 
-> Signed-off-by: Shenming Lu <lushenming@huawei.com>
-> ---
->  arch/arm64/kvm/vgic/vgic-v4.c      | 16 ++++++++++++++++
->  arch/arm64/kvm/vgic/vgic.c         |  3 +++
->  drivers/irqchip/irq-gic-v3-its.c   | 16 ++++++++++++----
->  drivers/irqchip/irq-gic-v4.c       | 11 +++++++++++
->  include/kvm/arm_vgic.h             |  3 +++
->  include/linux/irqchip/arm-gic-v4.h |  4 ++++
->  6 files changed, 49 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/vgic/vgic-v4.c 
-> b/arch/arm64/kvm/vgic/vgic-v4.c
-> index b5fa73c9fd35..b0da74809187 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v4.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v4.c
-> @@ -353,6 +353,22 @@ int vgic_v4_load(struct kvm_vcpu *vcpu)
->  	return err;
->  }
-> 
-> +void vgic_v4_commit(struct kvm_vcpu *vcpu)
-> +{
-> +	struct its_vpe *vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
-> +
-> +	/*
-> +	 * No need to wait for the vPE to be ready across a shallow guest
-> +	 * exit, as only a vcpu_put will invalidate it.
-> +	 */
-> +	if (vpe->vpe_ready)
-> +		return;
-> +
-> +	its_commit_vpe(vpe);
-> +
-> +	vpe->vpe_ready = true;
-
-This should be written as:
-
-if (!ready)
-      commit();
-
-and ready being driven by the commit() call itself.
-
-> +}
-> +
->  static struct vgic_its *vgic_get_its(struct kvm *kvm,
->  				     struct kvm_kernel_irq_routing_entry *irq_entry)
->  {
-> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-> index c3643b7f101b..1c597c9885fa 100644
-> --- a/arch/arm64/kvm/vgic/vgic.c
-> +++ b/arch/arm64/kvm/vgic/vgic.c
-> @@ -915,6 +915,9 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
-> 
->  	if (can_access_vgic_from_kernel())
->  		vgic_restore_state(vcpu);
-> +
-> +	if (vgic_supports_direct_msis(vcpu->kvm))
-> +		vgic_v4_commit(vcpu);
->  }
-> 
->  void kvm_vgic_load(struct kvm_vcpu *vcpu)
-> diff --git a/drivers/irqchip/irq-gic-v3-its.c 
-> b/drivers/irqchip/irq-gic-v3-its.c
-> index 22f427135c6b..f30aba14933e 100644
-> --- a/drivers/irqchip/irq-gic-v3-its.c
-> +++ b/drivers/irqchip/irq-gic-v3-its.c
-> @@ -3842,8 +3842,6 @@ static void its_vpe_schedule(struct its_vpe *vpe)
->  	val |= vpe->idai ? GICR_VPENDBASER_IDAI : 0;
->  	val |= GICR_VPENDBASER_Valid;
->  	gicr_write_vpendbaser(val, vlpi_base + GICR_VPENDBASER);
-> -
-> -	its_wait_vpt_parse_complete();
->  }
-> 
->  static void its_vpe_deschedule(struct its_vpe *vpe)
-> @@ -3855,6 +3853,8 @@ static void its_vpe_deschedule(struct its_vpe 
-> *vpe)
-> 
->  	vpe->idai = !!(val & GICR_VPENDBASER_IDAI);
->  	vpe->pending_last = !!(val & GICR_VPENDBASER_PendingLast);
-> +
-> +	vpe->vpe_ready = false;
-
-This should be set from the its_make_vpe_non_resident() call.
-
->  }
-> 
->  static void its_vpe_invall(struct its_vpe *vpe)
-> @@ -3891,6 +3891,10 @@ static int its_vpe_set_vcpu_affinity(struct
-> irq_data *d, void *vcpu_info)
->  		its_vpe_deschedule(vpe);
->  		return 0;
-> 
-> +	case COMMIT_VPE:
-> +		its_wait_vpt_parse_complete();
-> +		return 0;
-> +
->  	case INVALL_VPE:
->  		its_vpe_invall(vpe);
->  		return 0;
-> @@ -4052,8 +4056,6 @@ static void its_vpe_4_1_schedule(struct its_vpe 
-> *vpe,
->  	val |= FIELD_PREP(GICR_VPENDBASER_4_1_VPEID, vpe->vpe_id);
-> 
->  	gicr_write_vpendbaser(val, vlpi_base + GICR_VPENDBASER);
-> -
-> -	its_wait_vpt_parse_complete();
->  }
-> 
->  static void its_vpe_4_1_deschedule(struct its_vpe *vpe,
-> @@ -4091,6 +4093,8 @@ static void its_vpe_4_1_deschedule(struct its_vpe 
-> *vpe,
->  					    GICR_VPENDBASER_PendingLast);
->  		vpe->pending_last = true;
->  	}
-> +
-> +	vpe->vpe_ready = false;
->  }
-> 
->  static void its_vpe_4_1_invall(struct its_vpe *vpe)
-> @@ -4128,6 +4132,10 @@ static int its_vpe_4_1_set_vcpu_affinity(struct
-> irq_data *d, void *vcpu_info)
->  		its_vpe_4_1_deschedule(vpe, info);
->  		return 0;
-> 
-> +	case COMMIT_VPE:
-> +		its_wait_vpt_parse_complete();
-> +		return 0;
-> +
->  	case INVALL_VPE:
->  		its_vpe_4_1_invall(vpe);
->  		return 0;
-> diff --git a/drivers/irqchip/irq-gic-v4.c 
-> b/drivers/irqchip/irq-gic-v4.c
-> index 0c18714ae13e..6cea71a4e68b 100644
-> --- a/drivers/irqchip/irq-gic-v4.c
-> +++ b/drivers/irqchip/irq-gic-v4.c
-> @@ -258,6 +258,17 @@ int its_make_vpe_resident(struct its_vpe *vpe,
-> bool g0en, bool g1en)
->  	return ret;
->  }
-> 
-> +int its_commit_vpe(struct its_vpe *vpe)
-> +{
-> +	struct its_cmd_info info = {
-> +		.cmd_type = COMMIT_VPE,
-> +	};
-> +
-> +	WARN_ON(preemptible());
-> +
-> +	return its_send_vpe_cmd(vpe, &info);
-> +}
-> +
->  int its_invall_vpe(struct its_vpe *vpe)
->  {
->  	struct its_cmd_info info = {
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index a8d8fdcd3723..f2170df6cf7c 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -401,7 +401,10 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, 
-> int irq,
->  int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int irq,
->  				 struct kvm_kernel_irq_routing_entry *irq_entry);
-> 
-> +void vgic_v4_commit(struct kvm_vcpu *vcpu);
-> +
->  int vgic_v4_load(struct kvm_vcpu *vcpu);
-> +
-
-Spurious new lines.
-
->  int vgic_v4_put(struct kvm_vcpu *vcpu, bool need_db);
-> 
->  #endif /* __KVM_ARM_VGIC_H */
-> diff --git a/include/linux/irqchip/arm-gic-v4.h
-> b/include/linux/irqchip/arm-gic-v4.h
-> index 6976b8331b60..936d88e482a9 100644
-> --- a/include/linux/irqchip/arm-gic-v4.h
-> +++ b/include/linux/irqchip/arm-gic-v4.h
-> @@ -75,6 +75,8 @@ struct its_vpe {
->  	u16			vpe_id;
->  	/* Pending VLPIs on schedule out? */
->  	bool			pending_last;
-> +	/* VPT parse complete */
-> +	bool			vpe_ready;
->  };
-> 
->  /*
-> @@ -104,6 +106,7 @@ enum its_vcpu_info_cmd_type {
->  	PROP_UPDATE_AND_INV_VLPI,
->  	SCHEDULE_VPE,
->  	DESCHEDULE_VPE,
-> +	COMMIT_VPE,
->  	INVALL_VPE,
->  	PROP_UPDATE_VSGI,
->  };
-> @@ -129,6 +132,7 @@ int its_alloc_vcpu_irqs(struct its_vm *vm);
->  void its_free_vcpu_irqs(struct its_vm *vm);
->  int its_make_vpe_resident(struct its_vpe *vpe, bool g0en, bool g1en);
->  int its_make_vpe_non_resident(struct its_vpe *vpe, bool db);
-> +int its_commit_vpe(struct its_vpe *vpe);
->  int its_invall_vpe(struct its_vpe *vpe);
->  int its_map_vlpi(int irq, struct its_vlpi_map *map);
->  int its_get_vlpi(int irq, struct its_vlpi_map *map);
-
-In order to speed up the respin round-trip, I've taken the liberty
-to refactor this patch myself. Please have a look at [1] and let
-me know if you're OK with it.
-
-Thanks,
-
-         M.
-
-[1] 
-https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/commit/?h=kvm-arm64/misc-5.11&id=57e3cebd022fbc035dcf190ac789fd2ffc747f5b
--- 
-Jazz is not dead. It just smells funny...
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gMjAyMC0xMS0zMCAxMjoxMiwgU2hlbm1pbmcgTHUgd3JvdGU6Cj4gT24gMjAyMC8xMS8zMCAx
+OToyMiwgTWFyYyBaeW5naWVyIHdyb3RlOgo+PiBPbiAyMDIwLTExLTI4IDE0OjE4LCBTaGVubWlu
+ZyBMdSB3cm90ZToKPj4+IEluIG9yZGVyIHRvIGZ1cnRoZXIgcmVkdWNlIHRoZSBpbXBhY3Qgb2Yg
+dGhlIHdhaXQgZGVsYXkgb2YgdGhlCj4+PiBWUFQgYW5hbHlzaXMsIHdlIGNhbiBkZWxheSB0aGUg
+ZXhlY3V0aW9uIG9mIHRoZSBwb2xsaW5nIG9uIHRoZQo+Pj4gR0lDUl9WUEVOREJBU0VSLkRpcnR5
+IGJpdCAoY2FsbCBpdCBmcm9tIGt2bV92Z2ljX2ZsdXNoX2h3c3RhdGUoKQo+Pj4gY29ycmVzcG9u
+ZGluZyB0byB2UEUgcmVzaWRlbnQpLCBsZXQgdGhlIEdJQyBhbmQgdGhlIENQVSB3b3JrIGluCj4+
+PiBwYXJhbGxlbCBvbiB0aGUgZW50cnkgcGF0aC4KPj4+IAo+Pj4gU2lnbmVkLW9mZi1ieTogU2hl
+bm1pbmcgTHUgPGx1c2hlbm1pbmdAaHVhd2VpLmNvbT4KPj4+IC0tLQo+Pj4gwqBhcmNoL2FybTY0
+L2t2bS92Z2ljL3ZnaWMtdjQuY8KgwqDCoMKgwqAgfCAxNiArKysrKysrKysrKysrKysrCj4+PiDC
+oGFyY2gvYXJtNjQva3ZtL3ZnaWMvdmdpYy5jwqDCoMKgwqDCoMKgwqDCoCB8wqAgMyArKysKPj4+
+IMKgZHJpdmVycy9pcnFjaGlwL2lycS1naWMtdjMtaXRzLmPCoMKgIHwgMTYgKysrKysrKysrKysr
+LS0tLQo+Pj4gwqBkcml2ZXJzL2lycWNoaXAvaXJxLWdpYy12NC5jwqDCoMKgwqDCoMKgIHwgMTEg
+KysrKysrKysrKysKPj4+IMKgaW5jbHVkZS9rdm0vYXJtX3ZnaWMuaMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoCB8wqAgMyArKysKPj4+IMKgaW5jbHVkZS9saW51eC9pcnFjaGlwL2FybS1naWMtdjQu
+aCB8wqAgNCArKysrCj4+PiDCoDYgZmlsZXMgY2hhbmdlZCwgNDkgaW5zZXJ0aW9ucygrKSwgNCBk
+ZWxldGlvbnMoLSkKPj4+IAo+Pj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL3ZnaWMvdmdp
+Yy12NC5jIAo+Pj4gYi9hcmNoL2FybTY0L2t2bS92Z2ljL3ZnaWMtdjQuYwo+Pj4gaW5kZXggYjVm
+YTczYzlmZDM1Li5iMGRhNzQ4MDkxODcgMTAwNjQ0Cj4+PiAtLS0gYS9hcmNoL2FybTY0L2t2bS92
+Z2ljL3ZnaWMtdjQuYwo+Pj4gKysrIGIvYXJjaC9hcm02NC9rdm0vdmdpYy92Z2ljLXY0LmMKPj4+
+IEBAIC0zNTMsNiArMzUzLDIyIEBAIGludCB2Z2ljX3Y0X2xvYWQoc3RydWN0IGt2bV92Y3B1ICp2
+Y3B1KQo+Pj4gwqDCoMKgwqAgcmV0dXJuIGVycjsKPj4+IMKgfQo+Pj4gCj4+PiArdm9pZCB2Z2lj
+X3Y0X2NvbW1pdChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCj4+PiArewo+Pj4gK8KgwqDCoCBzdHJ1
+Y3QgaXRzX3ZwZSAqdnBlID0gJnZjcHUtPmFyY2gudmdpY19jcHUudmdpY192My5pdHNfdnBlOwo+
+Pj4gKwo+Pj4gK8KgwqDCoCAvKgo+Pj4gK8KgwqDCoMKgICogTm8gbmVlZCB0byB3YWl0IGZvciB0
+aGUgdlBFIHRvIGJlIHJlYWR5IGFjcm9zcyBhIHNoYWxsb3cgCj4+PiBndWVzdAo+Pj4gK8KgwqDC
+oMKgICogZXhpdCwgYXMgb25seSBhIHZjcHVfcHV0IHdpbGwgaW52YWxpZGF0ZSBpdC4KPj4+ICvC
+oMKgwqDCoCAqLwo+Pj4gK8KgwqDCoCBpZiAodnBlLT52cGVfcmVhZHkpCj4+PiArwqDCoMKgwqDC
+oMKgwqAgcmV0dXJuOwo+Pj4gKwo+Pj4gK8KgwqDCoCBpdHNfY29tbWl0X3ZwZSh2cGUpOwo+Pj4g
+Kwo+Pj4gK8KgwqDCoCB2cGUtPnZwZV9yZWFkeSA9IHRydWU7Cj4+IAo+PiBUaGlzIHNob3VsZCBi
+ZSB3cml0dGVuIGFzOgo+PiAKPj4gaWYgKCFyZWFkeSkKPj4gwqDCoMKgwqAgY29tbWl0KCk7Cj4+
+IAo+PiBhbmQgcmVhZHkgYmVpbmcgZHJpdmVuIGJ5IHRoZSBjb21taXQoKSBjYWxsIGl0c2VsZi4K
+Pj4gCj4+PiArfQo+Pj4gKwo+Pj4gwqBzdGF0aWMgc3RydWN0IHZnaWNfaXRzICp2Z2ljX2dldF9p
+dHMoc3RydWN0IGt2bSAqa3ZtLAo+Pj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgIHN0cnVjdCBrdm1fa2VybmVsX2lycV9yb3V0aW5nX2VudHJ5ICppcnFfZW50cnkp
+Cj4+PiDCoHsKPj4+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2t2bS92Z2ljL3ZnaWMuYyBiL2Fy
+Y2gvYXJtNjQva3ZtL3ZnaWMvdmdpYy5jCj4+PiBpbmRleCBjMzY0M2I3ZjEwMWIuLjFjNTk3Yzk4
+ODVmYSAxMDA2NDQKPj4+IC0tLSBhL2FyY2gvYXJtNjQva3ZtL3ZnaWMvdmdpYy5jCj4+PiArKysg
+Yi9hcmNoL2FybTY0L2t2bS92Z2ljL3ZnaWMuYwo+Pj4gQEAgLTkxNSw2ICs5MTUsOSBAQCB2b2lk
+IGt2bV92Z2ljX2ZsdXNoX2h3c3RhdGUoc3RydWN0IGt2bV92Y3B1IAo+Pj4gKnZjcHUpCj4+PiAK
+Pj4+IMKgwqDCoMKgIGlmIChjYW5fYWNjZXNzX3ZnaWNfZnJvbV9rZXJuZWwoKSkKPj4+IMKgwqDC
+oMKgwqDCoMKgwqAgdmdpY19yZXN0b3JlX3N0YXRlKHZjcHUpOwo+Pj4gKwo+Pj4gK8KgwqDCoCBp
+ZiAodmdpY19zdXBwb3J0c19kaXJlY3RfbXNpcyh2Y3B1LT5rdm0pKQo+Pj4gK8KgwqDCoMKgwqDC
+oMKgIHZnaWNfdjRfY29tbWl0KHZjcHUpOwo+Pj4gwqB9Cj4+PiAKPj4+IMKgdm9pZCBrdm1fdmdp
+Y19sb2FkKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKPj4+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2ly
+cWNoaXAvaXJxLWdpYy12My1pdHMuYyAKPj4+IGIvZHJpdmVycy9pcnFjaGlwL2lycS1naWMtdjMt
+aXRzLmMKPj4+IGluZGV4IDIyZjQyNzEzNWM2Yi4uZjMwYWJhMTQ5MzNlIDEwMDY0NAo+Pj4gLS0t
+IGEvZHJpdmVycy9pcnFjaGlwL2lycS1naWMtdjMtaXRzLmMKPj4+ICsrKyBiL2RyaXZlcnMvaXJx
+Y2hpcC9pcnEtZ2ljLXYzLWl0cy5jCj4+PiBAQCAtMzg0Miw4ICszODQyLDYgQEAgc3RhdGljIHZv
+aWQgaXRzX3ZwZV9zY2hlZHVsZShzdHJ1Y3QgaXRzX3ZwZSAKPj4+ICp2cGUpCj4+PiDCoMKgwqDC
+oCB2YWwgfD0gdnBlLT5pZGFpID8gR0lDUl9WUEVOREJBU0VSX0lEQUkgOiAwOwo+Pj4gwqDCoMKg
+wqAgdmFsIHw9IEdJQ1JfVlBFTkRCQVNFUl9WYWxpZDsKPj4+IMKgwqDCoMKgIGdpY3Jfd3JpdGVf
+dnBlbmRiYXNlcih2YWwsIHZscGlfYmFzZSArIEdJQ1JfVlBFTkRCQVNFUik7Cj4+PiAtCj4+PiAt
+wqDCoMKgIGl0c193YWl0X3ZwdF9wYXJzZV9jb21wbGV0ZSgpOwo+Pj4gwqB9Cj4+PiAKPj4+IMKg
+c3RhdGljIHZvaWQgaXRzX3ZwZV9kZXNjaGVkdWxlKHN0cnVjdCBpdHNfdnBlICp2cGUpCj4+PiBA
+QCAtMzg1NSw2ICszODUzLDggQEAgc3RhdGljIHZvaWQgaXRzX3ZwZV9kZXNjaGVkdWxlKHN0cnVj
+dCBpdHNfdnBlIAo+Pj4gKnZwZSkKPj4+IAo+Pj4gwqDCoMKgwqAgdnBlLT5pZGFpID0gISEodmFs
+ICYgR0lDUl9WUEVOREJBU0VSX0lEQUkpOwo+Pj4gwqDCoMKgwqAgdnBlLT5wZW5kaW5nX2xhc3Qg
+PSAhISh2YWwgJiBHSUNSX1ZQRU5EQkFTRVJfUGVuZGluZ0xhc3QpOwo+Pj4gKwo+Pj4gK8KgwqDC
+oCB2cGUtPnZwZV9yZWFkeSA9IGZhbHNlOwo+PiAKPj4gVGhpcyBzaG91bGQgYmUgc2V0IGZyb20g
+dGhlIGl0c19tYWtlX3ZwZV9ub25fcmVzaWRlbnQoKSBjYWxsLgo+PiAKPj4+IMKgfQo+Pj4gCj4+
+PiDCoHN0YXRpYyB2b2lkIGl0c192cGVfaW52YWxsKHN0cnVjdCBpdHNfdnBlICp2cGUpCj4+PiBA
+QCAtMzg5MSw2ICszODkxLDEwIEBAIHN0YXRpYyBpbnQgaXRzX3ZwZV9zZXRfdmNwdV9hZmZpbml0
+eShzdHJ1Y3QKPj4+IGlycV9kYXRhICpkLCB2b2lkICp2Y3B1X2luZm8pCj4+PiDCoMKgwqDCoMKg
+wqDCoMKgIGl0c192cGVfZGVzY2hlZHVsZSh2cGUpOwo+Pj4gwqDCoMKgwqDCoMKgwqDCoCByZXR1
+cm4gMDsKPj4+IAo+Pj4gK8KgwqDCoCBjYXNlIENPTU1JVF9WUEU6Cj4+PiArwqDCoMKgwqDCoMKg
+wqAgaXRzX3dhaXRfdnB0X3BhcnNlX2NvbXBsZXRlKCk7Cj4+PiArwqDCoMKgwqDCoMKgwqAgcmV0
+dXJuIDA7Cj4+PiArCj4+PiDCoMKgwqDCoCBjYXNlIElOVkFMTF9WUEU6Cj4+PiDCoMKgwqDCoMKg
+wqDCoMKgIGl0c192cGVfaW52YWxsKHZwZSk7Cj4+PiDCoMKgwqDCoMKgwqDCoMKgIHJldHVybiAw
+Owo+Pj4gQEAgLTQwNTIsOCArNDA1Niw2IEBAIHN0YXRpYyB2b2lkIGl0c192cGVfNF8xX3NjaGVk
+dWxlKHN0cnVjdCBpdHNfdnBlIAo+Pj4gKnZwZSwKPj4+IMKgwqDCoMKgIHZhbCB8PSBGSUVMRF9Q
+UkVQKEdJQ1JfVlBFTkRCQVNFUl80XzFfVlBFSUQsIHZwZS0+dnBlX2lkKTsKPj4+IAo+Pj4gwqDC
+oMKgwqAgZ2ljcl93cml0ZV92cGVuZGJhc2VyKHZhbCwgdmxwaV9iYXNlICsgR0lDUl9WUEVOREJB
+U0VSKTsKPj4+IC0KPj4+IC3CoMKgwqAgaXRzX3dhaXRfdnB0X3BhcnNlX2NvbXBsZXRlKCk7Cj4+
+PiDCoH0KPj4+IAo+Pj4gwqBzdGF0aWMgdm9pZCBpdHNfdnBlXzRfMV9kZXNjaGVkdWxlKHN0cnVj
+dCBpdHNfdnBlICp2cGUsCj4+PiBAQCAtNDA5MSw2ICs0MDkzLDggQEAgc3RhdGljIHZvaWQgaXRz
+X3ZwZV80XzFfZGVzY2hlZHVsZShzdHJ1Y3QgCj4+PiBpdHNfdnBlICp2cGUsCj4+PiDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgR0lDUl9WUEVOREJBU0VS
+X1BlbmRpbmdMYXN0KTsKPj4+IMKgwqDCoMKgwqDCoMKgwqAgdnBlLT5wZW5kaW5nX2xhc3QgPSB0
+cnVlOwo+Pj4gwqDCoMKgwqAgfQo+Pj4gKwo+Pj4gK8KgwqDCoCB2cGUtPnZwZV9yZWFkeSA9IGZh
+bHNlOwo+Pj4gwqB9Cj4+PiAKPj4+IMKgc3RhdGljIHZvaWQgaXRzX3ZwZV80XzFfaW52YWxsKHN0
+cnVjdCBpdHNfdnBlICp2cGUpCj4+PiBAQCAtNDEyOCw2ICs0MTMyLDEwIEBAIHN0YXRpYyBpbnQg
+Cj4+PiBpdHNfdnBlXzRfMV9zZXRfdmNwdV9hZmZpbml0eShzdHJ1Y3QKPj4+IGlycV9kYXRhICpk
+LCB2b2lkICp2Y3B1X2luZm8pCj4+PiDCoMKgwqDCoMKgwqDCoMKgIGl0c192cGVfNF8xX2Rlc2No
+ZWR1bGUodnBlLCBpbmZvKTsKPj4+IMKgwqDCoMKgwqDCoMKgwqAgcmV0dXJuIDA7Cj4+PiAKPj4+
+ICvCoMKgwqAgY2FzZSBDT01NSVRfVlBFOgo+Pj4gK8KgwqDCoMKgwqDCoMKgIGl0c193YWl0X3Zw
+dF9wYXJzZV9jb21wbGV0ZSgpOwo+Pj4gK8KgwqDCoMKgwqDCoMKgIHJldHVybiAwOwo+Pj4gKwo+
+Pj4gwqDCoMKgwqAgY2FzZSBJTlZBTExfVlBFOgo+Pj4gwqDCoMKgwqDCoMKgwqDCoCBpdHNfdnBl
+XzRfMV9pbnZhbGwodnBlKTsKPj4+IMKgwqDCoMKgwqDCoMKgwqAgcmV0dXJuIDA7Cj4+PiBkaWZm
+IC0tZ2l0IGEvZHJpdmVycy9pcnFjaGlwL2lycS1naWMtdjQuYyAKPj4+IGIvZHJpdmVycy9pcnFj
+aGlwL2lycS1naWMtdjQuYwo+Pj4gaW5kZXggMGMxODcxNGFlMTNlLi42Y2VhNzFhNGU2OGIgMTAw
+NjQ0Cj4+PiAtLS0gYS9kcml2ZXJzL2lycWNoaXAvaXJxLWdpYy12NC5jCj4+PiArKysgYi9kcml2
+ZXJzL2lycWNoaXAvaXJxLWdpYy12NC5jCj4+PiBAQCAtMjU4LDYgKzI1OCwxNyBAQCBpbnQgaXRz
+X21ha2VfdnBlX3Jlc2lkZW50KHN0cnVjdCBpdHNfdnBlICp2cGUsCj4+PiBib29sIGcwZW4sIGJv
+b2wgZzFlbikKPj4+IMKgwqDCoMKgIHJldHVybiByZXQ7Cj4+PiDCoH0KPj4+IAo+Pj4gK2ludCBp
+dHNfY29tbWl0X3ZwZShzdHJ1Y3QgaXRzX3ZwZSAqdnBlKQo+Pj4gK3sKPj4+ICvCoMKgwqAgc3Ry
+dWN0IGl0c19jbWRfaW5mbyBpbmZvID0gewo+Pj4gK8KgwqDCoMKgwqDCoMKgIC5jbWRfdHlwZSA9
+IENPTU1JVF9WUEUsCj4+PiArwqDCoMKgIH07Cj4+PiArCj4+PiArwqDCoMKgIFdBUk5fT04ocHJl
+ZW1wdGlibGUoKSk7Cj4+PiArCj4+PiArwqDCoMKgIHJldHVybiBpdHNfc2VuZF92cGVfY21kKHZw
+ZSwgJmluZm8pOwo+Pj4gK30KPj4+ICsKPj4+IMKgaW50IGl0c19pbnZhbGxfdnBlKHN0cnVjdCBp
+dHNfdnBlICp2cGUpCj4+PiDCoHsKPj4+IMKgwqDCoMKgIHN0cnVjdCBpdHNfY21kX2luZm8gaW5m
+byA9IHsKPj4+IGRpZmYgLS1naXQgYS9pbmNsdWRlL2t2bS9hcm1fdmdpYy5oIGIvaW5jbHVkZS9r
+dm0vYXJtX3ZnaWMuaAo+Pj4gaW5kZXggYThkOGZkY2QzNzIzLi5mMjE3MGRmNmNmN2MgMTAwNjQ0
+Cj4+PiAtLS0gYS9pbmNsdWRlL2t2bS9hcm1fdmdpYy5oCj4+PiArKysgYi9pbmNsdWRlL2t2bS9h
+cm1fdmdpYy5oCj4+PiBAQCAtNDAxLDcgKzQwMSwxMCBAQCBpbnQga3ZtX3ZnaWNfdjRfc2V0X2Zv
+cndhcmRpbmcoc3RydWN0IGt2bSAqa3ZtLCAKPj4+IGludCBpcnEsCj4+PiDCoGludCBrdm1fdmdp
+Y192NF91bnNldF9mb3J3YXJkaW5nKHN0cnVjdCBrdm0gKmt2bSwgaW50IGlycSwKPj4+IMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgc3RydWN0IGt2bV9rZXJuZWxfaXJxX3JvdXRp
+bmdfZW50cnkgKmlycV9lbnRyeSk7Cj4+PiAKPj4+ICt2b2lkIHZnaWNfdjRfY29tbWl0KHN0cnVj
+dCBrdm1fdmNwdSAqdmNwdSk7Cj4+PiArCj4+PiDCoGludCB2Z2ljX3Y0X2xvYWQoc3RydWN0IGt2
+bV92Y3B1ICp2Y3B1KTsKPj4+ICsKPj4gCj4+IFNwdXJpb3VzIG5ldyBsaW5lcy4KPj4gCj4+PiDC
+oGludCB2Z2ljX3Y0X3B1dChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIGJvb2wgbmVlZF9kYik7Cj4+
+PiAKPj4+IMKgI2VuZGlmIC8qIF9fS1ZNX0FSTV9WR0lDX0ggKi8KPj4+IGRpZmYgLS1naXQgYS9p
+bmNsdWRlL2xpbnV4L2lycWNoaXAvYXJtLWdpYy12NC5oCj4+PiBiL2luY2x1ZGUvbGludXgvaXJx
+Y2hpcC9hcm0tZ2ljLXY0LmgKPj4+IGluZGV4IDY5NzZiODMzMWI2MC4uOTM2ZDg4ZTQ4MmE5IDEw
+MDY0NAo+Pj4gLS0tIGEvaW5jbHVkZS9saW51eC9pcnFjaGlwL2FybS1naWMtdjQuaAo+Pj4gKysr
+IGIvaW5jbHVkZS9saW51eC9pcnFjaGlwL2FybS1naWMtdjQuaAo+Pj4gQEAgLTc1LDYgKzc1LDgg
+QEAgc3RydWN0IGl0c192cGUgewo+Pj4gwqDCoMKgwqAgdTE2wqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oCB2cGVfaWQ7Cj4+PiDCoMKgwqDCoCAvKiBQZW5kaW5nIFZMUElzIG9uIHNjaGVkdWxlIG91dD8g
+Ki8KPj4+IMKgwqDCoMKgIGJvb2zCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHBlbmRpbmdfbGFzdDsK
+Pj4+ICvCoMKgwqAgLyogVlBUIHBhcnNlIGNvbXBsZXRlICovCj4+PiArwqDCoMKgIGJvb2zCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgIHZwZV9yZWFkeTsKPj4+IMKgfTsKPj4+IAo+Pj4gwqAvKgo+Pj4g
+QEAgLTEwNCw2ICsxMDYsNyBAQCBlbnVtIGl0c192Y3B1X2luZm9fY21kX3R5cGUgewo+Pj4gwqDC
+oMKgwqAgUFJPUF9VUERBVEVfQU5EX0lOVl9WTFBJLAo+Pj4gwqDCoMKgwqAgU0NIRURVTEVfVlBF
+LAo+Pj4gwqDCoMKgwqAgREVTQ0hFRFVMRV9WUEUsCj4+PiArwqDCoMKgIENPTU1JVF9WUEUsCj4+
+PiDCoMKgwqDCoCBJTlZBTExfVlBFLAo+Pj4gwqDCoMKgwqAgUFJPUF9VUERBVEVfVlNHSSwKPj4+
+IMKgfTsKPj4+IEBAIC0xMjksNiArMTMyLDcgQEAgaW50IGl0c19hbGxvY192Y3B1X2lycXMoc3Ry
+dWN0IGl0c192bSAqdm0pOwo+Pj4gwqB2b2lkIGl0c19mcmVlX3ZjcHVfaXJxcyhzdHJ1Y3QgaXRz
+X3ZtICp2bSk7Cj4+PiDCoGludCBpdHNfbWFrZV92cGVfcmVzaWRlbnQoc3RydWN0IGl0c192cGUg
+KnZwZSwgYm9vbCBnMGVuLCBib29sIAo+Pj4gZzFlbik7Cj4+PiDCoGludCBpdHNfbWFrZV92cGVf
+bm9uX3Jlc2lkZW50KHN0cnVjdCBpdHNfdnBlICp2cGUsIGJvb2wgZGIpOwo+Pj4gK2ludCBpdHNf
+Y29tbWl0X3ZwZShzdHJ1Y3QgaXRzX3ZwZSAqdnBlKTsKPj4+IMKgaW50IGl0c19pbnZhbGxfdnBl
+KHN0cnVjdCBpdHNfdnBlICp2cGUpOwo+Pj4gwqBpbnQgaXRzX21hcF92bHBpKGludCBpcnEsIHN0
+cnVjdCBpdHNfdmxwaV9tYXAgKm1hcCk7Cj4+PiDCoGludCBpdHNfZ2V0X3ZscGkoaW50IGlycSwg
+c3RydWN0IGl0c192bHBpX21hcCAqbWFwKTsKPj4gCj4+IEluIG9yZGVyIHRvIHNwZWVkIHVwIHRo
+ZSByZXNwaW4gcm91bmQtdHJpcCwgSSd2ZSB0YWtlbiB0aGUgbGliZXJ0eQo+PiB0byByZWZhY3Rv
+ciB0aGlzIHBhdGNoIG15c2VsZi4gUGxlYXNlIGhhdmUgYSBsb29rIGF0IFsxXSBhbmQgbGV0Cj4+
+IG1lIGtub3cgaWYgeW91J3JlIE9LIHdpdGggaXQuCj4gCj4gSSBoYXZlIGxvb2tlZCBhdCBpdCBh
+bmQgYW0gT0suCj4gCj4gQnkgdGhlIHdheSwgd2lsbCB0aGUgZmlyc3QgcGF0Y2ggKHNldCB0aGUg
+ZGVsYXlfdXMgdG8gMSkgYmUgcGlja2VkIHVwCj4gdG9nZXRoZXI/CgpJJ2xsIHJvdXRlIGl0IHZp
+YSB0aGUgaXJxY2hpcCB0cmVlLgoKVGhhbmtzLAoKICAgICAgICAgTS4KLS0gCkphenogaXMgbm90
+IGRlYWQuIEl0IGp1c3Qgc21lbGxzIGZ1bm55Li4uCl9fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNz
+LmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3Rp
+bmZvL2t2bWFybQo=
