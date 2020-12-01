@@ -2,54 +2,57 @@ Return-Path: <SRS0=s1GN=FF=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C86DC71156
-	for <kvmarm@archiver.kernel.org>; Tue,  1 Dec 2020 15:00:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84033C64E7B
+	for <kvmarm@archiver.kernel.org>; Tue,  1 Dec 2020 15:00:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3A3C82076C
-	for <kvmarm@archiver.kernel.org>; Tue,  1 Dec 2020 15:00:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A3C82076C
+	by mail.kernel.org (Postfix) with ESMTP id D21092084C
+	for <kvmarm@archiver.kernel.org>; Tue,  1 Dec 2020 15:00:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D21092084C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B4FE4C17B;
-	Tue,  1 Dec 2020 10:00:45 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 59E5B4C282;
+	Tue,  1 Dec 2020 10:00:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id nZfTtkL7H0zI; Tue,  1 Dec 2020 10:00:44 -0500 (EST)
+	with ESMTP id vvJtpwZl0TbJ; Tue,  1 Dec 2020 10:00:50 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C0884C1F0;
-	Tue,  1 Dec 2020 10:00:44 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E7F2E4C287;
+	Tue,  1 Dec 2020 10:00:48 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C5E9D4C17B
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Dec 2020 10:00:42 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ECD974C270
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Dec 2020 10:00:47 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kn8DhQmJNt+X for <kvmarm@lists.cs.columbia.edu>;
- Tue,  1 Dec 2020 10:00:41 -0500 (EST)
+ with ESMTP id gP6GL2e1fB7P for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  1 Dec 2020 10:00:46 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E37F4B1DF
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Dec 2020 10:00:41 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 446C24C26F
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Dec 2020 10:00:45 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EFD7530E;
- Tue,  1 Dec 2020 07:00:40 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D0E9D30E;
+ Tue,  1 Dec 2020 07:00:44 -0800 (PST)
 Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 863B23F575;
- Tue,  1 Dec 2020 07:00:39 -0800 (PST)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E33A63F575;
+ Tue,  1 Dec 2020 07:00:43 -0800 (PST)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  maz@kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com,
  suzuki.poulose@arm.com
-Subject: [PATCH 0/5] KVM: arm64: Miscellaneous improvements
-Date: Tue,  1 Dec 2020 15:01:52 +0000
-Message-Id: <20201201150157.223625-1-alexandru.elisei@arm.com>
+Subject: [PATCH 3/5] KVM: arm64: Move double-checked lock to
+ kvm_vgic_map_resources()
+Date: Tue,  1 Dec 2020 15:01:55 +0000
+Message-Id: <20201201150157.223625-4-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.29.2
+In-Reply-To: <20201201150157.223625-1-alexandru.elisei@arm.com>
+References: <20201201150157.223625-1-alexandru.elisei@arm.com>
 MIME-Version: 1.0
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -67,55 +70,94 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The documentation update in the first patch was suggested by Marc [1]. When
-I was going through the code to track down all the places error codes were
-coming from I noticed a few things that in my opinion could be improved.
-The following patches aim to do just that. I'm fine dropping them if the
-churn looks unjustified.
+kvm_vgic_map_resources() is called when a VCPU if first run and it maps all
+the VGIC MMIO regions. To prevent double-initialization, the VGIC uses the
+ready variable to keep track of the state of resources and the global KVM
+mutex to protect against concurrent accesses. After the lock is taken, the
+variable is checked again in case another VCPU took the lock between the
+current VCPU reading ready equals false and taking the lock.
 
-Tested the Documentation changes by building pdfdocs, didn't notice any
-warnings regarding api.rst.
+The double-checked lock pattern is spread across four different functions:
+in kvm_vcpu_first_run_init(), in kvm_vgic_map_resource() and in
+vgic_{v2,v3}_map_resources(), which makes it hard to reason about and
+introduces minor code duplication. Consolidate the checks in
+kvm_vgic_map_resources(), where the lock is taken.
 
-Tested the other patches on a rockpro64 on the little cores. I ran
-kvm-unit-tests with qemu and kvmtool. I also ran a Linux guest with qemu
-and ran perf:
+No functional change intended.
 
-$ perf record -a -- iperf3 -c 127.0.0.1 -t 60
-
-I checked that interrupts were firing and nothing looked out of the
-ordinary. I used qemu because qemu VCPUs do initialization concurrently
-from their own thread, not from the main thread like kvmtool.
-
-To check that kvm_timer_enable() is never reached if the VGIC is not
-initialized, I hacked kvmtool to remove the ioctl
-KVM_DEV_ARM_VGIC_GRP_CTRL(KVM_DEV_ARM_VGIC_CTRL_INIT) from gic__init_gic().
-When trying to run a guest, I got the following error message:
-
-KVM_RUN failed: Device or resource busy
-
-which is consistent with the EBUSY return code from
-vgic_v3_map_resources(). Double checked that that's where the code is
-coming from by adding a pr_info statement to
-kvm_arch_vcpu_first_run_init().
-
-[1] https://www.spinics.net/lists/arm-kernel/msg858024.html
-
-Alexandru Elisei (5):
-  KVM: Documentation: Add arm64 KVM_RUN error codes
-  KVM: arm64: arch_timer: Remove VGIC initialization check
-  KVM: arm64: Move double-checked lock to kvm_vgic_map_resources()
-  KVM: arm64: Update comment in kvm_vgic_map_resources()
-  KVM: arm64: Remove redundant call to kvm_pmu_vcpu_reset()
-
- Documentation/virt/kvm/api.rst  | 9 +++++++--
- arch/arm64/kvm/arch_timer.c     | 3 ---
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+---
  arch/arm64/kvm/arm.c            | 8 +++-----
- arch/arm64/kvm/pmu-emul.c       | 2 --
- arch/arm64/kvm/vgic/vgic-init.c | 9 ++++++++-
+ arch/arm64/kvm/vgic/vgic-init.c | 6 ++++++
  arch/arm64/kvm/vgic/vgic-v2.c   | 3 ---
  arch/arm64/kvm/vgic/vgic-v3.c   | 3 ---
- 7 files changed, 18 insertions(+), 19 deletions(-)
+ 4 files changed, 9 insertions(+), 11 deletions(-)
 
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 9d69d2bf6943..65a5e89f5133 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -530,11 +530,9 @@ static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
+ 		 * Map the VGIC hardware resources before running a vcpu the
+ 		 * first time on this VM.
+ 		 */
+-		if (unlikely(!vgic_ready(kvm))) {
+-			ret = kvm_vgic_map_resources(kvm);
+-			if (ret)
+-				return ret;
+-		}
++		ret = kvm_vgic_map_resources(kvm);
++		if (ret)
++			return ret;
+ 	} else {
+ 		/*
+ 		 * Tell the rest of the code that there are userspace irqchip
+diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+index 32e32d67a127..a2f4d1c85f00 100644
+--- a/arch/arm64/kvm/vgic/vgic-init.c
++++ b/arch/arm64/kvm/vgic/vgic-init.c
+@@ -428,7 +428,13 @@ int kvm_vgic_map_resources(struct kvm *kvm)
+ 	struct vgic_dist *dist = &kvm->arch.vgic;
+ 	int ret = 0;
+ 
++	if (likely(vgic_ready(kvm)))
++		return 0;
++
+ 	mutex_lock(&kvm->lock);
++	if (vgic_ready(kvm))
++		goto out;
++
+ 	if (!irqchip_in_kernel(kvm))
+ 		goto out;
+ 
+diff --git a/arch/arm64/kvm/vgic/vgic-v2.c b/arch/arm64/kvm/vgic/vgic-v2.c
+index ebf53a4e1296..7f38c1a93639 100644
+--- a/arch/arm64/kvm/vgic/vgic-v2.c
++++ b/arch/arm64/kvm/vgic/vgic-v2.c
+@@ -306,9 +306,6 @@ int vgic_v2_map_resources(struct kvm *kvm)
+ 	struct vgic_dist *dist = &kvm->arch.vgic;
+ 	int ret = 0;
+ 
+-	if (vgic_ready(kvm))
+-		goto out;
+-
+ 	if (IS_VGIC_ADDR_UNDEF(dist->vgic_dist_base) ||
+ 	    IS_VGIC_ADDR_UNDEF(dist->vgic_cpu_base)) {
+ 		kvm_err("Need to set vgic cpu and dist addresses first\n");
+diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+index 9cdf39a94a63..35029c5cb0f1 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-v3.c
+@@ -500,9 +500,6 @@ int vgic_v3_map_resources(struct kvm *kvm)
+ 	int ret = 0;
+ 	int c;
+ 
+-	if (vgic_ready(kvm))
+-		goto out;
+-
+ 	kvm_for_each_vcpu(c, vcpu, kvm) {
+ 		struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+ 
 -- 
 2.29.2
 
