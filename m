@@ -2,67 +2,93 @@ Return-Path: <SRS0=s1GN=FF=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E4FDC71155
-	for <kvmarm@archiver.kernel.org>; Tue,  1 Dec 2020 11:02:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 113DFC64E7A
+	for <kvmarm@archiver.kernel.org>; Tue,  1 Dec 2020 11:50:09 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 52382206CB
-	for <kvmarm@archiver.kernel.org>; Tue,  1 Dec 2020 11:02:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52382206CB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 3ABEA2085B
+	for <kvmarm@archiver.kernel.org>; Tue,  1 Dec 2020 11:50:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="S4VW9Sgn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3ABEA2085B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D2D3E4B9C8;
-	Tue,  1 Dec 2020 06:02:50 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 71D464C1DA;
+	Tue,  1 Dec 2020 06:50:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 7m5JPpzhch5G; Tue,  1 Dec 2020 06:02:49 -0500 (EST)
+	with ESMTP id LcU9ngtpM6qt; Tue,  1 Dec 2020 06:50:06 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DD964B9DC;
-	Tue,  1 Dec 2020 06:02:47 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 54D1F4C1DC;
+	Tue,  1 Dec 2020 06:50:06 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BE6B04BDF7
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Dec 2020 04:38:28 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E9574C1DC
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Dec 2020 06:50:05 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0a6JVdgEF5TW for <kvmarm@lists.cs.columbia.edu>;
- Tue,  1 Dec 2020 04:38:26 -0500 (EST)
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CBF034BDB5
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Dec 2020 04:38:25 -0500 (EST)
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
- by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4ClcTc5vX0z72pS;
- Tue,  1 Dec 2020 17:37:56 +0800 (CST)
-Received: from [127.0.0.1] (10.57.22.126) by DGGEMS413-HUB.china.huawei.com
- (10.3.19.213) with Microsoft SMTP Server id 14.3.487.0; Tue, 1 Dec 2020
- 17:38:12 +0800
-Subject: Re: [RFC PATCH v1 1/4] irqchip/gic-v4.1: Plumb get_irqchip_state VLPI
- callback
-To: Marc Zyngier <maz@kernel.org>
-References: <20201123065410.1915-1-lushenming@huawei.com>
- <20201123065410.1915-2-lushenming@huawei.com>
- <869dbc36-c510-fd00-407a-b05e068537c8@huawei.com>
- <875z5p6ayp.wl-maz@kernel.org>
-From: luojiaxing <luojiaxing@huawei.com>
-Message-ID: <316fe41d-f004-f004-4f31-6fe6e7ff64b7@huawei.com>
-Date: Tue, 1 Dec 2020 17:38:12 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+ with ESMTP id RYUxVgznY-c6 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  1 Dec 2020 06:50:04 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0FBAA4C1DA
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Dec 2020 06:50:04 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 9726820770;
+ Tue,  1 Dec 2020 11:50:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1606823402;
+ bh=UE/XVXCsi7+x/uyIjMjMl6em1uv7ikjqa7mp1FXveyA=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=S4VW9Sgn7iW1ndWIZxYcNhZNcYzrdu4YLpAlGR+L9NWq1kn48g6Y4AjQsLMUboqDi
+ px82TrnsP+fOea64waKx9MDPGYbxyC/mmTjMV2SDQGdhlKvlPPX3OrDSqCpOMwmDfU
+ pi97M7j6fHneG9TEh+N29owEJN700T5yy5JzU9kQ=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
+ TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1kk4AS-00F1ps-IO; Tue, 01 Dec 2020 11:50:00 +0000
 MIME-Version: 1.0
-In-Reply-To: <875z5p6ayp.wl-maz@kernel.org>
-Content-Language: en-US
-X-Originating-IP: [10.57.22.126]
-X-CFilter-Loop: Reflected
-X-Mailman-Approved-At: Tue, 01 Dec 2020 06:02:46 -0500
-Cc: Cornelia Huck <cohuck@redhat.com>, Neo Jia <cjia@nvidia.com>,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Kirti Wankhede <kwankhede@nvidia.com>, Shenming Lu <lushenming@huawei.com>,
+Date: Tue, 01 Dec 2020 11:50:00 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Shenming Lu <lushenming@huawei.com>
+Subject: Re: [RFC PATCH v1 3/4] KVM: arm64: GICv4.1: Restore VLPI's pending
+ state to physical side
+In-Reply-To: <9b80d460-e149-20c8-e9b3-e695310b4ed1@huawei.com>
+References: <20201123065410.1915-1-lushenming@huawei.com>
+ <20201123065410.1915-4-lushenming@huawei.com>
+ <5c724bb83730cdd5dcf7add9a812fa92@kernel.org>
+ <b03edcf2-2950-572f-fd31-601d8d766c80@huawei.com>
+ <2d2bcae4f871d239a1af50362f5c11a4@kernel.org>
+ <49610291-cf57-ff78-d0ac-063af24efbb4@huawei.com>
+ <48c10467-30f3-9b5c-bbcb-533a51516dc5@huawei.com>
+ <2ad38077300bdcaedd2e3b073cd36743@kernel.org>
+ <9b80d460-e149-20c8-e9b3-e695310b4ed1@huawei.com>
+User-Agent: Roundcube Webmail/1.4.9
+Message-ID: <274dafb2e21f49326a64bb575e668793@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: lushenming@huawei.com, james.morse@arm.com,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, eric.auger@redhat.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org, christoffer.dall@arm.com,
+ alex.williamson@redhat.com, kwankhede@nvidia.com, cohuck@redhat.com,
+ cjia@nvidia.com, wanghaibin.wang@huawei.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Neo Jia <cjia@nvidia.com>, kvm@vger.kernel.org,
+ Cornelia Huck <cohuck@redhat.com>, linux-kernel@vger.kernel.org,
+ Kirti Wankhede <kwankhede@nvidia.com>,
  Alex Williamson <alex.williamson@redhat.com>, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -76,77 +102,57 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Ck9uIDIwMjAvMTEvMjggMTg6MTgsIE1hcmMgWnluZ2llciB3cm90ZToKPiBPbiBTYXQsIDI4IE5v
-diAyMDIwIDA3OjE5OjQ4ICswMDAwLAo+IGx1b2ppYXhpbmcgPGx1b2ppYXhpbmdAaHVhd2VpLmNv
-bT4gd3JvdGU6Cj4+IEhpLCBzaGVubWluZwo+Pgo+Pgo+PiBJIGdvdCBmZXcgcXVlc3Rpb25zIGFi
-b3V0IHRoaXMgcGF0Y2guCj4+Cj4+IEFsdGhvdWdoIGl0J3MgYSBiaXQgbGF0ZSBhbmQgbm90IHZl
-cnkgYXBwcm9wcmlhdGUsIEknZCBsaWtlIHRvIGFzawo+PiBiZWZvcmUgeW91IHNlbmQgbmV4dCB2
-ZXJzaW9uLgo+Pgo+PiBPbiAyMDIwLzExLzIzIDE0OjU0LCBTaGVubWluZyBMdSB3cm90ZToKPj4+
-IEZyb206IFplbmdodWkgWXUgPHl1emVuZ2h1aUBodWF3ZWkuY29tPgo+Pj4KPj4+IFVwIHRvIG5v
-dywgdGhlIGlycV9nZXRfaXJxY2hpcF9zdGF0ZSgpIGNhbGxiYWNrIG9mIGl0c19pcnFfY2hpcAo+
-Pj4gbGVhdmVzIHVuaW1wbGVtZW50ZWQgc2luY2UgdGhlcmUgaXMgbm8gYXJjaGl0ZWN0dXJhbCB3
-YXkgdG8gZ2V0Cj4+PiB0aGUgVkxQSSdzIHBlbmRpbmcgc3RhdGUgYmVmb3JlIEdJQ3Y0LjEuIFll
-YWgsIHRoZXJlIGhhcyBvbmUgaW4KPj4+IHY0LjEgZm9yIFZMUElzLgo+Pgo+PiBJIGNoZWNrZWQg
-dGhlIGludm9raW5nIHNjZW5hcmlvIG9mIGlycV9nZXRfaXJxY2hpcF9zdGF0ZSBhbmQgZm91bmQg
-bm8KPj4gc2NlbmFyaW8gcmVsYXRlZCB0byB2TFBJLgo+Pgo+PiBGb3IgZXhhbXBsZSwgc3luY2hy
-b25pemVfaXJxKCksIGl0IHBhc3MgSVJRQ0hJUF9TVEFURV9BQ1RJVkUgdG8gd2hpY2gsCj4+IHNv
-IGluIHlvdXIgcGF0Y2gsIHlvdSB3aWxsIGRpcmVjdGx5IHJldHVybiBhbmQgb3RoZXIgaXMgZm9y
-IHZTR0ksCj4+IEdJQ0RfSVNQRU5EUiwgR0lDRF9JQ1BFTkRSIGFuZCBzbyBvbi4KPiBZb3UgZG8g
-cmVhbGlzZSB0aGF0IExQSXMgaGF2ZSBubyBhY3RpdmUgc3RhdGUsIHJpZ2h0PwoKCnllcywgSSBr
-bm93CgoKPiBBbmQgdGhhdCBMUElzCj4gaGF2ZSBhIHJhZGljYWxseSBkaWZmZXJlbnQgcHJvZ3Jh
-bW1pbmcgaW50ZXJmYWNlIHRvIHRoZSByZXN0IG9mIHRoZSBHSUM/CgoKSSBmb3VuZCBvdXQgdGhh
-dCBteSBtYWlsYm94IHNvZnR3YXJlIGZpbHRlcmVkIG91dCB0aGUgb3RoZXIgdHdvIHBhdGNoZXMs
-IAp3aGljaCBsZWQgbWUgdG8gbG9vayBhdCB0aGUgcGF0Y2ggYWxvbmUsIHNvIGl0IHdhcyB3ZWly
-ZC4gSSBhbHJlYWR5IGdvdCAKdGhlIGFuc3dlciBub3cuCgoKPj4gVGhlIG9ubHkgb25lIEkgYW0g
-bm90IHN1cmUgaXMgdmdpY19nZXRfcGh5c19saW5lX2xldmVsKCksIGlzIGl0IHlvdXIKPj4gcHVy
-cG9zZSB0byBmaWxsIHRoaXMgY2FsbGJhY2ssIG9yIHNvbWUgc2NlbmFyaW9zIEkgZG9uJ3Qga25v
-dyBhYm91dAo+PiB0aGF0IHVzZSB0aGlzIGNhbGxiYWNrLgo+IExQSXMgb25seSBvZmZlciBlZGdl
-IHNpZ25hbGxpbmcsIHNvIHRoZSBjb25jZXB0IG9mICJsaW5lIGxldmVsIiBtZWFucwo+IGFic29s
-dXRlbHkgbm90aGluZy4KPgo+Pgo+Pj4gV2l0aCBHSUN2NC4xLCBhZnRlciB1bm1hcHBpbmcgdGhl
-IHZQRSwgd2hpY2ggY2xlYW5zIGFuZCBpbnZhbGlkYXRlcwo+Pj4gYW55IGNhY2hpbmcgb2YgdGhl
-IFZQVCwgd2UgY2FuIGdldCB0aGUgVkxQSSdzIHBlbmRpbmcgc3RhdGUgYnkKPj4+IHBlZWtpbmcg
-YXQgdGhlIFZQVC4gU28gd2UgaW1wbGVtZW50IHRoZSBpcnFfZ2V0X2lycWNoaXBfc3RhdGUoKQo+
-Pj4gY2FsbGJhY2sgb2YgaXRzX2lycV9jaGlwIHRvIGRvIGl0Lgo+Pj4KPj4+IFNpZ25lZC1vZmYt
-Ynk6IFplbmdodWkgWXUgPHl1emVuZ2h1aUBodWF3ZWkuY29tPgo+Pj4gU2lnbmVkLW9mZi1ieTog
-U2hlbm1pbmcgTHUgPGx1c2hlbm1pbmdAaHVhd2VpLmNvbT4KPj4+IC0tLQo+Pj4gICAgZHJpdmVy
-cy9pcnFjaGlwL2lycS1naWMtdjMtaXRzLmMgfCAzOCArKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKwo+Pj4gICAgMSBmaWxlIGNoYW5nZWQsIDM4IGluc2VydGlvbnMoKykKPj4+Cj4+PiBk
-aWZmIC0tZ2l0IGEvZHJpdmVycy9pcnFjaGlwL2lycS1naWMtdjMtaXRzLmMgYi9kcml2ZXJzL2ly
-cWNoaXAvaXJxLWdpYy12My1pdHMuYwo+Pj4gaW5kZXggMGZlYzMxOTMxZTExLi4yODcwMDNjYWNh
-YzcgMTAwNjQ0Cj4+PiAtLS0gYS9kcml2ZXJzL2lycWNoaXAvaXJxLWdpYy12My1pdHMuYwo+Pj4g
-KysrIGIvZHJpdmVycy9pcnFjaGlwL2lycS1naWMtdjMtaXRzLmMKPj4+IEBAIC0xNjk1LDYgKzE2
-OTUsNDMgQEAgc3RhdGljIHZvaWQgaXRzX2lycV9jb21wb3NlX21zaV9tc2coc3RydWN0IGlycV9k
-YXRhICpkLCBzdHJ1Y3QgbXNpX21zZyAqbXNnKQo+Pj4gICAgCWlvbW11X2RtYV9jb21wb3NlX21z
-aV9tc2coaXJxX2RhdGFfZ2V0X21zaV9kZXNjKGQpLCBtc2cpOwo+Pj4gICAgfQo+Pj4gICAgK3N0
-YXRpYyBib29sIGl0c19wZWVrX3ZwdChzdHJ1Y3QgaXRzX3ZwZSAqdnBlLCBpcnFfaHdfbnVtYmVy
-X3QKPj4+IGh3aXJxKQo+Pj4gK3sKPj4+ICsJaW50IG1hc2sgPSBod2lycSAlIEJJVFNfUEVSX0JZ
-VEU7Cj4+PiArCXZvaWQgKnZhOwo+Pj4gKwl1OCAqcHQ7Cj4+PiArCj4+PiArCXZhID0gcGFnZV9h
-ZGRyZXNzKHZwZS0+dnB0X3BhZ2UpOwo+Pj4gKwlwdCA9IHZhICsgaHdpcnEgLyBCSVRTX1BFUl9C
-WVRFOwo+Pj4gKwo+Pj4gKwlyZXR1cm4gISEoKnB0ICYgKDFVIDw8IG1hc2spKTsKPj4KPj4gSG93
-IGNhbiB5b3UgY29uZmlybSB0aGF0IHRoZSBpbnRlcnJ1cHQgcGVuZGluZyBzdGF0dXMgaXMgdGhl
-IGxhdGVzdD8KPj4gSXMgaXQgcG9zc2libGUgdGhhdCB0aGUgaW50ZXJydXB0IHBlbmRpbmcgc3Rh
-dHVzIGlzIHN0aWxsIGNhY2hlZCBpbgo+PiB0aGUgR0lDUiBidXQgbm90IHN5bmNocm9uaXplZCB0
-byB0aGUgbWVtb3J5Lgo+IFRoYXQncyBhIGNvbnNlcXVlbmNlIG9mIHRoZSB2UEUgaGF2aW5nIGJl
-ZW4gdW5tYXBwZWQ6Cj4KPiAiQSBWTUFQUCB3aXRoIHtWLEFsbG9jfT09ezAsMX0gY2xlYW5zIGFu
-ZCBpbnZhbGlkYXRlcyBhbnkgY2FjaGluZyBvZgo+IHRoZSBWaXJ0dWFsIFBlbmRpbmcgVGFibGUg
-YW5kIFZpcnR1YWwgQ29uZmlndXJhdGlvbiBUYWJsZSBhc3NvY2lhdGVkCj4gd2l0aCB0aGUgdlBF
-SUQgaGVsZCBpbiB0aGUgR0lDLiIKCgpZZXMsIGluIGFkZGl0aW9uIHRvIHRoYXQsIGlmIGEgdlBF
-IGlzIHNjaGVkdWxlZCBvdXQgb2YgdGhlIFBFLCB0aGUgY2FjaGUgCmNsZWFyaW5nIGFuZCB3cml0
-ZS1iYWNrIHRvIFZQVCBhcmUgYWxzbyBwZXJmb3JtZWQsIEkgdGhpbmsuCgoKSG93ZXZlciwgSSBm
-ZWVsIGEgbGl0dGVyIGNvbmZ1c2luZyB0byByZWFkIHRoaXMgY29tbWVudCBhdCBmaXJzdCAswqAg
-CmJlY2F1c2UgaXQgaXMgbm90IG9ubHkgVk1BUFAgdGhhdCBjYXVzZXMgY2FjaGUgY2xlYXJpbmcu
-CgpJIGRvbid0IGtub3cgd2h5IFZNQVBQIHdhcyBtZW50aW9uZWQgaGVyZSB1bnRpbCBJIGNoZWNr
-IHRoZSBvdGhlciB0d28gCnBhdGNoZXMgKCJLVk06IGFybTY0OiBHSUN2NC4xOiBUcnkgdG8gc2F2
-ZSBodyBwZW5kaW5nIHN0YXRlIGluIApzYXZlX3BlbmRpbmdfdGFibGVzIikuCgoKU28gSSB0aGlu
-ayBtYXkgYmUgaXQncyBiZXR0ZXIgdG8gYWRkIHNvbWUgYmFja2dyb3VuZCBkZXNjcmlwdGlvbiBo
-ZXJlLgoKClRoYW5rcwoKSmlheGluZwoKCj4KPiBBbiBpbXBsZW1lbnRhdGlvbiB0aGF0IHdvdWxk
-bid0IGZvbGxvdyB0aGlzIHNpbXBsZSBydWxlIHdvdWxkIHNpbXBseQo+IGJlIHRvdGFsbHkgYnJv
-a2VuLCBhbmQgdW5zdXBwb3J0ZWQuCj4KPiAJTS4KPgoKX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMu
-Y3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlz
-dGluZm8va3ZtYXJtCg==
+On 2020-12-01 11:40, Shenming Lu wrote:
+> On 2020/12/1 18:55, Marc Zyngier wrote:
+>> On 2020-11-30 07:23, Shenming Lu wrote:
+>> 
+>> Hi Shenming,
+>> 
+>>> We are pondering over this problem these days, but still don't get a
+>>> good solution...
+>>> Could you give us some advice on this?
+>>> 
+>>> Or could we move the restoring of the pending states (include the 
+>>> sync
+>>> from guest RAM and the transfer to HW) to the GIC VM state change 
+>>> handler,
+>>> which is completely corresponding to save_pending_tables (more 
+>>> symmetric?)
+>>> and don't expose GICv4...
+>> 
+>> What is "the GIC VM state change handler"? Is that a QEMU thing?
+> 
+> Yeah, it is a a QEMU thing...
+> 
+>> We don't really have that concept in KVM, so I'd appreciate if you 
+>> could
+>> be a bit more explicit on this.
+> 
+> My thought is to add a new interface (to QEMU) for the restoring of
+> the pending states, which is completely corresponding to
+> KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES...
+> And it is called from the GIC VM state change handler in QEMU, which
+> is happening after the restoring (call kvm_vgic_v4_set_forwarding())
+> but before the starting (running) of the VFIO device.
+
+Right, that makes sense. I still wonder how much the GIC save/restore
+stuff differs from other architectures that implement similar features,
+such as x86 with VT-D.
+
+It is obviously too late to change the userspace interface, but I wonder
+whether we missed something at the time.
+
+Thanks,
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
