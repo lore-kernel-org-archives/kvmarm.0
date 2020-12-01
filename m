@@ -2,87 +2,65 @@ Return-Path: <SRS0=s1GN=FF=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D92DC64E7B
-	for <kvmarm@archiver.kernel.org>; Tue,  1 Dec 2020 13:59:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6720EC64E7B
+	for <kvmarm@archiver.kernel.org>; Tue,  1 Dec 2020 14:07:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 716EE206A5
-	for <kvmarm@archiver.kernel.org>; Tue,  1 Dec 2020 13:59:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GBZd5ctS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 716EE206A5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id ACFCF20757
+	for <kvmarm@archiver.kernel.org>; Tue,  1 Dec 2020 14:07:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACFCF20757
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C797A4BEAD;
-	Tue,  1 Dec 2020 08:59:10 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DD73B4B718;
+	Tue,  1 Dec 2020 09:07:50 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 3t84WUVATqfZ; Tue,  1 Dec 2020 08:59:09 -0500 (EST)
+	with ESMTP id nQzdp0MeY6cu; Tue,  1 Dec 2020 09:07:49 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D64AB4BEBA;
-	Tue,  1 Dec 2020 08:59:09 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B79AA4B706;
+	Tue,  1 Dec 2020 09:07:49 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4DBC14BEAC
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Dec 2020 08:59:09 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A03D4B6F5
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Dec 2020 09:07:48 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id brpIzO4505k2 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  1 Dec 2020 08:59:08 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6EE584BA00
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Dec 2020 08:59:08 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1606831148;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=PwJG1illbebhBKC5v2IxyfNes6/XlUwSexlIWlX8yvI=;
- b=GBZd5ctS6YlYF8LKVjybLXTh3I48iCpAR6J7/9MIuz4CxSzut+dPi78Wd2pD8wupSEglPj
- hjbKXtLjkw+dRhtgEJGfb71Nz6/Ex4fPu2Y2KLwk1jyUY2jqrpeLfPI9TEhN4DZID1qUwi
- HLbRBScZtamSa1tBimr480GAqEL9uis=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-161-wovMo1sZOu2TKbhHgVoPFw-1; Tue, 01 Dec 2020 08:59:03 -0500
-X-MC-Unique: wovMo1sZOu2TKbhHgVoPFw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8FF338558E9;
- Tue,  1 Dec 2020 13:59:00 +0000 (UTC)
-Received: from [10.36.112.89] (ovpn-112-89.ams2.redhat.com [10.36.112.89])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A8A1A5C1BB;
- Tue,  1 Dec 2020 13:58:53 +0000 (UTC)
-Subject: Re: [PATCH v13 07/15] iommu/smmuv3: Allow stage 1 invalidation with
- unmanaged ASIDs
-To: Xingang Wang <wangxingang5@huawei.com>
-References: <20201118112151.25412-8-eric.auger@redhat.com>
- <1606829590-25924-1-git-send-email-wangxingang5@huawei.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <2e69adf5-8207-64f7-fa8e-9f2bd3a3c4e3@redhat.com>
-Date: Tue, 1 Dec 2020 14:58:52 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ with ESMTP id HwKa2P7zCiQ5 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  1 Dec 2020 09:07:47 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F35B4B6F1
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Dec 2020 09:07:47 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F2F0A30E;
+ Tue,  1 Dec 2020 06:07:46 -0800 (PST)
+Received: from C02TD0UTHF1T.local (unknown [10.57.30.155])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 03C943F718;
+ Tue,  1 Dec 2020 06:07:42 -0800 (PST)
+Date: Tue, 1 Dec 2020 14:07:34 +0000
+From: Mark Rutland <mark.rutland@arm.com>
+To: David Brazdil <dbrazdil@google.com>
+Subject: Re: [PATCH v3 06/23] kvm: arm64: Add kvm-arm.protected early kernel
+ parameter
+Message-ID: <20201201140734.GA86881@C02TD0UTHF1T.local>
+References: <20201126155421.14901-1-dbrazdil@google.com>
+ <20201126155421.14901-7-dbrazdil@google.com>
+ <20201127163254.zxdrszlveaxhluwn@bogus>
+ <20201201131913.u7m2eifvtus74dra@google.com>
 MIME-Version: 1.0
-In-Reply-To: <1606829590-25924-1-git-send-email-wangxingang5@huawei.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Cc: xieyingtai@huawei.com, jean-philippe@linaro.org, kvm@vger.kernel.org,
- maz@kernel.org, joro@8bytes.org, will@kernel.org,
- iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
- vivek.gautam@arm.com, alex.williamson@redhat.com, zhangfei.gao@linaro.org,
- robin.murphy@arm.com, kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
+Content-Disposition: inline
+In-Reply-To: <20201201131913.u7m2eifvtus74dra@google.com>
+Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, kernel-team@android.com,
+ Jonathan Corbet <corbet@lwn.net>, Catalin Marinas <catalin.marinas@arm.com>,
+ Sudeep Holla <sudeep.holla@arm.com>, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ Marc Zyngier <maz@kernel.org>, Tejun Heo <tj@kernel.org>,
+ Dennis Zhou <dennis@kernel.org>, Christoph Lameter <cl@linux.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -99,36 +77,60 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Xingang,
-
-On 12/1/20 2:33 PM, Xingang Wang wrote:
-> Hi Eric
+On Tue, Dec 01, 2020 at 01:19:13PM +0000, David Brazdil wrote:
+> Hey Sudeep,
 > 
-> On  Wed, 18 Nov 2020 12:21:43, Eric Auger wrote:
->> @@ -1710,7 +1710,11 @@ static void arm_smmu_tlb_inv_context(void *cookie)
->> 	 * insertion to guarantee those are observed before the TLBI. Do be
->> 	 * careful, 007.
->> 	 */
->> -	if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
->> +	if (ext_asid >= 0) { /* guest stage 1 invalidation */
->> +		cmd.opcode	= CMDQ_OP_TLBI_NH_ASID;
->> +		cmd.tlbi.asid	= ext_asid;
->> +		cmd.tlbi.vmid	= smmu_domain->s2_cfg.vmid;
->> +	} else if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+> > > diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+> > > index 526d65d8573a..06c89975c29c 100644
+> > > --- a/Documentation/admin-guide/kernel-parameters.txt
+> > > +++ b/Documentation/admin-guide/kernel-parameters.txt
+> > > @@ -2259,6 +2259,11 @@
+> > >  			for all guests.
+> > >  			Default is 1 (enabled) if in 64-bit or 32-bit PAE mode.
+> > >  
+> > > +	kvm-arm.protected=
+> > > +			[KVM,ARM] Allow spawning protected guests whose state
+> > > +			is kept private from the host. Only valid for non-VHE.
+> > > +			Default is 0 (disabled).
+> > > +
+> > 
+> > Sorry for being pedantic. Can we reword this to say valid for
+> > !CONFIG_ARM64_VHE ? I read this as valid only for non-VHE hardware, it may
+> > be just me, but if you agree please update so that it doesn't give remote
+> > idea that it is not valid on VHE enabled hardware.
+> > 
+> > I was trying to run this on the hardware and was trying to understand the
+> > details on how to do that.
 > 
-> Found a problem here, the cmd for guest stage 1 invalidation is built,
-> but it is not delivered to smmu.
+> I see what you're saying, but !CONFIG_ARM64_VHE isn't accurate either. The
+> option makes sense if:
+>   1) all cores booted in EL2
+>      == is_hyp_mode_available()
+>   2) ID_AA64MMFR1_EL1.VH=0 or !CONFIG_ARM64_VHE
+>      == !is_kernel_in_hyp_mode()
 > 
+> The former feels implied for KVM, the latter could be 'Valid if the kernel
+> is running in EL1'? WDYT?
 
-Thank you for the report. I will fix that soon. With that fixed, have
-you been able to run vSVA on top of the series. Do you need other stuff
-to be fixed at SMMU level? As I am going to respin soon, please let me
-know what is the best branch to rebase to alleviate your integration.
+I reckon we can avoid the restriction if we instead add an early stub
+like with have for KASLR. That way we could parse the command line
+early, and if necessary re-initialize EL2 and drop to EL1 before the
+main kernel has to make any decisions about how to initialize things.
+That would allow us to have a more general kvm-arm.mode option where a
+single kernel Image could support:
 
-Best Regards
+* "protected" mode on nVHE or VHE HW
+* "nvhe" mode on nVHE or VHE HW
+* "vhe" mode on VHE HW
 
-Eric
+... defaulting to VHE/nVHE modes depending on HW support.
 
+That would also be somewhat future-proof if we have to add other
+variants of protected mode in future, as we could extend the mode option
+with parameters for each mode.
+
+Thanks,
+Mark.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
