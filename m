@@ -2,93 +2,63 @@ Return-Path: <SRS0=8eDP=FG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 786BCC64E7B
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Dec 2020 15:44:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72883C64E7B
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Dec 2020 16:27:16 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BC9E320B1F
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Dec 2020 15:44:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC9E320B1F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 8297C21D7F
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Dec 2020 16:27:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8297C21D7F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 03CB54B33A;
-	Wed,  2 Dec 2020 10:44:43 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A6C394B3F0;
+	Wed,  2 Dec 2020 11:27:14 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id c+3Oeqxgp-Wi; Wed,  2 Dec 2020 10:44:42 -0500 (EST)
+	with ESMTP id f27JHl7REeEP; Wed,  2 Dec 2020 11:27:13 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 11CC44B351;
-	Wed,  2 Dec 2020 10:44:42 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 21EDC4B371;
+	Wed,  2 Dec 2020 11:27:13 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B02D94B33E
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Dec 2020 10:44:40 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E5294B371
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Dec 2020 11:27:12 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ICoETzQcm32V for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 Dec 2020 10:44:39 -0500 (EST)
-Received: from mail-wm1-f68.google.com (mail-wm1-f68.google.com
- [209.85.128.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A5C934B33A
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Dec 2020 10:44:39 -0500 (EST)
-Received: by mail-wm1-f68.google.com with SMTP id h21so9386032wmb.2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Dec 2020 07:44:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=/UHxwpIgzVzreRL98GaE+Nf+yyIwRliZkCO7QwUCEgs=;
- b=gp6qawBNxj20UMCB0qKbqw35Nh7dgu1epXjabfxPkvif2E6O8pV9qsix7Swhk16rgA
- 7U8GXJzUXnwfKVqYUjOLrtRQrSChgE7vZnpjBYWcRpilLM2szXRG69gSh5qpxe+GDMQ9
- KDwdufKg3mdvIsTbFSBlskjEK0inIAModCfOxYOJpbqCX4Nt9eX7sJN2jICQ5ByfPXTx
- 629pV2SxxiGkQCnmoA6E0i5XXYqDAJ3dQVWYMse12jjHf8G5E/9mMCEcUCiMne2eCFIS
- 97aq1mVCe4qraq5zC1HtXSTmf47MvJ2/dkbIQdZ2PEPjc9OFMWBuVoSbVniM6Z9RX8/T
- sOCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=/UHxwpIgzVzreRL98GaE+Nf+yyIwRliZkCO7QwUCEgs=;
- b=g/xKdqEf65eK7+WsM1DUyeS4/98+6vvshkXxphSCk5fDT3aKjXysI7i1fwdt43bVT1
- vmQRoxAdn682xG3dNNnlpiwUUlFfN7h9DaCcWAORsUZHuCfEVNAdESug6eCMvYcmRa/t
- ApgbCOvtsuzYY1ArPGXqF9NisqX9MHRCEESs9nsq3ZViQ0ZrTgPMBSVsffLy+pbOA79a
- yq5itHjRn/H+nU65HTABgsIPul1nTzC8BsZPEUrApGAv300I+M+/w66xGTbL+LZnjBTV
- 2X2NpXM1FkfkfoBsCchuotgHuDzZBZOMZhO0Ilqhy1BD0KuRqTWLEYid1Fujh2qCv9fC
- mEmw==
-X-Gm-Message-State: AOAM532ZX1dzzZtdheFdinw8SxHrHE8EnKkICYn5W+/yyDKsAJxhHR3Y
- ET6sv5yeW57seWgPqjNs6N8qUQ==
-X-Google-Smtp-Source: ABdhPJzjZbg91HBzD7xhdNYxZfeVt0A22RkKuj4c+xnN4xgU/POWZiYJcdkezzLJU++VssNAnOmuew==
-X-Received: by 2002:a1c:ddd5:: with SMTP id u204mr3724239wmg.174.1606923878152; 
- Wed, 02 Dec 2020 07:44:38 -0800 (PST)
-Received: from google.com ([2a01:4b00:8523:2d03:5ddd:b7c5:e3c9:e87a])
- by smtp.gmail.com with ESMTPSA id y7sm2620731wrp.3.2020.12.02.07.44.36
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 02 Dec 2020 07:44:37 -0800 (PST)
-Date: Wed, 2 Dec 2020 15:44:35 +0000
-From: David Brazdil <dbrazdil@google.com>
-To: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH v3 03/23] arm64: Make cpu_logical_map() take unsigned int
-Message-ID: <20201202154435.qpr7ow53xra3xjkd@google.com>
-References: <20201126155421.14901-1-dbrazdil@google.com>
- <20201126155421.14901-4-dbrazdil@google.com>
- <20201126172838.GD38486@C02TD0UTHF1T.local>
+ with ESMTP id YU-HX33jyJbW for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Dec 2020 11:27:11 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 062C64B35F
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Dec 2020 11:27:11 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4A8A71396;
+ Wed,  2 Dec 2020 08:27:05 -0800 (PST)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8440F3F718;
+ Wed,  2 Dec 2020 08:27:03 -0800 (PST)
+Subject: Re: [RFC PATCH v3 08/16] KVM: arm64: Add a new VCPU device control
+ group for SPE
+To: James Morse <james.morse@arm.com>
+References: <20201027172705.15181-1-alexandru.elisei@arm.com>
+ <20201027172705.15181-9-alexandru.elisei@arm.com>
+ <3f5b92d1-81d4-1df1-b666-bdb97857fbdf@arm.com>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <53f49d74-943a-dd38-2c67-193f877880d8@arm.com>
+Date: Wed, 2 Dec 2020 16:28:21 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.3
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20201126172838.GD38486@C02TD0UTHF1T.local>
-Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, kernel-team@android.com,
- Jonathan Corbet <corbet@lwn.net>, Catalin Marinas <catalin.marinas@arm.com>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- Sudeep Holla <sudeep.holla@arm.com>, linux-arm-kernel@lists.infradead.org,
- Marc Zyngier <maz@kernel.org>, Tejun Heo <tj@kernel.org>,
- Dennis Zhou <dennis@kernel.org>, Christoph Lameter <cl@linux.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <3f5b92d1-81d4-1df1-b666-bdb97857fbdf@arm.com>
+Content-Language: en-US
+Cc: maz@kernel.org, linux-arm-kernel@lists.infradead.org,
+ Sudeep Holla <sudeep.holla@arm.com>, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -105,29 +75,198 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Nov 26, 2020 at 05:28:38PM +0000, Mark Rutland wrote:
-> On Thu, Nov 26, 2020 at 03:54:01PM +0000, David Brazdil wrote:
-> > CPU index should never be negative. Change the signature of
-> > (set_)cpu_logical_map to take an unsigned int.
-> > 
-> > Signed-off-by: David Brazdil <dbrazdil@google.com>
-> 
-> Is there a function problem here, or is this just cleanup from
-> inspection?
-> 
-> Core code including the cpuhp_*() callbacks uses an int, so if there's a
-> strong justification to change this, it suggests there's some treewide
-> cleanup that should be done.
-> 
-> I don't have strong feelings on the matter, but I'd like to understand
-> the rationale.
+Hi James,
 
-Yeah, it's a mess. Marc and I felt that using a uint was less error-prone wrt
-bounds checks. If this gets an int, it still works and only checking the upper
-bound is required. Does that make sense?
+On 11/19/20 4:58 PM, James Morse wrote:
+> Hi Alex,
+>
+> On 27/10/2020 17:26, Alexandru Elisei wrote:
+>> From: Sudeep Holla <sudeep.holla@arm.com>
+>>
+>> To configure the virtual SPE buffer management interrupt number, we use a
+>> VCPU kvm_device ioctl, encapsulating the KVM_ARM_VCPU_SPE_IRQ attribute
+>> within the KVM_ARM_VCPU_SPE_CTRL group.
+>>
+>> After configuring the SPE, userspace is required to call the VCPU ioctl
+>> with the attribute KVM_ARM_VCPU_SPE_INIT to initialize SPE on the VCPU.
+>> diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
+>> index 2acec3b9ef65..6135b9827fbe 100644
+>> --- a/Documentation/virt/kvm/devices/vcpu.rst
+>> +++ b/Documentation/virt/kvm/devices/vcpu.rst
+>> @@ -161,3 +161,43 @@ Specifies the base address of the stolen time structure for this VCPU. The
+>>  base address must be 64 byte aligned and exist within a valid guest memory
+>>  region. See Documentation/virt/kvm/arm/pvtime.rst for more information
+>>  including the layout of the stolen time structure.
+>> +
+>> +4. GROUP: KVM_ARM_VCPU_SPE_CTRL
+>> +===============================
+>> +
+>> +:Architectures: ARM64
+>> +
+>> +4.1 ATTRIBUTE: KVM_ARM_VCPU_SPE_IRQ
+>> +-----------------------------------
+>> +
+>> +:Parameters: in kvm_device_attr.addr the address for the SPE buffer management
+>> +             interrupt is a pointer to an int
+>> +
+>> +Returns:
+>> +
+>> +	 =======  ========================================================
+>> +	 -EBUSY   The SPE buffer management interrupt is already set
+>> +	 -EINVAL  Invalid SPE overflow interrupt number
+>> +	 -EFAULT  Could not read the buffer management interrupt number
+>> +	 -ENXIO   SPE not supported or not properly configured
+>> +	 =======  ========================================================
+>> +
+>> +A value describing the SPE (Statistical Profiling Extension) overflow interrupt
+>> +number for this vcpu. This interrupt should be a PPI and the interrupt type and
+>> +number must be same for each vcpu.
+>> +
+>> +4.2 ATTRIBUTE: KVM_ARM_VCPU_SPE_INIT
+>> +------------------------------------
+>> +
+>> +:Parameters: no additional parameter in kvm_device_attr.addr
+>> +
+>> +Returns:
+>> +
+>> +	 =======  ======================================================
+>> +	 -EBUSY   SPE already initialized
+>> +	 -ENODEV  GIC not initialized
+>> +	 -ENXIO   SPE not supported or not properly configured
+>> +	 =======  ======================================================
+>> +Request the initialization of the SPE. Must be done after initializing the
+>> +in-kernel irqchip and after setting the interrupt number for the VCPU.
+> Fantastic!
+>
+>
+>> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+>> index f32490229a4c..4dc205fa4be1 100644
+>> --- a/arch/arm64/kvm/reset.c
+>> +++ b/arch/arm64/kvm/reset.c
+>> @@ -87,6 +87,9 @@ int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>>  	case KVM_CAP_ARM_PTRAUTH_GENERIC:
+>>  		r = system_has_full_ptr_auth();
+>>  		break;
+>> +	case KVM_CAP_ARM_SPE:
+>> +		r = kvm_arm_supports_spe();
+>> +		break;
+>>  	default:
+>>  		r = 0;
+>>  	}
+>> @@ -223,6 +226,19 @@ static int kvm_vcpu_enable_ptrauth(struct kvm_vcpu *vcpu)
+>>  	return 0;
+>>  }
+>>  
+>> +static int kvm_vcpu_enable_spe(struct kvm_vcpu *vcpu)
+>> +{
+>> +	if (!kvm_arm_supports_spe())
+>> +		return -EINVAL;
+>> +
+>> +	/* SPE is disabled if the PE is in AArch32 state */
+>> +	if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features))
+>> +		return -EINVAL;
+>> +
+>> +	vcpu->arch.flags |= KVM_ARM64_GUEST_HAS_SPE;
+>> +	return 0;
+>> +}
+> VCPU-reset promotes the VMM feature into flags. How does this interact with
+> kvm_arm_spe_init()?
+>
+> It doesn't look like this resets any state, couldn't it be done once by kvm_arm_spe_init()?
 
-David
+I need to check here for incompatible features (KVM_ARM_VCPU_EL1_32BIT) or
+unsupported SPE to return an error code to KVM_ARM_VCPU_INIT (the ioctl is handled
+in kvm_arch_vcpu_ioctl_vcpu_init -> kvm_vcpu_set_target)
 
+We need to track the feature per-vcpu, to refuse finalization if the feature was
+not set on all of them. I could use features, but I think using flags will end up
+slightly faster.
+
+When KVM SPE is optimized, I will probably add at least one vcpu->arch.flags flag
+(something like KVM_ARM64_HOST_USES_SPE) to allow for lazy save/restore of the
+host SPE context when the flag is missing. I was thinking that in that case
+checking vcpu->arch.flags will be cheaper. This is also the approach that SVE
+uses, from what I can tell.
+
+For now, I would prefer to keep it as a vcpu flag and make the decision once I
+start implementing performance optimizations. But using features is definitely
+doable if there are objections against using flags.
+
+>
+>
+>>  /**
+>>   * kvm_reset_vcpu - sets core registers and sys_regs to reset value
+>>   * @vcpu: The VCPU pointer
+>> @@ -274,6 +290,13 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+>>  		}
+>>  	}
+>>  
+>> +	if (test_bit(KVM_ARM_VCPU_SPE, vcpu->arch.features)) {
+>> +		if (kvm_vcpu_enable_spe(vcpu)) {
+>> +			ret = -EINVAL;
+>> +			goto out;
+>> +		}
+>> +	}
+>> +
+>>  	switch (vcpu->arch.target) {
+>>  	default:
+>>  		if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features)) {
+>> diff --git a/arch/arm64/kvm/spe.c b/arch/arm64/kvm/spe.c
+>> new file mode 100644
+>> index 000000000000..f91a52cd7cd3
+>> --- /dev/null
+>> +++ b/arch/arm64/kvm/spe.c
+>> @@ -0,0 +1,129 @@
+>> +static bool kvm_arm_spe_irq_is_valid(struct kvm *kvm, int irq)
+>> +{
+>> +	int i;
+>> +	struct kvm_vcpu *vcpu;
+>> +
+>> +	/* The SPE overflow interrupt can be a PPI only */
+>> +	if (!irq_is_ppi(irq))
+>> +		return false;
+>> +
+>> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+>> +		if (!kvm_arm_spe_irq_initialized(vcpu))
+>> +			continue;
+>> +
+>> +		if (vcpu->arch.spe_cpu.irq_num != irq)
+>> +			return false;
+>> +	}
+> Looks like you didn't really want a vcpu property! (huh, patch 10 adds a vm property too)
+> We're making this a vcpu property because of the PPI and system registers? (both good reasons)
+>
+> If the PPI number lived in struct kvm_arch, you'd only only need to check it was
+> uninitialised, or the same to get the same behaviour, which would save some of this error
+> handling.
+
+The Arm ARM mandates that the SPE interrupt must be a PPI. I think it makes more
+sense to have a Private Peripheral Interrupt ID saved as a per-vcpu variable than
+a per-VM one, like a SPI.
+
+>
+>
+>> +	return true;
+>> +}
+>> diff --git a/include/kvm/arm_spe.h b/include/kvm/arm_spe.h
+>> index 46ec447ed013..0275e8097529 100644
+>> --- a/include/kvm/arm_spe.h
+>> +++ b/include/kvm/arm_spe.h
+>> @@ -18,11 +18,38 @@ struct kvm_spe_cpu {
+>>  	bool initialized; 	/* Feature is initialized on VCPU */
+>>  };
+>>  
+>> +#define kvm_arm_spe_irq_initialized(v)			\
+>> +	((v)->arch.spe_cpu.irq_num >= VGIC_NR_SGIS &&	\
+>> +	 (v)->arch.spe_cpu.irq_num < VGIC_MAX_PRIVATE)
+> Didn't GICv(mumbles) add an additional PPI range? Could this be made irq_is_ppi(), that
+> way if the vgic gains support for that, we don't get weird behaviour here?
+
+You're right, the macro reimplements irq_is_ppi(), I'll rewrite it to use
+irq_is_ppi().
+
+Thanks,
+Alex
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
