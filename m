@@ -2,62 +2,93 @@ Return-Path: <SRS0=8eDP=FG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3979DC64E7B
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Dec 2020 17:24:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BB24C64E7B
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Dec 2020 17:49:28 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 958BA221E9
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Dec 2020 17:24:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 958BA221E9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id B4AF8221FB
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Dec 2020 17:49:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4AF8221FB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C96F74B40D;
-	Wed,  2 Dec 2020 12:24:03 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BB8464B3DC;
+	Wed,  2 Dec 2020 12:49:24 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JP3o4i1SIMpb; Wed,  2 Dec 2020 12:24:02 -0500 (EST)
+	with ESMTP id ge0pA448RWnQ; Wed,  2 Dec 2020 12:49:23 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CCC0F4B385;
-	Wed,  2 Dec 2020 12:24:02 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BFFEE4B34C;
+	Wed,  2 Dec 2020 12:49:23 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 65BFF4B385
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Dec 2020 12:24:01 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CC344B34C
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Dec 2020 12:49:22 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fYNvR83mHvDu for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 Dec 2020 12:24:00 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D6BB44B346
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Dec 2020 12:23:59 -0500 (EST)
-Date: Wed, 2 Dec 2020 17:23:53 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1606929838;
- bh=V0R76wAcMBTseb7fEiuVbTmAEpHIR3O49CO3yXppN/I=;
- h=From:To:Cc:Subject:References:In-Reply-To:From;
- b=FcM3/E2OmXiVMI7VnOvHGhA0og08kaAC1vTFv+2+JyVbtr5S6dvvgr+tt72611V5u
- qg3cXulfjJtJpaBkyCifKgJLRAKGw6xUQfXXZ17081KXcA1NtDvhZFqm9Slhj8cfBI
- 6JpUF4t3A2GONMWg5sVSPJgK3winpvI12tPcxCB0=
-From: Will Deacon <will@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [RFC PATCH v3 04/16] arm64: Introduce CPU SPE feature
-Message-ID: <20201202172353.GB29813@willie-the-truck>
-References: <20201027172705.15181-1-alexandru.elisei@arm.com>
- <20201027172705.15181-5-alexandru.elisei@arm.com>
- <418e3bf6-159c-6d1f-2b84-2fdb10c3cddd@arm.com>
- <906a02c2-3923-3542-ffb8-43d856498e07@arm.com>
+ with ESMTP id ObOW5S6IYKu4 for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Dec 2020 12:49:21 -0500 (EST)
+Received: from mail-wr1-f65.google.com (mail-wr1-f65.google.com
+ [209.85.221.65])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3663A4B2D6
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Dec 2020 12:49:21 -0500 (EST)
+Received: by mail-wr1-f65.google.com with SMTP id 64so4939951wra.11
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Dec 2020 09:49:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=uk3nyFML1nxsvGC9LCY/1s44UaqHe8BVZ1ofT7x457I=;
+ b=XO2vQdH95v1HgdI8fzNXcFmkx63nZT1kR7WW07T3iN8xawOcOSjMcaratXT62R6aol
+ 18Exdx6tN6JQlynTpVUZwWTx5yEfKHqoUXJ8bp5ZP8r4TxRk36V18+/ACCyAmoetPExg
+ ZhwuJ1VUm9FX8Tk3peri9lU3HFX5NozCPQXe8tUQi8I5wnwrKylWAmwqb7jEiKk0/PUt
+ RA+9v3xK6ufqjU325zvSInvuQG7b6fKJz3s3f5OJPhxqbuBGwDkBUf1LXppH3UkSGxER
+ OwcLDErcATCjMiaz7wGjjIGEuop04VGU2IBbBUBqQqdpTuKtFfCYhPUic/OCPb82mYON
+ iQvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=uk3nyFML1nxsvGC9LCY/1s44UaqHe8BVZ1ofT7x457I=;
+ b=swi8Uo9MVLA1E36hL8QzTypOa01X0Azv8RSPI23SCkU+41GgIuLu36/+UnIMaC2mR6
+ lLiDNeMHeH4FxtTx5BzU4y3HSc2O4cSz8bu3Oe1NZ9d/zvBRe6d9n68MVB41n0KMvtBf
+ zcWoecA/fsih8uA/LJLqg9nhzjQCFTJXUKhFhZij+hBVSWiHRabMCl+NT08E5r47pkc6
+ SQztLl61LweKoR1QBZ8X7KmXu1YLoPSNqMqcDLXIBgbDD7cgsogTAkgTeqTL5PvQ7dzV
+ +LRZdJ63fLuvcGYqaJjpuoOXjR19x3s02Df5M4Fjm7Zkit/DBcFzBvSF/CPFus+CI7T+
+ Oolw==
+X-Gm-Message-State: AOAM533QoqDQzwxdGGUBz6OMbz7p9yFnDFbB7ljNJi39p7x1E+iV4adA
+ C/M13XomrCk9q21PvelHP7w/5w==
+X-Google-Smtp-Source: ABdhPJwzHIaRNBQgiYJ4lBdup+j980orHCD3KEsoa4QfsBkkHpXFXQVpATyCsJ/euy7BQTFO2qp3nA==
+X-Received: by 2002:a5d:5482:: with SMTP id h2mr4962893wrv.18.1606931359793;
+ Wed, 02 Dec 2020 09:49:19 -0800 (PST)
+Received: from google.com ([2a01:4b00:8523:2d03:5ddd:b7c5:e3c9:e87a])
+ by smtp.gmail.com with ESMTPSA id u23sm2973631wmc.32.2020.12.02.09.49.18
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 02 Dec 2020 09:49:19 -0800 (PST)
+Date: Wed, 2 Dec 2020 17:49:17 +0000
+From: David Brazdil <dbrazdil@google.com>
+To: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>
+Subject: Re: [PATCH v3 16/23] kvm: arm64: Forward safe PSCI SMCs coming from
+ host
+Message-ID: <20201202174917.qey4ju2vrzipy4cn@google.com>
+References: <20201126155421.14901-1-dbrazdil@google.com>
+ <20201126155421.14901-17-dbrazdil@google.com>
+ <20201127101433.GA1061@e121166-lin.cambridge.arm.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <906a02c2-3923-3542-ffb8-43d856498e07@arm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: maz@kernel.org, linux-arm-kernel@lists.infradead.org,
+In-Reply-To: <20201127101433.GA1061@e121166-lin.cambridge.arm.com>
+Cc: Sudeep Holla <sudeep.holla@arm.com>, kernel-team@android.com,
+ Jonathan Corbet <corbet@lwn.net>, Catalin Marinas <catalin.marinas@arm.com>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
+ Tejun Heo <tj@kernel.org>, Dennis Zhou <dennis@kernel.org>,
+ Christoph Lameter <cl@linux.com>, Will Deacon <will@kernel.org>,
  kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -75,35 +106,34 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Dec 02, 2020 at 02:29:31PM +0000, Alexandru Elisei wrote:
-> On 11/19/20 4:58 PM, James Morse wrote:
-> > On 27/10/2020 17:26, Alexandru Elisei wrote:
-> >> Detect Statistical Profiling Extension (SPE) support using the cpufeatures
-> >> framework. The presence of SPE is reported via the ARM64_SPE capability.
-> >>
-> >> The feature will be necessary for emulating SPE in KVM, because KVM needs
-> >> that all CPUs have SPE hardware to avoid scheduling a VCPU on a CPU without
-> >> support. For this reason, the feature type ARM64_CPUCAP_SYSTEM_FEATURE has
-> >> been selected to disallow hotplugging a CPU which doesn't support SPE.
-> > Can you mention the existing driver in the commit message? Surprisingly it doesn't use
-> > cpufeature at all. It looks like arm_spe_pmu_dev_init() goes out of its way to support
-> > mismatched systems. (otherwise the significance of the new behaviour isn't clear!)
-> >
-> > I read it as: the host is fine with mismatched systems, and the existing drivers supports
-> > this. But KVM is not. After this patch you can't make the system mismatched 'late'.
+On Fri, Nov 27, 2020 at 10:14:33AM +0000, Lorenzo Pieralisi wrote:
+> On Thu, Nov 26, 2020 at 03:54:14PM +0000, David Brazdil wrote:
+> > Forward the following PSCI SMCs issued by host to EL3 as they do not
+> > require the hypervisor's intervention. This assumes that EL3 correctly
+> > implements the PSCI specification.
+> > 
+> > Only function IDs implemented in Linux are included.
+> > 
+> > Where both 32-bit and 64-bit variants exist, it is assumed that the host
+> > will always use the 64-bit variant.
+> > 
+> >  * SMCs that only return information about the system
+> >    * PSCI_VERSION        - PSCI version implemented by EL3
+> >    * PSCI_FEATURES       - optional features supported by EL3
+> >    * AFFINITY_INFO       - power state of core/cluster
+> >    * MIGRATE_INFO_TYPE   - whether Trusted OS can be migrated
+> >    * MIGRATE_INFO_UP_CPU - resident core of Trusted OS
+> >  * operations which do not affect the hypervisor
+> >    * MIGRATE             - migrate Trusted OS to a different core
+> >    * SET_SUSPEND_MODE    - toggle OS-initiated mode
+> >  * system shutdown/reset
+> >    * SYSTEM_OFF
+> >    * SYSTEM_RESET
+> >    * SYSTEM_RESET2
 > 
-> That was exactly my intention. Certainly, I'll try to make the commit message
-> clearer by mentioning the SPE driver.
+> What about SYSTEM_SUSPEND ?
+Oops, forgot that one. Will add a handler similar to CPU_SUSPEND.
 
-Hmm, so are you saying that with this patch applied, a machine where KVM
-isn't even being used can no longer late-online CPUs without SPE if the boot
-CPUs had it? If so, then I don't think that's acceptable, unfortunately.
-
-As James points out, the current driver is very careful to support
-big.LITTLE misconfigurations and I don't see why KVM support should change
-that.
-
-Will
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
