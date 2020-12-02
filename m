@@ -2,62 +2,63 @@ Return-Path: <SRS0=8eDP=FG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 312CCC64E7C
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Dec 2020 16:33:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3979DC64E7B
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Dec 2020 17:24:07 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3B86120872
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Dec 2020 16:33:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B86120872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 958BA221E9
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Dec 2020 17:24:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 958BA221E9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6549D4B367;
-	Wed,  2 Dec 2020 11:33:52 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C96F74B40D;
+	Wed,  2 Dec 2020 12:24:03 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id fW6zzXfKIYKq; Wed,  2 Dec 2020 11:33:51 -0500 (EST)
+	with ESMTP id JP3o4i1SIMpb; Wed,  2 Dec 2020 12:24:02 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 232F14B36D;
-	Wed,  2 Dec 2020 11:33:51 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CCC0F4B385;
+	Wed,  2 Dec 2020 12:24:02 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B4334B36D
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Dec 2020 11:33:50 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 65BFF4B385
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Dec 2020 12:24:01 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gy0vbxBCzGbu for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 Dec 2020 11:33:48 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 97A0E4B367
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Dec 2020 11:33:47 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0E6CF1063;
- Wed,  2 Dec 2020 08:33:47 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4D2E83F718;
- Wed,  2 Dec 2020 08:33:45 -0800 (PST)
-Subject: Re: [RFC PATCH v3 10/16] KVM: arm64: Add a new VM device control
- group for SPE
-To: Haibo Xu <haibo.xu@linaro.org>
+ with ESMTP id fYNvR83mHvDu for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Dec 2020 12:24:00 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D6BB44B346
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Dec 2020 12:23:59 -0500 (EST)
+Date: Wed, 2 Dec 2020 17:23:53 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1606929838;
+ bh=V0R76wAcMBTseb7fEiuVbTmAEpHIR3O49CO3yXppN/I=;
+ h=From:To:Cc:Subject:References:In-Reply-To:From;
+ b=FcM3/E2OmXiVMI7VnOvHGhA0og08kaAC1vTFv+2+JyVbtr5S6dvvgr+tt72611V5u
+ qg3cXulfjJtJpaBkyCifKgJLRAKGw6xUQfXXZ17081KXcA1NtDvhZFqm9Slhj8cfBI
+ 6JpUF4t3A2GONMWg5sVSPJgK3winpvI12tPcxCB0=
+From: Will Deacon <will@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [RFC PATCH v3 04/16] arm64: Introduce CPU SPE feature
+Message-ID: <20201202172353.GB29813@willie-the-truck>
 References: <20201027172705.15181-1-alexandru.elisei@arm.com>
- <20201027172705.15181-11-alexandru.elisei@arm.com>
- <CAJc+Z1HJq_j2wVXBM=0BY7p_A7=1sR+Gdf+edEQ5wZkT6-arfQ@mail.gmail.com>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <04a896b9-3bc9-f9be-81a4-0eaef37f286f@arm.com>
-Date: Wed, 2 Dec 2020 16:35:03 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.3
+ <20201027172705.15181-5-alexandru.elisei@arm.com>
+ <418e3bf6-159c-6d1f-2b84-2fdb10c3cddd@arm.com>
+ <906a02c2-3923-3542-ffb8-43d856498e07@arm.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJc+Z1HJq_j2wVXBM=0BY7p_A7=1sR+Gdf+edEQ5wZkT6-arfQ@mail.gmail.com>
-Content-Language: en-US
-Cc: maz@kernel.org, will@kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <906a02c2-3923-3542-ffb8-43d856498e07@arm.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: maz@kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -74,86 +75,35 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Haibo,
+On Wed, Dec 02, 2020 at 02:29:31PM +0000, Alexandru Elisei wrote:
+> On 11/19/20 4:58 PM, James Morse wrote:
+> > On 27/10/2020 17:26, Alexandru Elisei wrote:
+> >> Detect Statistical Profiling Extension (SPE) support using the cpufeatures
+> >> framework. The presence of SPE is reported via the ARM64_SPE capability.
+> >>
+> >> The feature will be necessary for emulating SPE in KVM, because KVM needs
+> >> that all CPUs have SPE hardware to avoid scheduling a VCPU on a CPU without
+> >> support. For this reason, the feature type ARM64_CPUCAP_SYSTEM_FEATURE has
+> >> been selected to disallow hotplugging a CPU which doesn't support SPE.
+> > Can you mention the existing driver in the commit message? Surprisingly it doesn't use
+> > cpufeature at all. It looks like arm_spe_pmu_dev_init() goes out of its way to support
+> > mismatched systems. (otherwise the significance of the new behaviour isn't clear!)
+> >
+> > I read it as: the host is fine with mismatched systems, and the existing drivers supports
+> > this. But KVM is not. After this patch you can't make the system mismatched 'late'.
+> 
+> That was exactly my intention. Certainly, I'll try to make the commit message
+> clearer by mentioning the SPE driver.
 
-On 11/5/20 10:10 AM, Haibo Xu wrote:
-> On Wed, 28 Oct 2020 at 01:26, Alexandru Elisei <alexandru.elisei@arm.com> wrote:
->> Stage 2 faults triggered by the profiling buffer attempting to write to
->> memory are reported by the SPE hardware by asserting a buffer management
->> event interrupt. Interrupts are by their nature asynchronous, which means
->> that the guest might have changed its stage 1 translation tables since the
->> attempted write. SPE reports the guest virtual address that caused the data
->> abort, but not the IPA, which means that KVM would have to walk the guest's
->> stage 1 tables to find the IPA; using the AT instruction to walk the
->> guest's tables in hardware is not an option because it doesn't report the
->> IPA in the case of a stage 2 fault on a stage 1 table walk.
->>
->> Fix both problems by pre-mapping the guest's memory at stage 2 with write
->> permissions to avoid any faults. Userspace calls mlock() on the VMAs that
->> back the guest's memory, pinning the pages in memory, then tells KVM to map
->> the memory at stage 2 by using the VM control group KVM_ARM_VM_SPE_CTRL
->> with the attribute KVM_ARM_VM_SPE_FINALIZE. KVM will map all writable VMAs
->> which have the VM_LOCKED flag set. Hugetlb VMAs are practically pinned in
->> memory after they are faulted in and mlock() doesn't set the VM_LOCKED
->> flag, and just faults the pages in; KVM will treat hugetlb VMAs like they
->> have the VM_LOCKED flag and will also map them, faulting them in if
->> necessary, when handling the ioctl.
->>
->> VM live migration relies on a bitmap of dirty pages. This bitmap is created
->> by write-protecting a memslot and updating it as KVM handles stage 2 write
->> faults. Because KVM cannot handle stage 2 faults reported by the profiling
->> buffer, it will not pre-map a logging memslot. This effectively means that
->> profiling is not available when the VM is configured for live migration.
->>
->> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
->> ---
->> [..]
-> It seems that the below function is used to de-finalize the spe status
-> if I get it correctly.
-> How about rename the function to some like "kvm_arm_vcpu_init_spe_definalize()"
+Hmm, so are you saying that with this patch applied, a machine where KVM
+isn't even being used can no longer late-online CPUs without SPE if the boot
+CPUs had it? If so, then I don't think that's acceptable, unfortunately.
 
-I don't have a strong opinion about the name and I'll keep your suggestion in mind
-for the next iteration. The series is an RFC and the function might not even be
-there in the final version.
+As James points out, the current driver is very careful to support
+big.LITTLE misconfigurations and I don't see why KVM support should change
+that.
 
->
->> +void kvm_arm_spe_notify_vcpu_init(struct kvm_vcpu *vcpu)
->> +{
->> +       vcpu->kvm->arch.spe.finalized = false;
->> +}
->> +
->>  static bool kvm_arm_vcpu_supports_spe(struct kvm_vcpu *vcpu)
->>  {
->>         if (!vcpu_has_spe(vcpu))
->> @@ -115,6 +122,50 @@ int kvm_arm_spe_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
->>         return -ENXIO;
->>  }
->>
->> +static int kvm_arm_spe_finalize(struct kvm *kvm)
->> +{
->> +       struct kvm_memory_slot *memslot;
->> +       enum kvm_pgtable_prot prot;
->> +       struct kvm_vcpu *vcpu;
->> +       int i, ret;
->> +
->> +       kvm_for_each_vcpu(i, vcpu, kvm) {
->> +               if (!kvm_arm_spe_vcpu_initialized(vcpu))
->> +                       return -ENXIO;
->> +       }
->> +
->> +       mutex_unlock(&kvm->slots_lock);
-> Should be mutex_lock(&kvm->slots_lock);?
-
-Definitely, nicely spotted! That's a typo on my part.
-
-It doesn't affect the test results because kvmtool will call finalize exactly once
-after the entire VM has been initialized, so there will be no concurrent accesses
-to this function.
-
-Thanks,
-
-Alex
-
+Will
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
