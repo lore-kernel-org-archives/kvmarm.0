@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 850AEC64E7C
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Dec 2020 18:41:52 +0000 (UTC)
-Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id F1AD322249
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC073C71155
 	for <kvmarm@archiver.kernel.org>; Wed,  2 Dec 2020 18:41:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1AD322249
+Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
+	by mail.kernel.org (Postfix) with ESMTP id 5B24C22263
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Dec 2020 18:41:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B24C22263
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 86D8F4B41E;
-	Wed,  2 Dec 2020 13:41:51 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E31914B39F;
+	Wed,  2 Dec 2020 13:41:50 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id dYE5B2o5ZQFa; Wed,  2 Dec 2020 13:41:50 -0500 (EST)
+	with ESMTP id 8CwY2BMSD3Fc; Wed,  2 Dec 2020 13:41:49 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E3084B421;
-	Wed,  2 Dec 2020 13:41:50 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 686DD4B410;
+	Wed,  2 Dec 2020 13:41:49 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CED3C4B333
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Dec 2020 13:41:49 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B21B4B410
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Dec 2020 13:41:48 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gGzdHWXxP9TU for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 Dec 2020 13:41:48 -0500 (EST)
-Received: from mail-wm1-f68.google.com (mail-wm1-f68.google.com
- [209.85.128.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BFACF4B40C
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Dec 2020 13:41:48 -0500 (EST)
-Received: by mail-wm1-f68.google.com with SMTP id d3so10150140wmb.4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Dec 2020 10:41:48 -0800 (PST)
+ with ESMTP id Hi98s4yZyH4u for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Dec 2020 13:41:47 -0500 (EST)
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com
+ [209.85.128.46])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D08BC4B40C
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Dec 2020 13:41:46 -0500 (EST)
+Received: by mail-wm1-f46.google.com with SMTP id f190so11188159wme.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Dec 2020 10:41:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=pY9jRbioJhJf7MwxwtV14CQQVHe+rZSO6XuQoMfB3LY=;
- b=NL0mNcnpizqXS1UX9W9Xx72wdHMsPuW8ohq6hfiQ1SgVzyFUmbVUVXO+UIp6cX3GXm
- 3RCq57FWsycLSju3jZUWCY5zUMAXA5v0bk+c/SHgZ+/DxvtNWejec3R7jeVgNTVOb2HP
- bZ5FDOGmbS1J0e0Jdjsloi7TwnD2P14i6sFptC1oDSTb6TGcbtiIWyzIngfHvHg0nt67
- r0zCYXyh+Hl9naVwqPp7J42lS4ZqCn+t8zbHpiCjyDpyOfMByZmYCs7dHw2V0ZQZar/0
- cOrWwZ0Co16GFlvenZ9YCMR2+Dhj3+aApPouoNTu4ibFPYqp0AtKOFRF+GOJULHxAdVc
- E+tA==
+ bh=5F/Up/Ebf6Bf2bbXNTPpS910fASqQtc48mTj0zAO7xk=;
+ b=SjMo0tJDhHyf0Mrm83VvRqCW1PLSUhEha+EXMzEWAvl4XghqKqgQhhDMZWPERqq8do
+ faEyJm2etTS2u8lTu8J9JR9Z6bJN2JqMxpj0qUUduCl35H6N78nEOsaBysrsvIsoi7ND
+ 2SxzzajH+kd967JO5t5TkVQlAEf0ECHxjt8iRD0E7u8SFQipEB4bViq3fLYGWB1xV7j6
+ eUaYlnvD7Ivri1VgCZgqTEcfbfFF1GCVvlDb4AyYus/GTEtjxZezjfn9ZWROWOh7IB4q
+ sm/Zf0vuMY+LHm+gXo4cCrO1JiIXryISFhAgA0KDOQdFtjjMpAe5cw4Lb0apI1kBplEs
+ aIUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=pY9jRbioJhJf7MwxwtV14CQQVHe+rZSO6XuQoMfB3LY=;
- b=RdGfaYOM5LAJ3NICdYpflc7x3VKb7jE47YimyyZF6cc95V2//8pq0luX02svc0lLo/
- UdhP8LJ7MaI5UhwDdZc6LSlcMcQZADYzKoBRyS/xfmAKoRoeRJAibVy8/X4msZZpx7A7
- 8AJuZYOUHmy0o6MvMcEs+5Cx+HPb5c2/9r7dMWYCS7sLZGm0iy8uKYWU5qBXQkEFSqgL
- BGS/+VDBQr6sTTtWQti7+Z6HQdC07MlcqJCvn7qdrcOUFeDlymFVL6590Ze0HrnBpuBZ
- uFqhBSgj51+r0w00hK4QRZTzUEBhHPT8wZwUUR6Inb0ZKAuOdbkYy4XJ1XbxTL+wcms3
- 9xkg==
-X-Gm-Message-State: AOAM530tI6xqrfElpCJTimd2xmCFVTkgBt1KmAI0j+DQdOHSCLQEVHLV
- fbTSW5mS1UDPvHbkTuPA+CWcxUMh37kEHw==
-X-Google-Smtp-Source: ABdhPJz89vM2fd/nDXaPHt9j0cPFTGj1oyMk3PstTs/+u86wCoX9DNGJNGbi4MtwwUU+yDdDBPf3FQ==
-X-Received: by 2002:a1c:328a:: with SMTP id y132mr4632122wmy.134.1606934507192; 
- Wed, 02 Dec 2020 10:41:47 -0800 (PST)
+ bh=5F/Up/Ebf6Bf2bbXNTPpS910fASqQtc48mTj0zAO7xk=;
+ b=MTPo7J6VKBnR+MVb0OcKAgTuBDf36YMWDD0PhVC/PrRky5+BAkXauC4iH5ZBfQJ/Od
+ NrPAarnH0Aua/x1hw2DryonsCiII0gSsvvNjxtfTrd7GIk9snaXiZnfzglLX5hZmO9pC
+ xHzZD/mTlk8HCpWIKC+Dt1kbQ9jZfC62Ul5dzl27YQRfFgO+qnnDv4KkzMXg5QoOOzAE
+ am/OY3xLPSiZEMJnNoLVFJ2wN/cUpkrE8pNUDe993EZohZVss4argGpXWVi04tddJtVa
+ M+WXE15x72OFKMHHabcf6lUWChtyawwxw0eJKHA76h/60hm9rMlpx42t/EUV5BptVBU0
+ gMKw==
+X-Gm-Message-State: AOAM5307NWFEKl5lQuwXhVAZOzHe5QU8rrZLqeRFYkIGJUOOTRJ7DUFX
+ 4BXqdmP94tJj8X6tGyrn37d57a9ilieeWA==
+X-Google-Smtp-Source: ABdhPJxXckzKmd0GUcj8deK6tWbGt/buaeRFujJdUjLM1LEwSGt5OIMk48B697gMb8Ns5ghNc0kBaQ==
+X-Received: by 2002:a1c:2d84:: with SMTP id t126mr4448330wmt.132.1606934505057; 
+ Wed, 02 Dec 2020 10:41:45 -0800 (PST)
 Received: from localhost ([2a01:4b00:8523:2d03:5ddd:b7c5:e3c9:e87a])
- by smtp.gmail.com with ESMTPSA id n128sm3159374wmb.46.2020.12.02.10.41.45
+ by smtp.gmail.com with ESMTPSA id r21sm3315875wrc.16.2020.12.02.10.41.43
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 02 Dec 2020 10:41:46 -0800 (PST)
+ Wed, 02 Dec 2020 10:41:44 -0800 (PST)
 From: David Brazdil <dbrazdil@google.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v4 09/26] kvm: arm64: Remove vector_ptr param of hyp-init
-Date: Wed,  2 Dec 2020 18:41:05 +0000
-Message-Id: <20201202184122.26046-10-dbrazdil@google.com>
+Subject: [PATCH v4 08/26] arm64: Extract parts of el2_setup into a macro
+Date: Wed,  2 Dec 2020 18:41:04 +0000
+Message-Id: <20201202184122.26046-9-dbrazdil@google.com>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201202184122.26046-1-dbrazdil@google.com>
 References: <20201202184122.26046-1-dbrazdil@google.com>
@@ -103,127 +103,412 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-KVM precomputes the hyp VA of __kvm_hyp_host_vector, essentially a
-constant (minus ASLR), before passing it to __kvm_hyp_init.
-Now that we have alternatives for converting kimg VA to hyp VA, replace
-this with computing the constant inside __kvm_hyp_init, thus removing
-the need for an argument.
+When a CPU is booted in EL2, the kernel checks for VHE support and
+initializes the CPU core accordingly. For nVHE it also installs the stub
+vectors and drops down to EL1.
+
+Once KVM gains the ability to boot cores without going through the
+kernel entry point, it will need to initialize the CPU the same way.
+Extract the relevant bits of el2_setup into an init_el2_state macro
+with an argument specifying whether to initialize for VHE or nVHE.
+
+The following ifdefs are removed:
+ * CONFIG_ARM_GIC_V3 - always selected on arm64
+ * CONFIG_COMPAT - hstr_el2 can be set even without 32-bit support
+
+No functional change intended. Size of el2_setup increased by
+148 bytes due to duplication.
 
 Signed-off-by: David Brazdil <dbrazdil@google.com>
 ---
- arch/arm64/include/asm/kvm_asm.h   |  2 --
- arch/arm64/include/asm/kvm_mmu.h   | 24 ++++++++++++++++++++++++
- arch/arm64/kvm/arm.c               |  4 +---
- arch/arm64/kvm/hyp/nvhe/hyp-init.S |  9 ++++++---
- 4 files changed, 31 insertions(+), 8 deletions(-)
+ arch/arm64/include/asm/el2_setup.h | 182 +++++++++++++++++++++++++++++
+ arch/arm64/kernel/head.S           | 144 +++--------------------
+ 2 files changed, 198 insertions(+), 128 deletions(-)
+ create mode 100644 arch/arm64/include/asm/el2_setup.h
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 4a6a77d8d13e..531f9d04eefd 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -163,10 +163,8 @@ struct kvm_vcpu;
- struct kvm_s2_mmu;
- 
- DECLARE_KVM_NVHE_SYM(__kvm_hyp_init);
--DECLARE_KVM_NVHE_SYM(__kvm_hyp_host_vector);
- DECLARE_KVM_HYP_SYM(__kvm_hyp_vector);
- #define __kvm_hyp_init		CHOOSE_NVHE_SYM(__kvm_hyp_init)
--#define __kvm_hyp_host_vector	CHOOSE_NVHE_SYM(__kvm_hyp_host_vector)
- #define __kvm_hyp_vector	CHOOSE_HYP_SYM(__kvm_hyp_vector)
- 
- extern unsigned long kvm_arm_hyp_percpu_base[NR_CPUS];
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index e298191a854d..e52d82aeadca 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -94,6 +94,30 @@ alternative_cb_end
- 	sub	\reg, \reg, \tmp
- .endm
- 
+diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
+new file mode 100644
+index 000000000000..b6cfd8aa2a81
+--- /dev/null
++++ b/arch/arm64/include/asm/el2_setup.h
+@@ -0,0 +1,182 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
 +/*
-+ * Convert a kernel image address to a hyp VA
-+ * reg: kernel address to be converted in place
-+ * tmp: temporary register
-+ *
-+ * The actual code generation takes place in kvm_get_kimage_voffset, and
-+ * the instructions below are only there to reserve the space and
-+ * perform the register allocation (kvm_update_kimg_phys_offset uses the
-+ * specific registers encoded in the instructions).
++ * Copyright (C) 2012,2013 - ARM Ltd
++ * Author: Marc Zyngier <marc.zyngier@arm.com>
 + */
-+.macro kimg_hyp_va reg, tmp
-+alternative_cb kvm_update_kimg_phys_offset
-+	movz	\tmp, #0
-+	movk	\tmp, #0, lsl #16
-+	movk	\tmp, #0, lsl #32
-+	movk	\tmp, #0, lsl #48
-+alternative_cb_end
 +
-+	sub	\reg, \reg, \tmp
-+	mov_q	\tmp, PAGE_OFFSET
-+	orr	\reg, \reg, \tmp
-+	kern_hyp_va \reg
++#ifndef __ARM_KVM_INIT_H__
++#define __ARM_KVM_INIT_H__
++
++#ifndef __ASSEMBLY__
++#error Assembly-only header
++#endif
++
++#include <asm/kvm_arm.h>
++#include <asm/ptrace.h>
++#include <asm/sysreg.h>
++#include <linux/irqchip/arm-gic-v3.h>
++
++.macro __init_el2_sctlr
++	mov_q	x0, (SCTLR_EL2_RES1 | ENDIAN_SET_EL2)
++	msr	sctlr_el2, x0
++	isb
 +.endm
 +
- #else
++/*
++ * Allow Non-secure EL1 and EL0 to access physical timer and counter.
++ * This is not necessary for VHE, since the host kernel runs in EL2,
++ * and EL0 accesses are configured in the later stage of boot process.
++ * Note that when HCR_EL2.E2H == 1, CNTHCTL_EL2 has the same bit layout
++ * as CNTKCTL_EL1, and CNTKCTL_EL1 accessing instructions are redefined
++ * to access CNTHCTL_EL2. This allows the kernel designed to run at EL1
++ * to transparently mess with the EL0 bits via CNTKCTL_EL1 access in
++ * EL2.
++ */
++.macro __init_el2_timers mode
++.ifeqs "\mode", "nvhe"
++	mrs	x0, cnthctl_el2
++	orr	x0, x0, #3			// Enable EL1 physical timers
++	msr	cnthctl_el2, x0
++.endif
++	msr	cntvoff_el2, xzr		// Clear virtual offset
++.endm
++
++.macro __init_el2_debug mode
++	mrs	x1, id_aa64dfr0_el1
++	sbfx	x0, x1, #ID_AA64DFR0_PMUVER_SHIFT, #4
++	cmp	x0, #1
++	b.lt	1f				// Skip if no PMU present
++	mrs	x0, pmcr_el0			// Disable debug access traps
++	ubfx	x0, x0, #11, #5			// to EL2 and allow access to
++1:
++	csel	x2, xzr, x0, lt			// all PMU counters from EL1
++
++	/* Statistical profiling */
++	ubfx	x0, x1, #ID_AA64DFR0_PMSVER_SHIFT, #4
++	cbz	x0, 3f				// Skip if SPE not present
++
++.ifeqs "\mode", "nvhe"
++	mrs_s	x0, SYS_PMBIDR_EL1              // If SPE available at EL2,
++	and	x0, x0, #(1 << SYS_PMBIDR_EL1_P_SHIFT)
++	cbnz	x0, 2f				// then permit sampling of physical
++	mov	x0, #(1 << SYS_PMSCR_EL2_PCT_SHIFT | \
++		      1 << SYS_PMSCR_EL2_PA_SHIFT)
++	msr_s	SYS_PMSCR_EL2, x0		// addresses and physical counter
++2:
++	mov	x0, #(MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT)
++	orr	x2, x2, x0			// If we don't have VHE, then
++						// use EL1&0 translation.
++.else
++	orr	x2, x2, #MDCR_EL2_TPMS		// For VHE, use EL2 translation
++						// and disable access from EL1
++.endif
++
++3:
++	msr	mdcr_el2, x2			// Configure debug traps
++.endm
++
++/* LORegions */
++.macro __init_el2_lor
++	mrs	x1, id_aa64mmfr1_el1
++	ubfx	x0, x1, #ID_AA64MMFR1_LOR_SHIFT, 4
++	cbz	x0, 1f
++	msr_s	SYS_LORC_EL1, xzr
++1:
++.endm
++
++/* Stage-2 translation */
++.macro __init_el2_stage2
++	msr	vttbr_el2, xzr
++.endm
++
++/* GICv3 system register access */
++.macro __init_el2_gicv3
++	mrs	x0, id_aa64pfr0_el1
++	ubfx	x0, x0, #ID_AA64PFR0_GIC_SHIFT, #4
++	cbz	x0, 1f
++
++	mrs_s	x0, SYS_ICC_SRE_EL2
++	orr	x0, x0, #ICC_SRE_EL2_SRE	// Set ICC_SRE_EL2.SRE==1
++	orr	x0, x0, #ICC_SRE_EL2_ENABLE	// Set ICC_SRE_EL2.Enable==1
++	msr_s	SYS_ICC_SRE_EL2, x0
++	isb					// Make sure SRE is now set
++	mrs_s	x0, SYS_ICC_SRE_EL2		// Read SRE back,
++	tbz	x0, #0, 1f			// and check that it sticks
++	msr_s	SYS_ICH_HCR_EL2, xzr		// Reset ICC_HCR_EL2 to defaults
++1:
++.endm
++
++.macro __init_el2_hstr
++	msr	hstr_el2, xzr			// Disable CP15 traps to EL2
++.endm
++
++/* Virtual CPU ID registers */
++.macro __init_el2_nvhe_idregs
++	mrs	x0, midr_el1
++	mrs	x1, mpidr_el1
++	msr	vpidr_el2, x0
++	msr	vmpidr_el2, x1
++.endm
++
++/* Coprocessor traps */
++.macro __init_el2_nvhe_cptr
++	mov	x0, #0x33ff
++	msr	cptr_el2, x0			// Disable copro. traps to EL2
++.endm
++
++/* SVE register access */
++.macro __init_el2_nvhe_sve
++	mrs	x1, id_aa64pfr0_el1
++	ubfx	x1, x1, #ID_AA64PFR0_SVE_SHIFT, #4
++	cbz	x1, 1f
++
++	bic	x0, x0, #CPTR_EL2_TZ		// Also disable SVE traps
++	msr	cptr_el2, x0			// Disable copro. traps to EL2
++	isb
++	mov	x1, #ZCR_ELx_LEN_MASK		// SVE: Enable full vector
++	msr_s	SYS_ZCR_EL2, x1			// length for EL1.
++1:
++.endm
++
++.macro __init_el2_nvhe_prepare_eret
++	mov	x0, #(PSR_F_BIT | PSR_I_BIT | PSR_A_BIT | PSR_D_BIT |\
++		      PSR_MODE_EL1h)
++	msr	spsr_el2, x0
++.endm
++
++/**
++ * Initialize EL2 registers to sane values. This should be called early on all
++ * cores that were booted in EL2.
++ *
++ * Regs: x0, x1 and x2 are clobbered.
++ */
++.macro init_el2_state mode
++.ifnes "\mode", "vhe"
++.ifnes "\mode", "nvhe"
++.error "Invalid 'mode' argument"
++.endif
++.endif
++
++	__init_el2_sctlr
++	__init_el2_timers \mode
++	__init_el2_debug \mode
++	__init_el2_lor
++	__init_el2_stage2
++	__init_el2_gicv3
++	__init_el2_hstr
++
++	/*
++	 * When VHE is not in use, early init of EL2 needs to be done here.
++	 * When VHE _is_ in use, EL1 will not be used in the host and
++	 * requires no configuration, and all non-hyp-specific EL2 setup
++	 * will be done via the _EL1 system register aliases in __cpu_setup.
++	 */
++.ifeqs "\mode", "nvhe"
++	__init_el2_nvhe_idregs
++	__init_el2_nvhe_cptr
++	__init_el2_nvhe_sve
++	__init_el2_nvhe_prepare_eret
++.endif
++.endm
++
++#endif /* __ARM_KVM_INIT_H__ */
+diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
+index d8d9caf02834..da913ce9e89f 100644
+--- a/arch/arm64/kernel/head.S
++++ b/arch/arm64/kernel/head.S
+@@ -11,7 +11,6 @@
  
+ #include <linux/linkage.h>
+ #include <linux/init.h>
+-#include <linux/irqchip/arm-gic-v3.h>
  #include <linux/pgtable.h>
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index d9e8d7dc7e11..9e5d0ea84822 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1386,7 +1386,6 @@ static void cpu_init_hyp_mode(void)
- {
- 	phys_addr_t pgd_ptr;
- 	unsigned long hyp_stack_ptr;
--	unsigned long vector_ptr;
- 	unsigned long tpidr_el2;
- 	struct arm_smccc_res res;
  
-@@ -1404,7 +1403,6 @@ static void cpu_init_hyp_mode(void)
- 	pgd_ptr = kvm_mmu_get_httbr();
- 	hyp_stack_ptr = __this_cpu_read(kvm_arm_hyp_stack_page) + PAGE_SIZE;
- 	hyp_stack_ptr = kern_hyp_va(hyp_stack_ptr);
--	vector_ptr = (unsigned long)kern_hyp_va(kvm_ksym_ref(__kvm_hyp_host_vector));
+ #include <asm/asm_pointer_auth.h>
+@@ -21,6 +20,7 @@
+ #include <asm/asm-offsets.h>
+ #include <asm/cache.h>
+ #include <asm/cputype.h>
++#include <asm/el2_setup.h>
+ #include <asm/elf.h>
+ #include <asm/image.h>
+ #include <asm/kernel-pgtable.h>
+@@ -493,159 +493,47 @@ SYM_FUNC_START(el2_setup)
+ 	mrs	x0, CurrentEL
+ 	cmp	x0, #CurrentEL_EL2
+ 	b.eq	1f
++
+ 	mov_q	x0, (SCTLR_EL1_RES1 | ENDIAN_SET_EL1)
+ 	msr	sctlr_el1, x0
+ 	mov	w0, #BOOT_CPU_MODE_EL1		// This cpu booted in EL1
+ 	isb
+ 	ret
  
+-1:	mov_q	x0, (SCTLR_EL2_RES1 | ENDIAN_SET_EL2)
+-	msr	sctlr_el2, x0
+-
++1:
+ #ifdef CONFIG_ARM64_VHE
  	/*
- 	 * Call initialization code, and switch to the full blown HYP code.
-@@ -1414,7 +1412,7 @@ static void cpu_init_hyp_mode(void)
+-	 * Check for VHE being present. For the rest of the EL2 setup,
+-	 * x2 being non-zero indicates that we do have VHE, and that the
+-	 * kernel is intended to run at EL2.
++	 * Check for VHE being present. x2 being non-zero indicates that we
++	 * do have VHE, and that the kernel is intended to run at EL2.
  	 */
- 	BUG_ON(!system_capabilities_finalized());
- 	arm_smccc_1_1_hvc(KVM_HOST_SMCCC_FUNC(__kvm_hyp_init),
--			  pgd_ptr, tpidr_el2, hyp_stack_ptr, vector_ptr, &res);
-+			  pgd_ptr, tpidr_el2, hyp_stack_ptr, &res);
- 	WARN_ON(res.a0 != SMCCC_RET_SUCCESS);
+ 	mrs	x2, id_aa64mmfr1_el1
+ 	ubfx	x2, x2, #ID_AA64MMFR1_VHE_SHIFT, #4
+-#else
+-	mov	x2, xzr
+-#endif
++	cbz	x2, el2_setup_nvhe
  
- 	/*
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-index b11a9d7db677..931a8c38f085 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-@@ -50,7 +50,6 @@ __invalid:
- 	 * x1: HYP pgd
- 	 * x2: per-CPU offset
- 	 * x3: HYP stack
--	 * x4: HYP vectors
- 	 */
- __do_hyp_init:
- 	/* Check for a stub HVC call */
-@@ -134,9 +133,13 @@ alternative_else_nop_endif
- 	msr	sctlr_el2, x0
+-	/* Hyp configuration. */
+-	mov_q	x0, HCR_HOST_NVHE_FLAGS
+-	cbz	x2, set_hcr
+ 	mov_q	x0, HCR_HOST_VHE_FLAGS
+-set_hcr:
+ 	msr	hcr_el2, x0
  	isb
  
--	/* Set the stack and new vectors */
-+	/* Set the stack */
- 	mov	sp, x3
--	msr	vbar_el2, x4
-+
-+	/* Set the host vector */
-+	ldr	x0, =__kvm_hyp_host_vector
-+	kimg_hyp_va x0, x1
-+	msr	vbar_el2, x0
+-	/*
+-	 * Allow Non-secure EL1 and EL0 to access physical timer and counter.
+-	 * This is not necessary for VHE, since the host kernel runs in EL2,
+-	 * and EL0 accesses are configured in the later stage of boot process.
+-	 * Note that when HCR_EL2.E2H == 1, CNTHCTL_EL2 has the same bit layout
+-	 * as CNTKCTL_EL1, and CNTKCTL_EL1 accessing instructions are redefined
+-	 * to access CNTHCTL_EL2. This allows the kernel designed to run at EL1
+-	 * to transparently mess with the EL0 bits via CNTKCTL_EL1 access in
+-	 * EL2.
+-	 */
+-	cbnz	x2, 1f
+-	mrs	x0, cnthctl_el2
+-	orr	x0, x0, #3			// Enable EL1 physical timers
+-	msr	cnthctl_el2, x0
+-1:
+-	msr	cntvoff_el2, xzr		// Clear virtual offset
+-
+-#ifdef CONFIG_ARM_GIC_V3
+-	/* GICv3 system register access */
+-	mrs	x0, id_aa64pfr0_el1
+-	ubfx	x0, x0, #ID_AA64PFR0_GIC_SHIFT, #4
+-	cbz	x0, 3f
+-
+-	mrs_s	x0, SYS_ICC_SRE_EL2
+-	orr	x0, x0, #ICC_SRE_EL2_SRE	// Set ICC_SRE_EL2.SRE==1
+-	orr	x0, x0, #ICC_SRE_EL2_ENABLE	// Set ICC_SRE_EL2.Enable==1
+-	msr_s	SYS_ICC_SRE_EL2, x0
+-	isb					// Make sure SRE is now set
+-	mrs_s	x0, SYS_ICC_SRE_EL2		// Read SRE back,
+-	tbz	x0, #0, 3f			// and check that it sticks
+-	msr_s	SYS_ICH_HCR_EL2, xzr		// Reset ICC_HCR_EL2 to defaults
+-
+-3:
+-#endif
+-
+-	/* Populate ID registers. */
+-	mrs	x0, midr_el1
+-	mrs	x1, mpidr_el1
+-	msr	vpidr_el2, x0
+-	msr	vmpidr_el2, x1
+-
+-#ifdef CONFIG_COMPAT
+-	msr	hstr_el2, xzr			// Disable CP15 traps to EL2
+-#endif
+-
+-	/* EL2 debug */
+-	mrs	x1, id_aa64dfr0_el1
+-	sbfx	x0, x1, #ID_AA64DFR0_PMUVER_SHIFT, #4
+-	cmp	x0, #1
+-	b.lt	4f				// Skip if no PMU present
+-	mrs	x0, pmcr_el0			// Disable debug access traps
+-	ubfx	x0, x0, #11, #5			// to EL2 and allow access to
+-4:
+-	csel	x3, xzr, x0, lt			// all PMU counters from EL1
+-
+-	/* Statistical profiling */
+-	ubfx	x0, x1, #ID_AA64DFR0_PMSVER_SHIFT, #4
+-	cbz	x0, 7f				// Skip if SPE not present
+-	cbnz	x2, 6f				// VHE?
+-	mrs_s	x4, SYS_PMBIDR_EL1		// If SPE available at EL2,
+-	and	x4, x4, #(1 << SYS_PMBIDR_EL1_P_SHIFT)
+-	cbnz	x4, 5f				// then permit sampling of physical
+-	mov	x4, #(1 << SYS_PMSCR_EL2_PCT_SHIFT | \
+-		      1 << SYS_PMSCR_EL2_PA_SHIFT)
+-	msr_s	SYS_PMSCR_EL2, x4		// addresses and physical counter
+-5:
+-	mov	x1, #(MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT)
+-	orr	x3, x3, x1			// If we don't have VHE, then
+-	b	7f				// use EL1&0 translation.
+-6:						// For VHE, use EL2 translation
+-	orr	x3, x3, #MDCR_EL2_TPMS		// and disable access from EL1
+-7:
+-	msr	mdcr_el2, x3			// Configure debug traps
+-
+-	/* LORegions */
+-	mrs	x1, id_aa64mmfr1_el1
+-	ubfx	x0, x1, #ID_AA64MMFR1_LOR_SHIFT, 4
+-	cbz	x0, 1f
+-	msr_s	SYS_LORC_EL1, xzr
+-1:
+-
+-	/* Stage-2 translation */
+-	msr	vttbr_el2, xzr
+-
+-	cbz	x2, install_el2_stub
++	init_el2_state vhe
  
- 	/* Hello, World! */
- 	mov	x0, #SMCCC_RET_SUCCESS
+ 	mov	w0, #BOOT_CPU_MODE_EL2		// This CPU booted in EL2
+ 	isb
+ 	ret
++#endif
+ 
+-SYM_INNER_LABEL(install_el2_stub, SYM_L_LOCAL)
+-	/*
+-	 * When VHE is not in use, early init of EL2 and EL1 needs to be
+-	 * done here.
+-	 * When VHE _is_ in use, EL1 will not be used in the host and
+-	 * requires no configuration, and all non-hyp-specific EL2 setup
+-	 * will be done via the _EL1 system register aliases in __cpu_setup.
+-	 */
+-	mov_q	x0, (SCTLR_EL1_RES1 | ENDIAN_SET_EL1)
+-	msr	sctlr_el1, x0
+-
+-	/* Coprocessor traps. */
+-	mov	x0, #0x33ff
+-	msr	cptr_el2, x0			// Disable copro. traps to EL2
+-
+-	/* SVE register access */
+-	mrs	x1, id_aa64pfr0_el1
+-	ubfx	x1, x1, #ID_AA64PFR0_SVE_SHIFT, #4
+-	cbz	x1, 7f
+-
+-	bic	x0, x0, #CPTR_EL2_TZ		// Also disable SVE traps
+-	msr	cptr_el2, x0			// Disable copro. traps to EL2
++SYM_INNER_LABEL(el2_setup_nvhe, SYM_L_LOCAL)
++	mov_q	x0, HCR_HOST_NVHE_FLAGS
++	msr	hcr_el2, x0
+ 	isb
+-	mov	x1, #ZCR_ELx_LEN_MASK		// SVE: Enable full vector
+-	msr_s	SYS_ZCR_EL2, x1			// length for EL1.
++
++	init_el2_state nvhe
+ 
+ 	/* Hypervisor stub */
+-7:	adr_l	x0, __hyp_stub_vectors
++	adr_l	x0, __hyp_stub_vectors
+ 	msr	vbar_el2, x0
+ 
+-	/* spsr */
+-	mov	x0, #(PSR_F_BIT | PSR_I_BIT | PSR_A_BIT | PSR_D_BIT |\
+-		      PSR_MODE_EL1h)
+-	msr	spsr_el2, x0
++	mov_q	x0, (SCTLR_EL1_RES1 | ENDIAN_SET_EL1)
++	msr	sctlr_el1, x0
+ 	msr	elr_el2, lr
+ 	mov	w0, #BOOT_CPU_MODE_EL2		// This CPU booted in EL2
+ 	eret
 -- 
 2.29.2.454.gaff20da3a2-goog
 
