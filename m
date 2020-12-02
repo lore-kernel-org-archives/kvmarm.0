@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45EFFC71155
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Dec 2020 18:41:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8027C64E7C
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Dec 2020 18:41:43 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A32AF206F9
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Dec 2020 18:41:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A32AF206F9
+	by mail.kernel.org (Postfix) with ESMTP id 36056221FA
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Dec 2020 18:41:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36056221FA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F07B4B3C2;
-	Wed,  2 Dec 2020 13:41:39 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 991E24B328;
+	Wed,  2 Dec 2020 13:41:42 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 5twDi74Mrk1C; Wed,  2 Dec 2020 13:41:38 -0500 (EST)
+	with ESMTP id RXm7Ic1tVHaA; Wed,  2 Dec 2020 13:41:41 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C8D0C4B424;
-	Wed,  2 Dec 2020 13:41:37 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E1C4B4B2D9;
+	Wed,  2 Dec 2020 13:41:40 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 08C6E4B363
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Dec 2020 13:41:37 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D1EC4B40B
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Dec 2020 13:41:39 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id iUs1TPnWvmaZ for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 Dec 2020 13:41:36 -0500 (EST)
-Received: from mail-wr1-f66.google.com (mail-wr1-f66.google.com
- [209.85.221.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 581A64B2CE
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Dec 2020 13:41:35 -0500 (EST)
-Received: by mail-wr1-f66.google.com with SMTP id z7so5173956wrn.3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Dec 2020 10:41:35 -0800 (PST)
+ with ESMTP id p3NwFAOCQQjn for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Dec 2020 13:41:38 -0500 (EST)
+Received: from mail-wm1-f68.google.com (mail-wm1-f68.google.com
+ [209.85.128.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8D0784B417
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Dec 2020 13:41:37 -0500 (EST)
+Received: by mail-wm1-f68.google.com with SMTP id d3so10148633wmb.4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Dec 2020 10:41:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=JTPYqEMEJVYu7EDLdYK8M/9yDaVtcEHoKzFLwQ3C9WQ=;
- b=G9nRp1NClO5ThaoHR0FfWTTV1jX37+O++dpEWQ5M8ktTDAMpJeJccyh4QbRtPHzrgj
- 3p0wDTK1oNkUPBZWEB48xqyd1DpiPlza78uG3UJmd0FRgJoXsvYEFC5/dJ6p1PDADnej
- JzxUan8mUbqcytiT8Xsbq58HdA7MIJPBZrBTgotHo8Pn9CTEZK8UNEMPbhDMlXHR7m1s
- PDfiRnDCZkEazv3nGY2YNAECEwG/U/mnyvg+RXProtzJE1N/fcd9LDxLtq4B8OclAb90
- fHQNn4wIZufUltwam9z0S7haohHxuJjP1yQ/G1kC05DlOQE4unx7Y8oRzB8xond/u6h2
- YkBA==
+ bh=oYr8FdouxPNXJYj6F8T1dGVqWutC568ZBSlYDhNUpeM=;
+ b=NFEcyQF7W9LakzcYiLFbTpnuPAMTiR4UFuRT3IJs/i5DDvUsC/Uk+pNi698+XnR+B3
+ QvuGNYXhk0dGxab42tIg+hNWSU6kt6X6ohldo4maT1nBg8OCcEsLb7KMRGyrWvFjWZ/H
+ 2MB6Hn6JpAEzYKrPxpWA8Q8hRQJkCsOHXtT+NYu5fSFfNjcA1GfzpsmPzA56wvUk00Cj
+ IZL1Q9wtPhCPc1k8fuvTMtfqVkMsQw16wnU8dYjnzN/A3CT2NCxt5QMNeN/STdRHVymz
+ g9/rpoZBqCJQLXqQDVCHWAEfjit68BnXYNUkvRfxB6WeaygnWo0DN1M+xUvQPp3l3xPn
+ +LmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=JTPYqEMEJVYu7EDLdYK8M/9yDaVtcEHoKzFLwQ3C9WQ=;
- b=Oo5biMWgzs3oyE+u0fQCD6bkVJBBy2F1u3QisZl5XZqK97R3yDbLO8kx4UnozQ0I8q
- H6xB75rygBhLqKd3hOE1hIKLR/g/1BJheZnnqbfKkICyco7GLxIayB18altvBmSIDb8w
- F+5N3TqfMGnbKHafenSikDNYnpDLWcq0p7SYwh1ZlcrBkEGNJRxmKEh7dmZOjFgl7Zs6
- 99kAcCA6pDiUQr2U/hrJsLQ76GWXZVB6FfqsVIz/O/HC3WjUY9Ai+GLvJ3dq0g8eT9xc
- ADERHS0Ez1mls6AvvEeEpc3PR886bGz82rIjqQ6Gj/qPS3G+fN4AIrcv6DQIY8/tpb08
- 7FxA==
-X-Gm-Message-State: AOAM533MTbRhXsZQitMTwZxHdzYu30hxbyNCYAWM06fVlB3So1YX8bu1
- tDngCz7Hl2sOpY8o09q+EIqa5BXKjhceqg==
-X-Google-Smtp-Source: ABdhPJziIgLZ0tc/W8uCPyhlwdgytrCa5jtp+4HLbEeMEMxZ9Y3AuJ3UEdaL+P3G5xYsvTsXBF1VmQ==
-X-Received: by 2002:a5d:4610:: with SMTP id t16mr5088666wrq.391.1606934493917; 
- Wed, 02 Dec 2020 10:41:33 -0800 (PST)
+ bh=oYr8FdouxPNXJYj6F8T1dGVqWutC568ZBSlYDhNUpeM=;
+ b=IqbxmNEC51ZzlO0Xed7G7aPCQAGzQrla1+z4hFJJ6zGwCe3EiG7Lk+DCmUSUmEALo4
+ vndUUnIWtRWHRQHLyprXhPSeUHDFL2PXJGyHKTj8rxFBJAlfcn2quyLlH/vkxFp1LdxP
+ hgB9DkAT7IFdyTHg3MZ8zke46KU1WI5qAn/QwbDrhL/yKkkZVjkmTQ45Kr2Ld5kIHz81
+ aALh1hegz62eML/bAS2sWLHLYsYV3iHQj2b+pvrDCaHMolRzqmIo4wvdBG6aP7GXB32L
+ a7kJtrvhABkva4uHyO9Sj/p3FPoeejbHyzwYiRYJn+LGPXQEAAfNW27gJDY4dIr/mhTe
+ enkQ==
+X-Gm-Message-State: AOAM530LZCqjRyCzPrlxcNfERiCSYnb3d+gtE9xyGpJLSjASZ40AlPuB
+ SMd5C9LS5qckqK9fc+a/ZrDLpKBrR0EcYQ==
+X-Google-Smtp-Source: ABdhPJyA+FeKGAZ0pnrVUnW1W88hwOUW0I0MbdOAm+Y14RWvjrRicJ4tZn4rpByON5cgnGjgoXvNAw==
+X-Received: by 2002:a1c:f315:: with SMTP id q21mr4543655wmq.1.1606934496105;
+ Wed, 02 Dec 2020 10:41:36 -0800 (PST)
 Received: from localhost ([2a01:4b00:8523:2d03:5ddd:b7c5:e3c9:e87a])
- by smtp.gmail.com with ESMTPSA id r21sm3315301wrc.16.2020.12.02.10.41.32
+ by smtp.gmail.com with ESMTPSA id h15sm3006773wrw.15.2020.12.02.10.41.34
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 02 Dec 2020 10:41:32 -0800 (PST)
+ Wed, 02 Dec 2020 10:41:35 -0800 (PST)
 From: David Brazdil <dbrazdil@google.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v4 03/26] psci: Support psci_ops.get_version for v0.1
-Date: Wed,  2 Dec 2020 18:40:59 +0000
-Message-Id: <20201202184122.26046-4-dbrazdil@google.com>
+Subject: [PATCH v4 04/26] psci: Split functions to v0.1 and v0.2+ variants
+Date: Wed,  2 Dec 2020 18:41:00 +0000
+Message-Id: <20201202184122.26046-5-dbrazdil@google.com>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201202184122.26046-1-dbrazdil@google.com>
 References: <20201202184122.26046-1-dbrazdil@google.com>
@@ -103,66 +103,185 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-KVM's host PSCI SMC filter needs to be aware of the PSCI version of the
-system but currently it is impossible to distinguish between v0.1 and
-PSCI disabled because both have get_version == NULL.
+Refactor implementation of v0.1+ functions (CPU_SUSPEND, CPU_OFF,
+CPU_ON, MIGRATE) to have two functions psci_0_1_foo / psci_0_2_foo that
+select the function ID and call a common helper __psci_foo.
 
-Populate get_version for v0.1 with a function that returns a constant.
+This is a small cleanup so that the function ID array is only used for
+v0.1 configurations.
 
-psci_opt.get_version is currently unused so this has no effect on
-existing functionality.
-
-Acked-by: Mark Rutland <mark.rutland@arm.com>
 Signed-off-by: David Brazdil <dbrazdil@google.com>
 ---
- drivers/firmware/psci/psci.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+ drivers/firmware/psci/psci.c | 94 +++++++++++++++++++++++-------------
+ 1 file changed, 60 insertions(+), 34 deletions(-)
 
 diff --git a/drivers/firmware/psci/psci.c b/drivers/firmware/psci/psci.c
-index 00af99b6f97c..ace5b9ac676c 100644
+index ace5b9ac676c..13b9ed71b446 100644
 --- a/drivers/firmware/psci/psci.c
 +++ b/drivers/firmware/psci/psci.c
-@@ -146,7 +146,12 @@ static int psci_to_linux_errno(int errno)
- 	return -EINVAL;
+@@ -168,46 +168,80 @@ int psci_set_osi_mode(bool enable)
+ 	return psci_to_linux_errno(err);
  }
  
--static u32 psci_get_version(void)
-+static u32 psci_0_1_get_version(void)
+-static int psci_cpu_suspend(u32 state, unsigned long entry_point)
++static int __psci_cpu_suspend(u32 fn, u32 state, unsigned long entry_point)
+ {
+ 	int err;
+-	u32 fn;
+ 
+-	fn = psci_function_id[PSCI_FN_CPU_SUSPEND];
+ 	err = invoke_psci_fn(fn, state, entry_point, 0);
+ 	return psci_to_linux_errno(err);
+ }
+ 
+-static int psci_cpu_off(u32 state)
++static int psci_0_1_cpu_suspend(u32 state, unsigned long entry_point)
 +{
-+	return PSCI_VERSION(0, 1);
++	return __psci_cpu_suspend(psci_function_id[PSCI_FN_CPU_SUSPEND],
++				  state, entry_point);
 +}
 +
-+static u32 psci_0_2_get_version(void)
++static int psci_0_2_cpu_suspend(u32 state, unsigned long entry_point)
++{
++	return __psci_cpu_suspend(PSCI_FN_NATIVE(0_2, CPU_SUSPEND),
++				  state, entry_point);
++}
++
++static int __psci_cpu_off(u32 fn, u32 state)
  {
- 	return invoke_psci_fn(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
+ 	int err;
+-	u32 fn;
+ 
+-	fn = psci_function_id[PSCI_FN_CPU_OFF];
+ 	err = invoke_psci_fn(fn, state, 0, 0);
+ 	return psci_to_linux_errno(err);
  }
-@@ -421,7 +426,7 @@ static void __init psci_init_smccc(void)
+ 
+-static int psci_cpu_on(unsigned long cpuid, unsigned long entry_point)
++static int psci_0_1_cpu_off(u32 state)
++{
++	return __psci_cpu_off(psci_function_id[PSCI_FN_CPU_OFF], state);
++}
++
++static int psci_0_2_cpu_off(u32 state)
++{
++	return __psci_cpu_off(PSCI_0_2_FN_CPU_OFF, state);
++}
++
++static int __psci_cpu_on(u32 fn, unsigned long cpuid, unsigned long entry_point)
+ {
+ 	int err;
+-	u32 fn;
+ 
+-	fn = psci_function_id[PSCI_FN_CPU_ON];
+ 	err = invoke_psci_fn(fn, cpuid, entry_point, 0);
+ 	return psci_to_linux_errno(err);
+ }
+ 
+-static int psci_migrate(unsigned long cpuid)
++static int psci_0_1_cpu_on(unsigned long cpuid, unsigned long entry_point)
++{
++	return __psci_cpu_on(psci_function_id[PSCI_FN_CPU_ON], cpuid, entry_point);
++}
++
++static int psci_0_2_cpu_on(unsigned long cpuid, unsigned long entry_point)
++{
++	return __psci_cpu_on(PSCI_FN_NATIVE(0_2, CPU_ON), cpuid, entry_point);
++}
++
++static int __psci_migrate(u32 fn, unsigned long cpuid)
+ {
+ 	int err;
+-	u32 fn;
+ 
+-	fn = psci_function_id[PSCI_FN_MIGRATE];
+ 	err = invoke_psci_fn(fn, cpuid, 0, 0);
+ 	return psci_to_linux_errno(err);
+ }
+ 
++static int psci_0_1_migrate(unsigned long cpuid)
++{
++	return __psci_migrate(psci_function_id[PSCI_FN_MIGRATE], cpuid);
++}
++
++static int psci_0_2_migrate(unsigned long cpuid)
++{
++	return __psci_migrate(PSCI_FN_NATIVE(0_2, MIGRATE), cpuid);
++}
++
+ static int psci_affinity_info(unsigned long target_affinity,
+ 		unsigned long lowest_affinity_level)
+ {
+@@ -352,7 +386,7 @@ static void __init psci_init_system_suspend(void)
+ 
+ static void __init psci_init_cpu_suspend(void)
+ {
+-	int feature = psci_features(psci_function_id[PSCI_FN_CPU_SUSPEND]);
++	int feature = psci_features(PSCI_FN_NATIVE(0_2, CPU_SUSPEND));
+ 
+ 	if (feature != PSCI_RET_NOT_SUPPORTED)
+ 		psci_cpu_suspend_feature = feature;
+@@ -426,24 +460,16 @@ static void __init psci_init_smccc(void)
  static void __init psci_0_2_set_functions(void)
  {
  	pr_info("Using standard PSCI v0.2 function IDs\n");
--	psci_ops.get_version = psci_get_version;
-+	psci_ops.get_version = psci_0_2_get_version;
+-	psci_ops.get_version = psci_0_2_get_version;
+-
+-	psci_function_id[PSCI_FN_CPU_SUSPEND] =
+-					PSCI_FN_NATIVE(0_2, CPU_SUSPEND);
+-	psci_ops.cpu_suspend = psci_cpu_suspend;
+-
+-	psci_function_id[PSCI_FN_CPU_OFF] = PSCI_0_2_FN_CPU_OFF;
+-	psci_ops.cpu_off = psci_cpu_off;
+-
+-	psci_function_id[PSCI_FN_CPU_ON] = PSCI_FN_NATIVE(0_2, CPU_ON);
+-	psci_ops.cpu_on = psci_cpu_on;
  
- 	psci_function_id[PSCI_FN_CPU_SUSPEND] =
- 					PSCI_FN_NATIVE(0_2, CPU_SUSPEND);
-@@ -450,7 +455,7 @@ static void __init psci_0_2_set_functions(void)
-  */
- static int __init psci_probe(void)
- {
--	u32 ver = psci_get_version();
-+	u32 ver = psci_0_2_get_version();
+-	psci_function_id[PSCI_FN_MIGRATE] = PSCI_FN_NATIVE(0_2, MIGRATE);
+-	psci_ops.migrate = psci_migrate;
+-
+-	psci_ops.affinity_info = psci_affinity_info;
+-
+-	psci_ops.migrate_info_type = psci_migrate_info_type;
++	psci_ops = (struct psci_operations){
++		.get_version = psci_0_2_get_version,
++		.cpu_suspend = psci_0_2_cpu_suspend,
++		.cpu_off = psci_0_2_cpu_off,
++		.cpu_on = psci_0_2_cpu_on,
++		.migrate = psci_0_2_migrate,
++		.affinity_info = psci_affinity_info,
++		.migrate_info_type = psci_migrate_info_type,
++	};
  
- 	pr_info("PSCIv%d.%d detected in firmware.\n",
- 			PSCI_VERSION_MAJOR(ver),
-@@ -514,6 +519,8 @@ static int __init psci_0_1_init(struct device_node *np)
+ 	arm_pm_restart = psci_sys_reset;
  
- 	pr_info("Using PSCI v0.1 Function IDs from DT\n");
+@@ -523,22 +549,22 @@ static int __init psci_0_1_init(struct device_node *np)
  
-+	psci_ops.get_version = psci_0_1_get_version;
-+
  	if (!of_property_read_u32(np, "cpu_suspend", &id)) {
  		psci_function_id[PSCI_FN_CPU_SUSPEND] = id;
- 		psci_ops.cpu_suspend = psci_cpu_suspend;
+-		psci_ops.cpu_suspend = psci_cpu_suspend;
++		psci_ops.cpu_suspend = psci_0_1_cpu_suspend;
+ 	}
+ 
+ 	if (!of_property_read_u32(np, "cpu_off", &id)) {
+ 		psci_function_id[PSCI_FN_CPU_OFF] = id;
+-		psci_ops.cpu_off = psci_cpu_off;
++		psci_ops.cpu_off = psci_0_1_cpu_off;
+ 	}
+ 
+ 	if (!of_property_read_u32(np, "cpu_on", &id)) {
+ 		psci_function_id[PSCI_FN_CPU_ON] = id;
+-		psci_ops.cpu_on = psci_cpu_on;
++		psci_ops.cpu_on = psci_0_1_cpu_on;
+ 	}
+ 
+ 	if (!of_property_read_u32(np, "migrate", &id)) {
+ 		psci_function_id[PSCI_FN_MIGRATE] = id;
+-		psci_ops.migrate = psci_migrate;
++		psci_ops.migrate = psci_0_1_migrate;
+ 	}
+ 
+ 	return 0;
 -- 
 2.29.2.454.gaff20da3a2-goog
 
