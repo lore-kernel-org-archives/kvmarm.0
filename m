@@ -2,78 +2,82 @@ Return-Path: <SRS0=mzwA=FH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71D8CC63777
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Dec 2020 13:31:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5274C84461
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Dec 2020 13:39:42 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 932982051A
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Dec 2020 13:31:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 932982051A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id CC35D206CA
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Dec 2020 13:39:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC35D206CA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E7E384B1D0;
-	Thu,  3 Dec 2020 08:31:27 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6AECA4B16C;
+	Thu,  3 Dec 2020 08:39:41 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id cmSa-kFRNVqr; Thu,  3 Dec 2020 08:31:26 -0500 (EST)
+	with ESMTP id gPZ0hitbnvet; Thu,  3 Dec 2020 08:39:40 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AB4374B19D;
-	Thu,  3 Dec 2020 08:31:26 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F1A94B193;
+	Thu,  3 Dec 2020 08:39:40 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F9E54B184
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2020 08:31:25 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C1D84B178
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2020 08:39:39 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JPAWSCjvYkUy for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Dec 2020 08:31:24 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 35C974B180
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2020 08:31:24 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ with ESMTP id aiCVeo+3lj84 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Dec 2020 08:39:38 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 20BA84B16C
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2020 08:39:38 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1607002778;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=iR7gkdJrFwjB9XBXC0FTKq3hO206gF6O5UUzfF12lxA=;
+ b=JHEz89G99o3Y9v+mju3CRpiRXuVHMQhuxHbOkR//Phl5M8NFoI1VFycXZPqx+rHWeSUrWy
+ 5LB024QZMA2L/5cVlFh09x4StLgILwYyXF4porDxv05ion09ezY1SZQoKZFTbVWL4NmZVG
+ 7fkdlikit45p3HWQ74rONnxcUskQJFY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-411-tW29N7-SO_SGZYklLh8iBA-1; Thu, 03 Dec 2020 08:39:36 -0500
+X-MC-Unique: tW29N7-SO_SGZYklLh8iBA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 91734207EA;
- Thu,  3 Dec 2020 13:31:22 +0000 (UTC)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
- TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
- (envelope-from <maz@kernel.org>)
- id 1kkohb-00FfbD-86; Thu, 03 Dec 2020 13:31:20 +0000
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 86FCE106F8DA;
+ Thu,  3 Dec 2020 13:39:34 +0000 (UTC)
+Received: from [10.36.112.89] (ovpn-112-89.ams2.redhat.com [10.36.112.89])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0AB7E6090F;
+ Thu,  3 Dec 2020 13:39:32 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH 08/10] arm/arm64: gic: Split check_acked()
+ into two functions
+To: Alexandru Elisei <alexandru.elisei@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, drjones@redhat.com
+References: <20201125155113.192079-1-alexandru.elisei@arm.com>
+ <20201125155113.192079-9-alexandru.elisei@arm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <0eb98cb0-835c-e257-484e-8210f1279f2c@redhat.com>
+Date: Thu, 3 Dec 2020 14:39:31 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Date: Thu, 03 Dec 2020 13:31:18 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: David Brazdil <dbrazdil@google.com>
-Subject: Re: [PATCH v4 15/26] kvm: arm64: Add SMC handler in nVHE EL2
-In-Reply-To: <20201202184122.26046-16-dbrazdil@google.com>
-References: <20201202184122.26046-1-dbrazdil@google.com>
- <20201202184122.26046-16-dbrazdil@google.com>
-User-Agent: Roundcube Webmail/1.4.9
-Message-ID: <6370e564fa4d82bf6a5fb3bb545e01a3@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: dbrazdil@google.com, kvmarm@lists.cs.columbia.edu,
- corbet@lwn.net, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com,
- julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, dennis@kernel.org,
- tj@kernel.org, cl@linux.com, mark.rutland@arm.com, lorenzo.pieralisi@arm.com,
- sudeep.holla@arm.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, kernel-team@android.com,
- Jonathan Corbet <corbet@lwn.net>, Catalin Marinas <catalin.marinas@arm.com>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, Sudeep Holla <sudeep.holla@arm.com>,
- Tejun Heo <tj@kernel.org>, Dennis Zhou <dennis@kernel.org>,
- Christoph Lameter <cl@linux.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20201125155113.192079-9-alexandru.elisei@arm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Cc: andre.przywara@arm.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -85,111 +89,186 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2020-12-02 18:41, David Brazdil wrote:
-> Add handler of host SMCs in KVM nVHE trap handler. Forward all SMCs to
-> EL3 and propagate the result back to EL1. This is done in preparation
-> for validating host SMCs in KVM protected mode.
+
+
+On 11/25/20 4:51 PM, Alexandru Elisei wrote:
+> check_acked() has several peculiarities: is the only function among the
+> check_* functions which calls report() directly, it does two things
+> (waits for interrupts and checks for misfired interrupts) and it also
+> mixes printf, report_info and report calls.
 > 
-> The implementation assumes that firmware uses SMCCC v1.2 or older. That
-> means x0-x17 can be used both for arguments and results, other GPRs are
-> preserved.
+> check_acked() also reports a pass and returns as soon all the target CPUs
+> have received interrupts, However, a CPU not having received an interrupt
+> *now* does not guarantee not receiving an eroneous interrupt if we wait
+erroneous
+> long enough.
 > 
-> Signed-off-by: David Brazdil <dbrazdil@google.com>
+> Rework the function by splitting it into two separate functions, each with
+> a single responsability: wait_for_interrupts(), which waits for the
+> expected interrupts to fire, and check_acked() which checks that interrupts
+> have been received as expected.
+> 
+> wait_for_interrupts() also waits an extra 100 milliseconds after the
+> expected interrupts have been received in an effort to make sure we don't
+> miss misfiring interrupts.
+> 
+> Splitting check_acked() into two functions will also allow us to
+> customize the behavior of each function in the future more easily
+> without using an unnecessarily long list of arguments for check_acked().
+> 
+> CC: Andre Przywara <andre.przywara@arm.com>
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 > ---
->  arch/arm64/kvm/hyp/nvhe/host.S     | 38 ++++++++++++++++++++++++++++++
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 35 ++++++++++++++++++++++++---
->  2 files changed, 70 insertions(+), 3 deletions(-)
+>  arm/gic.c | 73 +++++++++++++++++++++++++++++++++++--------------------
+>  1 file changed, 47 insertions(+), 26 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/host.S 
-> b/arch/arm64/kvm/hyp/nvhe/host.S
-> index fe2740b224cf..2b56f0bdf874 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/host.S
-> +++ b/arch/arm64/kvm/hyp/nvhe/host.S
-> @@ -180,3 +180,41 @@ SYM_CODE_START(__kvm_hyp_host_vector)
->  	invalid_host_el1_vect			// FIQ 32-bit EL1
->  	invalid_host_el1_vect			// Error 32-bit EL1
->  SYM_CODE_END(__kvm_hyp_host_vector)
-> +
-> +/*
-> + * Forward SMC with arguments in struct kvm_cpu_context, and
-> + * store the result into the same struct. Assumes SMCCC 1.2 or older.
-> + *
-> + * x0: struct kvm_cpu_context*
-> + */
-> +SYM_CODE_START(__kvm_hyp_host_forward_smc)
-> +	/*
-> +	 * Use x18 to keep the pointer to the host context because
-> +	 * x18 is callee-saved in SMCCC but not in AAPCS64.
-> +	 */
-> +	mov	x18, x0
-> +
-> +	ldp	x0, x1,   [x18, #CPU_XREG_OFFSET(0)]
-> +	ldp	x2, x3,   [x18, #CPU_XREG_OFFSET(2)]
-> +	ldp	x4, x5,   [x18, #CPU_XREG_OFFSET(4)]
-> +	ldp	x6, x7,   [x18, #CPU_XREG_OFFSET(6)]
-> +	ldp	x8, x9,   [x18, #CPU_XREG_OFFSET(8)]
-> +	ldp	x10, x11, [x18, #CPU_XREG_OFFSET(10)]
-> +	ldp	x12, x13, [x18, #CPU_XREG_OFFSET(12)]
-> +	ldp	x14, x15, [x18, #CPU_XREG_OFFSET(14)]
-> +	ldp	x16, x17, [x18, #CPU_XREG_OFFSET(16)]
-> +
-> +	smc	#0
-> +
-> +	stp	x0, x1,   [x18, #CPU_XREG_OFFSET(0)]
-> +	stp	x2, x3,   [x18, #CPU_XREG_OFFSET(2)]
-> +	stp	x4, x5,   [x18, #CPU_XREG_OFFSET(4)]
-> +	stp	x6, x7,   [x18, #CPU_XREG_OFFSET(6)]
-> +	stp	x8, x9,   [x18, #CPU_XREG_OFFSET(8)]
-> +	stp	x10, x11, [x18, #CPU_XREG_OFFSET(10)]
-> +	stp	x12, x13, [x18, #CPU_XREG_OFFSET(12)]
-> +	stp	x14, x15, [x18, #CPU_XREG_OFFSET(14)]
-> +	stp	x16, x17, [x18, #CPU_XREG_OFFSET(16)]
-> +
-> +	ret
-> +SYM_CODE_END(__kvm_hyp_host_forward_smc)
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index a4f1cac714d7..f25680ede080 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -18,6 +18,8 @@
-> 
->  DEFINE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
-> 
-> +void __kvm_hyp_host_forward_smc(struct kvm_cpu_context *host_ctxt);
-> +
->  static void handle___kvm_vcpu_run(struct kvm_cpu_context *host_ctxt)
->  {
->  	DECLARE_REG(struct kvm_vcpu *, vcpu, host_ctxt, 1);
-> @@ -152,12 +154,39 @@ static void handle_host_hcall(struct
-> kvm_cpu_context *host_ctxt)
->  	cpu_reg(host_ctxt, 0) = SMCCC_RET_NOT_SUPPORTED;
+> diff --git a/arm/gic.c b/arm/gic.c
+> index 544c283f5f47..dcdab7d5f39a 100644
+> --- a/arm/gic.c
+> +++ b/arm/gic.c
+> @@ -62,41 +62,42 @@ static void stats_reset(void)
+>  	}
 >  }
-> 
-> +static void default_host_smc_handler(struct kvm_cpu_context 
-> *host_ctxt)
-> +{
-> +	__kvm_hyp_host_forward_smc(host_ctxt);
+>  
+> -static void check_acked(const char *testname, cpumask_t *mask)
+> +static void wait_for_interrupts(cpumask_t *mask)
+>  {
+> -	int missing = 0, extra = 0, unexpected = 0;
+>  	int nr_pass, cpu, i;
+> -	bool bad = false;
+>  
+>  	/* Wait up to 5s for all interrupts to be delivered */
+> -	for (i = 0; i < 50; ++i) {
+> +	for (i = 0; i < 50; i++) {
+>  		mdelay(100);
+>  		nr_pass = 0;
+>  		for_each_present_cpu(cpu) {
+> +			/*
+> +			 * A CPU having receied more than one interrupts will
+received
+> +			 * show up in check_acked(), and no matter how long we
+> +			 * wait it cannot un-receive it. Consier at least one
+consider
+> +			 * interrupt as a pass.
+> +			 */
+>  			nr_pass += cpumask_test_cpu(cpu, mask) ?
+> -				acked[cpu] == 1 : acked[cpu] == 0;
+> -			smp_rmb(); /* pairs with smp_wmb in ipi_handler */
+> -
+> -			if (bad_sender[cpu] != -1) {
+> -				printf("cpu%d received IPI from wrong sender %d\n",
+> -					cpu, bad_sender[cpu]);
+> -				bad = true;
+> -			}
+> -
+> -			if (bad_irq[cpu] != -1) {
+> -				printf("cpu%d received wrong irq %d\n",
+> -					cpu, bad_irq[cpu]);
+> -				bad = true;
+> -			}
+> +				acked[cpu] >= 1 : acked[cpu] == 0;
+>  		}
+> +
+>  		if (nr_pass == nr_cpus) {
+> -			report(!bad, "%s", testname);
+>  			if (i)
+> -				report_info("took more than %d ms", i * 100);
+> +				report_info("interrupts took more than %d ms", i * 100);
+> +			mdelay(100);
+>  			return;
+>  		}
+>  	}
+>  
+> +	report_info("interrupts timed-out (5s)");
 > +}
 > +
-> +static void skip_host_instruction(void)
+> +static bool check_acked(cpumask_t *mask)
 > +{
-> +	write_sysreg_el2(read_sysreg_el2(SYS_ELR) + 4, SYS_ELR);
-> +}
+> +	int missing = 0, extra = 0, unexpected = 0;
+> +	bool pass = true;
+> +	int cpu;
+> +
+>  	for_each_present_cpu(cpu) {
+>  		if (cpumask_test_cpu(cpu, mask)) {
+>  			if (!acked[cpu])
+> @@ -107,11 +108,28 @@ static void check_acked(const char *testname, cpumask_t *mask)
+>  			if (acked[cpu])
+>  				++unexpected;
+>  		}
+> +		smp_rmb(); /* pairs with smp_wmb in ipi_handler */
+> +
+> +		if (bad_sender[cpu] != -1) {
+> +			report_info("cpu%d received IPI from wrong sender %d",
+> +					cpu, bad_sender[cpu]);
+> +			pass = false;
+> +		}
+> +
+> +		if (bad_irq[cpu] != -1) {
+> +			report_info("cpu%d received wrong irq %d",
+> +					cpu, bad_irq[cpu]);
+> +			pass = false;
+> +		}
+> +	}
+> +
+> +	if (missing || extra || unexpected) {
+> +		report_info("ACKS: missing=%d extra=%d unexpected=%d",
+> +				missing, extra, unexpected);
+> +		pass = false;
+>  	}
+>  
+> -	report(false, "%s", testname);
+> -	report_info("Timed-out (5s). ACKS: missing=%d extra=%d unexpected=%d",
+> -		    missing, extra, unexpected);
+> +	return pass;
+>  }
+>  
+>  static void check_spurious(void)
+> @@ -300,7 +318,8 @@ static void ipi_test_self(void)
+>  	cpumask_clear(&mask);
+>  	cpumask_set_cpu(smp_processor_id(), &mask);
+>  	gic->ipi.send_self();
+> -	check_acked("IPI: self", &mask);
+> +	wait_for_interrupts(&mask);
+> +	report(check_acked(&mask), "Interrupts received");
+>  	report_prefix_pop();
+>  }
+>  
+> @@ -315,7 +334,8 @@ static void ipi_test_smp(void)
+>  	for (i = smp_processor_id() & 1; i < nr_cpus; i += 2)
+>  		cpumask_clear_cpu(i, &mask);
+>  	gic_ipi_send_mask(IPI_IRQ, &mask);
+> -	check_acked("IPI: directed", &mask);
+> +	wait_for_interrupts(&mask);
+> +	report(check_acked(&mask), "Interrupts received");
+both ipi_test_smp and ipi_test_self are called from the same test so
+better to use different error messages like it was done originally.
 
-Just for the sake of keeping things together, it'd be good to
-move this helper to include/hyp/adjust_pc.h. Nothing urgent though.
+>  	report_prefix_pop();
+>  
+>  	report_prefix_push("broadcast");
+> @@ -323,7 +343,8 @@ static void ipi_test_smp(void)
+>  	cpumask_copy(&mask, &cpu_present_mask);
+>  	cpumask_clear_cpu(smp_processor_id(), &mask);
+>  	gic->ipi.send_broadcast();
+> -	check_acked("IPI: broadcast", &mask);
+> +	wait_for_interrupts(&mask);
+> +	report(check_acked(&mask), "Interrupts received");
+>  	report_prefix_pop();
+>  }
+>  
+> 
 
-Thanks,
+Otherwise looks good to me
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+Thanks
+
+Eric
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
