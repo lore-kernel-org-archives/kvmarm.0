@@ -1,92 +1,86 @@
-Return-Path: <SRS0=8eDP=FG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=mzwA=FH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 179CFC64E7C
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Dec 2020 18:42:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC2B0C63777
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Dec 2020 09:41:24 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7E5F22173E
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Dec 2020 18:42:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E5F22173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 24B2620872
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Dec 2020 09:41:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24B2620872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BCD14B459;
-	Wed,  2 Dec 2020 13:42:31 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 526A94B18A;
+	Thu,  3 Dec 2020 04:41:23 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 5wQZSasdtAe2; Wed,  2 Dec 2020 13:42:29 -0500 (EST)
+	with ESMTP id zf8JAtvVAKWJ; Thu,  3 Dec 2020 04:41:22 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E82594B474;
-	Wed,  2 Dec 2020 13:42:29 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D86F4B1C5;
+	Thu,  3 Dec 2020 04:41:22 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 81F994B3FE
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Dec 2020 13:42:29 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 571784B1C0
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2020 04:41:21 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LeZaQ2uFKgpf for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 Dec 2020 13:42:28 -0500 (EST)
-Received: from mail-wm1-f66.google.com (mail-wm1-f66.google.com
- [209.85.128.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 65BDC4B2CE
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Dec 2020 13:42:28 -0500 (EST)
-Received: by mail-wm1-f66.google.com with SMTP id e25so11136710wme.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Dec 2020 10:42:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=26Ee3tSf6bjWmO+pbW0InldfONK6QPnrCLx1QjKfx/Q=;
- b=Nu9UWjvhl68YCUsjhbXmp2EFwXOEzYW/jis6nLNCXn/NxJfU7CpOTssijMFw+UsPpd
- 7oltSpuibe/iHjGG2OpFQ4w4pD1qsmbBGRvFmjW2xuUn2JkuWyVwcg85RRjAp9tIXaTK
- aP2gAH/bBPYSxRqNlX8Plyl8Gky8pnctQ4ag/a3FWSbjY3S0k6kIfS78g+wEMf0OxlFk
- v65pBZ5UKBi8p2sRqdfPUqIc6NexyNIU1+i7sK09E/pPGsQ7wP233KAe1++CSZzOLErg
- 61rDJ75t8vNUKCFB/8Anz2tYqOdXv+9jzvHcdxm4tMFqEUh2BjkE8mApOYf3gCbWJHkp
- jjPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=26Ee3tSf6bjWmO+pbW0InldfONK6QPnrCLx1QjKfx/Q=;
- b=tZSTAOncxd5e0vFKSiVwfzLiVzWBkwTKT28t9UnO0mkozeRmHRjYNq9DVhT75PbK2V
- rx0/ij2zID0TD7W5f+IeHGnpwzdDNf1A7czPuJgjML5r72szSO6a85dIYN6nhdrhDa0C
- xoiuWAyw9K/4ZcNaA6lVb2hmNTXKc+Ch5xJ6iwUVh0HForzm/yl/yG1Q7sttZrX9GUP1
- 77eddOK9tU6u51u+jxQBRhq4j6/u/VDuu3j4XqgxFQwCItAqQSMSqCoNGbZaj40yg7O3
- UjmX/JwUAQkvyK+PFaX5Qraul2S/xqkK0QcuyLOAYKp8Le0b3HD19z3bi0DSXOB3blN3
- 8gDw==
-X-Gm-Message-State: AOAM532vFDGhP2jrS22Mq7Vj3oQ28ydIU54CZFtThtNBw/Jf3aTFpW/E
- dohZ+suj7K+/b/crTVVZV8y/+CKY9IvtBQ==
-X-Google-Smtp-Source: ABdhPJxp6dGVemgWiRIwNDXC1BFMQeJwThH7w+RQVGXX/e/0zonlc4l4p1zCzJtr2NzkM2SO9rchMQ==
-X-Received: by 2002:a1c:220a:: with SMTP id i10mr4451281wmi.93.1606934546855; 
- Wed, 02 Dec 2020 10:42:26 -0800 (PST)
-Received: from localhost ([2a01:4b00:8523:2d03:5ddd:b7c5:e3c9:e87a])
- by smtp.gmail.com with ESMTPSA id q12sm3056403wmc.45.2020.12.02.10.42.25
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 02 Dec 2020 10:42:25 -0800 (PST)
-From: David Brazdil <dbrazdil@google.com>
-To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v4 26/26] kvm: arm64: Fix EL2 mode availability checks
-Date: Wed,  2 Dec 2020 18:41:22 +0000
-Message-Id: <20201202184122.26046-27-dbrazdil@google.com>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20201202184122.26046-1-dbrazdil@google.com>
-References: <20201202184122.26046-1-dbrazdil@google.com>
+ with ESMTP id J+epZfLZtcu6 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Dec 2020 04:41:20 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3444D4B1BE
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2020 04:41:20 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1606988480;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=HeYzdAXqS+NSDGuCOA9BgR8uttc50eB1DCAVPpwd4mc=;
+ b=Eh3OYFqtu3BH+wa8NV6KtXr/7BZUc0wt5DCDLaHSK8ecUAgp/rB2QQ7ioELkucof4OnlCH
+ z8NRZ9gKiJTdONsEkmzED6avrBRaK1F5Puwvt50TXyWwgk5nOSM08QdW6TTxLQwD50zt3U
+ 8h2yzxoS669W6A1/XxHVE+yNJvpsvOw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-583-IZ-rfgQIP6qKFWYJtDKRcw-1; Thu, 03 Dec 2020 04:41:16 -0500
+X-MC-Unique: IZ-rfgQIP6qKFWYJtDKRcw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D4E641097D88;
+ Thu,  3 Dec 2020 09:41:14 +0000 (UTC)
+Received: from [10.36.112.89] (ovpn-112-89.ams2.redhat.com [10.36.112.89])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6FD5F5C1BD;
+ Thu,  3 Dec 2020 09:41:13 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH 03/10] arm/arm64: gic: Remove memory
+ synchronization from ipi_clear_active_handler()
+To: Alexandru Elisei <alexandru.elisei@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, drjones@redhat.com
+References: <20201125155113.192079-1-alexandru.elisei@arm.com>
+ <20201125155113.192079-4-alexandru.elisei@arm.com>
+ <038402be-a119-c162-04f2-d32db26e8a96@redhat.com>
+ <df9e2243-008b-3f93-e499-98b887b6c848@arm.com>
+ <7c18deb2-cdfc-0c74-f9d6-d08ace616060@arm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <0697d6ab-bfc0-da42-6c46-e496a5f32331@redhat.com>
+Date: Thu, 3 Dec 2020 10:41:11 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, kernel-team@android.com,
- Jonathan Corbet <corbet@lwn.net>, Catalin Marinas <catalin.marinas@arm.com>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- Sudeep Holla <sudeep.holla@arm.com>, linux-arm-kernel@lists.infradead.org,
- Marc Zyngier <maz@kernel.org>, Tejun Heo <tj@kernel.org>,
- Dennis Zhou <dennis@kernel.org>, Christoph Lameter <cl@linux.com>,
- Will Deacon <will@kernel.org>
+In-Reply-To: <7c18deb2-cdfc-0c74-f9d6-d08ace616060@arm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Cc: andre.przywara@arm.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -103,99 +97,103 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-With protected nVHE hyp code interception host's PSCI SMCs, the host
-starts seeing new CPUs boot in EL1 instead of EL2. The kernel logic
-that keeps track of the boot mode needs to be adjusted.
+Hi Alexandru,
 
-Add a static key enabled if KVM protected mode initialization is
-successful.
+On 12/2/20 3:14 PM, Alexandru Elisei wrote:
+> Hi,
+> 
+> On 12/2/20 2:02 PM, Alexandru Elisei wrote:
+> 
+>> Hi Eric,
+>>
+>> On 12/1/20 4:37 PM, Auger Eric wrote:
+>>> Hi Alexandru,
+>>>
+>>> On 11/25/20 4:51 PM, Alexandru Elisei wrote:
+>>>> The gicv{2,3}-active test sends an IPI from the boot CPU to itself, then
+>>>> checks that the interrupt has been received as expected. There is no need
+>>>> to use inter-processor memory synchronization primitives on code that runs
+>>>> on the same CPU, so remove the unneeded memory barriers.
+>>>>
+>>>> The arrays are modified asynchronously (in the interrupt handler) and it is
+>>>> possible for the compiler to infer that they won't be changed during normal
+>>>> program flow and try to perform harmful optimizations (like stashing a
+>>>> previous read in a register and reusing it). To prevent this, for GICv2,
+>>>> the smp_wmb() in gicv2_ipi_send_self() is replaced with a compiler barrier.
+>>>> For GICv3, the wmb() barrier in gic_ipi_send_single() already implies a
+>>>> compiler barrier.
+>>>>
+>>>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>>>> ---
+>>>>  arm/gic.c | 8 ++++----
+>>>>  1 file changed, 4 insertions(+), 4 deletions(-)
+>>>>
+>>>> diff --git a/arm/gic.c b/arm/gic.c
+>>>> index 401ffafe4299..4e947e8516a2 100644
+>>>> --- a/arm/gic.c
+>>>> +++ b/arm/gic.c
+>>>> @@ -12,6 +12,7 @@
+>>>>   * This work is licensed under the terms of the GNU LGPL, version 2.
+>>>>   */
+>>>>  #include <libcflat.h>
+>>>> +#include <linux/compiler.h>
+>>>>  #include <errata.h>
+>>>>  #include <asm/setup.h>
+>>>>  #include <asm/processor.h>
+>>>> @@ -260,7 +261,8 @@ static void check_lpi_hits(int *expected, const char *msg)
+>>>>  
+>>>>  static void gicv2_ipi_send_self(void)
+>>>>  {> -	smp_wmb();
+>>> nit: previous patch added it and this patch removes it. maybe squash the
+>>> modifs into the previous patch saying only a barrier() is needed for self()?
+>> You're right, this does look out of place. I'll merge this change into the
+>> previous patch.
+>>>> +	/* Prevent the compiler from optimizing memory accesses */
+>>>> +	barrier();
+>>>>  	writel(2 << 24 | IPI_IRQ, gicv2_dist_base() + GICD_SGIR);
+>>>>  }
+>>>>  
+>>>> @@ -359,6 +361,7 @@ static struct gic gicv3 = {
+>>>>  	},
+>>>>  };
+>>>>  
+>>>> +/* Runs on the same CPU as the sender, no need for memory synchronization */
+>>>>  static void ipi_clear_active_handler(struct pt_regs *regs __unused)
+>>>>  {
+>>>>  	u32 irqstat = gic_read_iar();
+>>>> @@ -375,13 +378,10 @@ static void ipi_clear_active_handler(struct pt_regs *regs __unused)
+>>>>  
+>>>>  		writel(val, base + GICD_ICACTIVER);
+>>>>  
+>>>> -		smp_rmb(); /* pairs with wmb in stats_reset */
+>>> the comment says it is paired with wmd in stats_reset. So is it OK to
+>>> leave the associated wmb?
+>> This patch removes multi-processor synchronization from the functions that run on
+>> the same CPU. stats_reset() can be called from one CPU (the IPI_SENDER CPU) and
+>> the variables it modifies accessed by the interrupt handlers running on different
+>> CPUs, like it happens for the IPI tests. In that case we do need the proper
+>> barriers in place.
+> 
+> Sorry, got confused about what you were asking. The next patch removes the
+> smp_wmb() from stats_reset() which became redundant after the barriers added to
+> the GIC functions that send IPIs. This patch is about removing barriers that were
+> never needed in the first place because the functions were running on the same
+> CPU, it's not dependent on anyGIC changes.
 
-When the key is enabled, is_hyp_mode_available continues to report
-`true` because its users either treat it as a check whether KVM will be
-/ was initialized, or whether stub HVCs can be made (eg. hibernate).
+OK I get it. I was just confused by this pairing commment as we remove
+one item and not the other but that's not an issue here as we do not
+need the barrier in that case.
 
-is_hyp_mode_mismatched is changed to report `false` when the key is
-enabled. That's because all cores' modes matched at the point of KVM
-init and KVM will not allow cores not present at init to boot. That
-said, the function is never used after KVM is initialized.
+Feel free to add my R-b w/ or wo the squash:
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Signed-off-by: David Brazdil <dbrazdil@google.com>
----
- arch/arm64/include/asm/virt.h | 18 ++++++++++++++++++
- arch/arm64/kvm/arm.c          |  9 ++++++---
- 2 files changed, 24 insertions(+), 3 deletions(-)
+Thanks
 
-diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
-index eb81dcc220b6..ee6a48df89d9 100644
---- a/arch/arm64/include/asm/virt.h
-+++ b/arch/arm64/include/asm/virt.h
-@@ -65,9 +65,19 @@ extern u32 __boot_cpu_mode[2];
- void __hyp_set_vectors(phys_addr_t phys_vector_base);
- void __hyp_reset_vectors(void);
- 
-+DECLARE_STATIC_KEY_FALSE(kvm_protected_mode_initialized);
-+
- /* Reports the availability of HYP mode */
- static inline bool is_hyp_mode_available(void)
- {
-+	/*
-+	 * If KVM protected mode is initialized, all CPUs must have been booted
-+	 * in EL2. Avoid checking __boot_cpu_mode as CPUs now come up in EL1.
-+	 */
-+	if (IS_ENABLED(CONFIG_KVM) &&
-+	    static_branch_likely(&kvm_protected_mode_initialized))
-+		return true;
-+
- 	return (__boot_cpu_mode[0] == BOOT_CPU_MODE_EL2 &&
- 		__boot_cpu_mode[1] == BOOT_CPU_MODE_EL2);
- }
-@@ -75,6 +85,14 @@ static inline bool is_hyp_mode_available(void)
- /* Check if the bootloader has booted CPUs in different modes */
- static inline bool is_hyp_mode_mismatched(void)
- {
-+	/*
-+	 * If KVM protected mode is initialized, all CPUs must have been booted
-+	 * in EL2. Avoid checking __boot_cpu_mode as CPUs now come up in EL1.
-+	 */
-+	if (IS_ENABLED(CONFIG_KVM) &&
-+	    static_branch_likely(&kvm_protected_mode_initialized))
-+		return false;
-+
- 	return __boot_cpu_mode[0] != __boot_cpu_mode[1];
- }
- 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 5f8776eefe46..6e637d2b4cfb 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -47,6 +47,7 @@ __asm__(".arch_extension	virt");
- #endif
- 
- static enum kvm_mode kvm_mode = KVM_MODE_DEFAULT;
-+DEFINE_STATIC_KEY_FALSE(kvm_protected_mode_initialized);
- 
- DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
- 
-@@ -1926,12 +1927,14 @@ int kvm_arch_init(void *opaque)
- 	if (err)
- 		goto out_hyp;
- 
--	if (is_protected_kvm_enabled())
-+	if (is_protected_kvm_enabled()) {
-+		static_branch_enable(&kvm_protected_mode_initialized);
- 		kvm_info("Protected nVHE mode initialized successfully\n");
--	else if (in_hyp_mode)
-+	} else if (in_hyp_mode) {
- 		kvm_info("VHE mode initialized successfully\n");
--	else
-+	} else {
- 		kvm_info("Hyp mode initialized successfully\n");
-+	}
- 
- 	return 0;
- 
--- 
-2.29.2.454.gaff20da3a2-goog
+Eric
+> 
+> Thanks,
+> Alex
+> 
 
 _______________________________________________
 kvmarm mailing list
