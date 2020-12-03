@@ -2,77 +2,90 @@ Return-Path: <SRS0=mzwA=FH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F414C2BB3F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6968FC4743C
 	for <kvmarm@archiver.kernel.org>; Thu,  3 Dec 2020 14:46:32 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id F02EB207DB
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Dec 2020 14:29:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F02EB207DB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 3D6BF207DC
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Dec 2020 14:29:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D6BF207DC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 567C14B1E0;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C047D4B208;
 	Thu,  3 Dec 2020 09:29:10 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id r8RQb8Sp-VQZ; Thu,  3 Dec 2020 09:29:08 -0500 (EST)
+	with ESMTP id vKGPqtp9w19v; Thu,  3 Dec 2020 09:29:08 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8EDED4B205;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 762884B1E9;
 	Thu,  3 Dec 2020 09:29:06 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 76A1A4B196
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2020 08:23:09 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 12A1A4B15F
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2020 07:58:13 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id R7Wu9QcyfcL2 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Dec 2020 08:23:07 -0500 (EST)
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 70B1F4B19D
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2020 08:23:07 -0500 (EST)
-Received: from DGGEMM404-HUB.china.huawei.com (unknown [172.30.72.57])
- by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4CmxMX2Y8qz13PHT;
- Thu,  3 Dec 2020 21:22:16 +0800 (CST)
-Received: from dggema765-chm.china.huawei.com (10.1.198.207) by
- DGGEMM404-HUB.china.huawei.com (10.3.20.212) with Microsoft SMTP Server (TLS)
- id 14.3.487.0; Thu, 3 Dec 2020 21:23:02 +0800
-Received: from [10.174.185.137] (10.174.185.137) by
- dggema765-chm.china.huawei.com (10.1.198.207) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1913.5; Thu, 3 Dec 2020 21:23:01 +0800
-Subject: Re: [PATCH v13 05/15] iommu/smmuv3: Get prepared for nested stage
- support
-To: Auger Eric <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
- <iommu@lists.linux-foundation.org>, <linux-kernel@vger.kernel.org>,
- <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>, <will@kernel.org>,
- <joro@8bytes.org>, <maz@kernel.org>, <robin.murphy@arm.com>,
- <alex.williamson@redhat.com>
-References: <20201118112151.25412-1-eric.auger@redhat.com>
- <20201118112151.25412-6-eric.auger@redhat.com>
- <a40b90bd-6756-c8cc-b455-c093d16d35f5@huawei.com>
- <096c2c79-84b2-75d4-094f-bdd8b0a2d125@redhat.com>
-From: Kunkun Jiang <jiangkunkun@huawei.com>
-Message-ID: <2b01af02-04cd-352f-6429-543e3e215595@huawei.com>
-Date: Thu, 3 Dec 2020 21:23:01 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+ with ESMTP id KZh7Tscvdl2k for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Dec 2020 07:58:10 -0500 (EST)
+Received: from mail-oo1-f67.google.com (mail-oo1-f67.google.com
+ [209.85.161.67])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C8EA54B14E
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2020 07:58:10 -0500 (EST)
+Received: by mail-oo1-f67.google.com with SMTP id l20so481624oot.3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 03 Dec 2020 04:58:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=FQFn841jHQ6lImpZMqjzWkJv/1YnlMG17mo2m57f2EU=;
+ b=T9bUaRlYDhvt4We2MKYu+1Wnxr1YWl9KM4nvJZx3ly7NyqjHFQjguBOJn6VKD1x/68
+ NBLwe53SCOLiCwFAdNL+tl9bBA6uocuY19aQlJvnTh8bpSwd4AVUJg94OqANAOJbkcVY
+ U4S6OaBE1JPMrn66VJ+KSDextlyLtWoHoq0gI3LV9+WIRvDUOeSPt3RYpy/pU4+1xfQG
+ u8YjGkMFs1RgNuqtTvPX8so+B6fA1oClhX8AO4sOcxb1UhYBkAdUktfG00uB/wSgWStN
+ XcpDYbAfdMB+HmyHBF8535eyr/0iHjq6jXNc+wL3FcDWawEBXF5Mpg8CKmvSlQOgIYjb
+ ESCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=FQFn841jHQ6lImpZMqjzWkJv/1YnlMG17mo2m57f2EU=;
+ b=Jjdl80CDH4DwRl0Z7j1ts8HGzcfpqfdyrMmyqxVIr7EPSSV3qYUesoYwcQc59q33/9
+ eQ/S21yXzx0Y9n3s/8tEUUhiYDBH5rDfEbO/UMeIGfTzgTnU9QheWdqi7GwXmrSd5gXO
+ rMlHj3q5rLm9ltMZAZHb7o9XBhHmBv/tDIU0OiDRVzhpZCE3OAq6xsObftoA/nmLYKEr
+ Zt5fWnj8KEoRjMtmCozBQ9DYPtxuyhbMSrgFl+HTmhBaK+uIPhpFyAADhT3sIxPfB7Eq
+ W85bjOnh6HkNbeOpz5ePmN8trtqcdNWb28+JV60tQr7x38OERrGjPtpdjIHJSxoyjW0T
+ BqkQ==
+X-Gm-Message-State: AOAM533rXpcfZwMZ/BonLT/Bm3ZBzgtq9M1gElTSg4Ytp8vxJ+4d0rM+
+ Q98oMjcHVlOaHhGKO+B6OuOEnbbe/H4KMIb0XzDjzg==
+X-Google-Smtp-Source: ABdhPJx9rBwzQljP09U15LlUpBM5Vd+Srs9avnElfeIp4Q6luog74c9jiIiXywhNuy4oKluSHHO01rKuaARLC3715c0=
+X-Received: by 2002:a4a:9e02:: with SMTP id t2mr1991529ook.42.1607000289727;
+ Thu, 03 Dec 2020 04:58:09 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <096c2c79-84b2-75d4-094f-bdd8b0a2d125@redhat.com>
-Content-Language: en-US
-X-Originating-IP: [10.174.185.137]
-X-ClientProxiedBy: dggeme715-chm.china.huawei.com (10.1.199.111) To
- dggema765-chm.china.huawei.com (10.1.198.207)
-X-CFilter-Loop: Reflected
+References: <20201117181607.1761516-1-qperret@google.com>
+ <20201117181607.1761516-17-qperret@google.com>
+In-Reply-To: <20201117181607.1761516-17-qperret@google.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Thu, 3 Dec 2020 12:57:33 +0000
+Message-ID: <CA+EHjTyJnZ8e=AN7H_k+oZb0VTWAgMicMY8Rqe2Di_3A87hm0A@mail.gmail.com>
+Subject: Re: [RFC PATCH 16/27] KVM: arm64: Prepare Hyp memory protection
+To: Quentin Perret <qperret@google.com>
 X-Mailman-Approved-At: Thu, 03 Dec 2020 09:29:05 -0500
-Cc: jean-philippe@linaro.org, jacob.jun.pan@linux.intel.com,
- nicoleotsuka@gmail.com, vivek.gautam@arm.com, yi.l.liu@intel.com,
- zhangfei.gao@linaro.org
+Cc: "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE"
+ <devicetree@vger.kernel.org>, kernel-team@android.com,
+ Frank Rowand <frowand.list@gmail.com>, Android KVM <android-kvm@google.com>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ open list <linux-kernel@vger.kernel.org>, Rob Herring <robh+dt@kernel.org>,
+ "moderated list:ARM64 PORT \(AARCH64 ARCHITECTURE\)"
+ <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>,
+ "open list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
+ <kvmarm@lists.cs.columbia.edu>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -84,149 +97,943 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Ck9uIDIwMjAvMTIvMyAyMTowMSwgQXVnZXIgRXJpYyB3cm90ZToKPiBIaSBLdW5rdW4sCj4KPiBP
-biAxMi8zLzIwIDE6MzIgUE0sIEt1bmt1biBKaWFuZyB3cm90ZToKPj4gSGkgRXJpYywKPj4KPj4g
-T24gMjAyMC8xMS8xOCAxOToyMSwgRXJpYyBBdWdlciB3cm90ZToKPj4+IFdoZW4gbmVzdGVkIHN0
-YWdlIHRyYW5zbGF0aW9uIGlzIHNldHVwLCBib3RoIHMxX2NmZyBhbmQKPj4+IHMyX2NmZyBhcmUg
-c2V0Lgo+Pj4KPj4+IFdlIGludHJvZHVjZSBhIG5ldyBzbW11IGRvbWFpbiBhYm9ydCBmaWVsZCB0
-aGF0IHdpbGwgYmUgc2V0Cj4+PiB1cG9uIGd1ZXN0IHN0YWdlMSBjb25maWd1cmF0aW9uIHBhc3Np
-bmcuCj4+Pgo+Pj4gYXJtX3NtbXVfd3JpdGVfc3RydGFiX2VudCgpIGlzIG1vZGlmaWVkIHRvIHdy
-aXRlIGJvdGggc3RhZ2UKPj4+IGZpZWxkcyBpbiB0aGUgU1RFIGFuZCBkZWFsIHdpdGggdGhlIGFi
-b3J0IGZpZWxkLgo+Pj4KPj4+IEluIG5lc3RlZCBtb2RlLCBvbmx5IHN0YWdlIDIgaXMgImZpbmFs
-aXplZCIgYXMgdGhlIGhvc3QgZG9lcwo+Pj4gbm90IG93bi9jb25maWd1cmUgdGhlIHN0YWdlIDEg
-Y29udGV4dCBkZXNjcmlwdG9yOyBndWVzdCBkb2VzLgo+Pj4KPj4+IFNpZ25lZC1vZmYtYnk6IEVy
-aWMgQXVnZXIgPGVyaWMuYXVnZXJAcmVkaGF0LmNvbT4KPj4+Cj4+PiAtLS0KPj4+IHYxMCAtPiB2
-MTE6Cj4+PiAtIEZpeCBhbiBpc3N1ZSByZXBvcnRlZCBieSBTaGFtZWVyIHdoZW4gc3dpdGNoaW5n
-IGZyb20gd2l0aCB2U01NVQo+Pj4gICAgdG8gd2l0aG91dCB2U01NVS4gRGVzcGl0ZSB0aGUgc3Bl
-YyBkb2VzIG5vdCBzZWVtIHRvIG1lbnRpb24gaXQKPj4+ICAgIHNlZW1zIHRvIGJlIG5lZWRlZCB0
-byByZXNldCB0aGUgMiBoaWdoIDY0YiB3aGVuIHN3aXRjaGluZyBmcm9tCj4+PiAgICBTMStTMiBj
-ZmcgdG8gUzEgb25seS4gRXNwZWNpYWxseSBkc3RbM10gbmVlZHMgdG8gYmUgcmVzZXQgKFMyVFRC
-KS4KPj4+ICAgIE9uIHNvbWUgaW1wbGVtZW50YXRpb25zLCBpZiB0aGUgUzJUVEIgaXMgbm90IHJl
-c2V0LCB0aGlzIGNhdXNlcwo+Pj4gICAgYSBDX0JBRF9TVEUgZXJyb3IKPj4+IC0tLQo+Pj4gICBk
-cml2ZXJzL2lvbW11L2FybS9hcm0tc21tdS12My9hcm0tc21tdS12My5jIHwgNjQgKysrKysrKysr
-KysrKysrKystLS0tCj4+PiAgIGRyaXZlcnMvaW9tbXUvYXJtL2FybS1zbW11LXYzL2FybS1zbW11
-LXYzLmggfCAgMiArCj4+PiAgIDIgZmlsZXMgY2hhbmdlZCwgNTYgaW5zZXJ0aW9ucygrKSwgMTAg
-ZGVsZXRpb25zKC0pCj4+Pgo+Pj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvaW9tbXUvYXJtL2FybS1z
-bW11LXYzL2FybS1zbW11LXYzLmMgYi9kcml2ZXJzL2lvbW11L2FybS9hcm0tc21tdS12My9hcm0t
-c21tdS12My5jCj4+PiBpbmRleCAxOGFjNWFmMWIyODQuLjQxMmVhMWJhZmE1MCAxMDA2NDQKPj4+
-IC0tLSBhL2RyaXZlcnMvaW9tbXUvYXJtL2FybS1zbW11LXYzL2FybS1zbW11LXYzLmMKPj4+ICsr
-KyBiL2RyaXZlcnMvaW9tbXUvYXJtL2FybS1zbW11LXYzL2FybS1zbW11LXYzLmMKPj4+IEBAIC0x
-MTgxLDggKzExODEsMTAgQEAgc3RhdGljIHZvaWQgYXJtX3NtbXVfd3JpdGVfc3RydGFiX2VudChz
-dHJ1Y3QgYXJtX3NtbXVfbWFzdGVyICptYXN0ZXIsIHUzMiBzaWQsCj4+PiAgIAkgKiB0aHJlZSBj
-YXNlcyBhdCB0aGUgbW9tZW50Ogo+PiBOb3csIGl0IHNob3VsZCBiZSAqZml2ZSBjYXNlcyouCj4+
-PiAgIAkgKgo+Pj4gICAJICogMS4gSW52YWxpZCAoYWxsIHplcm8pIC0+IGJ5cGFzcy9mYXVsdCAo
-aW5pdCkKPj4+IC0JICogMi4gQnlwYXNzL2ZhdWx0IC0+IHRyYW5zbGF0aW9uL2J5cGFzcyAoYXR0
-YWNoKQo+Pj4gLQkgKiAzLiBUcmFuc2xhdGlvbi9ieXBhc3MgLT4gYnlwYXNzL2ZhdWx0IChkZXRh
-Y2gpCj4+PiArCSAqIDIuIEJ5cGFzcy9mYXVsdCAtPiBzaW5nbGUgc3RhZ2UgdHJhbnNsYXRpb24v
-YnlwYXNzIChhdHRhY2gpCj4+PiArCSAqIDMuIFNpbmdsZSBvciBuZXN0ZWQgc3RhZ2UgVHJhbnNs
-YXRpb24vYnlwYXNzIC0+IGJ5cGFzcy9mYXVsdCAoZGV0YWNoKQo+Pj4gKwkgKiA0LiBTMiAtPiBT
-MSArIFMyIChhdHRhY2hfcGFzaWRfdGFibGUpCj4+IEkgd2FzIHRlc3RpbmcgdGhpcyBzZXJpZXMg
-b24gb25lIG9mIG91ciBoYXJkd2FyZSBib2FyZCB3aXRoIFNNTVV2My4gQW5kCj4+IEkgZm91bmQg
-d2hpbGUgdHJ5aW5nIHRvIC8iLy9hdHRhY2hfcGFzaWRfdGFibGUvLyIvLAo+Pgo+PiB0aGUgc2Vx
-dWVuY2Ugb2YgU1RFIChob3N0KSBjb25maWcoYml0WzM6MV0pIGlzIC8iUzItPmFib3J0LT5TMSAr
-IFMyIi8uCj4+IEJlY2F1c2UgdGhlIG1haW50ZW5hbmNlIGlzwqAgLyJXcml0ZSBldmVyeXRoaW5n
-IGFwYXJ0Ly8vCj4+Cj4+IC9mcm9tIGR3b3JkIDAsIHN5bmMsIHdyaXRlIGR3b3JkIDAsIHN5bmMi
-LyB3aGVuIHdlIHVwZGF0ZSB0aGUgU1RFCj4+IChndWVzdCkuIERvc2UgdGhlIHNlcXVlbmNlIG1l
-ZXQgeW91ciBleHBlY3RhdGlvbj8KPiB5ZXMgaXQgZG9lcy4gSSB3aWxsIGZpeCB0aGUgY29tbWVu
-dHMgYWNjb3JkaW5nbHkuCj4KPiBJcyB0aGVyZSBhbnl0aGluZyB0byBjb3JyZWN0IGluIHRoZSBj
-b2RlIG9yIHdhcyBpdCBmdW5jdGlvbmFsPwo+Cj4gVGhhbmtzCj4KPiBFcmljCk5vLCB0aGFua3Mu
-IEkganVzdCB3YW50IHRvIGNsYXJpZnkgdGhlIHNlcXVlbmNlLsKgwqAgOikKPj4+ICsJICogNS4g
-UzEgKyBTMiAtPiBTMiAoZGV0YWNoX3Bhc2lkX3RhYmxlKQo+Pj4gICAJICoKPj4+ICAgCSAqIEdp
-dmVuIHRoYXQgd2UgY2FuJ3QgdXBkYXRlIHRoZSBTVEUgYXRvbWljYWxseSBhbmQgdGhlIFNNTVUK
-Pj4+ICAgCSAqIGRvZXNuJ3QgcmVhZCB0aGUgdGhpbmcgaW4gYSBkZWZpbmVkIG9yZGVyLCB0aGF0
-IGxlYXZlcyB1cwo+Pj4gQEAgLTExOTMsNyArMTE5NSw4IEBAIHN0YXRpYyB2b2lkIGFybV9zbW11
-X3dyaXRlX3N0cnRhYl9lbnQoc3RydWN0IGFybV9zbW11X21hc3RlciAqbWFzdGVyLCB1MzIgc2lk
-LAo+Pj4gICAJICogMy4gVXBkYXRlIENvbmZpZywgc3luYwo+Pj4gICAJICovCj4+PiAgIAl1NjQg
-dmFsID0gbGU2NF90b19jcHUoZHN0WzBdKTsKPj4+IC0JYm9vbCBzdGVfbGl2ZSA9IGZhbHNlOwo+
-Pj4gKwlib29sIHMxX2xpdmUgPSBmYWxzZSwgczJfbGl2ZSA9IGZhbHNlLCBzdGVfbGl2ZTsKPj4+
-ICsJYm9vbCBhYm9ydCwgbmVzdGVkID0gZmFsc2UsIHRyYW5zbGF0ZSA9IGZhbHNlOwo+Pj4gICAJ
-c3RydWN0IGFybV9zbW11X2RldmljZSAqc21tdSA9IE5VTEw7Cj4+PiAgIAlzdHJ1Y3QgYXJtX3Nt
-bXVfczFfY2ZnICpzMV9jZmc7Cj4+PiAgIAlzdHJ1Y3QgYXJtX3NtbXVfczJfY2ZnICpzMl9jZmc7
-Cj4+PiBAQCAtMTIzMyw2ICsxMjM2LDggQEAgc3RhdGljIHZvaWQgYXJtX3NtbXVfd3JpdGVfc3Ry
-dGFiX2VudChzdHJ1Y3QgYXJtX3NtbXVfbWFzdGVyICptYXN0ZXIsIHUzMiBzaWQsCj4+PiAgIAkJ
-ZGVmYXVsdDoKPj4+ICAgCQkJYnJlYWs7Cj4+PiAgIAkJfQo+Pj4gKwkJbmVzdGVkID0gczFfY2Zn
-LT5zZXQgJiYgczJfY2ZnLT5zZXQ7Cj4+PiArCQl0cmFuc2xhdGUgPSBzMV9jZmctPnNldCB8fCBz
-Ml9jZmctPnNldDsKPj4+ICAgCX0KPj4+ICAgCj4+PiAgIAlpZiAodmFsICYgU1RSVEFCX1NURV8w
-X1YpIHsKPj4+IEBAIC0xMjQwLDIzICsxMjQ1LDM2IEBAIHN0YXRpYyB2b2lkIGFybV9zbW11X3dy
-aXRlX3N0cnRhYl9lbnQoc3RydWN0IGFybV9zbW11X21hc3RlciAqbWFzdGVyLCB1MzIgc2lkLAo+
-Pj4gICAJCWNhc2UgU1RSVEFCX1NURV8wX0NGR19CWVBBU1M6Cj4+PiAgIAkJCWJyZWFrOwo+Pj4g
-ICAJCWNhc2UgU1RSVEFCX1NURV8wX0NGR19TMV9UUkFOUzoKPj4+ICsJCQlzMV9saXZlID0gdHJ1
-ZTsKPj4+ICsJCQlicmVhazsKPj4+ICAgCQljYXNlIFNUUlRBQl9TVEVfMF9DRkdfUzJfVFJBTlM6
-Cj4+PiAtCQkJc3RlX2xpdmUgPSB0cnVlOwo+Pj4gKwkJCXMyX2xpdmUgPSB0cnVlOwo+Pj4gKwkJ
-CWJyZWFrOwo+Pj4gKwkJY2FzZSBTVFJUQUJfU1RFXzBfQ0ZHX05FU1RFRDoKPj4+ICsJCQlzMV9s
-aXZlID0gdHJ1ZTsKPj4+ICsJCQlzMl9saXZlID0gdHJ1ZTsKPj4+ICAgCQkJYnJlYWs7Cj4+PiAg
-IAkJY2FzZSBTVFJUQUJfU1RFXzBfQ0ZHX0FCT1JUOgo+Pj4gLQkJCUJVR19PTighZGlzYWJsZV9i
-eXBhc3MpOwo+Pj4gICAJCQlicmVhazsKPj4+ICAgCQlkZWZhdWx0Ogo+Pj4gICAJCQlCVUcoKTsg
-LyogU1RFIGNvcnJ1cHRpb24gKi8KPj4+ICAgCQl9Cj4+PiAgIAl9Cj4+PiAgIAo+Pj4gKwlzdGVf
-bGl2ZSA9IHMxX2xpdmUgfHwgczJfbGl2ZTsKPj4+ICsKPj4+ICAgCS8qIE51a2UgdGhlIGV4aXN0
-aW5nIFNURV8wIHZhbHVlLCBhcyB3ZSdyZSBnb2luZyB0byByZXdyaXRlIGl0ICovCj4+PiAgIAl2
-YWwgPSBTVFJUQUJfU1RFXzBfVjsKPj4+ICAgCj4+PiAgIAkvKiBCeXBhc3MvZmF1bHQgKi8KPj4+
-IC0JaWYgKCFzbW11X2RvbWFpbiB8fCAhKHMxX2NmZy0+c2V0IHx8IHMyX2NmZy0+c2V0KSkgewo+
-Pj4gLQkJaWYgKCFzbW11X2RvbWFpbiAmJiBkaXNhYmxlX2J5cGFzcykKPj4+ICsKPj4+ICsJaWYg
-KCFzbW11X2RvbWFpbikKPj4+ICsJCWFib3J0ID0gZGlzYWJsZV9ieXBhc3M7Cj4+PiArCWVsc2UK
-Pj4+ICsJCWFib3J0ID0gc21tdV9kb21haW4tPmFib3J0Owo+Pj4gKwo+Pj4gKwlpZiAoYWJvcnQg
-fHwgIXRyYW5zbGF0ZSkgewo+Pj4gKwkJaWYgKGFib3J0KQo+Pj4gICAJCQl2YWwgfD0gRklFTERf
-UFJFUChTVFJUQUJfU1RFXzBfQ0ZHLCBTVFJUQUJfU1RFXzBfQ0ZHX0FCT1JUKTsKPj4+ICAgCQll
-bHNlCj4+PiAgIAkJCXZhbCB8PSBGSUVMRF9QUkVQKFNUUlRBQl9TVEVfMF9DRkcsIFNUUlRBQl9T
-VEVfMF9DRkdfQllQQVNTKTsKPj4+IEBAIC0xMjc0LDggKzEyOTIsMTYgQEAgc3RhdGljIHZvaWQg
-YXJtX3NtbXVfd3JpdGVfc3RydGFiX2VudChzdHJ1Y3QgYXJtX3NtbXVfbWFzdGVyICptYXN0ZXIs
-IHUzMiBzaWQsCj4+PiAgIAkJcmV0dXJuOwo+Pj4gICAJfQo+Pj4gICAKPj4+ICsJQlVHX09OKHN0
-ZV9saXZlICYmICFuZXN0ZWQpOwo+Pj4gKwo+Pj4gKwlpZiAoc3RlX2xpdmUpIHsKPj4+ICsJCS8q
-IEZpcnN0IGludmFsaWRhdGUgdGhlIGxpdmUgU1RFICovCj4+PiArCQlkc3RbMF0gPSBjcHVfdG9f
-bGU2NChTVFJUQUJfU1RFXzBfQ0ZHX0FCT1JUKTsKPj4+ICsJCWFybV9zbW11X3N5bmNfc3RlX2Zv
-cl9zaWQoc21tdSwgc2lkKTsKPj4+ICsJfQo+Pj4gKwo+Pj4gICAJaWYgKHMxX2NmZy0+c2V0KSB7
-Cj4+PiAtCQlCVUdfT04oc3RlX2xpdmUpOwo+Pj4gKwkJQlVHX09OKHMxX2xpdmUpOwo+Pj4gICAJ
-CWRzdFsxXSA9IGNwdV90b19sZTY0KAo+Pj4gICAJCQkgRklFTERfUFJFUChTVFJUQUJfU1RFXzFf
-UzFEU1MsIFNUUlRBQl9TVEVfMV9TMURTU19TU0lEMCkgfAo+Pj4gICAJCQkgRklFTERfUFJFUChT
-VFJUQUJfU1RFXzFfUzFDSVIsIFNUUlRBQl9TVEVfMV9TMUNfQ0FDSEVfV0JSQSkgfAo+Pj4gQEAg
-LTEyOTQsNyArMTMyMCwxNCBAQCBzdGF0aWMgdm9pZCBhcm1fc21tdV93cml0ZV9zdHJ0YWJfZW50
-KHN0cnVjdCBhcm1fc21tdV9tYXN0ZXIgKm1hc3RlciwgdTMyIHNpZCwKPj4+ICAgCX0KPj4+ICAg
-Cj4+PiAgIAlpZiAoczJfY2ZnLT5zZXQpIHsKPj4+IC0JCUJVR19PTihzdGVfbGl2ZSk7Cj4+PiAr
-CQl1NjQgdnR0YnIgPSBzMl9jZmctPnZ0dGJyICYgU1RSVEFCX1NURV8zX1MyVFRCX01BU0s7Cj4+
-PiArCj4+PiArCQlpZiAoczJfbGl2ZSkgewo+Pj4gKwkJCXU2NCBzMnR0YiA9IGxlNjRfdG9fY3B1
-KGRzdFszXSAmIFNUUlRBQl9TVEVfM19TMlRUQl9NQVNLKTsKPj4+ICsKPj4+ICsJCQlCVUdfT04o
-czJ0dGIgIT0gdnR0YnIpOwo+Pj4gKwkJfQo+Pj4gKwo+Pj4gICAJCWRzdFsyXSA9IGNwdV90b19s
-ZTY0KAo+Pj4gICAJCQkgRklFTERfUFJFUChTVFJUQUJfU1RFXzJfUzJWTUlELCBzMl9jZmctPnZt
-aWQpIHwKPj4+ICAgCQkJIEZJRUxEX1BSRVAoU1RSVEFCX1NURV8yX1ZUQ1IsIHMyX2NmZy0+dnRj
-cikgfAo+Pj4gQEAgLTEzMDQsOSArMTMzNywxMiBAQCBzdGF0aWMgdm9pZCBhcm1fc21tdV93cml0
-ZV9zdHJ0YWJfZW50KHN0cnVjdCBhcm1fc21tdV9tYXN0ZXIgKm1hc3RlciwgdTMyIHNpZCwKPj4+
-ICAgCQkJIFNUUlRBQl9TVEVfMl9TMlBUVyB8IFNUUlRBQl9TVEVfMl9TMkFBNjQgfAo+Pj4gICAJ
-CQkgU1RSVEFCX1NURV8yX1MyUik7Cj4+PiAgIAo+Pj4gLQkJZHN0WzNdID0gY3B1X3RvX2xlNjQo
-czJfY2ZnLT52dHRiciAmIFNUUlRBQl9TVEVfM19TMlRUQl9NQVNLKTsKPj4+ICsJCWRzdFszXSA9
-IGNwdV90b19sZTY0KHZ0dGJyKTsKPj4+ICAgCj4+PiAgIAkJdmFsIHw9IEZJRUxEX1BSRVAoU1RS
-VEFCX1NURV8wX0NGRywgU1RSVEFCX1NURV8wX0NGR19TMl9UUkFOUyk7Cj4+PiArCX0gZWxzZSB7
-Cj4+PiArCQlkc3RbMl0gPSAwOwo+Pj4gKwkJZHN0WzNdID0gMDsKPj4+ICAgCX0KPj4+ICAgCj4+
-PiAgIAlpZiAobWFzdGVyLT5hdHNfZW5hYmxlZCkKPj4+IEBAIC0xOTgyLDYgKzIwMTgsMTQgQEAg
-c3RhdGljIGludCBhcm1fc21tdV9kb21haW5fZmluYWxpc2Uoc3RydWN0IGlvbW11X2RvbWFpbiAq
-ZG9tYWluLAo+Pj4gICAJCXJldHVybiAwOwo+Pj4gICAJfQo+Pj4gICAKPj4+ICsJaWYgKHNtbXVf
-ZG9tYWluLT5zdGFnZSA9PSBBUk1fU01NVV9ET01BSU5fTkVTVEVEICYmCj4+PiArCSAgICAoIShz
-bW11LT5mZWF0dXJlcyAmIEFSTV9TTU1VX0ZFQVRfVFJBTlNfUzEpIHx8Cj4+PiArCSAgICAgIShz
-bW11LT5mZWF0dXJlcyAmIEFSTV9TTU1VX0ZFQVRfVFJBTlNfUzIpKSkgewo+Pj4gKwkJZGV2X2lu
-Zm8oc21tdV9kb21haW4tPnNtbXUtPmRldiwKPj4+ICsJCQkgImRvZXMgbm90IGltcGxlbWVudCB0
-d28gc3RhZ2VzXG4iKTsKPj4+ICsJCXJldHVybiAtRUlOVkFMOwo+Pj4gKwl9Cj4+PiArCj4+PiAg
-IAkvKiBSZXN0cmljdCB0aGUgc3RhZ2UgdG8gd2hhdCB3ZSBjYW4gYWN0dWFsbHkgc3VwcG9ydCAq
-Lwo+Pj4gICAJaWYgKCEoc21tdS0+ZmVhdHVyZXMgJiBBUk1fU01NVV9GRUFUX1RSQU5TX1MxKSkK
-Pj4+ICAgCQlzbW11X2RvbWFpbi0+c3RhZ2UgPSBBUk1fU01NVV9ET01BSU5fUzI7Cj4+PiBkaWZm
-IC0tZ2l0IGEvZHJpdmVycy9pb21tdS9hcm0vYXJtLXNtbXUtdjMvYXJtLXNtbXUtdjMuaCBiL2Ry
-aXZlcnMvaW9tbXUvYXJtL2FybS1zbW11LXYzL2FybS1zbW11LXYzLmgKPj4+IGluZGV4IDA3ZjU5
-MjUyZGQyMS4uMjY5Nzc5ZGVlOGQxIDEwMDY0NAo+Pj4gLS0tIGEvZHJpdmVycy9pb21tdS9hcm0v
-YXJtLXNtbXUtdjMvYXJtLXNtbXUtdjMuaAo+Pj4gKysrIGIvZHJpdmVycy9pb21tdS9hcm0vYXJt
-LXNtbXUtdjMvYXJtLXNtbXUtdjMuaAo+Pj4gQEAgLTIwNiw2ICsyMDYsNyBAQAo+Pj4gICAjZGVm
-aW5lIFNUUlRBQl9TVEVfMF9DRkdfQllQQVNTCQk0Cj4+PiAgICNkZWZpbmUgU1RSVEFCX1NURV8w
-X0NGR19TMV9UUkFOUwk1Cj4+PiAgICNkZWZpbmUgU1RSVEFCX1NURV8wX0NGR19TMl9UUkFOUwk2
-Cj4+PiArI2RlZmluZSBTVFJUQUJfU1RFXzBfQ0ZHX05FU1RFRAkJNwo+Pj4gICAKPj4+ICAgI2Rl
-ZmluZSBTVFJUQUJfU1RFXzBfUzFGTVQJCUdFTk1BU0tfVUxMKDUsIDQpCj4+PiAgICNkZWZpbmUg
-U1RSVEFCX1NURV8wX1MxRk1UX0xJTkVBUgkwCj4+PiBAQCAtNjgyLDYgKzY4Myw3IEBAIHN0cnVj
-dCBhcm1fc21tdV9kb21haW4gewo+Pj4gICAJZW51bSBhcm1fc21tdV9kb21haW5fc3RhZ2UJc3Rh
-Z2U7Cj4+PiAgIAlzdHJ1Y3QgYXJtX3NtbXVfczFfY2ZnCXMxX2NmZzsKPj4+ICAgCXN0cnVjdCBh
-cm1fc21tdV9zMl9jZmcJczJfY2ZnOwo+Pj4gKwlib29sCQkJCWFib3J0Owo+Pj4gICAKPj4+ICAg
-CXN0cnVjdCBpb21tdV9kb21haW4JCWRvbWFpbjsKPj4gVGhhbmtzLAo+Pgo+PiBLdW5rdW4gSmlh
-bmcKPj4KPiAuCgpUaGFua3MKCkt1bmt1biBKaWFuZwoKX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMu
-Y3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlz
-dGluZm8va3ZtYXJtCg==
+Hi Quentin,
+
+On Tue, Nov 17, 2020 at 6:17 PM 'Quentin Perret' via kernel-team
+<kernel-team@android.com> wrote:
+>
+> When memory protection is enabled, the Hyp code needs the ability to
+> create and manage its own page-table. To do so, introduce a new set of
+> hypercalls to initialize Hyp memory protection.
+>
+> During the init hcall, the hypervisor runs with the host-provided
+> page-table and uses the trivial early page allocator to create its own
+> set of page-tables, using a memory pool that was donated by the host.
+> Specifically, the hypervisor creates its own mappings for __hyp_text,
+> the Hyp memory pool, the __hyp_bss, the portion of hyp_vmemmap
+> corresponding to the Hyp pool, among other things. It then jumps back in
+> the idmap page, switches to use the newly-created pgd (instead of the
+> temporary one provided by the host) and then installs the full-fledged
+> buddy allocator which will then be the only one in used from then on.
+>
+> Note that for the sake of symplifying the review, this only introduces
+> the code doing this operation, without actually being called by anyhing
+> yet. This will be done in a subsequent patch, which will introduce the
+> necessary host kernel changes.
+>
+> Credits to Will for __kvm_init_switch_pgd.
+>
+> Co-authored-by: Will Deacon <will@kernel.org>
+> Signed-off-by: Quentin Perret <qperret@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_asm.h         |   6 +-
+>  arch/arm64/include/asm/kvm_host.h        |   8 +
+>  arch/arm64/include/asm/kvm_hyp.h         |   8 +
+>  arch/arm64/kernel/cpufeature.c           |   2 +-
+>  arch/arm64/kernel/image-vars.h           |  19 +++
+>  arch/arm64/kvm/hyp/Makefile              |   2 +-
+>  arch/arm64/kvm/hyp/include/nvhe/memory.h |   6 +
+>  arch/arm64/kvm/hyp/include/nvhe/mm.h     |  79 +++++++++
+>  arch/arm64/kvm/hyp/nvhe/Makefile         |   4 +-
+>  arch/arm64/kvm/hyp/nvhe/hyp-init.S       |  30 ++++
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c       |  44 +++++
+>  arch/arm64/kvm/hyp/nvhe/mm.c             | 175 ++++++++++++++++++++
+>  arch/arm64/kvm/hyp/nvhe/psci-relay.c     |   2 -
+>  arch/arm64/kvm/hyp/nvhe/setup.c          | 196 +++++++++++++++++++++++
+>  arch/arm64/kvm/hyp/reserved_mem.c        |  75 +++++++++
+>  arch/arm64/kvm/mmu.c                     |   2 +-
+>  arch/arm64/mm/init.c                     |   3 +
+>  17 files changed, 653 insertions(+), 8 deletions(-)
+>  create mode 100644 arch/arm64/kvm/hyp/include/nvhe/mm.h
+>  create mode 100644 arch/arm64/kvm/hyp/nvhe/mm.c
+>  create mode 100644 arch/arm64/kvm/hyp/nvhe/setup.c
+>  create mode 100644 arch/arm64/kvm/hyp/reserved_mem.c
+>
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index e4934f5e4234..9266b17f8ba9 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -57,6 +57,10 @@
+>  #define __KVM_HOST_SMCCC_FUNC___kvm_get_mdcr_el2               12
+>  #define __KVM_HOST_SMCCC_FUNC___vgic_v3_save_aprs              13
+>  #define __KVM_HOST_SMCCC_FUNC___vgic_v3_restore_aprs           14
+> +#define __KVM_HOST_SMCCC_FUNC___kvm_hyp_protect                        15
+> +#define __KVM_HOST_SMCCC_FUNC___hyp_create_mappings            16
+> +#define __KVM_HOST_SMCCC_FUNC___hyp_create_private_mapping     17
+> +#define __KVM_HOST_SMCCC_FUNC___hyp_cpu_set_vector             18
+>
+>  #ifndef __ASSEMBLY__
+>
+> @@ -171,7 +175,7 @@ struct kvm_vcpu;
+>  struct kvm_s2_mmu;
+>
+>  DECLARE_KVM_NVHE_SYM(__kvm_hyp_init);
+> -DECLARE_KVM_NVHE_SYM(__kvm_hyp_host_vector);
+> +DECLARE_KVM_HYP_SYM(__kvm_hyp_host_vector);
+>  DECLARE_KVM_HYP_SYM(__kvm_hyp_vector);
+>  #define __kvm_hyp_init                 CHOOSE_NVHE_SYM(__kvm_hyp_init)
+>  #define __kvm_hyp_host_vector          CHOOSE_NVHE_SYM(__kvm_hyp_host_vector)
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 7a5d5f4b3351..ee8bb8021637 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -742,4 +742,12 @@ bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
+>  #define kvm_vcpu_has_pmu(vcpu)                                 \
+>         (test_bit(KVM_ARM_VCPU_PMU_V3, (vcpu)->arch.features))
+>
+> +#ifdef CONFIG_KVM
+> +extern phys_addr_t hyp_mem_base;
+> +extern phys_addr_t hyp_mem_size;
+> +void __init reserve_kvm_hyp(void);
+> +#else
+> +static inline void reserve_kvm_hyp(void) { }
+> +#endif
+> +
+>  #endif /* __ARM64_KVM_HOST_H__ */
+> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+> index 95a2bbbcc7e1..dbd2ef86afa9 100644
+> --- a/arch/arm64/include/asm/kvm_hyp.h
+> +++ b/arch/arm64/include/asm/kvm_hyp.h
+> @@ -105,5 +105,13 @@ void __noreturn hyp_panic(void);
+>  void __noreturn __hyp_do_panic(bool restore_host, u64 spsr, u64 elr, u64 par);
+>  #endif
+>
+> +#ifdef __KVM_NVHE_HYPERVISOR__
+> +void __kvm_init_switch_pgd(phys_addr_t phys, unsigned long size,
+> +                          phys_addr_t pgd, void *sp, void *cont_fn);
+> +int __kvm_hyp_protect(phys_addr_t phys, unsigned long size,
+> +                     unsigned long nr_cpus, unsigned long *per_cpu_base);
+> +void __noreturn __host_enter(struct kvm_cpu_context *host_ctxt);
+> +#endif
+> +
+>  #endif /* __ARM64_KVM_HYP_H__ */
+>
+> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> index 3bc86d1423f8..010458f6d799 100644
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@ -1722,7 +1722,7 @@ static void cpu_enable_mte(struct arm64_cpu_capabilities const *cap)
+>  #endif /* CONFIG_ARM64_MTE */
+>
+>  #ifdef CONFIG_KVM
+> -static bool enable_protected_kvm;
+> +bool enable_protected_kvm;
+>
+>  static bool has_protected_kvm(const struct arm64_cpu_capabilities *entry, int __unused)
+>  {
+> diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
+> index c35d768672eb..f2d43e6cd86d 100644
+> --- a/arch/arm64/kernel/image-vars.h
+> +++ b/arch/arm64/kernel/image-vars.h
+> @@ -118,6 +118,25 @@ __kvm_nvhe___memset                        = __kvm_nvhe___pi_memset;
+>
+>  _kvm_nvhe___flush_dcache_area          = __kvm_nvhe___pi___flush_dcache_area;
+>
+> +/* Hypevisor VA size */
+> +KVM_NVHE_ALIAS(hyp_va_bits);
+> +
+> +/* Kernel memory sections */
+> +KVM_NVHE_ALIAS(__start_rodata);
+> +KVM_NVHE_ALIAS(__end_rodata);
+> +KVM_NVHE_ALIAS(__bss_start);
+> +KVM_NVHE_ALIAS(__bss_stop);
+> +
+> +/* Hyp memory sections */
+> +KVM_NVHE_ALIAS(__hyp_idmap_text_start);
+> +KVM_NVHE_ALIAS(__hyp_idmap_text_end);
+> +KVM_NVHE_ALIAS(__hyp_text_start);
+> +KVM_NVHE_ALIAS(__hyp_text_end);
+> +KVM_NVHE_ALIAS(__hyp_data_ro_after_init_start);
+> +KVM_NVHE_ALIAS(__hyp_data_ro_after_init_end);
+> +KVM_NVHE_ALIAS(__hyp_bss_start);
+> +KVM_NVHE_ALIAS(__hyp_bss_end);
+> +
+>  #endif /* CONFIG_KVM */
+>
+>  #endif /* __ARM64_KERNEL_IMAGE_VARS_H */
+> diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
+> index 687598e41b21..b726332eec49 100644
+> --- a/arch/arm64/kvm/hyp/Makefile
+> +++ b/arch/arm64/kvm/hyp/Makefile
+> @@ -10,4 +10,4 @@ subdir-ccflags-y := -I$(incdir)                               \
+>                     -DDISABLE_BRANCH_PROFILING          \
+>                     $(DISABLE_STACKLEAK_PLUGIN)
+>
+> -obj-$(CONFIG_KVM) += vhe/ nvhe/ pgtable.o
+> +obj-$(CONFIG_KVM) += vhe/ nvhe/ pgtable.o reserved_mem.o
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/memory.h b/arch/arm64/kvm/hyp/include/nvhe/memory.h
+> index ed47674bc988..c8af6fe87bfb 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/memory.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/memory.h
+> @@ -6,6 +6,12 @@
+>
+>  #include <linux/types.h>
+>
+> +#define HYP_MEMBLOCK_REGIONS 128
+> +struct hyp_memblock_region {
+> +       phys_addr_t start;
+> +       phys_addr_t end;
+> +};
+> +
+>  struct hyp_pool;
+>  struct hyp_page {
+>         unsigned int refcount;
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/mm.h b/arch/arm64/kvm/hyp/include/nvhe/mm.h
+> new file mode 100644
+> index 000000000000..5a3ad6f4e5bc
+> --- /dev/null
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/mm.h
+> @@ -0,0 +1,79 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +#ifndef __KVM_HYP_MM_H
+> +#define __KVM_HYP_MM_H
+> +
+> +#include <asm/kvm_pgtable.h>
+> +#include <asm/spectre.h>
+> +#include <linux/types.h>
+> +
+> +#include <nvhe/memory.h>
+> +#include <nvhe/spinlock.h>
+> +
+> +extern struct hyp_memblock_region kvm_nvhe_sym(hyp_memory)[];
+> +extern int kvm_nvhe_sym(hyp_memblock_nr);
+> +extern struct kvm_pgtable hyp_pgtable;
+
+nit: I found the name of this struct to be confusing (hyp_pgtable),
+since there's also
+arch/arm64/kvm/mmu.c:25:static struct kvm_pgtable *hyp_pgtable;
+which has the same name, but is a pointer to the hyp page table before
+being swapped out in favor of this one.
+
+> +extern hyp_spinlock_t __hyp_pgd_lock;
+> +extern struct hyp_pool hpool;
+> +extern u64 __io_map_base;
+> +extern u32 hyp_va_bits;
+> +
+> +int hyp_create_idmap(void);
+> +int hyp_map_vectors(void);
+> +int hyp_back_vmemmap(phys_addr_t phys, unsigned long size, phys_addr_t back);
+> +int hyp_cpu_set_vector(enum arm64_hyp_spectre_vector slot);
+> +int hyp_create_mappings(void *from, void *to, enum kvm_pgtable_prot prot);
+> +int __hyp_create_mappings(unsigned long start, unsigned long size,
+> +                         unsigned long phys, unsigned long prot);
+> +unsigned long __hyp_create_private_mapping(phys_addr_t phys, size_t size,
+> +                                          unsigned long prot);
+> +
+
+nit: I also thought that the hyp_create_mappings function names are a
+bit confusing, since there's the create_hyp_mappings functions which
+use the aforementioned *hyp_pgtable.
+
+> +static inline void hyp_vmemmap_range(phys_addr_t phys, unsigned long size,
+> +                                    unsigned long *start, unsigned long *end)
+> +{
+> +       unsigned long nr_pages = size >> PAGE_SHIFT;
+> +       struct hyp_page *p = hyp_phys_to_page(phys);
+> +
+> +       *start = (unsigned long)p;
+> +       *end = *start + nr_pages * sizeof(struct hyp_page);
+> +       *start = ALIGN_DOWN(*start, PAGE_SIZE);
+> +       *end = ALIGN(*end, PAGE_SIZE);
+> +}
+> +
+> +static inline unsigned long __hyp_pgtable_max_pages(unsigned long nr_pages)
+> +{
+> +       unsigned long total = 0, i;
+> +
+> +       /* Provision the worst case scenario with 4 levels of page-table */
+> +       for (i = 0; i < 4; i++) {
+> +               nr_pages = DIV_ROUND_UP(nr_pages, PTRS_PER_PTE);
+> +               total += nr_pages;
+> +       }
+> +
+> +       return total;
+> +}
+> +
+> +static inline unsigned long hyp_s1_pgtable_size(void)
+> +{
+> +       struct hyp_memblock_region *reg;
+> +       unsigned long nr_pages, res = 0;
+> +       int i;
+> +
+> +       if (kvm_nvhe_sym(hyp_memblock_nr) <= 0)
+> +               return 0;
+> +
+> +       for (i = 0; i < kvm_nvhe_sym(hyp_memblock_nr); i++) {
+> +               reg = &kvm_nvhe_sym(hyp_memory)[i];
+> +               nr_pages = (reg->end - reg->start) >> PAGE_SHIFT;
+> +               nr_pages = __hyp_pgtable_max_pages(nr_pages);
+> +               res += nr_pages << PAGE_SHIFT;
+> +       }
+> +
+> +       /* Allow 1 GiB for private mappings */
+> +       nr_pages = (1 << 30) >> PAGE_SHIFT;
+> +       nr_pages = __hyp_pgtable_max_pages(nr_pages);
+> +       res += nr_pages << PAGE_SHIFT;
+> +
+> +       return res;
+> +}
+> +
+> +#endif /* __KVM_HYP_MM_H */
+> diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+> index 72cfe53f106f..d7381a503182 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/Makefile
+> +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+> @@ -11,9 +11,9 @@ lib-objs := $(addprefix ../../../lib/, $(lib-objs))
+>
+>  obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o \
+>          hyp-main.o hyp-smp.o psci-relay.o early_alloc.o stub.o page_alloc.o \
+> -        cache.o cpufeature.o
+> +        cache.o cpufeature.o setup.o mm.o
+>  obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
+> -        ../fpsimd.o ../hyp-entry.o ../exception.o
+> +        ../fpsimd.o ../hyp-entry.o ../exception.o ../pgtable.o
+>  obj-y += $(lib-objs)
+>
+>  ##
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> index 8f3602f320ac..e2d62297edfe 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> @@ -247,4 +247,34 @@ alternative_else_nop_endif
+>
+>  SYM_CODE_END(__kvm_handle_stub_hvc)
+>
+> +SYM_FUNC_START(__kvm_init_switch_pgd)
+> +       /* Turn the MMU off */
+> +       pre_disable_mmu_workaround
+> +       mrs     x2, sctlr_el2
+> +       bic     x3, x2, #SCTLR_ELx_M
+> +       msr     sctlr_el2, x3
+> +       isb
+> +
+> +       tlbi    alle2
+> +
+> +       /* Install the new pgtables */
+> +       ldr     x3, [x0, #NVHE_INIT_PGD_PA]
+> +       phys_to_ttbr x4, x3
+> +alternative_if ARM64_HAS_CNP
+> +       orr     x4, x4, #TTBR_CNP_BIT
+> +alternative_else_nop_endif
+> +       msr     ttbr0_el2, x4
+> +
+> +       /* Set the new stack pointer */
+> +       ldr     x0, [x0, #NVHE_INIT_STACK_HYP_VA]
+> +       mov     sp, x0
+> +
+> +       /* And turn the MMU back on! */
+> +       dsb     nsh
+> +       isb
+> +       msr     sctlr_el2, x2
+> +       isb
+> +       ret     x1
+> +SYM_FUNC_END(__kvm_init_switch_pgd)
+> +
+
+Should the instruction cache be flushed here (ic iallu), to discard
+speculatively fetched instructions?
+
+>         .popsection
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> index 933329699425..a0bfe0d26da6 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> @@ -6,12 +6,15 @@
+>
+>  #include <hyp/switch.h>
+>
+> +#include <asm/pgtable-types.h>
+>  #include <asm/kvm_asm.h>
+>  #include <asm/kvm_emulate.h>
+>  #include <asm/kvm_host.h>
+>  #include <asm/kvm_hyp.h>
+>  #include <asm/kvm_mmu.h>
+>
+> +#include <nvhe/mm.h>
+> +
+>  DEFINE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
+>
+>  #define cpu_reg(ctxt, r)       (ctxt)->regs.regs[r]
+> @@ -106,6 +109,43 @@ static void handle___vgic_v3_restore_aprs(struct kvm_cpu_context *host_ctxt)
+>         __vgic_v3_restore_aprs(kern_hyp_va(cpu_if));
+>  }
+>
+> +static void handle___kvm_hyp_protect(struct kvm_cpu_context *host_ctxt)
+> +{
+> +       DECLARE_REG(phys_addr_t, phys, host_ctxt, 1);
+> +       DECLARE_REG(unsigned long, size, host_ctxt, 2);
+> +       DECLARE_REG(unsigned long, nr_cpus, host_ctxt, 3);
+> +       DECLARE_REG(unsigned long *, per_cpu_base, host_ctxt, 4);
+> +
+> +       cpu_reg(host_ctxt, 1) = __kvm_hyp_protect(phys, size, nr_cpus,
+> +                                                 per_cpu_base);
+> +}
+> +
+> +static void handle___hyp_cpu_set_vector(struct kvm_cpu_context *host_ctxt)
+> +{
+> +       DECLARE_REG(enum arm64_hyp_spectre_vector, slot, host_ctxt, 1);
+> +
+> +       cpu_reg(host_ctxt, 1) = hyp_cpu_set_vector(slot);
+> +}
+> +
+> +static void handle___hyp_create_mappings(struct kvm_cpu_context *host_ctxt)
+> +{
+> +       DECLARE_REG(unsigned long, start, host_ctxt, 1);
+> +       DECLARE_REG(unsigned long, size, host_ctxt, 2);
+> +       DECLARE_REG(unsigned long, phys, host_ctxt, 3);
+> +       DECLARE_REG(unsigned long, prot, host_ctxt, 4);
+> +
+> +       cpu_reg(host_ctxt, 1) = __hyp_create_mappings(start, size, phys, prot);
+> +}
+> +
+> +static void handle___hyp_create_private_mapping(struct kvm_cpu_context *host_ctxt)
+> +{
+> +       DECLARE_REG(phys_addr_t, phys, host_ctxt, 1);
+> +       DECLARE_REG(size_t, size, host_ctxt, 2);
+> +       DECLARE_REG(unsigned long, prot, host_ctxt, 3);
+> +
+> +       cpu_reg(host_ctxt, 1) = __hyp_create_private_mapping(phys, size, prot);
+> +}
+> +
+>  typedef void (*hcall_t)(struct kvm_cpu_context *);
+>
+>  #define HANDLE_FUNC(x) [__KVM_HOST_SMCCC_FUNC_##x] = kimg_fn_ptr(handle_##x)
+> @@ -125,6 +165,10 @@ static const hcall_t *host_hcall[] = {
+>         HANDLE_FUNC(__kvm_get_mdcr_el2),
+>         HANDLE_FUNC(__vgic_v3_save_aprs),
+>         HANDLE_FUNC(__vgic_v3_restore_aprs),
+> +       HANDLE_FUNC(__kvm_hyp_protect),
+> +       HANDLE_FUNC(__hyp_cpu_set_vector),
+> +       HANDLE_FUNC(__hyp_create_mappings),
+> +       HANDLE_FUNC(__hyp_create_private_mapping),
+>  };
+>
+>  static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
+> new file mode 100644
+> index 000000000000..cad5dae197c6
+> --- /dev/null
+> +++ b/arch/arm64/kvm/hyp/nvhe/mm.c
+> @@ -0,0 +1,175 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (C) 2020 Google LLC
+> + * Author: Quentin Perret <qperret@google.com>
+> + */
+> +
+> +#include <linux/kvm_host.h>
+> +#include <asm/kvm_hyp.h>
+> +#include <asm/kvm_mmu.h>
+> +#include <asm/kvm_pgtable.h>
+> +#include <asm/spectre.h>
+> +
+> +#include <nvhe/early_alloc.h>
+> +#include <nvhe/gfp.h>
+> +#include <nvhe/memory.h>
+> +#include <nvhe/mm.h>
+> +#include <nvhe/spinlock.h>
+> +
+> +struct kvm_pgtable hyp_pgtable;
+> +
+> +hyp_spinlock_t __hyp_pgd_lock;
+> +u64 __io_map_base;
+> +
+> +struct hyp_memblock_region hyp_memory[HYP_MEMBLOCK_REGIONS];
+> +int hyp_memblock_nr;
+> +
+> +int __hyp_create_mappings(unsigned long start, unsigned long size,
+> +                         unsigned long phys, unsigned long prot)
+> +{
+> +       int err;
+> +
+> +       hyp_spin_lock(&__hyp_pgd_lock);
+> +       err = kvm_pgtable_hyp_map(&hyp_pgtable, start, size, phys, prot);
+> +       hyp_spin_unlock(&__hyp_pgd_lock);
+> +
+> +       return err;
+> +}
+> +
+> +unsigned long __hyp_create_private_mapping(phys_addr_t phys, size_t size,
+> +                                          unsigned long prot)
+> +{
+> +       unsigned long addr;
+> +       int ret;
+> +
+> +       hyp_spin_lock(&__hyp_pgd_lock);
+> +
+> +       size = PAGE_ALIGN(size + offset_in_page(phys));
+> +       addr = __io_map_base;
+> +       __io_map_base += size;
+> +
+> +       /* Are we overflowing on the vmemmap ? */
+> +       if (__io_map_base > __hyp_vmemmap) {
+> +               __io_map_base -= size;
+> +               addr = 0;
+> +               goto out;
+> +       }
+> +
+> +       ret = kvm_pgtable_hyp_map(&hyp_pgtable, addr, size, phys, prot);
+> +       if (ret) {
+> +               addr = 0;
+> +               goto out;
+> +       }
+> +
+> +       addr = addr + offset_in_page(phys);
+> +out:
+> +       hyp_spin_unlock(&__hyp_pgd_lock);
+> +
+> +       return addr;
+> +}
+> +
+> +int hyp_create_mappings(void *from, void *to, enum kvm_pgtable_prot prot)
+> +{
+> +       unsigned long start = (unsigned long)from;
+> +       unsigned long end = (unsigned long)to;
+> +       unsigned long virt_addr;
+> +       phys_addr_t phys;
+> +
+> +       start = start & PAGE_MASK;
+> +       end = PAGE_ALIGN(end);
+> +
+> +       for (virt_addr = start; virt_addr < end; virt_addr += PAGE_SIZE) {
+> +               int err;
+> +
+> +               phys = hyp_virt_to_phys((void *)virt_addr);
+> +               err = __hyp_create_mappings(virt_addr, PAGE_SIZE, phys, prot);
+> +               if (err)
+> +                       return err;
+> +       }
+> +
+> +       return 0;
+> +}
+> +
+> +int hyp_back_vmemmap(phys_addr_t phys, unsigned long size, phys_addr_t back)
+> +{
+> +       unsigned long start, end;
+> +
+> +       hyp_vmemmap_range(phys, size, &start, &end);
+> +
+> +       return __hyp_create_mappings(start, end - start, back, PAGE_HYP);
+> +}
+> +
+> +static void *__hyp_bp_vect_base;
+> +int hyp_cpu_set_vector(enum arm64_hyp_spectre_vector slot)
+> +{
+> +       void *vector;
+> +
+> +       switch (slot) {
+> +       case HYP_VECTOR_DIRECT: {
+> +               vector = hyp_symbol_addr(__kvm_hyp_vector);
+> +               break;
+> +       }
+> +       case HYP_VECTOR_SPECTRE_DIRECT: {
+> +               vector = hyp_symbol_addr(__bp_harden_hyp_vecs);
+> +               break;
+> +       }
+> +       case HYP_VECTOR_INDIRECT:
+> +       case HYP_VECTOR_SPECTRE_INDIRECT: {
+> +               vector = (void *)__hyp_bp_vect_base;
+> +               break;
+> +       }
+> +       default:
+> +               return -EINVAL;
+> +       }
+> +
+> +       vector = __kvm_vector_slot2addr(vector, slot);
+> +       *this_cpu_ptr(&kvm_hyp_vector) = (unsigned long)vector;
+> +
+> +       return 0;
+> +}
+> +
+> +int hyp_map_vectors(void)
+> +{
+> +       unsigned long bp_base;
+> +
+> +       if (!cpus_have_const_cap(ARM64_SPECTRE_V3A))
+> +               return 0;
+> +
+> +       bp_base = (unsigned long)hyp_symbol_addr(__bp_harden_hyp_vecs);
+> +       bp_base = __hyp_pa(bp_base);
+> +       bp_base = __hyp_create_private_mapping(bp_base, __BP_HARDEN_HYP_VECS_SZ,
+> +                                              PAGE_HYP_EXEC);
+> +       if (!bp_base)
+> +               return -1;
+> +
+> +       __hyp_bp_vect_base = (void *)bp_base;
+> +
+> +       return 0;
+> +}
+> +
+> +int hyp_create_idmap(void)
+> +{
+> +       unsigned long start, end;
+> +
+> +       start = (unsigned long)hyp_symbol_addr(__hyp_idmap_text_start);
+> +       start = hyp_virt_to_phys((void *)start);
+> +       start = ALIGN_DOWN(start, PAGE_SIZE);
+> +
+> +       end = (unsigned long)hyp_symbol_addr(__hyp_idmap_text_end);
+> +       end = hyp_virt_to_phys((void *)end);
+> +       end = ALIGN(end, PAGE_SIZE);
+> +
+> +       /*
+> +        * One half of the VA space is reserved to linearly map portions of
+> +        * memory -- see va_layout.c for more details. The other half of the VA
+> +        * space contains the trampoline page, and needs some care. Split that
+> +        * second half in two and find the quarter of VA space not conflicting
+> +        * with the idmap to place the IOs and the vmemmap. IOs use the lower
+> +        * half of the quarter and the vmemmap the upper half.
+> +        */
+> +       __io_map_base = start & BIT(hyp_va_bits - 2);
+> +       __io_map_base ^= BIT(hyp_va_bits - 2);
+> +       __hyp_vmemmap = __io_map_base | BIT(hyp_va_bits - 3);
+> +
+> +       return __hyp_create_mappings(start, end - start, start, PAGE_HYP_EXEC);
+> +}
+> diff --git a/arch/arm64/kvm/hyp/nvhe/psci-relay.c b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
+> index dbe57ae84a0c..cfc6dac0f0ac 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/psci-relay.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
+> @@ -193,8 +193,6 @@ static int psci_cpu_on(u64 func_id, struct kvm_cpu_context *host_ctxt)
+>         return ret;
+>  }
+>
+> -void __noreturn __host_enter(struct kvm_cpu_context *host_ctxt);
+> -
+>  asmlinkage void __noreturn __kvm_hyp_psci_cpu_entry(void)
+>  {
+>         struct kvm_host_psci_state *cpu_state = this_cpu_ptr(&kvm_host_psci_state);
+> diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+> new file mode 100644
+> index 000000000000..9679c97b875b
+> --- /dev/null
+> +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+> @@ -0,0 +1,196 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (C) 2020 Google LLC
+> + * Author: Quentin Perret <qperret@google.com>
+> + */
+> +
+> +#include <linux/kvm_host.h>
+> +#include <asm/kvm_hyp.h>
+> +#include <asm/kvm_mmu.h>
+> +#include <asm/kvm_pgtable.h>
+> +
+> +#include <nvhe/early_alloc.h>
+> +#include <nvhe/gfp.h>
+> +#include <nvhe/memory.h>
+> +#include <nvhe/mm.h>
+> +
+> +struct hyp_pool hpool;
+> +struct kvm_pgtable_mm_ops hyp_pgtable_mm_ops;
+> +unsigned long hyp_nr_cpus;
+> +
+> +#define hyp_percpu_size ((unsigned long)__per_cpu_end - \
+> +                        (unsigned long)__per_cpu_start)
+> +
+> +static void *stacks_base;
+> +static void *vmemmap_base;
+> +static void *hyp_pgt_base;
+> +
+> +static int divide_memory_pool(void *virt, unsigned long size)
+> +{
+> +       unsigned long vstart, vend, nr_pages;
+> +
+> +       hyp_early_alloc_init(virt, size);
+> +
+> +       stacks_base = hyp_early_alloc_contig(hyp_nr_cpus);
+> +       if (!stacks_base)
+> +               return -ENOMEM;
+> +
+> +       hyp_vmemmap_range(__hyp_pa(virt), size, &vstart, &vend);
+> +       nr_pages = (vend - vstart) >> PAGE_SHIFT;
+> +       vmemmap_base = hyp_early_alloc_contig(nr_pages);
+> +       if (!vmemmap_base)
+> +               return -ENOMEM;
+> +
+> +       nr_pages = hyp_s1_pgtable_size() >> PAGE_SHIFT;
+> +       hyp_pgt_base = hyp_early_alloc_contig(nr_pages);
+> +       if (!hyp_pgt_base)
+> +               return -ENOMEM;
+> +
+> +       return 0;
+> +}
+> +
+> +static int recreate_hyp_mappings(phys_addr_t phys, unsigned long size,
+> +                                unsigned long *per_cpu_base)
+> +{
+> +       void *start, *end, *virt = hyp_phys_to_virt(phys);
+> +       int ret, i;
+> +
+> +       /* Recreate the hyp page-table using the early page allocator */
+> +       hyp_early_alloc_init(hyp_pgt_base, hyp_s1_pgtable_size());
+> +       ret = kvm_pgtable_hyp_init(&hyp_pgtable, hyp_va_bits,
+> +                                  &hyp_early_alloc_mm_ops);
+> +       if (ret)
+> +               return ret;
+> +
+> +       ret = hyp_create_idmap();
+> +       if (ret)
+> +               return ret;
+> +
+> +       ret = hyp_map_vectors();
+> +       if (ret)
+> +               return ret;
+> +
+> +       ret = hyp_back_vmemmap(phys, size, hyp_virt_to_phys(vmemmap_base));
+> +       if (ret)
+> +               return ret;
+> +
+> +       ret = hyp_create_mappings(hyp_symbol_addr(__hyp_text_start),
+> +                                 hyp_symbol_addr(__hyp_text_end),
+> +                                 PAGE_HYP_EXEC);
+> +       if (ret)
+> +               return ret;
+> +
+> +       ret = hyp_create_mappings(hyp_symbol_addr(__start_rodata),
+> +                                 hyp_symbol_addr(__end_rodata), PAGE_HYP_RO);
+> +       if (ret)
+> +               return ret;
+> +
+> +       ret = hyp_create_mappings(hyp_symbol_addr(__hyp_data_ro_after_init_start),
+> +                                 hyp_symbol_addr(__hyp_data_ro_after_init_end),
+> +                                 PAGE_HYP_RO);
+> +       if (ret)
+> +               return ret;
+> +
+> +       ret = hyp_create_mappings(hyp_symbol_addr(__bss_start),
+> +                                 hyp_symbol_addr(__hyp_bss_end), PAGE_HYP);
+> +       if (ret)
+> +               return ret;
+> +
+> +       ret = hyp_create_mappings(hyp_symbol_addr(__hyp_bss_end),
+> +                                 hyp_symbol_addr(__bss_stop), PAGE_HYP_RO);
+> +       if (ret)
+> +               return ret;
+> +
+> +       ret = hyp_create_mappings(virt, virt + size - 1, PAGE_HYP);
+> +       if (ret)
+> +               return ret;
+> +
+> +       for (i = 0; i < hyp_nr_cpus; i++) {
+> +               start = (void *)kern_hyp_va(per_cpu_base[i]);
+> +               end = start + PAGE_ALIGN(hyp_percpu_size);
+> +               ret = hyp_create_mappings(start, end, PAGE_HYP);
+> +               if (ret)
+> +                       return ret;
+> +       }
+> +
+> +       return 0;
+> +}
+> +
+> +static void update_nvhe_init_params(void)
+> +{
+> +       struct kvm_nvhe_init_params *params;
+> +       unsigned long i, stack;
+> +
+> +       for (i = 0; i < hyp_nr_cpus; i++) {
+> +               stack = (unsigned long)stacks_base + (i << PAGE_SHIFT);
+> +               params = per_cpu_ptr(&kvm_init_params, i);
+> +               params->stack_hyp_va = stack + PAGE_SIZE;
+> +               params->pgd_pa = __hyp_pa(hyp_pgtable.pgd);
+> +               __flush_dcache_area(params, sizeof(*params));
+> +       }
+> +}
+> +
+> +static void *hyp_zalloc_hyp_page(void *arg)
+> +{
+> +       return hyp_alloc_pages(&hpool, HYP_GFP_ZERO, 0);
+> +}
+> +
+> +void __noreturn __kvm_hyp_protect_finalise(void)
+> +{
+> +       struct kvm_host_data *host_data = this_cpu_ptr(&kvm_host_data);
+> +       struct kvm_cpu_context *host_ctxt = &host_data->host_ctxt;
+> +       unsigned long nr_pages, used_pages;
+> +       int ret;
+> +
+> +       /* Now that the vmemmap is backed, install the full-fledged allocator */
+> +       nr_pages = hyp_s1_pgtable_size() >> PAGE_SHIFT;
+> +       used_pages = hyp_early_alloc_nr_pages();
+> +       ret = hyp_pool_init(&hpool, __hyp_pa(hyp_pgt_base), nr_pages, used_pages);
+> +       if (ret)
+> +               goto out;
+> +
+> +       hyp_pgtable_mm_ops.zalloc_page = hyp_zalloc_hyp_page;
+> +       hyp_pgtable_mm_ops.phys_to_virt = hyp_phys_to_virt;
+> +       hyp_pgtable_mm_ops.virt_to_phys = hyp_virt_to_phys;
+> +       hyp_pgtable_mm_ops.get_page = hyp_get_page;
+> +       hyp_pgtable_mm_ops.put_page = hyp_put_page;
+> +       hyp_pgtable.mm_ops = &hyp_pgtable_mm_ops;
+> +
+> +out:
+> +       host_ctxt->regs.regs[0] = SMCCC_RET_SUCCESS;
+> +       host_ctxt->regs.regs[1] = ret;
+> +
+> +       __host_enter(host_ctxt);
+> +}
+> +
+> +int __kvm_hyp_protect(phys_addr_t phys, unsigned long size,
+> +                     unsigned long nr_cpus, unsigned long *per_cpu_base)
+> +{
+> +       struct kvm_nvhe_init_params *params;
+> +       void *virt = hyp_phys_to_virt(phys);
+> +       void (*fn)(phys_addr_t params_pa, void *finalize_fn_va);
+> +       int ret;
+> +
+> +       if (phys % PAGE_SIZE || size % PAGE_SIZE || (u64)virt % PAGE_SIZE)
+> +               return -EINVAL;
+> +
+> +       hyp_spin_lock_init(&__hyp_pgd_lock);
+> +       hyp_nr_cpus = nr_cpus;
+> +
+> +       ret = divide_memory_pool(virt, size);
+> +       if (ret)
+> +               return ret;
+> +
+> +       ret = recreate_hyp_mappings(phys, size, per_cpu_base);
+> +       if (ret)
+> +               return ret;
+> +
+> +       update_nvhe_init_params();
+> +
+> +       /* Jump in the idmap page to switch to the new page-tables */
+> +       params = this_cpu_ptr(&kvm_init_params);
+> +       fn = (typeof(fn))__hyp_pa(hyp_symbol_addr(__kvm_init_switch_pgd));
+> +       fn(__hyp_pa(params), hyp_symbol_addr(__kvm_hyp_protect_finalise));
+> +
+> +       unreachable();
+> +}
+> diff --git a/arch/arm64/kvm/hyp/reserved_mem.c b/arch/arm64/kvm/hyp/reserved_mem.c
+> new file mode 100644
+> index 000000000000..02b0b18006f5
+> --- /dev/null
+> +++ b/arch/arm64/kvm/hyp/reserved_mem.c
+> @@ -0,0 +1,75 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright (C) 2020 - Google LLC
+> + * Author: Quentin Perret <qperret@google.com>
+> + */
+> +
+> +#include <linux/kvm_host.h>
+> +#include <linux/memblock.h>
+> +
+> +#include <asm/kvm_host.h>
+> +
+> +#include <nvhe/memory.h>
+> +#include <nvhe/mm.h>
+> +
+> +phys_addr_t hyp_mem_base;
+> +phys_addr_t hyp_mem_size;
+> +
+> +void __init early_init_dt_add_memory_hyp(u64 base, u64 size)
+> +{
+> +       struct hyp_memblock_region *reg;
+> +
+> +       if (kvm_nvhe_sym(hyp_memblock_nr) >= HYP_MEMBLOCK_REGIONS)
+> +               kvm_nvhe_sym(hyp_memblock_nr) = -1;
+> +
+> +       if (kvm_nvhe_sym(hyp_memblock_nr) < 0)
+> +               return;
+> +
+> +       reg = kvm_nvhe_sym(hyp_memory);
+> +       reg[kvm_nvhe_sym(hyp_memblock_nr)].start = base;
+> +       reg[kvm_nvhe_sym(hyp_memblock_nr)].end = base + size;
+> +       kvm_nvhe_sym(hyp_memblock_nr)++;
+> +}
+> +
+> +extern bool enable_protected_kvm;
+> +void __init reserve_kvm_hyp(void)
+> +{
+> +       u64 nr_pages, prev;
+> +
+> +       if (!enable_protected_kvm)
+> +               return;
+> +
+> +       if (!is_hyp_mode_available() || is_kernel_in_hyp_mode())
+> +               return;
+> +
+> +       if (kvm_nvhe_sym(hyp_memblock_nr) <= 0)
+> +               return;
+> +
+> +       hyp_mem_size += num_possible_cpus() << PAGE_SHIFT;
+> +       hyp_mem_size += hyp_s1_pgtable_size();
+> +
+> +       /*
+> +        * The hyp_vmemmap needs to be backed by pages, but these pages
+> +        * themselves need to be present in the vmemmap, so compute the number
+> +        * of pages needed by looking for a fixed point.
+> +        */
+> +       nr_pages = 0;
+> +       do {
+> +               prev = nr_pages;
+> +               nr_pages = (hyp_mem_size >> PAGE_SHIFT) + prev;
+> +               nr_pages = DIV_ROUND_UP(nr_pages * sizeof(struct hyp_page), PAGE_SIZE);
+> +               nr_pages += __hyp_pgtable_max_pages(nr_pages);
+> +       } while (nr_pages != prev);
+> +       hyp_mem_size += nr_pages << PAGE_SHIFT;
+> +
+> +       hyp_mem_base = memblock_find_in_range(0, memblock_end_of_DRAM(),
+> +                                             hyp_mem_size, SZ_2M);
+> +       if (!hyp_mem_base) {
+> +               kvm_err("Failed to reserve hyp memory\n");
+> +               return;
+> +       }
+> +       memblock_reserve(hyp_mem_base, hyp_mem_size);
+> +
+> +       kvm_info("Reserved %lld MiB at 0x%llx\n", hyp_mem_size >> 20,
+> +                hyp_mem_base);
+> +}
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 278e163beda4..3cf9397dabdb 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1264,10 +1264,10 @@ static struct kvm_pgtable_mm_ops kvm_hyp_mm_ops = {
+>         .virt_to_phys           = kvm_host_pa,
+>  };
+>
+> +u32 hyp_va_bits;
+>  int kvm_mmu_init(void)
+>  {
+>         int err;
+> -       u32 hyp_va_bits;
+>
+>         hyp_idmap_start = __pa_symbol(__hyp_idmap_text_start);
+>         hyp_idmap_start = ALIGN_DOWN(hyp_idmap_start, PAGE_SIZE);
+> diff --git a/arch/arm64/mm/init.c b/arch/arm64/mm/init.c
+> index 095540667f0f..f81da019b677 100644
+> --- a/arch/arm64/mm/init.c
+> +++ b/arch/arm64/mm/init.c
+> @@ -34,6 +34,7 @@
+>  #include <asm/fixmap.h>
+>  #include <asm/kasan.h>
+>  #include <asm/kernel-pgtable.h>
+> +#include <asm/kvm_host.h>
+>  #include <asm/memory.h>
+>  #include <asm/numa.h>
+>  #include <asm/sections.h>
+> @@ -390,6 +391,8 @@ void __init arm64_memblock_init(void)
+>
+>         reserve_elfcorehdr();
+>
+> +       reserve_kvm_hyp();
+> +
+>         high_memory = __va(memblock_end_of_DRAM() - 1) + 1;
+>
+>         dma_contiguous_reserve(arm64_dma32_phys_limit);
+> --
+> 2.29.2.299.gdc1121823c-goog
+
+Cheers,
+/fuad
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
