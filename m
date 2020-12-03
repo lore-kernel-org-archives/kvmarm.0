@@ -7,53 +7,52 @@ X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DCA7C433C1
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Dec 2020 14:17:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BAA8C433C1
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Dec 2020 14:18:25 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C29FD20793
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Dec 2020 14:17:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C29FD20793
+	by mail.kernel.org (Postfix) with ESMTP id 3ED2120793
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Dec 2020 14:18:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3ED2120793
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 17A484B1DA;
-	Thu,  3 Dec 2020 09:17:04 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7CCD64B1E2;
+	Thu,  3 Dec 2020 09:18:23 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id CdghbsxbOXuu; Thu,  3 Dec 2020 09:17:03 -0500 (EST)
+	with ESMTP id vnjgJY8UUq0Z; Thu,  3 Dec 2020 09:18:22 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B92E4B190;
-	Thu,  3 Dec 2020 09:17:03 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 74F344B1B6;
+	Thu,  3 Dec 2020 09:18:22 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F98F4B196
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2020 09:17:02 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 932544B1C0
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2020 09:18:20 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QCLw7chc+Qea for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Dec 2020 09:16:59 -0500 (EST)
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7106F4B190
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2020 09:16:59 -0500 (EST)
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.58])
- by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4CmyZ16TdSzhm1Q;
- Thu,  3 Dec 2020 22:16:25 +0800 (CST)
+ with ESMTP id pf7zVqwXLgNE for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Dec 2020 09:18:19 -0500 (EST)
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3C3B34B08E
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2020 09:18:19 -0500 (EST)
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.58])
+ by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4CmybY5N94z15VPL;
+ Thu,  3 Dec 2020 22:17:45 +0800 (CST)
 Received: from [10.174.187.37] (10.174.187.37) by
- DGGEMS405-HUB.china.huawei.com (10.3.19.205) with Microsoft SMTP Server id
- 14.3.487.0; Thu, 3 Dec 2020 22:16:43 +0800
-Subject: Re: [PATCH v2 0/2] KVM: arm64: Some fixes and code adjustments for
- pvtime ST
+ DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
+ 14.3.487.0; Thu, 3 Dec 2020 22:18:03 +0800
+Subject: Re: [PATCH v2 0/2] clocksource: arm_arch_timer: Some fixes
 To: <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
  <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>
-References: <20200817110728.12196-1-zhukeqian1@huawei.com>
+References: <20200818032814.15968-1-zhukeqian1@huawei.com>
 From: zhukeqian <zhukeqian1@huawei.com>
-Message-ID: <a87412a0-e0ca-d344-550a-91690ce3a612@huawei.com>
-Date: Thu, 3 Dec 2020 22:16:43 +0800
+Message-ID: <63334212-e151-07f4-ccf6-63eedaaf33bc@huawei.com>
+Date: Thu, 3 Dec 2020 22:18:02 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
  Thunderbird/45.7.1
 MIME-Version: 1.0
-In-Reply-To: <20200817110728.12196-1-zhukeqian1@huawei.com>
+In-Reply-To: <20200818032814.15968-1-zhukeqian1@huawei.com>
 X-Originating-IP: [10.174.187.37]
 X-CFilter-Loop: Reflected
 Cc: Marc Zyngier <maz@kernel.org>, Steven Price <steven.price@arm.com>,
@@ -76,30 +75,26 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Hi Marc,
 
-Found that this series is not applied for now.
+Found that this bugfix series is not applied for now.
 Does it need some modification? Wish you can pick it up :-)
 
 Thanks,
 Keqian
 
-On 2020/8/17 19:07, Keqian Zhu wrote:
-> During picking up pvtime LPT support for arm64, I do some trivial fixes for
-> pvtime ST.
-> 
+On 2020/8/18 11:28, Keqian Zhu wrote:
 > change log:
 > 
 > v2:
->  - Add Andrew's and Steven's R-b.
->  - Correct commit message of the first patch.
->  - Drop the second patch.
+>  - Do not revert commit 0ea415390cd3, fix it instead.
+>  - Correct the tags of second patch.
 > 
 > Keqian Zhu (2):
->   KVM: arm64: Some fixes of PV-time interface document
->   KVM: arm64: Use kvm_write_guest_lock when init stolen time
+>   clocksource: arm_arch_timer: Use stable count reader in erratum sne
+>   clocksource: arm_arch_timer: Correct fault programming of
+>     CNTKCTL_EL1.EVNTI
 > 
->  Documentation/virt/kvm/arm/pvtime.rst | 6 +++---
->  arch/arm64/kvm/pvtime.c               | 6 +-----
->  2 files changed, 4 insertions(+), 8 deletions(-)
+>  drivers/clocksource/arm_arch_timer.c | 14 +++++++++-----
+>  1 file changed, 9 insertions(+), 5 deletions(-)
 > 
 _______________________________________________
 kvmarm mailing list
