@@ -2,85 +2,63 @@ Return-Path: <SRS0=mzwA=FH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC2B0C63777
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Dec 2020 09:41:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DB7DC8301C
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Dec 2020 10:05:59 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 24B2620872
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Dec 2020 09:41:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24B2620872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 51CEE20705
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Dec 2020 10:05:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51CEE20705
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 526A94B18A;
-	Thu,  3 Dec 2020 04:41:23 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 620EF4B1E2;
+	Thu,  3 Dec 2020 05:05:57 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id zf8JAtvVAKWJ; Thu,  3 Dec 2020 04:41:22 -0500 (EST)
+	with ESMTP id EWHi46jxlWjl; Thu,  3 Dec 2020 05:05:56 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D86F4B1C5;
-	Thu,  3 Dec 2020 04:41:22 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2229D4B1E0;
+	Thu,  3 Dec 2020 05:05:56 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 571784B1C0
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2020 04:41:21 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 14CBD4B1E0
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2020 05:05:54 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id J+epZfLZtcu6 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Dec 2020 04:41:20 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3444D4B1BE
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2020 04:41:20 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1606988480;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=HeYzdAXqS+NSDGuCOA9BgR8uttc50eB1DCAVPpwd4mc=;
- b=Eh3OYFqtu3BH+wa8NV6KtXr/7BZUc0wt5DCDLaHSK8ecUAgp/rB2QQ7ioELkucof4OnlCH
- z8NRZ9gKiJTdONsEkmzED6avrBRaK1F5Puwvt50TXyWwgk5nOSM08QdW6TTxLQwD50zt3U
- 8h2yzxoS669W6A1/XxHVE+yNJvpsvOw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-583-IZ-rfgQIP6qKFWYJtDKRcw-1; Thu, 03 Dec 2020 04:41:16 -0500
-X-MC-Unique: IZ-rfgQIP6qKFWYJtDKRcw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D4E641097D88;
- Thu,  3 Dec 2020 09:41:14 +0000 (UTC)
-Received: from [10.36.112.89] (ovpn-112-89.ams2.redhat.com [10.36.112.89])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6FD5F5C1BD;
- Thu,  3 Dec 2020 09:41:13 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH 03/10] arm/arm64: gic: Remove memory
- synchronization from ipi_clear_active_handler()
-To: Alexandru Elisei <alexandru.elisei@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, drjones@redhat.com
-References: <20201125155113.192079-1-alexandru.elisei@arm.com>
- <20201125155113.192079-4-alexandru.elisei@arm.com>
- <038402be-a119-c162-04f2-d32db26e8a96@redhat.com>
- <df9e2243-008b-3f93-e499-98b887b6c848@arm.com>
- <7c18deb2-cdfc-0c74-f9d6-d08ace616060@arm.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <0697d6ab-bfc0-da42-6c46-e496a5f32331@redhat.com>
-Date: Thu, 3 Dec 2020 10:41:11 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ with ESMTP id Cpljt0xIx08P for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Dec 2020 05:05:52 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ACC654B1DF
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2020 05:05:52 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 44A53113E;
+ Thu,  3 Dec 2020 02:05:52 -0800 (PST)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 55B283F575;
+ Thu,  3 Dec 2020 02:05:51 -0800 (PST)
+Subject: Re: [RFC PATCH v3 04/16] arm64: Introduce CPU SPE feature
+To: Will Deacon <will@kernel.org>
+References: <20201027172705.15181-1-alexandru.elisei@arm.com>
+ <20201027172705.15181-5-alexandru.elisei@arm.com>
+ <418e3bf6-159c-6d1f-2b84-2fdb10c3cddd@arm.com>
+ <906a02c2-3923-3542-ffb8-43d856498e07@arm.com>
+ <20201202172353.GB29813@willie-the-truck>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <c103cf1d-786d-4151-04be-adaa19432ed5@arm.com>
+Date: Thu, 3 Dec 2020 10:07:10 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.3
 MIME-Version: 1.0
-In-Reply-To: <7c18deb2-cdfc-0c74-f9d6-d08ace616060@arm.com>
+In-Reply-To: <20201202172353.GB29813@willie-the-truck>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Cc: andre.przywara@arm.com
+Cc: maz@kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -97,104 +75,58 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Alexandru,
+Hi Will,
 
-On 12/2/20 3:14 PM, Alexandru Elisei wrote:
-> Hi,
-> 
-> On 12/2/20 2:02 PM, Alexandru Elisei wrote:
-> 
->> Hi Eric,
->>
->> On 12/1/20 4:37 PM, Auger Eric wrote:
->>> Hi Alexandru,
+On 12/2/20 5:23 PM, Will Deacon wrote:
+> On Wed, Dec 02, 2020 at 02:29:31PM +0000, Alexandru Elisei wrote:
+>> On 11/19/20 4:58 PM, James Morse wrote:
+>>> On 27/10/2020 17:26, Alexandru Elisei wrote:
+>>>> Detect Statistical Profiling Extension (SPE) support using the cpufeatures
+>>>> framework. The presence of SPE is reported via the ARM64_SPE capability.
+>>>>
+>>>> The feature will be necessary for emulating SPE in KVM, because KVM needs
+>>>> that all CPUs have SPE hardware to avoid scheduling a VCPU on a CPU without
+>>>> support. For this reason, the feature type ARM64_CPUCAP_SYSTEM_FEATURE has
+>>>> been selected to disallow hotplugging a CPU which doesn't support SPE.
+>>> Can you mention the existing driver in the commit message? Surprisingly it doesn't use
+>>> cpufeature at all. It looks like arm_spe_pmu_dev_init() goes out of its way to support
+>>> mismatched systems. (otherwise the significance of the new behaviour isn't clear!)
 >>>
->>> On 11/25/20 4:51 PM, Alexandru Elisei wrote:
->>>> The gicv{2,3}-active test sends an IPI from the boot CPU to itself, then
->>>> checks that the interrupt has been received as expected. There is no need
->>>> to use inter-processor memory synchronization primitives on code that runs
->>>> on the same CPU, so remove the unneeded memory barriers.
->>>>
->>>> The arrays are modified asynchronously (in the interrupt handler) and it is
->>>> possible for the compiler to infer that they won't be changed during normal
->>>> program flow and try to perform harmful optimizations (like stashing a
->>>> previous read in a register and reusing it). To prevent this, for GICv2,
->>>> the smp_wmb() in gicv2_ipi_send_self() is replaced with a compiler barrier.
->>>> For GICv3, the wmb() barrier in gic_ipi_send_single() already implies a
->>>> compiler barrier.
->>>>
->>>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
->>>> ---
->>>>  arm/gic.c | 8 ++++----
->>>>  1 file changed, 4 insertions(+), 4 deletions(-)
->>>>
->>>> diff --git a/arm/gic.c b/arm/gic.c
->>>> index 401ffafe4299..4e947e8516a2 100644
->>>> --- a/arm/gic.c
->>>> +++ b/arm/gic.c
->>>> @@ -12,6 +12,7 @@
->>>>   * This work is licensed under the terms of the GNU LGPL, version 2.
->>>>   */
->>>>  #include <libcflat.h>
->>>> +#include <linux/compiler.h>
->>>>  #include <errata.h>
->>>>  #include <asm/setup.h>
->>>>  #include <asm/processor.h>
->>>> @@ -260,7 +261,8 @@ static void check_lpi_hits(int *expected, const char *msg)
->>>>  
->>>>  static void gicv2_ipi_send_self(void)
->>>>  {> -	smp_wmb();
->>> nit: previous patch added it and this patch removes it. maybe squash the
->>> modifs into the previous patch saying only a barrier() is needed for self()?
->> You're right, this does look out of place. I'll merge this change into the
->> previous patch.
->>>> +	/* Prevent the compiler from optimizing memory accesses */
->>>> +	barrier();
->>>>  	writel(2 << 24 | IPI_IRQ, gicv2_dist_base() + GICD_SGIR);
->>>>  }
->>>>  
->>>> @@ -359,6 +361,7 @@ static struct gic gicv3 = {
->>>>  	},
->>>>  };
->>>>  
->>>> +/* Runs on the same CPU as the sender, no need for memory synchronization */
->>>>  static void ipi_clear_active_handler(struct pt_regs *regs __unused)
->>>>  {
->>>>  	u32 irqstat = gic_read_iar();
->>>> @@ -375,13 +378,10 @@ static void ipi_clear_active_handler(struct pt_regs *regs __unused)
->>>>  
->>>>  		writel(val, base + GICD_ICACTIVER);
->>>>  
->>>> -		smp_rmb(); /* pairs with wmb in stats_reset */
->>> the comment says it is paired with wmd in stats_reset. So is it OK to
->>> leave the associated wmb?
->> This patch removes multi-processor synchronization from the functions that run on
->> the same CPU. stats_reset() can be called from one CPU (the IPI_SENDER CPU) and
->> the variables it modifies accessed by the interrupt handlers running on different
->> CPUs, like it happens for the IPI tests. In that case we do need the proper
->> barriers in place.
-> 
-> Sorry, got confused about what you were asking. The next patch removes the
-> smp_wmb() from stats_reset() which became redundant after the barriers added to
-> the GIC functions that send IPIs. This patch is about removing barriers that were
-> never needed in the first place because the functions were running on the same
-> CPU, it's not dependent on anyGIC changes.
+>>> I read it as: the host is fine with mismatched systems, and the existing drivers supports
+>>> this. But KVM is not. After this patch you can't make the system mismatched 'late'.
+>> That was exactly my intention. Certainly, I'll try to make the commit message
+>> clearer by mentioning the SPE driver.
+> Hmm, so are you saying that with this patch applied, a machine where KVM
+> isn't even being used can no longer late-online CPUs without SPE if the boot
+> CPUs had it? If so, then I don't think that's acceptable, unfortunately.
 
-OK I get it. I was just confused by this pairing commment as we remove
-one item and not the other but that's not an issue here as we do not
-need the barrier in that case.
+Yes, the idea was to prevent hotplugging CPUs that don't have the capability so
+the kernel won't schedule a SPE-enabled guest on a CPU which doesn't have SPE.
 
-Feel free to add my R-b w/ or wo the squash:
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+>
+> As James points out, the current driver is very careful to support
+> big.LITTLE misconfigurations and I don't see why KVM support should change
+> that.
 
-Thanks
+That makes sense, thank you for making it clear from the start that this approach
+is not the right one.
 
-Eric
-> 
-> Thanks,
-> Alex
-> 
+There was a discussion for supporting KVM SPE on heterogeneous systems [1]. I
+chose to use a capability because the focus for this iteration was to ensure the
+correctness of SPE emulation, and the capability looked like the easiest way to
+get KVM SPE up and running for testing.
 
+The idea discussed previously [1] was to have userspace configure the VM with a
+cpumask representing the CPUs the VM is allowed to run on. KVM detects if the VCPU
+is scheduled on a physical CPU not in the cpumask, and returns from KVM_RUN with
+an error code. That looks like a good solution to me and generic enough that it
+can be used for all sorts of mismatched features. I will try to implement it in
+the next iteration, after I get more feedback on the current series.
+
+[1] https://www.spinics.net/lists/arm-kernel/msg778477.html
+
+Thanks,
+Alex
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
