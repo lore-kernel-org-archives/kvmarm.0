@@ -2,75 +2,82 @@ Return-Path: <SRS0=mzwA=FH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE9ACC433FE
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Dec 2020 14:58:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C085C4361B
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Dec 2020 14:59:30 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2CF05206EC
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Dec 2020 14:58:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CF05206EC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id DCA63207A7
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Dec 2020 14:59:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCA63207A7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9639F4B1D0;
-	Thu,  3 Dec 2020 09:58:35 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1CA784B1E6;
+	Thu,  3 Dec 2020 09:59:29 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id DM4X8vWTgv50; Thu,  3 Dec 2020 09:58:34 -0500 (EST)
+	with ESMTP id lxnflC9yKXyN; Thu,  3 Dec 2020 09:59:27 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A80C4B1E8;
-	Thu,  3 Dec 2020 09:58:34 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D810E4B1EC;
+	Thu,  3 Dec 2020 09:59:27 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D22254B1D4
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2020 09:58:33 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6268B4B1E7
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2020 09:59:27 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 24dTpDMs8uoa for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Dec 2020 09:58:33 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E38044B1D0
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2020 09:58:32 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ with ESMTP id TXyTc+lrgz7d for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Dec 2020 09:59:26 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 518704B1E5
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2020 09:59:26 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1607007566;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=/jV8rDC6NOVaLd8/c3i/yNh9laTUl2h94ANl+cpf9sQ=;
+ b=SnDZHg1qzgl9nNG9qkvHu6cT5WcoWCZBQ8ldy9CRaARG+ATQc3vRFJhyAVmMPKguWAtxwu
+ aCoPqmNUF9woC/QIQqPs8CmhaDCJj/3ZDcAhnBVTXHozKI3IycDXF6XFodgWlN03saiLnE
+ OwApCaWodD8Wfe7ED95THNmpW1dcDi4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-321-KL_vZvSDNIiHTCIUm98q6A-1; Thu, 03 Dec 2020 09:59:23 -0500
+X-MC-Unique: KL_vZvSDNIiHTCIUm98q6A-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 9AEF2206D6;
- Thu,  3 Dec 2020 14:58:31 +0000 (UTC)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
- TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
- (envelope-from <maz@kernel.org>)
- id 1kkq3v-00FhMk-F6; Thu, 03 Dec 2020 14:58:27 +0000
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 66D531966320;
+ Thu,  3 Dec 2020 14:59:22 +0000 (UTC)
+Received: from [10.36.112.89] (ovpn-112-89.ams2.redhat.com [10.36.112.89])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D23C510016FB;
+ Thu,  3 Dec 2020 14:59:20 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH 09/10] arm/arm64: gic: Make check_acked()
+ more generic
+To: Alexandru Elisei <alexandru.elisei@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, drjones@redhat.com
+References: <20201125155113.192079-1-alexandru.elisei@arm.com>
+ <20201125155113.192079-10-alexandru.elisei@arm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <d187299c-de94-bb1b-496a-0d552a3ae601@redhat.com>
+Date: Thu, 3 Dec 2020 15:59:19 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Date: Thu, 03 Dec 2020 14:58:27 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Keqian Zhu <zhukeqian1@huawei.com>
-Subject: Re: [PATCH v2 1/2] clocksource: arm_arch_timer: Use stable count
- reader in erratum sne
-In-Reply-To: <20200818032814.15968-2-zhukeqian1@huawei.com>
-References: <20200818032814.15968-1-zhukeqian1@huawei.com>
- <20200818032814.15968-2-zhukeqian1@huawei.com>
-User-Agent: Roundcube Webmail/1.4.9
-Message-ID: <c8e0506a7976deef0427a30b0d10e35b@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: zhukeqian1@huawei.com, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, steven.price@arm.com, drjones@redhat.com,
- catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com,
- suzuki.poulose@arm.com, wanghaibin.wang@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- linux-kernel@vger.kernel.org, Steven Price <steven.price@arm.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20201125155113.192079-10-alexandru.elisei@arm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Cc: andre.przywara@arm.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -82,62 +89,228 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2020-08-18 04:28, Keqian Zhu wrote:
-> In commit 0ea415390cd3 ("clocksource/arm_arch_timer: Use 
-> arch_timer_read_counter
-> to access stable counters"), we separate stable and normal count reader 
-> to omit
-> unnecessary overhead on systems that have no timer erratum.
-> 
-> However, in erratum_set_next_event_tval_generic(), count reader becomes 
-> normal
-> reader. This converts it to stable reader.
-> 
-> Fixes: 0ea415390cd3 ("clocksource/arm_arch_timer: Use
->        arch_timer_read_counter to access stable counters")
+Hi,
 
-On a single line.
+On 11/25/20 4:51 PM, Alexandru Elisei wrote:
+> Testing that an interrupt is received as expected is done in three places:
+> in check_ipi_sender(), check_irqnr() and check_acked(). check_irqnr()
+> compares the interrupt ID with IPI_IRQ and records a failure in bad_irq,
+> and check_ipi_sender() compares the sender with IPI_SENDER and writes to
+> bad_sender when they don't match.
+> 
+> Let's move all the checks to check_acked() by renaming
+> bad_sender->irq_sender and bad_irq->irq_number and changing their semantics
+> so they record the interrupt sender, respectively the irq number.
+> check_acked() now takes two new parameters: the expected interrupt number
+> and sender.
+> 
+> This has two distinct advantages:
+> 
+> 1. check_acked() and ipi_handler() can now be used for interrupts other
+>    than IPIs.
+> 2. Correctness checks are consolidated in one function.
+> 
+> CC: Andre Przywara <andre.przywara@arm.com>
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+Thanks
+
+Eric
+
 > ---
->  drivers/clocksource/arm_arch_timer.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  arm/gic.c | 68 +++++++++++++++++++++++++++----------------------------
+>  1 file changed, 33 insertions(+), 35 deletions(-)
 > 
-> diff --git a/drivers/clocksource/arm_arch_timer.c
-> b/drivers/clocksource/arm_arch_timer.c
-> index 6c3e841..777d38c 100644
-> --- a/drivers/clocksource/arm_arch_timer.c
-> +++ b/drivers/clocksource/arm_arch_timer.c
-> @@ -396,10 +396,10 @@ static void
-> erratum_set_next_event_tval_generic(const int access, unsigned long
->  	ctrl &= ~ARCH_TIMER_CTRL_IT_MASK;
-> 
->  	if (access == ARCH_TIMER_PHYS_ACCESS) {
-> -		cval = evt + arch_counter_get_cntpct();
-> +		cval = evt + arch_counter_get_cntpct_stable();
->  		write_sysreg(cval, cntp_cval_el0);
->  	} else {
-> -		cval = evt + arch_counter_get_cntvct();
-> +		cval = evt + arch_counter_get_cntvct_stable();
->  		write_sysreg(cval, cntv_cval_el0);
+> diff --git a/arm/gic.c b/arm/gic.c
+> index dcdab7d5f39a..da7b42da5449 100644
+> --- a/arm/gic.c
+> +++ b/arm/gic.c
+> @@ -35,7 +35,7 @@ struct gic {
+>  
+>  static struct gic *gic;
+>  static int acked[NR_CPUS], spurious[NR_CPUS];
+> -static int bad_sender[NR_CPUS], bad_irq[NR_CPUS];
+> +static int irq_sender[NR_CPUS], irq_number[NR_CPUS];
+>  static cpumask_t ready;
+>  
+>  static void nr_cpu_check(int nr)
+> @@ -57,8 +57,8 @@ static void stats_reset(void)
+>  
+>  	for (i = 0; i < nr_cpus; ++i) {
+>  		acked[i] = 0;
+> -		bad_sender[i] = -1;
+> -		bad_irq[i] = -1;
+> +		irq_sender[i] = -1;
+> +		irq_number[i] = -1;
 >  	}
+>  }
+>  
+> @@ -92,9 +92,10 @@ static void wait_for_interrupts(cpumask_t *mask)
+>  	report_info("interrupts timed-out (5s)");
+>  }
+>  
+> -static bool check_acked(cpumask_t *mask)
+> +static bool check_acked(cpumask_t *mask, int sender, int irqnum)
+>  {
+>  	int missing = 0, extra = 0, unexpected = 0;
+> +	bool has_gicv2 = (gic_version() == 2);
+>  	bool pass = true;
+>  	int cpu;
+>  
+> @@ -108,17 +109,19 @@ static bool check_acked(cpumask_t *mask)
+>  			if (acked[cpu])
+>  				++unexpected;
+>  		}
+> +		if (!acked[cpu])
+> +			continue;
+>  		smp_rmb(); /* pairs with smp_wmb in ipi_handler */
+>  
+> -		if (bad_sender[cpu] != -1) {
+> +		if (has_gicv2 && irq_sender[cpu] != sender) {
+>  			report_info("cpu%d received IPI from wrong sender %d",
+> -					cpu, bad_sender[cpu]);
+> +					cpu, irq_sender[cpu]);
+>  			pass = false;
+>  		}
+>  
+> -		if (bad_irq[cpu] != -1) {
+> +		if (irq_number[cpu] != irqnum) {
+>  			report_info("cpu%d received wrong irq %d",
+> -					cpu, bad_irq[cpu]);
+> +					cpu, irq_number[cpu]);
+>  			pass = false;
+>  		}
+>  	}
+> @@ -143,26 +146,18 @@ static void check_spurious(void)
+>  	}
+>  }
+>  
+> -static void check_ipi_sender(u32 irqstat, int sender)
+> +static int gic_get_sender(int irqstat)
+>  {
+> -	if (gic_version() == 2) {
+> -		int src = (irqstat >> 10) & 7;
+> -
+> -		if (src != sender)
+> -			bad_sender[smp_processor_id()] = src;
+> -	}
+> -}
+> -
+> -static void check_irqnr(u32 irqnr)
+> -{
+> -	if (irqnr != IPI_IRQ)
+> -		bad_irq[smp_processor_id()] = irqnr;
+> +	if (gic_version() == 2)
+> +		return (irqstat >> 10) & 7;
+> +	return -1;
+>  }
+>  
+>  static void ipi_handler(struct pt_regs *regs __unused)
+>  {
+>  	u32 irqstat = gic_read_iar();
+>  	u32 irqnr = gic_iar_irqnr(irqstat);
+> +	int this_cpu = smp_processor_id();
+>  
+>  	if (irqnr != GICC_INT_SPURIOUS) {
+>  		gic_write_eoir(irqstat);
+> @@ -173,12 +168,12 @@ static void ipi_handler(struct pt_regs *regs __unused)
+>  		 */
+>  		if (gic_version() == 2)
+>  			smp_rmb();
+> -		check_ipi_sender(irqstat, IPI_SENDER);
+> -		check_irqnr(irqnr);
+> +		irq_sender[this_cpu] = gic_get_sender(irqstat);
+> +		irq_number[this_cpu] = irqnr;
+>  		smp_wmb(); /* pairs with smp_rmb in check_acked */
+> -		++acked[smp_processor_id()];
+> +		++acked[this_cpu];
+>  	} else {
+> -		++spurious[smp_processor_id()];
+> +		++spurious[this_cpu];
+>  	}
+>  
+>  	/* Wait for writes to acked/spurious to complete */
+> @@ -311,40 +306,42 @@ static void gicv3_ipi_send_broadcast(void)
+>  
+>  static void ipi_test_self(void)
+>  {
+> +	int this_cpu = smp_processor_id();
+>  	cpumask_t mask;
+>  
+>  	report_prefix_push("self");
+>  	stats_reset();
+>  	cpumask_clear(&mask);
+> -	cpumask_set_cpu(smp_processor_id(), &mask);
+> +	cpumask_set_cpu(this_cpu, &mask);
+>  	gic->ipi.send_self();
+>  	wait_for_interrupts(&mask);
+> -	report(check_acked(&mask), "Interrupts received");
+> +	report(check_acked(&mask, this_cpu, IPI_IRQ), "Interrupts received");
+>  	report_prefix_pop();
+>  }
+>  
+>  static void ipi_test_smp(void)
+>  {
+> +	int this_cpu = smp_processor_id();
+>  	cpumask_t mask;
+>  	int i;
+>  
+>  	report_prefix_push("target-list");
+>  	stats_reset();
+>  	cpumask_copy(&mask, &cpu_present_mask);
+> -	for (i = smp_processor_id() & 1; i < nr_cpus; i += 2)
+> +	for (i = this_cpu & 1; i < nr_cpus; i += 2)
+>  		cpumask_clear_cpu(i, &mask);
+>  	gic_ipi_send_mask(IPI_IRQ, &mask);
+>  	wait_for_interrupts(&mask);
+> -	report(check_acked(&mask), "Interrupts received");
+> +	report(check_acked(&mask, this_cpu, IPI_IRQ), "Interrupts received");
+>  	report_prefix_pop();
+>  
+>  	report_prefix_push("broadcast");
+>  	stats_reset();
+>  	cpumask_copy(&mask, &cpu_present_mask);
+> -	cpumask_clear_cpu(smp_processor_id(), &mask);
+> +	cpumask_clear_cpu(this_cpu, &mask);
+>  	gic->ipi.send_broadcast();
+>  	wait_for_interrupts(&mask);
+> -	report(check_acked(&mask), "Interrupts received");
+> +	report(check_acked(&mask, this_cpu, IPI_IRQ), "Interrupts received");
+>  	report_prefix_pop();
+>  }
+>  
+> @@ -393,6 +390,7 @@ static void ipi_clear_active_handler(struct pt_regs *regs __unused)
+>  {
+>  	u32 irqstat = gic_read_iar();
+>  	u32 irqnr = gic_iar_irqnr(irqstat);
+> +	int this_cpu = smp_processor_id();
+>  
+>  	if (irqnr != GICC_INT_SPURIOUS) {
+>  		void *base;
+> @@ -405,11 +403,11 @@ static void ipi_clear_active_handler(struct pt_regs *regs __unused)
+>  
+>  		writel(val, base + GICD_ICACTIVER);
+>  
+> -		check_ipi_sender(irqstat, smp_processor_id());
+> -		check_irqnr(irqnr);
+> -		++acked[smp_processor_id()];
+> +		irq_sender[this_cpu] = gic_get_sender(irqstat);
+> +		irq_number[this_cpu] = irqnr;
+> +		++acked[this_cpu];
+>  	} else {
+> -		++spurious[smp_processor_id()];
+> +		++spurious[this_cpu];
+>  	}
+>  }
+>  
+> 
 
-With that fixed:
-
-Acked-by: Marc Zyngier <maz@kernel.org>
-
-This should go via the clocksource tree.
-
-Thanks,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
