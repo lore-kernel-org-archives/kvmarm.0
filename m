@@ -2,79 +2,85 @@ Return-Path: <SRS0=mzwA=FH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26880C4361A
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Dec 2020 17:08:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70F50C4361A
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Dec 2020 18:43:15 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5B548207B5
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Dec 2020 17:08:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B548207B5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 96CE4217BA
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Dec 2020 18:43:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96CE4217BA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A12554B18C;
-	Thu,  3 Dec 2020 12:07:59 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B8EAF4B1AD;
+	Thu,  3 Dec 2020 13:43:13 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id H++tfg1rGMDp; Thu,  3 Dec 2020 12:07:58 -0500 (EST)
+	with ESMTP id ldVkA7+bIYyk; Thu,  3 Dec 2020 13:43:12 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D0754B190;
-	Thu,  3 Dec 2020 12:07:58 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 849A24B1BC;
+	Thu,  3 Dec 2020 13:43:12 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E3FC94B18D
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2020 12:07:56 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 911E74B1AD
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2020 13:43:11 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Mw8Vvd18vWIQ for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Dec 2020 12:07:55 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B097D4B18C
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2020 12:07:55 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 5C993207AE;
- Thu,  3 Dec 2020 17:07:54 +0000 (UTC)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
- TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
- (envelope-from <maz@kernel.org>)
- id 1kks5A-00FjC8-59; Thu, 03 Dec 2020 17:07:52 +0000
+ with ESMTP id RLrwcgxj5Q32 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Dec 2020 13:43:09 -0500 (EST)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0B7B24B1AB
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2020 13:43:09 -0500 (EST)
+Received: from dggeme758-chm.china.huawei.com (unknown [172.30.72.55])
+ by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Cn4Sj3QmgzVgff;
+ Fri,  4 Dec 2020 02:42:13 +0800 (CST)
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ dggeme758-chm.china.huawei.com (10.3.19.104) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1913.5; Fri, 4 Dec 2020 02:42:59 +0800
+Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
+ lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
+ 15.01.1913.007; Thu, 3 Dec 2020 18:42:57 +0000
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To: Auger Eric <eric.auger@redhat.com>, wangxingang <wangxingang5@huawei.com>
+Subject: RE: [PATCH v13 07/15] iommu/smmuv3: Allow stage 1 invalidation with
+ unmanaged ASIDs
+Thread-Topic: [PATCH v13 07/15] iommu/smmuv3: Allow stage 1 invalidation with
+ unmanaged ASIDs
+Thread-Index: AQHWvZ36CODK3kmCyk2T9hmchYhCqqniWTe/gANqCPA=
+Date: Thu, 3 Dec 2020 18:42:57 +0000
+Message-ID: <e10ad90dc5144c0d9df98a9a078091af@huawei.com>
+References: <20201118112151.25412-8-eric.auger@redhat.com>
+ <1606829590-25924-1-git-send-email-wangxingang5@huawei.com>
+ <2e69adf5-8207-64f7-fa8e-9f2bd3a3c4e3@redhat.com>
+In-Reply-To: <2e69adf5-8207-64f7-fa8e-9f2bd3a3c4e3@redhat.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.200.67.109]
 MIME-Version: 1.0
-Date: Thu, 03 Dec 2020 17:07:52 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Steven Price <steven.price@arm.com>
-Subject: Re: [PATCH v6 1/2] arm64: kvm: Save/restore MTE registers
-In-Reply-To: <20201127152113.13099-2-steven.price@arm.com>
-References: <20201127152113.13099-1-steven.price@arm.com>
- <20201127152113.13099-2-steven.price@arm.com>
-User-Agent: Roundcube Webmail/1.4.9
-Message-ID: <946b1e7b06c4d286a78cf61408e0fc8d@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: steven.price@arm.com, catalin.marinas@arm.com,
- will@kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com,
- suzuki.poulose@arm.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Dave.Martin@arm.com, mark.rutland@arm.com, tglx@linutronix.de,
- qemu-devel@nongnu.org, quintela@redhat.com, dgilbert@redhat.com,
- richard.henderson@linaro.org, peter.maydell@linaro.org, Haibo.Xu@arm.com,
- drjones@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
- Catalin Marinas <catalin.marinas@arm.com>, Juan Quintela <quintela@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
- Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org,
- Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+X-CFilter-Loop: Reflected
+Cc: Xieyingtai <xieyingtai@huawei.com>,
+ "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "maz@kernel.org" <maz@kernel.org>,
+ "joro@8bytes.org" <joro@8bytes.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "vivek.gautam@arm.com" <vivek.gautam@arm.com>,
+ "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+ qubingbing <qubingbing@hisilicon.com>,
+ "Zengtao \(B\)" <prime.zeng@hisilicon.com>,
+ "zhangfei.gao@linaro.org" <zhangfei.gao@linaro.org>,
+ "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
+ "will@kernel.org" <will@kernel.org>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+ "robin.murphy@arm.com" <robin.murphy@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -86,58 +92,100 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+Hi Eric,
 
-> diff --git a/arch/arm64/include/asm/sysreg.h 
-> b/arch/arm64/include/asm/sysreg.h
-> index e2ef4c2edf06..b6668ffa04d9 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -569,7 +569,8 @@
->  #define SCTLR_ELx_M	(BIT(0))
+> -----Original Message-----
+> From: kvmarm-bounces@lists.cs.columbia.edu
+> [mailto:kvmarm-bounces@lists.cs.columbia.edu] On Behalf Of Auger Eric
+> Sent: 01 December 2020 13:59
+> To: wangxingang <wangxingang5@huawei.com>
+> Cc: Xieyingtai <xieyingtai@huawei.com>; jean-philippe@linaro.org;
+> kvm@vger.kernel.org; maz@kernel.org; joro@8bytes.org; will@kernel.org;
+> iommu@lists.linux-foundation.org; linux-kernel@vger.kernel.org;
+> vivek.gautam@arm.com; alex.williamson@redhat.com;
+> zhangfei.gao@linaro.org; robin.murphy@arm.com;
+> kvmarm@lists.cs.columbia.edu; eric.auger.pro@gmail.com
+> Subject: Re: [PATCH v13 07/15] iommu/smmuv3: Allow stage 1 invalidation with
+> unmanaged ASIDs
 > 
->  #define SCTLR_ELx_FLAGS	(SCTLR_ELx_M  | SCTLR_ELx_A | SCTLR_ELx_C | \
-> -			 SCTLR_ELx_SA | SCTLR_ELx_I | SCTLR_ELx_IESB)
-> +			 SCTLR_ELx_SA | SCTLR_ELx_I | SCTLR_ELx_IESB | \
-> +			 SCTLR_ELx_ITFSB)
+> Hi Xingang,
 > 
->  /* SCTLR_EL2 specific flags. */
->  #define SCTLR_EL2_RES1	((BIT(4))  | (BIT(5))  | (BIT(11)) | (BIT(16)) 
-> | \
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> index cce43bfe158f..45255ba60152 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> @@ -18,6 +18,11 @@
->  static inline void __sysreg_save_common_state(struct kvm_cpu_context 
-> *ctxt)
->  {
->  	ctxt_sys_reg(ctxt, MDSCR_EL1)	= read_sysreg(mdscr_el1);
-> +	if (system_supports_mte()) {
+> On 12/1/20 2:33 PM, Xingang Wang wrote:
+> > Hi Eric
+> >
+> > On  Wed, 18 Nov 2020 12:21:43, Eric Auger wrote:
+> >> @@ -1710,7 +1710,11 @@ static void arm_smmu_tlb_inv_context(void
+> *cookie)
+> >> 	 * insertion to guarantee those are observed before the TLBI. Do be
+> >> 	 * careful, 007.
+> >> 	 */
+> >> -	if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+> >> +	if (ext_asid >= 0) { /* guest stage 1 invalidation */
+> >> +		cmd.opcode	= CMDQ_OP_TLBI_NH_ASID;
+> >> +		cmd.tlbi.asid	= ext_asid;
+> >> +		cmd.tlbi.vmid	= smmu_domain->s2_cfg.vmid;
+> >> +	} else if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+> >
+> > Found a problem here, the cmd for guest stage 1 invalidation is built,
+> > but it is not delivered to smmu.
+> >
+> 
+> Thank you for the report. I will fix that soon. With that fixed, have
+> you been able to run vSVA on top of the series. Do you need other stuff
+> to be fixed at SMMU level? 
 
-Please move the per-VM predicate to this patch so that it can be used
-not to save/restore the MTE registers if we don't need to.
+I am seeing another issue with this series. This is when you have the vSMMU
+in non-strict mode(iommu.strict=0). Any network pass-through dev with iperf run 
+will be enough to reproduce the issue. It may randomly stop/hang.
 
-> +		ctxt_sys_reg(ctxt, RGSR_EL1)	= read_sysreg_s(SYS_RGSR_EL1);
-> +		ctxt_sys_reg(ctxt, GCR_EL1)	= read_sysreg_s(SYS_GCR_EL1);
-> +		ctxt_sys_reg(ctxt, TFSRE0_EL1)	= read_sysreg_s(SYS_TFSRE0_EL1);
-> +	}
+It looks like the .flush_iotlb_all from guest is not propagated down to the host
+correctly. I have a temp hack to fix this in Qemu wherein CMDQ_OP_TLBI_NH_ASID
+will result in a CACHE_INVALIDATE with IOMMU_INV_GRANU_PASID flag and archid
+set.
 
-Overall, I still don't understand how this is going to work once
-we have MTE in the kernel. You mentioned having the ability to
-create turn off the tag checks at times, but I don't see that
-in this patch (and I'm not sure we want that either).
+Please take a look and let me know. 
+
+As I am going to respin soon, please let me
+> know what is the best branch to rebase to alleviate your integration.
+
+Please find the latest kernel and Qemu branch with vSVA support added here,
+
+https://github.com/hisilicon/kernel-dev/tree/5.10-rc4-2stage-v13-vsva
+https://github.com/hisilicon/qemu/tree/v5.2.0-rc1-2stage-rfcv7-vsva
+
+I have done some basic minimum vSVA tests on a HiSilicon D06 board with
+a zip dev that supports STALL. All looks good so far apart from the issues
+that have been already reported/discussed.
+
+The kernel branch is actually a rebase of sva/uacce related patches from a
+Linaro branch here,
+
+https://github.com/Linaro/linux-kernel-uadk/tree/uacce-devel-5.10
+
+I think going forward it will be good(if possible) to respin your series on top of
+a sva branch with STALL/PRI support added. 
+
+Hi Jean/zhangfei,
+Is it possible to have a branch with minimum required SVA/UACCE related patches
+that are already public and can be a "stable" candidate for future respin of Eric's series?
+Please share your thoughts.
 
 Thanks,
+Shameer 
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+> Best Regards
+> 
+> Eric
+> 
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
