@@ -2,91 +2,104 @@ Return-Path: <SRS0=T6xz=FI=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7733CC433FE
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Dec 2020 08:25:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1B95C433FE
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Dec 2020 09:54:03 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B827E225A9
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Dec 2020 08:25:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B827E225A9
+	by mail.kernel.org (Postfix) with ESMTP id 403FD22838
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Dec 2020 09:54:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 403FD22838
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DC2994B2C7;
-	Fri,  4 Dec 2020 03:25:48 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 732F84B2D8;
+	Fri,  4 Dec 2020 04:54:02 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id oLBEu01AfYJ5; Fri,  4 Dec 2020 03:25:47 -0500 (EST)
+	with ESMTP id 4tganqw34L-x; Fri,  4 Dec 2020 04:54:01 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ACDBD4B2B7;
-	Fri,  4 Dec 2020 03:25:47 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DC5A4B2C3;
+	Fri,  4 Dec 2020 04:54:01 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E6BC4B2B7
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Dec 2020 03:25:46 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A19C54B2B1
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Dec 2020 04:54:00 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lXAIIsfvX-Ht for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Dec 2020 03:25:45 -0500 (EST)
-Received: from mail-il1-f196.google.com (mail-il1-f196.google.com
- [209.85.166.196])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3F65B4B290
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Dec 2020 03:25:45 -0500 (EST)
-Received: by mail-il1-f196.google.com with SMTP id y9so4498932ilb.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 04 Dec 2020 00:25:45 -0800 (PST)
+ with ESMTP id QhvBhaEFLD2u for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Dec 2020 04:53:59 -0500 (EST)
+Received: from mail-ej1-f66.google.com (mail-ej1-f66.google.com
+ [209.85.218.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6720D4B2AF
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Dec 2020 04:53:59 -0500 (EST)
+Received: by mail-ej1-f66.google.com with SMTP id d17so7772458ejy.9
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 04 Dec 2020 01:53:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=A/TF5i4Gpjq2x74Bg7OwEl9WA0OZL7YpdQhrSnvWrv4=;
- b=OPghMrWVhw0KraiEKIxFNUIiv9v/utgcP8RFjVVwweLxyG1yQ6badbCjfRCz8Yn/a/
- K8XVmn2OQhZVNM/SPJ+hSXWZPcprNliCA96iA5H2YTPIkSI+To7TM+ncl5TP3TLFQX8G
- ZgyS/WCmMszzpdtiErIxepqQziNv5JIAYG1rIbw4pbI4WfU1rAqOLmjgWZqpx5vJTa6C
- NaCQl1EMRJIjPVMh/VbKRSzmsgnPEodsCDY7OKRg+vGNisWXYhlGsvL4LeZwcSTERFjc
- 2tbQdvxblnTk0ocqfgkRuM1uVsz9zq0P9UhaxwMq8TufgrPltfbvWaovagbC7sd3OSd+
- MThg==
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=Uv2efItsQUhEgfX7SeOo28N5gNOKYGwcTRvbk7tp5sk=;
+ b=Y+yQmo30CQFiR5TTzDwrmyJatxpqtANqRpaIncgY2A8s2nWuzGUeyn1tlf4gOxugd2
+ hh8E3nHhmj4zo93RilCZjKplbsTkCbNxNPF8uYID9W5PuMKVGbJigGgWD9afGHl880zK
+ 58XjKXOHPeMO/smMTfgANFsLPDLJ7SGTQmRGvK5+9rVbt5ynuxcXqQInlbHiTr3T4N4V
+ w8Wu7TpMV552x6QPPvqgAlSK6lmA7BRml4jRWHiI63XOeYUq0EO1/mbxl22WqthPcaDm
+ nfWp3DFvC6vgW0kGiJ+NqG+v0vXx7/6/rIRANPewGZH1nMCdkpAXWjUQbYAPRfIXi/R1
+ CaKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=A/TF5i4Gpjq2x74Bg7OwEl9WA0OZL7YpdQhrSnvWrv4=;
- b=KCKlFL4siZ8WvJcq3VwvCYPPfYnqNICAdh3myqbOFh2efQr1Vz1GO0VBP6dmhu/1SJ
- mG7191oUIa4VwogFg9GCxELK3LZu2P+EaKXlzSlaEoqbo1RDdMP7l4I8VgXxjeOlF0NJ
- r60mjelK8ygktxwVWEQW5a0XCiWDlW+FUkxNs6TyFv3zyQ6w3oTsZncjJ8Kikhq8pk3H
- zNqQGcC5Wgs5nfQJ/5QP+upVQLNv/QQgE6GN+0x+LHps4YRjstmu6hSuF6ztYt/RWkJ/
- Th0vyn3D5Q6Wvf2NFudwnlrLjcVgHw9gy3YkDe27QrFakd8LbBzsrU/VW50insAgw0pV
- Tl8g==
-X-Gm-Message-State: AOAM5331AWJn2jrlux9cP5kdi5z3UdhXZAFrSXWTjgpjvMzcQVt3PDOC
- GUDlyPiFh/xzLjwr1wFTL69A+jFUrpY90KQFiIDs
-X-Google-Smtp-Source: ABdhPJxOUP7ZPr/TNKGDu7k4ned1HHOOyRF1U5Rs11h7us/dHdLm0ThGcpAs0FZbo8LMkEqfsiU+DKkBEQh37fbmq7w=
-X-Received: by 2002:a92:98db:: with SMTP id a88mr4401294ill.106.1607070344665; 
- Fri, 04 Dec 2020 00:25:44 -0800 (PST)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=Uv2efItsQUhEgfX7SeOo28N5gNOKYGwcTRvbk7tp5sk=;
+ b=cPN345zidXWpLRO3lWlDgftNxpu0E6KF+U6Wm+f2rbnXcvProsNLx1i24JXmXWhTat
+ GV+meGMhFkJRfCFS4jA8VjN8XzfYyTaLxQzJpmZAOaIBrSNQ2JNHFTsDNu7NGmWCH37P
+ fhdSMxBS/LuIAC6nVqmgRW9uBRKYfLDHYfD/PNh2+2pjcrZNzlwto/MON5dz+MkwpK+k
+ GWvjdK4V2CbXQQO1OTEtCm/+MZw57QE9Qmhl93oDHDVTQ0952NN1NyJeuT9VHXdp2qwh
+ duRd0WkILB9XZ0uBo9bGOpZlypZlBFR12Yw+BixO5L06pDgR9f88LkrGa1LsvRf2FUof
+ PKtg==
+X-Gm-Message-State: AOAM533sVdYaOVlu7h6QULQ3nc6P8UhDAlq6oWco5QCMjm/5kzSaF75N
+ NUr4DngB+USjnsMzpxyqUTxfTQ==
+X-Google-Smtp-Source: ABdhPJwXvl8nLosqnGM8eU8JP87XsB+l9fv0jbHDns3+jJMfPKJqM1nwHazVtadoe4qIEMJGSczwsg==
+X-Received: by 2002:a17:906:81ca:: with SMTP id
+ e10mr6195735ejx.449.1607075638385; 
+ Fri, 04 Dec 2020 01:53:58 -0800 (PST)
+Received: from myrica ([2001:1715:4e26:a7e0:116c:c27a:3e7f:5eaf])
+ by smtp.gmail.com with ESMTPSA id k2sm2690147ejp.6.2020.12.04.01.53.56
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 04 Dec 2020 01:53:57 -0800 (PST)
+Date: Fri, 4 Dec 2020 10:53:38 +0100
+From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Subject: Re: [PATCH v13 07/15] iommu/smmuv3: Allow stage 1 invalidation with
+ unmanaged ASIDs
+Message-ID: <20201204095338.GA1912466@myrica>
+References: <20201118112151.25412-8-eric.auger@redhat.com>
+ <1606829590-25924-1-git-send-email-wangxingang5@huawei.com>
+ <2e69adf5-8207-64f7-fa8e-9f2bd3a3c4e3@redhat.com>
+ <e10ad90dc5144c0d9df98a9a078091af@huawei.com>
 MIME-Version: 1.0
-References: <20201119153901.53705-1-steven.price@arm.com>
- <CAFEAcA85fiqA206FuFANKbV_3GkfY1F8Gv7MP58BgTT81bs9kA@mail.gmail.com>
- <20201119184248.4bycy6ouvaxqdiiy@kamzik.brq.redhat.com>
- <db5ad775fa7cfe7defbd78d9ca6ccfd8@kernel.org>
- <c25c297e-e9b5-ab3f-e401-c21ddd4d2ad1@arm.com>
-In-Reply-To: <c25c297e-e9b5-ab3f-e401-c21ddd4d2ad1@arm.com>
-From: Haibo Xu <haibo.xu@linaro.org>
-Date: Fri, 4 Dec 2020 16:25:33 +0800
-Message-ID: <CAJc+Z1H7akXwDtVvQLiGVVyZ0DfmsxyJQhE7Sno6aAO9GaafEA@mail.gmail.com>
-Subject: Re: [PATCH v5 0/2] MTE support for KVM guest
-To: Steven Price <steven.price@arm.com>
-Cc: lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Juan Quintela <quintela@redhat.com>, Marc Zyngier <maz@kernel.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
- kvmarm <kvmarm@lists.cs.columbia.edu>,
- arm-mail-list <linux-arm-kernel@lists.infradead.org>,
- Dave Martin <Dave.Martin@arm.com>
+Content-Disposition: inline
+In-Reply-To: <e10ad90dc5144c0d9df98a9a078091af@huawei.com>
+Cc: Xieyingtai <xieyingtai@huawei.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ wangxingang <wangxingang5@huawei.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "vivek.gautam@arm.com" <vivek.gautam@arm.com>,
+ "maz@kernel.org" <maz@kernel.org>, "joro@8bytes.org" <joro@8bytes.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+ qubingbing <qubingbing@hisilicon.com>,
+ "Zengtao \(B\)" <prime.zeng@hisilicon.com>,
+ "zhangfei.gao@linaro.org" <zhangfei.gao@linaro.org>,
+ "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
+ "will@kernel.org" <will@kernel.org>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+ "robin.murphy@arm.com" <robin.murphy@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -103,124 +116,23 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 20 Nov 2020 at 17:51, Steven Price <steven.price@arm.com> wrote:
->
-> On 19/11/2020 19:11, Marc Zyngier wrote:
-> > On 2020-11-19 18:42, Andrew Jones wrote:
-> >> On Thu, Nov 19, 2020 at 03:45:40PM +0000, Peter Maydell wrote:
-> >>> On Thu, 19 Nov 2020 at 15:39, Steven Price <steven.price@arm.com> wrote:
-> >>> > This series adds support for Arm's Memory Tagging Extension (MTE) to
-> >>> > KVM, allowing KVM guests to make use of it. This builds on the
-> >>> existing
-> >>> > user space support already in v5.10-rc1, see [1] for an overview.
-> >>>
-> >>> > The change to require the VMM to map all guest memory PROT_MTE is
-> >>> > significant as it means that the VMM has to deal with the MTE tags
-> >>> even
-> >>> > if it doesn't care about them (e.g. for virtual devices or if the VMM
-> >>> > doesn't support migration). Also unfortunately because the VMM can
-> >>> > change the memory layout at any time the check for PROT_MTE/VM_MTE has
-> >>> > to be done very late (at the point of faulting pages into stage 2).
-> >>>
-> >>> I'm a bit dubious about requring the VMM to map the guest memory
-> >>> PROT_MTE unless somebody's done at least a sketch of the design
-> >>> for how this would work on the QEMU side. Currently QEMU just
-> >>> assumes the guest memory is guest memory and it can access it
-> >>> without special precautions...
-> >>>
-> >>
-> >> There are two statements being made here:
-> >>
-> >> 1) Requiring the use of PROT_MTE when mapping guest memory may not fit
-> >>    QEMU well.
-> >>
-> >> 2) New KVM features should be accompanied with supporting QEMU code in
-> >>    order to prove that the APIs make sense.
-> >>
-> >> I strongly agree with (2). While kvmtool supports some quick testing, it
-> >> doesn't support migration. We must test all new features with a migration
-> >> supporting VMM.
-> >>
-> >> I'm not sure about (1). I don't feel like it should be a major problem,
-> >> but (2).
->
-> (1) seems to be contentious whichever way we go. Either PROT_MTE isn't
-> required in which case it's easy to accidentally screw up migration, or
-> it is required in which case it's difficult to handle normal guest
-> memory from the VMM. I get the impression that probably I should go back
-> to the previous approach - sorry for the distraction with this change.
->
-> (2) isn't something I'm trying to skip, but I'm limited in what I can do
-> myself so would appreciate help here. Haibo is looking into this.
->
+Hi Shameer,
 
-Hi Steven,
+On Thu, Dec 03, 2020 at 06:42:57PM +0000, Shameerali Kolothum Thodi wrote:
+> Hi Jean/zhangfei,
+> Is it possible to have a branch with minimum required SVA/UACCE related patches
+> that are already public and can be a "stable" candidate for future respin of Eric's series?
+> Please share your thoughts.
 
-Sorry for the later reply!
+By "stable" you mean a fixed branch with the latest SVA/UACCE patches
+based on mainline?  The uacce-devel branches from
+https://github.com/Linaro/linux-kernel-uadk do provide this at the moment
+(they track the latest sva/zip-devel branch
+https://jpbrucker.net/git/linux/ which is roughly based on mainline.)
 
-I have finished the POC for the MTE migration support with the assumption
-that all the memory is mapped with PROT_MTE. But I got stuck in the test
-with a FVP setup. Previously, I successfully compiled a test case to verify
-the basic function of MTE in a guest. But these days, the re-compiled test
-can't be executed by the guest(very weird). The short plan to verify
-the migration
-is to set the MTE tags on one page in the guest, and try to dump the migrated
-memory contents.
+Thanks,
+Jean
 
-I will update the status later next week!
-
-Regards,
-Haibo
-
-> >>
-> >> I'd be happy to help with the QEMU prototype, but preferably when there's
-> >> hardware available. Has all the current MTE testing just been done on
-> >> simulators? And, if so, are there regression tests regularly running on
-> >> the simulators too? And can they test migration? If hardware doesn't
-> >> show up quickly and simulators aren't used for regression tests, then
-> >> all this code will start rotting from day one.
->
-> As Marc says, hardware isn't available. Testing is either via the Arm
-> FVP model (that I've been using for most of my testing) or QEMU full
-> system emulation.
->
-> >
-> > While I agree with the sentiment, the reality is pretty bleak.
-> >
-> > I'm pretty sure nobody will ever run a migration on emulation. I also doubt
-> > there is much overlap between MTE users and migration users, unfortunately.
-> >
-> > No HW is available today, and when it becomes available, it will be in
-> > the form of a closed system on which QEMU doesn't run, either because
-> > we are locked out of EL2 (as usual), or because migration is not part of
-> > the use case (like KVM on Android, for example).
-> >
-> > So we can wait another two (five?) years until general purpose HW becomes
-> > available, or we start merging what we can test today. I'm inclined to
-> > do the latter.
-> >
-> > And I think it is absolutely fine for QEMU to say "no MTE support with KVM"
-> > (we can remove all userspace visibility, except for the capability).
->
-> What I'm trying to achieve is a situation where KVM+MTE without
-> migration works and we leave ourselves a clear path where migration can
-> be added. With hindsight I think this version of the series was a wrong
-> turn - if we return to not requiring PROT_MTE then we have the following
-> two potential options to explore for migration in the future:
->
->   * The VMM can choose to enable PROT_MTE if it needs to, and if desired
-> we can add a flag to enforce this in the kernel.
->
->   * If needed a new kernel interface can be provided to fetch/set tags
-> from guest memory which isn't mapped PROT_MTE.
->
-> Does this sound reasonable?
->
-> I'll clean up the set_pte_at() change and post a v6 later today.
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
