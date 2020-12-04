@@ -2,89 +2,75 @@ Return-Path: <SRS0=T6xz=FI=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1B95C433FE
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Dec 2020 09:54:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86B95C433FE
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Dec 2020 10:22:26 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 403FD22838
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Dec 2020 09:54:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 403FD22838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTP id B49CE2251F
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Dec 2020 10:22:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B49CE2251F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 732F84B2D8;
-	Fri,  4 Dec 2020 04:54:02 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EDF574B11F;
+	Fri,  4 Dec 2020 05:22:24 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 4tganqw34L-x; Fri,  4 Dec 2020 04:54:01 -0500 (EST)
+	with ESMTP id FzQ9LzToJGnZ; Fri,  4 Dec 2020 05:22:23 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DC5A4B2C3;
-	Fri,  4 Dec 2020 04:54:01 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B9F1C4B142;
+	Fri,  4 Dec 2020 05:22:23 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A19C54B2B1
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Dec 2020 04:54:00 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 50E024B12D
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Dec 2020 05:22:23 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QhvBhaEFLD2u for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Dec 2020 04:53:59 -0500 (EST)
-Received: from mail-ej1-f66.google.com (mail-ej1-f66.google.com
- [209.85.218.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6720D4B2AF
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Dec 2020 04:53:59 -0500 (EST)
-Received: by mail-ej1-f66.google.com with SMTP id d17so7772458ejy.9
- for <kvmarm@lists.cs.columbia.edu>; Fri, 04 Dec 2020 01:53:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=Uv2efItsQUhEgfX7SeOo28N5gNOKYGwcTRvbk7tp5sk=;
- b=Y+yQmo30CQFiR5TTzDwrmyJatxpqtANqRpaIncgY2A8s2nWuzGUeyn1tlf4gOxugd2
- hh8E3nHhmj4zo93RilCZjKplbsTkCbNxNPF8uYID9W5PuMKVGbJigGgWD9afGHl880zK
- 58XjKXOHPeMO/smMTfgANFsLPDLJ7SGTQmRGvK5+9rVbt5ynuxcXqQInlbHiTr3T4N4V
- w8Wu7TpMV552x6QPPvqgAlSK6lmA7BRml4jRWHiI63XOeYUq0EO1/mbxl22WqthPcaDm
- nfWp3DFvC6vgW0kGiJ+NqG+v0vXx7/6/rIRANPewGZH1nMCdkpAXWjUQbYAPRfIXi/R1
- CaKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=Uv2efItsQUhEgfX7SeOo28N5gNOKYGwcTRvbk7tp5sk=;
- b=cPN345zidXWpLRO3lWlDgftNxpu0E6KF+U6Wm+f2rbnXcvProsNLx1i24JXmXWhTat
- GV+meGMhFkJRfCFS4jA8VjN8XzfYyTaLxQzJpmZAOaIBrSNQ2JNHFTsDNu7NGmWCH37P
- fhdSMxBS/LuIAC6nVqmgRW9uBRKYfLDHYfD/PNh2+2pjcrZNzlwto/MON5dz+MkwpK+k
- GWvjdK4V2CbXQQO1OTEtCm/+MZw57QE9Qmhl93oDHDVTQ0952NN1NyJeuT9VHXdp2qwh
- duRd0WkILB9XZ0uBo9bGOpZlypZlBFR12Yw+BixO5L06pDgR9f88LkrGa1LsvRf2FUof
- PKtg==
-X-Gm-Message-State: AOAM533sVdYaOVlu7h6QULQ3nc6P8UhDAlq6oWco5QCMjm/5kzSaF75N
- NUr4DngB+USjnsMzpxyqUTxfTQ==
-X-Google-Smtp-Source: ABdhPJwXvl8nLosqnGM8eU8JP87XsB+l9fv0jbHDns3+jJMfPKJqM1nwHazVtadoe4qIEMJGSczwsg==
-X-Received: by 2002:a17:906:81ca:: with SMTP id
- e10mr6195735ejx.449.1607075638385; 
- Fri, 04 Dec 2020 01:53:58 -0800 (PST)
-Received: from myrica ([2001:1715:4e26:a7e0:116c:c27a:3e7f:5eaf])
- by smtp.gmail.com with ESMTPSA id k2sm2690147ejp.6.2020.12.04.01.53.56
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 04 Dec 2020 01:53:57 -0800 (PST)
-Date: Fri, 4 Dec 2020 10:53:38 +0100
-From: Jean-Philippe Brucker <jean-philippe@linaro.org>
-To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Subject: Re: [PATCH v13 07/15] iommu/smmuv3: Allow stage 1 invalidation with
+ with ESMTP id lPiMKaqi4c3A for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Dec 2020 05:22:21 -0500 (EST)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B251F4B11F
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Dec 2020 05:22:20 -0500 (EST)
+Received: from DGGEMM405-HUB.china.huawei.com (unknown [172.30.72.55])
+ by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4CnTJv5JjDzQndf;
+ Fri,  4 Dec 2020 18:21:51 +0800 (CST)
+Received: from dggemi753-chm.china.huawei.com (10.1.198.139) by
+ DGGEMM405-HUB.china.huawei.com (10.3.20.213) with Microsoft SMTP Server (TLS)
+ id 14.3.487.0; Fri, 4 Dec 2020 18:20:30 +0800
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ dggemi753-chm.china.huawei.com (10.1.198.139) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1913.5; Fri, 4 Dec 2020 18:20:29 +0800
+Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
+ lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
+ 15.01.1913.007; Fri, 4 Dec 2020 10:20:27 +0000
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To: Jean-Philippe Brucker <jean-philippe@linaro.org>
+Subject: RE: [PATCH v13 07/15] iommu/smmuv3: Allow stage 1 invalidation with
  unmanaged ASIDs
-Message-ID: <20201204095338.GA1912466@myrica>
+Thread-Topic: [PATCH v13 07/15] iommu/smmuv3: Allow stage 1 invalidation with
+ unmanaged ASIDs
+Thread-Index: AQHWvZ36CODK3kmCyk2T9hmchYhCqqniWTe/gANqCPCAAQgyAIAABi8Q
+Date: Fri, 4 Dec 2020 10:20:26 +0000
+Message-ID: <2de03a797517452cbfeab022e12612b7@huawei.com>
 References: <20201118112151.25412-8-eric.auger@redhat.com>
  <1606829590-25924-1-git-send-email-wangxingang5@huawei.com>
  <2e69adf5-8207-64f7-fa8e-9f2bd3a3c4e3@redhat.com>
  <e10ad90dc5144c0d9df98a9a078091af@huawei.com>
+ <20201204095338.GA1912466@myrica>
+In-Reply-To: <20201204095338.GA1912466@myrica>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.200.67.145]
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <e10ad90dc5144c0d9df98a9a078091af@huawei.com>
+X-CFilter-Loop: Reflected
 Cc: Xieyingtai <xieyingtai@huawei.com>,
  "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
  wangxingang <wangxingang5@huawei.com>,
@@ -116,22 +102,57 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Shameer,
+Hi Jean,
 
-On Thu, Dec 03, 2020 at 06:42:57PM +0000, Shameerali Kolothum Thodi wrote:
-> Hi Jean/zhangfei,
-> Is it possible to have a branch with minimum required SVA/UACCE related patches
-> that are already public and can be a "stable" candidate for future respin of Eric's series?
-> Please share your thoughts.
+> -----Original Message-----
+> From: Jean-Philippe Brucker [mailto:jean-philippe@linaro.org]
+> Sent: 04 December 2020 09:54
+> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> Cc: Auger Eric <eric.auger@redhat.com>; wangxingang
+> <wangxingang5@huawei.com>; Xieyingtai <xieyingtai@huawei.com>;
+> kvm@vger.kernel.org; maz@kernel.org; joro@8bytes.org; will@kernel.org;
+> iommu@lists.linux-foundation.org; linux-kernel@vger.kernel.org;
+> vivek.gautam@arm.com; alex.williamson@redhat.com;
+> zhangfei.gao@linaro.org; robin.murphy@arm.com;
+> kvmarm@lists.cs.columbia.edu; eric.auger.pro@gmail.com; Zengtao (B)
+> <prime.zeng@hisilicon.com>; qubingbing <qubingbing@hisilicon.com>
+> Subject: Re: [PATCH v13 07/15] iommu/smmuv3: Allow stage 1 invalidation with
+> unmanaged ASIDs
+> 
+> Hi Shameer,
+> 
+> On Thu, Dec 03, 2020 at 06:42:57PM +0000, Shameerali Kolothum Thodi wrote:
+> > Hi Jean/zhangfei,
+> > Is it possible to have a branch with minimum required SVA/UACCE related
+> patches
+> > that are already public and can be a "stable" candidate for future respin of
+> Eric's series?
+> > Please share your thoughts.
+> 
+> By "stable" you mean a fixed branch with the latest SVA/UACCE patches
+> based on mainline? 
 
-By "stable" you mean a fixed branch with the latest SVA/UACCE patches
-based on mainline?  The uacce-devel branches from
-https://github.com/Linaro/linux-kernel-uadk do provide this at the moment
-(they track the latest sva/zip-devel branch
-https://jpbrucker.net/git/linux/ which is roughly based on mainline.)
+Yes. 
+
+ The uacce-devel branches from
+> https://github.com/Linaro/linux-kernel-uadk do provide this at the moment
+> (they track the latest sva/zip-devel branch
+> https://jpbrucker.net/git/linux/ which is roughly based on mainline.)
+
+Thanks. 
+
+Hi Eric,
+
+Could you please take a look at the above branches and see whether it make sense
+to rebase on top of either of those?
+
+From vSVA point of view, it will be less rebase hassle if we can do that.
 
 Thanks,
-Jean
+Shameer
+
+> Thanks,
+> Jean
 
 _______________________________________________
 kvmarm mailing list
