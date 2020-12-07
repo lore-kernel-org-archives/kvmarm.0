@@ -6,87 +6,76 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB56BC433FE
-	for <kvmarm@archiver.kernel.org>; Mon,  7 Dec 2020 19:03:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD54AC433FE
+	for <kvmarm@archiver.kernel.org>; Mon,  7 Dec 2020 19:04:53 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 164B3238E4
-	for <kvmarm@archiver.kernel.org>; Mon,  7 Dec 2020 19:03:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 164B3238E4
+	by mail.kernel.org (Postfix) with ESMTP id 142D4238E2
+	for <kvmarm@archiver.kernel.org>; Mon,  7 Dec 2020 19:04:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 142D4238E2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F1F94B288;
-	Mon,  7 Dec 2020 14:03:23 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B4F44B273;
+	Mon,  7 Dec 2020 14:04:52 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id WZIyHDGGWhHZ; Mon,  7 Dec 2020 14:03:21 -0500 (EST)
+	with ESMTP id SHGcgjAGTFBw; Mon,  7 Dec 2020 14:04:51 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A2814B273;
-	Mon,  7 Dec 2020 14:03:21 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C86B4B288;
+	Mon,  7 Dec 2020 14:04:51 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A75B4B273
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Dec 2020 14:03:19 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BD4EE4B273
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Dec 2020 14:04:50 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1k14gM04uK5K for <kvmarm@lists.cs.columbia.edu>;
- Mon,  7 Dec 2020 14:03:18 -0500 (EST)
+ with ESMTP id oIcg64kqT3lW for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  7 Dec 2020 14:04:49 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 650D84B272
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Dec 2020 14:03:18 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D0A654B272
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Dec 2020 14:04:49 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 1C803238E3;
- Mon,  7 Dec 2020 19:03:17 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id B0E63238E2;
+ Mon,  7 Dec 2020 19:04:48 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1kmLn0-00GqYW-Qe; Mon, 07 Dec 2020 19:03:15 +0000
-Date: Mon, 07 Dec 2020 19:03:13 +0000
-Message-ID: <874kkx5thq.wl-maz@kernel.org>
+ id 1kmLoT-00Gqbd-Vs; Mon, 07 Dec 2020 19:04:46 +0000
+Date: Mon, 07 Dec 2020 19:04:44 +0000
+Message-ID: <87360h5tf7.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v5 0/2] MTE support for KVM guest
-In-Reply-To: <20201207163405.GD1526@gaia>
-References: <20201119153901.53705-1-steven.price@arm.com>
- <CAFEAcA85fiqA206FuFANKbV_3GkfY1F8Gv7MP58BgTT81bs9kA@mail.gmail.com>
- <20201119184248.4bycy6ouvaxqdiiy@kamzik.brq.redhat.com>
- <db5ad775fa7cfe7defbd78d9ca6ccfd8@kernel.org>
- <c25c297e-e9b5-ab3f-e401-c21ddd4d2ad1@arm.com>
- <CAJc+Z1H7akXwDtVvQLiGVVyZ0DfmsxyJQhE7Sno6aAO9GaafEA@mail.gmail.com>
- <46fd98a2-ee39-0086-9159-b38c406935ab@arm.com>
- <CAFEAcA_Q8RSB-zcS8+cEfvWz_0U5GLzmsf12m_7BFjX8h-1hrA@mail.gmail.com>
- <b975422f-14fd-13b3-c8ca-e8b1a68c0837@arm.com>
- <0d0eb6da6a11f76d10e532c157181985@kernel.org>
- <20201207163405.GD1526@gaia>
+To: Robin Murphy <robin.murphy@arm.com>
+Subject: Re: [PATCH] arm64: Work around broken GCC handling of "S" constraint
+In-Reply-To: <ce1666ea-eb6f-33d6-cfd8-934bfcf7e336@arm.com>
+References: <20201207154341.1004276-1-maz@kernel.org>
+ <CAMj1kXHb9=KPkCAwYWDFH1ddy_p3sDTZ7QemtvWV8nC_14rN+g@mail.gmail.com>
+ <CAMj1kXG9mmC8wY9Gvo-oJat0bZTNk495x1Hmmi-_FXbu-gDzDw@mail.gmail.com>
+ <87316821c90a13a912a624250055f50f@kernel.org>
+ <CAMj1kXG0DRX22SuoXC9VypKfwaUWTUJPAJ6mOZ=ra7+c9UCMXg@mail.gmail.com>
+ <ce1666ea-eb6f-33d6-cfd8-934bfcf7e336@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: catalin.marinas@arm.com, steven.price@arm.com,
- peter.maydell@linaro.org, haibo.xu@linaro.org, linux-kernel@vger.kernel.org,
- quintela@redhat.com, richard.henderson@linaro.org, qemu-devel@nongnu.org,
- dgilbert@redhat.com, tglx@linutronix.de, will@kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- Dave.Martin@arm.com
+X-SA-Exim-Rcpt-To: robin.murphy@arm.com, ardb@kernel.org,
+ kernel-team@android.com, catalin.marinas@arm.com, dbrazdil@google.com,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: Juan Quintela <quintela@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Dave Martin <Dave.Martin@arm.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Steven Price <steven.price@arm.com>,
- arm-mail-list <linux-arm-kernel@lists.infradead.org>,
- Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+Cc: Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
  kvmarm <kvmarm@lists.cs.columbia.edu>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+ Android Kernel Team <kernel-team@android.com>,
+ Ard Biesheuvel <ardb@kernel.org>,
+ Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -103,43 +92,44 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 07 Dec 2020 16:34:05 +0000,
-Catalin Marinas <catalin.marinas@arm.com> wrote:
+Hi Robin,
+
+On Mon, 07 Dec 2020 18:42:23 +0000,
+Robin Murphy <robin.murphy@arm.com> wrote:
 > 
-> On Mon, Dec 07, 2020 at 04:05:55PM +0000, Marc Zyngier wrote:
-> > What I'd really like to see is a description of how shared memory
-> > is, in general, supposed to work with MTE. My gut feeling is that
-> > it doesn't, and that you need to turn MTE off when sharing memory
-> > (either implicitly or explicitly).
+> On 2020-12-07 17:47, Ard Biesheuvel wrote:
+> > On Mon, 7 Dec 2020 at 18:41, Marc Zyngier <maz@kernel.org> wrote:
+> >> 
+> >> On 2020-12-07 17:19, Ard Biesheuvel wrote:
+> >>> (resend with David's email address fixed)
+> >> 
+> >> Irk. Thanks for that.
+> >> 
+> >>>>> +#ifdef CONFIG_CC_HAS_BROKEN_S_CONSTRAINT
+> >>>>> +#define SYM_CONSTRAINT "i"
+> >>>>> +#else
+> >>>>> +#define SYM_CONSTRAINT "S"
+> >>>>> +#endif
+> >>>>> +
+> >>>> 
+> >>>> Could we just check GCC_VERSION here?
+> >> 
+> >> I guess we could. But I haven't investigated which exact range of
+> >> compiler is broken (GCC 6.3 seems fixed, but that's the oldest
+> >> I have apart from the offending 4.9).
+> >> 
+> > 
+> > I tried 5.4 on godbolt, and it seems happy. And the failure will be
+> > obvious, so we can afford to get it slightly wrong and refine it
+> > later.
 > 
-> The allocation tag (in-memory tag) is a property assigned to a physical
-> address range and it can be safely shared between different processes as
-> long as they access it via pointers with the same allocation tag (bits
-> 59:56). The kernel enables such tagged shared memory for user processes
-> (anonymous, tmpfs, shmem).
+> FWIW the Linaro 14.11, 15.02 and 15.05 releases of GCC 4.9.3 seem to
+> build rc7 without complaint. The only thing older that I have to hand
+> is Ubuntu's GCC 4.8.4, which Kbuild chokes on entirely now.
 
-I think that's one case where the shared memory scheme breaks, as we
-have two kernels in charge of their own tags, and they obviously can't
-be synchronised
+Can you try kvmarm/next? David's PSCI relay is breaking badly here.
 
-> What we don't have in the architecture is a memory type which allows
-> access to tags but no tag checking. To access the data when the tags
-> aren't known, the tag checking would have to be disabled via either a
-> prctl() or by setting the PSTATE.TCO bit.
-
-I guess that's point (3) in Steven's taxonomy. It still a bit ugly to
-fit in an existing piece of userspace, specially if it wants to use
-MTE for its own benefit.
-
-> The kernel accesses the user memory via the linear map using a match-all
-> tag 0xf, so no TCO bit toggling. For user, however, we disabled such
-> match-all tag and it cannot be enabled at run-time (at least not easily,
-> it's cached in the TLB). However, we already have two modes to disable
-> tag checking which Qemu could use when migrating data+tags.
-
-I wonder whether we will have to have something kernel side to
-dump/reload tags in a way that matches the patterns used by live
-migration.
+Thanks,
 
 	M.
 
