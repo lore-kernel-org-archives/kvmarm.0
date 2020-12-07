@@ -2,85 +2,95 @@ Return-Path: <SRS0=wPN+=FL=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E07C6C4361B
-	for <kvmarm@archiver.kernel.org>; Mon,  7 Dec 2020 13:54:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45A1BC433FE
+	for <kvmarm@archiver.kernel.org>; Mon,  7 Dec 2020 14:11:33 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 42BCB235E4
-	for <kvmarm@archiver.kernel.org>; Mon,  7 Dec 2020 13:54:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42BCB235E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id A5AC6235F9
+	for <kvmarm@archiver.kernel.org>; Mon,  7 Dec 2020 14:11:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5AC6235F9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A3FED4B22D;
-	Mon,  7 Dec 2020 08:54:55 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DE1014B269;
+	Mon,  7 Dec 2020 09:11:31 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ZFe3U9WDc9bu; Mon,  7 Dec 2020 08:54:54 -0500 (EST)
+	with ESMTP id YlvNX4qLxxbN; Mon,  7 Dec 2020 09:11:31 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 97CF74B28C;
-	Mon,  7 Dec 2020 08:54:54 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 045344B27F;
+	Mon,  7 Dec 2020 09:11:31 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BEB084B246
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Dec 2020 08:54:53 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C28434B25E
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Dec 2020 09:11:29 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zipOS1RcYNC7 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  7 Dec 2020 08:54:52 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4F31D4B22D
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Dec 2020 08:54:52 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 33FD4235DD;
- Mon,  7 Dec 2020 13:54:51 +0000 (UTC)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
- TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
- (envelope-from <maz@kernel.org>)
- id 1kmGyW-00Gm6K-SB; Mon, 07 Dec 2020 13:54:49 +0000
-MIME-Version: 1.0
-Date: Mon, 07 Dec 2020 13:54:48 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Quentin Perret <qperret@google.com>
+ with ESMTP id 3vIhZmtaJEGW for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  7 Dec 2020 09:11:28 -0500 (EST)
+Received: from mail-wr1-f66.google.com (mail-wr1-f66.google.com
+ [209.85.221.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 991B04B137
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Dec 2020 09:11:28 -0500 (EST)
+Received: by mail-wr1-f66.google.com with SMTP id a12so6099863wrv.8
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 07 Dec 2020 06:11:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=kIglN2ENPr7zZxCKU9K9FdFhtb6JGzaE8AjsYQ4PtZ4=;
+ b=Xhc60KBVbnArBSefinJI+TleN6X7aSEsNC0tQlYENBG2ZPPq9HpuIQyl0v3s77lz4d
+ NaMMqkGUk2Y6w0tvbOkQAG1I6KgVd7yT8Wffq4xZm8NRs0HSBoivHZie/1RGmt2n3epv
+ FWlxQlQGrjPu/b46XKseWpoWCCzY5a8gSoyHbAKyk7rvq6JkalR11VCCD+mz9yo/uYLt
+ /GNmeSpjO/bd11ul7t0LgHnVA+wEfaLMtlihFIarwy5Cyr5nU64+sqY0OE8VOWKzZlX0
+ 3JRdkzVznY/XSjGX9AlOwFk42GHr6PPa4BxCms3CvL/Valg4Rg86Mypisvmqg2JBHR3o
+ XV0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=kIglN2ENPr7zZxCKU9K9FdFhtb6JGzaE8AjsYQ4PtZ4=;
+ b=t50Y2lojmlBJMRaJZ6x45y+BUBdI4L3mfvLej7LvZDJ4VF8/CCYz6H/KgW/yuu77AZ
+ FiOp6+yozKp06yfKweXZHI8MnPAHs/aujMnmwj7NOLTZRrBK4xAmIXx/xLrxnN1LY7cf
+ MvKMNU0CzXAWnq+jGY7b9DyXpSMQ0660TM53ak9kOWFnQ6Wozr/xmt1/prAbX65RQKRS
+ TbSH0DlmxiJUN3WFpP7+PhJk+tnAx0EbMixh3jE+YuAkUqsPM7K/SHy9VCMlG4JRyYG4
+ qr4tQoQ66vmq1y6fAZyASdOwXZ0+7jsJxIVKNom2LUYPQk0Iq6iv+VmaVen3ldTkT78Y
+ GsGw==
+X-Gm-Message-State: AOAM533QkJWnHTF3Wgeh9AJzGlMEgJ4v1vOC4vcroxRfPuqMrNPF5gCp
+ MwjHJdyFHdFtLDjka5z6D07JHQ==
+X-Google-Smtp-Source: ABdhPJwy02g4n9Bw93wn8robHfmfXCvn8HmKD427RxXtDweC+OQzf6Bi6J3mgHqERGzkgRm3qn05dQ==
+X-Received: by 2002:adf:fdc7:: with SMTP id i7mr17832777wrs.398.1607350287293; 
+ Mon, 07 Dec 2020 06:11:27 -0800 (PST)
+Received: from google.com ([2a00:79e0:d:210:f693:9fff:fef4:a7ef])
+ by smtp.gmail.com with ESMTPSA id z2sm3072994wml.23.2020.12.07.06.11.26
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 07 Dec 2020 06:11:26 -0800 (PST)
+Date: Mon, 7 Dec 2020 14:11:20 +0000
+From: Quentin Perret <qperret@google.com>
+To: Will Deacon <will@kernel.org>
 Subject: Re: [RFC PATCH 16/27] KVM: arm64: Prepare Hyp memory protection
-In-Reply-To: <X84Y07kbeSL4xcNJ@google.com>
+Message-ID: <X844CBNCTL4XT3iq@google.com>
 References: <20201117181607.1761516-1-qperret@google.com>
  <20201117181607.1761516-17-qperret@google.com>
- <CA+EHjTyJnZ8e=AN7H_k+oZb0VTWAgMicMY8Rqe2Di_3A87hm0A@mail.gmail.com>
- <X8p5kLSIq2MoQZ24@google.com>
- <CA+EHjTxW_z-P8bK7gCjGv2eBCAHFsvE873Gr2KyVq5-+_Mdv=g@mail.gmail.com>
- <X84Y07kbeSL4xcNJ@google.com>
-User-Agent: Roundcube Webmail/1.4.9
-Message-ID: <d6a674a0e8e259161ab741d78924c756@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: qperret@google.com, tabba@google.com,
- catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com,
- julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, robh+dt@kernel.org,
- frowand.list@gmail.com, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- devicetree@vger.kernel.org, kernel-team@android.com, android-kvm@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: "moderated list:ARM64 PORT \(AARCH64
- ARCHITECTURE\)" <linux-arm-kernel@lists.infradead.org>,
- "open list:OPEN FIRMWARE AND
- FLATTENED DEVICE TREE" <devicetree@vger.kernel.org>, kernel-team@android.com,
- Frank Rowand <frowand.list@gmail.com>, Android KVM <android-kvm@google.com>,
+ <20201207134052.GA4563@willie-the-truck>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <20201207134052.GA4563@willie-the-truck>
+Cc: "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE"
+ <devicetree@vger.kernel.org>, kernel-team@android.com, android-kvm@google.com,
  Catalin Marinas <catalin.marinas@arm.com>,
  open list <linux-kernel@vger.kernel.org>, Rob Herring <robh+dt@kernel.org>,
- Fuad Tabba <tabba@google.com>, Will Deacon <will@kernel.org>,
- "open list:KERNEL VIRTUAL MACHINE FOR ARM64
- \(KVM/arm64\)" <kvmarm@lists.cs.columbia.edu>
+ "moderated list:ARM64 PORT \(AARCH64 ARCHITECTURE\)"
+ <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>,
+ Frank Rowand <frowand.list@gmail.com>,
+ "open list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
+ <kvmarm@lists.cs.columbia.edu>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,55 +102,25 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2020-12-07 11:58, Quentin Perret wrote:
-> On Monday 07 Dec 2020 at 11:16:05 (+0000), Fuad Tabba wrote:
->> On Fri, Dec 4, 2020 at 6:01 PM Quentin Perret <qperret@google.com> 
->> wrote:
->> >
->> > On Thursday 03 Dec 2020 at 12:57:33 (+0000), Fuad Tabba wrote:
->> > <snip>
->> > > > +int hyp_create_idmap(void);
->> > > > +int hyp_map_vectors(void);
->> > > > +int hyp_back_vmemmap(phys_addr_t phys, unsigned long size, phys_addr_t back);
->> > > > +int hyp_cpu_set_vector(enum arm64_hyp_spectre_vector slot);
->> > > > +int hyp_create_mappings(void *from, void *to, enum kvm_pgtable_prot prot);
->> > > > +int __hyp_create_mappings(unsigned long start, unsigned long size,
->> > > > +                         unsigned long phys, unsigned long prot);
->> > > > +unsigned long __hyp_create_private_mapping(phys_addr_t phys, size_t size,
->> > > > +                                          unsigned long prot);
->> > > > +
->> > >
->> > > nit: I also thought that the hyp_create_mappings function names are a
->> > > bit confusing, since there's the create_hyp_mappings functions which
->> > > use the aforementioned *hyp_pgtable.
->> >
->> > Sure, happy to re-name those (and hyp_pgtable above). Any suggestions?
->> 
->> Perhaps something to indicate that these are temporary, tmp_ or
->> bootstrap_ maybe?
-> 
-> Hmm, the thing is these are temporary only in protected mode, they're
-> permanent otherwise :/
-> 
-> Perhaps I could prefix the protected pgtable (and associated functions)
-> with 'pkvm_' or so? Marc, any preferences?
+On Monday 07 Dec 2020 at 13:40:52 (+0000), Will Deacon wrote:
+> Why not use the RESERVEDMEM_OF_DECLARE() interface for the hypervisor
+> memory? That way, the hypervisor memory can either be statically partitioned
+> as a carveout or allocated dynamically for us -- we wouldn't need to care.
 
-None. Whichever name you pick, someone will ask you to change it.
-Just call it Bob.
-
-What I really *don't* want is see a blanket rename of existing symbols
-or concepts.
+Yup, I did consider that, but the actual amount of memory we need to
+reserve for the hypervisor depends on things such as the size of struct
+hyp_page, which depends on the kernel you're running (that is, it might
+change over time). So, that really felt like something the kernel should
+be doing, to keep the DT backward compatible, ... Or did you have
+something more elaborate in mind?
 
 Thanks,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
+Quentin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
