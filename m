@@ -7,81 +7,82 @@ X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA64FC4361B
-	for <kvmarm@archiver.kernel.org>; Tue,  8 Dec 2020 14:25:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B58C4C433FE
+	for <kvmarm@archiver.kernel.org>; Tue,  8 Dec 2020 14:25:08 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5A13F23A33
-	for <kvmarm@archiver.kernel.org>; Tue,  8 Dec 2020 14:25:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A13F23A33
+	by mail.kernel.org (Postfix) with ESMTP id 3A12323A6A
+	for <kvmarm@archiver.kernel.org>; Tue,  8 Dec 2020 14:25:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A12323A6A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EA2F14B271;
-	Tue,  8 Dec 2020 09:25:05 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CE0414B286;
+	Tue,  8 Dec 2020 09:25:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id aYcwDYRXhpEZ; Tue,  8 Dec 2020 09:25:04 -0500 (EST)
+	with ESMTP id Pih573pnGaMc; Tue,  8 Dec 2020 09:25:06 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B47414B281;
-	Tue,  8 Dec 2020 09:25:04 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E401F4B281;
+	Tue,  8 Dec 2020 09:25:06 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 696204B272
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Dec 2020 09:25:04 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 605BF4B263
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Dec 2020 09:25:06 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QEOd1ExObLzb for <kvmarm@lists.cs.columbia.edu>;
- Tue,  8 Dec 2020 09:25:02 -0500 (EST)
-Received: from mail-wr1-f68.google.com (mail-wr1-f68.google.com
- [209.85.221.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6B9954B232
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Dec 2020 09:25:02 -0500 (EST)
-Received: by mail-wr1-f68.google.com with SMTP id t4so16385324wrr.12
- for <kvmarm@lists.cs.columbia.edu>; Tue, 08 Dec 2020 06:25:02 -0800 (PST)
+ with ESMTP id w6QL1U5eEvlK for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  8 Dec 2020 09:25:04 -0500 (EST)
+Received: from mail-wr1-f65.google.com (mail-wr1-f65.google.com
+ [209.85.221.65])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7242A4B232
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Dec 2020 09:25:04 -0500 (EST)
+Received: by mail-wr1-f65.google.com with SMTP id a12so9618646wrv.8
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 08 Dec 2020 06:25:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=ZJVcW+gDZ2QoZEFI86wiRHeEnmSVBb/mqFwXrVdG81k=;
- b=JuodSu1f9maE2qhArXiU3zxnxd+Aa1T/qMyiVTbr02hSTThljFG0K8+XSuMk4C0I98
- 0VaePBU0TePTYesJkS4wRGX2eLRP5rumtaLHudGToFoRx+rnWJGJKrkv87+jGXtZRwng
- ZRR0fP3GIFkKYGa8TSriFT8dkl7x8HXQC8XnCuhoZUKJVjkX14Y4IOp0vTvR/8O17plK
- SwPJlzQ3cszZ0KBxIj+UrHjQynYhPQgVPKRc2h4WiO8zgJwuVmZyJxu/VcYkh5g2iAgW
- LA1Eo7zh7aF1jUUXxzGvEI7fwv++bQjB3joY5++AW/v2tM1QJ1lF1lEYOv/S2a/XvQgr
- bIhw==
+ bh=Js+kADbtgM+vdnerlP9z0cKyj1NsUqnpPe0pQv1UIXw=;
+ b=rNqDlvxyiJ1P0X/0WsQzcAkJH7Wxtpn3w4/snPmFyQE2KualXgw27WCaRrxPRFYwwI
+ QsoSIhbDK/z907X9cKGawWx3YqPOhniUpNV1ttzOUbL2Xq2ygPlTp3uuFaexqbw2e7TM
+ jdPGWa9M+DcgzmdFp0iih/gDDMH7slzsCXgDqnvpQ29RZuDbpmF3IqIKm06SjMnw2EzM
+ WOtgcp0yD0ppJcFJgI573XFMmWxBCOKN5+aoJmLMv7u2bHi87WbHN7aVZrm92p/mzelu
+ C76fa08qbD0a4wn1vmdzbRf2A1519kerYbbXV9QHDQqk2wmYfsyqYachY5A4E8hypG4o
+ MFUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=ZJVcW+gDZ2QoZEFI86wiRHeEnmSVBb/mqFwXrVdG81k=;
- b=q5ZYDOkR6PXfv4qeyySbhBhHXUOQmXZ6wABjHUrr8xv5STTeBf5BzfYy6H12b+swn6
- up9v7bCI0Dj1KLhlddbQf9hQAZ4hQ0TpMMJ7HgApe5oUTMniJpXP/G65nQgxdzfVFgYX
- ZssGaxVRZbmkWPZt3HgjyVS6SffGQcRGek1B3OYcHNHUzmYHsTxUMEtXrW1r5ZlmnUqt
- 1dEwkjCOvBO9YTI2dG23Uck/qYVudBB36jqS7rLIfgI5xdrITuudpM/RUzwSyTOnz4ND
- lYX+nkqTQg1x8g7aBYBYlphT24XjPRuWmyClTYZ/jby85IP6A2QPicr0HS/u1xoy71sJ
- Ah+Q==
-X-Gm-Message-State: AOAM5319XqTwtdWFu+4IN96iCrbhc5dIr/TAQ52TId87TIE7DoybbluI
- Q/9VQb5qDFbk9pRIYkHtom7j3pb9SVbY4g==
-X-Google-Smtp-Source: ABdhPJz8XZZNRVczP1MNa+5GwvK6arhmg8wv+WVN7EM+CgWkgNOsNuQYcOEIW/yFZ+6gPYaHW1knsg==
-X-Received: by 2002:adf:dc87:: with SMTP id r7mr3566881wrj.305.1607437501067; 
- Tue, 08 Dec 2020 06:25:01 -0800 (PST)
+ bh=Js+kADbtgM+vdnerlP9z0cKyj1NsUqnpPe0pQv1UIXw=;
+ b=lRNOFj3v+axr5OB+OglZH3rFQy674aIKiy1hUb74IL32a9r5pkFO3DIzDI/ZDzBt6A
+ MsLlK9G64Gqz67fMJfF/2Hk5OlCYKET0rFjPUzFquXfJPQPXt4HUQYqlo6T5371+7RJQ
+ qLyrJQ460uh4v2Z72/jFmkUh3tjVytje1a7U3GaYi3OxhAfXJr2Jfi7MX7yUow5bwSCp
+ WqdDdjyQMdjnCnaU/kTa598I/SqcUTAR6eQmBxLVTYNMZk/6Ve0QDz4DsE+eNMSG9SJN
+ thqwvGgZiEtB0Q3Sv+lh4pAztSZ0K76Dq0XXWgeI0xVY8gzipKy5hNS/mL9X0mYOqXet
+ nC/A==
+X-Gm-Message-State: AOAM533H7YGBVkCzs00qeGWXFrFR7zg6TzKevz56Evb7NFyTdZ+qanps
+ TOWfzkumWNxdrePAMRT0RICiplGk1D1dRg==
+X-Google-Smtp-Source: ABdhPJxHrjfFXJbqnCX9xFY5SICS+JzIJWzJPSavZ7ozgbyJlJghKGdV9NwVaAw/PLQwBO8RZFpRfA==
+X-Received: by 2002:adf:aa4a:: with SMTP id q10mr24761702wrd.276.1607437503226; 
+ Tue, 08 Dec 2020 06:25:03 -0800 (PST)
 Received: from localhost ([2a01:4b00:8523:2d03:258e:cb26:cef:a620])
- by smtp.gmail.com with ESMTPSA id i8sm3763850wma.32.2020.12.08.06.24.59
+ by smtp.gmail.com with ESMTPSA id m8sm3952024wmc.27.2020.12.08.06.25.01
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 08 Dec 2020 06:24:59 -0800 (PST)
+ Tue, 08 Dec 2020 06:25:02 -0800 (PST)
 From: David Brazdil <dbrazdil@google.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 1/6] kvm: arm64: Prevent use of invalid PSCI v0.1 function IDs
-Date: Tue,  8 Dec 2020 14:24:47 +0000
-Message-Id: <20201208142452.87237-2-dbrazdil@google.com>
+Subject: [PATCH 2/6] kvm: arm64: Use lm_alias in nVHE-only VA conversion
+Date: Tue,  8 Dec 2020 14:24:48 +0000
+Message-Id: <20201208142452.87237-3-dbrazdil@google.com>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201208142452.87237-1-dbrazdil@google.com>
 References: <20201208142452.87237-1-dbrazdil@google.com>
 MIME-Version: 1.0
-Cc: kernel-team@android.com, Marc Zyngier <maz@kernel.org>,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+Cc: kernel-team@android.com, Qian Cai <qcai@redhat.com>,
+ Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org,
  Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -99,192 +100,30 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-PSCI driver exposes a struct containing the PSCI v0.1 function IDs
-configured in the DT. However, the struct does not convey the
-information whether these were set from DT or contain the default value
-zero. This could be a problem for PSCI proxy in KVM protected mode.
+init_hyp_physvirt_offset() computes PA from a kernel VA. Conversion to
+kernel linear-map is required first but the code used kvm_ksym_ref() for
+this purpose. Under VHE that is a NOP and resulted in a runtime warning.
+Replace kvm_ksym_ref with lm_alias.
 
-Extend config passed to KVM with a bit mask with individual bits set
-depending on whether the corresponding function pointer in psci_ops is
-set, eg. set bit for PSCI_CPU_SUSPEND if psci_ops.cpu_suspend != NULL.
-
-Previously config was split into multiple global variables. Put
-everything into a single struct for convenience.
-
-Reported-by: Mark Rutland <mark.rutland@arm.com>
+Reported-by: Qian Cai <qcai@redhat.com>
 Signed-off-by: David Brazdil <dbrazdil@google.com>
 ---
- arch/arm64/include/asm/kvm_host.h    | 20 +++++++++++
- arch/arm64/kvm/arm.c                 | 14 +++++---
- arch/arm64/kvm/hyp/nvhe/psci-relay.c | 53 +++++++++++++++++++++-------
- 3 files changed, 70 insertions(+), 17 deletions(-)
+ arch/arm64/kvm/va_layout.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 11beda85ee7e..828d50d40dc2 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -17,6 +17,7 @@
- #include <linux/jump_label.h>
- #include <linux/kvm_types.h>
- #include <linux/percpu.h>
-+#include <linux/psci.h>
- #include <asm/arch_gicv3.h>
- #include <asm/barrier.h>
- #include <asm/cpufeature.h>
-@@ -240,6 +241,25 @@ struct kvm_host_data {
- 	struct kvm_pmu_events pmu_events;
- };
+diff --git a/arch/arm64/kvm/va_layout.c b/arch/arm64/kvm/va_layout.c
+index d8cc51bd60bf..914732b88c69 100644
+--- a/arch/arm64/kvm/va_layout.c
++++ b/arch/arm64/kvm/va_layout.c
+@@ -42,7 +42,7 @@ static void init_hyp_physvirt_offset(void)
+ 	u64 kern_va, hyp_va;
  
-+#define KVM_HOST_PSCI_0_1_CPU_SUSPEND	BIT(0)
-+#define KVM_HOST_PSCI_0_1_CPU_ON	BIT(1)
-+#define KVM_HOST_PSCI_0_1_CPU_OFF	BIT(2)
-+#define KVM_HOST_PSCI_0_1_MIGRATE	BIT(3)
-+
-+struct kvm_host_psci_config {
-+	/* PSCI version used by host. */
-+	u32 version;
-+
-+	/* Function IDs used by host if version is v0.1. */
-+	struct psci_0_1_function_ids function_ids_0_1;
-+
-+	/* Bitmask of functions enabled for v0.1, bits KVM_HOST_PSCI_0_1_*. */
-+	unsigned int enabled_functions_0_1;
-+};
-+
-+extern struct kvm_host_psci_config kvm_nvhe_sym(kvm_host_psci_config);
-+#define kvm_host_psci_config CHOOSE_NVHE_SYM(kvm_host_psci_config)
-+
- struct vcpu_reset_state {
- 	unsigned long	pc;
- 	unsigned long	r0;
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 6e637d2b4cfb..6a2f4e01b04f 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -66,8 +66,6 @@ static DEFINE_PER_CPU(unsigned char, kvm_arm_hardware_enabled);
- DEFINE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
- 
- extern u64 kvm_nvhe_sym(__cpu_logical_map)[NR_CPUS];
--extern u32 kvm_nvhe_sym(kvm_host_psci_version);
--extern struct psci_0_1_function_ids kvm_nvhe_sym(kvm_host_psci_0_1_function_ids);
- 
- int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu)
- {
-@@ -1618,8 +1616,16 @@ static bool init_psci_relay(void)
- 		return false;
- 	}
- 
--	kvm_nvhe_sym(kvm_host_psci_version) = psci_ops.get_version();
--	kvm_nvhe_sym(kvm_host_psci_0_1_function_ids) = get_psci_0_1_function_ids();
-+	kvm_host_psci_config.version = psci_ops.get_version();
-+
-+	if (kvm_host_psci_config.version == PSCI_VERSION(0, 1)) {
-+		kvm_host_psci_config.function_ids_0_1 = get_psci_0_1_function_ids();
-+		kvm_host_psci_config.enabled_functions_0_1 =
-+			(psci_ops.cpu_suspend ? KVM_HOST_PSCI_0_1_CPU_SUSPEND : 0) |
-+			(psci_ops.cpu_off ? KVM_HOST_PSCI_0_1_CPU_OFF : 0) |
-+			(psci_ops.cpu_on ? KVM_HOST_PSCI_0_1_CPU_ON : 0) |
-+			(psci_ops.migrate ? KVM_HOST_PSCI_0_1_MIGRATE : 0);
-+	}
- 	return true;
+ 	/* Compute the offset from the hyp VA and PA of a random symbol. */
+-	kern_va = (u64)kvm_ksym_ref(__hyp_text_start);
++	kern_va = (u64)lm_alias(__hyp_text_start);
+ 	hyp_va = __early_kern_hyp_va(kern_va);
+ 	CHOOSE_NVHE_SYM(hyp_physvirt_offset) = (s64)__pa(kern_va) - (s64)hyp_va;
  }
- 
-diff --git a/arch/arm64/kvm/hyp/nvhe/psci-relay.c b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-index 08dc9de69314..0d6f4aa39621 100644
---- a/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-+++ b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-@@ -22,9 +22,8 @@ void kvm_hyp_cpu_resume(unsigned long r0);
- void __noreturn __host_enter(struct kvm_cpu_context *host_ctxt);
- 
- /* Config options set by the host. */
--__ro_after_init u32 kvm_host_psci_version;
--__ro_after_init struct psci_0_1_function_ids kvm_host_psci_0_1_function_ids;
--__ro_after_init s64 hyp_physvirt_offset;
-+struct kvm_host_psci_config __ro_after_init kvm_host_psci_config;
-+s64 __ro_after_init hyp_physvirt_offset;
- 
- #define __hyp_pa(x) ((phys_addr_t)((x)) + hyp_physvirt_offset)
- 
-@@ -54,12 +53,41 @@ static u64 get_psci_func_id(struct kvm_cpu_context *host_ctxt)
- 	return func_id;
- }
- 
-+static inline bool is_psci_0_1_function_enabled(unsigned int fn_bit)
-+{
-+	return kvm_host_psci_config.enabled_functions_0_1 & fn_bit;
-+}
-+
-+static inline bool is_psci_0_1_cpu_suspend(u64 func_id)
-+{
-+	return is_psci_0_1_function_enabled(KVM_HOST_PSCI_0_1_CPU_SUSPEND) &&
-+	       (func_id == kvm_host_psci_config.function_ids_0_1.cpu_suspend);
-+}
-+
-+static inline bool is_psci_0_1_cpu_on(u64 func_id)
-+{
-+	return is_psci_0_1_function_enabled(KVM_HOST_PSCI_0_1_CPU_ON) &&
-+	       (func_id == kvm_host_psci_config.function_ids_0_1.cpu_on);
-+}
-+
-+static inline bool is_psci_0_1_cpu_off(u64 func_id)
-+{
-+	return is_psci_0_1_function_enabled(KVM_HOST_PSCI_0_1_CPU_OFF) &&
-+	       (func_id == kvm_host_psci_config.function_ids_0_1.cpu_off);
-+}
-+
-+static inline bool is_psci_0_1_migrate(u64 func_id)
-+{
-+	return is_psci_0_1_function_enabled(KVM_HOST_PSCI_0_1_MIGRATE) &&
-+	       (func_id == kvm_host_psci_config.function_ids_0_1.migrate);
-+}
-+
- static bool is_psci_0_1_call(u64 func_id)
- {
--	return (func_id == kvm_host_psci_0_1_function_ids.cpu_suspend) ||
--	       (func_id == kvm_host_psci_0_1_function_ids.cpu_on) ||
--	       (func_id == kvm_host_psci_0_1_function_ids.cpu_off) ||
--	       (func_id == kvm_host_psci_0_1_function_ids.migrate);
-+	return is_psci_0_1_cpu_suspend(func_id) ||
-+	       is_psci_0_1_cpu_on(func_id) ||
-+	       is_psci_0_1_cpu_off(func_id) ||
-+	       is_psci_0_1_migrate(func_id);
- }
- 
- static bool is_psci_0_2_call(u64 func_id)
-@@ -71,7 +99,7 @@ static bool is_psci_0_2_call(u64 func_id)
- 
- static bool is_psci_call(u64 func_id)
- {
--	switch (kvm_host_psci_version) {
-+	switch (kvm_host_psci_config.version) {
- 	case PSCI_VERSION(0, 1):
- 		return is_psci_0_1_call(func_id);
- 	default:
-@@ -248,12 +276,11 @@ asmlinkage void __noreturn kvm_host_psci_cpu_entry(bool is_cpu_on)
- 
- static unsigned long psci_0_1_handler(u64 func_id, struct kvm_cpu_context *host_ctxt)
- {
--	if ((func_id == kvm_host_psci_0_1_function_ids.cpu_off) ||
--	    (func_id == kvm_host_psci_0_1_function_ids.migrate))
-+	if (is_psci_0_1_cpu_off(func_id) || is_psci_0_1_migrate(func_id))
- 		return psci_forward(host_ctxt);
--	else if (func_id == kvm_host_psci_0_1_function_ids.cpu_on)
-+	else if (is_psci_0_1_cpu_on(func_id))
- 		return psci_cpu_on(func_id, host_ctxt);
--	else if (func_id == kvm_host_psci_0_1_function_ids.cpu_suspend)
-+	else if (is_psci_0_1_cpu_suspend(func_id))
- 		return psci_cpu_suspend(func_id, host_ctxt);
- 	else
- 		return PSCI_RET_NOT_SUPPORTED;
-@@ -304,7 +331,7 @@ bool kvm_host_psci_handler(struct kvm_cpu_context *host_ctxt)
- 	if (!is_psci_call(func_id))
- 		return false;
- 
--	switch (kvm_host_psci_version) {
-+	switch (kvm_host_psci_config.version) {
- 	case PSCI_VERSION(0, 1):
- 		ret = psci_0_1_handler(func_id, host_ctxt);
- 		break;
 -- 
 2.29.2.576.ga3fc446d84-goog
 
