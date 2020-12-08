@@ -2,87 +2,92 @@ Return-Path: <SRS0=0wdR=FM=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.7 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45E36C4361B
-	for <kvmarm@archiver.kernel.org>; Tue,  8 Dec 2020 18:21:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B572C433FE
+	for <kvmarm@archiver.kernel.org>; Tue,  8 Dec 2020 19:14:55 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id AA79523B4B
-	for <kvmarm@archiver.kernel.org>; Tue,  8 Dec 2020 18:21:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA79523B4B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 7B82123B6E
+	for <kvmarm@archiver.kernel.org>; Tue,  8 Dec 2020 19:14:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B82123B6E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 184514B270;
-	Tue,  8 Dec 2020 13:21:20 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B01B14B134;
+	Tue,  8 Dec 2020 14:14:53 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 4t6g-T7leaUF; Tue,  8 Dec 2020 13:21:18 -0500 (EST)
+	with ESMTP id gj-c4yERU+oW; Tue,  8 Dec 2020 14:14:52 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EC85A4B135;
-	Tue,  8 Dec 2020 13:21:18 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 93E404B2A6;
+	Tue,  8 Dec 2020 14:14:52 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 00D294B129
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Dec 2020 13:21:17 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DE6324B14B
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Dec 2020 14:14:50 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jsxtHF3Xyb11 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  8 Dec 2020 13:21:15 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C70B84B125
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Dec 2020 13:21:15 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id A5E3823B46;
- Tue,  8 Dec 2020 18:21:14 +0000 (UTC)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
- TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
- (envelope-from <maz@kernel.org>)
- id 1kmhbs-00H9Yx-CO; Tue, 08 Dec 2020 18:21:12 +0000
+ with ESMTP id 7CvYXEmA-8bn for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  8 Dec 2020 14:14:50 -0500 (EST)
+Received: from mail-wr1-f66.google.com (mail-wr1-f66.google.com
+ [209.85.221.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D32334B134
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Dec 2020 14:14:49 -0500 (EST)
+Received: by mail-wr1-f66.google.com with SMTP id x6so13459573wro.11
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 08 Dec 2020 11:14:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=REHA7EmuVy2412k5JBZlHnXSXCITuu5RQOyBaXf28o8=;
+ b=DgXW4UZBGLPpi3lT4JKM6pKgI6mSt/dk7wglJitvXIYua+es3r0i9AvLN/NQeGaP5U
+ 0o39PUgticPGXS/fYZNwS8crslfcVJzP5XqpbflzbNi1WIPQQkwrD8L+PyURTqOQpZXK
+ juYMowq4SdzpKYgYEWh9mjAqdMeSmT5AuzeomKp9OBkSwKn/nhgrCcRcloOpBNFyF+LS
+ F7QTMAtYzWvCBhMO17hlxIie6tINGAutTZqZ+iA69roa3OxdwFqTXq3aWTLNOU3Nf25h
+ h+HiI5SvMkOHNJE2debg9Vgm+45pfSNQ7dCEr+eKCAP0z5nl66gJpg6Khb1Qiev3/hZh
+ EtJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=REHA7EmuVy2412k5JBZlHnXSXCITuu5RQOyBaXf28o8=;
+ b=fGF5DKmyoDMJ1rbKlagjPmmLdIgrsHMYOo1yOa4jMkJuPvt491fVwQOcsD8xhWyWuN
+ kDtR+sJYItGY7AoPwEPt9P4iG+YNy8AcZF0j3uy5h5hxmpHvZxYpSweA//LknR3SB34u
+ 0vdi7dDbKAW9fxT7sHVix2nzFzpfn2P/BwZj0OQKtxy9qnVvJx0MztcmTmiFO8c1eWZ2
+ 79i7n2GJNVQYIFoPVePdyKZwSo9fiJctscEa9dJlUG9NdamusbMje0vv1EYEg7xWGo7T
+ u6sHpKf72l57jL3f0EFUBBvc5kXfQvycKRlsB1klkK91iQpLRxgWAOBF1IjU9OXhRuaT
+ SqHg==
+X-Gm-Message-State: AOAM533BoFwTUnExJUuRhxFDTru2h7vUt6/E0hXH10V0JIHMIG6X2hSD
+ ZHDn6D4Elalvr59wJipPBX/GMA==
+X-Google-Smtp-Source: ABdhPJzMvjijXhKf6UwzlQgGLdXNiyElYjmteXjfB+clUMsCI8Qf7bumNkex70eiOtelbQWNt3aQ2A==
+X-Received: by 2002:a5d:51d2:: with SMTP id n18mr19894485wrv.92.1607454888755; 
+ Tue, 08 Dec 2020 11:14:48 -0800 (PST)
+Received: from google.com ([2a01:4b00:8523:2d03:258e:cb26:cef:a620])
+ by smtp.gmail.com with ESMTPSA id i16sm2846391wrx.89.2020.12.08.11.14.47
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 08 Dec 2020 11:14:47 -0800 (PST)
+Date: Tue, 8 Dec 2020 19:14:47 +0000
+From: David Brazdil <dbrazdil@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v4 00/26] Opt-in always-on nVHE hypervisor
+Message-ID: <20201208191447.47idqf7n2v3hvrdg@google.com>
+References: <20201202184122.26046-1-dbrazdil@google.com>
+ <160702322202.1501317.9696987088711766533.b4-ty@kernel.org>
 MIME-Version: 1.0
-Date: Tue, 08 Dec 2020 18:21:12 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v5 0/2] MTE support for KVM guest
-In-Reply-To: <20201208172143.GB13960@gaia>
-References: <20201119184248.4bycy6ouvaxqdiiy@kamzik.brq.redhat.com>
- <db5ad775fa7cfe7defbd78d9ca6ccfd8@kernel.org>
- <c25c297e-e9b5-ab3f-e401-c21ddd4d2ad1@arm.com>
- <CAJc+Z1H7akXwDtVvQLiGVVyZ0DfmsxyJQhE7Sno6aAO9GaafEA@mail.gmail.com>
- <46fd98a2-ee39-0086-9159-b38c406935ab@arm.com>
- <CAFEAcA_Q8RSB-zcS8+cEfvWz_0U5GLzmsf12m_7BFjX8h-1hrA@mail.gmail.com>
- <b975422f-14fd-13b3-c8ca-e8b1a68c0837@arm.com>
- <0d0eb6da6a11f76d10e532c157181985@kernel.org> <20201207163405.GD1526@gaia>
- <874kkx5thq.wl-maz@kernel.org> <20201208172143.GB13960@gaia>
-User-Agent: Roundcube Webmail/1.4.9
-Message-ID: <7ff14490e253878d0735633b792e1ea9@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: catalin.marinas@arm.com, steven.price@arm.com,
- peter.maydell@linaro.org, haibo.xu@linaro.org, linux-kernel@vger.kernel.org,
- quintela@redhat.com, richard.henderson@linaro.org, qemu-devel@nongnu.org,
- dgilbert@redhat.com, tglx@linutronix.de, will@kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- Dave.Martin@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: Juan Quintela <quintela@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Dave Martin <Dave.Martin@arm.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Steven Price <steven.price@arm.com>,
- arm-mail-list <linux-arm-kernel@lists.infradead.org>,
- Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
- kvmarm <kvmarm@lists.cs.columbia.edu>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Content-Disposition: inline
+In-Reply-To: <160702322202.1501317.9696987088711766533.b4-ty@kernel.org>
+Cc: Christoph Lameter <cl@linux.com>,
+ Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, linux-doc@vger.kernel.org,
+ Catalin Marinas <catalin.marinas@arm.com>, Jonathan Corbet <corbet@lwn.net>,
+ linux-kernel@vger.kernel.org, Sudeep Holla <sudeep.holla@arm.com>,
+ Tejun Heo <tj@kernel.org>, Dennis Zhou <dennis@kernel.org>,
+ kernel-team@android.com, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -94,83 +99,63 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2020-12-08 17:21, Catalin Marinas wrote:
-> On Mon, Dec 07, 2020 at 07:03:13PM +0000, Marc Zyngier wrote:
->> On Mon, 07 Dec 2020 16:34:05 +0000,
->> Catalin Marinas <catalin.marinas@arm.com> wrote:
->> > On Mon, Dec 07, 2020 at 04:05:55PM +0000, Marc Zyngier wrote:
->> > > What I'd really like to see is a description of how shared memory
->> > > is, in general, supposed to work with MTE. My gut feeling is that
->> > > it doesn't, and that you need to turn MTE off when sharing memory
->> > > (either implicitly or explicitly).
->> >
->> > The allocation tag (in-memory tag) is a property assigned to a physical
->> > address range and it can be safely shared between different processes as
->> > long as they access it via pointers with the same allocation tag (bits
->> > 59:56). The kernel enables such tagged shared memory for user processes
->> > (anonymous, tmpfs, shmem).
->> 
->> I think that's one case where the shared memory scheme breaks, as we
->> have two kernels in charge of their own tags, and they obviously can't
->> be synchronised
+Hey Marc,
+
+On Thu, Dec 03, 2020 at 07:23:19PM +0000, Marc Zyngier wrote:
+> On Wed, 2 Dec 2020 18:40:56 +0000, David Brazdil wrote:
+> > As we progress towards being able to keep guest state private to the
+> > host running nVHE hypervisor, this series allows the hypervisor to
+> > install itself on newly booted CPUs before the host is allowed to run
+> > on them.
+> > 
+> > All functionality described below is opt-in, guarded by an early param
+> > 'kvm-arm.mode=protected'. Future patches specific to the new protected
+> > mode should be hidden behind the same param.
+> > 
+> > [...]
 > 
-> Yes, if you can't trust the other entity to not change the tags, the
-> only option is to do an untagged access.
+> Applied to kvm-arm64/psci-relay, thanks!
 > 
->> > What we don't have in the architecture is a memory type which allows
->> > access to tags but no tag checking. To access the data when the tags
->> > aren't known, the tag checking would have to be disabled via either a
->> > prctl() or by setting the PSTATE.TCO bit.
->> 
->> I guess that's point (3) in Steven's taxonomy. It still a bit ugly to
->> fit in an existing piece of userspace, specially if it wants to use
->> MTE for its own benefit.
+> Note that although I pushed it to -next, I still need people to
+> eyeball it and give it some Acks. The commit-IDs below will
+> thus change as I apply tags, if any.
 > 
-> I agree it's ugly. For the device DMA emulation case, the only sane way
-> is to mimic what a real device does - no tag checking. For a generic
-> implementation, this means that such shared memory should not be mapped
-> with PROT_MTE on the VMM side. I guess this leads to your point that
-> sharing doesn't work for this scenario ;).
 
-Exactly ;-)
+I'm looking at -next and I think the merge with Mark Rutland's el2_setup
+refactor didn't go as planned.
 
->> > The kernel accesses the user memory via the linear map using a match-all
->> > tag 0xf, so no TCO bit toggling. For user, however, we disabled such
->> > match-all tag and it cannot be enabled at run-time (at least not easily,
->> > it's cached in the TLB). However, we already have two modes to disable
->> > tag checking which Qemu could use when migrating data+tags.
->> 
->> I wonder whether we will have to have something kernel side to
->> dump/reload tags in a way that matches the patterns used by live
->> migration.
-> 
-> We have something related - ptrace dumps/resores the tags. Can the same
-> concept be expanded to a KVM ioctl?
+The `#ifdef CONFIG_ARM64_VHE` section needs to cover everything between
+init_el2 and init_el2_nvhe. Currently the code falls through into VHE init
+when CONFIG_ARM64_VHE is not set.
 
-Yes, although I wonder whether we should integrate this deeply into
-the dirty-log mechanism: it would be really interesting to dump the
-tags at the point where the page is flagged as clean from a dirty-log
-point of view. As the page is dirtied, discard the saved tags.
+Here's the snippet:
 
-It is probably expensive, but it ensures that the VMM sees consistent
-tags (if the page is clean, the tags are valid). Of course, it comes
-with the added requirement that the VMM allocates enough memory to
-store the tags, which may be a tall order. I'm not sure how to
-give a consistent view to userspace otherwise.
+SYM_INNER_LABEL(init_el2, SYM_L_LOCAL)
+#ifdef CONFIG_ARM64_VHE
+	/*
+	 * Check for VHE being present. x2 being non-zero indicates that we
+	 * do have VHE, and that the kernel is intended to run at EL2.
+	 */
+	mrs	x2, id_aa64mmfr1_el1
+	ubfx	x2, x2, #ID_AA64MMFR1_VHE_SHIFT, #4
+	cbz	x2, init_el2_nvhe
+#endif						// <--- THIS
 
-It'd be worth looking at how much we can reuse from the ptrace (and
-I expect swap?) code to implement this.
+	<... initialize VHE ...>
+	msr	elr_el2, lr
+	mov	w0, #BOOT_CPU_MODE_EL2
+	eret
+						// <--- NEEDS TO MOVE HERE
+SYM_INNER_LABEL(init_el2_nvhe, SYM_L_LOCAL)
+	<... initialize nVHE ...>
 
-Thanks,
+-David
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
