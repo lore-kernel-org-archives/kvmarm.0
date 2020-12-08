@@ -7,82 +7,81 @@ X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B58C4C433FE
-	for <kvmarm@archiver.kernel.org>; Tue,  8 Dec 2020 14:25:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F221AC4361B
+	for <kvmarm@archiver.kernel.org>; Tue,  8 Dec 2020 14:25:09 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3A12323A6A
-	for <kvmarm@archiver.kernel.org>; Tue,  8 Dec 2020 14:25:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A12323A6A
+	by mail.kernel.org (Postfix) with ESMTP id 741C323A6C
+	for <kvmarm@archiver.kernel.org>; Tue,  8 Dec 2020 14:25:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 741C323A6C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CE0414B286;
-	Tue,  8 Dec 2020 09:25:07 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E5DC4B272;
+	Tue,  8 Dec 2020 09:25:09 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Pih573pnGaMc; Tue,  8 Dec 2020 09:25:06 -0500 (EST)
+	with ESMTP id TBimWT5kFaxW; Tue,  8 Dec 2020 09:25:08 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E401F4B281;
-	Tue,  8 Dec 2020 09:25:06 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0BBBF4B2A6;
+	Tue,  8 Dec 2020 09:25:08 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 605BF4B263
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Dec 2020 09:25:06 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7300E4B263
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Dec 2020 09:25:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id w6QL1U5eEvlK for <kvmarm@lists.cs.columbia.edu>;
- Tue,  8 Dec 2020 09:25:04 -0500 (EST)
-Received: from mail-wr1-f65.google.com (mail-wr1-f65.google.com
- [209.85.221.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7242A4B232
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Dec 2020 09:25:04 -0500 (EST)
-Received: by mail-wr1-f65.google.com with SMTP id a12so9618646wrv.8
- for <kvmarm@lists.cs.columbia.edu>; Tue, 08 Dec 2020 06:25:04 -0800 (PST)
+ with ESMTP id GpN9IshGaMj9 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  8 Dec 2020 09:25:06 -0500 (EST)
+Received: from mail-wr1-f68.google.com (mail-wr1-f68.google.com
+ [209.85.221.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 783A54B2AB
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Dec 2020 09:25:06 -0500 (EST)
+Received: by mail-wr1-f68.google.com with SMTP id r7so5159570wrc.5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 08 Dec 2020 06:25:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Js+kADbtgM+vdnerlP9z0cKyj1NsUqnpPe0pQv1UIXw=;
- b=rNqDlvxyiJ1P0X/0WsQzcAkJH7Wxtpn3w4/snPmFyQE2KualXgw27WCaRrxPRFYwwI
- QsoSIhbDK/z907X9cKGawWx3YqPOhniUpNV1ttzOUbL2Xq2ygPlTp3uuFaexqbw2e7TM
- jdPGWa9M+DcgzmdFp0iih/gDDMH7slzsCXgDqnvpQ29RZuDbpmF3IqIKm06SjMnw2EzM
- WOtgcp0yD0ppJcFJgI573XFMmWxBCOKN5+aoJmLMv7u2bHi87WbHN7aVZrm92p/mzelu
- C76fa08qbD0a4wn1vmdzbRf2A1519kerYbbXV9QHDQqk2wmYfsyqYachY5A4E8hypG4o
- MFUQ==
+ bh=EaxldaDhN9JlM3hE+IVwd+bTy8bVzmLP3BfUJc4jBBQ=;
+ b=gULKGUKDNs5K8nvvXyITt50X6Uz79vM8+89FVjcAK6zuOHuIsYhOe00OqWQpm5TSDx
+ nO/IrbyzFdepEFETzFAk43WiZWmcNzfBkWmyFGZ7/CE3M3a8c8UgRUqJ1T7bxmgmEXTi
+ ah1qwtxT+O8hgLZgyXup0DutJii6RxEe0micQGZqCFpncp18p3Nr1G4O378zaFhdYGmH
+ 2rFzRZAG6RGGAifB5Ab+jkuNsBpkSU2V+GlcJZ5dEqcjjFYsMKVcpca30QjNdRH0HawY
+ NNE+iIMrSbbHfJ6G/Tl1kfUA7TX/Mml25q29hbTuoaFYkbORxsivaK/tU69ho0TbxZvv
+ iRSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Js+kADbtgM+vdnerlP9z0cKyj1NsUqnpPe0pQv1UIXw=;
- b=lRNOFj3v+axr5OB+OglZH3rFQy674aIKiy1hUb74IL32a9r5pkFO3DIzDI/ZDzBt6A
- MsLlK9G64Gqz67fMJfF/2Hk5OlCYKET0rFjPUzFquXfJPQPXt4HUQYqlo6T5371+7RJQ
- qLyrJQ460uh4v2Z72/jFmkUh3tjVytje1a7U3GaYi3OxhAfXJr2Jfi7MX7yUow5bwSCp
- WqdDdjyQMdjnCnaU/kTa598I/SqcUTAR6eQmBxLVTYNMZk/6Ve0QDz4DsE+eNMSG9SJN
- thqwvGgZiEtB0Q3Sv+lh4pAztSZ0K76Dq0XXWgeI0xVY8gzipKy5hNS/mL9X0mYOqXet
- nC/A==
-X-Gm-Message-State: AOAM533H7YGBVkCzs00qeGWXFrFR7zg6TzKevz56Evb7NFyTdZ+qanps
- TOWfzkumWNxdrePAMRT0RICiplGk1D1dRg==
-X-Google-Smtp-Source: ABdhPJxHrjfFXJbqnCX9xFY5SICS+JzIJWzJPSavZ7ozgbyJlJghKGdV9NwVaAw/PLQwBO8RZFpRfA==
-X-Received: by 2002:adf:aa4a:: with SMTP id q10mr24761702wrd.276.1607437503226; 
- Tue, 08 Dec 2020 06:25:03 -0800 (PST)
+ bh=EaxldaDhN9JlM3hE+IVwd+bTy8bVzmLP3BfUJc4jBBQ=;
+ b=K8NCLBaKSIhSn1mMb31Hp5DSfqsFOBncB8F+Uzgasd6nyBAn07FPNeMoqghMr6jC05
+ sq/eyrIutL2DqtFQbeIV00wHfZ6RwQVAf1JN1PLPKUEcmB8bfA5ksGPPCJ+D7eIJCOfx
+ cQckKJ8j3W8uS7ll3oHXpCjWgT+LsyCVBGb47cVMFcya+AEq+X8nEsy5bT+ARWAfGRSO
+ BugFEfzJTE9kA5O5ksMaHo+Ho4W9bxFwP+jiZ1pGcnRHgHccfFcKkoeNGXEBB7Vnx8cK
+ qqwBub2MzqWKXOp9VnBMdLsshh+kxxZUrbv/sU7+H9rEfVfs7Yzi5VwXcNob/2EayLdM
+ sSqg==
+X-Gm-Message-State: AOAM531PVj3Z3/aj8B547lk+DebIO8By5YHftpoCcdY3aMBXmamC468G
+ 9b5f/S0cFyvyBnobzFl4Nyye5o2ngbEXSQ==
+X-Google-Smtp-Source: ABdhPJzYqcZS7aoqzu4qYNksPaO6tUAeFeTHSKRNPw1/fsSQ1g1CJLkKZZZyFEt/fPl04D3ibmVhAw==
+X-Received: by 2002:adf:f98b:: with SMTP id f11mr26057502wrr.235.1607437505274; 
+ Tue, 08 Dec 2020 06:25:05 -0800 (PST)
 Received: from localhost ([2a01:4b00:8523:2d03:258e:cb26:cef:a620])
- by smtp.gmail.com with ESMTPSA id m8sm3952024wmc.27.2020.12.08.06.25.01
+ by smtp.gmail.com with ESMTPSA id d9sm20747214wrs.26.2020.12.08.06.25.04
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 08 Dec 2020 06:25:02 -0800 (PST)
+ Tue, 08 Dec 2020 06:25:04 -0800 (PST)
 From: David Brazdil <dbrazdil@google.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 2/6] kvm: arm64: Use lm_alias in nVHE-only VA conversion
-Date: Tue,  8 Dec 2020 14:24:48 +0000
-Message-Id: <20201208142452.87237-3-dbrazdil@google.com>
+Subject: [PATCH 3/6] kvm: arm64: Skip computing hyp VA layout for VHE
+Date: Tue,  8 Dec 2020 14:24:49 +0000
+Message-Id: <20201208142452.87237-4-dbrazdil@google.com>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201208142452.87237-1-dbrazdil@google.com>
 References: <20201208142452.87237-1-dbrazdil@google.com>
 MIME-Version: 1.0
-Cc: kernel-team@android.com, Qian Cai <qcai@redhat.com>,
- Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org,
+Cc: kernel-team@android.com, Marc Zyngier <maz@kernel.org>,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
  Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -100,30 +99,28 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-init_hyp_physvirt_offset() computes PA from a kernel VA. Conversion to
-kernel linear-map is required first but the code used kvm_ksym_ref() for
-this purpose. Under VHE that is a NOP and resulted in a runtime warning.
-Replace kvm_ksym_ref with lm_alias.
+Computing the hyp VA layout is redundant when the kernel runs in EL2 and
+hyp shares its VA mappings. Make calling kvm_compute_layout()
+conditional on not just CONFIG_KVM but also !is_kernel_in_hyp_mode().
 
-Reported-by: Qian Cai <qcai@redhat.com>
 Signed-off-by: David Brazdil <dbrazdil@google.com>
 ---
- arch/arm64/kvm/va_layout.c | 2 +-
+ arch/arm64/kernel/smp.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/va_layout.c b/arch/arm64/kvm/va_layout.c
-index d8cc51bd60bf..914732b88c69 100644
---- a/arch/arm64/kvm/va_layout.c
-+++ b/arch/arm64/kvm/va_layout.c
-@@ -42,7 +42,7 @@ static void init_hyp_physvirt_offset(void)
- 	u64 kern_va, hyp_va;
- 
- 	/* Compute the offset from the hyp VA and PA of a random symbol. */
--	kern_va = (u64)kvm_ksym_ref(__hyp_text_start);
-+	kern_va = (u64)lm_alias(__hyp_text_start);
- 	hyp_va = __early_kern_hyp_va(kern_va);
- 	CHOOSE_NVHE_SYM(hyp_physvirt_offset) = (s64)__pa(kern_va) - (s64)hyp_va;
+diff --git a/arch/arm64/kernel/smp.c b/arch/arm64/kernel/smp.c
+index 18e9727d3f64..4e585cc892e8 100644
+--- a/arch/arm64/kernel/smp.c
++++ b/arch/arm64/kernel/smp.c
+@@ -434,7 +434,7 @@ static void __init hyp_mode_check(void)
+ 			   "CPU: CPUs started in inconsistent modes");
+ 	else
+ 		pr_info("CPU: All CPU(s) started at EL1\n");
+-	if (IS_ENABLED(CONFIG_KVM))
++	if (IS_ENABLED(CONFIG_KVM) && !is_kernel_in_hyp_mode())
+ 		kvm_compute_layout();
  }
+ 
 -- 
 2.29.2.576.ga3fc446d84-goog
 
