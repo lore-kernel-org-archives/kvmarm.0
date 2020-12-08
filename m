@@ -2,61 +2,87 @@ Return-Path: <SRS0=0wdR=FM=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48304C4361B
-	for <kvmarm@archiver.kernel.org>; Tue,  8 Dec 2020 17:26:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45E36C4361B
+	for <kvmarm@archiver.kernel.org>; Tue,  8 Dec 2020 18:21:21 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B4E4523AFB
-	for <kvmarm@archiver.kernel.org>; Tue,  8 Dec 2020 17:26:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4E4523AFB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id AA79523B4B
+	for <kvmarm@archiver.kernel.org>; Tue,  8 Dec 2020 18:21:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA79523B4B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 05F704B14B;
-	Tue,  8 Dec 2020 12:26:36 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 184514B270;
+	Tue,  8 Dec 2020 13:21:20 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ACTr650haY-f; Tue,  8 Dec 2020 12:26:34 -0500 (EST)
+	with ESMTP id 4t6g-T7leaUF; Tue,  8 Dec 2020 13:21:18 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C6ADD4B12A;
-	Tue,  8 Dec 2020 12:26:34 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EC85A4B135;
+	Tue,  8 Dec 2020 13:21:18 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 85DB14B12A
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Dec 2020 12:26:33 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 00D294B129
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Dec 2020 13:21:17 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id eikEFnDcjX8w for <kvmarm@lists.cs.columbia.edu>;
- Tue,  8 Dec 2020 12:26:32 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 13DEF4B128
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Dec 2020 12:26:32 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 982841FB;
- Tue,  8 Dec 2020 09:26:31 -0800 (PST)
-Received: from C02TD0UTHF1T.local (unknown [10.57.29.31])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DCD4F3F68F;
- Tue,  8 Dec 2020 09:26:29 -0800 (PST)
-Date: Tue, 8 Dec 2020 17:26:28 +0000
-From: Mark Rutland <mark.rutland@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 1/6] kvm: arm64: Prevent use of invalid PSCI v0.1
- function IDs
-Message-ID: <20201208172628.GB18222@C02TD0UTHF1T.local>
-References: <20201208142452.87237-1-dbrazdil@google.com>
- <20201208142452.87237-2-dbrazdil@google.com>
- <e3f93946d66c0312a9778e49f1d85abe@kernel.org>
+ with ESMTP id jsxtHF3Xyb11 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  8 Dec 2020 13:21:15 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C70B84B125
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Dec 2020 13:21:15 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id A5E3823B46;
+ Tue,  8 Dec 2020 18:21:14 +0000 (UTC)
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
+ TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1kmhbs-00H9Yx-CO; Tue, 08 Dec 2020 18:21:12 +0000
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <e3f93946d66c0312a9778e49f1d85abe@kernel.org>
-Cc: kernel-team@android.com, Catalin Marinas <catalin.marinas@arm.com>,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
+Date: Tue, 08 Dec 2020 18:21:12 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v5 0/2] MTE support for KVM guest
+In-Reply-To: <20201208172143.GB13960@gaia>
+References: <20201119184248.4bycy6ouvaxqdiiy@kamzik.brq.redhat.com>
+ <db5ad775fa7cfe7defbd78d9ca6ccfd8@kernel.org>
+ <c25c297e-e9b5-ab3f-e401-c21ddd4d2ad1@arm.com>
+ <CAJc+Z1H7akXwDtVvQLiGVVyZ0DfmsxyJQhE7Sno6aAO9GaafEA@mail.gmail.com>
+ <46fd98a2-ee39-0086-9159-b38c406935ab@arm.com>
+ <CAFEAcA_Q8RSB-zcS8+cEfvWz_0U5GLzmsf12m_7BFjX8h-1hrA@mail.gmail.com>
+ <b975422f-14fd-13b3-c8ca-e8b1a68c0837@arm.com>
+ <0d0eb6da6a11f76d10e532c157181985@kernel.org> <20201207163405.GD1526@gaia>
+ <874kkx5thq.wl-maz@kernel.org> <20201208172143.GB13960@gaia>
+User-Agent: Roundcube Webmail/1.4.9
+Message-ID: <7ff14490e253878d0735633b792e1ea9@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: catalin.marinas@arm.com, steven.price@arm.com,
+ peter.maydell@linaro.org, haibo.xu@linaro.org, linux-kernel@vger.kernel.org,
+ quintela@redhat.com, richard.henderson@linaro.org, qemu-devel@nongnu.org,
+ dgilbert@redhat.com, tglx@linutronix.de, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ Dave.Martin@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Juan Quintela <quintela@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Dave Martin <Dave.Martin@arm.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Steven Price <steven.price@arm.com>,
+ arm-mail-list <linux-arm-kernel@lists.infradead.org>,
+ Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+ kvmarm <kvmarm@lists.cs.columbia.edu>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -68,112 +94,83 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Dec 08, 2020 at 03:56:39PM +0000, Marc Zyngier wrote:
-> On 2020-12-08 14:24, David Brazdil wrote:
-> > PSCI driver exposes a struct containing the PSCI v0.1 function IDs
-> > configured in the DT. However, the struct does not convey the
-> > information whether these were set from DT or contain the default value
-> > zero. This could be a problem for PSCI proxy in KVM protected mode.
-> > 
-> > Extend config passed to KVM with a bit mask with individual bits set
-> > depending on whether the corresponding function pointer in psci_ops is
-> > set, eg. set bit for PSCI_CPU_SUSPEND if psci_ops.cpu_suspend != NULL.
-> > 
-> > Previously config was split into multiple global variables. Put
-> > everything into a single struct for convenience.
-> > 
-> > Reported-by: Mark Rutland <mark.rutland@arm.com>
-> > Signed-off-by: David Brazdil <dbrazdil@google.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_host.h    | 20 +++++++++++
-> >  arch/arm64/kvm/arm.c                 | 14 +++++---
-> >  arch/arm64/kvm/hyp/nvhe/psci-relay.c | 53 +++++++++++++++++++++-------
-> >  3 files changed, 70 insertions(+), 17 deletions(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_host.h
-> > b/arch/arm64/include/asm/kvm_host.h
-> > index 11beda85ee7e..828d50d40dc2 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -17,6 +17,7 @@
-> >  #include <linux/jump_label.h>
-> >  #include <linux/kvm_types.h>
-> >  #include <linux/percpu.h>
-> > +#include <linux/psci.h>
-> >  #include <asm/arch_gicv3.h>
-> >  #include <asm/barrier.h>
-> >  #include <asm/cpufeature.h>
-> > @@ -240,6 +241,25 @@ struct kvm_host_data {
-> >  	struct kvm_pmu_events pmu_events;
-> >  };
-> > 
-> > +#define KVM_HOST_PSCI_0_1_CPU_SUSPEND	BIT(0)
-> > +#define KVM_HOST_PSCI_0_1_CPU_ON	BIT(1)
-> > +#define KVM_HOST_PSCI_0_1_CPU_OFF	BIT(2)
-> > +#define KVM_HOST_PSCI_0_1_MIGRATE	BIT(3)
-> > +
-> > +struct kvm_host_psci_config {
-> > +	/* PSCI version used by host. */
-> > +	u32 version;
-> > +
-> > +	/* Function IDs used by host if version is v0.1. */
-> > +	struct psci_0_1_function_ids function_ids_0_1;
-> > +
-> > +	/* Bitmask of functions enabled for v0.1, bits KVM_HOST_PSCI_0_1_*. */
-> > +	unsigned int enabled_functions_0_1;
+On 2020-12-08 17:21, Catalin Marinas wrote:
+> On Mon, Dec 07, 2020 at 07:03:13PM +0000, Marc Zyngier wrote:
+>> On Mon, 07 Dec 2020 16:34:05 +0000,
+>> Catalin Marinas <catalin.marinas@arm.com> wrote:
+>> > On Mon, Dec 07, 2020 at 04:05:55PM +0000, Marc Zyngier wrote:
+>> > > What I'd really like to see is a description of how shared memory
+>> > > is, in general, supposed to work with MTE. My gut feeling is that
+>> > > it doesn't, and that you need to turn MTE off when sharing memory
+>> > > (either implicitly or explicitly).
+>> >
+>> > The allocation tag (in-memory tag) is a property assigned to a physical
+>> > address range and it can be safely shared between different processes as
+>> > long as they access it via pointers with the same allocation tag (bits
+>> > 59:56). The kernel enables such tagged shared memory for user processes
+>> > (anonymous, tmpfs, shmem).
+>> 
+>> I think that's one case where the shared memory scheme breaks, as we
+>> have two kernels in charge of their own tags, and they obviously can't
+>> be synchronised
 > 
-> Nit: the conventional type for bitmaps is 'unsigned long'.
-> Also, "enabled" seems odd. Isn't it actually "available"?
+> Yes, if you can't trust the other entity to not change the tags, the
+> only option is to do an untagged access.
+> 
+>> > What we don't have in the architecture is a memory type which allows
+>> > access to tags but no tag checking. To access the data when the tags
+>> > aren't known, the tag checking would have to be disabled via either a
+>> > prctl() or by setting the PSTATE.TCO bit.
+>> 
+>> I guess that's point (3) in Steven's taxonomy. It still a bit ugly to
+>> fit in an existing piece of userspace, specially if it wants to use
+>> MTE for its own benefit.
+> 
+> I agree it's ugly. For the device DMA emulation case, the only sane way
+> is to mimic what a real device does - no tag checking. For a generic
+> implementation, this means that such shared memory should not be mapped
+> with PROT_MTE on the VMM side. I guess this leads to your point that
+> sharing doesn't work for this scenario ;).
 
-Sure, that or "implemented" works here.
+Exactly ;-)
 
-Since there are only 4 functions here, it might make sense to use
-independent bools rather than a bitmap, which might make this a bit
-simpler...
+>> > The kernel accesses the user memory via the linear map using a match-all
+>> > tag 0xf, so no TCO bit toggling. For user, however, we disabled such
+>> > match-all tag and it cannot be enabled at run-time (at least not easily,
+>> > it's cached in the TLB). However, we already have two modes to disable
+>> > tag checking which Qemu could use when migrating data+tags.
+>> 
+>> I wonder whether we will have to have something kernel side to
+>> dump/reload tags in a way that matches the patterns used by live
+>> migration.
+> 
+> We have something related - ptrace dumps/resores the tags. Can the same
+> concept be expanded to a KVM ioctl?
 
-> > get_psci_0_1_function_ids();
-> > +	kvm_host_psci_config.version = psci_ops.get_version();
-> > +
-> > +	if (kvm_host_psci_config.version == PSCI_VERSION(0, 1)) {
-> > +		kvm_host_psci_config.function_ids_0_1 = get_psci_0_1_function_ids();
-> > +		kvm_host_psci_config.enabled_functions_0_1 =
-> > +			(psci_ops.cpu_suspend ? KVM_HOST_PSCI_0_1_CPU_SUSPEND : 0) |
-> > +			(psci_ops.cpu_off ? KVM_HOST_PSCI_0_1_CPU_OFF : 0) |
-> > +			(psci_ops.cpu_on ? KVM_HOST_PSCI_0_1_CPU_ON : 0) |
-> > +			(psci_ops.migrate ? KVM_HOST_PSCI_0_1_MIGRATE : 0);
+Yes, although I wonder whether we should integrate this deeply into
+the dirty-log mechanism: it would be really interesting to dump the
+tags at the point where the page is flagged as clean from a dirty-log
+point of view. As the page is dirtied, discard the saved tags.
 
-... since e.g. this could be roughly:
+It is probably expensive, but it ensures that the VMM sees consistent
+tags (if the page is clean, the tags are valid). Of course, it comes
+with the added requirement that the VMM allocates enough memory to
+store the tags, which may be a tall order. I'm not sure how to
+give a consistent view to userspace otherwise.
 
-	kvm_host_psci_config.cpu_suspend_implemented = psci_ops.cpu_suspend;
-	kvm_host_psci_config.cpu_off_implemented = psci_ops.cpu_off;
-	kvm_host_psci_config.cpu_on_implemented = psci_ops.cpu_on;
-	kvm_host_psci_config.migrate_implemented = psci_ops.migrate;
-
-> > +static inline bool is_psci_0_1_cpu_suspend(u64 func_id)
-> > +{
-> > +	return is_psci_0_1_function_enabled(KVM_HOST_PSCI_0_1_CPU_SUSPEND) &&
-> > +	       (func_id == kvm_host_psci_config.function_ids_0_1.cpu_suspend);
-> > +}
-
-...and similarly:
-
-	return  kvm_host_psci_config.cpu_suspend_implemented &&
-		func_id == kvm_host_psci_config.function_ids_0_1.cpu_suspend)
-
-> Otherwise looks OK. Don't bother respinning the series for my
-> comments, I can tidy things up as I apply it if there are no other
-> issues.
-
-FWIW, I'm happy with whatever choose to do here, so don't feel like you
-have to follow my suggestions above.
+It'd be worth looking at how much we can reuse from the ptrace (and
+I expect swap?) code to implement this.
 
 Thanks,
-Mark.
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
