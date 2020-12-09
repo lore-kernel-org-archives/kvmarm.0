@@ -2,86 +2,88 @@ Return-Path: <SRS0=3Een=FN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39B6BC433FE
-	for <kvmarm@archiver.kernel.org>; Wed,  9 Dec 2020 13:17:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EED6FC4361B
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Dec 2020 13:17:57 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A5A2423B45
-	for <kvmarm@archiver.kernel.org>; Wed,  9 Dec 2020 13:17:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5A2423B45
+	by mail.kernel.org (Postfix) with ESMTP id 8FF4223B45
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Dec 2020 13:17:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FF4223B45
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 170FC4B2F6;
-	Wed,  9 Dec 2020 08:17:55 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3321E4B2D7;
+	Wed,  9 Dec 2020 08:17:57 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id xWVLL75y7Um7; Wed,  9 Dec 2020 08:17:54 -0500 (EST)
+	with ESMTP id tiDy7+cIkUor; Wed,  9 Dec 2020 08:17:56 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 121F44B2EF;
-	Wed,  9 Dec 2020 08:17:54 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 33A0A4B2F0;
+	Wed,  9 Dec 2020 08:17:56 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E91A4B2D1
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Dec 2020 08:17:53 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B93D34B2D2
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Dec 2020 08:17:54 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id T0ZsPrZYIBlM for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Dec 2020 08:17:51 -0500 (EST)
-Received: from mail-wr1-f67.google.com (mail-wr1-f67.google.com
- [209.85.221.67])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C362C4B228
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Dec 2020 08:17:51 -0500 (EST)
-Received: by mail-wr1-f67.google.com with SMTP id a12so1701430wrv.8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 09 Dec 2020 05:17:51 -0800 (PST)
+ with ESMTP id DD+MJI0Uq3FZ for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Dec 2020 08:17:53 -0500 (EST)
+Received: from mail-wr1-f66.google.com (mail-wr1-f66.google.com
+ [209.85.221.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8B1214B2D1
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Dec 2020 08:17:53 -0500 (EST)
+Received: by mail-wr1-f66.google.com with SMTP id l9so1691077wrt.13
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 09 Dec 2020 05:17:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=QypmxVIIHfEpkRMXwz8jV9VsRXxLaN9Gc9MoWcFoJN0=;
- b=kn2qu9K6MOj2MXP522yIjJX7A97Hyx0Phr4xxfxonQ/CMS6ng7WChR5TEVRC/jU2Su
- QLDFFAMueBgyOZhIR07ndwQHRYzcAX4yJrUz2OCRVGpilBOzkQhlaLAaABKKbaOo2VEF
- vm89uw1HvqgH3laEQB7NJVxW/XObdLyra7NrslCf0vlFxqx2u7jdJNb7iV0jOZQSbq2Y
- d0vs+Dms5KmvwpkpRnRmDFhmF3eaZc7BPFquhJnN6ii8hgGK1fH3IELu7Upqef2nN15l
- lc04nXOiIITjkqdBMmjhqITcQracKHbhw499CO72Uc3kCIH/DtWhayfxko85ipVEYdo/
- ehqQ==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=ui2AyYakjARNpvT610MmpwVISaykxIjU1EziL4bq/8g=;
+ b=TtPn5gbE5cUnZn/XoZAH5Q1SPuX8zUYSCs/O66h6C9BXK3fpK/Gxba6BH70xbSUMQI
+ rysLsdyUKSLybXMLAMuifFTOgm/GYv7CzvMxgqTkJEp1Fzljb4N/quSYihWIbdHGfOMS
+ YewS6M/7CjC7YsdpjGCrrDdk6y4EyOkTNlena25qIj6QWnxi/8p/lfEfwkgi6UyCbeb6
+ sjUB6nqC+Uxvz6IBGuj5pn76G9Dt2QO8PEqw5mKADfHfuFpx49k489ssqc8jcB5yU5iE
+ ahnxDbrtLwfx8ViQriceqefi2FsulHCF3546sTznByZRVN57V5UzPws2FuRb/mBmH1Xt
+ 6yQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=QypmxVIIHfEpkRMXwz8jV9VsRXxLaN9Gc9MoWcFoJN0=;
- b=Oip+wfvUC5xbPN0U7w9rJygW6hH1qsfWsvnjH3BY+ycnoWxpa3JTIg2xbuu1pBeE8C
- 5i9btHeXf/XSoKjU6dVg30hphQ0/Yx6avB4sK+Ej0EKz7EXbL2XB/oN3/U7UvfH84CJ3
- 1Pp1yj40CnqOXGpi4Tc195iRdHJ9JaivAmG3VgSZwpnPjRmEeHGy2ZytrgDIQvypwH+1
- SHivBqtBy0QCfUvib0xTA/K4QfZBNI3++khYKEwvVvWXiArQ0X/Y47uEVb36/GZNx3E9
- UHoOicwOR7DXL1rlxnHXdSaRmoMkSonRJpDTmmE3vb8x4pkSVPmoQuAGrRfoHRYrurI0
- DgWw==
-X-Gm-Message-State: AOAM533EntSAnpfMDKwr5gAZdl+ndOuGjZqMezmSNamMzgX9IJKfhcdv
- pU7Uo1DJ5Mv5EUwCiZpubyDBUrABC3XpQg==
-X-Google-Smtp-Source: ABdhPJxePgQkSVZVEUA4FZYzEF3UdagWSgDgT9hXezo4LvnwaZ1NClGbAw10690t+P/fIDVPZfv+0Q==
-X-Received: by 2002:adf:97db:: with SMTP id t27mr2599398wrb.375.1607519870252; 
- Wed, 09 Dec 2020 05:17:50 -0800 (PST)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=ui2AyYakjARNpvT610MmpwVISaykxIjU1EziL4bq/8g=;
+ b=YmeoGKhvxlpILEh2zGNkjUVPkPeDblCF2jCy9MzzObY3yVk65GKrriBqDIyXu59ZWb
+ q4JjMpSFcLS4aK2HCeIsq1kFzvtc8sHUFJOewk0oVY0v16eqVqQCFOfvuol0QuWf9RL0
+ h3XdziiwGG0aT//XCZJ6fZQP2+X8slhlt72k3l5gd3fFR2EebHWTKPvv7BtdIAK6/jAt
+ TEGa7A4rcdL0dpkxKBVsIvtzAWAskjdTw5Lxu26WO0QSbacsR9V5DdzBzuYRKTeCXYQq
+ 6xImAjytpHOzEejBsBxUEcb5YR09JpBeBgQuDQCPYeeL6BpajdrtO5c3O/3nzFgx9fxU
+ esxw==
+X-Gm-Message-State: AOAM530ulEtq1jvgXviUmONTlRfwvTPU+YkcLVNmxsB9Y7vziuIZSn0O
+ vJ8c2NufvyUOP7b4cxY5g61QhZ9w/BT6NA==
+X-Google-Smtp-Source: ABdhPJzlT1ZAQI8+iYY8fpTcJpj5l6KBwxxqgFiRZRdWFROI/wunQbz/voXHfXAhUBU4AIC7QtIReQ==
+X-Received: by 2002:a5d:5146:: with SMTP id u6mr2832541wrt.66.1607519872306;
+ Wed, 09 Dec 2020 05:17:52 -0800 (PST)
 Received: from localhost ([2a01:4b00:8523:2d03:9d1b:d0eb:db43:6cd2])
- by smtp.gmail.com with ESMTPSA id d187sm3644642wmd.8.2020.12.09.05.17.48
+ by smtp.gmail.com with ESMTPSA id g192sm3294480wme.48.2020.12.09.05.17.50
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 09 Dec 2020 05:17:48 -0800 (PST)
+ Wed, 09 Dec 2020 05:17:51 -0800 (PST)
 From: David Brazdil <dbrazdil@google.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 0/9] KVM: arm64: Relocate absolute hyp VAs
-Date: Wed,  9 Dec 2020 13:17:37 +0000
-Message-Id: <20201209131746.85622-1-dbrazdil@google.com>
+Subject: [PATCH 1/9] KVM: arm64: Correctly align nVHE percpu data
+Date: Wed,  9 Dec 2020 13:17:38 +0000
+Message-Id: <20201209131746.85622-2-dbrazdil@google.com>
 X-Mailer: git-send-email 2.29.2
+In-Reply-To: <20201209131746.85622-1-dbrazdil@google.com>
+References: <20201209131746.85622-1-dbrazdil@google.com>
 MIME-Version: 1.0
 Cc: kernel-team@android.com, Catalin Marinas <catalin.marinas@arm.com>,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
- Ard Biesheuvel <ardb@kernel.org>
+ Jamie Iles <jamie@nuviainc.com>, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -98,81 +100,67 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-nVHE hyp code is linked into the same kernel binary but executes under
-different memory mappings. If the compiler of hyp code chooses absolute
-addressing for accessing a symbol, the kernel linker will relocate that
-address to a kernel image virtual address, causing a runtime exception.
+From: Jamie Iles <jamie@nuviainc.com>
 
-So far the strategy has been to force PC-relative addressing by wrapping
-all symbol references with the hyp_symbol_addr macro. This is error
-prone and developer unfriendly.
+The nVHE percpu data is partially linked but the nVHE linker script did
+not align the percpu section.  The PERCPU_INPUT macro would then align
+the data to a page boundary:
 
-The series adds a new build-time step for nVHE hyp object file where
-positions targeted by R_AARCH64_ABS64 relocations are enumerated and
-the information stored in a separate ELF section in the kernel image.
-At runtime, the kernel first relocates all absolute addresses to their
-actual virtual offset (eg. for KASLR), and then addresses listed in this
-section are converted to hyp VAs.
+  #define PERCPU_INPUT(cacheline)					\
+  	__per_cpu_start = .;						\
+  	*(.data..percpu..first)						\
+  	. = ALIGN(PAGE_SIZE);						\
+  	*(.data..percpu..page_aligned)					\
+  	. = ALIGN(cacheline);						\
+  	*(.data..percpu..read_mostly)					\
+  	. = ALIGN(cacheline);						\
+  	*(.data..percpu)						\
+  	*(.data..percpu..shared_aligned)				\
+  	PERCPU_DECRYPTED_SECTION					\
+  	__per_cpu_end = .;
 
-The RFC of this series did not have a build-time step and instead relied
-on filtering dynamic relocations at runtime. That approach does not work
-if the kernel is built with !CONFIG_RELOCATABLE, hence an always-present
-set of relocation positions was added.
+but then when the final vmlinux linking happens the hypervisor percpu
+data is included after page alignment and so the offsets potentially
+don't match.  On my build I saw that the .hyp.data..percpu section was
+at address 0x20 and then the percpu data would begin at 0x1000 (because
+of the page alignment in PERCPU_INPUT), but when linked into vmlinux,
+everything would be shifted down by 0x20 bytes.
 
-The series is based on the current kvmarm/next (commit 3a514592b6) and
-structured as follows:
-  * patch 1 is Jamie's fix of .hyp.data..percpu alignment; already in
-    master, not yet in kvmarm/next; included to avoid merge conflicts
-  * patches 2-3 make sure that all sections referred to by hyp code are
-    handled by the hyp linker script and prefixed with .hyp so they can
-    be identified by the build-time tool
-  * patches 4-6 contain the actual changes to identify and relocate VAs
-  * patches 7-8 fix existing code that assumes kernel VAs
-  * patch 9 removes the (now redundant) hyp_symbol_addr
+This manifests as one of the CPUs getting lost when running
+kvm-unit-tests or starting any VM and subsequent soft lockup on a Cortex
+A72 device.
 
-The series is also available at:
-  https://android-kvm.googlesource.com/linux topic/hyp-reloc_v1
+Fixes: 30c953911c43 ("kvm: arm64: Set up hyp percpu data for nVHE")
+Signed-off-by: Jamie Iles <jamie@nuviainc.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Acked-by: David Brazdil <dbrazdil@google.com>
+Cc: David Brazdil <dbrazdil@google.com>
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Will Deacon <will@kernel.org>
+Link: https://lore.kernel.org/r/20201113150406.14314-1-jamie@nuviainc.com
+---
+ arch/arm64/kvm/hyp/nvhe/hyp.lds.S | 5 +++++
+ 1 file changed, 5 insertions(+)
 
--David
-
-David Brazdil (8):
-  KVM: arm64: Rename .idmap.text in hyp linker script
-  KVM: arm64: Set up .hyp.rodata ELF section
-  KVM: arm64: Add symbol at the beginning of each hyp section
-  KVM: arm64: Generate hyp relocation data
-  KVM: arm64: Apply hyp relocations at runtime
-  KVM: arm64: Fix constant-pool users in hyp
-  KVM: arm64: Remove patching of fn pointers in hyp
-  KVM: arm64: Remove hyp_symbol_addr
-
-Jamie Iles (1):
-  KVM: arm64: Correctly align nVHE percpu data
-
- arch/arm64/configs/defconfig             |   1 +
- arch/arm64/include/asm/hyp_image.h       |  29 +-
- arch/arm64/include/asm/kvm_asm.h         |  20 --
- arch/arm64/include/asm/kvm_mmu.h         |  61 ++---
- arch/arm64/include/asm/sections.h        |   3 +-
- arch/arm64/kernel/image-vars.h           |   1 -
- arch/arm64/kernel/smp.c                  |   4 +-
- arch/arm64/kernel/vmlinux.lds.S          |  18 +-
- arch/arm64/kvm/arm.c                     |   7 +-
- arch/arm64/kvm/hyp/include/hyp/switch.h  |   4 +-
- arch/arm64/kvm/hyp/nvhe/Makefile         |  28 +-
- arch/arm64/kvm/hyp/nvhe/gen-hyprel.c     | 326 +++++++++++++++++++++++
- arch/arm64/kvm/hyp/nvhe/host.S           |  29 +-
- arch/arm64/kvm/hyp/nvhe/hyp-init.S       |   4 +-
- arch/arm64/kvm/hyp/nvhe/hyp-main.c       |  11 +-
- arch/arm64/kvm/hyp/nvhe/hyp-smp.c        |   4 +-
- arch/arm64/kvm/hyp/nvhe/hyp.lds.S        |  14 +-
- arch/arm64/kvm/hyp/nvhe/psci-relay.c     |  24 +-
- arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c |   2 +-
- arch/arm64/kvm/va_layout.c               |  34 ++-
- 20 files changed, 495 insertions(+), 129 deletions(-)
- create mode 100644 arch/arm64/kvm/hyp/nvhe/gen-hyprel.c
-
---
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp.lds.S b/arch/arm64/kvm/hyp/nvhe/hyp.lds.S
+index 5d76ff2ba63e..1206d0d754d5 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp.lds.S
++++ b/arch/arm64/kvm/hyp/nvhe/hyp.lds.S
+@@ -13,6 +13,11 @@
+ 
+ SECTIONS {
+ 	HYP_SECTION(.text)
++	/*
++	 * .hyp..data..percpu needs to be page aligned to maintain the same
++	 * alignment for when linking into vmlinux.
++	 */
++	. = ALIGN(PAGE_SIZE);
+ 	HYP_SECTION_NAME(.data..percpu) : {
+ 		PERCPU_INPUT(L1_CACHE_BYTES)
+ 	}
+-- 
 2.29.2.576.ga3fc446d84-goog
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
