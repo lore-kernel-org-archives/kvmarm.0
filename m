@@ -2,88 +2,66 @@ Return-Path: <SRS0=3Een=FN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06358C433FE
-	for <kvmarm@archiver.kernel.org>; Wed,  9 Dec 2020 14:27:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8002C4361B
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Dec 2020 15:27:55 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 808D4223C8
-	for <kvmarm@archiver.kernel.org>; Wed,  9 Dec 2020 14:27:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 808D4223C8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 2C4CF23AAC
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Dec 2020 15:27:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C4CF23AAC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C773C4B28B;
-	Wed,  9 Dec 2020 09:27:11 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 95AC04B242;
+	Wed,  9 Dec 2020 10:27:54 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ACzsstWMPQHR; Wed,  9 Dec 2020 09:27:10 -0500 (EST)
+	with ESMTP id pcfOWjQOQgcv; Wed,  9 Dec 2020 10:27:53 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 58A6C4B286;
-	Wed,  9 Dec 2020 09:27:10 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6724E4B2BD;
+	Wed,  9 Dec 2020 10:27:53 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 855E54B183
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Dec 2020 09:27:09 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C11E14B235
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Dec 2020 10:27:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YSysm5y9WmyB for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Dec 2020 09:27:07 -0500 (EST)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2058D4B17D
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Dec 2020 09:27:07 -0500 (EST)
-Received: from DGGEMM406-HUB.china.huawei.com (unknown [172.30.72.55])
- by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4CrfVx558zzQp1g;
- Wed,  9 Dec 2020 22:26:33 +0800 (CST)
-Received: from dggema766-chm.china.huawei.com (10.1.198.208) by
- DGGEMM406-HUB.china.huawei.com (10.3.20.214) with Microsoft SMTP Server (TLS)
- id 14.3.487.0; Wed, 9 Dec 2020 22:27:01 +0800
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- dggema766-chm.china.huawei.com (10.1.198.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1913.5; Wed, 9 Dec 2020 22:27:01 +0800
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.2106.002; Wed, 9 Dec 2020 14:26:59 +0000
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: Eric Auger <eric.auger@redhat.com>, "eric.auger.pro@gmail.com"
- <eric.auger.pro@gmail.com>, "iommu@lists.linux-foundation.org"
- <iommu@lists.linux-foundation.org>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- "will@kernel.org" <will@kernel.org>, "joro@8bytes.org" <joro@8bytes.org>,
- "maz@kernel.org" <maz@kernel.org>, "robin.murphy@arm.com"
- <robin.murphy@arm.com>, "alex.williamson@redhat.com"
- <alex.williamson@redhat.com>
-Subject: RE: [PATCH v13 05/15] iommu/smmuv3: Get prepared for nested stage
- support
-Thread-Topic: [PATCH v13 05/15] iommu/smmuv3: Get prepared for nested stage
- support
-Thread-Index: AQHWvZ3YzXx0Iv4/TkmqLZQuADrJXqnu73jQ
-Date: Wed, 9 Dec 2020 14:26:59 +0000
-Message-ID: <d31ca662eb124fd3ba0c88936dcc098f@huawei.com>
-References: <20201118112151.25412-1-eric.auger@redhat.com>
- <20201118112151.25412-6-eric.auger@redhat.com>
-In-Reply-To: <20201118112151.25412-6-eric.auger@redhat.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.47.1.56]
+ with ESMTP id rFXPNJQ-sGPB for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Dec 2020 10:27:47 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 697C64B220
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Dec 2020 10:27:47 -0500 (EST)
+Date: Wed, 9 Dec 2020 15:27:41 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v5 0/2] MTE support for KVM guest
+Message-ID: <20201209152741.GC13566@gaia>
+References: <46fd98a2-ee39-0086-9159-b38c406935ab@arm.com>
+ <CAFEAcA_Q8RSB-zcS8+cEfvWz_0U5GLzmsf12m_7BFjX8h-1hrA@mail.gmail.com>
+ <b975422f-14fd-13b3-c8ca-e8b1a68c0837@arm.com>
+ <0d0eb6da6a11f76d10e532c157181985@kernel.org>
+ <20201207163405.GD1526@gaia> <874kkx5thq.wl-maz@kernel.org>
+ <20201208172143.GB13960@gaia>
+ <7ff14490e253878d0735633b792e1ea9@kernel.org>
+ <20201209124443.GB13566@gaia>
+ <ef14a5158fc65c00f6c3c842cfa83b2c@kernel.org>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
- "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
- "Zengtao \(B\)" <prime.zeng@hisilicon.com>,
- "nicoleotsuka@gmail.com" <nicoleotsuka@gmail.com>,
- "vivek.gautam@arm.com" <vivek.gautam@arm.com>,
- "yi.l.liu@intel.com" <yi.l.liu@intel.com>,
- "zhangfei.gao@linaro.org" <zhangfei.gao@linaro.org>,
- qubingbing <qubingbing@hisilicon.com>
+Content-Disposition: inline
+In-Reply-To: <ef14a5158fc65c00f6c3c842cfa83b2c@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: Juan Quintela <quintela@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Dave Martin <Dave.Martin@arm.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Steven Price <steven.price@arm.com>,
+ arm-mail-list <linux-arm-kernel@lists.infradead.org>,
+ Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+ kvmarm <kvmarm@lists.cs.columbia.edu>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -100,244 +78,56 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Eric,
+On Wed, Dec 09, 2020 at 01:25:18PM +0000, Marc Zyngier wrote:
+> On 2020-12-09 12:44, Catalin Marinas wrote:
+> > On Tue, Dec 08, 2020 at 06:21:12PM +0000, Marc Zyngier wrote:
+> > > On 2020-12-08 17:21, Catalin Marinas wrote:
+> > > > On Mon, Dec 07, 2020 at 07:03:13PM +0000, Marc Zyngier wrote:
+> > > > > I wonder whether we will have to have something kernel side to
+> > > > > dump/reload tags in a way that matches the patterns used by live
+> > > > > migration.
+> > > >
+> > > > We have something related - ptrace dumps/resores the tags. Can the same
+> > > > concept be expanded to a KVM ioctl?
+> > > 
+> > > Yes, although I wonder whether we should integrate this deeply into
+> > > the dirty-log mechanism: it would be really interesting to dump the
+> > > tags at the point where the page is flagged as clean from a dirty-log
+> > > point of view. As the page is dirtied, discard the saved tags.
+> > 
+> > From the VMM perspective, the tags can be treated just like additional
+> > (meta)data in a page. We'd only need the tags when copying over. It can
+> > race with the VM dirtying the page (writing tags would dirty it) but I
+> > don't think the current migration code cares about this. If dirtied, it
+> > copies it again.
+> > 
+> > The only downside I see is an extra syscall per page both on the origin
+> > VMM and the destination one to dump/restore the tags. Is this a
+> > performance issue?
+> 
+> I'm not sure. Migrating VMs already has a massive overhead, so an extra
+> syscall per page isn't terrifying. But that's the point where I admit
+> not knowing enough about what the VMM expects, nor whether that matches
+> what happens on other architectures that deal with per-page metadata.
+> 
+> Would this syscall operate on the guest address space? Or on the VMM's
+> own mapping?
 
-> -----Original Message-----
-> From: Eric Auger [mailto:eric.auger@redhat.com]
-> Sent: 18 November 2020 11:22
-> To: eric.auger.pro@gmail.com; eric.auger@redhat.com;
-> iommu@lists.linux-foundation.org; linux-kernel@vger.kernel.org;
-> kvm@vger.kernel.org; kvmarm@lists.cs.columbia.edu; will@kernel.org;
-> joro@8bytes.org; maz@kernel.org; robin.murphy@arm.com;
-> alex.williamson@redhat.com
-> Cc: jean-philippe@linaro.org; zhangfei.gao@linaro.org;
-> zhangfei.gao@gmail.com; vivek.gautam@arm.com; Shameerali Kolothum
-> Thodi <shameerali.kolothum.thodi@huawei.com>;
-> jacob.jun.pan@linux.intel.com; yi.l.liu@intel.com; tn@semihalf.com;
-> nicoleotsuka@gmail.com; yuzenghui <yuzenghui@huawei.com>
-> Subject: [PATCH v13 05/15] iommu/smmuv3: Get prepared for nested stage
-> support
-> 
-> When nested stage translation is setup, both s1_cfg and
-> s2_cfg are set.
-> 
-> We introduce a new smmu domain abort field that will be set
-> upon guest stage1 configuration passing.
-> 
-> arm_smmu_write_strtab_ent() is modified to write both stage
-> fields in the STE and deal with the abort field.
-> 
-> In nested mode, only stage 2 is "finalized" as the host does
-> not own/configure the stage 1 context descriptor; guest does.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> 
-> ---
-> v10 -> v11:
-> - Fix an issue reported by Shameer when switching from with vSMMU
->   to without vSMMU. Despite the spec does not seem to mention it
->   seems to be needed to reset the 2 high 64b when switching from
->   S1+S2 cfg to S1 only. Especially dst[3] needs to be reset (S2TTB).
->   On some implementations, if the S2TTB is not reset, this causes
->   a C_BAD_STE error
-> ---
->  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 64
-> +++++++++++++++++----
->  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h |  2 +
->  2 files changed, 56 insertions(+), 10 deletions(-)
-> 
-> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> index 18ac5af1b284..412ea1bafa50 100644
-> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> @@ -1181,8 +1181,10 @@ static void arm_smmu_write_strtab_ent(struct
-> arm_smmu_master *master, u32 sid,
->  	 * three cases at the moment:
->  	 *
->  	 * 1. Invalid (all zero) -> bypass/fault (init)
-> -	 * 2. Bypass/fault -> translation/bypass (attach)
-> -	 * 3. Translation/bypass -> bypass/fault (detach)
-> +	 * 2. Bypass/fault -> single stage translation/bypass (attach)
-> +	 * 3. Single or nested stage Translation/bypass -> bypass/fault (detach)
-> +	 * 4. S2 -> S1 + S2 (attach_pasid_table)
-> +	 * 5. S1 + S2 -> S2 (detach_pasid_table)
->  	 *
->  	 * Given that we can't update the STE atomically and the SMMU
->  	 * doesn't read the thing in a defined order, that leaves us
-> @@ -1193,7 +1195,8 @@ static void arm_smmu_write_strtab_ent(struct
-> arm_smmu_master *master, u32 sid,
->  	 * 3. Update Config, sync
->  	 */
->  	u64 val = le64_to_cpu(dst[0]);
-> -	bool ste_live = false;
-> +	bool s1_live = false, s2_live = false, ste_live;
-> +	bool abort, nested = false, translate = false;
->  	struct arm_smmu_device *smmu = NULL;
->  	struct arm_smmu_s1_cfg *s1_cfg;
->  	struct arm_smmu_s2_cfg *s2_cfg;
-> @@ -1233,6 +1236,8 @@ static void arm_smmu_write_strtab_ent(struct
-> arm_smmu_master *master, u32 sid,
->  		default:
->  			break;
->  		}
-> +		nested = s1_cfg->set && s2_cfg->set;
+Whatever is easier for the VMM, I don't think it matters as long as the
+host kernel can get the actual physical address (and linear map
+correspondent). Maybe simpler if it's the VMM address space as the
+kernel can check the access permissions in case you want to hide the
+guest memory from the VMM for other reasons (migration is also off the
+table).
 
-This is a problem when the Guest is booted with iommu.passthrough = 1 as we
-set s1_cfg.set = false for IOMMU_PASID_CONFIG_BYPASS. 
+Without syscalls, an option would be for the VMM to create two mappings:
+one with PROT_MTE for migration and the other without for normal DMA
+etc. That's achievable using memfd_create() or shm_open() and two mmap()
+calls, only one having PROT_MTE. The VMM address space should be
+sufficiently large to map two guest IPAs.
 
-Results in BUG_ON(ste_live && !nested).
-
-Can we instead have nested = true set a bit above in the code, where we set
-s2_cfg->set = true for the ARM_SMMU_DOMAIN_NESTED case?
-
-Please take a look.
-
-Thanks,
-Shameer
-
-> +		translate = s1_cfg->set || s2_cfg->set;
->  	}
-> 
->  	if (val & STRTAB_STE_0_V) {
-> @@ -1240,23 +1245,36 @@ static void arm_smmu_write_strtab_ent(struct
-> arm_smmu_master *master, u32 sid,
->  		case STRTAB_STE_0_CFG_BYPASS:
->  			break;
->  		case STRTAB_STE_0_CFG_S1_TRANS:
-> +			s1_live = true;
-> +			break;
->  		case STRTAB_STE_0_CFG_S2_TRANS:
-> -			ste_live = true;
-> +			s2_live = true;
-> +			break;
-> +		case STRTAB_STE_0_CFG_NESTED:
-> +			s1_live = true;
-> +			s2_live = true;
->  			break;
->  		case STRTAB_STE_0_CFG_ABORT:
-> -			BUG_ON(!disable_bypass);
->  			break;
->  		default:
->  			BUG(); /* STE corruption */
->  		}
->  	}
-> 
-> +	ste_live = s1_live || s2_live;
-> +
->  	/* Nuke the existing STE_0 value, as we're going to rewrite it */
->  	val = STRTAB_STE_0_V;
-> 
->  	/* Bypass/fault */
-> -	if (!smmu_domain || !(s1_cfg->set || s2_cfg->set)) {
-> -		if (!smmu_domain && disable_bypass)
-> +
-> +	if (!smmu_domain)
-> +		abort = disable_bypass;
-> +	else
-> +		abort = smmu_domain->abort;
-> +
-> +	if (abort || !translate) {
-> +		if (abort)
->  			val |= FIELD_PREP(STRTAB_STE_0_CFG,
-> STRTAB_STE_0_CFG_ABORT);
->  		else
->  			val |= FIELD_PREP(STRTAB_STE_0_CFG,
-> STRTAB_STE_0_CFG_BYPASS);
-> @@ -1274,8 +1292,16 @@ static void arm_smmu_write_strtab_ent(struct
-> arm_smmu_master *master, u32 sid,
->  		return;
->  	}
-> 
-> +	BUG_ON(ste_live && !nested);
-> +
-> +	if (ste_live) {
-> +		/* First invalidate the live STE */
-> +		dst[0] = cpu_to_le64(STRTAB_STE_0_CFG_ABORT);
-> +		arm_smmu_sync_ste_for_sid(smmu, sid);
-> +	}
-> +
->  	if (s1_cfg->set) {
-> -		BUG_ON(ste_live);
-> +		BUG_ON(s1_live);
->  		dst[1] = cpu_to_le64(
->  			 FIELD_PREP(STRTAB_STE_1_S1DSS,
-> STRTAB_STE_1_S1DSS_SSID0) |
->  			 FIELD_PREP(STRTAB_STE_1_S1CIR,
-> STRTAB_STE_1_S1C_CACHE_WBRA) |
-> @@ -1294,7 +1320,14 @@ static void arm_smmu_write_strtab_ent(struct
-> arm_smmu_master *master, u32 sid,
->  	}
-> 
->  	if (s2_cfg->set) {
-> -		BUG_ON(ste_live);
-> +		u64 vttbr = s2_cfg->vttbr & STRTAB_STE_3_S2TTB_MASK;
-> +
-> +		if (s2_live) {
-> +			u64 s2ttb = le64_to_cpu(dst[3] & STRTAB_STE_3_S2TTB_MASK);
-> +
-> +			BUG_ON(s2ttb != vttbr);
-> +		}
-> +
->  		dst[2] = cpu_to_le64(
->  			 FIELD_PREP(STRTAB_STE_2_S2VMID, s2_cfg->vmid) |
->  			 FIELD_PREP(STRTAB_STE_2_VTCR, s2_cfg->vtcr) |
-> @@ -1304,9 +1337,12 @@ static void arm_smmu_write_strtab_ent(struct
-> arm_smmu_master *master, u32 sid,
->  			 STRTAB_STE_2_S2PTW | STRTAB_STE_2_S2AA64 |
->  			 STRTAB_STE_2_S2R);
-> 
-> -		dst[3] = cpu_to_le64(s2_cfg->vttbr & STRTAB_STE_3_S2TTB_MASK);
-> +		dst[3] = cpu_to_le64(vttbr);
-> 
->  		val |= FIELD_PREP(STRTAB_STE_0_CFG,
-> STRTAB_STE_0_CFG_S2_TRANS);
-> +	} else {
-> +		dst[2] = 0;
-> +		dst[3] = 0;
->  	}
-> 
->  	if (master->ats_enabled)
-> @@ -1982,6 +2018,14 @@ static int arm_smmu_domain_finalise(struct
-> iommu_domain *domain,
->  		return 0;
->  	}
-> 
-> +	if (smmu_domain->stage == ARM_SMMU_DOMAIN_NESTED &&
-> +	    (!(smmu->features & ARM_SMMU_FEAT_TRANS_S1) ||
-> +	     !(smmu->features & ARM_SMMU_FEAT_TRANS_S2))) {
-> +		dev_info(smmu_domain->smmu->dev,
-> +			 "does not implement two stages\n");
-> +		return -EINVAL;
-> +	}
-> +
->  	/* Restrict the stage to what we can actually support */
->  	if (!(smmu->features & ARM_SMMU_FEAT_TRANS_S1))
->  		smmu_domain->stage = ARM_SMMU_DOMAIN_S2;
-> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-> b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-> index 07f59252dd21..269779dee8d1 100644
-> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-> @@ -206,6 +206,7 @@
->  #define STRTAB_STE_0_CFG_BYPASS		4
->  #define STRTAB_STE_0_CFG_S1_TRANS	5
->  #define STRTAB_STE_0_CFG_S2_TRANS	6
-> +#define STRTAB_STE_0_CFG_NESTED		7
-> 
->  #define STRTAB_STE_0_S1FMT		GENMASK_ULL(5, 4)
->  #define STRTAB_STE_0_S1FMT_LINEAR	0
-> @@ -682,6 +683,7 @@ struct arm_smmu_domain {
->  	enum arm_smmu_domain_stage	stage;
->  	struct arm_smmu_s1_cfg	s1_cfg;
->  	struct arm_smmu_s2_cfg	s2_cfg;
-> +	bool				abort;
-> 
->  	struct iommu_domain		domain;
-> 
-> --
-> 2.21.3
-
+-- 
+Catalin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
