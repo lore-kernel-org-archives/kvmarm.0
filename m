@@ -1,90 +1,60 @@
-Return-Path: <SRS0=0wdR=FM=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=3Een=FN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A13AC4361B
-	for <kvmarm@archiver.kernel.org>; Tue,  8 Dec 2020 20:13:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 759E9C433FE
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Dec 2020 06:10:00 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 25FB223B26
-	for <kvmarm@archiver.kernel.org>; Tue,  8 Dec 2020 20:13:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25FB223B26
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id B511B23B7C
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Dec 2020 06:09:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B511B23B7C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B55594B152;
-	Tue,  8 Dec 2020 15:13:25 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 09EB34B297;
+	Wed,  9 Dec 2020 01:09:59 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id k+S+VO5f+KHO; Tue,  8 Dec 2020 15:13:24 -0500 (EST)
+	with ESMTP id fFwtEbBVwzxp; Wed,  9 Dec 2020 01:09:57 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8030E4B2B4;
-	Tue,  8 Dec 2020 15:13:24 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 831E44B298;
+	Wed,  9 Dec 2020 01:09:57 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C750D4B1A8
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Dec 2020 15:02:59 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D6564B290
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Dec 2020 01:09:56 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Xi6qCfkmLV7U for <kvmarm@lists.cs.columbia.edu>;
- Tue,  8 Dec 2020 15:02:59 -0500 (EST)
-Received: from mail-qv1-f66.google.com (mail-qv1-f66.google.com
- [209.85.219.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EBC604B1C9
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Dec 2020 15:02:58 -0500 (EST)
-Received: by mail-qv1-f66.google.com with SMTP id l7so3462070qvt.4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 08 Dec 2020 12:02:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=FpPpi8VoMtsoCPIRy8jenvKh8eCrXui01GBoXCmAibc=;
- b=Gje8dhYAHnzmhozDV6nyAB+eibl0NgYpORU05kDPkIsFQm37tYrnN4/L5WpaA6uvS+
- +dHvy4ZXN5zo4qJlmIohacYz1zhwiR/rtYyTWwJJkoG/BYkpxYe4DqDiHWO1G0udLWou
- 1SE763ZcU8jYBPs4Sw8FnjLo5u6/kP+LatT4YlexzoE/lP6uul6Bwq7qCPg8w9eQDohr
- GADmErF1mrU4ZhcphF1gcZDAHe1M4sEMEjXCsCP6RDQPv+yg+Ad6+iXiDc+OU9sLeEGp
- f10bwiv7KZrCdvjE52W3zNx8L0cQ8XX6FbT+jBECaVlKTrFlaRkYVNHsf/Nozqzzrro7
- qBuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=FpPpi8VoMtsoCPIRy8jenvKh8eCrXui01GBoXCmAibc=;
- b=lmkFA8kJxFWvl5H9Wr9zAQt4SmLhPdriPcqgT4imJC3wj8sznd68LciSzEc6TiwKt2
- V0dbBjVwzSCd8lUwpzNAmyBqeCgtYnjO0xw7Ee+LjbV2z7tQT7SQnFcPRKE7UhpEOFUl
- wC883EDj4BMKPS6NmpKne0k8bd0nhThNp1m1oDn7LTh0JdlOk+IfgRnh9dpHSG7CfOMX
- 5+l1UI8bforx5xrKZSeFyvXM8HcxfOsL94FD2xZSezgNC9Jlxkm8aYlEgo2EIRi0WCuV
- P0PDDxYg3lrj8cKqxOvy6lrocuwCtKCUeZJtjLEFWEkA4FQOH4nRZFS+xKtj8wtLdqsV
- SCSw==
-X-Gm-Message-State: AOAM531r3V/Mxj++k6sWUvwdkKI5F9VBTm+MH1cyZy/LmSZhXeShrsoS
- 0ywluJbgfb0XiEYAGB5J1aLR/b42OvsCRZWVemkYdQ==
-X-Google-Smtp-Source: ABdhPJwfAM3wWeibHv8RrcoIhrJYGQjLkXIowS5Q4MiQJ6CrIMru6ycDzCbJFu7Uh1Oc0y/LYVfq5je68a5SrPqTFLM=
-X-Received: by 2002:ad4:59d2:: with SMTP id el18mr22835717qvb.35.1607457778234; 
- Tue, 08 Dec 2020 12:02:58 -0800 (PST)
-MIME-Version: 1.0
-References: <20200721041742.197354-1-sergey.senozhatsky@gmail.com>
- <20200817020310.GA1210848@jagdpanzerIV.localdomain>
- <fe72592c-c721-bece-1469-95eebf931299@huawei.com>
- <cbcfb402b7fdb8a2a45b80fbb0e79f3e@kernel.org>
- <20200911085841.GB562@jagdpanzerIV.localdomain>
-In-Reply-To: <20200911085841.GB562@jagdpanzerIV.localdomain>
-From: Joel Fernandes <joelaf@google.com>
-Date: Tue, 8 Dec 2020 15:02:47 -0500
-Message-ID: <CAJWu+oq26OK1-7Ze2pb5xpRJ-tS9wtXOdGFrYpHq+fhkyGhjkA@mail.gmail.com>
-Subject: Re: [RFC][PATCH 0/4] arm64:kvm: teach guest sched that VCPUs can be
- preempted
-To: Sergey Senozhatsky <sergey.senozhatsky@gmail.com>
-X-Mailman-Approved-At: Tue, 08 Dec 2020 15:13:23 -0500
-Cc: Marc Zyngier <maz@kernel.org>, LKML <linux-kernel@vger.kernel.org>,
- Suleiman Souhlal <suleiman@google.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu,
- "moderated list:ARM64 PORT \(AARCH64 ARCHITECTURE\)"
- <linux-arm-kernel@lists.infradead.org>
+ with ESMTP id axTVUhT0fdaZ for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Dec 2020 01:09:54 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AF0204B28B
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Dec 2020 01:09:54 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DE0941042;
+ Tue,  8 Dec 2020 22:09:53 -0800 (PST)
+Received: from entos-thunderx2-desktop.shanghai.arm.com
+ (entos-thunderx2-desktop.shanghai.arm.com [10.169.212.215])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id B07303F66B;
+ Tue,  8 Dec 2020 22:09:47 -0800 (PST)
+From: Jianyong Wu <jianyong.wu@arm.com>
+To: netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
+ tglx@linutronix.de, pbonzini@redhat.com, sean.j.christopherson@intel.com,
+ maz@kernel.org, richardcochran@gmail.com, Mark.Rutland@arm.com,
+ will@kernel.org, suzuki.poulose@arm.com, Andre.Przywara@arm.com,
+ steven.price@arm.com
+Subject: [PATCH v16 0/9] Enable ptp_kvm for arm/arm64
+Date: Wed,  9 Dec 2020 14:09:23 +0800
+Message-Id: <20201209060932.212364-1-jianyong.wu@arm.com>
+X-Mailer: git-send-email 2.17.1
+Cc: justin.he@arm.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ nd@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -96,46 +66,219 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Sep 11, 2020 at 4:58 AM Sergey Senozhatsky
-<sergey.senozhatsky@gmail.com> wrote:
->
-> My apologies for the slow reply.
->
-> On (20/08/17 13:25), Marc Zyngier wrote:
-> >
-> > It really isn't the same thing at all. You are exposing PV spinlocks,
-> > while Sergey exposes preemption to vcpus.
-> >
->
-> Correct, we see vcpu preemption as a "fundamental" feature, with
-> consequences that affect scheduling, which is a core feature :)
->
-> Marc, is there anything in particular that you dislike about this RFC
-> patch set? Joel has some ideas, which we may discuss offline if that
-> works for you.
+Currently, we offen use ntp (sync time with remote network clock)
+to sync time in VM. But the precision of ntp is subject to network delay
+so it's difficult to sync time in a high precision.
 
-Hi Marc, Sergey, Just checking what is the latest on this series?
+kvm virtual ptp clock (ptp_kvm) offers another way to sync time in VM,
+as the remote clock locates in the host instead of remote network clock.
+It targets to sync time between guest and host in virtualization
+environment and in this way, we can keep the time of all the VMs running
+in the same host in sync. In general, the delay of communication between
+host and guest is quiet small, so ptp_kvm can offer time sync precision
+up to in order of nanosecond. Please keep in mind that ptp_kvm just
+limits itself to be a channel which transmit the remote clock from
+host to guest and leaves the time sync jobs to an application, eg. chrony,
+in usersapce in VM.
 
-About the idea me and Sergey discussed, at a high level we discussed
-being able to share information similar to "Is the vCPU preempted?"
-using a more arch-independent infrastructure. I do not believe this
-needs to be arch-specific. Maybe the speciifc mechanism about how to
-share a page of information needs to be arch-specific, but the actual
-information shared need not be. This could open the door to sharing
-more such information in an arch-independent way (for example, if the
-scheduler needs to know other information such as the capacity of the
-CPU that the vCPU is on).
+How ptp_kvm works:
+After ptp_kvm initialized, there will be a new device node under
+/dev called ptp%d. A guest userspace service, like chrony, can use this
+device to get host walltime, sometimes also counter cycle, which depends
+on the service it calls. Then this guest userspace service can use those
+data to do the time sync for guest.
+here is a rough sketch to show how kvm ptp clock works.
 
-Other thoughts?
+|----------------------------|              |--------------------------|
+|       guest userspace      |              |          host            |
+|ioctl -> /dev/ptp%d         |              |                          |
+|       ^   |                |              |                          |
+|----------------------------|              |                          |
+|       |   | guest kernel   |              |                          |
+|       |   V      (get host walltime/counter cycle)                   |
+|      ptp_kvm -> hypercall - - - - - - - - - - ->hypercall service    |
+|                         <- - - - - - - - - - - -                     |
+|----------------------------|              |--------------------------|
 
-thanks,
+1. time sync service in guest userspace call ptp device through /dev/ptp%d.
+2. ptp_kvm module in guest receives this request then invoke hypercall to route
+into host kernel to request host walltime/counter cycle.
+3. ptp_kvm hypercall service in host response to the request and send data back.
+4. ptp (not ptp_kvm) in guest copy the data to userspace.
 
- - Joel
+This ptp_kvm implementation focuses itself to step 2 and 3 and step 2 works
+in guest comparing step 3 works in host kernel.
+
+change log:
+
+from v15 to v16:
+        (1) remove ARM_PTP_NONE_COUNTER suggested by Marc.
+        (2) add more detail for ptp_kvm doc.
+        (3) fix ci issues reported by test robot.
+
+from v14 to v15:
+        (1) enable ptp_kvm on arm32 guest, also ptp_kvm has been tested
+on both arm64 and arm32 guest running on arm64 kvm host.
+        (2) move arch-agnostic part of ptp_kvm.rst into timekeeping.rst.
+        (3) rename KVM_CAP_ARM_PTP_KVM to KVM_CAP_PTP_KVM as it should be
+arch agnostic.
+        (4) add description for KVM_CAP_PTP_KVM in Documentation/virt/kvm/api.rst.
+        (5) adjust dependency in Kconfig for ptp_kvm.
+        (6) refine multi-arch process in driver/ptp/Makefile.
+        (7) fix make pdfdocs htmldocs issue for ptp_kvm doc.
+        (8) address other issues from comments in v14.
+        (9) fold hypercall service of ptp_kvm as a function.
+        (10) rebase to 5.10-rc3.
+
+from v13 to v14
+        (1) rebase code on 5.9-rc3.
+        (2) add a document to introduce implementation of PTP_KVM on
+arm64.
+        (3) fix comments issue in hypercall.c.
+        (4) export arm_smccc_1_1_get_conduit using EXPORT_SYMBOL_GPL.
+        (5) fix make issue on x86 reported by kernel test robot.
+
+from v12 to v13:
+        (1) rebase code on 5.8-rc1.
+        (2) this patch set base on 2 patches of 1/8 and 2/8 from Will Decon.
+        (3) remove the change to ptp device code of extend getcrosststamp.
+        (4) remove the mechanism of letting user choose the counter type in
+ptp_kvm for arm64.
+        (5) add virtual counter option in ptp_kvm service to let user choose
+the specific counter explicitly.
+
+from v11 to v12:
+        (1) rebase code on 5.7-rc6 and rebase 2 patches from Will Decon
+including 1/11 and 2/11. as these patches introduce discover mechanism of
+vendor smccc service.
+        (2) rebase ptp_kvm hypercall service from standard smccc to vendor
+smccc and add ptp_kvm to vendor smccc service discover mechanism.
+        (3) add detail of why we need ptp_kvm and how ptp_kvm works in cover
+letter.
+
+from v10 to v11:
+        (1) rebase code on 5.7-rc2.
+        (2) remove support for arm32, as kvm support for arm32 will be
+removed [1]
+        (3) add error report in ptp_kvm initialization.
+
+from v9 to v10:
+        (1) change code base to v5.5.
+        (2) enable ptp_kvm both for arm32 and arm64.
+        (3) let user choose which of virtual counter or physical counter
+should return when using crosstimestamp mode of ptp_kvm for arm/arm64.
+        (4) extend input argument for getcrosstimestamp API.
+
+from v8 to v9:
+        (1) move ptp_kvm.h to driver/ptp/
+        (2) replace license declaration of ptp_kvm.h the same with other
+header files in the same directory.
+
+from v7 to v8:
+        (1) separate adding clocksource id for arm_arch_counter as a
+single patch.
+        (2) update commit message for patch 4/8.
+        (3) refine patch 7/8 and patch 8/8 to make them more independent.
+
+from v5 to v6:
+        (1) apply Mark's patch[4] to get SMCCC conduit.
+        (2) add mechanism to recognize current clocksource by add
+clocksouce_id value into struct clocksource instead of method in patch-v5.
+        (3) rename kvm_arch_ptp_get_clock_fn into
+kvm_arch_ptp_get_crosststamp.
+
+from v4 to v5:
+        (1) remove hvc delay compensasion as it should leave to userspace.
+        (2) check current clocksource in hvc call service.
+        (3) expose current clocksource by adding it to
+system_time_snapshot.
+        (4) add helper to check if clocksource is arm_arch_counter.
+        (5) rename kvm_ptp.c to ptp_kvm_common.c
+
+from v3 to v4:
+        (1) fix clocksource of ptp_kvm to arch_sys_counter.
+        (2) move kvm_arch_ptp_get_clock_fn into arm_arch_timer.c
+        (3) subtract cntvoff before return cycles from host.
+        (4) use ktime_get_snapshot instead of getnstimeofday and
+get_current_counterval to return time and counter value.
+        (5) split ktime and counter into two 32-bit block respectively
+to avoid Y2038-safe issue.
+        (6) set time compensation to device time as half of the delay of
+hvc call.
+        (7) add ARM_ARCH_TIMER as dependency of ptp_kvm for
+arm64.
+
+from v2 to v3:
+        (1) fix some issues in commit log.
+        (2) add some receivers in send list.
+
+from v1 to v2:
+        (1) move arch-specific code from arch/ to driver/ptp/
+        (2) offer mechanism to inform userspace if ptp_kvm service is
+available.
+        (3) separate ptp_kvm code for arm64 into hypervisor part and
+guest part.
+        (4) add API to expose monotonic clock and counter value.
+        (5) refine code: remove no necessary part and reconsitution.
+
+[1] https://patchwork.kernel.org/cover/11373351/
+
+
+Jianyong Wu (6):
+  ptp: Reorganize ptp_kvm module to make it arch-independent.
+  clocksource: Add clocksource id for arm arch counter
+  arm64/kvm: Add hypercall service for kvm ptp.
+  ptp: arm/arm64: Enable ptp_kvm for arm/arm64
+  doc: add ptp_kvm introduction for arm64 support
+  arm64: Add kvm capability check extension for ptp_kvm
+
+Thomas Gleixner (1):
+  time: Add mechanism to recognize clocksource in time_get_snapshot
+
+Will Deacon (2):
+  arm64: Probe for the presence of KVM hypervisor
+  arm/arm64: KVM: Advertise KVM UID to guests via SMCCC
+
+ Documentation/virt/kvm/api.rst              |  9 ++
+ Documentation/virt/kvm/arm/index.rst        |  1 +
+ Documentation/virt/kvm/arm/ptp_kvm.rst      | 31 +++++++
+ Documentation/virt/kvm/timekeeping.rst      | 35 ++++++++
+ arch/arm/kernel/setup.c                     |  5 ++
+ arch/arm64/kernel/setup.c                   |  1 +
+ arch/arm64/kvm/arm.c                        |  1 +
+ arch/arm64/kvm/hypercalls.c                 | 86 ++++++++++++++++--
+ drivers/clocksource/arm_arch_timer.c        | 31 +++++++
+ drivers/firmware/smccc/smccc.c              | 37 ++++++++
+ drivers/ptp/Kconfig                         |  2 +-
+ drivers/ptp/Makefile                        |  2 +
+ drivers/ptp/ptp_kvm_arm.c                   | 45 ++++++++++
+ drivers/ptp/{ptp_kvm.c => ptp_kvm_common.c} | 84 +++++-------------
+ drivers/ptp/ptp_kvm_x86.c                   | 96 +++++++++++++++++++++
+ include/linux/arm-smccc.h                   | 59 +++++++++++++
+ include/linux/clocksource.h                 |  6 ++
+ include/linux/clocksource_ids.h             | 12 +++
+ include/linux/ptp_kvm.h                     | 16 ++++
+ include/linux/timekeeping.h                 | 12 +--
+ include/uapi/linux/kvm.h                    |  1 +
+ kernel/time/clocksource.c                   |  2 +
+ kernel/time/timekeeping.c                   |  1 +
+ 23 files changed, 498 insertions(+), 77 deletions(-)
+ create mode 100644 Documentation/virt/kvm/arm/ptp_kvm.rst
+ create mode 100644 drivers/ptp/ptp_kvm_arm.c
+ rename drivers/ptp/{ptp_kvm.c => ptp_kvm_common.c} (60%)
+ create mode 100644 drivers/ptp/ptp_kvm_x86.c
+ create mode 100644 include/linux/clocksource_ids.h
+ create mode 100644 include/linux/ptp_kvm.h
+
+-- 
+2.17.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
