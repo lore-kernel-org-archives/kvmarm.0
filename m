@@ -6,53 +6,52 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B31EFC4361B
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 16:04:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ED8CC433FE
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 16:04:19 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5728123D56
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 16:04:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5728123D56
+	by mail.kernel.org (Postfix) with ESMTP id 1591E23DE5
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 16:04:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1591E23DE5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0057B4B1B5;
-	Thu, 10 Dec 2020 11:04:15 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B84924B263;
+	Thu, 10 Dec 2020 11:04:18 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id shPI09H1k95n; Thu, 10 Dec 2020 11:04:13 -0500 (EST)
+	with ESMTP id wt7IAFmy+Vzs; Thu, 10 Dec 2020 11:04:16 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0146E4B2A5;
-	Thu, 10 Dec 2020 11:04:13 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2BF8A4B2A7;
+	Thu, 10 Dec 2020 11:04:15 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 14E9B4B25F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 11:04:12 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DC7554B261
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 11:04:13 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lS4vPlTpSpRh for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Dec 2020 11:04:10 -0500 (EST)
+ with ESMTP id sVeL9fZyHkXs for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Dec 2020 11:04:12 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7F2D94B271
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 11:04:05 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 84FFF4B24F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 11:04:07 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 9F93A23EB4;
- Thu, 10 Dec 2020 16:04:04 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 8C3F523D5A;
+ Thu, 10 Dec 2020 16:04:06 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1knONL-0008Di-2d; Thu, 10 Dec 2020 16:01:03 +0000
+ id 1knONo-0008Di-Hx; Thu, 10 Dec 2020 16:01:33 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v3 31/66] KVM: arm64: nv: Filter out unsupported features from
- ID regs
-Date: Thu, 10 Dec 2020 15:59:27 +0000
-Message-Id: <20201210160002.1407373-32-maz@kernel.org>
+Subject: [PATCH v3 61/66] KVM: arm64: nv: Synchronize PSTATE early on exit
+Date: Thu, 10 Dec 2020 15:59:57 +0000
+Message-Id: <20201210160002.1407373-62-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201210160002.1407373-1-maz@kernel.org>
 References: <20201210160002.1407373-1-maz@kernel.org>
@@ -83,218 +82,232 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-As there is a number of features that we either can't support,
-or don't want to support right away with NV, let's add some
-basic filtering so that we don't advertize silly things to the
-EL2 guest.
+The NV code relies on predicates such as is_hyp_ctxt() being
+reliable. In turn, is_hyp_ctxt() relies on things like PSTATE
+and the virtual HCR_EL2 being accurate.
 
-Whilst we are at it, avertize ARMv8.4-TTL as well as ARMv8.5-GTG.
+But with ARMv8.4-NV removing trapping for a large part of the
+EL2 system registers (among which HCR_EL2), we can't use such
+trapping to synchronize the rest of the state.
+
+Let's look at the following sequence for a VHE guest:
+
+ (1) enter guest in host EL0
+ (2) guest traps to guest vEL2 (no hypervisor intervention)
+ (3) guest clears virtual HCR_EL2.TGE (no trap either)
+ (4) host interrupt fires, exit
+ (5) is_hyp_ctxt() now says "guest" (PSTATE.M==EL1 and TGE==0)
+
+It is obvious that such behaviour would be rather unfortunate,
+and lead to interesting, difficult to catch bugs specially if
+preemption kicks in (yes, I wasted a whole week chasing this one).
+
+In order to preserve the invariant that a guest entered in host
+context must exit in the same context, we must make sure that
+is_hyp_ctxt() works correctly. Since we can always observe the
+guest value of HCR_EL2.{E2H,TGE} in the VNCR_EL2 page, we solely
+need to synchronize PSTATE as early as possible.
+
+This basically amounts to moving from_hw_pstate() as close
+as possible to the guest exit point, and fixup_guest_exit()
+seems as good a place as any.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_nested.h |   6 ++
- arch/arm64/kvm/nested.c             | 152 ++++++++++++++++++++++++++++
- arch/arm64/kvm/sys_regs.c           |   4 +-
- 3 files changed, 161 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/hyp/include/hyp/switch.h    | 16 ++++--
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 26 ++--------
+ arch/arm64/kvm/hyp/nvhe/switch.c           |  8 ++-
+ arch/arm64/kvm/hyp/vhe/switch.c            | 57 +++++++++++++++++++++-
+ 4 files changed, 78 insertions(+), 29 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 07c15f51cf86..026ddaad972c 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -67,4 +67,10 @@ extern bool __forward_traps(struct kvm_vcpu *vcpu, unsigned int reg,
- extern bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit);
- extern bool forward_nv_traps(struct kvm_vcpu *vcpu);
- 
-+struct sys_reg_params;
-+struct sys_reg_desc;
-+
-+void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
-+			  const struct sys_reg_desc *r);
-+
- #endif /* __ARM64_KVM_NESTED_H */
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 42a96c8d2adc..9fb44bc7db3f 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -20,6 +20,10 @@
- #include <linux/kvm_host.h>
- 
- #include <asm/kvm_emulate.h>
-+#include <asm/kvm_nested.h>
-+#include <asm/sysreg.h>
-+
-+#include "sys_regs.h"
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index e5e201314c87..3b56841eb328 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -407,11 +407,11 @@ static inline bool __hyp_handle_ptrauth(struct kvm_vcpu *vcpu)
+ }
  
  /*
-  * Inject wfx to the virtual EL2 if this is not from the virtual EL2 and
-@@ -38,3 +42,151 @@ int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe)
+- * Return true when we were able to fixup the guest exit and should return to
+- * the guest, false when we should restore the host state and return to the
+- * main run loop.
++ * Prologue for the guest fixup, populating ESR_EL2 and fixing up PC
++ * if required.
+  */
+-static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
++static inline void fixup_guest_exit_prologue(struct kvm_vcpu *vcpu,
++					     u64 *exit_code)
+ {
+ 	if (ARM_EXCEPTION_CODE(*exit_code) != ARM_EXCEPTION_IRQ)
+ 		vcpu->arch.fault.esr_el2 = read_sysreg_el2(SYS_ESR);
+@@ -430,7 +430,15 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 		if (esr_ec == ESR_ELx_EC_HVC32 || esr_ec == ESR_ELx_EC_HVC64)
+ 			write_sysreg_el2(read_sysreg_el2(SYS_ELR) - 4, SYS_ELR);
+ 	}
++}
  
- 	return -EINVAL;
- }
-+
-+#define FEATURE(x)	(GENMASK_ULL(x##_SHIFT + 3, x##_SHIFT))
-+
 +/*
-+ * Our emulated CPU doesn't support all the possible features. For the
-+ * sake of simplicity (and probably mental sanity), wipe out a number
-+ * of feature bits we don't intend to support for the time being.
-+ * This list should get updated as new features get added to the NV
-+ * support, and new extension to the architecture.
++ * Return true when we were able to fixup the guest exit and should return to
++ * the guest, false when we should restore the host state and return to the
++ * main run loop.
 + */
-+void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
-+			  const struct sys_reg_desc *r)
++static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
 +{
-+	u32 id = sys_reg((u32)r->Op0, (u32)r->Op1,
-+			 (u32)r->CRn, (u32)r->CRm, (u32)r->Op2);
-+	u64 val, tmp;
+ 	/*
+ 	 * We're using the raw exception code in order to only process
+ 	 * the trap if no SError is pending. We will come back to the
+diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+index 92715fa01e88..1931c8667d52 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
++++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+@@ -51,32 +51,12 @@ static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
+ 	ctxt_sys_reg(ctxt, SPSR_EL1)	= read_sysreg_el1(SYS_SPSR);
+ }
+ 
+-static inline u64 from_hw_pstate(const struct kvm_cpu_context *ctxt)
+-{
+-	u64 reg = read_sysreg_el2(SYS_SPSR);
+-
+-	if (__is_hyp_ctxt(ctxt)) {
+-		u64 mode = reg & (PSR_MODE_MASK | PSR_MODE32_BIT);
+-
+-		switch (mode) {
+-		case PSR_MODE_EL1t:
+-			mode = PSR_MODE_EL2t;
+-			break;
+-		case PSR_MODE_EL1h:
+-			mode = PSR_MODE_EL2h;
+-			break;
+-		}
+-
+-		return (reg & ~(PSR_MODE_MASK | PSR_MODE32_BIT)) | mode;
+-	}
+-
+-	return reg;
+-}
+-
+ static inline void __sysreg_save_el2_return_state(struct kvm_cpu_context *ctxt)
+ {
++	/* On VHE, PSTATE is saved in fixup_guest_exit_vhe() */
++	if (!has_vhe())
++		ctxt->regs.pstate 	= read_sysreg_el2(SYS_SPSR);
+ 	ctxt->regs.pc			= read_sysreg_el2(SYS_ELR);
+-	ctxt->regs.pstate		= from_hw_pstate(ctxt);
+ 
+ 	if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN))
+ 		ctxt_sys_reg(ctxt, DISR_EL1) = read_sysreg_s(SYS_VDISR_EL2);
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index 07bf5c03631b..fb49757d3446 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -166,6 +166,12 @@ static void __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
+ 		write_sysreg(pmu->events_host, pmcntenset_el0);
+ }
+ 
++static bool fixup_guest_exit_nvhe(struct kvm_vcpu *vcpu, u64 *exit_code)
++{
++	fixup_guest_exit_prologue(vcpu, exit_code);
++	return fixup_guest_exit(vcpu, exit_code);
++}
 +
-+	if (!nested_virt_in_use(v))
-+		return;
+ /* Switch to the guest for legacy non-VHE systems */
+ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ {
+@@ -219,7 +225,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ 		exit_code = __guest_enter(vcpu);
+ 
+ 		/* And we're baaack! */
+-	} while (fixup_guest_exit(vcpu, &exit_code));
++	} while (fixup_guest_exit_nvhe(vcpu, &exit_code));
+ 
+ 	__sysreg_save_state_nvhe(guest_ctxt);
+ 	__sysreg32_save_state(vcpu);
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index d9dc470c7790..4d80596e32a5 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -156,12 +156,60 @@ void deactivate_traps_vhe_put(void)
+ 	__deactivate_traps_common();
+ }
+ 
++static bool fixup_guest_exit_vhe(struct kvm_vcpu *vcpu, u64 *exit_code,
++				 bool hyp_ctxt)
++{
++	u64 pstate = read_sysreg_el2(SYS_SPSR);
 +
-+	val = p->regval;
++	/*
++	 * Sync pstate back as early as possible, so that is_hyp_ctxt()
++	 * reflects the exact context. It is otherwise possible to get
++	 * confused with a VHE guest and ARMv8.4-NV, such as:
++	 *
++	 * (1) enter guest in host EL0
++	 * (2) guest traps to guest vEL2 (no hypervisor intervention)
++	 * (3) guest clears virtual HCR_EL2.TGE (no trap either)
++	 * (4) host interrupt fires, exit
++	 * (5) is_hyp_ctxt() now says "guest" (pstate.M==EL1 and TGE==0)
++	 *
++	 * If host preemption occurs, vcpu_load/put() will be very confused.
++	 *
++	 * Consider this as the prologue before the fixup prologue...
++	 */
 +
-+	switch (id) {
-+	case SYS_ID_AA64ISAR0_EL1:
-+		/* Support everything but O.S. and Range TLBIs */
-+		val &= ~(FEATURE(ID_AA64ISAR0_TLB)	|
-+			 GENMASK_ULL(27, 24)		|
-+			 GENMASK_ULL(3, 0));
-+		break;
++	if (unlikely(hyp_ctxt)) {
++		u64 mode = pstate & PSR_MODE_MASK;
 +
-+	case SYS_ID_AA64ISAR1_EL1:
-+		/* Support everything but PtrAuth and Spec Invalidation */
-+		val &= ~(GENMASK_ULL(63, 56)		|
-+			 FEATURE(ID_AA64ISAR1_SPECRES)	|
-+			 FEATURE(ID_AA64ISAR1_GPI)	|
-+			 FEATURE(ID_AA64ISAR1_GPA)	|
-+			 FEATURE(ID_AA64ISAR1_API)	|
-+			 FEATURE(ID_AA64ISAR1_APA));
-+		break;
-+
-+	case SYS_ID_AA64PFR0_EL1:
-+		/* No AMU, MPAM, S-EL2, RAS or SVE */
-+		val &= ~(GENMASK_ULL(55, 52)		|
-+			 FEATURE(ID_AA64PFR0_AMU)	|
-+			 FEATURE(ID_AA64PFR0_MPAM)	|
-+			 FEATURE(ID_AA64PFR0_SEL2)	|
-+			 FEATURE(ID_AA64PFR0_RAS)	|
-+			 FEATURE(ID_AA64PFR0_SVE)	|
-+			 FEATURE(ID_AA64PFR0_EL2));
-+		/* 64bit EL2 only */
-+		val |= FIELD_PREP(FEATURE(ID_AA64PFR0_EL2), 0b0001);
-+		break;
-+
-+	case SYS_ID_AA64PFR1_EL1:
-+		/* Only support SSBS */
-+		val &= FEATURE(ID_AA64PFR1_SSBS);
-+		break;
-+
-+	case SYS_ID_AA64MMFR0_EL1:
-+		/* Hide ECV, FGT, ExS, Secure Memory */
-+		val &= ~(GENMASK_ULL(63, 43)			|
-+			 FEATURE(ID_AA64MMFR0_TGRAN4_2)		|
-+			 FEATURE(ID_AA64MMFR0_TGRAN16_2)	|
-+			 FEATURE(ID_AA64MMFR0_TGRAN64_2)	|
-+			 FEATURE(ID_AA64MMFR0_SNSMEM));
-+
-+		/* Disallow unsupported S2 page sizes */
-+		switch (PAGE_SIZE) {
-+		case SZ_64K:
-+			val |= FIELD_PREP(FEATURE(ID_AA64MMFR0_TGRAN16_2), 0b0001);
-+			/* Fall through */
-+		case SZ_16K:
-+			val |= FIELD_PREP(FEATURE(ID_AA64MMFR0_TGRAN4_2), 0b0001);
-+			/* Fall through */
-+		case SZ_4K:
-+			/* Support everything */
++		switch (mode) {
++		case PSR_MODE_EL1t:
++			mode = PSR_MODE_EL2t;
++			break;
++		case PSR_MODE_EL1h:
++			mode = PSR_MODE_EL2h;
 +			break;
 +		}
-+		/* Advertize supported S2 page sizes */
-+		switch (PAGE_SIZE) {
-+		case SZ_4K:
-+			val |= FIELD_PREP(FEATURE(ID_AA64MMFR0_TGRAN4_2), 0b0010);
-+			/* Fall through */
-+		case SZ_16K:
-+			val |= FIELD_PREP(FEATURE(ID_AA64MMFR0_TGRAN16_2), 0b0010);
-+			/* Fall through */
-+		case SZ_64K:
-+			val |= FIELD_PREP(FEATURE(ID_AA64MMFR0_TGRAN64_2), 0b0010);
-+			break;
-+		}
-+		/* Cap PARange to 40bits */
-+		tmp = FIELD_GET(FEATURE(ID_AA64MMFR0_PARANGE), val);
-+		if (tmp > 0b0010) {
-+			val &= ~FEATURE(ID_AA64MMFR0_PARANGE);
-+			val |= FIELD_PREP(FEATURE(ID_AA64MMFR0_PARANGE), 0b0010);
-+		}
-+		break;
 +
-+	case SYS_ID_AA64MMFR1_EL1:
-+		val &= (FEATURE(ID_AA64MMFR1_PAN)	|
-+			FEATURE(ID_AA64MMFR1_LOR)	|
-+			FEATURE(ID_AA64MMFR1_HPD)	|
-+			FEATURE(ID_AA64MMFR1_VHE)	|
-+			FEATURE(ID_AA64MMFR1_VMIDBITS));
-+		break;
-+
-+	case SYS_ID_AA64MMFR2_EL1:
-+		val &= ~(FEATURE(ID_AA64MMFR2_EVT)	|
-+			 FEATURE(ID_AA64MMFR2_BBM)	|
-+			 FEATURE(ID_AA64MMFR2_TTL)	|
-+			 GENMASK_ULL(47, 44)		|
-+			 FEATURE(ID_AA64MMFR2_ST)	|
-+			 FEATURE(ID_AA64MMFR2_CCIDX)	|
-+			 FEATURE(ID_AA64MMFR2_LVA));
-+
-+		/* Force TTL support */
-+		val |= FIELD_PREP(FEATURE(ID_AA64MMFR2_TTL), 0b0001);
-+		break;
-+
-+	case SYS_ID_AA64DFR0_EL1:
-+		/* Only limited support for PMU, Debug, BPs and WPs */
-+		val &= (FEATURE(ID_AA64DFR0_PMSVER)	|
-+			FEATURE(ID_AA64DFR0_WRPS)	|
-+			FEATURE(ID_AA64DFR0_BRPS)	|
-+			FEATURE(ID_AA64DFR0_DEBUGVER));
-+
-+		/* Cap PMU to ARMv8.1 */
-+		tmp = FIELD_GET(FEATURE(ID_AA64DFR0_PMUVER), val);
-+		if (tmp > 0b0100) {
-+			val &= ~FEATURE(ID_AA64DFR0_PMUVER);
-+			val |= FIELD_PREP(FEATURE(ID_AA64DFR0_PMUVER), 0b0100);
-+		}
-+		/* Cap Debug to ARMv8.1 */
-+		tmp = FIELD_GET(FEATURE(ID_AA64DFR0_DEBUGVER), val);
-+		if (tmp > 0b0111) {
-+			val &= ~FEATURE(ID_AA64DFR0_DEBUGVER);
-+			val |= FIELD_PREP(FEATURE(ID_AA64DFR0_DEBUGVER), 0b0111);
-+		}
-+		break;
-+
-+	default:
-+		/* Unknown register, just wipe it clean */
-+		val = 0;
-+		break;
++		pstate = (pstate & ~PSR_MODE_MASK) | mode;
 +	}
 +
-+	p->regval = val;
++	*vcpu_cpsr(vcpu) = pstate;
++
++	fixup_guest_exit_prologue(vcpu, exit_code);
++
++	if (*exit_code == ARM_EXCEPTION_TRAP) {
++		/* more to come here */
++	}
++
++	return fixup_guest_exit(vcpu, exit_code);
 +}
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 80cf0c0761b9..d011b8156c52 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1372,8 +1372,10 @@ static bool access_id_reg(struct kvm_vcpu *vcpu,
- 			  const struct sys_reg_desc *r)
++
+ /* Switch to the guest for VHE systems running in EL2 */
+ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
  {
- 	bool raz = sysreg_visible_as_raz(vcpu, r);
-+	bool ret = __access_id_reg(vcpu, p, r, raz);
+ 	struct kvm_cpu_context *host_ctxt;
+ 	struct kvm_cpu_context *guest_ctxt;
+ 	u64 exit_code;
++	bool hyp_ctxt;
  
--	return __access_id_reg(vcpu, p, r, raz);
-+	access_nested_id_reg(vcpu, p, r);
-+	return ret;
- }
+ 	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+ 	host_ctxt->__hyp_running_vcpu = vcpu;
+@@ -188,12 +236,19 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+ 	sysreg_restore_guest_state_vhe(guest_ctxt);
+ 	__debug_switch_to_guest(vcpu);
  
- static bool access_raz_id_reg(struct kvm_vcpu *vcpu,
++	/*
++	 * Being in HYP context or not is an invariant here. If we enter in
++	 * a given context, we exit in the same context. We can thus only
++	 * sample the context once.
++	 */
++	WRITE_ONCE(hyp_ctxt, is_hyp_ctxt(vcpu));
++
+ 	do {
+ 		/* Jump in the fire! */
+ 		exit_code = __guest_enter(vcpu);
+ 
+ 		/* And we're baaack! */
+-	} while (fixup_guest_exit(vcpu, &exit_code));
++	} while (fixup_guest_exit_vhe(vcpu, &exit_code, READ_ONCE(hyp_ctxt)));
+ 
+ 	sysreg_save_guest_state_vhe(guest_ctxt);
+ 
 -- 
 2.29.2
 
