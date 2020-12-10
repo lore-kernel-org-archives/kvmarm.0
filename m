@@ -2,58 +2,56 @@ Return-Path: <SRS0=L5kI=FO=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.2 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE056C4361B
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 16:00:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82633C4361B
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 16:03:33 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 27C9823E24
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 16:00:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27C9823E24
+	by mail.kernel.org (Postfix) with ESMTP id E1B4723E1D
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 16:03:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1B4723E1D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B47DC4B1B3;
-	Thu, 10 Dec 2020 11:00:56 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F7FA4B213;
+	Thu, 10 Dec 2020 11:03:32 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id sz-W6l2is4Fr; Thu, 10 Dec 2020 11:00:51 -0500 (EST)
+	with ESMTP id 11eu7n66rWPQ; Thu, 10 Dec 2020 11:03:26 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C8C544B213;
-	Thu, 10 Dec 2020 11:00:46 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B4B514B1A5;
+	Thu, 10 Dec 2020 11:03:26 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 78D024B1DD
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 11:00:45 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CA7C34B179
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 11:03:25 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HC5TWVKtZqdw for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Dec 2020 11:00:40 -0500 (EST)
+ with ESMTP id aggGi39CxVGV for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Dec 2020 11:03:24 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2850B4B1ED
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 11:00:37 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1C7574B122
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 11:03:24 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 5F13323E1F;
- Thu, 10 Dec 2020 16:00:36 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id DEFA523D50;
+ Thu, 10 Dec 2020 16:03:22 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1knOMs-0008Di-Go; Thu, 10 Dec 2020 16:00:34 +0000
+ id 1knONO-0008Di-JC; Thu, 10 Dec 2020 16:01:06 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v3 07/66] KVM: arm64: nv: Handle HCR_EL2.NV system register
- traps
-Date: Thu, 10 Dec 2020 15:59:03 +0000
-Message-Id: <20201210160002.1407373-8-maz@kernel.org>
+Subject: [PATCH v3 35/66] KVM: arm64: nv: Handle shadow stage 2 page faults
+Date: Thu, 10 Dec 2020 15:59:31 +0000
+Message-Id: <20201210160002.1407373-36-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201210160002.1407373-1-maz@kernel.org>
 References: <20201210160002.1407373-1-maz@kernel.org>
@@ -63,11 +61,12 @@ X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org,
  kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com,
  christoffer.dall@arm.com, jintack@cs.columbia.edu, alexandru.elisei@arm.com,
  james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
- kernel-team@android.com, jintack.lim@linaro.org
+ kernel-team@android.com, christoffer.dall@linaro.org, jintack.lim@linaro.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
 Cc: kernel-team@android.com, Andre Przywara <andre.przywara@arm.com>,
+ Christoffer Dall <christoffer.dall@linaro.org>,
  Jintack Lim <jintack.lim@linaro.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -85,268 +84,342 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Jintack Lim <jintack.lim@linaro.org>
+If we are faulting on a shadow stage 2 translation, we first walk the
+guest hypervisor's stage 2 page table to see if it has a mapping. If
+not, we inject a stage 2 page fault to the virtual EL2. Otherwise, we
+create a mapping in the shadow stage 2 page table.
 
-ARM v8.3 introduces a new bit in the HCR_EL2, which is the NV bit. When
-this bit is set, accessing EL2 registers in EL1 traps to EL2. In
-addition, executing the following instructions in EL1 will trap to EL2:
-tlbi, at, eret, and msr/mrs instructions to access SP_EL1. Most of the
-instructions that trap to EL2 with the NV bit were undef at EL1 prior to
-ARM v8.3. The only instruction that was not undef is eret.
+Note that we have to deal with two IPAs when we got a shadow stage 2
+page fault. One is the address we faulted on, and is in the L2 guest
+phys space. The other is from the guest stage-2 page table walk, and is
+in the L1 guest phys space.  To differentiate them, we rename variables
+so that fault_ipa is used for the former and ipa is used for the latter.
 
-This patch sets up a handler for EL2 registers and SP_EL1 register
-accesses at EL1. The host hypervisor keeps those register values in
-memory, and will emulate their behavior.
-
-This patch doesn't set the NV bit yet. It will be set in a later patch
-once nested virtualization support is completed.
-
+Co-developed-by: Christoffer Dall <christoffer.dall@linaro.org>
+Co-developed-by: Jintack Lim <jintack.lim@linaro.org>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
-[maz: added SCTLR_EL2 RES0/RES1 handling]
+[maz: rewrote this multiple times...]
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/sysreg.h |  44 ++++++++++++-
- arch/arm64/kvm/sys_regs.c       | 112 ++++++++++++++++++++++++++++++--
- 2 files changed, 150 insertions(+), 6 deletions(-)
+ arch/arm64/include/asm/kvm_emulate.h |  6 ++
+ arch/arm64/include/asm/kvm_nested.h  | 18 ++++++
+ arch/arm64/kvm/mmu.c                 | 93 ++++++++++++++++++++++------
+ arch/arm64/kvm/nested.c              | 39 ++++++++++++
+ 4 files changed, 138 insertions(+), 18 deletions(-)
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 82521cdbfc1c..05b49eafbb49 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -469,19 +469,50 @@
- 
- #define SYS_PMCCFILTR_EL0		sys_reg(3, 3, 14, 15, 7)
- 
-+#define SYS_VPIDR_EL2			sys_reg(3, 4, 0, 0, 0)
-+#define SYS_VMPIDR_EL2			sys_reg(3, 4, 0, 0, 5)
-+
- #define SYS_SCTLR_EL2			sys_reg(3, 4, 1, 0, 0)
-+#define SYS_ACTLR_EL2			sys_reg(3, 4, 1, 0, 1)
-+#define SYS_HCR_EL2			sys_reg(3, 4, 1, 1, 0)
-+#define SYS_MDCR_EL2			sys_reg(3, 4, 1, 1, 1)
-+#define SYS_CPTR_EL2			sys_reg(3, 4, 1, 1, 2)
-+#define SYS_HSTR_EL2			sys_reg(3, 4, 1, 1, 3)
-+#define SYS_HACR_EL2			sys_reg(3, 4, 1, 1, 7)
-+
- #define SYS_ZCR_EL2			sys_reg(3, 4, 1, 2, 0)
-+
-+#define SYS_TTBR0_EL2			sys_reg(3, 4, 2, 0, 0)
-+#define SYS_TTBR1_EL2			sys_reg(3, 4, 2, 0, 1)
-+#define SYS_TCR_EL2			sys_reg(3, 4, 2, 0, 2)
-+#define SYS_VTTBR_EL2			sys_reg(3, 4, 2, 1, 0)
-+#define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
-+
- #define SYS_DACR32_EL2			sys_reg(3, 4, 3, 0, 0)
-+
- #define SYS_SPSR_EL2			sys_reg(3, 4, 4, 0, 0)
- #define SYS_ELR_EL2			sys_reg(3, 4, 4, 0, 1)
-+#define SYS_SP_EL1			sys_reg(3, 4, 4, 1, 0)
-+
- #define SYS_IFSR32_EL2			sys_reg(3, 4, 5, 0, 1)
-+#define SYS_AFSR0_EL2			sys_reg(3, 4, 5, 1, 0)
-+#define SYS_AFSR1_EL2			sys_reg(3, 4, 5, 1, 1)
- #define SYS_ESR_EL2			sys_reg(3, 4, 5, 2, 0)
- #define SYS_VSESR_EL2			sys_reg(3, 4, 5, 2, 3)
- #define SYS_FPEXC32_EL2			sys_reg(3, 4, 5, 3, 0)
- #define SYS_TFSR_EL2			sys_reg(3, 4, 5, 6, 0)
- #define SYS_FAR_EL2			sys_reg(3, 4, 6, 0, 0)
- 
--#define SYS_VDISR_EL2			sys_reg(3, 4, 12, 1,  1)
-+#define SYS_FAR_EL2			sys_reg(3, 4, 6, 0, 0)
-+#define SYS_HPFAR_EL2			sys_reg(3, 4, 6, 0, 4)
-+
-+#define SYS_MAIR_EL2			sys_reg(3, 4, 10, 2, 0)
-+#define SYS_AMAIR_EL2			sys_reg(3, 4, 10, 3, 0)
-+
-+#define SYS_VBAR_EL2			sys_reg(3, 4, 12, 0, 0)
-+#define SYS_RVBAR_EL2			sys_reg(3, 4, 12, 0, 1)
-+#define SYS_RMR_EL2			sys_reg(3, 4, 12, 0, 2)
-+#define SYS_VDISR_EL2			sys_reg(3, 4, 12, 1, 1)
- #define __SYS__AP0Rx_EL2(x)		sys_reg(3, 4, 12, 8, x)
- #define SYS_ICH_AP0R0_EL2		__SYS__AP0Rx_EL2(0)
- #define SYS_ICH_AP0R1_EL2		__SYS__AP0Rx_EL2(1)
-@@ -523,15 +554,24 @@
- #define SYS_ICH_LR14_EL2		__SYS__LR8_EL2(6)
- #define SYS_ICH_LR15_EL2		__SYS__LR8_EL2(7)
- 
-+#define SYS_CONTEXTIDR_EL2		sys_reg(3, 4, 13, 0, 1)
-+#define SYS_TPIDR_EL2			sys_reg(3, 4, 13, 0, 2)
-+
-+#define SYS_CNTVOFF_EL2			sys_reg(3, 4, 14, 0, 3)
-+#define SYS_CNTHCTL_EL2			sys_reg(3, 4, 14, 1, 0)
-+
- /* VHE encodings for architectural EL0/1 system registers */
- #define SYS_SCTLR_EL12			sys_reg(3, 5, 1, 0, 0)
- #define SYS_CPACR_EL12			sys_reg(3, 5, 1, 0, 2)
- #define SYS_ZCR_EL12			sys_reg(3, 5, 1, 2, 0)
-+
- #define SYS_TTBR0_EL12			sys_reg(3, 5, 2, 0, 0)
- #define SYS_TTBR1_EL12			sys_reg(3, 5, 2, 0, 1)
- #define SYS_TCR_EL12			sys_reg(3, 5, 2, 0, 2)
-+
- #define SYS_SPSR_EL12			sys_reg(3, 5, 4, 0, 0)
- #define SYS_ELR_EL12			sys_reg(3, 5, 4, 0, 1)
-+
- #define SYS_AFSR0_EL12			sys_reg(3, 5, 5, 1, 0)
- #define SYS_AFSR1_EL12			sys_reg(3, 5, 5, 1, 1)
- #define SYS_ESR_EL12			sys_reg(3, 5, 5, 2, 0)
-@@ -549,6 +589,8 @@
- #define SYS_CNTV_CTL_EL02		sys_reg(3, 5, 14, 3, 1)
- #define SYS_CNTV_CVAL_EL02		sys_reg(3, 5, 14, 3, 2)
- 
-+#define SYS_SP_EL2			sys_reg(3, 6,  4, 1, 0)
-+
- /* Common SCTLR_ELx flags. */
- #define SCTLR_ELx_DSSBS	(BIT(44))
- #define SCTLR_ELx_ATA	(BIT(43))
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 3313dedfa505..c049867a39bc 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -104,6 +104,57 @@ static u32 get_ccsidr(u32 csselr)
- 	return ccsidr;
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index a000e6e05091..b447817d9dee 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -586,4 +586,10 @@ static __always_inline void kvm_incr_pc(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.flags |= KVM_ARM64_INCREMENT_PC;
  }
  
-+static bool access_rw(struct kvm_vcpu *vcpu,
-+		      struct sys_reg_params *p,
-+		      const struct sys_reg_desc *r)
++static inline bool kvm_is_shadow_s2_fault(struct kvm_vcpu *vcpu)
 +{
-+	if (p->is_write)
-+		vcpu_write_sys_reg(vcpu, p->regval, r->reg);
-+	else
-+		p->regval = vcpu_read_sys_reg(vcpu, r->reg);
-+
-+	return true;
++	return (vcpu->arch.hw_mmu != &vcpu->kvm->arch.mmu &&
++		vcpu->arch.hw_mmu->nested_stage2_enabled);
 +}
 +
-+static bool access_wi(struct kvm_vcpu *vcpu,
-+		      struct sys_reg_params *p,
-+		      const struct sys_reg_desc *r)
-+{
-+	if (p->is_write)
-+		return ignore_write(vcpu, p);
-+
-+	p->regval = vcpu_read_sys_reg(vcpu, r->reg);
-+	return true;
-+}
-+
-+static bool access_sctlr_el2(struct kvm_vcpu *vcpu,
-+			     struct sys_reg_params *p,
-+			     const struct sys_reg_desc *r)
-+{
-+	if (p->is_write) {
-+		u64 val = p->regval;
-+
-+		if (vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu)) {
-+			val &= ~(GENMASK_ULL(63,45) | GENMASK_ULL(34, 32) |
-+				 BIT_ULL(17));
-+			val |=  SCTLR_EL1_RES1;
-+		} else {
-+			val &= ~(GENMASK_ULL(63,45) | BIT_ULL(42) |
-+				 GENMASK_ULL(39, 38) | GENMASK_ULL(35, 32) |
-+				 BIT_ULL(26) | BIT_ULL(24) | BIT_ULL(20) |
-+				 BIT_ULL(17) | GENMASK_ULL(15, 14) |
-+				 GENMASK(10, 7));
-+			val |=  SCTLR_EL2_RES1;
-+		}
-+
-+		vcpu_write_sys_reg(vcpu, val, r->reg);
-+	} else {
-+		p->regval = vcpu_read_sys_reg(vcpu, r->reg);
-+	}
-+
-+	return true;
-+}
-+
- /*
-  * See note at ARMv7 ARM B1.14.4 (TL;DR: S/W ops are not easily virtualized).
-  */
-@@ -342,12 +393,9 @@ static bool trap_debug_regs(struct kvm_vcpu *vcpu,
- 			    struct sys_reg_params *p,
- 			    const struct sys_reg_desc *r)
- {
--	if (p->is_write) {
--		vcpu_write_sys_reg(vcpu, p->regval, r->reg);
-+	access_rw(vcpu, p, r);
-+	if (p->is_write)
- 		vcpu->arch.flags |= KVM_ARM64_DEBUG_DIRTY;
--	} else {
--		p->regval = vcpu_read_sys_reg(vcpu, r->reg);
--	}
- 
- 	trace_trap_reg(__func__, r->reg, p->is_write, p->regval);
- 
-@@ -1314,6 +1362,18 @@ static bool access_ccsidr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 	.set_user = set_raz_id_reg,		\
- }
- 
-+static bool access_sp_el1(struct kvm_vcpu *vcpu,
-+			  struct sys_reg_params *p,
-+			  const struct sys_reg_desc *r)
-+{
-+	if (p->is_write)
-+		__vcpu_sys_reg(vcpu, SP_EL1) = p->regval;
-+	else
-+		p->regval = __vcpu_sys_reg(vcpu, SP_EL1);
-+
-+	return true;
-+}
-+
- /*
-  * Architected system registers.
-  * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
-@@ -1692,9 +1752,51 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	 */
- 	{ SYS_DESC(SYS_PMCCFILTR_EL0), access_pmu_evtyper, reset_val, PMCCFILTR_EL0, 0 },
- 
-+	{ SYS_DESC(SYS_VPIDR_EL2), access_rw, reset_val, VPIDR_EL2, 0 },
-+	{ SYS_DESC(SYS_VMPIDR_EL2), access_rw, reset_val, VMPIDR_EL2, 0 },
-+
-+	{ SYS_DESC(SYS_SCTLR_EL2), access_sctlr_el2, reset_val, SCTLR_EL2, SCTLR_EL2_RES1 },
-+	{ SYS_DESC(SYS_ACTLR_EL2), access_rw, reset_val, ACTLR_EL2, 0 },
-+	{ SYS_DESC(SYS_HCR_EL2), access_rw, reset_val, HCR_EL2, 0 },
-+	{ SYS_DESC(SYS_MDCR_EL2), access_rw, reset_val, MDCR_EL2, 0 },
-+	{ SYS_DESC(SYS_CPTR_EL2), access_rw, reset_val, CPTR_EL2, CPTR_EL2_RES1 },
-+	{ SYS_DESC(SYS_HSTR_EL2), access_rw, reset_val, HSTR_EL2, 0 },
-+	{ SYS_DESC(SYS_HACR_EL2), access_rw, reset_val, HACR_EL2, 0 },
-+
-+	{ SYS_DESC(SYS_TTBR0_EL2), access_rw, reset_val, TTBR0_EL2, 0 },
-+	{ SYS_DESC(SYS_TTBR1_EL2), access_rw, reset_val, TTBR1_EL2, 0 },
-+	{ SYS_DESC(SYS_TCR_EL2), access_rw, reset_val, TCR_EL2, TCR_EL2_RES1 },
-+	{ SYS_DESC(SYS_VTTBR_EL2), access_rw, reset_val, VTTBR_EL2, 0 },
-+	{ SYS_DESC(SYS_VTCR_EL2), access_rw, reset_val, VTCR_EL2, 0 },
-+
- 	{ SYS_DESC(SYS_DACR32_EL2), NULL, reset_unknown, DACR32_EL2 },
-+	{ SYS_DESC(SYS_SPSR_EL2), access_rw, reset_val, SPSR_EL2, 0 },
-+	{ SYS_DESC(SYS_ELR_EL2), access_rw, reset_val, ELR_EL2, 0 },
-+	{ SYS_DESC(SYS_SP_EL1), access_sp_el1},
-+
- 	{ SYS_DESC(SYS_IFSR32_EL2), NULL, reset_unknown, IFSR32_EL2 },
-+	{ SYS_DESC(SYS_AFSR0_EL2), access_rw, reset_val, AFSR0_EL2, 0 },
-+	{ SYS_DESC(SYS_AFSR1_EL2), access_rw, reset_val, AFSR1_EL2, 0 },
-+	{ SYS_DESC(SYS_ESR_EL2), access_rw, reset_val, ESR_EL2, 0 },
- 	{ SYS_DESC(SYS_FPEXC32_EL2), NULL, reset_val, FPEXC32_EL2, 0x700 },
-+
-+	{ SYS_DESC(SYS_FAR_EL2), access_rw, reset_val, FAR_EL2, 0 },
-+	{ SYS_DESC(SYS_HPFAR_EL2), access_rw, reset_val, HPFAR_EL2, 0 },
-+
-+	{ SYS_DESC(SYS_MAIR_EL2), access_rw, reset_val, MAIR_EL2, 0 },
-+	{ SYS_DESC(SYS_AMAIR_EL2), access_rw, reset_val, AMAIR_EL2, 0 },
-+
-+	{ SYS_DESC(SYS_VBAR_EL2), access_rw, reset_val, VBAR_EL2, 0 },
-+	{ SYS_DESC(SYS_RVBAR_EL2), access_rw, reset_val, RVBAR_EL2, 0 },
-+	{ SYS_DESC(SYS_RMR_EL2), access_wi, reset_val, RMR_EL2, 1 },
-+
-+	{ SYS_DESC(SYS_CONTEXTIDR_EL2), access_rw, reset_val, CONTEXTIDR_EL2, 0 },
-+	{ SYS_DESC(SYS_TPIDR_EL2), access_rw, reset_val, TPIDR_EL2, 0 },
-+
-+	{ SYS_DESC(SYS_CNTVOFF_EL2), access_rw, reset_val, CNTVOFF_EL2, 0 },
-+	{ SYS_DESC(SYS_CNTHCTL_EL2), access_rw, reset_val, CNTHCTL_EL2, 0 },
-+
-+	{ SYS_DESC(SYS_SP_EL2), NULL, reset_unknown, SP_EL2 },
+ #endif /* __ARM64_KVM_EMULATE_H__ */
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index b784d7891851..4f93a5dab183 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -78,9 +78,27 @@ struct kvm_s2_trans {
+ 	u64 upper_attr;
  };
  
- static bool trap_dbgidr(struct kvm_vcpu *vcpu,
++static inline phys_addr_t kvm_s2_trans_output(struct kvm_s2_trans *trans)
++{
++	return trans->output;
++}
++
++static inline unsigned long kvm_s2_trans_size(struct kvm_s2_trans *trans)
++{
++	return trans->block_size;
++}
++
++static inline u32 kvm_s2_trans_esr(struct kvm_s2_trans *trans)
++{
++	return trans->esr;
++}
++
+ extern int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
+ 			      struct kvm_s2_trans *result);
+ 
++extern int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu,
++				    struct kvm_s2_trans *trans);
++extern int kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u64 esr_el2);
+ int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
+ extern bool __forward_traps(struct kvm_vcpu *vcpu, unsigned int reg,
+ 			    u64 control_bit);
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 2f0302211af3..aa8e2ed7acfe 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -699,7 +699,7 @@ static bool fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
+ static unsigned long
+ transparent_hugepage_adjust(struct kvm_memory_slot *memslot,
+ 			    unsigned long hva, kvm_pfn_t *pfnp,
+-			    phys_addr_t *ipap)
++			    phys_addr_t *ipap, phys_addr_t *fault_ipap)
+ {
+ 	kvm_pfn_t pfn = *pfnp;
+ 
+@@ -728,6 +728,7 @@ transparent_hugepage_adjust(struct kvm_memory_slot *memslot,
+ 		 * to PG_head and switch the pfn from a tail page to the head
+ 		 * page accordingly.
+ 		 */
++		*fault_ipap &= PMD_MASK;
+ 		*ipap &= PMD_MASK;
+ 		kvm_release_pfn_clean(pfn);
+ 		pfn &= ~(PTRS_PER_PMD - 1);
+@@ -742,14 +743,16 @@ transparent_hugepage_adjust(struct kvm_memory_slot *memslot,
+ }
+ 
+ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+-			  struct kvm_memory_slot *memslot, unsigned long hva,
+-			  unsigned long fault_status)
++			  struct kvm_s2_trans *nested,
++			  struct kvm_memory_slot *memslot,
++			  unsigned long hva, unsigned long fault_status)
+ {
+ 	int ret = 0;
+-	bool write_fault, writable, force_pte = false;
++	bool write_fault, writable;
+ 	bool exec_fault;
+ 	bool device = false;
+ 	unsigned long mmu_seq;
++	phys_addr_t ipa = fault_ipa;
+ 	struct kvm *kvm = vcpu->kvm;
+ 	struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
+ 	struct vm_area_struct *vma;
+@@ -760,6 +763,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	unsigned long vma_pagesize;
+ 	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
+ 	struct kvm_pgtable *pgt;
++	unsigned long max_map_size = PUD_SIZE;
+ 
+ 	write_fault = kvm_is_write_fault(vcpu);
+ 	exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu);
+@@ -786,7 +790,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 
+ 	if (logging_active ||
+ 	    (vma->vm_flags & VM_PFNMAP)) {
+-		force_pte = true;
++		max_map_size = vma_pagesize = PAGE_SIZE;
+ 		vma_shift = PAGE_SHIFT;
+ 	}
+ 
+@@ -806,7 +810,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 		fallthrough;
+ 	case CONT_PTE_SHIFT:
+ 		vma_shift = PAGE_SHIFT;
+-		force_pte = true;
++		max_map_size = PAGE_SIZE;
+ 		fallthrough;
+ 	case PAGE_SHIFT:
+ 		break;
+@@ -815,10 +819,25 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	}
+ 
+ 	vma_pagesize = 1UL << vma_shift;
++
++	if (kvm_is_shadow_s2_fault(vcpu)) {
++		ipa = kvm_s2_trans_output(nested);
++
++		/*
++		 * If we're about to create a shadow stage 2 entry, then we
++		 * can only create a block mapping if the guest stage 2 page
++		 * table uses at least as big a mapping.
++		 */
++		max_map_size = min(kvm_s2_trans_size(nested), max_map_size);
++	}
++
++	vma_pagesize = min(vma_pagesize, max_map_size);
++
+ 	if (vma_pagesize == PMD_SIZE || vma_pagesize == PUD_SIZE)
+ 		fault_ipa &= ~(vma_pagesize - 1);
+ 
+-	gfn = fault_ipa >> PAGE_SHIFT;
++	gfn = ipa >> PAGE_SHIFT;
++
+ 	mmap_read_unlock(current->mm);
+ 
+ 	/*
+@@ -856,7 +875,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 
+ 	if (kvm_is_device_pfn(pfn)) {
+ 		device = true;
+-		force_pte = true;
++		max_map_size = PAGE_SIZE;
+ 	} else if (logging_active && !write_fault) {
+ 		/*
+ 		 * Only actually map the page as writable if this was a write
+@@ -877,9 +896,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	 * If we are not forced to use page mapping, check if we are
+ 	 * backed by a THP and thus use block mapping if possible.
+ 	 */
+-	if (vma_pagesize == PAGE_SIZE && !force_pte)
+-		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
+-							   &pfn, &fault_ipa);
++	if (vma_pagesize == PAGE_SIZE && max_map_size >= PMD_SIZE)
++		vma_pagesize = transparent_hugepage_adjust(memslot, hva, &pfn,
++							   &ipa, &fault_ipa);
+ 	if (writable) {
+ 		prot |= KVM_PGTABLE_PROT_W;
+ 		kvm_set_pfn_dirty(pfn);
+@@ -947,8 +966,10 @@ static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ {
+ 	unsigned long fault_status;
+-	phys_addr_t fault_ipa;
++	phys_addr_t fault_ipa; /* The address we faulted on */
++	phys_addr_t ipa; /* Always the IPA in the L1 guest phys space */
+ 	struct kvm_memory_slot *memslot;
++	struct kvm_s2_trans nested_trans;
+ 	unsigned long hva;
+ 	bool is_iabt, write_fault, writable;
+ 	gfn_t gfn;
+@@ -956,7 +977,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ 
+ 	fault_status = kvm_vcpu_trap_get_fault_type(vcpu);
+ 
+-	fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
++	ipa = fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
+ 	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
+ 
+ 	/* Synchronous External Abort? */
+@@ -977,6 +998,12 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ 	/* Check the stage-2 fault is trans. fault or write fault */
+ 	if (fault_status != FSC_FAULT && fault_status != FSC_PERM &&
+ 	    fault_status != FSC_ACCESS) {
++		/*
++		 * We must never see an address size fault on shadow stage 2
++		 * page table walk, because we would have injected an addr
++		 * size fault when we walked the nested s2 page and not
++		 * create the shadow entry.
++		 */
+ 		kvm_err("Unsupported FSC: EC=%#x xFSC=%#lx ESR_EL2=%#lx\n",
+ 			kvm_vcpu_trap_get_class(vcpu),
+ 			(unsigned long)kvm_vcpu_trap_get_fault(vcpu),
+@@ -986,7 +1013,36 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ 
+ 	idx = srcu_read_lock(&vcpu->kvm->srcu);
+ 
+-	gfn = fault_ipa >> PAGE_SHIFT;
++	/*
++	 * We may have faulted on a shadow stage 2 page table if we are
++	 * running a nested guest.  In this case, we have to resolve the L2
++	 * IPA to the L1 IPA first, before knowing what kind of memory should
++	 * back the L1 IPA.
++	 *
++	 * If the shadow stage 2 page table walk faults, then we simply inject
++	 * this to the guest and carry on.
++	 */
++	if (kvm_is_shadow_s2_fault(vcpu)) {
++		u32 esr;
++
++		ret = kvm_walk_nested_s2(vcpu, fault_ipa, &nested_trans);
++		esr = kvm_s2_trans_esr(&nested_trans);
++		if (esr)
++			kvm_inject_s2_fault(vcpu, esr);
++		if (ret)
++			goto out_unlock;
++
++		ret = kvm_s2_handle_perm_fault(vcpu, &nested_trans);
++		esr = kvm_s2_trans_esr(&nested_trans);
++		if (esr)
++			kvm_inject_s2_fault(vcpu, esr);
++		if (ret)
++			goto out_unlock;
++
++		ipa = kvm_s2_trans_output(&nested_trans);
++	}
++
++	gfn = ipa >> PAGE_SHIFT;
+ 	memslot = gfn_to_memslot(vcpu->kvm, gfn);
+ 	hva = gfn_to_hva_memslot_prot(memslot, gfn, &writable);
+ 	write_fault = kvm_is_write_fault(vcpu);
+@@ -1030,13 +1086,13 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ 		 * faulting VA. This is always 12 bits, irrespective
+ 		 * of the page size.
+ 		 */
+-		fault_ipa |= kvm_vcpu_get_hfar(vcpu) & ((1 << 12) - 1);
+-		ret = io_mem_abort(vcpu, fault_ipa);
++		ipa |= kvm_vcpu_get_hfar(vcpu) & ((1 << 12) - 1);
++		ret = io_mem_abort(vcpu, ipa);
+ 		goto out_unlock;
+ 	}
+ 
+ 	/* Userspace should not be able to register out-of-bounds IPAs */
+-	VM_BUG_ON(fault_ipa >= kvm_phys_size(vcpu->kvm));
++	VM_BUG_ON(ipa >= kvm_phys_size(vcpu->kvm));
+ 
+ 	if (fault_status == FSC_ACCESS) {
+ 		handle_access_fault(vcpu, fault_ipa);
+@@ -1044,7 +1100,8 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ 		goto out_unlock;
+ 	}
+ 
+-	ret = user_mem_abort(vcpu, fault_ipa, memslot, hva, fault_status);
++	ret = user_mem_abort(vcpu, fault_ipa, &nested_trans,
++			     memslot, hva, fault_status);
+ 	if (ret == 0)
+ 		ret = 1;
+ out:
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index ff970221a219..a64895ec6907 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -466,6 +466,45 @@ void kvm_vcpu_put_hw_mmu(struct kvm_vcpu *vcpu)
+ 	}
+ }
+ 
++/*
++ * Returns non-zero if permission fault is handled by injecting it to the next
++ * level hypervisor.
++ */
++int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu, struct kvm_s2_trans *trans)
++{
++	unsigned long fault_status = kvm_vcpu_trap_get_fault_type(vcpu);
++	bool forward_fault = false;
++
++	trans->esr = 0;
++
++	if (fault_status != FSC_PERM)
++		return 0;
++
++	if (kvm_vcpu_trap_is_iabt(vcpu)) {
++		forward_fault = (trans->upper_attr & BIT(54));
++	} else {
++		bool write_fault = kvm_is_write_fault(vcpu);
++
++		forward_fault = ((write_fault && !trans->writable) ||
++				 (!write_fault && !trans->readable));
++	}
++
++	if (forward_fault) {
++		trans->esr = esr_s2_fault(vcpu, trans->level, ESR_ELx_FSC_PERM);
++		return 1;
++	}
++
++	return 0;
++}
++
++int kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u64 esr_el2)
++{
++	vcpu_write_sys_reg(vcpu, vcpu->arch.fault.far_el2, FAR_EL2);
++	vcpu_write_sys_reg(vcpu, vcpu->arch.fault.hpfar_el2, HPFAR_EL2);
++
++	return kvm_inject_nested_sync(vcpu, esr_el2);
++}
++
+ /*
+  * Inject wfx to the virtual EL2 if this is not from the virtual EL2 and
+  * the virtual HCR_EL2.TWX is set. Otherwise, let the host hypervisor
 -- 
 2.29.2
 
