@@ -2,57 +2,62 @@ Return-Path: <SRS0=L5kI=FO=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC6AFC0018C
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 14:29:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EEF4C433FE
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 14:45:56 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7AF3823E1F
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 14:29:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AF3823E1F
+	by mail.kernel.org (Postfix) with ESMTP id AF36A22EBE
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 14:45:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF36A22EBE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C0DE4B1A6;
-	Thu, 10 Dec 2020 09:29:59 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 02BAE4B1B5;
+	Thu, 10 Dec 2020 09:45:55 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id zKNVl-xEYuvj; Thu, 10 Dec 2020 09:29:57 -0500 (EST)
+	with ESMTP id 1TX8qODjPCy0; Thu, 10 Dec 2020 09:45:53 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 783B44B261;
-	Thu, 10 Dec 2020 09:29:54 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5FED84B174;
+	Thu, 10 Dec 2020 09:45:53 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 741184B1D5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 09:29:52 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B72F4B124
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 09:45:52 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DpWeX8WYI+cU for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Dec 2020 09:29:51 -0500 (EST)
+ with ESMTP id seomdrqmXir7 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Dec 2020 09:45:51 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DE2BB4B1E3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 09:29:49 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E985E4B119
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 09:45:50 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AD01A1595;
- Thu, 10 Dec 2020 06:29:49 -0800 (PST)
-Received: from donnerap.arm.com (donnerap.cambridge.arm.com [10.1.195.35])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 93AC63F718;
- Thu, 10 Dec 2020 06:29:48 -0800 (PST)
-From: Andre Przywara <andre.przywara@arm.com>
-To: Will Deacon <will@kernel.org>,
- Julien Thierry <julien.thierry.kdev@gmail.com>
-Subject: [PATCH kvmtool 21/21] hw/rtc: ARM/arm64: Use MMIO at higher addresses
-Date: Thu, 10 Dec 2020 14:29:08 +0000
-Message-Id: <20201210142908.169597-22-andre.przywara@arm.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20201210142908.169597-1-andre.przywara@arm.com>
-References: <20201210142908.169597-1-andre.przywara@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9666C1FB;
+ Thu, 10 Dec 2020 06:45:50 -0800 (PST)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DD18C3F718;
+ Thu, 10 Dec 2020 06:45:49 -0800 (PST)
+Subject: Re: [kvm-unit-tests PATCH 08/10] arm/arm64: gic: Split check_acked()
+ into two functions
+To: Auger Eric <eric.auger@redhat.com>, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, drjones@redhat.com
+References: <20201125155113.192079-1-alexandru.elisei@arm.com>
+ <20201125155113.192079-9-alexandru.elisei@arm.com>
+ <0eb98cb0-835c-e257-484e-8210f1279f2c@redhat.com>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <2b8d774e-9398-e24b-6989-8643f5dd2492@arm.com>
+Date: Thu, 10 Dec 2020 14:45:37 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.3
+MIME-Version: 1.0
+In-Reply-To: <0eb98cb0-835c-e257-484e-8210f1279f2c@redhat.com>
+Content-Language: en-US
+Cc: andre.przywara@arm.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -64,108 +69,176 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Using the RTC device at its legacy I/O address as set by IBM in 1981
-was a kludge we used for simplicity on ARM platforms as well.
-However this imposes problems due to their missing alignment and overlap
-with the PCI I/O address space.
+Hi Eric,
 
-Now that we can switch a device easily between using ioports and
-MMIO, let's move the RTC out of the first 4K of memory on ARM platforms.
+On 12/3/20 1:39 PM, Auger Eric wrote:
+>
+> On 11/25/20 4:51 PM, Alexandru Elisei wrote:
+>> check_acked() has several peculiarities: is the only function among the
+>> check_* functions which calls report() directly, it does two things
+>> (waits for interrupts and checks for misfired interrupts) and it also
+>> mixes printf, report_info and report calls.
+>>
+>> check_acked() also reports a pass and returns as soon all the target CPUs
+>> have received interrupts, However, a CPU not having received an interrupt
+>> *now* does not guarantee not receiving an eroneous interrupt if we wait
+> erroneous
+>> long enough.
+>>
+>> Rework the function by splitting it into two separate functions, each with
+>> a single responsability: wait_for_interrupts(), which waits for the
+>> expected interrupts to fire, and check_acked() which checks that interrupts
+>> have been received as expected.
+>>
+>> wait_for_interrupts() also waits an extra 100 milliseconds after the
+>> expected interrupts have been received in an effort to make sure we don't
+>> miss misfiring interrupts.
+>>
+>> Splitting check_acked() into two functions will also allow us to
+>> customize the behavior of each function in the future more easily
+>> without using an unnecessarily long list of arguments for check_acked().
+>>
+>> CC: Andre Przywara <andre.przywara@arm.com>
+>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>> ---
+>>  arm/gic.c | 73 +++++++++++++++++++++++++++++++++++--------------------
+>>  1 file changed, 47 insertions(+), 26 deletions(-)
+>>
+>> diff --git a/arm/gic.c b/arm/gic.c
+>> index 544c283f5f47..dcdab7d5f39a 100644
+>> --- a/arm/gic.c
+>> +++ b/arm/gic.c
+>> @@ -62,41 +62,42 @@ static void stats_reset(void)
+>>  	}
+>>  }
+>>  
+>> -static void check_acked(const char *testname, cpumask_t *mask)
+>> +static void wait_for_interrupts(cpumask_t *mask)
+>>  {
+>> -	int missing = 0, extra = 0, unexpected = 0;
+>>  	int nr_pass, cpu, i;
+>> -	bool bad = false;
+>>  
+>>  	/* Wait up to 5s for all interrupts to be delivered */
+>> -	for (i = 0; i < 50; ++i) {
+>> +	for (i = 0; i < 50; i++) {
+>>  		mdelay(100);
+>>  		nr_pass = 0;
+>>  		for_each_present_cpu(cpu) {
+>> +			/*
+>> +			 * A CPU having receied more than one interrupts will
+> received
+>> +			 * show up in check_acked(), and no matter how long we
+>> +			 * wait it cannot un-receive it. Consier at least one
+> consider
 
-That should be transparent for well behaved guests, since the change is
-naturally reflected in the device tree.
+Will fix all three typos, thanks.
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
----
- hw/rtc.c | 24 ++++++++++++++++--------
- 1 file changed, 16 insertions(+), 8 deletions(-)
+>> +			 * interrupt as a pass.
+>> +			 */
+>>  			nr_pass += cpumask_test_cpu(cpu, mask) ?
+>> -				acked[cpu] == 1 : acked[cpu] == 0;
+>> -			smp_rmb(); /* pairs with smp_wmb in ipi_handler */
+>> -
+>> -			if (bad_sender[cpu] != -1) {
+>> -				printf("cpu%d received IPI from wrong sender %d\n",
+>> -					cpu, bad_sender[cpu]);
+>> -				bad = true;
+>> -			}
+>> -
+>> -			if (bad_irq[cpu] != -1) {
+>> -				printf("cpu%d received wrong irq %d\n",
+>> -					cpu, bad_irq[cpu]);
+>> -				bad = true;
+>> -			}
+>> +				acked[cpu] >= 1 : acked[cpu] == 0;
+>>  		}
+>> +
+>>  		if (nr_pass == nr_cpus) {
+>> -			report(!bad, "%s", testname);
+>>  			if (i)
+>> -				report_info("took more than %d ms", i * 100);
+>> +				report_info("interrupts took more than %d ms", i * 100);
+>> +			mdelay(100);
+>>  			return;
+>>  		}
+>>  	}
+>>  
+>> +	report_info("interrupts timed-out (5s)");
+>> +}
+>> +
+>> +static bool check_acked(cpumask_t *mask)
+>> +{
+>> +	int missing = 0, extra = 0, unexpected = 0;
+>> +	bool pass = true;
+>> +	int cpu;
+>> +
+>>  	for_each_present_cpu(cpu) {
+>>  		if (cpumask_test_cpu(cpu, mask)) {
+>>  			if (!acked[cpu])
+>> @@ -107,11 +108,28 @@ static void check_acked(const char *testname, cpumask_t *mask)
+>>  			if (acked[cpu])
+>>  				++unexpected;
+>>  		}
+>> +		smp_rmb(); /* pairs with smp_wmb in ipi_handler */
+>> +
+>> +		if (bad_sender[cpu] != -1) {
+>> +			report_info("cpu%d received IPI from wrong sender %d",
+>> +					cpu, bad_sender[cpu]);
+>> +			pass = false;
+>> +		}
+>> +
+>> +		if (bad_irq[cpu] != -1) {
+>> +			report_info("cpu%d received wrong irq %d",
+>> +					cpu, bad_irq[cpu]);
+>> +			pass = false;
+>> +		}
+>> +	}
+>> +
+>> +	if (missing || extra || unexpected) {
+>> +		report_info("ACKS: missing=%d extra=%d unexpected=%d",
+>> +				missing, extra, unexpected);
+>> +		pass = false;
+>>  	}
+>>  
+>> -	report(false, "%s", testname);
+>> -	report_info("Timed-out (5s). ACKS: missing=%d extra=%d unexpected=%d",
+>> -		    missing, extra, unexpected);
+>> +	return pass;
+>>  }
+>>  
+>>  static void check_spurious(void)
+>> @@ -300,7 +318,8 @@ static void ipi_test_self(void)
+>>  	cpumask_clear(&mask);
+>>  	cpumask_set_cpu(smp_processor_id(), &mask);
+>>  	gic->ipi.send_self();
+>> -	check_acked("IPI: self", &mask);
+>> +	wait_for_interrupts(&mask);
+>> +	report(check_acked(&mask), "Interrupts received");
+>>  	report_prefix_pop();
+>>  }
+>>  
+>> @@ -315,7 +334,8 @@ static void ipi_test_smp(void)
+>>  	for (i = smp_processor_id() & 1; i < nr_cpus; i += 2)
+>>  		cpumask_clear_cpu(i, &mask);
+>>  	gic_ipi_send_mask(IPI_IRQ, &mask);
+>> -	check_acked("IPI: directed", &mask);
+>> +	wait_for_interrupts(&mask);
+>> +	report(check_acked(&mask), "Interrupts received");
+> both ipi_test_smp and ipi_test_self are called from the same test so
+> better to use different error messages like it was done originally.
 
-diff --git a/hw/rtc.c b/hw/rtc.c
-index ee4c9102..bdb88f0f 100644
---- a/hw/rtc.c
-+++ b/hw/rtc.c
-@@ -5,6 +5,15 @@
- 
- #include <time.h>
- 
-+#if defined(CONFIG_ARM) || defined(CONFIG_ARM64)
-+#define RTC_BUS_TYPE		DEVICE_BUS_MMIO
-+#define RTC_BASE_ADDRESS	0x1010000
-+#else
-+/* PORT 0070-007F - CMOS RAM/RTC (REAL TIME CLOCK) */
-+#define RTC_BUS_TYPE		DEVICE_BUS_IOPORT
-+#define RTC_BASE_ADDRESS	0x70
-+#endif
-+
- /*
-  * MC146818 RTC registers
-  */
-@@ -49,7 +58,7 @@ static void cmos_ram_io(struct kvm_cpu *vcpu, u64 addr, u8 *data,
- 	time_t ti;
- 
- 	if (is_write) {
--		if (addr == 0x70) {	/* index register */
-+		if (addr == RTC_BASE_ADDRESS) {	/* index register */
- 			u8 value = ioport__read8(data);
- 
- 			vcpu->kvm->nmi_disabled	= value & (1UL << 7);
-@@ -70,7 +79,7 @@ static void cmos_ram_io(struct kvm_cpu *vcpu, u64 addr, u8 *data,
- 		return;
- 	}
- 
--	if (addr == 0x70)
-+	if (addr == RTC_BASE_ADDRESS)	/* index register is write-only */
- 		return;
- 
- 	time(&ti);
-@@ -127,7 +136,7 @@ static void generate_rtc_fdt_node(void *fdt,
- 							    u8 irq,
- 							    enum irq_type))
- {
--	u64 reg_prop[2] = { cpu_to_fdt64(0x70), cpu_to_fdt64(2) };
-+	u64 reg_prop[2] = { cpu_to_fdt64(RTC_BASE_ADDRESS), cpu_to_fdt64(2) };
- 
- 	_FDT(fdt_begin_node(fdt, "rtc"));
- 	_FDT(fdt_property_string(fdt, "compatible", "motorola,mc146818"));
-@@ -139,7 +148,7 @@ static void generate_rtc_fdt_node(void *fdt,
- #endif
- 
- struct device_header rtc_dev_hdr = {
--	.bus_type = DEVICE_BUS_IOPORT,
-+	.bus_type = RTC_BUS_TYPE,
- 	.data = generate_rtc_fdt_node,
- };
- 
-@@ -151,8 +160,8 @@ int rtc__init(struct kvm *kvm)
- 	if (r < 0)
- 		return r;
- 
--	/* PORT 0070-007F - CMOS RAM/RTC (REAL TIME CLOCK) */
--	r = kvm__register_pio(kvm, 0x0070, 2, cmos_ram_io, NULL);
-+	r = kvm__register_iotrap(kvm, RTC_BASE_ADDRESS, 2, cmos_ram_io, NULL,
-+				 RTC_BUS_TYPE);
- 	if (r < 0)
- 		goto out_device;
- 
-@@ -170,8 +179,7 @@ dev_init(rtc__init);
- 
- int rtc__exit(struct kvm *kvm)
- {
--	/* PORT 0070-007F - CMOS RAM/RTC (REAL TIME CLOCK) */
--	kvm__deregister_pio(kvm, 0x0070);
-+	kvm__deregister_iotrap(kvm, RTC_BASE_ADDRESS, RTC_BUS_TYPE);
- 
- 	return 0;
- }
--- 
-2.17.1
+I used the same error message because the tests have a different prefix
+("target-list" versus "broadcast"). Do you think there are cases where that's not
+enough?
 
+Thanks,
+Alex
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
