@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 135EEC4361B
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 14:29:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AFF2C4167B
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 14:29:50 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8C8C723D9B
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 14:29:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C8C723D9B
+	by mail.kernel.org (Postfix) with ESMTP id 03ED223E21
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 14:29:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03ED223E21
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A5CA4B236;
-	Thu, 10 Dec 2020 09:29:48 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C2794B1A6;
+	Thu, 10 Dec 2020 09:29:49 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id vd2G7cIV54Fs; Thu, 10 Dec 2020 09:29:46 -0500 (EST)
+	with ESMTP id aUDyCdBv4KHz; Thu, 10 Dec 2020 09:29:48 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E8BB4B25D;
-	Thu, 10 Dec 2020 09:29:44 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C07944B270;
+	Thu, 10 Dec 2020 09:29:45 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E43D4B1A6
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 440D84B229
  for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 09:29:44 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id keB8jwsoycx7 for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id OeW7U20Mw13I for <kvmarm@lists.cs.columbia.edu>;
  Thu, 10 Dec 2020 09:29:43 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CA1534B129
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 09:29:40 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 15A774B255
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 09:29:42 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7919A152B;
- Thu, 10 Dec 2020 06:29:40 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C8BD9152D;
+ Thu, 10 Dec 2020 06:29:41 -0800 (PST)
 Received: from donnerap.arm.com (donnerap.cambridge.arm.com [10.1.195.35])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5F6B13F718;
- Thu, 10 Dec 2020 06:29:39 -0800 (PST)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id ACA5C3F718;
+ Thu, 10 Dec 2020 06:29:40 -0800 (PST)
 From: Andre Przywara <andre.przywara@arm.com>
 To: Will Deacon <will@kernel.org>,
  Julien Thierry <julien.thierry.kdev@gmail.com>
-Subject: [PATCH kvmtool 14/21] hw/serial: Switch to new trap handlers
-Date: Thu, 10 Dec 2020 14:29:01 +0000
-Message-Id: <20201210142908.169597-15-andre.przywara@arm.com>
+Subject: [PATCH kvmtool 15/21] vfio: Refactor ioport trap handler
+Date: Thu, 10 Dec 2020 14:29:02 +0000
+Message-Id: <20201210142908.169597-16-andre.przywara@arm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20201210142908.169597-1-andre.przywara@arm.com>
 References: <20201210142908.169597-1-andre.przywara@arm.com>
@@ -70,91 +70,109 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Now that the serial device has a trap handler adhering to the MMIO fault
-handler prototype, let's switch over to the joint registration routine.
+With the planned retirement of the special ioport emulation code, we
+need to provide an emulation function compatible with the MMIO prototype.
 
-This allows us to get rid of the ioport shim routines.
+Adjust the I/O port trap handler to use that new function, and provide
+shims to implement the old ioport interface, for now.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- hw/serial.c | 36 +++---------------------------------
- 1 file changed, 3 insertions(+), 33 deletions(-)
+ vfio/core.c | 51 ++++++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 36 insertions(+), 15 deletions(-)
 
-diff --git a/hw/serial.c b/hw/serial.c
-index 2907089c..d840eebc 100644
---- a/hw/serial.c
-+++ b/hw/serial.c
-@@ -397,31 +397,6 @@ static void serial8250_mmio(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len,
- 	}
+diff --git a/vfio/core.c b/vfio/core.c
+index 0b45e78b..f55f1f87 100644
+--- a/vfio/core.c
++++ b/vfio/core.c
+@@ -81,15 +81,12 @@ out_free_buf:
+ 	return ret;
  }
  
--static bool serial8250_ioport_out(struct ioport *ioport, struct kvm_cpu *vcpu,
--				  u16 port, void *data, int size)
--{
--	struct serial8250_device *dev = ioport->priv;
--	u8 value = ioport__read8(data);
--
--	serial8250_mmio(vcpu, port, &value, 1, true, dev);
--
--	return true;
--}
--
--static bool serial8250_ioport_in(struct ioport *ioport, struct kvm_cpu *vcpu,
--				 u16 port, void *data, int size)
--{
--	struct serial8250_device *dev = ioport->priv;
--	u8 value = 0;
--
--
--	serial8250_mmio(vcpu, port, &value, 1, false, dev);
--
--	ioport__write8(data, value);
--
--	return true;
--}
--
- #ifdef CONFIG_HAS_LIBFDT
- 
- char *fdt_stdout_path = NULL;
-@@ -459,11 +434,6 @@ void serial8250_generate_fdt_node(void *fdt, struct device_header *dev_hdr,
- }
- #endif
- 
--static struct ioport_operations serial8250_ops = {
--	.io_in			= serial8250_ioport_in,
--	.io_out			= serial8250_ioport_out,
--};
--
- static int serial8250__device_init(struct kvm *kvm,
- 				   struct serial8250_device *dev)
+-static bool vfio_ioport_in(struct ioport *ioport, struct kvm_cpu *vcpu,
+-			   u16 port, void *data, int len)
++static bool _vfio_ioport_in(struct vfio_region *region, u32 offset,
++			    void *data, int len)
  {
-@@ -474,7 +444,7 @@ static int serial8250__device_init(struct kvm *kvm,
- 		return r;
+-	u32 val;
+-	ssize_t nr;
+-	struct vfio_region *region = ioport->priv;
+ 	struct vfio_device *vdev = region->vdev;
+-
+-	u32 offset = port - region->port_base;
++	ssize_t nr;
++	u32 val;
  
- 	ioport__map_irq(&dev->irq);
--	r = ioport__register(kvm, dev->iobase, &serial8250_ops, 8, dev);
-+	r = kvm__register_pio(kvm, dev->iobase, 8, serial8250_mmio, dev);
- 
- 	return r;
- }
-@@ -497,7 +467,7 @@ cleanup:
- 	for (j = 0; j <= i; j++) {
- 		struct serial8250_device *dev = &devices[j];
- 
--		ioport__unregister(kvm, dev->iobase);
-+		kvm__deregister_pio(kvm, dev->iobase);
- 		device__unregister(&dev->dev_hdr);
+ 	if (!(region->info.flags & VFIO_REGION_INFO_FLAG_READ))
+ 		return false;
+@@ -97,7 +94,7 @@ static bool vfio_ioport_in(struct ioport *ioport, struct kvm_cpu *vcpu,
+ 	nr = pread(vdev->fd, &val, len, region->info.offset + offset);
+ 	if (nr != len) {
+ 		vfio_dev_err(vdev, "could not read %d bytes from I/O port 0x%x\n",
+-			     len, port);
++			     len, offset);
+ 		return false;
  	}
  
-@@ -513,7 +483,7 @@ int serial8250__exit(struct kvm *kvm)
- 	for (i = 0; i < ARRAY_SIZE(devices); i++) {
- 		struct serial8250_device *dev = &devices[i];
+@@ -118,15 +115,13 @@ static bool vfio_ioport_in(struct ioport *ioport, struct kvm_cpu *vcpu,
+ 	return true;
+ }
  
--		r = ioport__unregister(kvm, dev->iobase);
-+		r = kvm__deregister_pio(kvm, dev->iobase);
- 		if (r < 0)
- 			return r;
- 		device__unregister(&dev->dev_hdr);
+-static bool vfio_ioport_out(struct ioport *ioport, struct kvm_cpu *vcpu,
+-			    u16 port, void *data, int len)
++static bool _vfio_ioport_out(struct vfio_region *region, u32 offset,
++			     void *data, int len)
+ {
+-	u32 val;
+-	ssize_t nr;
+-	struct vfio_region *region = ioport->priv;
+ 	struct vfio_device *vdev = region->vdev;
++	ssize_t nr;
++	u32 val;
+ 
+-	u32 offset = port - region->port_base;
+ 
+ 	if (!(region->info.flags & VFIO_REGION_INFO_FLAG_WRITE))
+ 		return false;
+@@ -148,11 +143,37 @@ static bool vfio_ioport_out(struct ioport *ioport, struct kvm_cpu *vcpu,
+ 	nr = pwrite(vdev->fd, &val, len, region->info.offset + offset);
+ 	if (nr != len)
+ 		vfio_dev_err(vdev, "could not write %d bytes to I/O port 0x%x",
+-			     len, port);
++			     len, offset);
+ 
+ 	return nr == len;
+ }
+ 
++static void vfio_ioport_mmio(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len,
++			     u8 is_write, void *ptr)
++{
++	struct vfio_region *region = ptr;
++	u32 offset = addr - region->port_base;
++
++	if (is_write)
++		_vfio_ioport_out(region, offset, data, len);
++	else
++		_vfio_ioport_in(region, offset, data, len);
++}
++
++static bool vfio_ioport_out(struct ioport *ioport, struct kvm_cpu *vcpu,
++			    u16 port, void *data, int len)
++{
++	vfio_ioport_mmio(vcpu, port, data, len, true, ioport->priv);
++	return true;
++}
++
++static bool vfio_ioport_in(struct ioport *ioport, struct kvm_cpu *vcpu,
++			   u16 port, void *data, int len)
++{
++	vfio_ioport_mmio(vcpu, port, data, len, false, ioport->priv);
++	return true;
++}
++
+ static struct ioport_operations vfio_ioport_ops = {
+ 	.io_in	= vfio_ioport_in,
+ 	.io_out	= vfio_ioport_out,
 -- 
 2.17.1
 
