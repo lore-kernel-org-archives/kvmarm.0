@@ -7,48 +7,47 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F7A5C433FE
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 14:29:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6283C0018C
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 14:29:46 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CABE523E51
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 14:29:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CABE523E51
+	by mail.kernel.org (Postfix) with ESMTP id 2F14123E21
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 14:29:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F14123E21
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E41B4B129;
-	Thu, 10 Dec 2020 09:29:44 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BECA94B263;
+	Thu, 10 Dec 2020 09:29:45 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id qjQke7uUXs6a; Thu, 10 Dec 2020 09:29:43 -0500 (EST)
+	with ESMTP id ez3QkDCYCXDr; Thu, 10 Dec 2020 09:29:40 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 652404B261;
-	Thu, 10 Dec 2020 09:29:42 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B0394B25A;
+	Thu, 10 Dec 2020 09:29:40 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 65E744B1CE
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 09:29:40 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 34E694B201
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 09:29:39 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id g4HbdGzVoWPB for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Dec 2020 09:29:39 -0500 (EST)
+ with ESMTP id C+5M1sM2dNAM for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Dec 2020 09:29:38 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 20F024B24F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 09:29:38 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 76E1E4B1F4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 09:29:35 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D38071480;
- Thu, 10 Dec 2020 06:29:37 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 39190147A;
+ Thu, 10 Dec 2020 06:29:35 -0800 (PST)
 Received: from donnerap.arm.com (donnerap.cambridge.arm.com [10.1.195.35])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B9FC43F718;
- Thu, 10 Dec 2020 06:29:36 -0800 (PST)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1F3853F718;
+ Thu, 10 Dec 2020 06:29:34 -0800 (PST)
 From: Andre Przywara <andre.przywara@arm.com>
 To: Will Deacon <will@kernel.org>,
  Julien Thierry <julien.thierry.kdev@gmail.com>
-Subject: [PATCH kvmtool 12/21] hw/vesa: Switch trap handling to use MMIO
- handler
-Date: Thu, 10 Dec 2020 14:28:59 +0000
-Message-Id: <20201210142908.169597-13-andre.przywara@arm.com>
+Subject: [PATCH kvmtool 10/21] hw/rtc: Refactor trap handlers
+Date: Thu, 10 Dec 2020 14:28:57 +0000
+Message-Id: <20201210142908.169597-11-andre.przywara@arm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20201210142908.169597-1-andre.przywara@arm.com>
 References: <20201210142908.169597-1-andre.przywara@arm.com>
@@ -71,63 +70,142 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-To be able to use the VESA device with the new generic I/O trap handler,
-we need to use the different MMIO handler callback routine.
+With the planned retirement of the special ioport emulation code, we
+need to provide emulation functions compatible with the MMIO prototype.
 
-Replace the existing dummy in and out handlers with a joint dummy
-MMIO handler, and register this using the new registration function.
+Merge the two different trap handlers into one function, checking for
+read/write and data/index register inside.
+Adjust the trap handlers to use that new function, and provide shims to
+implement the old ioport interface, for now.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- hw/vesa.c | 19 +++++--------------
- 1 file changed, 5 insertions(+), 14 deletions(-)
+ hw/rtc.c | 70 ++++++++++++++++++++++++++++----------------------------
+ 1 file changed, 35 insertions(+), 35 deletions(-)
 
-diff --git a/hw/vesa.c b/hw/vesa.c
-index 8659a002..7f82cdb4 100644
---- a/hw/vesa.c
-+++ b/hw/vesa.c
-@@ -43,21 +43,11 @@ static struct framebuffer vesafb = {
- 	.mem_size	= VESA_MEM_SIZE,
- };
+diff --git a/hw/rtc.c b/hw/rtc.c
+index 5483879f..664d4cb0 100644
+--- a/hw/rtc.c
++++ b/hw/rtc.c
+@@ -42,11 +42,37 @@ static inline unsigned char bin2bcd(unsigned val)
+ 	return ((val / 10) << 4) + val % 10;
+ }
  
--static bool vesa_pci_io_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
-+static void vesa_pci_io(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len,
-+		        u8 is_write, void *ptr)
+-static bool cmos_ram_data_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
++static void cmos_ram_io(struct kvm_cpu *vcpu, u64 addr, u8 *data,
++			u32 len, u8 is_write, void *ptr)
  {
+ 	struct tm *tm;
+ 	time_t ti;
+ 
++	if (is_write) {
++		if (addr == 0x70) {	/* index register */
++			u8 value = ioport__read8(data);
++
++			vcpu->kvm->nmi_disabled	= value & (1UL << 7);
++			rtc.cmos_idx		= value & ~(1UL << 7);
++
++			return;
++		}
++
++		switch (rtc.cmos_idx) {
++		case RTC_REG_C:
++		case RTC_REG_D:
++			/* Read-only */
++			break;
++		default:
++			rtc.cmos_data[rtc.cmos_idx] = ioport__read8(data);
++			break;
++		}
++		return;
++	}
++
++	if (addr == 0x70)
++		return;
++
+ 	time(&ti);
+ 
+ 	tm = gmtime(&ti);
+@@ -92,42 +118,23 @@ static bool cmos_ram_data_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 po
+ 		ioport__write8(data, rtc.cmos_data[rtc.cmos_idx]);
+ 		break;
+ 	}
+-
 -	return true;
  }
  
--static bool vesa_pci_io_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
--{
--	return true;
--}
+-static bool cmos_ram_data_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
++static bool cmos_ram_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
+ {
+-	switch (rtc.cmos_idx) {
+-	case RTC_REG_C:
+-	case RTC_REG_D:
+-		/* Read-only */
+-		break;
+-	default:
+-		rtc.cmos_data[rtc.cmos_idx] = ioport__read8(data);
+-		break;
+-	}
 -
--static struct ioport_operations vesa_io_ops = {
--	.io_in			= vesa_pci_io_in,
--	.io_out			= vesa_pci_io_out,
++	cmos_ram_io(vcpu, port, data, size, false, NULL);
+ 	return true;
+ }
+ 
+-static struct ioport_operations cmos_ram_data_ioport_ops = {
+-	.io_out		= cmos_ram_data_out,
+-	.io_in		= cmos_ram_data_in,
 -};
 -
- static int vesa__bar_activate(struct kvm *kvm, struct pci_device_header *pci_hdr,
- 			      int bar_num, void *data)
+-static bool cmos_ram_index_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
++static bool cmos_ram_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
  {
-@@ -82,7 +72,8 @@ struct framebuffer *vesa__init(struct kvm *kvm)
- 	BUILD_BUG_ON(VESA_MEM_SIZE < VESA_BPP/8 * VESA_WIDTH * VESA_HEIGHT);
+-	u8 value = ioport__read8(data);
+-
+-	vcpu->kvm->nmi_disabled	= value & (1UL << 7);
+-	rtc.cmos_idx		= value & ~(1UL << 7);
+-
++	cmos_ram_io(vcpu, port, data, size, true, NULL);
+ 	return true;
+ }
  
- 	vesa_base_addr = pci_get_io_port_block(PCI_IO_SIZE);
--	r = ioport__register(kvm, vesa_base_addr, &vesa_io_ops, PCI_IO_SIZE, NULL);
-+	r = kvm__register_pio(kvm, vesa_base_addr, PCI_IO_SIZE, vesa_pci_io,
-+			      NULL);
+-static struct ioport_operations cmos_ram_index_ioport_ops = {
+-	.io_out		= cmos_ram_index_out,
++static struct ioport_operations cmos_ram_ioport_ops = {
++	.io_out		= cmos_ram_out,
++	.io_in		= cmos_ram_in,
+ };
+ 
+ #ifdef CONFIG_HAS_LIBFDT
+@@ -162,21 +169,15 @@ int rtc__init(struct kvm *kvm)
+ 		return r;
+ 
+ 	/* PORT 0070-007F - CMOS RAM/RTC (REAL TIME CLOCK) */
+-	r = ioport__register(kvm, 0x0070, &cmos_ram_index_ioport_ops, 1, NULL);
++	r = ioport__register(kvm, 0x0070, &cmos_ram_ioport_ops, 2, NULL);
  	if (r < 0)
- 		goto out_error;
+ 		goto out_device;
  
-@@ -116,7 +107,7 @@ unmap_dev:
- unregister_device:
- 	device__unregister(&vesa_device);
- unregister_ioport:
--	ioport__unregister(kvm, vesa_base_addr);
-+	kvm__deregister_pio(kvm, vesa_base_addr);
- out_error:
- 	return ERR_PTR(r);
+-	r = ioport__register(kvm, 0x0071, &cmos_ram_data_ioport_ops, 1, NULL);
+-	if (r < 0)
+-		goto out_ioport;
+-
+ 	/* Set the VRT bit in Register D to indicate valid RAM and time */
+ 	rtc.cmos_data[RTC_REG_D] = RTC_REG_D_VRT;
+ 
+ 	return r;
+ 
+-out_ioport:
+-	ioport__unregister(kvm, 0x0070);
+ out_device:
+ 	device__unregister(&rtc_dev_hdr);
+ 
+@@ -188,7 +189,6 @@ int rtc__exit(struct kvm *kvm)
+ {
+ 	/* PORT 0070-007F - CMOS RAM/RTC (REAL TIME CLOCK) */
+ 	ioport__unregister(kvm, 0x0070);
+-	ioport__unregister(kvm, 0x0071);
+ 
+ 	return 0;
  }
 -- 
 2.17.1
