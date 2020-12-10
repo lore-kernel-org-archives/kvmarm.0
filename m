@@ -3,56 +3,56 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAFE3C433FE
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 16:00:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7221C4361B
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 16:00:49 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6590A23E51
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 16:00:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6590A23E51
+	by mail.kernel.org (Postfix) with ESMTP id 5D37123E24
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 16:00:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D37123E24
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 09B724B25B;
-	Thu, 10 Dec 2020 11:00:44 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F0E514B1B3;
+	Thu, 10 Dec 2020 11:00:48 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id CJOd97fBnQqG; Thu, 10 Dec 2020 11:00:42 -0500 (EST)
+	with ESMTP id C9ChuEEL7Vom; Thu, 10 Dec 2020 11:00:47 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 448514B1FA;
-	Thu, 10 Dec 2020 11:00:39 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 887A84B25D;
+	Thu, 10 Dec 2020 11:00:43 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 822AB4B1DC
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 11:00:38 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CED9C4B239
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 11:00:42 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id F1bpiz4Yip57 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Dec 2020 11:00:37 -0500 (EST)
+ with ESMTP id y3cfVY2cWzR8 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Dec 2020 11:00:41 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 484084B1FD
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 11:00:36 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 715D44B1D2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 11:00:38 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 518D523E1D;
- Thu, 10 Dec 2020 16:00:35 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id A1CF623E22;
+ Thu, 10 Dec 2020 16:00:37 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1knOMr-0008Di-IJ; Thu, 10 Dec 2020 16:00:33 +0000
+ id 1knOMt-0008Di-9F; Thu, 10 Dec 2020 16:00:35 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v3 06/66] KVM: arm64: nv: Add nested virt VCPU primitives for
- vEL2 VCPU state
-Date: Thu, 10 Dec 2020 15:59:02 +0000
-Message-Id: <20201210160002.1407373-7-maz@kernel.org>
+Subject: [PATCH v3 08/66] KVM: arm64: nv: Reset VMPIDR_EL2 and VPIDR_EL2 to
+ sane values
+Date: Thu, 10 Dec 2020 15:59:04 +0000
+Message-Id: <20201210160002.1407373-9-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201210160002.1407373-1-maz@kernel.org>
 References: <20201210160002.1407373-1-maz@kernel.org>
@@ -85,84 +85,66 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: Christoffer Dall <christoffer.dall@arm.com>
 
-When running a nested hypervisor we commonly have to figure out if
-the VCPU mode is running in the context of a guest hypervisor or guest
-guest, or just a normal guest.
-
-Add convenient primitives for this.
+The VMPIDR_EL2 and VPIDR_EL2 are architecturally UNKNOWN at reset, but
+let's be nice to a guest hypervisor behaving foolishly and reset these
+to something reasonable anyway.
 
 Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_emulate.h | 55 ++++++++++++++++++++++++++++
- 1 file changed, 55 insertions(+)
+ arch/arm64/kvm/sys_regs.c | 25 +++++++++++++++++++++----
+ 1 file changed, 21 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index c8f550a53516..e3e22d364dc9 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -173,6 +173,61 @@ static __always_inline void vcpu_set_reg(struct kvm_vcpu *vcpu, u8 reg_num,
- 		vcpu_gp_regs(vcpu)->regs[reg_num] = val;
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index c049867a39bc..cc7a86624e36 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -621,7 +621,7 @@ static void reset_actlr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+ 	vcpu_write_sys_reg(vcpu, actlr, ACTLR_EL1);
  }
  
-+static inline bool vcpu_mode_el2_ctxt(const struct kvm_cpu_context *ctxt)
-+{
-+	unsigned long cpsr = ctxt->regs.pstate;
+-static void reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
++static u64 compute_reset_mpidr(struct kvm_vcpu *vcpu)
+ {
+ 	u64 mpidr;
+ 
+@@ -635,7 +635,24 @@ static void reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+ 	mpidr = (vcpu->vcpu_id & 0x0f) << MPIDR_LEVEL_SHIFT(0);
+ 	mpidr |= ((vcpu->vcpu_id >> 4) & 0xff) << MPIDR_LEVEL_SHIFT(1);
+ 	mpidr |= ((vcpu->vcpu_id >> 12) & 0xff) << MPIDR_LEVEL_SHIFT(2);
+-	vcpu_write_sys_reg(vcpu, (1ULL << 31) | mpidr, MPIDR_EL1);
++	mpidr |= (1ULL << 31);
 +
-+	switch (cpsr & (PSR_MODE32_BIT | PSR_MODE_MASK)) {
-+	case PSR_MODE_EL2h:
-+	case PSR_MODE_EL2t:
-+		return true;
-+	default:
-+		return false;
-+	}
++	return mpidr;
 +}
 +
-+static inline bool vcpu_mode_el2(const struct kvm_vcpu *vcpu)
++static void reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
 +{
-+	return vcpu_mode_el2_ctxt(&vcpu->arch.ctxt);
++	vcpu_write_sys_reg(vcpu, compute_reset_mpidr(vcpu), MPIDR_EL1);
 +}
 +
-+static inline bool __vcpu_el2_e2h_is_set(const struct kvm_cpu_context *ctxt)
++static void reset_vmpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
 +{
-+	return ctxt_sys_reg(ctxt, HCR_EL2) & HCR_E2H;
++	vcpu_write_sys_reg(vcpu, compute_reset_mpidr(vcpu), VMPIDR_EL2);
 +}
 +
-+static inline bool vcpu_el2_e2h_is_set(const struct kvm_vcpu *vcpu)
++static void reset_vpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
 +{
-+	return __vcpu_el2_e2h_is_set(&vcpu->arch.ctxt);
-+}
-+
-+static inline bool __vcpu_el2_tge_is_set(const struct kvm_cpu_context *ctxt)
-+{
-+	return ctxt_sys_reg(ctxt, HCR_EL2) & HCR_TGE;
-+}
-+
-+static inline bool vcpu_el2_tge_is_set(const struct kvm_vcpu *vcpu)
-+{
-+	return __vcpu_el2_tge_is_set(&vcpu->arch.ctxt);
-+}
-+
-+static inline bool __is_hyp_ctxt(const struct kvm_cpu_context *ctxt)
-+{
-+	/*
-+	 * We are in a hypervisor context if the vcpu mode is EL2 or
-+	 * E2H and TGE bits are set. The latter means we are in the user space
-+	 * of the VHE kernel. ARMv8.1 ARM describes this as 'InHost'
-+	 */
-+	return vcpu_mode_el2_ctxt(ctxt) ||
-+		(__vcpu_el2_e2h_is_set(ctxt) && __vcpu_el2_tge_is_set(ctxt)) ||
-+		WARN_ON(__vcpu_el2_tge_is_set(ctxt));
-+}
-+
-+static inline bool is_hyp_ctxt(const struct kvm_vcpu *vcpu)
-+{
-+	return __is_hyp_ctxt(&vcpu->arch.ctxt);
-+}
-+
- /*
-  * The layout of SPSR for an AArch32 state is different when observed from an
-  * AArch64 SPSR_ELx or an AArch32 SPSR_*. This function generates the AArch32
++	vcpu_write_sys_reg(vcpu, read_cpuid_id(), VPIDR_EL2);
+ }
+ 
+ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+@@ -1752,8 +1769,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	 */
+ 	{ SYS_DESC(SYS_PMCCFILTR_EL0), access_pmu_evtyper, reset_val, PMCCFILTR_EL0, 0 },
+ 
+-	{ SYS_DESC(SYS_VPIDR_EL2), access_rw, reset_val, VPIDR_EL2, 0 },
+-	{ SYS_DESC(SYS_VMPIDR_EL2), access_rw, reset_val, VMPIDR_EL2, 0 },
++	{ SYS_DESC(SYS_VPIDR_EL2), access_rw, reset_vpidr, VPIDR_EL2 },
++	{ SYS_DESC(SYS_VMPIDR_EL2), access_rw, reset_vmpidr, VMPIDR_EL2 },
+ 
+ 	{ SYS_DESC(SYS_SCTLR_EL2), access_sctlr_el2, reset_val, SCTLR_EL2, SCTLR_EL2_RES1 },
+ 	{ SYS_DESC(SYS_ACTLR_EL2), access_rw, reset_val, ACTLR_EL2, 0 },
 -- 
 2.29.2
 
