@@ -3,55 +3,56 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9BF7C1B0E3
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 16:03:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFA35C433FE
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 16:03:37 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3C62D23E1B
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 16:03:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C62D23E1B
+	by mail.kernel.org (Postfix) with ESMTP id 78B9D23E21
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 16:03:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78B9D23E21
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C44034B1DF;
-	Thu, 10 Dec 2020 11:03:33 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 16BA34B271;
+	Thu, 10 Dec 2020 11:03:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id EkDWzh9xpzu1; Thu, 10 Dec 2020 11:03:32 -0500 (EST)
+	with ESMTP id MNuxJVSl89bm; Thu, 10 Dec 2020 11:03:35 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 00BB04B20C;
-	Thu, 10 Dec 2020 11:03:31 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 229B44B1D5;
+	Thu, 10 Dec 2020 11:03:35 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F38874B191
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 11:03:29 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 942524B1F1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 11:03:33 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HxAMXvImOban for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Dec 2020 11:03:28 -0500 (EST)
+ with ESMTP id 9aEMJu5Bdwct for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Dec 2020 11:03:32 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E5F894B195
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 11:03:27 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E39F44B219
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 11:03:29 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 030AE23DE4;
- Thu, 10 Dec 2020 16:03:27 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id DC6B223DE5;
+ Thu, 10 Dec 2020 16:03:28 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1knON0-0008Di-Hm; Thu, 10 Dec 2020 16:00:42 +0000
+ id 1knONN-0008Di-KA; Thu, 10 Dec 2020 16:01:05 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v3 16/66] KVM: arm64: nv: Save/Restore vEL2 sysregs
-Date: Thu, 10 Dec 2020 15:59:12 +0000
-Message-Id: <20201210160002.1407373-17-maz@kernel.org>
+Subject: [PATCH v3 34/66] KVM: arm64: nv: Implement nested Stage-2 page table
+ walk logic
+Date: Thu, 10 Dec 2020 15:59:30 +0000
+Message-Id: <20201210160002.1407373-35-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201210160002.1407373-1-maz@kernel.org>
 References: <20201210160002.1407373-1-maz@kernel.org>
@@ -61,11 +62,13 @@ X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org,
  kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com,
  christoffer.dall@arm.com, jintack@cs.columbia.edu, alexandru.elisei@arm.com,
  james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
- kernel-team@android.com
+ kernel-team@android.com, christoffer.dall@linaro.org, jintack.lim@linaro.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kernel-team@android.com, Andre Przywara <andre.przywara@arm.com>
+Cc: kernel-team@android.com, Andre Przywara <andre.przywara@arm.com>,
+ Christoffer Dall <christoffer.dall@linaro.org>,
+ Jintack Lim <jintack.lim@linaro.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -82,219 +85,358 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Whenever we need to restore the guest's system registers to the CPU, we
-now need to take care of the EL2 system registers as well. Most of them
-are accessed via traps only, but some have an immediate effect and also
-a guest running in VHE mode would expect them to be accessible via their
-EL1 encoding, which we do not trap.
+From: Christoffer Dall <christoffer.dall@linaro.org>
 
-For vEL2 we write the virtual EL2 registers with an identical format directly
-into their EL1 counterpart, and translate the few registers that have a
-different format for the same effect on the execution when running a
-non-VHE guest guest hypervisor.
+Based on the pseudo-code in the ARM ARM, implement a stage 2 software
+page table walker.
 
-Based on an initial patch from Andre Przywara, rewritten many times
-since.
-
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+[maz: heavily reworked for future ARMv8.4-TTL support]
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h |   5 +-
- arch/arm64/kvm/hyp/nvhe/sysreg-sr.c        |   2 +-
- arch/arm64/kvm/hyp/vhe/sysreg-sr.c         | 125 ++++++++++++++++++++-
- 3 files changed, 127 insertions(+), 5 deletions(-)
+ arch/arm64/include/asm/esr.h        |   1 +
+ arch/arm64/include/asm/kvm_arm.h    |   2 +
+ arch/arm64/include/asm/kvm_nested.h |  13 ++
+ arch/arm64/kvm/nested.c             | 276 ++++++++++++++++++++++++++++
+ 4 files changed, 292 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-index cce43bfe158f..e3901c73893e 100644
---- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-@@ -71,9 +71,10 @@ static inline void __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
- 	write_sysreg(ctxt_sys_reg(ctxt, TPIDRRO_EL0),	tpidrro_el0);
+diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+index ab63b7b3ea14..e099eba5e616 100644
+--- a/arch/arm64/include/asm/esr.h
++++ b/arch/arm64/include/asm/esr.h
+@@ -127,6 +127,7 @@
+ #define ESR_ELx_CM 		(UL(1) << ESR_ELx_CM_SHIFT)
+ 
+ /* ISS field definitions for exceptions taken in to Hyp */
++#define ESR_ELx_FSC_ADDRSZ	(0x00)
+ #define ESR_ELx_CV		(UL(1) << 24)
+ #define ESR_ELx_COND_SHIFT	(20)
+ #define ESR_ELx_COND_MASK	(UL(0xF) << ESR_ELx_COND_SHIFT)
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 3d2abc40d3a2..347e9e9b015c 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -264,6 +264,8 @@
+ #define VTTBR_VMID_SHIFT  (UL(48))
+ #define VTTBR_VMID_MASK(size) (_AT(u64, (1 << size) - 1) << VTTBR_VMID_SHIFT)
+ 
++#define SCTLR_EE	(UL(1) << 25)
++
+ /* Hyp System Trap Register */
+ #define HSTR_EL2_T(x)	(1 << x)
+ 
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index 473ecd1d60d0..b784d7891851 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -68,6 +68,19 @@ extern struct kvm_s2_mmu *lookup_s2_mmu(struct kvm *kvm, u64 vttbr, u64 hcr);
+ extern void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu);
+ extern void kvm_vcpu_put_hw_mmu(struct kvm_vcpu *vcpu);
+ 
++struct kvm_s2_trans {
++	phys_addr_t output;
++	unsigned long block_size;
++	bool writable;
++	bool readable;
++	int level;
++	u32 esr;
++	u64 upper_attr;
++};
++
++extern int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
++			      struct kvm_s2_trans *result);
++
+ int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
+ extern bool __forward_traps(struct kvm_vcpu *vcpu, unsigned int reg,
+ 			    u64 control_bit);
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 8e85d2ef24d9..ff970221a219 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -75,6 +75,282 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
+ 	return ret;
  }
  
--static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
-+static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt,
-+					      u64 mpidr)
- {
--	write_sysreg(ctxt_sys_reg(ctxt, MPIDR_EL1),	vmpidr_el2);
-+	write_sysreg(mpidr,				vmpidr_el2);
- 	write_sysreg(ctxt_sys_reg(ctxt, CSSELR_EL1),	csselr_el1);
- 
- 	if (has_vhe() ||
-diff --git a/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c b/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
-index 29305022bc04..dba101565de3 100644
---- a/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
-@@ -28,7 +28,7 @@ void __sysreg_save_state_nvhe(struct kvm_cpu_context *ctxt)
- 
- void __sysreg_restore_state_nvhe(struct kvm_cpu_context *ctxt)
- {
--	__sysreg_restore_el1_state(ctxt);
-+	__sysreg_restore_el1_state(ctxt, ctxt_sys_reg(ctxt, MPIDR_EL1));
- 	__sysreg_restore_common_state(ctxt);
- 	__sysreg_restore_user_state(ctxt);
- 	__sysreg_restore_el2_return_state(ctxt);
-diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-index 2a0b8c88d74f..53835fcc0ac6 100644
---- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-@@ -13,6 +13,96 @@
- #include <asm/kvm_asm.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_hyp.h>
-+#include <asm/kvm_nested.h>
++struct s2_walk_info {
++	int	     (*read_desc)(phys_addr_t pa, u64 *desc, void *data);
++	void	     *data;
++	u64	     baddr;
++	unsigned int max_pa_bits;
++	unsigned int pgshift;
++	unsigned int pgsize;
++	unsigned int ps;
++	unsigned int sl;
++	unsigned int t0sz;
++	bool	     be;
++	bool	     el1_aarch32;
++};
 +
-+static void __sysreg_save_vel2_state(struct kvm_cpu_context *ctxt)
++static unsigned int ps_to_output_size(unsigned int ps)
 +{
-+	/* These registers are common with EL1 */
-+	ctxt_sys_reg(ctxt, CSSELR_EL1)	= read_sysreg(csselr_el1);
-+	ctxt_sys_reg(ctxt, PAR_EL1)	= read_sysreg(par_el1);
-+	ctxt_sys_reg(ctxt, TPIDR_EL1)	= read_sysreg(tpidr_el1);
-+
-+	ctxt_sys_reg(ctxt, ESR_EL2)	= read_sysreg_el1(SYS_ESR);
-+	ctxt_sys_reg(ctxt, AFSR0_EL2)	= read_sysreg_el1(SYS_AFSR0);
-+	ctxt_sys_reg(ctxt, AFSR1_EL2)	= read_sysreg_el1(SYS_AFSR1);
-+	ctxt_sys_reg(ctxt, FAR_EL2)	= read_sysreg_el1(SYS_FAR);
-+	ctxt_sys_reg(ctxt, MAIR_EL2)	= read_sysreg_el1(SYS_MAIR);
-+	ctxt_sys_reg(ctxt, VBAR_EL2)	= read_sysreg_el1(SYS_VBAR);
-+	ctxt_sys_reg(ctxt, CONTEXTIDR_EL2) = read_sysreg_el1(SYS_CONTEXTIDR);
-+	ctxt_sys_reg(ctxt, AMAIR_EL2)	= read_sysreg_el1(SYS_AMAIR);
-+
-+	/*
-+	 * In VHE mode those registers are compatible between EL1 and EL2,
-+	 * and the guest uses the _EL1 versions on the CPU naturally.
-+	 * So we save them into their _EL2 versions here.
-+	 * For nVHE mode we trap accesses to those registers, so our
-+	 * _EL2 copy in sys_regs[] is always up-to-date and we don't need
-+	 * to save anything here.
-+	 */
-+	if (__vcpu_el2_e2h_is_set(ctxt)) {
-+		ctxt_sys_reg(ctxt, SCTLR_EL2)	= read_sysreg_el1(SYS_SCTLR);
-+		ctxt_sys_reg(ctxt, CPTR_EL2)	= read_sysreg_el1(SYS_CPACR);
-+		ctxt_sys_reg(ctxt, TTBR0_EL2)	= read_sysreg_el1(SYS_TTBR0);
-+		ctxt_sys_reg(ctxt, TTBR1_EL2)	= read_sysreg_el1(SYS_TTBR1);
-+		ctxt_sys_reg(ctxt, TCR_EL2)	= read_sysreg_el1(SYS_TCR);
-+		ctxt_sys_reg(ctxt, CNTHCTL_EL2)	= read_sysreg_el1(SYS_CNTKCTL);
++	switch (ps) {
++	case 0: return 32;
++	case 1: return 36;
++	case 2: return 40;
++	case 3: return 42;
++	case 4: return 44;
++	case 5:
++	default:
++		return 48;
 +	}
-+
-+	ctxt_sys_reg(ctxt, SP_EL2)	= read_sysreg(sp_el1);
-+	ctxt_sys_reg(ctxt, ELR_EL2)	= read_sysreg_el1(SYS_ELR);
-+	ctxt_sys_reg(ctxt, SPSR_EL2)	= __fixup_spsr_el2_read(ctxt, read_sysreg_el1(SYS_SPSR));
 +}
 +
-+static void __sysreg_restore_vel2_state(struct kvm_cpu_context *ctxt)
++static u32 compute_fsc(int level, u32 fsc)
 +{
-+	u64 val;
++	return fsc | (level & 0x3);
++}
 +
-+	/* These registers are common with EL1 */
-+	write_sysreg(ctxt_sys_reg(ctxt, CSSELR_EL1),	csselr_el1);
-+	write_sysreg(ctxt_sys_reg(ctxt, PAR_EL1),	par_el1);
-+	write_sysreg(ctxt_sys_reg(ctxt, TPIDR_EL1),	tpidr_el1);
++static int esr_s2_fault(struct kvm_vcpu *vcpu, int level, u32 fsc)
++{
++	u32 esr;
 +
-+	write_sysreg(read_cpuid_id(),			vpidr_el2);
-+	write_sysreg(ctxt_sys_reg(ctxt, MPIDR_EL1),	vmpidr_el2);
-+	write_sysreg_el1(ctxt_sys_reg(ctxt, MAIR_EL2),	SYS_MAIR);
-+	write_sysreg_el1(ctxt_sys_reg(ctxt, VBAR_EL2),	SYS_VBAR);
-+	write_sysreg_el1(ctxt_sys_reg(ctxt, CONTEXTIDR_EL2),SYS_CONTEXTIDR);
-+	write_sysreg_el1(ctxt_sys_reg(ctxt, AMAIR_EL2),	SYS_AMAIR);
++	esr = kvm_vcpu_get_esr(vcpu) & ~ESR_ELx_FSC;
++	esr |= compute_fsc(level, fsc);
++	return esr;
++}
 +
-+	if (__vcpu_el2_e2h_is_set(ctxt)) {
++static int check_base_s2_limits(struct s2_walk_info *wi,
++				int level, int input_size, int stride)
++{
++	int start_size;
++
++	/* Check translation limits */
++	switch (wi->pgsize) {
++	case SZ_64K:
++		if (level == 0 || (level == 1 && wi->max_pa_bits <= 42))
++			return -EFAULT;
++		break;
++	case SZ_16K:
++		if (level == 0 || (level == 1 && wi->max_pa_bits <= 40))
++			return -EFAULT;
++		break;
++	case SZ_4K:
++		if (level < 0 || (level == 0 && wi->max_pa_bits <= 42))
++			return -EFAULT;
++		break;
++	}
++
++	/* Check input size limits */
++	if (input_size > wi->max_pa_bits &&
++	    (!wi->el1_aarch32 || input_size > 40))
++		return -EFAULT;
++
++	/* Check number of entries in starting level table */
++	start_size = input_size - ((3 - level) * stride + wi->pgshift);
++	if (start_size < 1 || start_size > stride + 4)
++		return -EFAULT;
++
++	return 0;
++}
++
++/* Check if output is within boundaries */
++static int check_output_size(struct s2_walk_info *wi, phys_addr_t output)
++{
++	unsigned int output_size = ps_to_output_size(wi->ps);
++
++	if (output_size > wi->max_pa_bits)
++		output_size = wi->max_pa_bits;
++
++	if (output_size != 48 && (output & GENMASK_ULL(47, output_size)))
++		return -1;
++
++	return 0;
++}
++
++/*
++ * This is essentially a C-version of the pseudo code from the ARM ARM
++ * AArch64.TranslationTableWalk  function.  I strongly recommend looking at
++ * that pseudocode in trying to understand this.
++ *
++ * Must be called with the kvm->srcu read lock held
++ */
++static int walk_nested_s2_pgd(phys_addr_t ipa,
++			      struct s2_walk_info *wi, struct kvm_s2_trans *out)
++{
++	int first_block_level, level, stride, input_size, base_lower_bound;
++	phys_addr_t base_addr;
++	unsigned int addr_top, addr_bottom;
++	u64 desc;  /* page table entry */
++	int ret;
++	phys_addr_t paddr;
++
++	switch (wi->pgsize) {
++	case SZ_64K:
++	case SZ_16K:
++		level = 3 - wi->sl;
++		first_block_level = 2;
++		break;
++	case SZ_4K:
++		level = 2 - wi->sl;
++		first_block_level = 1;
++		break;
++	default:
++		/* GCC is braindead */
++		unreachable();
++	}
++
++	stride = wi->pgshift - 3;
++	input_size = 64 - wi->t0sz;
++	if (input_size > 48 || input_size < 25)
++		return -EFAULT;
++
++	ret = check_base_s2_limits(wi, level, input_size, stride);
++	if (WARN_ON(ret))
++		return ret;
++
++	base_lower_bound = 3 + input_size - ((3 - level) * stride +
++			   wi->pgshift);
++	base_addr = wi->baddr & GENMASK_ULL(47, base_lower_bound);
++
++	if (check_output_size(wi, base_addr)) {
++		out->esr = compute_fsc(level, ESR_ELx_FSC_ADDRSZ);
++		return 1;
++	}
++
++	addr_top = input_size - 1;
++
++	while (1) {
++		phys_addr_t index;
++
++		addr_bottom = (3 - level) * stride + wi->pgshift;
++		index = (ipa & GENMASK_ULL(addr_top, addr_bottom))
++			>> (addr_bottom - 3);
++
++		paddr = base_addr | index;
++		ret = wi->read_desc(paddr, &desc, wi->data);
++		if (ret < 0)
++			return ret;
++
 +		/*
-+		 * In VHE mode those registers are compatible between
-+		 * EL1 and EL2.
++		 * Handle reversedescriptors if endianness differs between the
++		 * host and the guest hypervisor.
 +		 */
-+		write_sysreg_el1(ctxt_sys_reg(ctxt, SCTLR_EL2),	SYS_SCTLR);
-+		write_sysreg_el1(ctxt_sys_reg(ctxt, CPTR_EL2),	SYS_CPACR);
-+		write_sysreg_el1(ctxt_sys_reg(ctxt, TTBR0_EL2),	SYS_TTBR0);
-+		write_sysreg_el1(ctxt_sys_reg(ctxt, TTBR1_EL2),	SYS_TTBR1);
-+		write_sysreg_el1(ctxt_sys_reg(ctxt, TCR_EL2),	SYS_TCR);
-+		write_sysreg_el1(ctxt_sys_reg(ctxt, CNTHCTL_EL2), SYS_CNTKCTL);
-+	} else {
-+		val = translate_sctlr_el2_to_sctlr_el1(ctxt_sys_reg(ctxt, SCTLR_EL2));
-+		write_sysreg_el1(val, SYS_SCTLR);
-+		val = translate_cptr_el2_to_cpacr_el1(ctxt_sys_reg(ctxt, CPTR_EL2));
-+		write_sysreg_el1(val, SYS_CPACR);
-+		val = translate_ttbr0_el2_to_ttbr0_el1(ctxt_sys_reg(ctxt, TTBR0_EL2));
-+		write_sysreg_el1(val, SYS_TTBR0);
-+		val = translate_tcr_el2_to_tcr_el1(ctxt_sys_reg(ctxt, TCR_EL2));
-+		write_sysreg_el1(val, SYS_TCR);
-+		val = translate_cnthctl_el2_to_cntkctl_el1(ctxt_sys_reg(ctxt, CNTHCTL_EL2));
-+		write_sysreg_el1(val, SYS_CNTKCTL);
-+	}
++		if (wi->be)
++			desc = be64_to_cpu(desc);
++		else
++			desc = le64_to_cpu(desc);
 +
-+	write_sysreg_el1(ctxt_sys_reg(ctxt, ESR_EL2),	SYS_ESR);
-+	write_sysreg_el1(ctxt_sys_reg(ctxt, AFSR0_EL2),	SYS_AFSR0);
-+	write_sysreg_el1(ctxt_sys_reg(ctxt, AFSR1_EL2),	SYS_AFSR1);
-+	write_sysreg_el1(ctxt_sys_reg(ctxt, FAR_EL2),	SYS_FAR);
-+	write_sysreg(ctxt_sys_reg(ctxt, SP_EL2),	sp_el1);
-+	write_sysreg_el1(ctxt_sys_reg(ctxt, ELR_EL2),	SYS_ELR);
-+
-+	val = __fixup_spsr_el2_write(ctxt, ctxt_sys_reg(ctxt, SPSR_EL2));
-+	write_sysreg_el1(val,	SYS_SPSR);
-+}
- 
- /*
-  * VHE: Host and guest must save mdscr_el1 and sp_el0 (and the PC and
-@@ -65,6 +155,7 @@ void kvm_vcpu_load_sysregs_vhe(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
- 	struct kvm_cpu_context *host_ctxt;
-+	u64 mpidr;
- 
- 	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
- 	__sysreg_save_user_state(host_ctxt);
-@@ -77,7 +168,29 @@ void kvm_vcpu_load_sysregs_vhe(struct kvm_vcpu *vcpu)
- 	 */
- 	__sysreg32_restore_state(vcpu);
- 	__sysreg_restore_user_state(guest_ctxt);
--	__sysreg_restore_el1_state(guest_ctxt);
-+
-+	if (unlikely(__is_hyp_ctxt(guest_ctxt))) {
-+		__sysreg_restore_vel2_state(guest_ctxt);
-+	} else {
-+		if (nested_virt_in_use(vcpu)) {
-+			/*
-+			 * Only set VPIDR_EL2 for nested VMs, as this is the
-+			 * only time it changes. We'll restore the MIDR_EL1
-+			 * view on put.
-+			 */
-+			write_sysreg(ctxt_sys_reg(guest_ctxt, VPIDR_EL2), vpidr_el2);
-+
-+			/*
-+			 * As we're restoring a nested guest, set the value
-+			 * provided by the guest hypervisor.
-+			 */
-+			mpidr = ctxt_sys_reg(guest_ctxt, VMPIDR_EL2);
-+		} else {
-+			mpidr = ctxt_sys_reg(guest_ctxt, MPIDR_EL1);
++		/* Check for valid descriptor at this point */
++		if (!(desc & 1) || ((desc & 3) == 1 && level == 3)) {
++			out->esr = compute_fsc(level, ESR_ELx_FSC_FAULT);
++			out->upper_attr = desc;
++			return 1;
 +		}
 +
-+		__sysreg_restore_el1_state(guest_ctxt, mpidr);
++		/* We're at the final level or block translation level */
++		if ((desc & 3) == 1 || level == 3)
++			break;
++
++		if (check_output_size(wi, desc)) {
++			out->esr = compute_fsc(level, ESR_ELx_FSC_ADDRSZ);
++			out->upper_attr = desc;
++			return 1;
++		}
++
++		base_addr = desc & GENMASK_ULL(47, wi->pgshift);
++
++		level += 1;
++		addr_top = addr_bottom - 1;
 +	}
- 
- 	vcpu->arch.sysregs_loaded_on_cpu = true;
- 
-@@ -103,12 +216,20 @@ void kvm_vcpu_put_sysregs_vhe(struct kvm_vcpu *vcpu)
- 	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
- 	deactivate_traps_vhe_put();
- 
--	__sysreg_save_el1_state(guest_ctxt);
-+	if (unlikely(__is_hyp_ctxt(guest_ctxt)))
-+		__sysreg_save_vel2_state(guest_ctxt);
-+	else
-+		__sysreg_save_el1_state(guest_ctxt);
 +
- 	__sysreg_save_user_state(guest_ctxt);
- 	__sysreg32_save_state(vcpu);
- 
- 	/* Restore host user state */
- 	__sysreg_restore_user_state(host_ctxt);
- 
-+	/* If leaving a nesting guest, restore MPIDR_EL1 default view */
-+	if (nested_virt_in_use(vcpu))
-+		write_sysreg(read_cpuid_id(),	vpidr_el2);
++	if (level < first_block_level) {
++		out->esr = compute_fsc(level, ESR_ELx_FSC_FAULT);
++		out->upper_attr = desc;
++		return 1;
++	}
 +
- 	vcpu->arch.sysregs_loaded_on_cpu = false;
- }
++	/*
++	 * We don't use the contiguous bit in the stage-2 ptes, so skip check
++	 * for misprogramming of the contiguous bit.
++	 */
++
++	if (check_output_size(wi, desc)) {
++		out->esr = compute_fsc(level, ESR_ELx_FSC_ADDRSZ);
++		out->upper_attr = desc;
++		return 1;
++	}
++
++	if (!(desc & BIT(10))) {
++		out->esr = compute_fsc(level, ESR_ELx_FSC_ACCESS);
++		out->upper_attr = desc;
++		return 1;
++	}
++
++	/* Calculate and return the result */
++	paddr = (desc & GENMASK_ULL(47, addr_bottom)) |
++		(ipa & GENMASK_ULL(addr_bottom - 1, 0));
++	out->output = paddr;
++	out->block_size = 1UL << ((3 - level) * stride + wi->pgshift);
++	out->readable = desc & (0b01 << 6);
++	out->writable = desc & (0b10 << 6);
++	out->level = level;
++	out->upper_attr = desc & GENMASK_ULL(63, 52);
++	return 0;
++}
++
++static int read_guest_s2_desc(phys_addr_t pa, u64 *desc, void *data)
++{
++	struct kvm_vcpu *vcpu = data;
++
++	return kvm_read_guest(vcpu->kvm, pa, desc, sizeof(*desc));
++}
++
++static void vtcr_to_walk_info(u64 vtcr, struct s2_walk_info *wi)
++{
++	wi->t0sz = vtcr & TCR_EL2_T0SZ_MASK;
++
++	switch (vtcr & VTCR_EL2_TG0_MASK) {
++	case VTCR_EL2_TG0_4K:
++		wi->pgshift = 12;	 break;
++	case VTCR_EL2_TG0_16K:
++		wi->pgshift = 14;	 break;
++	case VTCR_EL2_TG0_64K:
++	default:
++		wi->pgshift = 16;	 break;
++	}
++
++	wi->pgsize = 1UL << wi->pgshift;
++	wi->ps = (vtcr & VTCR_EL2_PS_MASK) >> VTCR_EL2_PS_SHIFT;
++	wi->sl = (vtcr & VTCR_EL2_SL0_MASK) >> VTCR_EL2_SL0_SHIFT;
++	wi->max_pa_bits = VTCR_EL2_IPA(vtcr);
++}
++
++int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
++		       struct kvm_s2_trans *result)
++{
++	u64 vtcr = vcpu_read_sys_reg(vcpu, VTCR_EL2);
++	struct s2_walk_info wi;
++	int ret;
++
++	result->esr = 0;
++
++	if (!nested_virt_in_use(vcpu))
++		return 0;
++
++	wi.read_desc = read_guest_s2_desc;
++	wi.data = vcpu;
++	wi.baddr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
++
++	vtcr_to_walk_info(vtcr, &wi);
++
++	wi.be = vcpu_read_sys_reg(vcpu, SCTLR_EL2) & SCTLR_EE;
++	wi.el1_aarch32 = vcpu_mode_is_32bit(vcpu);
++
++	ret = walk_nested_s2_pgd(gipa, &wi, result);
++	if (ret)
++		result->esr |= (kvm_vcpu_get_esr(vcpu) & ~ESR_ELx_FSC);
++
++	return ret;
++}
++
+ /* Must be called with kvm->lock held */
+ struct kvm_s2_mmu *lookup_s2_mmu(struct kvm *kvm, u64 vttbr, u64 hcr)
+ {
 -- 
 2.29.2
 
