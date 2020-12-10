@@ -2,62 +2,71 @@ Return-Path: <SRS0=L5kI=FO=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EEF4C433FE
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 14:45:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A0DBC433FE
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 16:00:37 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id AF36A22EBE
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 14:45:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF36A22EBE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 06A6323E22
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 16:00:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06A6323E22
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 02BAE4B1B5;
-	Thu, 10 Dec 2020 09:45:55 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 82F3F4B1C7;
+	Thu, 10 Dec 2020 11:00:36 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 1TX8qODjPCy0; Thu, 10 Dec 2020 09:45:53 -0500 (EST)
+	with ESMTP id krVhMCZ0YrrE; Thu, 10 Dec 2020 11:00:36 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5FED84B174;
-	Thu, 10 Dec 2020 09:45:53 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C98004B1DD;
+	Thu, 10 Dec 2020 11:00:34 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B72F4B124
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 09:45:52 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5980D4B126
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 11:00:33 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id seomdrqmXir7 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Dec 2020 09:45:51 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E985E4B119
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 09:45:50 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9666C1FB;
- Thu, 10 Dec 2020 06:45:50 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DD18C3F718;
- Thu, 10 Dec 2020 06:45:49 -0800 (PST)
-Subject: Re: [kvm-unit-tests PATCH 08/10] arm/arm64: gic: Split check_acked()
- into two functions
-To: Auger Eric <eric.auger@redhat.com>, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, drjones@redhat.com
-References: <20201125155113.192079-1-alexandru.elisei@arm.com>
- <20201125155113.192079-9-alexandru.elisei@arm.com>
- <0eb98cb0-835c-e257-484e-8210f1279f2c@redhat.com>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <2b8d774e-9398-e24b-6989-8643f5dd2492@arm.com>
-Date: Thu, 10 Dec 2020 14:45:37 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.3
+ with ESMTP id IEdl3UU5XwmF for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Dec 2020 11:00:32 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 134D14B17A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 11:00:32 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 2E29C23D56;
+ Thu, 10 Dec 2020 16:00:31 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1knOMm-0008Di-Ny; Thu, 10 Dec 2020 16:00:29 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org
+Subject: [PATCH v3 01/66] arm64: Add ARM64_HAS_NESTED_VIRT cpufeature
+Date: Thu, 10 Dec 2020 15:58:57 +0000
+Message-Id: <20201210160002.1407373-2-maz@kernel.org>
+X-Mailer: git-send-email 2.29.2
+In-Reply-To: <20201210160002.1407373-1-maz@kernel.org>
+References: <20201210160002.1407373-1-maz@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <0eb98cb0-835c-e257-484e-8210f1279f2c@redhat.com>
-Content-Language: en-US
-Cc: andre.przywara@arm.com
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com,
+ christoffer.dall@arm.com, jintack@cs.columbia.edu, alexandru.elisei@arm.com,
+ james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+ kernel-team@android.com, jintack.lim@linaro.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, Andre Przywara <andre.przywara@arm.com>,
+ Jintack Lim <jintack.lim@linaro.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -74,171 +83,96 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Eric,
+From: Jintack Lim <jintack.lim@linaro.org>
 
-On 12/3/20 1:39 PM, Auger Eric wrote:
->
-> On 11/25/20 4:51 PM, Alexandru Elisei wrote:
->> check_acked() has several peculiarities: is the only function among the
->> check_* functions which calls report() directly, it does two things
->> (waits for interrupts and checks for misfired interrupts) and it also
->> mixes printf, report_info and report calls.
->>
->> check_acked() also reports a pass and returns as soon all the target CPUs
->> have received interrupts, However, a CPU not having received an interrupt
->> *now* does not guarantee not receiving an eroneous interrupt if we wait
-> erroneous
->> long enough.
->>
->> Rework the function by splitting it into two separate functions, each with
->> a single responsability: wait_for_interrupts(), which waits for the
->> expected interrupts to fire, and check_acked() which checks that interrupts
->> have been received as expected.
->>
->> wait_for_interrupts() also waits an extra 100 milliseconds after the
->> expected interrupts have been received in an effort to make sure we don't
->> miss misfiring interrupts.
->>
->> Splitting check_acked() into two functions will also allow us to
->> customize the behavior of each function in the future more easily
->> without using an unnecessarily long list of arguments for check_acked().
->>
->> CC: Andre Przywara <andre.przywara@arm.com>
->> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
->> ---
->>  arm/gic.c | 73 +++++++++++++++++++++++++++++++++++--------------------
->>  1 file changed, 47 insertions(+), 26 deletions(-)
->>
->> diff --git a/arm/gic.c b/arm/gic.c
->> index 544c283f5f47..dcdab7d5f39a 100644
->> --- a/arm/gic.c
->> +++ b/arm/gic.c
->> @@ -62,41 +62,42 @@ static void stats_reset(void)
->>  	}
->>  }
->>  
->> -static void check_acked(const char *testname, cpumask_t *mask)
->> +static void wait_for_interrupts(cpumask_t *mask)
->>  {
->> -	int missing = 0, extra = 0, unexpected = 0;
->>  	int nr_pass, cpu, i;
->> -	bool bad = false;
->>  
->>  	/* Wait up to 5s for all interrupts to be delivered */
->> -	for (i = 0; i < 50; ++i) {
->> +	for (i = 0; i < 50; i++) {
->>  		mdelay(100);
->>  		nr_pass = 0;
->>  		for_each_present_cpu(cpu) {
->> +			/*
->> +			 * A CPU having receied more than one interrupts will
-> received
->> +			 * show up in check_acked(), and no matter how long we
->> +			 * wait it cannot un-receive it. Consier at least one
-> consider
+Add a new ARM64_HAS_NESTED_VIRT feature to indicate that the
+CPU has the ARMv8.3 nested virtualization capability.
 
-Will fix all three typos, thanks.
+This will be used to support nested virtualization in KVM.
 
->> +			 * interrupt as a pass.
->> +			 */
->>  			nr_pass += cpumask_test_cpu(cpu, mask) ?
->> -				acked[cpu] == 1 : acked[cpu] == 0;
->> -			smp_rmb(); /* pairs with smp_wmb in ipi_handler */
->> -
->> -			if (bad_sender[cpu] != -1) {
->> -				printf("cpu%d received IPI from wrong sender %d\n",
->> -					cpu, bad_sender[cpu]);
->> -				bad = true;
->> -			}
->> -
->> -			if (bad_irq[cpu] != -1) {
->> -				printf("cpu%d received wrong irq %d\n",
->> -					cpu, bad_irq[cpu]);
->> -				bad = true;
->> -			}
->> +				acked[cpu] >= 1 : acked[cpu] == 0;
->>  		}
->> +
->>  		if (nr_pass == nr_cpus) {
->> -			report(!bad, "%s", testname);
->>  			if (i)
->> -				report_info("took more than %d ms", i * 100);
->> +				report_info("interrupts took more than %d ms", i * 100);
->> +			mdelay(100);
->>  			return;
->>  		}
->>  	}
->>  
->> +	report_info("interrupts timed-out (5s)");
->> +}
->> +
->> +static bool check_acked(cpumask_t *mask)
->> +{
->> +	int missing = 0, extra = 0, unexpected = 0;
->> +	bool pass = true;
->> +	int cpu;
->> +
->>  	for_each_present_cpu(cpu) {
->>  		if (cpumask_test_cpu(cpu, mask)) {
->>  			if (!acked[cpu])
->> @@ -107,11 +108,28 @@ static void check_acked(const char *testname, cpumask_t *mask)
->>  			if (acked[cpu])
->>  				++unexpected;
->>  		}
->> +		smp_rmb(); /* pairs with smp_wmb in ipi_handler */
->> +
->> +		if (bad_sender[cpu] != -1) {
->> +			report_info("cpu%d received IPI from wrong sender %d",
->> +					cpu, bad_sender[cpu]);
->> +			pass = false;
->> +		}
->> +
->> +		if (bad_irq[cpu] != -1) {
->> +			report_info("cpu%d received wrong irq %d",
->> +					cpu, bad_irq[cpu]);
->> +			pass = false;
->> +		}
->> +	}
->> +
->> +	if (missing || extra || unexpected) {
->> +		report_info("ACKS: missing=%d extra=%d unexpected=%d",
->> +				missing, extra, unexpected);
->> +		pass = false;
->>  	}
->>  
->> -	report(false, "%s", testname);
->> -	report_info("Timed-out (5s). ACKS: missing=%d extra=%d unexpected=%d",
->> -		    missing, extra, unexpected);
->> +	return pass;
->>  }
->>  
->>  static void check_spurious(void)
->> @@ -300,7 +318,8 @@ static void ipi_test_self(void)
->>  	cpumask_clear(&mask);
->>  	cpumask_set_cpu(smp_processor_id(), &mask);
->>  	gic->ipi.send_self();
->> -	check_acked("IPI: self", &mask);
->> +	wait_for_interrupts(&mask);
->> +	report(check_acked(&mask), "Interrupts received");
->>  	report_prefix_pop();
->>  }
->>  
->> @@ -315,7 +334,8 @@ static void ipi_test_smp(void)
->>  	for (i = smp_processor_id() & 1; i < nr_cpus; i += 2)
->>  		cpumask_clear_cpu(i, &mask);
->>  	gic_ipi_send_mask(IPI_IRQ, &mask);
->> -	check_acked("IPI: directed", &mask);
->> +	wait_for_interrupts(&mask);
->> +	report(check_acked(&mask), "Interrupts received");
-> both ipi_test_smp and ipi_test_self are called from the same test so
-> better to use different error messages like it was done originally.
+Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ .../admin-guide/kernel-parameters.txt         |  4 +++
+ arch/arm64/include/asm/cpucaps.h              |  1 +
+ arch/arm64/kernel/cpufeature.c                | 25 +++++++++++++++++++
+ 3 files changed, 30 insertions(+)
 
-I used the same error message because the tests have a different prefix
-("target-list" versus "broadcast"). Do you think there are cases where that's not
-enough?
+diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+index ee9f13776388..727e49640124 100644
+--- a/Documentation/admin-guide/kernel-parameters.txt
++++ b/Documentation/admin-guide/kernel-parameters.txt
+@@ -2285,6 +2285,10 @@
+ 			[KVM,ARM] Allow use of GICv4 for direct injection of
+ 			LPIs.
+ 
++	kvm-arm.nested=
++			[KVM,ARM] Allow nested virtualization in KVM/ARM.
++			Default is 0 (disabled)
++
+ 	kvm_cma_resv_ratio=n [PPC]
+ 			Reserves given percentage from system memory area for
+ 			contiguous memory allocation for KVM hash pagetable
+diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
+index b77d997b173b..6c5b84692a01 100644
+--- a/arch/arm64/include/asm/cpucaps.h
++++ b/arch/arm64/include/asm/cpucaps.h
+@@ -16,6 +16,7 @@
+ #define ARM64_WORKAROUND_CAVIUM_23154		6
+ #define ARM64_WORKAROUND_834220			7
+ #define ARM64_HAS_NO_HW_PREFETCH		8
++#define ARM64_HAS_NESTED_VIRT			9
+ #define ARM64_HAS_VIRT_HOST_EXTN		11
+ #define ARM64_WORKAROUND_CAVIUM_27456		12
+ #define ARM64_HAS_32BIT_EL0			13
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index d96f4554282d..eaeea8a88292 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -1577,6 +1577,21 @@ static void cpu_copy_el2regs(const struct arm64_cpu_capabilities *__unused)
+ 	if (!alternative_is_applied(ARM64_HAS_VIRT_HOST_EXTN))
+ 		write_sysreg(read_sysreg(tpidr_el1), tpidr_el2);
+ }
++
++static bool nested_param;
++static bool has_nested_virt_support(const struct arm64_cpu_capabilities *cap,
++				    int scope)
++{
++	return has_cpuid_feature(cap, scope) &&
++		nested_param;
++}
++
++static int __init kvmarm_nested_cfg(char *buf)
++{
++	return strtobool(buf, &nested_param);
++}
++
++early_param("kvm-arm.nested", kvmarm_nested_cfg);
+ #endif
+ 
+ static void cpu_has_fwb(const struct arm64_cpu_capabilities *__unused)
+@@ -1790,6 +1805,16 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.matches = runs_at_el2,
+ 		.cpu_enable = cpu_copy_el2regs,
+ 	},
++	{
++		.desc = "Nested Virtualization Support",
++		.capability = ARM64_HAS_NESTED_VIRT,
++		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
++		.matches = has_nested_virt_support,
++		.sys_reg = SYS_ID_AA64MMFR2_EL1,
++		.sign = FTR_UNSIGNED,
++		.field_pos = ID_AA64MMFR2_NV_SHIFT,
++		.min_field_value = 1,
++	},
+ #endif	/* CONFIG_ARM64_VHE */
+ 	{
+ 		.desc = "32-bit EL0 Support",
+-- 
+2.29.2
 
-Thanks,
-Alex
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
