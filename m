@@ -2,56 +2,56 @@ Return-Path: <SRS0=L5kI=FO=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B0ACC433FE
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 07:35:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2503AC433FE
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 07:35:50 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DDAD823B51
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 07:35:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDAD823B51
+	by mail.kernel.org (Postfix) with ESMTP id B356323A7C
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 07:35:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B356323A7C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D1684B11F;
-	Thu, 10 Dec 2020 02:35:46 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 53F074B18C;
+	Thu, 10 Dec 2020 02:35:49 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id vxXQlykBmd78; Thu, 10 Dec 2020 02:35:45 -0500 (EST)
+	with ESMTP id cvsQUlqpNThA; Thu, 10 Dec 2020 02:35:48 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0AF3E4B1C9;
-	Thu, 10 Dec 2020 02:35:43 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4672C4B1DD;
+	Thu, 10 Dec 2020 02:35:47 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 559B64B134
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 02:35:42 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4879E4B11F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 02:35:46 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ts6UPF5LJ9hI for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Dec 2020 02:35:40 -0500 (EST)
+ with ESMTP id JcIWUkFJ8d5G for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Dec 2020 02:35:41 -0500 (EST)
 Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5BF0D4B18C
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E69644B17E
  for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 02:35:40 -0500 (EST)
 Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.58])
- by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4Cs5Kg6mXDz7CCV;
+ by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4Cs5Kg5xvQz7C9b;
  Thu, 10 Dec 2020 15:35:03 +0800 (CST)
 Received: from DESKTOP-5IS4806.china.huawei.com (10.174.187.37) by
  DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
- 14.3.487.0; Thu, 10 Dec 2020 15:35:26 +0800
+ 14.3.487.0; Thu, 10 Dec 2020 15:35:29 +0800
 From: Keqian Zhu <zhukeqian1@huawei.com>
 To: <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
  <iommu@lists.linux-foundation.org>, <kvm@vger.kernel.org>,
  <kvmarm@lists.cs.columbia.edu>, Alex Williamson <alex.williamson@redhat.com>, 
  Cornelia Huck <cohuck@redhat.com>, Marc Zyngier <maz@kernel.org>, Will Deacon
  <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>
-Subject: [PATCH 2/7] vfio: iommu_type1: Initially set the
- pinned_page_dirty_scope
-Date: Thu, 10 Dec 2020 15:34:20 +0800
-Message-ID: <20201210073425.25960-3-zhukeqian1@huawei.com>
+Subject: [PATCH 5/7] vfio: iommu_type1: Drop parameter "pgsize" of
+ vfio_dma_bitmap_alloc_all
+Date: Thu, 10 Dec 2020 15:34:23 +0800
+Message-ID: <20201210073425.25960-6-zhukeqian1@huawei.com>
 X-Mailer: git-send-email 2.8.4.windows.1
 In-Reply-To: <20201210073425.25960-1-zhukeqian1@huawei.com>
 References: <20201210073425.25960-1-zhukeqian1@huawei.com>
@@ -79,50 +79,44 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Currently there are 3 ways to promote the pinned_page_dirty_scope
-status of vfio_iommu:
-
-1. Through pin interface.
-2. Detach a group without dirty tracking.
-3. Attach a group with dirty tracking.
-
-For point 3, the only chance to change the pinned status is that
-the vfio_iommu is newly created.
-
-Consider that we can safely set the pinned status when create a
-new vfio_iommu, as we do it, the point 3 can be removed to reduce
-operations.
+We always use the smallest supported page size of vfio_iommu as
+pgsize. Remove parameter "pgsize" of vfio_dma_bitmap_alloc_all.
 
 Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
 ---
- drivers/vfio/vfio_iommu_type1.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+ drivers/vfio/vfio_iommu_type1.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index f129d24a6ec3..c52bcefba96b 100644
+index 00684597b098..32ab889c8193 100644
 --- a/drivers/vfio/vfio_iommu_type1.c
 +++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -2064,12 +2064,8 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
- 			 * Non-iommu backed group cannot dirty memory directly,
- 			 * it can only use interfaces that provide dirty
- 			 * tracking.
--			 * The iommu scope can only be promoted with the
--			 * addition of a dirty tracking group.
- 			 */
- 			group->pinned_page_dirty_scope = true;
--			if (!iommu->pinned_page_dirty_scope)
--				update_pinned_page_dirty_scope(iommu);
- 			mutex_unlock(&iommu->lock);
+@@ -236,9 +236,10 @@ static void vfio_dma_populate_bitmap(struct vfio_dma *dma, size_t pgsize)
+ 	}
+ }
  
- 			return 0;
-@@ -2457,6 +2453,7 @@ static void *vfio_iommu_type1_open(unsigned long arg)
- 	INIT_LIST_HEAD(&iommu->iova_list);
- 	iommu->dma_list = RB_ROOT;
- 	iommu->dma_avail = dma_entry_limit;
-+	iommu->pinned_page_dirty_scope = true;
- 	mutex_init(&iommu->lock);
- 	BLOCKING_INIT_NOTIFIER_HEAD(&iommu->notifier);
+-static int vfio_dma_bitmap_alloc_all(struct vfio_iommu *iommu, size_t pgsize)
++static int vfio_dma_bitmap_alloc_all(struct vfio_iommu *iommu)
+ {
+ 	struct rb_node *n;
++	size_t pgsize = (size_t)1 << __ffs(iommu->pgsize_bitmap);
  
+ 	for (n = rb_first(&iommu->dma_list); n; n = rb_next(n)) {
+ 		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
+@@ -2798,12 +2799,9 @@ static int vfio_iommu_type1_dirty_pages(struct vfio_iommu *iommu,
+ 		return -EINVAL;
+ 
+ 	if (dirty.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_START) {
+-		size_t pgsize;
+-
+ 		mutex_lock(&iommu->lock);
+-		pgsize = 1 << __ffs(iommu->pgsize_bitmap);
+ 		if (!iommu->dirty_page_tracking) {
+-			ret = vfio_dma_bitmap_alloc_all(iommu, pgsize);
++			ret = vfio_dma_bitmap_alloc_all(iommu);
+ 			if (!ret)
+ 				iommu->dirty_page_tracking = true;
+ 		}
 -- 
 2.23.0
 
