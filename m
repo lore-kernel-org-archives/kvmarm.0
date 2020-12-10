@@ -6,52 +6,53 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3144C4167B
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 16:05:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1008C4361B
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 16:05:15 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 481D323EB0
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 16:05:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 481D323EB0
+	by mail.kernel.org (Postfix) with ESMTP id 6A56F23DE4
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 16:05:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A56F23DE4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EA25D4B1B5;
-	Thu, 10 Dec 2020 11:05:13 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F0FF4B25A;
+	Thu, 10 Dec 2020 11:05:15 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id B-ekfmEuvFBh; Thu, 10 Dec 2020 11:05:09 -0500 (EST)
+	with ESMTP id X4LIIIXGh6H0; Thu, 10 Dec 2020 11:05:13 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 180084B2F0;
-	Thu, 10 Dec 2020 11:05:05 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4DB7C4B2D2;
+	Thu, 10 Dec 2020 11:05:13 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 228E74B2BC
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 11:05:04 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DE4E4B2BB
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 11:05:11 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gCWJF60qgyuK for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Dec 2020 11:05:03 -0500 (EST)
+ with ESMTP id kX7lD3KeHxVO for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Dec 2020 11:05:10 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9C34B4B298
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 11:05:02 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4B9C54B28D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 11:05:07 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id A762523E21;
- Thu, 10 Dec 2020 16:05:01 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 65F6623E25;
+ Thu, 10 Dec 2020 16:05:06 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1knONa-0008Di-9u; Thu, 10 Dec 2020 16:01:18 +0000
+ id 1knONW-0008Di-TQ; Thu, 10 Dec 2020 16:01:15 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v3 45/66] KVM: arm64: nv: Load timer before the GIC
-Date: Thu, 10 Dec 2020 15:59:41 +0000
-Message-Id: <20201210160002.1407373-46-maz@kernel.org>
+Subject: [PATCH v3 42/66] KVM: arm64: nv: Fold guest's HCR_EL2 configuration
+ into the host's
+Date: Thu, 10 Dec 2020 15:59:38 +0000
+Message-Id: <20201210160002.1407373-43-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201210160002.1407373-1-maz@kernel.org>
 References: <20201210160002.1407373-1-maz@kernel.org>
@@ -82,36 +83,30 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In order for vgic_v3_load_nested to be able to observe which timer
-interrupts have the HW bit set for the current context, the timers
-must have been loaded in the new mode and the right timer mapped
-to their corresponding HW IRQs.
+When entering a L2 guest (nested virt enabled, but not in hypervisor
+context), we need to honor the traps the L1 guest has asked enabled.
 
-At the moment, we load the GIC first, meaning that timer interrupts
-injected to an L2 guest will never have the HW bit set (we see the
-old configuration).
-
-Swapping the two loads solves this particular problem.
+For now, just OR the guest's HCR_EL2 into the host's. We may have to do
+some filtering in the future though.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/arm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm64/kvm/hyp/vhe/switch.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 1656dd80bbc4..2e042185e625 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -405,8 +405,8 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index bac6ccc2595c..d9dc470c7790 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -80,6 +80,8 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+ 			if (!vcpu_el2_tge_is_set(vcpu))
+ 				hcr |= HCR_AT | HCR_TTLB;
+ 		}
++	} else if (nested_virt_in_use(vcpu)) {
++		hcr |= __vcpu_sys_reg(vcpu, HCR_EL2);
+ 	}
  
- 	vcpu->cpu = cpu;
- 
--	kvm_vgic_load(vcpu);
- 	kvm_timer_vcpu_load(vcpu);
-+	kvm_vgic_load(vcpu);
- 	if (has_vhe())
- 		kvm_vcpu_load_sysregs_vhe(vcpu);
- 	kvm_arch_vcpu_load_fp(vcpu);
+ 	___activate_traps(vcpu, hcr);
 -- 
 2.29.2
 
