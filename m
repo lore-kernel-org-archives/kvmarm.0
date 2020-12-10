@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7A5DC433FE
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 16:05:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17240C4361B
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 16:05:27 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6DB0823E22
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 16:05:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DB0823E22
+	by mail.kernel.org (Postfix) with ESMTP id 99D8523EF1
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 16:05:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99D8523EF1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1467E4B315;
-	Thu, 10 Dec 2020 11:05:23 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3788F4B25A;
+	Thu, 10 Dec 2020 11:05:26 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id FGYl6nENUQPE; Thu, 10 Dec 2020 11:05:21 -0500 (EST)
+	with ESMTP id EN2+EgndnXC2; Thu, 10 Dec 2020 11:05:24 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C14B84B129;
-	Thu, 10 Dec 2020 11:05:21 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DB6D64B2E1;
+	Thu, 10 Dec 2020 11:05:24 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E0FE54B2F5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 11:05:20 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AFA7E4B1A4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 11:05:23 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Qc5ivK43h6iE for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Dec 2020 11:05:19 -0500 (EST)
+ with ESMTP id 3X4zpzqkecyW for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Dec 2020 11:05:22 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5C6714B2B4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 11:05:19 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 63AED4B131
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 11:05:22 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 7BED523D5A;
- Thu, 10 Dec 2020 16:05:18 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 4D8E923E51;
+ Thu, 10 Dec 2020 16:05:21 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1knOMv-0008Di-Mv; Thu, 10 Dec 2020 16:00:37 +0000
+ id 1knONr-0008Di-Mu; Thu, 10 Dec 2020 16:01:36 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v3 11/66] KVM: arm64: nv: Handle trapped ERET from virtual EL2
-Date: Thu, 10 Dec 2020 15:59:07 +0000
-Message-Id: <20201210160002.1407373-12-maz@kernel.org>
+Subject: [PATCH v3 64/66] KVM: arm64: nv: Enable ARMv8.4-NV support
+Date: Thu, 10 Dec 2020 16:00:00 +0000
+Message-Id: <20201210160002.1407373-65-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201210160002.1407373-1-maz@kernel.org>
 References: <20201210160002.1407373-1-maz@kernel.org>
@@ -82,77 +82,113 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@arm.com>
+As all the VNCR-capable system registers are nicely separated
+from the rest of the crowd, let's set HCR_EL2.NV2 on and let
+the ball rolling.
 
-When a guest hypervisor running virtual EL2 in EL1 executes an ERET
-instruction, we will have set HCR_EL2.NV which traps ERET to EL2, so
-that we can emulate the exception return in software.
-
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/esr.h     |  5 +++++
- arch/arm64/include/asm/kvm_arm.h |  2 +-
- arch/arm64/kvm/handle_exit.c     | 10 ++++++++++
- 3 files changed, 16 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_arm.h     |  1 +
+ arch/arm64/include/asm/kvm_emulate.h | 23 +++++++++++++----------
+ arch/arm64/include/asm/sysreg.h      |  1 +
+ arch/arm64/kvm/hyp/vhe/switch.c      | 14 +++++++++++++-
+ 4 files changed, 28 insertions(+), 11 deletions(-)
 
-diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-index 22c81f1edda2..ab63b7b3ea14 100644
---- a/arch/arm64/include/asm/esr.h
-+++ b/arch/arm64/include/asm/esr.h
-@@ -251,6 +251,11 @@
- 		(((e) & ESR_ELx_SYS64_ISS_OP2_MASK) >>		\
- 		 ESR_ELx_SYS64_ISS_OP2_SHIFT))
- 
-+/* ISS field definitions for ERET/ERETAA/ERETAB trapping */
-+
-+#define ESR_ELx_ERET_ISS_ERET_ERETAx	0x2
-+#define ESR_ELx_ERET_ISS_ERETA_ERATAB	0x1
-+
- /*
-  * ISS field definitions for floating-point exception traps
-  * (FP_EXC_32/FP_EXC_64).
 diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index e9e10e498785..4cf745f79985 100644
+index 0d88a7c51dec..37cd86aac727 100644
 --- a/arch/arm64/include/asm/kvm_arm.h
 +++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -326,7 +326,7 @@
- 	ECN(SP_ALIGN), ECN(FP_EXC32), ECN(FP_EXC64), ECN(SERROR), \
- 	ECN(BREAKPT_LOW), ECN(BREAKPT_CUR), ECN(SOFTSTP_LOW), \
- 	ECN(SOFTSTP_CUR), ECN(WATCHPT_LOW), ECN(WATCHPT_CUR), \
--	ECN(BKPT32), ECN(VECTOR32), ECN(BRK64)
-+	ECN(BKPT32), ECN(VECTOR32), ECN(BRK64), ECN(ERET)
+@@ -14,6 +14,7 @@
+ /* Hyp Configuration Register (HCR) bits */
+ #define HCR_ATA		(UL(1) << 56)
+ #define HCR_FWB		(UL(1) << 46)
++#define HCR_NV2		(UL(1) << 45)
+ #define HCR_AT		(UL(1) << 44)
+ #define HCR_NV1		(UL(1) << 43)
+ #define HCR_NV		(UL(1) << 42)
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 44b395854430..3afe937b81f1 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -242,21 +242,24 @@ static inline bool is_hyp_ctxt(const struct kvm_vcpu *vcpu)
  
- #define CPACR_EL1_FPEN		(3 << 20)
- #define CPACR_EL1_TTA		(1 << 28)
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 5245ac818e4f..56f8a77b9d4a 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -183,6 +183,15 @@ static int kvm_handle_ptrauth(struct kvm_vcpu *vcpu)
- 	return 1;
+ static inline u64 __fixup_spsr_el2_write(struct kvm_cpu_context *ctxt, u64 val)
+ {
+-	if (!__vcpu_el2_e2h_is_set(ctxt)) {
+-		/*
+-		 * Clear the .M field when writing SPSR to the CPU, so that we
+-		 * can detect when the CPU clobbered our SPSR copy during a
+-		 * local exception.
+-		 */
+-		val &= ~0xc;
+-	}
++	struct kvm_vcpu *vcpu = container_of(ctxt, struct kvm_vcpu, arch.ctxt);
++
++	if (enhanced_nested_virt_in_use(vcpu) || __vcpu_el2_e2h_is_set(ctxt))
++		return val;
+ 
+-	return val;
++	/*
++	 * Clear the .M field when writing SPSR to the CPU, so that we
++	 * can detect when the CPU clobbered our SPSR copy during a
++	 * local exception.
++	 */
++	return val &= ~0xc;
  }
  
-+static int kvm_handle_eret(struct kvm_vcpu *vcpu)
-+{
-+	if (kvm_vcpu_get_esr(vcpu) & ESR_ELx_ERET_ISS_ERET_ERETAx)
-+		return kvm_handle_ptrauth(vcpu);
+ static inline u64 __fixup_spsr_el2_read(const struct kvm_cpu_context *ctxt, u64 val)
+ {
+-	if (__vcpu_el2_e2h_is_set(ctxt))
++	struct kvm_vcpu *vcpu = container_of(ctxt, struct kvm_vcpu, arch.ctxt);
 +
-+	kvm_emulate_nested_eret(vcpu);
-+	return 1;
-+}
++	if (enhanced_nested_virt_in_use(vcpu) || __vcpu_el2_e2h_is_set(ctxt))
+ 		return val;
+ 
+ 	/*
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index d047954400d4..4cb55cf3c1d9 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -487,6 +487,7 @@
+ #define SYS_TCR_EL2			sys_reg(3, 4, 2, 0, 2)
+ #define SYS_VTTBR_EL2			sys_reg(3, 4, 2, 1, 0)
+ #define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
++#define SYS_VNCR_EL2			sys_reg(3, 4, 2, 2, 0)
+ 
+ #define SYS_DACR32_EL2			sys_reg(3, 4, 3, 0, 0)
+ 
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index 4d80596e32a5..6d57d09b8503 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -48,7 +48,13 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+ 			 * the EL1 virtual memory control register accesses
+ 			 * as well as the AT S1 operations.
+ 			 */
+-			hcr |= HCR_TVM | HCR_TRVM | HCR_AT | HCR_TTLB | HCR_NV1;
++			if (enhanced_nested_virt_in_use(vcpu)) {
++				hcr &= ~HCR_TVM;
++			} else {
++				hcr |= HCR_TVM | HCR_TRVM | HCR_TTLB;
++			}
 +
- static exit_handle_fn arm_exit_handlers[] = {
- 	[0 ... ESR_ELx_EC_MAX]	= kvm_handle_unknown_ec,
- 	[ESR_ELx_EC_WFx]	= kvm_handle_wfx,
-@@ -197,6 +206,7 @@ static exit_handle_fn arm_exit_handlers[] = {
- 	[ESR_ELx_EC_SMC64]	= handle_smc,
- 	[ESR_ELx_EC_SYS64]	= kvm_handle_sys_reg,
- 	[ESR_ELx_EC_SVE]	= handle_sve,
-+	[ESR_ELx_EC_ERET]	= kvm_handle_eret,
- 	[ESR_ELx_EC_IABT_LOW]	= kvm_handle_guest_abort,
- 	[ESR_ELx_EC_DABT_LOW]	= kvm_handle_guest_abort,
- 	[ESR_ELx_EC_SOFTSTP_LOW]= kvm_handle_guest_debug,
++			hcr |= HCR_AT | HCR_NV1;
+ 		} else {
+ 			/*
+ 			 * For a guest hypervisor on v8.1 (VHE), allow to
+@@ -80,6 +86,12 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+ 			if (!vcpu_el2_tge_is_set(vcpu))
+ 				hcr |= HCR_AT | HCR_TTLB;
+ 		}
++
++		if (enhanced_nested_virt_in_use(vcpu)) {
++			hcr |= HCR_AT | HCR_TTLB | HCR_NV2;
++			write_sysreg_s(vcpu->arch.ctxt.vncr_array,
++				       SYS_VNCR_EL2);
++		}
+ 	} else if (nested_virt_in_use(vcpu)) {
+ 		hcr |= __vcpu_sys_reg(vcpu, HCR_EL2);
+ 	}
 -- 
 2.29.2
 
