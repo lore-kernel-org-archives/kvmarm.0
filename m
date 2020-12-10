@@ -6,52 +6,53 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCF45C4361B
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 16:03:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29427C4361B
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 16:03:57 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 83B8823E56
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 16:03:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83B8823E56
+	by mail.kernel.org (Postfix) with ESMTP id A8C6523EB0
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Dec 2020 16:03:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8C6523EB0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 259594B1E4;
-	Thu, 10 Dec 2020 11:03:51 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B8B14B290;
+	Thu, 10 Dec 2020 11:03:56 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id IZNlb-P9tNBI; Thu, 10 Dec 2020 11:03:48 -0500 (EST)
+	with ESMTP id ffi27jTIKRSd; Thu, 10 Dec 2020 11:03:51 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ED8334B238;
-	Thu, 10 Dec 2020 11:03:48 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 212D34B28C;
+	Thu, 10 Dec 2020 11:03:50 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F2864B1B3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 11:03:47 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DA534B1B3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 11:03:49 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id f4LuOyIv4aJd for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Dec 2020 11:03:46 -0500 (EST)
+ with ESMTP id 3m8Ze-Ktslqo for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Dec 2020 11:03:47 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BC0FA4B24B
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 11:03:44 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C3D4B4B250
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Dec 2020 11:03:46 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id DAFB923E24;
- Thu, 10 Dec 2020 16:03:43 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id C5A0D23E25;
+ Thu, 10 Dec 2020 16:03:45 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1knOMz-0008Di-KD; Thu, 10 Dec 2020 16:00:41 +0000
+ id 1knONZ-0008Di-HH; Thu, 10 Dec 2020 16:01:17 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v3 15/66] KVM: arm64: nv: Handle HCR_EL2.E2H specially
-Date: Thu, 10 Dec 2020 15:59:11 +0000
-Message-Id: <20201210160002.1407373-16-maz@kernel.org>
+Subject: [PATCH v3 44/66] KVM: arm64: nv: Add handling of EL2-specific timer
+ registers
+Date: Thu, 10 Dec 2020 15:59:40 +0000
+Message-Id: <20201210160002.1407373-45-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201210160002.1407373-1-maz@kernel.org>
 References: <20201210160002.1407373-1-maz@kernel.org>
@@ -82,60 +83,158 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-HCR_EL2.E2H is nasty, as a flip of this bit completely changes the way
-we deal with a lot of the state. So when the guest flips this bit
-(sysregs are live), do the put/load dance so that we have a consistent
-state.
+Add the required handling for EL2 and EL02 registers, as
+well as EL1 registers used in the E2H context.
 
-Yes, this is slow. Don't do it.
-
-Suggested-by: Alexandru Elisei <alexandru.elisei@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ arch/arm64/include/asm/sysreg.h |  6 +++
+ arch/arm64/kvm/sys_regs.c       | 87 +++++++++++++++++++++++++++++++++
+ 2 files changed, 93 insertions(+)
 
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 814fb57b55d9..d047954400d4 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -559,6 +559,12 @@
+ 
+ #define SYS_CNTVOFF_EL2			sys_reg(3, 4, 14, 0, 3)
+ #define SYS_CNTHCTL_EL2			sys_reg(3, 4, 14, 1, 0)
++#define SYS_CNTHP_TVAL_EL2		sys_reg(3, 4, 14, 2, 0)
++#define SYS_CNTHP_CTL_EL2		sys_reg(3, 4, 14, 2, 1)
++#define SYS_CNTHP_CVAL_EL2		sys_reg(3, 4, 14, 2, 2)
++#define SYS_CNTHV_TVAL_EL2		sys_reg(3, 4, 14, 3, 0)
++#define SYS_CNTHV_CTL_EL2		sys_reg(3, 4, 14, 3, 1)
++#define SYS_CNTHV_CVAL_EL2		sys_reg(3, 4, 14, 3, 2)
+ 
+ /* VHE encodings for architectural EL0/1 system registers */
+ #define SYS_SCTLR_EL12			sys_reg(3, 5, 1, 0, 0)
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 77a2d452b79d..e7db4d809674 100644
+index 98ff5b42a6b5..560b44325e98 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -183,9 +183,24 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
- 		goto memory_write;
+@@ -1276,20 +1276,92 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
  
- 	if (unlikely(get_el2_mapping(reg, &el1r, &xlate))) {
-+		bool need_put_load;
+ 	switch (reg) {
+ 	case SYS_CNTP_TVAL_EL0:
++		if (vcpu_mode_el2(vcpu) && vcpu_el2_e2h_is_set(vcpu))
++			tmr = TIMER_HPTIMER;
++		else
++			tmr = TIMER_PTIMER;
++		treg = TIMER_REG_TVAL;
++		break;
 +
- 		if (!is_hyp_ctxt(vcpu))
- 			goto memory_write;
+ 	case SYS_AARCH32_CNTP_TVAL:
++	case SYS_CNTP_TVAL_EL02:
+ 		tmr = TIMER_PTIMER;
+ 		treg = TIMER_REG_TVAL;
+ 		break;
++
++	case SYS_CNTV_TVAL_EL02:
++		tmr = TIMER_VTIMER;
++		treg = TIMER_REG_TVAL;
++		break;
++
++	case SYS_CNTHP_TVAL_EL2:
++		tmr = TIMER_HPTIMER;
++		treg = TIMER_REG_TVAL;
++		break;
++
++	case SYS_CNTHV_TVAL_EL2:
++		tmr = TIMER_HVTIMER;
++		treg = TIMER_REG_TVAL;
++		break;
++
+ 	case SYS_CNTP_CTL_EL0:
++		if (vcpu_mode_el2(vcpu) && vcpu_el2_e2h_is_set(vcpu))
++			tmr = TIMER_HPTIMER;
++		else
++			tmr = TIMER_PTIMER;
++		treg = TIMER_REG_CTL;
++		break;
++
+ 	case SYS_AARCH32_CNTP_CTL:
++	case SYS_CNTP_CTL_EL02:
+ 		tmr = TIMER_PTIMER;
+ 		treg = TIMER_REG_CTL;
+ 		break;
++
++	case SYS_CNTV_CTL_EL02:
++		tmr = TIMER_VTIMER;
++		treg = TIMER_REG_CTL;
++		break;
++
++	case SYS_CNTHP_CTL_EL2:
++		tmr = TIMER_HPTIMER;
++		treg = TIMER_REG_CTL;
++		break;
++
++	case SYS_CNTHV_CTL_EL2:
++		tmr = TIMER_HVTIMER;
++		treg = TIMER_REG_CTL;
++		break;
++
+ 	case SYS_CNTP_CVAL_EL0:
++		if (vcpu_mode_el2(vcpu) && vcpu_el2_e2h_is_set(vcpu))
++			tmr = TIMER_HPTIMER;
++		else
++			tmr = TIMER_PTIMER;
++		treg = TIMER_REG_CVAL;
++		break;
++
+ 	case SYS_AARCH32_CNTP_CVAL:
++	case SYS_CNTP_CVAL_EL02:
+ 		tmr = TIMER_PTIMER;
+ 		treg = TIMER_REG_CVAL;
+ 		break;
++
++	case SYS_CNTV_CVAL_EL02:
++		tmr = TIMER_VTIMER;
++		treg = TIMER_REG_CVAL;
++		break;
++
++	case SYS_CNTHP_CVAL_EL2:
++		tmr = TIMER_HPTIMER;
++		treg = TIMER_REG_CVAL;
++		break;
++
++	case SYS_CNTHV_CVAL_EL2:
++		tmr = TIMER_HVTIMER;
++		treg = TIMER_REG_CVAL;
++		break;
++
+ 	case SYS_CNTVOFF_EL2:
+ 		tmr = TIMER_VTIMER;
+ 		treg = TIMER_REG_VOFF;
+@@ -2109,6 +2181,13 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_CNTVOFF_EL2), access_arch_timer },
+ 	{ SYS_DESC(SYS_CNTHCTL_EL2), access_rw, reset_val, CNTHCTL_EL2, 0 },
  
-+		/*
-+		 * HCR_EL2.E2H is nasty: it changes the way we interpret a
-+		 * lot of the EL2 state, so treat is as a full state
-+		 * transition.
-+		 */
-+		need_put_load = ((reg == HCR_EL2) &&
-+				 vcpu_el2_e2h_is_set(vcpu) != !!(val & HCR_E2H));
++	{ SYS_DESC(SYS_CNTHP_TVAL_EL2), access_arch_timer },
++	{ SYS_DESC(SYS_CNTHP_CTL_EL2), access_arch_timer },
++	{ SYS_DESC(SYS_CNTHP_CVAL_EL2), access_arch_timer },
++	{ SYS_DESC(SYS_CNTHV_TVAL_EL2), access_arch_timer },
++	{ SYS_DESC(SYS_CNTHV_CTL_EL2), access_arch_timer },
++	{ SYS_DESC(SYS_CNTHV_CVAL_EL2), access_arch_timer },
 +
-+		if (need_put_load) {
-+			preempt_disable();
-+			kvm_arch_vcpu_put(vcpu);
-+		}
-+
- 		/*
- 		 * Always store a copy of the write to memory to avoid having
- 		 * to reverse-translate virtual EL2 system registers for a
-@@ -193,6 +208,11 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
- 		 */
- 		__vcpu_sys_reg(vcpu, reg) = val;
+ 	{ SYS_DESC(SYS_SCTLR_EL12), access_vm_reg, reset_val, SCTLR_EL1, 0x00C50078 },
+ 	{ SYS_DESC(SYS_CPACR_EL12), access_rw, reset_val, CPACR_EL1, 0 },
+ 	{ SYS_DESC(SYS_TTBR0_EL12), access_vm_reg, reset_unknown, TTBR0_EL1 },
+@@ -2126,6 +2205,14 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_CONTEXTIDR_EL12), access_vm_reg, reset_val, CONTEXTIDR_EL1, 0 },
+ 	{ SYS_DESC(SYS_CNTKCTL_EL12), access_rw, reset_val, CNTKCTL_EL1, 0 },
  
-+		if (need_put_load) {
-+			kvm_arch_vcpu_load(vcpu, smp_processor_id());
-+			preempt_enable();
-+		}
++	{ SYS_DESC(SYS_CNTP_TVAL_EL02), access_arch_timer },
++	{ SYS_DESC(SYS_CNTP_CTL_EL02), access_arch_timer },
++	{ SYS_DESC(SYS_CNTP_CVAL_EL02), access_arch_timer },
 +
- 		switch (reg) {
- 		case ELR_EL2:
- 			write_sysreg_el1(val, SYS_ELR);
++	{ SYS_DESC(SYS_CNTV_TVAL_EL02), access_arch_timer },
++	{ SYS_DESC(SYS_CNTV_CTL_EL02), access_arch_timer },
++	{ SYS_DESC(SYS_CNTV_CVAL_EL02), access_arch_timer },
++
+ 	{ SYS_DESC(SYS_SP_EL2), NULL, reset_unknown, SP_EL2 },
+ };
+ 
 -- 
 2.29.2
 
