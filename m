@@ -7,48 +7,48 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 136EDC4167B
-	for <kvmarm@archiver.kernel.org>; Fri, 11 Dec 2020 16:00:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C773C433FE
+	for <kvmarm@archiver.kernel.org>; Fri, 11 Dec 2020 16:00:23 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 472D223E24
-	for <kvmarm@archiver.kernel.org>; Fri, 11 Dec 2020 16:00:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 472D223E24
+	by mail.kernel.org (Postfix) with ESMTP id 954ED206D5
+	for <kvmarm@archiver.kernel.org>; Fri, 11 Dec 2020 16:00:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 954ED206D5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C16ED4B2BE;
-	Fri, 11 Dec 2020 11:00:18 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DF934B31F;
+	Fri, 11 Dec 2020 11:00:22 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id yfc57h4-ogIw; Fri, 11 Dec 2020 11:00:17 -0500 (EST)
+	with ESMTP id hnSlZjpphwQM; Fri, 11 Dec 2020 11:00:20 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4019F4B30C;
-	Fri, 11 Dec 2020 11:00:17 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C1194B30E;
+	Fri, 11 Dec 2020 11:00:20 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 85A0D4B303
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Dec 2020 11:00:16 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F8374B2BD
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Dec 2020 11:00:19 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nk621s0ohB6U for <kvmarm@lists.cs.columbia.edu>;
- Fri, 11 Dec 2020 11:00:15 -0500 (EST)
+ with ESMTP id imqGm0b1YClq for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 11 Dec 2020 11:00:17 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 492624B28C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Dec 2020 11:00:15 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D5ED64B2B8
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Dec 2020 11:00:17 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E566B1042;
- Fri, 11 Dec 2020 08:00:14 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 075F613D5;
+ Fri, 11 Dec 2020 08:00:17 -0800 (PST)
 Received: from donnerap.arm.com (donnerap.cambridge.arm.com [10.1.195.35])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 10DD93F66B;
- Fri, 11 Dec 2020 08:00:12 -0800 (PST)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 25A853F66B;
+ Fri, 11 Dec 2020 08:00:15 -0800 (PST)
 From: Andre Przywara <andre.przywara@arm.com>
 To: Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
  Ard Biesheuvel <ardb@kernel.org>, Russell King <linux@armlinux.org.uk>,
  Marc Zyngier <maz@kernel.org>
-Subject: [PATCH v4 1/5] firmware: smccc: Add SMCCC TRNG function call IDs
-Date: Fri, 11 Dec 2020 16:00:01 +0000
-Message-Id: <20201211160005.187336-2-andre.przywara@arm.com>
+Subject: [PATCH v4 2/5] firmware: smccc: Introduce SMCCC TRNG framework
+Date: Fri, 11 Dec 2020 16:00:02 +0000
+Message-Id: <20201211160005.187336-3-andre.przywara@arm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20201211160005.187336-1-andre.przywara@arm.com>
 References: <20201211160005.187336-1-andre.przywara@arm.com>
@@ -74,63 +74,96 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Ard Biesheuvel <ardb@kernel.org>
+The ARM DEN0098 document describe an SMCCC based firmware service to
+deliver hardware generated random numbers. Its existence is advertised
+according to the SMCCC v1.1 specification.
 
-The ARM architected TRNG firmware interface, described in ARM spec
-DEN0098, define an ARM SMCCC based interface to a true random number
-generator, provided by firmware.
+Add a (dummy) call to probe functions implemented in each architecture
+(ARM and arm64), to determine the existence of this interface.
+For now this return false, but this will be overwritten by each
+architecture's support patch.
 
-Add the definitions of the SMCCC functions as defined by the spec.
-
-Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
 ---
- include/linux/arm-smccc.h | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+ arch/arm/include/asm/archrandom.h   | 10 ++++++++++
+ arch/arm64/include/asm/archrandom.h | 12 ++++++++++++
+ drivers/firmware/smccc/smccc.c      |  6 ++++++
+ 3 files changed, 28 insertions(+)
+ create mode 100644 arch/arm/include/asm/archrandom.h
 
-diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
-index f860645f6512..62c54234576c 100644
---- a/include/linux/arm-smccc.h
-+++ b/include/linux/arm-smccc.h
-@@ -102,6 +102,37 @@
- 			   ARM_SMCCC_OWNER_STANDARD_HYP,	\
- 			   0x21)
+diff --git a/arch/arm/include/asm/archrandom.h b/arch/arm/include/asm/archrandom.h
+new file mode 100644
+index 000000000000..a8e84ca5c2ee
+--- /dev/null
++++ b/arch/arm/include/asm/archrandom.h
+@@ -0,0 +1,10 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef _ASM_ARCHRANDOM_H
++#define _ASM_ARCHRANDOM_H
++
++static inline bool __init smccc_probe_trng(void)
++{
++	return false;
++}
++
++#endif /* _ASM_ARCHRANDOM_H */
+diff --git a/arch/arm64/include/asm/archrandom.h b/arch/arm64/include/asm/archrandom.h
+index ffb1a40d5475..abe07c21da8e 100644
+--- a/arch/arm64/include/asm/archrandom.h
++++ b/arch/arm64/include/asm/archrandom.h
+@@ -8,6 +8,11 @@
+ #include <linux/kernel.h>
+ #include <asm/cpufeature.h>
  
-+/* TRNG entropy source calls (defined by ARM DEN0098) */
-+#define ARM_SMCCC_TRNG_VERSION					\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
-+			   ARM_SMCCC_SMC_32,			\
-+			   ARM_SMCCC_OWNER_STANDARD,		\
-+			   0x50)
++static inline bool __init smccc_probe_trng(void)
++{
++	return false;
++}
 +
-+#define ARM_SMCCC_TRNG_FEATURES					\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
-+			   ARM_SMCCC_SMC_32,			\
-+			   ARM_SMCCC_OWNER_STANDARD,		\
-+			   0x51)
+ static inline bool __arm64_rndr(unsigned long *v)
+ {
+ 	bool ok;
+@@ -79,5 +84,12 @@ arch_get_random_seed_long_early(unsigned long *v)
+ }
+ #define arch_get_random_seed_long_early arch_get_random_seed_long_early
+ 
++#else /* !CONFIG_ARCH_RANDOM */
 +
-+#define ARM_SMCCC_TRNG_GET_UUID					\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
-+			   ARM_SMCCC_SMC_32,			\
-+			   ARM_SMCCC_OWNER_STANDARD,		\
-+			   0x52)
++static inline bool __init smccc_probe_trng(void)
++{
++	return false;
++}
 +
-+#define ARM_SMCCC_TRNG_RND32					\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
-+			   ARM_SMCCC_SMC_32,			\
-+			   ARM_SMCCC_OWNER_STANDARD,		\
-+			   0x53)
+ #endif /* CONFIG_ARCH_RANDOM */
+ #endif /* _ASM_ARCHRANDOM_H */
+diff --git a/drivers/firmware/smccc/smccc.c b/drivers/firmware/smccc/smccc.c
+index 00c88b809c0c..d52bfc5ed5e4 100644
+--- a/drivers/firmware/smccc/smccc.c
++++ b/drivers/firmware/smccc/smccc.c
+@@ -5,16 +5,22 @@
+ 
+ #define pr_fmt(fmt) "smccc: " fmt
+ 
++#include <linux/cache.h>
+ #include <linux/init.h>
+ #include <linux/arm-smccc.h>
++#include <asm/archrandom.h>
+ 
+ static u32 smccc_version = ARM_SMCCC_VERSION_1_0;
+ static enum arm_smccc_conduit smccc_conduit = SMCCC_CONDUIT_NONE;
+ 
++bool __ro_after_init smccc_trng_available = false;
 +
-+#define ARM_SMCCC_TRNG_RND64					\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
-+			   ARM_SMCCC_SMC_64,			\
-+			   ARM_SMCCC_OWNER_STANDARD,		\
-+			   0x53)
+ void __init arm_smccc_version_init(u32 version, enum arm_smccc_conduit conduit)
+ {
+ 	smccc_version = version;
+ 	smccc_conduit = conduit;
 +
- /*
-  * Return codes defined in ARM DEN 0070A
-  * ARM DEN 0070A is now merged/consolidated into ARM DEN 0028 C
++	smccc_trng_available = smccc_probe_trng();
+ }
+ 
+ enum arm_smccc_conduit arm_smccc_1_1_get_conduit(void)
 -- 
 2.17.1
 
