@@ -7,69 +7,69 @@ X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23342C4361B
-	for <kvmarm@archiver.kernel.org>; Sat, 12 Dec 2020 18:50:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EBC9C4361B
+	for <kvmarm@archiver.kernel.org>; Sat, 12 Dec 2020 18:51:03 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BCB25207B6
-	for <kvmarm@archiver.kernel.org>; Sat, 12 Dec 2020 18:50:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCB25207B6
+	by mail.kernel.org (Postfix) with ESMTP id DD5FA2076A
+	for <kvmarm@archiver.kernel.org>; Sat, 12 Dec 2020 18:51:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD5FA2076A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6EF384B4ED;
-	Sat, 12 Dec 2020 13:50:55 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8EBBC4B4EA;
+	Sat, 12 Dec 2020 13:51:02 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Xoqrqmq3SnMc; Sat, 12 Dec 2020 13:50:54 -0500 (EST)
+	with ESMTP id fT+AOAPT6xaD; Sat, 12 Dec 2020 13:51:01 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 66B164B4C4;
-	Sat, 12 Dec 2020 13:50:54 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 980E74B4CE;
+	Sat, 12 Dec 2020 13:51:01 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9601E4B4B8
- for <kvmarm@lists.cs.columbia.edu>; Sat, 12 Dec 2020 13:50:52 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A87D4B460
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 12 Dec 2020 13:51:00 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2itfpTl+Zi7k for <kvmarm@lists.cs.columbia.edu>;
- Sat, 12 Dec 2020 13:50:51 -0500 (EST)
+ with ESMTP id wnq2Zs1O5R6A for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 12 Dec 2020 13:50:59 -0500 (EST)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [63.128.21.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CCD5D4B4BE
- for <kvmarm@lists.cs.columbia.edu>; Sat, 12 Dec 2020 13:50:51 -0500 (EST)
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3648D4B3BF
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 12 Dec 2020 13:50:59 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1607799051;
+ s=mimecast20190719; t=1607799059;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=+A3phxBKaaaLjrjDmzMcORteXFYyi2v6m11ADHyJ5AE=;
- b=J2pxx60hie9jnLBebMm8L26YWttmV47tpvEaIQZP58ZAaqJBZJ3wARXg479ovdECXRUt+o
- QZW7zwRjM5NJhS+DRxnEKHHiTFhs/KxrN8o7hFk4QwN/FEoyqNUeXQ8k72ps4GyUn4hqRf
- 9UIv6RNmpL4yDH39JGvPFjn2RywcfCY=
+ bh=NlbOv5ii6grQlFjgIBY+uOK3pf0pS/ezgT4J4s7SvgU=;
+ b=d21RIwSebgIWeiQ5nOABYW9Vx17pdh7U9WGX4IPFsZ/vFz/4Ww+qW3r/OUdGan+CiqQDJX
+ 1MzlqDwuevs8eVLAVO6g316T+N/hlFbIzWBaSTelAUiYj2boTGDucigGP6Iz44QOESYHgH
+ hecOB4F8AILYtGoiqCGAn7kdhbg/S6M=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-500-c1s9mzLFP_-x7xrl0AmGAg-1; Sat, 12 Dec 2020 13:50:50 -0500
-X-MC-Unique: c1s9mzLFP_-x7xrl0AmGAg-1
+ us-mta-109-8mLKiPbROjeUz8Ab6OySaQ-1; Sat, 12 Dec 2020 13:50:55 -0500
+X-MC-Unique: 8mLKiPbROjeUz8Ab6OySaQ-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 57DFC10054FF;
- Sat, 12 Dec 2020 18:50:48 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CF599107ACE3;
+ Sat, 12 Dec 2020 18:50:53 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-115-41.ams2.redhat.com [10.36.115.41])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 76CF01F069;
- Sat, 12 Dec 2020 18:50:45 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AFA9F1F069;
+ Sat, 12 Dec 2020 18:50:48 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com,
  linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
  kvmarm@lists.cs.columbia.edu, maz@kernel.org, drjones@redhat.com
-Subject: [PATCH 6/9] docs: kvm: devices/arm-vgic-v3: enhance
- KVM_DEV_ARM_VGIC_CTRL_INIT doc
-Date: Sat, 12 Dec 2020 19:50:07 +0100
-Message-Id: <20201212185010.26579-7-eric.auger@redhat.com>
+Subject: [PATCH 7/9] KVM: arm64: Simplify argument passing to
+ vgic_uaccess_[read|write]
+Date: Sat, 12 Dec 2020 19:50:08 +0100
+Message-Id: <20201212185010.26579-8-eric.auger@redhat.com>
 In-Reply-To: <20201212185010.26579-1-eric.auger@redhat.com>
 References: <20201212185010.26579-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -91,28 +91,55 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-kvm_arch_vcpu_precreate() returns -EBUSY if the vgic is
-already initialized. So let's document that KVM_DEV_ARM_VGIC_CTRL_INIT
-must be called after all vcpu creations.
+Instead of converting the vgic_io_device handle to a kvm_io_device
+handled and then do the oppositive, pass a vgic_io_device pointer all
+along the call chain.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- Documentation/virt/kvm/devices/arm-vgic-v3.rst | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm64/kvm/vgic/vgic-mmio.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/Documentation/virt/kvm/devices/arm-vgic-v3.rst b/Documentation/virt/kvm/devices/arm-vgic-v3.rst
-index 5dd3bff51978..322de6aebdec 100644
---- a/Documentation/virt/kvm/devices/arm-vgic-v3.rst
-+++ b/Documentation/virt/kvm/devices/arm-vgic-v3.rst
-@@ -228,7 +228,7 @@ Groups:
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio.c b/arch/arm64/kvm/vgic/vgic-mmio.c
+index b2d73fc0d1ef..48c6067fc5ec 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio.c
++++ b/arch/arm64/kvm/vgic/vgic-mmio.c
+@@ -938,10 +938,9 @@ vgic_get_mmio_region(struct kvm_vcpu *vcpu, struct vgic_io_device *iodev,
+ 	return region;
+ }
  
-     KVM_DEV_ARM_VGIC_CTRL_INIT
-       request the initialization of the VGIC, no additional parameter in
--      kvm_device_attr.addr.
-+      kvm_device_attr.addr. Must be called after all vcpu creations.
-     KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES
-       save all LPI pending bits into guest RAM pending tables.
+-static int vgic_uaccess_read(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
++static int vgic_uaccess_read(struct kvm_vcpu *vcpu, struct vgic_io_device *iodev,
+ 			     gpa_t addr, u32 *val)
+ {
+-	struct vgic_io_device *iodev = kvm_to_vgic_iodev(dev);
+ 	const struct vgic_register_region *region;
+ 	struct kvm_vcpu *r_vcpu;
  
+@@ -960,10 +959,9 @@ static int vgic_uaccess_read(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
+ 	return 0;
+ }
+ 
+-static int vgic_uaccess_write(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
++static int vgic_uaccess_write(struct kvm_vcpu *vcpu, struct vgic_io_device *iodev,
+ 			      gpa_t addr, const u32 *val)
+ {
+-	struct vgic_io_device *iodev = kvm_to_vgic_iodev(dev);
+ 	const struct vgic_register_region *region;
+ 	struct kvm_vcpu *r_vcpu;
+ 
+@@ -986,9 +984,9 @@ int vgic_uaccess(struct kvm_vcpu *vcpu, struct vgic_io_device *dev,
+ 		 bool is_write, int offset, u32 *val)
+ {
+ 	if (is_write)
+-		return vgic_uaccess_write(vcpu, &dev->dev, offset, val);
++		return vgic_uaccess_write(vcpu, dev, offset, val);
+ 	else
+-		return vgic_uaccess_read(vcpu, &dev->dev, offset, val);
++		return vgic_uaccess_read(vcpu, dev, offset, val);
+ }
+ 
+ static int dispatch_mmio_read(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
 -- 
 2.21.3
 
