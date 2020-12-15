@@ -2,89 +2,70 @@ Return-Path: <SRS0=rNEr=FT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-20.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB32BC4361B
-	for <kvmarm@archiver.kernel.org>; Tue, 15 Dec 2020 09:15:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21BDDC4361B
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Dec 2020 09:37:32 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 19EB722225
-	for <kvmarm@archiver.kernel.org>; Tue, 15 Dec 2020 09:15:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19EB722225
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 6178C22258
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Dec 2020 09:37:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6178C22258
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 652D94B312;
-	Tue, 15 Dec 2020 04:15:25 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BDA124B5E6;
+	Tue, 15 Dec 2020 04:37:30 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id VlXoPvAtB8Pu; Tue, 15 Dec 2020 04:15:24 -0500 (EST)
+	with ESMTP id DSqG6176IzjT; Tue, 15 Dec 2020 04:37:29 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D0484B60A;
-	Tue, 15 Dec 2020 04:15:24 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A1D64B5EC;
+	Tue, 15 Dec 2020 04:37:29 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B93534B5A3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Dec 2020 04:15:22 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D7014B5D5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Dec 2020 04:37:28 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AjxtGsv4dxDU for <kvmarm@lists.cs.columbia.edu>;
- Tue, 15 Dec 2020 04:15:21 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [63.128.21.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B44A24B5A0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Dec 2020 04:15:21 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1608023721;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=O8vOwmavx8ihSPDbAxUEl+n9azXIzCxQySB+gxrmz0c=;
- b=eqjn3c9nVS8Wusry+P1DHSG+ZSQYsdRi08RKHFkgG2dGLGgE38+HVq0hn+RD/zyRTWU+UM
- 2PimUJsz7BBcZD8saITXONM9mtFEJ7tk59c9H+WnMSJGSqPGcV2SNVwtZE1mi2qWDbKdql
- RPLSqOwYiLGG8xvPwlKJ15NQV3neWPU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-590--Sn2KTchP_WvY6HMSz-iNA-1; Tue, 15 Dec 2020 04:15:17 -0500
-X-MC-Unique: -Sn2KTchP_WvY6HMSz-iNA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 447851935780;
- Tue, 15 Dec 2020 09:15:16 +0000 (UTC)
-Received: from [10.36.116.173] (ovpn-116-173.ams2.redhat.com [10.36.116.173])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2C08971CBE;
- Tue, 15 Dec 2020 09:15:13 +0000 (UTC)
-Subject: Re: [PATCH 5/5] KVM: arm64: Remove redundant call to
- kvm_pmu_vcpu_reset()
-To: Alexandru Elisei <alexandru.elisei@arm.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- maz@kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com,
- suzuki.poulose@arm.com
-References: <20201201150157.223625-1-alexandru.elisei@arm.com>
- <20201201150157.223625-6-alexandru.elisei@arm.com>
- <9f68ed5e-371e-6c0c-7ba3-b14ff059430f@redhat.com>
- <eba17923-3e33-3e3d-0cf0-8f66d389146b@arm.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <594ae6f5-ad00-6279-e963-8b047c0209d6@redhat.com>
-Date: Tue, 15 Dec 2020 10:15:12 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ with ESMTP id ToSqbEQ2dei6 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 15 Dec 2020 04:37:26 -0500 (EST)
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 001AB4B44A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Dec 2020 04:37:25 -0500 (EST)
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
+ by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4CwCnn3xk5z6tw7;
+ Tue, 15 Dec 2020 17:36:45 +0800 (CST)
+Received: from [10.174.187.37] (10.174.187.37) by
+ DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
+ 14.3.498.0; Tue, 15 Dec 2020 17:37:12 +0800
+Subject: Re: [PATCH 4/7] vfio: iommu_type1: Fix missing dirty page when
+ promote pinned_scope
+To: Alex Williamson <alex.williamson@redhat.com>
+References: <20201210073425.25960-1-zhukeqian1@huawei.com>
+ <20201210073425.25960-5-zhukeqian1@huawei.com>
+ <20201214170459.50cb8729@omen.home>
+From: zhukeqian <zhukeqian1@huawei.com>
+Message-ID: <d2073c05-b6c9-04b4-782c-b89680834633@huawei.com>
+Date: Tue, 15 Dec 2020 17:37:11 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-In-Reply-To: <eba17923-3e33-3e3d-0cf0-8f66d389146b@arm.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
+In-Reply-To: <20201214170459.50cb8729@omen.home>
+X-Originating-IP: [10.174.187.37]
+X-CFilter-Loop: Reflected
+Cc: Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, Marc
+ Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
+ Cornelia Huck <cohuck@redhat.com>, linux-kernel@vger.kernel.org,
+ Sean Christopherson <sean.j.christopherson@intel.com>,
+ Alexios Zavras <alexios.zavras@intel.com>, iommu@lists.linux-foundation.org,
+ Mark Brown <broonie@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ Robin Murphy <robin.murphy@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -101,80 +82,92 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Alexandru,
+Hi Alex,
 
-On 12/14/20 3:02 PM, Alexandru Elisei wrote:
-> Hi Eric,
+On 2020/12/15 8:04, Alex Williamson wrote:
+> On Thu, 10 Dec 2020 15:34:22 +0800
+> Keqian Zhu <zhukeqian1@huawei.com> wrote:
 > 
-> Thanks for having a look!
-> 
-> On 12/14/20 1:48 PM, Auger Eric wrote:
->> Alexandru,
+>> When we pin or detach a group which is not dirty tracking capable,
+>> we will try to promote pinned_scope of vfio_iommu.
 >>
->> On 12/1/20 4:01 PM, Alexandru Elisei wrote:
->>> KVM_ARM_VCPU_INIT ioctl calls kvm_reset_vcpu(), which in turn resets the
->>> PMU with a call to kvm_pmu_vcpu_reset(). The function zeroes the PMU
->>> chained counters bitmap and stops all the counters with a perf event
->>> attached. Because it is called before the VCPU has had the chance to run,
->>> no perf events are in use and none are released.
->>>
->>> kvm_arm_pmu_v3_enable(), called by kvm_vcpu_first_run_init() only if the
->>> VCPU has not been initialized, also resets the PMU. kvm_pmu_vcpu_reset() in
->> This sounds strange to me. kvm_vcpu_first_run_init() only is called if
->> kvm_vcpu_initialized(vcpu) is true.
+>> If we succeed to do so, vfio only report pinned_scope as dirty to
+>> userspace next time, but these memory written before pin or detach
+>> is missed.
+>>
+>> The solution is that we must populate all dma range as dirty before
+>> promoting pinned_scope of vfio_iommu.
 > 
-> Typo on my part, the "not" should not be there. kvm_vcpu_first_run_init() is
-> called only if kvm_vcpu_initialized() returns true in kvm_arch_vcpu_ioctl_run().
+> Please don't bury fixes patches into a series with other optimizations
+> and semantic changes.  Send it separately.
 > 
->>> this case does the exact same thing as the previous call, so remove it.
->>>
->>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
->>> ---
->>>  arch/arm64/kvm/pmu-emul.c | 2 --
->>>  1 file changed, 2 deletions(-)
->>>
->>> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
->>> index 398f6df1bbe4..4ad66a532e38 100644
->>> --- a/arch/arm64/kvm/pmu-emul.c
->>> +++ b/arch/arm64/kvm/pmu-emul.c
->>> @@ -850,8 +850,6 @@ int kvm_arm_pmu_v3_enable(struct kvm_vcpu *vcpu)
->>>  		   return -EINVAL;
->>>  	}
->>>  
->>> -	kvm_pmu_vcpu_reset(vcpu);
->>> -
->> this patch does not apply for me (vcpu->arch.pmu.ready = true; ?)
-> 
-> I should have mentioned it in the cover letter, this is on top of Marc's pmu-undef
-> branch:
-> 
-> https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/pmu-undef
-> 
-> it should work on top of commit 7521c3a9e630 ("KVM: arm64: Get ready of the PMU
-> ready state"), the branch was rebased since I sent the patches.
-OK noted.
+OK, I will.
 
-Thanks
-
-Eric
+>>
+>> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+>> ---
+>>  drivers/vfio/vfio_iommu_type1.c | 18 ++++++++++++++++++
+>>  1 file changed, 18 insertions(+)
+>>
+>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+>> index bd9a94590ebc..00684597b098 100644
+>> --- a/drivers/vfio/vfio_iommu_type1.c
+>> +++ b/drivers/vfio/vfio_iommu_type1.c
+>> @@ -1633,6 +1633,20 @@ static struct vfio_group *vfio_iommu_find_iommu_group(struct vfio_iommu *iommu,
+>>  	return group;
+>>  }
+>>  
+>> +static void vfio_populate_bitmap_all(struct vfio_iommu *iommu)
+>> +{
+>> +	struct rb_node *n;
+>> +	unsigned long pgshift = __ffs(iommu->pgsize_bitmap);
+>> +
+>> +	for (n = rb_first(&iommu->dma_list); n; n = rb_next(n)) {
+>> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
+>> +		unsigned long nbits = dma->size >> pgshift;
+>> +
+>> +		if (dma->iommu_mapped)
+>> +			bitmap_set(dma->bitmap, 0, nbits);
+>> +	}
+>> +}
 > 
-> Thanks,
+> 
+> If we detach a group which results in only non-IOMMU backed mdevs,
+> don't we also clear dma->iommu_mapped as part of vfio_unmap_unpin()
+> such that this test is invalid?  Thanks,
+
+Good spot :-). The code will skip bitmap_set under this situation.
+
+We should set the bitmap unconditionally when vfio_iommu is promoted,
+as we must have IOMMU backed domain before promoting the vfio_iommu.
+
+Besides, I think we should also mark dirty in vfio_remove_dma if dirty
+tracking is active. Right?
+
+Thanks,
+Keqian
+
+> 
 > Alex
->>
->> Thanks
->>
->> Eric
->>>  	return 0;
->>>  }
->>>  
->>>
 > 
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+>> +
+>>  static void promote_pinned_page_dirty_scope(struct vfio_iommu *iommu)
+>>  {
+>>  	struct vfio_domain *domain;
+>> @@ -1657,6 +1671,10 @@ static void promote_pinned_page_dirty_scope(struct vfio_iommu *iommu)
+>>  	}
+>>  
+>>  	iommu->pinned_page_dirty_scope = true;
+>> +
+>> +	/* Set all bitmap to avoid missing dirty page */
+>> +	if (iommu->dirty_page_tracking)
+>> +		vfio_populate_bitmap_all(iommu);
+>>  }
+>>  
+>>  static bool vfio_iommu_has_sw_msi(struct list_head *group_resv_regions,
 > 
-
+> .
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
