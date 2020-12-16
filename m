@@ -2,69 +2,93 @@ Return-Path: <SRS0=5C08=FU=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF869C2BBD4
-	for <kvmarm@archiver.kernel.org>; Wed, 16 Dec 2020 08:45:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 329B6C4361B
+	for <kvmarm@archiver.kernel.org>; Wed, 16 Dec 2020 09:42:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BC20E207BC
-	for <kvmarm@archiver.kernel.org>; Wed, 16 Dec 2020 08:45:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC20E207BC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 78A7A23105
+	for <kvmarm@archiver.kernel.org>; Wed, 16 Dec 2020 09:42:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78A7A23105
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E3E2F4B53C;
-	Wed, 16 Dec 2020 03:45:55 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B08474B2E2;
+	Wed, 16 Dec 2020 04:41:59 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id XCC6D-a16ZXG; Wed, 16 Dec 2020 03:45:54 -0500 (EST)
+	with ESMTP id z07iB1taUrkk; Wed, 16 Dec 2020 04:41:57 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3BD854B51E;
-	Wed, 16 Dec 2020 03:45:54 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DB42E4B44C;
+	Wed, 16 Dec 2020 04:41:57 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B326B4B51E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Dec 2020 03:45:53 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B7D04B570
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Dec 2020 20:45:45 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nnpCtk7GyilE for <kvmarm@lists.cs.columbia.edu>;
- Wed, 16 Dec 2020 03:45:50 -0500 (EST)
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1C2B34B4E7
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Dec 2020 03:45:50 -0500 (EST)
-Received: from dggeme755-chm.china.huawei.com (unknown [172.30.72.57])
- by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4CwpbG5F5Rz13VK8;
- Wed, 16 Dec 2020 16:44:42 +0800 (CST)
-Received: from [10.174.185.135] (10.174.185.135) by
- dggeme755-chm.china.huawei.com (10.3.19.101) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1913.5; Wed, 16 Dec 2020 16:45:45 +0800
-Subject: Re: [PATCH v2 0/6] KVM: arm64: VCPU preempted check support
-To: Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>
-References: <20191226135833.1052-1-yezengruan@huawei.com>
- <20200113121240.GC3260@willie-the-truck>
- <b1d23a82d6a7caa79a99597fb83472be@kernel.org>
-From: yezengruan <yezengruan@huawei.com>
-Message-ID: <6c1f0896-b78f-c92f-4c3b-9ab17400487b@huawei.com>
-Date: Wed, 16 Dec 2020 16:45:44 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+ with ESMTP id 2NNUBgSO07iu for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 15 Dec 2020 20:45:43 -0500 (EST)
+Received: from mail-qt1-f195.google.com (mail-qt1-f195.google.com
+ [209.85.160.195])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E72364B533
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Dec 2020 20:45:43 -0500 (EST)
+Received: by mail-qt1-f195.google.com with SMTP id 2so6350421qtt.10
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Dec 2020 17:45:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=kCToIgJ9t4fgOgR1IG7z/T+GyYq+8OtwKPwUFbQA53E=;
+ b=Gi1o+o2odN0GzIaw5X46sC3GPFaeMhjoBJnGwwFiCma44bSFjsl0bgwIxoEg9ec0Kp
+ OztQkTIT0mU8btHuUYdrAT4EBge+EdFc4M94KJ50AivdTCaUvXua82zvmcJn/JcJ0DqM
+ GdIW0Wjfmmh0z3upTz/s8oanoeVm2H+6egJWp0TS+xccJ3MoOzpnLVgObdOzRQ0p/26J
+ beoVo2wEs4tlY6mVtHNJ8VGZDCOEpSbST+AcuoWOvWGmTF1lgyN3Sd/zwvNFkrQvSnJP
+ N0T98P8htYMq+8wRWezxBwXtp74BY8sEV/M6s3OVeHNqUSOsRFaePCy8ZVgFL4MP7Elw
+ 3/iQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=kCToIgJ9t4fgOgR1IG7z/T+GyYq+8OtwKPwUFbQA53E=;
+ b=W94uZF8nuo8q8yDj2IgfxKtN+alqyIiUJG02zRfJPaPUHv1pIdPvo6vqlxalNaPvYn
+ 8pfEqeiQ+1wqH6dfqUuAU0mXaOTC/B7K/0aF2H2gE4RPNe+9iY57iAQwNu5FZETjuqNu
+ bZYwx6v0a0Dc1tluFmhFXKtPtNagT1bprfnkyVj6GOIPvYGB7xFc+AX6fpHL8m2bbWm9
+ mZ/crGXETIHzC6plA9YL51PA72nHhNFHiARToBaIaavymekFd1ebP7lAAkzLO3tRzOk7
+ eh3PTK8qyofuVrRdwnGUsjv6aW68d2+mBSO8AVYUc17mQUkLoPRC5hgqvWORBbs8rm0v
+ s7qw==
+X-Gm-Message-State: AOAM5338xUPgoRnGWg2xU55Cm8+jwPLaqKYfWzOLMVWGs1SD/fatMRHX
+ wffxZtOHB8EJYUDDgSdw6wBsj+jI2gWgPRtb0hYoyw==
+X-Google-Smtp-Source: ABdhPJwU/7CORIsAIiTVntmow90QUVubXxG+PPZiFr2mV+dF13CoGd56D1d8SNThX0rRsMFvF8yaaWWUEt3jESh+Tz0=
+X-Received: by 2002:ac8:6758:: with SMTP id n24mr41536181qtp.258.1608083143215; 
+ Tue, 15 Dec 2020 17:45:43 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <b1d23a82d6a7caa79a99597fb83472be@kernel.org>
-Content-Language: en-US
-X-Originating-IP: [10.174.185.135]
-X-ClientProxiedBy: dggeme707-chm.china.huawei.com (10.1.199.103) To
- dggeme755-chm.china.huawei.com (10.3.19.101)
-X-CFilter-Loop: Reflected
-Cc: daniel.lezcano@linaro.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
- peterz@infradead.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
- virtualization@lists.linux-foundation.org, linux@armlinux.org.uk,
- steven.price@arm.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+References: <20200721041742.197354-1-sergey.senozhatsky@gmail.com>
+ <20200817020310.GA1210848@jagdpanzerIV.localdomain>
+ <fe72592c-c721-bece-1469-95eebf931299@huawei.com>
+ <cbcfb402b7fdb8a2a45b80fbb0e79f3e@kernel.org>
+ <20200911085841.GB562@jagdpanzerIV.localdomain>
+ <CAJWu+oq26OK1-7Ze2pb5xpRJ-tS9wtXOdGFrYpHq+fhkyGhjkA@mail.gmail.com>
+ <fdc35e25f2bc2cdfa0849a84802eafd6@kernel.org>
+ <CAJWu+ooy=r=G+AnyriQDA9_4CJqfO6hkf=c8heV8HV+yNea_PQ@mail.gmail.com>
+ <78091359dab0d8decfc452f7c5c25971@kernel.org> <X9M9JuK5DIWzgdyQ@google.com>
+In-Reply-To: <X9M9JuK5DIWzgdyQ@google.com>
+From: Joel Fernandes <joelaf@google.com>
+Date: Tue, 15 Dec 2020 20:45:32 -0500
+Message-ID: <CAJWu+oqwYQDvcRa3_TPtDDXGnUOBPEqM4vCLCc7konKSe0jPEg@mail.gmail.com>
+Subject: Re: [RFC][PATCH 0/4] arm64:kvm: teach guest sched that VCPUs can be
+ preempted
+To: Quentin Perret <qperret@google.com>
+X-Mailman-Approved-At: Wed, 16 Dec 2020 04:41:56 -0500
+Cc: Sergey Senozhatsky <sergey.senozhatsky@gmail.com>,
+ Marc Zyngier <maz@kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+ Suleiman Souhlal <suleiman@google.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu,
+ "moderated list:ARM64 PORT \(AARCH64 ARCHITECTURE\)"
+ <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -76,396 +100,116 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============8508733694924940806=="
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
---===============8508733694924940806==
-Content-Type: multipart/alternative;
-	boundary="------------43CA695FE1BBE3490CBD148C"
-Content-Language: en-US
+Hi Marc, Quentin,
 
---------------43CA695FE1BBE3490CBD148C
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-
-On 2020/1/15 22:14, Marc Zyngier wrote:
-> On 2020-01-13 12:12, Will Deacon wrote:
->> [+PeterZ]
->>
->> On Thu, Dec 26, 2019 at 09:58:27PM +0800, Zengruan Ye wrote:
->>> This patch set aims to support the vcpu_is_preempted() functionality
->>> under KVM/arm64, which allowing the guest to obtain the VCPU is
->>> currently running or not. This will enhance lock performance on
->>> overcommitted hosts (more runnable VCPUs than physical CPUs in the
->>> system) as doing busy waits for preempted VCPUs will hurt system
->>> performance far worse than early yielding.
->>>
->>> We have observed some performace improvements in uninx benchmark tests.
->>>
->>> unix benchmark result:
->>>   host:  kernel 5.5.0-rc1, HiSilicon Kunpeng920, 8 CPUs
->>>   guest: kernel 5.5.0-rc1, 16 VCPUs
->>>
->>>                test-case                |    after-patch    |   before-patch
->>> ----------------------------------------+-------------------+------------------
->>>  Dhrystone 2 using register variables   | 334600751.0 lps   | 335319028.3 lps
->>>  Double-Precision Whetstone             |     32856.1 MWIPS |     32849.6 MWIPS
->>>  Execl Throughput                       |      3662.1 lps   |      2718.0 lps
->>>  File Copy 1024 bufsize 2000 maxblocks  |    432906.4 KBps  |    158011.8 KBps
->>>  File Copy 256 bufsize 500 maxblocks    |    116023.0 KBps  |     37664.0 KBps
->>>  File Copy 4096 bufsize 8000 maxblocks  |   1432769.8 KBps  |    441108.8 KBps
->>>  Pipe Throughput                        |   6405029.6 lps   |   6021457.6 lps
->>>  Pipe-based Context Switching           |    185872.7 lps   |    184255.3 lps
->>>  Process Creation                       |      4025.7 lps   |      3706.6 lps
->>>  Shell Scripts (1 concurrent)           |      6745.6 lpm   |      6436.1 lpm
->>>  Shell Scripts (8 concurrent)           |       998.7 lpm   |       931.1 lpm
->>>  System Call Overhead                   |   3913363.1 lps   |   3883287.8 lps
->>> ----------------------------------------+-------------------+------------------
->>>  System Benchmarks Index Score          |      1835.1       |      1327.6
->>
->> Interesting, thanks for the numbers.
->>
->> So it looks like there is a decent improvement to be had from targetted vCPU
->> wakeup, but I really dislike the explicit PV interface and it's already been
->> shown to interact badly with the WFE-based polling in smp_cond_load_*().
->>
->> Rather than expose a divergent interface, I would instead like to explore an
->> improvement to smp_cond_load_*() and see how that performs before we commit
->> to something more intrusive. Marc and I looked at this very briefly in the
->> past, and the basic idea is to register all of the WFE sites with the
->> hypervisor, indicating which register contains the address being spun on
->> and which register contains the "bad" value. That way, you don't bother
->> rescheduling a vCPU if the value at the address is still bad, because you
->> know it will exit immediately.
->>
->> Of course, the devil is in the details because when I say "address", that's
->> a guest virtual address, so you need to play some tricks in the hypervisor
->> so that you have a separate mapping for the lockword (it's enough to keep
->> track of the physical address).
->>
->> Our hacks are here but we basically ran out of time to work on them beyond
->> an unoptimised and hacky prototype:
->>
->> https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/pvcy
->>
->> Marc -- how would you prefer to handle this?
+On Fri, Dec 11, 2020 at 4:34 AM Quentin Perret <qperret@google.com> wrote:
 >
-> Let me try and rebase this thing to a modern kernel (I doubt it applies without
-> conflicts to mainline). We can then have discussion about its merit on the list
-> once I post it. It'd be good to have a pointer to the benchamrks that have been
-> used here.
-
-Hi Marc, Will,
-
-My apologies for the slow reply. Just checking what is the latest on this
-PV cond yield prototype?
-
-https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/pvcy
-
-Recently, I re-doed the unixbench test comparison between vCPU preempted check
-and PV cond yield. The results are as follows:
-
-
-unix benchmark result:
-  host:  kernel 5.10.0-rc6, HiSilicon Kunpeng920, 8 CPUs
-  guest: kernel 5.10.0-rc6, 16 VCPUs
-                                       | 5.10.0-rc6 | pv_cond_yield | vcpu_is_preempted
- System Benchmarks Index Values        |    INDEX   |      INDEX    |      INDEX
----------------------------------------+------------+---------------+-------------------
- Dhrystone 2 using register variables  |  29164.0   |    29156.9    |    29207.2
- Double-Precision Whetstone            |   6807.6   |     6789.2    |     6912.1
- Execl Throughput                      |    856.7   |     1195.6    |      863.1
- File Copy 1024 bufsize 2000 maxblocks |    189.9   |      923.5    |     1094.2
- File Copy 256 bufsize 500 maxblocks   |    121.9   |      578.4    |      588.7
- File Copy 4096 bufsize 8000 maxblocks |    419.9   |     1992.0    |     2733.7
- Pipe Throughput                       |   6727.2   |     6670.2    |     6743.2
- Pipe-based Context Switching          |    486.9   |      547.0    |      471.9
- Process Creation                      |    353.4   |      345.1    |      338.5
- Shell Scripts (1 concurrent)          |   3187.2   |     1432.2    |     2798.7
- Shell Scripts (8 concurrent)          |   3410.5   |     1360.1    |     2672.9
- System Call Overhead                  |   2967.0   |     3273.9    |     3497.9
----------------------------------------+------------+---------------+-------------------
- System Benchmarks Index Score         |   1410.0   |     1885.8    |     2128.5
-
-
-Thanks,
-
-Zengruan
-
+> On Thursday 10 Dec 2020 at 08:45:22 (+0000), Marc Zyngier wrote:
+> > On 2020-12-10 01:39, Joel Fernandes wrote:
+> >
+> > [...]
+> >
+> > > > Quentin and I have discussed potential ways of improving guest
+> > > > scheduling
+> > > > on terminally broken systems (otherwise known as big-little), in the
+> > > > form of a capacity request from the guest to the host. I'm not really
+> > > > keen on the host exposing its own capacity, as that doesn't tell the
+> > > > host what the guest actually needs.
+> > >
+> > > I am not sure how a capacity request could work well. It seems the
+> > > cost of a repeated hypercall could be prohibitive. In this case, a
+> > > lighter approach might be for KVM to restrict vCPU threads to run on
+> > > certain types of cores, and pass the capacity information to the guest
+> > > at guest's boot time.
+> >
+> > That seems like a very narrow use case. If you actually pin vcpus to
+> > physical CPU classes, DT is the right place to put things, because
+> > it is completely static. This is effectively creating a virtual
+> > big-little, which is in my opinion a userspace job.
 >
-> Thanks,
+> +1, all you should need for this is to have the VMM pin the vCPUS and
+> set capacity-dmips-mhz in the guest DT accordingly. And if you're
+> worried about sharing the runqueue with host tasks, could you vacate the
+> host CPUs using cpusets or such?
+
+I agree, the VMM is the right place for it with appropriate DT
+settings. I think this is similar to how CPUID is emulated on Intel as
+well (for example to specify SMT topology for a vCPU) -- it is done by
+the VMM.
+
+On sharing vCPU with host tasks, that is indeed an issue because the
+host does not know the priority of an app (For example, a "top app"
+running in Android in a VM). The sharing with host tasks should be Ok
+as long as the scheduler priorities of the vCPU threads on the host
+are setup correctly?
+
+> The last difficult bit is how to drive DVFS. I suppose Marc's suggestion
+> to relay capacity requests from the guest would help with that.
+
+Yeah I misunderstood Marc.  I think for DVFS, a hypercall for capacity
+request should work and be infrequent enough. IIRC, there is some rate
+limiting support in cpufreq governors as well that should reduce the
+rate of hypercalls if needed.
+
+> > > This would be a one-time cost to pay. And then,
+> > > then the guest scheduler can handle the scheduling appropriately
+> > > without any more hypercalls. Thoughts?
+> >
+> > Anything that is a one-off belongs to firmware configuration, IMO.
+> >
+> > The case I'm concerned with is when vcpus are allowed to roam across
+> > the system, and hit random physical CPUs because the host has no idea
+> > of the workload the guest deals with (specially as the AMU counters
+> > are either absent or unusable on any available core).
+
+It sounds like this might be a usecase for pinning the vCPU threads
+appropriately (So designate a set of vCPU threads to only run on bigs
+and another set to only run on LITTLEs).  The host can setup the DT to
+describe this and the VM kernel's scheduler can do appropriate task
+placement.  Did I miss anything?
+
+> > The cost of a hypercall really depends on where you terminate it.
+> > If it is a shallow exit, that's only a few hundred cycles on any half
+> > baked CPU. Go all the way to userspace, and the host scheduler is the
+> > limit. But the frequency of that hypercall obviously matters too.
+> >
+> > How often do you expect the capacity request to fire? Probably not
+> > on each and every time slice, right?
+> >
+> > Quentin, can you shed some light on this?
 >
->         M.
+> Assuming that we change the 'capacity request' (aka uclamp.min of the
+> vCPU) every time the guest makes a frequency request, then the answer
+> very much is 'it depends on the workload'. Yes there is an overhead, but
+> I think it is hard to say how bad that would be before we give it a go.
+> It's unfortunately not uncommon to have painfully slow frequency changes
+> on real hardware, so this may be just fine. And there may be ways we
+> can mitigate this too (with rate limiting and such), so all in all it is
+> worth a try.
 
+Agreed.
 
+> Also as per the above, this still would help even if the VMM pins vCPUs
+> and such, so these two things can live and complement each other I
+> think.
 
---------------43CA695FE1BBE3490CBD148C
-Content-Type: text/html; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Makes sense.
 
-<html>
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  </head>
-  <body>
-    <div class="moz-cite-prefix"><font face="Consolas">On 2020/1/15
-        22:14, Marc Zyngier wrote:<br>
-      </font></div>
-    <blockquote type="cite"
-      cite="mid:b1d23a82d6a7caa79a99597fb83472be@kernel.org"><font
-        face="Consolas">On 2020-01-13 12:12, Will Deacon wrote:
-        <br>
-      </font>
-      <blockquote type="cite"><font face="Consolas">[+PeterZ]
-          <br>
-        </font>
-        <font face="Consolas"><br>
-          On Thu, Dec 26, 2019 at 09:58:27PM +0800, Zengruan Ye wrote:
-          <br>
-        </font>
-        <blockquote type="cite"><font face="Consolas">This patch set
-            aims to support the vcpu_is_preempted() functionality
-            <br>
-            under KVM/arm64, which allowing the guest to obtain the VCPU
-            is
-            <br>
-            currently running or not. This will enhance lock performance
-            on
-            <br>
-            overcommitted hosts (more runnable VCPUs than physical CPUs
-            in the
-            <br>
-            system) as doing busy waits for preempted VCPUs will hurt
-            system
-            <br>
-            performance far worse than early yielding.
-            <br>
-          </font>
-          <font face="Consolas"><br>
-            We have observed some performace improvements in uninx
-            benchmark tests.
-            <br>
-          </font>
-          <font face="Consolas"><br>
-            unix benchmark result:
-            <br>
-              host:  kernel 5.5.0-rc1, HiSilicon Kunpeng920, 8 CPUs
-            <br>
-              guest: kernel 5.5.0-rc1, 16 VCPUs
-            <br>
-          </font>
-          <font face="Consolas"><br>
-                           test-case                |    after-patch   
-            |   before-patch
-            <br>
-----------------------------------------+-------------------+------------------
-            <br>
-             Dhrystone 2 using register variables   | 334600751.0 lps  
-            | 335319028.3 lps
-            <br>
-             Double-Precision Whetstone             |     32856.1 MWIPS
-            |     32849.6 MWIPS
-            <br>
-             Execl Throughput                       |      3662.1 lps  
-            |      2718.0 lps
-            <br>
-             File Copy 1024 bufsize 2000 maxblocks  |    432906.4 KBps 
-            |    158011.8 KBps
-            <br>
-             File Copy 256 bufsize 500 maxblocks    |    116023.0 KBps 
-            |     37664.0 KBps
-            <br>
-             File Copy 4096 bufsize 8000 maxblocks  |   1432769.8 KBps 
-            |    441108.8 KBps
-            <br>
-             Pipe Throughput                        |   6405029.6 lps  
-            |   6021457.6 lps
-            <br>
-             Pipe-based Context Switching           |    185872.7 lps  
-            |    184255.3 lps
-            <br>
-             Process Creation                       |      4025.7 lps  
-            |      3706.6 lps
-            <br>
-             Shell Scripts (1 concurrent)           |      6745.6 lpm  
-            |      6436.1 lpm
-            <br>
-             Shell Scripts (8 concurrent)           |       998.7 lpm  
-            |       931.1 lpm
-            <br>
-             System Call Overhead                   |   3913363.1 lps  
-            |   3883287.8 lps
-            <br>
-----------------------------------------+-------------------+------------------
-            <br>
-             System Benchmarks Index Score          |      1835.1      
-            |      1327.6
-            <br>
-          </font></blockquote>
-        <font face="Consolas"><br>
-          Interesting, thanks for the numbers.
-          <br>
-        </font>
-        <font face="Consolas"><br>
-          So it looks like there is a decent improvement to be had from
-          targetted vCPU
-          <br>
-          wakeup, but I really dislike the explicit PV interface and
-          it's already been
-          <br>
-          shown to interact badly with the WFE-based polling in
-          smp_cond_load_*().
-          <br>
-        </font>
-        <font face="Consolas"><br>
-          Rather than expose a divergent interface, I would instead like
-          to explore an
-          <br>
-          improvement to smp_cond_load_*() and see how that performs
-          before we commit
-          <br>
-          to something more intrusive. Marc and I looked at this very
-          briefly in the
-          <br>
-          past, and the basic idea is to register all of the WFE sites
-          with the
-          <br>
-          hypervisor, indicating which register contains the address
-          being spun on
-          <br>
-          and which register contains the "bad" value. That way, you
-          don't bother
-          <br>
-          rescheduling a vCPU if the value at the address is still bad,
-          because you
-          <br>
-          know it will exit immediately.
-          <br>
-        </font>
-        <font face="Consolas"><br>
-          Of course, the devil is in the details because when I say
-          "address", that's
-          <br>
-          a guest virtual address, so you need to play some tricks in
-          the hypervisor
-          <br>
-          so that you have a separate mapping for the lockword (it's
-          enough to keep
-          <br>
-          track of the physical address).
-          <br>
-        </font>
-        <font face="Consolas"><br>
-          Our hacks are here but we basically ran out of time to work on
-          them beyond
-          <br>
-          an unoptimised and hacky prototype:
-          <br>
-        </font>
-        <font face="Consolas"><br>
-<a class="moz-txt-link-freetext" href="https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/pvcy">https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/pvcy</a>
-          <br>
-        </font>
-        <font face="Consolas"><br>
-          Marc -- how would you prefer to handle this?
-          <br>
-        </font></blockquote>
-      <font face="Consolas"><br>
-        Let me try and rebase this thing to a modern kernel (I doubt it
-        applies without
-        <br>
-        conflicts to mainline). We can then have discussion about its
-        merit on the list
-        <br>
-        once I post it. It'd be good to have a pointer to the benchamrks
-        that have been
-        <br>
-        used here.
-        <br>
-      </font></blockquote>
-    <p><font face="Consolas">Hi Marc, Will,<br>
-        <br>
-        My apologies for the slow reply. Just checking what is the
-        latest on this<br>
-        PV cond yield prototype?<br>
-        <br>
-<a class="moz-txt-link-freetext" href="https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/pvcy">https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/pvcy</a><br>
-        <br>
-        Recently, I re-doed the unixbench test comparison between vCPU
-        preempted check<br>
-        and PV cond yield. The results are as follows:<br>
-        <br>
-        <br>
-        unix benchmark result:<br>
-          host:  kernel 5.10.0-rc6, HiSilicon Kunpeng920, 8 CPUs<br>
-          guest: kernel 5.10.0-rc6, 16 VCPUs<br>
-                                               | 5.10.0-rc6 |
-        pv_cond_yield | vcpu_is_preempted<br>
-         System Benchmarks Index Values        |    INDEX   |     
-        INDEX    |      INDEX<br>
----------------------------------------+------------+---------------+-------------------<br>
-         Dhrystone 2 using register variables  |  29164.0   |   
-        29156.9    |    29207.2<br>
-         Double-Precision Whetstone            |   6807.6   |    
-        6789.2    |     6912.1<br>
-         Execl Throughput                      |    856.7   |    
-        1195.6    |      863.1<br>
-         File Copy 1024 bufsize 2000 maxblocks |    189.9   |     
-        923.5    |     1094.2<br>
-         File Copy 256 bufsize 500 maxblocks   |    121.9   |     
-        578.4    |      588.7<br>
-         File Copy 4096 bufsize 8000 maxblocks |    419.9   |    
-        1992.0    |     2733.7<br>
-         Pipe Throughput                       |   6727.2   |    
-        6670.2    |     6743.2<br>
-         Pipe-based Context Switching          |    486.9   |     
-        547.0    |      471.9<br>
-         Process Creation                      |    353.4   |     
-        345.1    |      338.5<br>
-         Shell Scripts (1 concurrent)          |   3187.2   |    
-        1432.2    |     2798.7<br>
-         Shell Scripts (8 concurrent)          |   3410.5   |    
-        1360.1    |     2672.9<br>
-         System Call Overhead                  |   2967.0   |    
-        3273.9    |     3497.9<br>
----------------------------------------+------------+---------------+-------------------<br>
-         System Benchmarks Index Score         |   1410.0   |    
-        1885.8    |     2128.5<br>
-        <br>
-        <br>
-        Thanks,<br>
-        <br>
-        Zengruan<br>
-        <br>
-      </font></p>
-    <blockquote type="cite"
-      cite="mid:b1d23a82d6a7caa79a99597fb83472be@kernel.org">
-      <font face="Consolas"><br>
-        Thanks,
-        <br>
-      </font>
-      <font face="Consolas"><br>
-                M.
-        <br>
-      </font>
-    </blockquote>
-    <p><font face="Consolas"><br>
-      </font></p>
-  </body>
-</html>
+> Now, for the patch originally under discussion here, no objection from
+> me in principle, it looks like a nice improvement to the stolen time
+> stuff and I can see how that could help some use-cases, so +1 from me.
 
---------------43CA695FE1BBE3490CBD148C--
+Sounds good!
 
---===============8508733694924940806==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+thanks,
 
+ - Joel
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============8508733694924940806==--
