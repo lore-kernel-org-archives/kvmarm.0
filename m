@@ -4,52 +4,52 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FDCDC2BB9A
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Dec 2020 14:14:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0316C2BBCA
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Dec 2020 14:14:16 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 20E802389E
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Dec 2020 14:14:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20E802389E
+	by mail.kernel.org (Postfix) with ESMTP id 5D83D2360D
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Dec 2020 14:14:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D83D2360D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 782134B214;
-	Thu, 17 Dec 2020 09:14:17 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F05AA4B22D;
+	Thu, 17 Dec 2020 09:14:15 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id W2Ff5M4oPlx0; Thu, 17 Dec 2020 09:14:16 -0500 (EST)
+	with ESMTP id LfrE4YkfVj0x; Thu, 17 Dec 2020 09:14:14 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ED3024B227;
-	Thu, 17 Dec 2020 09:14:15 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BC3584B209;
+	Thu, 17 Dec 2020 09:14:14 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0CC6E4B1D2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Dec 2020 09:14:15 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C2A04B1FF
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Dec 2020 09:14:13 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 311g7gSwRmKU for <kvmarm@lists.cs.columbia.edu>;
- Thu, 17 Dec 2020 09:14:14 -0500 (EST)
+ with ESMTP id IqpobZXcXWax for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 17 Dec 2020 09:14:12 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A5FC4B204
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Dec 2020 09:14:13 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4169C4B1E8
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Dec 2020 09:14:12 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B42E9106F;
- Thu, 17 Dec 2020 06:14:12 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C601F3F66B;
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 916A51042;
  Thu, 17 Dec 2020 06:14:11 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A34033F66B;
+ Thu, 17 Dec 2020 06:14:10 -0800 (PST)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: drjones@redhat.com,
 	kvm@vger.kernel.org,
 	kvmarm@lists.cs.columbia.edu
-Subject: [kvm-unit-tests PATCH v2 03/12] arm/arm64: gic: Remove SMP
- synchronization from ipi_clear_active_handler()
-Date: Thu, 17 Dec 2020 14:13:51 +0000
-Message-Id: <20201217141400.106137-4-alexandru.elisei@arm.com>
+Subject: [kvm-unit-tests PATCH v2 02/12] lib: arm/arm64: gicv2: Add missing
+ barrier when sending IPIs
+Date: Thu, 17 Dec 2020 14:13:50 +0000
+Message-Id: <20201217141400.106137-3-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201217141400.106137-1-alexandru.elisei@arm.com>
 References: <20201217141400.106137-1-alexandru.elisei@arm.com>
@@ -71,41 +71,84 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The gicv{2,3}-active test sends an IPI from the boot CPU to itself, then
-checks that the interrupt has been received as expected. There is no need
-to use inter-processor memory synchronization primitives on code that runs
-on the same CPU, so remove the unneeded memory barriers.
+GICv2 generates IPIs with a MMIO write to the GICD_SGIR register. A common
+pattern for IPI usage is for the IPI receiver to read data written to
+memory by the sender. The armv7 and armv8 architectures implement a
+weakly-ordered memory model, which means that barriers are required to make
+sure that the expected values are observed.
+
+It turns out that because the receiver CPU must observe the write to memory
+that generated the IPI when reading the GICC_IAR MMIO register, we only
+need to ensure ordering of memory accesses, and not completion. Use a
+smp_wmb (DMB ISHST) barrier before sending the IPI.
+
+This also matches what the Linux GICv2 irqchip driver does (more details
+in commit 8adbf57fc429 ("irqchip: gic: use dmb ishst instead of dsb when
+raising a softirq")).
+
+The gicv2_ipi_send_self() function sends an IPI from a CPU to itself.
+The tests that use this function rely on the interrupt handler to record
+information about the interrupt by using several arrays. It is possible
+for the compiler to infer that the arrays won't be changed during normal
+program flow and try to perform harmful optimizations (like stashing a
+previous read in a register and reusing it). To prevent this, for GICv2,
+a compile barrier is added to gicv2_ipi_send_self(). For GICv3, the
+wmb() barrier in gic_ipi_send_single() (which is also used when a CPU
+sends an IPI to itself) already implies a compiler barrier.
 
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- arm/gic.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ lib/arm/gic-v2.c | 4 ++++
+ arm/gic.c        | 4 ++++
+ 2 files changed, 8 insertions(+)
 
+diff --git a/lib/arm/gic-v2.c b/lib/arm/gic-v2.c
+index dc6a97c600ec..da244c82de34 100644
+--- a/lib/arm/gic-v2.c
++++ b/lib/arm/gic-v2.c
+@@ -45,6 +45,8 @@ void gicv2_ipi_send_single(int irq, int cpu)
+ {
+ 	assert(cpu < 8);
+ 	assert(irq < 16);
++
++	smp_wmb();
+ 	writel(1 << (cpu + 16) | irq, gicv2_dist_base() + GICD_SGIR);
+ }
+ 
+@@ -53,5 +55,7 @@ void gicv2_ipi_send_mask(int irq, const cpumask_t *dest)
+ 	u8 tlist = (u8)cpumask_bits(dest)[0];
+ 
+ 	assert(irq < 16);
++
++	smp_wmb();
+ 	writel(tlist << 16 | irq, gicv2_dist_base() + GICD_SGIR);
+ }
 diff --git a/arm/gic.c b/arm/gic.c
-index ca61dba2986c..1c9f4a01b6e4 100644
+index fee48f9b4ccb..ca61dba2986c 100644
 --- a/arm/gic.c
 +++ b/arm/gic.c
-@@ -364,6 +364,7 @@ static struct gic gicv3 = {
- 	},
- };
+@@ -13,6 +13,7 @@
+  */
+ #include <libcflat.h>
+ #include <errata.h>
++#include <linux/compiler.h>
+ #include <asm/setup.h>
+ #include <asm/processor.h>
+ #include <asm/delay.h>
+@@ -260,11 +261,14 @@ static void check_lpi_hits(int *expected, const char *msg)
  
-+/* Runs on the same CPU as the sender, no need for memory synchronization */
- static void ipi_clear_active_handler(struct pt_regs *regs __unused)
+ static void gicv2_ipi_send_self(void)
  {
- 	u32 irqstat = gic_read_iar();
-@@ -380,13 +381,10 @@ static void ipi_clear_active_handler(struct pt_regs *regs __unused)
++	/* Prevent the compiler from optimizing memory accesses */
++	barrier();
+ 	writel(2 << 24 | IPI_IRQ, gicv2_dist_base() + GICD_SGIR);
+ }
  
- 		writel(val, base + GICD_ICACTIVER);
- 
--		smp_rmb(); /* pairs with wmb in stats_reset */
- 		++acked[smp_processor_id()];
- 		check_irqnr(irqnr);
--		smp_wmb(); /* pairs with rmb in check_acked */
- 	} else {
- 		++spurious[smp_processor_id()];
--		smp_wmb();
- 	}
+ static void gicv2_ipi_send_broadcast(void)
+ {
++	smp_wmb();
+ 	writel(1 << 24 | IPI_IRQ, gicv2_dist_base() + GICD_SGIR);
  }
  
 -- 
