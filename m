@@ -1,87 +1,96 @@
-Return-Path: <SRS0=5C08=FU=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=/4+A=FV=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7415EC4361B
-	for <kvmarm@archiver.kernel.org>; Wed, 16 Dec 2020 12:37:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32ABDC4361B
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Dec 2020 01:47:28 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D561623124
-	for <kvmarm@archiver.kernel.org>; Wed, 16 Dec 2020 12:37:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D561623124
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 621DB23432
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Dec 2020 01:47:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 621DB23432
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0BB414B4CE;
-	Wed, 16 Dec 2020 07:37:35 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 908944B210;
+	Wed, 16 Dec 2020 20:47:26 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id IzlDye2rOS3P; Wed, 16 Dec 2020 07:37:33 -0500 (EST)
+	with ESMTP id Wm6Xk+N2SZWy; Wed, 16 Dec 2020 20:47:25 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F02B54B4B9;
-	Wed, 16 Dec 2020 07:37:33 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 809424B29B;
+	Wed, 16 Dec 2020 20:47:25 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C11604B482
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Dec 2020 07:37:32 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D78284B210
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Dec 2020 20:47:23 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id R+aqB37lWwI6 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 16 Dec 2020 07:37:31 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DD59E4B369
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Dec 2020 07:37:31 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1608122251;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=oABMoOhptkaqKsqL4N/pdk2T+GrxPZ3e3Rs5s0jG0lQ=;
- b=Wpij8qNNXtr5NE/KZqWYNRd2QMCs8B0Y8Gr9iUe95wFHLHNsUzJAVF2+6jF8hyJr4R8tkH
- VshUNYSkskGVA4t3NAFv/v0WbXsbkpCVJ2yjq/fqDlcA0PQnMT+oV/oLBvXtL9oVKquxye
- Xx88CaQ+gp2ik7Glq/3zjSna3alXcOI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-183-_kHs0LayO4uj6OSt2HP73A-1; Wed, 16 Dec 2020 07:37:27 -0500
-X-MC-Unique: _kHs0LayO4uj6OSt2HP73A-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0B44E1005504;
- Wed, 16 Dec 2020 12:37:26 +0000 (UTC)
-Received: from [10.36.112.243] (ovpn-112-243.ams2.redhat.com [10.36.112.243])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 759265D9E8;
- Wed, 16 Dec 2020 12:37:23 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH 08/10] arm/arm64: gic: Split check_acked()
- into two functions
-To: Alexandru Elisei <alexandru.elisei@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, drjones@redhat.com
-References: <20201125155113.192079-1-alexandru.elisei@arm.com>
- <20201125155113.192079-9-alexandru.elisei@arm.com>
- <0eb98cb0-835c-e257-484e-8210f1279f2c@redhat.com>
- <2b8d774e-9398-e24b-6989-8643f5dd2492@arm.com>
- <b5ccedb2-5f8d-50d5-8caf-776013613d90@redhat.com>
- <a01f61cf-d174-87b7-4db1-32b62a2c3e8a@arm.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <08ba32cf-0a6f-79d9-fb53-a84205cae4b1@redhat.com>
-Date: Wed, 16 Dec 2020 13:37:21 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ with ESMTP id jjpRz9z4XaH2 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 16 Dec 2020 20:47:22 -0500 (EST)
+Received: from mail-io1-f50.google.com (mail-io1-f50.google.com
+ [209.85.166.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E80814B22A
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Dec 2020 20:47:22 -0500 (EST)
+Received: by mail-io1-f50.google.com with SMTP id i18so25978090ioa.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Dec 2020 17:47:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=VZ4JZTy9+IKB/FbonfM/ldsdg2nn5Yf2TNc8FXof9Fw=;
+ b=UCKfAQeBD/lJG4xTZujpMykS46OkdwA9BPik0ZiiP21lmRgJi3/09ohZX9ainMiDKI
+ zRxn1vaP+CfpIESFJS/QD4RnMwzU19wODWEC1xxljKq7id5AuvYG5Dhj6VKCiWpO2Bmu
+ xepCxxs/nvgAXLsdCo2asTTHWcfi0AsBbedsUSJ6VQp8rpnwvC6QtDd2SbN9Spb44SUF
+ VwSXJD16Eaw04aOWV7lxsiFWYQZtc8M40srQyPH6OUeMdOAFhkyMivfM99Y42ik6mm5N
+ g+0+Fxj5swtGtbxryrmlwpv3/CKawNt0PwS4A8NM3EMTCg9KLXX30DBH0v5yRbhKLl3w
+ dcNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=VZ4JZTy9+IKB/FbonfM/ldsdg2nn5Yf2TNc8FXof9Fw=;
+ b=f1S8RnOJBp7M2hru/W8s4rMBYdzjZ/QWmbCHYzd/iqhY6oMEz5VV5ALkaMPw0ipvDC
+ +RKAQZH+qoxpxx5jkKrSVkdWCuPcYhQCZ9N8E1jqaw7+7xoyCidGYvAKsCCcjEZVRZm+
+ GWH6CfWBjVuGSJ31r4dcBW9MLbrQMpAKV4NoLhcyBDEifMcq9RQJakZP0dLWWoiHX3rd
+ 14lItbiX+8WgWlSXtnzMfViHXvixYMo5QR3TM5W8dcLysy/wWUX+mSAlOh/ZFMTaZL8F
+ GfSqopibJ2WeyG+SEzveV06YNSMV1ynTNs49Xqj/Y7BDK4pNwrD9ualOfrkqtPWkGLqO
+ AtOw==
+X-Gm-Message-State: AOAM5323rS+XOGn7WCpMSELRkXjkTuVr4ni3pFOuBjBIfuK94bPl0NJD
+ MzBHNKvBtrGHQmm8Ng3zXkiwwOb9V8E4wFlU4voY
+X-Google-Smtp-Source: ABdhPJyjbWC+MxAHpU9U15X6j6tLnLYjUbu31cSB3o9cVK1vZQtR1OSioJ1js/51Pmr9o1T76zygxv5g3/iHHIbTXNs=
+X-Received: by 2002:a5e:8e05:: with SMTP id a5mr44246697ion.133.1608169642340; 
+ Wed, 16 Dec 2020 17:47:22 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <a01f61cf-d174-87b7-4db1-32b62a2c3e8a@arm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Cc: andre.przywara@arm.com
+References: <20201119153901.53705-1-steven.price@arm.com>
+ <CAFEAcA85fiqA206FuFANKbV_3GkfY1F8Gv7MP58BgTT81bs9kA@mail.gmail.com>
+ <20201119184248.4bycy6ouvaxqdiiy@kamzik.brq.redhat.com>
+ <db5ad775fa7cfe7defbd78d9ca6ccfd8@kernel.org>
+ <c25c297e-e9b5-ab3f-e401-c21ddd4d2ad1@arm.com>
+ <CAJc+Z1H7akXwDtVvQLiGVVyZ0DfmsxyJQhE7Sno6aAO9GaafEA@mail.gmail.com>
+ <46fd98a2-ee39-0086-9159-b38c406935ab@arm.com>
+ <CAJc+Z1EzaUjbQ0o8BSF_+PQy_KnwPp1NqO+94RMphvaUu=dnug@mail.gmail.com>
+ <29a7229d-a1ff-98a5-3007-1addcc85aa04@arm.com>
+In-Reply-To: <29a7229d-a1ff-98a5-3007-1addcc85aa04@arm.com>
+From: Haibo Xu <haibo.xu@linaro.org>
+Date: Thu, 17 Dec 2020 09:47:10 +0800
+Message-ID: <CAJc+Z1E0rdWcDD1N1R=d-v8FnWSWw=Yu7qypUjRFG_pXw1xybQ@mail.gmail.com>
+Subject: Re: [PATCH v5 0/2] MTE support for KVM guest
+To: Steven Price <steven.price@arm.com>
+Cc: lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Juan Quintela <quintela@redhat.com>, Marc Zyngier <maz@kernel.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+ kvmarm <kvmarm@lists.cs.columbia.edu>,
+ arm-mail-list <linux-arm-kernel@lists.infradead.org>,
+ Dave Martin <Dave.Martin@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -98,77 +107,40 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Alexandru,
+On Wed, 16 Dec 2020 at 18:23, Steven Price <steven.price@arm.com> wrote:
+>
+> On 16/12/2020 07:31, Haibo Xu wrote:
+> [...]
+> > Hi Steve,
+>
+> Hi Haibo
+>
+> > I have finished verifying the POC on a FVP setup, and the MTE test case can
+> > be migrated from one VM to another successfully. Since the test case is very
+> > simple which just maps one page with MTE enabled and does some memory
+> > access, so I can't say it's OK for other cases.
+>
+> That's great progress.
+>
+> >
+> > BTW, I noticed that you have sent out patch set v6 which mentions that mapping
+> > all the guest memory with PROT_MTE was not feasible. So what's the plan for the
+> > next step? Will new KVM APIs which can facilitate the tag store and recover be
+> > available?
+>
+> I'm currently rebasing on top of the KASAN MTE patch series. My plan for
+> now is to switch back to not requiring the VMM to supply PROT_MTE (so
+> KVM 'upgrades' the pages as necessary) and I'll add an RFC patch on the
+> end of the series to add an KVM API for doing bulk read/write of tags.
+> That way the VMM can map guest memory without PROT_MTE (so device 'DMA'
+> accesses will be unchecked), and use the new API for migration.
+>
 
-On 12/16/20 12:40 PM, Alexandru Elisei wrote:
-> Hi Eric,
-> 
-> On 12/15/20 1:58 PM, Auger Eric wrote:
->> Hi Alexandru,
->>
->> On 12/10/20 3:45 PM, Alexandru Elisei wrote:
->>> Hi Eric,
->>>
->>> On 12/3/20 1:39 PM, Auger Eric wrote:
->>>> [..]
->>>>  
->>>>  static void check_spurious(void)
->>>> @@ -300,7 +318,8 @@ static void ipi_test_self(void)
->>>>  	cpumask_clear(&mask);
->>>>  	cpumask_set_cpu(smp_processor_id(), &mask);
->>>>  	gic->ipi.send_self();
->>>> -	check_acked("IPI: self", &mask);
->>>> +	wait_for_interrupts(&mask);
->>>> +	report(check_acked(&mask), "Interrupts received");
->>>>  	report_prefix_pop();
->>>>  }
->>>>  
->>>> @@ -315,7 +334,8 @@ static void ipi_test_smp(void)
->>>>  	for (i = smp_processor_id() & 1; i < nr_cpus; i += 2)
->>>>  		cpumask_clear_cpu(i, &mask);
->>>>  	gic_ipi_send_mask(IPI_IRQ, &mask);
->>>> -	check_acked("IPI: directed", &mask);
->>>> +	wait_for_interrupts(&mask);
->>>> +	report(check_acked(&mask), "Interrupts received");
->>>> both ipi_test_smp and ipi_test_self are called from the same test so
->>>> better to use different error messages like it was done originally.
->>> I used the same error message because the tests have a different prefix
->>> ("target-list" versus "broadcast"). Do you think there are cases where that's not
->>> enough?
->> I think in "ipi" test,
->> ipi_test -> ipi_send -> ipi_test_self, ipi_test_smp
-> 
-> I'm afraid I don't understand what you are trying to say. This is the log for the
-> gicv3-ipi test:
-> 
-> $ cat logs/gicv3-ipi.log
-> timeout -k 1s --foreground 90s /usr/bin/qemu-system-aarch64 -nodefaults -machine
-> virt,gic-version=host,accel=kvm -cpu host -device virtio-serial-device -device
-> virtconsole,chardev=ctd -chardev testdev,id=ctd -device pci-testdev -display none
-> -serial stdio -kernel arm/gic.flat -smp 6 -machine gic-version=3 -append ipi #
-> -initrd /tmp/tmp.trk6aAcaZx
-> WARNING: early print support may not work. Found uart at 0x9000000, but early base
-> is 0x3f8.
-> PASS: gicv3: ipi: self: Interrupts received
-> PASS: gicv3: ipi: target-list: Interrupts received
-> PASS: gicv3: ipi: broadcast: Interrupts received
-> SUMMARY: 3 tests
-> 
-> The warning is because I forgot to reconfigure the tests with --vmm=qemu.
-> 
-> Would you mind pointing out what you think is ambiguous?
-Hum sorry I did not pay attention to the report_prefix_push() within
-ipi_test_self & ipi_test_smp. I had in mind those were only in the main().
+Great! Will have a try with the new API in my POC!
 
-Forgive me for the noise
-
-Eric
-> 
 > Thanks,
-> 
-> Alex
-> 
-
+>
+> Steve
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
