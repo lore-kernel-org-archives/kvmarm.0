@@ -2,74 +2,54 @@ Return-Path: <SRS0=/4+A=FV=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F701C4361B
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Dec 2020 11:50:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96267C2BB48
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Dec 2020 12:01:17 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B21E4238E8
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Dec 2020 11:50:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B21E4238E8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id E3E0A2395A
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Dec 2020 12:01:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3E0A2395A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D5E8E4B240;
-	Thu, 17 Dec 2020 06:50:07 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3128B4B136;
+	Thu, 17 Dec 2020 07:01:16 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ZnT79mmDti5I; Thu, 17 Dec 2020 06:50:06 -0500 (EST)
+	with ESMTP id LQocW5a1ykjL; Thu, 17 Dec 2020 07:01:11 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D6A614B1CC;
-	Thu, 17 Dec 2020 06:50:06 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 274B14B151;
+	Thu, 17 Dec 2020 07:01:11 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D840A4B1CC
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Dec 2020 06:50:04 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 60F6B4B246
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Dec 2020 07:01:10 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0eNyF5Xr5R6C for <kvmarm@lists.cs.columbia.edu>;
- Thu, 17 Dec 2020 06:50:02 -0500 (EST)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 72E424B1CB
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Dec 2020 06:50:02 -0500 (EST)
-Received: from DGGEMM404-HUB.china.huawei.com (unknown [172.30.72.53])
- by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4CxVdp4VVtz56Gr;
- Thu, 17 Dec 2020 19:49:18 +0800 (CST)
-Received: from dggema765-chm.china.huawei.com (10.1.198.207) by
- DGGEMM404-HUB.china.huawei.com (10.3.20.212) with Microsoft SMTP Server (TLS)
- id 14.3.498.0; Thu, 17 Dec 2020 19:49:56 +0800
-Received: from [10.174.185.137] (10.174.185.137) by
- dggema765-chm.china.huawei.com (10.1.198.207) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1913.5; Thu, 17 Dec 2020 19:49:55 +0800
-Subject: Re: [PATCH v11 04/13] vfio/pci: Add VFIO_REGION_TYPE_NESTED region
- type
-To: Eric Auger <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
- <iommu@lists.linux-foundation.org>, <linux-kernel@vger.kernel.org>,
- <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>, <will@kernel.org>,
- <joro@8bytes.org>, <maz@kernel.org>, <robin.murphy@arm.com>,
- <alex.williamson@redhat.com>
-References: <20201116110030.32335-1-eric.auger@redhat.com>
- <20201116110030.32335-5-eric.auger@redhat.com>
-From: Kunkun Jiang <jiangkunkun@huawei.com>
-Message-ID: <2b5031d4-fa1a-c893-e7e4-56c68da600e4@huawei.com>
-Date: Thu, 17 Dec 2020 19:49:55 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+ with ESMTP id GVHpxcpVCD6c for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 17 Dec 2020 07:01:09 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B59D4B201
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Dec 2020 07:01:09 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A19BA31B;
+ Thu, 17 Dec 2020 04:01:08 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 10C3A3F66B;
+ Thu, 17 Dec 2020 04:01:07 -0800 (PST)
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: drjones@redhat.com,
+	kvm@vger.kernel.org,
+	kvmarm@lists.cs.columbia.edu
+Subject: [kvm-unit-tests PATCH 0/1] Don't access PMU when not present
+Date: Thu, 17 Dec 2020 12:00:56 +0000
+Message-Id: <20201217120057.88562-1-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-In-Reply-To: <20201116110030.32335-5-eric.auger@redhat.com>
-Content-Language: en-US
-X-Originating-IP: [10.174.185.137]
-X-ClientProxiedBy: dggeme706-chm.china.huawei.com (10.1.199.102) To
- dggema765-chm.china.huawei.com (10.1.198.207)
-X-CFilter-Loop: Reflected
-Cc: jean-philippe@linaro.org, jacob.jun.pan@linux.intel.com,
- nicoleotsuka@gmail.com, vivek.gautam@arm.com, yi.l.liu@intel.com,
- zhangfei.gao@linaro.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -81,30 +61,74 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SGkgRXJpYywKCk9uIDIwMjAvMTEvMTYgMTk6MDAsIEVyaWMgQXVnZXIgd3JvdGU6Cj4gQWRkIGEg
-bmV3IHNwZWNpZmljIERNQV9GQVVMVCByZWdpb24gYWltaW5nIHRvIGV4cG9zZWQgbmVzdGVkIG1v
-ZGUKPiB0cmFuc2xhdGlvbiBmYXVsdHMuIFRoaXMgcmVnaW9uIG9ubHkgaXMgZXhwb3NlZCBpZiB0
-aGUgZGV2aWNlCj4gaXMgYXR0YWNoZWQgdG8gYSBuZXN0ZWQgZG9tYWluLgo+Cj4gVGhlIHJlZ2lv
-biBoYXMgYSByaW5nIGJ1ZmZlciB0aGF0IGNvbnRhaW5zIHRoZSBhY3R1YWwgZmF1bHQKPiByZWNv
-cmRzIHBsdXMgYSBoZWFkZXIgYWxsb3dpbmcgdG8gaGFuZGxlIGl0ICh0YWlsL2hlYWQgaW5kaWNl
-cywKPiBtYXggY2FwYWNpdHksIGVudHJ5IHNpemUpLiBBdCB0aGUgbW9tZW50IHRoZSByZWdpb24g
-aXMgZGltZW5zaW9ubmVkCj4gZm9yIDUxMiBmYXVsdCByZWNvcmRzLgo+Cj4gU2lnbmVkLW9mZi1i
-eTogRXJpYyBBdWdlciA8ZXJpYy5hdWdlckByZWRoYXQuY29tPgo+Cj4gLS0tClsuLi5dCj4gZGlm
-ZiAtLWdpdCBhL2luY2x1ZGUvdWFwaS9saW51eC92ZmlvLmggYi9pbmNsdWRlL3VhcGkvbGludXgv
-dmZpby5oCj4gaW5kZXggYjM1MmU3NmNmYjcxLi42MjlkZmIzOGQ5ZTcgMTAwNjQ0Cj4gLS0tIGEv
-aW5jbHVkZS91YXBpL2xpbnV4L3ZmaW8uaAo+ICsrKyBiL2luY2x1ZGUvdWFwaS9saW51eC92Zmlv
-LmgKPiBAQCAtMzQzLDYgKzM0Myw5IEBAIHN0cnVjdCB2ZmlvX3JlZ2lvbl9pbmZvX2NhcF90eXBl
-IHsKPiAgIC8qIHN1Yi10eXBlcyBmb3IgVkZJT19SRUdJT05fVFlQRV9HRlggKi8KPiAgICNkZWZp
-bmUgVkZJT19SRUdJT05fU1VCVFlQRV9HRlhfRURJRCAgICAgICAgICAgICgxKQo+ICAgCj4gKyNk
-ZWZpbmUgVkZJT19SRUdJT05fVFlQRV9ORVNURUQJCQkoMikKPiArI2RlZmluZSBWRklPX1JFR0lP
-Tl9TVUJUWVBFX05FU1RFRF9ETUFfRkFVTFQJKDEpCj4gKwoKVGhlIG1hY3JvICpkZWZpbmUgVkZJ
-T19SRUdJT05fVFlQRV9ORVNURUTCoMKgwqAgKDIpKiBpcyBpbiBjb25mbGljdCB3aXRoCgoqI2Rl
-ZmluZSBWRklPX1JFR0lPTl9UWVBFX0NDV8KgwqDCoCAoMikqLgoKClRoYW5rcywKCkt1bmt1biBK
-aWFuZy4KCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2
-bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xp
-c3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+Found this when reviewing the PMU undef patches [1], which will get merged
+for 5.11 (Paolo accepted the pull request [2]).
+
+This only happens if we try to run the PMU tests when creating a VCPU
+*without* the PMU feature. I think qemu creates the VCPU by default with a
+PMU and I don't know if or how that could be disabled. On the other hand,
+kvmtool doesn't enable the feature by default, and you need the specify the
+--pmu knob on the command line to enable guest PMU. I think this should
+only affect kvmtool users.
+
+For reference, this is what happens without the patch when I try to run a
+PMU test on a host built from the kvmarm-5.11 tag from the pull request
+(the --pmu knob is missing from the kvmtool command line):
+
+$ lkvm run -c1 -m64 -f arm/pmu.flat -p cycle-counter 
+  # lkvm run --firmware arm/pmu.flat -m 64 -c 1 --name guest-821
+  Info: Placing fdt at 0x80200000 - 0x80210000
+chr_testdev_init: chr-testdev: can't find a virtio-console
+Unhandled exception ec=0 (UNKNOWN)
+Vector: 4 (el1h_sync)
+ESR_EL1:         02000000, ec=0 (UNKNOWN)
+FAR_EL1: 1de7ec7edbadc0de (not valid)
+Exception frame registers:
+pc : [<000000008000b058>] lr : [<0000000080000084>] pstate: 00000000
+sp : 000000008003ff60
+x29: 0000000000000000 x28: 0000000000000000 
+x27: 0000000000000000 x26: 0000000000000000 
+x25: 0000000000000000 x24: 0000000000000000 
+x23: 0000000000000000 x22: 0000000000000000 
+x21: 0000000000000002 x20: 0000000080016a10 
+x19: 0000000000000000 x18: 0000000000000000 
+x17: 0000000000000000 x16: 0000000000000000 
+x15: 0000000080040000 x14: 0000000080040000 
+x13: 000000008003ff5c x12: 0000000000000058 
+x11: 0000000000000064 x10: 000000008003ff0c 
+x9 : 0000000000008400 x8 : 0000000000008008 
+x7 : 0000000000000001 x6 : 0000000000000004 
+x5 : 0000000000000000 x4 : 0000000080050003 
+x3 : 0000000000000001 x2 : 0000000080016d38 
+x1 : 0000000080016a10 x0 : 0000000000000002 
+
+With the patch applied:
+
+$ lkvm run -c1 -m64 -f arm/pmu.flat -p cycle-counter 
+  # lkvm run --firmware arm/pmu.flat -m 64 -c 1 --name guest-1240
+  Info: Placing fdt at 0x80200000 - 0x80210000
+chr_testdev_init: chr-testdev: can't find a virtio-console
+No PMU found, test skipped...
+SUMMARY: 0 tests
+
+[1] https://www.spinics.net/lists/kvm-arm/msg43347.html
+[2] https://www.spinics.net/lists/kvm/msg231080.html
+
+Alexandru Elisei (1):
+  arm: pmu: Don't read PMCR if PMU is not present
+
+ arm/pmu.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+-- 
+2.29.2
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
