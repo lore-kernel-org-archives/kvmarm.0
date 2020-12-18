@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BCEEC4361B
-	for <kvmarm@archiver.kernel.org>; Fri, 18 Dec 2020 18:16:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CF96C4361B
+	for <kvmarm@archiver.kernel.org>; Fri, 18 Dec 2020 18:37:09 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id ACB9223B5D
-	for <kvmarm@archiver.kernel.org>; Fri, 18 Dec 2020 18:16:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACB9223B5D
+	by mail.kernel.org (Postfix) with ESMTP id 09E8023B6B
+	for <kvmarm@archiver.kernel.org>; Fri, 18 Dec 2020 18:37:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09E8023B6B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ED02C4B0EB;
-	Fri, 18 Dec 2020 13:15:59 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B3FF4B0E7;
+	Fri, 18 Dec 2020 13:37:08 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id iEgjQIwYC71L; Fri, 18 Dec 2020 13:15:58 -0500 (EST)
+	with ESMTP id HZf0StAQdYQn; Fri, 18 Dec 2020 13:37:07 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AE2784B0F6;
-	Fri, 18 Dec 2020 13:15:58 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 30D404B0E9;
+	Fri, 18 Dec 2020 13:37:07 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AD6BC4B0EF
- for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Dec 2020 13:15:57 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8AFC24B0E6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Dec 2020 13:37:06 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZbsAWEu6z8ny for <kvmarm@lists.cs.columbia.edu>;
- Fri, 18 Dec 2020 13:15:56 -0500 (EST)
+ with ESMTP id q5TT+uMqbdv7 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 18 Dec 2020 13:37:05 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6165A4B0EB
- for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Dec 2020 13:15:56 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EA1D4B0B8
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Dec 2020 13:37:05 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9AB3330E;
- Fri, 18 Dec 2020 10:15:55 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DBF5330E;
+ Fri, 18 Dec 2020 10:37:04 -0800 (PST)
 Received: from [192.168.2.22] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B9D953F66E;
- Fri, 18 Dec 2020 10:15:54 -0800 (PST)
-Subject: Re: [kvm-unit-tests PATCH v2 10/12] arm64: gic: its-trigger: Don't
- trigger the LPI while it is pending
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E9CA23F66E;
+ Fri, 18 Dec 2020 10:37:03 -0800 (PST)
+Subject: Re: [kvm-unit-tests PATCH v2 11/12] lib: arm64: gic-v3-its: Add wmb()
+ barrier before INT command
 To: Alexandru Elisei <alexandru.elisei@arm.com>, drjones@redhat.com,
  kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 References: <20201217141400.106137-1-alexandru.elisei@arm.com>
- <20201217141400.106137-11-alexandru.elisei@arm.com>
+ <20201217141400.106137-12-alexandru.elisei@arm.com>
 From: =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
 Autocrypt: addr=andre.przywara@arm.com; prefer-encrypt=mutual; keydata=
  xsFNBFNPCKMBEAC+6GVcuP9ri8r+gg2fHZDedOmFRZPtcrMMF2Cx6KrTUT0YEISsqPoJTKld
@@ -93,12 +93,12 @@ Autocrypt: addr=andre.przywara@arm.com; prefer-encrypt=mutual; keydata=
  fDO4SAgJMIl6H5awliCY2zQvLHysS/Wb8QuB09hmhLZ4AifdHyF1J5qeePEhgTA+BaUbiUZf
  i4aIXCH3Wv6K
 Organization: ARM Ltd.
-Message-ID: <d24f7bf4-2a38-22f8-68e6-98940c61c65a@arm.com>
-Date: Fri, 18 Dec 2020 18:15:43 +0000
+Message-ID: <bb0faa84-d12f-05b7-9913-155ebfcb3073@arm.com>
+Date: Fri, 18 Dec 2020 18:36:53 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <20201217141400.106137-11-alexandru.elisei@arm.com>
+In-Reply-To: <20201217141400.106137-12-alexandru.elisei@arm.com>
 Content-Language: en-GB
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -117,62 +117,62 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On 17/12/2020 14:13, Alexandru Elisei wrote:
-> The its-trigger test checks that LPI 8195 is not delivered to the CPU while
-> it is disabled at the ITS level. After that it is re-enabled and the test
-> checks that the interrupt is properly asserted. After it's re-enabled and
-> before the stats are examined, the test triggers the interrupt again, which
-> can lead to the same interrupt being delivered twice: once after the
-> configuration invalidation and before the INT command, and once after the
-> INT command.
+> The ITS tests use the INT command like an SGI. The its_send_int() function
+> kicks a CPU and then the test checks that the interrupt was observed as
+> expected in check_lpi_stats(). This is done by using lpi_stats.observed and
+> lpi_stats.expected, where the target CPU only writes to lpi_stats.observed,
+> and the source CPU reads it and compares the values with
+> lpi_stats.expected.
 > 
-> Get rid of the INT command after the interrupt is re-enabled to prevent the
-
-This is confusing to read, since you don't remove anything in the patch.
-Can you reword this? Something like "Before explicitly triggering the
-interrupt, check that the unmasking worked, ..."
-
-> LPI from being asserted twice and add a separate check to test that the INT
-> command still works for the now re-enabled LPI 8195.
+> The fact that the target CPU doesn't read data written by the source CPU
+> means that we don't need to do inter-processor memory synchronization
+> for that between the two at the moment.
 > 
-> CC: Auger Eric <eric.auger@redhat.com>
-> Suggested-by: Zenghui Yu <yuzenghui@huawei.com>
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> The acked array is used by its-pending-migration test, but the reset value
+> for acked (zero) is the same as the initialization value for static
+> variables, so memory synchronization is again not needed.
+> 
+> However, that is all about to change when we modify all ITS tests to use
+> the same functions as the IPI tests. Add a write memory barrier to
+> its_send_int(), similar to the gicv3_ipi_send_mask(), which has similar
+> semantics.
 
-Otherwise this looks fine, but I think there is another flaw: There is
-no requirement that an INV(ALL) is *needed* to update the status, it
-could also update anytime (think: "cache invalidate").
+I agree to the requirement for having the barrier, but am not sure this
+is the right place. Wouldn't it be better to have the barrier in the
+callers?
 
-The KVM ITS emulation *only* bothers to read the memory on an INV(ALL)
-command, so that matches the test. But that's not how unit-tests should
-work ;-)
-
-But that's a separate issue, just mentioning this to not forget about it.
-
-For this patch, with the message fixed:
-
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+Besides: This command is written to the command queue (in normal
+memory), then we notify the ITS via an MMIO writeq. And this one has a
+"wmb" barrier already (though for other reasons).
 
 Cheers,
 Andre
 
-> ---
->  arm/gic.c | 3 +++
->  1 file changed, 3 insertions(+)
+
 > 
-> diff --git a/arm/gic.c b/arm/gic.c
-> index fb91861900b7..aa3aa1763984 100644
-> --- a/arm/gic.c
-> +++ b/arm/gic.c
-> @@ -805,6 +805,9 @@ static void test_its_trigger(void)
+> Suggested-by: Auger Eric <eric.auger@redhat.com>
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>  lib/arm64/gic-v3-its-cmd.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/lib/arm64/gic-v3-its-cmd.c b/lib/arm64/gic-v3-its-cmd.c
+> index 34574f71d171..32703147ee85 100644
+> --- a/lib/arm64/gic-v3-its-cmd.c
+> +++ b/lib/arm64/gic-v3-its-cmd.c
+> @@ -385,6 +385,12 @@ void __its_send_int(struct its_device *dev, u32 event_id, bool verbose)
+>  {
+>  	struct its_cmd_desc desc;
 >  
->  	/* Now call the invall and check the LPI hits */
->  	its_send_invall(col3);
-> +	lpi_stats_expect(3, 8195);
-> +	check_lpi_stats("dev2/eventid=20 pending LPI is received");
+> +	/*
+> +	 * The INT command is used by tests as an IPI. Ensure stores to Normal
+> +	 * memory are visible to other CPUs before sending the LPI.
+> +	 */
+> +	wmb();
 > +
->  	lpi_stats_expect(3, 8195);
->  	its_send_int(dev2, 20);
->  	check_lpi_stats("dev2/eventid=20 now triggers an LPI");
+>  	desc.its_int_cmd.dev = dev;
+>  	desc.its_int_cmd.event_id = event_id;
+>  	desc.verbose = verbose;
 > 
 
 _______________________________________________
