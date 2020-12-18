@@ -2,72 +2,61 @@ Return-Path: <SRS0=w40L=FW=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A57B6C4361B
-	for <kvmarm@archiver.kernel.org>; Fri, 18 Dec 2020 08:22:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF16FC4361B
+	for <kvmarm@archiver.kernel.org>; Fri, 18 Dec 2020 12:04:08 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D6ECC23A00
-	for <kvmarm@archiver.kernel.org>; Fri, 18 Dec 2020 08:22:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6ECC23A00
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 4A49623443
+	for <kvmarm@archiver.kernel.org>; Fri, 18 Dec 2020 12:04:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A49623443
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2BCD04B10E;
-	Fri, 18 Dec 2020 03:22:21 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A2CAF4B0EE;
+	Fri, 18 Dec 2020 07:04:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Ddr8-ZBQoHID; Fri, 18 Dec 2020 03:22:20 -0500 (EST)
+	with ESMTP id 4Dkq6jqUjGzO; Fri, 18 Dec 2020 07:04:06 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E7744B114;
-	Fri, 18 Dec 2020 03:22:20 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 611704B0EF;
+	Fri, 18 Dec 2020 07:04:06 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 038074B104
- for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Dec 2020 03:22:18 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A730B4B0E8
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Dec 2020 07:04:04 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xJ+-khKCAWgR for <kvmarm@lists.cs.columbia.edu>;
- Fri, 18 Dec 2020 03:22:14 -0500 (EST)
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5FA6E4B0B3
- for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Dec 2020 03:22:14 -0500 (EST)
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.58])
- by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4Cy1zZ3NMpz7Gx1;
- Fri, 18 Dec 2020 16:21:30 +0800 (CST)
-Received: from [10.174.187.37] (10.174.187.37) by
- DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
- 14.3.498.0; Fri, 18 Dec 2020 16:21:59 +0800
-Subject: Re: [PATCH 4/7] vfio: iommu_type1: Fix missing dirty page when
- promote pinned_scope
-To: Alex Williamson <alex.williamson@redhat.com>
-References: <20201210073425.25960-1-zhukeqian1@huawei.com>
- <20201210073425.25960-5-zhukeqian1@huawei.com>
- <20201214170459.50cb8729@omen.home>
- <d2073c05-b6c9-04b4-782c-b89680834633@huawei.com>
- <20201215085359.053e73ed@x1.home>
-From: Keqian Zhu <zhukeqian1@huawei.com>
-Message-ID: <340a58c3-3781-db31-59fa-06b015d27a5e@huawei.com>
-Date: Fri, 18 Dec 2020 16:21:58 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+ with ESMTP id BedlRJ7sQjhf for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 18 Dec 2020 07:04:03 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D51E4B0DD
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Dec 2020 07:04:03 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DADA71FB;
+ Fri, 18 Dec 2020 04:04:01 -0800 (PST)
+Received: from [192.168.2.22] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D65823F66E;
+ Fri, 18 Dec 2020 04:04:00 -0800 (PST)
+Subject: Re: [kvm-unit-tests PATCH v2 01/12] lib: arm/arm64: gicv3: Add
+ missing barrier when sending IPIs
+To: Alexandru Elisei <alexandru.elisei@arm.com>, drjones@redhat.com,
+ kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+References: <20201217141400.106137-1-alexandru.elisei@arm.com>
+ <20201217141400.106137-2-alexandru.elisei@arm.com>
+From: =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
+Organization: ARM Ltd.
+Message-ID: <911a9bfb-061c-69b7-1915-1877f1898e55@arm.com>
+Date: Fri, 18 Dec 2020 12:03:50 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <20201215085359.053e73ed@x1.home>
-X-Originating-IP: [10.174.187.37]
-X-CFilter-Loop: Reflected
-Cc: Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, Marc
- Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
- Cornelia Huck <cohuck@redhat.com>, linux-kernel@vger.kernel.org,
- Sean Christopherson <sean.j.christopherson@intel.com>,
- Alexios Zavras <alexios.zavras@intel.com>, iommu@lists.linux-foundation.org,
- Mark Brown <broonie@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- Robin Murphy <robin.murphy@arm.com>
+In-Reply-To: <20201217141400.106137-2-alexandru.elisei@arm.com>
+Content-Language: en-GB
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -84,65 +73,88 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-
-On 2020/12/15 23:53, Alex Williamson wrote:
-> On Tue, 15 Dec 2020 17:37:11 +0800
-> zhukeqian <zhukeqian1@huawei.com> wrote:
+On 17/12/2020 14:13, Alexandru Elisei wrote:
+> One common usage for IPIs is for one CPU to write to a shared memory
+> location, send the IPI to kick another CPU, and the receiver to read from
+> the same location. Proper synchronization is needed to make sure that the
+> IPI receiver reads the most recent value and not stale data (for example,
+> the write from the sender CPU might still be in a store buffer).
 > 
->> Hi Alex,
->>
->> On 2020/12/15 8:04, Alex Williamson wrote:
-[...]
-
->>>>  
->>>> +static void vfio_populate_bitmap_all(struct vfio_iommu *iommu)
->>>> +{
->>>> +	struct rb_node *n;
->>>> +	unsigned long pgshift = __ffs(iommu->pgsize_bitmap);
->>>> +
->>>> +	for (n = rb_first(&iommu->dma_list); n; n = rb_next(n)) {
->>>> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
->>>> +		unsigned long nbits = dma->size >> pgshift;
->>>> +
->>>> +		if (dma->iommu_mapped)
->>>> +			bitmap_set(dma->bitmap, 0, nbits);
->>>> +	}
->>>> +}  
->>>
->>>
->>> If we detach a group which results in only non-IOMMU backed mdevs,
->>> don't we also clear dma->iommu_mapped as part of vfio_unmap_unpin()
->>> such that this test is invalid?  Thanks,  
->>
->> Good spot :-). The code will skip bitmap_set under this situation.
->>
->> We should set the bitmap unconditionally when vfio_iommu is promoted,
->> as we must have IOMMU backed domain before promoting the vfio_iommu.
->>
->> Besides, I think we should also mark dirty in vfio_remove_dma if dirty
->> tracking is active. Right?
+> For GICv3, IPIs are generated with a write to the ICC_SGI1R_EL1 register.
+> To make sure the memory stores are observable by other CPUs, we need a
+> wmb() barrier (DSB ST), which waits for stores to complete.
 > 
-> There's no remaining bitmap to mark dirty if the vfio_dma is removed.
-> In this case it's the user's responsibility to collect remaining dirty
-> pages using the VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP support in the
-> VFIO_IOMMU_UNMAP_DMA ioctl.  Thanks,
+> From the definition of DSB from ARM DDI 0487F.b, page B2-139:
 > 
-Hi Alex,
+> "In addition, no instruction that appears in program order after the DSB
+> instruction can alter any state of the system or perform any part of its
+> functionality until the DSB completes other than:
+> 
+> - Being fetched from memory and decoded.
+> - Reading the general-purpose, SIMD and floating-point, Special-purpose, or
+> System registers that are directly or indirectly read without causing
+> side-effects."
+> 
+> Similar definition for armv7 (ARM DDI 0406C.d, page A3-150).
+> 
+> The DSB instruction is enough to prevent reordering of the GIC register
+> write which comes in program order after the memory access.
+> 
+> This also matches what the Linux GICv3 irqchip driver does (commit
+> 21ec30c0ef52 ("irqchip/gic-v3: Use wmb() instead of smb_wmb() in
+> gic_raise_softirq()")).
+> 
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
-Thanks for pointing it out. I also notice that vfio_iommu_type1_detach_group
-will remove all dma_range (in vfio_iommu_unmap_unpin_all). If this happens
-during dirty tracking, then we have no chance to report dirty log to userspace.
+Yes, makes sense. Also verified the references in both the ARM ARM and
+the Linux code.
 
-Besides, we will add more dirty log tracking ways to VFIO definitely, but
-we has no framework to support this, thus makes it inconvenient to extend
-and easy to lost dirty log.
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
 
-Giving above, I plan to refactor our dirty tracking code. One core idea is
-that we should distinguish Dirty Range Limit (such as pin, fully dirty) and
-Real Dirty Track (such as iopf, smmu httu).
+Cheers,
+Andre
 
-Thanks,
-Keqian
+> ---
+>  lib/arm/gic-v3.c | 6 ++++++
+>  arm/gic.c        | 5 +++++
+>  2 files changed, 11 insertions(+)
+> 
+> diff --git a/lib/arm/gic-v3.c b/lib/arm/gic-v3.c
+> index a7e2cb819746..2c067e4e9ba2 100644
+> --- a/lib/arm/gic-v3.c
+> +++ b/lib/arm/gic-v3.c
+> @@ -77,6 +77,12 @@ void gicv3_ipi_send_mask(int irq, const cpumask_t *dest)
+>  
+>  	assert(irq < 16);
+>  
+> +	/*
+> +	 * Ensure stores to Normal memory are visible to other CPUs before
+> +	 * sending the IPI.
+> +	 */
+> +	wmb();
+> +
+>  	/*
+>  	 * For each cpu in the mask collect its peers, which are also in
+>  	 * the mask, in order to form target lists.
+> diff --git a/arm/gic.c b/arm/gic.c
+> index acb060585fae..fee48f9b4ccb 100644
+> --- a/arm/gic.c
+> +++ b/arm/gic.c
+> @@ -275,6 +275,11 @@ static void gicv3_ipi_send_self(void)
+>  
+>  static void gicv3_ipi_send_broadcast(void)
+>  {
+> +	/*
+> +	 * Ensure stores to Normal memory are visible to other CPUs before
+> +	 * sending the IPI
+> +	 */
+> +	wmb();
+>  	gicv3_write_sgi1r(1ULL << 40 | IPI_IRQ << 24);
+>  	isb();
+>  }
+> 
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
