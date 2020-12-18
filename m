@@ -7,55 +7,98 @@ X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF0AAC4361B
-	for <kvmarm@archiver.kernel.org>; Fri, 18 Dec 2020 12:04:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6467C4361B
+	for <kvmarm@archiver.kernel.org>; Fri, 18 Dec 2020 15:52:54 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 60C2B23A51
-	for <kvmarm@archiver.kernel.org>; Fri, 18 Dec 2020 12:04:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60C2B23A51
+	by mail.kernel.org (Postfix) with ESMTP id 21C7C23B70
+	for <kvmarm@archiver.kernel.org>; Fri, 18 Dec 2020 15:52:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21C7C23B70
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F04BC4B0F0;
-	Fri, 18 Dec 2020 07:04:49 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 720694B0E7;
+	Fri, 18 Dec 2020 10:52:53 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ZSVoTvdUlxRN; Fri, 18 Dec 2020 07:04:48 -0500 (EST)
+	with ESMTP id ZgH2-bxnpvxs; Fri, 18 Dec 2020 10:52:51 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A5F574B0F4;
-	Fri, 18 Dec 2020 07:04:48 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CA3B34B0DB;
+	Fri, 18 Dec 2020 10:52:51 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B5D4F4B0E8
- for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Dec 2020 07:04:46 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D2014B0DB
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Dec 2020 10:52:50 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FHQcwyMXyxpc for <kvmarm@lists.cs.columbia.edu>;
- Fri, 18 Dec 2020 07:04:45 -0500 (EST)
+ with ESMTP id 7MrMzWeMpyYP for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 18 Dec 2020 10:52:48 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 571324B0DD
- for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Dec 2020 07:04:45 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B990B4B0B4
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Dec 2020 10:52:48 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0B14D1063;
- Fri, 18 Dec 2020 04:04:45 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DA75E30E;
+ Fri, 18 Dec 2020 07:52:47 -0800 (PST)
 Received: from [192.168.2.22] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2E3043F66E;
- Fri, 18 Dec 2020 04:04:44 -0800 (PST)
-Subject: Re: [kvm-unit-tests PATCH v2 05/12] arm/arm64: gic: Use correct
- memory ordering for the IPI test
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 04BC03F66B;
+ Fri, 18 Dec 2020 07:52:46 -0800 (PST)
+Subject: Re: [kvm-unit-tests PATCH v2 08/12] arm/arm64: gic: Split
+ check_acked() into two functions
 To: Alexandru Elisei <alexandru.elisei@arm.com>, drjones@redhat.com,
  kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 References: <20201217141400.106137-1-alexandru.elisei@arm.com>
- <20201217141400.106137-6-alexandru.elisei@arm.com>
+ <20201217141400.106137-9-alexandru.elisei@arm.com>
 From: =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
+Autocrypt: addr=andre.przywara@arm.com; prefer-encrypt=mutual; keydata=
+ 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
+ i4aIXCH3Wv6K
 Organization: ARM Ltd.
-Message-ID: <dce1fe3c-1ee8-f4dc-e1d0-355f7ff8db42@arm.com>
-Date: Fri, 18 Dec 2020 12:04:33 +0000
+Message-ID: <3539c229-fd05-2e1c-2159-995e51e2dcc4@arm.com>
+Date: Fri, 18 Dec 2020 15:52:36 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <20201217141400.106137-6-alexandru.elisei@arm.com>
+In-Reply-To: <20201217141400.106137-9-alexandru.elisei@arm.com>
 Content-Language: en-GB
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -74,135 +117,196 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On 17/12/2020 14:13, Alexandru Elisei wrote:
-> The IPI test works by sending IPIs to even numbered CPUs from the
-> IPI_SENDER CPU (CPU1), and then checking that the other CPUs received the
-> interrupts as expected. The check is done in check_acked() by the
-> IPI_SENDER CPU with the help of three arrays:
+> check_acked() has several peculiarities: is the only function among the
+> check_* functions which calls report() directly, it does two things
+> (waits for interrupts and checks for misfired interrupts) and it also
+> mixes printf, report_info and report calls.
 > 
-> - acked, where acked[i] == 1 means that CPU i received the interrupt.
-> - bad_irq, where bad_irq[i] == -1 means that the interrupt received by CPU
->   i had the expected interrupt number (IPI_IRQ).
-> - bad_sender, where bad_sender[i] == -1 means that the interrupt received
->   by CPU i was from the expected sender (IPI_SENDER, GICv2 only).
+> check_acked() also reports a pass and returns as soon all the target CPUs
+> have received interrupts, However, a CPU not having received an interrupt
+> *now* does not guarantee not receiving an erroneous interrupt if we wait
+> long enough.
 > 
-> The assumption made by check_acked() is that if a CPU acked an interrupt,
-> then bad_sender and bad_irq have also been updated. This is a common
-> inter-thread communication pattern called message passing.  For message
-> passing to work correctly on weakly consistent memory model architectures,
-> like arm and arm64, barriers or address dependencies are required. This is
-> described in ARM DDI 0487F.b, in "Armv7 compatible approaches for ordering,
-> using DMB and DSB barriers" (page K11-7993), in the section with a single
-> observer, which is in our case the IPI_SENDER CPU.
+> Rework the function by splitting it into two separate functions, each with
+> a single responsibility: wait_for_interrupts(), which waits for the
+> expected interrupts to fire, and check_acked() which checks that interrupts
+> have been received as expected.
 > 
-> The IPI test attempts to enforce the correct ordering using memory
-> barriers, but it's not enough. For example, the program execution below is
-> valid from an architectural point of view:
+> wait_for_interrupts() also waits an extra 100 milliseconds after the
+> expected interrupts have been received in an effort to make sure we don't
+> miss misfiring interrupts.
 > 
-> 3 online CPUs, initial state (from stats_reset()):
+> Splitting check_acked() into two functions will also allow us to
+> customize the behavior of each function in the future more easily
+> without using an unnecessarily long list of arguments for check_acked().
+
+Yes, splitting this up looks much better, in general this is a nice
+cleanup, thank you!
+
+Some comments below:
+
 > 
-> acked[2] = 0;
-> bad_sender[2] = -1;
-> bad_irq[2] = -1;
-> 
-> CPU1 (in check_acked())		| CPU2 (in ipi_handler())
-> 				|
-> smp_rmb() // DMB ISHLD		| acked[2]++;
-> read 1 from acked[2]		|
-> nr_pass++ // nr_pass = 3	|
-> read -1 from bad_sender[2]	|
-> read -1 from bad_irq[2]		|
-> 				| // in check_ipi_sender()
-> 				| bad_sender[2] = <bad ipi sender>
-> 				| // in check_irqnr()
-> 				| bad_irq[2] = <bad irq number>
-> 				| smp_wmb() // DMB ISHST
-> nr_pass == nr_cpus, return	|
-> 
-> In this scenario, CPU1 will read the updated acked value, but it will read
-> the initial bad_sender and bad_irq values. This is permitted because the
-> memory barriers do not create a data dependency between the value read from
-> acked and the values read from bad_rq and bad_sender on CPU1, respectively
-> between the values written to acked, bad_sender and bad_irq on CPU2.
-> 
-> To avoid this situation, let's reorder the barriers and accesses to the
-> arrays to create the needed dependencies that ensure that message passing
-> behaves as expected.
-> 
-> In the interrupt handler, the writes to bad_sender and bad_irq are
-> reordered before the write to acked and a smp_wmb() barrier is added. This
-> ensures that if other PEs observe the write to acked, then they will also
-> observe the writes to the other two arrays.
-> 
-> In check_acked(), put the smp_rmb() barrier after the read from acked to
-> ensure that the subsequent reads from bad_sender, respectively bad_irq,
-> aren't reordered locally by the PE.
-> 
-> With these changes, the expected ordering of accesses is respected and we
-> end up with the pattern described in the Arm ARM and also in the Linux
-> litmus test MP+fencewmbonceonce+fencermbonceonce.litmus from
-> tools/memory-model/litmus-tests. More examples and explanations can be
-> found in the Linux source tree, in Documentation/memory-barriers.txt, in
-> the sections "SMP BARRIER PAIRING" and "READ MEMORY BARRIERS VS LOAD
-> SPECULATION".
-> 
-> For consistency with ipi_handler(), the array accesses in
-> ipi_clear_active_handler() have also been reordered. This shouldn't affect
-> the functionality of that test.
-> 
+> CC: Andre Przywara <andre.przywara@arm.com>
 > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>  arm/gic.c | 73 +++++++++++++++++++++++++++++++++++--------------------
+>  1 file changed, 47 insertions(+), 26 deletions(-)
+> 
+> diff --git a/arm/gic.c b/arm/gic.c
+> index ec733719c776..a9ef1a5def56 100644
+> --- a/arm/gic.c
+> +++ b/arm/gic.c
+> @@ -62,41 +62,42 @@ static void stats_reset(void)
+>  	}
+>  }
+>  
+> -static void check_acked(const char *testname, cpumask_t *mask)
+> +static void wait_for_interrupts(cpumask_t *mask)
+>  {
+> -	int missing = 0, extra = 0, unexpected = 0;
+>  	int nr_pass, cpu, i;
+> -	bool bad = false;
+>  
+>  	/* Wait up to 5s for all interrupts to be delivered */
+> -	for (i = 0; i < 50; ++i) {
+> +	for (i = 0; i < 50; i++) {
+>  		mdelay(100);
+>  		nr_pass = 0;
+>  		for_each_present_cpu(cpu) {
+> +			/*
+> +			 * A CPU having received more than one interrupts will
+> +			 * show up in check_acked(), and no matter how long we
+> +			 * wait it cannot un-receive it. Consider at least one
+> +			 * interrupt as a pass.
+> +			 */
+>  			nr_pass += cpumask_test_cpu(cpu, mask) ?
+> -				acked[cpu] == 1 : acked[cpu] == 0;
+> -			smp_rmb(); /* pairs with smp_wmb in ipi_handler */
+> -
+> -			if (bad_sender[cpu] != -1) {
+> -				printf("cpu%d received IPI from wrong sender %d\n",
+> -					cpu, bad_sender[cpu]);
+> -				bad = true;
+> -			}
+> -
+> -			if (bad_irq[cpu] != -1) {
+> -				printf("cpu%d received wrong irq %d\n",
+> -					cpu, bad_irq[cpu]);
+> -				bad = true;
+> -			}
+> +				acked[cpu] >= 1 : acked[cpu] == 0;
 
-Yes, this is indeed a real ordering bug. Good find and analysis!
 
-Meditated over the new code for a while and it now looks right to me.
+I wonder if this logic was already flawed to begin with: For interrupts
+we expect to fire, we wait for up to 5 seconds (really that long?), but
+for interrupts we expect *not* to fire we are OK if they don't show up
+in the first 100 ms. That does not sound consistent.
 
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+I am wondering if we should *not* have the initial 100ms wait at all,
+since most interrupts will fire immediately (especially in KVM). And
+then have *one* extra wait for, say 100ms, to cover latecomers and
+spurious interrupts.
+
+But this might be a topic for some extra work/patch?
+
+>  		}
+> +
+>  		if (nr_pass == nr_cpus) {
+> -			report(!bad, "%s", testname);
+>  			if (i)
+> -				report_info("took more than %d ms", i * 100);
+> +				report_info("interrupts took more than %d ms", i * 100);
+> +			mdelay(100);
+
+So this is the extra 100ms you mention in the commit message? I am not
+convinced this is the right way (see above) or even the right place
+(rather at the call site?) to wait. But at least it deserves a comment,
+I believe.
+
+>  			return;
+>  		}
+>  	}
+>  
+> +	report_info("interrupts timed-out (5s)");
+> +}
+> +
+> +static bool check_acked(cpumask_t *mask)
+> +{
+> +	int missing = 0, extra = 0, unexpected = 0;
+> +	bool pass = true;
+> +	int cpu;
+> +
+>  	for_each_present_cpu(cpu) {
+>  		if (cpumask_test_cpu(cpu, mask)) {
+>  			if (!acked[cpu])
+> @@ -107,11 +108,28 @@ static void check_acked(const char *testname, cpumask_t *mask)
+>  			if (acked[cpu])
+>  				++unexpected;
+>  		}
+> +		smp_rmb(); /* pairs with smp_wmb in ipi_handler */
+> +
+> +		if (bad_sender[cpu] != -1) {
+> +			report_info("cpu%d received IPI from wrong sender %d",
+> +					cpu, bad_sender[cpu]);
+> +			pass = false;
+> +		}
+> +
+> +		if (bad_irq[cpu] != -1) {
+> +			report_info("cpu%d received wrong irq %d",
+> +					cpu, bad_irq[cpu]);
+> +			pass = false;
+> +		}
+> +	}
+> +
+> +	if (missing || extra || unexpected) {
+> +		report_info("ACKS: missing=%d extra=%d unexpected=%d",
+> +				missing, extra, unexpected);
+> +		pass = false;
+
+Thanks, that so much easier to read now.
 
 Cheers,
 Andre
 
-
-> ---
->  arm/gic.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arm/gic.c b/arm/gic.c
-> index d25529dd8b79..34643a73bd04 100644
-> --- a/arm/gic.c
-> +++ b/arm/gic.c
-> @@ -73,9 +73,9 @@ static void check_acked(const char *testname, cpumask_t *mask)
->  		mdelay(100);
->  		nr_pass = 0;
->  		for_each_present_cpu(cpu) {
-> -			smp_rmb();
->  			nr_pass += cpumask_test_cpu(cpu, mask) ?
->  				acked[cpu] == 1 : acked[cpu] == 0;
-> +			smp_rmb(); /* pairs with smp_wmb in ipi_handler */
->  
->  			if (bad_sender[cpu] != -1) {
->  				printf("cpu%d received IPI from wrong sender %d\n",
-> @@ -156,10 +156,10 @@ static void ipi_handler(struct pt_regs *regs __unused)
->  		 */
->  		if (gic_version() == 2)
->  			smp_rmb();
-> -		++acked[smp_processor_id()];
->  		check_ipi_sender(irqstat);
->  		check_irqnr(irqnr);
-> -		smp_wmb(); /* pairs with rmb in check_acked */
-> +		smp_wmb(); /* pairs with smp_rmb in check_acked */
-> +		++acked[smp_processor_id()];
->  	} else {
->  		++spurious[smp_processor_id()];
->  		smp_wmb();
-> @@ -386,8 +386,8 @@ static void ipi_clear_active_handler(struct pt_regs *regs __unused)
->  
->  		writel(val, base + GICD_ICACTIVER);
->  
-> -		++acked[smp_processor_id()];
->  		check_irqnr(irqnr);
-> +		++acked[smp_processor_id()];
->  	} else {
->  		++spurious[smp_processor_id()];
 >  	}
+>  
+> -	report(false, "%s", testname);
+> -	report_info("Timed-out (5s). ACKS: missing=%d extra=%d unexpected=%d",
+> -		    missing, extra, unexpected);
+> +	return pass;
+>  }
+>  
+>  static void check_spurious(void)
+> @@ -303,7 +321,8 @@ static void ipi_test_self(void)
+>  	cpumask_clear(&mask);
+>  	cpumask_set_cpu(smp_processor_id(), &mask);
+>  	gic->ipi.send_self();
+> -	check_acked("IPI: self", &mask);
+> +	wait_for_interrupts(&mask);
+> +	report(check_acked(&mask), "Interrupts received");
+>  	report_prefix_pop();
+>  }
+>  
+> @@ -318,7 +337,8 @@ static void ipi_test_smp(void)
+>  	for (i = smp_processor_id() & 1; i < nr_cpus; i += 2)
+>  		cpumask_clear_cpu(i, &mask);
+>  	gic_ipi_send_mask(IPI_IRQ, &mask);
+> -	check_acked("IPI: directed", &mask);
+> +	wait_for_interrupts(&mask);
+> +	report(check_acked(&mask), "Interrupts received");
+>  	report_prefix_pop();
+>  
+>  	report_prefix_push("broadcast");
+> @@ -326,7 +346,8 @@ static void ipi_test_smp(void)
+>  	cpumask_copy(&mask, &cpu_present_mask);
+>  	cpumask_clear_cpu(smp_processor_id(), &mask);
+>  	gic->ipi.send_broadcast();
+> -	check_acked("IPI: broadcast", &mask);
+> +	wait_for_interrupts(&mask);
+> +	report(check_acked(&mask), "Interrupts received");
+>  	report_prefix_pop();
+>  }
+>  
 > 
 
 _______________________________________________
