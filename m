@@ -1,105 +1,79 @@
-Return-Path: <SRS0=w40L=FW=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=fzzv=F2=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CF96C4361B
-	for <kvmarm@archiver.kernel.org>; Fri, 18 Dec 2020 18:37:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA763C433E0
+	for <kvmarm@archiver.kernel.org>; Tue, 22 Dec 2020 16:05:44 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 09E8023B6B
-	for <kvmarm@archiver.kernel.org>; Fri, 18 Dec 2020 18:37:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09E8023B6B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 5C70923124
+	for <kvmarm@archiver.kernel.org>; Tue, 22 Dec 2020 16:05:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C70923124
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B3FF4B0E7;
-	Fri, 18 Dec 2020 13:37:08 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A56D34B2A6;
+	Tue, 22 Dec 2020 11:05:43 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id HZf0StAQdYQn; Fri, 18 Dec 2020 13:37:07 -0500 (EST)
+	with ESMTP id jD2L1LtGyj+L; Tue, 22 Dec 2020 11:05:42 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 30D404B0E9;
-	Fri, 18 Dec 2020 13:37:07 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 160084B2B3;
+	Tue, 22 Dec 2020 11:05:42 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8AFC24B0E6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Dec 2020 13:37:06 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A8BB4B2A6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Dec 2020 11:05:41 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id q5TT+uMqbdv7 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 18 Dec 2020 13:37:05 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EA1D4B0B8
- for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Dec 2020 13:37:05 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DBF5330E;
- Fri, 18 Dec 2020 10:37:04 -0800 (PST)
-Received: from [192.168.2.22] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E9CA23F66E;
- Fri, 18 Dec 2020 10:37:03 -0800 (PST)
-Subject: Re: [kvm-unit-tests PATCH v2 11/12] lib: arm64: gic-v3-its: Add wmb()
- barrier before INT command
-To: Alexandru Elisei <alexandru.elisei@arm.com>, drjones@redhat.com,
- kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-References: <20201217141400.106137-1-alexandru.elisei@arm.com>
- <20201217141400.106137-12-alexandru.elisei@arm.com>
-From: =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
-Autocrypt: addr=andre.przywara@arm.com; prefer-encrypt=mutual; keydata=
- xsFNBFNPCKMBEAC+6GVcuP9ri8r+gg2fHZDedOmFRZPtcrMMF2Cx6KrTUT0YEISsqPoJTKld
- tPfEG0KnRL9CWvftyHseWTnU2Gi7hKNwhRkC0oBL5Er2hhNpoi8x4VcsxQ6bHG5/dA7ctvL6
- kYvKAZw4X2Y3GTbAZIOLf+leNPiF9175S8pvqMPi0qu67RWZD5H/uT/TfLpvmmOlRzNiXMBm
- kGvewkBpL3R2clHquv7pB6KLoY3uvjFhZfEedqSqTwBVu/JVZZO7tvYCJPfyY5JG9+BjPmr+
- REe2gS6w/4DJ4D8oMWKoY3r6ZpHx3YS2hWZFUYiCYovPxfj5+bOr78sg3JleEd0OB0yYtzTT
- esiNlQpCo0oOevwHR+jUiaZevM4xCyt23L2G+euzdRsUZcK/M6qYf41Dy6Afqa+PxgMEiDto
- ITEH3Dv+zfzwdeqCuNU0VOGrQZs/vrKOUmU/QDlYL7G8OIg5Ekheq4N+Ay+3EYCROXkstQnf
- YYxRn5F1oeVeqoh1LgGH7YN9H9LeIajwBD8OgiZDVsmb67DdF6EQtklH0ycBcVodG1zTCfqM
- AavYMfhldNMBg4vaLh0cJ/3ZXZNIyDlV372GmxSJJiidxDm7E1PkgdfCnHk+pD8YeITmSNyb
- 7qeU08Hqqh4ui8SSeUp7+yie9zBhJB5vVBJoO5D0MikZAODIDwARAQABzS1BbmRyZSBQcnp5
- d2FyYSAoQVJNKSA8YW5kcmUucHJ6eXdhcmFAYXJtLmNvbT7CwXsEEwECACUCGwMGCwkIBwMC
- BhUIAgkKCwQWAgMBAh4BAheABQJTWSV8AhkBAAoJEAL1yD+ydue63REP/1tPqTo/f6StS00g
- NTUpjgVqxgsPWYWwSLkgkaUZn2z9Edv86BLpqTY8OBQZ19EUwfNehcnvR+Olw+7wxNnatyxo
- D2FG0paTia1SjxaJ8Nx3e85jy6l7N2AQrTCFCtFN9lp8Pc0LVBpSbjmP+Peh5Mi7gtCBNkpz
- KShEaJE25a/+rnIrIXzJHrsbC2GwcssAF3bd03iU41J1gMTalB6HCtQUwgqSsbG8MsR/IwHW
- XruOnVp0GQRJwlw07e9T3PKTLj3LWsAPe0LHm5W1Q+euoCLsZfYwr7phQ19HAxSCu8hzp43u
- zSw0+sEQsO+9wz2nGDgQCGepCcJR1lygVn2zwRTQKbq7Hjs+IWZ0gN2nDajScuR1RsxTE4WR
- lj0+Ne6VrAmPiW6QqRhliDO+e82riI75ywSWrJb9TQw0+UkIQ2DlNr0u0TwCUTcQNN6aKnru
- ouVt3qoRlcD5MuRhLH+ttAcmNITMg7GQ6RQajWrSKuKFrt6iuDbjgO2cnaTrLbNBBKPTG4oF
- D6kX8Zea0KvVBagBsaC1CDTDQQMxYBPDBSlqYCb/b2x7KHTvTAHUBSsBRL6MKz8wwruDodTM
- 4E4ToV9URl4aE/msBZ4GLTtEmUHBh4/AYwk6ACYByYKyx5r3PDG0iHnJ8bV0OeyQ9ujfgBBP
- B2t4oASNnIOeGEEcQ2rjzsFNBFNPCKMBEACm7Xqafb1Dp1nDl06aw/3O9ixWsGMv1Uhfd2B6
- it6wh1HDCn9HpekgouR2HLMvdd3Y//GG89irEasjzENZPsK82PS0bvkxxIHRFm0pikF4ljIb
- 6tca2sxFr/H7CCtWYZjZzPgnOPtnagN0qVVyEM7L5f7KjGb1/o5EDkVR2SVSSjrlmNdTL2Rd
- zaPqrBoxuR/y/n856deWqS1ZssOpqwKhxT1IVlF6S47CjFJ3+fiHNjkljLfxzDyQXwXCNoZn
- BKcW9PvAMf6W1DGASoXtsMg4HHzZ5fW+vnjzvWiC4pXrcP7Ivfxx5pB+nGiOfOY+/VSUlW/9
- GdzPlOIc1bGyKc6tGREH5lErmeoJZ5k7E9cMJx+xzuDItvnZbf6RuH5fg3QsljQy8jLlr4S6
- 8YwxlObySJ5K+suPRzZOG2+kq77RJVqAgZXp3Zdvdaov4a5J3H8pxzjj0yZ2JZlndM4X7Msr
- P5tfxy1WvV4Km6QeFAsjcF5gM+wWl+mf2qrlp3dRwniG1vkLsnQugQ4oNUrx0ahwOSm9p6kM
- CIiTITo+W7O9KEE9XCb4vV0ejmLlgdDV8ASVUekeTJkmRIBnz0fa4pa1vbtZoi6/LlIdAEEt
- PY6p3hgkLLtr2GRodOW/Y3vPRd9+rJHq/tLIfwc58ZhQKmRcgrhtlnuTGTmyUqGSiMNfpwAR
- AQABwsFfBBgBAgAJBQJTTwijAhsMAAoJEAL1yD+ydue64BgP/33QKczgAvSdj9XTC14wZCGE
- U8ygZwkkyNf021iNMj+o0dpLU48PIhHIMTXlM2aiiZlPWgKVlDRjlYuc9EZqGgbOOuR/pNYA
- JX9vaqszyE34JzXBL9DBKUuAui8z8GcxRcz49/xtzzP0kH3OQbBIqZWuMRxKEpRptRT0wzBL
- O31ygf4FRxs68jvPCuZjTGKELIo656/Hmk17cmjoBAJK7JHfqdGkDXk5tneeHCkB411p9WJU
- vMO2EqsHjobjuFm89hI0pSxlUoiTL0Nuk9Edemjw70W4anGNyaQtBq+qu1RdjUPBvoJec7y/
- EXJtoGxq9Y+tmm22xwApSiIOyMwUi9A1iLjQLmngLeUdsHyrEWTbEYHd2sAM2sqKoZRyBDSv
- ejRvZD6zwkY/9nRqXt02H1quVOP42xlkwOQU6gxm93o/bxd7S5tEA359Sli5gZRaucpNQkwd
- KLQdCvFdksD270r4jU/rwR2R/Ubi+txfy0dk2wGBjl1xpSf0Lbl/KMR5TQntELfLR4etizLq
- Xpd2byn96Ivi8C8u9zJruXTueHH8vt7gJ1oax3yKRGU5o2eipCRiKZ0s/T7fvkdq+8beg9ku
- fDO4SAgJMIl6H5awliCY2zQvLHysS/Wb8QuB09hmhLZ4AifdHyF1J5qeePEhgTA+BaUbiUZf
- i4aIXCH3Wv6K
-Organization: ARM Ltd.
-Message-ID: <bb0faa84-d12f-05b7-9913-155ebfcb3073@arm.com>
-Date: Fri, 18 Dec 2020 18:36:53 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
-MIME-Version: 1.0
-In-Reply-To: <20201217141400.106137-12-alexandru.elisei@arm.com>
-Content-Language: en-GB
+ with ESMTP id 6anjimK1E+IM for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 22 Dec 2020 11:05:40 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E01054A4A0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Dec 2020 11:05:39 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 7E7FB22955;
+ Tue, 22 Dec 2020 16:05:38 +0000 (UTC)
+Received: from 91-161-240-24.subs.proxad.net ([91.161.240.24]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1krkAK-0037KV-7U; Tue, 22 Dec 2020 16:05:36 +0000
+Date: Tue, 22 Dec 2020 16:05:35 +0000
+Message-ID: <87r1nhrflc.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH 1/6] kvm: arm64: Prevent use of invalid PSCI v0.1 function
+ IDs
+In-Reply-To: <20201208172628.GB18222@C02TD0UTHF1T.local>
+References: <20201208142452.87237-1-dbrazdil@google.com>
+ <20201208142452.87237-2-dbrazdil@google.com>
+ <e3f93946d66c0312a9778e49f1d85abe@kernel.org>
+ <20201208172628.GB18222@C02TD0UTHF1T.local>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 91.161.240.24
+X-SA-Exim-Rcpt-To: mark.rutland@arm.com, dbrazdil@google.com,
+ kvmarm@lists.cs.columbia.edu, james.morse@arm.com,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, catalin.marinas@arm.com,
+ will@kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, Catalin Marinas <catalin.marinas@arm.com>,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -116,65 +90,326 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 17/12/2020 14:13, Alexandru Elisei wrote:
-> The ITS tests use the INT command like an SGI. The its_send_int() function
-> kicks a CPU and then the test checks that the interrupt was observed as
-> expected in check_lpi_stats(). This is done by using lpi_stats.observed and
-> lpi_stats.expected, where the target CPU only writes to lpi_stats.observed,
-> and the source CPU reads it and compares the values with
-> lpi_stats.expected.
+On Tue, 08 Dec 2020 17:26:28 +0000,
+Mark Rutland <mark.rutland@arm.com> wrote:
 > 
-> The fact that the target CPU doesn't read data written by the source CPU
-> means that we don't need to do inter-processor memory synchronization
-> for that between the two at the moment.
+> On Tue, Dec 08, 2020 at 03:56:39PM +0000, Marc Zyngier wrote:
+> > On 2020-12-08 14:24, David Brazdil wrote:
+> > > PSCI driver exposes a struct containing the PSCI v0.1 function IDs
+> > > configured in the DT. However, the struct does not convey the
+> > > information whether these were set from DT or contain the default value
+> > > zero. This could be a problem for PSCI proxy in KVM protected mode.
+> > > 
+> > > Extend config passed to KVM with a bit mask with individual bits set
+> > > depending on whether the corresponding function pointer in psci_ops is
+> > > set, eg. set bit for PSCI_CPU_SUSPEND if psci_ops.cpu_suspend != NULL.
+> > > 
+> > > Previously config was split into multiple global variables. Put
+> > > everything into a single struct for convenience.
+> > > 
+> > > Reported-by: Mark Rutland <mark.rutland@arm.com>
+> > > Signed-off-by: David Brazdil <dbrazdil@google.com>
+> > > ---
+> > >  arch/arm64/include/asm/kvm_host.h    | 20 +++++++++++
+> > >  arch/arm64/kvm/arm.c                 | 14 +++++---
+> > >  arch/arm64/kvm/hyp/nvhe/psci-relay.c | 53 +++++++++++++++++++++-------
+> > >  3 files changed, 70 insertions(+), 17 deletions(-)
+> > > 
+> > > diff --git a/arch/arm64/include/asm/kvm_host.h
+> > > b/arch/arm64/include/asm/kvm_host.h
+> > > index 11beda85ee7e..828d50d40dc2 100644
+> > > --- a/arch/arm64/include/asm/kvm_host.h
+> > > +++ b/arch/arm64/include/asm/kvm_host.h
+> > > @@ -17,6 +17,7 @@
+> > >  #include <linux/jump_label.h>
+> > >  #include <linux/kvm_types.h>
+> > >  #include <linux/percpu.h>
+> > > +#include <linux/psci.h>
+> > >  #include <asm/arch_gicv3.h>
+> > >  #include <asm/barrier.h>
+> > >  #include <asm/cpufeature.h>
+> > > @@ -240,6 +241,25 @@ struct kvm_host_data {
+> > >  	struct kvm_pmu_events pmu_events;
+> > >  };
+> > > 
+> > > +#define KVM_HOST_PSCI_0_1_CPU_SUSPEND	BIT(0)
+> > > +#define KVM_HOST_PSCI_0_1_CPU_ON	BIT(1)
+> > > +#define KVM_HOST_PSCI_0_1_CPU_OFF	BIT(2)
+> > > +#define KVM_HOST_PSCI_0_1_MIGRATE	BIT(3)
+> > > +
+> > > +struct kvm_host_psci_config {
+> > > +	/* PSCI version used by host. */
+> > > +	u32 version;
+> > > +
+> > > +	/* Function IDs used by host if version is v0.1. */
+> > > +	struct psci_0_1_function_ids function_ids_0_1;
+> > > +
+> > > +	/* Bitmask of functions enabled for v0.1, bits KVM_HOST_PSCI_0_1_*. */
+> > > +	unsigned int enabled_functions_0_1;
+> > 
+> > Nit: the conventional type for bitmaps is 'unsigned long'.
+> > Also, "enabled" seems odd. Isn't it actually "available"?
 > 
-> The acked array is used by its-pending-migration test, but the reset value
-> for acked (zero) is the same as the initialization value for static
-> variables, so memory synchronization is again not needed.
+> Sure, that or "implemented" works here.
 > 
-> However, that is all about to change when we modify all ITS tests to use
-> the same functions as the IPI tests. Add a write memory barrier to
-> its_send_int(), similar to the gicv3_ipi_send_mask(), which has similar
-> semantics.
-
-I agree to the requirement for having the barrier, but am not sure this
-is the right place. Wouldn't it be better to have the barrier in the
-callers?
-
-Besides: This command is written to the command queue (in normal
-memory), then we notify the ITS via an MMIO writeq. And this one has a
-"wmb" barrier already (though for other reasons).
-
-Cheers,
-Andre
-
-
+> Since there are only 4 functions here, it might make sense to use
+> independent bools rather than a bitmap, which might make this a bit
+> simpler...
 > 
-> Suggested-by: Auger Eric <eric.auger@redhat.com>
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
->  lib/arm64/gic-v3-its-cmd.c | 6 ++++++
->  1 file changed, 6 insertions(+)
+> > > get_psci_0_1_function_ids();
+> > > +	kvm_host_psci_config.version = psci_ops.get_version();
+> > > +
+> > > +	if (kvm_host_psci_config.version == PSCI_VERSION(0, 1)) {
+> > > +		kvm_host_psci_config.function_ids_0_1 = get_psci_0_1_function_ids();
+> > > +		kvm_host_psci_config.enabled_functions_0_1 =
+> > > +			(psci_ops.cpu_suspend ? KVM_HOST_PSCI_0_1_CPU_SUSPEND : 0) |
+> > > +			(psci_ops.cpu_off ? KVM_HOST_PSCI_0_1_CPU_OFF : 0) |
+> > > +			(psci_ops.cpu_on ? KVM_HOST_PSCI_0_1_CPU_ON : 0) |
+> > > +			(psci_ops.migrate ? KVM_HOST_PSCI_0_1_MIGRATE : 0);
 > 
-> diff --git a/lib/arm64/gic-v3-its-cmd.c b/lib/arm64/gic-v3-its-cmd.c
-> index 34574f71d171..32703147ee85 100644
-> --- a/lib/arm64/gic-v3-its-cmd.c
-> +++ b/lib/arm64/gic-v3-its-cmd.c
-> @@ -385,6 +385,12 @@ void __its_send_int(struct its_device *dev, u32 event_id, bool verbose)
->  {
->  	struct its_cmd_desc desc;
->  
-> +	/*
-> +	 * The INT command is used by tests as an IPI. Ensure stores to Normal
-> +	 * memory are visible to other CPUs before sending the LPI.
-> +	 */
-> +	wmb();
-> +
->  	desc.its_int_cmd.dev = dev;
->  	desc.its_int_cmd.event_id = event_id;
->  	desc.verbose = verbose;
+> ... since e.g. this could be roughly:
 > 
+> 	kvm_host_psci_config.cpu_suspend_implemented = psci_ops.cpu_suspend;
+> 	kvm_host_psci_config.cpu_off_implemented = psci_ops.cpu_off;
+> 	kvm_host_psci_config.cpu_on_implemented = psci_ops.cpu_on;
+> 	kvm_host_psci_config.migrate_implemented = psci_ops.migrate;
+> 
+> > > +static inline bool is_psci_0_1_cpu_suspend(u64 func_id)
+> > > +{
+> > > +	return is_psci_0_1_function_enabled(KVM_HOST_PSCI_0_1_CPU_SUSPEND) &&
+> > > +	       (func_id == kvm_host_psci_config.function_ids_0_1.cpu_suspend);
+> > > +}
+> 
+> ...and similarly:
+> 
+> 	return  kvm_host_psci_config.cpu_suspend_implemented &&
+> 		func_id == kvm_host_psci_config.function_ids_0_1.cpu_suspend)
+> 
+> > Otherwise looks OK. Don't bother respinning the series for my
+> > comments, I can tidy things up as I apply it if there are no other
+> > issues.
+> 
+> FWIW, I'm happy with whatever choose to do here, so don't feel like you
+> have to follow my suggestions above.
 
+FWIW, I've queued the following patch on top of the series, using the
+above suggestions and some creative use of macros, allowing some
+cleanup.
+
+	M.
+
+From 767c973f2e4a9264a4f159c9fad5ca8acdb9915e Mon Sep 17 00:00:00 2001
+From: Marc Zyngier <maz@kernel.org>
+Date: Tue, 22 Dec 2020 12:46:41 +0000
+Subject: [PATCH] KVM: arm64: Declutter host PSCI 0.1 handling
+
+Although there is nothing wrong with the current host PSCI relay
+implementation, we can clean it up and remove some of the helpers
+that do not improve the overall readability of the legacy PSCI 0.1
+handling.
+
+Opportunity is taken to turn the bitmap into a set of booleans,
+and creative use of preprocessor macros make init and check
+more concise/readable.
+
+Suggested-by: Mark Rutland <mark.rutland@arm.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/include/asm/kvm_host.h    | 11 ++--
+ arch/arm64/kvm/arm.c                 | 12 +++--
+ arch/arm64/kvm/hyp/nvhe/psci-relay.c | 77 +++++++---------------------
+ 3 files changed, 30 insertions(+), 70 deletions(-)
+
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index bce2452b305c..8fcfab0c2567 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -241,11 +241,6 @@ struct kvm_host_data {
+ 	struct kvm_pmu_events pmu_events;
+ };
+ 
+-#define KVM_HOST_PSCI_0_1_CPU_SUSPEND	BIT(0)
+-#define KVM_HOST_PSCI_0_1_CPU_ON	BIT(1)
+-#define KVM_HOST_PSCI_0_1_CPU_OFF	BIT(2)
+-#define KVM_HOST_PSCI_0_1_MIGRATE	BIT(3)
+-
+ struct kvm_host_psci_config {
+ 	/* PSCI version used by host. */
+ 	u32 version;
+@@ -253,8 +248,10 @@ struct kvm_host_psci_config {
+ 	/* Function IDs used by host if version is v0.1. */
+ 	struct psci_0_1_function_ids function_ids_0_1;
+ 
+-	/* Bitmask of functions enabled for v0.1, bits KVM_HOST_PSCI_0_1_*. */
+-	unsigned int enabled_functions_0_1;
++	bool psci_0_1_cpu_suspend_implemented;
++	bool psci_0_1_cpu_on_implemented;
++	bool psci_0_1_cpu_off_implemented;
++	bool psci_0_1_migrate_implemented;
+ };
+ 
+ extern struct kvm_host_psci_config kvm_nvhe_sym(kvm_host_psci_config);
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 836ca763b91d..e207e4541f55 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1603,6 +1603,9 @@ static void init_cpu_logical_map(void)
+ 		hyp_cpu_logical_map[cpu] = cpu_logical_map(cpu);
+ }
+ 
++#define init_psci_0_1_impl_state(config, what)	\
++	config.psci_0_1_ ## what ## _implemented = psci_ops.what
++
+ static bool init_psci_relay(void)
+ {
+ 	/*
+@@ -1618,11 +1621,10 @@ static bool init_psci_relay(void)
+ 
+ 	if (kvm_host_psci_config.version == PSCI_VERSION(0, 1)) {
+ 		kvm_host_psci_config.function_ids_0_1 = get_psci_0_1_function_ids();
+-		kvm_host_psci_config.enabled_functions_0_1 =
+-			(psci_ops.cpu_suspend ? KVM_HOST_PSCI_0_1_CPU_SUSPEND : 0) |
+-			(psci_ops.cpu_off ? KVM_HOST_PSCI_0_1_CPU_OFF : 0) |
+-			(psci_ops.cpu_on ? KVM_HOST_PSCI_0_1_CPU_ON : 0) |
+-			(psci_ops.migrate ? KVM_HOST_PSCI_0_1_MIGRATE : 0);
++		init_psci_0_1_impl_state(kvm_host_psci_config, cpu_suspend);
++		init_psci_0_1_impl_state(kvm_host_psci_config, cpu_on);
++		init_psci_0_1_impl_state(kvm_host_psci_config, cpu_off);
++		init_psci_0_1_impl_state(kvm_host_psci_config, migrate);
+ 	}
+ 	return true;
+ }
+diff --git a/arch/arm64/kvm/hyp/nvhe/psci-relay.c b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
+index 1f7237e45148..e3947846ffcb 100644
+--- a/arch/arm64/kvm/hyp/nvhe/psci-relay.c
++++ b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
+@@ -43,48 +43,16 @@ struct psci_boot_args {
+ static DEFINE_PER_CPU(struct psci_boot_args, cpu_on_args) = PSCI_BOOT_ARGS_INIT;
+ static DEFINE_PER_CPU(struct psci_boot_args, suspend_args) = PSCI_BOOT_ARGS_INIT;
+ 
+-static u64 get_psci_func_id(struct kvm_cpu_context *host_ctxt)
+-{
+-	DECLARE_REG(u64, func_id, host_ctxt, 0);
+-
+-	return func_id;
+-}
+-
+-static inline bool is_psci_0_1_function_enabled(unsigned int fn_bit)
+-{
+-	return kvm_host_psci_config.enabled_functions_0_1 & fn_bit;
+-}
+-
+-static inline bool is_psci_0_1_cpu_suspend(u64 func_id)
+-{
+-	return is_psci_0_1_function_enabled(KVM_HOST_PSCI_0_1_CPU_SUSPEND) &&
+-	       (func_id == kvm_host_psci_config.function_ids_0_1.cpu_suspend);
+-}
+-
+-static inline bool is_psci_0_1_cpu_on(u64 func_id)
+-{
+-	return is_psci_0_1_function_enabled(KVM_HOST_PSCI_0_1_CPU_ON) &&
+-	       (func_id == kvm_host_psci_config.function_ids_0_1.cpu_on);
+-}
+-
+-static inline bool is_psci_0_1_cpu_off(u64 func_id)
+-{
+-	return is_psci_0_1_function_enabled(KVM_HOST_PSCI_0_1_CPU_OFF) &&
+-	       (func_id == kvm_host_psci_config.function_ids_0_1.cpu_off);
+-}
+-
+-static inline bool is_psci_0_1_migrate(u64 func_id)
+-{
+-	return is_psci_0_1_function_enabled(KVM_HOST_PSCI_0_1_MIGRATE) &&
+-	       (func_id == kvm_host_psci_config.function_ids_0_1.migrate);
+-}
++#define	is_psci_0_1(what, func_id)					\
++	(kvm_host_psci_config.psci_0_1_ ## what ## _implemented &&	\
++	 (func_id) == kvm_host_psci_config.function_ids_0_1.what)
+ 
+ static bool is_psci_0_1_call(u64 func_id)
+ {
+-	return is_psci_0_1_cpu_suspend(func_id) ||
+-	       is_psci_0_1_cpu_on(func_id) ||
+-	       is_psci_0_1_cpu_off(func_id) ||
+-	       is_psci_0_1_migrate(func_id);
++	return (is_psci_0_1(cpu_suspend, func_id) ||
++		is_psci_0_1(cpu_on, func_id) ||
++		is_psci_0_1(cpu_off, func_id) ||
++		is_psci_0_1(migrate, func_id));
+ }
+ 
+ static bool is_psci_0_2_call(u64 func_id)
+@@ -94,16 +62,6 @@ static bool is_psci_0_2_call(u64 func_id)
+ 	       (PSCI_0_2_FN64(0) <= func_id && func_id <= PSCI_0_2_FN64(31));
+ }
+ 
+-static bool is_psci_call(u64 func_id)
+-{
+-	switch (kvm_host_psci_config.version) {
+-	case PSCI_VERSION(0, 1):
+-		return is_psci_0_1_call(func_id);
+-	default:
+-		return is_psci_0_2_call(func_id);
+-	}
+-}
+-
+ static unsigned long psci_call(unsigned long fn, unsigned long arg0,
+ 			       unsigned long arg1, unsigned long arg2)
+ {
+@@ -273,14 +231,14 @@ asmlinkage void __noreturn kvm_host_psci_cpu_entry(bool is_cpu_on)
+ 
+ static unsigned long psci_0_1_handler(u64 func_id, struct kvm_cpu_context *host_ctxt)
+ {
+-	if (is_psci_0_1_cpu_off(func_id) || is_psci_0_1_migrate(func_id))
++	if (is_psci_0_1(cpu_off, func_id) || is_psci_0_1(migrate, func_id))
+ 		return psci_forward(host_ctxt);
+-	else if (is_psci_0_1_cpu_on(func_id))
++	if (is_psci_0_1(cpu_on, func_id))
+ 		return psci_cpu_on(func_id, host_ctxt);
+-	else if (is_psci_0_1_cpu_suspend(func_id))
++	if (is_psci_0_1(cpu_suspend, func_id))
+ 		return psci_cpu_suspend(func_id, host_ctxt);
+-	else
+-		return PSCI_RET_NOT_SUPPORTED;
++
++	return PSCI_RET_NOT_SUPPORTED;
+ }
+ 
+ static unsigned long psci_0_2_handler(u64 func_id, struct kvm_cpu_context *host_ctxt)
+@@ -322,20 +280,23 @@ static unsigned long psci_1_0_handler(u64 func_id, struct kvm_cpu_context *host_
+ 
+ bool kvm_host_psci_handler(struct kvm_cpu_context *host_ctxt)
+ {
+-	u64 func_id = get_psci_func_id(host_ctxt);
++	DECLARE_REG(u64, func_id, host_ctxt, 0);
+ 	unsigned long ret;
+ 
+-	if (!is_psci_call(func_id))
+-		return false;
+-
+ 	switch (kvm_host_psci_config.version) {
+ 	case PSCI_VERSION(0, 1):
++		if (!is_psci_0_1_call(func_id))
++			return false;
+ 		ret = psci_0_1_handler(func_id, host_ctxt);
+ 		break;
+ 	case PSCI_VERSION(0, 2):
++		if (!is_psci_0_2_call(func_id))
++			return false;
+ 		ret = psci_0_2_handler(func_id, host_ctxt);
+ 		break;
+ 	default:
++		if (!is_psci_0_2_call(func_id))
++			return false;
+ 		ret = psci_1_0_handler(func_id, host_ctxt);
+ 		break;
+ 	}
+-- 
+2.29.2
+
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
