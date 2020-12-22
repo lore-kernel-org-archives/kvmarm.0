@@ -2,78 +2,72 @@ Return-Path: <SRS0=fzzv=F2=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA763C433E0
-	for <kvmarm@archiver.kernel.org>; Tue, 22 Dec 2020 16:05:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D811C433DB
+	for <kvmarm@archiver.kernel.org>; Tue, 22 Dec 2020 16:06:59 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5C70923124
-	for <kvmarm@archiver.kernel.org>; Tue, 22 Dec 2020 16:05:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C70923124
+	by mail.kernel.org (Postfix) with ESMTP id 2105523105
+	for <kvmarm@archiver.kernel.org>; Tue, 22 Dec 2020 16:06:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2105523105
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A56D34B2A6;
-	Tue, 22 Dec 2020 11:05:43 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 73A094B1BF;
+	Tue, 22 Dec 2020 11:06:58 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jD2L1LtGyj+L; Tue, 22 Dec 2020 11:05:42 -0500 (EST)
+	with ESMTP id ex1mhciPAhsE; Tue, 22 Dec 2020 11:06:57 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 160084B2B3;
-	Tue, 22 Dec 2020 11:05:42 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 609614B19C;
+	Tue, 22 Dec 2020 11:06:57 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A8BB4B2A6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Dec 2020 11:05:41 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B6C544B132
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Dec 2020 11:06:55 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6anjimK1E+IM for <kvmarm@lists.cs.columbia.edu>;
- Tue, 22 Dec 2020 11:05:40 -0500 (EST)
+ with ESMTP id mOLjiN5+leLC for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 22 Dec 2020 11:06:54 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E01054A4A0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Dec 2020 11:05:39 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C1B4C4B12E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Dec 2020 11:06:54 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 7E7FB22955;
- Tue, 22 Dec 2020 16:05:38 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id AD36422955;
+ Tue, 22 Dec 2020 16:06:53 +0000 (UTC)
 Received: from 91-161-240-24.subs.proxad.net ([91.161.240.24]
- helo=wait-a-minute.misterjones.org)
+ helo=localhost.localdomain)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1krkAK-0037KV-7U; Tue, 22 Dec 2020 16:05:36 +0000
-Date: Tue, 22 Dec 2020 16:05:35 +0000
-Message-ID: <87r1nhrflc.wl-maz@kernel.org>
+ id 1krkBX-0037LH-K0; Tue, 22 Dec 2020 16:06:51 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH 1/6] kvm: arm64: Prevent use of invalid PSCI v0.1 function
- IDs
-In-Reply-To: <20201208172628.GB18222@C02TD0UTHF1T.local>
+To: David Brazdil <dbrazdil@google.com>,
+	kvmarm@lists.cs.columbia.edu
+Subject: Re: [PATCH 0/6] Fixes and cleanups of PSCI relay for kvmarm/next
+Date: Tue, 22 Dec 2020 16:06:33 +0000
+Message-Id: <160865317053.248882.14763900616940105510.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.29.2
+In-Reply-To: <20201208142452.87237-1-dbrazdil@google.com>
 References: <20201208142452.87237-1-dbrazdil@google.com>
- <20201208142452.87237-2-dbrazdil@google.com>
- <e3f93946d66c0312a9778e49f1d85abe@kernel.org>
- <20201208172628.GB18222@C02TD0UTHF1T.local>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 91.161.240.24
-X-SA-Exim-Rcpt-To: mark.rutland@arm.com, dbrazdil@google.com,
- kvmarm@lists.cs.columbia.edu, james.morse@arm.com,
- julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, catalin.marinas@arm.com,
- will@kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, kernel-team@android.com
+X-SA-Exim-Rcpt-To: dbrazdil@google.com, kvmarm@lists.cs.columbia.edu,
+ will@kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com,
+ kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kernel-team@android.com, Catalin Marinas <catalin.marinas@arm.com>,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
+Cc: Catalin Marinas <catalin.marinas@arm.com>, kernel-team@android.com,
+ Will Deacon <will@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,326 +84,39 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 08 Dec 2020 17:26:28 +0000,
-Mark Rutland <mark.rutland@arm.com> wrote:
+On Tue, 8 Dec 2020 14:24:46 +0000, David Brazdil wrote:
+> Small batch of improvements for the 'Opt-in always-on nVHE hypervisor'
+> series, now merged in kvmarm/next.
 > 
-> On Tue, Dec 08, 2020 at 03:56:39PM +0000, Marc Zyngier wrote:
-> > On 2020-12-08 14:24, David Brazdil wrote:
-> > > PSCI driver exposes a struct containing the PSCI v0.1 function IDs
-> > > configured in the DT. However, the struct does not convey the
-> > > information whether these were set from DT or contain the default value
-> > > zero. This could be a problem for PSCI proxy in KVM protected mode.
-> > > 
-> > > Extend config passed to KVM with a bit mask with individual bits set
-> > > depending on whether the corresponding function pointer in psci_ops is
-> > > set, eg. set bit for PSCI_CPU_SUSPEND if psci_ops.cpu_suspend != NULL.
-> > > 
-> > > Previously config was split into multiple global variables. Put
-> > > everything into a single struct for convenience.
-> > > 
-> > > Reported-by: Mark Rutland <mark.rutland@arm.com>
-> > > Signed-off-by: David Brazdil <dbrazdil@google.com>
-> > > ---
-> > >  arch/arm64/include/asm/kvm_host.h    | 20 +++++++++++
-> > >  arch/arm64/kvm/arm.c                 | 14 +++++---
-> > >  arch/arm64/kvm/hyp/nvhe/psci-relay.c | 53 +++++++++++++++++++++-------
-> > >  3 files changed, 70 insertions(+), 17 deletions(-)
-> > > 
-> > > diff --git a/arch/arm64/include/asm/kvm_host.h
-> > > b/arch/arm64/include/asm/kvm_host.h
-> > > index 11beda85ee7e..828d50d40dc2 100644
-> > > --- a/arch/arm64/include/asm/kvm_host.h
-> > > +++ b/arch/arm64/include/asm/kvm_host.h
-> > > @@ -17,6 +17,7 @@
-> > >  #include <linux/jump_label.h>
-> > >  #include <linux/kvm_types.h>
-> > >  #include <linux/percpu.h>
-> > > +#include <linux/psci.h>
-> > >  #include <asm/arch_gicv3.h>
-> > >  #include <asm/barrier.h>
-> > >  #include <asm/cpufeature.h>
-> > > @@ -240,6 +241,25 @@ struct kvm_host_data {
-> > >  	struct kvm_pmu_events pmu_events;
-> > >  };
-> > > 
-> > > +#define KVM_HOST_PSCI_0_1_CPU_SUSPEND	BIT(0)
-> > > +#define KVM_HOST_PSCI_0_1_CPU_ON	BIT(1)
-> > > +#define KVM_HOST_PSCI_0_1_CPU_OFF	BIT(2)
-> > > +#define KVM_HOST_PSCI_0_1_MIGRATE	BIT(3)
-> > > +
-> > > +struct kvm_host_psci_config {
-> > > +	/* PSCI version used by host. */
-> > > +	u32 version;
-> > > +
-> > > +	/* Function IDs used by host if version is v0.1. */
-> > > +	struct psci_0_1_function_ids function_ids_0_1;
-> > > +
-> > > +	/* Bitmask of functions enabled for v0.1, bits KVM_HOST_PSCI_0_1_*. */
-> > > +	unsigned int enabled_functions_0_1;
-> > 
-> > Nit: the conventional type for bitmaps is 'unsigned long'.
-> > Also, "enabled" seems odd. Isn't it actually "available"?
+> Patch #1 fixes potential use of invalid v0.1 functions IDs reported
+> by Mark Rutland, patch #2 fixes a warning reported by Qian Cai.
+> Patch #3 avoids a code path not used in VHE, can be dropped if any
+> concerns arise. The remaining patches are minor cleanups from review.
 > 
-> Sure, that or "implemented" works here.
-> 
-> Since there are only 4 functions here, it might make sense to use
-> independent bools rather than a bitmap, which might make this a bit
-> simpler...
-> 
-> > > get_psci_0_1_function_ids();
-> > > +	kvm_host_psci_config.version = psci_ops.get_version();
-> > > +
-> > > +	if (kvm_host_psci_config.version == PSCI_VERSION(0, 1)) {
-> > > +		kvm_host_psci_config.function_ids_0_1 = get_psci_0_1_function_ids();
-> > > +		kvm_host_psci_config.enabled_functions_0_1 =
-> > > +			(psci_ops.cpu_suspend ? KVM_HOST_PSCI_0_1_CPU_SUSPEND : 0) |
-> > > +			(psci_ops.cpu_off ? KVM_HOST_PSCI_0_1_CPU_OFF : 0) |
-> > > +			(psci_ops.cpu_on ? KVM_HOST_PSCI_0_1_CPU_ON : 0) |
-> > > +			(psci_ops.migrate ? KVM_HOST_PSCI_0_1_MIGRATE : 0);
-> 
-> ... since e.g. this could be roughly:
-> 
-> 	kvm_host_psci_config.cpu_suspend_implemented = psci_ops.cpu_suspend;
-> 	kvm_host_psci_config.cpu_off_implemented = psci_ops.cpu_off;
-> 	kvm_host_psci_config.cpu_on_implemented = psci_ops.cpu_on;
-> 	kvm_host_psci_config.migrate_implemented = psci_ops.migrate;
-> 
-> > > +static inline bool is_psci_0_1_cpu_suspend(u64 func_id)
-> > > +{
-> > > +	return is_psci_0_1_function_enabled(KVM_HOST_PSCI_0_1_CPU_SUSPEND) &&
-> > > +	       (func_id == kvm_host_psci_config.function_ids_0_1.cpu_suspend);
-> > > +}
-> 
-> ...and similarly:
-> 
-> 	return  kvm_host_psci_config.cpu_suspend_implemented &&
-> 		func_id == kvm_host_psci_config.function_ids_0_1.cpu_suspend)
-> 
-> > Otherwise looks OK. Don't bother respinning the series for my
-> > comments, I can tidy things up as I apply it if there are no other
-> > issues.
-> 
-> FWIW, I'm happy with whatever choose to do here, so don't feel like you
-> have to follow my suggestions above.
+> [...]
 
-FWIW, I've queued the following patch on top of the series, using the
-above suggestions and some creative use of macros, allowing some
-cleanup.
+Applied to next, thanks!
+
+[1/6] kvm: arm64: Prevent use of invalid PSCI v0.1 function IDs
+      commit: ff367fe473a9857160c17827931375a899076394
+[2/6] kvm: arm64: Use lm_alias in nVHE-only VA conversion
+      commit: 7a96a0687b80a1870c689418d7b72012c8bdd53d
+[3/6] kvm: arm64: Skip computing hyp VA layout for VHE
+      commit: c3e181aec96f6ada84df1cb72a72be8970f8b284
+[4/6] kvm: arm64: Minor cleanup of hyp variables used in host
+      commit: 61fe0c37af57ac35472a870581a7d0bb5ac2f63a
+[5/6] kvm: arm64: Remove unused includes in psci-relay.c
+      commit: e6829e0384a49efe68537298132230bebd8bd1b3
+[6/6] kvm: arm64: Move skip_host_instruction to adjust_pc.h
+      commit: 860a4c3d1e04a3c3e62bacbbba64417bf49768e2
+
+Cheers,
 
 	M.
-
-From 767c973f2e4a9264a4f159c9fad5ca8acdb9915e Mon Sep 17 00:00:00 2001
-From: Marc Zyngier <maz@kernel.org>
-Date: Tue, 22 Dec 2020 12:46:41 +0000
-Subject: [PATCH] KVM: arm64: Declutter host PSCI 0.1 handling
-
-Although there is nothing wrong with the current host PSCI relay
-implementation, we can clean it up and remove some of the helpers
-that do not improve the overall readability of the legacy PSCI 0.1
-handling.
-
-Opportunity is taken to turn the bitmap into a set of booleans,
-and creative use of preprocessor macros make init and check
-more concise/readable.
-
-Suggested-by: Mark Rutland <mark.rutland@arm.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/kvm_host.h    | 11 ++--
- arch/arm64/kvm/arm.c                 | 12 +++--
- arch/arm64/kvm/hyp/nvhe/psci-relay.c | 77 +++++++---------------------
- 3 files changed, 30 insertions(+), 70 deletions(-)
-
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index bce2452b305c..8fcfab0c2567 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -241,11 +241,6 @@ struct kvm_host_data {
- 	struct kvm_pmu_events pmu_events;
- };
- 
--#define KVM_HOST_PSCI_0_1_CPU_SUSPEND	BIT(0)
--#define KVM_HOST_PSCI_0_1_CPU_ON	BIT(1)
--#define KVM_HOST_PSCI_0_1_CPU_OFF	BIT(2)
--#define KVM_HOST_PSCI_0_1_MIGRATE	BIT(3)
--
- struct kvm_host_psci_config {
- 	/* PSCI version used by host. */
- 	u32 version;
-@@ -253,8 +248,10 @@ struct kvm_host_psci_config {
- 	/* Function IDs used by host if version is v0.1. */
- 	struct psci_0_1_function_ids function_ids_0_1;
- 
--	/* Bitmask of functions enabled for v0.1, bits KVM_HOST_PSCI_0_1_*. */
--	unsigned int enabled_functions_0_1;
-+	bool psci_0_1_cpu_suspend_implemented;
-+	bool psci_0_1_cpu_on_implemented;
-+	bool psci_0_1_cpu_off_implemented;
-+	bool psci_0_1_migrate_implemented;
- };
- 
- extern struct kvm_host_psci_config kvm_nvhe_sym(kvm_host_psci_config);
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 836ca763b91d..e207e4541f55 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1603,6 +1603,9 @@ static void init_cpu_logical_map(void)
- 		hyp_cpu_logical_map[cpu] = cpu_logical_map(cpu);
- }
- 
-+#define init_psci_0_1_impl_state(config, what)	\
-+	config.psci_0_1_ ## what ## _implemented = psci_ops.what
-+
- static bool init_psci_relay(void)
- {
- 	/*
-@@ -1618,11 +1621,10 @@ static bool init_psci_relay(void)
- 
- 	if (kvm_host_psci_config.version == PSCI_VERSION(0, 1)) {
- 		kvm_host_psci_config.function_ids_0_1 = get_psci_0_1_function_ids();
--		kvm_host_psci_config.enabled_functions_0_1 =
--			(psci_ops.cpu_suspend ? KVM_HOST_PSCI_0_1_CPU_SUSPEND : 0) |
--			(psci_ops.cpu_off ? KVM_HOST_PSCI_0_1_CPU_OFF : 0) |
--			(psci_ops.cpu_on ? KVM_HOST_PSCI_0_1_CPU_ON : 0) |
--			(psci_ops.migrate ? KVM_HOST_PSCI_0_1_MIGRATE : 0);
-+		init_psci_0_1_impl_state(kvm_host_psci_config, cpu_suspend);
-+		init_psci_0_1_impl_state(kvm_host_psci_config, cpu_on);
-+		init_psci_0_1_impl_state(kvm_host_psci_config, cpu_off);
-+		init_psci_0_1_impl_state(kvm_host_psci_config, migrate);
- 	}
- 	return true;
- }
-diff --git a/arch/arm64/kvm/hyp/nvhe/psci-relay.c b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-index 1f7237e45148..e3947846ffcb 100644
---- a/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-+++ b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-@@ -43,48 +43,16 @@ struct psci_boot_args {
- static DEFINE_PER_CPU(struct psci_boot_args, cpu_on_args) = PSCI_BOOT_ARGS_INIT;
- static DEFINE_PER_CPU(struct psci_boot_args, suspend_args) = PSCI_BOOT_ARGS_INIT;
- 
--static u64 get_psci_func_id(struct kvm_cpu_context *host_ctxt)
--{
--	DECLARE_REG(u64, func_id, host_ctxt, 0);
--
--	return func_id;
--}
--
--static inline bool is_psci_0_1_function_enabled(unsigned int fn_bit)
--{
--	return kvm_host_psci_config.enabled_functions_0_1 & fn_bit;
--}
--
--static inline bool is_psci_0_1_cpu_suspend(u64 func_id)
--{
--	return is_psci_0_1_function_enabled(KVM_HOST_PSCI_0_1_CPU_SUSPEND) &&
--	       (func_id == kvm_host_psci_config.function_ids_0_1.cpu_suspend);
--}
--
--static inline bool is_psci_0_1_cpu_on(u64 func_id)
--{
--	return is_psci_0_1_function_enabled(KVM_HOST_PSCI_0_1_CPU_ON) &&
--	       (func_id == kvm_host_psci_config.function_ids_0_1.cpu_on);
--}
--
--static inline bool is_psci_0_1_cpu_off(u64 func_id)
--{
--	return is_psci_0_1_function_enabled(KVM_HOST_PSCI_0_1_CPU_OFF) &&
--	       (func_id == kvm_host_psci_config.function_ids_0_1.cpu_off);
--}
--
--static inline bool is_psci_0_1_migrate(u64 func_id)
--{
--	return is_psci_0_1_function_enabled(KVM_HOST_PSCI_0_1_MIGRATE) &&
--	       (func_id == kvm_host_psci_config.function_ids_0_1.migrate);
--}
-+#define	is_psci_0_1(what, func_id)					\
-+	(kvm_host_psci_config.psci_0_1_ ## what ## _implemented &&	\
-+	 (func_id) == kvm_host_psci_config.function_ids_0_1.what)
- 
- static bool is_psci_0_1_call(u64 func_id)
- {
--	return is_psci_0_1_cpu_suspend(func_id) ||
--	       is_psci_0_1_cpu_on(func_id) ||
--	       is_psci_0_1_cpu_off(func_id) ||
--	       is_psci_0_1_migrate(func_id);
-+	return (is_psci_0_1(cpu_suspend, func_id) ||
-+		is_psci_0_1(cpu_on, func_id) ||
-+		is_psci_0_1(cpu_off, func_id) ||
-+		is_psci_0_1(migrate, func_id));
- }
- 
- static bool is_psci_0_2_call(u64 func_id)
-@@ -94,16 +62,6 @@ static bool is_psci_0_2_call(u64 func_id)
- 	       (PSCI_0_2_FN64(0) <= func_id && func_id <= PSCI_0_2_FN64(31));
- }
- 
--static bool is_psci_call(u64 func_id)
--{
--	switch (kvm_host_psci_config.version) {
--	case PSCI_VERSION(0, 1):
--		return is_psci_0_1_call(func_id);
--	default:
--		return is_psci_0_2_call(func_id);
--	}
--}
--
- static unsigned long psci_call(unsigned long fn, unsigned long arg0,
- 			       unsigned long arg1, unsigned long arg2)
- {
-@@ -273,14 +231,14 @@ asmlinkage void __noreturn kvm_host_psci_cpu_entry(bool is_cpu_on)
- 
- static unsigned long psci_0_1_handler(u64 func_id, struct kvm_cpu_context *host_ctxt)
- {
--	if (is_psci_0_1_cpu_off(func_id) || is_psci_0_1_migrate(func_id))
-+	if (is_psci_0_1(cpu_off, func_id) || is_psci_0_1(migrate, func_id))
- 		return psci_forward(host_ctxt);
--	else if (is_psci_0_1_cpu_on(func_id))
-+	if (is_psci_0_1(cpu_on, func_id))
- 		return psci_cpu_on(func_id, host_ctxt);
--	else if (is_psci_0_1_cpu_suspend(func_id))
-+	if (is_psci_0_1(cpu_suspend, func_id))
- 		return psci_cpu_suspend(func_id, host_ctxt);
--	else
--		return PSCI_RET_NOT_SUPPORTED;
-+
-+	return PSCI_RET_NOT_SUPPORTED;
- }
- 
- static unsigned long psci_0_2_handler(u64 func_id, struct kvm_cpu_context *host_ctxt)
-@@ -322,20 +280,23 @@ static unsigned long psci_1_0_handler(u64 func_id, struct kvm_cpu_context *host_
- 
- bool kvm_host_psci_handler(struct kvm_cpu_context *host_ctxt)
- {
--	u64 func_id = get_psci_func_id(host_ctxt);
-+	DECLARE_REG(u64, func_id, host_ctxt, 0);
- 	unsigned long ret;
- 
--	if (!is_psci_call(func_id))
--		return false;
--
- 	switch (kvm_host_psci_config.version) {
- 	case PSCI_VERSION(0, 1):
-+		if (!is_psci_0_1_call(func_id))
-+			return false;
- 		ret = psci_0_1_handler(func_id, host_ctxt);
- 		break;
- 	case PSCI_VERSION(0, 2):
-+		if (!is_psci_0_2_call(func_id))
-+			return false;
- 		ret = psci_0_2_handler(func_id, host_ctxt);
- 		break;
- 	default:
-+		if (!is_psci_0_2_call(func_id))
-+			return false;
- 		ret = psci_1_0_handler(func_id, host_ctxt);
- 		break;
- 	}
--- 
-2.29.2
-
-
 -- 
 Without deviation from the norm, progress is not possible.
+
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
