@@ -1,70 +1,74 @@
-Return-Path: <SRS0=rHzB=F3=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=oQ5U=F7=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8063C433E0
-	for <kvmarm@archiver.kernel.org>; Wed, 23 Dec 2020 12:11:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC090C433DB
+	for <kvmarm@archiver.kernel.org>; Sun, 27 Dec 2020 14:36:16 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 11821223E8
-	for <kvmarm@archiver.kernel.org>; Wed, 23 Dec 2020 12:11:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11821223E8
+	by mail.kernel.org (Postfix) with ESMTP id 2829D2250E
+	for <kvmarm@archiver.kernel.org>; Sun, 27 Dec 2020 14:36:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2829D2250E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D1954B2A9;
-	Wed, 23 Dec 2020 07:11:44 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D8094B0FE;
+	Sun, 27 Dec 2020 09:36:15 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id P9hXmrPX3Oze; Wed, 23 Dec 2020 07:11:43 -0500 (EST)
+	with ESMTP id 8bZrUZLn5g7k; Sun, 27 Dec 2020 09:36:14 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B5E44B249;
-	Wed, 23 Dec 2020 07:11:43 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4DB3F4B15F;
+	Sun, 27 Dec 2020 09:36:14 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 82EEA4B273
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Dec 2020 07:11:41 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DE9304B138
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 27 Dec 2020 09:36:12 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LxxJiv2+1Pro for <kvmarm@lists.cs.columbia.edu>;
- Wed, 23 Dec 2020 07:11:40 -0500 (EST)
+ with ESMTP id b-eKbR-ULGHr for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 27 Dec 2020 09:36:11 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6AEDB4B245
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Dec 2020 07:11:40 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AFE164B0FE
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 27 Dec 2020 09:36:11 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 49D11223E8;
- Wed, 23 Dec 2020 12:11:39 +0000 (UTC)
-Received: from 91-161-240-24.subs.proxad.net ([91.161.240.24]
- helo=localhost.localdomain)
+ by mail.kernel.org (Postfix) with ESMTPSA id 61259217A0;
+ Sun, 27 Dec 2020 14:36:10 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1ks2zR-003KxB-70; Wed, 23 Dec 2020 12:11:37 +0000
+ id 1ktX9U-0042mB-1g; Sun, 27 Dec 2020 14:36:08 +0000
+Date: Sun, 27 Dec 2020 14:36:06 +0000
+Message-ID: <87czyvpb8p.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.cs.columbia.edu
-Subject: [PATCH] arm64: Fix labels in el2_setup macros
-Date: Wed, 23 Dec 2020 12:11:31 +0000
-Message-Id: <20201223121131.255551-1-maz@kernel.org>
-X-Mailer: git-send-email 2.29.2
-MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 91.161.240.24
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, james.morse@arm.com,
- julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
- alexandru.elisei@arm.com, mark.rutland@arm.com, dbrazdil@google.com,
- kernel-team@android.com
+To: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH 3/5] KVM: arm64: Move double-checked lock to
+ kvm_vgic_map_resources()
+In-Reply-To: <b686db4f-b520-6a33-4f09-d7c9cd024645@redhat.com>
+References: <20201201150157.223625-1-alexandru.elisei@arm.com>
+ <20201201150157.223625-4-alexandru.elisei@arm.com>
+ <b686db4f-b520-6a33-4f09-d7c9cd024645@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: eric.auger@redhat.com, alexandru.elisei@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kernel-team@android.com
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -81,118 +85,80 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-If someone happens to write the following code:
+On Mon, 14 Dec 2020 12:55:51 +0000,
+Auger Eric <eric.auger@redhat.com> wrote:
+> 
+> Hi Alexandru,
+> 
+> On 12/1/20 4:01 PM, Alexandru Elisei wrote:
+> > kvm_vgic_map_resources() is called when a VCPU if first run and it maps all
+> > the VGIC MMIO regions. To prevent double-initialization, the VGIC uses the
+> > ready variable to keep track of the state of resources and the global KVM
+> > mutex to protect against concurrent accesses. After the lock is taken, the
+> > variable is checked again in case another VCPU took the lock between the
+> > current VCPU reading ready equals false and taking the lock.
+> > 
+> > The double-checked lock pattern is spread across four different functions:
+> > in kvm_vcpu_first_run_init(), in kvm_vgic_map_resource() and in
+> > vgic_{v2,v3}_map_resources(), which makes it hard to reason about and
+> > introduces minor code duplication. Consolidate the checks in
+> > kvm_vgic_map_resources(), where the lock is taken.
+> > 
+> > No functional change intended.
+> > 
+> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > ---
+> >  arch/arm64/kvm/arm.c            | 8 +++-----
+> >  arch/arm64/kvm/vgic/vgic-init.c | 6 ++++++
+> >  arch/arm64/kvm/vgic/vgic-v2.c   | 3 ---
+> >  arch/arm64/kvm/vgic/vgic-v3.c   | 3 ---
+> >  4 files changed, 9 insertions(+), 11 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 9d69d2bf6943..65a5e89f5133 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -530,11 +530,9 @@ static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
+> >  		 * Map the VGIC hardware resources before running a vcpu the
+> >  		 * first time on this VM.
+> >  		 */
+> > -		if (unlikely(!vgic_ready(kvm))) {
+> > -			ret = kvm_vgic_map_resources(kvm);
+> > -			if (ret)
+> > -				return ret;
+> > -		}
+> > +		ret = kvm_vgic_map_resources(kvm);
+> > +		if (ret)
+> > +			return ret;
+> >  	} else {
+> >  		/*
+> >  		 * Tell the rest of the code that there are userspace irqchip
+> > diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+> > index 32e32d67a127..a2f4d1c85f00 100644
+> > --- a/arch/arm64/kvm/vgic/vgic-init.c
+> > +++ b/arch/arm64/kvm/vgic/vgic-init.c
+> > @@ -428,7 +428,13 @@ int kvm_vgic_map_resources(struct kvm *kvm)
+> >  	struct vgic_dist *dist = &kvm->arch.vgic;
+> >  	int ret = 0;
+> >  
+> > +	if (likely(vgic_ready(kvm)))
+> > +		return 0;
+> > +
+> >  	mutex_lock(&kvm->lock);
+> > +	if (vgic_ready(kvm))
+> > +		goto out;
+> > +
+> While we are at it, the setting of dist->ready may be moved in
+> kvm_vgic_map_resources() too.
 
-	b	1f
-	init_el2_state	vhe
-1:
-	[...]
+Good point. FWIW, I have added an extra patch on top to that effect.
 
-they will be in for a long debugging session, as the label "1f"
-will be resolved *inside* the init_el2_state macro instead of
-after it. Not really what one expects.
+Thanks,
 
-Instead, rewite the EL2 setup macros to use unambiguous labels,
-thanks to the usual macro counter trick.
+	M.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/el2_setup.h | 24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
-
-diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
-index a7f5a1bbc8ac..540116de80bf 100644
---- a/arch/arm64/include/asm/el2_setup.h
-+++ b/arch/arm64/include/asm/el2_setup.h
-@@ -45,24 +45,24 @@
- 	mrs	x1, id_aa64dfr0_el1
- 	sbfx	x0, x1, #ID_AA64DFR0_PMUVER_SHIFT, #4
- 	cmp	x0, #1
--	b.lt	1f				// Skip if no PMU present
-+	b.lt	.Lskip_pmu_\@			// Skip if no PMU present
- 	mrs	x0, pmcr_el0			// Disable debug access traps
- 	ubfx	x0, x0, #11, #5			// to EL2 and allow access to
--1:
-+.Lskip_pmu_\@:
- 	csel	x2, xzr, x0, lt			// all PMU counters from EL1
- 
- 	/* Statistical profiling */
- 	ubfx	x0, x1, #ID_AA64DFR0_PMSVER_SHIFT, #4
--	cbz	x0, 3f				// Skip if SPE not present
-+	cbz	x0, .Lskip_spe_\@		// Skip if SPE not present
- 
- .ifeqs "\mode", "nvhe"
- 	mrs_s	x0, SYS_PMBIDR_EL1              // If SPE available at EL2,
- 	and	x0, x0, #(1 << SYS_PMBIDR_EL1_P_SHIFT)
--	cbnz	x0, 2f				// then permit sampling of physical
-+	cbnz	x0, .Lskip_spe_el2_\@		// then permit sampling of physical
- 	mov	x0, #(1 << SYS_PMSCR_EL2_PCT_SHIFT | \
- 		      1 << SYS_PMSCR_EL2_PA_SHIFT)
- 	msr_s	SYS_PMSCR_EL2, x0		// addresses and physical counter
--2:
-+.Lskip_spe_el2_\@:
- 	mov	x0, #(MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT)
- 	orr	x2, x2, x0			// If we don't have VHE, then
- 						// use EL1&0 translation.
-@@ -71,7 +71,7 @@
- 						// and disable access from EL1
- .endif
- 
--3:
-+.Lskip_spe_\@:
- 	msr	mdcr_el2, x2			// Configure debug traps
- .endm
- 
-@@ -79,9 +79,9 @@
- .macro __init_el2_lor
- 	mrs	x1, id_aa64mmfr1_el1
- 	ubfx	x0, x1, #ID_AA64MMFR1_LOR_SHIFT, 4
--	cbz	x0, 1f
-+	cbz	x0, .Lskip_lor_\@
- 	msr_s	SYS_LORC_EL1, xzr
--1:
-+.Lskip_lor_\@:
- .endm
- 
- /* Stage-2 translation */
-@@ -93,7 +93,7 @@
- .macro __init_el2_gicv3
- 	mrs	x0, id_aa64pfr0_el1
- 	ubfx	x0, x0, #ID_AA64PFR0_GIC_SHIFT, #4
--	cbz	x0, 1f
-+	cbz	x0, .Lskip_gicv3_\@
- 
- 	mrs_s	x0, SYS_ICC_SRE_EL2
- 	orr	x0, x0, #ICC_SRE_EL2_SRE	// Set ICC_SRE_EL2.SRE==1
-@@ -103,7 +103,7 @@
- 	mrs_s	x0, SYS_ICC_SRE_EL2		// Read SRE back,
- 	tbz	x0, #0, 1f			// and check that it sticks
- 	msr_s	SYS_ICH_HCR_EL2, xzr		// Reset ICC_HCR_EL2 to defaults
--1:
-+.Lskip_gicv3_\@:
- .endm
- 
- .macro __init_el2_hstr
-@@ -128,14 +128,14 @@
- .macro __init_el2_nvhe_sve
- 	mrs	x1, id_aa64pfr0_el1
- 	ubfx	x1, x1, #ID_AA64PFR0_SVE_SHIFT, #4
--	cbz	x1, 1f
-+	cbz	x1, .Lskip_sve_\@
- 
- 	bic	x0, x0, #CPTR_EL2_TZ		// Also disable SVE traps
- 	msr	cptr_el2, x0			// Disable copro. traps to EL2
- 	isb
- 	mov	x1, #ZCR_ELx_LEN_MASK		// SVE: Enable full vector
- 	msr_s	SYS_ZCR_EL2, x1			// length for EL1.
--1:
-+.Lskip_sve_\@:
- .endm
- 
- .macro __init_el2_nvhe_prepare_eret
 -- 
-2.29.2
-
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
