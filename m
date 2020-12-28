@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 789CBC433E6
-	for <kvmarm@archiver.kernel.org>; Mon, 28 Dec 2020 10:50:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E707EC433E0
+	for <kvmarm@archiver.kernel.org>; Mon, 28 Dec 2020 11:20:00 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 16B92229C4
-	for <kvmarm@archiver.kernel.org>; Mon, 28 Dec 2020 10:50:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16B92229C4
+	by mail.kernel.org (Postfix) with ESMTP id 31592229EF
+	for <kvmarm@archiver.kernel.org>; Mon, 28 Dec 2020 11:20:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31592229EF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BF1DC4B212;
-	Mon, 28 Dec 2020 05:50:19 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8817D4B18D;
+	Mon, 28 Dec 2020 06:19:59 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 3sRfhnTHYk5F; Mon, 28 Dec 2020 05:50:18 -0500 (EST)
+	with ESMTP id I1lkpsg8Cxtc; Mon, 28 Dec 2020 06:19:58 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E62B64B252;
-	Mon, 28 Dec 2020 05:50:14 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CC2D4B1AF;
+	Mon, 28 Dec 2020 06:19:58 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A19364B21E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Dec 2020 05:50:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 31C644B18D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Dec 2020 06:19:57 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jdwYudwyWoZx for <kvmarm@lists.cs.columbia.edu>;
- Mon, 28 Dec 2020 05:50:10 -0500 (EST)
+ with ESMTP id oE9jqONRQlgj for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 28 Dec 2020 06:19:56 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8E6144B1F3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Dec 2020 05:50:10 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1A7474B0EB
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Dec 2020 06:19:56 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id A39D52242A;
- Mon, 28 Dec 2020 10:50:09 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id E951022583;
+ Mon, 28 Dec 2020 11:19:54 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1ktq6J-0048wX-S2; Mon, 28 Dec 2020 10:50:08 +0000
+ id 1ktq6N-0048wX-1q; Mon, 28 Dec 2020 10:50:11 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 09/17] arm64: cpufeature: Add global feature override facility
-Date: Mon, 28 Dec 2020 10:49:50 +0000
-Message-Id: <20201228104958.1848833-10-maz@kernel.org>
+Subject: [PATCH 14/17] arm64: Add an aliasing facility for the idreg override
+Date: Mon, 28 Dec 2020 10:49:55 +0000
+Message-Id: <20201228104958.1848833-15-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201228104958.1848833-1-maz@kernel.org>
 References: <20201228104958.1848833-1-maz@kernel.org>
@@ -83,76 +83,82 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add a facility to globally override a feature, no matter what
-the HW says. Yes, this is dangerous.
-
-Nothing uses this yet, so we are pretty safe. For now.
+In order to map the override of idregs to options that a user
+can easily understand, let's introduce yet another option
+array, which maps an option to the corresponding idreg options.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/cpufeature.h |  2 ++
- arch/arm64/kernel/cpufeature.c      | 26 +++++++++++++++++++++-----
- 2 files changed, 23 insertions(+), 5 deletions(-)
+ .../admin-guide/kernel-parameters.txt         |  3 +++
+ arch/arm64/kernel/idreg-override.c            | 20 +++++++++++++++++++
+ 2 files changed, 23 insertions(+)
 
-diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-index 9a555809b89c..465d2cb63bfc 100644
---- a/arch/arm64/include/asm/cpufeature.h
-+++ b/arch/arm64/include/asm/cpufeature.h
-@@ -75,6 +75,8 @@ struct arm64_ftr_reg {
- 	u64				sys_val;
- 	u64				user_val;
- 	const struct arm64_ftr_bits	*ftr_bits;
-+	u64				*override_val;
-+	u64				*override_mask;
+diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+index c722ec19cd00..e88e17bf5557 100644
+--- a/Documentation/admin-guide/kernel-parameters.txt
++++ b/Documentation/admin-guide/kernel-parameters.txt
+@@ -2257,6 +2257,9 @@
+ 	kvm-arm.mode=
+ 			[KVM,ARM] Select one of KVM/arm64's modes of operation.
+ 
++			nvhe: Standard nVHE-based mode, without support for
++			      protected guests.
++
+ 			protected: nVHE-based mode with support for guests whose
+ 				   state is kept private from the host.
+ 				   Not valid if the kernel is running in EL2.
+diff --git a/arch/arm64/kernel/idreg-override.c b/arch/arm64/kernel/idreg-override.c
+index 76f3d481535d..8f64100e0b1b 100644
+--- a/arch/arm64/kernel/idreg-override.c
++++ b/arch/arm64/kernel/idreg-override.c
+@@ -37,6 +37,12 @@ static const struct reg_desc * const regs[] __initdata = {
+ 	&mmfr1,
  };
  
- extern struct arm64_ftr_reg arm64_ftr_reg_ctrel0;
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 7ffb5f1d8b68..2dbfc0096b0d 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -544,13 +544,17 @@ static const struct arm64_ftr_bits ftr_raz[] = {
- 	ARM64_FTR_END,
- };
- 
--#define ARM64_FTR_REG(id, table) {		\
--	.sys_id = id,				\
--	.reg = 	&(struct arm64_ftr_reg){	\
--		.name = #id,			\
--		.ftr_bits = &((table)[0]),	\
-+#define ARM64_FTR_REG_OVERRIDE(id, table, v, m) {		\
-+		.sys_id = id,					\
-+		.reg = 	&(struct arm64_ftr_reg){		\
-+			.name = #id,				\
-+			.ftr_bits = &((table)[0]),		\
-+			.override_val = v,			\
-+			.override_mask = m,			\
- 	}}
- 
-+#define ARM64_FTR_REG(id, table) ARM64_FTR_REG_OVERRIDE(id, table, NULL, NULL)
++static const struct {
++	const char * const	alias;
++	const char * const	feature;
++} aliases[] __initdata = {
++};
 +
- static const struct __ftr_reg_entry {
- 	u32			sys_id;
- 	struct arm64_ftr_reg 	*reg;
-@@ -786,6 +790,18 @@ static void __init init_cpu_ftr_reg(u32 sys_reg, u64 new)
+ static int __init find_field(const char *cmdline, const struct reg_desc *reg,
+ 			     int f, u64 *v)
+ {
+@@ -77,6 +83,18 @@ static void __init match_options(const char *cmdline)
+ 	}
+ }
  
- 	val &= valid_mask;
- 
-+	if (reg->override_mask && reg->override_val) {
-+		u64 override = val;
-+		override &= ~*reg->override_mask;
-+		override |= (*reg->override_val & *reg->override_mask);
++static __init void match_aliases(const char *cmdline)
++{
++	int i;
 +
-+		if (val != override)
-+			pr_warn("%s: forced from %016llx to %016llx\n",
-+				reg->name, val, override);
++	for (i = 0; i < ARRAY_SIZE(aliases); i++) {
++		char *str = strstr(cmdline, aliases[i].alias);
 +
-+		val = override;
++		if ((str == cmdline || (str > cmdline && *(str - 1) == ' ')))
++			match_options(aliases[i].feature);
 +	}
++}
 +
- 	reg->sys_val = val;
- 	reg->strict_mask = strict_mask;
- 	reg->user_mask = user_mask;
+ static __init void parse_cmdline(void)
+ {
+ 	if (!IS_ENABLED(CONFIG_CMDLINE_FORCE)) {
+@@ -97,6 +115,7 @@ static __init void parse_cmdline(void)
+ 			goto out;
+ 
+ 		match_options(prop);
++		match_aliases(prop);
+ 
+ 		if (!IS_ENABLED(CONFIG_CMDLINE_EXTEND))
+ 			return;
+@@ -104,6 +123,7 @@ static __init void parse_cmdline(void)
+ 
+ out:
+ 	match_options(CONFIG_CMDLINE);
++	match_aliases(CONFIG_CMDLINE);
+ }
+ 
+ void __init init_shadow_regs(void)
 -- 
 2.29.2
 
