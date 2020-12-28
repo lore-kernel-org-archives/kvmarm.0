@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E707EC433E0
-	for <kvmarm@archiver.kernel.org>; Mon, 28 Dec 2020 11:20:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81799C433E6
+	for <kvmarm@archiver.kernel.org>; Mon, 28 Dec 2020 11:20:08 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 31592229EF
-	for <kvmarm@archiver.kernel.org>; Mon, 28 Dec 2020 11:20:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31592229EF
+	by mail.kernel.org (Postfix) with ESMTP id 1A45C22A84
+	for <kvmarm@archiver.kernel.org>; Mon, 28 Dec 2020 11:20:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A45C22A84
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8817D4B18D;
-	Mon, 28 Dec 2020 06:19:59 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A8B154B183;
+	Mon, 28 Dec 2020 06:20:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id I1lkpsg8Cxtc; Mon, 28 Dec 2020 06:19:58 -0500 (EST)
+	with ESMTP id sw3g-HwyABIy; Mon, 28 Dec 2020 06:20:06 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CC2D4B1AF;
-	Mon, 28 Dec 2020 06:19:58 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B0E0D4B226;
+	Mon, 28 Dec 2020 06:20:03 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 31C644B18D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Dec 2020 06:19:57 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A90A24B192
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Dec 2020 06:20:00 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id oE9jqONRQlgj for <kvmarm@lists.cs.columbia.edu>;
- Mon, 28 Dec 2020 06:19:56 -0500 (EST)
+ with ESMTP id 8gCIwCZT3PLd for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 28 Dec 2020 06:19:59 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1A7474B0EB
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Dec 2020 06:19:56 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CC7004B1FF
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Dec 2020 06:19:59 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id E951022583;
- Mon, 28 Dec 2020 11:19:54 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id CAB78229C5;
+ Mon, 28 Dec 2020 11:19:58 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1ktq6N-0048wX-1q; Mon, 28 Dec 2020 10:50:11 +0000
+ id 1ktq6O-0048wX-9y; Mon, 28 Dec 2020 10:50:12 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 14/17] arm64: Add an aliasing facility for the idreg override
-Date: Mon, 28 Dec 2020 10:49:55 +0000
-Message-Id: <20201228104958.1848833-15-maz@kernel.org>
+Subject: [PATCH 16/17] KVM: arm64: Document HVC_VHE_RESTART stub hypercall
+Date: Mon, 28 Dec 2020 10:49:57 +0000
+Message-Id: <20201228104958.1848833-17-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201228104958.1848833-1-maz@kernel.org>
 References: <20201228104958.1848833-1-maz@kernel.org>
@@ -83,82 +83,33 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In order to map the override of idregs to options that a user
-can easily understand, let's introduce yet another option
-array, which maps an option to the corresponding idreg options.
+For completeness, let's document the HVC_VHE_RESTART stub.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- .../admin-guide/kernel-parameters.txt         |  3 +++
- arch/arm64/kernel/idreg-override.c            | 20 +++++++++++++++++++
- 2 files changed, 23 insertions(+)
+ Documentation/virt/kvm/arm/hyp-abi.rst | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index c722ec19cd00..e88e17bf5557 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -2257,6 +2257,9 @@
- 	kvm-arm.mode=
- 			[KVM,ARM] Select one of KVM/arm64's modes of operation.
+diff --git a/Documentation/virt/kvm/arm/hyp-abi.rst b/Documentation/virt/kvm/arm/hyp-abi.rst
+index 83cadd8186fa..3961c529769b 100644
+--- a/Documentation/virt/kvm/arm/hyp-abi.rst
++++ b/Documentation/virt/kvm/arm/hyp-abi.rst
+@@ -58,6 +58,15 @@ these functions (see arch/arm{,64}/include/asm/virt.h):
+   into place (arm64 only), and jump to the restart address while at HYP/EL2.
+   This hypercall is not expected to return to its caller.
  
-+			nvhe: Standard nVHE-based mode, without support for
-+			      protected guests.
++* ::
 +
- 			protected: nVHE-based mode with support for guests whose
- 				   state is kept private from the host.
- 				   Not valid if the kernel is running in EL2.
-diff --git a/arch/arm64/kernel/idreg-override.c b/arch/arm64/kernel/idreg-override.c
-index 76f3d481535d..8f64100e0b1b 100644
---- a/arch/arm64/kernel/idreg-override.c
-+++ b/arch/arm64/kernel/idreg-override.c
-@@ -37,6 +37,12 @@ static const struct reg_desc * const regs[] __initdata = {
- 	&mmfr1,
- };
- 
-+static const struct {
-+	const char * const	alias;
-+	const char * const	feature;
-+} aliases[] __initdata = {
-+};
++    x0 = HVC_VHE_RESTART (arm64 only)
 +
- static int __init find_field(const char *cmdline, const struct reg_desc *reg,
- 			     int f, u64 *v)
- {
-@@ -77,6 +83,18 @@ static void __init match_options(const char *cmdline)
- 	}
- }
- 
-+static __init void match_aliases(const char *cmdline)
-+{
-+	int i;
++  Attempt to upgrade the kernel's exception level from EL1 to EL2 by enabling
++  the VHE mode. This is conditionned by the CPU supporting VHE, the EL2 MMU
++  being off, and VHE not being disabled by any other mean (comment line option,
++  for example).
 +
-+	for (i = 0; i < ARRAY_SIZE(aliases); i++) {
-+		char *str = strstr(cmdline, aliases[i].alias);
-+
-+		if ((str == cmdline || (str > cmdline && *(str - 1) == ' ')))
-+			match_options(aliases[i].feature);
-+	}
-+}
-+
- static __init void parse_cmdline(void)
- {
- 	if (!IS_ENABLED(CONFIG_CMDLINE_FORCE)) {
-@@ -97,6 +115,7 @@ static __init void parse_cmdline(void)
- 			goto out;
+ Any other value of r0/x0 triggers a hypervisor-specific handling,
+ which is not documented here.
  
- 		match_options(prop);
-+		match_aliases(prop);
- 
- 		if (!IS_ENABLED(CONFIG_CMDLINE_EXTEND))
- 			return;
-@@ -104,6 +123,7 @@ static __init void parse_cmdline(void)
- 
- out:
- 	match_options(CONFIG_CMDLINE);
-+	match_aliases(CONFIG_CMDLINE);
- }
- 
- void __init init_shadow_regs(void)
 -- 
 2.29.2
 
