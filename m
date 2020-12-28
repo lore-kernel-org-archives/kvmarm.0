@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1096FC433DB
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5945AC433E0
 	for <kvmarm@archiver.kernel.org>; Mon, 28 Dec 2020 10:50:19 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9F059229C4
-	for <kvmarm@archiver.kernel.org>; Mon, 28 Dec 2020 10:50:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F059229C4
+	by mail.kernel.org (Postfix) with ESMTP id 08B9022583
+	for <kvmarm@archiver.kernel.org>; Mon, 28 Dec 2020 10:50:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08B9022583
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5082F4B147;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B47EB4B22C;
 	Mon, 28 Dec 2020 05:50:18 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id VHg+3XHdpPZm; Mon, 28 Dec 2020 05:50:16 -0500 (EST)
+	with ESMTP id mKoX9wPt4g3t; Mon, 28 Dec 2020 05:50:17 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B98284B245;
-	Mon, 28 Dec 2020 05:50:11 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CFC144B24C;
+	Mon, 28 Dec 2020 05:50:14 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 855784B202
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Dec 2020 05:50:10 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A7CE4B226
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Dec 2020 05:50:11 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 86dihwzqbzii for <kvmarm@lists.cs.columbia.edu>;
- Mon, 28 Dec 2020 05:50:09 -0500 (EST)
+ with ESMTP id 3fgYa1SF+iyt for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 28 Dec 2020 05:50:08 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A6CD24B1F9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Dec 2020 05:50:09 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9BFE44B21F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Dec 2020 05:50:08 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id E055822AEC;
- Mon, 28 Dec 2020 10:50:08 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id BD52E22A84;
+ Mon, 28 Dec 2020 10:50:07 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1ktq6J-0048wX-74; Mon, 28 Dec 2020 10:50:07 +0000
+ id 1ktq6I-0048wX-0Z; Mon, 28 Dec 2020 10:50:06 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 08/17] arm64: Move SCTLR_EL1 initialisation to EL-agnostic code
-Date: Mon, 28 Dec 2020 10:49:49 +0000
-Message-Id: <20201228104958.1848833-9-maz@kernel.org>
+Subject: [PATCH 06/17] arm64: Move VHE-specific SPE setup to mutate_to_vhe()
+Date: Mon, 28 Dec 2020 10:49:47 +0000
+Message-Id: <20201228104958.1848833-7-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201228104958.1848833-1-maz@kernel.org>
 References: <20201228104958.1848833-1-maz@kernel.org>
@@ -83,45 +83,58 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-We can now move the initial SCTLR_EL1 setup to be used for both
-EL1 and EL2 setup.
+There isn't much that a VHE kernel needs on top of whatever has
+been done for nVHE, so let's move the little we need to the
+VHE stub (the SPE setup), and drop the init_el2_state macro.
+
+No expected functional change.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kernel/head.S | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+ arch/arm64/kernel/hyp-stub.S | 23 ++++++++++++++++++++---
+ 1 file changed, 20 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
-index 36212c05df42..b425d2587cdb 100644
---- a/arch/arm64/kernel/head.S
-+++ b/arch/arm64/kernel/head.S
-@@ -479,13 +479,14 @@ EXPORT_SYMBOL(kimage_vaddr)
-  * booted in EL1 or EL2 respectively.
-  */
- SYM_FUNC_START(init_kernel_el)
-+	mov_q	x0, INIT_SCTLR_EL1_MMU_OFF
-+	msr	sctlr_el1, x0
-+
- 	mrs	x0, CurrentEL
- 	cmp	x0, #CurrentEL_EL2
- 	b.eq	init_el2
- 
- SYM_INNER_LABEL(init_el1, SYM_L_LOCAL)
--	mov_q	x0, INIT_SCTLR_EL1_MMU_OFF
--	msr	sctlr_el1, x0
- 	isb
- 	mov_q	x0, INIT_PSTATE_EL1
- 	msr	spsr_el1, x0
-@@ -494,9 +495,6 @@ SYM_INNER_LABEL(init_el1, SYM_L_LOCAL)
- 	eret
- 
- SYM_INNER_LABEL(init_el2, SYM_L_LOCAL)
--	mov_q	x0, INIT_SCTLR_EL1_MMU_OFF
--	msr	sctlr_el1, x0
--
- 	mov_q	x0, HCR_HOST_NVHE_FLAGS
+diff --git a/arch/arm64/kernel/hyp-stub.S b/arch/arm64/kernel/hyp-stub.S
+index effa9c858014..5d19cba654c7 100644
+--- a/arch/arm64/kernel/hyp-stub.S
++++ b/arch/arm64/kernel/hyp-stub.S
+@@ -92,9 +92,6 @@ SYM_CODE_START_LOCAL(mutate_to_vhe)
  	msr	hcr_el2, x0
  	isb
+ 
+-	// Doesn't do much on VHE, but still, worth a shot
+-	init_el2_state vhe
+-
+ 	// Use the EL1 allocated stack, per-cpu offset
+ 	mrs	x0, sp_el1
+ 	mov	sp, x0
+@@ -107,6 +104,26 @@ SYM_CODE_START_LOCAL(mutate_to_vhe)
+ 	mrs_s	x0, SYS_VBAR_EL12
+ 	msr	vbar_el1, x0
+ 
++	// Fixup SPE configuration
++	mrs	x1, id_aa64dfr0_el1
++	ubfx	x1, x1, #ID_AA64DFR0_PMSVER_SHIFT, #4
++	mov	x2, #MDCR_EL2_TPMS
++	csel	x2, xzr, x2, eq
++	cbz	x1, skip_spe
++
++	// Let the SPE driver in control of the sampling
++	mrs_s	x0, SYS_PMSCR_EL1
++	bic	x0, x0, #(1 << SYS_PMSCR_EL2_PCT_SHIFT)
++	bic	x0, x0, #(1 << SYS_PMSCR_EL2_PA_SHIFT)
++	msr_s	SYS_PMSCR_EL1, x0
++
++skip_spe:
++	// For VHE, use EL2 translation and disable access from EL1
++	mrs	x0, mdcr_el2
++	bic	x0, x0, #(MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT)
++	orr	x0, x0, x2
++	msr	mdcr_el2, x0
++
+ 	// Transfert the MM state from EL1 to EL2
+ 	mrs_s	x0, SYS_TCR_EL12
+ 	msr	tcr_el1, x0
 -- 
 2.29.2
 
