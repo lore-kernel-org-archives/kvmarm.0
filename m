@@ -2,87 +2,78 @@ Return-Path: <SRS0=Fui2=GB=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BD84C433DB
-	for <kvmarm@archiver.kernel.org>; Tue, 29 Dec 2020 16:01:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C17AC433DB
+	for <kvmarm@archiver.kernel.org>; Tue, 29 Dec 2020 17:04:44 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 87A3320825
-	for <kvmarm@archiver.kernel.org>; Tue, 29 Dec 2020 16:01:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87A3320825
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id C920A20867
+	for <kvmarm@archiver.kernel.org>; Tue, 29 Dec 2020 17:04:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C920A20867
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D4CDD4B115;
-	Tue, 29 Dec 2020 11:01:26 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C5674B295;
+	Tue, 29 Dec 2020 12:04:43 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@armlinux.org.uk
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jo45vwLWiVWL; Tue, 29 Dec 2020 11:01:25 -0500 (EST)
+	with ESMTP id BhNQE-R5ERvM; Tue, 29 Dec 2020 12:04:41 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A71E94B253;
-	Tue, 29 Dec 2020 11:01:25 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id ECB5C4B249;
+	Tue, 29 Dec 2020 12:04:41 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C1E34B250
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Dec 2020 11:01:24 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A8934B255
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Dec 2020 12:04:40 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lpPS87tiz9IL for <kvmarm@lists.cs.columbia.edu>;
- Tue, 29 Dec 2020 11:01:23 -0500 (EST)
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com
- [209.85.221.48])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 948134B213
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Dec 2020 11:01:23 -0500 (EST)
-Received: by mail-wr1-f48.google.com with SMTP id m5so15012222wrx.9
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Dec 2020 08:01:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=NtCljhLriYtvqTyh0Oi7f3SoeajHUSS/0DAzm3hIGXE=;
- b=Oz7Ml7QJVCMzwv2c3OvZUVS1nQR+4abLjG0AvTqtcYOBygQ3cV++dq2Q6H5LlAKrJT
- yiLsX9sMElJJfJRsPvDEaP+TbemQEMjDGRraLIfCVxGD+J1oRK5SOotiiGSBR1h+utFs
- k3pYH3lbVXXATfVz7oopjMSJzngGXuu/egoKdfuLkxzdA0cJVJK5H1HBZcheS6le/UX2
- bR7Wy/OEayCryx50CMsvlN8wahXfGjPH3yP5ucV7N9nK9AGU3X/DyctWqEyNDF6LCIEA
- 4b7vbgmlTU4v2FSk5RCmiSPrrdDZY0nYjL0nBX3BHVA/0Xyyv+6JRgMuPGWQUtZ8JJrL
- yrYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=NtCljhLriYtvqTyh0Oi7f3SoeajHUSS/0DAzm3hIGXE=;
- b=s6MnFcfNwAymXZkhF1+Jl/EWhoMThaEgG+yyUbw9VBveHitnl59COf4vvcJxOuzDnk
- 2XhnS+c293svtpktvh7NB8qrjK9QtF0ZuHWLxmCfCRtutGdBh7f1ZWj/0UmUbTkgkli2
- uIb9hs62Ic2OPc8wfYHLlhvRtUthe+M+tPFKBt2E03DCj13HOsUxkfaTUBciVxWUwP63
- R0Rb6tuQRV+gb6NQkOPR1Ymo7IcxZqzxlTQjbbXem0YBkP4uPmrnXrzQTbrfXO2TW6dh
- CwHqptpBWW0Vo7MbC/mbDlHnPFJdT83Ol5JRkDPABB/iI1wvxhmrwog5iEHMEcacO3wY
- y9rw==
-X-Gm-Message-State: AOAM533Bu4Jsm2f7ZHxTk9AFsw5d29B4vlzinwYlEf7e2g+DGF77Gvt4
- KOoTUJZABVrHCevXf3dYBi8tYuUTqAr9AA==
-X-Google-Smtp-Source: ABdhPJw9Ayoh9M0GtPyVtC0R8Y+dAZ8drQfvlYeo93ZmkqUpL9igbq4DREd39sZg1DlSlN4TeaAUKw==
-X-Received: by 2002:adf:8290:: with SMTP id 16mr54668406wrc.27.1609257682161; 
- Tue, 29 Dec 2020 08:01:22 -0800 (PST)
-Received: from localhost ([2a01:4b00:8523:2d03:b0e4:997:fb3:e517])
- by smtp.gmail.com with ESMTPSA id l5sm61284118wrv.44.2020.12.29.08.01.19
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 29 Dec 2020 08:01:20 -0800 (PST)
-From: David Brazdil <dbrazdil@google.com>
-To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH] KVM: arm64: Allow PSCI SYSTEM_OFF/RESET to return
-Date: Tue, 29 Dec 2020 16:00:59 +0000
-Message-Id: <20201229160059.64135-1-dbrazdil@google.com>
-X-Mailer: git-send-email 2.29.2
+ with ESMTP id jLIg01xBsFlz for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 29 Dec 2020 12:04:39 -0500 (EST)
+Received: from pandora.armlinux.org.uk (unknown [78.32.30.218])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 006D64B249
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Dec 2020 12:04:38 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+ MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+ Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+ Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+ List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+ bh=FhCXE7slKDeIxopRDJZcSEDk1dcwjpLiihzO8A1DLYI=; b=AYhIRsKhcTRQMcw8YcP2xAlQP
+ ZJ7L1gjPikShRcrMBIm+phM9DzBwgyb0v11vAj4qepLHcuoQCQ/NlJtACcoE85OrXpInyCAaBMdSK
+ Td2Oykho2vQPWR407CJe6NN7DvuTOvf4sZVp/IqpijQq4Ql19Eth2DJJNXKEADW40L9qBSdzqth9B
+ EFsTsXoylISXM1eFdZlh/4udhreDKyRgx2I56jZQ5P2Y9KY1s7hN0PXwTmxKSY1hBY9a8Zin52g22
+ EXWzcXymEZ+3X3p4nwONwEJSJrHE8RtZQ5JTPQcg5BmKCwqOrdP16VOMLuXW4iPmd675vwWZ8D84Y
+ UNTNCYeMQ==;
+Received: from shell.armlinux.org.uk
+ ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44878)
+ by pandora.armlinux.org.uk with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
+ (envelope-from <linux@armlinux.org.uk>)
+ id 1kuIPv-0005F2-Sw; Tue, 29 Dec 2020 17:04:16 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.92)
+ (envelope-from <linux@shell.armlinux.org.uk>)
+ id 1kuIPs-0001ON-Dm; Tue, 29 Dec 2020 17:04:12 +0000
+Date: Tue, 29 Dec 2020 17:04:12 +0000
+From: Russell King - ARM Linux admin <linux@armlinux.org.uk>
+To: David Brazdil <dbrazdil@google.com>
+Subject: Re: [PATCH] KVM: arm64: Allow PSCI SYSTEM_OFF/RESET to return
+Message-ID: <20201229170412.GN1551@shell.armlinux.org.uk>
+References: <20201229160059.64135-1-dbrazdil@google.com>
 MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <20201229160059.64135-1-dbrazdil@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
- Marc Zyngier <maz@kernel.org>, Sudeep Holla <sudeep.holla@arm.com>,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Catalin Marinas <catalin.marinas@arm.com>, kernel-team@android.com,
- Will Deacon <will@kernel.org>
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
+ Sudeep Holla <sudeep.holla@arm.com>, kernel-team@android.com,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -99,52 +90,21 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The KVM/arm64 PSCI relay assumes that SYSTEM_OFF and SYSTEM_RESET should
-not return, as dictated by the PSCI spec. However, there is firmware out
-there which breaks this assumption, leading to a hyp panic. Make KVM
-more robust to broken firmware by allowing these to return.
+On Tue, Dec 29, 2020 at 04:00:59PM +0000, David Brazdil wrote:
+> The KVM/arm64 PSCI relay assumes that SYSTEM_OFF and SYSTEM_RESET should
+> not return, as dictated by the PSCI spec. However, there is firmware out
+> there which breaks this assumption, leading to a hyp panic. Make KVM
+> more robust to broken firmware by allowing these to return.
 
-Signed-off-by: David Brazdil <dbrazdil@google.com>
----
- arch/arm64/kvm/hyp/nvhe/psci-relay.c | 13 +++++--------
- 1 file changed, 5 insertions(+), 8 deletions(-)
+Are you sure you should just return?
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/psci-relay.c b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-index e3947846ffcb..8e7128cb7667 100644
---- a/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-+++ b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-@@ -77,12 +77,6 @@ static unsigned long psci_forward(struct kvm_cpu_context *host_ctxt)
- 			 cpu_reg(host_ctxt, 2), cpu_reg(host_ctxt, 3));
- }
- 
--static __noreturn unsigned long psci_forward_noreturn(struct kvm_cpu_context *host_ctxt)
--{
--	psci_forward(host_ctxt);
--	hyp_panic(); /* unreachable */
--}
--
- static unsigned int find_cpu_id(u64 mpidr)
- {
- 	unsigned int i;
-@@ -251,10 +245,13 @@ static unsigned long psci_0_2_handler(u64 func_id, struct kvm_cpu_context *host_
- 	case PSCI_0_2_FN_MIGRATE_INFO_TYPE:
- 	case PSCI_0_2_FN64_MIGRATE_INFO_UP_CPU:
- 		return psci_forward(host_ctxt);
-+	/*
-+	 * SYSTEM_OFF/RESET should not return according to the spec.
-+	 * Allow it so as to stay robust to broken firmware.
-+	 */
- 	case PSCI_0_2_FN_SYSTEM_OFF:
- 	case PSCI_0_2_FN_SYSTEM_RESET:
--		psci_forward_noreturn(host_ctxt);
--		unreachable();
-+		return psci_forward(host_ctxt);
- 	case PSCI_0_2_FN64_CPU_SUSPEND:
- 		return psci_cpu_suspend(func_id, host_ctxt);
- 	case PSCI_0_2_FN64_CPU_ON:
+We've had issues in the past with Linux reboot(2) that returns
+to userspace, allowing on 32-bit ARM for example watchdogs to
+unexpectedly continue being serviced.
+
 -- 
-2.29.2.729.g45daf8777d-goog
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 40Mbps down 10Mbps up. Decent connectivity at last!
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
