@@ -2,89 +2,74 @@ Return-Path: <SRS0=lrOB=GC=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2BF9C433E6
-	for <kvmarm@archiver.kernel.org>; Wed, 30 Dec 2020 09:09:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 061FFC433DB
+	for <kvmarm@archiver.kernel.org>; Wed, 30 Dec 2020 10:06:27 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4375421D94
-	for <kvmarm@archiver.kernel.org>; Wed, 30 Dec 2020 09:09:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4375421D94
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTP id 6E800221F8
+	for <kvmarm@archiver.kernel.org>; Wed, 30 Dec 2020 10:06:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E800221F8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DCEDB4B167;
-	Wed, 30 Dec 2020 04:09:20 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D1BA24B1CA;
+	Wed, 30 Dec 2020 05:06:25 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Q2kZvtCMbmXg; Wed, 30 Dec 2020 04:09:19 -0500 (EST)
+	with ESMTP id jjD34CfGMAWu; Wed, 30 Dec 2020 05:06:24 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B78C4B1CB;
-	Wed, 30 Dec 2020 04:09:18 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C5E074B1D1;
+	Wed, 30 Dec 2020 05:06:24 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2BF704B31A
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Dec 2020 17:34:39 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BE6E4B1CB
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Dec 2020 05:06:24 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dhXqyDymBBl8 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 29 Dec 2020 17:34:38 -0500 (EST)
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com
- [209.85.216.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F1A364B2C6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Dec 2020 17:34:37 -0500 (EST)
-Received: by mail-pj1-f51.google.com with SMTP id l23so2275496pjg.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Dec 2020 14:34:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=+puKxIHEHRO9Frraw+Ib5C3MtagJB4PPbY1dXGI0aMY=;
- b=Db/Bz0oUEsAEjotOi2aizjGW63kjeIkKxMbizlvrZhlT1mYxBo60/kirR5KhgAnPHi
- TQTO7bpvyRZ2D0sreSTAohT6HJe+R7TvOT5/CFTwil+LEAv/L6gYGzB/N0bq9NeLzvdv
- xAQ4AsPT5uMN0rD1hBTtW/s7HLqo8CQ3O3a6T/NbE2Wf3hiy/MzL3thsDyNRLhAWgjSC
- +8Xd7DayLQqfU3818hC6mZVO3OpV8zLNIBhQfYRFkXSd6NH3WN2ZSBzQpUQr5A3GorJC
- gKcahwW6EqxRf0kG3G6rG0wF8fiS6KS3M7M8YccSTy/QAa+GdeLAXzCcaVewpJkJSRfk
- aoig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=+puKxIHEHRO9Frraw+Ib5C3MtagJB4PPbY1dXGI0aMY=;
- b=JNeNjDymZyLWs13Ifbt+K/mwUj4qIbOt12XbbmqqwYGGZJYz6i5yq2RQsl6q2iBcJy
- huwU7wEXZujZWF9T5pl6lasFEbqa0UB/yJ5b2uEYCk3ydN06zoQEnU7OJKSIvivkVg6n
- NxXkvS3lffmAxM9B9a3abl23U0vfBf3m8wmQqz9WOLhhRN4MIVv/H/+WPG/V5ErIVLuw
- grkJ5Hkp9a/3ZuvU0quWGI302DJ+kAzywdOirIspOe2yKwS/yiJ+KEwtLWC0V7iPbkLr
- yNU0N0Lzlaod+UUBlgqr7ZgFkUaMkVPlEUAMxBN+RhT1NF1HIJnl9BK8JiZH1V8LfaZ0
- nlQA==
-X-Gm-Message-State: AOAM531zDgIFmyZdq+7+EhKq9IP4Y93MebuOR0KlmVvIewb0ffcV0Myx
- w6wAKqjEeuKS/3lrNd8A7Zw=
-X-Google-Smtp-Source: ABdhPJwO6+EhBdPbyeSEtZ8LGB13rmvcKxcwf9DtbsdqsocsaBED8zHWm/Uchykqky/r/A3M2vvv1A==
-X-Received: by 2002:a17:90b:2244:: with SMTP id
- hk4mr5693301pjb.222.1609281277010; 
- Tue, 29 Dec 2020 14:34:37 -0800 (PST)
-Received: from Ryzen-9-3900X.localdomain (ip68-104-204-241.ph.ph.cox.net.
- [68.104.204.241])
- by smtp.gmail.com with ESMTPSA id a136sm43067302pfd.149.2020.12.29.14.34.35
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 29 Dec 2020 14:34:36 -0800 (PST)
-Date: Tue, 29 Dec 2020 15:34:34 -0700
-From: Nathan Chancellor <natechancellor@gmail.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH] KVM: arm64: Fix hyp_cpu_pm_{init,exit} __init annotation
-Message-ID: <20201229223434.GA255@Ryzen-9-3900X.localdomain>
-References: <20201223120854.255347-1-maz@kernel.org>
+ with ESMTP id a9iGayyXP-Qn for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 30 Dec 2020 05:06:23 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 525C14B1CA
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Dec 2020 05:06:23 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 1A4EA21D94;
+ Wed, 30 Dec 2020 10:06:22 +0000 (UTC)
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
+ TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1kuYN2-004YYb-0Y; Wed, 30 Dec 2020 10:06:20 +0000
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20201223120854.255347-1-maz@kernel.org>
-X-Mailman-Approved-At: Wed, 30 Dec 2020 04:09:16 -0500
-Cc: kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+Date: Wed, 30 Dec 2020 10:06:19 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Russell King - ARM Linux admin <linux@armlinux.org.uk>
+Subject: Re: [PATCH] KVM: arm64: Allow PSCI SYSTEM_OFF/RESET to return
+In-Reply-To: <20201229170412.GN1551@shell.armlinux.org.uk>
+References: <20201229160059.64135-1-dbrazdil@google.com>
+ <20201229170412.GN1551@shell.armlinux.org.uk>
+User-Agent: Roundcube Webmail/1.4.9
+Message-ID: <0e1d555404e4ae8edcf6737735dc0eb7@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: linux@armlinux.org.uk, dbrazdil@google.com,
+ kvmarm@lists.cs.columbia.edu, mark.rutland@arm.com, lorenzo.pieralisi@arm.com,
+ suzuki.poulose@arm.com, sudeep.holla@arm.com, linux-kernel@vger.kernel.org,
+ james.morse@arm.com, linux-arm-kernel@lists.infradead.org,
+ catalin.marinas@arm.com, kernel-team@android.com, will@kernel.org,
+ julien.thierry.kdev@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+ Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
+ linux-kernel@vger.kernel.org, Sudeep Holla <sudeep.holla@arm.com>,
+ kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -97,53 +82,39 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Dec 23, 2020 at 12:08:54PM +0000, Marc Zyngier wrote:
-> The __init annotations on hyp_cpu_pm_{init,exit} are obviously incorrect,
-> and the build system shouts at you if you enable DEBUG_SECTION_MISMATCH.
+On 2020-12-29 17:04, Russell King - ARM Linux admin wrote:
+> On Tue, Dec 29, 2020 at 04:00:59PM +0000, David Brazdil wrote:
+>> The KVM/arm64 PSCI relay assumes that SYSTEM_OFF and SYSTEM_RESET 
+>> should
+>> not return, as dictated by the PSCI spec. However, there is firmware 
+>> out
+>> there which breaks this assumption, leading to a hyp panic. Make KVM
+>> more robust to broken firmware by allowing these to return.
 > 
-> Nothing really bad happens as we never execute that code outside of the
-> init context, but we can't label the callers as __int either, as kvm_init
-> isn't __init itself. Oh well.
+> Are you sure you should just return?
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> We've had issues in the past with Linux reboot(2) that returns
+> to userspace, allowing on 32-bit ARM for example watchdogs to
+> unexpectedly continue being serviced.
 
-Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
+I don't think this changes anything compared to the case where
+the PSCI relay isn't enabled. The EL1 part of the kernel would
+see the SYSTEM_RESET call return, and handle it accordingly
+(stay in a while(1) loop).
 
-> ---
->  arch/arm64/kvm/arm.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 6e637d2b4cfb..71a49eae9ea0 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -1574,12 +1574,12 @@ static struct notifier_block hyp_init_cpu_pm_nb = {
->  	.notifier_call = hyp_init_cpu_pm_notifier,
->  };
->  
-> -static void __init hyp_cpu_pm_init(void)
-> +static void hyp_cpu_pm_init(void)
->  {
->  	if (!is_protected_kvm_enabled())
->  		cpu_pm_register_notifier(&hyp_init_cpu_pm_nb);
->  }
-> -static void __init hyp_cpu_pm_exit(void)
-> +static void hyp_cpu_pm_exit(void)
->  {
->  	if (!is_protected_kvm_enabled())
->  		cpu_pm_unregister_notifier(&hyp_init_cpu_pm_nb);
-> -- 
-> 2.29.2
-> 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+This is consistent with the PSCI relay design goal of being
+invisible to the EL1 kernel.
+
+Thanks,
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
