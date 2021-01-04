@@ -2,81 +2,68 @@ Return-Path: <SRS0=G82f=GH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3F3EC433E0
-	for <kvmarm@archiver.kernel.org>; Mon,  4 Jan 2021 16:28:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AF0FC433E0
+	for <kvmarm@archiver.kernel.org>; Mon,  4 Jan 2021 17:27:50 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2112622473
-	for <kvmarm@archiver.kernel.org>; Mon,  4 Jan 2021 16:28:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2112622473
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id CE349224DF
+	for <kvmarm@archiver.kernel.org>; Mon,  4 Jan 2021 17:27:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE349224DF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C003F4B2D4;
-	Mon,  4 Jan 2021 11:27:59 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DB2B4B323;
+	Mon,  4 Jan 2021 12:27:49 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id NaqR+K2HWSon; Mon,  4 Jan 2021 11:27:58 -0500 (EST)
+	with ESMTP id a-PjjzYy0rs0; Mon,  4 Jan 2021 12:27:48 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8601B4B2E5;
-	Mon,  4 Jan 2021 11:27:57 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C8894B30D;
+	Mon,  4 Jan 2021 12:27:48 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C4E4A4B20C
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Jan 2021 11:22:14 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C0D54B310
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Jan 2021 12:27:46 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id i7pA31d+KBCT for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Jan 2021 11:22:13 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CA6034B1BF
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Jan 2021 11:22:13 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1609777333;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=1Q1DvyIxrkPxXGrCAY0p7IMPCUH81g19jkyhBrpKkfA=;
- b=RZuCDVSVhxoSLjtshLccArsfX8d7EiwKl1HjfxuDL+GPnJQ0PfqsZTnxB2XssIiA/51KkI
- z8QAZZ9CPIZ/J1JXHXOlZVmaLQ8/VV9Ei5uIMqjn9ynpoGeXaq6FxQ/nUOT4uTpEj/i7B9
- gboqiHrFg4TZBCnxU9TQZr33lLze2rM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-535-dMp1c77MMje3HQvVfpmXyg-1; Mon, 04 Jan 2021 11:22:09 -0500
-X-MC-Unique: dMp1c77MMje3HQvVfpmXyg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ with ESMTP id OMXihbYVrK8M for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Jan 2021 12:27:45 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3F37D4B308
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Jan 2021 12:27:45 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8758F107ACE8;
- Mon,  4 Jan 2021 16:22:07 +0000 (UTC)
-Received: from ovpn-66-203.rdu2.redhat.com (unknown [10.10.67.203])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5E88B1971B;
- Mon,  4 Jan 2021 16:22:06 +0000 (UTC)
-Message-ID: <f4300d00b9d2540bf90a6b1baadf030a2e4c92ed.camel@redhat.com>
-Subject: Re: [PATCH] KVM: arm64: Don't access PMCR_EL0 when no PMU is available
-From: Qian Cai <qcai@redhat.com>
-To: Marc Zyngier <maz@kernel.org>
-Date: Mon, 04 Jan 2021 11:22:05 -0500
-In-Reply-To: <579c839a0016107af66e704f147f9814@kernel.org>
-References: <20201210083059.1277162-1-maz@kernel.org>
- <703e1b5f2db1631e8f9c55619909fe66eb069f25.camel@redhat.com>
- <579c839a0016107af66e704f147f9814@kernel.org>
-Mime-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mailman-Approved-At: Mon, 04 Jan 2021 11:27:56 -0500
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>,
- Linux Next Mailing List <linux-next@vger.kernel.org>, kernel-team@android.com,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+ by mail.kernel.org (Postfix) with ESMTPSA id E0EEB224DF;
+ Mon,  4 Jan 2021 17:27:43 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=hot-poop.lan)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1kwTdt-005Gvi-Iq; Mon, 04 Jan 2021 17:27:41 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.cs.columbia.edu,
+	linux-arm-kernel@lists.infradead.org
+Subject: [PATCH] KVM: arm64: Replace KVM_ARM_PMU with HW_PERF_EVENTS
+Date: Mon,  4 Jan 2021 17:27:23 +0000
+Message-Id: <20210104172723.2014324-1-maz@kernel.org>
+X-Mailer: git-send-email 2.29.2
+MIME-Version: 1.0
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+ alexandru.elisei@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,51 +80,60 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 2021-01-04 at 16:08 +0000, Marc Zyngier wrote:
-> On 2021-01-04 15:47, Qian Cai wrote:
-> > On Thu, 2020-12-10 at 08:30 +0000, Marc Zyngier wrote:
-> > > We reset the guest's view of PMCR_EL0 unconditionally, based on
-> > > the host's view of this register. It is however legal for an
-> > > imnplementation not to provide any PMU, resulting in an UNDEF.
-> > > 
-> > > The obvious fix is to skip the reset of this shadow register
-> > > when no PMU is available, sidestepping the issue entirely.
-> > > If no PMU is available, the guest is not able to request
-> > > a virtual PMU anyway, so not doing nothing is the right thing
-> > > to do!
-> > > 
-> > > It is unlikely that this bug can hit any HW implementation
-> > > though, as they all provide a PMU. It has been found using nested
-> > > virt with the host KVM not implementing the PMU itself.
-> > > 
-> > > Fixes: ab9468340d2bc ("arm64: KVM: Add access handler for PMCR 
-> > > register")
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > 
-> > Reverting this commit on the top of today's linux-next fixed a qemu-kvm 
-> > coredump
-> > issue on TX2 while starting a guest.
-> > 
-> > - host kernel .config:
-> > https://cailca.coding.net/public/linux/mm/git/files/master/arm64.config
-> > 
-> > # /usr/libexec/qemu-kvm -name ubuntu-20.04-server-cloudimg -cpu host
-> > -smp 2 -m 2g
-> > -drive 
-> > if=none,format=qcow2,file=./ubuntu-20.04-server-cloudimg.qcow2,id=hd
-> > -device virtio-scsi -device scsi-hd,drive=hd -cdrom
-> > ./ubuntu-20.04-server-cloudimg.iso
-> > -bios /usr/share/AAVMF/AAVMF_CODE.fd -M gic-version=host -nographic
-> > -nic user,model=virtio,hostfwd=tcp::2222-:22
-> > 
-> > qemu-kvm: /builddir/build/BUILD/qemu-4.2.0/target/arm/helper.c:1812:
-> > pmevcntr_rawwrite: Assertion `counter < pmu_num_counters(env)' failed.
-> 
-> You don't have KVM_ARM_PMU selected in your config, so QEMU cannot
-> access the PMU registers, and no counters are exposed.
+KVM_ARM_PMU only existed for the benefit of 32bit ARM hosts,
+and makes no sense now that we are 64bit only. Get rid of it.
 
-Well, isn't it the rule that don't break the userspace? qemu works fine with
-KVM_ARM_PMU=n until this commit.
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/Kconfig  | 8 --------
+ arch/arm64/kvm/Makefile | 2 +-
+ include/kvm/arm_pmu.h   | 2 +-
+ 3 files changed, 2 insertions(+), 10 deletions(-)
+
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index 043756db8f6e..3964acf5451e 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -49,14 +49,6 @@ if KVM
+ 
+ source "virt/kvm/Kconfig"
+ 
+-config KVM_ARM_PMU
+-	bool "Virtual Performance Monitoring Unit (PMU) support"
+-	depends on HW_PERF_EVENTS
+-	default y
+-	help
+-	  Adds support for a virtual Performance Monitoring Unit (PMU) in
+-	  virtual machines.
+-
+ endif # KVM
+ 
+ endif # VIRTUALIZATION
+diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+index 60fd181df624..13b017284bf9 100644
+--- a/arch/arm64/kvm/Makefile
++++ b/arch/arm64/kvm/Makefile
+@@ -24,4 +24,4 @@ kvm-y := $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o \
+ 	 vgic/vgic-mmio-v3.o vgic/vgic-kvm-device.o \
+ 	 vgic/vgic-its.o vgic/vgic-debug.o
+ 
+-kvm-$(CONFIG_KVM_ARM_PMU)  += pmu-emul.o
++kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o
+diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+index fc85f50fa0e9..8dcb3e1477bc 100644
+--- a/include/kvm/arm_pmu.h
++++ b/include/kvm/arm_pmu.h
+@@ -13,7 +13,7 @@
+ #define ARMV8_PMU_CYCLE_IDX		(ARMV8_PMU_MAX_COUNTERS - 1)
+ #define ARMV8_PMU_MAX_COUNTER_PAIRS	((ARMV8_PMU_MAX_COUNTERS + 1) >> 1)
+ 
+-#ifdef CONFIG_KVM_ARM_PMU
++#ifdef CONFIG_HW_PERF_EVENTS
+ 
+ struct kvm_pmc {
+ 	u8 idx;	/* index into the pmu->pmc array */
+-- 
+2.29.2
 
 _______________________________________________
 kvmarm mailing list
