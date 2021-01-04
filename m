@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30CA1C433DB
-	for <kvmarm@archiver.kernel.org>; Mon,  4 Jan 2021 13:50:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A03A1C433E9
+	for <kvmarm@archiver.kernel.org>; Mon,  4 Jan 2021 13:50:51 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D2CD8207BC
-	for <kvmarm@archiver.kernel.org>; Mon,  4 Jan 2021 13:50:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2CD8207BC
+	by mail.kernel.org (Postfix) with ESMTP id 3C40C207BC
+	for <kvmarm@archiver.kernel.org>; Mon,  4 Jan 2021 13:50:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C40C207BC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7976B4B26E;
-	Mon,  4 Jan 2021 08:50:49 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E5DE14B260;
+	Mon,  4 Jan 2021 08:50:50 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id VAyo3h1a0toG; Mon,  4 Jan 2021 08:50:48 -0500 (EST)
+	with ESMTP id EBsJ-8OEmouS; Mon,  4 Jan 2021 08:50:49 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A2624B2C5;
-	Mon,  4 Jan 2021 08:50:46 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DBDB4B296;
+	Mon,  4 Jan 2021 08:50:48 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D7394B1F1
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Jan 2021 08:50:44 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 05ED54B277
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Jan 2021 08:50:47 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DGi+TFvcmjBg for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Jan 2021 08:50:43 -0500 (EST)
+ with ESMTP id 5wfwKccv5-aT for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Jan 2021 08:50:46 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2007A4B235
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Jan 2021 08:50:43 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4E38C4B235
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Jan 2021 08:50:44 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 452B7221E5;
- Mon,  4 Jan 2021 13:50:42 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 8898421BE5;
+ Mon,  4 Jan 2021 13:50:43 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1kwQFr-005E24-Ti; Mon, 04 Jan 2021 13:50:40 +0000
+ id 1kwQFt-005E24-RI; Mon, 04 Jan 2021 13:50:41 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v2 04/17] arm64: Provide an 'upgrade to VHE' stub hypercall
-Date: Mon,  4 Jan 2021 13:49:58 +0000
-Message-Id: <20210104135011.2063104-5-maz@kernel.org>
+Subject: [PATCH v2 06/17] arm64: Move VHE-specific SPE setup to mutate_to_vhe()
+Date: Mon,  4 Jan 2021 13:50:00 +0000
+Message-Id: <20210104135011.2063104-7-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210104135011.2063104-1-maz@kernel.org>
 References: <20210104135011.2063104-1-maz@kernel.org>
@@ -83,140 +83,63 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-As we are about to change the way a VHE system boots, let's
-provide the core helper, in the form of a stub hypercall that
-enables VHE and replicates the full EL1 context at EL2, thanks
-to EL1 and VHE-EL2 being extremely similar.
+There isn't much that a VHE kernel needs on top of whatever has
+been done for nVHE, so let's move the little we need to the
+VHE stub (the SPE setup), and drop the init_el2_state macro.
 
-On exception return, the kernel carries on at EL2. Fancy!
-
-Nothing calls this new hypercall yet, so no functional change.
+No expected functional change.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/virt.h |  7 +++-
- arch/arm64/kernel/hyp-stub.S  | 70 ++++++++++++++++++++++++++++++++++-
- 2 files changed, 74 insertions(+), 3 deletions(-)
+ arch/arm64/kernel/hyp-stub.S | 28 +++++++++++++++++++++++++---
+ 1 file changed, 25 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
-index ee6a48df89d9..7379f35ae2c6 100644
---- a/arch/arm64/include/asm/virt.h
-+++ b/arch/arm64/include/asm/virt.h
-@@ -35,8 +35,13 @@
-  */
- #define HVC_RESET_VECTORS 2
- 
-+/*
-+ * HVC_VHE_RESTART - Upgrade the CPU from EL1 to EL2, if possible
-+ */
-+#define HVC_VHE_RESTART	3
-+
- /* Max number of HYP stub hypercalls */
--#define HVC_STUB_HCALL_NR 3
-+#define HVC_STUB_HCALL_NR 4
- 
- /* Error returned when an invalid stub number is passed into x0 */
- #define HVC_STUB_ERR	0xbadca11
 diff --git a/arch/arm64/kernel/hyp-stub.S b/arch/arm64/kernel/hyp-stub.S
-index 160f5881a0b7..6ffdc1f7778b 100644
+index b727848bd0ec..232aab84b3cd 100644
 --- a/arch/arm64/kernel/hyp-stub.S
 +++ b/arch/arm64/kernel/hyp-stub.S
-@@ -8,9 +8,9 @@
+@@ -92,9 +92,6 @@ SYM_CODE_START_LOCAL(mutate_to_vhe)
+ 	msr	hcr_el2, x0
+ 	isb
  
- #include <linux/init.h>
- #include <linux/linkage.h>
--#include <linux/irqchip/arm-gic-v3.h>
+-	// Doesn't do much on VHE, but still, worth a shot
+-	init_el2_state vhe
+-
+ 	// Use the EL1 allocated stack, per-cpu offset
+ 	mrs	x0, sp_el1
+ 	mov	sp, x0
+@@ -107,6 +104,31 @@ SYM_CODE_START_LOCAL(mutate_to_vhe)
+ 	mrs_s	x0, SYS_VBAR_EL12
+ 	msr	vbar_el1, x0
  
- #include <asm/assembler.h>
-+#include <asm/el2_setup.h>
- #include <asm/kvm_arm.h>
- #include <asm/kvm_asm.h>
- #include <asm/ptrace.h>
-@@ -47,10 +47,16 @@ SYM_CODE_END(__hyp_stub_vectors)
- 
- SYM_CODE_START_LOCAL(el1_sync)
- 	cmp	x0, #HVC_SET_VECTORS
--	b.ne	2f
-+	b.ne	1f
- 	msr	vbar_el2, x1
- 	b	9f
- 
-+1:	cmp	x0, #HVC_VHE_RESTART
-+	b.ne	2f
-+	mov	x0, #HVC_SOFT_RESTART
-+	adr	x1, mutate_to_vhe
-+	// fall through...
++	// Fixup SPE configuration, if supported...
++	mrs	x1, id_aa64dfr0_el1
++	ubfx	x1, x1, #ID_AA64DFR0_PMSVER_SHIFT, #4
++	mov	x2, xzr
++	cbz	x1, skip_spe
 +
- 2:	cmp	x0, #HVC_SOFT_RESTART
- 	b.ne	3f
- 	mov	x0, x2
-@@ -70,6 +76,66 @@ SYM_CODE_START_LOCAL(el1_sync)
- 	eret
- SYM_CODE_END(el1_sync)
- 
-+// nVHE? No way! Give me the real thing!
-+SYM_CODE_START_LOCAL(mutate_to_vhe)
-+	// Sanity check: MMU *must* be off
-+	mrs	x0, sctlr_el2
-+	tbnz	x0, #0, 1f
++	// ... and not owned by EL3
++	mrs_s	x0, SYS_PMBIDR_EL1
++	and	x0, x0, #(1 << SYS_PMBIDR_EL1_P_SHIFT)
++	cbnz	x0, skip_spe
 +
-+	// Needs to be VHE capable, obviously
-+	mrs	x0, id_aa64mmfr1_el1
-+	ubfx	x0, x0, #ID_AA64MMFR1_VHE_SHIFT, #4
-+	cbz	x0, 1f
++	// Let the SPE driver in control of the sampling
++	mrs_s	x0, SYS_PMSCR_EL1
++	bic	x0, x0, #(1 << SYS_PMSCR_EL2_PCT_SHIFT)
++	bic	x0, x0, #(1 << SYS_PMSCR_EL2_PA_SHIFT)
++	msr_s	SYS_PMSCR_EL1, x0
++	mov	x2, #MDCR_EL2_TPMS
 +
-+	// Engage the VHE magic!
-+	mov_q	x0, HCR_HOST_VHE_FLAGS
-+	msr	hcr_el2, x0
-+	isb
++skip_spe:
++	// For VHE, use EL2 translation and disable access from EL1
++	mrs	x0, mdcr_el2
++	bic	x0, x0, #(MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT)
++	orr	x0, x0, x2
++	msr	mdcr_el2, x0
 +
-+	// Doesn't do much on VHE, but still, worth a shot
-+	init_el2_state vhe
-+
-+	// Use the EL1 allocated stack, per-cpu offset
-+	mrs	x0, sp_el1
-+	mov	sp, x0
-+	mrs	x0, tpidr_el1
-+	msr	tpidr_el2, x0
-+
-+	// FP configuration, vectors
-+	mrs_s	x0, SYS_CPACR_EL12
-+	msr	cpacr_el1, x0
-+	mrs_s	x0, SYS_VBAR_EL12
-+	msr	vbar_el1, x0
-+
-+	// Transfert the MM state from EL1 to EL2
-+	mrs_s	x0, SYS_TCR_EL12
-+	msr	tcr_el1, x0
-+	mrs_s	x0, SYS_TTBR0_EL12
-+	msr	ttbr0_el1, x0
-+	mrs_s	x0, SYS_TTBR1_EL12
-+	msr	ttbr1_el1, x0
-+	mrs_s	x0, SYS_MAIR_EL12
-+	msr	mair_el1, x0
-+	isb
-+
-+	// Invalidate TLBs before enabling the MMU
-+	tlbi	vmalle1
-+	dsb	nsh
-+
-+	// Enable the EL2 S1 MMU, as set up from EL1
-+	mrs_s	x0, SYS_SCTLR_EL12
-+	set_sctlr_el1	x0
-+
-+	// Hack the exception return to stay at EL2
-+	mrs	x0, spsr_el1
-+	and	x0, x0, #~PSR_MODE_MASK
-+	mov	x1, #PSR_MODE_EL2h
-+	orr	x0, x0, x1
-+	msr	spsr_el1, x0
-+
-+1:	eret
-+SYM_CODE_END(mutate_to_vhe)
-+
- .macro invalid_vector	label
- SYM_CODE_START_LOCAL(\label)
- 	b \label
+ 	// Transfert the MM state from EL1 to EL2
+ 	mrs_s	x0, SYS_TCR_EL12
+ 	msr	tcr_el1, x0
 -- 
 2.29.2
 
