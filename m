@@ -6,53 +6,53 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D9A8C433DB
-	for <kvmarm@archiver.kernel.org>; Mon,  4 Jan 2021 14:20:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C5BEC433DB
+	for <kvmarm@archiver.kernel.org>; Mon,  4 Jan 2021 14:20:17 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BEF1E21D93
-	for <kvmarm@archiver.kernel.org>; Mon,  4 Jan 2021 14:20:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEF1E21D93
+	by mail.kernel.org (Postfix) with ESMTP id 2008C207BC
+	for <kvmarm@archiver.kernel.org>; Mon,  4 Jan 2021 14:20:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2008C207BC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7728C4B2CC;
-	Mon,  4 Jan 2021 09:20:12 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C5B684B26E;
+	Mon,  4 Jan 2021 09:20:16 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 03CX5vPyqM8V; Mon,  4 Jan 2021 09:20:11 -0500 (EST)
+	with ESMTP id oUrKOAzmtjMl; Mon,  4 Jan 2021 09:20:14 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DAFB84B2F1;
-	Mon,  4 Jan 2021 09:20:10 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 074054B2D5;
+	Mon,  4 Jan 2021 09:20:14 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 15D124B2BD
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Jan 2021 09:20:10 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ABD8D4B115
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Jan 2021 09:20:12 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2h5m6zbGuoeY for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Jan 2021 09:20:09 -0500 (EST)
+ with ESMTP id Twbfn9Mra5DG for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Jan 2021 09:20:11 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E20FE4B2B5
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Jan 2021 09:20:08 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C69D34B307
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Jan 2021 09:20:10 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 25224221E5;
- Mon,  4 Jan 2021 14:20:08 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 03CC920784;
+ Mon,  4 Jan 2021 14:20:10 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1kwQG0-005E24-Px; Mon, 04 Jan 2021 13:50:48 +0000
+ id 1kwQFx-005E24-0h; Mon, 04 Jan 2021 13:50:45 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v2 17/17] arm64: Move "nokaslr" over to the early cpufeature
- infrastructure
-Date: Mon,  4 Jan 2021 13:50:11 +0000
-Message-Id: <20210104135011.2063104-18-maz@kernel.org>
+Subject: [PATCH v2 11/17] arm64: cpufeature: Add an early command-line
+ cpufeature override facility
+Date: Mon,  4 Jan 2021 13:50:05 +0000
+Message-Id: <20210104135011.2063104-12-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210104135011.2063104-1-maz@kernel.org>
 References: <20210104135011.2063104-1-maz@kernel.org>
@@ -84,108 +84,172 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Given that the early cpufeature infrastructure has borrowed quite
-a lot of code from the kaslr implementation, let's reimplement
-the matching of the "nokaslr" option with it.
+In order to be able to override CPU features at boot time,
+let's add a command line parser that matches options of the
+form "cpureg.feature=value", and store the corresponding
+value into the override val/mask pair.
+
+No features are currently defined, so no expected change in
+functionnality.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kernel/idreg-override.c | 17 ++++++++++++++
- arch/arm64/kernel/kaslr.c          | 37 +++---------------------------
- 2 files changed, 20 insertions(+), 34 deletions(-)
+ arch/arm64/kernel/Makefile         |   2 +-
+ arch/arm64/kernel/head.S           |   1 +
+ arch/arm64/kernel/idreg-override.c | 119 +++++++++++++++++++++++++++++
+ 3 files changed, 121 insertions(+), 1 deletion(-)
+ create mode 100644 arch/arm64/kernel/idreg-override.c
 
-diff --git a/arch/arm64/kernel/idreg-override.c b/arch/arm64/kernel/idreg-override.c
-index 1db54878b2c4..143fe7b8e3ce 100644
---- a/arch/arm64/kernel/idreg-override.c
-+++ b/arch/arm64/kernel/idreg-override.c
-@@ -33,8 +33,24 @@ static const struct reg_desc mmfr1 __initdata = {
- 	},
- };
+diff --git a/arch/arm64/kernel/Makefile b/arch/arm64/kernel/Makefile
+index 86364ab6f13f..2262f0392857 100644
+--- a/arch/arm64/kernel/Makefile
++++ b/arch/arm64/kernel/Makefile
+@@ -17,7 +17,7 @@ obj-y			:= debug-monitors.o entry.o irq.o fpsimd.o		\
+ 			   return_address.o cpuinfo.o cpu_errata.o		\
+ 			   cpufeature.o alternative.o cacheinfo.o		\
+ 			   smp.o smp_spin_table.o topology.o smccc-call.o	\
+-			   syscall.o proton-pack.o
++			   syscall.o proton-pack.o idreg-override.o
  
-+extern u64 kaslr_feature_val;
-+extern u64 kaslr_feature_mask;
+ targets			+= efi-entry.o
+ 
+diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
+index d74e5f84042e..b3c4dd04f74b 100644
+--- a/arch/arm64/kernel/head.S
++++ b/arch/arm64/kernel/head.S
+@@ -435,6 +435,7 @@ SYM_FUNC_START_LOCAL(__primary_switched)
+ 
+ 	mov	x0, x21				// pass FDT address in x0
+ 	bl	early_fdt_map			// Try mapping the FDT early
++	bl	init_shadow_regs
+ 	bl	switch_to_vhe
+ #if defined(CONFIG_KASAN_GENERIC) || defined(CONFIG_KASAN_SW_TAGS)
+ 	bl	kasan_early_init
+diff --git a/arch/arm64/kernel/idreg-override.c b/arch/arm64/kernel/idreg-override.c
+new file mode 100644
+index 000000000000..392f93b67103
+--- /dev/null
++++ b/arch/arm64/kernel/idreg-override.c
+@@ -0,0 +1,119 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Early cpufeature override framework
++ *
++ * Copyright (C) 2020 Google LLC
++ * Author: Marc Zyngier <maz@kernel.org>
++ */
 +
-+static const struct reg_desc kaslr __initdata = {
-+	.name		= "kaslr",
-+#ifdef CONFIG_RANDOMIZE_BASE
-+	.val		= &kaslr_feature_val,
-+	.mask		= &kaslr_feature_mask,
-+#endif
-+	.fields		= {
-+		{ "disabled", 0 },
-+		{}
-+	},
++#include <linux/kernel.h>
++#include <linux/libfdt.h>
++
++#include <asm/cacheflush.h>
++#include <asm/setup.h>
++
++struct reg_desc {
++	const char * const	name;
++	u64 * const		val;
++	u64 * const		mask;
++	struct {
++		const char * const	name;
++		u8			 shift;
++	} 			fields[];
 +};
 +
- static const struct reg_desc * const regs[] __initdata = {
- 	&mmfr1,
-+	&kaslr,
- };
- 
- static const struct {
-@@ -43,6 +59,7 @@ static const struct {
- } aliases[] __initdata = {
- 	{ "kvm-arm.mode=nvhe",		"id_aa64mmfr1.vh=0" },
- 	{ "kvm-arm.mode=protected",	"id_aa64mmfr1.vh=0" },
-+	{ "nokaslr",			"kaslr.disabled=1" },
- };
- 
- static int __init find_field(const char *cmdline, const struct reg_desc *reg,
-diff --git a/arch/arm64/kernel/kaslr.c b/arch/arm64/kernel/kaslr.c
-index 5fc86e7d01a1..dcc4a5aadbe2 100644
---- a/arch/arm64/kernel/kaslr.c
-+++ b/arch/arm64/kernel/kaslr.c
-@@ -51,39 +51,8 @@ static __init u64 get_kaslr_seed(void *fdt)
- 	return ret;
- }
- 
--static __init bool cmdline_contains_nokaslr(const u8 *cmdline)
--{
--	const u8 *str;
--
--	str = strstr(cmdline, "nokaslr");
--	return str == cmdline || (str > cmdline && *(str - 1) == ' ');
--}
--
--static __init bool is_kaslr_disabled_cmdline(void *fdt)
--{
--	if (!IS_ENABLED(CONFIG_CMDLINE_FORCE)) {
--		int node;
--		const u8 *prop;
--
--		node = fdt_path_offset(fdt, "/chosen");
--		if (node < 0)
--			goto out;
--
--		prop = fdt_getprop(fdt, node, "bootargs", NULL);
--		if (!prop)
--			goto out;
--
--		if (cmdline_contains_nokaslr(prop))
--			return true;
--
--		if (IS_ENABLED(CONFIG_CMDLINE_EXTEND))
--			goto out;
--
--		return false;
--	}
--out:
--	return cmdline_contains_nokaslr(CONFIG_CMDLINE);
--}
-+u64 kaslr_feature_val __initdata;
-+u64 kaslr_feature_mask __initdata;
- 
- /*
-  * This routine will be executed with the kernel mapped at its default virtual
-@@ -126,7 +95,7 @@ u64 __init kaslr_early_init(void)
- 	 * Check if 'nokaslr' appears on the command line, and
- 	 * return 0 if that is the case.
- 	 */
--	if (is_kaslr_disabled_cmdline(fdt)) {
-+	if (kaslr_feature_val & kaslr_feature_mask & 0xf) {
- 		kaslr_status = KASLR_DISABLED_CMDLINE;
- 		return 0;
- 	}
++static const struct reg_desc * const regs[] __initdata = {
++};
++
++static int __init find_field(const char *cmdline, const struct reg_desc *reg,
++			     int f, u64 *v)
++{
++	char buf[256], *str;
++	size_t len;
++
++	snprintf(buf, ARRAY_SIZE(buf), "%s.%s=", reg->name, reg->fields[f].name);
++
++	str = strstr(cmdline, buf);
++	if (!(str == cmdline || (str > cmdline && *(str - 1) == ' ')))
++		return -1;
++
++	str += strlen(buf);
++	len = strcspn(str, " ");
++	len = min(len, ARRAY_SIZE(buf) - 1);
++	strncpy(buf, str, len);
++	buf[len] = 0;
++
++	return kstrtou64(buf, 0, v);
++}
++
++static void __init match_options(const char *cmdline)
++{
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(regs); i++) {
++		int f;
++
++		if (!regs[i]->val || !regs[i]->mask)
++			continue;
++
++		for (f = 0; regs[i]->fields[f].name; f++) {
++			u64 v;
++
++			if (find_field(cmdline, regs[i], f, &v))
++				continue;
++
++			*regs[i]->val  |= (v & 0xf) << regs[i]->fields[f].shift;
++			*regs[i]->mask |= 0xfUL << regs[i]->fields[f].shift;
++		}
++	}
++}
++
++static __init void parse_cmdline(void)
++{
++	if (!IS_ENABLED(CONFIG_CMDLINE_FORCE)) {
++		const u8 *prop;
++		void *fdt;
++		int node;
++
++		fdt = get_early_fdt_ptr();
++		if (!fdt)
++			goto out;
++
++		node = fdt_path_offset(fdt, "/chosen");
++		if (node < 0)
++			goto out;
++
++		prop = fdt_getprop(fdt, node, "bootargs", NULL);
++		if (!prop)
++			goto out;
++
++		match_options(prop);
++
++		if (!IS_ENABLED(CONFIG_CMDLINE_EXTEND))
++			return;
++	}
++
++out:
++	match_options(CONFIG_CMDLINE);
++}
++
++void __init init_shadow_regs(void)
++{
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(regs); i++) {
++		if (regs[i]->val)
++			*regs[i]->val  = 0;
++		if (regs[i]->mask)
++			*regs[i]->mask = 0;
++	}
++
++	parse_cmdline();
++
++	for (i = 0; i < ARRAY_SIZE(regs); i++) {
++		if (regs[i]->val)
++			__flush_dcache_area(regs[i]->val, sizeof(*regs[i]->val));
++		if (regs[i]->mask)
++			__flush_dcache_area(regs[i]->mask, sizeof(*regs[i]->mask));
++	}
++}
 -- 
 2.29.2
 
