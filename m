@@ -1,67 +1,62 @@
-Return-Path: <SRS0=joaB=GG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=G82f=GH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AD2DC433DB
-	for <kvmarm@archiver.kernel.org>; Sun,  3 Jan 2021 16:45:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1BCDC433E0
+	for <kvmarm@archiver.kernel.org>; Mon,  4 Jan 2021 08:17:07 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A4CBF20780
-	for <kvmarm@archiver.kernel.org>; Sun,  3 Jan 2021 16:45:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4CBF20780
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 1927020798
+	for <kvmarm@archiver.kernel.org>; Mon,  4 Jan 2021 08:17:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1927020798
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A0544B284;
-	Sun,  3 Jan 2021 11:45:10 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 482304B2AA;
+	Mon,  4 Jan 2021 03:17:06 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Jg6jGJMgwDHt; Sun,  3 Jan 2021 11:45:09 -0500 (EST)
+	with ESMTP id pIKZ9oEbqVlq; Mon,  4 Jan 2021 03:17:05 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 00D854B1FB;
-	Sun,  3 Jan 2021 11:45:09 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1542A4B211;
+	Mon,  4 Jan 2021 03:17:05 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C0BA24B266
- for <kvmarm@lists.cs.columbia.edu>; Sun,  3 Jan 2021 09:01:10 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 87D104B217
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Jan 2021 03:17:04 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 40ZFLdsvA4d0 for <kvmarm@lists.cs.columbia.edu>;
- Sun,  3 Jan 2021 09:01:09 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C452B4B1F2
- for <kvmarm@lists.cs.columbia.edu>; Sun,  3 Jan 2021 09:01:09 -0500 (EST)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 3CC5B20C56;
- Sun,  3 Jan 2021 14:01:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1609682468;
- bh=HTypC30TDtap+wwyfZ7D+lF6Xf783015Cd+73+IGuD4=;
- h=From:To:Cc:Subject:Date:From;
- b=hoqjBQMsL0M+WFOYBk/RiHhGD0f3wf3zgivimzkWaIaHRZOWHhvs83ko3/UIquXZr
- JzoqCqv6D9c/Fs0qO9HcPRSZhUeaK7hTX7nusmqp7/8KzhcSKESrTsXLEcXz1ZOQlS
- cEnm+L7eF5Z+DvzLuA5H/BSN7W03A7AVtgOn/C0pXKUKoYGIiu6agHFaw4HAxCwfdW
- zm+Onu/34tJwWr922C7vUUj17Z7fHIkAn2AVRg43mru0Mm8oiqBSmq5SE/NDYVPPdc
- R0jrFiHjUunynrXGv3FTaJtSzqzrAXH1gxUAS1TTAo51C9df5wOlKUNlFNFLrk/6cI
- ErsZZbvoLRxbA==
-From: Arnd Bergmann <arnd@kernel.org>
-To: Marc Zyngier <maz@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will@kernel.org>
-Subject: [PATCH] KVM: arm64: remove incorrect __init annotation
-Date: Sun,  3 Jan 2021 15:00:50 +0100
-Message-Id: <20210103140104.3853922-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.29.2
+ with ESMTP id Ux19xC4pc8YJ for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Jan 2021 03:17:01 -0500 (EST)
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 869904B202
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Jan 2021 03:17:01 -0500 (EST)
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.58])
+ by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4D8T341WJnzMF83;
+ Mon,  4 Jan 2021 16:15:44 +0800 (CST)
+Received: from DESKTOP-7FEPK9S.china.huawei.com (10.174.184.196) by
+ DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
+ 14.3.498.0; Mon, 4 Jan 2021 16:16:45 +0800
+From: Shenming Lu <lushenming@huawei.com>
+To: Marc Zyngier <maz@kernel.org>, Eric Auger <eric.auger@redhat.com>, "Will
+ Deacon" <will@kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+ <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: [RFC PATCH v2 0/4] KVM: arm64: Add VLPI migration support on GICv4.1
+Date: Mon, 4 Jan 2021 16:16:09 +0800
+Message-ID: <20210104081613.100-1-lushenming@huawei.com>
+X-Mailer: git-send-email 2.27.0.windows.1
 MIME-Version: 1.0
-X-Mailman-Approved-At: Sun, 03 Jan 2021 11:45:07 -0500
-Cc: linux-arm-kernel@lists.infradead.org, Arnd Bergmann <arnd@arndb.de>,
- Sean Christopherson <seanjc@google.com>, linux-kernel@vger.kernel.org,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
+X-Originating-IP: [10.174.184.196]
+X-CFilter-Loop: Reflected
+Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+ Cornelia Huck <cohuck@redhat.com>, lushenming@huawei.com,
+ Alex Williamson <alex.williamson@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -78,46 +73,81 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Arnd Bergmann <arnd@arndb.de>
+In GICv4.1, migration has been supported except for (directly-injected)
+VLPI. And GICv4.1 Spec explicitly gives a way to get the VLPI's pending
+state (which was crucially missing in GICv4.0). So we make VLPI migration
+capable on GICv4.1 in this patch set.
 
-When hyp_cpu_pm_exit() is not inlined, it causes a link time warning:
+In order to support VLPI migration, we need to save and restore all
+required configuration information and pending states of VLPIs. But
+in fact, the configuration information of VLPIs has already been saved
+(or will be reallocated on the dst host...) in vgic(kvm) migration.
+So we only have to migrate the pending states of VLPIs specially.
 
-WARNING: modpost: vmlinux.o(.text+0x39974): Section mismatch in reference from the function kvm_arch_init() to the function .init.text:hyp_cpu_pm_exit()
-The function kvm_arch_init() references
-the function __init hyp_cpu_pm_exit().
-This is often because kvm_arch_init lacks a __init
-annotation or the annotation of hyp_cpu_pm_exit is wrong.
+Below is the related workflow in migration.
 
-This is not only called at boot time, so remove the annotation
-to prevent undefined behavior in case it gets called after being
-freed.
+On the save path:
+	In migration completion:
+		pause all vCPUs
+				|
+		call each VM state change handler:
+			pause other devices (just keep from sending interrupts, and
+			such as VFIO migration protocol has already realized it [1])
+					|
+			flush ITS tables into guest RAM
+					|
+			flush RDIST pending tables (also flush VLPI state here)
+				|
+		...
+On the resume path:
+	load each device's state:
+		restore ITS tables (include pending tables) from guest RAM
+				|
+		for other (PCI) devices (paused), if configured to have VLPIs,
+		establish the forwarding paths of their VLPIs (and transfer
+		the pending states from kvm's vgic to VPT here)
 
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- arch/arm64/kvm/arm.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+We have tested this series in VFIO migration, and found some related
+issues in QEMU [2].
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 6e637d2b4cfb..71a49eae9ea0 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1574,12 +1574,12 @@ static struct notifier_block hyp_init_cpu_pm_nb = {
- 	.notifier_call = hyp_init_cpu_pm_notifier,
- };
- 
--static void __init hyp_cpu_pm_init(void)
-+static void hyp_cpu_pm_init(void)
- {
- 	if (!is_protected_kvm_enabled())
- 		cpu_pm_register_notifier(&hyp_init_cpu_pm_nb);
- }
--static void __init hyp_cpu_pm_exit(void)
-+static void hyp_cpu_pm_exit(void)
- {
- 	if (!is_protected_kvm_enabled())
- 		cpu_pm_unregister_notifier(&hyp_init_cpu_pm_nb);
+Links:
+[1] vfio: UAPI for migration interface for device state:
+    https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/
+    commit/?id=a8a24f3f6e38103b77cf399c38eb54e1219d00d6
+[2] vfio: Some fixes and optimizations for VFIO migration:
+    https://patchwork.ozlabs.org/cover/1413263/
+
+History:
+
+v1 -> v2:
+ - Get the VLPI state from the KVM side.
+ - Nit fixes.
+
+Since there seems to be no better place to transfer the pending states
+in patch 3, we just keep it unchanged.
+
+Thanks,
+Shenming
+
+
+Shenming Lu (3):
+  KVM: arm64: GICv4.1: Add function to get VLPI state
+  KVM: arm64: GICv4.1: Try to save hw pending state in
+    save_pending_tables
+  KVM: arm64: GICv4.1: Give a chance to save VLPI's pending state
+
+Zenghui Yu (1):
+  KVM: arm64: GICv4.1: Restore VLPI's pending state to physical side
+
+ .../virt/kvm/devices/arm-vgic-its.rst         |  2 +-
+ arch/arm64/kvm/vgic/vgic-its.c                |  6 +-
+ arch/arm64/kvm/vgic/vgic-v3.c                 | 58 +++++++++++++++++--
+ arch/arm64/kvm/vgic/vgic-v4.c                 | 36 ++++++++++++
+ arch/arm64/kvm/vgic/vgic.h                    |  1 +
+ 5 files changed, 93 insertions(+), 10 deletions(-)
+
 -- 
-2.29.2
+2.19.1
 
 _______________________________________________
 kvmarm mailing list
