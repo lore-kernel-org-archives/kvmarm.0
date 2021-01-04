@@ -6,52 +6,53 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1039C433E0
-	for <kvmarm@archiver.kernel.org>; Mon,  4 Jan 2021 13:50:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 954A6C433E6
+	for <kvmarm@archiver.kernel.org>; Mon,  4 Jan 2021 13:50:54 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9917A207BC
-	for <kvmarm@archiver.kernel.org>; Mon,  4 Jan 2021 13:50:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9917A207BC
+	by mail.kernel.org (Postfix) with ESMTP id 31545207BC
+	for <kvmarm@archiver.kernel.org>; Mon,  4 Jan 2021 13:50:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31545207BC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E5704B2AA;
-	Mon,  4 Jan 2021 08:50:52 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D8A984B2E6;
+	Mon,  4 Jan 2021 08:50:53 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9y+rqYCl7Abp; Mon,  4 Jan 2021 08:50:51 -0500 (EST)
+	with ESMTP id HFTk2AmXLJKo; Mon,  4 Jan 2021 08:50:52 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 55DDD4B2BE;
-	Mon,  4 Jan 2021 08:50:48 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 897EF4B2E5;
+	Mon,  4 Jan 2021 08:50:49 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B94B4B26E
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Jan 2021 08:50:47 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B8A74B262
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Jan 2021 08:50:48 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Ou8N7YRNXccZ for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id w56+ZQ9bzZD2 for <kvmarm@lists.cs.columbia.edu>;
  Mon,  4 Jan 2021 08:50:46 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C94944B288
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Jan 2021 08:50:43 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C2ED94B259
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Jan 2021 08:50:45 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id EC76C221F9;
- Mon,  4 Jan 2021 13:50:42 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id E2A90207BC;
+ Mon,  4 Jan 2021 13:50:44 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1kwQFt-005E24-6q; Mon, 04 Jan 2021 13:50:41 +0000
+ id 1kwQFv-005E24-5P; Mon, 04 Jan 2021 13:50:43 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v2 05/17] arm64: Initialise as nVHE before switching to VHE
-Date: Mon,  4 Jan 2021 13:49:59 +0000
-Message-Id: <20210104135011.2063104-6-maz@kernel.org>
+Subject: [PATCH v2 08/17] arm64: Move SCTLR_EL1 initialisation to EL-agnostic
+ code
+Date: Mon,  4 Jan 2021 13:50:02 +0000
+Message-Id: <20210104135011.2063104-9-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210104135011.2063104-1-maz@kernel.org>
 References: <20210104135011.2063104-1-maz@kernel.org>
@@ -83,131 +84,45 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-As we are aiming to be able to control whether we enable VHE or
-not, let's always drop down to EL1 first, and only then upgrade
-to VHE if at all possible.
-
-This means that if the kernel is booted at EL2, we always start
-with a nVHE init, drop to EL1 to initialise the the kernel, and
-only then upgrade the kernel EL to EL2 if possible (the process
-is obviously shortened for secondary CPUs).
-
-The resume path is handled similarly to a secondary CPU boot.
+We can now move the initial SCTLR_EL1 setup to be used for both
+EL1 and EL2 setup.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kernel/head.S     | 38 ++----------------------------------
- arch/arm64/kernel/hyp-stub.S | 24 +++++++++++++++++++++++
- arch/arm64/kernel/sleep.S    |  1 +
- 3 files changed, 27 insertions(+), 36 deletions(-)
+ arch/arm64/kernel/head.S | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
 diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
-index 28e9735302df..07445fd976ef 100644
+index 36212c05df42..b425d2587cdb 100644
 --- a/arch/arm64/kernel/head.S
 +++ b/arch/arm64/kernel/head.S
-@@ -433,6 +433,7 @@ SYM_FUNC_START_LOCAL(__primary_switched)
- 	bl	__pi_memset
- 	dsb	ishst				// Make zero page visible to PTW
+@@ -479,13 +479,14 @@ EXPORT_SYMBOL(kimage_vaddr)
+  * booted in EL1 or EL2 respectively.
+  */
+ SYM_FUNC_START(init_kernel_el)
++	mov_q	x0, INIT_SCTLR_EL1_MMU_OFF
++	msr	sctlr_el1, x0
++
+ 	mrs	x0, CurrentEL
+ 	cmp	x0, #CurrentEL_EL2
+ 	b.eq	init_el2
  
-+	bl	switch_to_vhe
- #if defined(CONFIG_KASAN_GENERIC) || defined(CONFIG_KASAN_SW_TAGS)
- 	bl	kasan_early_init
- #endif
-@@ -493,42 +494,6 @@ SYM_INNER_LABEL(init_el1, SYM_L_LOCAL)
+ SYM_INNER_LABEL(init_el1, SYM_L_LOCAL)
+-	mov_q	x0, INIT_SCTLR_EL1_MMU_OFF
+-	msr	sctlr_el1, x0
+ 	isb
+ 	mov_q	x0, INIT_PSTATE_EL1
+ 	msr	spsr_el1, x0
+@@ -494,9 +495,6 @@ SYM_INNER_LABEL(init_el1, SYM_L_LOCAL)
  	eret
  
  SYM_INNER_LABEL(init_el2, SYM_L_LOCAL)
--#ifdef CONFIG_ARM64_VHE
--	/*
--	 * Check for VHE being present. x2 being non-zero indicates that we
--	 * do have VHE, and that the kernel is intended to run at EL2.
--	 */
--	mrs	x2, id_aa64mmfr1_el1
--	ubfx	x2, x2, #ID_AA64MMFR1_VHE_SHIFT, #4
--#else
--	mov	x2, xzr
--#endif
--	cbz	x2, init_el2_nvhe
+-	mov_q	x0, INIT_SCTLR_EL1_MMU_OFF
+-	msr	sctlr_el1, x0
 -
--	/*
--	 * When VHE _is_ in use, EL1 will not be used in the host and
--	 * requires no configuration, and all non-hyp-specific EL2 setup
--	 * will be done via the _EL1 system register aliases in __cpu_setup.
--	 */
--	mov_q	x0, HCR_HOST_VHE_FLAGS
--	msr	hcr_el2, x0
--	isb
--
--	init_el2_state vhe
--
--	isb
--
--	mov_q	x0, INIT_PSTATE_EL2
--	msr	spsr_el2, x0
--	msr	elr_el2, lr
--	mov	w0, #BOOT_CPU_MODE_EL2
--	eret
--
--SYM_INNER_LABEL(init_el2_nvhe, SYM_L_LOCAL)
--	/*
--	 * When VHE is not in use, early init of EL2 and EL1 needs to be
--	 * done here.
--	 */
- 	mov_q	x0, INIT_SCTLR_EL1_MMU_OFF
- 	msr	sctlr_el1, x0
- 
-@@ -623,6 +588,7 @@ SYM_FUNC_START_LOCAL(secondary_startup)
- 	/*
- 	 * Common entry point for secondary CPUs.
- 	 */
-+	bl	switch_to_vhe
- 	bl	__cpu_secondary_check52bitva
- 	bl	__cpu_setup			// initialise processor
- 	adrp	x1, swapper_pg_dir
-diff --git a/arch/arm64/kernel/hyp-stub.S b/arch/arm64/kernel/hyp-stub.S
-index 6ffdc1f7778b..b727848bd0ec 100644
---- a/arch/arm64/kernel/hyp-stub.S
-+++ b/arch/arm64/kernel/hyp-stub.S
-@@ -184,3 +184,27 @@ SYM_FUNC_START(__hyp_reset_vectors)
- 	hvc	#0
- 	ret
- SYM_FUNC_END(__hyp_reset_vectors)
-+
-+/*
-+ * Entry point to switch to VHE if deemed capable
-+ */
-+SYM_FUNC_START(switch_to_vhe)
-+#ifdef CONFIG_ARM64_VHE
-+	// Need to have booted at EL2
-+	adr_l	x1, __boot_cpu_mode
-+	ldr	w0, [x1]
-+	cmp	w0, #BOOT_CPU_MODE_EL2
-+	b.ne	1f
-+
-+	// and still be at EL1
-+	mrs	x0, CurrentEL
-+	cmp	x0, #CurrentEL_EL1
-+	b.ne	1f
-+
-+	// Turn the world upside down
-+	mov	x0, #HVC_VHE_RESTART
-+	hvc	#0
-+1:
-+#endif
-+	ret
-+SYM_FUNC_END(switch_to_vhe)
-diff --git a/arch/arm64/kernel/sleep.S b/arch/arm64/kernel/sleep.S
-index 6bdef7362c0e..5bfd9b87f85d 100644
---- a/arch/arm64/kernel/sleep.S
-+++ b/arch/arm64/kernel/sleep.S
-@@ -100,6 +100,7 @@ SYM_FUNC_END(__cpu_suspend_enter)
- 	.pushsection ".idmap.text", "awx"
- SYM_CODE_START(cpu_resume)
- 	bl	init_kernel_el
-+	bl	switch_to_vhe
- 	bl	__cpu_setup
- 	/* enable the MMU early - so we can access sleep_save_stash by va */
- 	adrp	x1, swapper_pg_dir
+ 	mov_q	x0, HCR_HOST_NVHE_FLAGS
+ 	msr	hcr_el2, x0
+ 	isb
 -- 
 2.29.2
 
