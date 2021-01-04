@@ -2,65 +2,69 @@ Return-Path: <SRS0=G82f=GH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16928C433E0
-	for <kvmarm@archiver.kernel.org>; Mon,  4 Jan 2021 11:50:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F9E2C433DB
+	for <kvmarm@archiver.kernel.org>; Mon,  4 Jan 2021 12:40:56 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9429D221F9
-	for <kvmarm@archiver.kernel.org>; Mon,  4 Jan 2021 11:50:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9429D221F9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id B04AB20770
+	for <kvmarm@archiver.kernel.org>; Mon,  4 Jan 2021 12:40:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B04AB20770
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E1DAC4B193;
-	Mon,  4 Jan 2021 06:50:48 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D9634B240;
+	Mon,  4 Jan 2021 07:40:55 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id GaEguzlgo3Gy; Mon,  4 Jan 2021 06:50:47 -0500 (EST)
+	with ESMTP id bVnuwUr6duzC; Mon,  4 Jan 2021 07:40:53 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CC7664B192;
-	Mon,  4 Jan 2021 06:50:47 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 006E84B24D;
+	Mon,  4 Jan 2021 07:40:53 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CC8E4B192
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Jan 2021 06:50:46 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0DC394B24D
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Jan 2021 07:40:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dBBzUUK-c91y for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Jan 2021 06:50:45 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 64AB64B191
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Jan 2021 06:50:45 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F08B11FB;
- Mon,  4 Jan 2021 03:50:44 -0800 (PST)
-Received: from slackpad.fritz.box (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 17E3F3F70D;
- Mon,  4 Jan 2021 03:50:42 -0800 (PST)
-Date: Mon, 4 Jan 2021 11:49:54 +0000
-From: Andre Przywara <andre.przywara@arm.com>
-To: Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v4 4/5] arm64: Add support for SMCCC TRNG entropy source
-Message-ID: <20210104114814.5e1fe218@slackpad.fritz.box>
-In-Reply-To: <20201211162612.GF4929@sirena.org.uk>
-References: <20201211160005.187336-1-andre.przywara@arm.com>
- <20201211160005.187336-5-andre.przywara@arm.com>
- <20201211162612.GF4929@sirena.org.uk>
-Organization: Arm Ltd.
-X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
+ with ESMTP id ZNGEbvwzjm9x for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Jan 2021 07:40:50 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1F0DC4B240
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Jan 2021 07:40:50 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id EDB2220770;
+ Mon,  4 Jan 2021 12:40:48 +0000 (UTC)
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
+ TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1kwPAE-005DAh-U0; Mon, 04 Jan 2021 12:40:47 +0000
 MIME-Version: 1.0
-Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
- Theodore Ts'o <tytso@mit.edu>, Catalin Marinas <catalin.marinas@arm.com>,
- Linus Walleij <linus.walleij@linaro.org>, Sudeep Holla <sudeep.holla@arm.com>,
- linux-kernel@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
- kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
+Date: Mon, 04 Jan 2021 12:40:46 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Shannon Zhao <shannon.zhao@linux.alibaba.com>
+Subject: Re: [PATCH] arm64: cpufeature: remove non-exist CONFIG_KVM_ARM_HOST
+In-Reply-To: <1609760324-92271-1-git-send-email-shannon.zhao@linux.alibaba.com>
+References: <1609760324-92271-1-git-send-email-shannon.zhao@linux.alibaba.com>
+User-Agent: Roundcube Webmail/1.4.9
+Message-ID: <53c52d0729cfc300b2cead400e2b846b@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: shannon.zhao@linux.alibaba.com, kvmarm@lists.cs.columbia.edu,
+ will@kernel.org, anshuman.khandual@arm.com, suzuki.poulose@arm.com,
  linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, anshuman.khandual@arm.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -72,67 +76,46 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 11 Dec 2020 16:26:12 +0000
-Mark Brown <broonie@kernel.org> wrote:
-
-> On Fri, Dec 11, 2020 at 04:00:04PM +0000, Andre Przywara wrote:
+On 2021-01-04 11:38, Shannon Zhao wrote:
+> Commit d82755b2e781 ("KVM: arm64: Kill off CONFIG_KVM_ARM_HOST") 
+> deletes
+> CONFIG_KVM_ARM_HOST option, it should use CONFIG_KVM instead.
 > 
-> >  static inline bool __must_check arch_get_random_seed_long(unsigned
-> > long *v) {
-> > +	struct arm_smccc_res res;
-> > +
-> > +	/*
-> > +	 * We prefer the SMCCC call, since its semantics (return
-> > actual
-> > +	 * hardware backed entropy) is closer to the idea behind
-> > this
-> > +	 * function here than what even the RNDRSS register
-> > provides
-> > +	 * (the output of a pseudo RNG freshly seeded by a TRNG).
-> > +	 */  
+> Just remove CONFIG_KVM_ARM_HOST here.
 > 
-> This logic...
+> Signed-off-by: Shannon Zhao <shannon.zhao@linux.alibaba.com>
+> ---
+>  arch/arm64/kernel/cpufeature.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> > @@ -77,10 +117,20 @@ arch_get_random_seed_long_early(unsigned long
-> > *v) {
-> >  	WARN_ON(system_state != SYSTEM_BOOTING);
-> >  
-> > -	if (!__early_cpu_has_rndr())
-> > -		return false;
-> > +	if (__early_cpu_has_rndr())
-> > +		return __arm64_rndr(v);
-> > +
-> > +	if (smccc_trng_available) {
-> > +		struct arm_smccc_res res;
-> >  
-> > -	return __arm64_rndr(v);
-> > +		arm_smccc_1_1_invoke(ARM_SMCCC_TRNG_RND64, 64,
-> > &res);
-> > +		if ((int)res.a0 >= 0) {
-> > +			*v = res.a3;
-> > +			return true;
-> > +		}
-> > +	}
-> > +
-> > +	return false;  
+> diff --git a/arch/arm64/kernel/cpufeature.c 
+> b/arch/arm64/kernel/cpufeature.c
+> index 7ffb5f1..e99edde 100644
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@ -2568,7 +2568,7 @@ static void verify_hyp_capabilities(void)
+>  	int parange, ipa_max;
+>  	unsigned int safe_vmid_bits, vmid_bits;
 > 
-> ...seems to also apply here but we prefer the RNDR instead of the
-> SMCC. We probably want to either do the same thing or add a comment
-> saying what's going on.
+> -	if (!IS_ENABLED(CONFIG_KVM) || !IS_ENABLED(CONFIG_KVM_ARM_HOST))
+> +	if (!IS_ENABLED(CONFIG_KVM))
+>  		return;
+> 
+>  	safe_mmfr1 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
 
-Argh, you are right, I missed to change this part as well.
+Well spotted. It means this function has never run since v5.8.
+It only performs a sanity check, but still...
 
-Will send a fixed and rebased v5 ASAP.
+Thanks,
 
-Cheers,
-Andre
-
-
+         M.
+-- 
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
