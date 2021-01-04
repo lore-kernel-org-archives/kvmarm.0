@@ -2,72 +2,71 @@ Return-Path: <SRS0=G82f=GH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C5BEC433DB
-	for <kvmarm@archiver.kernel.org>; Mon,  4 Jan 2021 14:20:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF461C433DB
+	for <kvmarm@archiver.kernel.org>; Mon,  4 Jan 2021 16:08:15 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2008C207BC
-	for <kvmarm@archiver.kernel.org>; Mon,  4 Jan 2021 14:20:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2008C207BC
+	by mail.kernel.org (Postfix) with ESMTP id 3F96D20578
+	for <kvmarm@archiver.kernel.org>; Mon,  4 Jan 2021 16:08:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F96D20578
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C5B684B26E;
-	Mon,  4 Jan 2021 09:20:16 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B3A7B4B1B9;
+	Mon,  4 Jan 2021 11:08:14 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id oUrKOAzmtjMl; Mon,  4 Jan 2021 09:20:14 -0500 (EST)
+	with ESMTP id SYFzbk0SrS-s; Mon,  4 Jan 2021 11:08:13 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 074054B2D5;
-	Mon,  4 Jan 2021 09:20:14 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 846294B238;
+	Mon,  4 Jan 2021 11:08:13 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ABD8D4B115
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Jan 2021 09:20:12 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 208174B238
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Jan 2021 11:08:12 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Twbfn9Mra5DG for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Jan 2021 09:20:11 -0500 (EST)
+ with ESMTP id kiK6EDWZI2-7 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Jan 2021 11:08:11 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C69D34B307
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Jan 2021 09:20:10 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 09CCA4B1B9
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Jan 2021 11:08:11 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 03CC920784;
- Mon,  4 Jan 2021 14:20:10 +0000 (UTC)
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ by mail.kernel.org (Postfix) with ESMTPSA id DB4C420665;
+ Mon,  4 Jan 2021 16:08:09 +0000 (UTC)
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
+ TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1kwQFx-005E24-0h; Mon, 04 Jan 2021 13:50:45 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v2 11/17] arm64: cpufeature: Add an early command-line
- cpufeature override facility
-Date: Mon,  4 Jan 2021 13:50:05 +0000
-Message-Id: <20210104135011.2063104-12-maz@kernel.org>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20210104135011.2063104-1-maz@kernel.org>
-References: <20210104135011.2063104-1-maz@kernel.org>
+ id 1kwSOt-005FxL-4b; Mon, 04 Jan 2021 16:08:07 +0000
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, catalin.marinas@arm.com, will@kernel.org,
- mark.rutland@arm.com, dbrazdil@google.com, alexandru.elisei@arm.com,
- ardb@kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com,
- suzuki.poulose@arm.com, kernel-team@android.com
+Date: Mon, 04 Jan 2021 16:08:07 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Qian Cai <qcai@redhat.com>
+Subject: Re: [PATCH] KVM: arm64: Don't access PMCR_EL0 when no PMU is available
+In-Reply-To: <703e1b5f2db1631e8f9c55619909fe66eb069f25.camel@redhat.com>
+References: <20201210083059.1277162-1-maz@kernel.org>
+ <703e1b5f2db1631e8f9c55619909fe66eb069f25.camel@redhat.com>
+User-Agent: Roundcube Webmail/1.4.9
+Message-ID: <579c839a0016107af66e704f147f9814@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: qcai@redhat.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kernel-team@android.com, sfr@canb.auug.org.au,
+ linux-next@vger.kernel.org, alexandru.elisei@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kernel-team@android.com, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>,
+ Linux Next Mailing List <linux-next@vger.kernel.org>, kernel-team@android.com,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -79,180 +78,56 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In order to be able to override CPU features at boot time,
-let's add a command line parser that matches options of the
-form "cpureg.feature=value", and store the corresponding
-value into the override val/mask pair.
+On 2021-01-04 15:47, Qian Cai wrote:
+> On Thu, 2020-12-10 at 08:30 +0000, Marc Zyngier wrote:
+>> We reset the guest's view of PMCR_EL0 unconditionally, based on
+>> the host's view of this register. It is however legal for an
+>> imnplementation not to provide any PMU, resulting in an UNDEF.
+>> 
+>> The obvious fix is to skip the reset of this shadow register
+>> when no PMU is available, sidestepping the issue entirely.
+>> If no PMU is available, the guest is not able to request
+>> a virtual PMU anyway, so not doing nothing is the right thing
+>> to do!
+>> 
+>> It is unlikely that this bug can hit any HW implementation
+>> though, as they all provide a PMU. It has been found using nested
+>> virt with the host KVM not implementing the PMU itself.
+>> 
+>> Fixes: ab9468340d2bc ("arm64: KVM: Add access handler for PMCR 
+>> register")
+>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> 
+> Reverting this commit on the top of today's linux-next fixed a qemu-kvm 
+> coredump
+> issue on TX2 while starting a guest.
+> 
+> - host kernel .config:
+> https://cailca.coding.net/public/linux/mm/git/files/master/arm64.config
+> 
+> # /usr/libexec/qemu-kvm -name ubuntu-20.04-server-cloudimg -cpu host
+> -smp 2 -m 2g
+> -drive 
+> if=none,format=qcow2,file=./ubuntu-20.04-server-cloudimg.qcow2,id=hd
+> -device virtio-scsi -device scsi-hd,drive=hd -cdrom
+> ./ubuntu-20.04-server-cloudimg.iso
+> -bios /usr/share/AAVMF/AAVMF_CODE.fd -M gic-version=host -nographic
+> -nic user,model=virtio,hostfwd=tcp::2222-:22
+> 
+> qemu-kvm: /builddir/build/BUILD/qemu-4.2.0/target/arm/helper.c:1812:
+> pmevcntr_rawwrite: Assertion `counter < pmu_num_counters(env)' failed.
 
-No features are currently defined, so no expected change in
-functionnality.
+You don't have KVM_ARM_PMU selected in your config, so QEMU cannot
+access the PMU registers, and no counters are exposed.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kernel/Makefile         |   2 +-
- arch/arm64/kernel/head.S           |   1 +
- arch/arm64/kernel/idreg-override.c | 119 +++++++++++++++++++++++++++++
- 3 files changed, 121 insertions(+), 1 deletion(-)
- create mode 100644 arch/arm64/kernel/idreg-override.c
-
-diff --git a/arch/arm64/kernel/Makefile b/arch/arm64/kernel/Makefile
-index 86364ab6f13f..2262f0392857 100644
---- a/arch/arm64/kernel/Makefile
-+++ b/arch/arm64/kernel/Makefile
-@@ -17,7 +17,7 @@ obj-y			:= debug-monitors.o entry.o irq.o fpsimd.o		\
- 			   return_address.o cpuinfo.o cpu_errata.o		\
- 			   cpufeature.o alternative.o cacheinfo.o		\
- 			   smp.o smp_spin_table.o topology.o smccc-call.o	\
--			   syscall.o proton-pack.o
-+			   syscall.o proton-pack.o idreg-override.o
- 
- targets			+= efi-entry.o
- 
-diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
-index d74e5f84042e..b3c4dd04f74b 100644
---- a/arch/arm64/kernel/head.S
-+++ b/arch/arm64/kernel/head.S
-@@ -435,6 +435,7 @@ SYM_FUNC_START_LOCAL(__primary_switched)
- 
- 	mov	x0, x21				// pass FDT address in x0
- 	bl	early_fdt_map			// Try mapping the FDT early
-+	bl	init_shadow_regs
- 	bl	switch_to_vhe
- #if defined(CONFIG_KASAN_GENERIC) || defined(CONFIG_KASAN_SW_TAGS)
- 	bl	kasan_early_init
-diff --git a/arch/arm64/kernel/idreg-override.c b/arch/arm64/kernel/idreg-override.c
-new file mode 100644
-index 000000000000..392f93b67103
---- /dev/null
-+++ b/arch/arm64/kernel/idreg-override.c
-@@ -0,0 +1,119 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Early cpufeature override framework
-+ *
-+ * Copyright (C) 2020 Google LLC
-+ * Author: Marc Zyngier <maz@kernel.org>
-+ */
-+
-+#include <linux/kernel.h>
-+#include <linux/libfdt.h>
-+
-+#include <asm/cacheflush.h>
-+#include <asm/setup.h>
-+
-+struct reg_desc {
-+	const char * const	name;
-+	u64 * const		val;
-+	u64 * const		mask;
-+	struct {
-+		const char * const	name;
-+		u8			 shift;
-+	} 			fields[];
-+};
-+
-+static const struct reg_desc * const regs[] __initdata = {
-+};
-+
-+static int __init find_field(const char *cmdline, const struct reg_desc *reg,
-+			     int f, u64 *v)
-+{
-+	char buf[256], *str;
-+	size_t len;
-+
-+	snprintf(buf, ARRAY_SIZE(buf), "%s.%s=", reg->name, reg->fields[f].name);
-+
-+	str = strstr(cmdline, buf);
-+	if (!(str == cmdline || (str > cmdline && *(str - 1) == ' ')))
-+		return -1;
-+
-+	str += strlen(buf);
-+	len = strcspn(str, " ");
-+	len = min(len, ARRAY_SIZE(buf) - 1);
-+	strncpy(buf, str, len);
-+	buf[len] = 0;
-+
-+	return kstrtou64(buf, 0, v);
-+}
-+
-+static void __init match_options(const char *cmdline)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(regs); i++) {
-+		int f;
-+
-+		if (!regs[i]->val || !regs[i]->mask)
-+			continue;
-+
-+		for (f = 0; regs[i]->fields[f].name; f++) {
-+			u64 v;
-+
-+			if (find_field(cmdline, regs[i], f, &v))
-+				continue;
-+
-+			*regs[i]->val  |= (v & 0xf) << regs[i]->fields[f].shift;
-+			*regs[i]->mask |= 0xfUL << regs[i]->fields[f].shift;
-+		}
-+	}
-+}
-+
-+static __init void parse_cmdline(void)
-+{
-+	if (!IS_ENABLED(CONFIG_CMDLINE_FORCE)) {
-+		const u8 *prop;
-+		void *fdt;
-+		int node;
-+
-+		fdt = get_early_fdt_ptr();
-+		if (!fdt)
-+			goto out;
-+
-+		node = fdt_path_offset(fdt, "/chosen");
-+		if (node < 0)
-+			goto out;
-+
-+		prop = fdt_getprop(fdt, node, "bootargs", NULL);
-+		if (!prop)
-+			goto out;
-+
-+		match_options(prop);
-+
-+		if (!IS_ENABLED(CONFIG_CMDLINE_EXTEND))
-+			return;
-+	}
-+
-+out:
-+	match_options(CONFIG_CMDLINE);
-+}
-+
-+void __init init_shadow_regs(void)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(regs); i++) {
-+		if (regs[i]->val)
-+			*regs[i]->val  = 0;
-+		if (regs[i]->mask)
-+			*regs[i]->mask = 0;
-+	}
-+
-+	parse_cmdline();
-+
-+	for (i = 0; i < ARRAY_SIZE(regs); i++) {
-+		if (regs[i]->val)
-+			__flush_dcache_area(regs[i]->val, sizeof(*regs[i]->val));
-+		if (regs[i]->mask)
-+			__flush_dcache_area(regs[i]->mask, sizeof(*regs[i]->mask));
-+	}
-+}
+         M.
 -- 
-2.29.2
-
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
