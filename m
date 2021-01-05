@@ -7,48 +7,48 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E4F8C433E6
-	for <kvmarm@archiver.kernel.org>; Tue,  5 Jan 2021 16:37:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 864F5C433E0
+	for <kvmarm@archiver.kernel.org>; Tue,  5 Jan 2021 16:37:13 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1F1BC22CB8
-	for <kvmarm@archiver.kernel.org>; Tue,  5 Jan 2021 16:37:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F1BC22CB8
+	by mail.kernel.org (Postfix) with ESMTP id 2DD4722CB3
+	for <kvmarm@archiver.kernel.org>; Tue,  5 Jan 2021 16:37:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DD4722CB3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B06194B329;
-	Tue,  5 Jan 2021 11:37:09 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D59A24B359;
+	Tue,  5 Jan 2021 11:37:12 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9bo1n3wL-XKn; Tue,  5 Jan 2021 11:37:08 -0500 (EST)
+	with ESMTP id PWGyAdUn6lZl; Tue,  5 Jan 2021 11:37:11 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4CADB4B34D;
-	Tue,  5 Jan 2021 11:37:08 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D5804B343;
+	Tue,  5 Jan 2021 11:37:11 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F2AE54B31F
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jan 2021 11:37:06 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BD4B04B331
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jan 2021 11:37:09 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id q7Y91e8qe02X for <kvmarm@lists.cs.columbia.edu>;
- Tue,  5 Jan 2021 11:37:05 -0500 (EST)
+ with ESMTP id NYm7WDrBUj6b for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  5 Jan 2021 11:37:08 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A89B4B334
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jan 2021 11:37:05 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AFFCF4B297
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jan 2021 11:37:07 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 505A41396;
- Tue,  5 Jan 2021 08:37:05 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 642961435;
+ Tue,  5 Jan 2021 08:37:07 -0800 (PST)
 Received: from donnerap.arm.com (donnerap.cambridge.arm.com [10.1.195.35])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 709E23F70D;
- Tue,  5 Jan 2021 08:37:03 -0800 (PST)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 846F53F70D;
+ Tue,  5 Jan 2021 08:37:05 -0800 (PST)
 From: Andre Przywara <andre.przywara@arm.com>
 To: Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
  Ard Biesheuvel <ardb@kernel.org>, Russell King <linux@armlinux.org.uk>,
  Marc Zyngier <maz@kernel.org>
-Subject: [PATCH v5 3/5] ARM: implement support for SMCCC TRNG entropy source
-Date: Tue,  5 Jan 2021 16:36:50 +0000
-Message-Id: <20210105163652.23646-4-andre.przywara@arm.com>
+Subject: [PATCH v5 4/5] arm64: Add support for SMCCC TRNG entropy source
+Date: Tue,  5 Jan 2021 16:36:51 +0000
+Message-Id: <20210105163652.23646-5-andre.przywara@arm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210105163652.23646-1-andre.przywara@arm.com>
 References: <20210105163652.23646-1-andre.przywara@arm.com>
@@ -74,119 +74,143 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Ard Biesheuvel <ardb@kernel.org>
+The ARM architected TRNG firmware interface, described in ARM spec
+DEN0098, defines an ARM SMCCC based interface to a true random number
+generator, provided by firmware.
+This can be discovered via the SMCCC >=v1.1 interface, and provides
+up to 192 bits of entropy per call.
 
-Implement arch_get_random_seed_*() for ARM based on the firmware
-or hypervisor provided entropy source described in ARM DEN0098.
+Hook this SMC call into arm64's arch_get_random_*() implementation,
+coming to the rescue when the CPU does not implement the ARM v8.5 RNG
+system registers.
 
-This will make the kernel's random number generator consume entropy
-provided by this interface, at early boot, and periodically at
-runtime when reseeding.
+For the detection, we piggy back on the PSCI/SMCCC discovery (which gives
+us the conduit to use (hvc/smc)), then try to call the
+ARM_SMCCC_TRNG_VERSION function, which returns -1 if this interface is
+not implemented.
 
-Cc: Linus Walleij <linus.walleij@linaro.org>
-Cc: Russell King <linux@armlinux.org.uk>
-Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
-[Andre: rework to be initialised by the SMCCC firmware driver]
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
 ---
- arch/arm/Kconfig                  |  4 ++
- arch/arm/include/asm/archrandom.h | 64 +++++++++++++++++++++++++++++++
- 2 files changed, 68 insertions(+)
+ arch/arm64/include/asm/archrandom.h | 72 ++++++++++++++++++++++++-----
+ 1 file changed, 61 insertions(+), 11 deletions(-)
 
-diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
-index 138248999df7..bfe642510b0a 100644
---- a/arch/arm/Kconfig
-+++ b/arch/arm/Kconfig
-@@ -1644,6 +1644,10 @@ config STACKPROTECTOR_PER_TASK
- 	  Enable this option to switch to a different method that uses a
- 	  different canary value for each task.
+diff --git a/arch/arm64/include/asm/archrandom.h b/arch/arm64/include/asm/archrandom.h
+index abe07c21da8e..e188228b2bcc 100644
+--- a/arch/arm64/include/asm/archrandom.h
++++ b/arch/arm64/include/asm/archrandom.h
+@@ -4,13 +4,24 @@
  
-+config ARCH_RANDOM
-+	def_bool y
-+	depends on HAVE_ARM_SMCCC_DISCOVERY
-+
- endmenu
+ #ifdef CONFIG_ARCH_RANDOM
  
- menu "Boot options"
-diff --git a/arch/arm/include/asm/archrandom.h b/arch/arm/include/asm/archrandom.h
-index a8e84ca5c2ee..f3e96a5b65f8 100644
---- a/arch/arm/include/asm/archrandom.h
-+++ b/arch/arm/include/asm/archrandom.h
-@@ -2,9 +2,73 @@
- #ifndef _ASM_ARCHRANDOM_H
- #define _ASM_ARCHRANDOM_H
- 
-+#ifdef CONFIG_ARCH_RANDOM
-+
 +#include <linux/arm-smccc.h>
-+#include <linux/kernel.h>
-+
-+#define ARM_SMCCC_TRNG_MIN_VERSION     0x10000UL
+ #include <linux/bug.h>
+ #include <linux/kernel.h>
+ #include <asm/cpufeature.h>
+ 
++#define ARM_SMCCC_TRNG_MIN_VERSION	0x10000UL
 +
 +extern bool smccc_trng_available;
 +
-+static inline bool __init smccc_probe_trng(void)
-+{
+ static inline bool __init smccc_probe_trng(void)
+ {
+-	return false;
 +	struct arm_smccc_res res;
 +
 +	arm_smccc_1_1_invoke(ARM_SMCCC_TRNG_VERSION, &res);
 +	if ((s32)res.a0 < 0)
 +		return false;
-+	if (res.a0 >= ARM_SMCCC_TRNG_MIN_VERSION) {
-+		/* double check that the 32-bit flavor is available */
-+		arm_smccc_1_1_invoke(ARM_SMCCC_TRNG_FEATURES,
-+				     ARM_SMCCC_TRNG_RND32,
-+				     &res);
-+		if ((s32)res.a0 >= 0)
-+			return true;
-+	}
 +
-+	return false;
-+}
-+
-+static inline bool __must_check arch_get_random_long(unsigned long *v)
-+{
-+	return false;
-+}
-+
-+static inline bool __must_check arch_get_random_int(unsigned int *v)
-+{
-+	return false;
-+}
-+
-+static inline bool __must_check arch_get_random_seed_long(unsigned long *v)
-+{
-+	struct arm_smccc_res res;
-+
-+	if (smccc_trng_available) {
-+		arm_smccc_1_1_invoke(ARM_SMCCC_TRNG_RND32, 8 * sizeof(*v), &res);
-+
-+		if (res.a0 != 0)
-+			return false;
-+
-+		*v = res.a3;
-+		return true;
-+	}
-+
-+	return false;
-+}
-+
-+static inline bool __must_check arch_get_random_seed_int(unsigned int *v)
-+{
-+	return arch_get_random_seed_long((unsigned long *)v);
-+}
-+
-+
-+#else /* !CONFIG_ARCH_RANDOM */
-+
- static inline bool __init smccc_probe_trng(void)
- {
- 	return false;
++	return res.a0 >= ARM_SMCCC_TRNG_MIN_VERSION;
  }
  
-+#endif /* CONFIG_ARCH_RANDOM */
- #endif /* _ASM_ARCHRANDOM_H */
+ static inline bool __arm64_rndr(unsigned long *v)
+@@ -43,26 +54,55 @@ static inline bool __must_check arch_get_random_int(unsigned int *v)
+ 
+ static inline bool __must_check arch_get_random_seed_long(unsigned long *v)
+ {
++	struct arm_smccc_res res;
++
++	/*
++	 * We prefer the SMCCC call, since its semantics (return actual
++	 * hardware backed entropy) is closer to the idea behind this
++	 * function here than what even the RNDRSS register provides
++	 * (the output of a pseudo RNG freshly seeded by a TRNG).
++	 */
++	if (smccc_trng_available) {
++		arm_smccc_1_1_invoke(ARM_SMCCC_TRNG_RND64, 64, &res);
++		if ((int)res.a0 >= 0) {
++			*v = res.a3;
++			return true;
++		}
++	}
++
+ 	/*
+ 	 * Only support the generic interface after we have detected
+ 	 * the system wide capability, avoiding complexity with the
+ 	 * cpufeature code and with potential scheduling between CPUs
+ 	 * with and without the feature.
+ 	 */
+-	if (!cpus_have_const_cap(ARM64_HAS_RNG))
+-		return false;
++	if (cpus_have_const_cap(ARM64_HAS_RNG))
++		return __arm64_rndr(v);
+ 
+-	return __arm64_rndr(v);
++	return false;
+ }
+ 
+-
+ static inline bool __must_check arch_get_random_seed_int(unsigned int *v)
+ {
++	struct arm_smccc_res res;
+ 	unsigned long val;
+-	bool ok = arch_get_random_seed_long(&val);
+ 
+-	*v = val;
+-	return ok;
++	if (smccc_trng_available) {
++		arm_smccc_1_1_invoke(ARM_SMCCC_TRNG_RND64, 32, &res);
++		if ((int)res.a0 >= 0) {
++			*v = res.a3 & GENMASK(31, 0);
++			return true;
++		}
++	}
++
++	if (cpus_have_const_cap(ARM64_HAS_RNG)) {
++		if (__arm64_rndr(&val)) {
++			*v = val;
++			return true;
++		}
++	}
++
++	return false;
+ }
+ 
+ static inline bool __init __early_cpu_has_rndr(void)
+@@ -77,10 +117,20 @@ arch_get_random_seed_long_early(unsigned long *v)
+ {
+ 	WARN_ON(system_state != SYSTEM_BOOTING);
+ 
+-	if (!__early_cpu_has_rndr())
+-		return false;
++	if (__early_cpu_has_rndr())
++		return __arm64_rndr(v);
++
++	if (smccc_trng_available) {
++		struct arm_smccc_res res;
+ 
+-	return __arm64_rndr(v);
++		arm_smccc_1_1_invoke(ARM_SMCCC_TRNG_RND64, 64, &res);
++		if ((int)res.a0 >= 0) {
++			*v = res.a3;
++			return true;
++		}
++	}
++
++	return false;
+ }
+ #define arch_get_random_seed_long_early arch_get_random_seed_long_early
+ 
 -- 
 2.17.1
 
