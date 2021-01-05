@@ -7,75 +7,74 @@ X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C39BC43381
-	for <kvmarm@archiver.kernel.org>; Tue,  5 Jan 2021 22:42:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2DFAC433E0
+	for <kvmarm@archiver.kernel.org>; Tue,  5 Jan 2021 22:58:19 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 877B0230F9
-	for <kvmarm@archiver.kernel.org>; Tue,  5 Jan 2021 22:42:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 877B0230F9
+	by mail.kernel.org (Postfix) with ESMTP id 40BE922E00
+	for <kvmarm@archiver.kernel.org>; Tue,  5 Jan 2021 22:58:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40BE922E00
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C8F8A4B27B;
-	Tue,  5 Jan 2021 17:42:23 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 90FCA4B29E;
+	Tue,  5 Jan 2021 17:58:18 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id oVG-y7B3qjxW; Tue,  5 Jan 2021 17:42:22 -0500 (EST)
+	with ESMTP id eP5h3IUGX-nd; Tue,  5 Jan 2021 17:58:17 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C29EF4B275;
-	Tue,  5 Jan 2021 17:42:22 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 913DB4B211;
+	Tue,  5 Jan 2021 17:58:17 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8799B4B275
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jan 2021 17:42:21 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A95B4B211
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jan 2021 17:58:15 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uSEocoBwsQkd for <kvmarm@lists.cs.columbia.edu>;
- Tue,  5 Jan 2021 17:42:20 -0500 (EST)
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com
- [209.85.167.48])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 13ECD4B274
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jan 2021 17:42:20 -0500 (EST)
-Received: by mail-lf1-f48.google.com with SMTP id s26so2229284lfc.8
- for <kvmarm@lists.cs.columbia.edu>; Tue, 05 Jan 2021 14:42:19 -0800 (PST)
+ with ESMTP id XG2gCgh13v7m for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  5 Jan 2021 17:58:14 -0500 (EST)
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com
+ [209.85.167.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 65F194B209
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jan 2021 17:58:14 -0500 (EST)
+Received: by mail-lf1-f52.google.com with SMTP id b26so2302527lff.9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 05 Jan 2021 14:58:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=8K2dvcU71/pwC4jHD+/NcfPpaQp8N4YqmX2cYFswaOA=;
- b=kK3zWPXdyTwPn82VV/feVszy0Lq50DMsPDdgRgcF1Wpq77EkMrDzcqnOXz/0nzGRfO
- x0IFp2wggLCsQrWnb8SRTsX/Vrx8VkIgg/Ylb1NZqnwdVr9WHwaQbPmpAkcqGa/PS/t7
- DCXi8Vf8l7bPZvFad4etuPwapVD45Yol+IDO0cfMQx/Zl5Lxy3ze3u3CvIZDHn0Q1VLY
- GiwREZwRmuEeL0eVTvqGxHKWTH+wnX8vR+BTG6Kv3fHV08fnBnndvUv+z/rvmDhJElcT
- PxJWTWY5XTMmat5xasDU6rV96z68nXhRmZq0rumnZsRhv2OnnoohBdvLU1YPi5oYoWah
- GMEQ==
+ :cc; bh=V0w3x+GF3kWC39en8rTC64sEYL5cEKVSWAvdiQhAh+g=;
+ b=ifbMOMA0QAFavhny0lYXm1SJM8oTqe5kwfdkomkcNtnMRZ7hqpbCYf/BFbqLUGQ/7m
+ klL/Jb41VKOYiBD1oCv7ISIneKq2c+hOrhStgQ3EXqIlVVian9q1OV+T9/yJylLQqiwz
+ 5O+uXYQLa+LJx04q+ggcpvFWgRdW/RvEBhPBe3uC4GSrb6aekmJ9i29ZUI/5wJCgbPE9
+ PW6mXK9hm2p4/b9rcPDZNAQBQMgDCVoJl1kYRGhXo228cYUFFhoKYyE7AtwAPIOXpzI2
+ jAkrByB8+Xeb8oef1q888uTHrPCb/Zd4TpXO9vilCimB3h4E5VBc/B9R+9kJl4oxGN5w
+ UCgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=8K2dvcU71/pwC4jHD+/NcfPpaQp8N4YqmX2cYFswaOA=;
- b=MzPbnNjIWUsY+RO46cZYzYvTRiQSPNsJpcMnCQ6FJodr9IjwBNzzbRkyeRsll0c3cf
- dBXzeQ74vHs4PdHl+Yj4kPRc0/Ssbp/Nol5vYhubtJ+SzLupYmBJBXv5dksYRu+R0z7j
- 1nbANc6v1y/4MkZgCKxAa0Pq8zxqMbgWxmdKyehWjvkzdMRln0HLRWSFOE21PWjIUjlZ
- ch3uWCPv67C8WyczaXICe1z4VrLd5zwX7P2eQJ0Rw/Dcp0EUVDyhkKjQXwO6a5TU0Ab6
- GGI52E/i7QG12PvsLeuoQE/WAHC6PsyQ7a0hdkLNhIh9WhMUuLH+JCNOCzAS4COWJjm1
- 2Qhg==
-X-Gm-Message-State: AOAM533c6D11CMFPnJn4/gs4xaZBktVfgTauemDs6qfG4XxPufwkfYNH
- s5Bzryy9zshDj1lHPdVQMsdGz1Bjt0slwz7SSiRfmQ==
-X-Google-Smtp-Source: ABdhPJxl91pFKLGKMJ2qJbq7uSrwslFYWBBcYxhh8yfs4emkwQTnkNoJxxJHYBFyu7OqqnU/vlBUeb6vbAfah5W7RYI=
-X-Received: by 2002:a05:651c:48b:: with SMTP id
- s11mr759044ljc.28.1609886538340; 
- Tue, 05 Jan 2021 14:42:18 -0800 (PST)
+ bh=V0w3x+GF3kWC39en8rTC64sEYL5cEKVSWAvdiQhAh+g=;
+ b=dbHD5Xyf4EwXVIzere+IiVHZliiLPIBC30o4ZsaNK8/MHY4DcAwbGykw6wer0x6h80
+ vPIMlKyEM28B1zv9rlR/u8HG1mbeDPn7V8DahuFvUOldR/LOY3it2mkILEB1pX6xxUAv
+ lXbzM4Flnn/kR00duXTovAaATw2QvvCtFqauT0Ct8U2PnlEd1y1rGBMofI/wMOALcdL/
+ ypOueO5ApdyrJLisjjTa6rla7v0096KWj4uE4O0ZFl2uCgaGucFK/mcxGS6doZSL5qfn
+ ET2JBE2dv6uriX+XT0mUm4xd3jjGMFtx/FcJI6b+8JYYcloeeLbh/g7DLHjfM6l34cGo
+ zA0w==
+X-Gm-Message-State: AOAM531tM8GGQ15IAz6kIBl4zAi+Vg0E9WOVgEfjC9du82SsIh3/egnF
+ hiaw63baTED8epBZoxEE/7thGjanvfxvS92s+8ZIvg==
+X-Google-Smtp-Source: ABdhPJw5+M3swJ5BBVrtWfWGX6IzQ3BoRQHtMVe5KvigCycioLZjq1PTg3GEtv3mz6Qzoka9n5I7+uS7VcJ/nKjt/0w=
+X-Received: by 2002:a2e:9ace:: with SMTP id p14mr714976ljj.439.1609887492944; 
+ Tue, 05 Jan 2021 14:58:12 -0800 (PST)
 MIME-Version: 1.0
 References: <20210104135011.2063104-1-maz@kernel.org>
- <20210104135011.2063104-13-maz@kernel.org>
-In-Reply-To: <20210104135011.2063104-13-maz@kernel.org>
+ <20210104135011.2063104-17-maz@kernel.org>
+In-Reply-To: <20210104135011.2063104-17-maz@kernel.org>
 From: Jing Zhang <jingzhangos@google.com>
-Date: Tue, 5 Jan 2021 16:42:06 -0600
-Message-ID: <CAAdAUtgdNyfq6wYi5mw4yBHKZ7UeSHdERxS=GYJFj=rBF0ZEDQ@mail.gmail.com>
-Subject: Re: [PATCH v2 12/17] arm64: Allow ID_AA64MMFR1_EL1.VH to be
- overridden from the command line
+Date: Tue, 5 Jan 2021 16:58:01 -0600
+Message-ID: <CAAdAUti35S-1_h=nx+zGGLz7CTxcQghseobUrd7Jc+rY5g58Zg@mail.gmail.com>
+Subject: Re: [PATCH v2 16/17] KVM: arm64: Document HVC_VHE_RESTART stub
+ hypercall
 To: Marc Zyngier <maz@kernel.org>
 Cc: kernel-team@android.com, Catalin Marinas <catalin.marinas@arm.com>,
  Ard Biesheuvel <ardb@kernel.org>, Will Deacon <will@kernel.org>,
@@ -98,88 +97,34 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On Mon, Jan 4, 2021 at 8:20 AM Marc Zyngier <maz@kernel.org> wrote:
 >
-> As we want to be able to disable VHE at runtime, let's match
-> "id_aa64mmfr1.vh=" from the command line as an override.
-> This doesn't have much effect yet as out boot code doesn't look
-Typo: out -> our
-> at the cpufeature, but only at the HW registers.
+> For completeness, let's document the HVC_VHE_RESTART stub.
 >
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  arch/arm64/include/asm/cpufeature.h |  3 +++
->  arch/arm64/kernel/cpufeature.c      |  6 +++++-
->  arch/arm64/kernel/idreg-override.c  | 12 ++++++++++++
->  3 files changed, 20 insertions(+), 1 deletion(-)
+>  Documentation/virt/kvm/arm/hyp-abi.rst | 9 +++++++++
+>  1 file changed, 9 insertions(+)
 >
-> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-> index 465d2cb63bfc..ef9487dfadca 100644
-> --- a/arch/arm64/include/asm/cpufeature.h
-> +++ b/arch/arm64/include/asm/cpufeature.h
-> @@ -813,6 +813,9 @@ static inline unsigned int get_vmid_bits(u64 mmfr1)
->         return 8;
->  }
+> diff --git a/Documentation/virt/kvm/arm/hyp-abi.rst b/Documentation/virt/kvm/arm/hyp-abi.rst
+> index 83cadd8186fa..3961c529769b 100644
+> --- a/Documentation/virt/kvm/arm/hyp-abi.rst
+> +++ b/Documentation/virt/kvm/arm/hyp-abi.rst
+> @@ -58,6 +58,15 @@ these functions (see arch/arm{,64}/include/asm/virt.h):
+>    into place (arm64 only), and jump to the restart address while at HYP/EL2.
+>    This hypercall is not expected to return to its caller.
 >
-> +extern u64 id_aa64mmfr1_val;
-> +extern u64 id_aa64mmfr1_mask;
+> +* ::
 > +
->  u32 get_kvm_ipa_limit(void);
->  void dump_cpu_features(void);
->
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index 2dbfc0096b0d..623a74090c9e 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -555,6 +555,9 @@ static const struct arm64_ftr_bits ftr_raz[] = {
->
->  #define ARM64_FTR_REG(id, table) ARM64_FTR_REG_OVERRIDE(id, table, NULL, NULL)
->
-> +u64 id_aa64mmfr1_val;
-> +u64 id_aa64mmfr1_mask;
+> +    x0 = HVC_VHE_RESTART (arm64 only)
 > +
->  static const struct __ftr_reg_entry {
->         u32                     sys_id;
->         struct arm64_ftr_reg    *reg;
-> @@ -602,7 +605,8 @@ static const struct __ftr_reg_entry {
->
->         /* Op1 = 0, CRn = 0, CRm = 7 */
->         ARM64_FTR_REG(SYS_ID_AA64MMFR0_EL1, ftr_id_aa64mmfr0),
-> -       ARM64_FTR_REG(SYS_ID_AA64MMFR1_EL1, ftr_id_aa64mmfr1),
-> +       ARM64_FTR_REG_OVERRIDE(SYS_ID_AA64MMFR1_EL1, ftr_id_aa64mmfr1,
-> +                              &id_aa64mmfr1_val, &id_aa64mmfr1_mask),
->         ARM64_FTR_REG(SYS_ID_AA64MMFR2_EL1, ftr_id_aa64mmfr2),
->
->         /* Op1 = 0, CRn = 1, CRm = 2 */
-> diff --git a/arch/arm64/kernel/idreg-override.c b/arch/arm64/kernel/idreg-override.c
-> index 392f93b67103..75d9845f489b 100644
-> --- a/arch/arm64/kernel/idreg-override.c
-> +++ b/arch/arm64/kernel/idreg-override.c
-> @@ -10,6 +10,7 @@
->  #include <linux/libfdt.h>
->
->  #include <asm/cacheflush.h>
-> +#include <asm/cpufeature.h>
->  #include <asm/setup.h>
->
->  struct reg_desc {
-> @@ -22,7 +23,18 @@ struct reg_desc {
->         }                       fields[];
->  };
->
-> +static const struct reg_desc mmfr1 __initdata = {
-> +       .name           = "id_aa64mmfr1",
-> +       .val            = &id_aa64mmfr1_val,
-> +       .mask           = &id_aa64mmfr1_mask,
-> +       .fields         = {
-> +               { "vh", ID_AA64MMFR1_VHE_SHIFT },
-> +               {}
-> +       },
-> +};
+> +  Attempt to upgrade the kernel's exception level from EL1 to EL2 by enabling
+> +  the VHE mode. This is conditionned by the CPU supporting VHE, the EL2 MMU
+Typo: conditionned -> conditioned
+> +  being off, and VHE not being disabled by any other mean (comment line option,
+> +  for example).
 > +
->  static const struct reg_desc * const regs[] __initdata = {
-> +       &mmfr1,
->  };
+>  Any other value of r0/x0 triggers a hypervisor-specific handling,
+>  which is not documented here.
 >
->  static int __init find_field(const char *cmdline, const struct reg_desc *reg,
 > --
 > 2.29.2
 >
