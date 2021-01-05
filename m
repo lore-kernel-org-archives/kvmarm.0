@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEBB4C433E6
-	for <kvmarm@archiver.kernel.org>; Tue,  5 Jan 2021 18:06:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78DEDC433E0
+	for <kvmarm@archiver.kernel.org>; Tue,  5 Jan 2021 18:06:13 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 722D222D5B
-	for <kvmarm@archiver.kernel.org>; Tue,  5 Jan 2021 18:06:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 722D222D5B
+	by mail.kernel.org (Postfix) with ESMTP id D847522CB3
+	for <kvmarm@archiver.kernel.org>; Tue,  5 Jan 2021 18:06:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D847522CB3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 213B84B37B;
-	Tue,  5 Jan 2021 13:06:11 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D2834B379;
+	Tue,  5 Jan 2021 13:06:12 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Nhc2Ey8MXXCR; Tue,  5 Jan 2021 13:06:10 -0500 (EST)
+	with ESMTP id X6aaQOaUGMJy; Tue,  5 Jan 2021 13:06:11 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0AAA54B385;
-	Tue,  5 Jan 2021 13:06:09 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 285264B38C;
+	Tue,  5 Jan 2021 13:06:11 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4791F4B275
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jan 2021 13:06:08 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F8354B394
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jan 2021 13:06:10 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PsbRKkq-OWTU for <kvmarm@lists.cs.columbia.edu>;
- Tue,  5 Jan 2021 13:06:04 -0500 (EST)
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com
- [209.85.128.42])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AED9B4B36E
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jan 2021 13:06:04 -0500 (EST)
-Received: by mail-wm1-f42.google.com with SMTP id a6so372326wmc.2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 05 Jan 2021 10:06:04 -0800 (PST)
+ with ESMTP id 7Tpn-2un8FsG for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  5 Jan 2021 13:06:08 -0500 (EST)
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com
+ [209.85.221.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B795A4B369
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jan 2021 13:06:08 -0500 (EST)
+Received: by mail-wr1-f52.google.com with SMTP id r3so115935wrt.2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 05 Jan 2021 10:06:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Pc2HqS8Yp/wLLNaRLrMUR3bpLwxoED7DL6jFSybCHtA=;
- b=NwMXL8631Z29wz/JNQC2mtB4LPJnxvcjKGq1fr1Utl3B/GGEKRb7ZHDWdnK2lDw5OG
- oTGcvo+K1wBAfozKawQtmBjFACNet+HKha0Qo7Am+Xt+UPZrvXPm1z1sPj41KhE1h5Ug
- WmaaMwftJ0NVNgYijUiGGeb3AjPOwDa/YWo+G1T3FO3wElFKgEL0fjPr1o8VWSKO6rBq
- Xu/nCJ9b+yCkUV1HToIHqLt28Y2OL0eeR387sTRTPas+KNfZHE2LgJc5q6E3Bm8rfVsU
- qngV6mgx+Uf22eI8s9F/Gt2QpyXWUFeKXyuKk00UgPwt3HbqD6q9MVhb3GYu0KPD5gwx
- OchQ==
+ bh=OlWNLkvu8os23nlNxmSq9Bz5E02cEWRlXUgN8SoW4qc=;
+ b=uiGccgbHmkHVH03l7PPlPzjM6OCn3VXs3LK6H2v5YAw7NErN+XLJ0zgvL0csQdRbxO
+ FOeRF9Usq9Ounr5UGTBl9EzTu0+3L43bAAQ14gaoCHgEZPMAlNUXD4tIX0OoWrLXfEgG
+ 3u4q+cNrF1+912qcOlxkOUSvn1fW4O7wckI8e5TWOTdaQvPmFP57yZek27rVgMXOlaRr
+ rLybTGpLps9RgQxfGEuoguGngesdC5Zn7LmA9HmYjnpEJGFVMnDqM/i+qbfrzGCBdlEo
+ JdhpfkJyS4oT718a0VEuaP6A3JGDWLymHtHCCXhwjCABJpXapeQRhTYfAM0/uBdjbzAJ
+ E5Kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Pc2HqS8Yp/wLLNaRLrMUR3bpLwxoED7DL6jFSybCHtA=;
- b=rs7Vn6BFE0gDGbSwo/NNXXeqej6ykNXN04v/nojp/yPQOz2dht7XJSbD/qXiLSn/S4
- 9HwbqHREIkXYqTjpDD9D2L09F+pI0IegZIdNsGu93zNP+UOhVpoiILY3dIkktzbuzCxI
- rCKoTX6tWXGjE5CbqcWny6IEfIvcAiEbHJyVurdHzf9ZCQba6z5JkEx1U68XCjZA5oVo
- cVuQ/GJx5yLbKQGLsYeJ6HP6xSCimQpSTQXxNk5rD2NKT2fCwdEOnFxF648Ae+hsItVc
- N7ThkCLHbiwmjIsaDGF4cXMr06HJ0hCza5dfG9KK58sLAUrClNap4XyGm4ywWDQBPUK2
- 5qRA==
-X-Gm-Message-State: AOAM532s58LOOlrC6BsBU5hmLnj/yMsIhnDGX1HX+qUDS8OYK3d6r6MD
- 0gK7Tx25pneUrc3uWpUSOHRJgDb1RVZNWA==
-X-Google-Smtp-Source: ABdhPJyjQgiFG9pABukLWKZ9tumLI2zRT36ETVQba0ShHk4CrZoXSiXzaLRNRGji3/47FkuqoFLB5Q==
-X-Received: by 2002:a1c:5644:: with SMTP id k65mr339701wmb.62.1609869963460;
- Tue, 05 Jan 2021 10:06:03 -0800 (PST)
+ bh=OlWNLkvu8os23nlNxmSq9Bz5E02cEWRlXUgN8SoW4qc=;
+ b=tGswzocaxBTTO06c3+SCz0lnh/hESSym1m5k/cJ//+h+oXuTgqtYE6sLIkHGySYfqh
+ 9pz8X8WbdtRR8qC0LiZlPVxY9D1g12blR5pdlMIl7vMj/Uz1ki5zy9QXW7IkxvgVVz3q
+ R/iBQezvSczqOKboQYh1sNHqjJZLvu17BHIkoIrPJbyd6lwDVNmYzOGqPXxEpkJLFsFq
+ 2kiObCfms+8sXDESDaYtyd7h0kEFEGPjcREQtZDotgogcpv5aFL8A+L2hc2HFZWVR91O
+ gHv+YDF5UqmUbxDmN3PkNrN7eyLeduSXrMYpOvyzWxKydw7NQKhqx3CdlyEdHPO702xw
+ d8zg==
+X-Gm-Message-State: AOAM533tJ1jviQk+RN+N/hEab7NAe1oR8aWskJ01aIQG1u+aF9sYYo7R
+ uW0gygAyzerKvmYF6UbyR8Z5SkeABhbQLA==
+X-Google-Smtp-Source: ABdhPJykPPGsPRvk5u16vzyumU8tD6czDOMIVrv06NmGFJ/zY/dEqModqSIRO58GD2prw5nLx9w35A==
+X-Received: by 2002:adf:94c7:: with SMTP id 65mr685725wrr.423.1609869967382;
+ Tue, 05 Jan 2021 10:06:07 -0800 (PST)
 Received: from localhost ([2a01:4b00:8523:2d03:4957:71a5:7b5c:c94f])
- by smtp.gmail.com with ESMTPSA id a14sm767523wrn.3.2021.01.05.10.06.02
+ by smtp.gmail.com with ESMTPSA id r82sm354256wma.18.2021.01.05.10.06.06
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 05 Jan 2021 10:06:02 -0800 (PST)
+ Tue, 05 Jan 2021 10:06:06 -0800 (PST)
 From: David Brazdil <dbrazdil@google.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v2 5/8] KVM: arm64: Apply hyp relocations at runtime
-Date: Tue,  5 Jan 2021 18:05:38 +0000
-Message-Id: <20210105180541.65031-6-dbrazdil@google.com>
+Subject: [PATCH v2 7/8] KVM: arm64: Remove patching of fn pointers in hyp
+Date: Tue,  5 Jan 2021 18:05:40 +0000
+Message-Id: <20210105180541.65031-8-dbrazdil@google.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20210105180541.65031-1-dbrazdil@google.com>
 References: <20210105180541.65031-1-dbrazdil@google.com>
@@ -99,105 +99,118 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-KVM nVHE code runs under a different VA mapping than the kernel, hence
-so far it avoided using absolute addressing because the VA in a constant
-pool is relocated by the linker to a kernel VA (see hyp_symbol_addr).
+Storing a function pointer in hyp now generates relocation information
+used at early boot to convert the address to hyp VA. The existing
+alternative-based conversion mechanism is therefore obsolete. Remove it
+and simplify its users.
 
-Now the kernel has access to a list of positions that contain a kimg VA
-but will be accessed only in hyp execution context. These are generated
-by the gen-hyprel build-time tool and stored in .hyp.reloc.
-
-Add early boot pass over the entries and convert the kimg VAs to hyp VAs.
-Note that this requires for .hyp* ELF sections to be mapped read-write
-at that point.
-
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
 Signed-off-by: David Brazdil <dbrazdil@google.com>
 ---
- arch/arm64/include/asm/kvm_mmu.h  |  1 +
- arch/arm64/include/asm/sections.h |  1 +
- arch/arm64/kernel/smp.c           |  4 +++-
- arch/arm64/kvm/va_layout.c        | 28 ++++++++++++++++++++++++++++
- 4 files changed, 33 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_mmu.h   | 18 ------------------
+ arch/arm64/kernel/image-vars.h     |  1 -
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c | 11 ++++-------
+ arch/arm64/kvm/va_layout.c         |  6 ------
+ 4 files changed, 4 insertions(+), 32 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index e52d82aeadca..6bbb44011c84 100644
+index adadc468cc71..90873851f677 100644
 --- a/arch/arm64/include/asm/kvm_mmu.h
 +++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -129,6 +129,7 @@ alternative_cb_end
- void kvm_update_va_mask(struct alt_instr *alt,
- 			__le32 *origptr, __le32 *updptr, int nr_inst);
- void kvm_compute_layout(void);
-+void kvm_apply_hyp_relocations(void);
+@@ -135,24 +135,6 @@ static __always_inline unsigned long __kern_hyp_va(unsigned long v)
  
- static __always_inline unsigned long __kern_hyp_va(unsigned long v)
+ #define kern_hyp_va(v) 	((typeof(v))(__kern_hyp_va((unsigned long)(v))))
+ 
+-static __always_inline unsigned long __kimg_hyp_va(unsigned long v)
+-{
+-	unsigned long offset;
+-
+-	asm volatile(ALTERNATIVE_CB("movz %0, #0\n"
+-				    "movk %0, #0, lsl #16\n"
+-				    "movk %0, #0, lsl #32\n"
+-				    "movk %0, #0, lsl #48\n",
+-				    kvm_update_kimg_phys_offset)
+-		     : "=r" (offset));
+-
+-	return __kern_hyp_va((v - offset) | PAGE_OFFSET);
+-}
+-
+-#define kimg_fn_hyp_va(v) 	((typeof(*v))(__kimg_hyp_va((unsigned long)(v))))
+-
+-#define kimg_fn_ptr(x)	(typeof(x) **)(x)
+-
+ /*
+  * We currently support using a VM-specified IPA size. For backward
+  * compatibility, the default IPA size is fixed to 40bits.
+diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
+index f676243abac6..23f1a557bd9f 100644
+--- a/arch/arm64/kernel/image-vars.h
++++ b/arch/arm64/kernel/image-vars.h
+@@ -64,7 +64,6 @@ __efistub__ctype		= _ctype;
+ /* Alternative callbacks for init-time patching of nVHE hyp code. */
+ KVM_NVHE_ALIAS(kvm_patch_vector_branch);
+ KVM_NVHE_ALIAS(kvm_update_va_mask);
+-KVM_NVHE_ALIAS(kvm_update_kimg_phys_offset);
+ KVM_NVHE_ALIAS(kvm_get_kimage_voffset);
+ 
+ /* Global kernel state accessed by nVHE hyp code. */
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index a906f9e2ff34..f012f8665ecc 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -108,9 +108,9 @@ static void handle___vgic_v3_restore_aprs(struct kvm_cpu_context *host_ctxt)
+ 
+ typedef void (*hcall_t)(struct kvm_cpu_context *);
+ 
+-#define HANDLE_FUNC(x)	[__KVM_HOST_SMCCC_FUNC_##x] = kimg_fn_ptr(handle_##x)
++#define HANDLE_FUNC(x)	[__KVM_HOST_SMCCC_FUNC_##x] = (hcall_t)handle_##x
+ 
+-static const hcall_t *host_hcall[] = {
++static const hcall_t host_hcall[] = {
+ 	HANDLE_FUNC(__kvm_vcpu_run),
+ 	HANDLE_FUNC(__kvm_flush_vm_context),
+ 	HANDLE_FUNC(__kvm_tlb_flush_vmid_ipa),
+@@ -130,7 +130,6 @@ static const hcall_t *host_hcall[] = {
+ static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
  {
-diff --git a/arch/arm64/include/asm/sections.h b/arch/arm64/include/asm/sections.h
-index a6f3557d1ab2..2f36b16a5b5d 100644
---- a/arch/arm64/include/asm/sections.h
-+++ b/arch/arm64/include/asm/sections.h
-@@ -12,6 +12,7 @@ extern char __hibernate_exit_text_start[], __hibernate_exit_text_end[];
- extern char __hyp_idmap_text_start[], __hyp_idmap_text_end[];
- extern char __hyp_text_start[], __hyp_text_end[];
- extern char __hyp_rodata_start[], __hyp_rodata_end[];
-+extern char __hyp_reloc_begin[], __hyp_reloc_end[];
- extern char __idmap_text_start[], __idmap_text_end[];
- extern char __initdata_begin[], __initdata_end[];
- extern char __inittext_begin[], __inittext_end[];
-diff --git a/arch/arm64/kernel/smp.c b/arch/arm64/kernel/smp.c
-index d08948c6979b..006f61a86438 100644
---- a/arch/arm64/kernel/smp.c
-+++ b/arch/arm64/kernel/smp.c
-@@ -434,8 +434,10 @@ static void __init hyp_mode_check(void)
- 			   "CPU: CPUs started in inconsistent modes");
- 	else
- 		pr_info("CPU: All CPU(s) started at EL1\n");
--	if (IS_ENABLED(CONFIG_KVM) && !is_kernel_in_hyp_mode())
-+	if (IS_ENABLED(CONFIG_KVM) && !is_kernel_in_hyp_mode()) {
- 		kvm_compute_layout();
-+		kvm_apply_hyp_relocations();
-+	}
- }
+ 	DECLARE_REG(unsigned long, id, host_ctxt, 0);
+-	const hcall_t *kfn;
+ 	hcall_t hfn;
  
- void __init smp_cpus_done(unsigned int max_cpus)
+ 	id -= KVM_HOST_SMCCC_ID(0);
+@@ -138,13 +137,11 @@ static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
+ 	if (unlikely(id >= ARRAY_SIZE(host_hcall)))
+ 		goto inval;
+ 
+-	kfn = host_hcall[id];
+-	if (unlikely(!kfn))
++	hfn = host_hcall[id];
++	if (unlikely(!hfn))
+ 		goto inval;
+ 
+ 	cpu_reg(host_ctxt, 0) = SMCCC_RET_SUCCESS;
+-
+-	hfn = kimg_fn_hyp_va(kfn);
+ 	hfn(host_ctxt);
+ 
+ 	return;
 diff --git a/arch/arm64/kvm/va_layout.c b/arch/arm64/kvm/va_layout.c
-index 70fcd6a12fe1..fee7dcd95d73 100644
+index fee7dcd95d73..978301392d67 100644
 --- a/arch/arm64/kvm/va_layout.c
 +++ b/arch/arm64/kvm/va_layout.c
-@@ -81,6 +81,34 @@ __init void kvm_compute_layout(void)
- 	init_hyp_physvirt_offset();
+@@ -283,12 +283,6 @@ static void generate_mov_q(u64 val, __le32 *origptr, __le32 *updptr, int nr_inst
+ 	*updptr++ = cpu_to_le32(insn);
  }
  
-+/*
-+ * The .hyp.reloc ELF section contains a list of kimg positions that
-+ * contains kimg VAs but will be accessed only in hyp execution context.
-+ * Convert them to hyp VAs. See gen-hyprel.c for more details.
-+ */
-+__init void kvm_apply_hyp_relocations(void)
-+{
-+	int32_t *rel;
-+	int32_t *begin = (int32_t *)__hyp_reloc_begin;
-+	int32_t *end = (int32_t *)__hyp_reloc_end;
-+
-+	for (rel = begin; rel < end; ++rel) {
-+		uintptr_t *ptr, kimg_va;
-+
-+		/*
-+		 * Each entry contains a 32-bit relative offset from itself
-+		 * to a kimg VA position.
-+		 */
-+		ptr = (uintptr_t *)lm_alias((char *)rel + *rel);
-+
-+		/* Read the kimg VA value at the relocation address. */
-+		kimg_va = *ptr;
-+
-+		/* Convert to hyp VA and store back to the relocation address. */
-+		*ptr = __early_kern_hyp_va((uintptr_t)lm_alias(kimg_va));
-+	}
-+}
-+
- static u32 compute_instruction(int n, u32 rd, u32 rn)
+-void kvm_update_kimg_phys_offset(struct alt_instr *alt,
+-				 __le32 *origptr, __le32 *updptr, int nr_inst)
+-{
+-	generate_mov_q(kimage_voffset + PHYS_OFFSET, origptr, updptr, nr_inst);
+-}
+-
+ void kvm_get_kimage_voffset(struct alt_instr *alt,
+ 			    __le32 *origptr, __le32 *updptr, int nr_inst)
  {
- 	u32 insn = AARCH64_BREAK_FAULT;
 -- 
 2.29.2.729.g45daf8777d-goog
 
