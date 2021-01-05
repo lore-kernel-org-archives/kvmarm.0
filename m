@@ -2,87 +2,82 @@ Return-Path: <SRS0=np2t=GI=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86B31C433DB
-	for <kvmarm@archiver.kernel.org>; Tue,  5 Jan 2021 18:06:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B83CC433E0
+	for <kvmarm@archiver.kernel.org>; Tue,  5 Jan 2021 20:35:54 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1BC9622CF7
-	for <kvmarm@archiver.kernel.org>; Tue,  5 Jan 2021 18:06:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BC9622CF7
+	by mail.kernel.org (Postfix) with ESMTP id B604322D73
+	for <kvmarm@archiver.kernel.org>; Tue,  5 Jan 2021 20:35:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B604322D73
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AE4064B383;
-	Tue,  5 Jan 2021 13:06:14 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 184ED4B23A;
+	Tue,  5 Jan 2021 15:35:53 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id dJ4MX4DvpXAl; Tue,  5 Jan 2021 13:06:13 -0500 (EST)
+	with ESMTP id b3rPB-X2dsM0; Tue,  5 Jan 2021 15:35:51 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EF5C4B369;
-	Tue,  5 Jan 2021 13:06:13 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B7DA04B234;
+	Tue,  5 Jan 2021 15:35:51 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E90694B38B
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jan 2021 13:06:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 045DB4B225
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jan 2021 15:35:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qcB6MmcsP751 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  5 Jan 2021 13:06:10 -0500 (EST)
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com
- [209.85.128.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AF9B34B392
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jan 2021 13:06:10 -0500 (EST)
-Received: by mail-wm1-f45.google.com with SMTP id a6so372544wmc.2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 05 Jan 2021 10:06:10 -0800 (PST)
+ with ESMTP id 0Ti6FJGXRz0Z for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  5 Jan 2021 15:35:49 -0500 (EST)
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com
+ [209.85.167.54])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8F8F14B1ED
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jan 2021 15:35:49 -0500 (EST)
+Received: by mail-lf1-f54.google.com with SMTP id b26so1490741lff.9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 05 Jan 2021 12:35:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=Gbp0yeP9fLTV4dr+t+2KX9FiCtVVsbkdYRtcsAjBIrU=;
- b=jFQIQrL34kPIQiwDILOVev4AaFi3ZoNyBOA8xZ6iS62BqlqSP7dEc+U5DcuueL5AZY
- yms3fpksZn+wuTcHbIA6fAydqmWnIy6wQhjzueC1z9F2cSvxNRkbK6Bfm49JBV/+CSxy
- f8uJYUJBM70p/Ehv4N2VR2lMw3RQWDHnZBNJ5bk9Kb3vjEfyL9DWHUjOedWgEasHZnm7
- 3hFhQehbUkyMB4YiRZO+AzqUb8zKtnU8W93R5RjuTCvMB7G68FdA1oQQ+m4nJYt7vZvR
- rHJtRZJOaJR3iu30iN/W1uhb9mboTBcscGAA5bxlqXoSl6XfH2+T3TYVAtHp7W+aiA4p
- OU1g==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=4VscyJYhiGIcTTrQBOeiyNR46ULLgAygeEpUjanGCfo=;
+ b=EcoR9tcQuqCugODFjv55EWqPY5iHhhMg/M7xKz8G9sXAOSq/MNvWaUdBoFUpil/HMO
+ v5wLQhGVMWBj5Ksg5wI5tg+JlxrJVaD8DwsOcPp+a8kmDoDfYv0GFCBdIlauEOR05SEc
+ ixIg0SWZhjI2MPCja8NoalnTeJpCRqlXHyivhmy/AB69NYE/SeiyfBhmZI26Tq35U64E
+ qjlNBulAIdWcOJVN/3NcmDn8YMnVQPI4Jax5l67tQd4E+70J11gxQ13wPrYc1FyVw38i
+ kBuDcjjYGTAPr15mhL+J7XsqdD0ce8LNO+UaEDNSGinhGNLqib71dQf6/FIw3jaGmaIV
+ /PRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=Gbp0yeP9fLTV4dr+t+2KX9FiCtVVsbkdYRtcsAjBIrU=;
- b=RntwIS1APBhg6fZOcyzPwNr2AH8uWbDG//0Qyv2XxxZtG8uUbEJT9soWW8OCDQdVbx
- W2+aqZ5PayPjhHmGzBq78NmC5OsIYU2rgblW/NAQJrz+ggKMgWK+kP3vY/hQjMAEzbBQ
- 6hSHwSmEfiIzddHPeTf+8XVpycPmdSbE8UAfm/+FcBzZpkLYlMEw0vPwW3JKVnRnyWeV
- iTiYkBVkyeZvnuckz8WcEVq0vb4uzydG6zTjMDYJGhWwjVMdL9Uvxkf8VMO24ua9mHw2
- fl0nEkwtDwvch5XKbgrO/CQrTaRdZHAz/FWjV8zjAKneGgHyoWC3j14bKNg/nLXvJx/S
- PD9w==
-X-Gm-Message-State: AOAM532zQ4JMv16h5pj+z6i+9cdTpmklCrKLKTsmZaDv2IYigCV5gAiy
- XIZp7Of6pc9XE7AVs7tgOiVQ77LRse+OUw==
-X-Google-Smtp-Source: ABdhPJzPGG9RBoyhJQLzttz8EAAC11owesE8rsq+vvvfbhxoYZs+I3UtJZieKVfwRoMz686oJu0KDw==
-X-Received: by 2002:a1c:7d58:: with SMTP id y85mr347623wmc.50.1609869969348;
- Tue, 05 Jan 2021 10:06:09 -0800 (PST)
-Received: from localhost ([2a01:4b00:8523:2d03:4957:71a5:7b5c:c94f])
- by smtp.gmail.com with ESMTPSA id l5sm658028wrv.44.2021.01.05.10.06.08
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 05 Jan 2021 10:06:08 -0800 (PST)
-From: David Brazdil <dbrazdil@google.com>
-To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v2 8/8] KVM: arm64: Remove hyp_symbol_addr
-Date: Tue,  5 Jan 2021 18:05:41 +0000
-Message-Id: <20210105180541.65031-9-dbrazdil@google.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20210105180541.65031-1-dbrazdil@google.com>
-References: <20210105180541.65031-1-dbrazdil@google.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=4VscyJYhiGIcTTrQBOeiyNR46ULLgAygeEpUjanGCfo=;
+ b=CYof/dMjfpIlNaRHzEPrt+xfoJgB35w/BCQYI8SW2RCyzWQGDkIlMSu/9uKcXZb9Lt
+ yXcdIkFAIz8a6TD+Wf+DetmDojUyr/gQSH3rSijEfr0U5oBzN7YVJuUhZtDMUSZiJ8Gi
+ 6+CpVIeCPgin0K8jEOXlUAUU1mzJO5UkVyxiqj2OJnzSlv4EB5P4jU0pTGruhIR/8fF6
+ 0QNMmZl+WVr+xAvbrRpr1Aom2IRHpeRWWsSGsN9liFUNOCfs9Bmy1siFAFF0KlGMWXqg
+ jipaVsmVutEbQ1IMsZ9zUYGM/FAudx8wJQvZ/6SQqZ4KYdnnBN6QbQ2TTYrStUHK/WJH
+ cIYw==
+X-Gm-Message-State: AOAM530rAUJWpiS7MRRbT2neNH6lKb9qNYRPqqCrIOHuT3PNxlP3Batu
+ LI2M/Eiy8gt7KJZpQA/PJg5ycfiEErKjEdZaDu2X8w==
+X-Google-Smtp-Source: ABdhPJzGF53jyYGA4ZUDiq/DyD8gsuVAzj4pKkpUmGFm0+lS55LundcofDfx94era8LH6n//MCzQhmYbQWFtY7IL51k=
+X-Received: by 2002:a2e:b1d4:: with SMTP id e20mr580773lja.304.1609878947905; 
+ Tue, 05 Jan 2021 12:35:47 -0800 (PST)
 MIME-Version: 1.0
-Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>
+References: <20210104135011.2063104-1-maz@kernel.org>
+ <20210104135011.2063104-5-maz@kernel.org>
+In-Reply-To: <20210104135011.2063104-5-maz@kernel.org>
+From: Jing Zhang <jingzhangos@google.com>
+Date: Tue, 5 Jan 2021 14:35:35 -0600
+Message-ID: <CAAdAUtiYe9Y6o2QLD_y94y-nVJM8ZquV-_ZETNSzc_u+rKM0-w@mail.gmail.com>
+Subject: Re: [PATCH v2 04/17] arm64: Provide an 'upgrade to VHE' stub hypercall
+To: Marc Zyngier <maz@kernel.org>
+Cc: kernel-team@android.com, Catalin Marinas <catalin.marinas@arm.com>,
+ Ard Biesheuvel <ardb@kernel.org>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -99,184 +94,151 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hyp code used the hyp_symbol_addr helper to force PC-relative addressing
-because absolute addressing results in kernel VAs due to the way hyp
-code is linked. This is not true anymore, so remove the helper and
-update all of its users.
-
-Acked-by: Ard Biesheuvel <ardb@kernel.org>
-Signed-off-by: David Brazdil <dbrazdil@google.com>
----
- arch/arm64/include/asm/kvm_asm.h         | 26 ------------------------
- arch/arm64/kvm/hyp/include/hyp/switch.h  |  4 ++--
- arch/arm64/kvm/hyp/nvhe/hyp-smp.c        |  4 ++--
- arch/arm64/kvm/hyp/nvhe/psci-relay.c     | 24 +++++++++++-----------
- arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c |  2 +-
- 5 files changed, 17 insertions(+), 43 deletions(-)
-
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 8a33d83ea843..22d933e9b59e 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -199,32 +199,6 @@ extern void __vgic_v3_init_lrs(void);
- 
- extern u32 __kvm_get_mdcr_el2(void);
- 
--#if defined(GCC_VERSION) && GCC_VERSION < 50000
--#define SYM_CONSTRAINT	"i"
--#else
--#define SYM_CONSTRAINT	"S"
--#endif
--
--/*
-- * Obtain the PC-relative address of a kernel symbol
-- * s: symbol
-- *
-- * The goal of this macro is to return a symbol's address based on a
-- * PC-relative computation, as opposed to a loading the VA from a
-- * constant pool or something similar. This works well for HYP, as an
-- * absolute VA is guaranteed to be wrong. Only use this if trying to
-- * obtain the address of a symbol (i.e. not something you obtained by
-- * following a pointer).
-- */
--#define hyp_symbol_addr(s)						\
--	({								\
--		typeof(s) *addr;					\
--		asm("adrp	%0, %1\n"				\
--		    "add	%0, %0, :lo12:%1\n"			\
--		    : "=r" (addr) : SYM_CONSTRAINT (&s));		\
--		addr;							\
--	})
--
- #define __KVM_EXTABLE(from, to)						\
- 	"	.pushsection	__kvm_ex_table, \"a\"\n"		\
- 	"	.align		3\n"					\
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 84473574c2e7..54f4860cd87c 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -505,8 +505,8 @@ static inline void __kvm_unexpected_el2_exception(void)
- 	struct exception_table_entry *entry, *end;
- 	unsigned long elr_el2 = read_sysreg(elr_el2);
- 
--	entry = hyp_symbol_addr(__start___kvm_ex_table);
--	end = hyp_symbol_addr(__stop___kvm_ex_table);
-+	entry = &__start___kvm_ex_table;
-+	end = &__stop___kvm_ex_table;
- 
- 	while (entry < end) {
- 		addr = (unsigned long)&entry->insn + entry->insn;
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-smp.c b/arch/arm64/kvm/hyp/nvhe/hyp-smp.c
-index 2997aa156d8e..879559057dee 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-smp.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-smp.c
-@@ -33,8 +33,8 @@ unsigned long __hyp_per_cpu_offset(unsigned int cpu)
- 	if (cpu >= ARRAY_SIZE(kvm_arm_hyp_percpu_base))
- 		hyp_panic();
- 
--	cpu_base_array = (unsigned long *)hyp_symbol_addr(kvm_arm_hyp_percpu_base);
-+	cpu_base_array = (unsigned long *)&kvm_arm_hyp_percpu_base;
- 	this_cpu_base = kern_hyp_va(cpu_base_array[cpu]);
--	elf_base = (unsigned long)hyp_symbol_addr(__per_cpu_start);
-+	elf_base = (unsigned long)&__per_cpu_start;
- 	return this_cpu_base - elf_base;
- }
-diff --git a/arch/arm64/kvm/hyp/nvhe/psci-relay.c b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-index e3947846ffcb..f254a425cb3a 100644
---- a/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-+++ b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-@@ -134,8 +134,8 @@ static int psci_cpu_on(u64 func_id, struct kvm_cpu_context *host_ctxt)
- 	if (cpu_id == INVALID_CPU_ID)
- 		return PSCI_RET_INVALID_PARAMS;
- 
--	boot_args = per_cpu_ptr(hyp_symbol_addr(cpu_on_args), cpu_id);
--	init_params = per_cpu_ptr(hyp_symbol_addr(kvm_init_params), cpu_id);
-+	boot_args = per_cpu_ptr(&cpu_on_args, cpu_id);
-+	init_params = per_cpu_ptr(&kvm_init_params, cpu_id);
- 
- 	/* Check if the target CPU is already being booted. */
- 	if (!try_acquire_boot_args(boot_args))
-@@ -146,7 +146,7 @@ static int psci_cpu_on(u64 func_id, struct kvm_cpu_context *host_ctxt)
- 	wmb();
- 
- 	ret = psci_call(func_id, mpidr,
--			__hyp_pa(hyp_symbol_addr(kvm_hyp_cpu_entry)),
-+			__hyp_pa(&kvm_hyp_cpu_entry),
- 			__hyp_pa(init_params));
- 
- 	/* If successful, the lock will be released by the target CPU. */
-@@ -165,8 +165,8 @@ static int psci_cpu_suspend(u64 func_id, struct kvm_cpu_context *host_ctxt)
- 	struct psci_boot_args *boot_args;
- 	struct kvm_nvhe_init_params *init_params;
- 
--	boot_args = this_cpu_ptr(hyp_symbol_addr(suspend_args));
--	init_params = this_cpu_ptr(hyp_symbol_addr(kvm_init_params));
-+	boot_args = this_cpu_ptr(&suspend_args);
-+	init_params = this_cpu_ptr(&kvm_init_params);
- 
- 	/*
- 	 * No need to acquire a lock before writing to boot_args because a core
-@@ -180,7 +180,7 @@ static int psci_cpu_suspend(u64 func_id, struct kvm_cpu_context *host_ctxt)
- 	 * point if it is a deep sleep state.
- 	 */
- 	return psci_call(func_id, power_state,
--			 __hyp_pa(hyp_symbol_addr(kvm_hyp_cpu_resume)),
-+			 __hyp_pa(&kvm_hyp_cpu_resume),
- 			 __hyp_pa(init_params));
- }
- 
-@@ -192,8 +192,8 @@ static int psci_system_suspend(u64 func_id, struct kvm_cpu_context *host_ctxt)
- 	struct psci_boot_args *boot_args;
- 	struct kvm_nvhe_init_params *init_params;
- 
--	boot_args = this_cpu_ptr(hyp_symbol_addr(suspend_args));
--	init_params = this_cpu_ptr(hyp_symbol_addr(kvm_init_params));
-+	boot_args = this_cpu_ptr(&suspend_args);
-+	init_params = this_cpu_ptr(&kvm_init_params);
- 
- 	/*
- 	 * No need to acquire a lock before writing to boot_args because a core
-@@ -204,7 +204,7 @@ static int psci_system_suspend(u64 func_id, struct kvm_cpu_context *host_ctxt)
- 
- 	/* Will only return on error. */
- 	return psci_call(func_id,
--			 __hyp_pa(hyp_symbol_addr(kvm_hyp_cpu_resume)),
-+			 __hyp_pa(&kvm_hyp_cpu_resume),
- 			 __hyp_pa(init_params), 0);
- }
- 
-@@ -213,12 +213,12 @@ asmlinkage void __noreturn kvm_host_psci_cpu_entry(bool is_cpu_on)
- 	struct psci_boot_args *boot_args;
- 	struct kvm_cpu_context *host_ctxt;
- 
--	host_ctxt = &this_cpu_ptr(hyp_symbol_addr(kvm_host_data))->host_ctxt;
-+	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
- 
- 	if (is_cpu_on)
--		boot_args = this_cpu_ptr(hyp_symbol_addr(cpu_on_args));
-+		boot_args = this_cpu_ptr(&cpu_on_args);
- 	else
--		boot_args = this_cpu_ptr(hyp_symbol_addr(suspend_args));
-+		boot_args = this_cpu_ptr(&suspend_args);
- 
- 	cpu_reg(host_ctxt, 0) = boot_args->r0;
- 	write_sysreg_el2(boot_args->pc, SYS_ELR);
-diff --git a/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c b/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
-index 8f0585640241..87a54375bd6e 100644
---- a/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
-+++ b/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
-@@ -64,7 +64,7 @@ int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu)
- 	}
- 
- 	rd = kvm_vcpu_dabt_get_rd(vcpu);
--	addr  = hyp_symbol_addr(kvm_vgic_global_state)->vcpu_hyp_va;
-+	addr  = kvm_vgic_global_state.vcpu_hyp_va;
- 	addr += fault_ipa - vgic->vgic_cpu_base;
- 
- 	if (kvm_vcpu_dabt_iswrite(vcpu)) {
--- 
-2.29.2.729.g45daf8777d-goog
-
+On Mon, Jan 4, 2021 at 7:50 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> As we are about to change the way a VHE system boots, let's
+> provide the core helper, in the form of a stub hypercall that
+> enables VHE and replicates the full EL1 context at EL2, thanks
+> to EL1 and VHE-EL2 being extremely similar.
+>
+> On exception return, the kernel carries on at EL2. Fancy!
+>
+> Nothing calls this new hypercall yet, so no functional change.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/virt.h |  7 +++-
+>  arch/arm64/kernel/hyp-stub.S  | 70 ++++++++++++++++++++++++++++++++++-
+>  2 files changed, 74 insertions(+), 3 deletions(-)
+>
+> diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
+> index ee6a48df89d9..7379f35ae2c6 100644
+> --- a/arch/arm64/include/asm/virt.h
+> +++ b/arch/arm64/include/asm/virt.h
+> @@ -35,8 +35,13 @@
+>   */
+>  #define HVC_RESET_VECTORS 2
+>
+> +/*
+> + * HVC_VHE_RESTART - Upgrade the CPU from EL1 to EL2, if possible
+> + */
+> +#define HVC_VHE_RESTART        3
+> +
+>  /* Max number of HYP stub hypercalls */
+> -#define HVC_STUB_HCALL_NR 3
+> +#define HVC_STUB_HCALL_NR 4
+>
+>  /* Error returned when an invalid stub number is passed into x0 */
+>  #define HVC_STUB_ERR   0xbadca11
+> diff --git a/arch/arm64/kernel/hyp-stub.S b/arch/arm64/kernel/hyp-stub.S
+> index 160f5881a0b7..6ffdc1f7778b 100644
+> --- a/arch/arm64/kernel/hyp-stub.S
+> +++ b/arch/arm64/kernel/hyp-stub.S
+> @@ -8,9 +8,9 @@
+>
+>  #include <linux/init.h>
+>  #include <linux/linkage.h>
+> -#include <linux/irqchip/arm-gic-v3.h>
+>
+>  #include <asm/assembler.h>
+> +#include <asm/el2_setup.h>
+>  #include <asm/kvm_arm.h>
+>  #include <asm/kvm_asm.h>
+>  #include <asm/ptrace.h>
+> @@ -47,10 +47,16 @@ SYM_CODE_END(__hyp_stub_vectors)
+>
+>  SYM_CODE_START_LOCAL(el1_sync)
+>         cmp     x0, #HVC_SET_VECTORS
+> -       b.ne    2f
+> +       b.ne    1f
+>         msr     vbar_el2, x1
+>         b       9f
+>
+> +1:     cmp     x0, #HVC_VHE_RESTART
+> +       b.ne    2f
+> +       mov     x0, #HVC_SOFT_RESTART
+> +       adr     x1, mutate_to_vhe
+> +       // fall through...
+Does "br x1" work here instead of falling through into
+HVC_SOFT_RESTART? Just curious about the reason for falling-through.
+> +
+>  2:     cmp     x0, #HVC_SOFT_RESTART
+>         b.ne    3f
+>         mov     x0, x2
+> @@ -70,6 +76,66 @@ SYM_CODE_START_LOCAL(el1_sync)
+>         eret
+>  SYM_CODE_END(el1_sync)
+>
+> +// nVHE? No way! Give me the real thing!
+> +SYM_CODE_START_LOCAL(mutate_to_vhe)
+> +       // Sanity check: MMU *must* be off
+> +       mrs     x0, sctlr_el2
+> +       tbnz    x0, #0, 1f
+> +
+> +       // Needs to be VHE capable, obviously
+> +       mrs     x0, id_aa64mmfr1_el1
+> +       ubfx    x0, x0, #ID_AA64MMFR1_VHE_SHIFT, #4
+> +       cbz     x0, 1f
+> +
+> +       // Engage the VHE magic!
+> +       mov_q   x0, HCR_HOST_VHE_FLAGS
+> +       msr     hcr_el2, x0
+> +       isb
+> +
+> +       // Doesn't do much on VHE, but still, worth a shot
+> +       init_el2_state vhe
+> +
+> +       // Use the EL1 allocated stack, per-cpu offset
+> +       mrs     x0, sp_el1
+> +       mov     sp, x0
+> +       mrs     x0, tpidr_el1
+> +       msr     tpidr_el2, x0
+> +
+> +       // FP configuration, vectors
+> +       mrs_s   x0, SYS_CPACR_EL12
+> +       msr     cpacr_el1, x0
+> +       mrs_s   x0, SYS_VBAR_EL12
+> +       msr     vbar_el1, x0
+> +
+> +       // Transfert the MM state from EL1 to EL2
+> +       mrs_s   x0, SYS_TCR_EL12
+> +       msr     tcr_el1, x0
+> +       mrs_s   x0, SYS_TTBR0_EL12
+> +       msr     ttbr0_el1, x0
+> +       mrs_s   x0, SYS_TTBR1_EL12
+> +       msr     ttbr1_el1, x0
+> +       mrs_s   x0, SYS_MAIR_EL12
+> +       msr     mair_el1, x0
+> +       isb
+> +
+> +       // Invalidate TLBs before enabling the MMU
+> +       tlbi    vmalle1
+> +       dsb     nsh
+> +
+> +       // Enable the EL2 S1 MMU, as set up from EL1
+> +       mrs_s   x0, SYS_SCTLR_EL12
+> +       set_sctlr_el1   x0
+> +
+> +       // Hack the exception return to stay at EL2
+> +       mrs     x0, spsr_el1
+> +       and     x0, x0, #~PSR_MODE_MASK
+> +       mov     x1, #PSR_MODE_EL2h
+> +       orr     x0, x0, x1
+> +       msr     spsr_el1, x0
+> +
+> +1:     eret
+> +SYM_CODE_END(mutate_to_vhe)
+> +
+>  .macro invalid_vector  label
+>  SYM_CODE_START_LOCAL(\label)
+>         b \label
+> --
+> 2.29.2
+>
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
