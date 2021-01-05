@@ -2,71 +2,81 @@ Return-Path: <SRS0=np2t=GI=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89262C433E0
-	for <kvmarm@archiver.kernel.org>; Tue,  5 Jan 2021 21:03:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C39BC43381
+	for <kvmarm@archiver.kernel.org>; Tue,  5 Jan 2021 22:42:25 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 097CD22D71
-	for <kvmarm@archiver.kernel.org>; Tue,  5 Jan 2021 21:03:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 097CD22D71
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 877B0230F9
+	for <kvmarm@archiver.kernel.org>; Tue,  5 Jan 2021 22:42:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 877B0230F9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 582B44B172;
-	Tue,  5 Jan 2021 16:03:47 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C8F8A4B27B;
+	Tue,  5 Jan 2021 17:42:23 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id AMcbPRVBQiF8; Tue,  5 Jan 2021 16:03:44 -0500 (EST)
+	with ESMTP id oVG-y7B3qjxW; Tue,  5 Jan 2021 17:42:22 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AF79D4B20C;
-	Tue,  5 Jan 2021 16:03:44 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C29EF4B275;
+	Tue,  5 Jan 2021 17:42:22 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 743A04B1D5
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jan 2021 16:03:43 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8799B4B275
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jan 2021 17:42:21 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JfLK8LSqssKu for <kvmarm@lists.cs.columbia.edu>;
- Tue,  5 Jan 2021 16:03:42 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 33BC74B172
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jan 2021 16:03:42 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id F41F722D5A;
- Tue,  5 Jan 2021 21:03:40 +0000 (UTC)
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=wait-a-minute.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
- (envelope-from <maz@kernel.org>)
- id 1kwtUQ-005Voo-Pe; Tue, 05 Jan 2021 21:03:39 +0000
-Date: Tue, 05 Jan 2021 21:03:37 +0000
-Message-ID: <87zh1njdue.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH v2 04/17] arm64: Provide an 'upgrade to VHE' stub hypercall
-In-Reply-To: <CAAdAUtiYe9Y6o2QLD_y94y-nVJM8ZquV-_ZETNSzc_u+rKM0-w@mail.gmail.com>
+ with ESMTP id uSEocoBwsQkd for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  5 Jan 2021 17:42:20 -0500 (EST)
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com
+ [209.85.167.48])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 13ECD4B274
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jan 2021 17:42:20 -0500 (EST)
+Received: by mail-lf1-f48.google.com with SMTP id s26so2229284lfc.8
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 05 Jan 2021 14:42:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=8K2dvcU71/pwC4jHD+/NcfPpaQp8N4YqmX2cYFswaOA=;
+ b=kK3zWPXdyTwPn82VV/feVszy0Lq50DMsPDdgRgcF1Wpq77EkMrDzcqnOXz/0nzGRfO
+ x0IFp2wggLCsQrWnb8SRTsX/Vrx8VkIgg/Ylb1NZqnwdVr9WHwaQbPmpAkcqGa/PS/t7
+ DCXi8Vf8l7bPZvFad4etuPwapVD45Yol+IDO0cfMQx/Zl5Lxy3ze3u3CvIZDHn0Q1VLY
+ GiwREZwRmuEeL0eVTvqGxHKWTH+wnX8vR+BTG6Kv3fHV08fnBnndvUv+z/rvmDhJElcT
+ PxJWTWY5XTMmat5xasDU6rV96z68nXhRmZq0rumnZsRhv2OnnoohBdvLU1YPi5oYoWah
+ GMEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=8K2dvcU71/pwC4jHD+/NcfPpaQp8N4YqmX2cYFswaOA=;
+ b=MzPbnNjIWUsY+RO46cZYzYvTRiQSPNsJpcMnCQ6FJodr9IjwBNzzbRkyeRsll0c3cf
+ dBXzeQ74vHs4PdHl+Yj4kPRc0/Ssbp/Nol5vYhubtJ+SzLupYmBJBXv5dksYRu+R0z7j
+ 1nbANc6v1y/4MkZgCKxAa0Pq8zxqMbgWxmdKyehWjvkzdMRln0HLRWSFOE21PWjIUjlZ
+ ch3uWCPv67C8WyczaXICe1z4VrLd5zwX7P2eQJ0Rw/Dcp0EUVDyhkKjQXwO6a5TU0Ab6
+ GGI52E/i7QG12PvsLeuoQE/WAHC6PsyQ7a0hdkLNhIh9WhMUuLH+JCNOCzAS4COWJjm1
+ 2Qhg==
+X-Gm-Message-State: AOAM533c6D11CMFPnJn4/gs4xaZBktVfgTauemDs6qfG4XxPufwkfYNH
+ s5Bzryy9zshDj1lHPdVQMsdGz1Bjt0slwz7SSiRfmQ==
+X-Google-Smtp-Source: ABdhPJxl91pFKLGKMJ2qJbq7uSrwslFYWBBcYxhh8yfs4emkwQTnkNoJxxJHYBFyu7OqqnU/vlBUeb6vbAfah5W7RYI=
+X-Received: by 2002:a05:651c:48b:: with SMTP id
+ s11mr759044ljc.28.1609886538340; 
+ Tue, 05 Jan 2021 14:42:18 -0800 (PST)
+MIME-Version: 1.0
 References: <20210104135011.2063104-1-maz@kernel.org>
- <20210104135011.2063104-5-maz@kernel.org>
- <CAAdAUtiYe9Y6o2QLD_y94y-nVJM8ZquV-_ZETNSzc_u+rKM0-w@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: jingzhangos@google.com, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kernel-team@android.com, catalin.marinas@arm.com,
- will@kernel.org, ardb@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+ <20210104135011.2063104-13-maz@kernel.org>
+In-Reply-To: <20210104135011.2063104-13-maz@kernel.org>
+From: Jing Zhang <jingzhangos@google.com>
+Date: Tue, 5 Jan 2021 16:42:06 -0600
+Message-ID: <CAAdAUtgdNyfq6wYi5mw4yBHKZ7UeSHdERxS=GYJFj=rBF0ZEDQ@mail.gmail.com>
+Subject: Re: [PATCH v2 12/17] arm64: Allow ID_AA64MMFR1_EL1.VH to be
+ overridden from the command line
+To: Marc Zyngier <maz@kernel.org>
 Cc: kernel-team@android.com, Catalin Marinas <catalin.marinas@arm.com>,
  Ard Biesheuvel <ardb@kernel.org>, Will Deacon <will@kernel.org>,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
@@ -86,93 +96,97 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 05 Jan 2021 20:35:35 +0000,
-Jing Zhang <jingzhangos@google.com> wrote:
-> 
-> On Mon, Jan 4, 2021 at 7:50 AM Marc Zyngier <maz@kernel.org> wrote:
-> >
-> > As we are about to change the way a VHE system boots, let's
-> > provide the core helper, in the form of a stub hypercall that
-> > enables VHE and replicates the full EL1 context at EL2, thanks
-> > to EL1 and VHE-EL2 being extremely similar.
-> >
-> > On exception return, the kernel carries on at EL2. Fancy!
-> >
-> > Nothing calls this new hypercall yet, so no functional change.
-> >
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/virt.h |  7 +++-
-> >  arch/arm64/kernel/hyp-stub.S  | 70 ++++++++++++++++++++++++++++++++++-
-> >  2 files changed, 74 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
-> > index ee6a48df89d9..7379f35ae2c6 100644
-> > --- a/arch/arm64/include/asm/virt.h
-> > +++ b/arch/arm64/include/asm/virt.h
-> > @@ -35,8 +35,13 @@
-> >   */
-> >  #define HVC_RESET_VECTORS 2
-> >
-> > +/*
-> > + * HVC_VHE_RESTART - Upgrade the CPU from EL1 to EL2, if possible
-> > + */
-> > +#define HVC_VHE_RESTART        3
-> > +
-> >  /* Max number of HYP stub hypercalls */
-> > -#define HVC_STUB_HCALL_NR 3
-> > +#define HVC_STUB_HCALL_NR 4
-> >
-> >  /* Error returned when an invalid stub number is passed into x0 */
-> >  #define HVC_STUB_ERR   0xbadca11
-> > diff --git a/arch/arm64/kernel/hyp-stub.S b/arch/arm64/kernel/hyp-stub.S
-> > index 160f5881a0b7..6ffdc1f7778b 100644
-> > --- a/arch/arm64/kernel/hyp-stub.S
-> > +++ b/arch/arm64/kernel/hyp-stub.S
-> > @@ -8,9 +8,9 @@
-> >
-> >  #include <linux/init.h>
-> >  #include <linux/linkage.h>
-> > -#include <linux/irqchip/arm-gic-v3.h>
-> >
-> >  #include <asm/assembler.h>
-> > +#include <asm/el2_setup.h>
-> >  #include <asm/kvm_arm.h>
-> >  #include <asm/kvm_asm.h>
-> >  #include <asm/ptrace.h>
-> > @@ -47,10 +47,16 @@ SYM_CODE_END(__hyp_stub_vectors)
-> >
-> >  SYM_CODE_START_LOCAL(el1_sync)
-> >         cmp     x0, #HVC_SET_VECTORS
-> > -       b.ne    2f
-> > +       b.ne    1f
-> >         msr     vbar_el2, x1
-> >         b       9f
-> >
-> > +1:     cmp     x0, #HVC_VHE_RESTART
-> > +       b.ne    2f
-> > +       mov     x0, #HVC_SOFT_RESTART
-> > +       adr     x1, mutate_to_vhe
-> > +       // fall through...
-> Does "br x1" work here instead of falling through into
-> HVC_SOFT_RESTART? Just curious about the reason for falling-through.
-
-Absolutely.
-
-This is the leftover from an initial (and pretty over-engineered)
-approach where the caller was using HVC_SOFT_RESTART with the address
-of mutate_to_vhe passed as the target. It was an interesting idea, but
-obtaining the PA for the function ended when the MMU is on created a
-separate, harder to maintain path.
-
-Cleanup time, I guess.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+On Mon, Jan 4, 2021 at 8:20 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> As we want to be able to disable VHE at runtime, let's match
+> "id_aa64mmfr1.vh=" from the command line as an override.
+> This doesn't have much effect yet as out boot code doesn't look
+Typo: out -> our
+> at the cpufeature, but only at the HW registers.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/cpufeature.h |  3 +++
+>  arch/arm64/kernel/cpufeature.c      |  6 +++++-
+>  arch/arm64/kernel/idreg-override.c  | 12 ++++++++++++
+>  3 files changed, 20 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+> index 465d2cb63bfc..ef9487dfadca 100644
+> --- a/arch/arm64/include/asm/cpufeature.h
+> +++ b/arch/arm64/include/asm/cpufeature.h
+> @@ -813,6 +813,9 @@ static inline unsigned int get_vmid_bits(u64 mmfr1)
+>         return 8;
+>  }
+>
+> +extern u64 id_aa64mmfr1_val;
+> +extern u64 id_aa64mmfr1_mask;
+> +
+>  u32 get_kvm_ipa_limit(void);
+>  void dump_cpu_features(void);
+>
+> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> index 2dbfc0096b0d..623a74090c9e 100644
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@ -555,6 +555,9 @@ static const struct arm64_ftr_bits ftr_raz[] = {
+>
+>  #define ARM64_FTR_REG(id, table) ARM64_FTR_REG_OVERRIDE(id, table, NULL, NULL)
+>
+> +u64 id_aa64mmfr1_val;
+> +u64 id_aa64mmfr1_mask;
+> +
+>  static const struct __ftr_reg_entry {
+>         u32                     sys_id;
+>         struct arm64_ftr_reg    *reg;
+> @@ -602,7 +605,8 @@ static const struct __ftr_reg_entry {
+>
+>         /* Op1 = 0, CRn = 0, CRm = 7 */
+>         ARM64_FTR_REG(SYS_ID_AA64MMFR0_EL1, ftr_id_aa64mmfr0),
+> -       ARM64_FTR_REG(SYS_ID_AA64MMFR1_EL1, ftr_id_aa64mmfr1),
+> +       ARM64_FTR_REG_OVERRIDE(SYS_ID_AA64MMFR1_EL1, ftr_id_aa64mmfr1,
+> +                              &id_aa64mmfr1_val, &id_aa64mmfr1_mask),
+>         ARM64_FTR_REG(SYS_ID_AA64MMFR2_EL1, ftr_id_aa64mmfr2),
+>
+>         /* Op1 = 0, CRn = 1, CRm = 2 */
+> diff --git a/arch/arm64/kernel/idreg-override.c b/arch/arm64/kernel/idreg-override.c
+> index 392f93b67103..75d9845f489b 100644
+> --- a/arch/arm64/kernel/idreg-override.c
+> +++ b/arch/arm64/kernel/idreg-override.c
+> @@ -10,6 +10,7 @@
+>  #include <linux/libfdt.h>
+>
+>  #include <asm/cacheflush.h>
+> +#include <asm/cpufeature.h>
+>  #include <asm/setup.h>
+>
+>  struct reg_desc {
+> @@ -22,7 +23,18 @@ struct reg_desc {
+>         }                       fields[];
+>  };
+>
+> +static const struct reg_desc mmfr1 __initdata = {
+> +       .name           = "id_aa64mmfr1",
+> +       .val            = &id_aa64mmfr1_val,
+> +       .mask           = &id_aa64mmfr1_mask,
+> +       .fields         = {
+> +               { "vh", ID_AA64MMFR1_VHE_SHIFT },
+> +               {}
+> +       },
+> +};
+> +
+>  static const struct reg_desc * const regs[] __initdata = {
+> +       &mmfr1,
+>  };
+>
+>  static int __init find_field(const char *cmdline, const struct reg_desc *reg,
+> --
+> 2.29.2
+>
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
