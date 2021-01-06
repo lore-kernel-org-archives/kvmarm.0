@@ -2,60 +2,70 @@ Return-Path: <SRS0=pXP7=GJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2867C433E0
-	for <kvmarm@archiver.kernel.org>; Wed,  6 Jan 2021 10:35:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B9D1C433DB
+	for <kvmarm@archiver.kernel.org>; Wed,  6 Jan 2021 13:11:11 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 53C212310E
-	for <kvmarm@archiver.kernel.org>; Wed,  6 Jan 2021 10:35:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53C212310E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id DF05723100
+	for <kvmarm@archiver.kernel.org>; Wed,  6 Jan 2021 13:11:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF05723100
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EC7E44B358;
-	Wed,  6 Jan 2021 05:35:16 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 531544B35B;
+	Wed,  6 Jan 2021 08:11:10 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9yJRu31XijVh; Wed,  6 Jan 2021 05:35:15 -0500 (EST)
+	with ESMTP id ipuc8ZBfDS1t; Wed,  6 Jan 2021 08:11:09 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B5B9A4B349;
-	Wed,  6 Jan 2021 05:35:15 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F8BF4B32B;
+	Wed,  6 Jan 2021 08:11:09 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ADBA94B34D
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Jan 2021 05:35:14 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D4EEB4B32B
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Jan 2021 08:11:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OGhuAeO7RmJj for <kvmarm@lists.cs.columbia.edu>;
- Wed,  6 Jan 2021 05:35:13 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 911214B365
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Jan 2021 05:35:12 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 46D9A11B3;
- Wed,  6 Jan 2021 02:35:12 -0800 (PST)
-Received: from donnerap.arm.com (donnerap.cambridge.arm.com [10.1.195.35])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 67CBC3F719;
- Wed,  6 Jan 2021 02:35:10 -0800 (PST)
-From: Andre Przywara <andre.przywara@arm.com>
-To: Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- Ard Biesheuvel <ardb@kernel.org>, Russell King <linux@armlinux.org.uk>,
- Marc Zyngier <maz@kernel.org>
-Subject: [PATCH v6 5/5] KVM: arm64: implement the TRNG hypervisor call
-Date: Wed,  6 Jan 2021 10:34:53 +0000
-Message-Id: <20210106103453.152275-6-andre.przywara@arm.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20210106103453.152275-1-andre.przywara@arm.com>
+ with ESMTP id Mhc-Md40Y2yK for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  6 Jan 2021 08:11:06 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id ACAA34B30E
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Jan 2021 08:11:06 -0500 (EST)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 1F7AF22EBD;
+ Wed,  6 Jan 2021 13:11:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1609938665;
+ bh=79wddeIkl6fxtztJZXYazG9ptPsHlnjqs/ligBQXeMs=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=hOzTNsUZRihG5hwg4TULYCcxSKgCU6r010mu39TRym7YLpOhDKFtVfI3v4cU1TtEo
+ J6MKaaqzwtTHyaOLn4auZKqaFjzotTiWHYuPNh2LGtBrEWPwSvNFWWSEK5zy4grMy2
+ kuubSjxLqyIy9i7lpG2q7XpMUkJliW3sGOUGSgeHgA43lBDEXjhufwIGhcUrBlsgsR
+ EMyjD8YWQBiaFQLlVnPwlXPvtEa9zzME1+6S3n2IwzrAYiKTUx2pD7KiIx+n8iscQp
+ 5l5tY3A8+2pi7h5RcuBjluaHZYxZ9IOCyGA6jHVZxcE/cNLSGq3FSmiKvpX5ZtS6pH
+ THoMKkqSI5fzA==
+Date: Wed, 6 Jan 2021 13:10:37 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH v6 4/5] arm64: Add support for SMCCC TRNG entropy source
+Message-ID: <20210106131037.GD4752@sirena.org.uk>
 References: <20210106103453.152275-1-andre.przywara@arm.com>
+ <20210106103453.152275-5-andre.przywara@arm.com>
+MIME-Version: 1.0
+In-Reply-To: <20210106103453.152275-5-andre.przywara@arm.com>
+X-Cookie: Happy feast of the pig!
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
- Theodore Ts'o <tytso@mit.edu>, Linus Walleij <linus.walleij@linaro.org>,
- linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>,
- Sudeep Holla <sudeep.holla@arm.com>, kvmarm@lists.cs.columbia.edu,
+ Theodore Ts'o <tytso@mit.edu>, Catalin Marinas <catalin.marinas@arm.com>,
+ Linus Walleij <linus.walleij@linaro.org>, Sudeep Holla <sudeep.holla@arm.com>,
+ linux-kernel@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
+ kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -68,169 +78,56 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="===============8205609677858372413=="
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Ard Biesheuvel <ardb@kernel.org>
 
-Provide a hypervisor implementation of the ARM architected TRNG firmware
-interface described in ARM spec DEN0098. All function IDs are implemented,
-including both 32-bit and 64-bit versions of the TRNG_RND service, which
-is the centerpiece of the API.
+--===============8205609677858372413==
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="UfEAyuTBtIjiZzX6"
+Content-Disposition: inline
 
-The API is backed by the kernel's entropy pool only, to avoid guests
-draining more precious direct entropy sources.
 
-Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
-[Andre: minor fixes, drop arch_get_random() usage]
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
----
- arch/arm64/include/asm/kvm_host.h |  2 +
- arch/arm64/kvm/Makefile           |  2 +-
- arch/arm64/kvm/hypercalls.c       |  6 +++
- arch/arm64/kvm/trng.c             | 85 +++++++++++++++++++++++++++++++
- 4 files changed, 94 insertions(+), 1 deletion(-)
- create mode 100644 arch/arm64/kvm/trng.c
+--UfEAyuTBtIjiZzX6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 11beda85ee7e..271c79914afd 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -748,4 +748,6 @@ bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
- #define kvm_vcpu_has_pmu(vcpu)					\
- 	(test_bit(KVM_ARM_VCPU_PMU_V3, (vcpu)->arch.features))
- 
-+int kvm_trng_call(struct kvm_vcpu *vcpu);
-+
- #endif /* __ARM64_KVM_HOST_H__ */
-diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-index 60fd181df624..8d2b9984ac36 100644
---- a/arch/arm64/kvm/Makefile
-+++ b/arch/arm64/kvm/Makefile
-@@ -16,7 +16,7 @@ kvm-y := $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o \
- 	 inject_fault.o va_layout.o handle_exit.o \
- 	 guest.o debug.o reset.o sys_regs.o \
- 	 vgic-sys-reg-v3.o fpsimd.o pmu.o \
--	 arch_timer.o \
-+	 arch_timer.o trng.o\
- 	 vgic/vgic.o vgic/vgic-init.o \
- 	 vgic/vgic-irqfd.o vgic/vgic-v2.o \
- 	 vgic/vgic-v3.o vgic/vgic-v4.o \
-diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-index 25ea4ecb6449..ead21b98b620 100644
---- a/arch/arm64/kvm/hypercalls.c
-+++ b/arch/arm64/kvm/hypercalls.c
-@@ -71,6 +71,12 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
- 		if (gpa != GPA_INVALID)
- 			val = gpa;
- 		break;
-+	case ARM_SMCCC_TRNG_VERSION:
-+	case ARM_SMCCC_TRNG_FEATURES:
-+	case ARM_SMCCC_TRNG_GET_UUID:
-+	case ARM_SMCCC_TRNG_RND32:
-+	case ARM_SMCCC_TRNG_RND64:
-+		return kvm_trng_call(vcpu);
- 	default:
- 		return kvm_psci_call(vcpu);
- 	}
-diff --git a/arch/arm64/kvm/trng.c b/arch/arm64/kvm/trng.c
-new file mode 100644
-index 000000000000..99bdd7103c9c
---- /dev/null
-+++ b/arch/arm64/kvm/trng.c
-@@ -0,0 +1,85 @@
-+// SPDX-License-Identifier: GPL-2.0
-+// Copyright (C) 2020 Arm Ltd.
-+
-+#include <linux/arm-smccc.h>
-+#include <linux/kvm_host.h>
-+
-+#include <asm/kvm_emulate.h>
-+
-+#include <kvm/arm_hypercalls.h>
-+
-+#define ARM_SMCCC_TRNG_VERSION_1_0	0x10000UL
-+
-+/* Those values are deliberately separate from the generic SMCCC definitions. */
-+#define TRNG_SUCCESS			0UL
-+#define TRNG_NOT_SUPPORTED		((unsigned long)-1)
-+#define TRNG_INVALID_PARAMETER		((unsigned long)-2)
-+#define TRNG_NO_ENTROPY			((unsigned long)-3)
-+
-+#define TRNG_MAX_BITS64			192
-+
-+static const uuid_t arm_smc_trng_uuid __aligned(4) = UUID_INIT(
-+	0x0d21e000, 0x4384, 0x11eb, 0x80, 0x70, 0x52, 0x44, 0x55, 0x4e, 0x5a, 0x4c);
-+
-+static int kvm_trng_do_rnd(struct kvm_vcpu *vcpu, int size)
-+{
-+	DECLARE_BITMAP(bits, TRNG_MAX_BITS64);
-+	u32 num_bits = smccc_get_arg1(vcpu);
-+	int i;
-+
-+	if (num_bits > 3 * size) {
-+		smccc_set_retval(vcpu, TRNG_INVALID_PARAMETER, 0, 0, 0);
-+		return 1;
-+	}
-+
-+	/* get as many bits as we need to fulfil the request */
-+	for (i = 0; i < DIV_ROUND_UP(num_bits, BITS_PER_LONG); i++)
-+		bits[i] = get_random_long();
-+
-+	bitmap_clear(bits, num_bits, TRNG_MAX_BITS64 - num_bits);
-+
-+	if (size == 32)
-+		smccc_set_retval(vcpu, TRNG_SUCCESS, lower_32_bits(bits[1]),
-+				 upper_32_bits(bits[0]), lower_32_bits(bits[0]));
-+	else
-+		smccc_set_retval(vcpu, TRNG_SUCCESS, bits[2], bits[1], bits[0]);
-+
-+	memzero_explicit(bits, sizeof(bits));
-+	return 1;
-+}
-+
-+int kvm_trng_call(struct kvm_vcpu *vcpu)
-+{
-+	const __le32 *u = (__le32 *)arm_smc_trng_uuid.b;
-+	u32 func_id = smccc_get_function(vcpu);
-+	unsigned long val = TRNG_NOT_SUPPORTED;
-+	int size = 64;
-+
-+	switch (func_id) {
-+	case ARM_SMCCC_TRNG_VERSION:
-+		val = ARM_SMCCC_TRNG_VERSION_1_0;
-+		break;
-+	case ARM_SMCCC_TRNG_FEATURES:
-+		switch (smccc_get_arg1(vcpu)) {
-+		case ARM_SMCCC_TRNG_VERSION:
-+		case ARM_SMCCC_TRNG_FEATURES:
-+		case ARM_SMCCC_TRNG_GET_UUID:
-+		case ARM_SMCCC_TRNG_RND32:
-+		case ARM_SMCCC_TRNG_RND64:
-+			val = TRNG_SUCCESS;
-+		}
-+		break;
-+	case ARM_SMCCC_TRNG_GET_UUID:
-+		smccc_set_retval(vcpu, le32_to_cpu(u[0]), le32_to_cpu(u[1]),
-+				 le32_to_cpu(u[2]), le32_to_cpu(u[3]));
-+		return 1;
-+	case ARM_SMCCC_TRNG_RND32:
-+		size = 32;
-+		fallthrough;
-+	case ARM_SMCCC_TRNG_RND64:
-+		return kvm_trng_do_rnd(vcpu, size);
-+	}
-+
-+	smccc_set_retval(vcpu, val, 0, 0, 0);
-+	return 1;
-+}
--- 
-2.17.1
+On Wed, Jan 06, 2021 at 10:34:52AM +0000, Andre Przywara wrote:
+> The ARM architected TRNG firmware interface, described in ARM spec
+> DEN0098, defines an ARM SMCCC based interface to a true random number
+> generator, provided by firmware.
+> This can be discovered via the SMCCC >=v1.1 interface, and provides
+> up to 192 bits of entropy per call.
+
+Reviewed-by: Mark Brown <broonie@kernel.org>
+
+--UfEAyuTBtIjiZzX6
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAl/1tswACgkQJNaLcl1U
+h9AU0gf/WEpGA7/Gqcj19WM0HyGcWr3K5f9j/Oet7jlOJd3xp5/OK/lHnRGxQ3UT
+u51f8W2bmXF6OQ645seYsM+hEkcDJq+VFk+/wFE2w7TORZRLs1r9tFb6KrWrOCt2
+A6ogtATKDYDwQeYIzf5+Ed3h/BP1Kgs3bPKo65hBulxWZUnRpIm3JlZegTGYC7hz
+IXW3Ok1pRiyBbzBSR90NC8MW3TfPrBQEZEz8cmdSwu9ft1uLJqFumPB7nFVv747q
+lCno+cS55Ikyj2OrdzQTLmsIYYutBgfd5yP9h3LHRIXZz5NC6eWlkKMqx/gL/sTO
+XHQHqe3gdxNQ5gduTzONG4LqoOrw6Q==
+=FSJJ
+-----END PGP SIGNATURE-----
+
+--UfEAyuTBtIjiZzX6--
+
+--===============8205609677858372413==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============8205609677858372413==--
