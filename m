@@ -2,65 +2,82 @@ Return-Path: <SRS0=pXP7=GJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1373BC433E0
-	for <kvmarm@archiver.kernel.org>; Wed,  6 Jan 2021 02:13:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31466C433DB
+	for <kvmarm@archiver.kernel.org>; Wed,  6 Jan 2021 02:16:37 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5A8DE22D50
-	for <kvmarm@archiver.kernel.org>; Wed,  6 Jan 2021 02:13:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A8DE22D50
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id A6E5322D6E
+	for <kvmarm@archiver.kernel.org>; Wed,  6 Jan 2021 02:16:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6E5322D6E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 70A4C4B311;
-	Tue,  5 Jan 2021 21:13:07 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 118434B2F6;
+	Tue,  5 Jan 2021 21:16:36 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id wS3uJ91WsvEw; Tue,  5 Jan 2021 21:13:06 -0500 (EST)
+	with ESMTP id HXKzi+an23oB; Tue,  5 Jan 2021 21:16:34 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D2724B2F6;
-	Tue,  5 Jan 2021 21:13:06 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DDB9A4B30D;
+	Tue,  5 Jan 2021 21:16:34 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1EE344B2F6
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jan 2021 21:13:05 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ADFDE4B2F6
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jan 2021 21:16:33 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EdpUMhGDOvVh for <kvmarm@lists.cs.columbia.edu>;
- Tue,  5 Jan 2021 21:13:03 -0500 (EST)
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 11E164B266
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jan 2021 21:13:03 -0500 (EST)
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.59])
- by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4D9XtT5Hf1zj3Vx;
- Wed,  6 Jan 2021 10:12:01 +0800 (CST)
-Received: from [10.174.184.196] (10.174.184.196) by
- DGGEMS408-HUB.china.huawei.com (10.3.19.208) with Microsoft SMTP Server id
- 14.3.498.0; Wed, 6 Jan 2021 10:12:50 +0800
-Subject: Re: [RFC PATCH v2 3/4] KVM: arm64: GICv4.1: Restore VLPI's pending
- state to physical side
-To: Marc Zyngier <maz@kernel.org>
-References: <20210104081613.100-1-lushenming@huawei.com>
- <20210104081613.100-4-lushenming@huawei.com>
- <76a7b9cca485dc8157d3be53189eac69@kernel.org>
-From: Shenming Lu <lushenming@huawei.com>
-Message-ID: <6b815f0e-d042-2ec6-369a-41a19cd1b9f9@huawei.com>
-Date: Wed, 6 Jan 2021 10:12:50 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.2.2
+ with ESMTP id zyluvg8fA23f for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  5 Jan 2021 21:16:32 -0500 (EST)
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com
+ [209.85.167.48])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 450374B266
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jan 2021 21:16:32 -0500 (EST)
+Received: by mail-lf1-f48.google.com with SMTP id y19so3090970lfa.13
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 05 Jan 2021 18:16:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=KVsuCyT2jZU85zfYB+NIaPMS8ajkTMctJkhL7DKcYnE=;
+ b=Utw66Ga679gB2x3y5LiM4QONKAQiITNcTW8HyxmeGLR0PjIQ3Uy5LVUiSpE8gpmbUs
+ pXFegXW94vtdZlbxnKOkMMvu2GMRHgG4PJQ23weqzoFjMdaR5OwVVle1+nQfp2JXhdnh
+ wT0smE/+Ai3+QvZ7UIjHrsoKgQ9e1wQONqt7oLaiP2H13BQJxP2zyFzWG/62SUtyaKLx
+ hy0SBZmUXo2mxYOAF+SsiIIYf+2IxFJuJbAYTWIkSwnHxrUqY+PsfR7g7AnxrFzEyGAf
+ CB16irwArYaiB4RamOsMPmrsRPlRgHzj2yXnjoRISboFtxwbgjBIC6YAPFLXb/0Pnh8Z
+ CIwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=KVsuCyT2jZU85zfYB+NIaPMS8ajkTMctJkhL7DKcYnE=;
+ b=GJgvIAeoyCCPFro/DszGDchqsafTLjfVJqFBDV9xykwMu+g5q/GWOLYJC/IMLCdK87
+ rzwuI3dfNrjm2luOFLZI/00l8mXAduB8Hj7rc1fxs/IziqIFsgxE7t8BoZbgf4WRLAPg
+ CZpfsa40I5MtrZLEr34K/gO3+txWrok9Re6tc+yYRURyiVG5LL4Xmm9BaWWUqfuE8vWr
+ /4Qy/HLEgT1p6EkW9w9zhM/ba1nthbDs7An6k3X1VXJX2EEa0iL80dijPJEQnBHRgJAd
+ MBl1EEuD8rNCcdD0dLdr2iCXeloboABoLjlL9UXZI/LF3BwlpHzz3+QAL5py64bRXUnr
+ B62g==
+X-Gm-Message-State: AOAM532C51LLMiZ9aJmf+jcwy++8auqJ34XlvodYWgjV7PXvbprAW8Ur
+ r6iEEcE+RNJ2bbW0FbylF3/3Ed6CPxtjNh1jpYXiXA==
+X-Google-Smtp-Source: ABdhPJxT+0/WlixsZVte1tikv55+uEMMQDYoOSMDqObQoTvJnCg5Bpd19CjKrRZCrUW4mO6FytZtWtUsYU9igflQN/g=
+X-Received: by 2002:a19:7fc8:: with SMTP id a191mr897666lfd.178.1609899390736; 
+ Tue, 05 Jan 2021 18:16:30 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <76a7b9cca485dc8157d3be53189eac69@kernel.org>
-Content-Language: en-US
-X-Originating-IP: [10.174.184.196]
-X-CFilter-Loop: Reflected
-Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, kvm@vger.kernel.org,
- Cornelia Huck <cohuck@redhat.com>, linux-kernel@vger.kernel.org,
- Alex Williamson <alex.williamson@redhat.com>, Will Deacon <will@kernel.org>,
+References: <20210104135011.2063104-1-maz@kernel.org>
+ <20210104135011.2063104-12-maz@kernel.org>
+In-Reply-To: <20210104135011.2063104-12-maz@kernel.org>
+From: Jing Zhang <jingzhangos@google.com>
+Date: Tue, 5 Jan 2021 20:16:18 -0600
+Message-ID: <CAAdAUtjNiBACFbxp-0x_ar9RcnFDkiSoGqOn0XKiwtJAd3qCHg@mail.gmail.com>
+Subject: Re: [PATCH v2 11/17] arm64: cpufeature: Add an early command-line
+ cpufeature override facility
+To: Marc Zyngier <maz@kernel.org>
+Cc: kernel-team@android.com, Catalin Marinas <catalin.marinas@arm.com>,
+ Ard Biesheuvel <ardb@kernel.org>, Will Deacon <will@kernel.org>,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -73,49 +90,189 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gMjAyMS8xLzUgMTc6MjUsIE1hcmMgWnluZ2llciB3cm90ZToKPiBPbiAyMDIxLTAxLTA0IDA4
-OjE2LCBTaGVubWluZyBMdSB3cm90ZToKPj4gRnJvbTogWmVuZ2h1aSBZdSA8eXV6ZW5naHVpQGh1
-YXdlaS5jb20+Cj4+Cj4+IFdoZW4gc2V0dGluZyB0aGUgZm9yd2FyZGluZyBwYXRoIG9mIGEgVkxQ
-SSAoc3dpdGNoIHRvIHRoZSBIVyBtb2RlKSwKPj4gd2UgY291bGQgYWxzbyB0cmFuc2ZlciB0aGUg
-cGVuZGluZyBzdGF0ZSBmcm9tIGlycS0+cGVuZGluZ19sYXRjaCB0bwo+PiBWUFQgKGVzcGVjaWFs
-bHkgaW4gbWlncmF0aW9uLCB0aGUgcGVuZGluZyBzdGF0ZXMgb2YgVkxQSXMgYXJlIHJlc3RvcmVk
-Cj4+IGludG8ga3Zt4oCZcyB2Z2ljIGZpcnN0KS4gQW5kIHdlIGN1cnJlbnRseSBzZW5kICJJTlQr
-VlNZTkMiIHRvIHRyaWdnZXIKPj4gYSBWTFBJIHRvIHBlbmRpbmcuCj4+Cj4+IFNpZ25lZC1vZmYt
-Ynk6IFplbmdodWkgWXUgPHl1emVuZ2h1aUBodWF3ZWkuY29tPgo+PiBTaWduZWQtb2ZmLWJ5OiBT
-aGVubWluZyBMdSA8bHVzaGVubWluZ0BodWF3ZWkuY29tPgo+PiAtLS0KPj4gwqBhcmNoL2FybTY0
-L2t2bS92Z2ljL3ZnaWMtdjQuYyB8IDEyICsrKysrKysrKysrKwo+PiDCoDEgZmlsZSBjaGFuZ2Vk
-LCAxMiBpbnNlcnRpb25zKCspCj4+Cj4+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2t2bS92Z2lj
-L3ZnaWMtdjQuYyBiL2FyY2gvYXJtNjQva3ZtL3ZnaWMvdmdpYy12NC5jCj4+IGluZGV4IGYyMTFh
-N2MzMjcwNC4uNzk0NWQ2ZDA5Y2RkIDEwMDY0NAo+PiAtLS0gYS9hcmNoL2FybTY0L2t2bS92Z2lj
-L3ZnaWMtdjQuYwo+PiArKysgYi9hcmNoL2FybTY0L2t2bS92Z2ljL3ZnaWMtdjQuYwo+PiBAQCAt
-NDU0LDYgKzQ1NCwxOCBAQCBpbnQga3ZtX3ZnaWNfdjRfc2V0X2ZvcndhcmRpbmcoc3RydWN0IGt2
-bSAqa3ZtLCBpbnQgdmlycSwKPj4gwqDCoMKgwqAgaXJxLT5ob3N0X2lyccKgwqDCoCA9IHZpcnE7
-Cj4+IMKgwqDCoMKgIGF0b21pY19pbmMoJm1hcC52cGUtPnZscGlfY291bnQpOwo+Pgo+PiArwqDC
-oMKgIC8qIFRyYW5zZmVyIHBlbmRpbmcgc3RhdGUgKi8KPj4gK8KgwqDCoCByZXQgPSBpcnFfc2V0
-X2lycWNoaXBfc3RhdGUoaXJxLT5ob3N0X2lycSwKPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgIElSUUNISVBfU1RBVEVfUEVORElORywKPj4gK8KgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGlycS0+cGVuZGluZ19sYXRjaCk7Cj4+ICvCoMKgwqAg
-V0FSTl9SQVRFTElNSVQocmV0LCAiSVJRICVkIiwgaXJxLT5ob3N0X2lycSk7Cj4gCj4gV2h5IGRv
-IHRoaXMgaWYgcGVuZGluZ19sYXRjaCBpcyAwLCB3aGljaCBpcyBsaWtlbHkgdG8gYmUKPiB0aGUg
-b3ZlcndoZWxtaW5nIGNhc2U/CgpZZXMsIHRoZXJlIGlzIG5vIG5lZWQgdG8gZG8gdGhpcyBpZiBw
-ZW5kaW5nX2xhdGNoIGlzIDAuCgo+IAo+PiArCj4+ICvCoMKgwqAgLyoKPj4gK8KgwqDCoMKgICog
-TGV0IGl0IGJlIHBydW5lZCBmcm9tIGFwX2xpc3QgbGF0ZXIgYW5kIGRvbid0IGJvdGhlcgo+PiAr
-wqDCoMKgwqAgKiB0aGUgTGlzdCBSZWdpc3Rlci4KPj4gK8KgwqDCoMKgICovCj4+ICvCoMKgwqAg
-aXJxLT5wZW5kaW5nX2xhdGNoID0gZmFsc2U7Cj4gCj4gV2hhdCBndWFyYW50ZWVzIHRoZSBwcnVu
-aW5nPyBQcnVuaW5nIG9ubHkgaGFwcGVucyBvbiB2Y3B1IGV4aXQsCj4gd2hpY2ggbWVhbnMgd2Ug
-bWF5IGhhdmUgdGhlIHNhbWUgaW50ZXJydXB0IHZpYSBib3RoIHRoZSBMUiBhbmQKPiB0aGUgc3Ry
-ZWFtIGludGVyZmFjZSwgd2hpY2ggSSBkb24ndCBiZWxpZXZlIGlzIGxlZ2FsIChpdCBpcwo+IGxp
-a2UgaGF2aW5nIHR3byBMUnMgaG9sZGluZyB0aGUgc2FtZSBpbnRlcnJ1cHQpLgoKU2luY2UgdGhl
-IGlycSdzIHBlbmRpbmdfbGF0Y2ggaXMgc2V0IHRvIGZhbHNlIGhlcmUsIGl0IHdpbGwgbm90IGJl
-CnBvcHVsYXRlZCB0byB0aGUgTFIgaW4gdmdpY19mbHVzaF9scl9zdGF0ZSgpICh2Z2ljX3Rhcmdl
-dF9vcmFjbGUoKQp3aWxsIHJldHVybiBOVUxMKS4KCj4gCj4+ICsKPj4gwqBvdXQ6Cj4+IMKgwqDC
-oMKgIG11dGV4X3VubG9jaygmaXRzLT5pdHNfbG9jayk7Cj4+IMKgwqDCoMKgIHJldHVybiByZXQ7
-Cj4gCj4gVGhhbmtzLAo+IAo+IMKgwqDCoMKgwqDCoMKgIE0uCl9fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxp
-c3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFu
-L2xpc3RpbmZvL2t2bWFybQo=
+On Mon, Jan 4, 2021 at 8:20 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> In order to be able to override CPU features at boot time,
+> let's add a command line parser that matches options of the
+> form "cpureg.feature=value", and store the corresponding
+> value into the override val/mask pair.
+>
+> No features are currently defined, so no expected change in
+> functionnality.
+Typo: functionnality -> functionality
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kernel/Makefile         |   2 +-
+>  arch/arm64/kernel/head.S           |   1 +
+>  arch/arm64/kernel/idreg-override.c | 119 +++++++++++++++++++++++++++++
+>  3 files changed, 121 insertions(+), 1 deletion(-)
+>  create mode 100644 arch/arm64/kernel/idreg-override.c
+>
+> diff --git a/arch/arm64/kernel/Makefile b/arch/arm64/kernel/Makefile
+> index 86364ab6f13f..2262f0392857 100644
+> --- a/arch/arm64/kernel/Makefile
+> +++ b/arch/arm64/kernel/Makefile
+> @@ -17,7 +17,7 @@ obj-y                 := debug-monitors.o entry.o irq.o fpsimd.o              \
+>                            return_address.o cpuinfo.o cpu_errata.o              \
+>                            cpufeature.o alternative.o cacheinfo.o               \
+>                            smp.o smp_spin_table.o topology.o smccc-call.o       \
+> -                          syscall.o proton-pack.o
+> +                          syscall.o proton-pack.o idreg-override.o
+>
+>  targets                        += efi-entry.o
+>
+> diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
+> index d74e5f84042e..b3c4dd04f74b 100644
+> --- a/arch/arm64/kernel/head.S
+> +++ b/arch/arm64/kernel/head.S
+> @@ -435,6 +435,7 @@ SYM_FUNC_START_LOCAL(__primary_switched)
+>
+>         mov     x0, x21                         // pass FDT address in x0
+>         bl      early_fdt_map                   // Try mapping the FDT early
+> +       bl      init_shadow_regs
+>         bl      switch_to_vhe
+>  #if defined(CONFIG_KASAN_GENERIC) || defined(CONFIG_KASAN_SW_TAGS)
+>         bl      kasan_early_init
+> diff --git a/arch/arm64/kernel/idreg-override.c b/arch/arm64/kernel/idreg-override.c
+> new file mode 100644
+> index 000000000000..392f93b67103
+> --- /dev/null
+> +++ b/arch/arm64/kernel/idreg-override.c
+> @@ -0,0 +1,119 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Early cpufeature override framework
+> + *
+> + * Copyright (C) 2020 Google LLC
+> + * Author: Marc Zyngier <maz@kernel.org>
+> + */
+> +
+> +#include <linux/kernel.h>
+> +#include <linux/libfdt.h>
+> +
+> +#include <asm/cacheflush.h>
+> +#include <asm/setup.h>
+> +
+> +struct reg_desc {
+> +       const char * const      name;
+> +       u64 * const             val;
+> +       u64 * const             mask;
+> +       struct {
+> +               const char * const      name;
+> +               u8                       shift;
+> +       }                       fields[];
+> +};
+> +
+> +static const struct reg_desc * const regs[] __initdata = {
+> +};
+> +
+> +static int __init find_field(const char *cmdline, const struct reg_desc *reg,
+> +                            int f, u64 *v)
+> +{
+> +       char buf[256], *str;
+> +       size_t len;
+> +
+> +       snprintf(buf, ARRAY_SIZE(buf), "%s.%s=", reg->name, reg->fields[f].name);
+> +
+> +       str = strstr(cmdline, buf);
+> +       if (!(str == cmdline || (str > cmdline && *(str - 1) == ' ')))
+> +               return -1;
+> +
+> +       str += strlen(buf);
+> +       len = strcspn(str, " ");
+> +       len = min(len, ARRAY_SIZE(buf) - 1);
+> +       strncpy(buf, str, len);
+> +       buf[len] = 0;
+> +
+> +       return kstrtou64(buf, 0, v);
+> +}
+> +
+> +static void __init match_options(const char *cmdline)
+> +{
+> +       int i;
+> +
+> +       for (i = 0; i < ARRAY_SIZE(regs); i++) {
+> +               int f;
+> +
+> +               if (!regs[i]->val || !regs[i]->mask)
+> +                       continue;
+> +
+> +               for (f = 0; regs[i]->fields[f].name; f++) {
+> +                       u64 v;
+> +
+> +                       if (find_field(cmdline, regs[i], f, &v))
+> +                               continue;
+> +
+> +                       *regs[i]->val  |= (v & 0xf) << regs[i]->fields[f].shift;
+> +                       *regs[i]->mask |= 0xfUL << regs[i]->fields[f].shift;
+> +               }
+> +       }
+> +}
+> +
+> +static __init void parse_cmdline(void)
+> +{
+> +       if (!IS_ENABLED(CONFIG_CMDLINE_FORCE)) {
+> +               const u8 *prop;
+> +               void *fdt;
+> +               int node;
+> +
+> +               fdt = get_early_fdt_ptr();
+> +               if (!fdt)
+> +                       goto out;
+> +
+> +               node = fdt_path_offset(fdt, "/chosen");
+> +               if (node < 0)
+> +                       goto out;
+> +
+> +               prop = fdt_getprop(fdt, node, "bootargs", NULL);
+> +               if (!prop)
+> +                       goto out;
+> +
+> +               match_options(prop);
+> +
+> +               if (!IS_ENABLED(CONFIG_CMDLINE_EXTEND))
+> +                       return;
+> +       }
+> +
+> +out:
+> +       match_options(CONFIG_CMDLINE);
+> +}
+> +
+> +void __init init_shadow_regs(void)
+> +{
+> +       int i;
+> +
+> +       for (i = 0; i < ARRAY_SIZE(regs); i++) {
+> +               if (regs[i]->val)
+> +                       *regs[i]->val  = 0;
+> +               if (regs[i]->mask)
+> +                       *regs[i]->mask = 0;
+> +       }
+> +
+> +       parse_cmdline();
+> +
+> +       for (i = 0; i < ARRAY_SIZE(regs); i++) {
+> +               if (regs[i]->val)
+> +                       __flush_dcache_area(regs[i]->val, sizeof(*regs[i]->val));
+> +               if (regs[i]->mask)
+> +                       __flush_dcache_area(regs[i]->mask, sizeof(*regs[i]->mask));
+> +       }
+Could you shed some light on the usage of __flush_dcache_area here? Thanks.
+> +}
+> --
+> 2.29.2
+>
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
