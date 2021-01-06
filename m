@@ -2,54 +2,56 @@ Return-Path: <SRS0=pXP7=GJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA222C433E0
-	for <kvmarm@archiver.kernel.org>; Wed,  6 Jan 2021 10:35:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28E8DC433DB
+	for <kvmarm@archiver.kernel.org>; Wed,  6 Jan 2021 10:35:09 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4173023122
-	for <kvmarm@archiver.kernel.org>; Wed,  6 Jan 2021 10:35:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4173023122
+	by mail.kernel.org (Postfix) with ESMTP id 969E22311C
+	for <kvmarm@archiver.kernel.org>; Wed,  6 Jan 2021 10:35:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 969E22311C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 60C9C4B359;
-	Wed,  6 Jan 2021 05:35:06 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 211AE4B343;
+	Wed,  6 Jan 2021 05:35:08 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Ove7pXU1Ddsg; Wed,  6 Jan 2021 05:35:04 -0500 (EST)
+	with ESMTP id 27Bl0b8rdauy; Wed,  6 Jan 2021 05:35:07 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E911B4B347;
-	Wed,  6 Jan 2021 05:35:04 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 17A3C4B34D;
+	Wed,  6 Jan 2021 05:35:07 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D87574B340
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Jan 2021 05:35:03 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BF5C4B346
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Jan 2021 05:35:05 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CQmDTQRKyJWS for <kvmarm@lists.cs.columbia.edu>;
- Wed,  6 Jan 2021 05:35:02 -0500 (EST)
+ with ESMTP id 3Uu5QJYzdiCQ for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  6 Jan 2021 05:35:04 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 72EE94B343
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Jan 2021 05:35:02 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4AFD24B343
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Jan 2021 05:35:04 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D11061FB;
- Wed,  6 Jan 2021 02:35:01 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E5421D6E;
+ Wed,  6 Jan 2021 02:35:03 -0800 (PST)
 Received: from donnerap.arm.com (donnerap.cambridge.arm.com [10.1.195.35])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F0EC43F719;
- Wed,  6 Jan 2021 02:34:59 -0800 (PST)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 10FBB3F719;
+ Wed,  6 Jan 2021 02:35:01 -0800 (PST)
 From: Andre Przywara <andre.przywara@arm.com>
 To: Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
  Ard Biesheuvel <ardb@kernel.org>, Russell King <linux@armlinux.org.uk>,
  Marc Zyngier <maz@kernel.org>
-Subject: [PATCH v6 0/5] ARM: arm64: Add SMCCC TRNG entropy service
-Date: Wed,  6 Jan 2021 10:34:48 +0000
-Message-Id: <20210106103453.152275-1-andre.przywara@arm.com>
+Subject: [PATCH v6 1/5] firmware: smccc: Add SMCCC TRNG function call IDs
+Date: Wed,  6 Jan 2021 10:34:49 +0000
+Message-Id: <20210106103453.152275-2-andre.przywara@arm.com>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20210106103453.152275-1-andre.przywara@arm.com>
+References: <20210106103453.152275-1-andre.przywara@arm.com>
 Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
  Theodore Ts'o <tytso@mit.edu>, Linus Walleij <linus.walleij@linaro.org>,
  linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>,
@@ -72,127 +74,64 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
-
-a fix to v5, now *really* fixing the wrong priority of SMCCC vs. RNDR
-in arch_get_random_seed_long_early(). Apologies for messing this up
-in v5 and thanks to broonie for being on the watch!
-
-Will, Catalin: it would be much appreciated if you could consider taking
-patch 1/5. This contains the common definitions, and is a prerequisite
-for every other patch, although they are somewhat independent and likely
-will need to go through different subsystems.
-
-Cheers,
-Andre
-==============================
+From: Ard Biesheuvel <ardb@kernel.org>
 
 The ARM architected TRNG firmware interface, described in ARM spec
-DEN0098[1], defines an ARM SMCCC based interface to a true random number
+DEN0098, define an ARM SMCCC based interface to a true random number
 generator, provided by firmware.
 
-This series collects all the patches implementing this in various
-places: as a user feeding into the ARCH_RANDOM pool, both for ARM and
-arm64, and as a service provider for KVM guests.
+Add the definitions of the SMCCC functions as defined by the spec.
 
-Patch 1 introduces the interface definition used by all three entities.
-Patch 2 prepares the Arm SMCCC firmware driver to probe for the
-interface. This patch is needed to avoid a later dependency on *two*
-patches (there might be a better solution to this problem).
+Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+Reviewed-by: Sudeep Holla <sudeep.holla@arm.com>
+---
+ include/linux/arm-smccc.h | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
 
-Patch 3 implements the ARM part, patch 4 is the arm64 version.
-The final patch 5 adds support to provide random numbers to KVM guests.
-
-This was tested on:
-- QEMU -kernel (no SMCCC, regression test)
-- Juno w/ prototype of the h/w Trusted RNG support
-- mainline KVM (SMCCC, but no TRNG: regression test)
-- ARM and arm64 KVM guests, using the KVM service in patch 5/5
-
-Based on v5.11-rc2, please let me know if I should rebase it on
-something else. A git repo is accessible at:
-https://gitlab.arm.com/linux-arm/linux-ap/-/commits/smccc-trng/v6/
-
-Cheers,
-Andre
-
-[1] https://developer.arm.com/documentation/den0098/latest/
-
-Changelog v5 ... v6:
-- *really* fixing order of SMCCC vs. RNDR call in the *_early() version
-
-Changelog v4 ... v5:
-- change order of SMCCC call vs. RNDR call in arch_get_random_seed_long_early
-- adding Sudeep's R-b: tags
-
-Changelog v3 ... v4:
-- include cache.h to always have __ro_after_init defined
-- change order of SMCCC call vs. RNDR call in arm64's archrandom.h
-- adding LinusW's R-b: tags
-
-Changelog v2 ... v3:
-- ARM: fix compilation with randconfig
-- arm64: use SMCCC call also in arch_get_random_seed_long_early()
-- KVM: comment on return value usage
-- KVM: use more interesting UUID (enjoy, Marc!)
-- KVM: use bitmaps instead of open coded long arrays
-- KVM: drop direct usage of arch_get_random() interface
-
-Changelog "v1" ... v2:
-- trigger ARCH_RANDOM initialisation from the SMCCC firmware driver
-- use a single bool in smccc.c to hold the initialisation state for arm64
-- handle endianess correctly in the KVM provider
-
-Andre Przywara (2):
-  firmware: smccc: Introduce SMCCC TRNG framework
-  arm64: Add support for SMCCC TRNG entropy source
-
-Ard Biesheuvel (3):
-  firmware: smccc: Add SMCCC TRNG function call IDs
-  ARM: implement support for SMCCC TRNG entropy source
-  KVM: arm64: implement the TRNG hypervisor call
-
- arch/arm/Kconfig                    |  4 ++
- arch/arm/include/asm/archrandom.h   | 74 +++++++++++++++++++++++++
- arch/arm64/include/asm/archrandom.h | 82 ++++++++++++++++++++++++----
- arch/arm64/include/asm/kvm_host.h   |  2 +
- arch/arm64/kvm/Makefile             |  2 +-
- arch/arm64/kvm/hypercalls.c         |  6 ++
- arch/arm64/kvm/trng.c               | 85 +++++++++++++++++++++++++++++
- drivers/firmware/smccc/smccc.c      |  6 ++
- include/linux/arm-smccc.h           | 31 +++++++++++
- 9 files changed, 281 insertions(+), 11 deletions(-)
- create mode 100644 arch/arm/include/asm/archrandom.h
- create mode 100644 arch/arm64/kvm/trng.c
-
--- 
-2.17.1
-
-
-*** BLURB HERE ***
-
-Andre Przywara (2):
-  firmware: smccc: Introduce SMCCC TRNG framework
-  arm64: Add support for SMCCC TRNG entropy source
-
-Ard Biesheuvel (3):
-  firmware: smccc: Add SMCCC TRNG function call IDs
-  ARM: implement support for SMCCC TRNG entropy source
-  KVM: arm64: implement the TRNG hypervisor call
-
- arch/arm/Kconfig                    |  4 ++
- arch/arm/include/asm/archrandom.h   | 74 +++++++++++++++++++++++++
- arch/arm64/include/asm/archrandom.h | 82 ++++++++++++++++++++++++----
- arch/arm64/include/asm/kvm_host.h   |  2 +
- arch/arm64/kvm/Makefile             |  2 +-
- arch/arm64/kvm/hypercalls.c         |  6 ++
- arch/arm64/kvm/trng.c               | 85 +++++++++++++++++++++++++++++
- drivers/firmware/smccc/smccc.c      |  6 ++
- include/linux/arm-smccc.h           | 31 +++++++++++
- 9 files changed, 281 insertions(+), 11 deletions(-)
- create mode 100644 arch/arm/include/asm/archrandom.h
- create mode 100644 arch/arm64/kvm/trng.c
-
+diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
+index f860645f6512..62c54234576c 100644
+--- a/include/linux/arm-smccc.h
++++ b/include/linux/arm-smccc.h
+@@ -102,6 +102,37 @@
+ 			   ARM_SMCCC_OWNER_STANDARD_HYP,	\
+ 			   0x21)
+ 
++/* TRNG entropy source calls (defined by ARM DEN0098) */
++#define ARM_SMCCC_TRNG_VERSION					\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
++			   ARM_SMCCC_SMC_32,			\
++			   ARM_SMCCC_OWNER_STANDARD,		\
++			   0x50)
++
++#define ARM_SMCCC_TRNG_FEATURES					\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
++			   ARM_SMCCC_SMC_32,			\
++			   ARM_SMCCC_OWNER_STANDARD,		\
++			   0x51)
++
++#define ARM_SMCCC_TRNG_GET_UUID					\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
++			   ARM_SMCCC_SMC_32,			\
++			   ARM_SMCCC_OWNER_STANDARD,		\
++			   0x52)
++
++#define ARM_SMCCC_TRNG_RND32					\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
++			   ARM_SMCCC_SMC_32,			\
++			   ARM_SMCCC_OWNER_STANDARD,		\
++			   0x53)
++
++#define ARM_SMCCC_TRNG_RND64					\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
++			   ARM_SMCCC_SMC_64,			\
++			   ARM_SMCCC_OWNER_STANDARD,		\
++			   0x53)
++
+ /*
+  * Return codes defined in ARM DEN 0070A
+  * ARM DEN 0070A is now merged/consolidated into ARM DEN 0028 C
 -- 
 2.17.1
 
