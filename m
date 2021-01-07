@@ -4,44 +4,44 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BA1FC433DB
-	for <kvmarm@archiver.kernel.org>; Thu,  7 Jan 2021 09:29:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8A9EC433E6
+	for <kvmarm@archiver.kernel.org>; Thu,  7 Jan 2021 09:29:47 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DF72923339
-	for <kvmarm@archiver.kernel.org>; Thu,  7 Jan 2021 09:29:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF72923339
+	by mail.kernel.org (Postfix) with ESMTP id 65D9823343
+	for <kvmarm@archiver.kernel.org>; Thu,  7 Jan 2021 09:29:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65D9823343
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 522E34B3EA;
-	Thu,  7 Jan 2021 04:29:45 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D9F704B3DC;
+	Thu,  7 Jan 2021 04:29:46 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JwBquLzcy5re; Thu,  7 Jan 2021 04:29:44 -0500 (EST)
+	with ESMTP id 6h9h-BDawgY7; Thu,  7 Jan 2021 04:29:45 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 25C7D4B3D9;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E25E4B3E0;
 	Thu,  7 Jan 2021 04:29:44 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8067C4B3D8
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 991CD4B3C7
  for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Jan 2021 04:29:43 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0TJRum-kiteM for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id qPKOfx4+oCez for <kvmarm@lists.cs.columbia.edu>;
  Thu,  7 Jan 2021 04:29:42 -0500 (EST)
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 086584B3C7
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Jan 2021 04:29:41 -0500 (EST)
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.58])
- by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4DBLWv36XKz15nXd;
- Thu,  7 Jan 2021 17:28:43 +0800 (CST)
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 185184B3CE
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Jan 2021 04:29:42 -0500 (EST)
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.60])
+ by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DBLWb6mFDzMGT6;
+ Thu,  7 Jan 2021 17:28:27 +0800 (CST)
 Received: from DESKTOP-5IS4806.china.huawei.com (10.174.184.42) by
  DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server id
- 14.3.498.0; Thu, 7 Jan 2021 17:29:31 +0800
+ 14.3.498.0; Thu, 7 Jan 2021 17:29:32 +0800
 From: Keqian Zhu <zhukeqian1@huawei.com>
 To: <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
  <iommu@lists.linux-foundation.org>, <kvm@vger.kernel.org>,
@@ -49,9 +49,10 @@ To: <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
  Kirti Wankhede <kwankhede@nvidia.com>, Cornelia Huck <cohuck@redhat.com>,
  Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Catalin Marinas
  <catalin.marinas@arm.com>
-Subject: [PATCH 3/5] vfio/iommu_type1: Populate dirty bitmap when attach group
-Date: Thu, 7 Jan 2021 17:28:59 +0800
-Message-ID: <20210107092901.19712-4-zhukeqian1@huawei.com>
+Subject: [PATCH 4/5] vfio/iommu_type1: Carefully use unmap_unpin_all during
+ dirty tracking
+Date: Thu, 7 Jan 2021 17:29:00 +0800
+Message-ID: <20210107092901.19712-5-zhukeqian1@huawei.com>
 X-Mailer: git-send-email 2.8.4.windows.1
 In-Reply-To: <20210107092901.19712-1-zhukeqian1@huawei.com>
 References: <20210107092901.19712-1-zhukeqian1@huawei.com>
@@ -78,51 +79,53 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Attach an iommu backend group will potentially access all dma
-ranges. We should traverse all dma ranges to mark dirty.
+If we detach group during dirty page tracking, we shouldn't remove
+vfio_dma, because dirty log will lose.
+
+But we don't prevent unmap_unpin_all in vfio_iommu_release, because
+under normal procedure, dirty tracking has been stopped.
 
 Fixes: d6a4c185660c ("vfio iommu: Implementation of ioctl for dirty pages tracking")
 Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
 ---
- drivers/vfio/vfio_iommu_type1.c | 18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
+ drivers/vfio/vfio_iommu_type1.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 29c8702c3b6e..26b7eb2a5cfc 100644
+index 26b7eb2a5cfc..9776a059904d 100644
 --- a/drivers/vfio/vfio_iommu_type1.c
 +++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -255,6 +255,17 @@ static void vfio_dma_populate_bitmap(struct vfio_iommu *iommu,
- 		vfio_dma_populate_bitmap_full(dma, pgsize);
- }
+@@ -2373,7 +2373,12 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
+ 			if (list_empty(&iommu->external_domain->group_list)) {
+ 				vfio_sanity_check_pfn_list(iommu);
  
-+static void vfio_iommu_populate_bitmap(struct vfio_iommu *iommu)
-+{
-+	struct rb_node *n;
-+	struct vfio_dma *dma;
-+
-+	for (n = rb_first(&iommu->dma_list); n; n = rb_next(n)) {
-+		dma = rb_entry(n, struct vfio_dma, node);
-+		vfio_dma_populate_bitmap(iommu, dma);
-+	}
-+}
-+
- static int vfio_dma_bitmap_alloc_all(struct vfio_iommu *iommu)
- {
- 	struct rb_node *n;
-@@ -2190,7 +2201,12 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
- 	 * demotes the iommu scope until it declares itself dirty tracking
- 	 * capable via the page pinning interface.
- 	 */
--	iommu->pinned_page_dirty_scope = false;
-+	if (iommu->pinned_page_dirty_scope) {
-+		iommu->pinned_page_dirty_scope = false;
-+		if (iommu->dirty_page_tracking)
-+			vfio_iommu_populate_bitmap(iommu);
-+	}
-+
- 	mutex_unlock(&iommu->lock);
- 	vfio_iommu_resv_free(&group_resv_regions);
+-				if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu))
++				/*
++				 * During dirty page tracking, we can't remove
++				 * vfio_dma because dirty log will lose.
++				 */
++				if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu) &&
++				    !iommu->dirty_page_tracking)
+ 					vfio_iommu_unmap_unpin_all(iommu);
  
+ 				kfree(iommu->external_domain);
+@@ -2406,10 +2411,15 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
+ 		 * iommu and external domain doesn't exist, then all the
+ 		 * mappings go away too. If it's the last domain with iommu and
+ 		 * external domain exist, update accounting
++		 *
++		 * Note: During dirty page tracking, we can't remove vfio_dma
++		 * because dirty log will lose. Just update accounting is a good
++		 * choice.
+ 		 */
+ 		if (list_empty(&domain->group_list)) {
+ 			if (list_is_singular(&iommu->domain_list)) {
+-				if (!iommu->external_domain)
++				if (!iommu->external_domain &&
++				    !iommu->dirty_page_tracking)
+ 					vfio_iommu_unmap_unpin_all(iommu);
+ 				else
+ 					vfio_iommu_unmap_unpin_reaccount(iommu);
 -- 
 2.19.1
 
