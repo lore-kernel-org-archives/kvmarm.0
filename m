@@ -6,51 +6,52 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E7D4C433E0
-	for <kvmarm@archiver.kernel.org>; Thu,  7 Jan 2021 11:50:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6007BC433E6
+	for <kvmarm@archiver.kernel.org>; Thu,  7 Jan 2021 11:50:58 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DBE2423356
-	for <kvmarm@archiver.kernel.org>; Thu,  7 Jan 2021 11:50:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBE2423356
+	by mail.kernel.org (Postfix) with ESMTP id 0A16423355
+	for <kvmarm@archiver.kernel.org>; Thu,  7 Jan 2021 11:50:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A16423355
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E7AC4B3E3;
-	Thu,  7 Jan 2021 06:50:56 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9274F4B3DA;
+	Thu,  7 Jan 2021 06:50:57 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id LIsFU1-rz5Xd; Thu,  7 Jan 2021 06:50:55 -0500 (EST)
+	with ESMTP id ly0eosGgQLEV; Thu,  7 Jan 2021 06:50:56 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 759E04B3DE;
-	Thu,  7 Jan 2021 06:50:55 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 933024B3E5;
+	Thu,  7 Jan 2021 06:50:56 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C2F2F4B3D6
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Jan 2021 06:50:53 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 927EA4B3DC
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Jan 2021 06:50:55 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WfYsBWm9+o1N for <kvmarm@lists.cs.columbia.edu>;
- Thu,  7 Jan 2021 06:50:52 -0500 (EST)
+ with ESMTP id z53Aul8xwyQN for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  7 Jan 2021 06:50:54 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AE3C14B3DE
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Jan 2021 06:50:52 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8A1144B3E5
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Jan 2021 06:50:54 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id C6C942333F;
- Thu,  7 Jan 2021 11:50:51 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id AAD5323340;
+ Thu,  7 Jan 2021 11:50:53 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1kxTM4-005p1o-Gt; Thu, 07 Jan 2021 11:21:24 +0000
+ id 1kxTM9-005p1o-EH; Thu, 07 Jan 2021 11:21:30 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH 10/18] KVM: arm64: arch_timer: Remove VGIC initialization check
-Date: Thu,  7 Jan 2021 11:20:53 +0000
-Message-Id: <20210107112101.2297944-11-maz@kernel.org>
+Subject: [PATCH 15/18] KVM: arm64: Fix hyp_cpu_pm_{init,
+ exit} __init annotation
+Date: Thu,  7 Jan 2021 11:20:58 +0000
+Message-Id: <20210107112101.2297944-16-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210107112101.2297944-1-maz@kernel.org>
 References: <20210107112101.2297944-1-maz@kernel.org>
@@ -87,49 +88,39 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Alexandru Elisei <alexandru.elisei@arm.com>
+The __init annotations on hyp_cpu_pm_{init,exit} are obviously incorrect,
+and the build system shouts at you if you enable DEBUG_SECTION_MISMATCH.
 
-kvm_timer_enable() is called in kvm_vcpu_first_run_init() after
-kvm_vgic_map_resources() if the VGIC wasn't ready. kvm_vgic_map_resources()
-is the only place where kvm->arch.vgic.ready is set to true.
+Nothing really bad happens as we never execute that code outside of the
+init context, but we can't label the callers as __int either, as kvm_init
+isn't __init itself. Oh well.
 
-For a v2 VGIC, kvm_vgic_map_resources() will attempt to initialize the VGIC
-and set the initialized flag.
-
-For a v3 VGIC, kvm_vgic_map_resources() will return an error code if the
-VGIC isn't already initialized.
-
-The end result is that if we've reached kvm_timer_enable(), the VGIC is
-initialzed and ready and vgic_initialized() will always be true, so remove
-this check.
-
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-[maz: added comment about vgic initialisation, as suggested by Eric]
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20201201150157.223625-3-alexandru.elisei@arm.com
+Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
+Link: https://lore.kernel.org/r/20201223120854.255347-1-maz@kernel.org
 ---
- arch/arm64/kvm/arch_timer.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/arm.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index 32ba6fbc3814..74e0699661e9 100644
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -1129,9 +1129,10 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
- 	if (!irqchip_in_kernel(vcpu->kvm))
- 		goto no_vgic;
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index ab782c480e9a..04c44853b103 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1568,12 +1568,12 @@ static struct notifier_block hyp_init_cpu_pm_nb = {
+ 	.notifier_call = hyp_init_cpu_pm_notifier,
+ };
  
--	if (!vgic_initialized(vcpu->kvm))
--		return -ENODEV;
--
-+	/*
-+	 * At this stage, we have the guarantee that the vgic is both
-+	 * available and initialized.
-+	 */
- 	if (!timer_irqs_are_valid(vcpu)) {
- 		kvm_debug("incorrectly configured timer irqs\n");
- 		return -EINVAL;
+-static void __init hyp_cpu_pm_init(void)
++static void hyp_cpu_pm_init(void)
+ {
+ 	if (!is_protected_kvm_enabled())
+ 		cpu_pm_register_notifier(&hyp_init_cpu_pm_nb);
+ }
+-static void __init hyp_cpu_pm_exit(void)
++static void hyp_cpu_pm_exit(void)
+ {
+ 	if (!is_protected_kvm_enabled())
+ 		cpu_pm_unregister_notifier(&hyp_init_cpu_pm_nb);
 -- 
 2.29.2
 
