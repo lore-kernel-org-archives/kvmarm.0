@@ -2,106 +2,86 @@ Return-Path: <SRS0=HOrx=GL=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61952C433DB
-	for <kvmarm@archiver.kernel.org>; Fri,  8 Jan 2021 10:04:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 061C8C433E0
+	for <kvmarm@archiver.kernel.org>; Fri,  8 Jan 2021 12:15:34 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CBE512368A
-	for <kvmarm@archiver.kernel.org>; Fri,  8 Jan 2021 10:04:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBE512368A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 35F70238E4
+	for <kvmarm@archiver.kernel.org>; Fri,  8 Jan 2021 12:15:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35F70238E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FF2A4B37D;
-	Fri,  8 Jan 2021 05:04:08 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 47D214B3EF;
+	Fri,  8 Jan 2021 07:15:32 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id OAkAMoQex8pe; Fri,  8 Jan 2021 05:04:07 -0500 (EST)
+	with ESMTP id obdCDCSJ+p8r; Fri,  8 Jan 2021 07:15:30 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1185F4B383;
-	Fri,  8 Jan 2021 05:04:07 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E0CE74B3DD;
+	Fri,  8 Jan 2021 07:15:30 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DE3DF4B37F
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jan 2021 05:04:05 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C0C34B3D8
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jan 2021 07:15:29 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vReRUa+ME2wb for <kvmarm@lists.cs.columbia.edu>;
- Fri,  8 Jan 2021 05:04:05 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 213B64B37D
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jan 2021 05:04:05 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1610100244;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=11l3mj1UE5jX79PBsPyiLxVECs3/fF4MoveQY9G6pbQ=;
- b=isUoiQeX5ZWiA1Op18oaQYLsmQXhCpjFDoTT+erg3n2upRre57+UhK95Wu50htTVYM2gcz
- GMvooasVRw9n7j4Ug86oAUWvhmfHcToImlTBJVMK38H3F+nJe1xQrA5hPzuqI/DP3lmwmC
- BVZjbxEW/DSYX6NYlZS0LA5jifhAhUU=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-379-qEUIdr5wMxCetO_K12oy4A-1; Fri, 08 Jan 2021 05:04:01 -0500
-X-MC-Unique: qEUIdr5wMxCetO_K12oy4A-1
-Received: by mail-wr1-f70.google.com with SMTP id i4so3921212wrm.21
- for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Jan 2021 02:04:00 -0800 (PST)
+ with ESMTP id mlzw687nJfJi for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  8 Jan 2021 07:15:27 -0500 (EST)
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com
+ [209.85.221.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8F55E4B3D4
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jan 2021 07:15:27 -0500 (EST)
+Received: by mail-wr1-f74.google.com with SMTP id 88so4057683wrc.17
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Jan 2021 04:15:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=sender:date:message-id:mime-version:subject:from:to:cc;
+ bh=8jWtBJc1CFcZb+VXrXLCFTBvH9ZyJNX9qmbOUYXXGY0=;
+ b=keePsNtl1E9gJ3ZSMLecqwf/miasl2f7G9Qw05xGjoSrd1phO1u0M4d0sD5gNWCwL3
+ IfBOoKkoYFErlFOZyuJxN6wX+NukPTNuI4IJ3fFJlV5UvFdOBEkiVdVzLmeqGsNGQMLv
+ Bzr1AVeWxssYqd7azGxpM14RQdhSiD+Avc6I29t/i3hH7HW4xBbAaSPO8SvQxT+ocep7
+ 4rKmwedbo/QeoMedDSlXM8ZHpNoBqGlOvWi6UfcDIe4eP1CI8y2K3jv7IE9KLnkjkpnF
+ abRO3MCs96CHqdlUmHw4pgCBCTMpEe4Jwvt/Dt8S0BDkLff5f66rb5FDGRHmVVqRVmH+
+ xPZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=11l3mj1UE5jX79PBsPyiLxVECs3/fF4MoveQY9G6pbQ=;
- b=t4vEKMA6XZ8ccl/4hCHHg88jh9otIYBYsB8Dlsoh1grFFyjiEdo5ChCuvj+1EhXNS3
- BFrdbJemTjGuXnAlQ7rYGRTneBKljwH7lb2lQduOzS306OaZO2U6HwdFH7SAAag+gXK7
- eeiLLIv13/Mwkma69DrOrOLT78JoIZ1pTnjyR/CsG1WTcPZ/8P6nTvc0HiwxtA1quGtW
- vdgueBKRpTvL6sCupj5+K6kfckY97fKTmeHkh36xkp1Kgf8KoBfPiksp495Rr5w2pm40
- qjWAH/vREDur4euOlZY/9Ju7T8TsAarCnrzN4sxoqndEVBpQlOTtdm7CGvDMzSswMG18
- RjEg==
-X-Gm-Message-State: AOAM533CDC9WWX0ulnhq/qog9qDCE5OZvi3KPfpIsPuY50BtHJa+B7Lw
- UJ4e6V40N9oVOm+WJTMgzeCb+YYWw60Gg3DwHOH1OqUqCyYMDDyydkob7WSkOKKgWK9ilN7HlQg
- SiDuNaQcUpYG78GcJutYfuTce
-X-Received: by 2002:a1c:2091:: with SMTP id g139mr2373449wmg.133.1610100239939; 
- Fri, 08 Jan 2021 02:03:59 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyFyMLPpPYKbyxpZXOaQ2QHZKNsKsCm/85IAHueIGD5l8QsZqKB6OB7QmV+330rv7+imjV54A==
-X-Received: by 2002:a1c:2091:: with SMTP id g139mr2373427wmg.133.1610100239715; 
- Fri, 08 Jan 2021 02:03:59 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
- ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
- by smtp.gmail.com with ESMTPSA id x7sm10927331wmi.11.2021.01.08.02.03.57
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 08 Jan 2021 02:03:58 -0800 (PST)
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 5.11, take #1
-To: Marc Zyngier <maz@kernel.org>
-References: <20210107112101.2297944-1-maz@kernel.org>
- <35b38baf-bd75-9054-76f8-15e642e05f55@redhat.com>
- <47864d22df766d6028f437a20aa4668a@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b75a791a-6727-1b55-ea96-d7860b4ade80@redhat.com>
-Date: Fri, 8 Jan 2021 11:03:57 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.0
-MIME-Version: 1.0
-In-Reply-To: <47864d22df766d6028f437a20aa4668a@kernel.org>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Cc: kernel-team@android.com, kvm@vger.kernel.org, Qian Cai <qcai@redhat.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Shannon Zhao <shannon.zhao@linux.alibaba.com>,
- linux-arm-kernel@lists.infradead.org,
- Nathan Chancellor <natechancellor@gmail.com>, kvmarm@lists.cs.columbia.edu
+ h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
+ :to:cc;
+ bh=8jWtBJc1CFcZb+VXrXLCFTBvH9ZyJNX9qmbOUYXXGY0=;
+ b=ItVACE8oIom3sdYz5xUv0ZKnak+4eRhqKOe7+3a+3Tx8l8cd5SkBO4JkA/3sYkPSS8
+ rOrHUMFcr8Vmxb782BFbxdt2idQJ2FZSF7Y88KwHpIGxWv0p0AgFtEV6aUNwjhBu+SJu
+ 6d7vf1us2kRIdwgn/+hETq0glDewM/9Y2/qrF7gr04+3Ei8C3NZE9f3lk8q/sgjwuqce
+ KZDY15DQkX/ENfxMOTpQZStDAIC1k//mr7si6hFM3aQHzpiBJaWh/+0jSktWvef+ZbCe
+ giw151mrkLdqEqHKNaEX5kMscXiHDeokbfzhvBdk0u1TLokaMEv6ADr8H3IRz30QeWsM
+ yy6g==
+X-Gm-Message-State: AOAM532DfqAWU0Fy14aHdUtEPnskhub66Qq1qWOWadgk2x0M+QO2O5BJ
+ i7gOSjHx70WLE8lnrVuaAiJk569igmTE
+X-Google-Smtp-Source: ABdhPJwI2qadtflNq64nGgHy8mDYMmobmhMLyzB308p1S4AbE2li7Ch6Zqf20u6+ktNgGnvmYe+pC6V4Gd15
+X-Received: from r2d2-qp.c.googlers.com ([fda3:e722:ac3:10:28:9cb1:c0a8:1652])
+ (user=qperret job=sendgmr) by 2002:a7b:cc94:: with SMTP id
+ p20mr2807021wma.22.1610108126249; Fri, 08 Jan 2021 04:15:26 -0800 (PST)
+Date: Fri,  8 Jan 2021 12:14:58 +0000
+Message-Id: <20210108121524.656872-1-qperret@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.30.0.284.gd98b1dd5eaa7-goog
+Subject: [RFC PATCH v2 00/26] KVM/arm64: A stage 2 for the host
+From: Quentin Perret <qperret@google.com>
+To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+ Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
+ Julien Thierry <julien.thierry.kdev@gmail.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Rob Herring <robh+dt@kernel.org>, Frank Rowand <frowand.list@gmail.com>
+Cc: devicetree@vger.kernel.org, android-kvm@google.com,
+ linux-kernel@vger.kernel.org, Fuad Tabba <tabba@google.com>,
+ kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -113,26 +93,152 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gMDgvMDEvMjEgMDk6MjIsIE1hcmMgWnluZ2llciB3cm90ZToKPj4KPj4+IMKgwqAgZ2l0Oi8v
-Z2l0Lmtlcm5lbC5vcmcvcHViL3NjbS9saW51eC9rZXJuZWwvZ2l0L2t2bWFybS9rdm1hcm0uZ2l0
-IAo+Pj4gdGFncy9rdm1hcm0tZml4ZXMtNS4xMS0xCj4+Cj4+IExvb2tzIGxpa2UgdGhlcmUgYXJl
-IGlzc3VlcyB3aXRoIHRoZSB1cHN0cmVhbSBjaGFuZ2VzIGJyb3VnaHQgaW4gYnkKPj4gdGhpcyBw
-dWxsIHJlcXVlc3QuwqAgVW5sZXNzIG15IGJpc2VjdGlvbiBpcyBxdWljayB0b21vcnJvdyBpdCBt
-YXkgbm90Cj4+IG1ha2UgaXQgaW50byA1LjExLXJjMy7CoCBJbiBhbnkgY2FzZSwgaXQncyBpbiBt
-eSBoYW5kcy4KPiAKPiBJJ20gbm90IHN1cmUgd2hhdCB5b3UgbWVhbiBieSAidXBzdHJlYW0gY2hh
-bmdlcyIsIGFzIHRoZXJlIGlzIG5vCj4gYWRkaXRpb25hbCBjaGFuZ2VzIG9uIHRvcCBvZiB3aGF0
-IGlzIGRlc2NyaWJlIGluIHRoaXMgcHVsbCByZXF1ZXN0LAo+IHdoaWNoIGlzIGRpcmVjdGx5IGJh
-c2VkIG9uIHRoZSB0YWfCoCB5b3UgcHVsbGVkIGZvciB0aGUgbWVyZ2Ugd2luZG93Lgo+IAo+IElm
-IHRoZXJlIGlzIGFuIGlzc3VlIHdpdGggYW55IG9mIHRoZXNlIDE4IHBhdGNoZXMgdGhlbXNlbHZl
-cywgcGxlYXNlCj4gc2hvdXQgYXMgc29vbiBhcyB5b3UgY2FuLgoKWW91J3JlIHJpZ2h0LCBpdCdz
-IG5vdCByZWxhdGVkIHRvIHRoaXMgcHVsbCByZXF1ZXN0IGJ1dCBqdXN0IHRvIExpbnVzJ3MgCnRy
-ZWUuICBJdCB3YXMgdG9vIGxhdGUgeWVzdGVyZGF5LCBhbmQgbm93IGl0J3MgYWxsIHNldCBmb3Ig
-c2VuZGluZyBpdCBvdXQuCgpQYW9sbwoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1i
-aWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3Zt
-YXJtCg==
+Hi all,
+
+This is the v2 of the series previously posted here:
+
+  https://lore.kernel.org/kvmarm/20201117181607.1761516-1-qperret@google.com/
+
+This basically allows us to wrap the host with a stage 2 when running in
+nVHE, hence paving the way for protecting guest memory from the host in
+the future (among other use-cases). For more details about the
+motivation and the design angle taken here, I would recommend to have a
+look at the cover letter of v1, and/or to watch these presentations at
+LPC [1] and KVM forum 2020 [2].
+
+In short, the changes since v1 include:
+
+ - Renamed most pkvm-specific pgtable functions as pkvm_* to avoid
+   confusion with the host's (Fuad)
+
+ - Added an IC flush when switching pgtables (Fuad, Mark)
+
+ - Cleaned-up the PI aliasing in image-vars.h (David)
+
+ - Added a TLB flush when enabling the host stage 2 to avoid stale TLBs
+   from bootloader
+
+ - Fixed the early memory reservation by using NR_CPUS instead of
+   num_possible_cpus() (which is always 1 that early)
+
+ - Added missing preempt_{dis,en}able() guards in
+   kvm_hyp_enable_protection()
+
+ - Rebased on latest kvmarm/next
+
+And if you'd like a branch that has all the goodies, there it is:
+
+    https://android-kvm.googlesource.com/linux qperret/host-stage2-v2
+
+Thanks!
+Quentin
+
+[1] https://youtu.be/54q6RzS9BpQ?t=10859
+[2] https://kvmforum2020.sched.com/event/eE24/virtualization-for-the-masses-exposing-kvm-on-android-will-deacon-google
+
+Quentin Perret (23):
+  KVM: arm64: Initialize kvm_nvhe_init_params early
+  KVM: arm64: Avoid free_page() in page-table allocator
+  KVM: arm64: Factor memory allocation out of pgtable.c
+  KVM: arm64: Introduce a BSS section for use at Hyp
+  KVM: arm64: Make kvm_call_hyp() a function call at Hyp
+  KVM: arm64: Allow using kvm_nvhe_sym() in hyp code
+  KVM: arm64: Introduce an early Hyp page allocator
+  KVM: arm64: Stub CONFIG_DEBUG_LIST at Hyp
+  KVM: arm64: Introduce a Hyp buddy page allocator
+  KVM: arm64: Enable access to sanitized CPU features at EL2
+  KVM: arm64: Factor out vector address calculation
+  of/fdt: Introduce early_init_dt_add_memory_hyp()
+  KVM: arm64: Prepare Hyp memory protection
+  KVM: arm64: Elevate Hyp mappings creation at EL2
+  KVM: arm64: Use kvm_arch for stage 2 pgtable
+  KVM: arm64: Use kvm_arch in kvm_s2_mmu
+  KVM: arm64: Set host stage 2 using kvm_nvhe_init_params
+  KVM: arm64: Refactor kvm_arm_setup_stage2()
+  KVM: arm64: Refactor __load_guest_stage2()
+  KVM: arm64: Refactor __populate_fault_info()
+  KVM: arm64: Make memcache anonymous in pgtable allocator
+  KVM: arm64: Reserve memory for host stage 2
+  KVM: arm64: Wrap the host with a stage 2
+
+Will Deacon (3):
+  arm64: lib: Annotate {clear,copy}_page() as position-independent
+  KVM: arm64: Link position-independent string routines into .hyp.text
+  arm64: kvm: Add standalone ticket spinlock implementation for use at
+    hyp
+
+ arch/arm64/include/asm/cpufeature.h           |   1 +
+ arch/arm64/include/asm/hyp_image.h            |   7 +
+ arch/arm64/include/asm/kvm_asm.h              |   7 +
+ arch/arm64/include/asm/kvm_cpufeature.h       |  19 ++
+ arch/arm64/include/asm/kvm_host.h             |  16 +-
+ arch/arm64/include/asm/kvm_hyp.h              |   8 +
+ arch/arm64/include/asm/kvm_mmu.h              |  69 +++++-
+ arch/arm64/include/asm/kvm_pgtable.h          |  41 +++-
+ arch/arm64/include/asm/sections.h             |   1 +
+ arch/arm64/kernel/asm-offsets.c               |   3 +
+ arch/arm64/kernel/cpufeature.c                |  12 +
+ arch/arm64/kernel/image-vars.h                |  33 +++
+ arch/arm64/kernel/vmlinux.lds.S               |   7 +
+ arch/arm64/kvm/arm.c                          | 144 ++++++++++--
+ arch/arm64/kvm/hyp/Makefile                   |   2 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h       |  36 +--
+ arch/arm64/kvm/hyp/include/nvhe/early_alloc.h |  14 ++
+ arch/arm64/kvm/hyp/include/nvhe/gfp.h         |  32 +++
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  33 +++
+ arch/arm64/kvm/hyp/include/nvhe/memory.h      |  55 +++++
+ arch/arm64/kvm/hyp/include/nvhe/mm.h          | 107 +++++++++
+ arch/arm64/kvm/hyp/include/nvhe/spinlock.h    |  92 ++++++++
+ arch/arm64/kvm/hyp/nvhe/Makefile              |   9 +-
+ arch/arm64/kvm/hyp/nvhe/cache.S               |  13 ++
+ arch/arm64/kvm/hyp/nvhe/cpufeature.c          |   8 +
+ arch/arm64/kvm/hyp/nvhe/early_alloc.c         |  60 +++++
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S            |  41 ++++
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  48 ++++
+ arch/arm64/kvm/hyp/nvhe/hyp.lds.S             |   1 +
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 191 ++++++++++++++++
+ arch/arm64/kvm/hyp/nvhe/mm.c                  | 174 ++++++++++++++
+ arch/arm64/kvm/hyp/nvhe/page_alloc.c          | 185 +++++++++++++++
+ arch/arm64/kvm/hyp/nvhe/psci-relay.c          |   4 +-
+ arch/arm64/kvm/hyp/nvhe/setup.c               | 214 ++++++++++++++++++
+ arch/arm64/kvm/hyp/nvhe/stub.c                |  22 ++
+ arch/arm64/kvm/hyp/nvhe/switch.c              |  12 +-
+ arch/arm64/kvm/hyp/nvhe/tlb.c                 |   4 +-
+ arch/arm64/kvm/hyp/pgtable.c                  |  98 ++++----
+ arch/arm64/kvm/hyp/reserved_mem.c             | 104 +++++++++
+ arch/arm64/kvm/mmu.c                          | 114 +++++++++-
+ arch/arm64/kvm/reset.c                        |  42 +---
+ arch/arm64/lib/clear_page.S                   |   4 +-
+ arch/arm64/lib/copy_page.S                    |   4 +-
+ arch/arm64/mm/init.c                          |   3 +
+ drivers/of/fdt.c                              |   5 +
+ 45 files changed, 1954 insertions(+), 145 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kvm_cpufeature.h
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/early_alloc.h
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/gfp.h
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/memory.h
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/mm.h
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/spinlock.h
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/cache.S
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/cpufeature.c
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/early_alloc.c
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/mem_protect.c
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/mm.c
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/page_alloc.c
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/setup.c
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/stub.c
+ create mode 100644 arch/arm64/kvm/hyp/reserved_mem.c
+
+-- 
+2.30.0.284.gd98b1dd5eaa7-goog
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
