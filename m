@@ -2,72 +2,71 @@ Return-Path: <SRS0=HOrx=GL=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E97DAC433DB
-	for <kvmarm@archiver.kernel.org>; Fri,  8 Jan 2021 17:59:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43223C433DB
+	for <kvmarm@archiver.kernel.org>; Fri,  8 Jan 2021 18:13:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 40F5C23877
-	for <kvmarm@archiver.kernel.org>; Fri,  8 Jan 2021 17:59:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40F5C23877
+	by mail.kernel.org (Postfix) with ESMTP id 898C523A6A
+	for <kvmarm@archiver.kernel.org>; Fri,  8 Jan 2021 18:13:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 898C523A6A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 848CC4B388;
-	Fri,  8 Jan 2021 12:59:20 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D228A4B450;
+	Fri,  8 Jan 2021 13:13:04 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id yubMvWWnuqlP; Fri,  8 Jan 2021 12:59:19 -0500 (EST)
+	with ESMTP id NMjN6Jh0ZPbW; Fri,  8 Jan 2021 13:13:03 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 375BA4B466;
-	Fri,  8 Jan 2021 12:59:19 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BC18A4B42A;
+	Fri,  8 Jan 2021 13:13:03 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DBE404B463
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jan 2021 12:59:17 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0641C4B42A
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jan 2021 13:13:03 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lu2iZfG9FGtR for <kvmarm@lists.cs.columbia.edu>;
- Fri,  8 Jan 2021 12:59:16 -0500 (EST)
+ with ESMTP id KweVUmOpIewi for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  8 Jan 2021 13:13:02 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9697B4B388
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jan 2021 12:59:16 -0500 (EST)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 67E6B23787
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jan 2021 17:59:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1610128755;
- bh=wc96z84yM7+ijehA2SYoGUW8DZyuJfOJIrKbtR7szIk=;
- h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
- b=RSD43E/mE2UsAsKe9qewwIUEALVyeAVj+CofHR74IaZHdCFvnVynW+gh0GKXWKVcq
- sHEcj/e2/zjZTxh03oXUcafLSMpv6K366jQb9zLN09AnGF8Yi2j0kOZrRKeRH4K6f0
- y7HjoEfNEEDyOR0viqjnqQu1u2sFEFchZDbLTKrgTsWRHAf00sD0hDlneh05DalmW0
- FvUKtiNHt9AdT/cp2fDTXCCXmVbQ8spXFt8krUsawAvQ0vttPZ6dquS8IW74UeQrgH
- XDr2+lS15hPXLm77ALRFZs6pwdQ/gzXtXDIsIb5/y6lSFFigCvd0SH9cAqXp91hdg1
- +kbrMuvNCDAWw==
-Received: by mail-oi1-f180.google.com with SMTP id l200so12221535oig.9
- for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Jan 2021 09:59:15 -0800 (PST)
-X-Gm-Message-State: AOAM533zhmZOhH3rPdXU0up31EaYDtaY5pMEcg51ssEUrT7v/fX2f2Bz
- T47E7/lc6xOCSgXT3aa9X8uNs3ztk5mY59+dfjQ=
-X-Google-Smtp-Source: ABdhPJxOlKA50eb6s4zqAv/LcIXwL3Ps2e4JUVQm+0twWog2x4RqnXRRcVocu22gw2w3PvSRn399ZWhfegv+iZs8kaU=
-X-Received: by 2002:aca:dd03:: with SMTP id u3mr3100885oig.47.1610128754674;
- Fri, 08 Jan 2021 09:59:14 -0800 (PST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D43D74B40E
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jan 2021 13:13:01 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 930E823A69;
+ Fri,  8 Jan 2021 18:13:00 +0000 (UTC)
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
+ TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1kxwFu-0068SH-9D; Fri, 08 Jan 2021 18:12:58 +0000
 MIME-Version: 1.0
-References: <20210108171216.2310188-1-maz@kernel.org>
- <20210108171216.2310188-3-maz@kernel.org>
-In-Reply-To: <20210108171216.2310188-3-maz@kernel.org>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Fri, 8 Jan 2021 18:59:03 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXGAQKHZ+MHggDJK9qv0bPNVr7Zb6hdzd78YfRaMUQg8yQ@mail.gmail.com>
-Message-ID: <CAMj1kXGAQKHZ+MHggDJK9qv0bPNVr7Zb6hdzd78YfRaMUQg8yQ@mail.gmail.com>
+Date: Fri, 08 Jan 2021 18:12:58 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Ard Biesheuvel <ardb@kernel.org>
 Subject: Re: [PATCH 2/2] KVM: arm64: Workaround firmware wrongly advertising
  GICv2-on-v3 compatibility
-To: Marc Zyngier <maz@kernel.org>
+In-Reply-To: <CAMj1kXGAQKHZ+MHggDJK9qv0bPNVr7Zb6hdzd78YfRaMUQg8yQ@mail.gmail.com>
+References: <20210108171216.2310188-1-maz@kernel.org>
+ <20210108171216.2310188-3-maz@kernel.org>
+ <CAMj1kXGAQKHZ+MHggDJK9qv0bPNVr7Zb6hdzd78YfRaMUQg8yQ@mail.gmail.com>
+User-Agent: Roundcube Webmail/1.4.9
+Message-ID: <72a1bea27a29d35413c193f81b7ba170@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: ardb@kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, shameerali.kolothum.thodi@huawei.com,
+ james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+ kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 Cc: Linux ARM <linux-arm-kernel@lists.infradead.org>,
  Android Kernel Team <kernel-team@android.com>,
  kvmarm <kvmarm@lists.cs.columbia.edu>
@@ -82,119 +81,104 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 8 Jan 2021 at 18:12, Marc Zyngier <maz@kernel.org> wrote:
->
-> It looks like we have broken firmware out there that wrongly advertises
-> a GICv2 compatibility interface, despite the CPUs not being able to deal
-> with it.
->
-> To work around this, check that the CPU initialising KVM is actually able
-> to switch to MMIO instead of system registers, and use that as a
-> precondition to enable GICv2 compatibility in KVM.
->
-> Note that the detection happens on a single CPU. If the firmware is
-> lying *and* that the CPUs are asymetric, all hope is lost anyway.
->
-> Reported-by: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/hyp/vgic-v3-sr.c | 34 +++++++++++++++++++++++++++++++--
->  arch/arm64/kvm/vgic/vgic-v3.c   |  8 ++++++--
->  2 files changed, 38 insertions(+), 4 deletions(-)
->
-> diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> index 005daa0c9dd7..d504499ab917 100644
-> --- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> +++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> @@ -408,11 +408,41 @@ void __vgic_v3_init_lrs(void)
->  /*
->   * Return the GIC CPU configuration:
->   * - [31:0]  ICH_VTR_EL2
-> - * - [63:32] RES0
-> + * - [62:32] RES0
-> + * - [63]    MMIO (GICv2) capable
->   */
->  u64 __vgic_v3_get_gic_config(void)
->  {
-> -       return read_gicreg(ICH_VTR_EL2);
-> +       u64 sre = read_gicreg(ICC_SRE_EL1);
-> +       unsigned long flags = 0;
-> +       bool v2_capable;
-> +
-> +       /*
-> +        * To check whether we have a MMIO-based (GICv2 compatible)
-> +        * CPU interface, we need to disable the system register
-> +        * view. To do that safely, we have to prevent any interrupt
-> +        * from firing (which would be deadly).
-> +        *
-> +        * Note that this only makes sense on VHE, as interrupts are
-> +        * already masked for nVHE as part of the exception entry to
-> +        * EL2.
-> +        */
-> +       if (has_vhe())
-> +               flags = local_daif_save();
-> +
-> +       write_gicreg(0, ICC_SRE_EL1);
-> +       isb();
-> +
-> +       v2_capable = !(read_gicreg(ICC_SRE_EL1) & ICC_SRE_EL1_SRE);
-> +
-> +       write_gicreg(sre, ICC_SRE_EL1);
-> +       isb();
-> +
-> +       if (has_vhe())
-> +               local_daif_restore(flags);
-> +
-> +       return (read_gicreg(ICH_VTR_EL2) |
-> +               v2_capable ? (1ULL << 63) : 0);
->  }
->
+On 2021-01-08 17:59, Ard Biesheuvel wrote:
+> On Fri, 8 Jan 2021 at 18:12, Marc Zyngier <maz@kernel.org> wrote:
+>> 
+>> It looks like we have broken firmware out there that wrongly 
+>> advertises
+>> a GICv2 compatibility interface, despite the CPUs not being able to 
+>> deal
+>> with it.
+>> 
+>> To work around this, check that the CPU initialising KVM is actually 
+>> able
+>> to switch to MMIO instead of system registers, and use that as a
+>> precondition to enable GICv2 compatibility in KVM.
+>> 
+>> Note that the detection happens on a single CPU. If the firmware is
+>> lying *and* that the CPUs are asymetric, all hope is lost anyway.
+>> 
+>> Reported-by: Shameerali Kolothum Thodi 
+>> <shameerali.kolothum.thodi@huawei.com>
+>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>> ---
+>>  arch/arm64/kvm/hyp/vgic-v3-sr.c | 34 
+>> +++++++++++++++++++++++++++++++--
+>>  arch/arm64/kvm/vgic/vgic-v3.c   |  8 ++++++--
+>>  2 files changed, 38 insertions(+), 4 deletions(-)
+>> 
+>> diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c 
+>> b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+>> index 005daa0c9dd7..d504499ab917 100644
+>> --- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
+>> +++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+>> @@ -408,11 +408,41 @@ void __vgic_v3_init_lrs(void)
+>>  /*
+>>   * Return the GIC CPU configuration:
+>>   * - [31:0]  ICH_VTR_EL2
+>> - * - [63:32] RES0
+>> + * - [62:32] RES0
+>> + * - [63]    MMIO (GICv2) capable
+>>   */
+>>  u64 __vgic_v3_get_gic_config(void)
+>>  {
+>> -       return read_gicreg(ICH_VTR_EL2);
+>> +       u64 sre = read_gicreg(ICC_SRE_EL1);
+>> +       unsigned long flags = 0;
+>> +       bool v2_capable;
+>> +
+>> +       /*
+>> +        * To check whether we have a MMIO-based (GICv2 compatible)
+>> +        * CPU interface, we need to disable the system register
+>> +        * view. To do that safely, we have to prevent any interrupt
+>> +        * from firing (which would be deadly).
+>> +        *
+>> +        * Note that this only makes sense on VHE, as interrupts are
+>> +        * already masked for nVHE as part of the exception entry to
+>> +        * EL2.
+>> +        */
+>> +       if (has_vhe())
+>> +               flags = local_daif_save();
+>> +
+>> +       write_gicreg(0, ICC_SRE_EL1);
+>> +       isb();
+>> +
+>> +       v2_capable = !(read_gicreg(ICC_SRE_EL1) & ICC_SRE_EL1_SRE);
+>> +
+>> +       write_gicreg(sre, ICC_SRE_EL1);
+>> +       isb();
+>> +
+>> +       if (has_vhe())
+>> +               local_daif_restore(flags);
+>> +
+>> +       return (read_gicreg(ICH_VTR_EL2) |
+>> +               v2_capable ? (1ULL << 63) : 0);
+>>  }
+>> 
+> 
+> Is it necessary to perform this check unconditionally? We only care
+> about this if the firmware claims v2 compat support.
 
-Is it necessary to perform this check unconditionally? We only care
-about this if the firmware claims v2 compat support.
+Indeed. But this is done exactly once per boot, and I see it as
+a way to extract the CPU configuration more than anything else.
 
->  u64 __vgic_v3_read_vmcr(void)
-> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-> index 8e7bf3151057..67b27b47312b 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v3.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
-> @@ -584,8 +584,10 @@ early_param("kvm-arm.vgic_v4_enable", early_gicv4_enable);
->  int vgic_v3_probe(const struct gic_kvm_info *info)
->  {
->         u64 ich_vtr_el2 = kvm_call_hyp_ret(__vgic_v3_get_gic_config);
-> +       bool has_v2;
->         int ret;
->
-> +       has_v2 = ich_vtr_el2 >> 63;
->         ich_vtr_el2 = (u32)ich_vtr_el2;
->
->         /*
-> @@ -605,13 +607,15 @@ int vgic_v3_probe(const struct gic_kvm_info *info)
->                          gicv4_enable ? "en" : "dis");
->         }
->
-> +       kvm_vgic_global_state.vcpu_base = 0;
-> +
->         if (!info->vcpu.start) {
->                 kvm_info("GICv3: no GICV resource entry\n");
-> -               kvm_vgic_global_state.vcpu_base = 0;
-> +       } else if (!has_v2) {
-> +               pr_warn("CPU interface incapable of MMIO access\n");
->         } else if (!PAGE_ALIGNED(info->vcpu.start)) {
->                 pr_warn("GICV physical address 0x%llx not page aligned\n",
->                         (unsigned long long)info->vcpu.start);
-> -               kvm_vgic_global_state.vcpu_base = 0;
->         } else {
->                 kvm_vgic_global_state.vcpu_base = info->vcpu.start;
->                 kvm_vgic_global_state.can_emulate_gicv2 = true;
-> --
-> 2.29.2
->
+Extracting it *only* when we have some v2 compat info would mean
+sharing that information with EL2 (in the nVHE case), and it felt
+more hassle than it is worth.
+
+Do you foresee any issue with this, other than the whole thing
+being disgusting (which I wilfully admit)?
+
+Thanks,
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
