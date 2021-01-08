@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 739EBC433DB
-	for <kvmarm@archiver.kernel.org>; Fri,  8 Jan 2021 12:15:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B842C433DB
+	for <kvmarm@archiver.kernel.org>; Fri,  8 Jan 2021 12:15:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id EF05D23975
-	for <kvmarm@archiver.kernel.org>; Fri,  8 Jan 2021 12:15:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF05D23975
+	by mail.kernel.org (Postfix) with ESMTP id 9590B239EB
+	for <kvmarm@archiver.kernel.org>; Fri,  8 Jan 2021 12:15:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9590B239EB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F79B4B386;
-	Fri,  8 Jan 2021 07:15:48 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 372AA4B3DE;
+	Fri,  8 Jan 2021 07:15:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id WJCB3yqnxDFz; Fri,  8 Jan 2021 07:15:47 -0500 (EST)
+	with ESMTP id Q9ji1l8JRaY0; Fri,  8 Jan 2021 07:15:50 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 04C734B3F4;
-	Fri,  8 Jan 2021 07:15:47 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 366F44B40D;
+	Fri,  8 Jan 2021 07:15:50 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 687F34B388
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jan 2021 07:15:45 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C8D04B3FD
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jan 2021 07:15:48 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QybDkppc0c0S for <kvmarm@lists.cs.columbia.edu>;
- Fri,  8 Jan 2021 07:15:44 -0500 (EST)
-Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com
- [209.85.160.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D1C634B3FD
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jan 2021 07:15:43 -0500 (EST)
-Received: by mail-qt1-f201.google.com with SMTP id v9so8124409qtw.12
- for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Jan 2021 04:15:43 -0800 (PST)
+ with ESMTP id RMBkAueur6zK for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  8 Jan 2021 07:15:47 -0500 (EST)
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com
+ [209.85.221.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5E4D64B403
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jan 2021 07:15:46 -0500 (EST)
+Received: by mail-wr1-f74.google.com with SMTP id u3so4038692wri.19
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Jan 2021 04:15:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=sender:date:in-reply-to:message-id:mime-version:references:subject
- :from:to:cc; bh=FNjMcGMBepA+DKYzWBZdafn9Pfvz5tgi5bFjDXzrpjw=;
- b=MnwPPAzoXNwaOiIaAGjdxyYKgCpjZp6Y/8k70XQrFxP2o4aKAID1+AZSD9MNSZDBu7
- C1KdtY+o82o9hD3Jv3i9pN11yqVnvTEMzLJECVqtKuxjPOhr4G+fCEVPEA1slzI1JowR
- CSXnnwarOjT0oN1R+ZhxnBm4V4rEHrNYwYu1fsoKb+lRL7HgwNvni2KmTT4h/RzLGhOO
- llmt1BjnI2tjj0RTLZJ49lVdW1/iNrO+a1O+zULzBx1EyMYKzRKJa7IR/UiOX2z6y3so
- 2Qt8L9hn3buycUtLVrwGXMuKpsy74lToWQTVDmDWMw+PhLbObGNxGzeYdWb4/SRx0AMn
- srfQ==
+ :from:to:cc; bh=j2147gnSzl9I0ScvZHWmAEizoS1X3L4ZHr3IS+13AKY=;
+ b=Ns/jsJnBKAEMgPThyuR5EpWbpEFuji6DabFH+5GBY0CvrWpmvNqu9R86B3G/uacWQS
+ KmN2zpRmuvtgq4B7YACdY7SURg02CGduxtogRTfv3ogluubm5YiaSF9YIp7Z01d6HSs6
+ s580RGQ/bhzezrX1DLcpZQ1xub6tyD6US0n+U7l3f5mQr/Nng8tw58EvPQ+pOHn13Kbs
+ m3e0q3j6/ETq9wkmQoFp8k0t3mxpKxsFtfPE+Iu6HMXj2287z9WV/eS3AJBTmYhm3rF1
+ K4g+HsMOnZqEbMKeNYSPpu3EAeAydUEzoDvGYM3uBjU/V0yKSJX+qcVx62rpCysU4UJj
+ 8gCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=FNjMcGMBepA+DKYzWBZdafn9Pfvz5tgi5bFjDXzrpjw=;
- b=VW87bf7erXrxP94q9AdfD/FhRZMVljF7WlwIxjfvdYiwNPOCptLw5JAKBgo6J4iyJi
- 2lk98dvmsuUNZswXMmCP0tuS+5ZHPMP3RMoF/0YIRs76ZD9IzYo0au+Z3SNW3E0gNXCK
- TxEyl8sa1MZXhb/TslK1A1i7FYNaUp1ZiCyYNWBONHFjIEL+ynAKgnRw5LZI3pvwkAnq
- ta1/BgHjSrsQsdEoE5RJHjddNAC2fscJRdCnOthu61u3omFJw61zHiw6CsNYKUayDMoW
- TXIsP0zfekJehsjZoPMZLpqHJosXh+JbRhUIbUfdrZ8y8LNfQnBSKkTDuPJTKni6gUvG
- Yxfg==
-X-Gm-Message-State: AOAM532z3BvrFJ+c1o8CU5PWWld4edXOGJKo7UM29ERYff1GjWwKqFky
- WL5SnhWovMe7Cu7Ghgx87YWg8gTpk6TG
-X-Google-Smtp-Source: ABdhPJzuZf85ALEgP2PMc7AcYtKZ4On8truit0/ITvMunEfbpbr7IAAERcJbv904cp6MdFKGk7/AvT6xTBf6
+ bh=j2147gnSzl9I0ScvZHWmAEizoS1X3L4ZHr3IS+13AKY=;
+ b=g/5Qz2iEbo68RDxI91MQBx0l7a0Mk04o+WRSgVkDaZaqT5ims77PxijTWf7dZpvr89
+ dRlXx7fc9FSBa3THtdHmOYcKiwCVySQMxgDbu2sJr2CpH+nurE01tw1LPWFczheuxw6I
+ zXQ8emqS5nrNgzkk506oNh68RnZIWGHNExx+YF5J0/vMDMcxUn5Hfo4mUMolLXrQxzbY
+ aH0Mz/Yhsu5B86uwUysriVVYg9yoLUjDsaRrvxGwsFfoD8lM8/zWhiFH/wF1kq/XjZ0p
+ r5vGtE89Qcz+AK+bAJd0mdLhwfpn51SDaYBcVYtB9FjAzy5kSoMFmJpHL1QlLNw9jwLX
+ 2kJQ==
+X-Gm-Message-State: AOAM532irWNGuAJJhMFasYWUaYzLUCfGPY9AM6mmK4u6y2QJ0CFhL6Wl
+ fD3HHrPmmBSCahm3RuxdVeGmEbxY3GGe
+X-Google-Smtp-Source: ABdhPJwRmzTEPIbtvpk5L3tJWHR0GVJuAQ8eMijo/E5QxD7yqAIOXUsNUHDzy7jweXBIXi3SBPh+MOe9FUID
 X-Received: from r2d2-qp.c.googlers.com ([fda3:e722:ac3:10:28:9cb1:c0a8:1652])
- (user=qperret job=sendgmr) by 2002:a05:6214:1754:: with SMTP id
- dc20mr3314023qvb.7.1610108143358; Fri, 08 Jan 2021 04:15:43 -0800 (PST)
-Date: Fri,  8 Jan 2021 12:15:06 +0000
+ (user=qperret job=sendgmr) by 2002:adf:fbd2:: with SMTP id
+ d18mr3451456wrs.222.1610108145504; Fri, 08 Jan 2021 04:15:45 -0800 (PST)
+Date: Fri,  8 Jan 2021 12:15:07 +0000
 In-Reply-To: <20210108121524.656872-1-qperret@google.com>
-Message-Id: <20210108121524.656872-9-qperret@google.com>
+Message-Id: <20210108121524.656872-10-qperret@google.com>
 Mime-Version: 1.0
 References: <20210108121524.656872-1-qperret@google.com>
 X-Mailer: git-send-email 2.30.0.284.gd98b1dd5eaa7-goog
-Subject: [RFC PATCH v2 08/26] KVM: arm64: Make kvm_call_hyp() a function call
- at Hyp
+Subject: [RFC PATCH v2 09/26] KVM: arm64: Allow using kvm_nvhe_sym() in hyp
+ code
 From: Quentin Perret <qperret@google.com>
 To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
  Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
@@ -101,42 +101,35 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-kvm_call_hyp() has some logic to issue a function call or a hypercall
-depending the EL at which the kernel is running. However, all the code
-compiled under __KVM_NVHE_HYPERVISOR__ is guaranteed to run only at EL2,
-and in this case a simple function call is needed.
-
-Add ifdefery to kvm_host.h to symplify kvm_call_hyp() in .hyp.text.
+In order to allow the usage of code shared by the host and the hyp in
+static inline library function, allow the usage of kvm_nvhe_sym() at el2
+by defaulting to the raw symbol name.
 
 Signed-off-by: Quentin Perret <qperret@google.com>
 ---
- arch/arm64/include/asm/kvm_host.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+ arch/arm64/include/asm/hyp_image.h | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 8fcfab0c2567..81212958ef55 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -592,6 +592,7 @@ int kvm_test_age_hva(struct kvm *kvm, unsigned long hva);
- void kvm_arm_halt_guest(struct kvm *kvm);
- void kvm_arm_resume_guest(struct kvm *kvm);
+diff --git a/arch/arm64/include/asm/hyp_image.h b/arch/arm64/include/asm/hyp_image.h
+index e06842756051..fb16e1018ea9 100644
+--- a/arch/arm64/include/asm/hyp_image.h
++++ b/arch/arm64/include/asm/hyp_image.h
+@@ -7,11 +7,15 @@
+ #ifndef __ARM64_HYP_IMAGE_H__
+ #define __ARM64_HYP_IMAGE_H__
  
 +#ifndef __KVM_NVHE_HYPERVISOR__
- #define kvm_call_hyp_nvhe(f, ...)						\
- 	({								\
- 		struct arm_smccc_res res;				\
-@@ -631,6 +632,11 @@ void kvm_arm_resume_guest(struct kvm *kvm);
- 									\
- 		ret;							\
- 	})
-+#else /* __KVM_NVHE_HYPERVISOR__ */
-+#define kvm_call_hyp(f, ...) f(__VA_ARGS__)
-+#define kvm_call_hyp_ret(f, ...) f(__VA_ARGS__)
-+#define kvm_call_hyp_nvhe(f, ...) f(__VA_ARGS__)
-+#endif /* __KVM_NVHE_HYPERVISOR__ */
+ /*
+  * KVM nVHE code has its own symbol namespace prefixed with __kvm_nvhe_,
+  * to separate it from the kernel proper.
+  */
+ #define kvm_nvhe_sym(sym)	__kvm_nvhe_##sym
++#else
++#define kvm_nvhe_sym(sym)	sym
++#endif
  
- void force_vm_exit(const cpumask_t *mask);
- void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot);
+ #ifdef LINKER_SCRIPT
+ 
 -- 
 2.30.0.284.gd98b1dd5eaa7-goog
 
