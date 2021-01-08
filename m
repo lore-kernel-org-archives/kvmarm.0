@@ -7,75 +7,73 @@ X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F64BC433E6
-	for <kvmarm@archiver.kernel.org>; Fri,  8 Jan 2021 12:15:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E01E5C433E0
+	for <kvmarm@archiver.kernel.org>; Fri,  8 Jan 2021 12:16:00 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 228A0239EB
-	for <kvmarm@archiver.kernel.org>; Fri,  8 Jan 2021 12:15:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 228A0239EB
+	by mail.kernel.org (Postfix) with ESMTP id 6E4C1239FE
+	for <kvmarm@archiver.kernel.org>; Fri,  8 Jan 2021 12:16:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E4C1239FE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A478A4B428;
-	Fri,  8 Jan 2021 07:15:58 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C4094B431;
+	Fri,  8 Jan 2021 07:16:00 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id qWKlapV+mXCl; Fri,  8 Jan 2021 07:15:57 -0500 (EST)
+	with ESMTP id RXGFK1VMYeQ6; Fri,  8 Jan 2021 07:15:58 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C031D4B43E;
-	Fri,  8 Jan 2021 07:15:56 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DC6484B42B;
+	Fri,  8 Jan 2021 07:15:58 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0889C4B378
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jan 2021 07:15:56 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BF904B3DE
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jan 2021 07:15:58 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id l7xcrqICy71v for <kvmarm@lists.cs.columbia.edu>;
- Fri,  8 Jan 2021 07:15:55 -0500 (EST)
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com
- [209.85.221.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D92AF4B408
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jan 2021 07:15:54 -0500 (EST)
-Received: by mail-wr1-f74.google.com with SMTP id g16so4102715wrv.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Jan 2021 04:15:54 -0800 (PST)
+ with ESMTP id Zf86wfiS+g9l for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  8 Jan 2021 07:15:57 -0500 (EST)
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com
+ [209.85.222.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AF59F4B2F3
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jan 2021 07:15:56 -0500 (EST)
+Received: by mail-qk1-f202.google.com with SMTP id u17so9091481qku.17
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Jan 2021 04:15:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=sender:date:in-reply-to:message-id:mime-version:references:subject
- :from:to:cc; bh=XzM1R3G7iPuwWNhb7rvYlamX+8/2PUNQToNsyQEZsII=;
- b=DcKmxLORRq1M0kuovDWg/xP8OMXxTwrOF1DgVrJ/oZz0DDarrYz/XCNtKeRq0PM4mL
- 7mQ905PXF/2WcWqR2bVtKvBb9Q+EMqd5Hq+Lg6bsWrbGaqf3uU/GlBoNOe8+C/LLcvVa
- npkwZ24gaoPrrTbndrnH41KXYZ6dDPFfxalkWli3+0tT2E0KNcXHnF4bczzCYIqCpy62
- jVveL/voAZz6EHnXr8YMtycQPIBQL2Vyp5SRGeNs0mDC8Cjy/wrExpKmHyt7ZvQxbPGk
- FygyqJW6IE3D/K9yDrMsA67cOEunpV3gtHa2n+TpA3pBPU7IO6whLEj9Bu2wJJVCkQo0
- isCQ==
+ :from:to:cc; bh=Qr6fo9oQ1pXE+2ggRpUPc27A93CFNZ1q8V/bSIAa7vQ=;
+ b=Lgsjd8FEXR/txZoyV8WuF4f0d4YJhY9e1uIwY2ZKBxuqtEnQJg33daGu1ILE6X1yVm
+ 3bmI+xMaWKSUxl2SagC/g4n5Md9L7G3vxikeo+mdAU7BfccT5W+kxzU5S7UG3feLKbme
+ ERxijuVD+57qQr/KtwpIs8VkMV1mg6FWqyYzHjswMh2hCX94sLdVeK/2UtrPFh000pBo
+ Wat+4kpdcMUp41zMURoOa/5m18zhBYzly85HHjcR5ZjnghiaHqmXLElzNX1WkR3dAuv3
+ zJfl09gvrPAlyBaybMTEqu+Yz+UH5M+Wv3AdrSOkrKLW83DqbiuFH6Ipyx6juV7+q36G
+ PnNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=XzM1R3G7iPuwWNhb7rvYlamX+8/2PUNQToNsyQEZsII=;
- b=jRG5wPRMlCBbTnFyua71j5EFukyNwp6jzDG2KP1sIpu8/xuCWasauPhoPkdcixXIMY
- +y15HYVkoKQAGc0qdMoF+seaiZOVKSb46twN6piUlKFZcNJ/etcJIGfMUF300MLKsL9d
- U7HzdTENQLys+dG3axaF6cpmABX8w0vdyEItDmC+OhlPSWTkxHEKvZb+VVMySuOmUt9e
- 6sLrjiDDlzykGDk/+CjOQ5b12hUCNEiYBWsTSOB3fuxXeTebkMsd6502JG6iMxxQiIq0
- wOCDREkFcG3bMVaqCfhPJ3k7Nh3sGAFYyKjMK1l5E7OV5DK1TQ40LUmBmfs1wB8MNsvu
- EgRw==
-X-Gm-Message-State: AOAM5322FlaSssdCZnqeCoGcon5LJejhhN2d9SER0UzJMYAor3wvYRDA
- 85cmYw3QHXqi6i8wsglzAk7SvlEOwEIp
-X-Google-Smtp-Source: ABdhPJyFmSVG1I0i2SdgXi2p2BgXDRlYslbUGi+bLN946AWy1KJL4BIuJSWsCymKp386o9X+cEeV1PaXK082
-X-Received: from r2d2-qp.c.googlers.com
- ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1652])
- (user=qperret job=sendgmr) by 2002:a05:600c:250:: with SMTP id
- 16mr2864472wmj.6.1610108154051; Fri, 08 Jan 2021 04:15:54 -0800 (PST)
-Date: Fri,  8 Jan 2021 12:15:11 +0000
+ bh=Qr6fo9oQ1pXE+2ggRpUPc27A93CFNZ1q8V/bSIAa7vQ=;
+ b=Rr5GsA2YcodbU9Hd8qjcYDETDU5UHbdI6KQJmCQX47pqtAQns+ID0AULoZA/48Cwer
+ QF5s8KTs5kvqklD2fksWdQ/2hhJxlJj1A/EICZ2iChUEGrMH9FQP27uZrMiy0qLdwfXq
+ 0T0Vn/KpcLnS5MGIYfqo1qkzSrqonY6w2VsmxPpQwhoPvNCa6yptwGYco7uRTY1UupxT
+ 8Swk5R6BEP+WIiKX36XOVLjme0mr0gTFfGw0OHuiDMGnzbUjKo5cDMl6R3FdFUx2oVRX
+ B8+Ri8e5d6ZBCfmcFi5XAQS3GdyyXk+AaVmwBe4pSCcA0JGt9AJZTDSivkrmLkT+MfRe
+ R2Ew==
+X-Gm-Message-State: AOAM533QQyuGoJHbF3oextuDJJN7NUw5kMSTc/nCt7A+TR5x4pY1zErD
+ l3uotOVOhbX5Y+odQQ26zVNSdRTItHbP
+X-Google-Smtp-Source: ABdhPJzRr7svgpB722+nCLZgCDSVanauE2weLVt/XbLAdLhD6Eu5KBqqXCwGoYrf6841yPmBUrW5blfOV65g
+X-Received: from r2d2-qp.c.googlers.com ([fda3:e722:ac3:10:28:9cb1:c0a8:1652])
+ (user=qperret job=sendgmr) by 2002:a0c:edab:: with SMTP id
+ h11mr3057028qvr.23.1610108156221; Fri, 08 Jan 2021 04:15:56 -0800 (PST)
+Date: Fri,  8 Jan 2021 12:15:12 +0000
 In-Reply-To: <20210108121524.656872-1-qperret@google.com>
-Message-Id: <20210108121524.656872-14-qperret@google.com>
+Message-Id: <20210108121524.656872-15-qperret@google.com>
 Mime-Version: 1.0
 References: <20210108121524.656872-1-qperret@google.com>
 X-Mailer: git-send-email 2.30.0.284.gd98b1dd5eaa7-goog
-Subject: [RFC PATCH v2 13/26] KVM: arm64: Enable access to sanitized CPU
- features at EL2
+Subject: [RFC PATCH v2 14/26] KVM: arm64: Factor out vector address calculation
 From: Quentin Perret <qperret@google.com>
 To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
  Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
@@ -102,194 +100,57 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Introduce the infrastructure in KVM enabling to copy CPU feature
-registers into EL2-owned data-structures, to allow reading sanitised
-values directly at EL2 in nVHE.
-
-Given that only a subset of these features are being read by the
-hypervisor, the ones that need to be copied are to be listed under
-<asm/kvm_cpufeature.h> together with the name of the nVHE variable that
-will hold the copy.
-
-While at it, introduce the first user of this infrastructure by
-implementing __flush_dcache_area at EL2, which needs
-arm64_ftr_reg_ctrel0.
+In order to re-map the guest vectors at EL2 when pKVM is enabled,
+refactor __kvm_vector_slot2idx() and kvm_init_vector_slot() to move all
+the address calculation logic in a static inline function.
 
 Signed-off-by: Quentin Perret <qperret@google.com>
 ---
- arch/arm64/include/asm/cpufeature.h     |  1 +
- arch/arm64/include/asm/kvm_cpufeature.h | 17 ++++++++++++++
- arch/arm64/kernel/cpufeature.c          | 12 ++++++++++
- arch/arm64/kvm/arm.c                    | 31 +++++++++++++++++++++++++
- arch/arm64/kvm/hyp/nvhe/Makefile        |  3 ++-
- arch/arm64/kvm/hyp/nvhe/cache.S         | 13 +++++++++++
- arch/arm64/kvm/hyp/nvhe/cpufeature.c    |  8 +++++++
- 7 files changed, 84 insertions(+), 1 deletion(-)
- create mode 100644 arch/arm64/include/asm/kvm_cpufeature.h
- create mode 100644 arch/arm64/kvm/hyp/nvhe/cache.S
- create mode 100644 arch/arm64/kvm/hyp/nvhe/cpufeature.c
+ arch/arm64/include/asm/kvm_mmu.h | 8 ++++++++
+ arch/arm64/kvm/arm.c             | 9 +--------
+ 2 files changed, 9 insertions(+), 8 deletions(-)
 
-diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-index 16063c813dcd..742e9bcc051b 100644
---- a/arch/arm64/include/asm/cpufeature.h
-+++ b/arch/arm64/include/asm/cpufeature.h
-@@ -600,6 +600,7 @@ void __init setup_cpu_features(void);
- void check_local_cpu_capabilities(void);
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index e52d82aeadca..d7ebd73ec86f 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -195,6 +195,14 @@ phys_addr_t kvm_mmu_get_httbr(void);
+ phys_addr_t kvm_get_idmap_vector(void);
+ int kvm_mmu_init(void);
  
- u64 read_sanitised_ftr_reg(u32 id);
-+int copy_ftr_reg(u32 id, struct arm64_ftr_reg *dst);
- 
- static inline bool cpu_supports_mixed_endian_el0(void)
- {
-diff --git a/arch/arm64/include/asm/kvm_cpufeature.h b/arch/arm64/include/asm/kvm_cpufeature.h
-new file mode 100644
-index 000000000000..d34f85cba358
---- /dev/null
-+++ b/arch/arm64/include/asm/kvm_cpufeature.h
-@@ -0,0 +1,17 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright (C) 2020 - Google LLC
-+ * Author: Quentin Perret <qperret@google.com>
-+ */
-+
-+#include <asm/cpufeature.h>
-+
-+#ifndef KVM_HYP_CPU_FTR_REG
-+#if defined(__KVM_NVHE_HYPERVISOR__)
-+#define KVM_HYP_CPU_FTR_REG(id, name) extern struct arm64_ftr_reg name;
-+#else
-+#define KVM_HYP_CPU_FTR_REG(id, name) DECLARE_KVM_NVHE_SYM(name);
-+#endif
-+#endif
-+
-+KVM_HYP_CPU_FTR_REG(SYS_CTR_EL0, arm64_ftr_reg_ctrel0)
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index bc3549663957..c2019aaaadc3 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -1113,6 +1113,18 @@ u64 read_sanitised_ftr_reg(u32 id)
- }
- EXPORT_SYMBOL_GPL(read_sanitised_ftr_reg);
- 
-+int copy_ftr_reg(u32 id, struct arm64_ftr_reg *dst)
++static inline void *__kvm_vector_slot2addr(void *base,
++					   enum arm64_hyp_spectre_vector slot)
 +{
-+	struct arm64_ftr_reg *regp = get_arm64_ftr_reg(id);
++	int idx = slot - (slot != HYP_VECTOR_DIRECT);
 +
-+	if (!regp)
-+		return -EINVAL;
-+
-+	memcpy(dst, regp, sizeof(*regp));
-+
-+	return 0;
++	return base + (idx * SZ_2K);
 +}
 +
- #define read_sysreg_case(r)	\
- 	case r:		return read_sysreg_s(r)
+ struct kvm;
  
+ #define kvm_flush_dcache_to_poc(a,l)	__flush_dcache_area((a), (l))
 diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 51b53ca36dc5..9fd769349e9e 100644
+index 9fd769349e9e..6af9204bcd5b 100644
 --- a/arch/arm64/kvm/arm.c
 +++ b/arch/arm64/kvm/arm.c
-@@ -34,6 +34,7 @@
- #include <asm/virt.h>
- #include <asm/kvm_arm.h>
- #include <asm/kvm_asm.h>
-+#include <asm/kvm_cpufeature.h>
- #include <asm/kvm_mmu.h>
- #include <asm/kvm_emulate.h>
- #include <asm/sections.h>
-@@ -1697,6 +1698,29 @@ static void teardown_hyp_mode(void)
- 	}
+@@ -1346,16 +1346,9 @@ static unsigned long nvhe_percpu_order(void)
+ /* A lookup table holding the hypervisor VA for each vector slot */
+ static void *hyp_spectre_vector_selector[BP_HARDEN_EL2_SLOTS];
+ 
+-static int __kvm_vector_slot2idx(enum arm64_hyp_spectre_vector slot)
+-{
+-	return slot - (slot != HYP_VECTOR_DIRECT);
+-}
+-
+ static void kvm_init_vector_slot(void *base, enum arm64_hyp_spectre_vector slot)
+ {
+-	int idx = __kvm_vector_slot2idx(slot);
+-
+-	hyp_spectre_vector_selector[slot] = base + (idx * SZ_2K);
++	hyp_spectre_vector_selector[slot] = __kvm_vector_slot2addr(base, slot);
  }
  
-+#undef KVM_HYP_CPU_FTR_REG
-+#define KVM_HYP_CPU_FTR_REG(id, name) \
-+	{ .sys_id = id, .dst = (struct arm64_ftr_reg *)&kvm_nvhe_sym(name) },
-+static const struct __ftr_reg_copy_entry {
-+	u32			sys_id;
-+	struct arm64_ftr_reg	*dst;
-+} hyp_ftr_regs[] = {
-+	#include <asm/kvm_cpufeature.h>
-+};
-+
-+static int copy_cpu_ftr_regs(void)
-+{
-+	int i, ret;
-+
-+	for (i = 0; i < ARRAY_SIZE(hyp_ftr_regs); i++) {
-+		ret = copy_ftr_reg(hyp_ftr_regs[i].sys_id, hyp_ftr_regs[i].dst);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	return 0;
-+}
-+
- /**
-  * Inits Hyp-mode on all online CPUs
-  */
-@@ -1705,6 +1729,13 @@ static int init_hyp_mode(void)
- 	int cpu;
- 	int err = 0;
- 
-+	/*
-+	 * Copy the required CPU feature register in their EL2 counterpart
-+	 */
-+	err = copy_cpu_ftr_regs();
-+	if (err)
-+		return err;
-+
- 	/*
- 	 * Allocate Hyp PGD and setup Hyp identity mapping
- 	 */
-diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-index 9e5eacfec6ec..72cfe53f106f 100644
---- a/arch/arm64/kvm/hyp/nvhe/Makefile
-+++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-@@ -10,7 +10,8 @@ lib-objs := clear_page.o copy_page.o memcpy.o memset.o
- lib-objs := $(addprefix ../../../lib/, $(lib-objs))
- 
- obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o \
--	 hyp-main.o hyp-smp.o psci-relay.o early_alloc.o stub.o page_alloc.o
-+	 hyp-main.o hyp-smp.o psci-relay.o early_alloc.o stub.o page_alloc.o \
-+	 cache.o cpufeature.o
- obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
- 	 ../fpsimd.o ../hyp-entry.o ../exception.o
- obj-y += $(lib-objs)
-diff --git a/arch/arm64/kvm/hyp/nvhe/cache.S b/arch/arm64/kvm/hyp/nvhe/cache.S
-new file mode 100644
-index 000000000000..36cef6915428
---- /dev/null
-+++ b/arch/arm64/kvm/hyp/nvhe/cache.S
-@@ -0,0 +1,13 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Code copied from arch/arm64/mm/cache.S.
-+ */
-+
-+#include <linux/linkage.h>
-+#include <asm/assembler.h>
-+#include <asm/alternative.h>
-+
-+SYM_FUNC_START_PI(__flush_dcache_area)
-+	dcache_by_line_op civac, sy, x0, x1, x2, x3
-+	ret
-+SYM_FUNC_END_PI(__flush_dcache_area)
-diff --git a/arch/arm64/kvm/hyp/nvhe/cpufeature.c b/arch/arm64/kvm/hyp/nvhe/cpufeature.c
-new file mode 100644
-index 000000000000..a887508f996f
---- /dev/null
-+++ b/arch/arm64/kvm/hyp/nvhe/cpufeature.c
-@@ -0,0 +1,8 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) 2020 - Google LLC
-+ * Author: Quentin Perret <qperret@google.com>
-+ */
-+
-+#define KVM_HYP_CPU_FTR_REG(id, name) struct arm64_ftr_reg name;
-+#include <asm/kvm_cpufeature.h>
+ static int kvm_init_vector_slots(void)
 -- 
 2.30.0.284.gd98b1dd5eaa7-goog
 
