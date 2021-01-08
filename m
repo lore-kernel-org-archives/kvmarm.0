@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0353FC433DB
-	for <kvmarm@archiver.kernel.org>; Fri,  8 Jan 2021 12:16:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E10D1C433DB
+	for <kvmarm@archiver.kernel.org>; Fri,  8 Jan 2021 12:16:21 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 819DB239FD
-	for <kvmarm@archiver.kernel.org>; Fri,  8 Jan 2021 12:16:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 819DB239FD
+	by mail.kernel.org (Postfix) with ESMTP id 7168D23998
+	for <kvmarm@archiver.kernel.org>; Fri,  8 Jan 2021 12:16:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7168D23998
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 24DC14B25F;
-	Fri,  8 Jan 2021 07:16:18 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F19E4B3ED;
+	Fri,  8 Jan 2021 07:16:21 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id oeG7f1XqgIbB; Fri,  8 Jan 2021 07:16:16 -0500 (EST)
+	with ESMTP id if5fwbJMFyoO; Fri,  8 Jan 2021 07:16:20 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F0B064B447;
-	Fri,  8 Jan 2021 07:16:16 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C98A4B3F4;
+	Fri,  8 Jan 2021 07:16:19 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F133E4B3D8
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jan 2021 07:16:15 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DDBAC4B370
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jan 2021 07:16:17 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FDlsiDBkC7lr for <kvmarm@lists.cs.columbia.edu>;
- Fri,  8 Jan 2021 07:16:15 -0500 (EST)
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com
- [209.85.219.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B09D14B45D
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jan 2021 07:16:14 -0500 (EST)
-Received: by mail-yb1-f202.google.com with SMTP id m203so15433024ybf.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Jan 2021 04:16:14 -0800 (PST)
+ with ESMTP id yJvKKBGes4Vo for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  8 Jan 2021 07:16:16 -0500 (EST)
+Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com
+ [209.85.160.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E18E24B25F
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jan 2021 07:16:16 -0500 (EST)
+Received: by mail-qt1-f201.google.com with SMTP id z43so8162583qtb.0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Jan 2021 04:16:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=sender:date:in-reply-to:message-id:mime-version:references:subject
- :from:to:cc; bh=UneVgNM1tyQijhnQQmLMVb1v446RL4t+C96eG3CaS6s=;
- b=sjy+Rq4XVFYrNu/u8dYKqV5xzTkxrsryfinUxE4vTpQxNEMUawE0WVAXTYAxrZrRxK
- 3AQucel0UXMfP6Z1Fpjunu5VnUt1x7FYQpkVARaMlEMqOoPg0rEpkTKfdvwdD4PNY1ho
- lP9zsxTHuFqSVVGhBMwFWckCWtFWKgAs+clmqF5nYdn1Tix2xYcJIfcboKppux/K+q6g
- 0f9UzpCDoWW2Drr/z5io3pGP2/80Wr2zCw//2zx2HfLq17hY58yPvumPXSHa44HUbFM3
- Zm6CqmHh74BUuZd0yCaychVURrioQxlyJilhlVhE/sUyuEzx8GXENr6x9SEOLk/jOx8p
- kQlw==
+ :from:to:cc; bh=pSI0R0y0LyZ0MvEgT/8TLG9r/LMGz98d06c78ikqYMM=;
+ b=ncicFESs3ffoWFoGIrRaXV+UDl8OOBsRzdKG5EpyzwDsT0yV7/eDINZFH8YAYdLFQh
+ Y9TheqAFWLGOdu5Ma12BYM5IyqUHQAiuEm03eYEc1djPhUHUt+GW5V+HRmWrfKSK6PFG
+ OnQkRt6iTH4FfGnyGLVzO+Hhvsauj/Z1MiAePgkHI9jvmc0XEJ5bFXuE23HXRU5lNRY8
+ /bH/4yf2JeHIynsSwkiZuJFYhDGSVNoub55OTznCHT6ga1UcI3TVJsV9yzVZ4EFAl5RS
+ dUVWi7djxRQN8R6/wJHxV2dByH4KaC4+SmMuujY+2acUKwtQOZnmnJyoO2sgaxMrN5ms
+ k35w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=UneVgNM1tyQijhnQQmLMVb1v446RL4t+C96eG3CaS6s=;
- b=mjxk8KbaZ2ckfCLqJ3Xu62F04J5Yav6ocOsn5Zh9Lq7NlW1ZUUDiksxDLM2NA37G9D
- pvAygp81L23Q4/v/NMWNlLb+biWCS1AW5oZn6j6vh/nFDXPWpN7fxlovTyPptwR2oH2C
- QJe08kUEJgwCBKM/29Mu25We2Xab1mWYllKhAyDTq4ZVkZwQUdw2JljafuackcPfVrgT
- xSBvgFlclrJLCl7rJrXXG6RZOYBmKLLDNjbkEbXAWKS2BZymPZvo+axAhe94OzKymvUA
- 2Y3vlehFiDj87/8ZPwDWUuxtSPaJ/3xHQi5egbckLi0yOl0dqCvFPvFtYpO4HpijFDdD
- 28iA==
-X-Gm-Message-State: AOAM530pQRzYVOcoSCfGSkZxeNAvhk4fULi85I4X5b7oez8CTX6mO20U
- MKWTT1YA+ptz/NYCQ3x/CyPFU2Un1BFK
-X-Google-Smtp-Source: ABdhPJx2tvQM5pHxJ1110zxDP3Dc7/b7XCKfM0MD28OR/73itm2z2W+f9Cz7ihMgWsQ1O6tYqWDGlPIiIyMg
+ bh=pSI0R0y0LyZ0MvEgT/8TLG9r/LMGz98d06c78ikqYMM=;
+ b=YrQic8pT68u+10H1ZkO/WjxB6rMwWm3ywL0ZzMXVyYnNXk8I/dzBRyYVnLw6OimtTK
+ Rk4t24Cz3ag+VIgXDZzEsrpVW8kb56B6e0NjkIT4R1PEnnQq2TW0sqvBhBWbCJH4GPgw
+ hyPOz6690a5xyESAkTDCYQi7w/cFZe7EJSCXxRYh7qkUGBYMYPj3VTVvQK6QyEeP93H4
+ vKEmGoVQxmtOxbD+ufbMV5xWC9S3VTw+p5W2Kh1SAYLao5+S2eLAvOj4EiMBUDyGqZv5
+ 5TH9yoS67IbhMkY6HszJnAvL/FDUmNqC0srFHJ4ZzEtwWL4z5nO5ugmqtz0mOtOSoqon
+ 4rcA==
+X-Gm-Message-State: AOAM530z3uTz+I+9/0Bve1UNuPWrKxHYKgw5KDlJ/VJLz0NHegknBZvY
+ bdhzPsxKhc3do/SREa2ST/TJhauE304S
+X-Google-Smtp-Source: ABdhPJznjaU0Yun87ow+H6KZ/LD9kUqsdbc9elNbI5loy7zUnacmNP+CBQyMkz84xwCbZHRBZ8tbgygT96wL
 X-Received: from r2d2-qp.c.googlers.com ([fda3:e722:ac3:10:28:9cb1:c0a8:1652])
- (user=qperret job=sendgmr) by 2002:a25:6405:: with SMTP id
- y5mr5295727ybb.328.1610108174241; Fri, 08 Jan 2021 04:16:14 -0800 (PST)
-Date: Fri,  8 Jan 2021 12:15:20 +0000
+ (user=qperret job=sendgmr) by 2002:a0c:90ee:: with SMTP id
+ p101mr3023584qvp.29.1610108176503; Fri, 08 Jan 2021 04:16:16 -0800 (PST)
+Date: Fri,  8 Jan 2021 12:15:21 +0000
 In-Reply-To: <20210108121524.656872-1-qperret@google.com>
-Message-Id: <20210108121524.656872-23-qperret@google.com>
+Message-Id: <20210108121524.656872-24-qperret@google.com>
 Mime-Version: 1.0
 References: <20210108121524.656872-1-qperret@google.com>
 X-Mailer: git-send-email 2.30.0.284.gd98b1dd5eaa7-goog
-Subject: [RFC PATCH v2 22/26] KVM: arm64: Refactor __load_guest_stage2()
+Subject: [RFC PATCH v2 23/26] KVM: arm64: Refactor __populate_fault_info()
 From: Quentin Perret <qperret@google.com>
 To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
  Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
@@ -100,42 +100,73 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Refactor __load_guest_stage2() to introduce __load_stage2() which will
-be re-used when loading the host stage 2.
+Refactor __populate_fault_info() to introduce __get_fault_info() which
+will be used once the host is wrapped in a stage 2.
 
 Signed-off-by: Quentin Perret <qperret@google.com>
 ---
- arch/arm64/include/asm/kvm_mmu.h | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 36 +++++++++++++++----------
+ 1 file changed, 22 insertions(+), 14 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 83b4c5cf4768..8d37d6d1ed29 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -345,9 +345,9 @@ static __always_inline u64 kvm_get_vttbr(struct kvm_s2_mmu *mmu)
-  * Must be called from hyp code running at EL2 with an updated VTTBR
-  * and interrupts disabled.
-  */
--static __always_inline void __load_guest_stage2(struct kvm_s2_mmu *mmu)
-+static __always_inline void __load_stage2(struct kvm_s2_mmu *mmu, unsigned long vtcr)
- {
--	write_sysreg(kern_hyp_va(mmu->arch)->vtcr, vtcr_el2);
-+	write_sysreg(vtcr, vtcr_el2);
- 	write_sysreg(kvm_get_vttbr(mmu), vttbr_el2);
- 
- 	/*
-@@ -358,6 +358,11 @@ static __always_inline void __load_guest_stage2(struct kvm_s2_mmu *mmu)
- 	asm(ALTERNATIVE("nop", "isb", ARM64_WORKAROUND_SPECULATIVE_AT));
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 84473574c2e7..e9005255d639 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -157,19 +157,9 @@ static inline bool __translate_far_to_hpfar(u64 far, u64 *hpfar)
+ 	return true;
  }
  
-+static __always_inline void __load_guest_stage2(struct kvm_s2_mmu *mmu)
-+{
-+	__load_stage2(mmu, kern_hyp_va(mmu->arch)->vtcr);
+-static inline bool __populate_fault_info(struct kvm_vcpu *vcpu)
++static inline bool __get_fault_info(u64 esr, u64 *far, u64 *hpfar)
+ {
+-	u8 ec;
+-	u64 esr;
+-	u64 hpfar, far;
+-
+-	esr = vcpu->arch.fault.esr_el2;
+-	ec = ESR_ELx_EC(esr);
+-
+-	if (ec != ESR_ELx_EC_DABT_LOW && ec != ESR_ELx_EC_IABT_LOW)
+-		return true;
+-
+-	far = read_sysreg_el2(SYS_FAR);
++	*far = read_sysreg_el2(SYS_FAR);
+ 
+ 	/*
+ 	 * The HPFAR can be invalid if the stage 2 fault did not
+@@ -185,12 +175,30 @@ static inline bool __populate_fault_info(struct kvm_vcpu *vcpu)
+ 	if (!(esr & ESR_ELx_S1PTW) &&
+ 	    (cpus_have_final_cap(ARM64_WORKAROUND_834220) ||
+ 	     (esr & ESR_ELx_FSC_TYPE) == FSC_PERM)) {
+-		if (!__translate_far_to_hpfar(far, &hpfar))
++		if (!__translate_far_to_hpfar(*far, hpfar))
+ 			return false;
+ 	} else {
+-		hpfar = read_sysreg(hpfar_el2);
++		*hpfar = read_sysreg(hpfar_el2);
+ 	}
+ 
++	return true;
 +}
 +
- static inline struct kvm *kvm_s2_mmu_to_kvm(struct kvm_s2_mmu *mmu)
- {
- 	return container_of(mmu->arch, struct kvm, arch);
++static inline bool __populate_fault_info(struct kvm_vcpu *vcpu)
++{
++	u8 ec;
++	u64 esr;
++	u64 hpfar, far;
++
++	esr = vcpu->arch.fault.esr_el2;
++	ec = ESR_ELx_EC(esr);
++
++	if (ec != ESR_ELx_EC_DABT_LOW && ec != ESR_ELx_EC_IABT_LOW)
++		return true;
++
++	if (!__get_fault_info(esr, &far, &hpfar))
++		return false;
++
+ 	vcpu->arch.fault.far_el2 = far;
+ 	vcpu->arch.fault.hpfar_el2 = hpfar;
+ 	return true;
 -- 
 2.30.0.284.gd98b1dd5eaa7-goog
 
