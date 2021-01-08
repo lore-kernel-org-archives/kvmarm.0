@@ -2,88 +2,86 @@ Return-Path: <SRS0=HOrx=GL=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E11B3C433DB
-	for <kvmarm@archiver.kernel.org>; Fri,  8 Jan 2021 12:16:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 141A7C433DB
+	for <kvmarm@archiver.kernel.org>; Fri,  8 Jan 2021 15:19:32 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6DE21238E4
-	for <kvmarm@archiver.kernel.org>; Fri,  8 Jan 2021 12:16:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DE21238E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 0C68E207C5
+	for <kvmarm@archiver.kernel.org>; Fri,  8 Jan 2021 15:19:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C68E207C5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 112BC4B3DF;
-	Fri,  8 Jan 2021 07:16:27 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 518C84B408;
+	Fri,  8 Jan 2021 10:19:30 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id M2-63xXYA8AV; Fri,  8 Jan 2021 07:16:25 -0500 (EST)
+	with ESMTP id 9YerwmwSnmZ5; Fri,  8 Jan 2021 10:19:28 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 855694B457;
-	Fri,  8 Jan 2021 07:16:25 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E3154B3F4;
+	Fri,  8 Jan 2021 10:19:28 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A2D84B25F
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jan 2021 07:16:24 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 04B604B3E3
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jan 2021 10:19:27 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2qVkuCmZMmrr for <kvmarm@lists.cs.columbia.edu>;
- Fri,  8 Jan 2021 07:16:23 -0500 (EST)
-Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com
- [209.85.160.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 14C6D4B333
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jan 2021 07:16:23 -0500 (EST)
-Received: by mail-qt1-f201.google.com with SMTP id k12so8098766qth.23
- for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Jan 2021 04:16:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=sender:date:in-reply-to:message-id:mime-version:references:subject
- :from:to:cc; bh=Lrlj1zDpp+shrrwmzbQl9mYOjw6ZCNar4qli7UVIZg8=;
- b=QYBd4WEQOF4REiQLDjhfFLKTSA4R+NFLQg2B9Erk2dzayOKXXWBgd3qanm8CvF9O6J
- Dj+uCbnNKDFXnYnwn4+Xm8ijA/E495hdew2v/ZPC72mevkxaL2ciGTNCFbeW9grImfI0
- 78aW9PAWZckzh8gSBG9r8R7njJgk/4bj4nIpggBODLnxQc1pgv/I/bpGkj1wAdP5Mq/o
- RUjCsP159LZoa4NZE3yw7vylLW6Fi5vjJwtAc30L3gIzdKOEl2q4BBVHkH0fHqZyJlJx
- sn6M3xQBYc7fCDnQ1I65JGs7sYpKM3fVCAvCjj4PmjMmnt9grfV66Dy3LHpzSb/IEfiD
- QDcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=Lrlj1zDpp+shrrwmzbQl9mYOjw6ZCNar4qli7UVIZg8=;
- b=kkrbLb0HzCxNqGpo4d+qGNNN2e9Ed0VGLzquakOEFBgTJeZb1VbXmZt/zZNMaDn+Bq
- vVjnG74llzrtoy0VfW+f6SpbcGCcqTkD8ZYk7a5NO0QorPuYxJ/JWCjlzK7Wsjude5L5
- p/AJ7n4IkSdC6Uan2lv3EsFtjM6hDqtBJ6CYn8zXv1ynLpGwDwc9NkNvymWpqymHo/5M
- ooIWiccp7ZAuyeklxIbSZ1ELeQFvTaN9zILqRdEqYDdPTXJUwt6QC04ORjf3m7D3YvRK
- c966fI5lmvmkjsK+RG65gCxFb//2a8RFNp5wfMK/nn/IzFLTcx2vWC3ztz7xCHP+RLsp
- U/ew==
-X-Gm-Message-State: AOAM533pSlu/FJFUQ4d1LRcZ/NkZa27vXyRQhGhS9zAlrJacJWVGEorA
- yyDSI6JxmwwtjiwbIDkHQ2lcrcf8wQTA
-X-Google-Smtp-Source: ABdhPJwWb0+XWZHJHqQdj0HxGhIlVOl0nrUOGKnqucLq/KGZtWR5BTrNZ4VLQrIi7/M7Gz3+vkyldnyYXjU8
-X-Received: from r2d2-qp.c.googlers.com ([fda3:e722:ac3:10:28:9cb1:c0a8:1652])
- (user=qperret job=sendgmr) by 2002:a0c:9ccb:: with SMTP id
- j11mr6363177qvf.44.1610108182674; Fri, 08 Jan 2021 04:16:22 -0800 (PST)
-Date: Fri,  8 Jan 2021 12:15:24 +0000
-In-Reply-To: <20210108121524.656872-1-qperret@google.com>
-Message-Id: <20210108121524.656872-27-qperret@google.com>
-Mime-Version: 1.0
-References: <20210108121524.656872-1-qperret@google.com>
-X-Mailer: git-send-email 2.30.0.284.gd98b1dd5eaa7-goog
-Subject: [RFC PATCH v2 26/26] KVM: arm64: Wrap the host with a stage 2
-From: Quentin Perret <qperret@google.com>
-To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
- Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
- Julien Thierry <julien.thierry.kdev@gmail.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Rob Herring <robh+dt@kernel.org>, Frank Rowand <frowand.list@gmail.com>
-Cc: devicetree@vger.kernel.org, android-kvm@google.com,
- linux-kernel@vger.kernel.org, Fuad Tabba <tabba@google.com>,
- kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ with ESMTP id Ghb6n5v3stIz for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  8 Jan 2021 10:19:24 -0500 (EST)
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2411F4B37F
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jan 2021 10:19:22 -0500 (EST)
+Received: from DGGEMM403-HUB.china.huawei.com (unknown [172.30.72.57])
+ by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4DC6DY2yL2z5D5C;
+ Fri,  8 Jan 2021 23:18:05 +0800 (CST)
+Received: from dggema713-chm.china.huawei.com (10.3.20.77) by
+ DGGEMM403-HUB.china.huawei.com (10.3.20.211) with Microsoft SMTP Server (TLS)
+ id 14.3.498.0; Fri, 8 Jan 2021 23:19:17 +0800
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ dggema713-chm.china.huawei.com (10.3.20.77) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1913.5; Fri, 8 Jan 2021 23:19:16 +0800
+Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
+ lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
+ 15.01.2106.002; Fri, 8 Jan 2021 15:19:14 +0000
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To: Eric Auger <eric.auger@redhat.com>, "eric.auger.pro@gmail.com"
+ <eric.auger.pro@gmail.com>, "iommu@lists.linux-foundation.org"
+ <iommu@lists.linux-foundation.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+ "will@kernel.org" <will@kernel.org>, "joro@8bytes.org" <joro@8bytes.org>,
+ "maz@kernel.org" <maz@kernel.org>, "robin.murphy@arm.com"
+ <robin.murphy@arm.com>, "alex.williamson@redhat.com"
+ <alex.williamson@redhat.com>
+Subject: RE: [PATCH v11 12/13] vfio/pci: Register a DMA fault response region
+Thread-Topic: [PATCH v11 12/13] vfio/pci: Register a DMA fault response region
+Thread-Index: AQHWvAgGhwjLBSYC0UyC6ARc2a6ugaoeJVMQ
+Date: Fri, 8 Jan 2021 15:19:14 +0000
+Message-ID: <510be72d8b934f78960157a76966a093@huawei.com>
+References: <20201116110030.32335-1-eric.auger@redhat.com>
+ <20201116110030.32335-13-eric.auger@redhat.com>
+In-Reply-To: <20201116110030.32335-13-eric.auger@redhat.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.47.94.9]
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
+Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+ "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+ "Zengtao \(B\)" <prime.zeng@hisilicon.com>,
+ "linuxarm@openeuler.org" <linuxarm@openeuler.org>,
+ "nicoleotsuka@gmail.com" <nicoleotsuka@gmail.com>,
+ "vivek.gautam@arm.com" <vivek.gautam@arm.com>,
+ "yi.l.liu@intel.com" <yi.l.liu@intel.com>,
+ "zhangfei.gao@linaro.org" <zhangfei.gao@linaro.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -100,411 +98,409 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-When KVM runs in protected nVHE mode, make use of a stage 2 page-table
-to give the hypervisor some control over the host memory accesses. At
-the moment all memory aborts from the host will be instantly idmapped
-RWX at stage 2 in a lazy fashion. Later patches will make use of that
-infrastructure to implement access control restrictions to e.g. protect
-guest memory from the host.
+Hi Eric,
 
-Signed-off-by: Quentin Perret <qperret@google.com>
+> -----Original Message-----
+> From: Eric Auger [mailto:eric.auger@redhat.com]
+> Sent: 16 November 2020 11:00
+> To: eric.auger.pro@gmail.com; eric.auger@redhat.com;
+> iommu@lists.linux-foundation.org; linux-kernel@vger.kernel.org;
+> kvm@vger.kernel.org; kvmarm@lists.cs.columbia.edu; will@kernel.org;
+> joro@8bytes.org; maz@kernel.org; robin.murphy@arm.com;
+> alex.williamson@redhat.com
+> Cc: jean-philippe@linaro.org; zhangfei.gao@linaro.org;
+> zhangfei.gao@gmail.com; vivek.gautam@arm.com; Shameerali Kolothum
+> Thodi <shameerali.kolothum.thodi@huawei.com>;
+> jacob.jun.pan@linux.intel.com; yi.l.liu@intel.com; tn@semihalf.com;
+> nicoleotsuka@gmail.com; yuzenghui <yuzenghui@huawei.com>
+> Subject: [PATCH v11 12/13] vfio/pci: Register a DMA fault response region
+> 
+> In preparation for vSVA, let's register a DMA fault response region,
+> where the userspace will push the page responses and increment the
+> head of the buffer. The kernel will pop those responses and inject them
+> on iommu side.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> ---
+>  drivers/vfio/pci/vfio_pci.c         | 114 +++++++++++++++++++++++++---
+>  drivers/vfio/pci/vfio_pci_private.h |   5 ++
+>  drivers/vfio/pci/vfio_pci_rdwr.c    |  39 ++++++++++
+>  include/uapi/linux/vfio.h           |  32 ++++++++
+>  4 files changed, 181 insertions(+), 9 deletions(-)
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+> index 65a83fd0e8c0..e9a904ce3f0d 100644
+> --- a/drivers/vfio/pci/vfio_pci.c
+> +++ b/drivers/vfio/pci/vfio_pci.c
+> @@ -318,9 +318,20 @@ static void vfio_pci_dma_fault_release(struct
+> vfio_pci_device *vdev,
+>  	kfree(vdev->fault_pages);
+>  }
+> 
+> -static int vfio_pci_dma_fault_mmap(struct vfio_pci_device *vdev,
+> -				   struct vfio_pci_region *region,
+> -				   struct vm_area_struct *vma)
+> +static void
+> +vfio_pci_dma_fault_response_release(struct vfio_pci_device *vdev,
+> +				    struct vfio_pci_region *region)
+> +{
+> +	if (vdev->dma_fault_response_wq)
+> +		destroy_workqueue(vdev->dma_fault_response_wq);
+> +	kfree(vdev->fault_response_pages);
+> +	vdev->fault_response_pages = NULL;
+> +}
+> +
+> +static int __vfio_pci_dma_fault_mmap(struct vfio_pci_device *vdev,
+> +				     struct vfio_pci_region *region,
+> +				     struct vm_area_struct *vma,
+> +				     u8 *pages)
+>  {
+>  	u64 phys_len, req_len, pgoff, req_start;
+>  	unsigned long long addr;
+> @@ -333,14 +344,14 @@ static int vfio_pci_dma_fault_mmap(struct
+> vfio_pci_device *vdev,
+>  		((1U << (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
+>  	req_start = pgoff << PAGE_SHIFT;
+> 
+> -	/* only the second page of the producer fault region is mmappable */
+> +	/* only the second page of the fault region is mmappable */
+>  	if (req_start < PAGE_SIZE)
+>  		return -EINVAL;
+> 
+>  	if (req_start + req_len > phys_len)
+>  		return -EINVAL;
+> 
+> -	addr = virt_to_phys(vdev->fault_pages);
+> +	addr = virt_to_phys(pages);
+>  	vma->vm_private_data = vdev;
+>  	vma->vm_pgoff = (addr >> PAGE_SHIFT) + pgoff;
+> 
+> @@ -349,13 +360,29 @@ static int vfio_pci_dma_fault_mmap(struct
+> vfio_pci_device *vdev,
+>  	return ret;
+>  }
+> 
+> -static int vfio_pci_dma_fault_add_capability(struct vfio_pci_device *vdev,
+> -					     struct vfio_pci_region *region,
+> -					     struct vfio_info_cap *caps)
+> +static int vfio_pci_dma_fault_mmap(struct vfio_pci_device *vdev,
+> +				   struct vfio_pci_region *region,
+> +				   struct vm_area_struct *vma)
+> +{
+> +	return __vfio_pci_dma_fault_mmap(vdev, region, vma,
+> vdev->fault_pages);
+> +}
+> +
+> +static int
+> +vfio_pci_dma_fault_response_mmap(struct vfio_pci_device *vdev,
+> +				struct vfio_pci_region *region,
+> +				struct vm_area_struct *vma)
+> +{
+> +	return __vfio_pci_dma_fault_mmap(vdev, region, vma,
+> vdev->fault_response_pages);
+> +}
+> +
+> +static int __vfio_pci_dma_fault_add_capability(struct vfio_pci_device *vdev,
+> +					       struct vfio_pci_region *region,
+> +					       struct vfio_info_cap *caps,
+> +					       u32 cap_id)
+>  {
+>  	struct vfio_region_info_cap_sparse_mmap *sparse = NULL;
+>  	struct vfio_region_info_cap_fault cap = {
+> -		.header.id = VFIO_REGION_INFO_CAP_DMA_FAULT,
+> +		.header.id = cap_id,
+>  		.header.version = 1,
+>  		.version = 1,
+>  	};
+> @@ -383,6 +410,14 @@ static int vfio_pci_dma_fault_add_capability(struct
+> vfio_pci_device *vdev,
+>  	return ret;
+>  }
+> 
+> +static int vfio_pci_dma_fault_add_capability(struct vfio_pci_device *vdev,
+> +					     struct vfio_pci_region *region,
+> +					     struct vfio_info_cap *caps)
+> +{
+> +	return __vfio_pci_dma_fault_add_capability(vdev, region, caps,
+> +						   VFIO_REGION_INFO_CAP_DMA_FAULT);
+> +}
+> +
+>  static const struct vfio_pci_regops vfio_pci_dma_fault_regops = {
+>  	.rw		= vfio_pci_dma_fault_rw,
+>  	.release	= vfio_pci_dma_fault_release,
+> @@ -390,6 +425,13 @@ static const struct vfio_pci_regops
+> vfio_pci_dma_fault_regops = {
+>  	.add_capability = vfio_pci_dma_fault_add_capability,
+>  };
+> 
+> +static const struct vfio_pci_regops vfio_pci_dma_fault_response_regops = {
+> +	.rw		= vfio_pci_dma_fault_response_rw,
+> +	.release	= vfio_pci_dma_fault_response_release,
+> +	.mmap		= vfio_pci_dma_fault_response_mmap,
+> +	.add_capability = vfio_pci_dma_fault_add_capability,
+> +};
+> +
+>  int vfio_pci_iommu_dev_fault_handler(struct iommu_fault *fault, void *data)
+>  {
+>  	struct vfio_pci_device *vdev = (struct vfio_pci_device *)data;
+> @@ -500,6 +542,55 @@ static int vfio_pci_dma_fault_init(struct
+> vfio_pci_device *vdev)
+>  	return ret;
+>  }
+> 
+> +#define DMA_FAULT_RESPONSE_RING_LENGTH 512
+> +
+> +static int vfio_pci_dma_fault_response_init(struct vfio_pci_device *vdev)
+> +{
+> +	struct vfio_region_dma_fault_response *header;
+> +	struct iommu_domain *domain;
+> +	size_t size;
+> +	bool nested;
+> +	int ret;
+> +
+> +	domain = iommu_get_domain_for_dev(&vdev->pdev->dev);
+> +	ret = iommu_domain_get_attr(domain, DOMAIN_ATTR_NESTING,
+> &nested);
+
+The above will fail((Thanks to Zengtao for reporting this) if the Guest is
+booted in "enable_unsafe_noiommu_mode" (CONFIG_VFIO_NOIOMMU)
+and dpdk testpmd is attempted.
+
+This is because even though there is an iommu group created for this
+mode, no iommu domain gets attached to it. And results in below
+crash,
+
+root@ubuntu:/mnt/dpdk/build/app# ./testpmd -w 0000:00:02.0 --file-prefix socket0 -l 0-1 -n 2 -- -i
+EAL: Detected 8 lcore(s)
+EAL: Detected 1 NUMA nodes
+EAL: Multi-process socket /var/run/dpdk/socket0/mp_socket
+EAL: Selected IOVA mode 'PA'
+EAL: No available hugepages reported in hugepages-32768kB
+EAL: No available hugepages reported in hugepages-64kB
+EAL: No available hugepages reported in hugepages-1048576kB
+EAL: Probing VFIO support...
+EAL: VFIO support initialized
+EAL:   Invalid NUMA socket, default to 0
+EAL:   using IOMMU type 8 (No-IOMMU)
+[   84.942213] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000008
+[   84.943047] Mem abort info:
 ---
- arch/arm64/include/asm/kvm_cpufeature.h       |   2 +
- arch/arm64/kernel/image-vars.h                |   3 +
- arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  33 +++
- arch/arm64/kvm/hyp/nvhe/Makefile              |   2 +-
- arch/arm64/kvm/hyp/nvhe/hyp-init.S            |   1 +
- arch/arm64/kvm/hyp/nvhe/hyp-main.c            |   6 +
- arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 191 ++++++++++++++++++
- arch/arm64/kvm/hyp/nvhe/setup.c               |   6 +
- arch/arm64/kvm/hyp/nvhe/switch.c              |   7 +-
- arch/arm64/kvm/hyp/nvhe/tlb.c                 |   4 +-
- 10 files changed, 248 insertions(+), 7 deletions(-)
- create mode 100644 arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
- create mode 100644 arch/arm64/kvm/hyp/nvhe/mem_protect.c
 
-diff --git a/arch/arm64/include/asm/kvm_cpufeature.h b/arch/arm64/include/asm/kvm_cpufeature.h
-index d34f85cba358..74043a149322 100644
---- a/arch/arm64/include/asm/kvm_cpufeature.h
-+++ b/arch/arm64/include/asm/kvm_cpufeature.h
-@@ -15,3 +15,5 @@
- #endif
- 
- KVM_HYP_CPU_FTR_REG(SYS_CTR_EL0, arm64_ftr_reg_ctrel0)
-+KVM_HYP_CPU_FTR_REG(SYS_ID_AA64MMFR0_EL1, arm64_ftr_reg_id_aa64mmfr0_el1)
-+KVM_HYP_CPU_FTR_REG(SYS_ID_AA64MMFR1_EL1, arm64_ftr_reg_id_aa64mmfr1_el1)
-diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
-index 366d837f0d39..e4e4f30ac251 100644
---- a/arch/arm64/kernel/image-vars.h
-+++ b/arch/arm64/kernel/image-vars.h
-@@ -132,6 +132,9 @@ KVM_NVHE_ALIAS(__hyp_data_ro_after_init_end);
- KVM_NVHE_ALIAS(__hyp_bss_start);
- KVM_NVHE_ALIAS(__hyp_bss_end);
- 
-+/* pKVM static key */
-+KVM_NVHE_ALIAS(kvm_protected_mode_initialized);
-+
- #endif /* CONFIG_KVM */
- 
- #endif /* __ARM64_KERNEL_IMAGE_VARS_H */
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-new file mode 100644
-index 000000000000..a22ef118a610
---- /dev/null
-+++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-@@ -0,0 +1,33 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright (C) 2020 Google LLC
-+ * Author: Quentin Perret <qperret@google.com>
-+ */
-+
-+#ifndef __KVM_NVHE_MEM_PROTECT__
-+#define __KVM_NVHE_MEM_PROTECT__
-+#include <linux/kvm_host.h>
-+#include <asm/kvm_hyp.h>
-+#include <asm/kvm_pgtable.h>
-+#include <asm/virt.h>
-+#include <nvhe/spinlock.h>
-+
-+struct host_kvm {
-+	struct kvm_arch arch;
-+	struct kvm_pgtable pgt;
-+	struct kvm_pgtable_mm_ops mm_ops;
-+	hyp_spinlock_t lock;
-+};
-+extern struct host_kvm host_kvm;
-+
-+int kvm_host_prepare_stage2(void *mem_pgt_pool, void *dev_pgt_pool);
-+void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt);
-+
-+static __always_inline void __load_host_stage2(void)
-+{
-+	if (static_branch_likely(&kvm_protected_mode_initialized))
-+		__load_stage2(&host_kvm.arch.mmu, host_kvm.arch.vtcr);
-+	else
-+		write_sysreg(0, vttbr_el2);
-+}
-+#endif /* __KVM_NVHE_MEM_PROTECT__ */
-diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-index d7381a503182..c3e2f98555c4 100644
---- a/arch/arm64/kvm/hyp/nvhe/Makefile
-+++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-@@ -11,7 +11,7 @@ lib-objs := $(addprefix ../../../lib/, $(lib-objs))
- 
- obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o \
- 	 hyp-main.o hyp-smp.o psci-relay.o early_alloc.o stub.o page_alloc.o \
--	 cache.o cpufeature.o setup.o mm.o
-+	 cache.o cpufeature.o setup.o mm.o mem_protect.o
- obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
- 	 ../fpsimd.o ../hyp-entry.o ../exception.o ../pgtable.o
- obj-y += $(lib-objs)
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-index b1341bb4b453..32591db76c75 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-@@ -129,6 +129,7 @@ alternative_else_nop_endif
- 
- 	/* Invalidate the stale TLBs from Bootloader */
- 	tlbi	alle2
-+	tlbi	vmalls12e1
- 	dsb	sy
- 
- 	/*
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 3075f117651c..93699600bc22 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -13,6 +13,7 @@
- #include <asm/kvm_hyp.h>
- #include <asm/kvm_mmu.h>
- 
-+#include <nvhe/mem_protect.h>
- #include <nvhe/mm.h>
- #include <nvhe/trap_handler.h>
- 
-@@ -222,6 +223,11 @@ void handle_trap(struct kvm_cpu_context *host_ctxt)
- 	case ESR_ELx_EC_SMC64:
- 		handle_host_smc(host_ctxt);
- 		break;
-+	case ESR_ELx_EC_IABT_LOW:
-+		fallthrough;
-+	case ESR_ELx_EC_DABT_LOW:
-+		handle_host_mem_abort(host_ctxt);
-+		break;
- 	default:
- 		hyp_panic();
- 	}
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-new file mode 100644
-index 000000000000..0cd3eb178f3b
---- /dev/null
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -0,0 +1,191 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) 2020 Google LLC
-+ * Author: Quentin Perret <qperret@google.com>
-+ */
-+
-+#include <linux/kvm_host.h>
-+#include <asm/kvm_cpufeature.h>
-+#include <asm/kvm_emulate.h>
-+#include <asm/kvm_hyp.h>
-+#include <asm/kvm_mmu.h>
-+#include <asm/kvm_pgtable.h>
-+#include <asm/stage2_pgtable.h>
-+
-+#include <hyp/switch.h>
-+
-+#include <nvhe/gfp.h>
-+#include <nvhe/memory.h>
-+#include <nvhe/mem_protect.h>
-+#include <nvhe/mm.h>
-+
-+extern unsigned long hyp_nr_cpus;
-+struct host_kvm host_kvm;
-+
-+struct hyp_pool host_s2_mem;
-+struct hyp_pool host_s2_dev;
-+
-+static void *host_s2_zalloc_pages_exact(size_t size)
-+{
-+	return hyp_alloc_pages(&host_s2_mem, HYP_GFP_ZERO, get_order(size));
-+}
-+
-+static void *host_s2_zalloc_page(void *pool)
-+{
-+	return hyp_alloc_pages(pool, HYP_GFP_ZERO, 0);
-+}
-+
-+static int prepare_s2_pools(void *mem_pgt_pool, void *dev_pgt_pool)
-+{
-+	unsigned long nr_pages;
-+	int ret;
-+
-+	nr_pages = host_s2_mem_pgtable_size() >> PAGE_SHIFT;
-+	ret = hyp_pool_init(&host_s2_mem, __hyp_pa(mem_pgt_pool), nr_pages, 0);
-+	if (ret)
-+		return ret;
-+
-+	nr_pages = host_s2_dev_pgtable_size() >> PAGE_SHIFT;
-+	ret = hyp_pool_init(&host_s2_dev, __hyp_pa(dev_pgt_pool), nr_pages, 0);
-+	if (ret)
-+		return ret;
-+
-+	host_kvm.mm_ops.zalloc_pages_exact = host_s2_zalloc_pages_exact;
-+	host_kvm.mm_ops.zalloc_page = host_s2_zalloc_page;
-+	host_kvm.mm_ops.phys_to_virt = hyp_phys_to_virt;
-+	host_kvm.mm_ops.virt_to_phys = hyp_virt_to_phys;
-+	host_kvm.mm_ops.page_count = hyp_page_count;
-+	host_kvm.mm_ops.get_page = hyp_get_page;
-+	host_kvm.mm_ops.put_page = hyp_put_page;
-+
-+	return 0;
-+}
-+
-+static void prepare_host_vtcr(void)
-+{
-+	u32 parange, phys_shift;
-+	u64 mmfr0, mmfr1;
-+
-+	mmfr0 = arm64_ftr_reg_id_aa64mmfr0_el1.sys_val;
-+	mmfr1 = arm64_ftr_reg_id_aa64mmfr1_el1.sys_val;
-+
-+	/* The host stage 2 is id-mapped, so use parange for T0SZ */
-+	parange = kvm_get_parange(mmfr0);
-+	phys_shift = id_aa64mmfr0_parange_to_phys_shift(parange);
-+
-+	host_kvm.arch.vtcr = kvm_get_vtcr(mmfr0, mmfr1, phys_shift);
-+}
-+
-+int kvm_host_prepare_stage2(void *mem_pgt_pool, void *dev_pgt_pool)
-+{
-+	struct kvm_s2_mmu *mmu = &host_kvm.arch.mmu;
-+	struct kvm_nvhe_init_params *params;
-+	int ret, i;
-+
-+	prepare_host_vtcr();
-+	hyp_spin_lock_init(&host_kvm.lock);
-+
-+	ret = prepare_s2_pools(mem_pgt_pool, dev_pgt_pool);
-+	if (ret)
-+		return ret;
-+
-+	ret = kvm_pgtable_stage2_init(&host_kvm.pgt, &host_kvm.arch,
-+				      &host_kvm.mm_ops);
-+	if (ret)
-+		return ret;
-+
-+	mmu->pgd_phys = __hyp_pa(host_kvm.pgt.pgd);
-+	mmu->arch = &host_kvm.arch;
-+	mmu->pgt = &host_kvm.pgt;
-+	mmu->vmid.vmid_gen = 0;
-+	mmu->vmid.vmid = 0;
-+
-+	for (i = 0; i < hyp_nr_cpus; i++) {
-+		params = per_cpu_ptr(&kvm_init_params, i);
-+		params->vttbr = kvm_get_vttbr(mmu);
-+		params->vtcr = host_kvm.arch.vtcr;
-+		params->hcr_el2 |= HCR_VM;
-+		__flush_dcache_area(params, sizeof(*params));
-+	}
-+
-+	write_sysreg(this_cpu_ptr(&kvm_init_params)->hcr_el2, hcr_el2);
-+	__load_stage2(&host_kvm.arch.mmu, host_kvm.arch.vtcr);
-+
-+	return 0;
-+}
-+
-+static void host_stage2_unmap_dev_all(void)
-+{
-+	struct kvm_pgtable *pgt = &host_kvm.pgt;
-+	struct hyp_memblock_region *reg;
-+	u64 addr = 0;
-+	int i;
-+
-+	/* Unmap all non-memory regions to recycle the pages */
-+	for (i = 0; i < hyp_memblock_nr; i++, addr = reg->end) {
-+		reg = &hyp_memory[i];
-+		kvm_pgtable_stage2_unmap(pgt, addr, reg->start - addr);
-+	}
-+	kvm_pgtable_stage2_unmap(pgt, addr, ULONG_MAX);
-+}
-+
-+static bool ipa_is_memory(u64 ipa)
-+{
-+	int cur, left = 0, right = hyp_memblock_nr;
-+	struct hyp_memblock_region *reg;
-+
-+	/* The list of memblock regions is sorted, binary search it */
-+	while (left < right) {
-+		cur = (left + right) >> 1;
-+		reg = &hyp_memory[cur];
-+		if (ipa < reg->start)
-+			right = cur;
-+		else if (ipa >= reg->end)
-+			left = cur + 1;
-+		else
-+			return true;
-+	}
-+
-+	return false;
-+}
-+
-+static int __host_stage2_map(u64 ipa, u64 size, enum kvm_pgtable_prot prot,
-+			     struct hyp_pool *p)
-+{
-+	return kvm_pgtable_stage2_map(&host_kvm.pgt, ipa, size, ipa, prot, p);
-+}
-+
-+static int host_stage2_map(u64 ipa, u64 size, enum kvm_pgtable_prot prot)
-+{
-+	int ret, is_memory = ipa_is_memory(ipa);
-+	struct hyp_pool *pool;
-+
-+	pool = is_memory ? &host_s2_mem : &host_s2_dev;
-+
-+	hyp_spin_lock(&host_kvm.lock);
-+	ret = __host_stage2_map(ipa, size, prot, pool);
-+	if (ret == -ENOMEM && !is_memory) {
-+		host_stage2_unmap_dev_all();
-+		ret = __host_stage2_map(ipa, size, prot, pool);
-+	}
-+	hyp_spin_unlock(&host_kvm.lock);
-+
-+	return ret;
-+}
-+
-+void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt)
-+{
-+	enum kvm_pgtable_prot prot;
-+	u64 far, hpfar, esr, ipa;
-+	int ret;
-+
-+	esr = read_sysreg_el2(SYS_ESR);
-+	if (!__get_fault_info(esr, &far, &hpfar))
-+		hyp_panic();
-+
-+	prot = KVM_PGTABLE_PROT_R | KVM_PGTABLE_PROT_W | KVM_PGTABLE_PROT_X;
-+	ipa = (hpfar & HPFAR_MASK) << 8;
-+	ret = host_stage2_map(ipa, PAGE_SIZE, prot);
-+	if (ret)
-+		hyp_panic();
-+}
-diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-index 79b697df01e2..f6d3318e92fa 100644
---- a/arch/arm64/kvm/hyp/nvhe/setup.c
-+++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-@@ -12,6 +12,7 @@
- #include <nvhe/early_alloc.h>
- #include <nvhe/gfp.h>
- #include <nvhe/memory.h>
-+#include <nvhe/mem_protect.h>
- #include <nvhe/mm.h>
- 
- struct hyp_pool hpool;
-@@ -161,6 +162,11 @@ void __noreturn __pkvm_init_finalise(void)
- 	if (ret)
- 		goto out;
- 
-+	/* Wrap the host with a stage 2 */
-+	ret = kvm_host_prepare_stage2(host_s2_mem_pgt_base, host_s2_dev_pgt_base);
-+	if (ret)
-+		goto out;
-+
- 	pkvm_pgtable_mm_ops.zalloc_page = hyp_zalloc_hyp_page;
- 	pkvm_pgtable_mm_ops.phys_to_virt = hyp_phys_to_virt;
- 	pkvm_pgtable_mm_ops.virt_to_phys = hyp_virt_to_phys;
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index 979a76cdf9fb..31bc1a843bf8 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -28,6 +28,8 @@
- #include <asm/processor.h>
- #include <asm/thread_info.h>
- 
-+#include <nvhe/mem_protect.h>
-+
- /* Non-VHE specific context */
- DEFINE_PER_CPU(struct kvm_host_data, kvm_host_data);
- DEFINE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
-@@ -102,11 +104,6 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
- 	write_sysreg(__kvm_hyp_host_vector, vbar_el2);
- }
- 
--static void __load_host_stage2(void)
--{
--	write_sysreg(0, vttbr_el2);
--}
--
- /* Save VGICv3 state on non-VHE systems */
- static void __hyp_vgic_save_state(struct kvm_vcpu *vcpu)
- {
-diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
-index fbde89a2c6e8..255a23a1b2db 100644
---- a/arch/arm64/kvm/hyp/nvhe/tlb.c
-+++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
-@@ -8,6 +8,8 @@
- #include <asm/kvm_mmu.h>
- #include <asm/tlbflush.h>
- 
-+#include <nvhe/mem_protect.h>
-+
- struct tlb_inv_context {
- 	u64		tcr;
- };
-@@ -43,7 +45,7 @@ static void __tlb_switch_to_guest(struct kvm_s2_mmu *mmu,
- 
- static void __tlb_switch_to_host(struct tlb_inv_context *cxt)
- {
--	write_sysreg(0, vttbr_el2);
-+	__load_host_stage2();
- 
- 	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
- 		/* Ensure write of the host VMID */
--- 
-2.30.0.284.gd98b1dd5eaa7-goog
+I have pushed a temp fix for this in my test branch here,
+https://github.com/hisilicon/kernel-dev/commit/7784d96fbac9c48e8093ec9dbf43a172b1cbe3c3
+
+Please take a look.
+
+(I am seeing another issue with testpmd + vsmmu. I will explain that in another thread).
+
+Thanks,
+Shameer
+
+
+
+  
+> +	if (ret || !nested)
+> +		return ret;
+> +
+> +	mutex_init(&vdev->fault_response_queue_lock);
+> +
+> +	/*
+> +	 * We provision 1 page for the header and space for
+> +	 * DMA_FAULT_RING_LENGTH fault records in the ring buffer.
+> +	 */
+> +	size = ALIGN(sizeof(struct iommu_page_response) *
+> +		     DMA_FAULT_RESPONSE_RING_LENGTH, PAGE_SIZE) +
+> PAGE_SIZE;
+> +
+> +	vdev->fault_response_pages = kzalloc(size, GFP_KERNEL);
+> +	if (!vdev->fault_response_pages)
+> +		return -ENOMEM;
+> +
+> +	ret = vfio_pci_register_dev_region(vdev,
+> +		VFIO_REGION_TYPE_NESTED,
+> +		VFIO_REGION_SUBTYPE_NESTED_DMA_FAULT_RESPONSE,
+> +		&vfio_pci_dma_fault_response_regops, size,
+> +		VFIO_REGION_INFO_FLAG_READ |
+> VFIO_REGION_INFO_FLAG_WRITE |
+> +		VFIO_REGION_INFO_FLAG_MMAP,
+> +		vdev->fault_response_pages);
+> +	if (ret)
+> +		goto out;
+> +
+> +	header = (struct vfio_region_dma_fault_response
+> *)vdev->fault_response_pages;
+> +	header->entry_size = sizeof(struct iommu_page_response);
+> +	header->nb_entries = DMA_FAULT_RESPONSE_RING_LENGTH;
+> +	header->offset = PAGE_SIZE;
+> +
+> +	return 0;
+> +out:
+> +	vdev->fault_response_pages = NULL;
+> +	return ret;
+> +}
+> +
+>  static int vfio_pci_enable(struct vfio_pci_device *vdev)
+>  {
+>  	struct pci_dev *pdev = vdev->pdev;
+> @@ -602,6 +693,10 @@ static int vfio_pci_enable(struct vfio_pci_device
+> *vdev)
+>  	if (ret)
+>  		goto disable_exit;
+> 
+> +	ret = vfio_pci_dma_fault_response_init(vdev);
+> +	if (ret)
+> +		goto disable_exit;
+> +
+>  	vfio_pci_probe_mmaps(vdev);
+> 
+>  	return 0;
+> @@ -2227,6 +2322,7 @@ static int vfio_pci_probe(struct pci_dev *pdev, const
+> struct pci_device_id *id)
+>  	INIT_LIST_HEAD(&vdev->ioeventfds_list);
+>  	mutex_init(&vdev->vma_lock);
+>  	INIT_LIST_HEAD(&vdev->vma_list);
+> +	INIT_LIST_HEAD(&vdev->dummy_resources_list);
+>  	init_rwsem(&vdev->memory_lock);
+> 
+>  	ret = vfio_add_group_dev(&pdev->dev, &vfio_pci_ops, vdev);
+> diff --git a/drivers/vfio/pci/vfio_pci_private.h
+> b/drivers/vfio/pci/vfio_pci_private.h
+> index e180b5435c8f..035634521cd0 100644
+> --- a/drivers/vfio/pci/vfio_pci_private.h
+> +++ b/drivers/vfio/pci/vfio_pci_private.h
+> @@ -144,7 +144,9 @@ struct vfio_pci_device {
+>  	struct eventfd_ctx	*err_trigger;
+>  	struct eventfd_ctx	*req_trigger;
+>  	u8			*fault_pages;
+> +	u8			*fault_response_pages;
+>  	struct mutex		fault_queue_lock;
+> +	struct mutex		fault_response_queue_lock;
+>  	struct list_head	dummy_resources_list;
+>  	struct mutex		ioeventfds_lock;
+>  	struct list_head	ioeventfds_list;
+> @@ -189,6 +191,9 @@ extern long vfio_pci_ioeventfd(struct vfio_pci_device
+> *vdev, loff_t offset,
+>  extern size_t vfio_pci_dma_fault_rw(struct vfio_pci_device *vdev,
+>  				    char __user *buf, size_t count,
+>  				    loff_t *ppos, bool iswrite);
+> +extern size_t vfio_pci_dma_fault_response_rw(struct vfio_pci_device *vdev,
+> +					     char __user *buf, size_t count,
+> +					     loff_t *ppos, bool iswrite);
+> 
+>  extern int vfio_pci_init_perm_bits(void);
+>  extern void vfio_pci_uninit_perm_bits(void);
+> diff --git a/drivers/vfio/pci/vfio_pci_rdwr.c b/drivers/vfio/pci/vfio_pci_rdwr.c
+> index 164120607469..efde0793360b 100644
+> --- a/drivers/vfio/pci/vfio_pci_rdwr.c
+> +++ b/drivers/vfio/pci/vfio_pci_rdwr.c
+> @@ -400,6 +400,45 @@ size_t vfio_pci_dma_fault_rw(struct vfio_pci_device
+> *vdev, char __user *buf,
+>  	return ret;
+>  }
+> 
+> +size_t vfio_pci_dma_fault_response_rw(struct vfio_pci_device *vdev, char
+> __user *buf,
+> +				      size_t count, loff_t *ppos, bool iswrite)
+> +{
+> +	unsigned int i = VFIO_PCI_OFFSET_TO_INDEX(*ppos) -
+> VFIO_PCI_NUM_REGIONS;
+> +	loff_t pos = *ppos & VFIO_PCI_OFFSET_MASK;
+> +	void *base = vdev->region[i].data;
+> +	int ret = -EFAULT;
+> +
+> +	if (pos >= vdev->region[i].size)
+> +		return -EINVAL;
+> +
+> +	count = min(count, (size_t)(vdev->region[i].size - pos));
+> +
+> +	if (iswrite) {
+> +		struct vfio_region_dma_fault_response *header =
+> +			(struct vfio_region_dma_fault_response *)base;
+> +		uint32_t  new_head;
+> +
+> +		if (pos != 0 || count != 4)
+> +			return -EINVAL;
+> +
+> +		if (copy_from_user((void *)&new_head, buf, count))
+> +			return -EFAULT;
+> +
+> +		if (new_head >= header->nb_entries)
+> +			return -EINVAL;
+> +
+> +		mutex_lock(&vdev->fault_response_queue_lock);
+> +		header->head = new_head;
+> +		mutex_unlock(&vdev->fault_response_queue_lock);
+> +	} else {
+> +		if (copy_to_user(buf, base + pos, count))
+> +			return -EFAULT;
+> +	}
+> +	*ppos += count;
+> +	ret = count;
+> +	return ret;
+> +}
+> +
+>  static void vfio_pci_ioeventfd_do_write(struct vfio_pci_ioeventfd *ioeventfd,
+>  					bool test_mem)
+>  {
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index 1e5c82f9d14d..5d106db7a4c5 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -345,6 +345,7 @@ struct vfio_region_info_cap_type {
+> 
+>  #define VFIO_REGION_TYPE_NESTED			(2)
+>  #define VFIO_REGION_SUBTYPE_NESTED_DMA_FAULT	(1)
+> +#define VFIO_REGION_SUBTYPE_NESTED_DMA_FAULT_RESPONSE	(2)
+> 
+>  /**
+>   * struct vfio_region_gfx_edid - EDID region layout.
+> @@ -1022,6 +1023,17 @@ struct vfio_region_info_cap_fault {
+>  	__u32 version;
+>  };
+> 
+> +/*
+> + * Capability exposed by the DMA fault response region
+> + * @version: ABI version
+> + */
+> +#define VFIO_REGION_INFO_CAP_DMA_FAULT_RESPONSE	7
+> +
+> +struct vfio_region_info_cap_fault_response {
+> +	struct vfio_info_cap_header header;
+> +	__u32 version;
+> +};
+> +
+>  /*
+>   * DMA Fault Region Layout
+>   * @tail: index relative to the start of the ring buffer at which the
+> @@ -1042,6 +1054,26 @@ struct vfio_region_dma_fault {
+>  	__u32   head;
+>  };
+> 
+> +/*
+> + * DMA Fault Response Region Layout
+> + * @head: index relative to the start of the ring buffer at which the
+> + *        producer (userspace) insert responses into the buffer
+> + * @entry_size: fault ring buffer entry size in bytes
+> + * @nb_entries: max capacity of the fault ring buffer
+> + * @offset: ring buffer offset relative to the start of the region
+> + * @tail: index relative to the start of the ring buffer at which the
+> + *        consumer (kernel) finds the next item in the buffer
+> + */
+> +struct vfio_region_dma_fault_response {
+> +	/* Write-Only */
+> +	__u32   head;
+> +	/* Read-Only */
+> +	__u32   entry_size;
+> +	__u32	nb_entries;
+> +	__u32	offset;
+> +	__u32   tail;
+> +};
+> +
+>  /* -------- API for Type1 VFIO IOMMU -------- */
+> 
+>  /**
+> --
+> 2.21.3
 
 _______________________________________________
 kvmarm mailing list
