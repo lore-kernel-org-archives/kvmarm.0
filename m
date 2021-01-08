@@ -2,70 +2,58 @@ Return-Path: <SRS0=HOrx=GL=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64425C433E0
-	for <kvmarm@archiver.kernel.org>; Fri,  8 Jan 2021 16:51:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91769C433E9
+	for <kvmarm@archiver.kernel.org>; Fri,  8 Jan 2021 17:04:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BABED239FE
-	for <kvmarm@archiver.kernel.org>; Fri,  8 Jan 2021 16:51:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BABED239FE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id D7D0F23A22
+	for <kvmarm@archiver.kernel.org>; Fri,  8 Jan 2021 17:04:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7D0F23A22
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 118924B42A;
-	Fri,  8 Jan 2021 11:51:19 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 133404B43D;
+	Fri,  8 Jan 2021 12:04:00 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id DB+P8Exv4zdC; Fri,  8 Jan 2021 11:51:17 -0500 (EST)
+	with ESMTP id Wz2vMwqjtNDm; Fri,  8 Jan 2021 12:03:58 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 225C64B42C;
-	Fri,  8 Jan 2021 11:51:17 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D4E8F4B445;
+	Fri,  8 Jan 2021 12:03:58 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 716CD4B428
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jan 2021 11:51:16 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C9384B439
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jan 2021 12:03:57 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HH4rj42Kbvc0 for <kvmarm@lists.cs.columbia.edu>;
- Fri,  8 Jan 2021 11:51:15 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 40D6A4B36D
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jan 2021 11:51:15 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 084A9239FD;
- Fri,  8 Jan 2021 16:51:14 +0000 (UTC)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
- TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
- (envelope-from <maz@kernel.org>)
- id 1kxuyl-0067gk-RL; Fri, 08 Jan 2021 16:51:11 +0000
-MIME-Version: 1.0
-Date: Fri, 08 Jan 2021 16:51:11 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Steven Price <steven.price@arm.com>
+ with ESMTP id QSlH0kUBkiqQ for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  8 Jan 2021 12:03:56 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7DD004B42C
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jan 2021 12:03:56 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1B35E11FB;
+ Fri,  8 Jan 2021 09:03:56 -0800 (PST)
+Received: from [192.168.1.179] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 034A43F70D;
+ Fri,  8 Jan 2021 09:03:53 -0800 (PST)
 Subject: Re: [PATCH] KVM: arm64: Compute TPIDR_EL2 ignoring MTE tag
-In-Reply-To: <20210108161254.53674-1-steven.price@arm.com>
+To: Marc Zyngier <maz@kernel.org>
 References: <20210108161254.53674-1-steven.price@arm.com>
-User-Agent: Roundcube Webmail/1.4.9
-Message-ID: <e49459f08d0afb30a120dfb3d6b80741@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: steven.price@arm.com, catalin.marinas@arm.com,
- will@kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com,
- suzuki.poulose@arm.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- glider@google.com, akpm@linux-foundation.org, andreyknvl@google.com,
- vincenzo.frascino@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+ <e49459f08d0afb30a120dfb3d6b80741@kernel.org>
+From: Steven Price <steven.price@arm.com>
+Message-ID: <d26549a7-8de8-876e-0385-ebb831da4a53@arm.com>
+Date: Fri, 8 Jan 2021 17:03:52 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <e49459f08d0afb30a120dfb3d6b80741@kernel.org>
+Content-Language: en-GB
 Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org, Andrey Konovalov <andreyknvl@google.com>,
  Alexander Potapenko <glider@google.com>,
@@ -83,43 +71,45 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Steven,
-
-On 2021-01-08 16:12, Steven Price wrote:
-> KASAN in HW_TAGS mode will store MTE tags in the top byte of the
-> pointer. When computing the offset for TPIDR_EL2 we don't want anything
-> in the top byte, so remove the tag to ensure the computation is correct
-> no matter what the tag.
-> 
-> Fixes: 94ab5b61ee16 ("kasan, arm64: enable CONFIG_KASAN_HW_TAGS")
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Without this fix I can't boot a config with KASAN_HW_TAGS and KVM on an
-> MTE enabled host. I'm unsure if this should really be in
-> this_cpu_ptr_nvhe_sym().
-
-this_cpu_ptr_nvhe_sym() should return something that is valid for
-the EL1 kernel, so I guess untagging in the helper may not be
-that useful.
-
-However, I'm more concerned by anything at requires us to follow
-pointers set up by EL1 at EL2. It looks to me that the only reason
-the whole thing works is because kern_hyp_va() *accidentally* drops
-tags before applying the EL1/EL2 offset...
-
-Or am I getting it wrong?
-
-Thanks,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gMDgvMDEvMjAyMSAxNjo1MSwgTWFyYyBaeW5naWVyIHdyb3RlOgo+IEhpIFN0ZXZlbiwKPiAK
+PiBPbiAyMDIxLTAxLTA4IDE2OjEyLCBTdGV2ZW4gUHJpY2Ugd3JvdGU6Cj4+IEtBU0FOIGluIEhX
+X1RBR1MgbW9kZSB3aWxsIHN0b3JlIE1URSB0YWdzIGluIHRoZSB0b3AgYnl0ZSBvZiB0aGUKPj4g
+cG9pbnRlci4gV2hlbiBjb21wdXRpbmcgdGhlIG9mZnNldCBmb3IgVFBJRFJfRUwyIHdlIGRvbid0
+IHdhbnQgYW55dGhpbmcKPj4gaW4gdGhlIHRvcCBieXRlLCBzbyByZW1vdmUgdGhlIHRhZyB0byBl
+bnN1cmUgdGhlIGNvbXB1dGF0aW9uIGlzIGNvcnJlY3QKPj4gbm8gbWF0dGVyIHdoYXQgdGhlIHRh
+Zy4KPj4KPj4gRml4ZXM6IDk0YWI1YjYxZWUxNiAoImthc2FuLCBhcm02NDogZW5hYmxlIENPTkZJ
+R19LQVNBTl9IV19UQUdTIikKPj4gU2lnbmVkLW9mZi1ieTogU3RldmVuIFByaWNlIDxzdGV2ZW4u
+cHJpY2VAYXJtLmNvbT4KPj4gLS0tCj4+IFdpdGhvdXQgdGhpcyBmaXggSSBjYW4ndCBib290IGEg
+Y29uZmlnIHdpdGggS0FTQU5fSFdfVEFHUyBhbmQgS1ZNIG9uIGFuCj4+IE1URSBlbmFibGVkIGhv
+c3QuIEknbSB1bnN1cmUgaWYgdGhpcyBzaG91bGQgcmVhbGx5IGJlIGluCj4+IHRoaXNfY3B1X3B0
+cl9udmhlX3N5bSgpLgo+IAo+IHRoaXNfY3B1X3B0cl9udmhlX3N5bSgpIHNob3VsZCByZXR1cm4g
+c29tZXRoaW5nIHRoYXQgaXMgdmFsaWQgZm9yCj4gdGhlIEVMMSBrZXJuZWwsIHNvIEkgZ3Vlc3Mg
+dW50YWdnaW5nIGluIHRoZSBoZWxwZXIgbWF5IG5vdCBiZQo+IHRoYXQgdXNlZnVsLgoKTWFrZXMg
+c2Vuc2UgYW5kIHdhcyBteSBzdXNwaWNpb24uCgo+IEhvd2V2ZXIsIEknbSBtb3JlIGNvbmNlcm5l
+ZCBieSBhbnl0aGluZyBhdCByZXF1aXJlcyB1cyB0byBmb2xsb3cKPiBwb2ludGVycyBzZXQgdXAg
+YnkgRUwxIGF0IEVMMi4gSXQgbG9va3MgdG8gbWUgdGhhdCB0aGUgb25seSByZWFzb24KPiB0aGUg
+d2hvbGUgdGhpbmcgd29ya3MgaXMgYmVjYXVzZSBrZXJuX2h5cF92YSgpICphY2NpZGVudGFsbHkq
+IGRyb3BzCj4gdGFncyBiZWZvcmUgYXBwbHlpbmcgdGhlIEVMMS9FTDIgb2Zmc2V0Li4uCgpJbiB0
+aGUgY2FzZSBJJ20gZml4aW5nIHRoaXMgaXMgaW50ZW5kZWQgdG8gYmUgYW4gb2Zmc2V0IGNhbGN1
+bGF0aW9uIC0gCml0J3MganVzdCBtZXNzZWQgdXAgYnkgdGhlIHByZXNlbmNlIG9mIGFuIE1URSB0
+YWcgaW4gb25lIG9mIHRoZSBwb2ludGVycy4KCkkgYWdyZWUgSSB3YXMgc29tZXdoYXQgc3VycHJp
+c2VkIHdoZW4gZXZlcnl0aGluZyAnanVzdCB3b3JrZWQnIHdpdGggdGhpcyAKb25lIGNoYW5nZSAt
+IGFuZCBJIHRoaW5rIHlvdSdyZSByaWdodCBpdCdzIGJlY2F1c2Uga2Vybl9oeXBfdmEoKSAnanVz
+dCAKaGFwcGVucycgdG8gbG9zZSB0aGUgdGFncy4gT2YgY291cnNlIHRoZXJlIG1heSBiZSBvdGhl
+ciBidWdzIGx1cmtpbmcgLSAKcnVubmluZyBNVEUrS0FTQU4gb24gdGhlIG1vZGVsIGlzIHNsb3cg
+c28gSSBkaWRuJ3QgZG8gbXVjaCBiZXlvbmQgYm9vdCBpdC4KCk9uZSBvZiB0aGUgJ2Z1bicgdGhp
+bmdzIGFib3V0IE1URSBpcyB0aGF0IHlvdSBjYW4gbm8gbG9uZ2VyIGRvIHBvaW50ZXIgCnN1YnRy
+YWN0aW9uIHRvIGNhbGN1bGF0ZSB0aGUgb2Zmc2V0IHVubGVzcyB0aGUgcG9pbnRlcnMgYXJlIGFj
+dHVhbGx5IApmcm9tIHRoZSBzYW1lIGFsbG9jYXRpb24gKGFuZCB0aGVyZWZvcmUgaGF2ZSB0aGUg
+c2FtZSB0YWcpLiBJJ20gc3VyZSB0aGUgCkMgbGFuZ3VhZ2UgZXhwZXJ0cyB3b3VsZCBwb2ludCBv
+dXQgdGhhdCdzICJhbHdheXMgYmVlbiB0aGUgY2FzZSIgYnV0IGl0IAp3aWxsIHByb2JhYmx5IGJy
+ZWFrIHRoaW5ncyBlbHNld2hlcmUgdG9vLgoKU3RldmUKCj4gT3IgYW0gSSBnZXR0aW5nIGl0IHdy
+b25nPwo+IAo+IFRoYW5rcywKPiAKPiAgwqDCoMKgwqDCoMKgwqAgTS4KCl9fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3Zt
+YXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9t
+YWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
