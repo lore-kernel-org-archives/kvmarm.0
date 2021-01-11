@@ -2,75 +2,86 @@ Return-Path: <SRS0=NVHA=GO=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBC42C433DB
-	for <kvmarm@archiver.kernel.org>; Mon, 11 Jan 2021 19:48:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A6F8C433E6
+	for <kvmarm@archiver.kernel.org>; Mon, 11 Jan 2021 21:05:19 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2F9F022BF3
-	for <kvmarm@archiver.kernel.org>; Mon, 11 Jan 2021 19:48:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F9F022BF3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id D96C122D03
+	for <kvmarm@archiver.kernel.org>; Mon, 11 Jan 2021 21:05:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D96C122D03
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 725924B1E4;
-	Mon, 11 Jan 2021 14:48:21 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1FC754B413;
+	Mon, 11 Jan 2021 16:05:18 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@mg.codeaurora.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ZDAAjIXrkwUf; Mon, 11 Jan 2021 14:48:19 -0500 (EST)
+	with ESMTP id Nh9p2Gk3DsMn; Mon, 11 Jan 2021 16:05:17 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E78314B409;
-	Mon, 11 Jan 2021 14:48:19 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1FE394B3F4;
+	Mon, 11 Jan 2021 16:05:17 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6EEF04B409
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Jan 2021 14:48:19 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B7A04B2F7
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Jan 2021 15:38:52 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id l9vW1WTZQUDx for <kvmarm@lists.cs.columbia.edu>;
- Mon, 11 Jan 2021 14:48:18 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 07E6B4B408
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Jan 2021 14:48:17 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id AB75022BEF;
- Mon, 11 Jan 2021 19:48:16 +0000 (UTC)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
- TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
- (envelope-from <maz@kernel.org>)
- id 1kz3Ak-006mV8-JL; Mon, 11 Jan 2021 19:48:14 +0000
-MIME-Version: 1.0
-Date: Mon, 11 Jan 2021 19:48:14 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
+ with ESMTP id EzpmHj4QIBLC for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 11 Jan 2021 15:38:51 -0500 (EST)
+Received: from m43-15.mailgun.net (m43-15.mailgun.net [69.72.43.15])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 520264B2E5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Jan 2021 15:38:49 -0500 (EST)
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org;
+ q=dns/txt; 
+ s=smtp; t=1610397531; h=Content-Transfer-Encoding: Content-Type:
+ In-Reply-To: MIME-Version: Date: Message-ID: From: References: Cc: To:
+ Subject: Sender; bh=Ees3o6e/XkCpCJVrzGN7Ici92EyC8KlYvYm+4z3SO9w=;
+ b=enlwoyZZ5UYLpWWCGhmbpqRHrI+/BryAYDFTZLhRh2IOjXTL2gB5k7otj9scxjif4p1H+smy
+ +q8LaBOoSCnkh4wUvSroY0nU2mJW0hXv6DeBfoLO7kw42+6QaAV6ts+MrBKPvqsDKHNcEd+R
+ YSK7RhRdzZdYX/XDARD4j8Kl7Gs=
+X-Mailgun-Sending-Ip: 69.72.43.15
+X-Mailgun-Sid: WyJiM2ZhNCIsICJrdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1IiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org
+ (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
+ smtp-out-n09.prod.us-east-1.postgun.com with SMTP id
+ 5ffcb7568fb3cda82f483026 (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Mon, 11 Jan 2021 20:38:46
+ GMT
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+ id 983F4C43464; Mon, 11 Jan 2021 20:38:45 +0000 (UTC)
+Received: from [192.168.1.11] (cpe-70-95-74-122.san.res.rr.com [70.95.74.122])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128
+ bits)) (No client certificate requested)
+ (Authenticated sender: sramana)
+ by smtp.codeaurora.org (Postfix) with ESMTPSA id EE9AAC433CA;
+ Mon, 11 Jan 2021 20:38:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org EE9AAC433CA
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org;
+ dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org;
+ spf=fail smtp.mailfrom=sramana@codeaurora.org
 Subject: Re: [PATCH v3 09/21] arm64: cpufeature: Add global feature override
  facility
-In-Reply-To: <20210111184154.GC17941@gaia>
+To: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>
 References: <20210111132811.2455113-1-maz@kernel.org>
  <20210111132811.2455113-10-maz@kernel.org> <20210111184154.GC17941@gaia>
-User-Agent: Roundcube Webmail/1.4.9
-Message-ID: <129db8bd3913a90c96d4cfe4f55e27a0@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: catalin.marinas@arm.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- linux-kernel@vger.kernel.org, will@kernel.org, mark.rutland@arm.com,
- dbrazdil@google.com, alexandru.elisei@arm.com, ardb@kernel.org,
- jingzhangos@google.com, pajay@qti.qualcomm.com, psodagud@codeaurora.org,
- sramana@codeaurora.org, james.morse@arm.com, julien.thierry.kdev@gmail.com,
- suzuki.poulose@arm.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: Prasad Sodagudi <psodagud@codeaurora.org>,
- Srinivas Ramana <sramana@codeaurora.org>, linux-kernel@vger.kernel.org,
+From: Srinivas Ramana <sramana@codeaurora.org>
+Message-ID: <de9d8631-4ff9-9d0c-e4eb-5ce0eeb0ecea@codeaurora.org>
+Date: Mon, 11 Jan 2021 12:38:43 -0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
+MIME-Version: 1.0
+In-Reply-To: <20210111184154.GC17941@gaia>
+Content-Language: en-US
+X-Mailman-Approved-At: Mon, 11 Jan 2021 16:05:15 -0500
+Cc: Prasad Sodagudi <psodagud@codeaurora.org>, linux-kernel@vger.kernel.org,
  Ard Biesheuvel <ardb@kernel.org>, Ajay Patil <pajay@qti.qualcomm.com>,
  kernel-team@android.com, Will Deacon <will@kernel.org>,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
@@ -92,163 +103,54 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Hi Catalin,
 
-On 2021-01-11 18:41, Catalin Marinas wrote:
+On 1/11/2021 10:41 AM, Catalin Marinas wrote:
 > Hi Marc,
-> 
+>
 > On Mon, Jan 11, 2021 at 01:27:59PM +0000, Marc Zyngier wrote:
 >> Add a facility to globally override a feature, no matter what
 >> the HW says. Yes, this is dangerous.
-> 
 > Yeah, it's dangerous. We can make it less so if we only allow safe
 > values (e.g. lower if FTR_UNSIGNED).
-
-My plan was also to allow non-safe values in order to trigger features
-that are not advertised by the HW. But I can understand if you are
-reluctant to allow such thing! :D
-
->> diff --git a/arch/arm64/include/asm/cpufeature.h 
->> b/arch/arm64/include/asm/cpufeature.h
+>
+>> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
 >> index 9a555809b89c..465d2cb63bfc 100644
 >> --- a/arch/arm64/include/asm/cpufeature.h
 >> +++ b/arch/arm64/include/asm/cpufeature.h
 >> @@ -75,6 +75,8 @@ struct arm64_ftr_reg {
->>  	u64				sys_val;
->>  	u64				user_val;
->>  	const struct arm64_ftr_bits	*ftr_bits;
+>>   	u64				sys_val;
+>>   	u64				user_val;
+>>   	const struct arm64_ftr_bits	*ftr_bits;
 >> +	u64				*override_val;
 >> +	u64				*override_mask;
->>  };
-> 
-> At the arm64_ftr_reg level, we don't have any information about the 
-> safe
+>>   };
+> At the arm64_ftr_reg level, we don't have any information about the safe
 > values for a feature. Could we instead move this to arm64_ftr_bits? We
 > probably only need a single field. When populating the feature values,
 > we can make sure it doesn't go above the hardware one.
-> 
+>
 > I attempted a feature modification for MTE here, though I dropped the
 > entire series in the meantime as we clarified the ARM ARM:
-> 
+>
 > https://lore.kernel.org/linux-arm-kernel/20200515171612.1020-24-catalin.marinas@arm.com/
-> 
+>
 > Srinivas copied it in his patch (but forgot to give credit ;)):
-> 
+
+Sorry about that. I did mention that its taken from your patch-set in my 
+cover letter. But missed your signed-off-by in the patch.
+
+https://lore.kernel.org/linux-arm-msm/6dfdf691b5ed57df81c4c61422949af5@misterjones.org/T/#m1ae76e6096c07ab5f1636a4e383a3fd6cfb4665f
+
+Since we can ignore my patch with the mechanism added by Marc, I am not 
+re-sending this. Thanks.
+
+>
 > https://lore.kernel.org/linux-arm-msm/1610152163-16554-3-git-send-email-sramana@codeaurora.org/
-> 
-> The above adds a filter function but, instead, just use your mechanism 
-> in
-> this series for idreg.feature setting via cmdline. The 
-> arm64_ftr_value()
-> function extracts the hardware value and lowers it if a cmdline 
-> argument
+>
+> The above adds a filter function but, instead, just use your mechanism in
+> this series for idreg.feature setting via cmdline. The arm64_ftr_value()
+> function extracts the hardware value and lowers it if a cmdline argument
 > was passed.
-
-One thing is that it is not always possible to sanitise the value passed
-if it is required very early on, as I do with VHE. But in that case
-I actually check that we are VHE capable before starting to poke at
-VHE-specific state.
-
-I came up with the following patch on top, which preserves the current
-global approach (no per arm64_ftr_bits state), but checks (and alters)
-the override as it iterates through the various fields.
-
-For example, if I pass "arm64.nopauth kvm-arm.mode=nvhe 
-id_aa64pfr1.bt=5"
-to the FVP, I get the following output:
-
-[    0.000000] CPU features: SYS_ID_AA64ISAR1_EL1[31:28]: forced from 1 
-to 0
-[    0.000000] CPU features: SYS_ID_AA64ISAR1_EL1[11:8]: forced from 1 
-to 0
-[    0.000000] CPU features: SYS_ID_AA64MMFR1_EL1[11:8]: forced from 1 
-to 0
-[    0.000000] CPU features: SYS_ID_AA64PFR1_EL1[3:0]: not forcing 1 to 
-5
-[    0.000000] CPU features: detected: GIC system register CPU interface
-[    0.000000] CPU features: detected: Hardware dirty bit management
-[    0.000000] CPU features: detected: Spectre-v4
-[    0.000000] CPU features: detected: Branch Target Identification
-
-showing that the PAC features have been downgraded, together with VHE,
-but that BTI is still detected as value 5 was obviously bogus.
-
-Thoughts?
-
-         M.
-
-diff --git a/arch/arm64/kernel/cpufeature.c 
-b/arch/arm64/kernel/cpufeature.c
-index 894af60b9669..00d99e593b65 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -774,6 +774,7 @@ static void __init init_cpu_ftr_reg(u32 sys_reg, u64 
-new)
-  	u64 strict_mask = ~0x0ULL;
-  	u64 user_mask = 0;
-  	u64 valid_mask = 0;
-+	u64 override_val = 0, override_mask = 0;
-
-  	const struct arm64_ftr_bits *ftrp;
-  	struct arm64_ftr_reg *reg = get_arm64_ftr_reg(sys_reg);
-@@ -781,9 +782,35 @@ static void __init init_cpu_ftr_reg(u32 sys_reg, 
-u64 new)
-  	if (!reg)
-  		return;
-
-+	if (reg->override_mask && reg->override_val) {
-+		override_mask = *reg->override_mask;
-+		override_val = *reg->override_val;
-+	}
-+
-  	for (ftrp = reg->ftr_bits; ftrp->width; ftrp++) {
-  		u64 ftr_mask = arm64_ftr_mask(ftrp);
-  		s64 ftr_new = arm64_ftr_value(ftrp, new);
-+		s64 ftr_ovr = arm64_ftr_value(ftrp, override_val);
-+
-+		if ((ftr_mask & override_mask) == ftr_mask) {
-+			if (ftr_ovr < ftr_new) {
-+				pr_warn("%s[%d:%d]: forced from %llx to %llx\n",
-+					reg->name,
-+					ftrp->shift + ftrp->width - 1,
-+					ftrp->shift, ftr_new, ftr_ovr);
-+
-+				ftr_new = ftr_ovr;
-+			} else if (ftr_ovr != ftr_new) {
-+				pr_warn("%s[%d:%d]: not forcing %llx to %llx\n",
-+					reg->name,
-+					ftrp->shift + ftrp->width - 1,
-+					ftrp->shift, ftr_new, ftr_ovr);
-+
-+				/* Remove the override */
-+				*reg->override_mask &= ~ftr_mask;
-+				*reg->override_val &= ~ftr_mask;
-+			}
-+		}
-
-  		val = arm64_ftr_set_value(ftrp, val, ftr_new);
-
-@@ -800,18 +827,6 @@ static void __init init_cpu_ftr_reg(u32 sys_reg, 
-u64 new)
-
-  	val &= valid_mask;
-
--	if (reg->override_mask && reg->override_val) {
--		u64 override = val;
--		override &= ~*reg->override_mask;
--		override |= (*reg->override_val & *reg->override_mask);
--
--		if (val != override)
--			pr_warn("%s: forced from %016llx to %016llx\n",
--				reg->name, val, override);
--
--		val = override;
--	}
--
-  	reg->sys_val = val;
-  	reg->strict_mask = strict_mask;
-  	reg->user_mask = user_mask;
-
--- 
-Jazz is not dead. It just smells funny...
+>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
