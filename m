@@ -6,53 +6,53 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BBCFC433DB
-	for <kvmarm@archiver.kernel.org>; Mon, 11 Jan 2021 13:38:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9959C433E6
+	for <kvmarm@archiver.kernel.org>; Mon, 11 Jan 2021 13:38:48 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0BD2D2222D
-	for <kvmarm@archiver.kernel.org>; Mon, 11 Jan 2021 13:38:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BD2D2222D
+	by mail.kernel.org (Postfix) with ESMTP id 58A9122211
+	for <kvmarm@archiver.kernel.org>; Mon, 11 Jan 2021 13:38:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58A9122211
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AE7174B2D9;
-	Mon, 11 Jan 2021 08:38:46 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F273A4B304;
+	Mon, 11 Jan 2021 08:38:47 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id V98ReCJq2NCY; Mon, 11 Jan 2021 08:38:45 -0500 (EST)
+	with ESMTP id Tq5lcB7-G+jJ; Mon, 11 Jan 2021 08:38:46 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A36014B308;
-	Mon, 11 Jan 2021 08:38:45 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BE5514B31C;
+	Mon, 11 Jan 2021 08:38:46 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7CED44B22A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Jan 2021 08:38:44 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B20254B2D9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Jan 2021 08:38:45 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9xFvEk0XMSbR for <kvmarm@lists.cs.columbia.edu>;
- Mon, 11 Jan 2021 08:38:43 -0500 (EST)
+ with ESMTP id rpimiI0+lJnA for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 11 Jan 2021 08:38:44 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B60334B300
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Jan 2021 08:38:42 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8A7CB4B243
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Jan 2021 08:38:44 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id B6AE12222B;
- Mon, 11 Jan 2021 13:38:41 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id BC595221FD;
+ Mon, 11 Jan 2021 13:38:43 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1kyxFJ-006gPD-TI; Mon, 11 Jan 2021 13:28:34 +0000
+ id 1kyxFF-006gPD-JI; Mon, 11 Jan 2021 13:28:29 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  linux-kernel@vger.kernel.org
-Subject: [PATCH v3 16/21] arm64: Make kvm-arm.mode={nvhe,
- protected} an alias of id_aa64mmfr1.vh=0
-Date: Mon, 11 Jan 2021 13:28:06 +0000
-Message-Id: <20210111132811.2455113-17-maz@kernel.org>
+Subject: [PATCH v3 12/21] arm64: cpufeature: Add an early command-line
+ cpufeature override facility
+Date: Mon, 11 Jan 2021 13:28:02 +0000
+Message-Id: <20210111132811.2455113-13-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210111132811.2455113-1-maz@kernel.org>
 References: <20210111132811.2455113-1-maz@kernel.org>
@@ -89,62 +89,172 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Admitedly, passing id_aa64mmfr1.vh=0 on the command-line isn't
-that easy to understand, and it is likely that users would much
-prefer write "kvm-arm.mode=nvhe", or "...=protected".
+In order to be able to override CPU features at boot time,
+let's add a command line parser that matches options of the
+form "cpureg.feature=value", and store the corresponding
+value into the override val/mask pair.
 
-So here you go. This has the added advantage that we can now
-always honor the "kvm-arm.mode=protected" option, even when
-booting on a VHE system.
+No features are currently defined, so no expected change in
+functionality.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- Documentation/admin-guide/kernel-parameters.txt | 3 +++
- arch/arm64/kernel/idreg-override.c              | 2 ++
- arch/arm64/kvm/arm.c                            | 3 +++
- 3 files changed, 8 insertions(+)
+ arch/arm64/kernel/Makefile         |   2 +-
+ arch/arm64/kernel/head.S           |   1 +
+ arch/arm64/kernel/idreg-override.c | 119 +++++++++++++++++++++++++++++
+ 3 files changed, 121 insertions(+), 1 deletion(-)
+ create mode 100644 arch/arm64/kernel/idreg-override.c
 
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index 9e3cdb271d06..2786fd39a047 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -2257,6 +2257,9 @@
- 	kvm-arm.mode=
- 			[KVM,ARM] Select one of KVM/arm64's modes of operation.
+diff --git a/arch/arm64/kernel/Makefile b/arch/arm64/kernel/Makefile
+index 86364ab6f13f..2262f0392857 100644
+--- a/arch/arm64/kernel/Makefile
++++ b/arch/arm64/kernel/Makefile
+@@ -17,7 +17,7 @@ obj-y			:= debug-monitors.o entry.o irq.o fpsimd.o		\
+ 			   return_address.o cpuinfo.o cpu_errata.o		\
+ 			   cpufeature.o alternative.o cacheinfo.o		\
+ 			   smp.o smp_spin_table.o topology.o smccc-call.o	\
+-			   syscall.o proton-pack.o
++			   syscall.o proton-pack.o idreg-override.o
  
-+			nvhe: Standard nVHE-based mode, without support for
-+			      protected guests.
-+
- 			protected: nVHE-based mode with support for guests whose
- 				   state is kept private from the host.
- 				   Not valid if the kernel is running in EL2.
+ targets			+= efi-entry.o
+ 
+diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
+index d74e5f84042e..b3c4dd04f74b 100644
+--- a/arch/arm64/kernel/head.S
++++ b/arch/arm64/kernel/head.S
+@@ -435,6 +435,7 @@ SYM_FUNC_START_LOCAL(__primary_switched)
+ 
+ 	mov	x0, x21				// pass FDT address in x0
+ 	bl	early_fdt_map			// Try mapping the FDT early
++	bl	init_shadow_regs
+ 	bl	switch_to_vhe
+ #if defined(CONFIG_KASAN_GENERIC) || defined(CONFIG_KASAN_SW_TAGS)
+ 	bl	kasan_early_init
 diff --git a/arch/arm64/kernel/idreg-override.c b/arch/arm64/kernel/idreg-override.c
-index 16bc8b3b93ae..1db54878b2c4 100644
---- a/arch/arm64/kernel/idreg-override.c
+new file mode 100644
+index 000000000000..392f93b67103
+--- /dev/null
 +++ b/arch/arm64/kernel/idreg-override.c
-@@ -41,6 +41,8 @@ static const struct {
- 	const char * const	alias;
- 	const char * const	feature;
- } aliases[] __initdata = {
-+	{ "kvm-arm.mode=nvhe",		"id_aa64mmfr1.vh=0" },
-+	{ "kvm-arm.mode=protected",	"id_aa64mmfr1.vh=0" },
- };
- 
- static int __init find_field(const char *cmdline, const struct reg_desc *reg,
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 04c44853b103..597565a65ca2 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1966,6 +1966,9 @@ static int __init early_kvm_mode_cfg(char *arg)
- 		return 0;
- 	}
- 
-+	if (strcmp(arg, "nvhe") == 0 && !WARN_ON(is_kernel_in_hyp_mode()))
-+		return 0;
+@@ -0,0 +1,119 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Early cpufeature override framework
++ *
++ * Copyright (C) 2020 Google LLC
++ * Author: Marc Zyngier <maz@kernel.org>
++ */
 +
- 	return -EINVAL;
- }
- early_param("kvm-arm.mode", early_kvm_mode_cfg);
++#include <linux/kernel.h>
++#include <linux/libfdt.h>
++
++#include <asm/cacheflush.h>
++#include <asm/setup.h>
++
++struct reg_desc {
++	const char * const	name;
++	u64 * const		val;
++	u64 * const		mask;
++	struct {
++		const char * const	name;
++		u8			 shift;
++	} 			fields[];
++};
++
++static const struct reg_desc * const regs[] __initdata = {
++};
++
++static int __init find_field(const char *cmdline, const struct reg_desc *reg,
++			     int f, u64 *v)
++{
++	char buf[256], *str;
++	size_t len;
++
++	snprintf(buf, ARRAY_SIZE(buf), "%s.%s=", reg->name, reg->fields[f].name);
++
++	str = strstr(cmdline, buf);
++	if (!(str == cmdline || (str > cmdline && *(str - 1) == ' ')))
++		return -1;
++
++	str += strlen(buf);
++	len = strcspn(str, " ");
++	len = min(len, ARRAY_SIZE(buf) - 1);
++	strncpy(buf, str, len);
++	buf[len] = 0;
++
++	return kstrtou64(buf, 0, v);
++}
++
++static void __init match_options(const char *cmdline)
++{
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(regs); i++) {
++		int f;
++
++		if (!regs[i]->val || !regs[i]->mask)
++			continue;
++
++		for (f = 0; regs[i]->fields[f].name; f++) {
++			u64 v;
++
++			if (find_field(cmdline, regs[i], f, &v))
++				continue;
++
++			*regs[i]->val  |= (v & 0xf) << regs[i]->fields[f].shift;
++			*regs[i]->mask |= 0xfUL << regs[i]->fields[f].shift;
++		}
++	}
++}
++
++static __init void parse_cmdline(void)
++{
++	if (!IS_ENABLED(CONFIG_CMDLINE_FORCE)) {
++		const u8 *prop;
++		void *fdt;
++		int node;
++
++		fdt = get_early_fdt_ptr();
++		if (!fdt)
++			goto out;
++
++		node = fdt_path_offset(fdt, "/chosen");
++		if (node < 0)
++			goto out;
++
++		prop = fdt_getprop(fdt, node, "bootargs", NULL);
++		if (!prop)
++			goto out;
++
++		match_options(prop);
++
++		if (!IS_ENABLED(CONFIG_CMDLINE_EXTEND))
++			return;
++	}
++
++out:
++	match_options(CONFIG_CMDLINE);
++}
++
++void __init init_shadow_regs(void)
++{
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(regs); i++) {
++		if (regs[i]->val)
++			*regs[i]->val  = 0;
++		if (regs[i]->mask)
++			*regs[i]->mask = 0;
++	}
++
++	parse_cmdline();
++
++	for (i = 0; i < ARRAY_SIZE(regs); i++) {
++		if (regs[i]->val)
++			__flush_dcache_area(regs[i]->val, sizeof(*regs[i]->val));
++		if (regs[i]->mask)
++			__flush_dcache_area(regs[i]->mask, sizeof(*regs[i]->mask));
++	}
++}
 -- 
 2.29.2
 
