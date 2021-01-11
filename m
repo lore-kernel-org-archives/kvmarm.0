@@ -2,73 +2,74 @@ Return-Path: <SRS0=NVHA=GO=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9CAAC433E6
-	for <kvmarm@archiver.kernel.org>; Mon, 11 Jan 2021 13:20:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 092DAC433DB
+	for <kvmarm@archiver.kernel.org>; Mon, 11 Jan 2021 13:28:28 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2AB77207D0
-	for <kvmarm@archiver.kernel.org>; Mon, 11 Jan 2021 13:20:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AB77207D0
+	by mail.kernel.org (Postfix) with ESMTP id 6B530223E8
+	for <kvmarm@archiver.kernel.org>; Mon, 11 Jan 2021 13:28:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B530223E8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BC0D4B2E0;
-	Mon, 11 Jan 2021 08:20:14 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D2D684B308;
+	Mon, 11 Jan 2021 08:28:26 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id re2lwD0unpMb; Mon, 11 Jan 2021 08:20:13 -0500 (EST)
+	with ESMTP id jI5fVKjNrFTQ; Mon, 11 Jan 2021 08:28:25 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 38BE64B2FA;
-	Mon, 11 Jan 2021 08:20:13 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 812014B243;
+	Mon, 11 Jan 2021 08:28:25 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 94AE24B2E0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Jan 2021 08:20:12 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E8244B21A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Jan 2021 08:28:24 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id J2o4XhuarZUv for <kvmarm@lists.cs.columbia.edu>;
- Mon, 11 Jan 2021 08:20:11 -0500 (EST)
+ with ESMTP id GOfX5VqzbAvj for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 11 Jan 2021 08:28:22 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4BA454B2D7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Jan 2021 08:20:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C4E934B1E2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Jan 2021 08:28:22 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 249B2206CD;
- Mon, 11 Jan 2021 13:20:10 +0000 (UTC)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
- TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
+ by mail.kernel.org (Postfix) with ESMTPSA id 97B0021919;
+ Mon, 11 Jan 2021 13:28:21 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1kyx7A-006gC4-1X; Mon, 11 Jan 2021 13:20:08 +0000
-MIME-Version: 1.0
-Date: Mon, 11 Jan 2021 13:20:07 +0000
+ id 1kyxF5-006gPD-Gd; Mon, 11 Jan 2021 13:28:19 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Subject: Re: [PATCH 2/2] KVM: arm64: Workaround firmware wrongly advertising
- GICv2-on-v3 compatibility
-In-Reply-To: <5d5fc9f960d54049bbfc88341b511a3e@huawei.com>
-References: <20210108171216.2310188-1-maz@kernel.org>
- <20210108171216.2310188-3-maz@kernel.org>
- <5d5fc9f960d54049bbfc88341b511a3e@huawei.com>
-User-Agent: Roundcube Webmail/1.4.9
-Message-ID: <03256357b239767af6f503978224dc70@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: shameerali.kolothum.thodi@huawei.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
- ardb@kernel.org, kernel-team@android.com, linuxarm@openeuler.org
+To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ linux-kernel@vger.kernel.org
+Subject: [PATCH v3 00/21] arm64: Early CPU feature override,
+ and applications to VHE, BTI and PAuth
+Date: Mon, 11 Jan 2021 13:27:50 +0000
+Message-Id: <20210111132811.2455113-1-maz@kernel.org>
+X-Mailer: git-send-email 2.29.2
+MIME-Version: 1.0
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+ catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com,
+ dbrazdil@google.com, alexandru.elisei@arm.com, ardb@kernel.org,
+ jingzhangos@google.com, pajay@qti.qualcomm.com, psodagud@codeaurora.org,
+ sramana@codeaurora.org, james.morse@arm.com, julien.thierry.kdev@gmail.com,
+ suzuki.poulose@arm.com, kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: linuxarm@openeuler.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
+Cc: Prasad Sodagudi <psodagud@codeaurora.org>,
+ Srinivas Ramana <sramana@codeaurora.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Ajay Patil <pajay@qti.qualcomm.com>,
+ kernel-team@android.com, Will Deacon <will@kernel.org>,
  Ard Biesheuvel <ardb@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -81,121 +82,115 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2021-01-11 12:21, Shameerali Kolothum Thodi wrote:
-> Hi Marc,
-> 
->> -----Original Message-----
->> From: Marc Zyngier [mailto:maz@kernel.org]
->> Sent: 08 January 2021 17:12
->> To: linux-arm-kernel@lists.infradead.org; kvmarm@lists.cs.columbia.edu
->> Cc: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
->> James Morse <james.morse@arm.com>; Julien Thierry
->> <julien.thierry.kdev@gmail.com>; Suzuki K Poulose
->> <suzuki.poulose@arm.com>; Ard Biesheuvel <ardb@kernel.org>;
->> kernel-team@android.com
->> Subject: [PATCH 2/2] KVM: arm64: Workaround firmware wrongly 
->> advertising
->> GICv2-on-v3 compatibility
->> 
->> It looks like we have broken firmware out there that wrongly 
->> advertises
->> a GICv2 compatibility interface, despite the CPUs not being able to 
->> deal
->> with it.
->> 
->> To work around this, check that the CPU initialising KVM is actually 
->> able
->> to switch to MMIO instead of system registers, and use that as a
->> precondition to enable GICv2 compatibility in KVM.
->> 
->> Note that the detection happens on a single CPU. If the firmware is
->> lying *and* that the CPUs are asymetric, all hope is lost anyway.
->> 
->> Reported-by: Shameerali Kolothum Thodi
->> <shameerali.kolothum.thodi@huawei.com>
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> ---
->>  arch/arm64/kvm/hyp/vgic-v3-sr.c | 34 
->> +++++++++++++++++++++++++++++++--
->>  arch/arm64/kvm/vgic/vgic-v3.c   |  8 ++++++--
->>  2 files changed, 38 insertions(+), 4 deletions(-)
->> 
->> diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c
->> b/arch/arm64/kvm/hyp/vgic-v3-sr.c
->> index 005daa0c9dd7..d504499ab917 100644
->> --- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
->> +++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
->> @@ -408,11 +408,41 @@ void __vgic_v3_init_lrs(void)
->>  /*
->>   * Return the GIC CPU configuration:
->>   * - [31:0]  ICH_VTR_EL2
->> - * - [63:32] RES0
->> + * - [62:32] RES0
->> + * - [63]    MMIO (GICv2) capable
->>   */
->>  u64 __vgic_v3_get_gic_config(void)
->>  {
->> -	return read_gicreg(ICH_VTR_EL2);
->> +	u64 sre = read_gicreg(ICC_SRE_EL1);
->> +	unsigned long flags = 0;
->> +	bool v2_capable;
->> +
->> +	/*
->> +	 * To check whether we have a MMIO-based (GICv2 compatible)
->> +	 * CPU interface, we need to disable the system register
->> +	 * view. To do that safely, we have to prevent any interrupt
->> +	 * from firing (which would be deadly).
->> +	 *
->> +	 * Note that this only makes sense on VHE, as interrupts are
->> +	 * already masked for nVHE as part of the exception entry to
->> +	 * EL2.
->> +	 */
->> +	if (has_vhe())
->> +		flags = local_daif_save();
->> +
->> +	write_gicreg(0, ICC_SRE_EL1);
->> +	isb();
->> +
->> +	v2_capable = !(read_gicreg(ICC_SRE_EL1) & ICC_SRE_EL1_SRE);
->> +
->> +	write_gicreg(sre, ICC_SRE_EL1);
->> +	isb();
->> +
->> +	if (has_vhe())
->> +		local_daif_restore(flags);
->> +
->> +	return (read_gicreg(ICH_VTR_EL2) |
->> +		v2_capable ? (1ULL << 63) : 0);
->>  }
-> 
-> Thanks for sending this out. I had a go with this series and 
-> unfortunately
-> it didn't work on a system with faulty BIOS. It looks like the culprit 
-> here is
-> the ?: operator. There seems to be an operator precedence at play here
-> and it returns,
->   vgic_v3_probe: ich_vtr_el2 0x8000000000000000
-> 
-> And with the below change,
-> 
->         return (read_gicreg(ICH_VTR_EL2) |
-> -               v2_capable ? (1ULL << 63) : 0);
-> +               (v2_capable ? (1ULL << 63) : 0));
+It recently came to light that there is a need to be able to override
+some CPU features very early on, before the kernel is fully up and
+running. The reasons for this range from specific feature support
+(such as using Protected KVM on VHE HW, which is the main motivation
+for this work) to errata workaround (a feature is broken on a CPU and
+needs to be turned off, or rather not enabled).
 
-Gaahh. Well caught! Each time I use this operator, I end-up screwing
-up one way or another. Thanks for the heads up, and for testing.
-I'll respin the series shortly.
+This series tries to offer a limited framework for this kind of
+problems, by allowing a set of options to be passed on the
+command-line and altering the feature set that the cpufeature
+subsystem exposes to the rest of the kernel. Note that this doesn't
+change anything for code that directly uses the CPU ID registers.
 
-Thanks,
+The series completely changes the way a VHE-capable system boots, by
+*always* booting non-VHE first, and then upgrading to VHE when deemed
+capable. Although it sounds scary, this is actually simple to
+implement (and I wish I had done that five years ago). The "upgrade to
+VHE" path is then conditioned on the VHE feature not being disabled
+from the command-line.
 
-         M.
+Said command-line parsing borrows a lot from the kaslr code, and
+subsequently allows the "nokaslr" option to be moved to the new
+infrastructure (though it all looks a bit... odd).
+
+Further patches now add support for disabling BTI and PAuth, the
+latter being based on an initial series by Srinivas Ramana[0].
+
+This has been tested on multiple VHE and non-VHE systems.
+
+* From v2 [2]:
+   - Simplify the VHE_RESTART stub
+   - Fixed a number of spelling mistakes, and hopefully introduced a
+     few more
+   - Override features in __read_sysreg_by_encoding()
+   - Allow both BTI and PAuth to be overridden on the command line
+   - Rebased on -rc3
+
+* From v1 [1]:
+  - Fix SPE init on VHE when EL2 doesn't own SPE
+  - Fix re-init when KASLR is used
+  - Handle the resume path
+  - Rebased to 5.11-rc2
+
+[0] https://lore.kernel.org/r/1610152163-16554-1-git-send-email-sramana@codeaurora.org
+[1] https://lore.kernel.org/r/20201228104958.1848833-1-maz@kernel.org
+[2] https://lore.kernel.org/r/20210104135011.2063104-1-maz@kernel.org
+
+Marc Zyngier (20):
+  arm64: Fix labels in el2_setup macros
+  arm64: Fix outdated TCR setup comment
+  arm64: Turn the MMU-on sequence into a macro
+  arm64: Provide an 'upgrade to VHE' stub hypercall
+  arm64: Initialise as nVHE before switching to VHE
+  arm64: Move VHE-specific SPE setup to mutate_to_vhe()
+  arm64: Simplify init_el2_state to be non-VHE only
+  arm64: Move SCTLR_EL1 initialisation to EL-agnostic code
+  arm64: cpufeature: Add global feature override facility
+  arm64: cpufeature: Use IDreg override in __read_sysreg_by_encoding()
+  arm64: Extract early FDT mapping from kaslr_early_init()
+  arm64: cpufeature: Add an early command-line cpufeature override
+    facility
+  arm64: Allow ID_AA64MMFR1_EL1.VH to be overridden from the command
+    line
+  arm64: Honor VHE being disabled from the command-line
+  arm64: Add an aliasing facility for the idreg override
+  arm64: Make kvm-arm.mode={nvhe,protected} an alias of
+    id_aa64mmfr1.vh=0
+  KVM: arm64: Document HVC_VHE_RESTART stub hypercall
+  arm64: Move "nokaslr" over to the early cpufeature infrastructure
+  arm64: cpufeatures: Allow disabling of BTI from the command-line
+  arm64: cpufeatures: Allow disabling of Pointer Auth from the
+    command-line
+
+Srinivas Ramana (1):
+  arm64: Defer enabling pointer authentication on boot core
+
+ .../admin-guide/kernel-parameters.txt         |   9 +
+ Documentation/virt/kvm/arm/hyp-abi.rst        |   9 +
+ arch/arm64/include/asm/assembler.h            |  17 ++
+ arch/arm64/include/asm/cpufeature.h           |  10 +
+ arch/arm64/include/asm/el2_setup.h            |  60 ++----
+ arch/arm64/include/asm/pointer_auth.h         |  10 +
+ arch/arm64/include/asm/setup.h                |  11 +
+ arch/arm64/include/asm/stackprotector.h       |   1 +
+ arch/arm64/include/asm/virt.h                 |   7 +-
+ arch/arm64/kernel/Makefile                    |   2 +-
+ arch/arm64/kernel/cpufeature.c                |  57 ++++-
+ arch/arm64/kernel/head.S                      |  75 ++-----
+ arch/arm64/kernel/hyp-stub.S                  | 124 ++++++++++-
+ arch/arm64/kernel/idreg-override.c            | 199 ++++++++++++++++++
+ arch/arm64/kernel/kaslr.c                     |  44 +---
+ arch/arm64/kernel/setup.c                     |  15 ++
+ arch/arm64/kernel/sleep.S                     |   1 +
+ arch/arm64/kvm/arm.c                          |   3 +
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S            |   2 +-
+ arch/arm64/mm/mmu.c                           |   2 +-
+ arch/arm64/mm/proc.S                          |  16 +-
+ 21 files changed, 505 insertions(+), 169 deletions(-)
+ create mode 100644 arch/arm64/include/asm/setup.h
+ create mode 100644 arch/arm64/kernel/idreg-override.c
+
 -- 
-Jazz is not dead. It just smells funny...
+2.29.2
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
