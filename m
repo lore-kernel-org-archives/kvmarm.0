@@ -2,81 +2,59 @@ Return-Path: <SRS0=NVHA=GO=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 645FCC433E0
-	for <kvmarm@archiver.kernel.org>; Mon, 11 Jan 2021 16:44:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48102C433DB
+	for <kvmarm@archiver.kernel.org>; Mon, 11 Jan 2021 18:42:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9F077223C8
-	for <kvmarm@archiver.kernel.org>; Mon, 11 Jan 2021 16:44:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F077223C8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 99DDE22A83
+	for <kvmarm@archiver.kernel.org>; Mon, 11 Jan 2021 18:42:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99DDE22A83
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D9C954B2D9;
-	Mon, 11 Jan 2021 11:44:26 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DC37C4B22A;
+	Mon, 11 Jan 2021 13:42:04 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id BkOGGkU7PAzv; Mon, 11 Jan 2021 11:44:25 -0500 (EST)
+	with ESMTP id In3X4lFvRCjT; Mon, 11 Jan 2021 13:42:03 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B14DE4B263;
-	Mon, 11 Jan 2021 11:44:25 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C3C594B2A9;
+	Mon, 11 Jan 2021 13:42:03 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 00D694A524
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Jan 2021 09:45:25 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1AC614B230
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Jan 2021 13:42:03 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id J1m6G9-+Rtqx for <kvmarm@lists.cs.columbia.edu>;
- Mon, 11 Jan 2021 09:45:24 -0500 (EST)
+ with ESMTP id 4zJPvW7Cktm2 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 11 Jan 2021 13:42:01 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 105C24B2AA
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Jan 2021 09:45:24 -0500 (EST)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id C19C2229CA
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Jan 2021 14:45:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1610376322;
- bh=l6ToqVwqm3E7ql9O4XRtENEPRhqlUUCrKobd4xM3lgg=;
- h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
- b=uZZApSfe3FBkwQ18jphBQE5TJf9VCYIcQg1oER0tBBAyxp29dxOxPD2ljGcZiwXvb
- QisYFN8GIZkXjZMiKHlRGvFQQJEjYRAFn9JDenRW8Kwcn0XE4cuPc1xasD9RFWdLCZ
- rEpzO7GRrDHPDyIkZ0TND+BTEwx39IlCN3wmZ0sBzwV6F6nqbwkA/ovLdCtGuozEBd
- dlmaNpQSDPgkq96V2JO3lBcHV8CdHNP8D18tz6LrkF7L9V56DMhVZ4yCokdo/G1F6Z
- L2/aA4Hu1SWwVage5ZwkLSzXgMq1OdlaUENqFCM4kKga+DZFq3vfMk2Sdtgb2FqlBH
- xzP5UFzB1v3uQ==
-Received: by mail-qv1-f45.google.com with SMTP id p5so7484504qvs.7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Jan 2021 06:45:22 -0800 (PST)
-X-Gm-Message-State: AOAM533v7bO/an3qnF/8gbQ9n3Kr2J3Eq1xQZmE6k2e896jibmjx/C15
- SAFD06AxpIgMJuj2uuZwqvymTTJgNRlYT9psmA==
-X-Google-Smtp-Source: ABdhPJymgMsMHFwjNXskq64kJCyaSLMJ3Do+hKilu0I/FvQeFX2WQUWySyGObrImhXuZnCRNVT6HEOiCX2LEoJH6Aqs=
-X-Received: by 2002:a0c:fe47:: with SMTP id u7mr13111qvs.4.1610376321947; Mon,
- 11 Jan 2021 06:45:21 -0800 (PST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A55944B22A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Jan 2021 13:42:01 -0500 (EST)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 65CE22251F;
+ Mon, 11 Jan 2021 18:41:57 +0000 (UTC)
+Date: Mon, 11 Jan 2021 18:41:54 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v3 09/21] arm64: cpufeature: Add global feature override
+ facility
+Message-ID: <20210111184154.GC17941@gaia>
+References: <20210111132811.2455113-1-maz@kernel.org>
+ <20210111132811.2455113-10-maz@kernel.org>
 MIME-Version: 1.0
-References: <20210108121524.656872-1-qperret@google.com>
- <20210108121524.656872-16-qperret@google.com>
-In-Reply-To: <20210108121524.656872-16-qperret@google.com>
-From: Rob Herring <robh+dt@kernel.org>
-Date: Mon, 11 Jan 2021 08:45:10 -0600
-X-Gmail-Original-Message-ID: <CAL_JsqLmzFWmTc=6JSRMofSEVRx9GCrwGxEsYog9dC16EMGdvQ@mail.gmail.com>
-Message-ID: <CAL_JsqLmzFWmTc=6JSRMofSEVRx9GCrwGxEsYog9dC16EMGdvQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 15/26] of/fdt: Introduce
- early_init_dt_add_memory_hyp()
-To: Quentin Perret <qperret@google.com>
-X-Mailman-Approved-At: Mon, 11 Jan 2021 11:44:23 -0500
-Cc: devicetree@vger.kernel.org, Android Kernel Team <kernel-team@android.com>,
- Frank Rowand <frowand.list@gmail.com>, android-kvm@google.com,
- Catalin Marinas <catalin.marinas@arm.com>, Fuad Tabba <tabba@google.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
- Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
- "open list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
- <kvmarm@lists.cs.columbia.edu>
+Content-Disposition: inline
+In-Reply-To: <20210111132811.2455113-10-maz@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: Prasad Sodagudi <psodagud@codeaurora.org>,
+ Srinivas Ramana <sramana@codeaurora.org>, linux-kernel@vger.kernel.org,
+ Ard Biesheuvel <ardb@kernel.org>, Ajay Patil <pajay@qti.qualcomm.com>,
+ kernel-team@android.com, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,47 +71,48 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Jan 8, 2021 at 6:16 AM Quentin Perret <qperret@google.com> wrote:
->
-> Introduce early_init_dt_add_memory_hyp() to allow KVM to conserve a copy
-> of the memory regions parsed from DT. This will be needed in the context
-> of the protected nVHE feature of KVM/arm64 where the code running at EL2
-> will be cleanly separated from the host kernel during boot, and will
-> need its own representation of memory.
+Hi Marc,
 
-What happened to doing this with memblock?
+On Mon, Jan 11, 2021 at 01:27:59PM +0000, Marc Zyngier wrote:
+> Add a facility to globally override a feature, no matter what
+> the HW says. Yes, this is dangerous.
 
-> Signed-off-by: Quentin Perret <qperret@google.com>
-> ---
->  drivers/of/fdt.c | 5 +++++
->  1 file changed, 5 insertions(+)
->
-> diff --git a/drivers/of/fdt.c b/drivers/of/fdt.c
-> index 4602e467ca8b..af2b5a09c5b4 100644
-> --- a/drivers/of/fdt.c
-> +++ b/drivers/of/fdt.c
-> @@ -1099,6 +1099,10 @@ int __init early_init_dt_scan_chosen(unsigned long node, const char *uname,
->  #define MAX_MEMBLOCK_ADDR      ((phys_addr_t)~0)
->  #endif
->
-> +void __init __weak early_init_dt_add_memory_hyp(u64 base, u64 size)
-> +{
-> +}
-> +
->  void __init __weak early_init_dt_add_memory_arch(u64 base, u64 size)
->  {
->         const u64 phys_offset = MIN_MEMBLOCK_ADDR;
-> @@ -1139,6 +1143,7 @@ void __init __weak early_init_dt_add_memory_arch(u64 base, u64 size)
->                 base = phys_offset;
->         }
->         memblock_add(base, size);
-> +       early_init_dt_add_memory_hyp(base, size);
->  }
->
->  int __init __weak early_init_dt_mark_hotplug_memory_arch(u64 base, u64 size)
-> --
-> 2.30.0.284.gd98b1dd5eaa7-goog
->
+Yeah, it's dangerous. We can make it less so if we only allow safe
+values (e.g. lower if FTR_UNSIGNED).
+
+> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+> index 9a555809b89c..465d2cb63bfc 100644
+> --- a/arch/arm64/include/asm/cpufeature.h
+> +++ b/arch/arm64/include/asm/cpufeature.h
+> @@ -75,6 +75,8 @@ struct arm64_ftr_reg {
+>  	u64				sys_val;
+>  	u64				user_val;
+>  	const struct arm64_ftr_bits	*ftr_bits;
+> +	u64				*override_val;
+> +	u64				*override_mask;
+>  };
+
+At the arm64_ftr_reg level, we don't have any information about the safe
+values for a feature. Could we instead move this to arm64_ftr_bits? We
+probably only need a single field. When populating the feature values,
+we can make sure it doesn't go above the hardware one.
+
+I attempted a feature modification for MTE here, though I dropped the
+entire series in the meantime as we clarified the ARM ARM:
+
+https://lore.kernel.org/linux-arm-kernel/20200515171612.1020-24-catalin.marinas@arm.com/
+
+Srinivas copied it in his patch (but forgot to give credit ;)):
+
+https://lore.kernel.org/linux-arm-msm/1610152163-16554-3-git-send-email-sramana@codeaurora.org/
+
+The above adds a filter function but, instead, just use your mechanism in
+this series for idreg.feature setting via cmdline. The arm64_ftr_value()
+function extracts the hardware value and lowers it if a cmdline argument
+was passed.
+
+-- 
+Catalin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
