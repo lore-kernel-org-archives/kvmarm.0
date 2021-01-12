@@ -2,96 +2,81 @@ Return-Path: <SRS0=ZMJ6=GP=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C86DAC4332B
-	for <kvmarm@archiver.kernel.org>; Tue, 12 Jan 2021 09:52:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12B3BC433DB
+	for <kvmarm@archiver.kernel.org>; Tue, 12 Jan 2021 11:50:23 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 27434230FF
-	for <kvmarm@archiver.kernel.org>; Tue, 12 Jan 2021 09:51:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27434230FF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 7BFAD23109
+	for <kvmarm@archiver.kernel.org>; Tue, 12 Jan 2021 11:50:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BFAD23109
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B8A04B34C;
-	Tue, 12 Jan 2021 04:51:59 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BB3A54B2BE;
+	Tue, 12 Jan 2021 06:50:21 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id uQVWpGaPmdfW; Tue, 12 Jan 2021 04:51:58 -0500 (EST)
+	with ESMTP id 56m8rcBJ9z8n; Tue, 12 Jan 2021 06:50:20 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A2CA4B22D;
-	Tue, 12 Jan 2021 04:51:58 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E7474B2BB;
+	Tue, 12 Jan 2021 06:50:20 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 88A854B22D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Jan 2021 04:51:56 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 87EC34B2B9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Jan 2021 06:50:19 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id j0Ps1rKNOWrb for <kvmarm@lists.cs.columbia.edu>;
- Tue, 12 Jan 2021 04:51:55 -0500 (EST)
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com
- [209.85.128.54])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5145D4B228
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Jan 2021 04:51:55 -0500 (EST)
-Received: by mail-wm1-f54.google.com with SMTP id c124so1322786wma.5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Jan 2021 01:51:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=kGqJqM+WMCcTD3fT9OGAlv624iwYZ5dObhUcI90VOiI=;
- b=YNctUgf8dt27MHnsqHy7GGqQMGB0dlxnW6P/Hq8s5vrm9RNUkp9NGZkONE++kDxT7T
- U7jU4by85oPF1vJDzvJwcAfOPnBUCXR/zclJrHyu1tzh1u92lNkPlR2+3z46r1fq/g5m
- IrR+vuZMuPGO1P7fyyICYqnduVYU1NJ892fvjXVaIYRoHRNk8oW9bxZA4FBKwZq9Rlo6
- 2kbyY3Q//P6GDLoCmbPwp3QW0XeFbfEviwnu6em2BJXwTLGoXEMAet88e90/JKRuOHLe
- XQfOh9mIVLfUWGpeTYNpES7H9flRB7wNdv6zktN03Bb8yauJt9FzGvVzjI2Xm6/jpVIa
- 0tIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=kGqJqM+WMCcTD3fT9OGAlv624iwYZ5dObhUcI90VOiI=;
- b=e4RVyVnEgQHsYR+tZb/6hMKfVOAY8hxbrpQbcD3U80xIwiH8ywwuvPhAxOGyDgISQb
- 1Mb/mEiKJEVPiJjUwPAAfsZoJCsF0RnPsVIuU6rscl0vpx59DbX0kUZGTiOODqPhOxrt
- c0A9XI0e6SmDWSOoNW+uY4PDQG4grZ2k5a1W1L5PO/5wBjVa2ULcHx3u4kAfB24MOP5z
- EB/0V+t9/WhFR3uWggbbr3FnzBC69EvTg3tmhHbu5wOPiM9JI21Sl+sD2jRrRZSbREfj
- ve2e2FEfKlmIGinKexCXI3EmXsLt5sZ5/WjB2Ti14vsrrAi0//LC+hgD6p+lfs+zHGzg
- 3wWg==
-X-Gm-Message-State: AOAM533ZqSStF9hm9ty/dyYl26QuvYd6SktlU+KjOsJysWSTVnhmpfOw
- HodRoe7LBT2BZVkP3HuxU75Agw==
-X-Google-Smtp-Source: ABdhPJyannuEzJ8s+cicyxOh3wgUmPKHSocFYoH2gsdTqcMhFGEpJUgFPRSxz6Y87UQnjYt6TxbX8g==
-X-Received: by 2002:a7b:c246:: with SMTP id b6mr2773011wmj.154.1610445114219; 
- Tue, 12 Jan 2021 01:51:54 -0800 (PST)
-Received: from google.com (49.222.77.34.bc.googleusercontent.com.
- [34.77.222.49])
- by smtp.gmail.com with ESMTPSA id b7sm3938742wrv.47.2021.01.12.01.51.53
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 12 Jan 2021 01:51:53 -0800 (PST)
-Date: Tue, 12 Jan 2021 09:51:51 +0000
-From: Quentin Perret <qperret@google.com>
-To: Rob Herring <robh+dt@kernel.org>
-Subject: Re: [RFC PATCH v2 15/26] of/fdt: Introduce
- early_init_dt_add_memory_hyp()
-Message-ID: <X/1xN2UxiUxkzAiN@google.com>
-References: <20210108121524.656872-1-qperret@google.com>
- <20210108121524.656872-16-qperret@google.com>
- <CAL_JsqLmzFWmTc=6JSRMofSEVRx9GCrwGxEsYog9dC16EMGdvQ@mail.gmail.com>
+ with ESMTP id DgxSoELEzagi for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 12 Jan 2021 06:50:18 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 50E1D4B2B5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Jan 2021 06:50:18 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 05C6F23104;
+ Tue, 12 Jan 2021 11:50:17 +0000 (UTC)
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
+ TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1kzIBi-006wqv-RB; Tue, 12 Jan 2021 11:50:14 +0000
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <CAL_JsqLmzFWmTc=6JSRMofSEVRx9GCrwGxEsYog9dC16EMGdvQ@mail.gmail.com>
-Cc: devicetree@vger.kernel.org, Android Kernel Team <kernel-team@android.com>,
- Frank Rowand <frowand.list@gmail.com>, android-kvm@google.com,
- Catalin Marinas <catalin.marinas@arm.com>, Fuad Tabba <tabba@google.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
- Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
- "open list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
- <kvmarm@lists.cs.columbia.edu>
+Date: Tue, 12 Jan 2021 11:50:14 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH v3 09/21] arm64: cpufeature: Add global feature override
+ facility
+In-Reply-To: <a122aa5c-4af9-e236-db82-db0ed885e0a5@arm.com>
+References: <20210111132811.2455113-1-maz@kernel.org>
+ <20210111132811.2455113-10-maz@kernel.org> <20210111184154.GC17941@gaia>
+ <129db8bd3913a90c96d4cfe4f55e27a0@kernel.org>
+ <a122aa5c-4af9-e236-db82-db0ed885e0a5@arm.com>
+User-Agent: Roundcube Webmail/1.4.9
+Message-ID: <d98aed718a26d0455d5549d53f97db06@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, catalin.marinas@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ linux-kernel@vger.kernel.org, will@kernel.org, mark.rutland@arm.com,
+ dbrazdil@google.com, alexandru.elisei@arm.com, ardb@kernel.org,
+ jingzhangos@google.com, pajay@qti.qualcomm.com, psodagud@codeaurora.org,
+ sramana@codeaurora.org, james.morse@arm.com, julien.thierry.kdev@gmail.com,
+ kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Prasad Sodagudi <psodagud@codeaurora.org>,
+ Srinivas Ramana <sramana@codeaurora.org>, kernel-team@android.com,
+ Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+ Ard Biesheuvel <ardb@kernel.org>, Ajay Patil <pajay@qti.qualcomm.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -103,42 +88,52 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Monday 11 Jan 2021 at 08:45:10 (-0600), Rob Herring wrote:
-> On Fri, Jan 8, 2021 at 6:16 AM Quentin Perret <qperret@google.com> wrote:
-> >
-> > Introduce early_init_dt_add_memory_hyp() to allow KVM to conserve a copy
-> > of the memory regions parsed from DT. This will be needed in the context
-> > of the protected nVHE feature of KVM/arm64 where the code running at EL2
-> > will be cleanly separated from the host kernel during boot, and will
-> > need its own representation of memory.
-> 
-> What happened to doing this with memblock?
-
-I gave it a go, but as mentioned in v1, I ran into issues for nomap
-regions. I want the hypervisor to know about these memory regions (it's
-possible some of those will be given to protected guests for instance)
-but these seem to be entirely removed from the memblocks when using DT:
-
-https://elixir.bootlin.com/linux/latest/source/drivers/of/fdt.c#L1153
-
-EFI appears to do things differently, though, as it 'just' uses
-memblock_mark_nomap() instead of actively removing the memblock. And that
-means I could actually use the memblock API for EFI, but I'd rather
-have a common solution. I tried to understand why things are done
-differently but couldn't find an answer and kept things simple and
-working for now.
-
-Is there a good reason for not using memblock_mark_nomap() with DT? If
-not, I'm happy to try that.
-
-Thanks,
-Quentin
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgU3V6dWtpLAoKT24gMjAyMS0wMS0xMiAwOToxNywgU3V6dWtpIEsgUG91bG9zZSB3cm90ZToK
+PiBIaSBNYXJjLAo+IAo+IE9uIDEvMTEvMjEgNzo0OCBQTSwgTWFyYyBaeW5naWVyIHdyb3RlOgoK
+Wy4uLl0KCj4+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2tlcm5lbC9jcHVmZWF0dXJlLmMgCj4+
+IGIvYXJjaC9hcm02NC9rZXJuZWwvY3B1ZmVhdHVyZS5jCj4+IGluZGV4IDg5NGFmNjBiOTY2OS4u
+MDBkOTllNTkzYjY1IDEwMDY0NAo+PiAtLS0gYS9hcmNoL2FybTY0L2tlcm5lbC9jcHVmZWF0dXJl
+LmMKPj4gKysrIGIvYXJjaC9hcm02NC9rZXJuZWwvY3B1ZmVhdHVyZS5jCj4+IEBAIC03NzQsNiAr
+Nzc0LDcgQEAgc3RhdGljIHZvaWQgX19pbml0IGluaXRfY3B1X2Z0cl9yZWcodTMyIHN5c19yZWcs
+IAo+PiB1NjQgbmV3KQo+PiAgwqDCoMKgwqAgdTY0IHN0cmljdF9tYXNrID0gfjB4MFVMTDsKPj4g
+IMKgwqDCoMKgIHU2NCB1c2VyX21hc2sgPSAwOwo+PiAgwqDCoMKgwqAgdTY0IHZhbGlkX21hc2sg
+PSAwOwo+PiArwqDCoMKgIHU2NCBvdmVycmlkZV92YWwgPSAwLCBvdmVycmlkZV9tYXNrID0gMDsK
+Pj4gCj4+ICDCoMKgwqDCoCBjb25zdCBzdHJ1Y3QgYXJtNjRfZnRyX2JpdHMgKmZ0cnA7Cj4+ICDC
+oMKgwqDCoCBzdHJ1Y3QgYXJtNjRfZnRyX3JlZyAqcmVnID0gZ2V0X2FybTY0X2Z0cl9yZWcoc3lz
+X3JlZyk7Cj4+IEBAIC03ODEsOSArNzgyLDM1IEBAIHN0YXRpYyB2b2lkIF9faW5pdCBpbml0X2Nw
+dV9mdHJfcmVnKHUzMiBzeXNfcmVnLCAKPj4gdTY0IG5ldykKPj4gIMKgwqDCoMKgIGlmICghcmVn
+KQo+PiAgwqDCoMKgwqDCoMKgwqDCoCByZXR1cm47Cj4+IAo+PiArwqDCoMKgIGlmIChyZWctPm92
+ZXJyaWRlX21hc2sgJiYgcmVnLT5vdmVycmlkZV92YWwpIHsKPj4gK8KgwqDCoMKgwqDCoMKgIG92
+ZXJyaWRlX21hc2sgPSAqcmVnLT5vdmVycmlkZV9tYXNrOwo+PiArwqDCoMKgwqDCoMKgwqAgb3Zl
+cnJpZGVfdmFsID0gKnJlZy0+b3ZlcnJpZGVfdmFsOwo+PiArwqDCoMKgIH0KPj4gKwo+PiAgwqDC
+oMKgwqAgZm9yIChmdHJwID0gcmVnLT5mdHJfYml0czsgZnRycC0+d2lkdGg7IGZ0cnArKykgewo+
+PiAgwqDCoMKgwqDCoMKgwqDCoCB1NjQgZnRyX21hc2sgPSBhcm02NF9mdHJfbWFzayhmdHJwKTsK
+Pj4gIMKgwqDCoMKgwqDCoMKgwqAgczY0IGZ0cl9uZXcgPSBhcm02NF9mdHJfdmFsdWUoZnRycCwg
+bmV3KTsKPj4gK8KgwqDCoMKgwqDCoMKgIHM2NCBmdHJfb3ZyID0gYXJtNjRfZnRyX3ZhbHVlKGZ0
+cnAsIG92ZXJyaWRlX3ZhbCk7Cj4+ICsKPj4gK8KgwqDCoMKgwqDCoMKgIGlmICgoZnRyX21hc2sg
+JiBvdmVycmlkZV9tYXNrKSA9PSBmdHJfbWFzaykgewo+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oCBpZiAoZnRyX292ciA8IGZ0cl9uZXcpIHsKPiAKPiBIZXJlIHdlIGFzc3VtZSB0aGF0IGFsbCB0
+aGUgZmVhdHVyZXMgYXJlIEZUUl9MT1dFUl9TQUZFLiBXZSBjb3VsZAo+IHByb2JhYmx5IHVzZSBh
+cm02NF9mdHJfc2FmZV92YWx1ZShmdHJwLCBmdHJfbmV3LCBmdHJfb3ZyKSBoZXJlID8KPiBUaGF0
+IHdvdWxkIGNvdmVyIHVzIGZvciBib3RoIEhJR0hFUl9TQUZFIGFuZCBMT1dFUl9TQUZFIGZlYXR1
+cmVzLgo+IEhvd2V2ZXIgdGhhdCBtYXkgYmUgcmVzdHJpY3RpdmUgZm9yIEZUUl9FWEFDVCwgYXMg
+d2UgdGhlIHNhZmUKPiB2YWx1ZSB3b3VsZCBiZSBzZXQgdG8gImZ0ci0+c2FmZV92YWwiLiBJIGd1
+ZXNzIHRoYXQgbWF5IGJlIGJldHRlcgo+IHRoYW4gZm9yY2luZyB0byB1c2UgYW4gdW5zYWZlIHZh
+bHVlIGZvciB0aGUgYm9vdCBDUFUsIHdoaWNoIGNvdWxkCj4gYW55d2F5IGNvbmZsaWN0IHdpdGgg
+dGhlIG90aGVyIENQVXMgYW5kIGV2ZW50dWFsbHkgdHJpZ2dlciB0aGUKPiBmdHIgYWx1ZSB0byBi
+ZSBzYWZlX3ZhbC4KCkkgbGlrZSB0aGUgaWRlYSBvZiB1c2luZyB0aGUgaGVscGVyLCBhcyBpdCBj
+bGVhbnVwcyB1cCB0aGUgY29kZSBhIGJpdC4KSG93ZXZlciwgbm90IGJlaW5nIHRvIHNldCBhIGZl
+YXR1cmUgdG8gYSBjZXJ0YWluIHZhbHVlIGNvdWxkIGJlIApyZXN0cmljdGl2ZSwKYXMgaW4gZ2Vu
+ZXJhbCwgaXQgbWVhbnMgdGhhdCB3ZSBjYW4gb25seSBkaXNhYmxlIGEgZmVhdHVyZSBhbmQgbm90
+IAphZGp1c3QKaXRzIGxldmVsIG9mIHN1cHBvcnQuCgpUYWtlIFBNVVZFUiBmb3IgZXhhbXBsZTog
+d2l0aCB0aGUgaGVscGVyLCBJIGNhbid0IG92ZXJyaWRlIGl0IGZyb20gdjguNCAKdG8KdjguMS4g
+SSBjYW4gb25seSBnbyB0byB2OC4wLgoKSXMgaXQgc29tZXRoaW5nIHdlIGNhcmUgYWJvdXQ/CgpU
+aGFua3MsCgogICAgICAgICBNLgotLSAKSmF6eiBpcyBub3QgZGVhZC4gSXQganVzdCBzbWVsbHMg
+ZnVubnkuLi4KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18K
+a3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8v
+bGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
