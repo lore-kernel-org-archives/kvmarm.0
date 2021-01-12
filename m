@@ -2,87 +2,90 @@ Return-Path: <SRS0=ZMJ6=GP=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EF36C433E0
-	for <kvmarm@archiver.kernel.org>; Tue, 12 Jan 2021 18:34:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34E71C433DB
+	for <kvmarm@archiver.kernel.org>; Tue, 12 Jan 2021 19:53:56 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 24B632076E
-	for <kvmarm@archiver.kernel.org>; Tue, 12 Jan 2021 18:34:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24B632076E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 8A39222202
+	for <kvmarm@archiver.kernel.org>; Tue, 12 Jan 2021 19:53:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A39222202
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B12B64B1CE;
-	Tue, 12 Jan 2021 13:34:25 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E9DD04B1D0;
+	Tue, 12 Jan 2021 14:53:54 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id athigfZVR-aS; Tue, 12 Jan 2021 13:34:24 -0500 (EST)
+	with ESMTP id EIxXCTqVjouN; Tue, 12 Jan 2021 14:53:53 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F2D54B229;
-	Tue, 12 Jan 2021 13:34:22 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B17A24B1DB;
+	Tue, 12 Jan 2021 14:53:53 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B7584B212
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Jan 2021 11:46:13 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1CB164B11C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Jan 2021 14:53:52 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XVLrVvihqh3k for <kvmarm@lists.cs.columbia.edu>;
- Tue, 12 Jan 2021 11:46:12 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CE9A14B1CC
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Jan 2021 11:46:11 -0500 (EST)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 7539923110
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Jan 2021 16:46:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1610469970;
- bh=G8QgmioLPowngS9PnWyS0qJ4GW5plz/qHFNOJiaPmLM=;
- h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
- b=utv8poqFkjEP20anauzkLWewiDee9vsGsy6vyLsmr3EPv7IlXm1g/fNO0INTpvRm1
- v2PgImEiKX8ztyABczzpBOEhbzIyaJpAccHLb8IFEW20WPjtZQFRKzdvQh24GDVYXF
- QuOrbf+4HF22PlWuAsAGgo7uxImKpfLnfNIMp63kcHLBVpAqkMg0JoW9xDlto6ZL4f
- dr9likG3mnT/AFbPWPkR+C/qxNxQ4CLS9lsSaOTfi0RyVGFDEGYp/mFrN3GUXVI+tz
- CVbb5KMFAirL9ETDQiHejG2L/6L62nC5eHgxduPHFT6jesN0HpHTDuzM+nFwhw3rRt
- 6dDhJZqR7ju3A==
-Received: by mail-ej1-f46.google.com with SMTP id b9so4498024ejy.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Jan 2021 08:46:10 -0800 (PST)
-X-Gm-Message-State: AOAM532OG7si3KtRR2d+Ys+HVNzRdn9dNZh0YyWxG4+Jsx7xLdJJtTa1
- DKCupEzTSDGonxIBtsK8nrPzxcGPXR4IK4PiUQ==
-X-Google-Smtp-Source: ABdhPJwpatqtscFinSdtYUrvRElGEmeizOIFHtAttZVKAEASK6GUt12WCxKJxKuZKsgMiopOcpPvL1kPhiZ1kgVNx0g=
-X-Received: by 2002:a17:906:ae43:: with SMTP id
- lf3mr3526825ejb.130.1610469968932; 
- Tue, 12 Jan 2021 08:46:08 -0800 (PST)
+ with ESMTP id DbeM3nVfuEaG for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 12 Jan 2021 14:53:50 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E6F074B1CE
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Jan 2021 14:53:50 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1610481230;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=jGddw3AEKpcsMt4782p5IEc+z+Jt2DqrmaucsUPFqxQ=;
+ b=bB1gzM9eI+QsSN16XHCj+JZIt12rpjffm8pbFXCetKoORwuCrwSOOY1EiqIWdVnOwnoVEf
+ 4YIGoDT2bNwYu4wQFP8q7ruTRdk5O6SDOuW7wfpiyLd/jj5jbu4wjUgZgjDu7jJMyElLpx
+ DhtzfBGN9k6WJ1WSEtkAof7wXrIu1r4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-319-GgrlOiiGOUaQkw9W9zNYKA-1; Tue, 12 Jan 2021 14:53:45 -0500
+X-MC-Unique: GgrlOiiGOUaQkw9W9zNYKA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9D877101AFCD;
+ Tue, 12 Jan 2021 19:53:40 +0000 (UTC)
+Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com
+ [10.3.112.255])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 66C2C100AE4F;
+ Tue, 12 Jan 2021 19:53:32 +0000 (UTC)
+Date: Tue, 12 Jan 2021 12:53:31 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Keqian Zhu <zhukeqian1@huawei.com>
+Subject: Re: [PATCH 4/5] vfio/iommu_type1: Carefully use unmap_unpin_all
+ during dirty tracking
+Message-ID: <20210112125331.789f47a5@omen.home.shazbot.org>
+In-Reply-To: <198f0afd-343a-9fbc-9556-95670ca76a2c@huawei.com>
+References: <20210107092901.19712-1-zhukeqian1@huawei.com>
+ <20210107092901.19712-5-zhukeqian1@huawei.com>
+ <20210111144913.3092b1b1@omen.home.shazbot.org>
+ <198f0afd-343a-9fbc-9556-95670ca76a2c@huawei.com>
 MIME-Version: 1.0
-References: <20210108121524.656872-1-qperret@google.com>
- <20210108121524.656872-16-qperret@google.com>
- <CAL_JsqLmzFWmTc=6JSRMofSEVRx9GCrwGxEsYog9dC16EMGdvQ@mail.gmail.com>
- <X/1xN2UxiUxkzAiN@google.com>
- <CAL_Jsq+5d+Ox_-m_Rd83R9xoZb6e2cxCNfbL8YPzKdwj=y0M8Q@mail.gmail.com>
- <X/2xlxx9Ucp4UZvL@google.com>
- <CAL_Jsq+o+t4YYXEW_nYqMsT4ubYJWe6Kdhu614RtrCqsHBtfLw@mail.gmail.com>
- <X/3LIGgx83XJ+U0F@google.com>
-In-Reply-To: <X/3LIGgx83XJ+U0F@google.com>
-From: Rob Herring <robh+dt@kernel.org>
-Date: Tue, 12 Jan 2021 10:45:56 -0600
-X-Gmail-Original-Message-ID: <CAL_Jsq+SeOrn4qFyFuPUmXdnM1oMNMLWLsDzrYgUt9Ts3hyoNg@mail.gmail.com>
-Message-ID: <CAL_Jsq+SeOrn4qFyFuPUmXdnM1oMNMLWLsDzrYgUt9Ts3hyoNg@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 15/26] of/fdt: Introduce
- early_init_dt_add_memory_hyp()
-To: Quentin Perret <qperret@google.com>
-X-Mailman-Approved-At: Tue, 12 Jan 2021 13:34:20 -0500
-Cc: devicetree@vger.kernel.org, Android Kernel Team <kernel-team@android.com>,
- Frank Rowand <frowand.list@gmail.com>, android-kvm@google.com,
- Catalin Marinas <catalin.marinas@arm.com>, Fuad Tabba <tabba@google.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
- Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
- "open list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
- <kvmarm@lists.cs.columbia.edu>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ Kirti Wankhede <kwankhede@nvidia.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, Marc
+ Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
+ Daniel Lezcano <daniel.lezcano@linaro.org>,
+ Alexios Zavras <alexios.zavras@intel.com>,
+ Thomas Gleixner <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org,
+ Cornelia Huck <cohuck@redhat.com>, linux-kernel@vger.kernel.org,
+ iommu@lists.linux-foundation.org, Andrew Morton <akpm@linux-foundation.org>,
+ Robin Murphy <robin.murphy@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -99,64 +102,111 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Jan 12, 2021 at 10:15 AM Quentin Perret <qperret@google.com> wrote:
->
-> On Tuesday 12 Jan 2021 at 09:53:36 (-0600), Rob Herring wrote:
-> > On Tue, Jan 12, 2021 at 8:26 AM Quentin Perret <qperret@google.com> wrote:
-> > >
-> > > On Tuesday 12 Jan 2021 at 08:10:47 (-0600), Rob Herring wrote:
-> > > > On Tue, Jan 12, 2021 at 3:51 AM Quentin Perret <qperret@google.com> wrote:
-> > > > >
-> > > > > On Monday 11 Jan 2021 at 08:45:10 (-0600), Rob Herring wrote:
-> > > > > > On Fri, Jan 8, 2021 at 6:16 AM Quentin Perret <qperret@google.com> wrote:
-> > > > > > >
-> > > > > > > Introduce early_init_dt_add_memory_hyp() to allow KVM to conserve a copy
-> > > > > > > of the memory regions parsed from DT. This will be needed in the context
-> > > > > > > of the protected nVHE feature of KVM/arm64 where the code running at EL2
-> > > > > > > will be cleanly separated from the host kernel during boot, and will
-> > > > > > > need its own representation of memory.
-> > > > > >
-> > > > > > What happened to doing this with memblock?
-> > > > >
-> > > > > I gave it a go, but as mentioned in v1, I ran into issues for nomap
-> > > > > regions. I want the hypervisor to know about these memory regions (it's
-> > > > > possible some of those will be given to protected guests for instance)
-> > > > > but these seem to be entirely removed from the memblocks when using DT:
-> > > > >
-> > > > > https://elixir.bootlin.com/linux/latest/source/drivers/of/fdt.c#L1153
-> > > > >
-> > > > > EFI appears to do things differently, though, as it 'just' uses
-> > > > > memblock_mark_nomap() instead of actively removing the memblock. And that
-> > > > > means I could actually use the memblock API for EFI, but I'd rather
-> > > > > have a common solution. I tried to understand why things are done
-> > > > > differently but couldn't find an answer and kept things simple and
-> > > > > working for now.
-> > > > >
-> > > > > Is there a good reason for not using memblock_mark_nomap() with DT? If
-> > > > > not, I'm happy to try that.
-> > > >
-> > > > There were 2 patches to do that, but it never got resolved. See here[1].
-> > >
-> > > Thanks. So the DT stuff predates the introduction of memblock_mark_nomap,
-> > > that's why...
-> > >
-> > > By reading the discussions, [1] still looks a sensible patch on its own,
-> > > independently from the issue Nicolas tried to solve. Any reason for not
-> > > applying it?
-> >
-> > As I mentioned in the thread, same patch with 2 different reasons. So
-> > I just wanted a better commit message covering both.
->
-> Sorry if I'm being thick, but I'm not seeing it. How are they the same?
-> IIUC, as per Nicolas' last reply, using memblock_mark_nomap() does not
-> solve his issue with a broken DT. These 2 patches address two completely
-> separate issues no?
+On Tue, 12 Jan 2021 20:04:38 +0800
+Keqian Zhu <zhukeqian1@huawei.com> wrote:
 
-Umm, yes you are right. But both are dealing with nomap. So someone
-needs to sort out what the right thing to do here is. No one cared
-enough to follow up in a year and a half.
+> On 2021/1/12 5:49, Alex Williamson wrote:
+> > On Thu, 7 Jan 2021 17:29:00 +0800
+> > Keqian Zhu <zhukeqian1@huawei.com> wrote:
+> >   
+> >> If we detach group during dirty page tracking, we shouldn't remove
+> >> vfio_dma, because dirty log will lose.
+> >>
+> >> But we don't prevent unmap_unpin_all in vfio_iommu_release, because
+> >> under normal procedure, dirty tracking has been stopped.  
+> > 
+> > This looks like it's creating a larger problem than it's fixing, it's
+> > not our job to maintain the dirty bitmap regardless of what the user
+> > does.  If the user detaches the last group in a container causing the
+> > mappings within that container to be deconstructed before the user has
+> > collected dirty pages, that sounds like a user error.  A container with
+> > no groups is de-privileged and therefore loses all state.  Thanks,
+> > 
+> > Alex  
+> 
+> Hi Alex,
+> 
+> This looks good to me ;-). That's a reasonable constraint for user behavior.
+> 
+> What about replacing this patch with an addition to the uapi document of
+> VFIO_GROUP_UNSET_CONTAINER? User should pay attention to this when call this
+> ioctl during dirty tracking.
 
-Rob
+Here's the current uapi comment:
+
+/**
+ * VFIO_GROUP_UNSET_CONTAINER - _IO(VFIO_TYPE, VFIO_BASE + 5)
+ *
+ * Remove the group from the attached container.  This is the
+ * opposite of the SET_CONTAINER call and returns the group to
+ * an initial state.  All device file descriptors must be released
+ * prior to calling this interface.  When removing the last group
+ * from a container, the IOMMU will be disabled and all state lost,
+ * effectively also returning the VFIO file descriptor to an initial
+ * state.
+ * Return: 0 on success, -errno on failure.
+ * Availability: When attached to container
+ */
+
+So we already indicate that "all state" of the container is lost when
+removing the last group, I don't see that it's necessarily to
+explicitly include dirty bitmap state beyond that statement.  Without
+mappings there can be no dirty bitmap to track.
+
+ > And any comments on other patches? thanks.
+
+I had a difficult time mapping the commit log to the actual code
+change, I'll likely have some wording suggestions.  Is patch 5/5 still
+necessary if this patch is dropped?  Thanks,
+
+Alex
+
+> >> Fixes: d6a4c185660c ("vfio iommu: Implementation of ioctl for dirty pages tracking")
+> >> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+> >> ---
+> >>  drivers/vfio/vfio_iommu_type1.c | 14 ++++++++++++--
+> >>  1 file changed, 12 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> >> index 26b7eb2a5cfc..9776a059904d 100644
+> >> --- a/drivers/vfio/vfio_iommu_type1.c
+> >> +++ b/drivers/vfio/vfio_iommu_type1.c
+> >> @@ -2373,7 +2373,12 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
+> >>  			if (list_empty(&iommu->external_domain->group_list)) {
+> >>  				vfio_sanity_check_pfn_list(iommu);
+> >>  
+> >> -				if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu))
+> >> +				/*
+> >> +				 * During dirty page tracking, we can't remove
+> >> +				 * vfio_dma because dirty log will lose.
+> >> +				 */
+> >> +				if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu) &&
+> >> +				    !iommu->dirty_page_tracking)
+> >>  					vfio_iommu_unmap_unpin_all(iommu);
+> >>  
+> >>  				kfree(iommu->external_domain);
+> >> @@ -2406,10 +2411,15 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
+> >>  		 * iommu and external domain doesn't exist, then all the
+> >>  		 * mappings go away too. If it's the last domain with iommu and
+> >>  		 * external domain exist, update accounting
+> >> +		 *
+> >> +		 * Note: During dirty page tracking, we can't remove vfio_dma
+> >> +		 * because dirty log will lose. Just update accounting is a good
+> >> +		 * choice.
+> >>  		 */
+> >>  		if (list_empty(&domain->group_list)) {
+> >>  			if (list_is_singular(&iommu->domain_list)) {
+> >> -				if (!iommu->external_domain)
+> >> +				if (!iommu->external_domain &&
+> >> +				    !iommu->dirty_page_tracking)
+> >>  					vfio_iommu_unmap_unpin_all(iommu);
+> >>  				else
+> >>  					vfio_iommu_unmap_unpin_reaccount(iommu);  
+> > 
+> > .
+> >   
+> 
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
