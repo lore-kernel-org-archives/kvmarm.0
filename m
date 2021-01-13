@@ -2,94 +2,88 @@ Return-Path: <SRS0=/ONs=GQ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 127B6C433E0
-	for <kvmarm@archiver.kernel.org>; Wed, 13 Jan 2021 14:35:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34AFEC433E6
+	for <kvmarm@archiver.kernel.org>; Wed, 13 Jan 2021 15:13:27 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4E15423436
-	for <kvmarm@archiver.kernel.org>; Wed, 13 Jan 2021 14:35:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E15423436
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 8A33823600
+	for <kvmarm@archiver.kernel.org>; Wed, 13 Jan 2021 15:13:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A33823600
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C7164B165;
-	Wed, 13 Jan 2021 09:35:11 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CB9804B1B2;
+	Wed, 13 Jan 2021 10:13:25 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id WgGaPpor5lkT; Wed, 13 Jan 2021 09:35:09 -0500 (EST)
+	with ESMTP id d1zfAJiVXVT1; Wed, 13 Jan 2021 10:13:22 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 191294B164;
-	Wed, 13 Jan 2021 09:35:09 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 386834B103;
+	Wed, 13 Jan 2021 10:13:22 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B71A4B164
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Jan 2021 09:35:07 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5ECB04B0F3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Jan 2021 10:13:20 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id t5CxW9K-slj7 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 13 Jan 2021 09:35:04 -0500 (EST)
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com
- [209.85.128.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B01114B161
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Jan 2021 09:35:04 -0500 (EST)
-Received: by mail-wm1-f49.google.com with SMTP id y23so1807954wmi.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Jan 2021 06:35:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=k8M4ay0pyWeTUsp8VTnmXaOTFerFbqdBD2/I+a5rVXU=;
- b=QRj1w8Zq8rESBoWrOk4jhvDSx+r0QWDtuf8GtQvgUpnFqBkcPHdTvb7c85hHF2l7cc
- qDKLJjq9Ii0ShbvDAU8iPTjVj20pMzOpAmpTWPBPhfpw7RQO8ZxSx4EUM8mZsSiXOwQL
- mdSHwkiWfb6QKpJX/SX1f5FrqdKK38gVDw2QhYa4LBWQ5jOkpmSnlu6QgdD7PLAOsV1i
- pjdicHccdwcNo3H+EHeD0jh7OVRjagkZ/8yX0F72Uzi/JeXwMnfHry8HzfWpKUBOJuAj
- gvO7/YEvY/bLsnuixLd6a0UD+ErWYadkCVa8OGxI4YHgEEgNnjV4lTOzzUhdH+UO71MZ
- 81gA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=k8M4ay0pyWeTUsp8VTnmXaOTFerFbqdBD2/I+a5rVXU=;
- b=oaIgXgOwHXoDqiithXHKIEY7wzuXYlyrbwSuPVw2LbLkUzvqg+TRlwr6LEHgm8lOuZ
- fOtnmaVGYyiIgcsn8cSHshzT3zZd9HZMu7cv31jpm/0TNZjwAeBkK4RrDdLHrXfFqzSY
- 3ky1fgEA+x6+6Q3VrFoL40j2nzA3vFoIteRa7ZiueWcbSgGURYwwBEE0qBB8IDtMt+0G
- CBLzczZtDLMnr1cK01D4s2iJNomYV1EvPcEjQkwpXFOq1P46xWEBhdUKImi+m44LGNMP
- /lKS8ZDW8SDoMANyGfllzP55gaCuuzM+XYcZYby8JtQ0/hUr9YvsQmAMySRGspHr159a
- LU5g==
-X-Gm-Message-State: AOAM532rdOkGA67h5GdQvBVB6PIhTUD+/ZjA18dp/dpy5Om+A7dVHxlC
- cSai/RxzBm0hqNF4Ympz+yQ56g==
-X-Google-Smtp-Source: ABdhPJyeEFIkF9DIJ5QpLZTm88kYBUJZLogYBqCXhodFTAckts1/BoAtWv9HKHGKxjjjbk2k938twA==
-X-Received: by 2002:a1c:7f83:: with SMTP id a125mr2516711wmd.86.1610548503499; 
- Wed, 13 Jan 2021 06:35:03 -0800 (PST)
-Received: from google.com (230.69.233.35.bc.googleusercontent.com.
- [35.233.69.230])
- by smtp.gmail.com with ESMTPSA id v7sm3410751wma.26.2021.01.13.06.35.02
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 13 Jan 2021 06:35:03 -0800 (PST)
-Date: Wed, 13 Jan 2021 14:35:00 +0000
-From: Quentin Perret <qperret@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [RFC PATCH v2 13/26] KVM: arm64: Enable access to sanitized CPU
- features at EL2
-Message-ID: <X/8FFKOLOVD9Ee2F@google.com>
-References: <20210108121524.656872-1-qperret@google.com>
- <20210108121524.656872-14-qperret@google.com>
- <d55643ea391f73a2297f499f3219ba8a@kernel.org>
- <X/8CR5eXGGccFjaL@google.com>
+ with ESMTP id dLzfHiYMHI8o for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 13 Jan 2021 10:13:16 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [63.128.21.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AA56F4B0F2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Jan 2021 10:13:16 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1610550796;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=453S8sBVjLr0faZuW43TaOSjhYKei55KCDbFiBmR9dY=;
+ b=hvP/nOKHkhKWguugvrTJGpW7481O44EVQgqYXTsggSe61c+GLL2AgNpc/HCS2g8e+CGEJW
+ PXHjtmSIzFPd7eneYY2qMU179pgBxJhtmwBu7rhdtR7JGEH687RChEYWF7YnS1S70qk4Ds
+ 90/p5klcq/mtb/KRXB/Uii/6bWWqRLw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-540-4yzDmH8lPpeaaE_NclWwuw-1; Wed, 13 Jan 2021 10:13:12 -0500
+X-MC-Unique: 4yzDmH8lPpeaaE_NclWwuw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BA475100559A;
+ Wed, 13 Jan 2021 15:13:08 +0000 (UTC)
+Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com
+ [10.3.112.255])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A6E8C5D9DD;
+ Wed, 13 Jan 2021 15:13:05 +0000 (UTC)
+Date: Wed, 13 Jan 2021 08:13:05 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH 1/5] vfio/iommu_type1: Fixes vfio_dma_populate_bitmap to
+ avoid dirty lose
+Message-ID: <20210113081305.1df7de8d@omen.home.shazbot.org>
+In-Reply-To: <3f4f9a82-0934-b114-8bd8-452e9e56712f@nvidia.com>
+References: <20210107092901.19712-1-zhukeqian1@huawei.com>
+ <20210107092901.19712-2-zhukeqian1@huawei.com>
+ <20210112142059.074c1b0f@omen.home.shazbot.org>
+ <3f4f9a82-0934-b114-8bd8-452e9e56712f@nvidia.com>
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <X/8CR5eXGGccFjaL@google.com>
-Cc: devicetree@vger.kernel.org, kernel-team@android.com,
- Frank Rowand <frowand.list@gmail.com>, android-kvm@google.com,
- Catalin Marinas <catalin.marinas@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-kernel@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
- linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+ Joerg Roedel <joro@8bytes.org>, Daniel Lezcano <daniel.lezcano@linaro.org>,
+ kvmarm@lists.cs.columbia.edu, Alexios Zavras <alexios.zavras@intel.com>,
+ Thomas Gleixner <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org,
+ Cornelia Huck <cohuck@redhat.com>, linux-kernel@vger.kernel.org,
+ iommu@lists.linux-foundation.org, Andrew Morton <akpm@linux-foundation.org>,
+ Robin Murphy <robin.murphy@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -106,17 +100,163 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wednesday 13 Jan 2021 at 14:23:03 (+0000), Quentin Perret wrote:
-> Good point, that would be nice indeed. Can I use that from outside an
-> __init function?
+On Wed, 13 Jan 2021 18:05:43 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-Just gave it a go, and the answer to this appears to be yes,
-surprisingly -- I was expecting a compile-time warning similar to what
-we get when non-__init code calls into __init, but that doesn't seem to
-trigger here. Anyways, I'll add the annotation in v3.
+> On 1/13/2021 2:50 AM, Alex Williamson wrote:
+> > On Thu, 7 Jan 2021 17:28:57 +0800
+> > Keqian Zhu <zhukeqian1@huawei.com> wrote:
+> >   
+> >> Defer checking whether vfio_dma is of fully-dirty in update_user_bitmap
+> >> is easy to lose dirty log. For example, after promoting pinned_scope of
+> >> vfio_iommu, vfio_dma is not considered as fully-dirty, then we may lose
+> >> dirty log that occurs before vfio_iommu is promoted.
+> >>
+> >> The key point is that pinned-dirty is not a real dirty tracking way, it
+> >> can't continuously track dirty pages, but just restrict dirty scope. It
+> >> is essentially the same as fully-dirty. Fully-dirty is of full-scope and
+> >> pinned-dirty is of pinned-scope.
+> >>
+> >> So we must mark pinned-dirty or fully-dirty after we start dirty tracking
+> >> or clear dirty bitmap, to ensure that dirty log is marked right away.  
+> > 
+> > I was initially convinced by these first three patches, but upon
+> > further review, I think the premise is wrong.  AIUI, the concern across
+> > these patches is that our dirty bitmap is only populated with pages
+> > dirtied by pinning and we only take into account the pinned page dirty
+> > scope at the time the bitmap is retrieved by the user.  You suppose
+> > this presents a gap where if a vendor driver has not yet identified
+> > with a page pinning scope that the entire bitmap should be considered
+> > dirty regardless of whether that driver later pins pages prior to the
+> > user retrieving the dirty bitmap.
+> > 
+> > I don't think this is how we intended the cooperation between the iommu
+> > driver and vendor driver to work.  By pinning pages a vendor driver is
+> > not declaring that only their future dirty page scope is limited to
+> > pinned pages, instead they're declaring themselves as a participant in
+> > dirty page tracking and take responsibility for pinning any necessary
+> > pages.  For example we might extend VFIO_IOMMU_DIRTY_PAGES_FLAG_START
+> > to trigger a blocking notification to groups to not only begin dirty
+> > tracking, but also to synchronously register their current device DMA
+> > footprint.  This patch would require a vendor driver to possibly perform
+> > a gratuitous page pinning in order to set the scope prior to dirty
+> > logging being enabled, or else the initial bitmap will be fully dirty.
+> > 
+> > Therefore, I don't see that this series is necessary or correct.  Kirti,
+> > does this match your thinking?
+> >   
+> 
+> That's correct Alex and I agree with you.
+> 
+> > Thinking about these semantics, it seems there might still be an issue
+> > if a group with non-pinned-page dirty scope is detached with dirty
+> > logging enabled.    
+> 
+> Hot-unplug a device while migration process has started - is this 
+> scenario supported?
 
-Thanks,
-Quentin
+It's not prevented, it would rely on a userspace policy, right?  The
+kernel should do the right thing regardless.  Thanks,
+
+Alex
+
+> > It seems this should in fact fully populate the dirty
+> > bitmaps at the time it's removed since we don't know the extent of its
+> > previous DMA, nor will the group be present to trigger the full bitmap
+> > when the user retrieves the dirty bitmap.  Creating fully populated
+> > bitmaps at the time tracking is enabled negates our ability to take
+> > advantage of later enlightenment though.  Thanks,
+> > 
+> > Alex
+> >   
+> >> Fixes: d6a4c185660c ("vfio iommu: Implementation of ioctl for dirty pages tracking")
+> >> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+> >> ---
+> >>   drivers/vfio/vfio_iommu_type1.c | 33 ++++++++++++++++++++++-----------
+> >>   1 file changed, 22 insertions(+), 11 deletions(-)
+> >>
+> >> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> >> index bceda5e8baaa..b0a26e8e0adf 100644
+> >> --- a/drivers/vfio/vfio_iommu_type1.c
+> >> +++ b/drivers/vfio/vfio_iommu_type1.c
+> >> @@ -224,7 +224,7 @@ static void vfio_dma_bitmap_free(struct vfio_dma *dma)
+> >>   	dma->bitmap = NULL;
+> >>   }
+> >>   
+> >> -static void vfio_dma_populate_bitmap(struct vfio_dma *dma, size_t pgsize)
+> >> +static void vfio_dma_populate_bitmap_pinned(struct vfio_dma *dma, size_t pgsize)
+> >>   {
+> >>   	struct rb_node *p;
+> >>   	unsigned long pgshift = __ffs(pgsize);
+> >> @@ -236,6 +236,25 @@ static void vfio_dma_populate_bitmap(struct vfio_dma *dma, size_t pgsize)
+> >>   	}
+> >>   }
+> >>   
+> >> +static void vfio_dma_populate_bitmap_full(struct vfio_dma *dma, size_t pgsize)
+> >> +{
+> >> +	unsigned long pgshift = __ffs(pgsize);
+> >> +	unsigned long nbits = dma->size >> pgshift;
+> >> +
+> >> +	bitmap_set(dma->bitmap, 0, nbits);
+> >> +}
+> >> +
+> >> +static void vfio_dma_populate_bitmap(struct vfio_iommu *iommu,
+> >> +				     struct vfio_dma *dma)
+> >> +{
+> >> +	size_t pgsize = (size_t)1 << __ffs(iommu->pgsize_bitmap);
+> >> +
+> >> +	if (iommu->pinned_page_dirty_scope)
+> >> +		vfio_dma_populate_bitmap_pinned(dma, pgsize);
+> >> +	else if (dma->iommu_mapped)
+> >> +		vfio_dma_populate_bitmap_full(dma, pgsize);
+> >> +}
+> >> +
+> >>   static int vfio_dma_bitmap_alloc_all(struct vfio_iommu *iommu)
+> >>   {
+> >>   	struct rb_node *n;
+> >> @@ -257,7 +276,7 @@ static int vfio_dma_bitmap_alloc_all(struct vfio_iommu *iommu)
+> >>   			}
+> >>   			return ret;
+> >>   		}
+> >> -		vfio_dma_populate_bitmap(dma, pgsize);
+> >> +		vfio_dma_populate_bitmap(iommu, dma);
+> >>   	}
+> >>   	return 0;
+> >>   }
+> >> @@ -987,13 +1006,6 @@ static int update_user_bitmap(u64 __user *bitmap, struct vfio_iommu *iommu,
+> >>   	unsigned long shift = bit_offset % BITS_PER_LONG;
+> >>   	unsigned long leftover;
+> >>   
+> >> -	/*
+> >> -	 * mark all pages dirty if any IOMMU capable device is not able
+> >> -	 * to report dirty pages and all pages are pinned and mapped.
+> >> -	 */
+> >> -	if (!iommu->pinned_page_dirty_scope && dma->iommu_mapped)
+> >> -		bitmap_set(dma->bitmap, 0, nbits);
+> >> -
+> >>   	if (shift) {
+> >>   		bitmap_shift_left(dma->bitmap, dma->bitmap, shift,
+> >>   				  nbits + shift);
+> >> @@ -1019,7 +1031,6 @@ static int vfio_iova_dirty_bitmap(u64 __user *bitmap, struct vfio_iommu *iommu,
+> >>   	struct vfio_dma *dma;
+> >>   	struct rb_node *n;
+> >>   	unsigned long pgshift = __ffs(iommu->pgsize_bitmap);
+> >> -	size_t pgsize = (size_t)1 << pgshift;
+> >>   	int ret;
+> >>   
+> >>   	/*
+> >> @@ -1055,7 +1066,7 @@ static int vfio_iova_dirty_bitmap(u64 __user *bitmap, struct vfio_iommu *iommu,
+> >>   		 * pages which are marked dirty by vfio_dma_rw()
+> >>   		 */
+> >>   		bitmap_clear(dma->bitmap, 0, dma->size >> pgshift);
+> >> -		vfio_dma_populate_bitmap(dma, pgsize);
+> >> +		vfio_dma_populate_bitmap(iommu, dma);
+> >>   	}
+> >>   	return 0;
+> >>   }  
+> >   
+> 
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
