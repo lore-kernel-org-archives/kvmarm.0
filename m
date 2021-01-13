@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F21EC433E6
-	for <kvmarm@archiver.kernel.org>; Wed, 13 Jan 2021 17:18:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A555C433E0
+	for <kvmarm@archiver.kernel.org>; Wed, 13 Jan 2021 17:18:35 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id AF35123444
-	for <kvmarm@archiver.kernel.org>; Wed, 13 Jan 2021 17:18:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF35123444
+	by mail.kernel.org (Postfix) with ESMTP id 7206A23441
+	for <kvmarm@archiver.kernel.org>; Wed, 13 Jan 2021 17:18:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7206A23441
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D6114B190;
-	Wed, 13 Jan 2021 12:18:32 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F33F64B1C5;
+	Wed, 13 Jan 2021 12:18:33 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id zirzNh3SujvO; Wed, 13 Jan 2021 12:18:30 -0500 (EST)
+	with ESMTP id xvjBoDkeFwJm; Wed, 13 Jan 2021 12:18:33 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B85F64B1BD;
-	Wed, 13 Jan 2021 12:18:29 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D6D114B1B4;
+	Wed, 13 Jan 2021 12:18:32 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A67304B122
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Jan 2021 12:18:28 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E77E64B1C9
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Jan 2021 12:18:31 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OA7nZruL3WXb for <kvmarm@lists.cs.columbia.edu>;
- Wed, 13 Jan 2021 12:18:27 -0500 (EST)
+ with ESMTP id 0R4x1kH1aL7A for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 13 Jan 2021 12:18:31 -0500 (EST)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C3C074B1AA
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Jan 2021 12:18:27 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0833D4B1C0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Jan 2021 12:18:31 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1610558307;
+ s=mimecast20190719; t=1610558310;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=A5hNzXnRtBLkRY+uChUouzv6yCzi7yuTb2zBLYxeP94=;
- b=YbWdM2eD9DenxP+kRBf2G/UeRlyZ9doqpw+HipumUVCu5YvDBAO9rOxxwO2E9iEgj2RFaf
- TQfCKBoneRr92Kf2DjXCeIO4mw1VR7WL1bOFKG7DE4bZLA6ve69mcv9aYmj3HO7nPKUqLD
- w4jk28bi0JhSoyPL+1uL2MQhMrEFMa4=
+ bh=RtqK698Gz2UPmkSrQZ+1pqM9fJn9xrCeQ0Ydv7oehh8=;
+ b=MLr4yLzYn4PgxVXssb1JMZ4HDk5azJpVvlu5qvQAAJzUiILPnrgySN0nnkiVL+fT0MsrKp
+ NFxhVbYZjTC7kL3zzrU4mB0np2ZUC26QYfynYYBM49c3K8c+XdBOwHuEw0pgB1Q+9RQdcG
+ VlZD7RGxwEzTL9vD/TddYUcbPF12gRg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-339-CS-aG-nUM0mMe2mBZ18P1A-1; Wed, 13 Jan 2021 12:18:23 -0500
-X-MC-Unique: CS-aG-nUM0mMe2mBZ18P1A-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-551-wnXSPicHN36julsnJPTxOA-1; Wed, 13 Jan 2021 12:18:26 -0500
+X-MC-Unique: wnXSPicHN36julsnJPTxOA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2F62380A5C0;
- Wed, 13 Jan 2021 17:18:22 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3243F1081B2F;
+ Wed, 13 Jan 2021 17:18:25 +0000 (UTC)
 Received: from [10.36.114.165] (ovpn-114-165.ams2.redhat.com [10.36.114.165])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4581074AA9;
- Wed, 13 Jan 2021 17:18:19 +0000 (UTC)
-Subject: Re: [PATCH 6/9] docs: kvm: devices/arm-vgic-v3: enhance
- KVM_DEV_ARM_VGIC_CTRL_INIT doc
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7812660BF1;
+ Wed, 13 Jan 2021 17:18:22 +0000 (UTC)
+Subject: Re: [PATCH 2/9] KVM: arm64: Fix KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
+ read
 To: Alexandru Elisei <alexandru.elisei@arm.com>, eric.auger.pro@gmail.com,
  linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
  kvmarm@lists.cs.columbia.edu, maz@kernel.org, drjones@redhat.com
 References: <20201212185010.26579-1-eric.auger@redhat.com>
- <20201212185010.26579-7-eric.auger@redhat.com>
- <4c0b3988-904c-a922-d0be-87a354c3203c@arm.com>
+ <20201212185010.26579-3-eric.auger@redhat.com>
+ <888cf519-8c0e-f781-98a1-86594bdfacb1@arm.com>
 From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <0f6f4848-b7df-9e9f-8b25-5009a5650350@redhat.com>
-Date: Wed, 13 Jan 2021 18:18:17 +0100
+Message-ID: <ccc874c3-75a9-a2b8-1e9d-b762c0f8d6ad@redhat.com>
+Date: Wed, 13 Jan 2021 18:18:20 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <4c0b3988-904c-a922-d0be-87a354c3203c@arm.com>
+In-Reply-To: <888cf519-8c0e-f781-98a1-86594bdfacb1@arm.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Cc: shuah@kernel.org, pbonzini@redhat.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -98,50 +98,54 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Hi Alexandru,
 
-On 1/12/21 4:39 PM, Alexandru Elisei wrote:
+On 1/6/21 6:12 PM, Alexandru Elisei wrote:
 > Hi Eric,
 > 
+> The patch looks correct to me. kvm_vgic_addr() masks out all the bits except index
+> from addr, so we don't need to do it in vgic_get_common_attr():
+> 
+> Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> 
+> One nitpick below.
+> 
 > On 12/12/20 6:50 PM, Eric Auger wrote:
->> kvm_arch_vcpu_precreate() returns -EBUSY if the vgic is
->> already initialized. So let's document that KVM_DEV_ARM_VGIC_CTRL_INIT
->> must be called after all vcpu creations.
-> 
-> Checked and this is indeed the case,
-> kvm_vm_ioctl_create_vcpu()->kvm_arch_vcpu_precreate() returns -EBUSY is
-> vgic_initialized() is true.
-thanks!
-> 
+>> The doc says:
+>> "The characteristics of a specific redistributor region can
+>>  be read by presetting the index field in the attr data.
+>>  Only valid for KVM_DEV_TYPE_ARM_VGIC_V3"
 >>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> ---
->>  Documentation/virt/kvm/devices/arm-vgic-v3.rst | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/Documentation/virt/kvm/devices/arm-vgic-v3.rst b/Documentation/virt/kvm/devices/arm-vgic-v3.rst
->> index 5dd3bff51978..322de6aebdec 100644
->> --- a/Documentation/virt/kvm/devices/arm-vgic-v3.rst
->> +++ b/Documentation/virt/kvm/devices/arm-vgic-v3.rst
->> @@ -228,7 +228,7 @@ Groups:
->>  
->>      KVM_DEV_ARM_VGIC_CTRL_INIT
->>        request the initialization of the VGIC, no additional parameter in
->> -      kvm_device_attr.addr.
->> +      kvm_device_attr.addr. Must be called after all vcpu creations.
+>> Unfortunately the existing code fails to read the input attr data
+>> and thus the index always is 0.
 > 
-> Nitpick here: the document writes VCPU with all caps. This also sounds a bit
-> weird, I think something like "Must be called after all VCPUs have been created"
-> is clearer.
-I took your suggestion.
-
-Thanks
+> addr is allocated on the stack, I don't think it will always be 0.
+I removed this statement in the commit message. Thanks!
 
 Eric
 > 
 > Thanks,
 > Alex
->>      KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES
->>        save all LPI pending bits into guest RAM pending tables.
+>>
+>> Fixes: 04c110932225 ("KVM: arm/arm64: Implement KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION")
+>> Cc: stable@vger.kernel.org#v4.17+
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> ---
+>>  arch/arm64/kvm/vgic/vgic-kvm-device.c | 3 +++
+>>  1 file changed, 3 insertions(+)
+>>
+>> diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+>> index 44419679f91a..2f66cf247282 100644
+>> --- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
+>> +++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+>> @@ -226,6 +226,9 @@ static int vgic_get_common_attr(struct kvm_device *dev,
+>>  		u64 addr;
+>>  		unsigned long type = (unsigned long)attr->attr;
 >>  
+>> +		if (copy_from_user(&addr, uaddr, sizeof(addr)))
+>> +			return -EFAULT;
+>> +
+>>  		r = kvm_vgic_addr(dev->kvm, type, &addr, false);
+>>  		if (r)
+>>  			return (r == -ENODEV) ? -ENXIO : r;
 > 
 
 _______________________________________________
