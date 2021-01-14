@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5D2AC433E0
-	for <kvmarm@archiver.kernel.org>; Thu, 14 Jan 2021 10:03:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 383F3C433E0
+	for <kvmarm@archiver.kernel.org>; Thu, 14 Jan 2021 10:16:40 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4177023A52
-	for <kvmarm@archiver.kernel.org>; Thu, 14 Jan 2021 10:03:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4177023A52
+	by mail.kernel.org (Postfix) with ESMTP id 76AAF23A50
+	for <kvmarm@archiver.kernel.org>; Thu, 14 Jan 2021 10:16:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76AAF23A50
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CAFEB4B176;
-	Thu, 14 Jan 2021 05:03:06 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BE894B0B2;
+	Thu, 14 Jan 2021 05:16:38 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id uoEbmgpskJVZ; Thu, 14 Jan 2021 05:03:05 -0500 (EST)
+	with ESMTP id 6YdBA7WjM2M1; Thu, 14 Jan 2021 05:16:37 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B10EC4B19F;
-	Thu, 14 Jan 2021 05:03:05 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B6464B173;
+	Thu, 14 Jan 2021 05:16:37 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B9B24B176
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jan 2021 05:03:04 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2AC4F4B173
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jan 2021 05:16:36 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LqV3b37-oiiP for <kvmarm@lists.cs.columbia.edu>;
- Thu, 14 Jan 2021 05:03:03 -0500 (EST)
+ with ESMTP id MGlFWzgLgJL6 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 14 Jan 2021 05:16:35 -0500 (EST)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [63.128.21.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B3B84B19C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jan 2021 05:03:03 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C2C24B16D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jan 2021 05:16:35 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1610618583;
+ s=mimecast20190719; t=1610619395;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=xXjNcBX1zyUVY22wn0iABMXWOTnE52HCbnMakakpYNA=;
- b=icG59PkANdv79vyej/Hw8Rys/CgnIBvuCfoLkjr3YtPcSQaxJE0dJ1gUdPlwf+woP9Cp3O
- yBF7H7hMUwjpvXVAODU3rR+NckZRP6GcSZTBi7xodVRr8FUvtcsj3JINW9YBLZd5bk3O+3
- BARgICKMD6xSOy/D4nNG8lCj6ls6HDU=
+ bh=IaIUvaMv2k9j6w56+5o78W95fqxpiStrTQ2Nmkvuj38=;
+ b=RGbjNInH2fJJZFFXJQ095eYSbv7ISpZDfABqWhUIgjzNj2K1Mk1I/dlRV2FOVbd7hkeQP6
+ Rkz9TlxF8r3UbNA2XOgXgXumKVEHPJEJdkJixFS8GkxjUOgVpA8ggI4lb9Wkvh71Sfhcx6
+ fFJ1MOx+Ozd5WNrJCxhyA1XbYmgnrDE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-348-p58qiEhWMVmNF5ryZwfFhw-1; Thu, 14 Jan 2021 05:03:01 -0500
-X-MC-Unique: p58qiEhWMVmNF5ryZwfFhw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-156-5iw1vXHqMKWXyi8cUWxbLg-1; Thu, 14 Jan 2021 05:16:33 -0500
+X-MC-Unique: 5iw1vXHqMKWXyi8cUWxbLg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8338084A5E8;
- Thu, 14 Jan 2021 10:02:59 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EB979107ACFB;
+ Thu, 14 Jan 2021 10:16:31 +0000 (UTC)
 Received: from [10.36.114.165] (ovpn-114-165.ams2.redhat.com [10.36.114.165])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B7CBF71D60;
- Thu, 14 Jan 2021 10:02:56 +0000 (UTC)
-Subject: Re: [PATCH 1/9] KVM: arm64: vgic-v3: Fix some error codes when
- setting RDIST base
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 05D4019C47;
+ Thu, 14 Jan 2021 10:16:28 +0000 (UTC)
+Subject: Re: [PATCH 8/9] KVM: arm64: vgic-v3: Expose GICR_TYPER.Last for
+ userspace
 To: Alexandru Elisei <alexandru.elisei@arm.com>, eric.auger.pro@gmail.com,
  linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
  kvmarm@lists.cs.columbia.edu, maz@kernel.org, drjones@redhat.com
 References: <20201212185010.26579-1-eric.auger@redhat.com>
- <20201212185010.26579-2-eric.auger@redhat.com>
- <fa73780d-b72b-6810-460e-5ed1057df093@arm.com>
+ <20201212185010.26579-9-eric.auger@redhat.com>
+ <45a364ec-eac6-a04b-9654-e97970186839@arm.com>
 From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <e37f1942-dcb7-3579-0aba-e131e4bd9217@redhat.com>
-Date: Thu, 14 Jan 2021 11:02:55 +0100
+Message-ID: <7078b0a5-fb18-5e65-953a-8a55009aa2be@redhat.com>
+Date: Thu, 14 Jan 2021 11:16:27 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <fa73780d-b72b-6810-460e-5ed1057df093@arm.com>
+In-Reply-To: <45a364ec-eac6-a04b-9654-e97970186839@arm.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Cc: shuah@kernel.org, pbonzini@redhat.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -91,67 +91,109 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SGkgQWxleGFuZHJ1LAoKT24gMS82LzIxIDU6MzIgUE0sIEFsZXhhbmRydSBFbGlzZWkgd3JvdGU6
-Cj4gSGkgRXJpYywKPiAKPiBPbiAxMi8xMi8yMCA2OjUwIFBNLCBFcmljIEF1Z2VyIHdyb3RlOgo+
-PiBLVk1fREVWX0FSTV9WR0lDX0dSUF9BRERSIGdyb3VwIGRvYyBzYXlzIHdlIHNob3VsZCByZXR1
-cm4KPj4gLUVFWElTVCBpbiBjYXNlIHRoZSBiYXNlIGFkZHJlc3Mgb2YgdGhlIHJlZGlzdCBpcyBh
-bHJlYWR5IHNldC4KPj4gV2UgY3VycmVudGx5IHJldHVybiAtRUlOVkFMLgo+Pgo+PiBIb3dldmVy
-IHdlIG5lZWQgdG8gcmV0dXJuIC1FSU5WQUwgaW4gY2FzZSBhIGxlZ2FjeSBSRURJU1QgYWRkcmVz
-cwo+PiBpcyBhdHRlbXB0ZWQgdG8gYmUgc2V0IHdoaWxlIFJFRElTVF9SRUdJT05TIHdlcmUgc2V0
-LiBUaGlzIGNhc2UKPj4gaXMgZGlzY3JpbWluYXRlZCBieSBsb29raW5nIGF0IHRoZSBjb3VudCBm
-aWVsZC4KPj4KPj4gU2lnbmVkLW9mZi1ieTogRXJpYyBBdWdlciA8ZXJpYy5hdWdlckByZWRoYXQu
-Y29tPgo+PiAtLS0KPj4gIGFyY2gvYXJtNjQva3ZtL3ZnaWMvdmdpYy1tbWlvLXYzLmMgfCA5ICsr
-KysrKystLQo+PiAgMSBmaWxlIGNoYW5nZWQsIDcgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMo
-LSkKPj4KPj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL3ZnaWMvdmdpYy1tbWlvLXYzLmMg
-Yi9hcmNoL2FybTY0L2t2bS92Z2ljL3ZnaWMtbW1pby12My5jCj4+IGluZGV4IDE1YTZjOThlZTky
-Zi4uOGU4YTg2MmRlZjc2IDEwMDY0NAo+PiAtLS0gYS9hcmNoL2FybTY0L2t2bS92Z2ljL3ZnaWMt
-bW1pby12My5jCj4+ICsrKyBiL2FyY2gvYXJtNjQva3ZtL3ZnaWMvdmdpYy1tbWlvLXYzLmMKPj4g
-QEAgLTc5Miw4ICs3OTIsMTMgQEAgc3RhdGljIGludCB2Z2ljX3YzX2luc2VydF9yZWRpc3RfcmVn
-aW9uKHN0cnVjdCBrdm0gKmt2bSwgdWludDMyX3QgaW5kZXgsCj4+ICAJaW50IHJldDsKPj4gIAo+
-PiAgCS8qIHNpbmdsZSByZGlzdCByZWdpb24gYWxyZWFkeSBzZXQgPyovCj4+IC0JaWYgKCFjb3Vu
-dCAmJiAhbGlzdF9lbXB0eShyZF9yZWdpb25zKSkKPj4gLQkJcmV0dXJuIC1FSU5WQUw7Cj4+ICsJ
-aWYgKCFjb3VudCAmJiAhbGlzdF9lbXB0eShyZF9yZWdpb25zKSkgewo+PiArCQlyZHJlZyA9IGxp
-c3RfbGFzdF9lbnRyeShyZF9yZWdpb25zLAo+PiArCQkJCSAgICAgICBzdHJ1Y3QgdmdpY19yZWRp
-c3RfcmVnaW9uLCBsaXN0KTsKPj4gKwkJaWYgKHJkcmVnLT5jb3VudCkKPj4gKwkJCXJldHVybiAt
-RUlOVkFMOyAvKiBNaXhpbmcgUkVESVNUIGFuZCBSRURJU1RfUkVHSU9OIEFQSSAqLwo+PiArCQly
-ZXR1cm4gLUVFWElTVDsKPj4gKwl9Cj4gCj4gQSBmZXcgaW5zdHJ1Y3Rpb25zIGJlbG93Ogo+IAo+
-IMKgwqDCoCBpZiAobGlzdF9lbXB0eShyZF9yZWdpb25zKSkgewo+IMKgwqDCoCDCoMKgwqAgWy4u
-XQo+IMKgwqDCoCB9IGVsc2Ugewo+IMKgwqDCoCDCoMKgwqAgcmRyZWcgPSBsaXN0X2xhc3RfZW50
-cnkocmRfcmVnaW9ucywKPiDCoMKgwqAgwqDCoMKgIMKgwqDCoCDCoMKgwqAgwqDCoMKgIHN0cnVj
-dCB2Z2ljX3JlZGlzdF9yZWdpb24sIGxpc3QpOwo+IMKgwqDCoCDCoMKgwqAgWy4uXQo+IAo+IMKg
-wqDCoCDCoMKgwqAgLyogQ2Fubm90IGFkZCBhbiBleHBsaWNpdGx5IHNpemVkIHJlZ2lvbnMgYWZ0
-ZXIgbGVnYWN5IHJlZ2lvbiAqLwo+IMKgwqDCoCDCoMKgwqAgaWYgKCFyZHJlZy0+Y291bnQpCj4g
-wqDCoMKgIMKgwqDCoCDCoMKgwqAgcmV0dXJuIC1FSU5WQUw7Cj4gwqDCoMKgIH0KPiAKPiBJc24n
-dCB0aGlzIHRlc3RpbmcgZm9yIHRoZSBzYW1lIHRoaW5nLCBidXQgdXNpbmcgdGhlIG9wcG9zaXRl
-IGNvbmRpdGlvbj8gT3IgYW0gSQo+IG1pc3VuZGVyc3RhbmRpbmcgdGhlIGNvZGUgKHF1aXRlIGxp
-a2VseSk/CnRoZSAxc3QgdGVzdCBzZXF1ZW5jZSBoYW5kbGVzIHRoZSBjYXNlIHdoZXJlIHRoZSBs
-ZWdhY3kKS1ZNX1ZHSUNfVjNfQUREUl9UWVBFX1JFRElTVCBpcyB1c2VkICghY291bnQpIHdoaWxl
-IHRoZSBzZWNvbmQgaGFuZGxlcwp0aGUgY2FzZSB3aGVyZSB0aGUgUkVESVNUX1JFR0lPTiBpcyB1
-c2VkLiBOZXZlcnRoZWxlc3MgSSB0aGluayB0aGlzIGNhbgpiZSBzaW1wbGlmaWVkIGludG86Cgog
-ICAgICAgIGlmIChsaXN0X2VtcHR5KHJkX3JlZ2lvbnMpKSB7CiAgICAgICAgICAgICAgICBpZiAo
-aW5kZXggIT0gMCkKICAgICAgICAgICAgICAgICAgICAgICAgcmV0dXJuIC1FSU5WQUw7CiAgICAg
-ICAgfSBlbHNlIHsKICAgICAgICAgICAgICAgIHJkcmVnID0gbGlzdF9sYXN0X2VudHJ5KHJkX3Jl
-Z2lvbnMsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzdHJ1Y3Qgdmdp
-Y19yZWRpc3RfcmVnaW9uLCBsaXN0KTsKCiAgICAgICAgICAgICAgICBpZiAoKCFjb3VudCkgIT0g
-KCFyZHJlZy0+Y291bnQpKQogICAgICAgICAgICAgICAgICAgICAgICByZXR1cm4gLUVJTlZBTDsg
-LyogTWl4IFJFRElTVCBhbmQgUkVESVNUX1JFR0lPTiAqLwoKICAgICAgICAgICAgICAgIGlmICgh
-Y291bnQpCiAgICAgICAgICAgICAgICAgICAgICAgIHJldHVybiAtRUVYSVNUOwoKICAgICAgICAg
-ICAgICAgIGlmIChpbmRleCAhPSByZHJlZy0+aW5kZXggKyAxKQogICAgICAgICAgICAgICAgICAg
-ICAgICByZXR1cm4gLUVJTlZBTDsKICAgICAgICB9CgoKCgoKCj4gCj4gTG9va3MgdG8gbWUgbGlr
-ZSBLVk1fREVWX0FSTV9WR0lDX0dSUF9BRERSKEtWTV9WR0lDX1YzX0FERFJfVFlQRV9SRURJU1R7
-LF9SRUdJT059KQo+IHVzZWQgdG8gcmV0dXJuIC1FRVhJU1QgKGZyb20gdmdpY19jaGVja19pb2Fk
-ZHIoKSkgYmVmb3JlIGNvbW1pdCBjY2MyN2JmNWJlN2I3Cj4gKCJLVk06IGFybS9hcm02NDogSGVs
-cGVyIHRvIHJlZ2lzdGVyIGEgbmV3IHJlZGlzdHJpYnV0b3IgcmVnaW9uIikgd2hpY2ggYWRkZWQg
-dGhlCj4gdmdpY192M19pbnNlcnRfcmVkaXN0X3JlZ2lvbigpIGZ1bmN0aW9uLCBzbyBicmluZ2lu
-ZyBiYWNrIHRoZSAtRUVYSVNUIHJldHVybiBjb2RlCj4gbG9va3MgdGhlIHJpZ2h0IHRoaW5nIHRv
-IG1lLgoKT0sgdGhhbmsgeW91IGZvciB0aGUgZGV0YWlsZWQgc3R1ZHkuCgpFcmljCj4gCj4gVGhh
-bmtzLAo+IEFsZXgKPj4gIAo+PiAgCS8qIGNyb3NzIHRoZSBlbmQgb2YgbWVtb3J5ID8gKi8KPj4g
-IAlpZiAoYmFzZSArIHNpemUgPCBiYXNlKQo+IAoKX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3Mu
-Y29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGlu
-Zm8va3ZtYXJtCg==
+Hi Alexandru,
+
+On 1/12/21 6:02 PM, Alexandru Elisei wrote:
+> Hi Eric,
+> 
+> On 12/12/20 6:50 PM, Eric Auger wrote:
+>> Commit 23bde34771f1 ("KVM: arm64: vgic-v3: Drop the
+>> reporting of GICR_TYPER.Last for userspace") temporarily fixed
+>> a bug identified when attempting to access the GICR_TYPER
+>> register before the redistributor region setting but dropped
+>> the support of the LAST bit. This patch restores its
+>> support (if the redistributor region was set) while keeping the
+>> code safe.
+> 
+> I suppose the reason for emulating GICR_TYPER.Last is for architecture compliance,
+> right? I think that should be in the commit message.
+OK added this in the commit msg.
+> 
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> ---
+>>  arch/arm64/kvm/vgic/vgic-mmio-v3.c | 7 ++++++-
+>>  include/kvm/arm_vgic.h             | 1 +
+>>  2 files changed, 7 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+>> index 581f0f490000..2f9ef6058f6e 100644
+>> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+>> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+>> @@ -277,6 +277,8 @@ static unsigned long vgic_uaccess_read_v3r_typer(struct kvm_vcpu *vcpu,
+>>  						 gpa_t addr, unsigned int len)
+>>  {
+>>  	unsigned long mpidr = kvm_vcpu_get_mpidr_aff(vcpu);
+>> +	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+>> +	struct vgic_redist_region *rdreg = vgic_cpu->rdreg;
+>>  	int target_vcpu_id = vcpu->vcpu_id;
+>>  	u64 value;
+>>  
+>> @@ -286,7 +288,9 @@ static unsigned long vgic_uaccess_read_v3r_typer(struct kvm_vcpu *vcpu,
+>>  	if (vgic_has_its(vcpu->kvm))
+>>  		value |= GICR_TYPER_PLPIS;
+>>  
+>> -	/* reporting of the Last bit is not supported for userspace */
+>> +	if (rdreg && (vgic_cpu->rdreg_index == (rdreg->free_index - 1)))
+>> +		value |= GICR_TYPER_LAST;
+>> +
+>>  	return extract_bytes(value, addr & 7, len);
+>>  }
+>>  
+>> @@ -714,6 +718,7 @@ int vgic_register_redist_iodev(struct kvm_vcpu *vcpu)
+>>  		return -EINVAL;
+>>  
+>>  	vgic_cpu->rdreg = rdreg;
+>> +	vgic_cpu->rdreg_index = rdreg->free_index;
+> 
+> What happens if the next redistributor region we register has the base address
+> adjacent to this one?
+> 
+> I'm really not familiar with the code, but is it not possible to create two
+> Redistributor regions (via
+> KVM_DEV_ARM_VGIC_GRP_ADDR(KVM_VGIC_V3_ADDR_TYPE_REDIST)) where the second
+> Redistributor region start address is immediately after the last Redistributor in
+> the preceding region?
+KVM_VGIC_V3_ADDR_TYPE_REDIST only allows to create a single rdist
+region. Only KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION allows to register
+several of them.
+
+with KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, it is possible to register
+adjacent rdist regions. vgic_v3_rdist_free_slot() previously returned
+the 1st rdist region where enough space remains for inserting the new
+reg. We put the rdist at the free index there.
+
+But maybe I misunderstood your question?
+
+Thanks
+
+Eric
+> 
+> Thanks,
+> Alex
+>>  
+>>  	rd_base = rdreg->base + rdreg->free_index * KVM_VGIC_V3_REDIST_SIZE;
+>>  
+>> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+>> index a8d8fdcd3723..596c069263a7 100644
+>> --- a/include/kvm/arm_vgic.h
+>> +++ b/include/kvm/arm_vgic.h
+>> @@ -322,6 +322,7 @@ struct vgic_cpu {
+>>  	 */
+>>  	struct vgic_io_device	rd_iodev;
+>>  	struct vgic_redist_region *rdreg;
+>> +	u32 rdreg_index;
+>>  
+>>  	/* Contains the attributes and gpa of the LPI pending tables. */
+>>  	u64 pendbaser;
+> 
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
