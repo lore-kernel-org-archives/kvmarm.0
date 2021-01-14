@@ -7,69 +7,68 @@ X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E13BEC433E0
-	for <kvmarm@archiver.kernel.org>; Thu, 14 Jan 2021 10:37:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB327C433E0
+	for <kvmarm@archiver.kernel.org>; Thu, 14 Jan 2021 10:37:45 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4ED7423A50
-	for <kvmarm@archiver.kernel.org>; Thu, 14 Jan 2021 10:37:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4ED7423A50
+	by mail.kernel.org (Postfix) with ESMTP id 6F62C23A50
+	for <kvmarm@archiver.kernel.org>; Thu, 14 Jan 2021 10:37:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F62C23A50
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EC6384B116;
-	Thu, 14 Jan 2021 05:37:35 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 18A584B088;
+	Thu, 14 Jan 2021 05:37:45 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id bEu7ynONhSbJ; Thu, 14 Jan 2021 05:37:34 -0500 (EST)
+	with ESMTP id xk0L+vnXqtZh; Thu, 14 Jan 2021 05:37:44 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E13604B197;
-	Thu, 14 Jan 2021 05:37:34 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 10B484B143;
+	Thu, 14 Jan 2021 05:37:44 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C2CB44B088
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jan 2021 05:37:33 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BDEE34B143
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jan 2021 05:37:42 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ldT75uZN+34x for <kvmarm@lists.cs.columbia.edu>;
- Thu, 14 Jan 2021 05:37:32 -0500 (EST)
+ with ESMTP id oXWYIMQEkqCC for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 14 Jan 2021 05:37:42 -0500 (EST)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [63.128.21.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BFCC14B1B3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jan 2021 05:37:32 -0500 (EST)
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C86A4B088
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jan 2021 05:37:42 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1610620652;
+ s=mimecast20190719; t=1610620661;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=G/DGlxtUTpbf673LGXUSi2zEyclPdvE3HTLHgWRcors=;
- b=Y7jG0ZnFETXRv+LQd0Db0HZhHYPWxHLOHT54nKRLDrmXNX9V8IePhubyKzhoNctZEuSXMH
- BhyWyqj+8GvyirjUfRiIamvKtS/22oZM5BDf1ACATLjgoMVIt+3blWvefvochaOiiHq4ll
- 8sskc33AeJz6XDQlHehFJdBBW3haapE=
+ bh=+hJXtfkfIsQuOWJQwFllSA/VmwaaMSwqBRVC3R1TgZY=;
+ b=HlEtjwXpnWQk0qi6f7mi5oob+b4yZ1Ukea3Tv7OUjOOaVDWz0+nms81C64YosfC4I4/xx1
+ odEQxpQ0rWdeRjOdi5Vd3+a60Il/WII33IOB68Tfk2rEnothgxTEjSLRomic+DvMO5Qy45
+ XA3DNnNQCs7KXZNxWbREPHygqXAdtvs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-514-H3suqp5uOO2vw0f5Oogxeg-1; Thu, 14 Jan 2021 05:37:31 -0500
-X-MC-Unique: H3suqp5uOO2vw0f5Oogxeg-1
+ us-mta-201-qAFO6Wd9NrmhCjLZgaESvQ-1; Thu, 14 Jan 2021 05:37:40 -0500
+X-MC-Unique: qAFO6Wd9NrmhCjLZgaESvQ-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7538E8066E1;
- Thu, 14 Jan 2021 10:37:29 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7F37C107ACF8;
+ Thu, 14 Jan 2021 10:37:38 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-114-165.ams2.redhat.com [10.36.114.165])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 823E112D7E;
- Thu, 14 Jan 2021 10:37:26 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B07287047A;
+ Thu, 14 Jan 2021 10:37:29 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com,
  linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
  kvmarm@lists.cs.columbia.edu, maz@kernel.org, drjones@redhat.com
-Subject: [PATCH v2 4/9] KVM: arm/arm64: vgic: Reset base address on
- kvm_vgic_dist_destroy()
-Date: Thu, 14 Jan 2021 11:37:03 +0100
-Message-Id: <20210114103708.26763-5-eric.auger@redhat.com>
+Subject: [PATCH v2 5/9] KVM: arm: move has_run_once after the map_resources
+Date: Thu, 14 Jan 2021 11:37:04 +0100
+Message-Id: <20210114103708.26763-6-eric.auger@redhat.com>
 In-Reply-To: <20210114103708.26763-1-eric.auger@redhat.com>
 References: <20210114103708.26763-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -91,51 +90,46 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On vgic_dist_destroy(), the addresses are not reset. However for
-kvm selftest purpose this would allow to continue the test execution
-even after a failure when running KVM_RUN. So let's reset the
-base addresses.
+has_run_once is set to true at the beginning of
+kvm_vcpu_first_run_init(). This generally is not an issue
+except when exercising the code with KVM selftests. for instance,
+if kvm_vgic_map_resources() fails due to erroneous user settings,
+has_run_once is set and this prevents from continuing
+executing the test. This patch moves the assignment after the
+kvm_vgic_map_resources().
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
 
 v1 -> v2:
-- use dist-> in the else and add braces
+- slight reword of the commit msg (for instance)
 ---
- arch/arm64/kvm/vgic/vgic-init.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/arm.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-index 052917deb149..cf6faa0aeddb 100644
---- a/arch/arm64/kvm/vgic/vgic-init.c
-+++ b/arch/arm64/kvm/vgic/vgic-init.c
-@@ -335,13 +335,16 @@ static void kvm_vgic_dist_destroy(struct kvm *kvm)
- 	kfree(dist->spis);
- 	dist->spis = NULL;
- 	dist->nr_spis = 0;
-+	dist->vgic_dist_base = VGIC_ADDR_UNDEF;
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 04c44853b103..580760e58980 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -573,8 +573,6 @@ static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
+ 	if (!kvm_arm_vcpu_is_finalized(vcpu))
+ 		return -EPERM;
  
--	if (kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
-+	if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
- 		list_for_each_entry_safe(rdreg, next, &dist->rd_regions, list) {
- 			list_del(&rdreg->list);
- 			kfree(rdreg);
- 		}
- 		INIT_LIST_HEAD(&dist->rd_regions);
-+	} else {
-+		dist->vgic_cpu_base = VGIC_ADDR_UNDEF;
+-	vcpu->arch.has_run_once = true;
+-
+ 	if (likely(irqchip_in_kernel(kvm))) {
+ 		/*
+ 		 * Map the VGIC hardware resources before running a vcpu the
+@@ -591,6 +589,8 @@ static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
+ 		static_branch_inc(&userspace_irqchip_in_use);
  	}
  
- 	if (vgic_has_its(kvm))
-@@ -362,6 +365,7 @@ void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
- 	vgic_flush_pending_lpis(vcpu);
- 
- 	INIT_LIST_HEAD(&vgic_cpu->ap_list_head);
-+	vgic_cpu->rd_iodev.base_addr = VGIC_ADDR_UNDEF;
- }
- 
- /* To be called with kvm->lock held */
++	vcpu->arch.has_run_once = true;
++
+ 	ret = kvm_timer_enable(vcpu);
+ 	if (ret)
+ 		return ret;
 -- 
 2.21.3
 
