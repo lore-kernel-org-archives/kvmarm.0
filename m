@@ -2,84 +2,76 @@ Return-Path: <SRS0=BtxD=GR=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 383F3C433E0
-	for <kvmarm@archiver.kernel.org>; Thu, 14 Jan 2021 10:16:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE2F2C433DB
+	for <kvmarm@archiver.kernel.org>; Thu, 14 Jan 2021 10:37:25 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 76AAF23A50
-	for <kvmarm@archiver.kernel.org>; Thu, 14 Jan 2021 10:16:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76AAF23A50
+	by mail.kernel.org (Postfix) with ESMTP id 266B223A52
+	for <kvmarm@archiver.kernel.org>; Thu, 14 Jan 2021 10:37:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 266B223A52
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BE894B0B2;
-	Thu, 14 Jan 2021 05:16:38 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5FF584B19F;
+	Thu, 14 Jan 2021 05:37:24 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6YdBA7WjM2M1; Thu, 14 Jan 2021 05:16:37 -0500 (EST)
+	with ESMTP id fAzBQTfj2L63; Thu, 14 Jan 2021 05:37:23 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B6464B173;
-	Thu, 14 Jan 2021 05:16:37 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DE374B1A0;
+	Thu, 14 Jan 2021 05:37:23 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2AC4F4B173
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jan 2021 05:16:36 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8AA5D4B195
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jan 2021 05:37:21 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MGlFWzgLgJL6 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 14 Jan 2021 05:16:35 -0500 (EST)
+ with ESMTP id hMmtFedkUT+A for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 14 Jan 2021 05:37:20 -0500 (EST)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [63.128.21.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C2C24B16D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jan 2021 05:16:35 -0500 (EST)
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 50F914B190
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jan 2021 05:37:20 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1610619395;
+ s=mimecast20190719; t=1610620640;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=IaIUvaMv2k9j6w56+5o78W95fqxpiStrTQ2Nmkvuj38=;
- b=RGbjNInH2fJJZFFXJQ095eYSbv7ISpZDfABqWhUIgjzNj2K1Mk1I/dlRV2FOVbd7hkeQP6
- Rkz9TlxF8r3UbNA2XOgXgXumKVEHPJEJdkJixFS8GkxjUOgVpA8ggI4lb9Wkvh71Sfhcx6
- fFJ1MOx+Ozd5WNrJCxhyA1XbYmgnrDE=
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=HoKabFZExfQoqXWLgrTNIdYwFwDTVzFUWj3mj+mPnlI=;
+ b=S8u32H0m+TOumlD8vnciw8y8wzmDZxZd2sljQOnlT3n+3aTfSd0HYYIMlvQQ+3n/LPvI5D
+ 07f/Lpb92Ckv0zTGsmLKh19JimxqTPwyt/MWz0MmgqNpdkKZOqgHY5VGSjLHZAdQTosD6G
+ /mg/CTFf4RugOXpRI6WiIML0yeL4ezU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-156-5iw1vXHqMKWXyi8cUWxbLg-1; Thu, 14 Jan 2021 05:16:33 -0500
-X-MC-Unique: 5iw1vXHqMKWXyi8cUWxbLg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-179-o-aRXnmkOWeaGKvKExWNCQ-1; Thu, 14 Jan 2021 05:37:18 -0500
+X-MC-Unique: o-aRXnmkOWeaGKvKExWNCQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EB979107ACFB;
- Thu, 14 Jan 2021 10:16:31 +0000 (UTC)
-Received: from [10.36.114.165] (ovpn-114-165.ams2.redhat.com [10.36.114.165])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 05D4019C47;
- Thu, 14 Jan 2021 10:16:28 +0000 (UTC)
-Subject: Re: [PATCH 8/9] KVM: arm64: vgic-v3: Expose GICR_TYPER.Last for
- userspace
-To: Alexandru Elisei <alexandru.elisei@arm.com>, eric.auger.pro@gmail.com,
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A96A1009446;
+ Thu, 14 Jan 2021 10:37:16 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-114-165.ams2.redhat.com [10.36.114.165])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7DBCF12D7E;
+ Thu, 14 Jan 2021 10:37:10 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com,
  linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
  kvmarm@lists.cs.columbia.edu, maz@kernel.org, drjones@redhat.com
-References: <20201212185010.26579-1-eric.auger@redhat.com>
- <20201212185010.26579-9-eric.auger@redhat.com>
- <45a364ec-eac6-a04b-9654-e97970186839@arm.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <7078b0a5-fb18-5e65-953a-8a55009aa2be@redhat.com>
-Date: Thu, 14 Jan 2021 11:16:27 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+Subject: [PATCH v2 0/9] KVM/ARM: Some vgic fixes and init sequence KVM
+ selftests
+Date: Thu, 14 Jan 2021 11:36:59 +0100
+Message-Id: <20210114103708.26763-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <45a364ec-eac6-a04b-9654-e97970186839@arm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Cc: shuah@kernel.org, pbonzini@redhat.com
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Cc: pbonzini@redhat.com, shuah@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -96,102 +88,52 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Alexandru,
+While writting vgic v3 init sequence KVM selftests I noticed some
+relatively minor issues. This was also the opportunity to try to
+fix the issue laterly reported by Zenghui, related to the RDIST_TYPER
+last bit emulation. The final patch is a first batch of VGIC init
+sequence selftests. Of course they can be augmented with a lot more
+register access tests, but let's try to move forward incrementally ...
 
-On 1/12/21 6:02 PM, Alexandru Elisei wrote:
-> Hi Eric,
-> 
-> On 12/12/20 6:50 PM, Eric Auger wrote:
->> Commit 23bde34771f1 ("KVM: arm64: vgic-v3: Drop the
->> reporting of GICR_TYPER.Last for userspace") temporarily fixed
->> a bug identified when attempting to access the GICR_TYPER
->> register before the redistributor region setting but dropped
->> the support of the LAST bit. This patch restores its
->> support (if the redistributor region was set) while keeping the
->> code safe.
-> 
-> I suppose the reason for emulating GICR_TYPER.Last is for architecture compliance,
-> right? I think that should be in the commit message.
-OK added this in the commit msg.
-> 
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> ---
->>  arch/arm64/kvm/vgic/vgic-mmio-v3.c | 7 ++++++-
->>  include/kvm/arm_vgic.h             | 1 +
->>  2 files changed, 7 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
->> index 581f0f490000..2f9ef6058f6e 100644
->> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
->> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
->> @@ -277,6 +277,8 @@ static unsigned long vgic_uaccess_read_v3r_typer(struct kvm_vcpu *vcpu,
->>  						 gpa_t addr, unsigned int len)
->>  {
->>  	unsigned long mpidr = kvm_vcpu_get_mpidr_aff(vcpu);
->> +	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
->> +	struct vgic_redist_region *rdreg = vgic_cpu->rdreg;
->>  	int target_vcpu_id = vcpu->vcpu_id;
->>  	u64 value;
->>  
->> @@ -286,7 +288,9 @@ static unsigned long vgic_uaccess_read_v3r_typer(struct kvm_vcpu *vcpu,
->>  	if (vgic_has_its(vcpu->kvm))
->>  		value |= GICR_TYPER_PLPIS;
->>  
->> -	/* reporting of the Last bit is not supported for userspace */
->> +	if (rdreg && (vgic_cpu->rdreg_index == (rdreg->free_index - 1)))
->> +		value |= GICR_TYPER_LAST;
->> +
->>  	return extract_bytes(value, addr & 7, len);
->>  }
->>  
->> @@ -714,6 +718,7 @@ int vgic_register_redist_iodev(struct kvm_vcpu *vcpu)
->>  		return -EINVAL;
->>  
->>  	vgic_cpu->rdreg = rdreg;
->> +	vgic_cpu->rdreg_index = rdreg->free_index;
-> 
-> What happens if the next redistributor region we register has the base address
-> adjacent to this one?
-> 
-> I'm really not familiar with the code, but is it not possible to create two
-> Redistributor regions (via
-> KVM_DEV_ARM_VGIC_GRP_ADDR(KVM_VGIC_V3_ADDR_TYPE_REDIST)) where the second
-> Redistributor region start address is immediately after the last Redistributor in
-> the preceding region?
-KVM_VGIC_V3_ADDR_TYPE_REDIST only allows to create a single rdist
-region. Only KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION allows to register
-several of them.
-
-with KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, it is possible to register
-adjacent rdist regions. vgic_v3_rdist_free_slot() previously returned
-the 1st rdist region where enough space remains for inserting the new
-reg. We put the rdist at the free index there.
-
-But maybe I misunderstood your question?
-
-Thanks
+Best Regards
 
 Eric
-> 
-> Thanks,
-> Alex
->>  
->>  	rd_base = rdreg->base + rdreg->free_index * KVM_VGIC_V3_REDIST_SIZE;
->>  
->> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
->> index a8d8fdcd3723..596c069263a7 100644
->> --- a/include/kvm/arm_vgic.h
->> +++ b/include/kvm/arm_vgic.h
->> @@ -322,6 +322,7 @@ struct vgic_cpu {
->>  	 */
->>  	struct vgic_io_device	rd_iodev;
->>  	struct vgic_redist_region *rdreg;
->> +	u32 rdreg_index;
->>  
->>  	/* Contains the attributes and gpa of the LPI pending tables. */
->>  	u64 pendbaser;
-> 
+
+This series can be found at:
+https://github.com/eauger/linux/tree/vgic_kvmselftests_v2
+
+History:
+- Took into account all comments from Marc and Alexandru's except
+  the has_run_once still after the map_resources (this would oblige
+  me to revisit in depth the selftests)
+
+Eric Auger (9):
+  KVM: arm64: vgic-v3: Fix some error codes when setting RDIST base
+  KVM: arm64: Fix KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION read
+  KVM: arm64: vgic-v3: Fix error handling in vgic_v3_set_redist_base()
+  KVM: arm/arm64: vgic: Reset base address on kvm_vgic_dist_destroy()
+  KVM: arm: move has_run_once after the map_resources
+  docs: kvm: devices/arm-vgic-v3: enhance KVM_DEV_ARM_VGIC_CTRL_INIT doc
+  KVM: arm64: Simplify argument passing to vgic_uaccess_[read|write]
+  KVM: arm64: vgic-v3: Expose GICR_TYPER.Last for userspace
+  KVM: selftests: aarch64/vgic-v3 init sequence tests
+
+ .../virt/kvm/devices/arm-vgic-v3.rst          |   2 +-
+ arch/arm64/kvm/arm.c                          |   4 +-
+ arch/arm64/kvm/vgic/vgic-init.c               |   6 +-
+ arch/arm64/kvm/vgic/vgic-kvm-device.c         |   3 +
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c            |  30 +-
+ arch/arm64/kvm/vgic/vgic-mmio.c               |  10 +-
+ include/kvm/arm_vgic.h                        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../testing/selftests/kvm/aarch64/vgic_init.c | 453 ++++++++++++++++++
+ .../testing/selftests/kvm/include/kvm_util.h  |   5 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  51 ++
+ 11 files changed, 546 insertions(+), 20 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/aarch64/vgic_init.c
+
+-- 
+2.21.3
 
 _______________________________________________
 kvmarm mailing list
