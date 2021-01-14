@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21DF7C433E6
-	for <kvmarm@archiver.kernel.org>; Thu, 14 Jan 2021 10:57:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1E67C433DB
+	for <kvmarm@archiver.kernel.org>; Thu, 14 Jan 2021 10:57:02 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A186D23A59
-	for <kvmarm@archiver.kernel.org>; Thu, 14 Jan 2021 10:57:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A186D23A59
+	by mail.kernel.org (Postfix) with ESMTP id 73D3223A59
+	for <kvmarm@archiver.kernel.org>; Thu, 14 Jan 2021 10:57:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73D3223A59
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 437144A522;
-	Thu, 14 Jan 2021 05:57:00 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 146074B1B6;
+	Thu, 14 Jan 2021 05:57:02 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id vKcVVlwCzNDg; Thu, 14 Jan 2021 05:56:59 -0500 (EST)
+	with ESMTP id Kd3FWtNScSjD; Thu, 14 Jan 2021 05:57:01 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E62D4B180;
-	Thu, 14 Jan 2021 05:56:57 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B136E4B1C5;
+	Thu, 14 Jan 2021 05:56:58 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 84DF74B1B6
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jan 2021 05:56:56 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E3EDF4A522
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jan 2021 05:56:57 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XvsNYYzRp2U6 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 14 Jan 2021 05:56:55 -0500 (EST)
+ with ESMTP id PYBLgfQUIcmh for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 14 Jan 2021 05:56:56 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 530064B19A
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CA1524B1B3
  for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jan 2021 05:56:54 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 7827123A55;
+ by mail.kernel.org (Postfix) with ESMTPSA id EC44E23A56;
  Thu, 14 Jan 2021 10:56:53 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1l00J9-007Tvz-NA; Thu, 14 Jan 2021 10:56:51 +0000
+ id 1l00JA-007Tvz-7m; Thu, 14 Jan 2021 10:56:52 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH 5/6] KVM: arm64: Limit the debug architecture to ARMv8.0
-Date: Thu, 14 Jan 2021 10:56:32 +0000
-Message-Id: <20210114105633.2558739-6-maz@kernel.org>
+Subject: [PATCH 6/6] KVM: arm64: Upgrade PMU support to ARMv8.4
+Date: Thu, 14 Jan 2021 10:56:33 +0000
+Message-Id: <20210114105633.2558739-7-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210114105633.2558739-1-maz@kernel.org>
 References: <20210114105633.2558739-1-maz@kernel.org>
@@ -81,28 +81,42 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Let's not pretend we support anything but ARMv8.0 as far as the
-debug architecture is concerned.
+Upgrading the PMU code from ARMv8.1 to ARMv8.4 turns out to be
+pretty easy. All that is required is support for PMMIR_EL1, which
+is read-only, and for which returning 0 is a valid option.
+
+Let's just do that and adjust what we return to the guest.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 3 +++
- 1 file changed, 3 insertions(+)
+ arch/arm64/kvm/sys_regs.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index dda16d60197b..8f79ec1fffa7 100644
+index 8f79ec1fffa7..2f4ecbd2abfb 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -1048,6 +1048,9 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
- 				 FEATURE(ID_AA64ISAR1_GPI));
- 		break;
- 	case SYS_ID_AA64DFR0_EL1:
-+		/* Limit debug to ARMv8.0 */
-+		val &= ~FEATURE(ID_AA64DFR0_DEBUGVER);
-+		val |= FIELD_PREP(FEATURE(ID_AA64DFR0_DEBUGVER), 6);
- 		/* Limit guests to PMUv3 for ARMv8.1 */
+@@ -1051,10 +1051,10 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+ 		/* Limit debug to ARMv8.0 */
+ 		val &= ~FEATURE(ID_AA64DFR0_DEBUGVER);
+ 		val |= FIELD_PREP(FEATURE(ID_AA64DFR0_DEBUGVER), 6);
+-		/* Limit guests to PMUv3 for ARMv8.1 */
++		/* Limit guests to PMUv3 for ARMv8.4 */
  		val = cpuid_feature_cap_perfmon_field(val,
  						      ID_AA64DFR0_PMUVER_SHIFT,
+-						      kvm_vcpu_has_pmu(vcpu) ? ID_AA64DFR0_PMUVER_8_1 : 0);
++						      kvm_vcpu_has_pmu(vcpu) ? ID_AA64DFR0_PMUVER_8_4 : 0);
+ 		break;
+ 	case SYS_ID_DFR0_EL1:
+ 		/* Limit guests to PMUv3 for ARMv8.1 */
+@@ -1496,6 +1496,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 
+ 	{ SYS_DESC(SYS_PMINTENSET_EL1), access_pminten, reset_unknown, PMINTENSET_EL1 },
+ 	{ SYS_DESC(SYS_PMINTENCLR_EL1), access_pminten, reset_unknown, PMINTENSET_EL1 },
++	{ SYS_DESC(SYS_PMMIR_EL1), trap_raz_wi },
+ 
+ 	{ SYS_DESC(SYS_MAIR_EL1), access_vm_reg, reset_unknown, MAIR_EL1 },
+ 	{ SYS_DESC(SYS_AMAIR_EL1), access_vm_reg, reset_amair_el1, AMAIR_EL1 },
 -- 
 2.29.2
 
