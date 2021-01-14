@@ -6,53 +6,52 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E3FCC433E9
-	for <kvmarm@archiver.kernel.org>; Thu, 14 Jan 2021 10:56:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A5D5C433DB
+	for <kvmarm@archiver.kernel.org>; Thu, 14 Jan 2021 10:57:00 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B04C523A59
-	for <kvmarm@archiver.kernel.org>; Thu, 14 Jan 2021 10:56:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B04C523A59
+	by mail.kernel.org (Postfix) with ESMTP id D144023A58
+	for <kvmarm@archiver.kernel.org>; Thu, 14 Jan 2021 10:56:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D144023A58
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 51F424B117;
-	Thu, 14 Jan 2021 05:56:58 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 796D44B1AC;
+	Thu, 14 Jan 2021 05:56:59 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 1OXEBs7SLpTz; Thu, 14 Jan 2021 05:56:57 -0500 (EST)
+	with ESMTP id ZZzgILOHXQ3P; Thu, 14 Jan 2021 05:56:58 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5388C4B1C8;
-	Thu, 14 Jan 2021 05:56:56 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E6E84B1A3;
+	Thu, 14 Jan 2021 05:56:57 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 745154B16F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jan 2021 05:56:54 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F40A4B16F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jan 2021 05:56:56 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id r7wJwXySe-0y for <kvmarm@lists.cs.columbia.edu>;
- Thu, 14 Jan 2021 05:56:53 -0500 (EST)
+ with ESMTP id G+hdT9z7f0iH for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 14 Jan 2021 05:56:54 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 666744B08F
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D0B674B082
  for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jan 2021 05:56:53 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 7BA6E23A52;
+ by mail.kernel.org (Postfix) with ESMTPSA id EBFF223A53;
  Thu, 14 Jan 2021 10:56:52 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1l00J8-007Tvz-Ny; Thu, 14 Jan 2021 10:56:50 +0000
+ id 1l00J9-007Tvz-7O; Thu, 14 Jan 2021 10:56:51 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH 3/6] KVM: arm64: Add handling of AArch32 PCMEID{2,
- 3} PMUv3 registers
-Date: Thu, 14 Jan 2021 10:56:30 +0000
-Message-Id: <20210114105633.2558739-4-maz@kernel.org>
+Subject: [PATCH 4/6] KVM: arm64: Refactor filtering of ID registers
+Date: Thu, 14 Jan 2021 10:56:31 +0000
+Message-Id: <20210114105633.2558739-5-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210114105633.2558739-1-maz@kernel.org>
 References: <20210114105633.2558739-1-maz@kernel.org>
@@ -82,62 +81,103 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Despite advertising support for AArch32 PMUv3p1, we fail to handle
-the PMCEID{2,3} registers, which conveniently alias with with the top
-bits of PMCEID{0,1}_EL1.
+Our current ID register filtering is starting to be a mess of if()
+statements, and isn't going to get any saner.
 
-Implement these registers with the usual AA32(HI/LO) aliasing
-mechanism.
+Let's turn it into a switch(), which has a chance of being more
+readable, and introduce a FEATURE() macro that allows easy generation
+of feature masks.
+
+No functionnal change intended.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 51 +++++++++++++++++++++------------------
+ 1 file changed, 28 insertions(+), 23 deletions(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index ce08d28ab15c..2bea0494b81d 100644
+index 2bea0494b81d..dda16d60197b 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -685,14 +685,18 @@ static bool access_pmselr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- static bool access_pmceid(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 			  const struct sys_reg_desc *r)
- {
--	u64 pmceid;
-+	u64 pmceid, mask, shift;
+@@ -9,6 +9,7 @@
+  *          Christoffer Dall <c.dall@virtualopensystems.com>
+  */
  
- 	BUG_ON(p->is_write);
++#include <linux/bitfield.h>
+ #include <linux/bsearch.h>
+ #include <linux/kvm_host.h>
+ #include <linux/mm.h>
+@@ -1016,6 +1017,8 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
+ 	return true;
+ }
  
- 	if (pmu_access_el0_disabled(vcpu))
- 		return false;
- 
-+	get_access_mask(r, &mask, &shift);
++#define FEATURE(x)	(GENMASK_ULL(x##_SHIFT + 3, x##_SHIFT))
 +
- 	pmceid = kvm_pmu_get_pmceid(vcpu, (p->Op2 & 1));
-+	pmceid &= mask;
-+	pmceid >>= shift;
+ /* Read a sanitised cpufeature ID register by sys_reg_desc */
+ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+ 		struct sys_reg_desc const *r, bool raz)
+@@ -1024,36 +1027,38 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+ 			 (u32)r->CRn, (u32)r->CRm, (u32)r->Op2);
+ 	u64 val = raz ? 0 : read_sanitised_ftr_reg(id);
  
- 	p->regval = pmceid;
+-	if (id == SYS_ID_AA64PFR0_EL1) {
++	switch (id) {
++	case SYS_ID_AA64PFR0_EL1:
+ 		if (!vcpu_has_sve(vcpu))
+-			val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
+-		val &= ~(0xfUL << ID_AA64PFR0_AMU_SHIFT);
+-		val &= ~(0xfUL << ID_AA64PFR0_CSV2_SHIFT);
+-		val |= ((u64)vcpu->kvm->arch.pfr0_csv2 << ID_AA64PFR0_CSV2_SHIFT);
+-		val &= ~(0xfUL << ID_AA64PFR0_CSV3_SHIFT);
+-		val |= ((u64)vcpu->kvm->arch.pfr0_csv3 << ID_AA64PFR0_CSV3_SHIFT);
+-	} else if (id == SYS_ID_AA64PFR1_EL1) {
+-		val &= ~(0xfUL << ID_AA64PFR1_MTE_SHIFT);
+-	} else if (id == SYS_ID_AA64ISAR1_EL1 && !vcpu_has_ptrauth(vcpu)) {
+-		val &= ~((0xfUL << ID_AA64ISAR1_APA_SHIFT) |
+-			 (0xfUL << ID_AA64ISAR1_API_SHIFT) |
+-			 (0xfUL << ID_AA64ISAR1_GPA_SHIFT) |
+-			 (0xfUL << ID_AA64ISAR1_GPI_SHIFT));
+-	} else if (id == SYS_ID_AA64DFR0_EL1) {
+-		u64 cap = 0;
+-
++			val &= ~FEATURE(ID_AA64PFR0_SVE);
++		val &= ~FEATURE(ID_AA64PFR0_AMU);
++		val &= ~FEATURE(ID_AA64PFR0_CSV2);
++		val |= FIELD_PREP(FEATURE(ID_AA64PFR0_CSV2), (u64)vcpu->kvm->arch.pfr0_csv2);
++		val &= ~FEATURE(ID_AA64PFR0_CSV3);
++		val |= FIELD_PREP(FEATURE(ID_AA64PFR0_CSV3), (u64)vcpu->kvm->arch.pfr0_csv3);
++		break;
++	case SYS_ID_AA64PFR1_EL1:
++		val &= ~FEATURE(ID_AA64PFR1_MTE);
++		break;
++	case SYS_ID_AA64ISAR1_EL1:
++		if (!vcpu_has_ptrauth(vcpu))
++			val &= ~(FEATURE(ID_AA64ISAR1_APA) |
++				 FEATURE(ID_AA64ISAR1_API) |
++				 FEATURE(ID_AA64ISAR1_GPA) |
++				 FEATURE(ID_AA64ISAR1_GPI));
++		break;
++	case SYS_ID_AA64DFR0_EL1:
+ 		/* Limit guests to PMUv3 for ARMv8.1 */
+-		if (kvm_vcpu_has_pmu(vcpu))
+-			cap = ID_AA64DFR0_PMUVER_8_1;
+-
+ 		val = cpuid_feature_cap_perfmon_field(val,
+-						ID_AA64DFR0_PMUVER_SHIFT,
+-						cap);
+-	} else if (id == SYS_ID_DFR0_EL1) {
++						      ID_AA64DFR0_PMUVER_SHIFT,
++						      kvm_vcpu_has_pmu(vcpu) ? ID_AA64DFR0_PMUVER_8_1 : 0);
++		break;
++	case SYS_ID_DFR0_EL1:
+ 		/* Limit guests to PMUv3 for ARMv8.1 */
+ 		val = cpuid_feature_cap_perfmon_field(val,
+ 						      ID_DFR0_PERFMON_SHIFT,
+ 						      kvm_vcpu_has_pmu(vcpu) ? ID_DFR0_PERFMON_8_1 : 0);
++		break;
+ 	}
  
-@@ -1895,8 +1899,8 @@ static const struct sys_reg_desc cp15_regs[] = {
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 3), access_pmovs },
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 4), access_pmswinc },
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 5), access_pmselr },
--	{ Op1( 0), CRn( 9), CRm(12), Op2( 6), access_pmceid },
--	{ Op1( 0), CRn( 9), CRm(12), Op2( 7), access_pmceid },
-+	{ AA32(LO), Op1( 0), CRn( 9), CRm(12), Op2( 6), access_pmceid },
-+	{ AA32(LO), Op1( 0), CRn( 9), CRm(12), Op2( 7), access_pmceid },
- 	{ Op1( 0), CRn( 9), CRm(13), Op2( 0), access_pmu_evcntr },
- 	{ Op1( 0), CRn( 9), CRm(13), Op2( 1), access_pmu_evtyper },
- 	{ Op1( 0), CRn( 9), CRm(13), Op2( 2), access_pmu_evcntr },
-@@ -1904,6 +1908,8 @@ static const struct sys_reg_desc cp15_regs[] = {
- 	{ Op1( 0), CRn( 9), CRm(14), Op2( 1), access_pminten },
- 	{ Op1( 0), CRn( 9), CRm(14), Op2( 2), access_pminten },
- 	{ Op1( 0), CRn( 9), CRm(14), Op2( 3), access_pmovs },
-+	{ AA32(HI), Op1( 0), CRn( 9), CRm(14), Op2( 4), access_pmceid },
-+	{ AA32(HI), Op1( 0), CRn( 9), CRm(14), Op2( 5), access_pmceid },
- 
- 	/* PRRR/MAIR0 */
- 	{ AA32(LO), Op1( 0), CRn(10), CRm( 2), Op2( 0), access_vm_reg, NULL, MAIR_EL1 },
+ 	return val;
 -- 
 2.29.2
 
