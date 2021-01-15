@@ -2,81 +2,68 @@ Return-Path: <SRS0=f0/l=GS=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8559C433E0
-	for <kvmarm@archiver.kernel.org>; Fri, 15 Jan 2021 14:01:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A065CC433E0
+	for <kvmarm@archiver.kernel.org>; Fri, 15 Jan 2021 14:03:33 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 73F9823772
-	for <kvmarm@archiver.kernel.org>; Fri, 15 Jan 2021 14:01:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73F9823772
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 0B509238A0
+	for <kvmarm@archiver.kernel.org>; Fri, 15 Jan 2021 14:03:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B509238A0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 14E384B1C8;
-	Fri, 15 Jan 2021 09:01:41 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 97C9C4B1BF;
+	Fri, 15 Jan 2021 09:03:32 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id dvrIPEj9Phoc; Fri, 15 Jan 2021 09:01:40 -0500 (EST)
+	with ESMTP id bAYrzh6SP92U; Fri, 15 Jan 2021 09:03:31 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 11D014B15B;
-	Fri, 15 Jan 2021 09:01:40 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FF8A4B169;
+	Fri, 15 Jan 2021 09:03:31 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B0584B1B6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2021 09:01:38 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D63AB4B15F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2021 09:03:30 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ithzAJv3Gd8v for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 Jan 2021 09:01:37 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 791F14B16C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2021 09:01:36 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1610719296;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=wR0ZOXj1CL5xBSwSHiAU/pRR3SrX7XQb4/oR0asLAWI=;
- b=NeC/noIpjEIte+8+TAkTRZiOchxtpsy7XWXIAphxb12wpmdxHlIwRAYL0k6ZQiBUmYU/4F
- thyn5JpzoLq11Xt3eOpkGIdXYJxTO4WGxvHL9kUPCEeis1pFlSBVDpmN3hOyqrIXMC7zkn
- 6ZcYN5VSZ4i4LE8zlLJx2OASMQnjbX4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-63-mo4GxPgLOQi8BfUM27e34g-1; Fri, 15 Jan 2021 09:01:32 -0500
-X-MC-Unique: mo4GxPgLOQi8BfUM27e34g-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ with ESMTP id apRL6KMIgBQl for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 Jan 2021 09:03:29 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D84C84B145
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2021 09:03:29 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D9A57A0CA3;
- Fri, 15 Jan 2021 14:01:30 +0000 (UTC)
-Received: from [10.36.114.165] (ovpn-114-165.ams2.redhat.com [10.36.114.165])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D04485D9E3;
- Fri, 15 Jan 2021 14:01:28 +0000 (UTC)
-Subject: Re: [PATCH 5/6] KVM: arm64: Limit the debug architecture to ARMv8.0
-To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-References: <20210114105633.2558739-1-maz@kernel.org>
- <20210114105633.2558739-6-maz@kernel.org>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <0abf9e50-4122-45aa-04e4-34cdc3627f57@redhat.com>
-Date: Fri, 15 Jan 2021 15:01:27 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ by mail.kernel.org (Postfix) with ESMTPSA id A4AD42388E;
+ Fri, 15 Jan 2021 14:03:28 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1l0PhG-007m8M-Pg; Fri, 15 Jan 2021 14:03:26 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.cs.columbia.edu
+Subject: [PATCH v2 0/2] KVM: arm64: Work around firmware wongly advertising
+ GICv2 compatibility
+Date: Fri, 15 Jan 2021 14:03:21 +0000
+Message-Id: <20210115140323.2682634-1-maz@kernel.org>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-In-Reply-To: <20210114105633.2558739-6-maz@kernel.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Cc: kernel-team@android.com
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, shameerali.kolothum.thodi@huawei.com,
+ james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+ ardb@kernel.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, Ard Biesheuvel <ardb@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,35 +80,42 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+It appears that there is firmware out there that advertises GICv2
+compatibility on GICv3, despite the CPUs not being able to actually do
+it. That's a bummer, and at best creates unexpected behaviours for the
+users. At worse, it will crash the machine. Awesome!
 
-On 1/14/21 11:56 AM, Marc Zyngier wrote:
-> Let's not pretend we support anything but ARMv8.0 as far as the
-> debug architecture is concerned.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+In order to mitigate this issue, try and validate whether we can
+actually flip the CPU into supporting MMIO accesses instead of system
+registers. If we can't, ignore the compatibility information and
+shout. It's not completely foolproof, but it should cover the existing
+broken platforms...
 
-Eric
-> ---
->  arch/arm64/kvm/sys_regs.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index dda16d60197b..8f79ec1fffa7 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1048,6 +1048,9 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
->  				 FEATURE(ID_AA64ISAR1_GPI));
->  		break;
->  	case SYS_ID_AA64DFR0_EL1:
-> +		/* Limit debug to ARMv8.0 */
-> +		val &= ~FEATURE(ID_AA64DFR0_DEBUGVER);
-> +		val |= FIELD_PREP(FEATURE(ID_AA64DFR0_DEBUGVER), 6);
->  		/* Limit guests to PMUv3 for ARMv8.1 */
->  		val = cpuid_feature_cap_perfmon_field(val,
->  						      ID_AA64DFR0_PMUVER_SHIFT,
-> 
+The workaround is much more invasive than Shameer's initial proposal,
+as I wanted to keep it localised to KVM instead of spreading the
+horror at every level (after all, only KVM is concerned with v2
+compatibility).
+
+Tested on a deliberately misconfigured FVP (DT advertising the MMIO
+regions with cluster*.gicv3.cpuintf-mmap-access-level=2).
+
+* From v1:
+  - Fixed silly thinko when computing the configuration state
+
+Marc Zyngier (2):
+  KVM: arm64: Rename __vgic_v3_get_ich_vtr_el2() to
+    __vgic_v3_get_gic_config()
+  KVM: arm64: Workaround firmware wrongly advertising GICv2-on-v3
+    compatibility
+
+ arch/arm64/include/asm/kvm_asm.h   |  4 +--
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c |  6 ++---
+ arch/arm64/kvm/hyp/vgic-v3-sr.c    | 40 ++++++++++++++++++++++++++++--
+ arch/arm64/kvm/vgic/vgic-v3.c      | 12 ++++++---
+ 4 files changed, 52 insertions(+), 10 deletions(-)
+
+-- 
+2.29.2
 
 _______________________________________________
 kvmarm mailing list
