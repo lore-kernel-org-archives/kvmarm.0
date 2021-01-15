@@ -2,69 +2,70 @@ Return-Path: <SRS0=f0/l=GS=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86FB2C433DB
-	for <kvmarm@archiver.kernel.org>; Fri, 15 Jan 2021 10:23:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBAD5C433DB
+	for <kvmarm@archiver.kernel.org>; Fri, 15 Jan 2021 11:20:55 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id EA932236FB
-	for <kvmarm@archiver.kernel.org>; Fri, 15 Jan 2021 10:23:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA932236FB
+	by mail.kernel.org (Postfix) with ESMTP id 5F0B423730
+	for <kvmarm@archiver.kernel.org>; Fri, 15 Jan 2021 11:20:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F0B423730
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 63D704B19E;
-	Fri, 15 Jan 2021 05:23:47 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 92D374B191;
+	Fri, 15 Jan 2021 06:20:54 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id oVgYFAi+DKc1; Fri, 15 Jan 2021 05:23:46 -0500 (EST)
+	with ESMTP id zyXu4K3-+P8I; Fri, 15 Jan 2021 06:20:52 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 556C34B177;
-	Fri, 15 Jan 2021 05:23:46 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8EEBB4B197;
+	Fri, 15 Jan 2021 06:20:52 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C69744B177
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2021 05:23:44 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 02CBC4B191
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2021 06:20:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gSOmgZmsBZgK for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 Jan 2021 05:23:42 -0500 (EST)
+ with ESMTP id mmkTIohQAtBN for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 Jan 2021 06:20:49 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B880C4B141
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2021 05:23:42 -0500 (EST)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 621BE235F9;
- Fri, 15 Jan 2021 10:23:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1610706221;
- bh=c/+XqWLmQTEyndmY4XhHmEat6eBL2W+LzNHlJg1xGlc=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=GQwIacPmjs/aOm4bQ1rFpzSRDHy739OTYVDLZinf3vIbt7XaORjK14OSbDSdGh6Ij
- 7DOaM4QxtaG0JZsU18PjC4KvQa6bGICy8UpXQw29+cxhdYimqTY9stfbshm+JhT/cf
- O821VSuzWQTvjgPq0kr+fXNYeQ1z207Ns8XMzOb7LQpsEu+vFr1+8V8TLI0u9i7PFs
- Z5bY3BeoxFG57wfFcqto6uPrpKzc3NlFGlVWKMEO+wX9/J5iLo2exKI16IJ1DGDZdB
- 3c4P0oFfKYtWfyHSPqCxayXwV4nWDUlKHeBadwhZArU4E9Q7ZPhnmoyQNBaIjUW+aX
- q5yeMNOO4fmBw==
-Date: Fri, 15 Jan 2021 10:23:35 +0000
-From: Will Deacon <will@kernel.org>
-To: Keqian Zhu <zhukeqian1@huawei.com>
-Subject: Re: [PATCH] kvm: arm64: Properly align the end address of table walk
-Message-ID: <20210115102334.GA14167@willie-the-truck>
-References: <20210115095307.12912-1-zhukeqian1@huawei.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B3A334B164
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2021 06:20:49 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 885A62371F;
+ Fri, 15 Jan 2021 11:20:48 +0000 (UTC)
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
+ TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1l0N9q-007iyv-BK; Fri, 15 Jan 2021 11:20:46 +0000
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210115095307.12912-1-zhukeqian1@huawei.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org,
- Catalin Marinas <catalin.marinas@arm.com>, Joerg Roedel <joro@8bytes.org>,
- Daniel Lezcano <daniel.lezcano@linaro.org>, linux-kernel@vger.kernel.org,
- Alexios Zavras <alexios.zavras@intel.com>, Marc Zyngier <maz@kernel.org>,
- Thomas Gleixner <tglx@linutronix.de>, Robin Murphy <robin.murphy@arm.com>,
+Date: Fri, 15 Jan 2021 11:20:46 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Jianyong Wu <jianyong.wu@arm.com>
+Subject: Re: [PATCH] arm64/kvm: correct the error report in
+ kvm_handle_guest_abort
+In-Reply-To: <20210115093028.6504-1-jianyong.wu@arm.com>
+References: <20210115093028.6504-1-jianyong.wu@arm.com>
+User-Agent: Roundcube Webmail/1.4.9
+Message-ID: <6f5a2ce458e33f879635f45140293517@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: jianyong.wu@arm.com, james.morse@arm.com, will@kernel.org,
+ suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, Steve.Capper@arm.com, justin.he@arm.com,
+ nd@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: justin.he@arm.com, nd@arm.com, will@kernel.org,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -77,39 +78,114 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Jan 15, 2021 at 05:53:07PM +0800, Keqian Zhu wrote:
-> When align the end address, ought to use its original value.
+On 2021-01-15 09:30, Jianyong Wu wrote:
+> Currently, error report when cache maintenance at read-only memory 
+> range,
+> like rom, is not clear enough and even not correct. As the specific 
+> error
+> is definitely known by kvm, it is obliged to give it out.
 > 
-> Fixes: b1e57de62cfb ("KVM: arm64: Add stand-alone page-table walker infrastructure")
-> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+> Fox example, in a qemu/kvm VM, if the guest do dc at the pflash range 
+> from
+> 0 to 128M, error is reported by kvm as "Data abort outside memslots 
+> with
+> no valid syndrome info" which is not quite correct.
+> 
+> Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
 > ---
->  arch/arm64/kvm/hyp/pgtable.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  arch/arm64/kvm/mmu.c | 12 +++++++++---
+>  1 file changed, 9 insertions(+), 3 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index bdf8e55ed308..670b0ef12440 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -296,7 +296,7 @@ int kvm_pgtable_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
->  	struct kvm_pgtable_walk_data walk_data = {
->  		.pgt	= pgt,
->  		.addr	= ALIGN_DOWN(addr, PAGE_SIZE),
-> -		.end	= PAGE_ALIGN(walk_data.addr + size),
-> +		.end	= PAGE_ALIGN(addr + size),
->  		.walker	= walker,
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 7d2257cc5438..de66b7e38a5b 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1022,9 +1022,15 @@ int kvm_handle_guest_abort(struct kvm_vcpu 
+> *vcpu)
+>  		 * So let's assume that the guest is just being
+>  		 * cautious, and skip the instruction.
+>  		 */
+> -		if (kvm_is_error_hva(hva) && kvm_vcpu_dabt_is_cm(vcpu)) {
+> -			kvm_incr_pc(vcpu);
+> -			ret = 1;
+> +		if (kvm_vcpu_dabt_is_cm(vcpu)) {
+> +			if (kvm_is_error_hva(hva)) {
+> +				kvm_incr_pc(vcpu);
+> +				ret = 1;
+> +				goto out_unlock;
+> +			}
+> +
+> +			kvm_err("Do cache maintenance in the read-only memory range\n");
 
-Hmm, this is a change in behaviour, no (consider the case where both 'addr'
-and 'size' are misaligned)? The current code is consistent with the
-kerneldoc in asm/kvm_pgtable.h, so I don't see the motivation to change it.
+We don't scream on the console for guests bugs.
 
-Did you hit a bug somewhere?
+> +			ret = -EFAULT;
+>  			goto out_unlock;
+>  		}
 
-Will
+And what is userspace going to do with that? To be honest, I'd rather
+not report it in any case:
+
+- either it isn't mapped, and there is no cache to clean/invalidate
+- or it is mapped read-only:
+   - if it is a "DC IVAC", the guest should get the fault as per
+     the ARM ARM. But I don't think we can identify the particular CMO
+     at this stage, so actually performing an invalidation is the least
+     bad thing to do.
+
+How about this (untested)?
+
+         M.
+
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 7d2257cc5438..0f497faad131 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1013,16 +1013,27 @@ int kvm_handle_guest_abort(struct kvm_vcpu 
+*vcpu)
+  		}
+
+  		/*
+-		 * Check for a cache maintenance operation. Since we
+-		 * ended-up here, we know it is outside of any memory
+-		 * slot. But we can't find out if that is for a device,
+-		 * or if the guest is just being stupid. The only thing
+-		 * we know for sure is that this range cannot be cached.
++		 * Check for a cache maintenance operation. Two cases:
+  		 *
+-		 * So let's assume that the guest is just being
+-		 * cautious, and skip the instruction.
++		 * - It is outside of any memory slot. But we can't
++		 *   find out if that is for a device, or if the guest
++		 *   is just being stupid. The only thing we know for
++		 *   sure is that this range cannot be cached.  So
++		 *   let's assume that the guest is just being
++		 *   cautious, and skip the instruction.
++		 *
++		 * - Otherwise, clean/invalidate the whole memslot. We
++		 *   should special-case DC IVAC and inject a
++		 *   permission fault, but we can't really identify it
++		 *   in this context.
+  		 */
+-		if (kvm_is_error_hva(hva) && kvm_vcpu_dabt_is_cm(vcpu)) {
++		if (kvm_vcpu_dabt_is_cm(vcpu)) {
++			if (!kvm_is_error_hva(hva)) {
++				spin_lock(&vcpu->kvm->mmu_lock);
++				stage2_flush_memslot(vcpu->kvm, memslot);
++				spin_unlock(&vcpu->kvm->mmu_lock);
++			}
++
+  			kvm_incr_pc(vcpu);
+  			ret = 1;
+  			goto out_unlock;
+
+-- 
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
