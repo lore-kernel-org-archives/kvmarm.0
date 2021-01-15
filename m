@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 020C6C433DB
-	for <kvmarm@archiver.kernel.org>; Fri, 15 Jan 2021 13:05:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C517C433E6
+	for <kvmarm@archiver.kernel.org>; Fri, 15 Jan 2021 13:05:28 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 87D8B22473
-	for <kvmarm@archiver.kernel.org>; Fri, 15 Jan 2021 13:05:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87D8B22473
+	by mail.kernel.org (Postfix) with ESMTP id AF2E622473
+	for <kvmarm@archiver.kernel.org>; Fri, 15 Jan 2021 13:05:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF2E622473
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2ACA14B1DF;
-	Fri, 15 Jan 2021 08:05:13 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 528734B1DC;
+	Fri, 15 Jan 2021 08:05:27 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id GGxqQYD5NtIZ; Fri, 15 Jan 2021 08:05:12 -0500 (EST)
+	with ESMTP id dopdnOyv0yHO; Fri, 15 Jan 2021 08:05:26 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 25CE34B188;
-	Fri, 15 Jan 2021 08:05:12 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B1D94B188;
+	Fri, 15 Jan 2021 08:05:26 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BF2CF4B188
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2021 08:05:10 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 54A3B4B1C9
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2021 08:05:25 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MLiYyUOy2D5u for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 Jan 2021 08:05:09 -0500 (EST)
+ with ESMTP id yABYF2BEnUCB for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 Jan 2021 08:05:24 -0500 (EST)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [63.128.21.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E46304B177
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2021 08:05:09 -0500 (EST)
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 530924B178
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2021 08:05:24 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1610715909;
+ s=mimecast20190719; t=1610715924;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=TxvB+q754UaZObK6W0e6FWV3zXyhkRQI3H3usZ5GYkg=;
- b=AV1wygJDVlz3A2SiuAuA5XuiNhv9ELHVVi8Yc+Qqg4KCUiQZF4wgMrJdE3FY63q4pk3/Qq
- dwyN4Sj96jXSWY7xNAFl9ft535xzpAFMUC0rk4vBnr7Xe4nQB7Dbxj0GQ9xBoGnUiiyD0W
- CbPNLV3sHv+zmaxkpLesgVWWXF4xKnU=
+ bh=vWLhTMNMfb5OQjwqjkp1CSuMt4hrhA8u/fDfTDp0riM=;
+ b=YCq+8n/YuzVBUWMaGNZCzyLEeNepkrXLTl/X1GKKynv9mHaUXkvpsU6xU9zssz78g/FNFN
+ msGMocvb/j3r3sHVgUSwHQOC76RYBDEYa2KcDOknJDqD180tf43t/BROl/66GLruL4OcY+
+ 4s9JAWCR8lk57ZApOUyEPen4Izfc9Sc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-304-oVDWnzotOe6WKoNtmicpNw-1; Fri, 15 Jan 2021 08:05:05 -0500
-X-MC-Unique: oVDWnzotOe6WKoNtmicpNw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-595-pMEY7HlWP7yscBvQ2Vnpzg-1; Fri, 15 Jan 2021 08:05:21 -0500
+X-MC-Unique: pMEY7HlWP7yscBvQ2Vnpzg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4DA31A0BD5;
- Fri, 15 Jan 2021 13:05:04 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ECC8C8144ED;
+ Fri, 15 Jan 2021 13:05:19 +0000 (UTC)
 Received: from [10.36.114.165] (ovpn-114-165.ams2.redhat.com [10.36.114.165])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F4148101E81C;
- Fri, 15 Jan 2021 13:05:01 +0000 (UTC)
-Subject: Re: [PATCH 1/6] KVM: arm64: Fix missing RES1 in emulation of DBGBIDR
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0D4CA77BF6;
+ Fri, 15 Jan 2021 13:05:17 +0000 (UTC)
+Subject: Re: [PATCH 2/6] KVM: arm64: Fix AArch32 PMUv3 capping
 To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
  kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 References: <20210114105633.2558739-1-maz@kernel.org>
- <20210114105633.2558739-2-maz@kernel.org>
+ <20210114105633.2558739-3-maz@kernel.org>
 From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <23d6d1f3-758e-051c-6ca6-0bd79a91a5f1@redhat.com>
-Date: Fri, 15 Jan 2021 14:05:00 +0100
+Message-ID: <444b17ec-e737-f6ae-400d-fd2142dfb175@redhat.com>
+Date: Fri, 15 Jan 2021 14:05:16 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20210114105633.2558739-2-maz@kernel.org>
+In-Reply-To: <20210114105633.2558739-3-maz@kernel.org>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Cc: kernel-team@android.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -96,36 +96,39 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 Hi Marc,
 
 On 1/14/21 11:56 AM, Marc Zyngier wrote:
-> The AArch32 CP14 DBGDIDR has bit 15 set to RES1, which our current
-> emulation doesn't set. Just add the missing bit.
+> We shouldn't expose *any* PMU capability when no PMU has been
+> configured for this VM.
 > 
-> Reported-by: Peter Maydell <peter.maydell@linaro.org>
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
-
-
 > ---
->  arch/arm64/kvm/sys_regs.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  arch/arm64/kvm/sys_regs.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
 > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 3313dedfa505..0c0832472c4a 100644
+> index 0c0832472c4a..ce08d28ab15c 100644
 > --- a/arch/arm64/kvm/sys_regs.c
 > +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1711,7 +1711,7 @@ static bool trap_dbgidr(struct kvm_vcpu *vcpu,
->  		p->regval = ((((dfr >> ID_AA64DFR0_WRPS_SHIFT) & 0xf) << 28) |
->  			     (((dfr >> ID_AA64DFR0_BRPS_SHIFT) & 0xf) << 24) |
->  			     (((dfr >> ID_AA64DFR0_CTX_CMPS_SHIFT) & 0xf) << 20)
-> -			     | (6 << 16) | (el3 << 14) | (el3 << 12));
-> +			     | (6 << 16) | (1 << 15) | (el3 << 14) | (el3 << 12));
->  		return true;
->  	}
->  }
-> 
+> @@ -1048,8 +1048,8 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+>  	} else if (id == SYS_ID_DFR0_EL1) {
+>  		/* Limit guests to PMUv3 for ARMv8.1 */
+>  		val = cpuid_feature_cap_perfmon_field(val,
+> -						ID_DFR0_PERFMON_SHIFT,
+> -						ID_DFR0_PERFMON_8_1);
+> +						      ID_DFR0_PERFMON_SHIFT,
+> +						      kvm_vcpu_has_pmu(vcpu) ? ID_DFR0_PERFMON_8_1 : 0);
+nit: Maybe you could use the same layout for SYS_ID_AA64DFR0_EL1
+andremove cap there.
+
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Thanks
-
 Eric
+
+
+
+>  	}
+>  
+>  	return val;
+> 
 
 _______________________________________________
 kvmarm mailing list
