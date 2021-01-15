@@ -2,61 +2,72 @@ Return-Path: <SRS0=f0/l=GS=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D427C433E0
-	for <kvmarm@archiver.kernel.org>; Fri, 15 Jan 2021 15:28:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7B63C433E0
+	for <kvmarm@archiver.kernel.org>; Fri, 15 Jan 2021 16:42:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A0CD422473
-	for <kvmarm@archiver.kernel.org>; Fri, 15 Jan 2021 15:28:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0CD422473
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 484B722473
+	for <kvmarm@archiver.kernel.org>; Fri, 15 Jan 2021 16:42:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 484B722473
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 428714B1BD;
-	Fri, 15 Jan 2021 10:28:34 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B60BA4B1AA;
+	Fri, 15 Jan 2021 11:42:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 7Zbo0CXPifTG; Fri, 15 Jan 2021 10:28:33 -0500 (EST)
+	with ESMTP id QQXenvqbrfva; Fri, 15 Jan 2021 11:42:49 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 030D64B1E2;
-	Fri, 15 Jan 2021 10:28:33 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 255444B189;
+	Fri, 15 Jan 2021 11:42:49 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C06744B1FE
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2021 10:28:31 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DC7AE4B175
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2021 11:42:47 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GD8-4-S5Yzik for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 Jan 2021 10:28:30 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 243644B1E2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2021 10:28:30 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CC61412FC;
- Fri, 15 Jan 2021 07:28:29 -0800 (PST)
-Received: from e112269-lin.arm.com (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1D39C3F70D;
- Fri, 15 Jan 2021 07:28:26 -0800 (PST)
-From: Steven Price <steven.price@arm.com>
-To: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>
-Subject: [RFC PATCH v7 3/3] KVM: arm64: ioctl to fetch/store tags in a guest
-Date: Fri, 15 Jan 2021 15:28:11 +0000
-Message-Id: <20210115152811.8398-4-steven.price@arm.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20210115152811.8398-1-steven.price@arm.com>
-References: <20210115152811.8398-1-steven.price@arm.com>
+ with ESMTP id Ke8+EE+zUUXT for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 Jan 2021 11:42:46 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BD6464B155
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2021 11:42:46 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 9B538221FE;
+ Fri, 15 Jan 2021 16:42:45 +0000 (UTC)
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
+ TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1l0SBP-007o67-EU; Fri, 15 Jan 2021 16:42:43 +0000
 MIME-Version: 1.0
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
- Dave Martin <Dave.Martin@arm.com>, Juan Quintela <quintela@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
- Steven Price <steven.price@arm.com>, Thomas Gleixner <tglx@linutronix.de>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Date: Fri, 15 Jan 2021 16:42:38 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH 6/6] KVM: arm64: Upgrade PMU support to ARMv8.4
+In-Reply-To: <ec06055b-56ad-1589-7a5d-95d9f47466ce@redhat.com>
+References: <20210114105633.2558739-1-maz@kernel.org>
+ <20210114105633.2558739-7-maz@kernel.org>
+ <ec06055b-56ad-1589-7a5d-95d9f47466ce@redhat.com>
+User-Agent: Roundcube Webmail/1.4.9
+Message-ID: <28dab4367d6ced5a7d7cbc80ee77f68d@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: eric.auger@redhat.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, suzuki.poulose@arm.com,
+ kernel-team@android.com, james.morse@arm.com, alexandru.elisei@arm.com,
+ julien.thierry.kdev@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -68,144 +79,61 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The VMM may not wish to have it's own mapping of guest memory mapped
-with PROT_MTE because this causes problems if the VMM has tag checking
-enabled (the guest controls the tags in physical RAM and it's unlikely
-the tags are correct for the VMM).
+Hi Eric,
 
-Instead add a new ioctl which allows the VMM to easily read/write the
-tags from guest memory, allowing the VMM's mapping to be non-PROT_MTE
-while the VMM can still read/write the tags for the purpose of
-migration.
+On 2021-01-15 14:01, Auger Eric wrote:
+> Hi Marc,
+> 
+> On 1/14/21 11:56 AM, Marc Zyngier wrote:
+>> Upgrading the PMU code from ARMv8.1 to ARMv8.4 turns out to be
+>> pretty easy. All that is required is support for PMMIR_EL1, which
+>> is read-only, and for which returning 0 is a valid option.
+>> 
+>> Let's just do that and adjust what we return to the guest.
+>> 
+>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>> ---
+>>  arch/arm64/kvm/sys_regs.c | 5 +++--
+>>  1 file changed, 3 insertions(+), 2 deletions(-)
+>> 
+>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+>> index 8f79ec1fffa7..2f4ecbd2abfb 100644
+>> --- a/arch/arm64/kvm/sys_regs.c
+>> +++ b/arch/arm64/kvm/sys_regs.c
+>> @@ -1051,10 +1051,10 @@ static u64 read_id_reg(const struct kvm_vcpu 
+>> *vcpu,
+>>  		/* Limit debug to ARMv8.0 */
+>>  		val &= ~FEATURE(ID_AA64DFR0_DEBUGVER);
+>>  		val |= FIELD_PREP(FEATURE(ID_AA64DFR0_DEBUGVER), 6);
+>> -		/* Limit guests to PMUv3 for ARMv8.1 */
+>> +		/* Limit guests to PMUv3 for ARMv8.4 */
+>>  		val = cpuid_feature_cap_perfmon_field(val,
+>>  						      ID_AA64DFR0_PMUVER_SHIFT,
+>> -						      kvm_vcpu_has_pmu(vcpu) ? ID_AA64DFR0_PMUVER_8_1 : 0);
+>> +						      kvm_vcpu_has_pmu(vcpu) ? ID_AA64DFR0_PMUVER_8_4 : 0);
+>>  		break;
+>>  	case SYS_ID_DFR0_EL1:
+>>  		/* Limit guests to PMUv3 for ARMv8.1 */
+> what about the debug version in aarch32 state. Is it on purpose that 
+> you
+> leave it as 8_1?
 
-Signed-off-by: Steven Price <steven.price@arm.com>
----
- arch/arm64/include/uapi/asm/kvm.h | 13 +++++++
- arch/arm64/kvm/arm.c              | 59 +++++++++++++++++++++++++++++++
- include/uapi/linux/kvm.h          |  1 +
- 3 files changed, 73 insertions(+)
+That's a good point. There is also the fact that we keep reporting
+STALL_SLOT as a valid event even in PMCEID0_EL1 despite PMMIR_EL1.SLOTS
+always reporting 0.
 
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 24223adae150..5fc2534ac5df 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -184,6 +184,19 @@ struct kvm_vcpu_events {
- 	__u32 reserved[12];
- };
- 
-+struct kvm_arm_copy_mte_tags {
-+	__u64 guest_ipa;
-+	__u64 length;
-+	union {
-+		void __user *addr;
-+		__u64 padding;
-+	};
-+	__u64 flags;
-+};
-+
-+#define KVM_ARM_TAGS_TO_GUEST		0
-+#define KVM_ARM_TAGS_FROM_GUEST		1
-+
- /* If you need to interpret the index values, here is the key: */
- #define KVM_REG_ARM_COPROC_MASK		0x000000000FFF0000
- #define KVM_REG_ARM_COPROC_SHIFT	16
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index f4c2fd2e7c49..d6dd6b79bb77 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1303,6 +1303,55 @@ static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
- 	}
- }
- 
-+static int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
-+				      struct kvm_arm_copy_mte_tags *copy_tags)
-+{
-+	gpa_t guest_ipa = copy_tags->guest_ipa;
-+	size_t length = copy_tags->length;
-+	void __user *tags = copy_tags->addr;
-+	gpa_t gfn;
-+	size_t pages;
-+	bool write = !(copy_tags->flags & KVM_ARM_TAGS_FROM_GUEST);
-+
-+	if (copy_tags->flags & ~KVM_ARM_TAGS_FROM_GUEST)
-+		return -EINVAL;
-+
-+	if (length & ~PAGE_MASK || guest_ipa & ~PAGE_MASK)
-+		return -EINVAL;
-+
-+	gfn = gpa_to_gfn(guest_ipa);
-+	pages = length >> PAGE_SHIFT;
-+
-+	while (length > 0) {
-+		kvm_pfn_t pfn = gfn_to_pfn_prot(kvm, gfn, write, NULL);
-+		void *maddr;
-+		unsigned long num_tags = PAGE_SIZE / MTE_GRANULE_SIZE;
-+
-+		if (is_error_noslot_pfn(pfn))
-+			return -ENOENT;
-+
-+		maddr = page_address(pfn_to_page(pfn));
-+
-+		if (!write) {
-+			num_tags = mte_copy_tags_to_user(tags, maddr, num_tags);
-+			kvm_release_pfn_clean(pfn);
-+		} else {
-+			num_tags = mte_copy_tags_from_user(maddr, tags,
-+							   num_tags);
-+			kvm_release_pfn_dirty(pfn);
-+		}
-+
-+		if (num_tags != PAGE_SIZE / MTE_GRANULE_SIZE)
-+			return -EFAULT;
-+
-+		gfn++;
-+		tags += num_tags;
-+		length -= PAGE_SIZE;
-+	}
-+
-+	return 0;
-+}
-+
- long kvm_arch_vm_ioctl(struct file *filp,
- 		       unsigned int ioctl, unsigned long arg)
- {
-@@ -1339,6 +1388,16 @@ long kvm_arch_vm_ioctl(struct file *filp,
- 
- 		return 0;
- 	}
-+	case KVM_ARM_MTE_COPY_TAGS: {
-+		struct kvm_arm_copy_mte_tags copy_tags;
-+
-+		if (!kvm_has_mte(kvm))
-+			return -EINVAL;
-+
-+		if (copy_from_user(&copy_tags, argp, sizeof(copy_tags)))
-+			return -EFAULT;
-+		return kvm_vm_ioctl_mte_copy_tags(kvm, &copy_tags);
-+	}
- 	default:
- 		return -EINVAL;
- 	}
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index de737d5102ca..76fccb33d025 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1397,6 +1397,7 @@ struct kvm_s390_ucas_mapping {
- /* Available with KVM_CAP_PMU_EVENT_FILTER */
- #define KVM_SET_PMU_EVENT_FILTER  _IOW(KVMIO,  0xb2, struct kvm_pmu_event_filter)
- #define KVM_PPC_SVM_OFF		  _IO(KVMIO,  0xb3)
-+#define KVM_ARM_MTE_COPY_TAGS	  _IOR(KVMIO,  0xb4, struct kvm_arm_copy_mte_tags)
- 
- /* ioctl for vm fd */
- #define KVM_CREATE_DEVICE	  _IOWR(KVMIO,  0xe0, struct kvm_create_device)
+I'll fix that and resend something next week.
+
+Thanks,
+
+         M.
 -- 
-2.20.1
-
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
