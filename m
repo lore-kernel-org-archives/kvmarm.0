@@ -4,76 +4,76 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EF67C433DB
-	for <kvmarm@archiver.kernel.org>; Fri, 15 Jan 2021 18:01:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3567C433DB
+	for <kvmarm@archiver.kernel.org>; Fri, 15 Jan 2021 19:15:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CB2E723603
-	for <kvmarm@archiver.kernel.org>; Fri, 15 Jan 2021 18:01:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB2E723603
+	by mail.kernel.org (Postfix) with ESMTP id 53406235F8
+	for <kvmarm@archiver.kernel.org>; Fri, 15 Jan 2021 19:15:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53406235F8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B3EE4A4A4;
-	Fri, 15 Jan 2021 13:01:56 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 80AF24B1BE;
+	Fri, 15 Jan 2021 14:15:00 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ljsNEODf0-tb; Fri, 15 Jan 2021 13:01:54 -0500 (EST)
+	with ESMTP id TxefZ33iDiUL; Fri, 15 Jan 2021 14:14:59 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E26FB4B173;
-	Fri, 15 Jan 2021 13:01:54 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1787C4B1AA;
+	Fri, 15 Jan 2021 14:14:59 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 60BAF4B133
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2021 13:01:54 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CDC574B1AA
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2021 14:14:57 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TQkkSxHrlAYq for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 Jan 2021 13:01:53 -0500 (EST)
+ with ESMTP id mrv0TZzqsLHY for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 Jan 2021 14:14:56 -0500 (EST)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [63.128.21.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 404714B0B1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2021 13:01:53 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B66EA4B18C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2021 14:14:56 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1610733712;
+ s=mimecast20190719; t=1610738096;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Gq10Kr5xse22ieR9b4aF/0j+yRbARGW5WK7gbGTTvCI=;
- b=Rffeyu0QF33Fu92yoYDsCDIi0o8ZCnL8iyKebBOKZhnqpf8nMYy+xbIT+X3PRhaZ1aEKT2
- EzaEiN3z49Y+xPTy675nWhWvnM6apOceRdtgBqV4psYhnYny31sV1dMPOMANu5+4R+mryw
- VYfu0wMKyzs07qFsAgZFmtnbCs3p1Zc=
+ bh=v4FwxeAEyXEI6CWznvqU5AtMWFcpWnT8O1IOjG3Vr1Y=;
+ b=NO6McH48ardHju9sMXHupcDuh6pwTCoRH5AgZxbKyA5QFzDmGZjdr64BNKjaTfYeEKkjCY
+ FdpJUeI2TuwKEG6ny/1kjluykJSZJC84Dqq6El6pHIjyCbqoKrYX2PEBOxqDlVOTT1sM5v
+ IqXBLXbSXoA8aoG0c+v3+Y8tvlDYehM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-280-gAhkavzzP3CD-QHWbBOljQ-1; Fri, 15 Jan 2021 13:01:50 -0500
-X-MC-Unique: gAhkavzzP3CD-QHWbBOljQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-246-QqrpG32lOIWZOPK7xYEGTg-1; Fri, 15 Jan 2021 14:14:52 -0500
+X-MC-Unique: QqrpG32lOIWZOPK7xYEGTg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A11F6107ACF8;
- Fri, 15 Jan 2021 18:01:47 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 93C32806662;
+ Fri, 15 Jan 2021 19:14:49 +0000 (UTC)
 Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com
  [10.3.112.255])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 90E4460BF3;
- Fri, 15 Jan 2021 18:01:45 +0000 (UTC)
-Date: Fri, 15 Jan 2021 11:01:44 -0700
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D6AFB5D9C6;
+ Fri, 15 Jan 2021 19:14:47 +0000 (UTC)
+Date: Fri, 15 Jan 2021 12:14:47 -0700
 From: Alex Williamson <alex.williamson@redhat.com>
 To: Keqian Zhu <zhukeqian1@huawei.com>
-Subject: Re: [PATCH v2 1/2] vfio/iommu_type1: Populate full dirty when
- detach non-pinned group
-Message-ID: <20210115110144.61e3c843@omen.home.shazbot.org>
-In-Reply-To: <20210115092643.728-2-zhukeqian1@huawei.com>
+Subject: Re: [PATCH v2 2/2] vfio/iommu_type1: Sanity check pfn_list when
+ remove vfio_dma
+Message-ID: <20210115121447.54c96857@omen.home.shazbot.org>
+In-Reply-To: <20210115092643.728-3-zhukeqian1@huawei.com>
 References: <20210115092643.728-1-zhukeqian1@huawei.com>
- <20210115092643.728-2-zhukeqian1@huawei.com>
+ <20210115092643.728-3-zhukeqian1@huawei.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
  Kirti Wankhede <kwankhede@nvidia.com>, Will Deacon <will@kernel.org>,
  kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
@@ -99,76 +99,90 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 15 Jan 2021 17:26:42 +0800
+On Fri, 15 Jan 2021 17:26:43 +0800
 Keqian Zhu <zhukeqian1@huawei.com> wrote:
 
-> If a group with non-pinned-page dirty scope is detached with dirty
-> logging enabled, we should fully populate the dirty bitmaps at the
-> time it's removed since we don't know the extent of its previous DMA,
-> nor will the group be present to trigger the full bitmap when the user
-> retrieves the dirty bitmap.
+> vfio_sanity_check_pfn_list() is used to check whether pfn_list of
+> vfio_dma is empty when remove the external domain, so it makes a
+> wrong assumption that only external domain will add pfn to dma pfn_list.
 > 
-> Fixes: d6a4c185660c ("vfio iommu: Implementation of ioctl for dirty pages tracking")
-> Suggested-by: Alex Williamson <alex.williamson@redhat.com>
+> Now we apply this check when remove a specific vfio_dma and extract
+> the notifier check just for external domain.
+
+The page pinning interface is gated by having a notifier registered for
+unmaps, therefore non-external domains would also need to register a
+notifier.  There's currently no other way to add entries to the
+pfn_list.  So if we allow pinning for such domains, then it's wrong to
+WARN_ON() when the notifier list is not-empty when removing an external
+domain.  Long term we should probably extend page {un}pinning for the
+caller to pass their notifier to be validated against the notifier list
+rather than just allowing page pinning if *any* notifier is registered.
+Thanks,
+
+Alex
+ 
+> Fixes: a54eb55045ae ("vfio iommu type1: Add support for mediated devices")
 > Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
 > ---
->  drivers/vfio/vfio_iommu_type1.c | 18 +++++++++++++++++-
->  1 file changed, 17 insertions(+), 1 deletion(-)
+>  drivers/vfio/vfio_iommu_type1.c | 24 +++++-------------------
+>  1 file changed, 5 insertions(+), 19 deletions(-)
 > 
 > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 0b4dedaa9128..4e82b9a3440f 100644
+> index 4e82b9a3440f..a9bc15e84a4e 100644
 > --- a/drivers/vfio/vfio_iommu_type1.c
 > +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -236,6 +236,19 @@ static void vfio_dma_populate_bitmap(struct vfio_dma *dma, size_t pgsize)
+> @@ -958,6 +958,7 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
+>  
+>  static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
+>  {
+> +	WARN_ON(!RB_EMPTY_ROOT(&dma->pfn_list);
+>  	vfio_unmap_unpin(iommu, dma, true);
+>  	vfio_unlink_dma(iommu, dma);
+>  	put_task_struct(dma->task);
+> @@ -2251,23 +2252,6 @@ static void vfio_iommu_unmap_unpin_reaccount(struct vfio_iommu *iommu)
 >  	}
 >  }
 >  
-> +static void vfio_iommu_populate_bitmap_full(struct vfio_iommu *iommu)
-> +{
-> +	struct rb_node *n;
-> +	unsigned long pgshift = __ffs(iommu->pgsize_bitmap);
-> +
-> +	for (n = rb_first(&iommu->dma_list); n; n = rb_next(n)) {
-> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
-> +
-> +		if (dma->iommu_mapped)
-> +			bitmap_set(dma->bitmap, 0, dma->size >> pgshift);
-> +	}
-> +}
-> +
->  static int vfio_dma_bitmap_alloc_all(struct vfio_iommu *iommu, size_t pgsize)
->  {
->  	struct rb_node *n;
-> @@ -2415,8 +2428,11 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
->  	 * Removal of a group without dirty tracking may allow the iommu scope
->  	 * to be promoted.
->  	 */
-> -	if (update_dirty_scope)
-> +	if (update_dirty_scope) {
->  		update_pinned_page_dirty_scope(iommu);
-> +		if (iommu->dirty_page_tracking)
-> +			vfio_iommu_populate_bitmap_full(iommu);
-> +	}
->  	mutex_unlock(&iommu->lock);
->  }
+> -static void vfio_sanity_check_pfn_list(struct vfio_iommu *iommu)
+> -{
+> -	struct rb_node *n;
+> -
+> -	n = rb_first(&iommu->dma_list);
+> -	for (; n; n = rb_next(n)) {
+> -		struct vfio_dma *dma;
+> -
+> -		dma = rb_entry(n, struct vfio_dma, node);
+> -
+> -		if (WARN_ON(!RB_EMPTY_ROOT(&dma->pfn_list)))
+> -			break;
+> -	}
+> -	/* mdev vendor driver must unregister notifier */
+> -	WARN_ON(iommu->notifier.head);
+> -}
+> -
+>  /*
+>   * Called when a domain is removed in detach. It is possible that
+>   * the removed domain decided the iova aperture window. Modify the
+> @@ -2367,7 +2351,8 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
+>  			kfree(group);
 >  
-
-This doesn't do the right thing.  This marks the bitmap dirty if:
-
- * The detached group dirty scope was not limited to pinned pages
-
- AND
-
- * Dirty tracking is enabled
-
- AND
-
- * The vfio_dma is *currently* (ie. after the detach) iommu_mapped
-
-We need to mark the bitmap dirty based on whether the vfio_dma *was*
-iommu_mapped by the group that is now detached.  Thanks,
-
-Alex
+>  			if (list_empty(&iommu->external_domain->group_list)) {
+> -				vfio_sanity_check_pfn_list(iommu);
+> +				/* mdev vendor driver must unregister notifier */
+> +				WARN_ON(iommu->notifier.head);
+>  
+>  				if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu))
+>  					vfio_iommu_unmap_unpin_all(iommu);
+> @@ -2491,7 +2476,8 @@ static void vfio_iommu_type1_release(void *iommu_data)
+>  
+>  	if (iommu->external_domain) {
+>  		vfio_release_domain(iommu->external_domain, true);
+> -		vfio_sanity_check_pfn_list(iommu);
+> +		/* mdev vendor driver must unregister notifier */
+> +		WARN_ON(iommu->notifier.head);
+>  		kfree(iommu->external_domain);
+>  	}
+>  
 
 _______________________________________________
 kvmarm mailing list
