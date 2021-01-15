@@ -2,85 +2,83 @@ Return-Path: <SRS0=f0/l=GS=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61017C433E0
-	for <kvmarm@archiver.kernel.org>; Fri, 15 Jan 2021 17:19:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CD90C433E0
+	for <kvmarm@archiver.kernel.org>; Fri, 15 Jan 2021 17:26:48 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id F10CB2396D
-	for <kvmarm@archiver.kernel.org>; Fri, 15 Jan 2021 17:19:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F10CB2396D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 62E0320691
+	for <kvmarm@archiver.kernel.org>; Fri, 15 Jan 2021 17:26:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62E0320691
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A07C04B266;
-	Fri, 15 Jan 2021 12:19:20 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B23044B237;
+	Fri, 15 Jan 2021 12:26:46 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id LZ2Vw1EDe2jd; Fri, 15 Jan 2021 12:19:19 -0500 (EST)
+	with ESMTP id Q8uktxBA+2ym; Fri, 15 Jan 2021 12:26:45 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 36CB04B176;
-	Fri, 15 Jan 2021 12:19:19 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 93A9B4B239;
+	Fri, 15 Jan 2021 12:26:45 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E80D4B22B
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2021 12:19:17 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C96684B237
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2021 12:26:44 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bx0WJvR0dVkJ for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 Jan 2021 12:19:16 -0500 (EST)
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com
- [209.85.222.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0D0444B270
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2021 12:19:16 -0500 (EST)
-Received: by mail-qk1-f202.google.com with SMTP id e25so8659720qka.3
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2021 09:19:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=sender:date:in-reply-to:message-id:mime-version:references:subject
- :from:to:cc; bh=iHVLKT2GDoD/bWysfKR91nfDSkdEIEEwPqsvUiYvewQ=;
- b=unnSOFGbj7bYH0H/CfqTTqhAsljbi+sSDonzIXbCfRF7iewo4PeFFpUK1S/em2X+rM
- j25bv/JtA6hqRivqRMgcMz19priFMFir91PJUhurQyaOkM8RiGvFvKWAq7DkCDnGa0/d
- lyTgIzQCS7p2tbDvRrmCjFWjy7UotZMN/lSOkRw/V6XAxApNu567s/4SqTMsBrdVvCiv
- zUL0lupK+jpd7pGMBLTK4gzWD8XztaGs1pHD2xlqn1fQduPBYYBvFZcjVkRuFQI+2euZ
- XYrgSPaqNhC7sxidOiyX/h1owrXH0fmG4y2m123yVDR4BZafeYTogGXsrwJNXvlvXNSX
- 9Q4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=iHVLKT2GDoD/bWysfKR91nfDSkdEIEEwPqsvUiYvewQ=;
- b=LZZdVDBpkIBKZMsqKjCEu8KzcUvHEBmlBRjEagIzfbdMaoiKqT++lj05m1Q2onno7v
- Z0uIFpcAKl3F5KnNTqpHlEnFA2U1mSVdt8fEjuj7qSCGIHG3QDntPWjOAZA8kWqI0WHg
- ZIg4/iqa5xrZY0HaJD3Y22hTAmw44TWiH8nPkQyaoq5KuyAyQg6u/HM6LbQoHldtgn2o
- DWl3pTKPoggl7Ks5PeQBUeqI4AVIBK1AGW8B22OSW5UUp4FNbP86qiS9BOXaRklDx2VP
- 58feSFrZE8Q2WMBFzzKfZ9rOUsf99ofiAlRR11s9VBkt6pU+OX7uzInRTtj6bBvTu7Ec
- OF7A==
-X-Gm-Message-State: AOAM532geaEkDVZjcs3Fb1ZAQdr8iD8UNalY1UEdyKBmiA+81oOSaWqH
- Z1VszkQpPQHVOMuwL7GZ3jagrZ2nExezRpxXNmRXhY45HWaq1XrBSZIm2jp48pEG79n8jfh2rvZ
- plvIeKgFF6WSsVpETaImPwY3P2F5BcX3Rn+zZf5Ce23TYRDtDWagX2T6jvvohiaCPmFh+rEGX
-X-Google-Smtp-Source: ABdhPJxRGiugW2lCtf26zO/nfxMa2RoqN+pB/rzgJWom5N/4mvf0M7cLCSVGq7QosXUMoERXi86lNP0vt9AC
-X-Received: from beef.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1091])
- (user=lenaptr job=sendgmr) by 2002:a05:6214:321:: with SMTP id
- j1mr13395636qvu.32.1610731155510; Fri, 15 Jan 2021 09:19:15 -0800 (PST)
-Date: Fri, 15 Jan 2021 17:18:30 +0000
-In-Reply-To: <20210115171830.3602110-1-lenaptr@google.com>
-Message-Id: <20210115171830.3602110-10-lenaptr@google.com>
-Mime-Version: 1.0
-References: <20210115171830.3602110-1-lenaptr@google.com>
-X-Mailer: git-send-email 2.30.0.296.g2bfb1c46d8-goog
-Subject: [PATCH v3 9/9] KVM: arm64: Add UBSan tests for PKVM.
-From: Elena Petrova <lenaptr@google.com>
-To: kvmarm@lists.cs.columbia.edu
-Cc: George-Aurelian Popescu <georgepope@google.com>,
- Elena Petrova <lenaptr@google.com>, Marc Zyngier <maz@kernel.org>,
- open list <linux-kernel@vger.kernel.org>, linux-arm-kernel@lists.infradead.org,
- George Popescu <george.apopescu97@gmail.com>
+ with ESMTP id DGIcBscdxZ1N for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 Jan 2021 12:26:43 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D054D4B22B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2021 12:26:43 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1610731603;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=VZBYusZAm1Is9olrKmtKLjdUp43A00Oaux7ATOrc+IQ=;
+ b=JJAEUe/fl1DgB+E9EYgrxFZjC/JJR6FG86kv8rKudF91L7GmY7xdzhmJiDgQH9e5e1uhQy
+ 3u0VJp3EPPcVfmCEHRUkcu0ch7utKD8iDghzhJHsq2Ws4mAYY5bt3BHklYsdwRcWO+rh3a
+ 61kP71k5J7cmi4afCw5PsagJmZkYKbI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-5-Ah3VMAcvN4SiSGyadioQJQ-1; Fri, 15 Jan 2021 12:26:39 -0500
+X-MC-Unique: Ah3VMAcvN4SiSGyadioQJQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AC233107ACF9;
+ Fri, 15 Jan 2021 17:26:37 +0000 (UTC)
+Received: from [10.36.114.165] (ovpn-114-165.ams2.redhat.com [10.36.114.165])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 37E01100AE30;
+ Fri, 15 Jan 2021 17:26:34 +0000 (UTC)
+Subject: Re: [PATCH 6/6] KVM: arm64: Upgrade PMU support to ARMv8.4
+To: Marc Zyngier <maz@kernel.org>
+References: <20210114105633.2558739-1-maz@kernel.org>
+ <20210114105633.2558739-7-maz@kernel.org>
+ <ec06055b-56ad-1589-7a5d-95d9f47466ce@redhat.com>
+ <28dab4367d6ced5a7d7cbc80ee77f68d@kernel.org>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <a0f7a8a7-81fc-282c-5b29-b037a425a8f7@redhat.com>
+Date: Fri, 15 Jan 2021 18:26:32 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
+MIME-Version: 1.0
+In-Reply-To: <28dab4367d6ced5a7d7cbc80ee77f68d@kernel.org>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Cc: kvm@vger.kernel.org, kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,272 +90,48 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: George-Aurelian Popescu <georgepope@google.com>
-
-Test the UBsan functionality inside hyp/nVHE.
-Because modules are not supported inside of hyp/nVHE code, the default
-testing module for UBSan can not be used.
-New functions have to be defined inside of hyp/nVHE.
-They are called in kvm_get_mdcr_el2, to test UBSAN whenever a VM starts.
-
-Signed-off-by: Elena Petrova <lenaptr@google.com>
----
- arch/arm64/include/asm/assembler.h          |  17 ++-
- arch/arm64/include/asm/kvm_debug_buffer.h   |  10 +-
- arch/arm64/include/asm/kvm_ubsan.h          |   2 +-
- arch/arm64/kvm/hyp/include/hyp/test_ubsan.h | 112 ++++++++++++++++++++
- arch/arm64/kvm/hyp/nvhe/hyp-main.c          |   3 +
- arch/arm64/kvm/kvm_ubsan_buffer.c           |   1 -
- 6 files changed, 128 insertions(+), 17 deletions(-)
- create mode 100644 arch/arm64/kvm/hyp/include/hyp/test_ubsan.h
-
-diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
-index ebc18a8a0e1f..8422b0d925e8 100644
---- a/arch/arm64/include/asm/assembler.h
-+++ b/arch/arm64/include/asm/assembler.h
-@@ -259,16 +259,15 @@ alternative_endif
- 	.endm
- 
- 	/*
--         * @sym: The name of the per-cpu variable
--         * @reg: value to store
--         * @tmp1: scratch register
--         * @tmp2: scratch register
--         */
--        .macro str_this_cpu sym, reg, tmp1, tmp2
--        adr_this_cpu \tmp1, \sym, \tmp2
-+	 * @sym: The name of the per-cpu variable
-+	 * @reg: value to store
-+	 * @tmp1: scratch register
-+	 * @tmp2: scratch register
-+	 */
-+	.macro str_this_cpu sym, reg, tmp1, tmp2
-+	adr_this_cpu \tmp1, \sym, \tmp2
-         str \reg, [\tmp1]
--        .endm
--
-+	.endm
- /*
-  * vma_vm_mm - get mm pointer from vma pointer (vma->vm_mm)
-  */
-diff --git a/arch/arm64/include/asm/kvm_debug_buffer.h b/arch/arm64/include/asm/kvm_debug_buffer.h
-index e5375c2cff1a..361b473bb004 100644
---- a/arch/arm64/include/asm/kvm_debug_buffer.h
-+++ b/arch/arm64/include/asm/kvm_debug_buffer.h
-@@ -3,10 +3,8 @@
-  * Copyright 2020 Google LLC
-  * Author: George Popescu <georgepope@google.com>
-  */
--
- #include <linux/percpu-defs.h>
- 
--
- #define KVM_DEBUG_BUFFER_SIZE 1000
- 
- #ifdef __KVM_NVHE_HYPERVISOR__
-@@ -20,17 +18,17 @@
- #else
- #define DECLARE_KVM_DEBUG_BUFFER(type_name, buffer_name, write_ind, size)\
- 	DECLARE_KVM_NVHE_PER_CPU(type_name, buffer_name)[size]; 	\
--        DECLARE_KVM_NVHE_PER_CPU(unsigned long, write_ind);
-+	DECLARE_KVM_NVHE_PER_CPU(unsigned long, write_ind);
- #endif //__KVM_NVHE_HYPERVISOR__
- 
- #ifdef __ASSEMBLY__
- #include <asm/assembler.h>
- 
- .macro clear_buffer tmp1, tmp2, tmp3
--        mov \tmp1, 0
-+	mov \tmp1, 0
- #ifdef CONFIG_UBSAN
--        str_this_cpu kvm_ubsan_buff_wr_ind, \tmp1, \tmp2, \tmp3
-+	str_this_cpu kvm_ubsan_buff_wr_ind, \tmp1, \tmp2, \tmp3
- #endif //CONFIG_UBSAN
- .endm
- 
--#endif
-\ No newline at end of file
-+#endif
-diff --git a/arch/arm64/include/asm/kvm_ubsan.h b/arch/arm64/include/asm/kvm_ubsan.h
-index da4a3b4e28e0..0b8bed08d48e 100644
---- a/arch/arm64/include/asm/kvm_ubsan.h
-+++ b/arch/arm64/include/asm/kvm_ubsan.h
-@@ -9,7 +9,6 @@
- #define UBSAN_MAX_TYPE 6
- #define KVM_UBSAN_BUFFER_SIZE 1000
- 
--
- struct ubsan_values {
- 	void *lval;
- 	void *rval;
-@@ -18,6 +17,7 @@ struct ubsan_values {
- 
- struct kvm_ubsan_info {
- 	enum {
-+		UBSAN_NONE,
- 		UBSAN_OUT_OF_BOUNDS,
- 		UBSAN_UNREACHABLE_DATA,
- 		UBSAN_SHIFT_OUT_OF_BOUNDS,
-diff --git a/arch/arm64/kvm/hyp/include/hyp/test_ubsan.h b/arch/arm64/kvm/hyp/include/hyp/test_ubsan.h
-new file mode 100644
-index 000000000000..07759c0d1e0e
---- /dev/null
-+++ b/arch/arm64/kvm/hyp/include/hyp/test_ubsan.h
-@@ -0,0 +1,112 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+
-+#include <linux/ctype.h>
-+
-+typedef void(*test_ubsan_fp)(void);
-+
-+static void test_ubsan_add_overflow(void)
-+{
-+	volatile int val = INT_MAX;
-+
-+	val += 2;
-+}
-+
-+static void test_ubsan_sub_overflow(void)
-+{
-+	volatile int val = INT_MIN;
-+	volatile int val2 = 2;
-+
-+	val -= val2;
-+}
-+
-+static void test_ubsan_mul_overflow(void)
-+{
-+	volatile int val = INT_MAX / 2;
-+
-+	val *= 3;
-+}
-+
-+static void test_ubsan_negate_overflow(void)
-+{
-+	volatile int val = INT_MIN;
-+
-+	val = -val;
-+}
-+
-+static void test_ubsan_divrem_overflow(void)
-+{
-+	volatile int val = 16;
-+	volatile int val2 = 0;
-+
-+	val /= val2;
-+}
-+
-+static void test_ubsan_shift_out_of_bounds(void)
-+{
-+	volatile int val = -1;
-+	int val2 = 10;
-+
-+	val2 <<= val;
-+}
-+
-+static void test_ubsan_out_of_bounds(void)
-+{
-+	volatile int i = 4, j = 5;
-+	volatile int arr[4];
-+	
-+	arr[j] = i;
-+}
-+
-+static void test_ubsan_load_invalid_value(void)
-+{
-+	volatile char *dst, *src;
-+	bool val, val2, *ptr;
-+	char c = 4;
-+
-+	dst = (char *)&val;
-+	src = &c;
-+	*dst = *src;
-+
-+	ptr = &val2;
-+	val2 = val;
-+}
-+
-+static void test_ubsan_misaligned_access(void)
-+{
-+	volatile char arr[5] __aligned(4) = {1, 2, 3, 4, 5};
-+	volatile int *ptr, val = 6;
-+
-+	ptr = (int *)(arr + 1);
-+	*ptr = val;
-+}
-+
-+static void test_ubsan_object_size_mismatch(void)
-+{
-+	/* "((aligned(8)))" helps this not into be misaligned for ptr-access. */
-+	volatile int val __aligned(8) = 4;
-+	volatile long long *ptr, val2;
-+
-+	ptr = (long long *)&val;
-+	val2 = *ptr;
-+}
-+
-+static const test_ubsan_fp test_ubsan_array[] = {
-+	test_ubsan_out_of_bounds,
-+	test_ubsan_add_overflow,
-+	test_ubsan_sub_overflow,
-+	test_ubsan_mul_overflow,
-+	test_ubsan_negate_overflow,
-+	test_ubsan_divrem_overflow,
-+	test_ubsan_shift_out_of_bounds,
-+	test_ubsan_load_invalid_value,
-+	test_ubsan_misaligned_access,
-+	test_ubsan_object_size_mismatch,
-+};
-+
-+static void test_ubsan(void)
-+{
-+	unsigned int i;
-+	
-+	for (i = 0; i < ARRAY_SIZE(test_ubsan_array); i++)
-+		test_ubsan_array[i]();
-+}
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index a906f9e2ff34..939600e9fdd6 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -13,6 +13,7 @@
- #include <asm/kvm_mmu.h>
- 
- #include <nvhe/trap_handler.h>
-+#include <hyp/test_ubsan.h>
- 
- DEFINE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
- 
-@@ -90,6 +91,8 @@ static void handle___vgic_v3_init_lrs(struct kvm_cpu_context *host_ctxt)
- static void handle___kvm_get_mdcr_el2(struct kvm_cpu_context *host_ctxt)
- {
- 	cpu_reg(host_ctxt, 1) = __kvm_get_mdcr_el2();
-+	if (IS_ENABLED(CONFIG_TEST_UBSAN))
-+		test_ubsan();
- }
- 
- static void handle___vgic_v3_save_aprs(struct kvm_cpu_context *host_ctxt)
-diff --git a/arch/arm64/kvm/kvm_ubsan_buffer.c b/arch/arm64/kvm/kvm_ubsan_buffer.c
-index 2c7060cbb48b..49bedc9de139 100644
---- a/arch/arm64/kvm/kvm_ubsan_buffer.c
-+++ b/arch/arm64/kvm/kvm_ubsan_buffer.c
-@@ -11,7 +11,6 @@
- #include <asm/kvm_asm.h>
- #include <kvm/arm_pmu.h>
- 
--#include <ubsan.h>
- #include <asm/kvm_ubsan.h>
- 
- DECLARE_KVM_DEBUG_BUFFER(struct kvm_ubsan_info, kvm_ubsan_buffer,
--- 
-2.30.0.296.g2bfb1c46d8-goog
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgTWFyYywKCk9uIDEvMTUvMjEgNTo0MiBQTSwgTWFyYyBaeW5naWVyIHdyb3RlOgo+IEhpIEVy
+aWMsCj4gCj4gT24gMjAyMS0wMS0xNSAxNDowMSwgQXVnZXIgRXJpYyB3cm90ZToKPj4gSGkgTWFy
+YywKPj4KPj4gT24gMS8xNC8yMSAxMTo1NiBBTSwgTWFyYyBaeW5naWVyIHdyb3RlOgo+Pj4gVXBn
+cmFkaW5nIHRoZSBQTVUgY29kZSBmcm9tIEFSTXY4LjEgdG8gQVJNdjguNCB0dXJucyBvdXQgdG8g
+YmUKPj4+IHByZXR0eSBlYXN5LiBBbGwgdGhhdCBpcyByZXF1aXJlZCBpcyBzdXBwb3J0IGZvciBQ
+TU1JUl9FTDEsIHdoaWNoCj4+PiBpcyByZWFkLW9ubHksIGFuZCBmb3Igd2hpY2ggcmV0dXJuaW5n
+IDAgaXMgYSB2YWxpZCBvcHRpb24uCj4+Pgo+Pj4gTGV0J3MganVzdCBkbyB0aGF0IGFuZCBhZGp1
+c3Qgd2hhdCB3ZSByZXR1cm4gdG8gdGhlIGd1ZXN0Lgo+Pj4KPj4+IFNpZ25lZC1vZmYtYnk6IE1h
+cmMgWnluZ2llciA8bWF6QGtlcm5lbC5vcmc+Cj4+PiAtLS0KPj4+IMKgYXJjaC9hcm02NC9rdm0v
+c3lzX3JlZ3MuYyB8IDUgKysrLS0KPj4+IMKgMSBmaWxlIGNoYW5nZWQsIDMgaW5zZXJ0aW9ucygr
+KSwgMiBkZWxldGlvbnMoLSkKPj4+Cj4+PiBkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rdm0vc3lz
+X3JlZ3MuYyBiL2FyY2gvYXJtNjQva3ZtL3N5c19yZWdzLmMKPj4+IGluZGV4IDhmNzllYzFmZmZh
+Ny4uMmY0ZWNiZDJhYmZiIDEwMDY0NAo+Pj4gLS0tIGEvYXJjaC9hcm02NC9rdm0vc3lzX3JlZ3Mu
+Ywo+Pj4gKysrIGIvYXJjaC9hcm02NC9rdm0vc3lzX3JlZ3MuYwo+Pj4gQEAgLTEwNTEsMTAgKzEw
+NTEsMTAgQEAgc3RhdGljIHU2NCByZWFkX2lkX3JlZyhjb25zdCBzdHJ1Y3Qga3ZtX3ZjcHUKPj4+
+ICp2Y3B1LAo+Pj4gwqDCoMKgwqDCoMKgwqDCoCAvKiBMaW1pdCBkZWJ1ZyB0byBBUk12OC4wICov
+Cj4+PiDCoMKgwqDCoMKgwqDCoMKgIHZhbCAmPSB+RkVBVFVSRShJRF9BQTY0REZSMF9ERUJVR1ZF
+Uik7Cj4+PiDCoMKgwqDCoMKgwqDCoMKgIHZhbCB8PSBGSUVMRF9QUkVQKEZFQVRVUkUoSURfQUE2
+NERGUjBfREVCVUdWRVIpLCA2KTsKPj4+IC3CoMKgwqDCoMKgwqDCoCAvKiBMaW1pdCBndWVzdHMg
+dG8gUE1VdjMgZm9yIEFSTXY4LjEgKi8KPj4+ICvCoMKgwqDCoMKgwqDCoCAvKiBMaW1pdCBndWVz
+dHMgdG8gUE1VdjMgZm9yIEFSTXY4LjQgKi8KPj4+IMKgwqDCoMKgwqDCoMKgwqAgdmFsID0gY3B1
+aWRfZmVhdHVyZV9jYXBfcGVyZm1vbl9maWVsZCh2YWwsCj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgSURfQUE2NERGUjBfUE1V
+VkVSX1NISUZULAo+Pj4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqAga3ZtX3ZjcHVfaGFzX3BtdSh2Y3B1KSA/Cj4+PiBJRF9BQTY0REZS
+MF9QTVVWRVJfOF8xIDogMCk7Cj4+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBrdm1fdmNwdV9oYXNfcG11KHZjcHUpID8KPj4+IElE
+X0FBNjRERlIwX1BNVVZFUl84XzQgOiAwKTsKPj4+IMKgwqDCoMKgwqDCoMKgwqAgYnJlYWs7Cj4+
+PiDCoMKgwqDCoCBjYXNlIFNZU19JRF9ERlIwX0VMMToKPj4+IMKgwqDCoMKgwqDCoMKgwqAgLyog
+TGltaXQgZ3Vlc3RzIHRvIFBNVXYzIGZvciBBUk12OC4xICovCj4+IHdoYXQgYWJvdXQgdGhlIGRl
+YnVnIHZlcnNpb24gaW4gYWFyY2gzMiBzdGF0ZS4gSXMgaXQgb24gcHVycG9zZSB0aGF0IHlvdQo+
+PiBsZWF2ZSBpdCBhcyA4XzE/Cj4gCj4gVGhhdCdzIGEgZ29vZCBwb2ludC4gVGhlcmUgaXMgYWxz
+byB0aGUgZmFjdCB0aGF0IHdlIGtlZXAgcmVwb3J0aW5nCj4gU1RBTExfU0xPVCBhcyBhIHZhbGlk
+IGV2ZW50IGV2ZW4gaW4gUE1DRUlEMF9FTDEgZGVzcGl0ZSBQTU1JUl9FTDEuU0xPVFMKPiBhbHdh
+eXMgcmVwb3J0aW5nIDAuCkh1bSBPSy4gSSBkaWQgbm90IG5vdGljZSB0aGF0IDstKQoKVGhhbmtz
+CgpFcmljCj4gCj4gSSdsbCBmaXggdGhhdCBhbmQgcmVzZW5kIHNvbWV0aGluZyBuZXh0IHdlZWsu
+Cj4gCj4gVGhhbmtzLAo+IAo+IMKgwqDCoMKgwqDCoMKgIE0uCgpfX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBs
+aXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1h
+bi9saXN0aW5mby9rdm1hcm0K
