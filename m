@@ -6,53 +6,52 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF3F8C433E0
-	for <kvmarm@archiver.kernel.org>; Mon, 18 Jan 2021 10:00:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A65EC433DB
+	for <kvmarm@archiver.kernel.org>; Mon, 18 Jan 2021 10:00:23 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7A27A2253A
-	for <kvmarm@archiver.kernel.org>; Mon, 18 Jan 2021 10:00:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A27A2253A
+	by mail.kernel.org (Postfix) with ESMTP id 1CE6922B39
+	for <kvmarm@archiver.kernel.org>; Mon, 18 Jan 2021 10:00:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CE6922B39
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E9E0A4B275;
-	Mon, 18 Jan 2021 05:00:18 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B25934B237;
+	Mon, 18 Jan 2021 05:00:22 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id vcbHDpBEtvb0; Mon, 18 Jan 2021 05:00:17 -0500 (EST)
+	with ESMTP id bOcqPEXgT5-w; Mon, 18 Jan 2021 05:00:20 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 30E514B26A;
-	Mon, 18 Jan 2021 05:00:17 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 52B124B266;
+	Mon, 18 Jan 2021 05:00:20 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F3EB4B265
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jan 2021 05:00:16 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CADD84B272
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jan 2021 05:00:18 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sMnZbZfDuX+B for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 Jan 2021 05:00:14 -0500 (EST)
+ with ESMTP id g+Pu6Rj+VqVP for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 Jan 2021 05:00:17 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B9EEC4B25B
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jan 2021 05:00:14 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 217DD4B25B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jan 2021 05:00:17 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id B4AE62245C;
- Mon, 18 Jan 2021 10:00:13 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 2F8DF224B0;
+ Mon, 18 Jan 2021 10:00:16 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1l1R6v-008RhD-3D; Mon, 18 Jan 2021 09:46:09 +0000
+ id 1l1R6z-008RhD-5S; Mon, 18 Jan 2021 09:46:13 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  linux-kernel@vger.kernel.org
-Subject: [PATCH v4 13/21] arm64: Allow ID_AA64MMFR1_EL1.VH to be overridden
- from the command line
-Date: Mon, 18 Jan 2021 09:45:25 +0000
-Message-Id: <20210118094533.2874082-14-maz@kernel.org>
+Subject: [PATCH v4 17/21] KVM: arm64: Document HVC_VHE_RESTART stub hypercall
+Date: Mon, 18 Jan 2021 09:45:29 +0000
+Message-Id: <20210118094533.2874082-18-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210118094533.2874082-1-maz@kernel.org>
 References: <20210118094533.2874082-1-maz@kernel.org>
@@ -89,87 +88,33 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-As we want to be able to disable VHE at runtime, let's match
-"id_aa64mmfr1.vh=" from the command line as an override.
-This doesn't have much effect yet as our boot code doesn't look
-at the cpufeature, but only at the HW registers.
+For completeness, let's document the HVC_VHE_RESTART stub.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/cpufeature.h |  3 +++
- arch/arm64/kernel/cpufeature.c      |  6 +++++-
- arch/arm64/kernel/idreg-override.c  | 12 ++++++++++++
- 3 files changed, 20 insertions(+), 1 deletion(-)
+ Documentation/virt/kvm/arm/hyp-abi.rst | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-index fe0130d6c0ff..80a5f423444e 100644
---- a/arch/arm64/include/asm/cpufeature.h
-+++ b/arch/arm64/include/asm/cpufeature.h
-@@ -814,6 +814,9 @@ static inline unsigned int get_vmid_bits(u64 mmfr1)
- 	return 8;
- }
+diff --git a/Documentation/virt/kvm/arm/hyp-abi.rst b/Documentation/virt/kvm/arm/hyp-abi.rst
+index 83cadd8186fa..1ba628baf11b 100644
+--- a/Documentation/virt/kvm/arm/hyp-abi.rst
++++ b/Documentation/virt/kvm/arm/hyp-abi.rst
+@@ -58,6 +58,15 @@ these functions (see arch/arm{,64}/include/asm/virt.h):
+   into place (arm64 only), and jump to the restart address while at HYP/EL2.
+   This hypercall is not expected to return to its caller.
  
-+extern u64 id_aa64mmfr1_val;
-+extern u64 id_aa64mmfr1_mask;
++* ::
 +
- u32 get_kvm_ipa_limit(void);
- void dump_cpu_features(void);
- 
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 48a011935d8c..5b9343d2e9f0 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -555,6 +555,9 @@ static const struct arm64_ftr_bits ftr_raz[] = {
- 
- #define ARM64_FTR_REG(id, table) ARM64_FTR_REG_OVERRIDE(id, table, NULL, NULL)
- 
-+u64 id_aa64mmfr1_val;
-+u64 id_aa64mmfr1_mask;
++    x0 = HVC_VHE_RESTART (arm64 only)
 +
- static const struct __ftr_reg_entry {
- 	u32			sys_id;
- 	struct arm64_ftr_reg 	*reg;
-@@ -602,7 +605,8 @@ static const struct __ftr_reg_entry {
- 
- 	/* Op1 = 0, CRn = 0, CRm = 7 */
- 	ARM64_FTR_REG(SYS_ID_AA64MMFR0_EL1, ftr_id_aa64mmfr0),
--	ARM64_FTR_REG(SYS_ID_AA64MMFR1_EL1, ftr_id_aa64mmfr1),
-+	ARM64_FTR_REG_OVERRIDE(SYS_ID_AA64MMFR1_EL1, ftr_id_aa64mmfr1,
-+			       &id_aa64mmfr1_val, &id_aa64mmfr1_mask),
- 	ARM64_FTR_REG(SYS_ID_AA64MMFR2_EL1, ftr_id_aa64mmfr2),
- 
- 	/* Op1 = 0, CRn = 1, CRm = 2 */
-diff --git a/arch/arm64/kernel/idreg-override.c b/arch/arm64/kernel/idreg-override.c
-index 392f93b67103..75d9845f489b 100644
---- a/arch/arm64/kernel/idreg-override.c
-+++ b/arch/arm64/kernel/idreg-override.c
-@@ -10,6 +10,7 @@
- #include <linux/libfdt.h>
- 
- #include <asm/cacheflush.h>
-+#include <asm/cpufeature.h>
- #include <asm/setup.h>
- 
- struct reg_desc {
-@@ -22,7 +23,18 @@ struct reg_desc {
- 	} 			fields[];
- };
- 
-+static const struct reg_desc mmfr1 __initdata = {
-+	.name		= "id_aa64mmfr1",
-+	.val		= &id_aa64mmfr1_val,
-+	.mask		= &id_aa64mmfr1_mask,
-+	.fields		= {
-+	        { "vh", ID_AA64MMFR1_VHE_SHIFT },
-+		{}
-+	},
-+};
++  Attempt to upgrade the kernel's exception level from EL1 to EL2 by enabling
++  the VHE mode. This is conditioned by the CPU supporting VHE, the EL2 MMU
++  being off, and VHE not being disabled by any other mean (comment line option,
++  for example).
 +
- static const struct reg_desc * const regs[] __initdata = {
-+	&mmfr1,
- };
+ Any other value of r0/x0 triggers a hypervisor-specific handling,
+ which is not documented here.
  
- static int __init find_field(const char *cmdline, const struct reg_desc *reg,
 -- 
 2.29.2
 
