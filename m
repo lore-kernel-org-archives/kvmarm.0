@@ -6,53 +6,53 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AB02C433E0
-	for <kvmarm@archiver.kernel.org>; Mon, 18 Jan 2021 10:00:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5823C433E0
+	for <kvmarm@archiver.kernel.org>; Mon, 18 Jan 2021 10:00:44 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2FB0D22B49
-	for <kvmarm@archiver.kernel.org>; Mon, 18 Jan 2021 10:00:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FB0D22B49
+	by mail.kernel.org (Postfix) with ESMTP id 7AB3522B49
+	for <kvmarm@archiver.kernel.org>; Mon, 18 Jan 2021 10:00:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AB3522B49
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D0AF24B230;
-	Mon, 18 Jan 2021 05:00:41 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F6BB4B253;
+	Mon, 18 Jan 2021 05:00:44 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id er5AWfwz-Bod; Mon, 18 Jan 2021 05:00:38 -0500 (EST)
+	with ESMTP id mqqJFlUiywGq; Mon, 18 Jan 2021 05:00:41 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F21474B2AB;
-	Mon, 18 Jan 2021 05:00:35 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1ADE34B2A7;
+	Mon, 18 Jan 2021 05:00:38 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F145C4B228
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jan 2021 05:00:34 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 391D64B1D9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jan 2021 05:00:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YBMQVhCGIQqe for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 Jan 2021 05:00:30 -0500 (EST)
+ with ESMTP id fVeB8ufiOjAC for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 Jan 2021 05:00:36 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 26F1E4B296
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jan 2021 05:00:29 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6C5BF4B275
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jan 2021 05:00:31 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 4EB4722ADC;
- Mon, 18 Jan 2021 10:00:28 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 929DD22B39;
+ Mon, 18 Jan 2021 10:00:30 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1l1R72-008RhD-7u; Mon, 18 Jan 2021 09:46:17 +0000
+ id 1l1R6t-008RhD-Hw; Mon, 18 Jan 2021 09:46:07 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  linux-kernel@vger.kernel.org
-Subject: [PATCH v4 19/21] arm64: cpufeatures: Allow disabling of BTI from the
- command-line
-Date: Mon, 18 Jan 2021 09:45:31 +0000
-Message-Id: <20210118094533.2874082-20-maz@kernel.org>
+Subject: [PATCH v4 11/21] arm64: Extract early FDT mapping from
+ kaslr_early_init()
+Date: Mon, 18 Jan 2021 09:45:23 +0000
+Message-Id: <20210118094533.2874082-12-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210118094533.2874082-1-maz@kernel.org>
 References: <20210118094533.2874082-1-maz@kernel.org>
@@ -89,121 +89,121 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In order to be able to disable BTI at runtime, whether it is
-for testing purposes, or to work around HW issues, let's add
-support for overriding the ID_AA64PFR1_EL1.BTI field.
+As we want to parse more options very early in the kernel lifetime,
+let's always map the FDT early. This is achieved by moving that
+code out of kaslr_early_init().
 
-This is further mapped on the arm64.nobti command-line alias.
+No functionnal change expected.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- Documentation/admin-guide/kernel-parameters.txt |  3 +++
- arch/arm64/include/asm/cpufeature.h             |  2 ++
- arch/arm64/kernel/cpufeature.c                  |  5 ++++-
- arch/arm64/kernel/idreg-override.c              | 12 ++++++++++++
- arch/arm64/mm/mmu.c                             |  2 +-
- 5 files changed, 22 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/setup.h | 11 +++++++++++
+ arch/arm64/kernel/head.S       |  3 ++-
+ arch/arm64/kernel/kaslr.c      |  7 +++----
+ arch/arm64/kernel/setup.c      | 15 +++++++++++++++
+ 4 files changed, 31 insertions(+), 5 deletions(-)
+ create mode 100644 arch/arm64/include/asm/setup.h
 
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index 2786fd39a047..7599fd0f1ad7 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -373,6 +373,9 @@
- 	arcrimi=	[HW,NET] ARCnet - "RIM I" (entirely mem-mapped) cards
- 			Format: <io>,<irq>,<nodeID>
- 
-+	arm64.nobti	[ARM64] Unconditionally disable Branch Target
-+			Identification support
+diff --git a/arch/arm64/include/asm/setup.h b/arch/arm64/include/asm/setup.h
+new file mode 100644
+index 000000000000..d3320618ed14
+--- /dev/null
++++ b/arch/arm64/include/asm/setup.h
+@@ -0,0 +1,11 @@
++// SPDX-License-Identifier: GPL-2.0
 +
- 	ataflop=	[HW,M68k]
- 
- 	atarimouse=	[HW,MOUSE] Atari Mouse
-diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-index 80a5f423444e..d3e0f6dd43c4 100644
---- a/arch/arm64/include/asm/cpufeature.h
-+++ b/arch/arm64/include/asm/cpufeature.h
-@@ -816,6 +816,8 @@ static inline unsigned int get_vmid_bits(u64 mmfr1)
- 
- extern u64 id_aa64mmfr1_val;
- extern u64 id_aa64mmfr1_mask;
-+extern u64 id_aa64pfr1_val;
-+extern u64 id_aa64pfr1_mask;
- 
- u32 get_kvm_ipa_limit(void);
- void dump_cpu_features(void);
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 5b9343d2e9f0..f223171a7c34 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -557,6 +557,8 @@ static const struct arm64_ftr_bits ftr_raz[] = {
- 
- u64 id_aa64mmfr1_val;
- u64 id_aa64mmfr1_mask;
-+u64 id_aa64pfr1_val;
-+u64 id_aa64pfr1_mask;
- 
- static const struct __ftr_reg_entry {
- 	u32			sys_id;
-@@ -592,7 +594,8 @@ static const struct __ftr_reg_entry {
- 
- 	/* Op1 = 0, CRn = 0, CRm = 4 */
- 	ARM64_FTR_REG(SYS_ID_AA64PFR0_EL1, ftr_id_aa64pfr0),
--	ARM64_FTR_REG(SYS_ID_AA64PFR1_EL1, ftr_id_aa64pfr1),
-+	ARM64_FTR_REG_OVERRIDE(SYS_ID_AA64PFR1_EL1, ftr_id_aa64pfr1,
-+			       &id_aa64pfr1_val, &id_aa64pfr1_mask),
- 	ARM64_FTR_REG(SYS_ID_AA64ZFR0_EL1, ftr_id_aa64zfr0),
- 
- 	/* Op1 = 0, CRn = 0, CRm = 5 */
-diff --git a/arch/arm64/kernel/idreg-override.c b/arch/arm64/kernel/idreg-override.c
-index 143fe7b8e3ce..a9e3ed193fd4 100644
---- a/arch/arm64/kernel/idreg-override.c
-+++ b/arch/arm64/kernel/idreg-override.c
-@@ -33,6 +33,16 @@ static const struct reg_desc mmfr1 __initdata = {
- 	},
- };
- 
-+static const struct reg_desc pfr1 __initdata = {
-+	.name		= "id_aa64pfr1",
-+	.val		= &id_aa64pfr1_val,
-+	.mask		= &id_aa64pfr1_mask,
-+	.fields		= {
-+	        { "bt", ID_AA64PFR1_BT_SHIFT },
-+		{}
-+	},
-+};
++#ifndef __ARM64_ASM_SETUP_H
++#define __ARM64_ASM_SETUP_H
 +
- extern u64 kaslr_feature_val;
- extern u64 kaslr_feature_mask;
++#include <uapi/asm/setup.h>
++
++void *get_early_fdt_ptr(void);
++void early_fdt_map(u64 dt_phys);
++
++#endif
+diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
+index b425d2587cdb..d74e5f84042e 100644
+--- a/arch/arm64/kernel/head.S
++++ b/arch/arm64/kernel/head.S
+@@ -433,6 +433,8 @@ SYM_FUNC_START_LOCAL(__primary_switched)
+ 	bl	__pi_memset
+ 	dsb	ishst				// Make zero page visible to PTW
  
-@@ -50,6 +60,7 @@ static const struct reg_desc kaslr __initdata = {
++	mov	x0, x21				// pass FDT address in x0
++	bl	early_fdt_map			// Try mapping the FDT early
+ 	bl	switch_to_vhe
+ #if defined(CONFIG_KASAN_GENERIC) || defined(CONFIG_KASAN_SW_TAGS)
+ 	bl	kasan_early_init
+@@ -440,7 +442,6 @@ SYM_FUNC_START_LOCAL(__primary_switched)
+ #ifdef CONFIG_RANDOMIZE_BASE
+ 	tst	x23, ~(MIN_KIMG_ALIGN - 1)	// already running randomized?
+ 	b.ne	0f
+-	mov	x0, x21				// pass FDT address in x0
+ 	bl	kaslr_early_init		// parse FDT for KASLR options
+ 	cbz	x0, 0f				// KASLR disabled? just proceed
+ 	orr	x23, x23, x0			// record KASLR offset
+diff --git a/arch/arm64/kernel/kaslr.c b/arch/arm64/kernel/kaslr.c
+index 1c74c45b9494..5fc86e7d01a1 100644
+--- a/arch/arm64/kernel/kaslr.c
++++ b/arch/arm64/kernel/kaslr.c
+@@ -19,6 +19,7 @@
+ #include <asm/memory.h>
+ #include <asm/mmu.h>
+ #include <asm/sections.h>
++#include <asm/setup.h>
  
- static const struct reg_desc * const regs[] __initdata = {
- 	&mmfr1,
-+	&pfr1,
- 	&kaslr,
- };
+ enum kaslr_status {
+ 	KASLR_ENABLED,
+@@ -92,12 +93,11 @@ static __init bool is_kaslr_disabled_cmdline(void *fdt)
+  * containing function pointers) to be reinitialized, and zero-initialized
+  * .bss variables will be reset to 0.
+  */
+-u64 __init kaslr_early_init(u64 dt_phys)
++u64 __init kaslr_early_init(void)
+ {
+ 	void *fdt;
+ 	u64 seed, offset, mask, module_range;
+ 	unsigned long raw;
+-	int size;
  
-@@ -59,6 +70,7 @@ static const struct {
- } aliases[] __initdata = {
- 	{ "kvm-arm.mode=nvhe",		"id_aa64mmfr1.vh=0" },
- 	{ "kvm-arm.mode=protected",	"id_aa64mmfr1.vh=0" },
-+	{ "arm64.nobti",		"id_aa64pfr1.bt=0" },
- 	{ "nokaslr",			"kaslr.disabled=1" },
- };
- 
-diff --git a/arch/arm64/mm/mmu.c b/arch/arm64/mm/mmu.c
-index ae0c3d023824..617e704c980b 100644
---- a/arch/arm64/mm/mmu.c
-+++ b/arch/arm64/mm/mmu.c
-@@ -628,7 +628,7 @@ static bool arm64_early_this_cpu_has_bti(void)
- 	if (!IS_ENABLED(CONFIG_ARM64_BTI_KERNEL))
- 		return false;
- 
--	pfr1 = read_sysreg_s(SYS_ID_AA64PFR1_EL1);
-+	pfr1 = __read_sysreg_by_encoding(SYS_ID_AA64PFR1_EL1);
- 	return cpuid_feature_extract_unsigned_field(pfr1,
- 						    ID_AA64PFR1_BT_SHIFT);
+ 	/*
+ 	 * Set a reasonable default for module_alloc_base in case
+@@ -111,8 +111,7 @@ u64 __init kaslr_early_init(u64 dt_phys)
+ 	 * and proceed with KASLR disabled. We will make another
+ 	 * attempt at mapping the FDT in setup_machine()
+ 	 */
+-	early_fixmap_init();
+-	fdt = fixmap_remap_fdt(dt_phys, &size, PAGE_KERNEL);
++	fdt = get_early_fdt_ptr();
+ 	if (!fdt) {
+ 		kaslr_status = KASLR_DISABLED_FDT_REMAP;
+ 		return 0;
+diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
+index c18aacde8bb0..01a994730754 100644
+--- a/arch/arm64/kernel/setup.c
++++ b/arch/arm64/kernel/setup.c
+@@ -168,6 +168,21 @@ static void __init smp_build_mpidr_hash(void)
+ 		pr_warn("Large number of MPIDR hash buckets detected\n");
  }
+ 
++static void *early_fdt_ptr __initdata;
++
++void __init *get_early_fdt_ptr(void)
++{
++	return early_fdt_ptr;
++}
++
++void __init early_fdt_map(u64 dt_phys)
++{
++	int fdt_size;
++
++	early_fixmap_init();
++	early_fdt_ptr = fixmap_remap_fdt(dt_phys, &fdt_size, PAGE_KERNEL);
++}
++
+ static void __init setup_machine_fdt(phys_addr_t dt_phys)
+ {
+ 	int size;
 -- 
 2.29.2
 
