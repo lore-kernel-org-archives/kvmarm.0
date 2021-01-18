@@ -2,71 +2,91 @@ Return-Path: <SRS0=ax30=GV=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.4 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C1B0C433DB
-	for <kvmarm@archiver.kernel.org>; Mon, 18 Jan 2021 13:16:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3B98C433DB
+	for <kvmarm@archiver.kernel.org>; Mon, 18 Jan 2021 13:18:50 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 92A7322B4E
-	for <kvmarm@archiver.kernel.org>; Mon, 18 Jan 2021 13:16:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92A7322B4E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 2559122B49
+	for <kvmarm@archiver.kernel.org>; Mon, 18 Jan 2021 13:18:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2559122B49
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CA5674B29F;
-	Mon, 18 Jan 2021 08:16:31 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9372E4B265;
+	Mon, 18 Jan 2021 08:18:49 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id x+z5FalKuVh4; Mon, 18 Jan 2021 08:16:27 -0500 (EST)
+	with ESMTP id PtRF+eqWvE13; Mon, 18 Jan 2021 08:18:46 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9618B4B2A4;
-	Mon, 18 Jan 2021 08:16:27 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F11414B267;
+	Mon, 18 Jan 2021 08:18:45 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B79EF4B2A1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jan 2021 08:16:26 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 82AED4B267
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jan 2021 08:18:44 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9N+Fc-CV4pwC for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 Jan 2021 08:16:24 -0500 (EST)
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B1A1D4B29F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jan 2021 08:16:23 -0500 (EST)
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
- by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DKC1r5CHCzMLqq;
- Mon, 18 Jan 2021 21:14:56 +0800 (CST)
-Received: from [10.174.184.42] (10.174.184.42) by
- DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
- 14.3.498.0; Mon, 18 Jan 2021 21:16:09 +0800
-Subject: Re: [PATCH v2 2/2] vfio/iommu_type1: Sanity check pfn_list when
- remove vfio_dma
-To: Alex Williamson <alex.williamson@redhat.com>
-References: <20210115092643.728-1-zhukeqian1@huawei.com>
- <20210115092643.728-3-zhukeqian1@huawei.com>
- <20210115121447.54c96857@omen.home.shazbot.org>
-From: Keqian Zhu <zhukeqian1@huawei.com>
-Message-ID: <32f8b347-587a-1a9a-bee8-569f09a03a15@huawei.com>
-Date: Mon, 18 Jan 2021 21:16:08 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+ with ESMTP id VtfTxRUTVoPh for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 Jan 2021 08:18:42 -0500 (EST)
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com
+ [209.85.221.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 89C584B265
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jan 2021 08:18:42 -0500 (EST)
+Received: by mail-wr1-f52.google.com with SMTP id 6so9142662wri.3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jan 2021 05:18:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=dT8H6DDOS90XqFHWCI7TqFyOQmYmAu8E1f2CVSOpl/o=;
+ b=EgspKE8oFCLCiFmdwKtBz2VjUuROfWzgFVAWJT2v2444A0T/mq8eQwih4wjcbDddGB
+ kXj2hnBpS3W4vDilb//9GY6jrkUfIj44PxVpxH9MYX5ds+1WnMVw4MzIhG9J0reDPisi
+ scE5mTvdAw5Hlnnn4IAsMJw8kncej6tCC3sqbl6YcHhuoYyKStMyGTHZ33dug43+iaLi
+ /vLjOyriHbV/JZgpR6REiio1aSN9n5pXnhww3etjfo01vaa34iINw6EeAMAFbx+NYhgA
+ rmoDjcd5wEqNg07GM1PnTNgJTYdRNnZMMnL9gFv1EMrC7g5IwYhcj+CIV849advE4KO/
+ cG9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=dT8H6DDOS90XqFHWCI7TqFyOQmYmAu8E1f2CVSOpl/o=;
+ b=ZmJaI4Vb9yo79qMM4nzs3p8eLBs6LqI1akdKQxRF3obS/Drt7MEvpdeU2sVj4DQ+CJ
+ rFn7Nu57NxyPrMnWEZKlQR6wnr5HL8Ir/BWD2Y/0h1HmVjEFtEDpyjUPW671vkWsZula
+ YTqqVP1tb8F2o1BDipozJP2eIBWQj2xcXEXyLFi3CjWWvKYmzh57TQAH4UgOlcWVGHIU
+ 3rjhXYTLfGH9vEwGNNOzlAUw4iz4OtqmX3Ud2w5o1zsPFxr6BlLGo/INHRgu8Bj2SzWU
+ fIJKxlgG9wyeqvn2dTtrkGxyY8UPrVJxBfHfr65WPO/KKZigqj2Z7KlPyURESZdKAFXI
+ uWiw==
+X-Gm-Message-State: AOAM530bjHyVTz8EdF2Lb6rdXtn4R6fNeoGx//4SwiALQsv8IMmOjmF0
+ tO2thIrKJiuTgiKvTRiAMKCwqg==
+X-Google-Smtp-Source: ABdhPJwWobt6pVg/42LLNxfilYuO6c87nDIqhPBmiOFom1mvCywbxa/XGq5HBvenNWiYZUprwDAUKA==
+X-Received: by 2002:adf:e883:: with SMTP id d3mr25756288wrm.139.1610975921450; 
+ Mon, 18 Jan 2021 05:18:41 -0800 (PST)
+Received: from google.com ([2a01:4b00:8523:2d03:3d4d:985d:87b7:4d55])
+ by smtp.gmail.com with ESMTPSA id y14sm25110466wru.96.2021.01.18.05.18.40
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 18 Jan 2021 05:18:40 -0800 (PST)
+Date: Mon, 18 Jan 2021 13:18:39 +0000
+From: David Brazdil <dbrazdil@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v4 15/21] arm64: Add an aliasing facility for the idreg
+ override
+Message-ID: <20210118131839.7ao33jeufq3dfnb4@google.com>
+References: <20210118094533.2874082-1-maz@kernel.org>
+ <20210118094533.2874082-16-maz@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20210115121447.54c96857@omen.home.shazbot.org>
-X-Originating-IP: [10.174.184.42]
-X-CFilter-Loop: Reflected
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- Kirti Wankhede <kwankhede@nvidia.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, Marc
- Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
- Daniel Lezcano <daniel.lezcano@linaro.org>,
- Alexios Zavras <alexios.zavras@intel.com>,
- Thomas Gleixner <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org,
- Cornelia Huck <cohuck@redhat.com>, linux-kernel@vger.kernel.org,
- iommu@lists.linux-foundation.org, Andrew Morton <akpm@linux-foundation.org>,
- Robin Murphy <robin.murphy@arm.com>
+Content-Disposition: inline
+In-Reply-To: <20210118094533.2874082-16-maz@kernel.org>
+Cc: kernel-team@android.com, Srinivas Ramana <sramana@codeaurora.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+ Ard Biesheuvel <ardb@kernel.org>, Ajay Patil <pajay@qti.qualcomm.com>,
+ Prasad Sodagudi <psodagud@codeaurora.org>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -83,103 +103,77 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-
-
-On 2021/1/16 3:14, Alex Williamson wrote:
-> On Fri, 15 Jan 2021 17:26:43 +0800
-> Keqian Zhu <zhukeqian1@huawei.com> wrote:
+On Mon, Jan 18, 2021 at 09:45:27AM +0000, Marc Zyngier wrote:
+> In order to map the override of idregs to options that a user
+> can easily understand, let's introduce yet another option
+> array, which maps an option to the corresponding idreg options.
 > 
->> vfio_sanity_check_pfn_list() is used to check whether pfn_list of
->> vfio_dma is empty when remove the external domain, so it makes a
->> wrong assumption that only external domain will add pfn to dma pfn_list.
->>
->> Now we apply this check when remove a specific vfio_dma and extract
->> the notifier check just for external domain.
-> 
-> The page pinning interface is gated by having a notifier registered for
-> unmaps, therefore non-external domains would also need to register a
-> notifier.  There's currently no other way to add entries to the
-> pfn_list.  So if we allow pinning for such domains, then it's wrong to
-> WARN_ON() when the notifier list is not-empty when removing an external
-> domain.  Long term we should probably extend page {un}pinning for the
-> caller to pass their notifier to be validated against the notifier list
-> rather than just allowing page pinning if *any* notifier is registered.
-> Thanks,
-I was misled by the code comments. So when the commit a54eb55045ae is added, the only
-user of pin interface is mdev vendor driver, but now we also allow iommu backed group
-to use this interface to constraint dirty scope. Is vfio_iommu_unmap_unpin_all() a
-proper place to put this WARN()?
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+Acked-by: David Brazdil <dbrazdil@google.com>
 
-Thanks,
-Keqian
-
+> ---
+>  arch/arm64/kernel/idreg-override.c | 20 ++++++++++++++++++++
+>  1 file changed, 20 insertions(+)
 > 
-> Alex
+> diff --git a/arch/arm64/kernel/idreg-override.c b/arch/arm64/kernel/idreg-override.c
+> index 75d9845f489b..16bc8b3b93ae 100644
+> --- a/arch/arm64/kernel/idreg-override.c
+> +++ b/arch/arm64/kernel/idreg-override.c
+> @@ -37,6 +37,12 @@ static const struct reg_desc * const regs[] __initdata = {
+>  	&mmfr1,
+>  };
 >  
->> Fixes: a54eb55045ae ("vfio iommu type1: Add support for mediated devices")
->> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
->> ---
->>  drivers/vfio/vfio_iommu_type1.c | 24 +++++-------------------
->>  1 file changed, 5 insertions(+), 19 deletions(-)
->>
->> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
->> index 4e82b9a3440f..a9bc15e84a4e 100644
->> --- a/drivers/vfio/vfio_iommu_type1.c
->> +++ b/drivers/vfio/vfio_iommu_type1.c
->> @@ -958,6 +958,7 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
->>  
->>  static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
->>  {
->> +	WARN_ON(!RB_EMPTY_ROOT(&dma->pfn_list);
->>  	vfio_unmap_unpin(iommu, dma, true);
->>  	vfio_unlink_dma(iommu, dma);
->>  	put_task_struct(dma->task);
->> @@ -2251,23 +2252,6 @@ static void vfio_iommu_unmap_unpin_reaccount(struct vfio_iommu *iommu)
->>  	}
->>  }
->>  
->> -static void vfio_sanity_check_pfn_list(struct vfio_iommu *iommu)
->> -{
->> -	struct rb_node *n;
->> -
->> -	n = rb_first(&iommu->dma_list);
->> -	for (; n; n = rb_next(n)) {
->> -		struct vfio_dma *dma;
->> -
->> -		dma = rb_entry(n, struct vfio_dma, node);
->> -
->> -		if (WARN_ON(!RB_EMPTY_ROOT(&dma->pfn_list)))
->> -			break;
->> -	}
->> -	/* mdev vendor driver must unregister notifier */
->> -	WARN_ON(iommu->notifier.head);
->> -}
->> -
->>  /*
->>   * Called when a domain is removed in detach. It is possible that
->>   * the removed domain decided the iova aperture window. Modify the
->> @@ -2367,7 +2351,8 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
->>  			kfree(group);
->>  
->>  			if (list_empty(&iommu->external_domain->group_list)) {
->> -				vfio_sanity_check_pfn_list(iommu);
->> +				/* mdev vendor driver must unregister notifier */
->> +				WARN_ON(iommu->notifier.head);
->>  
->>  				if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu))
->>  					vfio_iommu_unmap_unpin_all(iommu);
->> @@ -2491,7 +2476,8 @@ static void vfio_iommu_type1_release(void *iommu_data)
->>  
->>  	if (iommu->external_domain) {
->>  		vfio_release_domain(iommu->external_domain, true);
->> -		vfio_sanity_check_pfn_list(iommu);
->> +		/* mdev vendor driver must unregister notifier */
->> +		WARN_ON(iommu->notifier.head);
->>  		kfree(iommu->external_domain);
->>  	}
->>  
-> 
-> .
+> +static const struct {
+> +	const char * const	alias;
+> +	const char * const	feature;
+> +} aliases[] __initdata = {
+> +};
+> +
+>  static int __init find_field(const char *cmdline, const struct reg_desc *reg,
+>  			     int f, u64 *v)
+>  {
+> @@ -80,6 +86,18 @@ static void __init match_options(const char *cmdline)
+>  	}
+>  }
+>  
+> +static __init void match_aliases(const char *cmdline)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(aliases); i++) {
+> +		char *str = strstr(cmdline, aliases[i].alias);
+> +
+> +		if ((str == cmdline || (str > cmdline && *(str - 1) == ' ')))
+
+nit: Extract to a 'cmdline_contains' helper? Took me a good few seconds to
+parse this in the previous patch. Giving it a name would help, and now it's
+also shared.
+
+> +			match_options(aliases[i].feature);
+> +	}
+> +}
+> +
+>  static __init void parse_cmdline(void)
+>  {
+>  	if (!IS_ENABLED(CONFIG_CMDLINE_FORCE)) {
+> @@ -100,6 +118,7 @@ static __init void parse_cmdline(void)
+>  			goto out;
+>  
+>  		match_options(prop);
+> +		match_aliases(prop);
+>  
+>  		if (!IS_ENABLED(CONFIG_CMDLINE_EXTEND))
+>  			return;
+> @@ -107,6 +126,7 @@ static __init void parse_cmdline(void)
+>  
+>  out:
+>  	match_options(CONFIG_CMDLINE);
+> +	match_aliases(CONFIG_CMDLINE);
+>  }
+>  
+>  void __init init_shadow_regs(void)
+> -- 
+> 2.29.2
 > 
 _______________________________________________
 kvmarm mailing list
