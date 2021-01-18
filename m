@@ -2,89 +2,70 @@ Return-Path: <SRS0=ax30=GV=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5111BC433E0
-	for <kvmarm@archiver.kernel.org>; Mon, 18 Jan 2021 11:13:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4C7EC433E0
+	for <kvmarm@archiver.kernel.org>; Mon, 18 Jan 2021 11:18:28 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 81AAA22B39
-	for <kvmarm@archiver.kernel.org>; Mon, 18 Jan 2021 11:13:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81AAA22B39
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 6A37E223E8
+	for <kvmarm@archiver.kernel.org>; Mon, 18 Jan 2021 11:18:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A37E223E8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ABE574B270;
-	Mon, 18 Jan 2021 06:13:47 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A0F1E4B1E2;
+	Mon, 18 Jan 2021 06:18:27 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 98-gP9GJYcu5; Mon, 18 Jan 2021 06:13:46 -0500 (EST)
+	with ESMTP id Jl-+dgnbq9zE; Mon, 18 Jan 2021 06:18:26 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B334C4B272;
-	Mon, 18 Jan 2021 06:13:46 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 89D1C4B268;
+	Mon, 18 Jan 2021 06:18:26 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 79D184B270
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jan 2021 06:13:45 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 863D04B25A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jan 2021 06:18:25 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id On6gTczei6S7 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 Jan 2021 06:13:44 -0500 (EST)
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com
- [209.85.128.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5040A4B254
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jan 2021 06:13:44 -0500 (EST)
-Received: by mail-wm1-f44.google.com with SMTP id g10so13424055wmh.2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jan 2021 03:13:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=fLMG4vsTzbqzDa7NYZTtEssmDNdJhpiTjSVtjAKlEtA=;
- b=bYq5xCIxzjmV299kxFOaCiB/AS3jxa624Jqc6YIZmywPF0VJLTMwG3jbAp3Rl307/k
- hbfiB4H9mXbxETPI4v+GT1gwFHDX70mGRsQar2IpJ2FKIAKHJvFWzRMFchybki6gBfPB
- 6p7Z5e/42vPSZqedt7jpJtu9+gZwqSj8cfxt/JH2KRt19eCGYArh3kvHtA9a7qRIRLL8
- b+nazIab6dctS0iZyKhVbpkE8mb0EMfLHaKpgyBxCulmhIYnf5VVvq5LCDBvM/gkb6AL
- 2M3nAOmJjcBr9iah49+H/XndkzN8NpGh9ij+ij8wEH6swOnsfecHixfdPAc94g17XTIC
- z6bA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=fLMG4vsTzbqzDa7NYZTtEssmDNdJhpiTjSVtjAKlEtA=;
- b=tFg5z6+33oxBYgjU8+y/+eQ/dUfODkpzGxQn1pvzWm4e1qpMPOi8NG4K1mIuPcrYde
- 6atFZdNKc4pEIAzSol+yeQuzhXqwZH2Fq6szWQZPbGt4v7btXpXyC+Z2Yakjt7x769HQ
- ftT4Bnl9LwQa6FOEk294T2yQhvxdCZguTw2JmpfC83HlMmLoUAwePz/vePV6nNoEYYWd
- AiQiaWz1eVYbfpLRyH06uWOhqRABM9TeOkMKfzsRWNolcdqNsgZB/amfFqbQzhvve7t6
- iexii2z9dYjtb/nkEwcy7OZ89GPfY4DNw1vyBqpvd+bGEMnT1d+55wdonovmXTa8wFxQ
- tLtA==
-X-Gm-Message-State: AOAM531Z0enHZSidh1elzjiCxk1XTN1s5/3zyQCbhn93GHuDlw60cyF5
- xBvSMXaOyHwa0omseIjCwpAkXw==
-X-Google-Smtp-Source: ABdhPJzf9c0SbOFn9Oq6MnmHnjRdRnsDCTN+qFk/yY+z+IA/dnEfzlcf743XMJ3WHiVu6gPS86334Q==
-X-Received: by 2002:a1c:e055:: with SMTP id x82mr19724434wmg.185.1610968423194; 
- Mon, 18 Jan 2021 03:13:43 -0800 (PST)
-Received: from google.com ([2a01:4b00:8523:2d03:3d4d:985d:87b7:4d55])
- by smtp.gmail.com with ESMTPSA id b7sm28398175wrv.47.2021.01.18.03.13.41
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 18 Jan 2021 03:13:42 -0800 (PST)
-Date: Mon, 18 Jan 2021 11:13:41 +0000
-From: David Brazdil <dbrazdil@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v4 01/21] arm64: Fix labels in el2_setup macros
-Message-ID: <20210118111341.porgvi56bzqlt36v@google.com>
-References: <20210118094533.2874082-1-maz@kernel.org>
- <20210118094533.2874082-2-maz@kernel.org>
+ with ESMTP id 8dGwhpfTlss9 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 Jan 2021 06:18:24 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 840154B1E2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jan 2021 06:18:24 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 2481520E65;
+ Mon, 18 Jan 2021 11:18:23 +0000 (UTC)
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
+ TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1l1SY8-008Sno-QZ; Mon, 18 Jan 2021 11:18:21 +0000
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210118094533.2874082-2-maz@kernel.org>
-Cc: kernel-team@android.com, Srinivas Ramana <sramana@codeaurora.org>,
- Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
- Ard Biesheuvel <ardb@kernel.org>, Ajay Patil <pajay@qti.qualcomm.com>,
- Prasad Sodagudi <psodagud@codeaurora.org>, Will Deacon <will@kernel.org>,
+Date: Mon, 18 Jan 2021 11:18:20 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Yejune Deng <yejune.deng@gmail.com>
+Subject: Re: [PATCH] KVM: arm64: Fix the return value of
+ smp_call_function_single()
+In-Reply-To: <20210118093137.3383-1-yejune.deng@gmail.com>
+References: <20210118093137.3383-1-yejune.deng@gmail.com>
+User-Agent: Roundcube Webmail/1.4.10
+Message-ID: <af2ea1ad8df12907fa24eb4bf44c6e99@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: yejune.deng@gmail.com, james.morse@arm.com,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, catalin.marinas@arm.com,
+ will@kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: catalin.marinas@arm.com, linux-kernel@vger.kernel.org, will@kernel.org,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -97,34 +78,72 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Jan 18, 2021 at 09:45:13AM +0000, Marc Zyngier wrote:
-> If someone happens to write the following code:
+On 2021-01-18 09:31, Yejune Deng wrote:
+> In smp_call_function_single(), the 3rd parameter isn't the return value
+> and it's always positive. But it may return a negative value. So the
+> 'ret' is should be the return value of the smp_call_function_single().
 > 
-> 	b	1f
-> 	init_el2_state	vhe
-> 1:
-> 	[...]
+> In check_kvm_target_cpu(), 'phys_target' is more readable than 'ret'.
 > 
-> they will be in for a long debugging session, as the label "1f"
-> will be resolved *inside* the init_el2_state macro instead of
-> after it. Not really what one expects.
-> 
-> Instead, rewite the EL2 setup macros to use unambiguous labels,
-> thanks to the usual macro counter trick.
-> 
-> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Yejune Deng <yejune.deng@gmail.com>
 > ---
->  arch/arm64/include/asm/el2_setup.h | 24 ++++++++++++------------
->  1 file changed, 12 insertions(+), 12 deletions(-)
+>  arch/arm64/kvm/arm.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 04c44853b103..5fa5c04106de 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1815,9 +1815,9 @@ static int init_hyp_mode(void)
+>  	return err;
+>  }
+> 
+> -static void check_kvm_target_cpu(void *ret)
+> +static void check_kvm_target_cpu(void *phys_target)
+>  {
+> -	*(int *)ret = kvm_target_cpu();
+> +	*(int *)phys_target = kvm_target_cpu();
+>  }
+> 
+>  struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long 
+> mpidr)
+> @@ -1879,7 +1879,7 @@ void kvm_arch_irq_bypass_start(struct
+> irq_bypass_consumer *cons)
+>  int kvm_arch_init(void *opaque)
+>  {
+>  	int err;
+> -	int ret, cpu;
+> +	int ret, cpu, phys_target;
+>  	bool in_hyp_mode;
+> 
+>  	if (!is_hyp_mode_available()) {
+> @@ -1900,7 +1900,7 @@ int kvm_arch_init(void *opaque)
+>  			 "Only trusted guests should be used on this system.\n");
+> 
+>  	for_each_online_cpu(cpu) {
+> -		smp_call_function_single(cpu, check_kvm_target_cpu, &ret, 1);
+> +		ret = smp_call_function_single(cpu, check_kvm_target_cpu, 
+> &phys_target, 1);
+>  		if (ret < 0) {
+>  			kvm_err("Error, CPU %d not supported!\n", cpu);
+>  			return -ENODEV;
 
-Acked-by: David Brazdil <dbrazdil@google.com>
+That's not the purpose of this code. We check the target CPU
+for so that we can decide to *fail* the KVM init if there is
+a CPU we do not support (we definitely used to do that with
+32bit), and the error message clearly states this.
 
+So if you want to handle a cross-call failure, please do that.
+But don't change the existing semantics of this code.
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
