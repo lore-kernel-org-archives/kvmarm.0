@@ -2,91 +2,69 @@ Return-Path: <SRS0=ax30=GV=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.4 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F1CBC433E9
-	for <kvmarm@archiver.kernel.org>; Mon, 18 Jan 2021 13:29:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 722B3C433E0
+	for <kvmarm@archiver.kernel.org>; Mon, 18 Jan 2021 13:34:00 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 05CC4221FB
-	for <kvmarm@archiver.kernel.org>; Mon, 18 Jan 2021 13:29:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05CC4221FB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id DF46A222F9
+	for <kvmarm@archiver.kernel.org>; Mon, 18 Jan 2021 13:33:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF46A222F9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 51B4B4B29F;
-	Mon, 18 Jan 2021 08:29:41 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F63B4B2A8;
+	Mon, 18 Jan 2021 08:33:59 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id nTgTKwnbFovp; Mon, 18 Jan 2021 08:29:40 -0500 (EST)
+	with ESMTP id lJEPBqis5ayr; Mon, 18 Jan 2021 08:33:57 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 542774B2A3;
-	Mon, 18 Jan 2021 08:29:40 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DF2AB4B27E;
+	Mon, 18 Jan 2021 08:33:57 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1ADE44B29D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jan 2021 08:29:39 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 810104B27E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jan 2021 08:33:56 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nHxaiM4pbPq9 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 Jan 2021 08:29:38 -0500 (EST)
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com
- [209.85.128.42])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 15A024B26D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jan 2021 08:29:38 -0500 (EST)
-Received: by mail-wm1-f42.google.com with SMTP id g10so13780472wmh.2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jan 2021 05:29:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=azSUNypoUfXkpBNPZlINL/zcgEf9pXSAwHyqYLVciok=;
- b=Hdiq7ktUglPw2zVeBs7zzB+XtzIcpfitaPaWUCwOh9Lp9grsNlqjNfLEhWzbdqjyLr
- XwhO7yBQNhaa8PVRuXmwzBb4HoBM0FMU2kRFd1BKaZ4uX5qIute8XLIkw7aleByJtYGf
- BXUpgbwE6/LwYO5XnDY7K5pT8zQ7ng+PiUgi2+ewvj/+yl6NJJxZ448sKc8AC8xmExWX
- iyq8MLnxO818KbMz6m0jlISbSB5HOIgfxzwLAjOrQi8IDKamWFVMBQUCoTXjfam8WtZw
- NpPZUO8H3m3DlxZyqJQvFXYlVIjWbYG5/v1nBe7gt5DE1oDYURdCVacMi3U98mL76gyk
- ElPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=azSUNypoUfXkpBNPZlINL/zcgEf9pXSAwHyqYLVciok=;
- b=HeycWSLr6vB2JX2zSpJK8t+DmIu6HYkaDzZUoobViwR3st6K39tT7Q1dAQkjLFD5xB
- 60R8JWTW+o4AwvYzUuIn2CHZnKMs9aHZZ+eHGCyMBTCvrfHSjOZzlrP5qUbJto4Cea2T
- warxasuFN4O4mwdmc/jg9ggWaeR5hIuzX12wPh2u8DfKpWBibMLBEjmBAc0DW+my8XIs
- k6uAqXnzgtzRDMva36X/qq4LlEY6CB4U2KabBWLNjdoZRZP5YMzy37Leo93IqUfFVYGs
- e2KSLwdGrnTxTKjFqr6Lm/vu+m8KFENvB6z2CHMG7ShM8YWOHhognwqjNCkBmftzdkrA
- pb8g==
-X-Gm-Message-State: AOAM533sSBJ+3smB47OZWyZRA/gpGsirb93FQ2ZU0BHvE8mi2gnyz9KU
- BZUqVZeJ7Ulnmx6TLS9iCpkrpg==
-X-Google-Smtp-Source: ABdhPJwuICFtdmLsGWmzfsOVlfdR9kik5BbE6wWl9u1IG/qQD53UckSQXbc/RrHmiYn+JKe9B1+ugg==
-X-Received: by 2002:a1c:40d6:: with SMTP id n205mr21244747wma.0.1610976576985; 
- Mon, 18 Jan 2021 05:29:36 -0800 (PST)
-Received: from google.com ([2a01:4b00:8523:2d03:3d4d:985d:87b7:4d55])
- by smtp.gmail.com with ESMTPSA id g5sm30955277wro.60.2021.01.18.05.29.35
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 18 Jan 2021 05:29:36 -0800 (PST)
-Date: Mon, 18 Jan 2021 13:29:35 +0000
-From: David Brazdil <dbrazdil@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v4 17/21] KVM: arm64: Document HVC_VHE_RESTART stub
- hypercall
-Message-ID: <20210118132935.mutemf7j7wtyz7wz@google.com>
-References: <20210118094533.2874082-1-maz@kernel.org>
- <20210118094533.2874082-18-maz@kernel.org>
+ with ESMTP id OLyMPNw8O592 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 Jan 2021 08:33:54 -0500 (EST)
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A37CC4B279
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jan 2021 08:33:53 -0500 (EST)
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
+ by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DKCQ215LFzMLJL;
+ Mon, 18 Jan 2021 21:32:26 +0800 (CST)
+Received: from [10.174.184.42] (10.174.184.42) by
+ DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
+ 14.3.498.0; Mon, 18 Jan 2021 21:33:40 +0800
+Subject: Re: [PATCH 1/6] vfio/iommu_type1: Make an explicit "promote" semantic
+To: Alex Williamson <alex.williamson@redhat.com>
+References: <20210107044401.19828-1-zhukeqian1@huawei.com>
+ <20210107044401.19828-2-zhukeqian1@huawei.com>
+ <20210115154240.0d3ee455@omen.home.shazbot.org>
+From: Keqian Zhu <zhukeqian1@huawei.com>
+Message-ID: <0cf47d65-cb91-199e-af7d-048134634298@huawei.com>
+Date: Mon, 18 Jan 2021 21:33:39 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210118094533.2874082-18-maz@kernel.org>
-Cc: kernel-team@android.com, Srinivas Ramana <sramana@codeaurora.org>,
- Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
- Ard Biesheuvel <ardb@kernel.org>, Ajay Patil <pajay@qti.qualcomm.com>,
- Prasad Sodagudi <psodagud@codeaurora.org>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20210115154240.0d3ee455@omen.home.shazbot.org>
+X-Originating-IP: [10.174.184.42]
+X-CFilter-Loop: Reflected
+Cc: Daniel Lezcano <daniel.lezcano@linaro.org>,
+ Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org,
+ Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
+ Cornelia Huck <cohuck@redhat.com>, linux-kernel@vger.kernel.org,
+ Alexios Zavras <alexios.zavras@intel.com>, iommu@lists.linux-foundation.org,
+ Catalin Marinas <catalin.marinas@arm.com>, Thomas
+ Gleixner <tglx@linutronix.de>, Will
+ Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, Robin Murphy <robin.murphy@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -103,40 +81,157 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Jan 18, 2021 at 09:45:29AM +0000, Marc Zyngier wrote:
-> For completeness, let's document the HVC_VHE_RESTART stub.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-Acked-by: David Brazdil <dbrazdil@google.com>
 
-> ---
->  Documentation/virt/kvm/arm/hyp-abi.rst | 9 +++++++++
->  1 file changed, 9 insertions(+)
-> 
-> diff --git a/Documentation/virt/kvm/arm/hyp-abi.rst b/Documentation/virt/kvm/arm/hyp-abi.rst
-> index 83cadd8186fa..1ba628baf11b 100644
-> --- a/Documentation/virt/kvm/arm/hyp-abi.rst
-> +++ b/Documentation/virt/kvm/arm/hyp-abi.rst
-> @@ -58,6 +58,15 @@ these functions (see arch/arm{,64}/include/asm/virt.h):
->    into place (arm64 only), and jump to the restart address while at HYP/EL2.
->    This hypercall is not expected to return to its caller.
->  
-> +* ::
-> +
-> +    x0 = HVC_VHE_RESTART (arm64 only)
-> +
-> +  Attempt to upgrade the kernel's exception level from EL1 to EL2 by enabling
-> +  the VHE mode. This is conditioned by the CPU supporting VHE, the EL2 MMU
-> +  being off, and VHE not being disabled by any other mean (comment line option,
-'means' (both singular and plural), and 'command line'
 
-> +  for example).
-> +
->  Any other value of r0/x0 triggers a hypervisor-specific handling,
->  which is not documented here.
->  
-> -- 
-> 2.29.2
+On 2021/1/16 6:42, Alex Williamson wrote:
+> On Thu, 7 Jan 2021 12:43:56 +0800
+> Keqian Zhu <zhukeqian1@huawei.com> wrote:
+> 
+>> When we want to promote the pinned_page_dirty_scope of vfio_iommu,
+>> we call the "update" function to visit all vfio_group, but when we
+>> want to downgrade this, we can set the flag as false directly.
+> 
+> I agree that the transition can only go in one direction, but it's
+> still conditional on the scope of all groups involved.  We are
+> "updating" the iommu state based on the change of a group.  Renaming
+> this to "promote" seems like a matter of personal preference.
+> 
+>> So we'd better make an explicit "promote" semantic to the "update"
+>> function. BTW, if vfio_iommu already has been promoted, then return
+>> early.
+> 
+> Currently it's the caller that avoids using this function when the
+> iommu scope is already correct.  In fact the changes induces a
+> redundant test in the pin_pages code path, we're changing a group from
+> non-pinned-page-scope to pinned-page-scope, therefore the iommu scope
+> cannot initially be scope limited.  In the attach_group call path,
+> we're moving that test from the caller, so at best we've introduced an
+> additional function call.
+> 
+> The function as it exists today is also more versatile whereas the
+> "promote" version here forces it to a single task with no appreciable
+> difference in complexity or code.  This seems like a frivolous change.
+> Thanks,
+OK, I will adapt your idea that maintenance a counter of non-pinned groups.
+Then we keep the "update" semantic, and the target is the counter ;-).
+
+Thanks,
+Keqian
+
+> 
+> Alex
+> 
+>> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+>> ---
+>>  drivers/vfio/vfio_iommu_type1.c | 30 ++++++++++++++----------------
+>>  1 file changed, 14 insertions(+), 16 deletions(-)
+>>
+>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+>> index 0b4dedaa9128..334a8240e1da 100644
+>> --- a/drivers/vfio/vfio_iommu_type1.c
+>> +++ b/drivers/vfio/vfio_iommu_type1.c
+>> @@ -148,7 +148,7 @@ static int put_pfn(unsigned long pfn, int prot);
+>>  static struct vfio_group *vfio_iommu_find_iommu_group(struct vfio_iommu *iommu,
+>>  					       struct iommu_group *iommu_group);
+>>  
+>> -static void update_pinned_page_dirty_scope(struct vfio_iommu *iommu);
+>> +static void promote_pinned_page_dirty_scope(struct vfio_iommu *iommu);
+>>  /*
+>>   * This code handles mapping and unmapping of user data buffers
+>>   * into DMA'ble space using the IOMMU
+>> @@ -714,7 +714,7 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+>>  	group = vfio_iommu_find_iommu_group(iommu, iommu_group);
+>>  	if (!group->pinned_page_dirty_scope) {
+>>  		group->pinned_page_dirty_scope = true;
+>> -		update_pinned_page_dirty_scope(iommu);
+>> +		promote_pinned_page_dirty_scope(iommu);
+>>  	}
+>>  
+>>  	goto pin_done;
+>> @@ -1622,27 +1622,26 @@ static struct vfio_group *vfio_iommu_find_iommu_group(struct vfio_iommu *iommu,
+>>  	return group;
+>>  }
+>>  
+>> -static void update_pinned_page_dirty_scope(struct vfio_iommu *iommu)
+>> +static void promote_pinned_page_dirty_scope(struct vfio_iommu *iommu)
+>>  {
+>>  	struct vfio_domain *domain;
+>>  	struct vfio_group *group;
+>>  
+>> +	if (iommu->pinned_page_dirty_scope)
+>> +		return;
+>> +
+>>  	list_for_each_entry(domain, &iommu->domain_list, next) {
+>>  		list_for_each_entry(group, &domain->group_list, next) {
+>> -			if (!group->pinned_page_dirty_scope) {
+>> -				iommu->pinned_page_dirty_scope = false;
+>> +			if (!group->pinned_page_dirty_scope)
+>>  				return;
+>> -			}
+>>  		}
+>>  	}
+>>  
+>>  	if (iommu->external_domain) {
+>>  		domain = iommu->external_domain;
+>>  		list_for_each_entry(group, &domain->group_list, next) {
+>> -			if (!group->pinned_page_dirty_scope) {
+>> -				iommu->pinned_page_dirty_scope = false;
+>> +			if (!group->pinned_page_dirty_scope)
+>>  				return;
+>> -			}
+>>  		}
+>>  	}
+>>  
+>> @@ -2057,8 +2056,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>>  			 * addition of a dirty tracking group.
+>>  			 */
+>>  			group->pinned_page_dirty_scope = true;
+>> -			if (!iommu->pinned_page_dirty_scope)
+>> -				update_pinned_page_dirty_scope(iommu);
+>> +			promote_pinned_page_dirty_scope(iommu);
+>>  			mutex_unlock(&iommu->lock);
+>>  
+>>  			return 0;
+>> @@ -2341,7 +2339,7 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
+>>  	struct vfio_iommu *iommu = iommu_data;
+>>  	struct vfio_domain *domain;
+>>  	struct vfio_group *group;
+>> -	bool update_dirty_scope = false;
+>> +	bool promote_dirty_scope = false;
+>>  	LIST_HEAD(iova_copy);
+>>  
+>>  	mutex_lock(&iommu->lock);
+>> @@ -2349,7 +2347,7 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
+>>  	if (iommu->external_domain) {
+>>  		group = find_iommu_group(iommu->external_domain, iommu_group);
+>>  		if (group) {
+>> -			update_dirty_scope = !group->pinned_page_dirty_scope;
+>> +			promote_dirty_scope = !group->pinned_page_dirty_scope;
+>>  			list_del(&group->next);
+>>  			kfree(group);
+>>  
+>> @@ -2379,7 +2377,7 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
+>>  			continue;
+>>  
+>>  		vfio_iommu_detach_group(domain, group);
+>> -		update_dirty_scope = !group->pinned_page_dirty_scope;
+>> +		promote_dirty_scope = !group->pinned_page_dirty_scope;
+>>  		list_del(&group->next);
+>>  		kfree(group);
+>>  		/*
+>> @@ -2415,8 +2413,8 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
+>>  	 * Removal of a group without dirty tracking may allow the iommu scope
+>>  	 * to be promoted.
+>>  	 */
+>> -	if (update_dirty_scope)
+>> -		update_pinned_page_dirty_scope(iommu);
+>> +	if (promote_dirty_scope)
+>> +		promote_pinned_page_dirty_scope(iommu);
+>>  	mutex_unlock(&iommu->lock);
+>>  }
+>>  
+> 
+> .
 > 
 _______________________________________________
 kvmarm mailing list
