@@ -2,71 +2,54 @@ Return-Path: <SRS0=ax30=GV=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 782CBC433E0
-	for <kvmarm@archiver.kernel.org>; Mon, 18 Jan 2021 16:28:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAC23C433DB
+	for <kvmarm@archiver.kernel.org>; Mon, 18 Jan 2021 17:31:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E4D5A206D8
-	for <kvmarm@archiver.kernel.org>; Mon, 18 Jan 2021 16:28:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4D5A206D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 3691A22CA0
+	for <kvmarm@archiver.kernel.org>; Mon, 18 Jan 2021 17:31:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3691A22CA0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 565364B199;
-	Mon, 18 Jan 2021 11:28:18 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A9C04B28E;
+	Mon, 18 Jan 2021 12:31:05 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 0BkaX4Q-uiR1; Mon, 18 Jan 2021 11:28:17 -0500 (EST)
+	with ESMTP id hWMGVZ0B3UM7; Mon, 18 Jan 2021 12:31:04 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 395FE4B1AD;
-	Mon, 18 Jan 2021 11:28:17 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A63E4B2B3;
+	Mon, 18 Jan 2021 12:31:04 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 392894B1AD
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jan 2021 11:28:16 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E5F834B2A7
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jan 2021 12:31:02 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gTueNXlAM-Dp for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 Jan 2021 11:28:15 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1AF464B199
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jan 2021 11:28:15 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id BB96F206D8;
- Mon, 18 Jan 2021 16:28:13 +0000 (UTC)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
- TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
- (envelope-from <maz@kernel.org>)
- id 1l1XNz-008YJ7-L2; Mon, 18 Jan 2021 16:28:11 +0000
-MIME-Version: 1.0
-Date: Mon, 18 Jan 2021 16:28:11 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH] arm64: Drop workaround for broken 'S' constraint with GCC
- 4.9
-In-Reply-To: <20210118162604.GB4483@gaia>
-References: <20210118130129.2875949-1-maz@kernel.org>
- <20210118162604.GB4483@gaia>
-User-Agent: Roundcube Webmail/1.4.10
-Message-ID: <5e62b07d348a0210f82be5d101c3b109@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: catalin.marinas@arm.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- will@kernel.org, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kernel-team@android.com, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+ with ESMTP id gJZ4V3Z3yPjj for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 Jan 2021 12:31:01 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A799D4B28E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jan 2021 12:31:01 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3048A31B;
+ Mon, 18 Jan 2021 09:31:01 -0800 (PST)
+Received: from donnerap.arm.com (donnerap.cambridge.arm.com [10.1.195.35])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D343E3F719;
+ Mon, 18 Jan 2021 09:30:59 -0800 (PST)
+From: Andre Przywara <andre.przywara@arm.com>
+To: Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>
+Subject: [RFC PATCH] KVM: arm64: Avoid unconditional PMU register access
+Date: Mon, 18 Jan 2021 17:30:54 +0000
+Message-Id: <20210118173054.188160-1-andre.przywara@arm.com>
+X-Mailer: git-send-email 2.17.1
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -78,32 +61,106 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2021-01-18 16:26, Catalin Marinas wrote:
-> On Mon, Jan 18, 2021 at 01:01:29PM +0000, Marc Zyngier wrote:
->> Since GCC < 5.1 has been shown to be unsuitable for the arm64 kernel,
->> let's drop the workaround for the 'S' asm constraint that GCC 4.9
->> doesn't always grok.
->> 
->> This is effectively a revert of 9fd339a45be5 ("arm64: Work around
->> broken GCC 4.9 handling of "S" constraint").
->> 
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> 
-> It looks like I merged this fix in -rc1. Do you want me to merge the
-> revert as well or you'll handle it?
+The ARM PMU is an optional CPU feature, so we should consult the CPUID
+registers before accessing any PMU related registers.
+However the KVM code accesses some PMU registers (PMUSERENR_EL0 and
+PMSEL_EL0) unconditionally, when activating the traps.
+This wasn't a problem so far, because every(?) silicon implements the
+PMU, with KVM guests being the lone exception, and those never ran
+KVM host code.
 
-It'd make sense if it went via the arm64 tree as well.
+As this is about to change with nested virt, we need to guard PMU
+register accesses with a proper CPU feature check.
 
-Thanks,
+Add a new CPU capability, which marks whether we have at least the basic
+PMUv3 registers available. Use that in the KVM VHE code to check before
+accessing the PMU registers.
 
-         M.
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+---
+Hi,
+
+not sure a new CPU capability isn't a bit over the top here, and we should
+use a simple static key instead?
+
+Cheers,
+Andre
+
+ arch/arm64/include/asm/cpucaps.h        |  3 ++-
+ arch/arm64/kernel/cpufeature.c          | 10 ++++++++++
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  9 ++++++---
+ 3 files changed, 18 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
+index b77d997b173b..e3a002583c43 100644
+--- a/arch/arm64/include/asm/cpucaps.h
++++ b/arch/arm64/include/asm/cpucaps.h
+@@ -66,7 +66,8 @@
+ #define ARM64_WORKAROUND_1508412		58
+ #define ARM64_HAS_LDAPR				59
+ #define ARM64_KVM_PROTECTED_MODE		60
++#define ARM64_HAS_PMUV3				61
+ 
+-#define ARM64_NCAPS				61
++#define ARM64_NCAPS				62
+ 
+ #endif /* __ASM_CPUCAPS_H */
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index e99eddec0a46..54d23d38322d 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -2154,6 +2154,16 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.matches = has_cpuid_feature,
+ 		.min_field_value = 1,
+ 	},
++	{
++		.desc = "ARM PMUv3 support",
++		.capability = ARM64_HAS_PMUV3,
++		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
++		.sys_reg = SYS_ID_AA64DFR0_EL1,
++		.sign = FTR_SIGNED,
++		.field_pos = ID_AA64DFR0_PMUVER_SHIFT,
++		.matches = has_cpuid_feature,
++		.min_field_value = 1,
++	},
+ 	{},
+ };
+ 
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 84473574c2e7..622baf7b7371 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -90,15 +90,18 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
+ 	 * counter, which could make a PMXEVCNTR_EL0 access UNDEF at
+ 	 * EL1 instead of being trapped to EL2.
+ 	 */
+-	write_sysreg(0, pmselr_el0);
+-	write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
++	if (cpus_have_final_cap(ARM64_HAS_PMUV3)) {
++		write_sysreg(0, pmselr_el0);
++		write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
++	}
+ 	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
+ }
+ 
+ static inline void __deactivate_traps_common(void)
+ {
+ 	write_sysreg(0, hstr_el2);
+-	write_sysreg(0, pmuserenr_el0);
++	if (cpus_have_final_cap(ARM64_HAS_PMUV3))
++		write_sysreg(0, pmuserenr_el0);
+ }
+ 
+ static inline void ___activate_traps(struct kvm_vcpu *vcpu)
 -- 
-Jazz is not dead. It just smells funny...
+2.17.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
