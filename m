@@ -6,53 +6,53 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5AC5C433DB
-	for <kvmarm@archiver.kernel.org>; Mon, 18 Jan 2021 10:00:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C40CC433E0
+	for <kvmarm@archiver.kernel.org>; Mon, 18 Jan 2021 10:00:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6D6A522B49
-	for <kvmarm@archiver.kernel.org>; Mon, 18 Jan 2021 10:00:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D6A522B49
+	by mail.kernel.org (Postfix) with ESMTP id 0960C22B49
+	for <kvmarm@archiver.kernel.org>; Mon, 18 Jan 2021 10:00:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0960C22B49
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DE004B256;
-	Mon, 18 Jan 2021 05:00:48 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AA4714B253;
+	Mon, 18 Jan 2021 05:00:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id K7BlT+ylh9kl; Mon, 18 Jan 2021 05:00:44 -0500 (EST)
+	with ESMTP id wyzj2R63DqLG; Mon, 18 Jan 2021 05:00:47 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 440CA4B2A4;
-	Mon, 18 Jan 2021 05:00:39 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5BF734B280;
+	Mon, 18 Jan 2021 05:00:44 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 83C1E4B230
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jan 2021 05:00:38 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E49634B1E2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jan 2021 05:00:42 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id N3kMPbeb7jdp for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 Jan 2021 05:00:37 -0500 (EST)
+ with ESMTP id 0a6OUKvpOx7U for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 Jan 2021 05:00:39 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 383F24B2A4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jan 2021 05:00:34 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 434D24B2B3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jan 2021 05:00:36 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 382EF22B40;
- Mon, 18 Jan 2021 10:00:33 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 4DF8122B47;
+ Mon, 18 Jan 2021 10:00:35 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1l1R6w-008RhD-F5; Mon, 18 Jan 2021 09:46:11 +0000
+ id 1l1R6s-008RhD-Rx; Mon, 18 Jan 2021 09:46:06 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  linux-kernel@vger.kernel.org
-Subject: [PATCH v4 15/21] arm64: Add an aliasing facility for the idreg
- override
-Date: Mon, 18 Jan 2021 09:45:27 +0000
-Message-Id: <20210118094533.2874082-16-maz@kernel.org>
+Subject: [PATCH v4 10/21] arm64: cpufeature: Use IDreg override in
+ __read_sysreg_by_encoding()
+Date: Mon, 18 Jan 2021 09:45:22 +0000
+Message-Id: <20210118094533.2874082-11-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210118094533.2874082-1-maz@kernel.org>
 References: <20210118094533.2874082-1-maz@kernel.org>
@@ -89,67 +89,73 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In order to map the override of idregs to options that a user
-can easily understand, let's introduce yet another option
-array, which maps an option to the corresponding idreg options.
+__read_sysreg_by_encoding() is used by a bunch of cpufeature helpers,
+which should take the feature override into account. Let's do that.
+
+For a good measure (and because we are likely to need to further
+down the line), make this helper available to the rest of the
+non-modular kernel.
+
+Code that needs to know the *real* features of a CPU can still
+use read_sysreg_s(), and find the bare, ugly truth.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kernel/idreg-override.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ arch/arm64/include/asm/cpufeature.h |  1 +
+ arch/arm64/kernel/cpufeature.c      | 15 +++++++++++++--
+ 2 files changed, 14 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kernel/idreg-override.c b/arch/arm64/kernel/idreg-override.c
-index 75d9845f489b..16bc8b3b93ae 100644
---- a/arch/arm64/kernel/idreg-override.c
-+++ b/arch/arm64/kernel/idreg-override.c
-@@ -37,6 +37,12 @@ static const struct reg_desc * const regs[] __initdata = {
- 	&mmfr1,
- };
+diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+index 465d2cb63bfc..fe0130d6c0ff 100644
+--- a/arch/arm64/include/asm/cpufeature.h
++++ b/arch/arm64/include/asm/cpufeature.h
+@@ -602,6 +602,7 @@ void __init setup_cpu_features(void);
+ void check_local_cpu_capabilities(void);
  
-+static const struct {
-+	const char * const	alias;
-+	const char * const	feature;
-+} aliases[] __initdata = {
-+};
-+
- static int __init find_field(const char *cmdline, const struct reg_desc *reg,
- 			     int f, u64 *v)
+ u64 read_sanitised_ftr_reg(u32 id);
++u64 __read_sysreg_by_encoding(u32 sys_id);
+ 
+ static inline bool cpu_supports_mixed_endian_el0(void)
  {
-@@ -80,6 +86,18 @@ static void __init match_options(const char *cmdline)
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index aaa075c6f029..48a011935d8c 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -1149,14 +1149,17 @@ u64 read_sanitised_ftr_reg(u32 id)
+ EXPORT_SYMBOL_GPL(read_sanitised_ftr_reg);
+ 
+ #define read_sysreg_case(r)	\
+-	case r:		return read_sysreg_s(r)
++	case r:		val = read_sysreg_s(r); break;
+ 
+ /*
+  * __read_sysreg_by_encoding() - Used by a STARTING cpu before cpuinfo is populated.
+  * Read the system register on the current CPU
+  */
+-static u64 __read_sysreg_by_encoding(u32 sys_id)
++u64 __read_sysreg_by_encoding(u32 sys_id)
+ {
++	struct arm64_ftr_reg *regp;
++	u64 val;
++
+ 	switch (sys_id) {
+ 	read_sysreg_case(SYS_ID_PFR0_EL1);
+ 	read_sysreg_case(SYS_ID_PFR1_EL1);
+@@ -1199,6 +1202,14 @@ static u64 __read_sysreg_by_encoding(u32 sys_id)
+ 		BUG();
+ 		return 0;
  	}
- }
- 
-+static __init void match_aliases(const char *cmdline)
-+{
-+	int i;
 +
-+	for (i = 0; i < ARRAY_SIZE(aliases); i++) {
-+		char *str = strstr(cmdline, aliases[i].alias);
-+
-+		if ((str == cmdline || (str > cmdline && *(str - 1) == ' ')))
-+			match_options(aliases[i].feature);
++	regp  = get_arm64_ftr_reg(sys_id);
++	if (regp && regp->override_mask && regp->override_val) {
++		val &= ~*regp->override_mask;
++		val |= (*regp->override_val & *regp->override_mask);
 +	}
-+}
 +
- static __init void parse_cmdline(void)
- {
- 	if (!IS_ENABLED(CONFIG_CMDLINE_FORCE)) {
-@@ -100,6 +118,7 @@ static __init void parse_cmdline(void)
- 			goto out;
- 
- 		match_options(prop);
-+		match_aliases(prop);
- 
- 		if (!IS_ENABLED(CONFIG_CMDLINE_EXTEND))
- 			return;
-@@ -107,6 +126,7 @@ static __init void parse_cmdline(void)
- 
- out:
- 	match_options(CONFIG_CMDLINE);
-+	match_aliases(CONFIG_CMDLINE);
++	return val;
  }
  
- void __init init_shadow_regs(void)
+ #include <linux/irqchip/arm-gic-v3.h>
 -- 
 2.29.2
 
