@@ -6,66 +6,62 @@ X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4626EC433DB
-	for <kvmarm@archiver.kernel.org>; Wed, 20 Jan 2021 13:01:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF8AEC433E0
+	for <kvmarm@archiver.kernel.org>; Wed, 20 Jan 2021 13:01:34 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8A37B23357
-	for <kvmarm@archiver.kernel.org>; Wed, 20 Jan 2021 13:01:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A37B23357
+	by mail.kernel.org (Postfix) with ESMTP id 2502123355
+	for <kvmarm@archiver.kernel.org>; Wed, 20 Jan 2021 13:01:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2502123355
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CAD674B194;
-	Wed, 20 Jan 2021 08:01:25 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BA3864B153;
+	Wed, 20 Jan 2021 08:01:33 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, body has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ITqM+nl4ehui; Wed, 20 Jan 2021 08:01:24 -0500 (EST)
+	with ESMTP id XmYRPKJSvhgN; Wed, 20 Jan 2021 08:01:28 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C7F134B139;
-	Wed, 20 Jan 2021 08:01:24 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E91274B151;
+	Wed, 20 Jan 2021 08:01:28 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C12F4B132
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jan 2021 08:01:23 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B913A4B139
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jan 2021 08:01:27 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mffvB76opY3l for <kvmarm@lists.cs.columbia.edu>;
- Wed, 20 Jan 2021 08:01:18 -0500 (EST)
+ with ESMTP id 2WNjWw20TryN for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 20 Jan 2021 08:01:26 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 988E94B12E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jan 2021 08:01:18 -0500 (EST)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id B534423359;
- Wed, 20 Jan 2021 13:01:14 +0000 (UTC)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A3D164B12E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jan 2021 08:01:26 -0500 (EST)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 571442336D;
+ Wed, 20 Jan 2021 13:01:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1611147677;
- bh=fv6o22qVsOE0z15uZ3xH1mPJXj9J7IiDzaa60rlTTfI=;
+ s=k20201202; t=1611147685;
+ bh=CQnK8NOEqOn+2lw2WQmrg5m/8Ek+U2xfZNr32QvVLF4=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=YduoI6OqvxriKJsI6iQsSU1sNIWsz3fWcf4p7CgaeOKUjohpRnHheqTU3PO765iNp
- vGY2VXlOFDKPz6nClnbKlg+pWEIsLmdtS9hqA5Gkv+9JpZnB5K4vto/h7uQ1YUBa72
- BOfmeo4m4MPjpBLWr/ztZ2HMgoz1rmHWPn1jXFdbutdoDIqMniwDofk06oaq5C8k04
- /HY/qNDhuAliRs1+FyC2RtEFieEswHxxyUXs3Ph8QfvgUweibnJoFBjwlqQwr19dRn
- netuWz7cQi/Mi5uH8RUsOWkh68DFHIsxGLT6U7born+S/ewfCh+miaybHXTIc7qhAX
- RES9H8/CZub+Q==
+ b=DmkoqN1Qwca0h9LobM+p23TfZWVpO/rGiq3AZ+LGtehnaPaFT+/rMRBveI662sMlh
+ Z260mVVqfhO2zNNrNVr3mW/ZRrGu7n7fAUW1yKXftYxinPbr/jbIWd3aGzmUd8ABC/
+ F5H4VrC+bDnxAh1LpP9Lj5me7mK/yXPdxZBPTmaG+GguFHob2VpENVZpmQLUaMZMqq
+ LOTBFbKErb3S/a+scQszZXySCHrBbboPJ+XXBVLxWHi4xzvAWp4RI2qj13IzlSU7Xk
+ xnBOLloHIg9VgIVnjFlfWHjS0XnW1JTFyr0F77LhQ3Xny+u+0bZMyl82EIkyMuxLED
+ CNXrBwauj+c6Q==
 From: Will Deacon <will@kernel.org>
-To: Marc Zyngier <maz@kernel.org>, Russell King <linux@armlinux.org.uk>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Andre Przywara <andre.przywara@arm.com>, Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH v6 0/5] ARM: arm64: Add SMCCC TRNG entropy service
-Date: Wed, 20 Jan 2021 13:01:02 +0000
-Message-Id: <161114590396.218530.9227813162726341261.b4-ty@kernel.org>
+To: linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
+Subject: Re: [PATCH] arm64: Drop workaround for broken 'S' constraint with GCC
+ 4.9
+Date: Wed, 20 Jan 2021 13:01:07 +0000
+Message-Id: <161114468899.213658.2562467743255957589.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20210106103453.152275-1-andre.przywara@arm.com>
-References: <20210106103453.152275-1-andre.przywara@arm.com>
+In-Reply-To: <20210118130129.2875949-1-maz@kernel.org>
+References: <20210118130129.2875949-1-maz@kernel.org>
 MIME-Version: 1.0
-Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
- Theodore Ts'o <tytso@mit.edu>, kernel-team@android.com,
- Linus Walleij <linus.walleij@linaro.org>, linux-kernel@vger.kernel.org,
- Mark Brown <broonie@kernel.org>, Sudeep Holla <sudeep.holla@arm.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Cc: catalin.marinas@arm.com, kernel-team@android.com,
+ Will Deacon <will@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -82,31 +78,22 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 6 Jan 2021 10:34:48 +0000, Andre Przywara wrote:
-> a fix to v5, now *really* fixing the wrong priority of SMCCC vs. RNDR
-> in arch_get_random_seed_long_early(). Apologies for messing this up
-> in v5 and thanks to broonie for being on the watch!
+On Mon, 18 Jan 2021 13:01:29 +0000, Marc Zyngier wrote:
+> Since GCC < 5.1 has been shown to be unsuitable for the arm64 kernel,
+> let's drop the workaround for the 'S' asm constraint that GCC 4.9
+> doesn't always grok.
 > 
-> Will, Catalin: it would be much appreciated if you could consider taking
-> patch 1/5. This contains the common definitions, and is a prerequisite
-> for every other patch, although they are somewhat independent and likely
-> will need to go through different subsystems.
-> 
-> [...]
+> This is effectively a revert of 9fd339a45be5 ("arm64: Work around
+> broken GCC 4.9 handling of "S" constraint").
 
-Applied the first patch only to arm64 (for-next/rng), thanks!
+Applied to arm64 (for-next/misc), thanks!
 
-[1/5] firmware: smccc: Add SMCCC TRNG function call IDs
-      https://git.kernel.org/arm64/c/67c6bb56b649
-
-What's the plan for the rest of the series, and I think the related
-change over at [1]?
+[1/1] arm64: Drop workaround for broken 'S' constraint with GCC 4.9
+      https://git.kernel.org/arm64/c/7001d4af926b
 
 Cheers,
 -- 
 Will
-
-[1] https://lore.kernel.org/linux-arm-kernel/20201105152944.16953-1-ardb@kernel.org/
 
 https://fixes.arm64.dev
 https://next.arm64.dev
