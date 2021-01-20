@@ -7,56 +7,57 @@ X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEA51C433E6
-	for <kvmarm@archiver.kernel.org>; Wed, 20 Jan 2021 15:57:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0C1FC433E0
+	for <kvmarm@archiver.kernel.org>; Wed, 20 Jan 2021 16:13:37 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 645B92336D
-	for <kvmarm@archiver.kernel.org>; Wed, 20 Jan 2021 15:57:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 645B92336D
+	by mail.kernel.org (Postfix) with ESMTP id 27B29233EA
+	for <kvmarm@archiver.kernel.org>; Wed, 20 Jan 2021 16:13:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27B29233EA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9DE254B10F;
-	Wed, 20 Jan 2021 10:57:06 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 881A84B1AA;
+	Wed, 20 Jan 2021 11:13:36 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9eoxP2dLySOv; Wed, 20 Jan 2021 10:57:05 -0500 (EST)
+	with ESMTP id j4ALnqyTXV1w; Wed, 20 Jan 2021 11:13:35 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C8B44B0CE;
-	Wed, 20 Jan 2021 10:57:05 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 437AD4B16D;
+	Wed, 20 Jan 2021 11:13:35 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 00B9F4A522
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jan 2021 10:57:04 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E3A004B145
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jan 2021 11:13:33 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2sY6Czs6jy9S for <kvmarm@lists.cs.columbia.edu>;
- Wed, 20 Jan 2021 10:57:01 -0500 (EST)
+ with ESMTP id bq1TVeEtDD2X for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 20 Jan 2021 11:13:32 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AA2D14B0CE
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jan 2021 10:57:01 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 567C94B150
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jan 2021 11:13:32 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 310691063;
- Wed, 20 Jan 2021 07:57:01 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F18F6101E;
+ Wed, 20 Jan 2021 08:13:31 -0800 (PST)
 Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A00BF3F68F;
- Wed, 20 Jan 2021 07:56:59 -0800 (PST)
-Subject: Re: [PATCH 5/9] KVM: arm: move has_run_once after the map_resources
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6E9873F68F;
+ Wed, 20 Jan 2021 08:13:30 -0800 (PST)
+Subject: Re: [PATCH 8/9] KVM: arm64: vgic-v3: Expose GICR_TYPER.Last for
+ userspace
 To: Auger Eric <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
  linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
  kvmarm@lists.cs.columbia.edu, maz@kernel.org, drjones@redhat.com
 References: <20201212185010.26579-1-eric.auger@redhat.com>
- <20201212185010.26579-6-eric.auger@redhat.com>
- <0c9976a3-12ae-29b2-1f26-06ee52aa2ffe@arm.com>
- <3465e1e4-d202-ae36-5b61-87f796432428@redhat.com>
+ <20201212185010.26579-9-eric.auger@redhat.com>
+ <45a364ec-eac6-a04b-9654-e97970186839@arm.com>
+ <7078b0a5-fb18-5e65-953a-8a55009aa2be@redhat.com>
 From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <5590800f-f77d-52e1-e408-c1afe4e284a2@arm.com>
-Date: Wed, 20 Jan 2021 15:56:34 +0000
+Message-ID: <a4ab6472-41d9-1259-9416-54b06eb11626@arm.com>
+Date: Wed, 20 Jan 2021 16:13:31 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.6.1
 MIME-Version: 1.0
-In-Reply-To: <3465e1e4-d202-ae36-5b61-87f796432428@redhat.com>
+In-Reply-To: <7078b0a5-fb18-5e65-953a-8a55009aa2be@redhat.com>
 Content-Language: en-US
 Cc: shuah@kernel.org, pbonzini@redhat.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -70,78 +71,126 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SGkgRXJpYywKCk9uIDEvMTQvMjEgMTA6MDIgQU0sIEF1Z2VyIEVyaWMgd3JvdGU6Cj4gSGkgQWxl
-eGFuZHJ1LAo+Cj4gT24gMS8xMi8yMSAzOjU1IFBNLCBBbGV4YW5kcnUgRWxpc2VpIHdyb3RlOgo+
-PiBIaSBFcmljLAo+Pgo+PiBPbiAxMi8xMi8yMCA2OjUwIFBNLCBFcmljIEF1Z2VyIHdyb3RlOgo+
-Pj4gaGFzX3J1bl9vbmNlIGlzIHNldCB0byB0cnVlIGF0IHRoZSBiZWdpbm5pbmcgb2YKPj4+IGt2
-bV92Y3B1X2ZpcnN0X3J1bl9pbml0KCkuIFRoaXMgZ2VuZXJhbGx5IGlzIG5vdCBhbiBpc3N1ZQo+
-Pj4gZXhjZXB0IHdoZW4gZXhlcmNpc2luZyB0aGUgY29kZSB3aXRoIEtWTSBzZWxmdGVzdHMuIElu
-ZGVlZCwKPj4+IGlmIGt2bV92Z2ljX21hcF9yZXNvdXJjZXMoKSBmYWlscyBkdWUgdG8gZXJyb25l
-b3VzIHVzZXIgc2V0dGluZ3MsCj4+PiBoYXNfcnVuX29uY2UgaXMgc2V0IGFuZCB0aGlzIHByZXZl
-bnRzIGZyb20gY29udGludWluZwo+Pj4gZXhlY3V0aW5nIHRoZSB0ZXN0LiBUaGlzIHBhdGNoIG1v
-dmVzIHRoZSBhc3NpZ25tZW50IGFmdGVyIHRoZQo+Pj4ga3ZtX3ZnaWNfbWFwX3Jlc291cmNlcygp
-Lgo+Pj4KPj4+IFNpZ25lZC1vZmYtYnk6IEVyaWMgQXVnZXIgPGVyaWMuYXVnZXJAcmVkaGF0LmNv
-bT4KPj4+IC0tLQo+Pj4gIGFyY2gvYXJtNjQva3ZtL2FybS5jIHwgNCArKy0tCj4+PiAgMSBmaWxl
-IGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkKPj4+Cj4+PiBkaWZmIC0t
-Z2l0IGEvYXJjaC9hcm02NC9rdm0vYXJtLmMgYi9hcmNoL2FybTY0L2t2bS9hcm0uYwo+Pj4gaW5k
-ZXggYzBmZmIwMTljYThiLi4zMzFmYWU2YmZmMzEgMTAwNjQ0Cj4+PiAtLS0gYS9hcmNoL2FybTY0
-L2t2bS9hcm0uYwo+Pj4gKysrIGIvYXJjaC9hcm02NC9rdm0vYXJtLmMKPj4+IEBAIC01NDAsOCAr
-NTQwLDYgQEAgc3RhdGljIGludCBrdm1fdmNwdV9maXJzdF9ydW5faW5pdChzdHJ1Y3Qga3ZtX3Zj
-cHUgKnZjcHUpCj4+PiAgCWlmICgha3ZtX2FybV92Y3B1X2lzX2ZpbmFsaXplZCh2Y3B1KSkKPj4+
-ICAJCXJldHVybiAtRVBFUk07Cj4+PiAgCj4+PiAtCXZjcHUtPmFyY2guaGFzX3J1bl9vbmNlID0g
-dHJ1ZTsKPj4+IC0KPj4+ICAJaWYgKGxpa2VseShpcnFjaGlwX2luX2tlcm5lbChrdm0pKSkgewo+
-Pj4gIAkJLyoKPj4+ICAJCSAqIE1hcCB0aGUgVkdJQyBoYXJkd2FyZSByZXNvdXJjZXMgYmVmb3Jl
-IHJ1bm5pbmcgYSB2Y3B1IHRoZQo+Pj4gQEAgLTU2MCw2ICs1NTgsOCBAQCBzdGF0aWMgaW50IGt2
-bV92Y3B1X2ZpcnN0X3J1bl9pbml0KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKPj4+ICAJCXN0YXRp
-Y19icmFuY2hfaW5jKCZ1c2Vyc3BhY2VfaXJxY2hpcF9pbl91c2UpOwo+Pj4gIAl9Cj4+PiAgCj4+
-PiArCXZjcHUtPmFyY2guaGFzX3J1bl9vbmNlID0gdHJ1ZTsKPj4gSSBoYXZlIGEgZmV3IGNvbmNl
-cm5zIHJlZ2FyZGluZyB0aGlzOgo+Pgo+PiAxLiBNb3ZpbmcgaGFzX3J1bl9vbmNlID0gdHJ1ZSBo
-ZXJlIHNlZW1zIHZlcnkgYXJiaXRyYXJ5IHRvIG1lIC0ga3ZtX3RpbWVyX2VuYWJsZSgpCj4+IGFu
-ZCBrdm1fYXJtX3BtdV92M19lbmFibGUoKSwgYmVsb3cgaXQsIGNhbiBib3RoIGZhaWwgYmVjYXVz
-ZSBvZiBlcnJvbmVvdXMgdXNlcgo+PiB2YWx1ZXMuIElmIHRoZXJlJ3MgYSByZWFzb24gd2h5IHRo
-ZSBhc3NpZ25tZW50IGNhbm5vdCBiZSBtb3ZlZCBhdCB0aGUgZW5kIG9mIHRoZQo+PiBmdW5jdGlv
-biwgSSB0aGluayBpdCBzaG91bGQgYmUgY2xlYXJseSBzdGF0ZWQgaW4gYSBjb21tZW50IGZvciB0
-aGUgcGVvcGxlIHdobwo+PiBtaWdodCBiZSB0ZW1wdGVkIHRvIHdyaXRlIHNpbWlsYXIgdGVzdHMg
-Zm9yIHRoZSB0aW1lciBvciBwbXUuCj4gU2V0dGluZyBoYXNfcnVuX29uY2UgPSB0cnVlIGF0IHRo
-ZSBlbnRyeSBvZiB0aGUgZnVuY3Rpb24gbG9va3MgdG8gbWUKPiBldmVuIG1vcmUgYXJiaXRyYXJ5
-LiBJIGFncmVlIHdpdGggeW91IHRoYXQgZXZlbnR1YWxseSBoYXNfcnVuX29uY2UgbWF5CgpPciBp
-dCBjb3VsZCBiZSBpdCdzIHRoZXJlIHRvIHByZXZlbnQgdGhlIHVzZXIgZnJvbSBjYWxsaW5nCmt2
-bV92Z2ljX21hcF9yZXNvdXJjZXMoKSBhIHNlY29uZCB0aW1lIGFmdGVyIGl0IGZhaWxlZC4gVGhp
-cyBpcyB3aGF0IEknbSBjb25jZXJuZWQKYWJvdXQgYW5kIEkgdGhpbmsgZGVzZXJ2ZXMgbW9yZSBp
-bnZlc3RpZ2F0aW9uLgoKVGhhbmtzLApBbGV4Cj4gYmUgbW92ZWQgYXQgdGhlIHZlcnkgZW5kIGJ1
-dCBtYXliZSB0aGlzIGNhbiBiZSBkb25lIGxhdGVyIG9uY2UgdGltZXIsCj4gcG11IHRlc3RzIGhh
-dmVuIGJlbiB3cml0dGVuCj4+IDIuIFRoZXJlIGFyZSBtYW55IHdheXMgdGhhdCBrdm1fdmdpY19t
-YXBfcmVzb3VyY2VzKCkgY2FuIGZhaWwsIG90aGVyIHRoYW4KPj4gaW5jb3JyZWN0IHVzZXIgc2V0
-dGluZ3MuIEkgc3RhcnRlZCBkaWdnaW5nIGludG8gaG93Cj4+IGt2bV92Z2ljX21hcF9yZXNvdXJj
-ZXMoKS0+dmdpY192Ml9tYXBfcmVzb3VyY2VzKCkgY2FuIGZhaWwgZm9yIGEgVkdJQyBWMiBhbmQg
-dGhpcwo+PiBpcyB3aGF0IEkgbWFuYWdlZCB0byBmaW5kIGJlZm9yZSBJIGdhdmUgdXA6Cj4+Cj4+
-ICogdmdpY19pbml0KCkgY2FuIGZhaWwgaW46Cj4+IMKgwqDCoCAtIGt2bV92Z2ljX2Rpc3RfaW5p
-dCgpCj4+IMKgwqDCoCAtIHZnaWNfdjNfaW5pdCgpCj4+IMKgwqDCoCAtIGt2bV92Z2ljX3NldHVw
-X2RlZmF1bHRfaXJxX3JvdXRpbmcoKQo+PiAqIHZnaWNfcmVnaXN0ZXJfZGlzdF9pb2RldigpIGNh
-biBmYWlsIGluOgo+PiDCoMKgwqAgLSB2Z2ljX3YzX2luaXRfZGlzdF9pb2RldigpCj4+IMKgwqDC
-oCAtIGt2bV9pb19idXNfcmVnaXN0ZXJfZGV2KCkoKikKPj4gKiBrdm1fcGh5c19hZGRyX2lvcmVt
-YXAoKSBjYW4gZmFpbCBpbjoKPj4gwqDCoMKgIC0ga3ZtX21tdV90b3B1cF9tZW1vcnlfY2FjaGUo
-KQo+PiDCoMKgwqAgLSBrdm1fcGd0YWJsZV9zdGFnZTJfbWFwKCkKPiBJIGNoYW5nZWQgdGhlIGNv
-bW1pdCBtc2cgc28gdGhhdCAiaW5jb3JyZWN0IHVzZXIgc2V0dGluZ3MiIHNvdW5kcyBhcyBhbgo+
-IGV4YW1wbGUuCj4+IFNvIGlmIGFueSBvZiB0aGUgZnVuY3Rpb25zIGJlbG93IGZhaWwsIGFyZSB3
-ZSAxMDAlIHN1cmUgaXQgaXMgc2FmZSB0byBhbGxvdyB0aGUKPj4gdXNlciB0byBleGVjdXRlIGt2
-bV92Z2ljX21hcF9yZXNvdXJjZXMoKSBhZ2Fpbj8KPiBJIHRoaW5rIGFkZGl0aW9uYWwgdGVzdHMg
-d2lsbCBjb25maXJtIHRoaXMuIEhvd2V2ZXIgYXQgdGhlIG1vbWVudCwKPiBtb3ZpbmcgdGhlIGFz
-c2lnbm1lbnQsIHdoaWNoIGRvZXMgbm90IGxvb2sgd3JvbmcgdG8gbWUsIGFsbG93cyB0bwo+IGdy
-ZWF0bHkgc2ltcGxpZnkgdGhlIHRlc3RzIHNvIEkgd291bGQgdGVuZCB0byBzYXkgdGhhdCBpdCBp
-cyB3b3J0aC4KPj4gKCopIEl0IGxvb2tzIHRvIG1lIGxpa2Uga3ZtX2lvX2J1c19yZWdpc3Rlcl9k
-ZXYoKSBkb2Vzbid0IHRha2UgaW50byBhY2NvdW50IGEKPj4gY2FsbGVyIHRoYXQgdHJpZXMgdG8g
-cmVnaXN0ZXIgdGhlIHNhbWUgZGV2aWNlIGFkZHJlc3MgcmFuZ2UgYW5kIGl0IHdpbGwgY3JlYXRl
-Cj4+IGFub3RoZXIgaWRlbnRpY2FsIHJhbmdlLiBJcyB0aGlzIGludGVudGlvbmFsPyBJcyBpdCBh
-IGJ1ZyB0aGF0IHNob3VsZCBiZSBmaXhlZD8gT3IKPj4gYW0gSSBtaXN1bmRlcnN0YW5kaW5nIHRo
-ZSBmdW5jdGlvbj8KPiBkb2Vzbid0IGt2bV9pb19idXNfY21wKCkgZG8gdGhlIGNoZWNrPwo+Cj4g
-VGhhbmtzCj4KPiBFcmljCj4+IFRoYW5rcywKPj4gQWxleAo+Pj4gKwo+Pj4gIAlyZXQgPSBrdm1f
-dGltZXJfZW5hYmxlKHZjcHUpOwo+Pj4gIAlpZiAocmV0KQo+Pj4gIAkJcmV0dXJuIHJldDsKX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxp
-bmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29s
-dW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+Hi Eric,
+
+On 1/14/21 10:16 AM, Auger Eric wrote:
+> Hi Alexandru,
+>
+> On 1/12/21 6:02 PM, Alexandru Elisei wrote:
+>> Hi Eric,
+>>
+>> On 12/12/20 6:50 PM, Eric Auger wrote:
+>>> Commit 23bde34771f1 ("KVM: arm64: vgic-v3: Drop the
+>>> reporting of GICR_TYPER.Last for userspace") temporarily fixed
+>>> a bug identified when attempting to access the GICR_TYPER
+>>> register before the redistributor region setting but dropped
+>>> the support of the LAST bit. This patch restores its
+>>> support (if the redistributor region was set) while keeping the
+>>> code safe.
+>> I suppose the reason for emulating GICR_TYPER.Last is for architecture compliance,
+>> right? I think that should be in the commit message.
+> OK added this in the commit msg.
+>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>> ---
+>>>  arch/arm64/kvm/vgic/vgic-mmio-v3.c | 7 ++++++-
+>>>  include/kvm/arm_vgic.h             | 1 +
+>>>  2 files changed, 7 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+>>> index 581f0f490000..2f9ef6058f6e 100644
+>>> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+>>> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+>>> @@ -277,6 +277,8 @@ static unsigned long vgic_uaccess_read_v3r_typer(struct kvm_vcpu *vcpu,
+>>>  						 gpa_t addr, unsigned int len)
+>>>  {
+>>>  	unsigned long mpidr = kvm_vcpu_get_mpidr_aff(vcpu);
+>>> +	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+>>> +	struct vgic_redist_region *rdreg = vgic_cpu->rdreg;
+>>>  	int target_vcpu_id = vcpu->vcpu_id;
+>>>  	u64 value;
+>>>  
+>>> @@ -286,7 +288,9 @@ static unsigned long vgic_uaccess_read_v3r_typer(struct kvm_vcpu *vcpu,
+>>>  	if (vgic_has_its(vcpu->kvm))
+>>>  		value |= GICR_TYPER_PLPIS;
+>>>  
+>>> -	/* reporting of the Last bit is not supported for userspace */
+>>> +	if (rdreg && (vgic_cpu->rdreg_index == (rdreg->free_index - 1)))
+>>> +		value |= GICR_TYPER_LAST;
+>>> +
+>>>  	return extract_bytes(value, addr & 7, len);
+>>>  }
+>>>  
+>>> @@ -714,6 +718,7 @@ int vgic_register_redist_iodev(struct kvm_vcpu *vcpu)
+>>>  		return -EINVAL;
+>>>  
+>>>  	vgic_cpu->rdreg = rdreg;
+>>> +	vgic_cpu->rdreg_index = rdreg->free_index;
+>> What happens if the next redistributor region we register has the base address
+>> adjacent to this one?
+>>
+>> I'm really not familiar with the code, but is it not possible to create two
+>> Redistributor regions (via
+>> KVM_DEV_ARM_VGIC_GRP_ADDR(KVM_VGIC_V3_ADDR_TYPE_REDIST)) where the second
+>> Redistributor region start address is immediately after the last Redistributor in
+>> the preceding region?
+> KVM_VGIC_V3_ADDR_TYPE_REDIST only allows to create a single rdist
+> region. Only KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION allows to register
+> several of them.
+>
+> with KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, it is possible to register
+> adjacent rdist regions. vgic_v3_rdist_free_slot() previously returned
+> the 1st rdist region where enough space remains for inserting the new
+> reg. We put the rdist at the free index there.
+>
+> But maybe I misunderstood your question?
+
+Yes, I think you did a good job at answering my poorly worded question.
+
+This is the case I am concerned about:
+
+1. Userspace sets first redistributor base address to 0x0 via
+KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION(count = 1, base = 0x0, flags = 0, index = 0).
+
+2. Userspace sets first redistributor base address to 0x0 + 128K, immediately
+following the previous Redistributor.
+
+In that case the two Redistributors will be represented by two separate struct
+vgic_redist_region, but they are adjacent to one another and represent one
+contiguous memory region.
+
+From what I understand from your patch, GICR_TYPER.Last will be set for both
+Redistributors, when it should be set only for the second Redistributor. Does any
+of that make sense?
+
+Thanks,
+Alex
+>
+> Thanks
+>
+> Eric
+>> Thanks,
+>> Alex
+>>>  
+>>>  	rd_base = rdreg->base + rdreg->free_index * KVM_VGIC_V3_REDIST_SIZE;
+>>>  
+>>> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+>>> index a8d8fdcd3723..596c069263a7 100644
+>>> --- a/include/kvm/arm_vgic.h
+>>> +++ b/include/kvm/arm_vgic.h
+>>> @@ -322,6 +322,7 @@ struct vgic_cpu {
+>>>  	 */
+>>>  	struct vgic_io_device	rd_iodev;
+>>>  	struct vgic_redist_region *rdreg;
+>>> +	u32 rdreg_index;
+>>>  
+>>>  	/* Contains the attributes and gpa of the LPI pending tables. */
+>>>  	u64 pendbaser;
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
