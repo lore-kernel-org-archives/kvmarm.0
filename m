@@ -3,78 +3,77 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C6E2C433DB
-	for <kvmarm@archiver.kernel.org>; Thu, 21 Jan 2021 02:59:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D27C6C433DB
+	for <kvmarm@archiver.kernel.org>; Thu, 21 Jan 2021 03:03:44 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C853823899
-	for <kvmarm@archiver.kernel.org>; Thu, 21 Jan 2021 02:59:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C853823899
+	by mail.kernel.org (Postfix) with ESMTP id 3668523716
+	for <kvmarm@archiver.kernel.org>; Thu, 21 Jan 2021 03:03:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3668523716
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2135E4B16D;
-	Wed, 20 Jan 2021 21:59:31 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 51B844B13C;
+	Wed, 20 Jan 2021 22:03:43 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pJGWTdsBXumI; Wed, 20 Jan 2021 21:59:29 -0500 (EST)
+	with ESMTP id hNpoccJXGbXa; Wed, 20 Jan 2021 22:03:41 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EF434B166;
-	Wed, 20 Jan 2021 21:59:29 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D47BE4B15C;
+	Wed, 20 Jan 2021 22:03:41 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 12AFC4B15A
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jan 2021 21:59:28 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1FE5D4B132
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jan 2021 22:03:41 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id s2SzIoI3-8KW for <kvmarm@lists.cs.columbia.edu>;
- Wed, 20 Jan 2021 21:59:26 -0500 (EST)
-Received: from mail-io1-f45.google.com (mail-io1-f45.google.com
- [209.85.166.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 464124B154
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jan 2021 21:59:26 -0500 (EST)
-Received: by mail-io1-f45.google.com with SMTP id p72so1163070iod.12
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jan 2021 18:59:26 -0800 (PST)
+ with ESMTP id mV+rosgRx3a9 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 20 Jan 2021 22:03:39 -0500 (EST)
+Received: from mail-io1-f48.google.com (mail-io1-f48.google.com
+ [209.85.166.48])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7F07B4B0CC
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jan 2021 22:03:39 -0500 (EST)
+Received: by mail-io1-f48.google.com with SMTP id d13so1269337ioy.4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jan 2021 19:03:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Qz8ZjLOShljMc95QkDXlls/h7vHkfwkdKWmbz+iSbrQ=;
- b=SA+uipEQZkXChdqljPRyaEWbIAjOTQH7eiz4MkKaPH0ANiyfnl2vkPyxY5Y3DV5FKu
- Mb4fPegdpoUwSv8+H+cW/o3ZzQlZTQ0q0K/xf23qLfgm5qOCGEMgX+gRkzzgZ2yOT0RN
- nReC7MgNVEOZxrvwcKRCoXYluWPpmDt+RwqQvjQiN09hrUYtD23c4Eo7X0iASHlfTqfu
- RPZp5fNv2PRU9WxYegyInlctggnYTUPLODVWVmaGKuPmEwR7eC08KUXdTBxyiLvZGwZR
- W8/Gq5ESSwqCPTJ4cTNl8lE9iLBwIrhblvJWPsMEWRqo4k8AILpV3j4nPnGQBWiMPlWq
- zdQA==
+ :cc; bh=49fv5m5ZCfOtjJ909fahXhO6rbzTEITVE7JNaqYcExI=;
+ b=zIqWpdUtONjv+iNl4fal4rvG9gS1yfJYVTDldkNTGAdK0sIygi7Nk7f9haTYVWO4io
+ +EYnnNjU40IbQ04rvSPZZfP/sjfV5TjamNie6oy52OEEWg2jUFZm+W5UlHfeXMYkHEbR
+ soUbXu0w3SAnADuhC5TOgMka3kdnQCM5ftr7wd2PifcqTOaKiFWgZnNS8HWgwuIhg/3y
+ JiyXnHtjIApoMAvMPIFKND2grRQDavB6DvBwurk4RBmZadX6ctv1XqL8R6U3jf9VpslB
+ EfjugaBC9fEcVTncubyYFIP8Kw2XJPiw/KKTmw/TfGrc99QGTL5FasRSDZefuFV3+rL3
+ 76IQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=Qz8ZjLOShljMc95QkDXlls/h7vHkfwkdKWmbz+iSbrQ=;
- b=g5Y9rwA88rNz1plGGpchFsT338XUZuroZVgJMdIfPYKPI7uDMu1pT3VFTu2HkuV5NA
- WMfLFzSYKwhsJfDO4Qt4sNQIhHrw+Q4NvWqf75S5mN6IpAJrYYAgBepg6aeBFdJSvKg2
- d0vDtuDXFndqluJEMYM1X5gwDObjVtiy+8zsMtZILOvQl0mobMBr90e6y15MENLmP1EQ
- RAkZ1x1w3GHeYOB3mapuwMzjpz4kISbPH91toeexsuYgcfVkUPeSDFssaN4knG+hzUR0
- IjK0D9E2VMgvOAd0sefyNNDddMFzYKeKPuxw1YLzNF3bVC30xFgdEndiP9vzBEtwmIIN
- 7BKg==
-X-Gm-Message-State: AOAM533hXAliM2rizsjuKXE3DzVH3+FuJLA8CwwMImJT83Tnm2t9uylQ
- puh7jU5hz9rro+EJRIw0c43vR05OriTW5oLGHXp+
-X-Google-Smtp-Source: ABdhPJy4NKuGap+Qu3E2Ud1tLAbJPfqdhwLKexUnV2Hhm81czqtpLSglmsUTncsgsFDR5zBP7yiCafFNJW/ZK4CSZFY=
-X-Received: by 2002:a6b:7e02:: with SMTP id i2mr8970870iom.185.1611197965405; 
- Wed, 20 Jan 2021 18:59:25 -0800 (PST)
+ bh=49fv5m5ZCfOtjJ909fahXhO6rbzTEITVE7JNaqYcExI=;
+ b=akHiJiUVgE0O3hKYx+nKHj7iuEbgU2tO4Tq7dDP0BFwdoxvlUJo9u5iRODWXSA8l3d
+ deR+BfK067LwYGICaeqsvRyhctC7eTxIJgXop5cL3A0Feoyt5c+5f9KqzFsLsOkDJ/ud
+ Fwr2m3aDzCfDIe9N5pNQRmpzKuwszdfG8cSlKPMk8iTodJITb894hfgTv2n6iNnEOem4
+ hUa1mQvrlXsflvSnZ3Rb7004LlIWAhqs9QpCDFCpCBAUqHSoTn/jVi5BbytmAkVFPwLy
+ EiOqzJZXNpIusQqQ0q4IUINdQaeCQKIGXWNlp6HRNWxose1hf9PozDC03iHanxSBmXBo
+ AwqA==
+X-Gm-Message-State: AOAM531PvY+hkdhf/NesHPuc1Y2dQm2IYNIfvLJyh2PJcHJ0tqQwmKjA
+ AfmeMpvjDoSrmrJk1Qd8nNHxFD8wipcrZzqupD6Z
+X-Google-Smtp-Source: ABdhPJzr+rB8p5Mk3VaN7I2CVpYfNidIq1sphVuO90aZFtW9AZBDNDYgzFMdc8+oMGfbfetZhRcEVisO5+1ETZSjMUg=
+X-Received: by 2002:a5e:9612:: with SMTP id a18mr8856785ioq.13.1611198218728; 
+ Wed, 20 Jan 2021 19:03:38 -0800 (PST)
 MIME-Version: 1.0
 References: <20201210160002.1407373-1-maz@kernel.org>
- <20201210160002.1407373-34-maz@kernel.org>
-In-Reply-To: <20201210160002.1407373-34-maz@kernel.org>
+In-Reply-To: <20201210160002.1407373-1-maz@kernel.org>
 From: Haibo Xu <haibo.xu@linaro.org>
-Date: Thu, 21 Jan 2021 10:59:13 +0800
-Message-ID: <CAJc+Z1F5rvhWkWzbi2JrfSaETUg_qxiiLBVhrVcw7Da5=Yo2GQ@mail.gmail.com>
-Subject: Re: [PATCH v3 33/66] KVM: arm64: nv: Support multiple nested Stage-2
- mmu structures
+Date: Thu, 21 Jan 2021 11:03:27 +0800
+Message-ID: <CAJc+Z1FQmUFS=5xEG8mPkJCUZ+ecBt4G=YbxGJTO4YFbfGMg3w@mail.gmail.com>
+Subject: Re: [PATCH v3 00/66] KVM: arm64: ARMv8.3/8.4 Nested Virtualization
+ support
 To: Marc Zyngier <maz@kernel.org>
 Cc: Andre Przywara <andre.przywara@arm.com>, kernel-team@android.com,
  kvmarm <kvmarm@lists.cs.columbia.edu>,
@@ -95,463 +94,206 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 11 Dec 2020 at 00:04, Marc Zyngier <maz@kernel.org> wrote:
->
-> Add Stage-2 mmu data structures for virtual EL2 and for nested guests.
-> We don't yet populate shadow Stage-2 page tables, but we now have a
-> framework for getting to a shadow Stage-2 pgd.
->
-> We allocate twice the number of vcpus as Stage-2 mmu structures because
-> that's sufficient for each vcpu running two translation regimes without
-> having to flush the Stage-2 page tables.
->
-> Co-developed-by: Christoffer Dall <christoffer.dall@arm.com>
-> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_host.h   |  29 +++++
->  arch/arm64/include/asm/kvm_mmu.h    |   8 ++
->  arch/arm64/include/asm/kvm_nested.h |   7 ++
->  arch/arm64/kvm/arm.c                |  16 ++-
->  arch/arm64/kvm/mmu.c                |  18 ++-
->  arch/arm64/kvm/nested.c             | 183 ++++++++++++++++++++++++++++
->  6 files changed, 250 insertions(+), 11 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index d731cf7a56cb..d99e51e7cbee 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -95,14 +95,43 @@ struct kvm_s2_mmu {
->         int __percpu *last_vcpu_ran;
->
->         struct kvm *kvm;
-> +
-> +       /*
-> +        * For a shadow stage-2 MMU, the virtual vttbr programmed by the guest
-> +        * hypervisor.  Unused for kvm_arch->mmu. Set to 1 when the structure
-> +        * contains no valid information.
-> +        */
-> +       u64     vttbr;
-> +
-> +       /* true when this represents a nested context where virtual HCR_EL2.VM == 1 */
-> +       bool    nested_stage2_enabled;
-> +
-> +       /*
-> +        *  0: Nobody is currently using this, check vttbr for validity
-> +        * >0: Somebody is actively using this.
-> +        */
-> +       atomic_t refcnt;
->  };
->
-> +static inline bool kvm_s2_mmu_valid(struct kvm_s2_mmu *mmu)
-> +{
-> +       return !(mmu->vttbr & 1);
-> +}
-> +
->  struct kvm_arch_memory_slot {
->  };
->
->  struct kvm_arch {
->         struct kvm_s2_mmu mmu;
->
-> +       /*
-> +        * Stage 2 paging stage for VMs with nested virtual using a virtual
-> +        * VMID.
-> +        */
-> +       struct kvm_s2_mmu *nested_mmus;
-> +       size_t nested_mmus_size;
-> +       int nested_mmus_next;
-> +
->         /* VTCR_EL2 value for this VM */
->         u64    vtcr;
->
-> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> index 76a8a0ca45b8..ec39015bb2a6 100644
-> --- a/arch/arm64/include/asm/kvm_mmu.h
-> +++ b/arch/arm64/include/asm/kvm_mmu.h
-> @@ -126,6 +126,7 @@ alternative_cb_end
->  #include <asm/cacheflush.h>
->  #include <asm/mmu_context.h>
->  #include <asm/kvm_emulate.h>
-> +#include <asm/kvm_nested.h>
->
->  void kvm_update_va_mask(struct alt_instr *alt,
->                         __le32 *origptr, __le32 *updptr, int nr_inst);
-> @@ -184,6 +185,7 @@ int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
->                              void **haddr);
->  void free_hyp_pgds(void);
->
-> +void kvm_unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size);
->  void stage2_unmap_vm(struct kvm *kvm);
->  int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu);
->  void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu);
-> @@ -306,5 +308,11 @@ static __always_inline void __load_guest_stage2(struct kvm_s2_mmu *mmu)
->         asm(ALTERNATIVE("nop", "isb", ARM64_WORKAROUND_SPECULATIVE_AT));
->  }
->
-> +static inline u64 get_vmid(u64 vttbr)
-> +{
-> +       return (vttbr & VTTBR_VMID_MASK(kvm_get_vmid_bits())) >>
-> +               VTTBR_VMID_SHIFT;
-> +}
-> +
->  #endif /* __ASSEMBLY__ */
->  #endif /* __ARM64_KVM_MMU_H__ */
-> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-> index 026ddaad972c..473ecd1d60d0 100644
-> --- a/arch/arm64/include/asm/kvm_nested.h
-> +++ b/arch/arm64/include/asm/kvm_nested.h
-> @@ -61,6 +61,13 @@ static inline u64 translate_cnthctl_el2_to_cntkctl_el1(u64 cnthctl)
->                 (cnthctl & (CNTHCTL_EVNTI | CNTHCTL_EVNTDIR | CNTHCTL_EVNTEN)));
->  }
->
-> +extern void kvm_init_nested(struct kvm *kvm);
-> +extern int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu);
-> +extern void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu);
-> +extern struct kvm_s2_mmu *lookup_s2_mmu(struct kvm *kvm, u64 vttbr, u64 hcr);
-> +extern void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu);
-> +extern void kvm_vcpu_put_hw_mmu(struct kvm_vcpu *vcpu);
-> +
->  int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
->  extern bool __forward_traps(struct kvm_vcpu *vcpu, unsigned int reg,
->                             u64 control_bit);
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 6e637d2b4cfb..1656dd80bbc4 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -35,6 +35,7 @@
->  #include <asm/kvm_arm.h>
->  #include <asm/kvm_asm.h>
->  #include <asm/kvm_mmu.h>
-> +#include <asm/kvm_nested.h>
->  #include <asm/kvm_emulate.h>
->  #include <asm/sections.h>
->
-> @@ -142,6 +143,8 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->         if (ret)
->                 return ret;
->
-> +       kvm_init_nested(kvm);
-> +
->         ret = create_hyp_mappings(kvm, kvm + 1, PAGE_HYP);
->         if (ret)
->                 goto out_free_stage2_pgd;
-> @@ -385,6 +388,9 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->         struct kvm_s2_mmu *mmu;
->         int *last_ran;
->
-> +       if (nested_virt_in_use(vcpu))
-> +               kvm_vcpu_load_hw_mmu(vcpu);
-> +
->         mmu = vcpu->arch.hw_mmu;
->         last_ran = this_cpu_ptr(mmu->last_vcpu_ran);
->
-> @@ -426,6 +432,9 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->         kvm_vgic_put(vcpu);
->         kvm_vcpu_pmu_restore_host(vcpu);
->
-> +       if (nested_virt_in_use(vcpu))
-> +               kvm_vcpu_put_hw_mmu(vcpu);
-> +
->         vcpu->cpu = -1;
->  }
->
-> @@ -1026,8 +1035,13 @@ static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
->
->         vcpu->arch.target = phys_target;
->
-> +       /* Prepare for nested if required */
-> +       ret = kvm_vcpu_init_nested(vcpu);
-> +
->         /* Now we know what it is, we can reset it. */
-> -       ret = kvm_reset_vcpu(vcpu);
-> +       if (!ret)
-> +               ret = kvm_reset_vcpu(vcpu);
-> +
->         if (ret) {
->                 vcpu->arch.target = -1;
->                 bitmap_zero(vcpu->arch.features, KVM_VCPU_MAX_FEATURES);
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 1f41173e6149..2f0302211af3 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -113,7 +113,7 @@ static bool kvm_is_device_pfn(unsigned long pfn)
->   * does.
->   */
->  /**
-> - * unmap_stage2_range -- Clear stage2 page table entries to unmap a range
-> + * kvm_unmap_stage2_range -- Clear stage2 page table entries to unmap a range
->   * @mmu:   The KVM stage-2 MMU pointer
->   * @start: The intermediate physical base address of the range to unmap
->   * @size:  The size of the area to unmap
-> @@ -136,7 +136,7 @@ static void __unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64
->                                    may_block));
->  }
->
-> -static void unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size)
-> +void kvm_unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size)
->  {
->         __unmap_stage2_range(mmu, start, size, true);
->  }
-> @@ -391,6 +391,9 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
->         mmu->pgt = pgt;
->         mmu->pgd_phys = __pa(pgt->pgd);
->         mmu->vmid.vmid_gen = 0;
-> +
-> +       kvm_init_nested_s2_mmu(mmu);
-> +
->         return 0;
->
->  out_destroy_pgtable:
-> @@ -435,7 +438,7 @@ static void stage2_unmap_memslot(struct kvm *kvm,
->
->                 if (!(vma->vm_flags & VM_PFNMAP)) {
->                         gpa_t gpa = addr + (vm_start - memslot->userspace_addr);
-> -                       unmap_stage2_range(&kvm->arch.mmu, gpa, vm_end - vm_start);
-> +                       kvm_unmap_stage2_range(&kvm->arch.mmu, gpa, vm_end - vm_start);
->                 }
->                 hva = vm_end;
->         } while (hva < reg_end);
-> @@ -1360,7 +1363,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
->
->         spin_lock(&kvm->mmu_lock);
->         if (ret)
-> -               unmap_stage2_range(&kvm->arch.mmu, mem->guest_phys_addr, mem->memory_size);
-> +               kvm_unmap_stage2_range(&kvm->arch.mmu, mem->guest_phys_addr, mem->memory_size);
->         else if (!cpus_have_final_cap(ARM64_HAS_STAGE2_FWB))
->                 stage2_flush_memslot(kvm, memslot);
->         spin_unlock(&kvm->mmu_lock);
-> @@ -1377,11 +1380,6 @@ void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen)
->  {
->  }
->
-> -void kvm_arch_flush_shadow_all(struct kvm *kvm)
-> -{
-> -       kvm_free_stage2_pgd(&kvm->arch.mmu);
-> -}
-> -
->  void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
->                                    struct kvm_memory_slot *slot)
->  {
-> @@ -1389,7 +1387,7 @@ void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
->         phys_addr_t size = slot->npages << PAGE_SHIFT;
->
->         spin_lock(&kvm->mmu_lock);
-> -       unmap_stage2_range(&kvm->arch.mmu, gpa, size);
-> +       kvm_unmap_stage2_range(&kvm->arch.mmu, gpa, size);
->         spin_unlock(&kvm->mmu_lock);
->  }
->
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 9fb44bc7db3f..8e85d2ef24d9 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -19,12 +19,177 @@
->  #include <linux/kvm.h>
->  #include <linux/kvm_host.h>
->
-> +#include <asm/kvm_arm.h>
->  #include <asm/kvm_emulate.h>
-> +#include <asm/kvm_mmu.h>
->  #include <asm/kvm_nested.h>
->  #include <asm/sysreg.h>
->
->  #include "sys_regs.h"
->
-> +void kvm_init_nested(struct kvm *kvm)
-> +{
-> +       kvm->arch.nested_mmus = NULL;
-> +       kvm->arch.nested_mmus_size = 0;
-> +}
-> +
-> +int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
-> +{
-> +       struct kvm *kvm = vcpu->kvm;
-> +       struct kvm_s2_mmu *tmp;
-> +       int num_mmus;
-> +       int ret = -ENOMEM;
-> +
-> +       if (!test_bit(KVM_ARM_VCPU_HAS_EL2, vcpu->arch.features))
-> +               return 0;
-> +
-> +       if (!cpus_have_final_cap(ARM64_HAS_NESTED_VIRT))
-> +               return -EINVAL;
+Re-send in case the previous email was blocked for the inlined hyper-link.
 
-nit: returning a "not supported" kind of errno?
+Hi Marc,
 
-> +
-> +       mutex_lock(&kvm->lock);
-> +
-> +       /*
-> +        * Let's treat memory allocation failures as benign: If we fail to
-> +        * allocate anything, return an error and keep the allocated array
-> +        * alive. Userspace may try to recover by intializing the vcpu
-> +        * again, and there is no reason to affect the whole VM for this.
-> +        */
-> +       num_mmus = atomic_read(&kvm->online_vcpus) * 2;
-> +       tmp = krealloc(kvm->arch.nested_mmus,
-> +                      num_mmus * sizeof(*kvm->arch.nested_mmus),
-> +                      GFP_KERNEL | __GFP_ZERO);
-> +       if (tmp) {
-> +               if (kvm_init_stage2_mmu(kvm, &tmp[num_mmus - 1]) ||
-> +                   kvm_init_stage2_mmu(kvm, &tmp[num_mmus - 2])) {
-> +                       kvm_free_stage2_pgd(&tmp[num_mmus - 1]);
-> +                       kvm_free_stage2_pgd(&tmp[num_mmus - 2]);
-> +               } else {
-> +                       kvm->arch.nested_mmus_size = num_mmus;
-> +                       ret = 0;
-> +               }
-> +
-> +               kvm->arch.nested_mmus = tmp;
-> +       }
-> +
-> +       mutex_unlock(&kvm->lock);
-> +       return ret;
-> +}
-> +
-> +/* Must be called with kvm->lock held */
-> +struct kvm_s2_mmu *lookup_s2_mmu(struct kvm *kvm, u64 vttbr, u64 hcr)
-> +{
-> +       bool nested_stage2_enabled = hcr & HCR_VM;
-> +       int i;
-> +
-> +       /* Don't consider the CnP bit for the vttbr match */
-> +       vttbr = vttbr & ~VTTBR_CNP_BIT;
-> +
-> +       /*
-> +        * Two possibilities when looking up a S2 MMU context:
-> +        *
-> +        * - either S2 is enabled in the guest, and we need a context that
-> +         *   is S2-enabled and matches the full VTTBR (VMID+BADDR), which
-> +         *   makes it safe from a TLB conflict perspective (a broken guest
-> +         *   won't be able to generate them),
-> +        *
-> +        * - or S2 is disabled, and we need a context that is S2-disabled
-> +         *   and matches the VMID only, as all TLBs are tagged by VMID even
-> +         *   if S2 translation is enabled.
-> +        */
-> +       for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
-> +               struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
-> +
-> +               if (!kvm_s2_mmu_valid(mmu))
-> +                       continue;
-> +
-> +               if (nested_stage2_enabled &&
-> +                   mmu->nested_stage2_enabled &&
-> +                   vttbr == mmu->vttbr)
-> +                       return mmu;
-> +
-> +               if (!nested_stage2_enabled &&
-> +                   !mmu->nested_stage2_enabled &&
-> +                   get_vmid(vttbr) == get_vmid(mmu->vttbr))
-> +                       return mmu;
-> +       }
-> +       return NULL;
-> +}
-> +
-> +static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
-> +{
-> +       struct kvm *kvm = vcpu->kvm;
-> +       u64 vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
-> +       u64 hcr= vcpu_read_sys_reg(vcpu, HCR_EL2);
-> +       struct kvm_s2_mmu *s2_mmu;
-> +       int i;
-> +
-> +       s2_mmu = lookup_s2_mmu(kvm, vttbr, hcr);
-> +       if (s2_mmu)
-> +               goto out;
-> +
-> +       /*
-> +        * Make sure we don't always search from the same point, or we
-> +        * will always reuse a potentially active context, leaving
-> +        * free contexts unused.
-> +        */
-> +       for (i = kvm->arch.nested_mmus_next;
-> +            i < (kvm->arch.nested_mmus_size + kvm->arch.nested_mmus_next);
-> +            i++) {
-> +               s2_mmu = &kvm->arch.nested_mmus[i % kvm->arch.nested_mmus_size];
-> +
-> +               if (atomic_read(&s2_mmu->refcnt) == 0)
-> +                       break;
-> +       }
-> +       BUG_ON(atomic_read(&s2_mmu->refcnt)); /* We have struct MMUs to spare */
-> +
-> +       /* Set the scene for the next search */
-> +       kvm->arch.nested_mmus_next = (i + 1) % kvm->arch.nested_mmus_size;
-> +
-> +       if (kvm_s2_mmu_valid(s2_mmu)) {
-> +               /* Clear the old state */
-> +               kvm_unmap_stage2_range(s2_mmu, 0, kvm_phys_size(kvm));
-> +               if (s2_mmu->vmid.vmid_gen)
-> +                       kvm_call_hyp(__kvm_tlb_flush_vmid, s2_mmu);
-> +       }
-> +
-> +       /*
-> +        * The virtual VMID (modulo CnP) will be used as a key when matching
-> +        * an existing kvm_s2_mmu.
-> +        */
-> +       s2_mmu->vttbr = vttbr & ~VTTBR_CNP_BIT;
-> +       s2_mmu->nested_stage2_enabled = hcr & HCR_VM;
-> +
-> +out:
-> +       atomic_inc(&s2_mmu->refcnt);
-> +       return s2_mmu;
-> +}
-> +
-> +void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu)
-> +{
-> +       mmu->vttbr = 1;
-> +       mmu->nested_stage2_enabled = false;
-> +       atomic_set(&mmu->refcnt, 0);
-> +}
-> +
-> +void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu)
-> +{
-> +       if (is_hyp_ctxt(vcpu)) {
-> +               vcpu->arch.hw_mmu = &vcpu->kvm->arch.mmu;
-> +       } else {
-> +               spin_lock(&vcpu->kvm->mmu_lock);
-> +               vcpu->arch.hw_mmu = get_s2_mmu_nested(vcpu);
-> +               spin_unlock(&vcpu->kvm->mmu_lock);
-> +       }
-> +}
-> +
-> +void kvm_vcpu_put_hw_mmu(struct kvm_vcpu *vcpu)
-> +{
-> +       if (vcpu->arch.hw_mmu != &vcpu->kvm->arch.mmu) {
-> +               atomic_dec(&vcpu->arch.hw_mmu->refcnt);
-> +               vcpu->arch.hw_mmu = NULL;
-> +       }
-> +}
-> +
->  /*
->   * Inject wfx to the virtual EL2 if this is not from the virtual EL2 and
->   * the virtual HCR_EL2.TWX is set. Otherwise, let the host hypervisor
-> @@ -43,6 +208,24 @@ int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe)
->         return -EINVAL;
->  }
+I have tried to enable the NV support in Qemu, and now I can
+successfully boot a L2 guest
+in Qemu KVM mode.
+
+This patch series looks good from the Qemu side except for two minor
+requirements:
+(1) Qemu will check whether a feature was supported by the KVM cap
+when the user tries
+     to enable it in the command line, so a new capability was
+prefered for the NV(KVM_CAP_ARM_NV?).
+(2) According to the Documentation/virt/kvm/api.rst, userspace can
+call KVM_ARM_VCPU_INIT
+     multiple times for a given vcpu, but the kvm_vcpu_init_nested()
+do have some issue when
+     called multiple times(please refer to the detailed comments in patch 63)
+
+Regards,
+Haibo
+
+On Fri, 11 Dec 2020 at 00:00, Marc Zyngier <maz@kernel.org> wrote:
 >
-> +void kvm_arch_flush_shadow_all(struct kvm *kvm)
-> +{
-> +       int i;
-> +
-> +       for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
-> +               struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
-> +
-> +               WARN_ON(atomic_read(&mmu->refcnt));
-> +
-> +               if (!atomic_read(&mmu->refcnt))
-> +                       kvm_free_stage2_pgd(mmu);
-> +       }
-> +       kfree(kvm->arch.nested_mmus);
-> +       kvm->arch.nested_mmus = NULL;
-> +       kvm->arch.nested_mmus_size = 0;
-> +       kvm_free_stage2_pgd(&kvm->arch.mmu);
-> +}
-> +
->  #define FEATURE(x)     (GENMASK_ULL(x##_SHIFT + 3, x##_SHIFT))
+> This is a rework of the NV series that I posted 10 months ago[1], as a
+> lot of the KVM code has changed since, and the series apply anymore
+> (not that anybody really cares as the the HW is, as usual, made of
+> unobtainium...).
 >
->  /*
+> From the previous version:
+>
+> - Integration with the new page-table code
+> - New exception injection code
+> - No more messing with the nVHE code
+> - No AArch32!!!!
+> - Rebased on v5.10-rc4 + kvmarm/next for 5.11
+>
+> From a functionality perspective, you can expect a L2 guest to work,
+> but don't even think of L3, as we only partially emulate the
+> ARMv8.{3,4}-NV extensions themselves. Same thing for vgic, debug, PMU,
+> as well as anything that would require a Stage-1 PTW. What we want to
+> achieve is that with NV disabled, there is no performance overhead and
+> no regression.
+>
+> The series is roughly divided in 5 parts: exception handling, memory
+> virtualization, interrupts and timers for ARMv8.3, followed by the
+> ARMv8.4 support. There are of course some dependencies, but you'll
+> hopefully get the gist of it.
+>
+> For the most courageous of you, I've put out a branch[2]. Of course,
+> you'll need some userspace. Andre maintains a hacked version of
+> kvmtool[3] that takes a --nested option, allowing the guest to be
+> started at EL2. You can run the whole stack in the Foundation
+> model. Don't be in a hurry ;-).
+>
+> And to be clear: although Jintack and Christoffer have written tons of
+> the stuff originaly, I'm the one responsible for breaking it!
+>
+> [1] https://lore.kernel.org/r/20200211174938.27809-1-maz@kernel.org
+> [2] git://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git kvm-arm64/nv-5.11.-WIP
+> [3] git://linux-arm.org/kvmtool.git nv/nv-wip-5.2-rc5
+>
+> Andre Przywara (1):
+>   KVM: arm64: nv: vgic: Allow userland to set VGIC maintenance IRQ
+>
+> Christoffer Dall (15):
+>   KVM: arm64: nv: Introduce nested virtualization VCPU feature
+>   KVM: arm64: nv: Reset VCPU to EL2 registers if VCPU nested virt is set
+>   KVM: arm64: nv: Allow userspace to set PSR_MODE_EL2x
+>   KVM: arm64: nv: Add nested virt VCPU primitives for vEL2 VCPU state
+>   KVM: arm64: nv: Reset VMPIDR_EL2 and VPIDR_EL2 to sane values
+>   KVM: arm64: nv: Handle trapped ERET from virtual EL2
+>   KVM: arm64: nv: Emulate PSTATE.M for a guest hypervisor
+>   KVM: arm64: nv: Trap EL1 VM register accesses in virtual EL2
+>   KVM: arm64: nv: Only toggle cache for virtual EL2 when SCTLR_EL2
+>     changes
+>   KVM: arm64: nv: Implement nested Stage-2 page table walk logic
+>   KVM: arm64: nv: Unmap/flush shadow stage 2 page tables
+>   KVM: arm64: nv: arch_timer: Support hyp timer emulation
+>   KVM: arm64: nv: vgic: Emulate the HW bit in software
+>   KVM: arm64: nv: Add nested GICv3 tracepoints
+>   KVM: arm64: nv: Sync nested timer state with ARMv8.4
+>
+> Jintack Lim (19):
+>   arm64: Add ARM64_HAS_NESTED_VIRT cpufeature
+>   KVM: arm64: nv: Handle HCR_EL2.NV system register traps
+>   KVM: arm64: nv: Support virtual EL2 exceptions
+>   KVM: arm64: nv: Inject HVC exceptions to the virtual EL2
+>   KVM: arm64: nv: Trap SPSR_EL1, ELR_EL1 and VBAR_EL1 from virtual EL2
+>   KVM: arm64: nv: Trap CPACR_EL1 access in virtual EL2
+>   KVM: arm64: nv: Handle PSCI call via smc from the guest
+>   KVM: arm64: nv: Respect virtual HCR_EL2.TWX setting
+>   KVM: arm64: nv: Respect virtual CPTR_EL2.{TFP,FPEN} settings
+>   KVM: arm64: nv: Respect the virtual HCR_EL2.NV bit setting
+>   KVM: arm64: nv: Respect virtual HCR_EL2.TVM and TRVM settings
+>   KVM: arm64: nv: Respect the virtual HCR_EL2.NV1 bit setting
+>   KVM: arm64: nv: Emulate EL12 register accesses from the virtual EL2
+>   KVM: arm64: nv: Configure HCR_EL2 for nested virtualization
+>   KVM: arm64: nv: Introduce sys_reg_desc.forward_trap
+>   KVM: arm64: nv: Set a handler for the system instruction traps
+>   KVM: arm64: nv: Trap and emulate AT instructions from virtual EL2
+>   KVM: arm64: nv: Trap and emulate TLBI instructions from virtual EL2
+>   KVM: arm64: nv: Nested GICv3 Support
+>
+> Marc Zyngier (31):
+>   KVM: arm64: nv: Add EL2 system registers to vcpu context
+>   KVM: arm64: nv: Add non-VHE-EL2->EL1 translation helpers
+>   KVM: arm64: nv: Handle virtual EL2 registers in
+>     vcpu_read/write_sys_reg()
+>   KVM: arm64: nv: Handle SPSR_EL2 specially
+>   KVM: arm64: nv: Handle HCR_EL2.E2H specially
+>   KVM: arm64: nv: Save/Restore vEL2 sysregs
+>   KVM: arm64: nv: Forward debug traps to the nested guest
+>   KVM: arm64: nv: Filter out unsupported features from ID regs
+>   KVM: arm64: nv: Hide RAS from nested guests
+>   KVM: arm64: nv: Support multiple nested Stage-2 mmu structures
+>   KVM: arm64: nv: Handle shadow stage 2 page faults
+>   KVM: arm64: nv: Restrict S2 RD/WR permissions to match the guest's
+>   KVM: arm64: nv: Fold guest's HCR_EL2 configuration into the host's
+>   KVM: arm64: nv: Add handling of EL2-specific timer registers
+>   KVM: arm64: nv: Load timer before the GIC
+>   KVM: arm64: nv: Don't load the GICv4 context on entering a nested
+>     guest
+>   KVM: arm64: nv: Implement maintenance interrupt forwarding
+>   KVM: arm64: nv: Allow userspace to request KVM_ARM_VCPU_NESTED_VIRT
+>   KVM: arm64: nv: Add handling of ARMv8.4-TTL TLB invalidation
+>   KVM: arm64: nv: Invalidate TLBs based on shadow S2 TTL-like
+>     information
+>   KVM: arm64: Allow populating S2 SW bits
+>   KVM: arm64: nv: Tag shadow S2 entries with nested level
+>   KVM: arm64: nv: Add include containing the VNCR_EL2 offsets
+>   KVM: arm64: Map VNCR-capable registers to a separate page
+>   KVM: arm64: nv: Move nested vgic state into the sysreg file
+>   KVM: arm64: Add ARMv8.4 Enhanced Nested Virt cpufeature
+>   KVM: arm64: nv: Synchronize PSTATE early on exit
+>   KVM: arm64: nv: Allocate VNCR page when required
+>   KVM: arm64: nv: Enable ARMv8.4-NV support
+>   KVM: arm64: nv: Fast-track 'InHost' exception returns
+>   KVM: arm64: nv: Fast-track EL1 TLBIs for VHE guests
+>
+>  .../admin-guide/kernel-parameters.txt         |    4 +
+>  .../virt/kvm/devices/arm-vgic-v3.rst          |   12 +-
+>  arch/arm64/include/asm/cpucaps.h              |    2 +
+>  arch/arm64/include/asm/esr.h                  |    6 +
+>  arch/arm64/include/asm/kvm_arm.h              |   28 +-
+>  arch/arm64/include/asm/kvm_asm.h              |    4 +
+>  arch/arm64/include/asm/kvm_emulate.h          |  145 +-
+>  arch/arm64/include/asm/kvm_host.h             |  175 ++-
+>  arch/arm64/include/asm/kvm_hyp.h              |    2 +
+>  arch/arm64/include/asm/kvm_mmu.h              |   17 +-
+>  arch/arm64/include/asm/kvm_nested.h           |  152 ++
+>  arch/arm64/include/asm/kvm_pgtable.h          |   10 +
+>  arch/arm64/include/asm/sysreg.h               |  104 +-
+>  arch/arm64/include/asm/vncr_mapping.h         |   73 +
+>  arch/arm64/include/uapi/asm/kvm.h             |    2 +
+>  arch/arm64/kernel/cpufeature.c                |   35 +
+>  arch/arm64/kvm/Makefile                       |    4 +-
+>  arch/arm64/kvm/arch_timer.c                   |  189 ++-
+>  arch/arm64/kvm/arm.c                          |   34 +-
+>  arch/arm64/kvm/at.c                           |  231 ++++
+>  arch/arm64/kvm/emulate-nested.c               |  186 +++
+>  arch/arm64/kvm/guest.c                        |    6 +
+>  arch/arm64/kvm/handle_exit.c                  |   81 +-
+>  arch/arm64/kvm/hyp/exception.c                |   44 +-
+>  arch/arm64/kvm/hyp/include/hyp/switch.h       |   31 +-
+>  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h    |   28 +-
+>  arch/arm64/kvm/hyp/nvhe/switch.c              |   10 +-
+>  arch/arm64/kvm/hyp/nvhe/sysreg-sr.c           |    2 +-
+>  arch/arm64/kvm/hyp/pgtable.c                  |    6 +
+>  arch/arm64/kvm/hyp/vgic-v3-sr.c               |    2 +-
+>  arch/arm64/kvm/hyp/vhe/switch.c               |  207 ++-
+>  arch/arm64/kvm/hyp/vhe/sysreg-sr.c            |  125 +-
+>  arch/arm64/kvm/hyp/vhe/tlb.c                  |   83 ++
+>  arch/arm64/kvm/inject_fault.c                 |   62 +-
+>  arch/arm64/kvm/mmu.c                          |  183 ++-
+>  arch/arm64/kvm/nested.c                       |  908 ++++++++++++
+>  arch/arm64/kvm/reset.c                        |   14 +-
+>  arch/arm64/kvm/sys_regs.c                     | 1226 ++++++++++++++++-
+>  arch/arm64/kvm/sys_regs.h                     |    6 +
+>  arch/arm64/kvm/trace_arm.h                    |   65 +-
+>  arch/arm64/kvm/vgic/vgic-init.c               |   30 +
+>  arch/arm64/kvm/vgic/vgic-kvm-device.c         |   22 +
+>  arch/arm64/kvm/vgic/vgic-nested-trace.h       |  137 ++
+>  arch/arm64/kvm/vgic/vgic-v3-nested.c          |  240 ++++
+>  arch/arm64/kvm/vgic/vgic-v3.c                 |   39 +-
+>  arch/arm64/kvm/vgic/vgic.c                    |   44 +
+>  arch/arm64/kvm/vgic/vgic.h                    |   10 +
+>  include/kvm/arm_arch_timer.h                  |    7 +
+>  include/kvm/arm_vgic.h                        |   16 +
+>  tools/arch/arm/include/uapi/asm/kvm.h         |    1 +
+>  50 files changed, 4890 insertions(+), 160 deletions(-)
+>  create mode 100644 arch/arm64/include/asm/kvm_nested.h
+>  create mode 100644 arch/arm64/include/asm/vncr_mapping.h
+>  create mode 100644 arch/arm64/kvm/at.c
+>  create mode 100644 arch/arm64/kvm/emulate-nested.c
+>  create mode 100644 arch/arm64/kvm/nested.c
+>  create mode 100644 arch/arm64/kvm/vgic/vgic-nested-trace.h
+>  create mode 100644 arch/arm64/kvm/vgic/vgic-v3-nested.c
+>
 > --
 > 2.29.2
 >
