@@ -1,90 +1,63 @@
-Return-Path: <SRS0=IlRN=GY=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=o0cc=GZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C563C433E0
-	for <kvmarm@archiver.kernel.org>; Thu, 21 Jan 2021 18:14:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A0C0C433E0
+	for <kvmarm@archiver.kernel.org>; Fri, 22 Jan 2021 08:37:23 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 51B4F23A56
-	for <kvmarm@archiver.kernel.org>; Thu, 21 Jan 2021 18:14:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51B4F23A56
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id BAE99235F9
+	for <kvmarm@archiver.kernel.org>; Fri, 22 Jan 2021 08:37:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAE99235F9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9AAF74B096;
-	Thu, 21 Jan 2021 13:14:27 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EA4F34B081;
+	Fri, 22 Jan 2021 03:37:21 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 4cfY9AsHWiSh; Thu, 21 Jan 2021 13:14:26 -0500 (EST)
+	with ESMTP id MVeeN6uyThZs; Fri, 22 Jan 2021 03:37:20 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 62E854B0F5;
-	Thu, 21 Jan 2021 13:14:26 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E5B144B0BA;
+	Fri, 22 Jan 2021 03:37:20 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F1AA4B0DE
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Jan 2021 13:14:24 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 506614B081
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jan 2021 03:37:20 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FId2XrZrdiR4 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 21 Jan 2021 13:14:23 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C8EAF4B0DB
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Jan 2021 13:14:23 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1611252863;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=lEgMkUTOCJsoedIDEpBA2hjPtpKSlnIAkYz8Z2MMNg0=;
- b=HhV9sQ15u8xtMOCvc5f7XYyaKls4zmWZ3XnrKGBi8SLVsOj0ainwS2r11PbitDq/PEEzgD
- EE2r0OTfgQI7XSyaey4DEEolQZQK7q73EAJFV4O+cZdnE5kR1jFKNnNreppBZcyS+lSnkI
- 4BgDr7WmTT+vV4pVuOb0T52Anx48y6E=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-283-4sowHxENOA-jNF3X_XPxfw-1; Thu, 21 Jan 2021 13:14:19 -0500
-X-MC-Unique: 4sowHxENOA-jNF3X_XPxfw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 87956107ACE3;
- Thu, 21 Jan 2021 18:14:16 +0000 (UTC)
-Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com
- [10.3.112.255])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1251139A63;
- Thu, 21 Jan 2021 18:14:15 +0000 (UTC)
-Date: Thu, 21 Jan 2021 11:14:14 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Keqian Zhu <zhukeqian1@huawei.com>
-Subject: Re: [PATCH v2 2/2] vfio/iommu_type1: Sanity check pfn_list when
- remove vfio_dma
-Message-ID: <20210121111414.143e3e4e@omen.home.shazbot.org>
-In-Reply-To: <32f8b347-587a-1a9a-bee8-569f09a03a15@huawei.com>
-References: <20210115092643.728-1-zhukeqian1@huawei.com>
- <20210115092643.728-3-zhukeqian1@huawei.com>
- <20210115121447.54c96857@omen.home.shazbot.org>
- <32f8b347-587a-1a9a-bee8-569f09a03a15@huawei.com>
+ with ESMTP id eHdsrsfpZuH6 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 22 Jan 2021 03:37:17 -0500 (EST)
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B1D374AEF8
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jan 2021 03:37:15 -0500 (EST)
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.60])
+ by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4DMXdn4gT6zl8Rv;
+ Fri, 22 Jan 2021 16:35:41 +0800 (CST)
+Received: from DESKTOP-5IS4806.china.huawei.com (10.174.184.42) by
+ DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
+ 14.3.498.0; Fri, 22 Jan 2021 16:37:01 +0800
+From: Keqian Zhu <zhukeqian1@huawei.com>
+To: <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+ <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>, Will Deacon
+ <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Catalin Marinas
+ <catalin.marinas@arm.com>
+Subject: [RFC PATCH] kvm: arm64: Try stage2 block mapping for host device MMIO
+Date: Fri, 22 Jan 2021 16:36:50 +0800
+Message-ID: <20210122083650.21812-1-zhukeqian1@huawei.com>
+X-Mailer: git-send-email 2.8.4.windows.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- Kirti Wankhede <kwankhede@nvidia.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, Marc
- Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
- Daniel Lezcano <daniel.lezcano@linaro.org>,
- Alexios Zavras <alexios.zavras@intel.com>,
- Thomas Gleixner <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org,
- Cornelia Huck <cohuck@redhat.com>, linux-kernel@vger.kernel.org,
- iommu@lists.linux-foundation.org, Andrew Morton <akpm@linux-foundation.org>,
- Robin Murphy <robin.murphy@arm.com>
+X-Originating-IP: [10.174.184.42]
+X-CFilter-Loop: Reflected
+Cc: Joerg Roedel <joro@8bytes.org>, Daniel
+ Lezcano <daniel.lezcano@linaro.org>, Alexios Zavras <alexios.zavras@intel.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Robin Murphy <robin.murphy@arm.com>,
+ Andrew Morton <akpm@linux-foundation.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -101,40 +74,112 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 18 Jan 2021 21:16:08 +0800
-Keqian Zhu <zhukeqian1@huawei.com> wrote:
+The MMIO region of a device maybe huge (GB level), try to use block
+mapping in stage2 to speedup both map and unmap.
 
-> On 2021/1/16 3:14, Alex Williamson wrote:
-> > On Fri, 15 Jan 2021 17:26:43 +0800
-> > Keqian Zhu <zhukeqian1@huawei.com> wrote:
-> >   
-> >> vfio_sanity_check_pfn_list() is used to check whether pfn_list of
-> >> vfio_dma is empty when remove the external domain, so it makes a
-> >> wrong assumption that only external domain will add pfn to dma pfn_list.
-> >>
-> >> Now we apply this check when remove a specific vfio_dma and extract
-> >> the notifier check just for external domain.  
-> > 
-> > The page pinning interface is gated by having a notifier registered for
-> > unmaps, therefore non-external domains would also need to register a
-> > notifier.  There's currently no other way to add entries to the
-> > pfn_list.  So if we allow pinning for such domains, then it's wrong to
-> > WARN_ON() when the notifier list is not-empty when removing an external
-> > domain.  Long term we should probably extend page {un}pinning for the
-> > caller to pass their notifier to be validated against the notifier list
-> > rather than just allowing page pinning if *any* notifier is registered.
-> > Thanks,  
-> I was misled by the code comments. So when the commit a54eb55045ae is
-> added, the only user of pin interface is mdev vendor driver, but now
-> we also allow iommu backed group to use this interface to constraint
-> dirty scope. Is vfio_iommu_unmap_unpin_all() a proper place to put
-> this WARN()?
+Especially for unmap, it performs TLBI right after each invalidation
+of PTE. If all mapping is of PAGE_SIZE, it takes much time to handle
+GB level range.
 
-vfio_iommu_unmap_unpin_all() deals with removing vfio_dmas, it's
-logically unrelated to whether any driver is registered to receive
-unmap notifications.  Thanks,
+Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+---
+ arch/arm64/include/asm/kvm_pgtable.h | 11 +++++++++++
+ arch/arm64/kvm/hyp/pgtable.c         | 15 +++++++++++++++
+ arch/arm64/kvm/mmu.c                 | 12 ++++++++----
+ 3 files changed, 34 insertions(+), 4 deletions(-)
 
-Alex
+diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+index 52ab38db04c7..2266ac45f10c 100644
+--- a/arch/arm64/include/asm/kvm_pgtable.h
++++ b/arch/arm64/include/asm/kvm_pgtable.h
+@@ -82,6 +82,17 @@ struct kvm_pgtable_walker {
+ 	const enum kvm_pgtable_walk_flags	flags;
+ };
+ 
++/**
++ * kvm_supported_pgsize() - Get the max supported page size of a mapping.
++ * @pgt:	Initialised page-table structure.
++ * @addr:	Virtual address at which to place the mapping.
++ * @end:	End virtual address of the mapping.
++ * @phys:	Physical address of the memory to map.
++ *
++ * The smallest return value is PAGE_SIZE.
++ */
++u64 kvm_supported_pgsize(struct kvm_pgtable *pgt, u64 addr, u64 end, u64 phys);
++
+ /**
+  * kvm_pgtable_hyp_init() - Initialise a hypervisor stage-1 page-table.
+  * @pgt:	Uninitialised page-table structure to initialise.
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index bdf8e55ed308..ab11609b9b13 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -81,6 +81,21 @@ static bool kvm_block_mapping_supported(u64 addr, u64 end, u64 phys, u32 level)
+ 	return IS_ALIGNED(addr, granule) && IS_ALIGNED(phys, granule);
+ }
+ 
++u64 kvm_supported_pgsize(struct kvm_pgtable *pgt, u64 addr, u64 end, u64 phys)
++{
++	u32 lvl;
++	u64 pgsize = PAGE_SIZE;
++
++	for (lvl = pgt->start_level; lvl < KVM_PGTABLE_MAX_LEVELS; lvl++) {
++		if (kvm_block_mapping_supported(addr, end, phys, lvl)) {
++			pgsize = kvm_granule_size(lvl);
++			break;
++		}
++	}
++
++	return pgsize;
++}
++
+ static u32 kvm_pgtable_idx(struct kvm_pgtable_walk_data *data, u32 level)
+ {
+ 	u64 shift = kvm_granule_shift(level);
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 7d2257cc5438..80b403fc8e64 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -499,7 +499,8 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
+ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+ 			  phys_addr_t pa, unsigned long size, bool writable)
+ {
+-	phys_addr_t addr;
++	phys_addr_t addr, end;
++	unsigned long pgsize;
+ 	int ret = 0;
+ 	struct kvm_mmu_memory_cache cache = { 0, __GFP_ZERO, NULL, };
+ 	struct kvm_pgtable *pgt = kvm->arch.mmu.pgt;
+@@ -509,21 +510,24 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+ 
+ 	size += offset_in_page(guest_ipa);
+ 	guest_ipa &= PAGE_MASK;
++	end = guest_ipa + size;
+ 
+-	for (addr = guest_ipa; addr < guest_ipa + size; addr += PAGE_SIZE) {
++	for (addr = guest_ipa; addr < end; addr += pgsize) {
+ 		ret = kvm_mmu_topup_memory_cache(&cache,
+ 						 kvm_mmu_cache_min_pages(kvm));
+ 		if (ret)
+ 			break;
+ 
++		pgsize = kvm_supported_pgsize(pgt, addr, end, pa);
++
+ 		spin_lock(&kvm->mmu_lock);
+-		ret = kvm_pgtable_stage2_map(pgt, addr, PAGE_SIZE, pa, prot,
++		ret = kvm_pgtable_stage2_map(pgt, addr, pgsize, pa, prot,
+ 					     &cache);
+ 		spin_unlock(&kvm->mmu_lock);
+ 		if (ret)
+ 			break;
+ 
+-		pa += PAGE_SIZE;
++		pa += pgsize;
+ 	}
+ 
+ 	kvm_mmu_free_memory_cache(&cache);
+-- 
+2.19.1
 
 _______________________________________________
 kvmarm mailing list
