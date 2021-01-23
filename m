@@ -7,48 +7,48 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B482C433DB
-	for <kvmarm@archiver.kernel.org>; Sat, 23 Jan 2021 14:26:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 003F8C433E0
+	for <kvmarm@archiver.kernel.org>; Sat, 23 Jan 2021 14:28:18 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 23A1423159
-	for <kvmarm@archiver.kernel.org>; Sat, 23 Jan 2021 14:26:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23A1423159
+	by mail.kernel.org (Postfix) with ESMTP id 6A5AD2310A
+	for <kvmarm@archiver.kernel.org>; Sat, 23 Jan 2021 14:28:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A5AD2310A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B30C74B111;
-	Sat, 23 Jan 2021 09:26:48 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1650B4B0EA;
+	Sat, 23 Jan 2021 09:28:18 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id i3Q4f3RanNHe; Sat, 23 Jan 2021 09:26:47 -0500 (EST)
+	with ESMTP id jt50AV3h1eoO; Sat, 23 Jan 2021 09:28:15 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 93CA44B11F;
-	Sat, 23 Jan 2021 09:26:47 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D12B34B11F;
+	Sat, 23 Jan 2021 09:28:15 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 189A84B116
- for <kvmarm@lists.cs.columbia.edu>; Sat, 23 Jan 2021 09:26:46 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9AF174B11D
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 23 Jan 2021 09:28:14 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lr+bSYRh-DtY for <kvmarm@lists.cs.columbia.edu>;
- Sat, 23 Jan 2021 09:26:45 -0500 (EST)
+ with ESMTP id 37wof50750C7 for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 23 Jan 2021 09:28:13 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EE8BA4B111
- for <kvmarm@lists.cs.columbia.edu>; Sat, 23 Jan 2021 09:26:44 -0500 (EST)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 614B022DFA;
- Sat, 23 Jan 2021 14:26:41 +0000 (UTC)
-Date: Sat, 23 Jan 2021 14:26:39 +0000
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B85C94B0EA
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 23 Jan 2021 09:28:13 -0500 (EST)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 1BA3B22EBE;
+ Sat, 23 Jan 2021 14:28:09 +0000 (UTC)
+Date: Sat, 23 Jan 2021 14:28:07 +0000
 From: Catalin Marinas <catalin.marinas@arm.com>
 To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v4 20/21] arm64: Defer enabling pointer authentication on
- boot core
-Message-ID: <YAwyH8Ya4oqFKlC0@Catalins-MacBook-Air.local>
+Subject: Re: [PATCH v4 21/21] arm64: cpufeatures: Allow disabling of Pointer
+ Auth from the command-line
+Message-ID: <YAwydxY68TULznr1@Catalins-MacBook-Air.local>
 References: <20210118094533.2874082-1-maz@kernel.org>
- <20210118094533.2874082-21-maz@kernel.org>
+ <20210118094533.2874082-22-maz@kernel.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20210118094533.2874082-21-maz@kernel.org>
+In-Reply-To: <20210118094533.2874082-22-maz@kernel.org>
 Cc: Prasad Sodagudi <psodagud@codeaurora.org>,
  Srinivas Ramana <sramana@codeaurora.org>, linux-kernel@vger.kernel.org,
  Ard Biesheuvel <ardb@kernel.org>, Ajay Patil <pajay@qti.qualcomm.com>,
@@ -70,19 +70,15 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Jan 18, 2021 at 09:45:32AM +0000, Marc Zyngier wrote:
-> From: Srinivas Ramana <sramana@codeaurora.org>
+On Mon, Jan 18, 2021 at 09:45:33AM +0000, Marc Zyngier wrote:
+> In order to be able to disable Pointer Authentication  at runtime,
+> whether it is for testing purposes, or to work around HW issues,
+> let's add support for overriding the ID_AA64ISAR1_EL1.{GPI,GPA,API,APA}
+> fields.
 > 
-> Defer enabling pointer authentication on boot core until
-> after its required to be enabled by cpufeature framework.
-> This will help in controlling the feature dynamically
-> with a boot parameter.
+> This is further mapped on the arm64.nopauth command-line alias.
 > 
-> Signed-off-by: Ajay Patil <pajay@qti.qualcomm.com>
-> Signed-off-by: Prasad Sodagudi <psodagud@codeaurora.org>
-> Signed-off-by: Srinivas Ramana <sramana@codeaurora.org>
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Link: https://lore.kernel.org/r/1610152163-16554-2-git-send-email-sramana@codeaurora.org
 
 Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 _______________________________________________
