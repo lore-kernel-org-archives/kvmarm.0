@@ -2,57 +2,76 @@ Return-Path: <SRS0=6Z91=G2=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20934C433E0
-	for <kvmarm@archiver.kernel.org>; Sat, 23 Jan 2021 13:25:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEA10C433E0
+	for <kvmarm@archiver.kernel.org>; Sat, 23 Jan 2021 13:30:26 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7E52F23331
-	for <kvmarm@archiver.kernel.org>; Sat, 23 Jan 2021 13:25:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E52F23331
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 2627922AAD
+	for <kvmarm@archiver.kernel.org>; Sat, 23 Jan 2021 13:30:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2627922AAD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 27E6D4B115;
-	Sat, 23 Jan 2021 08:25:30 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A3134B139;
+	Sat, 23 Jan 2021 08:30:25 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ju5kvxsHdIS9; Sat, 23 Jan 2021 08:25:26 -0500 (EST)
+	with ESMTP id NzCCO87apwN2; Sat, 23 Jan 2021 08:30:24 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B584E4B151;
-	Sat, 23 Jan 2021 08:25:26 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6005F4B13F;
+	Sat, 23 Jan 2021 08:30:24 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8FA234B0FB
- for <kvmarm@lists.cs.columbia.edu>; Sat, 23 Jan 2021 08:25:25 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 29E4B4B137
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 23 Jan 2021 08:30:23 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mCKzp4CY7X+q for <kvmarm@lists.cs.columbia.edu>;
- Sat, 23 Jan 2021 08:25:24 -0500 (EST)
+ with ESMTP id ZbmrFT0+cUVH for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 23 Jan 2021 08:30:22 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A65514B0E6
- for <kvmarm@lists.cs.columbia.edu>; Sat, 23 Jan 2021 08:25:24 -0500 (EST)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 0D61523159;
- Sat, 23 Jan 2021 13:25:20 +0000 (UTC)
-Date: Sat, 23 Jan 2021 13:25:18 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v4 11/21] arm64: Extract early FDT mapping from
- kaslr_early_init()
-Message-ID: <YAwjvska5yaojm04@Catalins-MacBook-Air.local>
-References: <20210118094533.2874082-1-maz@kernel.org>
- <20210118094533.2874082-12-maz@kernel.org>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210118094533.2874082-12-maz@kernel.org>
-Cc: Prasad Sodagudi <psodagud@codeaurora.org>,
- Srinivas Ramana <sramana@codeaurora.org>, linux-kernel@vger.kernel.org,
- Ard Biesheuvel <ardb@kernel.org>, Ajay Patil <pajay@qti.qualcomm.com>,
- kernel-team@android.com, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 043954B120
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 23 Jan 2021 08:30:22 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id CB92222AAA;
+ Sat, 23 Jan 2021 13:30:20 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1l3Iza-009blL-SU; Sat, 23 Jan 2021 13:30:19 +0000
+Date: Sat, 23 Jan 2021 13:30:09 +0000
+Message-ID: <87zh0zkcgu.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: David Brazdil <dbrazdil@google.com>
+Subject: Re: [PATCH v2 3/8] KVM: arm64: Add symbol at the beginning of each
+ hyp section
+In-Reply-To: <20210105180541.65031-4-dbrazdil@google.com>
+References: <20210105180541.65031-1-dbrazdil@google.com>
+ <20210105180541.65031-4-dbrazdil@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: dbrazdil@google.com, kvmarm@lists.cs.columbia.edu,
+ catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, ardb@kernel.org,
+ mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+ Ard Biesheuvel <ardb@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -69,19 +88,45 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Jan 18, 2021 at 09:45:23AM +0000, Marc Zyngier wrote:
-> +void __init early_fdt_map(u64 dt_phys)
-> +{
-> +	int fdt_size;
+On Tue, 05 Jan 2021 18:05:36 +0000,
+David Brazdil <dbrazdil@google.com> wrote:
+> 
+> Generating hyp relocations will require referencing positions at a given
+> offset from the beginning of hyp sections. Since the final layout will
+> not be determined until the linking of `vmlinux`, modify the hyp linker
+> script to insert a symbol at the first byte of each hyp section to use
+> as an anchor. The linker of `vmlinux` will place the symbols together
+> with the sections.
+> 
+> Signed-off-by: David Brazdil <dbrazdil@google.com>
+> ---
+>  arch/arm64/include/asm/hyp_image.h | 29 +++++++++++++++++++++++++++--
+>  arch/arm64/kvm/hyp/nvhe/hyp.lds.S  |  4 ++--
+>  2 files changed, 29 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/hyp_image.h b/arch/arm64/include/asm/hyp_image.h
+> index daa1a1da539e..f97b774b58f4 100644
+> --- a/arch/arm64/include/asm/hyp_image.h
+> +++ b/arch/arm64/include/asm/hyp_image.h
+> @@ -7,6 +7,9 @@
+>  #ifndef __ARM64_HYP_IMAGE_H__
+>  #define __ARM64_HYP_IMAGE_H__
+>  
+> +#define HYP_CONCAT(a, b)	__HYP_CONCAT(a, b)
+> +#define __HYP_CONCAT(a, b)	a ## b
 > +
-> +	early_fixmap_init();
-> +	early_fdt_ptr = fixmap_remap_fdt(dt_phys, &fdt_size, PAGE_KERNEL);
-> +}
 
-asmlinkage here as well I think.
+OK, this may seem like a completely pointless comment, but I have a
+total mental block when I see macros written upside down
+
+I'll fix that myself, no need to resend just for that.
+
+Thanks,
+
+	M.
 
 -- 
-Catalin
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
