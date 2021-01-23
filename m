@@ -2,53 +2,53 @@ Return-Path: <SRS0=6Z91=G2=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1D9BC433DB
-	for <kvmarm@archiver.kernel.org>; Sat, 23 Jan 2021 14:15:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A128DC433E0
+	for <kvmarm@archiver.kernel.org>; Sat, 23 Jan 2021 14:20:03 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 59F6F22CAF
-	for <kvmarm@archiver.kernel.org>; Sat, 23 Jan 2021 14:15:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59F6F22CAF
+	by mail.kernel.org (Postfix) with ESMTP id 0F24D22D75
+	for <kvmarm@archiver.kernel.org>; Sat, 23 Jan 2021 14:20:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F24D22D75
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DAE214B0EA;
-	Sat, 23 Jan 2021 09:15:48 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A152B4B14A;
+	Sat, 23 Jan 2021 09:20:02 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id XlYr1hQP+mPw; Sat, 23 Jan 2021 09:15:46 -0500 (EST)
+	with ESMTP id iAnuykZfx3h3; Sat, 23 Jan 2021 09:20:01 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D5F324B12D;
-	Sat, 23 Jan 2021 09:15:46 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9AAD74B15A;
+	Sat, 23 Jan 2021 09:20:01 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1CD3A4B103
- for <kvmarm@lists.cs.columbia.edu>; Sat, 23 Jan 2021 09:15:46 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 867334B14A
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 23 Jan 2021 09:20:00 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1eneOvhAeIYX for <kvmarm@lists.cs.columbia.edu>;
- Sat, 23 Jan 2021 09:15:45 -0500 (EST)
+ with ESMTP id A4QwqDzvIU8C for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 23 Jan 2021 09:19:59 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1F8424B0EA
- for <kvmarm@lists.cs.columbia.edu>; Sat, 23 Jan 2021 09:15:45 -0500 (EST)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 6FD1B22B51;
- Sat, 23 Jan 2021 14:15:41 +0000 (UTC)
-Date: Sat, 23 Jan 2021 14:15:39 +0000
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8C5DD4B12D
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 23 Jan 2021 09:19:59 -0500 (EST)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id DA3F722D5A;
+ Sat, 23 Jan 2021 14:19:55 +0000 (UTC)
+Date: Sat, 23 Jan 2021 14:19:53 +0000
 From: Catalin Marinas <catalin.marinas@arm.com>
 To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v4 16/21] arm64: Make kvm-arm.mode={nvhe,protected} an
- alias of id_aa64mmfr1.vh=0
-Message-ID: <YAwvi9zEXZxbo9iK@Catalins-MacBook-Air.local>
+Subject: Re: [PATCH v4 18/21] arm64: Move "nokaslr" over to the early
+ cpufeature infrastructure
+Message-ID: <YAwwiRF4QnIoPS20@Catalins-MacBook-Air.local>
 References: <20210118094533.2874082-1-maz@kernel.org>
- <20210118094533.2874082-17-maz@kernel.org>
+ <20210118094533.2874082-19-maz@kernel.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20210118094533.2874082-17-maz@kernel.org>
+In-Reply-To: <20210118094533.2874082-19-maz@kernel.org>
 Cc: Prasad Sodagudi <psodagud@codeaurora.org>,
  Srinivas Ramana <sramana@codeaurora.org>, linux-kernel@vger.kernel.org,
  Ard Biesheuvel <ardb@kernel.org>, Ajay Patil <pajay@qti.qualcomm.com>,
@@ -70,16 +70,33 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Jan 18, 2021 at 09:45:28AM +0000, Marc Zyngier wrote:
-> Admitedly, passing id_aa64mmfr1.vh=0 on the command-line isn't
-> that easy to understand, and it is likely that users would much
-> prefer write "kvm-arm.mode=nvhe", or "...=protected".
-> 
-> So here you go. This has the added advantage that we can now
-> always honor the "kvm-arm.mode=protected" option, even when
-> booting on a VHE system.
+On Mon, Jan 18, 2021 at 09:45:30AM +0000, Marc Zyngier wrote:
+> Given that the early cpufeature infrastructure has borrowed quite
+> a lot of code from the kaslr implementation, let's reimplement
+> the matching of the "nokaslr" option with it.
 > 
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kernel/idreg-override.c | 17 ++++++++++++++
+>  arch/arm64/kernel/kaslr.c          | 37 +++---------------------------
+>  2 files changed, 20 insertions(+), 34 deletions(-)
+> 
+> diff --git a/arch/arm64/kernel/idreg-override.c b/arch/arm64/kernel/idreg-override.c
+> index 1db54878b2c4..143fe7b8e3ce 100644
+> --- a/arch/arm64/kernel/idreg-override.c
+> +++ b/arch/arm64/kernel/idreg-override.c
+> @@ -33,8 +33,24 @@ static const struct reg_desc mmfr1 __initdata = {
+>  	},
+>  };
+>  
+> +extern u64 kaslr_feature_val;
+> +extern u64 kaslr_feature_mask;
+> +
+> +static const struct reg_desc kaslr __initdata = {
+> +	.name		= "kaslr",
+
+We might as well rename this ftr_override or something more generic as
+we no longer describe registers here. Otherwise:
 
 Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 _______________________________________________
