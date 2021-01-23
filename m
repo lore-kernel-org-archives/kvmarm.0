@@ -2,57 +2,75 @@ Return-Path: <SRS0=6Z91=G2=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A948CC433DB
-	for <kvmarm@archiver.kernel.org>; Sat, 23 Jan 2021 13:44:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB4C7C433E0
+	for <kvmarm@archiver.kernel.org>; Sat, 23 Jan 2021 13:54:55 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1627B22AAF
-	for <kvmarm@archiver.kernel.org>; Sat, 23 Jan 2021 13:44:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1627B22AAF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 1E10D22B51
+	for <kvmarm@archiver.kernel.org>; Sat, 23 Jan 2021 13:54:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E10D22B51
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A947C4B13F;
-	Sat, 23 Jan 2021 08:44:03 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 82A9F4B153;
+	Sat, 23 Jan 2021 08:54:54 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id x5MIE45zsIYb; Sat, 23 Jan 2021 08:44:01 -0500 (EST)
+	with ESMTP id fi4CUTx4TU+H; Sat, 23 Jan 2021 08:54:52 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7ADD74B14A;
-	Sat, 23 Jan 2021 08:44:01 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DA0BA4B14D;
+	Sat, 23 Jan 2021 08:54:52 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DEA094B13B
- for <kvmarm@lists.cs.columbia.edu>; Sat, 23 Jan 2021 08:44:00 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D65EB4B13B
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 23 Jan 2021 08:54:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id K6pHhC9EqLAU for <kvmarm@lists.cs.columbia.edu>;
- Sat, 23 Jan 2021 08:43:59 -0500 (EST)
+ with ESMTP id bvVE52Jnc7+1 for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 23 Jan 2021 08:54:50 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CF7714B101
- for <kvmarm@lists.cs.columbia.edu>; Sat, 23 Jan 2021 08:43:59 -0500 (EST)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id C232C22AAD;
- Sat, 23 Jan 2021 13:43:55 +0000 (UTC)
-Date: Sat, 23 Jan 2021 13:43:52 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v4 12/21] arm64: cpufeature: Add an early command-line
- cpufeature override facility
-Message-ID: <YAwoGDODQKq3798H@Catalins-MacBook-Air.local>
-References: <20210118094533.2874082-1-maz@kernel.org>
- <20210118094533.2874082-13-maz@kernel.org>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210118094533.2874082-13-maz@kernel.org>
-Cc: Prasad Sodagudi <psodagud@codeaurora.org>,
- Srinivas Ramana <sramana@codeaurora.org>, linux-kernel@vger.kernel.org,
- Ard Biesheuvel <ardb@kernel.org>, Ajay Patil <pajay@qti.qualcomm.com>,
- kernel-team@android.com, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BC9D94B101
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 23 Jan 2021 08:54:50 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id A30BB22B48;
+ Sat, 23 Jan 2021 13:54:49 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1l3JNH-009bsW-PK; Sat, 23 Jan 2021 13:54:47 +0000
+Date: Sat, 23 Jan 2021 13:54:47 +0000
+Message-ID: <87y2gjkbbs.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: David Brazdil <dbrazdil@google.com>
+Subject: Re: [PATCH v2 8/8] KVM: arm64: Remove hyp_symbol_addr
+In-Reply-To: <20210105180541.65031-9-dbrazdil@google.com>
+References: <20210105180541.65031-1-dbrazdil@google.com>
+ <20210105180541.65031-9-dbrazdil@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: dbrazdil@google.com, kvmarm@lists.cs.columbia.edu,
+ catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, ardb@kernel.org,
+ mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+ Ard Biesheuvel <ardb@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -69,40 +87,69 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Jan 18, 2021 at 09:45:24AM +0000, Marc Zyngier wrote:
-> +struct reg_desc {
-> +	const char * const	name;
-> +	u64 * const		val;
-> +	u64 * const		mask;
-> +	struct {
-> +		const char * const	name;
-> +		u8			 shift;
-> +	} 			fields[];
-> +};
+On Tue, 05 Jan 2021 18:05:41 +0000,
+David Brazdil <dbrazdil@google.com> wrote:
+> 
+> Hyp code used the hyp_symbol_addr helper to force PC-relative addressing
+> because absolute addressing results in kernel VAs due to the way hyp
+> code is linked. This is not true anymore, so remove the helper and
+> update all of its users.
+> 
+> Acked-by: Ard Biesheuvel <ardb@kernel.org>
+> Signed-off-by: David Brazdil <dbrazdil@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_asm.h         | 26 ------------------------
+>  arch/arm64/kvm/hyp/include/hyp/switch.h  |  4 ++--
+>  arch/arm64/kvm/hyp/nvhe/hyp-smp.c        |  4 ++--
+>  arch/arm64/kvm/hyp/nvhe/psci-relay.c     | 24 +++++++++++-----------
+>  arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c |  2 +-
+>  5 files changed, 17 insertions(+), 43 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index 8a33d83ea843..22d933e9b59e 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -199,32 +199,6 @@ extern void __vgic_v3_init_lrs(void);
+>  
+>  extern u32 __kvm_get_mdcr_el2(void);
+>  
+> -#if defined(GCC_VERSION) && GCC_VERSION < 50000
+> -#define SYM_CONSTRAINT	"i"
+> -#else
+> -#define SYM_CONSTRAINT	"S"
+> -#endif
+> -
+> -/*
+> - * Obtain the PC-relative address of a kernel symbol
+> - * s: symbol
+> - *
+> - * The goal of this macro is to return a symbol's address based on a
+> - * PC-relative computation, as opposed to a loading the VA from a
+> - * constant pool or something similar. This works well for HYP, as an
+> - * absolute VA is guaranteed to be wrong. Only use this if trying to
+> - * obtain the address of a symbol (i.e. not something you obtained by
+> - * following a pointer).
+> - */
+> -#define hyp_symbol_addr(s)						\
+> -	({								\
+> -		typeof(s) *addr;					\
+> -		asm("adrp	%0, %1\n"				\
+> -		    "add	%0, %0, :lo12:%1\n"			\
+> -		    : "=r" (addr) : SYM_CONSTRAINT (&s));		\
+> -		addr;							\
+> -	})
+> -
 
-Sorry, I didn't see this earlier. Do we need to add all these consts
-here? So you want the pointers to be const but why is 'shift' special
-and not a const then? Is it modified later?
+This hunk is going to conflict in a fairly benign way with the
+removal of the GCC workaround which I think Will queued for 5.12.
+I'll work something out...
 
-Would this not work:
+Thanks,
 
-struct reg_desc {
-	const char	*name;
-	u64		*val;
-	u64		*mask;
-	struct {
-		const char	*name;
-		u8		shift;
-	} fields[];
-};
-
-> +static const struct reg_desc * const regs[] __initdata = {
-
-as we already declare the whole struct reg_desc pointers here as const.
-I may have confused myself...
+	M.
 
 -- 
-Catalin
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
