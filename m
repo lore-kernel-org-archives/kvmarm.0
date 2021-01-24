@@ -6,56 +6,57 @@ X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FBF6C433DB
-	for <kvmarm@archiver.kernel.org>; Sun, 24 Jan 2021 18:44:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AD45C433E0
+	for <kvmarm@archiver.kernel.org>; Sun, 24 Jan 2021 19:01:58 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 118E622D03
-	for <kvmarm@archiver.kernel.org>; Sun, 24 Jan 2021 18:44:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 118E622D03
+	by mail.kernel.org (Postfix) with ESMTP id 6A7D022D50
+	for <kvmarm@archiver.kernel.org>; Sun, 24 Jan 2021 19:01:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A7D022D50
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BD184B33A;
-	Sun, 24 Jan 2021 13:44:19 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D6AFF4B407;
+	Sun, 24 Jan 2021 14:01:56 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id DSbD8dx3esdW; Sun, 24 Jan 2021 13:44:17 -0500 (EST)
+	with ESMTP id KjRxqMrqgAoR; Sun, 24 Jan 2021 14:01:55 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 990E14B3F4;
-	Sun, 24 Jan 2021 13:44:17 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D21944B41E;
+	Sun, 24 Jan 2021 14:01:55 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A4C84B3C6
- for <kvmarm@lists.cs.columbia.edu>; Sun, 24 Jan 2021 13:44:17 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1970F4B41E
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 24 Jan 2021 14:01:54 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7M7cqewB40qD for <kvmarm@lists.cs.columbia.edu>;
- Sun, 24 Jan 2021 13:44:16 -0500 (EST)
+ with ESMTP id yfKQq2qkjetE for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 24 Jan 2021 14:01:53 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0601A4B3BD
- for <kvmarm@lists.cs.columbia.edu>; Sun, 24 Jan 2021 13:44:16 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F1D494B3F4
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 24 Jan 2021 14:01:52 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id E98CE222BB;
- Sun, 24 Jan 2021 18:44:14 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id E0AD122CF6;
+ Sun, 24 Jan 2021 19:01:51 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1l3kMu-009lbm-U9; Sun, 24 Jan 2021 18:44:13 +0000
-Date: Sun, 24 Jan 2021 18:44:11 +0000
-Message-ID: <87sg6qjhtw.wl-maz@kernel.org>
+ id 1l3kdx-009lho-MZ; Sun, 24 Jan 2021 19:01:49 +0000
+Date: Sun, 24 Jan 2021 19:01:48 +0000
+Message-ID: <87r1majh0j.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: David Brazdil <dbrazdil@google.com>
-Subject: Re: [PATCH v4 04/21] arm64: Provide an 'upgrade to VHE' stub hypercall
-In-Reply-To: <20210118112516.6a7lnrtbjvey4iiv@google.com>
+Subject: Re: [PATCH v4 15/21] arm64: Add an aliasing facility for the idreg
+ override
+In-Reply-To: <20210118131839.7ao33jeufq3dfnb4@google.com>
 References: <20210118094533.2874082-1-maz@kernel.org>
- <20210118094533.2874082-5-maz@kernel.org>
- <20210118112516.6a7lnrtbjvey4iiv@google.com>
+ <20210118094533.2874082-16-maz@kernel.org>
+ <20210118131839.7ao33jeufq3dfnb4@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -92,96 +93,56 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 18 Jan 2021 11:25:16 +0000,
+On Mon, 18 Jan 2021 13:18:39 +0000,
 David Brazdil <dbrazdil@google.com> wrote:
 > 
-> On Mon, Jan 18, 2021 at 09:45:16AM +0000, Marc Zyngier wrote:
-> > As we are about to change the way a VHE system boots, let's
-> > provide the core helper, in the form of a stub hypercall that
-> > enables VHE and replicates the full EL1 context at EL2, thanks
-> > to EL1 and VHE-EL2 being extremely similar.
-> > 
-> > On exception return, the kernel carries on at EL2. Fancy!
-> > 
-> > Nothing calls this new hypercall yet, so no functional change.
+> On Mon, Jan 18, 2021 at 09:45:27AM +0000, Marc Zyngier wrote:
+> > In order to map the override of idregs to options that a user
+> > can easily understand, let's introduce yet another option
+> > array, which maps an option to the corresponding idreg options.
 > > 
 > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/virt.h |  7 +++-
-> >  arch/arm64/kernel/hyp-stub.S  | 67 +++++++++++++++++++++++++++++++++--
-> >  2 files changed, 71 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
-> > index ee6a48df89d9..7379f35ae2c6 100644
-> > --- a/arch/arm64/include/asm/virt.h
-> > +++ b/arch/arm64/include/asm/virt.h
-> > @@ -35,8 +35,13 @@
-> >   */
-> >  #define HVC_RESET_VECTORS 2
-> >  
-> > +/*
-> > + * HVC_VHE_RESTART - Upgrade the CPU from EL1 to EL2, if possible
-> > + */
-> > +#define HVC_VHE_RESTART	3
-> > +
-> >  /* Max number of HYP stub hypercalls */
-> > -#define HVC_STUB_HCALL_NR 3
-> > +#define HVC_STUB_HCALL_NR 4
-> >  
-> >  /* Error returned when an invalid stub number is passed into x0 */
-> >  #define HVC_STUB_ERR	0xbadca11
-> > diff --git a/arch/arm64/kernel/hyp-stub.S b/arch/arm64/kernel/hyp-stub.S
-> > index 160f5881a0b7..fb12398b5c28 100644
-> > --- a/arch/arm64/kernel/hyp-stub.S
-> > +++ b/arch/arm64/kernel/hyp-stub.S
-> > @@ -8,9 +8,9 @@
-> >  
-> >  #include <linux/init.h>
-> >  #include <linux/linkage.h>
-> > -#include <linux/irqchip/arm-gic-v3.h>
-> >  
-> >  #include <asm/assembler.h>
-> > +#include <asm/el2_setup.h>
-> >  #include <asm/kvm_arm.h>
-> >  #include <asm/kvm_asm.h>
-> >  #include <asm/ptrace.h>
-> > @@ -47,10 +47,13 @@ SYM_CODE_END(__hyp_stub_vectors)
-> >  
-> >  SYM_CODE_START_LOCAL(el1_sync)
-> >  	cmp	x0, #HVC_SET_VECTORS
-> > -	b.ne	2f
-> > +	b.ne	1f
-> >  	msr	vbar_el2, x1
-> >  	b	9f
-> >  
-> > +1:	cmp	x0, #HVC_VHE_RESTART
-> > +	b.eq	mutate_to_vhe
-> > +
-> >  2:	cmp	x0, #HVC_SOFT_RESTART
-> >  	b.ne	3f
-> >  	mov	x0, x2
-> > @@ -70,6 +73,66 @@ SYM_CODE_START_LOCAL(el1_sync)
-> >  	eret
-> >  SYM_CODE_END(el1_sync)
-> >  
-> > +// nVHE? No way! Give me the real thing!
-> > +SYM_CODE_START_LOCAL(mutate_to_vhe)
-> > +	// Sanity check: MMU *must* be off
-> > +	mrs	x0, sctlr_el2
-> > +	tbnz	x0, #0, 1f
-> > +
-> > +	// Needs to be VHE capable, obviously
-> > +	mrs	x0, id_aa64mmfr1_el1
-> > +	ubfx	x0, x0, #ID_AA64MMFR1_VHE_SHIFT, #4
-> > +	cbz	x0, 1f
+> Acked-by: David Brazdil <dbrazdil@google.com>
 > 
-> nit: There is a HVC_STUB_ERR that you could return if these sanity
-> checks fail.  The documentation also states that it should be
-> returned on error.
+> > ---
+> >  arch/arm64/kernel/idreg-override.c | 20 ++++++++++++++++++++
+> >  1 file changed, 20 insertions(+)
+> > 
+> > diff --git a/arch/arm64/kernel/idreg-override.c b/arch/arm64/kernel/idreg-override.c
+> > index 75d9845f489b..16bc8b3b93ae 100644
+> > --- a/arch/arm64/kernel/idreg-override.c
+> > +++ b/arch/arm64/kernel/idreg-override.c
+> > @@ -37,6 +37,12 @@ static const struct reg_desc * const regs[] __initdata = {
+> >  	&mmfr1,
+> >  };
+> >  
+> > +static const struct {
+> > +	const char * const	alias;
+> > +	const char * const	feature;
+> > +} aliases[] __initdata = {
+> > +};
+> > +
+> >  static int __init find_field(const char *cmdline, const struct reg_desc *reg,
+> >  			     int f, u64 *v)
+> >  {
+> > @@ -80,6 +86,18 @@ static void __init match_options(const char *cmdline)
+> >  	}
+> >  }
+> >  
+> > +static __init void match_aliases(const char *cmdline)
+> > +{
+> > +	int i;
+> > +
+> > +	for (i = 0; i < ARRAY_SIZE(aliases); i++) {
+> > +		char *str = strstr(cmdline, aliases[i].alias);
+> > +
+> > +		if ((str == cmdline || (str > cmdline && *(str - 1) == ' ')))
+> 
+> nit: Extract to a 'cmdline_contains' helper? Took me a good few seconds to
+> parse this in the previous patch. Giving it a name would help, and now it's
+> also shared.
 
-Good point. I've now added it, but how the error can be handled is
-still up in the air. For now, I've decided to let the kernel continue
-its (probably doomed) course.
+Good point. Adopted!
 
 Thanks,
 
