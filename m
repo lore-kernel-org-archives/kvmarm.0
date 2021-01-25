@@ -6,53 +6,53 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FF21C433E0
-	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 10:53:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9E64C433E0
+	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 10:53:58 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8002222D04
-	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 10:53:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8002222D04
+	by mail.kernel.org (Postfix) with ESMTP id 49C1322ADF
+	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 10:53:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49C1322ADF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 19DD34B5B8;
-	Mon, 25 Jan 2021 05:53:55 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DC4B94B538;
+	Mon, 25 Jan 2021 05:53:57 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id lmuLOXt0tiMT; Mon, 25 Jan 2021 05:53:53 -0500 (EST)
+	with ESMTP id phC9jFnQ9hlb; Mon, 25 Jan 2021 05:53:57 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B52EF4B5D8;
-	Mon, 25 Jan 2021 05:53:53 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E66844B5AF;
+	Mon, 25 Jan 2021 05:53:55 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 94CE44B5BA
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 05:53:52 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B80924B5B0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 05:53:54 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Skqn9laLt82H for <kvmarm@lists.cs.columbia.edu>;
- Mon, 25 Jan 2021 05:53:51 -0500 (EST)
+ with ESMTP id jAbYdx2Qf1Tr for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 25 Jan 2021 05:53:53 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 586964B5B8
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 05:53:51 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7085F4B5BF
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 05:53:53 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 6C39822D50;
- Mon, 25 Jan 2021 10:53:50 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 7522022512;
+ Mon, 25 Jan 2021 10:53:52 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1l3zS6-009rDe-SV; Mon, 25 Jan 2021 10:50:35 +0000
+ id 1l3zS7-009rDe-KF; Mon, 25 Jan 2021 10:50:35 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  linux-kernel@vger.kernel.org
-Subject: [PATCH v5 12/21] arm64: cpufeature: Add an early command-line
- cpufeature override facility
-Date: Mon, 25 Jan 2021 10:50:10 +0000
-Message-Id: <20210125105019.2946057-13-maz@kernel.org>
+Subject: [PATCH v5 13/21] arm64: Allow ID_AA64MMFR1_EL1.VH to be overridden
+ from the command line
+Date: Mon, 25 Jan 2021 10:50:11 +0000
+Message-Id: <20210125105019.2946057-14-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210125105019.2946057-1-maz@kernel.org>
 References: <20210125105019.2946057-1-maz@kernel.org>
@@ -89,184 +89,85 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In order to be able to override CPU features at boot time,
-let's add a command line parser that matches options of the
-form "cpureg.feature=value", and store the corresponding
-value into the override val/mask pair.
-
-No features are currently defined, so no expected change in
-functionality.
+As we want to be able to disable VHE at runtime, let's match
+"id_aa64mmfr1.vh=" from the command line as an override.
+This doesn't have much effect yet as our boot code doesn't look
+at the cpufeature, but only at the HW registers.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 Acked-by: David Brazdil <dbrazdil@google.com>
 ---
- arch/arm64/kernel/Makefile         |   2 +-
- arch/arm64/kernel/head.S           |   1 +
- arch/arm64/kernel/idreg-override.c | 130 +++++++++++++++++++++++++++++
- 3 files changed, 132 insertions(+), 1 deletion(-)
- create mode 100644 arch/arm64/kernel/idreg-override.c
+ arch/arm64/include/asm/cpufeature.h |  2 ++
+ arch/arm64/kernel/cpufeature.c      |  5 ++++-
+ arch/arm64/kernel/idreg-override.c  | 11 +++++++++++
+ 3 files changed, 17 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kernel/Makefile b/arch/arm64/kernel/Makefile
-index 86364ab6f13f..2262f0392857 100644
---- a/arch/arm64/kernel/Makefile
-+++ b/arch/arm64/kernel/Makefile
-@@ -17,7 +17,7 @@ obj-y			:= debug-monitors.o entry.o irq.o fpsimd.o		\
- 			   return_address.o cpuinfo.o cpu_errata.o		\
- 			   cpufeature.o alternative.o cacheinfo.o		\
- 			   smp.o smp_spin_table.o topology.o smccc-call.o	\
--			   syscall.o proton-pack.o
-+			   syscall.o proton-pack.o idreg-override.o
+diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+index 4179cfc8ed57..b0ed37da4067 100644
+--- a/arch/arm64/include/asm/cpufeature.h
++++ b/arch/arm64/include/asm/cpufeature.h
+@@ -818,6 +818,8 @@ static inline unsigned int get_vmid_bits(u64 mmfr1)
+ 	return 8;
+ }
  
- targets			+= efi-entry.o
++extern struct arm64_ftr_override id_aa64mmfr1_override;
++
+ u32 get_kvm_ipa_limit(void);
+ void dump_cpu_features(void);
  
-diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
-index d74e5f84042e..3243e3ae9bd8 100644
---- a/arch/arm64/kernel/head.S
-+++ b/arch/arm64/kernel/head.S
-@@ -435,6 +435,7 @@ SYM_FUNC_START_LOCAL(__primary_switched)
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 4b84a1e1dc51..c1d6712c4249 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -557,6 +557,8 @@ static const struct arm64_ftr_bits ftr_raz[] = {
  
- 	mov	x0, x21				// pass FDT address in x0
- 	bl	early_fdt_map			// Try mapping the FDT early
-+	bl	init_feature_override
- 	bl	switch_to_vhe
- #if defined(CONFIG_KASAN_GENERIC) || defined(CONFIG_KASAN_SW_TAGS)
- 	bl	kasan_early_init
+ #define ARM64_FTR_REG(id, table) ARM64_FTR_REG_OVERRIDE(id, table, &no_override)
+ 
++struct arm64_ftr_override id_aa64mmfr1_override;
++
+ static const struct __ftr_reg_entry {
+ 	u32			sys_id;
+ 	struct arm64_ftr_reg 	*reg;
+@@ -604,7 +606,8 @@ static const struct __ftr_reg_entry {
+ 
+ 	/* Op1 = 0, CRn = 0, CRm = 7 */
+ 	ARM64_FTR_REG(SYS_ID_AA64MMFR0_EL1, ftr_id_aa64mmfr0),
+-	ARM64_FTR_REG(SYS_ID_AA64MMFR1_EL1, ftr_id_aa64mmfr1),
++	ARM64_FTR_REG_OVERRIDE(SYS_ID_AA64MMFR1_EL1, ftr_id_aa64mmfr1,
++			       &id_aa64mmfr1_override),
+ 	ARM64_FTR_REG(SYS_ID_AA64MMFR2_EL1, ftr_id_aa64mmfr2),
+ 
+ 	/* Op1 = 0, CRn = 1, CRm = 2 */
 diff --git a/arch/arm64/kernel/idreg-override.c b/arch/arm64/kernel/idreg-override.c
-new file mode 100644
-index 000000000000..2d184d6674fd
---- /dev/null
+index 2d184d6674fd..489aa274e3ec 100644
+--- a/arch/arm64/kernel/idreg-override.c
 +++ b/arch/arm64/kernel/idreg-override.c
-@@ -0,0 +1,130 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Early cpufeature override framework
-+ *
-+ * Copyright (C) 2020 Google LLC
-+ * Author: Marc Zyngier <maz@kernel.org>
-+ */
-+
-+#include <linux/kernel.h>
-+#include <linux/libfdt.h>
-+
-+#include <asm/cacheflush.h>
-+#include <asm/setup.h>
-+
-+struct ftr_set_desc {
-+	const char 			*name;
-+	struct arm64_ftr_override	*override;
-+	struct {
-+		const char 		*name;
-+		u8			shift;
-+	} 				fields[];
+@@ -10,6 +10,7 @@
+ #include <linux/libfdt.h>
+ 
+ #include <asm/cacheflush.h>
++#include <asm/cpufeature.h>
+ #include <asm/setup.h>
+ 
+ struct ftr_set_desc {
+@@ -21,7 +22,17 @@ struct ftr_set_desc {
+ 	} 				fields[];
+ };
+ 
++static const struct ftr_set_desc mmfr1 __initdata = {
++	.name		= "id_aa64mmfr1",
++	.override	= &id_aa64mmfr1_override,
++	.fields		= {
++	        { "vh", ID_AA64MMFR1_VHE_SHIFT },
++		{}
++	},
 +};
 +
-+static const struct ftr_set_desc * const regs[] __initdata = {
-+};
-+
-+static char *cmdline_contains_option(const char *cmdline, const char *option)
-+{
-+	char *str = strstr(cmdline, option);
-+
-+	if ((str == cmdline || (str > cmdline && *(str - 1) == ' ')))
-+		return str;
-+
-+	return NULL;
-+}
-+
-+static int __init find_field(const char *cmdline,
-+			     const struct ftr_set_desc *reg, int f, u64 *v)
-+{
-+	char buf[256], *str;
-+	size_t len;
-+
-+	snprintf(buf, ARRAY_SIZE(buf), "%s.%s=", reg->name, reg->fields[f].name);
-+
-+	str = cmdline_contains_option(cmdline, buf);
-+	if (!str)
-+		return -1;
-+
-+	str += strlen(buf);
-+	len = strcspn(str, " ");
-+	len = min(len, ARRAY_SIZE(buf) - 1);
-+	strncpy(buf, str, len);
-+	buf[len] = 0;
-+
-+	return kstrtou64(buf, 0, v);
-+}
-+
-+static void __init match_options(const char *cmdline)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(regs); i++) {
-+		int f;
-+
-+		if (!regs[i]->override)
-+			continue;
-+
-+		for (f = 0; regs[i]->fields[f].name; f++) {
-+			u64 v;
-+
-+			if (find_field(cmdline, regs[i], f, &v))
-+				continue;
-+
-+			regs[i]->override->val  |= (v & 0xf) << regs[i]->fields[f].shift;
-+			regs[i]->override->mask |= 0xfUL << regs[i]->fields[f].shift;
-+		}
-+	}
-+}
-+
-+static __init void parse_cmdline(void)
-+{
-+	if (!IS_ENABLED(CONFIG_CMDLINE_FORCE)) {
-+		const u8 *prop;
-+		void *fdt;
-+		int node;
-+
-+		fdt = get_early_fdt_ptr();
-+		if (!fdt)
-+			goto out;
-+
-+		node = fdt_path_offset(fdt, "/chosen");
-+		if (node < 0)
-+			goto out;
-+
-+		prop = fdt_getprop(fdt, node, "bootargs", NULL);
-+		if (!prop)
-+			goto out;
-+
-+		match_options(prop);
-+
-+		if (!IS_ENABLED(CONFIG_CMDLINE_EXTEND))
-+			return;
-+	}
-+
-+out:
-+	match_options(CONFIG_CMDLINE);
-+}
-+
-+/* Keep checkers quiet */
-+void init_feature_override(void);
-+
-+asmlinkage void __init init_feature_override(void)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(regs); i++) {
-+		if (regs[i]->override) {
-+			regs[i]->override->val  = 0;
-+			regs[i]->override->mask = 0;
-+		}
-+	}
-+
-+	parse_cmdline();
-+
-+	for (i = 0; i < ARRAY_SIZE(regs); i++) {
-+		if (regs[i]->override)
-+			__flush_dcache_area(regs[i]->override,
-+					    sizeof(*regs[i]->override));
-+	}
-+}
+ static const struct ftr_set_desc * const regs[] __initdata = {
++	&mmfr1,
+ };
+ 
+ static char *cmdline_contains_option(const char *cmdline, const char *option)
 -- 
 2.29.2
 
