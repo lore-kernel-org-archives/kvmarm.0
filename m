@@ -2,84 +2,80 @@ Return-Path: <SRS0=+Nyp=G4=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42B17C433E0
-	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 14:28:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D1B5C433E0
+	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 14:54:41 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9B92023127
-	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 14:28:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B92023127
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 8640E208CA
+	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 14:54:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8640E208CA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0DF214B56D;
-	Mon, 25 Jan 2021 09:28:54 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E81A94B5E3;
+	Mon, 25 Jan 2021 09:54:39 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id o83LC6G03mbD; Mon, 25 Jan 2021 09:28:52 -0500 (EST)
+	with ESMTP id DHwu0OAo7Hat; Mon, 25 Jan 2021 09:54:38 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D485D4B5DD;
-	Mon, 25 Jan 2021 09:28:52 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C98964B5DF;
+	Mon, 25 Jan 2021 09:54:38 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F0F074B5A0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 09:28:51 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4762D4B5DB
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 09:54:38 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rPlfPREXCnV7 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 25 Jan 2021 09:28:51 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D49054B56D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 09:28:50 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id AC6BE23121;
- Mon, 25 Jan 2021 14:28:49 +0000 (UTC)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
- TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
- (envelope-from <maz@kernel.org>)
- id 1l42rH-009tNN-FP; Mon, 25 Jan 2021 14:28:47 +0000
-MIME-Version: 1.0
-Date: Mon, 25 Jan 2021 14:28:47 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH v5 18/21] arm64: Move "nokaslr" over to the early
- cpufeature infrastructure
-In-Reply-To: <CAMj1kXGTu8AtMnm7NxB8M2xFuXHSKzAx2hjjeaAW2v-usvavVQ@mail.gmail.com>
-References: <20210125105019.2946057-1-maz@kernel.org>
- <20210125105019.2946057-19-maz@kernel.org>
- <CAMj1kXFcc+0At5+9Keo1MF=TeGE9-eOHtSpK7yVy5jzwXt6KCA@mail.gmail.com>
- <3a98ff1db79c90c96038b924eb534643@kernel.org>
- <CAMj1kXGTu8AtMnm7NxB8M2xFuXHSKzAx2hjjeaAW2v-usvavVQ@mail.gmail.com>
-User-Agent: Roundcube Webmail/1.4.10
-Message-ID: <32b49beb87b25303d71fd2f7053c7959@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: ardb@kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
- catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com,
- dbrazdil@google.com, alexandru.elisei@arm.com, jingzhangos@google.com,
- pajay@qti.qualcomm.com, psodagud@codeaurora.org, sramana@codeaurora.org,
- james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
- kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: Prasad Sodagudi <psodagud@codeaurora.org>,
- Srinivas Ramana <sramana@codeaurora.org>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Ajay Patil <pajay@qti.qualcomm.com>,
- Android Kernel Team <kernel-team@android.com>, Will Deacon <will@kernel.org>,
- kvmarm <kvmarm@lists.cs.columbia.edu>,
- Linux ARM <linux-arm-kernel@lists.infradead.org>
+ with ESMTP id XWkXZ3Tu5040 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 25 Jan 2021 09:54:37 -0500 (EST)
+Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com
+ [209.85.160.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4E48F4B5DA
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 09:54:37 -0500 (EST)
+Received: by mail-qt1-f202.google.com with SMTP id o20so4553397qtx.22
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 06:54:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=sender:date:message-id:mime-version:subject:from:to:cc;
+ bh=/4PnAV+mhhjXNhLkdpio+RJoHfL25foHEOaPlQoz/QE=;
+ b=NWB0nWRd64gJ2ZjxLt6crgU+r3JUbFMRZxpMdtoA20wnY8iLLCrM6zstQPRhuhIJWy
+ yjonV63K0Z8R6LkQhHDo073EVRKvw4VRCgSCbI6Ic8yDQ06ciKWqfpY4GwyhL7jznF7F
+ xAENORmQASBVeputBBKaogVlOPHlUhcpjc/OmuktgRN/uX+4FwTUbzpRl0/fDO/rwYzQ
+ 1d+U6YrHOSS9VBLYuBoQrISir0nCExsZTvw+1+vlbwvsDaOQgsP7bB/8XBDSxTIHtbNl
+ lgZwjjM3QU06Ha/jQyengbhGCUW60tr0yMqjE4R7lE/YdbeyW17pSdfnJ7e4iJhAXjRO
+ SnRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
+ :to:cc;
+ bh=/4PnAV+mhhjXNhLkdpio+RJoHfL25foHEOaPlQoz/QE=;
+ b=cKWMNayJCi56F7qce0dwP5QBhLecsAiqVA2bymLC0Gx9XMi35mxRK+lW8s5EXUjv/0
+ F+i70HIYk52kEmyPU/w7Cgk5l9UB07UM0Uo0jrY2daHpw8YBWkt5lI8CghRG1rpn2IRI
+ sohbi6QJQXBEJg4IpWmjA2dy0cgi4oC/fvZFfRxi0HZDl3NdNbqUbqOL2OMCkX2FPi7f
+ pwU2nGsL0t09bSktpRo5+DCPV/g/g19OgRp3jACK/tdcHqrOaY++GkH+OOlfo9LIGma6
+ WMGnfj3Lle6zZAdLi8Czb/qzUi9b1xdcxry+wzFWVXjdZAJyS5bsYHLySDBvzhvxZn3C
+ CxtQ==
+X-Gm-Message-State: AOAM533KHxQm+JglnmkW1F5A2xQALUIpaL2n3m3jtj35CREB++99VIs1
+ 8KjdNXoHe6d9mttbi+Cld+uRt9IgwEMy2jhAVvbvlcm7wU5LL5whHbYMTrEd8+LKmO1ItRZmwGD
+ CTTG6tUXvGxBmRYNmHXKFVAHfpKnYJa4jDJFtKO98rpIRTEIx1x+5uOLNdzLADqf+Ux++Pg==
+X-Google-Smtp-Source: ABdhPJzW3A8YhLAz8V2ijzySmwVfRRo+a1Rbs4+4rweK0rLdhD6l/dkP7a4P4U0BTNG4vNBRSTefqfXvWIA=
+X-Received: from ascull.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1510])
+ (user=ascull job=sendgmr) by 2002:a05:6214:c65:: with SMTP id
+ t5mr1085338qvj.19.1611586476689; Mon, 25 Jan 2021 06:54:36 -0800 (PST)
+Date: Mon, 25 Jan 2021 14:54:13 +0000
+Message-Id: <20210125145415.122439-1-ascull@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.30.0.280.ga3ce27912f-goog
+Subject: [PATCH 0/2] __do_hyp_init fix and tweak
+From: Andrew Scull <ascull@google.com>
+To: kvmarm@lists.cs.columbia.edu, kernel-team@android.com
+Cc: maz@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,69 +87,27 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2021-01-25 14:19, Ard Biesheuvel wrote:
-> On Mon, 25 Jan 2021 at 14:54, Marc Zyngier <maz@kernel.org> wrote:
->> 
->> On 2021-01-25 12:54, Ard Biesheuvel wrote:
+These apply on 5.11-rc4. The second is a fix for a clobbered register,
+the first is more cosmetic.
 
-[...]
+Thanks, David, for helping with build and boot tests after my logistical
+issues.
 
->> > This struct now takes up
->> > - ~100 bytes for the characters themselves (which btw are not emitted
->> > into __initdata or __initconst)
->> > - 6x8 bytes for the char pointers
->> > - 6x24 bytes for the RELA relocations that annotate these pointers as
->> > quantities that need to be relocated at boot (on a kernel built with
->> > KASLR)
->> >
->> > I know it's only a drop in the ocean, but in this case, where the
->> > struct is statically declared and defined only once, and in the same
->> > place, we could easily turn this into
->> >
->> > static const struct {
->> >    char alias[24];
->> >    char param[20];
->> > };
->> >
->> > and get rid of all the overhead. The only slightly annoying thing is
->> > that the array sizes need to be kept in sync with the largest instance
->> > appearing in the array, but this is easy when the struct type is
->> > declared in the same place where its only instance is defined.
->> 
->> Fair enough. I personally find the result butt-ugly, but I agree
->> that it certainly saves some memory. Does the following work for
->> you? I can even give symbolic names to the various constants (how
->> generous of me! ;-).
->> 
-> 
-> To be honest, I was anticipating more of a discussion, but this looks
-> reasonable to me.
+Andrew Scull (2):
+  KVM: arm64: Simplify __kvm_hyp_init HVC detection
+  KVM: arm64: Don't clobber x4 in __do_hyp_init
 
-It looked like a reasonable ask: all the strings are completely useless
-once the kernel has booted, and I'm the first to moan that I can't boot
-an arm64 kernel with less than 60MB of RAM (OK, it's a pretty bloated
-kernel...).
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S | 35 +++++++++++++-----------------
+ 1 file changed, 15 insertions(+), 20 deletions(-)
 
-> Does 'char    feature[80];' really need 80 bytes though?
-
-It really needs 75 bytes, because of this:
-
-	{ "arm64.nopauth",
-	  "id_aa64isar1.gpi=0 id_aa64isar1.gpa=0 "
-	  "id_aa64isar1.api=0 id_aa64isar1.apa=0"	   },
-
-80 is a round enough number.
-
-Thanks,
-
-         M.
 -- 
-Jazz is not dead. It just smells funny...
+2.30.0.280.ga3ce27912f-goog
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
