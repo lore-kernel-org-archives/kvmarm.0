@@ -2,60 +2,57 @@ Return-Path: <SRS0=+Nyp=G4=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2895C433DB
-	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 12:26:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA4CDC433E9
+	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 12:26:50 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2D5CB2310E
-	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 12:26:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D5CB2310E
+	by mail.kernel.org (Postfix) with ESMTP id 587402310D
+	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 12:26:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 587402310D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B35CA4B620;
-	Mon, 25 Jan 2021 07:26:48 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D62F34B619;
+	Mon, 25 Jan 2021 07:26:49 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Z63BShaRVA1j; Mon, 25 Jan 2021 07:26:47 -0500 (EST)
+	with ESMTP id MS6wsyXvEMB4; Mon, 25 Jan 2021 07:26:48 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B09AF4B61B;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CFB1F4B629;
 	Mon, 25 Jan 2021 07:26:47 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A1604B613
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BDBF64B613
  for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 07:26:46 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HxwdfTLrHyzB for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id xCatcBtbsq0g for <kvmarm@lists.cs.columbia.edu>;
  Mon, 25 Jan 2021 07:26:45 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 829EA4B614
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 07:26:45 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F09404B60E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 07:26:44 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 9BF5D22DFB;
- Mon, 25 Jan 2021 12:26:44 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id B2D6D22597;
+ Mon, 25 Jan 2021 12:26:43 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1l40x8-009sBu-UM; Mon, 25 Jan 2021 12:26:43 +0000
+ id 1l40x7-009sBu-G0; Mon, 25 Jan 2021 12:26:41 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v2 3/7] KVM: arm64: Add handling of AArch32 PCMEID{2,
- 3} PMUv3 registers
-Date: Mon, 25 Jan 2021 12:26:34 +0000
-Message-Id: <20210125122638.2947058-4-maz@kernel.org>
+Subject: [PATCH v2 0/7] KVM: arm64: More PMU/debug ID register fixes
+Date: Mon, 25 Jan 2021 12:26:31 +0000
+Message-Id: <20210125122638.2947058-1-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20210125122638.2947058-1-maz@kernel.org>
-References: <20210125122638.2947058-1-maz@kernel.org>
 MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 62.31.163.78
 X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org,
@@ -82,63 +79,40 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Despite advertising support for AArch32 PMUv3p1, we fail to handle
-the PMCEID{2,3} registers, which conveniently alias with the top
-bits of PMCEID{0,1}_EL1.
+This is a respin of a series I posted in the 5.7 time frame, and
+completely forgot about it until I noticed again that a few things
+where not what I remembered... Given how long it has been, I'm
+pretending this is all new work.
 
-Implement these registers with the usual AA32(HI/LO) aliasing
-mechanism.
+Anyway, this covers a few gaps in our ID register handling for PMU and
+Debug, plus the upgrade of the PMU support to 8.4 when possible.
 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/sys_regs.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+I don't plan to take this into 5.11, but this is a likely candidate
+for 5.12. Note that this conflicts with fixes that are on their way to
+5.11. I'll probably end-up dragging the fixes into 5.12 to solve it.
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index ce08d28ab15c..2bea0494b81d 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -685,14 +685,18 @@ static bool access_pmselr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- static bool access_pmceid(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 			  const struct sys_reg_desc *r)
- {
--	u64 pmceid;
-+	u64 pmceid, mask, shift;
- 
- 	BUG_ON(p->is_write);
- 
- 	if (pmu_access_el0_disabled(vcpu))
- 		return false;
- 
-+	get_access_mask(r, &mask, &shift);
-+
- 	pmceid = kvm_pmu_get_pmceid(vcpu, (p->Op2 & 1));
-+	pmceid &= mask;
-+	pmceid >>= shift;
- 
- 	p->regval = pmceid;
- 
-@@ -1895,8 +1899,8 @@ static const struct sys_reg_desc cp15_regs[] = {
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 3), access_pmovs },
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 4), access_pmswinc },
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 5), access_pmselr },
--	{ Op1( 0), CRn( 9), CRm(12), Op2( 6), access_pmceid },
--	{ Op1( 0), CRn( 9), CRm(12), Op2( 7), access_pmceid },
-+	{ AA32(LO), Op1( 0), CRn( 9), CRm(12), Op2( 6), access_pmceid },
-+	{ AA32(LO), Op1( 0), CRn( 9), CRm(12), Op2( 7), access_pmceid },
- 	{ Op1( 0), CRn( 9), CRm(13), Op2( 0), access_pmu_evcntr },
- 	{ Op1( 0), CRn( 9), CRm(13), Op2( 1), access_pmu_evtyper },
- 	{ Op1( 0), CRn( 9), CRm(13), Op2( 2), access_pmu_evcntr },
-@@ -1904,6 +1908,8 @@ static const struct sys_reg_desc cp15_regs[] = {
- 	{ Op1( 0), CRn( 9), CRm(14), Op2( 1), access_pminten },
- 	{ Op1( 0), CRn( 9), CRm(14), Op2( 2), access_pminten },
- 	{ Op1( 0), CRn( 9), CRm(14), Op2( 3), access_pmovs },
-+	{ AA32(HI), Op1( 0), CRn( 9), CRm(14), Op2( 4), access_pmceid },
-+	{ AA32(HI), Op1( 0), CRn( 9), CRm(14), Op2( 5), access_pmceid },
- 
- 	/* PRRR/MAIR0 */
- 	{ AA32(LO), Op1( 0), CRn(10), CRm( 2), Op2( 0), access_vm_reg, NULL, MAIR_EL1 },
+* From v1 [1]:
+  - Upgrade AArch32 to PMUv8.4 if possible
+  - Don't advertise STALL_SLOT when advertising PMU 8.4
+  - Add an extra patch replacing raw values for the PMU version with
+    the already existing symbolaic values
+
+[1] https://lore.kernel.org/r/20210114105633.2558739-1-maz@kernel.org
+
+Marc Zyngier (7):
+  KVM: arm64: Fix missing RES1 in emulation of DBGBIDR
+  KVM: arm64: Fix AArch32 PMUv3 capping
+  KVM: arm64: Add handling of AArch32 PCMEID{2,3} PMUv3 registers
+  KVM: arm64: Refactor filtering of ID registers
+  KVM: arm64: Limit the debug architecture to ARMv8.0
+  KVM: arm64: Upgrade PMU support to ARMv8.4
+  KVM: arm64: Use symbolic names for the PMU versions
+
+ arch/arm64/include/asm/sysreg.h |  3 ++
+ arch/arm64/kvm/pmu-emul.c       | 14 ++++--
+ arch/arm64/kvm/sys_regs.c       | 79 ++++++++++++++++++++-------------
+ 3 files changed, 61 insertions(+), 35 deletions(-)
+
 -- 
 2.29.2
 
