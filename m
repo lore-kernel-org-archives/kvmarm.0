@@ -2,64 +2,76 @@ Return-Path: <SRS0=+Nyp=G4=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33081C433E6
-	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 02:47:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 782F3C433DB
+	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 10:50:35 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B884422AAA
-	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 02:47:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B884422AAA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id D10E622D50
+	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 10:50:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D10E622D50
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EF74D4B476;
-	Sun, 24 Jan 2021 21:47:01 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2EF134B5CE;
+	Mon, 25 Jan 2021 05:50:34 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id WpEEq8rj2Toz; Sun, 24 Jan 2021 21:47:00 -0500 (EST)
+	with ESMTP id 0y+ajXvkd5XI; Mon, 25 Jan 2021 05:50:33 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C5DAE4B483;
-	Sun, 24 Jan 2021 21:47:00 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 154314B5D4;
+	Mon, 25 Jan 2021 05:50:33 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A7AC84B45C
- for <kvmarm@lists.cs.columbia.edu>; Sun, 24 Jan 2021 21:46:59 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 303D94B5CE
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 05:50:31 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3nJ0nPQDSHTk for <kvmarm@lists.cs.columbia.edu>;
- Sun, 24 Jan 2021 21:46:58 -0500 (EST)
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8D6534B458
- for <kvmarm@lists.cs.columbia.edu>; Sun, 24 Jan 2021 21:46:57 -0500 (EST)
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
- by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4DPDkp1PRwzjBfN;
- Mon, 25 Jan 2021 10:45:54 +0800 (CST)
-Received: from DESKTOP-5IS4806.china.huawei.com (10.174.184.42) by
- DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
- 14.3.498.0; Mon, 25 Jan 2021 10:46:45 +0800
-From: Keqian Zhu <zhukeqian1@huawei.com>
-To: <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
- <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
- <iommu@lists.linux-foundation.org>, Alex Williamson
- <alex.williamson@redhat.com>, Kirti Wankhede <kwankhede@nvidia.com>,
- "Cornelia Huck" <cohuck@redhat.com>
-Subject: [PATCH] vfio/iommu_type1: Mantainance a counter for non_pinned_groups
-Date: Mon, 25 Jan 2021 10:46:42 +0800
-Message-ID: <20210125024642.14604-1-zhukeqian1@huawei.com>
-X-Mailer: git-send-email 2.8.4.windows.1
+ with ESMTP id glIWZM7LqVzB for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 25 Jan 2021 05:50:29 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 50AA84B589
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 05:50:29 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 45287225A9;
+ Mon, 25 Jan 2021 10:50:28 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1l3zRy-009rDe-Ed; Mon, 25 Jan 2021 10:50:26 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ linux-kernel@vger.kernel.org
+Subject: [PATCH v5 01/21] arm64: Fix labels in el2_setup macros
+Date: Mon, 25 Jan 2021 10:49:59 +0000
+Message-Id: <20210125105019.2946057-2-maz@kernel.org>
+X-Mailer: git-send-email 2.29.2
+In-Reply-To: <20210125105019.2946057-1-maz@kernel.org>
+References: <20210125105019.2946057-1-maz@kernel.org>
 MIME-Version: 1.0
-X-Originating-IP: [10.174.184.42]
-X-CFilter-Loop: Reflected
-Cc: Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
- Joerg Roedel <joro@8bytes.org>, Daniel Lezcano <daniel.lezcano@linaro.org>,
- Alexios Zavras <alexios.zavras@intel.com>, Catalin
- Marinas <catalin.marinas@arm.com>, Thomas Gleixner <tglx@linutronix.de>,
- Robin Murphy <robin.murphy@arm.com>, Andrew Morton <akpm@linux-foundation.org>
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+ catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com,
+ dbrazdil@google.com, alexandru.elisei@arm.com, ardb@kernel.org,
+ jingzhangos@google.com, pajay@qti.qualcomm.com, psodagud@codeaurora.org,
+ sramana@codeaurora.org, james.morse@arm.com, julien.thierry.kdev@gmail.com,
+ suzuki.poulose@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Prasad Sodagudi <psodagud@codeaurora.org>,
+ Srinivas Ramana <sramana@codeaurora.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Ajay Patil <pajay@qti.qualcomm.com>,
+ kernel-team@android.com, Will Deacon <will@kernel.org>,
+ Ard Biesheuvel <ardb@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -76,117 +88,119 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-With this counter, we never need to traverse all groups to update
-pinned_scope of vfio_iommu.
+If someone happens to write the following code:
 
-Suggested-by: Alex Williamson <alex.williamson@redhat.com>
-Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+	b	1f
+	init_el2_state	vhe
+1:
+	[...]
+
+they will be in for a long debugging session, as the label "1f"
+will be resolved *inside* the init_el2_state macro instead of
+after it. Not really what one expects.
+
+Instead, rewite the EL2 setup macros to use unambiguous labels,
+thanks to the usual macro counter trick.
+
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Acked-by: David Brazdil <dbrazdil@google.com>
 ---
- drivers/vfio/vfio_iommu_type1.c | 40 +++++----------------------------
- 1 file changed, 5 insertions(+), 35 deletions(-)
+ arch/arm64/include/asm/el2_setup.h | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 0b4dedaa9128..bb4bbcc79101 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -73,7 +73,7 @@ struct vfio_iommu {
- 	bool			v2;
- 	bool			nesting;
- 	bool			dirty_page_tracking;
--	bool			pinned_page_dirty_scope;
-+	uint64_t		num_non_pinned_groups;
- };
+diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
+index a7f5a1bbc8ac..540116de80bf 100644
+--- a/arch/arm64/include/asm/el2_setup.h
++++ b/arch/arm64/include/asm/el2_setup.h
+@@ -45,24 +45,24 @@
+ 	mrs	x1, id_aa64dfr0_el1
+ 	sbfx	x0, x1, #ID_AA64DFR0_PMUVER_SHIFT, #4
+ 	cmp	x0, #1
+-	b.lt	1f				// Skip if no PMU present
++	b.lt	.Lskip_pmu_\@			// Skip if no PMU present
+ 	mrs	x0, pmcr_el0			// Disable debug access traps
+ 	ubfx	x0, x0, #11, #5			// to EL2 and allow access to
+-1:
++.Lskip_pmu_\@:
+ 	csel	x2, xzr, x0, lt			// all PMU counters from EL1
  
- struct vfio_domain {
-@@ -148,7 +148,6 @@ static int put_pfn(unsigned long pfn, int prot);
- static struct vfio_group *vfio_iommu_find_iommu_group(struct vfio_iommu *iommu,
- 					       struct iommu_group *iommu_group);
+ 	/* Statistical profiling */
+ 	ubfx	x0, x1, #ID_AA64DFR0_PMSVER_SHIFT, #4
+-	cbz	x0, 3f				// Skip if SPE not present
++	cbz	x0, .Lskip_spe_\@		// Skip if SPE not present
  
--static void update_pinned_page_dirty_scope(struct vfio_iommu *iommu);
- /*
-  * This code handles mapping and unmapping of user data buffers
-  * into DMA'ble space using the IOMMU
-@@ -714,7 +713,7 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
- 	group = vfio_iommu_find_iommu_group(iommu, iommu_group);
- 	if (!group->pinned_page_dirty_scope) {
- 		group->pinned_page_dirty_scope = true;
--		update_pinned_page_dirty_scope(iommu);
-+		iommu->num_non_pinned_groups--;
- 	}
+ .ifeqs "\mode", "nvhe"
+ 	mrs_s	x0, SYS_PMBIDR_EL1              // If SPE available at EL2,
+ 	and	x0, x0, #(1 << SYS_PMBIDR_EL1_P_SHIFT)
+-	cbnz	x0, 2f				// then permit sampling of physical
++	cbnz	x0, .Lskip_spe_el2_\@		// then permit sampling of physical
+ 	mov	x0, #(1 << SYS_PMSCR_EL2_PCT_SHIFT | \
+ 		      1 << SYS_PMSCR_EL2_PA_SHIFT)
+ 	msr_s	SYS_PMSCR_EL2, x0		// addresses and physical counter
+-2:
++.Lskip_spe_el2_\@:
+ 	mov	x0, #(MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT)
+ 	orr	x2, x2, x0			// If we don't have VHE, then
+ 						// use EL1&0 translation.
+@@ -71,7 +71,7 @@
+ 						// and disable access from EL1
+ .endif
  
- 	goto pin_done;
-@@ -991,7 +990,7 @@ static int update_user_bitmap(u64 __user *bitmap, struct vfio_iommu *iommu,
- 	 * mark all pages dirty if any IOMMU capable device is not able
- 	 * to report dirty pages and all pages are pinned and mapped.
- 	 */
--	if (!iommu->pinned_page_dirty_scope && dma->iommu_mapped)
-+	if (iommu->num_non_pinned_groups && dma->iommu_mapped)
- 		bitmap_set(dma->bitmap, 0, nbits);
+-3:
++.Lskip_spe_\@:
+ 	msr	mdcr_el2, x2			// Configure debug traps
+ .endm
  
- 	if (shift) {
-@@ -1622,33 +1621,6 @@ static struct vfio_group *vfio_iommu_find_iommu_group(struct vfio_iommu *iommu,
- 	return group;
- }
+@@ -79,9 +79,9 @@
+ .macro __init_el2_lor
+ 	mrs	x1, id_aa64mmfr1_el1
+ 	ubfx	x0, x1, #ID_AA64MMFR1_LOR_SHIFT, 4
+-	cbz	x0, 1f
++	cbz	x0, .Lskip_lor_\@
+ 	msr_s	SYS_LORC_EL1, xzr
+-1:
++.Lskip_lor_\@:
+ .endm
  
--static void update_pinned_page_dirty_scope(struct vfio_iommu *iommu)
--{
--	struct vfio_domain *domain;
--	struct vfio_group *group;
--
--	list_for_each_entry(domain, &iommu->domain_list, next) {
--		list_for_each_entry(group, &domain->group_list, next) {
--			if (!group->pinned_page_dirty_scope) {
--				iommu->pinned_page_dirty_scope = false;
--				return;
--			}
--		}
--	}
--
--	if (iommu->external_domain) {
--		domain = iommu->external_domain;
--		list_for_each_entry(group, &domain->group_list, next) {
--			if (!group->pinned_page_dirty_scope) {
--				iommu->pinned_page_dirty_scope = false;
--				return;
--			}
--		}
--	}
--
--	iommu->pinned_page_dirty_scope = true;
--}
--
- static bool vfio_iommu_has_sw_msi(struct list_head *group_resv_regions,
- 				  phys_addr_t *base)
- {
-@@ -2057,8 +2029,6 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
- 			 * addition of a dirty tracking group.
- 			 */
- 			group->pinned_page_dirty_scope = true;
--			if (!iommu->pinned_page_dirty_scope)
--				update_pinned_page_dirty_scope(iommu);
- 			mutex_unlock(&iommu->lock);
+ /* Stage-2 translation */
+@@ -93,7 +93,7 @@
+ .macro __init_el2_gicv3
+ 	mrs	x0, id_aa64pfr0_el1
+ 	ubfx	x0, x0, #ID_AA64PFR0_GIC_SHIFT, #4
+-	cbz	x0, 1f
++	cbz	x0, .Lskip_gicv3_\@
  
- 			return 0;
-@@ -2188,7 +2158,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
- 	 * demotes the iommu scope until it declares itself dirty tracking
- 	 * capable via the page pinning interface.
- 	 */
--	iommu->pinned_page_dirty_scope = false;
-+	iommu->num_non_pinned_groups++;
- 	mutex_unlock(&iommu->lock);
- 	vfio_iommu_resv_free(&group_resv_regions);
+ 	mrs_s	x0, SYS_ICC_SRE_EL2
+ 	orr	x0, x0, #ICC_SRE_EL2_SRE	// Set ICC_SRE_EL2.SRE==1
+@@ -103,7 +103,7 @@
+ 	mrs_s	x0, SYS_ICC_SRE_EL2		// Read SRE back,
+ 	tbz	x0, #0, 1f			// and check that it sticks
+ 	msr_s	SYS_ICH_HCR_EL2, xzr		// Reset ICC_HCR_EL2 to defaults
+-1:
++.Lskip_gicv3_\@:
+ .endm
  
-@@ -2416,7 +2386,7 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
- 	 * to be promoted.
- 	 */
- 	if (update_dirty_scope)
--		update_pinned_page_dirty_scope(iommu);
-+		iommu->num_non_pinned_groups--;
- 	mutex_unlock(&iommu->lock);
- }
+ .macro __init_el2_hstr
+@@ -128,14 +128,14 @@
+ .macro __init_el2_nvhe_sve
+ 	mrs	x1, id_aa64pfr0_el1
+ 	ubfx	x1, x1, #ID_AA64PFR0_SVE_SHIFT, #4
+-	cbz	x1, 1f
++	cbz	x1, .Lskip_sve_\@
  
+ 	bic	x0, x0, #CPTR_EL2_TZ		// Also disable SVE traps
+ 	msr	cptr_el2, x0			// Disable copro. traps to EL2
+ 	isb
+ 	mov	x1, #ZCR_ELx_LEN_MASK		// SVE: Enable full vector
+ 	msr_s	SYS_ZCR_EL2, x1			// length for EL1.
+-1:
++.Lskip_sve_\@:
+ .endm
+ 
+ .macro __init_el2_nvhe_prepare_eret
 -- 
-2.19.1
+2.29.2
 
 _______________________________________________
 kvmarm mailing list
