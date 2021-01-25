@@ -2,69 +2,97 @@ Return-Path: <SRS0=+Nyp=G4=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6066C433E0
-	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 18:40:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AED9AC433E0
+	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 21:03:35 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 121A3207B3
-	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 18:40:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 121A3207B3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 21DD1207B1
+	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 21:03:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21DD1207B1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B5A654B0EF;
-	Mon, 25 Jan 2021 13:40:47 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 827D74B0F5;
+	Mon, 25 Jan 2021 16:03:34 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id qFMmn2kf1jUW; Mon, 25 Jan 2021 13:40:45 -0500 (EST)
+	with ESMTP id soe9ToE1n-E1; Mon, 25 Jan 2021 16:03:33 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AC1514B13B;
-	Mon, 25 Jan 2021 13:40:45 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 06CB54B13B;
+	Mon, 25 Jan 2021 16:03:33 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C7E04B10A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 13:40:44 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E3924B1F5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 13:35:18 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XC7CSqc-NSI0 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 25 Jan 2021 13:40:43 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 28CA94B0EF
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 13:40:43 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 1B245206B2;
- Mon, 25 Jan 2021 18:40:42 +0000 (UTC)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
- TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
- (envelope-from <maz@kernel.org>)
- id 1l46n2-009wCQ-42; Mon, 25 Jan 2021 18:40:40 +0000
+ with ESMTP id 67nXRywFUiap for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 25 Jan 2021 13:35:17 -0500 (EST)
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com
+ [209.85.214.170])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DF0354B0E9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 13:35:16 -0500 (EST)
+Received: by mail-pl1-f170.google.com with SMTP id t6so8217176plq.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 10:35:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=5li4BVEipLZX5zx8rH4Z99dY7w+ascZy4Y8R2o+aUH8=;
+ b=ntnqgqJh8GrmgSLeIUVSOeq5ocf777yPSTQ/ma0WIPO30h+DKcbkCeMBXaDyu+II4o
+ UMpCUfTJekTMY3vCJYPmquE6msvyiqLQUxnv+Qa3r6AZbHT7+VpLvX6r5Q+OjazjvunH
+ NLPdZTZMV6N7ne6Bxo+VqIYyDyy37rGuL2RgVYOhrRNmdtspPcsGocvHDflOGXXNcL3S
+ m0VpqdXFHPlf1Rbm1QxZIvYNZoPDXUlGf3MUk88oOAMT/kUr0DXhL6pFdWc9nb/CDbjA
+ eukcfxn0wDeFNZPSqccJmj4nhOmZ8T+LYGGk8Gq334rQrt7MJTlhmWa0vzSCOkusKDUq
+ 5qfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=5li4BVEipLZX5zx8rH4Z99dY7w+ascZy4Y8R2o+aUH8=;
+ b=qG0Wuwi9TN7rALYC/yGXIpjp2i2PP1llzZuRmVL3x7En8KHxzgO6jveTW4eRpvSHuJ
+ xY9ogwHhuYVfmzDhHAfRzcB3xv0TlKEuUBBPCT68TVzswP6vR+vXQyvcSJI25260KWhM
+ XSdYzsZG4fhz3tYeQNFMF4KVdW93It06ve7QJs8aZqclO/G6tm+WVxhGr5yQTKsGHYvf
+ 2KPx4u80QsGltWOYXE1m/1+kV9/fYIaTZycfn1vfbssVM45Aptw9CyJlEJtN9Wq7+yFE
+ QTOMdo/0RI4rO4NiOgUpQ5PxwYsptj+lQjXrs0sCnp38NE38R7F+8koeXiH9MD3j6J29
+ i8Ww==
+X-Gm-Message-State: AOAM533nHoIgkTnCAB2CFi/SXKdRJiMC2xJsyV0pjQpqJa3XMrHkprqF
+ e+4vp+T9pJCVMzjS/1jt/hfbFg==
+X-Google-Smtp-Source: ABdhPJxgVscQHSmbku17rqN6Nk67IT0OKp5oZGNz41Gx1gtHDQegyJuNc0/nvJi9Q+6qG60UzNty/w==
+X-Received: by 2002:a17:90a:d305:: with SMTP id
+ p5mr1634140pju.33.1611599715885; 
+ Mon, 25 Jan 2021 10:35:15 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+ by smtp.gmail.com with ESMTPSA id n128sm18157528pga.55.2021.01.25.10.35.13
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 25 Jan 2021 10:35:15 -0800 (PST)
+Date: Mon, 25 Jan 2021 10:35:08 -0800
+From: Sean Christopherson <seanjc@google.com>
+To: David Stevens <stevensd@chromium.org>
+Subject: Re: [PATCH] KVM: x86/mmu: consider the hva in mmu_notifer retry
+Message-ID: <YA8PXCEVukW0UzC5@google.com>
+References: <20210125064234.2078146-1-stevensd@google.com>
 MIME-Version: 1.0
-Date: Mon, 25 Jan 2021 18:40:40 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [RFC PATCH] KVM: arm64: Avoid unconditional PMU register access
-In-Reply-To: <20210118173054.188160-1-andre.przywara@arm.com>
-References: <20210118173054.188160-1-andre.przywara@arm.com>
-User-Agent: Roundcube Webmail/1.4.10
-Message-ID: <e9881351d7c36aac18356b62a54e8e94@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: andre.przywara@arm.com, will@kernel.org,
- catalin.marinas@arm.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <20210125064234.2078146-1-stevensd@google.com>
+X-Mailman-Approved-At: Mon, 25 Jan 2021 16:03:31 -0500
+Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+ David Hildenbrand <david@redhat.com>, linux-mips@vger.kernel.org,
+ Paul Mackerras <paulus@ozlabs.org>, Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ kvmarm@lists.cs.columbia.edu, Janosch Frank <frankja@linux.ibm.com>,
+ Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
+ Huacai Chen <chenhuacai@kernel.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, kvm-ppc@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
+ Cornelia Huck <cohuck@redhat.com>, linux-kernel@vger.kernel.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -76,173 +104,307 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Andre,
++Cc the other architectures, I'm guessing this would be a helpful optimization
+for all archs.
 
-On 2021-01-18 17:30, Andre Przywara wrote:
-> The ARM PMU is an optional CPU feature, so we should consult the CPUID
-> registers before accessing any PMU related registers.
-> However the KVM code accesses some PMU registers (PMUSERENR_EL0 and
-> PMSEL_EL0) unconditionally, when activating the traps.
-> This wasn't a problem so far, because every(?) silicon implements the
-> PMU, with KVM guests being the lone exception, and those never ran
-> KVM host code.
+Quite a few comments, but they're all little more than nits.  Nice!
+
+On Mon, Jan 25, 2021, David Stevens wrote:
+> From: David Stevens <stevensd@chromium.org>
 > 
-> As this is about to change with nested virt, we need to guard PMU
-> register accesses with a proper CPU feature check.
+> Use the range passed to mmu_notifer's invalidate_range_start to prevent
+
+s/mmu_notifer/mmu_notifier.  
+
+And maybe avoid calling out invalidate_range_start() by name?  It took me a few
+reads to understand it's referring to the function, i.e. the start of the
+invalidation, not the start of the range.
+
+> spurious page fault retries due to changes in unrelated host virtual
+> addresses.
+
+This needs to elaborate on the exact scenario this is handling, as is it sounds
+like KVM is tracking the history of invalidations or something.  Understanding
+this patch requires a priori knowledge of mmu_notifier_count.  Something like:
+
+  Track the range being invalidated by mmu_notifier and skip page fault
+  retries if the fault address is not affected by the in-progress
+  invalidation.  Disable the optimization if multiple invalidations are
+  in-progress to keep things simple, as tracking multiple ranges has
+  diminishing returns.
+
+> This has the secondary effect of greatly reducing the likelihood of extreme
+
+Out of curiosity, is this really the _secondary_ effect?  I would expect this
+change to primarily benefit scenarios where the invalidation has gotten
+waylaid for whatever reason.
+
+> latency when handing a page fault due to another thread having been preempted
+> while modifying host virtual addresses.
 > 
-> Add a new CPU capability, which marks whether we have at least the 
-> basic
-> PMUv3 registers available. Use that in the KVM VHE code to check before
-> accessing the PMU registers.
-> 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> Signed-off-by: David Stevens <stevensd@chromium.org>
 > ---
-> Hi,
+
+...
+
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 6d16481aa29d..79166288ed03 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -3658,8 +3658,8 @@ static bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+>  }
+>  
+>  static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
+> -			 gpa_t cr2_or_gpa, kvm_pfn_t *pfn, bool write,
+> -			 bool *writable)
+> +			 gpa_t cr2_or_gpa, kvm_pfn_t *pfn, hva_t *hva,
+> +			 bool write, bool *writable)
+
+Side topic, I'm all for creating a 'struct kvm_page_fault' or whatever to hold
+all these variables.  The helper functions stacks are getting unwieldy.
+Definitely doesn't need to be addressed here, this just reminded of how ugly
+these stacks are.
+
+>  {
+>  	struct kvm_memory_slot *slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
+>  	bool async;
+> @@ -3672,7 +3672,8 @@ static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
+>  	}
+>  
+>  	async = false;
+> -	*pfn = __gfn_to_pfn_memslot(slot, gfn, false, &async, write, writable);
+> +	*pfn = __gfn_to_pfn_memslot(slot, gfn, false, &async,
+> +				    write, writable, hva);
+>  	if (!async)
+>  		return false; /* *pfn has correct page already */
+>  
+> @@ -3686,7 +3687,8 @@ static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
+>  			return true;
+>  	}
+>  
+> -	*pfn = __gfn_to_pfn_memslot(slot, gfn, false, NULL, write, writable);
+> +	*pfn = __gfn_to_pfn_memslot(slot, gfn, false, NULL,
+> +				    write, writable, hva);
+>  	return false;
+>  }
+>  
+> @@ -3699,6 +3701,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+>  	gfn_t gfn = gpa >> PAGE_SHIFT;
+>  	unsigned long mmu_seq;
+>  	kvm_pfn_t pfn;
+> +	hva_t hva;
+>  	int r;
+>  
+>  	if (page_fault_handle_page_track(vcpu, error_code, gfn))
+> @@ -3717,7 +3720,8 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+>  	mmu_seq = vcpu->kvm->mmu_notifier_seq;
+>  	smp_rmb();
+>  
+> -	if (try_async_pf(vcpu, prefault, gfn, gpa, &pfn, write, &map_writable))
+> +	if (try_async_pf(vcpu, prefault, gfn, gpa, &pfn, &hva,
+> +			 write, &map_writable))
+>  		return RET_PF_RETRY;
+>  
+>  	if (handle_abnormal_pfn(vcpu, is_tdp ? 0 : gpa, gfn, pfn, ACC_ALL, &r))
+> @@ -3725,7 +3729,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+>  
+>  	r = RET_PF_RETRY;
+>  	spin_lock(&vcpu->kvm->mmu_lock);
+> -	if (mmu_notifier_retry(vcpu->kvm, mmu_seq))
+> +	if (mmu_notifier_retry_hva(vcpu->kvm, mmu_seq, hva))
+>  		goto out_unlock;
+>  	r = make_mmu_pages_available(vcpu);
+>  	if (r)
+> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+> index 50e268eb8e1a..3171784139a4 100644
+> --- a/arch/x86/kvm/mmu/paging_tmpl.h
+> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
+> @@ -790,6 +790,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gpa_t addr, u32 error_code,
+>  	struct guest_walker walker;
+>  	int r;
+>  	kvm_pfn_t pfn;
+> +	hva_t hva;
+>  	unsigned long mmu_seq;
+>  	bool map_writable, is_self_change_mapping;
+>  	int max_level;
+> @@ -840,8 +841,8 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gpa_t addr, u32 error_code,
+>  	mmu_seq = vcpu->kvm->mmu_notifier_seq;
+>  	smp_rmb();
+>  
+> -	if (try_async_pf(vcpu, prefault, walker.gfn, addr, &pfn, write_fault,
+> -			 &map_writable))
+> +	if (try_async_pf(vcpu, prefault, walker.gfn, addr, &pfn, &hva,
+> +			 write_fault, &map_writable))
+>  		return RET_PF_RETRY;
+>  
+>  	if (handle_abnormal_pfn(vcpu, addr, walker.gfn, pfn, walker.pte_access, &r))
+> @@ -869,7 +870,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gpa_t addr, u32 error_code,
+>  
+>  	r = RET_PF_RETRY;
+>  	spin_lock(&vcpu->kvm->mmu_lock);
+> -	if (mmu_notifier_retry(vcpu->kvm, mmu_seq))
+> +	if (mmu_notifier_retry_hva(vcpu->kvm, mmu_seq, hva))
+>  		goto out_unlock;
+>  
+>  	kvm_mmu_audit(vcpu, AUDIT_PRE_PAGE_FAULT);
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index f3b1013fb22c..b70097685249 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -502,6 +502,8 @@ struct kvm {
+>  	struct mmu_notifier mmu_notifier;
+>  	unsigned long mmu_notifier_seq;
+>  	long mmu_notifier_count;
+> +	unsigned long mmu_notifier_range_start;
+> +	unsigned long mmu_notifier_range_end;
+>  #endif
+>  	long tlbs_dirty;
+>  	struct list_head devices;
+> @@ -729,7 +731,7 @@ kvm_pfn_t gfn_to_pfn_memslot(struct kvm_memory_slot *slot, gfn_t gfn);
+>  kvm_pfn_t gfn_to_pfn_memslot_atomic(struct kvm_memory_slot *slot, gfn_t gfn);
+>  kvm_pfn_t __gfn_to_pfn_memslot(struct kvm_memory_slot *slot, gfn_t gfn,
+>  			       bool atomic, bool *async, bool write_fault,
+> -			       bool *writable);
+> +			       bool *writable, hva_t *hva);
+>  
+>  void kvm_release_pfn_clean(kvm_pfn_t pfn);
+>  void kvm_release_pfn_dirty(kvm_pfn_t pfn);
+> @@ -1203,6 +1205,24 @@ static inline int mmu_notifier_retry(struct kvm *kvm, unsigned long mmu_seq)
+>  		return 1;
+>  	return 0;
+>  }
+> +
+> +static inline int mmu_notifier_retry_hva(struct kvm *kvm,
+> +					 unsigned long mmu_seq,
+> +					 unsigned long hva)
+> +{
+> +	/*
+> +	 * Unlike mmu_notifier_retry, this function relies on
+> +	 * kvm->mmu_lock for consistency.
+
+mmu_notifier_retry is the outlier due to PPC behavior.  Maybe just add a lockdep
+annonation and call it good?
+
+> +	 */
+
+This needs a comment to explicitly state that 'count > 1' cannot be done at
+this time.  My initial thought is that it would be more intuitive to check for
+'count > 1' here, but that would potentially check the wrong wrange when count
+goes from 2->1.  The comment about persistence in invalidate_range_start() is a
+good hint, but I think it's worth being explicit to avoid bad "cleanup" in the
+future.
+
+> +	if (unlikely(kvm->mmu_notifier_count)) {
+> +		if (kvm->mmu_notifier_range_start <= hva &&
+> +		    hva < kvm->mmu_notifier_range_end)
+
+Combine these into a single statement?  I think the result is easier to read?
+
+	if (unlikely(kvm->mmu_notifier_count) &&
+	    kvm->mmu_notifier_range_start <= hva &&
+	    hva < kvm->mmu_notifier_range_end)
+
+> +			return 1;
+> +	}
+> +	if (kvm->mmu_notifier_seq != mmu_seq)
+> +		return 1;
+> +	return 0;
+> +}
+>  #endif
+>  
+>  #ifdef CONFIG_HAVE_KVM_IRQ_ROUTING
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index fa9e3614d30e..d6e1ef5cb184 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -483,6 +483,18 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
+>  	 * count is also read inside the mmu_lock critical section.
+>  	 */
+>  	kvm->mmu_notifier_count++;
+> +	if (likely(kvm->mmu_notifier_count == 1)) {
+> +		kvm->mmu_notifier_range_start = range->start;
+> +		kvm->mmu_notifier_range_end = range->end;
+> +	} else {
+> +		/**
+> +		 * Tracking multiple concurrent ranges has diminishing returns,
+> +		 * so just use the maximum range. This persists until after all
+> +		 * outstanding invalidation operations complete.
+> +		 */
+> +		kvm->mmu_notifier_range_start = 0;
+> +		kvm->mmu_notifier_range_end = ULONG_MAX;
+
+Hrm, I don't think there's a corner case in practice, but ULONG_MAX is a legal
+virtual address and range_end is exclusive.  E.g. passing hva=-1ul would get a
+false negative in mmu_notifier_retry_hva().  It's not an issue as written
+because hva is generated from the gfn, and hva can't be a kernel address.  I'm
+guessing mmu_notifier also doesn't fire on kernel addresses.  I assume that all
+holds true for other architectures, and adding checks in mmu_notifier_retry_hva()
+feels like a waste of cycles, but it still bugs me. :-)
+
+Maybe zero out range_end and explicitly check for that, just to be paranoid?
+
+	if (unlikely(kvm->mmu_notifier_count) &&
+	    (!kvm->mmu_notifier_range_end ||
+            (kvm->mmu_notifier_range_start <= hva &&
+             hva < kvm->mmu_notifier_range_end))
+
+> +	}
+>  	need_tlb_flush = kvm_unmap_hva_range(kvm, range->start, range->end,
+>  					     range->flags);
+>  	/* we've to flush the tlb before the pages can be freed */
+> @@ -2010,9 +2022,11 @@ static kvm_pfn_t hva_to_pfn(unsigned long addr, bool atomic, bool *async,
+>  
+>  kvm_pfn_t __gfn_to_pfn_memslot(struct kvm_memory_slot *slot, gfn_t gfn,
+>  			       bool atomic, bool *async, bool write_fault,
+> -			       bool *writable)
+> +			       bool *writable, hva_t *hva)
+
+Hrm, it feels like we should really split gfn->hva and hva->pfn into separate
+operations, but pretty much every arch needs the hva error handling.  Splitting
+it would probably do more harm than good, at least not without a lot of
+additional refactoring.  Bummer.
+
+>  {
+>  	unsigned long addr = __gfn_to_hva_many(slot, gfn, NULL, write_fault);
+
+Newline here.
+
+> +	if (hva)
+> +		*hva = addr;
+>  
+>  	if (addr == KVM_HVA_ERR_RO_BAD) {
+>  		if (writable)
+> @@ -2041,19 +2055,19 @@ kvm_pfn_t gfn_to_pfn_prot(struct kvm *kvm, gfn_t gfn, bool write_fault,
+>  		      bool *writable)
+>  {
+>  	return __gfn_to_pfn_memslot(gfn_to_memslot(kvm, gfn), gfn, false, NULL,
+> -				    write_fault, writable);
+> +				    write_fault, writable, NULL);
+>  }
+>  EXPORT_SYMBOL_GPL(gfn_to_pfn_prot);
+>  
+>  kvm_pfn_t gfn_to_pfn_memslot(struct kvm_memory_slot *slot, gfn_t gfn)
+>  {
+> -	return __gfn_to_pfn_memslot(slot, gfn, false, NULL, true, NULL);
+> +	return __gfn_to_pfn_memslot(slot, gfn, false, NULL, true, NULL, NULL);
+>  }
+>  EXPORT_SYMBOL_GPL(gfn_to_pfn_memslot);
+>  
+>  kvm_pfn_t gfn_to_pfn_memslot_atomic(struct kvm_memory_slot *slot, gfn_t gfn)
+>  {
+> -	return __gfn_to_pfn_memslot(slot, gfn, true, NULL, true, NULL);
+> +	return __gfn_to_pfn_memslot(slot, gfn, true, NULL, true, NULL, NULL);
+>  }
+>  EXPORT_SYMBOL_GPL(gfn_to_pfn_memslot_atomic);
+>  
+> -- 
+> 2.30.0.280.ga3ce27912f-goog
 > 
-> not sure a new CPU capability isn't a bit over the top here, and we 
-> should
-> use a simple static key instead?
-
-Yes, I think this is a bit excessive, specially as we already have
-a predicate for the HW having a PMU (or the PMU being able on the
-host, which amounts to the same thing). I'm definitely not keen
-on adding more another one that has slightly different semantics.
-
-How about this instead, completely untested?
-
-Thanks,
-
-         M.
-
-diff --git a/arch/arm64/kernel/image-vars.h 
-b/arch/arm64/kernel/image-vars.h
-index 23f1a557bd9f..5aa9ed1e9ec6 100644
---- a/arch/arm64/kernel/image-vars.h
-+++ b/arch/arm64/kernel/image-vars.h
-@@ -101,6 +101,9 @@ KVM_NVHE_ALIAS(__stop___kvm_ex_table);
-  /* Array containing bases of nVHE per-CPU memory regions. */
-  KVM_NVHE_ALIAS(kvm_arm_hyp_percpu_base);
-
-+/* PMU available static key */
-+KVM_NVHE_ALIAS(kvm_arm_pmu_available);
-+
-  #endif /* CONFIG_KVM */
-
-  #endif /* __ARM64_KERNEL_IMAGE_VARS_H */
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h 
-b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 54f4860cd87c..6c1f51f25eb3 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -90,15 +90,18 @@ static inline void __activate_traps_common(struct 
-kvm_vcpu *vcpu)
-  	 * counter, which could make a PMXEVCNTR_EL0 access UNDEF at
-  	 * EL1 instead of being trapped to EL2.
-  	 */
--	write_sysreg(0, pmselr_el0);
--	write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
-+	if (kvm_arm_support_pmu_v3()) {
-+		write_sysreg(0, pmselr_el0);
-+		write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
-+	}
-  	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
-  }
-
-  static inline void __deactivate_traps_common(void)
-  {
-  	write_sysreg(0, hstr_el2);
--	write_sysreg(0, pmuserenr_el0);
-+	if (kvm_arm_support_pmu_v3())
-+		write_sysreg(0, pmuserenr_el0);
-  }
-
-  static inline void ___activate_traps(struct kvm_vcpu *vcpu)
-diff --git a/arch/arm64/kvm/perf.c b/arch/arm64/kvm/perf.c
-index d45b8b9a4415..198fa4266b2d 100644
---- a/arch/arm64/kvm/perf.c
-+++ b/arch/arm64/kvm/perf.c
-@@ -11,6 +11,8 @@
-
-  #include <asm/kvm_emulate.h>
-
-+DEFINE_STATIC_KEY_FALSE(kvm_arm_pmu_available);
-+
-  static int kvm_is_in_guest(void)
-  {
-          return kvm_get_running_vcpu() != NULL;
-@@ -48,6 +50,14 @@ static struct perf_guest_info_callbacks kvm_guest_cbs 
-= {
-
-  int kvm_perf_init(void)
-  {
-+	/*
-+	 * Check if HW_PERF_EVENTS are supported by checking the number of
-+	 * hardware performance counters. This could ensure the presence of
-+	 * a physical PMU and CONFIG_PERF_EVENT is selected.
-+	 */
-+	if (perf_num_counters() > 0)
-+		static_branch_enable(&kvm_arm_pmu_available);
-+
-  	return perf_register_guest_info_callbacks(&kvm_guest_cbs);
-  }
-
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 247422ac78a9..8d5ff7f3d416 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -817,16 +817,6 @@ u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool 
-pmceid1)
-  	return val & mask;
-  }
-
--bool kvm_arm_support_pmu_v3(void)
--{
--	/*
--	 * Check if HW_PERF_EVENTS are supported by checking the number of
--	 * hardware performance counters. This could ensure the presence of
--	 * a physical PMU and CONFIG_PERF_EVENT is selected.
--	 */
--	return (perf_num_counters() > 0);
--}
--
-  int kvm_arm_pmu_v3_enable(struct kvm_vcpu *vcpu)
-  {
-  	if (!kvm_vcpu_has_pmu(vcpu))
-diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index 8dcb3e1477bc..45631af820cd 100644
---- a/include/kvm/arm_pmu.h
-+++ b/include/kvm/arm_pmu.h
-@@ -13,6 +13,13 @@
-  #define ARMV8_PMU_CYCLE_IDX		(ARMV8_PMU_MAX_COUNTERS - 1)
-  #define ARMV8_PMU_MAX_COUNTER_PAIRS	((ARMV8_PMU_MAX_COUNTERS + 1) >> 1)
-
-+DECLARE_STATIC_KEY_FALSE(kvm_arm_pmu_available);
-+
-+static __always_inline bool kvm_arm_support_pmu_v3(void)
-+{
-+	return static_branch_likely(&kvm_arm_pmu_available);
-+}
-+
-  #ifdef CONFIG_HW_PERF_EVENTS
-
-  struct kvm_pmc {
-@@ -47,7 +54,6 @@ void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, 
-u64 val);
-  void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val);
-  void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
-  				    u64 select_idx);
--bool kvm_arm_support_pmu_v3(void);
-  int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu,
-  			    struct kvm_device_attr *attr);
-  int kvm_arm_pmu_v3_get_attr(struct kvm_vcpu *vcpu,
-
--- 
-Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
