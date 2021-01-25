@@ -7,47 +7,48 @@ X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44B0FC433E0
-	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 12:13:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E66BC433DB
+	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 12:14:18 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A3934224F9
-	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 12:13:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3934224F9
+	by mail.kernel.org (Postfix) with ESMTP id A55F022472
+	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 12:14:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A55F022472
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 346224B538;
-	Mon, 25 Jan 2021 07:13:51 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 32B254B5DE;
+	Mon, 25 Jan 2021 07:14:17 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id bwkObp0jwHZk; Mon, 25 Jan 2021 07:13:49 -0500 (EST)
+	with ESMTP id TfrQoiSGSJfg; Mon, 25 Jan 2021 07:14:15 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F20B4B5EF;
-	Mon, 25 Jan 2021 07:13:49 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 518724B5F0;
+	Mon, 25 Jan 2021 07:14:15 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C33A14B5E7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 07:13:48 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4ED554B5DF
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 07:14:14 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id i8wx1ulWveYb for <kvmarm@lists.cs.columbia.edu>;
- Mon, 25 Jan 2021 07:13:47 -0500 (EST)
+ with ESMTP id f5U3pEgDSJqM for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 25 Jan 2021 07:14:13 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DE9694B5DC
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 07:13:47 -0500 (EST)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 447BE22C9E;
- Mon, 25 Jan 2021 12:13:44 +0000 (UTC)
-Date: Mon, 25 Jan 2021 12:13:41 +0000
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 632644B5DE
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 07:14:13 -0500 (EST)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 9C91A230FA;
+ Mon, 25 Jan 2021 12:14:09 +0000 (UTC)
+Date: Mon, 25 Jan 2021 12:14:07 +0000
 From: Catalin Marinas <catalin.marinas@arm.com>
 To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v5 05/21] arm64: Initialise as nVHE before switching to VHE
-Message-ID: <20210125121341.GB25360@gaia>
+Subject: Re: [PATCH v5 06/21] arm64: Move VHE-specific SPE setup to
+ mutate_to_vhe()
+Message-ID: <20210125121406.GC25360@gaia>
 References: <20210125105019.2946057-1-maz@kernel.org>
- <20210125105019.2946057-6-maz@kernel.org>
+ <20210125105019.2946057-7-maz@kernel.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20210125105019.2946057-6-maz@kernel.org>
+In-Reply-To: <20210125105019.2946057-7-maz@kernel.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Cc: Prasad Sodagudi <psodagud@codeaurora.org>,
  Srinivas Ramana <sramana@codeaurora.org>, linux-kernel@vger.kernel.org,
@@ -70,17 +71,12 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Jan 25, 2021 at 10:50:03AM +0000, Marc Zyngier wrote:
-> As we are aiming to be able to control whether we enable VHE or
-> not, let's always drop down to EL1 first, and only then upgrade
-> to VHE if at all possible.
+On Mon, Jan 25, 2021 at 10:50:04AM +0000, Marc Zyngier wrote:
+> There isn't much that a VHE kernel needs on top of whatever has
+> been done for nVHE, so let's move the little we need to the
+> VHE stub (the SPE setup), and drop the init_el2_state macro.
 > 
-> This means that if the kernel is booted at EL2, we always start
-> with a nVHE init, drop to EL1 to initialise the the kernel, and
-> only then upgrade the kernel EL to EL2 if possible (the process
-> is obviously shortened for secondary CPUs).
-> 
-> The resume path is handled similarly to a secondary CPU boot.
+> No expected functional change.
 > 
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > Acked-by: David Brazdil <dbrazdil@google.com>
