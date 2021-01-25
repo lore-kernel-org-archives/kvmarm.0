@@ -6,52 +6,53 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39800C433DB
-	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 10:54:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DC5BC433DB
+	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 10:54:02 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9CD1522DD6
-	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 10:53:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CD1522DD6
+	by mail.kernel.org (Postfix) with ESMTP id C8CDD22DD6
+	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 10:54:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8CDD22DD6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E8734B5E7;
-	Mon, 25 Jan 2021 05:53:59 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6518C4B4EF;
+	Mon, 25 Jan 2021 05:54:01 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id B+gREC-0r0qo; Mon, 25 Jan 2021 05:53:58 -0500 (EST)
+	with ESMTP id GeQoDZBvzn5h; Mon, 25 Jan 2021 05:54:00 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 148274B5AF;
-	Mon, 25 Jan 2021 05:53:58 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 346144B5B8;
+	Mon, 25 Jan 2021 05:54:00 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 885294B5E6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 05:53:56 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1684B4B5E7
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 05:53:59 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7jTJE8dkyLWc for <kvmarm@lists.cs.columbia.edu>;
- Mon, 25 Jan 2021 05:53:55 -0500 (EST)
+ with ESMTP id LEJw4iBs+85R for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 25 Jan 2021 05:53:58 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 742394B5C3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 05:53:55 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3C6DC4B5DB
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 05:53:57 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 7429E22D58;
- Mon, 25 Jan 2021 10:53:54 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 5999D22D04;
+ Mon, 25 Jan 2021 10:53:56 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1l3zS8-009rDe-CR; Mon, 25 Jan 2021 10:50:36 +0000
+ id 1l3zSD-009rDe-B1; Mon, 25 Jan 2021 10:50:42 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  linux-kernel@vger.kernel.org
-Subject: [PATCH v5 14/21] arm64: Honor VHE being disabled from the command-line
-Date: Mon, 25 Jan 2021 10:50:12 +0000
-Message-Id: <20210125105019.2946057-15-maz@kernel.org>
+Subject: [PATCH v5 18/21] arm64: Move "nokaslr" over to the early cpufeature
+ infrastructure
+Date: Mon, 25 Jan 2021 10:50:16 +0000
+Message-Id: <20210125105019.2946057-19-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210125105019.2946057-1-maz@kernel.org>
 References: <20210125105019.2946057-1-maz@kernel.org>
@@ -88,52 +89,107 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Finally we can check whether VHE is disabled on the command line,
-and not enable it if that's the user's wish.
+Given that the early cpufeature infrastructure has borrowed quite
+a lot of code from the kaslr implementation, let's reimplement
+the matching of the "nokaslr" option with it.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 Acked-by: David Brazdil <dbrazdil@google.com>
 ---
- arch/arm64/kernel/asm-offsets.c |  3 +++
- arch/arm64/kernel/hyp-stub.S    | 11 +++++++++++
- 2 files changed, 14 insertions(+)
+ arch/arm64/kernel/idreg-override.c | 15 +++++++++++++
+ arch/arm64/kernel/kaslr.c          | 36 ++----------------------------
+ 2 files changed, 17 insertions(+), 34 deletions(-)
 
-diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
-index f42fd9e33981..1add0f21bffe 100644
---- a/arch/arm64/kernel/asm-offsets.c
-+++ b/arch/arm64/kernel/asm-offsets.c
-@@ -99,6 +99,9 @@ int main(void)
-   DEFINE(CPU_BOOT_STACK,	offsetof(struct secondary_data, stack));
-   DEFINE(CPU_BOOT_TASK,		offsetof(struct secondary_data, task));
-   BLANK();
-+  DEFINE(FTR_OVR_VAL_OFFSET,	offsetof(struct arm64_ftr_override, val));
-+  DEFINE(FTR_OVR_MASK_OFFSET,	offsetof(struct arm64_ftr_override, mask));
-+  BLANK();
- #ifdef CONFIG_KVM
-   DEFINE(VCPU_CONTEXT,		offsetof(struct kvm_vcpu, arch.ctxt));
-   DEFINE(VCPU_FAULT_DISR,	offsetof(struct kvm_vcpu, arch.fault.disr_el1));
-diff --git a/arch/arm64/kernel/hyp-stub.S b/arch/arm64/kernel/hyp-stub.S
-index 6b5c73cf9d52..aa7e8d592295 100644
---- a/arch/arm64/kernel/hyp-stub.S
-+++ b/arch/arm64/kernel/hyp-stub.S
-@@ -87,6 +87,17 @@ SYM_CODE_START_LOCAL(mutate_to_vhe)
- 	ubfx	x1, x1, #ID_AA64MMFR1_VHE_SHIFT, #4
- 	cbz	x1, 1f
+diff --git a/arch/arm64/kernel/idreg-override.c b/arch/arm64/kernel/idreg-override.c
+index cbb8eaa48742..3ccf51b84ba4 100644
+--- a/arch/arm64/kernel/idreg-override.c
++++ b/arch/arm64/kernel/idreg-override.c
+@@ -31,8 +31,22 @@ static const struct ftr_set_desc mmfr1 __initdata = {
+ 	},
+ };
  
-+	// Check whether VHE is disabled from the command line
-+	adr_l	x1, id_aa64mmfr1_override
-+	ldr	x2, [x1, FTR_OVR_VAL_OFFSET]
-+	ldr	x1, [x1, FTR_OVR_MASK_OFFSET]
-+	ubfx	x2, x2, #ID_AA64MMFR1_VHE_SHIFT, #4
-+	ubfx	x1, x1, #ID_AA64MMFR1_VHE_SHIFT, #4
-+	cmp	x1, xzr
-+	and	x2, x2, x1
-+	csinv	x2, x2, xzr, ne
-+	cbz	x2, 1f
++extern struct arm64_ftr_override kaslr_feature_override;
 +
- 	// Engage the VHE magic!
- 	mov_q	x0, HCR_HOST_VHE_FLAGS
- 	msr	hcr_el2, x0
++static const struct ftr_set_desc kaslr __initdata = {
++	.name		= "kaslr",
++#ifdef CONFIG_RANDOMIZE_BASE
++	.override	= &kaslr_feature_override,
++#endif
++	.fields		= {
++		{ "disabled", 0 },
++		{}
++	},
++};
++
+ static const struct ftr_set_desc * const regs[] __initdata = {
+ 	&mmfr1,
++	&kaslr,
+ };
+ 
+ static const struct {
+@@ -41,6 +55,7 @@ static const struct {
+ } aliases[] __initdata = {
+ 	{ "kvm-arm.mode=nvhe",		"id_aa64mmfr1.vh=0" },
+ 	{ "kvm-arm.mode=protected",	"id_aa64mmfr1.vh=0" },
++	{ "nokaslr",			"kaslr.disabled=1" },
+ };
+ 
+ static char *cmdline_contains_option(const char *cmdline, const char *option)
+diff --git a/arch/arm64/kernel/kaslr.c b/arch/arm64/kernel/kaslr.c
+index 5fc86e7d01a1..27f8939deb1b 100644
+--- a/arch/arm64/kernel/kaslr.c
++++ b/arch/arm64/kernel/kaslr.c
+@@ -51,39 +51,7 @@ static __init u64 get_kaslr_seed(void *fdt)
+ 	return ret;
+ }
+ 
+-static __init bool cmdline_contains_nokaslr(const u8 *cmdline)
+-{
+-	const u8 *str;
+-
+-	str = strstr(cmdline, "nokaslr");
+-	return str == cmdline || (str > cmdline && *(str - 1) == ' ');
+-}
+-
+-static __init bool is_kaslr_disabled_cmdline(void *fdt)
+-{
+-	if (!IS_ENABLED(CONFIG_CMDLINE_FORCE)) {
+-		int node;
+-		const u8 *prop;
+-
+-		node = fdt_path_offset(fdt, "/chosen");
+-		if (node < 0)
+-			goto out;
+-
+-		prop = fdt_getprop(fdt, node, "bootargs", NULL);
+-		if (!prop)
+-			goto out;
+-
+-		if (cmdline_contains_nokaslr(prop))
+-			return true;
+-
+-		if (IS_ENABLED(CONFIG_CMDLINE_EXTEND))
+-			goto out;
+-
+-		return false;
+-	}
+-out:
+-	return cmdline_contains_nokaslr(CONFIG_CMDLINE);
+-}
++struct arm64_ftr_override kaslr_feature_override __initdata;
+ 
+ /*
+  * This routine will be executed with the kernel mapped at its default virtual
+@@ -126,7 +94,7 @@ u64 __init kaslr_early_init(void)
+ 	 * Check if 'nokaslr' appears on the command line, and
+ 	 * return 0 if that is the case.
+ 	 */
+-	if (is_kaslr_disabled_cmdline(fdt)) {
++	if (kaslr_feature_override.val & kaslr_feature_override.mask & 0xf) {
+ 		kaslr_status = KASLR_DISABLED_CMDLINE;
+ 		return 0;
+ 	}
 -- 
 2.29.2
 
