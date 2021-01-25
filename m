@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42A0CC433E6
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCCDFC433E9
 	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 10:50:36 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A269822CA2
-	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 10:50:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A269822CA2
+	by mail.kernel.org (Postfix) with ESMTP id 591F122CA2
+	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 10:50:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 591F122CA2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 282AC4B5DB;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D9C654B5DF;
 	Mon, 25 Jan 2021 05:50:35 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id l5FdvSTjftab; Mon, 25 Jan 2021 05:50:34 -0500 (EST)
+	with ESMTP id VFv6YPnfrKvZ; Mon, 25 Jan 2021 05:50:34 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DF344B5E0;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 447464B5DE;
 	Mon, 25 Jan 2021 05:50:33 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 642C44B5CE
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 05:50:31 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EC8B4B5D3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 05:50:32 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id O3EceRnAV54M for <kvmarm@lists.cs.columbia.edu>;
- Mon, 25 Jan 2021 05:50:30 -0500 (EST)
+ with ESMTP id kCuZbfUbt5v3 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 25 Jan 2021 05:50:31 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 67C3F4B5D5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 05:50:30 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1521C4B5D6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 05:50:31 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 6E5182251D;
- Mon, 25 Jan 2021 10:50:29 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 2DD0722597;
+ Mon, 25 Jan 2021 10:50:30 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1l3zRz-009rDe-Ke; Mon, 25 Jan 2021 10:50:27 +0000
+ id 1l3zS0-009rDe-CP; Mon, 25 Jan 2021 10:50:28 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  linux-kernel@vger.kernel.org
-Subject: [PATCH v5 02/21] arm64: Fix outdated TCR setup comment
-Date: Mon, 25 Jan 2021 10:50:00 +0000
-Message-Id: <20210125105019.2946057-3-maz@kernel.org>
+Subject: [PATCH v5 03/21] arm64: Turn the MMU-on sequence into a macro
+Date: Mon, 25 Jan 2021 10:50:01 +0000
+Message-Id: <20210125105019.2946057-4-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210125105019.2946057-1-maz@kernel.org>
 References: <20210125105019.2946057-1-maz@kernel.org>
@@ -88,31 +88,109 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The arm64 kernel has long be able to use more than 39bit VAs.
-Since day one, actually. Let's rewrite the offending comment.
+Turning the MMU on is a popular sport in the arm64 kernel, and
+we do it more than once, or even twice. As we are about to add
+even more, let's turn it into a macro.
+
+No expected functional change.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 Acked-by: David Brazdil <dbrazdil@google.com>
 ---
- arch/arm64/mm/proc.S | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/assembler.h | 17 +++++++++++++++++
+ arch/arm64/kernel/head.S           | 19 ++++---------------
+ arch/arm64/mm/proc.S               | 12 +-----------
+ 3 files changed, 22 insertions(+), 26 deletions(-)
 
+diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
+index bf125c591116..8cded93f99c3 100644
+--- a/arch/arm64/include/asm/assembler.h
++++ b/arch/arm64/include/asm/assembler.h
+@@ -675,6 +675,23 @@ USER(\label, ic	ivau, \tmp2)			// invalidate I line PoU
+ 	.endif
+ 	.endm
+ 
++/*
++ * Set SCTLR_EL1 to the passed value, and invalidate the local icache
++ * in the process. This is called when setting the MMU on.
++ */
++.macro set_sctlr_el1, reg
++	msr	sctlr_el1, \reg
++	isb
++	/*
++	 * Invalidate the local I-cache so that any instructions fetched
++	 * speculatively from the PoC are discarded, since they may have
++	 * been dynamically patched at the PoU.
++	 */
++	ic	iallu
++	dsb	nsh
++	isb
++.endm
++
+ /*
+  * Check whether to yield to another runnable task from kernel mode NEON code
+  * (which runs with preemption disabled).
+diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
+index a0dc987724ed..28e9735302df 100644
+--- a/arch/arm64/kernel/head.S
++++ b/arch/arm64/kernel/head.S
+@@ -703,16 +703,9 @@ SYM_FUNC_START(__enable_mmu)
+ 	offset_ttbr1 x1, x3
+ 	msr	ttbr1_el1, x1			// load TTBR1
+ 	isb
+-	msr	sctlr_el1, x0
+-	isb
+-	/*
+-	 * Invalidate the local I-cache so that any instructions fetched
+-	 * speculatively from the PoC are discarded, since they may have
+-	 * been dynamically patched at the PoU.
+-	 */
+-	ic	iallu
+-	dsb	nsh
+-	isb
++
++	set_sctlr_el1	x0
++
+ 	ret
+ SYM_FUNC_END(__enable_mmu)
+ 
+@@ -883,11 +876,7 @@ SYM_FUNC_START_LOCAL(__primary_switch)
+ 	tlbi	vmalle1				// Remove any stale TLB entries
+ 	dsb	nsh
+ 
+-	msr	sctlr_el1, x19			// re-enable the MMU
+-	isb
+-	ic	iallu				// flush instructions fetched
+-	dsb	nsh				// via old mapping
+-	isb
++	set_sctlr_el1	x19			// re-enable the MMU
+ 
+ 	bl	__relocate_kernel
+ #endif
 diff --git a/arch/arm64/mm/proc.S b/arch/arm64/mm/proc.S
-index 1f7ee8c8b7b8..ece785477bdc 100644
+index ece785477bdc..c967bfd30d2b 100644
 --- a/arch/arm64/mm/proc.S
 +++ b/arch/arm64/mm/proc.S
-@@ -464,8 +464,8 @@ SYM_FUNC_START(__cpu_setup)
- #endif
- 	msr	mair_el1, x5
- 	/*
--	 * Set/prepare TCR and TTBR. We use 512GB (39-bit) address range for
--	 * both user and kernel.
-+	 * Set/prepare TCR and TTBR. TCR_EL1.T1SZ gets further
-+	 * adjusted if the kernel is compiled with 52bit VA support.
- 	 */
- 	mov_q	x10, TCR_TxSZ(VA_BITS) | TCR_CACHE_FLAGS | TCR_SMP_FLAGS | \
- 			TCR_TG_FLAGS | TCR_KASLR_FLAGS | TCR_ASID16 | \
+@@ -291,17 +291,7 @@ skip_pgd:
+ 	/* We're done: fire up the MMU again */
+ 	mrs	x17, sctlr_el1
+ 	orr	x17, x17, #SCTLR_ELx_M
+-	msr	sctlr_el1, x17
+-	isb
+-
+-	/*
+-	 * Invalidate the local I-cache so that any instructions fetched
+-	 * speculatively from the PoC are discarded, since they may have
+-	 * been dynamically patched at the PoU.
+-	 */
+-	ic	iallu
+-	dsb	nsh
+-	isb
++	set_sctlr_el1	x17
+ 
+ 	/* Set the flag to zero to indicate that we're all done */
+ 	str	wzr, [flag_ptr]
 -- 
 2.29.2
 
