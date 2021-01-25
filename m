@@ -7,48 +7,48 @@ X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C0E3C433E0
-	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 18:38:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D014AC433E0
+	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 18:38:25 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9468422B3F
-	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 18:38:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9468422B3F
+	by mail.kernel.org (Postfix) with ESMTP id 7F88220665
+	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 18:38:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F88220665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 165134B111;
-	Mon, 25 Jan 2021 13:38:04 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 171F54B0EF;
+	Mon, 25 Jan 2021 13:38:25 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id e9hlY-npNlIT; Mon, 25 Jan 2021 13:38:03 -0500 (EST)
+	with ESMTP id rHYnfiF6YbKC; Mon, 25 Jan 2021 13:38:23 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D4BF4B13B;
-	Mon, 25 Jan 2021 13:38:03 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 507DC4B12A;
+	Mon, 25 Jan 2021 13:38:23 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 25C334B0E9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 13:38:02 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 997664B10A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 13:38:22 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Z1p4naUyNEMV for <kvmarm@lists.cs.columbia.edu>;
- Mon, 25 Jan 2021 13:38:01 -0500 (EST)
+ with ESMTP id MWjUOhnl6iMI for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 25 Jan 2021 13:38:21 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3A2C94B0EF
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 13:38:01 -0500 (EST)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 6570622ADF;
- Mon, 25 Jan 2021 18:37:57 +0000 (UTC)
-Date: Mon, 25 Jan 2021 18:37:54 +0000
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B19804B108
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 13:38:21 -0500 (EST)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 48B502063A;
+ Mon, 25 Jan 2021 18:38:18 +0000 (UTC)
+Date: Mon, 25 Jan 2021 18:38:15 +0000
 From: Catalin Marinas <catalin.marinas@arm.com>
 To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v5 13/21] arm64: Allow ID_AA64MMFR1_EL1.VH to be
- overridden from the command line
-Message-ID: <20210125183753.GN25360@gaia>
+Subject: Re: [PATCH v5 14/21] arm64: Honor VHE being disabled from the
+ command-line
+Message-ID: <20210125183815.GO25360@gaia>
 References: <20210125105019.2946057-1-maz@kernel.org>
- <20210125105019.2946057-14-maz@kernel.org>
+ <20210125105019.2946057-15-maz@kernel.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20210125105019.2946057-14-maz@kernel.org>
+In-Reply-To: <20210125105019.2946057-15-maz@kernel.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Cc: Prasad Sodagudi <psodagud@codeaurora.org>,
  Srinivas Ramana <sramana@codeaurora.org>, linux-kernel@vger.kernel.org,
@@ -71,16 +71,14 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Jan 25, 2021 at 10:50:11AM +0000, Marc Zyngier wrote:
-> As we want to be able to disable VHE at runtime, let's match
-> "id_aa64mmfr1.vh=" from the command line as an override.
-> This doesn't have much effect yet as our boot code doesn't look
-> at the cpufeature, but only at the HW registers.
+On Mon, Jan 25, 2021 at 10:50:12AM +0000, Marc Zyngier wrote:
+> Finally we can check whether VHE is disabled on the command line,
+> and not enable it if that's the user's wish.
 > 
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > Acked-by: David Brazdil <dbrazdil@google.com>
 
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
