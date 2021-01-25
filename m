@@ -6,53 +6,53 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C387C433E9
-	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 10:54:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D441BC433DB
+	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 10:54:18 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A0D0223104
-	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 10:54:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0D0223104
+	by mail.kernel.org (Postfix) with ESMTP id 538C022B3B
+	for <kvmarm@archiver.kernel.org>; Mon, 25 Jan 2021 10:54:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 538C022B3B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 32E764B4EF;
-	Mon, 25 Jan 2021 05:54:13 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E398E4B5CC;
+	Mon, 25 Jan 2021 05:54:17 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id HhGiPSf88uby; Mon, 25 Jan 2021 05:54:11 -0500 (EST)
+	with ESMTP id RLeJMecnDBN9; Mon, 25 Jan 2021 05:54:16 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EB9E64B5F1;
-	Mon, 25 Jan 2021 05:54:11 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 184594B54B;
+	Mon, 25 Jan 2021 05:54:16 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 668904B5CC
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 05:54:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B06104B5CF
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 05:54:14 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id swW8WMN-9ewR for <kvmarm@lists.cs.columbia.edu>;
- Mon, 25 Jan 2021 05:54:10 -0500 (EST)
+ with ESMTP id DM2++8Au88Cr for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 25 Jan 2021 05:54:13 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 325B94B5AF
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 05:54:10 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9B5184B601
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2021 05:54:13 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 3AFD122EBD;
- Mon, 25 Jan 2021 10:54:09 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 904A622AAC;
+ Mon, 25 Jan 2021 10:54:12 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1l3zSL-009rDe-Fq; Mon, 25 Jan 2021 10:50:50 +0000
+ id 1l3zSA-009rDe-0b; Mon, 25 Jan 2021 10:50:39 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  linux-kernel@vger.kernel.org
-Subject: [PATCH v5 21/21] arm64: cpufeatures: Allow disabling of Pointer Auth
- from the command-line
-Date: Mon, 25 Jan 2021 10:50:19 +0000
-Message-Id: <20210125105019.2946057-22-maz@kernel.org>
+Subject: [PATCH v5 16/21] arm64: Make kvm-arm.mode={nvhe,
+ protected} an alias of id_aa64mmfr1.vh=0
+Date: Mon, 25 Jan 2021 10:50:14 +0000
+Message-Id: <20210125105019.2946057-17-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210125105019.2946057-1-maz@kernel.org>
 References: <20210125105019.2946057-1-maz@kernel.org>
@@ -89,112 +89,64 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In order to be able to disable Pointer Authentication  at runtime,
-whether it is for testing purposes, or to work around HW issues,
-let's add support for overriding the ID_AA64ISAR1_EL1.{GPI,GPA,API,APA}
-fields.
+Admitedly, passing id_aa64mmfr1.vh=0 on the command-line isn't
+that easy to understand, and it is likely that users would much
+prefer write "kvm-arm.mode=nvhe", or "...=protected".
 
-This is further mapped on the arm64.nopauth command-line alias.
+So here you go. This has the added advantage that we can now
+always honor the "kvm-arm.mode=protected" option, even when
+booting on a VHE system.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 Acked-by: David Brazdil <dbrazdil@google.com>
 ---
- Documentation/admin-guide/kernel-parameters.txt |  3 +++
- arch/arm64/include/asm/cpufeature.h             |  1 +
- arch/arm64/kernel/cpufeature.c                  |  4 +++-
- arch/arm64/kernel/idreg-override.c              | 16 ++++++++++++++++
- 4 files changed, 23 insertions(+), 1 deletion(-)
+ Documentation/admin-guide/kernel-parameters.txt | 3 +++
+ arch/arm64/kernel/idreg-override.c              | 2 ++
+ arch/arm64/kvm/arm.c                            | 3 +++
+ 3 files changed, 8 insertions(+)
 
 diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index 7599fd0f1ad7..f9cb28a39bd0 100644
+index 9e3cdb271d06..2786fd39a047 100644
 --- a/Documentation/admin-guide/kernel-parameters.txt
 +++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -376,6 +376,9 @@
- 	arm64.nobti	[ARM64] Unconditionally disable Branch Target
- 			Identification support
+@@ -2257,6 +2257,9 @@
+ 	kvm-arm.mode=
+ 			[KVM,ARM] Select one of KVM/arm64's modes of operation.
  
-+	arm64.nopauth	[ARM64] Unconditionally disable Pointer Authentication
-+			support
++			nvhe: Standard nVHE-based mode, without support for
++			      protected guests.
 +
- 	ataflop=	[HW,M68k]
- 
- 	atarimouse=	[HW,MOUSE] Atari Mouse
-diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-index 4e2f2de9d0d7..ec6311903ad4 100644
---- a/arch/arm64/include/asm/cpufeature.h
-+++ b/arch/arm64/include/asm/cpufeature.h
-@@ -820,6 +820,7 @@ static inline unsigned int get_vmid_bits(u64 mmfr1)
- 
- extern struct arm64_ftr_override id_aa64mmfr1_override;
- extern struct arm64_ftr_override id_aa64pfr1_override;
-+extern struct arm64_ftr_override id_aa64isar1_override;
- 
- u32 get_kvm_ipa_limit(void);
- void dump_cpu_features(void);
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index bb99ddb212b5..954a2b7e5d45 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -559,6 +559,7 @@ static const struct arm64_ftr_bits ftr_raz[] = {
- 
- struct arm64_ftr_override id_aa64mmfr1_override;
- struct arm64_ftr_override id_aa64pfr1_override;
-+struct arm64_ftr_override id_aa64isar1_override;
- 
- static const struct __ftr_reg_entry {
- 	u32			sys_id;
-@@ -604,7 +605,8 @@ static const struct __ftr_reg_entry {
- 
- 	/* Op1 = 0, CRn = 0, CRm = 6 */
- 	ARM64_FTR_REG(SYS_ID_AA64ISAR0_EL1, ftr_id_aa64isar0),
--	ARM64_FTR_REG(SYS_ID_AA64ISAR1_EL1, ftr_id_aa64isar1),
-+	ARM64_FTR_REG_OVERRIDE(SYS_ID_AA64ISAR1_EL1, ftr_id_aa64isar1,
-+			       &id_aa64isar1_override),
- 
- 	/* Op1 = 0, CRn = 0, CRm = 7 */
- 	ARM64_FTR_REG(SYS_ID_AA64MMFR0_EL1, ftr_id_aa64mmfr0),
+ 			protected: nVHE-based mode with support for guests whose
+ 				   state is kept private from the host.
+ 				   Not valid if the kernel is running in EL2.
 diff --git a/arch/arm64/kernel/idreg-override.c b/arch/arm64/kernel/idreg-override.c
-index 71349b644246..d1310438d95c 100644
+index 4fad3fc4d104..cbb8eaa48742 100644
 --- a/arch/arm64/kernel/idreg-override.c
 +++ b/arch/arm64/kernel/idreg-override.c
-@@ -40,6 +40,18 @@ static const struct ftr_set_desc pfr1 __initdata = {
- 	},
+@@ -39,6 +39,8 @@ static const struct {
+ 	const char	*alias;
+ 	const char	*feature;
+ } aliases[] __initdata = {
++	{ "kvm-arm.mode=nvhe",		"id_aa64mmfr1.vh=0" },
++	{ "kvm-arm.mode=protected",	"id_aa64mmfr1.vh=0" },
  };
  
-+static const struct ftr_set_desc isar1 __initdata = {
-+	.name		= "id_aa64isar1",
-+	.override	= &id_aa64isar1_override,
-+	.fields		= {
-+	        { "gpi", ID_AA64ISAR1_GPI_SHIFT },
-+	        { "gpa", ID_AA64ISAR1_GPA_SHIFT },
-+	        { "api", ID_AA64ISAR1_API_SHIFT },
-+	        { "apa", ID_AA64ISAR1_APA_SHIFT },
-+		{}
-+	},
-+};
+ static char *cmdline_contains_option(const char *cmdline, const char *option)
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 04c44853b103..597565a65ca2 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1966,6 +1966,9 @@ static int __init early_kvm_mode_cfg(char *arg)
+ 		return 0;
+ 	}
+ 
++	if (strcmp(arg, "nvhe") == 0 && !WARN_ON(is_kernel_in_hyp_mode()))
++		return 0;
 +
- extern struct arm64_ftr_override kaslr_feature_override;
- 
- static const struct ftr_set_desc kaslr __initdata = {
-@@ -56,6 +68,7 @@ static const struct ftr_set_desc kaslr __initdata = {
- static const struct ftr_set_desc * const regs[] __initdata = {
- 	&mmfr1,
- 	&pfr1,
-+	&isar1,
- 	&kaslr,
- };
- 
-@@ -66,6 +79,9 @@ static const struct {
- 	{ "kvm-arm.mode=nvhe",		"id_aa64mmfr1.vh=0" },
- 	{ "kvm-arm.mode=protected",	"id_aa64mmfr1.vh=0" },
- 	{ "arm64.nobti",		"id_aa64pfr1.bt=0" },
-+	{ "arm64.nopauth",
-+	  "id_aa64isar1.gpi=0 id_aa64isar1.gpa=0 "
-+	  "id_aa64isar1.api=0 id_aa64isar1.apa=0"	   },
- 	{ "nokaslr",			"kaslr.disabled=1" },
- };
- 
+ 	return -EINVAL;
+ }
+ early_param("kvm-arm.mode", early_kvm_mode_cfg);
 -- 
 2.29.2
 
