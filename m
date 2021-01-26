@@ -2,57 +2,55 @@ Return-Path: <SRS0=hkx2=G5=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC1B4C43381
-	for <kvmarm@archiver.kernel.org>; Tue, 26 Jan 2021 12:45:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 034D4C433DB
+	for <kvmarm@archiver.kernel.org>; Tue, 26 Jan 2021 12:45:33 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9B92923104
-	for <kvmarm@archiver.kernel.org>; Tue, 26 Jan 2021 12:45:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B92923104
+	by mail.kernel.org (Postfix) with ESMTP id A59DC2311D
+	for <kvmarm@archiver.kernel.org>; Tue, 26 Jan 2021 12:45:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A59DC2311D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E98C4B2A7;
-	Tue, 26 Jan 2021 07:45:28 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 575D34B28A;
+	Tue, 26 Jan 2021 07:45:32 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id M0kuzkjHm+U4; Tue, 26 Jan 2021 07:45:26 -0500 (EST)
+	with ESMTP id Nyk11P8b2X-6; Tue, 26 Jan 2021 07:45:31 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EA23F4B27D;
-	Tue, 26 Jan 2021 07:45:26 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1231E4B224;
+	Tue, 26 Jan 2021 07:45:31 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 402204B2AA
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jan 2021 07:45:25 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D7484B28A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jan 2021 07:45:29 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Khgf2KCupnII for <kvmarm@lists.cs.columbia.edu>;
- Tue, 26 Jan 2021 07:45:24 -0500 (EST)
+ with ESMTP id 5ZxuA3i21kTH for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 26 Jan 2021 07:45:28 -0500 (EST)
 Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7F94E4B27C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jan 2021 07:45:23 -0500 (EST)
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.60])
- by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DQ5yX1G7wzjDdr;
- Tue, 26 Jan 2021 20:44:04 +0800 (CST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3629B4B29A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jan 2021 07:45:26 -0500 (EST)
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.59])
+ by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DQ5yR2C4WzjDdv;
+ Tue, 26 Jan 2021 20:43:59 +0800 (CST)
 Received: from DESKTOP-5IS4806.china.huawei.com (10.174.184.42) by
  DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
- 14.3.498.0; Tue, 26 Jan 2021 20:45:07 +0800
+ 14.3.498.0; Tue, 26 Jan 2021 20:45:01 +0800
 From: Keqian Zhu <zhukeqian1@huawei.com>
 To: <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
  <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>, Marc Zyngier
  <maz@kernel.org>, Will Deacon <will@kernel.org>, Catalin Marinas
  <catalin.marinas@arm.com>
-Subject: [RFC PATCH 7/7] kvm: arm64: Start up SW/HW combined dirty log
-Date: Tue, 26 Jan 2021 20:44:44 +0800
-Message-ID: <20210126124444.27136-8-zhukeqian1@huawei.com>
+Subject: [RFC PATCH 0/7] kvm: arm64: Implement SW/HW combined dirty log
+Date: Tue, 26 Jan 2021 20:44:37 +0800
+Message-ID: <20210126124444.27136-1-zhukeqian1@huawei.com>
 X-Mailer: git-send-email 2.8.4.windows.1
-In-Reply-To: <20210126124444.27136-1-zhukeqian1@huawei.com>
-References: <20210126124444.27136-1-zhukeqian1@huawei.com>
 MIME-Version: 1.0
 X-Originating-IP: [10.174.184.42]
 X-CFilter-Loop: Reflected
@@ -71,241 +69,74 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-We do not enable hardware dirty at start (do not add DBM bit). When
-an arbitrary PT occurs fault, we execute soft tracking for this PT
-and enable hardware tracking for its nearby PTs (Add DBM bit for
-nearby 64PTs). Then when sync dirty log, we have known all PTs with
-hardware dirty enabled, so we do not need to scan all PTs.
-
-Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
----
- arch/arm64/include/asm/kvm_host.h |   6 ++
- arch/arm64/kvm/arm.c              | 125 ++++++++++++++++++++++++++++++
- arch/arm64/kvm/mmu.c              |   7 +-
- arch/arm64/kvm/reset.c            |   8 +-
- 4 files changed, 141 insertions(+), 5 deletions(-)
-
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 8fcfab0c2567..e9ea5b546326 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -99,6 +99,8 @@ struct kvm_s2_mmu {
- };
- 
- struct kvm_arch_memory_slot {
-+	#define HWDBM_GRANULE_SHIFT 6  /* 64 pages per bit */
-+	unsigned long *hwdbm_bitmap;
- };
- 
- struct kvm_arch {
-@@ -565,6 +567,10 @@ struct kvm_vcpu_stat {
- 	u64 exits;
- };
- 
-+int kvm_arm_init_hwdbm_bitmap(struct kvm_memory_slot *memslot);
-+void kvm_arm_destroy_hwdbm_bitmap(struct kvm_memory_slot *memslot);
-+void kvm_arm_enable_nearby_hwdbm(struct kvm *kvm, gfn_t gfn);
-+
- int kvm_vcpu_preferred_target(struct kvm_vcpu_init *init);
- unsigned long kvm_arm_num_regs(struct kvm_vcpu *vcpu);
- int kvm_arm_copy_reg_indices(struct kvm_vcpu *vcpu, u64 __user *indices);
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 04c44853b103..9e05d45fa6be 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1257,9 +1257,134 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 	return r;
- }
- 
-+static unsigned long kvm_hwdbm_bitmap_bytes(struct kvm_memory_slot *memslot)
-+{
-+	unsigned long nbits = DIV_ROUND_UP(memslot->npages, 1 << HWDBM_GRANULE_SHIFT);
-+
-+	return ALIGN(nbits, BITS_PER_LONG) / 8;
-+}
-+
-+static unsigned long *kvm_second_hwdbm_bitmap(struct kvm_memory_slot *memslot)
-+{
-+	unsigned long len = kvm_hwdbm_bitmap_bytes(memslot);
-+
-+	return (void *)memslot->arch.hwdbm_bitmap + len;
-+}
-+
-+/*
-+ * Allocate twice space. Refer kvm_arch_sync_dirty_log() to see why the
-+ * second space is needed.
-+ */
-+int kvm_arm_init_hwdbm_bitmap(struct kvm_memory_slot *memslot)
-+{
-+	unsigned long bytes = 2 * kvm_hwdbm_bitmap_bytes(memslot);
-+
-+	if (!system_supports_hw_dbm())
-+		return 0;
-+
-+	if (memslot->arch.hwdbm_bitmap) {
-+		/* Inherited from old memslot */
-+		bitmap_clear(memslot->arch.hwdbm_bitmap, 0, bytes * 8);
-+	} else {
-+		memslot->arch.hwdbm_bitmap = kvzalloc(bytes, GFP_KERNEL_ACCOUNT);
-+		if (!memslot->arch.hwdbm_bitmap)
-+			return -ENOMEM;
-+	}
-+
-+	return 0;
-+}
-+
-+void kvm_arm_destroy_hwdbm_bitmap(struct kvm_memory_slot *memslot)
-+{
-+	if (!memslot->arch.hwdbm_bitmap)
-+		return;
-+
-+	kvfree(memslot->arch.hwdbm_bitmap);
-+	memslot->arch.hwdbm_bitmap = NULL;
-+}
-+
-+/* Add DBM for nearby pagetables but do not across memslot */
-+void kvm_arm_enable_nearby_hwdbm(struct kvm *kvm, gfn_t gfn)
-+{
-+	struct kvm_memory_slot *memslot;
-+
-+	memslot = gfn_to_memslot(kvm, gfn);
-+	if (memslot && kvm_slot_dirty_track_enabled(memslot) &&
-+	    memslot->arch.hwdbm_bitmap) {
-+		unsigned long rel_gfn = gfn - memslot->base_gfn;
-+		unsigned long dbm_idx = rel_gfn >> HWDBM_GRANULE_SHIFT;
-+		unsigned long start_page, npages;
-+
-+		if (!test_and_set_bit(dbm_idx, memslot->arch.hwdbm_bitmap)) {
-+			start_page = dbm_idx << HWDBM_GRANULE_SHIFT;
-+			npages = 1 << HWDBM_GRANULE_SHIFT;
-+			npages = min(memslot->npages - start_page, npages);
-+			kvm_stage2_set_dbm(kvm, memslot, start_page, npages);
-+		}
-+	}
-+}
-+
-+/*
-+ * We have to find a place to clear hwdbm_bitmap, and clear hwdbm_bitmap means
-+ * to clear DBM bit of all related pgtables. Note that between we clear DBM bit
-+ * and flush TLB, HW dirty log may occur, so we must scan all related pgtables
-+ * after flush TLB. Giving above, it's best choice to clear hwdbm_bitmap before
-+ * sync HW dirty log.
-+ */
- void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
- {
-+	unsigned long *second_bitmap = kvm_second_hwdbm_bitmap(memslot);
-+	unsigned long start_page, npages;
-+	unsigned int end, rs, re;
-+	bool has_hwdbm = false;
-+
-+	if (!memslot->arch.hwdbm_bitmap)
-+		return;
- 
-+	end = kvm_hwdbm_bitmap_bytes(memslot) * 8;
-+	bitmap_clear(second_bitmap, 0, end);
-+
-+	spin_lock(&kvm->mmu_lock);
-+	bitmap_for_each_set_region(memslot->arch.hwdbm_bitmap, rs, re, 0, end) {
-+		has_hwdbm = true;
-+
-+		/*
-+		 * Must clear bitmap before clear DBM bit. During we clear DBM
-+		 * (it releases the mmu spinlock periodly), SW dirty tracking
-+		 * has chance to add DBM which overlaps what we are clearing. So
-+		 * if we clear bitmap after clear DBM, we will face a situation
-+		 * that bitmap is cleared but DBM are lefted, then we may have
-+		 * no chance to scan these lefted pgtables anymore.
-+		 */
-+		bitmap_clear(memslot->arch.hwdbm_bitmap, rs, re - rs);
-+
-+		/* Record the bitmap cleared */
-+		bitmap_set(second_bitmap, rs, re - rs);
-+
-+		start_page = rs << HWDBM_GRANULE_SHIFT;
-+		npages = (re - rs) << HWDBM_GRANULE_SHIFT;
-+		npages = min(memslot->npages - start_page, npages);
-+		kvm_stage2_clear_dbm(kvm, memslot, start_page, npages);
-+	}
-+	spin_unlock(&kvm->mmu_lock);
-+
-+	if (!has_hwdbm)
-+		return;
-+
-+	/*
-+	 * Ensure vcpu write-actions that occur after we clear hwdbm_bitmap can
-+	 * be catched by guest memory abort handler.
-+	 */
-+	kvm_flush_remote_tlbs(kvm);
-+
-+	spin_lock(&kvm->mmu_lock);
-+	bitmap_for_each_set_region(second_bitmap, rs, re, 0, end) {
-+		start_page = rs << HWDBM_GRANULE_SHIFT;
-+		npages = (re - rs) << HWDBM_GRANULE_SHIFT;
-+		npages = min(memslot->npages - start_page, npages);
-+		kvm_stage2_sync_dirty(kvm, memslot, start_page, npages);
-+	}
-+	spin_unlock(&kvm->mmu_lock);
- }
- 
- void kvm_arch_flush_remote_tlbs_memslot(struct kvm *kvm,
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 2f8c6770a4dc..1a8702035ddd 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -939,6 +939,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	 */
- 	if (fault_status == FSC_PERM && vma_pagesize == fault_granule) {
- 		ret = kvm_pgtable_stage2_relax_perms(pgt, fault_ipa, prot);
-+
-+		/* Put here with high probability that nearby PTEs are valid */
-+		if (!ret && vma_pagesize == PAGE_SIZE && writable)
-+			kvm_arm_enable_nearby_hwdbm(kvm, gfn);
- 	} else {
- 		ret = kvm_pgtable_stage2_map(pgt, fault_ipa, vma_pagesize,
- 					     __pfn_to_phys(pfn), prot,
-@@ -1407,11 +1411,12 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 	spin_unlock(&kvm->mmu_lock);
- out:
- 	mmap_read_unlock(current->mm);
--	return ret;
-+	return ret ? : kvm_arm_init_hwdbm_bitmap(memslot);
- }
- 
- void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot)
- {
-+	kvm_arm_destroy_hwdbm_bitmap(slot);
- }
- 
- void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen)
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index 47f3f035f3ea..231d11009db7 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -376,11 +376,11 @@ int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type)
- 	vtcr |= VTCR_EL2_LVLS_TO_SL0(lvls);
- 
- 	/*
--	 * Enable the Hardware Access Flag management, unconditionally
--	 * on all CPUs. The features is RES0 on CPUs without the support
--	 * and must be ignored by the CPUs.
-+	 * Enable the Hardware Access Flag and Dirty State management
-+	 * unconditionally on all CPUs. The features are RES0 on CPUs
-+	 * without the support and must be ignored by the CPUs.
- 	 */
--	vtcr |= VTCR_EL2_HA;
-+	vtcr |= VTCR_EL2_HA | VTCR_EL2_HD;
- 
- 	/* Set the vmid bits */
- 	vtcr |= (kvm_get_vmid_bits() == 16) ?
--- 
-2.19.1
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+VGhlIGludGVudGlvbjoKCk9uIGFybTY0IHBsYXRmb3JtLCB3ZSB0cmFja2luZyBkaXJ0eSBsb2cg
+b2YgdkNQVSB0aHJvdWdoIGd1ZXN0IG1lbW9yeSBhYm9ydC4KS1ZNIG9jY3VweXMgc29tZSB2Q1BV
+IHRpbWUgb2YgZ3Vlc3QgdG8gY2hhbmdlIHN0YWdlMiBtYXBwaW5nIGFuZCBtYXJrIGRpcnR5LgpU
+aGlzIGxlYWRzIHRvIGhlYXZ5IHNpZGUgZWZmZWN0IG9uIFZNLCBlc3BlY2lhbGx5IHdoZW4gbXVs
+dGkgdkNQVSByYWNlIGFuZApzb21lIG9mIHRoZW0gYmxvY2sgb24ga3ZtIG1tdV9sb2NrLgoKREJN
+IGlzIGEgSFcgYXV4aWxpYXJ5IGFwcHJvYWNoIHRvIGxvZyBkaXJ0eS4gTU1VIGNoYWdlcyBQVEUg
+dG8gYmUgd3JpdGFibGUgaWYKaXRzIERCTSBiaXQgaXMgc2V0LiBUaGVuIEtWTSBkb2Vzbid0IG9j
+Y3VweSB2Q1BVIHRpbWUgdG8gbG9nIGRpcnR5LgoKQWJvdXQgdGhpcyBwYXRjaCBzZXJpZXM6CgpU
+aGUgYmlnZ2VzdCBwcm9ibGVtIG9mIGFwcGx5IERCTSBmb3Igc3RhZ2UyIGlzIHRoYXQgc29mdHdh
+cmUgbXVzdCBzY2FuIFBUcyB0bwpjb2xsZWN0IGRpcnR5IHN0YXRlLCB3aGljaCBtYXkgY29zdCBt
+dWNoIHRpbWUgYW5kIGFmZmVjdCBkb3dudGltZSBvZiBtaWdyYXRpb24uCgpUaGlzIHNlcmllcyBy
+ZWFsaXplIGEgU1cvSFcgY29tYmluZWQgZGlydHkgbG9nIHRoYXQgY2FuIGVmZmVjdGl2ZWx5IHNv
+bHZlIHRoaXMKcHJvYmxlbSAoVGhlIHNtbXUgc2lkZSBjYW4gYWxzbyB1c2UgdGhpcyBhcHByb2Fj
+aCB0byBzb2x2ZSBkbWEgZGlydHkgbG9nIHRyYWNraW5nKS4KClRoZSBjb3JlIGlkZWEgaXMgdGhh
+dCB3ZSBkbyBub3QgZW5hYmxlIGhhcmR3YXJlIGRpcnR5IGF0IHN0YXJ0IChkbyBub3QgYWRkIERC
+TSBiaXQpLgpXaGVuIGEgYXJiaXRyYXJ5IFBUIG9jY3VycyBmYXVsdCwgd2UgZXhlY3V0ZSBzb2Z0
+IHRyYWNraW5nIGZvciB0aGlzIFBUIGFuZCBlbmFibGUKaGFyZHdhcmUgdHJhY2tpbmcgZm9yIGl0
+cyAqbmVhcmJ5KiBQVHMgKGUuZy4gQWRkIERCTSBiaXQgZm9yIG5lYXJieSAxNlBUcykuIFRoZW4g
+d2hlbgpzeW5jIGRpcnR5IGxvZywgd2UgaGF2ZSBrbm93biBhbGwgUFRzIHdpdGggaGFyZHdhcmUg
+ZGlydHkgZW5hYmxlZCwgc28gd2UgZG8gbm90IG5lZWQKdG8gc2NhbiBhbGwgUFRzLgoKICAgICAg
+ICBtZW0gYWJvcnQgcG9pbnQgICAgICAgICAgICAgbWVtIGFib3J0IHBvaW50CiAgICAgICAgICAg
+ICAg4oaTICAgICAgICAgICAgICAgICAgICAgICAgICAgIOKGkwotLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KICAgICAgICB8Kioq
+KioqKip8ICAgICAgICB8ICAgICAgICB8KioqKioqKip8ICAgICAgICB8ICAgICAgICB8Ci0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LQogICAgICAgICAgICAg4oaRICAgICAgICAgICAgICAgICAgICAgICAgICAgIOKGkQogICAgICAg
+IHNldCBEQk0gYml0IG9mICAgICAgICAgICAgICAgc2V0IERCTSBiaXQgb2YKICAgICB0aGlzIFBU
+IHNlY3Rpb24gKDY0UFRFcykgICAgICB0aGlzIFBUIHNlY3Rpb24gKDY0UFRFcykKCldlIG1heSB3
+b3JyeSB0aGF0IHdoZW4gZGlydHkgcmF0ZSBpcyBvdmVyLWhpZ2ggd2Ugc3RpbGwgbmVlZCB0byBz
+Y2FuIHRvbyBtdWNoIFBUcy4KV2UgbWFpbmx5IGNvbmNlcm4gdGhlIFZNIHN0b3AgdGltZS4gV2l0
+aCBRZW11IGRpcnR5IHJhdGUgdGhyb3R0bGluZywgdGhlIGRpcnR5IG1lbW9yeQppcyBjbG9zaW5n
+IHRvIHRoZSBWTSBzdG9wIHRocmVzaG9sZCwgc28gdGhlcmUgaXMgYSBsaXR0bGUgUFRzIHRvIHNj
+YW4gYWZ0ZXIgVk0gc3RvcC4KCkl0IGhhcyB0aGUgYWR2YW50YWdlcyBvZiBoYXJkd2FyZSB0cmFj
+a2luZyB0aGF0IG1pbmltaXplcyBzaWRlIGVmZmVjdCBvbiB2Q1BVLAphbmQgYWxzbyBoYXMgdGhl
+IGFkdmFudGFnZXMgb2Ygc29mdHdhcmUgdHJhY2tpbmcgdGhhdCBjb250cm9scyB2Q1BVIGRpcnR5
+IHJhdGUuCk1vcmVvdmVyLCBzb2Z0d2FyZSB0cmFja2luZyBoZWxwcyB1cyB0byBzY2FuIFBUcyBh
+dCBzb21lIGZpeGVkIHBvaW50cywgd2hpY2gKZ3JlYXRseSByZWR1Y2VzIHNjYW5uaW5nIHRpbWUu
+IEFuZCB0aGUgYmlnZ2VzdCBiZW5lZml0IGlzIHRoYXQgd2UgY2FuIGFwcGx5IHRoaXMKc29sdXRp
+b24gZm9yIGRtYSBkaXJ0eSB0cmFja2luZy4KClRlc3Q6CgpIb3N0OiBLdW5wZW5nIDkyMCB3aXRo
+IDEyOCBDUFUgNTEyRyBSQU0uIERpc2FibGUgVHJhbnNwYXJlbnQgSHVnZXBhZ2UgKEVuc3VyZSB0
+ZXN0IHJlc3VsdAogICAgICBpcyBub3QgZWZmZWN0ZWQgYnkgZGlzc29sdmUgb2YgYmxvY2sgcGFn
+ZSB0YWJsZSBhdCB0aGUgZWFybHkgc3RhZ2Ugb2YgbWlncmF0aW9uKS4KVk06ICAgMTYgQ1BVIDE2
+R0IgUkFNLiBSdW4gNCBwYWlyIG9mIChyZWRpc19iZW5jaG1hcmsrcmVkaXNfc2VydmVyKS4KCkVh
+Y2ggcnVuIDUgdGltZXMgZm9yIHNvZnR3YXJlIGRpcnR5IGxvZyBhbmQgU1cvSFcgY29uYmluZWQg
+ZGlydHkgbG9nLiAKClRlc3QgcmVzdWx0OgoKR2FpbiA1JX43JSBpbXByb3ZlbWVudCBvZiByZWRp
+cyBRUFMgZHVyaW5nIFZNIG1pZ3JhdGlvbi4KVk0gZG93bnRpbWUgaXMgbm90IGFmZmVjdGVkIGZ1
+bmRhbWVudGFsbHkuCkFib3V0IDU2LjclIG9mIERCTSBpcyBlZmZlY3RpdmVseSB1c2VkLgoKS2Vx
+aWFuIFpodSAoNyk6CiAgYXJtNjQ6IGNwdWZlYXR1cmU6IEFkZCBBUEkgdG8gcmVwb3J0IHN5c3Rl
+bSBzdXBwb3J0IG9mIEhXREJNCiAga3ZtOiBhcm02NDogVXNlIGF0b21pYyBvcGVyYXRpb24gd2hl
+biB1cGRhdGUgUFRFCiAga3ZtOiBhcm02NDogQWRkIGxldmVsX2FwcGx5IHBhcmFtZXRlciBmb3Ig
+c3RhZ2UyX2F0dHJfd2Fsa2VyCiAga3ZtOiBhcm02NDogQWRkIHNvbWUgSFdfREJNIHJlbGF0ZWQg
+cGd0YWJsZSBpbnRlcmZhY2VzCiAga3ZtOiBhcm02NDogQWRkIHNvbWUgSFdfREJNIHJlbGF0ZWQg
+bW11IGludGVyZmFjZXMKICBrdm06IGFybTY0OiBPbmx5IHdyaXRlIHByb3RlY3Qgc2VsZWN0ZWQg
+UFRFCiAga3ZtOiBhcm02NDogU3RhcnQgdXAgU1cvSFcgY29tYmluZWQgZGlydHkgbG9nCgogYXJj
+aC9hcm02NC9pbmNsdWRlL2FzbS9jcHVmZWF0dXJlLmggIHwgIDEyICsrKwogYXJjaC9hcm02NC9p
+bmNsdWRlL2FzbS9rdm1faG9zdC5oICAgIHwgICA2ICsrCiBhcmNoL2FybTY0L2luY2x1ZGUvYXNt
+L2t2bV9tbXUuaCAgICAgfCAgIDcgKysKIGFyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX3BndGFi
+bGUuaCB8ICA0NSArKysrKysrKysrCiBhcmNoL2FybTY0L2t2bS9hcm0uYyAgICAgICAgICAgICAg
+ICAgfCAxMjUgKysrKysrKysrKysrKysrKysrKysrKysrKysKIGFyY2gvYXJtNjQva3ZtL2h5cC9w
+Z3RhYmxlLmMgICAgICAgICB8IDEzMCArKysrKysrKysrKysrKysrKysrKysrLS0tLS0KIGFyY2gv
+YXJtNjQva3ZtL21tdS5jICAgICAgICAgICAgICAgICB8ICA0NyArKysrKysrKystCiBhcmNoL2Fy
+bTY0L2t2bS9yZXNldC5jICAgICAgICAgICAgICAgfCAgIDggKy0KIDggZmlsZXMgY2hhbmdlZCwg
+MzUxIGluc2VydGlvbnMoKyksIDI5IGRlbGV0aW9ucygtKQoKLS0gCjIuMTkuMQoKX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlz
+dAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEu
+ZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
