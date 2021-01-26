@@ -7,50 +7,49 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A8BEC433DB
-	for <kvmarm@archiver.kernel.org>; Tue, 26 Jan 2021 12:45:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43038C433E6
+	for <kvmarm@archiver.kernel.org>; Tue, 26 Jan 2021 12:45:23 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E53B823104
-	for <kvmarm@archiver.kernel.org>; Tue, 26 Jan 2021 12:45:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E53B823104
+	by mail.kernel.org (Postfix) with ESMTP id D60172311D
+	for <kvmarm@archiver.kernel.org>; Tue, 26 Jan 2021 12:45:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D60172311D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DBD34B286;
-	Tue, 26 Jan 2021 07:45:21 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B9AF4B28A;
+	Tue, 26 Jan 2021 07:45:22 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id s3NsvDdYz6zy; Tue, 26 Jan 2021 07:45:20 -0500 (EST)
+	with ESMTP id 7Q4KTJt3g60m; Tue, 26 Jan 2021 07:45:21 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 289FD4B27F;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4416C4B284;
 	Tue, 26 Jan 2021 07:45:20 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CA7364B27C
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E0A644B27B
  for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jan 2021 07:45:18 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qQck3xe3tTn9 for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id fOzb7XXE05yI for <kvmarm@lists.cs.columbia.edu>;
  Tue, 26 Jan 2021 07:45:16 -0500 (EST)
 Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CA13A4B21B
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C5EB44B21A
  for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jan 2021 07:45:15 -0500 (EST)
 Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.59])
- by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DQ5yR0MSnzjDYt;
+ by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DQ5yR1JhfzjDdq;
  Tue, 26 Jan 2021 20:43:59 +0800 (CST)
 Received: from DESKTOP-5IS4806.china.huawei.com (10.174.184.42) by
  DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
- 14.3.498.0; Tue, 26 Jan 2021 20:45:02 +0800
+ 14.3.498.0; Tue, 26 Jan 2021 20:45:03 +0800
 From: Keqian Zhu <zhukeqian1@huawei.com>
 To: <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
  <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>, Marc Zyngier
  <maz@kernel.org>, Will Deacon <will@kernel.org>, Catalin Marinas
  <catalin.marinas@arm.com>
-Subject: [RFC PATCH 1/7] arm64: cpufeature: Add API to report system support
- of HWDBM
-Date: Tue, 26 Jan 2021 20:44:38 +0800
-Message-ID: <20210126124444.27136-2-zhukeqian1@huawei.com>
+Subject: [RFC PATCH 2/7] kvm: arm64: Use atomic operation when update PTE
+Date: Tue, 26 Jan 2021 20:44:39 +0800
+Message-ID: <20210126124444.27136-3-zhukeqian1@huawei.com>
 X-Mailer: git-send-email 2.8.4.windows.1
 In-Reply-To: <20210126124444.27136-1-zhukeqian1@huawei.com>
 References: <20210126124444.27136-1-zhukeqian1@huawei.com>
@@ -77,39 +76,78 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Though we already has a cpu capability named ARM64_HW_DBM, it's a
-LOCAL_CPU cap and conditionally compiled by CONFIG_ARM64_HW_AFDBM.
+We are about to add HW_DBM support for stage2 dirty log, so software
+updating PTE may race with the MMU trying to set the access flag or
+dirty state.
 
-This reports the system wide support of HW_DBM.
+Use atomic oparations to avoid reverting these bits set by MMU.
 
 Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
 ---
- arch/arm64/include/asm/cpufeature.h | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ arch/arm64/kvm/hyp/pgtable.c | 41 ++++++++++++++++++++++++------------
+ 1 file changed, 27 insertions(+), 14 deletions(-)
 
-diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-index 9a555809b89c..dfded86c7684 100644
---- a/arch/arm64/include/asm/cpufeature.h
-+++ b/arch/arm64/include/asm/cpufeature.h
-@@ -664,6 +664,18 @@ static inline bool system_supports_mixed_endian(void)
- 	return val == 0x1;
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index bdf8e55ed308..4915ba35f93b 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -153,10 +153,34 @@ static kvm_pte_t *kvm_pte_follow(kvm_pte_t pte)
+ 	return __va(kvm_pte_to_phys(pte));
  }
  
-+static inline bool system_supports_hw_dbm(void)
++/*
++ * We may race with the MMU trying to set the access flag or dirty state,
++ * use atomic oparations to avoid reverting these bits.
++ *
++ * Return original PTE.
++ */
++static kvm_pte_t kvm_update_pte(kvm_pte_t *ptep, kvm_pte_t bit_set,
++				kvm_pte_t bit_clr)
 +{
-+	u64 mmfr1;
-+	u32 val;
++	kvm_pte_t old_pte, pte = *ptep;
 +
-+	mmfr1 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
-+	val = cpuid_feature_extract_unsigned_field(mmfr1,
-+						ID_AA64MMFR1_HADBS_SHIFT);
++	do {
++		old_pte = pte;
++		pte &= ~bit_clr;
++		pte |= bit_set;
 +
-+	return val == 0x2;
++		if (old_pte == pte)
++			break;
++
++		pte = cmpxchg_relaxed(ptep, old_pte, pte);
++	} while (pte != old_pte);
++
++	return old_pte;
 +}
 +
- static __always_inline bool system_supports_fpsimd(void)
+ static void kvm_set_invalid_pte(kvm_pte_t *ptep)
  {
- 	return !cpus_have_const_cap(ARM64_HAS_NO_FPSIMD);
+-	kvm_pte_t pte = *ptep;
+-	WRITE_ONCE(*ptep, pte & ~KVM_PTE_VALID);
++	kvm_update_pte(ptep, 0, KVM_PTE_VALID);
+ }
+ 
+ static void kvm_set_table_pte(kvm_pte_t *ptep, kvm_pte_t *childp)
+@@ -723,18 +747,7 @@ static int stage2_attr_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+ 		return 0;
+ 
+ 	data->level = level;
+-	data->pte = pte;
+-	pte &= ~data->attr_clr;
+-	pte |= data->attr_set;
+-
+-	/*
+-	 * We may race with the CPU trying to set the access flag here,
+-	 * but worst-case the access flag update gets lost and will be
+-	 * set on the next access instead.
+-	 */
+-	if (data->pte != pte)
+-		WRITE_ONCE(*ptep, pte);
+-
++	data->pte = kvm_update_pte(ptep, data->attr_set, data->attr_clr);
+ 	return 0;
+ }
+ 
 -- 
 2.19.1
 
