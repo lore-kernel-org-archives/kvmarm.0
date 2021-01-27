@@ -2,58 +2,58 @@ Return-Path: <SRS0=cUgw=G6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9554C433DB
-	for <kvmarm@archiver.kernel.org>; Wed, 27 Jan 2021 12:18:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26703C433E0
+	for <kvmarm@archiver.kernel.org>; Wed, 27 Jan 2021 14:09:31 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D349620789
-	for <kvmarm@archiver.kernel.org>; Wed, 27 Jan 2021 12:18:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D349620789
+	by mail.kernel.org (Postfix) with ESMTP id 5CFA5221E3
+	for <kvmarm@archiver.kernel.org>; Wed, 27 Jan 2021 14:09:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CFA5221E3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 45A5B4B240;
-	Wed, 27 Jan 2021 07:18:31 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9448F4B222;
+	Wed, 27 Jan 2021 09:09:29 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id yAh3MUvW+x4G; Wed, 27 Jan 2021 07:18:30 -0500 (EST)
+	with ESMTP id 1XYVl59PJ8TC; Wed, 27 Jan 2021 09:09:28 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1CC194B239;
-	Wed, 27 Jan 2021 07:18:30 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 52D334B253;
+	Wed, 27 Jan 2021 09:09:28 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F7F54B233
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jan 2021 07:18:29 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 989964B21A
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jan 2021 09:09:27 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LI4H1RUbuqhO for <kvmarm@lists.cs.columbia.edu>;
- Wed, 27 Jan 2021 07:18:28 -0500 (EST)
+ with ESMTP id lxM3s+Ms-LvQ for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 Jan 2021 09:09:26 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C0264B1F6
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jan 2021 07:18:28 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 33CBB4B181
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jan 2021 09:09:26 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9DBF91FB;
- Wed, 27 Jan 2021 04:18:27 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A97DA1FB;
+ Wed, 27 Jan 2021 06:09:25 -0800 (PST)
 Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6B1383F68F;
- Wed, 27 Jan 2021 04:18:26 -0800 (PST)
-Subject: Re: [PATCH v2 5/7] KVM: arm64: Limit the debug architecture to ARMv8.0
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 739653F68F;
+ Wed, 27 Jan 2021 06:09:24 -0800 (PST)
+Subject: Re: [PATCH v2 6/7] KVM: arm64: Upgrade PMU support to ARMv8.4
 To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
  kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 References: <20210125122638.2947058-1-maz@kernel.org>
- <20210125122638.2947058-6-maz@kernel.org>
+ <20210125122638.2947058-7-maz@kernel.org>
 From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <c21135dc-a579-fab2-dbd5-0e6221ed79a3@arm.com>
-Date: Wed, 27 Jan 2021 12:18:29 +0000
+Message-ID: <59700102-5340-b5ec-28e2-d95ee3e59c6b@arm.com>
+Date: Wed, 27 Jan 2021 14:09:23 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.6.1
 MIME-Version: 1.0
-In-Reply-To: <20210125122638.2947058-6-maz@kernel.org>
+In-Reply-To: <20210125122638.2947058-7-maz@kernel.org>
 Content-Language: en-US
 Cc: kernel-team@android.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -74,34 +74,108 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Hi Marc,
 
-This looks correct, and it also matches what we report for aarch32 in trap_dbgidr():
-
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
 On 1/25/21 12:26 PM, Marc Zyngier wrote:
-> Let's not pretend we support anything but ARMv8.0 as far as the
-> debug architecture is concerned.
+> Upgrading the PMU code from ARMv8.1 to ARMv8.4 turns out to be
+> pretty easy. All that is required is support for PMMIR_EL1, which
+> is read-only, and for which returning 0 is a valid option as long
+> as we don't advertise STALL_SLOT as an implemented event.
+
+According to ARM DDI 0487F.b, page D7-2743:
+
+"If ARMv8.4-PMU is implemented:
+- If STALL_SLOT is not implemented, it is IMPLEMENTATION DEFINED whether the PMMIR
+System registers are implemented.
+- If STALL_SLOT is implemented, then the PMMIR System registers are implemented."
+
+I tried to come up with a reason why PMMIR is emulated instead of being left
+undefined, but I couldn't figure it out. Would you mind adding a comment or
+changing the commit message to explain that?
+
+Thanks,
+Alex
+> Let's just do that and adjust what we return to the guest.
 >
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  arch/arm64/kvm/sys_regs.c | 3 +++
->  1 file changed, 3 insertions(+)
+>  arch/arm64/include/asm/sysreg.h |  3 +++
+>  arch/arm64/kvm/pmu-emul.c       |  6 ++++++
+>  arch/arm64/kvm/sys_regs.c       | 11 +++++++----
+>  3 files changed, 16 insertions(+), 4 deletions(-)
 >
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index 8b5e7e5c3cc8..2fb3f386588c 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -846,7 +846,10 @@
+>  
+>  #define ID_DFR0_PERFMON_SHIFT		24
+>  
+> +#define ID_DFR0_PERFMON_8_0		0x3
+>  #define ID_DFR0_PERFMON_8_1		0x4
+> +#define ID_DFR0_PERFMON_8_4		0x5
+> +#define ID_DFR0_PERFMON_8_5		0x6
+>  
+>  #define ID_ISAR4_SWP_FRAC_SHIFT		28
+>  #define ID_ISAR4_PSR_M_SHIFT		24
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index 398f6df1bbe4..72cd704a8368 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -795,6 +795,12 @@ u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
+>  		base = 0;
+>  	} else {
+>  		val = read_sysreg(pmceid1_el0);
+> +		/*
+> +		 * Don't advertise STALL_SLOT, as PMMIR_EL0 is handled
+> +		 * as RAZ
+> +		 */
+> +		if (vcpu->kvm->arch.pmuver >= ID_AA64DFR0_PMUVER_8_4)
+> +			val &= ~BIT_ULL(ARMV8_PMUV3_PERFCTR_STALL_SLOT - 32);
+>  		base = 32;
+>  	}
+>  
 > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index dda16d60197b..8f79ec1fffa7 100644
+> index 8f79ec1fffa7..5da536ab738d 100644
 > --- a/arch/arm64/kvm/sys_regs.c
 > +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1048,6 +1048,9 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
->  				 FEATURE(ID_AA64ISAR1_GPI));
->  		break;
->  	case SYS_ID_AA64DFR0_EL1:
-> +		/* Limit debug to ARMv8.0 */
-> +		val &= ~FEATURE(ID_AA64DFR0_DEBUGVER);
-> +		val |= FIELD_PREP(FEATURE(ID_AA64DFR0_DEBUGVER), 6);
->  		/* Limit guests to PMUv3 for ARMv8.1 */
+> @@ -1051,16 +1051,16 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+>  		/* Limit debug to ARMv8.0 */
+>  		val &= ~FEATURE(ID_AA64DFR0_DEBUGVER);
+>  		val |= FIELD_PREP(FEATURE(ID_AA64DFR0_DEBUGVER), 6);
+> -		/* Limit guests to PMUv3 for ARMv8.1 */
+> +		/* Limit guests to PMUv3 for ARMv8.4 */
 >  		val = cpuid_feature_cap_perfmon_field(val,
 >  						      ID_AA64DFR0_PMUVER_SHIFT,
+> -						      kvm_vcpu_has_pmu(vcpu) ? ID_AA64DFR0_PMUVER_8_1 : 0);
+> +						      kvm_vcpu_has_pmu(vcpu) ? ID_AA64DFR0_PMUVER_8_4 : 0);
+>  		break;
+>  	case SYS_ID_DFR0_EL1:
+> -		/* Limit guests to PMUv3 for ARMv8.1 */
+> +		/* Limit guests to PMUv3 for ARMv8.4 */
+>  		val = cpuid_feature_cap_perfmon_field(val,
+>  						      ID_DFR0_PERFMON_SHIFT,
+> -						      kvm_vcpu_has_pmu(vcpu) ? ID_DFR0_PERFMON_8_1 : 0);
+> +						      kvm_vcpu_has_pmu(vcpu) ? ID_DFR0_PERFMON_8_4 : 0);
+>  		break;
+>  	}
+>  
+> @@ -1496,6 +1496,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  
+>  	{ SYS_DESC(SYS_PMINTENSET_EL1), access_pminten, reset_unknown, PMINTENSET_EL1 },
+>  	{ SYS_DESC(SYS_PMINTENCLR_EL1), access_pminten, reset_unknown, PMINTENSET_EL1 },
+> +	{ SYS_DESC(SYS_PMMIR_EL1), trap_raz_wi },
+>  
+>  	{ SYS_DESC(SYS_MAIR_EL1), access_vm_reg, reset_unknown, MAIR_EL1 },
+>  	{ SYS_DESC(SYS_AMAIR_EL1), access_vm_reg, reset_amair_el1, AMAIR_EL1 },
+> @@ -1918,6 +1919,8 @@ static const struct sys_reg_desc cp15_regs[] = {
+>  	{ Op1( 0), CRn( 9), CRm(14), Op2( 3), access_pmovs },
+>  	{ AA32(HI), Op1( 0), CRn( 9), CRm(14), Op2( 4), access_pmceid },
+>  	{ AA32(HI), Op1( 0), CRn( 9), CRm(14), Op2( 5), access_pmceid },
+> +	/* PMMIR */
+> +	{ Op1( 0), CRn( 9), CRm(14), Op2( 6), trap_raz_wi },
+>  
+>  	/* PRRR/MAIR0 */
+>  	{ AA32(LO), Op1( 0), CRn(10), CRm( 2), Op2( 0), access_vm_reg, NULL, MAIR_EL1 },
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
