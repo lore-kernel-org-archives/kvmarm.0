@@ -2,74 +2,60 @@ Return-Path: <SRS0=cUgw=G6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F272C433E0
-	for <kvmarm@archiver.kernel.org>; Wed, 27 Jan 2021 17:24:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81CFBC433DB
+	for <kvmarm@archiver.kernel.org>; Wed, 27 Jan 2021 17:42:25 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 528D464DA5
-	for <kvmarm@archiver.kernel.org>; Wed, 27 Jan 2021 17:23:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 528D464DA5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id DE04964D9E
+	for <kvmarm@archiver.kernel.org>; Wed, 27 Jan 2021 17:42:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE04964D9E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7DE644B327;
-	Wed, 27 Jan 2021 12:23:59 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 50F874B0DD;
+	Wed, 27 Jan 2021 12:42:24 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id GTZcrhNEvZXQ; Wed, 27 Jan 2021 12:23:57 -0500 (EST)
+	with ESMTP id 2gRX9ShqN-Oj; Wed, 27 Jan 2021 12:42:23 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C79DC4B312;
-	Wed, 27 Jan 2021 12:23:57 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1CE6D4B112;
+	Wed, 27 Jan 2021 12:42:23 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D751B4B312
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jan 2021 12:23:55 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A78EC4B10C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jan 2021 12:42:21 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id safqXpvITHiQ for <kvmarm@lists.cs.columbia.edu>;
- Wed, 27 Jan 2021 12:23:54 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A6F234B29C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jan 2021 12:23:54 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 62CD064DA0;
- Wed, 27 Jan 2021 17:23:53 +0000 (UTC)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
- TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
- (envelope-from <maz@kernel.org>)
- id 1l4oXn-00AQmI-8F; Wed, 27 Jan 2021 17:23:51 +0000
-MIME-Version: 1.0
-Date: Wed, 27 Jan 2021 17:23:50 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
+ with ESMTP id qt0Li5AUE7fC for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 Jan 2021 12:42:20 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 60FC94B0DD
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jan 2021 12:42:20 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EBBE11FB;
+ Wed, 27 Jan 2021 09:42:19 -0800 (PST)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AA2D63F66E;
+ Wed, 27 Jan 2021 09:42:18 -0800 (PST)
 Subject: Re: [PATCH v2 6/7] KVM: arm64: Upgrade PMU support to ARMv8.4
-In-Reply-To: <cd3d33ff-6217-6a7f-3110-fe728d6c11be@arm.com>
+To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 References: <20210125122638.2947058-1-maz@kernel.org>
  <20210125122638.2947058-7-maz@kernel.org>
- <59700102-5340-b5ec-28e2-d95ee3e59c6b@arm.com>
- <1b594e7b1f47e372ea84f759507db0b9@kernel.org>
- <cd3d33ff-6217-6a7f-3110-fe728d6c11be@arm.com>
-User-Agent: Roundcube Webmail/1.4.10
-Message-ID: <54926337c1779a492f94f57ee63e5c69@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com,
- suzuki.poulose@arm.com, eric.auger@redhat.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kernel-team@android.com, kvmarm@lists.cs.columbia.edu
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <680c2e4f-cc9f-10c1-1158-7de32057fb0d@arm.com>
+Date: Wed, 27 Jan 2021 17:41:59 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.1
+MIME-Version: 1.0
+In-Reply-To: <20210125122638.2947058-7-maz@kernel.org>
+Content-Language: en-US
+Cc: kernel-team@android.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -81,69 +67,121 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2021-01-27 17:00, Alexandru Elisei wrote:
-> Hi Marc,
-> 
-> On 1/27/21 2:35 PM, Marc Zyngier wrote:
->> Hi Alex,
->> 
->> On 2021-01-27 14:09, Alexandru Elisei wrote:
->>> Hi Marc,
->>> 
->>> On 1/25/21 12:26 PM, Marc Zyngier wrote:
->>>> Upgrading the PMU code from ARMv8.1 to ARMv8.4 turns out to be
->>>> pretty easy. All that is required is support for PMMIR_EL1, which
->>>> is read-only, and for which returning 0 is a valid option as long
->>>> as we don't advertise STALL_SLOT as an implemented event.
->>> 
->>> According to ARM DDI 0487F.b, page D7-2743:
->>> 
->>> "If ARMv8.4-PMU is implemented:
->>> - If STALL_SLOT is not implemented, it is IMPLEMENTATION DEFINED
->>> whether the PMMIR
->>> System registers are implemented.
->>> - If STALL_SLOT is implemented, then the PMMIR System registers are
->>> implemented."
->>> 
->>> I tried to come up with a reason why PMMIR is emulated instead of 
->>> being left
->>> undefined, but I couldn't figure it out. Would you mind adding a 
->>> comment or
->>> changing the commit message to explain that?
->> 
->> The main reason is that PMMIR gets new fields down the line,
->> and doing the bare minimum in term of implementation allows
->> us to gently ease into it.
-> I think I understand what you are saying - add a bare minimum emulation 
-> of the
-> PMMIR register now so it's less work when we do decide to support the 
-> STALL_SLOT
-> event for a guest.
->> 
->> We could also go for the full PMMIR reporting on homogeneous
->> systems too, as a further improvement.
->> 
->> What do you think?
-> 
-> I don't have an opinion either way. But if you do decide to add full
-> emulation for
-> STALL_SLOT, I would like to help with reviewing the patches (I'm 
-> curious to see
-> how KVM will detect that it's running on a homogeneous system).
+Hi Marc,
 
-I'm not sure we can *detect* it. We'd need some more information
-from the core arch code and firmware. To be honest, PMU emulation
-is a joke on BL, so maybe we shouldn't really care and expose
-what we have.
+Had another look at the patch, comments below.
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+On 1/25/21 12:26 PM, Marc Zyngier wrote:
+> Upgrading the PMU code from ARMv8.1 to ARMv8.4 turns out to be
+> pretty easy. All that is required is support for PMMIR_EL1, which
+> is read-only, and for which returning 0 is a valid option as long
+> as we don't advertise STALL_SLOT as an implemented event.
+>
+> Let's just do that and adjust what we return to the guest.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/sysreg.h |  3 +++
+>  arch/arm64/kvm/pmu-emul.c       |  6 ++++++
+>  arch/arm64/kvm/sys_regs.c       | 11 +++++++----
+>  3 files changed, 16 insertions(+), 4 deletions(-)
+>
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index 8b5e7e5c3cc8..2fb3f386588c 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -846,7 +846,10 @@
+>  
+>  #define ID_DFR0_PERFMON_SHIFT		24
+>  
+> +#define ID_DFR0_PERFMON_8_0		0x3
+>  #define ID_DFR0_PERFMON_8_1		0x4
+> +#define ID_DFR0_PERFMON_8_4		0x5
+> +#define ID_DFR0_PERFMON_8_5		0x6
+>  
+>  #define ID_ISAR4_SWP_FRAC_SHIFT		28
+>  #define ID_ISAR4_PSR_M_SHIFT		24
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index 398f6df1bbe4..72cd704a8368 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -795,6 +795,12 @@ u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
+>  		base = 0;
+>  	} else {
+>  		val = read_sysreg(pmceid1_el0);
+> +		/*
+> +		 * Don't advertise STALL_SLOT, as PMMIR_EL0 is handled
+> +		 * as RAZ
+> +		 */
+> +		if (vcpu->kvm->arch.pmuver >= ID_AA64DFR0_PMUVER_8_4)
+> +			val &= ~BIT_ULL(ARMV8_PMUV3_PERFCTR_STALL_SLOT - 32);
+
+This is confusing the me. We have kvm->arch.pmuver set to the hardware PMU version
+(as set by __armv8pmu_probe_pmu()), but we ignore it when reporting the PMU
+version to the guest. Why do we do that? We limit the event number in
+kvm_pmu_event_mask() based on the hardware PMU version, so even if we advertise
+Armv8.4 PMU, support for all those extra events added by Arm8.1 PMU is missing (I
+hope I understood the code correctly).
+
+I looked at commit c854188ea010 ("KVM: arm64: limit PMU version to PMUv3 for
+ARMv8.1") which changed read_id_reg() to report PMUv3 for Armv8.1 unconditionally,
+and there's no explanation why PMUv3 for Armv8.1 was chosen instead of plain PMUv3
+(PMUVer = 0b0100).
+
+Thanks,
+
+Alex
+
+>  		base = 32;
+>  	}
+>  
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 8f79ec1fffa7..5da536ab738d 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1051,16 +1051,16 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+>  		/* Limit debug to ARMv8.0 */
+>  		val &= ~FEATURE(ID_AA64DFR0_DEBUGVER);
+>  		val |= FIELD_PREP(FEATURE(ID_AA64DFR0_DEBUGVER), 6);
+> -		/* Limit guests to PMUv3 for ARMv8.1 */
+> +		/* Limit guests to PMUv3 for ARMv8.4 */
+>  		val = cpuid_feature_cap_perfmon_field(val,
+>  						      ID_AA64DFR0_PMUVER_SHIFT,
+> -						      kvm_vcpu_has_pmu(vcpu) ? ID_AA64DFR0_PMUVER_8_1 : 0);
+> +						      kvm_vcpu_has_pmu(vcpu) ? ID_AA64DFR0_PMUVER_8_4 : 0);
+>  		break;
+>  	case SYS_ID_DFR0_EL1:
+> -		/* Limit guests to PMUv3 for ARMv8.1 */
+> +		/* Limit guests to PMUv3 for ARMv8.4 */
+>  		val = cpuid_feature_cap_perfmon_field(val,
+>  						      ID_DFR0_PERFMON_SHIFT,
+> -						      kvm_vcpu_has_pmu(vcpu) ? ID_DFR0_PERFMON_8_1 : 0);
+> +						      kvm_vcpu_has_pmu(vcpu) ? ID_DFR0_PERFMON_8_4 : 0);
+>  		break;
+>  	}
+>  
+> @@ -1496,6 +1496,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  
+>  	{ SYS_DESC(SYS_PMINTENSET_EL1), access_pminten, reset_unknown, PMINTENSET_EL1 },
+>  	{ SYS_DESC(SYS_PMINTENCLR_EL1), access_pminten, reset_unknown, PMINTENSET_EL1 },
+> +	{ SYS_DESC(SYS_PMMIR_EL1), trap_raz_wi },
+>  
+>  	{ SYS_DESC(SYS_MAIR_EL1), access_vm_reg, reset_unknown, MAIR_EL1 },
+>  	{ SYS_DESC(SYS_AMAIR_EL1), access_vm_reg, reset_amair_el1, AMAIR_EL1 },
+> @@ -1918,6 +1919,8 @@ static const struct sys_reg_desc cp15_regs[] = {
+>  	{ Op1( 0), CRn( 9), CRm(14), Op2( 3), access_pmovs },
+>  	{ AA32(HI), Op1( 0), CRn( 9), CRm(14), Op2( 4), access_pmceid },
+>  	{ AA32(HI), Op1( 0), CRn( 9), CRm(14), Op2( 5), access_pmceid },
+> +	/* PMMIR */
+> +	{ Op1( 0), CRn( 9), CRm(14), Op2( 6), trap_raz_wi },
+>  
+>  	/* PRRR/MAIR0 */
+>  	{ AA32(LO), Op1( 0), CRn(10), CRm( 2), Op2( 0), access_vm_reg, NULL, MAIR_EL1 },
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
