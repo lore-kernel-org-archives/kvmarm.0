@@ -2,97 +2,87 @@ Return-Path: <SRS0=cUgw=G6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B26F3C433E0
-	for <kvmarm@archiver.kernel.org>; Wed, 27 Jan 2021 19:34:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E2BDC433E0
+	for <kvmarm@archiver.kernel.org>; Wed, 27 Jan 2021 23:46:58 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3541C64DA3
-	for <kvmarm@archiver.kernel.org>; Wed, 27 Jan 2021 19:34:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3541C64DA3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id A7DD364DD2
+	for <kvmarm@archiver.kernel.org>; Wed, 27 Jan 2021 23:46:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7DD364DD2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A5784B38D;
-	Wed, 27 Jan 2021 14:34:29 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 01B9E4B187;
+	Wed, 27 Jan 2021 18:46:57 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id md2522RvFS6Y; Wed, 27 Jan 2021 14:34:28 -0500 (EST)
+	with ESMTP id T8Xg0oXgnypc; Wed, 27 Jan 2021 18:46:54 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D9B84B2B2;
-	Wed, 27 Jan 2021 14:34:28 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4AA794B18D;
+	Wed, 27 Jan 2021 18:46:54 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 40EB24B310
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jan 2021 13:23:24 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F5F84B18D
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jan 2021 18:46:52 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JLbYg-WiC9sG for <kvmarm@lists.cs.columbia.edu>;
- Wed, 27 Jan 2021 13:23:23 -0500 (EST)
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com
- [209.85.210.178])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F2F184B240
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jan 2021 13:23:22 -0500 (EST)
-Received: by mail-pf1-f178.google.com with SMTP id j12so1722160pfj.12
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jan 2021 10:23:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=jJRPrAWF7MFclOHB2Lr1Il6UnBQA+yMSwpuT+dr3FeE=;
- b=p+JOm0MaAq0DKLuPmm62TKPoLEb63Ivgqxil78dFCdEx4sz1UgEhA/sr1202i1f6fO
- gP7dBosWqWE8SEl5Q9bXMvRttmO8MBkch9w74sMo3b4uL32ehzuvDUOBIATwr0R0jhK0
- wGRAbqIP9ZOtS4RGRPo2nOos/oPULUsm4x6AllyAgIBAyWdz6upYM6KonsT6v1VM7h02
- rCbHzpgKaZvHxKNM2a0EAofk1HjicEqG+hgMq7srXFKGVCqhp+ey+fC+nLuHf0PTADwe
- rQtWBV+yPvFIpO4pNyMKRoWlZirWQrvsMnCt7yvFN3uXHS8Umhyg+bkawtJCTQvJHdiF
- ARtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=jJRPrAWF7MFclOHB2Lr1Il6UnBQA+yMSwpuT+dr3FeE=;
- b=ZsS1eT/pVsXlbEhto/d0sL81VJ/3szdY+USD4UPQxKDviHWacwKsJaaQYWtrivuDOd
- 8AJAK9jP33L1L/0WaAioha9qgKMkd7SFzZXCtJMSVJrqLClIjuINqGkxtS0mczVqK3p5
- t015DJtlvFgztOEqc/dn7aOcr6MYKgS9jTS5JJdv+SOHKGeMoyXuQZHiJvELjTSeVNGm
- 6/EIjPE7ygk7PwDsd3O90+iNlJSMvxwWLxsfDLhMlYMvad6yjkKmrunl1O9xFbnCsyWx
- 4jI5o54ZxowX1DkD6iRjU1MznWCdxqQEmqorur7EvX78ZQ0ytx8fXGUJvm2JEvN0TIJ8
- CeJg==
-X-Gm-Message-State: AOAM531aqw+FQ1M1zsSpxbV5a6r4dKFNTSGQtzK0ApI9WgFkx9TnuGmd
- VgMn0rciBvZOw6Yw1LZXXXVuAQ==
-X-Google-Smtp-Source: ABdhPJwSTnTQ18ANJPAv6GUZl6bhKkOAA3IiPI3vNrcPn/QyI7/VnJlki21EIEAx7yZmuM3T0cOiNg==
-X-Received: by 2002:a63:5459:: with SMTP id e25mr1610122pgm.403.1611771801851; 
- Wed, 27 Jan 2021 10:23:21 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
- by smtp.gmail.com with ESMTPSA id m73sm3022198pga.25.2021.01.27.10.23.19
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 27 Jan 2021 10:23:21 -0800 (PST)
-Date: Wed, 27 Jan 2021 10:23:14 -0800
-From: Sean Christopherson <seanjc@google.com>
-To: David Stevens <stevensd@chromium.org>
-Subject: Re: [PATCH v2] KVM: x86/mmu: consider the hva in mmu_notifier retry
-Message-ID: <YBGvku1KUUk6LPAj@google.com>
-References: <20210127024504.613844-1-stevensd@google.com>
+ with ESMTP id 1By2CpGC-cCn for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 Jan 2021 18:46:51 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B5CD4B187
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jan 2021 18:46:51 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1611791211;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=xJ/gs4iMushfcp0d07qS8uhcoreW6Bo1+Q0lKFHyKMM=;
+ b=K5q5sx0F9JmAI66uRYMLVsuL2ASVd1C1MBvfcLdioqyRaISG82gNBKRXCOrZROvGZUtiZ9
+ y8zLocIlesXDIlwnh/KO/rQHKSzyd2x9YFRztxl1jASYcsw02vT4spmDS7FUni8+tDC6VS
+ 4GxYoVfQdLf09Xl43EWhR+DbtvOVo2k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-159-WQ5wUpHQOfu8sZ2HJIUVTg-1; Wed, 27 Jan 2021 18:46:47 -0500
+X-MC-Unique: WQ5wUpHQOfu8sZ2HJIUVTg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C137E8030A0;
+ Wed, 27 Jan 2021 23:46:43 +0000 (UTC)
+Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com
+ [10.3.112.255])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E50C25C1BB;
+ Wed, 27 Jan 2021 23:46:41 +0000 (UTC)
+Date: Wed, 27 Jan 2021 16:46:41 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Keqian Zhu <zhukeqian1@huawei.com>
+Subject: Re: [PATCH v3 2/2] vfio/iommu_type1: Fix some sanity checks in
+ detach group
+Message-ID: <20210127164641.36e17bf5@omen.home.shazbot.org>
+In-Reply-To: <20210122092635.19900-3-zhukeqian1@huawei.com>
+References: <20210122092635.19900-1-zhukeqian1@huawei.com>
+ <20210122092635.19900-3-zhukeqian1@huawei.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="MkeFThl52DvUx8zi"
-Content-Disposition: inline
-In-Reply-To: <20210127024504.613844-1-stevensd@google.com>
-X-Mailman-Approved-At: Wed, 27 Jan 2021 14:34:27 -0500
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- David Hildenbrand <david@redhat.com>, linux-mips@vger.kernel.org,
- Paul Mackerras <paulus@ozlabs.org>, Claudio Imbrenda <imbrenda@linux.ibm.com>,
- kvmarm@lists.cs.columbia.edu, Janosch Frank <frankja@linux.ibm.com>,
- Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
- Huacai Chen <chenhuacai@kernel.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, kvm-ppc@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ Kirti Wankhede <kwankhede@nvidia.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
+ Joerg Roedel <joro@8bytes.org>, Daniel Lezcano <daniel.lezcano@linaro.org>,
+ Alexios Zavras <alexios.zavras@intel.com>,
+ Thomas Gleixner <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org,
  Cornelia Huck <cohuck@redhat.com>, linux-kernel@vger.kernel.org,
- Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
+ iommu@lists.linux-foundation.org, Andrew Morton <akpm@linux-foundation.org>,
+ Robin Murphy <robin.murphy@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -104,192 +94,117 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+On Fri, 22 Jan 2021 17:26:35 +0800
+Keqian Zhu <zhukeqian1@huawei.com> wrote:
 
---MkeFThl52DvUx8zi
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On Wed, Jan 27, 2021, David Stevens wrote:
-> From: David Stevens <stevensd@chromium.org>
+> vfio_sanity_check_pfn_list() is used to check whether pfn_list and
+> notifier are empty when remove the external domain, so it makes a
+> wrong assumption that only external domain will use the pinning
+> interface.
 > 
-> Track the range being invalidated by mmu_notifier and skip page fault
-> retries if the fault address is not affected by the in-progress
-> invalidation. Handle concurrent invalidations by finding the minimal
-> range which includes all ranges being invalidated. Although the combined
-> range may include unrelated addresses and cannot be shrunk as individual
-> invalidation operations complete, it is unlikely the marginal gains of
-> proper range tracking are worth the additional complexity.
+> Now we apply the pfn_list check when a vfio_dma is removed and apply
+> the notifier check when all domains are removed.
 > 
-> The primary benefit of this change is the reduction in the likelihood of
-> extreme latency when handing a page fault due to another thread having
-> been preempted while modifying host virtual addresses.
-> 
-> Signed-off-by: David Stevens <stevensd@chromium.org>
+> Fixes: a54eb55045ae ("vfio iommu type1: Add support for mediated devices")
+> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
 > ---
-> v1 -> v2:
->  - improve handling of concurrent invalidation requests by unioning
->    ranges, instead of just giving up and using [0, ULONG_MAX).
-
-Ooh, even better.
-
->  - add lockdep check
->  - code comments and formatting
+>  drivers/vfio/vfio_iommu_type1.c | 33 ++++++++++-----------------------
+>  1 file changed, 10 insertions(+), 23 deletions(-)
 > 
->  arch/powerpc/kvm/book3s_64_mmu_hv.c    |  2 +-
->  arch/powerpc/kvm/book3s_64_mmu_radix.c |  2 +-
->  arch/x86/kvm/mmu/mmu.c                 | 16 ++++++++------
->  arch/x86/kvm/mmu/paging_tmpl.h         |  7 ++++---
->  include/linux/kvm_host.h               | 27 +++++++++++++++++++++++-
->  virt/kvm/kvm_main.c                    | 29 ++++++++++++++++++++++----
->  6 files changed, 67 insertions(+), 16 deletions(-)
-> 
-
-...
-
-> @@ -3717,7 +3720,8 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
->  	mmu_seq = vcpu->kvm->mmu_notifier_seq;
->  	smp_rmb();
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index 161725395f2f..d8c10f508321 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -957,6 +957,7 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
 >  
-> -	if (try_async_pf(vcpu, prefault, gfn, gpa, &pfn, write, &map_writable))
-> +	if (try_async_pf(vcpu, prefault, gfn, gpa, &pfn, &hva,
-> +			 write, &map_writable))
->  		return RET_PF_RETRY;
->  
->  	if (handle_abnormal_pfn(vcpu, is_tdp ? 0 : gpa, gfn, pfn, ACC_ALL, &r))
-> @@ -3725,7 +3729,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
->  
->  	r = RET_PF_RETRY;
->  	spin_lock(&vcpu->kvm->mmu_lock);
-> -	if (mmu_notifier_retry(vcpu->kvm, mmu_seq))
-> +	if (mmu_notifier_retry_hva(vcpu->kvm, mmu_seq, hva))
-
-'hva' will be uninitialized at this point if the gfn did not resolve to a
-memslot, i.e. when handling an MMIO page fault.  On the plus side, that's an
-opportunity for another optimization as there is no need to retry MMIO page
-faults on mmu_notifier invalidations.  Including the attached patch as a preqreq
-to this will avoid consuming an uninitialized 'hva'.
-
-
->  		goto out_unlock;
->  	r = make_mmu_pages_available(vcpu);
->  	if (r)
-
-...
-
->  void kvm_release_pfn_clean(kvm_pfn_t pfn);
->  void kvm_release_pfn_dirty(kvm_pfn_t pfn);
-> @@ -1203,6 +1206,28 @@ static inline int mmu_notifier_retry(struct kvm *kvm, unsigned long mmu_seq)
->  		return 1;
->  	return 0;
+>  static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
+>  {
+> +	WARN_ON(!RB_EMPTY_ROOT(&dma->pfn_list));
+>  	vfio_unmap_unpin(iommu, dma, true);
+>  	vfio_unlink_dma(iommu, dma);
+>  	put_task_struct(dma->task);
+> @@ -2250,23 +2251,6 @@ static void vfio_iommu_unmap_unpin_reaccount(struct vfio_iommu *iommu)
+>  	}
 >  }
-> +
-> +static inline int mmu_notifier_retry_hva(struct kvm *kvm,
-> +					 unsigned long mmu_seq,
-> +					 unsigned long hva)
-> +{
-> +#ifdef CONFIG_LOCKDEP
-> +	lockdep_is_held(&kvm->mmu_lock);
-
-No need to manually do the #ifdef, just use lockdep_assert_held instead of
-lockdep_is_held.
-
-> +#endif
-> +	/*
-> +	 * If mmu_notifier_count is non-zero, then the range maintained by
-> +	 * kvm_mmu_notifier_invalidate_range_start contains all addresses that
-> +	 * might be being invalidated. Note that it may include some false
-> +	 * positives, due to shortcuts when handing concurrent invalidations.
-> +	 */
-> +	if (unlikely(kvm->mmu_notifier_count) &&
-> +	    kvm->mmu_notifier_range_start <= hva &&
-> +	    hva < kvm->mmu_notifier_range_end)
-
-Uber nit: I find this easier to read if 'hva' is on the left-hand side for both
-checks, i.e.
-
-	if (unlikely(kvm->mmu_notifier_count) &&
-	    hva >= kvm->mmu_notifier_range_start &&
-	    hva < kvm->mmu_notifier_range_end)
-
-> +		return 1;
-> +	if (kvm->mmu_notifier_seq != mmu_seq)
-> +		return 1;
-> +	return 0;
-> +}
->  #endif
 >  
->  #ifdef CONFIG_HAVE_KVM_IRQ_ROUTING
+> -static void vfio_sanity_check_pfn_list(struct vfio_iommu *iommu)
+> -{
+> -	struct rb_node *n;
+> -
+> -	n = rb_first(&iommu->dma_list);
+> -	for (; n; n = rb_next(n)) {
+> -		struct vfio_dma *dma;
+> -
+> -		dma = rb_entry(n, struct vfio_dma, node);
+> -
+> -		if (WARN_ON(!RB_EMPTY_ROOT(&dma->pfn_list)))
+> -			break;
+> -	}
+> -	/* mdev vendor driver must unregister notifier */
+> -	WARN_ON(iommu->notifier.head);
+> -}
+> -
+>  /*
+>   * Called when a domain is removed in detach. It is possible that
+>   * the removed domain decided the iova aperture window. Modify the
+> @@ -2366,10 +2350,10 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
+>  			kfree(group);
+>  
+>  			if (list_empty(&iommu->external_domain->group_list)) {
+> -				vfio_sanity_check_pfn_list(iommu);
+> -
+> -				if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu))
+> +				if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)) {
+> +					WARN_ON(iommu->notifier.head);
+>  					vfio_iommu_unmap_unpin_all(iommu);
+> +				}
+>  
+>  				kfree(iommu->external_domain);
+>  				iommu->external_domain = NULL;
+> @@ -2403,10 +2387,12 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
+>  		 */
+>  		if (list_empty(&domain->group_list)) {
+>  			if (list_is_singular(&iommu->domain_list)) {
+> -				if (!iommu->external_domain)
+> +				if (!iommu->external_domain) {
+> +					WARN_ON(iommu->notifier.head);
+>  					vfio_iommu_unmap_unpin_all(iommu);
+> -				else
+> +				} else {
+>  					vfio_iommu_unmap_unpin_reaccount(iommu);
+> +				}
+>  			}
+>  			iommu_domain_free(domain->domain);
+>  			list_del(&domain->next);
+> @@ -2488,9 +2474,10 @@ static void vfio_iommu_type1_release(void *iommu_data)
+>  	struct vfio_iommu *iommu = iommu_data;
+>  	struct vfio_domain *domain, *domain_tmp;
+>  
+> +	WARN_ON(iommu->notifier.head);
 
---MkeFThl52DvUx8zi
-Content-Type: text/x-diff; charset=us-ascii
-Content-Disposition: attachment;
-	filename="0001-KVM-x86-mmu-Skip-mmu_notifier-check-when-handling-MM.patch"
+I don't see that this does any harm, but isn't it actually redundant?
+It seems vfio-core only calls the iommu backend release function after
+removing all the groups, so the tests in _detach_group should catch all
+cases.  We're expecting the vfio bus/mdev driver to remove the notifier
+when a device is closed, which necessarily occurs before detaching the
+group.  Thanks,
 
-From a1bfdc6fe16582440815cfecc656313dff993003 Mon Sep 17 00:00:00 2001
-From: Sean Christopherson <seanjc@google.com>
-Date: Wed, 27 Jan 2021 10:04:45 -0800
-Subject: [PATCH] KVM: x86/mmu: Skip mmu_notifier check when handling MMIO page
- fault
+Alex
 
-Don't retry a page fault due to an mmu_notifier invalidation when
-handling a page fault for a GPA that did not resolve to a memslot, i.e.
-an MMIO page fault.  Invalidations from the mmu_notifier signal a change
-in a host virtual address (HVA) mapping; without a memslot, there is no
-HVA and thus no possibility that the invalidation is relevant to the
-page fault being handled.
-
-Note, the MMIO vs. memslot generation checks handle the case where a
-pending memslot will create a memslot overlapping the faulting GPA.  The
-mmu_notifier checks are orthogonal to memslot updates.
-
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/mmu/mmu.c         | 2 +-
- arch/x86/kvm/mmu/paging_tmpl.h | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 6d16481aa29d..9ac0a727015d 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3725,7 +3725,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
- 
- 	r = RET_PF_RETRY;
- 	spin_lock(&vcpu->kvm->mmu_lock);
--	if (mmu_notifier_retry(vcpu->kvm, mmu_seq))
-+	if (!is_noslot_pfn(pfn) && mmu_notifier_retry(vcpu->kvm, mmu_seq))
- 		goto out_unlock;
- 	r = make_mmu_pages_available(vcpu);
- 	if (r)
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 50e268eb8e1a..ab54263d857c 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -869,7 +869,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gpa_t addr, u32 error_code,
- 
- 	r = RET_PF_RETRY;
- 	spin_lock(&vcpu->kvm->mmu_lock);
--	if (mmu_notifier_retry(vcpu->kvm, mmu_seq))
-+	if (!is_noslot_pfn(pfn) && mmu_notifier_retry(vcpu->kvm, mmu_seq))
- 		goto out_unlock;
- 
- 	kvm_mmu_audit(vcpu, AUDIT_PRE_PAGE_FAULT);
--- 
-2.30.0.280.ga3ce27912f-goog
-
-
---MkeFThl52DvUx8zi
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+> +
+>  	if (iommu->external_domain) {
+>  		vfio_release_domain(iommu->external_domain, true);
+> -		vfio_sanity_check_pfn_list(iommu);
+>  		kfree(iommu->external_domain);
+>  	}
+>  
 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---MkeFThl52DvUx8zi--
