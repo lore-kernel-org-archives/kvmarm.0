@@ -2,59 +2,80 @@ Return-Path: <SRS0=cUgw=G6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81CFBC433DB
-	for <kvmarm@archiver.kernel.org>; Wed, 27 Jan 2021 17:42:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0C7BC433E0
+	for <kvmarm@archiver.kernel.org>; Wed, 27 Jan 2021 17:53:37 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DE04964D9E
-	for <kvmarm@archiver.kernel.org>; Wed, 27 Jan 2021 17:42:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE04964D9E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 16CF264DA9
+	for <kvmarm@archiver.kernel.org>; Wed, 27 Jan 2021 17:53:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16CF264DA9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 50F874B0DD;
-	Wed, 27 Jan 2021 12:42:24 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6ADF84B375;
+	Wed, 27 Jan 2021 12:53:36 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 2gRX9ShqN-Oj; Wed, 27 Jan 2021 12:42:23 -0500 (EST)
+	with ESMTP id gRs6TbRBDFBw; Wed, 27 Jan 2021 12:53:35 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1CE6D4B112;
-	Wed, 27 Jan 2021 12:42:23 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 486914B378;
+	Wed, 27 Jan 2021 12:53:35 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A78EC4B10C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jan 2021 12:42:21 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C3D394B375
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jan 2021 12:53:34 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qt0Li5AUE7fC for <kvmarm@lists.cs.columbia.edu>;
- Wed, 27 Jan 2021 12:42:20 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 60FC94B0DD
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jan 2021 12:42:20 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EBBE11FB;
- Wed, 27 Jan 2021 09:42:19 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AA2D63F66E;
- Wed, 27 Jan 2021 09:42:18 -0800 (PST)
+ with ESMTP id 9Maa3RsUPv9W for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 Jan 2021 12:53:33 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D7EA94B2EC
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jan 2021 12:53:33 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1611770013;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=gs9byxXxo31pA4w9DE/K2vaqzS8xJ0Ib6K2RN5jnLMA=;
+ b=a50hDi04xAIz3Xn3RFJ7XHPgS+U8mrrJ34o3/rigsVr2ZgYRhUsyEz02eB8ZxFu+lC4yrH
+ 4Vy+vl7pvOwBjB+Ac1Sq+A5rRXELCS8StUITwg5Krp+wVx9uKsjroX+5YGNeI3QgsOOY1T
+ bsdOKlQwO7f38XxS/nqzgcmbOeGLZMg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-8-SIok_f7_N8iL113M3FlO1w-1; Wed, 27 Jan 2021 12:53:31 -0500
+X-MC-Unique: SIok_f7_N8iL113M3FlO1w-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2FE4C190A7A2;
+ Wed, 27 Jan 2021 17:53:29 +0000 (UTC)
+Received: from [10.36.113.217] (ovpn-113-217.ams2.redhat.com [10.36.113.217])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CDFD06F940;
+ Wed, 27 Jan 2021 17:53:25 +0000 (UTC)
 Subject: Re: [PATCH v2 6/7] KVM: arm64: Upgrade PMU support to ARMv8.4
 To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
  kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 References: <20210125122638.2947058-1-maz@kernel.org>
  <20210125122638.2947058-7-maz@kernel.org>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <680c2e4f-cc9f-10c1-1158-7de32057fb0d@arm.com>
-Date: Wed, 27 Jan 2021 17:41:59 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.1
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <56041147-0bd8-dbb2-d1ca-550f3db7f05d@redhat.com>
+Date: Wed, 27 Jan 2021 18:53:23 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
 In-Reply-To: <20210125122638.2947058-7-maz@kernel.org>
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Cc: kernel-team@android.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -74,23 +95,21 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Hi Marc,
 
-Had another look at the patch, comments below.
-
-On 1/25/21 12:26 PM, Marc Zyngier wrote:
+On 1/25/21 1:26 PM, Marc Zyngier wrote:
 > Upgrading the PMU code from ARMv8.1 to ARMv8.4 turns out to be
 > pretty easy. All that is required is support for PMMIR_EL1, which
 > is read-only, and for which returning 0 is a valid option as long
 > as we don't advertise STALL_SLOT as an implemented event.
->
+> 
 > Let's just do that and adjust what we return to the guest.
->
+> 
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
 >  arch/arm64/include/asm/sysreg.h |  3 +++
 >  arch/arm64/kvm/pmu-emul.c       |  6 ++++++
 >  arch/arm64/kvm/sys_regs.c       | 11 +++++++----
 >  3 files changed, 16 insertions(+), 4 deletions(-)
->
+> 
 > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
 > index 8b5e7e5c3cc8..2fb3f386588c 100644
 > --- a/arch/arm64/include/asm/sysreg.h
@@ -120,23 +139,7 @@ On 1/25/21 12:26 PM, Marc Zyngier wrote:
 > +		 */
 > +		if (vcpu->kvm->arch.pmuver >= ID_AA64DFR0_PMUVER_8_4)
 > +			val &= ~BIT_ULL(ARMV8_PMUV3_PERFCTR_STALL_SLOT - 32);
-
-This is confusing the me. We have kvm->arch.pmuver set to the hardware PMU version
-(as set by __armv8pmu_probe_pmu()), but we ignore it when reporting the PMU
-version to the guest. Why do we do that? We limit the event number in
-kvm_pmu_event_mask() based on the hardware PMU version, so even if we advertise
-Armv8.4 PMU, support for all those extra events added by Arm8.1 PMU is missing (I
-hope I understood the code correctly).
-
-I looked at commit c854188ea010 ("KVM: arm64: limit PMU version to PMUv3 for
-ARMv8.1") which changed read_id_reg() to report PMUv3 for Armv8.1 unconditionally,
-and there's no explanation why PMUv3 for Armv8.1 was chosen instead of plain PMUv3
-(PMUVer = 0b0100).
-
-Thanks,
-
-Alex
-
+what about the STALL_SLOT_BACKEND and FRONTEND events then?
 >  		base = 32;
 >  	}
 >  
@@ -169,6 +172,8 @@ Alex
 >  
 >  	{ SYS_DESC(SYS_PMINTENSET_EL1), access_pminten, reset_unknown, PMINTENSET_EL1 },
 >  	{ SYS_DESC(SYS_PMINTENCLR_EL1), access_pminten, reset_unknown, PMINTENSET_EL1 },
+"KVM: arm64: Hide PMU registers from userspace when not available"
+changed the above, doesn't it?
 > +	{ SYS_DESC(SYS_PMMIR_EL1), trap_raz_wi },
 >  
 >  	{ SYS_DESC(SYS_MAIR_EL1), access_vm_reg, reset_unknown, MAIR_EL1 },
@@ -182,6 +187,11 @@ Alex
 >  
 >  	/* PRRR/MAIR0 */
 >  	{ AA32(LO), Op1( 0), CRn(10), CRm( 2), Op2( 0), access_vm_reg, NULL, MAIR_EL1 },
+> 
+Thanks
+
+Eric
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
