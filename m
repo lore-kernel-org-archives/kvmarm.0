@@ -2,56 +2,57 @@ Return-Path: <SRS0=rJEk=G7=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50E3DC433E6
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Jan 2021 15:18:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 846B3C433E0
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Jan 2021 15:18:43 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BC76B64DF0
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Jan 2021 15:18:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC76B64DF0
+	by mail.kernel.org (Postfix) with ESMTP id 054D464DED
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Jan 2021 15:18:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 054D464DED
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5ABFE4B18A;
-	Thu, 28 Jan 2021 10:18:29 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 884E94B0FC;
+	Thu, 28 Jan 2021 10:18:42 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pgXLhkx1OKcu; Thu, 28 Jan 2021 10:18:28 -0500 (EST)
+	with ESMTP id cVLYPPjwq62l; Thu, 28 Jan 2021 10:18:41 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D4E34B224;
-	Thu, 28 Jan 2021 10:18:28 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DF304B141;
+	Thu, 28 Jan 2021 10:18:41 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F0CCD4B204
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2021 10:18:24 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FD7A4B0FC
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2021 10:18:40 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FfKSBtHZYeEQ for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 Jan 2021 10:18:24 -0500 (EST)
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1AE724B1FB
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2021 10:18:13 -0500 (EST)
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.59])
- by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4DRPG952hDzjDTX;
- Thu, 28 Jan 2021 23:17:05 +0800 (CST)
+ with ESMTP id M7j+jqruUI1P for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 Jan 2021 10:18:39 -0500 (EST)
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D1D2A4B12F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2021 10:18:38 -0500 (EST)
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
+ by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4DRPG06S7Dz7btQ;
+ Thu, 28 Jan 2021 23:16:56 +0800 (CST)
 Received: from DESKTOP-5IS4806.china.huawei.com (10.174.184.42) by
  DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
- 14.3.498.0; Thu, 28 Jan 2021 23:17:55 +0800
+ 14.3.498.0; Thu, 28 Jan 2021 23:18:02 +0800
 From: Keqian Zhu <zhukeqian1@huawei.com>
 To: <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
  <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
  <iommu@lists.linux-foundation.org>, Will Deacon <will@kernel.org>, "Alex
  Williamson" <alex.williamson@redhat.com>, Marc Zyngier <maz@kernel.org>,
  Catalin Marinas <catalin.marinas@arm.com>
-Subject: [RFC PATCH 02/11] iommu/arm-smmu-v3: Enable HTTU for SMMU stage1
- mapping
-Date: Thu, 28 Jan 2021 23:17:33 +0800
-Message-ID: <20210128151742.18840-3-zhukeqian1@huawei.com>
+Subject: [RFC PATCH 10/11] vfio/iommu_type1: Optimize dirty bitmap population
+ based on iommu HWDBM
+Date: Thu, 28 Jan 2021 23:17:41 +0800
+Message-ID: <20210128151742.18840-11-zhukeqian1@huawei.com>
 X-Mailer: git-send-email 2.8.4.windows.1
 In-Reply-To: <20210128151742.18840-1-zhukeqian1@huawei.com>
 References: <20210128151742.18840-1-zhukeqian1@huawei.com>
@@ -78,76 +79,166 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: jiangkunkun <jiangkunkun@huawei.com>
 
-If HTTU is supported, we enable HA/HD bits in the SMMU CD (stage 1
-mapping), and set DBM bit for writable TTD.
-
-The dirty state information is encoded using the access permission
-bits AP[2] (stage 1) or S2AP[1] (stage 2) in conjunction with the
-DBM (Dirty Bit Modifier) bit, where DBM means writable and AP[2]/
-S2AP[1] means dirty.
+In the past if vfio_iommu is not of pinned_page_dirty_scope and
+vfio_dma is iommu_mapped, we populate full dirty bitmap for this
+vfio_dma. Now we can try to get dirty log from iommu before make
+the lousy decision.
 
 Co-developed-by: Keqian Zhu <zhukeqian1@huawei.com>
 Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
 ---
- drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 5 +++++
- drivers/iommu/io-pgtable-arm.c              | 7 ++++++-
- 2 files changed, 11 insertions(+), 1 deletion(-)
+ drivers/vfio/vfio_iommu_type1.c | 97 ++++++++++++++++++++++++++++++++-
+ 1 file changed, 94 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-index 0f0fe71cc10d..8cc9d7536b08 100644
---- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-+++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-@@ -1036,6 +1036,11 @@ int arm_smmu_write_ctx_desc(struct arm_smmu_domain *smmu_domain, int ssid,
- 			FIELD_PREP(CTXDESC_CD_0_ASID, cd->asid) |
- 			CTXDESC_CD_0_V;
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index 3b8522ebf955..1cd10f3e7ed4 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -999,6 +999,25 @@ static bool vfio_group_supports_hwdbm(struct vfio_group *group)
+ 	return true;
+ }
  
-+		if (smmu->features & ARM_SMMU_FEAT_HTTU_HA)
-+			val |= CTXDESC_CD_0_HA;
-+		if (smmu->features & ARM_SMMU_FEAT_HTTU_HD)
-+			val |= CTXDESC_CD_0_HD;
++static int vfio_iommu_dirty_log_clear(struct vfio_iommu *iommu,
++				      dma_addr_t start_iova, size_t size,
++				      unsigned long *bitmap_buffer,
++				      dma_addr_t base_iova, size_t pgsize)
++{
++	struct vfio_domain *d;
++	unsigned long pgshift = __ffs(pgsize);
++	int ret;
 +
- 		/* STALL_MODEL==0b10 && CD.S==0 is ILLEGAL */
- 		if (smmu->features & ARM_SMMU_FEAT_STALL_FORCE)
- 			val |= CTXDESC_CD_0_S;
-diff --git a/drivers/iommu/io-pgtable-arm.c b/drivers/iommu/io-pgtable-arm.c
-index 87def58e79b5..e299a44808ae 100644
---- a/drivers/iommu/io-pgtable-arm.c
-+++ b/drivers/iommu/io-pgtable-arm.c
-@@ -72,6 +72,7 @@
++	list_for_each_entry(d, &iommu->domain_list, next) {
++		ret = iommu_clear_dirty_log(d->domain, start_iova, size,
++					    bitmap_buffer, base_iova, pgshift);
++		if (ret)
++			return ret;
++	}
++
++	return 0;
++}
++
+ static int update_user_bitmap(u64 __user *bitmap, struct vfio_iommu *iommu,
+ 			      struct vfio_dma *dma, dma_addr_t base_iova,
+ 			      size_t pgsize)
+@@ -1010,13 +1029,28 @@ static int update_user_bitmap(u64 __user *bitmap, struct vfio_iommu *iommu,
+ 	unsigned long shift = bit_offset % BITS_PER_LONG;
+ 	unsigned long leftover;
  
- #define ARM_LPAE_PTE_NSTABLE		(((arm_lpae_iopte)1) << 63)
- #define ARM_LPAE_PTE_XN			(((arm_lpae_iopte)3) << 53)
-+#define ARM_LPAE_PTE_DBM		(((arm_lpae_iopte)1) << 51)
- #define ARM_LPAE_PTE_AF			(((arm_lpae_iopte)1) << 10)
- #define ARM_LPAE_PTE_SH_NS		(((arm_lpae_iopte)0) << 8)
- #define ARM_LPAE_PTE_SH_OS		(((arm_lpae_iopte)2) << 8)
-@@ -81,7 +82,7 @@
++	if (iommu->pinned_page_dirty_scope || !dma->iommu_mapped)
++		goto bitmap_done;
++
++	/* try to get dirty log from IOMMU */
++	if (!iommu->num_non_hwdbm_groups) {
++		struct vfio_domain *d;
++
++		list_for_each_entry(d, &iommu->domain_list, next) {
++			if (iommu_sync_dirty_log(d->domain, dma->iova, dma->size,
++						dma->bitmap, dma->iova, pgshift))
++				return -EFAULT;
++		}
++		goto bitmap_done;
++	}
++
+ 	/*
+ 	 * mark all pages dirty if any IOMMU capable device is not able
+ 	 * to report dirty pages and all pages are pinned and mapped.
+ 	 */
+-	if (!iommu->pinned_page_dirty_scope && dma->iommu_mapped)
+-		bitmap_set(dma->bitmap, 0, nbits);
++	bitmap_set(dma->bitmap, 0, nbits);
  
- #define ARM_LPAE_PTE_ATTR_LO_MASK	(((arm_lpae_iopte)0x3ff) << 2)
- /* Ignore the contiguous bit for block splitting */
--#define ARM_LPAE_PTE_ATTR_HI_MASK	(((arm_lpae_iopte)6) << 52)
-+#define ARM_LPAE_PTE_ATTR_HI_MASK	(((arm_lpae_iopte)13) << 51)
- #define ARM_LPAE_PTE_ATTR_MASK		(ARM_LPAE_PTE_ATTR_LO_MASK |	\
- 					 ARM_LPAE_PTE_ATTR_HI_MASK)
- /* Software bit for solving coherency races */
-@@ -379,6 +380,7 @@ static int __arm_lpae_map(struct arm_lpae_io_pgtable *data, unsigned long iova,
- static arm_lpae_iopte arm_lpae_prot_to_pte(struct arm_lpae_io_pgtable *data,
- 					   int prot)
++bitmap_done:
+ 	if (shift) {
+ 		bitmap_shift_left(dma->bitmap, dma->bitmap, shift,
+ 				  nbits + shift);
+@@ -1078,6 +1112,18 @@ static int vfio_iova_dirty_bitmap(u64 __user *bitmap, struct vfio_iommu *iommu,
+ 		 */
+ 		bitmap_clear(dma->bitmap, 0, dma->size >> pgshift);
+ 		vfio_dma_populate_bitmap(dma, pgsize);
++
++		/* Clear iommu dirty log to re-enable dirty log tracking */
++		if (!iommu->pinned_page_dirty_scope &&
++		    dma->iommu_mapped && !iommu->num_non_hwdbm_groups) {
++			ret = vfio_iommu_dirty_log_clear(iommu,	dma->iova,
++					dma->size, dma->bitmap, dma->iova,
++					pgsize);
++			if (ret) {
++				pr_warn("dma dirty log clear failed!\n");
++				return ret;
++			}
++		}
+ 	}
+ 	return 0;
+ }
+@@ -2780,6 +2826,48 @@ static int vfio_iommu_type1_unmap_dma(struct vfio_iommu *iommu,
+ 			-EFAULT : 0;
+ }
+ 
++static void vfio_dma_dirty_log_start(struct vfio_iommu *iommu,
++				     struct vfio_dma *dma)
++{
++	struct vfio_domain *d;
++
++	list_for_each_entry(d, &iommu->domain_list, next) {
++		/* Go through all domain anyway even if we fail */
++		iommu_split_block(d->domain, dma->iova, dma->size);
++	}
++}
++
++static void vfio_dma_dirty_log_stop(struct vfio_iommu *iommu,
++				    struct vfio_dma *dma)
++{
++	struct vfio_domain *d;
++
++	list_for_each_entry(d, &iommu->domain_list, next) {
++		/* Go through all domain anyway even if we fail */
++		iommu_merge_page(d->domain, dma->iova, dma->size,
++				 d->prot | dma->prot);
++	}
++}
++
++static void vfio_iommu_dirty_log_switch(struct vfio_iommu *iommu, bool start)
++{
++	struct rb_node *n;
++
++	/* Split and merge even if all iommu don't support HWDBM now */
++	for (n = rb_first(&iommu->dma_list); n; n = rb_next(n)) {
++		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
++
++		if (!dma->iommu_mapped)
++			continue;
++
++		/* Go through all dma range anyway even if we fail */
++		if (start)
++			vfio_dma_dirty_log_start(iommu, dma);
++		else
++			vfio_dma_dirty_log_stop(iommu, dma);
++	}
++}
++
+ static int vfio_iommu_type1_dirty_pages(struct vfio_iommu *iommu,
+ 					unsigned long arg)
  {
-+	struct io_pgtable_cfg *cfg = &data->iop.cfg;
- 	arm_lpae_iopte pte;
- 
- 	if (data->iop.fmt == ARM_64_LPAE_S1 ||
-@@ -386,6 +388,9 @@ static arm_lpae_iopte arm_lpae_prot_to_pte(struct arm_lpae_io_pgtable *data,
- 		pte = ARM_LPAE_PTE_nG;
- 		if (!(prot & IOMMU_WRITE) && (prot & IOMMU_READ))
- 			pte |= ARM_LPAE_PTE_AP_RDONLY;
-+		else if (cfg->httu_hd)
-+			pte |= ARM_LPAE_PTE_DBM;
-+
- 		if (!(prot & IOMMU_PRIV))
- 			pte |= ARM_LPAE_PTE_AP_UNPRIV;
- 	} else {
+@@ -2812,8 +2900,10 @@ static int vfio_iommu_type1_dirty_pages(struct vfio_iommu *iommu,
+ 		pgsize = 1 << __ffs(iommu->pgsize_bitmap);
+ 		if (!iommu->dirty_page_tracking) {
+ 			ret = vfio_dma_bitmap_alloc_all(iommu, pgsize);
+-			if (!ret)
++			if (!ret) {
+ 				iommu->dirty_page_tracking = true;
++				vfio_iommu_dirty_log_switch(iommu, true);
++			}
+ 		}
+ 		mutex_unlock(&iommu->lock);
+ 		return ret;
+@@ -2822,6 +2912,7 @@ static int vfio_iommu_type1_dirty_pages(struct vfio_iommu *iommu,
+ 		if (iommu->dirty_page_tracking) {
+ 			iommu->dirty_page_tracking = false;
+ 			vfio_dma_bitmap_free_all(iommu);
++			vfio_iommu_dirty_log_switch(iommu, false);
+ 		}
+ 		mutex_unlock(&iommu->lock);
+ 		return 0;
 -- 
 2.19.1
 
