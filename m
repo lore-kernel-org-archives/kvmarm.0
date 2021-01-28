@@ -2,56 +2,55 @@ Return-Path: <SRS0=rJEk=G7=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 805BCC433DB
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Jan 2021 15:18:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B3DDC43381
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Jan 2021 15:18:17 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E16D764DE5
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Jan 2021 15:18:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E16D764DE5
+	by mail.kernel.org (Postfix) with ESMTP id 131BE64DE5
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Jan 2021 15:18:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 131BE64DE5
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 558444B21A;
-	Thu, 28 Jan 2021 10:18:15 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A826C4B201;
+	Thu, 28 Jan 2021 10:18:16 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id RmeBCHV+9WTP; Thu, 28 Jan 2021 10:18:13 -0500 (EST)
+	with ESMTP id uzhklXZLtotF; Thu, 28 Jan 2021 10:18:15 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 55C5E4B225;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C0454B22B;
 	Thu, 28 Jan 2021 10:18:13 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2687D4B133
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2021 10:18:10 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0AEC44B1E2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2021 10:18:11 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sxKENtNQwFjp for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 Jan 2021 10:18:08 -0500 (EST)
+ with ESMTP id jksVEq2gdYXy for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 Jan 2021 10:18:10 -0500 (EST)
 Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7D9D84B140
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2021 10:18:07 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9B8754B1F9
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2021 10:18:09 -0500 (EST)
 Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.59])
- by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4DRPG943JhzjDT7;
+ by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4DRPG93c68zjDPv;
  Thu, 28 Jan 2021 23:17:05 +0800 (CST)
 Received: from DESKTOP-5IS4806.china.huawei.com (10.174.184.42) by
  DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
- 14.3.498.0; Thu, 28 Jan 2021 23:17:57 +0800
+ 14.3.498.0; Thu, 28 Jan 2021 23:17:56 +0800
 From: Keqian Zhu <zhukeqian1@huawei.com>
 To: <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
  <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
  <iommu@lists.linux-foundation.org>, Will Deacon <will@kernel.org>, "Alex
  Williamson" <alex.williamson@redhat.com>, Marc Zyngier <maz@kernel.org>,
  Catalin Marinas <catalin.marinas@arm.com>
-Subject: [RFC PATCH 04/11] iommu/arm-smmu-v3: Split block descriptor to a span
- of page
-Date: Thu, 28 Jan 2021 23:17:35 +0800
-Message-ID: <20210128151742.18840-5-zhukeqian1@huawei.com>
+Subject: [RFC PATCH 03/11] iommu/arm-smmu-v3: Add feature detection for BBML
+Date: Thu, 28 Jan 2021 23:17:34 +0800
+Message-ID: <20210128151742.18840-4-zhukeqian1@huawei.com>
 X-Mailer: git-send-email 2.8.4.windows.1
 In-Reply-To: <20210128151742.18840-1-zhukeqian1@huawei.com>
 References: <20210128151742.18840-1-zhukeqian1@huawei.com>
@@ -78,310 +77,114 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: jiangkunkun <jiangkunkun@huawei.com>
 
-Block descriptor is not a proper granule for dirty log tracking. This
-adds a new interface named split_block in iommu layer and arm smmuv3
-implements it, which splits block descriptor to an equivalent span of
-page descriptors.
+When altering a translation table descriptor of some specific reasons,
+we require break-before-make procedure. But it might cause problems when
+the TTD is alive. The I/O streams might not tolerate translation faults.
 
-During spliting block, other interfaces are not expected to be working,
-so race condition does not exist. And we flush all iotlbs after the split
-procedure is completed to ease the pressure of iommu, as we will split a
-huge range of block mappings in general.
+If the SMMU supports BBML level 1 or BBML level 2, we can change the block
+size without using break-before-make.
+
+This adds feature detection for BBML, none functional change.
 
 Co-developed-by: Keqian Zhu <zhukeqian1@huawei.com>
 Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
 ---
- drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c |  20 ++++
- drivers/iommu/io-pgtable-arm.c              | 122 ++++++++++++++++++++
- drivers/iommu/iommu.c                       |  40 +++++++
- include/linux/io-pgtable.h                  |   2 +
- include/linux/iommu.h                       |  10 ++
- 5 files changed, 194 insertions(+)
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 24 ++++++++++++++++++++-
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h |  6 ++++++
+ include/linux/io-pgtable.h                  |  1 +
+ 3 files changed, 30 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-index 9208881a571c..5469f4fca820 100644
+index 8cc9d7536b08..9208881a571c 100644
 --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
 +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-@@ -2510,6 +2510,25 @@ static int arm_smmu_domain_set_attr(struct iommu_domain *domain,
- 	return ret;
- }
- 
-+static size_t arm_smmu_split_block(struct iommu_domain *domain,
-+				   unsigned long iova, size_t size)
-+{
-+	struct arm_smmu_device *smmu = to_smmu_domain(domain)->smmu;
-+	struct io_pgtable_ops *ops = to_smmu_domain(domain)->pgtbl_ops;
-+
-+	if (!(smmu->features & (ARM_SMMU_FEAT_BBML1 | ARM_SMMU_FEAT_BBML2))) {
-+		dev_err(smmu->dev, "don't support BBML1/2 and split block\n");
-+		return 0;
-+	}
-+
-+	if (!ops || !ops->split_block) {
-+		pr_err("don't support split block\n");
-+		return 0;
-+	}
-+
-+	return ops->split_block(ops, iova, size);
-+}
-+
- static int arm_smmu_of_xlate(struct device *dev, struct of_phandle_args *args)
+@@ -1947,7 +1947,7 @@ static int arm_smmu_domain_finalise_s2(struct arm_smmu_domain *smmu_domain,
+ static int arm_smmu_domain_finalise(struct iommu_domain *domain,
+ 				    struct arm_smmu_master *master)
  {
- 	return iommu_fwspec_add_ids(dev, args->args, 1);
-@@ -2609,6 +2628,7 @@ static struct iommu_ops arm_smmu_ops = {
- 	.device_group		= arm_smmu_device_group,
- 	.domain_get_attr	= arm_smmu_domain_get_attr,
- 	.domain_set_attr	= arm_smmu_domain_set_attr,
-+	.split_block		= arm_smmu_split_block,
- 	.of_xlate		= arm_smmu_of_xlate,
- 	.get_resv_regions	= arm_smmu_get_resv_regions,
- 	.put_resv_regions	= generic_iommu_put_resv_regions,
-diff --git a/drivers/iommu/io-pgtable-arm.c b/drivers/iommu/io-pgtable-arm.c
-index e299a44808ae..f3b7f7115e38 100644
---- a/drivers/iommu/io-pgtable-arm.c
-+++ b/drivers/iommu/io-pgtable-arm.c
-@@ -79,6 +79,8 @@
- #define ARM_LPAE_PTE_SH_IS		(((arm_lpae_iopte)3) << 8)
- #define ARM_LPAE_PTE_NS			(((arm_lpae_iopte)1) << 5)
- #define ARM_LPAE_PTE_VALID		(((arm_lpae_iopte)1) << 0)
-+/* Block descriptor bits */
-+#define ARM_LPAE_PTE_NT			(((arm_lpae_iopte)1) << 16)
+-	int ret;
++	int ret, bbml;
+ 	unsigned long ias, oas;
+ 	enum io_pgtable_fmt fmt;
+ 	struct io_pgtable_cfg pgtbl_cfg;
+@@ -1988,12 +1988,20 @@ static int arm_smmu_domain_finalise(struct iommu_domain *domain,
+ 		return -EINVAL;
+ 	}
  
- #define ARM_LPAE_PTE_ATTR_LO_MASK	(((arm_lpae_iopte)0x3ff) << 2)
- /* Ignore the contiguous bit for block splitting */
-@@ -679,6 +681,125 @@ static phys_addr_t arm_lpae_iova_to_phys(struct io_pgtable_ops *ops,
- 	return iopte_to_paddr(pte, data) | iova;
- }
- 
-+static size_t __arm_lpae_split_block(struct arm_lpae_io_pgtable *data,
-+				     unsigned long iova, size_t size, int lvl,
-+				     arm_lpae_iopte *ptep);
++	if (smmu->features & ARM_SMMU_FEAT_BBML2)
++		bbml = 2;
++	else if (smmu->features & ARM_SMMU_FEAT_BBML1)
++		bbml = 1;
++	else
++		bbml = 0;
 +
-+static size_t arm_lpae_do_split_blk(struct arm_lpae_io_pgtable *data,
-+				    unsigned long iova, size_t size,
-+				    arm_lpae_iopte blk_pte, int lvl,
-+				    arm_lpae_iopte *ptep)
-+{
-+	struct io_pgtable_cfg *cfg = &data->iop.cfg;
-+	arm_lpae_iopte pte, *tablep;
-+	phys_addr_t blk_paddr;
-+	size_t tablesz = ARM_LPAE_GRANULE(data);
-+	size_t split_sz = ARM_LPAE_BLOCK_SIZE(lvl, data);
-+	int i;
-+
-+	if (WARN_ON(lvl == ARM_LPAE_MAX_LEVELS))
-+		return 0;
-+
-+	tablep = __arm_lpae_alloc_pages(tablesz, GFP_ATOMIC, cfg);
-+	if (!tablep)
-+		return 0;
-+
-+	blk_paddr = iopte_to_paddr(blk_pte, data);
-+	pte = iopte_prot(blk_pte);
-+	for (i = 0; i < tablesz / sizeof(pte); i++, blk_paddr += split_sz)
-+		__arm_lpae_init_pte(data, blk_paddr, pte, lvl, &tablep[i]);
-+
-+	if (cfg->bbml == 1) {
-+		/* Race does not exist */
-+		blk_pte |= ARM_LPAE_PTE_NT;
-+		__arm_lpae_set_pte(ptep, blk_pte, cfg);
-+		io_pgtable_tlb_flush_walk(&data->iop, iova, size, size);
-+	}
-+	/* Race does not exist */
-+	pte = arm_lpae_install_table(tablep, ptep, blk_pte, cfg);
-+
-+	/* Have splited it into page? */
-+	if (lvl == (ARM_LPAE_MAX_LEVELS - 1))
-+		return size;
-+
-+	/* Go back to lvl - 1 */
-+	ptep -= ARM_LPAE_LVL_IDX(iova, lvl - 1, data);
-+	return __arm_lpae_split_block(data, iova, size, lvl - 1, ptep);
-+}
-+
-+static size_t __arm_lpae_split_block(struct arm_lpae_io_pgtable *data,
-+				     unsigned long iova, size_t size, int lvl,
-+				     arm_lpae_iopte *ptep)
-+{
-+	arm_lpae_iopte pte;
-+	struct io_pgtable *iop = &data->iop;
-+	size_t base, next_size, total_size;
-+
-+	if (WARN_ON(lvl == ARM_LPAE_MAX_LEVELS))
-+		return 0;
-+
-+	ptep += ARM_LPAE_LVL_IDX(iova, lvl, data);
-+	pte = READ_ONCE(*ptep);
-+	if (WARN_ON(!pte))
-+		return 0;
-+
-+	if (size == ARM_LPAE_BLOCK_SIZE(lvl, data)) {
-+		if (iopte_leaf(pte, lvl, iop->fmt)) {
-+			if (lvl == (ARM_LPAE_MAX_LEVELS - 1) ||
-+			    (pte & ARM_LPAE_PTE_AP_RDONLY))
-+				return size;
-+
-+			/* We find a writable block, split it. */
-+			return arm_lpae_do_split_blk(data, iova, size, pte,
-+					lvl + 1, ptep);
-+		} else {
-+			/* If it is the last table level, then nothing to do */
-+			if (lvl == (ARM_LPAE_MAX_LEVELS - 2))
-+				return size;
-+
-+			total_size = 0;
-+			next_size = ARM_LPAE_BLOCK_SIZE(lvl + 1, data);
-+			ptep = iopte_deref(pte, data);
-+			for (base = 0; base < size; base += next_size)
-+				total_size += __arm_lpae_split_block(data,
-+						iova + base, next_size, lvl + 1,
-+						ptep);
-+			return total_size;
-+		}
-+	} else if (iopte_leaf(pte, lvl, iop->fmt)) {
-+		WARN(1, "Can't split behind a block.\n");
-+		return 0;
-+	}
-+
-+	/* Keep on walkin */
-+	ptep = iopte_deref(pte, data);
-+	return __arm_lpae_split_block(data, iova, size, lvl + 1, ptep);
-+}
-+
-+static size_t arm_lpae_split_block(struct io_pgtable_ops *ops,
-+				   unsigned long iova, size_t size)
-+{
-+	struct arm_lpae_io_pgtable *data = io_pgtable_ops_to_data(ops);
-+	arm_lpae_iopte *ptep = data->pgd;
-+	struct io_pgtable_cfg *cfg = &data->iop.cfg;
-+	int lvl = data->start_level;
-+	long iaext = (s64)iova >> cfg->ias;
-+
-+	if (WARN_ON(!size || (size & cfg->pgsize_bitmap) != size))
-+		return 0;
-+
-+	if (cfg->quirks & IO_PGTABLE_QUIRK_ARM_TTBR1)
-+		iaext = ~iaext;
-+	if (WARN_ON(iaext))
-+		return 0;
-+
-+	/* If it is smallest granule, then nothing to do */
-+	if (size == ARM_LPAE_BLOCK_SIZE(ARM_LPAE_MAX_LEVELS - 1, data))
-+		return size;
-+
-+	return __arm_lpae_split_block(data, iova, size, lvl, ptep);
-+}
-+
- static void arm_lpae_restrict_pgsizes(struct io_pgtable_cfg *cfg)
- {
- 	unsigned long granule, page_sizes;
-@@ -757,6 +878,7 @@ arm_lpae_alloc_pgtable(struct io_pgtable_cfg *cfg)
- 		.map		= arm_lpae_map,
- 		.unmap		= arm_lpae_unmap,
- 		.iova_to_phys	= arm_lpae_iova_to_phys,
-+		.split_block	= arm_lpae_split_block,
+ 	pgtbl_cfg = (struct io_pgtable_cfg) {
+ 		.pgsize_bitmap	= smmu->pgsize_bitmap,
+ 		.ias		= ias,
+ 		.oas		= oas,
+ 		.httu_hd	= smmu->features & ARM_SMMU_FEAT_HTTU_HD,
+ 		.coherent_walk	= smmu->features & ARM_SMMU_FEAT_COHERENCY,
++		.bbml		= bbml,
+ 		.tlb		= &arm_smmu_flush_ops,
+ 		.iommu_dev	= smmu->dev,
  	};
+@@ -3328,6 +3336,20 @@ static int arm_smmu_device_hw_probe(struct arm_smmu_device *smmu)
  
- 	return data;
-diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-index ffeebda8d6de..7dc0850448c3 100644
---- a/drivers/iommu/iommu.c
-+++ b/drivers/iommu/iommu.c
-@@ -2707,6 +2707,46 @@ int iommu_domain_set_attr(struct iommu_domain *domain,
- }
- EXPORT_SYMBOL_GPL(iommu_domain_set_attr);
+ 	/* IDR3 */
+ 	reg = readl_relaxed(smmu->base + ARM_SMMU_IDR3);
++	switch (FIELD_GET(IDR3_BBML, reg)) {
++	case IDR3_BBML0:
++		break;
++	case IDR3_BBML1:
++		smmu->features |= ARM_SMMU_FEAT_BBML1;
++		break;
++	case IDR3_BBML2:
++		smmu->features |= ARM_SMMU_FEAT_BBML2;
++		break;
++	default:
++		dev_err(smmu->dev, "unknown/unsupported BBM behavior level\n");
++		return -ENXIO;
++	}
++
+ 	if (FIELD_GET(IDR3_RIL, reg))
+ 		smmu->features |= ARM_SMMU_FEAT_RANGE_INV;
  
-+size_t iommu_split_block(struct iommu_domain *domain, unsigned long iova,
-+			 size_t size)
-+{
-+	const struct iommu_ops *ops = domain->ops;
-+	unsigned int min_pagesz;
-+	size_t pgsize, splited_size;
-+	size_t splited = 0;
-+
-+	min_pagesz = 1 << __ffs(domain->pgsize_bitmap);
-+
-+	if (!IS_ALIGNED(iova | size, min_pagesz)) {
-+		pr_err("unaligned: iova 0x%lx size 0x%zx min_pagesz 0x%x\n",
-+		       iova, size, min_pagesz);
-+		return 0;
-+	}
-+
-+	if (!ops || !ops->split_block) {
-+		pr_err("don't support split block\n");
-+		return 0;
-+	}
-+
-+	while (size) {
-+		pgsize = iommu_pgsize(domain, iova, size);
-+
-+		splited_size = ops->split_block(domain, iova, pgsize);
-+
-+		pr_debug("splited: iova 0x%lx size 0x%zx\n", iova, splited_size);
-+		iova += splited_size;
-+		size -= splited_size;
-+		splited += splited_size;
-+
-+		if (splited_size != pgsize)
-+			break;
-+	}
-+	iommu_flush_iotlb_all(domain);
-+
-+	return splited;
-+}
-+EXPORT_SYMBOL_GPL(iommu_split_block);
-+
- void iommu_get_resv_regions(struct device *dev, struct list_head *list)
- {
- 	const struct iommu_ops *ops = dev->bus->iommu_ops;
+diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+index e91bea44519e..11e526ab7239 100644
+--- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
++++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+@@ -55,6 +55,10 @@
+ #define IDR1_SIDSIZE			GENMASK(5, 0)
+ 
+ #define ARM_SMMU_IDR3			0xc
++#define IDR3_BBML			GENMASK(12, 11)
++#define IDR3_BBML0			0
++#define IDR3_BBML1			1
++#define IDR3_BBML2			2
+ #define IDR3_RIL			(1 << 10)
+ 
+ #define ARM_SMMU_IDR5			0x14
+@@ -612,6 +616,8 @@ struct arm_smmu_device {
+ #define ARM_SMMU_FEAT_SVA		(1 << 17)
+ #define ARM_SMMU_FEAT_HTTU_HA		(1 << 18)
+ #define ARM_SMMU_FEAT_HTTU_HD		(1 << 19)
++#define ARM_SMMU_FEAT_BBML1		(1 << 20)
++#define ARM_SMMU_FEAT_BBML2		(1 << 21)
+ 	u32				features;
+ 
+ #define ARM_SMMU_OPT_SKIP_PREFETCH	(1 << 0)
 diff --git a/include/linux/io-pgtable.h b/include/linux/io-pgtable.h
-index 26583beeb5d9..b87c6f4ecaa2 100644
+index 1a00ea8562c7..26583beeb5d9 100644
 --- a/include/linux/io-pgtable.h
 +++ b/include/linux/io-pgtable.h
-@@ -162,6 +162,8 @@ struct io_pgtable_ops {
- 			size_t size, struct iommu_iotlb_gather *gather);
- 	phys_addr_t (*iova_to_phys)(struct io_pgtable_ops *ops,
- 				    unsigned long iova);
-+	size_t (*split_block)(struct io_pgtable_ops *ops, unsigned long iova,
-+			      size_t size);
- };
+@@ -99,6 +99,7 @@ struct io_pgtable_cfg {
+ 	unsigned int			oas;
+ 	bool				httu_hd;
+ 	bool				coherent_walk;
++	int				bbml;
+ 	const struct iommu_flush_ops	*tlb;
+ 	struct device			*iommu_dev;
  
- /**
-diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-index b3f0e2018c62..abeb811098a5 100644
---- a/include/linux/iommu.h
-+++ b/include/linux/iommu.h
-@@ -258,6 +258,8 @@ struct iommu_ops {
- 			       enum iommu_attr attr, void *data);
- 	int (*domain_set_attr)(struct iommu_domain *domain,
- 			       enum iommu_attr attr, void *data);
-+	size_t (*split_block)(struct iommu_domain *domain, unsigned long iova,
-+			      size_t size);
- 
- 	/* Request/Free a list of reserved regions for a device */
- 	void (*get_resv_regions)(struct device *dev, struct list_head *list);
-@@ -509,6 +511,8 @@ extern int iommu_domain_get_attr(struct iommu_domain *domain, enum iommu_attr,
- 				 void *data);
- extern int iommu_domain_set_attr(struct iommu_domain *domain, enum iommu_attr,
- 				 void *data);
-+extern size_t iommu_split_block(struct iommu_domain *domain, unsigned long iova,
-+				size_t size);
- 
- /* Window handling function prototypes */
- extern int iommu_domain_window_enable(struct iommu_domain *domain, u32 wnd_nr,
-@@ -903,6 +907,12 @@ static inline int iommu_domain_set_attr(struct iommu_domain *domain,
- 	return -EINVAL;
- }
- 
-+static inline size_t iommu_split_block(struct iommu_domain *domain,
-+				       unsigned long iova, size_t size)
-+{
-+	return 0;
-+}
-+
- static inline int  iommu_device_register(struct iommu_device *iommu)
- {
- 	return -ENODEV;
 -- 
 2.19.1
 
