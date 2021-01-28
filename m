@@ -2,60 +2,63 @@ Return-Path: <SRS0=rJEk=G7=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 986D4C433E0
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Jan 2021 15:17:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54CE4C433DB
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Jan 2021 15:18:13 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D76E964E05
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Jan 2021 15:17:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D76E964E05
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id B0F6F64DEF
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Jan 2021 15:18:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0F6F64DEF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F8F94B1F5;
-	Thu, 28 Jan 2021 10:17:37 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 258F44B1F5;
+	Thu, 28 Jan 2021 10:18:12 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 7wvMABjFf4TV; Thu, 28 Jan 2021 10:17:35 -0500 (EST)
+	with ESMTP id Pvou371H2BHZ; Thu, 28 Jan 2021 10:18:11 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C7DD94B105;
-	Thu, 28 Jan 2021 10:17:35 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F3FE4B203;
+	Thu, 28 Jan 2021 10:18:11 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 888714B0F2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2021 10:17:34 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E56F14B1FF
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2021 10:18:09 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id btVCFO17tp4n for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 Jan 2021 10:17:33 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 511B64B0E4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2021 10:17:33 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BED061396;
- Thu, 28 Jan 2021 07:17:32 -0800 (PST)
-Received: from slackpad.fritz.box (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 81AA63F7C3;
- Thu, 28 Jan 2021 07:17:31 -0800 (PST)
-Date: Thu, 28 Jan 2021 15:16:43 +0000
-From: Andre Przywara <andre.przywara@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 1/2] KVM: arm64: Turn kvm_arm_support_pmu_v3() into a
- static key
-Message-ID: <20210128151643.6e2c3668@slackpad.fritz.box>
-In-Reply-To: <20210126151521.2958688-2-maz@kernel.org>
-References: <20210126151521.2958688-1-maz@kernel.org>
- <20210126151521.2958688-2-maz@kernel.org>
-Organization: Arm Ltd.
-X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
+ with ESMTP id X3UbA+oAjTqi for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 Jan 2021 10:18:08 -0500 (EST)
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7D9794B133
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2021 10:18:07 -0500 (EST)
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.59])
+ by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4DRPG938VYzjDJD;
+ Thu, 28 Jan 2021 23:17:05 +0800 (CST)
+Received: from DESKTOP-5IS4806.china.huawei.com (10.174.184.42) by
+ DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
+ 14.3.498.0; Thu, 28 Jan 2021 23:17:54 +0800
+From: Keqian Zhu <zhukeqian1@huawei.com>
+To: <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+ <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
+ <iommu@lists.linux-foundation.org>, Will Deacon <will@kernel.org>, "Alex
+ Williamson" <alex.williamson@redhat.com>, Marc Zyngier <maz@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>
+Subject: [RFC PATCH 01/11] iommu/arm-smmu-v3: Add feature detection for HTTU
+Date: Thu, 28 Jan 2021 23:17:32 +0800
+Message-ID: <20210128151742.18840-2-zhukeqian1@huawei.com>
+X-Mailer: git-send-email 2.8.4.windows.1
+In-Reply-To: <20210128151742.18840-1-zhukeqian1@huawei.com>
+References: <20210128151742.18840-1-zhukeqian1@huawei.com>
 MIME-Version: 1.0
-Cc: linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
- kvmarm@lists.cs.columbia.edu
+X-Originating-IP: [10.174.184.42]
+X-CFilter-Loop: Reflected
+Cc: Cornelia Huck <cohuck@redhat.com>, lushenming@huawei.com,
+ Kirti Wankhede <kwankhede@nvidia.com>, Robin Murphy <robin.murphy@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -72,122 +75,103 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 26 Jan 2021 15:15:20 +0000
-Marc Zyngier <maz@kernel.org> wrote:
+From: jiangkunkun <jiangkunkun@huawei.com>
 
-Hi Marc,
+The SMMU which supports HTTU (Hardware Translation Table Update) can
+update the access flag and the dirty state of TTD by hardware. It is
+essential to track dirty pages of DMA.
 
-> We currently find out about the presence of a HW PMU (or the handling
-> of that PMU by perf, which amounts to the same thing) in a fairly
-> roundabout way, by checking the number of counters available to perf.
-> That's good enough for now, but we will soon need to find about about
-> that on paths where perf is out of reach (in the world switch).
-> 
-> Instead, let's turn kvm_arm_support_pmu_v3() into a static key.
+This adds feature detection, none functional change.
 
-I am sure the pesky build bot has told you about it already, but this
-fails when ARM_PMU is not defined, as perf_num_counters() is not
-defined. It's  bit nasty, since it's a generic function, so we
-can't easily stub it in its original header.
+Co-developed-by: Keqian Zhu <zhukeqian1@huawei.com>
+Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
+---
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 16 ++++++++++++++++
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h |  8 ++++++++
+ include/linux/io-pgtable.h                  |  1 +
+ 3 files changed, 25 insertions(+)
 
-Shall we find a place somewhere in arch/arm64 and provide a stub
-implementation there, #ifndef CONFIG_ARM_PMU? Sounds ugly, though.
-
-Or something else entirely?
-
-Cheers,
-Andre
-
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/perf.c     | 10 ++++++++++
->  arch/arm64/kvm/pmu-emul.c | 10 ----------
->  include/kvm/arm_pmu.h     |  9 +++++++--
->  3 files changed, 17 insertions(+), 12 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/perf.c b/arch/arm64/kvm/perf.c
-> index d45b8b9a4415..198fa4266b2d 100644
-> --- a/arch/arm64/kvm/perf.c
-> +++ b/arch/arm64/kvm/perf.c
-> @@ -11,6 +11,8 @@
->  
->  #include <asm/kvm_emulate.h>
->  
-> +DEFINE_STATIC_KEY_FALSE(kvm_arm_pmu_available);
-> +
->  static int kvm_is_in_guest(void)
->  {
->          return kvm_get_running_vcpu() != NULL;
-> @@ -48,6 +50,14 @@ static struct perf_guest_info_callbacks kvm_guest_cbs = {
->  
->  int kvm_perf_init(void)
->  {
-> +	/*
-> +	 * Check if HW_PERF_EVENTS are supported by checking the number of
-> +	 * hardware performance counters. This could ensure the presence of
-> +	 * a physical PMU and CONFIG_PERF_EVENT is selected.
-> +	 */
-> +	if (perf_num_counters() > 0)
-> +		static_branch_enable(&kvm_arm_pmu_available);
-> +
->  	return perf_register_guest_info_callbacks(&kvm_guest_cbs);
->  }
->  
-> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> index 4ad66a532e38..44d500706ab9 100644
-> --- a/arch/arm64/kvm/pmu-emul.c
-> +++ b/arch/arm64/kvm/pmu-emul.c
-> @@ -813,16 +813,6 @@ u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
->  	return val & mask;
->  }
->  
-> -bool kvm_arm_support_pmu_v3(void)
-> -{
-> -	/*
-> -	 * Check if HW_PERF_EVENTS are supported by checking the number of
-> -	 * hardware performance counters. This could ensure the presence of
-> -	 * a physical PMU and CONFIG_PERF_EVENT is selected.
-> -	 */
-> -	return (perf_num_counters() > 0);
-> -}
-> -
->  int kvm_arm_pmu_v3_enable(struct kvm_vcpu *vcpu)
->  {
->  	if (!kvm_vcpu_has_pmu(vcpu))
-> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-> index 8dcb3e1477bc..6fd3cda608e4 100644
-> --- a/include/kvm/arm_pmu.h
-> +++ b/include/kvm/arm_pmu.h
-> @@ -13,6 +13,13 @@
->  #define ARMV8_PMU_CYCLE_IDX		(ARMV8_PMU_MAX_COUNTERS - 1)
->  #define ARMV8_PMU_MAX_COUNTER_PAIRS	((ARMV8_PMU_MAX_COUNTERS + 1) >> 1)
->  
-> +DECLARE_STATIC_KEY_FALSE(kvm_arm_pmu_available);
-> +
-> +static __always_inline bool kvm_arm_support_pmu_v3(void)
-> +{
-> +	return static_branch_likely(&kvm_arm_pmu_available);
-> +}
-> +
->  #ifdef CONFIG_HW_PERF_EVENTS
->  
->  struct kvm_pmc {
-> @@ -47,7 +54,6 @@ void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val);
->  void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val);
->  void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
->  				    u64 select_idx);
-> -bool kvm_arm_support_pmu_v3(void);
->  int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu,
->  			    struct kvm_device_attr *attr);
->  int kvm_arm_pmu_v3_get_attr(struct kvm_vcpu *vcpu,
-> @@ -87,7 +93,6 @@ static inline void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val) {}
->  static inline void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val) {}
->  static inline void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu,
->  						  u64 data, u64 select_idx) {}
-> -static inline bool kvm_arm_support_pmu_v3(void) { return false; }
->  static inline int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu,
->  					  struct kvm_device_attr *attr)
->  {
+diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+index 8ca7415d785d..0f0fe71cc10d 100644
+--- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
++++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+@@ -1987,6 +1987,7 @@ static int arm_smmu_domain_finalise(struct iommu_domain *domain,
+ 		.pgsize_bitmap	= smmu->pgsize_bitmap,
+ 		.ias		= ias,
+ 		.oas		= oas,
++		.httu_hd	= smmu->features & ARM_SMMU_FEAT_HTTU_HD,
+ 		.coherent_walk	= smmu->features & ARM_SMMU_FEAT_COHERENCY,
+ 		.tlb		= &arm_smmu_flush_ops,
+ 		.iommu_dev	= smmu->dev,
+@@ -3224,6 +3225,21 @@ static int arm_smmu_device_hw_probe(struct arm_smmu_device *smmu)
+ 	if (reg & IDR0_HYP)
+ 		smmu->features |= ARM_SMMU_FEAT_HYP;
+ 
++	switch (FIELD_GET(IDR0_HTTU, reg)) {
++	case IDR0_HTTU_NONE:
++		break;
++	case IDR0_HTTU_HA:
++		smmu->features |= ARM_SMMU_FEAT_HTTU_HA;
++		break;
++	case IDR0_HTTU_HAD:
++		smmu->features |= ARM_SMMU_FEAT_HTTU_HA;
++		smmu->features |= ARM_SMMU_FEAT_HTTU_HD;
++		break;
++	default:
++		dev_err(smmu->dev, "unknown/unsupported HTTU!\n");
++		return -ENXIO;
++	}
++
+ 	/*
+ 	 * The coherency feature as set by FW is used in preference to the ID
+ 	 * register, but warn on mismatch.
+diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+index 96c2e9565e00..e91bea44519e 100644
+--- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
++++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+@@ -33,6 +33,10 @@
+ #define IDR0_ASID16			(1 << 12)
+ #define IDR0_ATS			(1 << 10)
+ #define IDR0_HYP			(1 << 9)
++#define IDR0_HTTU			GENMASK(7, 6)
++#define IDR0_HTTU_NONE			0
++#define IDR0_HTTU_HA			1
++#define IDR0_HTTU_HAD			2
+ #define IDR0_COHACC			(1 << 4)
+ #define IDR0_TTF			GENMASK(3, 2)
+ #define IDR0_TTF_AARCH64		2
+@@ -286,6 +290,8 @@
+ #define CTXDESC_CD_0_TCR_TBI0		(1ULL << 38)
+ 
+ #define CTXDESC_CD_0_AA64		(1UL << 41)
++#define CTXDESC_CD_0_HD			(1UL << 42)
++#define CTXDESC_CD_0_HA			(1UL << 43)
+ #define CTXDESC_CD_0_S			(1UL << 44)
+ #define CTXDESC_CD_0_R			(1UL << 45)
+ #define CTXDESC_CD_0_A			(1UL << 46)
+@@ -604,6 +610,8 @@ struct arm_smmu_device {
+ #define ARM_SMMU_FEAT_RANGE_INV		(1 << 15)
+ #define ARM_SMMU_FEAT_BTM		(1 << 16)
+ #define ARM_SMMU_FEAT_SVA		(1 << 17)
++#define ARM_SMMU_FEAT_HTTU_HA		(1 << 18)
++#define ARM_SMMU_FEAT_HTTU_HD		(1 << 19)
+ 	u32				features;
+ 
+ #define ARM_SMMU_OPT_SKIP_PREFETCH	(1 << 0)
+diff --git a/include/linux/io-pgtable.h b/include/linux/io-pgtable.h
+index ea727eb1a1a9..1a00ea8562c7 100644
+--- a/include/linux/io-pgtable.h
++++ b/include/linux/io-pgtable.h
+@@ -97,6 +97,7 @@ struct io_pgtable_cfg {
+ 	unsigned long			pgsize_bitmap;
+ 	unsigned int			ias;
+ 	unsigned int			oas;
++	bool				httu_hd;
+ 	bool				coherent_walk;
+ 	const struct iommu_flush_ops	*tlb;
+ 	struct device			*iommu_dev;
+-- 
+2.19.1
 
 _______________________________________________
 kvmarm mailing list
