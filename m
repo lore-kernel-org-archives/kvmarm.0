@@ -2,54 +2,60 @@ Return-Path: <SRS0=rJEk=G7=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E83BC433DB
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Jan 2021 13:28:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 986D4C433E0
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Jan 2021 15:17:38 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9BC1064DD9
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Jan 2021 13:28:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BC1064DD9
+	by mail.kernel.org (Postfix) with ESMTP id D76E964E05
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Jan 2021 15:17:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D76E964E05
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C35A94B19A;
-	Thu, 28 Jan 2021 08:28:24 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F8F94B1F5;
+	Thu, 28 Jan 2021 10:17:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ovhwlY72J0iW; Thu, 28 Jan 2021 08:28:23 -0500 (EST)
+	with ESMTP id 7wvMABjFf4TV; Thu, 28 Jan 2021 10:17:35 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0596F4B19B;
-	Thu, 28 Jan 2021 08:28:23 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C7DD94B105;
+	Thu, 28 Jan 2021 10:17:35 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3807B4B199
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2021 08:28:22 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 888714B0F2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2021 10:17:34 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XsrhRVMsGYgR for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 Jan 2021 08:28:20 -0500 (EST)
+ with ESMTP id btVCFO17tp4n for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 Jan 2021 10:17:33 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D6EC14B187
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2021 08:28:20 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 511B64B0E4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2021 10:17:33 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 68F391396;
- Thu, 28 Jan 2021 05:28:20 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6D31C3F719;
- Thu, 28 Jan 2021 05:28:19 -0800 (PST)
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: maz@kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu
-Subject: [PATCH] KVM: arm64: Correct spelling of DBGDIDR register
-Date: Thu, 28 Jan 2021 13:28:23 +0000
-Message-Id: <20210128132823.35067-1-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.30.0
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BED061396;
+ Thu, 28 Jan 2021 07:17:32 -0800 (PST)
+Received: from slackpad.fritz.box (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 81AA63F7C3;
+ Thu, 28 Jan 2021 07:17:31 -0800 (PST)
+Date: Thu, 28 Jan 2021 15:16:43 +0000
+From: Andre Przywara <andre.przywara@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH 1/2] KVM: arm64: Turn kvm_arm_support_pmu_v3() into a
+ static key
+Message-ID: <20210128151643.6e2c3668@slackpad.fritz.box>
+In-Reply-To: <20210126151521.2958688-2-maz@kernel.org>
+References: <20210126151521.2958688-1-maz@kernel.org>
+ <20210126151521.2958688-2-maz@kernel.org>
+Organization: Arm Ltd.
+X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
 MIME-Version: 1.0
+Cc: linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -66,45 +72,122 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The aarch32 debug ID register is called DBG*D*IDR (emphasis added), not
-DBGIDR, use the correct spelling.
+On Tue, 26 Jan 2021 15:15:20 +0000
+Marc Zyngier <maz@kernel.org> wrote:
 
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
-Found while reviewing Marc's PMU and debug register fixes [1]. The patch
-was created on top of that series and v5.11-rc3.
+Hi Marc,
 
-[1] https://lore.kernel.org/kvmarm/20210125122638.2947058-1-maz@kernel.org/
+> We currently find out about the presence of a HW PMU (or the handling
+> of that PMU by perf, which amounts to the same thing) in a fairly
+> roundabout way, by checking the number of counters available to perf.
+> That's good enough for now, but we will soon need to find about about
+> that on paths where perf is out of reach (in the world switch).
+> 
+> Instead, let's turn kvm_arm_support_pmu_v3() into a static key.
 
- arch/arm64/kvm/sys_regs.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+I am sure the pesky build bot has told you about it already, but this
+fails when ARM_PMU is not defined, as perf_num_counters() is not
+defined. It's  bit nasty, since it's a generic function, so we
+can't easily stub it in its original header.
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 0434e1672810..56f08e9f48c6 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1714,7 +1714,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_FPEXC32_EL2), NULL, reset_val, FPEXC32_EL2, 0x700 },
- };
- 
--static bool trap_dbgidr(struct kvm_vcpu *vcpu,
-+static bool trap_dbgdidr(struct kvm_vcpu *vcpu,
- 			struct sys_reg_params *p,
- 			const struct sys_reg_desc *r)
- {
-@@ -1761,8 +1761,8 @@ static bool trap_dbgidr(struct kvm_vcpu *vcpu,
-  * guest. Revisit this one day, would this principle change.
-  */
- static const struct sys_reg_desc cp14_regs[] = {
--	/* DBGIDR */
--	{ Op1( 0), CRn( 0), CRm( 0), Op2( 0), trap_dbgidr },
-+	/* DBGDIDR */
-+	{ Op1( 0), CRn( 0), CRm( 0), Op2( 0), trap_dbgdidr },
- 	/* DBGDTRRXext */
- 	{ Op1( 0), CRn( 0), CRm( 0), Op2( 2), trap_raz_wi },
- 
--- 
-2.30.0
+Shall we find a place somewhere in arch/arm64 and provide a stub
+implementation there, #ifndef CONFIG_ARM_PMU? Sounds ugly, though.
+
+Or something else entirely?
+
+Cheers,
+Andre
+
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/perf.c     | 10 ++++++++++
+>  arch/arm64/kvm/pmu-emul.c | 10 ----------
+>  include/kvm/arm_pmu.h     |  9 +++++++--
+>  3 files changed, 17 insertions(+), 12 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/perf.c b/arch/arm64/kvm/perf.c
+> index d45b8b9a4415..198fa4266b2d 100644
+> --- a/arch/arm64/kvm/perf.c
+> +++ b/arch/arm64/kvm/perf.c
+> @@ -11,6 +11,8 @@
+>  
+>  #include <asm/kvm_emulate.h>
+>  
+> +DEFINE_STATIC_KEY_FALSE(kvm_arm_pmu_available);
+> +
+>  static int kvm_is_in_guest(void)
+>  {
+>          return kvm_get_running_vcpu() != NULL;
+> @@ -48,6 +50,14 @@ static struct perf_guest_info_callbacks kvm_guest_cbs = {
+>  
+>  int kvm_perf_init(void)
+>  {
+> +	/*
+> +	 * Check if HW_PERF_EVENTS are supported by checking the number of
+> +	 * hardware performance counters. This could ensure the presence of
+> +	 * a physical PMU and CONFIG_PERF_EVENT is selected.
+> +	 */
+> +	if (perf_num_counters() > 0)
+> +		static_branch_enable(&kvm_arm_pmu_available);
+> +
+>  	return perf_register_guest_info_callbacks(&kvm_guest_cbs);
+>  }
+>  
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index 4ad66a532e38..44d500706ab9 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -813,16 +813,6 @@ u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
+>  	return val & mask;
+>  }
+>  
+> -bool kvm_arm_support_pmu_v3(void)
+> -{
+> -	/*
+> -	 * Check if HW_PERF_EVENTS are supported by checking the number of
+> -	 * hardware performance counters. This could ensure the presence of
+> -	 * a physical PMU and CONFIG_PERF_EVENT is selected.
+> -	 */
+> -	return (perf_num_counters() > 0);
+> -}
+> -
+>  int kvm_arm_pmu_v3_enable(struct kvm_vcpu *vcpu)
+>  {
+>  	if (!kvm_vcpu_has_pmu(vcpu))
+> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+> index 8dcb3e1477bc..6fd3cda608e4 100644
+> --- a/include/kvm/arm_pmu.h
+> +++ b/include/kvm/arm_pmu.h
+> @@ -13,6 +13,13 @@
+>  #define ARMV8_PMU_CYCLE_IDX		(ARMV8_PMU_MAX_COUNTERS - 1)
+>  #define ARMV8_PMU_MAX_COUNTER_PAIRS	((ARMV8_PMU_MAX_COUNTERS + 1) >> 1)
+>  
+> +DECLARE_STATIC_KEY_FALSE(kvm_arm_pmu_available);
+> +
+> +static __always_inline bool kvm_arm_support_pmu_v3(void)
+> +{
+> +	return static_branch_likely(&kvm_arm_pmu_available);
+> +}
+> +
+>  #ifdef CONFIG_HW_PERF_EVENTS
+>  
+>  struct kvm_pmc {
+> @@ -47,7 +54,6 @@ void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val);
+>  void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val);
+>  void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
+>  				    u64 select_idx);
+> -bool kvm_arm_support_pmu_v3(void);
+>  int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu,
+>  			    struct kvm_device_attr *attr);
+>  int kvm_arm_pmu_v3_get_attr(struct kvm_vcpu *vcpu,
+> @@ -87,7 +93,6 @@ static inline void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val) {}
+>  static inline void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val) {}
+>  static inline void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu,
+>  						  u64 data, u64 select_idx) {}
+> -static inline bool kvm_arm_support_pmu_v3(void) { return false; }
+>  static inline int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu,
+>  					  struct kvm_device_attr *attr)
+>  {
 
 _______________________________________________
 kvmarm mailing list
