@@ -2,72 +2,80 @@ Return-Path: <SRS0=rJEk=G7=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09441C433E0
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Jan 2021 16:56:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A133C433E6
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Jan 2021 17:38:59 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 214DC64E07
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Jan 2021 16:56:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 214DC64E07
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id A6D0D64E12
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Jan 2021 17:38:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6D0D64E12
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3AC074B1B2;
-	Thu, 28 Jan 2021 11:56:08 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 031094B178;
+	Thu, 28 Jan 2021 12:38:58 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Qh2-VINyYLuw; Thu, 28 Jan 2021 11:56:07 -0500 (EST)
+	with ESMTP id KgfRs2FlRJVW; Thu, 28 Jan 2021 12:38:56 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2BCBB4B184;
-	Thu, 28 Jan 2021 11:56:07 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D085C4B1A2;
+	Thu, 28 Jan 2021 12:38:56 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DF0104B17E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2021 11:56:05 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EAA44B17D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2021 12:38:56 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WPvail-+Iev5 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 Jan 2021 11:56:05 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EED5F4B0DE
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2021 11:56:04 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 9501D64E07;
- Thu, 28 Jan 2021 16:56:03 +0000 (UTC)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
- TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
- (envelope-from <maz@kernel.org>)
- id 1l5AaP-00AedB-9V; Thu, 28 Jan 2021 16:56:01 +0000
-MIME-Version: 1.0
-Date: Thu, 28 Jan 2021 16:56:01 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH 1/2] KVM: arm64: Turn kvm_arm_support_pmu_v3() into a
- static key
-In-Reply-To: <20210128151643.6e2c3668@slackpad.fritz.box>
-References: <20210126151521.2958688-1-maz@kernel.org>
- <20210126151521.2958688-2-maz@kernel.org>
- <20210128151643.6e2c3668@slackpad.fritz.box>
-User-Agent: Roundcube Webmail/1.4.10
-Message-ID: <9bf9be4149cfd0671fe5178ce553159b@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: andre.przywara@arm.com, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, james.morse@arm.com,
- julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
- kvmarm@lists.cs.columbia.edu
+ with ESMTP id yz9TWhqRQfSy for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 Jan 2021 12:38:55 -0500 (EST)
+Received: from mail-ed1-f73.google.com (mail-ed1-f73.google.com
+ [209.85.208.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 30E9E4B178
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2021 12:38:55 -0500 (EST)
+Received: by mail-ed1-f73.google.com with SMTP id o8so3551724edh.12
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2021 09:38:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=sender:date:message-id:mime-version:subject:from:to:cc;
+ bh=TrahohdnGnkFNIlzsxT0lt2fKHMsEEWPsWhwzs4awt8=;
+ b=uukTJK9rp794K+uk3CI4kYPX+Mu1VkRgFU3Nkz0UD6J51DW9OqWQHkIlADcKrO8NDC
+ PfYfKMwHHla4Yxj07UL1oI5BN32BuvvgAslyhCF0Ky+oDyYXLefeZ5zckX6jiYHKGM8C
+ lY+jXTTQGzTjfd5qAnfeiE4ueO4TjhSY69iOz7yHDZBv1tF+1ketzX8IWxCt/WDO5EW8
+ 5r1sOEUl+wYEsmXlC0Rvj+Fj3++dhKjrCXvWBszTSxRJm8Omqb62yoLDX1v6R1Ws66OQ
+ /GmOQ7B5A5q4BqFu9EsVM82Hi1nVhuKY7oupMhhaMVCKL/IrtcUcWxauxqna7xkVy4Gy
+ qSZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
+ :to:cc;
+ bh=TrahohdnGnkFNIlzsxT0lt2fKHMsEEWPsWhwzs4awt8=;
+ b=SA8FkQgNripor3axGi1O48hRmfdzfT+jKQGJWEfc9e3ZOHoJ4zaL1P/+F691wBq6O6
+ 7eF/yMuiqYHE8M2aUUaozuMZ4Lsh6G1KYOHZWnYbDFDDBxLs7IoR0VRdfTtYrH2HcUR+
+ GQtutMlehGZiL2RDcFxTSrSRhYHtKGMhbk2TzeZoaHfyeKQUAZs5eaBMFAiVjevj8bd0
+ aeraDMxKK0VQ90amQwkEI5blDozvAP/DHlfm7/WWfnavAY6mlgUYNl5R1Gmuls8T6Eg1
+ XgwhqFi1Bb/AnrS1ijj09sbarzkeOq3Ts/0LkCrQ8GQSwhCM3wm+Pf4W/qBEcFsCa4ul
+ vOHQ==
+X-Gm-Message-State: AOAM532wT9t0TlCsvCDOAheryQfgyC5FaJmBeEDVOKrHKzTxF9sL8qz2
+ HmNjv61mnKy6KB/r40r1XMRHfCW0s0rX
+X-Google-Smtp-Source: ABdhPJxEhKi749Qbu8TbBAghdDiR8ZIeAEhUG60Tu9mrTIiKptvwvEbelYwTE1zdZE7ACRqs/3KXL+gvnUFV
+X-Received: from r2d2-qp.c.googlers.com ([fda3:e722:ac3:10:28:9cb1:c0a8:1652])
+ (user=qperret job=sendgmr) by 2002:a17:906:3685:: with SMTP id
+ a5mr496672ejc.544.1611855533828; Thu, 28 Jan 2021 09:38:53 -0800 (PST)
+Date: Thu, 28 Jan 2021 17:38:50 +0000
+Message-Id: <20210128173850.2478161-1-qperret@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.30.0.280.ga3ce27912f-goog
+Subject: [PATCH] KVM: arm64: Move __hyp_set_vectors out of .hyp.text
+From: Quentin Perret <qperret@google.com>
+To: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org
+Cc: kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -79,58 +87,41 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2021-01-28 15:16, Andre Przywara wrote:
-> On Tue, 26 Jan 2021 15:15:20 +0000
-> Marc Zyngier <maz@kernel.org> wrote:
-> 
-> Hi Marc,
-> 
->> We currently find out about the presence of a HW PMU (or the handling
->> of that PMU by perf, which amounts to the same thing) in a fairly
->> roundabout way, by checking the number of counters available to perf.
->> That's good enough for now, but we will soon need to find about about
->> that on paths where perf is out of reach (in the world switch).
->> 
->> Instead, let's turn kvm_arm_support_pmu_v3() into a static key.
-> 
-> I am sure the pesky build bot has told you about it already, but this
-> fails when ARM_PMU is not defined, as perf_num_counters() is not
-> defined. It's  bit nasty, since it's a generic function, so we
-> can't easily stub it in its original header.
+The .hyp.text section is supposed to be reserved for the nVHE EL2 code.
+However, there is currently one occurrence of EL1 executing code located
+in .hyp.text when calling __hyp_{re}set_vectors(), which happen to sit
+next to the EL2 stub vectors. While not a problem yet, such patterns
+will cause issues when removing the host kernel from the TCB, so a
+cleaner split would be preferable.
 
-No sign from the bot yet, but that's indeed a problem. Well spotted.
+Fix this by delimiting the end of the .hyp.text section in hyp-stub.S.
 
-> Shall we find a place somewhere in arch/arm64 and provide a stub
-> implementation there, #ifndef CONFIG_ARM_PMU? Sounds ugly, though.
-> 
-> Or something else entirely?
+Signed-off-by: Quentin Perret <qperret@google.com>
+---
+ arch/arm64/kernel/hyp-stub.S | 2 ++
+ 1 file changed, 2 insertions(+)
 
-How about:
-
-diff --git a/arch/arm64/kvm/perf.c b/arch/arm64/kvm/perf.c
-index 198fa4266b2d..739164324afe 100644
---- a/arch/arm64/kvm/perf.c
-+++ b/arch/arm64/kvm/perf.c
-@@ -55,7 +55,7 @@ int kvm_perf_init(void)
-  	 * hardware performance counters. This could ensure the presence of
-  	 * a physical PMU and CONFIG_PERF_EVENT is selected.
-  	 */
--	if (perf_num_counters() > 0)
-+	if (IS_ENABLED(CONFIG_ARM_PMU) && perf_num_counters() > 0)
-  		static_branch_enable(&kvm_arm_pmu_available);
-
-  	return perf_register_guest_info_callbacks(&kvm_guest_cbs);
-
-It certainly compiles here.
-
-         M.
+diff --git a/arch/arm64/kernel/hyp-stub.S b/arch/arm64/kernel/hyp-stub.S
+index 160f5881a0b7..8a60f9c586bb 100644
+--- a/arch/arm64/kernel/hyp-stub.S
++++ b/arch/arm64/kernel/hyp-stub.S
+@@ -85,6 +85,8 @@ SYM_CODE_END(\label)
+ 	invalid_vector	el1_fiq_invalid
+ 	invalid_vector	el1_error_invalid
+ 
++	.popsection
++
+ /*
+  * __hyp_set_vectors: Call this after boot to set the initial hypervisor
+  * vectors as part of hypervisor installation.  On an SMP system, this should
 -- 
-Jazz is not dead. It just smells funny...
+2.30.0.280.ga3ce27912f-goog
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
