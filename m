@@ -2,65 +2,71 @@ Return-Path: <SRS0=rJEk=G7=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 846B3C433E0
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Jan 2021 15:18:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D86FFC433E0
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Jan 2021 15:21:41 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 054D464DED
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Jan 2021 15:18:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 054D464DED
+	by mail.kernel.org (Postfix) with ESMTP id 2932E64DED
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Jan 2021 15:21:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2932E64DED
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 884E94B0FC;
-	Thu, 28 Jan 2021 10:18:42 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8393A4B211;
+	Thu, 28 Jan 2021 10:21:40 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id cVLYPPjwq62l; Thu, 28 Jan 2021 10:18:41 -0500 (EST)
+	with ESMTP id oPpj24Z8C8rS; Thu, 28 Jan 2021 10:21:39 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DF304B141;
-	Thu, 28 Jan 2021 10:18:41 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A0314B1F9;
+	Thu, 28 Jan 2021 10:21:39 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FD7A4B0FC
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2021 10:18:40 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 67C594B185
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2021 10:21:38 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id M7j+jqruUI1P for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 Jan 2021 10:18:39 -0500 (EST)
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D1D2A4B12F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2021 10:18:38 -0500 (EST)
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
- by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4DRPG06S7Dz7btQ;
- Thu, 28 Jan 2021 23:16:56 +0800 (CST)
-Received: from DESKTOP-5IS4806.china.huawei.com (10.174.184.42) by
- DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
- 14.3.498.0; Thu, 28 Jan 2021 23:18:02 +0800
+ with ESMTP id PS7xQTsstwqT for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 Jan 2021 10:21:37 -0500 (EST)
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7AF434B109
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2021 10:21:36 -0500 (EST)
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.59])
+ by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DRPKs1ZVgzjFdr;
+ Thu, 28 Jan 2021 23:20:17 +0800 (CST)
+Received: from [10.174.184.42] (10.174.184.42) by
+ DGGEMS406-HUB.china.huawei.com (10.3.19.206) with Microsoft SMTP Server id
+ 14.3.498.0; Thu, 28 Jan 2021 23:21:20 +0800
+Subject: Re: [PATCH v3 2/2] vfio/iommu_type1: Fix some sanity checks in detach
+ group
+To: Alex Williamson <alex.williamson@redhat.com>
+References: <20210122092635.19900-1-zhukeqian1@huawei.com>
+ <20210122092635.19900-3-zhukeqian1@huawei.com>
+ <20210127164641.36e17bf5@omen.home.shazbot.org>
 From: Keqian Zhu <zhukeqian1@huawei.com>
-To: <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
- <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
- <iommu@lists.linux-foundation.org>, Will Deacon <will@kernel.org>, "Alex
- Williamson" <alex.williamson@redhat.com>, Marc Zyngier <maz@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>
-Subject: [RFC PATCH 10/11] vfio/iommu_type1: Optimize dirty bitmap population
- based on iommu HWDBM
-Date: Thu, 28 Jan 2021 23:17:41 +0800
-Message-ID: <20210128151742.18840-11-zhukeqian1@huawei.com>
-X-Mailer: git-send-email 2.8.4.windows.1
-In-Reply-To: <20210128151742.18840-1-zhukeqian1@huawei.com>
-References: <20210128151742.18840-1-zhukeqian1@huawei.com>
+Message-ID: <5093dace-4b8a-d455-ba16-d0c2da755573@huawei.com>
+Date: Thu, 28 Jan 2021 23:21:20 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
+In-Reply-To: <20210127164641.36e17bf5@omen.home.shazbot.org>
 X-Originating-IP: [10.174.184.42]
 X-CFilter-Loop: Reflected
-Cc: Cornelia Huck <cohuck@redhat.com>, lushenming@huawei.com,
- Kirti Wankhede <kwankhede@nvidia.com>, Robin Murphy <robin.murphy@arm.com>
+Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ Kirti Wankhede <kwankhede@nvidia.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, Marc
+ Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
+ Daniel Lezcano <daniel.lezcano@linaro.org>,
+ Alexios Zavras <alexios.zavras@intel.com>,
+ Thomas Gleixner <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org,
+ Cornelia Huck <cohuck@redhat.com>, linux-kernel@vger.kernel.org,
+ iommu@lists.linux-foundation.org, Andrew Morton <akpm@linux-foundation.org>,
+ Robin Murphy <robin.murphy@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -77,171 +83,123 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: jiangkunkun <jiangkunkun@huawei.com>
 
-In the past if vfio_iommu is not of pinned_page_dirty_scope and
-vfio_dma is iommu_mapped, we populate full dirty bitmap for this
-vfio_dma. Now we can try to get dirty log from iommu before make
-the lousy decision.
 
-Co-developed-by: Keqian Zhu <zhukeqian1@huawei.com>
-Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
----
- drivers/vfio/vfio_iommu_type1.c | 97 ++++++++++++++++++++++++++++++++-
- 1 file changed, 94 insertions(+), 3 deletions(-)
+On 2021/1/28 7:46, Alex Williamson wrote:
+> On Fri, 22 Jan 2021 17:26:35 +0800
+> Keqian Zhu <zhukeqian1@huawei.com> wrote:
+> 
+>> vfio_sanity_check_pfn_list() is used to check whether pfn_list and
+>> notifier are empty when remove the external domain, so it makes a
+>> wrong assumption that only external domain will use the pinning
+>> interface.
+>>
+>> Now we apply the pfn_list check when a vfio_dma is removed and apply
+>> the notifier check when all domains are removed.
+>>
+>> Fixes: a54eb55045ae ("vfio iommu type1: Add support for mediated devices")
+>> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+>> ---
+>>  drivers/vfio/vfio_iommu_type1.c | 33 ++++++++++-----------------------
+>>  1 file changed, 10 insertions(+), 23 deletions(-)
+>>
+>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+>> index 161725395f2f..d8c10f508321 100644
+>> --- a/drivers/vfio/vfio_iommu_type1.c
+>> +++ b/drivers/vfio/vfio_iommu_type1.c
+>> @@ -957,6 +957,7 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
+>>  
+>>  static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
+>>  {
+>> +	WARN_ON(!RB_EMPTY_ROOT(&dma->pfn_list));
+>>  	vfio_unmap_unpin(iommu, dma, true);
+>>  	vfio_unlink_dma(iommu, dma);
+>>  	put_task_struct(dma->task);
+>> @@ -2250,23 +2251,6 @@ static void vfio_iommu_unmap_unpin_reaccount(struct vfio_iommu *iommu)
+>>  	}
+>>  }
+>>  
+>> -static void vfio_sanity_check_pfn_list(struct vfio_iommu *iommu)
+>> -{
+>> -	struct rb_node *n;
+>> -
+>> -	n = rb_first(&iommu->dma_list);
+>> -	for (; n; n = rb_next(n)) {
+>> -		struct vfio_dma *dma;
+>> -
+>> -		dma = rb_entry(n, struct vfio_dma, node);
+>> -
+>> -		if (WARN_ON(!RB_EMPTY_ROOT(&dma->pfn_list)))
+>> -			break;
+>> -	}
+>> -	/* mdev vendor driver must unregister notifier */
+>> -	WARN_ON(iommu->notifier.head);
+>> -}
+>> -
+>>  /*
+>>   * Called when a domain is removed in detach. It is possible that
+>>   * the removed domain decided the iova aperture window. Modify the
+>> @@ -2366,10 +2350,10 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
+>>  			kfree(group);
+>>  
+>>  			if (list_empty(&iommu->external_domain->group_list)) {
+>> -				vfio_sanity_check_pfn_list(iommu);
+>> -
+>> -				if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu))
+>> +				if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)) {
+>> +					WARN_ON(iommu->notifier.head);
+>>  					vfio_iommu_unmap_unpin_all(iommu);
+>> +				}
+>>  
+>>  				kfree(iommu->external_domain);
+>>  				iommu->external_domain = NULL;
+>> @@ -2403,10 +2387,12 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
+>>  		 */
+>>  		if (list_empty(&domain->group_list)) {
+>>  			if (list_is_singular(&iommu->domain_list)) {
+>> -				if (!iommu->external_domain)
+>> +				if (!iommu->external_domain) {
+>> +					WARN_ON(iommu->notifier.head);
+>>  					vfio_iommu_unmap_unpin_all(iommu);
+>> -				else
+>> +				} else {
+>>  					vfio_iommu_unmap_unpin_reaccount(iommu);
+>> +				}
+>>  			}
+>>  			iommu_domain_free(domain->domain);
+>>  			list_del(&domain->next);
+>> @@ -2488,9 +2474,10 @@ static void vfio_iommu_type1_release(void *iommu_data)
+>>  	struct vfio_iommu *iommu = iommu_data;
+>>  	struct vfio_domain *domain, *domain_tmp;
+>>  
+>> +	WARN_ON(iommu->notifier.head);
+> 
+> I don't see that this does any harm, but isn't it actually redundant?
+> It seems vfio-core only calls the iommu backend release function after
+> removing all the groups, so the tests in _detach_group should catch all
+> cases.  We're expecting the vfio bus/mdev driver to remove the notifier
+> when a device is closed, which necessarily occurs before detaching the
+> group.  Thanks,
+> 
+> Alex
+Hi Alex,
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 3b8522ebf955..1cd10f3e7ed4 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -999,6 +999,25 @@ static bool vfio_group_supports_hwdbm(struct vfio_group *group)
- 	return true;
- }
- 
-+static int vfio_iommu_dirty_log_clear(struct vfio_iommu *iommu,
-+				      dma_addr_t start_iova, size_t size,
-+				      unsigned long *bitmap_buffer,
-+				      dma_addr_t base_iova, size_t pgsize)
-+{
-+	struct vfio_domain *d;
-+	unsigned long pgshift = __ffs(pgsize);
-+	int ret;
-+
-+	list_for_each_entry(d, &iommu->domain_list, next) {
-+		ret = iommu_clear_dirty_log(d->domain, start_iova, size,
-+					    bitmap_buffer, base_iova, pgshift);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	return 0;
-+}
-+
- static int update_user_bitmap(u64 __user *bitmap, struct vfio_iommu *iommu,
- 			      struct vfio_dma *dma, dma_addr_t base_iova,
- 			      size_t pgsize)
-@@ -1010,13 +1029,28 @@ static int update_user_bitmap(u64 __user *bitmap, struct vfio_iommu *iommu,
- 	unsigned long shift = bit_offset % BITS_PER_LONG;
- 	unsigned long leftover;
- 
-+	if (iommu->pinned_page_dirty_scope || !dma->iommu_mapped)
-+		goto bitmap_done;
-+
-+	/* try to get dirty log from IOMMU */
-+	if (!iommu->num_non_hwdbm_groups) {
-+		struct vfio_domain *d;
-+
-+		list_for_each_entry(d, &iommu->domain_list, next) {
-+			if (iommu_sync_dirty_log(d->domain, dma->iova, dma->size,
-+						dma->bitmap, dma->iova, pgshift))
-+				return -EFAULT;
-+		}
-+		goto bitmap_done;
-+	}
-+
- 	/*
- 	 * mark all pages dirty if any IOMMU capable device is not able
- 	 * to report dirty pages and all pages are pinned and mapped.
- 	 */
--	if (!iommu->pinned_page_dirty_scope && dma->iommu_mapped)
--		bitmap_set(dma->bitmap, 0, nbits);
-+	bitmap_set(dma->bitmap, 0, nbits);
- 
-+bitmap_done:
- 	if (shift) {
- 		bitmap_shift_left(dma->bitmap, dma->bitmap, shift,
- 				  nbits + shift);
-@@ -1078,6 +1112,18 @@ static int vfio_iova_dirty_bitmap(u64 __user *bitmap, struct vfio_iommu *iommu,
- 		 */
- 		bitmap_clear(dma->bitmap, 0, dma->size >> pgshift);
- 		vfio_dma_populate_bitmap(dma, pgsize);
-+
-+		/* Clear iommu dirty log to re-enable dirty log tracking */
-+		if (!iommu->pinned_page_dirty_scope &&
-+		    dma->iommu_mapped && !iommu->num_non_hwdbm_groups) {
-+			ret = vfio_iommu_dirty_log_clear(iommu,	dma->iova,
-+					dma->size, dma->bitmap, dma->iova,
-+					pgsize);
-+			if (ret) {
-+				pr_warn("dma dirty log clear failed!\n");
-+				return ret;
-+			}
-+		}
- 	}
- 	return 0;
- }
-@@ -2780,6 +2826,48 @@ static int vfio_iommu_type1_unmap_dma(struct vfio_iommu *iommu,
- 			-EFAULT : 0;
- }
- 
-+static void vfio_dma_dirty_log_start(struct vfio_iommu *iommu,
-+				     struct vfio_dma *dma)
-+{
-+	struct vfio_domain *d;
-+
-+	list_for_each_entry(d, &iommu->domain_list, next) {
-+		/* Go through all domain anyway even if we fail */
-+		iommu_split_block(d->domain, dma->iova, dma->size);
-+	}
-+}
-+
-+static void vfio_dma_dirty_log_stop(struct vfio_iommu *iommu,
-+				    struct vfio_dma *dma)
-+{
-+	struct vfio_domain *d;
-+
-+	list_for_each_entry(d, &iommu->domain_list, next) {
-+		/* Go through all domain anyway even if we fail */
-+		iommu_merge_page(d->domain, dma->iova, dma->size,
-+				 d->prot | dma->prot);
-+	}
-+}
-+
-+static void vfio_iommu_dirty_log_switch(struct vfio_iommu *iommu, bool start)
-+{
-+	struct rb_node *n;
-+
-+	/* Split and merge even if all iommu don't support HWDBM now */
-+	for (n = rb_first(&iommu->dma_list); n; n = rb_next(n)) {
-+		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
-+
-+		if (!dma->iommu_mapped)
-+			continue;
-+
-+		/* Go through all dma range anyway even if we fail */
-+		if (start)
-+			vfio_dma_dirty_log_start(iommu, dma);
-+		else
-+			vfio_dma_dirty_log_stop(iommu, dma);
-+	}
-+}
-+
- static int vfio_iommu_type1_dirty_pages(struct vfio_iommu *iommu,
- 					unsigned long arg)
- {
-@@ -2812,8 +2900,10 @@ static int vfio_iommu_type1_dirty_pages(struct vfio_iommu *iommu,
- 		pgsize = 1 << __ffs(iommu->pgsize_bitmap);
- 		if (!iommu->dirty_page_tracking) {
- 			ret = vfio_dma_bitmap_alloc_all(iommu, pgsize);
--			if (!ret)
-+			if (!ret) {
- 				iommu->dirty_page_tracking = true;
-+				vfio_iommu_dirty_log_switch(iommu, true);
-+			}
- 		}
- 		mutex_unlock(&iommu->lock);
- 		return ret;
-@@ -2822,6 +2912,7 @@ static int vfio_iommu_type1_dirty_pages(struct vfio_iommu *iommu,
- 		if (iommu->dirty_page_tracking) {
- 			iommu->dirty_page_tracking = false;
- 			vfio_dma_bitmap_free_all(iommu);
-+			vfio_iommu_dirty_log_switch(iommu, false);
- 		}
- 		mutex_unlock(&iommu->lock);
- 		return 0;
--- 
-2.19.1
+Sorry that today I was busy at sending the smmu HTTU based dma dirty log tracking.
+I will reply you tomorrow. Thanks!
 
+Keqian.
+
+> 
+>> +
+>>  	if (iommu->external_domain) {
+>>  		vfio_release_domain(iommu->external_domain, true);
+>> -		vfio_sanity_check_pfn_list(iommu);
+>>  		kfree(iommu->external_domain);
+>>  	}
+>>  
+> 
+> .
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
