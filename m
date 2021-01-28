@@ -2,56 +2,56 @@ Return-Path: <SRS0=rJEk=G7=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 016D1C43381
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Jan 2021 15:18:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50E3DC433E6
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Jan 2021 15:18:30 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 88EBF64E0A
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Jan 2021 15:18:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88EBF64E0A
+	by mail.kernel.org (Postfix) with ESMTP id BC76B64DF0
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Jan 2021 15:18:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC76B64DF0
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E75DB4B201;
-	Thu, 28 Jan 2021 10:18:26 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5ABFE4B18A;
+	Thu, 28 Jan 2021 10:18:29 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id aDleyrYchScI; Thu, 28 Jan 2021 10:18:25 -0500 (EST)
+	with ESMTP id pgXLhkx1OKcu; Thu, 28 Jan 2021 10:18:28 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E8354B223;
-	Thu, 28 Jan 2021 10:18:25 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D4E34B224;
+	Thu, 28 Jan 2021 10:18:28 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C2F8C4B222
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2021 10:18:23 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F0CCD4B204
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2021 10:18:24 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LD2WLn1XZIvX for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 Jan 2021 10:18:22 -0500 (EST)
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 297504B22E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2021 10:18:21 -0500 (EST)
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
- by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4DRPG04PzBz7bL1;
- Thu, 28 Jan 2021 23:16:56 +0800 (CST)
+ with ESMTP id FfKSBtHZYeEQ for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 Jan 2021 10:18:24 -0500 (EST)
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1AE724B1FB
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2021 10:18:13 -0500 (EST)
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.59])
+ by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4DRPG952hDzjDTX;
+ Thu, 28 Jan 2021 23:17:05 +0800 (CST)
 Received: from DESKTOP-5IS4806.china.huawei.com (10.174.184.42) by
  DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
- 14.3.498.0; Thu, 28 Jan 2021 23:18:01 +0800
+ 14.3.498.0; Thu, 28 Jan 2021 23:17:55 +0800
 From: Keqian Zhu <zhukeqian1@huawei.com>
 To: <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
  <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
  <iommu@lists.linux-foundation.org>, Will Deacon <will@kernel.org>, "Alex
  Williamson" <alex.williamson@redhat.com>, Marc Zyngier <maz@kernel.org>,
  Catalin Marinas <catalin.marinas@arm.com>
-Subject: [RFC PATCH 09/11] vfio/iommu_type1: Add HWDBM status maintanance
-Date: Thu, 28 Jan 2021 23:17:40 +0800
-Message-ID: <20210128151742.18840-10-zhukeqian1@huawei.com>
+Subject: [RFC PATCH 02/11] iommu/arm-smmu-v3: Enable HTTU for SMMU stage1
+ mapping
+Date: Thu, 28 Jan 2021 23:17:33 +0800
+Message-ID: <20210128151742.18840-3-zhukeqian1@huawei.com>
 X-Mailer: git-send-email 2.8.4.windows.1
 In-Reply-To: <20210128151742.18840-1-zhukeqian1@huawei.com>
 References: <20210128151742.18840-1-zhukeqian1@huawei.com>
@@ -78,103 +78,76 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: jiangkunkun <jiangkunkun@huawei.com>
 
-We are going to optimize dirty log tracking based on iommu
-HWDBM feature, but the dirty log from iommu is useful only
-when all iommu backed groups are connected to iommu with
-HWDBM feature. This maintains a counter for this feature.
+If HTTU is supported, we enable HA/HD bits in the SMMU CD (stage 1
+mapping), and set DBM bit for writable TTD.
+
+The dirty state information is encoded using the access permission
+bits AP[2] (stage 1) or S2AP[1] (stage 2) in conjunction with the
+DBM (Dirty Bit Modifier) bit, where DBM means writable and AP[2]/
+S2AP[1] means dirty.
 
 Co-developed-by: Keqian Zhu <zhukeqian1@huawei.com>
 Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
 ---
- drivers/vfio/vfio_iommu_type1.c | 33 +++++++++++++++++++++++++++++++++
- 1 file changed, 33 insertions(+)
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 5 +++++
+ drivers/iommu/io-pgtable-arm.c              | 7 ++++++-
+ 2 files changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 0b4dedaa9128..3b8522ebf955 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -74,6 +74,7 @@ struct vfio_iommu {
- 	bool			nesting;
- 	bool			dirty_page_tracking;
- 	bool			pinned_page_dirty_scope;
-+	uint64_t		num_non_hwdbm_groups;
- };
+diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+index 0f0fe71cc10d..8cc9d7536b08 100644
+--- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
++++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+@@ -1036,6 +1036,11 @@ int arm_smmu_write_ctx_desc(struct arm_smmu_domain *smmu_domain, int ssid,
+ 			FIELD_PREP(CTXDESC_CD_0_ASID, cd->asid) |
+ 			CTXDESC_CD_0_V;
  
- struct vfio_domain {
-@@ -102,6 +103,7 @@ struct vfio_group {
- 	struct list_head	next;
- 	bool			mdev_group;	/* An mdev group */
- 	bool			pinned_page_dirty_scope;
-+	bool			iommu_hwdbm;	/* Valid for non-mdev group */
- };
++		if (smmu->features & ARM_SMMU_FEAT_HTTU_HA)
++			val |= CTXDESC_CD_0_HA;
++		if (smmu->features & ARM_SMMU_FEAT_HTTU_HD)
++			val |= CTXDESC_CD_0_HD;
++
+ 		/* STALL_MODEL==0b10 && CD.S==0 is ILLEGAL */
+ 		if (smmu->features & ARM_SMMU_FEAT_STALL_FORCE)
+ 			val |= CTXDESC_CD_0_S;
+diff --git a/drivers/iommu/io-pgtable-arm.c b/drivers/iommu/io-pgtable-arm.c
+index 87def58e79b5..e299a44808ae 100644
+--- a/drivers/iommu/io-pgtable-arm.c
++++ b/drivers/iommu/io-pgtable-arm.c
+@@ -72,6 +72,7 @@
  
- struct vfio_iova {
-@@ -976,6 +978,27 @@ static void vfio_update_pgsize_bitmap(struct vfio_iommu *iommu)
- 	}
- }
+ #define ARM_LPAE_PTE_NSTABLE		(((arm_lpae_iopte)1) << 63)
+ #define ARM_LPAE_PTE_XN			(((arm_lpae_iopte)3) << 53)
++#define ARM_LPAE_PTE_DBM		(((arm_lpae_iopte)1) << 51)
+ #define ARM_LPAE_PTE_AF			(((arm_lpae_iopte)1) << 10)
+ #define ARM_LPAE_PTE_SH_NS		(((arm_lpae_iopte)0) << 8)
+ #define ARM_LPAE_PTE_SH_OS		(((arm_lpae_iopte)2) << 8)
+@@ -81,7 +82,7 @@
  
-+static int vfio_dev_has_feature(struct device *dev, void *data)
-+{
-+	enum iommu_dev_features *feat = data;
-+
-+	if (!iommu_dev_has_feature(dev, *feat))
-+		return -ENODEV;
-+
-+	return 0;
-+}
-+
-+static bool vfio_group_supports_hwdbm(struct vfio_group *group)
-+{
-+	enum iommu_dev_features feat = IOMMU_DEV_FEAT_HWDBM;
-+
-+	if (iommu_group_for_each_dev(group->iommu_group, &feat,
-+				     vfio_dev_has_feature))
-+		return false;
-+
-+	return true;
-+}
-+
- static int update_user_bitmap(u64 __user *bitmap, struct vfio_iommu *iommu,
- 			      struct vfio_dma *dma, dma_addr_t base_iova,
- 			      size_t pgsize)
-@@ -2189,6 +2212,12 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
- 	 * capable via the page pinning interface.
- 	 */
- 	iommu->pinned_page_dirty_scope = false;
-+
-+	/* Update the hwdbm status of group and iommu */
-+	group->iommu_hwdbm = vfio_group_supports_hwdbm(group);
-+	if (!group->iommu_hwdbm)
-+		iommu->num_non_hwdbm_groups++;
-+
- 	mutex_unlock(&iommu->lock);
- 	vfio_iommu_resv_free(&group_resv_regions);
+ #define ARM_LPAE_PTE_ATTR_LO_MASK	(((arm_lpae_iopte)0x3ff) << 2)
+ /* Ignore the contiguous bit for block splitting */
+-#define ARM_LPAE_PTE_ATTR_HI_MASK	(((arm_lpae_iopte)6) << 52)
++#define ARM_LPAE_PTE_ATTR_HI_MASK	(((arm_lpae_iopte)13) << 51)
+ #define ARM_LPAE_PTE_ATTR_MASK		(ARM_LPAE_PTE_ATTR_LO_MASK |	\
+ 					 ARM_LPAE_PTE_ATTR_HI_MASK)
+ /* Software bit for solving coherency races */
+@@ -379,6 +380,7 @@ static int __arm_lpae_map(struct arm_lpae_io_pgtable *data, unsigned long iova,
+ static arm_lpae_iopte arm_lpae_prot_to_pte(struct arm_lpae_io_pgtable *data,
+ 					   int prot)
+ {
++	struct io_pgtable_cfg *cfg = &data->iop.cfg;
+ 	arm_lpae_iopte pte;
  
-@@ -2342,6 +2371,7 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
- 	struct vfio_domain *domain;
- 	struct vfio_group *group;
- 	bool update_dirty_scope = false;
-+	bool update_iommu_hwdbm = false;
- 	LIST_HEAD(iova_copy);
- 
- 	mutex_lock(&iommu->lock);
-@@ -2380,6 +2410,7 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
- 
- 		vfio_iommu_detach_group(domain, group);
- 		update_dirty_scope = !group->pinned_page_dirty_scope;
-+		update_iommu_hwdbm = !group->iommu_hwdbm;
- 		list_del(&group->next);
- 		kfree(group);
- 		/*
-@@ -2417,6 +2448,8 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
- 	 */
- 	if (update_dirty_scope)
- 		update_pinned_page_dirty_scope(iommu);
-+	if (update_iommu_hwdbm)
-+		iommu->num_non_hwdbm_groups--;
- 	mutex_unlock(&iommu->lock);
- }
- 
+ 	if (data->iop.fmt == ARM_64_LPAE_S1 ||
+@@ -386,6 +388,9 @@ static arm_lpae_iopte arm_lpae_prot_to_pte(struct arm_lpae_io_pgtable *data,
+ 		pte = ARM_LPAE_PTE_nG;
+ 		if (!(prot & IOMMU_WRITE) && (prot & IOMMU_READ))
+ 			pte |= ARM_LPAE_PTE_AP_RDONLY;
++		else if (cfg->httu_hd)
++			pte |= ARM_LPAE_PTE_DBM;
++
+ 		if (!(prot & IOMMU_PRIV))
+ 			pte |= ARM_LPAE_PTE_AP_UNPRIV;
+ 	} else {
 -- 
 2.19.1
 
