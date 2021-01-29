@@ -2,58 +2,60 @@ Return-Path: <SRS0=WMPN=HA=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC396C433E0
-	for <kvmarm@archiver.kernel.org>; Fri, 29 Jan 2021 16:54:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26220C433DB
+	for <kvmarm@archiver.kernel.org>; Fri, 29 Jan 2021 18:05:46 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6885160234
-	for <kvmarm@archiver.kernel.org>; Fri, 29 Jan 2021 16:54:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6885160234
+	by mail.kernel.org (Postfix) with ESMTP id 8EF6664E0B
+	for <kvmarm@archiver.kernel.org>; Fri, 29 Jan 2021 18:05:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EF6664E0B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 844294B36F;
-	Fri, 29 Jan 2021 11:54:18 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D5BAD4B13B;
+	Fri, 29 Jan 2021 13:05:44 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id O7oYUXyRCyeA; Fri, 29 Jan 2021 11:54:16 -0500 (EST)
+	with ESMTP id jwJslz7bODZq; Fri, 29 Jan 2021 13:05:43 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C6EE24B364;
-	Fri, 29 Jan 2021 11:54:16 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A17884B143;
+	Fri, 29 Jan 2021 13:05:43 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 125584B362
- for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Jan 2021 11:54:15 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C54E4B124
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Jan 2021 13:05:42 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ySaKjAQUVEVz for <kvmarm@lists.cs.columbia.edu>;
- Fri, 29 Jan 2021 11:54:13 -0500 (EST)
+ with ESMTP id te3gsuiOJJHL for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 29 Jan 2021 13:05:41 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 36AD14B361
- for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Jan 2021 11:54:13 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A7524B119
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Jan 2021 13:05:41 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BD99913A1;
- Fri, 29 Jan 2021 08:54:12 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 241623F71B;
- Fri, 29 Jan 2021 08:54:12 -0800 (PST)
-Subject: Re: [kvm-unit-tests PATCH v3 00/11] GIC fixes and improvements
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: drjones@redhat.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-References: <20210129163647.91564-1-alexandru.elisei@arm.com>
-Message-ID: <17136b22-bfde-26e9-cc4e-e21e7d469347@arm.com>
-Date: Fri, 29 Jan 2021 16:53:54 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6B77713A1;
+ Fri, 29 Jan 2021 10:05:40 -0800 (PST)
+Received: from slackpad.fritz.box (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 48D333F885;
+ Fri, 29 Jan 2021 10:05:38 -0800 (PST)
+Date: Fri, 29 Jan 2021 18:04:52 +0000
+From: Andre Przywara <andre.przywara@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v3 05/66] KVM: arm64: nv: Add EL2 system registers to
+ vcpu context
+Message-ID: <20210129180452.6d527e91@slackpad.fritz.box>
+In-Reply-To: <20201210160002.1407373-6-maz@kernel.org>
+References: <20201210160002.1407373-1-maz@kernel.org>
+ <20201210160002.1407373-6-maz@kernel.org>
+Organization: Arm Ltd.
+X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20210129163647.91564-1-alexandru.elisei@arm.com>
-Content-Language: en-US
-Cc: andre.przywara@arm.com
+Cc: kvm@vger.kernel.org, kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -70,133 +72,79 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Drew,
+On Thu, 10 Dec 2020 15:59:01 +0000
+Marc Zyngier <maz@kernel.org> wrote:
 
-Had a chat in private with Andre regarding his comments on patch #8 ("arm/arm64:
-gic: Split check_acked() into two functions") [1]. He said that the patch looks ok
-to him. The delay he mentioned was triggered by him when testing his GIC patches
-[2] on top of master.
+Hi,
 
-[1] https://www.spinics.net/lists/kvm/msg231390.html
+> Add the minimal set of EL2 system registers to the vcpu context.
+> Nothing uses them just yet.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-[2] https://lists.cs.columbia.edu/pipermail/kvmarm/2019-November/037853.html
+Checked against the ARM ARM that this list contains the _EL2 registers
+available in ARMv8.1, minus timer and GIC registers.
 
-Thanks,
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
 
-Alex
+Cheers,
+Andre 
 
-On 1/29/21 4:36 PM, Alexandru Elisei wrote:
-> What started this series is Andre's SPI and group interrupts tests [1],
-> which prompted me to attempt to rewrite check_acked() so it's more flexible
-> and not so complicated to review. When I was doing that I noticed that the
-> message passing pattern for accesses to the acked, bad_irq and bad_sender
-> arrays didn't look quite right, and that turned into the first 7 patches of
-> the series. Even though the diffs are relatively small, they are not
-> trivial and the reviewer can skip them for the more palatable patches that
-> follow. I would still appreciate someone having a look at the memory
-> ordering fixes.
->
-> Patch #8 ("Split check_acked() into two functions") is where check_acked()
-> is reworked with an eye towards supporting different timeout values or
-> silent reporting without adding too many arguments to check_acked().
->
-> After changing the IPI tests, I turned my attention to the LPI tests, which
-> followed the same memory synchronization patterns, but invented their own
-> interrupt handler and testing functions. Instead of redoing the work that I
-> did for the IPI tests, I decided to convert the LPI tests to use the same
-> infrastructure.
->
-> For v2, I ran tests on the following machines and didn't see any issues:
->
-> - Ampere EMAG: all arm64 tests 10,000+ times (combined) under qemu and
->   kvmtool.
->
-> - rockpro64: the arm GICv2 and GICv3 tests 10,000+ times under kvmtool (I
->   chose kvmtool because it's faster than qemu); the arm64 gic tests (GICv2
->   and GICv3) 5000+ times with qemu (didn't realize that ./run_tests.sh -g
->   gic doesn't include the its tests); the arm64 GICv2 and GICv3 and ITS
->   tests under kvmtool 13,000+ times.
->
-> For v3, because the changes weren't too big, I ran ./run_tests.sh for arm
-> and arm64 with qemu TCG on the my x86 machine; ran ./run_tests.sh for arm64
-> on rockpro64; and ran all the gic tests for arm and arm64 under kvmtool on
-> the rockpro64.
->
-> Changes in v3:
->
-> * Gathered Reviewed-by tags, thank you for the feedback!
->
-> * Reworked patch #2 and renamed it to "lib: arm/arm64: gicv2: Document
->   existing barriers when sending IPIs". The necessary barriers were already in
->   place in writel/readl. Dropped the R-b tag.
->
-> * Removed the GICv2 smp_rmb() barrier in #4 ("arm/arm64: gic: Remove unnecessary
->   synchronization with stats_reset") because of the rmb() already present in
->   readl() and reworded the commit message accordingly. Dropped the R-b tag.
->
-> * Commented the extra delay in wait_for_interrupts() for patch #8
->   ("arm/arm64: gic: Split check_acked() into two functions").
->
-> * Minor change to the commit message for #10 ("arm64: gic: its-trigger:
->   Don't trigger the LPI while it is pending") as per Andre's suggestion.
->
-> * Dropped patch #11 ("lib: arm64: gic-v3-its: Add wmb() barrier before INT
->   command") because the wmb() was already present in __its_send_int() ->
->   its_send_single_command() -> its_post_commands() -> writeq().
->
-> Changes in v2:
->
-> * Gathered Reviewed-by tags, thank you for the feedback!
->
-> * Modified code comments in #1 ("lib: arm/arm64: gicv3: Add missing barrier
->   when sending IPIs") as per review suggestions.
->
-> * Moved the barrier() in gicv2_ipi_send_self() from #3 ("arm/arm64: gic:
->   Remove memory synchronization from ipi_clear_active_handler()") to #2
->   ("lib: arm/arm64: gicv2: Add missing barrier when sending IPIs").
->
-> * Renamed #3, changed "[..] Remove memory synchronization [..]" to
->   "[..] Remove SMP synchronization [..]".
->
-> * Moved the removal of smp_rmb() from check_spurious() from #5 ("arm/arm64:
->   gic: Use correct memory ordering for the IPI test") to patch #7
->   ("arm/arm64: gic: Wait for writes to acked or spurious to complete").
->
-> * Fixed typos in #8 ("arm/arm64: gic: Split check_acked() into two
->   functions").
->
-> * Patch #10 ("arm64: gic: its-trigger: Don't trigger the LPI while it is
->   pending") is new. It was added to fix an issue found in v1 [2].
->
-> * Patch #11 ("lib: arm64: gic-v3-its: Add wmb() barrier before INT
->   command") is also new; it was split from #12 ("arm64: gic: Use IPI test
->   checking for the LPI tests") following review comments.
->
-> * Removed the now redundant call to stats_reset() from its_prerequisites()
->   in #12 ("arm64: gic: Use IPI test checking for the LPI tests").
->
-> [1] https://lists.cs.columbia.edu/pipermail/kvmarm/2019-November/037853.html
-> [2] https://www.spinics.net/lists/kvm-arm/msg43628.html
->
-> Alexandru Elisei (11):
->   lib: arm/arm64: gicv3: Add missing barrier when sending IPIs
->   lib: arm/arm64: gicv2: Document existing barriers when sending IPIs
->   arm/arm64: gic: Remove SMP synchronization from
->     ipi_clear_active_handler()
->   arm/arm64: gic: Remove unnecessary synchronization with stats_reset()
->   arm/arm64: gic: Use correct memory ordering for the IPI test
->   arm/arm64: gic: Check spurious and bad_sender in the active test
->   arm/arm64: gic: Wait for writes to acked or spurious to complete
->   arm/arm64: gic: Split check_acked() into two functions
->   arm/arm64: gic: Make check_acked() more generic
->   arm64: gic: its-trigger: Don't trigger the LPI while it is pending
->   arm64: gic: Use IPI test checking for the LPI tests
->
->  lib/arm/gic-v2.c |   6 +
->  lib/arm/gic-v3.c |   6 +
->  arm/gic.c        | 338 +++++++++++++++++++++++++----------------------
->  3 files changed, 190 insertions(+), 160 deletions(-)
->
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 34 ++++++++++++++++++++++++++++++-
+>  1 file changed, 33 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 11beda85ee7e..d731cf7a56cb 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -206,12 +206,44 @@ enum vcpu_sysreg {
+>  	CNTP_CVAL_EL0,
+>  	CNTP_CTL_EL0,
+>  
+> -	/* 32bit specific registers. Keep them at the end of the range */
+> +	/* 32bit specific registers. */
+>  	DACR32_EL2,	/* Domain Access Control Register */
+>  	IFSR32_EL2,	/* Instruction Fault Status Register */
+>  	FPEXC32_EL2,	/* Floating-Point Exception Control Register */
+>  	DBGVCR32_EL2,	/* Debug Vector Catch Register */
+>  
+> +	/* EL2 registers */
+> +	VPIDR_EL2,	/* Virtualization Processor ID Register */
+> +	VMPIDR_EL2,	/* Virtualization Multiprocessor ID Register */
+> +	SCTLR_EL2,	/* System Control Register (EL2) */
+> +	ACTLR_EL2,	/* Auxiliary Control Register (EL2) */
+> +	HCR_EL2,	/* Hypervisor Configuration Register */
+> +	MDCR_EL2,	/* Monitor Debug Configuration Register (EL2) */
+> +	CPTR_EL2,	/* Architectural Feature Trap Register (EL2) */
+> +	HSTR_EL2,	/* Hypervisor System Trap Register */
+> +	HACR_EL2,	/* Hypervisor Auxiliary Control Register */
+> +	TTBR0_EL2,	/* Translation Table Base Register 0 (EL2) */
+> +	TTBR1_EL2,	/* Translation Table Base Register 1 (EL2) */
+> +	TCR_EL2,	/* Translation Control Register (EL2) */
+> +	VTTBR_EL2,	/* Virtualization Translation Table Base Register */
+> +	VTCR_EL2,	/* Virtualization Translation Control Register */
+> +	SPSR_EL2,	/* EL2 saved program status register */
+> +	ELR_EL2,	/* EL2 exception link register */
+> +	AFSR0_EL2,	/* Auxiliary Fault Status Register 0 (EL2) */
+> +	AFSR1_EL2,	/* Auxiliary Fault Status Register 1 (EL2) */
+> +	ESR_EL2,	/* Exception Syndrome Register (EL2) */
+> +	FAR_EL2,	/* Hypervisor IPA Fault Address Register */
+> +	HPFAR_EL2,	/* Hypervisor IPA Fault Address Register */
+> +	MAIR_EL2,	/* Memory Attribute Indirection Register (EL2) */
+> +	AMAIR_EL2,	/* Auxiliary Memory Attribute Indirection Register (EL2) */
+> +	VBAR_EL2,	/* Vector Base Address Register (EL2) */
+> +	RVBAR_EL2,	/* Reset Vector Base Address Register */
+> +	RMR_EL2,	/* Reset Management Register */
+> +	CONTEXTIDR_EL2,	/* Context ID Register (EL2) */
+> +	TPIDR_EL2,	/* EL2 Software Thread ID Register */
+> +	CNTHCTL_EL2,	/* Counter-timer Hypervisor Control register */
+> +	SP_EL2,		/* EL2 Stack Pointer */
+> +
+>  	NR_SYS_REGS	/* Nothing after this line! */
+>  };
+>  
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
