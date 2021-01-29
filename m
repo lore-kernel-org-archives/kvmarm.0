@@ -7,49 +7,49 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2730DC433E9
-	for <kvmarm@archiver.kernel.org>; Fri, 29 Jan 2021 16:37:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D96DEC433E0
+	for <kvmarm@archiver.kernel.org>; Fri, 29 Jan 2021 16:37:27 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B5FCB64DD6
-	for <kvmarm@archiver.kernel.org>; Fri, 29 Jan 2021 16:37:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5FCB64DD6
+	by mail.kernel.org (Postfix) with ESMTP id 819F364DFF
+	for <kvmarm@archiver.kernel.org>; Fri, 29 Jan 2021 16:37:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 819F364DFF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 17B8F4B2B8;
-	Fri, 29 Jan 2021 11:37:23 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 27D424B0E2;
+	Fri, 29 Jan 2021 11:37:27 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Es01pp8eDQT2; Fri, 29 Jan 2021 11:37:21 -0500 (EST)
+	with ESMTP id xtd594XoXAkD; Fri, 29 Jan 2021 11:37:24 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 156114B373;
-	Fri, 29 Jan 2021 11:37:20 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DEF94B0D5;
+	Fri, 29 Jan 2021 11:37:22 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 393884B34C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Jan 2021 11:37:18 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C716F4B33E
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Jan 2021 11:37:19 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CDEqphZqBAsc for <kvmarm@lists.cs.columbia.edu>;
- Fri, 29 Jan 2021 11:37:16 -0500 (EST)
+ with ESMTP id 7pD3LYbBf6LG for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 29 Jan 2021 11:37:18 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F03E94B2F7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Jan 2021 11:37:14 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 75AF14B343
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Jan 2021 11:37:17 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A6488153B;
- Fri, 29 Jan 2021 08:37:14 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 244AE1596;
+ Fri, 29 Jan 2021 08:37:17 -0800 (PST)
 Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E64F83F71B;
- Fri, 29 Jan 2021 08:37:13 -0800 (PST)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 485443F71B;
+ Fri, 29 Jan 2021 08:37:16 -0800 (PST)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: drjones@redhat.com,
 	kvm@vger.kernel.org,
 	kvmarm@lists.cs.columbia.edu
-Subject: [kvm-unit-tests PATCH v3 05/11] arm/arm64: gic: Use correct memory
- ordering for the IPI test
-Date: Fri, 29 Jan 2021 16:36:41 +0000
-Message-Id: <20210129163647.91564-6-alexandru.elisei@arm.com>
+Subject: [kvm-unit-tests PATCH v3 07/11] arm/arm64: gic: Wait for writes to
+ acked or spurious to complete
+Date: Fri, 29 Jan 2021 16:36:43 +0000
+Message-Id: <20210129163647.91564-8-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20210129163647.91564-1-alexandru.elisei@arm.com>
 References: <20210129163647.91564-1-alexandru.elisei@arm.com>
@@ -71,125 +71,64 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The IPI test works by sending IPIs to even numbered CPUs from the
-IPI_SENDER CPU (CPU1), and then checking that the other CPUs received the
-interrupts as expected. The check is done in check_acked() by the
-IPI_SENDER CPU with the help of three arrays:
+The IPI test has two parts: in the first part, it tests that the sender CPU
+can send an IPI to itself (ipi_test_self()), and in the second part it
+sends interrupts to even-numbered CPUs (ipi_test_smp()). When acknowledging
+an interrupt, if we read back a spurious interrupt ID (1023), the handler
+increments the index in the static array spurious corresponding to the CPU
+ID that the handler is running on; if we get the expected interrupt ID, we
+increment the same index in the acked array.
 
-- acked, where acked[i] == 1 means that CPU i received the interrupt.
-- bad_irq, where bad_irq[i] == -1 means that the interrupt received by CPU
-  i had the expected interrupt number (IPI_IRQ).
-- bad_sender, where bad_sender[i] == -1 means that the interrupt received
-  by CPU i was from the expected sender (IPI_SENDER, GICv2 only).
+Reads of the spurious and acked arrays are synchronized with writes
+performed before sending the IPI. The synchronization is done either in the
+IPI sender function (GICv3), either by creating a data dependency (GICv2).
 
-The assumption made by check_acked() is that if a CPU acked an interrupt,
-then bad_sender and bad_irq have also been updated. This is a common
-inter-thread communication pattern called message passing.  For message
-passing to work correctly on weakly consistent memory model architectures,
-like arm and arm64, barriers or address dependencies are required. This is
-described in ARM DDI 0487F.b, in "Armv7 compatible approaches for ordering,
-using DMB and DSB barriers" (page K11-7993), in the section with a single
-observer, which is in our case the IPI_SENDER CPU.
+At the end of the test, the sender CPU reads from the acked and spurious
+arrays to check against the expected behaviour. We need to make sure the
+that writes in ipi_handler() are observable by the sender CPU. Use a DSB
+ISHST to make sure that the writes have completed.
 
-The IPI test attempts to enforce the correct ordering using memory
-barriers, but it's not enough. For example, the program execution below is
-valid from an architectural point of view:
+One might rightfully argue that there are no guarantees regarding when the
+DSB instruction completes, just like there are no guarantees regarding when
+the value is observed by the other CPUs. However, let's do our best and
+instruct the CPU to complete the memory access when we know that it will be
+needed.
 
-3 online CPUs, initial state (from stats_reset()):
+We still need to follow the message passing pattern for the acked,
+respectively bad_irq and bad_sender, because DSB guarantees that all memory
+accesses that come before the barrier have completed, not that they have
+completed in program order.
 
-acked[2] = 0;
-bad_sender[2] = -1;
-bad_irq[2] = -1;
-
-CPU1 (in check_acked())		| CPU2 (in ipi_handler())
-				|
-smp_rmb() // DMB ISHLD		| acked[2]++;
-read 1 from acked[2]		|
-nr_pass++ // nr_pass = 3	|
-read -1 from bad_sender[2]	|
-read -1 from bad_irq[2]		|
-				| // in check_ipi_sender()
-				| bad_sender[2] = <bad ipi sender>
-				| // in check_irqnr()
-				| bad_irq[2] = <bad irq number>
-				| smp_wmb() // DMB ISHST
-nr_pass == nr_cpus, return	|
-
-In this scenario, CPU1 will read the updated acked value, but it will read
-the initial bad_sender and bad_irq values. This is permitted because the
-memory barriers do not create a data dependency between the value read from
-acked and the values read from bad_rq and bad_sender on CPU1, respectively
-between the values written to acked, bad_sender and bad_irq on CPU2.
-
-To avoid this situation, let's reorder the barriers and accesses to the
-arrays to create the needed dependencies that ensure that message passing
-behaves as expected.
-
-In the interrupt handler, the writes to bad_sender and bad_irq are
-reordered before the write to acked and a smp_wmb() barrier is added. This
-ensures that if other PEs observe the write to acked, then they will also
-observe the writes to the other two arrays.
-
-In check_acked(), put the smp_rmb() barrier after the read from acked to
-ensure that the subsequent reads from bad_sender, respectively bad_irq,
-aren't reordered locally by the PE.
-
-With these changes, the expected ordering of accesses is respected and we
-end up with the pattern described in the Arm ARM and also in the Linux
-litmus test MP+fencewmbonceonce+fencermbonceonce.litmus from
-tools/memory-model/litmus-tests. More examples and explanations can be
-found in the Linux source tree, in Documentation/memory-barriers.txt, in
-the sections "SMP BARRIER PAIRING" and "READ MEMORY BARRIERS VS LOAD
-SPECULATION".
-
-For consistency with ipi_handler(), the array accesses in
-ipi_clear_active_handler() have also been reordered. This shouldn't affect
-the functionality of that test.
-
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- arm/gic.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ arm/gic.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/arm/gic.c b/arm/gic.c
-index db1417ae1ca1..c1b6c94a5f5e 100644
+index 982c96681cf9..af4d4645c0ae 100644
 --- a/arm/gic.c
 +++ b/arm/gic.c
-@@ -72,9 +72,9 @@ static void check_acked(const char *testname, cpumask_t *mask)
- 		mdelay(100);
- 		nr_pass = 0;
- 		for_each_present_cpu(cpu) {
--			smp_rmb();
- 			nr_pass += cpumask_test_cpu(cpu, mask) ?
- 				acked[cpu] == 1 : acked[cpu] == 0;
-+			smp_rmb(); /* pairs with smp_wmb in ipi_handler */
+@@ -117,7 +117,6 @@ static void check_spurious(void)
+ {
+ 	int cpu;
  
- 			if (bad_sender[cpu] != -1) {
- 				printf("cpu%d received IPI from wrong sender %d\n",
-@@ -148,10 +148,10 @@ static void ipi_handler(struct pt_regs *regs __unused)
- 
- 	if (irqnr != GICC_INT_SPURIOUS) {
- 		gic_write_eoir(irqstat);
--		++acked[smp_processor_id()];
- 		check_ipi_sender(irqstat);
- 		check_irqnr(irqnr);
--		smp_wmb(); /* pairs with rmb in check_acked */
-+		smp_wmb(); /* pairs with smp_rmb in check_acked */
-+		++acked[smp_processor_id()];
+-	smp_rmb();
+ 	for_each_present_cpu(cpu) {
+ 		if (spurious[cpu])
+ 			report_info("WARN: cpu%d got %d spurious interrupts",
+@@ -154,8 +153,10 @@ static void ipi_handler(struct pt_regs *regs __unused)
+ 		++acked[smp_processor_id()];
  	} else {
  		++spurious[smp_processor_id()];
- 		smp_wmb();
-@@ -382,8 +382,8 @@ static void ipi_clear_active_handler(struct pt_regs *regs __unused)
- 
- 		writel(val, base + GICD_ICACTIVER);
- 
--		++acked[smp_processor_id()];
- 		check_irqnr(irqnr);
-+		++acked[smp_processor_id()];
- 	} else {
- 		++spurious[smp_processor_id()];
+-		smp_wmb();
  	}
++
++	/* Wait for writes to acked/spurious to complete */
++	dsb(ishst);
+ }
+ 
+ static void setup_irq(irq_handler_fn handler)
 -- 
 2.30.0
 
