@@ -2,87 +2,92 @@ Return-Path: <SRS0=CHPd=HD=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A3D3C433DB
-	for <kvmarm@archiver.kernel.org>; Mon,  1 Feb 2021 15:01:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27971C433DB
+	for <kvmarm@archiver.kernel.org>; Mon,  1 Feb 2021 15:15:54 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7076664EA4
-	for <kvmarm@archiver.kernel.org>; Mon,  1 Feb 2021 15:01:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7076664EA4
+	by mail.kernel.org (Postfix) with ESMTP id 7EBEB64DE3
+	for <kvmarm@archiver.kernel.org>; Mon,  1 Feb 2021 15:15:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EBEB64DE3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B2E1F4B3A8;
-	Mon,  1 Feb 2021 10:01:21 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F28094B391;
+	Mon,  1 Feb 2021 10:15:52 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id AxIeI-uUID9M; Mon,  1 Feb 2021 10:01:20 -0500 (EST)
+	with ESMTP id R+QSxbJjs7vh; Mon,  1 Feb 2021 10:15:51 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BE1B4B3A9;
-	Mon,  1 Feb 2021 10:01:20 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id ED9234B3A8;
+	Mon,  1 Feb 2021 10:15:51 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 39ECB4B3A5
- for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Feb 2021 10:01:19 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 521C64B391
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Feb 2021 10:15:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jMffO-mEmnjy for <kvmarm@lists.cs.columbia.edu>;
- Mon,  1 Feb 2021 10:01:18 -0500 (EST)
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com
- [209.85.208.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0F9D34B2D5
- for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Feb 2021 10:01:18 -0500 (EST)
-Received: by mail-ed1-f44.google.com with SMTP id d2so19235800edz.3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 01 Feb 2021 07:01:18 -0800 (PST)
+ with ESMTP id eALf6ynuBupd for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  1 Feb 2021 10:15:50 -0500 (EST)
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com
+ [209.85.128.42])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4C79C4B305
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Feb 2021 10:15:50 -0500 (EST)
+Received: by mail-wm1-f42.google.com with SMTP id m2so12956598wmm.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 01 Feb 2021 07:15:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=hZ3xD2/2lcYcAhtu708AbjR6mIFxqFO7i7RlxJAZ5ZU=;
- b=vgNYmiNTNpQzx2jV86jycjLWMXZ6nJ4tSwFTGE5x9SuV+VLEyH6rZomNo5oqBVo48Z
- DsUNK+cQyv8QkSJJyXCZV4tv7cR0lGYCjwpm+TwjNSzGMAIRQxs9GEmw8ufWoEShxBYa
- GurBr5HHFFkdq90UWzoaiYGIUkN3QyDzID/0qAL8SuJUtIPCsK6PqLwuBRW7lZ+fqOpE
- JjjRgi3SE94pzzb3u1PKCrV1lkLEtli/cajzD6YV9W7lzHADaLkPi5/ewt2oaZw4uKdu
- tgk1m8Lrv1Qvlu+q7sAxQ2juiqAdpdQe2746+17+ZmPEo8rXHJ5J2rZ6cKbFzR+uOsZh
- Rltg==
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=iCud/oZ0jp00VRdDLSDWa/VPzMcKe48VJwPVpyKJcE8=;
+ b=bljmv40viwV5v57+TtBOFwGAaz54F5a9tDXB2PSZe5+LMS1pOd9d8QiRNcEEtmVfmT
+ pdNUcTuIXIUH3CaAc+wpyhYC5hKvmCSEj3iNLAZHozaqd/vHgd82MB0cpAg+LE90lF16
+ 4P26uy+BK3EEMlaZGLfJlDisoXkiQ0huHLkrVAmKcmxDHmxRD8LzSGmdL2Cr3wzW5T7M
+ zg97INgmlfCsvWBOEZA+9NcyNVwamwDVUFyds+AxAL8QQh5KBvfc3PUTwvICN//HHTDZ
+ qkNaJJ1NQUcUnxMsjuP69oEL1TAKNDjTmwV8/PCUe7VrMoqb6akq/NuC0JNy5Wkan48Y
+ G81A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=hZ3xD2/2lcYcAhtu708AbjR6mIFxqFO7i7RlxJAZ5ZU=;
- b=KCq2m1arlpd6udmRKQ5MrpRBLd+654OeHtKclONexviULeorWFOjzefHPARkvQTCeV
- pjWSqbV5g1+Pd2tphV41bKATM3Hz/tP8TgCQ1tNHVXSxU8xGqnBAylpAkqH6kdFWH1UI
- hOJ40JiG4YhHlYI8SDXJ6S5Zw/H8q08RPFsJvlc3EOMZFv9JuhMXU/M94mmxLAosTOZR
- DUN3ZXJbFQPF+4ZICJU9vT/h8Dm42uXF3s/MfTSMgvXpNH/vjBVwhL5ATkX7DP59susv
- czYtZaYXneMwyC5wA8n/c3yLlubgDPf8UHz9fxyd1/ExgFq6g2GolzMRonn7yITnczf7
- 5n+w==
-X-Gm-Message-State: AOAM531qnwQ6rF+vdZt3acvfWl9O2E/ltpnXW1PjoEJBBtzLVSp3u7do
- k49ix9k3Wb+JnzXmvnQwswvjfNL7ugukS/91Q9DTww==
-X-Google-Smtp-Source: ABdhPJyUKDJgotj2iV/EZDBBDNQh6SKgJOObpqGbdfNKm6jwpeZr7z46WvIqVVcQo2wc5dGjzyguHOPwSCGKOdVqhQ8=
-X-Received: by 2002:a05:6402:26c9:: with SMTP id
- x9mr19192479edd.365.1612191676837; 
- Mon, 01 Feb 2021 07:01:16 -0800 (PST)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=iCud/oZ0jp00VRdDLSDWa/VPzMcKe48VJwPVpyKJcE8=;
+ b=rXxZi8XeK0bw0j4SoQFKUbxVUsBkQTVUdzclteqqkOaenoKS4cxk4lOx0weTicGjPZ
+ 9QcY5775kXYlUX2L/b/1bIyocG/5yoQf6FAQHoKorahKI9iJ9OtUIdJRM4aNSoRAkEDt
+ PeoSgkWyOcvF9KdGqSZWN1MN0iSHDPrb5bTHKJnW31k3bzmevVGt2DWWy//3NXYbG89/
+ g/9gqoXI5eohIzCzRHAJqz8CQK9ejDG4PjvCmzhLc31HTInKs5sCfJn0X94lgueJOC60
+ Lx6gavYa1j5PCNqISbTX1FSaNuEFfLjme7wVQk52xbXEZ8E03f544ClE0Mm7dCX6Yglk
+ 2wvQ==
+X-Gm-Message-State: AOAM533ikx6iZrYsHvMabpT5SEsqVQBvHBrxKPP+mCh2Nrayg4LyjMtZ
+ NYWMHx4dRh81to8XJSaOYJY2Bg==
+X-Google-Smtp-Source: ABdhPJxyP1BG+oDXc31HY7CW5MYwKqTaLbVBSjGD3rpSrDcbzKlD5YRXlGtJCbFbmp87GaK0VAFutQ==
+X-Received: by 2002:a7b:c8c3:: with SMTP id f3mr15569794wml.110.1612192549227; 
+ Mon, 01 Feb 2021 07:15:49 -0800 (PST)
+Received: from myrica ([2001:1715:4e26:a7e0:116c:c27a:3e7f:5eaf])
+ by smtp.gmail.com with ESMTPSA id y11sm26855292wrh.16.2021.02.01.07.15.48
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 01 Feb 2021 07:15:48 -0800 (PST)
+Date: Mon, 1 Feb 2021 16:15:29 +0100
+From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+To: Keqian Zhu <zhukeqian1@huawei.com>
+Subject: Re: [PATCH v13 03/15] iommu/arm-smmu-v3: Maintain a SID->device
+ structure
+Message-ID: <YBgbESEyReLV124Z@myrica>
+References: <20201118112151.25412-1-eric.auger@redhat.com>
+ <20201118112151.25412-4-eric.auger@redhat.com>
+ <a5cc1635-b69b-50a6-404a-5bf667296669@huawei.com>
 MIME-Version: 1.0
-References: <CA+G9fYvzh5GEssPJHM=r2TVUKOhsFJ8jqrY+pP4t7+jF8ctz9A@mail.gmail.com>
- <5f072f84c7c9b03ded810e56687935b2@kernel.org>
-In-Reply-To: <5f072f84c7c9b03ded810e56687935b2@kernel.org>
-From: Naresh Kamboju <naresh.kamboju@linaro.org>
-Date: Mon, 1 Feb 2021 20:31:05 +0530
-Message-ID: <CA+G9fYs4u=E+jMxTds8A-gYWchC4OSdx26cCw7079+w3_bUiZQ@mail.gmail.com>
-Subject: Re: arm64: gen-hyprel.c:40:10: fatal error: generated/autoconf.h: No
- such file or directory
-To: Marc Zyngier <maz@kernel.org>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>, Arnd Bergmann <arnd@arndb.de>,
- kvm list <kvm@vger.kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- open list <linux-kernel@vger.kernel.org>, lkft-triage@lists.linaro.org,
- Linux-Next Mailing List <linux-next@vger.kernel.org>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- Linux ARM <linux-arm-kernel@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <a5cc1635-b69b-50a6-404a-5bf667296669@huawei.com>
+Cc: jacob.jun.pan@linux.intel.com, alex.williamson@redhat.com,
+ kvm@vger.kernel.org, vivek.gautam@arm.com, maz@kernel.org, joro@8bytes.org,
+ linux-kernel@vger.kernel.org, nicoleotsuka@gmail.com,
+ iommu@lists.linux-foundation.org, yi.l.liu@intel.com, zhangfei.gao@linaro.org,
+ robin.murphy@arm.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ eric.auger.pro@gmail.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -99,50 +104,45 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 1 Feb 2021 at 19:15, Marc Zyngier <maz@kernel.org> wrote:
->
-> On 2021-02-01 13:38, Naresh Kamboju wrote:
-> > Linux next 20210201 tag arm64 builds failed.
-> > kernel config attached to this email.
-> >
-> > BAD:    next-20210201
-> > GOOD: next-20210129
-> >
-> > make --silent --keep-going --jobs=8
-> > O=/home/tuxbuild/.cache/tuxmake/builds/1/tmp ARCH=arm64
-> > CROSS_COMPILE=aarch64-linux-gnu- 'CC=sccache aarch64-linux-gnu-gcc'
-> > 'HOSTCC=sccache gcc'
-> > arch/arm64/kvm/hyp/nvhe/gen-hyprel.c:40:10: fatal error:
-> > generated/autoconf.h: No such file or directory
-> >    40 | #include <generated/autoconf.h>
-> >       |          ^~~~~~~~~~~~~~~~~~~~~~
-> > compilation terminated.
-> >
-> > Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
->
-> Could you please check with the fix suggested at [1]?
+On Mon, Feb 01, 2021 at 08:26:41PM +0800, Keqian Zhu wrote:
+> > +static int arm_smmu_insert_master(struct arm_smmu_device *smmu,
+> > +				  struct arm_smmu_master *master)
+> > +{
+> > +	int i;
+> > +	int ret = 0;
+> > +	struct arm_smmu_stream *new_stream, *cur_stream;
+> > +	struct rb_node **new_node, *parent_node = NULL;
+> > +	struct iommu_fwspec *fwspec = dev_iommu_fwspec_get(master->dev);
+> > +
+> > +	master->streams = kcalloc(fwspec->num_ids,
+> > +				  sizeof(struct arm_smmu_stream), GFP_KERNEL);
+> > +	if (!master->streams)
+> > +		return -ENOMEM;
+> > +	master->num_streams = fwspec->num_ids;
+> This is not roll-backed when fail.
 
-Here is the change I have applied and the arm64 builds successful now.
+No need, the caller frees master
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-index 09d04dd50eb8..ed10fcf1b345 100644
---- a/arch/arm64/kvm/hyp/nvhe/Makefile
-+++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-@@ -7,7 +7,7 @@ asflags-y := -D__KVM_NVHE_HYPERVISOR__
- ccflags-y := -D__KVM_NVHE_HYPERVISOR__
+> > +
+> > +	mutex_lock(&smmu->streams_mutex);
+> > +	for (i = 0; i < fwspec->num_ids && !ret; i++) {
+> Check ret at here, makes it hard to decide the start index of rollback.
+> 
+> If we fail at here, then start index is (i-2).
+> If we fail in the loop, then start index is (i-1).
+> 
+[...]
+> > +	if (ret) {
+> > +		for (; i > 0; i--)
+> should be (i >= 0)?
+> And the start index seems not correct.
 
- hostprogs := gen-hyprel
--HOST_EXTRACFLAGS += -I$(srctree)/include
-+HOST_EXTRACFLAGS += -I$(objtree)/include
+Indeed, this whole bit is wrong. I'll fix it while resending the IOPF
+series.
 
- obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o \
-         hyp-main.o hyp-smp.o psci-relay.o
+Thanks,
+Jean
 
-
-> [1] https://lore.kernel.org/r/20210201104251.5foc64qq3ewgnhuz@google.com
-
-
-- Naresh
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
