@@ -6,52 +6,53 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E02EC433E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9567EC433E6
 	for <kvmarm@archiver.kernel.org>; Mon,  1 Feb 2021 12:04:32 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BC7FC64EA1
-	for <kvmarm@archiver.kernel.org>; Mon,  1 Feb 2021 12:04:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC7FC64EA1
+	by mail.kernel.org (Postfix) with ESMTP id 1E9F064EA2
+	for <kvmarm@archiver.kernel.org>; Mon,  1 Feb 2021 12:04:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E9F064EA2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F9094B3F0;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B78AC4B3E1;
 	Mon,  1 Feb 2021 07:04:31 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id mfl2Hq62Vh8Y; Mon,  1 Feb 2021 07:04:29 -0500 (EST)
+	with ESMTP id gI11LaICg8EF; Mon,  1 Feb 2021 07:04:30 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 853734B3E1;
-	Mon,  1 Feb 2021 07:04:29 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A720A4B3DC;
+	Mon,  1 Feb 2021 07:04:30 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 370734B405
- for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Feb 2021 07:04:28 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 31F7D4B3D8
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Feb 2021 07:04:29 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vC30huRrUr0l for <kvmarm@lists.cs.columbia.edu>;
- Mon,  1 Feb 2021 07:04:27 -0500 (EST)
+ with ESMTP id Ty9K5sSYA2Kw for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  1 Feb 2021 07:04:28 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 533AB4B3EA
- for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Feb 2021 07:04:26 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1C6154B426
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Feb 2021 07:04:28 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 5160A64E9B;
- Mon,  1 Feb 2021 12:04:25 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 3878464EA0;
+ Mon,  1 Feb 2021 12:04:27 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1l6XpB-00BG09-UF; Mon, 01 Feb 2021 11:56:59 +0000
+ id 1l6Xp7-00BG09-68; Mon, 01 Feb 2021 11:56:53 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  linux-kernel@vger.kernel.org
-Subject: [PATCH v6 14/21] arm64: Honor VHE being disabled from the command-line
-Date: Mon,  1 Feb 2021 11:56:30 +0000
-Message-Id: <20210201115637.3123740-15-maz@kernel.org>
+Subject: [PATCH v6 10/21] arm64: cpufeature: Use IDreg override in
+ __read_sysreg_by_encoding()
+Date: Mon,  1 Feb 2021 11:56:26 +0000
+Message-Id: <20210201115637.3123740-11-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210201115637.3123740-1-maz@kernel.org>
 References: <20210201115637.3123740-1-maz@kernel.org>
@@ -88,53 +89,76 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Finally we can check whether VHE is disabled on the command line,
-and not enable it if that's the user's wish.
+__read_sysreg_by_encoding() is used by a bunch of cpufeature helpers,
+which should take the feature override into account. Let's do that.
+
+For a good measure (and because we are likely to need to further
+down the line), make this helper available to the rest of the
+non-modular kernel.
+
+Code that needs to know the *real* features of a CPU can still
+use read_sysreg_s(), and find the bare, ugly truth.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Acked-by: David Brazdil <dbrazdil@google.com>
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 ---
- arch/arm64/kernel/asm-offsets.c |  3 +++
- arch/arm64/kernel/hyp-stub.S    | 11 +++++++++++
- 2 files changed, 14 insertions(+)
+ arch/arm64/include/asm/cpufeature.h |  1 +
+ arch/arm64/kernel/cpufeature.c      | 15 +++++++++++++--
+ 2 files changed, 14 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
-index f42fd9e33981..1add0f21bffe 100644
---- a/arch/arm64/kernel/asm-offsets.c
-+++ b/arch/arm64/kernel/asm-offsets.c
-@@ -99,6 +99,9 @@ int main(void)
-   DEFINE(CPU_BOOT_STACK,	offsetof(struct secondary_data, stack));
-   DEFINE(CPU_BOOT_TASK,		offsetof(struct secondary_data, task));
-   BLANK();
-+  DEFINE(FTR_OVR_VAL_OFFSET,	offsetof(struct arm64_ftr_override, val));
-+  DEFINE(FTR_OVR_MASK_OFFSET,	offsetof(struct arm64_ftr_override, mask));
-+  BLANK();
- #ifdef CONFIG_KVM
-   DEFINE(VCPU_CONTEXT,		offsetof(struct kvm_vcpu, arch.ctxt));
-   DEFINE(VCPU_FAULT_DISR,	offsetof(struct kvm_vcpu, arch.fault.disr_el1));
-diff --git a/arch/arm64/kernel/hyp-stub.S b/arch/arm64/kernel/hyp-stub.S
-index 6b5c73cf9d52..aa7e8d592295 100644
---- a/arch/arm64/kernel/hyp-stub.S
-+++ b/arch/arm64/kernel/hyp-stub.S
-@@ -87,6 +87,17 @@ SYM_CODE_START_LOCAL(mutate_to_vhe)
- 	ubfx	x1, x1, #ID_AA64MMFR1_VHE_SHIFT, #4
- 	cbz	x1, 1f
+diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+index b1f53147e2b2..b5bf7af68691 100644
+--- a/arch/arm64/include/asm/cpufeature.h
++++ b/arch/arm64/include/asm/cpufeature.h
+@@ -606,6 +606,7 @@ void __init setup_cpu_features(void);
+ void check_local_cpu_capabilities(void);
  
-+	// Check whether VHE is disabled from the command line
-+	adr_l	x1, id_aa64mmfr1_override
-+	ldr	x2, [x1, FTR_OVR_VAL_OFFSET]
-+	ldr	x1, [x1, FTR_OVR_MASK_OFFSET]
-+	ubfx	x2, x2, #ID_AA64MMFR1_VHE_SHIFT, #4
-+	ubfx	x1, x1, #ID_AA64MMFR1_VHE_SHIFT, #4
-+	cmp	x1, xzr
-+	and	x2, x2, x1
-+	csinv	x2, x2, xzr, ne
-+	cbz	x2, 1f
+ u64 read_sanitised_ftr_reg(u32 id);
++u64 __read_sysreg_by_encoding(u32 sys_id);
+ 
+ static inline bool cpu_supports_mixed_endian_el0(void)
+ {
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index a4e5c619a516..97da9ed4b79d 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -1148,14 +1148,17 @@ u64 read_sanitised_ftr_reg(u32 id)
+ EXPORT_SYMBOL_GPL(read_sanitised_ftr_reg);
+ 
+ #define read_sysreg_case(r)	\
+-	case r:		return read_sysreg_s(r)
++	case r:		val = read_sysreg_s(r); break;
+ 
+ /*
+  * __read_sysreg_by_encoding() - Used by a STARTING cpu before cpuinfo is populated.
+  * Read the system register on the current CPU
+  */
+-static u64 __read_sysreg_by_encoding(u32 sys_id)
++u64 __read_sysreg_by_encoding(u32 sys_id)
+ {
++	struct arm64_ftr_reg *regp;
++	u64 val;
 +
- 	// Engage the VHE magic!
- 	mov_q	x0, HCR_HOST_VHE_FLAGS
- 	msr	hcr_el2, x0
+ 	switch (sys_id) {
+ 	read_sysreg_case(SYS_ID_PFR0_EL1);
+ 	read_sysreg_case(SYS_ID_PFR1_EL1);
+@@ -1198,6 +1201,14 @@ static u64 __read_sysreg_by_encoding(u32 sys_id)
+ 		BUG();
+ 		return 0;
+ 	}
++
++	regp  = get_arm64_ftr_reg(sys_id);
++	if (regp) {
++		val &= ~regp->override->mask;
++		val |= (regp->override->val & regp->override->mask);
++	}
++
++	return val;
+ }
+ 
+ #include <linux/irqchip/arm-gic-v3.h>
 -- 
 2.29.2
 
