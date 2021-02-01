@@ -2,66 +2,76 @@ Return-Path: <SRS0=CHPd=HD=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ED86C433DB
-	for <kvmarm@archiver.kernel.org>; Mon,  1 Feb 2021 11:53:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CA11C433E0
+	for <kvmarm@archiver.kernel.org>; Mon,  1 Feb 2021 11:56:53 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DF9B464E50
-	for <kvmarm@archiver.kernel.org>; Mon,  1 Feb 2021 11:53:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF9B464E50
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id A687864EA7
+	for <kvmarm@archiver.kernel.org>; Mon,  1 Feb 2021 11:56:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A687864EA7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E4FC4B3FA;
-	Mon,  1 Feb 2021 06:53:00 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2595D4B455;
+	Mon,  1 Feb 2021 06:56:52 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id IKu0iKDeqzhm; Mon,  1 Feb 2021 06:52:59 -0500 (EST)
+	with ESMTP id 3SL9HJ2UFez9; Mon,  1 Feb 2021 06:56:50 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C8894B38E;
-	Mon,  1 Feb 2021 06:52:59 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BDDCE4B3E7;
+	Mon,  1 Feb 2021 06:56:50 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E399B4B3B3
- for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Feb 2021 06:52:57 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F6CE4B3B3
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Feb 2021 06:56:49 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id okOKFbkjxXXt for <kvmarm@lists.cs.columbia.edu>;
- Mon,  1 Feb 2021 06:52:55 -0500 (EST)
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4AB7D4B342
- for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Feb 2021 06:52:55 -0500 (EST)
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
- by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DTmWC0lfWzjHP0;
- Mon,  1 Feb 2021 19:51:35 +0800 (CST)
-Received: from [10.174.184.42] (10.174.184.42) by
- DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
- 14.3.498.0; Mon, 1 Feb 2021 19:52:45 +0800
-Subject: Re: [PATCH v13 02/15] iommu: Introduce bind/unbind_guest_msi
-To: Eric Auger <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
- <iommu@lists.linux-foundation.org>, <linux-kernel@vger.kernel.org>,
- <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>, <will@kernel.org>,
- <joro@8bytes.org>, <maz@kernel.org>, <robin.murphy@arm.com>,
- <alex.williamson@redhat.com>
-References: <20201118112151.25412-1-eric.auger@redhat.com>
- <20201118112151.25412-3-eric.auger@redhat.com>
-From: Keqian Zhu <zhukeqian1@huawei.com>
-Message-ID: <6a70d93d-329f-4129-bd90-03f8589c5de4@huawei.com>
-Date: Mon, 1 Feb 2021 19:52:44 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+ with ESMTP id rpPfzX6yRzSF for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  1 Feb 2021 06:56:48 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C949D4B20F
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Feb 2021 06:56:47 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id E24B564E50;
+ Mon,  1 Feb 2021 11:56:46 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1l6Xoz-00BG09-04; Mon, 01 Feb 2021 11:56:45 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ linux-kernel@vger.kernel.org
+Subject: [PATCH v6 01/21] arm64: Fix labels in el2_setup macros
+Date: Mon,  1 Feb 2021 11:56:17 +0000
+Message-Id: <20210201115637.3123740-2-maz@kernel.org>
+X-Mailer: git-send-email 2.29.2
+In-Reply-To: <20210201115637.3123740-1-maz@kernel.org>
+References: <20210201115637.3123740-1-maz@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20201118112151.25412-3-eric.auger@redhat.com>
-X-Originating-IP: [10.174.184.42]
-X-CFilter-Loop: Reflected
-Cc: jean-philippe@linaro.org, jacob.jun.pan@linux.intel.com,
- nicoleotsuka@gmail.com, vivek.gautam@arm.com, yi.l.liu@intel.com,
- zhangfei.gao@linaro.org
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+ catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com,
+ dbrazdil@google.com, alexandru.elisei@arm.com, ardb@kernel.org,
+ jingzhangos@google.com, pajay@qti.qualcomm.com, psodagud@codeaurora.org,
+ sramana@codeaurora.org, james.morse@arm.com, julien.thierry.kdev@gmail.com,
+ suzuki.poulose@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Prasad Sodagudi <psodagud@codeaurora.org>,
+ Srinivas Ramana <sramana@codeaurora.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Ajay Patil <pajay@qti.qualcomm.com>,
+ kernel-team@android.com, Will Deacon <will@kernel.org>,
+ Ard Biesheuvel <ardb@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -78,80 +88,119 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Eric,
+If someone happens to write the following code:
 
-On 2020/11/18 19:21, Eric Auger wrote:
-> On ARM, MSI are translated by the SMMU. An IOVA is allocated
-> for each MSI doorbell. If both the host and the guest are exposed
-> with SMMUs, we end up with 2 different IOVAs allocated by each.
-> guest allocates an IOVA (gIOVA) to map onto the guest MSI
-> doorbell (gDB). The Host allocates another IOVA (hIOVA) to map
-> onto the physical doorbell (hDB).
-> 
-> So we end up with 2 untied mappings:
->          S1            S2
-> gIOVA    ->    gDB
->               hIOVA    ->    hDB
-> 
-> Currently the PCI device is programmed by the host with hIOVA
-> as MSI doorbell. So this does not work.
-> 
-> This patch introduces an API to pass gIOVA/gDB to the host so
-> that gIOVA can be reused by the host instead of re-allocating
-> a new IOVA. So the goal is to create the following nested mapping:
-Does the gDB can be reused under non-nested mode?
+	b	1f
+	init_el2_state	vhe
+1:
+	[...]
 
-> 
->          S1            S2
-> gIOVA    ->    gDB     ->    hDB
-> 
-> and program the PCI device with gIOVA MSI doorbell.
-> 
-> In case we have several devices attached to this nested domain
-> (devices belonging to the same group), they cannot be isolated
-> on guest side either. So they should also end up in the same domain
-> on guest side. We will enforce that all the devices attached to
-> the host iommu domain use the same physical doorbell and similarly
-> a single virtual doorbell mapping gets registered (1 single
-> virtual doorbell is used on guest as well).
-> 
-[...]
+they will be in for a long debugging session, as the label "1f"
+will be resolved *inside* the init_el2_state macro instead of
+after it. Not really what one expects.
 
-> + *
-> + * The associated IOVA can be reused by the host to create a nested
-> + * stage2 binding mapping translating into the physical doorbell used
-> + * by the devices attached to the domain.
-> + *
-> + * All devices within the domain must share the same physical doorbell.
-> + * A single MSI GIOVA/GPA mapping can be attached to an iommu_domain.
-> + */
-> +
-> +int iommu_bind_guest_msi(struct iommu_domain *domain,
-> +			 dma_addr_t giova, phys_addr_t gpa, size_t size)
-> +{
-> +	if (unlikely(!domain->ops->bind_guest_msi))
-> +		return -ENODEV;
-> +
-> +	return domain->ops->bind_guest_msi(domain, giova, gpa, size);
-> +}
-> +EXPORT_SYMBOL_GPL(iommu_bind_guest_msi);
-> +
-> +void iommu_unbind_guest_msi(struct iommu_domain *domain,
-> +			    dma_addr_t iova)
-nit: s/iova/giova
+Instead, rewite the EL2 setup macros to use unambiguous labels,
+thanks to the usual macro counter trick.
 
-> +{
-> +	if (unlikely(!domain->ops->unbind_guest_msi))
-> +		return;
-> +
-> +	domain->ops->unbind_guest_msi(domain, iova);
-> +}
-> +EXPORT_SYMBOL_GPL(iommu_unbind_guest_msi);
-> +
-[...]
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Acked-by: David Brazdil <dbrazdil@google.com>
+---
+ arch/arm64/include/asm/el2_setup.h | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
 
-Thanks,
-Keqian
+diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
+index a7f5a1bbc8ac..540116de80bf 100644
+--- a/arch/arm64/include/asm/el2_setup.h
++++ b/arch/arm64/include/asm/el2_setup.h
+@@ -45,24 +45,24 @@
+ 	mrs	x1, id_aa64dfr0_el1
+ 	sbfx	x0, x1, #ID_AA64DFR0_PMUVER_SHIFT, #4
+ 	cmp	x0, #1
+-	b.lt	1f				// Skip if no PMU present
++	b.lt	.Lskip_pmu_\@			// Skip if no PMU present
+ 	mrs	x0, pmcr_el0			// Disable debug access traps
+ 	ubfx	x0, x0, #11, #5			// to EL2 and allow access to
+-1:
++.Lskip_pmu_\@:
+ 	csel	x2, xzr, x0, lt			// all PMU counters from EL1
+ 
+ 	/* Statistical profiling */
+ 	ubfx	x0, x1, #ID_AA64DFR0_PMSVER_SHIFT, #4
+-	cbz	x0, 3f				// Skip if SPE not present
++	cbz	x0, .Lskip_spe_\@		// Skip if SPE not present
+ 
+ .ifeqs "\mode", "nvhe"
+ 	mrs_s	x0, SYS_PMBIDR_EL1              // If SPE available at EL2,
+ 	and	x0, x0, #(1 << SYS_PMBIDR_EL1_P_SHIFT)
+-	cbnz	x0, 2f				// then permit sampling of physical
++	cbnz	x0, .Lskip_spe_el2_\@		// then permit sampling of physical
+ 	mov	x0, #(1 << SYS_PMSCR_EL2_PCT_SHIFT | \
+ 		      1 << SYS_PMSCR_EL2_PA_SHIFT)
+ 	msr_s	SYS_PMSCR_EL2, x0		// addresses and physical counter
+-2:
++.Lskip_spe_el2_\@:
+ 	mov	x0, #(MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT)
+ 	orr	x2, x2, x0			// If we don't have VHE, then
+ 						// use EL1&0 translation.
+@@ -71,7 +71,7 @@
+ 						// and disable access from EL1
+ .endif
+ 
+-3:
++.Lskip_spe_\@:
+ 	msr	mdcr_el2, x2			// Configure debug traps
+ .endm
+ 
+@@ -79,9 +79,9 @@
+ .macro __init_el2_lor
+ 	mrs	x1, id_aa64mmfr1_el1
+ 	ubfx	x0, x1, #ID_AA64MMFR1_LOR_SHIFT, 4
+-	cbz	x0, 1f
++	cbz	x0, .Lskip_lor_\@
+ 	msr_s	SYS_LORC_EL1, xzr
+-1:
++.Lskip_lor_\@:
+ .endm
+ 
+ /* Stage-2 translation */
+@@ -93,7 +93,7 @@
+ .macro __init_el2_gicv3
+ 	mrs	x0, id_aa64pfr0_el1
+ 	ubfx	x0, x0, #ID_AA64PFR0_GIC_SHIFT, #4
+-	cbz	x0, 1f
++	cbz	x0, .Lskip_gicv3_\@
+ 
+ 	mrs_s	x0, SYS_ICC_SRE_EL2
+ 	orr	x0, x0, #ICC_SRE_EL2_SRE	// Set ICC_SRE_EL2.SRE==1
+@@ -103,7 +103,7 @@
+ 	mrs_s	x0, SYS_ICC_SRE_EL2		// Read SRE back,
+ 	tbz	x0, #0, 1f			// and check that it sticks
+ 	msr_s	SYS_ICH_HCR_EL2, xzr		// Reset ICC_HCR_EL2 to defaults
+-1:
++.Lskip_gicv3_\@:
+ .endm
+ 
+ .macro __init_el2_hstr
+@@ -128,14 +128,14 @@
+ .macro __init_el2_nvhe_sve
+ 	mrs	x1, id_aa64pfr0_el1
+ 	ubfx	x1, x1, #ID_AA64PFR0_SVE_SHIFT, #4
+-	cbz	x1, 1f
++	cbz	x1, .Lskip_sve_\@
+ 
+ 	bic	x0, x0, #CPTR_EL2_TZ		// Also disable SVE traps
+ 	msr	cptr_el2, x0			// Disable copro. traps to EL2
+ 	isb
+ 	mov	x1, #ZCR_ELx_LEN_MASK		// SVE: Enable full vector
+ 	msr_s	SYS_ZCR_EL2, x1			// length for EL1.
+-1:
++.Lskip_sve_\@:
+ .endm
+ 
+ .macro __init_el2_nvhe_prepare_eret
+-- 
+2.29.2
 
 _______________________________________________
 kvmarm mailing list
