@@ -6,53 +6,52 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9567EC433E6
-	for <kvmarm@archiver.kernel.org>; Mon,  1 Feb 2021 12:04:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2011C433DB
+	for <kvmarm@archiver.kernel.org>; Mon,  1 Feb 2021 12:04:35 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1E9F064EA2
-	for <kvmarm@archiver.kernel.org>; Mon,  1 Feb 2021 12:04:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E9F064EA2
+	by mail.kernel.org (Postfix) with ESMTP id 42C9F64EA4
+	for <kvmarm@archiver.kernel.org>; Mon,  1 Feb 2021 12:04:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42C9F64EA4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B78AC4B3E1;
-	Mon,  1 Feb 2021 07:04:31 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DEE404B406;
+	Mon,  1 Feb 2021 07:04:34 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id gI11LaICg8EF; Mon,  1 Feb 2021 07:04:30 -0500 (EST)
+	with ESMTP id BlbYftR9Bwsi; Mon,  1 Feb 2021 07:04:33 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A720A4B3DC;
-	Mon,  1 Feb 2021 07:04:30 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CA42F4B3CE;
+	Mon,  1 Feb 2021 07:04:33 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 31F7D4B3D8
- for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Feb 2021 07:04:29 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F6F54B3CE
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Feb 2021 07:04:32 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Ty9K5sSYA2Kw for <kvmarm@lists.cs.columbia.edu>;
- Mon,  1 Feb 2021 07:04:28 -0500 (EST)
+ with ESMTP id btT-FoZ9CkdR for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  1 Feb 2021 07:04:31 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1C6154B426
- for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Feb 2021 07:04:28 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B6AF14B3D8
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Feb 2021 07:04:30 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 3878464EA0;
- Mon,  1 Feb 2021 12:04:27 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id D5F6464E9D;
+ Mon,  1 Feb 2021 12:04:29 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1l6Xp7-00BG09-68; Mon, 01 Feb 2021 11:56:53 +0000
+ id 1l6XpH-00BG09-7u; Mon, 01 Feb 2021 11:57:03 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  linux-kernel@vger.kernel.org
-Subject: [PATCH v6 10/21] arm64: cpufeature: Use IDreg override in
- __read_sysreg_by_encoding()
-Date: Mon,  1 Feb 2021 11:56:26 +0000
-Message-Id: <20210201115637.3123740-11-maz@kernel.org>
+Subject: [PATCH v6 17/21] KVM: arm64: Document HVC_VHE_RESTART stub hypercall
+Date: Mon,  1 Feb 2021 11:56:33 +0000
+Message-Id: <20210201115637.3123740-18-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210201115637.3123740-1-maz@kernel.org>
 References: <20210201115637.3123740-1-maz@kernel.org>
@@ -89,76 +88,34 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-__read_sysreg_by_encoding() is used by a bunch of cpufeature helpers,
-which should take the feature override into account. Let's do that.
-
-For a good measure (and because we are likely to need to further
-down the line), make this helper available to the rest of the
-non-modular kernel.
-
-Code that needs to know the *real* features of a CPU can still
-use read_sysreg_s(), and find the bare, ugly truth.
+For completeness, let's document the HVC_VHE_RESTART stub.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Acked-by: David Brazdil <dbrazdil@google.com>
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 ---
- arch/arm64/include/asm/cpufeature.h |  1 +
- arch/arm64/kernel/cpufeature.c      | 15 +++++++++++++--
- 2 files changed, 14 insertions(+), 2 deletions(-)
+ Documentation/virt/kvm/arm/hyp-abi.rst | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-index b1f53147e2b2..b5bf7af68691 100644
---- a/arch/arm64/include/asm/cpufeature.h
-+++ b/arch/arm64/include/asm/cpufeature.h
-@@ -606,6 +606,7 @@ void __init setup_cpu_features(void);
- void check_local_cpu_capabilities(void);
+diff --git a/Documentation/virt/kvm/arm/hyp-abi.rst b/Documentation/virt/kvm/arm/hyp-abi.rst
+index 83cadd8186fa..4d43fbc25195 100644
+--- a/Documentation/virt/kvm/arm/hyp-abi.rst
++++ b/Documentation/virt/kvm/arm/hyp-abi.rst
+@@ -58,6 +58,15 @@ these functions (see arch/arm{,64}/include/asm/virt.h):
+   into place (arm64 only), and jump to the restart address while at HYP/EL2.
+   This hypercall is not expected to return to its caller.
  
- u64 read_sanitised_ftr_reg(u32 id);
-+u64 __read_sysreg_by_encoding(u32 sys_id);
- 
- static inline bool cpu_supports_mixed_endian_el0(void)
- {
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index a4e5c619a516..97da9ed4b79d 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -1148,14 +1148,17 @@ u64 read_sanitised_ftr_reg(u32 id)
- EXPORT_SYMBOL_GPL(read_sanitised_ftr_reg);
- 
- #define read_sysreg_case(r)	\
--	case r:		return read_sysreg_s(r)
-+	case r:		val = read_sysreg_s(r); break;
- 
- /*
-  * __read_sysreg_by_encoding() - Used by a STARTING cpu before cpuinfo is populated.
-  * Read the system register on the current CPU
-  */
--static u64 __read_sysreg_by_encoding(u32 sys_id)
-+u64 __read_sysreg_by_encoding(u32 sys_id)
- {
-+	struct arm64_ftr_reg *regp;
-+	u64 val;
++* ::
 +
- 	switch (sys_id) {
- 	read_sysreg_case(SYS_ID_PFR0_EL1);
- 	read_sysreg_case(SYS_ID_PFR1_EL1);
-@@ -1198,6 +1201,14 @@ static u64 __read_sysreg_by_encoding(u32 sys_id)
- 		BUG();
- 		return 0;
- 	}
++    x0 = HVC_VHE_RESTART (arm64 only)
 +
-+	regp  = get_arm64_ftr_reg(sys_id);
-+	if (regp) {
-+		val &= ~regp->override->mask;
-+		val |= (regp->override->val & regp->override->mask);
-+	}
++  Attempt to upgrade the kernel's exception level from EL1 to EL2 by enabling
++  the VHE mode. This is conditioned by the CPU supporting VHE, the EL2 MMU
++  being off, and VHE not being disabled by any other means (command line
++  option, for example).
 +
-+	return val;
- }
+ Any other value of r0/x0 triggers a hypervisor-specific handling,
+ which is not documented here.
  
- #include <linux/irqchip/arm-gic-v3.h>
 -- 
 2.29.2
 
