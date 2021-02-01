@@ -2,91 +2,66 @@ Return-Path: <SRS0=CHPd=HD=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D67E8C433E0
-	for <kvmarm@archiver.kernel.org>; Mon,  1 Feb 2021 10:42:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA92EC433E6
+	for <kvmarm@archiver.kernel.org>; Mon,  1 Feb 2021 11:27:42 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 36D4764E9D
-	for <kvmarm@archiver.kernel.org>; Mon,  1 Feb 2021 10:42:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36D4764E9D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 248FD64DD9
+	for <kvmarm@archiver.kernel.org>; Mon,  1 Feb 2021 11:27:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 248FD64DD9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 968DF4B3B5;
-	Mon,  1 Feb 2021 05:42:57 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 852464B2C8;
+	Mon,  1 Feb 2021 06:27:41 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 4YBwrvTJpFX8; Mon,  1 Feb 2021 05:42:56 -0500 (EST)
+	with ESMTP id j4t5ZGjxDg4W; Mon,  1 Feb 2021 06:27:40 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AB0E94B2BE;
-	Mon,  1 Feb 2021 05:42:56 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 31F874B367;
+	Mon,  1 Feb 2021 06:27:40 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BB044B1D5
- for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Feb 2021 05:42:55 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 82CBA4B2F2
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Feb 2021 06:27:39 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YHadwc-qFTA2 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  1 Feb 2021 05:42:54 -0500 (EST)
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com
- [209.85.221.48])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 699E34B159
- for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Feb 2021 05:42:54 -0500 (EST)
-Received: by mail-wr1-f48.google.com with SMTP id q7so15982449wre.13
- for <kvmarm@lists.cs.columbia.edu>; Mon, 01 Feb 2021 02:42:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=KdljAzvVi5//s6op/UovX5xLDFP4TmnwHCTlJ043Sgk=;
- b=oDc7dLdep+fwQDEfn8GKNdZwRpnBo6pbFxId8749NzFRiSokjVe3DGWPKGRscTKK+K
- 4uwbAOmL8cdT5tnvzsCWkSs17w/qwu2amo5Z3VgvXadbhwvMy/gOM08WBIcfdYRG+Fwf
- 8/rN00FPZygg5ZVzcKauVFZnt6AtClTUkTAe+vOJ08sDUqm6VXcefnNio8jJswex+lkZ
- YpGywOvETDx/20tlLBCaFeJTUyiPAB7ttMps/767ajZUfsCgiWKWZNmPfpbW72jJu2h5
- hOea0XYe7cUUPfWv9aVdiuqCXNBrRZB/uBMqg8j5LUwlx9PaUOzVEXXgZCBtKYs+XwsF
- 53/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=KdljAzvVi5//s6op/UovX5xLDFP4TmnwHCTlJ043Sgk=;
- b=e5a6Ef/Gw8i1Xy/DwTPwv3tMy3XTJsGwrS8qHprhYNa/0UDH+mPJ551NPgotHGlYcu
- GhJ2ypMgYvEDzJA8AztiDJN6avl95LScschd1pPHceWtn2rT98cQP0rSWNx7Lm6xhva9
- ImqxX/eMOL8vyt1qRb7o2LzYMwydAHVcT9KjEneiGeK4tn5R1kXmDcoKOg9P1tOcNnZ4
- 9BrqWUD6bDJ8QvwIHsgnWVMqXABdMi+B5W0hFdY+SKKc19BLmQLNkCVEWloe3Z9XW+ur
- LhJ/yHLGkJ5LiFM44k3pGAgG5ERuGvO3P/g52rPP0k9luyNuuqK+JNN+iwHjm+C2/Sej
- a5AA==
-X-Gm-Message-State: AOAM531Pb+DSRcIHLTbsH4SgJOhzy/Pi++AVLP2tl+drc3z5Q3WtxoSe
- yfn918Ppd0orcvJhkZIv/5ZsgQ==
-X-Google-Smtp-Source: ABdhPJydmzBGxSKJDIIxBGPgQq5UBMTmfHPMLAkRE0ySxb9liEtdsEzf3CE1EZZkSpxZNhIt/1nYkA==
-X-Received: by 2002:adf:e90d:: with SMTP id f13mr17047307wrm.371.1612176173319; 
- Mon, 01 Feb 2021 02:42:53 -0800 (PST)
-Received: from google.com ([2a01:4b00:8523:2d03:1007:9eb8:9b35:92ae])
- by smtp.gmail.com with ESMTPSA id t15sm4716534wmi.48.2021.02.01.02.42.52
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 01 Feb 2021 02:42:52 -0800 (PST)
-Date: Mon, 1 Feb 2021 10:42:51 +0000
-From: David Brazdil <dbrazdil@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v2 4/8] KVM: arm64: Generate hyp relocation data
-Message-ID: <20210201104251.5foc64qq3ewgnhuz@google.com>
-References: <20210105180541.65031-1-dbrazdil@google.com>
- <20210105180541.65031-5-dbrazdil@google.com>
- <20210129214325.GA195322@roeck-us.net>
- <87r1m2lets.wl-maz@kernel.org>
+ with ESMTP id z7-mqgag8FgO for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  1 Feb 2021 06:27:37 -0500 (EST)
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1170C4B2C8
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Feb 2021 06:27:37 -0500 (EST)
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.60])
+ by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4DTlyF3Nd8zjDSV;
+ Mon,  1 Feb 2021 19:26:29 +0800 (CST)
+Received: from [10.174.184.42] (10.174.184.42) by
+ DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
+ 14.3.498.0; Mon, 1 Feb 2021 19:27:26 +0800
+Subject: Re: [PATCH v13 01/15] iommu: Introduce attach/detach_pasid_table API
+To: Eric Auger <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
+ <iommu@lists.linux-foundation.org>, <linux-kernel@vger.kernel.org>,
+ <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>, <will@kernel.org>,
+ <joro@8bytes.org>, <maz@kernel.org>, <robin.murphy@arm.com>,
+ <alex.williamson@redhat.com>
+References: <20201118112151.25412-1-eric.auger@redhat.com>
+ <20201118112151.25412-2-eric.auger@redhat.com>
+From: Keqian Zhu <zhukeqian1@huawei.com>
+Message-ID: <529d39a0-acf1-9132-b6ae-d7cbd57ba1e5@huawei.com>
+Date: Mon, 1 Feb 2021 19:27:25 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <87r1m2lets.wl-maz@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
- Ard Biesheuvel <ardb@kernel.org>, linux-arm-kernel@lists.infradead.org,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- Guenter Roeck <linux@roeck-us.net>
+In-Reply-To: <20201118112151.25412-2-eric.auger@redhat.com>
+X-Originating-IP: [10.174.184.42]
+X-CFilter-Loop: Reflected
+Cc: jean-philippe@linaro.org, jacob.jun.pan@linux.intel.com,
+ nicoleotsuka@gmail.com, vivek.gautam@arm.com, yi.l.liu@intel.com,
+ zhangfei.gao@linaro.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -103,28 +78,261 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Thanks for writing the fix, Marc! There are no corner cases in this code so
-if it boots, that should be a good indicator that all BE inputs were converted.
+Hi Eric,
 
-Just one little thing I noticed below, otherwise:
-Acked-by: David Brazdil <dbrazdil@google.com>
-
->  arch/arm64/kvm/hyp/nvhe/Makefile     |  1 +
->  arch/arm64/kvm/hyp/nvhe/gen-hyprel.c | 57 ++++++++++++++++++++--------
->  2 files changed, 42 insertions(+), 16 deletions(-)
+On 2020/11/18 19:21, Eric Auger wrote:
+> In virtualization use case, when a guest is assigned
+> a PCI host device, protected by a virtual IOMMU on the guest,
+> the physical IOMMU must be programmed to be consistent with
+> the guest mappings. If the physical IOMMU supports two
+> translation stages it makes sense to program guest mappings
+> onto the first stage/level (ARM/Intel terminology) while the host
+> owns the stage/level 2.
 > 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-> index 268be1376f74..09d04dd50eb8 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/Makefile
-> +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-> @@ -7,6 +7,7 @@ asflags-y := -D__KVM_NVHE_HYPERVISOR__
->  ccflags-y := -D__KVM_NVHE_HYPERVISOR__
+> In that case, it is mandated to trap on guest configuration
+> settings and pass those to the physical iommu driver.
+> 
+> This patch adds a new API to the iommu subsystem that allows
+> to set/unset the pasid table information.
+> 
+> A generic iommu_pasid_table_config struct is introduced in
+> a new iommu.h uapi header. This is going to be used by the VFIO
+> user API.
+> 
+> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
+> Signed-off-by: Ashok Raj <ashok.raj@intel.com>
+> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> ---
+> 
+> v12 -> v13:
+> - Fix config check
+> 
+> v11 -> v12:
+> - add argsz, name the union
+> ---
+>  drivers/iommu/iommu.c      | 68 ++++++++++++++++++++++++++++++++++++++
+>  include/linux/iommu.h      | 21 ++++++++++++
+>  include/uapi/linux/iommu.h | 54 ++++++++++++++++++++++++++++++
+>  3 files changed, 143 insertions(+)
+> 
+> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> index b53446bb8c6b..978fe34378fb 100644
+> --- a/drivers/iommu/iommu.c
+> +++ b/drivers/iommu/iommu.c
+> @@ -2171,6 +2171,74 @@ int iommu_uapi_sva_unbind_gpasid(struct iommu_domain *domain, struct device *dev
+>  }
+>  EXPORT_SYMBOL_GPL(iommu_uapi_sva_unbind_gpasid);
 >  
->  hostprogs := gen-hyprel
-> +HOST_EXTRACFLAGS += -I$(srctree)/include
-This should be $(objtree), autoconf.h is generated.
+> +int iommu_attach_pasid_table(struct iommu_domain *domain,
+> +			     struct iommu_pasid_table_config *cfg)
+> +{
+> +	if (unlikely(!domain->ops->attach_pasid_table))
+> +		return -ENODEV;
+> +
+> +	return domain->ops->attach_pasid_table(domain, cfg);
+> +}
+miss export symbol?
 
-David
+> +
+> +int iommu_uapi_attach_pasid_table(struct iommu_domain *domain,
+> +				  void __user *uinfo)
+> +{
+> +	struct iommu_pasid_table_config pasid_table_data = { 0 };
+> +	u32 minsz;
+> +
+> +	if (unlikely(!domain->ops->attach_pasid_table))
+> +		return -ENODEV;
+> +
+> +	/*
+> +	 * No new spaces can be added before the variable sized union, the
+> +	 * minimum size is the offset to the union.
+> +	 */
+> +	minsz = offsetof(struct iommu_pasid_table_config, vendor_data);
+> +
+> +	/* Copy minsz from user to get flags and argsz */
+> +	if (copy_from_user(&pasid_table_data, uinfo, minsz))
+> +		return -EFAULT;
+> +
+> +	/* Fields before the variable size union are mandatory */
+> +	if (pasid_table_data.argsz < minsz)
+> +		return -EINVAL;
+> +
+> +	/* PASID and address granu require additional info beyond minsz */
+> +	if (pasid_table_data.version != PASID_TABLE_CFG_VERSION_1)
+> +		return -EINVAL;
+> +	if (pasid_table_data.format == IOMMU_PASID_FORMAT_SMMUV3 &&
+> +	    pasid_table_data.argsz <
+> +		offsetofend(struct iommu_pasid_table_config, vendor_data.smmuv3))
+> +		return -EINVAL;
+> +
+> +	/*
+> +	 * User might be using a newer UAPI header which has a larger data
+> +	 * size, we shall support the existing flags within the current
+> +	 * size. Copy the remaining user data _after_ minsz but not more
+> +	 * than the current kernel supported size.
+> +	 */
+> +	if (copy_from_user((void *)&pasid_table_data + minsz, uinfo + minsz,
+> +			   min_t(u32, pasid_table_data.argsz, sizeof(pasid_table_data)) - minsz))
+> +		return -EFAULT;
+> +
+> +	/* Now the argsz is validated, check the content */
+> +	if (pasid_table_data.config < IOMMU_PASID_CONFIG_TRANSLATE ||
+> +	    pasid_table_data.config > IOMMU_PASID_CONFIG_ABORT)
+> +		return -EINVAL;
+> +
+> +	return domain->ops->attach_pasid_table(domain, &pasid_table_data);
+> +}
+> +EXPORT_SYMBOL_GPL(iommu_uapi_attach_pasid_table);
+> +
+> +void iommu_detach_pasid_table(struct iommu_domain *domain)
+> +{
+> +	if (unlikely(!domain->ops->detach_pasid_table))
+> +		return;
+> +
+> +	domain->ops->detach_pasid_table(domain);
+> +}
+> +EXPORT_SYMBOL_GPL(iommu_detach_pasid_table);
+> +
+>  static void __iommu_detach_device(struct iommu_domain *domain,
+>  				  struct device *dev)
+>  {
+> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+> index b95a6f8db6ff..464fcbecf841 100644
+> --- a/include/linux/iommu.h
+> +++ b/include/linux/iommu.h
+> @@ -223,6 +223,8 @@ struct iommu_iotlb_gather {
+>   * @cache_invalidate: invalidate translation caches
+>   * @sva_bind_gpasid: bind guest pasid and mm
+>   * @sva_unbind_gpasid: unbind guest pasid and mm
+> + * @attach_pasid_table: attach a pasid table
+> + * @detach_pasid_table: detach the pasid table
+>   * @def_domain_type: device default domain type, return value:
+>   *		- IOMMU_DOMAIN_IDENTITY: must use an identity domain
+>   *		- IOMMU_DOMAIN_DMA: must use a dma domain
+> @@ -287,6 +289,9 @@ struct iommu_ops {
+>  				      void *drvdata);
+>  	void (*sva_unbind)(struct iommu_sva *handle);
+>  	u32 (*sva_get_pasid)(struct iommu_sva *handle);
+> +	int (*attach_pasid_table)(struct iommu_domain *domain,
+> +				  struct iommu_pasid_table_config *cfg);
+> +	void (*detach_pasid_table)(struct iommu_domain *domain);
+>  
+>  	int (*page_response)(struct device *dev,
+>  			     struct iommu_fault_event *evt,
+> @@ -434,6 +439,11 @@ extern int iommu_uapi_sva_unbind_gpasid(struct iommu_domain *domain,
+>  					struct device *dev, void __user *udata);
+>  extern int iommu_sva_unbind_gpasid(struct iommu_domain *domain,
+>  				   struct device *dev, ioasid_t pasid);
+> +extern int iommu_attach_pasid_table(struct iommu_domain *domain,
+> +				    struct iommu_pasid_table_config *cfg);
+> +extern int iommu_uapi_attach_pasid_table(struct iommu_domain *domain,
+> +					 void __user *udata);
+> +extern void iommu_detach_pasid_table(struct iommu_domain *domain);
+>  extern struct iommu_domain *iommu_get_domain_for_dev(struct device *dev);
+>  extern struct iommu_domain *iommu_get_dma_domain(struct device *dev);
+>  extern int iommu_map(struct iommu_domain *domain, unsigned long iova,
+> @@ -639,6 +649,7 @@ struct iommu_sva *iommu_sva_bind_device(struct device *dev,
+>  void iommu_sva_unbind_device(struct iommu_sva *handle);
+>  u32 iommu_sva_get_pasid(struct iommu_sva *handle);
+>  
+> +
+extra blank line.
+
+>  #else /* CONFIG_IOMMU_API */
+>  
+>  struct iommu_ops {};
+> @@ -1020,6 +1031,16 @@ iommu_aux_get_pasid(struct iommu_domain *domain, struct device *dev)
+>  	return -ENODEV;
+>  }
+>  
+> +static inline
+> +int iommu_attach_pasid_table(struct iommu_domain *domain,
+> +			     struct iommu_pasid_table_config *cfg)
+> +{
+> +	return -ENODEV;
+> +}
+
+miss dummy iommu_uapi_attach_pasid_table?
+
+> +
+> +static inline
+> +void iommu_detach_pasid_table(struct iommu_domain *domain) {}
+> +
+>  static inline struct iommu_sva *
+>  iommu_sva_bind_device(struct device *dev, struct mm_struct *mm, void *drvdata)
+>  {
+> diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
+> index e1d9e75f2c94..082d758dd016 100644
+> --- a/include/uapi/linux/iommu.h
+> +++ b/include/uapi/linux/iommu.h
+> @@ -338,4 +338,58 @@ struct iommu_gpasid_bind_data {
+>  	} vendor;
+>  };
+>  
+> +/**
+> + * struct iommu_pasid_smmuv3 - ARM SMMUv3 Stream Table Entry stage 1 related
+> + *     information
+> + * @version: API version of this structure
+> + * @s1fmt: STE s1fmt (format of the CD table: single CD, linear table
+> + *         or 2-level table)
+> + * @s1dss: STE s1dss (specifies the behavior when @pasid_bits != 0
+> + *         and no PASID is passed along with the incoming transaction)
+> + * @padding: reserved for future use (should be zero)
+> + *
+> + * The PASID table is referred to as the Context Descriptor (CD) table on ARM
+> + * SMMUv3. Please refer to the ARM SMMU 3.x spec (ARM IHI 0070A) for full
+> + * details.
+> + */
+> +struct iommu_pasid_smmuv3 {
+> +#define PASID_TABLE_SMMUV3_CFG_VERSION_1 1
+> +	__u32	version;
+> +	__u8	s1fmt;
+> +	__u8	s1dss;
+> +	__u8	padding[2];
+> +};
+> +
+> +/**
+> + * struct iommu_pasid_table_config - PASID table data used to bind guest PASID
+> + *     table to the host IOMMU
+> + * @argsz: User filled size of this data
+> + * @version: API version to prepare for future extensions
+> + * @format: format of the PASID table
+> + * @base_ptr: guest physical address of the PASID table
+> + * @pasid_bits: number of PASID bits used in the PASID table
+> + * @config: indicates whether the guest translation stage must
+> + *          be translated, bypassed or aborted.
+> + * @padding: reserved for future use (should be zero)
+> + * @vendor_data.smmuv3: table information when @format is
+> + * %IOMMU_PASID_FORMAT_SMMUV3
+> + */
+> +struct iommu_pasid_table_config {
+> +	__u32	argsz;
+> +#define PASID_TABLE_CFG_VERSION_1 1
+> +	__u32	version;
+> +#define IOMMU_PASID_FORMAT_SMMUV3	1
+> +	__u32	format;
+> +	__u64	base_ptr;
+put @base_ptr between @version and @format can save some memory.
+
+> +	__u8	pasid_bits;
+> +#define IOMMU_PASID_CONFIG_TRANSLATE	1
+> +#define IOMMU_PASID_CONFIG_BYPASS	2
+> +#define IOMMU_PASID_CONFIG_ABORT	3
+> +	__u8	config;
+> +	__u8    padding[2];
+> +	union {
+> +		struct iommu_pasid_smmuv3 smmuv3;
+> +	} vendor_data;
+> +};
+> +
+>  #endif /* _UAPI_IOMMU_H */
+> 
+
+Thanks,
+Keqian
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
