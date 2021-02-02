@@ -6,55 +6,54 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 255D9C433DB
-	for <kvmarm@archiver.kernel.org>; Tue,  2 Feb 2021 14:12:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89022C433E6
+	for <kvmarm@archiver.kernel.org>; Tue,  2 Feb 2021 14:12:25 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BF6B664F4A
-	for <kvmarm@archiver.kernel.org>; Tue,  2 Feb 2021 14:12:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF6B664F4A
+	by mail.kernel.org (Postfix) with ESMTP id 37D6064F45
+	for <kvmarm@archiver.kernel.org>; Tue,  2 Feb 2021 14:12:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37D6064F45
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 74BB04B1E0;
-	Tue,  2 Feb 2021 09:12:23 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DDEA14B1B4;
+	Tue,  2 Feb 2021 09:12:24 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id zbbyUjYDG3sV; Tue,  2 Feb 2021 09:12:22 -0500 (EST)
+	with ESMTP id l3PaimLuRbXU; Tue,  2 Feb 2021 09:12:23 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0CB974B1BC;
-	Tue,  2 Feb 2021 09:12:21 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DA194B1EC;
+	Tue,  2 Feb 2021 09:12:22 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B45FD4B1E0
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Feb 2021 09:12:19 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D7714B19C
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Feb 2021 09:12:20 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5h4vlcaAuiGq for <kvmarm@lists.cs.columbia.edu>;
- Tue,  2 Feb 2021 09:12:17 -0500 (EST)
+ with ESMTP id rObpG-4s8m0Y for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  2 Feb 2021 09:12:18 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CE6B24B1B4
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Feb 2021 09:12:14 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AA64B4B1E2
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Feb 2021 09:12:16 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 00A3964E9C;
- Tue,  2 Feb 2021 14:12:14 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id CBC3164F65;
+ Tue,  2 Feb 2021 14:12:15 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1l6wPc-00BVqw-9Q; Tue, 02 Feb 2021 14:12:12 +0000
+ id 1l6wPe-00BVqw-49; Tue, 02 Feb 2021 14:12:14 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
  tglx@linutronix.de, pbonzini@redhat.com, seanjc@google.com,
  richardcochran@gmail.com, Mark.Rutland@arm.com, will@kernel.org,
  suzuki.poulose@arm.com, Andre.Przywara@arm.com, steven.price@arm.com
-Subject: [PATCH v17 4/7] time: Add mechanism to recognize clocksource in
- time_get_snapshot
-Date: Tue,  2 Feb 2021 14:12:01 +0000
-Message-Id: <20210202141204.3134855-5-maz@kernel.org>
+Subject: [PATCH v17 6/7] KVM: arm64: Add support for the KVM PTP service
+Date: Tue,  2 Feb 2021 14:12:03 +0000
+Message-Id: <20210202141204.3134855-7-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210202141204.3134855-1-maz@kernel.org>
 References: <20210202141204.3134855-1-maz@kernel.org>
@@ -90,137 +89,214 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Thomas Gleixner <tglx@linutronix.de>
+From: Jianyong Wu <jianyong.wu@arm.com>
 
-System time snapshots are not conveying information about the current
-clocksource which was used, but callers like the PTP KVM guest
-implementation have the requirement to evaluate the clocksource type to
-select the appropriate mechanism.
+Implement the hypervisor side of the KVM PTP interface.
 
-Introduce a clocksource id field in struct clocksource which is by default
-set to CSID_GENERIC (0). Clocksource implementations can set that field to
-a value which allows to identify the clocksource.
+The service offers wall time and cycle count from host to guest.
+The caller must specify whether they want the host's view of
+either the virtual or physical counter.
 
-Store the clocksource id of the current clocksource in the
-system_time_snapshot so callers can evaluate which clocksource was used to
-take the snapshot and act accordingly.
-
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
 Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20201209060932.212364-5-jianyong.wu@arm.com
+Link: https://lore.kernel.org/r/20201209060932.212364-7-jianyong.wu@arm.com
 ---
- include/linux/clocksource.h     |  6 ++++++
- include/linux/clocksource_ids.h | 11 +++++++++++
- include/linux/timekeeping.h     | 12 +++++++-----
- kernel/time/clocksource.c       |  2 ++
- kernel/time/timekeeping.c       |  1 +
- 5 files changed, 27 insertions(+), 5 deletions(-)
- create mode 100644 include/linux/clocksource_ids.h
+ Documentation/virt/kvm/api.rst         |  9 +++++
+ Documentation/virt/kvm/arm/index.rst   |  1 +
+ Documentation/virt/kvm/arm/ptp_kvm.rst | 25 ++++++++++++
+ arch/arm64/kvm/arm.c                   |  1 +
+ arch/arm64/kvm/hypercalls.c            | 53 ++++++++++++++++++++++++++
+ include/linux/arm-smccc.h              | 16 ++++++++
+ include/uapi/linux/kvm.h               |  1 +
+ 7 files changed, 106 insertions(+)
+ create mode 100644 Documentation/virt/kvm/arm/ptp_kvm.rst
 
-diff --git a/include/linux/clocksource.h b/include/linux/clocksource.h
-index 86d143db6523..1290d0dce840 100644
---- a/include/linux/clocksource.h
-+++ b/include/linux/clocksource.h
-@@ -17,6 +17,7 @@
- #include <linux/timer.h>
- #include <linux/init.h>
- #include <linux/of.h>
-+#include <linux/clocksource_ids.h>
- #include <asm/div64.h>
- #include <asm/io.h>
- 
-@@ -62,6 +63,10 @@ struct module;
-  *			400-499: Perfect
-  *				The ideal clocksource. A must-use where
-  *				available.
-+ * @id:			Defaults to CSID_GENERIC. The id value is captured
-+ *			in certain snapshot functions to allow callers to
-+ *			validate the clocksource from which the snapshot was
-+ *			taken.
-  * @flags:		Flags describing special properties
-  * @enable:		Optional function to enable the clocksource
-  * @disable:		Optional function to disable the clocksource
-@@ -100,6 +105,7 @@ struct clocksource {
- 	const char		*name;
- 	struct list_head	list;
- 	int			rating;
-+	enum clocksource_ids	id;
- 	enum vdso_clock_mode	vdso_clock_mode;
- 	unsigned long		flags;
- 
-diff --git a/include/linux/clocksource_ids.h b/include/linux/clocksource_ids.h
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index c136e254b496..7123bedd4248 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -6501,3 +6501,12 @@ KVM_GET_DIRTY_LOG and KVM_CLEAR_DIRTY_LOG.  After enabling
+ KVM_CAP_DIRTY_LOG_RING with an acceptable dirty ring size, the virtual
+ machine will switch to ring-buffer dirty page tracking and further
+ KVM_GET_DIRTY_LOG or KVM_CLEAR_DIRTY_LOG ioctls will fail.
++
++8.30 KVM_CAP_PTP_KVM
++--------------------
++
++:Architectures: arm64
++
++This capability indicates that the KVM virtual PTP service is
++supported in the host. A VMM can check whether the service is
++available to the guest on migration.
+diff --git a/Documentation/virt/kvm/arm/index.rst b/Documentation/virt/kvm/arm/index.rst
+index 3e2b2aba90fc..78a9b670aafe 100644
+--- a/Documentation/virt/kvm/arm/index.rst
++++ b/Documentation/virt/kvm/arm/index.rst
+@@ -10,3 +10,4 @@ ARM
+    hyp-abi
+    psci
+    pvtime
++   ptp_kvm
+diff --git a/Documentation/virt/kvm/arm/ptp_kvm.rst b/Documentation/virt/kvm/arm/ptp_kvm.rst
 new file mode 100644
-index 000000000000..4d8e19e05328
+index 000000000000..68cffb50d8bf
 --- /dev/null
-+++ b/include/linux/clocksource_ids.h
-@@ -0,0 +1,11 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef _LINUX_CLOCKSOURCE_IDS_H
-+#define _LINUX_CLOCKSOURCE_IDS_H
++++ b/Documentation/virt/kvm/arm/ptp_kvm.rst
+@@ -0,0 +1,25 @@
++.. SPDX-License-Identifier: GPL-2.0
 +
-+/* Enum to give clocksources a unique identifier */
-+enum clocksource_ids {
-+	CSID_GENERIC		= 0,
-+	CSID_MAX,
-+};
++PTP_KVM support for arm/arm64
++=============================
 +
-+#endif
-diff --git a/include/linux/timekeeping.h b/include/linux/timekeeping.h
-index c6792cf01bc7..78a98bdff76d 100644
---- a/include/linux/timekeeping.h
-+++ b/include/linux/timekeeping.h
-@@ -3,6 +3,7 @@
- #define _LINUX_TIMEKEEPING_H
++PTP_KVM is used for high precision time sync between host and guests.
++It relies on transferring the wall clock and counter value from the
++host to the guest using a KVM-specific hypercall.
++
++* ARM_SMCCC_HYP_KVM_PTP_FUNC_ID: 0x86000001
++
++This hypercall uses the SMC32/HVC32 calling convention:
++
++ARM_SMCCC_HYP_KVM_PTP_FUNC_ID
++    =============    ==========    ==========
++    Function ID:     (uint32)      0x86000001
++    Arguments:       (uint32)      KVM_PTP_VIRT_COUNTER(0)
++                                   KVM_PTP_PHYS_COUNTER(1)
++    Return Values:   (int32)       NOT_SUPPORTED(-1) on error, or
++                     (uint32)      Upper 32 bits of wall clock time (r0)
++                     (uint32)      Lower 32 bits of wall clock time (r1)
++                     (uint32)      Upper 32 bits of counter (r2)
++                     (uint32)      Lower 32 bits of counter (r3)
++    Endianness:                    No Restrictions.
++    =============    ==========    ==========
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 04c44853b103..7ce851fc5643 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -206,6 +206,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_ARM_INJECT_EXT_DABT:
+ 	case KVM_CAP_SET_GUEST_DEBUG:
+ 	case KVM_CAP_VCPU_ATTRIBUTES:
++	case KVM_CAP_PTP_KVM:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_ARM_SET_DEVICE_ADDR:
+diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+index b9d8607083eb..71812879f503 100644
+--- a/arch/arm64/kvm/hypercalls.c
++++ b/arch/arm64/kvm/hypercalls.c
+@@ -9,6 +9,55 @@
+ #include <kvm/arm_hypercalls.h>
+ #include <kvm/arm_psci.h>
  
- #include <linux/errno.h>
-+#include <linux/clocksource_ids.h>
++static void kvm_ptp_get_time(struct kvm_vcpu *vcpu, u64 *val)
++{
++	struct system_time_snapshot systime_snapshot;
++	u64 cycles = ~0UL;
++	u32 feature;
++
++	/*
++	 * system time and counter value must captured at the same
++	 * time to keep consistency and precision.
++	 */
++	ktime_get_snapshot(&systime_snapshot);
++
++	/*
++	 * This is only valid if the current clocksource is the
++	 * architected counter, as this is the only one the guest
++	 * can see.
++	 */
++	if (systime_snapshot.cs_id != CSID_ARM_ARCH_COUNTER)
++		return;
++
++	/*
++	 * The guest selects one of the two reference counters
++	 * (virtual or physical) with the first argument of the SMCCC
++	 * call. In case the identifier is not supported, error out.
++	 */
++	feature = smccc_get_arg1(vcpu);
++	switch (feature) {
++	case KVM_PTP_VIRT_COUNTER:
++		cycles = systime_snapshot.cycles - vcpu_read_sys_reg(vcpu, CNTVOFF_EL2);
++		break;
++	case KVM_PTP_PHYS_COUNTER:
++		cycles = systime_snapshot.cycles;
++		break;
++	default:
++		return;
++	}
++
++	/*
++	 * This relies on the top bit of val[0] never being set for
++	 * valid values of system time, because that is *really* far
++	 * in the future (about 292 years from 1970, and at that stage
++	 * nobody will give a damn about it).
++	 */
++	val[0] = upper_32_bits(systime_snapshot.real);
++	val[1] = lower_32_bits(systime_snapshot.real);
++	val[2] = upper_32_bits(cycles);
++	val[3] = lower_32_bits(cycles);
++}
++
+ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+ {
+ 	u32 func_id = smccc_get_function(vcpu);
+@@ -79,6 +128,10 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+ 		break;
+ 	case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
+ 		val[0] = BIT(ARM_SMCCC_KVM_FUNC_FEATURES);
++		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_PTP);
++		break;
++	case ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID:
++		kvm_ptp_get_time(vcpu, val);
+ 		break;
+ 	default:
+ 		return kvm_psci_call(vcpu);
+diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
+index 74e90b65b489..96d4973d42d3 100644
+--- a/include/linux/arm-smccc.h
++++ b/include/linux/arm-smccc.h
+@@ -103,6 +103,7 @@
  
- /* Included from linux/ktime.h */
+ /* KVM "vendor specific" services */
+ #define ARM_SMCCC_KVM_FUNC_FEATURES		0
++#define ARM_SMCCC_KVM_FUNC_PTP			1
+ #define ARM_SMCCC_KVM_FUNC_FEATURES_2		127
+ #define ARM_SMCCC_KVM_NUM_FUNCS			128
  
-@@ -243,11 +244,12 @@ struct ktime_timestamps {
-  * @cs_was_changed_seq:	The sequence number of clocksource change events
-  */
- struct system_time_snapshot {
--	u64		cycles;
--	ktime_t		real;
--	ktime_t		raw;
--	unsigned int	clock_was_set_seq;
--	u8		cs_was_changed_seq;
-+	u64			cycles;
-+	ktime_t			real;
-+	ktime_t			raw;
-+	enum clocksource_ids	cs_id;
-+	unsigned int		clock_was_set_seq;
-+	u8			cs_was_changed_seq;
- };
+@@ -114,6 +115,21 @@
  
- /**
-diff --git a/kernel/time/clocksource.c b/kernel/time/clocksource.c
-index cce484a2cc7c..4fe1df894ee5 100644
---- a/kernel/time/clocksource.c
-+++ b/kernel/time/clocksource.c
-@@ -920,6 +920,8 @@ int __clocksource_register_scale(struct clocksource *cs, u32 scale, u32 freq)
+ #define SMCCC_ARCH_WORKAROUND_RET_UNAFFECTED	1
  
- 	clocksource_arch_init(cs);
++/*
++ * ptp_kvm is a feature used for time sync between vm and host.
++ * ptp_kvm module in guest kernel will get service from host using
++ * this hypercall ID.
++ */
++#define ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID				\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
++			   ARM_SMCCC_SMC_32,				\
++			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
++			   ARM_SMCCC_KVM_FUNC_PTP)
++
++/* ptp_kvm counter type ID */
++#define KVM_PTP_VIRT_COUNTER			0
++#define KVM_PTP_PHYS_COUNTER			1
++
+ /* Paravirtualised time calls (defined by ARM DEN0057A) */
+ #define ARM_SMCCC_HV_PV_TIME_FEATURES				\
+ 	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 374c67875cdb..ef75c3532759 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1058,6 +1058,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_ENFORCE_PV_FEATURE_CPUID 190
+ #define KVM_CAP_SYS_HYPERV_CPUID 191
+ #define KVM_CAP_DIRTY_LOG_RING 192
++#define KVM_CAP_PTP_KVM 193
  
-+	if (WARN_ON_ONCE((unsigned int)cs->id >= CSID_MAX))
-+		cs->id = CSID_GENERIC;
- 	if (cs->vdso_clock_mode < 0 ||
- 	    cs->vdso_clock_mode >= VDSO_CLOCKMODE_MAX) {
- 		pr_warn("clocksource %s registered with invalid VDSO mode %d. Disabling VDSO support.\n",
-diff --git a/kernel/time/timekeeping.c b/kernel/time/timekeeping.c
-index a45cedda93a7..50f08632165c 100644
---- a/kernel/time/timekeeping.c
-+++ b/kernel/time/timekeeping.c
-@@ -1049,6 +1049,7 @@ void ktime_get_snapshot(struct system_time_snapshot *systime_snapshot)
- 	do {
- 		seq = read_seqcount_begin(&tk_core.seq);
- 		now = tk_clock_read(&tk->tkr_mono);
-+		systime_snapshot->cs_id = tk->tkr_mono.clock->id;
- 		systime_snapshot->cs_was_changed_seq = tk->cs_was_changed_seq;
- 		systime_snapshot->clock_was_set_seq = tk->clock_was_set_seq;
- 		base_real = ktime_add(tk->tkr_mono.base,
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
 -- 
 2.29.2
 
