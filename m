@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1562EC433E0
-	for <kvmarm@archiver.kernel.org>; Tue,  2 Feb 2021 15:36:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B501C43381
+	for <kvmarm@archiver.kernel.org>; Tue,  2 Feb 2021 17:13:04 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 85FBF64F65
-	for <kvmarm@archiver.kernel.org>; Tue,  2 Feb 2021 15:36:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85FBF64F65
+	by mail.kernel.org (Postfix) with ESMTP id 5F84164F4B
+	for <kvmarm@archiver.kernel.org>; Tue,  2 Feb 2021 17:13:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F84164F4B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 065E24B157;
-	Tue,  2 Feb 2021 10:36:52 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D123A4B148;
+	Tue,  2 Feb 2021 12:13:02 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id vasYjM-uwkVl; Tue,  2 Feb 2021 10:36:50 -0500 (EST)
+	with ESMTP id kE1KNczbrSJZ; Tue,  2 Feb 2021 12:13:00 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 70C084B177;
-	Tue,  2 Feb 2021 10:36:50 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 370224B13D;
+	Tue,  2 Feb 2021 12:13:00 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 748064B14F
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Feb 2021 10:36:49 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DB534B0EF
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Feb 2021 12:12:58 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HXRPMlhKmb30 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  2 Feb 2021 10:36:48 -0500 (EST)
+ with ESMTP id eO8Zcui4R2ci for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  2 Feb 2021 12:12:57 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D1F014B14A
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Feb 2021 10:36:47 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D06864B0EB
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Feb 2021 12:12:56 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id BAAFB64E9C;
- Tue,  2 Feb 2021 15:36:46 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id AD5B864F87;
+ Tue,  2 Feb 2021 17:12:55 +0000 (UTC)
 Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
  by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
  TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1l6xjQ-00BXLD-MV; Tue, 02 Feb 2021 15:36:44 +0000
+ id 1l6zET-00BYvb-E7; Tue, 02 Feb 2021 17:12:53 +0000
 MIME-Version: 1.0
-Date: Tue, 02 Feb 2021 15:36:44 +0000
+Date: Tue, 02 Feb 2021 17:12:53 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: Steven Price <steven.price@arm.com>
-Subject: Re: [PATCH v7 1/3] arm64: kvm: Save/restore MTE registers
-In-Reply-To: <20210115152811.8398-2-steven.price@arm.com>
+Subject: Re: [PATCH v7 2/3] arm64: kvm: Introduce MTE VCPU feature
+In-Reply-To: <20210115152811.8398-3-steven.price@arm.com>
 References: <20210115152811.8398-1-steven.price@arm.com>
- <20210115152811.8398-2-steven.price@arm.com>
+ <20210115152811.8398-3-steven.price@arm.com>
 User-Agent: Roundcube Webmail/1.4.10
-Message-ID: <a99f09a56cf33bfa18b55c251380ef22@kernel.org>
+Message-ID: <0c0adbcd250690f703ac4a28faf99263@kernel.org>
 X-Sender: maz@kernel.org
 X-SA-Exim-Connect-IP: 51.254.78.96
 X-SA-Exim-Rcpt-To: steven.price@arm.com, catalin.marinas@arm.com,
@@ -92,289 +92,273 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On 2021-01-15 15:28, Steven Price wrote:
-> Define the new system registers that MTE introduces and context switch
-> them. The MTE feature is still hidden from the ID register as it isn't
-> supported in a VM yet.
+> Add a new VM feature 'KVM_ARM_CAP_MTE' which enables memory tagging
+> for a VM. This exposes the feature to the guest and automatically tags
+> memory pages touched by the VM as PG_mte_tagged (and clears the tags
+> storage) to ensure that the guest cannot see stale tags, and so that 
+> the
+> tags are correctly saved/restored across swap.
 > 
 > Signed-off-by: Steven Price <steven.price@arm.com>
 > ---
->  arch/arm64/include/asm/kvm_host.h          |  4 ++
->  arch/arm64/include/asm/kvm_mte.h           | 74 ++++++++++++++++++++++
->  arch/arm64/include/asm/sysreg.h            |  3 +-
->  arch/arm64/kernel/asm-offsets.c            |  3 +
->  arch/arm64/kvm/hyp/entry.S                 |  7 ++
->  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h |  4 ++
->  arch/arm64/kvm/sys_regs.c                  | 14 ++--
->  7 files changed, 104 insertions(+), 5 deletions(-)
->  create mode 100644 arch/arm64/include/asm/kvm_mte.h
+>  arch/arm64/include/asm/kvm_emulate.h |  3 +++
+>  arch/arm64/include/asm/kvm_host.h    |  3 +++
+>  arch/arm64/include/asm/pgtable.h     |  2 +-
+>  arch/arm64/kernel/mte.c              | 36 +++++++++++++++++-----------
+>  arch/arm64/kvm/arm.c                 |  9 +++++++
+>  arch/arm64/kvm/hyp/exception.c       |  3 ++-
+>  arch/arm64/kvm/mmu.c                 | 16 +++++++++++++
+>  arch/arm64/kvm/sys_regs.c            |  6 ++++-
+>  include/uapi/linux/kvm.h             |  1 +
+>  9 files changed, 62 insertions(+), 17 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h
-> b/arch/arm64/include/asm/kvm_host.h
-> index 11beda85ee7e..51590a397e4b 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -148,6 +148,8 @@ enum vcpu_sysreg {
->  	SCTLR_EL1,	/* System Control Register */
->  	ACTLR_EL1,	/* Auxiliary Control Register */
->  	CPACR_EL1,	/* Coprocessor Access Control */
-> +	RGSR_EL1,	/* Random Allocation Tag Seed Register */
-> +	GCR_EL1,	/* Tag Control Register */
->  	ZCR_EL1,	/* SVE Control */
->  	TTBR0_EL1,	/* Translation Table Base Register 0 */
->  	TTBR1_EL1,	/* Translation Table Base Register 1 */
-> @@ -164,6 +166,8 @@ enum vcpu_sysreg {
->  	TPIDR_EL1,	/* Thread ID, Privileged */
->  	AMAIR_EL1,	/* Aux Memory Attribute Indirection Register */
->  	CNTKCTL_EL1,	/* Timer Control Register (EL1) */
-> +	TFSRE0_EL1,	/* Tag Fault Status Register (EL0) */
-> +	TFSR_EL1,	/* Tag Fault Stauts Register (EL1) */
-
-s/Stauts/Status/
-
-Is there any reason why the MTE registers aren't grouped together?
-
->  	PAR_EL1,	/* Physical Address Register */
->  	MDSCR_EL1,	/* Monitor Debug System Control Register */
->  	MDCCINT_EL1,	/* Monitor Debug Comms Channel Interrupt Enable Reg */
-> diff --git a/arch/arm64/include/asm/kvm_mte.h 
-> b/arch/arm64/include/asm/kvm_mte.h
-> new file mode 100644
-> index 000000000000..62bbfae77f33
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/kvm_mte.h
-> @@ -0,0 +1,74 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Copyright (C) 2020 ARM Ltd.
-> + */
-> +#ifndef __ASM_KVM_MTE_H
-> +#define __ASM_KVM_MTE_H
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h
+> b/arch/arm64/include/asm/kvm_emulate.h
+> index f612c090f2e4..6bf776c2399c 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -84,6 +84,9 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu 
+> *vcpu)
+>  	if (cpus_have_const_cap(ARM64_MISMATCHED_CACHE_TYPE) ||
+>  	    vcpu_el1_is_32bit(vcpu))
+>  		vcpu->arch.hcr_el2 |= HCR_TID2;
 > +
-> +#ifdef __ASSEMBLY__
-> +
-> +#include <asm/sysreg.h>
-> +
-> +#ifdef CONFIG_ARM64_MTE
-> +
-> +.macro mte_switch_to_guest g_ctxt, h_ctxt, reg1
-> +alternative_if_not ARM64_MTE
-> +	b	.L__skip_switch\@
-> +alternative_else_nop_endif
-> +	mrs	\reg1, hcr_el2
-> +	and	\reg1, \reg1, #(HCR_ATA)
-> +	cbz	\reg1, .L__skip_switch\@
-> +
-> +	mrs_s	\reg1, SYS_RGSR_EL1
-> +	str	\reg1, [\h_ctxt, #CPU_RGSR_EL1]
-> +	mrs_s	\reg1, SYS_GCR_EL1
-> +	str	\reg1, [\h_ctxt, #CPU_GCR_EL1]
-> +	mrs_s	\reg1, SYS_TFSRE0_EL1
-> +	str	\reg1, [\h_ctxt, #CPU_TFSRE0_EL1]
-> +
-> +	ldr	\reg1, [\g_ctxt, #CPU_RGSR_EL1]
-> +	msr_s	SYS_RGSR_EL1, \reg1
-> +	ldr	\reg1, [\g_ctxt, #CPU_GCR_EL1]
-> +	msr_s	SYS_GCR_EL1, \reg1
-> +	ldr	\reg1, [\g_ctxt, #CPU_TFSRE0_EL1]
-> +	msr_s	SYS_TFSRE0_EL1, \reg1
-> +
-> +.L__skip_switch\@:
-> +.endm
-> +
-> +.macro mte_switch_to_hyp g_ctxt, h_ctxt, reg1
-> +alternative_if_not ARM64_MTE
-> +	b	.L__skip_switch\@
-> +alternative_else_nop_endif
-> +	mrs	\reg1, hcr_el2
-> +	and	\reg1, \reg1, #(HCR_ATA)
-> +	cbz	\reg1, .L__skip_switch\@
-> +
-> +	mrs_s	\reg1, SYS_RGSR_EL1
-> +	str	\reg1, [\g_ctxt, #CPU_RGSR_EL1]
-> +	mrs_s	\reg1, SYS_GCR_EL1
-> +	str	\reg1, [\g_ctxt, #CPU_GCR_EL1]
-> +	mrs_s	\reg1, SYS_TFSRE0_EL1
-> +	str	\reg1, [\g_ctxt, #CPU_TFSRE0_EL1]
-
-Can't the EL0 state save/restore be moved to the C code?
-
-> +
-> +	ldr	\reg1, [\h_ctxt, #CPU_RGSR_EL1]
-> +	msr_s	SYS_RGSR_EL1, \reg1
-> +	ldr	\reg1, [\h_ctxt, #CPU_GCR_EL1]
-> +	msr_s	SYS_GCR_EL1, \reg1
-> +	ldr	\reg1, [\h_ctxt, #CPU_TFSRE0_EL1]
-> +	msr_s	SYS_TFSRE0_EL1, \reg1
-> +
-> +.L__skip_switch\@:
-> +.endm
-> +
-> +#else /* CONFIG_ARM64_MTE */
-> +
-> +.macro mte_switch_to_guest g_ctxt, h_ctxt, reg1
-> +.endm
-> +
-> +.macro mte_switch_to_hyp g_ctxt, h_ctxt, reg1
-> +.endm
-> +
-> +#endif /* CONFIG_ARM64_MTE */
-> +#endif /* __ASSEMBLY__ */
-> +#endif /* __ASM_KVM_MTE_H */
-> diff --git a/arch/arm64/include/asm/sysreg.h 
-> b/arch/arm64/include/asm/sysreg.h
-> index 8b5e7e5c3cc8..0a01975d331d 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -574,7 +574,8 @@
->  #define SCTLR_ELx_M	(BIT(0))
-> 
->  #define SCTLR_ELx_FLAGS	(SCTLR_ELx_M  | SCTLR_ELx_A | SCTLR_ELx_C | \
-> -			 SCTLR_ELx_SA | SCTLR_ELx_I | SCTLR_ELx_IESB)
-> +			 SCTLR_ELx_SA | SCTLR_ELx_I | SCTLR_ELx_IESB | \
-> +			 SCTLR_ELx_ITFSB)
-> 
->  /* SCTLR_EL2 specific flags. */
->  #define SCTLR_EL2_RES1	((BIT(4))  | (BIT(5))  | (BIT(11)) | (BIT(16)) 
-> | \
-> diff --git a/arch/arm64/kernel/asm-offsets.c 
-> b/arch/arm64/kernel/asm-offsets.c
-> index f42fd9e33981..801531e1fa5c 100644
-> --- a/arch/arm64/kernel/asm-offsets.c
-> +++ b/arch/arm64/kernel/asm-offsets.c
-> @@ -105,6 +105,9 @@ int main(void)
->    DEFINE(VCPU_WORKAROUND_FLAGS,	offsetof(struct kvm_vcpu,
-> arch.workaround_flags));
->    DEFINE(VCPU_HCR_EL2,		offsetof(struct kvm_vcpu, arch.hcr_el2));
->    DEFINE(CPU_USER_PT_REGS,	offsetof(struct kvm_cpu_context, regs));
-> +  DEFINE(CPU_RGSR_EL1,		offsetof(struct kvm_cpu_context, 
-> sys_regs[RGSR_EL1]));
-> +  DEFINE(CPU_GCR_EL1,		offsetof(struct kvm_cpu_context, 
-> sys_regs[GCR_EL1]));
-> +  DEFINE(CPU_TFSRE0_EL1,	offsetof(struct kvm_cpu_context,
-> sys_regs[TFSRE0_EL1]));
->    DEFINE(CPU_APIAKEYLO_EL1,	offsetof(struct kvm_cpu_context,
-> sys_regs[APIAKEYLO_EL1]));
->    DEFINE(CPU_APIBKEYLO_EL1,	offsetof(struct kvm_cpu_context,
-> sys_regs[APIBKEYLO_EL1]));
->    DEFINE(CPU_APDAKEYLO_EL1,	offsetof(struct kvm_cpu_context,
-> sys_regs[APDAKEYLO_EL1]));
-> diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
-> index b0afad7a99c6..c67582c6dd55 100644
-> --- a/arch/arm64/kvm/hyp/entry.S
-> +++ b/arch/arm64/kvm/hyp/entry.S
-> @@ -13,6 +13,7 @@
->  #include <asm/kvm_arm.h>
->  #include <asm/kvm_asm.h>
->  #include <asm/kvm_mmu.h>
-> +#include <asm/kvm_mte.h>
->  #include <asm/kvm_ptrauth.h>
-> 
->  	.text
-> @@ -51,6 +52,9 @@ alternative_else_nop_endif
-> 
->  	add	x29, x0, #VCPU_CONTEXT
-> 
-> +	// mte_switch_to_guest(g_ctxt, h_ctxt, tmp1)
-> +	mte_switch_to_guest x29, x1, x2
-> +
->  	// Macro ptrauth_switch_to_guest format:
->  	// 	ptrauth_switch_to_guest(guest cxt, tmp1, tmp2, tmp3)
->  	// The below macro to restore guest keys is not implemented in C code
-> @@ -140,6 +144,9 @@ SYM_INNER_LABEL(__guest_exit, SYM_L_GLOBAL)
->  	// when this feature is enabled for kernel code.
->  	ptrauth_switch_to_hyp x1, x2, x3, x4, x5
-> 
-> +	// mte_switch_to_hyp(g_ctxt, h_ctxt, reg1)
-> +	mte_switch_to_hyp x1, x2, x3
-> +
->  	// Restore hyp's sp_el0
->  	restore_sp_el0 x2, x3
-> 
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> index cce43bfe158f..94d9736f0133 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> @@ -45,6 +45,8 @@ static inline void __sysreg_save_el1_state(struct
-> kvm_cpu_context *ctxt)
->  	ctxt_sys_reg(ctxt, CNTKCTL_EL1)	= read_sysreg_el1(SYS_CNTKCTL);
->  	ctxt_sys_reg(ctxt, PAR_EL1)	= read_sysreg_par();
->  	ctxt_sys_reg(ctxt, TPIDR_EL1)	= read_sysreg(tpidr_el1);
-> +	if (system_supports_mte())
-> +		ctxt_sys_reg(ctxt, TFSR_EL1) = read_sysreg_el1(SYS_TFSR);
-
-I already asked for it, and I'm going to ask for it again:
-Most of the sysreg save/restore is guarded by a per-vcpu check
-(HCR_EL2.ATA), while this one is unconditionally saved/restore
-if the host is MTE capable. Why is that so?
-
-The required infrastructure should be available, and if anything
-is missing, let's add it.
-
-> 
->  	ctxt_sys_reg(ctxt, SP_EL1)	= read_sysreg(sp_el1);
->  	ctxt_sys_reg(ctxt, ELR_EL1)	= read_sysreg_el1(SYS_ELR);
-> @@ -106,6 +108,8 @@ static inline void
-> __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
->  	write_sysreg_el1(ctxt_sys_reg(ctxt, CNTKCTL_EL1), SYS_CNTKCTL);
->  	write_sysreg(ctxt_sys_reg(ctxt, PAR_EL1),	par_el1);
->  	write_sysreg(ctxt_sys_reg(ctxt, TPIDR_EL1),	tpidr_el1);
-> +	if (system_supports_mte())
-> +		write_sysreg_el1(ctxt_sys_reg(ctxt, TFSR_EL1), SYS_TFSR);
-> 
->  	if (!has_vhe() &&
->  	    cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT) &&
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 3313dedfa505..88d4f360949e 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1281,6 +1281,12 @@ static bool access_ccsidr(struct kvm_vcpu
-> *vcpu, struct sys_reg_params *p,
->  	return true;
+> +	if (kvm_has_mte(vcpu->kvm))
+> +		vcpu->arch.hcr_el2 |= HCR_ATA;
 >  }
 > 
-> +static unsigned int mte_visibility(const struct kvm_vcpu *vcpu,
-> +				   const struct sys_reg_desc *rd)
-> +{
-> +	return REG_HIDDEN;
-> +}
+>  static inline unsigned long *vcpu_hcr(struct kvm_vcpu *vcpu)
+> diff --git a/arch/arm64/include/asm/kvm_host.h
+> b/arch/arm64/include/asm/kvm_host.h
+> index 51590a397e4b..1ca5785fb0e9 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -132,6 +132,8 @@ struct kvm_arch {
+> 
+>  	u8 pfr0_csv2;
+>  	u8 pfr0_csv3;
+> +	/* Memory Tagging Extension enabled for the guest */
+> +	bool mte_enabled;
+>  };
+> 
+>  struct kvm_vcpu_fault_info {
+> @@ -749,6 +751,7 @@ bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu 
+> *vcpu);
+>  #define kvm_arm_vcpu_sve_finalized(vcpu) \
+>  	((vcpu)->arch.flags & KVM_ARM64_VCPU_SVE_FINALIZED)
+> 
+> +#define kvm_has_mte(kvm) (system_supports_mte() && 
+> (kvm)->arch.mte_enabled)
+>  #define kvm_vcpu_has_pmu(vcpu)					\
+>  	(test_bit(KVM_ARM_VCPU_PMU_V3, (vcpu)->arch.features))
+> 
+> diff --git a/arch/arm64/include/asm/pgtable.h 
+> b/arch/arm64/include/asm/pgtable.h
+> index 501562793ce2..27416d52f6a9 100644
+> --- a/arch/arm64/include/asm/pgtable.h
+> +++ b/arch/arm64/include/asm/pgtable.h
+> @@ -312,7 +312,7 @@ static inline void set_pte_at(struct mm_struct
+> *mm, unsigned long addr,
+>  		__sync_icache_dcache(pte);
+> 
+>  	if (system_supports_mte() &&
+> -	    pte_present(pte) && pte_tagged(pte) && !pte_special(pte))
+> +	    pte_present(pte) && pte_valid_user(pte) && !pte_special(pte))
+>  		mte_sync_tags(ptep, pte);
+
+Care to elaborate on this change?
+
+> 
+>  	__check_racy_pte_update(mm, ptep, pte);
+> diff --git a/arch/arm64/kernel/mte.c b/arch/arm64/kernel/mte.c
+> index dc9ada64feed..f9e089be1603 100644
+> --- a/arch/arm64/kernel/mte.c
+> +++ b/arch/arm64/kernel/mte.c
+> @@ -25,27 +25,33 @@
+> 
+>  u64 gcr_kernel_excl __ro_after_init;
+> 
+> -static void mte_sync_page_tags(struct page *page, pte_t *ptep, bool 
+> check_swap)
+> +static void mte_sync_page_tags(struct page *page, pte_t *ptep, bool 
+> check_swap,
+> +			       bool pte_is_tagged)
+>  {
+>  	pte_t old_pte = READ_ONCE(*ptep);
+> 
+>  	if (check_swap && is_swap_pte(old_pte)) {
+>  		swp_entry_t entry = pte_to_swp_entry(old_pte);
+> 
+> -		if (!non_swap_entry(entry) && mte_restore_tags(entry, page))
+> +		if (!non_swap_entry(entry) && mte_restore_tags(entry, page)) {
+> +			set_bit(PG_mte_tagged, &page->flags);
+>  			return;
+> +		}
+>  	}
+> 
+> -	page_kasan_tag_reset(page);
+> -	/*
+> -	 * We need smp_wmb() in between setting the flags and clearing the
+> -	 * tags because if another thread reads page->flags and builds a
+> -	 * tagged address out of it, there is an actual dependency to the
+> -	 * memory access, but on the current thread we do not guarantee that
+> -	 * the new page->flags are visible before the tags were updated.
+> -	 */
+> -	smp_wmb();
+> -	mte_clear_page_tags(page_address(page));
+> +	if (pte_is_tagged) {
+> +		set_bit(PG_mte_tagged, &page->flags);
+> +		page_kasan_tag_reset(page);
+> +		/*
+> +		 * We need smp_wmb() in between setting the flags and clearing the
+> +		 * tags because if another thread reads page->flags and builds a
+> +		 * tagged address out of it, there is an actual dependency to the
+> +		 * memory access, but on the current thread we do not guarantee that
+> +		 * the new page->flags are visible before the tags were updated.
+> +		 */
+> +		smp_wmb();
+> +		mte_clear_page_tags(page_address(page));
+> +	}
+>  }
+> 
+>  void mte_sync_tags(pte_t *ptep, pte_t pte)
+> @@ -53,11 +59,13 @@ void mte_sync_tags(pte_t *ptep, pte_t pte)
+>  	struct page *page = pte_page(pte);
+>  	long i, nr_pages = compound_nr(page);
+>  	bool check_swap = nr_pages == 1;
+> +	bool pte_is_tagged = pte_tagged(pte);
+> 
+>  	/* if PG_mte_tagged is set, tags have already been initialised */
+>  	for (i = 0; i < nr_pages; i++, page++) {
+> -		if (!test_and_set_bit(PG_mte_tagged, &page->flags))
+> -			mte_sync_page_tags(page, ptep, check_swap);
+> +		if (!test_bit(PG_mte_tagged, &page->flags))
+> +			mte_sync_page_tags(page, ptep, check_swap,
+> +					   pte_is_tagged);
+>  	}
+>  }
+
+This part really wants to have its own patch and be documented,
+explaining why it is still valid not to atomically test and set
+the PG_mte_tagged bit.
+
+> 
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 6e637d2b4cfb..f4c2fd2e7c49 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -97,6 +97,12 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+>  		r = 0;
+>  		kvm->arch.return_nisv_io_abort_to_user = true;
+>  		break;
+> +	case KVM_CAP_ARM_MTE:
+> +		if (!system_supports_mte() || kvm->created_vcpus)
+> +			return -EINVAL;
+> +		r = 0;
+> +		kvm->arch.mte_enabled = true;
+> +		break;
+>  	default:
+>  		r = -EINVAL;
+>  		break;
+> @@ -238,6 +244,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, 
+> long ext)
+>  		 */
+>  		r = 1;
+>  		break;
+> +	case KVM_CAP_ARM_MTE:
+> +		r = system_supports_mte();
+> +		break;
+>  	case KVM_CAP_STEAL_TIME:
+>  		r = kvm_arm_pvtime_supported();
+>  		break;
+> diff --git a/arch/arm64/kvm/hyp/exception.c 
+> b/arch/arm64/kvm/hyp/exception.c
+> index 73629094f903..56426565600c 100644
+> --- a/arch/arm64/kvm/hyp/exception.c
+> +++ b/arch/arm64/kvm/hyp/exception.c
+> @@ -112,7 +112,8 @@ static void enter_exception64(struct kvm_vcpu
+> *vcpu, unsigned long target_mode,
+>  	new |= (old & PSR_C_BIT);
+>  	new |= (old & PSR_V_BIT);
+> 
+> -	// TODO: TCO (if/when ARMv8.5-MemTag is exposed to guests)
+> +	if (kvm_has_mte(vcpu->kvm))
+> +		new |= PSR_TCO_BIT;
+> 
+>  	new |= (old & PSR_DIT_BIT);
+> 
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 7d2257cc5438..b9f9fb462de6 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -879,6 +879,22 @@ static int user_mem_abort(struct kvm_vcpu *vcpu,
+> phys_addr_t fault_ipa,
+>  	if (vma_pagesize == PAGE_SIZE && !force_pte)
+>  		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
+>  							   &pfn, &fault_ipa);
 > +
->  /* sys_reg_desc initialiser for known cpufeature ID registers */
->  #define ID_SANITISED(name) {			\
->  	SYS_DESC(SYS_##name),			\
-> @@ -1449,8 +1455,8 @@ static const struct sys_reg_desc sys_reg_descs[] 
-> = {
->  	{ SYS_DESC(SYS_ACTLR_EL1), access_actlr, reset_actlr, ACTLR_EL1 },
->  	{ SYS_DESC(SYS_CPACR_EL1), NULL, reset_val, CPACR_EL1, 0 },
-> 
-> -	{ SYS_DESC(SYS_RGSR_EL1), undef_access },
-> -	{ SYS_DESC(SYS_GCR_EL1), undef_access },
-> +	{ SYS_DESC(SYS_RGSR_EL1), undef_access, reset_unknown, RGSR_EL1,
-> .visibility = mte_visibility },
-> +	{ SYS_DESC(SYS_GCR_EL1), undef_access, reset_unknown, GCR_EL1,
-> .visibility = mte_visibility },
+> +	if (kvm_has_mte(kvm) && pfn_valid(pfn)) {
+> +		/*
+> +		 * VM will be able to see the page's tags, so we must ensure
+> +		 * they have been initialised.
+> +		 */
+> +		struct page *page = pfn_to_page(pfn);
+> +		long i, nr_pages = compound_nr(page);
 
-Please don't mix implicit and designated assignments, as it is
-pretty confusing.
+"unsigned long" to match the return type of compound_nr().
 
+Also, shouldn't you cap nr_pages to vma_pagesize? It could well
+be that what we end-up mapping at S2 has nothing to do with
+the view the kernel has of that page.
+
+> +
+> +		/* if PG_mte_tagged is set, tags have already been initialised */
+> +		for (i = 0; i < nr_pages; i++, page++) {
+> +			if (!test_and_set_bit(PG_mte_tagged, &page->flags))
+> +				mte_clear_page_tags(page_address(page));
+> +		}
+> +	}
+> +
+>  	if (writable) {
+>  		prot |= KVM_PGTABLE_PROT_W;
+>  		kvm_set_pfn_dirty(pfn);
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 88d4f360949e..57e5be14f1cc 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1029,7 +1029,8 @@ static u64 read_id_reg(const struct kvm_vcpu 
+> *vcpu,
+>  		val &= ~(0xfUL << ID_AA64PFR0_CSV3_SHIFT);
+>  		val |= ((u64)vcpu->kvm->arch.pfr0_csv3 << ID_AA64PFR0_CSV3_SHIFT);
+>  	} else if (id == SYS_ID_AA64PFR1_EL1) {
+> -		val &= ~(0xfUL << ID_AA64PFR1_MTE_SHIFT);
+> +		if (!kvm_has_mte(vcpu->kvm))
+> +			val &= ~(0xfUL << ID_AA64PFR1_MTE_SHIFT);
+>  	} else if (id == SYS_ID_AA64ISAR1_EL1 && !vcpu_has_ptrauth(vcpu)) {
+>  		val &= ~((0xfUL << ID_AA64ISAR1_APA_SHIFT) |
+>  			 (0xfUL << ID_AA64ISAR1_API_SHIFT) |
+> @@ -1284,6 +1285,9 @@ static bool access_ccsidr(struct kvm_vcpu *vcpu,
+> struct sys_reg_params *p,
+>  static unsigned int mte_visibility(const struct kvm_vcpu *vcpu,
+>  				   const struct sys_reg_desc *rd)
+>  {
+> +	if (kvm_has_mte(vcpu->kvm))
+> +		return 0;
+> +
+>  	return REG_HIDDEN;
+>  }
 > 
->  	{ SYS_DESC(SYS_ZCR_EL1), NULL, reset_val, ZCR_EL1, 0, .visibility =
-> sve_visibility },
->  	{ SYS_DESC(SYS_TTBR0_EL1), access_vm_reg, reset_unknown, TTBR0_EL1 },
-> @@ -1476,8 +1482,8 @@ static const struct sys_reg_desc sys_reg_descs[] 
-> = {
->  	{ SYS_DESC(SYS_ERXMISC0_EL1), trap_raz_wi },
->  	{ SYS_DESC(SYS_ERXMISC1_EL1), trap_raz_wi },
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 886802b8ffba..de737d5102ca 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1056,6 +1056,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_ENFORCE_PV_FEATURE_CPUID 190
+>  #define KVM_CAP_SYS_HYPERV_CPUID 191
+>  #define KVM_CAP_DIRTY_LOG_RING 192
+> +#define KVM_CAP_ARM_MTE 193
 > 
-> -	{ SYS_DESC(SYS_TFSR_EL1), undef_access },
-> -	{ SYS_DESC(SYS_TFSRE0_EL1), undef_access },
-> +	{ SYS_DESC(SYS_TFSR_EL1), undef_access, reset_unknown, TFSR_EL1,
-> .visibility = mte_visibility },
-> +	{ SYS_DESC(SYS_TFSRE0_EL1), undef_access, reset_unknown, TFSRE0_EL1,
-> .visibility = mte_visibility },
-> 
->  	{ SYS_DESC(SYS_FAR_EL1), access_vm_reg, reset_unknown, FAR_EL1 },
->  	{ SYS_DESC(SYS_PAR_EL1), NULL, reset_unknown, PAR_EL1 },
+>  #ifdef KVM_CAP_IRQ_ROUTING
 
 Thanks,
 
