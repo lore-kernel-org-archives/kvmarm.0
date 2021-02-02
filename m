@@ -2,66 +2,78 @@ Return-Path: <SRS0=mEDx=HE=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.4 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EDD6C433E6
-	for <kvmarm@archiver.kernel.org>; Tue,  2 Feb 2021 12:34:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FB20C433E0
+	for <kvmarm@archiver.kernel.org>; Tue,  2 Feb 2021 13:18:35 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 595CF64F5C
-	for <kvmarm@archiver.kernel.org>; Tue,  2 Feb 2021 12:34:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 595CF64F5C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id D52E664EEB
+	for <kvmarm@archiver.kernel.org>; Tue,  2 Feb 2021 13:18:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D52E664EEB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D51734B192;
-	Tue,  2 Feb 2021 07:34:49 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 523BC4B186;
+	Tue,  2 Feb 2021 08:18:34 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id zc4X5EVsq38s; Tue,  2 Feb 2021 07:34:48 -0500 (EST)
+	with ESMTP id 5+Nz0YZzP2Mh; Tue,  2 Feb 2021 08:18:31 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A43A74B14F;
-	Tue,  2 Feb 2021 07:34:48 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 839B44B189;
+	Tue,  2 Feb 2021 08:18:31 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 01CC04B14C
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Feb 2021 07:34:48 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C0EC14B10E
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Feb 2021 08:18:29 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Gwu8XWMjSSkX for <kvmarm@lists.cs.columbia.edu>;
- Tue,  2 Feb 2021 07:34:45 -0500 (EST)
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6718B4B149
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Feb 2021 07:34:43 -0500 (EST)
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
- by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4DVPPC5SkTzjFR0;
- Tue,  2 Feb 2021 20:33:35 +0800 (CST)
-Received: from [10.174.184.42] (10.174.184.42) by
- DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
- 14.3.498.0; Tue, 2 Feb 2021 20:34:36 +0800
-Subject: Re: [PATCH v11 01/13] vfio: VFIO_IOMMU_SET_PASID_TABLE
-To: Eric Auger <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
- <iommu@lists.linux-foundation.org>, <linux-kernel@vger.kernel.org>,
- <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>, <will@kernel.org>,
- <joro@8bytes.org>, <maz@kernel.org>, <robin.murphy@arm.com>,
- <alex.williamson@redhat.com>
-References: <20201116110030.32335-1-eric.auger@redhat.com>
- <20201116110030.32335-2-eric.auger@redhat.com>
-From: Keqian Zhu <zhukeqian1@huawei.com>
-Message-ID: <84a111da-1969-1701-9a6d-cae8d7c285c6@huawei.com>
-Date: Tue, 2 Feb 2021 20:34:35 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+ with ESMTP id B7OrfQjPoFyp for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  2 Feb 2021 08:18:28 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 674C24B183
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Feb 2021 08:18:28 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 43D6264ED7;
+ Tue,  2 Feb 2021 13:18:27 +0000 (UTC)
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
+ TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1l6vZZ-00BUwh-61; Tue, 02 Feb 2021 13:18:25 +0000
 MIME-Version: 1.0
-In-Reply-To: <20201116110030.32335-2-eric.auger@redhat.com>
-X-Originating-IP: [10.174.184.42]
-X-CFilter-Loop: Reflected
-Cc: jean-philippe@linaro.org, jacob.jun.pan@linux.intel.com,
- nicoleotsuka@gmail.com, vivek.gautam@arm.com, yi.l.liu@intel.com,
- zhangfei.gao@linaro.org
+Date: Tue, 02 Feb 2021 13:18:24 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Jianyong Wu <jianyong.wu@arm.com>
+Subject: Re: [PATCH v16 1/9] arm64: Probe for the presence of KVM hypervisor
+In-Reply-To: <20201209060932.212364-2-jianyong.wu@arm.com>
+References: <20201209060932.212364-1-jianyong.wu@arm.com>
+ <20201209060932.212364-2-jianyong.wu@arm.com>
+User-Agent: Roundcube Webmail/1.4.10
+Message-ID: <0099a326c906f52fa5422d7c1b4fe767@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: jianyong.wu@arm.com, netdev@vger.kernel.org,
+ yangbo.lu@nxp.com, john.stultz@linaro.org, tglx@linutronix.de,
+ pbonzini@redhat.com, sean.j.christopherson@intel.com, richardcochran@gmail.com,
+ Mark.Rutland@arm.com, will@kernel.org, suzuki.poulose@arm.com,
+ Andre.Przywara@arm.com, steven.price@arm.com, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, Steve.Capper@arm.com, justin.he@arm.com, nd@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: justin.he@arm.com, kvm@vger.kernel.org, netdev@vger.kernel.org,
+ richardcochran@gmail.com, linux-kernel@vger.kernel.org,
+ sean.j.christopherson@intel.com, steven.price@arm.com, Andre.Przywara@arm.com,
+ john.stultz@linaro.org, yangbo.lu@nxp.com, pbonzini@redhat.com,
+ tglx@linutronix.de, nd@arm.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,190 +85,227 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Eric,
+On 2020-12-09 06:09, Jianyong Wu wrote:
+> From: Will Deacon <will@kernel.org>
+> 
+> Although the SMCCC specification provides some limited functionality 
+> for
+> describing the presence of hypervisor and firmware services, this is
+> generally applicable only to functions designated as "Arm Architecture
+> Service Functions" and no portable discovery mechanism is provided for
+> standard hypervisor services, despite having a designated range of
+> function identifiers reserved by the specification.
+> 
+> In an attempt to avoid the need for additional firmware changes every
+> time a new function is added, introduce a UID to identify the service
+> provider as being compatible with KVM. Once this has been established,
+> additional services can be discovered via a feature bitmap.
+> 
+> Change from Jianyong Wu:
+> mv kvm_arm_hyp_service_available to common place to let both arm/arm64 
+> touch it.
+> add kvm_init_hyp_services also under arm arch to let arm kvm guest use
+> this service.
+> 
+> Cc: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Will Deacon <will@kernel.org>
+> Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
+> ---
+>  arch/arm/kernel/setup.c        |  5 ++++
+>  arch/arm64/kernel/setup.c      |  1 +
+>  drivers/firmware/smccc/smccc.c | 37 +++++++++++++++++++++++++++++
+>  include/linux/arm-smccc.h      | 43 ++++++++++++++++++++++++++++++++++
+>  4 files changed, 86 insertions(+)
+> 
+> diff --git a/arch/arm/kernel/setup.c b/arch/arm/kernel/setup.c
+> index 1a5edf562e85..adcefa9c8fab 100644
+> --- a/arch/arm/kernel/setup.c
+> +++ b/arch/arm/kernel/setup.c
+> @@ -1156,6 +1156,11 @@ void __init setup_arch(char **cmdline_p)
+> 
+>  	arm_dt_init_cpu_maps();
+>  	psci_dt_init();
+> +
+> +#ifdef CONFIG_HAVE_ARM_SMCCC_DISCOVERY
+> +	kvm_init_hyp_services();
+> +#endif
+> +
+>  #ifdef CONFIG_SMP
+>  	if (is_smp()) {
+>  		if (!mdesc->smp_init || !mdesc->smp_init()) {
+> diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
+> index a950d5bc1ba5..97037b15c6ea 100644
+> --- a/arch/arm64/kernel/setup.c
+> +++ b/arch/arm64/kernel/setup.c
+> @@ -353,6 +353,7 @@ void __init __no_sanitize_address setup_arch(char
+> **cmdline_p)
+>  	else
+>  		psci_acpi_init();
+> 
+> +	kvm_init_hyp_services();
 
-On 2020/11/16 19:00, Eric Auger wrote:
-> From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
+Given that there is a dependency between the KVM discovery and PSCI,
+it may make more sense to directly call this from the PSCI init,
+and leave the arch-specific code alone.
+
+>  	init_bootcpu_ops();
+>  	smp_init_cpus();
+>  	smp_build_mpidr_hash();
+> diff --git a/drivers/firmware/smccc/smccc.c 
+> b/drivers/firmware/smccc/smccc.c
+> index 00c88b809c0c..e153c71ece99 100644
+> --- a/drivers/firmware/smccc/smccc.c
+> +++ b/drivers/firmware/smccc/smccc.c
+> @@ -7,10 +7,47 @@
 > 
-> This patch adds an VFIO_IOMMU_SET_PASID_TABLE ioctl
-> which aims to pass the virtual iommu guest configuration
-> to the host. This latter takes the form of the so-called
-> PASID table.
+>  #include <linux/init.h>
+>  #include <linux/arm-smccc.h>
+> +#include <linux/kernel.h>
+> +#include <linux/string.h>
 > 
-> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>  static u32 smccc_version = ARM_SMCCC_VERSION_1_0;
+>  static enum arm_smccc_conduit smccc_conduit = SMCCC_CONDUIT_NONE;
 > 
-> ---
-> v11 -> v12:
-> - use iommu_uapi_set_pasid_table
-> - check SET and UNSET are not set simultaneously (Zenghui)
-> 
-> v8 -> v9:
-> - Merge VFIO_IOMMU_ATTACH/DETACH_PASID_TABLE into a single
->   VFIO_IOMMU_SET_PASID_TABLE ioctl.
-> 
-> v6 -> v7:
-> - add a comment related to VFIO_IOMMU_DETACH_PASID_TABLE
-> 
-> v3 -> v4:
-> - restore ATTACH/DETACH
-> - add unwind on failure
-> 
-> v2 -> v3:
-> - s/BIND_PASID_TABLE/SET_PASID_TABLE
-> 
-> v1 -> v2:
-> - s/BIND_GUEST_STAGE/BIND_PASID_TABLE
-> - remove the struct device arg
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 65 +++++++++++++++++++++++++++++++++
->  include/uapi/linux/vfio.h       | 19 ++++++++++
->  2 files changed, 84 insertions(+)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 67e827638995..87ddd9e882dc 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -2587,6 +2587,41 @@ static int vfio_iommu_iova_build_caps(struct vfio_iommu *iommu,
->  	return ret;
->  }
->  
-> +static void
-> +vfio_detach_pasid_table(struct vfio_iommu *iommu)
+> +DECLARE_BITMAP(__kvm_arm_hyp_services, ARM_SMCCC_KVM_NUM_FUNCS) = { };
+> +EXPORT_SYMBOL_GPL(__kvm_arm_hyp_services);
+> +
+> +void __init kvm_init_hyp_services(void)
 > +{
-> +	struct vfio_domain *d;
+> +	int i;
+> +	struct arm_smccc_res res;
 > +
-> +	mutex_lock(&iommu->lock);
-> +	list_for_each_entry(d, &iommu->domain_list, next)
-> +		iommu_detach_pasid_table(d->domain);
+> +	if (arm_smccc_get_version() == ARM_SMCCC_VERSION_1_0)
+> +		return;
 > +
-> +	mutex_unlock(&iommu->lock);
+> +	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID, &res);
+
+I think we may end-up calling into EL3 when running this on bare
+metal if the systems implement PSCI 1,1. Robust firmware should
+handle it, but there is plenty of broken ones around...
+
+Checking on the SMCCC conduit would be safer.
+
+> +	if (res.a0 != ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0 ||
+> +	    res.a1 != ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1 ||
+> +	    res.a2 != ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2 ||
+> +	    res.a3 != ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3)
+> +		return;
+> +
+> +	memset(&res, 0, sizeof(res));
+> +	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID, 
+> &res);
+> +	for (i = 0; i < 32; ++i) {
+> +		if (res.a0 & (i))
+> +			set_bit(i + (32 * 0), __kvm_arm_hyp_services);
+> +		if (res.a1 & (i))
+> +			set_bit(i + (32 * 1), __kvm_arm_hyp_services);
+> +		if (res.a2 & (i))
+> +			set_bit(i + (32 * 2), __kvm_arm_hyp_services);
+> +		if (res.a3 & (i))
+> +			set_bit(i + (32 * 3), __kvm_arm_hyp_services);
+> +	}
+> +
+> +	pr_info("KVM hypervisor services detected (0x%08lx 0x%08lx 0x%08lx
+> 0x%08lx)\n",
+> +		 res.a3, res.a2, res.a1, res.a0);
 > +}
 > +
-> +static int
-> +vfio_attach_pasid_table(struct vfio_iommu *iommu, unsigned long arg)
+
+Overall, this code should be in its own file, much like we already
+do for the SOC_ID stuff.
+
+>  void __init arm_smccc_version_init(u32 version, enum arm_smccc_conduit 
+> conduit)
+>  {
+>  	smccc_version = version;
+> diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
+> index f860645f6512..d75408141137 100644
+> --- a/include/linux/arm-smccc.h
+> +++ b/include/linux/arm-smccc.h
+> @@ -55,6 +55,8 @@
+>  #define ARM_SMCCC_OWNER_TRUSTED_OS	50
+>  #define ARM_SMCCC_OWNER_TRUSTED_OS_END	63
+> 
+> +#define ARM_SMCCC_FUNC_QUERY_CALL_UID  0xff01
+> +
+>  #define ARM_SMCCC_QUIRK_NONE		0
+>  #define ARM_SMCCC_QUIRK_QCOM_A6		1 /* Save/restore register a6 */
+> 
+> @@ -87,6 +89,29 @@
+>  			   ARM_SMCCC_SMC_32,				\
+>  			   0, 0x7fff)
+> 
+> +#define ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID				\
+> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
+> +			   ARM_SMCCC_SMC_32,				\
+> +			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
+> +			   ARM_SMCCC_FUNC_QUERY_CALL_UID)
+> +
+> +/* KVM UID value: 28b46fb6-2ec5-11e9-a9ca-4b564d003a74 */
+> +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0	0xb66fb428U
+> +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1	0xe911c52eU
+> +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2	0x564bcaa9U
+> +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3	0x743a004dU
+> +
+> +/* KVM "vendor specific" services */
+> +#define ARM_SMCCC_KVM_FUNC_FEATURES		0
+> +#define ARM_SMCCC_KVM_FUNC_FEATURES_2		127
+> +#define ARM_SMCCC_KVM_NUM_FUNCS			128
+> +
+> +#define ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID			\
+> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
+> +			   ARM_SMCCC_SMC_32,				\
+> +			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
+> +			   ARM_SMCCC_KVM_FUNC_FEATURES)
+> +
+>  #define SMCCC_ARCH_WORKAROUND_RET_UNAFFECTED	1
+> 
+>  /* Paravirtualised time calls (defined by ARM DEN0057A) */
+> @@ -391,5 +416,23 @@ asmlinkage void __arm_smccc_hvc(unsigned long a0,
+> unsigned long a1,
+>  		method;							\
+>  	})
+> 
+> +void __init kvm_init_hyp_services(void);
+> +
+> +/*
+> + * This helper will be called in guest. We put it here then both arm 
+> and arm64
+> + * guest can touch it.
+> + */
+> +#include <linux/kernel.h>
+> +#include <linux/err.h>
+
+I don't see the need for linux/err.h.
+
+> +static inline bool kvm_arm_hyp_service_available(u32 func_id)
 > +{
-> +	struct vfio_domain *d;
-> +	int ret = 0;
+> +	extern DECLARE_BITMAP(__kvm_arm_hyp_services, 
+> ARM_SMCCC_KVM_NUM_FUNCS);
 > +
-> +	mutex_lock(&iommu->lock);
+> +	if (func_id >= ARM_SMCCC_KVM_NUM_FUNCS)
+> +		return -EINVAL;
 > +
-> +	list_for_each_entry(d, &iommu->domain_list, next) {
-> +		ret = iommu_uapi_attach_pasid_table(d->domain, (void __user *)arg);
-This design is not very clear to me. This assumes all iommu_domains share the same pasid table.
+> +	return test_bit(func_id, __kvm_arm_hyp_services);
+> +}
+> +
+>  #endif /*__ASSEMBLY__*/
+>  #endif /*__LINUX_ARM_SMCCC_H*/
 
-As I understand, it's reasonable when there is only one group in the domain, and only one domain in the vfio_iommu.
-If more than one group in the vfio_iommu, the guest may put them into different guest iommu_domain, then they have different pasid table.
-
-Is this the use scenario?
+If we move this as part of a file holding the whole of the
+KVM discovery, we can make it non-inline and export it
+instead of the bitmap.
 
 Thanks,
-Keqian
 
-> +		if (ret)
-> +			goto unwind;
-> +	}
-> +	goto unlock;
-> +unwind:
-> +	list_for_each_entry_continue_reverse(d, &iommu->domain_list, next) {
-> +		iommu_detach_pasid_table(d->domain);
-> +	}
-> +unlock:
-> +	mutex_unlock(&iommu->lock);
-> +	return ret;
-> +}
-> +
->  static int vfio_iommu_migration_build_caps(struct vfio_iommu *iommu,
->  					   struct vfio_info_cap *caps)
->  {
-> @@ -2747,6 +2782,34 @@ static int vfio_iommu_type1_unmap_dma(struct vfio_iommu *iommu,
->  			-EFAULT : 0;
->  }
->  
-> +static int vfio_iommu_type1_set_pasid_table(struct vfio_iommu *iommu,
-> +					    unsigned long arg)
-> +{
-> +	struct vfio_iommu_type1_set_pasid_table spt;
-> +	unsigned long minsz;
-> +	int ret = -EINVAL;
-> +
-> +	minsz = offsetofend(struct vfio_iommu_type1_set_pasid_table, flags);
-> +
-> +	if (copy_from_user(&spt, (void __user *)arg, minsz))
-> +		return -EFAULT;
-> +
-> +	if (spt.argsz < minsz)
-> +		return -EINVAL;
-> +
-> +	if (spt.flags & VFIO_PASID_TABLE_FLAG_SET &&
-> +	    spt.flags & VFIO_PASID_TABLE_FLAG_UNSET)
-> +		return -EINVAL;
-> +
-> +	if (spt.flags & VFIO_PASID_TABLE_FLAG_SET)
-> +		ret = vfio_attach_pasid_table(iommu, arg + minsz);
-> +	else if (spt.flags & VFIO_PASID_TABLE_FLAG_UNSET) {
-> +		vfio_detach_pasid_table(iommu);
-> +		ret = 0;
-> +	}
-> +	return ret;
-> +}
-> +
->  static int vfio_iommu_type1_dirty_pages(struct vfio_iommu *iommu,
->  					unsigned long arg)
->  {
-> @@ -2867,6 +2930,8 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
->  		return vfio_iommu_type1_unmap_dma(iommu, arg);
->  	case VFIO_IOMMU_DIRTY_PAGES:
->  		return vfio_iommu_type1_dirty_pages(iommu, arg);
-> +	case VFIO_IOMMU_SET_PASID_TABLE:
-> +		return vfio_iommu_type1_set_pasid_table(iommu, arg);
->  	default:
->  		return -ENOTTY;
->  	}
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index 2f313a238a8f..78ce3ce6c331 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -14,6 +14,7 @@
->  
->  #include <linux/types.h>
->  #include <linux/ioctl.h>
-> +#include <linux/iommu.h>
->  
->  #define VFIO_API_VERSION	0
->  
-> @@ -1180,6 +1181,24 @@ struct vfio_iommu_type1_dirty_bitmap_get {
->  
->  #define VFIO_IOMMU_DIRTY_PAGES             _IO(VFIO_TYPE, VFIO_BASE + 17)
->  
-> +/*
-> + * VFIO_IOMMU_SET_PASID_TABLE - _IOWR(VFIO_TYPE, VFIO_BASE + 22,
-> + *			struct vfio_iommu_type1_set_pasid_table)
-> + *
-> + * The SET operation passes a PASID table to the host while the
-> + * UNSET operation detaches the one currently programmed. Setting
-> + * a table while another is already programmed replaces the old table.
-> + */
-> +struct vfio_iommu_type1_set_pasid_table {
-> +	__u32	argsz;
-> +	__u32	flags;
-> +#define VFIO_PASID_TABLE_FLAG_SET	(1 << 0)
-> +#define VFIO_PASID_TABLE_FLAG_UNSET	(1 << 1)
-> +	struct iommu_pasid_table_config config; /* used on SET */
-> +};
-> +
-> +#define VFIO_IOMMU_SET_PASID_TABLE	_IO(VFIO_TYPE, VFIO_BASE + 22)
-> +
->  /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
->  
->  /*
-> 
+         M.
+-- 
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
