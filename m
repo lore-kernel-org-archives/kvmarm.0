@@ -2,67 +2,94 @@ Return-Path: <SRS0=mEDx=HE=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.4 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A274DC433DB
-	for <kvmarm@archiver.kernel.org>; Tue,  2 Feb 2021 08:03:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65F86C433DB
+	for <kvmarm@archiver.kernel.org>; Tue,  2 Feb 2021 09:44:42 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 303FB64EED
-	for <kvmarm@archiver.kernel.org>; Tue,  2 Feb 2021 08:03:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 303FB64EED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id BDC9664DA8
+	for <kvmarm@archiver.kernel.org>; Tue,  2 Feb 2021 09:44:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDC9664DA8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7FDEE4B19F;
-	Tue,  2 Feb 2021 03:03:46 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A6714B193;
+	Tue,  2 Feb 2021 04:44:41 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id rqoIC+0+GkGw; Tue,  2 Feb 2021 03:03:45 -0500 (EST)
+	with ESMTP id eNermH8rd-VM; Tue,  2 Feb 2021 04:44:40 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 54F754B18C;
-	Tue,  2 Feb 2021 03:03:45 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B3A64B175;
+	Tue,  2 Feb 2021 04:44:40 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DA85A4B15D
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Feb 2021 03:03:44 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 44B384B175
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Feb 2021 04:44:39 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ds1A3CgCxV3Q for <kvmarm@lists.cs.columbia.edu>;
- Tue,  2 Feb 2021 03:03:43 -0500 (EST)
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A8E774B155
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Feb 2021 03:03:42 -0500 (EST)
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.58])
- by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4DVHND3fyRz7f54;
- Tue,  2 Feb 2021 16:02:20 +0800 (CST)
-Received: from [10.174.184.42] (10.174.184.42) by
- DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
- 14.3.498.0; Tue, 2 Feb 2021 16:03:32 +0800
-Subject: Re: [PATCH v13 06/15] iommu/smmuv3: Implement
- attach/detach_pasid_table
-To: Eric Auger <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
- <iommu@lists.linux-foundation.org>, <linux-kernel@vger.kernel.org>,
- <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>, <will@kernel.org>,
- <joro@8bytes.org>, <maz@kernel.org>, <robin.murphy@arm.com>,
- <alex.williamson@redhat.com>
-References: <20201118112151.25412-1-eric.auger@redhat.com>
- <20201118112151.25412-7-eric.auger@redhat.com>
-From: Keqian Zhu <zhukeqian1@huawei.com>
-Message-ID: <4c3dded7-8b60-a303-3bdf-fa610f0e1a73@huawei.com>
-Date: Tue, 2 Feb 2021 16:03:31 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+ with ESMTP id uprJXaQTmCP4 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  2 Feb 2021 04:44:38 -0500 (EST)
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com
+ [209.85.128.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 12A004B134
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Feb 2021 04:44:38 -0500 (EST)
+Received: by mail-wm1-f52.google.com with SMTP id i9so1670519wmq.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 02 Feb 2021 01:44:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=VSSaPfRwvDGbQxdeByNUZ9wyHZguwKJIHB4orZkRX1U=;
+ b=icnf8IsQd9Q4RXyrczWdoSkwbyXLaEO6875Us6xORHCs9Jiwot3EFoxuqn8jHAGlqJ
+ WC9WKxlkoKRuzYW5lQfPyf4X37E2NgGZDBulxh+ddu/9JSwp7kTe2nPHMnMwFxfB+YhR
+ 7c1qWY/YfsE22reCcr1x+CsicRskIT1cq/Bh9JrQ3TPma5wZyf9A53G78pmr9m62vImQ
+ 6gIsG+A2mm3O1Ic7fDPm1buPDEDNp0MEFD3zZx1FYOsCutARFZKGY4yA1Umv41CoszTH
+ /FUg8mWpEJuh2GWVvmFLwAv7tvSIGUo4oSD0BvbjJXwUDW/SYj1Q2/JACFpZ/hiIf/u8
+ SkfQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=VSSaPfRwvDGbQxdeByNUZ9wyHZguwKJIHB4orZkRX1U=;
+ b=PZeG/sIkT2kMKUuSPP2BAuiZGP0iptH69m1alEvpgtODr5/G1rol5O/NpBsc2w/XWG
+ HXbhH/CLRn2iAlWJJj3O9zFI1/RmfTfO4+fGoqkgZt0ECauthfcb5qjW05GIx0OmzOki
+ cJllQg0ySQKgzh0RuRLY0wAFcigSsl763G1c5KiLpCw4/3hAShUZLtl/04BwwjiuOHnt
+ ue8xdEpsXOZgaK6PJtmIKZBlmgCXpj/MGZF5BIXZHHeAwpBhnpW3m6I7t3WKRPGDDd88
+ k4cJfFCPcIoyyFb3eEi1/+0ZK76f+TE+XuUJ1xCyIapibk6iAHQYw9+HYIuV2R0L9wwa
+ oEeA==
+X-Gm-Message-State: AOAM530YyElKrJSq3yhR3oWp8Ih+jwhPyRlUYqNEoxL8FGdf9cV0sLSE
+ mrlWCWuE6iTLruEv8qB39Ogebg==
+X-Google-Smtp-Source: ABdhPJyFiDDkIMMluTAJ82TQKsuEQkfwk62lc0hmMunFauchGHnGuIDHT9S1UODUlL2ZopO0LOlhTQ==
+X-Received: by 2002:a05:600c:24e:: with SMTP id
+ 14mr2705390wmj.87.1612259076914; 
+ Tue, 02 Feb 2021 01:44:36 -0800 (PST)
+Received: from google.com (230.69.233.35.bc.googleusercontent.com.
+ [35.233.69.230])
+ by smtp.gmail.com with ESMTPSA id u1sm2169128wml.11.2021.02.02.01.44.36
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 02 Feb 2021 01:44:36 -0800 (PST)
+Date: Tue, 2 Feb 2021 09:44:33 +0000
+From: Quentin Perret <qperret@google.com>
+To: Will Deacon <will@kernel.org>
+Subject: Re: [RFC PATCH v2 10/26] KVM: arm64: Introduce an early Hyp page
+ allocator
+Message-ID: <YBkfAVC4KWPUnvI4@google.com>
+References: <20210108121524.656872-1-qperret@google.com>
+ <20210108121524.656872-11-qperret@google.com>
+ <20210201190008.GI15632@willie-the-truck>
 MIME-Version: 1.0
-In-Reply-To: <20201118112151.25412-7-eric.auger@redhat.com>
-X-Originating-IP: [10.174.184.42]
-X-CFilter-Loop: Reflected
-Cc: jean-philippe@linaro.org, jacob.jun.pan@linux.intel.com,
- nicoleotsuka@gmail.com, vivek.gautam@arm.com, yi.l.liu@intel.com,
- zhangfei.gao@linaro.org
+Content-Disposition: inline
+In-Reply-To: <20210201190008.GI15632@willie-the-truck>
+Cc: devicetree@vger.kernel.org, kernel-team@android.com, android-kvm@google.com,
+ Catalin Marinas <catalin.marinas@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-kernel@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
+ linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
+ Frank Rowand <frowand.list@gmail.com>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -79,118 +106,114 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Eric,
+On Monday 01 Feb 2021 at 19:00:08 (+0000), Will Deacon wrote:
+> On Fri, Jan 08, 2021 at 12:15:08PM +0000, Quentin Perret wrote:
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/early_alloc.c b/arch/arm64/kvm/hyp/nvhe/early_alloc.c
+> > new file mode 100644
+> > index 000000000000..de4c45662970
+> > --- /dev/null
+> > +++ b/arch/arm64/kvm/hyp/nvhe/early_alloc.c
+> > @@ -0,0 +1,60 @@
+> > +// SPDX-License-Identifier: GPL-2.0-only
+> > +/*
+> > + * Copyright (C) 2020 Google LLC
+> > + * Author: Quentin Perret <qperret@google.com>
+> > + */
+> > +
+> > +#include <asm/kvm_pgtable.h>
+> > +
+> > +#include <nvhe/memory.h>
+> > +
+> > +struct kvm_pgtable_mm_ops hyp_early_alloc_mm_ops;
+> > +s64 __ro_after_init hyp_physvirt_offset;
+> > +
+> > +static unsigned long base;
+> > +static unsigned long end;
+> > +static unsigned long cur;
+> > +
+> > +unsigned long hyp_early_alloc_nr_pages(void)
+> > +{
+> > +	return (cur - base) >> PAGE_SHIFT;
+> > +}
+> 
+> nit: but I find this function name confusing (it's returning the number of
+> _allocated_ pages, not the number of _free_ pages!). How about something
+> like hyp_early_alloc_size() to match hyp_s1_pgtable_size() which you add
+> later? [and move the shift out to the caller]?
 
-On 2020/11/18 19:21, Eric Auger wrote:
-> On attach_pasid_table() we program STE S1 related info set
-> by the guest into the actual physical STEs. At minimum
-> we need to program the context descriptor GPA and compute
-> whether the stage1 is translated/bypassed or aborted.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> 
-> ---
-> v7 -> v8:
-> - remove smmu->features check, now done on domain finalize
-> 
-> v6 -> v7:
-> - check versions and comment the fact we don't need to take
->   into account s1dss and s1fmt
-> v3 -> v4:
-> - adapt to changes in iommu_pasid_table_config
-> - different programming convention at s1_cfg/s2_cfg/ste.abort
-> 
-> v2 -> v3:
-> - callback now is named set_pasid_table and struct fields
->   are laid out differently.
-> 
-> v1 -> v2:
-> - invalidate the STE before changing them
-> - hold init_mutex
-> - handle new fields
-> ---
->  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 89 +++++++++++++++++++++
->  1 file changed, 89 insertions(+)
-> 
-> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> index 412ea1bafa50..805acdc18a3a 100644
-> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> @@ -2661,6 +2661,93 @@ static void arm_smmu_get_resv_regions(struct device *dev,
->  	iommu_dma_get_resv_regions(dev, head);
->  }
->  
-> +static int arm_smmu_attach_pasid_table(struct iommu_domain *domain,
-> +				       struct iommu_pasid_table_config *cfg)
-> +{
-> +	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
-> +	struct arm_smmu_master *master;
-> +	struct arm_smmu_device *smmu;
-> +	unsigned long flags;
-> +	int ret = -EINVAL;
-> +
-> +	if (cfg->format != IOMMU_PASID_FORMAT_SMMUV3)
-> +		return -EINVAL;
-> +
-> +	if (cfg->version != PASID_TABLE_CFG_VERSION_1 ||
-> +	    cfg->vendor_data.smmuv3.version != PASID_TABLE_SMMUV3_CFG_VERSION_1)
-> +		return -EINVAL;
-> +
-> +	mutex_lock(&smmu_domain->init_mutex);
-> +
-> +	smmu = smmu_domain->smmu;
-> +
-> +	if (!smmu)
-> +		goto out;
-> +
-> +	if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
-> +		goto out;
-> +
-> +	switch (cfg->config) {
-> +	case IOMMU_PASID_CONFIG_ABORT:
-> +		smmu_domain->s1_cfg.set = false;
-> +		smmu_domain->abort = true;
-> +		break;
-> +	case IOMMU_PASID_CONFIG_BYPASS:
-> +		smmu_domain->s1_cfg.set = false;
-> +		smmu_domain->abort = false;
-I didn't test it, but it seems that this will cause BUG() in arm_smmu_write_strtab_ent().
-At the line "BUG_ON(ste_live && !nested);". Maybe I miss something?
+Works for me.
 
-> +		break;
-> +	case IOMMU_PASID_CONFIG_TRANSLATE:
-> +		/* we do not support S1 <-> S1 transitions */
-> +		if (smmu_domain->s1_cfg.set)
-> +			goto out;
-> +
-> +		/*
-> +		 * we currently support a single CD so s1fmt and s1dss
-> +		 * fields are also ignored
-> +		 */
-> +		if (cfg->pasid_bits)
-> +			goto out;
-> +
-> +		smmu_domain->s1_cfg.cdcfg.cdtab_dma = cfg->base_ptr;
-> +		smmu_domain->s1_cfg.set = true;
-> +		smmu_domain->abort = false;
-> +		break;
-> +	default:
-> +		goto out;
-> +	}
-> +	spin_lock_irqsave(&smmu_domain->devices_lock, flags);
-> +	list_for_each_entry(master, &smmu_domain->devices, domain_head)
-> +		arm_smmu_install_ste_for_dev(master);
-> +	spin_unlock_irqrestore(&smmu_domain->devices_lock, flags);
-> +	ret = 0;
-> +out:
-> +	mutex_unlock(&smmu_domain->init_mutex);
-> +	return ret;
-> +}
-> +
-[...]
+> > +extern void clear_page(void *to);
+> 
+> Stick this in a header?
 
-Thanks,
-Keqian
+Right, that, or perhaps just use asm/page.h directly -- I _think_ that
+should work fine assuming with have the correct symbol aliasing in
+place.
+
+> > +
+> > +void *hyp_early_alloc_contig(unsigned int nr_pages)
+> 
+> I think order might make more sense, or do you need to allocate
+> non-power-of-2 batches of pages?
+
+Indeed, I allocate page-aligned blobs of arbitrary size (e.g.
+divide_memory_pool() in patch 16), so I prefer it that way.
+
+> > +{
+> > +	unsigned long ret = cur, i, p;
+> > +
+> > +	if (!nr_pages)
+> > +		return NULL;
+> > +
+> > +	cur += nr_pages << PAGE_SHIFT;
+> > +	if (cur > end) {
+> 
+> This would mean that concurrent hyp_early_alloc_nr_pages() would transiently
+> give the wrong answer. Might be worth sticking the locking expectations with
+> the function prototypes.
+
+This is only called from a single CPU from a non-preemptible section, so
+that is not a problem. But yes, I'll stick a comment.
+
+> That said, maybe it would be better to write this check as:
+> 
+> 	if (end - cur < (nr_pages << PAGE_SHIFT))
+> 
+> as that also removes the need to worry about overflow if nr_pages is huge
+> (which would be a bug in the hypervisor, which we would then catch here).
+
+Sounds good.
+
+> > +		cur = ret;
+> > +		return NULL;
+> > +	}
+> > +
+> > +	for (i = 0; i < nr_pages; i++) {
+> > +		p = ret + (i << PAGE_SHIFT);
+> > +		clear_page((void *)(p));
+> > +	}
+> > +
+> > +	return (void *)ret;
+> > +}
+> > +
+> > +void *hyp_early_alloc_page(void *arg)
+> > +{
+> > +	return hyp_early_alloc_contig(1);
+> > +}
+> > +
+> > +void hyp_early_alloc_init(unsigned long virt, unsigned long size)
+> > +{
+> > +	base = virt;
+> > +	end = virt + size;
+> > +	cur = virt;
+> 
+> nit: base = cur = virt;
+
+Ack.
+
+Thanks for the review,
+Quentin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
