@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9370DC433DB
-	for <kvmarm@archiver.kernel.org>; Wed,  3 Feb 2021 15:34:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24449C433DB
+	for <kvmarm@archiver.kernel.org>; Wed,  3 Feb 2021 15:38:13 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C669B64F4D
-	for <kvmarm@archiver.kernel.org>; Wed,  3 Feb 2021 15:34:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C669B64F4D
+	by mail.kernel.org (Postfix) with ESMTP id 6596064F58
+	for <kvmarm@archiver.kernel.org>; Wed,  3 Feb 2021 15:38:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6596064F58
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B6884B297;
-	Wed,  3 Feb 2021 10:34:42 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E13364B1D1;
+	Wed,  3 Feb 2021 10:38:11 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Z9PlI+laz6Qd; Wed,  3 Feb 2021 10:34:41 -0500 (EST)
+	with ESMTP id k7zoBuSyGfgW; Wed,  3 Feb 2021 10:38:10 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B1604B28B;
-	Wed,  3 Feb 2021 10:34:41 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D2C884B1DB;
+	Wed,  3 Feb 2021 10:38:10 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C073C4B286
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2021 10:34:40 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 86F764B1DB
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2021 10:38:09 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 18-jYFXQICBE for <kvmarm@lists.cs.columbia.edu>;
- Wed,  3 Feb 2021 10:34:39 -0500 (EST)
+ with ESMTP id 959JD2W7RmHv for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  3 Feb 2021 10:38:08 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C99464B162
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2021 10:34:39 -0500 (EST)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id B226B64F8D;
- Wed,  3 Feb 2021 15:34:35 +0000 (UTC)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A0E0F4B1D1
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2021 10:38:08 -0500 (EST)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 88CCD64F8C;
+ Wed,  3 Feb 2021 15:38:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1612366478;
- bh=S9+Bq4aGL8vsbiEdvdMBV0S68KqoN1oduE+b7bzwEXw=;
+ s=k20201202; t=1612366687;
+ bh=Qak6mhwDNjguVOOBu6kwlKWIJ1viPAqdFwNyzm7XLsY=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=nubzrsC4b6rjzazEb1YDuQhppwUNSktXo9CXG8NdZGVSsf5LLvZvo5fop0k6fZ2Hh
- kqgNvs+M/pwwFN+R3Cun3MjtUUhBP62uFcdsxxMiG/hIZs9bYge9MlW8iFAR27X230
- wIBaOixNb7z4pyTKDSjGw/WuPm5iXml+XAjkBmQFWOIBRcoBjXeIvxBD+OGVDuhbYK
- 3kspVhQQzIwm+nsVyyCbv760KcMS/v9wU+xXSCYn98alZRNLrNmUV2AghECbIqTqKv
- zRbpuBwLp2CaSm0VeMmn72CI2WmWdcz+VeRdcpMD1cKBJWEzTEvXSzew9b9F6YL7l/
- WbN8/SMs9Ofnw==
-Date: Wed, 3 Feb 2021 15:34:32 +0000
+ b=WE08rcuIZPrjb3tZ2Brfsaz61cnJTNscqfNeBsiftXJXvl0RFgDQMRQGsL9y4bvdz
+ hRIEC9eV1iTFkGbVHirIkUTAbNC1fNlLxM3S6Ldc+fjAksC1NLVwUMWZKm6KlkRNbZ
+ oxlaa7Y1p8USkggIuj3MNcsY6nu0QM8R6BUBq2hny0vI1g2a8ZiehGC7e7hI6OQCeD
+ FnNkbnkIpmUgzCJs85nPzlOTQtPEiz0XhLSxv+5egwoARq3K8t2NEMo1GargXbJQgv
+ h3MDcVD8FlPpYXhzKd9A8jHHWQaFTXJDy8gC3cs4x+2yDybuQSO1tZ5hQGV3sB84qo
+ aRTYgR+mHu8Qw==
+Date: Wed, 3 Feb 2021 15:38:01 +0000
 From: Will Deacon <will@kernel.org>
 To: Quentin Perret <qperret@google.com>
-Subject: Re: [RFC PATCH v2 18/26] KVM: arm64: Use kvm_arch for stage 2 pgtable
-Message-ID: <20210203153431.GC18974@willie-the-truck>
+Subject: Re: [RFC PATCH v2 19/26] KVM: arm64: Use kvm_arch in kvm_s2_mmu
+Message-ID: <20210203153801.GD18974@willie-the-truck>
 References: <20210108121524.656872-1-qperret@google.com>
- <20210108121524.656872-19-qperret@google.com>
+ <20210108121524.656872-20-qperret@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20210108121524.656872-19-qperret@google.com>
+In-Reply-To: <20210108121524.656872-20-qperret@google.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Cc: devicetree@vger.kernel.org, kernel-team@android.com, android-kvm@google.com,
  Catalin Marinas <catalin.marinas@arm.com>, Fuad Tabba <tabba@google.com>,
@@ -82,17 +82,17 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Jan 08, 2021 at 12:15:16PM +0000, Quentin Perret wrote:
+On Fri, Jan 08, 2021 at 12:15:17PM +0000, Quentin Perret wrote:
 > In order to make use of the stage 2 pgtable code for the host stage 2,
-> use struct kvm_arch in lieu of struct kvm as the host will have the
-> former but not the latter.
+> change kvm_s2_mmu to use a kvm_arch pointer in lieu of the kvm pointer,
+> as the host will have the former but not the latter.
 > 
 > Signed-off-by: Quentin Perret <qperret@google.com>
 > ---
->  arch/arm64/include/asm/kvm_pgtable.h | 5 +++--
->  arch/arm64/kvm/hyp/pgtable.c         | 6 +++---
->  arch/arm64/kvm/mmu.c                 | 2 +-
->  3 files changed, 7 insertions(+), 6 deletions(-)
+>  arch/arm64/include/asm/kvm_host.h | 2 +-
+>  arch/arm64/include/asm/kvm_mmu.h  | 7 ++++++-
+>  arch/arm64/kvm/mmu.c              | 8 ++++----
+>  3 files changed, 11 insertions(+), 6 deletions(-)
 
 Acked-by: Will Deacon <will@kernel.org>
 
