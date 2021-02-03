@@ -2,70 +2,72 @@ Return-Path: <SRS0=xLVY=HF=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA824C433DB
-	for <kvmarm@archiver.kernel.org>; Wed,  3 Feb 2021 16:11:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28AF4C433DB
+	for <kvmarm@archiver.kernel.org>; Wed,  3 Feb 2021 16:44:07 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3788364F7E
-	for <kvmarm@archiver.kernel.org>; Wed,  3 Feb 2021 16:11:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3788364F7E
+	by mail.kernel.org (Postfix) with ESMTP id 5997064F7E
+	for <kvmarm@archiver.kernel.org>; Wed,  3 Feb 2021 16:44:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5997064F7E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BA6124B282;
-	Wed,  3 Feb 2021 11:11:58 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C92E94B290;
+	Wed,  3 Feb 2021 11:44:05 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 8350hqcd3R7s; Wed,  3 Feb 2021 11:11:57 -0500 (EST)
+	with ESMTP id Ve6Jk1MhTTxX; Wed,  3 Feb 2021 11:44:03 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AB2414B286;
-	Wed,  3 Feb 2021 11:11:57 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 777B44B291;
+	Wed,  3 Feb 2021 11:44:03 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AFD9C4B285
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2021 11:11:55 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 47FC14B282
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2021 11:44:02 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id I-ZBxuewo0JX for <kvmarm@lists.cs.columbia.edu>;
- Wed,  3 Feb 2021 11:11:54 -0500 (EST)
+ with ESMTP id OObRINzJ-GPW for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  3 Feb 2021 11:44:01 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B46BC4B282
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2021 11:11:54 -0500 (EST)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 690FD64F7C;
- Wed,  3 Feb 2021 16:11:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1612368713;
- bh=7199PDpVTlqOjnCdGa1C2okl1sOKmVDKqDkYKIiqhaY=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=FuYblYiB5DXGGToKuosdQ/gmxLGmdtzvKntyOdRlqdN9qhhWUAJE3kHa1bOGTmwEQ
- eL22cLZgiqYFp8YZ3pXeNnElHV48a5UgvsULX6qQ/CuwARYwT47Wo3OGbf4Ek/AGPi
- I4ohHWcS3JCZPpjDxIlDKePYxucDjQOocD904+jEK/wCPRvIObio8zUzXUIs663RgM
- FQKTWIjoMnJOVQTdYo+QNvPTnrdR65aYKZNvwGhPMT2QgBfubvcsxh2DXt+s4Tx08N
- HohfrVM09LweAR6hGFGzdhkee7ZJe5u6AQS46++V8sJY3Z3YefUQLyqyIaDIC18wsc
- nAnjbTO03hiYw==
-Date: Wed, 3 Feb 2021 16:11:47 +0000
-From: Will Deacon <will@kernel.org>
-To: Quentin Perret <qperret@google.com>
-Subject: Re: [RFC PATCH v2 26/26] KVM: arm64: Wrap the host with a stage 2
-Message-ID: <20210203161146.GJ18974@willie-the-truck>
-References: <20210108121524.656872-1-qperret@google.com>
- <20210108121524.656872-27-qperret@google.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 532CD4B281
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2021 11:44:01 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 1207564F7C;
+ Wed,  3 Feb 2021 16:44:00 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=hot-poop.lan)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1l7LG1-00Bnsm-Sk; Wed, 03 Feb 2021 16:43:57 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: arnd@arndb.de, Quentin Perret <qperret@google.com>,
+ catalin.marinas@arm.com, will@kernel.org
+Subject: Re: [PATCH 0/2] KVM: arm64: Stub exports in nvhe code
+Date: Wed,  3 Feb 2021 16:43:48 +0000
+Message-Id: <161237062025.1419625.13086305573512898143.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.29.2
+In-Reply-To: <20210203141931.615898-1-qperret@google.com>
+References: <20210203141931.615898-1-qperret@google.com>
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210108121524.656872-27-qperret@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: devicetree@vger.kernel.org, kernel-team@android.com, android-kvm@google.com,
- Catalin Marinas <catalin.marinas@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-kernel@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
- linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
- Frank Rowand <frowand.list@gmail.com>, kvmarm@lists.cs.columbia.edu
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: arnd@arndb.de, qperret@google.com, catalin.marinas@arm.com,
+ will@kernel.org, ardb@kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-arch@vger.kernel.org, kernel-team@android.com,
+ linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org, ardb@kernel.org,
+ kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -82,50 +84,35 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Jan 08, 2021 at 12:15:24PM +0000, Quentin Perret wrote:
-> When KVM runs in protected nVHE mode, make use of a stage 2 page-table
-> to give the hypervisor some control over the host memory accesses. At
-> the moment all memory aborts from the host will be instantly idmapped
-> RWX at stage 2 in a lazy fashion. Later patches will make use of that
-> infrastructure to implement access control restrictions to e.g. protect
-> guest memory from the host.
+On Wed, 3 Feb 2021 14:19:29 +0000, Quentin Perret wrote:
+> In the context of the currently ongoing work to remove the host kernel
+> from the TCB under KVM/arm64, I have been trying to wrap the host kernel
+> with a stage 2 page-table -- see [1].
 > 
-> Signed-off-by: Quentin Perret <qperret@google.com>
-> ---
->  arch/arm64/include/asm/kvm_cpufeature.h       |   2 +
->  arch/arm64/kernel/image-vars.h                |   3 +
->  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  33 +++
->  arch/arm64/kvm/hyp/nvhe/Makefile              |   2 +-
->  arch/arm64/kvm/hyp/nvhe/hyp-init.S            |   1 +
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c            |   6 +
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 191 ++++++++++++++++++
->  arch/arm64/kvm/hyp/nvhe/setup.c               |   6 +
->  arch/arm64/kvm/hyp/nvhe/switch.c              |   7 +-
->  arch/arm64/kvm/hyp/nvhe/tlb.c                 |   4 +-
->  10 files changed, 248 insertions(+), 7 deletions(-)
->  create mode 100644 arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
->  create mode 100644 arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> Using this infrastructure, I attempted to unmap the .hyp. sections from
+> the host stage 2 as it really shouldn't need to access them. But by
+> doing so, I realized quickly the module loader was getting very confused
+> by the usage of EXPORT_SYMBOL() macros in library functions that have
+> been pulled into the EL2 object, and that we end up linking modules
+> against the EL2 copy of e.g. memset. And so, this series essentially
+> tries to fix this.
+> 
+> [...]
 
-[...]
+Applied to kvm-arm64/misc-5.12, thanks!
 
-> +void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	enum kvm_pgtable_prot prot;
-> +	u64 far, hpfar, esr, ipa;
-> +	int ret;
-> +
-> +	esr = read_sysreg_el2(SYS_ESR);
-> +	if (!__get_fault_info(esr, &far, &hpfar))
-> +		hyp_panic();
-> +
-> +	prot = KVM_PGTABLE_PROT_R | KVM_PGTABLE_PROT_W | KVM_PGTABLE_PROT_X;
-> +	ipa = (hpfar & HPFAR_MASK) << 8;
-> +	ret = host_stage2_map(ipa, PAGE_SIZE, prot);
+[1/2] asm-generic: export: Stub EXPORT_SYMBOL with __DISABLE_EXPORTS
+      commit: 54effa653246c35997f5e990e0134be5be09f9d1
+[2/2] KVM: arm64: Stub EXPORT_SYMBOL for nVHE EL2 code
+      commit: bbc075e01ceac50e0a8353b520544f3089e94e44
 
-Can we try to put down a block mapping if the whole thing falls within
-memory?
+Cheers,
 
-Will
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
+
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
