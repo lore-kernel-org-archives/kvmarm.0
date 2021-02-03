@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92264C433DB
-	for <kvmarm@archiver.kernel.org>; Wed,  3 Feb 2021 12:59:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79B8DC433DB
+	for <kvmarm@archiver.kernel.org>; Wed,  3 Feb 2021 12:59:39 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E5A2264F4E
-	for <kvmarm@archiver.kernel.org>; Wed,  3 Feb 2021 12:59:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5A2264F4E
+	by mail.kernel.org (Postfix) with ESMTP id 04F6164E4F
+	for <kvmarm@archiver.kernel.org>; Wed,  3 Feb 2021 12:59:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04F6164E4F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 746D24B1D4;
-	Wed,  3 Feb 2021 07:59:29 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 820314B271;
+	Wed,  3 Feb 2021 07:59:38 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id VOTlfcmfZJ-m; Wed,  3 Feb 2021 07:59:28 -0500 (EST)
+	with ESMTP id UFTdtqeObdZE; Wed,  3 Feb 2021 07:59:37 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C6854B1FC;
-	Wed,  3 Feb 2021 07:59:28 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 619B54B1C1;
+	Wed,  3 Feb 2021 07:59:37 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 361904B250
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2021 07:59:27 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CE434B17C
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2021 07:59:36 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lyBbN6YMqB5g for <kvmarm@lists.cs.columbia.edu>;
- Wed,  3 Feb 2021 07:59:25 -0500 (EST)
+ with ESMTP id bb709bNS-HyX for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  3 Feb 2021 07:59:30 -0500 (EST)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 232364B24F
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2021 07:59:25 -0500 (EST)
+ (us-smtp-delivery-124.mimecast.com [63.128.21.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8AA1D4B1FC
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2021 07:59:30 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1612357164;
+ s=mimecast20190719; t=1612357170;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=i8/mAF7tPJmuIVyni5K3ahZ5kwY4m05qM8J1tBKTUho=;
- b=QRAV6G+DlbP1mo74zvO8NqAVnnmiG23iPht0bSJSlsPdrivZ6z5HL1B4vZMbLbcfslODM0
- JlNKcHAL4Fo4hC2ZdhVcpIZkzQ5mCoxbTuFLBVEMj2a77g+Q8ekeMI1x0xrcfmhlnzp/XA
- 9zTSzRA+7BxriA4CodA81CTV4uGppnw=
+ bh=qYb4OGzNQZv0lI1Md7SNJMIqcjDngUeaMmZcgMWB/wI=;
+ b=HwUkydXlK2uvF/ulbRIcrcFVJ1hLzBeg2+315vzlgWaM79BY3Cg/jaHpdcM77DVr5EYhoU
+ D/iDrRSfloNHdhtbd6if5cl4ZdDeYRdDMwxU9p/PHupYHcLdtSG+VxPh66APj2q+QZX7BS
+ wXINYD76EnSWjBTUi8mPt86fatr63Sw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-485-3IyS_6ztNSWoTM8amAuEaA-1; Wed, 03 Feb 2021 07:59:23 -0500
-X-MC-Unique: 3IyS_6ztNSWoTM8amAuEaA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-580-KExexx4pO4aqvrcfRpC5Cg-1; Wed, 03 Feb 2021 07:59:23 -0500
+X-MC-Unique: KExexx4pO4aqvrcfRpC5Cg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 93F5C18A0838;
- Wed,  3 Feb 2021 12:59:17 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8BA2DDF8C4;
+ Wed,  3 Feb 2021 12:59:19 +0000 (UTC)
 Received: from [10.36.113.43] (ovpn-113-43.ams2.redhat.com [10.36.113.43])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CEA8E3828;
- Wed,  3 Feb 2021 12:59:15 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v3 05/11] arm/arm64: gic: Use correct
- memory ordering for the IPI test
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 24E251E2;
+ Wed,  3 Feb 2021 12:59:17 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v3 02/11] lib: arm/arm64: gicv2: Document
+ existing barriers when sending IPIs
 To: Alexandru Elisei <alexandru.elisei@arm.com>, drjones@redhat.com,
  kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 References: <20210129163647.91564-1-alexandru.elisei@arm.com>
- <20210129163647.91564-6-alexandru.elisei@arm.com>
+ <20210129163647.91564-3-alexandru.elisei@arm.com>
 From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <84e3b198-399c-d0a1-e7de-8a70f60ba00c@redhat.com>
-Date: Wed, 3 Feb 2021 13:59:14 +0100
+Message-ID: <d05e1437-aff3-5e6b-a7d8-ac77030adf2f@redhat.com>
+Date: Wed, 3 Feb 2021 13:59:16 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20210129163647.91564-6-alexandru.elisei@arm.com>
+In-Reply-To: <20210129163647.91564-3-alexandru.elisei@arm.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Cc: andre.przywara@arm.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -94,132 +94,95 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
+Hi Alexandru,
 
 On 1/29/21 5:36 PM, Alexandru Elisei wrote:
-> The IPI test works by sending IPIs to even numbered CPUs from the
-> IPI_SENDER CPU (CPU1), and then checking that the other CPUs received the
-> interrupts as expected. The check is done in check_acked() by the
-> IPI_SENDER CPU with the help of three arrays:
+> GICv2 generates IPIs with a MMIO write to the GICD_SGIR register. A common
+> pattern for IPI usage is for the IPI receiver to read data written to
+> memory by the sender. The armv7 and armv8 architectures implement a
+> weakly-ordered memory model, which means that barriers are required to make
+> sure that the expected values are observed.
 > 
-> - acked, where acked[i] == 1 means that CPU i received the interrupt.
-> - bad_irq, where bad_irq[i] == -1 means that the interrupt received by CPU
->   i had the expected interrupt number (IPI_IRQ).
-> - bad_sender, where bad_sender[i] == -1 means that the interrupt received
->   by CPU i was from the expected sender (IPI_SENDER, GICv2 only).
+> Because the receiver CPU must observe the write to memory that generated
+> the IPI when reading the GICC_IAR MMIO register, we only need to ensure
+> ordering of memory accesses, and not completion. The same pattern can be
+> observed in the Linux GICv2 irqchip driver (more details in commit
+> 8adbf57fc429 ("irqchip: gic: use dmb ishst instead of dsb when raising a
+> softirq")).
 > 
-> The assumption made by check_acked() is that if a CPU acked an interrupt,
-> then bad_sender and bad_irq have also been updated. This is a common
-> inter-thread communication pattern called message passing.  For message
-> passing to work correctly on weakly consistent memory model architectures,
-> like arm and arm64, barriers or address dependencies are required. This is
-> described in ARM DDI 0487F.b, in "Armv7 compatible approaches for ordering,
-> using DMB and DSB barriers" (page K11-7993), in the section with a single
-> observer, which is in our case the IPI_SENDER CPU.
+> However, it turns out that no changes are needed to the way GICv2 sends
+> IPIs because of the implicit barriers in the MMIO writel and readl
+> functions. Writel executes a wmb() (DST ST) before the MMIO write, and
+> readl executes a rmb() (DST LD) after the MMIO read. According to  ARM DDI
+> 0406C.d and ARM DDI 0487F.b, the DSB instruction:
 > 
-> The IPI test attempts to enforce the correct ordering using memory
-> barriers, but it's not enough. For example, the program execution below is
-> valid from an architectural point of view:
+> "[..] acts as a stronger barrier than a DMB and all ordering that is
+> created by a DMB with specific options is also generated by a DSB with the
+> same options."
 > 
-> 3 online CPUs, initial state (from stats_reset()):
+> which means that the correct memory ordering is enforced.
 > 
-> acked[2] = 0;
-> bad_sender[2] = -1;
-> bad_irq[2] = -1;
+> It's not immediately obvious that the proper barriers are in place, so add
+> a comment explaining that correct memory synchronization is implemented.
 > 
-> CPU1 (in check_acked())		| CPU2 (in ipi_handler())
-> 				|
-> smp_rmb() // DMB ISHLD		| acked[2]++;
-> read 1 from acked[2]		|
-> nr_pass++ // nr_pass = 3	|
-> read -1 from bad_sender[2]	|
-> read -1 from bad_irq[2]		|
-> 				| // in check_ipi_sender()
-> 				| bad_sender[2] = <bad ipi sender>
-> 				| // in check_irqnr()
-> 				| bad_irq[2] = <bad irq number>
-> 				| smp_wmb() // DMB ISHST
-> nr_pass == nr_cpus, return	|
-> 
-> In this scenario, CPU1 will read the updated acked value, but it will read
-> the initial bad_sender and bad_irq values. This is permitted because the
-> memory barriers do not create a data dependency between the value read from
-> acked and the values read from bad_rq and bad_sender on CPU1, respectively
-> between the values written to acked, bad_sender and bad_irq on CPU2.
-> 
-> To avoid this situation, let's reorder the barriers and accesses to the
-> arrays to create the needed dependencies that ensure that message passing
-> behaves as expected.
-> 
-> In the interrupt handler, the writes to bad_sender and bad_irq are
-> reordered before the write to acked and a smp_wmb() barrier is added. This
-> ensures that if other PEs observe the write to acked, then they will also
-> observe the writes to the other two arrays.
-> 
-> In check_acked(), put the smp_rmb() barrier after the read from acked to
-> ensure that the subsequent reads from bad_sender, respectively bad_irq,
-> aren't reordered locally by the PE.
-> 
-> With these changes, the expected ordering of accesses is respected and we
-> end up with the pattern described in the Arm ARM and also in the Linux
-> litmus test MP+fencewmbonceonce+fencermbonceonce.litmus from
-> tools/memory-model/litmus-tests. More examples and explanations can be
-> found in the Linux source tree, in Documentation/memory-barriers.txt, in
-> the sections "SMP BARRIER PAIRING" and "READ MEMORY BARRIERS VS LOAD
-> SPECULATION".
-> 
-> For consistency with ipi_handler(), the array accesses in
-> ipi_clear_active_handler() have also been reordered. This shouldn't affect
-> the functionality of that test.
-> 
-> Reviewed-by: Andre Przywara <andre.przywara@arm.com>
 > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
+
+Thanks
 
 Eric
 
 > ---
->  arm/gic.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+>  lib/arm/gic-v2.c | 6 ++++++
+>  arm/gic.c        | 7 +++++++
+>  2 files changed, 13 insertions(+)
 > 
+> diff --git a/lib/arm/gic-v2.c b/lib/arm/gic-v2.c
+> index dc6a97c600ec..786d6a4e4c6e 100644
+> --- a/lib/arm/gic-v2.c
+> +++ b/lib/arm/gic-v2.c
+> @@ -45,6 +45,11 @@ void gicv2_ipi_send_single(int irq, int cpu)
+>  {
+>  	assert(cpu < 8);
+>  	assert(irq < 16);
+> +	/*
+> +	 * The wmb() in writel and rmb() in readl() from gicv2_read_iar() are
+> +	 * sufficient for ensuring that stores that happen in program order
+> +	 * before the IPI will be visible after the interrupt is acknowledged.
+> +	 */
+>  	writel(1 << (cpu + 16) | irq, gicv2_dist_base() + GICD_SGIR);
+>  }
+>  
+> @@ -53,5 +58,6 @@ void gicv2_ipi_send_mask(int irq, const cpumask_t *dest)
+>  	u8 tlist = (u8)cpumask_bits(dest)[0];
+>  
+>  	assert(irq < 16);
+> +	/* No barriers needed, same situation as gicv2_ipi_send_single() */
+>  	writel(tlist << 16 | irq, gicv2_dist_base() + GICD_SGIR);
+>  }
 > diff --git a/arm/gic.c b/arm/gic.c
-> index db1417ae1ca1..c1b6c94a5f5e 100644
+> index fee48f9b4ccb..e2e053aeb823 100644
 > --- a/arm/gic.c
 > +++ b/arm/gic.c
-> @@ -72,9 +72,9 @@ static void check_acked(const char *testname, cpumask_t *mask)
->  		mdelay(100);
->  		nr_pass = 0;
->  		for_each_present_cpu(cpu) {
-> -			smp_rmb();
->  			nr_pass += cpumask_test_cpu(cpu, mask) ?
->  				acked[cpu] == 1 : acked[cpu] == 0;
-> +			smp_rmb(); /* pairs with smp_wmb in ipi_handler */
+> @@ -260,11 +260,18 @@ static void check_lpi_hits(int *expected, const char *msg)
 >  
->  			if (bad_sender[cpu] != -1) {
->  				printf("cpu%d received IPI from wrong sender %d\n",
-> @@ -148,10 +148,10 @@ static void ipi_handler(struct pt_regs *regs __unused)
+>  static void gicv2_ipi_send_self(void)
+>  {
+> +	/*
+> +	 * The wmb() in writel and rmb() when acknowledging the interrupt are
+> +	 * sufficient for ensuring that writes that happen in program order
+> +	 * before the interrupt are observed in the interrupt handler after
+> +	 * acknowledging the interrupt.
+> +	 */
+>  	writel(2 << 24 | IPI_IRQ, gicv2_dist_base() + GICD_SGIR);
+>  }
 >  
->  	if (irqnr != GICC_INT_SPURIOUS) {
->  		gic_write_eoir(irqstat);
-> -		++acked[smp_processor_id()];
->  		check_ipi_sender(irqstat);
->  		check_irqnr(irqnr);
-> -		smp_wmb(); /* pairs with rmb in check_acked */
-> +		smp_wmb(); /* pairs with smp_rmb in check_acked */
-> +		++acked[smp_processor_id()];
->  	} else {
->  		++spurious[smp_processor_id()];
->  		smp_wmb();
-> @@ -382,8 +382,8 @@ static void ipi_clear_active_handler(struct pt_regs *regs __unused)
+>  static void gicv2_ipi_send_broadcast(void)
+>  {
+> +	/* No barriers are needed, same situation as gicv2_ipi_send_self() */
+>  	writel(1 << 24 | IPI_IRQ, gicv2_dist_base() + GICD_SGIR);
+>  }
 >  
->  		writel(val, base + GICD_ICACTIVER);
->  
-> -		++acked[smp_processor_id()];
->  		check_irqnr(irqnr);
-> +		++acked[smp_processor_id()];
->  	} else {
->  		++spurious[smp_processor_id()];
->  	}
 > 
 
 _______________________________________________
