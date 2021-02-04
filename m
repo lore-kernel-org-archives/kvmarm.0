@@ -2,87 +2,88 @@ Return-Path: <SRS0=ioR1=HG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA0A3C433E0
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Feb 2021 10:47:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEBFEC433DB
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Feb 2021 11:08:43 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 287CA64D92
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Feb 2021 10:47:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 287CA64D92
+	by mail.kernel.org (Postfix) with ESMTP id 6106364F5E
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Feb 2021 11:08:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6106364F5E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B16A4B331;
-	Thu,  4 Feb 2021 05:47:18 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B9F534B28B;
+	Thu,  4 Feb 2021 06:08:42 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id lGzjN1v9Kbhq; Thu,  4 Feb 2021 05:47:16 -0500 (EST)
+	with ESMTP id 0mn0sI37+Ad2; Thu,  4 Feb 2021 06:08:41 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8FB824B274;
-	Thu,  4 Feb 2021 05:47:16 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 571974B25C;
+	Thu,  4 Feb 2021 06:08:41 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 556B84B265
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2021 05:47:15 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DAF9C4B24E
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2021 06:08:39 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lRKT++IYvbS2 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Feb 2021 05:47:13 -0500 (EST)
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com
- [209.85.128.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 679714B274
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2021 05:47:13 -0500 (EST)
-Received: by mail-wm1-f49.google.com with SMTP id c127so2559500wmf.5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 04 Feb 2021 02:47:13 -0800 (PST)
+ with ESMTP id uIq9EWWG7GrA for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Feb 2021 06:08:38 -0500 (EST)
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com
+ [209.85.128.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F04284B1E7
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2021 06:08:37 -0500 (EST)
+Received: by mail-wm1-f52.google.com with SMTP id t142so582336wmt.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 04 Feb 2021 03:08:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=NOCj8LvAZfA2IhLGtDyD8aqwcZfCSlKmfqSK6jzKVM8=;
- b=E+ehj9Ixa8BQtYRKSJn2Q+ZzYd8u4hrkEVsvNCGWHcxQ4vHno2guL9w/7catAVN6cY
- XUvFzCU3ZUt88AluDIa583iVDXxvN5iiv44ugr5TkYhzn73wVh4+68fOX/b3jPzPSUOT
- 4l6UWT2lMWMbaSZ2eJfvIOjSr5RFUNMZDk4hqty7q0fI4hRMlVHoCpcCTdZFZvUS1XaK
- seHWrkJuN5CCSuQgHoquUl7xLgX1lF/HcNEhItpf6QX1BmqWaxszKHnMZ3iK6AN+ttIO
- 2FWu7AT0i9JPlWLabPy7/09QUfVdlGTsyWrDfC26rWvAKnuB9TbwpG2L69PBKFKFDknZ
- J7+Q==
+ bh=Ac2cWoetiRazQ6sY02jAtUWhjT9m83ovv4OBQ4t/wAE=;
+ b=A4pYkiXZ376bPY33RfHADMh/Av+CR5JRDGbuuLfF8edaHdTjgTDmNsL2P1wbxBnu9n
+ 6+VHNCMB4m+vXPsgmT/sW4vL31F9UfF1V2/d/I8u6zAhT2cr8tHLj6ujCg8u3or8NhU4
+ 9AjHewTcziPuwb5SF88UTdGtsaLLRiNGclmWIKW3x3YMCcy2J0SjCm6qzOOWHJHt/eM6
+ EYA3/kcSK3f54psGOhTOHB2+XqczNu8pRisvRhZCpksIye+1a4Y4eSaW8/tkW02FenGC
+ QYEwJmjsOfZ8SYkGnHTWHzwFxibFw5swOcjMKpm1B40MPRK43AUPNO2plnYy2tAau8AV
+ cXDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=NOCj8LvAZfA2IhLGtDyD8aqwcZfCSlKmfqSK6jzKVM8=;
- b=Ij3HfdBh9KKVNLwAyMXY31Xplf47tYvzF8guAkhSSWJJlPHVsmEmN5dqxkYB8WBrwX
- X1zYpH7xGPVW+7n9Q8aNE+QTJysiiSiakj4UY836stH8y0iTv2fCZbUa7USejVwVaS58
- L5x36sATmjIJ1PMyJjvJPJ9H8HQG2h/cmjfsgTMovg8F+TB7KwXF+IhdUVGN2v54v5nE
- E9fe8r6YvBy/dcj0apUmxX+2QKlhvVNvzXsy0wMGqq6WoemKaCm6CYCPfKFrjaM7gfWc
- 2lZp8naKxTKblDEWiAjkca5MP5fXiA7i+1xuJR0D5RADSGh5SittQwRo0s/6lS8LGT5o
- Rwug==
-X-Gm-Message-State: AOAM530VeqcuPvsqYMyPfInCcH84IPLb7z3znl0km6ar7hHJ82Yb8BdB
- PhGt4Ef8zL3YXs2iEHroxbKjeg==
-X-Google-Smtp-Source: ABdhPJysS1IWOzz0LoC3mlXmYAQ2kma25oyguPhQd/kJOf334eVPIi5qENPQk/5bXfxF7SkcC5/NgQ==
-X-Received: by 2002:a1c:6a16:: with SMTP id f22mr6802271wmc.176.1612435631983; 
- Thu, 04 Feb 2021 02:47:11 -0800 (PST)
+ bh=Ac2cWoetiRazQ6sY02jAtUWhjT9m83ovv4OBQ4t/wAE=;
+ b=jg7th1zuoSOrh0vrL+eXFnPs3G4NR02CAcwNKz42s7E6srsEWOphg0XwwbLHCBEHPu
+ 9tjOHOn6CqmvtVHbcPo19pPKRcaSpStNQL6iqIqoAfDpBttVsA2HGx8EbIQrzuPWaLTu
+ ImeBRZZgeZt5dqi5jxW/ehnT/c7dJCvnLOawOwgmsoxHc+gYWIz1Y54gbI8lNhIjVHRY
+ gXQq6Iuu77OtNHtZO11dueHQFEOY98Qfu1jy/ZcSu4ty6kHEstWwYYM2hAFBH1zXizul
+ SGPcWE2m8NILSMOuF+c9EnSQqMy+UL/iiieh8cYzr8JInmpRhPuIJFtiG8fVqNNbVZZX
+ vWGA==
+X-Gm-Message-State: AOAM530BoGiF0tlOj1teUd8+NE11ANs+YdZtZozLvMUH7AP1ZUYiq89E
+ hcRNbfYnWryozGC1g7ZjpLb01A==
+X-Google-Smtp-Source: ABdhPJxofrOU9QtBbx8B1URQt7oPE0DC7M1sC/q1/8AlgNixgkixfYv7H9DmSmdVl0NIFGKJzk2aIg==
+X-Received: by 2002:a1c:d7:: with SMTP id 206mr7022487wma.68.1612436916642;
+ Thu, 04 Feb 2021 03:08:36 -0800 (PST)
 Received: from google.com (230.69.233.35.bc.googleusercontent.com.
  [35.233.69.230])
- by smtp.gmail.com with ESMTPSA id r15sm7722035wrj.61.2021.02.04.02.47.11
+ by smtp.gmail.com with ESMTPSA id w25sm5923406wmc.42.2021.02.04.03.08.36
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 04 Feb 2021 02:47:11 -0800 (PST)
-Date: Thu, 4 Feb 2021 10:47:08 +0000
+ Thu, 04 Feb 2021 03:08:36 -0800 (PST)
+Date: Thu, 4 Feb 2021 11:08:33 +0000
 From: Quentin Perret <qperret@google.com>
 To: Will Deacon <will@kernel.org>
-Subject: Re: [RFC PATCH v2 16/26] KVM: arm64: Prepare Hyp memory protection
-Message-ID: <YBvQrHdbiNTSLQq6@google.com>
+Subject: Re: [RFC PATCH v2 17/26] KVM: arm64: Elevate Hyp mappings creation
+ at EL2
+Message-ID: <YBvVseNd/r8q5He1@google.com>
 References: <20210108121524.656872-1-qperret@google.com>
- <20210108121524.656872-17-qperret@google.com>
- <20210203143709.GA18907@willie-the-truck>
+ <20210108121524.656872-18-qperret@google.com>
+ <20210203153138.GB18974@willie-the-truck>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20210203143709.GA18907@willie-the-truck>
+In-Reply-To: <20210203153138.GB18974@willie-the-truck>
 Cc: devicetree@vger.kernel.org, kernel-team@android.com, android-kvm@google.com,
  Catalin Marinas <catalin.marinas@arm.com>, Fuad Tabba <tabba@google.com>,
  linux-kernel@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
@@ -104,653 +105,236 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wednesday 03 Feb 2021 at 14:37:10 (+0000), Will Deacon wrote:
-> On Fri, Jan 08, 2021 at 12:15:14PM +0000, Quentin Perret wrote:
-> > +static inline unsigned long __hyp_pgtable_max_pages(unsigned long nr_pages)
-> > +{
-> > +	unsigned long total = 0, i;
-> > +
-> > +	/* Provision the worst case scenario with 4 levels of page-table */
-> > +	for (i = 0; i < 4; i++) {
-> 
-> Looks like you want KVM_PGTABLE_MAX_LEVELS, so maybe move that into a
-> header?
-
-Will do.
-
-> 
-> > +		nr_pages = DIV_ROUND_UP(nr_pages, PTRS_PER_PTE);
-> > +		total += nr_pages;
-> > +	}
-> 
-> ... that said, I'm not sure this needs to iterate at all. What exactly are
-> you trying to compute?
-
-I'm trying to figure out how many pages I will need to construct a
-page-table covering nr_pages contiguous pages. The first iteration tells
-me how many level 0 pages I need to cover nr_pages, the second iteration
-how many level 1 pages I need to cover the level 0 pages, and so on...
-
-I might be doing this naively though. Got a better idea?
-
-> > +
-> > +	return total;
-> > +}
-> > +
-> > +static inline unsigned long hyp_s1_pgtable_size(void)
-> > +{
-> > +	struct hyp_memblock_region *reg;
-> > +	unsigned long nr_pages, res = 0;
-> > +	int i;
-> > +
-> > +	if (kvm_nvhe_sym(hyp_memblock_nr) <= 0)
-> > +		return 0;
-> 
-> It's a bit grotty having this be signed. Why do we need to encode the error
-> case differently from the 0 case?
-
-Here specifically we don't, but it is needed in early_init_dt_add_memory_hyp()
-to distinguish the overflow case from the first memblock being added.
-
-> 
-> > +
-> > +	for (i = 0; i < kvm_nvhe_sym(hyp_memblock_nr); i++) {
-> > +		reg = &kvm_nvhe_sym(hyp_memory)[i];
-> 
-> You could declare reg in the loop body.
-
-I found it prettier like that and assumed the compiler would optimize it
-anyway, but ok.
-
-> > +		nr_pages = (reg->end - reg->start) >> PAGE_SHIFT;
-> > +		nr_pages = __hyp_pgtable_max_pages(nr_pages);
-> 
-> Maybe it would make more sense for __hyp_pgtable_max_pages to take the
-> size in bytes rather than pages, since most callers seem to have to do the
-> conversion?
-
-Yes, and it seems I can apply small cleanups in other places, so I'll
-fix this throughout the patch.
-
-> > +		res += nr_pages << PAGE_SHIFT;
-> > +	}
-> > +
-> > +	/* Allow 1 GiB for private mappings */
-> > +	nr_pages = (1 << 30) >> PAGE_SHIFT;
-> 
-> SZ_1G >> PAGE_SHIFT
-
-Much nicer, thanks. I was also considering adding a Kconfig option for
-that, because 1GiB is totally arbitrary. Toughts?
-
-> > +	nr_pages = __hyp_pgtable_max_pages(nr_pages);
-> > +	res += nr_pages << PAGE_SHIFT;
-> > +
-> > +	return res;
-> 
-> Might make more sense to keep res in pages until here, then just shift when
-> returning.
-> 
-> > +}
-> > +
-> > +#endif /* __KVM_HYP_MM_H */
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-> > index 72cfe53f106f..d7381a503182 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/Makefile
-> > +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-> > @@ -11,9 +11,9 @@ lib-objs := $(addprefix ../../../lib/, $(lib-objs))
-> >  
-> >  obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o \
-> >  	 hyp-main.o hyp-smp.o psci-relay.o early_alloc.o stub.o page_alloc.o \
-> > -	 cache.o cpufeature.o
-> > +	 cache.o cpufeature.o setup.o mm.o
-> >  obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
-> > -	 ../fpsimd.o ../hyp-entry.o ../exception.o
-> > +	 ../fpsimd.o ../hyp-entry.o ../exception.o ../pgtable.o
-> >  obj-y += $(lib-objs)
-> >  
-> >  ##
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-> > index 31b060a44045..ad943966c39f 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-> > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-> > @@ -251,4 +251,35 @@ alternative_else_nop_endif
-> >  
-> >  SYM_CODE_END(__kvm_handle_stub_hvc)
-> >  
-> > +SYM_FUNC_START(__pkvm_init_switch_pgd)
-> > +	/* Turn the MMU off */
-> > +	pre_disable_mmu_workaround
-> > +	mrs	x2, sctlr_el2
-> > +	bic	x3, x2, #SCTLR_ELx_M
-> > +	msr	sctlr_el2, x3
-> > +	isb
-> > +
-> > +	tlbi	alle2
-> > +
-> > +	/* Install the new pgtables */
-> > +	ldr	x3, [x0, #NVHE_INIT_PGD_PA]
-> > +	phys_to_ttbr x4, x3
-> > +alternative_if ARM64_HAS_CNP
-> > +	orr	x4, x4, #TTBR_CNP_BIT
-> > +alternative_else_nop_endif
-> > +	msr	ttbr0_el2, x4
-> > +
-> > +	/* Set the new stack pointer */
-> > +	ldr	x0, [x0, #NVHE_INIT_STACK_HYP_VA]
-> > +	mov	sp, x0
-> > +
-> > +	/* And turn the MMU back on! */
-> > +	dsb	nsh
-> > +	isb
-> > +	msr	sctlr_el2, x2
-> > +	ic	iallu
-> > +	isb
-> > +	ret	x1
-> > +SYM_FUNC_END(__pkvm_init_switch_pgd)
-> > +
-> >  	.popsection
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > index a906f9e2ff34..3075f117651c 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > @@ -6,12 +6,14 @@
-> >  
-> >  #include <hyp/switch.h>
-> >  
-> > +#include <asm/pgtable-types.h>
-> >  #include <asm/kvm_asm.h>
-> >  #include <asm/kvm_emulate.h>
-> >  #include <asm/kvm_host.h>
-> >  #include <asm/kvm_hyp.h>
-> >  #include <asm/kvm_mmu.h>
-> >  
-> > +#include <nvhe/mm.h>
-> >  #include <nvhe/trap_handler.h>
-> >  
-> >  DEFINE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
-> > @@ -106,6 +108,42 @@ static void handle___vgic_v3_restore_aprs(struct kvm_cpu_context *host_ctxt)
-> >  	__vgic_v3_restore_aprs(kern_hyp_va(cpu_if));
+On Wednesday 03 Feb 2021 at 15:31:39 (+0000), Will Deacon wrote:
+> On Fri, Jan 08, 2021 at 12:15:15PM +0000, Quentin Perret wrote:
+> > Previous commits have introduced infrastructure at EL2 to enable the Hyp
+> > code to manage its own memory, and more specifically its stage 1 page
+> > tables. However, this was preliminary work, and none of it is currently
+> > in use.
+> > 
+> > Put all of this together by elevating the hyp mappings creation at EL2
+> > when memory protection is enabled. In this case, the host kernel running
+> > at EL1 still creates _temporary_ Hyp mappings, only used while
+> > initializing the hypervisor, but frees them right after.
+> > 
+> > As such, all calls to create_hyp_mappings() after kvm init has finished
+> > turn into hypercalls, as the host now has no 'legal' way to modify the
+> > hypevisor page tables directly.
+> > 
+> > Signed-off-by: Quentin Perret <qperret@google.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_mmu.h |  1 -
+> >  arch/arm64/kvm/arm.c             | 62 +++++++++++++++++++++++++++++---
+> >  arch/arm64/kvm/mmu.c             | 34 ++++++++++++++++++
+> >  3 files changed, 92 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> > index d7ebd73ec86f..6c8466a042a9 100644
+> > --- a/arch/arm64/include/asm/kvm_mmu.h
+> > +++ b/arch/arm64/include/asm/kvm_mmu.h
+> > @@ -309,6 +309,5 @@ static __always_inline void __load_guest_stage2(struct kvm_s2_mmu *mmu)
+> >  	 */
+> >  	asm(ALTERNATIVE("nop", "isb", ARM64_WORKAROUND_SPECULATIVE_AT));
+> >  }
+> > -
+> >  #endif /* __ASSEMBLY__ */
+> >  #endif /* __ARM64_KVM_MMU_H__ */
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 6af9204bcd5b..e524682c2ccf 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -1421,7 +1421,7 @@ static void cpu_prepare_hyp_mode(int cpu)
+> >  	kvm_flush_dcache_to_poc(params, sizeof(*params));
 > >  }
 > >  
-> > +static void handle___pkvm_init(struct kvm_cpu_context *host_ctxt)
-> > +{
-> > +	DECLARE_REG(phys_addr_t, phys, host_ctxt, 1);
-> > +	DECLARE_REG(unsigned long, size, host_ctxt, 2);
-> > +	DECLARE_REG(unsigned long, nr_cpus, host_ctxt, 3);
-> > +	DECLARE_REG(unsigned long *, per_cpu_base, host_ctxt, 4);
-> > +
-> > +	cpu_reg(host_ctxt, 1) = __pkvm_init(phys, size, nr_cpus, per_cpu_base);
+> > -static void cpu_init_hyp_mode(void)
+> > +static void kvm_set_hyp_vector(void)
 > 
-> __pkvm_init() doesn't return, so I think this assignment back into host_ctxt
-> is confusing.
+> Please do something about the naming: now we have both cpu_set_hyp_vector()
+> and kvm_set_hyp_vector()!
 
-Very good point, I'll get rid of this.
+I'll try to find something different, but no guarantees it'll be much
+better :) Suggestions welcome.
 
-> 
-> Also, I wonder if these bare numbers would be better hidden behind, e.g.
-> 
->  #define DECLARE_ARG0(...)	DECLARE_REG(__VA_ARGS__, 1)
->  ...
->  #define DECLARE_RET(...)	DECLARE_REG(__VA_ARGS__, 1)
-> 
-> but it's cosmetic, so no need to change your patch. Just worried about
-> off-by-1s causing interesting behaviour!
-
-Works for me, but I'll leave this with Marc.
-
-> > +
-> > +static void handle___pkvm_cpu_set_vector(struct kvm_cpu_context *host_ctxt)
-> > +{
-> > +	DECLARE_REG(enum arm64_hyp_spectre_vector, slot, host_ctxt, 1);
-> > +
-> > +	cpu_reg(host_ctxt, 1) = pkvm_cpu_set_vector(slot);
+> >  {
+> >  	struct kvm_nvhe_init_params *params;
+> >  	struct arm_smccc_res res;
+> > @@ -1439,6 +1439,11 @@ static void cpu_init_hyp_mode(void)
+> >  	params = this_cpu_ptr_nvhe_sym(kvm_init_params);
+> >  	arm_smccc_1_1_hvc(KVM_HOST_SMCCC_FUNC(__kvm_hyp_init), virt_to_phys(params), &res);
+> >  	WARN_ON(res.a0 != SMCCC_RET_SUCCESS);
 > > +}
 > > +
-> > +static void handle___pkvm_create_mappings(struct kvm_cpu_context *host_ctxt)
+> > +static void cpu_init_hyp_mode(void)
 > > +{
-> > +	DECLARE_REG(unsigned long, start, host_ctxt, 1);
-> > +	DECLARE_REG(unsigned long, size, host_ctxt, 2);
-> > +	DECLARE_REG(unsigned long, phys, host_ctxt, 3);
-> > +	DECLARE_REG(unsigned long, prot, host_ctxt, 4);
-> > +
-> > +	cpu_reg(host_ctxt, 1) = __pkvm_create_mappings(start, size, phys, prot);
-> > +}
-> > +
-> > +static void handle___pkvm_create_private_mapping(struct kvm_cpu_context *host_ctxt)
-> > +{
-> > +	DECLARE_REG(phys_addr_t, phys, host_ctxt, 1);
-> > +	DECLARE_REG(size_t, size, host_ctxt, 2);
-> 
-> Why the size_t vs unsigned long discrepancy with pkvm_create_mappings?
-> Same with phys_addr_t, although that one probably doesn't matter.
-> 
-> Also, the pgtable API uses an enum type for the prot bits.
-
-Yes this needs cleaning up.
-
-> > +	DECLARE_REG(unsigned long, prot, host_ctxt, 3);
-> > +
-> > +	cpu_reg(host_ctxt, 1) = __pkvm_create_private_mapping(phys, size, prot);
-> > +}
-> > +
-> >  typedef void (*hcall_t)(struct kvm_cpu_context *);
+> > +	kvm_set_hyp_vector();
 > >  
-> >  #define HANDLE_FUNC(x)	[__KVM_HOST_SMCCC_FUNC_##x] = kimg_fn_ptr(handle_##x)
-> > @@ -125,6 +163,10 @@ static const hcall_t *host_hcall[] = {
-> >  	HANDLE_FUNC(__kvm_get_mdcr_el2),
-> >  	HANDLE_FUNC(__vgic_v3_save_aprs),
-> >  	HANDLE_FUNC(__vgic_v3_restore_aprs),
-> > +	HANDLE_FUNC(__pkvm_init),
-> > +	HANDLE_FUNC(__pkvm_cpu_set_vector),
-> > +	HANDLE_FUNC(__pkvm_create_mappings),
-> > +	HANDLE_FUNC(__pkvm_create_private_mapping),
-> >  };
+> >  	/*
+> >  	 * Disabling SSBD on a non-VHE system requires us to enable SSBS
+> > @@ -1481,7 +1486,10 @@ static void cpu_set_hyp_vector(void)
+> >  	struct bp_hardening_data *data = this_cpu_ptr(&bp_hardening_data);
+> >  	void *vector = hyp_spectre_vector_selector[data->slot];
 > >  
-> >  static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
-> > new file mode 100644
-> > index 000000000000..f3481646a94e
-> > --- /dev/null
-> > +++ b/arch/arm64/kvm/hyp/nvhe/mm.c
-> > @@ -0,0 +1,174 @@
-> > +// SPDX-License-Identifier: GPL-2.0-only
-> > +/*
-> > + * Copyright (C) 2020 Google LLC
-> > + * Author: Quentin Perret <qperret@google.com>
-> > + */
-> > +
-> > +#include <linux/kvm_host.h>
-> > +#include <asm/kvm_hyp.h>
-> > +#include <asm/kvm_mmu.h>
-> > +#include <asm/kvm_pgtable.h>
-> > +#include <asm/spectre.h>
-> > +
-> > +#include <nvhe/early_alloc.h>
-> > +#include <nvhe/gfp.h>
-> > +#include <nvhe/memory.h>
-> > +#include <nvhe/mm.h>
-> > +#include <nvhe/spinlock.h>
-> > +
-> > +struct kvm_pgtable pkvm_pgtable;
-> > +hyp_spinlock_t pkvm_pgd_lock;
-> > +u64 __io_map_base;
-> > +
-> > +struct hyp_memblock_region hyp_memory[HYP_MEMBLOCK_REGIONS];
-> > +int hyp_memblock_nr;
-> > +
-> > +int __pkvm_create_mappings(unsigned long start, unsigned long size,
-> > +			  unsigned long phys, unsigned long prot)
-> > +{
-> > +	int err;
-> > +
-> > +	hyp_spin_lock(&pkvm_pgd_lock);
-> > +	err = kvm_pgtable_hyp_map(&pkvm_pgtable, start, size, phys, prot);
-> > +	hyp_spin_unlock(&pkvm_pgd_lock);
-> > +
-> > +	return err;
-> > +}
-> > +
-> > +unsigned long __pkvm_create_private_mapping(phys_addr_t phys, size_t size,
-> > +					   unsigned long prot)
-> > +{
-> > +	unsigned long addr;
-> > +	int ret;
-> > +
-> > +	hyp_spin_lock(&pkvm_pgd_lock);
-> > +
-> > +	size = PAGE_ALIGN(size + offset_in_page(phys));
+> > -	*this_cpu_ptr_hyp_sym(kvm_hyp_vector) = (unsigned long)vector;
+> > +	if (!is_protected_kvm_enabled())
+> > +		*this_cpu_ptr_hyp_sym(kvm_hyp_vector) = (unsigned long)vector;
+> > +	else
+> > +		kvm_call_hyp_nvhe(__pkvm_cpu_set_vector, data->slot);
 > 
-> It might just be simpler to require page-aligned size and phys in the
-> caller. At least, for the vectors that should be straightforward because
-> I think they're guaranteed not to span a page boundary.
-
-That is done this way for consistency with the host's equivalent
-(__create_hyp_private_mapping()), but I can probably factorize the
-size-alignment stuff for both.
-
-> > +	addr = __io_map_base;
-> > +	__io_map_base += size;
-> > +
-> > +	/* Are we overflowing on the vmemmap ? */
-> > +	if (__io_map_base > __hyp_vmemmap) {
-> > +		__io_map_base -= size;
-> > +		addr = 0;
+> *Very* minor nit, but it might be cleaner to have static inline functions
+> with the same prototypes as the hypercalls, just to make the code even
+> easier to read. e.g
 > 
-> Can we use ERR_PTR(), or does that fail miserably at EL2?
-
-Good question, I'll give it a go.
-
-> > +		goto out;
-> > +	}
-> > +
-> > +	ret = kvm_pgtable_hyp_map(&pkvm_pgtable, addr, size, phys, prot);
-> > +	if (ret) {
-> > +		addr = 0;
-> > +		goto out;
-> > +	}
-> > +
-> > +	addr = addr + offset_in_page(phys);
-> > +out:
-> > +	hyp_spin_unlock(&pkvm_pgd_lock);
-> > +
-> > +	return addr;
-> > +}
+> 	if (!is_protected_kvm_enabled())
+> 		_cpu_set_vector(data->slot);
+> 	else
+> 		kvm_call_hyp_nvhe(__pkvm_cpu_set_vector, data->slot);
 > 
-> [...]
-> 
-> > +static int recreate_hyp_mappings(phys_addr_t phys, unsigned long size,
-> > +				 unsigned long *per_cpu_base)
-> > +{
-> > +	void *start, *end, *virt = hyp_phys_to_virt(phys);
-> > +	int ret, i;
-> > +
-> > +	/* Recreate the hyp page-table using the early page allocator */
-> > +	hyp_early_alloc_init(hyp_pgt_base, hyp_s1_pgtable_size());
-> > +	ret = kvm_pgtable_hyp_init(&pkvm_pgtable, hyp_va_bits,
-> > +				   &hyp_early_alloc_mm_ops);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	ret = hyp_create_idmap();
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	ret = hyp_map_vectors();
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	ret = hyp_back_vmemmap(phys, size, hyp_virt_to_phys(vmemmap_base));
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	ret = pkvm_create_mappings(hyp_symbol_addr(__hyp_text_start),
-> > +				  hyp_symbol_addr(__hyp_text_end),
-> > +				  PAGE_HYP_EXEC);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	ret = pkvm_create_mappings(hyp_symbol_addr(__start_rodata),
-> > +				   hyp_symbol_addr(__end_rodata), PAGE_HYP_RO);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	ret = pkvm_create_mappings(hyp_symbol_addr(__hyp_data_ro_after_init_start),
-> > +				   hyp_symbol_addr(__hyp_data_ro_after_init_end),
-> > +				   PAGE_HYP_RO);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	ret = pkvm_create_mappings(hyp_symbol_addr(__bss_start),
-> 
-> __hyp_bss_start
->
-> > +				   hyp_symbol_addr(__hyp_bss_end), PAGE_HYP);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	ret = pkvm_create_mappings(hyp_symbol_addr(__hyp_bss_end),
-> > +				   hyp_symbol_addr(__bss_stop), PAGE_HYP_RO);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	ret = pkvm_create_mappings(virt, virt + size - 1, PAGE_HYP);
-> 
-> Why is the range inclusive here?
+> you could then conceivably wrap that in a macro and avoid having the
+> "is_protected_kvm_enabled()" checks explicit every time.
 
-It shouldn't be really, I'll fix it.
+Happy to do this here, but are you suggesting to generalize this pattern
+to other places as well?
 
-> > +	if (ret)
-> > +		return ret;
+> >  }
+> >  
+> >  static void cpu_hyp_reinit(void)
+> > @@ -1489,13 +1497,14 @@ static void cpu_hyp_reinit(void)
+> >  	kvm_init_host_cpu_context(&this_cpu_ptr_hyp_sym(kvm_host_data)->host_ctxt);
+> >  
+> >  	cpu_hyp_reset();
+> > -	cpu_set_hyp_vector();
+> >  
+> >  	if (is_kernel_in_hyp_mode())
+> >  		kvm_timer_init_vhe();
+> >  	else
+> >  		cpu_init_hyp_mode();
+> >  
+> > +	cpu_set_hyp_vector();
 > > +
-> > +	for (i = 0; i < hyp_nr_cpus; i++) {
-> > +		start = (void *)kern_hyp_va(per_cpu_base[i]);
-> > +		end = start + PAGE_ALIGN(hyp_percpu_size);
-> > +		ret = pkvm_create_mappings(start, end, PAGE_HYP);
-> > +		if (ret)
-> > +			return ret;
-> > +	}
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static void update_nvhe_init_params(void)
+> >  	kvm_arm_init_debug();
+> >  
+> >  	if (vgic_present)
+> > @@ -1714,13 +1723,52 @@ static int copy_cpu_ftr_regs(void)
+> >  	return 0;
+> >  }
+> >  
+> > +static int kvm_hyp_enable_protection(void)
 > > +{
-> > +	struct kvm_nvhe_init_params *params;
-> > +	unsigned long i, stack;
+> > +	void *per_cpu_base = kvm_ksym_ref(kvm_arm_hyp_percpu_base);
+> > +	int ret, cpu;
+> > +	void *addr;
 > > +
-> > +	for (i = 0; i < hyp_nr_cpus; i++) {
-> > +		stack = (unsigned long)stacks_base + (i << PAGE_SHIFT);
-> > +		params = per_cpu_ptr(&kvm_init_params, i);
-> > +		params->stack_hyp_va = stack + PAGE_SIZE;
-> > +		params->pgd_pa = __hyp_pa(pkvm_pgtable.pgd);
-> > +		__flush_dcache_area(params, sizeof(*params));
-> > +	}
-> > +}
-> > +
-> > +static void *hyp_zalloc_hyp_page(void *arg)
-> > +{
-> > +	return hyp_alloc_pages(&hpool, HYP_GFP_ZERO, 0);
-> > +}
-> > +
-> > +void __noreturn __pkvm_init_finalise(void)
-> > +{
-> > +	struct kvm_host_data *host_data = this_cpu_ptr(&kvm_host_data);
-> > +	struct kvm_cpu_context *host_ctxt = &host_data->host_ctxt;
-> > +	unsigned long nr_pages, used_pages;
-> > +	int ret;
-> > +
-> > +	/* Now that the vmemmap is backed, install the full-fledged allocator */
-> > +	nr_pages = hyp_s1_pgtable_size() >> PAGE_SHIFT;
-> > +	used_pages = hyp_early_alloc_nr_pages();
-> > +	ret = hyp_pool_init(&hpool, __hyp_pa(hyp_pgt_base), nr_pages, used_pages);
-> > +	if (ret)
-> > +		goto out;
-> > +
-> > +	pkvm_pgtable_mm_ops.zalloc_page = hyp_zalloc_hyp_page;
-> > +	pkvm_pgtable_mm_ops.phys_to_virt = hyp_phys_to_virt;
-> > +	pkvm_pgtable_mm_ops.virt_to_phys = hyp_virt_to_phys;
-> > +	pkvm_pgtable_mm_ops.get_page = hyp_get_page;
-> > +	pkvm_pgtable_mm_ops.put_page = hyp_put_page;
-> > +	pkvm_pgtable.mm_ops = &pkvm_pgtable_mm_ops;
-> > +
-> > +out:
-> > +	host_ctxt->regs.regs[0] = SMCCC_RET_SUCCESS;
-> > +	host_ctxt->regs.regs[1] = ret;
+> > +	if (!is_protected_kvm_enabled())
+> > +		return 0;
 > 
-> Use the cpu_reg() helper for these?
+> Maybe I'm hung up on my previous suggestion, but I feel like we shouldn't
+> get here if protected kvm isn't enabled.
 
-+1
+The alternative is to move this check next to the call site, but it
+won't help much IMO.
 
-> > +
-> > +	__host_enter(host_ctxt);
-> > +}
-> > +
-> > +int __pkvm_init(phys_addr_t phys, unsigned long size, unsigned long nr_cpus,
-> > +		unsigned long *per_cpu_base)
-> > +{
-> > +	struct kvm_nvhe_init_params *params;
-> > +	void *virt = hyp_phys_to_virt(phys);
-> > +	void (*fn)(phys_addr_t params_pa, void *finalize_fn_va);
-> > +	int ret;
-> > +
-> > +	if (phys % PAGE_SIZE || size % PAGE_SIZE || (u64)virt % PAGE_SIZE)
-> > +		return -EINVAL;
-> > +
-> > +	hyp_spin_lock_init(&pkvm_pgd_lock);
-> > +	hyp_nr_cpus = nr_cpus;
-> > +
-> > +	ret = divide_memory_pool(virt, size);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	ret = recreate_hyp_mappings(phys, size, per_cpu_base);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	update_nvhe_init_params();
-> > +
-> > +	/* Jump in the idmap page to switch to the new page-tables */
-> > +	params = this_cpu_ptr(&kvm_init_params);
-> > +	fn = (typeof(fn))__hyp_pa(hyp_symbol_addr(__pkvm_init_switch_pgd));
-> > +	fn(__hyp_pa(params), hyp_symbol_addr(__pkvm_init_finalise));
-> > +
-> > +	unreachable();
-> > +}
-> > diff --git a/arch/arm64/kvm/hyp/reserved_mem.c b/arch/arm64/kvm/hyp/reserved_mem.c
-> > new file mode 100644
-> > index 000000000000..32f648992835
-> > --- /dev/null
-> > +++ b/arch/arm64/kvm/hyp/reserved_mem.c
-> > @@ -0,0 +1,102 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +/*
-> > + * Copyright (C) 2020 - Google LLC
-> > + * Author: Quentin Perret <qperret@google.com>
-> > + */
-> > +
-> > +#include <linux/kvm_host.h>
-> > +#include <linux/memblock.h>
-> > +#include <linux/sort.h>
-> > +
-> > +#include <asm/kvm_host.h>
-> > +
-> > +#include <nvhe/memory.h>
-> > +#include <nvhe/mm.h>
-> > +
-> > +phys_addr_t hyp_mem_base;
-> > +phys_addr_t hyp_mem_size;
-> > +
-> > +int __init early_init_dt_add_memory_hyp(u64 base, u64 size)
-> > +{
-> > +	struct hyp_memblock_region *reg;
-> > +
-> > +	if (kvm_nvhe_sym(hyp_memblock_nr) >= HYP_MEMBLOCK_REGIONS)
-> > +		kvm_nvhe_sym(hyp_memblock_nr) = -1;
-> > +
-> > +	if (kvm_nvhe_sym(hyp_memblock_nr) < 0)
+> 
+> > +	if (!hyp_mem_base)
 > > +		return -ENOMEM;
 > > +
-> > +	reg = kvm_nvhe_sym(hyp_memory);
-> > +	reg[kvm_nvhe_sym(hyp_memblock_nr)].start = base;
-> > +	reg[kvm_nvhe_sym(hyp_memblock_nr)].end = base + size;
-> > +	kvm_nvhe_sym(hyp_memblock_nr)++;
+> > +	addr = phys_to_virt(hyp_mem_base);
+> > +	ret = create_hyp_mappings(addr, addr + hyp_mem_size - 1, PAGE_HYP);
+> > +	if (ret)
+> > +		return ret;
+> > +
+> > +	preempt_disable();
+> > +	kvm_set_hyp_vector();
+> > +	ret = kvm_call_hyp_nvhe(__pkvm_init, hyp_mem_base, hyp_mem_size,
+> > +				num_possible_cpus(), kern_hyp_va(per_cpu_base));
+> 
+> Would it make sense for the __pkvm_init() hypercall to set the vector as
+> well, so that we wouldn't need to disable preemption over two hypercalls?
+
+Not sure, kvm_set_hyp_vector() itself already does multiple hypercalls,
+and I need it separate from __pkvm_init for secondary CPUs.
+
+> Failing that, maybe move the whole preempt_disable/enable sequence into
+> another function.
+
+But that I can do.
+
+> > +	preempt_enable();
+> > +	if (ret)
+> > +		return ret;
+> > +
+> > +	free_hyp_pgds();
+> > +	for_each_possible_cpu(cpu)
+> > +		free_page(per_cpu(kvm_arm_hyp_stack_page, cpu));
 > > +
 > > +	return 0;
 > > +}
-> 
-> This isn't called by anything in this patch afaict, so it's a bit tricky to
-> review, especially as I was trying to see how it interacts with
-> kvm_hyp_reserve(), which reads hyp_memblock_nr.
-
-It's not obvious by the look of it, but this _is_ called -- see the
-previous patch. But note that given the outcome of the discussion
-with Rob, this is changing in v3 as I'll be using the memblock API
-instead.
-
 > > +
-> > +static int cmp_hyp_memblock(const void *p1, const void *p2)
-> > +{
-> > +	const struct hyp_memblock_region *r1 = p1;
-> > +	const struct hyp_memblock_region *r2 = p2;
-> > +
-> > +	return r1->start < r2->start ? -1 : (r1->start > r2->start);
-> > +}
-> > +
-> > +static void __init sort_memblock_regions(void)
-> > +{
-> > +	sort(kvm_nvhe_sym(hyp_memory),
-> > +	     kvm_nvhe_sym(hyp_memblock_nr),
-> > +	     sizeof(struct hyp_memblock_region),
-> > +	     cmp_hyp_memblock,
-> > +	     NULL);
-> > +}
-> > +
-> > +void __init kvm_hyp_reserve(void)
-> > +{
-> > +	u64 nr_pages, prev;
-> > +
-> > +	if (!is_hyp_mode_available() || is_kernel_in_hyp_mode())
-> > +		return;
-> > +
-> > +	if (kvm_get_mode() != KVM_MODE_PROTECTED)
-> > +		return;
-> > +
-> > +	if (kvm_nvhe_sym(hyp_memblock_nr) < 0) {
-> > +		kvm_err("Failed to register hyp memblocks\n");
-> > +		return;
-> > +	}
-> > +
-> > +	sort_memblock_regions();
+> >  /**
+> >   * Inits Hyp-mode on all online CPUs
+> >   */
+> >  static int init_hyp_mode(void)
+> >  {
+> >  	int cpu;
+> > -	int err = 0;
+> > +	int err = -ENOMEM;
 > > +
 > > +	/*
-> > +	 * We don't know the number of possible CPUs yet, so allocate for the
-> > +	 * worst case.
+> > +	 * The protected Hyp-mode cannot be initialized if the memory pool
+> > +	 * allocation has failed.
 > > +	 */
-> > +	hyp_mem_size += NR_CPUS << PAGE_SHIFT;
-> 
-> There was a recent patch bumping NR_CPUs to 512, so this would be 32MB
-> with 64k pages. Is it possible to return memory to the host later on once
-> we have a better handle on the number of CPUs in the system?
-
-That's not possible yet, no :/
-
-> 
-> > +	hyp_mem_size += hyp_s1_pgtable_size();
-> > +
-> > +	/*
-> > +	 * The hyp_vmemmap needs to be backed by pages, but these pages
-> > +	 * themselves need to be present in the vmemmap, so compute the number
-> > +	 * of pages needed by looking for a fixed point.
-> > +	 */
-> > +	nr_pages = 0;
-> > +	do {
-> > +		prev = nr_pages;
-> > +		nr_pages = (hyp_mem_size >> PAGE_SHIFT) + prev;
-> > +		nr_pages = DIV_ROUND_UP(nr_pages * sizeof(struct hyp_page), PAGE_SIZE);
-> > +		nr_pages += __hyp_pgtable_max_pages(nr_pages);
-> > +	} while (nr_pages != prev);
-> > +	hyp_mem_size += nr_pages << PAGE_SHIFT;
-> > +
-> > +	hyp_mem_base = memblock_find_in_range(0, memblock_end_of_DRAM(),
-> > +					      hyp_mem_size, SZ_2M);
-> 
-> Why SZ_2M? Guessing you might mean PMD_SIZE,
-
-Indeed.
-
-> although then we will probably
-> want to retry with smaller alignment if the allocation fails as this can
-> again be large with e.g. 64k pages.
-
-That can't hurt I guess.
-
-> > +	if (!hyp_mem_base) {
-> > +		kvm_err("Failed to reserve hyp memory\n");
-> > +		return;
+> > +	if (is_protected_kvm_enabled() && !hyp_mem_base)
+> > +		return err;
+> >  
+> >  	/*
+> >  	 * Copy the required CPU feature register in their EL2 counterpart
+> > @@ -1854,6 +1902,12 @@ static int init_hyp_mode(void)
+> >  	for_each_possible_cpu(cpu)
+> >  		cpu_prepare_hyp_mode(cpu);
+> >  
+> > +	err = kvm_hyp_enable_protection();
+> > +	if (err) {
+> > +		kvm_err("Failed to enable hyp memory protection: %d\n", err);
+> > +		goto out_err;
 > > +	}
-> > +	memblock_reserve(hyp_mem_base, hyp_mem_size);
 > > +
-> > +	kvm_info("Reserved %lld MiB at 0x%llx\n", hyp_mem_size >> 20,
-> > +		 hyp_mem_base);
-> > +}
+> >  	return 0;
+> >  
+> >  out_err:
 > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index 278e163beda4..3cf9397dabdb 100644
+> > index 3cf9397dabdb..9d4c9251208e 100644
 > > --- a/arch/arm64/kvm/mmu.c
 > > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -1264,10 +1264,10 @@ static struct kvm_pgtable_mm_ops kvm_hyp_mm_ops = {
-> >  	.virt_to_phys		= kvm_host_pa,
-> >  };
+> > @@ -225,15 +225,39 @@ void free_hyp_pgds(void)
+> >  	if (hyp_pgtable) {
+> >  		kvm_pgtable_hyp_destroy(hyp_pgtable);
+> >  		kfree(hyp_pgtable);
+> > +		hyp_pgtable = NULL;
+> >  	}
+> >  	mutex_unlock(&kvm_hyp_pgd_mutex);
+> >  }
 > >  
-> > +u32 hyp_va_bits;
+> > +static bool kvm_host_owns_hyp_mappings(void)
+> > +{
+> > +	if (static_branch_likely(&kvm_protected_mode_initialized))
+> > +		return false;
+> > +
+> > +	/*
+> > +	 * This can happen at boot time when __create_hyp_mappings() is called
+> > +	 * after the hyp protection has been enabled, but the static key has
+> > +	 * not been flipped yet.
+> > +	 */
+> > +	if (!hyp_pgtable && is_protected_kvm_enabled())
+> > +		return false;
+> > +
+> > +	BUG_ON(!hyp_pgtable);
 > 
-> Perhaps it would be better to pass this to __pkvm_init() instead of making
-> it global?
+> Can we fail more gracefully, e.g. by continuing without KVM?
 
-Sure, I'll have init_hyp_mode() pass a pointer to kvm_mmu_init() to
-propagate it back.
+Got any suggestion as to how that can be done? We could also just remove
+that line -- that really should not happen.
 
-Cheers,
+Thanks!
 Quentin
 _______________________________________________
 kvmarm mailing list
