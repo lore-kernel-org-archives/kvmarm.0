@@ -5,59 +5,59 @@ X-Spam-Level:
 X-Spam-Status: No, score=-15.4 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F6BAC433E6
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Feb 2021 19:51:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C513BC433DB
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Feb 2021 19:51:25 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id F05C564F38
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Feb 2021 19:51:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F05C564F38
+	by mail.kernel.org (Postfix) with ESMTP id 2AF9864E02
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Feb 2021 19:51:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AF9864E02
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 434294B312;
-	Thu,  4 Feb 2021 14:51:03 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BEE6D4B386;
+	Thu,  4 Feb 2021 14:51:24 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id y+uietoleVdI; Thu,  4 Feb 2021 14:51:02 -0500 (EST)
+	with ESMTP id leEjZq0DCKy4; Thu,  4 Feb 2021 14:51:23 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F95C4B2F4;
-	Thu,  4 Feb 2021 14:51:02 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A41A4B372;
+	Thu,  4 Feb 2021 14:51:23 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 61A764B2F4
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2021 14:51:00 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C47804B320
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2021 14:51:21 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UPzSMfVf92Lr for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Feb 2021 14:50:59 -0500 (EST)
+ with ESMTP id 7rkDy7jgijmz for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Feb 2021 14:51:20 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DDE014B28F
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2021 14:50:58 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1756A4B312
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2021 14:51:20 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 25137D6E;
- Thu,  4 Feb 2021 11:50:58 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B8C071424;
+ Thu,  4 Feb 2021 11:51:19 -0800 (PST)
 Received: from [10.57.49.26] (unknown [10.57.49.26])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 838793F73B;
- Thu,  4 Feb 2021 11:50:55 -0800 (PST)
-Subject: Re: [RFC PATCH 01/11] iommu/arm-smmu-v3: Add feature detection for
- HTTU
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DCF6D3F73B;
+ Thu,  4 Feb 2021 11:51:16 -0800 (PST)
+Subject: Re: [RFC PATCH 04/11] iommu/arm-smmu-v3: Split block descriptor to a
+ span of page
 To: Keqian Zhu <zhukeqian1@huawei.com>, linux-kernel@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
  kvmarm@lists.cs.columbia.edu, iommu@lists.linux-foundation.org,
  Will Deacon <will@kernel.org>, Alex Williamson <alex.williamson@redhat.com>,
  Marc Zyngier <maz@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>
 References: <20210128151742.18840-1-zhukeqian1@huawei.com>
- <20210128151742.18840-2-zhukeqian1@huawei.com>
+ <20210128151742.18840-5-zhukeqian1@huawei.com>
 From: Robin Murphy <robin.murphy@arm.com>
-Message-ID: <f8be5718-d4d9-0565-eaf0-b5a128897d15@arm.com>
-Date: Thu, 4 Feb 2021 19:50:53 +0000
+Message-ID: <b7f45b39-59c4-3707-13eb-937d161e72f0@arm.com>
+Date: Thu, 4 Feb 2021 19:51:15 +0000
 User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101
  Thunderbird/78.7.0
 MIME-Version: 1.0
-In-Reply-To: <20210128151742.18840-2-zhukeqian1@huawei.com>
+In-Reply-To: <20210128151742.18840-5-zhukeqian1@huawei.com>
 Content-Language: en-GB
 Cc: Cornelia Huck <cohuck@redhat.com>, lushenming@huawei.com,
  Kirti Wankhede <kwankhede@nvidia.com>
@@ -80,113 +80,348 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 On 2021-01-28 15:17, Keqian Zhu wrote:
 > From: jiangkunkun <jiangkunkun@huawei.com>
 > 
-> The SMMU which supports HTTU (Hardware Translation Table Update) can
-> update the access flag and the dirty state of TTD by hardware. It is
-> essential to track dirty pages of DMA.
+> Block descriptor is not a proper granule for dirty log tracking. This
+> adds a new interface named split_block in iommu layer and arm smmuv3
+> implements it, which splits block descriptor to an equivalent span of
+> page descriptors.
 > 
-> This adds feature detection, none functional change.
-> 
+> During spliting block, other interfaces are not expected to be working,
+> so race condition does not exist. And we flush all iotlbs after the split
+> procedure is completed to ease the pressure of iommu, as we will split a
+> huge range of block mappings in general.
+
+"Not expected to be" is not the same thing as "can not". Presumably the 
+whole point of dirty log tracking is that it can be run speculatively in 
+the background, so is there any actual guarantee that the guest can't, 
+say, issue a hotplug event that would cause some memory to be released 
+back to the host and unmapped while a scan might be in progress? Saying 
+effectively "there is no race condition as long as you assume there is 
+no race condition" isn't all that reassuring...
+
+That said, it's not very clear why patches #4 and #5 are here at all, 
+given that patches #6 and #7 appear quite happy to handle block entries.
+
 > Co-developed-by: Keqian Zhu <zhukeqian1@huawei.com>
 > Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
 > ---
->   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 16 ++++++++++++++++
->   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h |  8 ++++++++
->   include/linux/io-pgtable.h                  |  1 +
->   3 files changed, 25 insertions(+)
+>   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c |  20 ++++
+>   drivers/iommu/io-pgtable-arm.c              | 122 ++++++++++++++++++++
+>   drivers/iommu/iommu.c                       |  40 +++++++
+>   include/linux/io-pgtable.h                  |   2 +
+>   include/linux/iommu.h                       |  10 ++
+>   5 files changed, 194 insertions(+)
 > 
 > diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> index 8ca7415d785d..0f0fe71cc10d 100644
+> index 9208881a571c..5469f4fca820 100644
 > --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
 > +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> @@ -1987,6 +1987,7 @@ static int arm_smmu_domain_finalise(struct iommu_domain *domain,
->   		.pgsize_bitmap	= smmu->pgsize_bitmap,
->   		.ias		= ias,
->   		.oas		= oas,
-> +		.httu_hd	= smmu->features & ARM_SMMU_FEAT_HTTU_HD,
->   		.coherent_walk	= smmu->features & ARM_SMMU_FEAT_COHERENCY,
->   		.tlb		= &arm_smmu_flush_ops,
->   		.iommu_dev	= smmu->dev,
-> @@ -3224,6 +3225,21 @@ static int arm_smmu_device_hw_probe(struct arm_smmu_device *smmu)
->   	if (reg & IDR0_HYP)
->   		smmu->features |= ARM_SMMU_FEAT_HYP;
+> @@ -2510,6 +2510,25 @@ static int arm_smmu_domain_set_attr(struct iommu_domain *domain,
+>   	return ret;
+>   }
 >   
-> +	switch (FIELD_GET(IDR0_HTTU, reg)) {
-
-We need to accommodate the firmware override as well if we need this to 
-be meaningful. Jean-Philippe is already carrying a suitable patch in the 
-SVA stack[1].
-
-> +	case IDR0_HTTU_NONE:
-> +		break;
-> +	case IDR0_HTTU_HA:
-> +		smmu->features |= ARM_SMMU_FEAT_HTTU_HA;
-> +		break;
-> +	case IDR0_HTTU_HAD:
-> +		smmu->features |= ARM_SMMU_FEAT_HTTU_HA;
-> +		smmu->features |= ARM_SMMU_FEAT_HTTU_HD;
-> +		break;
-> +	default:
-> +		dev_err(smmu->dev, "unknown/unsupported HTTU!\n");
-> +		return -ENXIO;
+> +static size_t arm_smmu_split_block(struct iommu_domain *domain,
+> +				   unsigned long iova, size_t size)
+> +{
+> +	struct arm_smmu_device *smmu = to_smmu_domain(domain)->smmu;
+> +	struct io_pgtable_ops *ops = to_smmu_domain(domain)->pgtbl_ops;
+> +
+> +	if (!(smmu->features & (ARM_SMMU_FEAT_BBML1 | ARM_SMMU_FEAT_BBML2))) {
+> +		dev_err(smmu->dev, "don't support BBML1/2 and split block\n");
+> +		return 0;
 > +	}
 > +
->   	/*
->   	 * The coherency feature as set by FW is used in preference to the ID
->   	 * register, but warn on mismatch.
-> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-> index 96c2e9565e00..e91bea44519e 100644
-> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-> @@ -33,6 +33,10 @@
->   #define IDR0_ASID16			(1 << 12)
->   #define IDR0_ATS			(1 << 10)
->   #define IDR0_HYP			(1 << 9)
-> +#define IDR0_HTTU			GENMASK(7, 6)
-> +#define IDR0_HTTU_NONE			0
-> +#define IDR0_HTTU_HA			1
-> +#define IDR0_HTTU_HAD			2
->   #define IDR0_COHACC			(1 << 4)
->   #define IDR0_TTF			GENMASK(3, 2)
->   #define IDR0_TTF_AARCH64		2
-> @@ -286,6 +290,8 @@
->   #define CTXDESC_CD_0_TCR_TBI0		(1ULL << 38)
+> +	if (!ops || !ops->split_block) {
+> +		pr_err("don't support split block\n");
+> +		return 0;
+> +	}
+> +
+> +	return ops->split_block(ops, iova, size);
+> +}
+> +
+>   static int arm_smmu_of_xlate(struct device *dev, struct of_phandle_args *args)
+>   {
+>   	return iommu_fwspec_add_ids(dev, args->args, 1);
+> @@ -2609,6 +2628,7 @@ static struct iommu_ops arm_smmu_ops = {
+>   	.device_group		= arm_smmu_device_group,
+>   	.domain_get_attr	= arm_smmu_domain_get_attr,
+>   	.domain_set_attr	= arm_smmu_domain_set_attr,
+> +	.split_block		= arm_smmu_split_block,
+>   	.of_xlate		= arm_smmu_of_xlate,
+>   	.get_resv_regions	= arm_smmu_get_resv_regions,
+>   	.put_resv_regions	= generic_iommu_put_resv_regions,
+> diff --git a/drivers/iommu/io-pgtable-arm.c b/drivers/iommu/io-pgtable-arm.c
+> index e299a44808ae..f3b7f7115e38 100644
+> --- a/drivers/iommu/io-pgtable-arm.c
+> +++ b/drivers/iommu/io-pgtable-arm.c
+> @@ -79,6 +79,8 @@
+>   #define ARM_LPAE_PTE_SH_IS		(((arm_lpae_iopte)3) << 8)
+>   #define ARM_LPAE_PTE_NS			(((arm_lpae_iopte)1) << 5)
+>   #define ARM_LPAE_PTE_VALID		(((arm_lpae_iopte)1) << 0)
+> +/* Block descriptor bits */
+> +#define ARM_LPAE_PTE_NT			(((arm_lpae_iopte)1) << 16)
 >   
->   #define CTXDESC_CD_0_AA64		(1UL << 41)
-> +#define CTXDESC_CD_0_HD			(1UL << 42)
-> +#define CTXDESC_CD_0_HA			(1UL << 43)
->   #define CTXDESC_CD_0_S			(1UL << 44)
->   #define CTXDESC_CD_0_R			(1UL << 45)
->   #define CTXDESC_CD_0_A			(1UL << 46)
-> @@ -604,6 +610,8 @@ struct arm_smmu_device {
->   #define ARM_SMMU_FEAT_RANGE_INV		(1 << 15)
->   #define ARM_SMMU_FEAT_BTM		(1 << 16)
->   #define ARM_SMMU_FEAT_SVA		(1 << 17)
-> +#define ARM_SMMU_FEAT_HTTU_HA		(1 << 18)
-> +#define ARM_SMMU_FEAT_HTTU_HD		(1 << 19)
->   	u32				features;
+>   #define ARM_LPAE_PTE_ATTR_LO_MASK	(((arm_lpae_iopte)0x3ff) << 2)
+>   /* Ignore the contiguous bit for block splitting */
+> @@ -679,6 +681,125 @@ static phys_addr_t arm_lpae_iova_to_phys(struct io_pgtable_ops *ops,
+>   	return iopte_to_paddr(pte, data) | iova;
+>   }
 >   
->   #define ARM_SMMU_OPT_SKIP_PREFETCH	(1 << 0)
-> diff --git a/include/linux/io-pgtable.h b/include/linux/io-pgtable.h
-> index ea727eb1a1a9..1a00ea8562c7 100644
-> --- a/include/linux/io-pgtable.h
-> +++ b/include/linux/io-pgtable.h
-> @@ -97,6 +97,7 @@ struct io_pgtable_cfg {
->   	unsigned long			pgsize_bitmap;
->   	unsigned int			ias;
->   	unsigned int			oas;
-> +	bool				httu_hd;
+> +static size_t __arm_lpae_split_block(struct arm_lpae_io_pgtable *data,
+> +				     unsigned long iova, size_t size, int lvl,
+> +				     arm_lpae_iopte *ptep);
+> +
+> +static size_t arm_lpae_do_split_blk(struct arm_lpae_io_pgtable *data,
+> +				    unsigned long iova, size_t size,
+> +				    arm_lpae_iopte blk_pte, int lvl,
+> +				    arm_lpae_iopte *ptep)
+> +{
+> +	struct io_pgtable_cfg *cfg = &data->iop.cfg;
+> +	arm_lpae_iopte pte, *tablep;
+> +	phys_addr_t blk_paddr;
+> +	size_t tablesz = ARM_LPAE_GRANULE(data);
+> +	size_t split_sz = ARM_LPAE_BLOCK_SIZE(lvl, data);
+> +	int i;
+> +
+> +	if (WARN_ON(lvl == ARM_LPAE_MAX_LEVELS))
+> +		return 0;
+> +
+> +	tablep = __arm_lpae_alloc_pages(tablesz, GFP_ATOMIC, cfg);
+> +	if (!tablep)
+> +		return 0;
+> +
+> +	blk_paddr = iopte_to_paddr(blk_pte, data);
+> +	pte = iopte_prot(blk_pte);
+> +	for (i = 0; i < tablesz / sizeof(pte); i++, blk_paddr += split_sz)
+> +		__arm_lpae_init_pte(data, blk_paddr, pte, lvl, &tablep[i]);
+> +
+> +	if (cfg->bbml == 1) {
+> +		/* Race does not exist */
+> +		blk_pte |= ARM_LPAE_PTE_NT;
+> +		__arm_lpae_set_pte(ptep, blk_pte, cfg);
+> +		io_pgtable_tlb_flush_walk(&data->iop, iova, size, size);
+> +	}
+> +	/* Race does not exist */
+> +	pte = arm_lpae_install_table(tablep, ptep, blk_pte, cfg);
+> +
+> +	/* Have splited it into page? */
+> +	if (lvl == (ARM_LPAE_MAX_LEVELS - 1))
+> +		return size;
+> +
+> +	/* Go back to lvl - 1 */
+> +	ptep -= ARM_LPAE_LVL_IDX(iova, lvl - 1, data);
+> +	return __arm_lpae_split_block(data, iova, size, lvl - 1, ptep);
 
-This is very specific to the AArch64 stage 1 format, not a generic 
-capability - I think it should be a quirk flag rather than a common field.
+If there is a good enough justification for actually using this, 
+recursive splitting is a horrible way to do it. The theoretical 
+split_blk_unmap case does it for the sake of simplicity and mitigating 
+races wherein multiple parts of the same block may be unmapped, but if 
+were were using this in anger then we'd need it to be fast - and a race 
+does not exist, right? - so building the entire sub-table first then 
+swizzling a single PTE would make far more sense.
+
+> +}
+> +
+> +static size_t __arm_lpae_split_block(struct arm_lpae_io_pgtable *data,
+> +				     unsigned long iova, size_t size, int lvl,
+> +				     arm_lpae_iopte *ptep)
+> +{
+> +	arm_lpae_iopte pte;
+> +	struct io_pgtable *iop = &data->iop;
+> +	size_t base, next_size, total_size;
+> +
+> +	if (WARN_ON(lvl == ARM_LPAE_MAX_LEVELS))
+> +		return 0;
+> +
+> +	ptep += ARM_LPAE_LVL_IDX(iova, lvl, data);
+> +	pte = READ_ONCE(*ptep);
+> +	if (WARN_ON(!pte))
+> +		return 0;
+> +
+> +	if (size == ARM_LPAE_BLOCK_SIZE(lvl, data)) {
+> +		if (iopte_leaf(pte, lvl, iop->fmt)) {
+> +			if (lvl == (ARM_LPAE_MAX_LEVELS - 1) ||
+> +			    (pte & ARM_LPAE_PTE_AP_RDONLY))
+> +				return size;
+> +
+> +			/* We find a writable block, split it. */
+> +			return arm_lpae_do_split_blk(data, iova, size, pte,
+> +					lvl + 1, ptep);
+> +		} else {
+> +			/* If it is the last table level, then nothing to do */
+> +			if (lvl == (ARM_LPAE_MAX_LEVELS - 2))
+> +				return size;
+> +
+> +			total_size = 0;
+> +			next_size = ARM_LPAE_BLOCK_SIZE(lvl + 1, data);
+> +			ptep = iopte_deref(pte, data);
+> +			for (base = 0; base < size; base += next_size)
+> +				total_size += __arm_lpae_split_block(data,
+> +						iova + base, next_size, lvl + 1,
+> +						ptep);
+> +			return total_size;
+> +		}
+> +	} else if (iopte_leaf(pte, lvl, iop->fmt)) {
+> +		WARN(1, "Can't split behind a block.\n");
+> +		return 0;
+> +	}
+> +
+> +	/* Keep on walkin */
+> +	ptep = iopte_deref(pte, data);
+> +	return __arm_lpae_split_block(data, iova, size, lvl + 1, ptep);
+> +}
+> +
+> +static size_t arm_lpae_split_block(struct io_pgtable_ops *ops,
+> +				   unsigned long iova, size_t size)
+> +{
+> +	struct arm_lpae_io_pgtable *data = io_pgtable_ops_to_data(ops);
+> +	arm_lpae_iopte *ptep = data->pgd;
+> +	struct io_pgtable_cfg *cfg = &data->iop.cfg;
+> +	int lvl = data->start_level;
+> +	long iaext = (s64)iova >> cfg->ias;
+> +
+> +	if (WARN_ON(!size || (size & cfg->pgsize_bitmap) != size))
+> +		return 0;
+> +
+> +	if (cfg->quirks & IO_PGTABLE_QUIRK_ARM_TTBR1)
+> +		iaext = ~iaext;
+> +	if (WARN_ON(iaext))
+> +		return 0;
+> +
+> +	/* If it is smallest granule, then nothing to do */
+> +	if (size == ARM_LPAE_BLOCK_SIZE(ARM_LPAE_MAX_LEVELS - 1, data))
+> +		return size;
+> +
+> +	return __arm_lpae_split_block(data, iova, size, lvl, ptep);
+> +}
+> +
+>   static void arm_lpae_restrict_pgsizes(struct io_pgtable_cfg *cfg)
+>   {
+>   	unsigned long granule, page_sizes;
+> @@ -757,6 +878,7 @@ arm_lpae_alloc_pgtable(struct io_pgtable_cfg *cfg)
+>   		.map		= arm_lpae_map,
+>   		.unmap		= arm_lpae_unmap,
+>   		.iova_to_phys	= arm_lpae_iova_to_phys,
+> +		.split_block	= arm_lpae_split_block,
+>   	};
+>   
+>   	return data;
+> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> index ffeebda8d6de..7dc0850448c3 100644
+> --- a/drivers/iommu/iommu.c
+> +++ b/drivers/iommu/iommu.c
+> @@ -2707,6 +2707,46 @@ int iommu_domain_set_attr(struct iommu_domain *domain,
+>   }
+>   EXPORT_SYMBOL_GPL(iommu_domain_set_attr);
+>   
+> +size_t iommu_split_block(struct iommu_domain *domain, unsigned long iova,
+> +			 size_t size)
+> +{
+> +	const struct iommu_ops *ops = domain->ops;
+> +	unsigned int min_pagesz;
+> +	size_t pgsize, splited_size;
+> +	size_t splited = 0;
+> +
+> +	min_pagesz = 1 << __ffs(domain->pgsize_bitmap);
+> +
+> +	if (!IS_ALIGNED(iova | size, min_pagesz)) {
+> +		pr_err("unaligned: iova 0x%lx size 0x%zx min_pagesz 0x%x\n",
+> +		       iova, size, min_pagesz);
+> +		return 0;
+> +	}
+> +
+> +	if (!ops || !ops->split_block) {
+> +		pr_err("don't support split block\n");
+> +		return 0;
+> +	}
+> +
+> +	while (size) {
+> +		pgsize = iommu_pgsize(domain, iova, size);
+
+If the whole point of this operation is to split a mapping down to a 
+specific granularity, why bother recalculating that granularity over and 
+over again?
+
+> +
+> +		splited_size = ops->split_block(domain, iova, pgsize);
+> +
+> +		pr_debug("splited: iova 0x%lx size 0x%zx\n", iova, splited_size);
+> +		iova += splited_size;
+> +		size -= splited_size;
+> +		splited += splited_size;
+> +
+> +		if (splited_size != pgsize)
+> +			break;
+> +	}
+> +	iommu_flush_iotlb_all(domain);
+> +
+> +	return splited;
+
+Language tangent: note that "split" is one of those delightful irregular 
+verbs, in that its past tense is also "split". This isn't the best 
+operation for clear, unambigous naming :)
+
+Don't let these idle nitpicks distract from the bigger concerns above, 
+though. FWIW if the caller knows from the start that they want to keep 
+track of things at page granularity, they always have the option of just 
+stripping the larger sizes out of domain->pgsize_bitmap before mapping 
+anything.
 
 Robin.
 
-[1] 
-https://jpbrucker.net/git/linux/commit/?h=sva/current&id=1ef7d512fb9082450dfe0d22ca4f7e35625a097b
-
->   	bool				coherent_walk;
->   	const struct iommu_flush_ops	*tlb;
->   	struct device			*iommu_dev;
+> +}
+> +EXPORT_SYMBOL_GPL(iommu_split_block);
+> +
+>   void iommu_get_resv_regions(struct device *dev, struct list_head *list)
+>   {
+>   	const struct iommu_ops *ops = dev->bus->iommu_ops;
+> diff --git a/include/linux/io-pgtable.h b/include/linux/io-pgtable.h
+> index 26583beeb5d9..b87c6f4ecaa2 100644
+> --- a/include/linux/io-pgtable.h
+> +++ b/include/linux/io-pgtable.h
+> @@ -162,6 +162,8 @@ struct io_pgtable_ops {
+>   			size_t size, struct iommu_iotlb_gather *gather);
+>   	phys_addr_t (*iova_to_phys)(struct io_pgtable_ops *ops,
+>   				    unsigned long iova);
+> +	size_t (*split_block)(struct io_pgtable_ops *ops, unsigned long iova,
+> +			      size_t size);
+>   };
+>   
+>   /**
+> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+> index b3f0e2018c62..abeb811098a5 100644
+> --- a/include/linux/iommu.h
+> +++ b/include/linux/iommu.h
+> @@ -258,6 +258,8 @@ struct iommu_ops {
+>   			       enum iommu_attr attr, void *data);
+>   	int (*domain_set_attr)(struct iommu_domain *domain,
+>   			       enum iommu_attr attr, void *data);
+> +	size_t (*split_block)(struct iommu_domain *domain, unsigned long iova,
+> +			      size_t size);
+>   
+>   	/* Request/Free a list of reserved regions for a device */
+>   	void (*get_resv_regions)(struct device *dev, struct list_head *list);
+> @@ -509,6 +511,8 @@ extern int iommu_domain_get_attr(struct iommu_domain *domain, enum iommu_attr,
+>   				 void *data);
+>   extern int iommu_domain_set_attr(struct iommu_domain *domain, enum iommu_attr,
+>   				 void *data);
+> +extern size_t iommu_split_block(struct iommu_domain *domain, unsigned long iova,
+> +				size_t size);
+>   
+>   /* Window handling function prototypes */
+>   extern int iommu_domain_window_enable(struct iommu_domain *domain, u32 wnd_nr,
+> @@ -903,6 +907,12 @@ static inline int iommu_domain_set_attr(struct iommu_domain *domain,
+>   	return -EINVAL;
+>   }
+>   
+> +static inline size_t iommu_split_block(struct iommu_domain *domain,
+> +				       unsigned long iova, size_t size)
+> +{
+> +	return 0;
+> +}
+> +
+>   static inline int  iommu_device_register(struct iommu_device *iommu)
+>   {
+>   	return -ENODEV;
 > 
 _______________________________________________
 kvmarm mailing list
