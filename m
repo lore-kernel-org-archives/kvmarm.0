@@ -7,89 +7,87 @@ X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B065AC433DB
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Feb 2021 18:24:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14732C433DB
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Feb 2021 18:32:43 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 24A0B64F53
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Feb 2021 18:24:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24A0B64F53
+	by mail.kernel.org (Postfix) with ESMTP id 51C1E64E49
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Feb 2021 18:32:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51C1E64E49
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BCB5B4B252;
-	Thu,  4 Feb 2021 13:24:32 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BD4D44B2FC;
+	Thu,  4 Feb 2021 13:32:41 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id wp-EVUqulUPf; Thu,  4 Feb 2021 13:24:31 -0500 (EST)
+	with ESMTP id 49FFcQzkYY+B; Thu,  4 Feb 2021 13:32:40 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B68984B2FC;
-	Thu,  4 Feb 2021 13:24:31 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AB3BB4B2A5;
+	Thu,  4 Feb 2021 13:32:40 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C43374B2FA
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2021 13:24:29 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C1754B2A5
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2021 13:32:39 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kwtEDPlo9R0Y for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Feb 2021 13:24:28 -0500 (EST)
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com
- [209.85.221.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B001F4B28C
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2021 13:24:28 -0500 (EST)
-Received: by mail-wr1-f49.google.com with SMTP id g10so4738045wrx.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 04 Feb 2021 10:24:28 -0800 (PST)
+ with ESMTP id X3ZlgM0Rt064 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Feb 2021 13:32:38 -0500 (EST)
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com
+ [209.85.221.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E33304B283
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2021 13:32:37 -0500 (EST)
+Received: by mail-wr1-f45.google.com with SMTP id g10so4764712wrx.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 04 Feb 2021 10:32:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=bqhKJeoVgC8X9omnqAQFhGwn7i6vcm5biCu8hCuSmsc=;
- b=mS1F26WRUDL/2eC6m6CaQ7EFMSsdGeTCCOhzSMDCjGT93wLceWJ9el78YcVG2XqT5i
- UqVytoukFRxRQT8DHQOcZSdezf6aZfm4cMHxWtUBL914wTBeCU3B+7bROExs5LUwFrCJ
- WXe2PCmgsr4VArHc42+FuL7ILIXzXBFQv0oVLONVawbLaWqcC6hgjXQBMZBD6TX8J8dJ
- 3TrqtrEJZ117lGENT5OWBVyBNmhfhsO2lc4Ev0t3lQ+xJX2ZNI9xwHK76j1T8+bfINfz
- SSnuRec1a0u+Fgv5p1JNHOiDUnNYpC3ZZM4JebJW5CZizUNezhin4g67sF9QjV0HpO74
- meWg==
+ bh=i5OkDpHRHvhiXPZMMrrT7zhfgAaMhV3SLJ8BwwytR0s=;
+ b=NzENSC2sGUAf6yMy4ybJ293aeKFlUOzRFqVDwa74QP6UwZ/5IB3S3LIPQlwbp8bt+o
+ my5F6ZY9nh5di/2C5uBrcKhs1fQfE4OjUXJxheN1wZ1ovB0osI0wHXutPiHAY6pkY928
+ OR/S/0A2mA0gjFJH/vBiR0uoQi938QDkKsHzUCcRVEycYypV02mCwH+ckuhX0Clxw+2v
+ McHwgjv6KG1P3zyyXs7Bt3u5wlGAn4NA54GuwScW05yezBwR9v5ja/FCqYiw2uJ6WrWA
+ XhnTVy2FmSfpuLX/NciEWonqr0lJprKj2D3hDkRr4Fs5NcqZ2QedkbgZMh7JLQPgylbK
+ e7oA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=bqhKJeoVgC8X9omnqAQFhGwn7i6vcm5biCu8hCuSmsc=;
- b=gVviseLgaKEM72NEHAe1uBW9lQuYn97TCKCC7hrPPlCSeOsDziY+a+QsliFz9ZMPdv
- QIczeXHZeL1p4roF874ZZ7m+EUhPQkPdl1OOTAzmTpebIhp9v1znNIZExPO7Cc5d0vZ8
- 7p7x1EZmDBhBu0RiQadZJgFWp0ub0vFgFA2PGNkHZlWtapPkB6V2SN6CcSY7QgFrpTQQ
- Wa4MYgDL1au7BFJal5dbINRCUHCG2RPOD/uwKzIlg9z+OCMUt0Jf0XPuuk07cVXAI5XP
- +5Jmi8gIU7C25tESL9B7A1oE2C2Ul3etBoPZvStAM6OzxwZkczhAc6+vNCgv2hw93zW4
- D/dw==
-X-Gm-Message-State: AOAM530QxdIqyU3XlhMGHb88V1y3x0QRoIHueMTBNY8vBEXgYxRSOmDz
- euOWfyC3oneV0whr0Ttg1Y1NcA==
-X-Google-Smtp-Source: ABdhPJyY9kiYlOPf8laxHOlhG16GwuGMkScM8L4Dj0rm/ARmDfAXf85n5/++3N6RBc9bsoayAr8Ncg==
-X-Received: by 2002:adf:e642:: with SMTP id b2mr668852wrn.221.1612463067694;
- Thu, 04 Feb 2021 10:24:27 -0800 (PST)
+ bh=i5OkDpHRHvhiXPZMMrrT7zhfgAaMhV3SLJ8BwwytR0s=;
+ b=l3rYhemieIQGEJ3qiyEkmfKjjBum9twHPgh1OC78cpUuyg5lE+ZLtWTesJzsbIXalV
+ 6CTTTjAYDkfHqjTpLmLhpPVWTszB4QM0J1zFO3qhZdgrLrAGdWRsv2/NR+rlbntvoqmD
+ 5oZ77PtsDFBQwCwYFq2EXOV9R4d8djk2P0NM5zOarKnxSRrBk2jGEyO8KXoWc4FI1OAZ
+ mk9gmqevuD5TfTGsOpL0mfXpXkkv6dep3e8p0bUZxdtqVuEyMMXC8k6dZnXl6G1M4k0U
+ YU4E2JfNHki0oQilmKeR6ffOvb5V4K+id6BTlb9HcIc3bMvzBfJopRiPOxuNRc9cLrm7
+ 8pVg==
+X-Gm-Message-State: AOAM5302xvwAPXF0dZtb94Qg7UtOD2qP6Q2OExVlSn6PDK8HJrD1BI0D
+ rfZeP4Q8IwCteqqCRH5En8qluw==
+X-Google-Smtp-Source: ABdhPJy3jMGnpK1oKMDwo50uDDpX8aOtqGavw98z6Rfz/JgQr0QwNihP4xXGA7II1oRyQsQB6m2lqg==
+X-Received: by 2002:a5d:560c:: with SMTP id l12mr675373wrv.417.1612463555851; 
+ Thu, 04 Feb 2021 10:32:35 -0800 (PST)
 Received: from google.com (230.69.233.35.bc.googleusercontent.com.
  [35.233.69.230])
- by smtp.gmail.com with ESMTPSA id g14sm9650047wru.45.2021.02.04.10.24.27
+ by smtp.gmail.com with ESMTPSA id c20sm6618034wmb.38.2021.02.04.10.32.35
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 04 Feb 2021 10:24:27 -0800 (PST)
-Date: Thu, 4 Feb 2021 18:24:24 +0000
+ Thu, 04 Feb 2021 10:32:35 -0800 (PST)
+Date: Thu, 4 Feb 2021 18:32:32 +0000
 From: Quentin Perret <qperret@google.com>
 To: Will Deacon <will@kernel.org>
 Subject: Re: [RFC PATCH v2 12/26] KVM: arm64: Introduce a Hyp buddy page
  allocator
-Message-ID: <YBw72KeLQ5dzSoJi@google.com>
+Message-ID: <YBw9wCvkAXLUpgw7@google.com>
 References: <20210108121524.656872-1-qperret@google.com>
  <20210108121524.656872-13-qperret@google.com>
  <20210202181307.GA17311@willie-the-truck>
  <YBrsep4xK1F4YRWb@google.com>
  <20210204143106.GA20792@willie-the-truck>
- <YBwKRM3uHDMC9S0U@google.com>
- <20210204174849.GA21303@willie-the-truck>
- <YBw2aIr/Ktx1dsOT@google.com>
- <20210204181317.GE21303@willie-the-truck>
+ <YBw6uInyY+AlE7D3@google.com>
+ <20210204182404.GB21526@willie-the-truck>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20210204181317.GE21303@willie-the-truck>
+In-Reply-To: <20210204182404.GB21526@willie-the-truck>
 Cc: devicetree@vger.kernel.org, kernel-team@android.com, android-kvm@google.com,
  Catalin Marinas <catalin.marinas@arm.com>, Fuad Tabba <tabba@google.com>,
  linux-kernel@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
@@ -111,20 +109,36 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thursday 04 Feb 2021 at 18:13:18 (+0000), Will Deacon wrote:
-> I was going from memory, but the loop in __hyp_alloc_pages() searches up to
-> HYP_MAX_ORDER, whereas this is _never_ going to succeed beyond some per-pool
-> order determined by the size of the pool. But I doubt it matters -- I
-> thought we did more than just check a list.
+On Thursday 04 Feb 2021 at 18:24:05 (+0000), Will Deacon wrote:
+> On Thu, Feb 04, 2021 at 06:19:36PM +0000, Quentin Perret wrote:
+> > On Thursday 04 Feb 2021 at 14:31:08 (+0000), Will Deacon wrote:
+> > > Just feels a bit backwards having __find_buddy() take an order parameter,
+> > > yet then return a page of the wrong order! __hyp_extract_page() always
+> > > passes the p->order as the order,
+> > 
+> > Gotcha, so maybe this is just a naming problem. __find_buddy() is simply
+> > a helper to lookup/index the vmemmap, but it's perfectly possible that
+> > the 'destination' page that is being indexed has already been allocated,
+> > and split up multiple time (and so at a different order), etc ... And
+> > that is the caller's job to decide.
+> > 
+> > How about __lookup_potential_buddy() ? Any suggestion?
+> 
+> Hey, my job here is to waffle incoherently and hope that you find bugs in
+> your own code. Now you want me to _name_ something! Jeez...
 
-Ah, I see -- I was looking at the __hyp_attach_page() loop.
+Hey, that's my special -- I already got Marc to make a suggestion on v1
+and it's been my favorite function name so far, so why not try again?
 
-I think it's a good point, I should be able to figure out a max order
-based on the size and alignment of the pool, and cache that in struct
-hyp_pool to optimize cases where this is < HYP_MAX_ORDER.
-Should be easy enough, I'll see what I can do in v3.
+https://lore.kernel.org/kvmarm/d6a674a0e8e259161ab741d78924c756@kernel.org/
 
-Thanks!
+> Ok, how about __find_buddy() does what it does today but doesn't take an
+> order argument, whereas __find_buddy_of_order() takes the order argument
+> and checks the page order before returning?
+
+Sounds like a plan!
+
+Cheers,
 Quentin
 _______________________________________________
 kvmarm mailing list
