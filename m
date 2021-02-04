@@ -2,93 +2,66 @@ Return-Path: <SRS0=ioR1=HG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.4 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEBFEC433DB
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Feb 2021 11:08:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CCAFC433DB
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Feb 2021 12:32:33 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6106364F5E
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Feb 2021 11:08:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6106364F5E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 78D3164DDB
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Feb 2021 12:32:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78D3164DDB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B9F534B28B;
-	Thu,  4 Feb 2021 06:08:42 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D560F4B0F3;
+	Thu,  4 Feb 2021 07:32:31 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 0mn0sI37+Ad2; Thu,  4 Feb 2021 06:08:41 -0500 (EST)
+	with ESMTP id SSXvD0mNVadH; Thu,  4 Feb 2021 07:32:30 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 571974B25C;
-	Thu,  4 Feb 2021 06:08:41 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A4044B223;
+	Thu,  4 Feb 2021 07:32:30 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DAF9C4B24E
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2021 06:08:39 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 53E1B4B21F
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2021 07:32:29 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uIq9EWWG7GrA for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Feb 2021 06:08:38 -0500 (EST)
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com
- [209.85.128.52])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F04284B1E7
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2021 06:08:37 -0500 (EST)
-Received: by mail-wm1-f52.google.com with SMTP id t142so582336wmt.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 04 Feb 2021 03:08:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=Ac2cWoetiRazQ6sY02jAtUWhjT9m83ovv4OBQ4t/wAE=;
- b=A4pYkiXZ376bPY33RfHADMh/Av+CR5JRDGbuuLfF8edaHdTjgTDmNsL2P1wbxBnu9n
- 6+VHNCMB4m+vXPsgmT/sW4vL31F9UfF1V2/d/I8u6zAhT2cr8tHLj6ujCg8u3or8NhU4
- 9AjHewTcziPuwb5SF88UTdGtsaLLRiNGclmWIKW3x3YMCcy2J0SjCm6qzOOWHJHt/eM6
- EYA3/kcSK3f54psGOhTOHB2+XqczNu8pRisvRhZCpksIye+1a4Y4eSaW8/tkW02FenGC
- QYEwJmjsOfZ8SYkGnHTWHzwFxibFw5swOcjMKpm1B40MPRK43AUPNO2plnYy2tAau8AV
- cXDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=Ac2cWoetiRazQ6sY02jAtUWhjT9m83ovv4OBQ4t/wAE=;
- b=jg7th1zuoSOrh0vrL+eXFnPs3G4NR02CAcwNKz42s7E6srsEWOphg0XwwbLHCBEHPu
- 9tjOHOn6CqmvtVHbcPo19pPKRcaSpStNQL6iqIqoAfDpBttVsA2HGx8EbIQrzuPWaLTu
- ImeBRZZgeZt5dqi5jxW/ehnT/c7dJCvnLOawOwgmsoxHc+gYWIz1Y54gbI8lNhIjVHRY
- gXQq6Iuu77OtNHtZO11dueHQFEOY98Qfu1jy/ZcSu4ty6kHEstWwYYM2hAFBH1zXizul
- SGPcWE2m8NILSMOuF+c9EnSQqMy+UL/iiieh8cYzr8JInmpRhPuIJFtiG8fVqNNbVZZX
- vWGA==
-X-Gm-Message-State: AOAM530BoGiF0tlOj1teUd8+NE11ANs+YdZtZozLvMUH7AP1ZUYiq89E
- hcRNbfYnWryozGC1g7ZjpLb01A==
-X-Google-Smtp-Source: ABdhPJxofrOU9QtBbx8B1URQt7oPE0DC7M1sC/q1/8AlgNixgkixfYv7H9DmSmdVl0NIFGKJzk2aIg==
-X-Received: by 2002:a1c:d7:: with SMTP id 206mr7022487wma.68.1612436916642;
- Thu, 04 Feb 2021 03:08:36 -0800 (PST)
-Received: from google.com (230.69.233.35.bc.googleusercontent.com.
- [35.233.69.230])
- by smtp.gmail.com with ESMTPSA id w25sm5923406wmc.42.2021.02.04.03.08.36
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 04 Feb 2021 03:08:36 -0800 (PST)
-Date: Thu, 4 Feb 2021 11:08:33 +0000
-From: Quentin Perret <qperret@google.com>
-To: Will Deacon <will@kernel.org>
-Subject: Re: [RFC PATCH v2 17/26] KVM: arm64: Elevate Hyp mappings creation
- at EL2
-Message-ID: <YBvVseNd/r8q5He1@google.com>
-References: <20210108121524.656872-1-qperret@google.com>
- <20210108121524.656872-18-qperret@google.com>
- <20210203153138.GB18974@willie-the-truck>
+ with ESMTP id 2VJoUt4JHOKn for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Feb 2021 07:32:27 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D00244B21E
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2021 07:32:27 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D2CC4D6E;
+ Thu,  4 Feb 2021 04:32:26 -0800 (PST)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9DB543F73B;
+ Thu,  4 Feb 2021 04:32:25 -0800 (PST)
+Subject: Re: [PATCH v2 6/7] KVM: arm64: Upgrade PMU support to ARMv8.4
+To: Marc Zyngier <maz@kernel.org>, Auger Eric <eric.auger@redhat.com>
+References: <20210125122638.2947058-1-maz@kernel.org>
+ <20210125122638.2947058-7-maz@kernel.org>
+ <56041147-0bd8-dbb2-d1ca-550f3db7f05d@redhat.com>
+ <adbdbfbcecb65a1eca21afa622679836@kernel.org>
+ <7808bec4-2ac5-a36d-2960-b4b90574e0d2@redhat.com>
+ <f6875f72511a69f9ac9a18ebf7698466@kernel.org>
+ <d9f8b79a-74de-0058-aa14-4ed5ec3b6aab@redhat.com>
+ <ac172223d388393004819e338728f45b@kernel.org>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <7134513d-bccf-923f-961a-08527cf77f8e@arm.com>
+Date: Thu, 4 Feb 2021 12:32:14 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210203153138.GB18974@willie-the-truck>
-Cc: devicetree@vger.kernel.org, kernel-team@android.com, android-kvm@google.com,
- Catalin Marinas <catalin.marinas@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-kernel@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
- linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
- Frank Rowand <frowand.list@gmail.com>, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <ac172223d388393004819e338728f45b@kernel.org>
+Content-Language: en-US
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kernel-team@android.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -100,243 +73,104 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wednesday 03 Feb 2021 at 15:31:39 (+0000), Will Deacon wrote:
-> On Fri, Jan 08, 2021 at 12:15:15PM +0000, Quentin Perret wrote:
-> > Previous commits have introduced infrastructure at EL2 to enable the Hyp
-> > code to manage its own memory, and more specifically its stage 1 page
-> > tables. However, this was preliminary work, and none of it is currently
-> > in use.
-> > 
-> > Put all of this together by elevating the hyp mappings creation at EL2
-> > when memory protection is enabled. In this case, the host kernel running
-> > at EL1 still creates _temporary_ Hyp mappings, only used while
-> > initializing the hypervisor, but frees them right after.
-> > 
-> > As such, all calls to create_hyp_mappings() after kvm init has finished
-> > turn into hypercalls, as the host now has no 'legal' way to modify the
-> > hypevisor page tables directly.
-> > 
-> > Signed-off-by: Quentin Perret <qperret@google.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_mmu.h |  1 -
-> >  arch/arm64/kvm/arm.c             | 62 +++++++++++++++++++++++++++++---
-> >  arch/arm64/kvm/mmu.c             | 34 ++++++++++++++++++
-> >  3 files changed, 92 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> > index d7ebd73ec86f..6c8466a042a9 100644
-> > --- a/arch/arm64/include/asm/kvm_mmu.h
-> > +++ b/arch/arm64/include/asm/kvm_mmu.h
-> > @@ -309,6 +309,5 @@ static __always_inline void __load_guest_stage2(struct kvm_s2_mmu *mmu)
-> >  	 */
-> >  	asm(ALTERNATIVE("nop", "isb", ARM64_WORKAROUND_SPECULATIVE_AT));
-> >  }
-> > -
-> >  #endif /* __ASSEMBLY__ */
-> >  #endif /* __ARM64_KVM_MMU_H__ */
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index 6af9204bcd5b..e524682c2ccf 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -1421,7 +1421,7 @@ static void cpu_prepare_hyp_mode(int cpu)
-> >  	kvm_flush_dcache_to_poc(params, sizeof(*params));
-> >  }
-> >  
-> > -static void cpu_init_hyp_mode(void)
-> > +static void kvm_set_hyp_vector(void)
-> 
-> Please do something about the naming: now we have both cpu_set_hyp_vector()
-> and kvm_set_hyp_vector()!
-
-I'll try to find something different, but no guarantees it'll be much
-better :) Suggestions welcome.
-
-> >  {
-> >  	struct kvm_nvhe_init_params *params;
-> >  	struct arm_smccc_res res;
-> > @@ -1439,6 +1439,11 @@ static void cpu_init_hyp_mode(void)
-> >  	params = this_cpu_ptr_nvhe_sym(kvm_init_params);
-> >  	arm_smccc_1_1_hvc(KVM_HOST_SMCCC_FUNC(__kvm_hyp_init), virt_to_phys(params), &res);
-> >  	WARN_ON(res.a0 != SMCCC_RET_SUCCESS);
-> > +}
-> > +
-> > +static void cpu_init_hyp_mode(void)
-> > +{
-> > +	kvm_set_hyp_vector();
-> >  
-> >  	/*
-> >  	 * Disabling SSBD on a non-VHE system requires us to enable SSBS
-> > @@ -1481,7 +1486,10 @@ static void cpu_set_hyp_vector(void)
-> >  	struct bp_hardening_data *data = this_cpu_ptr(&bp_hardening_data);
-> >  	void *vector = hyp_spectre_vector_selector[data->slot];
-> >  
-> > -	*this_cpu_ptr_hyp_sym(kvm_hyp_vector) = (unsigned long)vector;
-> > +	if (!is_protected_kvm_enabled())
-> > +		*this_cpu_ptr_hyp_sym(kvm_hyp_vector) = (unsigned long)vector;
-> > +	else
-> > +		kvm_call_hyp_nvhe(__pkvm_cpu_set_vector, data->slot);
-> 
-> *Very* minor nit, but it might be cleaner to have static inline functions
-> with the same prototypes as the hypercalls, just to make the code even
-> easier to read. e.g
-> 
-> 	if (!is_protected_kvm_enabled())
-> 		_cpu_set_vector(data->slot);
-> 	else
-> 		kvm_call_hyp_nvhe(__pkvm_cpu_set_vector, data->slot);
-> 
-> you could then conceivably wrap that in a macro and avoid having the
-> "is_protected_kvm_enabled()" checks explicit every time.
-
-Happy to do this here, but are you suggesting to generalize this pattern
-to other places as well?
-
-> >  }
-> >  
-> >  static void cpu_hyp_reinit(void)
-> > @@ -1489,13 +1497,14 @@ static void cpu_hyp_reinit(void)
-> >  	kvm_init_host_cpu_context(&this_cpu_ptr_hyp_sym(kvm_host_data)->host_ctxt);
-> >  
-> >  	cpu_hyp_reset();
-> > -	cpu_set_hyp_vector();
-> >  
-> >  	if (is_kernel_in_hyp_mode())
-> >  		kvm_timer_init_vhe();
-> >  	else
-> >  		cpu_init_hyp_mode();
-> >  
-> > +	cpu_set_hyp_vector();
-> > +
-> >  	kvm_arm_init_debug();
-> >  
-> >  	if (vgic_present)
-> > @@ -1714,13 +1723,52 @@ static int copy_cpu_ftr_regs(void)
-> >  	return 0;
-> >  }
-> >  
-> > +static int kvm_hyp_enable_protection(void)
-> > +{
-> > +	void *per_cpu_base = kvm_ksym_ref(kvm_arm_hyp_percpu_base);
-> > +	int ret, cpu;
-> > +	void *addr;
-> > +
-> > +	if (!is_protected_kvm_enabled())
-> > +		return 0;
-> 
-> Maybe I'm hung up on my previous suggestion, but I feel like we shouldn't
-> get here if protected kvm isn't enabled.
-
-The alternative is to move this check next to the call site, but it
-won't help much IMO.
-
-> 
-> > +	if (!hyp_mem_base)
-> > +		return -ENOMEM;
-> > +
-> > +	addr = phys_to_virt(hyp_mem_base);
-> > +	ret = create_hyp_mappings(addr, addr + hyp_mem_size - 1, PAGE_HYP);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	preempt_disable();
-> > +	kvm_set_hyp_vector();
-> > +	ret = kvm_call_hyp_nvhe(__pkvm_init, hyp_mem_base, hyp_mem_size,
-> > +				num_possible_cpus(), kern_hyp_va(per_cpu_base));
-> 
-> Would it make sense for the __pkvm_init() hypercall to set the vector as
-> well, so that we wouldn't need to disable preemption over two hypercalls?
-
-Not sure, kvm_set_hyp_vector() itself already does multiple hypercalls,
-and I need it separate from __pkvm_init for secondary CPUs.
-
-> Failing that, maybe move the whole preempt_disable/enable sequence into
-> another function.
-
-But that I can do.
-
-> > +	preempt_enable();
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	free_hyp_pgds();
-> > +	for_each_possible_cpu(cpu)
-> > +		free_page(per_cpu(kvm_arm_hyp_stack_page, cpu));
-> > +
-> > +	return 0;
-> > +}
-> > +
-> >  /**
-> >   * Inits Hyp-mode on all online CPUs
-> >   */
-> >  static int init_hyp_mode(void)
-> >  {
-> >  	int cpu;
-> > -	int err = 0;
-> > +	int err = -ENOMEM;
-> > +
-> > +	/*
-> > +	 * The protected Hyp-mode cannot be initialized if the memory pool
-> > +	 * allocation has failed.
-> > +	 */
-> > +	if (is_protected_kvm_enabled() && !hyp_mem_base)
-> > +		return err;
-> >  
-> >  	/*
-> >  	 * Copy the required CPU feature register in their EL2 counterpart
-> > @@ -1854,6 +1902,12 @@ static int init_hyp_mode(void)
-> >  	for_each_possible_cpu(cpu)
-> >  		cpu_prepare_hyp_mode(cpu);
-> >  
-> > +	err = kvm_hyp_enable_protection();
-> > +	if (err) {
-> > +		kvm_err("Failed to enable hyp memory protection: %d\n", err);
-> > +		goto out_err;
-> > +	}
-> > +
-> >  	return 0;
-> >  
-> >  out_err:
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index 3cf9397dabdb..9d4c9251208e 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -225,15 +225,39 @@ void free_hyp_pgds(void)
-> >  	if (hyp_pgtable) {
-> >  		kvm_pgtable_hyp_destroy(hyp_pgtable);
-> >  		kfree(hyp_pgtable);
-> > +		hyp_pgtable = NULL;
-> >  	}
-> >  	mutex_unlock(&kvm_hyp_pgd_mutex);
-> >  }
-> >  
-> > +static bool kvm_host_owns_hyp_mappings(void)
-> > +{
-> > +	if (static_branch_likely(&kvm_protected_mode_initialized))
-> > +		return false;
-> > +
-> > +	/*
-> > +	 * This can happen at boot time when __create_hyp_mappings() is called
-> > +	 * after the hyp protection has been enabled, but the static key has
-> > +	 * not been flipped yet.
-> > +	 */
-> > +	if (!hyp_pgtable && is_protected_kvm_enabled())
-> > +		return false;
-> > +
-> > +	BUG_ON(!hyp_pgtable);
-> 
-> Can we fail more gracefully, e.g. by continuing without KVM?
-
-Got any suggestion as to how that can be done? We could also just remove
-that line -- that really should not happen.
-
-Thanks!
-Quentin
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGksCgpPbiAyLzMvMjEgMToyOCBQTSwgTWFyYyBaeW5naWVyIHdyb3RlOgo+IE9uIDIwMjEtMDIt
+MDMgMTI6MzksIEF1Z2VyIEVyaWMgd3JvdGU6Cj4+IEhpLAo+Pgo+PiBPbiAyLzMvMjEgMTI6MjAg
+UE0sIE1hcmMgWnluZ2llciB3cm90ZToKPj4+IE9uIDIwMjEtMDItMDMgMTE6MDcsIEF1Z2VyIEVy
+aWMgd3JvdGU6Cj4+Pj4gSGkgTWFyYywKPj4+PiBPbiAyLzMvMjEgMTE6MzYgQU0sIE1hcmMgWnlu
+Z2llciB3cm90ZToKPj4+Pj4gSGkgRXJpYywKPj4+Pj4KPj4+Pj4gT24gMjAyMS0wMS0yNyAxNzo1
+MywgQXVnZXIgRXJpYyB3cm90ZToKPj4+Pj4+IEhpIE1hcmMsCj4+Pj4+Pgo+Pj4+Pj4gT24gMS8y
+NS8yMSAxOjI2IFBNLCBNYXJjIFp5bmdpZXIgd3JvdGU6Cj4+Pj4+Pj4gVXBncmFkaW5nIHRoZSBQ
+TVUgY29kZSBmcm9tIEFSTXY4LjEgdG8gQVJNdjguNCB0dXJucyBvdXQgdG8gYmUKPj4+Pj4+PiBw
+cmV0dHkgZWFzeS4gQWxsIHRoYXQgaXMgcmVxdWlyZWQgaXMgc3VwcG9ydCBmb3IgUE1NSVJfRUwx
+LCB3aGljaAo+Pj4+Pj4+IGlzIHJlYWQtb25seSwgYW5kIGZvciB3aGljaCByZXR1cm5pbmcgMCBp
+cyBhIHZhbGlkIG9wdGlvbiBhcyBsb25nCj4+Pj4+Pj4gYXMgd2UgZG9uJ3QgYWR2ZXJ0aXNlIFNU
+QUxMX1NMT1QgYXMgYW4gaW1wbGVtZW50ZWQgZXZlbnQuCj4+Pj4+Pj4KPj4+Pj4+PiBMZXQncyBq
+dXN0IGRvIHRoYXQgYW5kIGFkanVzdCB3aGF0IHdlIHJldHVybiB0byB0aGUgZ3Vlc3QuCj4+Pj4+
+Pj4KPj4+Pj4+PiBTaWduZWQtb2ZmLWJ5OiBNYXJjIFp5bmdpZXIgPG1hekBrZXJuZWwub3JnPgo+
+Pj4+Pj4+IC0tLQo+Pj4+Pj4+IMKgYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9zeXNyZWcuaCB8wqAg
+MyArKysKPj4+Pj4+PiDCoGFyY2gvYXJtNjQva3ZtL3BtdS1lbXVsLmPCoMKgwqDCoMKgwqAgfMKg
+IDYgKysrKysrCj4+Pj4+Pj4gwqBhcmNoL2FybTY0L2t2bS9zeXNfcmVncy5jwqDCoMKgwqDCoMKg
+IHwgMTEgKysrKysrKy0tLS0KPj4+Pj4+PiDCoDMgZmlsZXMgY2hhbmdlZCwgMTYgaW5zZXJ0aW9u
+cygrKSwgNCBkZWxldGlvbnMoLSkKPj4+Pj4+Pgo+Pj4+Pj4+IGRpZmYgLS1naXQgYS9hcmNoL2Fy
+bTY0L2luY2x1ZGUvYXNtL3N5c3JlZy5oCj4+Pj4+Pj4gYi9hcmNoL2FybTY0L2luY2x1ZGUvYXNt
+L3N5c3JlZy5oCj4+Pj4+Pj4gaW5kZXggOGI1ZTdlNWMzY2M4Li4yZmIzZjM4NjU4OGMgMTAwNjQ0
+Cj4+Pj4+Pj4gLS0tIGEvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9zeXNyZWcuaAo+Pj4+Pj4+ICsr
+KyBiL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20vc3lzcmVnLmgKPj4+Pj4+PiBAQCAtODQ2LDcgKzg0
+NiwxMCBAQAo+Pj4+Pj4+Cj4+Pj4+Pj4gwqAjZGVmaW5lIElEX0RGUjBfUEVSRk1PTl9TSElGVMKg
+wqDCoMKgwqDCoMKgIDI0Cj4+Pj4+Pj4KPj4+Pj4+PiArI2RlZmluZSBJRF9ERlIwX1BFUkZNT05f
+OF8wwqDCoMKgwqDCoMKgwqAgMHgzCj4+Pj4+Pj4gwqAjZGVmaW5lIElEX0RGUjBfUEVSRk1PTl84
+XzHCoMKgwqDCoMKgwqDCoCAweDQKPj4+Pj4+PiArI2RlZmluZSBJRF9ERlIwX1BFUkZNT05fOF80
+wqDCoMKgwqDCoMKgwqAgMHg1Cj4+Pj4+Pj4gKyNkZWZpbmUgSURfREZSMF9QRVJGTU9OXzhfNcKg
+wqDCoMKgwqDCoMKgIDB4Ngo+Pj4+Pj4+Cj4+Pj4+Pj4gwqAjZGVmaW5lIElEX0lTQVI0X1NXUF9G
+UkFDX1NISUZUwqDCoMKgwqDCoMKgwqAgMjgKPj4+Pj4+PiDCoCNkZWZpbmUgSURfSVNBUjRfUFNS
+X01fU0hJRlTCoMKgwqDCoMKgwqDCoCAyNAo+Pj4+Pj4+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0
+L2t2bS9wbXUtZW11bC5jIGIvYXJjaC9hcm02NC9rdm0vcG11LWVtdWwuYwo+Pj4+Pj4+IGluZGV4
+IDM5OGY2ZGYxYmJlNC4uNzJjZDcwNGE4MzY4IDEwMDY0NAo+Pj4+Pj4+IC0tLSBhL2FyY2gvYXJt
+NjQva3ZtL3BtdS1lbXVsLmMKPj4+Pj4+PiArKysgYi9hcmNoL2FybTY0L2t2bS9wbXUtZW11bC5j
+Cj4+Pj4+Pj4gQEAgLTc5NSw2ICs3OTUsMTIgQEAgdTY0IGt2bV9wbXVfZ2V0X3BtY2VpZChzdHJ1
+Y3Qga3ZtX3ZjcHUgKnZjcHUsCj4+Pj4+Pj4gYm9vbCBwbWNlaWQxKQo+Pj4+Pj4+IMKgwqDCoMKg
+wqDCoMKgwqAgYmFzZSA9IDA7Cj4+Pj4+Pj4gwqDCoMKgwqAgfSBlbHNlIHsKPj4+Pj4+PiDCoMKg
+wqDCoMKgwqDCoMKgIHZhbCA9IHJlYWRfc3lzcmVnKHBtY2VpZDFfZWwwKTsKPj4+Pj4+PiArwqDC
+oMKgwqDCoMKgwqAgLyoKPj4+Pj4+PiArwqDCoMKgwqDCoMKgwqDCoCAqIERvbid0IGFkdmVydGlz
+ZSBTVEFMTF9TTE9ULCBhcyBQTU1JUl9FTDAgaXMgaGFuZGxlZAo+Pj4+Pj4+ICvCoMKgwqDCoMKg
+wqDCoMKgICogYXMgUkFaCj4+Pj4+Pj4gK8KgwqDCoMKgwqDCoMKgwqAgKi8KPj4+Pj4+PiArwqDC
+oMKgwqDCoMKgwqAgaWYgKHZjcHUtPmt2bS0+YXJjaC5wbXV2ZXIgPj0gSURfQUE2NERGUjBfUE1V
+VkVSXzhfNCkKPj4+Pj4+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB2YWwgJj0gfkJJVF9VTEwo
+QVJNVjhfUE1VVjNfUEVSRkNUUl9TVEFMTF9TTE9UIC0gMzIpOwo+Pj4+Pj4gd2hhdCBhYm91dCB0
+aGUgU1RBTExfU0xPVF9CQUNLRU5EIGFuZCBGUk9OVEVORCBldmVudHMgdGhlbj8KPj4+Pj4KPj4+
+Pj4gQXJlbid0IHRoZXNlIGEgbWFuZGF0b3J5IEFSTXY4LjEgZmVhdHVyZT8gSSBkb24ndCBzZWUg
+YSByZWFzb24gdG8KPj4+Pj4gZHJvcCB0aGVtLgo+Pj4+Cj4+Pj4gSSB1bmRlcnN0YW5kIHRoZSAz
+IGFyZSBsaW5rZWQgdG9nZXRoZXIuCj4+Pj4KPj4+PiBJbiBENy4xMSBpdCBpcyBzYWlkCj4+Pj4g
+Igo+Pj4+IFdoZW4gYW55IG9mIHRoZSBmb2xsb3dpbmcgY29tbW9uIGV2ZW50cyBhcmUgaW1wbGVt
+ZW50ZWQsIGFsbCB0aHJlZSBvZgo+Pj4+IHRoZW0gYXJlIGltcGxlbWVudGVkOgo+Pj4+IDB4MDAz
+RCAsIFNUQUxMX1NMT1RfQkFDS0VORCwgTm8gb3BlcmF0aW9uIHNlbnQgZm9yIGV4ZWN1dGlvbiBv
+biBhIFNsb3QKPj4+PiBkdWUgdG8gdGhlIGJhY2tlbmQsCj4+Pj4gMHgwMDNFICwgU1RBTExfU0xP
+VF9GUk9OVEVORCwgTm8gb3BlcmF0aW9uIHNlbnQgZm9yIGV4ZWN1dGlvbiBvbiBhIFNsb3QKPj4+
+PiBkdWUgdG8gdGhlIGZyb250ZW5kLgo+Pj4+IDB4MDAzRiAsIFNUQUxMX1NMT1QsIE5vIG9wZXJh
+dGlvbiBzZW50IGZvciBleGVjdXRpb24gb24gYSBTbG90Lgo+Pj4+ICIKPj4+Cj4+PiBUaGV5IGFy
+ZSBsaW5rZWQgaW4gdGhlIHNlbnNlIHRoYXQgdGhleSByZXBvcnQgcmVsYXRlZCBldmVudHMsIGJ1
+dCB0aGV5Cj4+PiBkb24ndCBoYXZlIHRvIGJlIGltcGxlbWVudGVkIGluIHRoZSBzYW1lIGxldmVs
+IG9mIHRoZSBhcmNoaXRlY3VyZSwgaWYgb25seQo+Pj4gYmVjYXVzZSBCQUNLRU5EL0ZST05URU5E
+IHdlcmUgaW50cm9kdWNlZHdheSBiZWZvcmUgQVJNdjguNC4KPj4+Cj4+PiBXaGF0IHRoZSBhcmNo
+aXRlY3R1cmUgc2F5cyBpczoKPj4+Cj4+PiAtIEZvciBGRUFUX1BNVXYzcDEgKEFSTXY4LjEpOgo+
+Pj4gwqAgIlRoZSBTVEFMTF9GUk9OVEVORCBhbmQgU1RBTExfQkFDS0VORCBldmVudHMgYXJlIHJl
+cXVpcmVkIHRvIGJlCj4+PiDCoMKgIGltcGxlbWVudGVkLiIgKEEyLjQuMSwgRERJMDQ4N0cuYSkK
+Pj4gT0sKPj4+Cj4+PiAtIEZvciBGRUFUX1BNVXYzcDQgKEFSTXY4LjQpOgo+Pj4gwqAgIklmIEZF
+QVRfUE1VdjNwNCBpcyBpbXBsZW1lbnRlZDoKPj4+IMKgwqAgLSBJZiBTVEFMTF9TTE9UIGlzIG5v
+dCBpbXBsZW1lbnRlZCwgaXQgaXMgSU1QTEVNRU5UQVRJT04gREVGSU5FRAo+Pj4gd2hldGhlciB0
+aGUgUE1NSVIgU3lzdGVtIHJlZ2lzdGVycyBhcmUgaW1wbGVtZW50ZWQuCj4+PiDCoMKgIC0gSWYg
+U1RBTExfU0xPVCBpcyBpbXBsZW1lbnRlZCwgdGhlbiB0aGUgUE1NSVIgU3lzdGVtIHJlZ2lzdGVy
+cyBhcmUKPj4+IGltcGxlbWVudGVkLiIgKEQ3LTI4NzMsIERESTA0ODdHLmEpCj4+Pgo+Pj4gU28g
+d2hpbGUgQkFDS0VORC9GUk9OVEVORCBhcmUgcmVxdWlyZWQgaW4gYW4gQVJNdjguNCBpbXBsZW1l
+bnRhdGlvbgo+Pj4gYnkgdmlydHVlIG9mIGJlaW5nIG1hbmRhdG9yeSBpbiBBUk12OC4xLCBTVEFM
+TF9TTE9UIGlzbid0IGF0IGFueSBwb2ludC4KPj4gQnV0IHRoZW4gaG93IGRvIHlvdSB1bmRlcnN0
+YW5kICJXaGVuIGFueSBvZiB0aGUgZm9sbG93aW5nIGNvbW1vbiBldmVudHMKPj4gYXJlIGltcGxl
+bWVudGVkLCBhbGwgdGhyZWUgb2YgdGhlbSBhcmUgaW1wbGVtZW50ZWQiPwo+Cj4gSSB0aGluayB0
+aGF0J3Mgd2hvbGx5IGluY29uc2lzdGVudCwgYmVjYXVzZSBpdCB3b3VsZCBtZWFuIHRoYXQgU1RB
+TExfU0xPVAo+IGlzbid0IG9wdGlvbmFsIG9uIEFSTXY4LjQsIGFuZCB3b3VsZCBtYWtlIFBNTUlS
+IG1hbmRhdG9yeS4KCkkgdGhpbmsgdGhlcmUncyBzb21lIGNvbmZ1c2lvbiByZWdhcmRpbmcgdGhl
+IGV2ZW50IG5hbWVzLiBGcm9tIG15IHJlYWRpbmcgb2YgdGhlCmFyY2hpdGVjdHVyZSwgU1RBTEwg
+IT0gU1RBTExfU0xPVCwgU1RBTExfQkFDS0VORCAhPSBTVEFMTF9TTE9UX0JBQ0tFTkQsClNUQUxM
+X0ZST05URU5EICE9IFNUQUxMX1NMT1RfRlJPTlRFTkQuCgpTVEFMTHssIF9CQUNLRU5ELCBfRlJP
+TlRFTkR9IGNvdW50IHRoZSBudW1iZXIgb2YgQ1BVIGN5Y2xlcyB3aGVyZSBubyBpbnN0cnVjdGlv
+bnMKYXJlIGJlaW5nIGV4ZWN1dGVkIG9uIHRoZSBQRSAocGFnZSBENy0yODcyKSwgU1RBTExfU0xP
+VHssIF9CQUNLRU5ELCBfRlJPTlRFTkR9CmNvdW50IHRoZSBudW1iZXIgb2Ygc2xvdHMgd2hlcmUg
+bm8gaW5zdHJ1Y3Rpb25zIGFyZSBiZWluZyBleGVjdXRlZCAocGFnZSBENy0yODczKS4KClNUQUxM
+X3tCQUNLRU5ELCBGUk9OVEVORH0gYXJlIHJlcXVpcmVkIGJ5IEFSTXY4LjEtUE1VIChwYWdlcyBB
+Mi03NiwgRDctMjkxMyk7ClNUQUxMIGlzIHJlcXVpcmVkIGJ5IEFSTXY4LjQtUE1VIChwYWdlIEQ3
+LTI5MTQpLgoKU1RBTExfU0xPVHssIF9CQUNLRU5ELCBfRlJPTlRFTkR9IGFyZSBvcHRpb25hbCBp
+biBBUk12OC40LVBNVSAocGFnZXMgRDctMjkxMywKRDctMjkxNCksIGJ1dCBpZiBvbmUgb2YgdGhl
+bSBpcyBpbXBsZW1lbnRlZCwgYWxsIG9mIHRoZW0gbXVzdCBiZSBpbXBsZW1lbnRlZCAocGFnZQpE
+Ny0yOTE0KS4KClRoZSBwcm9ibGVtIEkgc2VlIHdpdGggdGhpcyBwYXRjaCBpcyB0aGF0IGl0IGRv
+ZXNuJ3QgY2xlYXIgdGhlClNUQUxMX1NMT1Rfe0JBQ0tFTkQsIEZST05URU5EfSBldmVudCBiaXRz
+IGFsb25nIHdpdGggdGhlIFNUQUxMX1NMT1QgYml0IGZyb20KUE1DRUlEMV9FTDAuCgpUaGFua3MK
+CkFsZXgKCj4KPiBJJ20gc3RhcnRpbmcgdG8gdGhpbmsgdGhhdCBkcm9wcGluZyB0aGlzIHBhdGNo
+IG1heSBiZSB0aGUgYmVzdCB0aGluZyB0byBkby4uLgo+Cj4gVGhhbmtzLAo+Cj4gwqDCoMKgwqDC
+oMKgwqAgTS4KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18K
+a3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8v
+bGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
