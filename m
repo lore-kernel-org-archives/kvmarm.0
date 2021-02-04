@@ -2,67 +2,91 @@ Return-Path: <SRS0=ioR1=HG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55127C433E0
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Feb 2021 14:37:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC41AC433E0
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Feb 2021 14:53:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CBE1364F4D
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Feb 2021 14:37:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBE1364F4D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 76ADF64F4D
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Feb 2021 14:53:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76ADF64F4D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 581A84B1C1;
-	Thu,  4 Feb 2021 09:37:37 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C9FBF4B235;
+	Thu,  4 Feb 2021 09:53:00 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id MLjRanU-uiLY; Thu,  4 Feb 2021 09:37:36 -0500 (EST)
+	with ESMTP id 2M66JhM2swJl; Thu,  4 Feb 2021 09:52:59 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EAD34B1D0;
-	Thu,  4 Feb 2021 09:37:36 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D29744B23E;
+	Thu,  4 Feb 2021 09:52:59 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 641AB4B1A9
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2021 09:37:34 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 330F54B235
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2021 09:52:58 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Aua0Pe6RupMm for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Feb 2021 09:37:33 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 580924B175
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2021 09:37:33 -0500 (EST)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 96D7A64F42;
- Thu,  4 Feb 2021 14:37:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1612449452;
- bh=eX/1xnMdBH58oq4Cm//d2eH7lZEj/ruuIIGGb0auhuU=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=lFUg2MhCGRwGCnWckleg2a585Xz+UPVroJoNasl+l4uT0swGpvGoFDX9tZU3lQU8T
- /yrQSfPWtuDwynUHzXjcNMRmcL3Hpe9GUojzRx7oLBzcEMnuf5Fugs46AmSYNirHm0
- GOMjZtv2zt6lmt5JUCXfTx3Ou8ZLooidFTn5ePcH+jLvp6JlcZ/wq3kED3EeiOTmV8
- JEyrlU6Zy1/rze1wxKk2PST5LR1xrcY/gBK6mtU2kGkZssp+m9Yz6Ihgp+3PZWtUtX
- O386OeZwIL5OOsEzKkiZf9BK0SHUN10bysPQh3rGOM9NhwGiYRKNzb5RJWkLPFQzp3
- CLQa41rKVOCfA==
-Date: Thu, 4 Feb 2021 14:37:26 +0000
-From: Will Deacon <will@kernel.org>
-To: Quentin Perret <qperret@google.com>
-Subject: Re: [RFC PATCH v2 26/26] KVM: arm64: Wrap the host with a stage 2
-Message-ID: <20210204143725.GB20815@willie-the-truck>
+ with ESMTP id 05+dCyppEeXn for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Feb 2021 09:52:57 -0500 (EST)
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com
+ [209.85.128.43])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 162464B229
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2021 09:52:57 -0500 (EST)
+Received: by mail-wm1-f43.google.com with SMTP id c127so3218026wmf.5
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 04 Feb 2021 06:52:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=GmzDwYCwB3ACF6L8pkrzfaM1KU2/zTHOCAwwjAAIW1c=;
+ b=T4n7B/HDfO8GLn9RDv5a9Mnd7w6QzC1CmmDAy2dGrwaoMO/jJ9ye68xPKJXV0LUP0g
+ HMI9KaeCJNVypsn0VcgiXF0nahQXoHOgDKN4FwRWRycbYlkqaH9q1rmG+kRJ8FGQJ1TS
+ KQOwwrHclrlRKXj4BjzWTg9Tds6QLnXBGQlVYn2K5UHD2lSJLkgLXYfczlptpwyjMoni
+ lRVSC4FnURwvgkpAlTUnIrGGVyJXCmGFRKRzLAt1vP7qj8FHDEynp0phez5v1FcB62jo
+ bg9FLizdXkt4a8l65wUYQQXLTkD0GdTnUAlZekz6904IYqEVSUDgLLvEPRXk+a/P6Ta/
+ bNSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=GmzDwYCwB3ACF6L8pkrzfaM1KU2/zTHOCAwwjAAIW1c=;
+ b=ZTGsD0PgFoKoR9dzO/BtNpTAiMyF937tMbnwRq5WOP0EwqyoueuZKgG4WrPfysqFbG
+ D0iDvfoFqA6h5yi/VHNnADlYQcE+mTYrf5DGSxK+sY1wnCLBvmrPkC37ZeZOv2UVY0JO
+ jfX1lZ91X7kC/1J6/lJvCPSYcfgoRkYHtCw6CjbrNtfS7k1nqlXp2fm/bRrv82i4n6HY
+ /C9FAx9jKELXnSz5JdzHAM7oZvnCIMM4tBYSq7wh2hXaZjCe7HuZZgBDHF9n4Agdkqfu
+ RMF0pGVXVaV5Qw17Pz84Ou9Fk7ijJDQ6+hQydj/S08vwXB0ultzYxFosIgo3nAKpbQNm
+ 1e3A==
+X-Gm-Message-State: AOAM531xSkIHqElIV0VYkOFgJIAG9gy0VVnXxTGS+tGXXFRrTIOihKMQ
+ 2Ih1RHOzPljSnImysz+W4eu7FA==
+X-Google-Smtp-Source: ABdhPJytkpleb2goc1M1MLDTsD+ny4hCYPN6kmBxFpTwEmpJaqq+R5jrD51y1ejkMwjS5CKoxfmVRw==
+X-Received: by 2002:a05:600c:ce:: with SMTP id
+ u14mr7866356wmm.10.1612450375861; 
+ Thu, 04 Feb 2021 06:52:55 -0800 (PST)
+Received: from google.com (230.69.233.35.bc.googleusercontent.com.
+ [35.233.69.230])
+ by smtp.gmail.com with ESMTPSA id y63sm6195028wmd.21.2021.02.04.06.52.55
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 04 Feb 2021 06:52:55 -0800 (PST)
+Date: Thu, 4 Feb 2021 14:52:52 +0000
+From: Quentin Perret <qperret@google.com>
+To: Will Deacon <will@kernel.org>
+Subject: Re: [RFC PATCH v2 12/26] KVM: arm64: Introduce a Hyp buddy page
+ allocator
+Message-ID: <YBwKRM3uHDMC9S0U@google.com>
 References: <20210108121524.656872-1-qperret@google.com>
- <20210108121524.656872-27-qperret@google.com>
- <20210203161146.GJ18974@willie-the-truck>
- <YBwEGx1tv8hob9ho@google.com>
+ <20210108121524.656872-13-qperret@google.com>
+ <20210202181307.GA17311@willie-the-truck>
+ <YBrsep4xK1F4YRWb@google.com>
+ <20210204143106.GA20792@willie-the-truck>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <YBwEGx1tv8hob9ho@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20210204143106.GA20792@willie-the-truck>
 Cc: devicetree@vger.kernel.org, kernel-team@android.com, android-kvm@google.com,
  Catalin Marinas <catalin.marinas@arm.com>, Fuad Tabba <tabba@google.com>,
  linux-kernel@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
@@ -84,57 +108,37 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Feb 04, 2021 at 02:26:35PM +0000, Quentin Perret wrote:
-> On Wednesday 03 Feb 2021 at 16:11:47 (+0000), Will Deacon wrote:
-> > On Fri, Jan 08, 2021 at 12:15:24PM +0000, Quentin Perret wrote:
-> > > When KVM runs in protected nVHE mode, make use of a stage 2 page-table
-> > > to give the hypervisor some control over the host memory accesses. At
-> > > the moment all memory aborts from the host will be instantly idmapped
-> > > RWX at stage 2 in a lazy fashion. Later patches will make use of that
-> > > infrastructure to implement access control restrictions to e.g. protect
-> > > guest memory from the host.
+On Thursday 04 Feb 2021 at 14:31:08 (+0000), Will Deacon wrote:
+> On Wed, Feb 03, 2021 at 06:33:30PM +0000, Quentin Perret wrote:
+> > On Tuesday 02 Feb 2021 at 18:13:08 (+0000), Will Deacon wrote:
+> > > On Fri, Jan 08, 2021 at 12:15:10PM +0000, Quentin Perret wrote:
+> > > > + *   __find_buddy(pool, page 0, order 0) => page 1
+> > > > + *   __find_buddy(pool, page 0, order 1) => page 2
+> > > > + *   __find_buddy(pool, page 1, order 0) => page 0
+> > > > + *   __find_buddy(pool, page 2, order 0) => page 3
+> > > > + */
+> > > > +static struct hyp_page *__find_buddy(struct hyp_pool *pool, struct hyp_page *p,
+> > > > +				     unsigned int order)
+> > > > +{
+> > > > +	phys_addr_t addr = hyp_page_to_phys(p);
+> > > > +
+> > > > +	addr ^= (PAGE_SIZE << order);
+> > > > +	if (addr < pool->range_start || addr >= pool->range_end)
+> > > > +		return NULL;
 > > > 
-> > > Signed-off-by: Quentin Perret <qperret@google.com>
-> > > ---
-> > >  arch/arm64/include/asm/kvm_cpufeature.h       |   2 +
-> > >  arch/arm64/kernel/image-vars.h                |   3 +
-> > >  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  33 +++
-> > >  arch/arm64/kvm/hyp/nvhe/Makefile              |   2 +-
-> > >  arch/arm64/kvm/hyp/nvhe/hyp-init.S            |   1 +
-> > >  arch/arm64/kvm/hyp/nvhe/hyp-main.c            |   6 +
-> > >  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 191 ++++++++++++++++++
-> > >  arch/arm64/kvm/hyp/nvhe/setup.c               |   6 +
-> > >  arch/arm64/kvm/hyp/nvhe/switch.c              |   7 +-
-> > >  arch/arm64/kvm/hyp/nvhe/tlb.c                 |   4 +-
-> > >  10 files changed, 248 insertions(+), 7 deletions(-)
-> > >  create mode 100644 arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> > >  create mode 100644 arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > > Are these range checks only needed because the pool isn't required to be
+> > > an exact power-of-2 pages in size? If so, maybe it would be more
+> > > straightforward to limit the max order on a per-pool basis depending upon
+> > > its size?
 > > 
-> > [...]
-> > 
-> > > +void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt)
-> > > +{
-> > > +	enum kvm_pgtable_prot prot;
-> > > +	u64 far, hpfar, esr, ipa;
-> > > +	int ret;
-> > > +
-> > > +	esr = read_sysreg_el2(SYS_ESR);
-> > > +	if (!__get_fault_info(esr, &far, &hpfar))
-> > > +		hyp_panic();
-> > > +
-> > > +	prot = KVM_PGTABLE_PROT_R | KVM_PGTABLE_PROT_W | KVM_PGTABLE_PROT_X;
-> > > +	ipa = (hpfar & HPFAR_MASK) << 8;
-> > > +	ret = host_stage2_map(ipa, PAGE_SIZE, prot);
-> > 
-> > Can we try to put down a block mapping if the whole thing falls within
-> > memory?
+> > More importantly, it is because pages outside of the pool are not
+> > guaranteed to be covered by the hyp_vmemmap, so I really need to make
+> > sure I don't dereference them.
 > 
-> Yes we can! And in fact we can do that outside of memory too. It's
-> queued for v3 already, so stay tuned ... :)
+> Wouldn't having a per-pool max order help with that?
 
-Awesome! The Stage-2 TLB thanks you.
-
-Will
+The issue is, I have no alignment guarantees for the pools, so I may end
+up with max_order = 0 ...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
