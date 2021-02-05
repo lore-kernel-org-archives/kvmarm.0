@@ -1,66 +1,74 @@
-Return-Path: <SRS0=ioR1=HG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=/Ra0=HH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.4 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A64EC433E0
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Feb 2021 19:53:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8C0FC433DB
+	for <kvmarm@archiver.kernel.org>; Fri,  5 Feb 2021 03:31:03 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id EB50964F51
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Feb 2021 19:53:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB50964F51
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 25A2B64F92
+	for <kvmarm@archiver.kernel.org>; Fri,  5 Feb 2021 03:31:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25A2B64F92
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C8C24B37A;
-	Thu,  4 Feb 2021 14:53:00 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6991F4B2EB;
+	Thu,  4 Feb 2021 22:31:02 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id KSMxNiV+wqi4; Thu,  4 Feb 2021 14:52:58 -0500 (EST)
+	with ESMTP id HI4vIJfr94On; Thu,  4 Feb 2021 22:31:01 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BDC8B4B37C;
-	Thu,  4 Feb 2021 14:52:58 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 34F9B4B2F1;
+	Thu,  4 Feb 2021 22:31:01 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A1774B363
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2021 14:52:58 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 44D884B2EB
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2021 22:31:00 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1Knowf+Hi2Wi for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Feb 2021 14:52:56 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 732524B289
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2021 14:52:56 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1E3A8143B;
- Thu,  4 Feb 2021 11:52:56 -0800 (PST)
-Received: from [10.57.49.26] (unknown [10.57.49.26])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3BB573F73B;
- Thu,  4 Feb 2021 11:52:53 -0800 (PST)
-Subject: Re: [RFC PATCH 06/11] iommu/arm-smmu-v3: Scan leaf TTD to sync
- hardware dirty log
-To: Keqian Zhu <zhukeqian1@huawei.com>, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, iommu@lists.linux-foundation.org,
- Will Deacon <will@kernel.org>, Alex Williamson <alex.williamson@redhat.com>,
- Marc Zyngier <maz@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>
-References: <20210128151742.18840-1-zhukeqian1@huawei.com>
- <20210128151742.18840-7-zhukeqian1@huawei.com>
-From: Robin Murphy <robin.murphy@arm.com>
-Message-ID: <2a731fe7-5879-8d89-7b96-d7385117b869@arm.com>
-Date: Thu, 4 Feb 2021 19:52:52 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+ with ESMTP id Fuz1B5tQftdR for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Feb 2021 22:30:58 -0500 (EST)
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BDB624B2EA
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2021 22:30:57 -0500 (EST)
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.59])
+ by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4DX19j3NZpzlGfQ;
+ Fri,  5 Feb 2021 11:29:13 +0800 (CST)
+Received: from [10.174.184.42] (10.174.184.42) by
+ DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
+ 14.3.498.0; Fri, 5 Feb 2021 11:30:47 +0800
+Subject: Re: [RFC] Use SMMU HTTU for DMA dirty page tracking
+To: Jean-Philippe Brucker <jean-philippe@linaro.org>, "Tian, Kevin"
+ <kevin.tian@intel.com>
+References: <b926ec0b-fe87-0792-c41d-acad56c656a4@huawei.com>
+ <20200522171452.GC3453945@myrica>
+ <e68c1158-8573-a477-42ce-48cee510c3ce@huawei.com>
+ <MWHPR11MB16454475DA1FF417CEF5A32B8CB10@MWHPR11MB1645.namprd11.prod.outlook.com>
+ <897a84ac-0a71-ace7-e05b-3cc9f0b05c28@huawei.com>
+ <MWHPR11MB1645AA007D24F2D005794E5C8CB10@MWHPR11MB1645.namprd11.prod.outlook.com>
+ <20200527091428.GB265288@myrica>
+From: Keqian Zhu <zhukeqian1@huawei.com>
+Message-ID: <c1c96639-2311-398a-15e0-2ff2d59fe320@huawei.com>
+Date: Fri, 5 Feb 2021 11:30:47 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-In-Reply-To: <20210128151742.18840-7-zhukeqian1@huawei.com>
-Content-Language: en-GB
-Cc: Cornelia Huck <cohuck@redhat.com>, lushenming@huawei.com,
- Kirti Wankhede <kwankhede@nvidia.com>
+In-Reply-To: <20200527091428.GB265288@myrica>
+X-Originating-IP: [10.174.184.42]
+X-CFilter-Loop: Reflected
+Cc: "Zhao, Yan Y" <yan.y.zhao@intel.com>, "maz@kernel.org" <maz@kernel.org>,
+ "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+ Kirti Wankhede <kwankhede@nvidia.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "prime.zeng@hisilicon.com" <prime.zeng@hisilicon.com>, Will
+ Deacon <will@kernel.org>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+ "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -72,318 +80,122 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2021-01-28 15:17, Keqian Zhu wrote:
-> From: jiangkunkun <jiangkunkun@huawei.com>
+Hi Jean and Kevin,
+
+FYI, I have send out the SMMUv3 HTTU support for DMA dirty tracking[1] a week ago.
+
+Thanks,
+Keqian
+
+[1] https://lore.kernel.org/linux-iommu/20210128151742.18840-1-zhukeqian1@huawei.com/
+
+On 2020/5/27 17:14, Jean-Philippe Brucker wrote:
+> On Wed, May 27, 2020 at 08:40:47AM +0000, Tian, Kevin wrote:
+>>> From: Xiang Zheng <zhengxiang9@huawei.com>
+>>> Sent: Wednesday, May 27, 2020 2:45 PM
+>>>
+>>>
+>>> On 2020/5/27 11:27, Tian, Kevin wrote:
+>>>>> From: Xiang Zheng
+>>>>> Sent: Monday, May 25, 2020 7:34 PM
+>>>>>
+>>>>> [+cc Kirti, Yan, Alex]
+>>>>>
+>>>>> On 2020/5/23 1:14, Jean-Philippe Brucker wrote:
+>>>>>> Hi,
+>>>>>>
+>>>>>> On Tue, May 19, 2020 at 05:42:55PM +0800, Xiang Zheng wrote:
+>>>>>>> Hi all,
+>>>>>>>
+>>>>>>> Is there any plan for enabling SMMU HTTU?
+>>>>>>
+>>>>>> Not outside of SVA, as far as I know.
+>>>>>>
+>>>>>
+>>>>>>> I have seen the patch locates in the SVA series patch, which adds
+>>>>>>> support for HTTU:
+>>>>>>>     https://www.spinics.net/lists/arm-kernel/msg798694.html
+>>>>>>>
+>>>>>>> HTTU reduces the number of access faults on SMMU fault queue
+>>>>>>> (permission faults also benifit from it).
+>>>>>>>
+>>>>>>> Besides reducing the faults, HTTU also helps to track dirty pages for
+>>>>>>> device DMA. Is it feasible to utilize HTTU to get dirty pages on device
+>>>>>>> DMA during VFIO live migration?
+>>>>>>
+>>>>>> As you know there is a VFIO interface for this under discussion:
+>>>>>> https://lore.kernel.org/kvm/1589781397-28368-1-git-send-email-
+>>>>> kwankhede@nvidia.com/
+>>>>>> It doesn't implement an internal API to communicate with the IOMMU
+>>>>> driver
+>>>>>> about dirty pages.
+>>>>
+>>>> We plan to add such API later, e.g. to utilize A/D bit in VT-d 2nd-level
+>>>> page tables (Rev 3.0).
+>>>>
+>>>
+>>> Thank you, Kevin.
+>>>
+>>> When will you send this series patches? Maybe(Hope) we can also support
+>>> hardware-based dirty pages tracking via common APIs based on your
+>>> patches. :)
+>>
+>> Yan is working with Kirti on basic live migration support now. After that
+>> part is done, we will start working on A/D bit support. Yes, common APIs
+>> are definitely the goal here.
+>>
+>>>
+>>>>>
+>>>>>>
+>>>>>>> If SMMU can track dirty pages, devices are not required to implement
+>>>>>>> additional dirty pages tracking to support VFIO live migration.
+>>>>>>
+>>>>>> It seems feasible, though tracking it in the device might be more
+>>>>>> efficient. I might have misunderstood but I think for live migration of
+>>>>>> the Intel NIC they trap guest accesses to the device and introspect its
+>>>>>> state to figure out which pages it is accessing.
+>>>>
+>>>> Does HTTU implement A/D-like mechanism in SMMU page tables, or just
+>>>> report dirty pages in a log buffer? Either way tracking dirty pages in IOMMU
+>>>> side is generic thus doesn't require device-specific tweak like in Intel NIC.
+>>>>
+>>>
+>>> Currently HTTU just implement A/D-like mechanism in SMMU page tables.
+>>> We certainly
+>>> expect SMMU can also implement PML-like feature so that we can avoid
+>>> walking the
+>>> whole page table to get the dirty pages.
 > 
-> During dirty log tracking, user will try to retrieve dirty log from
-> iommu if it supports hardware dirty log. This adds a new interface
-> named sync_dirty_log in iommu layer and arm smmuv3 implements it,
-> which scans leaf TTD and treats it's dirty if it's writable (As we
-> just enable HTTU for stage1, so check AP[2] is not set).
+> There is no reporting of dirty pages in log buffer. It might be possible
+> to do software logging based on PRI or Stall, but that requires special
+> support in the endpoint as well as the SMMU.
 > 
-> Co-developed-by: Keqian Zhu <zhukeqian1@huawei.com>
-> Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
-> ---
->   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 27 +++++++
->   drivers/iommu/io-pgtable-arm.c              | 90 +++++++++++++++++++++
->   drivers/iommu/iommu.c                       | 41 ++++++++++
->   include/linux/io-pgtable.h                  |  4 +
->   include/linux/iommu.h                       | 17 ++++
->   5 files changed, 179 insertions(+)
+>> Is there a link to HTTU introduction?
 > 
-> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> index 2434519e4bb6..43d0536b429a 100644
-> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> @@ -2548,6 +2548,32 @@ static size_t arm_smmu_merge_page(struct iommu_domain *domain, unsigned long iov
->   	return ops->merge_page(ops, iova, paddr, size, prot);
->   }
->   
-> +static int arm_smmu_sync_dirty_log(struct iommu_domain *domain,
-> +				   unsigned long iova, size_t size,
-> +				   unsigned long *bitmap,
-> +				   unsigned long base_iova,
-> +				   unsigned long bitmap_pgshift)
-> +{
-> +	struct io_pgtable_ops *ops = to_smmu_domain(domain)->pgtbl_ops;
-> +	struct arm_smmu_device *smmu = to_smmu_domain(domain)->smmu;
-> +
-> +	if (!(smmu->features & ARM_SMMU_FEAT_HTTU_HD)) {
-> +		dev_err(smmu->dev, "don't support HTTU_HD and sync dirty log\n");
-> +		return -EPERM;
-> +	}
-> +
-> +	if (!ops || !ops->sync_dirty_log) {
-> +		pr_err("don't support sync dirty log\n");
-> +		return -ENODEV;
-> +	}
-> +
-> +	/* To ensure all inflight transactions are completed */
-> +	arm_smmu_flush_iotlb_all(domain);
-
-What about transactions that arrive between the point that this 
-completes, and the point - potentially much later - that we actually 
-access any given PTE during the walk? I don't see what this is supposed 
-to be synchronising against, even if it were just a CMD_SYNC (I 
-especially don't see why we'd want to knock out the TLBs).
-
-> +
-> +	return ops->sync_dirty_log(ops, iova, size, bitmap,
-> +			base_iova, bitmap_pgshift);
-> +}
-> +
->   static int arm_smmu_of_xlate(struct device *dev, struct of_phandle_args *args)
->   {
->   	return iommu_fwspec_add_ids(dev, args->args, 1);
-> @@ -2649,6 +2675,7 @@ static struct iommu_ops arm_smmu_ops = {
->   	.domain_set_attr	= arm_smmu_domain_set_attr,
->   	.split_block		= arm_smmu_split_block,
->   	.merge_page		= arm_smmu_merge_page,
-> +	.sync_dirty_log		= arm_smmu_sync_dirty_log,
->   	.of_xlate		= arm_smmu_of_xlate,
->   	.get_resv_regions	= arm_smmu_get_resv_regions,
->   	.put_resv_regions	= generic_iommu_put_resv_regions,
-> diff --git a/drivers/iommu/io-pgtable-arm.c b/drivers/iommu/io-pgtable-arm.c
-> index 17390f258eb1..6cfe1ef3fedd 100644
-> --- a/drivers/iommu/io-pgtable-arm.c
-> +++ b/drivers/iommu/io-pgtable-arm.c
-> @@ -877,6 +877,95 @@ static size_t arm_lpae_merge_page(struct io_pgtable_ops *ops, unsigned long iova
->   	return __arm_lpae_merge_page(data, iova, paddr, size, lvl, ptep, prot);
->   }
->   
-> +static int __arm_lpae_sync_dirty_log(struct arm_lpae_io_pgtable *data,
-> +				     unsigned long iova, size_t size,
-> +				     int lvl, arm_lpae_iopte *ptep,
-> +				     unsigned long *bitmap,
-> +				     unsigned long base_iova,
-> +				     unsigned long bitmap_pgshift)
-> +{
-> +	arm_lpae_iopte pte;
-> +	struct io_pgtable *iop = &data->iop;
-> +	size_t base, next_size;
-> +	unsigned long offset;
-> +	int nbits, ret;
-> +
-> +	if (WARN_ON(lvl == ARM_LPAE_MAX_LEVELS))
-> +		return -EINVAL;
-> +
-> +	ptep += ARM_LPAE_LVL_IDX(iova, lvl, data);
-> +	pte = READ_ONCE(*ptep);
-> +	if (WARN_ON(!pte))
-> +		return -EINVAL;
-> +
-> +	if (size == ARM_LPAE_BLOCK_SIZE(lvl, data)) {
-> +		if (iopte_leaf(pte, lvl, iop->fmt)) {
-> +			if (pte & ARM_LPAE_PTE_AP_RDONLY)
-> +				return 0;
-> +
-> +			/* It is writable, set the bitmap */
-> +			nbits = size >> bitmap_pgshift;
-> +			offset = (iova - base_iova) >> bitmap_pgshift;
-> +			bitmap_set(bitmap, offset, nbits);
-> +			return 0;
-> +		} else {
-> +			/* To traverse next level */
-> +			next_size = ARM_LPAE_BLOCK_SIZE(lvl + 1, data);
-> +			ptep = iopte_deref(pte, data);
-> +			for (base = 0; base < size; base += next_size) {
-> +				ret = __arm_lpae_sync_dirty_log(data,
-> +						iova + base, next_size, lvl + 1,
-> +						ptep, bitmap, base_iova, bitmap_pgshift);
-> +				if (ret)
-> +					return ret;
-> +			}
-> +			return 0;
-> +		}
-> +	} else if (iopte_leaf(pte, lvl, iop->fmt)) {
-> +		if (pte & ARM_LPAE_PTE_AP_RDONLY)
-> +			return 0;
-> +
-> +		/* Though the size is too small, also set bitmap */
-> +		nbits = size >> bitmap_pgshift;
-> +		offset = (iova - base_iova) >> bitmap_pgshift;
-> +		bitmap_set(bitmap, offset, nbits);
-> +		return 0;
-> +	}
-> +
-> +	/* Keep on walkin */
-> +	ptep = iopte_deref(pte, data);
-> +	return __arm_lpae_sync_dirty_log(data, iova, size, lvl + 1, ptep,
-> +			bitmap, base_iova, bitmap_pgshift);
-> +}
-> +
-> +static int arm_lpae_sync_dirty_log(struct io_pgtable_ops *ops,
-> +				   unsigned long iova, size_t size,
-> +				   unsigned long *bitmap,
-> +				   unsigned long base_iova,
-> +				   unsigned long bitmap_pgshift)
-> +{
-> +	struct arm_lpae_io_pgtable *data = io_pgtable_ops_to_data(ops);
-> +	arm_lpae_iopte *ptep = data->pgd;
-> +	int lvl = data->start_level;
-> +	struct io_pgtable_cfg *cfg = &data->iop.cfg;
-> +	long iaext = (s64)iova >> cfg->ias;
-> +
-> +	if (WARN_ON(!size || (size & cfg->pgsize_bitmap) != size))
-> +		return -EINVAL;
-> +
-> +	if (cfg->quirks & IO_PGTABLE_QUIRK_ARM_TTBR1)
-> +		iaext = ~iaext;
-> +	if (WARN_ON(iaext))
-> +		return -EINVAL;
-> +
-> +	if (data->iop.fmt != ARM_64_LPAE_S1 &&
-> +	    data->iop.fmt != ARM_32_LPAE_S1)
-> +		return -EINVAL;
-> +
-> +	return __arm_lpae_sync_dirty_log(data, iova, size, lvl, ptep,
-> +					 bitmap, base_iova, bitmap_pgshift);
-> +}
-> +
->   static void arm_lpae_restrict_pgsizes(struct io_pgtable_cfg *cfg)
->   {
->   	unsigned long granule, page_sizes;
-> @@ -957,6 +1046,7 @@ arm_lpae_alloc_pgtable(struct io_pgtable_cfg *cfg)
->   		.iova_to_phys	= arm_lpae_iova_to_phys,
->   		.split_block	= arm_lpae_split_block,
->   		.merge_page	= arm_lpae_merge_page,
-> +		.sync_dirty_log	= arm_lpae_sync_dirty_log,
->   	};
->   
->   	return data;
-> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-> index f1261da11ea8..69f268069282 100644
-> --- a/drivers/iommu/iommu.c
-> +++ b/drivers/iommu/iommu.c
-> @@ -2822,6 +2822,47 @@ size_t iommu_merge_page(struct iommu_domain *domain, unsigned long iova,
->   }
->   EXPORT_SYMBOL_GPL(iommu_merge_page);
->   
-> +int iommu_sync_dirty_log(struct iommu_domain *domain, unsigned long iova,
-> +			 size_t size, unsigned long *bitmap,
-> +			 unsigned long base_iova, unsigned long bitmap_pgshift)
-> +{
-> +	const struct iommu_ops *ops = domain->ops;
-> +	unsigned int min_pagesz;
-> +	size_t pgsize;
-> +	int ret;
-> +
-> +	min_pagesz = 1 << __ffs(domain->pgsize_bitmap);
-> +
-> +	if (!IS_ALIGNED(iova | size, min_pagesz)) {
-> +		pr_err("unaligned: iova 0x%lx size 0x%zx min_pagesz 0x%x\n",
-> +		       iova, size, min_pagesz);
-> +		return -EINVAL;
-> +	}
-> +
-> +	if (!ops || !ops->sync_dirty_log) {
-> +		pr_err("don't support sync dirty log\n");
-> +		return -ENODEV;
-> +	}
-> +
-> +	while (size) {
-> +		pgsize = iommu_pgsize(domain, iova, size);
-> +
-> +		ret = ops->sync_dirty_log(domain, iova, pgsize,
-> +					  bitmap, base_iova, bitmap_pgshift);
-
-Once again, we have a worst-of-both-worlds iteration that doesn't make 
-much sense. iommu_pgsize() essentially tells you the best supported size 
-that an IOVA range *can* be mapped with, but we're iterating a range 
-that's already mapped, so we don't know if it's relevant, and either way 
-it may not bear any relation to the granularity of the bitmap, which is 
-presumably what actually matters.
-
-Logically, either we should iterate at the bitmap granularity here, and 
-the driver just says whether the given iova chunk contains any dirty 
-pages or not, or we just pass everything through to the driver and let 
-it do the whole job itself. Doing a little bit of both is just an 
-overcomplicated mess.
-
-I'm skimming patch #7 and pretty much the same comments apply, so I 
-can't be bothered to repeat them there...
-
-Robin.
-
-> +		if (ret)
-> +			break;
-> +
-> +		pr_debug("dirty_log_sync: iova 0x%lx pagesz 0x%zx\n", iova,
-> +			 pgsize);
-> +
-> +		iova += pgsize;
-> +		size -= pgsize;
-> +	}
-> +
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL_GPL(iommu_sync_dirty_log);
-> +
->   void iommu_get_resv_regions(struct device *dev, struct list_head *list)
->   {
->   	const struct iommu_ops *ops = dev->bus->iommu_ops;
-> diff --git a/include/linux/io-pgtable.h b/include/linux/io-pgtable.h
-> index 754b62a1bbaf..f44551e4a454 100644
-> --- a/include/linux/io-pgtable.h
-> +++ b/include/linux/io-pgtable.h
-> @@ -166,6 +166,10 @@ struct io_pgtable_ops {
->   			      size_t size);
->   	size_t (*merge_page)(struct io_pgtable_ops *ops, unsigned long iova,
->   			     phys_addr_t phys, size_t size, int prot);
-> +	int (*sync_dirty_log)(struct io_pgtable_ops *ops,
-> +			      unsigned long iova, size_t size,
-> +			      unsigned long *bitmap, unsigned long base_iova,
-> +			      unsigned long bitmap_pgshift);
->   };
->   
->   /**
-> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-> index ac2b0b1bce0f..8069c8375e63 100644
-> --- a/include/linux/iommu.h
-> +++ b/include/linux/iommu.h
-> @@ -262,6 +262,10 @@ struct iommu_ops {
->   			      size_t size);
->   	size_t (*merge_page)(struct iommu_domain *domain, unsigned long iova,
->   			     phys_addr_t phys, size_t size, int prot);
-> +	int (*sync_dirty_log)(struct iommu_domain *domain,
-> +			      unsigned long iova, size_t size,
-> +			      unsigned long *bitmap, unsigned long base_iova,
-> +			      unsigned long bitmap_pgshift);
->   
->   	/* Request/Free a list of reserved regions for a device */
->   	void (*get_resv_regions)(struct device *dev, struct list_head *list);
-> @@ -517,6 +521,10 @@ extern size_t iommu_split_block(struct iommu_domain *domain, unsigned long iova,
->   				size_t size);
->   extern size_t iommu_merge_page(struct iommu_domain *domain, unsigned long iova,
->   			       size_t size, int prot);
-> +extern int iommu_sync_dirty_log(struct iommu_domain *domain, unsigned long iova,
-> +				size_t size, unsigned long *bitmap,
-> +				unsigned long base_iova,
-> +				unsigned long bitmap_pgshift);
->   
->   /* Window handling function prototypes */
->   extern int iommu_domain_window_enable(struct iommu_domain *domain, u32 wnd_nr,
-> @@ -923,6 +931,15 @@ static inline size_t iommu_merge_page(struct iommu_domain *domain,
->   	return -EINVAL;
->   }
->   
-> +static inline int iommu_sync_dirty_log(struct iommu_domain *domain,
-> +				       unsigned long iova, size_t size,
-> +				       unsigned long *bitmap,
-> +				       unsigned long base_iova,
-> +				       unsigned long pgshift)
-> +{
-> +	return -EINVAL;
-> +}
-> +
->   static inline int  iommu_device_register(struct iommu_device *iommu)
->   {
->   	return -ENODEV;
+> I don't know any gentle introduction, but there are sections D5.4.11
+> "Hardware management of the Access flag and dirty state" in the ARM
+> Architecture Reference Manual (DDI0487E), and section 3.13 "Translation
+> table entries and Access/Dirty flags" in the SMMU specification
+> (IHI0070C). HTTU stands for "Hardware Translation Table Update".
+> 
+> In short, when HTTU is enabled, the SMMU translation performs an atomic
+> read-modify-write on the leaf translation table descriptor, setting some
+> bits depending on the type of memory access. This can be enabled
+> independently on both stage-1 and stage-2 tables (equivalent to your 1st
+> and 2nd page tables levels, I think).
+> 
+> Thanks,
+> Jean
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> .
 > 
 _______________________________________________
 kvmarm mailing list
