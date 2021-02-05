@@ -2,68 +2,82 @@ Return-Path: <SRS0=/Ra0=HH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.6 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+X-Spam-Status: No, score=-15.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08D35C433E0
-	for <kvmarm@archiver.kernel.org>; Fri,  5 Feb 2021 11:48:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D5FFC433DB
+	for <kvmarm@archiver.kernel.org>; Fri,  5 Feb 2021 13:30:43 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2863464E56
-	for <kvmarm@archiver.kernel.org>; Fri,  5 Feb 2021 11:48:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2863464E56
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id E622464FC2
+	for <kvmarm@archiver.kernel.org>; Fri,  5 Feb 2021 13:30:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E622464FC2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 879984B3C9;
-	Fri,  5 Feb 2021 06:48:41 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 34BD84B3F9;
+	Fri,  5 Feb 2021 08:30:42 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id h+C3hWhX7ZG6; Fri,  5 Feb 2021 06:48:40 -0500 (EST)
+	with ESMTP id K9EY5FkKjf+b; Fri,  5 Feb 2021 08:30:40 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BEAF4B373;
-	Fri,  5 Feb 2021 06:48:40 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AB5DD4B3FA;
+	Fri,  5 Feb 2021 08:30:40 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D865C4B373
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Feb 2021 06:48:38 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DF824B3F2
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Feb 2021 08:30:39 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WOqYvWslHaBq for <kvmarm@lists.cs.columbia.edu>;
- Fri,  5 Feb 2021 06:48:37 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E4BD14B35D
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Feb 2021 06:48:36 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 71CC8ED1;
- Fri,  5 Feb 2021 03:48:36 -0800 (PST)
-Received: from [10.57.49.26] (unknown [10.57.49.26])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5B9C03F719;
- Fri,  5 Feb 2021 03:48:33 -0800 (PST)
-Subject: Re: [RFC PATCH 01/11] iommu/arm-smmu-v3: Add feature detection for
- HTTU
-To: Keqian Zhu <zhukeqian1@huawei.com>, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, iommu@lists.linux-foundation.org,
- Jean-Philippe Brucker <jean-philippe@linaro.org>
-References: <20210128151742.18840-1-zhukeqian1@huawei.com>
- <20210128151742.18840-2-zhukeqian1@huawei.com>
- <f8be5718-d4d9-0565-eaf0-b5a128897d15@arm.com>
- <df1b8fb2-b853-e797-0072-9dbdffc4ff67@huawei.com>
-From: Robin Murphy <robin.murphy@arm.com>
-Message-ID: <5ada4a8b-8852-f83c-040a-9ef5dac51de2@arm.com>
-Date: Fri, 5 Feb 2021 11:48:32 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+ with ESMTP id KSeCh8nlp67a for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  5 Feb 2021 08:30:37 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A6D0C4B3F0
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Feb 2021 08:30:37 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1612531837;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=vkvNzDYx2G5b+4FrrL18Wyy2xuuCwoarafrFqqqu/dA=;
+ b=OFakh7f0y22SOmjPAf7+16PFURJwEvaenh4KNxnLAvrj3AEs9a+HzcynJ3Q98aMAEEJtA8
+ BU+fcBMvuNDRtBCMvlJm+Lk4NK1RHK3BulMKKx8jNnNHzs1CoTgXuuW/MxZ/6/R1XqqETY
+ h8ntel/HuDxGg1YXJCbLQR6Ukszv6cM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-197-VDtSqi4vNMSvjTWcyrFXug-1; Fri, 05 Feb 2021 08:30:33 -0500
+X-MC-Unique: VDtSqi4vNMSvjTWcyrFXug-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BD84D835E20;
+ Fri,  5 Feb 2021 13:30:31 +0000 (UTC)
+Received: from [10.36.113.43] (ovpn-113-43.ams2.redhat.com [10.36.113.43])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EDBB010016FA;
+ Fri,  5 Feb 2021 13:30:29 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v3 11/11] arm64: gic: Use IPI test checking
+ for the LPI tests
+To: Alexandru Elisei <alexandru.elisei@arm.com>, drjones@redhat.com,
+ kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+References: <20210129163647.91564-1-alexandru.elisei@arm.com>
+ <20210129163647.91564-12-alexandru.elisei@arm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <12c8b5a8-b515-64b8-eece-d9d85fb2fe72@redhat.com>
+Date: Fri, 5 Feb 2021 14:30:28 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <df1b8fb2-b853-e797-0072-9dbdffc4ff67@huawei.com>
-Content-Language: en-GB
-Cc: "Tian, Kevin" <kevin.tian@intel.com>, Cornelia Huck <cohuck@redhat.com>,
- Marc Zyngier <maz@kernel.org>, Kirti Wankhede <kwankhede@nvidia.com>,
- lushenming@huawei.com, Alex Williamson <alex.williamson@redhat.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+In-Reply-To: <20210129163647.91564-12-alexandru.elisei@arm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Cc: andre.przywara@arm.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -75,161 +89,412 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2021-02-05 09:13, Keqian Zhu wrote:
-> Hi Robin and Jean,
+Hi Alexandru,
+
+On 1/29/21 5:36 PM, Alexandru Elisei wrote:
+> The LPI code validates a result similarly to the IPI tests, by checking if
+> the target CPU received the interrupt with the expected interrupt number.
+> However, the LPI tests invent their own way of checking the test results by
+> creating a global struct (lpi_stats), using a separate interrupt handler
+> (lpi_handler) and test function (check_lpi_stats).
 > 
-> On 2021/2/5 3:50, Robin Murphy wrote:
->> On 2021-01-28 15:17, Keqian Zhu wrote:
->>> From: jiangkunkun <jiangkunkun@huawei.com>
->>>
->>> The SMMU which supports HTTU (Hardware Translation Table Update) can
->>> update the access flag and the dirty state of TTD by hardware. It is
->>> essential to track dirty pages of DMA.
->>>
->>> This adds feature detection, none functional change.
->>>
->>> Co-developed-by: Keqian Zhu <zhukeqian1@huawei.com>
->>> Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
->>> ---
->>>    drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 16 ++++++++++++++++
->>>    drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h |  8 ++++++++
->>>    include/linux/io-pgtable.h                  |  1 +
->>>    3 files changed, 25 insertions(+)
->>>
->>> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->>> index 8ca7415d785d..0f0fe71cc10d 100644
->>> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->>> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->>> @@ -1987,6 +1987,7 @@ static int arm_smmu_domain_finalise(struct iommu_domain *domain,
->>>            .pgsize_bitmap    = smmu->pgsize_bitmap,
->>>            .ias        = ias,
->>>            .oas        = oas,
->>> +        .httu_hd    = smmu->features & ARM_SMMU_FEAT_HTTU_HD,
->>>            .coherent_walk    = smmu->features & ARM_SMMU_FEAT_COHERENCY,
->>>            .tlb        = &arm_smmu_flush_ops,
->>>            .iommu_dev    = smmu->dev,
->>> @@ -3224,6 +3225,21 @@ static int arm_smmu_device_hw_probe(struct arm_smmu_device *smmu)
->>>        if (reg & IDR0_HYP)
->>>            smmu->features |= ARM_SMMU_FEAT_HYP;
->>>    +    switch (FIELD_GET(IDR0_HTTU, reg)) {
->>
->> We need to accommodate the firmware override as well if we need this to be meaningful. Jean-Philippe is already carrying a suitable patch in the SVA stack[1].
-> Robin, Thanks for pointing it out.
+> There are several areas that can be improved in the LPI code, which are
+> already covered by the IPI tests:
 > 
-> Jean, I see that the IORT HTTU flag overrides the hardware register info unconditionally. I have some concern about it:
+> - check_lpi_stats() doesn't take into account that the target CPU can
+>   receive the correct interrupt multiple times.
+> - check_lpi_stats() doesn't take into the account the scenarios where all
+>   online CPUs can receive the interrupt, but the target CPU is the last CPU
+>   that touches lpi_stats.observed.
+> - Insufficient or missing memory synchronization.
 > 
-> If the override flag has HTTU but hardware doesn't support it, then driver will use this feature but receive access fault or permission fault from SMMU unexpectedly.
-> 1) If IOPF is not supported, then kernel can not work normally.
-> 2) If IOPF is supported, kernel will perform useless actions, such as HTTU based dma dirty tracking (this series).
-
-Yes, if the IORT describes the SMMU incorrectly, things will not work 
-well. Just like if it describes the wrong base address or the wrong 
-interrupt numbers, things will also not work well. The point is that 
-incorrect firmware can be updated in the field fairly easily; incorrect 
-hardware can not.
-
-Say the SMMU designer hard-codes the ID register field to 0x2 because 
-the SMMU itself is capable of HTTU, and they assume it's always going to 
-be wired up coherently, but then a customer integrates it to a 
-non-coherent interconnect. Firmware needs to override that value to 
-prevent an OS thinking that the claimed HTTU capability is ever going to 
-work.
-
-Or say the SMMU *is* integrated correctly, but due to an erratum 
-discovered later in the interconnect or SMMU itself, it turns out DBM 
-doesn't always work reliably, but AF is still OK. Firmware needs to 
-downgrade the indicated level of support from that which was intended to 
-that which works reliably.
-
-Or say someone forgets to set an integration tieoff so their SMMU 
-reports 0x0 even though it and the interconnect *can* happily support 
-HTTU. In that case, firmware may want to upgrade the value to *allow* an 
-OS to use HTTU despite the ID register being wrong.
-
-> As the IORT spec doesn't give an explicit explanation for HTTU override, can we comprehend it as a mask for HTTU related hardware register?
-> So the logic becomes: smmu->feature = HTTU override & IDR0_HTTU;
-
-No, it literally states that the OS must use the value of the firmware 
-field *instead* of the value from the hardware field.
-
->>> +    case IDR0_HTTU_NONE:
->>> +        break;
->>> +    case IDR0_HTTU_HA:
->>> +        smmu->features |= ARM_SMMU_FEAT_HTTU_HA;
->>> +        break;
->>> +    case IDR0_HTTU_HAD:
->>> +        smmu->features |= ARM_SMMU_FEAT_HTTU_HA;
->>> +        smmu->features |= ARM_SMMU_FEAT_HTTU_HD;
->>> +        break;
->>> +    default:
->>> +        dev_err(smmu->dev, "unknown/unsupported HTTU!\n");
->>> +        return -ENXIO;
->>> +    }
->>> +
->>>        /*
->>>         * The coherency feature as set by FW is used in preference to the ID
->>>         * register, but warn on mismatch.
->>> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
->>> index 96c2e9565e00..e91bea44519e 100644
->>> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
->>> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
->>> @@ -33,6 +33,10 @@
->>>    #define IDR0_ASID16            (1 << 12)
->>>    #define IDR0_ATS            (1 << 10)
->>>    #define IDR0_HYP            (1 << 9)
->>> +#define IDR0_HTTU            GENMASK(7, 6)
->>> +#define IDR0_HTTU_NONE            0
->>> +#define IDR0_HTTU_HA            1
->>> +#define IDR0_HTTU_HAD            2
->>>    #define IDR0_COHACC            (1 << 4)
->>>    #define IDR0_TTF            GENMASK(3, 2)
->>>    #define IDR0_TTF_AARCH64        2
->>> @@ -286,6 +290,8 @@
->>>    #define CTXDESC_CD_0_TCR_TBI0        (1ULL << 38)
->>>      #define CTXDESC_CD_0_AA64        (1UL << 41)
->>> +#define CTXDESC_CD_0_HD            (1UL << 42)
->>> +#define CTXDESC_CD_0_HA            (1UL << 43)
->>>    #define CTXDESC_CD_0_S            (1UL << 44)
->>>    #define CTXDESC_CD_0_R            (1UL << 45)
->>>    #define CTXDESC_CD_0_A            (1UL << 46)
->>> @@ -604,6 +610,8 @@ struct arm_smmu_device {
->>>    #define ARM_SMMU_FEAT_RANGE_INV        (1 << 15)
->>>    #define ARM_SMMU_FEAT_BTM        (1 << 16)
->>>    #define ARM_SMMU_FEAT_SVA        (1 << 17)
->>> +#define ARM_SMMU_FEAT_HTTU_HA        (1 << 18)
->>> +#define ARM_SMMU_FEAT_HTTU_HD        (1 << 19)
->>>        u32                features;
->>>      #define ARM_SMMU_OPT_SKIP_PREFETCH    (1 << 0)
->>> diff --git a/include/linux/io-pgtable.h b/include/linux/io-pgtable.h
->>> index ea727eb1a1a9..1a00ea8562c7 100644
->>> --- a/include/linux/io-pgtable.h
->>> +++ b/include/linux/io-pgtable.h
->>> @@ -97,6 +97,7 @@ struct io_pgtable_cfg {
->>>        unsigned long            pgsize_bitmap;
->>>        unsigned int            ias;
->>>        unsigned int            oas;
->>> +    bool                httu_hd;
->>
->> This is very specific to the AArch64 stage 1 format, not a generic capability - I think it should be a quirk flag rather than a common field.
-> OK, so BBML should be a quirk flag too?
+> Instead of duplicating code, let's convert the LPI tests to use
+> check_acked() and the same interrupt handler as the IPI tests, which has
+> been renamed to irq_handler() to avoid any confusion.
 > 
-> Though the word "quirk" is not suitable for HTTU and BBML, we have no other place to convey smmu feature to io-pgtable.
+> check_lpi_stats() has been replaced with check_acked() which, together with
+> using irq_handler(), instantly gives us more correctness checks and proper
+> memory synchronization between threads. lpi_stats.expected has been
+> replaced by the CPU mask and the expected interrupt number arguments to
+> check_acked(), with no change in semantics.
+> 
+> lpi_handler() aborted the test if the interrupt number was not an LPI. This
+> was changed in favor of allowing the test to continue, as it will fail in
+> check_acked(), but possibly print information useful for debugging. If the
+> test receives spurious interrupts, those are reported via report_info() at
+> the end of the test for consistency with the IPI tests, which don't treat
+> spurious interrupts as critical errors.
+> 
+> In the spirit of code reuse, secondary_lpi_tests() has been replaced with
+> ipi_recv() because the two are now identical; ipi_recv() has been renamed
+> to irq_recv(), similarly to irq_handler(), to avoid confusion.
+> 
+> CC: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>  arm/gic.c | 190 +++++++++++++++++++++++++-----------------------------
+>  1 file changed, 87 insertions(+), 103 deletions(-)
+> 
+> diff --git a/arm/gic.c b/arm/gic.c
+> index 8bc2a35908f2..42048436c4c1 100644
+> --- a/arm/gic.c
+> +++ b/arm/gic.c
+> @@ -105,13 +105,12 @@ static bool check_acked(cpumask_t *mask, int sender, int irqnum)
+>  				++missing;
+>  			else if (acked[cpu] > 1)
+>  				++extra;
+> -		} else {
+> -			if (acked[cpu])
+> +		} else if (acked[cpu]) {
+>  				++unexpected;
+>  		}
+>  		if (!acked[cpu])
+>  			continue;
+> -		smp_rmb(); /* pairs with smp_wmb in ipi_handler */
+> +		smp_rmb(); /* pairs with smp_wmb in irq_handler */
+>  
+>  		if (has_gicv2 && irq_sender[cpu] != sender) {
+>  			report_info("cpu%d received IPI from wrong sender %d",
+> @@ -149,11 +148,12 @@ static void check_spurious(void)
+>  static int gic_get_sender(int irqstat)
+>  {
+>  	if (gic_version() == 2)
+> +		/* GICC_IAR.CPUID is RAZ for non-SGIs */
+>  		return (irqstat >> 10) & 7;
+>  	return -1;
+>  }
+>  
+> -static void ipi_handler(struct pt_regs *regs __unused)
+> +static void irq_handler(struct pt_regs *regs __unused)
+>  {
+>  	u32 irqstat = gic_read_iar();
+>  	u32 irqnr = gic_iar_irqnr(irqstat);
+> @@ -185,75 +185,6 @@ static void setup_irq(irq_handler_fn handler)
+>  }
+>  
+>  #if defined(__aarch64__)
+> -struct its_event {
+> -	int cpu_id;
+> -	int lpi_id;
+> -};
+> -
+> -struct its_stats {
+> -	struct its_event expected;
+> -	struct its_event observed;
+> -};
+> -
+> -static struct its_stats lpi_stats;
+> -
+> -static void lpi_handler(struct pt_regs *regs __unused)
+> -{
+> -	u32 irqstat = gic_read_iar();
+> -	int irqnr = gic_iar_irqnr(irqstat);
+> -
+> -	gic_write_eoir(irqstat);
+> -	assert(irqnr >= 8192);
+> -	smp_rmb(); /* pairs with wmb in lpi_stats_expect */
+> -	lpi_stats.observed.cpu_id = smp_processor_id();
+> -	lpi_stats.observed.lpi_id = irqnr;
+> -	acked[lpi_stats.observed.cpu_id]++;
+> -	smp_wmb(); /* pairs with rmb in check_lpi_stats */
+> -}
+> -
+> -static void lpi_stats_expect(int exp_cpu_id, int exp_lpi_id)
+> -{
+> -	lpi_stats.expected.cpu_id = exp_cpu_id;
+> -	lpi_stats.expected.lpi_id = exp_lpi_id;
+> -	lpi_stats.observed.cpu_id = -1;
+> -	lpi_stats.observed.lpi_id = -1;
+> -	smp_wmb(); /* pairs with rmb in handler */
+> -}
+> -
+> -static void check_lpi_stats(const char *msg)
+> -{
+> -	int i;
+> -
+> -	for (i = 0; i < 50; i++) {
+> -		mdelay(100);
+> -		smp_rmb(); /* pairs with wmb in lpi_handler */
+> -		if (lpi_stats.observed.cpu_id == lpi_stats.expected.cpu_id &&
+> -		    lpi_stats.observed.lpi_id == lpi_stats.expected.lpi_id) {
+> -			report(true, "%s", msg);
+> -			return;
+> -		}
+> -	}
+> -
+> -	if (lpi_stats.observed.cpu_id == -1 && lpi_stats.observed.lpi_id == -1) {
+> -		report_info("No LPI received whereas (cpuid=%d, intid=%d) "
+> -			    "was expected", lpi_stats.expected.cpu_id,
+> -			    lpi_stats.expected.lpi_id);
+> -	} else {
+> -		report_info("Unexpected LPI (cpuid=%d, intid=%d)",
+> -			    lpi_stats.observed.cpu_id,
+> -			    lpi_stats.observed.lpi_id);
+> -	}
+> -	report(false, "%s", msg);
+> -}
+> -
+> -static void secondary_lpi_test(void)
+> -{
+> -	setup_irq(lpi_handler);
+> -	cpumask_set_cpu(smp_processor_id(), &ready);
+> -	while (1)
+> -		wfi();
+> -}
+> -
+>  static void check_lpi_hits(int *expected, const char *msg)
+>  {
+>  	bool pass = true;
+> @@ -347,7 +278,7 @@ static void ipi_test_smp(void)
+>  
+>  static void ipi_send(void)
+>  {
+> -	setup_irq(ipi_handler);
+> +	setup_irq(irq_handler);
+>  	wait_on_ready();
+>  	ipi_test_self();
+>  	ipi_test_smp();
+> @@ -355,9 +286,9 @@ static void ipi_send(void)
+>  	exit(report_summary());
+>  }
+>  
+> -static void ipi_recv(void)
+> +static void irq_recv(void)
+>  {
+> -	setup_irq(ipi_handler);
+> +	setup_irq(irq_handler);
+>  	cpumask_set_cpu(smp_processor_id(), &ready);
+>  	while (1)
+>  		wfi();
+> @@ -368,7 +299,7 @@ static void ipi_test(void *data __unused)
+>  	if (smp_processor_id() == IPI_SENDER)
+>  		ipi_send();
+>  	else
+> -		ipi_recv();
+> +		irq_recv();
+>  }
+>  
+>  static struct gic gicv2 = {
+> @@ -696,14 +627,12 @@ static int its_prerequisites(int nb_cpus)
+>  		return -1;
+>  	}
+>  
+> -	stats_reset();
+> -
+> -	setup_irq(lpi_handler);
+> +	setup_irq(irq_handler);
+>  
+>  	for_each_present_cpu(cpu) {
+>  		if (cpu == 0)
+>  			continue;
+> -		smp_boot_secondary(cpu, secondary_lpi_test);
+> +		smp_boot_secondary(cpu, irq_recv);
+>  	}
+>  	wait_on_ready();
+>  
+> @@ -757,6 +686,7 @@ static void test_its_trigger(void)
+>  {
+>  	struct its_collection *col3;
+>  	struct its_device *dev2, *dev7;
+> +	cpumask_t mask;
+>  
+>  	if (its_setup1())
+>  		return;
+> @@ -767,13 +697,21 @@ static void test_its_trigger(void)
+>  
+>  	report_prefix_push("int");
+>  
+> -	lpi_stats_expect(3, 8195);
+> +	stats_reset();
+> +	cpumask_clear(&mask);
+> +	cpumask_set_cpu(3, &mask);
+>  	its_send_int(dev2, 20);
+> -	check_lpi_stats("dev=2, eventid=20  -> lpi= 8195, col=3");
+> +	wait_for_interrupts(&mask);
+> +	report(check_acked(&mask, 0, 8195),
+> +			"dev=2, eventid=20  -> lpi= 8195, col=3");
+>  
+> -	lpi_stats_expect(2, 8196);
+> +	stats_reset();
+> +	cpumask_clear(&mask);
+> +	cpumask_set_cpu(2, &mask);
+>  	its_send_int(dev7, 255);
+> -	check_lpi_stats("dev=7, eventid=255 -> lpi= 8196, col=2");
+> +	wait_for_interrupts(&mask);
+> +	report(check_acked(&mask, 0, 8196),
+> +			"dev=7, eventid=255 -> lpi= 8196, col=2");
+>  
+>  	report_prefix_pop();
+>  
+> @@ -786,9 +724,12 @@ static void test_its_trigger(void)
+>  	gicv3_lpi_set_config(8195, LPI_PROP_DEFAULT & ~LPI_PROP_ENABLED);
+>  	its_send_inv(dev2, 20);
+>  
+> -	lpi_stats_expect(-1, -1);
+> +	stats_reset();
+> +	cpumask_clear(&mask);
+>  	its_send_int(dev2, 20);
+> -	check_lpi_stats("dev2/eventid=20 does not trigger any LPI");
+> +	wait_for_interrupts(&mask);
+> +	report(check_acked(&mask, -1, -1),
+> +			"dev2/eventid=20 does not trigger any LPI");
+>  
+>  	/*
+>  	 * re-enable the LPI but willingly do not call invall
+> @@ -796,18 +737,31 @@ static void test_its_trigger(void)
+>  	 * The LPI should not hit
+>  	 */
+>  	gicv3_lpi_set_config(8195, LPI_PROP_DEFAULT);
+> -	lpi_stats_expect(-1, -1);
+> +	stats_reset();
+> +	cpumask_clear(&mask);
+>  	its_send_int(dev2, 20);
+> -	check_lpi_stats("dev2/eventid=20 still does not trigger any LPI");
+> +	wait_for_interrupts(&mask);
+> +	report(check_acked(&mask, -1, -1),
+> +			"dev2/eventid=20 still does not trigger any LPI");
+>  
+>  	/* Now call the invall and check the LPI hits */
+> +	stats_reset();
+> +	/* The barrier is from its_send_int() */
+> +	wmb();
+In v1 it was envisionned to add the wmb in __its_send_it but I fail to
+see it. Is it implicit in some way?
 
-Indeed these features aren't decorative grooves on a piece of furniture, 
-but in the case of io-pgtable we're merely using "quirk" in its broadest 
-sense to imply something that differs from the baseline default 
-behaviour - ARM_MTK_EXT, ARM_TTBR1 and ARM_OUTER_WBWA (or whatever it's 
-called this week) are all just indicating extra hardware features 
-entirely comparable to HTTU; NON_STRICT is describing a similarly 
-intentional and desired software behaviour. In fact only ARM_NS 
-represents something that could be considered a "workaround".
+Thanks
 
-Robin.
+Eric
+> +	cpumask_clear(&mask);
+> +	cpumask_set_cpu(3, &mask);
+>  	its_send_invall(col3);
+> -	lpi_stats_expect(3, 8195);
+> -	check_lpi_stats("dev2/eventid=20 pending LPI is received");
+> +	wait_for_interrupts(&mask);
+> +	report(check_acked(&mask, 0, 8195),
+> +			"dev2/eventid=20 pending LPI is received");
+>  
+> -	lpi_stats_expect(3, 8195);
+> +	stats_reset();
+> +	cpumask_clear(&mask);
+> +	cpumask_set_cpu(3, &mask);
+>  	its_send_int(dev2, 20);
+> -	check_lpi_stats("dev2/eventid=20 now triggers an LPI");
+> +	wait_for_interrupts(&mask);
+> +	report(check_acked(&mask, 0, 8195),
+> +			"dev2/eventid=20 now triggers an LPI");
+>  
+>  	report_prefix_pop();
+>  
+> @@ -818,9 +772,13 @@ static void test_its_trigger(void)
+>  	 */
+>  
+>  	its_send_mapd(dev2, false);
+> -	lpi_stats_expect(-1, -1);
+> +	stats_reset();
+> +	cpumask_clear(&mask);
+>  	its_send_int(dev2, 20);
+> -	check_lpi_stats("no LPI after device unmap");
+> +	wait_for_interrupts(&mask);
+> +	report(check_acked(&mask, -1, -1), "no LPI after device unmap");
+> +
+> +	check_spurious();
+>  	report_prefix_pop();
+>  }
+>  
+> @@ -828,6 +786,7 @@ static void test_its_migration(void)
+>  {
+>  	struct its_device *dev2, *dev7;
+>  	bool test_skipped = false;
+> +	cpumask_t mask;
+>  
+>  	if (its_setup1()) {
+>  		test_skipped = true;
+> @@ -844,13 +803,23 @@ do_migrate:
+>  	if (test_skipped)
+>  		return;
+>  
+> -	lpi_stats_expect(3, 8195);
+> +	stats_reset();
+> +	cpumask_clear(&mask);
+> +	cpumask_set_cpu(3, &mask);
+>  	its_send_int(dev2, 20);
+> -	check_lpi_stats("dev2/eventid=20 triggers LPI 8195 on PE #3 after migration");
+> +	wait_for_interrupts(&mask);
+> +	report(check_acked(&mask, 0, 8195),
+> +			"dev2/eventid=20 triggers LPI 8195 on PE #3 after migration");
+>  
+> -	lpi_stats_expect(2, 8196);
+> +	stats_reset();
+> +	cpumask_clear(&mask);
+> +	cpumask_set_cpu(2, &mask);
+>  	its_send_int(dev7, 255);
+> -	check_lpi_stats("dev7/eventid=255 triggers LPI 8196 on PE #2 after migration");
+> +	wait_for_interrupts(&mask);
+> +	report(check_acked(&mask, 0, 8196),
+> +			"dev7/eventid=255 triggers LPI 8196 on PE #2 after migration");
+> +
+> +	check_spurious();
+>  }
+>  
+>  #define ERRATA_UNMAPPED_COLLECTIONS "ERRATA_8c58be34494b"
+> @@ -860,6 +829,7 @@ static void test_migrate_unmapped_collection(void)
+>  	struct its_collection *col = NULL;
+>  	struct its_device *dev2 = NULL, *dev7 = NULL;
+>  	bool test_skipped = false;
+> +	cpumask_t mask;
+>  	int pe0 = 0;
+>  	u8 config;
+>  
+> @@ -894,17 +864,27 @@ do_migrate:
+>  	its_send_mapc(col, true);
+>  	its_send_invall(col);
+>  
+> -	lpi_stats_expect(2, 8196);
+> +	stats_reset();
+> +	cpumask_clear(&mask);
+> +	cpumask_set_cpu(2, &mask);
+>  	its_send_int(dev7, 255);
+> -	check_lpi_stats("dev7/eventid= 255 triggered LPI 8196 on PE #2");
+> +	wait_for_interrupts(&mask);
+> +	report(check_acked(&mask, 0, 8196),
+> +			"dev7/eventid= 255 triggered LPI 8196 on PE #2");
+>  
+>  	config = gicv3_lpi_get_config(8192);
+>  	report(config == LPI_PROP_DEFAULT,
+>  	       "Config of LPI 8192 was properly migrated");
+>  
+> -	lpi_stats_expect(pe0, 8192);
+> +	stats_reset();
+> +	cpumask_clear(&mask);
+> +	cpumask_set_cpu(pe0, &mask);
+>  	its_send_int(dev2, 0);
+> -	check_lpi_stats("dev2/eventid = 0 triggered LPI 8192 on PE0");
+> +	wait_for_interrupts(&mask);
+> +	report(check_acked(&mask, 0, 8192),
+> +			"dev2/eventid = 0 triggered LPI 8192 on PE0");
+> +
+> +	check_spurious();
+>  }
+>  
+>  static void test_its_pending_migration(void)
+> @@ -961,6 +941,10 @@ static void test_its_pending_migration(void)
+>  	pendbaser = readq(ptr);
+>  	writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
+>  
+> +	/*
+> +	 * Reset and initialization values for acked are the same, so we don't
+> +	 * need to explicitely call stats_reset().
+> +	 */
+>  	gicv3_lpi_rdist_enable(pe0);
+>  	gicv3_lpi_rdist_enable(pe1);
+>  
+> 
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
