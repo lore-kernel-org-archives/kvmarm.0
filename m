@@ -2,70 +2,72 @@ Return-Path: <SRS0=/Ra0=HH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.6 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0906C433E0
-	for <kvmarm@archiver.kernel.org>; Fri,  5 Feb 2021 16:11:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44A60C433E0
+	for <kvmarm@archiver.kernel.org>; Fri,  5 Feb 2021 16:35:35 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DBBE364F8C
-	for <kvmarm@archiver.kernel.org>; Fri,  5 Feb 2021 16:11:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBBE364F8C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 9525064EAC
+	for <kvmarm@archiver.kernel.org>; Fri,  5 Feb 2021 16:35:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9525064EAC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 442274B423;
-	Fri,  5 Feb 2021 11:11:15 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 19C314B42D;
+	Fri,  5 Feb 2021 11:35:34 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id yNpEcP-TeAG8; Fri,  5 Feb 2021 11:11:13 -0500 (EST)
+	with ESMTP id 4DxSi-brDOQh; Fri,  5 Feb 2021 11:35:32 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AE23A4B3CA;
-	Fri,  5 Feb 2021 11:11:13 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3299D4B43C;
+	Fri,  5 Feb 2021 11:35:32 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C785D4B41A
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Feb 2021 11:11:12 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E7BEC4B43A
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Feb 2021 11:35:30 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BSSWpraNrtJt for <kvmarm@lists.cs.columbia.edu>;
- Fri,  5 Feb 2021 11:11:11 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 169BC4B3CA
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Feb 2021 11:11:11 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8AD8431B;
- Fri,  5 Feb 2021 08:11:10 -0800 (PST)
-Received: from [10.57.49.26] (unknown [10.57.49.26])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 60A403F719;
- Fri,  5 Feb 2021 08:11:07 -0800 (PST)
-Subject: Re: [RFC PATCH 01/11] iommu/arm-smmu-v3: Add feature detection for
- HTTU
-From: Robin Murphy <robin.murphy@arm.com>
-To: Keqian Zhu <zhukeqian1@huawei.com>, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, iommu@lists.linux-foundation.org,
- Jean-Philippe Brucker <jean-philippe@linaro.org>
-References: <20210128151742.18840-1-zhukeqian1@huawei.com>
- <20210128151742.18840-2-zhukeqian1@huawei.com>
- <f8be5718-d4d9-0565-eaf0-b5a128897d15@arm.com>
- <df1b8fb2-b853-e797-0072-9dbdffc4ff67@huawei.com>
- <5ada4a8b-8852-f83c-040a-9ef5dac51de2@arm.com>
-Message-ID: <94375ed6-1e25-b592-8bb0-e433e7a09b4c@arm.com>
-Date: Fri, 5 Feb 2021 16:11:06 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+ with ESMTP id GPDh1j+W1mAB for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  5 Feb 2021 11:35:29 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A4B934B439
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Feb 2021 11:35:29 -0500 (EST)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 5406D64EA1;
+ Fri,  5 Feb 2021 16:35:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1612542928;
+ bh=u1co/FGUat5HAI0yiGhQV5noHY+wEidod999P0y8ViM=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=MsQqI2OprR5K8XBTnraMicQl74H5xko+0MMnyykPyvgI9YrKYFCMFR/RtXsed/BzW
+ SXFgRKhNWXw95Eottebxi8Ys+xK+Un6T+rySi2SADXZkfJ17awPDHIum6UkEx2KPyt
+ XV38tn5MTx/hI14KD2VQ115CqZ7ZM2O2BQ1UiGxg+303PJncao1khjzgecRuAD1s0f
+ w9zp6SkM4B3keN4/XtsmmrgzhZskd8LXV9Q8Zd+8dHU6iH7Ec1kTLjBWKr7z0BQ/GK
+ 4nKiMN7r+Yx8pK2Frh3LJSDnqhawCmXJAYzb/UUg8EqSneIZQtgoo4ywTiFGPX89WF
+ lbdNOWOrgjWlw==
+Date: Fri, 5 Feb 2021 16:35:21 +0000
+From: Will Deacon <will@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v6 12/21] arm64: cpufeature: Add an early command-line
+ cpufeature override facility
+Message-ID: <20210205163521.GA22665@willie-the-truck>
+References: <20210201115637.3123740-1-maz@kernel.org>
+ <20210201115637.3123740-13-maz@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <5ada4a8b-8852-f83c-040a-9ef5dac51de2@arm.com>
-Content-Language: en-GB
-Cc: "Tian, Kevin" <kevin.tian@intel.com>, Marc Zyngier <maz@kernel.org>,
- Cornelia Huck <cohuck@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>, lushenming@huawei.com,
- Kirti Wankhede <kwankhede@nvidia.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20210201115637.3123740-13-maz@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: Prasad Sodagudi <psodagud@codeaurora.org>,
+ Srinivas Ramana <sramana@codeaurora.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+ Ard Biesheuvel <ardb@kernel.org>, Ajay Patil <pajay@qti.qualcomm.com>,
+ kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -77,164 +79,125 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gMjAyMS0wMi0wNSAxMTo0OCwgUm9iaW4gTXVycGh5IHdyb3RlOgo+IE9uIDIwMjEtMDItMDUg
-MDk6MTMsIEtlcWlhbiBaaHUgd3JvdGU6Cj4+IEhpIFJvYmluIGFuZCBKZWFuLAo+Pgo+PiBPbiAy
-MDIxLzIvNSAzOjUwLCBSb2JpbiBNdXJwaHkgd3JvdGU6Cj4+PiBPbiAyMDIxLTAxLTI4IDE1OjE3
-LCBLZXFpYW4gWmh1IHdyb3RlOgo+Pj4+IEZyb206IGppYW5na3Vua3VuIDxqaWFuZ2t1bmt1bkBo
-dWF3ZWkuY29tPgo+Pj4+Cj4+Pj4gVGhlIFNNTVUgd2hpY2ggc3VwcG9ydHMgSFRUVSAoSGFyZHdh
-cmUgVHJhbnNsYXRpb24gVGFibGUgVXBkYXRlKSBjYW4KPj4+PiB1cGRhdGUgdGhlIGFjY2VzcyBm
-bGFnIGFuZCB0aGUgZGlydHkgc3RhdGUgb2YgVFREIGJ5IGhhcmR3YXJlLiBJdCBpcwo+Pj4+IGVz
-c2VudGlhbCB0byB0cmFjayBkaXJ0eSBwYWdlcyBvZiBETUEuCj4+Pj4KPj4+PiBUaGlzIGFkZHMg
-ZmVhdHVyZSBkZXRlY3Rpb24sIG5vbmUgZnVuY3Rpb25hbCBjaGFuZ2UuCj4+Pj4KPj4+PiBDby1k
-ZXZlbG9wZWQtYnk6IEtlcWlhbiBaaHUgPHpodWtlcWlhbjFAaHVhd2VpLmNvbT4KPj4+PiBTaWdu
-ZWQtb2ZmLWJ5OiBLdW5rdW4gSmlhbmcgPGppYW5na3Vua3VuQGh1YXdlaS5jb20+Cj4+Pj4gLS0t
-Cj4+Pj4gwqDCoCBkcml2ZXJzL2lvbW11L2FybS9hcm0tc21tdS12My9hcm0tc21tdS12My5jIHwg
-MTYgKysrKysrKysrKysrKysrKwo+Pj4+IMKgwqAgZHJpdmVycy9pb21tdS9hcm0vYXJtLXNtbXUt
-djMvYXJtLXNtbXUtdjMuaCB8wqAgOCArKysrKysrKwo+Pj4+IMKgwqAgaW5jbHVkZS9saW51eC9p
-by1wZ3RhYmxlLmjCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHzCoCAxICsKPj4+
-PiDCoMKgIDMgZmlsZXMgY2hhbmdlZCwgMjUgaW5zZXJ0aW9ucygrKQo+Pj4+Cj4+Pj4gZGlmZiAt
-LWdpdCBhL2RyaXZlcnMvaW9tbXUvYXJtL2FybS1zbW11LXYzL2FybS1zbW11LXYzLmMgCj4+Pj4g
-Yi9kcml2ZXJzL2lvbW11L2FybS9hcm0tc21tdS12My9hcm0tc21tdS12My5jCj4+Pj4gaW5kZXgg
-OGNhNzQxNWQ3ODVkLi4wZjBmZTcxY2MxMGQgMTAwNjQ0Cj4+Pj4gLS0tIGEvZHJpdmVycy9pb21t
-dS9hcm0vYXJtLXNtbXUtdjMvYXJtLXNtbXUtdjMuYwo+Pj4+ICsrKyBiL2RyaXZlcnMvaW9tbXUv
-YXJtL2FybS1zbW11LXYzL2FybS1zbW11LXYzLmMKPj4+PiBAQCAtMTk4Nyw2ICsxOTg3LDcgQEAg
-c3RhdGljIGludCBhcm1fc21tdV9kb21haW5fZmluYWxpc2Uoc3RydWN0IAo+Pj4+IGlvbW11X2Rv
-bWFpbiAqZG9tYWluLAo+Pj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgIC5wZ3NpemVfYml0bWFwwqDC
-oMKgID0gc21tdS0+cGdzaXplX2JpdG1hcCwKPj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoCAuaWFz
-wqDCoMKgwqDCoMKgwqAgPSBpYXMsCj4+Pj4gwqDCoMKgwqDCoMKgwqDCoMKgwqAgLm9hc8KgwqDC
-oMKgwqDCoMKgID0gb2FzLAo+Pj4+ICvCoMKgwqDCoMKgwqDCoCAuaHR0dV9oZMKgwqDCoCA9IHNt
-bXUtPmZlYXR1cmVzICYgQVJNX1NNTVVfRkVBVF9IVFRVX0hELAo+Pj4+IMKgwqDCoMKgwqDCoMKg
-wqDCoMKgIC5jb2hlcmVudF93YWxrwqDCoMKgID0gc21tdS0+ZmVhdHVyZXMgJiAKPj4+PiBBUk1f
-U01NVV9GRUFUX0NPSEVSRU5DWSwKPj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoCAudGxiwqDCoMKg
-wqDCoMKgwqAgPSAmYXJtX3NtbXVfZmx1c2hfb3BzLAo+Pj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKg
-IC5pb21tdV9kZXbCoMKgwqAgPSBzbW11LT5kZXYsCj4+Pj4gQEAgLTMyMjQsNiArMzIyNSwyMSBA
-QCBzdGF0aWMgaW50IGFybV9zbW11X2RldmljZV9od19wcm9iZShzdHJ1Y3QgCj4+Pj4gYXJtX3Nt
-bXVfZGV2aWNlICpzbW11KQo+Pj4+IMKgwqDCoMKgwqDCoCBpZiAocmVnICYgSURSMF9IWVApCj4+
-Pj4gwqDCoMKgwqDCoMKgwqDCoMKgwqAgc21tdS0+ZmVhdHVyZXMgfD0gQVJNX1NNTVVfRkVBVF9I
-WVA7Cj4+Pj4gwqDCoCArwqDCoMKgIHN3aXRjaCAoRklFTERfR0VUKElEUjBfSFRUVSwgcmVnKSkg
-ewo+Pj4KPj4+IFdlIG5lZWQgdG8gYWNjb21tb2RhdGUgdGhlIGZpcm13YXJlIG92ZXJyaWRlIGFz
-IHdlbGwgaWYgd2UgbmVlZCB0aGlzIAo+Pj4gdG8gYmUgbWVhbmluZ2Z1bC4gSmVhbi1QaGlsaXBw
-ZSBpcyBhbHJlYWR5IGNhcnJ5aW5nIGEgc3VpdGFibGUgcGF0Y2ggCj4+PiBpbiB0aGUgU1ZBIHN0
-YWNrWzFdLgo+PiBSb2JpbiwgVGhhbmtzIGZvciBwb2ludGluZyBpdCBvdXQuCj4+Cj4+IEplYW4s
-IEkgc2VlIHRoYXQgdGhlIElPUlQgSFRUVSBmbGFnIG92ZXJyaWRlcyB0aGUgaGFyZHdhcmUgcmVn
-aXN0ZXIgCj4+IGluZm8gdW5jb25kaXRpb25hbGx5LiBJIGhhdmUgc29tZSBjb25jZXJuIGFib3V0
-IGl0Ogo+Pgo+PiBJZiB0aGUgb3ZlcnJpZGUgZmxhZyBoYXMgSFRUVSBidXQgaGFyZHdhcmUgZG9l
-c24ndCBzdXBwb3J0IGl0LCB0aGVuIAo+PiBkcml2ZXIgd2lsbCB1c2UgdGhpcyBmZWF0dXJlIGJ1
-dCByZWNlaXZlIGFjY2VzcyBmYXVsdCBvciBwZXJtaXNzaW9uIAo+PiBmYXVsdCBmcm9tIFNNTVUg
-dW5leHBlY3RlZGx5Lgo+PiAxKSBJZiBJT1BGIGlzIG5vdCBzdXBwb3J0ZWQsIHRoZW4ga2VybmVs
-IGNhbiBub3Qgd29yayBub3JtYWxseS4KPj4gMikgSWYgSU9QRiBpcyBzdXBwb3J0ZWQsIGtlcm5l
-bCB3aWxsIHBlcmZvcm0gdXNlbGVzcyBhY3Rpb25zLCBzdWNoIGFzIAo+PiBIVFRVIGJhc2VkIGRt
-YSBkaXJ0eSB0cmFja2luZyAodGhpcyBzZXJpZXMpLgo+IAo+IFllcywgaWYgdGhlIElPUlQgZGVz
-Y3JpYmVzIHRoZSBTTU1VIGluY29ycmVjdGx5LCB0aGluZ3Mgd2lsbCBub3Qgd29yayAKPiB3ZWxs
-LiBKdXN0IGxpa2UgaWYgaXQgZGVzY3JpYmVzIHRoZSB3cm9uZyBiYXNlIGFkZHJlc3Mgb3IgdGhl
-IHdyb25nIAo+IGludGVycnVwdCBudW1iZXJzLCB0aGluZ3Mgd2lsbCBhbHNvIG5vdCB3b3JrIHdl
-bGwuIFRoZSBwb2ludCBpcyB0aGF0IAo+IGluY29ycmVjdCBmaXJtd2FyZSBjYW4gYmUgdXBkYXRl
-ZCBpbiB0aGUgZmllbGQgZmFpcmx5IGVhc2lseTsgaW5jb3JyZWN0IAo+IGhhcmR3YXJlIGNhbiBu
-b3QuCj4gCj4gU2F5IHRoZSBTTU1VIGRlc2lnbmVyIGhhcmQtY29kZXMgdGhlIElEIHJlZ2lzdGVy
-IGZpZWxkIHRvIDB4MiBiZWNhdXNlIAo+IHRoZSBTTU1VIGl0c2VsZiBpcyBjYXBhYmxlIG9mIEhU
-VFUsIGFuZCB0aGV5IGFzc3VtZSBpdCdzIGFsd2F5cyBnb2luZyB0byAKPiBiZSB3aXJlZCB1cCBj
-b2hlcmVudGx5LCBidXQgdGhlbiBhIGN1c3RvbWVyIGludGVncmF0ZXMgaXQgdG8gYSAKPiBub24t
-Y29oZXJlbnQgaW50ZXJjb25uZWN0LiBGaXJtd2FyZSBuZWVkcyB0byBvdmVycmlkZSB0aGF0IHZh
-bHVlIHRvIAo+IHByZXZlbnQgYW4gT1MgdGhpbmtpbmcgdGhhdCB0aGUgY2xhaW1lZCBIVFRVIGNh
-cGFiaWxpdHkgaXMgZXZlciBnb2luZyB0byAKPiB3b3JrLgo+IAo+IE9yIHNheSB0aGUgU01NVSAq
-aXMqIGludGVncmF0ZWQgY29ycmVjdGx5LCBidXQgZHVlIHRvIGFuIGVycmF0dW0gCj4gZGlzY292
-ZXJlZCBsYXRlciBpbiB0aGUgaW50ZXJjb25uZWN0IG9yIFNNTVUgaXRzZWxmLCBpdCB0dXJucyBv
-dXQgREJNIAo+IGRvZXNuJ3QgYWx3YXlzIHdvcmsgcmVsaWFibHksIGJ1dCBBRiBpcyBzdGlsbCBP
-Sy4gRmlybXdhcmUgbmVlZHMgdG8gCj4gZG93bmdyYWRlIHRoZSBpbmRpY2F0ZWQgbGV2ZWwgb2Yg
-c3VwcG9ydCBmcm9tIHRoYXQgd2hpY2ggd2FzIGludGVuZGVkIHRvIAo+IHRoYXQgd2hpY2ggd29y
-a3MgcmVsaWFibHkuCj4gCj4gT3Igc2F5IHNvbWVvbmUgZm9yZ2V0cyB0byBzZXQgYW4gaW50ZWdy
-YXRpb24gdGllb2ZmIHNvIHRoZWlyIFNNTVUgCj4gcmVwb3J0cyAweDAgZXZlbiB0aG91Z2ggaXQg
-YW5kIHRoZSBpbnRlcmNvbm5lY3QgKmNhbiogaGFwcGlseSBzdXBwb3J0IAo+IEhUVFUuIEluIHRo
-YXQgY2FzZSwgZmlybXdhcmUgbWF5IHdhbnQgdG8gdXBncmFkZSB0aGUgdmFsdWUgdG8gKmFsbG93
-KiBhbiAKPiBPUyB0byB1c2UgSFRUVSBkZXNwaXRlIHRoZSBJRCByZWdpc3RlciBiZWluZyB3cm9u
-Zy4KPiAKPj4gQXMgdGhlIElPUlQgc3BlYyBkb2Vzbid0IGdpdmUgYW4gZXhwbGljaXQgZXhwbGFu
-YXRpb24gZm9yIEhUVFUgCj4+IG92ZXJyaWRlLCBjYW4gd2UgY29tcHJlaGVuZCBpdCBhcyBhIG1h
-c2sgZm9yIEhUVFUgcmVsYXRlZCBoYXJkd2FyZSAKPj4gcmVnaXN0ZXI/Cj4+IFNvIHRoZSBsb2dp
-YyBiZWNvbWVzOiBzbW11LT5mZWF0dXJlID0gSFRUVSBvdmVycmlkZSAmIElEUjBfSFRUVTsKPiAK
-PiBObywgaXQgbGl0ZXJhbGx5IHN0YXRlcyB0aGF0IHRoZSBPUyBtdXN0IHVzZSB0aGUgdmFsdWUg
-b2YgdGhlIGZpcm13YXJlIAo+IGZpZWxkICppbnN0ZWFkKiBvZiB0aGUgdmFsdWUgZnJvbSB0aGUg
-aGFyZHdhcmUgZmllbGQuCgpPb3BzLCBhcG9sb2dpZXMgZm9yIGFuIG92ZXJzaWdodCB0aGVyZSAt
-IEkndmUgYmVlbiByZXZpZXdpbmcgSU9SVCBzcGVjIAp1cGRhdGVzIGxhdGVseSBzbyBuYXR1cmFs
-bHkgaGFkIHRoZSBuZXdlc3QgdmVyc2lvbiBvcGVuIGFscmVhZHkuIFR1cm5zIApvdXQgdGhlc2Ug
-ZGVzY3JpcHRpb25zIHdlcmUgb25seSBjbGFyaWZpZWQgaW4gdGhlIG1vc3QgcmVjZW50IHJlbGVh
-c2UsIApzbyBpZiB5b3Ugd2VyZSBsb29raW5nIGF0IGFuIG9sZGVyIGRvY3VtZW50IHRoZXkgKndl
-cmUqIGhvcnJpYmx5IHZhZ3VlLgoKUm9iaW4uCgo+Pj4+ICvCoMKgwqAgY2FzZSBJRFIwX0hUVFVf
-Tk9ORToKPj4+PiArwqDCoMKgwqDCoMKgwqAgYnJlYWs7Cj4+Pj4gK8KgwqDCoCBjYXNlIElEUjBf
-SFRUVV9IQToKPj4+PiArwqDCoMKgwqDCoMKgwqAgc21tdS0+ZmVhdHVyZXMgfD0gQVJNX1NNTVVf
-RkVBVF9IVFRVX0hBOwo+Pj4+ICvCoMKgwqDCoMKgwqDCoCBicmVhazsKPj4+PiArwqDCoMKgIGNh
-c2UgSURSMF9IVFRVX0hBRDoKPj4+PiArwqDCoMKgwqDCoMKgwqAgc21tdS0+ZmVhdHVyZXMgfD0g
-QVJNX1NNTVVfRkVBVF9IVFRVX0hBOwo+Pj4+ICvCoMKgwqDCoMKgwqDCoCBzbW11LT5mZWF0dXJl
-cyB8PSBBUk1fU01NVV9GRUFUX0hUVFVfSEQ7Cj4+Pj4gK8KgwqDCoMKgwqDCoMKgIGJyZWFrOwo+
-Pj4+ICvCoMKgwqAgZGVmYXVsdDoKPj4+PiArwqDCoMKgwqDCoMKgwqAgZGV2X2VycihzbW11LT5k
-ZXYsICJ1bmtub3duL3Vuc3VwcG9ydGVkIEhUVFUhXG4iKTsKPj4+PiArwqDCoMKgwqDCoMKgwqAg
-cmV0dXJuIC1FTlhJTzsKPj4+PiArwqDCoMKgIH0KPj4+PiArCj4+Pj4gwqDCoMKgwqDCoMKgIC8q
-Cj4+Pj4gwqDCoMKgwqDCoMKgwqAgKiBUaGUgY29oZXJlbmN5IGZlYXR1cmUgYXMgc2V0IGJ5IEZX
-IGlzIHVzZWQgaW4gcHJlZmVyZW5jZSAKPj4+PiB0byB0aGUgSUQKPj4+PiDCoMKgwqDCoMKgwqDC
-oCAqIHJlZ2lzdGVyLCBidXQgd2FybiBvbiBtaXNtYXRjaC4KPj4+PiBkaWZmIC0tZ2l0IGEvZHJp
-dmVycy9pb21tdS9hcm0vYXJtLXNtbXUtdjMvYXJtLXNtbXUtdjMuaCAKPj4+PiBiL2RyaXZlcnMv
-aW9tbXUvYXJtL2FybS1zbW11LXYzL2FybS1zbW11LXYzLmgKPj4+PiBpbmRleCA5NmMyZTk1NjVl
-MDAuLmU5MWJlYTQ0NTE5ZSAxMDA2NDQKPj4+PiAtLS0gYS9kcml2ZXJzL2lvbW11L2FybS9hcm0t
-c21tdS12My9hcm0tc21tdS12My5oCj4+Pj4gKysrIGIvZHJpdmVycy9pb21tdS9hcm0vYXJtLXNt
-bXUtdjMvYXJtLXNtbXUtdjMuaAo+Pj4+IEBAIC0zMyw2ICszMywxMCBAQAo+Pj4+IMKgwqAgI2Rl
-ZmluZSBJRFIwX0FTSUQxNsKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgKDEgPDwgMTIpCj4+Pj4gwqDC
-oCAjZGVmaW5lIElEUjBfQVRTwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAoMSA8PCAxMCkKPj4+PiDC
-oMKgICNkZWZpbmUgSURSMF9IWVDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICgxIDw8IDkpCj4+Pj4g
-KyNkZWZpbmUgSURSMF9IVFRVwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBHRU5NQVNLKDcsIDYpCj4+
-Pj4gKyNkZWZpbmUgSURSMF9IVFRVX05PTkXCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIDAKPj4+PiAr
-I2RlZmluZSBJRFIwX0hUVFVfSEHCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIDEKPj4+PiArI2RlZmlu
-ZSBJRFIwX0hUVFVfSEFEwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAyCj4+Pj4gwqDCoCAjZGVmaW5l
-IElEUjBfQ09IQUNDwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAoMSA8PCA0KQo+Pj4+IMKgwqAgI2Rl
-ZmluZSBJRFIwX1RURsKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgR0VOTUFTSygzLCAyKQo+Pj4+IMKg
-wqAgI2RlZmluZSBJRFIwX1RURl9BQVJDSDY0wqDCoMKgwqDCoMKgwqAgMgo+Pj4+IEBAIC0yODYs
-NiArMjkwLDggQEAKPj4+PiDCoMKgICNkZWZpbmUgQ1RYREVTQ19DRF8wX1RDUl9UQkkwwqDCoMKg
-wqDCoMKgwqAgKDFVTEwgPDwgMzgpCj4+Pj4gwqDCoMKgwqAgI2RlZmluZSBDVFhERVNDX0NEXzBf
-QUE2NMKgwqDCoMKgwqDCoMKgICgxVUwgPDwgNDEpCj4+Pj4gKyNkZWZpbmUgQ1RYREVTQ19DRF8w
-X0hEwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAoMVVMIDw8IDQyKQo+Pj4+ICsjZGVmaW5lIENUWERF
-U0NfQ0RfMF9IQcKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgKDFVTCA8PCA0MykKPj4+PiDCoMKgICNk
-ZWZpbmUgQ1RYREVTQ19DRF8wX1PCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICgxVUwgPDwgNDQpCj4+
-Pj4gwqDCoCAjZGVmaW5lIENUWERFU0NfQ0RfMF9SwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAoMVVM
-IDw8IDQ1KQo+Pj4+IMKgwqAgI2RlZmluZSBDVFhERVNDX0NEXzBfQcKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqAgKDFVTCA8PCA0NikKPj4+PiBAQCAtNjA0LDYgKzYxMCw4IEBAIHN0cnVjdCBhcm1fc21t
-dV9kZXZpY2Ugewo+Pj4+IMKgwqAgI2RlZmluZSBBUk1fU01NVV9GRUFUX1JBTkdFX0lOVsKgwqDC
-oMKgwqDCoMKgICgxIDw8IDE1KQo+Pj4+IMKgwqAgI2RlZmluZSBBUk1fU01NVV9GRUFUX0JUTcKg
-wqDCoMKgwqDCoMKgICgxIDw8IDE2KQo+Pj4+IMKgwqAgI2RlZmluZSBBUk1fU01NVV9GRUFUX1NW
-QcKgwqDCoMKgwqDCoMKgICgxIDw8IDE3KQo+Pj4+ICsjZGVmaW5lIEFSTV9TTU1VX0ZFQVRfSFRU
-VV9IQcKgwqDCoMKgwqDCoMKgICgxIDw8IDE4KQo+Pj4+ICsjZGVmaW5lIEFSTV9TTU1VX0ZFQVRf
-SFRUVV9IRMKgwqDCoMKgwqDCoMKgICgxIDw8IDE5KQo+Pj4+IMKgwqDCoMKgwqDCoCB1MzLCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgZmVhdHVyZXM7Cj4+Pj4gwqDCoMKgwqAgI2RlZmlu
-ZSBBUk1fU01NVV9PUFRfU0tJUF9QUkVGRVRDSMKgwqDCoCAoMSA8PCAwKQo+Pj4+IGRpZmYgLS1n
-aXQgYS9pbmNsdWRlL2xpbnV4L2lvLXBndGFibGUuaCBiL2luY2x1ZGUvbGludXgvaW8tcGd0YWJs
-ZS5oCj4+Pj4gaW5kZXggZWE3MjdlYjFhMWE5Li4xYTAwZWE4NTYyYzcgMTAwNjQ0Cj4+Pj4gLS0t
-IGEvaW5jbHVkZS9saW51eC9pby1wZ3RhYmxlLmgKPj4+PiArKysgYi9pbmNsdWRlL2xpbnV4L2lv
-LXBndGFibGUuaAo+Pj4+IEBAIC05Nyw2ICs5Nyw3IEBAIHN0cnVjdCBpb19wZ3RhYmxlX2NmZyB7
-Cj4+Pj4gwqDCoMKgwqDCoMKgIHVuc2lnbmVkIGxvbmfCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHBn
-c2l6ZV9iaXRtYXA7Cj4+Pj4gwqDCoMKgwqDCoMKgIHVuc2lnbmVkIGludMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqAgaWFzOwo+Pj4+IMKgwqDCoMKgwqDCoCB1bnNpZ25lZCBpbnTCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgIG9hczsKPj4+PiArwqDCoMKgIGJvb2zCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqAgaHR0dV9oZDsKPj4+Cj4+PiBUaGlzIGlzIHZlcnkgc3BlY2lmaWMgdG8gdGhlIEFBcmNo
-NjQgc3RhZ2UgMSBmb3JtYXQsIG5vdCBhIGdlbmVyaWMgCj4+PiBjYXBhYmlsaXR5IC0gSSB0aGlu
-ayBpdCBzaG91bGQgYmUgYSBxdWlyayBmbGFnIHJhdGhlciB0aGFuIGEgY29tbW9uIAo+Pj4gZmll
-bGQuCj4+IE9LLCBzbyBCQk1MIHNob3VsZCBiZSBhIHF1aXJrIGZsYWcgdG9vPwo+Pgo+PiBUaG91
-Z2ggdGhlIHdvcmQgInF1aXJrIiBpcyBub3Qgc3VpdGFibGUgZm9yIEhUVFUgYW5kIEJCTUwsIHdl
-IGhhdmUgbm8gCj4+IG90aGVyIHBsYWNlIHRvIGNvbnZleSBzbW11IGZlYXR1cmUgdG8gaW8tcGd0
-YWJsZS4KPiAKPiBJbmRlZWQgdGhlc2UgZmVhdHVyZXMgYXJlbid0IGRlY29yYXRpdmUgZ3Jvb3Zl
-cyBvbiBhIHBpZWNlIG9mIGZ1cm5pdHVyZSwgCj4gYnV0IGluIHRoZSBjYXNlIG9mIGlvLXBndGFi
-bGUgd2UncmUgbWVyZWx5IHVzaW5nICJxdWlyayIgaW4gaXRzIGJyb2FkZXN0IAo+IHNlbnNlIHRv
-IGltcGx5IHNvbWV0aGluZyB0aGF0IGRpZmZlcnMgZnJvbSB0aGUgYmFzZWxpbmUgZGVmYXVsdCAK
-PiBiZWhhdmlvdXIgLSBBUk1fTVRLX0VYVCwgQVJNX1RUQlIxIGFuZCBBUk1fT1VURVJfV0JXQSAo
-b3Igd2hhdGV2ZXIgaXQncyAKPiBjYWxsZWQgdGhpcyB3ZWVrKSBhcmUgYWxsIGp1c3QgaW5kaWNh
-dGluZyBleHRyYSBoYXJkd2FyZSBmZWF0dXJlcyAKPiBlbnRpcmVseSBjb21wYXJhYmxlIHRvIEhU
-VFU7IE5PTl9TVFJJQ1QgaXMgZGVzY3JpYmluZyBhIHNpbWlsYXJseSAKPiBpbnRlbnRpb25hbCBh
-bmQgZGVzaXJlZCBzb2Z0d2FyZSBiZWhhdmlvdXIuIEluIGZhY3Qgb25seSBBUk1fTlMgCj4gcmVw
-cmVzZW50cyBzb21ldGhpbmcgdGhhdCBjb3VsZCBiZSBjb25zaWRlcmVkIGEgIndvcmthcm91bmQi
-Lgo+IAo+IFJvYmluLgo+IF9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fCj4gaW9tbXUgbWFpbGluZyBsaXN0Cj4gaW9tbXVAbGlzdHMubGludXgtZm91bmRhdGlv
-bi5vcmcKPiBodHRwczovL2xpc3RzLmxpbnV4Zm91bmRhdGlvbi5vcmcvbWFpbG1hbi9saXN0aW5m
-by9pb21tdQpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpr
-dm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9s
-aXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+On Mon, Feb 01, 2021 at 11:56:28AM +0000, Marc Zyngier wrote:
+> In order to be able to override CPU features at boot time,
+> let's add a command line parser that matches options of the
+> form "cpureg.feature=value", and store the corresponding
+> value into the override val/mask pair.
+> 
+> No features are currently defined, so no expected change in
+> functionality.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Acked-by: David Brazdil <dbrazdil@google.com>
+> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+> ---
+>  arch/arm64/kernel/Makefile         |   2 +-
+>  arch/arm64/kernel/head.S           |   1 +
+>  arch/arm64/kernel/idreg-override.c | 164 +++++++++++++++++++++++++++++
+>  3 files changed, 166 insertions(+), 1 deletion(-)
+>  create mode 100644 arch/arm64/kernel/idreg-override.c
+> 
+> diff --git a/arch/arm64/kernel/Makefile b/arch/arm64/kernel/Makefile
+> index 86364ab6f13f..2262f0392857 100644
+> --- a/arch/arm64/kernel/Makefile
+> +++ b/arch/arm64/kernel/Makefile
+> @@ -17,7 +17,7 @@ obj-y			:= debug-monitors.o entry.o irq.o fpsimd.o		\
+>  			   return_address.o cpuinfo.o cpu_errata.o		\
+>  			   cpufeature.o alternative.o cacheinfo.o		\
+>  			   smp.o smp_spin_table.o topology.o smccc-call.o	\
+> -			   syscall.o proton-pack.o
+> +			   syscall.o proton-pack.o idreg-override.o
+>  
+>  targets			+= efi-entry.o
+>  
+> diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
+> index d74e5f84042e..3243e3ae9bd8 100644
+> --- a/arch/arm64/kernel/head.S
+> +++ b/arch/arm64/kernel/head.S
+> @@ -435,6 +435,7 @@ SYM_FUNC_START_LOCAL(__primary_switched)
+>  
+>  	mov	x0, x21				// pass FDT address in x0
+>  	bl	early_fdt_map			// Try mapping the FDT early
+> +	bl	init_feature_override
+>  	bl	switch_to_vhe
+>  #if defined(CONFIG_KASAN_GENERIC) || defined(CONFIG_KASAN_SW_TAGS)
+>  	bl	kasan_early_init
+> diff --git a/arch/arm64/kernel/idreg-override.c b/arch/arm64/kernel/idreg-override.c
+> new file mode 100644
+> index 000000000000..d8d0d3b25bc3
+> --- /dev/null
+> +++ b/arch/arm64/kernel/idreg-override.c
+> @@ -0,0 +1,164 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Early cpufeature override framework
+> + *
+> + * Copyright (C) 2020 Google LLC
+> + * Author: Marc Zyngier <maz@kernel.org>
+> + */
+> +
+> +#include <linux/ctype.h>
+> +#include <linux/kernel.h>
+> +#include <linux/libfdt.h>
+> +
+> +#include <asm/cacheflush.h>
+> +#include <asm/setup.h>
+> +
+> +#define FTR_DESC_NAME_LEN	20
+> +#define FTR_DESC_FIELD_LEN	10
+> +
+> +struct ftr_set_desc {
+> +	char 				name[FTR_DESC_NAME_LEN];
+> +	struct arm64_ftr_override	*override;
+> +	struct {
+> +		char			name[FTR_DESC_FIELD_LEN];
+> +		u8			shift;
+> +	} 				fields[];
+> +};
+> +
+> +static const struct ftr_set_desc * const regs[] __initconst = {
+> +};
+> +
+> +static char *cmdline_contains_option(const char *cmdline, const char *option)
+> +{
+> +	char *str = strstr(cmdline, option);
+> +
+> +	if ((str == cmdline || (str > cmdline && isspace(*(str - 1)))))
+> +		return str;
+> +
+> +	return NULL;
+> +}
+> +
+> +static int __init find_field(const char *cmdline,
+> +			     const struct ftr_set_desc *reg, int f, u64 *v)
+> +{
+> +	char opt[FTR_DESC_NAME_LEN + FTR_DESC_FIELD_LEN + 2], *str;
+> +	size_t len;
+> +
+> +	snprintf(opt, ARRAY_SIZE(opt), "%s.%s=", reg->name, reg->fields[f].name);
+> +
+> +	str = cmdline_contains_option(cmdline, opt);
+> +	if (!str)
+> +		return -1;
+> +
+> +	str += strlen(opt);
+> +	len = strcspn(str, " ");
+
+I'm absolutely terrified of string parsing in C, but just wondering why you
+only ignore literal spaces here. I _think_ the full-fat cmdline parsing uses
+isspace() to delimit the options.
+
+Would it be possible to reuse any of the logic over in parse_args() to avoid
+having to roll this ourselves?
+
+Will
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
