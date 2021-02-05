@@ -2,81 +2,82 @@ Return-Path: <SRS0=/Ra0=HH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADD63C433DB
-	for <kvmarm@archiver.kernel.org>; Fri,  5 Feb 2021 11:23:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4CD2C433E0
+	for <kvmarm@archiver.kernel.org>; Fri,  5 Feb 2021 11:24:05 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DFA1764FC6
-	for <kvmarm@archiver.kernel.org>; Fri,  5 Feb 2021 11:23:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFA1764FC6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 0AB6B64FC6
+	for <kvmarm@archiver.kernel.org>; Fri,  5 Feb 2021 11:24:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AB6B64FC6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 472764B3D0;
-	Fri,  5 Feb 2021 06:23:46 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 76E1C4B3D0;
+	Fri,  5 Feb 2021 06:24:04 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id LyyylpUysY29; Fri,  5 Feb 2021 06:23:44 -0500 (EST)
+	with ESMTP id 8vLMIgNmmx0F; Fri,  5 Feb 2021 06:24:03 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3CFF94B3A6;
-	Fri,  5 Feb 2021 06:23:44 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 64CEB4B3A6;
+	Fri,  5 Feb 2021 06:24:03 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 16C284B3C3
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Feb 2021 06:23:43 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BB8684B3A6
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Feb 2021 06:24:02 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id X6ECEH4jxzVY for <kvmarm@lists.cs.columbia.edu>;
- Fri,  5 Feb 2021 06:23:42 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CB3FA4B3A6
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Feb 2021 06:23:41 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ with ESMTP id Izh9akVcSkSO for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  5 Feb 2021 06:24:01 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [63.128.21.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B49E14B37F
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Feb 2021 06:24:01 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1612524241;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=1khU1C0GfELsGU0Fj00nuXnaZ6zgV1rmRJ0fb1z6uq4=;
+ b=GxVN8G63NDFvkC33koKaVFwf7rr7c11UPgP4wja/EfYomIZuw/VguH/zcpySobz9TEHLbs
+ q3YLgW8lJgINPfp69g3mF6Bu8cvpMC++6lCdRBYBPPZpXRbugrvIKyEeRdybU5+n1mqe5a
+ WBDxjju9jsEyPgR3NcKLmBHqrRu9Jvs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-196-YGIWRmuOO8-Sgup-V2dHqQ-1; Fri, 05 Feb 2021 06:23:57 -0500
+X-MC-Unique: YGIWRmuOO8-Sgup-V2dHqQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 7ABB264DB2;
- Fri,  5 Feb 2021 11:23:40 +0000 (UTC)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
- TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
- (envelope-from <maz@kernel.org>)
- id 1l7zD8-00CFsF-2x; Fri, 05 Feb 2021 11:23:38 +0000
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 744C8107ACC7;
+ Fri,  5 Feb 2021 11:23:56 +0000 (UTC)
+Received: from [10.36.113.43] (ovpn-113-43.ams2.redhat.com [10.36.113.43])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 08C3D60DA1;
+ Fri,  5 Feb 2021 11:23:54 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v3 10/11] arm64: gic: its-trigger: Don't
+ trigger the LPI while it is pending
+To: Alexandru Elisei <alexandru.elisei@arm.com>, drjones@redhat.com,
+ kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+References: <20210129163647.91564-1-alexandru.elisei@arm.com>
+ <20210129163647.91564-11-alexandru.elisei@arm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <a3d1c79d-22d8-f1f0-f594-6ce616401950@redhat.com>
+Date: Fri, 5 Feb 2021 12:23:52 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Date: Fri, 05 Feb 2021 11:23:37 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Will Deacon <will@kernel.org>, Steven Price <steven.price@arm.com>
-Subject: Re: [PATCH v17 1/7] arm/arm64: Probe for the presence of KVM
- hypervisor
-In-Reply-To: <20210205111921.GA22109@willie-the-truck>
-References: <20210202141204.3134855-1-maz@kernel.org>
- <20210202141204.3134855-2-maz@kernel.org>
- <d5765ade-7199-2d1e-6d59-d3de6a52c6ce@arm.com>
- <20210205111921.GA22109@willie-the-truck>
-User-Agent: Roundcube Webmail/1.4.10
-Message-ID: <29f8b6f5faf33472b74ab5f2406c6081@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: will@kernel.org, steven.price@arm.com,
- netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
- tglx@linutronix.de, pbonzini@redhat.com, seanjc@google.com,
- richardcochran@gmail.com, Mark.Rutland@arm.com, suzuki.poulose@arm.com,
- Andre.Przywara@arm.com, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, Steve.Capper@arm.com, justin.he@arm.com,
- jianyong.wu@arm.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: justin.he@arm.com, kvm@vger.kernel.org, netdev@vger.kernel.org,
- richardcochran@gmail.com, yangbo.lu@nxp.com, linux-kernel@vger.kernel.org,
- Andre.Przywara@arm.com, john.stultz@linaro.org, seanjc@google.com,
- pbonzini@redhat.com, tglx@linutronix.de, kernel-team@android.com,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20210129163647.91564-11-alexandru.elisei@arm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Cc: andre.przywara@arm.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -88,71 +89,54 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2021-02-05 11:19, Will Deacon wrote:
-> On Fri, Feb 05, 2021 at 09:11:00AM +0000, Steven Price wrote:
->> On 02/02/2021 14:11, Marc Zyngier wrote:
->> > diff --git a/drivers/firmware/smccc/kvm_guest.c b/drivers/firmware/smccc/kvm_guest.c
->> > new file mode 100644
->> > index 000000000000..23ce1ded88b4
->> > --- /dev/null
->> > +++ b/drivers/firmware/smccc/kvm_guest.c
->> > @@ -0,0 +1,51 @@
->> > +// SPDX-License-Identifier: GPL-2.0
->> > +
->> > +#define pr_fmt(fmt) "smccc: KVM: " fmt
->> > +
->> > +#include <linux/init.h>
->> > +#include <linux/arm-smccc.h>
->> > +#include <linux/kernel.h>
->> > +#include <linux/string.h>
->> > +
->> > +static DECLARE_BITMAP(__kvm_arm_hyp_services, ARM_SMCCC_KVM_NUM_FUNCS) __ro_after_init = { };
->> > +
->> > +void __init kvm_init_hyp_services(void)
->> > +{
->> > +	int i;
->> > +	struct arm_smccc_res res;
->> > +
->> > +	if (arm_smccc_1_1_get_conduit() != SMCCC_CONDUIT_HVC)
->> > +		return;
->> > +
->> > +	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID, &res);
->> > +	if (res.a0 != ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0 ||
->> > +	    res.a1 != ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1 ||
->> > +	    res.a2 != ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2 ||
->> > +	    res.a3 != ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3)
->> > +		return;
->> > +
->> > +	memset(&res, 0, sizeof(res));
->> > +	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID, &res);
->> > +	for (i = 0; i < 32; ++i) {
->> > +		if (res.a0 & (i))
->> > +			set_bit(i + (32 * 0), __kvm_arm_hyp_services);
->> > +		if (res.a1 & (i))
->> > +			set_bit(i + (32 * 1), __kvm_arm_hyp_services);
->> > +		if (res.a2 & (i))
->> > +			set_bit(i + (32 * 2), __kvm_arm_hyp_services);
->> > +		if (res.a3 & (i))
->> > +			set_bit(i + (32 * 3), __kvm_arm_hyp_services);
->> 
->> The bit shifts are missing, the tests should be of the form:
->> 
->> 	if (res.a0 & (1 << i))
->> 
->> Or indeed using a BIT() macro.
+Hi,
+
+On 1/29/21 5:36 PM, Alexandru Elisei wrote:
+> The its-trigger test checks that LPI 8195 is not delivered to the CPU while
+> it is disabled at the ITS level. After that it is re-enabled and the test
+> checks that the interrupt is properly asserted. After it's re-enabled and
+> before the stats are examined, the test triggers the interrupt again, which
+> can lead to the same interrupt being delivered twice: once after the
+> configuration invalidation and before the INT command, and once after the
+> INT command.
 > 
-> Maybe even test_bit()?
+> Add an explicit check that the interrupt has fired after the invalidation.
+> Leave the check after the INT command to make sure the INT command still
+> works for the now re-enabled LPI.
+> 
+> CC: Auger Eric <eric.auger@redhat.com>
+> Suggested-by: Zenghui Yu <yuzenghui@huawei.com>
+> Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-yeah. I'll fix that up, thanks for pointing this out.
+Eric
 
-       M.
--- 
-Jazz is not dead. It just smells funny...
+> ---
+>  arm/gic.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/arm/gic.c b/arm/gic.c
+> index af2c112336e7..8bc2a35908f2 100644
+> --- a/arm/gic.c
+> +++ b/arm/gic.c
+> @@ -802,6 +802,9 @@ static void test_its_trigger(void)
+>  
+>  	/* Now call the invall and check the LPI hits */
+>  	its_send_invall(col3);
+> +	lpi_stats_expect(3, 8195);
+> +	check_lpi_stats("dev2/eventid=20 pending LPI is received");
+> +
+>  	lpi_stats_expect(3, 8195);
+>  	its_send_int(dev2, 20);
+>  	check_lpi_stats("dev2/eventid=20 now triggers an LPI");
+> 
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
