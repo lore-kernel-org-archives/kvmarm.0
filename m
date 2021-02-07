@@ -1,84 +1,69 @@
-Return-Path: <SRS0=/Ra0=HH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=MRwa=HJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CED54C433E6
-	for <kvmarm@archiver.kernel.org>; Fri,  5 Feb 2021 18:56:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB53DC433E0
+	for <kvmarm@archiver.kernel.org>; Sun,  7 Feb 2021 01:43:09 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2386D64DA5
-	for <kvmarm@archiver.kernel.org>; Fri,  5 Feb 2021 18:56:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2386D64DA5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 1D57064E8E
+	for <kvmarm@archiver.kernel.org>; Sun,  7 Feb 2021 01:43:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D57064E8E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BFA34B48C;
-	Fri,  5 Feb 2021 13:56:56 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C2B24B2E1;
+	Sat,  6 Feb 2021 20:43:08 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id zvSBVoRrTaLN; Fri,  5 Feb 2021 13:56:55 -0500 (EST)
+	with ESMTP id 78ivbWkRwjjb; Sat,  6 Feb 2021 20:43:07 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D2594B48E;
-	Fri,  5 Feb 2021 13:56:55 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 566FD4B22F;
+	Sat,  6 Feb 2021 20:43:07 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DDC54B3E8
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Feb 2021 13:56:55 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 52CD94A4E5
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  6 Feb 2021 20:43:05 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wUCv6dRikX-h for <kvmarm@lists.cs.columbia.edu>;
- Fri,  5 Feb 2021 13:56:54 -0500 (EST)
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com
- [209.85.167.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F1FDF4B3E1
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Feb 2021 13:56:53 -0500 (EST)
-Received: by mail-lf1-f44.google.com with SMTP id p21so11305321lfu.11
- for <kvmarm@lists.cs.columbia.edu>; Fri, 05 Feb 2021 10:56:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=cHuXgL884ShiDPsTYGfb0bTiHe7tuKKlwCFWqjM9XGY=;
- b=CHXTe4WuMyR8yTZK5y1ObmdD8r5SZk+v7YJ52A6CFUKOggESswlbxpD2997kTc/Fqe
- qW8ICFqf2Cw+JpMT8DQ9BPZLxkDe/rncdnNVkq4Wl7w8CuVMb/7G5Y4obbJjd4efG5c8
- giwHvumB7vcyFAVnCYstwF5UEJ6ikWdOeTUF62Q31HiO6WJahXIRBJrYZgpzsralqWAg
- qPZ+CYStfuHqK6BNjIxUjprosOsBRt2r4xwUXQ3C1ONcDXeECFQGYsNbninL2xRCVUb7
- PrZcddIEjWasBtMSK1biaujW2VwxP1MiCQ0HOMUBjydr8WGbjwR6gE6OP9nEXH7dneF/
- xnLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=cHuXgL884ShiDPsTYGfb0bTiHe7tuKKlwCFWqjM9XGY=;
- b=ZRPHQbUwcR73y1VmUTZfOEvvjNHWGTsyiBikswWy93pDxc52UBb9ZNRqO6xFuFnqbK
- d4C9Q/Pkp4E5YVs55mGcBD8/Q54WQ/XVbKrYLj20jLSFM39dJ3TVtk/QP54pfOnsUtmF
- JoW+y9H2jGsu76H0ZlFr1MDZF/80AmxFjgGQDGImto/N2DPWcPllfC5gHkNWmW+nsPZa
- K43ZWTtl/7JGig18dwcV+SC/wsb+4/U4VxWFz03mb4U3ZvGA2K0/0AqxSyhBh2MKcE+8
- 07jQvO8DSC1dUcRAOVrQVFSEwNut6f0mgzy6kmnSSJ3MFH04yemNl0l6cyrnSoyWL8V3
- FhQQ==
-X-Gm-Message-State: AOAM530LnhkRBgj63h0TzQHA1GParZsflVAJGieQwN0c7XfKgxhLmLwr
- f/odxvUP1YhGL19S4IuW6A+C0B+RszX479leLXVuCQ==
-X-Google-Smtp-Source: ABdhPJzfVloJ4puX9xBHwRSQPUgMiKklXtUzBdRAeZ5HPFQShbChjmVGYLEF7ed9XOC9vFYWa/+bRSr39/mR18cQ/Vs=
-X-Received: by 2002:a05:6512:1042:: with SMTP id
- c2mr3280984lfb.359.1612551412383; 
- Fri, 05 Feb 2021 10:56:52 -0800 (PST)
+ with ESMTP id 5yvwipa+irHy for <kvmarm@lists.cs.columbia.edu>;
+ Sat,  6 Feb 2021 20:43:03 -0500 (EST)
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4932D4A4E1
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  6 Feb 2021 20:43:03 -0500 (EST)
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
+ by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4DYBhf58fzz164j9;
+ Sun,  7 Feb 2021 09:41:38 +0800 (CST)
+Received: from [10.174.184.42] (10.174.184.42) by
+ DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
+ 14.3.498.0; Sun, 7 Feb 2021 09:42:50 +0800
+Subject: Re: [RFC PATCH 01/11] iommu/arm-smmu-v3: Add feature detection for
+ HTTU
+To: Jean-Philippe Brucker <jean-philippe@linaro.org>
+References: <20210128151742.18840-1-zhukeqian1@huawei.com>
+ <20210128151742.18840-2-zhukeqian1@huawei.com>
+ <f8be5718-d4d9-0565-eaf0-b5a128897d15@arm.com>
+ <df1b8fb2-b853-e797-0072-9dbdffc4ff67@huawei.com> <YB0VErwkA0ivRXTd@myrica>
+From: Keqian Zhu <zhukeqian1@huawei.com>
+Message-ID: <a07eee49-e997-8e7a-f510-64d23b9c9b98@huawei.com>
+Date: Sun, 7 Feb 2021 09:42:49 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-References: <20210205044403.1559010-1-jingzhangos@google.com>
- <e34480715d3d5e13e5238195d596feda@kernel.org>
-In-Reply-To: <e34480715d3d5e13e5238195d596feda@kernel.org>
-From: Jing Zhang <jingzhangos@google.com>
-Date: Fri, 5 Feb 2021 12:56:41 -0600
-Message-ID: <CAAdAUtggLdom5=KOHPZYSVGSO2SmnO71bM796=F0YFayMWj5yw@mail.gmail.com>
-Subject: Re: [PATCH] KVM: arm64: Remove redundant check for S2FWB
-To: Marc Zyngier <maz@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
- linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+In-Reply-To: <YB0VErwkA0ivRXTd@myrica>
+X-Originating-IP: [10.174.184.42]
+X-CFilter-Loop: Reflected
+Cc: "Tian, Kevin" <kevin.tian@intel.com>, Cornelia Huck <cohuck@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org, Will
+ Deacon <will@kernel.org>, lushenming@huawei.com, linux-kernel@vger.kernel.org,
+ Kirti Wankhede <kwankhede@nvidia.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, iommu@lists.linux-foundation.org,
+ Marc Zyngier <maz@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -95,40 +80,46 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+Hi Jean,
 
-Thanks for the comment.
-On Fri, Feb 5, 2021 at 11:24 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> Hi Jing,
->
-> On 2021-02-05 04:44, Jing Zhang wrote:
-> > Remove redundant check for CPU feature S2FWB in dcache flush code
-> > to save some CPU cycles for every memslot flush and unmapping.
->
-> What CPU cycles? This is only a static branch. Can you actually
-> measure the overhead? What does it represent in the face of
-> a full memslot unmapping?
-For CPU cycles, I mean CPU time spent for S2FWB check.
-For memslot unmapping, there is actually no improvement, just move the
-check to the stage2_unmap_walker since we removed the S2FWB check in
-stage2_flush_dcache.
-The saving is from the code path of memslot flush. The S2FWB check was
-in stage2_flush_dcache, in which case, for a memslot flush, the check
-was done for every page. Now it will save some CPU time if we do the
-check at a higher level, like in kvm_toggle_cache, access_dcsw,
-kvm_arch_prepare_memory_region.
-The redundant check is as follows (Only the first check is necessary):
-kvm_arch_prepare_memory_region -> S2FWB check -> stage2_flush_memslot
--> kvm_pgtable_stage2_flush -> S2FWB check -> stage2_flush_walker ->
-S2FWB check -> __flush_dcache_area
+On 2021/2/5 17:51, Jean-Philippe Brucker wrote:
+> Hi Keqian,
+> 
+> On Fri, Feb 05, 2021 at 05:13:50PM +0800, Keqian Zhu wrote:
+>>> We need to accommodate the firmware override as well if we need this to be meaningful. Jean-Philippe is already carrying a suitable patch in the SVA stack[1].
+>> Robin, Thanks for pointing it out.
+>>
+>> Jean, I see that the IORT HTTU flag overrides the hardware register info unconditionally. I have some concern about it:
+>>
+>> If the override flag has HTTU but hardware doesn't support it, then driver will use this feature but receive access fault or permission fault from SMMU unexpectedly.
+>> 1) If IOPF is not supported, then kernel can not work normally.
+>> 2) If IOPF is supported, kernel will perform useless actions, such as HTTU based dma dirty tracking (this series).
+>>
+>> As the IORT spec doesn't give an explicit explanation for HTTU override, can we comprehend it as a mask for HTTU related hardware register?
+> 
+> To me "Overrides the value of SMMU_IDR0.HTTU" is clear enough: disregard
+> the value of SMMU_IDR0.HTTU and use the one specified by IORT instead. And
+> that's both ways, since there is no validity mask for the IORT value: if
+> there is an IORT table, always ignore SMMU_IDR0.HTTU.
+> 
+> That's how the SMMU driver implements the COHACC bit, which has the same
+> wording in IORT. So I think we should implement HTTU the same way.
+OK, and Robin said that the latest IORT spec literally states it.
 
->
+> 
+> One complication is that there is no equivalent override for device tree.
+> I think it can be added later if necessary, because unlike IORT it can be
+> tri state (property not present, overriden positive, overridden negative).
+Yeah, that would be more flexible. ;-)
+
+> 
 > Thanks,
->
->          M.
-> --
-> Jazz is not dead. It just smells funny...
+> Jean
+> 
+> .
+> 
+Thanks,
+Keqian
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
