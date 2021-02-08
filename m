@@ -6,52 +6,53 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A99DC433DB
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Feb 2021 09:58:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D953C433E0
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Feb 2021 10:04:20 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D7B1664E9D
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Feb 2021 09:58:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7B1664E9D
+	by mail.kernel.org (Postfix) with ESMTP id 2D1A064E99
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Feb 2021 10:04:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D1A064E99
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6EF1C4B417;
-	Mon,  8 Feb 2021 04:58:08 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AC9984B55E;
+	Mon,  8 Feb 2021 05:04:18 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Ol3-14RQj688; Mon,  8 Feb 2021 04:58:07 -0500 (EST)
+	with ESMTP id tFJ3USpBNhVU; Mon,  8 Feb 2021 05:04:17 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9DF2A4B62F;
-	Mon,  8 Feb 2021 04:58:04 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E12D4B56D;
+	Mon,  8 Feb 2021 05:04:17 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E45354B417
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2021 04:58:03 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CC7704B552
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2021 05:04:16 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CLFWShs0crvu for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Feb 2021 04:58:02 -0500 (EST)
+ with ESMTP id 6eJ53rOLEXTG for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Feb 2021 05:04:15 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9518D4B577
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2021 04:57:59 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6D39A4B53C
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2021 05:04:15 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id A1E9C64E9A;
- Mon,  8 Feb 2021 09:57:58 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id DC4AC64E87;
+ Mon,  8 Feb 2021 10:04:13 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1l93Iq-00Ck14-Po; Mon, 08 Feb 2021 09:57:56 +0000
+ id 1l93JA-00Ck14-4f; Mon, 08 Feb 2021 09:58:16 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  linux-kernel@vger.kernel.org
-Subject: [PATCH v7 08/23] arm64: Simplify init_el2_state to be non-VHE only
-Date: Mon,  8 Feb 2021 09:57:17 +0000
-Message-Id: <20210208095732.3267263-9-maz@kernel.org>
+Subject: [PATCH v7 22/23] arm64: cpufeatures: Allow disabling of Pointer Auth
+ from the command-line
+Date: Mon,  8 Feb 2021 09:57:31 +0000
+Message-Id: <20210208095732.3267263-23-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210208095732.3267263-1-maz@kernel.org>
 References: <20210208095732.3267263-1-maz@kernel.org>
@@ -88,127 +89,113 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-As init_el2_state is now nVHE only, let's simplify it and drop
-the VHE setup.
+In order to be able to disable Pointer Authentication  at runtime,
+whether it is for testing purposes, or to work around HW issues,
+let's add support for overriding the ID_AA64ISAR1_EL1.{GPI,GPA,API,APA}
+fields.
+
+This is further mapped on the arm64.nopauth command-line alias.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 Acked-by: David Brazdil <dbrazdil@google.com>
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+Tested-by: Srinivas Ramana <sramana@codeaurora.org>
 ---
- arch/arm64/include/asm/el2_setup.h | 33 ++++++++----------------------
- arch/arm64/kernel/head.S           |  2 +-
- arch/arm64/kvm/hyp/nvhe/hyp-init.S |  2 +-
- 3 files changed, 10 insertions(+), 27 deletions(-)
+ Documentation/admin-guide/kernel-parameters.txt |  3 +++
+ arch/arm64/include/asm/cpufeature.h             |  1 +
+ arch/arm64/kernel/cpufeature.c                  |  4 +++-
+ arch/arm64/kernel/idreg-override.c              | 16 ++++++++++++++++
+ 4 files changed, 23 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
-index 56c9e1cef180..d77d358f9395 100644
---- a/arch/arm64/include/asm/el2_setup.h
-+++ b/arch/arm64/include/asm/el2_setup.h
-@@ -32,16 +32,14 @@
-  * to transparently mess with the EL0 bits via CNTKCTL_EL1 access in
-  * EL2.
-  */
--.macro __init_el2_timers mode
--.ifeqs "\mode", "nvhe"
-+.macro __init_el2_timers
- 	mrs	x0, cnthctl_el2
- 	orr	x0, x0, #3			// Enable EL1 physical timers
- 	msr	cnthctl_el2, x0
--.endif
- 	msr	cntvoff_el2, xzr		// Clear virtual offset
- .endm
+diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+index 7599fd0f1ad7..f9cb28a39bd0 100644
+--- a/Documentation/admin-guide/kernel-parameters.txt
++++ b/Documentation/admin-guide/kernel-parameters.txt
+@@ -376,6 +376,9 @@
+ 	arm64.nobti	[ARM64] Unconditionally disable Branch Target
+ 			Identification support
  
--.macro __init_el2_debug mode
-+.macro __init_el2_debug
- 	mrs	x1, id_aa64dfr0_el1
- 	sbfx	x0, x1, #ID_AA64DFR0_PMUVER_SHIFT, #4
- 	cmp	x0, #1
-@@ -55,7 +53,6 @@
- 	ubfx	x0, x1, #ID_AA64DFR0_PMSVER_SHIFT, #4
- 	cbz	x0, .Lskip_spe_\@		// Skip if SPE not present
++	arm64.nopauth	[ARM64] Unconditionally disable Pointer Authentication
++			support
++
+ 	ataflop=	[HW,M68k]
  
--.ifeqs "\mode", "nvhe"
- 	mrs_s	x0, SYS_PMBIDR_EL1              // If SPE available at EL2,
- 	and	x0, x0, #(1 << SYS_PMBIDR_EL1_P_SHIFT)
- 	cbnz	x0, .Lskip_spe_el2_\@		// then permit sampling of physical
-@@ -66,7 +63,6 @@
- 	mov	x0, #(MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT)
- 	orr	x2, x2, x0			// If we don't have VHE, then
- 						// use EL1&0 translation.
--.endif
+ 	atarimouse=	[HW,MOUSE] Atari Mouse
+diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+index 30917b9a760b..61177bac49fa 100644
+--- a/arch/arm64/include/asm/cpufeature.h
++++ b/arch/arm64/include/asm/cpufeature.h
+@@ -820,6 +820,7 @@ static inline unsigned int get_vmid_bits(u64 mmfr1)
  
- .Lskip_spe_\@:
- 	msr	mdcr_el2, x2			// Configure debug traps
-@@ -142,37 +138,24 @@
+ extern struct arm64_ftr_override id_aa64mmfr1_override;
+ extern struct arm64_ftr_override id_aa64pfr1_override;
++extern struct arm64_ftr_override id_aa64isar1_override;
  
- /**
-  * Initialize EL2 registers to sane values. This should be called early on all
-- * cores that were booted in EL2.
-+ * cores that were booted in EL2. Note that everything gets initialised as
-+ * if VHE was not evailable. The kernel context will be upgraded to VHE
-+ * if possible later on in the boot process
-  *
-  * Regs: x0, x1 and x2 are clobbered.
-  */
--.macro init_el2_state mode
--.ifnes "\mode", "vhe"
--.ifnes "\mode", "nvhe"
--.error "Invalid 'mode' argument"
--.endif
--.endif
--
-+.macro init_el2_state
- 	__init_el2_sctlr
--	__init_el2_timers \mode
--	__init_el2_debug \mode
-+	__init_el2_timers
-+	__init_el2_debug
- 	__init_el2_lor
- 	__init_el2_stage2
- 	__init_el2_gicv3
- 	__init_el2_hstr
--
--	/*
--	 * When VHE is not in use, early init of EL2 needs to be done here.
--	 * When VHE _is_ in use, EL1 will not be used in the host and
--	 * requires no configuration, and all non-hyp-specific EL2 setup
--	 * will be done via the _EL1 system register aliases in __cpu_setup.
--	 */
--.ifeqs "\mode", "nvhe"
- 	__init_el2_nvhe_idregs
- 	__init_el2_nvhe_cptr
- 	__init_el2_nvhe_sve
- 	__init_el2_nvhe_prepare_eret
--.endif
- .endm
+ u32 get_kvm_ipa_limit(void);
+ void dump_cpu_features(void);
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 7fbeab497adb..3bce87a03717 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -559,6 +559,7 @@ static const struct arm64_ftr_bits ftr_raz[] = {
  
- #endif /* __ARM_KVM_INIT_H__ */
-diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
-index 07445fd976ef..36212c05df42 100644
---- a/arch/arm64/kernel/head.S
-+++ b/arch/arm64/kernel/head.S
-@@ -501,7 +501,7 @@ SYM_INNER_LABEL(init_el2, SYM_L_LOCAL)
- 	msr	hcr_el2, x0
- 	isb
+ struct arm64_ftr_override __ro_after_init id_aa64mmfr1_override;
+ struct arm64_ftr_override __ro_after_init id_aa64pfr1_override;
++struct arm64_ftr_override __ro_after_init id_aa64isar1_override;
  
--	init_el2_state nvhe
-+	init_el2_state
+ static const struct __ftr_reg_entry {
+ 	u32			sys_id;
+@@ -604,7 +605,8 @@ static const struct __ftr_reg_entry {
  
- 	/* Hypervisor stub */
- 	adr_l	x0, __hyp_stub_vectors
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-index 31b060a44045..222cfc3e7190 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-@@ -189,7 +189,7 @@ SYM_CODE_START_LOCAL(__kvm_hyp_init_cpu)
- 2:	msr	SPsel, #1			// We want to use SP_EL{1,2}
+ 	/* Op1 = 0, CRn = 0, CRm = 6 */
+ 	ARM64_FTR_REG(SYS_ID_AA64ISAR0_EL1, ftr_id_aa64isar0),
+-	ARM64_FTR_REG(SYS_ID_AA64ISAR1_EL1, ftr_id_aa64isar1),
++	ARM64_FTR_REG_OVERRIDE(SYS_ID_AA64ISAR1_EL1, ftr_id_aa64isar1,
++			       &id_aa64isar1_override),
  
- 	/* Initialize EL2 CPU state to sane values. */
--	init_el2_state nvhe			// Clobbers x0..x2
-+	init_el2_state				// Clobbers x0..x2
+ 	/* Op1 = 0, CRn = 0, CRm = 7 */
+ 	ARM64_FTR_REG(SYS_ID_AA64MMFR0_EL1, ftr_id_aa64mmfr0),
+diff --git a/arch/arm64/kernel/idreg-override.c b/arch/arm64/kernel/idreg-override.c
+index d691e9015c62..dffb16682330 100644
+--- a/arch/arm64/kernel/idreg-override.c
++++ b/arch/arm64/kernel/idreg-override.c
+@@ -46,6 +46,18 @@ static const struct ftr_set_desc pfr1 __initconst = {
+ 	},
+ };
  
- 	/* Enable MMU, set vectors and stack. */
- 	mov	x0, x28
++static const struct ftr_set_desc isar1 __initconst = {
++	.name		= "id_aa64isar1",
++	.override	= &id_aa64isar1_override,
++	.fields		= {
++	        { "gpi", ID_AA64ISAR1_GPI_SHIFT },
++	        { "gpa", ID_AA64ISAR1_GPA_SHIFT },
++	        { "api", ID_AA64ISAR1_API_SHIFT },
++	        { "apa", ID_AA64ISAR1_APA_SHIFT },
++		{}
++	},
++};
++
+ extern struct arm64_ftr_override kaslr_feature_override;
+ 
+ static const struct ftr_set_desc kaslr __initconst = {
+@@ -62,6 +74,7 @@ static const struct ftr_set_desc kaslr __initconst = {
+ static const struct ftr_set_desc * const regs[] __initconst = {
+ 	&mmfr1,
+ 	&pfr1,
++	&isar1,
+ 	&kaslr,
+ };
+ 
+@@ -72,6 +85,9 @@ static const struct {
+ 	{ "kvm-arm.mode=nvhe",		"id_aa64mmfr1.vh=0" },
+ 	{ "kvm-arm.mode=protected",	"id_aa64mmfr1.vh=0" },
+ 	{ "arm64.nobti",		"id_aa64pfr1.bt=0" },
++	{ "arm64.nopauth",
++	  "id_aa64isar1.gpi=0 id_aa64isar1.gpa=0 "
++	  "id_aa64isar1.api=0 id_aa64isar1.apa=0"	   },
+ 	{ "nokaslr",			"kaslr.disabled=1" },
+ };
+ 
 -- 
 2.29.2
 
