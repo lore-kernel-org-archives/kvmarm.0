@@ -2,78 +2,70 @@ Return-Path: <SRS0=ArS2=HK=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD4E9C433DB
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Feb 2021 13:40:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EA79C433E0
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Feb 2021 14:33:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4EBDF64E66
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Feb 2021 13:40:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EBDF64E66
+	by mail.kernel.org (Postfix) with ESMTP id C53BD64E8C
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Feb 2021 14:33:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C53BD64E8C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E37D64B568;
-	Mon,  8 Feb 2021 08:40:51 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4BAC34B1C8;
+	Mon,  8 Feb 2021 09:33:00 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 0ZDJcjzct-6i; Mon,  8 Feb 2021 08:40:50 -0500 (EST)
+	with ESMTP id SaXcBRJIoitl; Mon,  8 Feb 2021 09:32:59 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DEC04B68B;
-	Mon,  8 Feb 2021 08:40:50 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3345F4B201;
+	Mon,  8 Feb 2021 09:32:59 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 78CF04B687
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2021 08:40:46 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 544714B1A4
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2021 09:32:58 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3NPnI0zkKDaq for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Feb 2021 08:40:44 -0500 (EST)
+ with ESMTP id 0pIMlqnN4F4t for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Feb 2021 09:32:57 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 22E864B676
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2021 08:40:43 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 427D264E6B;
- Mon,  8 Feb 2021 13:40:40 +0000 (UTC)
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
- (envelope-from <maz@kernel.org>)
- id 1l96mM-00Cn0C-GE; Mon, 08 Feb 2021 13:40:38 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
- tglx@linutronix.de, pbonzini@redhat.com, seanjc@google.com,
- richardcochran@gmail.com, Mark.Rutland@arm.com, will@kernel.org,
- suzuki.poulose@arm.com, Andre.Przywara@arm.com, steven.price@arm.com,
- lorenzo.pieralisi@arm.com, sudeep.holla@arm.com
-Subject: [PATCH v18 6/7] KVM: arm64: Add support for the KVM PTP service
-Date: Mon,  8 Feb 2021 13:40:28 +0000
-Message-Id: <20210208134029.3269384-7-maz@kernel.org>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20210208134029.3269384-1-maz@kernel.org>
-References: <20210208134029.3269384-1-maz@kernel.org>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 24CF24B0F1
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2021 09:32:57 -0500 (EST)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id DF0E464E30;
+ Mon,  8 Feb 2021 14:32:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1612794776;
+ bh=6KdzPmYqB+bGvxQs/MeqN8+No+/dd/gL7m2Dw37//uo=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=YRxcx/CzDqmm4c++0Yqjr8ULS70s5iUOjyryFfltC8Nh1jciCm4FVQCFWeC6lf2l/
+ NCxLd1tT3BNbg4MKtkYidcnaLY0NZV0KKXXJMJDKvBkcvsUh2N2qjunOr0EZSEUZo2
+ 5ol0kGGH+7wX+DPe1MLj7koxS0sUJJoVUjuWrB795/sQhFe4fczU8cmM6BSeFYHOgr
+ CCH0NA/qYle0yA0DxCBrBvu5TMjLax1+Ti+xUKyuIoKbsrj33arc3d7FFfRNnrBEUj
+ /pFtS3a8uvOELDElhswdUPrmFfnScr9Q3DXldE0Y62WcypCettcUoOX8LDuap+CWFQ
+ dl/NkZ6/RmH2Q==
+Date: Mon, 8 Feb 2021 14:32:49 +0000
+From: Will Deacon <will@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v7 00/23] arm64: Early CPU feature override, and
+ applications to VHE, BTI and PAuth
+Message-ID: <20210208143248.GA25934@willie-the-truck>
+References: <20210208095732.3267263-1-maz@kernel.org>
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: netdev@vger.kernel.org, yangbo.lu@nxp.com,
- john.stultz@linaro.org, tglx@linutronix.de, pbonzini@redhat.com,
- seanjc@google.com, richardcochran@gmail.com, Mark.Rutland@arm.com,
- will@kernel.org, suzuki.poulose@arm.com, Andre.Przywara@arm.com,
- steven.price@arm.com, lorenzo.pieralisi@arm.com, sudeep.holla@arm.com,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Steve.Capper@arm.com,
- justin.he@arm.com, jianyong.wu@arm.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: justin.he@arm.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <20210208095732.3267263-1-maz@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: Prasad Sodagudi <psodagud@codeaurora.org>,
+ Srinivas Ramana <sramana@codeaurora.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Hector Martin <marcan@marcan.st>,
+ linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+ Ajay Patil <pajay@qti.qualcomm.com>, kernel-team@android.com,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,216 +82,67 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Jianyong Wu <jianyong.wu@arm.com>
+Hi Marc,
 
-Implement the hypervisor side of the KVM PTP interface.
+On Mon, Feb 08, 2021 at 09:57:09AM +0000, Marc Zyngier wrote:
+> It recently came to light that there is a need to be able to override
+> some CPU features very early on, before the kernel is fully up and
+> running. The reasons for this range from specific feature support
+> (such as using Protected KVM on VHE HW, which is the main motivation
+> for this work) to errata workaround (a feature is broken on a CPU and
+> needs to be turned off, or rather not enabled).
+> 
+> This series tries to offer a limited framework for this kind of
+> problems, by allowing a set of options to be passed on the
+> command-line and altering the feature set that the cpufeature
+> subsystem exposes to the rest of the kernel. Note that this doesn't
+> change anything for code that directly uses the CPU ID registers.
 
-The service offers wall time and cycle count from host to guest.
-The caller must specify whether they want the host's view of
-either the virtual or physical counter.
+I applied this locally, but I'm seeing consistent boot failure under QEMU when
+KASAN is enabled. I tried sprinkling some __no_sanitize_address annotations
+around (see below) but it didn't help. The culprit appears to be
+early_fdt_map(), but looking a bit more closely, I'm really nervous about the
+way we call into C functions from __primary_switched. Remember -- this code
+runs _twice_ when KASLR is active: before and after the randomization. This
+also means that any memory writes the first time around can be lost due to
+the D-cache invalidation when (re-)creating the kernel page-tables.
 
-Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20201209060932.212364-7-jianyong.wu@arm.com
----
- Documentation/virt/kvm/api.rst         |  9 +++++
- Documentation/virt/kvm/arm/index.rst   |  1 +
- Documentation/virt/kvm/arm/ptp_kvm.rst | 25 ++++++++++++
- arch/arm64/kvm/arm.c                   |  1 +
- arch/arm64/kvm/hypercalls.c            | 53 ++++++++++++++++++++++++++
- include/linux/arm-smccc.h              | 16 ++++++++
- include/uapi/linux/kvm.h               |  1 +
- 7 files changed, 106 insertions(+)
- create mode 100644 Documentation/virt/kvm/arm/ptp_kvm.rst
+Will
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index c136e254b496..7123bedd4248 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -6501,3 +6501,12 @@ KVM_GET_DIRTY_LOG and KVM_CLEAR_DIRTY_LOG.  After enabling
- KVM_CAP_DIRTY_LOG_RING with an acceptable dirty ring size, the virtual
- machine will switch to ring-buffer dirty page tracking and further
- KVM_GET_DIRTY_LOG or KVM_CLEAR_DIRTY_LOG ioctls will fail.
-+
-+8.30 KVM_CAP_PTP_KVM
-+--------------------
-+
-+:Architectures: arm64
-+
-+This capability indicates that the KVM virtual PTP service is
-+supported in the host. A VMM can check whether the service is
-+available to the guest on migration.
-diff --git a/Documentation/virt/kvm/arm/index.rst b/Documentation/virt/kvm/arm/index.rst
-index 3e2b2aba90fc..78a9b670aafe 100644
---- a/Documentation/virt/kvm/arm/index.rst
-+++ b/Documentation/virt/kvm/arm/index.rst
-@@ -10,3 +10,4 @@ ARM
-    hyp-abi
-    psci
-    pvtime
-+   ptp_kvm
-diff --git a/Documentation/virt/kvm/arm/ptp_kvm.rst b/Documentation/virt/kvm/arm/ptp_kvm.rst
-new file mode 100644
-index 000000000000..68cffb50d8bf
---- /dev/null
-+++ b/Documentation/virt/kvm/arm/ptp_kvm.rst
-@@ -0,0 +1,25 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+PTP_KVM support for arm/arm64
-+=============================
-+
-+PTP_KVM is used for high precision time sync between host and guests.
-+It relies on transferring the wall clock and counter value from the
-+host to the guest using a KVM-specific hypercall.
-+
-+* ARM_SMCCC_HYP_KVM_PTP_FUNC_ID: 0x86000001
-+
-+This hypercall uses the SMC32/HVC32 calling convention:
-+
-+ARM_SMCCC_HYP_KVM_PTP_FUNC_ID
-+    =============    ==========    ==========
-+    Function ID:     (uint32)      0x86000001
-+    Arguments:       (uint32)      KVM_PTP_VIRT_COUNTER(0)
-+                                   KVM_PTP_PHYS_COUNTER(1)
-+    Return Values:   (int32)       NOT_SUPPORTED(-1) on error, or
-+                     (uint32)      Upper 32 bits of wall clock time (r0)
-+                     (uint32)      Lower 32 bits of wall clock time (r1)
-+                     (uint32)      Upper 32 bits of counter (r2)
-+                     (uint32)      Lower 32 bits of counter (r3)
-+    Endianness:                    No Restrictions.
-+    =============    ==========    ==========
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 04c44853b103..7ce851fc5643 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -206,6 +206,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_ARM_INJECT_EXT_DABT:
- 	case KVM_CAP_SET_GUEST_DEBUG:
- 	case KVM_CAP_VCPU_ATTRIBUTES:
-+	case KVM_CAP_PTP_KVM:
- 		r = 1;
- 		break;
- 	case KVM_CAP_ARM_SET_DEVICE_ADDR:
-diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-index b9d8607083eb..71812879f503 100644
---- a/arch/arm64/kvm/hypercalls.c
-+++ b/arch/arm64/kvm/hypercalls.c
-@@ -9,6 +9,55 @@
- #include <kvm/arm_hypercalls.h>
- #include <kvm/arm_psci.h>
+--->8
+
+diff --git a/arch/arm64/kernel/idreg-override.c b/arch/arm64/kernel/idreg-override.c
+index dffb16682330..751ed55261b5 100644
+--- a/arch/arm64/kernel/idreg-override.c
++++ b/arch/arm64/kernel/idreg-override.c
+@@ -195,7 +195,7 @@ static __init void parse_cmdline(void)
+ /* Keep checkers quiet */
+ void init_feature_override(void);
  
-+static void kvm_ptp_get_time(struct kvm_vcpu *vcpu, u64 *val)
-+{
-+	struct system_time_snapshot systime_snapshot;
-+	u64 cycles = ~0UL;
-+	u32 feature;
-+
-+	/*
-+	 * system time and counter value must captured at the same
-+	 * time to keep consistency and precision.
-+	 */
-+	ktime_get_snapshot(&systime_snapshot);
-+
-+	/*
-+	 * This is only valid if the current clocksource is the
-+	 * architected counter, as this is the only one the guest
-+	 * can see.
-+	 */
-+	if (systime_snapshot.cs_id != CSID_ARM_ARCH_COUNTER)
-+		return;
-+
-+	/*
-+	 * The guest selects one of the two reference counters
-+	 * (virtual or physical) with the first argument of the SMCCC
-+	 * call. In case the identifier is not supported, error out.
-+	 */
-+	feature = smccc_get_arg1(vcpu);
-+	switch (feature) {
-+	case KVM_PTP_VIRT_COUNTER:
-+		cycles = systime_snapshot.cycles - vcpu_read_sys_reg(vcpu, CNTVOFF_EL2);
-+		break;
-+	case KVM_PTP_PHYS_COUNTER:
-+		cycles = systime_snapshot.cycles;
-+		break;
-+	default:
-+		return;
-+	}
-+
-+	/*
-+	 * This relies on the top bit of val[0] never being set for
-+	 * valid values of system time, because that is *really* far
-+	 * in the future (about 292 years from 1970, and at that stage
-+	 * nobody will give a damn about it).
-+	 */
-+	val[0] = upper_32_bits(systime_snapshot.real);
-+	val[1] = lower_32_bits(systime_snapshot.real);
-+	val[2] = upper_32_bits(cycles);
-+	val[3] = lower_32_bits(cycles);
-+}
-+
- int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+-asmlinkage void __init init_feature_override(void)
++asmlinkage void __init __no_sanitize_address init_feature_override(void)
  {
- 	u32 func_id = smccc_get_function(vcpu);
-@@ -79,6 +128,10 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
- 		break;
- 	case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
- 		val[0] = BIT(ARM_SMCCC_KVM_FUNC_FEATURES);
-+		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_PTP);
-+		break;
-+	case ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID:
-+		kvm_ptp_get_time(vcpu, val);
- 		break;
- 	default:
- 		return kvm_psci_call(vcpu);
-diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
-index 74e90b65b489..96d4973d42d3 100644
---- a/include/linux/arm-smccc.h
-+++ b/include/linux/arm-smccc.h
-@@ -103,6 +103,7 @@
+        int i;
  
- /* KVM "vendor specific" services */
- #define ARM_SMCCC_KVM_FUNC_FEATURES		0
-+#define ARM_SMCCC_KVM_FUNC_PTP			1
- #define ARM_SMCCC_KVM_FUNC_FEATURES_2		127
- #define ARM_SMCCC_KVM_NUM_FUNCS			128
+diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
+index 61845c0821d9..33581de05d2e 100644
+--- a/arch/arm64/kernel/setup.c
++++ b/arch/arm64/kernel/setup.c
+@@ -170,12 +170,12 @@ static void __init smp_build_mpidr_hash(void)
  
-@@ -114,6 +115,21 @@
+ static void *early_fdt_ptr __initdata;
  
- #define SMCCC_ARCH_WORKAROUND_RET_UNAFFECTED	1
+-void __init *get_early_fdt_ptr(void)
++void __init __no_sanitize_address *get_early_fdt_ptr(void)
+ {
+        return early_fdt_ptr;
+ }
  
-+/*
-+ * ptp_kvm is a feature used for time sync between vm and host.
-+ * ptp_kvm module in guest kernel will get service from host using
-+ * this hypercall ID.
-+ */
-+#define ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID				\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-+			   ARM_SMCCC_SMC_32,				\
-+			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
-+			   ARM_SMCCC_KVM_FUNC_PTP)
-+
-+/* ptp_kvm counter type ID */
-+#define KVM_PTP_VIRT_COUNTER			0
-+#define KVM_PTP_PHYS_COUNTER			1
-+
- /* Paravirtualised time calls (defined by ARM DEN0057A) */
- #define ARM_SMCCC_HV_PV_TIME_FEATURES				\
- 	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 374c67875cdb..ef75c3532759 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1058,6 +1058,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_ENFORCE_PV_FEATURE_CPUID 190
- #define KVM_CAP_SYS_HYPERV_CPUID 191
- #define KVM_CAP_DIRTY_LOG_RING 192
-+#define KVM_CAP_PTP_KVM 193
+-asmlinkage void __init early_fdt_map(u64 dt_phys)
++asmlinkage void __init __no_sanitize_address early_fdt_map(u64 dt_phys)
+ {
+        int fdt_size;
  
- #ifdef KVM_CAP_IRQ_ROUTING
- 
--- 
-2.29.2
 
 _______________________________________________
 kvmarm mailing list
