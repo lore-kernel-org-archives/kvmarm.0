@@ -6,53 +6,53 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26A5BC433DB
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Feb 2021 10:04:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 904DAC433E0
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Feb 2021 10:04:44 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B3B4064EB4
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Feb 2021 10:04:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3B4064EB4
+	by mail.kernel.org (Postfix) with ESMTP id 160D464EB1
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Feb 2021 10:04:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 160D464EB1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B5534B611;
-	Mon,  8 Feb 2021 05:04:40 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id ABA374B614;
+	Mon,  8 Feb 2021 05:04:43 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JKMhgxONucye; Mon,  8 Feb 2021 05:04:36 -0500 (EST)
+	with ESMTP id czrmqXLGLJLR; Mon,  8 Feb 2021 05:04:40 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EAC74B607;
-	Mon,  8 Feb 2021 05:04:36 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 749224B639;
+	Mon,  8 Feb 2021 05:04:40 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F39FF4B607
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2021 05:04:35 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 532424B5A2
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2021 05:04:39 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lkFCVUV9gVLw for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Feb 2021 05:04:31 -0500 (EST)
+ with ESMTP id w2UYld15gK7s for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Feb 2021 05:04:35 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AF76A4B571
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2021 05:04:28 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 20D4C4B55E
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2021 05:04:31 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id B589964E8A;
- Mon,  8 Feb 2021 10:04:27 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 2C6E164E9A;
+ Mon,  8 Feb 2021 10:04:30 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1l93J6-00Ck14-24; Mon, 08 Feb 2021 09:58:12 +0000
+ id 1l93Is-00Ck14-9h; Mon, 08 Feb 2021 09:57:58 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  linux-kernel@vger.kernel.org
-Subject: [PATCH v7 19/23] arm64: Move "nokaslr" over to the early cpufeature
- infrastructure
-Date: Mon,  8 Feb 2021 09:57:28 +0000
-Message-Id: <20210208095732.3267263-20-maz@kernel.org>
+Subject: [PATCH v7 10/23] arm64: cpufeature: Add global feature override
+ facility
+Date: Mon,  8 Feb 2021 09:57:19 +0000
+Message-Id: <20210208095732.3267263-11-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210208095732.3267263-1-maz@kernel.org>
 References: <20210208095732.3267263-1-maz@kernel.org>
@@ -89,107 +89,120 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Given that the early cpufeature infrastructure has borrowed quite
-a lot of code from the kaslr implementation, let's reimplement
-the matching of the "nokaslr" option with it.
+Add a facility to globally override a feature, no matter what
+the HW says. Yes, this sounds dangerous, but we do respect the
+"safe" value for a given feature. This doesn't mean the user
+doesn't need to know what they are doing.
+
+Nothing uses this yet, so we are pretty safe. For now.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Acked-by: David Brazdil <dbrazdil@google.com>
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 ---
- arch/arm64/kernel/idreg-override.c | 15 +++++++++++++
- arch/arm64/kernel/kaslr.c          | 36 ++----------------------------
- 2 files changed, 17 insertions(+), 34 deletions(-)
+ arch/arm64/include/asm/cpufeature.h |  6 ++++
+ arch/arm64/kernel/cpufeature.c      | 45 +++++++++++++++++++++++++----
+ 2 files changed, 45 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/kernel/idreg-override.c b/arch/arm64/kernel/idreg-override.c
-index b994d689d6fb..70dd70eee7a2 100644
---- a/arch/arm64/kernel/idreg-override.c
-+++ b/arch/arm64/kernel/idreg-override.c
-@@ -37,8 +37,22 @@ static const struct ftr_set_desc mmfr1 __initconst = {
- 	},
+diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+index 9a555809b89c..b1f53147e2b2 100644
+--- a/arch/arm64/include/asm/cpufeature.h
++++ b/arch/arm64/include/asm/cpufeature.h
+@@ -63,6 +63,11 @@ struct arm64_ftr_bits {
+ 	s64		safe_val; /* safe value for FTR_EXACT features */
  };
  
-+extern struct arm64_ftr_override kaslr_feature_override;
-+
-+static const struct ftr_set_desc kaslr __initconst = {
-+	.name		= "kaslr",
-+#ifdef CONFIG_RANDOMIZE_BASE
-+	.override	= &kaslr_feature_override,
-+#endif
-+	.fields		= {
-+		{ "disabled", 0 },
-+		{}
-+	},
++struct arm64_ftr_override {
++	u64		val;
++	u64		mask;
 +};
 +
- static const struct ftr_set_desc * const regs[] __initconst = {
- 	&mmfr1,
-+	&kaslr,
- };
- 
- static const struct {
-@@ -47,6 +61,7 @@ static const struct {
- } aliases[] __initconst = {
- 	{ "kvm-arm.mode=nvhe",		"id_aa64mmfr1.vh=0" },
- 	{ "kvm-arm.mode=protected",	"id_aa64mmfr1.vh=0" },
-+	{ "nokaslr",			"kaslr.disabled=1" },
- };
- 
- static int __init find_field(const char *cmdline,
-diff --git a/arch/arm64/kernel/kaslr.c b/arch/arm64/kernel/kaslr.c
-index 5fc86e7d01a1..27f8939deb1b 100644
---- a/arch/arm64/kernel/kaslr.c
-+++ b/arch/arm64/kernel/kaslr.c
-@@ -51,39 +51,7 @@ static __init u64 get_kaslr_seed(void *fdt)
- 	return ret;
- }
- 
--static __init bool cmdline_contains_nokaslr(const u8 *cmdline)
--{
--	const u8 *str;
--
--	str = strstr(cmdline, "nokaslr");
--	return str == cmdline || (str > cmdline && *(str - 1) == ' ');
--}
--
--static __init bool is_kaslr_disabled_cmdline(void *fdt)
--{
--	if (!IS_ENABLED(CONFIG_CMDLINE_FORCE)) {
--		int node;
--		const u8 *prop;
--
--		node = fdt_path_offset(fdt, "/chosen");
--		if (node < 0)
--			goto out;
--
--		prop = fdt_getprop(fdt, node, "bootargs", NULL);
--		if (!prop)
--			goto out;
--
--		if (cmdline_contains_nokaslr(prop))
--			return true;
--
--		if (IS_ENABLED(CONFIG_CMDLINE_EXTEND))
--			goto out;
--
--		return false;
--	}
--out:
--	return cmdline_contains_nokaslr(CONFIG_CMDLINE);
--}
-+struct arm64_ftr_override kaslr_feature_override __initdata;
- 
  /*
-  * This routine will be executed with the kernel mapped at its default virtual
-@@ -126,7 +94,7 @@ u64 __init kaslr_early_init(void)
- 	 * Check if 'nokaslr' appears on the command line, and
- 	 * return 0 if that is the case.
- 	 */
--	if (is_kaslr_disabled_cmdline(fdt)) {
-+	if (kaslr_feature_override.val & kaslr_feature_override.mask & 0xf) {
- 		kaslr_status = KASLR_DISABLED_CMDLINE;
- 		return 0;
- 	}
+  * @arm64_ftr_reg - Feature register
+  * @strict_mask		Bits which should match across all CPUs for sanity.
+@@ -74,6 +79,7 @@ struct arm64_ftr_reg {
+ 	u64				user_mask;
+ 	u64				sys_val;
+ 	u64				user_val;
++	struct arm64_ftr_override	*override;
+ 	const struct arm64_ftr_bits	*ftr_bits;
+ };
+ 
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index e99eddec0a46..a4e5c619a516 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -352,9 +352,12 @@ static const struct arm64_ftr_bits ftr_ctr[] = {
+ 	ARM64_FTR_END,
+ };
+ 
++static struct arm64_ftr_override __ro_after_init no_override = { };
++
+ struct arm64_ftr_reg arm64_ftr_reg_ctrel0 = {
+ 	.name		= "SYS_CTR_EL0",
+-	.ftr_bits	= ftr_ctr
++	.ftr_bits	= ftr_ctr,
++	.override	= &no_override,
+ };
+ 
+ static const struct arm64_ftr_bits ftr_id_mmfr0[] = {
+@@ -544,13 +547,16 @@ static const struct arm64_ftr_bits ftr_raz[] = {
+ 	ARM64_FTR_END,
+ };
+ 
+-#define ARM64_FTR_REG(id, table) {		\
+-	.sys_id = id,				\
+-	.reg = 	&(struct arm64_ftr_reg){	\
+-		.name = #id,			\
+-		.ftr_bits = &((table)[0]),	\
++#define ARM64_FTR_REG_OVERRIDE(id, table, ovr) {		\
++		.sys_id = id,					\
++		.reg = 	&(struct arm64_ftr_reg){		\
++			.name = #id,				\
++			.override = (ovr),			\
++			.ftr_bits = &((table)[0]),		\
+ 	}}
+ 
++#define ARM64_FTR_REG(id, table) ARM64_FTR_REG_OVERRIDE(id, table, &no_override)
++
+ static const struct __ftr_reg_entry {
+ 	u32			sys_id;
+ 	struct arm64_ftr_reg 	*reg;
+@@ -770,6 +776,33 @@ static void __init init_cpu_ftr_reg(u32 sys_reg, u64 new)
+ 	for (ftrp = reg->ftr_bits; ftrp->width; ftrp++) {
+ 		u64 ftr_mask = arm64_ftr_mask(ftrp);
+ 		s64 ftr_new = arm64_ftr_value(ftrp, new);
++		s64 ftr_ovr = arm64_ftr_value(ftrp, reg->override->val);
++
++		if ((ftr_mask & reg->override->mask) == ftr_mask) {
++			s64 tmp = arm64_ftr_safe_value(ftrp, ftr_ovr, ftr_new);
++			char *str = NULL;
++
++			if (ftr_ovr != tmp) {
++				/* Unsafe, remove the override */
++				reg->override->mask &= ~ftr_mask;
++				reg->override->val &= ~ftr_mask;
++				tmp = ftr_ovr;
++				str = "ignoring override";
++			} else if (ftr_new != tmp) {
++				/* Override was valid */
++				ftr_new = tmp;
++				str = "forced";
++			} else if (ftr_ovr == tmp) {
++				/* Override was the safe value */
++				str = "already set";
++			}
++
++			if (str)
++				pr_warn("%s[%d:%d]: %s to %llx\n",
++					reg->name,
++					ftrp->shift + ftrp->width - 1,
++					ftrp->shift, str, tmp);
++		}
+ 
+ 		val = arm64_ftr_set_value(ftrp, val, ftr_new);
+ 
 -- 
 2.29.2
 
