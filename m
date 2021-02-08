@@ -2,79 +2,89 @@ Return-Path: <SRS0=ArS2=HK=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB2ABC433DB
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Feb 2021 16:30:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79126C433E0
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Feb 2021 17:31:55 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4B09A64E8F
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Feb 2021 16:30:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B09A64E8F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id AC8A464DB2
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Feb 2021 17:31:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC8A464DB2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 823494B6C5;
-	Mon,  8 Feb 2021 11:30:57 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0BF914B665;
+	Mon,  8 Feb 2021 12:31:54 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id EMth3lx9J3w2; Mon,  8 Feb 2021 11:30:56 -0500 (EST)
+	with ESMTP id rozqd5OiOdny; Mon,  8 Feb 2021 12:31:53 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C8B84B6C7;
-	Mon,  8 Feb 2021 11:30:56 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F3B134B6B2;
+	Mon,  8 Feb 2021 12:31:52 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BB014B6C5
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2021 11:30:55 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9314A4B665
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2021 12:31:52 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3fhP3pj3k3lW for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Feb 2021 11:30:54 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 67A6D4B659
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2021 11:30:54 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 2FBC264E8C;
- Mon,  8 Feb 2021 16:30:53 +0000 (UTC)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
- TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
- (envelope-from <maz@kernel.org>)
- id 1l99R4-00CpnW-SH; Mon, 08 Feb 2021 16:30:50 +0000
+ with ESMTP id 7cs+56mHqCTU for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Feb 2021 12:31:51 -0500 (EST)
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com
+ [209.85.208.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 874144B599
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2021 12:31:51 -0500 (EST)
+Received: by mail-ed1-f50.google.com with SMTP id z22so19337451edb.9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 08 Feb 2021 09:31:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=150RTcQf9BfKKICDDXV9LKFJabVH26+mj9gc5y6fe7Y=;
+ b=hyAFs0fKGKFRmcciR03ZZ+YgXacp92jIDmnU50sMK4A9BRuJZf1z7VY29bDmosfHTb
+ 1WxxFJmX4Gx2fA5LbII7eG20wFGqZn2bS948AI6OJ6Alo0QsDcr/UWtsoB9PEoSSrQs6
+ Sgp9ku+9stH6xnurZ6pYqxXLqFor2p8XQ8xdOHBcBbW6DZ9qjJXHVcwNrJ9g2FJfHgrr
+ nJ7wG+20YbrL/0Rdm7sCRiO2XEvUYsLQR+ZhObZcRDg0iMfiwvTqtzC1QFMWLyLnPeZW
+ eyTK7lotvYRoGNA1ptcR3iRB9VOCPrva6py9K0rLj2MnNZz0HANq9733DQWdvkSShO8W
+ u1jQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=150RTcQf9BfKKICDDXV9LKFJabVH26+mj9gc5y6fe7Y=;
+ b=khYEcPEYIJZK71L2ZO4KD7B7iha+12mu6Z80WyWXPoiPWLQbiB2SEggo0bH3khQ076
+ w3eVBzgP0DoYpuQkmwpvVT7aF0f7+1IEekufANno0iIs2qhk2HMnle1Gv1G78p3qZOUJ
+ CM8Bmsc0jX6GeEZr1iABtMbsJ2A4DAKk5mcEFg6vprLDpBdHYwjoAvKWwVhQhs8zaX7a
+ KFm1CJpMdeJ3h2xskCLLEvGD9wEMDDY7KYp4iQISIdcxqdnOpkYd8rwc7jFHF29Vqb8g
+ FGkw85evplHHB79KLNdu7N7VreJ2q9FKNIYzWFYpIuhx5fm1wF1KcmaAcEad3SvV9NU8
+ l8/g==
+X-Gm-Message-State: AOAM530Gpd0qibqemrcN9jbiLvHRTMVk6X9agfHOhkpxEMZiGE4/zRqc
+ y6PIibX3gLB8iJ5A6BK9yEqe1xHzPIf40t3RR8+arQ==
+X-Google-Smtp-Source: ABdhPJyfU7DR5l4b18tnpHL187lOP8zLT1R2zc8ro9MwTmAB+zuO7xlpf0gqcrlNJL178r53Bg3pYOpuitw0w/ezOBI=
+X-Received: by 2002:a50:e80d:: with SMTP id e13mr17842705edn.251.1612805510357; 
+ Mon, 08 Feb 2021 09:31:50 -0800 (PST)
 MIME-Version: 1.0
-Date: Mon, 08 Feb 2021 16:30:50 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v7 00/23] arm64: Early CPU feature override, and
- applications to VHE, BTI and PAuth
-In-Reply-To: <20210208143248.GA25934@willie-the-truck>
-References: <20210208095732.3267263-1-maz@kernel.org>
- <20210208143248.GA25934@willie-the-truck>
-User-Agent: Roundcube Webmail/1.4.10
-Message-ID: <e4969ab634754a927f812788b2b2f082@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: will@kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
- catalin.marinas@arm.com, mark.rutland@arm.com, dbrazdil@google.com,
- alexandru.elisei@arm.com, ardb@kernel.org, jingzhangos@google.com,
- pajay@qti.qualcomm.com, psodagud@codeaurora.org, sramana@codeaurora.org,
- marcan@marcan.st, james.morse@arm.com, julien.thierry.kdev@gmail.com,
- suzuki.poulose@arm.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: Prasad Sodagudi <psodagud@codeaurora.org>,
- Srinivas Ramana <sramana@codeaurora.org>,
- Catalin Marinas <catalin.marinas@arm.com>, Hector Martin <marcan@marcan.st>,
- linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
- Ajay Patil <pajay@qti.qualcomm.com>, kernel-team@android.com,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+References: <20210205135803.48321-1-steven.price@arm.com>
+ <20210205135803.48321-6-steven.price@arm.com>
+In-Reply-To: <20210205135803.48321-6-steven.price@arm.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 8 Feb 2021 17:31:39 +0000
+Message-ID: <CAFEAcA99kV_d6ev9wC4ySiyoD7Cp=HCD0v2bBhGSOU-KrzkqaQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v8 5/5] KVM: arm64: ioctl to fetch/store tags in a
+ guest
+To: Steven Price <steven.price@arm.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Juan Quintela <quintela@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Dave Martin <Dave.Martin@arm.com>,
+ arm-mail-list <linux-arm-kernel@lists.infradead.org>,
+ Marc Zyngier <maz@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+ Will Deacon <will@kernel.org>, kvmarm <kvmarm@lists.cs.columbia.edu>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -86,83 +96,34 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2021-02-08 14:32, Will Deacon wrote:
-> Hi Marc,
-> 
-> On Mon, Feb 08, 2021 at 09:57:09AM +0000, Marc Zyngier wrote:
->> It recently came to light that there is a need to be able to override
->> some CPU features very early on, before the kernel is fully up and
->> running. The reasons for this range from specific feature support
->> (such as using Protected KVM on VHE HW, which is the main motivation
->> for this work) to errata workaround (a feature is broken on a CPU and
->> needs to be turned off, or rather not enabled).
->> 
->> This series tries to offer a limited framework for this kind of
->> problems, by allowing a set of options to be passed on the
->> command-line and altering the feature set that the cpufeature
->> subsystem exposes to the rest of the kernel. Note that this doesn't
->> change anything for code that directly uses the CPU ID registers.
-> 
-> I applied this locally, but I'm seeing consistent boot failure under 
-> QEMU when
-> KASAN is enabled. I tried sprinkling some __no_sanitize_address 
-> annotations
-> around (see below) but it didn't help. The culprit appears to be
-> early_fdt_map(), but looking a bit more closely, I'm really nervous 
-> about the
-> way we call into C functions from __primary_switched. Remember -- this 
-> code
-> runs _twice_ when KASLR is active: before and after the randomization. 
-> This
-> also means that any memory writes the first time around can be lost due 
-> to
-> the D-cache invalidation when (re-)creating the kernel page-tables.
+On Fri, 5 Feb 2021 at 13:58, Steven Price <steven.price@arm.com> wrote:
+>
+> The VMM may not wish to have it's own mapping of guest memory mapped
+> with PROT_MTE because this causes problems if the VMM has tag checking
+> enabled (the guest controls the tags in physical RAM and it's unlikely
+> the tags are correct for the VMM).
+>
+> Instead add a new ioctl which allows the VMM to easily read/write the
+> tags from guest memory, allowing the VMM's mapping to be non-PROT_MTE
+> while the VMM can still read/write the tags for the purpose of
+> migration.
+>
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+>  arch/arm64/include/uapi/asm/kvm.h | 13 +++++++
+>  arch/arm64/kvm/arm.c              | 57 +++++++++++++++++++++++++++++++
+>  include/uapi/linux/kvm.h          |  1 +
+>  3 files changed, 71 insertions(+)
 
-Nailed it. Of course, before anything starts writing from C code, we 
-need
-to have initialised KASAN. kasan_init.c itself is compiled without any
-address sanitising, but we can't repaint all the stuff that is called
-from early_fdt_map() (quite a lot).
+Missing the update to the docs in Documentation/virtual/kvm/api.txt :-)
 
-So the natural thing to do is to keep kasan_early_init() as the first
-thing we do in C code, and everything falls from that.
-
-Any chance you could try that on top and see if that cures your problem?
-If that works for you, I'll push an updates series.
-
-Thanks,
-
-         M.
-
-diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
-index bce66d6bda74..09a5b603c950 100644
---- a/arch/arm64/kernel/head.S
-+++ b/arch/arm64/kernel/head.S
-@@ -429,13 +429,13 @@ SYM_FUNC_START_LOCAL(__primary_switched)
-  	bl	__pi_memset
-  	dsb	ishst				// Make zero page visible to PTW
-
-+#if defined(CONFIG_KASAN_GENERIC) || defined(CONFIG_KASAN_SW_TAGS)
-+	bl	kasan_early_init
-+#endif
-  	mov	x0, x21				// pass FDT address in x0
-  	bl	early_fdt_map			// Try mapping the FDT early
-  	bl	init_feature_override
-  	bl	switch_to_vhe
--#if defined(CONFIG_KASAN_GENERIC) || defined(CONFIG_KASAN_SW_TAGS)
--	bl	kasan_early_init
--#endif
-  #ifdef CONFIG_RANDOMIZE_BASE
-  	tst	x23, ~(MIN_KIMG_ALIGN - 1)	// already running randomized?
-  	b.ne	0f
-
--- 
-Jazz is not dead. It just smells funny...
+thanks
+-- PMM
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
