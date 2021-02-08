@@ -2,62 +2,76 @@ Return-Path: <SRS0=ArS2=HK=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 826C5C433DB
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Feb 2021 12:02:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBB30C433E0
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Feb 2021 13:40:40 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id AC46864E79
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Feb 2021 12:02:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC46864E79
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 304A364E27
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Feb 2021 13:40:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 304A364E27
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 04BAE4B214;
-	Mon,  8 Feb 2021 07:02:58 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A24C4B67A;
+	Mon,  8 Feb 2021 08:40:39 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9wsKGe9VQjfz; Mon,  8 Feb 2021 07:02:56 -0500 (EST)
+	with ESMTP id oqRRFw7X7Icq; Mon,  8 Feb 2021 08:40:38 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 794AB4B0C0;
-	Mon,  8 Feb 2021 07:02:56 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6388A4B678;
+	Mon,  8 Feb 2021 08:40:38 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5525A4B0C0
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2021 07:02:55 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ED1154B665
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2021 08:40:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DUtHsQjXCBvl for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Feb 2021 07:02:53 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 718C04AEDC
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2021 07:02:53 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EF24931B;
- Mon,  8 Feb 2021 04:02:52 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3AE893F73B;
- Mon,  8 Feb 2021 04:02:52 -0800 (PST)
-Subject: Re: [kvm-unit-tests PATCH v3 11/11] arm64: gic: Use IPI test checking
- for the LPI tests
-To: Auger Eric <eric.auger@redhat.com>, drjones@redhat.com,
- kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-References: <20210129163647.91564-1-alexandru.elisei@arm.com>
- <20210129163647.91564-12-alexandru.elisei@arm.com>
- <12c8b5a8-b515-64b8-eece-d9d85fb2fe72@redhat.com>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <b9f49e6d-bd59-2b1a-323a-e7c153e8d87c@arm.com>
-Date: Mon, 8 Feb 2021 12:02:40 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+ with ESMTP id pfCsefvJzcHJ for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Feb 2021 08:40:36 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AC3C84B60C
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2021 08:40:36 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 7B8746186A;
+ Mon,  8 Feb 2021 13:40:35 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1l96mH-00Cn0C-9k; Mon, 08 Feb 2021 13:40:33 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
+ tglx@linutronix.de, pbonzini@redhat.com, seanjc@google.com,
+ richardcochran@gmail.com, Mark.Rutland@arm.com, will@kernel.org,
+ suzuki.poulose@arm.com, Andre.Przywara@arm.com, steven.price@arm.com,
+ lorenzo.pieralisi@arm.com, sudeep.holla@arm.com
+Subject: [PATCH v18 0/7] KVM: arm64: Add host/guest KVM-PTP support
+Date: Mon,  8 Feb 2021 13:40:22 +0000
+Message-Id: <20210208134029.3269384-1-maz@kernel.org>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-In-Reply-To: <12c8b5a8-b515-64b8-eece-d9d85fb2fe72@redhat.com>
-Content-Language: en-US
-Cc: andre.przywara@arm.com
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: netdev@vger.kernel.org, yangbo.lu@nxp.com,
+ john.stultz@linaro.org, tglx@linutronix.de, pbonzini@redhat.com,
+ seanjc@google.com, richardcochran@gmail.com, Mark.Rutland@arm.com,
+ will@kernel.org, suzuki.poulose@arm.com, Andre.Przywara@arm.com,
+ steven.price@arm.com, lorenzo.pieralisi@arm.com, sudeep.holla@arm.com,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Steve.Capper@arm.com,
+ justin.he@arm.com, jianyong.wu@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: justin.he@arm.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -74,218 +88,89 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Eric,
+Given that this series[0] has languished in my Inbox for the best of the
+past two years, and in an effort to eventually get it merged, I've
+taken the liberty to pick it up and do the changes I wanted to see
+instead of waiting to go through yet another round.
 
-On 2/5/21 1:30 PM, Auger Eric wrote:
-> Hi Alexandru,
->
-> On 1/29/21 5:36 PM, Alexandru Elisei wrote:
->> The LPI code validates a result similarly to the IPI tests, by checking if
->> the target CPU received the interrupt with the expected interrupt number.
->> However, the LPI tests invent their own way of checking the test results by
->> creating a global struct (lpi_stats), using a separate interrupt handler
->> (lpi_handler) and test function (check_lpi_stats).
->>
->> There are several areas that can be improved in the LPI code, which are
->> already covered by the IPI tests:
->>
->> - check_lpi_stats() doesn't take into account that the target CPU can
->>   receive the correct interrupt multiple times.
->> - check_lpi_stats() doesn't take into the account the scenarios where all
->>   online CPUs can receive the interrupt, but the target CPU is the last CPU
->>   that touches lpi_stats.observed.
->> - Insufficient or missing memory synchronization.
->>
->> Instead of duplicating code, let's convert the LPI tests to use
->> check_acked() and the same interrupt handler as the IPI tests, which has
->> been renamed to irq_handler() to avoid any confusion.
->>
->> check_lpi_stats() has been replaced with check_acked() which, together with
->> using irq_handler(), instantly gives us more correctness checks and proper
->> memory synchronization between threads. lpi_stats.expected has been
->> replaced by the CPU mask and the expected interrupt number arguments to
->> check_acked(), with no change in semantics.
->>
->> lpi_handler() aborted the test if the interrupt number was not an LPI. This
->> was changed in favor of allowing the test to continue, as it will fail in
->> check_acked(), but possibly print information useful for debugging. If the
->> test receives spurious interrupts, those are reported via report_info() at
->> the end of the test for consistency with the IPI tests, which don't treat
->> spurious interrupts as critical errors.
->>
->> In the spirit of code reuse, secondary_lpi_tests() has been replaced with
->> ipi_recv() because the two are now identical; ipi_recv() has been renamed
->> to irq_recv(), similarly to irq_handler(), to avoid confusion.
->>
->> CC: Eric Auger <eric.auger@redhat.com>
->> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
->> ---
->>  arm/gic.c | 190 +++++++++++++++++++++++++-----------------------------
->>  1 file changed, 87 insertions(+), 103 deletions(-)
->>
->> [..]
->> @@ -796,18 +737,31 @@ static void test_its_trigger(void)
->>  	 * The LPI should not hit
->>  	 */
->>  	gicv3_lpi_set_config(8195, LPI_PROP_DEFAULT);
->> -	lpi_stats_expect(-1, -1);
->> +	stats_reset();
->> +	cpumask_clear(&mask);
->>  	its_send_int(dev2, 20);
->> -	check_lpi_stats("dev2/eventid=20 still does not trigger any LPI");
->> +	wait_for_interrupts(&mask);
->> +	report(check_acked(&mask, -1, -1),
->> +			"dev2/eventid=20 still does not trigger any LPI");
->>  
->>  	/* Now call the invall and check the LPI hits */
->> +	stats_reset();
->> +	/* The barrier is from its_send_int() */
->> +	wmb();
-> In v1 it was envisionned to add the wmb in __its_send_it but I fail to
-> see it. Is it implicit in some way?
+All the patches have a link to their original counterpart (though I
+have squashed a couple of them where it made sense). Tested both 64
+and 32bit guests for a good measure. Of course, I claim full
+responsibility for any bug introduced here.
 
-Thank you for having a look at this, it seems I forgot to remove this barrier.
+* From v17 [1]:
+  - Fixed compilation issue on 32bit systems not selecting
+    CONFIG_HAVE_ARM_SMCCC_DISCOVERY
+  - Fixed KVM service discovery not properly parsing the reply
+    from the hypervisor
 
-The barriers in __its_send_int() and the one above are not needed because the
-barrier is already present in its_send_invall() -> its_send_single_command() ->
-its_post_commands() -> writeq() (the removal from __its_send_int() is also
-explained in the cover letter).
+* From v16 [0]:
+  - Moved the KVM service discovery to its own file, plugged it into
+    PSCI instead of the arch code, dropped the inlining, made use of
+    asm/hypervisor.h.
+  - Tidied-up the namespacing
+  - Cleanup the hypercall handler
+  - De-duplicate the guest code
+  - Tidied-up arm64-specific documentation
+  - Dropped the generic PTP documentation as it needs a new location,
+    and some cleanup
+  - Squashed hypercall documentation and capability into the
+    main KVM patch
+  - Rebased on top of 5.11-rc4
 
-I'll remove the wmb() barrier in the next version.
+[0] https://lore.kernel.org/r/20201209060932.212364-1-jianyong.wu@arm.com
+[1] https://lore.kernel.org/r/20210202141204.3134855-1-maz@kernel.org
 
-Thanks,
+Jianyong Wu (4):
+  ptp: Reorganize ptp_kvm.c to make it arch-independent
+  clocksource: Add clocksource id for arm arch counter
+  KVM: arm64: Add support for the KVM PTP service
+  ptp: arm/arm64: Enable ptp_kvm for arm/arm64
 
-Alex
+Thomas Gleixner (1):
+  time: Add mechanism to recognize clocksource in time_get_snapshot
 
->
-> Thanks
->
-> Eric
->> +	cpumask_clear(&mask);
->> +	cpumask_set_cpu(3, &mask);
->>  	its_send_invall(col3);
->> -	lpi_stats_expect(3, 8195);
->> -	check_lpi_stats("dev2/eventid=20 pending LPI is received");
->> +	wait_for_interrupts(&mask);
->> +	report(check_acked(&mask, 0, 8195),
->> +			"dev2/eventid=20 pending LPI is received");
->>  
->> -	lpi_stats_expect(3, 8195);
->> +	stats_reset();
->> +	cpumask_clear(&mask);
->> +	cpumask_set_cpu(3, &mask);
->>  	its_send_int(dev2, 20);
->> -	check_lpi_stats("dev2/eventid=20 now triggers an LPI");
->> +	wait_for_interrupts(&mask);
->> +	report(check_acked(&mask, 0, 8195),
->> +			"dev2/eventid=20 now triggers an LPI");
->>  
->>  	report_prefix_pop();
->>  
->> @@ -818,9 +772,13 @@ static void test_its_trigger(void)
->>  	 */
->>  
->>  	its_send_mapd(dev2, false);
->> -	lpi_stats_expect(-1, -1);
->> +	stats_reset();
->> +	cpumask_clear(&mask);
->>  	its_send_int(dev2, 20);
->> -	check_lpi_stats("no LPI after device unmap");
->> +	wait_for_interrupts(&mask);
->> +	report(check_acked(&mask, -1, -1), "no LPI after device unmap");
->> +
->> +	check_spurious();
->>  	report_prefix_pop();
->>  }
->>  
->> @@ -828,6 +786,7 @@ static void test_its_migration(void)
->>  {
->>  	struct its_device *dev2, *dev7;
->>  	bool test_skipped = false;
->> +	cpumask_t mask;
->>  
->>  	if (its_setup1()) {
->>  		test_skipped = true;
->> @@ -844,13 +803,23 @@ do_migrate:
->>  	if (test_skipped)
->>  		return;
->>  
->> -	lpi_stats_expect(3, 8195);
->> +	stats_reset();
->> +	cpumask_clear(&mask);
->> +	cpumask_set_cpu(3, &mask);
->>  	its_send_int(dev2, 20);
->> -	check_lpi_stats("dev2/eventid=20 triggers LPI 8195 on PE #3 after migration");
->> +	wait_for_interrupts(&mask);
->> +	report(check_acked(&mask, 0, 8195),
->> +			"dev2/eventid=20 triggers LPI 8195 on PE #3 after migration");
->>  
->> -	lpi_stats_expect(2, 8196);
->> +	stats_reset();
->> +	cpumask_clear(&mask);
->> +	cpumask_set_cpu(2, &mask);
->>  	its_send_int(dev7, 255);
->> -	check_lpi_stats("dev7/eventid=255 triggers LPI 8196 on PE #2 after migration");
->> +	wait_for_interrupts(&mask);
->> +	report(check_acked(&mask, 0, 8196),
->> +			"dev7/eventid=255 triggers LPI 8196 on PE #2 after migration");
->> +
->> +	check_spurious();
->>  }
->>  
->>  #define ERRATA_UNMAPPED_COLLECTIONS "ERRATA_8c58be34494b"
->> @@ -860,6 +829,7 @@ static void test_migrate_unmapped_collection(void)
->>  	struct its_collection *col = NULL;
->>  	struct its_device *dev2 = NULL, *dev7 = NULL;
->>  	bool test_skipped = false;
->> +	cpumask_t mask;
->>  	int pe0 = 0;
->>  	u8 config;
->>  
->> @@ -894,17 +864,27 @@ do_migrate:
->>  	its_send_mapc(col, true);
->>  	its_send_invall(col);
->>  
->> -	lpi_stats_expect(2, 8196);
->> +	stats_reset();
->> +	cpumask_clear(&mask);
->> +	cpumask_set_cpu(2, &mask);
->>  	its_send_int(dev7, 255);
->> -	check_lpi_stats("dev7/eventid= 255 triggered LPI 8196 on PE #2");
->> +	wait_for_interrupts(&mask);
->> +	report(check_acked(&mask, 0, 8196),
->> +			"dev7/eventid= 255 triggered LPI 8196 on PE #2");
->>  
->>  	config = gicv3_lpi_get_config(8192);
->>  	report(config == LPI_PROP_DEFAULT,
->>  	       "Config of LPI 8192 was properly migrated");
->>  
->> -	lpi_stats_expect(pe0, 8192);
->> +	stats_reset();
->> +	cpumask_clear(&mask);
->> +	cpumask_set_cpu(pe0, &mask);
->>  	its_send_int(dev2, 0);
->> -	check_lpi_stats("dev2/eventid = 0 triggered LPI 8192 on PE0");
->> +	wait_for_interrupts(&mask);
->> +	report(check_acked(&mask, 0, 8192),
->> +			"dev2/eventid = 0 triggered LPI 8192 on PE0");
->> +
->> +	check_spurious();
->>  }
->>  
->>  static void test_its_pending_migration(void)
->> @@ -961,6 +941,10 @@ static void test_its_pending_migration(void)
->>  	pendbaser = readq(ptr);
->>  	writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
->>  
->> +	/*
->> +	 * Reset and initialization values for acked are the same, so we don't
->> +	 * need to explicitely call stats_reset().
->> +	 */
->>  	gicv3_lpi_rdist_enable(pe0);
->>  	gicv3_lpi_rdist_enable(pe1);
->>  
->>
+Will Deacon (2):
+  arm/arm64: Probe for the presence of KVM hypervisor
+  KVM: arm64: Advertise KVM UID to guests via SMCCC
+
+ Documentation/virt/kvm/api.rst              |  9 ++
+ Documentation/virt/kvm/arm/index.rst        |  1 +
+ Documentation/virt/kvm/arm/ptp_kvm.rst      | 25 ++++++
+ arch/arm/include/asm/hypervisor.h           |  3 +
+ arch/arm64/include/asm/hypervisor.h         |  3 +
+ arch/arm64/kvm/arm.c                        |  1 +
+ arch/arm64/kvm/hypercalls.c                 | 80 +++++++++++++++--
+ drivers/clocksource/arm_arch_timer.c        | 36 ++++++++
+ drivers/firmware/psci/psci.c                |  2 +
+ drivers/firmware/smccc/Makefile             |  2 +-
+ drivers/firmware/smccc/kvm_guest.c          | 50 +++++++++++
+ drivers/firmware/smccc/smccc.c              |  1 +
+ drivers/ptp/Kconfig                         |  2 +-
+ drivers/ptp/Makefile                        |  2 +
+ drivers/ptp/ptp_kvm_arm.c                   | 28 ++++++
+ drivers/ptp/{ptp_kvm.c => ptp_kvm_common.c} | 84 +++++-------------
+ drivers/ptp/ptp_kvm_x86.c                   | 97 +++++++++++++++++++++
+ include/linux/arm-smccc.h                   | 41 +++++++++
+ include/linux/clocksource.h                 |  6 ++
+ include/linux/clocksource_ids.h             | 12 +++
+ include/linux/ptp_kvm.h                     | 19 ++++
+ include/linux/timekeeping.h                 | 12 +--
+ include/uapi/linux/kvm.h                    |  1 +
+ kernel/time/clocksource.c                   |  2 +
+ kernel/time/timekeeping.c                   |  1 +
+ 25 files changed, 442 insertions(+), 78 deletions(-)
+ create mode 100644 Documentation/virt/kvm/arm/ptp_kvm.rst
+ create mode 100644 drivers/firmware/smccc/kvm_guest.c
+ create mode 100644 drivers/ptp/ptp_kvm_arm.c
+ rename drivers/ptp/{ptp_kvm.c => ptp_kvm_common.c} (60%)
+ create mode 100644 drivers/ptp/ptp_kvm_x86.c
+ create mode 100644 include/linux/clocksource_ids.h
+ create mode 100644 include/linux/ptp_kvm.h
+
+-- 
+2.29.2
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
