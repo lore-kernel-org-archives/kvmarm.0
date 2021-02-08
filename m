@@ -6,53 +6,53 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7461C433E0
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Feb 2021 10:04:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C1EBC433E0
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Feb 2021 10:04:59 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6DC2564EAC
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Feb 2021 10:04:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DC2564EAC
+	by mail.kernel.org (Postfix) with ESMTP id 025DD64EB4
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Feb 2021 10:04:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 025DD64EB4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C4AF4B5CA;
-	Mon,  8 Feb 2021 05:04:55 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 96F554B615;
+	Mon,  8 Feb 2021 05:04:58 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id lkxi5sGjBXCB; Mon,  8 Feb 2021 05:04:53 -0500 (EST)
+	with ESMTP id v1pKfuPFGGfG; Mon,  8 Feb 2021 05:04:55 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 156DA4B637;
-	Mon,  8 Feb 2021 05:04:48 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F1574B671;
+	Mon,  8 Feb 2021 05:04:50 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BA4064B3A3
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2021 05:04:47 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 494BB4B607
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2021 05:04:49 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8CoZj40tUveG for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Feb 2021 05:04:43 -0500 (EST)
+ with ESMTP id NysHFwPD3kvU for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Feb 2021 05:04:48 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2E1DC4B66B
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2021 05:04:41 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 343604B35C
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2021 05:04:43 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 4BD3264EA7;
- Mon,  8 Feb 2021 10:04:40 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 4A8F964E9C;
+ Mon,  8 Feb 2021 10:04:42 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1l93It-00Ck14-Ne; Mon, 08 Feb 2021 09:57:59 +0000
+ id 1l93JA-00Ck14-Tq; Mon, 08 Feb 2021 09:58:17 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  linux-kernel@vger.kernel.org
-Subject: [PATCH v7 12/23] arm64: Extract early FDT mapping from
- kaslr_early_init()
-Date: Mon,  8 Feb 2021 09:57:21 +0000
-Message-Id: <20210208095732.3267263-13-maz@kernel.org>
+Subject: [PATCH v7 23/23] [DO NOT MERGE] arm64: Cope with CPUs stuck in VHE
+ mode
+Date: Mon,  8 Feb 2021 09:57:32 +0000
+Message-Id: <20210208095732.3267263-24-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210208095732.3267263-1-maz@kernel.org>
 References: <20210208095732.3267263-1-maz@kernel.org>
@@ -89,123 +89,137 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-As we want to parse more options very early in the kernel lifetime,
-let's always map the FDT early. This is achieved by moving that
-code out of kaslr_early_init().
+It seems that the CPU known as Apple M1 has the terrible habit
+of being stuck with HCR_EL2.E2H==1, in violation of the architecture.
 
-No functionnal change expected.
+Try and work around this deplorable state of affairs by detecting
+the stuck bit early and short-circuit the nVHE dance. It is still
+unknown whether there are many more such nuggets to be found...
 
+Reported-by: Hector Martin <marcan@marcan.st>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
-Acked-by: David Brazdil <dbrazdil@google.com>
 ---
- arch/arm64/include/asm/setup.h | 11 +++++++++++
- arch/arm64/kernel/head.S       |  3 ++-
- arch/arm64/kernel/kaslr.c      |  7 +++----
- arch/arm64/kernel/setup.c      | 15 +++++++++++++++
- 4 files changed, 31 insertions(+), 5 deletions(-)
- create mode 100644 arch/arm64/include/asm/setup.h
+ arch/arm64/kernel/head.S     | 33 ++++++++++++++++++++++++++++++---
+ arch/arm64/kernel/hyp-stub.S | 28 ++++++++++++++++++++++++----
+ 2 files changed, 54 insertions(+), 7 deletions(-)
 
-diff --git a/arch/arm64/include/asm/setup.h b/arch/arm64/include/asm/setup.h
-new file mode 100644
-index 000000000000..d3320618ed14
---- /dev/null
-+++ b/arch/arm64/include/asm/setup.h
-@@ -0,0 +1,11 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#ifndef __ARM64_ASM_SETUP_H
-+#define __ARM64_ASM_SETUP_H
-+
-+#include <uapi/asm/setup.h>
-+
-+void *get_early_fdt_ptr(void);
-+void early_fdt_map(u64 dt_phys);
-+
-+#endif
 diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
-index b425d2587cdb..d74e5f84042e 100644
+index 2e116ef255e1..bce66d6bda74 100644
 --- a/arch/arm64/kernel/head.S
 +++ b/arch/arm64/kernel/head.S
-@@ -433,6 +433,8 @@ SYM_FUNC_START_LOCAL(__primary_switched)
- 	bl	__pi_memset
- 	dsb	ishst				// Make zero page visible to PTW
- 
-+	mov	x0, x21				// pass FDT address in x0
-+	bl	early_fdt_map			// Try mapping the FDT early
- 	bl	switch_to_vhe
- #if defined(CONFIG_KASAN_GENERIC) || defined(CONFIG_KASAN_SW_TAGS)
- 	bl	kasan_early_init
-@@ -440,7 +442,6 @@ SYM_FUNC_START_LOCAL(__primary_switched)
- #ifdef CONFIG_RANDOMIZE_BASE
- 	tst	x23, ~(MIN_KIMG_ALIGN - 1)	// already running randomized?
- 	b.ne	0f
--	mov	x0, x21				// pass FDT address in x0
- 	bl	kaslr_early_init		// parse FDT for KASLR options
- 	cbz	x0, 0f				// KASLR disabled? just proceed
- 	orr	x23, x23, x0			// record KASLR offset
-diff --git a/arch/arm64/kernel/kaslr.c b/arch/arm64/kernel/kaslr.c
-index 1c74c45b9494..5fc86e7d01a1 100644
---- a/arch/arm64/kernel/kaslr.c
-+++ b/arch/arm64/kernel/kaslr.c
-@@ -19,6 +19,7 @@
- #include <asm/memory.h>
- #include <asm/mmu.h>
- #include <asm/sections.h>
-+#include <asm/setup.h>
- 
- enum kaslr_status {
- 	KASLR_ENABLED,
-@@ -92,12 +93,11 @@ static __init bool is_kaslr_disabled_cmdline(void *fdt)
-  * containing function pointers) to be reinitialized, and zero-initialized
-  * .bss variables will be reset to 0.
+@@ -477,14 +477,13 @@ EXPORT_SYMBOL(kimage_vaddr)
+  * booted in EL1 or EL2 respectively.
   */
--u64 __init kaslr_early_init(u64 dt_phys)
-+u64 __init kaslr_early_init(void)
- {
- 	void *fdt;
- 	u64 seed, offset, mask, module_range;
- 	unsigned long raw;
--	int size;
+ SYM_FUNC_START(init_kernel_el)
+-	mov_q	x0, INIT_SCTLR_EL1_MMU_OFF
+-	msr	sctlr_el1, x0
+-
+ 	mrs	x0, CurrentEL
+ 	cmp	x0, #CurrentEL_EL2
+ 	b.eq	init_el2
  
- 	/*
- 	 * Set a reasonable default for module_alloc_base in case
-@@ -111,8 +111,7 @@ u64 __init kaslr_early_init(u64 dt_phys)
- 	 * and proceed with KASLR disabled. We will make another
- 	 * attempt at mapping the FDT in setup_machine()
- 	 */
--	early_fixmap_init();
--	fdt = fixmap_remap_fdt(dt_phys, &size, PAGE_KERNEL);
-+	fdt = get_early_fdt_ptr();
- 	if (!fdt) {
- 		kaslr_status = KASLR_DISABLED_FDT_REMAP;
- 		return 0;
-diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
-index c18aacde8bb0..61845c0821d9 100644
---- a/arch/arm64/kernel/setup.c
-+++ b/arch/arm64/kernel/setup.c
-@@ -168,6 +168,21 @@ static void __init smp_build_mpidr_hash(void)
- 		pr_warn("Large number of MPIDR hash buckets detected\n");
- }
+ SYM_INNER_LABEL(init_el1, SYM_L_LOCAL)
++	mov_q	x0, INIT_SCTLR_EL1_MMU_OFF
++	msr	sctlr_el1, x0
+ 	isb
+ 	mov_q	x0, INIT_PSTATE_EL1
+ 	msr	spsr_el1, x0
+@@ -504,6 +503,34 @@ SYM_INNER_LABEL(init_el2, SYM_L_LOCAL)
+ 	msr	vbar_el2, x0
+ 	isb
  
-+static void *early_fdt_ptr __initdata;
++	/*
++	 * Fruity CPUs seem to have HCR_EL2.E2H set to RES1,
++	 * making it impossible to start in nVHE mode. Is that
++	 * compliant with the architecture? Absolutely not!
++	 */
++	mrs	x0, hcr_el2
++	and	x0, x0, #HCR_E2H
++	cbz	x0, 1f
 +
-+void __init *get_early_fdt_ptr(void)
-+{
-+	return early_fdt_ptr;
-+}
++	/* Switching to VHE requires a sane SCTLR_EL1 as a start */
++	mov_q	x0, INIT_SCTLR_EL1_MMU_OFF
++	msr_s	SYS_SCTLR_EL12, x0
 +
-+asmlinkage void __init early_fdt_map(u64 dt_phys)
-+{
-+	int fdt_size;
++	/*
++	 * Force an eret into a helper "function", and let it return
++	 * to our original caller... This makes sure that we have
++	 * initialised the basic PSTATE state.
++	 */
++	mov	x0, #INIT_PSTATE_EL2
++	msr	spsr_el1, x0
++	adr_l	x0, stick_to_vhe
++	msr	elr_el1, x0
++	eret
 +
-+	early_fixmap_init();
-+	early_fdt_ptr = fixmap_remap_fdt(dt_phys, &fdt_size, PAGE_KERNEL);
-+}
++1:
++	mov_q	x0, INIT_SCTLR_EL1_MMU_OFF
++	msr	sctlr_el1, x0
 +
- static void __init setup_machine_fdt(phys_addr_t dt_phys)
- {
- 	int size;
+ 	msr	elr_el2, lr
+ 	mov	w0, #BOOT_CPU_MODE_EL2
+ 	eret
+diff --git a/arch/arm64/kernel/hyp-stub.S b/arch/arm64/kernel/hyp-stub.S
+index 3e08dcc924b5..b55ed4af4c4a 100644
+--- a/arch/arm64/kernel/hyp-stub.S
++++ b/arch/arm64/kernel/hyp-stub.S
+@@ -27,12 +27,12 @@ SYM_CODE_START(__hyp_stub_vectors)
+ 	ventry	el2_fiq_invalid			// FIQ EL2t
+ 	ventry	el2_error_invalid		// Error EL2t
+ 
+-	ventry	el2_sync_invalid		// Synchronous EL2h
++	ventry	elx_sync			// Synchronous EL2h
+ 	ventry	el2_irq_invalid			// IRQ EL2h
+ 	ventry	el2_fiq_invalid			// FIQ EL2h
+ 	ventry	el2_error_invalid		// Error EL2h
+ 
+-	ventry	el1_sync			// Synchronous 64-bit EL1
++	ventry	elx_sync			// Synchronous 64-bit EL1
+ 	ventry	el1_irq_invalid			// IRQ 64-bit EL1
+ 	ventry	el1_fiq_invalid			// FIQ 64-bit EL1
+ 	ventry	el1_error_invalid		// Error 64-bit EL1
+@@ -45,7 +45,7 @@ SYM_CODE_END(__hyp_stub_vectors)
+ 
+ 	.align 11
+ 
+-SYM_CODE_START_LOCAL(el1_sync)
++SYM_CODE_START_LOCAL(elx_sync)
+ 	cmp	x0, #HVC_SET_VECTORS
+ 	b.ne	1f
+ 	msr	vbar_el2, x1
+@@ -71,7 +71,7 @@ SYM_CODE_START_LOCAL(el1_sync)
+ 
+ 9:	mov	x0, xzr
+ 	eret
+-SYM_CODE_END(el1_sync)
++SYM_CODE_END(elx_sync)
+ 
+ // nVHE? No way! Give me the real thing!
+ SYM_CODE_START_LOCAL(mutate_to_vhe)
+@@ -227,3 +227,23 @@ SYM_FUNC_START(switch_to_vhe)
+ #endif
+ 	ret
+ SYM_FUNC_END(switch_to_vhe)
++
++SYM_FUNC_START(stick_to_vhe)
++	/*
++	 * Make sure the switch to VHE cannot fail, by overriding the
++	 * override. This is hilarious.
++	 */
++	adr_l	x1, id_aa64mmfr1_override
++	add	x1, x1, #FTR_OVR_MASK_OFFSET
++	dc 	civac, x1
++	dsb	sy
++	isb
++	ldr	x0, [x1]
++	bic	x0, x0, #(0xf << ID_AA64MMFR1_VHE_SHIFT)
++	str	x0, [x1]
++
++	mov	x0, #HVC_VHE_RESTART
++	hvc	#0
++	mov	x0, #BOOT_CPU_MODE_EL2
++	ret
++SYM_FUNC_END(stick_to_vhe)
 -- 
 2.29.2
 
