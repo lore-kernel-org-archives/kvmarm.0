@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79492C433E0
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Feb 2021 11:23:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDFA2C433DB
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Feb 2021 11:23:17 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BFE6564E40
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Feb 2021 11:23:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFE6564E40
+	by mail.kernel.org (Postfix) with ESMTP id 2D3EC64E50
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Feb 2021 11:23:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D3EC64E50
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 56B574B48B;
-	Mon,  8 Feb 2021 06:23:15 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B3F4E4B617;
+	Mon,  8 Feb 2021 06:23:16 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id O6rSOj4TfpOB; Mon,  8 Feb 2021 06:23:14 -0500 (EST)
+	with ESMTP id S0cLi5z0JAZs; Mon,  8 Feb 2021 06:23:15 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4192C4B483;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A0A14B48A;
 	Mon,  8 Feb 2021 06:23:14 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 760144B48A
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 74C8B4B483
  for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2021 06:23:12 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QNlvFfzmsDRP for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id dprTcksOYROw for <kvmarm@lists.cs.columbia.edu>;
  Mon,  8 Feb 2021 06:23:11 -0500 (EST)
 Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 02ACC4B471
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2021 06:23:09 -0500 (EST)
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
- by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4DZ3WW1s5Tz165PY;
- Mon,  8 Feb 2021 19:21:43 +0800 (CST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F19F64B46A
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2021 06:23:08 -0500 (EST)
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.60])
+ by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4DZ3W558lPzlHb3;
+ Mon,  8 Feb 2021 19:21:21 +0800 (CST)
 Received: from DESKTOP-TMVL5KK.china.huawei.com (10.174.187.128) by
  DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
- 14.3.498.0; Mon, 8 Feb 2021 19:22:56 +0800
+ 14.3.498.0; Mon, 8 Feb 2021 19:22:57 +0800
 From: Yanan Wang <wangyanan55@huawei.com>
 To: Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, "Catalin
  Marinas" <catalin.marinas@arm.com>, James Morse <james.morse@arm.com>,
@@ -50,10 +50,10 @@ To: Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, "Catalin
  <qperret@google.com>, <kvmarm@lists.cs.columbia.edu>,
  <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
  <linux-kernel@vger.kernel.org>
-Subject: [RFC PATCH 3/4] KVM: arm64: Install the block entry before unmapping
- the page mappings
-Date: Mon, 8 Feb 2021 19:22:49 +0800
-Message-ID: <20210208112250.163568-4-wangyanan55@huawei.com>
+Subject: [RFC PATCH 4/4] KVM: arm64: Distinguish cases of memcache allocations
+ completely
+Date: Mon, 8 Feb 2021 19:22:50 +0800
+Message-ID: <20210208112250.163568-5-wangyanan55@huawei.com>
 X-Mailer: git-send-email 2.8.4.windows.1
 In-Reply-To: <20210208112250.163568-1-wangyanan55@huawei.com>
 References: <20210208112250.163568-1-wangyanan55@huawei.com>
@@ -76,87 +76,63 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-When KVM needs to coalesce the normal page mappings into a block mapping,
-we currently invalidate the old table entry first followed by invalidation
-of TLB, then unmap the page mappings, and install the block entry at last.
+With a guest translation fault, the memcache pages are not needed if KVM
+is only about to install a new leaf entry into the existing page table.
+And with a guest permission fault, the memcache pages are also not needed
+for a write_fault in dirty-logging time if KVM is only about to update
+the existing leaf entry instead of collapsing a block entry into a table.
 
-It will cost a long time to unmap the numerous page mappings, which means
-there will be a long period when the table entry can be found invalid.
-If other vCPUs access any guest page within the block range and find the
-table entry invalid, they will all exit from guest with a translation fault
-which is not necessary. And KVM will make efforts to handle these faults,
-especially when performing CMOs by block range.
-
-So let's quickly install the block entry at first to ensure uninterrupted
-memory access of the other vCPUs, and then unmap the page mappings after
-installation. This will reduce most of the time when the table entry is
-invalid, and avoid most of the unnecessary translation faults.
+By comparing fault_granule and vma_pagesize, cases that require allocations
+from memcache and cases that don't can be distinguished completely.
 
 Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
 ---
- arch/arm64/kvm/hyp/pgtable.c | 26 ++++++++++++--------------
- 1 file changed, 12 insertions(+), 14 deletions(-)
+ arch/arm64/kvm/mmu.c | 25 ++++++++++++-------------
+ 1 file changed, 12 insertions(+), 13 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 78a560446f80..308c36b9cd21 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -434,6 +434,7 @@ struct stage2_map_data {
- 	kvm_pte_t			attr;
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index d151927a7d62..550498a9104e 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -815,19 +815,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	gfn = fault_ipa >> PAGE_SHIFT;
+ 	mmap_read_unlock(current->mm);
  
- 	kvm_pte_t			*anchor;
-+	kvm_pte_t			*follow;
- 
- 	struct kvm_s2_mmu		*mmu;
- 	struct kvm_mmu_memory_cache	*memcache;
-@@ -553,15 +554,14 @@ static int stage2_map_walk_table_pre(u64 addr, u64 end, u32 level,
- 	if (!kvm_block_mapping_supported(addr, end, data->phys, level))
- 		return 0;
- 
--	kvm_set_invalid_pte(ptep);
+-	/*
+-	 * Permission faults just need to update the existing leaf entry,
+-	 * and so normally don't require allocations from the memcache. The
+-	 * only exception to this is when dirty logging is enabled at runtime
+-	 * and a write fault needs to collapse a block entry into a table.
+-	 */
+-	if (fault_status != FSC_PERM || (logging_active && write_fault)) {
+-		ret = kvm_mmu_topup_memory_cache(memcache,
+-						 kvm_mmu_cache_min_pages(kvm));
+-		if (ret)
+-			return ret;
+-	}
 -
+ 	mmu_seq = vcpu->kvm->mmu_notifier_seq;
  	/*
--	 * Invalidate the whole stage-2, as we may have numerous leaf
--	 * entries below us which would otherwise need invalidating
--	 * individually.
-+	 * If we need to coalesce existing table entries into a block here,
-+	 * then install the block entry first and the sub-level page mappings
-+	 * will be unmapped later.
- 	 */
--	kvm_call_hyp(__kvm_tlb_flush_vmid, data->mmu);
- 	data->anchor = ptep;
-+	data->follow = kvm_pte_follow(*ptep);
-+	stage2_coalesce_tables_into_block(addr, level, ptep, data);
- 	return 0;
- }
+ 	 * Ensure the read of mmu_notifier_seq happens before we call
+@@ -887,6 +874,18 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	else if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC))
+ 		prot |= KVM_PGTABLE_PROT_X;
  
-@@ -614,20 +614,18 @@ static int stage2_map_walk_table_post(u64 addr, u64 end, u32 level,
- 				      kvm_pte_t *ptep,
- 				      struct stage2_map_data *data)
- {
--	int ret = 0;
--
- 	if (!data->anchor)
- 		return 0;
- 
--	free_page((unsigned long)kvm_pte_follow(*ptep));
--	put_page(virt_to_page(ptep));
--
--	if (data->anchor == ptep) {
-+	if (data->anchor != ptep) {
-+		free_page((unsigned long)kvm_pte_follow(*ptep));
-+		put_page(virt_to_page(ptep));
-+	} else {
-+		free_page((unsigned long)data->follow);
- 		data->anchor = NULL;
--		ret = stage2_map_walk_leaf(addr, end, level, ptep, data);
- 	}
- 
--	return ret;
-+	return 0;
- }
- 
- /*
++	/*
++	 * Allocations from the memcache are required only when granule of the
++	 * lookup level where the guest fault happened exceeds vma_pagesize,
++	 * which means new page tables will be created in the fault handlers.
++	 */
++	if (fault_granule > vma_pagesize) {
++		ret = kvm_mmu_topup_memory_cache(memcache,
++						 kvm_mmu_cache_min_pages(kvm));
++		if (ret)
++			return ret;
++	}
++
+ 	/*
+ 	 * Under the premise of getting a FSC_PERM fault, we just need to relax
+ 	 * permissions only if vma_pagesize equals fault_granule. Otherwise,
 -- 
 2.23.0
 
