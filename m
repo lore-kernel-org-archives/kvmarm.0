@@ -6,53 +6,53 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D953C433E0
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Feb 2021 10:04:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0E22C433DB
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Feb 2021 10:04:21 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2D1A064E99
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Feb 2021 10:04:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D1A064E99
+	by mail.kernel.org (Postfix) with ESMTP id 660F364E8F
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Feb 2021 10:04:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 660F364E8F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AC9984B55E;
-	Mon,  8 Feb 2021 05:04:18 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E872E4B571;
+	Mon,  8 Feb 2021 05:04:20 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id tFJ3USpBNhVU; Mon,  8 Feb 2021 05:04:17 -0500 (EST)
+	with ESMTP id 9xg4wbdQhUGd; Mon,  8 Feb 2021 05:04:19 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E12D4B56D;
-	Mon,  8 Feb 2021 05:04:17 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FEDE4B587;
+	Mon,  8 Feb 2021 05:04:19 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CC7704B552
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2021 05:04:16 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 834FD4B55F
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2021 05:04:18 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6eJ53rOLEXTG for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Feb 2021 05:04:15 -0500 (EST)
+ with ESMTP id 5uJnUQEotfcP for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Feb 2021 05:04:17 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6D39A4B53C
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2021 05:04:15 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 263754B53C
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2021 05:04:17 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id DC4AC64E87;
- Mon,  8 Feb 2021 10:04:13 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id D6ECE64E7D;
+ Mon,  8 Feb 2021 10:04:15 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1l93JA-00Ck14-4f; Mon, 08 Feb 2021 09:58:16 +0000
+ id 1l93J8-00Ck14-Gw; Mon, 08 Feb 2021 09:58:14 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  linux-kernel@vger.kernel.org
-Subject: [PATCH v7 22/23] arm64: cpufeatures: Allow disabling of Pointer Auth
- from the command-line
-Date: Mon,  8 Feb 2021 09:57:31 +0000
-Message-Id: <20210208095732.3267263-23-maz@kernel.org>
+Subject: [PATCH v7 20/23] arm64: cpufeatures: Allow disabling of BTI from the
+ command-line
+Date: Mon,  8 Feb 2021 09:57:29 +0000
+Message-Id: <20210208095732.3267263-21-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210208095732.3267263-1-maz@kernel.org>
 References: <20210208095732.3267263-1-maz@kernel.org>
@@ -89,12 +89,11 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In order to be able to disable Pointer Authentication  at runtime,
-whether it is for testing purposes, or to work around HW issues,
-let's add support for overriding the ID_AA64ISAR1_EL1.{GPI,GPA,API,APA}
-fields.
+In order to be able to disable BTI at runtime, whether it is
+for testing purposes, or to work around HW issues, let's add
+support for overriding the ID_AA64PFR1_EL1.BTI field.
 
-This is further mapped on the arm64.nopauth command-line alias.
+This is further mapped on the arm64.nobti command-line alias.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
@@ -104,73 +103,71 @@ Tested-by: Srinivas Ramana <sramana@codeaurora.org>
  Documentation/admin-guide/kernel-parameters.txt |  3 +++
  arch/arm64/include/asm/cpufeature.h             |  1 +
  arch/arm64/kernel/cpufeature.c                  |  4 +++-
- arch/arm64/kernel/idreg-override.c              | 16 ++++++++++++++++
- 4 files changed, 23 insertions(+), 1 deletion(-)
+ arch/arm64/kernel/idreg-override.c              | 11 +++++++++++
+ arch/arm64/mm/mmu.c                             |  2 +-
+ 5 files changed, 19 insertions(+), 2 deletions(-)
 
 diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index 7599fd0f1ad7..f9cb28a39bd0 100644
+index 2786fd39a047..7599fd0f1ad7 100644
 --- a/Documentation/admin-guide/kernel-parameters.txt
 +++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -376,6 +376,9 @@
- 	arm64.nobti	[ARM64] Unconditionally disable Branch Target
- 			Identification support
+@@ -373,6 +373,9 @@
+ 	arcrimi=	[HW,NET] ARCnet - "RIM I" (entirely mem-mapped) cards
+ 			Format: <io>,<irq>,<nodeID>
  
-+	arm64.nopauth	[ARM64] Unconditionally disable Pointer Authentication
-+			support
++	arm64.nobti	[ARM64] Unconditionally disable Branch Target
++			Identification support
 +
  	ataflop=	[HW,M68k]
  
  	atarimouse=	[HW,MOUSE] Atari Mouse
 diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-index 30917b9a760b..61177bac49fa 100644
+index 570f1b4ba3cc..30917b9a760b 100644
 --- a/arch/arm64/include/asm/cpufeature.h
 +++ b/arch/arm64/include/asm/cpufeature.h
-@@ -820,6 +820,7 @@ static inline unsigned int get_vmid_bits(u64 mmfr1)
+@@ -819,6 +819,7 @@ static inline unsigned int get_vmid_bits(u64 mmfr1)
+ }
  
  extern struct arm64_ftr_override id_aa64mmfr1_override;
- extern struct arm64_ftr_override id_aa64pfr1_override;
-+extern struct arm64_ftr_override id_aa64isar1_override;
++extern struct arm64_ftr_override id_aa64pfr1_override;
  
  u32 get_kvm_ipa_limit(void);
  void dump_cpu_features(void);
 diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 7fbeab497adb..3bce87a03717 100644
+index faada5d8bea6..7fbeab497adb 100644
 --- a/arch/arm64/kernel/cpufeature.c
 +++ b/arch/arm64/kernel/cpufeature.c
-@@ -559,6 +559,7 @@ static const struct arm64_ftr_bits ftr_raz[] = {
+@@ -558,6 +558,7 @@ static const struct arm64_ftr_bits ftr_raz[] = {
+ #define ARM64_FTR_REG(id, table) ARM64_FTR_REG_OVERRIDE(id, table, &no_override)
  
  struct arm64_ftr_override __ro_after_init id_aa64mmfr1_override;
- struct arm64_ftr_override __ro_after_init id_aa64pfr1_override;
-+struct arm64_ftr_override __ro_after_init id_aa64isar1_override;
++struct arm64_ftr_override __ro_after_init id_aa64pfr1_override;
  
  static const struct __ftr_reg_entry {
  	u32			sys_id;
-@@ -604,7 +605,8 @@ static const struct __ftr_reg_entry {
+@@ -593,7 +594,8 @@ static const struct __ftr_reg_entry {
  
- 	/* Op1 = 0, CRn = 0, CRm = 6 */
- 	ARM64_FTR_REG(SYS_ID_AA64ISAR0_EL1, ftr_id_aa64isar0),
--	ARM64_FTR_REG(SYS_ID_AA64ISAR1_EL1, ftr_id_aa64isar1),
-+	ARM64_FTR_REG_OVERRIDE(SYS_ID_AA64ISAR1_EL1, ftr_id_aa64isar1,
-+			       &id_aa64isar1_override),
+ 	/* Op1 = 0, CRn = 0, CRm = 4 */
+ 	ARM64_FTR_REG(SYS_ID_AA64PFR0_EL1, ftr_id_aa64pfr0),
+-	ARM64_FTR_REG(SYS_ID_AA64PFR1_EL1, ftr_id_aa64pfr1),
++	ARM64_FTR_REG_OVERRIDE(SYS_ID_AA64PFR1_EL1, ftr_id_aa64pfr1,
++			       &id_aa64pfr1_override),
+ 	ARM64_FTR_REG(SYS_ID_AA64ZFR0_EL1, ftr_id_aa64zfr0),
  
- 	/* Op1 = 0, CRn = 0, CRm = 7 */
- 	ARM64_FTR_REG(SYS_ID_AA64MMFR0_EL1, ftr_id_aa64mmfr0),
+ 	/* Op1 = 0, CRn = 0, CRm = 5 */
 diff --git a/arch/arm64/kernel/idreg-override.c b/arch/arm64/kernel/idreg-override.c
-index d691e9015c62..dffb16682330 100644
+index 70dd70eee7a2..d691e9015c62 100644
 --- a/arch/arm64/kernel/idreg-override.c
 +++ b/arch/arm64/kernel/idreg-override.c
-@@ -46,6 +46,18 @@ static const struct ftr_set_desc pfr1 __initconst = {
+@@ -37,6 +37,15 @@ static const struct ftr_set_desc mmfr1 __initconst = {
  	},
  };
  
-+static const struct ftr_set_desc isar1 __initconst = {
-+	.name		= "id_aa64isar1",
-+	.override	= &id_aa64isar1_override,
++static const struct ftr_set_desc pfr1 __initconst = {
++	.name		= "id_aa64pfr1",
++	.override	= &id_aa64pfr1_override,
 +	.fields		= {
-+	        { "gpi", ID_AA64ISAR1_GPI_SHIFT },
-+	        { "gpa", ID_AA64ISAR1_GPA_SHIFT },
-+	        { "api", ID_AA64ISAR1_API_SHIFT },
-+	        { "apa", ID_AA64ISAR1_APA_SHIFT },
++	        { "bt", ID_AA64PFR1_BT_SHIFT },
 +		{}
 +	},
 +};
@@ -178,24 +175,35 @@ index d691e9015c62..dffb16682330 100644
  extern struct arm64_ftr_override kaslr_feature_override;
  
  static const struct ftr_set_desc kaslr __initconst = {
-@@ -62,6 +74,7 @@ static const struct ftr_set_desc kaslr __initconst = {
+@@ -52,6 +61,7 @@ static const struct ftr_set_desc kaslr __initconst = {
+ 
  static const struct ftr_set_desc * const regs[] __initconst = {
  	&mmfr1,
- 	&pfr1,
-+	&isar1,
++	&pfr1,
  	&kaslr,
  };
  
-@@ -72,6 +85,9 @@ static const struct {
+@@ -61,6 +71,7 @@ static const struct {
+ } aliases[] __initconst = {
  	{ "kvm-arm.mode=nvhe",		"id_aa64mmfr1.vh=0" },
  	{ "kvm-arm.mode=protected",	"id_aa64mmfr1.vh=0" },
- 	{ "arm64.nobti",		"id_aa64pfr1.bt=0" },
-+	{ "arm64.nopauth",
-+	  "id_aa64isar1.gpi=0 id_aa64isar1.gpa=0 "
-+	  "id_aa64isar1.api=0 id_aa64isar1.apa=0"	   },
++	{ "arm64.nobti",		"id_aa64pfr1.bt=0" },
  	{ "nokaslr",			"kaslr.disabled=1" },
  };
  
+diff --git a/arch/arm64/mm/mmu.c b/arch/arm64/mm/mmu.c
+index ae0c3d023824..617e704c980b 100644
+--- a/arch/arm64/mm/mmu.c
++++ b/arch/arm64/mm/mmu.c
+@@ -628,7 +628,7 @@ static bool arm64_early_this_cpu_has_bti(void)
+ 	if (!IS_ENABLED(CONFIG_ARM64_BTI_KERNEL))
+ 		return false;
+ 
+-	pfr1 = read_sysreg_s(SYS_ID_AA64PFR1_EL1);
++	pfr1 = __read_sysreg_by_encoding(SYS_ID_AA64PFR1_EL1);
+ 	return cpuid_feature_extract_unsigned_field(pfr1,
+ 						    ID_AA64PFR1_BT_SHIFT);
+ }
 -- 
 2.29.2
 
