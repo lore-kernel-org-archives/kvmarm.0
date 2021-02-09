@@ -7,66 +7,67 @@ X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31156C433E0
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Feb 2021 05:04:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F71BC433E6
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Feb 2021 05:04:46 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BE1D064EB6
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Feb 2021 05:04:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE1D064EB6
+	by mail.kernel.org (Postfix) with ESMTP id C5D7964EBC
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Feb 2021 05:04:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5D7964EBC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 604454B70A;
-	Tue,  9 Feb 2021 00:04:43 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B7244B6FC;
+	Tue,  9 Feb 2021 00:04:45 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pcXm3LrRJ6UA; Tue,  9 Feb 2021 00:04:41 -0500 (EST)
+	with ESMTP id MrYRM5mHtcLv; Tue,  9 Feb 2021 00:04:44 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D22C14B684;
-	Tue,  9 Feb 2021 00:04:41 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 039C34B719;
+	Tue,  9 Feb 2021 00:04:44 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7BAB04B410
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Feb 2021 00:04:40 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C6DFC4B417
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Feb 2021 00:04:42 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ymbmL7Kkv9L0 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 Feb 2021 00:04:39 -0500 (EST)
+ with ESMTP id O7J7zJNqjRcI for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Feb 2021 00:04:41 -0500 (EST)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [63.128.21.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3345C4B24A
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Feb 2021 00:04:39 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 895774B24A
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Feb 2021 00:04:41 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1612847078;
+ s=mimecast20190719; t=1612847081;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=zcIOJsfR5kW5YDNliY+nt3uBPyj7GiL6t2yI8D04j0s=;
- b=G0Uaug5BS/dp1PmPcTE5A8E9ksgE1WBAXz3cws5QSzTUdIbIK8cxlfobity3LciJHjn1ri
- UZWuMOdnBru0QyM/CIKxVV5w7pFMSb3ZdZO4KVzHfxCFJiERaFWaVRWjEgATE8L/oLb2q/
- Gf3LvbBObYCznnIAKMcv1vTC+LD8Klo=
+ bh=bHgjEwSUdOEp0qoIJfnsI3SMQkTf6kiWa4qcZ+kaqGg=;
+ b=iStz6yI/0nk7dxaEEmCy+ZcyOA4CVgC19IIXeRNmi20QRBr7ARnzDQJVobLap3wmq+Qkag
+ qSaCjrV9FaMSHxrFMxocnD+RBmnJEN90idl9zbMM/+XN63AN8tx/sHM73s4R2cLOeAdL59
+ SDMPR5J6FoXRzjGi1i51taogtgOrJbc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-336-kPIsWSOAO6aoi595So5JjA-1; Tue, 09 Feb 2021 00:04:35 -0500
-X-MC-Unique: kPIsWSOAO6aoi595So5JjA-1
+ us-mta-278-qJNIsH0_MxWYELh_Qg-Quw-1; Tue, 09 Feb 2021 00:04:39 -0500
+X-MC-Unique: qJNIsH0_MxWYELh_Qg-Quw-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 47D22803F49;
- Tue,  9 Feb 2021 05:04:34 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8693D36492;
+ Tue,  9 Feb 2021 05:04:37 +0000 (UTC)
 Received: from gshan.redhat.com (vpn2-54-26.bne.redhat.com [10.64.54.26])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 49E385D9C0;
- Tue,  9 Feb 2021 05:04:27 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AB78D5D9CD;
+ Tue,  9 Feb 2021 05:04:34 +0000 (UTC)
 From: Gavin Shan <gshan@redhat.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v2 04/17] KVM: x86: Use generic async PF slot management
-Date: Tue,  9 Feb 2021 13:03:50 +0800
-Message-Id: <20210209050403.103143-5-gshan@redhat.com>
+Subject: [PATCH v2 05/17] arm64: Probe for the presence of KVM hypervisor
+ services during boot
+Date: Tue,  9 Feb 2021 13:03:51 +0800
+Message-Id: <20210209050403.103143-6-gshan@redhat.com>
 In-Reply-To: <20210209050403.103143-1-gshan@redhat.com>
 References: <20210209050403.103143-1-gshan@redhat.com>
 MIME-Version: 1.0
@@ -89,204 +90,156 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This uses the generic slot management mechanism for asynchronous
-page fault by enabling CONFIG_KVM_ASYNC_PF_SLOT because the private
-implementation is totally duplicate to the generic one.
+From: Will Deacon <will@kernel.org>
 
-The changes introduced by this is pretty mechanical and shouldn't
-cause any logical changes.
+Although the SMCCC specification provides some limited functionality for
+describing the presence of hypervisor and firmware services, this is
+generally applicable only to functions designated as "Arm Architecture
+Service Functions" and no portable discovery mechanism is provided for
+standard hypervisor services, despite having a designated range of
+function identifiers reserved by the specification.
 
+In an attempt to avoid the need for additional firmware changes every
+time a new function is added, introduce a UID to identify the service
+provider as being compatible with KVM. Once this has been established,
+additional services can be discovered via a feature bitmap.
+
+Signed-off-by: Will Deacon <will@kernel.org>
 Signed-off-by: Gavin Shan <gshan@redhat.com>
 ---
- arch/x86/include/asm/kvm_host.h |  1 -
- arch/x86/kvm/Kconfig            |  1 +
- arch/x86/kvm/mmu/mmu.c          |  2 +-
- arch/x86/kvm/x86.c              | 86 +++------------------------------
- 4 files changed, 8 insertions(+), 82 deletions(-)
+ arch/arm64/include/asm/hypervisor.h | 11 ++++++++++
+ arch/arm64/kernel/setup.c           | 32 +++++++++++++++++++++++++++++
+ include/linux/arm-smccc.h           | 25 ++++++++++++++++++++++
+ 3 files changed, 68 insertions(+)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 3d6616f6f6ef..3488eeb79c79 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1714,7 +1714,6 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu,
- 			       struct kvm_async_pf *work);
- void kvm_arch_async_page_present_queued(struct kvm_vcpu *vcpu);
- bool kvm_arch_can_dequeue_async_page_present(struct kvm_vcpu *vcpu);
--extern bool kvm_find_async_pf_gfn(struct kvm_vcpu *vcpu, gfn_t gfn);
+diff --git a/arch/arm64/include/asm/hypervisor.h b/arch/arm64/include/asm/hypervisor.h
+index f9cc1d021791..91e4bd890819 100644
+--- a/arch/arm64/include/asm/hypervisor.h
++++ b/arch/arm64/include/asm/hypervisor.h
+@@ -2,6 +2,17 @@
+ #ifndef _ASM_ARM64_HYPERVISOR_H
+ #define _ASM_ARM64_HYPERVISOR_H
  
- int kvm_skip_emulated_instruction(struct kvm_vcpu *vcpu);
- int kvm_complete_insn_gp(struct kvm_vcpu *vcpu, int err);
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index 7ac592664c52..b0ad75087ab5 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -34,6 +34,7 @@ config KVM
- 	select HAVE_KVM_IRQ_ROUTING
- 	select HAVE_KVM_EVENTFD
- 	select KVM_ASYNC_PF
-+	select KVM_ASYNC_PF_SLOT
- 	select USER_RETURN_NOTIFIER
- 	select KVM_MMIO
- 	select TASKSTATS
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 6d16481aa29d..ca2e84d6743c 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3678,7 +3678,7 @@ static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
++#include <linux/arm-smccc.h>
+ #include <asm/xen/hypervisor.h>
  
- 	if (!prefault && kvm_can_do_async_pf(vcpu)) {
- 		trace_kvm_try_async_get_page(cr2_or_gpa, gfn);
--		if (kvm_find_async_pf_gfn(vcpu, gfn)) {
-+		if (kvm_async_pf_find_slot(vcpu, gfn)) {
- 			trace_kvm_async_pf_doublefault(cr2_or_gpa, gfn);
- 			kvm_make_request(KVM_REQ_APF_HALT, vcpu);
- 			return true;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index f3c9fe5c424e..b04d78a87abe 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -290,13 +290,6 @@ static struct kmem_cache *kvm_alloc_emulator_cache(void)
++static inline bool kvm_arm_hyp_service_available(u32 func_id)
++{
++	extern DECLARE_BITMAP(__kvm_arm_hyp_services, ARM_SMCCC_KVM_NUM_FUNCS);
++
++	if (func_id >= ARM_SMCCC_KVM_NUM_FUNCS)
++		return -EINVAL;
++
++	return test_bit(func_id, __kvm_arm_hyp_services);
++}
++
+ #endif
+diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
+index c18aacde8bb0..8cbb99d80869 100644
+--- a/arch/arm64/kernel/setup.c
++++ b/arch/arm64/kernel/setup.c
+@@ -7,6 +7,7 @@
+  */
  
- static int emulator_fix_hypercall(struct x86_emulate_ctxt *ctxt);
+ #include <linux/acpi.h>
++#include <linux/arm-smccc.h>
+ #include <linux/export.h>
+ #include <linux/kernel.h>
+ #include <linux/stddef.h>
+@@ -275,12 +276,42 @@ static int __init reserve_memblock_reserved_regions(void)
+ arch_initcall(reserve_memblock_reserved_regions);
  
--static inline void kvm_async_pf_hash_reset(struct kvm_vcpu *vcpu)
--{
--	int i;
--	for (i = 0; i < ASYNC_PF_PER_VCPU; i++)
--		vcpu->arch.apf.gfns[i] = ~0;
--}
--
- static void kvm_on_user_return(struct user_return_notifier *urn)
+ u64 __cpu_logical_map[NR_CPUS] = { [0 ... NR_CPUS-1] = INVALID_HWID };
++DECLARE_BITMAP(__kvm_arm_hyp_services, ARM_SMCCC_KVM_NUM_FUNCS) = { };
+ 
+ u64 cpu_logical_map(unsigned int cpu)
  {
- 	unsigned slot;
-@@ -812,7 +805,7 @@ void kvm_post_set_cr0(struct kvm_vcpu *vcpu, unsigned long old_cr0, unsigned lon
- 
- 	if ((cr0 ^ old_cr0) & X86_CR0_PG) {
- 		kvm_clear_async_pf_completion_queue(vcpu);
--		kvm_async_pf_hash_reset(vcpu);
-+		kvm_async_pf_reset_slot(vcpu);
- 	}
- 
- 	if ((cr0 ^ old_cr0) & update_bits)
-@@ -2905,7 +2898,7 @@ static int kvm_pv_enable_async_pf(struct kvm_vcpu *vcpu, u64 data)
- 
- 	if (!kvm_pv_async_pf_enabled(vcpu)) {
- 		kvm_clear_async_pf_completion_queue(vcpu);
--		kvm_async_pf_hash_reset(vcpu);
-+		kvm_async_pf_reset_slot(vcpu);
- 		return 0;
- 	}
- 
-@@ -9996,7 +9989,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 
- 	vcpu->arch.pat = MSR_IA32_CR_PAT_DEFAULT;
- 
--	kvm_async_pf_hash_reset(vcpu);
-+	kvm_async_pf_reset_slot(vcpu);
- 	kvm_pmu_init(vcpu);
- 
- 	vcpu->arch.pending_external_vector = -1;
-@@ -10117,7 +10110,7 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
- 	kvmclock_reset(vcpu);
- 
- 	kvm_clear_async_pf_completion_queue(vcpu);
--	kvm_async_pf_hash_reset(vcpu);
-+	kvm_async_pf_reset_slot(vcpu);
- 	vcpu->arch.apf.halted = false;
- 
- 	if (vcpu->arch.guest_fpu && kvm_mpx_supported()) {
-@@ -10932,73 +10925,6 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
- 	kvm_mmu_do_page_fault(vcpu, work->cr2_or_gpa, 0, true);
+ 	return __cpu_logical_map[cpu];
  }
  
--static inline u32 kvm_async_pf_hash_fn(gfn_t gfn)
--{
--	BUILD_BUG_ON(!is_power_of_2(ASYNC_PF_PER_VCPU));
--
--	return hash_32(gfn & 0xffffffff, order_base_2(ASYNC_PF_PER_VCPU));
--}
--
--static inline u32 kvm_async_pf_next_probe(u32 key)
--{
--	return (key + 1) & (ASYNC_PF_PER_VCPU - 1);
--}
--
--static void kvm_add_async_pf_gfn(struct kvm_vcpu *vcpu, gfn_t gfn)
--{
--	u32 key = kvm_async_pf_hash_fn(gfn);
--
--	while (vcpu->arch.apf.gfns[key] != ~0)
--		key = kvm_async_pf_next_probe(key);
--
--	vcpu->arch.apf.gfns[key] = gfn;
--}
--
--static u32 kvm_async_pf_gfn_slot(struct kvm_vcpu *vcpu, gfn_t gfn)
--{
--	int i;
--	u32 key = kvm_async_pf_hash_fn(gfn);
--
--	for (i = 0; i < ASYNC_PF_PER_VCPU &&
--		     (vcpu->arch.apf.gfns[key] != gfn &&
--		      vcpu->arch.apf.gfns[key] != ~0); i++)
--		key = kvm_async_pf_next_probe(key);
--
--	return key;
--}
--
--bool kvm_find_async_pf_gfn(struct kvm_vcpu *vcpu, gfn_t gfn)
--{
--	return vcpu->arch.apf.gfns[kvm_async_pf_gfn_slot(vcpu, gfn)] == gfn;
--}
--
--static void kvm_del_async_pf_gfn(struct kvm_vcpu *vcpu, gfn_t gfn)
--{
--	u32 i, j, k;
--
--	i = j = kvm_async_pf_gfn_slot(vcpu, gfn);
--
--	if (WARN_ON_ONCE(vcpu->arch.apf.gfns[i] != gfn))
--		return;
--
--	while (true) {
--		vcpu->arch.apf.gfns[i] = ~0;
--		do {
--			j = kvm_async_pf_next_probe(j);
--			if (vcpu->arch.apf.gfns[j] == ~0)
--				return;
--			k = kvm_async_pf_hash_fn(vcpu->arch.apf.gfns[j]);
--			/*
--			 * k lies cyclically in ]i,j]
--			 * |    i.k.j |
--			 * |....j i.k.| or  |.k..j i...|
--			 */
--		} while ((i <= j) ? (i < k && k <= j) : (i < k || k <= j));
--		vcpu->arch.apf.gfns[i] = vcpu->arch.apf.gfns[j];
--		i = j;
--	}
--}
--
- static inline int apf_put_user_notpresent(struct kvm_vcpu *vcpu)
++static void __init kvm_init_hyp_services(void)
++{
++	struct arm_smccc_res res;
++	int i;
++
++	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID, &res);
++	if (res.a0 != ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0 ||
++	    res.a1 != ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1 ||
++	    res.a2 != ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2 ||
++	    res.a3 != ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3)
++		return;
++
++	memset(&res, 0, sizeof(res));
++	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID, &res);
++	for (i = 0; i < 32; ++i) {
++		if (res.a0 & (i))
++			set_bit(i + (32 * 0), __kvm_arm_hyp_services);
++		if (res.a1 & (i))
++			set_bit(i + (32 * 1), __kvm_arm_hyp_services);
++		if (res.a2 & (i))
++			set_bit(i + (32 * 2), __kvm_arm_hyp_services);
++		if (res.a3 & (i))
++			set_bit(i + (32 * 3), __kvm_arm_hyp_services);
++	}
++
++	pr_info("KVM hypervisor services detected (0x%08lx 0x%08lx 0x%08lx 0x%08lx)\n",
++		res.a3, res.a2, res.a1, res.a0);
++}
++
+ void __init __no_sanitize_address setup_arch(char **cmdline_p)
  {
- 	u32 reason = KVM_PV_REASON_PAGE_NOT_PRESENT;
-@@ -11062,7 +10988,7 @@ bool kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
- 	struct x86_exception fault;
- 
- 	trace_kvm_async_pf_not_present(work->arch.token, work->cr2_or_gpa);
--	kvm_add_async_pf_gfn(vcpu, work->arch.gfn);
-+	kvm_async_pf_add_slot(vcpu, work->arch.gfn);
- 
- 	if (kvm_can_deliver_async_pf(vcpu) &&
- 	    !apf_put_user_notpresent(vcpu)) {
-@@ -11099,7 +11025,7 @@ void kvm_arch_async_page_present(struct kvm_vcpu *vcpu,
- 	if (work->wakeup_all)
- 		work->arch.token = ~0; /* broadcast wakeup */
+ 	init_mm.start_code = (unsigned long) _stext;
+@@ -353,6 +384,7 @@ void __init __no_sanitize_address setup_arch(char **cmdline_p)
  	else
--		kvm_del_async_pf_gfn(vcpu, work->arch.gfn);
-+		kvm_async_pf_remove_slot(vcpu, work->arch.gfn);
- 	trace_kvm_async_pf_ready(work->arch.token, work->cr2_or_gpa);
+ 		psci_acpi_init();
  
- 	if ((work->wakeup_all || work->notpresent_injected) &&
++	kvm_init_hyp_services();
+ 	init_bootcpu_ops();
+ 	smp_init_cpus();
+ 	smp_build_mpidr_hash();
+diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
+index f860645f6512..7eb816241697 100644
+--- a/include/linux/arm-smccc.h
++++ b/include/linux/arm-smccc.h
+@@ -55,6 +55,8 @@
+ #define ARM_SMCCC_OWNER_TRUSTED_OS	50
+ #define ARM_SMCCC_OWNER_TRUSTED_OS_END	63
+ 
++#define ARM_SMCCC_FUNC_QUERY_CALL_UID	0xff01
++
+ #define ARM_SMCCC_QUIRK_NONE		0
+ #define ARM_SMCCC_QUIRK_QCOM_A6		1 /* Save/restore register a6 */
+ 
+@@ -102,6 +104,29 @@
+ 			   ARM_SMCCC_OWNER_STANDARD_HYP,	\
+ 			   0x21)
+ 
++#define ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID			\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
++			   ARM_SMCCC_SMC_32,			\
++			   ARM_SMCCC_OWNER_VENDOR_HYP,		\
++			   ARM_SMCCC_FUNC_QUERY_CALL_UID)
++
++/* KVM UID value: 28b46fb6-2ec5-11e9-a9ca-4b564d003a74 */
++#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0	0xb66fb428U
++#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1	0xe911c52eU
++#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2	0x564bcaa9U
++#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3	0x743a004dU
++
++/* KVM "vendor specific" services */
++#define ARM_SMCCC_KVM_FUNC_FEATURES		0
++#define ARM_SMCCC_KVM_FUNC_FEATURES_2		127
++#define ARM_SMCCC_KVM_NUM_FUNCS			128
++
++#define ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID		\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
++			   ARM_SMCCC_SMC_32,			\
++			   ARM_SMCCC_OWNER_VENDOR_HYP,		\
++			   ARM_SMCCC_KVM_FUNC_FEATURES)
++
+ /*
+  * Return codes defined in ARM DEN 0070A
+  * ARM DEN 0070A is now merged/consolidated into ARM DEN 0028 C
 -- 
 2.23.0
 
