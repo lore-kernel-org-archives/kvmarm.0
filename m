@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C5D5C433E0
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Feb 2021 05:05:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA8E4C433E6
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Feb 2021 05:05:12 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A982964EBA
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Feb 2021 05:05:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A982964EBA
+	by mail.kernel.org (Postfix) with ESMTP id 47E4E64EB6
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Feb 2021 05:05:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47E4E64EB6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4FB6D4B410;
-	Tue,  9 Feb 2021 00:05:10 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DD3844B659;
+	Tue,  9 Feb 2021 00:05:11 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id gpINqb6oBG+p; Tue,  9 Feb 2021 00:05:08 -0500 (EST)
+	with ESMTP id Qr8P9sGq+rtK; Tue,  9 Feb 2021 00:05:10 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E62364B683;
-	Tue,  9 Feb 2021 00:05:08 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 130114B707;
+	Tue,  9 Feb 2021 00:05:09 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9760D4B713
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Feb 2021 00:05:07 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 627414B59B
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Feb 2021 00:05:08 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aJa3ViF4WVgf for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 Feb 2021 00:05:06 -0500 (EST)
+ with ESMTP id ScLYVPMTOyYL for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Feb 2021 00:05:07 -0500 (EST)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C85B4B59B
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Feb 2021 00:05:06 -0500 (EST)
+ (us-smtp-delivery-124.mimecast.com [63.128.21.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 542094B69F
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Feb 2021 00:05:05 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1612847106;
+ s=mimecast20190719; t=1612847105;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=dJPF3D2lIfpavWv0ASGM2tGJ9PKIi2CsfVfBDqQ79RI=;
- b=Xv0kNIz2/5Y0hawsDfWUwoXyP4T+1LyvBsTHL/HSltslDrdx0Nh7ZA6cuZAQnONeuPyo0X
- xgmR3CQ968dGKoaIz4Ec5Gf0KSV0z85fb/b2Xz3Ms3T8Vl4RsEzwSDbISqNBppNYyIv/BB
- 1gVqnTNYCN0UNAcmK0Gw0fv2kf2QRJc=
+ bh=dlw76BEcqgsLICHpLjr4wfTo1oCYV+bre8IHCdH08mE=;
+ b=h04SPLpC/vZLc5xLnDLskeLfdxXWewPK741oESz3lJTkhh+MSefHrIc0lm6Fw9nvUhbI8i
+ +nD45yPZsZ4l0Y6TQZtcmvCtIHnSRVfEefixaFuqKIlYyhFb+nHLcN4IxWlQ2xutvfwlag
+ KuT5pf3uAnl+dVjJpUcJdmhvyUX/KwQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-485-LX637OOGPVGrBmjeTiGgZA-1; Tue, 09 Feb 2021 00:05:04 -0500
-X-MC-Unique: LX637OOGPVGrBmjeTiGgZA-1
+ us-mta-542-gKEx2vGFMKaIQfkksgPFJQ-1; Tue, 09 Feb 2021 00:05:01 -0500
+X-MC-Unique: gKEx2vGFMKaIQfkksgPFJQ-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AE95B192CC41;
- Tue,  9 Feb 2021 05:05:02 +0000 (UTC)
-Received: from gshan.redhat.com (vpn2-54-26.bne.redhat.com [10.64.54.26])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1BF4D5D9C0;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A2078801965;
  Tue,  9 Feb 2021 05:04:59 +0000 (UTC)
+Received: from gshan.redhat.com (vpn2-54-26.bne.redhat.com [10.64.54.26])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4EBAE5D9C0;
+ Tue,  9 Feb 2021 05:04:56 +0000 (UTC)
 From: Gavin Shan <gshan@redhat.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v2 12/17] KVM: arm64: Support async PF ioctl commands
-Date: Tue,  9 Feb 2021 13:03:58 +0800
-Message-Id: <20210209050403.103143-13-gshan@redhat.com>
+Subject: [PATCH v2 11/17] KVM: arm64: Support async PF hypercalls
+Date: Tue,  9 Feb 2021 13:03:57 +0800
+Message-Id: <20210209050403.103143-12-gshan@redhat.com>
 In-Reply-To: <20210209050403.103143-1-gshan@redhat.com>
 References: <20210209050403.103143-1-gshan@redhat.com>
 MIME-Version: 1.0
@@ -89,207 +89,192 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This supports ioctl commands for configuration and migration:
+This introduces (SMCCC) KVM vendor specific services to configure
+the asynchronous page fault functionality. The following services
+are introduced:
 
-   KVM_ARM_ASYNC_PF_CMD_GET_VERSION
-      Return implementation version
-   KVM_ARM_ASYNC_PF_CMD_GET_SDEI
-      Return SDEI event number used for page-not-present notification
-   KVM_ARM_ASYNC_PF_CMD_GET_IRQ
-      Return IRQ number used for page-ready notification
-   KVM_ARM_ASYNC_PF_CMD_GET_CONTROL
-      Get control block when VM is migrated
-   KVM_ARM_ASYNC_PF_CMD_SET_SDEI
-      Set SDEI event number when VM is started or migrated
-   KVM_ARM_ASYNC_PF_CMD_SET_IRQ
-      Set IRQ number during when VM is started or migrated
-   KVM_ARM_ASYNC_PF_CMD_SET_CONTROL
-      Set control block when VM is migrated
+   * ARM_SMCCC_KVM_FUNC_ASYNC_PF_VERSION
+     Returns the version, which can be used to identify ABI changes
+     in the future.
+   * ARM_SMCCC_KVM_FUNC_ASYNC_PF_SLOTS
+     Return maximal number of tokens that current vCPU can have.
+     It's used by guest to allocate the required resources.
+   * ARM_SMCCC_KVM_FUNC_ASYNC_PF_{SDEI, IRQ}
+     Return the associated SDEI or (PPI) IRQ number, configured by
+     vCPU ioctl command.
+   * ARM_SMCCC_KVM_FUNC_ASYNC_PF_ENABLE
+     Enable or disable asynchronous page fault on current vCPU.
+
+The corresponding SDEI event and (PPI) IRQ are owned by VMM. So they
+are configured by vCPU ioctl interface and it will be implemented when
+the asynchronous page fault capability is exported in the subsequent
+patches.
 
 Signed-off-by: Gavin Shan <gshan@redhat.com>
 ---
- arch/arm64/include/asm/kvm_host.h | 14 +++++++
- arch/arm64/include/uapi/asm/kvm.h | 19 +++++++++
- arch/arm64/kvm/arm.c              |  6 +++
- arch/arm64/kvm/async_pf.c         | 64 +++++++++++++++++++++++++++++++
- include/uapi/linux/kvm.h          |  3 ++
- 5 files changed, 106 insertions(+)
+ arch/arm64/kvm/async_pf.c | 119 ++++++++++++++++++++++++++++++++++++++
+ include/linux/arm-smccc.h |   5 ++
+ 2 files changed, 124 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 6349920fd9ce..14b3d1505b15 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -778,6 +778,8 @@ void kvm_arch_async_page_present(struct kvm_vcpu *vcpu,
- 				 struct kvm_async_pf *work);
- long kvm_arch_async_pf_hypercall(struct kvm_vcpu *vcpu,
- 				 long *r1, long *r2, long *r3);
-+long kvm_arch_async_pf_vm_ioctl(struct kvm *kvm, unsigned long arg);
-+long kvm_arch_async_pf_vcpu_ioctl(struct kvm_vcpu *vcpu, unsigned long arg);
- void kvm_arch_async_pf_destroy_vcpu(struct kvm_vcpu *vcpu);
- #else
- static inline void kvm_arch_async_pf_create_vcpu(struct kvm_vcpu *vcpu) { }
-@@ -799,6 +801,18 @@ static inline long kvm_arch_async_pf_hypercall(struct kvm_vcpu *vcpu,
- {
- 	return SMCCC_RET_NOT_SUPPORTED;
- }
-+
-+static inline long kvm_arch_async_pf_vm_ioctl(struct kvm *kvm,
-+					      unsigned long arg)
-+{
-+	return -EPERM;
-+}
-+
-+static inline long kvm_arch_async_pf_vcpu_ioctl(struct kvm_vcpu *vcpu,
-+						unsigned long arg)
-+{
-+	return -EPERM;
-+}
- #endif
- 
- /* Guest/host FPSIMD coordination helpers */
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 15499751997d..a6124068bee6 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -403,6 +403,25 @@ struct kvm_vcpu_events {
- #define KVM_PSCI_RET_INVAL		PSCI_RET_INVALID_PARAMS
- #define KVM_PSCI_RET_DENIED		PSCI_RET_DENIED
- 
-+/* Asynchronous page fault */
-+#define KVM_ARM_ASYNC_PF_CMD_GET_VERSION	0
-+#define KVM_ARM_ASYNC_PF_CMD_GET_SDEI		1
-+#define KVM_ARM_ASYNC_PF_CMD_GET_IRQ		2
-+#define KVM_ARM_ASYNC_PF_CMD_GET_CONTROL	3
-+#define KVM_ARM_ASYNC_PF_CMD_SET_SDEI		4
-+#define KVM_ARM_ASYNC_PF_CMD_SET_IRQ		5
-+#define KVM_ARM_ASYNC_PF_CMD_SET_CONTROL	6
-+
-+struct kvm_arm_async_pf_cmd {
-+	__u32		cmd;
-+	union {
-+		__u32	version;
-+		__u64	sdei;
-+		__u32	irq;
-+		__u64	control;
-+	};
-+};
-+
- #endif
- 
- #endif /* __ARM_KVM_H__ */
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index e34fca3fa0ff..be0e6c2db2a5 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1287,6 +1287,9 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 	case KVM_ARM_SDEI_COMMAND: {
- 		return kvm_sdei_vcpu_ioctl(vcpu, arg);
- 	}
-+	case KVM_ARM_ASYNC_PF_COMMAND: {
-+		return kvm_arch_async_pf_vcpu_ioctl(vcpu, arg);
-+	}
- 	default:
- 		r = -EINVAL;
- 	}
-@@ -1364,6 +1367,9 @@ long kvm_arch_vm_ioctl(struct file *filp,
- 	case KVM_ARM_SDEI_COMMAND: {
- 		return kvm_sdei_vm_ioctl(kvm, arg);
- 	}
-+	case KVM_ARM_ASYNC_PF_COMMAND: {
-+		return kvm_arch_async_pf_vm_ioctl(kvm, arg);
-+	}
- 	default:
- 		return -EINVAL;
- 	}
 diff --git a/arch/arm64/kvm/async_pf.c b/arch/arm64/kvm/async_pf.c
-index 4734c5b26aa8..6f763edbe3a3 100644
+index f73c406456e9..4734c5b26aa8 100644
 --- a/arch/arm64/kvm/async_pf.c
 +++ b/arch/arm64/kvm/async_pf.c
-@@ -464,6 +464,70 @@ long kvm_arch_async_pf_hypercall(struct kvm_vcpu *vcpu,
- 	return ret;
+@@ -313,12 +313,115 @@ void kvm_arch_async_page_present(struct kvm_vcpu *vcpu,
+ 	write_cache(vcpu, offsetof(struct kvm_vcpu_pv_apf_data, token), 0);
  }
  
-+long kvm_arch_async_pf_vm_ioctl(struct kvm *kvm, unsigned long arg)
++static void kvm_arch_async_sdei_notifier(struct kvm_vcpu *vcpu,
++					 unsigned long num,
++					 unsigned int state)
 +{
-+	struct kvm_arm_async_pf_cmd cmd;
-+	unsigned int version = 0x010000; /* v1.0.0 */
-+	void __user *argp = (void __user *)arg;
-+
-+	if (copy_from_user(&cmd, argp, sizeof(cmd)))
-+		return -EFAULT;
-+
-+	if (cmd.cmd != KVM_ARM_ASYNC_PF_CMD_GET_VERSION)
-+		return -EINVAL;
-+
-+	cmd.version = version;
-+	if (copy_to_user(argp, &cmd, sizeof(cmd)))
-+		return -EFAULT;
-+
-+	return 0;
-+}
-+
-+long kvm_arch_async_pf_vcpu_ioctl(struct kvm_vcpu *vcpu, unsigned long arg)
-+{
++	struct kvm *kvm = vcpu->kvm;
 +	struct kvm_arch_async_pf_control *apf = vcpu->arch.apf;
-+	struct kvm_arm_async_pf_cmd cmd;
-+	void __user *argp = (void __user *)arg;
-+	long ret = 0;
 +
 +	if (!apf)
-+		return -EPERM;
++		return;
 +
-+	if (copy_from_user(&cmd, argp, sizeof(cmd)))
-+		return -EFAULT;
-+
-+	switch (cmd.cmd) {
-+	case KVM_ARM_ASYNC_PF_CMD_GET_SDEI:
-+		cmd.sdei = apf->sdei_event_num;
-+		break;
-+	case KVM_ARM_ASYNC_PF_CMD_GET_IRQ:
-+		cmd.irq = apf->irq;
-+		break;
-+	case KVM_ARM_ASYNC_PF_CMD_GET_CONTROL:
-+		cmd.control = apf->control_block;
-+		break;
-+	case KVM_ARM_ASYNC_PF_CMD_SET_SDEI:
-+		apf->sdei_event_num = cmd.sdei;
-+		break;
-+	case KVM_ARM_ASYNC_PF_CMD_SET_IRQ:
-+		apf->irq = cmd.irq;
-+		break;
-+	case KVM_ARM_ASYNC_PF_CMD_SET_CONTROL:
-+		if (kvm_arch_async_enable(vcpu, cmd.control) !=
-+		    SMCCC_RET_SUCCESS)
-+			ret = -EIO;
-+
-+		break;
-+	default:
-+		ret = -EINVAL;
++	if (num != apf->sdei_event_num) {
++		kvm_err("%s: Invalid event number (%d-%d %lx-%llx)\n",
++			__func__, kvm->userspace_pid, vcpu->vcpu_idx,
++			num, apf->sdei_event_num);
++		return;
 +	}
 +
-+	if (!ret && copy_to_user(argp, &cmd, sizeof(cmd)))
-+		ret = -EFAULT;
++	switch (state) {
++	case KVM_SDEI_NOTIFY_DELIVERED:
++		if (!apf->notpresent_pending)
++			break;
 +
-+	return ret;
++		apf->notpresent_token = 0;
++		apf->notpresent_pending = false;
++		break;
++	case KVM_SDEI_NOTIFY_COMPLETED:
++		break;
++	default:
++		kvm_err("%s: Invalid state (%d-%d %lx-%d)\n",
++			__func__, kvm->userspace_pid, vcpu->vcpu_idx,
++			num, state);
++	}
 +}
 +
- void kvm_arch_async_pf_destroy_vcpu(struct kvm_vcpu *vcpu)
- {
- 	kfree(vcpu->arch.apf);
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 133128d45fcb..1f161156edb2 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1569,6 +1569,9 @@ struct kvm_pv_cmd {
- /* Available with KVM_CAP_ARM_SDEI */
- #define KVM_ARM_SDEI_COMMAND   _IOWR(KVMIO, 0xc8, struct kvm_sdei_cmd)
- 
-+/* Available with KVM_CAP_ASYNC_PF or KVM_CAP_ASYNC_PF_INT */
-+#define KVM_ARM_ASYNC_PF_COMMAND  _IOWR(KVMIO, 0xc9, struct kvm_arm_async_pf_cmd)
++static long kvm_arch_async_enable(struct kvm_vcpu *vcpu, u64 data)
++{
++	struct kvm *kvm = vcpu->kvm;
++	struct kvm_arch_async_pf_control *apf = vcpu->arch.apf;
++	gpa_t gpa = (data & ~0x3FUL);
++	bool enabled, enable;
++	int ret;
 +
- /* Secure Encrypted Virtualization command */
- enum sev_cmd_id {
- 	/* Guest initialization commands */
++	if (!apf || !irqchip_in_kernel(kvm))
++		return SMCCC_RET_NOT_SUPPORTED;
++
++	/* Bail if the state transition isn't allowed */
++	enabled = !!(apf->control_block & KVM_ASYNC_PF_ENABLED);
++	enable = !!(data & KVM_ASYNC_PF_ENABLED);
++	if (enable == enabled) {
++		kvm_debug("%s: Async PF has been %s on (%d-%d %llx-%llx)\n",
++			  __func__, enabled ? "enabled" : "disabled",
++			  kvm->userspace_pid, vcpu->vcpu_idx,
++			  apf->control_block, data);
++		return SMCCC_RET_NOT_REQUIRED;
++	}
++
++	/* To disable the functinality */
++	if (!enable) {
++		kvm_clear_async_pf_completion_queue(vcpu);
++		apf->control_block = data;
++		return SMCCC_RET_SUCCESS;
++	}
++
++	/*
++	 * The SDEI event and IRQ number should have been given
++	 * prior to enablement.
++	 */
++	if (!apf->sdei_event_num || !apf->irq) {
++		kvm_err("%s: Invalid SDEI event or IRQ (%d-%d %llx-%d)\n",
++			__func__, kvm->userspace_pid, vcpu->vcpu_idx,
++			apf->sdei_event_num, apf->irq);
++		return SMCCC_RET_INVALID_PARAMETER;
++	}
++
++	/* Register SDEI event notifier */
++	ret = kvm_sdei_register_notifier(kvm, apf->sdei_event_num,
++					 kvm_arch_async_sdei_notifier);
++	if (ret) {
++		kvm_err("%s: Error %d registering SDEI notifier (%d-%d %llx)\n",
++			__func__, ret, kvm->userspace_pid, vcpu->vcpu_idx,
++			apf->sdei_event_num);
++		return SMCCC_RET_NOT_SUPPORTED;
++	}
++
++	/* Initialize cache shared by host and guest */
++	ret = kvm_gfn_to_hva_cache_init(kvm, &apf->cache, gpa,
++			offsetofend(struct kvm_vcpu_pv_apf_data, token));
++	if (ret) {
++		kvm_err("%s: Error %d initializing cache (%d-%d)\n",
++			__func__, ret, kvm->userspace_pid, vcpu->vcpu_idx);
++		return SMCCC_RET_NOT_SUPPORTED;
++	}
++
++	/* Flush the token table */
++	kvm_async_pf_reset_slot(vcpu);
++	apf->send_user_only = !(data & KVM_ASYNC_PF_SEND_ALWAYS);
++	kvm_async_pf_wakeup_all(vcpu);
++	apf->control_block = data;
++
++	return SMCCC_RET_SUCCESS;
++}
++
+ long kvm_arch_async_pf_hypercall(struct kvm_vcpu *vcpu,
+ 				 long *r1, long *r2, long *r3)
+ {
+ 	struct kvm *kvm = vcpu->kvm;
+ 	struct kvm_arch_async_pf_control *apf = vcpu->arch.apf;
+ 	u32 func;
++	u64 data;
+ 	long ret = SMCCC_RET_SUCCESS;
+ 
+ 	if (!apf) {
+@@ -328,6 +431,22 @@ long kvm_arch_async_pf_hypercall(struct kvm_vcpu *vcpu,
+ 
+ 	func = smccc_get_arg1(vcpu);
+ 	switch (func) {
++	case ARM_SMCCC_KVM_FUNC_ASYNC_PF_VERSION:
++		*r1 = 0x010000; /* v1.0.0 */
++		break;
++	case ARM_SMCCC_KVM_FUNC_ASYNC_PF_SLOTS:
++		*r1 = ASYNC_PF_PER_VCPU;
++		break;
++	case ARM_SMCCC_KVM_FUNC_ASYNC_PF_SDEI:
++		*r1 = apf->sdei_event_num;
++		break;
++	case ARM_SMCCC_KVM_FUNC_ASYNC_PF_IRQ:
++		*r1 = apf->irq;
++		break;
++	case ARM_SMCCC_KVM_FUNC_ASYNC_PF_ENABLE:
++		data = (smccc_get_arg3(vcpu) << 32) | smccc_get_arg2(vcpu);
++		ret = kvm_arch_async_enable(vcpu, data);
++		break;
+ 	case ARM_SMCCC_KVM_FUNC_ASYNC_PF_IRQ_ACK:
+ 		if (!apf->pageready_pending)
+ 			break;
+diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
+index 0476afbd3178..ae081156132d 100644
+--- a/include/linux/arm-smccc.h
++++ b/include/linux/arm-smccc.h
+@@ -129,6 +129,11 @@
+ 			   ARM_SMCCC_KVM_FUNC_FEATURES)
+ 
+ /* Asynchronous page fault service */
++#define ARM_SMCCC_KVM_FUNC_ASYNC_PF_VERSION		0
++#define ARM_SMCCC_KVM_FUNC_ASYNC_PF_SLOTS		1
++#define ARM_SMCCC_KVM_FUNC_ASYNC_PF_SDEI		2
++#define ARM_SMCCC_KVM_FUNC_ASYNC_PF_IRQ			3
++#define ARM_SMCCC_KVM_FUNC_ASYNC_PF_ENABLE		4
+ #define ARM_SMCCC_KVM_FUNC_ASYNC_PF_IRQ_ACK		5
+ 
+ #define ARM_SMCCC_VENDOR_HYP_KVM_ASYNC_PF_FUNC_ID		\
 -- 
 2.23.0
 
