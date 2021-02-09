@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76452C433E0
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Feb 2021 05:05:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70BB8C433E0
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Feb 2021 05:05:25 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0BAA464EB9
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Feb 2021 05:05:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BAA464EB9
+	by mail.kernel.org (Postfix) with ESMTP id 1092A64EB9
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Feb 2021 05:05:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1092A64EB9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 98A5D4B70A;
-	Tue,  9 Feb 2021 00:05:15 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A0E074B410;
+	Tue,  9 Feb 2021 00:05:24 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id s4oNNuxiCUhE; Tue,  9 Feb 2021 00:05:14 -0500 (EST)
+	with ESMTP id xxWX5BQNhKIi; Tue,  9 Feb 2021 00:05:23 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A4D24B734;
-	Tue,  9 Feb 2021 00:05:14 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 48D4C4B66D;
+	Tue,  9 Feb 2021 00:05:23 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E2614B559
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Feb 2021 00:05:13 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EDF7E4B59B
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Feb 2021 00:05:21 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SnEZydsq9IBi for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 Feb 2021 00:05:12 -0500 (EST)
+ with ESMTP id dXfYqd-BXOP1 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Feb 2021 00:05:19 -0500 (EST)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 07E314B72D
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Feb 2021 00:05:12 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A255E4B525
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Feb 2021 00:05:19 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1612847111;
+ s=mimecast20190719; t=1612847119;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=lykTvxA53wjtht4Rhfogm7ARHCpnIyEDc9oLghHVR9E=;
- b=X7OpuUK4eD+OkloPGUfuN24V7YHusTGJHaMLxcNLk881AgZaj4s4OlhcCnZZP21vBE2eG2
- aOr3uqzFDeI0WihgwWjTWzs2TzwudYU3IQmo5orHLdR5TaWXOfqSZLx6sGMkRa9F06og2b
- woDQ+j+PPE4jvVyXnGO7vu8pVk+uw4g=
+ bh=iUu+lzwBSV+fLOITGUpcU5W0RbJdTJsAIGp714lX3hQ=;
+ b=KudFj6KDHBQcsgufMkdwASOt1V7MqCVYyJaLQljJPybJbMxAQ9AiK2yjlX8M2BJ8iTBXkV
+ CAu6Zh+gCOI6w7dwqe41PG9j/zRUUrKWZIsdu5x6SFDnfadWId0EA/wSBA1Qy8+jS4F/mF
+ EdfgKcG80txFJbDrMXOWgLBMkzVPLiY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-547-xJ1Cy6XOMlW3VF7ygWMSNQ-1; Tue, 09 Feb 2021 00:05:09 -0500
-X-MC-Unique: xJ1Cy6XOMlW3VF7ygWMSNQ-1
+ us-mta-201-Dr5KQhgwM0Gwv1MGTmGang-1; Tue, 09 Feb 2021 00:05:17 -0500
+X-MC-Unique: Dr5KQhgwM0Gwv1MGTmGang-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7043A192CC43;
- Tue,  9 Feb 2021 05:05:07 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C80AB803F48;
+ Tue,  9 Feb 2021 05:05:15 +0000 (UTC)
 Received: from gshan.redhat.com (vpn2-54-26.bne.redhat.com [10.64.54.26])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4A36B5D9C0;
- Tue,  9 Feb 2021 05:05:02 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D11F95D9C0;
+ Tue,  9 Feb 2021 05:05:07 +0000 (UTC)
 From: Gavin Shan <gshan@redhat.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v2 13/17] KVM: arm64: Export async PF capability
-Date: Tue,  9 Feb 2021 13:03:59 +0800
-Message-Id: <20210209050403.103143-14-gshan@redhat.com>
+Subject: [PATCH v2 14/17] arm64: Detect async PF para-virtualization feature
+Date: Tue,  9 Feb 2021 13:04:00 +0800
+Message-Id: <20210209050403.103143-15-gshan@redhat.com>
 In-Reply-To: <20210209050403.103143-1-gshan@redhat.com>
 References: <20210209050403.103143-1-gshan@redhat.com>
 MIME-Version: 1.0
@@ -89,78 +89,94 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This exports the asynchronous page fault capability:
+This implements kvm_para_available() to check if para-virtualization
+features are available or not. Besides, kvm_para_has_feature() is
+enhanced to detect the asynchronous page fault para-virtualization
+feature. These two functions are going to be used by guest kernel
+to enable the asynchronous page fault.
 
-    * Identify capability KVM_CAP_ASYNC_{PF, PF_INT}.
-
-    * Standardize SDEI event for asynchronous page fault.
-
-    * Enable kernel config CONFIG_KVM_ASYNC_{PF, PF_SLOT}.
+This also adds kernel option (CONFIG_KVM_GUEST), which is the umbrella
+for the optimizations related to KVM para-virtualization.
 
 Signed-off-by: Gavin Shan <gshan@redhat.com>
 ---
- arch/arm64/include/uapi/asm/kvm_sdei.h | 1 +
- arch/arm64/kvm/Kconfig                 | 2 ++
- arch/arm64/kvm/arm.c                   | 4 ++++
- arch/arm64/kvm/sdei.c                  | 5 +++++
- 4 files changed, 12 insertions(+)
+ arch/arm64/Kconfig                     | 11 +++++++++++
+ arch/arm64/include/asm/kvm_para.h      | 12 +++++++++++-
+ arch/arm64/include/uapi/asm/kvm_para.h |  2 ++
+ 3 files changed, 24 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/uapi/asm/kvm_sdei.h b/arch/arm64/include/uapi/asm/kvm_sdei.h
-index 232092de5e21..47d578abba1a 100644
---- a/arch/arm64/include/uapi/asm/kvm_sdei.h
-+++ b/arch/arm64/include/uapi/asm/kvm_sdei.h
-@@ -13,6 +13,7 @@
- #define KVM_SDEI_MAX_VCPUS     512
- #define KVM_SDEI_INVALID_NUM   0
- #define KVM_SDEI_DEFAULT_NUM   0x40400000
-+#define KVM_SDEI_ASYNC_PF_NUM  0x40400001
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index f39568b28ec1..792ae09aa690 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -1078,6 +1078,17 @@ config PARAVIRT_TIME_ACCOUNTING
  
- struct kvm_sdei_event_state {
- 	uint64_t	num;
-diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index 3964acf5451e..dfb3ed0de2ca 100644
---- a/arch/arm64/kvm/Kconfig
-+++ b/arch/arm64/kvm/Kconfig
-@@ -31,6 +31,8 @@ menuconfig KVM
- 	select SRCU
- 	select KVM_VFIO
- 	select HAVE_KVM_EVENTFD
-+	select KVM_ASYNC_PF
-+	select KVM_ASYNC_PF_SLOT
- 	select HAVE_KVM_IRQFD
- 	select HAVE_KVM_MSI
- 	select HAVE_KVM_IRQCHIP
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index be0e6c2db2a5..0940de3ebcff 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -269,6 +269,10 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_ARM_SDEI:
- 		r = 1;
- 		break;
-+	case KVM_CAP_ASYNC_PF:
-+	case KVM_CAP_ASYNC_PF_INT:
-+		r = IS_ENABLED(CONFIG_KVM_ASYNC_PF) ? 1 : 0;
-+		break;
- 	default:
- 		r = 0;
- 	}
-diff --git a/arch/arm64/kvm/sdei.c b/arch/arm64/kvm/sdei.c
-index 4f5a582daa97..437303bfafba 100644
---- a/arch/arm64/kvm/sdei.c
-+++ b/arch/arm64/kvm/sdei.c
-@@ -19,6 +19,11 @@ static struct kvm_sdei_event_state defined_kse[] = {
- 	  1,
- 	  SDEI_EVENT_PRIORITY_CRITICAL
- 	},
-+	{ KVM_SDEI_ASYNC_PF_NUM,
-+	  SDEI_EVENT_TYPE_PRIVATE,
-+	  1,
-+	  SDEI_EVENT_PRIORITY_CRITICAL
-+	},
- };
+ 	  If in doubt, say N here.
  
- static struct kvm_sdei_event *kvm_sdei_find_event(struct kvm *kvm,
++config KVM_GUEST
++	bool "KVM Guest Support"
++	depends on PARAVIRT
++	default y
++	help
++	  This option enables various optimizations for running under the KVM
++	  hypervisor. Overhead for the kernel when not running inside KVM should
++	  be minimal.
++
++	  In case of doubt, say Y
++
+ config KEXEC
+ 	depends on PM_SLEEP_SMP
+ 	select KEXEC_CORE
+diff --git a/arch/arm64/include/asm/kvm_para.h b/arch/arm64/include/asm/kvm_para.h
+index 0ea481dd1c7a..8f39c60a6619 100644
+--- a/arch/arm64/include/asm/kvm_para.h
++++ b/arch/arm64/include/asm/kvm_para.h
+@@ -3,6 +3,8 @@
+ #define _ASM_ARM_KVM_PARA_H
+ 
+ #include <uapi/asm/kvm_para.h>
++#include <linux/of.h>
++#include <asm/hypervisor.h>
+ 
+ static inline bool kvm_check_and_clear_guest_paused(void)
+ {
+@@ -11,7 +13,12 @@ static inline bool kvm_check_and_clear_guest_paused(void)
+ 
+ static inline unsigned int kvm_arch_para_features(void)
+ {
+-	return 0;
++	unsigned int features = 0;
++
++	if (kvm_arm_hyp_service_available(ARM_SMCCC_KVM_FUNC_ASYNC_PF))
++		features |= (1 << KVM_FEATURE_ASYNC_PF);
++
++	return features;
+ }
+ 
+ static inline unsigned int kvm_arch_para_hints(void)
+@@ -21,6 +28,9 @@ static inline unsigned int kvm_arch_para_hints(void)
+ 
+ static inline bool kvm_para_available(void)
+ {
++	if (IS_ENABLED(CONFIG_KVM_GUEST))
++		return true;
++
+ 	return false;
+ }
+ 
+diff --git a/arch/arm64/include/uapi/asm/kvm_para.h b/arch/arm64/include/uapi/asm/kvm_para.h
+index 162325e2638f..70bbc7d1ec75 100644
+--- a/arch/arm64/include/uapi/asm/kvm_para.h
++++ b/arch/arm64/include/uapi/asm/kvm_para.h
+@@ -4,6 +4,8 @@
+ 
+ #include <linux/types.h>
+ 
++#define KVM_FEATURE_ASYNC_PF		0
++
+ /* Async PF */
+ #define KVM_ASYNC_PF_ENABLED		(1 << 0)
+ #define KVM_ASYNC_PF_SEND_ALWAYS	(1 << 1)
 -- 
 2.23.0
 
