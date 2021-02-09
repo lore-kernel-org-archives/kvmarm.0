@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26589C433E0
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Feb 2021 05:05:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49F20C433E0
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Feb 2021 05:05:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B5B4564E27
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Feb 2021 05:05:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5B4564E27
+	by mail.kernel.org (Postfix) with ESMTP id DEBF164EB8
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Feb 2021 05:05:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEBF164EB8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B39B4B6FD;
-	Tue,  9 Feb 2021 00:05:01 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7ED784B66F;
+	Tue,  9 Feb 2021 00:05:05 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 7P6CbMbVPLKV; Tue,  9 Feb 2021 00:04:59 -0500 (EST)
+	with ESMTP id p15sIDtSPu7N; Tue,  9 Feb 2021 00:05:03 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E79D4B70F;
-	Tue,  9 Feb 2021 00:04:59 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AF5A34B683;
+	Tue,  9 Feb 2021 00:05:02 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CAA6B4B683
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Feb 2021 00:04:57 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A2744B71A
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Feb 2021 00:05:01 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XMrahotil3rP for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 Feb 2021 00:04:56 -0500 (EST)
+ with ESMTP id 156zgfQvixvE for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Feb 2021 00:04:59 -0500 (EST)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [63.128.21.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 005AE4B718
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Feb 2021 00:04:55 -0500 (EST)
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A3924B24A
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Feb 2021 00:04:59 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1612847095;
+ s=mimecast20190719; t=1612847099;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=BjYhJsm41zkoUf56AVlE9cuBjj8HBoDRn0oILnM4jPU=;
- b=iayZOkiO/s7WtSJFSYJzViDvpf9TYrI5/0MeQQrbEps10xmXMHFHHFbV2rZJZA1WH29rEb
- XfPNKP4q3ackHQDCYL5VjQsYDtUh4OrOdF3HvPq1mUYk6esIBsHWxV5JAjuFdmuV4f/For
- Kk+sxyykausMjEYzv//Ucce5w6fcZZQ=
+ bh=bsQLMovIRhqyb74JGkxUSNLv+EjubJGHQUvqwyR4Guw=;
+ b=NgpGUdgbyqVsKQnfyppsysPCLaiRKUieMu7iAARA88ABdLc7HqwwYAJap9wLY4nJAVt2az
+ 69q9X2rqOUUj+G/ZmmFsnpmKKM/oOQYDEVi7UhKxtPicx8Q02esoSVPwM/2AP7a9FOUngQ
+ 3YUZG4pRnDGTGRrAR7NGhHN1Lm649Ek=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-330-NoYszbyfMO25AbLxHobnwA-1; Tue, 09 Feb 2021 00:04:53 -0500
-X-MC-Unique: NoYszbyfMO25AbLxHobnwA-1
+ us-mta-427-xXcFyTKtMMeRWieEQVslSQ-1; Tue, 09 Feb 2021 00:04:57 -0500
+X-MC-Unique: xXcFyTKtMMeRWieEQVslSQ-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0FBE3107ACC7;
- Tue,  9 Feb 2021 05:04:52 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B812D107ACE4;
+ Tue,  9 Feb 2021 05:04:55 +0000 (UTC)
 Received: from gshan.redhat.com (vpn2-54-26.bne.redhat.com [10.64.54.26])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 754745D9C0;
- Tue,  9 Feb 2021 05:04:49 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A22745D9C0;
+ Tue,  9 Feb 2021 05:04:52 +0000 (UTC)
 From: Gavin Shan <gshan@redhat.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v2 09/17] KVM: arm64: Support page-not-present notification
-Date: Tue,  9 Feb 2021 13:03:55 +0800
-Message-Id: <20210209050403.103143-10-gshan@redhat.com>
+Subject: [PATCH v2 10/17] KVM: arm64: Support page-ready notification
+Date: Tue,  9 Feb 2021 13:03:56 +0800
+Message-Id: <20210209050403.103143-11-gshan@redhat.com>
 In-Reply-To: <20210209050403.103143-1-gshan@redhat.com>
 References: <20210209050403.103143-1-gshan@redhat.com>
 MIME-Version: 1.0
@@ -89,284 +89,280 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The requested page might be not resident in memory during the stage-2
-page fault. For example, the requested page could be resident in swap
-device (file). In this case, disk I/O is issued in order to fetch the
-requested page and it could take tens of milliseconds, even hundreds
-of milliseconds in extreme situation. During the period, the guest's
-vCPU is suspended until the requested page becomes ready. Actually,
-the something else on the guest's vCPU could be rescheduled during
-the period, so that the time slice isn't wasted as the guest's vCPU
-can see. This is the primary goal of the feature (Asynchronous Page
-Fault).
+The asynchronous page fault starts with a worker when the requested
+page isn't present. The worker makes the requested page present
+in the background and the worker, together with the associated
+information, is queued to the completion queue after that. The
+worker and the completion queue are checked as below.
 
-This supports delivery of page-not-present notification through SDEI
-event when the requested page isn't present. When the notification is
-received on the guest's vCPU, something else (another process) can be
-scheduled. The design is highlighted as below:
+   * A request (KVM_REQ_ASYNC_PF) is raised if the worker is the
+     first one enqueued to the completion queue. With the request,
+     the completion queue is checked and the worker is dequeued.
+     A PPI is sent to guest as the page-ready notification and
+     the guest should acknowledge the interrupt by SMCCC interface.
 
-   * There is dedicated memory region shared by host and guest. It's
-     represented by "struct kvm_vcpu_pv_apf_data". The field @reason
-     indicates the reason why the SDEI event is triggered, while the
-     unique @token is used by guest to associate the event with the
-     suspended process.
+   * When the notification (PPI) is acknowledged by guest, the
+     completion queue is checked again and next worker is dequeued
+     if we have one. For this particular worker, another notification
+     (PPI) is sent to the guest without raising the request. Once the
+     notification (PPI) is acknowledged by the guest, the completion
+     queue is checked to process next worker, which has been queued
+     to it.
 
-   * One control block is associated with each guest's vCPU and it's
-     represented by "struct kvm_arch_async_pf_control". It allows the
-     guest to configure the functionality to indicate the situations
-     where the host can deliver the page-not-present notification to
-     kick off asyncrhonous page fault. Besides, runtime states are
-     also maintained in this struct.
+Similar to page-not-present notification, the shared memory region
+is used to convey the reason and token associated with the page-ready
+notification. The region is represented by "struct kvm_vcpu_pv_apf_data".
 
-   * Before the page-not-present notification is sent to the guest's
-     vCPU, a worker is started and executed asynchronously on host,
-     to fetch the requested page. "struct kvm{_,_arch}async_pf" is
-     associated with the worker, to track the work.
-
-The feature isn't enabled by CONFIG_KVM_ASYNC_PF yet. Also, the
-page-ready notification delivery and control path isn't implemented
-and will be done in the subsequent patches.
+The feature isn't enabled by CONFIG_KVM_ASYNC_PF yet. Also, the control
+path isn't implemented and will be done in the subsequent patches.
 
 Signed-off-by: Gavin Shan <gshan@redhat.com>
 ---
- arch/arm64/include/asm/kvm_host.h      |  50 +++++++++
- arch/arm64/include/uapi/asm/kvm_para.h |  15 +++
- arch/arm64/kvm/Makefile                |   1 +
- arch/arm64/kvm/arm.c                   |   3 +
- arch/arm64/kvm/async_pf.c              | 145 +++++++++++++++++++++++++
- arch/arm64/kvm/mmu.c                   |  32 +++++-
- 6 files changed, 245 insertions(+), 1 deletion(-)
- create mode 100644 arch/arm64/kvm/async_pf.c
+ arch/arm64/include/asm/kvm_host.h      |  17 ++
+ arch/arm64/include/uapi/asm/kvm_para.h |   1 +
+ arch/arm64/kvm/arm.c                   |  24 ++-
+ arch/arm64/kvm/async_pf.c              | 207 +++++++++++++++++++++++++
+ arch/arm64/kvm/hypercalls.c            |   6 +
+ include/linux/arm-smccc.h              |  10 ++
+ 6 files changed, 262 insertions(+), 3 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 00b30b7554e5..49cccefb22cf 100644
+index 49cccefb22cf..6349920fd9ce 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -273,6 +273,31 @@ struct vcpu_reset_state {
- 	bool		reset;
+@@ -48,6 +48,7 @@
+ #define KVM_REQ_RECORD_STEAL	KVM_ARCH_REQ(3)
+ #define KVM_REQ_RELOAD_GICv4	KVM_ARCH_REQ(4)
+ #define KVM_REQ_SDEI		KVM_ARCH_REQ(5)
++#define KVM_REQ_ASYNC_PF	KVM_ARCH_REQ(6)
+ 
+ #define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
+ 				     KVM_DIRTY_LOG_INITIALLY_SET)
+@@ -292,10 +293,12 @@ struct kvm_arch_async_pf_control {
+ 		u64			control_block;
+ 		bool			send_user_only;
+ 		u64			sdei_event_num;
++		u32			irq;
+ 
+ 		u16			id;
+ 		bool			notpresent_pending;
+ 		u32			notpresent_token;
++		bool			pageready_pending;
  };
  
-+/* Should be a power of two number */
-+#define ASYNC_PF_PER_VCPU	64
-+
-+/*
-+ * The association of gfn and token. The token will be sent to guest as
-+ * page fault address. Also, the guest could be in aarch32 mode. So its
-+ * length should be 32-bits.
-+ */
-+struct kvm_arch_async_pf {
-+	u32	token;
-+	gfn_t	gfn;
-+	u32	esr;
-+};
-+
-+struct kvm_arch_async_pf_control {
-+		struct gfn_to_hva_cache	cache;
-+		u64			control_block;
-+		bool			send_user_only;
-+		u64			sdei_event_num;
-+
-+		u16			id;
-+		bool			notpresent_pending;
-+		u32			notpresent_token;
-+};
-+
  struct kvm_vcpu_arch {
- 	struct kvm_cpu_context ctxt;
- 	void *sve_state;
-@@ -375,6 +400,7 @@ struct kvm_vcpu_arch {
- 	} steal;
- 
- 	struct kvm_sdei_vcpu *sdei;
-+	struct kvm_arch_async_pf_control *apf;
- };
- 
- /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
-@@ -734,6 +760,30 @@ int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
- int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
- 			       struct kvm_device_attr *attr);
- 
-+#ifdef CONFIG_KVM_ASYNC_PF
-+void kvm_arch_async_pf_create_vcpu(struct kvm_vcpu *vcpu);
-+bool kvm_arch_async_not_present_allowed(struct kvm_vcpu *vcpu);
-+bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu,
-+			     u32 esr, gpa_t gpa, gfn_t gfn);
-+bool kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
-+				     struct kvm_async_pf *work);
-+void kvm_arch_async_pf_destroy_vcpu(struct kvm_vcpu *vcpu);
-+#else
-+static inline void kvm_arch_async_pf_create_vcpu(struct kvm_vcpu *vcpu) { }
-+static inline void kvm_arch_async_pf_destroy_vcpu(struct kvm_vcpu *vcpu) { }
+@@ -767,6 +770,14 @@ bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu,
+ 			     u32 esr, gpa_t gpa, gfn_t gfn);
+ bool kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
+ 				     struct kvm_async_pf *work);
++void kvm_arch_async_page_present_queued(struct kvm_vcpu *vcpu);
++bool kvm_arch_can_dequeue_async_page_present(struct kvm_vcpu *vcpu);
++void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu,
++			       struct kvm_async_pf *work);
++void kvm_arch_async_page_present(struct kvm_vcpu *vcpu,
++				 struct kvm_async_pf *work);
++long kvm_arch_async_pf_hypercall(struct kvm_vcpu *vcpu,
++				 long *r1, long *r2, long *r3);
+ void kvm_arch_async_pf_destroy_vcpu(struct kvm_vcpu *vcpu);
+ #else
+ static inline void kvm_arch_async_pf_create_vcpu(struct kvm_vcpu *vcpu) { }
+@@ -782,6 +793,12 @@ static inline bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu,
+ {
+ 	return false;
+ }
 +
-+static inline bool kvm_arch_async_not_present_allowed(struct kvm_vcpu *vcpu)
++static inline long kvm_arch_async_pf_hypercall(struct kvm_vcpu *vcpu,
++					       long *r1, long *r2, long *r3)
 +{
-+	return false;
++	return SMCCC_RET_NOT_SUPPORTED;
 +}
-+
-+static inline bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu,
-+					   u32 esr, gpa_t gpa, gfn_t gfn)
-+{
-+	return false;
-+}
-+#endif
-+
+ #endif
+ 
  /* Guest/host FPSIMD coordination helpers */
- int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
- void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu);
 diff --git a/arch/arm64/include/uapi/asm/kvm_para.h b/arch/arm64/include/uapi/asm/kvm_para.h
-index cd212282b90c..3fa04006714e 100644
+index 3fa04006714e..162325e2638f 100644
 --- a/arch/arm64/include/uapi/asm/kvm_para.h
 +++ b/arch/arm64/include/uapi/asm/kvm_para.h
-@@ -2,4 +2,19 @@
- #ifndef _UAPI_ASM_ARM_KVM_PARA_H
- #define _UAPI_ASM_ARM_KVM_PARA_H
+@@ -9,6 +9,7 @@
+ #define KVM_ASYNC_PF_SEND_ALWAYS	(1 << 1)
  
-+#include <linux/types.h>
-+
-+/* Async PF */
-+#define KVM_ASYNC_PF_ENABLED		(1 << 0)
-+#define KVM_ASYNC_PF_SEND_ALWAYS	(1 << 1)
-+
-+#define KVM_PV_REASON_PAGE_NOT_PRESENT	1
-+
-+struct kvm_vcpu_pv_apf_data {
-+	__u32	reason;
-+	__u32	token;
-+	__u8	pad[56];
-+	__u32	enabled;
-+};
-+
- #endif /* _UAPI_ASM_ARM_KVM_PARA_H */
-diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-index dcb353f29d20..35721f9076d8 100644
---- a/arch/arm64/kvm/Makefile
-+++ b/arch/arm64/kvm/Makefile
-@@ -25,3 +25,4 @@ kvm-y := $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o \
- 	 vgic/vgic-its.o vgic/vgic-debug.o
+ #define KVM_PV_REASON_PAGE_NOT_PRESENT	1
++#define KVM_PV_REASON_PAGE_READY	2
  
- kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o
-+kvm-$(CONFIG_KVM_ASYNC_PF) += $(KVM)/async_pf.o async_pf.o
+ struct kvm_vcpu_pv_apf_data {
+ 	__u32	reason;
 diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index f8b44a29e164..c98fbb4e914b 100644
+index c98fbb4e914b..e34fca3fa0ff 100644
 --- a/arch/arm64/kvm/arm.c
 +++ b/arch/arm64/kvm/arm.c
-@@ -330,6 +330,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 
- 	kvm_sdei_create_vcpu(vcpu);
- 
-+	kvm_arch_async_pf_create_vcpu(vcpu);
+@@ -484,9 +484,23 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+  */
+ int kvm_arch_vcpu_runnable(struct kvm_vcpu *v)
+ {
++	struct kvm_arch_async_pf_control *apf = v->arch.apf;
+ 	bool irq_lines = *vcpu_hcr(v) & (HCR_VI | HCR_VF);
+-	return ((irq_lines || kvm_vgic_vcpu_pending_irq(v))
+-		&& !v->arch.power_off && !v->arch.pause);
 +
- 	vcpu->arch.hw_mmu = &vcpu->kvm->arch.mmu;
++	if ((irq_lines || kvm_vgic_vcpu_pending_irq(v)) &&
++	    !v->arch.power_off && !v->arch.pause)
++		return true;
++
++	if (apf && (apf->control_block & KVM_ASYNC_PF_ENABLED)) {
++		if (kvm_check_async_pf_completion_queue(v))
++			return true;
++
++		if (apf->notpresent_pending ||
++		    apf->pageready_pending)
++			return true;
++	}
++
++	return false;
+ }
  
- 	err = kvm_vgic_vcpu_init(vcpu);
-@@ -351,6 +353,7 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
- 	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_cache);
- 	kvm_timer_vcpu_terminate(vcpu);
- 	kvm_pmu_vcpu_destroy(vcpu);
-+	kvm_arch_async_pf_destroy_vcpu(vcpu);
- 	kvm_sdei_destroy_vcpu(vcpu);
+ bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
+@@ -674,6 +688,9 @@ static void check_vcpu_requests(struct kvm_vcpu *vcpu)
+ 		if (kvm_check_request(KVM_REQ_VCPU_RESET, vcpu))
+ 			kvm_reset_vcpu(vcpu);
  
- 	kvm_arm_vcpu_destroy(vcpu);
++		if (kvm_check_request(KVM_REQ_ASYNC_PF, vcpu))
++			kvm_check_async_pf_completion(vcpu);
++
+ 		if (kvm_check_request(KVM_REQ_SDEI, vcpu))
+ 			kvm_sdei_deliver(vcpu);
+ 
+@@ -789,7 +806,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 		smp_store_mb(vcpu->mode, IN_GUEST_MODE);
+ 
+ 		if (ret <= 0 || need_new_vmid_gen(&vcpu->arch.hw_mmu->vmid) ||
+-		    kvm_request_pending(vcpu)) {
++		    (kvm_request_pending(vcpu) &&
++		     READ_ONCE(vcpu->requests) != (1UL << KVM_REQ_ASYNC_PF))) {
+ 			vcpu->mode = OUTSIDE_GUEST_MODE;
+ 			isb(); /* Ensure work in x_flush_hwstate is committed */
+ 			kvm_pmu_sync_hwstate(vcpu);
 diff --git a/arch/arm64/kvm/async_pf.c b/arch/arm64/kvm/async_pf.c
-new file mode 100644
-index 000000000000..742bb8a0a8c0
---- /dev/null
+index 742bb8a0a8c0..f73c406456e9 100644
+--- a/arch/arm64/kvm/async_pf.c
 +++ b/arch/arm64/kvm/async_pf.c
-@@ -0,0 +1,145 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Asynchronous page fault support.
-+ *
-+ * Copyright (C) 2021 Red Hat, Inc.
-+ *
-+ * Author(s): Gavin Shan <gshan@redhat.com>
-+ */
+@@ -138,6 +138,213 @@ bool kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
+ 	return false;
+ }
+ 
++void kvm_arch_async_page_present_queued(struct kvm_vcpu *vcpu)
++{
++	struct kvm_arch_async_pf_control *apf = vcpu->arch.apf;
 +
-+#include <linux/arm-smccc.h>
-+#include <linux/kvm_host.h>
-+#include <asm/kvm_emulate.h>
-+#include <kvm/arm_hypercalls.h>
-+#include <kvm/arm_vgic.h>
-+#include <asm/kvm_sdei.h>
++	kvm_make_request(KVM_REQ_ASYNC_PF, vcpu);
++	if (apf && !apf->pageready_pending)
++		kvm_vcpu_kick(vcpu);
++}
 +
-+static inline int read_cache(struct kvm_vcpu *vcpu, u32 offset, u32 *val)
++bool kvm_arch_can_dequeue_async_page_present(struct kvm_vcpu *vcpu)
 +{
 +	struct kvm *kvm = vcpu->kvm;
 +	struct kvm_arch_async_pf_control *apf = vcpu->arch.apf;
-+
-+	return kvm_read_guest_offset_cached(kvm, &apf->cache,
-+					    val, offset, sizeof(*val));
-+}
-+
-+static inline int write_cache(struct kvm_vcpu *vcpu, u32 offset, u32 val)
-+{
-+	struct kvm *kvm = vcpu->kvm;
-+	struct kvm_arch_async_pf_control *apf = vcpu->arch.apf;
-+
-+	return kvm_write_guest_offset_cached(kvm, &apf->cache,
-+					     &val, offset, sizeof(val));
-+}
-+
-+void kvm_arch_async_pf_create_vcpu(struct kvm_vcpu *vcpu)
-+{
-+	vcpu->arch.apf = kzalloc(sizeof(*(vcpu->arch.apf)), GFP_KERNEL);
-+}
-+
-+bool kvm_arch_async_not_present_allowed(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm *kvm = vcpu->kvm;
-+	struct kvm_arch_async_pf_control *apf = vcpu->arch.apf;
-+	struct kvm_sdei_vcpu *vsdei = vcpu->arch.sdei;
++	struct kvm_async_pf *work;
 +	u32 reason, token;
 +	int ret;
 +
 +	if (!apf || !(apf->control_block & KVM_ASYNC_PF_ENABLED))
-+		return false;
++		return true;
 +
-+	if (apf->send_user_only && vcpu_mode_priv(vcpu))
-+		return false;
++	if (apf->pageready_pending)
++		goto fail;
 +
-+	if (!irqchip_in_kernel(vcpu->kvm))
-+		return false;
-+
-+	if (!vsdei || vsdei->critical_event || vsdei->normal_event)
-+		return false;
-+
-+	/* Pending page fault, which isn't acknowledged by guest */
 +	ret = read_cache(vcpu, offsetof(struct kvm_vcpu_pv_apf_data, reason),
 +			 &reason);
 +	if (ret) {
 +		kvm_err("%s: Error %d to read reason (%d-%d)\n",
 +			__func__, ret, kvm->userspace_pid, vcpu->vcpu_idx);
-+		return false;
++		goto fail;
 +	}
 +
 +	ret = read_cache(vcpu, offsetof(struct kvm_vcpu_pv_apf_data, token),
 +			 &token);
 +	if (ret) {
-+		kvm_err("%s: Error %d to read token %d-%d\n",
++		kvm_err("%s: Error %d to read token (%d-%d)\n",
 +			__func__, ret, kvm->userspace_pid, vcpu->vcpu_idx);
-+		return false;
++		goto fail;
++	}
++
++	/*
++	 * There might be pending page-not-present notification (SDEI)
++	 * to be delivered. However, the corresponding work has been
++	 * completed. For this case, we need to cancel the notification
++	 * early to avoid the overhead because of the injected SDEI
++	 * and interrupt.
++	 */
++	if (apf->notpresent_pending) {
++		spin_lock(&vcpu->async_pf.lock);
++		work = list_first_entry_or_null(&vcpu->async_pf.done,
++						typeof(*work), link);
++		spin_unlock(&vcpu->async_pf.lock);
++		if (!work)
++			goto fail;
++
++		if (reason == KVM_PV_REASON_PAGE_NOT_PRESENT &&
++		    work->arch.token == apf->notpresent_token &&
++		    token == apf->notpresent_token) {
++			kvm_make_request(KVM_REQ_ASYNC_PF, vcpu);
++			return true;
++		}
 +	}
 +
 +	if (reason || token)
-+		return false;
++		goto fail;
 +
 +	return true;
++
++fail:
++	kvm_make_request(KVM_REQ_ASYNC_PF, vcpu);
++	return false;
 +}
 +
-+bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu,
-+			     u32 esr, gpa_t gpa, gfn_t gfn)
++void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu,
++			       struct kvm_async_pf *work)
 +{
-+	struct kvm_arch_async_pf_control *apf = vcpu->arch.apf;
-+	struct kvm_arch_async_pf arch;
-+	unsigned long hva = kvm_vcpu_gfn_to_hva(vcpu, gfn);
++	struct kvm_memory_slot *memslot;
++	unsigned int esr = work->arch.esr;
++	phys_addr_t gpa = work->cr2_or_gpa;
++	gfn_t gfn = gpa >> PAGE_SHIFT;
++	unsigned long hva;
++	bool write_fault, writable;
++	int idx;
 +
-+	arch.token = (apf->id++ << 12) | vcpu->vcpu_id;
-+	arch.gfn = gfn;
-+	arch.esr = esr;
++	/*
++	 * We shouldn't issue prefault for special work to wake up
++	 * all pending tasks because the associated token (address)
++	 * is invalid.
++	 */
++	if (work->wakeup_all)
++		return;
 +
-+	return kvm_setup_async_pf(vcpu, gpa, hva, &arch);
++	/*
++	 * The gpa was validated before the work is started. However, the
++	 * memory slots might be changed since then. So we need to redo the
++	 * validatation here.
++	 */
++	idx = srcu_read_lock(&vcpu->kvm->srcu);
++
++	if (esr_dabt_is_s1ptw(esr))
++		write_fault = true;
++	else if (ESR_ELx_EC(esr) == ESR_ELx_EC_IABT_LOW)
++		write_fault = false;
++	else
++		write_fault = esr_dabt_is_wnr(esr);
++
++	memslot = gfn_to_memslot(vcpu->kvm, gfn);
++	hva = gfn_to_hva_memslot_prot(memslot, gfn, &writable);
++	if (kvm_is_error_hva(hva) || (write_fault && !writable))
++		goto out;
++
++	kvm_handle_user_mem_abort(vcpu, memslot, gpa, hva, esr, true);
++
++out:
++	srcu_read_unlock(&vcpu->kvm->srcu, idx);
 +}
 +
 +/*
@@ -374,14 +370,31 @@ index 000000000000..742bb8a0a8c0
 + * called. It means all previous issued asynchronous page faults have
 + * been acknowledged.
 + */
-+bool kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
-+				     struct kvm_async_pf *work)
++void kvm_arch_async_page_present(struct kvm_vcpu *vcpu,
++				 struct kvm_async_pf *work)
 +{
 +	struct kvm *kvm = vcpu->kvm;
 +	struct kvm_arch_async_pf_control *apf = vcpu->arch.apf;
 +	int ret;
 +
-+	kvm_async_pf_add_slot(vcpu, work->arch.gfn);
++	/*
++	 * The work could be completed prior to page-not-present notification
++	 * delivery. In this case, what we need to do is just to cancel the
++	 * page-not-present notification to avoid unnecessary overhead.
++	 */
++	if (work->wakeup_all) {
++		work->arch.token = ~0;
++	} else {
++		kvm_async_pf_remove_slot(vcpu, work->arch.gfn);
++
++		if (apf->notpresent_pending &&
++		    apf->notpresent_token == work->arch.token &&
++		    !kvm_sdei_cancel(vcpu, apf->sdei_event_num)) {
++			apf->notpresent_pending = false;
++			apf->notpresent_token = 0;
++			goto done;
++		}
++	}
 +
 +	ret = write_cache(vcpu, offsetof(struct kvm_vcpu_pv_apf_data, token),
 +			  work->arch.token);
@@ -389,85 +402,108 @@ index 000000000000..742bb8a0a8c0
 +		kvm_err("%s: Error %d to write token (%d-%d %08x)\n",
 +			__func__, ret, kvm->userspace_pid,
 +			vcpu->vcpu_idx, work->arch.token);
-+		goto fail;
++		goto done;
 +	}
 +
 +	ret = write_cache(vcpu, offsetof(struct kvm_vcpu_pv_apf_data, reason),
-+			  KVM_PV_REASON_PAGE_NOT_PRESENT);
++			  KVM_PV_REASON_PAGE_READY);
 +	if (ret) {
 +		kvm_err("%s: Error %d to write reason (%d-%d %08x)\n",
 +			__func__, ret, kvm->userspace_pid,
 +			vcpu->vcpu_idx, work->arch.token);
-+		goto fail;
++		goto done;
 +	}
 +
-+	apf->notpresent_pending = true;
-+	apf->notpresent_token = work->arch.token;
++	apf->pageready_pending = true;
++	kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_idx,
++			    apf->irq, true, NULL);
++	return;
 +
-+	return !kvm_sdei_inject(vcpu, apf->sdei_event_num, true);
-+
-+fail:
-+	write_cache(vcpu, offsetof(struct kvm_vcpu_pv_apf_data, token), 0);
++done:
 +	write_cache(vcpu, offsetof(struct kvm_vcpu_pv_apf_data, reason), 0);
-+	kvm_async_pf_remove_slot(vcpu, work->arch.gfn);
-+	return false;
++	write_cache(vcpu, offsetof(struct kvm_vcpu_pv_apf_data, token), 0);
 +}
 +
-+void kvm_arch_async_pf_destroy_vcpu(struct kvm_vcpu *vcpu)
++long kvm_arch_async_pf_hypercall(struct kvm_vcpu *vcpu,
++				 long *r1, long *r2, long *r3)
 +{
-+	kfree(vcpu->arch.apf);
-+	vcpu->arch.apf = NULL;
-+}
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index ff8480b68fb8..f170c44691f0 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -760,6 +760,33 @@ static inline bool is_write_fault(unsigned int esr)
- 	return esr_dabt_is_wnr(esr);
- }
- 
-+static bool try_async_pf(struct kvm_vcpu *vcpu, u32 esr, gpa_t gpa,
-+			 gfn_t gfn, kvm_pfn_t *pfn, bool write,
-+			 bool *writable, bool prefault)
-+{
++	struct kvm *kvm = vcpu->kvm;
 +	struct kvm_arch_async_pf_control *apf = vcpu->arch.apf;
-+	struct kvm_memory_slot *slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
-+	bool async = false;
++	u32 func;
++	long ret = SMCCC_RET_SUCCESS;
 +
-+	if (apf) {
-+		/* Bail if *pfn has correct page */
-+		*pfn = __gfn_to_pfn_memslot(slot, gfn, false,
-+					    &async, write, writable);
-+		if (!async)
-+			return false;
-+
-+		if (!prefault && kvm_arch_async_not_present_allowed(vcpu)) {
-+			if (kvm_async_pf_find_slot(vcpu, gfn) ||
-+			    kvm_arch_setup_async_pf(vcpu, esr, gpa, gfn))
-+				return true;
-+		}
++	if (!apf) {
++		ret = SMCCC_RET_NOT_SUPPORTED;
++		goto out;
 +	}
 +
-+	*pfn = __gfn_to_pfn_memslot(slot, gfn, false,
-+				    NULL, write, writable);
-+	return false;
++	func = smccc_get_arg1(vcpu);
++	switch (func) {
++	case ARM_SMCCC_KVM_FUNC_ASYNC_PF_IRQ_ACK:
++		if (!apf->pageready_pending)
++			break;
++
++		kvm_vgic_inject_irq(kvm, vcpu->vcpu_idx,
++				    apf->irq, false, NULL);
++		apf->pageready_pending = false;
++		kvm_check_async_pf_completion(vcpu);
++		break;
++	default:
++		ret = SMCCC_RET_NOT_SUPPORTED;
++	}
++
++out:
++	return ret;
 +}
 +
- int kvm_handle_user_mem_abort(struct kvm_vcpu *vcpu,
- 			      struct kvm_memory_slot *memslot,
- 			      phys_addr_t fault_ipa,
-@@ -871,7 +898,10 @@ int kvm_handle_user_mem_abort(struct kvm_vcpu *vcpu,
- 	 */
- 	smp_rmb();
+ void kvm_arch_async_pf_destroy_vcpu(struct kvm_vcpu *vcpu)
+ {
+ 	kfree(vcpu->arch.apf);
+diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+index e02e29a12bbf..7413ce328672 100644
+--- a/arch/arm64/kvm/hypercalls.c
++++ b/arch/arm64/kvm/hypercalls.c
+@@ -79,6 +79,12 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+ 		break;
+ 	case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
+ 		val[0] = BIT(ARM_SMCCC_KVM_FUNC_FEATURES);
++		if (vcpu->arch.apf)
++			val[0] |= BIT(ARM_SMCCC_KVM_FUNC_ASYNC_PF);
++		break;
++	case ARM_SMCCC_VENDOR_HYP_KVM_ASYNC_PF_FUNC_ID:
++		val[0] = kvm_arch_async_pf_hypercall(vcpu, &val[1],
++						     &val[2], &val[3]);
+ 		break;
+ 	case SDEI_1_0_FN_SDEI_VERSION:
+ 	case SDEI_1_0_FN_SDEI_EVENT_REGISTER:
+diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
+index 7eb816241697..0476afbd3178 100644
+--- a/include/linux/arm-smccc.h
++++ b/include/linux/arm-smccc.h
+@@ -118,6 +118,7 @@
  
--	pfn = gfn_to_pfn_prot(kvm, gfn, write_fault, &writable);
-+	if (try_async_pf(vcpu, esr, fault_ipa, gfn, &pfn,
-+			 write_fault, &writable, prefault))
-+		return 1;
+ /* KVM "vendor specific" services */
+ #define ARM_SMCCC_KVM_FUNC_FEATURES		0
++#define ARM_SMCCC_KVM_FUNC_ASYNC_PF		1
+ #define ARM_SMCCC_KVM_FUNC_FEATURES_2		127
+ #define ARM_SMCCC_KVM_NUM_FUNCS			128
+ 
+@@ -127,6 +128,15 @@
+ 			   ARM_SMCCC_OWNER_VENDOR_HYP,		\
+ 			   ARM_SMCCC_KVM_FUNC_FEATURES)
+ 
++/* Asynchronous page fault service */
++#define ARM_SMCCC_KVM_FUNC_ASYNC_PF_IRQ_ACK		5
 +
- 	if (pfn == KVM_PFN_ERR_HWPOISON) {
- 		kvm_send_hwpoison_signal(hva, vma_shift);
- 		return 0;
++#define ARM_SMCCC_VENDOR_HYP_KVM_ASYNC_PF_FUNC_ID		\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
++			   ARM_SMCCC_SMC_32,			\
++			   ARM_SMCCC_OWNER_VENDOR_HYP,		\
++			   ARM_SMCCC_KVM_FUNC_ASYNC_PF)
++
+ /*
+  * Return codes defined in ARM DEN 0070A
+  * ARM DEN 0070A is now merged/consolidated into ARM DEN 0028 C
 -- 
 2.23.0
 
