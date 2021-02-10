@@ -7,64 +7,61 @@ X-Spam-Status: No, score=-15.5 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F8FDC433DB
-	for <kvmarm@archiver.kernel.org>; Wed, 10 Feb 2021 16:03:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21248C433DB
+	for <kvmarm@archiver.kernel.org>; Wed, 10 Feb 2021 16:07:35 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id AFDF664E0B
-	for <kvmarm@archiver.kernel.org>; Wed, 10 Feb 2021 16:03:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFDF664E0B
+	by mail.kernel.org (Postfix) with ESMTP id 73BE164E57
+	for <kvmarm@archiver.kernel.org>; Wed, 10 Feb 2021 16:07:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73BE164E57
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 170484B3D5;
-	Wed, 10 Feb 2021 11:03:20 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E97F84B52E;
+	Wed, 10 Feb 2021 11:07:33 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ep80mKuVVHmL; Wed, 10 Feb 2021 11:03:18 -0500 (EST)
+	with ESMTP id CLhrBQUhjoHq; Wed, 10 Feb 2021 11:07:32 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D1F0B4B3E8;
-	Wed, 10 Feb 2021 11:03:18 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 99FA94B555;
+	Wed, 10 Feb 2021 11:07:32 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5BAC64B3D5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Feb 2021 11:03:18 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 34BB94B52E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Feb 2021 11:07:31 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6mKNInmSXN7v for <kvmarm@lists.cs.columbia.edu>;
- Wed, 10 Feb 2021 11:03:17 -0500 (EST)
+ with ESMTP id PzoJKPUCOowD for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 10 Feb 2021 11:07:29 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3CDC64B3C9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Feb 2021 11:03:17 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A76B54B466
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Feb 2021 11:07:29 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7E0BA113E;
- Wed, 10 Feb 2021 08:03:16 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3EB95113E;
+ Wed, 10 Feb 2021 08:07:29 -0800 (PST)
 Received: from [192.168.1.179] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EE5D83F73B;
- Wed, 10 Feb 2021 08:03:13 -0800 (PST)
-Subject: Re: [RFC PATCH v8 5/5] KVM: arm64: ioctl to fetch/store tags in a
- guest
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20210205135803.48321-1-steven.price@arm.com>
- <20210205135803.48321-6-steven.price@arm.com>
- <CAFEAcA99kV_d6ev9wC4ySiyoD7Cp=HCD0v2bBhGSOU-KrzkqaQ@mail.gmail.com>
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3F48C3F73B;
+ Wed, 10 Feb 2021 08:07:26 -0800 (PST)
+Subject: Re: [PATCH v18 1/7] arm/arm64: Probe for the presence of KVM
+ hypervisor
+To: Marc Zyngier <maz@kernel.org>, netdev@vger.kernel.org, yangbo.lu@nxp.com, 
+ john.stultz@linaro.org, tglx@linutronix.de, pbonzini@redhat.com,
+ seanjc@google.com, richardcochran@gmail.com, Mark.Rutland@arm.com,
+ will@kernel.org, suzuki.poulose@arm.com, Andre.Przywara@arm.com,
+ lorenzo.pieralisi@arm.com, sudeep.holla@arm.com
+References: <20210208134029.3269384-1-maz@kernel.org>
+ <20210208134029.3269384-2-maz@kernel.org>
 From: Steven Price <steven.price@arm.com>
-Message-ID: <1e09d70a-1443-c7bd-2d16-f50bc3993a83@arm.com>
-Date: Wed, 10 Feb 2021 16:03:34 +0000
+Message-ID: <7ac905c1-1039-eff6-7785-f2eef3d8e934@arm.com>
+Date: Wed, 10 Feb 2021 16:07:46 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA99kV_d6ev9wC4ySiyoD7Cp=HCD0v2bBhGSOU-KrzkqaQ@mail.gmail.com>
+In-Reply-To: <20210208134029.3269384-2-maz@kernel.org>
 Content-Language: en-GB
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Catalin Marinas <catalin.marinas@arm.com>, Juan Quintela <quintela@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Dave Martin <Dave.Martin@arm.com>,
- arm-mail-list <linux-arm-kernel@lists.infradead.org>,
- Marc Zyngier <maz@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Will Deacon <will@kernel.org>, kvmarm <kvmarm@lists.cs.columbia.edu>
+Cc: justin.he@arm.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -81,35 +78,209 @@ Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 08/02/2021 17:31, Peter Maydell wrote:
-> On Fri, 5 Feb 2021 at 13:58, Steven Price <steven.price@arm.com> wrote:
->>
->> The VMM may not wish to have it's own mapping of guest memory mapped
->> with PROT_MTE because this causes problems if the VMM has tag checking
->> enabled (the guest controls the tags in physical RAM and it's unlikely
->> the tags are correct for the VMM).
->>
->> Instead add a new ioctl which allows the VMM to easily read/write the
->> tags from guest memory, allowing the VMM's mapping to be non-PROT_MTE
->> while the VMM can still read/write the tags for the purpose of
->> migration.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->>   arch/arm64/include/uapi/asm/kvm.h | 13 +++++++
->>   arch/arm64/kvm/arm.c              | 57 +++++++++++++++++++++++++++++++
->>   include/uapi/linux/kvm.h          |  1 +
->>   3 files changed, 71 insertions(+)
+On 08/02/2021 13:40, Marc Zyngier wrote:
+> From: Will Deacon <will@kernel.org>
 > 
-> Missing the update to the docs in Documentation/virtual/kvm/api.txt :-)
+> Although the SMCCC specification provides some limited functionality for
+> describing the presence of hypervisor and firmware services, this is
+> generally applicable only to functions designated as "Arm Architecture
+> Service Functions" and no portable discovery mechanism is provided for
+> standard hypervisor services, despite having a designated range of
+> function identifiers reserved by the specification.
+> 
+> In an attempt to avoid the need for additional firmware changes every
+> time a new function is added, introduce a UID to identify the service
+> provider as being compatible with KVM. Once this has been established,
+> additional services can be discovered via a feature bitmap.
+> 
+> Signed-off-by: Will Deacon <will@kernel.org>
+> Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
+> [maz: move code to its own file, plug it into PSCI]
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Link: https://lore.kernel.org/r/20201209060932.212364-2-jianyong.wu@arm.com
 
-Good point - although I was secretly hoping to get some feedback on the 
-concepts before writing the documentation! But I guess the documentation 
-will help with the review. I'll include some in the next posting.
+Looks good to me, FWIW:
 
-Thanks,
+Reviewed-by: Steven Price <steven.price@arm.com>
 
-Steve
+> ---
+>   arch/arm/include/asm/hypervisor.h   |  3 ++
+>   arch/arm64/include/asm/hypervisor.h |  3 ++
+>   drivers/firmware/psci/psci.c        |  2 ++
+>   drivers/firmware/smccc/Makefile     |  2 +-
+>   drivers/firmware/smccc/kvm_guest.c  | 50 +++++++++++++++++++++++++++++
+>   drivers/firmware/smccc/smccc.c      |  1 +
+>   include/linux/arm-smccc.h           | 25 +++++++++++++++
+>   7 files changed, 85 insertions(+), 1 deletion(-)
+>   create mode 100644 drivers/firmware/smccc/kvm_guest.c
+> 
+> diff --git a/arch/arm/include/asm/hypervisor.h b/arch/arm/include/asm/hypervisor.h
+> index df8524365637..bd61502b9715 100644
+> --- a/arch/arm/include/asm/hypervisor.h
+> +++ b/arch/arm/include/asm/hypervisor.h
+> @@ -4,4 +4,7 @@
+>   
+>   #include <asm/xen/hypervisor.h>
+>   
+> +void kvm_init_hyp_services(void);
+> +bool kvm_arm_hyp_service_available(u32 func_id);
+> +
+>   #endif
+> diff --git a/arch/arm64/include/asm/hypervisor.h b/arch/arm64/include/asm/hypervisor.h
+> index f9cc1d021791..0ae427f352c8 100644
+> --- a/arch/arm64/include/asm/hypervisor.h
+> +++ b/arch/arm64/include/asm/hypervisor.h
+> @@ -4,4 +4,7 @@
+>   
+>   #include <asm/xen/hypervisor.h>
+>   
+> +void kvm_init_hyp_services(void);
+> +bool kvm_arm_hyp_service_available(u32 func_id);
+> +
+>   #endif
+> diff --git a/drivers/firmware/psci/psci.c b/drivers/firmware/psci/psci.c
+> index f5fc429cae3f..69e296f02902 100644
+> --- a/drivers/firmware/psci/psci.c
+> +++ b/drivers/firmware/psci/psci.c
+> @@ -23,6 +23,7 @@
+>   
+>   #include <asm/cpuidle.h>
+>   #include <asm/cputype.h>
+> +#include <asm/hypervisor.h>
+>   #include <asm/system_misc.h>
+>   #include <asm/smp_plat.h>
+>   #include <asm/suspend.h>
+> @@ -498,6 +499,7 @@ static int __init psci_probe(void)
+>   		psci_init_cpu_suspend();
+>   		psci_init_system_suspend();
+>   		psci_init_system_reset2();
+> +		kvm_init_hyp_services();
+>   	}
+>   
+>   	return 0;
+> diff --git a/drivers/firmware/smccc/Makefile b/drivers/firmware/smccc/Makefile
+> index 72ab84042832..40d19144a860 100644
+> --- a/drivers/firmware/smccc/Makefile
+> +++ b/drivers/firmware/smccc/Makefile
+> @@ -1,4 +1,4 @@
+>   # SPDX-License-Identifier: GPL-2.0
+>   #
+> -obj-$(CONFIG_HAVE_ARM_SMCCC_DISCOVERY)	+= smccc.o
+> +obj-$(CONFIG_HAVE_ARM_SMCCC_DISCOVERY)	+= smccc.o kvm_guest.o
+>   obj-$(CONFIG_ARM_SMCCC_SOC_ID)	+= soc_id.o
+> diff --git a/drivers/firmware/smccc/kvm_guest.c b/drivers/firmware/smccc/kvm_guest.c
+> new file mode 100644
+> index 000000000000..08836f2f39ee
+> --- /dev/null
+> +++ b/drivers/firmware/smccc/kvm_guest.c
+> @@ -0,0 +1,50 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +
+> +#define pr_fmt(fmt) "smccc: KVM: " fmt
+> +
+> +#include <linux/arm-smccc.h>
+> +#include <linux/bitmap.h>
+> +#include <linux/kernel.h>
+> +#include <linux/string.h>
+> +
+> +#include <asm/hypervisor.h>
+> +
+> +static DECLARE_BITMAP(__kvm_arm_hyp_services, ARM_SMCCC_KVM_NUM_FUNCS) __ro_after_init = { };
+> +
+> +void __init kvm_init_hyp_services(void)
+> +{
+> +	struct arm_smccc_res res;
+> +	u32 val[4];
+> +
+> +	if (arm_smccc_1_1_get_conduit() != SMCCC_CONDUIT_HVC)
+> +		return;
+> +
+> +	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID, &res);
+> +	if (res.a0 != ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0 ||
+> +	    res.a1 != ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1 ||
+> +	    res.a2 != ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2 ||
+> +	    res.a3 != ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3)
+> +		return;
+> +
+> +	memset(&res, 0, sizeof(res));
+> +	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID, &res);
+> +
+> +	val[0] = lower_32_bits(res.a0);
+> +	val[1] = lower_32_bits(res.a1);
+> +	val[2] = lower_32_bits(res.a2);
+> +	val[3] = lower_32_bits(res.a3);
+> +
+> +	bitmap_from_arr32(__kvm_arm_hyp_services, val, ARM_SMCCC_KVM_NUM_FUNCS);
+> +
+> +	pr_info("hypervisor services detected (0x%08lx 0x%08lx 0x%08lx 0x%08lx)\n",
+> +		 res.a3, res.a2, res.a1, res.a0);
+> +}
+> +
+> +bool kvm_arm_hyp_service_available(u32 func_id)
+> +{
+> +	if (func_id >= ARM_SMCCC_KVM_NUM_FUNCS)
+> +		return -EINVAL;
+> +
+> +	return test_bit(func_id, __kvm_arm_hyp_services);
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_arm_hyp_service_available);
+> diff --git a/drivers/firmware/smccc/smccc.c b/drivers/firmware/smccc/smccc.c
+> index 00c88b809c0c..94eca6ffda05 100644
+> --- a/drivers/firmware/smccc/smccc.c
+> +++ b/drivers/firmware/smccc/smccc.c
+> @@ -7,6 +7,7 @@
+>   
+>   #include <linux/init.h>
+>   #include <linux/arm-smccc.h>
+> +#include <linux/kernel.h>
+>   
+>   static u32 smccc_version = ARM_SMCCC_VERSION_1_0;
+>   static enum arm_smccc_conduit smccc_conduit = SMCCC_CONDUIT_NONE;
+> diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
+> index f860645f6512..74e90b65b489 100644
+> --- a/include/linux/arm-smccc.h
+> +++ b/include/linux/arm-smccc.h
+> @@ -55,6 +55,8 @@
+>   #define ARM_SMCCC_OWNER_TRUSTED_OS	50
+>   #define ARM_SMCCC_OWNER_TRUSTED_OS_END	63
+>   
+> +#define ARM_SMCCC_FUNC_QUERY_CALL_UID  0xff01
+> +
+>   #define ARM_SMCCC_QUIRK_NONE		0
+>   #define ARM_SMCCC_QUIRK_QCOM_A6		1 /* Save/restore register a6 */
+>   
+> @@ -87,6 +89,29 @@
+>   			   ARM_SMCCC_SMC_32,				\
+>   			   0, 0x7fff)
+>   
+> +#define ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID				\
+> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
+> +			   ARM_SMCCC_SMC_32,				\
+> +			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
+> +			   ARM_SMCCC_FUNC_QUERY_CALL_UID)
+> +
+> +/* KVM UID value: 28b46fb6-2ec5-11e9-a9ca-4b564d003a74 */
+> +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0	0xb66fb428U
+> +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1	0xe911c52eU
+> +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2	0x564bcaa9U
+> +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3	0x743a004dU
+> +
+> +/* KVM "vendor specific" services */
+> +#define ARM_SMCCC_KVM_FUNC_FEATURES		0
+> +#define ARM_SMCCC_KVM_FUNC_FEATURES_2		127
+> +#define ARM_SMCCC_KVM_NUM_FUNCS			128
+> +
+> +#define ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID			\
+> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
+> +			   ARM_SMCCC_SMC_32,				\
+> +			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
+> +			   ARM_SMCCC_KVM_FUNC_FEATURES)
+> +
+>   #define SMCCC_ARCH_WORKAROUND_RET_UNAFFECTED	1
+>   
+>   /* Paravirtualised time calls (defined by ARM DEN0057A) */
+> 
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
