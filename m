@@ -2,88 +2,62 @@ Return-Path: <SRS0=hpFi=HN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5434DC433E6
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Feb 2021 17:42:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33CB2C433DB
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Feb 2021 17:46:51 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 949AC64E74
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Feb 2021 17:42:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 949AC64E74
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 9C4D864DEE
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Feb 2021 17:46:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C4D864DEE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C6F004B2E6;
-	Thu, 11 Feb 2021 12:35:41 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A9034B331;
+	Thu, 11 Feb 2021 12:46:50 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id rwOTaJpJElI3; Thu, 11 Feb 2021 12:35:40 -0500 (EST)
+	with ESMTP id 0qxJDcosyK7a; Thu, 11 Feb 2021 12:46:48 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B2D184B2F2;
-	Thu, 11 Feb 2021 12:35:40 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D10D4B3D0;
+	Thu, 11 Feb 2021 12:46:48 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DA4564B2E6
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2021 12:35:39 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 032034B3BA
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2021 12:46:48 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Zi-stuu6ThKN for <kvmarm@lists.cs.columbia.edu>;
- Thu, 11 Feb 2021 12:35:38 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A40BD4B134
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2021 12:35:38 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1613064938;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ovn4XLZrYHU/jHtxdQ18Zp83BU5l3A71xzjYtmAEsIM=;
- b=QlVNQ1zbudj41TTLdw1mN9a68JpT94/tRDCO1g3rQTTYAW9pKV6rKW6lqGI6gGUtJnyY+3
- T1OOie/HgrBqY+HmJdC1YuAYmzDNDirB9WNz5KkN+5qnrjdDLiOatSNVKWYuWOgVWRoxwR
- kiDD56P0Vu2+Hfcj52SjaxYpLM2IFi8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-29-Vcg4Znx-N2muzaI-yOl0lQ-1; Thu, 11 Feb 2021 12:35:34 -0500
-X-MC-Unique: Vcg4Znx-N2muzaI-yOl0lQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 04833100A8EA;
- Thu, 11 Feb 2021 17:35:32 +0000 (UTC)
-Received: from [10.36.114.34] (ovpn-114-34.ams2.redhat.com [10.36.114.34])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CFEA45D9D2;
- Thu, 11 Feb 2021 17:35:24 +0000 (UTC)
-Subject: Re: [PATCH v13 06/15] iommu/smmuv3: Implement
- attach/detach_pasid_table
-To: Keqian Zhu <zhukeqian1@huawei.com>, eric.auger.pro@gmail.com,
- iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, will@kernel.org,
- joro@8bytes.org, maz@kernel.org, robin.murphy@arm.com,
- alex.williamson@redhat.com
-References: <20201118112151.25412-1-eric.auger@redhat.com>
- <20201118112151.25412-7-eric.auger@redhat.com>
- <4c3dded7-8b60-a303-3bdf-fa610f0e1a73@huawei.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <da89ce83-f27f-3b81-9d06-085eb9c4c046@redhat.com>
-Date: Thu, 11 Feb 2021 18:35:22 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+ with ESMTP id q+ZmNtT+5utl for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Feb 2021 12:46:46 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F9144B3AA
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2021 12:46:46 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 32F1811D4;
+ Thu, 11 Feb 2021 09:46:46 -0800 (PST)
+Received: from slackpad.fritz.box (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EF6353F73B;
+ Thu, 11 Feb 2021 09:46:44 -0800 (PST)
+Date: Thu, 11 Feb 2021 17:45:47 +0000
+From: Andre Przywara <andre.przywara@arm.com>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH kvmtool 02/21] hw/serial: Use device abstraction for FDT
+ generator function
+Message-ID: <20210211174547.2bf5a5a0@slackpad.fritz.box>
+In-Reply-To: <d0fbeccf-ecf6-5b53-c165-67a531e79e45@arm.com>
+References: <20201210142908.169597-1-andre.przywara@arm.com>
+ <20201210142908.169597-3-andre.przywara@arm.com>
+ <d0fbeccf-ecf6-5b53-c165-67a531e79e45@arm.com>
+Organization: Arm Ltd.
+X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <4c3dded7-8b60-a303-3bdf-fa610f0e1a73@huawei.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Cc: jean-philippe@linaro.org, jacob.jun.pan@linux.intel.com,
- nicoleotsuka@gmail.com, vivek.gautam@arm.com, yi.l.liu@intel.com,
- zhangfei.gao@linaro.org
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -100,132 +74,209 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Keqian,
+On Thu, 11 Feb 2021 12:05:35 +0000
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 
-On 2/2/21 9:03 AM, Keqian Zhu wrote:
-> Hi Eric,
+Hi,
+
+> On 12/10/20 2:28 PM, Andre Przywara wrote:
+> > At the moment we use the .generate_fdt_node member of the ioport ops
+> > structure to store the function pointer for the FDT node generator
+> > function. ioport__register() will then put a wrapper and this pointer
+> > into the device header.
+> > The serial device is the only device making use of this special ioport
+> > feature, so let's move this over to using the device header directly.
+> >
+> > This will allow us to get rid of this .generate_fdt_node member in the
+> > ops and simplify the code.
+> >
+> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> > ---
+> >  hw/serial.c       | 49 +++++++++++++++++++++++++++++++++++++----------
+> >  include/kvm/kvm.h |  2 ++
+> >  2 files changed, 41 insertions(+), 10 deletions(-)
+> >
+> > diff --git a/hw/serial.c b/hw/serial.c
+> > index 13c4663e..b0465d99 100644
+> > --- a/hw/serial.c
+> > +++ b/hw/serial.c
+> > @@ -23,6 +23,7 @@
+> >  #define UART_IIR_TYPE_BITS	0xc0
+> >  
+> >  struct serial8250_device {
+> > +	struct device_header	dev_hdr;
+> >  	struct mutex		mutex;
+> >  	u8			id;
+> >  
+> > @@ -53,9 +54,20 @@ struct serial8250_device {
+> >  	.msr			= UART_MSR_DCD | UART_MSR_DSR | UART_MSR_CTS, \
+> >  	.mcr			= UART_MCR_OUT2,
+> >  
+> > +#ifdef CONFIG_HAS_LIBFDT
+> > +static
+> > +void serial8250_generate_fdt_node(void *fdt, struct device_header *dev_hdr,
+> > +				  fdt_irq_fn irq_fn);
+> > +#else
+> > +#define serial8250_generate_fdt_node	NULL
+> > +#endif
+> >  static struct serial8250_device devices[] = {
+> >  	/* ttyS0 */
+> >  	[0]	= {
+> > +		.dev_hdr = {
+> > +			.bus_type	= DEVICE_BUS_IOPORT,
+> > +			.data		= serial8250_generate_fdt_node,
+> > +		},
+> >  		.mutex			= MUTEX_INITIALIZER,
+> >  
+> >  		.id			= 0,
+> > @@ -66,6 +78,10 @@ static struct serial8250_device devices[] = {
+> >  	},
+> >  	/* ttyS1 */
+> >  	[1]	= {
+> > +		.dev_hdr = {
+> > +			.bus_type	= DEVICE_BUS_IOPORT,
+> > +			.data		= serial8250_generate_fdt_node,
+> > +		},
+> >  		.mutex			= MUTEX_INITIALIZER,
+> >  
+> >  		.id			= 1,
+> > @@ -76,6 +92,10 @@ static struct serial8250_device devices[] = {
+> >  	},
+> >  	/* ttyS2 */
+> >  	[2]	= {
+> > +		.dev_hdr = {
+> > +			.bus_type	= DEVICE_BUS_IOPORT,
+> > +			.data		= serial8250_generate_fdt_node,
+> > +		},
+> >  		.mutex			= MUTEX_INITIALIZER,
+> >  
+> >  		.id			= 2,
+> > @@ -86,6 +106,10 @@ static struct serial8250_device devices[] = {
+> >  	},
+> >  	/* ttyS3 */
+> >  	[3]	= {
+> > +		.dev_hdr = {
+> > +			.bus_type	= DEVICE_BUS_IOPORT,
+> > +			.data		= serial8250_generate_fdt_node,
+> > +		},
+> >  		.mutex			= MUTEX_INITIALIZER,
+> >  
+> >  		.id			= 3,
+> > @@ -371,13 +395,14 @@ char *fdt_stdout_path = NULL;
+> >  
+> >  #define DEVICE_NAME_MAX_LEN 32
+> >  static
+> > -void serial8250_generate_fdt_node(struct ioport *ioport, void *fdt,
+> > -				  void (*generate_irq_prop)(void *fdt,
+> > -							    u8 irq,
+> > -							    enum irq_type))
+> > +void serial8250_generate_fdt_node(void *fdt, struct device_header *dev_hdr,
+> > +				  fdt_irq_fn irq_fn)
+> >  {
+> >  	char dev_name[DEVICE_NAME_MAX_LEN];
+> > -	struct serial8250_device *dev = ioport->priv;
+> > +	struct serial8250_device *dev = container_of(dev_hdr,
+> > +						     struct serial8250_device,
+> > +						     dev_hdr);
+> > +
+> >  	u64 addr = KVM_IOPORT_AREA + dev->iobase;
+> >  	u64 reg_prop[] = {
+> >  		cpu_to_fdt64(addr),
+> > @@ -395,24 +420,26 @@ void serial8250_generate_fdt_node(struct ioport *ioport, void *fdt,
+> >  	_FDT(fdt_begin_node(fdt, dev_name));
+> >  	_FDT(fdt_property_string(fdt, "compatible", "ns16550a"));
+> >  	_FDT(fdt_property(fdt, "reg", reg_prop, sizeof(reg_prop)));
+> > -	generate_irq_prop(fdt, dev->irq, IRQ_TYPE_LEVEL_HIGH);
+> > +	irq_fn(fdt, dev->irq, IRQ_TYPE_LEVEL_HIGH);
+> >  	_FDT(fdt_property_cell(fdt, "clock-frequency", 1843200));
+> >  	_FDT(fdt_end_node(fdt));
+> >  }
+> > -#else
+> > -#define serial8250_generate_fdt_node	NULL
+> >  #endif
+> >  
+> >  static struct ioport_operations serial8250_ops = {
+> >  	.io_in			= serial8250_in,
+> >  	.io_out			= serial8250_out,
+> > -	.generate_fdt_node	= serial8250_generate_fdt_node,
+> >  };
+> >  
+> > -static int serial8250__device_init(struct kvm *kvm, struct serial8250_device *dev)
+> > +static int serial8250__device_init(struct kvm *kvm,
+> > +				   struct serial8250_device *dev)
+> >  {
+> >  	int r;
+> >  
+> > +	r = device__register(&dev->dev_hdr);
+> > +	if (r < 0)
+> > +		return r;
+> > +
+> >  	ioport__map_irq(&dev->irq);
+> >  	r = ioport__register(kvm, dev->iobase, &serial8250_ops, 8, dev);  
 > 
-> On 2020/11/18 19:21, Eric Auger wrote:
->> On attach_pasid_table() we program STE S1 related info set
->> by the guest into the actual physical STEs. At minimum
->> we need to program the context descriptor GPA and compute
->> whether the stage1 is translated/bypassed or aborted.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->> v7 -> v8:
->> - remove smmu->features check, now done on domain finalize
->>
->> v6 -> v7:
->> - check versions and comment the fact we don't need to take
->>   into account s1dss and s1fmt
->> v3 -> v4:
->> - adapt to changes in iommu_pasid_table_config
->> - different programming convention at s1_cfg/s2_cfg/ste.abort
->>
->> v2 -> v3:
->> - callback now is named set_pasid_table and struct fields
->>   are laid out differently.
->>
->> v1 -> v2:
->> - invalidate the STE before changing them
->> - hold init_mutex
->> - handle new fields
->> ---
->>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 89 +++++++++++++++++++++
->>  1 file changed, 89 insertions(+)
->>
->> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->> index 412ea1bafa50..805acdc18a3a 100644
->> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->> @@ -2661,6 +2661,93 @@ static void arm_smmu_get_resv_regions(struct device *dev,
->>  	iommu_dma_get_resv_regions(dev, head);
->>  }
->>  
->> +static int arm_smmu_attach_pasid_table(struct iommu_domain *domain,
->> +				       struct iommu_pasid_table_config *cfg)
->> +{
->> +	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
->> +	struct arm_smmu_master *master;
->> +	struct arm_smmu_device *smmu;
->> +	unsigned long flags;
->> +	int ret = -EINVAL;
->> +
->> +	if (cfg->format != IOMMU_PASID_FORMAT_SMMUV3)
->> +		return -EINVAL;
->> +
->> +	if (cfg->version != PASID_TABLE_CFG_VERSION_1 ||
->> +	    cfg->vendor_data.smmuv3.version != PASID_TABLE_SMMUV3_CFG_VERSION_1)
->> +		return -EINVAL;
->> +
->> +	mutex_lock(&smmu_domain->init_mutex);
->> +
->> +	smmu = smmu_domain->smmu;
->> +
->> +	if (!smmu)
->> +		goto out;
->> +
->> +	if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
->> +		goto out;
->> +
->> +	switch (cfg->config) {
->> +	case IOMMU_PASID_CONFIG_ABORT:
->> +		smmu_domain->s1_cfg.set = false;
->> +		smmu_domain->abort = true;
->> +		break;
->> +	case IOMMU_PASID_CONFIG_BYPASS:
->> +		smmu_domain->s1_cfg.set = false;
->> +		smmu_domain->abort = false;
-> I didn't test it, but it seems that this will cause BUG() in arm_smmu_write_strtab_ent().
-> At the line "BUG_ON(ste_live && !nested);". Maybe I miss something?
+> It's unfortunate that we now create two devices for one serial instance: one here,
+> and one created by ioport__register(). But I guess that's unavoidable in this
+> patch, and later patches will remove it.
 
-No you are fully correct. Shammeer hit the BUG_ON() when booting the
-guest with iommu.passthrough = 1. So I removed the BUG_ON(). The legacy
-BUG_ON(ste_live) still is there under the form of BUG_ON(s1_live).
+Well, we do this already, wherever we register multiple I/O ports per
+device, RTC and i8042 are an example (because we register one device
+per I/O port). This really isn't a particular problem, it's just ugly,
+so just get's a tiny bit more uglier for a few patches that
+hopefully nobody will actually use (in anger).
+
+> 
+> >  
+> > @@ -438,6 +465,7 @@ cleanup:
+> >  		struct serial8250_device *dev = &devices[j];
+> >  
+> >  		ioport__unregister(kvm, dev->iobase);
+> > +		device__unregister(&dev->dev_hdr);
+> >  	}
+> >  
+> >  	return r;
+> > @@ -455,6 +483,7 @@ int serial8250__exit(struct kvm *kvm)
+> >  		r = ioport__unregister(kvm, dev->iobase);
+> >  		if (r < 0)
+> >  			return r;
+> > +		device__unregister(&dev->dev_hdr);
+> >  	}
+> >  
+> >  	return 0;
+> > diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
+> > index 53373b08..ee99c28e 100644
+> > --- a/include/kvm/kvm.h
+> > +++ b/include/kvm/kvm.h
+> > @@ -31,6 +31,8 @@
+> >  	.name = #ext,			\
+> >  	.code = ext
+> >  
+> > +typedef void (*fdt_irq_fn)(void *fdt, u8 irq, enum irq_type);  
+> 
+> Shouldn't that last parameter be enum irq_type irq_type? Would you consider moving
+> the typedef to include/kvm/fdt.h?
+
+I think where I came from was that typedef's don't need parameter names,
+just the type. But just having (void *, u8, enum irq_type) is really
+hard to understand, so I added parameter names where this helps. "enum
+irq_type irq_type" looks redundant, but I can certainly add this for
+consistency.
+
+> Other than the nitpicks above, the patch looks sound to me. I also did a quick
+> test by running kvm-unit-tests:
+> 
+> Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
 Thanks!
 
-Eric
+Andre
 
-
-> 
->> +		break;
->> +	case IOMMU_PASID_CONFIG_TRANSLATE:
->> +		/* we do not support S1 <-> S1 transitions */
->> +		if (smmu_domain->s1_cfg.set)
->> +			goto out;
->> +
->> +		/*
->> +		 * we currently support a single CD so s1fmt and s1dss
->> +		 * fields are also ignored
->> +		 */
->> +		if (cfg->pasid_bits)
->> +			goto out;
->> +
->> +		smmu_domain->s1_cfg.cdcfg.cdtab_dma = cfg->base_ptr;
->> +		smmu_domain->s1_cfg.set = true;
->> +		smmu_domain->abort = false;
->> +		break;
->> +	default:
->> +		goto out;
->> +	}
->> +	spin_lock_irqsave(&smmu_domain->devices_lock, flags);
->> +	list_for_each_entry(master, &smmu_domain->devices, domain_head)
->> +		arm_smmu_install_ste_for_dev(master);
->> +	spin_unlock_irqrestore(&smmu_domain->devices_lock, flags);
->> +	ret = 0;
->> +out:
->> +	mutex_unlock(&smmu_domain->init_mutex);
->> +	return ret;
->> +}
->> +
-> [...]
 > 
 > Thanks,
-> Keqian
-> 
+> Alex
+> > +
+> >  enum {
+> >  	KVM_VMSTATE_RUNNING,
+> >  	KVM_VMSTATE_PAUSED,  
 
 _______________________________________________
 kvmarm mailing list
