@@ -1,59 +1,60 @@
-Return-Path: <SRS0=D7pb=HM=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=hpFi=HN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.5 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-15.4 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 791EBC433DB
-	for <kvmarm@archiver.kernel.org>; Wed, 10 Feb 2021 17:44:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 089FFC433DB
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Feb 2021 12:05:33 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id EEEA364ECF
-	for <kvmarm@archiver.kernel.org>; Wed, 10 Feb 2021 17:44:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEEA364ECF
+	by mail.kernel.org (Postfix) with ESMTP id 575AD64E92
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Feb 2021 12:05:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 575AD64E92
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 841774B229;
-	Wed, 10 Feb 2021 12:44:48 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 997D94B43C;
+	Thu, 11 Feb 2021 07:05:31 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Fd2ZMWW7qzHK; Wed, 10 Feb 2021 12:44:47 -0500 (EST)
+	with ESMTP id 4HGqgT0mBx7a; Thu, 11 Feb 2021 07:05:30 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F1AB4B5AB;
-	Wed, 10 Feb 2021 12:44:47 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 428074B456;
+	Thu, 11 Feb 2021 07:05:30 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 24D744B571
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Feb 2021 12:44:46 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E0EEC4B43D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2021 07:05:28 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kDfCyFZ3dyIG for <kvmarm@lists.cs.columbia.edu>;
- Wed, 10 Feb 2021 12:44:44 -0500 (EST)
+ with ESMTP id zH2DS-rX+Wvk for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Feb 2021 07:05:24 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C2D164B229
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Feb 2021 12:44:44 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 930794B3DF
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2021 07:05:24 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6F97511D4;
- Wed, 10 Feb 2021 09:44:44 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C48801063;
+ Thu, 11 Feb 2021 04:05:23 -0800 (PST)
 Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 748FA3F73B;
- Wed, 10 Feb 2021 09:44:43 -0800 (PST)
-Subject: Re: [PATCH kvmtool 01/21] ioport: Remove ioport__setup_arch()
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CBD5D3F73B;
+ Thu, 11 Feb 2021 04:05:22 -0800 (PST)
+Subject: Re: [PATCH kvmtool 02/21] hw/serial: Use device abstraction for FDT
+ generator function
 To: Andre Przywara <andre.przywara@arm.com>, Will Deacon <will@kernel.org>,
  Julien Thierry <julien.thierry.kdev@gmail.com>
 References: <20201210142908.169597-1-andre.przywara@arm.com>
- <20201210142908.169597-2-andre.przywara@arm.com>
+ <20201210142908.169597-3-andre.przywara@arm.com>
 From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <814e0cd9-5e54-fade-f05c-80ea2b4a9039@arm.com>
-Date: Wed, 10 Feb 2021 17:44:59 +0000
+Message-ID: <d0fbeccf-ecf6-5b53-c165-67a531e79e45@arm.com>
+Date: Thu, 11 Feb 2021 12:05:35 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+ Thunderbird/78.7.1
 MIME-Version: 1.0
-In-Reply-To: <20201210142908.169597-2-andre.przywara@arm.com>
+In-Reply-To: <20201210142908.169597-3-andre.przywara@arm.com>
 Content-Language: en-US
 Cc: linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
  kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
@@ -76,179 +77,185 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 Hi Andre,
 
 On 12/10/20 2:28 PM, Andre Przywara wrote:
-> Since x86 had a special need for registering tons of special I/O ports,
-> we had an ioport__setup_arch() callback, to allow each architecture
-> to do the same. As it turns out no one uses it beside x86, so we remove
-> that unnecessary abstraction.
+> At the moment we use the .generate_fdt_node member of the ioport ops
+> structure to store the function pointer for the FDT node generator
+> function. ioport__register() will then put a wrapper and this pointer
+> into the device header.
+> The serial device is the only device making use of this special ioport
+> feature, so let's move this over to using the device header directly.
 >
-> The generic function was registered via a device_base_init() call, so
-> we just do the same for the x86 specific function only, and can remove
-> the unneeded ioport__setup_arch().
+> This will allow us to get rid of this .generate_fdt_node member in the
+> ops and simplify the code.
 >
 > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 > ---
->  arm/ioport.c         |  5 -----
->  include/kvm/ioport.h |  1 -
->  ioport.c             | 28 ----------------------------
->  mips/kvm.c           |  5 -----
->  powerpc/ioport.c     |  6 ------
->  x86/ioport.c         | 25 ++++++++++++++++++++++++-
->  6 files changed, 24 insertions(+), 46 deletions(-)
+>  hw/serial.c       | 49 +++++++++++++++++++++++++++++++++++++----------
+>  include/kvm/kvm.h |  2 ++
+>  2 files changed, 41 insertions(+), 10 deletions(-)
 >
-> diff --git a/arm/ioport.c b/arm/ioport.c
-> index 2f0feb9a..24092c9d 100644
-> --- a/arm/ioport.c
-> +++ b/arm/ioport.c
-> @@ -1,11 +1,6 @@
->  #include "kvm/ioport.h"
->  #include "kvm/irq.h"
+> diff --git a/hw/serial.c b/hw/serial.c
+> index 13c4663e..b0465d99 100644
+> --- a/hw/serial.c
+> +++ b/hw/serial.c
+> @@ -23,6 +23,7 @@
+>  #define UART_IIR_TYPE_BITS	0xc0
 >  
-> -int ioport__setup_arch(struct kvm *kvm)
-> -{
-> -	return 0;
-> -}
-> -
->  void ioport__map_irq(u8 *irq)
+>  struct serial8250_device {
+> +	struct device_header	dev_hdr;
+>  	struct mutex		mutex;
+>  	u8			id;
+>  
+> @@ -53,9 +54,20 @@ struct serial8250_device {
+>  	.msr			= UART_MSR_DCD | UART_MSR_DSR | UART_MSR_CTS, \
+>  	.mcr			= UART_MCR_OUT2,
+>  
+> +#ifdef CONFIG_HAS_LIBFDT
+> +static
+> +void serial8250_generate_fdt_node(void *fdt, struct device_header *dev_hdr,
+> +				  fdt_irq_fn irq_fn);
+> +#else
+> +#define serial8250_generate_fdt_node	NULL
+> +#endif
+>  static struct serial8250_device devices[] = {
+>  	/* ttyS0 */
+>  	[0]	= {
+> +		.dev_hdr = {
+> +			.bus_type	= DEVICE_BUS_IOPORT,
+> +			.data		= serial8250_generate_fdt_node,
+> +		},
+>  		.mutex			= MUTEX_INITIALIZER,
+>  
+>  		.id			= 0,
+> @@ -66,6 +78,10 @@ static struct serial8250_device devices[] = {
+>  	},
+>  	/* ttyS1 */
+>  	[1]	= {
+> +		.dev_hdr = {
+> +			.bus_type	= DEVICE_BUS_IOPORT,
+> +			.data		= serial8250_generate_fdt_node,
+> +		},
+>  		.mutex			= MUTEX_INITIALIZER,
+>  
+>  		.id			= 1,
+> @@ -76,6 +92,10 @@ static struct serial8250_device devices[] = {
+>  	},
+>  	/* ttyS2 */
+>  	[2]	= {
+> +		.dev_hdr = {
+> +			.bus_type	= DEVICE_BUS_IOPORT,
+> +			.data		= serial8250_generate_fdt_node,
+> +		},
+>  		.mutex			= MUTEX_INITIALIZER,
+>  
+>  		.id			= 2,
+> @@ -86,6 +106,10 @@ static struct serial8250_device devices[] = {
+>  	},
+>  	/* ttyS3 */
+>  	[3]	= {
+> +		.dev_hdr = {
+> +			.bus_type	= DEVICE_BUS_IOPORT,
+> +			.data		= serial8250_generate_fdt_node,
+> +		},
+>  		.mutex			= MUTEX_INITIALIZER,
+>  
+>  		.id			= 3,
+> @@ -371,13 +395,14 @@ char *fdt_stdout_path = NULL;
+>  
+>  #define DEVICE_NAME_MAX_LEN 32
+>  static
+> -void serial8250_generate_fdt_node(struct ioport *ioport, void *fdt,
+> -				  void (*generate_irq_prop)(void *fdt,
+> -							    u8 irq,
+> -							    enum irq_type))
+> +void serial8250_generate_fdt_node(void *fdt, struct device_header *dev_hdr,
+> +				  fdt_irq_fn irq_fn)
 >  {
->  	*irq = irq__alloc_line();
-> diff --git a/include/kvm/ioport.h b/include/kvm/ioport.h
-> index 039633f7..d0213541 100644
-> --- a/include/kvm/ioport.h
-> +++ b/include/kvm/ioport.h
-> @@ -35,7 +35,6 @@ struct ioport_operations {
->  							    enum irq_type));
+>  	char dev_name[DEVICE_NAME_MAX_LEN];
+> -	struct serial8250_device *dev = ioport->priv;
+> +	struct serial8250_device *dev = container_of(dev_hdr,
+> +						     struct serial8250_device,
+> +						     dev_hdr);
+> +
+>  	u64 addr = KVM_IOPORT_AREA + dev->iobase;
+>  	u64 reg_prop[] = {
+>  		cpu_to_fdt64(addr),
+> @@ -395,24 +420,26 @@ void serial8250_generate_fdt_node(struct ioport *ioport, void *fdt,
+>  	_FDT(fdt_begin_node(fdt, dev_name));
+>  	_FDT(fdt_property_string(fdt, "compatible", "ns16550a"));
+>  	_FDT(fdt_property(fdt, "reg", reg_prop, sizeof(reg_prop)));
+> -	generate_irq_prop(fdt, dev->irq, IRQ_TYPE_LEVEL_HIGH);
+> +	irq_fn(fdt, dev->irq, IRQ_TYPE_LEVEL_HIGH);
+>  	_FDT(fdt_property_cell(fdt, "clock-frequency", 1843200));
+>  	_FDT(fdt_end_node(fdt));
+>  }
+> -#else
+> -#define serial8250_generate_fdt_node	NULL
+>  #endif
+>  
+>  static struct ioport_operations serial8250_ops = {
+>  	.io_in			= serial8250_in,
+>  	.io_out			= serial8250_out,
+> -	.generate_fdt_node	= serial8250_generate_fdt_node,
 >  };
 >  
-> -int ioport__setup_arch(struct kvm *kvm);
->  void ioport__map_irq(u8 *irq);
->  
->  int __must_check ioport__register(struct kvm *kvm, u16 port, struct ioport_operations *ops,
-> diff --git a/ioport.c b/ioport.c
-> index 844a832d..667e8386 100644
-> --- a/ioport.c
-> +++ b/ioport.c
-> @@ -158,21 +158,6 @@ int ioport__unregister(struct kvm *kvm, u16 port)
->  	return 0;
->  }
->  
-> -static void ioport__unregister_all(void)
-> -{
-> -	struct ioport *entry;
-> -	struct rb_node *rb;
-> -	struct rb_int_node *rb_node;
-> -
-> -	rb = rb_first(&ioport_tree);
-> -	while (rb) {
-> -		rb_node = rb_int(rb);
-> -		entry = ioport_node(rb_node);
-> -		ioport_unregister(&ioport_tree, entry);
-> -		rb = rb_first(&ioport_tree);
-> -	}
-> -}
-
-I get the impression this is a rebasing artifact. The commit message doesn't
-mention anything about removing ioport__exit() -> ioport__unregister_all(), and as
-far as I can tell it's still needed because there are places other than
-ioport__setup_arch() from where ioport__register() is called.
-
-Thanks,
-
-Alex
-
-> -
->  static const char *to_direction(int direction)
->  {
->  	if (direction == KVM_EXIT_IO_IN)
-> @@ -220,16 +205,3 @@ out:
->  
->  	return !kvm->cfg.ioport_debug;
->  }
-> -
-> -int ioport__init(struct kvm *kvm)
-> -{
-> -	return ioport__setup_arch(kvm);
-> -}
-> -dev_base_init(ioport__init);
-> -
-> -int ioport__exit(struct kvm *kvm)
-> -{
-> -	ioport__unregister_all();
-> -	return 0;
-> -}
-> -dev_base_exit(ioport__exit);
-> diff --git a/mips/kvm.c b/mips/kvm.c
-> index 26355930..e110e5d5 100644
-> --- a/mips/kvm.c
-> +++ b/mips/kvm.c
-> @@ -100,11 +100,6 @@ void kvm__irq_trigger(struct kvm *kvm, int irq)
->  		die_perror("KVM_IRQ_LINE ioctl");
->  }
->  
-> -int ioport__setup_arch(struct kvm *kvm)
-> -{
-> -	return 0;
-> -}
-> -
->  bool kvm__arch_cpu_supports_vm(void)
->  {
->  	return true;
-> diff --git a/powerpc/ioport.c b/powerpc/ioport.c
-> index 0c188b61..a5cff4ee 100644
-> --- a/powerpc/ioport.c
-> +++ b/powerpc/ioport.c
-> @@ -12,12 +12,6 @@
->  
->  #include <stdlib.h>
->  
-> -int ioport__setup_arch(struct kvm *kvm)
-> -{
-> -	/* PPC has no legacy ioports to set up */
-> -	return 0;
-> -}
-> -
->  void ioport__map_irq(u8 *irq)
->  {
->  }
-> diff --git a/x86/ioport.c b/x86/ioport.c
-> index 7ad7b8f3..8c5c7699 100644
-> --- a/x86/ioport.c
-> +++ b/x86/ioport.c
-> @@ -69,7 +69,7 @@ void ioport__map_irq(u8 *irq)
->  {
->  }
->  
-> -int ioport__setup_arch(struct kvm *kvm)
-> +static int ioport__setup_arch(struct kvm *kvm)
+> -static int serial8250__device_init(struct kvm *kvm, struct serial8250_device *dev)
+> +static int serial8250__device_init(struct kvm *kvm,
+> +				   struct serial8250_device *dev)
 >  {
 >  	int r;
 >  
-> @@ -150,3 +150,26 @@ int ioport__setup_arch(struct kvm *kvm)
+> +	r = device__register(&dev->dev_hdr);
+> +	if (r < 0)
+> +		return r;
+> +
+>  	ioport__map_irq(&dev->irq);
+>  	r = ioport__register(kvm, dev->iobase, &serial8250_ops, 8, dev);
+
+It's unfortunate that we now create two devices for one serial instance: one here,
+and one created by ioport__register(). But I guess that's unavoidable in this
+patch, and later patches will remove it.
+
+>  
+> @@ -438,6 +465,7 @@ cleanup:
+>  		struct serial8250_device *dev = &devices[j];
+>  
+>  		ioport__unregister(kvm, dev->iobase);
+> +		device__unregister(&dev->dev_hdr);
+>  	}
+>  
+>  	return r;
+> @@ -455,6 +483,7 @@ int serial8250__exit(struct kvm *kvm)
+>  		r = ioport__unregister(kvm, dev->iobase);
+>  		if (r < 0)
+>  			return r;
+> +		device__unregister(&dev->dev_hdr);
+>  	}
 >  
 >  	return 0;
->  }
-> +dev_base_init(ioport__setup_arch);
+> diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
+> index 53373b08..ee99c28e 100644
+> --- a/include/kvm/kvm.h
+> +++ b/include/kvm/kvm.h
+> @@ -31,6 +31,8 @@
+>  	.name = #ext,			\
+>  	.code = ext
+>  
+> +typedef void (*fdt_irq_fn)(void *fdt, u8 irq, enum irq_type);
+
+Shouldn't that last parameter be enum irq_type irq_type? Would you consider moving
+the typedef to include/kvm/fdt.h?
+
+Other than the nitpicks above, the patch looks sound to me. I also did a quick
+test by running kvm-unit-tests:
+
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+Thanks,
+Alex
 > +
-> +static int ioport__remove_arch(struct kvm *kvm)
-> +{
-> +	ioport__unregister(kvm, 0x510);
-> +	ioport__unregister(kvm, 0x402);
-> +	ioport__unregister(kvm, 0x03D5);
-> +	ioport__unregister(kvm, 0x03D4);
-> +	ioport__unregister(kvm, 0x0378);
-> +	ioport__unregister(kvm, 0x0278);
-> +	ioport__unregister(kvm, 0x00F0);
-> +	ioport__unregister(kvm, 0x00ED);
-> +	ioport__unregister(kvm, IOPORT_DBG);
-> +	ioport__unregister(kvm, 0x00C0);
-> +	ioport__unregister(kvm, 0x00A0);
-> +	ioport__unregister(kvm, 0x0092);
-> +	ioport__unregister(kvm, 0x0040);
-> +	ioport__unregister(kvm, 0x0020);
-> +	ioport__unregister(kvm, 0x0000);
-> +
-> +	return 0;
-> +}
-> +dev_base_exit(ioport__remove_arch);
+>  enum {
+>  	KVM_VMSTATE_RUNNING,
+>  	KVM_VMSTATE_PAUSED,
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
