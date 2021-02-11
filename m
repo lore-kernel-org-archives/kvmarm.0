@@ -2,61 +2,61 @@ Return-Path: <SRS0=hpFi=HN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.4 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 019AAC433DB
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Feb 2021 16:55:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94FE3C433E0
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Feb 2021 17:17:51 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 47CCE64E13
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Feb 2021 16:55:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47CCE64E13
+	by mail.kernel.org (Postfix) with ESMTP id F300A64E87
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Feb 2021 17:17:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F300A64E87
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AB3124B424;
-	Thu, 11 Feb 2021 11:55:32 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C37C4B3B7;
+	Thu, 11 Feb 2021 12:17:50 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id adrEK-DUL8Iy; Thu, 11 Feb 2021 11:55:31 -0500 (EST)
+	with ESMTP id 0sM8I77N55WJ; Thu, 11 Feb 2021 12:17:48 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D04D4B437;
-	Thu, 11 Feb 2021 11:55:31 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 36FFF4B3B4;
+	Thu, 11 Feb 2021 12:17:48 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 17DD44B424
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2021 11:55:30 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B8F284B3A2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2021 12:17:46 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PMtsbaLusPyc for <kvmarm@lists.cs.columbia.edu>;
- Thu, 11 Feb 2021 11:55:28 -0500 (EST)
+ with ESMTP id rmRmh+uzWt2J for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Feb 2021 12:17:45 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B16524B410
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2021 11:55:28 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E26F4B3AA
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2021 12:17:45 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5611E11D4;
- Thu, 11 Feb 2021 08:55:28 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5CF773F73B;
- Thu, 11 Feb 2021 08:55:27 -0800 (PST)
-Subject: Re: [PATCH kvmtool 05/21] hw/i8042: Clean up data types
-To: Andre Przywara <andre.przywara@arm.com>, Will Deacon <will@kernel.org>,
- Julien Thierry <julien.thierry.kdev@gmail.com>
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BA88D11D4;
+ Thu, 11 Feb 2021 09:17:44 -0800 (PST)
+Received: from slackpad.fritz.box (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8AA5A3F73B;
+ Thu, 11 Feb 2021 09:17:43 -0800 (PST)
+Date: Thu, 11 Feb 2021 17:16:48 +0000
+From: Andre Przywara <andre.przywara@arm.com>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH kvmtool 01/21] ioport: Remove ioport__setup_arch()
+Message-ID: <20210211171648.36000cce@slackpad.fritz.box>
+In-Reply-To: <814e0cd9-5e54-fade-f05c-80ea2b4a9039@arm.com>
 References: <20201210142908.169597-1-andre.przywara@arm.com>
- <20201210142908.169597-6-andre.przywara@arm.com>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <04b5f537-1594-61b9-b7ef-4062e732e380@arm.com>
-Date: Thu, 11 Feb 2021 16:55:43 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.1
+ <20201210142908.169597-2-andre.przywara@arm.com>
+ <814e0cd9-5e54-fade-f05c-80ea2b4a9039@arm.com>
+Organization: Arm Ltd.
+X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20201210142908.169597-6-andre.przywara@arm.com>
-Content-Language: en-US
-Cc: linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,103 +73,195 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Andre,
+On Wed, 10 Feb 2021 17:44:59 +0000
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 
-On 12/10/20 2:28 PM, Andre Przywara wrote:
+Hi Alex,
 
-> The i8042 is clearly an 8-bit era device, so there is little room for
-> 32-bit registers.
-> Clean up the data types used.
->
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
->  hw/i8042.c | 20 ++++++++++----------
->  1 file changed, 10 insertions(+), 10 deletions(-)
->
-> diff --git a/hw/i8042.c b/hw/i8042.c
-> index 37a99a2d..36ee183f 100644
-> --- a/hw/i8042.c
-> +++ b/hw/i8042.c
-> @@ -64,11 +64,11 @@
->  struct kbd_state {
->  	struct kvm		*kvm;
->  
-> -	char			kq[QUEUE_SIZE];	/* Keyboard queue */
-> +	u8			kq[QUEUE_SIZE];	/* Keyboard queue */
->  	int			kread, kwrite;	/* Indexes into the queue */
->  	int			kcount;		/* number of elements in queue */
->  
-> -	char			mq[QUEUE_SIZE];
-> +	u8			mq[QUEUE_SIZE];
->  	int			mread, mwrite;
->  	int			mcount;
+> On 12/10/20 2:28 PM, Andre Przywara wrote:
+> > Since x86 had a special need for registering tons of special I/O ports,
+> > we had an ioport__setup_arch() callback, to allow each architecture
+> > to do the same. As it turns out no one uses it beside x86, so we remove
+> > that unnecessary abstraction.
+> >
+> > The generic function was registered via a device_base_init() call, so
+> > we just do the same for the x86 specific function only, and can remove
+> > the unneeded ioport__setup_arch().
+> >
+> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> > ---
+> >  arm/ioport.c         |  5 -----
+> >  include/kvm/ioport.h |  1 -
+> >  ioport.c             | 28 ----------------------------
+> >  mips/kvm.c           |  5 -----
+> >  powerpc/ioport.c     |  6 ------
+> >  x86/ioport.c         | 25 ++++++++++++++++++++++++-
+> >  6 files changed, 24 insertions(+), 46 deletions(-)
+> >
+> > diff --git a/arm/ioport.c b/arm/ioport.c
+> > index 2f0feb9a..24092c9d 100644
+> > --- a/arm/ioport.c
+> > +++ b/arm/ioport.c
+> > @@ -1,11 +1,6 @@
+> >  #include "kvm/ioport.h"
+> >  #include "kvm/irq.h"
+> >  
+> > -int ioport__setup_arch(struct kvm *kvm)
+> > -{
+> > -	return 0;
+> > -}
+> > -
+> >  void ioport__map_irq(u8 *irq)
+> >  {
+> >  	*irq = irq__alloc_line();
+> > diff --git a/include/kvm/ioport.h b/include/kvm/ioport.h
+> > index 039633f7..d0213541 100644
+> > --- a/include/kvm/ioport.h
+> > +++ b/include/kvm/ioport.h
+> > @@ -35,7 +35,6 @@ struct ioport_operations {
+> >  							    enum irq_type));
+> >  };
+> >  
+> > -int ioport__setup_arch(struct kvm *kvm);
+> >  void ioport__map_irq(u8 *irq);
+> >  
+> >  int __must_check ioport__register(struct kvm *kvm, u16 port, struct ioport_operations *ops,
+> > diff --git a/ioport.c b/ioport.c
+> > index 844a832d..667e8386 100644
+> > --- a/ioport.c
+> > +++ b/ioport.c
+> > @@ -158,21 +158,6 @@ int ioport__unregister(struct kvm *kvm, u16 port)
+> >  	return 0;
+> >  }
+> >  
+> > -static void ioport__unregister_all(void)
+> > -{
+> > -	struct ioport *entry;
+> > -	struct rb_node *rb;
+> > -	struct rb_int_node *rb_node;
+> > -
+> > -	rb = rb_first(&ioport_tree);
+> > -	while (rb) {
+> > -		rb_node = rb_int(rb);
+> > -		entry = ioport_node(rb_node);
+> > -		ioport_unregister(&ioport_tree, entry);
+> > -		rb = rb_first(&ioport_tree);
+> > -	}
+> > -}  
+> 
+> I get the impression this is a rebasing artifact. The commit message doesn't
+> mention anything about removing ioport__exit() -> ioport__unregister_all(), and as
+> far as I can tell it's still needed because there are places other than
+> ioport__setup_arch() from where ioport__register() is called.
 
-I think the write_cmd field further down should also be u8 because it stores the
-first byte of a command (and it's set only to an 8 bit value in kbd_write_command()).
+I agree that the commit message is a bit thin on this fact, but the
+functionality of ioport__unregister_all() is now in
+x86/ioport.c:ioport__remove_arch(). I think removing ioport__init()
+without removing ioport__exit() as well would look very weird, if not
+hackish.
 
-Otherwise, it looks ok to me. osdev wiki seems to confirm that the device is
-indeed 8 bit only, and all the registers are 8 bit now:
+I can amend the commit message to mention this, or is there anything
+else I missed?
 
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Cheers,
+Andre
 
-Thanks,
+> 
+> > -
+> >  static const char *to_direction(int direction)
+> >  {
+> >  	if (direction == KVM_EXIT_IO_IN)
+> > @@ -220,16 +205,3 @@ out:
+> >  
+> >  	return !kvm->cfg.ioport_debug;
+> >  }
+> > -
+> > -int ioport__init(struct kvm *kvm)
+> > -{
+> > -	return ioport__setup_arch(kvm);
+> > -}
+> > -dev_base_init(ioport__init);
+> > -
+> > -int ioport__exit(struct kvm *kvm)
+> > -{
+> > -	ioport__unregister_all();
+> > -	return 0;
+> > -}
+> > -dev_base_exit(ioport__exit);
+> > diff --git a/mips/kvm.c b/mips/kvm.c
+> > index 26355930..e110e5d5 100644
+> > --- a/mips/kvm.c
+> > +++ b/mips/kvm.c
+> > @@ -100,11 +100,6 @@ void kvm__irq_trigger(struct kvm *kvm, int irq)
+> >  		die_perror("KVM_IRQ_LINE ioctl");
+> >  }
+> >  
+> > -int ioport__setup_arch(struct kvm *kvm)
+> > -{
+> > -	return 0;
+> > -}
+> > -
+> >  bool kvm__arch_cpu_supports_vm(void)
+> >  {
+> >  	return true;
+> > diff --git a/powerpc/ioport.c b/powerpc/ioport.c
+> > index 0c188b61..a5cff4ee 100644
+> > --- a/powerpc/ioport.c
+> > +++ b/powerpc/ioport.c
+> > @@ -12,12 +12,6 @@
+> >  
+> >  #include <stdlib.h>
+> >  
+> > -int ioport__setup_arch(struct kvm *kvm)
+> > -{
+> > -	/* PPC has no legacy ioports to set up */
+> > -	return 0;
+> > -}
+> > -
+> >  void ioport__map_irq(u8 *irq)
+> >  {
+> >  }
+> > diff --git a/x86/ioport.c b/x86/ioport.c
+> > index 7ad7b8f3..8c5c7699 100644
+> > --- a/x86/ioport.c
+> > +++ b/x86/ioport.c
+> > @@ -69,7 +69,7 @@ void ioport__map_irq(u8 *irq)
+> >  {
+> >  }
+> >  
+> > -int ioport__setup_arch(struct kvm *kvm)
+> > +static int ioport__setup_arch(struct kvm *kvm)
+> >  {
+> >  	int r;
+> >  
+> > @@ -150,3 +150,26 @@ int ioport__setup_arch(struct kvm *kvm)
+> >  
+> >  	return 0;
+> >  }
+> > +dev_base_init(ioport__setup_arch);
+> > +
+> > +static int ioport__remove_arch(struct kvm *kvm)
+> > +{
+> > +	ioport__unregister(kvm, 0x510);
+> > +	ioport__unregister(kvm, 0x402);
+> > +	ioport__unregister(kvm, 0x03D5);
+> > +	ioport__unregister(kvm, 0x03D4);
+> > +	ioport__unregister(kvm, 0x0378);
+> > +	ioport__unregister(kvm, 0x0278);
+> > +	ioport__unregister(kvm, 0x00F0);
+> > +	ioport__unregister(kvm, 0x00ED);
+> > +	ioport__unregister(kvm, IOPORT_DBG);
+> > +	ioport__unregister(kvm, 0x00C0);
+> > +	ioport__unregister(kvm, 0x00A0);
+> > +	ioport__unregister(kvm, 0x0092);
+> > +	ioport__unregister(kvm, 0x0040);
+> > +	ioport__unregister(kvm, 0x0020);
+> > +	ioport__unregister(kvm, 0x0000);
+> > +
+> > +	return 0;
+> > +}
+> > +dev_base_exit(ioport__remove_arch);  
 
-Alex
-
->  
-> @@ -173,9 +173,9 @@ static void kbd_write_command(struct kvm *kvm, u8 val)
->  /*
->   * Called when the OS reads from port 0x60 (PS/2 data)
->   */
-> -static u32 kbd_read_data(void)
-> +static u8 kbd_read_data(void)
->  {
-> -	u32 ret;
-> +	u8 ret;
->  	int i;
->  
->  	if (state.kcount != 0) {
-> @@ -202,9 +202,9 @@ static u32 kbd_read_data(void)
->  /*
->   * Called when the OS read from port 0x64, the command port
->   */
-> -static u32 kbd_read_status(void)
-> +static u8 kbd_read_status(void)
->  {
-> -	return (u32)state.status;
-> +	return state.status;
->  }
->  
->  /*
-> @@ -212,7 +212,7 @@ static u32 kbd_read_status(void)
->   * Things written here are generally arguments to commands previously
->   * written to port 0x64 and stored in state.write_cmd
->   */
-> -static void kbd_write_data(u32 val)
-> +static void kbd_write_data(u8 val)
->  {
->  	switch (state.write_cmd) {
->  	case I8042_CMD_CTL_WCTR:
-> @@ -304,8 +304,8 @@ static bool kbd_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *
->  		break;
->  	}
->  	case I8042_DATA_REG: {
-> -		u32 value = kbd_read_data();
-> -		ioport__write32(data, value);
-> +		u8 value = kbd_read_data();
-> +		ioport__write8(data, value);
->  		break;
->  	}
->  	case I8042_PORT_B_REG: {
-> @@ -328,7 +328,7 @@ static bool kbd_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void
->  		break;
->  	}
->  	case I8042_DATA_REG: {
-> -		u32 value = ioport__read32(data);
-> +		u8 value = ioport__read8(data);
->  		kbd_write_data(value);
->  		break;
->  	}
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
