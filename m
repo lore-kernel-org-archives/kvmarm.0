@@ -2,69 +2,62 @@ Return-Path: <SRS0=hpFi=HN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.4 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E655BC433DB
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Feb 2021 14:27:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78CB5C43381
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Feb 2021 16:10:22 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 306FA64E13
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Feb 2021 14:27:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 306FA64E13
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id E8EF464E95
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Feb 2021 16:10:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8EF464E95
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AF3024B6CB;
-	Thu, 11 Feb 2021 09:27:57 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 62C504B6D0;
+	Thu, 11 Feb 2021 11:10:21 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id UvX-y3nLbebJ; Thu, 11 Feb 2021 09:27:56 -0500 (EST)
+	with ESMTP id FwAZSeLo9iAo; Thu, 11 Feb 2021 11:10:19 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B3DE4B6D5;
-	Thu, 11 Feb 2021 09:27:56 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BCE034B751;
+	Thu, 11 Feb 2021 11:10:19 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BA264B42A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2021 09:27:55 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BAA7D4B6E5
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2021 11:10:18 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MhPLSqZleKyd for <kvmarm@lists.cs.columbia.edu>;
- Thu, 11 Feb 2021 09:27:54 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3EF5B4B40F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2021 09:27:54 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id CEEC364E14;
- Thu, 11 Feb 2021 14:27:52 +0000 (UTC)
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=hot-poop.lan)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
- (envelope-from <maz@kernel.org>)
- id 1lACwg-00DYwa-7G; Thu, 11 Feb 2021 14:27:50 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- kvm@vger.kernel.org
-Subject: [PATCH] KVM: arm64: Handle CMOs on Read Only memslots
-Date: Thu, 11 Feb 2021 14:27:38 +0000
-Message-Id: <20210211142738.1478292-1-maz@kernel.org>
-X-Mailer: git-send-email 2.30.0
+ with ESMTP id u3987jrmdSBy for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Feb 2021 11:10:17 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F0004B6D0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2021 11:10:17 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8DED01063;
+ Thu, 11 Feb 2021 08:10:16 -0800 (PST)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 90D393F73D;
+ Thu, 11 Feb 2021 08:10:15 -0800 (PST)
+Subject: Re: [PATCH kvmtool 04/21] mmio: Extend handling to include ioport
+ emulation
+To: Andre Przywara <andre.przywara@arm.com>, Will Deacon <will@kernel.org>,
+ Julien Thierry <julien.thierry.kdev@gmail.com>
+References: <20201210142908.169597-1-andre.przywara@arm.com>
+ <20201210142908.169597-5-andre.przywara@arm.com>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <a97cc31b-73b0-7c48-79bb-fc14f7ec0aa1@arm.com>
+Date: Thu, 11 Feb 2021 16:10:16 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.1
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com,
- julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
- alexandru.elisei@arm.com, will@kernel.org, kernel-team@android.com,
- jianyong.wu@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kernel-team@android.com, Will Deacon <will@kernel.org>
+In-Reply-To: <20201210142908.169597-5-andre.przywara@arm.com>
+Content-Language: en-US
+Cc: linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -81,139 +74,301 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-It appears that when a guest traps into KVM because it is
-performing a CMO on a Read Only memslot, our handling of
-this operation is "slightly suboptimal", as we treat it as
-an MMIO access without a valid syndrome.
+Hi Andre,
 
-The chances that userspace is adequately equiped to deal
-with such an exception being slim, it would be better to
-handle it in the kernel.
+On 12/10/20 2:28 PM, Andre Przywara wrote:
+> In their core functionality MMIO and I/O port traps are not really
+> different, yet we still have two totally separate code paths for
+> handling them. Devices need to decide on one conduit or need to provide
+> different handler functions for each of them.
+>
+> Extend the existing MMIO emulation to also cover ioport handlers.
+> This just adds another RB tree root for holding the I/O port handlers,
+> but otherwise uses the same tree population and lookup code.
 
-What we need to provide is roughly as follows:
+Maybe I'm missing something, but why two trees? Is it valid to have an overlap
+between IO port and MMIO emulation? Or was it done to make the removal of ioport
+emulation easier?
 
-(a) if a CMO hits writeable memory, handle it as a normal memory acess
-(b) if a CMO hits non-memory, skip it
-(c) if a CMO hits R/O memory, that's where things become fun:
-  (1) if the CMO is DC IVAC, the architecture says this should result
-      in a permission fault
-  (2) if the CMO is DC CIVAC, it should work similarly to (a)
+If it's not valid to have that overlap, then I think having one tree for both
+would better. Struct mmio_mapping would have to be augmented with a flags field
+that holds the same flags given to kvm__register_iotrap to differentiate between
+the two slightly different emulations. Saving the IOTRAP_COALESCE flag would also
+make it trivial to call KVM_UNREGISTER_COALESCED_MMIO in kvm__deregister_iotrap,
+which we currently don't do.
 
-We already perform (a) and (b) correctly, but (c) is a total mess.
-Hence we need to distinguish between IVAC (c.1) and CIVAC (c.2).
+> "ioport" or "mmio" just become a flag in the registration function.
+> Provide wrappers to not break existing users, and allow an easy
+> transition for the existing ioport handlers.
+>
+> This also means that ioport handlers now can use the same emulation
+> callback prototype as MMIO handlers, which means we have to migrate them
+> over. To allow a smooth transition, we hook up the new I/O emulate
+> function to the end of the existing ioport emulation code.
 
-One way to do it is to treat CMOs generating a translation fault as
-a *read*, even when they are on a RW memslot. This allows us to
-further triage things:
+I'm sorry, but I don't understand that last sentence. Do you mean that the ioport
+emulation code has been modified to use kvm__emulate_pio() as a fallback for when
+the port is not found in the ioport_tree?
 
-If they come back with a permission fault, that is because this is
-a DC IVAC instruction:
-- inside a RW memslot: no problem, treat it as a write (a)(c.2)
-- inside a RO memslot: inject a data abort in the guest (c.1)
+>
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+>  include/kvm/kvm.h | 42 +++++++++++++++++++++++++++++----
+>  ioport.c          |  4 ++--
+>  mmio.c            | 59 +++++++++++++++++++++++++++++++++++++++--------
+>  3 files changed, 89 insertions(+), 16 deletions(-)
+>
+> diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
+> index ee99c28e..14f9d58b 100644
+> --- a/include/kvm/kvm.h
+> +++ b/include/kvm/kvm.h
+> @@ -27,10 +27,16 @@
+>  #define PAGE_SIZE (sysconf(_SC_PAGE_SIZE))
+>  #endif
+>  
+> +#define IOTRAP_BUS_MASK		0xf
 
-The only drawback is that DC IVAC on a yet unmapped page faults
-twice: one for the initial translation fault that result in a RO
-mapping, and once for the permission fault. I think we can live with
-that.
+It's not immediately obvious what this mask does. It turns out it's used to mask
+the enum flags defined in the header devices.h, header which is not included in
+this file.
 
-Reported-by: Jianyong Wu <jianyong.wu@arm.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
+The flag names we pass to kvm__register_iotrap() are slightly inconsistent
+(DEVICE_BUS_PCI, DEVICE_BUS_MMIO and IOTRAP_COALESCE), where DEVICE_BUS_{PCI,
+MMIO} come from devices.h as an enum. I was wondering if I'm missing something and
+there is a particular reason why we don't define our own flags for that here
+(something like IOTRAP_PIO and IOTRAP_MMIO).
 
-Notes:
-    I have taken the option to inject an abort in the guest when
-    it issues a DC IVAC on a R/O memslot, but another option would
-    be to just perform the invalidation ourselves as a DC CIAVAC.
-    
-    This would have the advantage of being consistent with what we
-    do for emulated MMIO.
+If we do decide to keep the flags from devices.h, I think it would be worth it to
+have a compile time check (with BUILD_BUG_ON) that IOTRAP_BUS_MASK is >=
+DEVICES_BUS_MAX, which would also be a good indication of where those flags are
+coming from.
 
- arch/arm64/kvm/mmu.c | 53 ++++++++++++++++++++++++++++++++++----------
- 1 file changed, 41 insertions(+), 12 deletions(-)
+> +#define IOTRAP_COALESCE		(1U << 4)
+> +
+>  #define DEFINE_KVM_EXT(ext)		\
+>  	.name = #ext,			\
+>  	.code = ext
+>  
+> +struct kvm_cpu;
+> +typedef void (*mmio_handler_fn)(struct kvm_cpu *vcpu, u64 addr, u8 *data,
+> +				u32 len, u8 is_write, void *ptr);
+>  typedef void (*fdt_irq_fn)(void *fdt, u8 irq, enum irq_type);
+>  
+>  enum {
+> @@ -113,6 +119,8 @@ void kvm__irq_line(struct kvm *kvm, int irq, int level);
+>  void kvm__irq_trigger(struct kvm *kvm, int irq);
+>  bool kvm__emulate_io(struct kvm_cpu *vcpu, u16 port, void *data, int direction, int size, u32 count);
+>  bool kvm__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data, u32 len, u8 is_write);
+> +bool kvm__emulate_pio(struct kvm_cpu *vcpu, u16 port, void *data,
+> +		      int direction, int size, u32 count);
+>  int kvm__destroy_mem(struct kvm *kvm, u64 guest_phys, u64 size, void *userspace_addr);
+>  int kvm__register_mem(struct kvm *kvm, u64 guest_phys, u64 size, void *userspace_addr,
+>  		      enum kvm_mem_type type);
+> @@ -136,10 +144,36 @@ static inline int kvm__reserve_mem(struct kvm *kvm, u64 guest_phys, u64 size)
+>  				 KVM_MEM_TYPE_RESERVED);
+>  }
+>  
+> -int __must_check kvm__register_mmio(struct kvm *kvm, u64 phys_addr, u64 phys_addr_len, bool coalesce,
+> -				    void (*mmio_fn)(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len, u8 is_write, void *ptr),
+> -				    void *ptr);
+> -bool kvm__deregister_mmio(struct kvm *kvm, u64 phys_addr);
+> +int __must_check kvm__register_iotrap(struct kvm *kvm, u64 phys_addr, u64 len,
+> +				      mmio_handler_fn mmio_fn, void *ptr,
+> +				      unsigned int flags);
+> +
+> +static inline
+> +int __must_check kvm__register_mmio(struct kvm *kvm, u64 phys_addr,
+> +				    u64 phys_addr_len, bool coalesce,
+> +				    mmio_handler_fn mmio_fn, void *ptr)
+> +{
+> +	return kvm__register_iotrap(kvm, phys_addr, phys_addr_len, mmio_fn, ptr,
+> +			DEVICE_BUS_MMIO | (coalesce ? IOTRAP_COALESCE : 0));
+> +}
+> +static inline
+> +int __must_check kvm__register_pio(struct kvm *kvm, u16 port, u16 len,
+> +				   mmio_handler_fn mmio_fn, void *ptr)
+> +{
+> +	return kvm__register_iotrap(kvm, port, len, mmio_fn, ptr,
+> +				    DEVICE_BUS_IOPORT);
+> +}
+> +
+> +bool kvm__deregister_iotrap(struct kvm *kvm, u64 phys_addr, unsigned int flags);
+> +static inline bool kvm__deregister_mmio(struct kvm *kvm, u64 phys_addr)
+> +{
+> +	return kvm__deregister_iotrap(kvm, phys_addr, DEVICE_BUS_MMIO);
+> +}
+> +static inline bool kvm__deregister_pio(struct kvm *kvm, u16 port)
+> +{
+> +	return kvm__deregister_iotrap(kvm, port, DEVICE_BUS_IOPORT);
+> +}
+> +
+>  void kvm__reboot(struct kvm *kvm);
+>  void kvm__pause(struct kvm *kvm);
+>  void kvm__continue(struct kvm *kvm);
+> diff --git a/ioport.c b/ioport.c
+> index b98836d3..204d8103 100644
+> --- a/ioport.c
+> +++ b/ioport.c
+> @@ -147,7 +147,8 @@ bool kvm__emulate_io(struct kvm_cpu *vcpu, u16 port, void *data, int direction,
+>  
+>  	entry = ioport_get(&ioport_tree, port);
+>  	if (!entry)
+> -		goto out;
+> +		return kvm__emulate_pio(vcpu, port, data, direction,
+> +					size, count);
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 7d2257cc5438..c7f4388bea45 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -760,7 +760,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	struct kvm_pgtable *pgt;
- 
- 	fault_granule = 1UL << ARM64_HW_PGTABLE_LEVEL_SHIFT(fault_level);
--	write_fault = kvm_is_write_fault(vcpu);
-+	/*
-+	 * Treat translation faults on CMOs as read faults. Should
-+	 * this further generate a permission fault on a R/O memslot,
-+	 * it will be caught in kvm_handle_guest_abort(), with
-+	 * prejudice. Permission faults on non-R/O memslot will be
-+	 * gracefully handled as writes.
-+	 */
-+	if (fault_status == FSC_FAULT && kvm_vcpu_dabt_is_cm(vcpu))
-+		write_fault = false;
-+	else
-+		write_fault = kvm_is_write_fault(vcpu);
- 	exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu);
- 	VM_BUG_ON(write_fault && exec_fault);
- 
-@@ -1013,19 +1023,37 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
- 		}
- 
- 		/*
--		 * Check for a cache maintenance operation. Since we
--		 * ended-up here, we know it is outside of any memory
--		 * slot. But we can't find out if that is for a device,
--		 * or if the guest is just being stupid. The only thing
--		 * we know for sure is that this range cannot be cached.
-+		 * Check for a cache maintenance operation. Three cases:
-+		 *
-+		 * - It is outside of any memory slot. But we can't find out
-+		 *   if that is for a device, or if the guest is just being
-+		 *   stupid. The only thing we know for sure is that this
-+		 *   range cannot be cached.  So let's assume that the guest
-+		 *   is just being cautious, and skip the instruction.
-+		 *
-+		 * - Otherwise, check whether this is a permission fault.
-+		 *   If so, that's a DC IVAC on a R/O memslot, which is a
-+		 *   pretty bad idea, and we tell the guest so.
- 		 *
--		 * So let's assume that the guest is just being
--		 * cautious, and skip the instruction.
-+		 * - If this wasn't a permission fault, pass it along for
-+		 *   further handling (including faulting the page in if it
-+		 *   was a translation fault).
- 		 */
--		if (kvm_is_error_hva(hva) && kvm_vcpu_dabt_is_cm(vcpu)) {
--			kvm_incr_pc(vcpu);
--			ret = 1;
--			goto out_unlock;
-+		if (kvm_vcpu_dabt_is_cm(vcpu)) {
-+			if (kvm_is_error_hva(hva)) {
-+				kvm_incr_pc(vcpu);
-+				ret = 1;
-+				goto out_unlock;
-+			}
-+
-+			if (fault_status == FSC_PERM) {
-+				/* DC IVAC on a R/O memslot */
-+				kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
-+				ret = 1;
-+				goto out_unlock;
-+			}
-+
-+			goto handle_access;
- 		}
- 
- 		/*
-@@ -1039,6 +1067,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
- 		goto out_unlock;
- 	}
- 
-+handle_access:
- 	/* Userspace should not be able to register out-of-bounds IPAs */
- 	VM_BUG_ON(fault_ipa >= kvm_phys_size(vcpu->kvm));
- 
--- 
-2.30.0
+I have to admit this gave me pause because this patch doesn't add any users for
+kvm__register_pio() (although with this change the behaviour of kvm__emulate_io()
+remains exactly the same). Do you think this change would fit better in patch #7,
+where the first user for kvm__register_pio() is added, or do you prefer it here?
 
+>  
+>  	ops	= entry->ops;
+>  
+> @@ -162,7 +163,6 @@ bool kvm__emulate_io(struct kvm_cpu *vcpu, u16 port, void *data, int direction,
+>  
+>  	ioport_put(&ioport_tree, entry);
+>  
+> -out:
+>  	if (ret)
+>  		return true;
+>  
+> diff --git a/mmio.c b/mmio.c
+> index cd141cd3..4cce1901 100644
+> --- a/mmio.c
+> +++ b/mmio.c
+> @@ -19,13 +19,14 @@ static DEFINE_MUTEX(mmio_lock);
+>  
+>  struct mmio_mapping {
+>  	struct rb_int_node	node;
+> -	void			(*mmio_fn)(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len, u8 is_write, void *ptr);
+> +	mmio_handler_fn		mmio_fn;
+>  	void			*ptr;
+>  	u32			refcount;
+>  	bool			remove;
+>  };
+>  
+>  static struct rb_root mmio_tree = RB_ROOT;
+> +static struct rb_root pio_tree = RB_ROOT;
+>  
+>  static struct mmio_mapping *mmio_search(struct rb_root *root, u64 addr, u64 len)
+>  {
+> @@ -103,9 +104,9 @@ static void mmio_put(struct kvm *kvm, struct rb_root *root, struct mmio_mapping
+>  	mutex_unlock(&mmio_lock);
+>  }
+>  
+> -int kvm__register_mmio(struct kvm *kvm, u64 phys_addr, u64 phys_addr_len, bool coalesce,
+> -		       void (*mmio_fn)(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len, u8 is_write, void *ptr),
+> -			void *ptr)
+> +int kvm__register_iotrap(struct kvm *kvm, u64 phys_addr, u64 phys_addr_len,
+> +			 mmio_handler_fn mmio_fn, void *ptr,
+> +			 unsigned int flags)
+>  {
+>  	struct mmio_mapping *mmio;
+>  	struct kvm_coalesced_mmio_zone zone;
+> @@ -127,7 +128,7 @@ int kvm__register_mmio(struct kvm *kvm, u64 phys_addr, u64 phys_addr_len, bool c
+>  		.remove		= false,
+>  	};
+>  
+> -	if (coalesce) {
+> +	if (flags & IOTRAP_COALESCE) {
+
+There is no such flag being used in ioport.c, is it valid to have the flags
+DEVICE_BUS_IOPORT and IOTRAP_COALESCE set at the same time?
+
+>  		zone = (struct kvm_coalesced_mmio_zone) {
+>  			.addr	= phys_addr,
+>  			.size	= phys_addr_len,
+> @@ -139,18 +140,27 @@ int kvm__register_mmio(struct kvm *kvm, u64 phys_addr, u64 phys_addr_len, bool c
+>  		}
+>  	}
+>  	mutex_lock(&mmio_lock);
+> -	ret = mmio_insert(&mmio_tree, mmio);
+> +	if ((flags & IOTRAP_BUS_MASK) == DEVICE_BUS_IOPORT)
+> +		ret = mmio_insert(&pio_tree, mmio);
+> +	else
+> +		ret = mmio_insert(&mmio_tree, mmio);
+>  	mutex_unlock(&mmio_lock);
+>  
+>  	return ret;
+>  }
+>  
+> -bool kvm__deregister_mmio(struct kvm *kvm, u64 phys_addr)
+> +bool kvm__deregister_iotrap(struct kvm *kvm, u64 phys_addr, unsigned int flags)
+>  {
+>  	struct mmio_mapping *mmio;
+> +	struct rb_root *tree;
+> +
+> +	if ((flags & IOTRAP_BUS_MASK) == DEVICE_BUS_IOPORT)
+> +		tree = &pio_tree;
+> +	else
+> +		tree = &mmio_tree;
+>  
+>  	mutex_lock(&mmio_lock);
+> -	mmio = mmio_search_single(&mmio_tree, phys_addr);
+> +	mmio = mmio_search_single(tree, phys_addr);
+>  	if (mmio == NULL) {
+>  		mutex_unlock(&mmio_lock);
+>  		return false;
+> @@ -167,7 +177,7 @@ bool kvm__deregister_mmio(struct kvm *kvm, u64 phys_addr)
+>  	 * called mmio_put(). This will trigger use-after-free errors on VCPU0.
+>  	 */
+>  	if (mmio->refcount == 0)
+> -		mmio_deregister(kvm, &mmio_tree, mmio);
+> +		mmio_deregister(kvm, tree, mmio);
+>  	else
+>  		mmio->remove = true;
+>  	mutex_unlock(&mmio_lock);
+> @@ -175,7 +185,8 @@ bool kvm__deregister_mmio(struct kvm *kvm, u64 phys_addr)
+>  	return true;
+>  }
+>  
+> -bool kvm__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data, u32 len, u8 is_write)
+> +bool kvm__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data,
+> +		       u32 len, u8 is_write)
+
+I don't think style changes should be part of this patch, the patch is large
+enough as it is.
+
+Thanks,
+
+Alex
+
+>  {
+>  	struct mmio_mapping *mmio;
+>  
+> @@ -194,3 +205,31 @@ bool kvm__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data, u32 len, u
+>  out:
+>  	return true;
+>  }
+> +
+> +bool kvm__emulate_pio(struct kvm_cpu *vcpu, u16 port, void *data,
+> +		     int direction, int size, u32 count)
+> +{
+> +	struct mmio_mapping *mmio;
+> +	bool is_write = direction == KVM_EXIT_IO_OUT;
+> +
+> +	mmio = mmio_get(&pio_tree, port, size);
+> +	if (!mmio) {
+> +		if (vcpu->kvm->cfg.ioport_debug) {
+> +			fprintf(stderr, "IO error: %s port=%x, size=%d, count=%u\n",
+> +				to_direction(direction), port, size, count);
+> +
+> +			return false;
+> +		}
+> +		return true;
+> +	}
+> +
+> +	while (count--) {
+> +		mmio->mmio_fn(vcpu, port, data, size, is_write, mmio->ptr);
+> +
+> +		data += size;
+> +	}
+> +
+> +	mmio_put(vcpu->kvm, &pio_tree, mmio);
+> +
+> +	return true;
+> +}
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
