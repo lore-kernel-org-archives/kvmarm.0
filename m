@@ -2,63 +2,88 @@ Return-Path: <SRS0=hpFi=HN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.4 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A725DC433E0
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Feb 2021 17:31:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 504F5C433E0
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Feb 2021 17:42:42 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id F387464E87
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Feb 2021 17:31:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F387464E87
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 9482C64DCE
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Feb 2021 17:42:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9482C64DCE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5FD104B3CF;
-	Thu, 11 Feb 2021 12:31:50 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 296424B2EC;
+	Thu, 11 Feb 2021 12:36:20 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JNq+7o0G2MnN; Thu, 11 Feb 2021 12:31:49 -0500 (EST)
+	with ESMTP id p6wJM0a7Vn6e; Thu, 11 Feb 2021 12:36:18 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 186B04B3B6;
-	Thu, 11 Feb 2021 12:31:49 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E4AA64B351;
+	Thu, 11 Feb 2021 12:36:18 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B7064B3B2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2021 12:31:48 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 922EB4B2F3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2021 12:36:17 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yYLsLkOiU+XT for <kvmarm@lists.cs.columbia.edu>;
- Thu, 11 Feb 2021 12:31:46 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F5DF4B314
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2021 12:31:46 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 380C211D4;
- Thu, 11 Feb 2021 09:31:46 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3CA723F73B;
- Thu, 11 Feb 2021 09:31:45 -0800 (PST)
-Subject: Re: [PATCH kvmtool 01/21] ioport: Remove ioport__setup_arch()
-To: Andre Przywara <andre.przywara@arm.com>
-References: <20201210142908.169597-1-andre.przywara@arm.com>
- <20201210142908.169597-2-andre.przywara@arm.com>
- <814e0cd9-5e54-fade-f05c-80ea2b4a9039@arm.com>
- <20210211171648.36000cce@slackpad.fritz.box>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <111b6cd6-ddf3-ec67-b782-67120be97943@arm.com>
-Date: Thu, 11 Feb 2021 17:32:01 +0000
+ with ESMTP id Bxveu5LlBcQy for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Feb 2021 12:36:16 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 911374B2EC
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2021 12:36:16 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1613064976;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=iI21Pcg7YQSwB2wQEIgSvnGnSK7Kb/kyFlXapjRwTPg=;
+ b=eG8TkWenij/eCWwBBtVPSiMHKv7DFklGlr26njX/WAG225qsQIV5voAo2mgvd5QmjxQK2t
+ m9o6gimktm8ynvMQI6bNnDRJYbNe5+E6uUkwqYNcXwgKq0XRPmCqahsJTCSWDbFNyMpiKy
+ 8PxtSd3YuIH4cTo5mBBzOmm3jGuorZc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-491-Gj4ll3mqPfG2iEePjc3b1g-1; Thu, 11 Feb 2021 12:36:13 -0500
+X-MC-Unique: Gj4ll3mqPfG2iEePjc3b1g-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 132CC803F48;
+ Thu, 11 Feb 2021 17:36:10 +0000 (UTC)
+Received: from [10.36.114.34] (ovpn-114-34.ams2.redhat.com [10.36.114.34])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 298E85C1BD;
+ Thu, 11 Feb 2021 17:36:02 +0000 (UTC)
+Subject: Re: [PATCH v13 05/15] iommu/smmuv3: Get prepared for nested stage
+ support
+To: Keqian Zhu <zhukeqian1@huawei.com>, eric.auger.pro@gmail.com,
+ iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, will@kernel.org,
+ joro@8bytes.org, maz@kernel.org, robin.murphy@arm.com,
+ alex.williamson@redhat.com
+References: <20201118112151.25412-1-eric.auger@redhat.com>
+ <20201118112151.25412-6-eric.auger@redhat.com>
+ <118a047b-91f4-3c84-867f-6c0b89f9011e@huawei.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <0d949aef-6719-2ef4-f1cd-f323b4d4130b@redhat.com>
+Date: Thu, 11 Feb 2021 18:36:01 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.1
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-In-Reply-To: <20210211171648.36000cce@slackpad.fritz.box>
+In-Reply-To: <118a047b-91f4-3c84-867f-6c0b89f9011e@huawei.com>
 Content-Language: en-US
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Cc: jean-philippe@linaro.org, jacob.jun.pan@linux.intel.com,
+ nicoleotsuka@gmail.com, vivek.gautam@arm.com, yi.l.liu@intel.com,
+ zhangfei.gao@linaro.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -75,203 +100,153 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Andre,
+Hi Keqian,
 
-On 2/11/21 5:16 PM, Andre Przywara wrote:
-> On Wed, 10 Feb 2021 17:44:59 +0000
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
->
-> Hi Alex,
->
->> On 12/10/20 2:28 PM, Andre Przywara wrote:
->>> Since x86 had a special need for registering tons of special I/O ports,
->>> we had an ioport__setup_arch() callback, to allow each architecture
->>> to do the same. As it turns out no one uses it beside x86, so we remove
->>> that unnecessary abstraction.
->>>
->>> The generic function was registered via a device_base_init() call, so
->>> we just do the same for the x86 specific function only, and can remove
->>> the unneeded ioport__setup_arch().
->>>
->>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->>> ---
->>>  arm/ioport.c         |  5 -----
->>>  include/kvm/ioport.h |  1 -
->>>  ioport.c             | 28 ----------------------------
->>>  mips/kvm.c           |  5 -----
->>>  powerpc/ioport.c     |  6 ------
->>>  x86/ioport.c         | 25 ++++++++++++++++++++++++-
->>>  6 files changed, 24 insertions(+), 46 deletions(-)
->>>
->>> diff --git a/arm/ioport.c b/arm/ioport.c
->>> index 2f0feb9a..24092c9d 100644
->>> --- a/arm/ioport.c
->>> +++ b/arm/ioport.c
->>> @@ -1,11 +1,6 @@
->>>  #include "kvm/ioport.h"
->>>  #include "kvm/irq.h"
->>>  
->>> -int ioport__setup_arch(struct kvm *kvm)
->>> -{
->>> -	return 0;
->>> -}
->>> -
->>>  void ioport__map_irq(u8 *irq)
->>>  {
->>>  	*irq = irq__alloc_line();
->>> diff --git a/include/kvm/ioport.h b/include/kvm/ioport.h
->>> index 039633f7..d0213541 100644
->>> --- a/include/kvm/ioport.h
->>> +++ b/include/kvm/ioport.h
->>> @@ -35,7 +35,6 @@ struct ioport_operations {
->>>  							    enum irq_type));
->>>  };
->>>  
->>> -int ioport__setup_arch(struct kvm *kvm);
->>>  void ioport__map_irq(u8 *irq);
->>>  
->>>  int __must_check ioport__register(struct kvm *kvm, u16 port, struct ioport_operations *ops,
->>> diff --git a/ioport.c b/ioport.c
->>> index 844a832d..667e8386 100644
->>> --- a/ioport.c
->>> +++ b/ioport.c
->>> @@ -158,21 +158,6 @@ int ioport__unregister(struct kvm *kvm, u16 port)
->>>  	return 0;
->>>  }
->>>  
->>> -static void ioport__unregister_all(void)
->>> -{
->>> -	struct ioport *entry;
->>> -	struct rb_node *rb;
->>> -	struct rb_int_node *rb_node;
->>> -
->>> -	rb = rb_first(&ioport_tree);
->>> -	while (rb) {
->>> -		rb_node = rb_int(rb);
->>> -		entry = ioport_node(rb_node);
->>> -		ioport_unregister(&ioport_tree, entry);
->>> -		rb = rb_first(&ioport_tree);
->>> -	}
->>> -}  
->> I get the impression this is a rebasing artifact. The commit message doesn't
->> mention anything about removing ioport__exit() -> ioport__unregister_all(), and as
->> far as I can tell it's still needed because there are places other than
->> ioport__setup_arch() from where ioport__register() is called.
-> I agree that the commit message is a bit thin on this fact, but the
-> functionality of ioport__unregister_all() is now in
-> x86/ioport.c:ioport__remove_arch(). I think removing ioport__init()
-> without removing ioport__exit() as well would look very weird, if not
-> hackish.
+On 2/2/21 8:14 AM, Keqian Zhu wrote:
+> Hi Eric,
+> 
+> On 2020/11/18 19:21, Eric Auger wrote:
+>> When nested stage translation is setup, both s1_cfg and
+>> s2_cfg are set.
+>>
+>> We introduce a new smmu domain abort field that will be set
+>> upon guest stage1 configuration passing.
+>>
+>> arm_smmu_write_strtab_ent() is modified to write both stage
+>> fields in the STE and deal with the abort field.
+>>
+>> In nested mode, only stage 2 is "finalized" as the host does
+>> not own/configure the stage 1 context descriptor; guest does.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>> v10 -> v11:
+>> - Fix an issue reported by Shameer when switching from with vSMMU
+>>   to without vSMMU. Despite the spec does not seem to mention it
+>>   seems to be needed to reset the 2 high 64b when switching from
+>>   S1+S2 cfg to S1 only. Especially dst[3] needs to be reset (S2TTB).
+>>   On some implementations, if the S2TTB is not reset, this causes
+>>   a C_BAD_STE error
+>> ---
+>>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 64 +++++++++++++++++----
+>>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h |  2 +
+>>  2 files changed, 56 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>> index 18ac5af1b284..412ea1bafa50 100644
+>> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>> @@ -1181,8 +1181,10 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_master *master, u32 sid,
+>>  	 * three cases at the moment:
+>>  	 *
+>>  	 * 1. Invalid (all zero) -> bypass/fault (init)
+>> -	 * 2. Bypass/fault -> translation/bypass (attach)
+>> -	 * 3. Translation/bypass -> bypass/fault (detach)
+>> +	 * 2. Bypass/fault -> single stage translation/bypass (attach)
+>> +	 * 3. Single or nested stage Translation/bypass -> bypass/fault (detach)
+>> +	 * 4. S2 -> S1 + S2 (attach_pasid_table)
+>> +	 * 5. S1 + S2 -> S2 (detach_pasid_table)
+> 
+> The following line "BUG_ON(ste_live && !nested);" forbids this transform.
 
-Not necessarily. ioport__unregister_all() removes the ioports added by
-x86/ioport.c::ioport__setup_arch(), *plus* ioports added by different devices,
-like serial, rtc, virtio-pci and vfio-pci (which are used by arm/arm64).
+Yes as pointed out by Kunkun, there is always an abort in-between. I
+will restore the original comment.
 
-Thanks,
+> And I have a look at the 6th patch, the transform seems S1 + S2 -> abort.
+> So after detach, the status is not the same as that before attach. Does it
+> match our expectation?
 
-Alex
+Indeed at detach time I think I should reset the abort() flag as this
+latter is not imposed anymore by the guest.
 
->
-> I can amend the commit message to mention this, or is there anything
-> else I missed?
->
-> Cheers,
-> Andre
->
->>> -
->>>  static const char *to_direction(int direction)
->>>  {
->>>  	if (direction == KVM_EXIT_IO_IN)
->>> @@ -220,16 +205,3 @@ out:
->>>  
->>>  	return !kvm->cfg.ioport_debug;
->>>  }
->>> -
->>> -int ioport__init(struct kvm *kvm)
->>> -{
->>> -	return ioport__setup_arch(kvm);
->>> -}
->>> -dev_base_init(ioport__init);
->>> -
->>> -int ioport__exit(struct kvm *kvm)
->>> -{
->>> -	ioport__unregister_all();
->>> -	return 0;
->>> -}
->>> -dev_base_exit(ioport__exit);
->>> diff --git a/mips/kvm.c b/mips/kvm.c
->>> index 26355930..e110e5d5 100644
->>> --- a/mips/kvm.c
->>> +++ b/mips/kvm.c
->>> @@ -100,11 +100,6 @@ void kvm__irq_trigger(struct kvm *kvm, int irq)
->>>  		die_perror("KVM_IRQ_LINE ioctl");
->>>  }
->>>  
->>> -int ioport__setup_arch(struct kvm *kvm)
->>> -{
->>> -	return 0;
->>> -}
->>> -
->>>  bool kvm__arch_cpu_supports_vm(void)
->>>  {
->>>  	return true;
->>> diff --git a/powerpc/ioport.c b/powerpc/ioport.c
->>> index 0c188b61..a5cff4ee 100644
->>> --- a/powerpc/ioport.c
->>> +++ b/powerpc/ioport.c
->>> @@ -12,12 +12,6 @@
->>>  
->>>  #include <stdlib.h>
->>>  
->>> -int ioport__setup_arch(struct kvm *kvm)
->>> -{
->>> -	/* PPC has no legacy ioports to set up */
->>> -	return 0;
->>> -}
->>> -
->>>  void ioport__map_irq(u8 *irq)
->>>  {
->>>  }
->>> diff --git a/x86/ioport.c b/x86/ioport.c
->>> index 7ad7b8f3..8c5c7699 100644
->>> --- a/x86/ioport.c
->>> +++ b/x86/ioport.c
->>> @@ -69,7 +69,7 @@ void ioport__map_irq(u8 *irq)
->>>  {
->>>  }
->>>  
->>> -int ioport__setup_arch(struct kvm *kvm)
->>> +static int ioport__setup_arch(struct kvm *kvm)
->>>  {
->>>  	int r;
->>>  
->>> @@ -150,3 +150,26 @@ int ioport__setup_arch(struct kvm *kvm)
->>>  
->>>  	return 0;
->>>  }
->>> +dev_base_init(ioport__setup_arch);
->>> +
->>> +static int ioport__remove_arch(struct kvm *kvm)
->>> +{
->>> +	ioport__unregister(kvm, 0x510);
->>> +	ioport__unregister(kvm, 0x402);
->>> +	ioport__unregister(kvm, 0x03D5);
->>> +	ioport__unregister(kvm, 0x03D4);
->>> +	ioport__unregister(kvm, 0x0378);
->>> +	ioport__unregister(kvm, 0x0278);
->>> +	ioport__unregister(kvm, 0x00F0);
->>> +	ioport__unregister(kvm, 0x00ED);
->>> +	ioport__unregister(kvm, IOPORT_DBG);
->>> +	ioport__unregister(kvm, 0x00C0);
->>> +	ioport__unregister(kvm, 0x00A0);
->>> +	ioport__unregister(kvm, 0x0092);
->>> +	ioport__unregister(kvm, 0x0040);
->>> +	ioport__unregister(kvm, 0x0020);
->>> +	ioport__unregister(kvm, 0x0000);
->>> +
->>> +	return 0;
->>> +}
->>> +dev_base_exit(ioport__remove_arch);  
+Thanks!
+
+Eric
+
+
+> 
+>>  	 *
+>>  	 * Given that we can't update the STE atomically and the SMMU
+>>  	 * doesn't read the thing in a defined order, that leaves us
+>> @@ -1193,7 +1195,8 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_master *master, u32 sid,
+>>  	 * 3. Update Config, sync
+>>  	 */
+>>  	u64 val = le64_to_cpu(dst[0]);
+>> -	bool ste_live = false;
+>> +	bool s1_live = false, s2_live = false, ste_live;
+>> +	bool abort, nested = false, translate = false;
+>>  	struct arm_smmu_device *smmu = NULL;
+>>  	struct arm_smmu_s1_cfg *s1_cfg;
+>>  	struct arm_smmu_s2_cfg *s2_cfg;
+>> @@ -1233,6 +1236,8 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_master *master, u32 sid,
+>>  		default:
+>>  			break;
+>>  		}
+>> +		nested = s1_cfg->set && s2_cfg->set;
+>> +		translate = s1_cfg->set || s2_cfg->set;
+>>  	}
+>>  
+>>  	if (val & STRTAB_STE_0_V) {
+>> @@ -1240,23 +1245,36 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_master *master, u32 sid,
+>>  		case STRTAB_STE_0_CFG_BYPASS:
+>>  			break;
+>>  		case STRTAB_STE_0_CFG_S1_TRANS:
+>> +			s1_live = true;
+>> +			break;
+>>  		case STRTAB_STE_0_CFG_S2_TRANS:
+>> -			ste_live = true;
+>> +			s2_live = true;
+>> +			break;
+>> +		case STRTAB_STE_0_CFG_NESTED:
+>> +			s1_live = true;
+>> +			s2_live = true;
+>>  			break;
+>>  		case STRTAB_STE_0_CFG_ABORT:
+>> -			BUG_ON(!disable_bypass);
+>>  			break;
+>>  		default:
+>>  			BUG(); /* STE corruption */
+>>  		}
+>>  	}
+>>  
+>> +	ste_live = s1_live || s2_live;
+>> +
+>>  	/* Nuke the existing STE_0 value, as we're going to rewrite it */
+>>  	val = STRTAB_STE_0_V;
+>>  
+>>  	/* Bypass/fault */
+>> -	if (!smmu_domain || !(s1_cfg->set || s2_cfg->set)) {
+>> -		if (!smmu_domain && disable_bypass)
+>> +
+>> +	if (!smmu_domain)
+>> +		abort = disable_bypass;
+>> +	else
+>> +		abort = smmu_domain->abort;
+>> +
+>> +	if (abort || !translate) {
+>> +		if (abort)
+>>  			val |= FIELD_PREP(STRTAB_STE_0_CFG, STRTAB_STE_0_CFG_ABORT);
+>>  		else
+>>  			val |= FIELD_PREP(STRTAB_STE_0_CFG, STRTAB_STE_0_CFG_BYPASS);
+>> @@ -1274,8 +1292,16 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_master *master, u32 sid,
+>>  		return;
+>>  	}
+>>  
+>> +	BUG_ON(ste_live && !nested);
+>> +
+>> +	if (ste_live) {
+>> +		/* First invalidate the live STE */
+>> +		dst[0] = cpu_to_le64(STRTAB_STE_0_CFG_ABORT);
+>> +		arm_smmu_sync_ste_for_sid(smmu, sid);
+>> +	}
+>> +
+> [...]
+> 
+> Thanks,
+> Keqian
+> 
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
