@@ -2,105 +2,59 @@ Return-Path: <SRS0=FDJp=HO=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-20.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.4 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 492D0C433E0
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Feb 2021 16:24:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14931C433E0
+	for <kvmarm@archiver.kernel.org>; Fri, 12 Feb 2021 17:12:15 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A077D64E79
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Feb 2021 16:24:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A077D64E79
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 831AB64E57
+	for <kvmarm@archiver.kernel.org>; Fri, 12 Feb 2021 17:12:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 831AB64E57
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 189E24B3EB;
-	Fri, 12 Feb 2021 11:24:39 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 03A0B4B390;
+	Fri, 12 Feb 2021 12:12:14 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id cNaXcfBdwyOy; Fri, 12 Feb 2021 11:24:37 -0500 (EST)
+	with ESMTP id NIW+7-O2ifaB; Fri, 12 Feb 2021 12:12:12 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C223C4B3F3;
-	Fri, 12 Feb 2021 11:24:37 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AB5714B3F9;
+	Fri, 12 Feb 2021 12:12:12 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 073AA4B3E1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Feb 2021 11:24:37 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 051CB4B3AE
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Feb 2021 12:12:11 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tHfIok71rtTn for <kvmarm@lists.cs.columbia.edu>;
- Fri, 12 Feb 2021 11:24:35 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [63.128.21.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F07D4B3D4
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Feb 2021 11:24:35 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1613147075;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=AEhU2g4edUykQP1EilIJTjjqCzDqbCg1Qo9rDd+6lLw=;
- b=S1aLVwq42+KpI5TObSTJJmnS0XCigurCpwI+lA+craaVGu8FP5F0lSgLZUbbbD9JLezrTP
- MKw9cahjWelTbT+dbgL1pyc1TEMOcaeIfCCaLKCe4KIXMbgfOI+wNBnDSZolxmN9i/LVNW
- as2gzw0QURpXSx9+3Q+N2Y0sXcE+5aA=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-90-EvEQgIKwNu-9xGtq7TlNaw-1; Fri, 12 Feb 2021 11:24:33 -0500
-X-MC-Unique: EvEQgIKwNu-9xGtq7TlNaw-1
-Received: by mail-ed1-f69.google.com with SMTP id z8so256361edr.18
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Feb 2021 08:24:32 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=AEhU2g4edUykQP1EilIJTjjqCzDqbCg1Qo9rDd+6lLw=;
- b=LggnnOmO/fLWeKMihk6yV0esMG70IpQrfutEG1wdmU0/L8sOv3LUdB0FYjI8bnS9FA
- nIvYf14SG/IGi9sjVjCyq6WA44PKwAfWcvM5hW8ztae+oePHEvSS+sZlCeJfPrc6ehMN
- 8w4AOw21AAAr1n4JBkM9JctEhXpOvXr8YgQFTKPElBr2R8tFHcSDW4ALvMk8BU0fu9DB
- fF9GAtFszK8YX7or07Fy9zGqajfc2BKdiFcNbpGBJfMnijRsvTY6ahFDz8/Oq3qqQlMa
- mz0UbHRTIB05axMFODoBjdxsXfiqLmEQtqd24ZXrsbYOo4CvxpNGSqHbqctHkkFX3CuS
- mymA==
-X-Gm-Message-State: AOAM533DHz1KPmIvLFbg/w8pem51N294wqiW5UACk5UH1AnYW97Vs9PN
- axHlAyvJaN6SnpYrcolpD7IQskflVnlaCRl1XJXQ7Obz8/ojbaz8xCvW3K1bE3sjuIk4U4d+0VI
- 2m38mLWw0jrl/6vsZZdWC9ck3
-X-Received: by 2002:a17:906:7fca:: with SMTP id
- r10mr3802950ejs.242.1613147071479; 
- Fri, 12 Feb 2021 08:24:31 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwUoIIpvIext07j2KdWmGqKYKwVP/MDe4WIR+YP2feyQgQwq50Q4z+f73FlLvwpRRgFwel5dQ==
-X-Received: by 2002:a17:906:7fca:: with SMTP id
- r10mr3802922ejs.242.1613147071262; 
- Fri, 12 Feb 2021 08:24:31 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
- ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
- by smtp.gmail.com with ESMTPSA id a15sm6011648edv.95.2021.02.12.08.24.29
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 12 Feb 2021 08:24:30 -0800 (PST)
-Subject: Re: [GIT PULL] KVM/arm64 updates for 5.12
-To: Marc Zyngier <maz@kernel.org>
-References: <20210212143657.3312035-1-maz@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a04f2c97-a7cf-eeb6-2f79-d96ae2215cdd@redhat.com>
-Date: Fri, 12 Feb 2021 17:24:28 +0100
+ with ESMTP id im9f6r8WpsQB for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 12 Feb 2021 12:12:09 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DEAC4B390
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Feb 2021 12:12:09 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F0D751063;
+ Fri, 12 Feb 2021 09:12:08 -0800 (PST)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9B8C23F73B;
+ Fri, 12 Feb 2021 09:12:07 -0800 (PST)
+Subject: Re: [PATCH] KVM: arm64: Handle CMOs on Read Only memslots
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+References: <20210211142738.1478292-1-maz@kernel.org>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <4bfd380b-a654-c104-f424-a258bb142e34@arm.com>
+Date: Fri, 12 Feb 2021 17:12:20 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+ Thunderbird/78.7.1
 MIME-Version: 1.0
-In-Reply-To: <20210212143657.3312035-1-maz@kernel.org>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20210211142738.1478292-1-maz@kernel.org>
 Content-Language: en-US
-Cc: linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
- kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, Ard Biesheuvel <ardb@kernel.org>
+Cc: kernel-team@android.com, Will Deacon <will@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -112,133 +66,171 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gMTIvMDIvMjEgMTU6MzYsIE1hcmMgWnluZ2llciB3cm90ZToKPiBIaSBQYW9sbywKPiAKPiBI
-ZXJlJ3MgdGhlIGluaXRpYWwgc2V0IG9mIEtWTS9hcm02NCB1cGRhdGVzIGZvciA1LjExLgo+IAo+
-IFRoZSBtb3N0IG5vdGFibGUgY2hhbmdlIHRoaXMgdGltZSBpcyBEYXZpZCdzIHdvcmsgdG8gZmlu
-YWxseSBidWlsZCB0aGUKPiBuVkhFIEVMMiBvYmplY3QgYXMgYSByZWxvY2F0YWJsZSBvYmplY3Qu
-IFRoaXMgbWFrZXMgdGhlIGNvZGUgYSBsb3QKPiBjbGVhbmVyLCBtb3JlIHJlbGlhYmxlICh3ZSBk
-b24ndCBoYXZlIHRvIGFzc3VtZSB0aGluZ3MgYWJvdXQgY29kZQo+IGdlbmVyYXRpb24pLCBhbmQg
-YWxsb3dzLi4uIGZ1bmN0aW9uIHBvaW50ZXJzLCB3aXRoIGFueSB1Z2x5IGhhY2shCj4gUHJvZ3Jl
-c3MsIGF0IGxhc3QsIGFuZCBhIGh1Z2UgdGhhbmsgeW91IHRvIERhdmlkIQo+IAo+IFdlIGFsc28g
-Z2FpbmVkIHN1cHBvcnQgZm9yIHRoZSBuZXcgVFJORyBzdGFuZGFyZCBoeXBlcmNhbGwsIGFuZCBh
-IG5pY2UKPiBvcHRpbWlzYXRpb24gZm9yIGNvbmN1cnJlbnQgdHJhbnNsYXRpb24gZmF1bHRzIHRh
-cmdldGluZyB0aGUgc2FtZQo+IHBhZ2UuIFRoZSByZXN0IGlzIGEgc21hbGwgYmF0Y2ggb2YgZml4
-ZXMgYW5kIG90aGVyIGNsZWFudXBzLgo+IAo+IE5vdGUgdGhhdCB0aGVyZSBpcyBhbm90aGVyIGJ1
-bmNoIG9mIGNoYW5nZXMgaW5kaXJlY3RseSBhZmZlY3RpbmcKPiBLVk0vYXJtNjQgdGhhdCBhcmUg
-cm91dGVkIHZpYSB0aGUgYXJtNjQgdHJlZSwgYXMgd2UgdHVybiB1cHNpZGUgZG93bgo+IHRoZSB3
-YXkgd2UgYm9vdCBMaW51eCBvbiBhIFZIRSBzeXN0ZW0uIEl0J3MgYWxsIGdvb2QgZnVuLgo+IAo+
-IFRoaXMgcHVsbCByZXF1ZXN0IGFsc28gY29tZXMgd2l0aCBzdHJpbmdzIGF0dGFjaGVkOgo+IC0g
-dGhlIGt2bWFybS1maXhlcy01LjExLTIgdGFnIGluIG9yZGVyIHRvIGF2b2lkIHVnbHkgY29uZmxp
-Y3RzLCB3aGljaAo+ICAgIGV4cGxhaW5zIGEgc2Vuc2Ugb2YgZMOpasOgLXZ1IGluIHRoZSBzaG9y
-dC1sb2cgYmVsb3cKPiAtIHRoZSBhcm02NC9mb3ItbmV4dC9taXNjIGJyYW5jaCBiZWNhdXNlIG9m
-IGRlcGVuZGVuY2llcwo+IAo+IFBsZWFzZSBwdWxsLAo+IAo+IAlNLgo+IAo+IFRoZSBmb2xsb3dp
-bmcgY2hhbmdlcyBzaW5jZSBjb21taXQgMTljMzI5ZjY4MDg5OTViMTQyYjM5NjYzMDFmMjE3Yzgz
-MWU3Y2YzMToKPiAKPiAgICBMaW51eCA1LjExLXJjNCAoMjAyMS0wMS0xNyAxNjozNzowNSAtMDgw
-MCkKPiAKPiBhcmUgYXZhaWxhYmxlIGluIHRoZSBHaXQgcmVwb3NpdG9yeSBhdDoKPiAKPiAgICBn
-aXQ6Ly9naXQua2VybmVsLm9yZy9wdWIvc2NtL2xpbnV4L2tlcm5lbC9naXQva3ZtYXJtL2t2bWFy
-bS5naXQgdGFncy9rdm1hcm0tNS4xMgo+IAo+IGZvciB5b3UgdG8gZmV0Y2ggY2hhbmdlcyB1cCB0
-byBjOTMxOTllOTNlMTIzMmI3MjIwNDgyZGZmYTA1YjdhMzJhMTk1ZmU4Ogo+IAo+ICAgIE1lcmdl
-IGJyYW5jaCAna3ZtLWFybTY0L3BtdS1kZWJ1Zy1maXhlcy01LjExJyBpbnRvIGt2bWFybS1tYXN0
-ZXIvbmV4dCAoMjAyMS0wMi0xMiAxNDowODo0MSArMDAwMCkKPiAKPiAtLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCj4gS1ZNL2Fy
-bTY0IHVwZGF0ZXMgZm9yIExpbnV4IDUuMTIKPiAKPiAtIE1ha2UgdGhlIG5WSEUgRUwyIG9iamVj
-dCByZWxvY2F0YWJsZSwgcmVzdWx0aW5nIGluIG11Y2ggbW9yZQo+ICAgIG1haW50YWluYWJsZSBj
-b2RlCj4gLSBIYW5kbGUgY29uY3VycmVudCB0cmFuc2xhdGlvbiBmYXVsdHMgaGl0dGluZyB0aGUg
-c2FtZSBwYWdlCj4gICAgaW4gYSBtb3JlIGVsZWdhbnQgd2F5Cj4gLSBTdXBwb3J0IGZvciB0aGUg
-c3RhbmRhcmQgVFJORyBoeXBlcnZpc29yIGNhbGwKPiAtIEEgYnVuY2ggb2Ygc21hbGwgUE1VL0Rl
-YnVnIGZpeGVzCj4gLSBBbGxvdyB0aGUgZGlzYWJsaW5nIG9mIHN5bWJvbCBleHBvcnQgZnJvbSBh
-c3NlbWJseSBjb2RlCj4gLSBTaW1wbGlmaWNhdGlvbiBvZiB0aGUgZWFybHkgaW5pdCBoeXBlcmNh
-bGwgaGFuZGxpbmcKPiAKPiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCj4gQWxleGFuZHJ1IEVsaXNlaSAoMik6Cj4gICAgICAg
-IEtWTTogYXJtNjQ6IFVzZSB0aGUgcmVnX3RvX2VuY29kaW5nKCkgbWFjcm8gaW5zdGVhZCBvZiBz
-eXNfcmVnKCkKPiAgICAgICAgS1ZNOiBhcm02NDogQ29ycmVjdCBzcGVsbGluZyBvZiBEQkdESURS
-IHJlZ2lzdGVyCj4gCj4gQW5kcmV3IFNjdWxsICgxKToKPiAgICAgICAgS1ZNOiBhcm02NDogU2lt
-cGxpZnkgX19rdm1faHlwX2luaXQgSFZDIGRldGVjdGlvbgo+IAo+IEFyZCBCaWVzaGV1dmVsICgy
-KToKPiAgICAgICAgZmlybXdhcmU6IHNtY2NjOiBBZGQgU01DQ0MgVFJORyBmdW5jdGlvbiBjYWxs
-IElEcwo+ICAgICAgICBLVk06IGFybTY0OiBJbXBsZW1lbnQgdGhlIFRSTkcgaHlwZXJ2aXNvciBj
-YWxsCj4gCj4gRGF2aWQgQnJhemRpbCAoOSk6Cj4gICAgICAgIEtWTTogYXJtNjQ6IEFsbG93IFBT
-Q0kgU1lTVEVNX09GRi9SRVNFVCB0byByZXR1cm4KPiAgICAgICAgS1ZNOiBhcm02NDogUmVuYW1l
-IC5pZG1hcC50ZXh0IGluIGh5cCBsaW5rZXIgc2NyaXB0Cj4gICAgICAgIEtWTTogYXJtNjQ6IFNl
-dCB1cCAuaHlwLnJvZGF0YSBFTEYgc2VjdGlvbgo+ICAgICAgICBLVk06IGFybTY0OiBBZGQgc3lt
-Ym9sIGF0IHRoZSBiZWdpbm5pbmcgb2YgZWFjaCBoeXAgc2VjdGlvbgo+ICAgICAgICBLVk06IGFy
-bTY0OiBHZW5lcmF0ZSBoeXAgcmVsb2NhdGlvbiBkYXRhCj4gICAgICAgIEtWTTogYXJtNjQ6IEFw
-cGx5IGh5cCByZWxvY2F0aW9ucyBhdCBydW50aW1lCj4gICAgICAgIEtWTTogYXJtNjQ6IEZpeCBj
-b25zdGFudC1wb29sIHVzZXJzIGluIGh5cAo+ICAgICAgICBLVk06IGFybTY0OiBSZW1vdmUgcGF0
-Y2hpbmcgb2YgZm4gcG9pbnRlcnMgaW4gaHlwCj4gICAgICAgIEtWTTogYXJtNjQ6IFJlbW92ZSBo
-eXBfc3ltYm9sX2FkZHIKPiAKPiBNYXJjIFp5bmdpZXIgKDIwKToKPiAgICAgICAgS1ZNOiBhcm02
-NDogSGlkZSBQTVUgcmVnaXN0ZXJzIGZyb20gdXNlcnNwYWNlIHdoZW4gbm90IGF2YWlsYWJsZQo+
-ICAgICAgICBLVk06IGFybTY0OiBTaW1wbGlmeSBoYW5kbGluZyBvZiBhYnNlbnQgUE1VIHN5c3Rl
-bSByZWdpc3RlcnMKPiAgICAgICAgYXJtNjQ6IERyb3Agd29ya2Fyb3VuZCBmb3IgYnJva2VuICdT
-JyBjb25zdHJhaW50IHdpdGggR0NDIDQuOQo+ICAgICAgICBLVk06IGFybTY0OiBGaWx0ZXIgb3V0
-IHY4LjErIGV2ZW50cyBvbiB2OC4wIEhXCj4gICAgICAgIEtWTTogRm9yYmlkIHRoZSB1c2Ugb2Yg
-dGFnZ2VkIHVzZXJzcGFjZSBhZGRyZXNzZXMgZm9yIG1lbXNsb3RzCj4gICAgICAgIE1lcmdlIGJy
-YW5jaCAnYXJtNjQvZm9yLW5leHQvbWlzYycgaW50byBrdm0tYXJtNjQvaHlwLXJlbG9jCj4gICAg
-ICAgIEtWTTogYXJtNjQ6IE1ha2UgZ2VuLWh5cHJlbCBlbmRpYW5uZXNzIGFnbm9zdGljCj4gICAg
-ICAgIEtWTTogYXJtNjQ6IEZpeCBtaXNzaW5nIFJFUzEgaW4gZW11bGF0aW9uIG9mIERCR0JJRFIK
-PiAgICAgICAgS1ZNOiBhcm02NDogRml4IEFBcmNoMzIgUE1VdjMgY2FwcGluZwo+ICAgICAgICBL
-Vk06IGFybTY0OiBBZGQgaGFuZGxpbmcgb2YgQUFyY2gzMiBQQ01FSUR7MiwzfSBQTVV2MyByZWdp
-c3RlcnMKPiAgICAgICAgS1ZNOiBhcm02NDogUmVmYWN0b3IgZmlsdGVyaW5nIG9mIElEIHJlZ2lz
-dGVycwo+ICAgICAgICBLVk06IGFybTY0OiBMaW1pdCB0aGUgZGVidWcgYXJjaGl0ZWN0dXJlIHRv
-IEFSTXY4LjAKPiAgICAgICAgS1ZNOiBhcm02NDogVXBncmFkZSBQTVUgc3VwcG9ydCB0byBBUk12
-OC40Cj4gICAgICAgIEtWTTogYXJtNjQ6IFVzZSBzeW1ib2xpYyBuYW1lcyBmb3IgdGhlIFBNVSB2
-ZXJzaW9ucwo+ICAgICAgICBNZXJnZSB0YWcgJ2t2bWFybS1maXhlcy01LjExLTInIGludG8ga3Zt
-YXJtLW1hc3Rlci9uZXh0Cj4gICAgICAgIE1lcmdlIGJyYW5jaCAna3ZtLWFybTY0L21pc2MtNS4x
-MicgaW50byBrdm1hcm0tbWFzdGVyL25leHQKPiAgICAgICAgTWVyZ2UgYnJhbmNoICdrdm0tYXJt
-NjQvY29uY3VycmVudC10cmFuc2xhdGlvbi1mYXVsdCcgaW50byBrdm1hcm0tbWFzdGVyL25leHQK
-PiAgICAgICAgTWVyZ2UgYnJhbmNoICdrdm0tYXJtNjQvaHlwLXJlbG9jJyBpbnRvIGt2bWFybS1t
-YXN0ZXIvbmV4dAo+ICAgICAgICBNZXJnZSBicmFuY2ggJ2t2bS1hcm02NC9ybmctNS4xMicgaW50
-byBrdm1hcm0tbWFzdGVyL25leHQKPiAgICAgICAgTWVyZ2UgYnJhbmNoICdrdm0tYXJtNjQvcG11
-LWRlYnVnLWZpeGVzLTUuMTEnIGludG8ga3ZtYXJtLW1hc3Rlci9uZXh0Cj4gCj4gUXVlbnRpbiBQ
-ZXJyZXQgKDIpOgo+ICAgICAgICBhc20tZ2VuZXJpYzogZXhwb3J0OiBTdHViIEVYUE9SVF9TWU1C
-T0wgd2l0aCBfX0RJU0FCTEVfRVhQT1JUUwo+ICAgICAgICBLVk06IGFybTY0OiBTdHViIEVYUE9S
-VF9TWU1CT0wgZm9yIG5WSEUgRUwyIGNvZGUKPiAKPiBTdGV2ZW4gUHJpY2UgKDEpOgo+ICAgICAg
-ICBLVk06IGFybTY0OiBDb21wdXRlIFRQSURSX0VMMiBpZ25vcmluZyBNVEUgdGFnCj4gCj4gWWFu
-YW4gV2FuZyAoMyk6Cj4gICAgICAgIEtWTTogYXJtNjQ6IEFkanVzdCBwYXJ0aWFsIGNvZGUgb2Yg
-aHlwIHN0YWdlLTEgbWFwIGFuZCBndWVzdCBzdGFnZS0yIG1hcAo+ICAgICAgICBLVk06IGFybTY0
-OiBGaWx0ZXIgb3V0IHRoZSBjYXNlIG9mIG9ubHkgY2hhbmdpbmcgcGVybWlzc2lvbnMgZnJvbSBz
-dGFnZS0yIG1hcCBwYXRoCj4gICAgICAgIEtWTTogYXJtNjQ6IE1hcmsgdGhlIHBhZ2UgZGlydHkg
-b25seSBpZiB0aGUgZmF1bHQgaXMgaGFuZGxlZCBzdWNjZXNzZnVsbHkKPiAKPiAgIERvY3VtZW50
-YXRpb24vdmlydC9rdm0vYXBpLnJzdCAgICAgICAgICAgfCAgIDMgKwo+ICAgYXJjaC9hcm02NC9p
-bmNsdWRlL2FzbS9oeXBfaW1hZ2UuaCAgICAgICB8ICAyOSArLQo+ICAgYXJjaC9hcm02NC9pbmNs
-dWRlL2FzbS9rdm1fYXNtLmggICAgICAgICB8ICAyNiAtLQo+ICAgYXJjaC9hcm02NC9pbmNsdWRl
-L2FzbS9rdm1faG9zdC5oICAgICAgICB8ICAgMiArCj4gICBhcmNoL2FybTY0L2luY2x1ZGUvYXNt
-L2t2bV9tbXUuaCAgICAgICAgIHwgIDYxICsrLS0tCj4gICBhcmNoL2FybTY0L2luY2x1ZGUvYXNt
-L2t2bV9wZ3RhYmxlLmggICAgIHwgICA1ICsKPiAgIGFyY2gvYXJtNjQvaW5jbHVkZS9hc20vc2Vj
-dGlvbnMuaCAgICAgICAgfCAgIDMgKy0KPiAgIGFyY2gvYXJtNjQvaW5jbHVkZS9hc20vc3lzcmVn
-LmggICAgICAgICAgfCAgIDMgKwo+ICAgYXJjaC9hcm02NC9rZXJuZWwvaW1hZ2UtdmFycy5oICAg
-ICAgICAgICB8ICAgMSAtCj4gICBhcmNoL2FybTY0L2tlcm5lbC9zbXAuYyAgICAgICAgICAgICAg
-ICAgIHwgICA0ICstCj4gICBhcmNoL2FybTY0L2tlcm5lbC92bWxpbnV4Lmxkcy5TICAgICAgICAg
-IHwgIDE4ICstCj4gICBhcmNoL2FybTY0L2t2bS9NYWtlZmlsZSAgICAgICAgICAgICAgICAgIHwg
-ICAyICstCj4gICBhcmNoL2FybTY0L2t2bS9hcm0uYyAgICAgICAgICAgICAgICAgICAgIHwgIDEw
-ICstCj4gICBhcmNoL2FybTY0L2t2bS9oeXAvaW5jbHVkZS9oeXAvc3dpdGNoLmggIHwgICA0ICst
-Cj4gICBhcmNoL2FybTY0L2t2bS9oeXAvbnZoZS8uZ2l0aWdub3JlICAgICAgIHwgICAyICsKPiAg
-IGFyY2gvYXJtNjQva3ZtL2h5cC9udmhlL01ha2VmaWxlICAgICAgICAgfCAgMzMgKystCj4gICBh
-cmNoL2FybTY0L2t2bS9oeXAvbnZoZS9nZW4taHlwcmVsLmMgICAgIHwgNDM4ICsrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysKPiAgIGFyY2gvYXJtNjQva3ZtL2h5cC9udmhlL2hvc3QuUyAg
-ICAgICAgICAgfCAgMjkgKy0KPiAgIGFyY2gvYXJtNjQva3ZtL2h5cC9udmhlL2h5cC1pbml0LlMg
-ICAgICAgfCAgMTkgKy0KPiAgIGFyY2gvYXJtNjQva3ZtL2h5cC9udmhlL2h5cC1tYWluLmMgICAg
-ICAgfCAgMTEgKy0KPiAgIGFyY2gvYXJtNjQva3ZtL2h5cC9udmhlL2h5cC1zbXAuYyAgICAgICAg
-fCAgIDQgKy0KPiAgIGFyY2gvYXJtNjQva3ZtL2h5cC9udmhlL2h5cC5sZHMuUyAgICAgICAgfCAg
-IDkgKy0KPiAgIGFyY2gvYXJtNjQva3ZtL2h5cC9udmhlL3BzY2ktcmVsYXkuYyAgICAgfCAgMzcg
-KystCj4gICBhcmNoL2FybTY0L2t2bS9oeXAvcGd0YWJsZS5jICAgICAgICAgICAgIHwgIDgzICsr
-Ky0tLQo+ICAgYXJjaC9hcm02NC9rdm0vaHlwL3ZnaWMtdjItY3B1aWYtcHJveHkuYyB8ICAgMiAr
-LQo+ICAgYXJjaC9hcm02NC9rdm0vaHlwZXJjYWxscy5jICAgICAgICAgICAgICB8ICAgNiArCj4g
-ICBhcmNoL2FybTY0L2t2bS9tbXUuYyAgICAgICAgICAgICAgICAgICAgIHwgIDEzICstCj4gICBh
-cmNoL2FybTY0L2t2bS9wbXUtZW11bC5jICAgICAgICAgICAgICAgIHwgIDI0ICstCj4gICBhcmNo
-L2FybTY0L2t2bS9zeXNfcmVncy5jICAgICAgICAgICAgICAgIHwgMTc4ICsrKysrKysrLS0tLS0K
-PiAgIGFyY2gvYXJtNjQva3ZtL3RybmcuYyAgICAgICAgICAgICAgICAgICAgfCAgODUgKysrKysr
-Cj4gICBhcmNoL2FybTY0L2t2bS92YV9sYXlvdXQuYyAgICAgICAgICAgICAgIHwgIDM0ICsrLQo+
-ICAgaW5jbHVkZS9hc20tZ2VuZXJpYy9leHBvcnQuaCAgICAgICAgICAgICB8ICAgMiArLQo+ICAg
-aW5jbHVkZS9saW51eC9hcm0tc21jY2MuaCAgICAgICAgICAgICAgICB8ICAzMSArKysKPiAgIHZp
-cnQva3ZtL2t2bV9tYWluLmMgICAgICAgICAgICAgICAgICAgICAgfCAgIDEgKwo+ICAgMzQgZmls
-ZXMgY2hhbmdlZCwgOTM0IGluc2VydGlvbnMoKyksIDI3OCBkZWxldGlvbnMoLSkKPiAgIGNyZWF0
-ZSBtb2RlIDEwMDY0NCBhcmNoL2FybTY0L2t2bS9oeXAvbnZoZS9nZW4taHlwcmVsLmMKPiAgIGNy
-ZWF0ZSBtb2RlIDEwMDY0NCBhcmNoL2FybTY0L2t2bS90cm5nLmMKPiAKClB1bGxlZCwgdGhhbmtz
-IQoKUGFvbG8KCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-Cmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczov
-L2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+Hi Marc,
+
+I've been trying to get my head around what the architecture says about CMOs, so
+please bare with me if I misunderstood some things.
+
+On 2/11/21 2:27 PM, Marc Zyngier wrote:
+> It appears that when a guest traps into KVM because it is
+> performing a CMO on a Read Only memslot, our handling of
+> this operation is "slightly suboptimal", as we treat it as
+> an MMIO access without a valid syndrome.
+>
+> The chances that userspace is adequately equiped to deal
+> with such an exception being slim, it would be better to
+> handle it in the kernel.
+>
+> What we need to provide is roughly as follows:
+>
+> (a) if a CMO hits writeable memory, handle it as a normal memory acess
+> (b) if a CMO hits non-memory, skip it
+> (c) if a CMO hits R/O memory, that's where things become fun:
+>   (1) if the CMO is DC IVAC, the architecture says this should result
+>       in a permission fault
+>   (2) if the CMO is DC CIVAC, it should work similarly to (a)
+
+When you say it should work similarly to (a), you mean it should be handled as a
+normal memory access, without the "CMO hits writeable memory" part, right?
+
+>
+> We already perform (a) and (b) correctly, but (c) is a total mess.
+> Hence we need to distinguish between IVAC (c.1) and CIVAC (c.2).
+>
+> One way to do it is to treat CMOs generating a translation fault as
+> a *read*, even when they are on a RW memslot. This allows us to
+> further triage things:
+>
+> If they come back with a permission fault, that is because this is
+> a DC IVAC instruction:
+> - inside a RW memslot: no problem, treat it as a write (a)(c.2)
+> - inside a RO memslot: inject a data abort in the guest (c.1)
+>
+> The only drawback is that DC IVAC on a yet unmapped page faults
+> twice: one for the initial translation fault that result in a RO
+> mapping, and once for the permission fault. I think we can live with
+> that.
+
+I'm trying to make sure I understand what the problem is.
+
+gfn_to_pfn_prot() returnsKVM_HVA_ERR_RO_BAD if the write is to a RO memslot.
+KVM_HVA_ERR_RO_BAD is PAGE_OFFSET + PAGE_SIZE, which means that
+is_error_noslot_pfn() return true. In that case we exit to userspace with -EFAULT
+for DC IVAC and DC CIVAC. But what we should be doing is this:
+
+- For DC IVAC, inject a dabt with ISS = 0x10, meaning an external abort (that's
+what kvm_inject_dabt_does()).
+
+- For DC CIVAC, exit to userspace with -EFAULT.
+
+Did I get that right?
+
+Thanks,
+
+Alex
+
+>
+> Reported-by: Jianyong Wu <jianyong.wu@arm.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>
+> Notes:
+>     I have taken the option to inject an abort in the guest when
+>     it issues a DC IVAC on a R/O memslot, but another option would
+>     be to just perform the invalidation ourselves as a DC CIAVAC.
+>     
+>     This would have the advantage of being consistent with what we
+>     do for emulated MMIO.
+>
+>  arch/arm64/kvm/mmu.c | 53 ++++++++++++++++++++++++++++++++++----------
+>  1 file changed, 41 insertions(+), 12 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 7d2257cc5438..c7f4388bea45 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -760,7 +760,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	struct kvm_pgtable *pgt;
+>  
+>  	fault_granule = 1UL << ARM64_HW_PGTABLE_LEVEL_SHIFT(fault_level);
+> -	write_fault = kvm_is_write_fault(vcpu);
+> +	/*
+> +	 * Treat translation faults on CMOs as read faults. Should
+> +	 * this further generate a permission fault on a R/O memslot,
+> +	 * it will be caught in kvm_handle_guest_abort(), with
+> +	 * prejudice. Permission faults on non-R/O memslot will be
+> +	 * gracefully handled as writes.
+> +	 */
+> +	if (fault_status == FSC_FAULT && kvm_vcpu_dabt_is_cm(vcpu))
+> +		write_fault = false;
+> +	else
+> +		write_fault = kvm_is_write_fault(vcpu);
+>  	exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu);
+>  	VM_BUG_ON(write_fault && exec_fault);
+>  
+> @@ -1013,19 +1023,37 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+>  		}
+>  
+>  		/*
+> -		 * Check for a cache maintenance operation. Since we
+> -		 * ended-up here, we know it is outside of any memory
+> -		 * slot. But we can't find out if that is for a device,
+> -		 * or if the guest is just being stupid. The only thing
+> -		 * we know for sure is that this range cannot be cached.
+> +		 * Check for a cache maintenance operation. Three cases:
+> +		 *
+> +		 * - It is outside of any memory slot. But we can't find out
+> +		 *   if that is for a device, or if the guest is just being
+> +		 *   stupid. The only thing we know for sure is that this
+> +		 *   range cannot be cached.  So let's assume that the guest
+> +		 *   is just being cautious, and skip the instruction.
+> +		 *
+> +		 * - Otherwise, check whether this is a permission fault.
+> +		 *   If so, that's a DC IVAC on a R/O memslot, which is a
+> +		 *   pretty bad idea, and we tell the guest so.
+>  		 *
+> -		 * So let's assume that the guest is just being
+> -		 * cautious, and skip the instruction.
+> +		 * - If this wasn't a permission fault, pass it along for
+> +		 *   further handling (including faulting the page in if it
+> +		 *   was a translation fault).
+>  		 */
+> -		if (kvm_is_error_hva(hva) && kvm_vcpu_dabt_is_cm(vcpu)) {
+> -			kvm_incr_pc(vcpu);
+> -			ret = 1;
+> -			goto out_unlock;
+> +		if (kvm_vcpu_dabt_is_cm(vcpu)) {
+> +			if (kvm_is_error_hva(hva)) {
+> +				kvm_incr_pc(vcpu);
+> +				ret = 1;
+> +				goto out_unlock;
+> +			}
+> +
+> +			if (fault_status == FSC_PERM) {
+> +				/* DC IVAC on a R/O memslot */
+> +				kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
+> +				ret = 1;
+> +				goto out_unlock;
+> +			}
+> +
+> +			goto handle_access;
+>  		}
+>  
+>  		/*
+> @@ -1039,6 +1067,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+>  		goto out_unlock;
+>  	}
+>  
+> +handle_access:
+>  	/* Userspace should not be able to register out-of-bounds IPAs */
+>  	VM_BUG_ON(fault_ipa >= kvm_phys_size(vcpu->kvm));
+>  
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
