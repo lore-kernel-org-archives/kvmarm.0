@@ -2,59 +2,62 @@ Return-Path: <SRS0=hAGT=HS=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBA0AC433DB
-	for <kvmarm@archiver.kernel.org>; Tue, 16 Feb 2021 12:18:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11C1DC433E0
+	for <kvmarm@archiver.kernel.org>; Tue, 16 Feb 2021 12:19:03 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 18BC964DEC
-	for <kvmarm@archiver.kernel.org>; Tue, 16 Feb 2021 12:18:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18BC964DEC
+	by mail.kernel.org (Postfix) with ESMTP id 4D9C864DA1
+	for <kvmarm@archiver.kernel.org>; Tue, 16 Feb 2021 12:19:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D9C864DA1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8AAA64B556;
-	Tue, 16 Feb 2021 07:18:39 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C79024B5B8;
+	Tue, 16 Feb 2021 07:19:01 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id gQRkHbFdq6sz; Tue, 16 Feb 2021 07:18:38 -0500 (EST)
+	with ESMTP id 0p37rZXbeynn; Tue, 16 Feb 2021 07:19:00 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3025A4B560;
-	Tue, 16 Feb 2021 07:18:38 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 533944B5B3;
+	Tue, 16 Feb 2021 07:19:00 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F73A4B560
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Feb 2021 07:18:36 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 614A24B560
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Feb 2021 07:18:58 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5DLv9qDQ1V67 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 16 Feb 2021 07:18:35 -0500 (EST)
+ with ESMTP id 1hluRqINI2jK for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 16 Feb 2021 07:18:57 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0845A4B556
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Feb 2021 07:18:35 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 11AA04B556
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Feb 2021 07:18:57 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5AF321FB;
- Tue, 16 Feb 2021 04:18:34 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AEE2CD6E;
+ Tue, 16 Feb 2021 04:18:56 -0800 (PST)
 Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 061823F73B;
- Tue, 16 Feb 2021 04:18:32 -0800 (PST)
-Subject: Re: [PATCH] KVM: arm64: Handle CMOs on Read Only memslots
-To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-References: <20210211142738.1478292-1-maz@kernel.org>
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 44B793F73B;
+ Tue, 16 Feb 2021 04:18:55 -0800 (PST)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <63fbfcec-b31f-7248-0382-0cad4165424c@arm.com>
-Date: Tue, 16 Feb 2021 12:18:31 +0000
+Subject: Re: [PATCH] KVM: arm64: Handle CMOs on Read Only memslots
+To: Marc Zyngier <maz@kernel.org>
+References: <20210211142738.1478292-1-maz@kernel.org>
+ <4bfd380b-a654-c104-f424-a258bb142e34@arm.com>
+ <6c127a2d4276b56205d2d28cc0b9ffc2@kernel.org>
+Message-ID: <951ad762-3f9e-9469-7b71-e93b7cb554a2@arm.com>
+Date: Tue, 16 Feb 2021 12:19:09 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.7.1
 MIME-Version: 1.0
-In-Reply-To: <20210211142738.1478292-1-maz@kernel.org>
+In-Reply-To: <6c127a2d4276b56205d2d28cc0b9ffc2@kernel.org>
 Content-Language: en-US
-Cc: kernel-team@android.com, Will Deacon <will@kernel.org>
+Cc: kvm@vger.kernel.org, kernel-team@android.com,
+ linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -66,169 +69,115 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
-
-Played with this for a bit to try to understand the problem better, wrote a simple
-MMIO device in kvmtool which maps the memory as a read-only memslot [1] and poked
-it with kvm-unit-tests [2].
-
-[1] https://gitlab.arm.com/linux-arm/kvmtool-ae/-/tree/mmiodev-wip1
-
-[2] https://gitlab.arm.com/linux-arm/kvm-unit-tests-ae/-/tree/mmiodev-wip1
-
-On 2/11/21 2:27 PM, Marc Zyngier wrote:
-> It appears that when a guest traps into KVM because it is
-> performing a CMO on a Read Only memslot, our handling of
-> this operation is "slightly suboptimal", as we treat it as
-> an MMIO access without a valid syndrome.
->
-> The chances that userspace is adequately equiped to deal
-> with such an exception being slim, it would be better to
-> handle it in the kernel.
->
-> What we need to provide is roughly as follows:
->
-> (a) if a CMO hits writeable memory, handle it as a normal memory acess
-> (b) if a CMO hits non-memory, skip it
-> (c) if a CMO hits R/O memory, that's where things become fun:
->   (1) if the CMO is DC IVAC, the architecture says this should result
->       in a permission fault
->   (2) if the CMO is DC CIVAC, it should work similarly to (a)
->
-> We already perform (a) and (b) correctly, but (c) is a total mess.
-> Hence we need to distinguish between IVAC (c.1) and CIVAC (c.2).
->
-> One way to do it is to treat CMOs generating a translation fault as
-> a *read*, even when they are on a RW memslot. This allows us to
-> further triage things:
->
-> If they come back with a permission fault, that is because this is
-> a DC IVAC instruction:
-> - inside a RW memslot: no problem, treat it as a write (a)(c.2)
-> - inside a RO memslot: inject a data abort in the guest (c.1)
->
-> The only drawback is that DC IVAC on a yet unmapped page faults
-> twice: one for the initial translation fault that result in a RO
-> mapping, and once for the permission fault. I think we can live with
-> that.
->
-> Reported-by: Jianyong Wu <jianyong.wu@arm.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->
-> Notes:
->     I have taken the option to inject an abort in the guest when
->     it issues a DC IVAC on a R/O memslot, but another option would
->     be to just perform the invalidation ourselves as a DC CIAVAC.
->     
->     This would have the advantage of being consistent with what we
->     do for emulated MMIO.
->
->  arch/arm64/kvm/mmu.c | 53 ++++++++++++++++++++++++++++++++++----------
->  1 file changed, 41 insertions(+), 12 deletions(-)
->
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 7d2257cc5438..c7f4388bea45 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -760,7 +760,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	struct kvm_pgtable *pgt;
->  
->  	fault_granule = 1UL << ARM64_HW_PGTABLE_LEVEL_SHIFT(fault_level);
-> -	write_fault = kvm_is_write_fault(vcpu);
-> +	/*
-> +	 * Treat translation faults on CMOs as read faults. Should
-> +	 * this further generate a permission fault on a R/O memslot,
-> +	 * it will be caught in kvm_handle_guest_abort(), with
-> +	 * prejudice. Permission faults on non-R/O memslot will be
-> +	 * gracefully handled as writes.
-> +	 */
-> +	if (fault_status == FSC_FAULT && kvm_vcpu_dabt_is_cm(vcpu))
-> +		write_fault = false;
-
-This means that every DC CIVAC will map the IPA with read permissions in the stage
-2 tables, regardless of the IPA being already mapped. It's harmless, but a bit
-unexpected.
-
-> +	else
-> +		write_fault = kvm_is_write_fault(vcpu);
->  	exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu);
->  	VM_BUG_ON(write_fault && exec_fault);
->  
-> @@ -1013,19 +1023,37 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
->  		}
->  
->  		/*
-> -		 * Check for a cache maintenance operation. Since we
-> -		 * ended-up here, we know it is outside of any memory
-> -		 * slot. But we can't find out if that is for a device,
-> -		 * or if the guest is just being stupid. The only thing
-> -		 * we know for sure is that this range cannot be cached.
-> +		 * Check for a cache maintenance operation. Three cases:
-> +		 *
-> +		 * - It is outside of any memory slot. But we can't find out
-> +		 *   if that is for a device, or if the guest is just being
-> +		 *   stupid. The only thing we know for sure is that this
-> +		 *   range cannot be cached.  So let's assume that the guest
-> +		 *   is just being cautious, and skip the instruction.
-> +		 *
-> +		 * - Otherwise, check whether this is a permission fault.
-> +		 *   If so, that's a DC IVAC on a R/O memslot, which is a
-> +		 *   pretty bad idea, and we tell the guest so.
->  		 *
-> -		 * So let's assume that the guest is just being
-> -		 * cautious, and skip the instruction.
-> +		 * - If this wasn't a permission fault, pass it along for
-> +		 *   further handling (including faulting the page in if it
-> +		 *   was a translation fault).
->  		 */
-> -		if (kvm_is_error_hva(hva) && kvm_vcpu_dabt_is_cm(vcpu)) {
-> -			kvm_incr_pc(vcpu);
-> -			ret = 1;
-> -			goto out_unlock;
-> +		if (kvm_vcpu_dabt_is_cm(vcpu)) {
-> +			if (kvm_is_error_hva(hva)) {
-> +				kvm_incr_pc(vcpu);
-> +				ret = 1;
-> +				goto out_unlock;
-> +			}
-> +
-> +			if (fault_status == FSC_PERM) {
-> +				/* DC IVAC on a R/O memslot */
-> +				kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
-> +				ret = 1;
-> +				goto out_unlock;
-> +			}
-
-I don't like the inconsistency. We go from exiting to userspace for both DC
-IVAC/DC CIVAC to mapping the IPA with read permissions for DC CIVAC, but injecting
-a DABT for a DC IVAC. DC IVAC acts just like a DC CIVAC and requires the same
-permissions when executed by a guest, so I'm not sure we should be handling them
-differently.
-
-Thanks,
-
-Alex
-
-> +
-> +			goto handle_access;
->  		}
->  
->  		/*
-> @@ -1039,6 +1067,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
->  		goto out_unlock;
->  	}
->  
-> +handle_access:
->  	/* Userspace should not be able to register out-of-bounds IPAs */
->  	VM_BUG_ON(fault_ipa >= kvm_phys_size(vcpu->kvm));
->  
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgTWFyYywKClRoYW5rIHlvdSBmb3IgdGhlIGV4cGxhbmF0aW9ucyEKCk9uIDIvMTIvMjEgNjox
+OCBQTSwgTWFyYyBaeW5naWVyIHdyb3RlOgo+IEhpIEFsZXgsCj4KPiBPbiAyMDIxLTAyLTEyIDE3
+OjEyLCBBbGV4YW5kcnUgRWxpc2VpIHdyb3RlOgo+PiBIaSBNYXJjLAo+Pgo+PiBJJ3ZlIGJlZW4g
+dHJ5aW5nIHRvIGdldCBteSBoZWFkIGFyb3VuZCB3aGF0IHRoZSBhcmNoaXRlY3R1cmUgc2F5cyBh
+Ym91dCBDTU9zLCBzbwo+PiBwbGVhc2UgYmFyZSB3aXRoIG1lIGlmIEkgbWlzdW5kZXJzdG9vZCBz
+b21lIHRoaW5ncy4KPgo+IE5vIHdvcnJpZXMuIEkndmUgaGFkIHRoaXMgcGF0Y2ggZm9yIGEgZmV3
+IHdlZWtzIG5vdywgYW5kIGNhbid0Cj4gbWFrZSB1cCBteSBtaW5kIGFib3V0IGl0LiBJdCBkb2Vz
+IGFkZHJlc3MgYW4gYWN0dWFsIGlzc3VlIHRob3VnaCwKPiBzbyBJIGNvdWxkbid0IGp1c3QgZGlz
+Y2FyZCBpdC4uLiA7LSkKPgo+PiBPbiAyLzExLzIxIDI6MjcgUE0sIE1hcmMgWnluZ2llciB3cm90
+ZToKPj4+IEl0IGFwcGVhcnMgdGhhdCB3aGVuIGEgZ3Vlc3QgdHJhcHMgaW50byBLVk0gYmVjYXVz
+ZSBpdCBpcwo+Pj4gcGVyZm9ybWluZyBhIENNTyBvbiBhIFJlYWQgT25seSBtZW1zbG90LCBvdXIg
+aGFuZGxpbmcgb2YKPj4+IHRoaXMgb3BlcmF0aW9uIGlzICJzbGlnaHRseSBzdWJvcHRpbWFsIiwg
+YXMgd2UgdHJlYXQgaXQgYXMKPj4+IGFuIE1NSU8gYWNjZXNzIHdpdGhvdXQgYSB2YWxpZCBzeW5k
+cm9tZS4KPj4+Cj4+PiBUaGUgY2hhbmNlcyB0aGF0IHVzZXJzcGFjZSBpcyBhZGVxdWF0ZWx5IGVx
+dWlwZWQgdG8gZGVhbAo+Pj4gd2l0aCBzdWNoIGFuIGV4Y2VwdGlvbiBiZWluZyBzbGltLCBpdCB3
+b3VsZCBiZSBiZXR0ZXIgdG8KPj4+IGhhbmRsZSBpdCBpbiB0aGUga2VybmVsLgo+Pj4KPj4+IFdo
+YXQgd2UgbmVlZCB0byBwcm92aWRlIGlzIHJvdWdobHkgYXMgZm9sbG93czoKPj4+Cj4+PiAoYSkg
+aWYgYSBDTU8gaGl0cyB3cml0ZWFibGUgbWVtb3J5LCBoYW5kbGUgaXQgYXMgYSBub3JtYWwgbWVt
+b3J5IGFjZXNzCj4+PiAoYikgaWYgYSBDTU8gaGl0cyBub24tbWVtb3J5LCBza2lwIGl0Cj4+PiAo
+YykgaWYgYSBDTU8gaGl0cyBSL08gbWVtb3J5LCB0aGF0J3Mgd2hlcmUgdGhpbmdzIGJlY29tZSBm
+dW46Cj4+PiDCoCAoMSkgaWYgdGhlIENNTyBpcyBEQyBJVkFDLCB0aGUgYXJjaGl0ZWN0dXJlIHNh
+eXMgdGhpcyBzaG91bGQgcmVzdWx0Cj4+PiDCoMKgwqDCoMKgIGluIGEgcGVybWlzc2lvbiBmYXVs
+dAoKRm9yIEtWTSB0byBnZXQgYSBzdGFnZSAyIGZhdWx0LCB0aGUgSVBBIG11c3QgYWxyZWFkeSBi
+ZSBtYXBwZWQgYXMgd3JpdGFibGUgaW4gdGhlCmd1ZXN0J3Mgc3RhZ2UgMSB0YWJsZXMuIElmIEkg
+cmVhZCB0aGF0IHJpZ2h0IGFuZCB5b3UgYXJlIHN1Z2dlc3RpbmcgdGhhdCB0aGUgZ3Vlc3QKc2hv
+dWxkIGdldCBhIHBlcm1pc3Npb24gZmF1bHQsIEkgZG9uJ3QgdGhpbmsgdGhhdCdzIGNvcnJlY3Qg
+ZnJvbSB0aGUgZ3Vlc3Qncwp2aWV3cG9pbnQuCgo+Pj4KPj4+IMKgICgyKSBpZiB0aGUgQ01PIGlz
+IERDIENJVkFDLCBpdCBzaG91bGQgd29yayBzaW1pbGFybHkgdG8gKGEpCj4+Cj4+IFdoZW4geW91
+IHNheSBpdCBzaG91bGQgd29yayBzaW1pbGFybHkgdG8gKGEpLCB5b3UgbWVhbiBpdCBzaG91bGQg
+YmUgaGFuZGxlZCBhcyBhCj4+IG5vcm1hbCBtZW1vcnkgYWNjZXNzLCB3aXRob3V0IHRoZSAiQ01P
+IGhpdHMgd3JpdGVhYmxlIG1lbW9yeSIgcGFydCwgcmlnaHQ/Cj4KPiBXaGF0IEkgbWVhbiBpcyB0
+aGF0IHRoZSBjYWNoZSBpbnZhbGlkYXRpb24gc2hvdWxkIHRha2UgcGxhY2UsCj4gcHJlZmVyYWJs
+eSB3aXRob3V0IGludm9sdmluZyBLVk0gYXQgYWxsIChvdGhlciB0aGFuIHBvcHVsYXRpbmcKPiBT
+MiBpZiByZXF1aXJlZCkuCj4KPj4KPj4+Cj4+PiBXZSBhbHJlYWR5IHBlcmZvcm0gKGEpIGFuZCAo
+YikgY29ycmVjdGx5LCBidXQgKGMpIGlzIGEgdG90YWwgbWVzcy4KPj4+IEhlbmNlIHdlIG5lZWQg
+dG8gZGlzdGluZ3Vpc2ggYmV0d2VlbiBJVkFDIChjLjEpIGFuZCBDSVZBQyAoYy4yKS4KPj4+Cj4+
+PiBPbmUgd2F5IHRvIGRvIGl0IGlzIHRvIHRyZWF0IENNT3MgZ2VuZXJhdGluZyBhIHRyYW5zbGF0
+aW9uIGZhdWx0IGFzCj4+PiBhICpyZWFkKiwgZXZlbiB3aGVuIHRoZXkgYXJlIG9uIGEgUlcgbWVt
+c2xvdC4gVGhpcyBhbGxvd3MgdXMgdG8KPj4+IGZ1cnRoZXIgdHJpYWdlIHRoaW5nczoKPj4+Cj4+
+PiBJZiB0aGV5IGNvbWUgYmFjayB3aXRoIGEgcGVybWlzc2lvbiBmYXVsdCwgdGhhdCBpcyBiZWNh
+dXNlIHRoaXMgaXMKPj4+IGEgREMgSVZBQyBpbnN0cnVjdGlvbjoKPj4+IC0gaW5zaWRlIGEgUlcg
+bWVtc2xvdDogbm8gcHJvYmxlbSwgdHJlYXQgaXQgYXMgYSB3cml0ZSAoYSkoYy4yKQo+Pj4gLSBp
+bnNpZGUgYSBSTyBtZW1zbG90OiBpbmplY3QgYSBkYXRhIGFib3J0IGluIHRoZSBndWVzdCAoYy4x
+KQo+Pj4KPj4+IFRoZSBvbmx5IGRyYXdiYWNrIGlzIHRoYXQgREMgSVZBQyBvbiBhIHlldCB1bm1h
+cHBlZCBwYWdlIGZhdWx0cwo+Pj4gdHdpY2U6IG9uZSBmb3IgdGhlIGluaXRpYWwgdHJhbnNsYXRp
+b24gZmF1bHQgdGhhdCByZXN1bHQgaW4gYSBSTwo+Pj4gbWFwcGluZywgYW5kIG9uY2UgZm9yIHRo
+ZSBwZXJtaXNzaW9uIGZhdWx0LiBJIHRoaW5rIHdlIGNhbiBsaXZlIHdpdGgKPj4+IHRoYXQuCj4+
+Cj4+IEknbSB0cnlpbmcgdG8gbWFrZSBzdXJlIEkgdW5kZXJzdGFuZCB3aGF0IHRoZSBwcm9ibGVt
+IGlzLgo+Pgo+PiBnZm5fdG9fcGZuX3Byb3QoKSByZXR1cm5zS1ZNX0hWQV9FUlJfUk9fQkFEIGlm
+IHRoZSB3cml0ZSBpcyB0byBhIFJPIG1lbXNsb3QuCj4+IEtWTV9IVkFfRVJSX1JPX0JBRCBpcyBQ
+QUdFX09GRlNFVCArIFBBR0VfU0laRSwgd2hpY2ggbWVhbnMgdGhhdAo+PiBpc19lcnJvcl9ub3Ns
+b3RfcGZuKCkgcmV0dXJuIHRydWUuIEluIHRoYXQgY2FzZSB3ZSBleGl0IHRvIHVzZXJzcGFjZQo+
+PiB3aXRoIC1FRkFVTFQKPj4gZm9yIERDIElWQUMgYW5kIERDIENJVkFDLiBCdXQgd2hhdCB3ZSBz
+aG91bGQgYmUgZG9pbmcgaXMgdGhpczoKPj4KPj4gLSBGb3IgREMgSVZBQywgaW5qZWN0IGEgZGFi
+dCB3aXRoIElTUyA9IDB4MTAsIG1lYW5pbmcgYW4gZXh0ZXJuYWwgYWJvcnQgKHRoYXQncwo+PiB3
+aGF0IGt2bV9pbmplY3RfZGFidF9kb2VzKCkpLgo+Pgo+PiAtIEZvciBEQyBDSVZBQywgZXhpdCB0
+byB1c2Vyc3BhY2Ugd2l0aCAtRUZBVUxULgo+Pgo+PiBEaWQgSSBnZXQgdGhhdCByaWdodD8KPgo+
+IE5vdCBxdWl0ZS4gV2hhdCBJICp0aGluayogd2Ugc2hvdWxkIGRvIGlzOgo+Cj4gLSBEQyBDSVZB
+QyBzaG91bGQganVzdCB3b3JrLCB3aXRob3V0IGdvaW5nIHRvIHVzZXJzcGFjZS4gSSBjYW4ndCBp
+bWFnaW5lCj4gwqAgYSByZWFzb24gd2h5IHdlJ2QgaW52b2x2ZSB1c2Vyc3BhY2UgZm9yIHRoaXMs
+IGFuZCB3ZSBjdXJyZW50bHkgZG9uJ3QKPiDCoCByZWFsbHkgaGF2ZSBhIGdvb2Qgd2F5IHRvIGRl
+c2NyaWJlIHRoaXMgdG8gdXNlcnNwYWNlLgo+Cj4gLSBEQyBJVkFDIGlzIG1vcmUgbnVhbmNlZDog
+d2UgY291bGQgZWl0aGVyIGluamVjdCBhbiBleGNlcHRpb24gKHdoaWNoCj4gwqAgaXMgd2hhdCB0
+aGlzIHBhdGNoIGRvZXMpLCBvciBwZXJmb3JtIHRoZSBDTU8gb3Vyc2VsdmVzIGFzIGEgREMgQ0lW
+QUMKPiDCoCAoY29uc2lzdGVudCB3aXRoIHRoZSBJVkEtPkNJVkEgdXBncmFkZSBjYXVzZWQgYnkg
+aGF2aW5nIGEgUzIgdHJhbnNsYXRpb24pLgo+IMKgIFRoaXMgc2Vjb25kIGFwcHJvYWNoIGlzIGNv
+bXBhcmFibGUgdG8gd2hhdCB3ZSBkbyB3aGVuIHRoZSBndWVzdAo+IMKgIGlzc3VlcyBhIENNTyBv
+biBhbiBlbXVsYXRlZCBNTUlPIGFkZHJlc3MgKHdlIGRvbid0IGluamVjdCBhIGZhdWx0KS4KCkhl
+cmUgYXJlIG15IHRob3VnaHRzIGFib3V0IHRoaXMuCgpUaGVyZSBpcyBub3RoaW5nIHRoYXQgdXNl
+cnNwYWNlIGNhbiBkbyByZWdhcmRpbmcgdGhlIENNTyBvcGVyYXRpb25zLCBzbyBJIGFncmVlCnRo
+YXQgd2Ugc2hvdWxkIGhhbmRsZSB0aGlzIGluIHRoZSBrZXJuZWwuCgpJZiB0aGVyZSBpcyBubyBt
+ZW1zbG90IGFzc29jaWF0ZWQgd2l0aCB0aGUgZmF1bHRpbmcgSVBBLCB0aGVuIEkgZG9uJ3QgdGhp
+bmsgd2UgY2FuCmRvIHRoZSBDTU8gYmVjYXVzZSB0aGVyZSBpcyBubyBQQSBhc3NvY2lhdGVkIHdp
+dGggdGhlIElQQS4KCkFzc3VtaW5nIHRoZSBtZW1zbG90IGFzc29jaWF0ZWQgd2l0aCB0aGUgZmF1
+bHQgSVBBIGlzIHJlYWRvbmx5OgoKV3JpdGVzIGNvbWluZyBmcm9tIHRoZSBndWVzdCBhcmUgZW11
+bGF0ZWQsIHNvIHdoYXRldmVyIHRoZSBndWVzdCB3cml0ZXMgd2lsbCBuZXZlcgpiZSBpbiBhIGRp
+cnR5IGNhY2hlIGxpbmUuIENsZWFuaW5nIHRoYXQgYWRkcmVzcyB3b3VsZCBtYXRjaCB3aGF0IEtW
+TV9NRU1fUkVBRE9OTFkKQVBJIGd1YXJhbnRlZXM6ICJbLi5dIEluIHRoaXMgY2FzZSwgd3JpdGVz
+IHRvIHRoaXMgbWVtb3J5IHdpbGwgYmUgcG9zdGVkIHRvCnVzZXJzcGFjZSBhcyBLVk1fRVhJVF9N
+TUlPIGV4aXRzLiIgTm8gZGlydHkgY2FjaGUgbGluZSAoZnJvbSB0aGUgZ3Vlc3QncyBwb2ludCBv
+Zgp2aWV3KSwgbm90aGluZyB3cml0dGVuIHRvIG1lbW9yeS4KClRoZSBjYWNoZSBsaW5lIG1pZ2h0
+IGJlIGRpcnR5IGZvciB0d28gcmVhc29uczoKCi0gVGhpcyBpcyB0aGUgZmlyc3QgdGltZSB0aGUg
+Z3Vlc3QgYWNjZXNzZXMgdGhhdCBtZW1vcnkgbG9jYXRpb24uIE5vIG5lZWQgdG8gZG8KYW55dGhp
+bmcgKG5laXRoZXIgY2xlYW5pbmcsIG5vciBtYXBwaW5nwqAgYXQgc3RhZ2UgMiksIGJlY2F1c2Ug
+dGhlIHN1YnNlcXVlbnQgcmVhZApmcm9tIHRoZSBndWVzdCB3aWxsIG1hcCBpdCBhdCBzdGFnZSAy
+LCBhbmQgdGhhdCB3aWxsIHRyaWdnZXIgdGhlIGRjYWNoZSBjbGVhbmluZwppbiB1c2VyX21lbV9h
+Ym9ydCgpLgoKLSBVc2Vyc3BhY2Ugd3JvdGUgdG8gdGhlIHBoeXNpY2FsIGFkZHJlc3MgYXMgcGFy
+dCBvZiBkZXZpY2UgZW11bGF0aW9uLiBJdCBpcwplbnRpcmVseSByZWFzb25hYmxlIGZvciBob3N0
+IHVzZXJzcGFjZSB0byBhc3N1bWUgdGhhdCB0aGUgUk8gbWVtc2xvdCBpcyBtYXBwZWQgYXMKZGV2
+aWNlIG1lbW9yeSBieSB0aGUgZ3Vlc3QsIHdoaWNoIG1lYW5zIHRoYXQgdGhlIGd1ZXN0IHJlYWRz
+IGZyb20gbWFpbiBtZW1vcnksCndoaWxlIGhvc3QgdXNlcnNwYWNlIHdyaXRlcyB0byBjYWNoZSAo
+YXNzdW1pbmcgbm8gRldCKS4gSW4gdGhpcyBjYXNlLCBJIHRoaW5rIGl0J3MKdGhlIGhvc3QgdXNl
+cnNwYWNlJ3MgZHV0eSB0byBkbyB0aGUgZGNhY2hlIGNsZWFuaW5nLgoKQmVjYXVzZSBvZiB0aGUg
+dHdvIHJlYXNvbnMgYWJvdmUsIEkgdGhpbmsgY2xlYW5pbmcgdGhlIGRjYWNoZSB3aWxsIGhhdmUg
+bm8gZWZmZWN0CmZyb20gYSBjb3JyZWN0bmVzcyBwZXJzcGVjdGl2ZS4KCkFzIGZvciBpbnZhbGlk
+YXRpbmcgdGhlIGNhY2hlIGxpbmUsIGJlc2lkZSB0aGUgdHdvIHNjZW5hcmlvcyBhYm92ZSwgYSBj
+bGVhbiBjYWNoZQpsaW5lIGNvdWxkIGhhdmUgYmVlbiBhbGxvY2F0ZWQgYnkgYSByZWFkLCBkb25l
+IGVpdGhlciBieSB0aGUgZ3Vlc3QgKGlmIGl0IG1hcHBlZAp0aGUgSVBBIGFzIE5vcm1hbCBjYWNo
+ZWFibGUpIG9yIGJ5IHRoZSBob3N0IChDUFUgc3BlY3VsYXRpbmcgbG9hZHMgb3IKdXNlcnNwYWNl
+L2tlcm5lbCByZWFkaW5nIGZyb20gdGhlIGFkZHJlc3MpLiBJIHRoaW5rIGludmFsaWRhdGluZywg
+anVzdCBsaWtlCmNsZWFuaW5nLCB3b3VsZCBoYXZlIG5vIGVmZmVjdCBvbiB0aGUgY29ycmVjdG5l
+c3Mgb2YgdGhlIGVtdWxhdGlvbi4KCk15IG9waW5pb24gaXMgdGhhdCB3ZSBzaG91bGQgc2ltcGx5
+IHNraXAgQ01PcyBvbiByZWFkLW9ubHkgbWVtc2xvdC4KCldoYXQgZG8geW91IHRoaW5rPwoKVGhh
+bmtzLApBbGV4Cj4gVGhhbmtzLAo+Cj4gwqDCoMKgwqDCoMKgwqAgTS4KX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1h
+cm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21h
+aWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
