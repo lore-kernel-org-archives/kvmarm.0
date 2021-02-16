@@ -2,74 +2,75 @@ Return-Path: <SRS0=hAGT=HS=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34829C433DB
-	for <kvmarm@archiver.kernel.org>; Tue, 16 Feb 2021 19:03:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89A5CC433DB
+	for <kvmarm@archiver.kernel.org>; Tue, 16 Feb 2021 22:05:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8CA0C64E76
-	for <kvmarm@archiver.kernel.org>; Tue, 16 Feb 2021 19:03:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CA0C64E76
+	by mail.kernel.org (Postfix) with ESMTP id 1877A64E79
+	for <kvmarm@archiver.kernel.org>; Tue, 16 Feb 2021 22:05:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1877A64E79
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 297E94B4F7;
-	Tue, 16 Feb 2021 14:03:25 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AC43C4B467;
+	Tue, 16 Feb 2021 17:05:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id CSDBQp4eM6oa; Tue, 16 Feb 2021 14:03:23 -0500 (EST)
+	with ESMTP id 3yF+yYO2jRlq; Tue, 16 Feb 2021 17:05:50 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B6C14B3CF;
-	Tue, 16 Feb 2021 14:03:23 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AC0414B657;
+	Tue, 16 Feb 2021 17:05:50 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F26F44B2F8
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Feb 2021 14:03:21 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EAB094B467
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Feb 2021 17:05:48 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3s+RBu3mJb7D for <kvmarm@lists.cs.columbia.edu>;
- Tue, 16 Feb 2021 14:03:20 -0500 (EST)
+ with ESMTP id m2wScfMIMamO for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 16 Feb 2021 17:05:48 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B88664B2E3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Feb 2021 14:03:20 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 060E54B653
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Feb 2021 17:05:47 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id C8A7364E28;
- Tue, 16 Feb 2021 19:03:17 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 0DF8A64DDA;
+ Tue, 16 Feb 2021 22:05:46 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why.misterjones.org)
+ helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1lC5cx-00ETSL-MA; Tue, 16 Feb 2021 19:03:15 +0000
-Date: Tue, 16 Feb 2021 19:03:15 +0000
-Message-ID: <87lfbnq1ho.wl-maz@kernel.org>
+ id 1lC8TW-00EVA0-Cw; Tue, 16 Feb 2021 22:05:42 +0000
+Date: Tue, 16 Feb 2021 22:05:33 +0000
+Message-ID: <87tuqbpt1u.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Haibo Xu <haibo.xu@linaro.org>
-Subject: Re: [PATCH v3 63/66] KVM: arm64: nv: Allocate VNCR page when required
-In-Reply-To: <CAJc+Z1G6QEEiUh=KLdS6Xut7q63zZ6zQxfpGCkCtY5tTSXPeZw@mail.gmail.com>
+To: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH v3 09/66] KVM: arm64: nv: Support virtual EL2 exceptions
+In-Reply-To: <20210129180539.2c508b6e@slackpad.fritz.box>
 References: <20201210160002.1407373-1-maz@kernel.org>
- <20201210160002.1407373-64-maz@kernel.org>
- <CAJc+Z1G6QEEiUh=KLdS6Xut7q63zZ6zQxfpGCkCtY5tTSXPeZw@mail.gmail.com>
+ <20201210160002.1407373-10-maz@kernel.org>
+ <20210129180539.2c508b6e@slackpad.fritz.box>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: haibo.xu@linaro.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com,
- andre.przywara@arm.com
+X-SA-Exim-Rcpt-To: andre.przywara@arm.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, christoffer.dall@arm.com,
+ jintack@cs.columbia.edu, alexandru.elisei@arm.com, james.morse@arm.com,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kernel-team@android.com,
+ jintack.lim@linaro.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: Andre Przywara <andre.przywara@arm.com>, kernel-team@android.com,
- kvmarm <kvmarm@lists.cs.columbia.edu>,
- arm-mail-list <linux-arm-kernel@lists.infradead.org>, kvm@vger.kernel.org
+Cc: kvm@vger.kernel.org, kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ Jintack Lim <jintack.lim@linaro.org>, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -86,105 +87,41 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 21 Jan 2021 02:47:45 +0000,
-Haibo Xu <haibo.xu@linaro.org> wrote:
+On Fri, 29 Jan 2021 18:05:39 +0000,
+Andre Przywara <andre.przywara@arm.com> wrote:
 > 
-> On Fri, 11 Dec 2020 at 00:04, Marc Zyngier <maz@kernel.org> wrote:
-> >
-> > If running a NV guest on an ARMv8.4-NV capable system, let's
-> > allocate an additional page that will be used by the hypervisor
-> > to fulfill system register accesses.
-> >
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/kvm_host.h | 3 ++-
-> >  arch/arm64/kvm/nested.c           | 8 ++++++++
-> >  arch/arm64/kvm/reset.c            | 1 +
-> >  3 files changed, 11 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index 78630bd5124d..dada0678c28e 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -523,7 +523,8 @@ struct kvm_vcpu_arch {
-> >   */
-> >  static inline u64 *__ctxt_sys_reg(const struct kvm_cpu_context *ctxt, int r)
-> >  {
-> > -       if (unlikely(r >= __VNCR_START__ && ctxt->vncr_array))
-> > +       if (unlikely(cpus_have_final_cap(ARM64_HAS_ENHANCED_NESTED_VIRT) &&
-> > +                    r >= __VNCR_START__ && ctxt->vncr_array))
-> >                 return &ctxt->vncr_array[r - __VNCR_START__];
-> >
-> >         return (u64 *)&ctxt->sys_regs[r];
-> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> > index eef8f9873814..88147ec99755 100644
-> > --- a/arch/arm64/kvm/nested.c
-> > +++ b/arch/arm64/kvm/nested.c
-> > @@ -47,6 +47,12 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
-> >         if (!cpus_have_final_cap(ARM64_HAS_NESTED_VIRT))
-> >                 return -EINVAL;
-> >
-> > +       if (cpus_have_final_cap(ARM64_HAS_ENHANCED_NESTED_VIRT)) {
-> > +               vcpu->arch.ctxt.vncr_array = (u64 *)__get_free_page(GFP_KERNEL | __GFP_ZERO);
-> > +               if (!vcpu->arch.ctxt.vncr_array)
-> > +                       return -ENOMEM;
-> > +       }
+> On Thu, 10 Dec 2020 15:59:05 +0000
+> Marc Zyngier <maz@kernel.org> wrote:
+
+[...]
+
+> > diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+> > index b47df73e98d7..530562eb09fd 100644
+> > --- a/arch/arm64/kvm/inject_fault.c
+> > +++ b/arch/arm64/kvm/inject_fault.c
+> > @@ -14,17 +14,50 @@
+> >  #include <asm/kvm_emulate.h>
+> >  #include <asm/esr.h>
+> >  
+> > +static void pend_sync_exception(struct kvm_vcpu *vcpu)
+> > +{
+> > +	vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA64_ELx_SYNC	|
+> > +			     KVM_ARM64_PENDING_EXCEPTION);
 > > +
+> > +	/* If not nesting, EL1 is the only possible exception target */
+> > +	if (likely(!nested_virt_in_use(vcpu))) {
 > 
-> If KVM_ARM_VCPU_INIT was called multiple times, the above codes
-> would try to allocate a new page without free-ing the previous
-> one. Besides that, the following kvm_free_stage2_pgd() call would
+> This breaks compilation for the next 14 patches, because
+> nested_virt_in_use() is unknown here. Patch 23/66 fixes this by adding
+> kvm_nested.h to kvm_emulate.h.
 
-I assume you mean kvm_init_stage2_mmu() here.
+Indeed, well caught.
 
-> fail in the second call with the error message "kvm_arch already
-> initialized?".  I think a possible fix is to add a new flag to
-> indicate whether the NV related meta data have been initialized, and
-> only initialize them for the first call.
+> Shall we do this already in this patch here, or pull in kvm_nested.h in
+> every C file we use nested_virt_in_use(), like exception.c above?
 
-Good catch. But I think we have all the data we need at this stage to
-avoid this issue:
-
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index abb0669bdd4c..baff7373863f 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -390,7 +390,20 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
- 	int cpu, err;
- 	struct kvm_pgtable *pgt;
- 
-+	/*
-+	 * If we already have our page tables in place, and that the
-+	 * MMU context is the canonical one, we have a bug somewhere,
-+	 * as this is only supposed to ever happen once per VM.
-+	 *
-+	 * Otherwise, we're building nested page tables, and that's
-+	 * probably because userspace called KVM_ARM_VCPU_INIT more
-+	 * than once on the same vcpu. Since that's actually legal,
-+	 * don't kick a fuss and leave gracefully.
-+	 */
- 	if (mmu->pgt != NULL) {
-+		if (&kvm->arch.mmu != mmu)
-+			return 0;
-+
- 		kvm_err("kvm_arch already initialized?\n");
- 		return -EINVAL;
- 	}
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 88147ec99755..3b21ea57fbce 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -48,7 +48,9 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
- 		return -EINVAL;
- 
- 	if (cpus_have_final_cap(ARM64_HAS_ENHANCED_NESTED_VIRT)) {
--		vcpu->arch.ctxt.vncr_array = (u64 *)__get_free_page(GFP_KERNEL | __GFP_ZERO);
-+		if (!vcpu->arch.ctxt.vncr_array)
-+			vcpu->arch.ctxt.vncr_array = (u64 *)__get_free_page(GFP_KERNEL | __GFP_ZERO);
-+
- 		if (!vcpu->arch.ctxt.vncr_array)
- 			return -ENOMEM;
- 	}
+I've just added kvm_nested.h in the two places that were required at
+this stage (and verified that it all bisects correctly now).
 
 Thanks,
 
