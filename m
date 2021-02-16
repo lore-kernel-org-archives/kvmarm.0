@@ -2,62 +2,61 @@ Return-Path: <SRS0=hAGT=HS=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11C1DC433E0
-	for <kvmarm@archiver.kernel.org>; Tue, 16 Feb 2021 12:19:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0CE6C433DB
+	for <kvmarm@archiver.kernel.org>; Tue, 16 Feb 2021 14:22:07 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4D9C864DA1
-	for <kvmarm@archiver.kernel.org>; Tue, 16 Feb 2021 12:19:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D9C864DA1
+	by mail.kernel.org (Postfix) with ESMTP id D284F64DFF
+	for <kvmarm@archiver.kernel.org>; Tue, 16 Feb 2021 14:22:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D284F64DFF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C79024B5B8;
-	Tue, 16 Feb 2021 07:19:01 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3459F4B4FC;
+	Tue, 16 Feb 2021 09:22:06 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 0p37rZXbeynn; Tue, 16 Feb 2021 07:19:00 -0500 (EST)
+	with ESMTP id 4+UmMg3axit0; Tue, 16 Feb 2021 09:22:04 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 533944B5B3;
-	Tue, 16 Feb 2021 07:19:00 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CE6054B5D8;
+	Tue, 16 Feb 2021 09:22:04 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 614A24B560
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Feb 2021 07:18:58 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 94B744B5CE
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Feb 2021 09:22:03 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1hluRqINI2jK for <kvmarm@lists.cs.columbia.edu>;
- Tue, 16 Feb 2021 07:18:57 -0500 (EST)
+ with ESMTP id 5Ubnn36OCICA for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 16 Feb 2021 09:22:01 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 11AA04B556
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Feb 2021 07:18:57 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9AB714B4FC
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Feb 2021 09:22:01 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AEE2CD6E;
- Tue, 16 Feb 2021 04:18:56 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E120A31B;
+ Tue, 16 Feb 2021 06:22:00 -0800 (PST)
 Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 44B793F73B;
- Tue, 16 Feb 2021 04:18:55 -0800 (PST)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E571D3F694;
+ Tue, 16 Feb 2021 06:21:59 -0800 (PST)
+Subject: Re: [PATCH kvmtool 13/21] hw/serial: Refactor trap handler
+To: Andre Przywara <andre.przywara@arm.com>, Will Deacon <will@kernel.org>,
+ Julien Thierry <julien.thierry.kdev@gmail.com>
+References: <20201210142908.169597-1-andre.przywara@arm.com>
+ <20201210142908.169597-14-andre.przywara@arm.com>
 From: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH] KVM: arm64: Handle CMOs on Read Only memslots
-To: Marc Zyngier <maz@kernel.org>
-References: <20210211142738.1478292-1-maz@kernel.org>
- <4bfd380b-a654-c104-f424-a258bb142e34@arm.com>
- <6c127a2d4276b56205d2d28cc0b9ffc2@kernel.org>
-Message-ID: <951ad762-3f9e-9469-7b71-e93b7cb554a2@arm.com>
-Date: Tue, 16 Feb 2021 12:19:09 +0000
+Message-ID: <5c91e8f2-7bdf-4c4a-1da3-08dac79fd9a4@arm.com>
+Date: Tue, 16 Feb 2021 14:22:05 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.7.1
 MIME-Version: 1.0
-In-Reply-To: <6c127a2d4276b56205d2d28cc0b9ffc2@kernel.org>
+In-Reply-To: <20201210142908.169597-14-andre.przywara@arm.com>
 Content-Language: en-US
-Cc: kvm@vger.kernel.org, kernel-team@android.com,
- linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+Cc: linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -69,115 +68,238 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SGkgTWFyYywKClRoYW5rIHlvdSBmb3IgdGhlIGV4cGxhbmF0aW9ucyEKCk9uIDIvMTIvMjEgNjox
-OCBQTSwgTWFyYyBaeW5naWVyIHdyb3RlOgo+IEhpIEFsZXgsCj4KPiBPbiAyMDIxLTAyLTEyIDE3
-OjEyLCBBbGV4YW5kcnUgRWxpc2VpIHdyb3RlOgo+PiBIaSBNYXJjLAo+Pgo+PiBJJ3ZlIGJlZW4g
-dHJ5aW5nIHRvIGdldCBteSBoZWFkIGFyb3VuZCB3aGF0IHRoZSBhcmNoaXRlY3R1cmUgc2F5cyBh
-Ym91dCBDTU9zLCBzbwo+PiBwbGVhc2UgYmFyZSB3aXRoIG1lIGlmIEkgbWlzdW5kZXJzdG9vZCBz
-b21lIHRoaW5ncy4KPgo+IE5vIHdvcnJpZXMuIEkndmUgaGFkIHRoaXMgcGF0Y2ggZm9yIGEgZmV3
-IHdlZWtzIG5vdywgYW5kIGNhbid0Cj4gbWFrZSB1cCBteSBtaW5kIGFib3V0IGl0LiBJdCBkb2Vz
-IGFkZHJlc3MgYW4gYWN0dWFsIGlzc3VlIHRob3VnaCwKPiBzbyBJIGNvdWxkbid0IGp1c3QgZGlz
-Y2FyZCBpdC4uLiA7LSkKPgo+PiBPbiAyLzExLzIxIDI6MjcgUE0sIE1hcmMgWnluZ2llciB3cm90
-ZToKPj4+IEl0IGFwcGVhcnMgdGhhdCB3aGVuIGEgZ3Vlc3QgdHJhcHMgaW50byBLVk0gYmVjYXVz
-ZSBpdCBpcwo+Pj4gcGVyZm9ybWluZyBhIENNTyBvbiBhIFJlYWQgT25seSBtZW1zbG90LCBvdXIg
-aGFuZGxpbmcgb2YKPj4+IHRoaXMgb3BlcmF0aW9uIGlzICJzbGlnaHRseSBzdWJvcHRpbWFsIiwg
-YXMgd2UgdHJlYXQgaXQgYXMKPj4+IGFuIE1NSU8gYWNjZXNzIHdpdGhvdXQgYSB2YWxpZCBzeW5k
-cm9tZS4KPj4+Cj4+PiBUaGUgY2hhbmNlcyB0aGF0IHVzZXJzcGFjZSBpcyBhZGVxdWF0ZWx5IGVx
-dWlwZWQgdG8gZGVhbAo+Pj4gd2l0aCBzdWNoIGFuIGV4Y2VwdGlvbiBiZWluZyBzbGltLCBpdCB3
-b3VsZCBiZSBiZXR0ZXIgdG8KPj4+IGhhbmRsZSBpdCBpbiB0aGUga2VybmVsLgo+Pj4KPj4+IFdo
-YXQgd2UgbmVlZCB0byBwcm92aWRlIGlzIHJvdWdobHkgYXMgZm9sbG93czoKPj4+Cj4+PiAoYSkg
-aWYgYSBDTU8gaGl0cyB3cml0ZWFibGUgbWVtb3J5LCBoYW5kbGUgaXQgYXMgYSBub3JtYWwgbWVt
-b3J5IGFjZXNzCj4+PiAoYikgaWYgYSBDTU8gaGl0cyBub24tbWVtb3J5LCBza2lwIGl0Cj4+PiAo
-YykgaWYgYSBDTU8gaGl0cyBSL08gbWVtb3J5LCB0aGF0J3Mgd2hlcmUgdGhpbmdzIGJlY29tZSBm
-dW46Cj4+PiDCoCAoMSkgaWYgdGhlIENNTyBpcyBEQyBJVkFDLCB0aGUgYXJjaGl0ZWN0dXJlIHNh
-eXMgdGhpcyBzaG91bGQgcmVzdWx0Cj4+PiDCoMKgwqDCoMKgIGluIGEgcGVybWlzc2lvbiBmYXVs
-dAoKRm9yIEtWTSB0byBnZXQgYSBzdGFnZSAyIGZhdWx0LCB0aGUgSVBBIG11c3QgYWxyZWFkeSBi
-ZSBtYXBwZWQgYXMgd3JpdGFibGUgaW4gdGhlCmd1ZXN0J3Mgc3RhZ2UgMSB0YWJsZXMuIElmIEkg
-cmVhZCB0aGF0IHJpZ2h0IGFuZCB5b3UgYXJlIHN1Z2dlc3RpbmcgdGhhdCB0aGUgZ3Vlc3QKc2hv
-dWxkIGdldCBhIHBlcm1pc3Npb24gZmF1bHQsIEkgZG9uJ3QgdGhpbmsgdGhhdCdzIGNvcnJlY3Qg
-ZnJvbSB0aGUgZ3Vlc3Qncwp2aWV3cG9pbnQuCgo+Pj4KPj4+IMKgICgyKSBpZiB0aGUgQ01PIGlz
-IERDIENJVkFDLCBpdCBzaG91bGQgd29yayBzaW1pbGFybHkgdG8gKGEpCj4+Cj4+IFdoZW4geW91
-IHNheSBpdCBzaG91bGQgd29yayBzaW1pbGFybHkgdG8gKGEpLCB5b3UgbWVhbiBpdCBzaG91bGQg
-YmUgaGFuZGxlZCBhcyBhCj4+IG5vcm1hbCBtZW1vcnkgYWNjZXNzLCB3aXRob3V0IHRoZSAiQ01P
-IGhpdHMgd3JpdGVhYmxlIG1lbW9yeSIgcGFydCwgcmlnaHQ/Cj4KPiBXaGF0IEkgbWVhbiBpcyB0
-aGF0IHRoZSBjYWNoZSBpbnZhbGlkYXRpb24gc2hvdWxkIHRha2UgcGxhY2UsCj4gcHJlZmVyYWJs
-eSB3aXRob3V0IGludm9sdmluZyBLVk0gYXQgYWxsIChvdGhlciB0aGFuIHBvcHVsYXRpbmcKPiBT
-MiBpZiByZXF1aXJlZCkuCj4KPj4KPj4+Cj4+PiBXZSBhbHJlYWR5IHBlcmZvcm0gKGEpIGFuZCAo
-YikgY29ycmVjdGx5LCBidXQgKGMpIGlzIGEgdG90YWwgbWVzcy4KPj4+IEhlbmNlIHdlIG5lZWQg
-dG8gZGlzdGluZ3Vpc2ggYmV0d2VlbiBJVkFDIChjLjEpIGFuZCBDSVZBQyAoYy4yKS4KPj4+Cj4+
-PiBPbmUgd2F5IHRvIGRvIGl0IGlzIHRvIHRyZWF0IENNT3MgZ2VuZXJhdGluZyBhIHRyYW5zbGF0
-aW9uIGZhdWx0IGFzCj4+PiBhICpyZWFkKiwgZXZlbiB3aGVuIHRoZXkgYXJlIG9uIGEgUlcgbWVt
-c2xvdC4gVGhpcyBhbGxvd3MgdXMgdG8KPj4+IGZ1cnRoZXIgdHJpYWdlIHRoaW5nczoKPj4+Cj4+
-PiBJZiB0aGV5IGNvbWUgYmFjayB3aXRoIGEgcGVybWlzc2lvbiBmYXVsdCwgdGhhdCBpcyBiZWNh
-dXNlIHRoaXMgaXMKPj4+IGEgREMgSVZBQyBpbnN0cnVjdGlvbjoKPj4+IC0gaW5zaWRlIGEgUlcg
-bWVtc2xvdDogbm8gcHJvYmxlbSwgdHJlYXQgaXQgYXMgYSB3cml0ZSAoYSkoYy4yKQo+Pj4gLSBp
-bnNpZGUgYSBSTyBtZW1zbG90OiBpbmplY3QgYSBkYXRhIGFib3J0IGluIHRoZSBndWVzdCAoYy4x
-KQo+Pj4KPj4+IFRoZSBvbmx5IGRyYXdiYWNrIGlzIHRoYXQgREMgSVZBQyBvbiBhIHlldCB1bm1h
-cHBlZCBwYWdlIGZhdWx0cwo+Pj4gdHdpY2U6IG9uZSBmb3IgdGhlIGluaXRpYWwgdHJhbnNsYXRp
-b24gZmF1bHQgdGhhdCByZXN1bHQgaW4gYSBSTwo+Pj4gbWFwcGluZywgYW5kIG9uY2UgZm9yIHRo
-ZSBwZXJtaXNzaW9uIGZhdWx0LiBJIHRoaW5rIHdlIGNhbiBsaXZlIHdpdGgKPj4+IHRoYXQuCj4+
-Cj4+IEknbSB0cnlpbmcgdG8gbWFrZSBzdXJlIEkgdW5kZXJzdGFuZCB3aGF0IHRoZSBwcm9ibGVt
-IGlzLgo+Pgo+PiBnZm5fdG9fcGZuX3Byb3QoKSByZXR1cm5zS1ZNX0hWQV9FUlJfUk9fQkFEIGlm
-IHRoZSB3cml0ZSBpcyB0byBhIFJPIG1lbXNsb3QuCj4+IEtWTV9IVkFfRVJSX1JPX0JBRCBpcyBQ
-QUdFX09GRlNFVCArIFBBR0VfU0laRSwgd2hpY2ggbWVhbnMgdGhhdAo+PiBpc19lcnJvcl9ub3Ns
-b3RfcGZuKCkgcmV0dXJuIHRydWUuIEluIHRoYXQgY2FzZSB3ZSBleGl0IHRvIHVzZXJzcGFjZQo+
-PiB3aXRoIC1FRkFVTFQKPj4gZm9yIERDIElWQUMgYW5kIERDIENJVkFDLiBCdXQgd2hhdCB3ZSBz
-aG91bGQgYmUgZG9pbmcgaXMgdGhpczoKPj4KPj4gLSBGb3IgREMgSVZBQywgaW5qZWN0IGEgZGFi
-dCB3aXRoIElTUyA9IDB4MTAsIG1lYW5pbmcgYW4gZXh0ZXJuYWwgYWJvcnQgKHRoYXQncwo+PiB3
-aGF0IGt2bV9pbmplY3RfZGFidF9kb2VzKCkpLgo+Pgo+PiAtIEZvciBEQyBDSVZBQywgZXhpdCB0
-byB1c2Vyc3BhY2Ugd2l0aCAtRUZBVUxULgo+Pgo+PiBEaWQgSSBnZXQgdGhhdCByaWdodD8KPgo+
-IE5vdCBxdWl0ZS4gV2hhdCBJICp0aGluayogd2Ugc2hvdWxkIGRvIGlzOgo+Cj4gLSBEQyBDSVZB
-QyBzaG91bGQganVzdCB3b3JrLCB3aXRob3V0IGdvaW5nIHRvIHVzZXJzcGFjZS4gSSBjYW4ndCBp
-bWFnaW5lCj4gwqAgYSByZWFzb24gd2h5IHdlJ2QgaW52b2x2ZSB1c2Vyc3BhY2UgZm9yIHRoaXMs
-IGFuZCB3ZSBjdXJyZW50bHkgZG9uJ3QKPiDCoCByZWFsbHkgaGF2ZSBhIGdvb2Qgd2F5IHRvIGRl
-c2NyaWJlIHRoaXMgdG8gdXNlcnNwYWNlLgo+Cj4gLSBEQyBJVkFDIGlzIG1vcmUgbnVhbmNlZDog
-d2UgY291bGQgZWl0aGVyIGluamVjdCBhbiBleGNlcHRpb24gKHdoaWNoCj4gwqAgaXMgd2hhdCB0
-aGlzIHBhdGNoIGRvZXMpLCBvciBwZXJmb3JtIHRoZSBDTU8gb3Vyc2VsdmVzIGFzIGEgREMgQ0lW
-QUMKPiDCoCAoY29uc2lzdGVudCB3aXRoIHRoZSBJVkEtPkNJVkEgdXBncmFkZSBjYXVzZWQgYnkg
-aGF2aW5nIGEgUzIgdHJhbnNsYXRpb24pLgo+IMKgIFRoaXMgc2Vjb25kIGFwcHJvYWNoIGlzIGNv
-bXBhcmFibGUgdG8gd2hhdCB3ZSBkbyB3aGVuIHRoZSBndWVzdAo+IMKgIGlzc3VlcyBhIENNTyBv
-biBhbiBlbXVsYXRlZCBNTUlPIGFkZHJlc3MgKHdlIGRvbid0IGluamVjdCBhIGZhdWx0KS4KCkhl
-cmUgYXJlIG15IHRob3VnaHRzIGFib3V0IHRoaXMuCgpUaGVyZSBpcyBub3RoaW5nIHRoYXQgdXNl
-cnNwYWNlIGNhbiBkbyByZWdhcmRpbmcgdGhlIENNTyBvcGVyYXRpb25zLCBzbyBJIGFncmVlCnRo
-YXQgd2Ugc2hvdWxkIGhhbmRsZSB0aGlzIGluIHRoZSBrZXJuZWwuCgpJZiB0aGVyZSBpcyBubyBt
-ZW1zbG90IGFzc29jaWF0ZWQgd2l0aCB0aGUgZmF1bHRpbmcgSVBBLCB0aGVuIEkgZG9uJ3QgdGhp
-bmsgd2UgY2FuCmRvIHRoZSBDTU8gYmVjYXVzZSB0aGVyZSBpcyBubyBQQSBhc3NvY2lhdGVkIHdp
-dGggdGhlIElQQS4KCkFzc3VtaW5nIHRoZSBtZW1zbG90IGFzc29jaWF0ZWQgd2l0aCB0aGUgZmF1
-bHQgSVBBIGlzIHJlYWRvbmx5OgoKV3JpdGVzIGNvbWluZyBmcm9tIHRoZSBndWVzdCBhcmUgZW11
-bGF0ZWQsIHNvIHdoYXRldmVyIHRoZSBndWVzdCB3cml0ZXMgd2lsbCBuZXZlcgpiZSBpbiBhIGRp
-cnR5IGNhY2hlIGxpbmUuIENsZWFuaW5nIHRoYXQgYWRkcmVzcyB3b3VsZCBtYXRjaCB3aGF0IEtW
-TV9NRU1fUkVBRE9OTFkKQVBJIGd1YXJhbnRlZXM6ICJbLi5dIEluIHRoaXMgY2FzZSwgd3JpdGVz
-IHRvIHRoaXMgbWVtb3J5IHdpbGwgYmUgcG9zdGVkIHRvCnVzZXJzcGFjZSBhcyBLVk1fRVhJVF9N
-TUlPIGV4aXRzLiIgTm8gZGlydHkgY2FjaGUgbGluZSAoZnJvbSB0aGUgZ3Vlc3QncyBwb2ludCBv
-Zgp2aWV3KSwgbm90aGluZyB3cml0dGVuIHRvIG1lbW9yeS4KClRoZSBjYWNoZSBsaW5lIG1pZ2h0
-IGJlIGRpcnR5IGZvciB0d28gcmVhc29uczoKCi0gVGhpcyBpcyB0aGUgZmlyc3QgdGltZSB0aGUg
-Z3Vlc3QgYWNjZXNzZXMgdGhhdCBtZW1vcnkgbG9jYXRpb24uIE5vIG5lZWQgdG8gZG8KYW55dGhp
-bmcgKG5laXRoZXIgY2xlYW5pbmcsIG5vciBtYXBwaW5nwqAgYXQgc3RhZ2UgMiksIGJlY2F1c2Ug
-dGhlIHN1YnNlcXVlbnQgcmVhZApmcm9tIHRoZSBndWVzdCB3aWxsIG1hcCBpdCBhdCBzdGFnZSAy
-LCBhbmQgdGhhdCB3aWxsIHRyaWdnZXIgdGhlIGRjYWNoZSBjbGVhbmluZwppbiB1c2VyX21lbV9h
-Ym9ydCgpLgoKLSBVc2Vyc3BhY2Ugd3JvdGUgdG8gdGhlIHBoeXNpY2FsIGFkZHJlc3MgYXMgcGFy
-dCBvZiBkZXZpY2UgZW11bGF0aW9uLiBJdCBpcwplbnRpcmVseSByZWFzb25hYmxlIGZvciBob3N0
-IHVzZXJzcGFjZSB0byBhc3N1bWUgdGhhdCB0aGUgUk8gbWVtc2xvdCBpcyBtYXBwZWQgYXMKZGV2
-aWNlIG1lbW9yeSBieSB0aGUgZ3Vlc3QsIHdoaWNoIG1lYW5zIHRoYXQgdGhlIGd1ZXN0IHJlYWRz
-IGZyb20gbWFpbiBtZW1vcnksCndoaWxlIGhvc3QgdXNlcnNwYWNlIHdyaXRlcyB0byBjYWNoZSAo
-YXNzdW1pbmcgbm8gRldCKS4gSW4gdGhpcyBjYXNlLCBJIHRoaW5rIGl0J3MKdGhlIGhvc3QgdXNl
-cnNwYWNlJ3MgZHV0eSB0byBkbyB0aGUgZGNhY2hlIGNsZWFuaW5nLgoKQmVjYXVzZSBvZiB0aGUg
-dHdvIHJlYXNvbnMgYWJvdmUsIEkgdGhpbmsgY2xlYW5pbmcgdGhlIGRjYWNoZSB3aWxsIGhhdmUg
-bm8gZWZmZWN0CmZyb20gYSBjb3JyZWN0bmVzcyBwZXJzcGVjdGl2ZS4KCkFzIGZvciBpbnZhbGlk
-YXRpbmcgdGhlIGNhY2hlIGxpbmUsIGJlc2lkZSB0aGUgdHdvIHNjZW5hcmlvcyBhYm92ZSwgYSBj
-bGVhbiBjYWNoZQpsaW5lIGNvdWxkIGhhdmUgYmVlbiBhbGxvY2F0ZWQgYnkgYSByZWFkLCBkb25l
-IGVpdGhlciBieSB0aGUgZ3Vlc3QgKGlmIGl0IG1hcHBlZAp0aGUgSVBBIGFzIE5vcm1hbCBjYWNo
-ZWFibGUpIG9yIGJ5IHRoZSBob3N0IChDUFUgc3BlY3VsYXRpbmcgbG9hZHMgb3IKdXNlcnNwYWNl
-L2tlcm5lbCByZWFkaW5nIGZyb20gdGhlIGFkZHJlc3MpLiBJIHRoaW5rIGludmFsaWRhdGluZywg
-anVzdCBsaWtlCmNsZWFuaW5nLCB3b3VsZCBoYXZlIG5vIGVmZmVjdCBvbiB0aGUgY29ycmVjdG5l
-c3Mgb2YgdGhlIGVtdWxhdGlvbi4KCk15IG9waW5pb24gaXMgdGhhdCB3ZSBzaG91bGQgc2ltcGx5
-IHNraXAgQ01PcyBvbiByZWFkLW9ubHkgbWVtc2xvdC4KCldoYXQgZG8geW91IHRoaW5rPwoKVGhh
-bmtzLApBbGV4Cj4gVGhhbmtzLAo+Cj4gwqDCoMKgwqDCoMKgwqAgTS4KX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1h
-cm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21h
-aWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+Hi Andre,
+
+Patch looks good, nitpicks below.
+
+On 12/10/20 2:29 PM, Andre Przywara wrote:
+> With the planned retirement of the special ioport emulation code, we
+> need to provide an emulation function compatible with the MMIO prototype.
+>
+> Adjust the trap handler to use that new function, and provide shims to
+> implement the old ioport interface, for now.
+>
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+>  hw/serial.c | 97 +++++++++++++++++++++++++++++++++++------------------
+>  1 file changed, 65 insertions(+), 32 deletions(-)
+>
+> diff --git a/hw/serial.c b/hw/serial.c
+> index b0465d99..2907089c 100644
+> --- a/hw/serial.c
+> +++ b/hw/serial.c
+> @@ -242,36 +242,31 @@ void serial8250__inject_sysrq(struct kvm *kvm, char sysrq)
+>  	sysrq_pending = sysrq;
+>  }
+>  
+> -static bool serial8250_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port,
+> -			   void *data, int size)
+> +static bool serial8250_out(struct serial8250_device *dev, struct kvm_cpu *vcpu,
+> +			   u16 offset, u8 data)
+>  {
+> -	struct serial8250_device *dev = ioport->priv;
+> -	u16 offset;
+>  	bool ret = true;
+> -	char *addr = data;
+>  
+>  	mutex_lock(&dev->mutex);
+>  
+> -	offset = port - dev->iobase;
+> -
+>  	switch (offset) {
+>  	case UART_TX:
+>  		if (dev->lcr & UART_LCR_DLAB) {
+> -			dev->dll = ioport__read8(data);
+> +			dev->dll = data;
+>  			break;
+>  		}
+>  
+>  		/* Loopback mode */
+>  		if (dev->mcr & UART_MCR_LOOP) {
+>  			if (dev->rxcnt < FIFO_LEN) {
+> -				dev->rxbuf[dev->rxcnt++] = *addr;
+> +				dev->rxbuf[dev->rxcnt++] = data;
+>  				dev->lsr |= UART_LSR_DR;
+>  			}
+>  			break;
+>  		}
+>  
+>  		if (dev->txcnt < FIFO_LEN) {
+> -			dev->txbuf[dev->txcnt++] = *addr;
+> +			dev->txbuf[dev->txcnt++] = data;
+>  			dev->lsr &= ~UART_LSR_TEMT;
+>  			if (dev->txcnt == FIFO_LEN / 2)
+>  				dev->lsr &= ~UART_LSR_THRE;
+> @@ -283,18 +278,18 @@ static bool serial8250_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port
+>  		break;
+>  	case UART_IER:
+>  		if (!(dev->lcr & UART_LCR_DLAB))
+> -			dev->ier = ioport__read8(data) & 0x0f;
+> +			dev->ier = data & 0x0f;
+>  		else
+> -			dev->dlm = ioport__read8(data);
+> +			dev->dlm = data;
+>  		break;
+>  	case UART_FCR:
+> -		dev->fcr = ioport__read8(data);
+> +		dev->fcr = data;
+>  		break;
+>  	case UART_LCR:
+> -		dev->lcr = ioport__read8(data);
+> +		dev->lcr = data;
+>  		break;
+>  	case UART_MCR:
+> -		dev->mcr = ioport__read8(data);
+> +		dev->mcr = data;
+>  		break;
+>  	case UART_LSR:
+>  		/* Factory test */
+> @@ -303,7 +298,7 @@ static bool serial8250_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port
+>  		/* Not used */
+>  		break;
+>  	case UART_SCR:
+> -		dev->scr = ioport__read8(data);
+> +		dev->scr = data;
+>  		break;
+>  	default:
+>  		ret = false;
+> @@ -336,46 +331,43 @@ static void serial8250_rx(struct serial8250_device *dev, void *data)
+>  	}
+>  }
+>  
+> -static bool serial8250_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
+> +static bool serial8250_in(struct serial8250_device *dev, struct kvm_cpu *vcpu,
+> +			  u16 offset, u8 *data)
+>  {
+> -	struct serial8250_device *dev = ioport->priv;
+> -	u16 offset;
+>  	bool ret = true;
+>  
+>  	mutex_lock(&dev->mutex);
+>  
+> -	offset = port - dev->iobase;
+> -
+>  	switch (offset) {
+>  	case UART_RX:
+>  		if (dev->lcr & UART_LCR_DLAB)
+> -			ioport__write8(data, dev->dll);
+> +			*data = dev->dll;
+>  		else
+>  			serial8250_rx(dev, data);
+>  		break;
+>  	case UART_IER:
+>  		if (dev->lcr & UART_LCR_DLAB)
+> -			ioport__write8(data, dev->dlm);
+> +			*data = dev->dlm;
+>  		else
+> -			ioport__write8(data, dev->ier);
+> +			*data = dev->ier;
+>  		break;
+>  	case UART_IIR:
+> -		ioport__write8(data, dev->iir | UART_IIR_TYPE_BITS);
+> +		*data = dev->iir | UART_IIR_TYPE_BITS;
+>  		break;
+>  	case UART_LCR:
+> -		ioport__write8(data, dev->lcr);
+> +		*data = dev->lcr;
+>  		break;
+>  	case UART_MCR:
+> -		ioport__write8(data, dev->mcr);
+> +		*data = dev->mcr;
+>  		break;
+>  	case UART_LSR:
+> -		ioport__write8(data, dev->lsr);
+> +		*data = dev->lsr;
+>  		break;
+>  	case UART_MSR:
+> -		ioport__write8(data, dev->msr);
+> +		*data = dev->msr;
+>  		break;
+>  	case UART_SCR:
+> -		ioport__write8(data, dev->scr);
+> +		*data = dev->scr;
+>  		break;
+>  	default:
+>  		ret = false;
+> @@ -389,6 +381,47 @@ static bool serial8250_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port,
+>  	return ret;
+>  }
+>  
+> +static void serial8250_mmio(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len,
+> +			    u8 is_write, void *ptr)
+> +{
+> +	struct serial8250_device *dev = ptr;
+> +	u8 value = 0;
+> +
+> +	if (is_write) {
+> +		 value = *data;
+
+Extra space before value.
+
+> +
+> +		serial8250_out(dev, vcpu, addr - dev->iobase, value);
+> +	} else {
+> +		if (serial8250_in(dev, vcpu, addr - dev->iobase, &value))
+> +			*data = value;
+> +	}
+> +}
+> +
+> +static bool serial8250_ioport_out(struct ioport *ioport, struct kvm_cpu *vcpu,
+> +				  u16 port, void *data, int size)
+> +{
+> +	struct serial8250_device *dev = ioport->priv;
+> +	u8 value = ioport__read8(data);
+> +
+> +	serial8250_mmio(vcpu, port, &value, 1, true, dev);
+> +
+> +	return true;
+> +}
+> +
+> +static bool serial8250_ioport_in(struct ioport *ioport, struct kvm_cpu *vcpu,
+> +				 u16 port, void *data, int size)
+> +{
+> +	struct serial8250_device *dev = ioport->priv;
+> +	u8 value = 0;
+> +
+> +
+> +	serial8250_mmio(vcpu, port, &value, 1, false, dev);
+> +
+> +	ioport__write8(data, value);
+
+This is correct, but confusing. You pass the address of a local variable as *data
+to serial8250_mmio, serial8250_mmio conditionally updates the value at data (which
+is &value from here), and then here we update the *data unconditionally. Why not
+pass data directly to serial8250_mmio and skip the local variable? Am I missing
+something?
+
+Thanks,
+
+Alex
+
+> +
+> +	return true;
+> +}
+> +
+>  #ifdef CONFIG_HAS_LIBFDT
+>  
+>  char *fdt_stdout_path = NULL;
+> @@ -427,8 +460,8 @@ void serial8250_generate_fdt_node(void *fdt, struct device_header *dev_hdr,
+>  #endif
+>  
+>  static struct ioport_operations serial8250_ops = {
+> -	.io_in			= serial8250_in,
+> -	.io_out			= serial8250_out,
+> +	.io_in			= serial8250_ioport_in,
+> +	.io_out			= serial8250_ioport_out,
+>  };
+>  
+>  static int serial8250__device_init(struct kvm *kvm,
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
