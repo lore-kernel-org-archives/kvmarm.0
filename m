@@ -2,68 +2,61 @@ Return-Path: <SRS0=5K0R=HU=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60A7FC433DB
-	for <kvmarm@archiver.kernel.org>; Thu, 18 Feb 2021 08:44:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F219EC433DB
+	for <kvmarm@archiver.kernel.org>; Thu, 18 Feb 2021 10:35:28 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9B3C764E68
-	for <kvmarm@archiver.kernel.org>; Thu, 18 Feb 2021 08:44:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B3C764E68
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 3BD5764E4B
+	for <kvmarm@archiver.kernel.org>; Thu, 18 Feb 2021 10:35:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BD5764E4B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EC99A4B276;
-	Thu, 18 Feb 2021 03:44:07 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A6F2A4B3C7;
+	Thu, 18 Feb 2021 05:35:27 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id sUQiUC7kzyhg; Thu, 18 Feb 2021 03:44:06 -0500 (EST)
+	with ESMTP id y4Lb2TeAATf7; Thu, 18 Feb 2021 05:35:26 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CE8164B280;
-	Thu, 18 Feb 2021 03:44:06 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 76B874B3CC;
+	Thu, 18 Feb 2021 05:35:26 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A29414B26E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Feb 2021 03:44:05 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2868F4B397
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Feb 2021 05:35:26 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CZh+XkMxoL4J for <kvmarm@lists.cs.columbia.edu>;
- Thu, 18 Feb 2021 03:44:02 -0500 (EST)
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CC22F4B276
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Feb 2021 03:43:57 -0500 (EST)
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.60])
- by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Dh7WF1DQPzjMg3;
- Thu, 18 Feb 2021 16:42:33 +0800 (CST)
-Received: from [10.174.184.42] (10.174.184.42) by
- DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
- 14.3.498.0; Thu, 18 Feb 2021 16:43:44 +0800
-Subject: Re: [PATCH v13 02/15] iommu: Introduce bind/unbind_guest_msi
-To: Auger Eric <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
- <iommu@lists.linux-foundation.org>, <linux-kernel@vger.kernel.org>,
- <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>, <will@kernel.org>,
- <joro@8bytes.org>, <maz@kernel.org>, <robin.murphy@arm.com>,
- <alex.williamson@redhat.com>
-References: <20201118112151.25412-1-eric.auger@redhat.com>
- <20201118112151.25412-3-eric.auger@redhat.com>
- <6a70d93d-329f-4129-bd90-03f8589c5de4@huawei.com>
- <1ef4f5ae-9ca6-7c6d-f8a9-31240e5688c2@redhat.com>
-From: Keqian Zhu <zhukeqian1@huawei.com>
-Message-ID: <bc7b223e-7c30-9baa-85e3-2195e03dfe48@huawei.com>
-Date: Thu, 18 Feb 2021 16:43:43 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+ with ESMTP id KD8HifhRPjUz for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 18 Feb 2021 05:35:24 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C97424B38E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Feb 2021 05:35:24 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 42CAFED1;
+ Thu, 18 Feb 2021 02:35:24 -0800 (PST)
+Received: from slackpad.fritz.box (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0B9D03F73B;
+ Thu, 18 Feb 2021 02:35:22 -0800 (PST)
+Date: Thu, 18 Feb 2021 10:34:25 +0000
+From: Andre Przywara <andre.przywara@arm.com>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH kvmtool 06/21] hw/i8042: Refactor trap handler
+Message-ID: <20210218103425.26a27000@slackpad.fritz.box>
+In-Reply-To: <288df0e8-997c-7691-2dda-017876dba3f4@arm.com>
+References: <20201210142908.169597-1-andre.przywara@arm.com>
+ <20201210142908.169597-7-andre.przywara@arm.com>
+ <288df0e8-997c-7691-2dda-017876dba3f4@arm.com>
+Organization: Arm Ltd.
+X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <1ef4f5ae-9ca6-7c6d-f8a9-31240e5688c2@redhat.com>
-X-Originating-IP: [10.174.184.42]
-X-CFilter-Loop: Reflected
-Cc: jean-philippe@linaro.org, jacob.jun.pan@linux.intel.com,
- nicoleotsuka@gmail.com, vivek.gautam@arm.com, yi.l.liu@intel.com,
- zhangfei.gao@linaro.org
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -80,113 +73,144 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Eric,
+On Thu, 11 Feb 2021 17:23:13 +0000
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 
-On 2021/2/12 16:55, Auger Eric wrote:
-> Hi Keqian,
+> Hi Andre,
 > 
-> On 2/1/21 12:52 PM, Keqian Zhu wrote:
->> Hi Eric,
->>
->> On 2020/11/18 19:21, Eric Auger wrote:
->>> On ARM, MSI are translated by the SMMU. An IOVA is allocated
->>> for each MSI doorbell. If both the host and the guest are exposed
->>> with SMMUs, we end up with 2 different IOVAs allocated by each.
->>> guest allocates an IOVA (gIOVA) to map onto the guest MSI
->>> doorbell (gDB). The Host allocates another IOVA (hIOVA) to map
->>> onto the physical doorbell (hDB).
->>>
->>> So we end up with 2 untied mappings:
->>>          S1            S2
->>> gIOVA    ->    gDB
->>>               hIOVA    ->    hDB
->>>
->>> Currently the PCI device is programmed by the host with hIOVA
->>> as MSI doorbell. So this does not work.
->>>
->>> This patch introduces an API to pass gIOVA/gDB to the host so
->>> that gIOVA can be reused by the host instead of re-allocating
->>> a new IOVA. So the goal is to create the following nested mapping:
->> Does the gDB can be reused under non-nested mode?
+> On 12/10/20 2:28 PM, Andre Przywara wrote:
+> > With the planned retirement of the special ioport emulation code, we
+> > need to provide an emulation function compatible with the MMIO
+> > prototype.
+> >
+> > Adjust the trap handler to use that new function, and provide shims to
+> > implement the old ioport interface, for now.
+> >
+> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> > ---
+> >  hw/i8042.c | 68 +++++++++++++++++++++++++++---------------------------
+> >  1 file changed, 34 insertions(+), 34 deletions(-)
+> >
+> > diff --git a/hw/i8042.c b/hw/i8042.c
+> > index 36ee183f..eb1f9d28 100644
+> > --- a/hw/i8042.c
+> > +++ b/hw/i8042.c
+> > @@ -292,52 +292,52 @@ static void kbd_reset(void)
+> >  	};
+> >  }
+> >  
+> > -/*
+> > - * Called when the OS has written to one of the keyboard's ports (0x60 or 0x64)
+> > - */
+> > -static bool kbd_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
+> > +static void kbd_io(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len,
+> > +		   u8 is_write, void *ptr)
+> >  {
+> > -	switch (port) {
+> > -	case I8042_COMMAND_REG: {
+> > -		u8 value = kbd_read_status();
+> > -		ioport__write8(data, value);
+> > +	u8 value;
+> > +
+> > +	if (is_write)
+> > +		value = ioport__read8(data);
+> > +
+> > +	switch (addr) {
+> > +	case I8042_COMMAND_REG:
+> > +		if (is_write)
+> > +			kbd_write_command(vcpu->kvm, value);
+> > +		else
+> > +			value = kbd_read_status();
+> >  		break;
+> > -	}
+> > -	case I8042_DATA_REG: {
+> > -		u8 value = kbd_read_data();
+> > -		ioport__write8(data, value);
+> > +	case I8042_DATA_REG:
+> > +		if (is_write)
+> > +			kbd_write_data(value);
+> > +		else
+> > +			value = kbd_read_data();
+> >  		break;
+> > -	}
+> > -	case I8042_PORT_B_REG: {
+> > -		ioport__write8(data, 0x20);
+> > +	case I8042_PORT_B_REG:
+> > +		if (!is_write)
+> > +			value = 0x20;
+> >  		break;
+> > -	}
+> >  	default:
+> > -		return false;
+> > +		return;  
 > 
-> Under non nested mode the hIOVA is allocated within the MSI reserved
-> region exposed by the SMMU driver, [0x8000000, 80fffff]. see
-> iommu_dma_prepare_msi/iommu_dma_get_msi_page in dma_iommu.c. this hIOVA
-> is programmed in the physical device so that the physical SMMU
-> translates it into the physical doorbell (hDB = host physical ITS
-So, AFAIU, under non-nested mode, at smmu side, we reuse the workflow of non-virtualization scenario.
+> Any particular reason for removing the false return value? I don't see it
+> mentioned in the commit message. Otherwise this is identical to the two functions
+> it replaces.
 
-> doorbell). The gDB is not used at pIOMMU programming level. It is only
-> used when setting up the KVM irq route.
-> 
-> Hope this answers your question.
-Thanks for your explanation!
-> 
+Because the MMIO handler prototype is void, in contrast to the PIO one.
+Since on returning "false" we only seem to panic kvmtool, this is of
+quite limited use, I'd say.
 
-Thanks,
-Keqian
+> >  	}
+> >  
+> > +	if (!is_write)
+> > +		ioport__write8(data, value);
+> > +}
+> > +
+> > +/*
+> > + * Called when the OS has written to one of the keyboard's ports (0x60 or 0x64)
+> > + */
+> > +static bool kbd_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
+> > +{
+> > +	kbd_io(vcpu, port, data, size, false, NULL);  
+> 
+> is_write is an u8, not a bool.
 
->>
->>>
->>>          S1            S2
->>> gIOVA    ->    gDB     ->    hDB
->>>
->>> and program the PCI device with gIOVA MSI doorbell.
->>>
->>> In case we have several devices attached to this nested domain
->>> (devices belonging to the same group), they cannot be isolated
->>> on guest side either. So they should also end up in the same domain
->>> on guest side. We will enforce that all the devices attached to
->>> the host iommu domain use the same physical doorbell and similarly
->>> a single virtual doorbell mapping gets registered (1 single
->>> virtual doorbell is used on guest as well).
->>>
->> [...]
->>
->>> + *
->>> + * The associated IOVA can be reused by the host to create a nested
->>> + * stage2 binding mapping translating into the physical doorbell used
->>> + * by the devices attached to the domain.
->>> + *
->>> + * All devices within the domain must share the same physical doorbell.
->>> + * A single MSI GIOVA/GPA mapping can be attached to an iommu_domain.
->>> + */
->>> +
->>> +int iommu_bind_guest_msi(struct iommu_domain *domain,
->>> +			 dma_addr_t giova, phys_addr_t gpa, size_t size)
->>> +{
->>> +	if (unlikely(!domain->ops->bind_guest_msi))
->>> +		return -ENODEV;
->>> +
->>> +	return domain->ops->bind_guest_msi(domain, giova, gpa, size);
->>> +}
->>> +EXPORT_SYMBOL_GPL(iommu_bind_guest_msi);
->>> +
->>> +void iommu_unbind_guest_msi(struct iommu_domain *domain,
->>> +			    dma_addr_t iova)
->> nit: s/iova/giova
-> sure
->>
->>> +{
->>> +	if (unlikely(!domain->ops->unbind_guest_msi))
->>> +		return;
->>> +
->>> +	domain->ops->unbind_guest_msi(domain, iova);
->>> +}
->>> +EXPORT_SYMBOL_GPL(iommu_unbind_guest_msi);
->>> +
->> [...]
->>
->> Thanks,
->> Keqian
->>
-> 
-> Thanks
-> 
-> Eric
-> 
-> .
-> 
+Right, will fix this.
+
+> I never could wrap my head around the ioport convention of "in" (read) and "out"
+> (write). To be honest, changing is_write changed to an enum so it's crystal clear
+> what is happening would help with that a lot, but I guess that's a separate patch.
+
+"in" and "out" are the x86 assembly mnemonics, but it's indeed
+confusing, because the device side has a different view (CPU "in" means
+pushing data "out" of the device). I usually look at the code to see
+what it's actually meant to do.
+So yeah, I feel like a lot of those device emulations could use
+some update. but that's indeed something for another day.
+
+Cheers,
+Andre
+
+> > +
+> >  	return true;
+> >  }
+> >  
+> >  static bool kbd_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
+> >  {
+> > -	switch (port) {
+> > -	case I8042_COMMAND_REG: {
+> > -		u8 value = ioport__read8(data);
+> > -		kbd_write_command(vcpu->kvm, value);
+> > -		break;
+> > -	}
+> > -	case I8042_DATA_REG: {
+> > -		u8 value = ioport__read8(data);
+> > -		kbd_write_data(value);
+> > -		break;
+> > -	}
+> > -	case I8042_PORT_B_REG: {
+> > -		break;
+> > -	}
+> > -	default:
+> > -		return false;
+> > -	}
+> > +	kbd_io(vcpu, port, data, size, true, NULL);
+> >  
+> >  	return true;
+> >  }  
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
