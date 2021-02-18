@@ -7,51 +7,51 @@ X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 900D6C433DB
-	for <kvmarm@archiver.kernel.org>; Thu, 18 Feb 2021 16:14:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C51BC433E0
+	for <kvmarm@archiver.kernel.org>; Thu, 18 Feb 2021 16:35:54 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D5AEE64EAD
-	for <kvmarm@archiver.kernel.org>; Thu, 18 Feb 2021 16:14:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5AEE64EAD
+	by mail.kernel.org (Postfix) with ESMTP id 954BE64EB2
+	for <kvmarm@archiver.kernel.org>; Thu, 18 Feb 2021 16:35:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 954BE64EB2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 34D2B4B3BD;
-	Thu, 18 Feb 2021 11:14:56 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EAD214B2F1;
+	Thu, 18 Feb 2021 11:35:52 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id EtZMFWcDrc5n; Thu, 18 Feb 2021 11:14:54 -0500 (EST)
+	with ESMTP id YldqmcE3nZrl; Thu, 18 Feb 2021 11:35:51 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D96614B2B0;
-	Thu, 18 Feb 2021 11:14:54 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C0EA4B326;
+	Thu, 18 Feb 2021 11:35:51 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 480AA4B26B
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Feb 2021 11:14:54 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CC3FF4B2F1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Feb 2021 11:35:49 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mTZy16ZYckXi for <kvmarm@lists.cs.columbia.edu>;
- Thu, 18 Feb 2021 11:14:52 -0500 (EST)
+ with ESMTP id 7v3tiPdwcp3G for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 18 Feb 2021 11:35:48 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B725F4B275
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Feb 2021 11:14:51 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 30F5C4B2AA
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Feb 2021 11:35:48 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 04EB8ED1;
- Thu, 18 Feb 2021 08:14:51 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 795A61042;
+ Thu, 18 Feb 2021 08:35:47 -0800 (PST)
 Received: from slackpad.fritz.box (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6E2793F73D;
- Thu, 18 Feb 2021 08:14:48 -0800 (PST)
-Date: Thu, 18 Feb 2021 16:13:49 +0000
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DD5C73F73D;
+ Thu, 18 Feb 2021 08:35:44 -0800 (PST)
+Date: Thu, 18 Feb 2021 16:34:46 +0000
 From: Andre Przywara <andre.przywara@arm.com>
 To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH kvmtool 17/21] virtio: Switch trap handling to use MMIO
- handler
-Message-ID: <20210218161349.632897c9@slackpad.fritz.box>
-In-Reply-To: <0c6e033e-4bc4-bc81-173f-c7c195ded78a@arm.com>
+Subject: Re: [PATCH kvmtool 19/21] Remove ioport specific routines
+Message-ID: <20210218163446.655df12f@slackpad.fritz.box>
+In-Reply-To: <389aa087-b079-cafb-b018-eab599e337ed@arm.com>
 References: <20201210142908.169597-1-andre.przywara@arm.com>
- <20201210142908.169597-18-andre.przywara@arm.com>
- <0c6e033e-4bc4-bc81-173f-c7c195ded78a@arm.com>
+ <20201210142908.169597-20-andre.przywara@arm.com>
+ <05a0df3a-625f-74de-8014-e78aee9e8427@arm.com>
+ <389aa087-b079-cafb-b018-eab599e337ed@arm.com>
 Organization: Arm Ltd.
 X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
 MIME-Version: 1.0
@@ -69,112 +69,316 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gVHVlLCAxNiBGZWIgMjAyMSAxNzowMzowNCArMDAwMApBbGV4YW5kcnUgRWxpc2VpIDxhbGV4
-YW5kcnUuZWxpc2VpQGFybS5jb20+IHdyb3RlOgoKPiBIaSBBbmRyZSwKPiAKPiBOaXRwaWNrIGJl
-bG93LCBvdGhlcndpc2UgbG9va3MgZ29vZC4KPiAKPiBPbiAxMi8xMC8yMCAyOjI5IFBNLCBBbmRy
-ZSBQcnp5d2FyYSB3cm90ZToKPiA+IFdpdGggdGhlIHBsYW5uZWQgcmV0aXJlbWVudCBvZiB0aGUg
-c3BlY2lhbCBpb3BvcnQgZW11bGF0aW9uIGNvZGUsIHdlCj4gPiBuZWVkIHRvIHByb3ZpZGUgYW4g
-ZW11bGF0aW9uIGZ1bmN0aW9uIGNvbXBhdGlibGUgd2l0aCB0aGUgTU1JTyBwcm90b3R5cGUuCj4g
-Pgo+ID4gQWRqdXN0IHRoZSBleGlzdGluZyBNTUlPIGNhbGxiYWNrIHJvdXRpbmUgdG8gYXV0b21h
-dGljYWxseSBkZXRlcm1pbmUKPiA+IHRoZSByZWdpb24gdGhpcyB0cmFwIGNhbWUgdGhyb3VnaCwg
-YW5kIGNhbGwgdGhlIGV4aXN0aW5nIEkvTyBoYW5kbGVycy4KPiA+IFJlZ2lzdGVyIHRoZSBpb3Bv
-cnQgcmVnaW9uIHVzaW5nIHRoZSBuZXcgcmVnaXN0cmF0aW9uIGZ1bmN0aW9uLgo+ID4KPiA+IFNp
-Z25lZC1vZmYtYnk6IEFuZHJlIFByenl3YXJhIDxhbmRyZS5wcnp5d2FyYUBhcm0uY29tPgo+ID4g
-LS0tCj4gPiAgdmlydGlvL3BjaS5jIHwgNDIgKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tCj4gPiAgMSBmaWxlIGNoYW5nZWQsIDEwIGluc2VydGlvbnMoKyksIDMyIGRl
-bGV0aW9ucygtKQo+ID4KPiA+IGRpZmYgLS1naXQgYS92aXJ0aW8vcGNpLmMgYi92aXJ0aW8vcGNp
-LmMKPiA+IGluZGV4IDZlZWE2YzY4Li40OWQzZjRkNSAxMDA2NDQKPiA+IC0tLSBhL3ZpcnRpby9w
-Y2kuYwo+ID4gKysrIGIvdmlydGlvL3BjaS5jCj4gPiBAQCAtMTc4LDE1ICsxNzgsNiBAQCBzdGF0
-aWMgYm9vbCB2aXJ0aW9fcGNpX19kYXRhX2luKHN0cnVjdCBrdm1fY3B1ICp2Y3B1LCBzdHJ1Y3Qg
-dmlydGlvX2RldmljZSAqdmRldgo+ID4gIAlyZXR1cm4gcmV0Owo+ID4gIH0KPiA+ICAKPiA+IC1z
-dGF0aWMgYm9vbCB2aXJ0aW9fcGNpX19pb19pbihzdHJ1Y3QgaW9wb3J0ICppb3BvcnQsIHN0cnVj
-dCBrdm1fY3B1ICp2Y3B1LCB1MTYgcG9ydCwgdm9pZCAqZGF0YSwgaW50IHNpemUpCj4gPiAtewo+
-ID4gLQlzdHJ1Y3QgdmlydGlvX2RldmljZSAqdmRldiA9IGlvcG9ydC0+cHJpdjsKPiA+IC0Jc3Ry
-dWN0IHZpcnRpb19wY2kgKnZwY2kgPSB2ZGV2LT52aXJ0aW87Cj4gPiAtCXVuc2lnbmVkIGxvbmcg
-b2Zmc2V0ID0gcG9ydCAtIHZpcnRpb19wY2lfX3BvcnRfYWRkcih2cGNpKTsKPiA+IC0KPiA+IC0J
-cmV0dXJuIHZpcnRpb19wY2lfX2RhdGFfaW4odmNwdSwgdmRldiwgb2Zmc2V0LCBkYXRhLCBzaXpl
-KTsKPiA+IC19Cj4gPiAtCj4gPiAgc3RhdGljIHZvaWQgdXBkYXRlX21zaXhfbWFwKHN0cnVjdCB2
-aXJ0aW9fcGNpICp2cGNpLAo+ID4gIAkJCSAgICBzdHJ1Y3QgbXNpeF90YWJsZSAqbXNpeF9lbnRy
-eSwgdTMyIHZlY251bSkKPiA+ICB7Cj4gPiBAQCAtMzM0LDIwICszMjUsNiBAQCBzdGF0aWMgYm9v
-bCB2aXJ0aW9fcGNpX19kYXRhX291dChzdHJ1Y3Qga3ZtX2NwdSAqdmNwdSwgc3RydWN0IHZpcnRp
-b19kZXZpY2UgKnZkZQo+ID4gIAlyZXR1cm4gcmV0Owo+ID4gIH0KPiA+ICAKPiA+IC1zdGF0aWMg
-Ym9vbCB2aXJ0aW9fcGNpX19pb19vdXQoc3RydWN0IGlvcG9ydCAqaW9wb3J0LCBzdHJ1Y3Qga3Zt
-X2NwdSAqdmNwdSwgdTE2IHBvcnQsIHZvaWQgKmRhdGEsIGludCBzaXplKQo+ID4gLXsKPiA+IC0J
-c3RydWN0IHZpcnRpb19kZXZpY2UgKnZkZXYgPSBpb3BvcnQtPnByaXY7Cj4gPiAtCXN0cnVjdCB2
-aXJ0aW9fcGNpICp2cGNpID0gdmRldi0+dmlydGlvOwo+ID4gLQl1bnNpZ25lZCBsb25nIG9mZnNl
-dCA9IHBvcnQgLSB2aXJ0aW9fcGNpX19wb3J0X2FkZHIodnBjaSk7Cj4gPiAtCj4gPiAtCXJldHVy
-biB2aXJ0aW9fcGNpX19kYXRhX291dCh2Y3B1LCB2ZGV2LCBvZmZzZXQsIGRhdGEsIHNpemUpOwo+
-ID4gLX0KPiA+IC0KPiA+IC1zdGF0aWMgc3RydWN0IGlvcG9ydF9vcGVyYXRpb25zIHZpcnRpb19w
-Y2lfX2lvX29wcyA9IHsKPiA+IC0JLmlvX2luCT0gdmlydGlvX3BjaV9faW9faW4sCj4gPiAtCS5p
-b19vdXQJPSB2aXJ0aW9fcGNpX19pb19vdXQsCj4gPiAtfTsKPiA+IC0KPiA+ICBzdGF0aWMgdm9p
-ZCB2aXJ0aW9fcGNpX19tc2l4X21taW9fY2FsbGJhY2soc3RydWN0IGt2bV9jcHUgKnZjcHUsCj4g
-PiAgCQkJCQkgICB1NjQgYWRkciwgdTggKmRhdGEsIHUzMiBsZW4sCj4gPiAgCQkJCQkgICB1OCBp
-c193cml0ZSwgdm9pZCAqcHRyKQo+ID4gQEAgLTQ1NSwxMiArNDMyLDE1IEBAIHN0YXRpYyB2b2lk
-IHZpcnRpb19wY2lfX2lvX21taW9fY2FsbGJhY2soc3RydWN0IGt2bV9jcHUgKnZjcHUsCj4gPiAg
-ewo+ID4gIAlzdHJ1Y3QgdmlydGlvX2RldmljZSAqdmRldiA9IHB0cjsKPiA+ICAJc3RydWN0IHZp
-cnRpb19wY2kgKnZwY2kgPSB2ZGV2LT52aXJ0aW87Cj4gPiAtCXUzMiBtbWlvX2FkZHIgPSB2aXJ0
-aW9fcGNpX19tbWlvX2FkZHIodnBjaSk7Cj4gPiArCXUzMiBiYXNlX2FkZHIgPSB2aXJ0aW9fcGNp
-X19tbWlvX2FkZHIodnBjaSk7Cj4gPiArCj4gPiArCWlmIChhZGRyIDwgYmFzZV9hZGRyIHx8IGFk
-ZHIgPj0gYmFzZV9hZGRyICsgUENJX0lPX1NJWkUpCj4gPiArCQliYXNlX2FkZHIgPSB2aXJ0aW9f
-cGNpX19wb3J0X2FkZHIodnBjaSk7ICAKPiAKPiBUaGVyZSBhcmUgb25seSB0d28gQkFScyB0aGF0
-IHVzZSB0aGlzIGNhbGxiYWNrLCB0aGUgaW9wb3J0IEJBUiAoQkFSMCkgYW5kIHRoZQo+IG1lbW9y
-eSBCQVIgKEJBUjEpIChNU0lYIHVzZXMgYSBkaWZmZXJlbnQgZW11bGF0aW9uIGNhbGxiYWNrKS4g
-VGhlIGNvbmRpdGlvbiBhYm92ZQo+IHNheXMgdGhhdCBpZiBhZGRyIGlzIG5vdCBpbnNpZGUgdGhl
-IHJlZ2lvbiBkZXNjcmliZWQgYnkgdGhlIG1lbW9yeSBCQVIsIHRoZW4gaXQncwo+IGFuIGlvcG9y
-dCBCQVIuIEhvdyBhYm91dCBjaGVja2luZyBleHBsaWNpdGx5IHRoYXQgaXQgaXMgaW5zaWRlIHRo
-ZSBpb3BvcnQgcmVnaW9uCj4gbGlrZSB0aGlzIChjb21waWxlIHRlc3RlZCBvbmx5KSwgd2hpY2gg
-bG9va3MgYSBiaXQgbW9yZSBpbnR1aXRpdmUgZm9yIG1lOgoKRmFpciBlbm91Z2guCgpDaGVlcnMs
-CkFuZHJlCgo+IAo+IGRpZmYgLS1naXQgYS92aXJ0aW8vcGNpLmMgYi92aXJ0aW8vcGNpLmMKPiBp
-bmRleCA0OWQzZjRkNTI0YjIuLjQwMjRiY2Q3MDljZCAxMDA2NDQKPiAtLS0gYS92aXJ0aW8vcGNp
-LmMKPiArKysgYi92aXJ0aW8vcGNpLmMKPiBAQCAtNDMyLDEwICs0MzIsMTUgQEAgc3RhdGljIHZv
-aWQgdmlydGlvX3BjaV9faW9fbW1pb19jYWxsYmFjayhzdHJ1Y3Qga3ZtX2NwdSAqdmNwdSwKPiDC
-oHsKPiDCoMKgwqDCoMKgwqDCoCBzdHJ1Y3QgdmlydGlvX2RldmljZSAqdmRldiA9IHB0cjsKPiDC
-oMKgwqDCoMKgwqDCoCBzdHJ1Y3QgdmlydGlvX3BjaSAqdnBjaSA9IHZkZXYtPnZpcnRpbzsKPiAt
-wqDCoMKgwqDCoMKgIHUzMiBiYXNlX2FkZHIgPSB2aXJ0aW9fcGNpX19tbWlvX2FkZHIodnBjaSk7
-Cj4gK8KgwqDCoMKgwqDCoCB1MzIgbW1pb19hZGRyID0gdmlydGlvX3BjaV9fbW1pb19hZGRyKHZw
-Y2kpOwo+ICvCoMKgwqDCoMKgwqAgdTMyIGlvcG9ydF9hZGRyID0gdmlydGlvX3BjaV9fcG9ydF9h
-ZGRyKHZwY2kpOwo+ICvCoMKgwqDCoMKgwqAgdTMyIGJhc2VfYWRkcjsKPiDCoAo+IC3CoMKgwqDC
-oMKgwqAgaWYgKGFkZHIgPCBiYXNlX2FkZHIgfHwgYWRkciA+PSBiYXNlX2FkZHIgKyBQQ0lfSU9f
-U0laRSkKPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBiYXNlX2FkZHIgPSB2aXJ0aW9f
-cGNpX19wb3J0X2FkZHIodnBjaSk7Cj4gK8KgwqDCoMKgwqDCoCBpZiAoYWRkciA+PSBpb3BvcnRf
-YWRkciAmJgo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoCBhZGRyIDwgaW9wb3J0X2FkZHIgKyBwY2lf
-X2Jhcl9zaXplKCZ2cGNpLT5wY2lfaGRyLCAwKSkKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoCBiYXNlX2FkZHIgPSBpb3BvcnRfYWRkcjsKPiArwqDCoMKgwqDCoMKgIGVsc2UKPiArwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBiYXNlX2FkZHIgPSBtbWlvX2FkZHI7Cj4gwqAKPiDC
-oMKgwqDCoMKgwqDCoCBpZiAoIWlzX3dyaXRlKQo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoCB2aXJ0aW9fcGNpX19kYXRhX2luKHZjcHUsIHZkZXYsIGFkZHIgLSBiYXNlX2FkZHIsIGRh
-dGEsIGxlbik7Cj4gCj4gVGhhbmtzLAo+IAo+IEFsZXgKPiAKPiA+ICAKPiA+ICAJaWYgKCFpc193
-cml0ZSkKPiA+IC0JCXZpcnRpb19wY2lfX2RhdGFfaW4odmNwdSwgdmRldiwgYWRkciAtIG1taW9f
-YWRkciwgZGF0YSwgbGVuKTsKPiA+ICsJCXZpcnRpb19wY2lfX2RhdGFfaW4odmNwdSwgdmRldiwg
-YWRkciAtIGJhc2VfYWRkciwgZGF0YSwgbGVuKTsKPiA+ICAJZWxzZQo+ID4gLQkJdmlydGlvX3Bj
-aV9fZGF0YV9vdXQodmNwdSwgdmRldiwgYWRkciAtIG1taW9fYWRkciwgZGF0YSwgbGVuKTsKPiA+
-ICsJCXZpcnRpb19wY2lfX2RhdGFfb3V0KHZjcHUsIHZkZXYsIGFkZHIgLSBiYXNlX2FkZHIsIGRh
-dGEsIGxlbik7Cj4gPiAgfQo+ID4gIAo+ID4gIHN0YXRpYyBpbnQgdmlydGlvX3BjaV9fYmFyX2Fj
-dGl2YXRlKHN0cnVjdCBrdm0gKmt2bSwKPiA+IEBAIC00NzgsMTAgKzQ1OCw4IEBAIHN0YXRpYyBp
-bnQgdmlydGlvX3BjaV9fYmFyX2FjdGl2YXRlKHN0cnVjdCBrdm0gKmt2bSwKPiA+ICAKPiA+ICAJ
-c3dpdGNoIChiYXJfbnVtKSB7Cj4gPiAgCWNhc2UgMDoKPiA+IC0JCXIgPSBpb3BvcnRfX3JlZ2lz
-dGVyKGt2bSwgYmFyX2FkZHIsICZ2aXJ0aW9fcGNpX19pb19vcHMsCj4gPiAtCQkJCSAgICAgYmFy
-X3NpemUsIHZkZXYpOwo+ID4gLQkJaWYgKHIgPiAwKQo+ID4gLQkJCXIgPSAwOwo+ID4gKwkJciA9
-IGt2bV9fcmVnaXN0ZXJfcGlvKGt2bSwgYmFyX2FkZHIsIGJhcl9zaXplLAo+ID4gKwkJCQkgICAg
-ICB2aXJ0aW9fcGNpX19pb19tbWlvX2NhbGxiYWNrLCB2ZGV2KTsKPiA+ICAJCWJyZWFrOwo+ID4g
-IAljYXNlIDE6Cj4gPiAgCQlyID0gIGt2bV9fcmVnaXN0ZXJfbW1pbyhrdm0sIGJhcl9hZGRyLCBi
-YXJfc2l6ZSwgZmFsc2UsCj4gPiBAQCAtNTEwLDcgKzQ4OCw3IEBAIHN0YXRpYyBpbnQgdmlydGlv
-X3BjaV9fYmFyX2RlYWN0aXZhdGUoc3RydWN0IGt2bSAqa3ZtLAo+ID4gIAo+ID4gIAlzd2l0Y2gg
-KGJhcl9udW0pIHsKPiA+ICAJY2FzZSAwOgo+ID4gLQkJciA9IGlvcG9ydF9fdW5yZWdpc3Rlcihr
-dm0sIGJhcl9hZGRyKTsKPiA+ICsJCXIgPSBrdm1fX2RlcmVnaXN0ZXJfcGlvKGt2bSwgYmFyX2Fk
-ZHIpOwo+ID4gIAkJYnJlYWs7Cj4gPiAgCWNhc2UgMToKPiA+ICAJY2FzZSAyOgo+ID4gQEAgLTYy
-NSw3ICs2MDMsNyBAQCBpbnQgdmlydGlvX3BjaV9fZXhpdChzdHJ1Y3Qga3ZtICprdm0sIHN0cnVj
-dCB2aXJ0aW9fZGV2aWNlICp2ZGV2KQo+ID4gIAl2aXJ0aW9fcGNpX19yZXNldChrdm0sIHZkZXYp
-Owo+ID4gIAlrdm1fX2RlcmVnaXN0ZXJfbW1pbyhrdm0sIHZpcnRpb19wY2lfX21taW9fYWRkcih2
-cGNpKSk7Cj4gPiAgCWt2bV9fZGVyZWdpc3Rlcl9tbWlvKGt2bSwgdmlydGlvX3BjaV9fbXNpeF9p
-b19hZGRyKHZwY2kpKTsKPiA+IC0JaW9wb3J0X191bnJlZ2lzdGVyKGt2bSwgdmlydGlvX3BjaV9f
-cG9ydF9hZGRyKHZwY2kpKTsKPiA+ICsJa3ZtX19kZXJlZ2lzdGVyX3Bpbyhrdm0sIHZpcnRpb19w
-Y2lfX3BvcnRfYWRkcih2cGNpKSk7Cj4gPiAgCj4gPiAgCXJldHVybiAwOwo+ID4gIH0gIAoKX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxp
-bmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29s
-dW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+On Wed, 17 Feb 2021 16:11:51 +0000
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+
+> Hi Andre,
+> 
+> On 2/17/21 3:49 PM, Alexandru Elisei wrote:
+> > Hi Andre,
+> >
+> > On 12/10/20 2:29 PM, Andre Przywara wrote:  
+> >> Now that all users of the dedicated ioport trap handler interface are
+> >> gone, we can retire the code associated with it.
+> >>
+> >> This removes ioport.c and ioport.h, along with removing prototypes from
+> >> other header files.
+> >>
+> >> This also transfers the responsibility for port I/O trap handling
+> >> entirely into the new routine in mmio.c.
+> >>
+> >> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> >> ---
+> >>  Makefile             |   1 -
+> >>  include/kvm/ioport.h |  20 -----
+> >>  include/kvm/kvm.h    |   2 -
+> >>  ioport.c             | 173 -------------------------------------------
+> >>  mmio.c               |   2 +-
+> >>  5 files changed, 1 insertion(+), 197 deletions(-)
+> >>  delete mode 100644 ioport.c
+> >>
+> >> diff --git a/Makefile b/Makefile
+> >> index 35bb1182..94ff5da6 100644
+> >> --- a/Makefile
+> >> +++ b/Makefile
+> >> @@ -56,7 +56,6 @@ OBJS	+= framebuffer.o
+> >>  OBJS	+= guest_compat.o
+> >>  OBJS	+= hw/rtc.o
+> >>  OBJS	+= hw/serial.o
+> >> -OBJS	+= ioport.o
+> >>  OBJS	+= irq.o
+> >>  OBJS	+= kvm-cpu.o
+> >>  OBJS	+= kvm.o
+> >> diff --git a/include/kvm/ioport.h b/include/kvm/ioport.h
+> >> index a61038e2..38636553 100644
+> >> --- a/include/kvm/ioport.h
+> >> +++ b/include/kvm/ioport.h
+> >> @@ -17,28 +17,8 @@
+> >>  
+> >>  struct kvm;  
+> > Looks to me like the above forward declaration can be removed; same for all the
+> > includes except linux/byteorder.h, needed for the lexx_to_cpu/cpu_to_lexx
+> > functions, and linux/types.h for the uxx typedefs. Otherwise looks good.  
+> 
+> Actually, ignore the part about removing the includes, it opens a new can of worms
+> - byteorder.h doesn't include compiler.h where __always_inline is defined, and
+> various files where struct kvm_cpu is used don't include kvm-cpu.h (like pci.c,
+> hw/serial.c, etc). The header removal is not trivial and I think it should be part
+> of another cleanup patch.
+
+Well, it looks like I can remove some obvious headers like for fdt and
+rbtree. Will do that.
+
+Cheers,
+Andre
+
+> >
+> > Thanks,
+> >
+> > Alex
+> >  
+> >>  
+> >> -struct ioport {
+> >> -	struct rb_int_node		node;
+> >> -	struct ioport_operations	*ops;
+> >> -	void				*priv;
+> >> -	struct device_header		dev_hdr;
+> >> -	u32				refcount;
+> >> -	bool				remove;
+> >> -};
+> >> -
+> >> -struct ioport_operations {
+> >> -	bool (*io_in)(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size);
+> >> -	bool (*io_out)(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size);
+> >> -};
+> >> -
+> >>  void ioport__map_irq(u8 *irq);
+> >>  
+> >> -int __must_check ioport__register(struct kvm *kvm, u16 port, struct ioport_operations *ops,
+> >> -				  int count, void *param);
+> >> -int ioport__unregister(struct kvm *kvm, u16 port);
+> >> -int ioport__init(struct kvm *kvm);
+> >> -int ioport__exit(struct kvm *kvm);
+> >> -
+> >>  static inline u8 ioport__read8(u8 *data)
+> >>  {
+> >>  	return *data;
+> >> diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
+> >> index 14f9d58b..e70f8ef6 100644
+> >> --- a/include/kvm/kvm.h
+> >> +++ b/include/kvm/kvm.h
+> >> @@ -119,8 +119,6 @@ void kvm__irq_line(struct kvm *kvm, int irq, int level);
+> >>  void kvm__irq_trigger(struct kvm *kvm, int irq);
+> >>  bool kvm__emulate_io(struct kvm_cpu *vcpu, u16 port, void *data, int direction, int size, u32 count);
+> >>  bool kvm__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data, u32 len, u8 is_write);
+> >> -bool kvm__emulate_pio(struct kvm_cpu *vcpu, u16 port, void *data,
+> >> -		      int direction, int size, u32 count);
+> >>  int kvm__destroy_mem(struct kvm *kvm, u64 guest_phys, u64 size, void *userspace_addr);
+> >>  int kvm__register_mem(struct kvm *kvm, u64 guest_phys, u64 size, void *userspace_addr,
+> >>  		      enum kvm_mem_type type);
+> >> diff --git a/ioport.c b/ioport.c
+> >> deleted file mode 100644
+> >> index 204d8103..00000000
+> >> --- a/ioport.c
+> >> +++ /dev/null
+> >> @@ -1,173 +0,0 @@
+> >> -#include "kvm/ioport.h"
+> >> -
+> >> -#include "kvm/kvm.h"
+> >> -#include "kvm/util.h"
+> >> -#include "kvm/rbtree-interval.h"
+> >> -#include "kvm/mutex.h"
+> >> -
+> >> -#include <linux/kvm.h>	/* for KVM_EXIT_* */
+> >> -#include <linux/types.h>
+> >> -
+> >> -#include <stdbool.h>
+> >> -#include <limits.h>
+> >> -#include <stdlib.h>
+> >> -#include <stdio.h>
+> >> -
+> >> -#define ioport_node(n) rb_entry(n, struct ioport, node)
+> >> -
+> >> -static DEFINE_MUTEX(ioport_lock);
+> >> -
+> >> -static struct rb_root		ioport_tree = RB_ROOT;
+> >> -
+> >> -static struct ioport *ioport_search(struct rb_root *root, u64 addr)
+> >> -{
+> >> -	struct rb_int_node *node;
+> >> -
+> >> -	node = rb_int_search_single(root, addr);
+> >> -	if (node == NULL)
+> >> -		return NULL;
+> >> -
+> >> -	return ioport_node(node);
+> >> -}
+> >> -
+> >> -static int ioport_insert(struct rb_root *root, struct ioport *data)
+> >> -{
+> >> -	return rb_int_insert(root, &data->node);
+> >> -}
+> >> -
+> >> -static void ioport_remove(struct rb_root *root, struct ioport *data)
+> >> -{
+> >> -	rb_int_erase(root, &data->node);
+> >> -}
+> >> -
+> >> -static struct ioport *ioport_get(struct rb_root *root, u64 addr)
+> >> -{
+> >> -	struct ioport *ioport;
+> >> -
+> >> -	mutex_lock(&ioport_lock);
+> >> -	ioport = ioport_search(root, addr);
+> >> -	if (ioport)
+> >> -		ioport->refcount++;
+> >> -	mutex_unlock(&ioport_lock);
+> >> -
+> >> -	return ioport;
+> >> -}
+> >> -
+> >> -/* Called with ioport_lock held. */
+> >> -static void ioport_unregister(struct rb_root *root, struct ioport *data)
+> >> -{
+> >> -	ioport_remove(root, data);
+> >> -	free(data);
+> >> -}
+> >> -
+> >> -static void ioport_put(struct rb_root *root, struct ioport *data)
+> >> -{
+> >> -	mutex_lock(&ioport_lock);
+> >> -	data->refcount--;
+> >> -	if (data->remove && data->refcount == 0)
+> >> -		ioport_unregister(root, data);
+> >> -	mutex_unlock(&ioport_lock);
+> >> -}
+> >> -
+> >> -int ioport__register(struct kvm *kvm, u16 port, struct ioport_operations *ops, int count, void *param)
+> >> -{
+> >> -	struct ioport *entry;
+> >> -	int r;
+> >> -
+> >> -	entry = malloc(sizeof(*entry));
+> >> -	if (entry == NULL)
+> >> -		return -ENOMEM;
+> >> -
+> >> -	*entry = (struct ioport) {
+> >> -		.node		= RB_INT_INIT(port, port + count),
+> >> -		.ops		= ops,
+> >> -		.priv		= param,
+> >> -		/*
+> >> -		 * Start from 0 because ioport__unregister() doesn't decrement
+> >> -		 * the reference count.
+> >> -		 */
+> >> -		.refcount	= 0,
+> >> -		.remove		= false,
+> >> -	};
+> >> -
+> >> -	mutex_lock(&ioport_lock);
+> >> -	r = ioport_insert(&ioport_tree, entry);
+> >> -	if (r < 0)
+> >> -		goto out_free;
+> >> -	mutex_unlock(&ioport_lock);
+> >> -
+> >> -	return port;
+> >> -
+> >> -out_free:
+> >> -	free(entry);
+> >> -	mutex_unlock(&ioport_lock);
+> >> -	return r;
+> >> -}
+> >> -
+> >> -int ioport__unregister(struct kvm *kvm, u16 port)
+> >> -{
+> >> -	struct ioport *entry;
+> >> -
+> >> -	mutex_lock(&ioport_lock);
+> >> -	entry = ioport_search(&ioport_tree, port);
+> >> -	if (!entry) {
+> >> -		mutex_unlock(&ioport_lock);
+> >> -		return -ENOENT;
+> >> -	}
+> >> -	/* The same reasoning from kvm__deregister_mmio() applies. */
+> >> -	if (entry->refcount == 0)
+> >> -		ioport_unregister(&ioport_tree, entry);
+> >> -	else
+> >> -		entry->remove = true;
+> >> -	mutex_unlock(&ioport_lock);
+> >> -
+> >> -	return 0;
+> >> -}
+> >> -
+> >> -static const char *to_direction(int direction)
+> >> -{
+> >> -	if (direction == KVM_EXIT_IO_IN)
+> >> -		return "IN";
+> >> -	else
+> >> -		return "OUT";
+> >> -}
+> >> -
+> >> -static void ioport_error(u16 port, void *data, int direction, int size, u32 count)
+> >> -{
+> >> -	fprintf(stderr, "IO error: %s port=%x, size=%d, count=%u\n", to_direction(direction), port, size, count);
+> >> -}
+> >> -
+> >> -bool kvm__emulate_io(struct kvm_cpu *vcpu, u16 port, void *data, int direction, int size, u32 count)
+> >> -{
+> >> -	struct ioport_operations *ops;
+> >> -	bool ret = false;
+> >> -	struct ioport *entry;
+> >> -	void *ptr = data;
+> >> -	struct kvm *kvm = vcpu->kvm;
+> >> -
+> >> -	entry = ioport_get(&ioport_tree, port);
+> >> -	if (!entry)
+> >> -		return kvm__emulate_pio(vcpu, port, data, direction,
+> >> -					size, count);
+> >> -
+> >> -	ops	= entry->ops;
+> >> -
+> >> -	while (count--) {
+> >> -		if (direction == KVM_EXIT_IO_IN && ops->io_in)
+> >> -				ret = ops->io_in(entry, vcpu, port, ptr, size);
+> >> -		else if (direction == KVM_EXIT_IO_OUT && ops->io_out)
+> >> -				ret = ops->io_out(entry, vcpu, port, ptr, size);
+> >> -
+> >> -		ptr += size;
+> >> -	}
+> >> -
+> >> -	ioport_put(&ioport_tree, entry);
+> >> -
+> >> -	if (ret)
+> >> -		return true;
+> >> -
+> >> -	if (kvm->cfg.ioport_debug)
+> >> -		ioport_error(port, data, direction, size, count);
+> >> -
+> >> -	return !kvm->cfg.ioport_debug;
+> >> -}
+> >> diff --git a/mmio.c b/mmio.c
+> >> index 4cce1901..5249af39 100644
+> >> --- a/mmio.c
+> >> +++ b/mmio.c
+> >> @@ -206,7 +206,7 @@ out:
+> >>  	return true;
+> >>  }
+> >>  
+> >> -bool kvm__emulate_pio(struct kvm_cpu *vcpu, u16 port, void *data,
+> >> +bool kvm__emulate_io(struct kvm_cpu *vcpu, u16 port, void *data,
+> >>  		     int direction, int size, u32 count)
+> >>  {
+> >>  	struct mmio_mapping *mmio;  
+> > _______________________________________________
+> > kvmarm mailing list
+> > kvmarm@lists.cs.columbia.edu
+> > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm  
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
