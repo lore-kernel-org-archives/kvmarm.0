@@ -7,51 +7,52 @@ X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C51BC433E0
-	for <kvmarm@archiver.kernel.org>; Thu, 18 Feb 2021 16:35:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F29BC433E0
+	for <kvmarm@archiver.kernel.org>; Thu, 18 Feb 2021 16:39:41 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 954BE64EB2
-	for <kvmarm@archiver.kernel.org>; Thu, 18 Feb 2021 16:35:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 954BE64EB2
+	by mail.kernel.org (Postfix) with ESMTP id C060664EAD
+	for <kvmarm@archiver.kernel.org>; Thu, 18 Feb 2021 16:39:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C060664EAD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EAD214B2F1;
-	Thu, 18 Feb 2021 11:35:52 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 391114B3C4;
+	Thu, 18 Feb 2021 11:39:40 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id YldqmcE3nZrl; Thu, 18 Feb 2021 11:35:51 -0500 (EST)
+	with ESMTP id jNcW-RNcvm6C; Thu, 18 Feb 2021 11:39:38 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C0EA4B326;
-	Thu, 18 Feb 2021 11:35:51 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B06204B370;
+	Thu, 18 Feb 2021 11:39:38 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CC3FF4B2F1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Feb 2021 11:35:49 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DE04B4B322
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Feb 2021 11:39:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7v3tiPdwcp3G for <kvmarm@lists.cs.columbia.edu>;
- Thu, 18 Feb 2021 11:35:48 -0500 (EST)
+ with ESMTP id KwlJSb4wPhM6 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 18 Feb 2021 11:39:36 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 30F5C4B2AA
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Feb 2021 11:35:48 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CC1794B2B2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Feb 2021 11:39:35 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 795A61042;
- Thu, 18 Feb 2021 08:35:47 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 54398113E;
+ Thu, 18 Feb 2021 08:39:30 -0800 (PST)
 Received: from slackpad.fritz.box (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DD5C73F73D;
- Thu, 18 Feb 2021 08:35:44 -0800 (PST)
-Date: Thu, 18 Feb 2021 16:34:46 +0000
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 24AA83F73D;
+ Thu, 18 Feb 2021 08:39:28 -0800 (PST)
+Date: Thu, 18 Feb 2021 16:38:31 +0000
 From: Andre Przywara <andre.przywara@arm.com>
 To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH kvmtool 19/21] Remove ioport specific routines
-Message-ID: <20210218163446.655df12f@slackpad.fritz.box>
-In-Reply-To: <389aa087-b079-cafb-b018-eab599e337ed@arm.com>
+Subject: Re: [PATCH kvmtool 20/21] hw/serial: ARM/arm64: Use MMIO at higher
+ addresses
+Message-ID: <20210218163831.476c0f35@slackpad.fritz.box>
+In-Reply-To: <f16f89dc-78fd-1046-eefc-1dccd468fba8@arm.com>
 References: <20201210142908.169597-1-andre.przywara@arm.com>
- <20201210142908.169597-20-andre.przywara@arm.com>
- <05a0df3a-625f-74de-8014-e78aee9e8427@arm.com>
- <389aa087-b079-cafb-b018-eab599e337ed@arm.com>
+ <20201210142908.169597-21-andre.przywara@arm.com>
+ <bce317a9-2c8e-2254-57c3-e0bea9a13760@arm.com>
+ <f16f89dc-78fd-1046-eefc-1dccd468fba8@arm.com>
 Organization: Arm Ltd.
 X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
 MIME-Version: 1.0
@@ -74,305 +75,198 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 17 Feb 2021 16:11:51 +0000
+On Thu, 18 Feb 2021 12:18:38 +0000
 Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 
 > Hi Andre,
 > 
-> On 2/17/21 3:49 PM, Alexandru Elisei wrote:
+> On 2/17/21 4:48 PM, Alexandru Elisei wrote:
 > > Hi Andre,
 > >
 > > On 12/10/20 2:29 PM, Andre Przywara wrote:  
-> >> Now that all users of the dedicated ioport trap handler interface are
-> >> gone, we can retire the code associated with it.
+> >> Using the UART devices at their legacy I/O addresses as set by IBM in
+> >> 1981 was a kludge we used for simplicity on ARM platforms as well.
+> >> However this imposes problems due to their missing alignment and overlap
+> >> with the PCI I/O address space.
 > >>
-> >> This removes ioport.c and ioport.h, along with removing prototypes from
-> >> other header files.
+> >> Now that we can switch a device easily between using ioports and MMIO,
+> >> let's move the UARTs out of the first 4K of memory on ARM platforms.
 > >>
-> >> This also transfers the responsibility for port I/O trap handling
-> >> entirely into the new routine in mmio.c.
+> >> That should be transparent for well behaved guests, since the change is
+> >> naturally reflected in the device tree. Even "earlycon" keeps working,
+> >> as the stdout-path property is adjusted automatically.
+> >>
+> >> People providing direct earlycon parameters via the command line need to
+> >> adjust it to: "earlycon=uart,mmio,0x1000000".
 > >>
 > >> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 > >> ---
-> >>  Makefile             |   1 -
-> >>  include/kvm/ioport.h |  20 -----
-> >>  include/kvm/kvm.h    |   2 -
-> >>  ioport.c             | 173 -------------------------------------------
-> >>  mmio.c               |   2 +-
-> >>  5 files changed, 1 insertion(+), 197 deletions(-)
-> >>  delete mode 100644 ioport.c
+> >>  hw/serial.c | 52 ++++++++++++++++++++++++++++++++++++----------------
+> >>  1 file changed, 36 insertions(+), 16 deletions(-)
 > >>
-> >> diff --git a/Makefile b/Makefile
-> >> index 35bb1182..94ff5da6 100644
-> >> --- a/Makefile
-> >> +++ b/Makefile
-> >> @@ -56,7 +56,6 @@ OBJS	+= framebuffer.o
-> >>  OBJS	+= guest_compat.o
-> >>  OBJS	+= hw/rtc.o
-> >>  OBJS	+= hw/serial.o
-> >> -OBJS	+= ioport.o
-> >>  OBJS	+= irq.o
-> >>  OBJS	+= kvm-cpu.o
-> >>  OBJS	+= kvm.o
-> >> diff --git a/include/kvm/ioport.h b/include/kvm/ioport.h
-> >> index a61038e2..38636553 100644
-> >> --- a/include/kvm/ioport.h
-> >> +++ b/include/kvm/ioport.h
-> >> @@ -17,28 +17,8 @@
+> >> diff --git a/hw/serial.c b/hw/serial.c
+> >> index d840eebc..00fb3aa8 100644
+> >> --- a/hw/serial.c
+> >> +++ b/hw/serial.c
+> >> @@ -13,6 +13,24 @@
 > >>  
-> >>  struct kvm;  
-> > Looks to me like the above forward declaration can be removed; same for all the
-> > includes except linux/byteorder.h, needed for the lexx_to_cpu/cpu_to_lexx
-> > functions, and linux/types.h for the uxx typedefs. Otherwise looks good.  
+> >>  #include <pthread.h>
+> >>  
+> >> +#if defined(CONFIG_ARM) || defined(CONFIG_ARM64)
+> >> +#define serial_iobase(nr)	(0x1000000 + (nr) * 0x1000)
+> >> +#define serial_irq(nr)		(32 + (nr))
+> >> +#define SERIAL8250_BUS_TYPE	DEVICE_BUS_MMIO
+> >> +#else
+> >> +#define serial_iobase_0		0x3f8
+> >> +#define serial_iobase_1		0x2f8
+> >> +#define serial_iobase_2		0x3e8
+> >> +#define serial_iobase_3		0x2e8
+> >> +#define serial_irq_0		4
+> >> +#define serial_irq_1		3
+> >> +#define serial_irq_2		4
+> >> +#define serial_irq_3		3  
+> > Nitpick: serial_iobase_* and serial_irq_* could be changed to have two leading
+> > underscores, to stress the fact that they are helpers for serial_iobase() and
+> > serial_irq() and are not meant to be used by themselves. But that's just personal
+> > preference, otherwise the patch looks really nice and clean:
+> >
+> > Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>  
 > 
-> Actually, ignore the part about removing the includes, it opens a new can of worms
-> - byteorder.h doesn't include compiler.h where __always_inline is defined, and
-> various files where struct kvm_cpu is used don't include kvm-cpu.h (like pci.c,
-> hw/serial.c, etc). The header removal is not trivial and I think it should be part
-> of another cleanup patch.
+> I gave it more thought and I think I spoke too soon. I think it would be good to
+> document in the commit message how you came to the base MMIO address and size
+> (even if it was just a nice looking number). Also, the CFI flash device has its
+> memory range described in the memory layout for the architecture, in
+> arm/include/arm-common/kvm-arch.h. I think it would be a good idea to put the
+> serial region there, to prevent regressions in the future.
 
-Well, it looks like I can remove some obvious headers like for fdt and
-rbtree. Will do that.
+Yes, that's very true, the memory map should be described in one place
+only. Will try to do that.
 
-Cheers,
+
+> 
+> I did the math to make sure there's no overlap with the ioport region (16M >> 16K)
+> or the flash region (16M + 0x4000 < 32M). I also tested the changes with a kernel
+> with 4K and 64K pages (I can't access any hardware with 16K pages at the moment),
+> and everything worked as expected.
+
+Thanks!
 Andre
 
-> >
-> > Thanks,
-> >
-> > Alex
-> >  
+> >> +#define serial_iobase(nr)	serial_iobase_##nr
+> >> +#define serial_irq(nr)		serial_irq_##nr
+> >> +#define SERIAL8250_BUS_TYPE	DEVICE_BUS_IOPORT
+> >> +#endif
+> >> +
+> >>  /*
+> >>   * This fakes a U6_16550A. The fifo len needs to be 64 as the kernel
+> >>   * expects that for autodetection.
+> >> @@ -27,7 +45,7 @@ struct serial8250_device {
+> >>  	struct mutex		mutex;
+> >>  	u8			id;
 > >>  
-> >> -struct ioport {
-> >> -	struct rb_int_node		node;
-> >> -	struct ioport_operations	*ops;
-> >> -	void				*priv;
-> >> -	struct device_header		dev_hdr;
-> >> -	u32				refcount;
-> >> -	bool				remove;
-> >> -};
-> >> -
-> >> -struct ioport_operations {
-> >> -	bool (*io_in)(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size);
-> >> -	bool (*io_out)(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size);
-> >> -};
-> >> -
-> >>  void ioport__map_irq(u8 *irq);
+> >> -	u16			iobase;
+> >> +	u32			iobase;
+> >>  	u8			irq;
+> >>  	u8			irq_state;
+> >>  	int			txcnt;
+> >> @@ -65,56 +83,56 @@ static struct serial8250_device devices[] = {
+> >>  	/* ttyS0 */
+> >>  	[0]	= {
+> >>  		.dev_hdr = {
+> >> -			.bus_type	= DEVICE_BUS_IOPORT,
+> >> +			.bus_type	= SERIAL8250_BUS_TYPE,
+> >>  			.data		= serial8250_generate_fdt_node,
+> >>  		},
+> >>  		.mutex			= MUTEX_INITIALIZER,
 > >>  
-> >> -int __must_check ioport__register(struct kvm *kvm, u16 port, struct ioport_operations *ops,
-> >> -				  int count, void *param);
-> >> -int ioport__unregister(struct kvm *kvm, u16 port);
-> >> -int ioport__init(struct kvm *kvm);
-> >> -int ioport__exit(struct kvm *kvm);
-> >> -
-> >>  static inline u8 ioport__read8(u8 *data)
-> >>  {
-> >>  	return *data;
-> >> diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
-> >> index 14f9d58b..e70f8ef6 100644
-> >> --- a/include/kvm/kvm.h
-> >> +++ b/include/kvm/kvm.h
-> >> @@ -119,8 +119,6 @@ void kvm__irq_line(struct kvm *kvm, int irq, int level);
-> >>  void kvm__irq_trigger(struct kvm *kvm, int irq);
-> >>  bool kvm__emulate_io(struct kvm_cpu *vcpu, u16 port, void *data, int direction, int size, u32 count);
-> >>  bool kvm__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data, u32 len, u8 is_write);
-> >> -bool kvm__emulate_pio(struct kvm_cpu *vcpu, u16 port, void *data,
-> >> -		      int direction, int size, u32 count);
-> >>  int kvm__destroy_mem(struct kvm *kvm, u64 guest_phys, u64 size, void *userspace_addr);
-> >>  int kvm__register_mem(struct kvm *kvm, u64 guest_phys, u64 size, void *userspace_addr,
-> >>  		      enum kvm_mem_type type);
-> >> diff --git a/ioport.c b/ioport.c
-> >> deleted file mode 100644
-> >> index 204d8103..00000000
-> >> --- a/ioport.c
-> >> +++ /dev/null
-> >> @@ -1,173 +0,0 @@
-> >> -#include "kvm/ioport.h"
-> >> -
-> >> -#include "kvm/kvm.h"
-> >> -#include "kvm/util.h"
-> >> -#include "kvm/rbtree-interval.h"
-> >> -#include "kvm/mutex.h"
-> >> -
-> >> -#include <linux/kvm.h>	/* for KVM_EXIT_* */
-> >> -#include <linux/types.h>
-> >> -
-> >> -#include <stdbool.h>
-> >> -#include <limits.h>
-> >> -#include <stdlib.h>
-> >> -#include <stdio.h>
-> >> -
-> >> -#define ioport_node(n) rb_entry(n, struct ioport, node)
-> >> -
-> >> -static DEFINE_MUTEX(ioport_lock);
-> >> -
-> >> -static struct rb_root		ioport_tree = RB_ROOT;
-> >> -
-> >> -static struct ioport *ioport_search(struct rb_root *root, u64 addr)
-> >> -{
-> >> -	struct rb_int_node *node;
-> >> -
-> >> -	node = rb_int_search_single(root, addr);
-> >> -	if (node == NULL)
-> >> -		return NULL;
-> >> -
-> >> -	return ioport_node(node);
-> >> -}
-> >> -
-> >> -static int ioport_insert(struct rb_root *root, struct ioport *data)
-> >> -{
-> >> -	return rb_int_insert(root, &data->node);
-> >> -}
-> >> -
-> >> -static void ioport_remove(struct rb_root *root, struct ioport *data)
-> >> -{
-> >> -	rb_int_erase(root, &data->node);
-> >> -}
-> >> -
-> >> -static struct ioport *ioport_get(struct rb_root *root, u64 addr)
-> >> -{
-> >> -	struct ioport *ioport;
-> >> -
-> >> -	mutex_lock(&ioport_lock);
-> >> -	ioport = ioport_search(root, addr);
-> >> -	if (ioport)
-> >> -		ioport->refcount++;
-> >> -	mutex_unlock(&ioport_lock);
-> >> -
-> >> -	return ioport;
-> >> -}
-> >> -
-> >> -/* Called with ioport_lock held. */
-> >> -static void ioport_unregister(struct rb_root *root, struct ioport *data)
-> >> -{
-> >> -	ioport_remove(root, data);
-> >> -	free(data);
-> >> -}
-> >> -
-> >> -static void ioport_put(struct rb_root *root, struct ioport *data)
-> >> -{
-> >> -	mutex_lock(&ioport_lock);
-> >> -	data->refcount--;
-> >> -	if (data->remove && data->refcount == 0)
-> >> -		ioport_unregister(root, data);
-> >> -	mutex_unlock(&ioport_lock);
-> >> -}
-> >> -
-> >> -int ioport__register(struct kvm *kvm, u16 port, struct ioport_operations *ops, int count, void *param)
-> >> -{
-> >> -	struct ioport *entry;
-> >> -	int r;
-> >> -
-> >> -	entry = malloc(sizeof(*entry));
-> >> -	if (entry == NULL)
-> >> -		return -ENOMEM;
-> >> -
-> >> -	*entry = (struct ioport) {
-> >> -		.node		= RB_INT_INIT(port, port + count),
-> >> -		.ops		= ops,
-> >> -		.priv		= param,
-> >> -		/*
-> >> -		 * Start from 0 because ioport__unregister() doesn't decrement
-> >> -		 * the reference count.
-> >> -		 */
-> >> -		.refcount	= 0,
-> >> -		.remove		= false,
-> >> -	};
-> >> -
-> >> -	mutex_lock(&ioport_lock);
-> >> -	r = ioport_insert(&ioport_tree, entry);
-> >> -	if (r < 0)
-> >> -		goto out_free;
-> >> -	mutex_unlock(&ioport_lock);
-> >> -
-> >> -	return port;
-> >> -
-> >> -out_free:
-> >> -	free(entry);
-> >> -	mutex_unlock(&ioport_lock);
-> >> -	return r;
-> >> -}
-> >> -
-> >> -int ioport__unregister(struct kvm *kvm, u16 port)
-> >> -{
-> >> -	struct ioport *entry;
-> >> -
-> >> -	mutex_lock(&ioport_lock);
-> >> -	entry = ioport_search(&ioport_tree, port);
-> >> -	if (!entry) {
-> >> -		mutex_unlock(&ioport_lock);
-> >> -		return -ENOENT;
-> >> -	}
-> >> -	/* The same reasoning from kvm__deregister_mmio() applies. */
-> >> -	if (entry->refcount == 0)
-> >> -		ioport_unregister(&ioport_tree, entry);
-> >> -	else
-> >> -		entry->remove = true;
-> >> -	mutex_unlock(&ioport_lock);
-> >> -
-> >> -	return 0;
-> >> -}
-> >> -
-> >> -static const char *to_direction(int direction)
-> >> -{
-> >> -	if (direction == KVM_EXIT_IO_IN)
-> >> -		return "IN";
-> >> -	else
-> >> -		return "OUT";
-> >> -}
-> >> -
-> >> -static void ioport_error(u16 port, void *data, int direction, int size, u32 count)
-> >> -{
-> >> -	fprintf(stderr, "IO error: %s port=%x, size=%d, count=%u\n", to_direction(direction), port, size, count);
-> >> -}
-> >> -
-> >> -bool kvm__emulate_io(struct kvm_cpu *vcpu, u16 port, void *data, int direction, int size, u32 count)
-> >> -{
-> >> -	struct ioport_operations *ops;
-> >> -	bool ret = false;
-> >> -	struct ioport *entry;
-> >> -	void *ptr = data;
-> >> -	struct kvm *kvm = vcpu->kvm;
-> >> -
-> >> -	entry = ioport_get(&ioport_tree, port);
-> >> -	if (!entry)
-> >> -		return kvm__emulate_pio(vcpu, port, data, direction,
-> >> -					size, count);
-> >> -
-> >> -	ops	= entry->ops;
-> >> -
-> >> -	while (count--) {
-> >> -		if (direction == KVM_EXIT_IO_IN && ops->io_in)
-> >> -				ret = ops->io_in(entry, vcpu, port, ptr, size);
-> >> -		else if (direction == KVM_EXIT_IO_OUT && ops->io_out)
-> >> -				ret = ops->io_out(entry, vcpu, port, ptr, size);
-> >> -
-> >> -		ptr += size;
-> >> -	}
-> >> -
-> >> -	ioport_put(&ioport_tree, entry);
-> >> -
-> >> -	if (ret)
-> >> -		return true;
-> >> -
-> >> -	if (kvm->cfg.ioport_debug)
-> >> -		ioport_error(port, data, direction, size, count);
-> >> -
-> >> -	return !kvm->cfg.ioport_debug;
-> >> -}
-> >> diff --git a/mmio.c b/mmio.c
-> >> index 4cce1901..5249af39 100644
-> >> --- a/mmio.c
-> >> +++ b/mmio.c
-> >> @@ -206,7 +206,7 @@ out:
-> >>  	return true;
+> >>  		.id			= 0,
+> >> -		.iobase			= 0x3f8,
+> >> -		.irq			= 4,
+> >> +		.iobase			= serial_iobase(0),
+> >> +		.irq			= serial_irq(0),
+> >>  
+> >>  		SERIAL_REGS_SETTING
+> >>  	},
+> >>  	/* ttyS1 */
+> >>  	[1]	= {
+> >>  		.dev_hdr = {
+> >> -			.bus_type	= DEVICE_BUS_IOPORT,
+> >> +			.bus_type	= SERIAL8250_BUS_TYPE,
+> >>  			.data		= serial8250_generate_fdt_node,
+> >>  		},
+> >>  		.mutex			= MUTEX_INITIALIZER,
+> >>  
+> >>  		.id			= 1,
+> >> -		.iobase			= 0x2f8,
+> >> -		.irq			= 3,
+> >> +		.iobase			= serial_iobase(1),
+> >> +		.irq			= serial_irq(1),
+> >>  
+> >>  		SERIAL_REGS_SETTING
+> >>  	},
+> >>  	/* ttyS2 */
+> >>  	[2]	= {
+> >>  		.dev_hdr = {
+> >> -			.bus_type	= DEVICE_BUS_IOPORT,
+> >> +			.bus_type	= SERIAL8250_BUS_TYPE,
+> >>  			.data		= serial8250_generate_fdt_node,
+> >>  		},
+> >>  		.mutex			= MUTEX_INITIALIZER,
+> >>  
+> >>  		.id			= 2,
+> >> -		.iobase			= 0x3e8,
+> >> -		.irq			= 4,
+> >> +		.iobase			= serial_iobase(2),
+> >> +		.irq			= serial_irq(2),
+> >>  
+> >>  		SERIAL_REGS_SETTING
+> >>  	},
+> >>  	/* ttyS3 */
+> >>  	[3]	= {
+> >>  		.dev_hdr = {
+> >> -			.bus_type	= DEVICE_BUS_IOPORT,
+> >> +			.bus_type	= SERIAL8250_BUS_TYPE,
+> >>  			.data		= serial8250_generate_fdt_node,
+> >>  		},
+> >>  		.mutex			= MUTEX_INITIALIZER,
+> >>  
+> >>  		.id			= 3,
+> >> -		.iobase			= 0x2e8,
+> >> -		.irq			= 3,
+> >> +		.iobase			= serial_iobase(3),
+> >> +		.irq			= serial_irq(3),
+> >>  
+> >>  		SERIAL_REGS_SETTING
+> >>  	},
+> >> @@ -444,7 +462,8 @@ static int serial8250__device_init(struct kvm *kvm,
+> >>  		return r;
+> >>  
+> >>  	ioport__map_irq(&dev->irq);
+> >> -	r = kvm__register_pio(kvm, dev->iobase, 8, serial8250_mmio, dev);
+> >> +	r = kvm__register_iotrap(kvm, dev->iobase, 8, serial8250_mmio, dev,
+> >> +				 SERIAL8250_BUS_TYPE);
+> >>  
+> >>  	return r;
 > >>  }
+> >> @@ -467,7 +486,7 @@ cleanup:
+> >>  	for (j = 0; j <= i; j++) {
+> >>  		struct serial8250_device *dev = &devices[j];
 > >>  
-> >> -bool kvm__emulate_pio(struct kvm_cpu *vcpu, u16 port, void *data,
-> >> +bool kvm__emulate_io(struct kvm_cpu *vcpu, u16 port, void *data,
-> >>  		     int direction, int size, u32 count)
-> >>  {
-> >>  	struct mmio_mapping *mmio;  
+> >> -		kvm__deregister_pio(kvm, dev->iobase);
+> >> +		kvm__deregister_iotrap(kvm, dev->iobase, SERIAL8250_BUS_TYPE);
+> >>  		device__unregister(&dev->dev_hdr);
+> >>  	}
+> >>  
+> >> @@ -483,7 +502,8 @@ int serial8250__exit(struct kvm *kvm)
+> >>  	for (i = 0; i < ARRAY_SIZE(devices); i++) {
+> >>  		struct serial8250_device *dev = &devices[i];
+> >>  
+> >> -		r = kvm__deregister_pio(kvm, dev->iobase);
+> >> +		r = kvm__deregister_iotrap(kvm, dev->iobase,
+> >> +					   SERIAL8250_BUS_TYPE);
+> >>  		if (r < 0)
+> >>  			return r;
+> >>  		device__unregister(&dev->dev_hdr);  
 > > _______________________________________________
 > > kvmarm mailing list
 > > kvmarm@lists.cs.columbia.edu
