@@ -2,57 +2,93 @@ Return-Path: <SRS0=3b8a=HV=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59BC0C433E0
-	for <kvmarm@archiver.kernel.org>; Fri, 19 Feb 2021 16:37:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33E9EC433E0
+	for <kvmarm@archiver.kernel.org>; Fri, 19 Feb 2021 17:57:25 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BC1DA64E57
-	for <kvmarm@archiver.kernel.org>; Fri, 19 Feb 2021 16:37:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC1DA64E57
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 78C4364EB1
+	for <kvmarm@archiver.kernel.org>; Fri, 19 Feb 2021 17:57:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78C4364EB1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3CA754B2BD;
-	Fri, 19 Feb 2021 11:37:12 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E58954B31A;
+	Fri, 19 Feb 2021 12:57:23 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id YtH9btExMHib; Fri, 19 Feb 2021 11:37:10 -0500 (EST)
+	with ESMTP id B6jgcWHRlBNB; Fri, 19 Feb 2021 12:57:23 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EA32D4B2B1;
-	Fri, 19 Feb 2021 11:37:10 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F1A714B31E;
+	Fri, 19 Feb 2021 12:57:22 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E89724B211
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Feb 2021 11:37:09 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 30D274B31A
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Feb 2021 12:57:22 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pEL8N9WIqGaD for <kvmarm@lists.cs.columbia.edu>;
- Fri, 19 Feb 2021 11:37:08 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 769034B274
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Feb 2021 11:37:08 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C8734ED1;
- Fri, 19 Feb 2021 08:37:07 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 144FE3F73B;
- Fri, 19 Feb 2021 08:37:06 -0800 (PST)
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: drjones@redhat.com,
-	kvm@vger.kernel.org,
-	kvmarm@lists.cs.columbia.edu
-Subject: [kvm-unit-tests PATCH] configure: arm/arm64: Add --earlycon option to
- set UART type and address
-Date: Fri, 19 Feb 2021 16:37:18 +0000
-Message-Id: <20210219163718.109101-1-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.30.1
+ with ESMTP id kYtiurhr-KiP for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 19 Feb 2021 12:57:21 -0500 (EST)
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com
+ [209.85.128.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0DB044B258
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Feb 2021 12:57:21 -0500 (EST)
+Received: by mail-wm1-f50.google.com with SMTP id o15so7763493wmq.5
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Feb 2021 09:57:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=wSDGwoocflGRIUHKyKkTZr409vUlF3AWV+fTAIOXUPE=;
+ b=AbfIdFqm4xyNtnKCriEj3ztzc1Gjd0MbqggKgNzwhkA6aOPx4NDOMFXEbkrYmINjj+
+ OQJPGkY1UUu8x/fxguDXcyrrmF49OM/RHXgd6Sx3aZHa+CJl4T/2OnbwQ5L7ekAc6M1O
+ IfRGreUXZxsoxJV/XuAcGQ5c12V3pS5+ymb4O66tkz8SnvrOu2D2h3sp4vwdnkn8oEMK
+ bPmvFRBOLUC1OospurDh44uj/mV8ZMWnixELHFmVBA6m46hKDa389j7U9f2+T3BROkpm
+ lj+fo31DFiEsNYIWeNVM0CIqFRZj4Kv5LO2Ngx2paI/QjR7ITufSwvouov6dBeZcBdQU
+ Lhyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=wSDGwoocflGRIUHKyKkTZr409vUlF3AWV+fTAIOXUPE=;
+ b=X0mprD8X1WOmHtbF6EWcbuujvpJTc+wOgZXLNq8BXrE+EBTiJeRQdDD99TP79PAF1h
+ /iJ57mc+xRCvxquu1Di1hinFdHWaxdhAhvnEpX5YrURahes2ipFvw10d9f4o5GnNY4Hb
+ za/iyc3hwHtCWHbJHopip1iIKdGDN/Y7pp+qFCAY8HSFE7YEyE5OgpyvS9B7CS2N0Abr
+ U2X5DbkKW46+J8ItplG4S0XYEZzJPSjQ09xC5FNhNe0ueYL0lFuJ6QphPKDAj12ZGHs9
+ gnHubANEvO9I26cYYSI+B/1MzqGERWL10awLKABcEItvbqxADIZmAwl9pMBhdOvIQNH3
+ oL+w==
+X-Gm-Message-State: AOAM533B6ui4yGHsfKb1zQvIKqQbZA/y0+YsxKSUWTZQtJLZR1aYkno9
+ Zhg5ZQjty9PBtiTD9Kjz9+y/YA==
+X-Google-Smtp-Source: ABdhPJxsiiByL8wUUfnZSNR07gNAM/FJ7VrbvCTpRolHBc5LKfAskVcQmZEzfpvfHkY0MiFCvM+Z4Q==
+X-Received: by 2002:a05:600c:48a8:: with SMTP id
+ j40mr9105297wmp.57.1613757439910; 
+ Fri, 19 Feb 2021 09:57:19 -0800 (PST)
+Received: from google.com (230.69.233.35.bc.googleusercontent.com.
+ [35.233.69.230])
+ by smtp.gmail.com with ESMTPSA id c2sm14302124wrx.70.2021.02.19.09.57.19
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 19 Feb 2021 09:57:19 -0800 (PST)
+Date: Fri, 19 Feb 2021 17:57:17 +0000
+From: Quentin Perret <qperret@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Subject: Re: [RFC PATCH v2 00/26] KVM/arm64: A stage 2 for the host
+Message-ID: <YC/7/fOJ7IAfo61D@google.com>
+References: <20210108121524.656872-1-qperret@google.com>
+ <YC/7XuB30N8C3sNx@google.com>
 MIME-Version: 1.0
-Cc: pbonzini@redhat.com
+Content-Disposition: inline
+In-Reply-To: <YC/7XuB30N8C3sNx@google.com>
+Cc: devicetree@vger.kernel.org, kernel-team@android.com,
+ Frank Rowand <frowand.list@gmail.com>, android-kvm@google.com,
+ Catalin Marinas <catalin.marinas@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-kernel@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
+ linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -69,111 +105,20 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Currently, the UART early address is set indirectly with the --vmm option
-and there are only two possible values: if the VMM is qemu (the default),
-then the UART address is set to 0x09000000; if the VMM is kvmtool, then the
-UART address is set to 0x3f8.
+On Friday 19 Feb 2021 at 09:54:38 (-0800), Sean Christopherson wrote:
+> On Fri, Jan 08, 2021, Quentin Perret wrote:
+> > [2] https://kvmforum2020.sched.com/event/eE24/virtualization-for-the-masses-exposing-kvm-on-android-will-deacon-google
+> 
+> I couldn't find any slides on the official KVM forum site linked above.  I was
+> able to track down a mirror[1] and the recorded presentation[2].
+> 
+> [1] https://mirrors.edge.kernel.org/pub/linux/kernel/people/will/slides/kvmforum-2020-edited.pdf
+> [2] https://youtu.be/wY-u6n75iXc
 
-There several efforts under way to change the kvmtool UART address, and
-kvm-unit-tests so far hasn't had mechanism to let the user set a specific
-address, which means that the early UART won't be available.
+Much nicer, I'll make sure to link those in the next cover letter.
 
-This situation will only become worse as kvm-unit-tests gains support to
-run as an EFI app, as each platform will have their own UART type and
-address.
-
-To address both issues, a new configure option is added, --earlycon. The
-syntax and semantics are identical to the kernel parameter with the same
-name. Specifying this option will overwrite the UART address set by --vmm.
-
-At the moment, the UART type and register width parameters are ignored
-since both qemu's and kvmtool's UART emulation use the same offset for the
-TX register and no other registers are used by kvm-unit-tests, but the
-parameters will become relevant once EFI support is added.
-
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
-The kvmtool patches I was referring to are the patches to unify ioport and
-MMIO emulation [1] and to allow the user to specify a custom memory layout
-for the VM [2] (these patches are very old, but I plan to revive them after
-the ioport and MMIO unification series are merged).
-
-[1] https://lore.kernel.org/kvm/20201210142908.169597-1-andre.przywara@arm.com/T/#t
-[2] https://lore.kernel.org/kvm/1569245722-23375-1-git-send-email-alexandru.elisei@arm.com/
-
- configure | 35 +++++++++++++++++++++++++++++++++++
- 1 file changed, 35 insertions(+)
-
-diff --git a/configure b/configure
-index cdcd34e94030..d94b92255088 100755
---- a/configure
-+++ b/configure
-@@ -26,6 +26,7 @@ errata_force=0
- erratatxt="$srcdir/errata.txt"
- host_key_document=
- page_size=
-+earlycon=
- 
- usage() {
-     cat <<-EOF
-@@ -54,6 +55,17 @@ usage() {
- 	    --page-size=PAGE_SIZE
- 	                           Specify the page size (translation granule) (4k, 16k or
- 	                           64k, default is 64k, arm64 only)
-+	    --earlycon=EARLYCON
-+	                           Specify the UART name, type and address (optional, arm and
-+	                           arm64 only). The specified address will overwrite the UART
-+	                           address set by the --vmm option. EARLYCON can be on of (case
-+	                           sensitive):
-+	               uart[8250],mmio,ADDR
-+	                           Specify an 8250 compatible UART at address ADDR. Supported
-+	                           register stride is 8 bit only.
-+	               pl011,mmio,ADDR
-+	                           Specify a PL011 compatible UART at address ADDR. Supported
-+	                           register stride is 8 bit only.
- EOF
-     exit 1
- }
-@@ -112,6 +124,9 @@ while [[ "$1" = -* ]]; do
- 	--page-size)
- 	    page_size="$arg"
- 	    ;;
-+	--earlycon)
-+	    earlycon="$arg"
-+	    ;;
- 	--help)
- 	    usage
- 	    ;;
-@@ -170,6 +185,26 @@ elif [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
-         echo '--vmm must be one of "qemu" or "kvmtool"!'
-         usage
-     fi
-+
-+    if [ "$earlycon" ]; then
-+        name=$(echo $earlycon|cut -d',' -f1)
-+        if [ "$name" != "uart" ] && [ "$name" != "uart8250" ] &&
-+                [ "$name" != "pl011" ]; then
-+            echo "unknown earlycon name: $name"
-+            usage
-+        fi
-+        type=$(echo $earlycon|cut -d',' -f2)
-+        if [ "$type" != "mmio" ]; then
-+            echo "unknown earlycon type: $type"
-+            usage
-+        fi
-+        addr=$(echo $earlycon|cut -d',' -f3)
-+        if [ -z "$addr" ]; then
-+            echo "missing earlycon address"
-+            usage
-+        fi
-+        arm_uart_early_addr=$addr
-+    fi
- elif [ "$arch" = "ppc64" ]; then
-     testdir=powerpc
-     firmware="$testdir/boot_rom.bin"
--- 
-2.30.1
-
+Thanks Sean!
+Quentin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
