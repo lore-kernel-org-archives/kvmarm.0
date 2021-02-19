@@ -2,59 +2,81 @@ Return-Path: <SRS0=3b8a=HV=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABF02C433DB
-	for <kvmarm@archiver.kernel.org>; Fri, 19 Feb 2021 12:13:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00B62C433E0
+	for <kvmarm@archiver.kernel.org>; Fri, 19 Feb 2021 12:24:21 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3609C64EC0
-	for <kvmarm@archiver.kernel.org>; Fri, 19 Feb 2021 12:13:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3609C64EC0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 573CD64ED6
+	for <kvmarm@archiver.kernel.org>; Fri, 19 Feb 2021 12:24:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 573CD64ED6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C891F4B2CD;
-	Fri, 19 Feb 2021 07:13:52 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B9A034B2B6;
+	Fri, 19 Feb 2021 07:24:19 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id WnJI7ifGwxJD; Fri, 19 Feb 2021 07:13:51 -0500 (EST)
+	with ESMTP id M+jCBegnVPpS; Fri, 19 Feb 2021 07:24:18 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 64CC64B2D1;
-	Fri, 19 Feb 2021 07:13:50 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F1134B2BD;
+	Fri, 19 Feb 2021 07:24:18 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0783C4B2D8
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Feb 2021 07:13:49 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 78C9E4B2B3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Feb 2021 07:24:17 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yhbAVjpYNR-T for <kvmarm@lists.cs.columbia.edu>;
- Fri, 19 Feb 2021 07:13:47 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 042B54B312
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Feb 2021 07:13:46 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9E8831477;
- Fri, 19 Feb 2021 04:13:45 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C1CBC3F73B;
- Fri, 19 Feb 2021 04:13:44 -0800 (PST)
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: drjones@redhat.com,
-	kvm@vger.kernel.org,
-	kvmarm@lists.cs.columbia.edu
-Subject: [kvm-unit-tests PATCH v4 11/11] arm64: gic: Use IPI test checking for
- the LPI tests
-Date: Fri, 19 Feb 2021 12:13:37 +0000
-Message-Id: <20210219121337.76533-12-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.30.1
-In-Reply-To: <20210219121337.76533-1-alexandru.elisei@arm.com>
-References: <20210219121337.76533-1-alexandru.elisei@arm.com>
-MIME-Version: 1.0
-Cc: andre.przywara@arm.com
+ with ESMTP id xYBBrN7x1h+0 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 19 Feb 2021 07:24:16 -0500 (EST)
+Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com
+ [209.85.219.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 837EF4B2B4
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Feb 2021 07:24:16 -0500 (EST)
+Received: by mail-qv1-f73.google.com with SMTP id k14so3062111qvw.17
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Feb 2021 04:24:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=sender:date:message-id:mime-version:subject:from:to:cc;
+ bh=TjICHKCTzDMja+79MrvqOUORH0l2JlSOQGujchxQyOg=;
+ b=BDIZEIY6PBgqVg46OiBrMTS4HJQKBIx1Ls1cJd0lementEI/2iSyngz/6BgwRMFqV9
+ gM5ltwB3G8wzahl7UPdYwR8I8Sf/HlZGEuTh5BhtddSpdizMdXxjDIPS2yQhYJtdSs6k
+ 6kJg9t65jx3gp7XVlyMesIKRzmlGra8Swp86GhlTlYnF1vIs5DFgRYqbCcRPkRge6hCI
+ MVSFanzJvGgmwz1XHaDFnEcqM2oulCwjdBCsAP2CynR2gY+qnsZiMT1s2FnZxATt98BU
+ 4mEfn+WA/MGb6C0gpAnwcKhbYEAyXQMKRLOD2lrxN6uFKSCmVAfZtHm67ZzhrhxhtYd3
+ rG6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
+ :to:cc;
+ bh=TjICHKCTzDMja+79MrvqOUORH0l2JlSOQGujchxQyOg=;
+ b=iPhNvHAeTXaI2+e7hkZxJUPoj+FqDsZP/0bgjD5+KS2Not/ECe1FoDIvB24Xwkl4Zk
+ vpBVwzOqWL4I9GLPyvOr+uPQ6U+fASwE3SxGWaJXnj13NRaffjSDr7Y3QYSBg2mjCJjA
+ intpS3aVIP0ErSP5nD8lc5YW//MkwPe6rZNqUIg6iv1MEML9xXfNCO5MZZzTu2nbQLT3
+ UDxOSwt+TA6yXbVEF9ob3e5PIt8svjGDYL+USBRFU9rSPFxPww5b+ftqQwfY2lw5RoUW
+ wPAi5FOYI8qyzPEwCKFALiXZJvn02GGmBxX1rYDAbcmihA3xjtUE/BYJ33GRk1iRYBNR
+ dfZQ==
+X-Gm-Message-State: AOAM531HM6ImAnQog9/kc+Qr6rxacaAABgzelLk73RP4qGZwnc3gU50y
+ 4uXflN/fgSGWX+dkucTeNq2YBAyevXQeIyMFe3wU7LJGDW2D07W9LrI4ZF5Paiwfu9LXZDADFWy
+ BsEZn0xHdI3BvMWypwV+J7F2/ROBJRuQGriXGKfF/7j6l+DhrIwEV0gXAhDJs8grjiGpexA==
+X-Google-Smtp-Source: ABdhPJxy1ZItxvSvCDUTzSn+plxXi0SBKkh61Bwhunhl/oNzffkynYCfwV7O4oJx6skkxdrB6XrERXBOTHY=
+X-Received: from ascull.c.googlers.com ([fda3:e722:ac3:10:28:9cb1:c0a8:1510])
+ (user=ascull job=sendgmr) by 2002:a05:6214:186b:: with SMTP id
+ eh11mr8627663qvb.1.1613737455903; Fri, 19 Feb 2021 04:24:15 -0800 (PST)
+Date: Fri, 19 Feb 2021 12:24:06 +0000
+Message-Id: <20210219122406.1337626-1-ascull@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.30.0.617.g56c4b15f3c-goog
+Subject: [PATCH] KVM: arm64: Fix nVHE hyp panic host context restore
+From: Andrew Scull <ascull@google.com>
+To: kvmarm@lists.cs.columbia.edu
+Cc: kernel-team@android.com, maz@kernel.org, catalin.marinas@arm.com,
+ will@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,396 +93,106 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The LPI code validates a result similarly to the IPI tests, by checking if
-the target CPU received the interrupt with the expected interrupt number.
-However, the LPI tests invent their own way of checking the test results by
-creating a global struct (lpi_stats), using a separate interrupt handler
-(lpi_handler) and test function (check_lpi_stats).
+When panicking from the nVHE hyp and restoring the host context, x29 is
+expected to hold a pointer to the host context. This wasn't being done
+so fix it to make sure there's a valid pointer the host context being
+used.
 
-There are several areas that can be improved in the LPI code, which are
-already covered by the IPI tests:
+Rather than passing a boolean indicating whether or not the host context
+should be restored, instead pass the pointer to the host context. NULL
+is passed to indicate that no context should be restored.
 
-- check_lpi_stats() doesn't take into account that the target CPU can
-  receive the correct interrupt multiple times.
-- check_lpi_stats() doesn't take into the account the scenarios where all
-  online CPUs can receive the interrupt, but the target CPU is the last CPU
-  that touches lpi_stats.observed.
-- Insufficient or missing memory synchronization.
-
-Instead of duplicating code, let's convert the LPI tests to use
-check_acked() and the same interrupt handler as the IPI tests, which has
-been renamed to irq_handler() to avoid any confusion.
-
-check_lpi_stats() has been replaced with check_acked() which, together with
-using irq_handler(), instantly gives us more correctness checks and proper
-memory synchronization between threads. lpi_stats.expected has been
-replaced by the CPU mask and the expected interrupt number arguments to
-check_acked(), with no change in semantics.
-
-lpi_handler() aborted the test if the interrupt number was not an LPI. This
-was changed in favor of allowing the test to continue, as it will fail in
-check_acked(), but possibly print information useful for debugging. If the
-test receives spurious interrupts, those are reported via report_info() at
-the end of the test for consistency with the IPI tests, which don't treat
-spurious interrupts as critical errors.
-
-In the spirit of code reuse, secondary_lpi_tests() has been replaced with
-ipi_recv() because the two are now identical; ipi_recv() has been renamed
-to irq_recv(), similarly to irq_handler(), to avoid confusion.
-
-CC: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Signed-off-by: Andrew Scull <ascull@google.com>
 ---
- arm/gic.c | 188 ++++++++++++++++++++++++------------------------------
- 1 file changed, 85 insertions(+), 103 deletions(-)
+ arch/arm64/include/asm/kvm_hyp.h |  3 ++-
+ arch/arm64/kvm/hyp/nvhe/host.S   | 20 ++++++++++----------
+ arch/arm64/kvm/hyp/nvhe/switch.c |  3 +--
+ 3 files changed, 13 insertions(+), 13 deletions(-)
 
-diff --git a/arm/gic.c b/arm/gic.c
-index 8bc2a35908f2..98135ef2cb06 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -105,13 +105,12 @@ static bool check_acked(cpumask_t *mask, int sender, int irqnum)
- 				++missing;
- 			else if (acked[cpu] > 1)
- 				++extra;
--		} else {
--			if (acked[cpu])
-+		} else if (acked[cpu]) {
- 				++unexpected;
- 		}
- 		if (!acked[cpu])
- 			continue;
--		smp_rmb(); /* pairs with smp_wmb in ipi_handler */
-+		smp_rmb(); /* pairs with smp_wmb in irq_handler */
+diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+index c0450828378b..fb8404fefd1f 100644
+--- a/arch/arm64/include/asm/kvm_hyp.h
++++ b/arch/arm64/include/asm/kvm_hyp.h
+@@ -97,7 +97,8 @@ bool kvm_host_psci_handler(struct kvm_cpu_context *host_ctxt);
  
- 		if (has_gicv2 && irq_sender[cpu] != sender) {
- 			report_info("cpu%d received IPI from wrong sender %d",
-@@ -149,11 +148,12 @@ static void check_spurious(void)
- static int gic_get_sender(int irqstat)
- {
- 	if (gic_version() == 2)
-+		/* GICC_IAR.CPUID is RAZ for non-SGIs */
- 		return (irqstat >> 10) & 7;
- 	return -1;
- }
+ void __noreturn hyp_panic(void);
+ #ifdef __KVM_NVHE_HYPERVISOR__
+-void __noreturn __hyp_do_panic(bool restore_host, u64 spsr, u64 elr, u64 par);
++void __noreturn __hyp_do_panic(struct kvm_cpu_context *host_ctxt, u64 spsr,
++			       u64 elr, u64 par);
+ #endif
  
--static void ipi_handler(struct pt_regs *regs __unused)
-+static void irq_handler(struct pt_regs *regs __unused)
- {
- 	u32 irqstat = gic_read_iar();
- 	u32 irqnr = gic_iar_irqnr(irqstat);
-@@ -185,75 +185,6 @@ static void setup_irq(irq_handler_fn handler)
- }
+ #endif /* __ARM64_KVM_HYP_H__ */
+diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
+index a820dfdc9c25..3dc5a9f3e575 100644
+--- a/arch/arm64/kvm/hyp/nvhe/host.S
++++ b/arch/arm64/kvm/hyp/nvhe/host.S
+@@ -71,10 +71,15 @@ SYM_FUNC_START(__host_enter)
+ SYM_FUNC_END(__host_enter)
  
- #if defined(__aarch64__)
--struct its_event {
--	int cpu_id;
--	int lpi_id;
--};
--
--struct its_stats {
--	struct its_event expected;
--	struct its_event observed;
--};
--
--static struct its_stats lpi_stats;
--
--static void lpi_handler(struct pt_regs *regs __unused)
--{
--	u32 irqstat = gic_read_iar();
--	int irqnr = gic_iar_irqnr(irqstat);
--
--	gic_write_eoir(irqstat);
--	assert(irqnr >= 8192);
--	smp_rmb(); /* pairs with wmb in lpi_stats_expect */
--	lpi_stats.observed.cpu_id = smp_processor_id();
--	lpi_stats.observed.lpi_id = irqnr;
--	acked[lpi_stats.observed.cpu_id]++;
--	smp_wmb(); /* pairs with rmb in check_lpi_stats */
--}
--
--static void lpi_stats_expect(int exp_cpu_id, int exp_lpi_id)
--{
--	lpi_stats.expected.cpu_id = exp_cpu_id;
--	lpi_stats.expected.lpi_id = exp_lpi_id;
--	lpi_stats.observed.cpu_id = -1;
--	lpi_stats.observed.lpi_id = -1;
--	smp_wmb(); /* pairs with rmb in handler */
--}
--
--static void check_lpi_stats(const char *msg)
--{
--	int i;
--
--	for (i = 0; i < 50; i++) {
--		mdelay(100);
--		smp_rmb(); /* pairs with wmb in lpi_handler */
--		if (lpi_stats.observed.cpu_id == lpi_stats.expected.cpu_id &&
--		    lpi_stats.observed.lpi_id == lpi_stats.expected.lpi_id) {
--			report(true, "%s", msg);
--			return;
--		}
--	}
--
--	if (lpi_stats.observed.cpu_id == -1 && lpi_stats.observed.lpi_id == -1) {
--		report_info("No LPI received whereas (cpuid=%d, intid=%d) "
--			    "was expected", lpi_stats.expected.cpu_id,
--			    lpi_stats.expected.lpi_id);
--	} else {
--		report_info("Unexpected LPI (cpuid=%d, intid=%d)",
--			    lpi_stats.observed.cpu_id,
--			    lpi_stats.observed.lpi_id);
--	}
--	report(false, "%s", msg);
--}
--
--static void secondary_lpi_test(void)
--{
--	setup_irq(lpi_handler);
--	cpumask_set_cpu(smp_processor_id(), &ready);
--	while (1)
--		wfi();
--}
--
- static void check_lpi_hits(int *expected, const char *msg)
- {
- 	bool pass = true;
-@@ -347,7 +278,7 @@ static void ipi_test_smp(void)
+ /*
+- * void __noreturn __hyp_do_panic(bool restore_host, u64 spsr, u64 elr, u64 par);
++ * void __noreturn __hyp_do_panic(struct kvm_cpu_context *host_ctxt, u64 spsr,
++ * 				  u64 elr, u64 par);
+  */
+ SYM_FUNC_START(__hyp_do_panic)
+-	/* Load the format arguments into x1-7 */
++	mov	x29, x0
++
++	/* Load the format string into x0 and arguments into x1-7 */
++	ldr	x0, =__hyp_panic_string
++
+ 	mov	x6, x3
+ 	get_vcpu_ptr x7, x3
  
- static void ipi_send(void)
- {
--	setup_irq(ipi_handler);
-+	setup_irq(irq_handler);
- 	wait_on_ready();
- 	ipi_test_self();
- 	ipi_test_smp();
-@@ -355,9 +286,9 @@ static void ipi_send(void)
- 	exit(report_summary());
- }
+@@ -89,13 +94,8 @@ SYM_FUNC_START(__hyp_do_panic)
+ 	ldr	lr, =panic
+ 	msr	elr_el2, lr
  
--static void ipi_recv(void)
-+static void irq_recv(void)
- {
--	setup_irq(ipi_handler);
-+	setup_irq(irq_handler);
- 	cpumask_set_cpu(smp_processor_id(), &ready);
- 	while (1)
- 		wfi();
-@@ -368,7 +299,7 @@ static void ipi_test(void *data __unused)
- 	if (smp_processor_id() == IPI_SENDER)
- 		ipi_send();
- 	else
--		ipi_recv();
-+		irq_recv();
- }
+-	/*
+-	 * Set the panic format string and enter the host, conditionally
+-	 * restoring the host context.
+-	 */
+-	cmp	x0, xzr
+-	ldr	x0, =__hyp_panic_string
+-	b.eq	__host_enter_without_restoring
++	/* Enter the host, restoring the host context if it was provided. */
++	cbz	x29, __host_enter_without_restoring
+ 	b	__host_enter_for_panic
+ SYM_FUNC_END(__hyp_do_panic)
  
- static struct gic gicv2 = {
-@@ -696,14 +627,12 @@ static int its_prerequisites(int nb_cpus)
- 		return -1;
+@@ -150,7 +150,7 @@ SYM_FUNC_END(__hyp_do_panic)
+ 
+ .macro invalid_host_el1_vect
+ 	.align 7
+-	mov	x0, xzr		/* restore_host = false */
++	mov	x0, xzr		/* host_ctxt = NULL */
+ 	mrs	x1, spsr_el2
+ 	mrs	x2, elr_el2
+ 	mrs	x3, par_el1
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index f3d0e9eca56c..038147b7674b 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -257,7 +257,6 @@ void __noreturn hyp_panic(void)
+ 	u64 spsr = read_sysreg_el2(SYS_SPSR);
+ 	u64 elr = read_sysreg_el2(SYS_ELR);
+ 	u64 par = read_sysreg_par();
+-	bool restore_host = true;
+ 	struct kvm_cpu_context *host_ctxt;
+ 	struct kvm_vcpu *vcpu;
+ 
+@@ -271,7 +270,7 @@ void __noreturn hyp_panic(void)
+ 		__sysreg_restore_state_nvhe(host_ctxt);
  	}
  
--	stats_reset();
--
--	setup_irq(lpi_handler);
-+	setup_irq(irq_handler);
- 
- 	for_each_present_cpu(cpu) {
- 		if (cpu == 0)
- 			continue;
--		smp_boot_secondary(cpu, secondary_lpi_test);
-+		smp_boot_secondary(cpu, irq_recv);
- 	}
- 	wait_on_ready();
- 
-@@ -757,6 +686,7 @@ static void test_its_trigger(void)
- {
- 	struct its_collection *col3;
- 	struct its_device *dev2, *dev7;
-+	cpumask_t mask;
- 
- 	if (its_setup1())
- 		return;
-@@ -767,13 +697,21 @@ static void test_its_trigger(void)
- 
- 	report_prefix_push("int");
- 
--	lpi_stats_expect(3, 8195);
-+	stats_reset();
-+	cpumask_clear(&mask);
-+	cpumask_set_cpu(3, &mask);
- 	its_send_int(dev2, 20);
--	check_lpi_stats("dev=2, eventid=20  -> lpi= 8195, col=3");
-+	wait_for_interrupts(&mask);
-+	report(check_acked(&mask, 0, 8195),
-+			"dev=2, eventid=20  -> lpi= 8195, col=3");
- 
--	lpi_stats_expect(2, 8196);
-+	stats_reset();
-+	cpumask_clear(&mask);
-+	cpumask_set_cpu(2, &mask);
- 	its_send_int(dev7, 255);
--	check_lpi_stats("dev=7, eventid=255 -> lpi= 8196, col=2");
-+	wait_for_interrupts(&mask);
-+	report(check_acked(&mask, 0, 8196),
-+			"dev=7, eventid=255 -> lpi= 8196, col=2");
- 
- 	report_prefix_pop();
- 
-@@ -786,9 +724,12 @@ static void test_its_trigger(void)
- 	gicv3_lpi_set_config(8195, LPI_PROP_DEFAULT & ~LPI_PROP_ENABLED);
- 	its_send_inv(dev2, 20);
- 
--	lpi_stats_expect(-1, -1);
-+	stats_reset();
-+	cpumask_clear(&mask);
- 	its_send_int(dev2, 20);
--	check_lpi_stats("dev2/eventid=20 does not trigger any LPI");
-+	wait_for_interrupts(&mask);
-+	report(check_acked(&mask, -1, -1),
-+			"dev2/eventid=20 does not trigger any LPI");
- 
- 	/*
- 	 * re-enable the LPI but willingly do not call invall
-@@ -796,18 +737,29 @@ static void test_its_trigger(void)
- 	 * The LPI should not hit
- 	 */
- 	gicv3_lpi_set_config(8195, LPI_PROP_DEFAULT);
--	lpi_stats_expect(-1, -1);
-+	stats_reset();
-+	cpumask_clear(&mask);
- 	its_send_int(dev2, 20);
--	check_lpi_stats("dev2/eventid=20 still does not trigger any LPI");
-+	wait_for_interrupts(&mask);
-+	report(check_acked(&mask, -1, -1),
-+			"dev2/eventid=20 still does not trigger any LPI");
- 
- 	/* Now call the invall and check the LPI hits */
-+	stats_reset();
-+	cpumask_clear(&mask);
-+	cpumask_set_cpu(3, &mask);
- 	its_send_invall(col3);
--	lpi_stats_expect(3, 8195);
--	check_lpi_stats("dev2/eventid=20 pending LPI is received");
-+	wait_for_interrupts(&mask);
-+	report(check_acked(&mask, 0, 8195),
-+			"dev2/eventid=20 pending LPI is received");
- 
--	lpi_stats_expect(3, 8195);
-+	stats_reset();
-+	cpumask_clear(&mask);
-+	cpumask_set_cpu(3, &mask);
- 	its_send_int(dev2, 20);
--	check_lpi_stats("dev2/eventid=20 now triggers an LPI");
-+	wait_for_interrupts(&mask);
-+	report(check_acked(&mask, 0, 8195),
-+			"dev2/eventid=20 now triggers an LPI");
- 
- 	report_prefix_pop();
- 
-@@ -818,9 +770,13 @@ static void test_its_trigger(void)
- 	 */
- 
- 	its_send_mapd(dev2, false);
--	lpi_stats_expect(-1, -1);
-+	stats_reset();
-+	cpumask_clear(&mask);
- 	its_send_int(dev2, 20);
--	check_lpi_stats("no LPI after device unmap");
-+	wait_for_interrupts(&mask);
-+	report(check_acked(&mask, -1, -1), "no LPI after device unmap");
-+
-+	check_spurious();
- 	report_prefix_pop();
+-	__hyp_do_panic(restore_host, spsr, elr, par);
++	__hyp_do_panic(host_ctxt, spsr, elr, par);
+ 	unreachable();
  }
- 
-@@ -828,6 +784,7 @@ static void test_its_migration(void)
- {
- 	struct its_device *dev2, *dev7;
- 	bool test_skipped = false;
-+	cpumask_t mask;
- 
- 	if (its_setup1()) {
- 		test_skipped = true;
-@@ -844,13 +801,23 @@ do_migrate:
- 	if (test_skipped)
- 		return;
- 
--	lpi_stats_expect(3, 8195);
-+	stats_reset();
-+	cpumask_clear(&mask);
-+	cpumask_set_cpu(3, &mask);
- 	its_send_int(dev2, 20);
--	check_lpi_stats("dev2/eventid=20 triggers LPI 8195 on PE #3 after migration");
-+	wait_for_interrupts(&mask);
-+	report(check_acked(&mask, 0, 8195),
-+			"dev2/eventid=20 triggers LPI 8195 on PE #3 after migration");
- 
--	lpi_stats_expect(2, 8196);
-+	stats_reset();
-+	cpumask_clear(&mask);
-+	cpumask_set_cpu(2, &mask);
- 	its_send_int(dev7, 255);
--	check_lpi_stats("dev7/eventid=255 triggers LPI 8196 on PE #2 after migration");
-+	wait_for_interrupts(&mask);
-+	report(check_acked(&mask, 0, 8196),
-+			"dev7/eventid=255 triggers LPI 8196 on PE #2 after migration");
-+
-+	check_spurious();
- }
- 
- #define ERRATA_UNMAPPED_COLLECTIONS "ERRATA_8c58be34494b"
-@@ -860,6 +827,7 @@ static void test_migrate_unmapped_collection(void)
- 	struct its_collection *col = NULL;
- 	struct its_device *dev2 = NULL, *dev7 = NULL;
- 	bool test_skipped = false;
-+	cpumask_t mask;
- 	int pe0 = 0;
- 	u8 config;
- 
-@@ -894,17 +862,27 @@ do_migrate:
- 	its_send_mapc(col, true);
- 	its_send_invall(col);
- 
--	lpi_stats_expect(2, 8196);
-+	stats_reset();
-+	cpumask_clear(&mask);
-+	cpumask_set_cpu(2, &mask);
- 	its_send_int(dev7, 255);
--	check_lpi_stats("dev7/eventid= 255 triggered LPI 8196 on PE #2");
-+	wait_for_interrupts(&mask);
-+	report(check_acked(&mask, 0, 8196),
-+			"dev7/eventid= 255 triggered LPI 8196 on PE #2");
- 
- 	config = gicv3_lpi_get_config(8192);
- 	report(config == LPI_PROP_DEFAULT,
- 	       "Config of LPI 8192 was properly migrated");
- 
--	lpi_stats_expect(pe0, 8192);
-+	stats_reset();
-+	cpumask_clear(&mask);
-+	cpumask_set_cpu(pe0, &mask);
- 	its_send_int(dev2, 0);
--	check_lpi_stats("dev2/eventid = 0 triggered LPI 8192 on PE0");
-+	wait_for_interrupts(&mask);
-+	report(check_acked(&mask, 0, 8192),
-+			"dev2/eventid = 0 triggered LPI 8192 on PE0");
-+
-+	check_spurious();
- }
- 
- static void test_its_pending_migration(void)
-@@ -961,6 +939,10 @@ static void test_its_pending_migration(void)
- 	pendbaser = readq(ptr);
- 	writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
- 
-+	/*
-+	 * Reset and initialization values for acked are the same, so we don't
-+	 * need to explicitely call stats_reset().
-+	 */
- 	gicv3_lpi_rdist_enable(pe0);
- 	gicv3_lpi_rdist_enable(pe1);
  
 -- 
-2.30.1
+2.30.0.617.g56c4b15f3c-goog
 
 _______________________________________________
 kvmarm mailing list
