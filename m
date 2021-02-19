@@ -7,87 +7,88 @@ X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5864EC433E0
-	for <kvmarm@archiver.kernel.org>; Fri, 19 Feb 2021 18:11:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F813C433DB
+	for <kvmarm@archiver.kernel.org>; Fri, 19 Feb 2021 18:47:21 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BD70C64E5F
-	for <kvmarm@archiver.kernel.org>; Fri, 19 Feb 2021 18:11:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD70C64E5F
+	by mail.kernel.org (Postfix) with ESMTP id 8998E64E92
+	for <kvmarm@archiver.kernel.org>; Fri, 19 Feb 2021 18:47:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8998E64E92
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A35A4B322;
-	Fri, 19 Feb 2021 13:11:40 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 051C74B2C3;
+	Fri, 19 Feb 2021 13:47:20 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pz8cFHUoxG2W; Fri, 19 Feb 2021 13:11:39 -0500 (EST)
+	with ESMTP id zDwUccAyPFEz; Fri, 19 Feb 2021 13:47:18 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EFAB4B2B9;
-	Fri, 19 Feb 2021 13:11:39 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C21F74B31E;
+	Fri, 19 Feb 2021 13:47:18 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AB7124B279
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Feb 2021 12:54:48 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ED5924B1C8
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Feb 2021 13:33:08 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Mrc836xAJejZ for <kvmarm@lists.cs.columbia.edu>;
- Fri, 19 Feb 2021 12:54:47 -0500 (EST)
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com
- [209.85.215.175])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 824984B276
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Feb 2021 12:54:47 -0500 (EST)
-Received: by mail-pg1-f175.google.com with SMTP id j1so1834134pgh.4
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Feb 2021 09:54:47 -0800 (PST)
+ with ESMTP id PaU-i9ufWojp for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 19 Feb 2021 13:33:07 -0500 (EST)
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com
+ [209.85.216.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BBDA34B1BC
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Feb 2021 13:33:07 -0500 (EST)
+Received: by mail-pj1-f53.google.com with SMTP id cl8so4189727pjb.0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Feb 2021 10:33:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=glvZ+nCfB9TtbAroDymQkDFhBNuKdCgNd2JMzbDR3kI=;
- b=OCyoHdUAUdv7opL3EZFA7lTMEfk3yF8FryLxCsvYVnjGDzjyo3IU/c24JBfeqd7Wek
- htlrq3CI2X7xA4XR6tgBgRmcOimlCZyvreXpDi0cBn0e7Op3Gtb9GT+mvag2vQoL86sf
- J0f5gDbks/Dkv/ld51c1f0GgMocBOlWoIoOEdzcEOPTTrwnF/h8V0l0WfEqpLvGWNdWX
- pRsJzlcOFdUHpbWX4cx1FCRdE1h+ASi7U36zIZ2gY/fAR3a14ZS2bBkxXS4Pg3/6hmRG
- uxDTlXeWoVGVQ+nqd4wJZsOKg5SJvzrp201YnPYTjQuRSLi2j+7jVMsSPZO2TUloFe1t
- ZqWQ==
+ bh=apaYLCgpKww0D9oOCdL1/leTpd02z3P4w+UfyB0qUtE=;
+ b=cNzmU6RwCi2M7zc1iN6kXALpuF4Dr3p9TUe2IZrVSxDRNZxj43w4OZN9GBVNUyVoGY
+ H1RXDjVYIy/K8yNu7pM4zNUC+X8IPbISNDZkI7CMRH6NW31SInd7dD92i1llEAJIpNl9
+ iWbI8rgOSf7uQmj0SebJ6NcX/Ooy0yvSHYo1XyOoSpU19UIDftAZr4ACUicBtUMeLzOs
+ JxUyV+lfMm+gr31mLh9yWgpO+USuw7r8q/XR26xRmrLSWdm95R71UclAbHcjdoD9mUVg
+ /RXbSkNXY3aLx0dVZoac6BkHs3HET/aQxjW2WzpvO3e5JjAUaXvXTBmMVyOyA+7Xdb05
+ 6Cfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=glvZ+nCfB9TtbAroDymQkDFhBNuKdCgNd2JMzbDR3kI=;
- b=oyl2MgGnzd3s3lRmyxGmnAhLYMI1WHXbn1mWhgyXZL5mZmQSE6naW0aREKdelQISII
- KJneoQNFHeHL3OH35bW7l+ofEPdapmqHoEhJlX5jnmtK84NAZloJ6zK+ZEn3fjydUgiV
- 6U4zM3hcSRNn9CnK2ZDgRW7TZAEb1X0o7OGYZsah7+xJBvuzPPZkyg7CMUkYqOKMzVZh
- /gJFDY+iKZXr12n+31iuD0Wyu7CCq0Ye/IaI0zKF/85WslpAbZudCx81vTbLy9ms/tym
- 3FfHRkzewvyhAZcYRj9z+WYs5HV/Y5HnfoyZltIlgqfm4K8UBbSjB64pxsqO9kHUyla3
- lwpg==
-X-Gm-Message-State: AOAM532JnAZ3w8mabLGxoq7x+n8z++8VmSpsZHaHXHHQAANJigMImYvZ
- Y50bJz4oZSfrPt3Ozr6wlZTKiA==
-X-Google-Smtp-Source: ABdhPJx6LkZZbRlVWvf8Qceg5jpRQTiPkyf5Y3+HD6ZGTTavt9ztCUZdCVv8/v9Y3O4vJmgK1tv/Fw==
-X-Received: by 2002:a62:7985:0:b029:1e1:1703:c2e7 with SMTP id
- u127-20020a6279850000b02901e11703c2e7mr10602461pfc.69.1613757286450; 
- Fri, 19 Feb 2021 09:54:46 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:903f:bec1:f9d:479b])
- by smtp.gmail.com with ESMTPSA id t2sm5997590pfg.152.2021.02.19.09.54.44
+ bh=apaYLCgpKww0D9oOCdL1/leTpd02z3P4w+UfyB0qUtE=;
+ b=iGBWALMBGq9HTgMkqAsp0GAP012eY9jFb0oIJd6N3MZ3zYSRimSJDEPiIfwoZQgjl6
+ D2LKIXLYJKe3COx2gNRDjMDyU/ak4TtnWFwISkdoNzy+myXYlUpKcxTftwkgDdrttzc6
+ 21zNNhZTBqn7dvwiNvIGznxnaGSSSnzUSMlbRTdtRWLuSz2tYPhNZaKDDOlOu/uciHdt
+ 5TSnxGc+NJL57aQiFU9qrmw8NVpiUlmTMWz77d5qYKWNcMlor3lYZYDmIFfiJoaPUf4i
+ 7tSiRFOtIwUu7zhGXa6HJ1m6IRa3Ry4mFkK9iG90JmtwzPYPMiAZaWSodPoVN0+DATjf
+ SOHA==
+X-Gm-Message-State: AOAM5312CZBkZ0DFxE1iJXr1/wa9tsiQGK/w3lFRenjqfD7SbPiQHCwY
+ cb8X8LXUML9fzITN9+cVebrMUw==
+X-Google-Smtp-Source: ABdhPJzGsluCsG7fkC2FvoTQGUbPeiWB8QuireUSeDuRRKhKexRWjsorjPjofN2X3s0CAIhvLZ+5ZQ==
+X-Received: by 2002:a17:902:9894:b029:e3:7aa3:a499 with SMTP id
+ s20-20020a1709029894b02900e37aa3a499mr3088340plp.11.1613759586653; 
+ Fri, 19 Feb 2021 10:33:06 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:fc4d:e9c3:d7d:9cb3])
+ by smtp.gmail.com with ESMTPSA id 3sm9467713pjk.26.2021.02.19.10.33.04
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 19 Feb 2021 09:54:45 -0800 (PST)
-Date: Fri, 19 Feb 2021 09:54:38 -0800
+ Fri, 19 Feb 2021 10:33:06 -0800 (PST)
+Date: Fri, 19 Feb 2021 10:32:58 -0800
 From: Sean Christopherson <seanjc@google.com>
-To: Quentin Perret <qperret@google.com>
-Subject: Re: [RFC PATCH v2 00/26] KVM/arm64: A stage 2 for the host
-Message-ID: <YC/7XuB30N8C3sNx@google.com>
+To: Will Deacon <will@kernel.org>
+Subject: Re: [RFC PATCH v2 16/26] KVM: arm64: Prepare Hyp memory protection
+Message-ID: <YDAEWu7RkG1OBFed@google.com>
 References: <20210108121524.656872-1-qperret@google.com>
+ <20210108121524.656872-17-qperret@google.com>
+ <20210203143709.GA18907@willie-the-truck>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20210108121524.656872-1-qperret@google.com>
-X-Mailman-Approved-At: Fri, 19 Feb 2021 13:11:37 -0500
-Cc: devicetree@vger.kernel.org, kernel-team@android.com,
- Frank Rowand <frowand.list@gmail.com>, android-kvm@google.com,
+In-Reply-To: <20210203143709.GA18907@willie-the-truck>
+X-Mailman-Approved-At: Fri, 19 Feb 2021 13:47:17 -0500
+Cc: devicetree@vger.kernel.org, kernel-team@android.com, android-kvm@google.com,
  Catalin Marinas <catalin.marinas@arm.com>, Fuad Tabba <tabba@google.com>,
  linux-kernel@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
  linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
+ Frank Rowand <frowand.list@gmail.com>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -104,14 +105,77 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Jan 08, 2021, Quentin Perret wrote:
-> [2] https://kvmforum2020.sched.com/event/eE24/virtualization-for-the-masses-exposing-kvm-on-android-will-deacon-google
+On Wed, Feb 03, 2021, Will Deacon wrote:
+> On Fri, Jan 08, 2021 at 12:15:14PM +0000, Quentin Perret wrote:
 
-I couldn't find any slides on the official KVM forum site linked above.  I was
-able to track down a mirror[1] and the recorded presentation[2].
+...
 
-[1] https://mirrors.edge.kernel.org/pub/linux/kernel/people/will/slides/kvmforum-2020-edited.pdf
-[2] https://youtu.be/wY-u6n75iXc
+> > +static inline unsigned long hyp_s1_pgtable_size(void)
+> > +{
+
+...
+
+> > +		res += nr_pages << PAGE_SHIFT;
+> > +	}
+> > +
+> > +	/* Allow 1 GiB for private mappings */
+> > +	nr_pages = (1 << 30) >> PAGE_SHIFT;
+> 
+> SZ_1G >> PAGE_SHIFT
+
+Where does the 1gb magic number come from?  IIUC, this is calculating the number
+of pages needed for the hypervisor's Stage-1 page tables.  The amount of memory
+needed for those page tables should be easily calculated, and assuming huge
+pages can be used, should be far less the 1gb.
+ 
+> > +	nr_pages = __hyp_pgtable_max_pages(nr_pages);
+> > +	res += nr_pages << PAGE_SHIFT;
+> > +
+> > +	return res;
+
+...
+
+> > +void __init kvm_hyp_reserve(void)
+> > +{
+> > +	u64 nr_pages, prev;
+> > +
+> > +	if (!is_hyp_mode_available() || is_kernel_in_hyp_mode())
+> > +		return;
+> > +
+> > +	if (kvm_get_mode() != KVM_MODE_PROTECTED)
+> > +		return;
+> > +
+> > +	if (kvm_nvhe_sym(hyp_memblock_nr) < 0) {
+> > +		kvm_err("Failed to register hyp memblocks\n");
+> > +		return;
+> > +	}
+> > +
+> > +	sort_memblock_regions();
+> > +
+> > +	/*
+> > +	 * We don't know the number of possible CPUs yet, so allocate for the
+> > +	 * worst case.
+> > +	 */
+> > +	hyp_mem_size += NR_CPUS << PAGE_SHIFT;
+
+Is this for per-cpu stack?
+
+If so, what guarantees a single page is sufficient?  Mostly a curiosity question,
+since it looks like this is an existing assumption by init_hyp_mode().  Shouldn't
+the required stack size be defined in bytes and converted to pages, or is there a
+guarantee that 64kb pages will be used?
+
+> There was a recent patch bumping NR_CPUs to 512, so this would be 32MB
+> with 64k pages. Is it possible to return memory to the host later on once
+> we have a better handle on the number of CPUs in the system?
+
+Does kvm_hyp_reserve() really need to be called during bootmem_init()?  What
+prevents doing the reservation during init_hyp_mode()?  If the problem is that
+pKVM needs a single contiguous chunk of memory, then it might be worth solving
+_that_ problem, e.g. letting the host donate memory in N-byte chunks instead of
+requiring a single huge blob of memory.
+ 
+> > +	hyp_mem_size += hyp_s1_pgtable_size();
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
