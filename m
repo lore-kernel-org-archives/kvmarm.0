@@ -1,94 +1,97 @@
-Return-Path: <SRS0=3b8a=HV=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=ZoUG=HX=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	URIBL_RED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F813C433DB
-	for <kvmarm@archiver.kernel.org>; Fri, 19 Feb 2021 18:47:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29C22C433E0
+	for <kvmarm@archiver.kernel.org>; Sun, 21 Feb 2021 18:21:28 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8998E64E92
-	for <kvmarm@archiver.kernel.org>; Fri, 19 Feb 2021 18:47:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8998E64E92
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 76AFE64EEC
+	for <kvmarm@archiver.kernel.org>; Sun, 21 Feb 2021 18:21:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76AFE64EEC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 051C74B2C3;
-	Fri, 19 Feb 2021 13:47:20 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D8A294B116;
+	Sun, 21 Feb 2021 13:21:26 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id zDwUccAyPFEz; Fri, 19 Feb 2021 13:47:18 -0500 (EST)
+	with ESMTP id Pw35SfAQ33jk; Sun, 21 Feb 2021 13:21:25 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C21F74B31E;
-	Fri, 19 Feb 2021 13:47:18 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C2994B0E0;
+	Sun, 21 Feb 2021 13:21:25 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ED5924B1C8
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Feb 2021 13:33:08 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 899BA4B151
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 21 Feb 2021 13:21:24 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PaU-i9ufWojp for <kvmarm@lists.cs.columbia.edu>;
- Fri, 19 Feb 2021 13:33:07 -0500 (EST)
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com
- [209.85.216.53])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BBDA34B1BC
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Feb 2021 13:33:07 -0500 (EST)
-Received: by mail-pj1-f53.google.com with SMTP id cl8so4189727pjb.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Feb 2021 10:33:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=apaYLCgpKww0D9oOCdL1/leTpd02z3P4w+UfyB0qUtE=;
- b=cNzmU6RwCi2M7zc1iN6kXALpuF4Dr3p9TUe2IZrVSxDRNZxj43w4OZN9GBVNUyVoGY
- H1RXDjVYIy/K8yNu7pM4zNUC+X8IPbISNDZkI7CMRH6NW31SInd7dD92i1llEAJIpNl9
- iWbI8rgOSf7uQmj0SebJ6NcX/Ooy0yvSHYo1XyOoSpU19UIDftAZr4ACUicBtUMeLzOs
- JxUyV+lfMm+gr31mLh9yWgpO+USuw7r8q/XR26xRmrLSWdm95R71UclAbHcjdoD9mUVg
- /RXbSkNXY3aLx0dVZoac6BkHs3HET/aQxjW2WzpvO3e5JjAUaXvXTBmMVyOyA+7Xdb05
- 6Cfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=apaYLCgpKww0D9oOCdL1/leTpd02z3P4w+UfyB0qUtE=;
- b=iGBWALMBGq9HTgMkqAsp0GAP012eY9jFb0oIJd6N3MZ3zYSRimSJDEPiIfwoZQgjl6
- D2LKIXLYJKe3COx2gNRDjMDyU/ak4TtnWFwISkdoNzy+myXYlUpKcxTftwkgDdrttzc6
- 21zNNhZTBqn7dvwiNvIGznxnaGSSSnzUSMlbRTdtRWLuSz2tYPhNZaKDDOlOu/uciHdt
- 5TSnxGc+NJL57aQiFU9qrmw8NVpiUlmTMWz77d5qYKWNcMlor3lYZYDmIFfiJoaPUf4i
- 7tSiRFOtIwUu7zhGXa6HJ1m6IRa3Ry4mFkK9iG90JmtwzPYPMiAZaWSodPoVN0+DATjf
- SOHA==
-X-Gm-Message-State: AOAM5312CZBkZ0DFxE1iJXr1/wa9tsiQGK/w3lFRenjqfD7SbPiQHCwY
- cb8X8LXUML9fzITN9+cVebrMUw==
-X-Google-Smtp-Source: ABdhPJzGsluCsG7fkC2FvoTQGUbPeiWB8QuireUSeDuRRKhKexRWjsorjPjofN2X3s0CAIhvLZ+5ZQ==
-X-Received: by 2002:a17:902:9894:b029:e3:7aa3:a499 with SMTP id
- s20-20020a1709029894b02900e37aa3a499mr3088340plp.11.1613759586653; 
- Fri, 19 Feb 2021 10:33:06 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:fc4d:e9c3:d7d:9cb3])
- by smtp.gmail.com with ESMTPSA id 3sm9467713pjk.26.2021.02.19.10.33.04
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 19 Feb 2021 10:33:06 -0800 (PST)
-Date: Fri, 19 Feb 2021 10:32:58 -0800
-From: Sean Christopherson <seanjc@google.com>
-To: Will Deacon <will@kernel.org>
-Subject: Re: [RFC PATCH v2 16/26] KVM: arm64: Prepare Hyp memory protection
-Message-ID: <YDAEWu7RkG1OBFed@google.com>
-References: <20210108121524.656872-1-qperret@google.com>
- <20210108121524.656872-17-qperret@google.com>
- <20210203143709.GA18907@willie-the-truck>
+ with ESMTP id ftn6EIjvWiav for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 21 Feb 2021 13:21:22 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [63.128.21.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A94F4B116
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 21 Feb 2021 13:21:22 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1613931682;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Zglb5HPjQwXkwakAytJHCKEB76+JAMUrAbTe4isW8k8=;
+ b=MPm5qNVsGEjFSNnefpKLLJQqqG1PQVsroa3PqD+8bgCheFSJisNSXraRfI89NGpIgwRjjT
+ VupDn07OnOeVx0mD4biDL9rsJKIgL8rkdY8tV79UQ6U95SYMhCgG1fD1Bx32DVk/S/+i9q
+ TBj7JNxeJqs70zl+lvpdeQyx3Ox1VD0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-440-l2jy31ocMDOPi0f0jf4RdQ-1; Sun, 21 Feb 2021 13:21:17 -0500
+X-MC-Unique: l2jy31ocMDOPi0f0jf4RdQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 965521E565;
+ Sun, 21 Feb 2021 18:21:14 +0000 (UTC)
+Received: from [10.36.114.34] (ovpn-114-34.ams2.redhat.com [10.36.114.34])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 816935D9CA;
+ Sun, 21 Feb 2021 18:21:04 +0000 (UTC)
+Subject: Re: [PATCH v13 00/15] SMMUv3 Nested Stage Setup (IOMMU part)
+To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+ "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
+ "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+ "will@kernel.org" <will@kernel.org>, "joro@8bytes.org" <joro@8bytes.org>,
+ "maz@kernel.org" <maz@kernel.org>,
+ "robin.murphy@arm.com" <robin.murphy@arm.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>
+References: <20201118112151.25412-1-eric.auger@redhat.com>
+ <ad88f78cf56f4f7fb69728cbf22a1052@huawei.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <9554e747-59fe-3bda-8cfc-13f40f74f0ca@redhat.com>
+Date: Sun, 21 Feb 2021 19:21:01 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210203143709.GA18907@willie-the-truck>
-X-Mailman-Approved-At: Fri, 19 Feb 2021 13:47:17 -0500
-Cc: devicetree@vger.kernel.org, kernel-team@android.com, android-kvm@google.com,
- Catalin Marinas <catalin.marinas@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-kernel@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
- linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
- Frank Rowand <frowand.list@gmail.com>, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <ad88f78cf56f4f7fb69728cbf22a1052@huawei.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+ "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+ "Zengtao \(B\)" <prime.zeng@hisilicon.com>,
+ "linuxarm@openeuler.org" <linuxarm@openeuler.org>,
+ "nicoleotsuka@gmail.com" <nicoleotsuka@gmail.com>,
+ "vivek.gautam@arm.com" <vivek.gautam@arm.com>,
+ "yi.l.liu@intel.com" <yi.l.liu@intel.com>,
+ "zhangfei.gao@linaro.org" <zhangfei.gao@linaro.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -105,77 +108,239 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Feb 03, 2021, Will Deacon wrote:
-> On Fri, Jan 08, 2021 at 12:15:14PM +0000, Quentin Perret wrote:
-
-...
-
-> > +static inline unsigned long hyp_s1_pgtable_size(void)
-> > +{
-
-...
-
-> > +		res += nr_pages << PAGE_SHIFT;
-> > +	}
-> > +
-> > +	/* Allow 1 GiB for private mappings */
-> > +	nr_pages = (1 << 30) >> PAGE_SHIFT;
+Hi Shameer,
+On 1/8/21 6:05 PM, Shameerali Kolothum Thodi wrote:
+> Hi Eric,
 > 
-> SZ_1G >> PAGE_SHIFT
+>> -----Original Message-----
+>> From: Eric Auger [mailto:eric.auger@redhat.com]
+>> Sent: 18 November 2020 11:22
+>> To: eric.auger.pro@gmail.com; eric.auger@redhat.com;
+>> iommu@lists.linux-foundation.org; linux-kernel@vger.kernel.org;
+>> kvm@vger.kernel.org; kvmarm@lists.cs.columbia.edu; will@kernel.org;
+>> joro@8bytes.org; maz@kernel.org; robin.murphy@arm.com;
+>> alex.williamson@redhat.com
+>> Cc: jean-philippe@linaro.org; zhangfei.gao@linaro.org;
+>> zhangfei.gao@gmail.com; vivek.gautam@arm.com; Shameerali Kolothum
+>> Thodi <shameerali.kolothum.thodi@huawei.com>;
+>> jacob.jun.pan@linux.intel.com; yi.l.liu@intel.com; tn@semihalf.com;
+>> nicoleotsuka@gmail.com; yuzenghui <yuzenghui@huawei.com>
+>> Subject: [PATCH v13 00/15] SMMUv3 Nested Stage Setup (IOMMU part)
+>>
+>> This series brings the IOMMU part of HW nested paging support
+>> in the SMMUv3. The VFIO part is submitted separately.
+>>
+>> The IOMMU API is extended to support 2 new API functionalities:
+>> 1) pass the guest stage 1 configuration
+>> 2) pass stage 1 MSI bindings
+>>
+>> Then those capabilities gets implemented in the SMMUv3 driver.
+>>
+>> The virtualizer passes information through the VFIO user API
+>> which cascades them to the iommu subsystem. This allows the guest
+>> to own stage 1 tables and context descriptors (so-called PASID
+>> table) while the host owns stage 2 tables and main configuration
+>> structures (STE).
+> 
+> I am seeing an issue with Guest testpmd run with this series.
+> I have two different setups and testpmd works fine with the
+> first one but not with the second.
+> 
+> 1). Guest doesn't have kernel driver built-in for pass-through dev.
+> 
+> root@ubuntu:/# lspci -v
+> ...
+> 00:02.0 Ethernet controller: Huawei Technologies Co., Ltd. Device a22e (rev 21)
+> Subsystem: Huawei Technologies Co., Ltd. Device 0000
+> Flags: fast devsel
+> Memory at 8000100000 (64-bit, prefetchable) [disabled] [size=64K]
+> Memory at 8000000000 (64-bit, prefetchable) [disabled] [size=1M]
+> Capabilities: [40] Express Root Complex Integrated Endpoint, MSI 00
+> Capabilities: [a0] MSI-X: Enable- Count=67 Masked-
+> Capabilities: [b0] Power Management version 3
+> Capabilities: [100] Access Control Services
+> Capabilities: [300] Transaction Processing Hints
+> 
+> root@ubuntu:/# echo vfio-pci > /sys/bus/pci/devices/0000:00:02.0/driver_override
+> root@ubuntu:/# echo 0000:00:02.0 > /sys/bus/pci/drivers_probe
+> 
+> root@ubuntu:/mnt/dpdk/build/app# ./testpmd -w 0000:00:02.0 --file-prefix socket0  -l 0-1 -n 2 -- -i
+> EAL: Detected 8 lcore(s)
+> EAL: Detected 1 NUMA nodes
+> EAL: Multi-process socket /var/run/dpdk/socket0/mp_socket
+> EAL: Selected IOVA mode 'VA'
+> EAL: No available hugepages reported in hugepages-32768kB
+> EAL: No available hugepages reported in hugepages-64kB
+> EAL: No available hugepages reported in hugepages-1048576kB
+> EAL: Probing VFIO support...
+> EAL: VFIO support initialized
+> EAL:   Invalid NUMA socket, default to 0
+> EAL:   using IOMMU type 1 (Type 1)
+> EAL: Probe PCI driver: net_hns3_vf (19e5:a22e) device: 0000:00:02.0 (socket 0)
+> EAL: No legacy callbacks, legacy socket not created
+> Interactive-mode selected
+> testpmd: create a new mbuf pool <mbuf_pool_socket_0>: n=155456, size=2176, socket=0
+> testpmd: preferred mempool ops selected: ring_mp_mc
+> 
+> Warning! port-topology=paired and odd forward ports number, the last port will pair with itself.
+> 
+> Configuring Port 0 (socket 0)
+> Port 0: 8E:A6:8C:43:43:45
+> Checking link statuses...
+> Done
+> testpmd>
+> 
+> 2). Guest have kernel driver built-in for pass-through dev.
+> 
+> root@ubuntu:/# lspci -v
+> ...
+> 00:02.0 Ethernet controller: Huawei Technologies Co., Ltd. Device a22e (rev 21)
+> Subsystem: Huawei Technologies Co., Ltd. Device 0000
+> Flags: bus master, fast devsel, latency 0
+> Memory at 8000100000 (64-bit, prefetchable) [size=64K]
+> Memory at 8000000000 (64-bit, prefetchable) [size=1M]
+> Capabilities: [40] Express Root Complex Integrated Endpoint, MSI 00
+> Capabilities: [a0] MSI-X: Enable+ Count=67 Masked-
+> Capabilities: [b0] Power Management version 3
+> Capabilities: [100] Access Control Services
+> Capabilities: [300] Transaction Processing Hints
+> Kernel driver in use: hns3
+> 
+> root@ubuntu:/# echo vfio-pci > /sys/bus/pci/devices/0000:00:02.0/driver_override
+> root@ubuntu:/# echo 0000:00:02.0 > /sys/bus/pci/drivers/hns3/unbind
+> root@ubuntu:/# echo 0000:00:02.0 > /sys/bus/pci/drivers_probe
+> 
+> root@ubuntu:/mnt/dpdk/build/app# ./testpmd -w 0000:00:02.0 --file-prefix socket0 -l 0-1 -n 2 -- -i
+> EAL: Detected 8 lcore(s)
+> EAL: Detected 1 NUMA nodes
+> EAL: Multi-process socket /var/run/dpdk/socket0/mp_socket
+> EAL: Selected IOVA mode 'VA'
+> EAL: No available hugepages reported in hugepages-32768kB
+> EAL: No available hugepages reported in hugepages-64kB
+> EAL: No available hugepages reported in hugepages-1048576kB
+> EAL: Probing VFIO support...
+> EAL: VFIO support initialized
+> EAL:   Invalid NUMA socket, default to 0
+> EAL:   using IOMMU type 1 (Type 1)
+> EAL: Probe PCI driver: net_hns3_vf (19e5:a22e) device: 0000:00:02.0 (socket 0)
+> 0000:00:02.0 hns3_get_mbx_resp(): VF could not get mbx(11,0) head(1) tail(0) lost(1) from PF in_irq:0
+> hns3vf_get_queue_info(): Failed to get tqp info from PF: -62
+> hns3vf_init_vf(): Failed to fetch configuration: -62
+> hns3vf_dev_init(): Failed to init vf: -62
+> EAL: Releasing pci mapped resource for 0000:00:02.0
+> EAL: Calling pci_unmap_resource for 0000:00:02.0 at 0x1100800000
+> EAL: Calling pci_unmap_resource for 0000:00:02.0 at 0x1100810000
+> EAL: Requested device 0000:00:02.0 cannot be used
+> EAL: Bus (pci) probe failed.
+> EAL: No legacy callbacks, legacy socket not created
+> testpmd: No probed ethernet devices
+> Interactive-mode selected
+> testpmd: create a new mbuf pool <mbuf_pool_socket_0>: n=155456, size=2176, socket=0
+> testpmd: preferred mempool ops selected: ring_mp_mc
+> Done
+> testpmd>
+> 
+> And in this case, smmu(host) reports a translation fault,
+> 
+> [ 6542.670624] arm-smmu-v3 arm-smmu-v3.2.auto: event 0x10 received:
+> [ 6542.670630] arm-smmu-v3 arm-smmu-v3.2.auto: 0x00007d1200000010
+> [ 6542.670631] arm-smmu-v3 arm-smmu-v3.2.auto: 0x000012000000007c
+> [ 6542.670633] arm-smmu-v3 arm-smmu-v3.2.auto: 0x00000000fffef040
+> [ 6542.670634] arm-smmu-v3 arm-smmu-v3.2.auto: 0x00000000fffef000
+> 
+> Tested with Intel 82599 card(ixgbevf) as well. but same errror.
 
-Where does the 1gb magic number come from?  IIUC, this is calculating the number
-of pages needed for the hypervisor's Stage-1 page tables.  The amount of memory
-needed for those page tables should be easily calculated, and assuming huge
-pages can be used, should be far less the 1gb.
- 
-> > +	nr_pages = __hyp_pgtable_max_pages(nr_pages);
-> > +	res += nr_pages << PAGE_SHIFT;
-> > +
-> > +	return res;
+So this should be fixed in the next release. The problem came from the
+fact the MSI giova was not duly unregistered. When vfio is not in used
+on guest side, the guest kernel allocates giovas for MSIs @fffef000 - 40
+is the ITS translater offset ;-) - When passthrough is in use, the iova
+is allocated @0x8000000. As fffef000 MSI giova was not properly
+unregistered, the host kernel used it - despite it has been unmapped by
+the guest kernel -, hence the translation fault. So the fix is to
+unregister the MSI in the VFIO QEMU code when msix are disabled. So to
+me this is a QEMU integration issue.
 
-...
+Thank you very much for testing and reporting!
 
-> > +void __init kvm_hyp_reserve(void)
-> > +{
-> > +	u64 nr_pages, prev;
-> > +
-> > +	if (!is_hyp_mode_available() || is_kernel_in_hyp_mode())
-> > +		return;
-> > +
-> > +	if (kvm_get_mode() != KVM_MODE_PROTECTED)
-> > +		return;
-> > +
-> > +	if (kvm_nvhe_sym(hyp_memblock_nr) < 0) {
-> > +		kvm_err("Failed to register hyp memblocks\n");
-> > +		return;
-> > +	}
-> > +
-> > +	sort_memblock_regions();
-> > +
-> > +	/*
-> > +	 * We don't know the number of possible CPUs yet, so allocate for the
-> > +	 * worst case.
-> > +	 */
-> > +	hyp_mem_size += NR_CPUS << PAGE_SHIFT;
+Thanks
 
-Is this for per-cpu stack?
+Eric
+> 
+> Not able to root cause the problem yet. With the hope that, this is 
+> related to tlb entries not being invlaidated properly, I tried explicitly
+> issuing CMD_TLBI_NSNH_ALL and CMD_CFGI_CD_ALL just before
+> the STE update, but no luck yet :(
+> 
+> Please let me know if I am missing something here or has any clue if you
+> can replicate this on your setup.
+> 
+> Thanks,
+> Shameer
+> 
+>>
+>> Best Regards
+>>
+>> Eric
+>>
+>> This series can be found at:
+>> https://github.com/eauger/linux/tree/5.10-rc4-2stage-v13
+>> (including the VFIO part in his last version: v11)
+>>
+>> The series includes a patch from Jean-Philippe. It is better to
+>> review the original patch:
+>> [PATCH v8 2/9] iommu/arm-smmu-v3: Maintain a SID->device structure
+>>
+>> The VFIO series is sent separately.
+>>
+>> History:
+>>
+>> v12 -> v13:
+>> - fixed compilation issue with CONFIG_ARM_SMMU_V3_SVA
+>>   reported by Shameer. This urged me to revisit patch 4 into
+>>   iommu/smmuv3: Allow s1 and s2 configs to coexist where
+>>   s1_cfg and s2_cfg are not dynamically allocated anymore.
+>>   Instead I use a new set field in existing structs
+>> - fixed 2 others config checks
+>> - Updated "iommu/arm-smmu-v3: Maintain a SID->device structure"
+>>   according to the last version
+>>
+>> v11 -> v12:
+>> - rebase on top of v5.10-rc4
+>>
+>> Eric Auger (14):
+>>   iommu: Introduce attach/detach_pasid_table API
+>>   iommu: Introduce bind/unbind_guest_msi
+>>   iommu/smmuv3: Allow s1 and s2 configs to coexist
+>>   iommu/smmuv3: Get prepared for nested stage support
+>>   iommu/smmuv3: Implement attach/detach_pasid_table
+>>   iommu/smmuv3: Allow stage 1 invalidation with unmanaged ASIDs
+>>   iommu/smmuv3: Implement cache_invalidate
+>>   dma-iommu: Implement NESTED_MSI cookie
+>>   iommu/smmuv3: Nested mode single MSI doorbell per domain enforcement
+>>   iommu/smmuv3: Enforce incompatibility between nested mode and HW MSI
+>>     regions
+>>   iommu/smmuv3: Implement bind/unbind_guest_msi
+>>   iommu/smmuv3: Report non recoverable faults
+>>   iommu/smmuv3: Accept configs with more than one context descriptor
+>>   iommu/smmuv3: Add PASID cache invalidation per PASID
+>>
+>> Jean-Philippe Brucker (1):
+>>   iommu/arm-smmu-v3: Maintain a SID->device structure
+>>
+>>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 659
+>> ++++++++++++++++++--
+>>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h | 103 ++-
+>>  drivers/iommu/dma-iommu.c                   | 142 ++++-
+>>  drivers/iommu/iommu.c                       | 105 ++++
+>>  include/linux/dma-iommu.h                   |  16 +
+>>  include/linux/iommu.h                       |  41 ++
+>>  include/uapi/linux/iommu.h                  |  54 ++
+>>  7 files changed, 1042 insertions(+), 78 deletions(-)
+>>
+>> --
+>> 2.21.3
+> 
 
-If so, what guarantees a single page is sufficient?  Mostly a curiosity question,
-since it looks like this is an existing assumption by init_hyp_mode().  Shouldn't
-the required stack size be defined in bytes and converted to pages, or is there a
-guarantee that 64kb pages will be used?
-
-> There was a recent patch bumping NR_CPUs to 512, so this would be 32MB
-> with 64k pages. Is it possible to return memory to the host later on once
-> we have a better handle on the number of CPUs in the system?
-
-Does kvm_hyp_reserve() really need to be called during bootmem_init()?  What
-prevents doing the reservation during init_hyp_mode()?  If the problem is that
-pKVM needs a single contiguous chunk of memory, then it might be worth solving
-_that_ problem, e.g. letting the host donate memory in N-byte chunks instead of
-requiring a single huge blob of memory.
- 
-> > +	hyp_mem_size += hyp_s1_pgtable_size();
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
