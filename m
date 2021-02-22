@@ -2,76 +2,64 @@ Return-Path: <SRS0=UwAz=HY=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40BB4C433DB
-	for <kvmarm@archiver.kernel.org>; Mon, 22 Feb 2021 09:47:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB549C433E0
+	for <kvmarm@archiver.kernel.org>; Mon, 22 Feb 2021 10:24:44 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4E7AD64E5F
-	for <kvmarm@archiver.kernel.org>; Mon, 22 Feb 2021 09:47:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E7AD64E5F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 3E9B964E31
+	for <kvmarm@archiver.kernel.org>; Mon, 22 Feb 2021 10:24:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E9B964E31
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BBD404B164;
-	Mon, 22 Feb 2021 04:47:13 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E87C4B15D;
+	Mon, 22 Feb 2021 05:24:43 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id XWvR1O4oYLGP; Mon, 22 Feb 2021 04:47:12 -0500 (EST)
+	with ESMTP id KH93s2pRIya9; Mon, 22 Feb 2021 05:24:42 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AD4674B16E;
-	Mon, 22 Feb 2021 04:47:12 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 22E8B4B16C;
+	Mon, 22 Feb 2021 05:24:42 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 97FB54B164
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Feb 2021 04:47:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 10D124B15D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Feb 2021 05:24:41 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UCq9vD6mYjm9 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 22 Feb 2021 04:47:10 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9DAD24B144
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Feb 2021 04:47:10 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 910C564E2F;
- Mon, 22 Feb 2021 09:47:08 +0000 (UTC)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
- TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
- (envelope-from <maz@kernel.org>)
- id 1lE7o2-00FI1i-EN; Mon, 22 Feb 2021 09:47:06 +0000
+ with ESMTP id 51SMMGt7pctw for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 22 Feb 2021 05:24:39 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C7EE4B168
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Feb 2021 05:24:39 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 99B69D6E;
+ Mon, 22 Feb 2021 02:24:38 -0800 (PST)
+Received: from slackpad.fritz.box (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6C95E3F73B;
+ Mon, 22 Feb 2021 02:24:37 -0800 (PST)
+Date: Mon, 22 Feb 2021 10:23:33 +0000
+From: Andre Przywara <andre.przywara@arm.com>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH kvmtool 01/21] ioport: Remove ioport__setup_arch()
+Message-ID: <20210222102333.2f1cb9e2@slackpad.fritz.box>
+In-Reply-To: <20210217155459.3a4bc991@slackpad.fritz.box>
+References: <20201210142908.169597-1-andre.przywara@arm.com>
+ <20201210142908.169597-2-andre.przywara@arm.com>
+ <814e0cd9-5e54-fade-f05c-80ea2b4a9039@arm.com>
+ <20210211171648.36000cce@slackpad.fritz.box>
+ <111b6cd6-ddf3-ec67-b782-67120be97943@arm.com>
+ <20210217155459.3a4bc991@slackpad.fritz.box>
+Organization: Arm Ltd.
+X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
 MIME-Version: 1.0
-Date: Mon, 22 Feb 2021 09:47:06 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: =?UTF-8?Q?Jonathan_Neusch=C3=A4fer?= <j.ne@posteo.net>
-Subject: Re: [PATCH v7 23/23] [DO NOT MERGE] arm64: Cope with CPUs stuck in
- VHE mode
-In-Reply-To: <YDN6BtDhzmF5OtBO@latitude>
-References: <20210208095732.3267263-1-maz@kernel.org>
- <20210208095732.3267263-24-maz@kernel.org> <YDN6BtDhzmF5OtBO@latitude>
-User-Agent: Roundcube Webmail/1.4.11
-Message-ID: <4d4e9a5cff65dbd8861f829089f570e5@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: j.ne@posteo.net, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
- psodagud@codeaurora.org, sramana@codeaurora.org, catalin.marinas@arm.com,
- marcan@marcan.st, pajay@qti.qualcomm.com, kernel-team@android.com,
- will@kernel.org, ardb@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: Srinivas Ramana <sramana@codeaurora.org>,
- Catalin Marinas <catalin.marinas@arm.com>, Hector Martin <marcan@marcan.st>,
- linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
- Will Deacon <will@kernel.org>, Ajay Patil <pajay@qti.qualcomm.com>,
- Prasad Sodagudi <psodagud@codeaurora.org>, kernel-team@android.com,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -83,28 +71,235 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SGkgSm9uYXRoYW4sCgpPbiAyMDIxLTAyLTIyIDA5OjM1LCBKb25hdGhhbiBOZXVzY2jDpGZlciB3
-cm90ZToKPiBIaSwKPiAKPiBPbiBNb24sIEZlYiAwOCwgMjAyMSBhdCAwOTo1NzozMkFNICswMDAw
-LCBNYXJjIFp5bmdpZXIgd3JvdGU6Cj4+IEl0IHNlZW1zIHRoYXQgdGhlIENQVSBrbm93biBhcyBB
-cHBsZSBNMSBoYXMgdGhlIHRlcnJpYmxlIGhhYml0Cj4+IG9mIGJlaW5nIHN0dWNrIHdpdGggSENS
-X0VMMi5FMkg9PTEsIGluIHZpb2xhdGlvbiBvZiB0aGUgYXJjaGl0ZWN0dXJlLgo+IAo+IE1pbm9y
-IG5pdHBpY2sgZnJvbSB0aGUgc2lkZWxpbmU6IFRoZSBNMSBTb0MgaGFzIHR3byBraW5kcyBvZiBD
-UFUgaW4gaXQKPiAoSWNlc3Rvcm0gYW5kIEZpcmVzdG9ybSksIHdoaWNoIG1ha2VzICJDUFUga25v
-d24gYXMgQXBwbGUgTTEiIGEgYml0Cj4gaW1wcmVjaXNlLgoKRmFpciBlbm91Z2guIEhvdyBhYm91
-dCBzb21ldGhpbmcgYWxvbmcgdGhlIGxpbmVzIG9mOgoiQXQgbGVhc3Qgc29tZSBvZiB0aGUgQ1BV
-cyBpbnRlZ3JhdGVkIGluIHRoZSBBcHBsZSBNMSBTb0MgaGF2ZQogIHRoZSB0ZXJyaWJsZSBoYWJp
-dC4uLiIKCj4gSW4gcHJhY3RpY2FsaXR5IGl0IHNlZW1zIHVubGlrZWx5IHRob3VnaCwgdGhhdCBJ
-Y2VzdG9ybSBhbmQgRmlyZXN0b3JtCj4gYWN0IGRpZmZlcmVudGx5IHdpdGggcmVnYXJkcyB0byB0
-aGUgY29kZSBpbiB0aGlzIHBhdGNoLgoKVGhpcyBpcyBteSBodW5jaCBhcyB3ZWxsLiBBbmQgaWYg
-dGhleSBkaWQsIGl0IHNob3VsZG4ndCBiZSBhIGJpZyBkZWFsOgp0aGUgImFyY2hpdGVjdHVyZSBj
-b21wbGlhbnQiIENQVXMgd291bGQgc2ltcGx5IHRyYW5zaXRpb24gdmlhIEVMMQphcyBleHBlY3Rl
-ZCwgYW5kIGpvaW4gdGhlaXIgYnVnZ3kgZnJpZW5kcyBydW5uaW5nIGF0IEVMMiBzbGlnaHRseSBs
-YXRlci4KClRoYW5rcywKCiAgICAgICAgIE0uCi0tIApKYXp6IGlzIG5vdCBkZWFkLiBJdCBqdXN0
-IHNtZWxscyBmdW5ueS4uLgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUK
-aHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+On Wed, 17 Feb 2021 16:46:47 +0000
+Andre Przywara <andre.przywara@arm.com> wrote:
+
+> On Thu, 11 Feb 2021 17:32:01 +0000
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> Hi,
+> 
+> > On 2/11/21 5:16 PM, Andre Przywara wrote:  
+> > > On Wed, 10 Feb 2021 17:44:59 +0000
+> > > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> > >
+> > > Hi Alex,
+> > >    
+> > >> On 12/10/20 2:28 PM, Andre Przywara wrote:    
+> > >>> Since x86 had a special need for registering tons of special I/O ports,
+> > >>> we had an ioport__setup_arch() callback, to allow each architecture
+> > >>> to do the same. As it turns out no one uses it beside x86, so we remove
+> > >>> that unnecessary abstraction.
+> > >>>
+> > >>> The generic function was registered via a device_base_init() call, so
+> > >>> we just do the same for the x86 specific function only, and can remove
+> > >>> the unneeded ioport__setup_arch().
+> > >>>
+> > >>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> > >>> ---
+> > >>>  arm/ioport.c         |  5 -----
+> > >>>  include/kvm/ioport.h |  1 -
+> > >>>  ioport.c             | 28 ----------------------------
+> > >>>  mips/kvm.c           |  5 -----
+> > >>>  powerpc/ioport.c     |  6 ------
+> > >>>  x86/ioport.c         | 25 ++++++++++++++++++++++++-
+> > >>>  6 files changed, 24 insertions(+), 46 deletions(-)
+> > >>>
+> > >>> diff --git a/arm/ioport.c b/arm/ioport.c
+> > >>> index 2f0feb9a..24092c9d 100644
+> > >>> --- a/arm/ioport.c
+> > >>> +++ b/arm/ioport.c
+> > >>> @@ -1,11 +1,6 @@
+> > >>>  #include "kvm/ioport.h"
+> > >>>  #include "kvm/irq.h"
+> > >>>  
+> > >>> -int ioport__setup_arch(struct kvm *kvm)
+> > >>> -{
+> > >>> -	return 0;
+> > >>> -}
+> > >>> -
+> > >>>  void ioport__map_irq(u8 *irq)
+> > >>>  {
+> > >>>  	*irq = irq__alloc_line();
+> > >>> diff --git a/include/kvm/ioport.h b/include/kvm/ioport.h
+> > >>> index 039633f7..d0213541 100644
+> > >>> --- a/include/kvm/ioport.h
+> > >>> +++ b/include/kvm/ioport.h
+> > >>> @@ -35,7 +35,6 @@ struct ioport_operations {
+> > >>>  							    enum irq_type));
+> > >>>  };
+> > >>>  
+> > >>> -int ioport__setup_arch(struct kvm *kvm);
+> > >>>  void ioport__map_irq(u8 *irq);
+> > >>>  
+> > >>>  int __must_check ioport__register(struct kvm *kvm, u16 port, struct ioport_operations *ops,
+> > >>> diff --git a/ioport.c b/ioport.c
+> > >>> index 844a832d..667e8386 100644
+> > >>> --- a/ioport.c
+> > >>> +++ b/ioport.c
+> > >>> @@ -158,21 +158,6 @@ int ioport__unregister(struct kvm *kvm, u16 port)
+> > >>>  	return 0;
+> > >>>  }
+> > >>>  
+> > >>> -static void ioport__unregister_all(void)
+> > >>> -{
+> > >>> -	struct ioport *entry;
+> > >>> -	struct rb_node *rb;
+> > >>> -	struct rb_int_node *rb_node;
+> > >>> -
+> > >>> -	rb = rb_first(&ioport_tree);
+> > >>> -	while (rb) {
+> > >>> -		rb_node = rb_int(rb);
+> > >>> -		entry = ioport_node(rb_node);
+> > >>> -		ioport_unregister(&ioport_tree, entry);
+> > >>> -		rb = rb_first(&ioport_tree);
+> > >>> -	}
+> > >>> -}      
+> > >> I get the impression this is a rebasing artifact. The commit message doesn't
+> > >> mention anything about removing ioport__exit() -> ioport__unregister_all(), and as
+> > >> far as I can tell it's still needed because there are places other than
+> > >> ioport__setup_arch() from where ioport__register() is called.    
+> > > I agree that the commit message is a bit thin on this fact, but the
+> > > functionality of ioport__unregister_all() is now in
+> > > x86/ioport.c:ioport__remove_arch(). I think removing ioport__init()
+> > > without removing ioport__exit() as well would look very weird, if not
+> > > hackish.    
+> > 
+> > Not necessarily. ioport__unregister_all() removes the ioports added by
+> > x86/ioport.c::ioport__setup_arch(), *plus* ioports added by different devices,
+> > like serial, rtc, virtio-pci and vfio-pci (which are used by arm/arm64).  
+> 
+> Right, indeed. Not that it really matters, since we are about to exit
+> anyway, but it looks indeed I need to move this to a generic teardown
+> method, or actually just keep that part here in this file.
+> 
+> Will give this a try.
+
+Well, now having a closer look I needed to remove this from here,
+because this whole file will go away.
+To keep the current functionality, we would need to add it to mmio.c,
+and interestingly we don't do any kind of similar cleanup there for the
+MMIO regions (probably this is kvmtool exiting anyway, see above).
+
+I will see if I can introduce it there, for good measure.
+
+Cheers,
+Andre
+
+
+> 
+> Thanks!
+> Andre
+> 
+> > >
+> > > I can amend the commit message to mention this, or is there anything
+> > > else I missed?
+> > >
+> > > Cheers,
+> > > Andre
+> > >    
+> > >>> -
+> > >>>  static const char *to_direction(int direction)
+> > >>>  {
+> > >>>  	if (direction == KVM_EXIT_IO_IN)
+> > >>> @@ -220,16 +205,3 @@ out:
+> > >>>  
+> > >>>  	return !kvm->cfg.ioport_debug;
+> > >>>  }
+> > >>> -
+> > >>> -int ioport__init(struct kvm *kvm)
+> > >>> -{
+> > >>> -	return ioport__setup_arch(kvm);
+> > >>> -}
+> > >>> -dev_base_init(ioport__init);
+> > >>> -
+> > >>> -int ioport__exit(struct kvm *kvm)
+> > >>> -{
+> > >>> -	ioport__unregister_all();
+> > >>> -	return 0;
+> > >>> -}
+> > >>> -dev_base_exit(ioport__exit);
+> > >>> diff --git a/mips/kvm.c b/mips/kvm.c
+> > >>> index 26355930..e110e5d5 100644
+> > >>> --- a/mips/kvm.c
+> > >>> +++ b/mips/kvm.c
+> > >>> @@ -100,11 +100,6 @@ void kvm__irq_trigger(struct kvm *kvm, int irq)
+> > >>>  		die_perror("KVM_IRQ_LINE ioctl");
+> > >>>  }
+> > >>>  
+> > >>> -int ioport__setup_arch(struct kvm *kvm)
+> > >>> -{
+> > >>> -	return 0;
+> > >>> -}
+> > >>> -
+> > >>>  bool kvm__arch_cpu_supports_vm(void)
+> > >>>  {
+> > >>>  	return true;
+> > >>> diff --git a/powerpc/ioport.c b/powerpc/ioport.c
+> > >>> index 0c188b61..a5cff4ee 100644
+> > >>> --- a/powerpc/ioport.c
+> > >>> +++ b/powerpc/ioport.c
+> > >>> @@ -12,12 +12,6 @@
+> > >>>  
+> > >>>  #include <stdlib.h>
+> > >>>  
+> > >>> -int ioport__setup_arch(struct kvm *kvm)
+> > >>> -{
+> > >>> -	/* PPC has no legacy ioports to set up */
+> > >>> -	return 0;
+> > >>> -}
+> > >>> -
+> > >>>  void ioport__map_irq(u8 *irq)
+> > >>>  {
+> > >>>  }
+> > >>> diff --git a/x86/ioport.c b/x86/ioport.c
+> > >>> index 7ad7b8f3..8c5c7699 100644
+> > >>> --- a/x86/ioport.c
+> > >>> +++ b/x86/ioport.c
+> > >>> @@ -69,7 +69,7 @@ void ioport__map_irq(u8 *irq)
+> > >>>  {
+> > >>>  }
+> > >>>  
+> > >>> -int ioport__setup_arch(struct kvm *kvm)
+> > >>> +static int ioport__setup_arch(struct kvm *kvm)
+> > >>>  {
+> > >>>  	int r;
+> > >>>  
+> > >>> @@ -150,3 +150,26 @@ int ioport__setup_arch(struct kvm *kvm)
+> > >>>  
+> > >>>  	return 0;
+> > >>>  }
+> > >>> +dev_base_init(ioport__setup_arch);
+> > >>> +
+> > >>> +static int ioport__remove_arch(struct kvm *kvm)
+> > >>> +{
+> > >>> +	ioport__unregister(kvm, 0x510);
+> > >>> +	ioport__unregister(kvm, 0x402);
+> > >>> +	ioport__unregister(kvm, 0x03D5);
+> > >>> +	ioport__unregister(kvm, 0x03D4);
+> > >>> +	ioport__unregister(kvm, 0x0378);
+> > >>> +	ioport__unregister(kvm, 0x0278);
+> > >>> +	ioport__unregister(kvm, 0x00F0);
+> > >>> +	ioport__unregister(kvm, 0x00ED);
+> > >>> +	ioport__unregister(kvm, IOPORT_DBG);
+> > >>> +	ioport__unregister(kvm, 0x00C0);
+> > >>> +	ioport__unregister(kvm, 0x00A0);
+> > >>> +	ioport__unregister(kvm, 0x0092);
+> > >>> +	ioport__unregister(kvm, 0x0040);
+> > >>> +	ioport__unregister(kvm, 0x0020);
+> > >>> +	ioport__unregister(kvm, 0x0000);
+> > >>> +
+> > >>> +	return 0;
+> > >>> +}
+> > >>> +dev_base_exit(ioport__remove_arch);      
+> 
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
