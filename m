@@ -2,89 +2,92 @@ Return-Path: <SRS0=UwAz=HY=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B3A7C433DB
-	for <kvmarm@archiver.kernel.org>; Mon, 22 Feb 2021 11:58:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CC2AC433E6
+	for <kvmarm@archiver.kernel.org>; Mon, 22 Feb 2021 11:58:40 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4D15864E27
-	for <kvmarm@archiver.kernel.org>; Mon, 22 Feb 2021 11:58:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D15864E27
+	by mail.kernel.org (Postfix) with ESMTP id 5FBF664E27
+	for <kvmarm@archiver.kernel.org>; Mon, 22 Feb 2021 11:58:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FBF664E27
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AE2D24B173;
-	Mon, 22 Feb 2021 06:58:37 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E75484B18D;
+	Mon, 22 Feb 2021 06:58:38 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@chromium.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id gNJu8xOSGTOz; Mon, 22 Feb 2021 06:58:33 -0500 (EST)
+	with ESMTP id J6wvP3aHtMWY; Mon, 22 Feb 2021 06:58:37 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E77854B176;
-	Mon, 22 Feb 2021 06:58:33 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 059204B17D;
+	Mon, 22 Feb 2021 06:58:34 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 912594B111
- for <kvmarm@lists.cs.columbia.edu>; Sun, 21 Feb 2021 21:45:41 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B22FB4B114
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 21 Feb 2021 21:45:49 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ab-85VcpxJeA for <kvmarm@lists.cs.columbia.edu>;
- Sun, 21 Feb 2021 21:45:40 -0500 (EST)
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com
- [209.85.215.181])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A6D164B102
- for <kvmarm@lists.cs.columbia.edu>; Sun, 21 Feb 2021 21:45:40 -0500 (EST)
-Received: by mail-pg1-f181.google.com with SMTP id m2so9365341pgq.5
- for <kvmarm@lists.cs.columbia.edu>; Sun, 21 Feb 2021 18:45:40 -0800 (PST)
+ with ESMTP id Tj-+HTyasEJv for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 21 Feb 2021 21:45:48 -0500 (EST)
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com
+ [209.85.214.173])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A4AC74B102
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 21 Feb 2021 21:45:48 -0500 (EST)
+Received: by mail-pl1-f173.google.com with SMTP id g20so6849856plo.2
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 21 Feb 2021 18:45:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chromium.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=XvYAYuW5s5qinuMeBbssbbRBBrYSpWkKVGWmhyi6aks=;
- b=SQN3YewJJCVgPoZW33ilUolg2UKuFOff9YMoNynS6YazfZf97j6rEtP8B4hdFiJUPN
- x/+/LdV2d+MwWs94nVraKcNpabBohd6yIfVxdjN8tCWQAmrhxeIDMdGhw9RCBtskVaLN
- c+y9iCUVvhRpZuYVo8HdTUkA1R+B6hSVeK8BI=
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=YI7HyzDG3owLPU4UQfa7tiUEs9jP6yMxkdlolNtJ+LQ=;
+ b=oFZXsVYacLQwXAQgBXWMVNd4tYXERP+aOxK5JtlWHh10GwD8sUEk2xy3lHQcfTdxNJ
+ A6c9eWv3q8ddSG8D4h1LqOoseHnCbmYkxklZ6Xfy3SnqUUMRHonQ6E6OabJC+EI947OM
+ +XuAC7e32rEtYRhECOHtBOFGA47fYnVe624N4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=XvYAYuW5s5qinuMeBbssbbRBBrYSpWkKVGWmhyi6aks=;
- b=PlsvWEx3NTv6GnoXXCJK3X0SyApSeFcw7huxSO8G6JwsqvzUM+Ox9Ev3WBxPlft89B
- rCCmkLFj8MKEHWeyg97fRy0Dba6L5z1aahC2k13i7P3rpr6lrc8SW6Vgcuors7ryyAQ/
- ZQTyZa0KHuuzzkhB2LWhqg1JrQFQpnR90GG48Y7WPGqkE3/gUz5lRMutsUp0z/zDjJvZ
- uoGoDym450TbCX6O6j6yjZsEwnuE8J9ooZ2bKPJS0PWcdB8uscgYB+3y8kgGD+iCQvFr
- zQshzPwQIRlx9kfNwM2pIFh/6/wdYZBDWPBEQTdwVVVigRHn2YS+XVol9VVRN9E6Z577
- bSsQ==
-X-Gm-Message-State: AOAM531j8UOgM+wIVjUfreJFmX8Xm26UaZHjLQVJMdXED3Wom4S8xR/5
- CHXq9YyiQYsOspME98TJ2jt6Uw==
-X-Google-Smtp-Source: ABdhPJxZBJ5R6P+6KWCdQ/BarGMyXsUR+MHf6ansvmPqZOtFJPNjlFfXgwH4tftoJWaWtQXpcQFE4w==
-X-Received: by 2002:aa7:961b:0:b029:1db:532c:9030 with SMTP id
- q27-20020aa7961b0000b02901db532c9030mr20358294pfg.30.1613961939826; 
- Sun, 21 Feb 2021 18:45:39 -0800 (PST)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=YI7HyzDG3owLPU4UQfa7tiUEs9jP6yMxkdlolNtJ+LQ=;
+ b=tJDsjVhPLAOYaUruMregBVVRVT+MYe2HRyouPkX5pFzfZqpxPNb31RZ4TXseJVMeGT
+ Mp29ooyKWhwJ+LCtljG9I9HVuBMWeqQhSvh7+urC5zSoubO0IXSXPnNHhDDUX0ga2dv/
+ pL6DBT7Szg1d/VFYfcOHuU72oy0CRCYNmBI5vNdyZRKuI7chFZPklijfkqEfFMbZtUAy
+ u2q0cDcfMJS9WXA01ax9gXxSEe+A3jsiFaM3Osl8qeifp8gZTDX3JjWaKOJKqBSjhTHT
+ hHC4QhFG8jo6ofBFJ9WADkIUTJgZ9f7jCDyuCvUtZFw1rnP3juxOWaoNVmkaPv4haVMi
+ EGPg==
+X-Gm-Message-State: AOAM533WSyhm1+3F6sVeU4rgdhX0DDaa9bzrtqWs2f9TWLi23NgYMChm
+ xBe7trq5+KvCUffFvTjxHC9lCA==
+X-Google-Smtp-Source: ABdhPJx0ONsyfWmAv6BuRaUkUpIoDCKbgVlmXVQvduvaRKvsylbKwcg3SupTc3g+xjmq0KI028TOMQ==
+X-Received: by 2002:a17:90a:4882:: with SMTP id
+ b2mr20682824pjh.78.1613961947967; 
+ Sun, 21 Feb 2021 18:45:47 -0800 (PST)
 Received: from localhost ([2401:fa00:8f:203:11b3:5e1a:7cb:7e1f])
- by smtp.gmail.com with UTF8SMTPSA id 77sm15847696pgd.65.2021.02.21.18.45.34
+ by smtp.gmail.com with UTF8SMTPSA id y2sm15413682pjw.36.2021.02.21.18.45.43
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 21 Feb 2021 18:45:39 -0800 (PST)
+ Sun, 21 Feb 2021 18:45:47 -0800 (PST)
 From: David Stevens <stevensd@chromium.org>
 X-Google-Original-From: David Stevens <stevensd@google.com>
 To: Sean Christopherson <seanjc@google.com>,
  Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v4 0/2] KVM: x86/mmu: Skip mmu_notifier changes when possible
-Date: Mon, 22 Feb 2021 11:45:20 +0900
-Message-Id: <20210222024522.1751719-1-stevensd@google.com>
+Subject: [PATCH v4 1/2] KVM: x86/mmu: Skip mmu_notifier check when handling
+ MMIO page fault
+Date: Mon, 22 Feb 2021 11:45:21 +0900
+Message-Id: <20210222024522.1751719-2-stevensd@google.com>
 X-Mailer: git-send-email 2.30.0.617.g56c4b15f3c-goog
+In-Reply-To: <20210222024522.1751719-1-stevensd@google.com>
+References: <20210222024522.1751719-1-stevensd@google.com>
 MIME-Version: 1.0
 X-Mailman-Approved-At: Mon, 22 Feb 2021 06:58:33 -0500
 Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- David Hildenbrand <david@redhat.com>, David Stevens <stevensd@google.com>,
- linux-mips@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, kvmarm@lists.cs.columbia.edu,
- Janosch Frank <frankja@linux.ibm.com>, Marc Zyngier <maz@kernel.org>,
- Joerg Roedel <joro@8bytes.org>, Huacai Chen <chenhuacai@kernel.org>,
+ David Hildenbrand <david@redhat.com>, linux-mips@vger.kernel.org,
+ Paul Mackerras <paulus@ozlabs.org>, Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ kvmarm@lists.cs.columbia.edu, Janosch Frank <frankja@linux.ibm.com>,
+ Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
+ Huacai Chen <chenhuacai@kernel.org>,
  Christian Borntraeger <borntraeger@de.ibm.com>,
  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, kvm-ppc@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
@@ -106,32 +109,51 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-These patches reduce how often mmu_notifier updates block guest page
-faults. The primary benefit of this is the reduction in the likelihood
-of extreme latency when handling a page fault due to another thread
-having been preempted while modifying host virtual addresses.
+From: Sean Christopherson <seanjc@google.com>
 
-v3 -> v4:
- - Fix bug by skipping prefetch during invalidation
+Don't retry a page fault due to an mmu_notifier invalidation when
+handling a page fault for a GPA that did not resolve to a memslot, i.e.
+an MMIO page fault.  Invalidations from the mmu_notifier signal a change
+in a host virtual address (HVA) mapping; without a memslot, there is no
+HVA and thus no possibility that the invalidation is relevant to the
+page fault being handled.
 
-v2 -> v3:
- - Added patch to skip check for MMIO page faults
- - Style changes
+Note, the MMIO vs. memslot generation checks handle the case where a
+pending memslot will create a memslot overlapping the faulting GPA.  The
+mmu_notifier checks are orthogonal to memslot updates.
 
-David Stevens (1):
-  KVM: x86/mmu: Consider the hva in mmu_notifier retry
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/mmu/mmu.c         | 2 +-
+ arch/x86/kvm/mmu/paging_tmpl.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-Sean Christopherson (1):
-  KVM: x86/mmu: Skip mmu_notifier check when handling MMIO page fault
-
- arch/powerpc/kvm/book3s_64_mmu_hv.c    |  2 +-
- arch/powerpc/kvm/book3s_64_mmu_radix.c |  2 +-
- arch/x86/kvm/mmu/mmu.c                 | 23 ++++++++++++++------
- arch/x86/kvm/mmu/paging_tmpl.h         |  7 ++++---
- include/linux/kvm_host.h               | 25 +++++++++++++++++++++-
- virt/kvm/kvm_main.c                    | 29 ++++++++++++++++++++++----
- 6 files changed, 72 insertions(+), 16 deletions(-)
-
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 6d16481aa29d..9ac0a727015d 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3725,7 +3725,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+ 
+ 	r = RET_PF_RETRY;
+ 	spin_lock(&vcpu->kvm->mmu_lock);
+-	if (mmu_notifier_retry(vcpu->kvm, mmu_seq))
++	if (!is_noslot_pfn(pfn) && mmu_notifier_retry(vcpu->kvm, mmu_seq))
+ 		goto out_unlock;
+ 	r = make_mmu_pages_available(vcpu);
+ 	if (r)
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index 50e268eb8e1a..ab54263d857c 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -869,7 +869,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gpa_t addr, u32 error_code,
+ 
+ 	r = RET_PF_RETRY;
+ 	spin_lock(&vcpu->kvm->mmu_lock);
+-	if (mmu_notifier_retry(vcpu->kvm, mmu_seq))
++	if (!is_noslot_pfn(pfn) && mmu_notifier_retry(vcpu->kvm, mmu_seq))
+ 		goto out_unlock;
+ 
+ 	kvm_mmu_audit(vcpu, AUDIT_PRE_PAGE_FAULT);
 -- 
 2.30.0.617.g56c4b15f3c-goog
 
