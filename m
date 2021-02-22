@@ -2,87 +2,94 @@ Return-Path: <SRS0=UwAz=HY=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEA20C433E6
-	for <kvmarm@archiver.kernel.org>; Mon, 22 Feb 2021 10:53:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C68D8C433E0
+	for <kvmarm@archiver.kernel.org>; Mon, 22 Feb 2021 11:04:27 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 067B564E5C
-	for <kvmarm@archiver.kernel.org>; Mon, 22 Feb 2021 10:53:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 067B564E5C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 0AD3064E61
+	for <kvmarm@archiver.kernel.org>; Mon, 22 Feb 2021 11:04:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AD3064E61
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B5594B17A;
-	Mon, 22 Feb 2021 05:53:58 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 79AB64B15F;
+	Mon, 22 Feb 2021 06:04:26 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 2pOifucMOE39; Mon, 22 Feb 2021 05:53:57 -0500 (EST)
+	with ESMTP id svTdS9z7K5ps; Mon, 22 Feb 2021 06:04:24 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0CB4E4B15F;
-	Mon, 22 Feb 2021 05:53:57 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A93F04B166;
+	Mon, 22 Feb 2021 06:04:24 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4BA2A4B0F6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Feb 2021 05:53:56 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A75824B15E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Feb 2021 06:04:23 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rb6P-6EvqP3I for <kvmarm@lists.cs.columbia.edu>;
- Mon, 22 Feb 2021 05:53:55 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [63.128.21.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2044C4B0CC
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Feb 2021 05:53:55 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1613991234;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=4OT0Rqw5Wl9T/7XHQTc0+4SQvZIZjrveo3V9rnAMoIU=;
- b=Koj9Vqhl+rT8RWRHbO5yjhfr0HQGvXAJXekRCRxkJk8bIDjKcP05AXns1+CIsV9s8W6IEz
- noWGiva46Do88c5n9P30I/yOyrHjHm7smfj43Y+2FzmzzvhYMps1QqubLS0jzXRaf38hPw
- M5PfKiefCZtUdgo8+CH3nk97zwkY17o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-410-fsHw0bK2OuWq84CK_CtRJA-1; Mon, 22 Feb 2021 05:53:50 -0500
-X-MC-Unique: fsHw0bK2OuWq84CK_CtRJA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 784AD801965;
- Mon, 22 Feb 2021 10:53:48 +0000 (UTC)
-Received: from [10.36.114.34] (ovpn-114-34.ams2.redhat.com [10.36.114.34])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A573F10016DB;
- Mon, 22 Feb 2021 10:53:40 +0000 (UTC)
-Subject: Re: [PATCH v11 01/13] vfio: VFIO_IOMMU_SET_PASID_TABLE
-To: Keqian Zhu <zhukeqian1@huawei.com>, eric.auger.pro@gmail.com,
- iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, will@kernel.org,
- joro@8bytes.org, maz@kernel.org, robin.murphy@arm.com,
- alex.williamson@redhat.com
-References: <20201116110030.32335-1-eric.auger@redhat.com>
- <20201116110030.32335-2-eric.auger@redhat.com>
- <84a111da-1969-1701-9a6d-cae8d7c285c6@huawei.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <e476f85d-f49f-f9a6-3232-e99a4cb5a0a2@redhat.com>
-Date: Mon, 22 Feb 2021 11:53:38 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+ with ESMTP id mvx2kps1AMUG for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 22 Feb 2021 06:04:20 -0500 (EST)
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com
+ [209.85.221.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A5B1D4B105
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Feb 2021 06:04:20 -0500 (EST)
+Received: by mail-wr1-f49.google.com with SMTP id n8so18546297wrm.10
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Feb 2021 03:04:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=w6npELERY6rB3Dp9A7WDHsdNDwVeXG2MhW1a6MllviU=;
+ b=AGxhojrCDx89PT+ATbFNrC9o05X4CdmNDewjWlY4kRAotuz6K4g8lTe6F7MI7TAsd/
+ t1UhE4GmUc8UU2jRgOT0UAim4SDtwchNBcEbJ2sIByMB5Tz+tmZ+4ScgArPT/rJ8b4p3
+ ktA6fXbESdmdl6LnOCWbo/LB1Vwth9A4NTM7YLsuGSRnNz2GRmy1Xm4dL4KHhs/rNzzY
+ WwrSZ3pPjl4Jfc5qxHuPLE66PdyE5HIjrFQ18myghhwepi7VO5/ZOpnlmktzJrlhgp20
+ vR0P9zbdP1TmxvGqisnhieWerU/Zekskp/sE9zs/6zhpfmIcWerjSFCzxJMYQsLcOV+M
+ XCqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=w6npELERY6rB3Dp9A7WDHsdNDwVeXG2MhW1a6MllviU=;
+ b=cGJ6j4QutCLsH45xPPwaF2Z6CRonQb2ktz08YTcewj+BqZck1RV/AEVcvOW2t6Pt9+
+ z5BGj9iql/15srnC9d7/u42b4GDN3/AjHx317rvEPOHZ8nD9Vl32S6xn/8kSXBdrRUOP
+ NVQyyAoDl04SXouFaYtloQ6ZwGmH0OgOS59o51mVHdKzLgUvwR1nWxPXM+Salm4pm/Ln
+ Ar68iQ55lRmpjOOkjp1BMIvRbDTCr7r1BsKhOTwR8YlnNj+TdLm8EOLezCpRhUuWRn/Q
+ 4WlF8lqT0DxkQj0gdmC0lthbKAIJe3GECJFZ23MH/5K2hshMc8Q2gU4g41MuWn0r2V4E
+ 1ldw==
+X-Gm-Message-State: AOAM531ILglyZKkqSTNP21JncCLbg/zl+wGn4hxMugw8CTZ4QA1D09va
+ 5lUhtKnl5pjeYZbf6m6X5yCLNQ==
+X-Google-Smtp-Source: ABdhPJxgFDcmq5dsILmm6KR9g+MsM/rBJTmBsyfH/l7oU2+CjNz1rIn8Osx2uhrrwoGXu4U3HE8c4w==
+X-Received: by 2002:a5d:6148:: with SMTP id y8mr21007272wrt.238.1613991859512; 
+ Mon, 22 Feb 2021 03:04:19 -0800 (PST)
+Received: from google.com (230.69.233.35.bc.googleusercontent.com.
+ [35.233.69.230])
+ by smtp.gmail.com with ESMTPSA id z21sm20005568wma.29.2021.02.22.03.04.19
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 22 Feb 2021 03:04:19 -0800 (PST)
+Date: Mon, 22 Feb 2021 11:04:16 +0000
+From: Quentin Perret <qperret@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Subject: Re: [RFC PATCH v2 16/26] KVM: arm64: Prepare Hyp memory protection
+Message-ID: <YDOPsBG7dPD2M3Xm@google.com>
+References: <20210108121524.656872-1-qperret@google.com>
+ <20210108121524.656872-17-qperret@google.com>
+ <20210203143709.GA18907@willie-the-truck>
+ <YDAEWu7RkG1OBFed@google.com>
 MIME-Version: 1.0
-In-Reply-To: <84a111da-1969-1701-9a6d-cae8d7c285c6@huawei.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Cc: jean-philippe@linaro.org, jacob.jun.pan@linux.intel.com,
- nicoleotsuka@gmail.com, vivek.gautam@arm.com, yi.l.liu@intel.com,
- zhangfei.gao@linaro.org
+Content-Disposition: inline
+In-Reply-To: <YDAEWu7RkG1OBFed@google.com>
+Cc: devicetree@vger.kernel.org, kernel-team@android.com,
+ Frank Rowand <frowand.list@gmail.com>, android-kvm@google.com,
+ Catalin Marinas <catalin.marinas@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-kernel@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
+ linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -99,200 +106,122 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Keqian,
+Hi Sean,
 
-On 2/2/21 1:34 PM, Keqian Zhu wrote:
-> Hi Eric,
+On Friday 19 Feb 2021 at 10:32:58 (-0800), Sean Christopherson wrote:
+> On Wed, Feb 03, 2021, Will Deacon wrote:
+> > On Fri, Jan 08, 2021 at 12:15:14PM +0000, Quentin Perret wrote:
 > 
-> On 2020/11/16 19:00, Eric Auger wrote:
->> From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
->>
->> This patch adds an VFIO_IOMMU_SET_PASID_TABLE ioctl
->> which aims to pass the virtual iommu guest configuration
->> to the host. This latter takes the form of the so-called
->> PASID table.
->>
->> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
->> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->> v11 -> v12:
->> - use iommu_uapi_set_pasid_table
->> - check SET and UNSET are not set simultaneously (Zenghui)
->>
->> v8 -> v9:
->> - Merge VFIO_IOMMU_ATTACH/DETACH_PASID_TABLE into a single
->>   VFIO_IOMMU_SET_PASID_TABLE ioctl.
->>
->> v6 -> v7:
->> - add a comment related to VFIO_IOMMU_DETACH_PASID_TABLE
->>
->> v3 -> v4:
->> - restore ATTACH/DETACH
->> - add unwind on failure
->>
->> v2 -> v3:
->> - s/BIND_PASID_TABLE/SET_PASID_TABLE
->>
->> v1 -> v2:
->> - s/BIND_GUEST_STAGE/BIND_PASID_TABLE
->> - remove the struct device arg
->> ---
->>  drivers/vfio/vfio_iommu_type1.c | 65 +++++++++++++++++++++++++++++++++
->>  include/uapi/linux/vfio.h       | 19 ++++++++++
->>  2 files changed, 84 insertions(+)
->>
->> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
->> index 67e827638995..87ddd9e882dc 100644
->> --- a/drivers/vfio/vfio_iommu_type1.c
->> +++ b/drivers/vfio/vfio_iommu_type1.c
->> @@ -2587,6 +2587,41 @@ static int vfio_iommu_iova_build_caps(struct vfio_iommu *iommu,
->>  	return ret;
->>  }
->>  
->> +static void
->> +vfio_detach_pasid_table(struct vfio_iommu *iommu)
->> +{
->> +	struct vfio_domain *d;
->> +
->> +	mutex_lock(&iommu->lock);
->> +	list_for_each_entry(d, &iommu->domain_list, next)
->> +		iommu_detach_pasid_table(d->domain);
->> +
->> +	mutex_unlock(&iommu->lock);
->> +}
->> +
->> +static int
->> +vfio_attach_pasid_table(struct vfio_iommu *iommu, unsigned long arg)
->> +{
->> +	struct vfio_domain *d;
->> +	int ret = 0;
->> +
->> +	mutex_lock(&iommu->lock);
->> +
->> +	list_for_each_entry(d, &iommu->domain_list, next) {
->> +		ret = iommu_uapi_attach_pasid_table(d->domain, (void __user *)arg);
-> This design is not very clear to me. This assumes all iommu_domains share the same pasid table.
+> ...
 > 
-> As I understand, it's reasonable when there is only one group in the domain, and only one domain in the vfio_iommu.
-> If more than one group in the vfio_iommu, the guest may put them into different guest iommu_domain, then they have different pasid table.
+> > > +static inline unsigned long hyp_s1_pgtable_size(void)
+> > > +{
 > 
-> Is this the use scenario?
+> ...
+> 
+> > > +		res += nr_pages << PAGE_SHIFT;
+> > > +	}
+> > > +
+> > > +	/* Allow 1 GiB for private mappings */
+> > > +	nr_pages = (1 << 30) >> PAGE_SHIFT;
+> > 
+> > SZ_1G >> PAGE_SHIFT
+> 
+> Where does the 1gb magic number come from?
 
-the vfio_iommu is attached to a container. all the groups within a
-container share the same set of page tables (linux
-Documentation/driver-api/vfio.rst). So to me if you want to use
-different pasid tables, the groups need to be attached to different
-containers. Does that make sense to you?
+Admittedly it is arbitrary. It needs to be enough to cover all the
+so-called 'private' mappings that EL2 needs, and which can vary a little
+depending on the hardware.
 
-Thanks
+> IIUC, this is calculating the number
+> of pages needed for the hypervisor's Stage-1 page tables.
 
-Eric
-> 
-> Thanks,
-> Keqian
-> 
->> +		if (ret)
->> +			goto unwind;
->> +	}
->> +	goto unlock;
->> +unwind:
->> +	list_for_each_entry_continue_reverse(d, &iommu->domain_list, next) {
->> +		iommu_detach_pasid_table(d->domain);
->> +	}
->> +unlock:
->> +	mutex_unlock(&iommu->lock);
->> +	return ret;
->> +}
->> +
->>  static int vfio_iommu_migration_build_caps(struct vfio_iommu *iommu,
->>  					   struct vfio_info_cap *caps)
->>  {
->> @@ -2747,6 +2782,34 @@ static int vfio_iommu_type1_unmap_dma(struct vfio_iommu *iommu,
->>  			-EFAULT : 0;
->>  }
->>  
->> +static int vfio_iommu_type1_set_pasid_table(struct vfio_iommu *iommu,
->> +					    unsigned long arg)
->> +{
->> +	struct vfio_iommu_type1_set_pasid_table spt;
->> +	unsigned long minsz;
->> +	int ret = -EINVAL;
->> +
->> +	minsz = offsetofend(struct vfio_iommu_type1_set_pasid_table, flags);
->> +
->> +	if (copy_from_user(&spt, (void __user *)arg, minsz))
->> +		return -EFAULT;
->> +
->> +	if (spt.argsz < minsz)
->> +		return -EINVAL;
->> +
->> +	if (spt.flags & VFIO_PASID_TABLE_FLAG_SET &&
->> +	    spt.flags & VFIO_PASID_TABLE_FLAG_UNSET)
->> +		return -EINVAL;
->> +
->> +	if (spt.flags & VFIO_PASID_TABLE_FLAG_SET)
->> +		ret = vfio_attach_pasid_table(iommu, arg + minsz);
->> +	else if (spt.flags & VFIO_PASID_TABLE_FLAG_UNSET) {
->> +		vfio_detach_pasid_table(iommu);
->> +		ret = 0;
->> +	}
->> +	return ret;
->> +}
->> +
->>  static int vfio_iommu_type1_dirty_pages(struct vfio_iommu *iommu,
->>  					unsigned long arg)
->>  {
->> @@ -2867,6 +2930,8 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
->>  		return vfio_iommu_type1_unmap_dma(iommu, arg);
->>  	case VFIO_IOMMU_DIRTY_PAGES:
->>  		return vfio_iommu_type1_dirty_pages(iommu, arg);
->> +	case VFIO_IOMMU_SET_PASID_TABLE:
->> +		return vfio_iommu_type1_set_pasid_table(iommu, arg);
->>  	default:
->>  		return -ENOTTY;
->>  	}
->> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
->> index 2f313a238a8f..78ce3ce6c331 100644
->> --- a/include/uapi/linux/vfio.h
->> +++ b/include/uapi/linux/vfio.h
->> @@ -14,6 +14,7 @@
->>  
->>  #include <linux/types.h>
->>  #include <linux/ioctl.h>
->> +#include <linux/iommu.h>
->>  
->>  #define VFIO_API_VERSION	0
->>  
->> @@ -1180,6 +1181,24 @@ struct vfio_iommu_type1_dirty_bitmap_get {
->>  
->>  #define VFIO_IOMMU_DIRTY_PAGES             _IO(VFIO_TYPE, VFIO_BASE + 17)
->>  
->> +/*
->> + * VFIO_IOMMU_SET_PASID_TABLE - _IOWR(VFIO_TYPE, VFIO_BASE + 22,
->> + *			struct vfio_iommu_type1_set_pasid_table)
->> + *
->> + * The SET operation passes a PASID table to the host while the
->> + * UNSET operation detaches the one currently programmed. Setting
->> + * a table while another is already programmed replaces the old table.
->> + */
->> +struct vfio_iommu_type1_set_pasid_table {
->> +	__u32	argsz;
->> +	__u32	flags;
->> +#define VFIO_PASID_TABLE_FLAG_SET	(1 << 0)
->> +#define VFIO_PASID_TABLE_FLAG_UNSET	(1 << 1)
->> +	struct iommu_pasid_table_config config; /* used on SET */
->> +};
->> +
->> +#define VFIO_IOMMU_SET_PASID_TABLE	_IO(VFIO_TYPE, VFIO_BASE + 22)
->> +
->>  /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
->>  
->>  /*
->>
-> 
+Correct. The thing worth noting is that the hypervisor VA space is
+essentially split in half. One half is reserved to map portions of
+memory with a fixed offset, and the other half is used for a whole bunch
+of other things: we have a vmemmap, the 'private' mappings and the idmap
+page.
 
+> The amount of memory
+> needed for those page tables should be easily calculated
+
+As mentioned above, that is true for pretty much everything in the hyp
+VA space except the private mappings as that depends on e.g. the CPU
+uarch and such.
+
+> and assuming huge pages can be used, should be far less the 1gb.
+
+Ack, though this is no supported for the EL2 mappings yet. Historically
+the amount of contiguous portions of memory mapped at EL2 has been
+rather small, so there wasn't really a need, but we might want to
+revisit this at some point.
+
+> > > +	nr_pages = __hyp_pgtable_max_pages(nr_pages);
+> > > +	res += nr_pages << PAGE_SHIFT;
+> > > +
+> > > +	return res;
+> 
+> ...
+> 
+> > > +void __init kvm_hyp_reserve(void)
+> > > +{
+> > > +	u64 nr_pages, prev;
+> > > +
+> > > +	if (!is_hyp_mode_available() || is_kernel_in_hyp_mode())
+> > > +		return;
+> > > +
+> > > +	if (kvm_get_mode() != KVM_MODE_PROTECTED)
+> > > +		return;
+> > > +
+> > > +	if (kvm_nvhe_sym(hyp_memblock_nr) < 0) {
+> > > +		kvm_err("Failed to register hyp memblocks\n");
+> > > +		return;
+> > > +	}
+> > > +
+> > > +	sort_memblock_regions();
+> > > +
+> > > +	/*
+> > > +	 * We don't know the number of possible CPUs yet, so allocate for the
+> > > +	 * worst case.
+> > > +	 */
+> > > +	hyp_mem_size += NR_CPUS << PAGE_SHIFT;
+> 
+> Is this for per-cpu stack?
+
+Correct.
+
+> If so, what guarantees a single page is sufficient? Mostly a curiosity question,
+> since it looks like this is an existing assumption by init_hyp_mode().  Shouldn't
+> the required stack size be defined in bytes and converted to pages, or is there a
+> guarantee that 64kb pages will be used?
+
+Nope, we have no such guarantees, but 4K has been more than enough for
+EL2 so far. The hyp code doesn't use recursion much (I think the only
+occurence we have is Will's pgtable code, and that is architecturally
+limited to 4 levels of recursion for obvious reasons) and doesn't have
+use stack allocations.
+
+It's on my todo list to remap the stack pages in the 'private' range, to
+surround them with guard pages so we can at least run-time check this
+assumption, so stay tuned :)
+
+> > There was a recent patch bumping NR_CPUs to 512, so this would be 32MB
+> > with 64k pages. Is it possible to return memory to the host later on once
+> > we have a better handle on the number of CPUs in the system?
+> 
+> Does kvm_hyp_reserve() really need to be called during bootmem_init()?  What
+> prevents doing the reservation during init_hyp_mode()?  If the problem is that
+> pKVM needs a single contiguous chunk of memory, then it might be worth solving
+> _that_ problem, e.g. letting the host donate memory in N-byte chunks instead of
+> requiring a single huge blob of memory.
+
+Right, I've been thinking about this over the weekend and that might
+actually be fairly straightforward for stack pages. I'll try to move this
+allocation to init_hyp_mode() where it belongs (or better, re-use the
+existing one) in the nest version.
+
+Thanks,
+Quentin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
