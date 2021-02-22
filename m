@@ -1,89 +1,79 @@
-Return-Path: <SRS0=ZoUG=HX=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=UwAz=HY=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	URIBL_RED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29C22C433E0
-	for <kvmarm@archiver.kernel.org>; Sun, 21 Feb 2021 18:21:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72517C433E0
+	for <kvmarm@archiver.kernel.org>; Mon, 22 Feb 2021 08:56:45 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 76AFE64EEC
-	for <kvmarm@archiver.kernel.org>; Sun, 21 Feb 2021 18:21:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76AFE64EEC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id B8EEA64E61
+	for <kvmarm@archiver.kernel.org>; Mon, 22 Feb 2021 08:56:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8EEA64E61
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D8A294B116;
-	Sun, 21 Feb 2021 13:21:26 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 168414B10D;
+	Mon, 22 Feb 2021 03:56:44 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Pw35SfAQ33jk; Sun, 21 Feb 2021 13:21:25 -0500 (EST)
+	with ESMTP id nh84RSwgnBcu; Mon, 22 Feb 2021 03:56:42 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C2994B0E0;
-	Sun, 21 Feb 2021 13:21:25 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BF994B150;
+	Mon, 22 Feb 2021 03:56:42 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 899BA4B151
- for <kvmarm@lists.cs.columbia.edu>; Sun, 21 Feb 2021 13:21:24 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1341B4B10D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Feb 2021 03:56:42 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ftn6EIjvWiav for <kvmarm@lists.cs.columbia.edu>;
- Sun, 21 Feb 2021 13:21:22 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [63.128.21.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A94F4B116
- for <kvmarm@lists.cs.columbia.edu>; Sun, 21 Feb 2021 13:21:22 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1613931682;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Zglb5HPjQwXkwakAytJHCKEB76+JAMUrAbTe4isW8k8=;
- b=MPm5qNVsGEjFSNnefpKLLJQqqG1PQVsroa3PqD+8bgCheFSJisNSXraRfI89NGpIgwRjjT
- VupDn07OnOeVx0mD4biDL9rsJKIgL8rkdY8tV79UQ6U95SYMhCgG1fD1Bx32DVk/S/+i9q
- TBj7JNxeJqs70zl+lvpdeQyx3Ox1VD0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-440-l2jy31ocMDOPi0f0jf4RdQ-1; Sun, 21 Feb 2021 13:21:17 -0500
-X-MC-Unique: l2jy31ocMDOPi0f0jf4RdQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 965521E565;
- Sun, 21 Feb 2021 18:21:14 +0000 (UTC)
-Received: from [10.36.114.34] (ovpn-114-34.ams2.redhat.com [10.36.114.34])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 816935D9CA;
- Sun, 21 Feb 2021 18:21:04 +0000 (UTC)
-Subject: Re: [PATCH v13 00/15] SMMUv3 Nested Stage Setup (IOMMU part)
-To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
- "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
- "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ with ESMTP id hEHApQiNoRbE for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 22 Feb 2021 03:56:39 -0500 (EST)
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 268874B107
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Feb 2021 03:56:38 -0500 (EST)
+Received: from DGGEMM405-HUB.china.huawei.com (unknown [172.30.72.56])
+ by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4DkbZc2M5zz13wpY;
+ Mon, 22 Feb 2021 16:54:00 +0800 (CST)
+Received: from dggema763-chm.china.huawei.com (10.1.198.205) by
+ DGGEMM405-HUB.china.huawei.com (10.3.20.213) with Microsoft SMTP Server (TLS)
+ id 14.3.498.0; Mon, 22 Feb 2021 16:56:31 +0800
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ dggema763-chm.china.huawei.com (10.1.198.205) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2106.2; Mon, 22 Feb 2021 16:56:30 +0800
+Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
+ lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
+ 15.01.2106.006; Mon, 22 Feb 2021 08:56:29 +0000
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To: Auger Eric <eric.auger@redhat.com>, "eric.auger.pro@gmail.com"
+ <eric.auger.pro@gmail.com>, "iommu@lists.linux-foundation.org"
+ <iommu@lists.linux-foundation.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
  "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
  "will@kernel.org" <will@kernel.org>, "joro@8bytes.org" <joro@8bytes.org>,
- "maz@kernel.org" <maz@kernel.org>,
- "robin.murphy@arm.com" <robin.murphy@arm.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>
+ "maz@kernel.org" <maz@kernel.org>, "robin.murphy@arm.com"
+ <robin.murphy@arm.com>, "alex.williamson@redhat.com"
+ <alex.williamson@redhat.com>
+Subject: RE: [PATCH v13 00/15] SMMUv3 Nested Stage Setup (IOMMU part)
+Thread-Topic: [PATCH v13 00/15] SMMUv3 Nested Stage Setup (IOMMU part)
+Thread-Index: AQHWvZ3PFBCcuzrn5UiXiOG2BGlsE6oeOV7wgEVIA4CAAPORcA==
+Date: Mon, 22 Feb 2021 08:56:29 +0000
+Message-ID: <8ba61a0ca6534b5cb9a129def21e9259@huawei.com>
 References: <20201118112151.25412-1-eric.auger@redhat.com>
  <ad88f78cf56f4f7fb69728cbf22a1052@huawei.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <9554e747-59fe-3bda-8cfc-13f40f74f0ca@redhat.com>
-Date: Sun, 21 Feb 2021 19:21:01 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
-MIME-Version: 1.0
-In-Reply-To: <ad88f78cf56f4f7fb69728cbf22a1052@huawei.com>
+ <9554e747-59fe-3bda-8cfc-13f40f74f0ca@redhat.com>
+In-Reply-To: <9554e747-59fe-3bda-8cfc-13f40f74f0ca@redhat.com>
+Accept-Language: en-GB, en-US
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.47.88.147]
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
 Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
  "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
  "Zengtao \(B\)" <prime.zeng@hisilicon.com>,
@@ -103,245 +93,160 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Shameer,
-On 1/8/21 6:05 PM, Shameerali Kolothum Thodi wrote:
-> Hi Eric,
-> 
->> -----Original Message-----
->> From: Eric Auger [mailto:eric.auger@redhat.com]
->> Sent: 18 November 2020 11:22
->> To: eric.auger.pro@gmail.com; eric.auger@redhat.com;
->> iommu@lists.linux-foundation.org; linux-kernel@vger.kernel.org;
->> kvm@vger.kernel.org; kvmarm@lists.cs.columbia.edu; will@kernel.org;
->> joro@8bytes.org; maz@kernel.org; robin.murphy@arm.com;
->> alex.williamson@redhat.com
->> Cc: jean-philippe@linaro.org; zhangfei.gao@linaro.org;
->> zhangfei.gao@gmail.com; vivek.gautam@arm.com; Shameerali Kolothum
->> Thodi <shameerali.kolothum.thodi@huawei.com>;
->> jacob.jun.pan@linux.intel.com; yi.l.liu@intel.com; tn@semihalf.com;
->> nicoleotsuka@gmail.com; yuzenghui <yuzenghui@huawei.com>
->> Subject: [PATCH v13 00/15] SMMUv3 Nested Stage Setup (IOMMU part)
->>
->> This series brings the IOMMU part of HW nested paging support
->> in the SMMUv3. The VFIO part is submitted separately.
->>
->> The IOMMU API is extended to support 2 new API functionalities:
->> 1) pass the guest stage 1 configuration
->> 2) pass stage 1 MSI bindings
->>
->> Then those capabilities gets implemented in the SMMUv3 driver.
->>
->> The virtualizer passes information through the VFIO user API
->> which cascades them to the iommu subsystem. This allows the guest
->> to own stage 1 tables and context descriptors (so-called PASID
->> table) while the host owns stage 2 tables and main configuration
->> structures (STE).
-> 
-> I am seeing an issue with Guest testpmd run with this series.
-> I have two different setups and testpmd works fine with the
-> first one but not with the second.
-> 
-> 1). Guest doesn't have kernel driver built-in for pass-through dev.
-> 
-> root@ubuntu:/# lspci -v
-> ...
-> 00:02.0 Ethernet controller: Huawei Technologies Co., Ltd. Device a22e (rev 21)
-> Subsystem: Huawei Technologies Co., Ltd. Device 0000
-> Flags: fast devsel
-> Memory at 8000100000 (64-bit, prefetchable) [disabled] [size=64K]
-> Memory at 8000000000 (64-bit, prefetchable) [disabled] [size=1M]
-> Capabilities: [40] Express Root Complex Integrated Endpoint, MSI 00
-> Capabilities: [a0] MSI-X: Enable- Count=67 Masked-
-> Capabilities: [b0] Power Management version 3
-> Capabilities: [100] Access Control Services
-> Capabilities: [300] Transaction Processing Hints
-> 
-> root@ubuntu:/# echo vfio-pci > /sys/bus/pci/devices/0000:00:02.0/driver_override
-> root@ubuntu:/# echo 0000:00:02.0 > /sys/bus/pci/drivers_probe
-> 
-> root@ubuntu:/mnt/dpdk/build/app# ./testpmd -w 0000:00:02.0 --file-prefix socket0  -l 0-1 -n 2 -- -i
-> EAL: Detected 8 lcore(s)
-> EAL: Detected 1 NUMA nodes
-> EAL: Multi-process socket /var/run/dpdk/socket0/mp_socket
-> EAL: Selected IOVA mode 'VA'
-> EAL: No available hugepages reported in hugepages-32768kB
-> EAL: No available hugepages reported in hugepages-64kB
-> EAL: No available hugepages reported in hugepages-1048576kB
-> EAL: Probing VFIO support...
-> EAL: VFIO support initialized
-> EAL:   Invalid NUMA socket, default to 0
-> EAL:   using IOMMU type 1 (Type 1)
-> EAL: Probe PCI driver: net_hns3_vf (19e5:a22e) device: 0000:00:02.0 (socket 0)
-> EAL: No legacy callbacks, legacy socket not created
-> Interactive-mode selected
-> testpmd: create a new mbuf pool <mbuf_pool_socket_0>: n=155456, size=2176, socket=0
-> testpmd: preferred mempool ops selected: ring_mp_mc
-> 
-> Warning! port-topology=paired and odd forward ports number, the last port will pair with itself.
-> 
-> Configuring Port 0 (socket 0)
-> Port 0: 8E:A6:8C:43:43:45
-> Checking link statuses...
-> Done
-> testpmd>
-> 
-> 2). Guest have kernel driver built-in for pass-through dev.
-> 
-> root@ubuntu:/# lspci -v
-> ...
-> 00:02.0 Ethernet controller: Huawei Technologies Co., Ltd. Device a22e (rev 21)
-> Subsystem: Huawei Technologies Co., Ltd. Device 0000
-> Flags: bus master, fast devsel, latency 0
-> Memory at 8000100000 (64-bit, prefetchable) [size=64K]
-> Memory at 8000000000 (64-bit, prefetchable) [size=1M]
-> Capabilities: [40] Express Root Complex Integrated Endpoint, MSI 00
-> Capabilities: [a0] MSI-X: Enable+ Count=67 Masked-
-> Capabilities: [b0] Power Management version 3
-> Capabilities: [100] Access Control Services
-> Capabilities: [300] Transaction Processing Hints
-> Kernel driver in use: hns3
-> 
-> root@ubuntu:/# echo vfio-pci > /sys/bus/pci/devices/0000:00:02.0/driver_override
-> root@ubuntu:/# echo 0000:00:02.0 > /sys/bus/pci/drivers/hns3/unbind
-> root@ubuntu:/# echo 0000:00:02.0 > /sys/bus/pci/drivers_probe
-> 
-> root@ubuntu:/mnt/dpdk/build/app# ./testpmd -w 0000:00:02.0 --file-prefix socket0 -l 0-1 -n 2 -- -i
-> EAL: Detected 8 lcore(s)
-> EAL: Detected 1 NUMA nodes
-> EAL: Multi-process socket /var/run/dpdk/socket0/mp_socket
-> EAL: Selected IOVA mode 'VA'
-> EAL: No available hugepages reported in hugepages-32768kB
-> EAL: No available hugepages reported in hugepages-64kB
-> EAL: No available hugepages reported in hugepages-1048576kB
-> EAL: Probing VFIO support...
-> EAL: VFIO support initialized
-> EAL:   Invalid NUMA socket, default to 0
-> EAL:   using IOMMU type 1 (Type 1)
-> EAL: Probe PCI driver: net_hns3_vf (19e5:a22e) device: 0000:00:02.0 (socket 0)
-> 0000:00:02.0 hns3_get_mbx_resp(): VF could not get mbx(11,0) head(1) tail(0) lost(1) from PF in_irq:0
-> hns3vf_get_queue_info(): Failed to get tqp info from PF: -62
-> hns3vf_init_vf(): Failed to fetch configuration: -62
-> hns3vf_dev_init(): Failed to init vf: -62
-> EAL: Releasing pci mapped resource for 0000:00:02.0
-> EAL: Calling pci_unmap_resource for 0000:00:02.0 at 0x1100800000
-> EAL: Calling pci_unmap_resource for 0000:00:02.0 at 0x1100810000
-> EAL: Requested device 0000:00:02.0 cannot be used
-> EAL: Bus (pci) probe failed.
-> EAL: No legacy callbacks, legacy socket not created
-> testpmd: No probed ethernet devices
-> Interactive-mode selected
-> testpmd: create a new mbuf pool <mbuf_pool_socket_0>: n=155456, size=2176, socket=0
-> testpmd: preferred mempool ops selected: ring_mp_mc
-> Done
-> testpmd>
-> 
-> And in this case, smmu(host) reports a translation fault,
-> 
-> [ 6542.670624] arm-smmu-v3 arm-smmu-v3.2.auto: event 0x10 received:
-> [ 6542.670630] arm-smmu-v3 arm-smmu-v3.2.auto: 0x00007d1200000010
-> [ 6542.670631] arm-smmu-v3 arm-smmu-v3.2.auto: 0x000012000000007c
-> [ 6542.670633] arm-smmu-v3 arm-smmu-v3.2.auto: 0x00000000fffef040
-> [ 6542.670634] arm-smmu-v3 arm-smmu-v3.2.auto: 0x00000000fffef000
-> 
-> Tested with Intel 82599 card(ixgbevf) as well. but same errror.
-
-So this should be fixed in the next release. The problem came from the
-fact the MSI giova was not duly unregistered. When vfio is not in used
-on guest side, the guest kernel allocates giovas for MSIs @fffef000 - 40
-is the ITS translater offset ;-) - When passthrough is in use, the iova
-is allocated @0x8000000. As fffef000 MSI giova was not properly
-unregistered, the host kernel used it - despite it has been unmapped by
-the guest kernel -, hence the translation fault. So the fix is to
-unregister the MSI in the VFIO QEMU code when msix are disabled. So to
-me this is a QEMU integration issue.
-
-Thank you very much for testing and reporting!
-
-Thanks
-
-Eric
-> 
-> Not able to root cause the problem yet. With the hope that, this is 
-> related to tlb entries not being invlaidated properly, I tried explicitly
-> issuing CMD_TLBI_NSNH_ALL and CMD_CFGI_CD_ALL just before
-> the STE update, but no luck yet :(
-> 
-> Please let me know if I am missing something here or has any clue if you
-> can replicate this on your setup.
-> 
-> Thanks,
-> Shameer
-> 
->>
->> Best Regards
->>
->> Eric
->>
->> This series can be found at:
->> https://github.com/eauger/linux/tree/5.10-rc4-2stage-v13
->> (including the VFIO part in his last version: v11)
->>
->> The series includes a patch from Jean-Philippe. It is better to
->> review the original patch:
->> [PATCH v8 2/9] iommu/arm-smmu-v3: Maintain a SID->device structure
->>
->> The VFIO series is sent separately.
->>
->> History:
->>
->> v12 -> v13:
->> - fixed compilation issue with CONFIG_ARM_SMMU_V3_SVA
->>   reported by Shameer. This urged me to revisit patch 4 into
->>   iommu/smmuv3: Allow s1 and s2 configs to coexist where
->>   s1_cfg and s2_cfg are not dynamically allocated anymore.
->>   Instead I use a new set field in existing structs
->> - fixed 2 others config checks
->> - Updated "iommu/arm-smmu-v3: Maintain a SID->device structure"
->>   according to the last version
->>
->> v11 -> v12:
->> - rebase on top of v5.10-rc4
->>
->> Eric Auger (14):
->>   iommu: Introduce attach/detach_pasid_table API
->>   iommu: Introduce bind/unbind_guest_msi
->>   iommu/smmuv3: Allow s1 and s2 configs to coexist
->>   iommu/smmuv3: Get prepared for nested stage support
->>   iommu/smmuv3: Implement attach/detach_pasid_table
->>   iommu/smmuv3: Allow stage 1 invalidation with unmanaged ASIDs
->>   iommu/smmuv3: Implement cache_invalidate
->>   dma-iommu: Implement NESTED_MSI cookie
->>   iommu/smmuv3: Nested mode single MSI doorbell per domain enforcement
->>   iommu/smmuv3: Enforce incompatibility between nested mode and HW MSI
->>     regions
->>   iommu/smmuv3: Implement bind/unbind_guest_msi
->>   iommu/smmuv3: Report non recoverable faults
->>   iommu/smmuv3: Accept configs with more than one context descriptor
->>   iommu/smmuv3: Add PASID cache invalidation per PASID
->>
->> Jean-Philippe Brucker (1):
->>   iommu/arm-smmu-v3: Maintain a SID->device structure
->>
->>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 659
->> ++++++++++++++++++--
->>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h | 103 ++-
->>  drivers/iommu/dma-iommu.c                   | 142 ++++-
->>  drivers/iommu/iommu.c                       | 105 ++++
->>  include/linux/dma-iommu.h                   |  16 +
->>  include/linux/iommu.h                       |  41 ++
->>  include/uapi/linux/iommu.h                  |  54 ++
->>  7 files changed, 1042 insertions(+), 78 deletions(-)
->>
->> --
->> 2.21.3
-> 
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogQXVnZXIgRXJpYyBbbWFp
+bHRvOmVyaWMuYXVnZXJAcmVkaGF0LmNvbV0NCj4gU2VudDogMjEgRmVicnVhcnkgMjAyMSAxODoy
+MQ0KPiBUbzogU2hhbWVlcmFsaSBLb2xvdGh1bSBUaG9kaSA8c2hhbWVlcmFsaS5rb2xvdGh1bS50
+aG9kaUBodWF3ZWkuY29tPjsNCj4gZXJpYy5hdWdlci5wcm9AZ21haWwuY29tOyBpb21tdUBsaXN0
+cy5saW51eC1mb3VuZGF0aW9uLm9yZzsNCj4gbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZzsg
+a3ZtQHZnZXIua2VybmVsLm9yZzsNCj4ga3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdTsgd2ls
+bEBrZXJuZWwub3JnOyBqb3JvQDhieXRlcy5vcmc7DQo+IG1hekBrZXJuZWwub3JnOyByb2Jpbi5t
+dXJwaHlAYXJtLmNvbTsgYWxleC53aWxsaWFtc29uQHJlZGhhdC5jb20NCj4gQ2M6IGplYW4tcGhp
+bGlwcGVAbGluYXJvLm9yZzsgemhhbmdmZWkuZ2FvQGxpbmFyby5vcmc7DQo+IHpoYW5nZmVpLmdh
+b0BnbWFpbC5jb207IHZpdmVrLmdhdXRhbUBhcm0uY29tOw0KPiBqYWNvYi5qdW4ucGFuQGxpbnV4
+LmludGVsLmNvbTsgeWkubC5saXVAaW50ZWwuY29tOyB0bkBzZW1paGFsZi5jb207DQo+IG5pY29s
+ZW90c3VrYUBnbWFpbC5jb207IHl1emVuZ2h1aSA8eXV6ZW5naHVpQGh1YXdlaS5jb20+OyBaZW5n
+dGFvIChCKQ0KPiA8cHJpbWUuemVuZ0BoaXNpbGljb24uY29tPjsgbGludXhhcm1Ab3BlbmV1bGVy
+Lm9yZw0KPiBTdWJqZWN0OiBSZTogW1BBVENIIHYxMyAwMC8xNV0gU01NVXYzIE5lc3RlZCBTdGFn
+ZSBTZXR1cCAoSU9NTVUgcGFydCkNCj4gDQo+IEhpIFNoYW1lZXIsDQo+IE9uIDEvOC8yMSA2OjA1
+IFBNLCBTaGFtZWVyYWxpIEtvbG90aHVtIFRob2RpIHdyb3RlOg0KPiA+IEhpIEVyaWMsDQo+ID4N
+Cj4gPj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gPj4gRnJvbTogRXJpYyBBdWdlciBb
+bWFpbHRvOmVyaWMuYXVnZXJAcmVkaGF0LmNvbV0NCj4gPj4gU2VudDogMTggTm92ZW1iZXIgMjAy
+MCAxMToyMg0KPiA+PiBUbzogZXJpYy5hdWdlci5wcm9AZ21haWwuY29tOyBlcmljLmF1Z2VyQHJl
+ZGhhdC5jb207DQo+ID4+IGlvbW11QGxpc3RzLmxpbnV4LWZvdW5kYXRpb24ub3JnOyBsaW51eC1r
+ZXJuZWxAdmdlci5rZXJuZWwub3JnOw0KPiA+PiBrdm1Admdlci5rZXJuZWwub3JnOyBrdm1hcm1A
+bGlzdHMuY3MuY29sdW1iaWEuZWR1OyB3aWxsQGtlcm5lbC5vcmc7DQo+ID4+IGpvcm9AOGJ5dGVz
+Lm9yZzsgbWF6QGtlcm5lbC5vcmc7IHJvYmluLm11cnBoeUBhcm0uY29tOw0KPiA+PiBhbGV4Lndp
+bGxpYW1zb25AcmVkaGF0LmNvbQ0KPiA+PiBDYzogamVhbi1waGlsaXBwZUBsaW5hcm8ub3JnOyB6
+aGFuZ2ZlaS5nYW9AbGluYXJvLm9yZzsNCj4gPj4gemhhbmdmZWkuZ2FvQGdtYWlsLmNvbTsgdml2
+ZWsuZ2F1dGFtQGFybS5jb207IFNoYW1lZXJhbGkgS29sb3RodW0NCj4gPj4gVGhvZGkgPHNoYW1l
+ZXJhbGkua29sb3RodW0udGhvZGlAaHVhd2VpLmNvbT47DQo+ID4+IGphY29iLmp1bi5wYW5AbGlu
+dXguaW50ZWwuY29tOyB5aS5sLmxpdUBpbnRlbC5jb207IHRuQHNlbWloYWxmLmNvbTsNCj4gPj4g
+bmljb2xlb3RzdWthQGdtYWlsLmNvbTsgeXV6ZW5naHVpIDx5dXplbmdodWlAaHVhd2VpLmNvbT4N
+Cj4gPj4gU3ViamVjdDogW1BBVENIIHYxMyAwMC8xNV0gU01NVXYzIE5lc3RlZCBTdGFnZSBTZXR1
+cCAoSU9NTVUgcGFydCkNCj4gPj4NCj4gPj4gVGhpcyBzZXJpZXMgYnJpbmdzIHRoZSBJT01NVSBw
+YXJ0IG9mIEhXIG5lc3RlZCBwYWdpbmcgc3VwcG9ydA0KPiA+PiBpbiB0aGUgU01NVXYzLiBUaGUg
+VkZJTyBwYXJ0IGlzIHN1Ym1pdHRlZCBzZXBhcmF0ZWx5Lg0KPiA+Pg0KPiA+PiBUaGUgSU9NTVUg
+QVBJIGlzIGV4dGVuZGVkIHRvIHN1cHBvcnQgMiBuZXcgQVBJIGZ1bmN0aW9uYWxpdGllczoNCj4g
+Pj4gMSkgcGFzcyB0aGUgZ3Vlc3Qgc3RhZ2UgMSBjb25maWd1cmF0aW9uDQo+ID4+IDIpIHBhc3Mg
+c3RhZ2UgMSBNU0kgYmluZGluZ3MNCj4gPj4NCj4gPj4gVGhlbiB0aG9zZSBjYXBhYmlsaXRpZXMg
+Z2V0cyBpbXBsZW1lbnRlZCBpbiB0aGUgU01NVXYzIGRyaXZlci4NCj4gPj4NCj4gPj4gVGhlIHZp
+cnR1YWxpemVyIHBhc3NlcyBpbmZvcm1hdGlvbiB0aHJvdWdoIHRoZSBWRklPIHVzZXIgQVBJDQo+
+ID4+IHdoaWNoIGNhc2NhZGVzIHRoZW0gdG8gdGhlIGlvbW11IHN1YnN5c3RlbS4gVGhpcyBhbGxv
+d3MgdGhlIGd1ZXN0DQo+ID4+IHRvIG93biBzdGFnZSAxIHRhYmxlcyBhbmQgY29udGV4dCBkZXNj
+cmlwdG9ycyAoc28tY2FsbGVkIFBBU0lEDQo+ID4+IHRhYmxlKSB3aGlsZSB0aGUgaG9zdCBvd25z
+IHN0YWdlIDIgdGFibGVzIGFuZCBtYWluIGNvbmZpZ3VyYXRpb24NCj4gPj4gc3RydWN0dXJlcyAo
+U1RFKS4NCj4gPg0KPiA+IEkgYW0gc2VlaW5nIGFuIGlzc3VlIHdpdGggR3Vlc3QgdGVzdHBtZCBy
+dW4gd2l0aCB0aGlzIHNlcmllcy4NCj4gPiBJIGhhdmUgdHdvIGRpZmZlcmVudCBzZXR1cHMgYW5k
+IHRlc3RwbWQgd29ya3MgZmluZSB3aXRoIHRoZQ0KPiA+IGZpcnN0IG9uZSBidXQgbm90IHdpdGgg
+dGhlIHNlY29uZC4NCj4gPg0KPiA+IDEpLiBHdWVzdCBkb2Vzbid0IGhhdmUga2VybmVsIGRyaXZl
+ciBidWlsdC1pbiBmb3IgcGFzcy10aHJvdWdoIGRldi4NCj4gPg0KPiA+IHJvb3RAdWJ1bnR1Oi8j
+IGxzcGNpIC12DQo+ID4gLi4uDQo+ID4gMDA6MDIuMCBFdGhlcm5ldCBjb250cm9sbGVyOiBIdWF3
+ZWkgVGVjaG5vbG9naWVzIENvLiwgTHRkLiBEZXZpY2UgYTIyZSAocmV2DQo+IDIxKQ0KPiA+IFN1
+YnN5c3RlbTogSHVhd2VpIFRlY2hub2xvZ2llcyBDby4sIEx0ZC4gRGV2aWNlIDAwMDANCj4gPiBG
+bGFnczogZmFzdCBkZXZzZWwNCj4gPiBNZW1vcnkgYXQgODAwMDEwMDAwMCAoNjQtYml0LCBwcmVm
+ZXRjaGFibGUpIFtkaXNhYmxlZF0gW3NpemU9NjRLXQ0KPiA+IE1lbW9yeSBhdCA4MDAwMDAwMDAw
+ICg2NC1iaXQsIHByZWZldGNoYWJsZSkgW2Rpc2FibGVkXSBbc2l6ZT0xTV0NCj4gPiBDYXBhYmls
+aXRpZXM6IFs0MF0gRXhwcmVzcyBSb290IENvbXBsZXggSW50ZWdyYXRlZCBFbmRwb2ludCwgTVNJ
+IDAwDQo+ID4gQ2FwYWJpbGl0aWVzOiBbYTBdIE1TSS1YOiBFbmFibGUtIENvdW50PTY3IE1hc2tl
+ZC0NCj4gPiBDYXBhYmlsaXRpZXM6IFtiMF0gUG93ZXIgTWFuYWdlbWVudCB2ZXJzaW9uIDMNCj4g
+PiBDYXBhYmlsaXRpZXM6IFsxMDBdIEFjY2VzcyBDb250cm9sIFNlcnZpY2VzDQo+ID4gQ2FwYWJp
+bGl0aWVzOiBbMzAwXSBUcmFuc2FjdGlvbiBQcm9jZXNzaW5nIEhpbnRzDQo+ID4NCj4gPiByb290
+QHVidW50dTovIyBlY2hvIHZmaW8tcGNpID4NCj4gL3N5cy9idXMvcGNpL2RldmljZXMvMDAwMDow
+MDowMi4wL2RyaXZlcl9vdmVycmlkZQ0KPiA+IHJvb3RAdWJ1bnR1Oi8jIGVjaG8gMDAwMDowMDow
+Mi4wID4gL3N5cy9idXMvcGNpL2RyaXZlcnNfcHJvYmUNCj4gPg0KPiA+IHJvb3RAdWJ1bnR1Oi9t
+bnQvZHBkay9idWlsZC9hcHAjIC4vdGVzdHBtZCAtdyAwMDAwOjAwOjAyLjAgLS1maWxlLXByZWZp
+eA0KPiBzb2NrZXQwICAtbCAwLTEgLW4gMiAtLSAtaQ0KPiA+IEVBTDogRGV0ZWN0ZWQgOCBsY29y
+ZShzKQ0KPiA+IEVBTDogRGV0ZWN0ZWQgMSBOVU1BIG5vZGVzDQo+ID4gRUFMOiBNdWx0aS1wcm9j
+ZXNzIHNvY2tldCAvdmFyL3J1bi9kcGRrL3NvY2tldDAvbXBfc29ja2V0DQo+ID4gRUFMOiBTZWxl
+Y3RlZCBJT1ZBIG1vZGUgJ1ZBJw0KPiA+IEVBTDogTm8gYXZhaWxhYmxlIGh1Z2VwYWdlcyByZXBv
+cnRlZCBpbiBodWdlcGFnZXMtMzI3NjhrQg0KPiA+IEVBTDogTm8gYXZhaWxhYmxlIGh1Z2VwYWdl
+cyByZXBvcnRlZCBpbiBodWdlcGFnZXMtNjRrQg0KPiA+IEVBTDogTm8gYXZhaWxhYmxlIGh1Z2Vw
+YWdlcyByZXBvcnRlZCBpbiBodWdlcGFnZXMtMTA0ODU3NmtCDQo+ID4gRUFMOiBQcm9iaW5nIFZG
+SU8gc3VwcG9ydC4uLg0KPiA+IEVBTDogVkZJTyBzdXBwb3J0IGluaXRpYWxpemVkDQo+ID4gRUFM
+OiAgIEludmFsaWQgTlVNQSBzb2NrZXQsIGRlZmF1bHQgdG8gMA0KPiA+IEVBTDogICB1c2luZyBJ
+T01NVSB0eXBlIDEgKFR5cGUgMSkNCj4gPiBFQUw6IFByb2JlIFBDSSBkcml2ZXI6IG5ldF9obnMz
+X3ZmICgxOWU1OmEyMmUpIGRldmljZTogMDAwMDowMDowMi4wIChzb2NrZXQNCj4gMCkNCj4gPiBF
+QUw6IE5vIGxlZ2FjeSBjYWxsYmFja3MsIGxlZ2FjeSBzb2NrZXQgbm90IGNyZWF0ZWQNCj4gPiBJ
+bnRlcmFjdGl2ZS1tb2RlIHNlbGVjdGVkDQo+ID4gdGVzdHBtZDogY3JlYXRlIGEgbmV3IG1idWYg
+cG9vbCA8bWJ1Zl9wb29sX3NvY2tldF8wPjogbj0xNTU0NTYsDQo+IHNpemU9MjE3Niwgc29ja2V0
+PTANCj4gPiB0ZXN0cG1kOiBwcmVmZXJyZWQgbWVtcG9vbCBvcHMgc2VsZWN0ZWQ6IHJpbmdfbXBf
+bWMNCj4gPg0KPiA+IFdhcm5pbmchIHBvcnQtdG9wb2xvZ3k9cGFpcmVkIGFuZCBvZGQgZm9yd2Fy
+ZCBwb3J0cyBudW1iZXIsIHRoZSBsYXN0IHBvcnQNCj4gd2lsbCBwYWlyIHdpdGggaXRzZWxmLg0K
+PiA+DQo+ID4gQ29uZmlndXJpbmcgUG9ydCAwIChzb2NrZXQgMCkNCj4gPiBQb3J0IDA6IDhFOkE2
+OjhDOjQzOjQzOjQ1DQo+ID4gQ2hlY2tpbmcgbGluayBzdGF0dXNlcy4uLg0KPiA+IERvbmUNCj4g
+PiB0ZXN0cG1kPg0KPiA+DQo+ID4gMikuIEd1ZXN0IGhhdmUga2VybmVsIGRyaXZlciBidWlsdC1p
+biBmb3IgcGFzcy10aHJvdWdoIGRldi4NCj4gPg0KPiA+IHJvb3RAdWJ1bnR1Oi8jIGxzcGNpIC12
+DQo+ID4gLi4uDQo+ID4gMDA6MDIuMCBFdGhlcm5ldCBjb250cm9sbGVyOiBIdWF3ZWkgVGVjaG5v
+bG9naWVzIENvLiwgTHRkLiBEZXZpY2UgYTIyZSAocmV2DQo+IDIxKQ0KPiA+IFN1YnN5c3RlbTog
+SHVhd2VpIFRlY2hub2xvZ2llcyBDby4sIEx0ZC4gRGV2aWNlIDAwMDANCj4gPiBGbGFnczogYnVz
+IG1hc3RlciwgZmFzdCBkZXZzZWwsIGxhdGVuY3kgMA0KPiA+IE1lbW9yeSBhdCA4MDAwMTAwMDAw
+ICg2NC1iaXQsIHByZWZldGNoYWJsZSkgW3NpemU9NjRLXQ0KPiA+IE1lbW9yeSBhdCA4MDAwMDAw
+MDAwICg2NC1iaXQsIHByZWZldGNoYWJsZSkgW3NpemU9MU1dDQo+ID4gQ2FwYWJpbGl0aWVzOiBb
+NDBdIEV4cHJlc3MgUm9vdCBDb21wbGV4IEludGVncmF0ZWQgRW5kcG9pbnQsIE1TSSAwMA0KPiA+
+IENhcGFiaWxpdGllczogW2EwXSBNU0ktWDogRW5hYmxlKyBDb3VudD02NyBNYXNrZWQtDQo+ID4g
+Q2FwYWJpbGl0aWVzOiBbYjBdIFBvd2VyIE1hbmFnZW1lbnQgdmVyc2lvbiAzDQo+ID4gQ2FwYWJp
+bGl0aWVzOiBbMTAwXSBBY2Nlc3MgQ29udHJvbCBTZXJ2aWNlcw0KPiA+IENhcGFiaWxpdGllczog
+WzMwMF0gVHJhbnNhY3Rpb24gUHJvY2Vzc2luZyBIaW50cw0KPiA+IEtlcm5lbCBkcml2ZXIgaW4g
+dXNlOiBobnMzDQo+ID4NCj4gPiByb290QHVidW50dTovIyBlY2hvIHZmaW8tcGNpID4NCj4gL3N5
+cy9idXMvcGNpL2RldmljZXMvMDAwMDowMDowMi4wL2RyaXZlcl9vdmVycmlkZQ0KPiA+IHJvb3RA
+dWJ1bnR1Oi8jIGVjaG8gMDAwMDowMDowMi4wID4gL3N5cy9idXMvcGNpL2RyaXZlcnMvaG5zMy91
+bmJpbmQNCj4gPiByb290QHVidW50dTovIyBlY2hvIDAwMDA6MDA6MDIuMCA+IC9zeXMvYnVzL3Bj
+aS9kcml2ZXJzX3Byb2JlDQo+ID4NCj4gPiByb290QHVidW50dTovbW50L2RwZGsvYnVpbGQvYXBw
+IyAuL3Rlc3RwbWQgLXcgMDAwMDowMDowMi4wIC0tZmlsZS1wcmVmaXgNCj4gc29ja2V0MCAtbCAw
+LTEgLW4gMiAtLSAtaQ0KPiA+IEVBTDogRGV0ZWN0ZWQgOCBsY29yZShzKQ0KPiA+IEVBTDogRGV0
+ZWN0ZWQgMSBOVU1BIG5vZGVzDQo+ID4gRUFMOiBNdWx0aS1wcm9jZXNzIHNvY2tldCAvdmFyL3J1
+bi9kcGRrL3NvY2tldDAvbXBfc29ja2V0DQo+ID4gRUFMOiBTZWxlY3RlZCBJT1ZBIG1vZGUgJ1ZB
+Jw0KPiA+IEVBTDogTm8gYXZhaWxhYmxlIGh1Z2VwYWdlcyByZXBvcnRlZCBpbiBodWdlcGFnZXMt
+MzI3NjhrQg0KPiA+IEVBTDogTm8gYXZhaWxhYmxlIGh1Z2VwYWdlcyByZXBvcnRlZCBpbiBodWdl
+cGFnZXMtNjRrQg0KPiA+IEVBTDogTm8gYXZhaWxhYmxlIGh1Z2VwYWdlcyByZXBvcnRlZCBpbiBo
+dWdlcGFnZXMtMTA0ODU3NmtCDQo+ID4gRUFMOiBQcm9iaW5nIFZGSU8gc3VwcG9ydC4uLg0KPiA+
+IEVBTDogVkZJTyBzdXBwb3J0IGluaXRpYWxpemVkDQo+ID4gRUFMOiAgIEludmFsaWQgTlVNQSBz
+b2NrZXQsIGRlZmF1bHQgdG8gMA0KPiA+IEVBTDogICB1c2luZyBJT01NVSB0eXBlIDEgKFR5cGUg
+MSkNCj4gPiBFQUw6IFByb2JlIFBDSSBkcml2ZXI6IG5ldF9obnMzX3ZmICgxOWU1OmEyMmUpIGRl
+dmljZTogMDAwMDowMDowMi4wIChzb2NrZXQNCj4gMCkNCj4gPiAwMDAwOjAwOjAyLjAgaG5zM19n
+ZXRfbWJ4X3Jlc3AoKTogVkYgY291bGQgbm90IGdldCBtYngoMTEsMCkgaGVhZCgxKSB0YWlsKDAp
+DQo+IGxvc3QoMSkgZnJvbSBQRiBpbl9pcnE6MA0KPiA+IGhuczN2Zl9nZXRfcXVldWVfaW5mbygp
+OiBGYWlsZWQgdG8gZ2V0IHRxcCBpbmZvIGZyb20gUEY6IC02Mg0KPiA+IGhuczN2Zl9pbml0X3Zm
+KCk6IEZhaWxlZCB0byBmZXRjaCBjb25maWd1cmF0aW9uOiAtNjINCj4gPiBobnMzdmZfZGV2X2lu
+aXQoKTogRmFpbGVkIHRvIGluaXQgdmY6IC02Mg0KPiA+IEVBTDogUmVsZWFzaW5nIHBjaSBtYXBw
+ZWQgcmVzb3VyY2UgZm9yIDAwMDA6MDA6MDIuMA0KPiA+IEVBTDogQ2FsbGluZyBwY2lfdW5tYXBf
+cmVzb3VyY2UgZm9yIDAwMDA6MDA6MDIuMCBhdCAweDExMDA4MDAwMDANCj4gPiBFQUw6IENhbGxp
+bmcgcGNpX3VubWFwX3Jlc291cmNlIGZvciAwMDAwOjAwOjAyLjAgYXQgMHgxMTAwODEwMDAwDQo+
+ID4gRUFMOiBSZXF1ZXN0ZWQgZGV2aWNlIDAwMDA6MDA6MDIuMCBjYW5ub3QgYmUgdXNlZA0KPiA+
+IEVBTDogQnVzIChwY2kpIHByb2JlIGZhaWxlZC4NCj4gPiBFQUw6IE5vIGxlZ2FjeSBjYWxsYmFj
+a3MsIGxlZ2FjeSBzb2NrZXQgbm90IGNyZWF0ZWQNCj4gPiB0ZXN0cG1kOiBObyBwcm9iZWQgZXRo
+ZXJuZXQgZGV2aWNlcw0KPiA+IEludGVyYWN0aXZlLW1vZGUgc2VsZWN0ZWQNCj4gPiB0ZXN0cG1k
+OiBjcmVhdGUgYSBuZXcgbWJ1ZiBwb29sIDxtYnVmX3Bvb2xfc29ja2V0XzA+OiBuPTE1NTQ1NiwN
+Cj4gc2l6ZT0yMTc2LCBzb2NrZXQ9MA0KPiA+IHRlc3RwbWQ6IHByZWZlcnJlZCBtZW1wb29sIG9w
+cyBzZWxlY3RlZDogcmluZ19tcF9tYw0KPiA+IERvbmUNCj4gPiB0ZXN0cG1kPg0KPiA+DQo+ID4g
+QW5kIGluIHRoaXMgY2FzZSwgc21tdShob3N0KSByZXBvcnRzIGEgdHJhbnNsYXRpb24gZmF1bHQs
+DQo+ID4NCj4gPiBbIDY1NDIuNjcwNjI0XSBhcm0tc21tdS12MyBhcm0tc21tdS12My4yLmF1dG86
+IGV2ZW50IDB4MTAgcmVjZWl2ZWQ6DQo+ID4gWyA2NTQyLjY3MDYzMF0gYXJtLXNtbXUtdjMgYXJt
+LXNtbXUtdjMuMi5hdXRvOiAweDAwMDA3ZDEyMDAwMDAwMTANCj4gPiBbIDY1NDIuNjcwNjMxXSBh
+cm0tc21tdS12MyBhcm0tc21tdS12My4yLmF1dG86IDB4MDAwMDEyMDAwMDAwMDA3Yw0KPiA+IFsg
+NjU0Mi42NzA2MzNdIGFybS1zbW11LXYzIGFybS1zbW11LXYzLjIuYXV0bzogMHgwMDAwMDAwMGZm
+ZmVmMDQwDQo+ID4gWyA2NTQyLjY3MDYzNF0gYXJtLXNtbXUtdjMgYXJtLXNtbXUtdjMuMi5hdXRv
+OiAweDAwMDAwMDAwZmZmZWYwMDANCj4gPg0KPiA+IFRlc3RlZCB3aXRoIEludGVsIDgyNTk5IGNh
+cmQoaXhnYmV2ZikgYXMgd2VsbC4gYnV0IHNhbWUgZXJycm9yLg0KPiANCj4gU28gdGhpcyBzaG91
+bGQgYmUgZml4ZWQgaW4gdGhlIG5leHQgcmVsZWFzZS4gVGhlIHByb2JsZW0gY2FtZSBmcm9tIHRo
+ZQ0KPiBmYWN0IHRoZSBNU0kgZ2lvdmEgd2FzIG5vdCBkdWx5IHVucmVnaXN0ZXJlZC4gV2hlbiB2
+ZmlvIGlzIG5vdCBpbiB1c2VkDQo+IG9uIGd1ZXN0IHNpZGUsIHRoZSBndWVzdCBrZXJuZWwgYWxs
+b2NhdGVzIGdpb3ZhcyBmb3IgTVNJcyBAZmZmZWYwMDAgLSA0MA0KPiBpcyB0aGUgSVRTIHRyYW5z
+bGF0ZXIgb2Zmc2V0IDstKSAtIFdoZW4gcGFzc3Rocm91Z2ggaXMgaW4gdXNlLCB0aGUgaW92YQ0K
+PiBpcyBhbGxvY2F0ZWQgQDB4ODAwMDAwMC4gQXMgZmZmZWYwMDAgTVNJIGdpb3ZhIHdhcyBub3Qg
+cHJvcGVybHkNCj4gdW5yZWdpc3RlcmVkLCB0aGUgaG9zdCBrZXJuZWwgdXNlZCBpdCAtIGRlc3Bp
+dGUgaXQgaGFzIGJlZW4gdW5tYXBwZWQgYnkNCj4gdGhlIGd1ZXN0IGtlcm5lbCAtLCBoZW5jZSB0
+aGUgdHJhbnNsYXRpb24gZmF1bHQuIFNvIHRoZSBmaXggaXMgdG8NCj4gdW5yZWdpc3RlciB0aGUg
+TVNJIGluIHRoZSBWRklPIFFFTVUgY29kZSB3aGVuIG1zaXggYXJlIGRpc2FibGVkLiBTbyB0bw0K
+PiBtZSB0aGlzIGlzIGEgUUVNVSBpbnRlZ3JhdGlvbiBpc3N1ZS4NCg0KU3VwZXIhLiBJIHdhcyBm
+b2N1c2luZyBvbiB0aGUgVExCSSBzaWRlIGFuZCB3YXMgc2xpZ2h0bHkgd29ycmllZCBpdCBpcyBz
+b21laG93DQpyZWxhdGVkIG91ciBzcGVjaWZpYyBoYXJkd2FyZS4gVGhhdOKAmXMgYSByZWxpZWYg
+OikuDQoNClRoYW5rcywNClNoYW1lZXIgDQoNCg0KX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3Mu
+Y29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGlu
+Zm8va3ZtYXJtCg==
