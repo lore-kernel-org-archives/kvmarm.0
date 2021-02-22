@@ -7,47 +7,48 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87CA9C433DB
-	for <kvmarm@archiver.kernel.org>; Mon, 22 Feb 2021 15:54:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16F54C433E0
+	for <kvmarm@archiver.kernel.org>; Mon, 22 Feb 2021 15:54:59 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E599664EDB
-	for <kvmarm@archiver.kernel.org>; Mon, 22 Feb 2021 15:54:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E599664EDB
+	by mail.kernel.org (Postfix) with ESMTP id 8F0BA64ED6
+	for <kvmarm@archiver.kernel.org>; Mon, 22 Feb 2021 15:54:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F0BA64ED6
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7FD914B174;
-	Mon, 22 Feb 2021 10:54:48 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 30FD34B151;
+	Mon, 22 Feb 2021 10:54:58 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id KpwwD14aSuPe; Mon, 22 Feb 2021 10:54:47 -0500 (EST)
+	with ESMTP id 78yrAdPlrBqX; Mon, 22 Feb 2021 10:54:57 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 08E234B15F;
-	Mon, 22 Feb 2021 10:54:47 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 300EB4B0F1;
+	Mon, 22 Feb 2021 10:54:57 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 33D174B080
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Feb 2021 10:54:45 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ECA2A4B0F1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Feb 2021 10:54:55 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HciAh6xAVcTj for <kvmarm@lists.cs.columbia.edu>;
- Mon, 22 Feb 2021 10:54:44 -0500 (EST)
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8DF214B164
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Feb 2021 10:54:43 -0500 (EST)
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.58])
- by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4DkmtB5MCmz7p80;
- Mon, 22 Feb 2021 23:53:06 +0800 (CST)
+ with ESMTP id zpzCQN0hkOKk for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 22 Feb 2021 10:54:54 -0500 (EST)
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 79EB34B0EE
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Feb 2021 10:54:53 -0500 (EST)
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.59])
+ by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Dkmsp5cdxzlNSL;
+ Mon, 22 Feb 2021 23:52:46 +0800 (CST)
 Received: from S00345302A-PC.china.huawei.com (10.47.88.147) by
  DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
- 14.3.498.0; Mon, 22 Feb 2021 23:54:31 +0800
+ 14.3.498.0; Mon, 22 Feb 2021 23:54:37 +0800
 From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 To: <linux-arm-kernel@lists.infradead.org>,
  <iommu@lists.linux-foundation.org>, <kvmarm@lists.cs.columbia.edu>
-Subject: [RFC PATCH 3/5] KVM: ARM64: Add support for pinned VMIDs
-Date: Mon, 22 Feb 2021 15:53:36 +0000
-Message-ID: <20210222155338.26132-4-shameerali.kolothum.thodi@huawei.com>
+Subject: [RFC PATCH 4/5] iommu/arm-smmu-v3: Use pinned VMID for NESTED stage
+ with BTM
+Date: Mon, 22 Feb 2021 15:53:37 +0000
+Message-ID: <20210222155338.26132-5-shameerali.kolothum.thodi@huawei.com>
 X-Mailer: git-send-email 2.12.0.windows.1
 In-Reply-To: <20210222155338.26132-1-shameerali.kolothum.thodi@huawei.com>
 References: <20210222155338.26132-1-shameerali.kolothum.thodi@huawei.com>
@@ -68,115 +69,119 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gYW4gQVJNNjQgc3lzdGVtIHdpdGggYSBTTU1VdjPCoGltcGxlbWVudGF0aW9uIHRoYXQgZnVs
-bHkgc3VwcG9ydHMKQnJvYWRjYXN0IFRMQiBNYWludGVuYW5jZShCVE0pIGZlYXR1cmUsIHRoZSBD
-UFUgVExCIGludmFsaWRhdGUKaW5zdHJ1Y3Rpb25zIGFyZSByZWNlaXZlZMKgYnkgU01NVS4gVGhp
-cyBpc8KgdmVyecKgdXNlZnVsIHdoZW4gdGhlClNNTVUgc2hhcmVzwqB0aGUgcGFnZSB0YWJsZXMg
-d2l0aCB0aGUgQ1BVKGVnOiBHdWVzdCBTVkEgdXNlIGNhc2UpLgpGb3IgdGhpcyB0byB3b3JrLCB0
-aGUgU01NVSBtdXN0IHVzZSB0aGUgc2FtZSBWTUlEIHRoYXQgaXMgYWxsb2NhdGVkCmJ5IEtWTSB0
-byBjb25maWd1cmUgdGhlIHN0YWdlIDIgdHJhbnNsYXRpb25zLgoKQXQgcHJlc2VudCBLVk0gVk1J
-RCBhbGxvY2F0aW9ucyBhcmUgcmVjeWNsZWQgb24gcm9sbG92ZXIgYW5kIG1heQpjaGFuZ2UgYXMg
-YSByZXN1bHQuIFRoaXMgd2lsbCBjcmVhdGXCoGlzc3VlcyBpZiB3ZSBoYXZlwqB0byBzaGFyZQp0
-aGUgS1ZNIFZNSUQgd2l0aCBTTU1VLiBIZW5jZSwgd2Ugc3BpbHTCoHRoZSBLVk0gVk1JRCBzcGFj
-ZSBpbnRvCnR3bywgdGhlIGZpcnN0IGhhbGYgZm9sbG93cyB0aGUgbm9ybWFsIHJlY3ljbGXCoG9u
-IHJvbGxvdmVyIHBvbGljeQp3aGlsZSB0aGUgc2Vjb25kIGhhbGYgb2YgdGhlIFZNSUQgcGFjZSBp
-cyB1c2VkIHRvIGFsbG9jYXRlIHBpbm5lZApWTUlEcy4gVGhpcyBmZWF0dXJlIGlzIGVuYWJsZWQg
-YmFzZWQgb24gYSBjb21tYW5kIGxpbmUgb3B0aW9uCiJrdm0tYXJtLnBpbm5lZF92bWlkX2VuYWJs
-ZSIuCgpTaWduZWQtb2ZmLWJ5OiBTaGFtZWVyIEtvbG90aHVtIDxzaGFtZWVyYWxpLmtvbG90aHVt
-LnRob2RpQGh1YXdlaS5jb20+Ci0tLQogYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faG9zdC5o
-IHwgICAyICsKIGFyY2gvYXJtNjQva3ZtL0tjb25maWcgICAgICAgICAgICB8ICAgMSArCiBhcmNo
-L2FybTY0L2t2bS9hcm0uYyAgICAgICAgICAgICAgfCAxMDQgKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKystCiAzIGZpbGVzIGNoYW5nZWQsIDEwNiBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9u
-KC0pCgpkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faG9zdC5oIGIvYXJj
-aC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faG9zdC5oCmluZGV4IDBjZDlmMGY3NWMxMy4uZGI2NDQx
-YzZhNTgwIDEwMDY0NAotLS0gYS9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmgKKysr
-IGIvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faG9zdC5oCkBAIC0yNSw2ICsyNSw3IEBACiAj
-aW5jbHVkZSA8YXNtL2Zwc2ltZC5oPgogI2luY2x1ZGUgPGFzbS9rdm0uaD4KICNpbmNsdWRlIDxh
-c20va3ZtX2FzbS5oPgorI2luY2x1ZGUgPGxpbnV4L3JlZmNvdW50Lmg+CiAjaW5jbHVkZSA8YXNt
-L3RocmVhZF9pbmZvLmg+CiAKICNkZWZpbmUgX19LVk1fSEFWRV9BUkNIX0lOVENfSU5JVElBTEla
-RUQKQEAgLTY1LDYgKzY2LDcgQEAgc3RydWN0IGt2bV92bWlkIHsKIAkvKiBUaGUgVk1JRCBnZW5l
-cmF0aW9uIHVzZWQgZm9yIHRoZSB2aXJ0LiBtZW1vcnkgc3lzdGVtICovCiAJdTY0ICAgIHZtaWRf
-Z2VuOwogCXUzMiAgICB2bWlkOworCXJlZmNvdW50X3QgICBwaW5uZWQ7CiB9OwogCiBzdHJ1Y3Qg
-a3ZtX3MyX21tdSB7CmRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2t2bS9LY29uZmlnIGIvYXJjaC9h
-cm02NC9rdm0vS2NvbmZpZwppbmRleCAwNDM3NTZkYjhmNmUuLmM1YzUyOTUzZTg0MiAxMDA2NDQK
-LS0tIGEvYXJjaC9hcm02NC9rdm0vS2NvbmZpZworKysgYi9hcmNoL2FybTY0L2t2bS9LY29uZmln
-CkBAIC00MCw2ICs0MCw3IEBAIG1lbnVjb25maWcgS1ZNCiAJc2VsZWN0IEhBVkVfS1ZNX1ZDUFVf
-UlVOX1BJRF9DSEFOR0UKIAlzZWxlY3QgVEFTS1NUQVRTCiAJc2VsZWN0IFRBU0tfREVMQVlfQUND
-VAorCXNlbGVjdCBIQVZFX0tWTV9QSU5ORURfVk1JRAogCWhlbHAKIAkgIFN1cHBvcnQgaG9zdGlu
-ZyB2aXJ0dWFsaXplZCBndWVzdCBtYWNoaW5lcy4KIApkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9r
-dm0vYXJtLmMgYi9hcmNoL2FybTY0L2t2bS9hcm0uYwppbmRleCBjMGZmYjAxOWNhOGIuLjg5NTU5
-NjhiZTQ5ZiAxMDA2NDQKLS0tIGEvYXJjaC9hcm02NC9rdm0vYXJtLmMKKysrIGIvYXJjaC9hcm02
-NC9rdm0vYXJtLmMKQEAgLTU2LDYgKzU2LDE5IEBAIHN0YXRpYyBhdG9taWM2NF90IGt2bV92bWlk
-X2dlbiA9IEFUT01JQzY0X0lOSVQoMSk7CiBzdGF0aWMgdTMyIGt2bV9uZXh0X3ZtaWQ7CiBzdGF0
-aWMgREVGSU5FX1NQSU5MT0NLKGt2bV92bWlkX2xvY2spOwogCitzdGF0aWMgYm9vbCBrdm1fcGlu
-bmVkX3ZtaWRfZW5hYmxlOworCitzdGF0aWMgaW50IF9faW5pdCBlYXJseV9waW5uZWRfdm1pZF9l
-bmFibGUoY2hhciAqYnVmKQoreworCXJldHVybiBzdHJ0b2Jvb2woYnVmLCAma3ZtX3Bpbm5lZF92
-bWlkX2VuYWJsZSk7Cit9CisKK2Vhcmx5X3BhcmFtKCJrdm0tYXJtLnBpbm5lZF92bWlkX2VuYWJs
-ZSIsIGVhcmx5X3Bpbm5lZF92bWlkX2VuYWJsZSk7CisKK3N0YXRpYyBERUZJTkVfSURBKGt2bV9w
-aW5uZWRfdm1pZHMpOworc3RhdGljIHUzMiBrdm1fcGlubmVkX3ZtaWRfc3RhcnQ7CitzdGF0aWMg
-dTMyIGt2bV9waW5uZWRfdm1pZF9lbmQ7CisKIHN0YXRpYyBib29sIHZnaWNfcHJlc2VudDsKIAog
-c3RhdGljIERFRklORV9QRVJfQ1BVKHVuc2lnbmVkIGNoYXIsIGt2bV9hcm1faGFyZHdhcmVfZW5h
-YmxlZCk7CkBAIC00NzUsNiArNDg4LDEwIEBAIHZvaWQgZm9yY2Vfdm1fZXhpdChjb25zdCBjcHVt
-YXNrX3QgKm1hc2spCiBzdGF0aWMgYm9vbCBuZWVkX25ld192bWlkX2dlbihzdHJ1Y3Qga3ZtX3Zt
-aWQgKnZtaWQpCiB7CiAJdTY0IGN1cnJlbnRfdm1pZF9nZW4gPSBhdG9taWM2NF9yZWFkKCZrdm1f
-dm1pZF9nZW4pOworCisJaWYgKHJlZmNvdW50X3JlYWQoJnZtaWQtPnBpbm5lZCkpCisJCXJldHVy
-biBmYWxzZTsKKwogCXNtcF9ybWIoKTsgLyogT3JkZXJzIHJlYWQgb2Yga3ZtX3ZtaWRfZ2VuIGFu
-ZCBrdm0tPmFyY2gudm1pZCAqLwogCXJldHVybiB1bmxpa2VseShSRUFEX09OQ0Uodm1pZC0+dm1p
-ZF9nZW4pICE9IGN1cnJlbnRfdm1pZF9nZW4pOwogfQpAQCAtNDg1LDYgKzUwMiw4IEBAIHN0YXRp
-YyBib29sIG5lZWRfbmV3X3ZtaWRfZ2VuKHN0cnVjdCBrdm1fdm1pZCAqdm1pZCkKICAqLwogc3Rh
-dGljIHZvaWQgdXBkYXRlX3ZtaWQoc3RydWN0IGt2bV92bWlkICp2bWlkKQogeworCXVuc2lnbmVk
-IGludCB2bWlkX2JpdHM7CisKIAlpZiAoIW5lZWRfbmV3X3ZtaWRfZ2VuKHZtaWQpKQogCQlyZXR1
-cm47CiAKQEAgLTUyMSw3ICs1NDAsMTIgQEAgc3RhdGljIHZvaWQgdXBkYXRlX3ZtaWQoc3RydWN0
-IGt2bV92bWlkICp2bWlkKQogCiAJdm1pZC0+dm1pZCA9IGt2bV9uZXh0X3ZtaWQ7CiAJa3ZtX25l
-eHRfdm1pZCsrOwotCWt2bV9uZXh0X3ZtaWQgJj0gKDEgPDwga3ZtX2dldF92bWlkX2JpdHMoKSkg
-LSAxOworCWlmIChrdm1fcGlubmVkX3ZtaWRfZW5hYmxlKQorCQl2bWlkX2JpdHMgPSBrdm1fZ2V0
-X3ZtaWRfYml0cygpIC0gMTsKKwllbHNlCisJCXZtaWRfYml0cyA9IGt2bV9nZXRfdm1pZF9iaXRz
-KCk7CisKKwlrdm1fbmV4dF92bWlkICY9ICgxIDw8IHZtaWRfYml0cykgLSAxOwogCiAJc21wX3dt
-YigpOwogCVdSSVRFX09OQ0Uodm1pZC0+dm1pZF9nZW4sIGF0b21pYzY0X3JlYWQoJmt2bV92bWlk
-X2dlbikpOwpAQCAtNTY5LDYgKzU5Myw3MSBAQCBzdGF0aWMgaW50IGt2bV92Y3B1X2ZpcnN0X3J1
-bl9pbml0KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKIAlyZXR1cm4gcmV0OwogfQogCitpbnQga3Zt
-X2FyY2hfcGlubmVkX3ZtaWRfZ2V0KHN0cnVjdCBrdm0gKmt2bSkKK3sKKwlzdHJ1Y3Qga3ZtX3Zj
-cHUgKnZjcHU7CisJc3RydWN0IGt2bV92bWlkICprdm1fdm1pZDsKKwlpbnQgcmV0OworCisJaWYg
-KCFrdm1fcGlubmVkX3ZtaWRfZW5hYmxlIHx8ICFhdG9taWNfcmVhZCgma3ZtLT5vbmxpbmVfdmNw
-dXMpKQorCQlyZXR1cm4gLUVJTlZBTDsKKworCXZjcHUgPSBrdm1fZ2V0X3ZjcHUoa3ZtLCAwKTsK
-KwlpZiAoIXZjcHUpCisJCXJldHVybiAtRUlOVkFMOworCisJa3ZtX3ZtaWQgPSAmdmNwdS0+YXJj
-aC5od19tbXUtPnZtaWQ7CisKKwlzcGluX2xvY2soJmt2bV92bWlkX2xvY2spOworCisJaWYgKHJl
-ZmNvdW50X2luY19ub3RfemVybygma3ZtX3ZtaWQtPnBpbm5lZCkpIHsKKwkJc3Bpbl91bmxvY2so
-Jmt2bV92bWlkX2xvY2spOworCQlyZXR1cm4ga3ZtX3ZtaWQtPnZtaWQ7CisJfQorCisJcmV0ID0g
-aWRhX2FsbG9jX3JhbmdlKCZrdm1fcGlubmVkX3ZtaWRzLCBrdm1fcGlubmVkX3ZtaWRfc3RhcnQs
-CisJCQkgICAgICBrdm1fcGlubmVkX3ZtaWRfZW5kLCBHRlBfS0VSTkVMKTsKKwlpZiAocmV0IDwg
-MCkgeworCQlzcGluX3VubG9jaygma3ZtX3ZtaWRfbG9jayk7CisJCXJldHVybiByZXQ7CisJfQor
-CisJZm9yY2Vfdm1fZXhpdChjcHVfYWxsX21hc2spOworCWt2bV9jYWxsX2h5cChfX2t2bV9mbHVz
-aF92bV9jb250ZXh0KTsKKworCWt2bV92bWlkLT52bWlkID0gKHUzMilyZXQ7CisJcmVmY291bnRf
-c2V0KCZrdm1fdm1pZC0+cGlubmVkLCAxKTsKKwlzcGluX3VubG9jaygma3ZtX3ZtaWRfbG9jayk7
-CisKKwlyZXR1cm4gcmV0OworfQorCitpbnQga3ZtX2FyY2hfcGlubmVkX3ZtaWRfcHV0KHN0cnVj
-dCBrdm0gKmt2bSkKK3sKKwlzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHU7CisJc3RydWN0IGt2bV92bWlk
-ICprdm1fdm1pZDsKKworCWlmICgha3ZtX3Bpbm5lZF92bWlkX2VuYWJsZSkKKwkJcmV0dXJuIC1F
-SU5WQUw7CisKKwl2Y3B1ID0ga3ZtX2dldF92Y3B1KGt2bSwgMCk7CisJaWYgKCF2Y3B1KQorCQly
-ZXR1cm4gLUVJTlZBTDsKKworCWt2bV92bWlkID0gJnZjcHUtPmFyY2guaHdfbW11LT52bWlkOwor
-CisJc3Bpbl9sb2NrKCZrdm1fdm1pZF9sb2NrKTsKKworCWlmICghcmVmY291bnRfcmVhZCgma3Zt
-X3ZtaWQtPnBpbm5lZCkpCisJCWdvdG8gb3V0OworCisJaWYgKHJlZmNvdW50X2RlY19hbmRfdGVz
-dCgma3ZtX3ZtaWQtPnBpbm5lZCkpCisJCWlkYV9mcmVlKCZrdm1fcGlubmVkX3ZtaWRzLCBrdm1f
-dm1pZC0+dm1pZCk7CitvdXQ6CisJc3Bpbl91bmxvY2soJmt2bV92bWlkX2xvY2spOworCXJldHVy
-biAwOworfQorCiBib29sIGt2bV9hcmNoX2ludGNfaW5pdGlhbGl6ZWQoc3RydWN0IGt2bSAqa3Zt
-KQogewogCXJldHVybiB2Z2ljX2luaXRpYWxpemVkKGt2bSk7CkBAIC0xNjgwLDYgKzE3NjksMTYg
-QEAgc3RhdGljIHZvaWQgY2hlY2tfa3ZtX3RhcmdldF9jcHUodm9pZCAqcmV0KQogCSooaW50ICop
-cmV0ID0ga3ZtX3RhcmdldF9jcHUoKTsKIH0KIAorc3RhdGljIHZvaWQga3ZtX2FybV9waW5uZWRf
-dm1pZF9pbml0KHZvaWQpCit7CisJdW5zaWduZWQgaW50IHZtaWRfYml0cyA9IGt2bV9nZXRfdm1p
-ZF9iaXRzKCk7CisKKwlrdm1fcGlubmVkX3ZtaWRfc3RhcnQgPSAoMSA8PCAodm1pZF9iaXRzIC0g
-MSkpOworCWt2bV9waW5uZWRfdm1pZF9lbmQgPSAoMSA8PCB2bWlkX2JpdHMpIC0gMTsKKworCWt2
-bV9pbmZvKCJQaW5uZWQgVk1JRFsweCV4IC0gMHgleF0gZW5hYmxlZFxuIiwga3ZtX3Bpbm5lZF92
-bWlkX3N0YXJ0LCBrdm1fcGlubmVkX3ZtaWRfZW5kKTsKK30KKwogc3RydWN0IGt2bV92Y3B1ICpr
-dm1fbXBpZHJfdG9fdmNwdShzdHJ1Y3Qga3ZtICprdm0sIHVuc2lnbmVkIGxvbmcgbXBpZHIpCiB7
-CiAJc3RydWN0IGt2bV92Y3B1ICp2Y3B1OwpAQCAtMTc5MCw2ICsxODg5LDkgQEAgaW50IGt2bV9h
-cmNoX2luaXQodm9pZCAqb3BhcXVlKQogCWVsc2UKIAkJa3ZtX2luZm8oIkh5cCBtb2RlIGluaXRp
-YWxpemVkIHN1Y2Nlc3NmdWxseVxuIik7CiAKKwlpZiAoa3ZtX3Bpbm5lZF92bWlkX2VuYWJsZSkK
-KwkJa3ZtX2FybV9waW5uZWRfdm1pZF9pbml0KCk7CisKIAlyZXR1cm4gMDsKIAogb3V0X2h5cDoK
-LS0gCjIuMTcuMQoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBz
-Oi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+If the SMMU supports BTM and the device belongs to NESTED domain
+with shared pasid table, we need to use the VMID allocated by the
+KVM for the s2 configuration. Hence, request a pinned VMID from KVM.
+
+Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+---
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 49 ++++++++++++++++++++-
+ 1 file changed, 47 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+index 26bf7da1bcd0..04f83f7c8319 100644
+--- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
++++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+@@ -28,6 +28,7 @@
+ #include <linux/pci.h>
+ #include <linux/pci-ats.h>
+ #include <linux/platform_device.h>
++#include <linux/kvm_host.h>
+ 
+ #include <linux/amba/bus.h>
+ 
+@@ -2195,6 +2196,33 @@ static void arm_smmu_bitmap_free(unsigned long *map, int idx)
+ 	clear_bit(idx, map);
+ }
+ 
++static int arm_smmu_pinned_vmid_get(struct arm_smmu_domain *smmu_domain)
++{
++	struct arm_smmu_master *master;
++
++	master = list_first_entry_or_null(&smmu_domain->devices,
++					  struct arm_smmu_master, domain_head);
++	if (!master)
++		return -EINVAL;
++
++	return kvm_pinned_vmid_get(master->dev);
++}
++
++static int arm_smmu_pinned_vmid_put(struct arm_smmu_domain *smmu_domain)
++{
++	struct arm_smmu_master *master;
++
++	master = list_first_entry_or_null(&smmu_domain->devices,
++					  struct arm_smmu_master, domain_head);
++	if (!master)
++		return -EINVAL;
++
++	if (smmu_domain->s2_cfg.vmid)
++		return kvm_pinned_vmid_put(master->dev);
++
++	return 0;
++}
++
+ static void arm_smmu_domain_free(struct iommu_domain *domain)
+ {
+ 	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
+@@ -2215,8 +2243,11 @@ static void arm_smmu_domain_free(struct iommu_domain *domain)
+ 		mutex_unlock(&arm_smmu_asid_lock);
+ 	}
+ 	if (s2_cfg->set) {
+-		if (s2_cfg->vmid)
+-			arm_smmu_bitmap_free(smmu->vmid_map, s2_cfg->vmid);
++		if (s2_cfg->vmid) {
++			if (!(smmu->features & ARM_SMMU_FEAT_BTM) &&
++			    smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
++				arm_smmu_bitmap_free(smmu->vmid_map, s2_cfg->vmid);
++		}
+ 	}
+ 
+ 	kfree(smmu_domain);
+@@ -3199,6 +3230,17 @@ static int arm_smmu_attach_pasid_table(struct iommu_domain *domain,
+ 				!(smmu->features & ARM_SMMU_FEAT_2_LVL_CDTAB))
+ 			goto out;
+ 
++		if (smmu->features & ARM_SMMU_FEAT_BTM) {
++			ret = arm_smmu_pinned_vmid_get(smmu_domain);
++			if (ret < 0)
++				goto out;
++
++			if (smmu_domain->s2_cfg.vmid)
++				arm_smmu_bitmap_free(smmu->vmid_map, smmu_domain->s2_cfg.vmid);
++
++			smmu_domain->s2_cfg.vmid = (u16)ret;
++		}
++
+ 		smmu_domain->s1_cfg.cdcfg.cdtab_dma = cfg->base_ptr;
+ 		smmu_domain->s1_cfg.s1cdmax = cfg->pasid_bits;
+ 		smmu_domain->s1_cfg.s1fmt = cfg->vendor_data.smmuv3.s1fmt;
+@@ -3221,6 +3263,7 @@ static int arm_smmu_attach_pasid_table(struct iommu_domain *domain,
+ static void arm_smmu_detach_pasid_table(struct iommu_domain *domain)
+ {
+ 	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
++	struct arm_smmu_device *smmu = smmu_domain->smmu;
+ 	struct arm_smmu_master *master;
+ 	unsigned long flags;
+ 
+@@ -3237,6 +3280,8 @@ static void arm_smmu_detach_pasid_table(struct iommu_domain *domain)
+ 		arm_smmu_install_ste_for_dev(master);
+ 	spin_unlock_irqrestore(&smmu_domain->devices_lock, flags);
+ 
++	if (smmu->features & ARM_SMMU_FEAT_BTM)
++		arm_smmu_pinned_vmid_put(smmu_domain);
+ unlock:
+ 	mutex_unlock(&smmu_domain->init_mutex);
+ }
+-- 
+2.17.1
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
