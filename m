@@ -2,89 +2,99 @@ Return-Path: <SRS0=rfx0=HZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5C8AC433DB
-	for <kvmarm@archiver.kernel.org>; Tue, 23 Feb 2021 12:57:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D3E5C433DB
+	for <kvmarm@archiver.kernel.org>; Tue, 23 Feb 2021 14:49:14 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 53D5B64E68
-	for <kvmarm@archiver.kernel.org>; Tue, 23 Feb 2021 12:57:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53D5B64E68
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 5E23564E58
+	for <kvmarm@archiver.kernel.org>; Tue, 23 Feb 2021 14:49:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E23564E58
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C98884B1E7;
-	Tue, 23 Feb 2021 07:57:53 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CC0904B0D6;
+	Tue, 23 Feb 2021 09:49:12 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id g5Gm9ww96-Z4; Tue, 23 Feb 2021 07:57:52 -0500 (EST)
+	with ESMTP id 65-2QZ2CpUSr; Tue, 23 Feb 2021 09:49:11 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C4D9F4B1D0;
-	Tue, 23 Feb 2021 07:57:52 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B72DB4B1D4;
+	Tue, 23 Feb 2021 09:49:11 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 419F14B1B3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Feb 2021 07:57:52 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B2AB54B159
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Feb 2021 11:25:01 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vlMqoPodSW5B for <kvmarm@lists.cs.columbia.edu>;
- Tue, 23 Feb 2021 07:57:51 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [63.128.21.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A66A4B1B1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Feb 2021 07:57:51 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1614085071;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ejww2KN9lm9jdMXwKJXUxNSbDO+xho00yxBfGY60kHQ=;
- b=Z5JM1iOxw7XENzneWDBk71LjRuLaFxWj662m94AwUatPh7Z+2BFg347pj6sYj/FvosEXUR
- /6VObk7PHGY6GdTIxWThvlINq2Kh0VTHktv+J3B9Tdswx7z5bczyGZuG3oXG3kOjHTIsE6
- sppOJQje/md42xpyWt/k1N/vWzcrnew=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-406-StTCqMhkNUqtugcRrQksTQ-1; Tue, 23 Feb 2021 07:57:47 -0500
-X-MC-Unique: StTCqMhkNUqtugcRrQksTQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2B85A1005501;
- Tue, 23 Feb 2021 12:57:44 +0000 (UTC)
-Received: from [10.36.114.34] (ovpn-114-34.ams2.redhat.com [10.36.114.34])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 507585D9D0;
- Tue, 23 Feb 2021 12:57:34 +0000 (UTC)
-Subject: Re: [PATCH v11 04/13] vfio/pci: Add VFIO_REGION_TYPE_NESTED region
- type
-To: Shenming Lu <lushenming@huawei.com>, eric.auger.pro@gmail.com,
- iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, will@kernel.org,
- joro@8bytes.org, maz@kernel.org, robin.murphy@arm.com,
- Alex Williamson <alex.williamson@redhat.com>
-References: <20201116110030.32335-1-eric.auger@redhat.com>
- <20201116110030.32335-5-eric.auger@redhat.com>
- <2b5031d4-fa1a-c893-e7e4-56c68da600e4@huawei.com>
- <081265c6-a579-6041-5a74-99bf74cc3d5f@huawei.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <022eec8e-ae33-720a-b882-d00cc95a2a27@redhat.com>
-Date: Tue, 23 Feb 2021 13:57:33 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+ with ESMTP id kc5idE7keD8R for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 22 Feb 2021 11:25:00 -0500 (EST)
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com
+ [209.85.216.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A3AE14B14E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Feb 2021 11:25:00 -0500 (EST)
+Received: by mail-pj1-f45.google.com with SMTP id b15so4371251pjb.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Feb 2021 08:25:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=K8Mk8DPpk11B6V3YwuQN3+iAtbjKIINrpZOMJr9ijMU=;
+ b=ZkL+DPyOhtNNe7hZI9CaKbe4ebR0w/c08TMwcW6jEWxnEH8r794ZleXZWoZ/UR0m9l
+ /JvwszOIsqxGcoQusTcqqjnSjevmzjijIqmibZWhNlf1fAH+fqB2XaC9yYLNGSgQajKW
+ cQ37mvXb34+aOOxfrJiSDd0duyNERIQhiKqe1mF+9oUWIOq5QI43wZI8wjHcqYbkkeNz
+ F74iB1b0pF2iLrhK6gzgmonIkdXMBmp9UGOP+w4UrVRBbDRpQmc5IjIAIQwXpNnoKanf
+ hCRm8lc+Mszq2AP9WNUUdxblVMsJd9jJlh10sSOCswStuXopFHTvKoZcecsf/gsAVlr3
+ E8CA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=K8Mk8DPpk11B6V3YwuQN3+iAtbjKIINrpZOMJr9ijMU=;
+ b=VE9IQdFUvYe/JFTSNGJpbzHXOwvRGCDIuwNeLjoWEQY3944k1PqdIwdNebgDF34FIx
+ k5b4AuCBH9uZ633dqQZnM1SApkdGNKK5u4xtdeAFtC0gul6yXYZ8b0WbOXJgwoTe/FFx
+ /7jqpW6rCn0C9/ErCkn1RZkqpu/rfEfpyqTxSSqTqMXMebxeQw7EvRd1XmGflCIbiuDG
+ 5sy5d197JFtes9fhJtnncP9aCI+HEZGEhzYMi1Kjs69mnVUMINONGWKL/bYGXROkSV/a
+ LfecwdBZPWAqblVCMPNudTDiV+BU/vfq9XBHUFM8Tzn0n/ND9ENc8I7qtdBU7u/P8KE/
+ ZNpg==
+X-Gm-Message-State: AOAM531G4d2OxkcUCr2gkleZycJ3GjEcpzNQGs9AA7xL7bdwqcYD6Gvt
+ Gm9WMd35qniiJqWDPCGOSKHoyA==
+X-Google-Smtp-Source: ABdhPJzpaRZ20ovy1dpVfBdxXc3ZVF23iR3XDePJsjQUoeSVBm8Osbw6p/Oa6Rqwlvu7+JfquMJWyQ==
+X-Received: by 2002:a17:903:1d0:b029:df:d098:f1cb with SMTP id
+ e16-20020a17090301d0b02900dfd098f1cbmr23104083plh.49.1614011099559; 
+ Mon, 22 Feb 2021 08:24:59 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:655e:415b:3b95:bd58])
+ by smtp.gmail.com with ESMTPSA id f2sm21929378pfk.63.2021.02.22.08.24.57
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 22 Feb 2021 08:24:58 -0800 (PST)
+Date: Mon, 22 Feb 2021 08:24:51 -0800
+From: Sean Christopherson <seanjc@google.com>
+To: David Stevens <stevensd@chromium.org>
+Subject: Re: [PATCH v4 2/2] KVM: x86/mmu: Consider the hva in mmu_notifier
+ retry
+Message-ID: <YDPa07i3S3Y7/iwy@google.com>
+References: <20210222024522.1751719-1-stevensd@google.com>
+ <20210222024522.1751719-3-stevensd@google.com>
 MIME-Version: 1.0
-In-Reply-To: <081265c6-a579-6041-5a74-99bf74cc3d5f@huawei.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Cc: jean-philippe@linaro.org, jacob.jun.pan@linux.intel.com,
- nicoleotsuka@gmail.com, vivek.gautam@arm.com, yi.l.liu@intel.com,
- zhangfei.gao@linaro.org
+Content-Disposition: inline
+In-Reply-To: <20210222024522.1751719-3-stevensd@google.com>
+X-Mailman-Approved-At: Tue, 23 Feb 2021 09:49:10 -0500
+Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+ David Hildenbrand <david@redhat.com>, linux-mips@vger.kernel.org,
+ Paul Mackerras <paulus@ozlabs.org>, Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ kvmarm@lists.cs.columbia.edu, Janosch Frank <frankja@linux.ibm.com>,
+ Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
+ Huacai Chen <chenhuacai@kernel.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, kvm-ppc@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
+ Cornelia Huck <cohuck@redhat.com>, linux-kernel@vger.kernel.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -101,37 +111,43 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Shenming,
+On Mon, Feb 22, 2021, David Stevens wrote:
+> ---
+> v3 -> v4:
+>  - Skip prefetch while invalidations are in progress
 
-On 2/23/21 1:45 PM, Shenming Lu wrote:
->> +static int vfio_pci_dma_fault_init(struct vfio_pci_device *vdev)
->> +{
->> +	struct vfio_region_dma_fault *header;
->> +	struct iommu_domain *domain;
->> +	size_t size;
->> +	bool nested;
->> +	int ret;
->> +
->> +	domain = iommu_get_domain_for_dev(&vdev->pdev->dev);
->> +	ret = iommu_domain_get_attr(domain, DOMAIN_ATTR_NESTING, &nested);
->> +	if (ret || !nested)
->> +		return ret;
-> 
-> Hi Eric,
-> 
-> It seems that the type of nested should be int, the use of bool might trigger
-> a panic in arm_smmu_domain_get_attr().
+Oof, nice catch.
 
-Thank you. That's fixed now.
+...
 
-Best Regards
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 9ac0a727015d..f6aaac729667 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -2758,6 +2758,13 @@ static void direct_pte_prefetch(struct kvm_vcpu *vcpu, u64 *sptep)
+>  	if (sp->role.level > PG_LEVEL_4K)
+>  		return;
+>  
+> +	/*
+> +	 * If addresses are being invalidated, skip prefetching to avoid
+> +	 * accidentally prefetching those addresses.
+> +	 */
+> +	if (unlikely(vcpu->kvm->mmu_notifier_count))
+> +		return;
 
-Eric
-> 
-> Thanks,
-> Shenming
-> 
+FNAME(pte_prefetch) needs the same check.
 
+Paolo, this brings up a good addition for the work to integrate the mmu notifier
+into the rest of KVM, e.g. for vmcs12 pages.  Ideally, gfn_to_page_many_atomic()
+and __gfn_to_pfn_memslot() would WARN if mmu_notifier_count is non-zero, but
+that will fire all over the place until the nested code properly integrates the
+notifier.  There are a few use cases where racing with the notifier is acceptable,
+e.g. reexecute_instruction(), but hopefully we can address those flows without
+things getting too ugly.
+
+> +
+>  	__direct_pte_prefetch(vcpu, sp, sptep);
+>  }
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
