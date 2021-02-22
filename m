@@ -7,47 +7,48 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A629BC433DB
-	for <kvmarm@archiver.kernel.org>; Mon, 22 Feb 2021 15:54:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5DABC433E0
+	for <kvmarm@archiver.kernel.org>; Mon, 22 Feb 2021 15:54:44 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 38A2A64ED6
-	for <kvmarm@archiver.kernel.org>; Mon, 22 Feb 2021 15:54:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38A2A64ED6
+	by mail.kernel.org (Postfix) with ESMTP id 631F364EF2
+	for <kvmarm@archiver.kernel.org>; Mon, 22 Feb 2021 15:54:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 631F364EF2
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C4D784B153;
-	Mon, 22 Feb 2021 10:54:38 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F35894B177;
+	Mon, 22 Feb 2021 10:54:43 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id VqDxnLzch6TX; Mon, 22 Feb 2021 10:54:37 -0500 (EST)
+	with ESMTP id wZZhAZA8gIP2; Mon, 22 Feb 2021 10:54:42 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C53AF4B151;
-	Mon, 22 Feb 2021 10:54:37 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E1C454B153;
+	Mon, 22 Feb 2021 10:54:42 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D5774B151
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Feb 2021 10:54:36 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 63CA54B164
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Feb 2021 10:54:41 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mfWuq4ohieLM for <kvmarm@lists.cs.columbia.edu>;
- Mon, 22 Feb 2021 10:54:35 -0500 (EST)
+ with ESMTP id 1JBrsE5unlMM for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 22 Feb 2021 10:54:40 -0500 (EST)
 Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D2F3A4B0F1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Feb 2021 10:54:34 -0500 (EST)
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.58])
- by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4Dkmt04Lnzz7nyT;
- Mon, 22 Feb 2021 23:52:56 +0800 (CST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 455094B151
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Feb 2021 10:54:40 -0500 (EST)
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.59])
+ by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4Dkmt54vTmz7p7t;
+ Mon, 22 Feb 2021 23:53:01 +0800 (CST)
 Received: from S00345302A-PC.china.huawei.com (10.47.88.147) by
  DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
- 14.3.498.0; Mon, 22 Feb 2021 23:54:20 +0800
+ 14.3.498.0; Mon, 22 Feb 2021 23:54:26 +0800
 From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 To: <linux-arm-kernel@lists.infradead.org>,
  <iommu@lists.linux-foundation.org>, <kvmarm@lists.cs.columbia.edu>
-Subject: [RFC PATCH 1/5] vfio: Add a helper to retrieve kvm instance from a dev
-Date: Mon, 22 Feb 2021 15:53:34 +0000
-Message-ID: <20210222155338.26132-2-shameerali.kolothum.thodi@huawei.com>
+Subject: [RFC PATCH 2/5] KVM: Add generic infrastructure to support pinned
+ VMIDs
+Date: Mon, 22 Feb 2021 15:53:35 +0000
+Message-ID: <20210222155338.26132-3-shameerali.kolothum.thodi@huawei.com>
 X-Mailer: git-send-email 2.12.0.windows.1
 In-Reply-To: <20210222155338.26132-1-shameerali.kolothum.thodi@huawei.com>
 References: <20210222155338.26132-1-shameerali.kolothum.thodi@huawei.com>
@@ -73,50 +74,102 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-A device that belongs to vfio_group has the kvm instance associated
-with it. Retrieve it.
+Provide generic helper functions to get/put pinned VMIDs if the arch
+supports it.
 
 Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 ---
- drivers/vfio/vfio.c  | 12 ++++++++++++
- include/linux/vfio.h |  1 +
- 2 files changed, 13 insertions(+)
+ include/linux/kvm_host.h | 17 +++++++++++++++++
+ virt/kvm/Kconfig         |  2 ++
+ virt/kvm/kvm_main.c      | 25 +++++++++++++++++++++++++
+ 3 files changed, 44 insertions(+)
 
-diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-index 2151bc7f87ab..d1968e4bf9f4 100644
---- a/drivers/vfio/vfio.c
-+++ b/drivers/vfio/vfio.c
-@@ -876,6 +876,18 @@ struct vfio_device *vfio_device_get_from_dev(struct device *dev)
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 7f2e2a09ebbd..25856db74a08 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -836,6 +836,8 @@ bool kvm_vcpu_wake_up(struct kvm_vcpu *vcpu);
+ void kvm_vcpu_kick(struct kvm_vcpu *vcpu);
+ int kvm_vcpu_yield_to(struct kvm_vcpu *target);
+ void kvm_vcpu_on_spin(struct kvm_vcpu *vcpu, bool usermode_vcpu_not_eligible);
++int kvm_pinned_vmid_get(struct device *dev);
++int kvm_pinned_vmid_put(struct device *dev);
+ 
+ void kvm_flush_remote_tlbs(struct kvm *kvm);
+ void kvm_reload_remote_mmus(struct kvm *kvm);
+@@ -1478,4 +1480,19 @@ static inline void kvm_handle_signal_exit(struct kvm_vcpu *vcpu)
  }
- EXPORT_SYMBOL_GPL(vfio_device_get_from_dev);
+ #endif /* CONFIG_KVM_XFER_TO_GUEST_WORK */
  
-+struct kvm *vfio_kvm_get_from_dev(struct device *dev)
++#ifdef CONFIG_HAVE_KVM_PINNED_VMID
++int kvm_arch_pinned_vmid_get(struct kvm *kvm);
++int kvm_arch_pinned_vmid_put(struct kvm *kvm);
++#else
++static inline int kvm_arch_pinned_vmid_get(struct kvm *kvm)
 +{
-+	struct vfio_group *group;
-+
-+	group = vfio_group_get_from_dev(dev);
-+	if (!group)
-+		return NULL;
-+
-+	return group->kvm;
++	return -EINVAL;
 +}
-+EXPORT_SYMBOL_GPL(vfio_kvm_get_from_dev);
 +
- static struct vfio_device *vfio_device_get_from_name(struct vfio_group *group,
- 						     char *buf)
- {
-diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-index 38d3c6a8dc7e..8716298fee27 100644
---- a/include/linux/vfio.h
-+++ b/include/linux/vfio.h
-@@ -56,6 +56,7 @@ extern void *vfio_del_group_dev(struct device *dev);
- extern struct vfio_device *vfio_device_get_from_dev(struct device *dev);
- extern void vfio_device_put(struct vfio_device *device);
- extern void *vfio_device_data(struct vfio_device *device);
-+extern struct kvm *vfio_kvm_get_from_dev(struct device *dev);
++static inline int kvm_arch_pinned_vmid_put(struct kvm *kvm)
++{
++	return -EINVAL;
++}
++#endif
++
+ #endif
+diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+index 1c37ccd5d402..bb55616c5616 100644
+--- a/virt/kvm/Kconfig
++++ b/virt/kvm/Kconfig
+@@ -63,3 +63,5 @@ config HAVE_KVM_NO_POLL
  
- /**
-  * struct vfio_iommu_driver_ops - VFIO IOMMU driver callbacks
+ config KVM_XFER_TO_GUEST_WORK
+        bool
++config HAVE_KVM_PINNED_VMID
++       bool
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 2541a17ff1c4..632d391f0e34 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -51,6 +51,7 @@
+ #include <linux/io.h>
+ #include <linux/lockdep.h>
+ #include <linux/kthread.h>
++#include <linux/vfio.h>
+ 
+ #include <asm/processor.h>
+ #include <asm/ioctl.h>
+@@ -2849,6 +2850,30 @@ bool kvm_vcpu_wake_up(struct kvm_vcpu *vcpu)
+ }
+ EXPORT_SYMBOL_GPL(kvm_vcpu_wake_up);
+ 
++int kvm_pinned_vmid_get(struct device *dev)
++{
++	struct kvm *kvm;
++
++	kvm = vfio_kvm_get_from_dev(dev);
++	if (!kvm)
++		return -EINVAL;
++
++	return kvm_arch_pinned_vmid_get(kvm);
++}
++EXPORT_SYMBOL_GPL(kvm_pinned_vmid_get);
++
++int kvm_pinned_vmid_put(struct device *dev)
++{
++	struct kvm *kvm;
++
++	kvm = vfio_kvm_get_from_dev(dev);
++	if (!kvm)
++		return -EINVAL;
++
++	return kvm_arch_pinned_vmid_put(kvm);
++}
++EXPORT_SYMBOL_GPL(kvm_pinned_vmid_put);
++
+ #ifndef CONFIG_S390
+ /*
+  * Kick a sleeping VCPU, or a guest VCPU in guest mode, into host kernel mode.
 -- 
 2.17.1
 
