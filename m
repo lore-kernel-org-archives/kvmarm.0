@@ -4,40 +4,40 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27BB1C433E0
-	for <kvmarm@archiver.kernel.org>; Tue, 23 Feb 2021 21:07:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A53AFC433DB
+	for <kvmarm@archiver.kernel.org>; Tue, 23 Feb 2021 21:07:20 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B8BA364EAD
-	for <kvmarm@archiver.kernel.org>; Tue, 23 Feb 2021 21:07:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8BA364EAD
+	by mail.kernel.org (Postfix) with ESMTP id 2EC1764EC9
+	for <kvmarm@archiver.kernel.org>; Tue, 23 Feb 2021 21:07:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EC1764EC9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 654644B196;
-	Tue, 23 Feb 2021 16:07:18 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BF86B4B1F9;
+	Tue, 23 Feb 2021 16:07:19 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id dV6Ufm2bgvVf; Tue, 23 Feb 2021 16:07:17 -0500 (EST)
+	with ESMTP id 4XWMadJzBb8o; Tue, 23 Feb 2021 16:07:18 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D79D4B206;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 69FB74B253;
 	Tue, 23 Feb 2021 16:07:17 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A25D64B1DD
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C02E24B196
  for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Feb 2021 16:07:16 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KsT5UdiqWPVm for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id OAyPmzKtTo8D for <kvmarm@lists.cs.columbia.edu>;
  Tue, 23 Feb 2021 16:07:15 -0500 (EST)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [63.128.21.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C16BE4B196
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C880F4B1B3
  for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Feb 2021 16:07:15 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1614114435;
@@ -45,32 +45,32 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=genscmgMsjlA4KiTDkitCw7fvwsL/tsui1bdhDkf9uw=;
- b=JhaDh6Iy/NFqoGxqtegsbj9iQc9QcFtZJZj/QkMrChc7tEbg/7RxW+UhipTBnv4ChXvZG/
- IqtRHXfFRXTyN1hCdxmneNHDLtGcJ1riO7F3qRz8HTTOAThZCjxn2whJ6XTFjZwoKX5Ydu
- tmSsBn6ew76R5G2Mdkcq2pM5zT+TvfA=
+ bh=CnOB9upSv3gmXiLbJB7XG4Tyob3YoikXOx0RnJ+CFUM=;
+ b=E4wu4XcAV/q3e62OBoWM5gtvWekrsT6GvVKg7LamE7E/nzdgoQ+NTDS+s8AVXeOWasxkOP
+ MnvpRiqg95D6EVwj4vDgxLu0XD5jn0judMVekBOLY0CYvxkFyFcc/GZfwDePX8fSO0GIFZ
+ Uk7CqKn2/d/0JWuMQ5+oH7jKaqjJ9GI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-500-Scu5nHSbMFubdgZcbsVi4w-1; Tue, 23 Feb 2021 16:07:13 -0500
-X-MC-Unique: Scu5nHSbMFubdgZcbsVi4w-1
+ us-mta-172-q7OeracxNimw3F203Asihg-1; Tue, 23 Feb 2021 16:06:42 -0500
+X-MC-Unique: q7OeracxNimw3F203Asihg-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CA6E31020C2B;
- Tue, 23 Feb 2021 21:07:10 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 788208030CC;
+ Tue, 23 Feb 2021 21:06:39 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-114-34.ams2.redhat.com [10.36.114.34])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D8AC75D9D0;
- Tue, 23 Feb 2021 21:07:01 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0F23E5D9D0;
+ Tue, 23 Feb 2021 21:06:33 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com,
  iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
  kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, will@kernel.org,
  maz@kernel.org, robin.murphy@arm.com, joro@8bytes.org,
  alex.williamson@redhat.com, tn@semihalf.com, zhukeqian1@huawei.com
-Subject: [PATCH v12 05/13] vfio/pci: Register an iommu fault handler
-Date: Tue, 23 Feb 2021 22:06:17 +0100
-Message-Id: <20210223210625.604517-6-eric.auger@redhat.com>
+Subject: [PATCH v12 01/13] vfio: VFIO_IOMMU_SET_PASID_TABLE
+Date: Tue, 23 Feb 2021 22:06:13 +0100
+Message-Id: <20210223210625.604517-2-eric.auger@redhat.com>
 In-Reply-To: <20210223210625.604517-1-eric.auger@redhat.com>
 References: <20210223210625.604517-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -95,125 +95,166 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Register an IOMMU fault handler which records faults in
-the DMA FAULT region ring buffer. In a subsequent patch, we
-will add the signaling of a specific eventfd to allow the
-userspace to be notified whenever a new fault has shown up.
+From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
 
+This patch adds an VFIO_IOMMU_SET_PASID_TABLE ioctl
+which aims to pass the virtual iommu guest configuration
+to the host. This latter takes the form of the so-called
+PASID table.
+
+Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
 v11 -> v12:
-- take the fault_queue_lock before reading header (Zenghui)
-- also record recoverable errors
-- only WARN_ON if the unregistration returns -EBUSY
-- make vfio_pci_iommu_dev_fault_handler static
-
-v10 -> v11:
-- move iommu_unregister_device_fault_handler into
-  vfio_pci_disable
-- check fault_pages != 0
+- use iommu_uapi_set_pasid_table
+- Rework the flags checks [Zenghui, Alex]
+- use VFIO_BASE + 19 [Alex]
+- rework the unwind in vfio_attach_pasid_table() [Alex]
 
 v8 -> v9:
-- handler now takes an iommu_fault handle
-- eventfd signaling moved to a subsequent patch
-- check the fault type and return an error if != UNRECOV
-- still the fault handler registration can fail. We need to
-  reach an agreement about how to deal with the situation
+- Merge VFIO_IOMMU_ATTACH/DETACH_PASID_TABLE into a single
+  VFIO_IOMMU_SET_PASID_TABLE ioctl.
+
+v6 -> v7:
+- add a comment related to VFIO_IOMMU_DETACH_PASID_TABLE
 
 v3 -> v4:
-- move iommu_unregister_device_fault_handler to vfio_pci_release
----
- drivers/vfio/pci/vfio_pci.c | 48 ++++++++++++++++++++++++++++++++++++-
- 1 file changed, 47 insertions(+), 1 deletion(-)
+- restore ATTACH/DETACH
+- add unwind on failure
 
-diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index e9a4a1c502c7..ad3fe0ce2e64 100644
---- a/drivers/vfio/pci/vfio_pci.c
-+++ b/drivers/vfio/pci/vfio_pci.c
-@@ -27,6 +27,7 @@
- #include <linux/vgaarb.h>
- #include <linux/nospec.h>
- #include <linux/sched/mm.h>
-+#include <linux/circ_buf.h>
+v2 -> v3:
+- s/BIND_PASID_TABLE/SET_PASID_TABLE
+
+v1 -> v2:
+- s/BIND_GUEST_STAGE/BIND_PASID_TABLE
+- remove the struct device arg
+---
+ drivers/vfio/vfio_iommu_type1.c | 58 +++++++++++++++++++++++++++++++++
+ include/uapi/linux/vfio.h       | 19 +++++++++++
+ 2 files changed, 77 insertions(+)
+
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index 0b4dedaa9128..50c4f8ae5b03 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -2587,6 +2587,39 @@ static int vfio_iommu_iova_build_caps(struct vfio_iommu *iommu,
+ 	return ret;
+ }
  
- #include "vfio_pci_private.h"
- 
-@@ -333,6 +334,41 @@ static const struct vfio_pci_regops vfio_pci_dma_fault_regops = {
- 	.add_capability = vfio_pci_dma_fault_add_capability,
- };
- 
-+static int
-+vfio_pci_iommu_dev_fault_handler(struct iommu_fault *fault, void *data)
++static void
++vfio_detach_pasid_table(struct vfio_iommu *iommu)
 +{
-+	struct vfio_pci_device *vdev = (struct vfio_pci_device *)data;
-+	struct vfio_region_dma_fault *reg =
-+		(struct vfio_region_dma_fault *)vdev->fault_pages;
-+	struct iommu_fault *new;
-+	u32 head, tail, size;
-+	int ret = -EINVAL;
++	struct vfio_domain *d;
 +
-+	if (WARN_ON(!reg))
-+		return ret;
++	mutex_lock(&iommu->lock);
++	list_for_each_entry(d, &iommu->domain_list, next)
++		iommu_detach_pasid_table(d->domain);
 +
-+	mutex_lock(&vdev->fault_queue_lock);
++	mutex_unlock(&iommu->lock);
++}
 +
-+	head = reg->head;
-+	tail = reg->tail;
-+	size = reg->nb_entries;
++static int
++vfio_attach_pasid_table(struct vfio_iommu *iommu, unsigned long arg)
++{
++	struct vfio_domain *d;
++	int ret = 0;
 +
-+	new = (struct iommu_fault *)(vdev->fault_pages + reg->offset +
-+				     head * reg->entry_size);
++	mutex_lock(&iommu->lock);
 +
-+	if (CIRC_SPACE(head, tail, size) < 1) {
-+		ret = -ENOSPC;
-+		goto unlock;
++	list_for_each_entry(d, &iommu->domain_list, next) {
++		ret = iommu_uapi_attach_pasid_table(d->domain, (void __user *)arg);
++		if (ret) {
++			list_for_each_entry_continue_reverse(d, &iommu->domain_list, next)
++				iommu_detach_pasid_table(d->domain);
++			break;
++		}
 +	}
 +
-+	*new = *fault;
-+	reg->head = (head + 1) % size;
-+	ret = 0;
-+unlock:
-+	mutex_unlock(&vdev->fault_queue_lock);
++	mutex_unlock(&iommu->lock);
 +	return ret;
 +}
 +
- #define DMA_FAULT_RING_LENGTH 512
+ static int vfio_iommu_migration_build_caps(struct vfio_iommu *iommu,
+ 					   struct vfio_info_cap *caps)
+ {
+@@ -2747,6 +2780,29 @@ static int vfio_iommu_type1_unmap_dma(struct vfio_iommu *iommu,
+ 			-EFAULT : 0;
+ }
  
- static int vfio_pci_dma_fault_init(struct vfio_pci_device *vdev)
-@@ -377,6 +413,13 @@ static int vfio_pci_dma_fault_init(struct vfio_pci_device *vdev)
- 	header->entry_size = sizeof(struct iommu_fault);
- 	header->nb_entries = DMA_FAULT_RING_LENGTH;
- 	header->offset = sizeof(struct vfio_region_dma_fault);
++static int vfio_iommu_type1_set_pasid_table(struct vfio_iommu *iommu,
++					    unsigned long arg)
++{
++	struct vfio_iommu_type1_set_pasid_table spt;
++	unsigned long minsz;
 +
-+	ret = iommu_register_device_fault_handler(&vdev->pdev->dev,
-+					vfio_pci_iommu_dev_fault_handler,
-+					vdev);
-+	if (ret) /* the dma fault region is freed in vfio_pci_disable() */
-+		goto out;
++	minsz = offsetofend(struct vfio_iommu_type1_set_pasid_table, flags);
 +
- 	return 0;
- out:
- 	kfree(vdev->fault_pages);
-@@ -500,7 +543,7 @@ static void vfio_pci_disable(struct vfio_pci_device *vdev)
- 	struct pci_dev *pdev = vdev->pdev;
- 	struct vfio_pci_dummy_resource *dummy_res, *tmp;
- 	struct vfio_pci_ioeventfd *ioeventfd, *ioeventfd_tmp;
--	int i, bar;
-+	int i, bar, ret;
++	if (copy_from_user(&spt, (void __user *)arg, minsz))
++		return -EFAULT;
++
++	if (spt.argsz < minsz)
++		return -EINVAL;
++
++	if (spt.flags == VFIO_PASID_TABLE_FLAG_SET) {
++		return vfio_attach_pasid_table(iommu, arg + minsz);
++	} else if (spt.flags == VFIO_PASID_TABLE_FLAG_UNSET) {
++		vfio_detach_pasid_table(iommu);
++		return 0;
++	}
++	return -EINVAL;
++}
++
+ static int vfio_iommu_type1_dirty_pages(struct vfio_iommu *iommu,
+ 					unsigned long arg)
+ {
+@@ -2867,6 +2923,8 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+ 		return vfio_iommu_type1_unmap_dma(iommu, arg);
+ 	case VFIO_IOMMU_DIRTY_PAGES:
+ 		return vfio_iommu_type1_dirty_pages(iommu, arg);
++	case VFIO_IOMMU_SET_PASID_TABLE:
++		return vfio_iommu_type1_set_pasid_table(iommu, arg);
+ 	default:
+ 		return -ENOTTY;
+ 	}
+diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+index d1812777139f..6d77779c941d 100644
+--- a/include/uapi/linux/vfio.h
++++ b/include/uapi/linux/vfio.h
+@@ -14,6 +14,7 @@
  
- 	/* Stop the device from further DMA */
- 	pci_clear_master(pdev);
-@@ -509,6 +552,9 @@ static void vfio_pci_disable(struct vfio_pci_device *vdev)
- 				VFIO_IRQ_SET_ACTION_TRIGGER,
- 				vdev->irq_type, 0, 0, NULL);
+ #include <linux/types.h>
+ #include <linux/ioctl.h>
++#include <linux/iommu.h>
  
-+	ret = iommu_unregister_device_fault_handler(&vdev->pdev->dev);
-+	WARN_ON(ret == -EBUSY);
+ #define VFIO_API_VERSION	0
+ 
+@@ -1181,6 +1182,24 @@ struct vfio_iommu_type1_dirty_bitmap_get {
+ 
+ #define VFIO_IOMMU_DIRTY_PAGES             _IO(VFIO_TYPE, VFIO_BASE + 17)
+ 
++/*
++ * VFIO_IOMMU_SET_PASID_TABLE - _IOWR(VFIO_TYPE, VFIO_BASE + 18,
++ *			struct vfio_iommu_type1_set_pasid_table)
++ *
++ * The SET operation passes a PASID table to the host while the
++ * UNSET operation detaches the one currently programmed. Setting
++ * a table while another is already programmed replaces the old table.
++ */
++struct vfio_iommu_type1_set_pasid_table {
++	__u32	argsz;
++	__u32	flags;
++#define VFIO_PASID_TABLE_FLAG_SET	(1 << 0)
++#define VFIO_PASID_TABLE_FLAG_UNSET	(1 << 1)
++	struct iommu_pasid_table_config config; /* used on SET */
++};
 +
- 	/* Device closed, don't need mutex here */
- 	list_for_each_entry_safe(ioeventfd, ioeventfd_tmp,
- 				 &vdev->ioeventfds_list, next) {
++#define VFIO_IOMMU_SET_PASID_TABLE	_IO(VFIO_TYPE, VFIO_BASE + 18)
++
+ /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
+ 
+ /*
 -- 
 2.26.2
 
