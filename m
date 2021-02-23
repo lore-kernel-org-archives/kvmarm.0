@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CF6DC433E0
-	for <kvmarm@archiver.kernel.org>; Tue, 23 Feb 2021 09:49:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2249C433DB
+	for <kvmarm@archiver.kernel.org>; Tue, 23 Feb 2021 09:49:43 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1EDCD64E60
-	for <kvmarm@archiver.kernel.org>; Tue, 23 Feb 2021 09:49:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EDCD64E60
+	by mail.kernel.org (Postfix) with ESMTP id 62AB764E5C
+	for <kvmarm@archiver.kernel.org>; Tue, 23 Feb 2021 09:49:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62AB764E5C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B2B244B1F1;
-	Tue, 23 Feb 2021 04:49:40 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E9CC24B1F0;
+	Tue, 23 Feb 2021 04:49:42 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 97FDPy-WQD7i; Tue, 23 Feb 2021 04:49:39 -0500 (EST)
+	with ESMTP id aMKrFoWDwpKF; Tue, 23 Feb 2021 04:49:41 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A4D014B1EC;
-	Tue, 23 Feb 2021 04:49:39 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C87494B1EB;
+	Tue, 23 Feb 2021 04:49:41 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B9A04B1D5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Feb 2021 04:49:38 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 59CFC4B1C0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Feb 2021 04:49:40 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4eCVkOwEfoqX for <kvmarm@lists.cs.columbia.edu>;
- Tue, 23 Feb 2021 04:49:37 -0500 (EST)
-Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com
- [209.85.160.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 500DB4B0D6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Feb 2021 04:49:37 -0500 (EST)
-Received: by mail-qt1-f201.google.com with SMTP id t5so9624346qti.5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Feb 2021 01:49:37 -0800 (PST)
+ with ESMTP id d8dslYJwEsEA for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 23 Feb 2021 04:49:39 -0500 (EST)
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com
+ [209.85.222.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4C5134B1B1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Feb 2021 04:49:39 -0500 (EST)
+Received: by mail-qk1-f201.google.com with SMTP id k2so6800711qkh.2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Feb 2021 01:49:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=sender:date:in-reply-to:message-id:mime-version:references:subject
- :from:to:cc; bh=Yq3UF/O6ghf1oapvxUJWBbk4uV2Kh5VLtR3aNkbqwLU=;
- b=hD9Jlj9YF1o/WCGyN5vUtU9153ZnKrb5uyJTMxKBsfPOU1xLSLrjoxnN5JMm1+CpMv
- f4otmBn6wd+SaDuv+J7T1kAO5clCt/0sSiuSCYx7MZjedJi+Kt32G+btOWGmGeVYcXhI
- W4TenexOBXfSg9hcW7YvQlzjDmOjIduMWFBEZ4NcZax5Siyu4Lp95vBroj4oMdche885
- do4QL+I1rqOsXVDmCctYI7tL5scgFZV+a6pWBd1uFs0Kd184yn+eKiVU+p5Qk/A6Nvf1
- VB8UjeNE6AylFH5hYddGfqM6OpbuDVFSYok/9B400HDajcnup3+feDi9z0SmfbBk/rLe
- 8owQ==
+ :from:to:cc; bh=7C3tkJ6qIqYWp/7tEC4IjuJsnJ0m8o0qtdgiU4uDjW4=;
+ b=JTe4QRC6SezgQLyxeZsVXcnipeAHg9rDiU2TqvUWkCdwzBIT2fB1+Jc39ZDc3HsQuy
+ UqeAz7JIcmF45TO2EWrgqvZAvBw0iXAQsQHpVh/dlWSdNwXzx53M6du62CpNY6Mj4PGA
+ XaznytJCUXBm4M1LCZRrH7qNk15H8KcKPlYQX7FOe7jhRv0Dm2zDSstRK+2HqB0KD0xr
+ ISveSk+YilRqPOVs7Bdu3zDUWmdy1zl6Jgg2z5ac0jZ3TJ33quGrQkkWQL+itspeKUu/
+ CcliShFUCAQ1Gi+bC0ZukIkOWDFyr7n7xVrDDfLhSAXuKfyPyxyIKaWiZgjQaeikth4V
+ LgZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=Yq3UF/O6ghf1oapvxUJWBbk4uV2Kh5VLtR3aNkbqwLU=;
- b=o5LCAAt1lSTdad46SizVhAflxTXDiPUxTDd4t25RQng96LaTcY5V2VJqqgZzW/DHMO
- PdW9kxvBwtokI5OSM97TqwBzKuhtKQ6MURrqin/GbDGKz2qK87HMxpyKwNqMtLw1He/C
- 5N5B27A78oka0V6fMY/Bz2dUydidvNUeQgvsoCD8sP/TFKByVP9Vxo+BsJ+BKD2UVgeF
- 9tgkgQAlGTRGMMkY9PO2dYjnwV/XJyJVXGgQiuLVugPuI5NZ0QBr7gh6NzXP9ofkqyvN
- Ck1sCt+s4fMwvgR+K1uD3D+SSiA6P/iiM7UBRRnAo12G45M08Br+vTyzBmIiE1hfCk4/
- 2SQg==
-X-Gm-Message-State: AOAM532FHLRq7uWcLJxlCx7OastOFYHa7t+wikKL8Hev9VAFntE/a88u
- KOXfTMsyf5e+wFckYMjv9AvXvY2CW2EBj8S6HqcQcbphBW7tqsEVCVqZwJgkFJH6cU9y0ImcIpZ
- 9pfQ9mIEbeBvjR/1F6tXMLYHaic8O9lGuGGTQf2vmOT80e70GEQwwsrUBD68QP453R8HgKw==
-X-Google-Smtp-Source: ABdhPJz38dBT7VX3FyWuDPXxw7meMSBJqJ/lccWrUHQ/7+O798GcGbiE1SovJz/Vpj+Lqa7gpuyUIHN+1GE=
-X-Received: from ascull.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1510])
- (user=ascull job=sendgmr) by 2002:a0c:eb0f:: with SMTP id
- j15mr11595845qvp.58.1614073776698; 
- Tue, 23 Feb 2021 01:49:36 -0800 (PST)
-Date: Tue, 23 Feb 2021 09:49:26 +0000
+ bh=7C3tkJ6qIqYWp/7tEC4IjuJsnJ0m8o0qtdgiU4uDjW4=;
+ b=bjL7AnbG/4LK/H+knpiZ7tp9wyYj8t287M/GFVieowe46ZefOYqCZDALXFJfbj0AI3
+ 8fIuD8zYvUSWVX3zhXLGYJU22v5PAHYXFKcJuSbEDU6JL09fShqflMPf66k3SDs1FOkZ
+ nbry1lxowJ/O6etrjhddTeUOMXKwyQOMLFU6lOip6D9Jg2e735QzkJQB3aG4Ia+KiwtR
+ KpeK4i3aVjMibu1T73eWe6uyDIjsMiSUfiPlZ7zKCUD7tVtpr4b5WHJ5ky18WfOppvcF
+ EsSmqJ8T3eJn44vC69fv0TJx01K4dFYnoI+VN3oukd1K4Lq+DJe5BdwGn1S1sfQIQETI
+ M/lg==
+X-Gm-Message-State: AOAM5323vaIPRh0PEbPIUxSkvj0QZ7P8LkFKFDGVvYxEHzOoMkQDNJlb
+ D7wvCLfLNOk1xElvaCdvuHpQ2xrAnuwrHvUYgFgNjkPDItB731kPmPBiB+iiLzcwfVoRXtD4ol/
+ qtgo7kf0ogT6htOjSM+ekf2mWLNsMRLP7YiJG0IW0K+q2AZ/7w3Z57pDF4Kro5XVQYiuayQ==
+X-Google-Smtp-Source: ABdhPJwS3l/WQ8RayqR/FhY+tz3XrtHvICnsGPJqNcrlJC76DKh9cuzaL7MGO1fKFBdHbtg4+sIX3TFLbUw=
+X-Received: from ascull.c.googlers.com ([fda3:e722:ac3:10:28:9cb1:c0a8:1510])
+ (user=ascull job=sendgmr) by 2002:ad4:4e10:: with SMTP id
+ dl16mr5331793qvb.10.1614073778725; 
+ Tue, 23 Feb 2021 01:49:38 -0800 (PST)
+Date: Tue, 23 Feb 2021 09:49:27 +0000
 In-Reply-To: <20210223094927.766572-1-ascull@google.com>
-Message-Id: <20210223094927.766572-2-ascull@google.com>
+Message-Id: <20210223094927.766572-3-ascull@google.com>
 Mime-Version: 1.0
 References: <20210223094927.766572-1-ascull@google.com>
 X-Mailer: git-send-email 2.30.0.617.g56c4b15f3c-goog
-Subject: [PATCH 1/2] KVM: arm64: Use BUG and BUG_ON in nVHE hyp
+Subject: [PATCH 2/2] KVM: arm64: Log source when panicking from nVHE hyp
 From: Andrew Scull <ascull@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: kernel-team@android.com, maz@kernel.org, catalin.marinas@arm.com,
@@ -96,68 +96,158 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-hyp_panic() reports the address of the panic by using ELR_EL2, but this
-isn't a useful address when hyp_panic() is called directly. Replace such
-direct calls with BUG() and BUG_ON() which use BRK to trigger and
-exception that then goes to hyp_panic() with the correct address. Also
-remove the hyp_panic() declaration from the header file to avoid
-accidental misuse.
+To aid with debugging, add details of the source of a panic. This is
+done by having nVHE hyp exit to nvhe_hyp_panic_handler() rather than
+directly to panic(). The handler will then add the extra details for
+debugging before panicking the kernel.
+
+If the panic was due to a BUG(), look up the metadata to log the file
+and line, if available, otherwise log the kimg address that can be
+looked up in vmlinux.
 
 Signed-off-by: Andrew Scull <ascull@google.com>
 ---
- arch/arm64/include/asm/kvm_hyp.h   | 1 -
- arch/arm64/kvm/hyp/nvhe/hyp-main.c | 2 +-
- arch/arm64/kvm/hyp/nvhe/hyp-smp.c  | 6 ++----
- 3 files changed, 3 insertions(+), 6 deletions(-)
+ arch/arm64/include/asm/kvm_mmu.h        |  2 ++
+ arch/arm64/kernel/image-vars.h          |  3 +-
+ arch/arm64/kvm/handle_exit.c            | 38 +++++++++++++++++++++++++
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  2 --
+ arch/arm64/kvm/hyp/nvhe/host.S          | 18 ++++++------
+ arch/arm64/kvm/hyp/nvhe/psci-relay.c    |  2 --
+ 6 files changed, 49 insertions(+), 16 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index fb8404fefd1f..746eb9a2891b 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -95,7 +95,6 @@ u64 __guest_enter(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index e52d82aeadca..f07c55f9dd1e 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -130,6 +130,8 @@ void kvm_update_va_mask(struct alt_instr *alt,
+ 			__le32 *origptr, __le32 *updptr, int nr_inst);
+ void kvm_compute_layout(void);
  
- bool kvm_host_psci_handler(struct kvm_cpu_context *host_ctxt);
- 
--void __noreturn hyp_panic(void);
- #ifdef __KVM_NVHE_HYPERVISOR__
- void __noreturn __hyp_do_panic(struct kvm_cpu_context *host_ctxt, u64 spsr,
- 			       u64 elr, u64 par);
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index a906f9e2ff34..9f37a4240562 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -181,6 +181,6 @@ void handle_trap(struct kvm_cpu_context *host_ctxt)
- 		handle_host_smc(host_ctxt);
- 		break;
- 	default:
--		hyp_panic();
-+		BUG();
- 	}
- }
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-smp.c b/arch/arm64/kvm/hyp/nvhe/hyp-smp.c
-index 2997aa156d8e..4495aed04240 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-smp.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-smp.c
-@@ -18,8 +18,7 @@ u64 __ro_after_init hyp_cpu_logical_map[NR_CPUS] = { [0 ... NR_CPUS-1] = INVALID
- 
- u64 cpu_logical_map(unsigned int cpu)
++#define __hyp_pa(x) ((phys_addr_t)((x)) + hyp_physvirt_offset)
++
+ static __always_inline unsigned long __kern_hyp_va(unsigned long v)
  {
--	if (cpu >= ARRAY_SIZE(hyp_cpu_logical_map))
--		hyp_panic();
-+	BUG_ON(cpu >= ARRAY_SIZE(hyp_cpu_logical_map));
+ 	asm volatile(ALTERNATIVE_CB("and %0, %0, #1\n"
+diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
+index f676243abac6..cf12b0d6441e 100644
+--- a/arch/arm64/kernel/image-vars.h
++++ b/arch/arm64/kernel/image-vars.h
+@@ -71,8 +71,7 @@ KVM_NVHE_ALIAS(kvm_get_kimage_voffset);
+ KVM_NVHE_ALIAS(kvm_vgic_global_state);
  
- 	return hyp_cpu_logical_map[cpu];
+ /* Kernel symbols used to call panic() from nVHE hyp code (via ERET). */
+-KVM_NVHE_ALIAS(__hyp_panic_string);
+-KVM_NVHE_ALIAS(panic);
++KVM_NVHE_ALIAS(nvhe_hyp_panic_handler);
+ 
+ /* Vectors installed by hyp-init on reset HVC. */
+ KVM_NVHE_ALIAS(__hyp_stub_vectors);
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index cebe39f3b1b6..5e0d9a5152e5 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -291,3 +291,41 @@ void handle_exit_early(struct kvm_vcpu *vcpu, int exception_index)
+ 	if (exception_index == ARM_EXCEPTION_EL1_SERROR)
+ 		kvm_handle_guest_serror(vcpu, kvm_vcpu_get_esr(vcpu));
  }
-@@ -30,8 +29,7 @@ unsigned long __hyp_per_cpu_offset(unsigned int cpu)
- 	unsigned long this_cpu_base;
- 	unsigned long elf_base;
++
++void __noreturn __cold nvhe_hyp_panic_handler(bool hyp, u64 spsr, u64 elr,
++					      u64 par, uintptr_t vcpu,
++					      u64 far, u64 hpfar, u64 esr) {
++	extern const char __hyp_panic_string[];
++	u64 elr_in_kimg = __phys_to_kimg(__hyp_pa(elr));
++
++	if (!hyp) {
++		kvm_err("Invalid host exception to nVHE hyp!\n");
++	} else if (ESR_ELx_EC(esr) == ESR_ELx_EC_BRK64 &&
++		   (esr & ESR_ELx_BRK64_ISS_COMMENT_MASK) == BUG_BRK_IMM) {
++		struct bug_entry *bug = find_bug(elr_in_kimg);
++		const char *file = NULL;
++		unsigned line = 0;
++
++		/* All hyp bugs, including warnings, are treated as fatal. */
++		if (bug) {
++#ifdef CONFIG_DEBUG_BUGVERBOSE
++#ifndef CONFIG_GENERIC_BUG_RELATIVE_POINTERS
++			file = bug->file;
++#else
++			file = (const char *)bug + bug->file_disp;
++#endif
++			line = bug->line;
++#endif
++		}
++
++		if (file) {
++			kvm_err("nVHE hyp BUG at: %s:%u!\n", file, line);
++		} else {
++			kvm_err("nVHE hyp BUG at: %016llx!\n", elr_in_kimg);
++		}
++	} else {
++		kvm_err("nVHE hyp panic at: %016llx!\n", elr_in_kimg);
++	}
++
++	panic(__hyp_panic_string, spsr, elr, esr, far, hpfar, par, vcpu);
++}
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 84473574c2e7..f9e8bb97d199 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -30,8 +30,6 @@
+ #include <asm/processor.h>
+ #include <asm/thread_info.h>
  
--	if (cpu >= ARRAY_SIZE(kvm_arm_hyp_percpu_base))
--		hyp_panic();
-+	BUG_ON(cpu >= ARRAY_SIZE(kvm_arm_hyp_percpu_base));
+-extern const char __hyp_panic_string[];
+-
+ extern struct exception_table_entry __start___kvm_ex_table;
+ extern struct exception_table_entry __stop___kvm_ex_table;
  
- 	cpu_base_array = (unsigned long *)hyp_symbol_addr(kvm_arm_hyp_percpu_base);
- 	this_cpu_base = kern_hyp_va(cpu_base_array[cpu]);
+diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
+index 3dc5a9f3e575..d9a9dd66b1a2 100644
+--- a/arch/arm64/kvm/hyp/nvhe/host.S
++++ b/arch/arm64/kvm/hyp/nvhe/host.S
+@@ -77,21 +77,19 @@ SYM_FUNC_END(__host_enter)
+ SYM_FUNC_START(__hyp_do_panic)
+ 	mov	x29, x0
+ 
+-	/* Load the format string into x0 and arguments into x1-7 */
+-	ldr	x0, =__hyp_panic_string
+-
+-	mov	x6, x3
+-	get_vcpu_ptr x7, x3
+-
+-	mrs	x3, esr_el2
+-	mrs	x4, far_el2
+-	mrs	x5, hpfar_el2
++	/* Load the panic arguments into x0-7 */
++	cmp	x0, xzr
++	cset	x0, ne
++	get_vcpu_ptr x4, x5
++	mrs	x5, far_el2
++	mrs	x6, hpfar_el2
++	mrs	x7, esr_el2
+ 
+ 	/* Prepare and exit to the host's panic funciton. */
+ 	mov	lr, #(PSR_F_BIT | PSR_I_BIT | PSR_A_BIT | PSR_D_BIT |\
+ 		      PSR_MODE_EL1h)
+ 	msr	spsr_el2, lr
+-	ldr	lr, =panic
++	ldr	lr, =nvhe_hyp_panic_handler
+ 	msr	elr_el2, lr
+ 
+ 	/* Enter the host, restoring the host context if it was provided. */
+diff --git a/arch/arm64/kvm/hyp/nvhe/psci-relay.c b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
+index 8e7128cb7667..54b70189229b 100644
+--- a/arch/arm64/kvm/hyp/nvhe/psci-relay.c
++++ b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
+@@ -22,8 +22,6 @@ void __noreturn __host_enter(struct kvm_cpu_context *host_ctxt);
+ struct kvm_host_psci_config __ro_after_init kvm_host_psci_config;
+ s64 __ro_after_init hyp_physvirt_offset;
+ 
+-#define __hyp_pa(x) ((phys_addr_t)((x)) + hyp_physvirt_offset)
+-
+ #define INVALID_CPU_ID	UINT_MAX
+ 
+ struct psci_boot_args {
 -- 
 2.30.0.617.g56c4b15f3c-goog
 
