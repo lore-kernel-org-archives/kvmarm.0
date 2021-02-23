@@ -3,76 +3,73 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D899BC433DB
-	for <kvmarm@archiver.kernel.org>; Tue, 23 Feb 2021 20:57:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4EEDC433E6
+	for <kvmarm@archiver.kernel.org>; Tue, 23 Feb 2021 20:57:29 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 729C864E60
-	for <kvmarm@archiver.kernel.org>; Tue, 23 Feb 2021 20:57:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 729C864E60
+	by mail.kernel.org (Postfix) with ESMTP id 62BA664E7A
+	for <kvmarm@archiver.kernel.org>; Tue, 23 Feb 2021 20:57:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62BA664E7A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CC2AE4B201;
-	Tue, 23 Feb 2021 15:57:23 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 111DC4B1AE;
+	Tue, 23 Feb 2021 15:57:29 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 5vcyjQEKgc6A; Tue, 23 Feb 2021 15:57:22 -0500 (EST)
+	with ESMTP id dMI2BVKNGc54; Tue, 23 Feb 2021 15:57:27 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B84584B214;
-	Tue, 23 Feb 2021 15:57:22 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E329D4B216;
+	Tue, 23 Feb 2021 15:57:27 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 407DD4B1F3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Feb 2021 15:57:22 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 38ECE4B1F3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Feb 2021 15:57:27 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RJMWF51guLhb for <kvmarm@lists.cs.columbia.edu>;
- Tue, 23 Feb 2021 15:57:21 -0500 (EST)
+ with ESMTP id 8FMMJXHM9BE7 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 23 Feb 2021 15:57:26 -0500 (EST)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [63.128.21.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3413E4B100
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Feb 2021 15:57:21 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B4D14B216
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Feb 2021 15:57:26 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1614113841;
+ s=mimecast20190719; t=1614113846;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=us9lsbD9lkCV40S8Ssu96U4+rIQ0qhW8ubedw2LURJU=;
- b=BA7fRhS+FzXcs16w8WzHcUCaNdWobthL0/mLtKF/0K2mqw090v0/c5ZaBTRe79ljeUPIJb
- 9yJeDrrVVskrt3shm9dZQj73OeWZH46jq4smcuyA6UeQuuODJo5Jm7fBuSKLcEz1CTzWLJ
- mqWrE/skWhiqHVaHasTEY7531SPiNH0=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=dspjyoruL6FYvLVfk5NSTgJZHzGM/NlapNw3ZfaV3DI=;
+ b=ivFV8Gnq0CF+fSzYqe5T4UaD5lmoVmucedPCGsuKqO/rf0i+cvRl/tFziLrBT7lRxMzsCZ
+ sb3GXz7alUUOnk2IHdWdA+C6RrWVTnT/+tvzstTjaZnjkVKT6sTXBXB91CnB+lG877isMr
+ D591CFcIphhtK3s40xiTlv1VZT2iK8s=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-296-FF9tupmVPuaMCRbjyjRmew-1; Tue, 23 Feb 2021 15:57:17 -0500
-X-MC-Unique: FF9tupmVPuaMCRbjyjRmew-1
+ us-mta-358-iiKcvpHJP16wVJHD1fCK1Q-1; Tue, 23 Feb 2021 15:56:51 -0500
+X-MC-Unique: iiKcvpHJP16wVJHD1fCK1Q-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CFD8518B9ECA;
- Tue, 23 Feb 2021 20:57:14 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 306A3835E25;
+ Tue, 23 Feb 2021 20:56:48 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-114-34.ams2.redhat.com [10.36.114.34])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 881205D9D0;
- Tue, 23 Feb 2021 20:57:01 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6207F5D9D0;
+ Tue, 23 Feb 2021 20:56:36 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com,
  iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
  kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, will@kernel.org,
  maz@kernel.org, robin.murphy@arm.com, joro@8bytes.org,
  alex.williamson@redhat.com, tn@semihalf.com, zhukeqian1@huawei.com
-Subject: [PATCH v14 03/13] iommu/smmuv3: Allow s1 and s2 configs to coexist
-Date: Tue, 23 Feb 2021 21:56:24 +0100
-Message-Id: <20210223205634.604221-4-eric.auger@redhat.com>
-In-Reply-To: <20210223205634.604221-1-eric.auger@redhat.com>
-References: <20210223205634.604221-1-eric.auger@redhat.com>
+Subject: [PATCH v14 00/13] SMMUv3 Nested Stage Setup (IOMMU part)
+Date: Tue, 23 Feb 2021 21:56:21 +0100
+Message-Id: <20210223205634.604221-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Cc: jean-philippe@linaro.org, jacob.jun.pan@linux.intel.com,
@@ -95,166 +92,86 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In true nested mode, both s1_cfg and s2_cfg will coexist.
-Let's remove the union and add a "set" field in each
-config structure telling whether the config is set and needs
-to be applied when writing the STE. In legacy nested mode,
-only the second stage is used. In true nested mode, both stages
-are used and the S1 config is "set" when the guest passes
-its pasid table.
+This series brings the IOMMU part of HW nested paging support
+in the SMMUv3. The VFIO part is submitted separately.
 
-No functional change intended.
+This is based on Jean-Philippe's
+[PATCH v12 00/10] iommu: I/O page faults for SMMUv3
+https://lore.kernel.org/linux-arm-kernel/YBfij71tyYvh8LhB@myrica/T/
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+The IOMMU API is extended to support 2 new API functionalities:
+1) pass the guest stage 1 configuration
+2) pass stage 1 MSI bindings
 
----
+Then those capabilities gets implemented in the SMMUv3 driver.
+
+The virtualizer passes information through the VFIO user API
+which cascades them to the iommu subsystem. This allows the guest
+to own stage 1 tables and context descriptors (so-called PASID
+table) while the host owns stage 2 tables and main configuration
+structures (STE).
+
+Best Regards
+
+Eric
+
+This series can be found at:
+https://github.com/eauger/linux/tree/v5.11-stallv12-2stage-v14
+(including the VFIO part in its last version: v12)
+
+The VFIO series is sent separately.
+
+History:
+
+Previous version (v13):
+https://github.com/eauger/linux/tree/5.10-rc4-2stage-v13
 
 v13 -> v14:
-- slight reword of the commit message
+- Took into account all received comments I think. Great
+  thanks to all the testers for their effort and sometimes
+  fixes. I am really grateful to you!
+- numerous fixes including guest running in
+  noiommu, iommu.strict=0, iommu.passthrough=on,
+  enable_unsafe_noiommu_mode
 
 v12 -> v13:
-- does not dynamically allocate s1-cfg and s2_cfg anymore. Add
-  the set field
----
- drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 43 +++++++++++++--------
- drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h |  8 ++--
- 2 files changed, 31 insertions(+), 20 deletions(-)
+- fixed compilation issue with CONFIG_ARM_SMMU_V3_SVA
+  reported by Shameer. This urged me to revisit patch 4 into
+  iommu/smmuv3: Allow s1 and s2 configs to coexist where
+  s1_cfg and s2_cfg are not dynamically allocated anymore.
+  Instead I use a new set field in existing structs
+- fixed 2 others config checks
+- Updated "iommu/arm-smmu-v3: Maintain a SID->device structure"
+  according to the last version
 
-diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-index 0f1264a86eec..14e5666c25dc 100644
---- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-+++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-@@ -1239,8 +1239,8 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_master *master, u32 sid,
- 	u64 val = le64_to_cpu(dst[0]);
- 	bool ste_live = false;
- 	struct arm_smmu_device *smmu = NULL;
--	struct arm_smmu_s1_cfg *s1_cfg = NULL;
--	struct arm_smmu_s2_cfg *s2_cfg = NULL;
-+	struct arm_smmu_s1_cfg *s1_cfg;
-+	struct arm_smmu_s2_cfg *s2_cfg;
- 	struct arm_smmu_domain *smmu_domain = NULL;
- 	struct arm_smmu_cmdq_ent prefetch_cmd = {
- 		.opcode		= CMDQ_OP_PREFETCH_CFG,
-@@ -1255,13 +1255,24 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_master *master, u32 sid,
- 	}
- 
- 	if (smmu_domain) {
-+		s1_cfg = &smmu_domain->s1_cfg;
-+		s2_cfg = &smmu_domain->s2_cfg;
-+
- 		switch (smmu_domain->stage) {
- 		case ARM_SMMU_DOMAIN_S1:
--			s1_cfg = &smmu_domain->s1_cfg;
-+			s1_cfg->set = true;
-+			s2_cfg->set = false;
- 			break;
- 		case ARM_SMMU_DOMAIN_S2:
-+			s1_cfg->set = false;
-+			s2_cfg->set = true;
-+			break;
- 		case ARM_SMMU_DOMAIN_NESTED:
--			s2_cfg = &smmu_domain->s2_cfg;
-+			/*
-+			 * Actual usage of stage 1 depends on nested mode:
-+			 * legacy (2d stage only) or true nested mode
-+			 */
-+			s2_cfg->set = true;
- 			break;
- 		default:
- 			break;
-@@ -1288,7 +1299,7 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_master *master, u32 sid,
- 	val = STRTAB_STE_0_V;
- 
- 	/* Bypass/fault */
--	if (!smmu_domain || !(s1_cfg || s2_cfg)) {
-+	if (!smmu_domain || !(s1_cfg->set || s2_cfg->set)) {
- 		if (!smmu_domain && disable_bypass)
- 			val |= FIELD_PREP(STRTAB_STE_0_CFG, STRTAB_STE_0_CFG_ABORT);
- 		else
-@@ -1307,7 +1318,7 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_master *master, u32 sid,
- 		return;
- 	}
- 
--	if (s1_cfg) {
-+	if (s1_cfg->set) {
- 		u64 strw = smmu->features & ARM_SMMU_FEAT_E2H ?
- 			STRTAB_STE_1_STRW_EL2 : STRTAB_STE_1_STRW_NSEL1;
- 
-@@ -1329,7 +1340,7 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_master *master, u32 sid,
- 			FIELD_PREP(STRTAB_STE_0_S1FMT, s1_cfg->s1fmt);
- 	}
- 
--	if (s2_cfg) {
-+	if (s2_cfg->set) {
- 		BUG_ON(ste_live);
- 		dst[2] = cpu_to_le64(
- 			 FIELD_PREP(STRTAB_STE_2_S2VMID, s2_cfg->vmid) |
-@@ -2016,24 +2027,24 @@ static void arm_smmu_domain_free(struct iommu_domain *domain)
- {
- 	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
- 	struct arm_smmu_device *smmu = smmu_domain->smmu;
-+	struct arm_smmu_s1_cfg *s1_cfg = &smmu_domain->s1_cfg;
-+	struct arm_smmu_s2_cfg *s2_cfg = &smmu_domain->s2_cfg;
- 
- 	iommu_put_dma_cookie(domain);
- 	free_io_pgtable_ops(smmu_domain->pgtbl_ops);
- 
- 	/* Free the CD and ASID, if we allocated them */
--	if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
--		struct arm_smmu_s1_cfg *cfg = &smmu_domain->s1_cfg;
--
-+	if (s1_cfg->set) {
- 		/* Prevent SVA from touching the CD while we're freeing it */
- 		mutex_lock(&arm_smmu_asid_lock);
--		if (cfg->cdcfg.cdtab)
-+		if (s1_cfg->cdcfg.cdtab)
- 			arm_smmu_free_cd_tables(smmu_domain);
--		arm_smmu_free_asid(&cfg->cd);
-+		arm_smmu_free_asid(&s1_cfg->cd);
- 		mutex_unlock(&arm_smmu_asid_lock);
--	} else {
--		struct arm_smmu_s2_cfg *cfg = &smmu_domain->s2_cfg;
--		if (cfg->vmid)
--			arm_smmu_bitmap_free(smmu->vmid_map, cfg->vmid);
-+	}
-+	if (s2_cfg->set) {
-+		if (s2_cfg->vmid)
-+			arm_smmu_bitmap_free(smmu->vmid_map, s2_cfg->vmid);
- 	}
- 
- 	kfree(smmu_domain);
-diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-index 59af0bbd2f7b..ec2b77596b6a 100644
---- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-+++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-@@ -598,12 +598,14 @@ struct arm_smmu_s1_cfg {
- 	struct arm_smmu_ctx_desc	cd;
- 	u8				s1fmt;
- 	u8				s1cdmax;
-+	bool				set;
- };
- 
- struct arm_smmu_s2_cfg {
- 	u16				vmid;
- 	u64				vttbr;
- 	u64				vtcr;
-+	bool				set;
- };
- 
- struct arm_smmu_strtab_cfg {
-@@ -718,10 +720,8 @@ struct arm_smmu_domain {
- 	atomic_t			nr_ats_masters;
- 
- 	enum arm_smmu_domain_stage	stage;
--	union {
--		struct arm_smmu_s1_cfg	s1_cfg;
--		struct arm_smmu_s2_cfg	s2_cfg;
--	};
-+	struct arm_smmu_s1_cfg	s1_cfg;
-+	struct arm_smmu_s2_cfg	s2_cfg;
- 
- 	struct iommu_domain		domain;
- 
+v11 -> v12:
+- rebase on top of v5.10-rc4
+
+Eric Auger (13):
+  iommu: Introduce attach/detach_pasid_table API
+  iommu: Introduce bind/unbind_guest_msi
+  iommu/smmuv3: Allow s1 and s2 configs to coexist
+  iommu/smmuv3: Get prepared for nested stage support
+  iommu/smmuv3: Implement attach/detach_pasid_table
+  iommu/smmuv3: Allow stage 1 invalidation with unmanaged ASIDs
+  iommu/smmuv3: Implement cache_invalidate
+  dma-iommu: Implement NESTED_MSI cookie
+  iommu/smmuv3: Nested mode single MSI doorbell per domain enforcement
+  iommu/smmuv3: Enforce incompatibility between nested mode and HW MSI
+    regions
+  iommu/smmuv3: Implement bind/unbind_guest_msi
+  iommu/smmuv3: report additional recoverable faults
+  iommu/smmuv3: Accept configs with more than one context descriptor
+
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 444 ++++++++++++++++++--
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h |  14 +-
+ drivers/iommu/dma-iommu.c                   | 142 ++++++-
+ drivers/iommu/iommu.c                       | 106 +++++
+ include/linux/dma-iommu.h                   |  16 +
+ include/linux/iommu.h                       |  47 +++
+ include/uapi/linux/iommu.h                  |  54 +++
+ 7 files changed, 781 insertions(+), 42 deletions(-)
+
 -- 
 2.26.2
 
