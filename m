@@ -2,82 +2,86 @@ Return-Path: <SRS0=rfx0=HZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98AC2C433E0
-	for <kvmarm@archiver.kernel.org>; Tue, 23 Feb 2021 15:58:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A4FBC433DB
+	for <kvmarm@archiver.kernel.org>; Tue, 23 Feb 2021 15:58:12 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E077164E60
-	for <kvmarm@archiver.kernel.org>; Tue, 23 Feb 2021 15:58:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E077164E60
+	by mail.kernel.org (Postfix) with ESMTP id 905FC64E60
+	for <kvmarm@archiver.kernel.org>; Tue, 23 Feb 2021 15:58:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 905FC64E60
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 50E464B0B5;
-	Tue, 23 Feb 2021 10:58:07 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 318414B1F9;
+	Tue, 23 Feb 2021 10:58:11 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id uM430JwXKT-g; Tue, 23 Feb 2021 10:58:06 -0500 (EST)
+	with ESMTP id 2f9-h9W3Tgm5; Tue, 23 Feb 2021 10:58:10 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A5CB4B1C0;
-	Tue, 23 Feb 2021 10:58:06 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C8FD4B1F7;
+	Tue, 23 Feb 2021 10:58:09 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 87F494B0C0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Feb 2021 10:58:05 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5625C4B1A7
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Feb 2021 10:58:08 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bY3moMGmT0vM for <kvmarm@lists.cs.columbia.edu>;
- Tue, 23 Feb 2021 10:58:04 -0500 (EST)
-Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com
- [209.85.219.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 49C4B4B0B5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Feb 2021 10:58:04 -0500 (EST)
-Received: by mail-qv1-f73.google.com with SMTP id u8so10323245qvm.5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Feb 2021 07:58:04 -0800 (PST)
+ with ESMTP id Mln8HGQyVIbu for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 23 Feb 2021 10:58:07 -0500 (EST)
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com
+ [209.85.221.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E64914B1A8
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Feb 2021 10:58:06 -0500 (EST)
+Received: by mail-wr1-f73.google.com with SMTP id l3so5885483wrx.15
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Feb 2021 07:58:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=sender:date:message-id:mime-version:subject:from:to:cc;
- bh=8+RAJRfk7OgTbqYxM+UQ8jVedyDuoEoPCHMyB2VOKvw=;
- b=snwCyNWSPwFiEEeXVMcwvUJc/IRLxmiXQcR7NjazF5zumyLDL41CwJuCP2fGuVho1C
- z5RYgOeRTAfC/A8s46Ycm002cgQir0u2TrRHv7a5W5s5GaHUNAl+Q4ozk53eCwJcm+bj
- 8qt9sgY/Jlt+1Xnvh/HLfAm021tDWKoeAa7kBxKFmXWHPqn+A0H8GJv3kqUwWVXA4yHh
- 5DpuhixsHvEA2k4L6Da4x3qFZm0yPkbdZ4I4MJoYXkJD8djPs6fCBa7k88HX/Q007WzO
- 8r6bkwmdzRd9sxsvGiHLRdTI4pnJ7U1qvIlPgmmCmTLDaohHrp/uhKmlMcwZPwn1/CO/
- Ksvw==
+ h=sender:date:in-reply-to:message-id:mime-version:references:subject
+ :from:to:cc; bh=CQEfesAGh6Yaxupcr8w3bDyhXlptt6J3Yf5vNzEZ7xI=;
+ b=ahJMz/9QD//FktmI3FiYI5kZv2HmCwtxm6T0qpp83ZVG11ijWrwdYwZhWhlWBJ+CEk
+ 1jnG0OcblYWp0DVJ2dRRxnnLq+pq/xlYOWPblGlAnVTe4mmpgGKdY6ht57WvK4H62vTB
+ CGC8mOl2P3AhVSh0z/+sXRUnjWeANK35861+rdXPjXd7vpwV2nV7e4gUfGh750HKKDJX
+ r78EbvODYloUoicbFLZE55MmD1KVG5MrrSLwvm8nefA6P2EJdhqCH+x+jCmeDqeLQ68e
+ oDb0F8nFaTaHd77uYGBKUBqhEv8gIzKcfslPSAY4HgpmgTHHKG5egD0k3uoCse1RY+Nw
+ ZaVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
- :to:cc;
- bh=8+RAJRfk7OgTbqYxM+UQ8jVedyDuoEoPCHMyB2VOKvw=;
- b=N417cyJWfEJuSuNIifwN5DfMLbpAxT/dlioY9u9YJJ9WCewgLNG2Bdmybw7rBAdpFr
- mXp1BOpXjdGXRSFETqzC6NEi75lgcuWEEdmAwc4pZYsC+fvRvxLZSdPpHf7UJ+Waedqt
- H73dGjm2CjhbnKTHH4tTc3VBm0W3CIMHPXxZxZORCISZS0DfCZfUT5zOMyRfnnB9D8iD
- JN+q4cUr2gJG8xvbYwW0+AmGIARqFbITdJPbep8aczvbScAaXWCLEgPkzdLBqltkba/p
- k8F3kfWNaoyD0SA0CzKj+w0DaW8SVoXm0rwC81x1VAYFCkI1cyZiR7qz81GfwyR1DQXs
- mYYw==
-X-Gm-Message-State: AOAM533bWSh9z0L/EJSe2yVnVCa8ac5sBqr2iV+bTwHLm700s9petY1u
- LGnfNVXjpcUVvLWGAlRBqORVQVDOMpXBfhvYbOc+poCEiFWFcjYKz1TW+cQHnML8AbLPxGAdmgq
- JctRKwY93HogtmT9ZqVZoj3T8v7EHGYBDy1GSKS7vw5CDJMC477TEQUA1JmvsT8HNRhLKzQ==
-X-Google-Smtp-Source: ABdhPJxbhW6PmZUZmluboVPrGia5p5n2v2pDxQTnwmvGVtN8k23UllNq5Fr1Q5n5YQhxcPwFJhKZvg6Qm0c=
+ h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
+ :references:subject:from:to:cc;
+ bh=CQEfesAGh6Yaxupcr8w3bDyhXlptt6J3Yf5vNzEZ7xI=;
+ b=fLnHaDNMBwdvLgn8z3lBS4SOaQhUHftoksYvGv19Wrq33NGS23iwC6dXiW9KU9PvAC
+ i2B9V81HEj7pPlyIELPz7EaLkUUUsfULTTFyRlz2c6/Nv6hgVhiLEjrRyIOpJiSEIUHa
+ hEkjdZBeVNuEFGycehTP3FVpnzZV3gWjwteVGPmH0gQALQsV638lOwrot2FBL+V16y8M
+ OdWzfD9LubI4kBhR6oawkNTm1sHz7mkAU5AgBeWmFXJ8D3MJVZZVZ3NW7m6z4G+rtvIW
+ RJNPeYJBASX7hHOX+a6D7QmYtVGAjVu6ztuuVXeBOfGbgv8Ki1rt5+n491s6KE7zLw6Q
+ 1VIA==
+X-Gm-Message-State: AOAM531VFodA05PD0x4/bH2OIFA7vtEmCPzhtCPDMe9mcqcJ4xTPHWU+
+ rTcx0lXhPOz6fK8CuHSS6/Tri4n00Iq792dvi3fah3hX2wGi6bt3mqqSHRCotjVkCUlEhPu3/+q
+ z8+iW2Ug2eD9D9fBs772Vpx5x/0mo2utxuF2v4KcWC6VCW8y4+aCI9cl8yXRUAbIkdYYGsA==
+X-Google-Smtp-Source: ABdhPJx243HHOgDuZVZvZaJGT0iEdqLHawYC1nTIPMVKhxwcycsNTCwKSh8mZBNkhlNs39I7Nz8grf21hKw=
 X-Received: from ascull.c.googlers.com ([fda3:e722:ac3:10:28:9cb1:c0a8:1510])
- (user=ascull job=sendgmr) by 2002:a0c:b495:: with SMTP id
- c21mr25640106qve.19.1614095882687; 
- Tue, 23 Feb 2021 07:58:02 -0800 (PST)
-Date: Tue, 23 Feb 2021 15:57:55 +0000
-Message-Id: <20210223155759.3495252-1-ascull@google.com>
+ (user=ascull job=sendgmr) by 2002:a1c:17:: with SMTP id
+ 23mr216919wma.6.1614095885613; 
+ Tue, 23 Feb 2021 07:58:05 -0800 (PST)
+Date: Tue, 23 Feb 2021 15:57:56 +0000
+In-Reply-To: <20210223155759.3495252-1-ascull@google.com>
+Message-Id: <20210223155759.3495252-2-ascull@google.com>
 Mime-Version: 1.0
+References: <20210223155759.3495252-1-ascull@google.com>
 X-Mailer: git-send-email 2.30.0.617.g56c4b15f3c-goog
-Subject: [PATCH v2 0/4] Debug info for nVHE hyp panics
+Subject: [PATCH v2 1/4] bug: Remove redundant condition check in report_bug
 From: Andrew Scull <ascull@google.com>
 To: kvmarm@lists.cs.columbia.edu
-Cc: kernel-team@android.com, maz@kernel.org, linux-kernel@vger.kernel.org,
- catalin.marinas@arm.com, will@kernel.org
+Cc: kernel-team@android.com, Peter Zijlstra <peterz@infradead.org>,
+ maz@kernel.org, linux-kernel@vger.kernel.org,
+ "Steven Rostedt \(VMware\)" <rostedt@goodmis.org>, catalin.marinas@arm.com,
+ will@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -94,44 +98,67 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Panics from arm64's nVHE hyp mode are hard to interpret. This series
-adds some more debug info to help with diagnosis.
+report_bug() will return early if it cannot find a bug corresponding to
+the provided address. The subsequent test for the bug will always be
+true so remove it.
 
-Using BUG() in nVHE hyp gives a meaningful address to locate invariants
-that fail to hold. The host can also look up the bug to provide the file
-and line, if the debug configs are enabled. Otherwise a kimg address is
-much more useful than a hyp VA since it can be looked up in vmlinux.
+Signed-off-by: Andrew Scull <ascull@google.com>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: "Steven Rostedt (VMware)" <rostedt@goodmis.org>
+---
+ lib/bug.c | 33 +++++++++++++++------------------
+ 1 file changed, 15 insertions(+), 18 deletions(-)
 
-The lib/bug.c changes apply on 5.11.
-
-This arm64 KVM changes apply on top of the previous panic fix at
-https://lore.kernel.org/r/20210219122406.1337626-1-ascull@google.com/
-
-From v1 (https://lore.kernel.org/r/20210223094927.766572-1-ascull@google.com/):
- - keeping struct bug details in bug.c
- - using SPSR to distinguish hyp from host
- - inlined __hyp_panic_string
-
-Andrew Scull (4):
-  bug: Remove redundant condition check in report_bug
-  bug: Factor out a getter for a bug's file line
-  KVM: arm64: Use BUG and BUG_ON in nVHE hyp
-  KVM: arm64: Log source when panicking from nVHE hyp
-
- arch/arm64/include/asm/kvm_hyp.h        |  1 -
- arch/arm64/include/asm/kvm_mmu.h        |  2 +
- arch/arm64/kernel/image-vars.h          |  3 +-
- arch/arm64/kvm/handle_exit.c            | 31 ++++++++++++++
- arch/arm64/kvm/hyp/include/hyp/switch.h |  2 -
- arch/arm64/kvm/hyp/nvhe/host.S          | 17 ++++----
- arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  2 +-
- arch/arm64/kvm/hyp/nvhe/hyp-smp.c       |  6 +--
- arch/arm64/kvm/hyp/nvhe/psci-relay.c    |  2 -
- arch/arm64/kvm/hyp/vhe/switch.c         |  4 +-
- include/linux/bug.h                     |  3 ++
- lib/bug.c                               | 54 +++++++++++++------------
- 12 files changed, 77 insertions(+), 50 deletions(-)
-
+diff --git a/lib/bug.c b/lib/bug.c
+index 7103440c0ee1..4ab398a2de93 100644
+--- a/lib/bug.c
++++ b/lib/bug.c
+@@ -158,30 +158,27 @@ enum bug_trap_type report_bug(unsigned long bugaddr, struct pt_regs *regs)
+ 
+ 	file = NULL;
+ 	line = 0;
+-	warning = 0;
+ 
+-	if (bug) {
+ #ifdef CONFIG_DEBUG_BUGVERBOSE
+ #ifndef CONFIG_GENERIC_BUG_RELATIVE_POINTERS
+-		file = bug->file;
++	file = bug->file;
+ #else
+-		file = (const char *)bug + bug->file_disp;
++	file = (const char *)bug + bug->file_disp;
+ #endif
+-		line = bug->line;
++	line = bug->line;
+ #endif
+-		warning = (bug->flags & BUGFLAG_WARNING) != 0;
+-		once = (bug->flags & BUGFLAG_ONCE) != 0;
+-		done = (bug->flags & BUGFLAG_DONE) != 0;
+-
+-		if (warning && once) {
+-			if (done)
+-				return BUG_TRAP_TYPE_WARN;
+-
+-			/*
+-			 * Since this is the only store, concurrency is not an issue.
+-			 */
+-			bug->flags |= BUGFLAG_DONE;
+-		}
++	warning = (bug->flags & BUGFLAG_WARNING) != 0;
++	once = (bug->flags & BUGFLAG_ONCE) != 0;
++	done = (bug->flags & BUGFLAG_DONE) != 0;
++
++	if (warning && once) {
++		if (done)
++			return BUG_TRAP_TYPE_WARN;
++
++		/*
++		 * Since this is the only store, concurrency is not an issue.
++		 */
++		bug->flags |= BUGFLAG_DONE;
+ 	}
+ 
+ 	/*
 -- 
 2.30.0.617.g56c4b15f3c-goog
 
