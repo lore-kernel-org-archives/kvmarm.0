@@ -4,73 +4,74 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA624C433DB
-	for <kvmarm@archiver.kernel.org>; Tue, 23 Feb 2021 21:08:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A44D4C433E0
+	for <kvmarm@archiver.kernel.org>; Tue, 23 Feb 2021 21:08:40 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7137164E89
-	for <kvmarm@archiver.kernel.org>; Tue, 23 Feb 2021 21:08:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7137164E89
+	by mail.kernel.org (Postfix) with ESMTP id 35F6164EAD
+	for <kvmarm@archiver.kernel.org>; Tue, 23 Feb 2021 21:08:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35F6164EAD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 20D484B24C;
-	Tue, 23 Feb 2021 16:08:35 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CAEFE4B216;
+	Tue, 23 Feb 2021 16:08:39 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id qwBp8mgdfFyH; Tue, 23 Feb 2021 16:08:33 -0500 (EST)
+	with ESMTP id xH2VKVR8-kr7; Tue, 23 Feb 2021 16:08:38 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E6014B239;
-	Tue, 23 Feb 2021 16:08:33 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B63BF4B24C;
+	Tue, 23 Feb 2021 16:08:38 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E87984B254
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Feb 2021 16:08:30 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1118A4B216
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Feb 2021 16:08:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id v7sHdQJpznE5 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 23 Feb 2021 16:08:29 -0500 (EST)
+ with ESMTP id d8BiwpXh+2Gn for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 23 Feb 2021 16:08:36 -0500 (EST)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [63.128.21.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 97A8F4B24C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Feb 2021 16:08:29 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3AF564B240
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Feb 2021 16:08:36 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1614114509;
+ s=mimecast20190719; t=1614114516;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=KqFeqgTbob/s/PUsdHWvzrNlEYoPz5xOjIwBMf8S8ls=;
- b=E5wishwQGa7jrvojsetw0lNlQQVZcBp3r4NP83rX8XyVuNOQaVBw4RzyrfTdGgPcfPHXxM
- D+A6no69QUMFyTu0lZHQbtKhRCeL69zJ0DB6vT5ykl5XoYeLi0Vykz0TKEgki4BiEZ+HLO
- etTSjnSMbjdZ825IvscVKDP5tPsQEfo=
+ bh=wBstdMXs79EJykLHS2kM7Pc567oyQTx13taKoYZoVkE=;
+ b=YfFwgw/FVzJpj8TfsaW8zVGTifSrrJWGg9ClQrRT58quXiT7k00YsOtddt1PWDeMeE8CLz
+ uw6KYXMVo2Ap4rYlPAzmXUhr1ubZUmjQBCcp2IuvmoG4wQelU2fpqnNa9iXtAuoudJy2ky
+ ntCexLcWQ9v2DHmZ/H1tI82LlsrW34A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-374-rYkZ8BHcPUucOfjLfZKd3g-1; Tue, 23 Feb 2021 16:08:15 -0500
-X-MC-Unique: rYkZ8BHcPUucOfjLfZKd3g-1
+ us-mta-276-TVbmlccvOb6B0ll0BxUn1w-1; Tue, 23 Feb 2021 16:07:29 -0500
+X-MC-Unique: TVbmlccvOb6B0ll0BxUn1w-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5208619611A9;
- Tue, 23 Feb 2021 21:08:12 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4886B803F59;
+ Tue, 23 Feb 2021 21:07:26 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-114-34.ams2.redhat.com [10.36.114.34])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1F06D5D9D0;
- Tue, 23 Feb 2021 21:08:01 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E0FCF5D9D0;
+ Tue, 23 Feb 2021 21:07:16 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com,
  iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
  kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, will@kernel.org,
  maz@kernel.org, robin.murphy@arm.com, joro@8bytes.org,
  alex.williamson@redhat.com, tn@semihalf.com, zhukeqian1@huawei.com
-Subject: [PATCH v12 12/13] vfio/pci: Register a DMA fault response region
-Date: Tue, 23 Feb 2021 22:06:24 +0100
-Message-Id: <20210223210625.604517-13-eric.auger@redhat.com>
+Subject: [PATCH v12 07/13] vfio: Use capability chains to handle device
+ specific irq
+Date: Tue, 23 Feb 2021 22:06:19 +0100
+Message-Id: <20210223210625.604517-8-eric.auger@redhat.com>
 In-Reply-To: <20210223210625.604517-1-eric.auger@redhat.com>
 References: <20210223210625.604517-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -95,354 +96,64 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In preparation for vSVA, let's register a DMA fault response region,
-where the userspace will push the page responses and increment the
-head of the buffer. The kernel will pop those responses and inject them
-on iommu side.
+From: Tina Zhang <tina.zhang@intel.com>
 
+Caps the number of irqs with fixed indexes and uses capability chains
+to chain device specific irqs.
+
+Signed-off-by: Tina Zhang <tina.zhang@intel.com>
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
+[Eric: Put cap_offset at the end of the vfio_irq_info struct,
+remove GFX IRQ at the moment and remove any reference to this latter
+in the commit message]
 
 ---
-
-v11 -> v12:
-- use DMA_FAULT_RESPONSE cap [Shameer]
-- struct vfio_pci_device dma_fault_response_wq field introduced in
-  this patch
-- return 0 if the domain is NULL
-- pass an int pointer to iommu_domain_get_attr
 ---
- drivers/vfio/pci/vfio_pci.c         | 125 ++++++++++++++++++++++++++--
- drivers/vfio/pci/vfio_pci_private.h |   6 ++
- drivers/vfio/pci/vfio_pci_rdwr.c    |  39 +++++++++
- include/uapi/linux/vfio.h           |  32 +++++++
- 4 files changed, 193 insertions(+), 9 deletions(-)
+ include/uapi/linux/vfio.h | 19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index f3fa6d4318ae..9f1f5008e556 100644
---- a/drivers/vfio/pci/vfio_pci.c
-+++ b/drivers/vfio/pci/vfio_pci.c
-@@ -316,9 +316,20 @@ static void vfio_pci_dma_fault_release(struct vfio_pci_device *vdev,
- 	kfree(vdev->fault_pages);
- }
- 
--static int vfio_pci_dma_fault_mmap(struct vfio_pci_device *vdev,
--				   struct vfio_pci_region *region,
--				   struct vm_area_struct *vma)
-+static void
-+vfio_pci_dma_fault_response_release(struct vfio_pci_device *vdev,
-+				    struct vfio_pci_region *region)
-+{
-+	if (vdev->dma_fault_response_wq)
-+		destroy_workqueue(vdev->dma_fault_response_wq);
-+	kfree(vdev->fault_response_pages);
-+	vdev->fault_response_pages = NULL;
-+}
-+
-+static int __vfio_pci_dma_fault_mmap(struct vfio_pci_device *vdev,
-+				     struct vfio_pci_region *region,
-+				     struct vm_area_struct *vma,
-+				     u8 *pages)
- {
- 	u64 phys_len, req_len, pgoff, req_start;
- 	unsigned long long addr;
-@@ -331,14 +342,14 @@ static int vfio_pci_dma_fault_mmap(struct vfio_pci_device *vdev,
- 		((1U << (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
- 	req_start = pgoff << PAGE_SHIFT;
- 
--	/* only the second page of the producer fault region is mmappable */
-+	/* only the second page of the fault region is mmappable */
- 	if (req_start < PAGE_SIZE)
- 		return -EINVAL;
- 
- 	if (req_start + req_len > phys_len)
- 		return -EINVAL;
- 
--	addr = virt_to_phys(vdev->fault_pages);
-+	addr = virt_to_phys(pages);
- 	vma->vm_private_data = vdev;
- 	vma->vm_pgoff = (addr >> PAGE_SHIFT) + pgoff;
- 
-@@ -347,13 +358,29 @@ static int vfio_pci_dma_fault_mmap(struct vfio_pci_device *vdev,
- 	return ret;
- }
- 
--static int vfio_pci_dma_fault_add_capability(struct vfio_pci_device *vdev,
--					     struct vfio_pci_region *region,
--					     struct vfio_info_cap *caps)
-+static int vfio_pci_dma_fault_mmap(struct vfio_pci_device *vdev,
-+				   struct vfio_pci_region *region,
-+				   struct vm_area_struct *vma)
-+{
-+	return __vfio_pci_dma_fault_mmap(vdev, region, vma, vdev->fault_pages);
-+}
-+
-+static int
-+vfio_pci_dma_fault_response_mmap(struct vfio_pci_device *vdev,
-+				struct vfio_pci_region *region,
-+				struct vm_area_struct *vma)
-+{
-+	return __vfio_pci_dma_fault_mmap(vdev, region, vma, vdev->fault_response_pages);
-+}
-+
-+static int __vfio_pci_dma_fault_add_capability(struct vfio_pci_device *vdev,
-+					       struct vfio_pci_region *region,
-+					       struct vfio_info_cap *caps,
-+					       u32 cap_id)
- {
- 	struct vfio_region_info_cap_sparse_mmap *sparse = NULL;
- 	struct vfio_region_info_cap_fault cap = {
--		.header.id = VFIO_REGION_INFO_CAP_DMA_FAULT,
-+		.header.id = cap_id,
- 		.header.version = 1,
- 		.version = 1,
- 	};
-@@ -381,6 +408,23 @@ static int vfio_pci_dma_fault_add_capability(struct vfio_pci_device *vdev,
- 	return ret;
- }
- 
-+static int vfio_pci_dma_fault_add_capability(struct vfio_pci_device *vdev,
-+					     struct vfio_pci_region *region,
-+					     struct vfio_info_cap *caps)
-+{
-+	return __vfio_pci_dma_fault_add_capability(vdev, region, caps,
-+						   VFIO_REGION_INFO_CAP_DMA_FAULT);
-+}
-+
-+static int
-+vfio_pci_dma_fault_response_add_capability(struct vfio_pci_device *vdev,
-+					   struct vfio_pci_region *region,
-+					   struct vfio_info_cap *caps)
-+{
-+	return __vfio_pci_dma_fault_add_capability(vdev, region, caps,
-+						   VFIO_REGION_INFO_CAP_DMA_FAULT_RESPONSE);
-+}
-+
- static const struct vfio_pci_regops vfio_pci_dma_fault_regops = {
- 	.rw		= vfio_pci_dma_fault_rw,
- 	.release	= vfio_pci_dma_fault_release,
-@@ -388,6 +432,13 @@ static const struct vfio_pci_regops vfio_pci_dma_fault_regops = {
- 	.add_capability = vfio_pci_dma_fault_add_capability,
- };
- 
-+static const struct vfio_pci_regops vfio_pci_dma_fault_response_regops = {
-+	.rw		= vfio_pci_dma_fault_response_rw,
-+	.release	= vfio_pci_dma_fault_response_release,
-+	.mmap		= vfio_pci_dma_fault_response_mmap,
-+	.add_capability = vfio_pci_dma_fault_response_add_capability,
-+};
-+
- static int
- vfio_pci_iommu_dev_fault_handler(struct iommu_fault *fault, void *data)
- {
-@@ -501,6 +552,57 @@ static int vfio_pci_dma_fault_init(struct vfio_pci_device *vdev)
- 	return ret;
- }
- 
-+#define DMA_FAULT_RESPONSE_RING_LENGTH 512
-+
-+static int vfio_pci_dma_fault_response_init(struct vfio_pci_device *vdev)
-+{
-+	struct vfio_region_dma_fault_response *header;
-+	struct iommu_domain *domain;
-+	int nested, ret;
-+	size_t size;
-+
-+	domain = iommu_get_domain_for_dev(&vdev->pdev->dev);
-+	if (!domain)
-+		return 0;
-+
-+	ret = iommu_domain_get_attr(domain, DOMAIN_ATTR_NESTING, &nested);
-+	if (ret || !nested)
-+		return ret;
-+
-+	mutex_init(&vdev->fault_response_queue_lock);
-+
-+	/*
-+	 * We provision 1 page for the header and space for
-+	 * DMA_FAULT_RING_LENGTH fault records in the ring buffer.
-+	 */
-+	size = ALIGN(sizeof(struct iommu_page_response) *
-+		     DMA_FAULT_RESPONSE_RING_LENGTH, PAGE_SIZE) + PAGE_SIZE;
-+
-+	vdev->fault_response_pages = kzalloc(size, GFP_KERNEL);
-+	if (!vdev->fault_response_pages)
-+		return -ENOMEM;
-+
-+	ret = vfio_pci_register_dev_region(vdev,
-+		VFIO_REGION_TYPE_NESTED,
-+		VFIO_REGION_SUBTYPE_NESTED_DMA_FAULT_RESPONSE,
-+		&vfio_pci_dma_fault_response_regops, size,
-+		VFIO_REGION_INFO_FLAG_READ | VFIO_REGION_INFO_FLAG_WRITE |
-+		VFIO_REGION_INFO_FLAG_MMAP,
-+		vdev->fault_response_pages);
-+	if (ret)
-+		goto out;
-+
-+	header = (struct vfio_region_dma_fault_response *)vdev->fault_response_pages;
-+	header->entry_size = sizeof(struct iommu_page_response);
-+	header->nb_entries = DMA_FAULT_RESPONSE_RING_LENGTH;
-+	header->offset = PAGE_SIZE;
-+
-+	return 0;
-+out:
-+	vdev->fault_response_pages = NULL;
-+	return ret;
-+}
-+
- static int vfio_pci_enable(struct vfio_pci_device *vdev)
- {
- 	struct pci_dev *pdev = vdev->pdev;
-@@ -603,6 +705,10 @@ static int vfio_pci_enable(struct vfio_pci_device *vdev)
- 	if (ret)
- 		goto disable_exit;
- 
-+	ret = vfio_pci_dma_fault_response_init(vdev);
-+	if (ret)
-+		goto disable_exit;
-+
- 	vfio_pci_probe_mmaps(vdev);
- 
- 	return 0;
-@@ -2230,6 +2336,7 @@ static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	INIT_LIST_HEAD(&vdev->ioeventfds_list);
- 	mutex_init(&vdev->vma_lock);
- 	INIT_LIST_HEAD(&vdev->vma_list);
-+	INIT_LIST_HEAD(&vdev->dummy_resources_list);
- 	init_rwsem(&vdev->memory_lock);
- 
- 	ret = vfio_add_group_dev(&pdev->dev, &vfio_pci_ops, vdev);
-diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
-index e180b5435c8f..82a883c101c9 100644
---- a/drivers/vfio/pci/vfio_pci_private.h
-+++ b/drivers/vfio/pci/vfio_pci_private.h
-@@ -144,7 +144,10 @@ struct vfio_pci_device {
- 	struct eventfd_ctx	*err_trigger;
- 	struct eventfd_ctx	*req_trigger;
- 	u8			*fault_pages;
-+	u8			*fault_response_pages;
-+	struct workqueue_struct *dma_fault_response_wq;
- 	struct mutex		fault_queue_lock;
-+	struct mutex		fault_response_queue_lock;
- 	struct list_head	dummy_resources_list;
- 	struct mutex		ioeventfds_lock;
- 	struct list_head	ioeventfds_list;
-@@ -189,6 +192,9 @@ extern long vfio_pci_ioeventfd(struct vfio_pci_device *vdev, loff_t offset,
- extern size_t vfio_pci_dma_fault_rw(struct vfio_pci_device *vdev,
- 				    char __user *buf, size_t count,
- 				    loff_t *ppos, bool iswrite);
-+extern size_t vfio_pci_dma_fault_response_rw(struct vfio_pci_device *vdev,
-+					     char __user *buf, size_t count,
-+					     loff_t *ppos, bool iswrite);
- 
- extern int vfio_pci_init_perm_bits(void);
- extern void vfio_pci_uninit_perm_bits(void);
-diff --git a/drivers/vfio/pci/vfio_pci_rdwr.c b/drivers/vfio/pci/vfio_pci_rdwr.c
-index 164120607469..efde0793360b 100644
---- a/drivers/vfio/pci/vfio_pci_rdwr.c
-+++ b/drivers/vfio/pci/vfio_pci_rdwr.c
-@@ -400,6 +400,45 @@ size_t vfio_pci_dma_fault_rw(struct vfio_pci_device *vdev, char __user *buf,
- 	return ret;
- }
- 
-+size_t vfio_pci_dma_fault_response_rw(struct vfio_pci_device *vdev, char __user *buf,
-+				      size_t count, loff_t *ppos, bool iswrite)
-+{
-+	unsigned int i = VFIO_PCI_OFFSET_TO_INDEX(*ppos) - VFIO_PCI_NUM_REGIONS;
-+	loff_t pos = *ppos & VFIO_PCI_OFFSET_MASK;
-+	void *base = vdev->region[i].data;
-+	int ret = -EFAULT;
-+
-+	if (pos >= vdev->region[i].size)
-+		return -EINVAL;
-+
-+	count = min(count, (size_t)(vdev->region[i].size - pos));
-+
-+	if (iswrite) {
-+		struct vfio_region_dma_fault_response *header =
-+			(struct vfio_region_dma_fault_response *)base;
-+		uint32_t  new_head;
-+
-+		if (pos != 0 || count != 4)
-+			return -EINVAL;
-+
-+		if (copy_from_user((void *)&new_head, buf, count))
-+			return -EFAULT;
-+
-+		if (new_head >= header->nb_entries)
-+			return -EINVAL;
-+
-+		mutex_lock(&vdev->fault_response_queue_lock);
-+		header->head = new_head;
-+		mutex_unlock(&vdev->fault_response_queue_lock);
-+	} else {
-+		if (copy_to_user(buf, base + pos, count))
-+			return -EFAULT;
-+	}
-+	*ppos += count;
-+	ret = count;
-+	return ret;
-+}
-+
- static void vfio_pci_ioeventfd_do_write(struct vfio_pci_ioeventfd *ioeventfd,
- 					bool test_mem)
- {
 diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-index f0eea0f9305a..30dfaa473495 100644
+index bc46e5d6daa4..3688215843fe 100644
 --- a/include/uapi/linux/vfio.h
 +++ b/include/uapi/linux/vfio.h
-@@ -346,6 +346,7 @@ struct vfio_region_info_cap_type {
- 
- /* sub-types for VFIO_REGION_TYPE_NESTED */
- #define VFIO_REGION_SUBTYPE_NESTED_DMA_FAULT	(1)
-+#define VFIO_REGION_SUBTYPE_NESTED_DMA_FAULT_RESPONSE	(2)
- 
- /**
-  * struct vfio_region_gfx_edid - EDID region layout.
-@@ -1024,6 +1025,17 @@ struct vfio_region_info_cap_fault {
- 	__u32 version;
+@@ -702,11 +702,27 @@ struct vfio_irq_info {
+ #define VFIO_IRQ_INFO_MASKABLE		(1 << 1)
+ #define VFIO_IRQ_INFO_AUTOMASKED	(1 << 2)
+ #define VFIO_IRQ_INFO_NORESIZE		(1 << 3)
++#define VFIO_IRQ_INFO_FLAG_CAPS		(1 << 4) /* Info supports caps */
+ 	__u32	index;		/* IRQ index */
+ 	__u32	count;		/* Number of IRQs within this index */
++	__u32	cap_offset;	/* Offset within info struct of first cap */
  };
+ #define VFIO_DEVICE_GET_IRQ_INFO	_IO(VFIO_TYPE, VFIO_BASE + 9)
  
 +/*
-+ * Capability exposed by the DMA fault response region
-+ * @version: ABI version
++ * The irq type capability allows IRQs unique to a specific device or
++ * class of devices to be exposed.
++ *
++ * The structures below define version 1 of this capability.
 + */
-+#define VFIO_REGION_INFO_CAP_DMA_FAULT_RESPONSE	7
++#define VFIO_IRQ_INFO_CAP_TYPE      3
 +
-+struct vfio_region_info_cap_fault_response {
++struct vfio_irq_info_cap_type {
 +	struct vfio_info_cap_header header;
-+	__u32 version;
++	__u32 type;     /* global per bus driver */
++	__u32 subtype;  /* type specific */
 +};
 +
- /*
-  * DMA Fault Region Layout
-  * @tail: index relative to the start of the ring buffer at which the
-@@ -1044,6 +1056,26 @@ struct vfio_region_dma_fault {
- 	__u32   head;
+ /**
+  * VFIO_DEVICE_SET_IRQS - _IOW(VFIO_TYPE, VFIO_BASE + 10, struct vfio_irq_set)
+  *
+@@ -808,7 +824,8 @@ enum {
+ 	VFIO_PCI_MSIX_IRQ_INDEX,
+ 	VFIO_PCI_ERR_IRQ_INDEX,
+ 	VFIO_PCI_REQ_IRQ_INDEX,
+-	VFIO_PCI_NUM_IRQS
++	VFIO_PCI_NUM_IRQS = 5	/* Fixed user ABI, IRQ indexes >=5 use   */
++				/* device specific cap to define content */
  };
  
-+/*
-+ * DMA Fault Response Region Layout
-+ * @head: index relative to the start of the ring buffer at which the
-+ *        producer (userspace) insert responses into the buffer
-+ * @entry_size: fault ring buffer entry size in bytes
-+ * @nb_entries: max capacity of the fault ring buffer
-+ * @offset: ring buffer offset relative to the start of the region
-+ * @tail: index relative to the start of the ring buffer at which the
-+ *        consumer (kernel) finds the next item in the buffer
-+ */
-+struct vfio_region_dma_fault_response {
-+	/* Write-Only */
-+	__u32   head;
-+	/* Read-Only */
-+	__u32   entry_size;
-+	__u32	nb_entries;
-+	__u32	offset;
-+	__u32   tail;
-+};
-+
- /* -------- API for Type1 VFIO IOMMU -------- */
- 
- /**
+ /*
 -- 
 2.26.2
 
