@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B489C433DB
-	for <kvmarm@archiver.kernel.org>; Wed, 24 Feb 2021 01:20:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6A29C433DB
+	for <kvmarm@archiver.kernel.org>; Wed, 24 Feb 2021 02:23:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6004064E4D
-	for <kvmarm@archiver.kernel.org>; Wed, 24 Feb 2021 01:20:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6004064E4D
+	by mail.kernel.org (Postfix) with ESMTP id B1DE664E09
+	for <kvmarm@archiver.kernel.org>; Wed, 24 Feb 2021 02:23:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1DE664E09
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B193F4B262;
-	Tue, 23 Feb 2021 20:20:50 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 283144B25C;
+	Tue, 23 Feb 2021 21:23:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id g7gd-BPJZhwA; Tue, 23 Feb 2021 20:20:49 -0500 (EST)
+	with ESMTP id Gpl7BDgc2Rnr; Tue, 23 Feb 2021 21:23:49 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 22E844B25A;
-	Tue, 23 Feb 2021 20:20:49 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C0E234B23E;
+	Tue, 23 Feb 2021 21:23:49 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 666844B24C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Feb 2021 20:20:47 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C4E1A4B239
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Feb 2021 21:23:48 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id neJPKLpXVSpk for <kvmarm@lists.cs.columbia.edu>;
- Tue, 23 Feb 2021 20:20:44 -0500 (EST)
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8E60F4B0C7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Feb 2021 20:20:44 -0500 (EST)
-IronPort-SDR: zrvPtyhfOO0d0Mfjs3L2I5p3ObdZi+qGJAxiVKIKUppx7633Vm0dkv3rCl4P/dmAxZ7HOZR4dc
- JoB6XPanIPGg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9904"; a="185120406"
+ with ESMTP id F-tqFsSdLt+6 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 23 Feb 2021 21:23:46 -0500 (EST)
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 152D04B1FF
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Feb 2021 21:23:45 -0500 (EST)
+IronPort-SDR: Dd1R1pQYOqyqhfoZTKrFRNiR4G0DH/ebt8IYJa1W1T60iM7oZHxj2+N54qUwMXswW8FumxasA9
+ 5ruGwBqtW1zQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9904"; a="249079677"
 X-IronPort-AV: E=Sophos;i="5.81,201,1610438400"; 
- d="gz'50?scan'50,208,50";a="185120406"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
- by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 23 Feb 2021 17:20:36 -0800
-IronPort-SDR: /4clpMseEwM3P8sOez0kyU3bFQto5FHvAU9pcYFGPdb1sd6rElozfYMxiP+zoOt0w41RcExt1B
- XPCGTVNdZ3aA==
+ d="gz'50?scan'50,208,50";a="249079677"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+ by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 23 Feb 2021 18:23:41 -0800
+IronPort-SDR: r4M5r2I+lRKkP5kPKc79RgOx5z1D5gYvGWf3//+6Zar0ukzB8+DwA3aZg4pyr8G7u6+r8mtxNY
+ 8qOzPnsJ0wJw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.81,201,1610438400"; 
- d="gz'50?scan'50,208,50";a="499376512"
+ d="gz'50?scan'50,208,50";a="597074042"
 Received: from lkp-server01.sh.intel.com (HELO 16660e54978b) ([10.239.97.150])
- by fmsmga001.fm.intel.com with ESMTP; 23 Feb 2021 17:20:32 -0800
+ by fmsmga005.fm.intel.com with ESMTP; 23 Feb 2021 18:23:36 -0800
 Received: from kbuild by 16660e54978b with local (Exim 4.92)
  (envelope-from <lkp@intel.com>)
- id 1lEiqu-0001gA-6U; Wed, 24 Feb 2021 01:20:32 +0000
-Date: Wed, 24 Feb 2021 09:19:33 +0800
+ id 1lEjpw-0001hr-9s; Wed, 24 Feb 2021 02:23:36 +0000
+Date: Wed, 24 Feb 2021 10:22:45 +0800
 From: kernel test robot <lkp@intel.com>
 To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
  iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
  kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, will@kernel.org,
  maz@kernel.org, robin.murphy@arm.com, joro@8bytes.org
-Subject: Re: [PATCH v12 01/13] vfio: VFIO_IOMMU_SET_PASID_TABLE
-Message-ID: <202102240932.fQcLJjjp-lkp@intel.com>
-References: <20210223210625.604517-2-eric.auger@redhat.com>
+Subject: Re: [PATCH v12 03/13] vfio: VFIO_IOMMU_SET_MSI_BINDING
+Message-ID: <202102241009.ObGvRI0a-lkp@intel.com>
+References: <20210223210625.604517-4-eric.auger@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="OXfL5xGRrasGEqWY"
+Content-Type: multipart/mixed; boundary="gKMricLos+KVdGMg"
 Content-Disposition: inline
-In-Reply-To: <20210223210625.604517-2-eric.auger@redhat.com>
+In-Reply-To: <20210223210625.604517-4-eric.auger@redhat.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Cc: clang-built-linux@googlegroups.com, kbuild-all@lists.01.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -84,17 +84,16 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 
---OXfL5xGRrasGEqWY
+--gKMricLos+KVdGMg
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
 Hi Eric,
 
-Thank you for the patch! Yet something to improve:
+I love your patch! Yet something to improve:
 
 [auto build test ERROR on v5.11]
-[also build test ERROR on next-20210223]
-[cannot apply to vfio/next]
+[cannot apply to vfio/next next-20210223]
 [If your patch is applied to the wrong git tree, kindly drop us a note.
 And when submitting patch, we suggest to use '--base' as documented in
 https://git-scm.com/docs/git-format-patch]
@@ -108,10 +107,10 @@ reproduce (this is a W=1 build):
         chmod +x ~/bin/make.cross
         # install arm64 cross compiling tool for clang build
         # apt-get install binutils-aarch64-linux-gnu
-        # https://github.com/0day-ci/linux/commit/3bb0b5b270edf8c80af65a89749296990f9b9213
+        # https://github.com/0day-ci/linux/commit/ec823a68d862693dc787422f168409996f43b10a
         git remote add linux-review https://github.com/0day-ci/linux
         git fetch --no-tags linux-review Eric-Auger/SMMUv3-Nested-Stage-Setup-VFIO-part/20210224-051641
-        git checkout 3bb0b5b270edf8c80af65a89749296990f9b9213
+        git checkout ec823a68d862693dc787422f168409996f43b10a
         # save the attached .config to linux build tree
         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross ARCH=arm64 
 
@@ -120,70 +119,117 @@ Reported-by: kernel test robot <lkp@intel.com>
 
 All errors (new ones prefixed by >>):
 
-   In file included from drivers/vfio/vfio.c:32:
-   In file included from include/linux/vfio.h:16:
->> include/uapi/linux/vfio.h:1198:34: error: field has incomplete type 'struct iommu_pasid_table_config'
-           struct iommu_pasid_table_config config; /* used on SET */
-                                           ^
-   include/uapi/linux/vfio.h:1198:9: note: forward declaration of 'struct iommu_pasid_table_config'
-           struct iommu_pasid_table_config config; /* used on SET */
-                  ^
-   1 error generated.
---
    In file included from drivers/vfio/vfio_iommu_type1.c:36:
    In file included from include/linux/vfio.h:16:
->> include/uapi/linux/vfio.h:1198:34: error: field has incomplete type 'struct iommu_pasid_table_config'
+   include/uapi/linux/vfio.h:1198:34: error: field has incomplete type 'struct iommu_pasid_table_config'
            struct iommu_pasid_table_config config; /* used on SET */
                                            ^
    include/uapi/linux/vfio.h:1198:9: note: forward declaration of 'struct iommu_pasid_table_config'
            struct iommu_pasid_table_config config; /* used on SET */
                   ^
->> drivers/vfio/vfio_iommu_type1.c:2597:3: error: implicit declaration of function 'iommu_detach_pasid_table' [-Werror,-Wimplicit-function-declaration]
+   drivers/vfio/vfio_iommu_type1.c:2625:3: error: implicit declaration of function 'iommu_detach_pasid_table' [-Werror,-Wimplicit-function-declaration]
                    iommu_detach_pasid_table(d->domain);
                    ^
-   drivers/vfio/vfio_iommu_type1.c:2597:3: note: did you mean 'vfio_detach_pasid_table'?
-   drivers/vfio/vfio_iommu_type1.c:2591:1: note: 'vfio_detach_pasid_table' declared here
+   drivers/vfio/vfio_iommu_type1.c:2625:3: note: did you mean 'vfio_detach_pasid_table'?
+   drivers/vfio/vfio_iommu_type1.c:2619:1: note: 'vfio_detach_pasid_table' declared here
    vfio_detach_pasid_table(struct vfio_iommu *iommu)
    ^
->> drivers/vfio/vfio_iommu_type1.c:2611:9: error: implicit declaration of function 'iommu_uapi_attach_pasid_table' [-Werror,-Wimplicit-function-declaration]
+   drivers/vfio/vfio_iommu_type1.c:2639:9: error: implicit declaration of function 'iommu_uapi_attach_pasid_table' [-Werror,-Wimplicit-function-declaration]
                    ret = iommu_uapi_attach_pasid_table(d->domain, (void __user *)arg);
                          ^
-   drivers/vfio/vfio_iommu_type1.c:2614:5: error: implicit declaration of function 'iommu_detach_pasid_table' [-Werror,-Wimplicit-function-declaration]
+   drivers/vfio/vfio_iommu_type1.c:2642:5: error: implicit declaration of function 'iommu_detach_pasid_table' [-Werror,-Wimplicit-function-declaration]
                                    iommu_detach_pasid_table(d->domain);
                                    ^
-   4 errors generated.
+>> drivers/vfio/vfio_iommu_type1.c:2668:9: error: implicit declaration of function 'iommu_bind_guest_msi' [-Werror,-Wimplicit-function-declaration]
+                   ret = iommu_bind_guest_msi(d->domain, giova, gpa, size);
+                         ^
+>> drivers/vfio/vfio_iommu_type1.c:2675:3: error: implicit declaration of function 'iommu_unbind_guest_msi' [-Werror,-Wimplicit-function-declaration]
+                   iommu_unbind_guest_msi(d->domain, giova);
+                   ^
+   drivers/vfio/vfio_iommu_type1.c:2689:3: error: implicit declaration of function 'iommu_unbind_guest_msi' [-Werror,-Wimplicit-function-declaration]
+                   iommu_unbind_guest_msi(d->domain, giova);
+                   ^
+   7 errors generated.
 
 
-vim +1198 include/uapi/linux/vfio.h
+vim +/iommu_bind_guest_msi +2668 drivers/vfio/vfio_iommu_type1.c
 
-  1184	
-  1185	/*
-  1186	 * VFIO_IOMMU_SET_PASID_TABLE - _IOWR(VFIO_TYPE, VFIO_BASE + 18,
-  1187	 *			struct vfio_iommu_type1_set_pasid_table)
-  1188	 *
-  1189	 * The SET operation passes a PASID table to the host while the
-  1190	 * UNSET operation detaches the one currently programmed. Setting
-  1191	 * a table while another is already programmed replaces the old table.
-  1192	 */
-  1193	struct vfio_iommu_type1_set_pasid_table {
-  1194		__u32	argsz;
-  1195		__u32	flags;
-  1196	#define VFIO_PASID_TABLE_FLAG_SET	(1 << 0)
-  1197	#define VFIO_PASID_TABLE_FLAG_UNSET	(1 << 1)
-> 1198		struct iommu_pasid_table_config config; /* used on SET */
-  1199	};
-  1200	
+  2617	
+  2618	static void
+> 2619	vfio_detach_pasid_table(struct vfio_iommu *iommu)
+  2620	{
+  2621		struct vfio_domain *d;
+  2622	
+  2623		mutex_lock(&iommu->lock);
+  2624		list_for_each_entry(d, &iommu->domain_list, next)
+  2625			iommu_detach_pasid_table(d->domain);
+  2626	
+  2627		mutex_unlock(&iommu->lock);
+  2628	}
+  2629	
+  2630	static int
+  2631	vfio_attach_pasid_table(struct vfio_iommu *iommu, unsigned long arg)
+  2632	{
+  2633		struct vfio_domain *d;
+  2634		int ret = 0;
+  2635	
+  2636		mutex_lock(&iommu->lock);
+  2637	
+  2638		list_for_each_entry(d, &iommu->domain_list, next) {
+> 2639			ret = iommu_uapi_attach_pasid_table(d->domain, (void __user *)arg);
+  2640			if (ret) {
+  2641				list_for_each_entry_continue_reverse(d, &iommu->domain_list, next)
+  2642					iommu_detach_pasid_table(d->domain);
+  2643				break;
+  2644			}
+  2645		}
+  2646	
+  2647		mutex_unlock(&iommu->lock);
+  2648		return ret;
+  2649	}
+  2650	static int vfio_cache_inv_fn(struct device *dev, void *data)
+  2651	{
+  2652		struct domain_capsule *dc = (struct domain_capsule *)data;
+  2653		unsigned long arg = *(unsigned long *)dc->data;
+  2654	
+  2655		return iommu_uapi_cache_invalidate(dc->domain, dev, (void __user *)arg);
+  2656	}
+  2657	
+  2658	static int
+  2659	vfio_bind_msi(struct vfio_iommu *iommu,
+  2660		      dma_addr_t giova, phys_addr_t gpa, size_t size)
+  2661	{
+  2662		struct vfio_domain *d;
+  2663		int ret = 0;
+  2664	
+  2665		mutex_lock(&iommu->lock);
+  2666	
+  2667		list_for_each_entry(d, &iommu->domain_list, next) {
+> 2668			ret = iommu_bind_guest_msi(d->domain, giova, gpa, size);
+  2669			if (ret)
+  2670				goto unwind;
+  2671		}
+  2672		goto unlock;
+  2673	unwind:
+  2674		list_for_each_entry_continue_reverse(d, &iommu->domain_list, next) {
+> 2675			iommu_unbind_guest_msi(d->domain, giova);
+  2676		}
+  2677	unlock:
+  2678		mutex_unlock(&iommu->lock);
+  2679		return ret;
+  2680	}
+  2681	
 
 ---
 0-DAY CI Kernel Test Service, Intel Corporation
 https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
 
---OXfL5xGRrasGEqWY
+--gKMricLos+KVdGMg
 Content-Type: application/gzip
 Content-Disposition: attachment; filename=".config.gz"
 Content-Transfer-Encoding: base64
 
-H4sICOiWNWAAAy5jb25maWcAnDxbd+M2j+/9FT7tS7+Hr/UtTmb35IGSKJu1biEp28mLjpvx
+H4sICICsNWAAAy5jb25maWcAnDxbd+M2j+/9FT7tS7+Hr/UtTmb35IGSKJu1biEp28mLjpvx
 TLPNZT7Hmbb/fgFSF5KinOzO6ZmOCZAEQQAEQFA//fDTiLydXp72p4f7/ePjP6Ovh+fDcX86
 fB59eXg8/PcoykdZLkc0YvIXQE4ent/+/nV/fFrMRxe/TCa/jEfrw/H58DgKX56/PHx9g74P
 L88//PRDmGcxW1ZhWG0oFyzPKkl38vrH+8f989fR98PxFfBGk+kvYxjj568Pp//69Vf4++nh
@@ -993,7 +1039,7 @@ wmI0XPkas/HanaHQICv4sIk/FY6xwGo6R7uoJ4hHViZYArld48e7rCngxJ1a4KPYw5xhFHE/
 hI+u3QrDCOxda2kRg5borLVW+KCaYWT6Dzx2Y1l5XBgyNr4enDktvPfmU9uWYYAoMo6xEbuk
 io+FrQZKE8U2k3sIHWrWumP//6J4/e/DvgIA
 
---OXfL5xGRrasGEqWY
+--gKMricLos+KVdGMg
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -1004,4 +1050,4 @@ kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 
---OXfL5xGRrasGEqWY--
+--gKMricLos+KVdGMg--
