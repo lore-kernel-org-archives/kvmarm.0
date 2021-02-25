@@ -2,72 +2,78 @@ Return-Path: <SRS0=vuhq=H3=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB524C433DB
-	for <kvmarm@archiver.kernel.org>; Thu, 25 Feb 2021 06:14:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31437C433DB
+	for <kvmarm@archiver.kernel.org>; Thu, 25 Feb 2021 09:55:22 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C409A64EC8
-	for <kvmarm@archiver.kernel.org>; Thu, 25 Feb 2021 06:13:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C409A64EC8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 7A0D564F21
+	for <kvmarm@archiver.kernel.org>; Thu, 25 Feb 2021 09:55:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A0D564F21
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4263F4B26D;
-	Thu, 25 Feb 2021 01:13:58 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F07004B2DB;
+	Thu, 25 Feb 2021 04:55:20 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id F+k7HnG+VqFc; Thu, 25 Feb 2021 01:13:56 -0500 (EST)
+	with ESMTP id SbrxV7Shojwj; Thu, 25 Feb 2021 04:55:19 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E32A24B274;
-	Thu, 25 Feb 2021 01:13:56 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C3D24B22B;
+	Thu, 25 Feb 2021 04:55:19 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 62BE54B269
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Feb 2021 01:13:56 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 356284B22B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Feb 2021 04:55:18 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PRKe72rnhcIt for <kvmarm@lists.cs.columbia.edu>;
- Thu, 25 Feb 2021 01:13:54 -0500 (EST)
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7B0334B1F2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Feb 2021 01:13:53 -0500 (EST)
-Received: from dggeme759-chm.china.huawei.com (unknown [172.30.72.56])
- by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4DmMqN36kXz13xLd;
- Thu, 25 Feb 2021 14:11:12 +0800 (CST)
-Received: from [10.174.187.128] (10.174.187.128) by
- dggeme759-chm.china.huawei.com (10.3.19.105) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2106.2; Thu, 25 Feb 2021 14:13:47 +0800
-Subject: Re: [RFC PATCH 0/4] KVM: arm64: Improve efficiency of stage2 page
- table
-To: Alexandru Elisei <alexandru.elisei@arm.com>, Marc Zyngier
- <maz@kernel.org>, Will Deacon <will@kernel.org>, Catalin Marinas
- <catalin.marinas@arm.com>, James Morse <james.morse@arm.com>, Julien Thierry
- <julien.thierry.kdev@gmail.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
- Gavin Shan <gshan@redhat.com>, Quentin Perret <qperret@google.com>,
- <kvmarm@lists.cs.columbia.edu>, <linux-arm-kernel@lists.infradead.org>,
- <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+ with ESMTP id elUsUjb5Z1lu for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 25 Feb 2021 04:55:17 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D1EF64B1D4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Feb 2021 04:55:16 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 8475B64EC8;
+ Thu, 25 Feb 2021 09:55:15 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1lFDMX-00Fpix-Di; Thu, 25 Feb 2021 09:55:13 +0000
+Date: Thu, 25 Feb 2021 09:55:12 +0000
+Message-ID: <871rd41ngf.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Yanan Wang <wangyanan55@huawei.com>
+Subject: Re: [RFC PATCH 1/4] KVM: arm64: Move the clean of dcache to the map
+ handler
+In-Reply-To: <20210208112250.163568-2-wangyanan55@huawei.com>
 References: <20210208112250.163568-1-wangyanan55@huawei.com>
- <3a128c43-ff18-2132-1eaa-1fc882c80b1e@arm.com>
- <0dd3a764-0e11-af6a-2b46-84509bef7294@huawei.com>
- <0385a692-efed-9c1d-0e7f-a3e3af8258d5@arm.com>
-From: "wangyanan (Y)" <wangyanan55@huawei.com>
-Message-ID: <dd9307eb-e7f8-9f6c-4905-421f7d8e6cc1@huawei.com>
-Date: Thu, 25 Feb 2021 14:13:46 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
-MIME-Version: 1.0
-In-Reply-To: <0385a692-efed-9c1d-0e7f-a3e3af8258d5@arm.com>
-Content-Language: en-US
-X-Originating-IP: [10.174.187.128]
-X-ClientProxiedBy: dggeme720-chm.china.huawei.com (10.1.199.116) To
- dggeme759-chm.china.huawei.com (10.3.19.105)
-X-CFilter-Loop: Reflected
+ <20210208112250.163568-2-wangyanan55@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: wangyanan55@huawei.com, will@kernel.org,
+ catalin.marinas@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com,
+ suzuki.poulose@arm.com, gshan@redhat.com, qperret@google.com,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org, wanghaibin.wang@huawei.com,
+ zhukeqian1@huawei.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, Catalin
+ Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -79,152 +85,170 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Ck9uIDIwMjEvMi8yNSAxOjIwLCBBbGV4YW5kcnUgRWxpc2VpIHdyb3RlOgo+IEhpLAo+Cj4gT24g
-Mi8yNC8yMSAyOjM1IEFNLCB3YW5neWFuYW4gKFkpIHdyb3RlOgo+Cj4+IEhpIEFsZXgsCj4+Cj4+
-IE9uIDIwMjEvMi8yMyAyMzo1NSwgQWxleGFuZHJ1IEVsaXNlaSB3cm90ZToKPj4+IEhpIFlhbmFu
-LAo+Pj4KPj4+IEkgd2FudGVkIHRvIHJldmlldyB0aGUgcGF0Y2hlcywgYnV0IHVuZm9ydHVuYXRl
-bHkgSSBnZXQgYW4gZXJyb3Igd2hlbiB0cnlpbmcgdG8KPj4+IGFwcGx5IHRoZSBmaXJzdCBwYXRj
-aCBpbiB0aGUgc2VyaWVzOgo+Pj4KPj4+IEFwcGx5aW5nOiBLVk06IGFybTY0OiBNb3ZlIHRoZSBj
-bGVhbiBvZiBkY2FjaGUgdG8gdGhlIG1hcCBoYW5kbGVyCj4+PiBlcnJvcjogcGF0Y2ggZmFpbGVk
-OiBhcmNoL2FybTY0L2t2bS9oeXAvcGd0YWJsZS5jOjQ2NAo+Pj4gZXJyb3I6IGFyY2gvYXJtNjQv
-a3ZtL2h5cC9wZ3RhYmxlLmM6IHBhdGNoIGRvZXMgbm90IGFwcGx5Cj4+PiBlcnJvcjogcGF0Y2gg
-ZmFpbGVkOiBhcmNoL2FybTY0L2t2bS9tbXUuYzo4ODIKPj4+IGVycm9yOiBhcmNoL2FybTY0L2t2
-bS9tbXUuYzogcGF0Y2ggZG9lcyBub3QgYXBwbHkKPj4+IFBhdGNoIGZhaWxlZCBhdCAwMDAxIEtW
-TTogYXJtNjQ6IE1vdmUgdGhlIGNsZWFuIG9mIGRjYWNoZSB0byB0aGUgbWFwIGhhbmRsZXIKPj4+
-IGhpbnQ6IFVzZSAnZ2l0IGFtIC0tc2hvdy1jdXJyZW50LXBhdGNoPWRpZmYnIHRvIHNlZSB0aGUg
-ZmFpbGVkIHBhdGNoCj4+PiBXaGVuIHlvdSBoYXZlIHJlc29sdmVkIHRoaXMgcHJvYmxlbSwgcnVu
-ICJnaXQgYW0gLS1jb250aW51ZSIuCj4+PiBJZiB5b3UgcHJlZmVyIHRvIHNraXAgdGhpcyBwYXRj
-aCwgcnVuICJnaXQgYW0gLS1za2lwIiBpbnN0ZWFkLgo+Pj4gVG8gcmVzdG9yZSB0aGUgb3JpZ2lu
-YWwgYnJhbmNoIGFuZCBzdG9wIHBhdGNoaW5nLCBydW4gImdpdCBhbSAtLWFib3J0Ii4KPj4+Cj4+
-PiBUcmllZCB0aGlzIHdpdGggTGludXggdGFncyB2NS4xMS1yYzEgdG8gdjUuMTEtcmM3LiBJdCBs
-b29rcyBsaWtlIHBndGFibGUuYyBhbmQKPj4+IG1tdS5jIGZyb20geW91ciBwYXRjaCBpcyBkaWZm
-ZXJlbnQgdGhhbiB3aGF0IGlzIGZvdW5kIG9uIHVwc3RyZWFtIG1hc3Rlci4gRGlkIHlvdQo+Pj4g
-dXNlIGFub3RoZXIgYnJhbmNoIGFzIHRoZSBiYXNlIGZvciB5b3VyIHBhdGNoZXM/Cj4+IFRoYW5r
-cyBmb3IgeW91ciBhdHRlbnRpb24uCj4+IEluZGVlZCwgdGhpcyBzZXJpZXMgd2FzwqAgbW9yZSBv
-ciBsZXNzIGJhc2VkIG9uIHRoZSBwYXRjaGVzIEkgcG9zdCBiZWZvcmUgKExpbms6Cj4+IGh0dHBz
-Oi8vbG9yZS5rZXJuZWwub3JnL3IvMjAyMTAxMTQxMjEzNTAuMTIzNjg0LTQtd2FuZ3lhbmFuNTVA
-aHVhd2VpLmNvbSkuCj4+IEFuZCB0aGV5IGhhdmUgYWxyZWFkeSBiZWVuIG1lcmdlZCBpbnRvIHVw
-LXRvLWRhdGEgdXBzdHJlYW0gbWFzdGVyIChjb21taXQ6Cj4+IDUwOTU1MmU2NWFlODI4NzE3OGE1
-Y2RlYTJkNzM0ZGNkMmQ2MzgwYWIpLCBidXQgbm90IGludG8gdGFncyB2NS4xMS1yYzEgdG8KPj4g
-djUuMTEtcmM3Lgo+PiBDb3VsZCB5b3UgcGxlYXNlIHRyeSB0aGUgbmV3ZXN0IHVwc3RyZWFtIG1h
-c3RlcihzaW5jZSBjb21taXQ6Cj4+IDUwOTU1MmU2NWFlODI4NzE3OGE1Y2RlYTJkNzM0ZGNkMmQ2
-MzgwYWIpID8gSSBoYXZlIHRlc3RlZCBvbiBteSBsb2NhbCBhbmQgbm8KPj4gYXBwbHkgZXJyb3Jz
-IG9jY3VyLgo+IFRoYXQgd29ya2VkIGZvciBtZSwgdGhhbmsgeW91IGZvciB0aGUgcXVpY2sgcmVw
-bHkuCj4KPiBKdXN0IHRvIGRvdWJsZSBjaGVjaywgd2hlbiB5b3UgcnVuIHRoZSBiZW5jaG1hcmtz
-LCB0aGUgYmVmb3JlIHJlc3VsdHMgYXJlIGZvciBhCj4ga2VybmVsIGJ1aWx0IGZyb20gY29tbWl0
-IDUwOTU1MmU2NWFlOCAoIktWTTogYXJtNjQ6IE1hcmsgdGhlIHBhZ2UgZGlydHkgb25seSBpZgo+
-IHRoZSBmYXVsdCBpcyBoYW5kbGVkIHN1Y2Nlc3NmdWxseSIpLCBhbmQgdGhlIGFmdGVyIHJlc3Vs
-dHMgYXJlIHdpdGggdGhpcyBzZXJpZXMgb24KPiB0b3AsIHJpZ2h0PwoKWWVzLCB0aGF0J3Mgcmln
-aHQuIFNvIHRoZSBwZXJmb3JtYW5jZSBjaGFuZ2UgcmVzdWx0cyBoYXZlIG5vdGhpbmcgdG8gZG8g
-CndpdGggdGhlIHNlcmllcyBvZiBjb21taXQgNTA5NTUyZTY1YWU4LgoKVGhhbmtzLAoKWWFuYW4K
-Cj4KPiBUaGFua3MsCj4KPiBBbGV4Cj4KPj4gVGhhbmtzLAo+Pgo+PiBZYW5hbi4KPj4KPj4+IFRo
-YW5rcywKPj4+Cj4+PiBBbGV4Cj4+Pgo+Pj4gT24gMi84LzIxIDExOjIyIEFNLCBZYW5hbiBXYW5n
-IHdyb3RlOgo+Pj4+IEhpLAo+Pj4+Cj4+Pj4gVGhpcyBzZXJpZXMgbWFrZXMgc29tZSBlZmZpY2ll
-bmN5IGltcHJvdmVtZW50IG9mIHN0YWdlMiBwYWdlIHRhYmxlIGNvZGUsCj4+Pj4gYW5kIHRoZXJl
-IGFyZSBzb21lIHRlc3QgcmVzdWx0cyB0byBwcmVzZW50IHRoZSBwZXJmb3JtYW5jZSBjaGFuZ2Vz
-LCB3aGljaAo+Pj4+IHdlcmUgdGVzdGVkIGJ5IGEga3ZtIHNlbGZ0ZXN0IFsxXSB0aGF0IEkgaGF2
-ZSBwb3N0Ogo+Pj4+IFsxXSBodHRwczovL2xvcmUua2VybmVsLm9yZy9sa21sLzIwMjEwMjA4MDkw
-ODQxLjMzMzcyNC0xLXdhbmd5YW5hbjU1QGh1YXdlaS5jb20vCj4+Pj4KPj4+PiBBYm91dCBwYXRj
-aCAxOgo+Pj4+IFdlIGN1cnJlbnRseSB1bmlmb3JtbHkgY2xlYW4gZGNhY2hlIGluIHVzZXJfbWVt
-X2Fib3J0KCkgYmVmb3JlIGNhbGxpbmcgdGhlCj4+Pj4gZmF1bHQgaGFuZGxlcnMsIGlmIHdlIHRh
-a2UgYSB0cmFuc2xhdGlvbiBmYXVsdCBhbmQgdGhlIHBmbiBpcyBjYWNoZWFibGUuCj4+Pj4gQnV0
-IGlmIHRoZXJlIGFyZSBjb25jdXJyZW50IHRyYW5zbGF0aW9uIGZhdWx0cyBvbiB0aGUgc2FtZSBw
-YWdlIG9yIGJsb2NrLAo+Pj4+IGNsZWFuIG9mIGRjYWNoZSBmb3IgdGhlIGZpcnN0IHRpbWUgaXMg
-bmVjZXNzYXJ5IHdoaWxlIHRoZSBvdGhlcnMgYXJlIG5vdC4KPj4+Pgo+Pj4+IEJ5IG1vdmluZyBj
-bGVhbiBvZiBkY2FjaGUgdG8gdGhlIG1hcCBoYW5kbGVyLCB3ZSBjYW4gZWFzaWx5IGlkZW50aWZ5
-IHRoZQo+Pj4+IGNvbmRpdGlvbnMgd2hlcmUgQ01PcyBhcmUgcmVhbGx5IG5lZWRlZCBhbmQgYXZv
-aWQgdGhlIHVubmVjZXNzYXJ5IG9uZXMuCj4+Pj4gQXMgaXQncyBhIHRpbWUgY29uc3VtaW5nIHBy
-b2Nlc3MgdG8gcGVyZm9ybSBDTU9zIGVzcGVjaWFsbHkgd2hlbiBmbHVzaGluZwo+Pj4+IGEgYmxv
-Y2sgcmFuZ2UsIHNvIHRoaXMgc29sdXRpb24gcmVkdWNlcyBtdWNoIGxvYWQgb2Yga3ZtIGFuZCBp
-bXByb3ZlIHRoZQo+Pj4+IGVmZmljaWVuY3kgb2YgY3JlYXRpbmcgbWFwcGluZ3MuCj4+Pj4KPj4+
-PiBUZXN0IHJlc3VsdHM6Cj4+Pj4gKDEpIHdoZW4gMjAgdkNQVXMgY29uY3VycmVudGx5IGFjY2Vz
-cyAyMEcgcmFtIChhbGwgMUcgaHVnZXBhZ2VzKToKPj4+PiBLVk0gY3JlYXRlIGJsb2NrIG1hcHBp
-bmdzIHRpbWU6IDUyLjgzcyAtPiAzLjcwcwo+Pj4+IEtWTSByZWNvdmVyIGJsb2NrIG1hcHBpbmdz
-IHRpbWUoYWZ0ZXIgZGlydHktbG9nZ2luZyk6IDUyLjBzIC0+IDIuODdzCj4+Pj4KPj4+PiAoMikg
-d2hlbiA0MCB2Q1BVcyBjb25jdXJyZW50bHkgYWNjZXNzIDIwRyByYW0gKGFsbCAxRyBodWdlcGFn
-ZXMpOgo+Pj4+IEtWTSBjcmVhdGluZyBibG9jayBtYXBwaW5ncyB0aW1lOiAxMDQuNTZzIC0+IDMu
-NzBzCj4+Pj4gS1ZNIHJlY292ZXIgYmxvY2sgbWFwcGluZ3MgdGltZShhZnRlciBkaXJ0eS1sb2dn
-aW5nKTogMTAzLjkzcyAtPiAyLjk2cwo+Pj4+Cj4+Pj4gQWJvdXQgcGF0Y2ggMiwgMzoKPj4+PiBX
-aGVuIEtWTSBuZWVkcyB0byBjb2FsZXNjZSB0aGUgbm9ybWFsIHBhZ2UgbWFwcGluZ3MgaW50byBh
-IGJsb2NrIG1hcHBpbmcsCj4+Pj4gd2UgY3VycmVudGx5IGludmFsaWRhdGUgdGhlIG9sZCB0YWJs
-ZSBlbnRyeSBmaXJzdCBmb2xsb3dlZCBieSBpbnZhbGlkYXRpb24KPj4+PiBvZiBUTEIsIHRoZW4g
-dW5tYXAgdGhlIHBhZ2UgbWFwcGluZ3MsIGFuZCBpbnN0YWxsIHRoZSBibG9jayBlbnRyeSBhdCBs
-YXN0Lgo+Pj4+Cj4+Pj4gSXQgd2lsbCBjb3N0IGEgbG90IG9mIHRpbWUgdG8gdW5tYXAgdGhlIG51
-bWVyb3VzIHBhZ2UgbWFwcGluZ3MsIHdoaWNoIG1lYW5zCj4+Pj4gdGhlIHRhYmxlIGVudHJ5IHdp
-bGwgYmUgbGVmdCBpbnZhbGlkIGZvciBhIGxvbmcgdGltZSBiZWZvcmUgaW5zdGFsbGF0aW9uIG9m
-Cj4+Pj4gdGhlIGJsb2NrIGVudHJ5LCBhbmQgdGhpcyB3aWxsIGNhdXNlIG1hbnkgc3B1cmlvdXMg
-dHJhbnNsYXRpb24gZmF1bHRzLgo+Pj4+Cj4+Pj4gU28gbGV0J3MgcXVpY2tseSBpbnN0YWxsIHRo
-ZSBibG9jayBlbnRyeSBhdCBmaXJzdCB0byBlbnN1cmUgdW5pbnRlcnJ1cHRlZAo+Pj4+IG1lbW9y
-eSBhY2Nlc3Mgb2YgdGhlIG90aGVyIHZDUFVzLCBhbmQgdGhlbiB1bm1hcCB0aGUgcGFnZSBtYXBw
-aW5ncyBhZnRlcgo+Pj4+IGluc3RhbGxhdGlvbi4gVGhpcyB3aWxsIHJlZHVjZSBtb3N0IG9mIHRo
-ZSB0aW1lIHdoZW4gdGhlIHRhYmxlIGVudHJ5IGlzCj4+Pj4gaW52YWxpZCwgYW5kIGF2b2lkIG1v
-c3Qgb2YgdGhlIHVubmVjZXNzYXJ5IHRyYW5zbGF0aW9uIGZhdWx0cy4KPj4+Pgo+Pj4+IFRlc3Qg
-cmVzdWx0cyBiYXNlZCBvbiBwYXRjaCAxOgo+Pj4+ICgxKSB3aGVuIDIwIHZDUFVzIGNvbmN1cnJl
-bnRseSBhY2Nlc3MgMjBHIHJhbSAoYWxsIDFHIGh1Z2VwYWdlcyk6Cj4+Pj4gS1ZNIHJlY292ZXIg
-YmxvY2sgbWFwcGluZ3MgdGltZShhZnRlciBkaXJ0eS1sb2dnaW5nKTogMi44N3MgLT4gMC4zMHMK
-Pj4+Pgo+Pj4+ICgyKSB3aGVuIDQwIHZDUFVzIGNvbmN1cnJlbnRseSBhY2Nlc3MgMjBHIHJhbSAo
-YWxsIDFHIGh1Z2VwYWdlcyk6Cj4+Pj4gS1ZNIHJlY292ZXIgYmxvY2sgbWFwcGluZ3MgdGltZShh
-ZnRlciBkaXJ0eS1sb2dnaW5nKTogMi45NnMgLT4gMC4zNXMKPj4+Pgo+Pj4+IFNvIGNvbWJpbmVk
-IHdpdGggcGF0Y2ggMSwgaXQgbWFrZXMgYSBiaWcgZGlmZmVyZW5jZSBvZiBLVk0gY3JlYXRpbmcg
-bWFwcGluZ3MKPj4+PiBhbmQgcmVjb3ZlcmluZyBibG9jayBtYXBwaW5ncyB3aXRoIG5vdCBtdWNo
-IGNvZGUgY2hhbmdlLgo+Pj4+Cj4+Pj4gQWJvdXQgcGF0Y2ggNDoKPj4+PiBBIG5ldyBtZXRob2Qg
-dG8gZGlzdGluZ3Vpc2ggY2FzZXMgb2YgbWVtY2FjaGUgYWxsb2NhdGlvbnMgaXMgaW50cm9kdWNl
-ZC4KPj4+PiBCeSBjb21wYXJpbmcgZmF1bHRfZ3JhbnVsZSBhbmQgdm1hX3BhZ2VzaXplLCBjYXNl
-cyB0aGF0IHJlcXVpcmUgYWxsb2NhdGlvbnMKPj4+PiBmcm9tIG1lbWNhY2hlIGFuZCBjYXNlcyB0
-aGF0IGRvbid0IGNhbiBiZSBkaXN0aW5ndWlzaGVkIGNvbXBsZXRlbHkuCj4+Pj4KPj4+PiAtLS0K
-Pj4+Pgo+Pj4+IERldGFpbHMgb2YgdGVzdCByZXN1bHRzCj4+Pj4gcGxhdGZvcm06IEhpU2lsaWNv
-biBLdW5wZW5nOTIwIChGV0Igbm90IHN1cHBvcnRlZCkKPj4+PiBob3N0IGtlcm5lbDogTGludXgg
-bWFpbmxpbmUgKHY1LjExLXJjNikKPj4+Pgo+Pj4+ICgxKSBwZXJmb3JtYW5jZSBjaGFuZ2Ugb2Yg
-cGF0Y2ggMQo+Pj4+IGNtZGxpbmU6IC4va3ZtX3BhZ2VfdGFibGVfdGVzdCAtbSA0IC10IDIgLWcg
-MUcgLXMgMjBHIC12IDIwCj4+Pj4gIMKgwqDCoMKgwqDCoCAoMjAgdmNwdXMsIDIwRyBtZW1vcnks
-IGJsb2NrIG1hcHBpbmdzKGdyYW51bGUgMUcpKQo+Pj4+IEJlZm9yZSBwYXRjaDogS1ZNX0NSRUFU
-RV9NQVBQSU5HUzogNTIuODMzOHMgNTIuODMyN3MgNTIuODMzNnMgNTIuODI1NXMgNTIuODMwM3MK
-Pj4+PiBBZnRlcsKgIHBhdGNoOiBLVk1fQ1JFQVRFX01BUFBJTkdTOsKgIDMuNzAyMnPCoCAzLjcw
-MzFzwqAgMy43MDI4c8KgIDMuNzAxMnPCoCAzLjcwMjRzCj4+Pj4KPj4+PiBCZWZvcmUgcGF0Y2g6
-IEtWTV9BREpVU1RfTUFQUElOR1M6IDUyLjA0NjZzIDUyLjA0NzNzIDUyLjA1NTBzIDUyLjA1MThz
-IDUyLjA0NjdzCj4+Pj4gQWZ0ZXLCoCBwYXRjaDogS1ZNX0FESlVTVF9NQVBQSU5HUzrCoCAyLjg3
-ODdzwqAgMi44Nzgxc8KgIDIuODc4NXPCoCAyLjg3NDJzwqAgMi44NzU5cwo+Pj4+Cj4+Pj4gY21k
-bGluZTogLi9rdm1fcGFnZV90YWJsZV90ZXN0IC1tIDQgLXQgMiAtZyAxRyAtcyAyMEcgLXYgNDAK
-Pj4+PiAgwqDCoMKgwqDCoMKgICg0MCB2Y3B1cywgMjBHIG1lbW9yeSwgYmxvY2sgbWFwcGluZ3Mo
-Z3JhbnVsZSAxRykpCj4+Pj4gQmVmb3JlIHBhdGNoOiBLVk1fQ1JFQVRFX01BUFBJTkdTOiAxMDQu
-NTYwcyAxMDQuNTU2cyAxMDQuNTU0cyAxMDQuNTU2cyAxMDQuNTUwcwo+Pj4+IEFmdGVywqAgcGF0
-Y2g6IEtWTV9DUkVBVEVfTUFQUElOR1M6wqAgMy43MDExc8KgIDMuNzEwM3PCoCAzLjcwMDVzwqAg
-My43MDI0c8KgIDMuNzEwNnMKPj4+Pgo+Pj4+IEJlZm9yZSBwYXRjaDogS1ZNX0FESlVTVF9NQVBQ
-SU5HUzogMTAzLjkzMXMgMTAzLjkzNnMgMTAzLjkyN3MgMTAzLjk0MnMgMTAzLjkyN3MKPj4+PiBB
-ZnRlcsKgIHBhdGNoOiBLVk1fQURKVVNUX01BUFBJTkdTOsKgIDIuOTYyMXPCoCAyLjk2NDhzwqAg
-Mi45NDc0c8KgIDIuOTU4N3PCoCAyLjk2MDNzCj4+Pj4KPj4+PiAoMikgcGVyZm9ybWFuY2UgY2hh
-bmdlIG9mIHBhdGNoIDIsIDMoYmFzZWQgb24gcGF0Y2ggMSkKPj4+PiBjbWRsaW5lOiAuL2t2bV9w
-YWdlX3RhYmxlX3Rlc3QgLW0gNCAtdCAyIC1nIDFHIC1zIDIwRyAtdiAxCj4+Pj4gIMKgwqDCoMKg
-wqDCoCAoMSB2Y3B1LCAyMEcgbWVtb3J5LCBibG9jayBtYXBwaW5ncyhncmFudWxlIDFHKSkKPj4+
-PiBCZWZvcmUgcGF0Y2g6IEtWTV9BREpVU1RfTUFQUElOR1M6IDIuODI0MXMgMi44MjM0cyAyLjgy
-NDVzIDIuODIzMHMgMi44NjUycwo+Pj4+IEFmdGVywqAgcGF0Y2g6IEtWTV9BREpVU1RfTUFQUElO
-R1M6IDAuMjQ0NHMgMC4yNDQycyAwLjI0MjNzIDAuMjQ0MXMgMC4yNDI5cwo+Pj4+Cj4+Pj4gY21k
-bGluZTogLi9rdm1fcGFnZV90YWJsZV90ZXN0IC1tIDQgLXQgMiAtZyAxRyAtcyAyMEcgLXYgMjAK
-Pj4+PiAgwqDCoMKgwqDCoMKgICgyMCB2Y3B1cywgMjBHIG1lbW9yeSwgYmxvY2sgbWFwcGluZ3Mo
-Z3JhbnVsZSAxRykpCj4+Pj4gQmVmb3JlIHBhdGNoOiBLVk1fQURKVVNUX01BUFBJTkdTOiAyLjg3
-ODdzIDIuODc4MXMgMi44Nzg1cyAyLjg3NDJzIDIuODc1OXMKPj4+PiBBZnRlcsKgIHBhdGNoOiBL
-Vk1fQURKVVNUX01BUFBJTkdTOiAwLjMwMDhzIDAuMzAwNHMgMC4yOTc0cyAwLjI5MTdzIDAuMjkw
-MHMKPj4+Pgo+Pj4+IGNtZGxpbmU6IC4va3ZtX3BhZ2VfdGFibGVfdGVzdCAtbSA0IC10IDIgLWcg
-MUcgLXMgMjBHIC12IDQwCj4+Pj4gIMKgwqDCoMKgwqDCoCAoNDAgdmNwdXMsIDIwRyBtZW1vcnks
-IGJsb2NrIG1hcHBpbmdzKGdyYW51bGUgMUcpKQo+Pj4+IEJlZm9yZSBwYXRjaDogS1ZNX0FESlVT
-VF9NQVBQSU5HUzogMi45NjIxcyAyLjk2NDhzIDIuOTQ3NHMgMi45NTg3cyAyLjk2MDNzCj4+Pj4g
-QWZ0ZXLCoCBwYXRjaDogS1ZNX0FESlVTVF9NQVBQSU5HUzogMC4zNTQxcyAwLjM2OTRzIDAuMzY1
-NnMgMC4zNjkzcyAwLjM2ODdzCj4+Pj4KPj4+PiAtLS0KPj4+Pgo+Pj4+IFlhbmFuIFdhbmcgKDQp
-Ogo+Pj4+ICDCoMKgIEtWTTogYXJtNjQ6IE1vdmUgdGhlIGNsZWFuIG9mIGRjYWNoZSB0byB0aGUg
-bWFwIGhhbmRsZXIKPj4+PiAgwqDCoCBLVk06IGFybTY0OiBBZGQgYW4gaW5kZXBlbmRlbnQgQVBJ
-IGZvciBjb2FsZXNjaW5nIHRhYmxlcwo+Pj4+ICDCoMKgIEtWTTogYXJtNjQ6IEluc3RhbGwgdGhl
-IGJsb2NrIGVudHJ5IGJlZm9yZSB1bm1hcHBpbmcgdGhlIHBhZ2UgbWFwcGluZ3MKPj4+PiAgwqDC
-oCBLVk06IGFybTY0OiBEaXN0aW5ndWlzaCBjYXNlcyBvZiBtZW1jYWNoZSBhbGxvY2F0aW9ucyBj
-b21wbGV0ZWx5Cj4+Pj4KPj4+PiAgwqAgYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1fbW11Lmgg
-fCAxNiAtLS0tLS0tCj4+Pj4gIMKgIGFyY2gvYXJtNjQva3ZtL2h5cC9wZ3RhYmxlLmPCoMKgwqDC
-oCB8IDgyICsrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tCj4+Pj4gIMKgIGFyY2gvYXJt
-NjQva3ZtL21tdS5jwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwgMzkgKysrKysrLS0tLS0tLS0t
-Cj4+Pj4gIMKgIDMgZmlsZXMgY2hhbmdlZCwgNjkgaW5zZXJ0aW9ucygrKSwgNjggZGVsZXRpb25z
-KC0pCj4+Pj4KPj4+IC4KPiAuCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVk
-dQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+Hi Yanan,
+
+On Mon, 08 Feb 2021 11:22:47 +0000,
+Yanan Wang <wangyanan55@huawei.com> wrote:
+> 
+> We currently uniformly clean dcache in user_mem_abort() before calling the
+> fault handlers, if we take a translation fault and the pfn is cacheable.
+> But if there are concurrent translation faults on the same page or block,
+> clean of dcache for the first time is necessary while the others are not.
+> 
+> By moving clean of dcache to the map handler, we can easily identify the
+> conditions where CMOs are really needed and avoid the unnecessary ones.
+> As it's a time consuming process to perform CMOs especially when flushing
+> a block range, so this solution reduces much load of kvm and improve the
+> efficiency of creating mappings.
+
+That's an interesting approach. However, wouldn't it be better to
+identify early that there is already something mapped, and return to
+the guest ASAP?
+
+Can you quantify the benefit of this patch alone?
+
+> 
+> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
+> ---
+>  arch/arm64/include/asm/kvm_mmu.h | 16 --------------
+>  arch/arm64/kvm/hyp/pgtable.c     | 38 ++++++++++++++++++++------------
+>  arch/arm64/kvm/mmu.c             | 14 +++---------
+>  3 files changed, 27 insertions(+), 41 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index e52d82aeadca..4ec9879e82ed 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -204,22 +204,6 @@ static inline bool vcpu_has_cache_enabled(struct kvm_vcpu *vcpu)
+>  	return (vcpu_read_sys_reg(vcpu, SCTLR_EL1) & 0b101) == 0b101;
+>  }
+>  
+> -static inline void __clean_dcache_guest_page(kvm_pfn_t pfn, unsigned long size)
+> -{
+> -	void *va = page_address(pfn_to_page(pfn));
+> -
+> -	/*
+> -	 * With FWB, we ensure that the guest always accesses memory using
+> -	 * cacheable attributes, and we don't have to clean to PoC when
+> -	 * faulting in pages. Furthermore, FWB implies IDC, so cleaning to
+> -	 * PoU is not required either in this case.
+> -	 */
+> -	if (cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
+> -		return;
+> -
+> -	kvm_flush_dcache_to_poc(va, size);
+> -}
+> -
+>  static inline void __invalidate_icache_guest_page(kvm_pfn_t pfn,
+>  						  unsigned long size)
+>  {
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index 4d177ce1d536..2f4f87021980 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -464,6 +464,26 @@ static int stage2_map_set_prot_attr(enum kvm_pgtable_prot prot,
+>  	return 0;
+>  }
+>  
+> +static bool stage2_pte_cacheable(kvm_pte_t pte)
+> +{
+> +	u64 memattr = pte & KVM_PTE_LEAF_ATTR_LO_S2_MEMATTR;
+> +	return memattr == PAGE_S2_MEMATTR(NORMAL);
+> +}
+> +
+> +static void stage2_flush_dcache(void *addr, u64 size)
+> +{
+> +	/*
+> +	 * With FWB, we ensure that the guest always accesses memory using
+> +	 * cacheable attributes, and we don't have to clean to PoC when
+> +	 * faulting in pages. Furthermore, FWB implies IDC, so cleaning to
+> +	 * PoU is not required either in this case.
+> +	 */
+> +	if (cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
+> +		return;
+> +
+> +	__flush_dcache_area(addr, size);
+> +}
+> +
+>  static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
+>  				      kvm_pte_t *ptep,
+>  				      struct stage2_map_data *data)
+> @@ -495,6 +515,10 @@ static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
+>  		put_page(page);
+>  	}
+>  
+> +	/* Flush data cache before installation of the new PTE */
+> +	if (stage2_pte_cacheable(new))
+> +		stage2_flush_dcache(__va(phys), granule);
+> +
+>  	smp_store_release(ptep, new);
+>  	get_page(page);
+>  	data->phys += granule;
+> @@ -651,20 +675,6 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+>  	return ret;
+>  }
+>  
+> -static void stage2_flush_dcache(void *addr, u64 size)
+> -{
+> -	if (cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
+> -		return;
+> -
+> -	__flush_dcache_area(addr, size);
+> -}
+> -
+> -static bool stage2_pte_cacheable(kvm_pte_t pte)
+> -{
+> -	u64 memattr = pte & KVM_PTE_LEAF_ATTR_LO_S2_MEMATTR;
+> -	return memattr == PAGE_S2_MEMATTR(NORMAL);
+> -}
+> -
+>  static int stage2_unmap_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+>  			       enum kvm_pgtable_walk_flags flag,
+>  			       void * const arg)
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 77cb2d28f2a4..d151927a7d62 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -609,11 +609,6 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
+>  	kvm_mmu_write_protect_pt_masked(kvm, slot, gfn_offset, mask);
+>  }
+>  
+> -static void clean_dcache_guest_page(kvm_pfn_t pfn, unsigned long size)
+> -{
+> -	__clean_dcache_guest_page(pfn, size);
+> -}
+> -
+>  static void invalidate_icache_guest_page(kvm_pfn_t pfn, unsigned long size)
+>  {
+>  	__invalidate_icache_guest_page(pfn, size);
+> @@ -882,9 +877,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	if (writable)
+>  		prot |= KVM_PGTABLE_PROT_W;
+>  
+> -	if (fault_status != FSC_PERM && !device)
+> -		clean_dcache_guest_page(pfn, vma_pagesize);
+> -
+>  	if (exec_fault) {
+>  		prot |= KVM_PGTABLE_PROT_X;
+>  		invalidate_icache_guest_page(pfn, vma_pagesize);
+
+It seems that the I-side CMO now happens *before* the D-side, which
+seems odd. What prevents the CPU from speculatively fetching
+instructions in the interval? I would also feel much more confident if
+the two were kept close together.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
