@@ -7,49 +7,48 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3B68C433E6
-	for <kvmarm@archiver.kernel.org>; Sat, 27 Feb 2021 10:41:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CA3DC433E9
+	for <kvmarm@archiver.kernel.org>; Sat, 27 Feb 2021 10:41:58 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 97DCF64EC0
-	for <kvmarm@archiver.kernel.org>; Sat, 27 Feb 2021 10:41:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97DCF64EC0
+	by mail.kernel.org (Postfix) with ESMTP id B290C64EC0
+	for <kvmarm@archiver.kernel.org>; Sat, 27 Feb 2021 10:41:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B290C64EC0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3660B4B43A;
-	Sat, 27 Feb 2021 05:41:56 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 56F514B42D;
+	Sat, 27 Feb 2021 05:41:57 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id NoXvhQrHtkOk; Sat, 27 Feb 2021 05:41:55 -0500 (EST)
+	with ESMTP id vdrMMkcJBdYQ; Sat, 27 Feb 2021 05:41:56 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 140F34B432;
-	Sat, 27 Feb 2021 05:41:54 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D0004B43E;
+	Sat, 27 Feb 2021 05:41:56 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F94E4B3E9
- for <kvmarm@lists.cs.columbia.edu>; Sat, 27 Feb 2021 05:41:52 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 72F774B444
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 27 Feb 2021 05:41:54 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xzCdXfORCrvD for <kvmarm@lists.cs.columbia.edu>;
- Sat, 27 Feb 2021 05:41:51 -0500 (EST)
+ with ESMTP id IRUkJDuLMGGW for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 27 Feb 2021 05:41:53 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 621394B427
- for <kvmarm@lists.cs.columbia.edu>; Sat, 27 Feb 2021 05:41:51 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B10664B441
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 27 Feb 2021 05:41:52 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B0F1111D4;
- Sat, 27 Feb 2021 02:41:50 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 607B712FC;
+ Sat, 27 Feb 2021 02:41:52 -0800 (PST)
 Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1AF5E3F73B;
- Sat, 27 Feb 2021 02:41:49 -0800 (PST)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BEB713F73B;
+ Sat, 27 Feb 2021 02:41:51 -0800 (PST)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: drjones@redhat.com,
 	kvm@vger.kernel.org,
 	kvmarm@lists.cs.columbia.edu
-Subject: [kvm-unit-tests PATCH 3/6] arm/arm64: Remove unnecessary ISB when
- doing dcache maintenance
-Date: Sat, 27 Feb 2021 10:41:58 +0000
-Message-Id: <20210227104201.14403-4-alexandru.elisei@arm.com>
+Subject: [kvm-unit-tests PATCH 5/6] arm64: Configure SCTLR_EL1 at boot
+Date: Sat, 27 Feb 2021 10:42:00 +0000
+Message-Id: <20210227104201.14403-6-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.30.1
 In-Reply-To: <20210227104201.14403-1-alexandru.elisei@arm.com>
 References: <20210227104201.14403-1-alexandru.elisei@arm.com>
@@ -70,61 +69,59 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The dcache_by_line_op macro executes a DSB to complete the cache
-maintenance operations. According to ARM DDI 0487G.a, page B2-150:
-
-"In addition, no instruction that appears in program order after the DSB
-instruction can alter any state of the system or perform any part of its
-functionality until the DSB completes other than:
-
-- Being fetched from memory and decoded.
-- Reading the general-purpose, SIMD and floating-point, Special-purpose, or
-  System registers that are directly or indirectly read without causing
-  side-effects."
-
-Similar definition for ARM in ARM DDI 0406C.d, page A3-150:
-
-"In addition, no instruction that appears in program order after the DSB
-instruction can execute until the DSB completes."
-
-This means that we don't need the ISB to prevent reordering of the cache
-maintenance instructions.
-
-We are also not doing icache maintenance, where an ISB would be required
-for the PE to discard instructions speculated before the invalidation.
-
-In conclusion, the ISB is unnecessary, so remove it.
+Some fields in SCTLR_EL1 are UNKNOWN at reset and the arm64 boot
+requirements, as stated by Linux in Documentation/arm64/booting.rst, do not
+specify a particular value for all the fields. Do not rely on the good will
+of the hypervisor and userspace to set SCTLR_EL1 to a sane value (by their
+definition of sane) and set SCTLR_EL1 explicitely before running setup().
+This will ensure that all tests are performed with the hardware set up
+identically, regardless of the KVM or VMM versions.
 
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- arm/cstart.S   | 1 -
- arm/cstart64.S | 1 -
- 2 files changed, 2 deletions(-)
+ lib/arm64/asm/sysreg.h | 7 +++++++
+ arm/cstart64.S         | 5 +++++
+ 2 files changed, 12 insertions(+)
 
-diff --git a/arm/cstart.S b/arm/cstart.S
-index 954748b00f64..2d62c1e6d40d 100644
---- a/arm/cstart.S
-+++ b/arm/cstart.S
-@@ -212,7 +212,6 @@ asm_mmu_disable:
- 	ldr	r1, [r1]
- 	sub	r1, r1, r0
- 	dcache_by_line_op dccimvac, sy, r0, r1, r2, r3
--	isb
+diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
+index 9d6b4fc66936..18c4ed39557a 100644
+--- a/lib/arm64/asm/sysreg.h
++++ b/lib/arm64/asm/sysreg.h
+@@ -8,6 +8,8 @@
+ #ifndef _ASMARM64_SYSREG_H_
+ #define _ASMARM64_SYSREG_H_
  
- 	mov     pc, lr
++#include <linux/const.h>
++
+ #define sys_reg(op0, op1, crn, crm, op2) \
+ 	((((op0)&3)<<19)|((op1)<<16)|((crn)<<12)|((crm)<<8)|((op2)<<5))
  
+@@ -87,4 +89,9 @@ asm(
+ #define SCTLR_EL1_A	(1 << 1)
+ #define SCTLR_EL1_M	(1 << 0)
+ 
++#define SCTLR_EL1_RES1	(_BITUL(7) | _BITUL(8) | _BITUL(11) | _BITUL(20) | \
++			 _BITUL(22) | _BITUL(23) | _BITUL(28) | _BITUL(29))
++#define INIT_SCTLR_EL1_MMU_OFF	\
++			SCTLR_EL1_RES1
++
+ #endif /* _ASMARM64_SYSREG_H_ */
 diff --git a/arm/cstart64.S b/arm/cstart64.S
-index 046bd3914098..c1deff842f03 100644
+index f6c5d2ebccf3..42a838ff4c38 100644
 --- a/arm/cstart64.S
 +++ b/arm/cstart64.S
-@@ -219,7 +219,6 @@ asm_mmu_disable:
- 	ldr	x1, [x1, :lo12:__phys_end]
- 	sub	x1, x1, x0
- 	dcache_by_line_op civac, sy, x0, x1, x2, x3
--	isb
+@@ -52,6 +52,11 @@ start:
+ 	b	1b
  
- 	ret
- 
+ 1:
++	/* set SCTLR_EL1 to a known value */
++	ldr	x4, =INIT_SCTLR_EL1_MMU_OFF
++	msr	sctlr_el1, x4
++	isb
++
+ 	/* set up stack */
+ 	mov	x4, #1
+ 	msr	spsel, x4
 -- 
 2.30.1
 
