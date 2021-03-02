@@ -4,74 +4,78 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ECC8C433DB
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F186DC433E6
 	for <kvmarm@archiver.kernel.org>; Tue,  2 Mar 2021 15:00:13 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 74F6C64F39
-	for <kvmarm@archiver.kernel.org>; Tue,  2 Mar 2021 15:00:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74F6C64F39
+	by mail.kernel.org (Postfix) with ESMTP id 7485264F38
+	for <kvmarm@archiver.kernel.org>; Tue,  2 Mar 2021 15:00:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7485264F38
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EA3404B632;
-	Tue,  2 Mar 2021 10:00:11 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2555A4B650;
+	Tue,  2 Mar 2021 10:00:13 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id yt+vl-jmmzha; Tue,  2 Mar 2021 10:00:10 -0500 (EST)
+	with ESMTP id 8WMBJf6-2GQJ; Tue,  2 Mar 2021 10:00:11 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 79DBE4B646;
-	Tue,  2 Mar 2021 10:00:10 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E5D34B64F;
+	Tue,  2 Mar 2021 10:00:11 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E7774B63C
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Mar 2021 10:00:09 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 84B704B62B
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Mar 2021 10:00:10 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jon2Sr9LM2+E for <kvmarm@lists.cs.columbia.edu>;
- Tue,  2 Mar 2021 10:00:07 -0500 (EST)
-Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com
- [209.85.221.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 86F414B62B
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Mar 2021 10:00:07 -0500 (EST)
-Received: by mail-wr1-f73.google.com with SMTP id z6so2518030wrh.11
- for <kvmarm@lists.cs.columbia.edu>; Tue, 02 Mar 2021 07:00:07 -0800 (PST)
+ with ESMTP id UHlPxtiNqoIL for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  2 Mar 2021 10:00:09 -0500 (EST)
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com
+ [209.85.128.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 802804B63C
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Mar 2021 10:00:09 -0500 (EST)
+Received: by mail-wm1-f74.google.com with SMTP id z26so1312429wml.4
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 02 Mar 2021 07:00:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=sender:date:message-id:mime-version:subject:from:to:cc;
- bh=8cdx2cy8bS1Yk1hOvoxJoIxgvMKS4vuWA9cIA1RP624=;
- b=YjzVe3TPmAvkQCDj/HWux0EV0FszWglzZrY/X7sQ4PP1pehQ7BRIGiVyN3MLlMr3li
- huvMmx5Y3nArbKhf91/o25rYsgIu4x+kp2oJMolgK94RuxqGkONc30xK6IKkPeKdw+az
- 7Vctx4VxHYaXaENho0mlZ7QiMu85gh+Sh420ulaF3seaMGn2jIvBd8X8e+MqGmxTd2M6
- 1X5vt1fRx59Pb9zdTuS+WO8mkN0JUh4Cwzw9IM1gJ8xOhx9fWpOVEMqhRoA6KH8bDNf6
- 983WHMNuHeka5//hhYLYRrnsFZTkhhkGTnt5avmFO0K6/pTikDHYzM+l7KGykdTBPC8e
- FkSg==
+ h=sender:date:in-reply-to:message-id:mime-version:references:subject
+ :from:to:cc; bh=AbQOhTo5qTBDcGKT4ROquEtU01mLpiQKpICJ+GOnoG0=;
+ b=MfW/XHtPJX0w2ipZVk2ijDvDAMfL6HCaJrecrAAwfFAlbKa/hgXriwrQC/xOMitILV
+ HdeX+FO8dVOXvJ349UOGKSfzw/G8uO3yAwL6GNM/TEN+7BJOpvN6cPTje25i9rOjEdFo
+ Ze8aV5OUD8zbeIjktjuBv3Fx4bJTcKIUqeaNFPiZzdrljYxVNzrXJrvbLcKWBzbh478I
+ gL8cwdt0E3dCMiyFlf1XGEThwupYU3c9H/mT2wRIck9dvEg3atzKumxpxoJ5g+SNIHGF
+ FMI1FTzWJ4QlMmJ+28ZhCaYFXCUALVIdDv9d3OE6oZERGtFbYN4KyiSg+RbRZnI4i231
+ Mmfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
- :to:cc;
- bh=8cdx2cy8bS1Yk1hOvoxJoIxgvMKS4vuWA9cIA1RP624=;
- b=HR9ZeKZ/kNPBkorfpdER2aBGskeij5yvBbBM2jiGDrgauQXBpjLh2OVzAQJ5ajHnqn
- pHzbORgQIYLKQbp8Ikeh42Uyzz6JC8zPDfac5Rq5A44y1TtIand1vlP8gjQxgYLdf8J2
- RSBtw4poxuirXxSw1iQ0/vKjnQEVbG8wDkph1XERNUkh6hO7SYt75MqzngtWvW6bKlov
- 8mZZiCOvOhWZm+U03zBuuz+Ig9P/4wVeqhTD6PufEhw6LBxY8c1Ke2DM4yooN8IujEgj
- bvF1Nl0WuyFsVAhUGleX7MOaxO+VD1Yf7EcmUSYVuQmCg9DTzUdQileGh1hUn/ZvwNDU
- Yd0A==
-X-Gm-Message-State: AOAM533VQTBFTVSTamWg5Rtf51hIlk3sWC/cy9ac4dWgB1U2WZ2ipxCF
- hGiomyW7tjJ6m2JK5da4UrPoJJvVyiJa
-X-Google-Smtp-Source: ABdhPJwDCkMLeCoT4sUtiPOZrUAgJEKZ4OzzcKOcwzE3U3mmOILtARNPs12yHIt3Rzw7l59VN19/YF8Gf5Xv
-X-Received: from r2d2-qp.c.googlers.com ([fda3:e722:ac3:10:28:9cb1:c0a8:1652])
- (user=qperret job=sendgmr) by 2002:a1c:f006:: with SMTP id
- a6mr4583157wmb.166.1614697206272; Tue, 02 Mar 2021 07:00:06 -0800 (PST)
-Date: Tue,  2 Mar 2021 14:59:30 +0000
-Message-Id: <20210302150002.3685113-1-qperret@google.com>
+ h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
+ :references:subject:from:to:cc;
+ bh=AbQOhTo5qTBDcGKT4ROquEtU01mLpiQKpICJ+GOnoG0=;
+ b=V6ltgZQ73DHrSP4x+GQ4ns7/Hdu8JfWZhjH5JastlTgC25FFFNyRAlM7eCqqEjLlLN
+ kpDI1k9uf4JiSa3jtKZrIpbdxtbfoLeWm/3zh/vFjSm5+ukixfco1L8u/yijLvcfKK0r
+ nV9bIiMLMADWqRcIStW9CdCFpHBWJkaY345CS+3t4dcNutRnHjO8IxoVdiOGrt+83zJC
+ 06kQFmFsXwval839YsMIE3tn0UAjMIRnKbqmq+n1tLDz0zbqGoSzWXZduPsR+5BskIIm
+ o6qz13kvaeNdf2tFzFM/rTq9WzrukxHxxcOZv+eJVrveYiET79Png6rLcC9bmIkvBIpU
+ /kiA==
+X-Gm-Message-State: AOAM530IkpNTWRC9Y1EnmeAX6Ryo+/SxMUeB4G3g1zexYZNt7s42sTvh
+ fWOHLcotrpaY21SesbRi7It4JM+kGNlE
+X-Google-Smtp-Source: ABdhPJxKe/abaoaQDAN0ud0u087kNQ1v1cFYLoKd692l087a2pLQ0SHZGffvQJSKkW0kxuZW5igSyzEjrCP4
+X-Received: from r2d2-qp.c.googlers.com
+ ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1652])
+ (user=qperret job=sendgmr) by 2002:a05:600c:4c11:: with SMTP id
+ d17mr4573540wmp.86.1614697208554; Tue, 02 Mar 2021 07:00:08 -0800 (PST)
+Date: Tue,  2 Mar 2021 14:59:31 +0000
+In-Reply-To: <20210302150002.3685113-1-qperret@google.com>
+Message-Id: <20210302150002.3685113-2-qperret@google.com>
 Mime-Version: 1.0
+References: <20210302150002.3685113-1-qperret@google.com>
 X-Mailer: git-send-email 2.30.1.766.gb4fecdf3b7-goog
-Subject: [PATCH v3 00/32] KVM: arm64: A stage 2 for the host
+Subject: [PATCH v3 01/32] arm64: lib: Annotate {clear,
+ copy}_page() as position-independent
 From: Quentin Perret <qperret@google.com>
 To: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org, 
  james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
@@ -95,160 +99,58 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi all,
+From: Will Deacon <will@kernel.org>
 
-This is the v3 of the series previously posted here:
+clear_page() and copy_page() are suitable for use outside of the kernel
+address space, so annotate them as position-independent code.
 
-  https://lore.kernel.org/kvmarm/20201117181607.1761516-1-qperret@google.com/
+Signed-off-by: Will Deacon <will@kernel.org>
+Signed-off-by: Quentin Perret <qperret@google.com>
+---
+ arch/arm64/lib/clear_page.S | 4 ++--
+ arch/arm64/lib/copy_page.S  | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-This basically allows us to wrap the host with a stage 2 when running in
-nVHE, hence paving the way for protecting guest memory from the host in
-the future (among other use-cases). For more details about the
-motivation and the design angle taken here, I would recommend to have a
-look at the cover letter of v1, and/or to watch these presentations at
-LPC [1] and KVM forum 2020 [2].
-
-V3 includes a bunch of clean-ups and small refactorings all over the
-place as well as a few new features. Specifically, this now allows us to
-remove memory pages from the host stage 2 cleanly, and this series does
-so for all the .hyp memory sections (which has uncovered existing bugs
-upstream and in v2 of this series -- see [3] and [4]). This also now
-makes good use of block mappings whenever that is possible, and has
-gotten a bit more testing on real hardware (which helped uncover other
-bugs [5]).
-
-The other changes to v3 include:
-
- - clean-ups, refactoring and extra comments all over the place (Will);
-
- - dropped fdt hook in favor of memblock API now that the relevant
-   patches ([6]) are merged (Rob);
-
- - moved the CPU feature copy stuff to __init/__initdata (Marc);
-
- - fixed FWB support (Mate);
-
- - rebased on v5.12-rc1.
-
-This series depends on Will's vCPU context fix ([5]) and Marc's PMU
-fixes ([7]). And here's a branch with all the goodies applied:
-
-  https://android-kvm.googlesource.com/linux qperret/host-stage2-v3
-
-Thanks,
-Quentin
-
-[1] https://youtu.be/54q6RzS9BpQ?t=10859
-[2] https://youtu.be/wY-u6n75iXc
-[3] https://lore.kernel.org/kvmarm/20210203141931.615898-1-qperret@google.com/
-[4] https://lore.kernel.org/kvmarm/20210128173850.2478161-1-qperret@google.com/
-[5] https://lore.kernel.org/kvmarm/20210226181211.14542-1-will@kernel.org/
-[6] https://lore.kernel.org/lkml/20210115114544.1830068-1-qperret@google.com/
-[7] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/pmu-undef-NV
-
-
-Quentin Perret (29):
-  KVM: arm64: Initialize kvm_nvhe_init_params early
-  KVM: arm64: Avoid free_page() in page-table allocator
-  KVM: arm64: Factor memory allocation out of pgtable.c
-  KVM: arm64: Introduce a BSS section for use at Hyp
-  KVM: arm64: Make kvm_call_hyp() a function call at Hyp
-  KVM: arm64: Allow using kvm_nvhe_sym() in hyp code
-  KVM: arm64: Introduce an early Hyp page allocator
-  KVM: arm64: Stub CONFIG_DEBUG_LIST at Hyp
-  KVM: arm64: Introduce a Hyp buddy page allocator
-  KVM: arm64: Enable access to sanitized CPU features at EL2
-  KVM: arm64: Factor out vector address calculation
-  KVM: arm64: Prepare the creation of s1 mappings at EL2
-  KVM: arm64: Elevate hypervisor mappings creation at EL2
-  KVM: arm64: Use kvm_arch for stage 2 pgtable
-  KVM: arm64: Use kvm_arch in kvm_s2_mmu
-  KVM: arm64: Set host stage 2 using kvm_nvhe_init_params
-  KVM: arm64: Refactor kvm_arm_setup_stage2()
-  KVM: arm64: Refactor __load_guest_stage2()
-  KVM: arm64: Refactor __populate_fault_info()
-  KVM: arm64: Make memcache anonymous in pgtable allocator
-  KVM: arm64: Reserve memory for host stage 2
-  KVM: arm64: Sort the hypervisor memblocks
-  KVM: arm64: Introduce PROT_NONE mappings for stage 2
-  KVM: arm64: Refactor stage2_map_set_prot_attr()
-  KVM: arm64: Add kvm_pgtable_stage2_idmap_greedy()
-  KVM: arm64: Wrap the host with a stage 2
-  KVM: arm64: Page-align the .hyp sections
-  KVM: arm64: Disable PMU support in protected mode
-  KVM: arm64: Protect the .hyp sections from the host
-
-Will Deacon (3):
-  arm64: lib: Annotate {clear,copy}_page() as position-independent
-  KVM: arm64: Link position-independent string routines into .hyp.text
-  arm64: kvm: Add standalone ticket spinlock implementation for use at
-    hyp
-
- arch/arm64/include/asm/cpufeature.h           |   1 +
- arch/arm64/include/asm/hyp_image.h            |   7 +
- arch/arm64/include/asm/kvm_asm.h              |   9 +
- arch/arm64/include/asm/kvm_cpufeature.h       |  19 ++
- arch/arm64/include/asm/kvm_host.h             |  19 +-
- arch/arm64/include/asm/kvm_hyp.h              |   8 +
- arch/arm64/include/asm/kvm_mmu.h              |  23 +-
- arch/arm64/include/asm/kvm_pgtable.h          | 117 ++++++-
- arch/arm64/include/asm/sections.h             |   1 +
- arch/arm64/kernel/asm-offsets.c               |   3 +
- arch/arm64/kernel/cpufeature.c                |  13 +
- arch/arm64/kernel/image-vars.h                |  30 ++
- arch/arm64/kernel/vmlinux.lds.S               |  74 +++--
- arch/arm64/kvm/arm.c                          | 199 ++++++++++--
- arch/arm64/kvm/hyp/Makefile                   |   2 +-
- arch/arm64/kvm/hyp/include/hyp/switch.h       |  37 ++-
- arch/arm64/kvm/hyp/include/nvhe/early_alloc.h |  14 +
- arch/arm64/kvm/hyp/include/nvhe/gfp.h         |  55 ++++
- arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  36 +++
- arch/arm64/kvm/hyp/include/nvhe/memory.h      |  52 +++
- arch/arm64/kvm/hyp/include/nvhe/mm.h          |  92 ++++++
- arch/arm64/kvm/hyp/include/nvhe/spinlock.h    |  92 ++++++
- arch/arm64/kvm/hyp/nvhe/Makefile              |   9 +-
- arch/arm64/kvm/hyp/nvhe/cache.S               |  13 +
- arch/arm64/kvm/hyp/nvhe/cpufeature.c          |   8 +
- arch/arm64/kvm/hyp/nvhe/early_alloc.c         |  54 ++++
- arch/arm64/kvm/hyp/nvhe/hyp-init.S            |  46 ++-
- arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  69 ++++
- arch/arm64/kvm/hyp/nvhe/hyp.lds.S             |   1 +
- arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 235 ++++++++++++++
- arch/arm64/kvm/hyp/nvhe/mm.c                  | 173 ++++++++++
- arch/arm64/kvm/hyp/nvhe/page_alloc.c          | 195 ++++++++++++
- arch/arm64/kvm/hyp/nvhe/psci-relay.c          |   4 +-
- arch/arm64/kvm/hyp/nvhe/setup.c               | 212 +++++++++++++
- arch/arm64/kvm/hyp/nvhe/stub.c                |  22 ++
- arch/arm64/kvm/hyp/nvhe/switch.c              |  12 +-
- arch/arm64/kvm/hyp/nvhe/tlb.c                 |   4 +-
- arch/arm64/kvm/hyp/pgtable.c                  | 298 ++++++++++++++----
- arch/arm64/kvm/hyp/reserved_mem.c             | 113 +++++++
- arch/arm64/kvm/mmu.c                          | 115 ++++++-
- arch/arm64/kvm/perf.c                         |   3 +-
- arch/arm64/kvm/pmu.c                          |   8 +-
- arch/arm64/kvm/reset.c                        |  42 +--
- arch/arm64/kvm/sys_regs.c                     |  21 ++
- arch/arm64/lib/clear_page.S                   |   4 +-
- arch/arm64/lib/copy_page.S                    |   4 +-
- arch/arm64/mm/init.c                          |   3 +
- 47 files changed, 2356 insertions(+), 215 deletions(-)
- create mode 100644 arch/arm64/include/asm/kvm_cpufeature.h
- create mode 100644 arch/arm64/kvm/hyp/include/nvhe/early_alloc.h
- create mode 100644 arch/arm64/kvm/hyp/include/nvhe/gfp.h
- create mode 100644 arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
- create mode 100644 arch/arm64/kvm/hyp/include/nvhe/memory.h
- create mode 100644 arch/arm64/kvm/hyp/include/nvhe/mm.h
- create mode 100644 arch/arm64/kvm/hyp/include/nvhe/spinlock.h
- create mode 100644 arch/arm64/kvm/hyp/nvhe/cache.S
- create mode 100644 arch/arm64/kvm/hyp/nvhe/cpufeature.c
- create mode 100644 arch/arm64/kvm/hyp/nvhe/early_alloc.c
- create mode 100644 arch/arm64/kvm/hyp/nvhe/mem_protect.c
- create mode 100644 arch/arm64/kvm/hyp/nvhe/mm.c
- create mode 100644 arch/arm64/kvm/hyp/nvhe/page_alloc.c
- create mode 100644 arch/arm64/kvm/hyp/nvhe/setup.c
- create mode 100644 arch/arm64/kvm/hyp/nvhe/stub.c
- create mode 100644 arch/arm64/kvm/hyp/reserved_mem.c
-
+diff --git a/arch/arm64/lib/clear_page.S b/arch/arm64/lib/clear_page.S
+index 073acbf02a7c..b84b179edba3 100644
+--- a/arch/arm64/lib/clear_page.S
++++ b/arch/arm64/lib/clear_page.S
+@@ -14,7 +14,7 @@
+  * Parameters:
+  *	x0 - dest
+  */
+-SYM_FUNC_START(clear_page)
++SYM_FUNC_START_PI(clear_page)
+ 	mrs	x1, dczid_el0
+ 	and	w1, w1, #0xf
+ 	mov	x2, #4
+@@ -25,5 +25,5 @@ SYM_FUNC_START(clear_page)
+ 	tst	x0, #(PAGE_SIZE - 1)
+ 	b.ne	1b
+ 	ret
+-SYM_FUNC_END(clear_page)
++SYM_FUNC_END_PI(clear_page)
+ EXPORT_SYMBOL(clear_page)
+diff --git a/arch/arm64/lib/copy_page.S b/arch/arm64/lib/copy_page.S
+index e7a793961408..29144f4cd449 100644
+--- a/arch/arm64/lib/copy_page.S
++++ b/arch/arm64/lib/copy_page.S
+@@ -17,7 +17,7 @@
+  *	x0 - dest
+  *	x1 - src
+  */
+-SYM_FUNC_START(copy_page)
++SYM_FUNC_START_PI(copy_page)
+ alternative_if ARM64_HAS_NO_HW_PREFETCH
+ 	// Prefetch three cache lines ahead.
+ 	prfm	pldl1strm, [x1, #128]
+@@ -75,5 +75,5 @@ alternative_else_nop_endif
+ 	stnp	x16, x17, [x0, #112 - 256]
+ 
+ 	ret
+-SYM_FUNC_END(copy_page)
++SYM_FUNC_END_PI(copy_page)
+ EXPORT_SYMBOL(copy_page)
 -- 
 2.30.1.766.gb4fecdf3b7-goog
 
