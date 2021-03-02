@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CE57C433DB
-	for <kvmarm@archiver.kernel.org>; Tue,  2 Mar 2021 15:01:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 772D4C433DB
+	for <kvmarm@archiver.kernel.org>; Tue,  2 Mar 2021 15:01:18 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0374664F3F
-	for <kvmarm@archiver.kernel.org>; Tue,  2 Mar 2021 15:01:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0374664F3F
+	by mail.kernel.org (Postfix) with ESMTP id 22B3964F3B
+	for <kvmarm@archiver.kernel.org>; Tue,  2 Mar 2021 15:01:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22B3964F3B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C09B4B68D;
-	Tue,  2 Mar 2021 10:01:15 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C5C8D4B684;
+	Tue,  2 Mar 2021 10:01:17 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id n5mDMy3b2om0; Tue,  2 Mar 2021 10:01:14 -0500 (EST)
+	with ESMTP id zOMAVAjiBC31; Tue,  2 Mar 2021 10:01:15 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 674CD4B65C;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 924144B69D;
 	Tue,  2 Mar 2021 10:01:14 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 522F14B654
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Mar 2021 10:01:12 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4FB284B4B9
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Mar 2021 10:01:14 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tlD0fCmNDewk for <kvmarm@lists.cs.columbia.edu>;
- Tue,  2 Mar 2021 10:01:11 -0500 (EST)
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com
- [209.85.128.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E67E74B664
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Mar 2021 10:01:10 -0500 (EST)
-Received: by mail-wm1-f74.google.com with SMTP id s192so1312306wme.6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 02 Mar 2021 07:01:10 -0800 (PST)
+ with ESMTP id JBjISxywGfzn for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  2 Mar 2021 10:01:12 -0500 (EST)
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com
+ [209.85.222.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BE4AA4B68E
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Mar 2021 10:01:12 -0500 (EST)
+Received: by mail-qk1-f201.google.com with SMTP id y79so17051974qka.23
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 02 Mar 2021 07:01:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=sender:date:in-reply-to:message-id:mime-version:references:subject
- :from:to:cc; bh=5Zt+as2f0a/zAo23kFlziOtkEY/5uJ8Xq9YYontT/aE=;
- b=oy/UdeB5LbnLjtFmM/dbYim6mMzp2qHYBSC13VZs9FaJTFSyaT5CDRtQj/Eb4TG+BN
- 0qtiQe0mzOlHVdur176OUctyO9lmahpfO/cGM2Iz8/eLYjlye4xly371PfFUU6L1dmsW
- flOfBgxFPo02Ph1rABAUHRoOy8BisQRcd1qsoH8uwGogHwNT1F7aM+pl3qwYmMwE3rZ9
- EOf4aVi4DTalvrWxvq7Nfmlls3aOTfLbQl8kPnYd+v0IKHNr1fcEHNU1ksLlXUbt8htj
- tPYk6Ic5sJ+UTglqHEL5gmqam/FGCqcrJCZzjWFrHaxx9v8IRAOvLk/SYa3HSSkqCdAe
- wljw==
+ :from:to:cc; bh=Jg5go4Wd5FLiBP8kRkVAj+VGU2ss+/GL7/UumznY/w4=;
+ b=igasOdtuDiqpVcdxAPHRRksVB2sNzpiejUlUsNf4C0NgpeiqQekJZ58+YXImo1MIm2
+ 5YYTVoFeW7pDPidv/lkWDaQcIXzUF81QTEMU6a/9G6agVkO5Cfp9t8ZUQ3iCmwtbbF8u
+ AbzJLyM1T4hyEY24TIEuBOZEWJ2TzZUiKKz1AoRNbzOECeDEc8h/Zy9VQ/IxC6b2AH2D
+ qhE2O02SLEEDvCKhMaFBIb3ATWJZqGsMkTDomc3/9IuCgUgB7c+cBK5Pc9UhpLX0+Zfr
+ A7YX4LyFjSs3l9CLNrJPLho4gyziCvyf+YE1KvJPPWzhKyLcpc0BeT14U4/om7V63hXh
+ bfUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=5Zt+as2f0a/zAo23kFlziOtkEY/5uJ8Xq9YYontT/aE=;
- b=bsc8Ujc95fLUFc14F/TxRvJqiKevCNRqaoKsqGlqu8SN8p20c7MBc8gy93su3NkiWD
- jJwOBdhT9Un144VXkQlP/d2xh2FY4dlkPCW2ylIYDqJYdK3Egi1+GuhW0myoNc8bk8st
- tq+5WYzbhDGelXiR1IbBqqq1lFxh2hnzyNvxRumRdXU4vGQppVCFAYjjiOozKVXiZJ4X
- Y5mg3sShrfgetJ5XyeYYWIT9TR9ZdYuufc8bYcBbuuazxVv/bTWlcf+eJd7BVxhI16Yh
- P8pq+4LS72HY3fYZMwJ10pPIPM7Rs4UU44qJayMJiQStgQ5X1k0Td/DamPAd+yBe3Yao
- wFOw==
-X-Gm-Message-State: AOAM530ZybFUpbJycUH3MfW00566JhGePsmLAckJtMB6Ku17nrgFuKmv
- cB4jHUzlNHa19O0otA0UdVA5hzikWAvH
-X-Google-Smtp-Source: ABdhPJxty67guDux2vyMCWfPogWra+Q8rpbOely2ebtEwkY4f4QkKw5qaFq5tmMfz2TLhcjiBewjHI5nTeut
+ bh=Jg5go4Wd5FLiBP8kRkVAj+VGU2ss+/GL7/UumznY/w4=;
+ b=i3XZgjDLPMMOks3D7I2N+gXXuS0W3gA+eFZaFaWOlhCCRaEkmMJW41brK7esI+pkqj
+ I5oiaQLh1O+1XxauM7/WFsxlpjH0ugCcPljMjP6grXO/pkT/jhDwqNtsq/N15b0vwLyG
+ 05Gc/M5zl5hifKom79YJ0mITz3znxa6HD4SulVQquOFdNaldISHzOtdVoUpQI/EydtIr
+ wQVcIyeY/sAPzH2HFk6vnGtSSwsD4xiW0WUdt3yso9Eil+drORD/WxP+FgjKPI2c/h1O
+ 5hK1+fa96/VpADz5BVqS5vBvZnYzuz+WoBp5xpaxaxvhxQu1ZP1scaG8l12vjVjeOiJ5
+ MF6w==
+X-Gm-Message-State: AOAM530i8sw01nycfo7J7hA7uhkfs6dXyjj8PBCKmfdRhE2MyJJERGO0
+ VFLVnrTXTZ18TCAZ+JPmTX1K7qYKpiQk
+X-Google-Smtp-Source: ABdhPJz808GhNX5vbh3GFCLA3Ox+UkaMCaWk4Ecv3W+FM4bvmylVip7Cm+nrT6lSDce/iZ60Vy1/OZE5f16A
 X-Received: from r2d2-qp.c.googlers.com ([fda3:e722:ac3:10:28:9cb1:c0a8:1652])
- (user=qperret job=sendgmr) by 2002:a05:600c:2254:: with SMTP id
- a20mr4602912wmm.115.1614697269979; Tue, 02 Mar 2021 07:01:09 -0800 (PST)
-Date: Tue,  2 Mar 2021 14:59:58 +0000
+ (user=qperret job=sendgmr) by 2002:a0c:fd47:: with SMTP id
+ j7mr3869257qvs.22.1614697272185; Tue, 02 Mar 2021 07:01:12 -0800 (PST)
+Date: Tue,  2 Mar 2021 14:59:59 +0000
 In-Reply-To: <20210302150002.3685113-1-qperret@google.com>
-Message-Id: <20210302150002.3685113-29-qperret@google.com>
+Message-Id: <20210302150002.3685113-30-qperret@google.com>
 Mime-Version: 1.0
 References: <20210302150002.3685113-1-qperret@google.com>
 X-Mailer: git-send-email 2.30.1.766.gb4fecdf3b7-goog
-Subject: [PATCH v3 28/32] KVM: arm64: Add kvm_pgtable_stage2_idmap_greedy()
+Subject: [PATCH v3 29/32] KVM: arm64: Wrap the host with a stage 2
 From: Quentin Perret <qperret@google.com>
 To: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org, 
  james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
@@ -97,202 +97,492 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add a new map function to the KVM page-table library that allows to
-greedily create block identity-mappings. This will be useful to create
-lazily the host stage 2 page-table as it will own most of memory and
-will always be identity mapped.
+When KVM runs in protected nVHE mode, make use of a stage 2 page-table
+to give the hypervisor some control over the host memory accesses. The
+host stage 2 is created lazily using large block mappings if possible,
+and will default to page mappings in absence of a better solution.
 
-The new helper function creates the mapping in 2 steps: it first walks
-the page-table to compute the largest possible granule that can be used
-to idmap a given address without overriding existing incompatible
-mappings; and then creates a mapping accordingly.
+From this point on, memory accesses from the host to protected memory
+regions (e.g. marked PROT_NONE) are fatal and lead to hyp_panic().
 
 Signed-off-by: Quentin Perret <qperret@google.com>
 ---
- arch/arm64/include/asm/kvm_pgtable.h |  37 +++++++++
- arch/arm64/kvm/hyp/pgtable.c         | 119 +++++++++++++++++++++++++++
- 2 files changed, 156 insertions(+)
+ arch/arm64/include/asm/kvm_asm.h              |   1 +
+ arch/arm64/include/asm/kvm_cpufeature.h       |   2 +
+ arch/arm64/kernel/image-vars.h                |   3 +
+ arch/arm64/kvm/arm.c                          |  10 +
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  34 +++
+ arch/arm64/kvm/hyp/nvhe/Makefile              |   2 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S            |   1 +
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  11 +
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 213 ++++++++++++++++++
+ arch/arm64/kvm/hyp/nvhe/setup.c               |   5 +
+ arch/arm64/kvm/hyp/nvhe/switch.c              |   7 +-
+ arch/arm64/kvm/hyp/nvhe/tlb.c                 |   4 +-
+ 12 files changed, 286 insertions(+), 7 deletions(-)
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/mem_protect.c
 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index c9f6ed76e0ad..e51dcce69a5e 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -96,6 +96,16 @@ enum kvm_pgtable_prot {
- #define PAGE_HYP_RO		(KVM_PGTABLE_PROT_R)
- #define PAGE_HYP_DEVICE		(PAGE_HYP | KVM_PGTABLE_PROT_DEVICE)
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index 6dce860f8bca..b127af02bd45 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -61,6 +61,7 @@
+ #define __KVM_HOST_SMCCC_FUNC___pkvm_create_mappings		16
+ #define __KVM_HOST_SMCCC_FUNC___pkvm_create_private_mapping	17
+ #define __KVM_HOST_SMCCC_FUNC___pkvm_cpu_set_vector		18
++#define __KVM_HOST_SMCCC_FUNC___pkvm_prot_finalize		19
  
-+/**
-+ * struct kvm_mem_range - Range of Intermediate Physical Addresses
-+ * @start:	Start of the range.
-+ * @end:	End of the range.
-+ */
-+struct kvm_mem_range {
-+	u64 start;
-+	u64 end;
-+};
+ #ifndef __ASSEMBLY__
+ 
+diff --git a/arch/arm64/include/asm/kvm_cpufeature.h b/arch/arm64/include/asm/kvm_cpufeature.h
+index d34f85cba358..74043a149322 100644
+--- a/arch/arm64/include/asm/kvm_cpufeature.h
++++ b/arch/arm64/include/asm/kvm_cpufeature.h
+@@ -15,3 +15,5 @@
+ #endif
+ 
+ KVM_HYP_CPU_FTR_REG(SYS_CTR_EL0, arm64_ftr_reg_ctrel0)
++KVM_HYP_CPU_FTR_REG(SYS_ID_AA64MMFR0_EL1, arm64_ftr_reg_id_aa64mmfr0_el1)
++KVM_HYP_CPU_FTR_REG(SYS_ID_AA64MMFR1_EL1, arm64_ftr_reg_id_aa64mmfr1_el1)
+diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
+index 940c378fa837..d5dc2b792651 100644
+--- a/arch/arm64/kernel/image-vars.h
++++ b/arch/arm64/kernel/image-vars.h
+@@ -131,6 +131,9 @@ KVM_NVHE_ALIAS(__hyp_bss_end);
+ KVM_NVHE_ALIAS(__hyp_rodata_start);
+ KVM_NVHE_ALIAS(__hyp_rodata_end);
+ 
++/* pKVM static key */
++KVM_NVHE_ALIAS(kvm_protected_mode_initialized);
 +
- /**
-  * enum kvm_pgtable_walk_flags - Flags to control a depth-first page-table walk.
-  * @KVM_PGTABLE_WALK_LEAF:		Visit leaf entries, including invalid
-@@ -379,4 +389,31 @@ int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size);
- int kvm_pgtable_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 		     struct kvm_pgtable_walker *walker);
+ #endif /* CONFIG_KVM */
  
-+/**
-+ * kvm_pgtable_stage2_idmap_greedy() - Identity-map an Intermediate Physical
-+ *				       Address with a leaf entry at the highest
-+ *				       possible level.
-+ * @pgt:	Page-table structure initialised by kvm_pgtable_*_init().
-+ * @addr:	Input address to identity-map.
-+ * @prot:	Permissions and attributes for the mapping.
-+ * @range:	Boundaries of the maximum memory region to map.
-+ * @mc:		Cache of pre-allocated memory from which to allocate page-table
-+ *		pages.
-+ *
-+ * This function attempts to install high-level identity-mappings covering @addr
-+ * without overriding existing mappings with incompatible permissions or
-+ * attributes. An existing table entry may be coalesced into a block mapping
-+ * if and only if it covers @addr and all its leafs are either invalid and/or
-+ * have permissions and attributes strictly matching @prot. The mapping is
-+ * guaranteed to be contained within the boundaries specified by @range at call
-+ * time. If only a subset of the memory specified by @range is mapped (because
-+ * of e.g. alignment issues or existing incompatible mappings), @range will be
-+ * updated accordingly.
-+ *
-+ * Return: 0 on success, negative error code on failure.
-+ */
-+int kvm_pgtable_stage2_idmap_greedy(struct kvm_pgtable *pgt, u64 addr,
-+				    enum kvm_pgtable_prot prot,
-+				    struct kvm_mem_range *range,
-+				    void *mc);
- #endif	/* __ARM64_KVM_PGTABLE_H__ */
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 8aa01a9e2603..6897d771e2b2 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -987,3 +987,122 @@ void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt)
- 	pgt->mm_ops->free_pages_exact(pgt->pgd, pgd_sz);
- 	pgt->pgd = NULL;
+ #endif /* __ARM64_KERNEL_IMAGE_VARS_H */
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index b6a818f88051..a31c56bc55b3 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1889,12 +1889,22 @@ static int init_hyp_mode(void)
+ 	return err;
  }
-+
-+struct stage2_reduce_range_data {
-+	kvm_pte_t attr;
-+	u64 target_addr;
-+	u32 start_level;
-+	struct kvm_mem_range *range;
-+};
-+
-+static int __stage2_reduce_range(struct stage2_reduce_range_data *data, u64 addr)
+ 
++void _kvm_host_prot_finalize(void *discard)
 +{
-+	u32 level = data->start_level;
++	WARN_ON(kvm_call_hyp_nvhe(__pkvm_prot_finalize));
++}
 +
-+	for (; level < KVM_PGTABLE_MAX_LEVELS; level++) {
-+		u64 granule = kvm_granule_size(level);
-+		u64 start = ALIGN_DOWN(data->target_addr, granule);
-+		u64 end = start + granule;
+ static int finalize_hyp_mode(void)
+ {
+ 	if (!is_protected_kvm_enabled())
+ 		return 0;
+ 
++	/*
++	 * Flip the static key upfront as that may no longer be possible
++	 * once the host stage 2 is installed.
++	 */
+ 	static_branch_enable(&kvm_protected_mode_initialized);
++	on_each_cpu(_kvm_host_prot_finalize, NULL, 1);
+ 
+ 	return 0;
+ }
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+new file mode 100644
+index 000000000000..d293cb328cc4
+--- /dev/null
++++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+@@ -0,0 +1,34 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright (C) 2020 Google LLC
++ * Author: Quentin Perret <qperret@google.com>
++ */
 +
-+		/*
-+		 * The pinned address is in the current range, try one level
-+		 * deeper.
-+		 */
-+		if (start == ALIGN_DOWN(addr, granule))
-+			continue;
++#ifndef __KVM_NVHE_MEM_PROTECT__
++#define __KVM_NVHE_MEM_PROTECT__
++#include <linux/kvm_host.h>
++#include <asm/kvm_hyp.h>
++#include <asm/kvm_pgtable.h>
++#include <asm/virt.h>
++#include <nvhe/spinlock.h>
 +
-+		/*
-+		 * Make sure the current range is a reduction of the existing
-+		 * range before updating it.
-+		 */
-+		if (data->range->start <= start && end <= data->range->end) {
-+			data->start_level = level;
-+			data->range->start = start;
-+			data->range->end = end;
-+			return 0;
++struct host_kvm {
++	struct kvm_arch arch;
++	struct kvm_pgtable pgt;
++	struct kvm_pgtable_mm_ops mm_ops;
++	hyp_spinlock_t lock;
++};
++extern struct host_kvm host_kvm;
++
++int __pkvm_prot_finalize(void);
++int kvm_host_prepare_stage2(void *mem_pgt_pool, void *dev_pgt_pool);
++void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt);
++
++static __always_inline void __load_host_stage2(void)
++{
++	if (static_branch_likely(&kvm_protected_mode_initialized))
++		__load_stage2(&host_kvm.arch.mmu, host_kvm.arch.vtcr);
++	else
++		write_sysreg(0, vttbr_el2);
++}
++#endif /* __KVM_NVHE_MEM_PROTECT__ */
+diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+index e204ea77ab27..ce49795324a7 100644
+--- a/arch/arm64/kvm/hyp/nvhe/Makefile
++++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+@@ -14,7 +14,7 @@ lib-objs := $(addprefix ../../../lib/, $(lib-objs))
+ 
+ obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o \
+ 	 hyp-main.o hyp-smp.o psci-relay.o early_alloc.o stub.o page_alloc.o \
+-	 cache.o cpufeature.o setup.o mm.o
++	 cache.o cpufeature.o setup.o mm.o mem_protect.o
+ obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
+ 	 ../fpsimd.o ../hyp-entry.o ../exception.o ../pgtable.o
+ obj-y += $(lib-objs)
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+index f312672d895e..6fa01b04954f 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+@@ -119,6 +119,7 @@ alternative_else_nop_endif
+ 
+ 	/* Invalidate the stale TLBs from Bootloader */
+ 	tlbi	alle2
++	tlbi	vmalls12e1
+ 	dsb	sy
+ 
+ 	/*
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index ae6503c9be15..f47028d3fd0a 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -13,6 +13,7 @@
+ #include <asm/kvm_hyp.h>
+ #include <asm/kvm_mmu.h>
+ 
++#include <nvhe/mem_protect.h>
+ #include <nvhe/mm.h>
+ #include <nvhe/trap_handler.h>
+ 
+@@ -151,6 +152,10 @@ static void handle___pkvm_create_private_mapping(struct kvm_cpu_context *host_ct
+ 	cpu_reg(host_ctxt, 1) = __pkvm_create_private_mapping(phys, size, prot);
+ }
+ 
++static void handle___pkvm_prot_finalize(struct kvm_cpu_context *host_ctxt)
++{
++	cpu_reg(host_ctxt, 1) = __pkvm_prot_finalize();
++}
+ typedef void (*hcall_t)(struct kvm_cpu_context *);
+ 
+ #define HANDLE_FUNC(x)	[__KVM_HOST_SMCCC_FUNC_##x] = (hcall_t)handle_##x
+@@ -174,6 +179,7 @@ static const hcall_t host_hcall[] = {
+ 	HANDLE_FUNC(__pkvm_cpu_set_vector),
+ 	HANDLE_FUNC(__pkvm_create_mappings),
+ 	HANDLE_FUNC(__pkvm_create_private_mapping),
++	HANDLE_FUNC(__pkvm_prot_finalize),
+ };
+ 
+ static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
+@@ -226,6 +232,11 @@ void handle_trap(struct kvm_cpu_context *host_ctxt)
+ 	case ESR_ELx_EC_SMC64:
+ 		handle_host_smc(host_ctxt);
+ 		break;
++	case ESR_ELx_EC_IABT_LOW:
++		fallthrough;
++	case ESR_ELx_EC_DABT_LOW:
++		handle_host_mem_abort(host_ctxt);
++		break;
+ 	default:
+ 		hyp_panic();
+ 	}
+diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+new file mode 100644
+index 000000000000..2252ad1a8945
+--- /dev/null
++++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+@@ -0,0 +1,213 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright (C) 2020 Google LLC
++ * Author: Quentin Perret <qperret@google.com>
++ */
++
++#include <linux/kvm_host.h>
++#include <asm/kvm_cpufeature.h>
++#include <asm/kvm_emulate.h>
++#include <asm/kvm_hyp.h>
++#include <asm/kvm_mmu.h>
++#include <asm/kvm_pgtable.h>
++#include <asm/stage2_pgtable.h>
++
++#include <hyp/switch.h>
++
++#include <nvhe/gfp.h>
++#include <nvhe/memory.h>
++#include <nvhe/mem_protect.h>
++#include <nvhe/mm.h>
++
++extern unsigned long hyp_nr_cpus;
++struct host_kvm host_kvm;
++
++struct hyp_pool host_s2_mem;
++struct hyp_pool host_s2_dev;
++
++static void *host_s2_zalloc_pages_exact(size_t size)
++{
++	return hyp_alloc_pages(&host_s2_mem, get_order(size));
++}
++
++static void *host_s2_zalloc_page(void *pool)
++{
++	return hyp_alloc_pages(pool, 0);
++}
++
++static int prepare_s2_pools(void *mem_pgt_pool, void *dev_pgt_pool)
++{
++	unsigned long nr_pages, pfn;
++	int ret;
++
++	pfn = hyp_virt_to_pfn(mem_pgt_pool);
++	nr_pages = host_s2_mem_pgtable_pages();
++	ret = hyp_pool_init(&host_s2_mem, pfn, nr_pages, 0);
++	if (ret)
++		return ret;
++
++	pfn = hyp_virt_to_pfn(dev_pgt_pool);
++	nr_pages = host_s2_dev_pgtable_pages();
++	ret = hyp_pool_init(&host_s2_dev, pfn, nr_pages, 0);
++	if (ret)
++		return ret;
++
++	host_kvm.mm_ops.zalloc_pages_exact = host_s2_zalloc_pages_exact;
++	host_kvm.mm_ops.zalloc_page = host_s2_zalloc_page;
++	host_kvm.mm_ops.phys_to_virt = hyp_phys_to_virt;
++	host_kvm.mm_ops.virt_to_phys = hyp_virt_to_phys;
++	host_kvm.mm_ops.page_count = hyp_page_count;
++	host_kvm.mm_ops.get_page = hyp_get_page;
++	host_kvm.mm_ops.put_page = hyp_put_page;
++
++	return 0;
++}
++
++static void prepare_host_vtcr(void)
++{
++	u32 parange, phys_shift;
++	u64 mmfr0, mmfr1;
++
++	mmfr0 = arm64_ftr_reg_id_aa64mmfr0_el1.sys_val;
++	mmfr1 = arm64_ftr_reg_id_aa64mmfr1_el1.sys_val;
++
++	/* The host stage 2 is id-mapped, so use parange for T0SZ */
++	parange = kvm_get_parange(mmfr0);
++	phys_shift = id_aa64mmfr0_parange_to_phys_shift(parange);
++
++	host_kvm.arch.vtcr = kvm_get_vtcr(mmfr0, mmfr1, phys_shift);
++}
++
++int kvm_host_prepare_stage2(void *mem_pgt_pool, void *dev_pgt_pool)
++{
++	struct kvm_s2_mmu *mmu = &host_kvm.arch.mmu;
++	int ret;
++
++	prepare_host_vtcr();
++	hyp_spin_lock_init(&host_kvm.lock);
++
++	ret = prepare_s2_pools(mem_pgt_pool, dev_pgt_pool);
++	if (ret)
++		return ret;
++
++	ret = kvm_pgtable_stage2_init(&host_kvm.pgt, &host_kvm.arch,
++				      &host_kvm.mm_ops);
++	if (ret)
++		return ret;
++
++	mmu->pgd_phys = __hyp_pa(host_kvm.pgt.pgd);
++	mmu->arch = &host_kvm.arch;
++	mmu->pgt = &host_kvm.pgt;
++	mmu->vmid.vmid_gen = 0;
++	mmu->vmid.vmid = 0;
++
++	return 0;
++}
++
++int __pkvm_prot_finalize(void)
++{
++	struct kvm_s2_mmu *mmu = &host_kvm.arch.mmu;
++	struct kvm_nvhe_init_params *params = this_cpu_ptr(&kvm_init_params);
++
++	params->vttbr = kvm_get_vttbr(mmu);
++	params->vtcr = host_kvm.arch.vtcr;
++	params->hcr_el2 |= HCR_VM;
++	if (cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
++		params->hcr_el2 |= HCR_FWB;
++	kvm_flush_dcache_to_poc(params, sizeof(*params));
++
++	write_sysreg(params->hcr_el2, hcr_el2);
++	__load_stage2(&host_kvm.arch.mmu, host_kvm.arch.vtcr);
++
++	__tlbi(vmalls12e1is);
++	dsb(ish);
++	isb();
++
++	return 0;
++}
++
++static void host_stage2_unmap_dev_all(void)
++{
++	struct kvm_pgtable *pgt = &host_kvm.pgt;
++	struct memblock_region *reg;
++	u64 addr = 0;
++	int i;
++
++	/* Unmap all non-memory regions to recycle the pages */
++	for (i = 0; i < hyp_memblock_nr; i++, addr = reg->base + reg->size) {
++		reg = &hyp_memory[i];
++		kvm_pgtable_stage2_unmap(pgt, addr, reg->base - addr);
++	}
++	kvm_pgtable_stage2_unmap(pgt, addr, ULONG_MAX);
++}
++
++static bool find_mem_range(phys_addr_t addr, struct kvm_mem_range *range)
++{
++	int cur, left = 0, right = hyp_memblock_nr;
++	struct memblock_region *reg;
++	phys_addr_t end;
++
++	range->start = 0;
++	range->end = ULONG_MAX;
++
++	/* The list of memblock regions is sorted, binary search it */
++	while (left < right) {
++		cur = (left + right) >> 1;
++		reg = &hyp_memory[cur];
++		end = reg->base + reg->size;
++		if (addr < reg->base) {
++			right = cur;
++			range->end = reg->base;
++		} else if (addr >= end) {
++			left = cur + 1;
++			range->start = end;
++		} else {
++			range->start = reg->base;
++			range->end = end;
++			return true;
 +		}
 +	}
 +
-+	return -EINVAL;
++	return false;
 +}
 +
-+#define KVM_PTE_LEAF_S2_COMPAT_MASK	(KVM_PTE_LEAF_ATTR_S2_PERMS | \
-+					 KVM_PTE_LEAF_ATTR_LO_S2_MEMATTR | \
-+					 KVM_PTE_LEAF_SW_BIT_PROT_NONE)
-+
-+static int stage2_reduce_range_walker(u64 addr, u64 end, u32 level,
-+				      kvm_pte_t *ptep,
-+				      enum kvm_pgtable_walk_flags flag,
-+				      void * const arg)
++static int host_stage2_idmap(u64 addr)
 +{
-+	struct stage2_reduce_range_data *data = arg;
-+	kvm_pte_t attr;
++	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R | KVM_PGTABLE_PROT_W;
++	struct kvm_mem_range range;
++	bool is_memory = find_mem_range(addr, &range);
++	struct hyp_pool *pool = is_memory ? &host_s2_mem : &host_s2_dev;
 +	int ret;
 +
-+	if (addr < data->range->start || addr >= data->range->end)
-+		return 0;
++	if (is_memory)
++		prot |= KVM_PGTABLE_PROT_X;
 +
-+	attr = *ptep & KVM_PTE_LEAF_S2_COMPAT_MASK;
-+	if (!attr || attr == data->attr)
-+		return 0;
-+
-+	/*
-+	 * An existing mapping with incompatible protection attributes is
-+	 * 'pinned', so reduce the range if we hit one.
-+	 */
-+	ret = __stage2_reduce_range(data, addr);
-+	if (ret)
-+		return ret;
-+
-+	return -EAGAIN;
-+}
-+
-+static int stage2_reduce_range(struct kvm_pgtable *pgt, u64 addr,
-+			       enum kvm_pgtable_prot prot,
-+			       struct kvm_mem_range *range)
-+{
-+	struct stage2_reduce_range_data data = {
-+		.start_level	= pgt->start_level,
-+		.range		= range,
-+		.target_addr	= addr,
-+	};
-+	struct kvm_pgtable_walker walker = {
-+		.cb		= stage2_reduce_range_walker,
-+		.flags		= KVM_PGTABLE_WALK_LEAF,
-+		.arg		= &data,
-+	};
-+	int ret;
-+
-+	data.attr = stage2_get_prot_attr(prot) & KVM_PTE_LEAF_S2_COMPAT_MASK;
-+	if (!data.attr)
-+		return -EINVAL;
-+
-+	/* Reduce the kvm_mem_range to a granule size */
-+	ret = __stage2_reduce_range(&data, range->end);
-+	if (ret)
-+		return ret;
-+
-+	/* Walk the range to check permissions and reduce further if needed */
-+	do {
-+		ret = kvm_pgtable_walk(pgt, range->start, range->end, &walker);
-+	} while (ret == -EAGAIN);
++	hyp_spin_lock(&host_kvm.lock);
++	ret = kvm_pgtable_stage2_idmap_greedy(&host_kvm.pgt, addr, prot,
++					      &range, pool);
++	if (is_memory || ret != -ENOMEM)
++		goto unlock;
++	host_stage2_unmap_dev_all();
++	ret = kvm_pgtable_stage2_idmap_greedy(&host_kvm.pgt, addr, prot,
++					      &range, pool);
++unlock:
++	hyp_spin_unlock(&host_kvm.lock);
 +
 +	return ret;
 +}
 +
-+int kvm_pgtable_stage2_idmap_greedy(struct kvm_pgtable *pgt, u64 addr,
-+				    enum kvm_pgtable_prot prot,
-+				    struct kvm_mem_range *range,
-+				    void *mc)
++void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt)
 +{
-+	u64 size;
-+	int ret;
++	struct kvm_vcpu_fault_info fault;
++	u64 esr, addr;
++	int ret = 0;
 +
-+	ret = stage2_reduce_range(pgt, addr, prot, range);
-+	if (ret)
-+		return ret;
++	esr = read_sysreg_el2(SYS_ESR);
++	if (!__get_fault_info(esr, &fault))
++		hyp_panic();
 +
-+	size = range->end - range->start;
-+	return kvm_pgtable_stage2_map(pgt, range->start, size, range->start,
-+				      prot, mc);
++	addr = (fault.hpfar_el2 & HPFAR_MASK) << 8;
++	ret = host_stage2_idmap(addr);
++	if (ret && ret != -EAGAIN)
++		hyp_panic();
 +}
+diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+index 7e923b25271c..94b9f14491f9 100644
+--- a/arch/arm64/kvm/hyp/nvhe/setup.c
++++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+@@ -12,6 +12,7 @@
+ #include <nvhe/early_alloc.h>
+ #include <nvhe/gfp.h>
+ #include <nvhe/memory.h>
++#include <nvhe/mem_protect.h>
+ #include <nvhe/mm.h>
+ #include <nvhe/trap_handler.h>
+ 
+@@ -157,6 +158,10 @@ void __noreturn __pkvm_init_finalise(void)
+ 	if (ret)
+ 		goto out;
+ 
++	ret = kvm_host_prepare_stage2(host_s2_mem_pgt_base, host_s2_dev_pgt_base);
++	if (ret)
++		goto out;
++
+ 	pkvm_pgtable_mm_ops.zalloc_page = hyp_zalloc_hyp_page;
+ 	pkvm_pgtable_mm_ops.phys_to_virt = hyp_phys_to_virt;
+ 	pkvm_pgtable_mm_ops.virt_to_phys = hyp_virt_to_phys;
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index 979a76cdf9fb..31bc1a843bf8 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -28,6 +28,8 @@
+ #include <asm/processor.h>
+ #include <asm/thread_info.h>
+ 
++#include <nvhe/mem_protect.h>
++
+ /* Non-VHE specific context */
+ DEFINE_PER_CPU(struct kvm_host_data, kvm_host_data);
+ DEFINE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
+@@ -102,11 +104,6 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
+ 	write_sysreg(__kvm_hyp_host_vector, vbar_el2);
+ }
+ 
+-static void __load_host_stage2(void)
+-{
+-	write_sysreg(0, vttbr_el2);
+-}
+-
+ /* Save VGICv3 state on non-VHE systems */
+ static void __hyp_vgic_save_state(struct kvm_vcpu *vcpu)
+ {
+diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
+index fbde89a2c6e8..255a23a1b2db 100644
+--- a/arch/arm64/kvm/hyp/nvhe/tlb.c
++++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
+@@ -8,6 +8,8 @@
+ #include <asm/kvm_mmu.h>
+ #include <asm/tlbflush.h>
+ 
++#include <nvhe/mem_protect.h>
++
+ struct tlb_inv_context {
+ 	u64		tcr;
+ };
+@@ -43,7 +45,7 @@ static void __tlb_switch_to_guest(struct kvm_s2_mmu *mmu,
+ 
+ static void __tlb_switch_to_host(struct tlb_inv_context *cxt)
+ {
+-	write_sysreg(0, vttbr_el2);
++	__load_host_stage2();
+ 
+ 	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
+ 		/* Ensure write of the host VMID */
 -- 
 2.30.1.766.gb4fecdf3b7-goog
 
