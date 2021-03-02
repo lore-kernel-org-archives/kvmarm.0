@@ -2,68 +2,83 @@ Return-Path: <SRS0=a/wb=IA=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-20.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9238CC433E0
-	for <kvmarm@archiver.kernel.org>; Tue,  2 Mar 2021 12:19:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ECC8C433DB
+	for <kvmarm@archiver.kernel.org>; Tue,  2 Mar 2021 15:00:13 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CD08264F62
-	for <kvmarm@archiver.kernel.org>; Tue,  2 Mar 2021 12:19:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD08264F62
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 74F6C64F39
+	for <kvmarm@archiver.kernel.org>; Tue,  2 Mar 2021 15:00:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74F6C64F39
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2708C4B520;
-	Tue,  2 Mar 2021 07:19:28 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EA3404B632;
+	Tue,  2 Mar 2021 10:00:11 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id zTxqqp9PKqaA; Tue,  2 Mar 2021 07:19:26 -0500 (EST)
+	with ESMTP id yt+vl-jmmzha; Tue,  2 Mar 2021 10:00:10 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D31A64B2D4;
-	Tue,  2 Mar 2021 07:19:26 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 79DBE4B646;
+	Tue,  2 Mar 2021 10:00:10 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CEEF84B2B1
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Mar 2021 07:19:25 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E7774B63C
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Mar 2021 10:00:09 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cnQ46ijuW93D for <kvmarm@lists.cs.columbia.edu>;
- Tue,  2 Mar 2021 07:19:22 -0500 (EST)
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 568494B2B0
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Mar 2021 07:19:22 -0500 (EST)
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.58])
- by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Dqbjs4k32zjVL7;
- Tue,  2 Mar 2021 20:17:37 +0800 (CST)
-Received: from [10.174.184.42] (10.174.184.42) by
- DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
- 14.3.498.0; Tue, 2 Mar 2021 20:19:09 +0800
-Subject: Re: [RFC PATCH] kvm: arm64: Try stage2 block mapping for host device
- MMIO
-To: Marc Zyngier <maz@kernel.org>
-References: <20210122083650.21812-1-zhukeqian1@huawei.com>
- <09d89355cdbbd19c456699774a9a980a@kernel.org>
- <e4836dbc-4f7f-15fe-7b2c-e70bd2909bb7@huawei.com>
-From: Keqian Zhu <zhukeqian1@huawei.com>
-Message-ID: <8fda1c07-7f6e-065b-c3a1-5f6fa1aeb316@huawei.com>
-Date: Tue, 2 Mar 2021 20:19:09 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
-MIME-Version: 1.0
-In-Reply-To: <e4836dbc-4f7f-15fe-7b2c-e70bd2909bb7@huawei.com>
-X-Originating-IP: [10.174.184.42]
-X-CFilter-Loop: Reflected
-Cc: Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org,
- Catalin Marinas <catalin.marinas@arm.com>, Joerg Roedel <joro@8bytes.org>,
- Daniel Lezcano <daniel.lezcano@linaro.org>, linux-kernel@vger.kernel.org,
- Alexios Zavras <alexios.zavras@intel.com>,
- Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- Robin Murphy <robin.murphy@arm.com>
+ with ESMTP id jon2Sr9LM2+E for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  2 Mar 2021 10:00:07 -0500 (EST)
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com
+ [209.85.221.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 86F414B62B
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Mar 2021 10:00:07 -0500 (EST)
+Received: by mail-wr1-f73.google.com with SMTP id z6so2518030wrh.11
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 02 Mar 2021 07:00:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=sender:date:message-id:mime-version:subject:from:to:cc;
+ bh=8cdx2cy8bS1Yk1hOvoxJoIxgvMKS4vuWA9cIA1RP624=;
+ b=YjzVe3TPmAvkQCDj/HWux0EV0FszWglzZrY/X7sQ4PP1pehQ7BRIGiVyN3MLlMr3li
+ huvMmx5Y3nArbKhf91/o25rYsgIu4x+kp2oJMolgK94RuxqGkONc30xK6IKkPeKdw+az
+ 7Vctx4VxHYaXaENho0mlZ7QiMu85gh+Sh420ulaF3seaMGn2jIvBd8X8e+MqGmxTd2M6
+ 1X5vt1fRx59Pb9zdTuS+WO8mkN0JUh4Cwzw9IM1gJ8xOhx9fWpOVEMqhRoA6KH8bDNf6
+ 983WHMNuHeka5//hhYLYRrnsFZTkhhkGTnt5avmFO0K6/pTikDHYzM+l7KGykdTBPC8e
+ FkSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
+ :to:cc;
+ bh=8cdx2cy8bS1Yk1hOvoxJoIxgvMKS4vuWA9cIA1RP624=;
+ b=HR9ZeKZ/kNPBkorfpdER2aBGskeij5yvBbBM2jiGDrgauQXBpjLh2OVzAQJ5ajHnqn
+ pHzbORgQIYLKQbp8Ikeh42Uyzz6JC8zPDfac5Rq5A44y1TtIand1vlP8gjQxgYLdf8J2
+ RSBtw4poxuirXxSw1iQ0/vKjnQEVbG8wDkph1XERNUkh6hO7SYt75MqzngtWvW6bKlov
+ 8mZZiCOvOhWZm+U03zBuuz+Ig9P/4wVeqhTD6PufEhw6LBxY8c1Ke2DM4yooN8IujEgj
+ bvF1Nl0WuyFsVAhUGleX7MOaxO+VD1Yf7EcmUSYVuQmCg9DTzUdQileGh1hUn/ZvwNDU
+ Yd0A==
+X-Gm-Message-State: AOAM533VQTBFTVSTamWg5Rtf51hIlk3sWC/cy9ac4dWgB1U2WZ2ipxCF
+ hGiomyW7tjJ6m2JK5da4UrPoJJvVyiJa
+X-Google-Smtp-Source: ABdhPJwDCkMLeCoT4sUtiPOZrUAgJEKZ4OzzcKOcwzE3U3mmOILtARNPs12yHIt3Rzw7l59VN19/YF8Gf5Xv
+X-Received: from r2d2-qp.c.googlers.com ([fda3:e722:ac3:10:28:9cb1:c0a8:1652])
+ (user=qperret job=sendgmr) by 2002:a1c:f006:: with SMTP id
+ a6mr4583157wmb.166.1614697206272; Tue, 02 Mar 2021 07:00:06 -0800 (PST)
+Date: Tue,  2 Mar 2021 14:59:30 +0000
+Message-Id: <20210302150002.3685113-1-qperret@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.30.1.766.gb4fecdf3b7-goog
+Subject: [PATCH v3 00/32] KVM: arm64: A stage 2 for the host
+From: Quentin Perret <qperret@google.com>
+To: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org, 
+ james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
+Cc: android-kvm@google.com, seanjc@google.com, mate.toth-pal@arm.com,
+ linux-kernel@vger.kernel.org, robh+dt@kernel.org,
+ linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
+ kvmarm@lists.cs.columbia.edu, tabba@google.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -75,134 +90,169 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SGkgTWFyYywKCkRvIHlvdSBoYXZlIGZ1cnRoZXIgc3VnZ2VzdGlvbiBvbiB0aGlzPyBCbG9jayBt
-YXBwaW5nIGRvIGJyaW5nIG9idmlvdXMgYmVuZWZpdC4KClRoYW5rcywKS2VxaWFuCgpPbiAyMDIx
-LzEvMjUgMTk6MjUsIEtlcWlhbiBaaHUgd3JvdGU6Cj4gSGkgTWFyYywKPiAKPiBPbiAyMDIxLzEv
-MjIgMTc6NDUsIE1hcmMgWnluZ2llciB3cm90ZToKPj4gT24gMjAyMS0wMS0yMiAwODozNiwgS2Vx
-aWFuIFpodSB3cm90ZToKPj4+IFRoZSBNTUlPIHJlZ2lvbiBvZiBhIGRldmljZSBtYXliZSBodWdl
-IChHQiBsZXZlbCksIHRyeSB0byB1c2UgYmxvY2sKPj4+IG1hcHBpbmcgaW4gc3RhZ2UyIHRvIHNw
-ZWVkdXAgYm90aCBtYXAgYW5kIHVubWFwLgo+Pj4KPj4+IEVzcGVjaWFsbHkgZm9yIHVubWFwLCBp
-dCBwZXJmb3JtcyBUTEJJIHJpZ2h0IGFmdGVyIGVhY2ggaW52YWxpZGF0aW9uCj4+PiBvZiBQVEUu
-IElmIGFsbCBtYXBwaW5nIGlzIG9mIFBBR0VfU0laRSwgaXQgdGFrZXMgbXVjaCB0aW1lIHRvIGhh
-bmRsZQo+Pj4gR0IgbGV2ZWwgcmFuZ2UuCj4+Cj4+IFRoaXMgaXMgb25seSBvbiBWTSB0ZWFyZG93
-biwgcmlnaHQ/IE9yIGRvIHlvdSB1bm1hcCB0aGUgZGV2aWNlIG1vcmUgb2ZldD8KPj4gQ2FuIHlv
-dSBwbGVhc2UgcXVhbnRpZnkgdGhlIHNwZWVkdXAgYW5kIHRoZSBjb25kaXRpb25zIHRoaXMgb2Nj
-dXJzIGluPwo+IAo+IFllcywgYW5kIHRoZXJlIGFyZSBzb21lIG90aGVyIHBhdGhzIChpbmNsdWRl
-cyB3aGF0IHlvdXIgcGF0Y2ggc2VyaWVzIGhhbmRsZXMpIHdpbGwgZG8gdGhlIHVubWFwIGFjdGlv
-bjoKPiAKPiAx44CBZ3Vlc3QgcmVib290IHdpdGhvdXQgUzJGV0I6IHN0YWdlMl91bm1hcF92be+8
-iO+8iXdoaWNoIG9ubHkgdW5tYXBzIGd1ZXN0IHJlZ3VsYXIgUkFNLgo+IDLjgIF1c2Vyc3BhY2Ug
-ZGVsZXRlcyBtZW1zbG90OiBrdm1fYXJjaF9mbHVzaF9zaGFkb3dfbWVtc2xvdCgpLgo+IDPjgIFy
-b2xsYmFjayBvZiBkZXZpY2UgTU1JTyBtYXBwaW5nOiBrdm1fYXJjaF9wcmVwYXJlX21lbW9yeV9y
-ZWdpb24oKS4KPiA044CBcm9sbGJhY2sgb2YgZGlydHkgbG9nIHRyYWNraW5nOiBJZiB3ZSBlbmFi
-bGUgaHVnZXBhZ2UgZm9yIGd1ZXN0IFJBTSwgYWZ0ZXIgZGlydHkgbG9nIGlzIHN0b3BwZWQsCj4g
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB0aGUgbmV3bHkgY3JlYXRlZCBibG9j
-ayBtYXBwaW5ncyB3aWxsIHVubWFwIGFsbCBwYWdlIG1hcHBpbmdzLgo+IDXjgIFtbXUgbm90aWZp
-ZXI6IGt2bV91bm1hcF9odmFfcmFuZ2UoKS4gQUZBSUNTLCB3ZSB3aWxsIHVzZSB0aGlzIHBhdGgg
-d2hlbiBWTSB0ZWFyZG93biBvciBndWVzdCByZXNldHMgcGFzcy10aHJvdWdoIGRldmljZXMuCj4g
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFRoZSBidWdmaXhbMV0gZ2l2
-ZXMgdGhlIHJlYXNvbiBmb3IgdW5tYXBwaW5nIE1NSU8gcmVnaW9uIHdoZW4gZ3Vlc3QgcmVzZXRz
-IHBhc3MtdGhyb3VnaCBkZXZpY2VzLgo+IAo+IHVubWFwIHJlbGF0ZWQgdG8gTU1JTyByZWdpb24s
-IGFzIHRoaXMgcGF0Y2ggc29sdmVzOgo+IHBvaW50IDEgaXMgbm90IGFwcGxpZWQuCj4gcG9pbnQg
-MiBvY2N1cnMgd2hlbiB1c2Vyc3BhY2UgdW5wbHVnIHBhc3MtdGhyb3VnaCBkZXZpY2VzLgo+IHBv
-aW50IDMgY2FuIG9jY3VycywgYnV0IHJhcmVseS4KPiBwb2ludCA0IGlzIG5vdCBhcHBsaWVkLgo+
-IHBvaW50IDUgb2NjdXJzIHdoZW4gVk0gdGVhcmRvd24gb3IgZ3Vlc3QgcmVzZXRzIHBhc3MtdGhy
-b3VnaCBkZXZpY2VzLgo+IAo+IEFuZCBJIGhhZCBhIGxvb2sgYXQgeW91ciBwYXRjaCBzZXJpZXMs
-IGl0IGNhbiBzb2x2ZToKPiBGb3IgVk0gdGVhcmRvd24sIGVsaWRlIENNTyBhbmQgcGVyZm9ybSBW
-TUFMTCBpbnN0ZWFkIG9mIGluZGl2aWR1YWxseSAoQnV0IGN1cnJlbnQga2VybmVsIGRvIG5vdCBn
-byB0aHJvdWdoIHRoaXMgcGF0aCB3aGVuIFZNIHRlYXJkb3duKS4KPiBGb3Igcm9sbGJhY2sgb2Yg
-ZGlydHkgbG9nIHRyYWNraW5nLCBlbGlkZSBDTU8uCj4gRm9yIGt2bV91bm1hcF9odmFfcmFuZ2Us
-IGlmIGV2ZW50IGlzIE1NVV9OT1RJRllfVU5NQVAuIGVsaWRlIENNTy4KPiAKPiAoQnV0IEkgZG91
-YnQgdGhlIENNT3MgaW4gdW5tYXAuIEFzIHdlIHBlcmZvcm0gQ01PcyBpbiB1c2VyX21lbV9hYm9y
-dCB3aGVuIGluc3RhbGwgbmV3IHN0YWdlMiBtYXBwaW5nIGZvciBWTSwKPiAgbWF5YmUgdGhlIENN
-TyBpbiB1bm1hcCBpcyB1bm5lY2Vzc2FyeSB1bmRlciBhbGwgY29uZGl0aW9ucyA6LSkgPykKPiAK
-PiBTbyBpdCBzaG93cyB0aGF0IHdlIGFyZSBzb2x2aW5nIGRpZmZlcmVudCBwYXJ0cyBvZiB1bm1h
-cCwgc28gdGhleSBhcmUgbm90IGNvbmZsaWN0aW5nLiBBdCBsZWFzdCB0aGlzIHBhdGNoIGNhbgo+
-IHN0aWxsIHNwZWVkdXAgbWFwIG9mIGRldmljZSBNTUlPIHJlZ2lvbiwgYW5kIHNwZWVkdXAgdW5t
-YXAgb2YgZGV2aWNlIE1NSU8gcmVnaW9uIGV2ZW4gaWYgd2UgZG8gbm90IG5lZWQgdG8gcGVyZm9y
-bQo+IENNTyBhbmQgVExCSSA7LSkuCj4gCj4gc3BlZWR1cDogdW5tYXAgOEdCIE1NSU8gb24gRlBH
-QS4KPiAKPiAgICAgICAgICAgIGJlZm9yZSAgICAgICAgICAgIGFmdGVyIG9wdAo+IGNvc3QgICAg
-MzArIG1pbnV0ZXMgICAgICAgICAgICA5NDltcwo+IAo+IFRoYW5rcywKPiBLZXFpYW4KPiAKPj4K
-Pj4gSSBoYXZlIHRoZSBmZWVsaW5nIHRoYXQgd2UgYXJlIGp1c3QgY2lyY2xpbmcgYXJvdW5kIGFu
-b3RoZXIgcHJvYmxlbSwKPj4gd2hpY2ggaXMgdGhhdCB3ZSBjb3VsZCByZWx5IG9uIGEgVk0td2lk
-ZSBUTEJJIHdoZW4gdGVhcmluZyBkb3duIHRoZQo+PiBndWVzdC4gSSB3b3JrZWQgb24gc29tZXRo
-aW5nIGxpa2UgdGhhdFsxXSBhIGxvbmcgd2hpbGUgYWdvLCBhbmQgcGFya2VkCj4+IGl0IGZvciBz
-b21lIHJlYXNvbi4gTWF5YmUgaXQgaXMgd29ydGggcmV2aXZpbmcuCj4+Cj4+IFsxXSBodHRwczov
-L2dpdC5rZXJuZWwub3JnL3B1Yi9zY20vbGludXgva2VybmVsL2dpdC9tYXovYXJtLXBsYXRmb3Jt
-cy5naXQvbG9nLz9oPWt2bS1hcm02NC9lbGlkZS1jbW8tdGxiaQo+Pgo+Pj4KPj4+IFNpZ25lZC1v
-ZmYtYnk6IEtlcWlhbiBaaHUgPHpodWtlcWlhbjFAaHVhd2VpLmNvbT4KPj4+IC0tLQo+Pj4gIGFy
-Y2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX3BndGFibGUuaCB8IDExICsrKysrKysrKysrCj4+PiAg
-YXJjaC9hcm02NC9rdm0vaHlwL3BndGFibGUuYyAgICAgICAgIHwgMTUgKysrKysrKysrKysrKysr
-Cj4+PiAgYXJjaC9hcm02NC9rdm0vbW11LmMgICAgICAgICAgICAgICAgIHwgMTIgKysrKysrKyst
-LS0tCj4+PiAgMyBmaWxlcyBjaGFuZ2VkLCAzNCBpbnNlcnRpb25zKCspLCA0IGRlbGV0aW9ucygt
-KQo+Pj4KPj4+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9wZ3RhYmxl
-LmgKPj4+IGIvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1fcGd0YWJsZS5oCj4+PiBpbmRleCA1
-MmFiMzhkYjA0YzcuLjIyNjZhYzQ1ZjEwYyAxMDA2NDQKPj4+IC0tLSBhL2FyY2gvYXJtNjQvaW5j
-bHVkZS9hc20va3ZtX3BndGFibGUuaAo+Pj4gKysrIGIvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9r
-dm1fcGd0YWJsZS5oCj4+PiBAQCAtODIsNiArODIsMTcgQEAgc3RydWN0IGt2bV9wZ3RhYmxlX3dh
-bGtlciB7Cj4+PiAgICAgIGNvbnN0IGVudW0ga3ZtX3BndGFibGVfd2Fsa19mbGFncyAgICBmbGFn
-czsKPj4+ICB9Owo+Pj4KPj4+ICsvKioKPj4+ICsgKiBrdm1fc3VwcG9ydGVkX3Bnc2l6ZSgpIC0g
-R2V0IHRoZSBtYXggc3VwcG9ydGVkIHBhZ2Ugc2l6ZSBvZiBhIG1hcHBpbmcuCj4+PiArICogQHBn
-dDogICAgSW5pdGlhbGlzZWQgcGFnZS10YWJsZSBzdHJ1Y3R1cmUuCj4+PiArICogQGFkZHI6ICAg
-IFZpcnR1YWwgYWRkcmVzcyBhdCB3aGljaCB0byBwbGFjZSB0aGUgbWFwcGluZy4KPj4+ICsgKiBA
-ZW5kOiAgICBFbmQgdmlydHVhbCBhZGRyZXNzIG9mIHRoZSBtYXBwaW5nLgo+Pj4gKyAqIEBwaHlz
-OiAgICBQaHlzaWNhbCBhZGRyZXNzIG9mIHRoZSBtZW1vcnkgdG8gbWFwLgo+Pj4gKyAqCj4+PiAr
-ICogVGhlIHNtYWxsZXN0IHJldHVybiB2YWx1ZSBpcyBQQUdFX1NJWkUuCj4+PiArICovCj4+PiAr
-dTY0IGt2bV9zdXBwb3J0ZWRfcGdzaXplKHN0cnVjdCBrdm1fcGd0YWJsZSAqcGd0LCB1NjQgYWRk
-ciwgdTY0IGVuZCwgdTY0IHBoeXMpOwo+Pj4gKwo+Pj4gIC8qKgo+Pj4gICAqIGt2bV9wZ3RhYmxl
-X2h5cF9pbml0KCkgLSBJbml0aWFsaXNlIGEgaHlwZXJ2aXNvciBzdGFnZS0xIHBhZ2UtdGFibGUu
-Cj4+PiAgICogQHBndDogICAgVW5pbml0aWFsaXNlZCBwYWdlLXRhYmxlIHN0cnVjdHVyZSB0byBp
-bml0aWFsaXNlLgo+Pj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL2h5cC9wZ3RhYmxlLmMg
-Yi9hcmNoL2FybTY0L2t2bS9oeXAvcGd0YWJsZS5jCj4+PiBpbmRleCBiZGY4ZTU1ZWQzMDguLmFi
-MTE2MDliOWIxMyAxMDA2NDQKPj4+IC0tLSBhL2FyY2gvYXJtNjQva3ZtL2h5cC9wZ3RhYmxlLmMK
-Pj4+ICsrKyBiL2FyY2gvYXJtNjQva3ZtL2h5cC9wZ3RhYmxlLmMKPj4+IEBAIC04MSw2ICs4MSwy
-MSBAQCBzdGF0aWMgYm9vbCBrdm1fYmxvY2tfbWFwcGluZ19zdXBwb3J0ZWQodTY0IGFkZHIsCj4+
-PiB1NjQgZW5kLCB1NjQgcGh5cywgdTMyIGxldmVsKQo+Pj4gICAgICByZXR1cm4gSVNfQUxJR05F
-RChhZGRyLCBncmFudWxlKSAmJiBJU19BTElHTkVEKHBoeXMsIGdyYW51bGUpOwo+Pj4gIH0KPj4+
-Cj4+PiArdTY0IGt2bV9zdXBwb3J0ZWRfcGdzaXplKHN0cnVjdCBrdm1fcGd0YWJsZSAqcGd0LCB1
-NjQgYWRkciwgdTY0IGVuZCwgdTY0IHBoeXMpCj4+PiArewo+Pj4gKyAgICB1MzIgbHZsOwo+Pj4g
-KyAgICB1NjQgcGdzaXplID0gUEFHRV9TSVpFOwo+Pj4gKwo+Pj4gKyAgICBmb3IgKGx2bCA9IHBn
-dC0+c3RhcnRfbGV2ZWw7IGx2bCA8IEtWTV9QR1RBQkxFX01BWF9MRVZFTFM7IGx2bCsrKSB7Cj4+
-PiArICAgICAgICBpZiAoa3ZtX2Jsb2NrX21hcHBpbmdfc3VwcG9ydGVkKGFkZHIsIGVuZCwgcGh5
-cywgbHZsKSkgewo+Pj4gKyAgICAgICAgICAgIHBnc2l6ZSA9IGt2bV9ncmFudWxlX3NpemUobHZs
-KTsKPj4+ICsgICAgICAgICAgICBicmVhazsKPj4+ICsgICAgICAgIH0KPj4+ICsgICAgfQo+Pj4g
-Kwo+Pj4gKyAgICByZXR1cm4gcGdzaXplOwo+Pj4gK30KPj4+ICsKPj4+ICBzdGF0aWMgdTMyIGt2
-bV9wZ3RhYmxlX2lkeChzdHJ1Y3Qga3ZtX3BndGFibGVfd2Fsa19kYXRhICpkYXRhLCB1MzIgbGV2
-ZWwpCj4+PiAgewo+Pj4gICAgICB1NjQgc2hpZnQgPSBrdm1fZ3JhbnVsZV9zaGlmdChsZXZlbCk7
-Cj4+PiBkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rdm0vbW11LmMgYi9hcmNoL2FybTY0L2t2bS9t
-bXUuYwo+Pj4gaW5kZXggN2QyMjU3Y2M1NDM4Li44MGI0MDNmYzhlNjQgMTAwNjQ0Cj4+PiAtLS0g
-YS9hcmNoL2FybTY0L2t2bS9tbXUuYwo+Pj4gKysrIGIvYXJjaC9hcm02NC9rdm0vbW11LmMKPj4+
-IEBAIC00OTksNyArNDk5LDggQEAgdm9pZCBrdm1fZnJlZV9zdGFnZTJfcGdkKHN0cnVjdCBrdm1f
-czJfbW11ICptbXUpCj4+PiAgaW50IGt2bV9waHlzX2FkZHJfaW9yZW1hcChzdHJ1Y3Qga3ZtICpr
-dm0sIHBoeXNfYWRkcl90IGd1ZXN0X2lwYSwKPj4+ICAgICAgICAgICAgICAgIHBoeXNfYWRkcl90
-IHBhLCB1bnNpZ25lZCBsb25nIHNpemUsIGJvb2wgd3JpdGFibGUpCj4+PiAgewo+Pj4gLSAgICBw
-aHlzX2FkZHJfdCBhZGRyOwo+Pj4gKyAgICBwaHlzX2FkZHJfdCBhZGRyLCBlbmQ7Cj4+PiArICAg
-IHVuc2lnbmVkIGxvbmcgcGdzaXplOwo+Pj4gICAgICBpbnQgcmV0ID0gMDsKPj4+ICAgICAgc3Ry
-dWN0IGt2bV9tbXVfbWVtb3J5X2NhY2hlIGNhY2hlID0geyAwLCBfX0dGUF9aRVJPLCBOVUxMLCB9
-Owo+Pj4gICAgICBzdHJ1Y3Qga3ZtX3BndGFibGUgKnBndCA9IGt2bS0+YXJjaC5tbXUucGd0Owo+
-Pj4gQEAgLTUwOSwyMSArNTEwLDI0IEBAIGludCBrdm1fcGh5c19hZGRyX2lvcmVtYXAoc3RydWN0
-IGt2bSAqa3ZtLAo+Pj4gcGh5c19hZGRyX3QgZ3Vlc3RfaXBhLAo+Pj4KPj4+ICAgICAgc2l6ZSAr
-PSBvZmZzZXRfaW5fcGFnZShndWVzdF9pcGEpOwo+Pj4gICAgICBndWVzdF9pcGEgJj0gUEFHRV9N
-QVNLOwo+Pj4gKyAgICBlbmQgPSBndWVzdF9pcGEgKyBzaXplOwo+Pj4KPj4+IC0gICAgZm9yIChh
-ZGRyID0gZ3Vlc3RfaXBhOyBhZGRyIDwgZ3Vlc3RfaXBhICsgc2l6ZTsgYWRkciArPSBQQUdFX1NJ
-WkUpIHsKPj4+ICsgICAgZm9yIChhZGRyID0gZ3Vlc3RfaXBhOyBhZGRyIDwgZW5kOyBhZGRyICs9
-IHBnc2l6ZSkgewo+Pj4gICAgICAgICAgcmV0ID0ga3ZtX21tdV90b3B1cF9tZW1vcnlfY2FjaGUo
-JmNhY2hlLAo+Pj4gICAgICAgICAgICAgICAgICAgICAgICAgICBrdm1fbW11X2NhY2hlX21pbl9w
-YWdlcyhrdm0pKTsKPj4+ICAgICAgICAgIGlmIChyZXQpCj4+PiAgICAgICAgICAgICAgYnJlYWs7
-Cj4+Pgo+Pj4gKyAgICAgICAgcGdzaXplID0ga3ZtX3N1cHBvcnRlZF9wZ3NpemUocGd0LCBhZGRy
-LCBlbmQsIHBhKTsKPj4+ICsKPj4+ICAgICAgICAgIHNwaW5fbG9jaygma3ZtLT5tbXVfbG9jayk7
-Cj4+PiAtICAgICAgICByZXQgPSBrdm1fcGd0YWJsZV9zdGFnZTJfbWFwKHBndCwgYWRkciwgUEFH
-RV9TSVpFLCBwYSwgcHJvdCwKPj4+ICsgICAgICAgIHJldCA9IGt2bV9wZ3RhYmxlX3N0YWdlMl9t
-YXAocGd0LCBhZGRyLCBwZ3NpemUsIHBhLCBwcm90LAo+Pj4gICAgICAgICAgICAgICAgICAgICAg
-ICAgICAmY2FjaGUpOwo+Pj4gICAgICAgICAgc3Bpbl91bmxvY2soJmt2bS0+bW11X2xvY2spOwo+
-Pj4gICAgICAgICAgaWYgKHJldCkKPj4+ICAgICAgICAgICAgICBicmVhazsKPj4+Cj4+PiAtICAg
-ICAgICBwYSArPSBQQUdFX1NJWkU7Cj4+PiArICAgICAgICBwYSArPSBwZ3NpemU7Cj4+PiAgICAg
-IH0KPj4+Cj4+PiAgICAgIGt2bV9tbXVfZnJlZV9tZW1vcnlfY2FjaGUoJmNhY2hlKTsKPj4KPj4g
-VGhpcyBvdGhlcndpc2UgbG9va3MgbmVhdCBlbm91Z2guCj4+Cj4+IFRoYW5rcywKPj4KPj4gICAg
-ICAgICBNLgo+IC4KPiAKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0
-dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+Hi all,
+
+This is the v3 of the series previously posted here:
+
+  https://lore.kernel.org/kvmarm/20201117181607.1761516-1-qperret@google.com/
+
+This basically allows us to wrap the host with a stage 2 when running in
+nVHE, hence paving the way for protecting guest memory from the host in
+the future (among other use-cases). For more details about the
+motivation and the design angle taken here, I would recommend to have a
+look at the cover letter of v1, and/or to watch these presentations at
+LPC [1] and KVM forum 2020 [2].
+
+V3 includes a bunch of clean-ups and small refactorings all over the
+place as well as a few new features. Specifically, this now allows us to
+remove memory pages from the host stage 2 cleanly, and this series does
+so for all the .hyp memory sections (which has uncovered existing bugs
+upstream and in v2 of this series -- see [3] and [4]). This also now
+makes good use of block mappings whenever that is possible, and has
+gotten a bit more testing on real hardware (which helped uncover other
+bugs [5]).
+
+The other changes to v3 include:
+
+ - clean-ups, refactoring and extra comments all over the place (Will);
+
+ - dropped fdt hook in favor of memblock API now that the relevant
+   patches ([6]) are merged (Rob);
+
+ - moved the CPU feature copy stuff to __init/__initdata (Marc);
+
+ - fixed FWB support (Mate);
+
+ - rebased on v5.12-rc1.
+
+This series depends on Will's vCPU context fix ([5]) and Marc's PMU
+fixes ([7]). And here's a branch with all the goodies applied:
+
+  https://android-kvm.googlesource.com/linux qperret/host-stage2-v3
+
+Thanks,
+Quentin
+
+[1] https://youtu.be/54q6RzS9BpQ?t=10859
+[2] https://youtu.be/wY-u6n75iXc
+[3] https://lore.kernel.org/kvmarm/20210203141931.615898-1-qperret@google.com/
+[4] https://lore.kernel.org/kvmarm/20210128173850.2478161-1-qperret@google.com/
+[5] https://lore.kernel.org/kvmarm/20210226181211.14542-1-will@kernel.org/
+[6] https://lore.kernel.org/lkml/20210115114544.1830068-1-qperret@google.com/
+[7] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/pmu-undef-NV
+
+
+Quentin Perret (29):
+  KVM: arm64: Initialize kvm_nvhe_init_params early
+  KVM: arm64: Avoid free_page() in page-table allocator
+  KVM: arm64: Factor memory allocation out of pgtable.c
+  KVM: arm64: Introduce a BSS section for use at Hyp
+  KVM: arm64: Make kvm_call_hyp() a function call at Hyp
+  KVM: arm64: Allow using kvm_nvhe_sym() in hyp code
+  KVM: arm64: Introduce an early Hyp page allocator
+  KVM: arm64: Stub CONFIG_DEBUG_LIST at Hyp
+  KVM: arm64: Introduce a Hyp buddy page allocator
+  KVM: arm64: Enable access to sanitized CPU features at EL2
+  KVM: arm64: Factor out vector address calculation
+  KVM: arm64: Prepare the creation of s1 mappings at EL2
+  KVM: arm64: Elevate hypervisor mappings creation at EL2
+  KVM: arm64: Use kvm_arch for stage 2 pgtable
+  KVM: arm64: Use kvm_arch in kvm_s2_mmu
+  KVM: arm64: Set host stage 2 using kvm_nvhe_init_params
+  KVM: arm64: Refactor kvm_arm_setup_stage2()
+  KVM: arm64: Refactor __load_guest_stage2()
+  KVM: arm64: Refactor __populate_fault_info()
+  KVM: arm64: Make memcache anonymous in pgtable allocator
+  KVM: arm64: Reserve memory for host stage 2
+  KVM: arm64: Sort the hypervisor memblocks
+  KVM: arm64: Introduce PROT_NONE mappings for stage 2
+  KVM: arm64: Refactor stage2_map_set_prot_attr()
+  KVM: arm64: Add kvm_pgtable_stage2_idmap_greedy()
+  KVM: arm64: Wrap the host with a stage 2
+  KVM: arm64: Page-align the .hyp sections
+  KVM: arm64: Disable PMU support in protected mode
+  KVM: arm64: Protect the .hyp sections from the host
+
+Will Deacon (3):
+  arm64: lib: Annotate {clear,copy}_page() as position-independent
+  KVM: arm64: Link position-independent string routines into .hyp.text
+  arm64: kvm: Add standalone ticket spinlock implementation for use at
+    hyp
+
+ arch/arm64/include/asm/cpufeature.h           |   1 +
+ arch/arm64/include/asm/hyp_image.h            |   7 +
+ arch/arm64/include/asm/kvm_asm.h              |   9 +
+ arch/arm64/include/asm/kvm_cpufeature.h       |  19 ++
+ arch/arm64/include/asm/kvm_host.h             |  19 +-
+ arch/arm64/include/asm/kvm_hyp.h              |   8 +
+ arch/arm64/include/asm/kvm_mmu.h              |  23 +-
+ arch/arm64/include/asm/kvm_pgtable.h          | 117 ++++++-
+ arch/arm64/include/asm/sections.h             |   1 +
+ arch/arm64/kernel/asm-offsets.c               |   3 +
+ arch/arm64/kernel/cpufeature.c                |  13 +
+ arch/arm64/kernel/image-vars.h                |  30 ++
+ arch/arm64/kernel/vmlinux.lds.S               |  74 +++--
+ arch/arm64/kvm/arm.c                          | 199 ++++++++++--
+ arch/arm64/kvm/hyp/Makefile                   |   2 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h       |  37 ++-
+ arch/arm64/kvm/hyp/include/nvhe/early_alloc.h |  14 +
+ arch/arm64/kvm/hyp/include/nvhe/gfp.h         |  55 ++++
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  36 +++
+ arch/arm64/kvm/hyp/include/nvhe/memory.h      |  52 +++
+ arch/arm64/kvm/hyp/include/nvhe/mm.h          |  92 ++++++
+ arch/arm64/kvm/hyp/include/nvhe/spinlock.h    |  92 ++++++
+ arch/arm64/kvm/hyp/nvhe/Makefile              |   9 +-
+ arch/arm64/kvm/hyp/nvhe/cache.S               |  13 +
+ arch/arm64/kvm/hyp/nvhe/cpufeature.c          |   8 +
+ arch/arm64/kvm/hyp/nvhe/early_alloc.c         |  54 ++++
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S            |  46 ++-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  69 ++++
+ arch/arm64/kvm/hyp/nvhe/hyp.lds.S             |   1 +
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 235 ++++++++++++++
+ arch/arm64/kvm/hyp/nvhe/mm.c                  | 173 ++++++++++
+ arch/arm64/kvm/hyp/nvhe/page_alloc.c          | 195 ++++++++++++
+ arch/arm64/kvm/hyp/nvhe/psci-relay.c          |   4 +-
+ arch/arm64/kvm/hyp/nvhe/setup.c               | 212 +++++++++++++
+ arch/arm64/kvm/hyp/nvhe/stub.c                |  22 ++
+ arch/arm64/kvm/hyp/nvhe/switch.c              |  12 +-
+ arch/arm64/kvm/hyp/nvhe/tlb.c                 |   4 +-
+ arch/arm64/kvm/hyp/pgtable.c                  | 298 ++++++++++++++----
+ arch/arm64/kvm/hyp/reserved_mem.c             | 113 +++++++
+ arch/arm64/kvm/mmu.c                          | 115 ++++++-
+ arch/arm64/kvm/perf.c                         |   3 +-
+ arch/arm64/kvm/pmu.c                          |   8 +-
+ arch/arm64/kvm/reset.c                        |  42 +--
+ arch/arm64/kvm/sys_regs.c                     |  21 ++
+ arch/arm64/lib/clear_page.S                   |   4 +-
+ arch/arm64/lib/copy_page.S                    |   4 +-
+ arch/arm64/mm/init.c                          |   3 +
+ 47 files changed, 2356 insertions(+), 215 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kvm_cpufeature.h
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/early_alloc.h
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/gfp.h
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/memory.h
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/mm.h
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/spinlock.h
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/cache.S
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/cpufeature.c
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/early_alloc.c
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/mem_protect.c
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/mm.c
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/page_alloc.c
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/setup.c
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/stub.c
+ create mode 100644 arch/arm64/kvm/hyp/reserved_mem.c
+
+-- 
+2.30.1.766.gb4fecdf3b7-goog
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
