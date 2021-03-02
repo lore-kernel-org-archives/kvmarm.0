@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5D88C433DB
-	for <kvmarm@archiver.kernel.org>; Tue,  2 Mar 2021 15:01:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C603C433DB
+	for <kvmarm@archiver.kernel.org>; Tue,  2 Mar 2021 15:01:13 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8006D64F3B
-	for <kvmarm@archiver.kernel.org>; Tue,  2 Mar 2021 15:01:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8006D64F3B
+	by mail.kernel.org (Postfix) with ESMTP id BDC9C64F37
+	for <kvmarm@archiver.kernel.org>; Tue,  2 Mar 2021 15:01:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDC9C64F37
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F62D4B698;
-	Tue,  2 Mar 2021 10:01:10 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 578824B664;
+	Tue,  2 Mar 2021 10:01:12 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id H4-hSY78Ng8F; Tue,  2 Mar 2021 10:01:09 -0500 (EST)
+	with ESMTP id LI7Rt8+drpqf; Tue,  2 Mar 2021 10:01:11 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DF884B68C;
-	Tue,  2 Mar 2021 10:01:09 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 42FA24B688;
+	Tue,  2 Mar 2021 10:01:11 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A8EA94B642
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Mar 2021 10:01:07 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 32F8D4B687
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Mar 2021 10:01:10 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id p6XGoqFRnejQ for <kvmarm@lists.cs.columbia.edu>;
- Tue,  2 Mar 2021 10:01:06 -0500 (EST)
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com
- [209.85.222.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E9BB14B69C
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Mar 2021 10:01:05 -0500 (EST)
-Received: by mail-qk1-f202.google.com with SMTP id i69so7291804qke.19
- for <kvmarm@lists.cs.columbia.edu>; Tue, 02 Mar 2021 07:01:05 -0800 (PST)
+ with ESMTP id zIGrzfAtqqdt for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  2 Mar 2021 10:01:09 -0500 (EST)
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com
+ [209.85.221.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EDCA24B645
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Mar 2021 10:01:08 -0500 (EST)
+Received: by mail-wr1-f74.google.com with SMTP id v1so715350wru.7
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 02 Mar 2021 07:01:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=sender:date:in-reply-to:message-id:mime-version:references:subject
- :from:to:cc; bh=fnu4kZLmantAPLgmfgZ7PZzVHqXbW8DjkSliDC/e8I8=;
- b=uUNW1RSwz/PPPl1Ua1IuQ64hOM0R+lTodrWU3UbAefyenAEai8RA0+im6R8w77uKKJ
- g4DVj/KqEe1TwMkcz/Ygt9jjIn5f38pgXuncyWnVA/+aa/N++uGeKO34r+o678oP9Mq8
- 67RAjq0NNwnf+jsn3QGIHhc250LRidVe1EfBP+5OIoO/7rtNLutaZrtEM1c24NPrdROO
- AFGrLf0EhJQzjScHxY2yPE6vMV/MjHb4X61lyzoWiVZ4RX2UG8RcNll2OE8OrY1N1eKg
- 6/SG5RQNSa0TOnAV1pRMMAOGJJqvxbtGjwYBUsH85FOGQKa/2mvXOYVgOo4Aa+FxfQOa
- yteA==
+ :from:to:cc; bh=MUiu5cL4XJy7bcbjb67w8AVccQ6swyc7cTqk7H/pito=;
+ b=V2tQz8JIPctM0p8zJgSN56SE2f+sjG4GB6ZR55LMQiswnxYtR/ePVhbwO/o8W66G0b
+ PbHVynwDMo4m5hQTkVbwHPUN6c0PkFKQE/sf5DH5nMyM0tggxmbD3FPQjbi6a0POeCz+
+ jh+2Nsxcsol/OZxoAVv6MqFZjCqNUXiv4O8MXjSVu9i+FDKGBgulOa9tkVjyrYK5Z9Bd
+ Nq67f+OAletST31RgOjWXRR0vHMxg7CzWFcXeOoLWmi9Q4vWw9Jmfj0fTHu7FSTjC0o5
+ F2L8XjgbG6jShJL/W0Af7NMKKMKboklNsvT6OliD+fo6afqsvX1EexCiNHhJOW3b0KIF
+ 4qmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=fnu4kZLmantAPLgmfgZ7PZzVHqXbW8DjkSliDC/e8I8=;
- b=JeMZgoOTqpo3uK9dUf8Skbu+g8aoSfkJFV66loxGmz9AsAzIPbfvCEMS21jcj2IOgc
- zG0xEWgnXuqwR3hWyptCUebrxcPikADNdokQ8sFQKHlqvyfWZK2ix4UAxqW6CBTAFVSn
- U6IuIPB+BERmj3eW1nqU5vt22s20nAMDIt8kTwtsJKSh7QEco6BEizlDhA3IF+7XnJuy
- 3eSjpMVsOLOOrHTkpPIbetXiFg5+eW4lAmFUO10pJW6Gs8Qwur4NGzDDPnb8q9+LK0qs
- dEOItBozo3W/SVEc8b1h3gcba+yVZThrw9VPWcSSF9Mt8yP0Uj6JJWtlKyTJ9O2nVSAa
- vegQ==
-X-Gm-Message-State: AOAM532h4BzGcndS2FgjcK7YHJdeQdEBXaQvXBNbkVAAOmg+MM7lFS9p
- BFB6wVr2DSGdJh5nMYM7fAj+lM6dY/Fy
-X-Google-Smtp-Source: ABdhPJw8Dq6/V08jN1owoo4yABfxU5wp1FwJVtfeIaUa56rS2EjFaWfxxNpGQxARvmsP7DWrgv0nk/HKhje6
+ bh=MUiu5cL4XJy7bcbjb67w8AVccQ6swyc7cTqk7H/pito=;
+ b=owhdRwhkoU7DBRIP8voi8npVITxUS0XGqke4+jo9fSjIgG3M8k4+x+pH3vB809zot5
+ 1bPmJXF72lxVEXJDp7Blsiads4Ep2q7kWHEBXn4Bz3mkuLXbYZ378SfcHH2+hQsTXywA
+ 5i+uhjYvA95ZT5//VaoKX8ciLiBrX+21/xZPbATWoGHAZlobuu9TS4WrA/8LY7IygJp/
+ dL8LTY29Y1mjK5/KaHyneA33D5fGFuou2swN8yJeZy/WmnEMaOzZGm02SrK3OH/hmgvG
+ 0wJkbcu6DM8UW/fCCglp3J5aiJlfqcHzyr5nLfsw+/JU2dJ25dbmXq0nS+ijbazBEhIb
+ 7etQ==
+X-Gm-Message-State: AOAM530qAKkV0IAO+BfKBWJfLKTYV9uJnL1Si3XjBudmY+2BdkUbPoo5
+ rwZUSFgO0FTN2xw4YMZBQ1BwiemCayY5
+X-Google-Smtp-Source: ABdhPJz9F9KFBBfsTkBPKASwdRvs8WkwjMfKCJcm0vk7lvPEyGjjf4UWYBSGhgGbD6PbV21B/moA66tRIrG2
 X-Received: from r2d2-qp.c.googlers.com ([fda3:e722:ac3:10:28:9cb1:c0a8:1652])
- (user=qperret job=sendgmr) by 2002:a0c:c78c:: with SMTP id
- k12mr3964748qvj.47.1614697265404; Tue, 02 Mar 2021 07:01:05 -0800 (PST)
-Date: Tue,  2 Mar 2021 14:59:56 +0000
+ (user=qperret job=sendgmr) by 2002:a7b:c18e:: with SMTP id
+ y14mr495903wmi.1.1614697267665; Tue, 02 Mar 2021 07:01:07 -0800 (PST)
+Date: Tue,  2 Mar 2021 14:59:57 +0000
 In-Reply-To: <20210302150002.3685113-1-qperret@google.com>
-Message-Id: <20210302150002.3685113-27-qperret@google.com>
+Message-Id: <20210302150002.3685113-28-qperret@google.com>
 Mime-Version: 1.0
 References: <20210302150002.3685113-1-qperret@google.com>
 X-Mailer: git-send-email 2.30.1.766.gb4fecdf3b7-goog
-Subject: [PATCH v3 26/32] KVM: arm64: Introduce PROT_NONE mappings for stage 2
+Subject: [PATCH v3 27/32] KVM: arm64: Refactor stage2_map_set_prot_attr()
 From: Quentin Perret <qperret@google.com>
 To: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org, 
  james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
@@ -97,116 +97,72 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Once we start unmapping portions of memory from the host stage 2 (such
-as e.g. the hypervisor memory sections, or pages that belong to
-protected guests), we will need a way to track page ownership. And
-given that all mappings in the host stage 2 will be identity-mapped, we
-can use the host stage 2 page-table itself as a simplistic rmap.
-
-As a first step towards this, introduce a new protection attribute
-in the stage 2 page table code, called KVM_PGTABLE_PROT_NONE, which
-allows to annotate portions of the IPA space as inaccessible. For
-simplicity, PROT_NONE mappings are created as invalid mappings with a
-software bit set.
+In order to ease its re-use in other code paths, refactor
+stage2_map_set_prot_attr() to not depend on a stage2_map_data struct.
+No functional change intended.
 
 Signed-off-by: Quentin Perret <qperret@google.com>
 ---
- arch/arm64/include/asm/kvm_pgtable.h |  2 ++
- arch/arm64/kvm/hyp/pgtable.c         | 26 ++++++++++++++++++++++++--
- 2 files changed, 26 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/hyp/pgtable.c | 19 ++++++++-----------
+ 1 file changed, 8 insertions(+), 11 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index 9935dbae2cc1..c9f6ed76e0ad 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -80,6 +80,7 @@ struct kvm_pgtable {
-  * @KVM_PGTABLE_PROT_W:		Write permission.
-  * @KVM_PGTABLE_PROT_R:		Read permission.
-  * @KVM_PGTABLE_PROT_DEVICE:	Device attributes.
-+ * @KVM_PGTABLE_PROT_NONE:	No permission.
-  */
- enum kvm_pgtable_prot {
- 	KVM_PGTABLE_PROT_X			= BIT(0),
-@@ -87,6 +88,7 @@ enum kvm_pgtable_prot {
- 	KVM_PGTABLE_PROT_R			= BIT(2),
- 
- 	KVM_PGTABLE_PROT_DEVICE			= BIT(3),
-+	KVM_PGTABLE_PROT_NONE			= BIT(4),
- };
- 
- #define PAGE_HYP		(KVM_PGTABLE_PROT_R | KVM_PGTABLE_PROT_W)
 diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index bdd6e3d4eeb6..8e7059fcfd40 100644
+index 8e7059fcfd40..8aa01a9e2603 100644
 --- a/arch/arm64/kvm/hyp/pgtable.c
 +++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -48,6 +48,8 @@
- 					 KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W | \
- 					 KVM_PTE_LEAF_ATTR_HI_S2_XN)
- 
-+#define KVM_PTE_LEAF_SW_BIT_PROT_NONE	BIT(55)
-+
- struct kvm_pgtable_walk_data {
- 	struct kvm_pgtable		*pgt;
- 	struct kvm_pgtable_walker	*walker;
-@@ -120,6 +122,16 @@ static bool kvm_pte_valid(kvm_pte_t pte)
- 	return pte & KVM_PTE_VALID;
+@@ -494,8 +494,7 @@ u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift)
+ 	return vtcr;
  }
  
-+static bool kvm_pte_prot_none(kvm_pte_t pte)
-+{
-+	return pte & KVM_PTE_LEAF_SW_BIT_PROT_NONE;
-+}
-+
-+static inline bool stage2_is_permanent_mapping(kvm_pte_t pte)
-+{
-+	return kvm_pte_prot_none(pte);
-+}
-+
- static bool kvm_pte_table(kvm_pte_t pte, u32 level)
+-static int stage2_map_set_prot_attr(enum kvm_pgtable_prot prot,
+-				    struct stage2_map_data *data)
++static kvm_pte_t stage2_get_prot_attr(enum kvm_pgtable_prot prot)
  {
- 	if (level == KVM_PGTABLE_MAX_LEVELS - 1)
-@@ -182,7 +194,8 @@ static kvm_pte_t kvm_init_valid_leaf_pte(u64 pa, kvm_pte_t attr, u32 level)
+ 	bool device = prot & KVM_PGTABLE_PROT_DEVICE;
+ 	kvm_pte_t attr = device ? PAGE_S2_MEMATTR(DEVICE_nGnRE) :
+@@ -504,15 +503,15 @@ static int stage2_map_set_prot_attr(enum kvm_pgtable_prot prot,
  
- 	pte |= attr & (KVM_PTE_LEAF_ATTR_LO | KVM_PTE_LEAF_ATTR_HI);
- 	pte |= FIELD_PREP(KVM_PTE_TYPE, type);
--	pte |= KVM_PTE_VALID;
-+	if (!kvm_pte_prot_none(pte))
-+		pte |= KVM_PTE_VALID;
+ 	if (prot & KVM_PGTABLE_PROT_NONE) {
+ 		if (prot != KVM_PGTABLE_PROT_NONE)
+-			return -EINVAL;
++			return 0;
+ 		attr |= KVM_PTE_LEAF_SW_BIT_PROT_NONE;
+-		goto out;
++		return attr;
+ 	}
  
- 	return pte;
- }
-@@ -317,7 +330,7 @@ static int hyp_map_set_prot_attr(enum kvm_pgtable_prot prot,
- 	u32 ap = (prot & KVM_PGTABLE_PROT_W) ? KVM_PTE_LEAF_ATTR_LO_S1_AP_RW :
- 					       KVM_PTE_LEAF_ATTR_LO_S1_AP_RO;
- 
--	if (!(prot & KVM_PGTABLE_PROT_R))
-+	if (!(prot & KVM_PGTABLE_PROT_R) || (prot & KVM_PGTABLE_PROT_NONE))
- 		return -EINVAL;
- 
- 	if (prot & KVM_PGTABLE_PROT_X) {
-@@ -489,6 +502,13 @@ static int stage2_map_set_prot_attr(enum kvm_pgtable_prot prot,
- 			    PAGE_S2_MEMATTR(NORMAL);
- 	u32 sh = KVM_PTE_LEAF_ATTR_LO_S2_SH_IS;
- 
-+	if (prot & KVM_PGTABLE_PROT_NONE) {
-+		if (prot != KVM_PGTABLE_PROT_NONE)
-+			return -EINVAL;
-+		attr |= KVM_PTE_LEAF_SW_BIT_PROT_NONE;
-+		goto out;
-+	}
-+
  	if (!(prot & KVM_PGTABLE_PROT_X))
  		attr |= KVM_PTE_LEAF_ATTR_HI_S2_XN;
  	else if (device)
-@@ -502,6 +522,8 @@ static int stage2_map_set_prot_attr(enum kvm_pgtable_prot prot,
+-		return -EINVAL;
++		return 0;
  
+ 	if (prot & KVM_PGTABLE_PROT_R)
+ 		attr |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
+@@ -523,9 +522,7 @@ static int stage2_map_set_prot_attr(enum kvm_pgtable_prot prot,
  	attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S2_SH, sh);
  	attr |= KVM_PTE_LEAF_ATTR_LO_S2_AF;
-+
-+out:
- 	data->attr = attr;
- 	return 0;
+ 
+-out:
+-	data->attr = attr;
+-	return 0;
++	return attr;
  }
+ 
+ static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
+@@ -708,9 +705,9 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+ 		.arg		= &map_data,
+ 	};
+ 
+-	ret = stage2_map_set_prot_attr(prot, &map_data);
+-	if (ret)
+-		return ret;
++	map_data.attr = stage2_get_prot_attr(prot);
++	if (!map_data.attr)
++		return -EINVAL;
+ 
+ 	ret = kvm_pgtable_walk(pgt, addr, size, &walker);
+ 	dsb(ishst);
 -- 
 2.30.1.766.gb4fecdf3b7-goog
 
