@@ -2,58 +2,71 @@ Return-Path: <SRS0=lGHe=IB=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43F6CC433E0
-	for <kvmarm@archiver.kernel.org>; Wed,  3 Mar 2021 14:19:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3F7BC433E0
+	for <kvmarm@archiver.kernel.org>; Wed,  3 Mar 2021 16:45:18 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6D8CB64ED7
-	for <kvmarm@archiver.kernel.org>; Wed,  3 Mar 2021 14:19:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D8CB64ED7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 0B66864ED7
+	for <kvmarm@archiver.kernel.org>; Wed,  3 Mar 2021 16:45:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B66864ED7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C9FBA4B256;
-	Wed,  3 Mar 2021 09:18:59 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E9274B2B2;
+	Wed,  3 Mar 2021 11:45:17 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id DnN99MFhq5tr; Wed,  3 Mar 2021 09:18:58 -0500 (EST)
+	with ESMTP id EOFWpWY+FS-6; Wed,  3 Mar 2021 11:45:16 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BCF74B21F;
-	Wed,  3 Mar 2021 09:18:58 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AF0E4B2C4;
+	Wed,  3 Mar 2021 11:45:16 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 46F164B21F
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Mar 2021 09:18:57 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3FAF84B2B2
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Mar 2021 11:45:15 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yuEpMQ0jJ0jF for <kvmarm@lists.cs.columbia.edu>;
- Wed,  3 Mar 2021 09:18:55 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BE1624B21E
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Mar 2021 09:18:55 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4ABB631B;
- Wed,  3 Mar 2021 06:18:55 -0800 (PST)
-Received: from slackpad.fritz.box (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5C4E73F766;
- Wed,  3 Mar 2021 06:18:54 -0800 (PST)
-Date: Wed, 3 Mar 2021 14:18:46 +0000
-From: Andre Przywara <andre.przywara@arm.com>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [kvm-unit-tests PATCH] configure: arm/arm64: Add --earlycon
- option to set UART type and address
-Message-ID: <20210303141846.0bcc0d2c@slackpad.fritz.box>
-In-Reply-To: <20210219163718.109101-1-alexandru.elisei@arm.com>
-References: <20210219163718.109101-1-alexandru.elisei@arm.com>
-Organization: Arm Ltd.
-X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
+ with ESMTP id 7uerBE-G8QIF for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  3 Mar 2021 11:45:14 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 002054B2B0
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Mar 2021 11:45:13 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id DD85E64EBB;
+ Wed,  3 Mar 2021 16:45:11 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=hot-poop.lan)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1lHUcX-00H3NQ-JX; Wed, 03 Mar 2021 16:45:09 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org
+Subject: [PATCH] KVM: arm64: Ensure I-cache isolation between vcpus of a same
+ VM
+Date: Wed,  3 Mar 2021 16:45:05 +0000
+Message-Id: <20210303164505.68492-1-maz@kernel.org>
+X-Mailer: git-send-email 2.30.0
 MIME-Version: 1.0
-Cc: pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com,
+ james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+ will@kernel.org, mark.rutland@arm.com, catalin.marinas@arm.com,
+ alexandru.elisei@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -70,131 +83,157 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 19 Feb 2021 16:37:18 +0000
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+It recently became apparent that the ARMv8 architecture has interesting
+rules regarding attributes being used when fetching instructions
+if the MMU is off at Stage-1.
 
-> Currently, the UART early address is set indirectly with the --vmm option
-> and there are only two possible values: if the VMM is qemu (the default),
-> then the UART address is set to 0x09000000; if the VMM is kvmtool, then the
-> UART address is set to 0x3f8.
-> 
-> There several efforts under way to change the kvmtool UART address, and
-> kvm-unit-tests so far hasn't had mechanism to let the user set a specific
-> address, which means that the early UART won't be available.
-> 
-> This situation will only become worse as kvm-unit-tests gains support to
-> run as an EFI app, as each platform will have their own UART type and
-> address.
-> 
-> To address both issues, a new configure option is added, --earlycon. The
-> syntax and semantics are identical to the kernel parameter with the same
-> name.
+In this situation, the CPU is allowed to fetch from the PoC and
+allocate into the I-cache (unless the memory is mapped with
+the XN attribute at Stage-2).
 
-Nice one! I like that reusing of an existing scheme.
+If we transpose this to vcpus sharing a single physical CPU,
+it is possible for a vcpu running with its MMU off to influence
+another vcpu running with its MMU on, as the latter is expected to
+fetch from the PoU (and self-patching code doesn't flush below that
+level).
 
-> Specifying this option will overwrite the UART address set by --vmm.
-> 
-> At the moment, the UART type and register width parameters are ignored
-> since both qemu's and kvmtool's UART emulation use the same offset for the
-> TX register and no other registers are used by kvm-unit-tests, but the
-> parameters will become relevant once EFI support is added.
-> 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
-> The kvmtool patches I was referring to are the patches to unify ioport and
-> MMIO emulation [1] and to allow the user to specify a custom memory layout
-> for the VM [2] (these patches are very old, but I plan to revive them after
-> the ioport and MMIO unification series are merged).
-> 
-> [1] https://lore.kernel.org/kvm/20201210142908.169597-1-andre.przywara@arm.com/T/#t
-> [2] https://lore.kernel.org/kvm/1569245722-23375-1-git-send-email-alexandru.elisei@arm.com/
-> 
->  configure | 35 +++++++++++++++++++++++++++++++++++
->  1 file changed, 35 insertions(+)
-> 
-> diff --git a/configure b/configure
-> index cdcd34e94030..d94b92255088 100755
-> --- a/configure
-> +++ b/configure
-> @@ -26,6 +26,7 @@ errata_force=0
->  erratatxt="$srcdir/errata.txt"
->  host_key_document=
->  page_size=
-> +earlycon=
->  
->  usage() {
->      cat <<-EOF
-> @@ -54,6 +55,17 @@ usage() {
->  	    --page-size=PAGE_SIZE
->  	                           Specify the page size (translation granule) (4k, 16k or
->  	                           64k, default is 64k, arm64 only)
-> +	    --earlycon=EARLYCON
-> +	                           Specify the UART name, type and address (optional, arm and
-> +	                           arm64 only). The specified address will overwrite the UART
-> +	                           address set by the --vmm option. EARLYCON can be on of (case
-> +	                           sensitive):
-> +	               uart[8250],mmio,ADDR
-> +	                           Specify an 8250 compatible UART at address ADDR. Supported
-> +	                           register stride is 8 bit only.
-> +	               pl011,mmio,ADDR
-> +	                           Specify a PL011 compatible UART at address ADDR. Supported
-> +	                           register stride is 8 bit only.
+In order to solve this, reuse the vcpu-private TLB invalidation
+code to apply the same policy to the I-cache, nuking it every time
+the vcpu runs on a physical CPU that ran another vcpu of the same
+VM in the past.
 
-I think the PL011 only ever specified 32-bit register accesses? I just
-see that we actually do a writeb() for puts, that is not guaranteed to
-work on a hardware PL011, AFAIK. I guess QEMU just doesn't care ...
-Looks like we should fix this, maybe we get mmio32 for uart8250 for
-free, then.
+This involve renaming __kvm_tlb_flush_local_vmid() to
+__kvm_flush_cpu_context(), and inserting a local i-cache invalidation
+there.
 
-The kernel specifies "pl011,mmio32,ADDR" or "pl011,ADDR", so I think we
-should keep it compatible. "mmio[32]" is pretty much redundant on the
-PL011 (no port I/O), I think it's just for consistency with the 8250.
-Can you tweak the routine below to make this optional, and also accept
-mmio32?
+Cc: stable@vger.kernel.org
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/include/asm/kvm_asm.h   | 4 ++--
+ arch/arm64/kvm/arm.c               | 7 ++++++-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c | 6 +++---
+ arch/arm64/kvm/hyp/nvhe/tlb.c      | 3 ++-
+ arch/arm64/kvm/hyp/vhe/tlb.c       | 3 ++-
+ 5 files changed, 15 insertions(+), 8 deletions(-)
 
-Cheers,
-Andre
-
->  EOF
->      exit 1
->  }
-> @@ -112,6 +124,9 @@ while [[ "$1" = -* ]]; do
->  	--page-size)
->  	    page_size="$arg"
->  	    ;;
-> +	--earlycon)
-> +	    earlycon="$arg"
-> +	    ;;
->  	--help)
->  	    usage
->  	    ;;
-> @@ -170,6 +185,26 @@ elif [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
->          echo '--vmm must be one of "qemu" or "kvmtool"!'
->          usage
->      fi
-> +
-> +    if [ "$earlycon" ]; then
-> +        name=$(echo $earlycon|cut -d',' -f1)
-> +        if [ "$name" != "uart" ] && [ "$name" != "uart8250" ] &&
-> +                [ "$name" != "pl011" ]; then
-> +            echo "unknown earlycon name: $name"
-> +            usage
-> +        fi
-> +        type=$(echo $earlycon|cut -d',' -f2)
-> +        if [ "$type" != "mmio" ]; then
-> +            echo "unknown earlycon type: $type"
-> +            usage
-> +        fi
-> +        addr=$(echo $earlycon|cut -d',' -f3)
-> +        if [ -z "$addr" ]; then
-> +            echo "missing earlycon address"
-> +            usage
-> +        fi
-> +        arm_uart_early_addr=$addr
-> +    fi
->  elif [ "$arch" = "ppc64" ]; then
->      testdir=powerpc
->      firmware="$testdir/boot_rom.bin"
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index 9c0e396dd03f..a7ab84f781f7 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -47,7 +47,7 @@
+ #define __KVM_HOST_SMCCC_FUNC___kvm_flush_vm_context		2
+ #define __KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa		3
+ #define __KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid		4
+-#define __KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_local_vmid	5
++#define __KVM_HOST_SMCCC_FUNC___kvm_flush_cpu_context		5
+ #define __KVM_HOST_SMCCC_FUNC___kvm_timer_set_cntvoff		6
+ #define __KVM_HOST_SMCCC_FUNC___kvm_enable_ssbs			7
+ #define __KVM_HOST_SMCCC_FUNC___vgic_v3_get_gic_config		8
+@@ -183,10 +183,10 @@ DECLARE_KVM_HYP_SYM(__bp_harden_hyp_vecs);
+ #define __bp_harden_hyp_vecs	CHOOSE_HYP_SYM(__bp_harden_hyp_vecs)
+ 
+ extern void __kvm_flush_vm_context(void);
++extern void __kvm_flush_cpu_context(struct kvm_s2_mmu *mmu);
+ extern void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa,
+ 				     int level);
+ extern void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu);
+-extern void __kvm_tlb_flush_local_vmid(struct kvm_s2_mmu *mmu);
+ 
+ extern void __kvm_timer_set_cntvoff(u64 cntvoff);
+ 
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index fc4c95dd2d26..7f06ba76698d 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -385,11 +385,16 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 	last_ran = this_cpu_ptr(mmu->last_vcpu_ran);
+ 
+ 	/*
++	 * We guarantee that both TLBs and I-cache are private to each
++	 * vcpu. If detecting that a vcpu from the same VM has
++	 * previously run on the same physical CPU, call into the
++	 * hypervisor code to nuke the relevant contexts.
++	 *
+ 	 * We might get preempted before the vCPU actually runs, but
+ 	 * over-invalidation doesn't affect correctness.
+ 	 */
+ 	if (*last_ran != vcpu->vcpu_id) {
+-		kvm_call_hyp(__kvm_tlb_flush_local_vmid, mmu);
++		kvm_call_hyp(__kvm_flush_cpu_context, mmu);
+ 		*last_ran = vcpu->vcpu_id;
+ 	}
+ 
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index 8f129968204e..936328207bde 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -46,11 +46,11 @@ static void handle___kvm_tlb_flush_vmid(struct kvm_cpu_context *host_ctxt)
+ 	__kvm_tlb_flush_vmid(kern_hyp_va(mmu));
+ }
+ 
+-static void handle___kvm_tlb_flush_local_vmid(struct kvm_cpu_context *host_ctxt)
++static void handle___kvm_flush_cpu_context(struct kvm_cpu_context *host_ctxt)
+ {
+ 	DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
+ 
+-	__kvm_tlb_flush_local_vmid(kern_hyp_va(mmu));
++	__kvm_flush_cpu_context(kern_hyp_va(mmu));
+ }
+ 
+ static void handle___kvm_timer_set_cntvoff(struct kvm_cpu_context *host_ctxt)
+@@ -115,7 +115,7 @@ static const hcall_t host_hcall[] = {
+ 	HANDLE_FUNC(__kvm_flush_vm_context),
+ 	HANDLE_FUNC(__kvm_tlb_flush_vmid_ipa),
+ 	HANDLE_FUNC(__kvm_tlb_flush_vmid),
+-	HANDLE_FUNC(__kvm_tlb_flush_local_vmid),
++	HANDLE_FUNC(__kvm_flush_cpu_context),
+ 	HANDLE_FUNC(__kvm_timer_set_cntvoff),
+ 	HANDLE_FUNC(__kvm_enable_ssbs),
+ 	HANDLE_FUNC(__vgic_v3_get_gic_config),
+diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
+index fbde89a2c6e8..229b06748c20 100644
+--- a/arch/arm64/kvm/hyp/nvhe/tlb.c
++++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
+@@ -123,7 +123,7 @@ void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu)
+ 	__tlb_switch_to_host(&cxt);
+ }
+ 
+-void __kvm_tlb_flush_local_vmid(struct kvm_s2_mmu *mmu)
++void __kvm_flush_cpu_context(struct kvm_s2_mmu *mmu)
+ {
+ 	struct tlb_inv_context cxt;
+ 
+@@ -131,6 +131,7 @@ void __kvm_tlb_flush_local_vmid(struct kvm_s2_mmu *mmu)
+ 	__tlb_switch_to_guest(mmu, &cxt);
+ 
+ 	__tlbi(vmalle1);
++	asm volatile("ic iallu");
+ 	dsb(nsh);
+ 	isb();
+ 
+diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
+index fd7895945bbc..66f17349f0c3 100644
+--- a/arch/arm64/kvm/hyp/vhe/tlb.c
++++ b/arch/arm64/kvm/hyp/vhe/tlb.c
+@@ -127,7 +127,7 @@ void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu)
+ 	__tlb_switch_to_host(&cxt);
+ }
+ 
+-void __kvm_tlb_flush_local_vmid(struct kvm_s2_mmu *mmu)
++void __kvm_flush_cpu_context(struct kvm_s2_mmu *mmu)
+ {
+ 	struct tlb_inv_context cxt;
+ 
+@@ -135,6 +135,7 @@ void __kvm_tlb_flush_local_vmid(struct kvm_s2_mmu *mmu)
+ 	__tlb_switch_to_guest(mmu, &cxt);
+ 
+ 	__tlbi(vmalle1);
++	asm volatile("ic iallu");
+ 	dsb(nsh);
+ 	isb();
+ 
+-- 
+2.30.0
 
 _______________________________________________
 kvmarm mailing list
