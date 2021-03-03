@@ -2,74 +2,69 @@ Return-Path: <SRS0=lGHe=IB=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2140C433DB
-	for <kvmarm@archiver.kernel.org>; Wed,  3 Mar 2021 19:07:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4EFCC433E0
+	for <kvmarm@archiver.kernel.org>; Wed,  3 Mar 2021 21:13:44 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E1EA364EEF
-	for <kvmarm@archiver.kernel.org>; Wed,  3 Mar 2021 19:07:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1EA364EEF
+	by mail.kernel.org (Postfix) with ESMTP id 1E85F64EF8
+	for <kvmarm@archiver.kernel.org>; Wed,  3 Mar 2021 21:13:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E85F64EF8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E8A74B4ED;
-	Wed,  3 Mar 2021 14:07:46 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F4DD4B58F;
+	Wed,  3 Mar 2021 16:13:43 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id eKxeqHaI6CbB; Wed,  3 Mar 2021 14:07:45 -0500 (EST)
+	with ESMTP id JkoEiy1hd4lF; Wed,  3 Mar 2021 16:13:38 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 375D34B53E;
-	Wed,  3 Mar 2021 14:07:45 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D0AB34B502;
+	Wed,  3 Mar 2021 16:13:38 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DBC554B531
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Mar 2021 14:07:43 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 776CA4B4BC
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Mar 2021 16:13:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id U8tms-XMUXK0 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  3 Mar 2021 14:07:42 -0500 (EST)
+ with ESMTP id 6uSMDeXJ6B1T for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  3 Mar 2021 16:13:35 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 651304B4ED
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Mar 2021 14:07:42 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 0254164E90;
- Wed,  3 Mar 2021 19:07:41 +0000 (UTC)
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
- (envelope-from <maz@kernel.org>)
- id 1lHWqQ-00H5g8-NI; Wed, 03 Mar 2021 19:07:38 +0000
-Date: Wed, 03 Mar 2021 19:07:37 +0000
-Message-ID: <87mtvkys1y.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Will Deacon <will@kernel.org>, Jia He <justin.he@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E9FF84B12E
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Mar 2021 16:13:34 -0500 (EST)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id D1E2E64EC4;
+ Wed,  3 Mar 2021 21:13:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1614806011;
+ bh=La069RJVv7lSY65LoO9v4vrFVi06mMCWoGSs5E3bs80=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=ChLlPyKWb/dzGDPuABC1x/e5vhIYdLeTFGQHCU75XumX71T2cxBhQEizAyGm5ILbm
+ OnH9//VdNR4ieq71aPR0gWq9xb0G3ZBbVggXbZofYmjYpoMNmOI8IJ0ntQr2dYgLBZ
+ +lIIDL2g/ErngnPuC2K9axtXikrtjiaf3WOov/Z7CVUxWeX/eWOjS9BbUlqA+akLsq
+ ZkaUQGyFfOM7Ci7sFgOLIflfcwAi3BH2ksW5Ll34EfE9d3INdakvVlGPjIisiXUFWJ
+ PdoSNU3rotHuwS+YPkG/wSdwQZRsQ1/ETLAau5/hmNkPeKL/DX/8DYdr8o9e3W/ub+
+ KsUcvRP1waJdg==
+Date: Wed, 3 Mar 2021 21:13:26 +0000
+From: Will Deacon <will@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
 Subject: Re: [PATCH] KVM: arm64: Fix unaligned addr case in mmu walking
-In-Reply-To: <20210303112934.GA18452@willie-the-truck>
+Message-ID: <20210303211325.GA20055@willie-the-truck>
 References: <20210303024225.2591-1-justin.he@arm.com>
  <20210303112934.GA18452@willie-the-truck>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: will@kernel.org, justin.he@arm.com,
- kvmarm@lists.cs.columbia.edu, james.morse@arm.com,
- julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, catalin.marinas@arm.com,
- gshan@redhat.com, wangyanan55@huawei.com, qperret@google.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+ <87mtvkys1y.wl-maz@kernel.org>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <87mtvkys1y.wl-maz@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: Jia He <justin.he@arm.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -86,106 +81,54 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 03 Mar 2021 11:29:34 +0000,
-Will Deacon <will@kernel.org> wrote:
+On Wed, Mar 03, 2021 at 07:07:37PM +0000, Marc Zyngier wrote:
+> From e0524b41a71e0f17d6dc8f197e421e677d584e72 Mon Sep 17 00:00:00 2001
+> From: Jia He <justin.he@arm.com>
+> Date: Wed, 3 Mar 2021 10:42:25 +0800
+> Subject: [PATCH] KVM: arm64: Fix range alignment when walking page tables
 > 
-> On Wed, Mar 03, 2021 at 10:42:25AM +0800, Jia He wrote:
-> > If the start addr is not aligned with the granule size of that level.
-> > loop step size should be adjusted to boundary instead of simple
-> > kvm_granual_size(level) increment. Otherwise, some mmu entries might miss
-> > the chance to be walked through.
-> > E.g. Assume the unmap range [data->addr, data->end] is
-> > [0xff00ab2000,0xff00cb2000] in level 2 walking and NOT block mapping.
-> > And the 1st part of that pmd entry is [0xff00ab2000,0xff00c00000]. The
-> > pmd value is 0x83fbd2c1002 (not valid entry). In this case, data->addr
-> > should be adjusted to 0xff00c00000 instead of 0xff00cb2000.
-> > 
-> > Without this fix, userspace "segment fault" error can be easily
-> > triggered by running simple gVisor runsc cases on an Ampere Altra
-> > server:
-> >     docker run --runtime=runsc -it --rm  ubuntu /bin/bash
-> > 
-> > In container:
-> >     for i in `seq 1 100`;do ls;done
-> > 
-> > Reported-by: Howard Zhang <Howard.Zhang@arm.com>
-> > Signed-off-by: Jia He <justin.he@arm.com>
-> > ---
-> >  arch/arm64/kvm/hyp/pgtable.c | 1 +
-> >  1 file changed, 1 insertion(+)
-> > 
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > index bdf8e55ed308..4d99d07c610c 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -225,6 +225,7 @@ static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
-> >  		goto out;
-> >  
-> >  	if (!table) {
-> > +		data->addr = ALIGN_DOWN(data->addr, kvm_granule_size(level));
-> >  		data->addr += kvm_granule_size(level);
+> When walking the page tables at a given level, and if the start
+> address for the range isn't aligned for that level, we propagate
+> the misalignment on each iteration at that level.
 > 
-> Can you replace both of these lines with:
+> This results in the walker ignoring a number of entries (depending
+> on the original misalignment) on each subsequent iteration.
 > 
-> 	data->addr = ALIGN(data->addr, kvm_granule_size(level));
+> Properly aligning the address at the before the next iteration
+
+"at the before the next" ???
+
+> addresses the issue.
 > 
-> instead?
+> Cc: stable@vger.kernel.org
+> Reported-by: Howard Zhang <Howard.Zhang@arm.com>
+> Signed-off-by: Jia He <justin.he@arm.com>
+> Fixes: b1e57de62cfb ("KVM: arm64: Add stand-alone page-table walker infrastructure")
+> [maz: rewrite commit message]
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Link: https://lore.kernel.org/r/20210303024225.2591-1-justin.he@arm.com
+> ---
+>  arch/arm64/kvm/hyp/pgtable.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index 4d177ce1d536..124cd2f93020 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -223,7 +223,7 @@ static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
+>  		goto out;
+>  
+>  	if (!table) {
+> -		data->addr += kvm_granule_size(level);
+> +		data->addr = ALIGN(data->addr, kvm_granule_size(level));
+>  		goto out;
+>  	}
 
-Seems like a good option. I also took the liberty to rewrite the
-commit message in an effort to make it a bit clearer.
+If Jia is happy with it, please feel free to add:
 
-Jia, please let me know if you are OK with these cosmetic changes.
+Acked-by: Will Deacon <will@kernel.org>
 
-
-Thanks,
-
-	M.
-
-From e0524b41a71e0f17d6dc8f197e421e677d584e72 Mon Sep 17 00:00:00 2001
-From: Jia He <justin.he@arm.com>
-Date: Wed, 3 Mar 2021 10:42:25 +0800
-Subject: [PATCH] KVM: arm64: Fix range alignment when walking page tables
-
-When walking the page tables at a given level, and if the start
-address for the range isn't aligned for that level, we propagate
-the misalignment on each iteration at that level.
-
-This results in the walker ignoring a number of entries (depending
-on the original misalignment) on each subsequent iteration.
-
-Properly aligning the address at the before the next iteration
-addresses the issue.
-
-Cc: stable@vger.kernel.org
-Reported-by: Howard Zhang <Howard.Zhang@arm.com>
-Signed-off-by: Jia He <justin.he@arm.com>
-Fixes: b1e57de62cfb ("KVM: arm64: Add stand-alone page-table walker infrastructure")
-[maz: rewrite commit message]
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20210303024225.2591-1-justin.he@arm.com
----
- arch/arm64/kvm/hyp/pgtable.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 4d177ce1d536..124cd2f93020 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -223,7 +223,7 @@ static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
- 		goto out;
- 
- 	if (!table) {
--		data->addr += kvm_granule_size(level);
-+		data->addr = ALIGN(data->addr, kvm_granule_size(level));
- 		goto out;
- 	}
- 
--- 
-2.30.0
-
-
--- 
-Without deviation from the norm, progress is not possible.
+Will
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
