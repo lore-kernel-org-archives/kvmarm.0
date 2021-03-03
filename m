@@ -1,74 +1,58 @@
-Return-Path: <SRS0=a/wb=IA=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=lGHe=IB=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 593D2C433DB
-	for <kvmarm@archiver.kernel.org>; Tue,  2 Mar 2021 18:57:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2647DC433DB
+	for <kvmarm@archiver.kernel.org>; Wed,  3 Mar 2021 02:42:43 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CDE6F64F32
-	for <kvmarm@archiver.kernel.org>; Tue,  2 Mar 2021 18:57:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDE6F64F32
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 652BF64EBB
+	for <kvmarm@archiver.kernel.org>; Wed,  3 Mar 2021 02:42:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 652BF64EBB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 741C84B6DD;
-	Tue,  2 Mar 2021 13:57:33 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D46104B714;
+	Tue,  2 Mar 2021 21:42:41 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id fttU2ZJiah6V; Tue,  2 Mar 2021 13:57:32 -0500 (EST)
+	with ESMTP id 2Xkh2ILurEIs; Tue,  2 Mar 2021 21:42:40 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B8EF64B6E6;
-	Tue,  2 Mar 2021 13:57:30 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BB20F4B709;
+	Tue,  2 Mar 2021 21:42:40 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D07EB4B461
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Mar 2021 13:57:29 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4DF974B707
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Mar 2021 21:42:40 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Y6HFkKb4CgGG for <kvmarm@lists.cs.columbia.edu>;
- Tue,  2 Mar 2021 13:57:27 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 805824B444
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Mar 2021 13:57:27 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id D528B64F2F;
- Tue,  2 Mar 2021 18:57:25 +0000 (UTC)
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=hot-poop.lan)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
- (envelope-from <maz@kernel.org>)
- id 1lHACy-00GmGh-4N; Tue, 02 Mar 2021 18:57:24 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH] kvm: arm64: nvhe: Save the SPE context early
-Date: Tue,  2 Mar 2021 18:57:11 +0000
-Message-Id: <161471117620.3770794.12358302238773672698.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20210302120345.3102874-1-suzuki.poulose@arm.com>
-References: <20210302120345.3102874-1-suzuki.poulose@arm.com>
-MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, anshuman.khandual@arm.com,
- linux-arm-kernel@lists.infradead.org, christoffer.dall@arm.com,
- mark.rutland@arm.com, stable@vger.kernel.org, will@kernel.org,
- catalin.marinas@arm.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- alexandru.elisei@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, anshuman.khandual@arm.com,
- Catalin Marinas <catalin.marinas@arm.com>, stable@vger.kernel.org,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ with ESMTP id tSmRKDhWcanL for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  2 Mar 2021 21:42:39 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 10F0A4B67B
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Mar 2021 21:42:39 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8D8B71FB;
+ Tue,  2 Mar 2021 18:42:38 -0800 (PST)
+Received: from entos-ampere-02.shanghai.arm.com
+ (entos-ampere-02.shanghai.arm.com [10.169.214.110])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id A34EE3F73B;
+ Tue,  2 Mar 2021 18:42:34 -0800 (PST)
+From: Jia He <justin.he@arm.com>
+To: Marc Zyngier <maz@kernel.org>,
+	kvmarm@lists.cs.columbia.edu
+Subject: [PATCH] KVM: arm64: Fix unaligned addr case in mmu walking
+Date: Wed,  3 Mar 2021 10:42:25 +0800
+Message-Id: <20210303024225.2591-1-justin.he@arm.com>
+X-Mailer: git-send-email 2.17.1
+Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, Jia He <justin.he@arm.com>,
+ Will Deacon <will@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -80,34 +64,50 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 2 Mar 2021 12:03:45 +0000, Suzuki K Poulose wrote:
-> The nVHE KVM hyp drains and disables the SPE buffer, before
-> entering the guest, as the EL1&0 translation regime
-> is going to be loaded with that of the guest.
-> 
-> But this operation is performed way too late, because :
->   - The owning translation regime of the SPE buffer
->     is transferred to EL2. (MDCR_EL2_E2PB == 0)
->   - The guest Stage1 is loaded.
-> 
-> [...]
+If the start addr is not aligned with the granule size of that level.
+loop step size should be adjusted to boundary instead of simple
+kvm_granual_size(level) increment. Otherwise, some mmu entries might miss
+the chance to be walked through.
+E.g. Assume the unmap range [data->addr, data->end] is
+[0xff00ab2000,0xff00cb2000] in level 2 walking and NOT block mapping.
+And the 1st part of that pmd entry is [0xff00ab2000,0xff00c00000]. The
+pmd value is 0x83fbd2c1002 (not valid entry). In this case, data->addr
+should be adjusted to 0xff00c00000 instead of 0xff00cb2000.
 
-Applied to kvmarm-master/fixes, thanks!
+Without this fix, userspace "segment fault" error can be easily
+triggered by running simple gVisor runsc cases on an Ampere Altra
+server:
+    docker run --runtime=runsc -it --rm  ubuntu /bin/bash
 
-[1/1] kvm: arm64: nvhe: Save the SPE context early
-      commit: cfe1e2b6949785e90e84918295f2be1b6fd152b6
+In container:
+    for i in `seq 1 100`;do ls;done
 
-Cheers,
+Reported-by: Howard Zhang <Howard.Zhang@arm.com>
+Signed-off-by: Jia He <justin.he@arm.com>
+---
+ arch/arm64/kvm/hyp/pgtable.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-	M.
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index bdf8e55ed308..4d99d07c610c 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -225,6 +225,7 @@ static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
+ 		goto out;
+ 
+ 	if (!table) {
++		data->addr = ALIGN_DOWN(data->addr, kvm_granule_size(level));
+ 		data->addr += kvm_granule_size(level);
+ 		goto out;
+ 	}
 -- 
-Without deviation from the norm, progress is not possible.
-
+2.17.1
 
 _______________________________________________
 kvmarm mailing list
