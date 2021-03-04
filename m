@@ -2,78 +2,81 @@ Return-Path: <SRS0=dAAB=IC=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65156C433DB
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Mar 2021 11:55:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D3E0C433E0
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Mar 2021 11:55:20 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B728C64F35
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Mar 2021 11:55:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B728C64F35
+	by mail.kernel.org (Postfix) with ESMTP id 89BEF64F34
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Mar 2021 11:55:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89BEF64F34
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 303AA4B39E;
-	Thu,  4 Mar 2021 06:55:17 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B5634B3B4;
+	Thu,  4 Mar 2021 06:55:19 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Wrd4YM5r5-02; Thu,  4 Mar 2021 06:55:15 -0500 (EST)
+	with ESMTP id 2XULOMGJVt3E; Thu,  4 Mar 2021 06:55:18 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E81094B3B3;
-	Thu,  4 Mar 2021 06:55:15 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FB084B4BE;
+	Thu,  4 Mar 2021 06:55:18 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EC4FC4B2EC
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Mar 2021 06:55:14 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AED724B344
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Mar 2021 06:55:16 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id g31Lp7zX9j5w for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Mar 2021 06:55:13 -0500 (EST)
-Received: from mail-ej1-f73.google.com (mail-ej1-f73.google.com
- [209.85.218.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A4C9A4B2BB
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Mar 2021 06:55:13 -0500 (EST)
-Received: by mail-ej1-f73.google.com with SMTP id v10so12003729ejh.15
- for <kvmarm@lists.cs.columbia.edu>; Thu, 04 Mar 2021 03:55:13 -0800 (PST)
+ with ESMTP id bZ2bju2HcGdZ for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Mar 2021 06:55:15 -0500 (EST)
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com
+ [209.85.128.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9C4AA4B2BB
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Mar 2021 06:55:15 -0500 (EST)
+Received: by mail-wm1-f74.google.com with SMTP id b62so4362275wmc.5
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 04 Mar 2021 03:55:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=sender:date:message-id:mime-version:subject:from:to:cc;
- bh=Hfz/wP17GW//DdQHHpJ3y23DvHBN61353wBiQ+oY30Q=;
- b=EkWT3nItTf1VPr+IOgUa03NVgBqlJASEmi7YHgB7MIeHcBqVMDMQfLwKzHLbMHGZ8C
- eWZZF/+BpVE2XfpBOpoacp52/I2sCNJn4t0c+aXKuwGSoVDZgw2geSQ/vCeR7UTi54iA
- Tb50hMhsT50dNNzlFz1L5aW1kS89Pr0ycDFVUexjOezhW4anaOXKJOWlTl49e9tDVq2i
- ZQhp9Dh80yJbUVyBd7W7vcNB9TTdN509A5gUuLvuwk8hh3wbpaV023SvSyTFs+8BZHrm
- 1bp/BZmNRpLz/se+1ANgduLDryJDWlEfZCYVkrlAOF0wyufotLmPVUjT1d69t+/gW4g1
- lwNg==
+ h=sender:date:in-reply-to:message-id:mime-version:references:subject
+ :from:to:cc; bh=w3uq674/0tvskVI05Vhx67uka1K//LSv9mwUEMDST+Y=;
+ b=q+aWYVuCFmvb1x9aRuZGZBFT/kXFp7/HF+NtIpWReaJxFShWCABaZ+mx/gqh2zoTb0
+ ube4+sDB9Gd+gJq6AcsaZfKJ+b42Th/iJW8VHKAk8wVIOg4rRoyJElP62mxil0+Cj9Qs
+ 4WfEZkpPk7OyU2LPCBbp/YfF4TnrH5xvSADclCA0yyYYBBWR72zAxtLsBt6/VjOtnOiN
+ 9Xx6TqPV6ylYaSObBjXYK+JAtK4BAfB9R/HF3Z+VtGIbSM8OkRcfkgqC+ikvYgxI1VzF
+ u1wBi++2ju4kKETTi6/IIPGKrFTI9UNLvTcJTrutRUDJoKR79o0piBXWqegwYB4qJQpp
+ Uc+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
- :to:cc;
- bh=Hfz/wP17GW//DdQHHpJ3y23DvHBN61353wBiQ+oY30Q=;
- b=f5N6B9zEBWGLXozN9MzuK/cPrIUUrk638lFyRJhv/2a8WXUvstMXSe9le4NIx9wD6T
- 46b+ELJB8nYoYDb1om9PCVUvnohvrNuV9hV+tCeVgOYjSxo3gubtY/ab3xLCzPCaQMGm
- /28y2MunFE/1eXYD94tUHMn0pJ/Di0SYhZ33YJDyuq/O/zGKzax0T8pgPY73Y9P6C2jq
- y3pflnH5GI10vS7z6UbQJi/Pda2dTV5rVRfQEil6cnAhdfM0dK/Ep2RNxmHusQ9d//t+
- f1t/B3WnmhAtpgMJQJKqpHgPv6iswNCYDeuyfVUqJGBRPmrk5olQkdH/rGC5OHhPcx7O
- Ro5w==
-X-Gm-Message-State: AOAM5338k5fpr6qrtc5PctkPErR0w7ucEBFUJIh0C7Pei3fsZej6OEKq
- nAozOc9lhEeRL3JIJrLfCi2qWB/oJet8tx2pnGSBSiXQs7fXC32Su0CJrQg3xaxotxH/xEAofFN
- M2Wa/wB3ltmGysAkkNMtEsqMvRjo4TUQ7FF4lNxUPb7GKXm6Aj6m/ozdbpUIiu7K7kRnc6w==
-X-Google-Smtp-Source: ABdhPJyr/dmkwWpyrd9O3u1hYhf6Ehhl7VcNvVS0RsDtMB5galzAQdgfT4qvuI5D7D4eZDdmNlVhVdykODU=
-X-Received: from ascull.c.googlers.com ([fda3:e722:ac3:10:28:9cb1:c0a8:1510])
- (user=ascull job=sendgmr) by 2002:aa7:da48:: with SMTP id
- w8mr3744158eds.81.1614858912225; 
- Thu, 04 Mar 2021 03:55:12 -0800 (PST)
-Date: Thu,  4 Mar 2021 11:54:43 +0000
-Message-Id: <20210304115454.3597879-1-ascull@google.com>
+ h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
+ :references:subject:from:to:cc;
+ bh=w3uq674/0tvskVI05Vhx67uka1K//LSv9mwUEMDST+Y=;
+ b=Jy8xnnAUo/QblRpacDTJ3eDJUXWsKE4cX0Cct237eWp1i56m5QAj8UxVBkEy3zTJg9
+ yoN/aMl/wioyBjzeDvecc815+dCe5WJIOAqNuLbZm+BTnlmb1CoMTuK6E+X+E1K4TFmf
+ ugbj2KZPqu7tKC9kAWvYAaVQYWMHLz72nqLzucwId8Vz7ppYyAQiqIdjv9XZ0k1Mjcqm
+ r1Q7W3Q6Pxak9trHuULpag6QpABOwdcVSEpeCqjydStFTZMIREBLl3zvQALuX0qu5n3U
+ zjGiog2xjvZ3b4rmyXAsZlkOVlGKZg/vqcRqJlD/AUrT0RMam7A6Y1eDC0WnOEnr2+/8
+ WHrg==
+X-Gm-Message-State: AOAM531LspOWXuXRruALy8afw6cVseu513d0gtKQ5UkG5O3HAKdsUXrJ
+ OGIpU8VzPIlgpmKx+SFmhtGjgM0fSxghWeyj/GduT5/AXw9VRo66pY78EF7GnKs8nU3aJMD9Mmt
+ Dkp9zt+9iCU4BMJSQrsFdy3AbadHyceDVd37NniegLV9GBrCKbgkpUcyMOGurB1JgHKtgNg==
+X-Google-Smtp-Source: ABdhPJyPKPyg87hB2EkQ0c/eqbRX7g3yaxFHzgDRaefDedmhXDrwobSFSKnBb1BBKIu0XVmMfK/phRXtnJY=
+X-Received: from ascull.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1510])
+ (user=ascull job=sendgmr) by 2002:a7b:c18e:: with SMTP id
+ y14mr1285799wmi.1.1614858914228; 
+ Thu, 04 Mar 2021 03:55:14 -0800 (PST)
+Date: Thu,  4 Mar 2021 11:54:44 +0000
+In-Reply-To: <20210304115454.3597879-1-ascull@google.com>
+Message-Id: <20210304115454.3597879-2-ascull@google.com>
 Mime-Version: 1.0
+References: <20210304115454.3597879-1-ascull@google.com>
 X-Mailer: git-send-email 2.30.1.766.gb4fecdf3b7-goog
-Subject: [PATCH 00/10] FPSIMD restore bypass and protecting
+Subject: [PATCH 01/10] KVM: arm64: Leave KVM_ARM64_DEBUG_DIRTY updates to the
+ host
 From: Andrew Scull <ascull@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: kernel-team@android.com, maz@kernel.org, catalin.marinas@arm.com,
@@ -94,57 +97,61 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This series build towards protecting of FPSIMD state in protected KVM.
-Most of the series is refactoring to create separation between host and
-hyp for when that is needed.
+Move the clearing of KVM_ARM64_DEBUG_DIRTY from being one of the last
+things hyp does before exiting to the host, to being one of the first
+things the host does after hyp exits.
 
-There was the need to track where a vcpu last loaded its FPSIMD state so
-I've also made use of this to avoid needless reloading of vcpu FPSIMD
-state when that's possible. I don't know if this makes any performance
-difference and don't know what a meaningful benchmark would be to
-measure against so help and advice on this front would be appreciated.
+This means the host always manages the state of the bit and hyp simply
+respects that in the context switch.
 
-The last patch in the series is concerned with the protecting of a
-protected VM's FPSIMD state. It will depend on knowing which vcpus are
-protected and having a stage 2 over the host but demonstrates the
-trapping and lazy switching that I had in mind.
+No functional change.
 
-The series has, so far, only been lightly tested on qemu with paranoia
-running on the host and in the vcpu.
+Signed-off-by: Andrew Scull <ascull@google.com>
+---
+ arch/arm64/include/asm/kvm_host.h         | 2 +-
+ arch/arm64/kvm/debug.c                    | 2 ++
+ arch/arm64/kvm/hyp/include/hyp/debug-sr.h | 2 --
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-It applies atop 5.12-rc.
-
-This is similar, but much evolved, version of a series sent out last
-year:
-https://lore.kernel.org/r/20200713210505.2959828-1-ascull@google.com/
-
-Andrew Scull (10):
-  KVM: arm64: Leave KVM_ARM64_DEBUG_DIRTY updates to the host
-  KVM: arm64: Synchronize vcpu FPSIMD in the host
-  KVM: arm64: Unmap host task thread flags from hyp
-  KVM: arm64: Support smp_processor_id() in nVHE hyp
-  KVM: arm64: Track where vcpu FP state was last loaded
-  KVM: arm64: Avoid needlessly reloading guest FP state
-  KVM: arm64: Separate host and hyp vcpu FP flags
-  KVM: arm64: Pass the arch run struct explicitly
-  KVM: arm64: Use hyp-private run struct in protected mode
-  RFC: KVM: arm64: Manage FPSIMD state at EL2 for protected vCPUs
-
- arch/arm64/include/asm/fpsimd.h           |   1 +
- arch/arm64/include/asm/kvm_host.h         |  46 +++++++---
- arch/arm64/include/asm/kvm_hyp.h          |   1 +
- arch/arm64/kernel/fpsimd.c                |  11 ++-
- arch/arm64/kvm/arm.c                      |   8 +-
- arch/arm64/kvm/debug.c                    |   2 +
- arch/arm64/kvm/fpsimd.c                   |  69 +++++++++++----
- arch/arm64/kvm/hyp/include/hyp/debug-sr.h |   2 -
- arch/arm64/kvm/hyp/include/hyp/switch.h   |  57 ++++++------
- arch/arm64/kvm/hyp/nvhe/hyp-main.c        |  24 ++++++
- arch/arm64/kvm/hyp/nvhe/hyp-smp.c         |   2 +
- arch/arm64/kvm/hyp/nvhe/switch.c          | 100 ++++++++++++++++++----
- arch/arm64/kvm/hyp/vhe/switch.c           |   8 +-
- 13 files changed, 249 insertions(+), 82 deletions(-)
-
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 3d10e6527f7d..6b33f720ce9c 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -390,7 +390,7 @@ struct kvm_vcpu_arch {
+ })
+ 
+ /* vcpu_arch flags field values: */
+-#define KVM_ARM64_DEBUG_DIRTY		(1 << 0)
++#define KVM_ARM64_DEBUG_DIRTY		(1 << 0) /* vcpu is using debug */
+ #define KVM_ARM64_FP_ENABLED		(1 << 1) /* guest FP regs loaded */
+ #define KVM_ARM64_FP_HOST		(1 << 2) /* host FP regs loaded */
+ #define KVM_ARM64_HOST_SVE_IN_USE	(1 << 3) /* backup for host TIF_SVE */
+diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+index 7a7e425616b5..e9932618a362 100644
+--- a/arch/arm64/kvm/debug.c
++++ b/arch/arm64/kvm/debug.c
+@@ -209,6 +209,8 @@ void kvm_arm_clear_debug(struct kvm_vcpu *vcpu)
+ {
+ 	trace_kvm_arm_clear_debug(vcpu->guest_debug);
+ 
++	vcpu->arch.flags &= ~KVM_ARM64_DEBUG_DIRTY;
++
+ 	if (vcpu->guest_debug) {
+ 		restore_guest_debug_regs(vcpu);
+ 
+diff --git a/arch/arm64/kvm/hyp/include/hyp/debug-sr.h b/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
+index 4ebe9f558f3a..344c76a7af35 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
++++ b/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
+@@ -161,8 +161,6 @@ static inline void __debug_switch_to_host_common(struct kvm_vcpu *vcpu)
+ 
+ 	__debug_save_state(guest_dbg, guest_ctxt);
+ 	__debug_restore_state(host_dbg, host_ctxt);
+-
+-	vcpu->arch.flags &= ~KVM_ARM64_DEBUG_DIRTY;
+ }
+ 
+ #endif /* __ARM64_KVM_HYP_DEBUG_SR_H__ */
 -- 
 2.30.1.766.gb4fecdf3b7-goog
 
