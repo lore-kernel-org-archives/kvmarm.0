@@ -2,65 +2,87 @@ Return-Path: <SRS0=dAAB=IC=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D8E3C433DB
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Mar 2021 15:30:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94617C433DB
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Mar 2021 15:49:13 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8E2AC64FAA
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Mar 2021 15:30:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E2AC64FAA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id BBD6264F1C
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Mar 2021 15:49:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBD6264F1C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 232EF4B44B;
-	Thu,  4 Mar 2021 10:30:49 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 066544B3DB;
+	Thu,  4 Mar 2021 10:49:12 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 8haFNulKSD8z; Thu,  4 Mar 2021 10:30:48 -0500 (EST)
+	with ESMTP id 01a-75ASd8b4; Thu,  4 Mar 2021 10:49:11 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F02324B621;
-	Thu,  4 Mar 2021 10:30:47 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B4974B3F0;
+	Thu,  4 Mar 2021 10:49:11 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 01A184B621
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Mar 2021 10:30:46 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B7224B3DB
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Mar 2021 10:49:10 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZvtuPEc3K3hN for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Mar 2021 10:30:44 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9859A4B44B
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Mar 2021 10:30:44 -0500 (EST)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id F057A64F21;
- Thu,  4 Mar 2021 15:30:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1614871842;
- bh=zcvP/xRNovmcUNqEXMV6SKPJwphc6KAygaqAb/6nSsM=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=LADuN40EQStLkH6O6LUzMIxhc/aLZYRwZKhO9mkajUqlnhNqVCpweEwDTWfe/rlFO
- 1uQCI+qt3ZZN1DOkNmnQe1WEpAOpg+1xC++v9qwF9uND09qh5dh9soS9HnTO9ml74b
- b19FJ4Ma/0z5HrqtqOZrTUhKPKI4qgfRfgkAnyix0VgknVwyKyMu04vrSE44IXyPCg
- BmPKyobfvS7+/1bL+Ue+5VOJAyrGb4U1Im9vvRkmZkXTxt6xqmXsmb9bncj+iQeQnP
- WgKxC+ZQ7pQPsKNNYzx7rkiyzoluF2q4M3OwXSoy8LrssD3fUB8E4IrcEcf4ZCzi3V
- zhLZ8/pyh3I3A==
-Date: Thu, 4 Mar 2021 15:30:36 +0000
-From: Will Deacon <will@kernel.org>
-To: Quentin Perret <qperret@google.com>
+ with ESMTP id hWfPz1KlTJUz for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Mar 2021 10:49:09 -0500 (EST)
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com
+ [209.85.221.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2605D4B1F2
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Mar 2021 10:49:09 -0500 (EST)
+Received: by mail-wr1-f53.google.com with SMTP id f12so24376342wrx.8
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 04 Mar 2021 07:49:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=LhGupbzdEthuR24ULnc5046PaiLJrBs+er9+oVApeFU=;
+ b=EWHLHh+IyVUqUgAF4LFZSuMlY9wO0QpbQ806Aov0N14LnzY3kFNc0MBKZlNk0fMhBa
+ 7g4Vv/tUs3yoiKwACuE890DOhAPuphZYbSCPPuUaBxUgawsBJAdJTCBLXVzt5wVIYVUt
+ zc8bT49uF5u2iGpc6PKcZNdkMzvNW6RSaF2yAKzUaTiHmSf1WpEgc5Yhp8f7q+4albDc
+ nF4lron7w2kjGuZ+LtZ6whwHeQQrh6JNZcPXFeccx3iXxxUL7VHPFH6MEx27zPsugvH7
+ ZyGHw9Tchk2qVIeN2zMA+sCqvgrf1e2fXQObBmKBSPKY2GJeESgGs+oXFyLQCjmcCF1l
+ u3jw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=LhGupbzdEthuR24ULnc5046PaiLJrBs+er9+oVApeFU=;
+ b=fXmf9jQD/eC3FU4/g4cHuyEsIar4urE3k+chKFNjK0oLnfo4UJbz2Z00HLlSTf+A08
+ j6yYwMhEH+sOTNW5yKiFreQQEIdH0jl0ZoT6d7GyxsCP588yO+HYUj1tga7lvUpgBRqJ
+ E8IFYIwa0OjUZvSaprgGHby9KML8bNSwjni9vodChJL+WoqDjL5hmsw06dJ9iSOHBEDt
+ kP+5U+JKF/kqIXzrvncj9/C43fqlzD1hXSH2qix4RegujwHHhMg7ZnHCopx8xnjh56b7
+ Yq1izu3zayBvdwdXL1hfziklgkdn2m7Z14gJDH7OFZJ3NtvnQTcjUgpIP5YyUaPPEK/F
+ z7Zw==
+X-Gm-Message-State: AOAM531xaArfCj72WmDlSFf89sdY0APJYF2Mw5EmeT8ty6AXI0wJl88c
+ VJ4RVNbwixe/w4K34vS/R+0IOw==
+X-Google-Smtp-Source: ABdhPJwAMOHT+NpKRPC4qB1GLJVh8vLpTUsT2vC7aS+EbNwN1mBpqTrXaelCzUyIK9ZPcLvl/WPgqA==
+X-Received: by 2002:adf:9bcf:: with SMTP id e15mr4631058wrc.276.1614872947974; 
+ Thu, 04 Mar 2021 07:49:07 -0800 (PST)
+Received: from google.com (230.69.233.35.bc.googleusercontent.com.
+ [35.233.69.230])
+ by smtp.gmail.com with ESMTPSA id m10sm10074082wmh.13.2021.03.04.07.49.07
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 04 Mar 2021 07:49:07 -0800 (PST)
+Date: Thu, 4 Mar 2021 15:49:05 +0000
+From: Quentin Perret <qperret@google.com>
+To: Will Deacon <will@kernel.org>
 Subject: Re: [PATCH v3 12/32] KVM: arm64: Introduce a Hyp buddy page allocator
-Message-ID: <20210304153036.GA21507@willie-the-truck>
+Message-ID: <YEEBccpDtnJJdwkJ@google.com>
 References: <20210302150002.3685113-1-qperret@google.com>
  <20210302150002.3685113-13-qperret@google.com>
+ <20210304153036.GA21507@willie-the-truck>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20210302150002.3685113-13-qperret@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20210304153036.GA21507@willie-the-truck>
 Cc: android-kvm@google.com, catalin.marinas@arm.com, mate.toth-pal@arm.com,
  seanjc@google.com, tabba@google.com, linux-kernel@vger.kernel.org,
  robh+dt@kernel.org, linux-arm-kernel@lists.infradead.org, maz@kernel.org,
@@ -81,147 +103,47 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Mar 02, 2021 at 02:59:42PM +0000, Quentin Perret wrote:
-> When memory protection is enabled, the hyp code will require a basic
-> form of memory management in order to allocate and free memory pages at
-> EL2. This is needed for various use-cases, including the creation of hyp
-> mappings or the allocation of stage 2 page tables.
+On Thursday 04 Mar 2021 at 15:30:36 (+0000), Will Deacon wrote:
+> On Tue, Mar 02, 2021 at 02:59:42PM +0000, Quentin Perret wrote:
+> > +void *hyp_alloc_pages(struct hyp_pool *pool, unsigned int order)
+> > +{
+> > +	unsigned int i = order;
+> > +	struct hyp_page *p;
+> > +
+> > +	hyp_spin_lock(&pool->lock);
+> > +
+> > +	/* Look for a high-enough-order page */
+> > +	while (i < pool->max_order && list_empty(&pool->free_area[i]))
+> > +		i++;
+> > +	if (i >= pool->max_order) {
+> > +		hyp_spin_unlock(&pool->lock);
+> > +		return NULL;
+> > +	}
+> > +
+> > +	/* Extract it from the tree at the right order */
+> > +	p = list_first_entry(&pool->free_area[i], struct hyp_page, node);
+> > +	p = __hyp_extract_page(pool, p, order);
+> > +
+> > +	hyp_spin_unlock(&pool->lock);
+> > +	hyp_page_ref_inc(p);
 > 
-> To address these use-case, introduce a simple memory allocator in the
-> hyp code. The allocator is designed as a conventional 'buddy allocator',
-> working with a page granularity. It allows to allocate and free
-> physically contiguous pages from memory 'pools', with a guaranteed order
-> alignment in the PA space. Each page in a memory pool is associated
-> with a struct hyp_page which holds the page's metadata, including its
-> refcount, as well as its current order, hence mimicking the kernel's
-> buddy system in the GFP infrastructure. The hyp_page metadata are made
-> accessible through a hyp_vmemmap, following the concept of
-> SPARSE_VMEMMAP in the kernel.
-> 
-> Signed-off-by: Quentin Perret <qperret@google.com>
-> ---
->  arch/arm64/kvm/hyp/include/nvhe/gfp.h    |  55 +++++++
->  arch/arm64/kvm/hyp/include/nvhe/memory.h |  28 ++++
->  arch/arm64/kvm/hyp/nvhe/Makefile         |   2 +-
->  arch/arm64/kvm/hyp/nvhe/page_alloc.c     | 195 +++++++++++++++++++++++
->  4 files changed, 279 insertions(+), 1 deletion(-)
->  create mode 100644 arch/arm64/kvm/hyp/include/nvhe/gfp.h
->  create mode 100644 arch/arm64/kvm/hyp/nvhe/page_alloc.c
+> I find this a little scary, as we momentarily drop the lock. It think
+> it's ok because the reference count on the page must be 0 at this point,
 
-[...]
+Yep, @p shouldn't be visible to the caller yet so this should be fine.
 
-> +static void __hyp_attach_page(struct hyp_pool *pool,
-> +			      struct hyp_page *p)
-> +{
-> +	unsigned int order = p->order;
-> +	struct hyp_page *buddy;
-> +
-> +	memset(hyp_page_to_virt(p), 0, PAGE_SIZE << p->order);
-> +
-> +	/*
-> +	 * Only the first struct hyp_page of a high-order page (otherwise known
-> +	 * as the 'head') should have p->order set. The non-head pages should
-> +	 * have p->order = HYP_NO_ORDER. Here @p may no longer be the head
-> +	 * after coallescing, so make sure to mark it HYP_NO_ORDER proactively.
-> +	 */
-> +	p->order = HYP_NO_ORDER;
-> +	for (; (order + 1) < pool->max_order; order++) {
-> +		buddy = __find_buddy_avail(pool, p, order);
-> +		if (!buddy)
-> +			break;
-> +
-> +		/* Take the buddy out of its list, and coallesce with @p */
-> +		list_del_init(&buddy->node);
-> +		buddy->order = HYP_NO_ORDER;
-> +		p = (p < buddy) ? p : buddy;
+> but actually then I think it would be clearer to have a
+> hyp_page_ref_init() function which could take the lock, check that the
+> refcount is indeed 0 and then set it to 1.
 
-nit: this is min()
+Works for me. Maybe I'll use another name for the API to stay consistent
+with the kernel gfp code (hyp_page_ref_inc() and friends are inspired
+from their kernel counterpart). And I guess I can hyp_panic() if the
+refcount is not 0 at this point to match the VM_BUG_ON_PAGE() in
+set_page_refcounted().
 
-> +	}
-> +
-> +	/* Mark the new head, and insert it */
-> +	p->order = order;
-> +	list_add_tail(&p->node, &pool->free_area[order]);
-> +}
-> +
-> +static void hyp_attach_page(struct hyp_page *p)
-> +{
-> +	struct hyp_pool *pool = hyp_page_to_pool(p);
-> +
-> +	hyp_spin_lock(&pool->lock);
-> +	__hyp_attach_page(pool, p);
-> +	hyp_spin_unlock(&pool->lock);
-> +}
-> +
-> +static struct hyp_page *__hyp_extract_page(struct hyp_pool *pool,
-> +					   struct hyp_page *p,
-> +					   unsigned int order)
-> +{
-> +	struct hyp_page *buddy;
-> +
-> +	list_del_init(&p->node);
-> +	while (p->order > order) {
-> +		/*
-> +		 * The buddy of order n - 1 currently has HYP_NO_ORDER as it
-> +		 * is covered by a higher-level page (whose head is @p). Use
-> +		 * __find_buddy_nocheck() to find it and inject it in the
-> +		 * free_list[n - 1], effectively splitting @p in half.
-> +		 */
-> +		p->order--;
-> +		buddy = __find_buddy_nocheck(pool, p, p->order);
-> +		buddy->order = p->order;
-> +		list_add_tail(&buddy->node, &pool->free_area[buddy->order]);
-> +	}
-> +
-> +	return p;
-> +}
-> +
-> +void hyp_put_page(void *addr)
-> +{
-> +	struct hyp_page *p = hyp_virt_to_page(addr);
-> +
-> +	if (hyp_page_ref_dec_and_test(p))
-> +		hyp_attach_page(p);
-> +}
-> +
-> +void hyp_get_page(void *addr)
-> +{
-> +	struct hyp_page *p = hyp_virt_to_page(addr);
-> +
-> +	hyp_page_ref_inc(p);
-> +}
-> +
-> +void *hyp_alloc_pages(struct hyp_pool *pool, unsigned int order)
-> +{
-> +	unsigned int i = order;
-> +	struct hyp_page *p;
-> +
-> +	hyp_spin_lock(&pool->lock);
-> +
-> +	/* Look for a high-enough-order page */
-> +	while (i < pool->max_order && list_empty(&pool->free_area[i]))
-> +		i++;
-> +	if (i >= pool->max_order) {
-> +		hyp_spin_unlock(&pool->lock);
-> +		return NULL;
-> +	}
-> +
-> +	/* Extract it from the tree at the right order */
-> +	p = list_first_entry(&pool->free_area[i], struct hyp_page, node);
-> +	p = __hyp_extract_page(pool, p, order);
-> +
-> +	hyp_spin_unlock(&pool->lock);
-> +	hyp_page_ref_inc(p);
-
-I find this a little scary, as we momentarily drop the lock. It think
-it's ok because the reference count on the page must be 0 at this point,
-but actually then I think it would be clearer to have a
-hyp_page_ref_init() function which could take the lock, check that the
-refcount is indeed 0 and then set it to 1.
-
-What do you think?
-
-Will
+Thanks!
+Quentin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
