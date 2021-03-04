@@ -2,59 +2,69 @@ Return-Path: <SRS0=dAAB=IC=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=ham
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FD23C433E6
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Mar 2021 15:00:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D8E3C433DB
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Mar 2021 15:30:50 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C302A64F6C
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Mar 2021 15:00:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C302A64F6C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 8E2AC64FAA
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Mar 2021 15:30:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E2AC64FAA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 495D34B622;
-	Thu,  4 Mar 2021 10:00:47 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 232EF4B44B;
+	Thu,  4 Mar 2021 10:30:49 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ZqiBH1uype5u; Thu,  4 Mar 2021 10:00:45 -0500 (EST)
+	with ESMTP id 8haFNulKSD8z; Thu,  4 Mar 2021 10:30:48 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C3BA34B630;
-	Thu,  4 Mar 2021 10:00:45 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F02324B621;
+	Thu,  4 Mar 2021 10:30:47 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 85A6E4B622
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Mar 2021 10:00:44 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 01A184B621
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Mar 2021 10:30:46 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0p3Ov0c6GNX3 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Mar 2021 10:00:43 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0454D4B5FE
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Mar 2021 10:00:42 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D29ABD6E;
- Thu,  4 Mar 2021 07:00:41 -0800 (PST)
-Received: from slackpad.fritz.box (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0F2EB3F766;
- Thu,  4 Mar 2021 07:00:40 -0800 (PST)
-Date: Thu, 4 Mar 2021 15:00:31 +0000
-From: Andre Przywara <andre.przywara@arm.com>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [kvm-unit-tests PATCH 2/6] arm/arm64: Remove dcache_line_size
- global variable
-Message-ID: <20210304150031.7805c75e@slackpad.fritz.box>
-In-Reply-To: <20210227104201.14403-3-alexandru.elisei@arm.com>
-References: <20210227104201.14403-1-alexandru.elisei@arm.com>
- <20210227104201.14403-3-alexandru.elisei@arm.com>
-Organization: Arm Ltd.
-X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
+ with ESMTP id ZvtuPEc3K3hN for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Mar 2021 10:30:44 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9859A4B44B
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Mar 2021 10:30:44 -0500 (EST)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id F057A64F21;
+ Thu,  4 Mar 2021 15:30:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1614871842;
+ bh=zcvP/xRNovmcUNqEXMV6SKPJwphc6KAygaqAb/6nSsM=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=LADuN40EQStLkH6O6LUzMIxhc/aLZYRwZKhO9mkajUqlnhNqVCpweEwDTWfe/rlFO
+ 1uQCI+qt3ZZN1DOkNmnQe1WEpAOpg+1xC++v9qwF9uND09qh5dh9soS9HnTO9ml74b
+ b19FJ4Ma/0z5HrqtqOZrTUhKPKI4qgfRfgkAnyix0VgknVwyKyMu04vrSE44IXyPCg
+ BmPKyobfvS7+/1bL+Ue+5VOJAyrGb4U1Im9vvRkmZkXTxt6xqmXsmb9bncj+iQeQnP
+ WgKxC+ZQ7pQPsKNNYzx7rkiyzoluF2q4M3OwXSoy8LrssD3fUB8E4IrcEcf4ZCzi3V
+ zhLZ8/pyh3I3A==
+Date: Thu, 4 Mar 2021 15:30:36 +0000
+From: Will Deacon <will@kernel.org>
+To: Quentin Perret <qperret@google.com>
+Subject: Re: [PATCH v3 12/32] KVM: arm64: Introduce a Hyp buddy page allocator
+Message-ID: <20210304153036.GA21507@willie-the-truck>
+References: <20210302150002.3685113-1-qperret@google.com>
+ <20210302150002.3685113-13-qperret@google.com>
 MIME-Version: 1.0
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Content-Disposition: inline
+In-Reply-To: <20210302150002.3685113-13-qperret@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: android-kvm@google.com, catalin.marinas@arm.com, mate.toth-pal@arm.com,
+ seanjc@google.com, tabba@google.com, linux-kernel@vger.kernel.org,
+ robh+dt@kernel.org, linux-arm-kernel@lists.infradead.org, maz@kernel.org,
+ kernel-team@android.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,321 +81,147 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sat, 27 Feb 2021 10:41:57 +0000
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-
-> Compute the dcache line size when doing dcache maintenance instead of using
-> a global variable computed in setup(), which allows us to do dcache
-> maintenance at any point in the boot process. This will be useful for
-> running as an EFI app and it also aligns our implementation to that of the
-> Linux kernel.
-
-Can you add that this changes the semantic of dcache_by_line_op to use
-the size instead of the end address?
-
+On Tue, Mar 02, 2021 at 02:59:42PM +0000, Quentin Perret wrote:
+> When memory protection is enabled, the hyp code will require a basic
+> form of memory management in order to allocate and free memory pages at
+> EL2. This is needed for various use-cases, including the creation of hyp
+> mappings or the allocation of stage 2 page tables.
 > 
-> For consistency, the arm code has been similary modified.
+> To address these use-case, introduce a simple memory allocator in the
+> hyp code. The allocator is designed as a conventional 'buddy allocator',
+> working with a page granularity. It allows to allocate and free
+> physically contiguous pages from memory 'pools', with a guaranteed order
+> alignment in the PA space. Each page in a memory pool is associated
+> with a struct hyp_page which holds the page's metadata, including its
+> refcount, as well as its current order, hence mimicking the kernel's
+> buddy system in the GFP infrastructure. The hyp_page metadata are made
+> accessible through a hyp_vmemmap, following the concept of
+> SPARSE_VMEMMAP in the kernel.
 > 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> Signed-off-by: Quentin Perret <qperret@google.com>
 > ---
->  lib/arm/asm/assembler.h   | 44 ++++++++++++++++++++++++++++++++
->  lib/arm/asm/processor.h   |  7 ------
->  lib/arm64/asm/assembler.h | 53 +++++++++++++++++++++++++++++++++++++++
->  lib/arm64/asm/processor.h |  7 ------
->  lib/arm/setup.c           |  7 ------
->  arm/cstart.S              | 18 +++----------
->  arm/cstart64.S            | 16 ++----------
->  7 files changed, 102 insertions(+), 50 deletions(-)
->  create mode 100644 lib/arm/asm/assembler.h
->  create mode 100644 lib/arm64/asm/assembler.h
-> 
-> diff --git a/lib/arm/asm/assembler.h b/lib/arm/asm/assembler.h
-> new file mode 100644
-> index 000000000000..6b932df86204
-> --- /dev/null
-> +++ b/lib/arm/asm/assembler.h
-> @@ -0,0 +1,44 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Based on several files from Linux version v5.10: arch/arm/mm/proc-macros.S,
-> + * arch/arm/mm/proc-v7.S.
-> + */
+>  arch/arm64/kvm/hyp/include/nvhe/gfp.h    |  55 +++++++
+>  arch/arm64/kvm/hyp/include/nvhe/memory.h |  28 ++++
+>  arch/arm64/kvm/hyp/nvhe/Makefile         |   2 +-
+>  arch/arm64/kvm/hyp/nvhe/page_alloc.c     | 195 +++++++++++++++++++++++
+>  4 files changed, 279 insertions(+), 1 deletion(-)
+>  create mode 100644 arch/arm64/kvm/hyp/include/nvhe/gfp.h
+>  create mode 100644 arch/arm64/kvm/hyp/nvhe/page_alloc.c
+
+[...]
+
+> +static void __hyp_attach_page(struct hyp_pool *pool,
+> +			      struct hyp_page *p)
+> +{
+> +	unsigned int order = p->order;
+> +	struct hyp_page *buddy;
 > +
-> +/*
-> + * dcache_line_size - get the minimum D-cache line size from the CTR register
-`> + * on ARMv7.
-> + */
-> +	.macro	dcache_line_size, reg, tmp
-> +	mrc	p15, 0, \tmp, c0, c0, 1		// read ctr
-> +	lsr	\tmp, \tmp, #16
-> +	and	\tmp, \tmp, #0xf		// cache line size encoding
-> +	mov	\reg, #4			// bytes per word
-> +	mov	\reg, \reg, lsl \tmp		// actual cache line size
-> +	.endm
+> +	memset(hyp_page_to_virt(p), 0, PAGE_SIZE << p->order);
 > +
-> +/*
-> + * Macro to perform a data cache maintenance for the interval
-> + * [addr, addr + size).
-> + *
-> + * 	op:		operation to execute
-> + * 	domain		domain used in the dsb instruction
-> + * 	addr:		starting virtual address of the region
-> + * 	size:		size of the region
-> + * 	Corrupts:	addr, size, tmp1, tmp2
-> + */
-> +	.macro dcache_by_line_op op, domain, addr, size, tmp1, tmp2
-> +	dcache_line_size \tmp1, \tmp2
-> +	add	\size, \addr, \size
-> +	sub	\tmp2, \tmp1, #1
-> +	bic	\addr, \addr, \tmp2
-
-Just a nit, but since my brain was in assembly land: We could skip tmp2,
-by adding back #1 to tmp1 after the bic.
-Same for the arm64 code.
-
-> +9998:
-> +	.ifc	\op, dccimvac
-> +	mcr	p15, 0, \addr, c7, c14, 1
-> +	.else
-> +	.err
-> +	.endif
-> +	add	\addr, \addr, \tmp1
-> +	cmp	\addr, \size
-> +	blo	9998b
-> +	dsb	\domain
-> +	.endm
-> diff --git a/lib/arm/asm/processor.h b/lib/arm/asm/processor.h
-> index 273366d1fe1c..3c36eac903f0 100644
-> --- a/lib/arm/asm/processor.h
-> +++ b/lib/arm/asm/processor.h
-> @@ -9,11 +9,6 @@
->  #include <asm/sysreg.h>
->  #include <asm/barrier.h>
-
-Do we want the same protection against inclusion from C here as in the
-arm64 version?
-
-> -#define CTR_DMINLINE_SHIFT	16
-> -#define CTR_DMINLINE_MASK	(0xf << 16)
-> -#define CTR_DMINLINE(x)	\
-> -	(((x) & CTR_DMINLINE_MASK) >> CTR_DMINLINE_SHIFT)
-> -
->  enum vector {
->  	EXCPTN_RST,
->  	EXCPTN_UND,
-> @@ -89,6 +84,4 @@ static inline u32 get_ctr(void)
->  	return read_sysreg(CTR);
->  }
->  
-> -extern unsigned long dcache_line_size;
-> -
->  #endif /* _ASMARM_PROCESSOR_H_ */
-> diff --git a/lib/arm64/asm/assembler.h b/lib/arm64/asm/assembler.h
-> new file mode 100644
-> index 000000000000..f801c0c43d02
-> --- /dev/null
-> +++ b/lib/arm64/asm/assembler.h
-> @@ -0,0 +1,53 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Based on the file arch/arm64/include/asm/assembled.h from Linux v5.10, which
-> + * in turn is based on arch/arm/include/asm/assembler.h and
-> + * arch/arm/mm/proc-macros.S
-> + *
-> + * Copyright (C) 1996-2000 Russell King
-> + * Copyright (C) 2012 ARM Ltd.
-> + */
-> +#ifndef __ASSEMBLY__
-> +#error "Only include this from assembly code"
-> +#endif
+> +	/*
+> +	 * Only the first struct hyp_page of a high-order page (otherwise known
+> +	 * as the 'head') should have p->order set. The non-head pages should
+> +	 * have p->order = HYP_NO_ORDER. Here @p may no longer be the head
+> +	 * after coallescing, so make sure to mark it HYP_NO_ORDER proactively.
+> +	 */
+> +	p->order = HYP_NO_ORDER;
+> +	for (; (order + 1) < pool->max_order; order++) {
+> +		buddy = __find_buddy_avail(pool, p, order);
+> +		if (!buddy)
+> +			break;
 > +
-> +#ifndef __ASM_ASSEMBLER_H
-> +#define __ASM_ASSEMBLER_H
+> +		/* Take the buddy out of its list, and coallesce with @p */
+> +		list_del_init(&buddy->node);
+> +		buddy->order = HYP_NO_ORDER;
+> +		p = (p < buddy) ? p : buddy;
+
+nit: this is min()
+
+> +	}
 > +
-> +/*
-> + * raw_dcache_line_size - get the minimum D-cache line size on this CPU
-> + * from the CTR register.
-> + */
-> +	.macro	raw_dcache_line_size, reg, tmp
-> +	mrs	\tmp, ctr_el0			// read CTR
-> +	ubfm	\tmp, \tmp, #16, #19		// cache line size encoding
-
-this encoding of ubfm is supposed to be written as:
-	ubfx \tmp, \tmp, #16, #4
-This is also what objdump makes of the above.
-
-The rest looks good, I convinced myself that the assembly algorithms are
-correct.
-
-Cheers,
-Andre
-
-
-> +	mov	\reg, #4			// bytes per word
-> +	lsl	\reg, \reg, \tmp		// actual cache line size
-> +	.endm
+> +	/* Mark the new head, and insert it */
+> +	p->order = order;
+> +	list_add_tail(&p->node, &pool->free_area[order]);
+> +}
 > +
-> +/*
-> + * Macro to perform a data cache maintenance for the interval
-> + * [addr, addr + size). Use the raw value for the dcache line size because
-> + * kvm-unit-tests has no concept of scheduling.
-> + *
-> + * 	op:		operation passed to dc instruction
-> + * 	domain:		domain used in dsb instruciton
-> + * 	addr:		starting virtual address of the region
-> + * 	size:		size of the region
-> + * 	Corrupts:	addr, size, tmp1, tmp2
-> + */
+> +static void hyp_attach_page(struct hyp_page *p)
+> +{
+> +	struct hyp_pool *pool = hyp_page_to_pool(p);
 > +
-> +	.macro dcache_by_line_op op, domain, addr, size, tmp1, tmp2
-> +	raw_dcache_line_size \tmp1, \tmp2
-> +	add	\size, \addr, \size
-> +	sub	\tmp2, \tmp1, #1
-> +	bic	\addr, \addr, \tmp2
-> +9998:
-> +	dc	\op, \addr
-> +	add	\addr, \addr, \tmp1
-> +	cmp	\addr, \size
-> +	b.lo	9998b
-> +	dsb	\domain
-> +	.endm
+> +	hyp_spin_lock(&pool->lock);
+> +	__hyp_attach_page(pool, p);
+> +	hyp_spin_unlock(&pool->lock);
+> +}
 > +
-> +#endif	/* __ASM_ASSEMBLER_H */
-> diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
-> index 771b2d1e0c94..cdc2463e1981 100644
-> --- a/lib/arm64/asm/processor.h
-> +++ b/lib/arm64/asm/processor.h
-> @@ -16,11 +16,6 @@
->  #define SCTLR_EL1_A	(1 << 1)
->  #define SCTLR_EL1_M	(1 << 0)
->  
-> -#define CTR_DMINLINE_SHIFT	16
-> -#define CTR_DMINLINE_MASK	(0xf << 16)
-> -#define CTR_DMINLINE(x)	\
-> -	(((x) & CTR_DMINLINE_MASK) >> CTR_DMINLINE_SHIFT)
-> -
->  #ifndef __ASSEMBLY__
->  #include <asm/ptrace.h>
->  #include <asm/esr.h>
-> @@ -115,8 +110,6 @@ static inline u64 get_ctr(void)
->  	return read_sysreg(ctr_el0);
->  }
->  
-> -extern unsigned long dcache_line_size;
-> -
->  static inline unsigned long get_id_aa64mmfr0_el1(void)
->  {
->  	return read_sysreg(id_aa64mmfr0_el1);
-> diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-> index 066524f8bf61..751ba980000a 100644
-> --- a/lib/arm/setup.c
-> +++ b/lib/arm/setup.c
-> @@ -42,8 +42,6 @@ static struct mem_region __initial_mem_regions[NR_INITIAL_MEM_REGIONS + 1];
->  struct mem_region *mem_regions = __initial_mem_regions;
->  phys_addr_t __phys_offset, __phys_end;
->  
-> -unsigned long dcache_line_size;
-> -
->  int mpidr_to_cpu(uint64_t mpidr)
->  {
->  	int i;
-> @@ -72,11 +70,6 @@ static void cpu_init(void)
->  	ret = dt_for_each_cpu_node(cpu_set, NULL);
->  	assert(ret == 0);
->  	set_cpu_online(0, true);
-> -	/*
-> -	 * DminLine is log2 of the number of words in the smallest cache line; a
-> -	 * word is 4 bytes.
-> -	 */
-> -	dcache_line_size = 1 << (CTR_DMINLINE(get_ctr()) + 2);
->  }
->  
->  unsigned int mem_region_get_flags(phys_addr_t paddr)
-> diff --git a/arm/cstart.S b/arm/cstart.S
-> index ef936ae2f874..954748b00f64 100644
-> --- a/arm/cstart.S
-> +++ b/arm/cstart.S
-> @@ -7,6 +7,7 @@
->   */
->  #define __ASSEMBLY__
->  #include <auxinfo.h>
-> +#include <asm/assembler.h>
->  #include <asm/thread_info.h>
->  #include <asm/asm-offsets.h>
->  #include <asm/pgtable-hwdef.h>
-> @@ -197,20 +198,6 @@ asm_mmu_enable:
->  
->  	mov     pc, lr
->  
-> -.macro dcache_clean_inval domain, start, end, tmp1, tmp2
-> -	ldr	\tmp1, =dcache_line_size
-> -	ldr	\tmp1, [\tmp1]
-> -	sub	\tmp2, \tmp1, #1
-> -	bic	\start, \start, \tmp2
-> -9998:
-> -	/* DCCIMVAC */
-> -	mcr	p15, 0, \start, c7, c14, 1
-> -	add	\start, \start, \tmp1
-> -	cmp	\start, \end
-> -	blo	9998b
-> -	dsb	\domain
-> -.endm
-> -
->  .globl asm_mmu_disable
->  asm_mmu_disable:
->  	/* SCTLR */
-> @@ -223,7 +210,8 @@ asm_mmu_disable:
->  	ldr	r0, [r0]
->  	ldr	r1, =__phys_end
->  	ldr	r1, [r1]
-> -	dcache_clean_inval sy, r0, r1, r2, r3
-> +	sub	r1, r1, r0
-> +	dcache_by_line_op dccimvac, sy, r0, r1, r2, r3
->  	isb
->  
->  	mov     pc, lr
-> diff --git a/arm/cstart64.S b/arm/cstart64.S
-> index fc1930bcdb53..046bd3914098 100644
-> --- a/arm/cstart64.S
-> +++ b/arm/cstart64.S
-> @@ -8,6 +8,7 @@
->  #define __ASSEMBLY__
->  #include <auxinfo.h>
->  #include <asm/asm-offsets.h>
-> +#include <asm/assembler.h>
->  #include <asm/ptrace.h>
->  #include <asm/processor.h>
->  #include <asm/page.h>
-> @@ -204,20 +205,6 @@ asm_mmu_enable:
->  
->  	ret
->  
-> -/* Taken with small changes from arch/arm64/incluse/asm/assembler.h */
-> -.macro dcache_by_line_op op, domain, start, end, tmp1, tmp2
-> -	adrp	\tmp1, dcache_line_size
-> -	ldr	\tmp1, [\tmp1, :lo12:dcache_line_size]
-> -	sub	\tmp2, \tmp1, #1
-> -	bic	\start, \start, \tmp2
-> -9998:
-> -	dc	\op , \start
-> -	add	\start, \start, \tmp1
-> -	cmp	\start, \end
-> -	b.lo	9998b
-> -	dsb	\domain
-> -.endm
-> -
->  .globl asm_mmu_disable
->  asm_mmu_disable:
->  	mrs	x0, sctlr_el1
-> @@ -230,6 +217,7 @@ asm_mmu_disable:
->  	ldr	x0, [x0, :lo12:__phys_offset]
->  	adrp	x1, __phys_end
->  	ldr	x1, [x1, :lo12:__phys_end]
-> +	sub	x1, x1, x0
->  	dcache_by_line_op civac, sy, x0, x1, x2, x3
->  	isb
->  
+> +static struct hyp_page *__hyp_extract_page(struct hyp_pool *pool,
+> +					   struct hyp_page *p,
+> +					   unsigned int order)
+> +{
+> +	struct hyp_page *buddy;
+> +
+> +	list_del_init(&p->node);
+> +	while (p->order > order) {
+> +		/*
+> +		 * The buddy of order n - 1 currently has HYP_NO_ORDER as it
+> +		 * is covered by a higher-level page (whose head is @p). Use
+> +		 * __find_buddy_nocheck() to find it and inject it in the
+> +		 * free_list[n - 1], effectively splitting @p in half.
+> +		 */
+> +		p->order--;
+> +		buddy = __find_buddy_nocheck(pool, p, p->order);
+> +		buddy->order = p->order;
+> +		list_add_tail(&buddy->node, &pool->free_area[buddy->order]);
+> +	}
+> +
+> +	return p;
+> +}
+> +
+> +void hyp_put_page(void *addr)
+> +{
+> +	struct hyp_page *p = hyp_virt_to_page(addr);
+> +
+> +	if (hyp_page_ref_dec_and_test(p))
+> +		hyp_attach_page(p);
+> +}
+> +
+> +void hyp_get_page(void *addr)
+> +{
+> +	struct hyp_page *p = hyp_virt_to_page(addr);
+> +
+> +	hyp_page_ref_inc(p);
+> +}
+> +
+> +void *hyp_alloc_pages(struct hyp_pool *pool, unsigned int order)
+> +{
+> +	unsigned int i = order;
+> +	struct hyp_page *p;
+> +
+> +	hyp_spin_lock(&pool->lock);
+> +
+> +	/* Look for a high-enough-order page */
+> +	while (i < pool->max_order && list_empty(&pool->free_area[i]))
+> +		i++;
+> +	if (i >= pool->max_order) {
+> +		hyp_spin_unlock(&pool->lock);
+> +		return NULL;
+> +	}
+> +
+> +	/* Extract it from the tree at the right order */
+> +	p = list_first_entry(&pool->free_area[i], struct hyp_page, node);
+> +	p = __hyp_extract_page(pool, p, order);
+> +
+> +	hyp_spin_unlock(&pool->lock);
+> +	hyp_page_ref_inc(p);
 
+I find this a little scary, as we momentarily drop the lock. It think
+it's ok because the reference count on the page must be 0 at this point,
+but actually then I think it would be clearer to have a
+hyp_page_ref_init() function which could take the lock, check that the
+refcount is indeed 0 and then set it to 1.
+
+What do you think?
+
+Will
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
