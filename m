@@ -2,69 +2,59 @@ Return-Path: <SRS0=dAAB=IC=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C406AC433DB
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Mar 2021 14:38:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FD23C433E6
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Mar 2021 15:00:48 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 069C164F5B
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Mar 2021 14:38:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 069C164F5B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id C302A64F6C
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Mar 2021 15:00:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C302A64F6C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D0D74B168;
-	Thu,  4 Mar 2021 09:38:36 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 495D34B622;
+	Thu,  4 Mar 2021 10:00:47 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id HgKxRHDQ4bxj; Thu,  4 Mar 2021 09:38:35 -0500 (EST)
+	with ESMTP id ZqiBH1uype5u; Thu,  4 Mar 2021 10:00:45 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 760614B192;
-	Thu,  4 Mar 2021 09:38:35 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C3BA34B630;
+	Thu,  4 Mar 2021 10:00:45 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 06F9E4B168
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Mar 2021 09:38:34 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 85A6E4B622
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Mar 2021 10:00:44 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1plbgq2WkhMI for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Mar 2021 09:38:33 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0D4A54B0C7
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Mar 2021 09:38:33 -0500 (EST)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 4E75764F53;
- Thu,  4 Mar 2021 14:38:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1614868712;
- bh=8HCRgaAXUQKJEYk45KGjzpayiZSJL7Z75jrU+D65Qeo=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=X5yEwJIaq0J3G+LX6gOVqkHLOFA7A1fzuRqCO9TA3yz2kYuwqLKdBrGz76rPD96U2
- cKxMcAvYWFIn0mO4mwEXY8GDmT7CujlI2LMHCeYDKCxCFT+MS7YUtSLUZgseGev/xB
- nGDRIQhE3SgnpSPCaLFPVNGxI9ZIEar6b0EurD8f6+x6FTn+2mosIODf05n8Fhps7T
- 6QAmQ2r7uAqH2YL1JnUMvggdafAHFhTeRJA6Ahi2Z9kxafeSU3qpbvvwMD8QMRRMdf
- M7fZC0WyDhSD4F/RBO4PNluP+ce8uxYNzwoR2gYlXfFBH1z7UPaIWt7zo1b4j71CLe
- LtYItYCXzSl+w==
-Date: Thu, 4 Mar 2021 14:38:25 +0000
-From: Will Deacon <will@kernel.org>
-To: Quentin Perret <qperret@google.com>
-Subject: Re: [PATCH v3 10/32] KVM: arm64: Introduce an early Hyp page allocator
-Message-ID: <20210304143825.GA21410@willie-the-truck>
-References: <20210302150002.3685113-1-qperret@google.com>
- <20210302150002.3685113-11-qperret@google.com>
+ with ESMTP id 0p3Ov0c6GNX3 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Mar 2021 10:00:43 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0454D4B5FE
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Mar 2021 10:00:42 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D29ABD6E;
+ Thu,  4 Mar 2021 07:00:41 -0800 (PST)
+Received: from slackpad.fritz.box (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0F2EB3F766;
+ Thu,  4 Mar 2021 07:00:40 -0800 (PST)
+Date: Thu, 4 Mar 2021 15:00:31 +0000
+From: Andre Przywara <andre.przywara@arm.com>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [kvm-unit-tests PATCH 2/6] arm/arm64: Remove dcache_line_size
+ global variable
+Message-ID: <20210304150031.7805c75e@slackpad.fritz.box>
+In-Reply-To: <20210227104201.14403-3-alexandru.elisei@arm.com>
+References: <20210227104201.14403-1-alexandru.elisei@arm.com>
+ <20210227104201.14403-3-alexandru.elisei@arm.com>
+Organization: Arm Ltd.
+X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210302150002.3685113-11-qperret@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: android-kvm@google.com, catalin.marinas@arm.com, mate.toth-pal@arm.com,
- seanjc@google.com, tabba@google.com, linux-kernel@vger.kernel.org,
- robh+dt@kernel.org, linux-arm-kernel@lists.infradead.org, maz@kernel.org,
- kernel-team@android.com, kvmarm@lists.cs.columbia.edu
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -81,34 +71,321 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Mar 02, 2021 at 02:59:40PM +0000, Quentin Perret wrote:
-> With nVHE, the host currently creates all stage 1 hypervisor mappings at
-> EL1 during boot, installs them at EL2, and extends them as required
-> (e.g. when creating a new VM). But in a world where the host is no
-> longer trusted, it cannot have full control over the code mapped in the
-> hypervisor.
+On Sat, 27 Feb 2021 10:41:57 +0000
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+
+> Compute the dcache line size when doing dcache maintenance instead of using
+> a global variable computed in setup(), which allows us to do dcache
+> maintenance at any point in the boot process. This will be useful for
+> running as an EFI app and it also aligns our implementation to that of the
+> Linux kernel.
+
+Can you add that this changes the semantic of dcache_by_line_op to use
+the size instead of the end address?
+
 > 
-> In preparation for enabling the hypervisor to create its own stage 1
-> mappings during boot, introduce an early page allocator, with minimal
-> functionality. This allocator is designed to be used only during early
-> bootstrap of the hyp code when memory protection is enabled, which will
-> then switch to using a full-fledged page allocator after init.
+> For consistency, the arm code has been similary modified.
 > 
-> Signed-off-by: Quentin Perret <qperret@google.com>
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 > ---
->  arch/arm64/kvm/hyp/include/nvhe/early_alloc.h | 14 +++++
->  arch/arm64/kvm/hyp/include/nvhe/memory.h      | 24 +++++++++
->  arch/arm64/kvm/hyp/nvhe/Makefile              |  2 +-
->  arch/arm64/kvm/hyp/nvhe/early_alloc.c         | 54 +++++++++++++++++++
->  arch/arm64/kvm/hyp/nvhe/psci-relay.c          |  4 +-
->  5 files changed, 94 insertions(+), 4 deletions(-)
->  create mode 100644 arch/arm64/kvm/hyp/include/nvhe/early_alloc.h
->  create mode 100644 arch/arm64/kvm/hyp/include/nvhe/memory.h
->  create mode 100644 arch/arm64/kvm/hyp/nvhe/early_alloc.c
+>  lib/arm/asm/assembler.h   | 44 ++++++++++++++++++++++++++++++++
+>  lib/arm/asm/processor.h   |  7 ------
+>  lib/arm64/asm/assembler.h | 53 +++++++++++++++++++++++++++++++++++++++
+>  lib/arm64/asm/processor.h |  7 ------
+>  lib/arm/setup.c           |  7 ------
+>  arm/cstart.S              | 18 +++----------
+>  arm/cstart64.S            | 16 ++----------
+>  7 files changed, 102 insertions(+), 50 deletions(-)
+>  create mode 100644 lib/arm/asm/assembler.h
+>  create mode 100644 lib/arm64/asm/assembler.h
+> 
+> diff --git a/lib/arm/asm/assembler.h b/lib/arm/asm/assembler.h
+> new file mode 100644
+> index 000000000000..6b932df86204
+> --- /dev/null
+> +++ b/lib/arm/asm/assembler.h
+> @@ -0,0 +1,44 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Based on several files from Linux version v5.10: arch/arm/mm/proc-macros.S,
+> + * arch/arm/mm/proc-v7.S.
+> + */
+> +
+> +/*
+> + * dcache_line_size - get the minimum D-cache line size from the CTR register
+`> + * on ARMv7.
+> + */
+> +	.macro	dcache_line_size, reg, tmp
+> +	mrc	p15, 0, \tmp, c0, c0, 1		// read ctr
+> +	lsr	\tmp, \tmp, #16
+> +	and	\tmp, \tmp, #0xf		// cache line size encoding
+> +	mov	\reg, #4			// bytes per word
+> +	mov	\reg, \reg, lsl \tmp		// actual cache line size
+> +	.endm
+> +
+> +/*
+> + * Macro to perform a data cache maintenance for the interval
+> + * [addr, addr + size).
+> + *
+> + * 	op:		operation to execute
+> + * 	domain		domain used in the dsb instruction
+> + * 	addr:		starting virtual address of the region
+> + * 	size:		size of the region
+> + * 	Corrupts:	addr, size, tmp1, tmp2
+> + */
+> +	.macro dcache_by_line_op op, domain, addr, size, tmp1, tmp2
+> +	dcache_line_size \tmp1, \tmp2
+> +	add	\size, \addr, \size
+> +	sub	\tmp2, \tmp1, #1
+> +	bic	\addr, \addr, \tmp2
 
-Acked-by: Will Deacon <will@kernel.org>
+Just a nit, but since my brain was in assembly land: We could skip tmp2,
+by adding back #1 to tmp1 after the bic.
+Same for the arm64 code.
 
-Will
+> +9998:
+> +	.ifc	\op, dccimvac
+> +	mcr	p15, 0, \addr, c7, c14, 1
+> +	.else
+> +	.err
+> +	.endif
+> +	add	\addr, \addr, \tmp1
+> +	cmp	\addr, \size
+> +	blo	9998b
+> +	dsb	\domain
+> +	.endm
+> diff --git a/lib/arm/asm/processor.h b/lib/arm/asm/processor.h
+> index 273366d1fe1c..3c36eac903f0 100644
+> --- a/lib/arm/asm/processor.h
+> +++ b/lib/arm/asm/processor.h
+> @@ -9,11 +9,6 @@
+>  #include <asm/sysreg.h>
+>  #include <asm/barrier.h>
+
+Do we want the same protection against inclusion from C here as in the
+arm64 version?
+
+> -#define CTR_DMINLINE_SHIFT	16
+> -#define CTR_DMINLINE_MASK	(0xf << 16)
+> -#define CTR_DMINLINE(x)	\
+> -	(((x) & CTR_DMINLINE_MASK) >> CTR_DMINLINE_SHIFT)
+> -
+>  enum vector {
+>  	EXCPTN_RST,
+>  	EXCPTN_UND,
+> @@ -89,6 +84,4 @@ static inline u32 get_ctr(void)
+>  	return read_sysreg(CTR);
+>  }
+>  
+> -extern unsigned long dcache_line_size;
+> -
+>  #endif /* _ASMARM_PROCESSOR_H_ */
+> diff --git a/lib/arm64/asm/assembler.h b/lib/arm64/asm/assembler.h
+> new file mode 100644
+> index 000000000000..f801c0c43d02
+> --- /dev/null
+> +++ b/lib/arm64/asm/assembler.h
+> @@ -0,0 +1,53 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Based on the file arch/arm64/include/asm/assembled.h from Linux v5.10, which
+> + * in turn is based on arch/arm/include/asm/assembler.h and
+> + * arch/arm/mm/proc-macros.S
+> + *
+> + * Copyright (C) 1996-2000 Russell King
+> + * Copyright (C) 2012 ARM Ltd.
+> + */
+> +#ifndef __ASSEMBLY__
+> +#error "Only include this from assembly code"
+> +#endif
+> +
+> +#ifndef __ASM_ASSEMBLER_H
+> +#define __ASM_ASSEMBLER_H
+> +
+> +/*
+> + * raw_dcache_line_size - get the minimum D-cache line size on this CPU
+> + * from the CTR register.
+> + */
+> +	.macro	raw_dcache_line_size, reg, tmp
+> +	mrs	\tmp, ctr_el0			// read CTR
+> +	ubfm	\tmp, \tmp, #16, #19		// cache line size encoding
+
+this encoding of ubfm is supposed to be written as:
+	ubfx \tmp, \tmp, #16, #4
+This is also what objdump makes of the above.
+
+The rest looks good, I convinced myself that the assembly algorithms are
+correct.
+
+Cheers,
+Andre
+
+
+> +	mov	\reg, #4			// bytes per word
+> +	lsl	\reg, \reg, \tmp		// actual cache line size
+> +	.endm
+> +
+> +/*
+> + * Macro to perform a data cache maintenance for the interval
+> + * [addr, addr + size). Use the raw value for the dcache line size because
+> + * kvm-unit-tests has no concept of scheduling.
+> + *
+> + * 	op:		operation passed to dc instruction
+> + * 	domain:		domain used in dsb instruciton
+> + * 	addr:		starting virtual address of the region
+> + * 	size:		size of the region
+> + * 	Corrupts:	addr, size, tmp1, tmp2
+> + */
+> +
+> +	.macro dcache_by_line_op op, domain, addr, size, tmp1, tmp2
+> +	raw_dcache_line_size \tmp1, \tmp2
+> +	add	\size, \addr, \size
+> +	sub	\tmp2, \tmp1, #1
+> +	bic	\addr, \addr, \tmp2
+> +9998:
+> +	dc	\op, \addr
+> +	add	\addr, \addr, \tmp1
+> +	cmp	\addr, \size
+> +	b.lo	9998b
+> +	dsb	\domain
+> +	.endm
+> +
+> +#endif	/* __ASM_ASSEMBLER_H */
+> diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
+> index 771b2d1e0c94..cdc2463e1981 100644
+> --- a/lib/arm64/asm/processor.h
+> +++ b/lib/arm64/asm/processor.h
+> @@ -16,11 +16,6 @@
+>  #define SCTLR_EL1_A	(1 << 1)
+>  #define SCTLR_EL1_M	(1 << 0)
+>  
+> -#define CTR_DMINLINE_SHIFT	16
+> -#define CTR_DMINLINE_MASK	(0xf << 16)
+> -#define CTR_DMINLINE(x)	\
+> -	(((x) & CTR_DMINLINE_MASK) >> CTR_DMINLINE_SHIFT)
+> -
+>  #ifndef __ASSEMBLY__
+>  #include <asm/ptrace.h>
+>  #include <asm/esr.h>
+> @@ -115,8 +110,6 @@ static inline u64 get_ctr(void)
+>  	return read_sysreg(ctr_el0);
+>  }
+>  
+> -extern unsigned long dcache_line_size;
+> -
+>  static inline unsigned long get_id_aa64mmfr0_el1(void)
+>  {
+>  	return read_sysreg(id_aa64mmfr0_el1);
+> diff --git a/lib/arm/setup.c b/lib/arm/setup.c
+> index 066524f8bf61..751ba980000a 100644
+> --- a/lib/arm/setup.c
+> +++ b/lib/arm/setup.c
+> @@ -42,8 +42,6 @@ static struct mem_region __initial_mem_regions[NR_INITIAL_MEM_REGIONS + 1];
+>  struct mem_region *mem_regions = __initial_mem_regions;
+>  phys_addr_t __phys_offset, __phys_end;
+>  
+> -unsigned long dcache_line_size;
+> -
+>  int mpidr_to_cpu(uint64_t mpidr)
+>  {
+>  	int i;
+> @@ -72,11 +70,6 @@ static void cpu_init(void)
+>  	ret = dt_for_each_cpu_node(cpu_set, NULL);
+>  	assert(ret == 0);
+>  	set_cpu_online(0, true);
+> -	/*
+> -	 * DminLine is log2 of the number of words in the smallest cache line; a
+> -	 * word is 4 bytes.
+> -	 */
+> -	dcache_line_size = 1 << (CTR_DMINLINE(get_ctr()) + 2);
+>  }
+>  
+>  unsigned int mem_region_get_flags(phys_addr_t paddr)
+> diff --git a/arm/cstart.S b/arm/cstart.S
+> index ef936ae2f874..954748b00f64 100644
+> --- a/arm/cstart.S
+> +++ b/arm/cstart.S
+> @@ -7,6 +7,7 @@
+>   */
+>  #define __ASSEMBLY__
+>  #include <auxinfo.h>
+> +#include <asm/assembler.h>
+>  #include <asm/thread_info.h>
+>  #include <asm/asm-offsets.h>
+>  #include <asm/pgtable-hwdef.h>
+> @@ -197,20 +198,6 @@ asm_mmu_enable:
+>  
+>  	mov     pc, lr
+>  
+> -.macro dcache_clean_inval domain, start, end, tmp1, tmp2
+> -	ldr	\tmp1, =dcache_line_size
+> -	ldr	\tmp1, [\tmp1]
+> -	sub	\tmp2, \tmp1, #1
+> -	bic	\start, \start, \tmp2
+> -9998:
+> -	/* DCCIMVAC */
+> -	mcr	p15, 0, \start, c7, c14, 1
+> -	add	\start, \start, \tmp1
+> -	cmp	\start, \end
+> -	blo	9998b
+> -	dsb	\domain
+> -.endm
+> -
+>  .globl asm_mmu_disable
+>  asm_mmu_disable:
+>  	/* SCTLR */
+> @@ -223,7 +210,8 @@ asm_mmu_disable:
+>  	ldr	r0, [r0]
+>  	ldr	r1, =__phys_end
+>  	ldr	r1, [r1]
+> -	dcache_clean_inval sy, r0, r1, r2, r3
+> +	sub	r1, r1, r0
+> +	dcache_by_line_op dccimvac, sy, r0, r1, r2, r3
+>  	isb
+>  
+>  	mov     pc, lr
+> diff --git a/arm/cstart64.S b/arm/cstart64.S
+> index fc1930bcdb53..046bd3914098 100644
+> --- a/arm/cstart64.S
+> +++ b/arm/cstart64.S
+> @@ -8,6 +8,7 @@
+>  #define __ASSEMBLY__
+>  #include <auxinfo.h>
+>  #include <asm/asm-offsets.h>
+> +#include <asm/assembler.h>
+>  #include <asm/ptrace.h>
+>  #include <asm/processor.h>
+>  #include <asm/page.h>
+> @@ -204,20 +205,6 @@ asm_mmu_enable:
+>  
+>  	ret
+>  
+> -/* Taken with small changes from arch/arm64/incluse/asm/assembler.h */
+> -.macro dcache_by_line_op op, domain, start, end, tmp1, tmp2
+> -	adrp	\tmp1, dcache_line_size
+> -	ldr	\tmp1, [\tmp1, :lo12:dcache_line_size]
+> -	sub	\tmp2, \tmp1, #1
+> -	bic	\start, \start, \tmp2
+> -9998:
+> -	dc	\op , \start
+> -	add	\start, \start, \tmp1
+> -	cmp	\start, \end
+> -	b.lo	9998b
+> -	dsb	\domain
+> -.endm
+> -
+>  .globl asm_mmu_disable
+>  asm_mmu_disable:
+>  	mrs	x0, sctlr_el1
+> @@ -230,6 +217,7 @@ asm_mmu_disable:
+>  	ldr	x0, [x0, :lo12:__phys_offset]
+>  	adrp	x1, __phys_end
+>  	ldr	x1, [x1, :lo12:__phys_end]
+> +	sub	x1, x1, x0
+>  	dcache_by_line_op civac, sy, x0, x1, x2, x3
+>  	isb
+>  
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
