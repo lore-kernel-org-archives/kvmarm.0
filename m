@@ -7,75 +7,74 @@ X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBB23C433E6
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Mar 2021 11:55:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7637BC433DB
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Mar 2021 11:55:25 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6EC5464ED4
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Mar 2021 11:55:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EC5464ED4
+	by mail.kernel.org (Postfix) with ESMTP id 05D9064F36
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Mar 2021 11:55:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05D9064F36
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 182DC4B4DC;
-	Thu,  4 Mar 2021 06:55:23 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 961734B613;
+	Thu,  4 Mar 2021 06:55:24 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id UsFnbUzBUiK0; Thu,  4 Mar 2021 06:55:22 -0500 (EST)
+	with ESMTP id YBPSfnQSJ5Gd; Thu,  4 Mar 2021 06:55:24 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B82E4B615;
-	Thu,  4 Mar 2021 06:55:21 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7EB1B4B637;
+	Thu,  4 Mar 2021 06:55:23 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A46DE4B2EC
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Mar 2021 06:55:20 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BAB244B4DC
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Mar 2021 06:55:22 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Oe3+fEkSqPOW for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Mar 2021 06:55:19 -0500 (EST)
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com
- [209.85.221.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9EB234B4C8
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Mar 2021 06:55:19 -0500 (EST)
-Received: by mail-wr1-f74.google.com with SMTP id h21so9878717wrc.19
- for <kvmarm@lists.cs.columbia.edu>; Thu, 04 Mar 2021 03:55:19 -0800 (PST)
+ with ESMTP id Ka5nyozkc+HX for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Mar 2021 06:55:21 -0500 (EST)
+Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com
+ [209.85.160.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 51CF44B4F0
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Mar 2021 06:55:21 -0500 (EST)
+Received: by mail-qt1-f201.google.com with SMTP id j25so15427584qtv.10
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 04 Mar 2021 03:55:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=sender:date:in-reply-to:message-id:mime-version:references:subject
- :from:to:cc; bh=K4cZRZezA7JguyGx2ZTlnQ6V/e664IrdL1fpgE6aIpA=;
- b=t8BzH4or3ynjmcVoZZ+Y5BRYlQOFPipFgSZoV/wzzuGY5GG1tbDnAE8V55P/pmKX1H
- HBGQoey9XrlqepxpCJFXlJ7x8WFz9biqN0NvxURurau3OflbJFZ8vi3Z2l2bkgoCt1RQ
- y+I+sPnMlek1oBSo6soLufTSfa8cD8mi5NR8w6pLAQnl5CI+Btz3K4C/hbOKH/RZoDru
- B7TVvPpcA2cDkARRBNsu4ki/szjlHmR5B1he5KFJ7ZIKF06o/HFFnPEcotU6SwIhkhiG
- Oy3Bt88lftAzekvbpUTvkP0U9B8MKMRVTpPcal/ZpLtUpwQ7vJ5gbfGu+LKYtWI1NZGL
- OAaQ==
+ :from:to:cc; bh=UUJN2Q5WluHa1Ll2+7p/Qu05jL40zhrFUlZue6KcZG8=;
+ b=ZJdhYidQWtQV/SvvWf4iw/cFMWWqYO5MQT0a0jd9f4TK+OI6xhTI6OxnaH4uA90hJz
+ f5YCFTLeVfY/aiTG9cdlJqp/tesrPPMFm6sQiDdg+U6LfRWpVkV06nRpJ9LjiqRr74l8
+ sSdkkJRCCdcEURAOZVgbxI8lnnk+pgqOdOvkMR6pwOE7+9w49IZs5tMLsJ6tiSjK9wOq
+ 7gU0X1B13FUebwYSDjqhYjkNXsLK7VScAy1/7QMxUEFEk9lyTm0mFVJJwFbdI7kUrQED
+ 4G0oCly99OivF/v4kSE3Z3e5pkq2O+JPIOiMAJRyrDe4dPhg/9elHqtG4NyQzTmKaVBX
+ 07bQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=K4cZRZezA7JguyGx2ZTlnQ6V/e664IrdL1fpgE6aIpA=;
- b=W0LlyEbGnJ5eF6OVV+19S6ZZ+it5cbuSjTTowXEsNm2gLRJl2AOQDbzQVjCK3AIRMg
- dQppL0wnSQLDhWKB/HGinP7FLeEy7+5JOWG9RarWQwAx95BYnYxBoir5Sur2FD5V6QE+
- +tDBbsUSTxLQAlpLBv9ptvph3CEIj0zu8+Ssj5Viktearj3o1Gyp7ULYBJDztqzG1NHa
- uCUTqvw5doz1XvyjOeDK7RqnuTNWP3c6VKbyXUyUsSrPORC+DJxSVX/BVPh5wO5WcJJl
- PcxrzO5iGsyK27NICb7xqarNGd18HOaUIi5IpFTXrwcdwIPGcdcbpWi6z41zEkXk2iRJ
- UZ6w==
-X-Gm-Message-State: AOAM533OfNZAlJgoP9PR6azRz3mNkz6q+DHLxhoEpE7RZjspD7E0DlJR
- a9VbFru6kOhDCXNr2NIc7jd85Nffhe9NbvBwdG/5gZJdZuRyNCM5rXzoFpySa71kkkMt3zdtULR
- 1NoiJ00ADkZjuWEqhh7mUAsbhkP4wVMkFQUU90uQeqHaxKMXdMAlcIEumGhmq/NjXaf7/YQ==
-X-Google-Smtp-Source: ABdhPJzKSNAzexYjrxi3AS3Cz8f4mW76NeZ9JQYqKiHdbJs2Khy8kDqbItIzfNDSBdv8l8fMVh6I2hcb+Es=
-X-Received: from ascull.c.googlers.com ([fda3:e722:ac3:10:28:9cb1:c0a8:1510])
- (user=ascull job=sendgmr) by 2002:a5d:4fca:: with SMTP id
- h10mr3882875wrw.70.1614858918529; 
- Thu, 04 Mar 2021 03:55:18 -0800 (PST)
-Date: Thu,  4 Mar 2021 11:54:46 +0000
+ bh=UUJN2Q5WluHa1Ll2+7p/Qu05jL40zhrFUlZue6KcZG8=;
+ b=RZJHY9UC9eK8ATnoI6dBpyWGFvAsRE3zyzpI91Y/I2T7uu2YMxVZaL4St9BKHnVXD1
+ coNnn+Tv3VhZi4Rn726mAhcUUAYDG7cURuj3I+YnECzp0S1N7NQ0mW6N7sVyY019mNjs
+ rLVSEA7l4WzoIUybosmceVhQImkbWkuLCXQI/8WoUybr97vNBU9uLH8sHrz1qoQiM02a
+ qnVemJny9CM5xigyW4lQ3Gk0l2ANN6bKPdgYUPHjIHroTW3Sp00U32tFoy21TPN92Tof
+ 4aT9vMVX051fW0Gwj2dXMNLID/S+0ct5pEMcRRAYQ2qCws9axHvo0d/AEE2pV2tf7hr5
+ 0fug==
+X-Gm-Message-State: AOAM532ziwr5ZZtRb5KKp+I5PuSLeXtwPegTzlG/db02vYouHg+u2HvD
+ gdxMAfwF7W3rZ8Qhv8qgoKKyEFm4Efh4gjGI1RYmzHc3gMilg3lgxSErUflqB9Gyk+JUHwV4U8S
+ ARsQBCez0//n2Gs9Y8/fnKa9s2nUnmYFOEQecKH+0sBZLGmuZEKeXM88+akuu2DeewhVxgw==
+X-Google-Smtp-Source: ABdhPJyDnIdKbm5cOCEILWYJ2FXL7Ru1Se3FhvxfVdhwgKBHMlYM3DbEZThtffqmOT3iuDDPNY9SImdE9J4=
+X-Received: from ascull.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1510])
+ (user=ascull job=sendgmr) by 2002:a05:6214:1909:: with SMTP id
+ er9mr3734318qvb.5.1614858920707; Thu, 04 Mar 2021 03:55:20 -0800 (PST)
+Date: Thu,  4 Mar 2021 11:54:47 +0000
 In-Reply-To: <20210304115454.3597879-1-ascull@google.com>
-Message-Id: <20210304115454.3597879-4-ascull@google.com>
+Message-Id: <20210304115454.3597879-5-ascull@google.com>
 Mime-Version: 1.0
 References: <20210304115454.3597879-1-ascull@google.com>
 X-Mailer: git-send-email 2.30.1.766.gb4fecdf3b7-goog
-Subject: [PATCH 03/10] KVM: arm64: Unmap host task thread flags from hyp
+Subject: [PATCH 04/10] KVM: arm64: Support smp_processor_id() in nVHE hyp
 From: Andrew Scull <ascull@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: kernel-team@android.com, maz@kernel.org, catalin.marinas@arm.com,
@@ -96,64 +95,49 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hyp no longer needs access to the host task's thread flags so remove the
-corresponding hyp mapping.
+smp_procesor_id() works off of the cpu_number per-cpu variable. Create
+an nVHE hyp version of cpu_number and initialize it to the same value as
+the host when creating the hyp per-cpu regions.
 
 Signed-off-by: Andrew Scull <ascull@google.com>
-Cc: Dave Martin <Dave.Martin@arm.com>
 ---
- arch/arm64/include/asm/kvm_host.h |  2 --
- arch/arm64/kvm/fpsimd.c           | 11 +----------
- 2 files changed, 1 insertion(+), 12 deletions(-)
+ arch/arm64/kvm/arm.c              | 2 ++
+ arch/arm64/kvm/hyp/nvhe/hyp-smp.c | 2 ++
+ 2 files changed, 4 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index f6a478d3a902..8a559fa2f237 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -26,7 +26,6 @@
- #include <asm/fpsimd.h>
- #include <asm/kvm.h>
- #include <asm/kvm_asm.h>
--#include <asm/thread_info.h>
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 26ccc369cf11..e3edea8379f3 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -54,6 +54,7 @@ DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
+ static DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_page);
+ unsigned long kvm_arm_hyp_percpu_base[NR_CPUS];
+ DECLARE_KVM_NVHE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
++DECLARE_KVM_NVHE_PER_CPU(int, cpu_number);
  
- #define __KVM_HAVE_ARCH_INTC_INITIALIZED
+ /* The VMID used in the VTTBR */
+ static atomic64_t kvm_vmid_gen = ATOMIC64_INIT(1);
+@@ -1740,6 +1741,7 @@ static int init_hyp_mode(void)
+ 		page_addr = page_address(page);
+ 		memcpy(page_addr, CHOOSE_NVHE_SYM(__per_cpu_start), nvhe_percpu_size());
+ 		kvm_arm_hyp_percpu_base[cpu] = (unsigned long)page_addr;
++		*per_cpu_ptr_nvhe_sym(cpu_number, cpu) = cpu;
+ 	}
  
-@@ -307,7 +306,6 @@ struct kvm_vcpu_arch {
- 	struct kvm_guest_debug_arch vcpu_debug_state;
- 	struct kvm_guest_debug_arch external_debug_state;
+ 	/*
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-smp.c b/arch/arm64/kvm/hyp/nvhe/hyp-smp.c
+index 879559057dee..86f952b1de18 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-smp.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-smp.c
+@@ -8,6 +8,8 @@
+ #include <asm/kvm_hyp.h>
+ #include <asm/kvm_mmu.h>
  
--	struct thread_info *host_thread_info;	/* hyp VA */
- 	struct user_fpsimd_state *host_fpsimd_state;	/* hyp VA */
- 
- 	struct {
-diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-index 0c5e79be34d5..3e5a02137643 100644
---- a/arch/arm64/kvm/fpsimd.c
-+++ b/arch/arm64/kvm/fpsimd.c
-@@ -27,22 +27,13 @@ int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu)
- {
- 	int ret;
- 
--	struct thread_info *ti = &current->thread_info;
- 	struct user_fpsimd_state *fpsimd = &current->thread.uw.fpsimd_state;
- 
--	/*
--	 * Make sure the host task thread flags and fpsimd state are
--	 * visible to hyp:
--	 */
--	ret = create_hyp_mappings(ti, ti + 1, PAGE_HYP);
--	if (ret)
--		goto error;
--
-+	/* Make sure the host task fpsimd state is visible to hyp: */
- 	ret = create_hyp_mappings(fpsimd, fpsimd + 1, PAGE_HYP);
- 	if (ret)
- 		goto error;
- 
--	vcpu->arch.host_thread_info = kern_hyp_va(ti);
- 	vcpu->arch.host_fpsimd_state = kern_hyp_va(fpsimd);
- error:
- 	return ret;
++DEFINE_PER_CPU_READ_MOSTLY(int, cpu_number);
++
+ /*
+  * nVHE copy of data structures tracking available CPU cores.
+  * Only entries for CPUs that were online at KVM init are populated.
 -- 
 2.30.1.766.gb4fecdf3b7-goog
 
