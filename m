@@ -2,90 +2,70 @@ Return-Path: <SRS0=dAAB=IC=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EAD7C433DB
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Mar 2021 17:11:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C8E8C4332B
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Mar 2021 18:47:31 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 110CE64F59
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Mar 2021 17:11:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 110CE64F59
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTP id 1B32764F6A
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Mar 2021 18:47:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B32764F6A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8790E4B6BF;
-	Thu,  4 Mar 2021 12:11:23 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A8AFB4B622;
+	Thu,  4 Mar 2021 13:47:30 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linaro.org
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id e1ok7KqPAPTW; Thu,  4 Mar 2021 12:11:22 -0500 (EST)
+	with ESMTP id ezs4tgaUJZwK; Thu,  4 Mar 2021 13:47:29 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E3364B6B2;
-	Thu,  4 Mar 2021 12:11:22 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6102B4B6A5;
+	Thu,  4 Mar 2021 13:47:29 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F3464B6AB
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Mar 2021 12:11:21 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 595B04B624
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Mar 2021 13:47:28 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qca7jh8OVizS for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Mar 2021 12:11:19 -0500 (EST)
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com
- [209.85.128.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A92D54B388
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Mar 2021 12:11:19 -0500 (EST)
-Received: by mail-wm1-f46.google.com with SMTP id w7so8729416wmb.5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 04 Mar 2021 09:11:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=xFBPptA1LX4xyld1RDDV7UcfKnkB6M3UWan7nS+Z21M=;
- b=tiAETIbaY5PD9LghmQ3hpAzU9/xT4+vZSyepR2JFaM6dHEk/nttduYLtMdNKlbr2F0
- 2xGgwDcrWQicytfoFsHEZMFSB+tMZSqJXGirbIeyyBAC3+b+WR5V7b1uCEmu52HozAMb
- h8nRzWD3zCA7q7WSXN9wKLu7cnMPJZJZT+dApiQnAniTfYMWA0KTH7HBLWECDRgYYToV
- 1/oSGc3jHjaz0ecfGCVuE8qn8ac/W6C4v44HP/uDzaCLEPs0kGrBaV2Y+WFlf7rYTJdL
- aSI7OWJff8UayvQr2V7rLdtbfuHyCjM7gUcKlBHvLg5uF8+ZjZed/hoZXH/Fff2EASul
- 9Tfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=xFBPptA1LX4xyld1RDDV7UcfKnkB6M3UWan7nS+Z21M=;
- b=UtYbxkltiIKde+f5J72nlt3ayadkb9DUD9rMDd0oQtb+3xnEWL6gJbF2oUJZD3eB97
- kO2I7on+gvNukYq1dcteKnonfOhL/lS1l9Bp8pFGDHR4R6kBcEvoMiEAVt+WTAu2mJ1N
- FZaWkMXl505Bs0/OknYI7vCnZvUbw+8tRCjq0gd3KciDnxoP2+kdCK4KI0vmVmG+b3HQ
- XxBrTY1t6txXK5YnKC+t5g6buRAVq+lQdPBWgHj/PEpkcGf2BH8Vbyk4bZ14W9lRmOJi
- WmE5wEnEsF5ihd4S5+1g+rLK8qquRbbijC0fxT6F+LbWtOwrVvomiFLnHwTtzky8MhnE
- sL6g==
-X-Gm-Message-State: AOAM532OeleTjjl1KNeOcObqU1Hdv1MYbHr7EpLNPIjsMD9Nx/gpgaPk
- zgPYhJSQJuYSSspaySgd3ibx/g==
-X-Google-Smtp-Source: ABdhPJxOntYhGbDUS7U/hw2vNYCli4kH7kDgdSmiVlbsTu2jHmpDOTkFqOg/YkOfklJtre/JYQMOtg==
-X-Received: by 2002:a7b:c3cd:: with SMTP id t13mr4891812wmj.109.1614877878605; 
- Thu, 04 Mar 2021 09:11:18 -0800 (PST)
-Received: from myrica ([2001:1715:4e26:a7e0:116c:c27a:3e7f:5eaf])
- by smtp.gmail.com with ESMTPSA id b186sm58826wmc.44.2021.03.04.09.11.17
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 04 Mar 2021 09:11:18 -0800 (PST)
-Date: Thu, 4 Mar 2021 18:10:57 +0100
-From: Jean-Philippe Brucker <jean-philippe@linaro.org>
-To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Subject: Re: [RFC PATCH 4/5] iommu/arm-smmu-v3: Use pinned VMID for NESTED
- stage with BTM
-Message-ID: <YEEUocRn3IfIDpLj@myrica>
-References: <20210222155338.26132-1-shameerali.kolothum.thodi@huawei.com>
- <20210222155338.26132-5-shameerali.kolothum.thodi@huawei.com>
+ with ESMTP id 4yxquh2-4Oqa for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Mar 2021 13:47:27 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0C1894B622
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Mar 2021 13:47:27 -0500 (EST)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 3E6AB64F62;
+ Thu,  4 Mar 2021 18:47:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1614883645;
+ bh=S7ckbpy5k+FMYq7pq6vAO3yRrbvaZRD48psVeKkEYws=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=lmub3J0ySh9kg/YLOGmK63ZbK4yI7/sglPxmzJMzMwvqJxE0oghLQQSsHTkhaxGc4
+ NRpLwz3FaDRDzrthiSL/C/y3P7P051jjtBZ2ExkZcisAeTmryPNf/pkxg4deSP/nM1
+ 0VrYJ2dZKWW3EfQ0Uu71CqKtLX3t5w5zSwyR86aoM/TVojE169AJrUTm6VIh9z5+mr
+ elIjgsFyBf+pRcuvSUfZGz+bFS3Hvzfvv2mjPx3QxT3Iq1FGvsxg9iE3F0NHMOrwH3
+ fiqLrWI6x98xdPeFFudWVgSrScA3kkHyaB2LelAmsrNTwT2f3rD+unKJ3rSGn44QFo
+ 8SMiBub77GgJg==
+Date: Thu, 4 Mar 2021 18:47:17 +0000
+From: Will Deacon <will@kernel.org>
+To: Quentin Perret <qperret@google.com>
+Subject: Re: [PATCH v3 15/32] KVM: arm64: Prepare the creation of s1 mappings
+ at EL2
+Message-ID: <20210304184717.GB21795@willie-the-truck>
+References: <20210302150002.3685113-1-qperret@google.com>
+ <20210302150002.3685113-16-qperret@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20210222155338.26132-5-shameerali.kolothum.thodi@huawei.com>
-Cc: maz@kernel.org, alex.williamson@redhat.com, linuxarm@openeuler.org,
- iommu@lists.linux-foundation.org, prime.zeng@hisilicon.com,
- jonathan.cameron@huawei.com, zhangfei.gao@linaro.org,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20210302150002.3685113-16-qperret@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: android-kvm@google.com, catalin.marinas@arm.com, mate.toth-pal@arm.com,
+ seanjc@google.com, tabba@google.com, linux-kernel@vger.kernel.org,
+ robh+dt@kernel.org, linux-arm-kernel@lists.infradead.org, maz@kernel.org,
+ kernel-team@android.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -102,147 +82,172 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Shameer,
+Hi Quentin,
 
-On Mon, Feb 22, 2021 at 03:53:37PM +0000, Shameer Kolothum wrote:
-> If the SMMU supports BTM and the device belongs to NESTED domain
-> with shared pasid table, we need to use the VMID allocated by the
-> KVM for the s2 configuration. Hence, request a pinned VMID from KVM.
+On Tue, Mar 02, 2021 at 02:59:45PM +0000, Quentin Perret wrote:
+> When memory protection is enabled, the EL2 code needs the ability to
+> create and manage its own page-table. To do so, introduce a new set of
+> hypercalls to bootstrap a memory management system at EL2.
 > 
-> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> This leads to the following boot flow in nVHE Protected mode:
+> 
+>  1. the host allocates memory for the hypervisor very early on, using
+>     the memblock API;
+> 
+>  2. the host creates a set of stage 1 page-table for EL2, installs the
+>     EL2 vectors, and issues the __pkvm_init hypercall;
+> 
+>  3. during __pkvm_init, the hypervisor re-creates its stage 1 page-table
+>     and stores it in the memory pool provided by the host;
+> 
+>  4. the hypervisor then extends its stage 1 mappings to include a
+>     vmemmap in the EL2 VA space, hence allowing to use the buddy
+>     allocator introduced in a previous patch;
+> 
+>  5. the hypervisor jumps back in the idmap page, switches from the
+>     host-provided page-table to the new one, and wraps up its
+>     initialization by enabling the new allocator, before returning to
+>     the host.
+> 
+>  6. the host can free the now unused page-table created for EL2, and
+>     will now need to issue hypercalls to make changes to the EL2 stage 1
+>     mappings instead of modifying them directly.
+> 
+> Note that for the sake of simplifying the review, this patch focuses on
+> the hypervisor side of things. In other words, this only implements the
+> new hypercalls, but does not make use of them from the host yet. The
+> host-side changes will follow in a subsequent patch.
+> 
+> Credits to Will for __pkvm_init_switch_pgd.
+> 
+> Co-authored-by: Will Deacon <will@kernel.org>
+> Signed-off-by: Will Deacon <will@kernel.org>
+> Signed-off-by: Quentin Perret <qperret@google.com>
 > ---
->  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 49 ++++++++++++++++++++-
->  1 file changed, 47 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> index 26bf7da1bcd0..04f83f7c8319 100644
-> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> @@ -28,6 +28,7 @@
->  #include <linux/pci.h>
->  #include <linux/pci-ats.h>
->  #include <linux/platform_device.h>
-> +#include <linux/kvm_host.h>
+>  arch/arm64/include/asm/kvm_asm.h     |   4 +
+>  arch/arm64/include/asm/kvm_host.h    |   7 +
+>  arch/arm64/include/asm/kvm_hyp.h     |   8 ++
+>  arch/arm64/include/asm/kvm_pgtable.h |   2 +
+>  arch/arm64/kernel/image-vars.h       |  16 +++
+>  arch/arm64/kvm/hyp/Makefile          |   2 +-
+>  arch/arm64/kvm/hyp/include/nvhe/mm.h |  71 ++++++++++
+>  arch/arm64/kvm/hyp/nvhe/Makefile     |   4 +-
+>  arch/arm64/kvm/hyp/nvhe/hyp-init.S   |  31 +++++
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c   |  49 +++++++
+>  arch/arm64/kvm/hyp/nvhe/mm.c         | 173 ++++++++++++++++++++++++
+>  arch/arm64/kvm/hyp/nvhe/setup.c      | 195 +++++++++++++++++++++++++++
+>  arch/arm64/kvm/hyp/pgtable.c         |   2 -
+>  arch/arm64/kvm/hyp/reserved_mem.c    |  92 +++++++++++++
+>  arch/arm64/mm/init.c                 |   3 +
+>  15 files changed, 654 insertions(+), 5 deletions(-)
+
+This mostly looks good to me, but in a patch this size I was bound to spot
+a few niggles. It is _huge_!
+
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> index c631e29fb001..bc56ea92b812 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> @@ -244,4 +244,35 @@ alternative_else_nop_endif
 >  
->  #include <linux/amba/bus.h>
+>  SYM_CODE_END(__kvm_handle_stub_hvc)
 >  
-> @@ -2195,6 +2196,33 @@ static void arm_smmu_bitmap_free(unsigned long *map, int idx)
->  	clear_bit(idx, map);
->  }
->  
-> +static int arm_smmu_pinned_vmid_get(struct arm_smmu_domain *smmu_domain)
+> +SYM_FUNC_START(__pkvm_init_switch_pgd)
+> +	/* Turn the MMU off */
+> +	pre_disable_mmu_workaround
+> +	mrs	x2, sctlr_el2
+> +	bic	x3, x2, #SCTLR_ELx_M
+> +	msr	sctlr_el2, x3
+> +	isb
+> +
+> +	tlbi	alle2
+> +
+> +	/* Install the new pgtables */
+> +	ldr	x3, [x0, #NVHE_INIT_PGD_PA]
+> +	phys_to_ttbr x4, x3
+> +alternative_if ARM64_HAS_CNP
+> +	orr	x4, x4, #TTBR_CNP_BIT
+> +alternative_else_nop_endif
+> +	msr	ttbr0_el2, x4
+> +
+> +	/* Set the new stack pointer */
+> +	ldr	x0, [x0, #NVHE_INIT_STACK_HYP_VA]
+> +	mov	sp, x0
+> +
+> +	/* And turn the MMU back on! */
+> +	dsb	nsh
+> +	isb
+> +	msr	sctlr_el2, x2
+> +	ic	iallu
+> +	isb
+
+Comparing with the new-fangled set_sctlr_el1 macro we have, this sequence
+isn't quite right. Probably best to introduce set_sctlr_el2, and implement
+that and the existing macro in terms of set_sctlr_elX or something like
+that.
+
+> +void __noreturn __pkvm_init_finalise(void)
 > +{
-> +	struct arm_smmu_master *master;
+> +	struct kvm_host_data *host_data = this_cpu_ptr(&kvm_host_data);
+> +	struct kvm_cpu_context *host_ctxt = &host_data->host_ctxt;
+> +	unsigned long nr_pages, reserved_pages, pfn;
+> +	int ret;
 > +
-> +	master = list_first_entry_or_null(&smmu_domain->devices,
-> +					  struct arm_smmu_master, domain_head);
-
-This probably needs to hold devices_lock while using master.
-
-> +	if (!master)
-> +		return -EINVAL;
+> +	/* Now that the vmemmap is backed, install the full-fledged allocator */
+> +	pfn = hyp_virt_to_pfn(hyp_pgt_base);
+> +	nr_pages = hyp_s1_pgtable_pages();
+> +	reserved_pages = hyp_early_alloc_nr_used_pages();
+> +	ret = hyp_pool_init(&hpool, pfn, nr_pages, reserved_pages);
+> +	if (ret)
+> +		goto out;
 > +
-> +	return kvm_pinned_vmid_get(master->dev);
+> +	pkvm_pgtable_mm_ops.zalloc_page = hyp_zalloc_hyp_page;
+> +	pkvm_pgtable_mm_ops.phys_to_virt = hyp_phys_to_virt;
+> +	pkvm_pgtable_mm_ops.virt_to_phys = hyp_virt_to_phys;
+> +	pkvm_pgtable_mm_ops.get_page = hyp_get_page;
+> +	pkvm_pgtable_mm_ops.put_page = hyp_put_page;
+> +	pkvm_pgtable.mm_ops = &pkvm_pgtable_mm_ops;
+
+Can you do:
+
+	pkvm_pgtable_mm_ops = (struct kvm_pgtable_mm_ops) {
+		.zalloc_page	= hyp_zalloc_hyp_page,
+		.phys_to_virt	= ...,
+		...
+	};
+
+here?
+
+> +
+> +out:
+> +	/*
+> +	 * We tail-called to here from handle___pkvm_init() and will not return,
+> +	 * so make sure to propagate the return value to the host.
+> +	 */
+> +	cpu_reg(host_ctxt, 1) = ret;
+> +
+> +	__host_enter(host_ctxt);
 > +}
 > +
-> +static int arm_smmu_pinned_vmid_put(struct arm_smmu_domain *smmu_domain)
+> +int __pkvm_init(phys_addr_t phys, unsigned long size, unsigned long nr_cpus,
+> +		unsigned long *per_cpu_base, u32 hyp_va_bits)
 > +{
-> +	struct arm_smmu_master *master;
+> +	struct kvm_nvhe_init_params *params;
+> +	void *virt = hyp_phys_to_virt(phys);
+> +	void (*fn)(phys_addr_t params_pa, void *finalize_fn_va);
+> +	int ret;
 > +
-> +	master = list_first_entry_or_null(&smmu_domain->devices,
-> +					  struct arm_smmu_master, domain_head);
-> +	if (!master)
+> +	if (phys % PAGE_SIZE || size % PAGE_SIZE)
 > +		return -EINVAL;
-> +
-> +	if (smmu_domain->s2_cfg.vmid)
-> +		return kvm_pinned_vmid_put(master->dev);
-> +
-> +	return 0;
-> +}
-> +
->  static void arm_smmu_domain_free(struct iommu_domain *domain)
->  {
->  	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
-> @@ -2215,8 +2243,11 @@ static void arm_smmu_domain_free(struct iommu_domain *domain)
->  		mutex_unlock(&arm_smmu_asid_lock);
->  	}
->  	if (s2_cfg->set) {
-> -		if (s2_cfg->vmid)
-> -			arm_smmu_bitmap_free(smmu->vmid_map, s2_cfg->vmid);
-> +		if (s2_cfg->vmid) {
-> +			if (!(smmu->features & ARM_SMMU_FEAT_BTM) &&
-> +			    smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
-> +				arm_smmu_bitmap_free(smmu->vmid_map, s2_cfg->vmid);
-> +		}
->  	}
->  
->  	kfree(smmu_domain);
-> @@ -3199,6 +3230,17 @@ static int arm_smmu_attach_pasid_table(struct iommu_domain *domain,
->  				!(smmu->features & ARM_SMMU_FEAT_2_LVL_CDTAB))
->  			goto out;
->  
-> +		if (smmu->features & ARM_SMMU_FEAT_BTM) {
-> +			ret = arm_smmu_pinned_vmid_get(smmu_domain);
-> +			if (ret < 0)
-> +				goto out;
-> +
-> +			if (smmu_domain->s2_cfg.vmid)
-> +				arm_smmu_bitmap_free(smmu->vmid_map, smmu_domain->s2_cfg.vmid);
-> +
-> +			smmu_domain->s2_cfg.vmid = (u16)ret;
 
-That will require a TLB invalidation on the old VMID, once the STE is
-rewritten.
+Either PAGE_ALIGNED or '& ~PAGE_MASK' would be better than spelling this
+with '%', I reckon.
 
-More generally I think this pinned VMID set conflicts with that of
-stage-2-only domains (which is the default state until a guest attaches a
-PASID table). Say you have one guest using DOMAIN_NESTED without PASID
-table, just DMA to IPA using VMID 0x8000. Now another guest attaches a
-PASID table and obtains the same VMID from KVM. The stage-2 translation
-might use TLB entries from the other guest, no?  They'll both create
-stage-2 TLB entries with {StreamWorld=NS-EL1, VMID=0x8000}
+Anyway, other than these nits:
 
-It's tempting to allocate all VMIDs through KVM instead, but that will
-force a dependency on KVM to use VFIO_TYPE1_NESTING_IOMMU and might break
-existing users of that extension (though I'm not sure there are any).
-Instead we might need to restrict the SMMU VMID bitmap to match the
-private VMID set in KVM.
+Acked-by: Will Deacon <will@kernel.org>
 
-Besides we probably want to restrict this feature to systems supporting
-VMID16 on both SMMU and CPUs, or at least check that they are compatible.
-
-> +		}
-> +
->  		smmu_domain->s1_cfg.cdcfg.cdtab_dma = cfg->base_ptr;
->  		smmu_domain->s1_cfg.s1cdmax = cfg->pasid_bits;
->  		smmu_domain->s1_cfg.s1fmt = cfg->vendor_data.smmuv3.s1fmt;
-> @@ -3221,6 +3263,7 @@ static int arm_smmu_attach_pasid_table(struct iommu_domain *domain,
->  static void arm_smmu_detach_pasid_table(struct iommu_domain *domain)
->  {
->  	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
-> +	struct arm_smmu_device *smmu = smmu_domain->smmu;
->  	struct arm_smmu_master *master;
->  	unsigned long flags;
->  
-> @@ -3237,6 +3280,8 @@ static void arm_smmu_detach_pasid_table(struct iommu_domain *domain)
->  		arm_smmu_install_ste_for_dev(master);
->  	spin_unlock_irqrestore(&smmu_domain->devices_lock, flags);
->  
-> +	if (smmu->features & ARM_SMMU_FEAT_BTM)
-> +		arm_smmu_pinned_vmid_put(smmu_domain);
-
-Aliasing here as well: the VMID is still live but can be reallocated by
-KVM and another domain might obtain it.
-
-Thanks,
-Jean
-
->  unlock:
->  	mutex_unlock(&smmu_domain->init_mutex);
->  }
-> -- 
-> 2.17.1
-> 
+Will
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
