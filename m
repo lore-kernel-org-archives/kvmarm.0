@@ -2,91 +2,90 @@ Return-Path: <SRS0=dAAB=IC=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94617C433DB
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Mar 2021 15:49:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EAD7C433DB
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Mar 2021 17:11:24 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BBD6264F1C
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Mar 2021 15:49:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBD6264F1C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 110CE64F59
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Mar 2021 17:11:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 110CE64F59
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 066544B3DB;
-	Thu,  4 Mar 2021 10:49:12 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8790E4B6BF;
+	Thu,  4 Mar 2021 12:11:23 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 01a-75ASd8b4; Thu,  4 Mar 2021 10:49:11 -0500 (EST)
+	with ESMTP id e1ok7KqPAPTW; Thu,  4 Mar 2021 12:11:22 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B4974B3F0;
-	Thu,  4 Mar 2021 10:49:11 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E3364B6B2;
+	Thu,  4 Mar 2021 12:11:22 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B7224B3DB
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Mar 2021 10:49:10 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F3464B6AB
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Mar 2021 12:11:21 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hWfPz1KlTJUz for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Mar 2021 10:49:09 -0500 (EST)
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com
- [209.85.221.53])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2605D4B1F2
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Mar 2021 10:49:09 -0500 (EST)
-Received: by mail-wr1-f53.google.com with SMTP id f12so24376342wrx.8
- for <kvmarm@lists.cs.columbia.edu>; Thu, 04 Mar 2021 07:49:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ with ESMTP id qca7jh8OVizS for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Mar 2021 12:11:19 -0500 (EST)
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com
+ [209.85.128.46])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A92D54B388
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Mar 2021 12:11:19 -0500 (EST)
+Received: by mail-wm1-f46.google.com with SMTP id w7so8729416wmb.5
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 04 Mar 2021 09:11:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=LhGupbzdEthuR24ULnc5046PaiLJrBs+er9+oVApeFU=;
- b=EWHLHh+IyVUqUgAF4LFZSuMlY9wO0QpbQ806Aov0N14LnzY3kFNc0MBKZlNk0fMhBa
- 7g4Vv/tUs3yoiKwACuE890DOhAPuphZYbSCPPuUaBxUgawsBJAdJTCBLXVzt5wVIYVUt
- zc8bT49uF5u2iGpc6PKcZNdkMzvNW6RSaF2yAKzUaTiHmSf1WpEgc5Yhp8f7q+4albDc
- nF4lron7w2kjGuZ+LtZ6whwHeQQrh6JNZcPXFeccx3iXxxUL7VHPFH6MEx27zPsugvH7
- ZyGHw9Tchk2qVIeN2zMA+sCqvgrf1e2fXQObBmKBSPKY2GJeESgGs+oXFyLQCjmcCF1l
- u3jw==
+ bh=xFBPptA1LX4xyld1RDDV7UcfKnkB6M3UWan7nS+Z21M=;
+ b=tiAETIbaY5PD9LghmQ3hpAzU9/xT4+vZSyepR2JFaM6dHEk/nttduYLtMdNKlbr2F0
+ 2xGgwDcrWQicytfoFsHEZMFSB+tMZSqJXGirbIeyyBAC3+b+WR5V7b1uCEmu52HozAMb
+ h8nRzWD3zCA7q7WSXN9wKLu7cnMPJZJZT+dApiQnAniTfYMWA0KTH7HBLWECDRgYYToV
+ 1/oSGc3jHjaz0ecfGCVuE8qn8ac/W6C4v44HP/uDzaCLEPs0kGrBaV2Y+WFlf7rYTJdL
+ aSI7OWJff8UayvQr2V7rLdtbfuHyCjM7gUcKlBHvLg5uF8+ZjZed/hoZXH/Fff2EASul
+ 9Tfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=LhGupbzdEthuR24ULnc5046PaiLJrBs+er9+oVApeFU=;
- b=fXmf9jQD/eC3FU4/g4cHuyEsIar4urE3k+chKFNjK0oLnfo4UJbz2Z00HLlSTf+A08
- j6yYwMhEH+sOTNW5yKiFreQQEIdH0jl0ZoT6d7GyxsCP588yO+HYUj1tga7lvUpgBRqJ
- E8IFYIwa0OjUZvSaprgGHby9KML8bNSwjni9vodChJL+WoqDjL5hmsw06dJ9iSOHBEDt
- kP+5U+JKF/kqIXzrvncj9/C43fqlzD1hXSH2qix4RegujwHHhMg7ZnHCopx8xnjh56b7
- Yq1izu3zayBvdwdXL1hfziklgkdn2m7Z14gJDH7OFZJ3NtvnQTcjUgpIP5YyUaPPEK/F
- z7Zw==
-X-Gm-Message-State: AOAM531xaArfCj72WmDlSFf89sdY0APJYF2Mw5EmeT8ty6AXI0wJl88c
- VJ4RVNbwixe/w4K34vS/R+0IOw==
-X-Google-Smtp-Source: ABdhPJwAMOHT+NpKRPC4qB1GLJVh8vLpTUsT2vC7aS+EbNwN1mBpqTrXaelCzUyIK9ZPcLvl/WPgqA==
-X-Received: by 2002:adf:9bcf:: with SMTP id e15mr4631058wrc.276.1614872947974; 
- Thu, 04 Mar 2021 07:49:07 -0800 (PST)
-Received: from google.com (230.69.233.35.bc.googleusercontent.com.
- [35.233.69.230])
- by smtp.gmail.com with ESMTPSA id m10sm10074082wmh.13.2021.03.04.07.49.07
+ bh=xFBPptA1LX4xyld1RDDV7UcfKnkB6M3UWan7nS+Z21M=;
+ b=UtYbxkltiIKde+f5J72nlt3ayadkb9DUD9rMDd0oQtb+3xnEWL6gJbF2oUJZD3eB97
+ kO2I7on+gvNukYq1dcteKnonfOhL/lS1l9Bp8pFGDHR4R6kBcEvoMiEAVt+WTAu2mJ1N
+ FZaWkMXl505Bs0/OknYI7vCnZvUbw+8tRCjq0gd3KciDnxoP2+kdCK4KI0vmVmG+b3HQ
+ XxBrTY1t6txXK5YnKC+t5g6buRAVq+lQdPBWgHj/PEpkcGf2BH8Vbyk4bZ14W9lRmOJi
+ WmE5wEnEsF5ihd4S5+1g+rLK8qquRbbijC0fxT6F+LbWtOwrVvomiFLnHwTtzky8MhnE
+ sL6g==
+X-Gm-Message-State: AOAM532OeleTjjl1KNeOcObqU1Hdv1MYbHr7EpLNPIjsMD9Nx/gpgaPk
+ zgPYhJSQJuYSSspaySgd3ibx/g==
+X-Google-Smtp-Source: ABdhPJxOntYhGbDUS7U/hw2vNYCli4kH7kDgdSmiVlbsTu2jHmpDOTkFqOg/YkOfklJtre/JYQMOtg==
+X-Received: by 2002:a7b:c3cd:: with SMTP id t13mr4891812wmj.109.1614877878605; 
+ Thu, 04 Mar 2021 09:11:18 -0800 (PST)
+Received: from myrica ([2001:1715:4e26:a7e0:116c:c27a:3e7f:5eaf])
+ by smtp.gmail.com with ESMTPSA id b186sm58826wmc.44.2021.03.04.09.11.17
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 04 Mar 2021 07:49:07 -0800 (PST)
-Date: Thu, 4 Mar 2021 15:49:05 +0000
-From: Quentin Perret <qperret@google.com>
-To: Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v3 12/32] KVM: arm64: Introduce a Hyp buddy page allocator
-Message-ID: <YEEBccpDtnJJdwkJ@google.com>
-References: <20210302150002.3685113-1-qperret@google.com>
- <20210302150002.3685113-13-qperret@google.com>
- <20210304153036.GA21507@willie-the-truck>
+ Thu, 04 Mar 2021 09:11:18 -0800 (PST)
+Date: Thu, 4 Mar 2021 18:10:57 +0100
+From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Subject: Re: [RFC PATCH 4/5] iommu/arm-smmu-v3: Use pinned VMID for NESTED
+ stage with BTM
+Message-ID: <YEEUocRn3IfIDpLj@myrica>
+References: <20210222155338.26132-1-shameerali.kolothum.thodi@huawei.com>
+ <20210222155338.26132-5-shameerali.kolothum.thodi@huawei.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20210304153036.GA21507@willie-the-truck>
-Cc: android-kvm@google.com, catalin.marinas@arm.com, mate.toth-pal@arm.com,
- seanjc@google.com, tabba@google.com, linux-kernel@vger.kernel.org,
- robh+dt@kernel.org, linux-arm-kernel@lists.infradead.org, maz@kernel.org,
- kernel-team@android.com, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20210222155338.26132-5-shameerali.kolothum.thodi@huawei.com>
+Cc: maz@kernel.org, alex.williamson@redhat.com, linuxarm@openeuler.org,
+ iommu@lists.linux-foundation.org, prime.zeng@hisilicon.com,
+ jonathan.cameron@huawei.com, zhangfei.gao@linaro.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -103,47 +102,147 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thursday 04 Mar 2021 at 15:30:36 (+0000), Will Deacon wrote:
-> On Tue, Mar 02, 2021 at 02:59:42PM +0000, Quentin Perret wrote:
-> > +void *hyp_alloc_pages(struct hyp_pool *pool, unsigned int order)
-> > +{
-> > +	unsigned int i = order;
-> > +	struct hyp_page *p;
-> > +
-> > +	hyp_spin_lock(&pool->lock);
-> > +
-> > +	/* Look for a high-enough-order page */
-> > +	while (i < pool->max_order && list_empty(&pool->free_area[i]))
-> > +		i++;
-> > +	if (i >= pool->max_order) {
-> > +		hyp_spin_unlock(&pool->lock);
-> > +		return NULL;
-> > +	}
-> > +
-> > +	/* Extract it from the tree at the right order */
-> > +	p = list_first_entry(&pool->free_area[i], struct hyp_page, node);
-> > +	p = __hyp_extract_page(pool, p, order);
-> > +
-> > +	hyp_spin_unlock(&pool->lock);
-> > +	hyp_page_ref_inc(p);
+Hi Shameer,
+
+On Mon, Feb 22, 2021 at 03:53:37PM +0000, Shameer Kolothum wrote:
+> If the SMMU supports BTM and the device belongs to NESTED domain
+> with shared pasid table, we need to use the VMID allocated by the
+> KVM for the s2 configuration. Hence, request a pinned VMID from KVM.
 > 
-> I find this a little scary, as we momentarily drop the lock. It think
-> it's ok because the reference count on the page must be 0 at this point,
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> ---
+>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 49 ++++++++++++++++++++-
+>  1 file changed, 47 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> index 26bf7da1bcd0..04f83f7c8319 100644
+> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> @@ -28,6 +28,7 @@
+>  #include <linux/pci.h>
+>  #include <linux/pci-ats.h>
+>  #include <linux/platform_device.h>
+> +#include <linux/kvm_host.h>
+>  
+>  #include <linux/amba/bus.h>
+>  
+> @@ -2195,6 +2196,33 @@ static void arm_smmu_bitmap_free(unsigned long *map, int idx)
+>  	clear_bit(idx, map);
+>  }
+>  
+> +static int arm_smmu_pinned_vmid_get(struct arm_smmu_domain *smmu_domain)
+> +{
+> +	struct arm_smmu_master *master;
+> +
+> +	master = list_first_entry_or_null(&smmu_domain->devices,
+> +					  struct arm_smmu_master, domain_head);
 
-Yep, @p shouldn't be visible to the caller yet so this should be fine.
+This probably needs to hold devices_lock while using master.
 
-> but actually then I think it would be clearer to have a
-> hyp_page_ref_init() function which could take the lock, check that the
-> refcount is indeed 0 and then set it to 1.
+> +	if (!master)
+> +		return -EINVAL;
+> +
+> +	return kvm_pinned_vmid_get(master->dev);
+> +}
+> +
+> +static int arm_smmu_pinned_vmid_put(struct arm_smmu_domain *smmu_domain)
+> +{
+> +	struct arm_smmu_master *master;
+> +
+> +	master = list_first_entry_or_null(&smmu_domain->devices,
+> +					  struct arm_smmu_master, domain_head);
+> +	if (!master)
+> +		return -EINVAL;
+> +
+> +	if (smmu_domain->s2_cfg.vmid)
+> +		return kvm_pinned_vmid_put(master->dev);
+> +
+> +	return 0;
+> +}
+> +
+>  static void arm_smmu_domain_free(struct iommu_domain *domain)
+>  {
+>  	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
+> @@ -2215,8 +2243,11 @@ static void arm_smmu_domain_free(struct iommu_domain *domain)
+>  		mutex_unlock(&arm_smmu_asid_lock);
+>  	}
+>  	if (s2_cfg->set) {
+> -		if (s2_cfg->vmid)
+> -			arm_smmu_bitmap_free(smmu->vmid_map, s2_cfg->vmid);
+> +		if (s2_cfg->vmid) {
+> +			if (!(smmu->features & ARM_SMMU_FEAT_BTM) &&
+> +			    smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
+> +				arm_smmu_bitmap_free(smmu->vmid_map, s2_cfg->vmid);
+> +		}
+>  	}
+>  
+>  	kfree(smmu_domain);
+> @@ -3199,6 +3230,17 @@ static int arm_smmu_attach_pasid_table(struct iommu_domain *domain,
+>  				!(smmu->features & ARM_SMMU_FEAT_2_LVL_CDTAB))
+>  			goto out;
+>  
+> +		if (smmu->features & ARM_SMMU_FEAT_BTM) {
+> +			ret = arm_smmu_pinned_vmid_get(smmu_domain);
+> +			if (ret < 0)
+> +				goto out;
+> +
+> +			if (smmu_domain->s2_cfg.vmid)
+> +				arm_smmu_bitmap_free(smmu->vmid_map, smmu_domain->s2_cfg.vmid);
+> +
+> +			smmu_domain->s2_cfg.vmid = (u16)ret;
 
-Works for me. Maybe I'll use another name for the API to stay consistent
-with the kernel gfp code (hyp_page_ref_inc() and friends are inspired
-from their kernel counterpart). And I guess I can hyp_panic() if the
-refcount is not 0 at this point to match the VM_BUG_ON_PAGE() in
-set_page_refcounted().
+That will require a TLB invalidation on the old VMID, once the STE is
+rewritten.
 
-Thanks!
-Quentin
+More generally I think this pinned VMID set conflicts with that of
+stage-2-only domains (which is the default state until a guest attaches a
+PASID table). Say you have one guest using DOMAIN_NESTED without PASID
+table, just DMA to IPA using VMID 0x8000. Now another guest attaches a
+PASID table and obtains the same VMID from KVM. The stage-2 translation
+might use TLB entries from the other guest, no?  They'll both create
+stage-2 TLB entries with {StreamWorld=NS-EL1, VMID=0x8000}
+
+It's tempting to allocate all VMIDs through KVM instead, but that will
+force a dependency on KVM to use VFIO_TYPE1_NESTING_IOMMU and might break
+existing users of that extension (though I'm not sure there are any).
+Instead we might need to restrict the SMMU VMID bitmap to match the
+private VMID set in KVM.
+
+Besides we probably want to restrict this feature to systems supporting
+VMID16 on both SMMU and CPUs, or at least check that they are compatible.
+
+> +		}
+> +
+>  		smmu_domain->s1_cfg.cdcfg.cdtab_dma = cfg->base_ptr;
+>  		smmu_domain->s1_cfg.s1cdmax = cfg->pasid_bits;
+>  		smmu_domain->s1_cfg.s1fmt = cfg->vendor_data.smmuv3.s1fmt;
+> @@ -3221,6 +3263,7 @@ static int arm_smmu_attach_pasid_table(struct iommu_domain *domain,
+>  static void arm_smmu_detach_pasid_table(struct iommu_domain *domain)
+>  {
+>  	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
+> +	struct arm_smmu_device *smmu = smmu_domain->smmu;
+>  	struct arm_smmu_master *master;
+>  	unsigned long flags;
+>  
+> @@ -3237,6 +3280,8 @@ static void arm_smmu_detach_pasid_table(struct iommu_domain *domain)
+>  		arm_smmu_install_ste_for_dev(master);
+>  	spin_unlock_irqrestore(&smmu_domain->devices_lock, flags);
+>  
+> +	if (smmu->features & ARM_SMMU_FEAT_BTM)
+> +		arm_smmu_pinned_vmid_put(smmu_domain);
+
+Aliasing here as well: the VMID is still live but can be reallocated by
+KVM and another domain might obtain it.
+
+Thanks,
+Jean
+
+>  unlock:
+>  	mutex_unlock(&smmu_domain->init_mutex);
+>  }
+> -- 
+> 2.17.1
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
