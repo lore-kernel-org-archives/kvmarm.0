@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75004C433E0
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Mar 2021 11:55:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41909C433DB
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Mar 2021 11:55:35 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E8DC864F37
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Mar 2021 11:55:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8DC864F37
+	by mail.kernel.org (Postfix) with ESMTP id CC35164F36
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Mar 2021 11:55:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC35164F36
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 92BB34B1FD;
-	Thu,  4 Mar 2021 06:55:31 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 705C94B265;
+	Thu,  4 Mar 2021 06:55:34 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id SCII2TYBz8RO; Thu,  4 Mar 2021 06:55:30 -0500 (EST)
+	with ESMTP id o-aG2-0Ki3MT; Thu,  4 Mar 2021 06:55:33 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EA6374B613;
-	Thu,  4 Mar 2021 06:55:29 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 17BBF4B63F;
+	Thu,  4 Mar 2021 06:55:33 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 198D24B3B4
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Mar 2021 06:55:29 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5EFF84B1FD
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Mar 2021 06:55:31 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OqnoZv2cqlXe for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Mar 2021 06:55:27 -0500 (EST)
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com
- [209.85.128.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 46A544B616
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Mar 2021 06:55:27 -0500 (EST)
-Received: by mail-wm1-f74.google.com with SMTP id f9so4377293wml.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 04 Mar 2021 03:55:27 -0800 (PST)
+ with ESMTP id ImUZn63C9Ma4 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Mar 2021 06:55:30 -0500 (EST)
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com
+ [209.85.221.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 438F64B3B4
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Mar 2021 06:55:29 -0500 (EST)
+Received: by mail-wr1-f74.google.com with SMTP id g2so7417712wrx.20
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 04 Mar 2021 03:55:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=sender:date:in-reply-to:message-id:mime-version:references:subject
- :from:to:cc; bh=OiZpXDKllD6faQeY+ISCMbgMo/47OtYWnkWC6xd58k4=;
- b=UM/Z9HxYkNtCY91A9AOXb1GpONC1Umnj2UW6QYUdwFC0W8Gb4XWUgevy8dXc4t8R9A
- 1XrezOqL7CflBbpyknFZa+fxxiWlPZenv69xhIpb8w9fnDoD6kLCg3M5bkT9tJ0VflDN
- rSPfjgyGSPrUfBOX9gCu1/Tpg0gxr+Dag25hi8aSaRuf/OiCwa3ryAXBWlsjNlJy4WM1
- f17PxISVlnLnFgmq/xw8kfmh4tcEu4StlXqoVPRqQP3AZiA2P/ibl2KVdD0Fi/BA9UoT
- iLoeGoDn/GAsKiRpAG/aR8CMk7XksU8GA0UNCJbvT6FsCKTodlCdc4oSDJbEtVtarIU3
- UbEg==
+ :from:to:cc; bh=Ha6235LVGOpsrXJ6DIkpbeVmu+A6TXQUbK1vj86gkEw=;
+ b=sjieROa9X26PPDaTjRsYn6P4wKf2isbHz4i5Fx/kMw0jz3dPpQUXWUZa74dJtFVcBq
+ 7DUvgHdDZQgBlrssCql7bwEiuKtKw1a8PfnFGv2F/6MeI7AqDzR6eDzaOxTDwEGrTlw1
+ 4xRiUCfK/Ll2PVH2qxrXZVCEmOxib3KyfqqrZTPohCov/8Bt/OyXPFXZWQqQIxtKeefS
+ Lh4kw9lgO03hN4ysuVsGmY1lgeT8V+pBIS5ZxK2Ph+5Sebw0XYyP3g9/6l/Y/F24Yccn
+ yccKQaSN/LegkYjBNy1a/FXnGmWDk9ozffPe6Rh+tglmL2ZUiei8UM1ztkAkPJiherF9
+ 6YQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=OiZpXDKllD6faQeY+ISCMbgMo/47OtYWnkWC6xd58k4=;
- b=ki7LCUOjNlhta5C5XUqqBdwWIxxNq9XDVSpOUKXyhe75M8BQ7iPQ8d5HYYzXkEGISn
- q8TDZgTLta9SzHj09MW+miwW2bHZ+Nplxn5W/U/sZJ/A+Z89DymnkTvOf6paU65HEVqT
- EnzbOIaxeU12jf9aOqkEk/26nx1TgqXZVcYuaxZDbfM/V0Px5bySO38om4SFNC12XzXo
- ZouYROqQ7LSPrZM/A8QZqDEiuB69UIyJdQTrr5Kr10piIvCFWWGwgS+ptxl/oRKLv2TK
- yCzjzy9ICw5mLftpYpthsZGDy9RdNAYmzvsjiC+vC/MG0fBrLFs/DwjS8LjIl92Twpao
- snXQ==
-X-Gm-Message-State: AOAM530m3AjOb2aUgWGKWuX/gOv97hLBEB163+S1ZMpq1CRvMZfMbKoE
- C1zLYIt0cDXOPnaofCnMBGhAWpN/H7dkRXeGXkRdxSfOU8P6zIOubq/UfjACwdE7n83YXQoeGpx
- 5ajHnqtTatQCVYH8wHHr+TRyvqTJUqtPa/GQ50BESnPS9pItLmwfc6XzsB+IgQFH7U9w9Jw==
-X-Google-Smtp-Source: ABdhPJx4DEgrbojP/5L0qk7LADEtX4qlpW9nw2YzD96fhoam5l2vKn3tzA2CO3nPMSmzJfjB/0avUzEBlIA=
+ bh=Ha6235LVGOpsrXJ6DIkpbeVmu+A6TXQUbK1vj86gkEw=;
+ b=RmmquJL8aMOBY+u3bIfilsNP0F01+J6yt+Z65hB62LjRzsbuu4eCrzRDooY87hrsg5
+ 29uPhee0Pdo64nB8WhpvKlTTs6HsVrL2QakdKQJ8JCvXbIRKEaZkdLV6SakSDakQ7laM
+ EBdc97N8SzOI5bMjzlyrByUzkhTvsiK35Ez2pnf+x9YFFD+ACfCLe6VFfW06AU9mPJmN
+ qwrI4TtPtr1uyWeYuLqilMGcZU64QbsHiYqjapWTeKn8rSGc0MpjMrCOIc7ZdvmLKOhZ
+ uqL4E9N04qOloptGMtVtX8rDGH3xR5cUEQQehzO3U+sU0PGtqpXDeDMaumqwqLcE+VmF
+ 4rCg==
+X-Gm-Message-State: AOAM530qHXlXpaCKltvuSOjHLuZ0gtfEagO5xLjvjuvCI6cwerrekEcj
+ C6PFSXQMw7RF0d8MPKdKaP8bIkG9ulwAHbJtKQ0AoeS2q1lp60snZCjAu1AH6s1QtZaszZns0AH
+ MeiFNdZVeaZ488kixTggaOArkz8XgmwEcFo7Ts2Z2XpBWw1UtidJmEOHeG8lQxceem6H4AQ==
+X-Google-Smtp-Source: ABdhPJynlR4ymNdnraD3D3zWwyvGokSETwvH4cJ8yXP8ahzEMlWjKM2fzfwsOpV2piobOd7oGMJdHlScSLU=
 X-Received: from ascull.c.googlers.com ([fda3:e722:ac3:10:28:9cb1:c0a8:1510])
- (user=ascull job=sendgmr) by 2002:a1c:c903:: with SMTP id
- f3mr3548534wmb.69.1614858926516; 
- Thu, 04 Mar 2021 03:55:26 -0800 (PST)
-Date: Thu,  4 Mar 2021 11:54:50 +0000
+ (user=ascull job=sendgmr) by 2002:a1c:df46:: with SMTP id
+ w67mr3590007wmg.176.1614858928419; 
+ Thu, 04 Mar 2021 03:55:28 -0800 (PST)
+Date: Thu,  4 Mar 2021 11:54:51 +0000
 In-Reply-To: <20210304115454.3597879-1-ascull@google.com>
-Message-Id: <20210304115454.3597879-8-ascull@google.com>
+Message-Id: <20210304115454.3597879-9-ascull@google.com>
 Mime-Version: 1.0
 References: <20210304115454.3597879-1-ascull@google.com>
 X-Mailer: git-send-email 2.30.1.766.gb4fecdf3b7-goog
-Subject: [PATCH 07/10] KVM: arm64: Separate host and hyp vcpu FP flags
+Subject: [PATCH 08/10] KVM: arm64: Pass the arch run struct explicitly
 From: Andrew Scull <ascull@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: kernel-team@android.com, maz@kernel.org, catalin.marinas@arm.com,
@@ -96,226 +96,131 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The FP flags on the vcpu are used as arguments to hyp and to track the
-state as hyp runs. In protected mode, this sort of state needs to be
-safe from meddling by the host. Begin the separation with the FP flags.
-
-Since protected mode is only available for nVHE and nVHE does not yet
-support SVE, the SVE flags are left untouched.
+Rather than accessing struct kvm_vcpu_arch_run via the vcpu, pass it
+explicitly as an argument where needed. This will allow a hyp-private
+copy of the struct to be swapped in when running in protected mode.
 
 Signed-off-by: Andrew Scull <ascull@google.com>
 ---
- arch/arm64/include/asm/kvm_host.h       | 33 ++++++++++++++++++-------
- arch/arm64/kvm/fpsimd.c                 | 24 +++++++++---------
- arch/arm64/kvm/hyp/include/hyp/switch.h |  6 ++---
- arch/arm64/kvm/hyp/nvhe/switch.c        |  4 +--
- arch/arm64/kvm/hyp/vhe/switch.c         |  4 +--
- 5 files changed, 44 insertions(+), 27 deletions(-)
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 15 +++++++++------
+ arch/arm64/kvm/hyp/nvhe/switch.c        |  8 ++++----
+ arch/arm64/kvm/hyp/vhe/switch.c         |  2 +-
+ 3 files changed, 14 insertions(+), 11 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index a01194371ae5..8c5242d4ed73 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -268,6 +268,16 @@ struct vcpu_reset_state {
- 	bool		reset;
- };
- 
-+/*
-+ * State that affects the behaviour of hyp when running a vcpu. In protected
-+ * mode, the hypervisor will have a private copy of this state so that the host
-+ * cannot interfere with the hyp while it is running.
-+ */
-+struct kvm_vcpu_arch_run {
-+	/* Miscellaneous vcpu run state flags */
-+	u64 flags;
-+};
-+
- struct kvm_vcpu_arch {
- 	struct kvm_cpu_context ctxt;
- 	void *sve_state;
-@@ -289,6 +299,9 @@ struct kvm_vcpu_arch {
- 	/* Miscellaneous vcpu state flags */
- 	u64 flags;
- 
-+	/* State to manage running of the vcpu by hyp */
-+	struct kvm_vcpu_arch_run run;
-+
- 	/*
- 	 * We maintain more than a single set of debug registers to support
- 	 * debugging the guest from the host and to maintain separate host and
-@@ -390,15 +403,17 @@ struct kvm_vcpu_arch {
- 
- /* vcpu_arch flags field values: */
- #define KVM_ARM64_DEBUG_DIRTY		(1 << 0) /* vcpu is using debug */
--#define KVM_ARM64_FP_ENABLED		(1 << 1) /* guest FP regs loaded */
--#define KVM_ARM64_FP_HOST		(1 << 2) /* host FP regs loaded */
--#define KVM_ARM64_HOST_SVE_IN_USE	(1 << 3) /* backup for host TIF_SVE */
--#define KVM_ARM64_HOST_SVE_ENABLED	(1 << 4) /* SVE enabled for EL0 */
--#define KVM_ARM64_GUEST_HAS_SVE		(1 << 5) /* SVE exposed to guest */
--#define KVM_ARM64_VCPU_SVE_FINALIZED	(1 << 6) /* SVE config completed */
--#define KVM_ARM64_GUEST_HAS_PTRAUTH	(1 << 7) /* PTRAUTH exposed to guest */
--#define KVM_ARM64_PENDING_EXCEPTION	(1 << 8) /* Exception pending */
--#define KVM_ARM64_EXCEPT_MASK		(7 << 9) /* Target EL/MODE */
-+#define KVM_ARM64_HOST_SVE_IN_USE	(1 << 1) /* backup for host TIF_SVE */
-+#define KVM_ARM64_HOST_SVE_ENABLED	(1 << 2) /* SVE enabled for EL0 */
-+#define KVM_ARM64_GUEST_HAS_SVE		(1 << 3) /* SVE exposed to guest */
-+#define KVM_ARM64_VCPU_SVE_FINALIZED	(1 << 4) /* SVE config completed */
-+#define KVM_ARM64_GUEST_HAS_PTRAUTH	(1 << 5) /* PTRAUTH exposed to guest */
-+#define KVM_ARM64_PENDING_EXCEPTION	(1 << 6) /* Exception pending */
-+#define KVM_ARM64_EXCEPT_MASK		(7 << 7) /* Target EL/MODE */
-+
-+/* vcpu_arch_run flags field values: */
-+#define KVM_ARM64_RUN_FP_ENABLED	(1 << 0) /* guest FP regs loaded */
-+#define KVM_ARM64_RUN_FP_HOST		(1 << 1) /* host FP regs loaded */
- 
- /*
-  * When KVM_ARM64_PENDING_EXCEPTION is set, KVM_ARM64_EXCEPT_MASK can
-diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-index dcc5bfad5408..74a4b55d1b37 100644
---- a/arch/arm64/kvm/fpsimd.c
-+++ b/arch/arm64/kvm/fpsimd.c
-@@ -43,8 +43,9 @@ int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu)
-  * Prepare vcpu for saving the host's FPSIMD state and loading the guest's.
-  * The actual loading is done by the FPSIMD access trap taken to hyp.
-  *
-- * Here, we just set the correct metadata to indicate that the FPSIMD
-- * state in the cpu regs (if any) belongs to current on the host.
-+ * Here, we just set the correct metadata to indicate that the FPSIMD state in
-+ * the cpu regs (if any) belongs to current on the host and will need to be
-+ * saved before replacing it.
-  *
-  * TIF_SVE is backed up here, since it may get clobbered with guest state.
-  * This flag is restored by kvm_arch_vcpu_put_fp(vcpu).
-@@ -55,9 +56,10 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
- 
- 	BUG_ON(!current->mm);
- 
--	vcpu->arch.flags &= ~(KVM_ARM64_FP_ENABLED |
--			      KVM_ARM64_FP_HOST |
--			      KVM_ARM64_HOST_SVE_IN_USE |
-+	vcpu->arch.run.flags &= ~(KVM_ARM64_RUN_FP_ENABLED |
-+				  KVM_ARM64_RUN_FP_HOST);
-+
-+	vcpu->arch.flags &= ~(KVM_ARM64_HOST_SVE_IN_USE |
- 			      KVM_ARM64_HOST_SVE_ENABLED);
- 
- 	if (!system_supports_fpsimd())
-@@ -70,9 +72,9 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
- 		clear_thread_flag(TIF_FOREIGN_FPSTATE);
- 		update_thread_flag(TIF_SVE, vcpu_has_sve(vcpu));
- 
--		vcpu->arch.flags |= KVM_ARM64_FP_ENABLED;
-+		vcpu->arch.run.flags |= KVM_ARM64_RUN_FP_ENABLED;
- 	} else {
--		vcpu->arch.flags |= KVM_ARM64_FP_HOST;
-+		vcpu->arch.run.flags |= KVM_ARM64_RUN_FP_HOST;
- 	}
- 
- 	if (test_thread_flag(TIF_SVE))
-@@ -99,8 +101,8 @@ void kvm_arch_vcpu_sync_fp_before_hyp(struct kvm_vcpu *vcpu)
- 		return;
- 
- 	if (test_thread_flag(TIF_FOREIGN_FPSTATE))
--		vcpu->arch.flags &= ~(KVM_ARM64_FP_ENABLED |
--				      KVM_ARM64_FP_HOST);
-+		vcpu->arch.run.flags &= ~(KVM_ARM64_RUN_FP_ENABLED |
-+					  KVM_ARM64_RUN_FP_HOST);
- }
- 
- /*
-@@ -113,7 +115,7 @@ void kvm_arch_vcpu_sync_fp_after_hyp(struct kvm_vcpu *vcpu)
- {
- 	WARN_ON_ONCE(!irqs_disabled());
- 
--	if (vcpu->arch.flags & KVM_ARM64_FP_ENABLED) {
-+	if (vcpu->arch.run.flags & KVM_ARM64_RUN_FP_ENABLED) {
- 		fpsimd_bind_state_to_cpu(&vcpu->arch.ctxt.fp_regs,
- 					 vcpu->arch.sve_state,
- 					 vcpu->arch.sve_max_vl);
-@@ -137,7 +139,7 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
- 
- 	local_irq_save(flags);
- 
--	if (vcpu->arch.flags & KVM_ARM64_FP_ENABLED) {
-+	if (vcpu->arch.run.flags & KVM_ARM64_RUN_FP_ENABLED) {
- 		fpsimd_thread_switch(current);
- 
- 		if (guest_has_sve)
 diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 1afee8557ddf..3f299c7d42cd 100644
+index 3f299c7d42cd..53120cccd2a5 100644
 --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
 +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -227,7 +227,7 @@ static inline bool __hyp_handle_fpsimd(struct kvm_vcpu *vcpu)
+@@ -178,7 +178,8 @@ static inline bool __populate_fault_info(struct kvm_vcpu *vcpu)
+ }
+ 
+ /* Check for an FPSIMD/SVE trap and handle as appropriate */
+-static inline bool __hyp_handle_fpsimd(struct kvm_vcpu *vcpu)
++static inline bool __hyp_handle_fpsimd(struct kvm_vcpu *vcpu,
++				       struct kvm_vcpu_arch_run *run)
+ {
+ 	bool vhe, sve_guest, sve_host;
+ 	u8 esr_ec;
+@@ -227,7 +228,7 @@ static inline bool __hyp_handle_fpsimd(struct kvm_vcpu *vcpu)
  
  	isb();
  
--	if (vcpu->arch.flags & KVM_ARM64_FP_HOST) {
-+	if (vcpu->arch.run.flags & KVM_ARM64_RUN_FP_HOST) {
+-	if (vcpu->arch.run.flags & KVM_ARM64_RUN_FP_HOST) {
++	if (run->flags & KVM_ARM64_RUN_FP_HOST) {
  		/*
  		 * In the SVE case, VHE is assumed: it is enforced by
  		 * Kconfig and kvm_arch_init().
-@@ -243,7 +243,7 @@ static inline bool __hyp_handle_fpsimd(struct kvm_vcpu *vcpu)
+@@ -243,7 +244,7 @@ static inline bool __hyp_handle_fpsimd(struct kvm_vcpu *vcpu)
  			__fpsimd_save_state(vcpu->arch.host_fpsimd_state);
  		}
  
--		vcpu->arch.flags &= ~KVM_ARM64_FP_HOST;
-+		vcpu->arch.run.flags &= ~KVM_ARM64_RUN_FP_HOST;
+-		vcpu->arch.run.flags &= ~KVM_ARM64_RUN_FP_HOST;
++		run->flags &= ~KVM_ARM64_RUN_FP_HOST;
  	}
  
  	if (sve_guest) {
-@@ -261,7 +261,7 @@ static inline bool __hyp_handle_fpsimd(struct kvm_vcpu *vcpu)
+@@ -261,7 +262,7 @@ static inline bool __hyp_handle_fpsimd(struct kvm_vcpu *vcpu)
  
  	vcpu->arch.fpsimd_cpu = smp_processor_id();
  
--	vcpu->arch.flags |= KVM_ARM64_FP_ENABLED;
-+	vcpu->arch.run.flags |= KVM_ARM64_RUN_FP_ENABLED;
+-	vcpu->arch.run.flags |= KVM_ARM64_RUN_FP_ENABLED;
++	run->flags |= KVM_ARM64_RUN_FP_ENABLED;
  
  	return true;
  }
+@@ -389,7 +390,9 @@ static inline bool __hyp_handle_ptrauth(struct kvm_vcpu *vcpu)
+  * the guest, false when we should restore the host state and return to the
+  * main run loop.
+  */
+-static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
++static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu,
++				    struct kvm_vcpu_arch_run *run,
++				    u64 *exit_code)
+ {
+ 	if (ARM_EXCEPTION_CODE(*exit_code) != ARM_EXCEPTION_IRQ)
+ 		vcpu->arch.fault.esr_el2 = read_sysreg_el2(SYS_ESR);
+@@ -430,7 +433,7 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	 * undefined instruction exception to the guest.
+ 	 * Similarly for trapped SVE accesses.
+ 	 */
+-	if (__hyp_handle_fpsimd(vcpu))
++	if (__hyp_handle_fpsimd(vcpu, run))
+ 		goto guest;
+ 
+ 	if (__hyp_handle_ptrauth(vcpu))
 diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index 6fc1e0a5adaa..f0a32c993ac4 100644
+index f0a32c993ac4..076c2200324f 100644
 --- a/arch/arm64/kvm/hyp/nvhe/switch.c
 +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -32,7 +32,7 @@ DEFINE_PER_CPU(struct kvm_host_data, kvm_host_data);
+ DEFINE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
+ DEFINE_PER_CPU(unsigned long, kvm_hyp_vector);
+ 
+-static void __activate_traps(struct kvm_vcpu *vcpu)
++static void __activate_traps(struct kvm_vcpu *vcpu, struct kvm_vcpu_arch_run *run)
+ {
+ 	u64 val;
+ 
 @@ -41,7 +41,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
  
  	val = CPTR_EL2_DEFAULT;
  	val |= CPTR_EL2_TTA | CPTR_EL2_TZ | CPTR_EL2_TAM;
--	if (!(vcpu->arch.flags & KVM_ARM64_FP_ENABLED)) {
-+	if (!(vcpu->arch.run.flags & KVM_ARM64_RUN_FP_ENABLED)) {
+-	if (!(vcpu->arch.run.flags & KVM_ARM64_RUN_FP_ENABLED)) {
++	if (!(run->flags & KVM_ARM64_RUN_FP_ENABLED)) {
  		val |= CPTR_EL2_TFP;
  		__activate_traps_fpsimd32(vcpu);
  	}
-@@ -230,7 +230,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+@@ -206,7 +206,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ 	__sysreg_restore_state_nvhe(guest_ctxt);
  
- 	__sysreg_restore_state_nvhe(host_ctxt);
+ 	__load_guest_stage2(kern_hyp_va(vcpu->arch.hw_mmu));
+-	__activate_traps(vcpu);
++	__activate_traps(vcpu, &vcpu->arch.run);
  
--	if (vcpu->arch.flags & KVM_ARM64_FP_ENABLED)
-+	if (vcpu->arch.run.flags & KVM_ARM64_RUN_FP_ENABLED)
- 		__fpsimd_save_fpexc32(vcpu);
+ 	__hyp_vgic_restore_state(vcpu);
+ 	__timer_enable_traps(vcpu);
+@@ -218,7 +218,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ 		exit_code = __guest_enter(vcpu);
  
- 	/*
+ 		/* And we're baaack! */
+-	} while (fixup_guest_exit(vcpu, &exit_code));
++	} while (fixup_guest_exit(vcpu, &vcpu->arch.run, &exit_code));
+ 
+ 	__sysreg_save_state_nvhe(guest_ctxt);
+ 	__sysreg32_save_state(vcpu);
 diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index f6f60a537b3e..5bb6a2cf574d 100644
+index 5bb6a2cf574d..ff3ce150d636 100644
 --- a/arch/arm64/kvm/hyp/vhe/switch.c
 +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -54,7 +54,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+@@ -143,7 +143,7 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+ 		exit_code = __guest_enter(vcpu);
  
- 	val |= CPTR_EL2_TAM;
+ 		/* And we're baaack! */
+-	} while (fixup_guest_exit(vcpu, &exit_code));
++	} while (fixup_guest_exit(vcpu, &vcpu->arch.run, &exit_code));
  
--	if (vcpu->arch.flags & KVM_ARM64_FP_ENABLED) {
-+	if (vcpu->arch.run.flags & KVM_ARM64_RUN_FP_ENABLED) {
- 		if (vcpu_has_sve(vcpu))
- 			val |= CPACR_EL1_ZEN;
- 	} else {
-@@ -151,7 +151,7 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+ 	sysreg_save_guest_state_vhe(guest_ctxt);
  
- 	sysreg_restore_host_state_vhe(host_ctxt);
- 
--	if (vcpu->arch.flags & KVM_ARM64_FP_ENABLED)
-+	if (vcpu->arch.run.flags & KVM_ARM64_RUN_FP_ENABLED)
- 		__fpsimd_save_fpexc32(vcpu);
- 
- 	__debug_switch_to_host(vcpu);
 -- 
 2.30.1.766.gb4fecdf3b7-goog
 
