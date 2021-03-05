@@ -2,92 +2,73 @@ Return-Path: <SRS0=QgbO=ID=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-22.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
+	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66A9AC433DB
-	for <kvmarm@archiver.kernel.org>; Fri,  5 Mar 2021 15:03:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19D24C433E0
+	for <kvmarm@archiver.kernel.org>; Fri,  5 Mar 2021 16:50:04 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CDB6165016
-	for <kvmarm@archiver.kernel.org>; Fri,  5 Mar 2021 15:03:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDB6165016
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 811DE6508D
+	for <kvmarm@archiver.kernel.org>; Fri,  5 Mar 2021 16:50:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 811DE6508D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4445A4B232;
-	Fri,  5 Mar 2021 10:03:44 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 15B1A4B58A;
+	Fri,  5 Mar 2021 11:50:03 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jbY6iXrKcNaO; Fri,  5 Mar 2021 10:03:43 -0500 (EST)
+	with ESMTP id 8l2+4Cw5nXGa; Fri,  5 Mar 2021 11:50:00 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D8544B29B;
-	Fri,  5 Mar 2021 10:03:43 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 68CAA4B56C;
+	Fri,  5 Mar 2021 11:50:00 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AC7B64B226
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Mar 2021 10:03:41 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BDC834B56C
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Mar 2021 11:49:58 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id reYh8BAMnhBU for <kvmarm@lists.cs.columbia.edu>;
- Fri,  5 Mar 2021 10:03:40 -0500 (EST)
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com
- [209.85.128.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 495354B1E6
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Mar 2021 10:03:40 -0500 (EST)
-Received: by mail-wm1-f43.google.com with SMTP id
- w203-20020a1c49d40000b029010c706d0642so6176844wma.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 05 Mar 2021 07:03:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=GpKc+xvCgCJSH13ZTIZLN2AMkxZK13gtHVewqGBpJ68=;
- b=cDP6bYf/Jne/eaTwyPukya/ajVOlbRSFeM9DU5NkgFY1C1PufCEwfcmjD4flOs6vvQ
- cEXq4jeuNQ9SwRjtFAmF8obyb3gMoMTaAKh6efRRsmNNQfTCbE0OIEg4yl2PRe4BWq94
- 68tqXY756a6i6ineeXI+cO6KLABD1tkD0X33Vn11m9z8aKu5ToC3QPn/6v2buKjvnS6Y
- TbTrKWqjFHE8tW0/nt9TvX4zEF4yv1Jozi0/1i3+ZyguoIMJDww8jaK5s5drDILD7BsK
- sswTxLXiNvjLhxpVc+b4VWnNKKD8uVRNUiIilKtA6LZSyPmdQcH/Rw/MF9mj2rDNkhOE
- 7miw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=GpKc+xvCgCJSH13ZTIZLN2AMkxZK13gtHVewqGBpJ68=;
- b=ExM+OPvsvioRsqeI9oRy4T81TwRDO5LI7P4UiTugbphpHn+kbZTh8GfrgkivdaBuUT
- WA9qYH1BIu+t6EeN7hg3cBRjYfUxOj5L0UwxAFDTgbn1WDQEscz960ndD1b3XBSxipRc
- B2Tcl8dgV1ceD47y3WvN7eXWCrg7lPsDUSFqwFhnLoytT3h62ach7VEq7i8KJZmFEoiJ
- iG6GWh95+cfmxTGtzT6QtknmxCGyTvQNZi+eyLZfnrUoOWdYqO84E3ow9vX/EfRKeiX6
- G+/iOH7o6rEx9lnWr+kyDdmgW7Zg8CGvGr0yn/q50+G9FWE4gnQr6pgD4suVf2xr49iD
- ZdZg==
-X-Gm-Message-State: AOAM531JHjvAet8Aze6SLpsN7/3bfoFBmuzZfUwgTzAKBC/v3ftNCkfc
- wtxsqsf9t4ZtAWkqpMgf7nuG1A==
-X-Google-Smtp-Source: ABdhPJyIVygS7OGfQ/tnLuo3JNzZV/t4cpIfs6xJ3+AzFEa7C1ZYEN/vjbSjEeIhwx5P2PjxYvt8TA==
-X-Received: by 2002:a7b:c151:: with SMTP id z17mr9405485wmi.189.1614956619109; 
- Fri, 05 Mar 2021 07:03:39 -0800 (PST)
-Received: from google.com (230.69.233.35.bc.googleusercontent.com.
- [35.233.69.230])
- by smtp.gmail.com with ESMTPSA id v9sm4931146wrn.86.2021.03.05.07.03.38
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 05 Mar 2021 07:03:38 -0800 (PST)
-Date: Fri, 5 Mar 2021 15:03:36 +0000
-From: Quentin Perret <qperret@google.com>
-To: Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v3 28/32] KVM: arm64: Add kvm_pgtable_stage2_idmap_greedy()
-Message-ID: <YEJISCQOHNbs363+@google.com>
-References: <20210302150002.3685113-1-qperret@google.com>
- <20210302150002.3685113-29-qperret@google.com>
- <20210305143941.GA23017@willie-the-truck>
+ with ESMTP id Ne858KnWHl9k for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  5 Mar 2021 11:49:57 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B0A3F4B526
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Mar 2021 11:49:57 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id A88946508B;
+ Fri,  5 Mar 2021 16:49:55 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1lIDeD-00HWzC-DC; Fri, 05 Mar 2021 16:49:53 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: [GIT PULL] KVM/arm64 fixes for 5.12, take #1
+Date: Fri,  5 Mar 2021 16:49:43 +0000
+Message-Id: <20210305164944.3729910-1-maz@kernel.org>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210305143941.GA23017@willie-the-truck>
-Cc: android-kvm@google.com, catalin.marinas@arm.com, mate.toth-pal@arm.com,
- seanjc@google.com, tabba@google.com, linux-kernel@vger.kernel.org,
- robh+dt@kernel.org, linux-arm-kernel@lists.infradead.org, maz@kernel.org,
- kernel-team@android.com, kvmarm@lists.cs.columbia.edu
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com,
+ andre.przywara@arm.com, ascull@google.com, catalin.marinas@arm.com,
+ christoffer.dall@arm.com, Howard.Zhang@arm.com, justin.he@arm.com,
+ mark.rutland@arm.com, qperret@google.com, shameerali.kolothum.thodi@huawei.com,
+ suzuki.poulose@arm.com, will@kernel.org, james.morse@arm.com,
+ julien.thierry.kdev@gmail.com, kernel-team@android.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, Jia He <justin.he@arm.com>, kvm@vger.kernel.org,
+ Will Deacon <will@kernel.org>, Andre Przywara <andre.przywara@arm.com>,
+ Howard Zhang <Howard.Zhang@arm.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -104,183 +85,76 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Friday 05 Mar 2021 at 14:39:42 (+0000), Will Deacon wrote:
-> On Tue, Mar 02, 2021 at 02:59:58PM +0000, Quentin Perret wrote:
-> > +/**
-> > + * kvm_pgtable_stage2_idmap_greedy() - Identity-map an Intermediate Physical
-> > + *				       Address with a leaf entry at the highest
-> > + *				       possible level.
-> 
-> Not sure it's worth mentioning "highest possible level" here, as
-> realistically the caller still has to provide a memcache to deal with the
-> worst case and the structure of the page-table shouldn't matter.
+Hi Paolo,
 
-Right, we need to pass a range so I suppose that should be enough to
-say 'this tries to cover large portions of memory'.
+Here's the first batch of fixes for 5.12. We have a handful of low
+level world-switch regressions, a page table walker fix, more PMU
+tidying up, and a workaround for systems with creative firmware.
 
-> > + * @pgt:	Page-table structure initialised by kvm_pgtable_*_init().
-> > + * @addr:	Input address to identity-map.
-> > + * @prot:	Permissions and attributes for the mapping.
-> > + * @range:	Boundaries of the maximum memory region to map.
-> > + * @mc:		Cache of pre-allocated memory from which to allocate page-table
-> > + *		pages.
-> > + *
-> > + * This function attempts to install high-level identity-mappings covering @addr
-> 
-> "high-level"? (again, I think I'd just drop this)
-> 
-> > + * without overriding existing mappings with incompatible permissions or
-> > + * attributes. An existing table entry may be coalesced into a block mapping
-> > + * if and only if it covers @addr and all its leafs are either invalid and/or
-> 
-> s/leafs/leaf entries/
+Note that this is based on -rc1 despite the breakage, as I didn't feel
+like holding these patches until -rc2.
 
-Ack for both.
+Please pull,
 
-> > + * have permissions and attributes strictly matching @prot. The mapping is
-> > + * guaranteed to be contained within the boundaries specified by @range at call
-> > + * time. If only a subset of the memory specified by @range is mapped (because
-> > + * of e.g. alignment issues or existing incompatible mappings), @range will be
-> > + * updated accordingly.
-> > + *
-> > + * Return: 0 on success, negative error code on failure.
-> > + */
-> > +int kvm_pgtable_stage2_idmap_greedy(struct kvm_pgtable *pgt, u64 addr,
-> > +				    enum kvm_pgtable_prot prot,
-> > +				    struct kvm_mem_range *range,
-> > +				    void *mc);
-> >  #endif	/* __ARM64_KVM_PGTABLE_H__ */
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > index 8aa01a9e2603..6897d771e2b2 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -987,3 +987,122 @@ void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt)
-> >  	pgt->mm_ops->free_pages_exact(pgt->pgd, pgd_sz);
-> >  	pgt->pgd = NULL;
-> >  }
-> > +
-> > +struct stage2_reduce_range_data {
-> > +	kvm_pte_t attr;
-> > +	u64 target_addr;
-> > +	u32 start_level;
-> > +	struct kvm_mem_range *range;
-> > +};
-> > +
-> > +static int __stage2_reduce_range(struct stage2_reduce_range_data *data, u64 addr)
-> > +{
-> > +	u32 level = data->start_level;
-> > +
-> > +	for (; level < KVM_PGTABLE_MAX_LEVELS; level++) {
-> > +		u64 granule = kvm_granule_size(level);
-> > +		u64 start = ALIGN_DOWN(data->target_addr, granule);
-> > +		u64 end = start + granule;
-> > +
-> > +		/*
-> > +		 * The pinned address is in the current range, try one level
-> > +		 * deeper.
-> > +		 */
-> > +		if (start == ALIGN_DOWN(addr, granule))
-> > +			continue;
-> > +
-> > +		/*
-> > +		 * Make sure the current range is a reduction of the existing
-> > +		 * range before updating it.
-> > +		 */
-> > +		if (data->range->start <= start && end <= data->range->end) {
-> > +			data->start_level = level;
-> > +			data->range->start = start;
-> > +			data->range->end = end;
-> > +			return 0;
-> > +		}
-> > +	}
-> > +
-> > +	return -EINVAL;
-> > +}
-> > +
-> > +#define KVM_PTE_LEAF_S2_COMPAT_MASK	(KVM_PTE_LEAF_ATTR_S2_PERMS | \
-> > +					 KVM_PTE_LEAF_ATTR_LO_S2_MEMATTR | \
-> > +					 KVM_PTE_LEAF_SW_BIT_PROT_NONE)
-> > +
-> > +static int stage2_reduce_range_walker(u64 addr, u64 end, u32 level,
-> > +				      kvm_pte_t *ptep,
-> > +				      enum kvm_pgtable_walk_flags flag,
-> > +				      void * const arg)
-> > +{
-> > +	struct stage2_reduce_range_data *data = arg;
-> > +	kvm_pte_t attr;
-> > +	int ret;
-> > +
-> > +	if (addr < data->range->start || addr >= data->range->end)
-> > +		return 0;
-> > +
-> > +	attr = *ptep & KVM_PTE_LEAF_S2_COMPAT_MASK;
-> > +	if (!attr || attr == data->attr)
-> > +		return 0;
-> > +
-> > +	/*
-> > +	 * An existing mapping with incompatible protection attributes is
-> > +	 * 'pinned', so reduce the range if we hit one.
-> > +	 */
-> > +	ret = __stage2_reduce_range(data, addr);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	return -EAGAIN;
-> > +}
-> > +
-> > +static int stage2_reduce_range(struct kvm_pgtable *pgt, u64 addr,
-> > +			       enum kvm_pgtable_prot prot,
-> > +			       struct kvm_mem_range *range)
-> > +{
-> > +	struct stage2_reduce_range_data data = {
-> > +		.start_level	= pgt->start_level,
-> > +		.range		= range,
-> > +		.target_addr	= addr,
-> > +	};
-> > +	struct kvm_pgtable_walker walker = {
-> > +		.cb		= stage2_reduce_range_walker,
-> > +		.flags		= KVM_PGTABLE_WALK_LEAF,
-> > +		.arg		= &data,
-> > +	};
-> > +	int ret;
-> > +
-> > +	data.attr = stage2_get_prot_attr(prot) & KVM_PTE_LEAF_S2_COMPAT_MASK;
-> > +	if (!data.attr)
-> > +		return -EINVAL;
-> 
-> (this will need updating based on the other discussion we had)
+	M.
 
-Ack.
+The following changes since commit fe07bfda2fb9cdef8a4d4008a409bb02f35f1bd8:
 
-> > +	/* Reduce the kvm_mem_range to a granule size */
-> > +	ret = __stage2_reduce_range(&data, range->end);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	/* Walk the range to check permissions and reduce further if needed */
-> > +	do {
-> > +		ret = kvm_pgtable_walk(pgt, range->start, range->end, &walker);
-> 
-> (we spent some time debugging an issue here and you spotted that you're
-> passing range->end instead of the size ;)
+  Linux 5.12-rc1 (2021-02-28 16:05:19 -0800)
 
-Yep, I have the fix applied locally, and ready to fly in v4 :)
+are available in the Git repository at:
 
-> > +	} while (ret == -EAGAIN);
-> 
-> I'm a bit nervous about this loop -- what guarantees forward progress here?
-> Can we return to the host after a few tries instead?
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.12-1
 
--EAGAIN only happens when we've been able to successfully reduce the
-range to a potentially valid granule size. That can't happen infinitely.
+for you to fetch changes up to e85583b3f1fe62c9b371a3100c1c91af94005ca9:
 
-We're guaranteed to fail when trying to reduce the range to a
-granularity smaller than PAGE_SIZE (the -EINVAL case of
-__stage2_reduce_range), which is indicative of a host memory abort in a
-page it should not access (because marked PROT_NONE for instance).
+  KVM: arm64: Fix range alignment when walking page tables (2021-03-04 09:54:12 +0000)
 
-Cheers,
-Quentin
+----------------------------------------------------------------
+KVM/arm64 fixes for 5.12, take #1
+
+- Fix SPE context save/restore on nVHE
+- Fix some subtle host context corruption on vcpu exit
+- Fix panic handling on nVHE
+- Prevent the hypervisor from accessing PMU registers when there is none
+- Workaround broken firmwares advertising bogus GICv2 compatibility
+- Fix Stage-2 unaligned range unmapping
+
+----------------------------------------------------------------
+Andrew Scull (1):
+      KVM: arm64: Fix nVHE hyp panic host context restore
+
+Jia He (1):
+      KVM: arm64: Fix range alignment when walking page tables
+
+Marc Zyngier (4):
+      KVM: arm64: Turn kvm_arm_support_pmu_v3() into a static key
+      KVM: arm64: Don't access PMSELR_EL0/PMUSERENR_EL0 when no PMU is available
+      KVM: arm64: Rename __vgic_v3_get_ich_vtr_el2() to __vgic_v3_get_gic_config()
+      KVM: arm64: Workaround firmware wrongly advertising GICv2-on-v3 compatibility
+
+Suzuki K Poulose (1):
+      KVM: arm64: nvhe: Save the SPE context early
+
+Will Deacon (1):
+      KVM: arm64: Avoid corrupting vCPU context register in guest exit
+
+ arch/arm64/include/asm/kvm_asm.h        |  4 ++--
+ arch/arm64/include/asm/kvm_hyp.h        |  8 ++++++-
+ arch/arm64/kernel/image-vars.h          |  3 +++
+ arch/arm64/kvm/hyp/entry.S              |  2 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  9 +++++---
+ arch/arm64/kvm/hyp/nvhe/debug-sr.c      | 12 ++++++++--
+ arch/arm64/kvm/hyp/nvhe/host.S          | 15 +++++++------
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  6 ++---
+ arch/arm64/kvm/hyp/nvhe/switch.c        | 14 +++++++++---
+ arch/arm64/kvm/hyp/pgtable.c            |  1 +
+ arch/arm64/kvm/hyp/vgic-v3-sr.c         | 40 +++++++++++++++++++++++++++++++--
+ arch/arm64/kvm/perf.c                   | 10 +++++++++
+ arch/arm64/kvm/pmu-emul.c               | 10 ---------
+ arch/arm64/kvm/vgic/vgic-v3.c           | 12 +++++++---
+ include/kvm/arm_pmu.h                   |  9 ++++++--
+ 15 files changed, 116 insertions(+), 39 deletions(-)
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
