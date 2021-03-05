@@ -6,51 +6,52 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9822C433DB
-	for <kvmarm@archiver.kernel.org>; Fri,  5 Mar 2021 18:53:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E31CEC433DB
+	for <kvmarm@archiver.kernel.org>; Fri,  5 Mar 2021 18:53:11 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 444146509A
-	for <kvmarm@archiver.kernel.org>; Fri,  5 Mar 2021 18:53:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 444146509A
+	by mail.kernel.org (Postfix) with ESMTP id 6260065090
+	for <kvmarm@archiver.kernel.org>; Fri,  5 Mar 2021 18:53:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6260065090
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E5C0D4B6DA;
-	Fri,  5 Mar 2021 13:53:08 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 006CF4B70C;
+	Fri,  5 Mar 2021 13:53:11 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Z+RkkMtLkLjy; Fri,  5 Mar 2021 13:53:07 -0500 (EST)
+	with ESMTP id lkr-IHel9+c1; Fri,  5 Mar 2021 13:53:09 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E275F4B6FE;
-	Fri,  5 Mar 2021 13:53:05 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 122254B708;
+	Fri,  5 Mar 2021 13:53:07 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B6604B286
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Mar 2021 13:53:04 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4DEC14B286
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Mar 2021 13:53:06 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QYGczfsOtWOQ for <kvmarm@lists.cs.columbia.edu>;
- Fri,  5 Mar 2021 13:53:03 -0500 (EST)
+ with ESMTP id 3I1LHJiEdL-V for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  5 Mar 2021 13:53:04 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4FB294B52E
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Mar 2021 13:53:03 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 40E1D4B6D6
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Mar 2021 13:53:04 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 7B183650A1;
- Fri,  5 Mar 2021 18:53:02 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 5D6E0650A3;
+ Fri,  5 Mar 2021 18:53:03 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1lIFZM-00HYFA-RT; Fri, 05 Mar 2021 18:53:00 +0000
+ id 1lIFZN-00HYFA-JC; Fri, 05 Mar 2021 18:53:01 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH 3/8] KVM: arm64: Fix nVHE hyp panic host context restore
-Date: Fri,  5 Mar 2021 18:52:49 +0000
-Message-Id: <20210305185254.3730990-4-maz@kernel.org>
+Subject: [PATCH 4/8] KVM: arm64: Turn kvm_arm_support_pmu_v3() into a static
+ key
+Date: Fri,  5 Mar 2021 18:52:50 +0000
+Message-Id: <20210305185254.3730990-5-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210305185254.3730990-1-maz@kernel.org>
 References: <87eegtzbch.wl-maz@kernel.org>
@@ -64,15 +65,14 @@ X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com,
  suzuki.poulose@arm.com, will@kernel.org, james.morse@arm.com,
  julien.thierry.kdev@gmail.com, kernel-team@android.com,
  linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, stable@vger.kernel.org
+ kvm@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
 Cc: kernel-team@android.com, Jia He <justin.he@arm.com>, kvm@vger.kernel.org,
  Will Deacon <will@kernel.org>, Andre Przywara <andre.przywara@arm.com>,
  Howard Zhang <Howard.Zhang@arm.com>, Catalin Marinas <catalin.marinas@arm.com>,
- stable@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -89,104 +89,106 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Andrew Scull <ascull@google.com>
+We currently find out about the presence of a HW PMU (or the handling
+of that PMU by perf, which amounts to the same thing) in a fairly
+roundabout way, by checking the number of counters available to perf.
+That's good enough for now, but we will soon need to find about about
+that on paths where perf is out of reach (in the world switch).
 
-When panicking from the nVHE hyp and restoring the host context, x29 is
-expected to hold a pointer to the host context. This wasn't being done
-so fix it to make sure there's a valid pointer the host context being
-used.
+Instead, let's turn kvm_arm_support_pmu_v3() into a static key.
 
-Rather than passing a boolean indicating whether or not the host context
-should be restored, instead pass the pointer to the host context. NULL
-is passed to indicate that no context should be restored.
-
-Fixes: a2e102e20fd6 ("KVM: arm64: nVHE: Handle hyp panics")
-Cc: stable@vger.kernel.org
-Signed-off-by: Andrew Scull <ascull@google.com>
-[maz: partial rewrite to fit 5.12-rc1]
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20210219122406.1337626-1-ascull@google.com
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Link: https://lore.kernel.org/r/20210209114844.3278746-2-maz@kernel.org
 ---
- arch/arm64/include/asm/kvm_hyp.h |  3 ++-
- arch/arm64/kvm/hyp/nvhe/host.S   | 15 ++++++++-------
- arch/arm64/kvm/hyp/nvhe/switch.c |  3 +--
- 3 files changed, 11 insertions(+), 10 deletions(-)
+ arch/arm64/kvm/perf.c     | 10 ++++++++++
+ arch/arm64/kvm/pmu-emul.c | 10 ----------
+ include/kvm/arm_pmu.h     |  9 +++++++--
+ 3 files changed, 17 insertions(+), 12 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index 385bd7dd3d39..32ae676236b6 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -102,7 +102,8 @@ bool kvm_host_psci_handler(struct kvm_cpu_context *host_ctxt);
+diff --git a/arch/arm64/kvm/perf.c b/arch/arm64/kvm/perf.c
+index d45b8b9a4415..739164324afe 100644
+--- a/arch/arm64/kvm/perf.c
++++ b/arch/arm64/kvm/perf.c
+@@ -11,6 +11,8 @@
  
- void __noreturn hyp_panic(void);
- #ifdef __KVM_NVHE_HYPERVISOR__
--void __noreturn __hyp_do_panic(bool restore_host, u64 spsr, u64 elr, u64 par);
-+void __noreturn __hyp_do_panic(struct kvm_cpu_context *host_ctxt, u64 spsr,
-+			       u64 elr, u64 par);
- #endif
+ #include <asm/kvm_emulate.h>
  
- #endif /* __ARM64_KVM_HYP_H__ */
-diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
-index 6585a7cbbc56..5d94584840cc 100644
---- a/arch/arm64/kvm/hyp/nvhe/host.S
-+++ b/arch/arm64/kvm/hyp/nvhe/host.S
-@@ -71,7 +71,8 @@ SYM_FUNC_START(__host_enter)
- SYM_FUNC_END(__host_enter)
- 
- /*
-- * void __noreturn __hyp_do_panic(bool restore_host, u64 spsr, u64 elr, u64 par);
-+ * void __noreturn __hyp_do_panic(struct kvm_cpu_context *host_ctxt, u64 spsr,
-+ * 				  u64 elr, u64 par);
-  */
- SYM_FUNC_START(__hyp_do_panic)
- 	/* Prepare and exit to the host's panic funciton. */
-@@ -82,9 +83,11 @@ SYM_FUNC_START(__hyp_do_panic)
- 	hyp_kimg_va lr, x6
- 	msr	elr_el2, lr
- 
--	/* Set the panic format string. Use the, now free, LR as scratch. */
--	ldr	lr, =__hyp_panic_string
--	hyp_kimg_va lr, x6
-+	mov	x29, x0
++DEFINE_STATIC_KEY_FALSE(kvm_arm_pmu_available);
 +
-+	/* Load the format string into x0 and arguments into x1-7 */
-+	ldr	x0, =__hyp_panic_string
-+	hyp_kimg_va x0, x6
+ static int kvm_is_in_guest(void)
+ {
+         return kvm_get_running_vcpu() != NULL;
+@@ -48,6 +50,14 @@ static struct perf_guest_info_callbacks kvm_guest_cbs = {
  
- 	/* Load the format arguments into x1-7. */
- 	mov	x6, x3
-@@ -94,9 +97,7 @@ SYM_FUNC_START(__hyp_do_panic)
- 	mrs	x5, hpfar_el2
- 
- 	/* Enter the host, conditionally restoring the host context. */
--	cmp	x0, xzr
--	mov	x0, lr
--	b.eq	__host_enter_without_restoring
-+	cbz	x29, __host_enter_without_restoring
- 	b	__host_enter_for_panic
- SYM_FUNC_END(__hyp_do_panic)
- 
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index 59aa1045fdaf..68ab6b4d5141 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -266,7 +266,6 @@ void __noreturn hyp_panic(void)
- 	u64 spsr = read_sysreg_el2(SYS_SPSR);
- 	u64 elr = read_sysreg_el2(SYS_ELR);
- 	u64 par = read_sysreg_par();
--	bool restore_host = true;
- 	struct kvm_cpu_context *host_ctxt;
- 	struct kvm_vcpu *vcpu;
- 
-@@ -280,7 +279,7 @@ void __noreturn hyp_panic(void)
- 		__sysreg_restore_state_nvhe(host_ctxt);
- 	}
- 
--	__hyp_do_panic(restore_host, spsr, elr, par);
-+	__hyp_do_panic(host_ctxt, spsr, elr, par);
- 	unreachable();
+ int kvm_perf_init(void)
+ {
++	/*
++	 * Check if HW_PERF_EVENTS are supported by checking the number of
++	 * hardware performance counters. This could ensure the presence of
++	 * a physical PMU and CONFIG_PERF_EVENT is selected.
++	 */
++	if (IS_ENABLED(CONFIG_ARM_PMU) && perf_num_counters() > 0)
++		static_branch_enable(&kvm_arm_pmu_available);
++
+ 	return perf_register_guest_info_callbacks(&kvm_guest_cbs);
  }
  
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index e9ec08b0b070..e32c6e139a09 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -823,16 +823,6 @@ u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
+ 	return val & mask;
+ }
+ 
+-bool kvm_arm_support_pmu_v3(void)
+-{
+-	/*
+-	 * Check if HW_PERF_EVENTS are supported by checking the number of
+-	 * hardware performance counters. This could ensure the presence of
+-	 * a physical PMU and CONFIG_PERF_EVENT is selected.
+-	 */
+-	return (perf_num_counters() > 0);
+-}
+-
+ int kvm_arm_pmu_v3_enable(struct kvm_vcpu *vcpu)
+ {
+ 	if (!kvm_vcpu_has_pmu(vcpu))
+diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+index 8dcb3e1477bc..6fd3cda608e4 100644
+--- a/include/kvm/arm_pmu.h
++++ b/include/kvm/arm_pmu.h
+@@ -13,6 +13,13 @@
+ #define ARMV8_PMU_CYCLE_IDX		(ARMV8_PMU_MAX_COUNTERS - 1)
+ #define ARMV8_PMU_MAX_COUNTER_PAIRS	((ARMV8_PMU_MAX_COUNTERS + 1) >> 1)
+ 
++DECLARE_STATIC_KEY_FALSE(kvm_arm_pmu_available);
++
++static __always_inline bool kvm_arm_support_pmu_v3(void)
++{
++	return static_branch_likely(&kvm_arm_pmu_available);
++}
++
+ #ifdef CONFIG_HW_PERF_EVENTS
+ 
+ struct kvm_pmc {
+@@ -47,7 +54,6 @@ void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val);
+ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val);
+ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
+ 				    u64 select_idx);
+-bool kvm_arm_support_pmu_v3(void);
+ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu,
+ 			    struct kvm_device_attr *attr);
+ int kvm_arm_pmu_v3_get_attr(struct kvm_vcpu *vcpu,
+@@ -87,7 +93,6 @@ static inline void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val) {}
+ static inline void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val) {}
+ static inline void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu,
+ 						  u64 data, u64 select_idx) {}
+-static inline bool kvm_arm_support_pmu_v3(void) { return false; }
+ static inline int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu,
+ 					  struct kvm_device_attr *attr)
+ {
 -- 
 2.29.2
 
