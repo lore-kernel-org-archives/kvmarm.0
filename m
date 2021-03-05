@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07851C433E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED9A5C433E6
 	for <kvmarm@archiver.kernel.org>; Fri,  5 Mar 2021 18:53:13 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 79E2A65090
-	for <kvmarm@archiver.kernel.org>; Fri,  5 Mar 2021 18:53:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79E2A65090
+	by mail.kernel.org (Postfix) with ESMTP id 802EC65090
+	for <kvmarm@archiver.kernel.org>; Fri,  5 Mar 2021 18:53:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 802EC65090
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 25CB74B15D;
-	Fri,  5 Mar 2021 13:53:12 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D0494B15A;
+	Fri,  5 Mar 2021 13:53:13 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id wr0JfIYpqWi8; Fri,  5 Mar 2021 13:53:11 -0500 (EST)
+	with ESMTP id crrV-9K3EjYc; Fri,  5 Mar 2021 13:53:11 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 291084B700;
-	Fri,  5 Mar 2021 13:53:08 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 45CF14B6F3;
+	Fri,  5 Mar 2021 13:53:11 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A01A64B6D6
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Mar 2021 13:53:07 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DF5194B6E5
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Mar 2021 13:53:09 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tU-vTqNXPyKc for <kvmarm@lists.cs.columbia.edu>;
- Fri,  5 Mar 2021 13:53:06 -0500 (EST)
+ with ESMTP id owlVW45DRu-2 for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  5 Mar 2021 13:53:08 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E59F74B6E5
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Mar 2021 13:53:04 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E1C314B6FF
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Mar 2021 13:53:05 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 19794650A6;
- Fri,  5 Mar 2021 18:53:04 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 01E9D650A4;
+ Fri,  5 Mar 2021 18:53:05 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1lIFZO-00HYFA-D6; Fri, 05 Mar 2021 18:53:02 +0000
+ id 1lIFZP-00HYFA-8k; Fri, 05 Mar 2021 18:53:03 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH 5/8] KVM: arm64: Don't access PMSELR_EL0/PMUSERENR_EL0 when no
- PMU is available
-Date: Fri,  5 Mar 2021 18:52:51 +0000
-Message-Id: <20210305185254.3730990-6-maz@kernel.org>
+Subject: [PATCH 6/8] KVM: arm64: Rename __vgic_v3_get_ich_vtr_el2() to
+ __vgic_v3_get_gic_config()
+Date: Fri,  5 Mar 2021 18:52:52 +0000
+Message-Id: <20210305185254.3730990-7-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210305185254.3730990-1-maz@kernel.org>
 References: <87eegtzbch.wl-maz@kernel.org>
@@ -89,60 +89,103 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-When running under a nesting hypervisor, it isn't guaranteed that
-the virtual HW will include a PMU. In which case, let's not try
-to access the PMU registers in the world switch, as that'd be
-deadly.
+As we are about to report a bit more information to the rest of
+the kernel, rename __vgic_v3_get_ich_vtr_el2() to the more
+explicit __vgic_v3_get_gic_config().
 
-Reported-by: Andre Przywara <andre.przywara@arm.com>
+No functional change.
+
+Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-Link: https://lore.kernel.org/r/20210209114844.3278746-3-maz@kernel.org
 ---
- arch/arm64/kernel/image-vars.h          | 3 +++
- arch/arm64/kvm/hyp/include/hyp/switch.h | 9 ++++++---
- 2 files changed, 9 insertions(+), 3 deletions(-)
+ arch/arm64/include/asm/kvm_asm.h   | 4 ++--
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c | 6 +++---
+ arch/arm64/kvm/hyp/vgic-v3-sr.c    | 7 ++++++-
+ arch/arm64/kvm/vgic/vgic-v3.c      | 4 +++-
+ 4 files changed, 14 insertions(+), 7 deletions(-)
 
-diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
-index 23f1a557bd9f..5aa9ed1e9ec6 100644
---- a/arch/arm64/kernel/image-vars.h
-+++ b/arch/arm64/kernel/image-vars.h
-@@ -101,6 +101,9 @@ KVM_NVHE_ALIAS(__stop___kvm_ex_table);
- /* Array containing bases of nVHE per-CPU memory regions. */
- KVM_NVHE_ALIAS(kvm_arm_hyp_percpu_base);
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index 22d933e9b59e..9c0e396dd03f 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -50,7 +50,7 @@
+ #define __KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_local_vmid	5
+ #define __KVM_HOST_SMCCC_FUNC___kvm_timer_set_cntvoff		6
+ #define __KVM_HOST_SMCCC_FUNC___kvm_enable_ssbs			7
+-#define __KVM_HOST_SMCCC_FUNC___vgic_v3_get_ich_vtr_el2		8
++#define __KVM_HOST_SMCCC_FUNC___vgic_v3_get_gic_config		8
+ #define __KVM_HOST_SMCCC_FUNC___vgic_v3_read_vmcr		9
+ #define __KVM_HOST_SMCCC_FUNC___vgic_v3_write_vmcr		10
+ #define __KVM_HOST_SMCCC_FUNC___vgic_v3_init_lrs		11
+@@ -192,7 +192,7 @@ extern void __kvm_timer_set_cntvoff(u64 cntvoff);
  
-+/* PMU available static key */
-+KVM_NVHE_ALIAS(kvm_arm_pmu_available);
-+
- #endif /* CONFIG_KVM */
+ extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
  
- #endif /* __ARM64_KERNEL_IMAGE_VARS_H */
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 54f4860cd87c..6c1f51f25eb3 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -90,15 +90,18 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
- 	 * counter, which could make a PMXEVCNTR_EL0 access UNDEF at
- 	 * EL1 instead of being trapped to EL2.
- 	 */
--	write_sysreg(0, pmselr_el0);
--	write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
-+	if (kvm_arm_support_pmu_v3()) {
-+		write_sysreg(0, pmselr_el0);
-+		write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
-+	}
- 	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
+-extern u64 __vgic_v3_get_ich_vtr_el2(void);
++extern u64 __vgic_v3_get_gic_config(void);
+ extern u64 __vgic_v3_read_vmcr(void);
+ extern void __vgic_v3_write_vmcr(u32 vmcr);
+ extern void __vgic_v3_init_lrs(void);
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index f012f8665ecc..8f129968204e 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -67,9 +67,9 @@ static void handle___kvm_enable_ssbs(struct kvm_cpu_context *host_ctxt)
+ 	write_sysreg_el2(tmp, SYS_SCTLR);
  }
  
- static inline void __deactivate_traps_common(void)
+-static void handle___vgic_v3_get_ich_vtr_el2(struct kvm_cpu_context *host_ctxt)
++static void handle___vgic_v3_get_gic_config(struct kvm_cpu_context *host_ctxt)
  {
- 	write_sysreg(0, hstr_el2);
--	write_sysreg(0, pmuserenr_el0);
-+	if (kvm_arm_support_pmu_v3())
-+		write_sysreg(0, pmuserenr_el0);
+-	cpu_reg(host_ctxt, 1) = __vgic_v3_get_ich_vtr_el2();
++	cpu_reg(host_ctxt, 1) = __vgic_v3_get_gic_config();
  }
  
- static inline void ___activate_traps(struct kvm_vcpu *vcpu)
+ static void handle___vgic_v3_read_vmcr(struct kvm_cpu_context *host_ctxt)
+@@ -118,7 +118,7 @@ static const hcall_t host_hcall[] = {
+ 	HANDLE_FUNC(__kvm_tlb_flush_local_vmid),
+ 	HANDLE_FUNC(__kvm_timer_set_cntvoff),
+ 	HANDLE_FUNC(__kvm_enable_ssbs),
+-	HANDLE_FUNC(__vgic_v3_get_ich_vtr_el2),
++	HANDLE_FUNC(__vgic_v3_get_gic_config),
+ 	HANDLE_FUNC(__vgic_v3_read_vmcr),
+ 	HANDLE_FUNC(__vgic_v3_write_vmcr),
+ 	HANDLE_FUNC(__vgic_v3_init_lrs),
+diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+index 80406f463c28..005daa0c9dd7 100644
+--- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
++++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+@@ -405,7 +405,12 @@ void __vgic_v3_init_lrs(void)
+ 		__gic_v3_set_lr(0, i);
+ }
+ 
+-u64 __vgic_v3_get_ich_vtr_el2(void)
++/*
++ * Return the GIC CPU configuration:
++ * - [31:0]  ICH_VTR_EL2
++ * - [63:32] RES0
++ */
++u64 __vgic_v3_get_gic_config(void)
+ {
+ 	return read_gicreg(ICH_VTR_EL2);
+ }
+diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+index 52915b342351..c3e6c3fd333b 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-v3.c
+@@ -574,9 +574,11 @@ early_param("kvm-arm.vgic_v4_enable", early_gicv4_enable);
+  */
+ int vgic_v3_probe(const struct gic_kvm_info *info)
+ {
+-	u32 ich_vtr_el2 = kvm_call_hyp_ret(__vgic_v3_get_ich_vtr_el2);
++	u64 ich_vtr_el2 = kvm_call_hyp_ret(__vgic_v3_get_gic_config);
+ 	int ret;
+ 
++	ich_vtr_el2 = (u32)ich_vtr_el2;
++
+ 	/*
+ 	 * The ListRegs field is 5 bits, but there is an architectural
+ 	 * maximum of 16 list registers. Just ignore bit 4...
 -- 
 2.29.2
 
