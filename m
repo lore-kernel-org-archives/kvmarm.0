@@ -2,61 +2,68 @@ Return-Path: <SRS0=mzoY=IG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 707A9C433DB
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Mar 2021 17:21:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 649A0C433DB
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Mar 2021 17:46:58 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CA38865235
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Mar 2021 17:21:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA38865235
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id C401D65296
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Mar 2021 17:46:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C401D65296
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EDFE4B711;
-	Mon,  8 Mar 2021 12:21:47 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 328044B436;
+	Mon,  8 Mar 2021 12:46:57 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JGtjafpE50Mf; Mon,  8 Mar 2021 12:21:45 -0500 (EST)
+	with ESMTP id iGI2fPV+u9Bd; Mon,  8 Mar 2021 12:46:56 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D3C914B6FC;
-	Mon,  8 Mar 2021 12:21:45 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 116644B6F7;
+	Mon,  8 Mar 2021 12:46:56 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C00B4B6FC
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Mar 2021 12:21:44 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 68E8B4B436
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Mar 2021 12:46:54 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MVBZRQY0ur+q for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Mar 2021 12:21:43 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 26F004B6F9
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Mar 2021 12:21:43 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 82B21D6E;
- Mon,  8 Mar 2021 09:21:42 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 886EA3F71B;
- Mon,  8 Mar 2021 09:21:41 -0800 (PST)
-Subject: Re: [PATCH kvmtool v2 07/22] hw/i8042: Switch to new trap handlers
-To: Andre Przywara <andre.przywara@arm.com>, Will Deacon <will@kernel.org>,
- Julien Thierry <julien.thierry.kdev@gmail.com>
-References: <20210225005915.26423-1-andre.przywara@arm.com>
- <20210225005915.26423-8-andre.przywara@arm.com>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <3a77522e-c3f7-7250-5a9a-0533400ce9bd@arm.com>
-Date: Mon, 8 Mar 2021 17:22:06 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
+ with ESMTP id 5u1osQrp1VNn for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Mar 2021 12:46:53 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3D7064B404
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Mar 2021 12:46:53 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 2450165296;
+ Mon,  8 Mar 2021 17:46:52 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=hot-poop.lan)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1lJJxy-000OD8-8a; Mon, 08 Mar 2021 17:46:50 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ kvm@vger.kernel.org
+Subject: [PATCH] KVM: arm64: Cap default IPA size to the host's own size
+Date: Mon,  8 Mar 2021 17:46:43 +0000
+Message-Id: <20210308174643.761100-1-maz@kernel.org>
+X-Mailer: git-send-email 2.30.0
 MIME-Version: 1.0
-In-Reply-To: <20210225005915.26423-8-andre.przywara@arm.com>
-Content-Language: en-US
-Cc: Marc Zyngier <maz@kernel.org>, Sami Mujawar <sami.mujawar@arm.com>,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+ alexandru.elisei@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,90 +80,104 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Andre,
+KVM/arm64 has forever used a 40bit default IPA space, partially
+due to its 32bit heritage (where the only choice is 40bit).
 
-On 2/25/21 12:59 AM, Andre Przywara wrote:
-> Now that the PC keyboard has a trap handler adhering to the MMIO fault
-> handler prototype, let's switch over to the joint registration routine.
->
-> This allows us to get rid of the ioport shim routines.
->
-> Make the kbd_init() function static on the way.
->
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
->  hw/i8042.c          | 30 ++++--------------------------
->  include/kvm/i8042.h |  1 -
->  2 files changed, 4 insertions(+), 27 deletions(-)
->
-> diff --git a/hw/i8042.c b/hw/i8042.c
-> index ab866662..20be36c4 100644
-> --- a/hw/i8042.c
-> +++ b/hw/i8042.c
-> @@ -325,40 +325,18 @@ static void kbd_io(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len,
->  		ioport__write8(data, value);
->  }
->  
-> -/*
-> - * Called when the OS has written to one of the keyboard's ports (0x60 or 0x64)
-> - */
-> -static bool kbd_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
-> -{
-> -	kbd_io(vcpu, port, data, size, false, NULL);
-> -
-> -	return true;
-> -}
-> -
-> -static bool kbd_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
-> -{
-> -	kbd_io(vcpu, port, data, size, true, NULL);
-> -
-> -	return true;
-> -}
-> -
-> -static struct ioport_operations kbd_ops = {
-> -	.io_in		= kbd_in,
-> -	.io_out		= kbd_out,
-> -};
-> -
-> -int kbd__init(struct kvm *kvm)
-> +static int kbd__init(struct kvm *kvm)
->  {
->  	int r;
->  
->  	kbd_reset();
->  	state.kvm = kvm;
-> -	r = ioport__register(kvm, I8042_DATA_REG, &kbd_ops, 2, NULL);
-> +	r = kvm__register_pio(kvm, I8042_DATA_REG, 2, kbd_io, NULL);
->  	if (r < 0)
->  		return r;
-> -	r = ioport__register(kvm, I8042_COMMAND_REG, &kbd_ops, 2, NULL);
-> +	r = kvm__register_pio(kvm, I8042_COMMAND_REG, 2, kbd_io, NULL);
->  	if (r < 0) {
-> -		ioport__unregister(kvm, I8042_DATA_REG);
-> +		kvm__deregister_pio(kvm, I8042_DATA_REG);
->  		return r;
->  	}
->  
-> diff --git a/include/kvm/i8042.h b/include/kvm/i8042.h
-> index 3b4ab688..cd4ae6bb 100644
-> --- a/include/kvm/i8042.h
-> +++ b/include/kvm/i8042.h
-> @@ -7,6 +7,5 @@ struct kvm;
->  
->  void mouse_queue(u8 c);
->  void kbd_queue(u8 c);
-> -int kbd__init(struct kvm *kvm);
->  
->  #endif
+However, there are implementations in the wild that have a *cough*
+much smaller *cough* IPA space, which leads to a misprogramming of
+VTCR_EL2, and a guest that is stuck on its first memory access
+if userspace dares to ask for the default IPA setting (which most
+VMMs do).
 
-Looks good, I also compile tested the code:
+Instead, cap the default IPA size to what the host can actually
+do, and spit out a one-off message on the console. The boot warning
+is turned into a more meaningfull message, and the new behaviour
+is also documented.
 
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Although this is a userspace ABI change, it doesn't really change
+much for userspace:
 
-Thanks,
+- the guest couldn't run before this change, while it now has
+  a chance to if the memory range fits the reduced IPA space
 
-Alex
+- a memory slot that was accepted because it did fit the default
+  IPA space but didn't fit the HW constraints is now properly
+  rejected
+
+The other thing that's left doing is to convince userspace to
+actually use the IPA space setting instead of relying on the
+antiquated default.
+
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ Documentation/virt/kvm/api.rst | 13 +++++++------
+ arch/arm64/kvm/reset.c         | 12 ++++++++----
+ 2 files changed, 15 insertions(+), 10 deletions(-)
+
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index aed52b0fc16e..80c710035f31 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -158,12 +158,13 @@ flag KVM_VM_MIPS_VZ.
+ 
+ 
+ On arm64, the physical address size for a VM (IPA Size limit) is limited
+-to 40bits by default. The limit can be configured if the host supports the
+-extension KVM_CAP_ARM_VM_IPA_SIZE. When supported, use
++to 40bits by default, though capped to the host's limit. The VM's own
++limit can be configured if the host supports the extension
++KVM_CAP_ARM_VM_IPA_SIZE. When supported, use
+ KVM_VM_TYPE_ARM_IPA_SIZE(IPA_Bits) to set the size in the machine type
+-identifier, where IPA_Bits is the maximum width of any physical
+-address used by the VM. The IPA_Bits is encoded in bits[7-0] of the
+-machine type identifier.
++identifier, where IPA_Bits is the maximum width of any physical address
++used by the VM. The IPA_Bits is encoded in bits[7-0] of the machine type
++identifier.
+ 
+ e.g, to configure a guest to use 48bit physical address size::
+ 
+@@ -172,7 +173,7 @@ e.g, to configure a guest to use 48bit physical address size::
+ The requested size (IPA_Bits) must be:
+ 
+  ==   =========================================================
+-  0   Implies default size, 40bits (for backward compatibility)
++  0   Implies default size, 40bits or less (for backward compatibility)
+   N   Implies N bits, where N is a positive integer such that,
+       32 <= N <= Host_IPA_Limit
+  ==   =========================================================
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index 47f3f035f3ea..1f22b36a0eff 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -324,10 +324,9 @@ int kvm_set_ipa_limit(void)
+ 	}
+ 
+ 	kvm_ipa_limit = id_aa64mmfr0_parange_to_phys_shift(parange);
+-	WARN(kvm_ipa_limit < KVM_PHYS_SHIFT,
+-	     "KVM IPA Size Limit (%d bits) is smaller than default size\n",
+-	     kvm_ipa_limit);
+-	kvm_info("IPA Size Limit: %d bits\n", kvm_ipa_limit);
++	kvm_info("IPA Size Limit: %d bits%s\n", kvm_ipa_limit,
++		 ((kvm_ipa_limit < KVM_PHYS_SHIFT) ?
++		  " (Reduced IPA size, limited VM compatibility)" : ""));
+ 
+ 	return 0;
+ }
+@@ -356,6 +355,11 @@ int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type)
+ 			return -EINVAL;
+ 	} else {
+ 		phys_shift = KVM_PHYS_SHIFT;
++		if (phys_shift > kvm_ipa_limit) {
++			pr_warn_once("Userspace using unsupported default IPA limit, capping to %d bits\n",
++				     kvm_ipa_limit);
++			phys_shift = kvm_ipa_limit;
++		}
+ 	}
+ 
+ 	mmfr0 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
+-- 
+2.30.0
 
 _______________________________________________
 kvmarm mailing list
