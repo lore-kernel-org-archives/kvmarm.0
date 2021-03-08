@@ -2,69 +2,93 @@ Return-Path: <SRS0=mzoY=IG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BC8FC433DB
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Mar 2021 13:31:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 031CCC433E0
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Mar 2021 13:38:17 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6B645651CC
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Mar 2021 13:31:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B645651CC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 5673F651CD
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Mar 2021 13:38:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5673F651CD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C16624B5C3;
-	Mon,  8 Mar 2021 08:31:04 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BF9D54B6F5;
+	Mon,  8 Mar 2021 08:38:15 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 8QHqJRSlWuI1; Mon,  8 Mar 2021 08:31:02 -0500 (EST)
+	with ESMTP id AeG7OCE1mfKF; Mon,  8 Mar 2021 08:38:14 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4ECEB4B6D3;
-	Mon,  8 Mar 2021 08:31:02 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4907E4B70F;
+	Mon,  8 Mar 2021 08:38:14 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BA5AE4B6C7
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Mar 2021 08:31:01 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 12F974B6F5
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Mar 2021 08:38:13 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UJHVTn5cNDyH for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Mar 2021 08:31:00 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 05A464B5C3
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Mar 2021 08:30:59 -0500 (EST)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id EA44964DA3;
- Mon,  8 Mar 2021 13:30:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1615210258;
- bh=pEXNet6N/egXd7wBXv+XZqh8Z0VGXmL8Y0GWpDXYgSU=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=cKyWPlExbizCNVfKpN0ou+bCV20Y4lb3vpBkQS2Vmo3MZrrlJQh/iUsAO0JLf7oom
- Aflt8QGqmFYVUY8Zoiag1rK2aK5nf7xwG+EThpUDEqEjn6MScpRvXvHbMLGDeywvrw
- WWiK5i+VSUsi8FHgLgoDTguaw2tETYur8CDLJvxvop3CT1bE01EW2xjxsh8OQ4qdXj
- GwOH4MfOsamqJ4lC32GoG/POx0M8kDUF82rFM3HPT6hBlwnQ+glrbXy0A7BO3OfZGU
- 4cUoYzdmvTf2bToG82yD3eHRe2YFbLqF1oklALbm0QeZuNe7ARB0QrZ1vjAHnhVRDX
- 9nL4V2qDnHBug==
-Date: Mon, 8 Mar 2021 13:30:53 +0000
-From: Will Deacon <will@kernel.org>
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Subject: Re: [PATCH] arm64/mm: Fix __enable_mmu() for new TGRAN range values
-Message-ID: <20210308133053.GA26128@willie-the-truck>
-References: <1614954969-14338-1-git-send-email-anshuman.khandual@arm.com>
- <20210305145111.GA78884@C02TD0UTHF1T.local>
- <1f339512-34ac-9779-e534-bee6698b99aa@arm.com>
+ with ESMTP id zpDcgOaDK3nJ for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Mar 2021 08:38:11 -0500 (EST)
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com
+ [209.85.128.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 78D064B6D7
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Mar 2021 08:38:11 -0500 (EST)
+Received: by mail-wm1-f53.google.com with SMTP id l22so6079158wme.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 08 Mar 2021 05:38:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=PFBRtObdnApUzRvAuScTx2Kw0ULloMz5ElbqpQCVZ4E=;
+ b=DlzGUTmvsB+sDC4hIi5gNvd6CbNk1Tz0/nBGg/8SbC9YimO5Z2Ao2m8EqeETEhTmXH
+ gg+bIb953rzFbi0I9YjzrON8nRevQLzIIXHIY/U/AJqjF9kTvmKnuxwuYP8I3NECMxGR
+ z6/82TezvDq1Q8Jl48hOqizM545OfysJc0nESM3s9mnWvUtMu1HITc9HAcFu9oiJAotR
+ F/w3ueSVFouExv1E7EOGc9FkpX5HY0bZm2Thd14AVt36z4UwYHBYGV1QiJP1Dx3RUsx/
+ 1UVl+XdfNd9IiYbGp5p8mmvGj/ozNnOuee7lP3M9mD6k1Boi2AtckS0mhwbZ/0MmakvB
+ 1SFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=PFBRtObdnApUzRvAuScTx2Kw0ULloMz5ElbqpQCVZ4E=;
+ b=mK9hYGm2j4jp0KHNOPfZb7m8n7Y7Q5XvEkiW9eUGDG+D/JVPGxPAAVQ5cH3ZpFBM0R
+ JFadRZV2bQ+jAvhIpjpvtUhYZ8e8l0L2/fsn6cUCQUWFhEf835tdCb7JsXqawK2HNp3Q
+ 3PjEsLCGdOPOPwDr9beICSxBhmh9UK9v9LJa8FqLOl+WMQFTXD8rqYgfYs8Xm86i/Z1n
+ kGTpABnWHYuM0fCOb7+KVvBS/UGMWLjmYqiM1aNxFp/rIrWeqgSZAr5OrWCYecezxXwh
+ 6UBeRjvCIfnk2Fl7Nm8yC9pFv896EwQxK5jgTCc/WK20oGFvTOpPonFXz3jUZ0TXncTd
+ aIGQ==
+X-Gm-Message-State: AOAM531vlmJlBh13jjp7bQCqjFAeT/wJA2KUqDnFLOqxitcK0f7GbIYI
+ AbFNha6saUOfLqTaeg7fodOTmA==
+X-Google-Smtp-Source: ABdhPJxdMgJt1UHBWtl36bgUKr2lFU/ztPx2Xm8qGG8vibyqeSTLpcrl/63fHe5uBl7JNr0lG8I+yg==
+X-Received: by 2002:a1c:7905:: with SMTP id l5mr22576268wme.181.1615210690018; 
+ Mon, 08 Mar 2021 05:38:10 -0800 (PST)
+Received: from google.com (230.69.233.35.bc.googleusercontent.com.
+ [35.233.69.230])
+ by smtp.gmail.com with ESMTPSA id a5sm18572985wrs.35.2021.03.08.05.38.09
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 08 Mar 2021 05:38:09 -0800 (PST)
+Date: Mon, 8 Mar 2021 13:38:07 +0000
+From: Quentin Perret <qperret@google.com>
+To: Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v3 29/32] KVM: arm64: Wrap the host with a stage 2
+Message-ID: <YEYov+r6A3uil1aU@google.com>
+References: <20210302150002.3685113-1-qperret@google.com>
+ <20210302150002.3685113-30-qperret@google.com>
+ <20210305192905.GE23633@willie-the-truck>
+ <YEXs1cOlmhHg4u8x@google.com>
+ <20210308124606.GA25879@willie-the-truck>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <1f339512-34ac-9779-e534-bee6698b99aa@arm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: linux-efi@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20210308124606.GA25879@willie-the-truck>
+Cc: android-kvm@google.com, catalin.marinas@arm.com, mate.toth-pal@arm.com,
+ seanjc@google.com, tabba@google.com, linux-kernel@vger.kernel.org,
+ robh+dt@kernel.org, linux-arm-kernel@lists.infradead.org, maz@kernel.org,
+ kernel-team@android.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -81,70 +105,111 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sun, Mar 07, 2021 at 05:24:21PM +0530, Anshuman Khandual wrote:
+On Monday 08 Mar 2021 at 12:46:07 (+0000), Will Deacon wrote:
+> __load_stage2() _only_ has the ISB if ARM64_WORKAROUND_SPECULATIVE_AT is
+> present, whereas I think you need one unconditionall here so that the
+> system register write has taken effect before the TLB invalidation.
 > 
+> It's similar to the comment at the end of __tlb_switch_to_guest().
 > 
-> On 3/5/21 8:21 PM, Mark Rutland wrote:
-> > On Fri, Mar 05, 2021 at 08:06:09PM +0530, Anshuman Khandual wrote:
-> >> From: James Morse <james.morse@arm.com>
-> >>
-> >> As per ARM ARM DDI 0487G.a, when FEAT_LPA2 is implemented, ID_AA64MMFR0_EL1
-> >> might contain a range of values to describe supported translation granules
-> >> (4K and 16K pages sizes in particular) instead of just enabled or disabled
-> >> values. This changes __enable_mmu() function to handle complete acceptable
-> >> range of values (depending on whether the field is signed or unsigned) now
-> >> represented with ID_AA64MMFR0_TGRAN_SUPPORTED_[MIN..MAX] pair. While here,
-> >> also fix similar situations in EFI stub and KVM as well.
-> >>
-> >> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> >> Cc: Will Deacon <will@kernel.org>
-> >> Cc: Marc Zyngier <maz@kernel.org>
-> >> Cc: James Morse <james.morse@arm.com>
-> >> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-> >> Cc: Ard Biesheuvel <ardb@kernel.org>
-> >> Cc: Mark Rutland <mark.rutland@arm.com>
-> >> Cc: linux-arm-kernel@lists.infradead.org
-> >> Cc: kvmarm@lists.cs.columbia.edu
-> >> Cc: linux-efi@vger.kernel.org
-> >> Cc: linux-kernel@vger.kernel.org
-> >> Signed-off-by: James Morse <james.morse@arm.com>
-> >> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
-> >> ---
-> >>  arch/arm64/include/asm/sysreg.h           | 20 ++++++++++++++------
-> >>  arch/arm64/kernel/head.S                  |  6 ++++--
-> >>  arch/arm64/kvm/reset.c                    | 23 ++++++++++++-----------
-> >>  drivers/firmware/efi/libstub/arm64-stub.c |  2 +-
-> >>  4 files changed, 31 insertions(+), 20 deletions(-)
-> >>
-> >> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> >> index dfd4edb..d4a5fca9 100644
-> >> --- a/arch/arm64/include/asm/sysreg.h
-> >> +++ b/arch/arm64/include/asm/sysreg.h
-> >> @@ -796,6 +796,11 @@
-> >>  #define ID_AA64MMFR0_PARANGE_48		0x5
-> >>  #define ID_AA64MMFR0_PARANGE_52		0x6
-> >>  
-> >> +#define ID_AA64MMFR0_TGRAN_2_SUPPORTED_DEFAULT	0x0
-> >> +#define ID_AA64MMFR0_TGRAN_2_SUPPORTED_NONE	0x1
-> >> +#define ID_AA64MMFR0_TGRAN_2_SUPPORTED_MIN	0x2
-> >> +#define ID_AA64MMFR0_TGRAN_2_SUPPORTED_MAX	0x7
-> >
-> > The TGRAN2 fields doesn't quite follow the usual ID scheme rules, so how
-> > do we deteremine the max value? Does the ARM ARM say anything in
-> > particular about them, like we do for some of the PMU ID fields?
+> Having said that, I do worry that ARM64_WORKAROUND_SPECULATIVE_AT probably
+> needs a closer look in the world of pKVM, since it currently special-cases
+> the host.
+
+Yes, I see that now. I'll start looking into this.
+
+> > > > +	__tlbi(vmalls12e1is);
+> > > > +	dsb(ish);
+> > > 
+> > > Given that the TLB is invalidated on the boot path, please can you add
+> > > a comment here about the stale entries which you need to invalidate?
+> > 
+> > Sure -- that is for HCR bits cached in TLBs for VMID 0. Thinking about
+> > it I could probably reduce the tlbi scope as well.
+> > 
+> > > Also, does this need to be inner-shareable? I thought this function ran on
+> > > each CPU.
+> > 
+> > Hmm, correct, nsh should do.
 > 
-> Did not find anything in ARM ARM, regarding what scheme TGRAN2 fields
-> actually follow. I had arrived at more restrictive 0x7 value, like the
-> usual signed fields as the TGRAN4 fields definitely do not follow the
-> unsigned ID scheme. Would restricting max value to 0x3 (i.e LPA2) be a
-> better option instead ?
+> Cool, then you can do that for both the TLBI and the DSB instructions (and
+> please add a comment that the invalidation is due to the HCR bits).
 
-I don't think it helps much, as TGRAN64_2 doesn't even define 0x3.
+Sure.
 
-So I think this patch is probably the best we can do, but the Arm ARM could
-really do with describing the scheme here.
+> > > > +static void host_stage2_unmap_dev_all(void)
+> > > > +{
+> > > > +	struct kvm_pgtable *pgt = &host_kvm.pgt;
+> > > > +	struct memblock_region *reg;
+> > > > +	u64 addr = 0;
+> > > > +	int i;
+> > > > +
+> > > > +	/* Unmap all non-memory regions to recycle the pages */
+> > > > +	for (i = 0; i < hyp_memblock_nr; i++, addr = reg->base + reg->size) {
+> > > > +		reg = &hyp_memory[i];
+> > > > +		kvm_pgtable_stage2_unmap(pgt, addr, reg->base - addr);
+> > > > +	}
+> > > > +	kvm_pgtable_stage2_unmap(pgt, addr, ULONG_MAX);
+> > > 
+> > > Is this just going to return -ERANGE?
+> > 
+> > Hrmpf, yes, that wants BIT(pgt->ia_bits) I think. And that wants testing
+> > as well, clearly.
+> 
+> Agreed, maybe it's worth checking the return value.
 
-Will
+Ack, and hyp_panic if != 0, but that is probably preferable anyway.
+
+> > > > +static int host_stage2_idmap(u64 addr)
+> > > > +{
+> > > > +	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R | KVM_PGTABLE_PROT_W;
+> > > > +	struct kvm_mem_range range;
+> > > > +	bool is_memory = find_mem_range(addr, &range);
+> > > > +	struct hyp_pool *pool = is_memory ? &host_s2_mem : &host_s2_dev;
+> > > > +	int ret;
+> > > > +
+> > > > +	if (is_memory)
+> > > > +		prot |= KVM_PGTABLE_PROT_X;
+> > > > +
+> > > > +	hyp_spin_lock(&host_kvm.lock);
+> > > > +	ret = kvm_pgtable_stage2_idmap_greedy(&host_kvm.pgt, addr, prot,
+> > > > +					      &range, pool);
+> > > > +	if (is_memory || ret != -ENOMEM)
+> > > > +		goto unlock;
+> > > > +	host_stage2_unmap_dev_all();
+> > > > +	ret = kvm_pgtable_stage2_idmap_greedy(&host_kvm.pgt, addr, prot,
+> > > > +					      &range, pool);
+> > > 
+> > > I find this _really_ hard to reason about, as range is passed by reference
+> > > and we don't reset it after the first call returns -ENOMEM for an MMIO
+> > > mapping. Maybe some commentary on why it's still valid here?
+> > 
+> > Sure, I'll add something. FWIW, that is intended -- -ENOMEM can only be
+> > caused by the call to kvm_pgtable_stage2_map() which leaves the range
+> > untouched. So, as long as we don't release the lock, the range returned
+> > by the first call to kvm_pgtable_stage2_idmap_greedy() should still be
+> > valid. I suppose I could call kvm_pgtable_stage2_map() directly the
+> > second time to make it obvious but I thought this would expose the
+> > internal of kvm_pgtable_stage2_idmap_greedy() a little bit too much.
+> 
+> I can see it both ways, but updating the kerneldoc for
+> kvm_pgtable_stage2_idmap_greedy() to state in which cases the range is
+> updated and how would be helpful. It just says "negative error code on
+> failure" at the moment.
+
+Alternatively I could expose the 'reduce' path (maybe with another name
+e.g. stage2_find_compatible_range() or so) and remove the
+kvm_pgtable_stage2_idmap_greedy() wrapper. So it'd be the caller's
+responsibility to not release the lock in between
+stage2_find_compatible_range() and kvm_pgtable_stage2_map() for
+instance, but that sounds reasonable to me. And that would make it
+explicit it's the _map() path that failed with -ENOMEM, and that the
+range can be re-used the second time.
+
+Thoughts?
+
+Thanks,
+Quentin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
