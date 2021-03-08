@@ -2,85 +2,81 @@ Return-Path: <SRS0=mzoY=IG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8617C433E0
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Mar 2021 18:12:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F261C433E0
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Mar 2021 18:43:59 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5A082652AC
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Mar 2021 18:12:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A082652AC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id C928A6526C
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Mar 2021 18:43:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C928A6526C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B6D894B6FB;
-	Mon,  8 Mar 2021 13:12:50 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 493E54B478;
+	Mon,  8 Mar 2021 13:43:58 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id tkfm96Zw3dVu; Mon,  8 Mar 2021 13:12:49 -0500 (EST)
+	with ESMTP id WUtz5SSAo16k; Mon,  8 Mar 2021 13:43:56 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 690814B717;
-	Mon,  8 Mar 2021 13:12:49 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D2E684B419;
+	Mon,  8 Mar 2021 13:43:56 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ED5DE4B717
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Mar 2021 13:12:47 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BF684B3D2
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Mar 2021 13:43:55 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XATD39+NljJ4 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Mar 2021 13:12:45 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 443FC4B6FB
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Mar 2021 13:12:45 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1615227164;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=g3PfKhdiqdgUwSWYSwDNbfusFaETS5oAF78BcOmOgew=;
- b=KojPM+aCjtw7dZvKWAuFFjs6OQ+SE59GTh2hxHMYuVClQNO6oqblWOga7PCeU6LdlMWpM7
- uBvzMxmmW0h4lUGVhr/DNChmtpgw9fxjy5Ui19gZkatH2nr1e2HqimRq+43k1O/jlDWMpm
- meieghCrrWB4REOn6/z9Yh6qNYhzNEY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-509-LHQEfOXhMzaPdazJnqfR1g-1; Mon, 08 Mar 2021 13:12:40 -0500
-X-MC-Unique: LHQEfOXhMzaPdazJnqfR1g-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E1E3980432E;
- Mon,  8 Mar 2021 18:12:35 +0000 (UTC)
-Received: from [10.36.112.254] (ovpn-112-254.ams2.redhat.com [10.36.112.254])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 29A7D5D756;
- Mon,  8 Mar 2021 18:12:22 +0000 (UTC)
-Subject: Re: [PATCH v12 03/13] vfio: VFIO_IOMMU_SET_MSI_BINDING
-To: Jean-Philippe Brucker <jean-philippe@linaro.org>
-References: <20210223210625.604517-1-eric.auger@redhat.com>
- <20210223210625.604517-4-eric.auger@redhat.com> <YEIL3qmcRfhUoRGt@myrica>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <0e23edb9-9923-edb9-ac3d-8fb52d2fe8c6@redhat.com>
-Date: Mon, 8 Mar 2021 19:12:21 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+ with ESMTP id No5NmwW-RBO6 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Mar 2021 13:43:53 -0500 (EST)
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com
+ [209.85.167.48])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D20164B108
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Mar 2021 13:43:52 -0500 (EST)
+Received: by mail-lf1-f48.google.com with SMTP id u4so22697429lfs.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 08 Mar 2021 10:43:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=oWJi9TTK3RpTTf/7yDpb3oKd8vTmZ+hAd/ZIvo399K0=;
+ b=VDtPSQXlEcN+q/UYFT4QEKwBkymIGMbNymOpTZqlJp1yVZszjOrHhcSGx9SoKLjNHv
+ vjU+4cVg3NgBi4iN4aWrHKfSupE3huSJ5oxnbVMdLKVlNtdW7gH3r0pnlQxXtvwBLzma
+ 0l0hIsr07cNuqnswsLmBM3Gauey8bhBHBunRF28DNV48YBMtjmJxqtS5uhAB61E7/H3P
+ HqbTxcX1jXT/pG138l1FiXJJZbp3yf8SWcFeMsF401pmqJ+ZFiCgtQLaG3y/ZT6FQa76
+ yKWLOvST0TKWWT0+pS58+dcMSWRgqN60nODXwRKRF6U6gKoC4p/ywvSRi21HfY0+TwMJ
+ qXCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=oWJi9TTK3RpTTf/7yDpb3oKd8vTmZ+hAd/ZIvo399K0=;
+ b=fxN0r+YVTlyJAEv2HvKl1KrhBZq40wF//htIj+D+OGXBlu1QGxpYkA1UW1v+EfXy0g
+ 3g9SpbgnIJC5Z2ty+ilmCtB/KWDHwsEyy4WezdsmGQMRiSICmOQ8zTdps3MDx7S8PPcx
+ 2xGraMiO5SMW9dr5I99osxef/FD/zVE5QHYdw6C1DCFhmTAtE9P6weJDozL6KtqKTUuk
+ Ku6LIkQ4oCgG/H/BXgXksx4409sEFe+EkZBKEP+By3nhdVPsW7wtS1Q2AToXiERDePLU
+ Gv3huN5naij3XTYBv14xtXPDeO12wtXIdpkhvL8h2RdbHgKFL++sOCVDJYnavUTT9wPl
+ 1vfw==
+X-Gm-Message-State: AOAM532XdJyph/lOE6AaV/O35YEZJOR7/RX4Dd5yOwJMerzNeWokMe7o
+ sunK6hWHwzCi2PbHjz0cemvUf+XrM8ZP1qO8GrtucQ==
+X-Google-Smtp-Source: ABdhPJxNiNBgvk6wXCSYzNgULfRUBJt1pMh/Hd/bhT6XXmFMIkmzLRDwOxVJYiu9798wXBq4uKOEtpr5D7uRIIY6MY4=
+X-Received: by 2002:ac2:5ca7:: with SMTP id e7mr15135284lfq.646.1615229030939; 
+ Mon, 08 Mar 2021 10:43:50 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <YEIL3qmcRfhUoRGt@myrica>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Cc: kvm@vger.kernel.org, vivek.gautam@arm.com, kvmarm@lists.cs.columbia.edu,
- eric.auger.pro@gmail.com, yi.l.liu@intel.com, wangxingang5@huawei.com,
- maz@kernel.org, joro@8bytes.org, vsethi@nvidia.com, zhangfei.gao@linaro.org,
- jacob.jun.pan@linux.intel.com, will@kernel.org, nicoleotsuka@gmail.com,
- alex.williamson@redhat.com, linux-kernel@vger.kernel.org,
- lushenming@huawei.com, iommu@lists.linux-foundation.org, robin.murphy@arm.com
+References: <20210205044403.1559010-1-jingzhangos@google.com>
+ <20210308164902.GA26772@willie-the-truck>
+In-Reply-To: <20210308164902.GA26772@willie-the-truck>
+From: Jing Zhang <jingzhangos@google.com>
+Date: Mon, 8 Mar 2021 12:43:40 -0600
+Message-ID: <CAAdAUtjhye2f5uHQjmYdfU8HD+c0WvxvbaLg3AKzu28tEDkDhQ@mail.gmail.com>
+Subject: Re: [PATCH] KVM: arm64: Remove redundant check for S2FWB
+To: Will Deacon <will@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -97,50 +93,93 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Jean,
+Hi Will,
 
-On 3/5/21 11:45 AM, Jean-Philippe Brucker wrote:
-> Hi,
-> 
-> On Tue, Feb 23, 2021 at 10:06:15PM +0100, Eric Auger wrote:
->> This patch adds the VFIO_IOMMU_SET_MSI_BINDING ioctl which aim
->> to (un)register the guest MSI binding to the host. This latter
->> then can use those stage 1 bindings to build a nested stage
->> binding targeting the physical MSIs.
-> 
-> Now that RMR is in the IORT spec, could it be used for the nested MSI
-> problem?  For virtio-iommu tables I was planning to do it like this:
-> 
-> MSI is mapped at stage-2 with an arbitrary IPA->doorbell PA. We report
-> this IPA to userspace through iommu_groups/X/reserved_regions. No change
-> there. Then to the guest we report a reserved identity mapping at IPA
-> (using RMR, an equivalent DT binding, or probed RESV_MEM for
-> virtio-iommu).
+On Mon, Mar 8, 2021 at 10:49 AM Will Deacon <will@kernel.org> wrote:
+>
+> On Fri, Feb 05, 2021 at 04:44:03AM +0000, Jing Zhang wrote:
+> > Remove redundant check for CPU feature S2FWB in dcache flush code
+> > to save some CPU cycles for every memslot flush and unmapping.
+> > And move the S2FWB check to outer functions to avoid future
+> > redundancy and keep consistent with other usage like in
+> > access_dcsw and kvm_arch_prepare_memory_region.
+> >
+> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> > ---
+> >  arch/arm64/kvm/hyp/pgtable.c | 9 ++-------
+> >  arch/arm64/kvm/mmu.c         | 3 ++-
+> >  2 files changed, 4 insertions(+), 8 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> > index bdf8e55ed308..afd57564b1cb 100644
+> > --- a/arch/arm64/kvm/hyp/pgtable.c
+> > +++ b/arch/arm64/kvm/hyp/pgtable.c
+> > @@ -642,9 +642,6 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+> >
+> >  static void stage2_flush_dcache(void *addr, u64 size)
+> >  {
+> > -     if (cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
+> > -             return;
+> > -
+> >       __flush_dcache_area(addr, size);
+> >  }
+> >
+> > @@ -670,7 +667,8 @@ static int stage2_unmap_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+> >
+> >               if (page_count(virt_to_page(childp)) != 1)
+> >                       return 0;
+> > -     } else if (stage2_pte_cacheable(pte)) {
+> > +     } else if (stage2_pte_cacheable(pte) &&
+> > +                     !cpus_have_const_cap(ARM64_HAS_STAGE2_FWB)) {
+> >               need_flush = true;
+> >       }
+> >
+> > @@ -846,9 +844,6 @@ int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size)
+> >               .flags  = KVM_PGTABLE_WALK_LEAF,
+> >       };
+> >
+> > -     if (cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
+> > -             return 0;
+> > -
+> >       return kvm_pgtable_walk(pgt, addr, size, &walker);
+> >  }
+>
+> I think we should leave pgtable.c as it is: there's no benefit from this
+> change on the unmap path, and the other path involves the case where the
+> caller has asked for a flush and we can elide it.
+Agreed.
+>
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index 7d2257cc5438..53130ed23304 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -1458,7 +1458,8 @@ void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled)
+> >        * If switching it off, need to clean the caches.
+> >        * Clean + invalidate does the trick always.
+> >        */
+> > -     if (now_enabled != was_enabled)
+> > +     if (now_enabled != was_enabled &&
+> > +                     !cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
+> >               stage2_flush_vm(vcpu->kvm);
+>
+> This change looks fine, but I don't grok the justification in your follow-up
+> email. You say:
+>
+>   | The saving is from the code path of memslot flush. The S2FWB check was
+>   | in stage2_flush_dcache, in which case, for a memslot flush, the check
+>   | was done for every page.
+>
+> but I don't see where this is called for every page. It looks to me like it's
+> called for every pgd in the range, which is a very different kettle of frogs.
+>
+> What am I missing?
+You are right. It is called for every pgd in the range instead of for
+every page.
+>
+> Will
 
-Is there any DT binding equivalent?
-
- The guest creates that mapping at stage-1, and that's it.
-> Unless I overlooked something we'd only reuse existing infrastructure and
-> avoid the SET_MSI_BINDING interface.
-
-Yes at first glance I think this should work. The guest SMMU driver will
-continue allocating IOVA for MSIs but I think that's not an issue as
-they won't be used.
-
-For the SMMU case this makes the guest behavior different from the
-baremetal one though. Typically you will never get any S1 fault. Also
-the S1 mapping is static and direct.
-
-I will prototype this too.
-
-Thanks
-
-Eric
-> 
-> Thanks,
-> Jean
-> 
-
+Thanks,
+Jing
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
