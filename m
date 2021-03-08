@@ -2,61 +2,69 @@ Return-Path: <SRS0=mzoY=IG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DFAFC433E0
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Mar 2021 15:03:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F15FC433E0
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Mar 2021 16:35:09 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D686D65220
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Mar 2021 15:03:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D686D65220
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 884EC6522B
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Mar 2021 16:35:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 884EC6522B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 39C344B325;
-	Mon,  8 Mar 2021 10:03:37 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0ADED4B5FA;
+	Mon,  8 Mar 2021 11:35:08 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 8XqOe8hWdV8A; Mon,  8 Mar 2021 10:03:35 -0500 (EST)
+	with ESMTP id 2U+yETcM2Jv1; Mon,  8 Mar 2021 11:35:05 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E36574B3C2;
-	Mon,  8 Mar 2021 10:03:35 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BB30D4B5BC;
+	Mon,  8 Mar 2021 11:35:05 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 085B14B325
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Mar 2021 10:03:35 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E6EF34B5BC
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Mar 2021 11:35:03 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id D6dqEL3ZwhmA for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Mar 2021 10:03:33 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CA054B2B4
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Mar 2021 10:03:33 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0A77431B;
- Mon,  8 Mar 2021 07:03:33 -0800 (PST)
-Received: from C02TD0UTHF1T.local (unknown [10.57.51.12])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 918373F73C;
- Mon,  8 Mar 2021 07:03:30 -0800 (PST)
-Date: Mon, 8 Mar 2021 15:03:20 +0000
-From: Mark Rutland <mark.rutland@arm.com>
-To: Will Deacon <will@kernel.org>
-Subject: Re: [PATCH] arm64/mm: Fix __enable_mmu() for new TGRAN range values
-Message-ID: <20210308150232.GA14159@C02TD0UTHF1T.local>
-References: <1614954969-14338-1-git-send-email-anshuman.khandual@arm.com>
- <20210305145111.GA78884@C02TD0UTHF1T.local>
- <1f339512-34ac-9779-e534-bee6698b99aa@arm.com>
- <20210308133053.GA26128@willie-the-truck>
+ with ESMTP id 19dvph2ZVVn8 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Mar 2021 11:35:02 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5716E4B4FC
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Mar 2021 11:35:02 -0500 (EST)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 4C22365227;
+ Mon,  8 Mar 2021 16:34:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1615221300;
+ bh=/a8q5f9+mgUFjkaLUOWpenLQISW7GAOWifO2INunHhc=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=t5mel8PvzyIhShxoDA+EYt9ooh6ur1wDK1mo2e24m54Zx3cROiOtV0NEhX4/3rRSl
+ /TlHqZIXfRKvEQOHpJErHsLES1zBkjwEoExPy6eht2zFRgBtMpqY5ls2zXbjfMo3Pn
+ C1J3+tV/nHLvKuNv/hMb/40sr4OIwG0Fg7LZfzb5tYfh6bpBtEUMzd9M/XftoY2IeF
+ We5ZbQAUx2VgWHkI4eEwybZK2xxJT+l5Sx7kWe/31C2e2rnE/pjyq0ED4mWGN4oG9d
+ bfqXkhSEHSlb5p42qw8nyzwEf1xamImHeIz7i9CtXfsH5iv6hd5MXuAR14aqd1Wx3E
+ E8wW/7oQAOKsg==
+Date: Mon, 8 Mar 2021 16:34:55 +0000
+From: Will Deacon <will@kernel.org>
+To: Yanan Wang <wangyanan55@huawei.com>
+Subject: Re: [PATCH 2/2] KVM: arm64: Skip the cache flush when coalescing
+ tables into a block
+Message-ID: <20210308163454.GA26561@willie-the-truck>
+References: <20210125141044.380156-1-wangyanan55@huawei.com>
+ <20210125141044.380156-3-wangyanan55@huawei.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20210308133053.GA26128@willie-the-truck>
-Cc: linux-efi@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Anshuman Khandual <anshuman.khandual@arm.com>, linux-kernel@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, Catalin Marinas <catalin.marinas@arm.com>,
- linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20210125141044.380156-3-wangyanan55@huawei.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,39 +81,61 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Mar 08, 2021 at 01:30:53PM +0000, Will Deacon wrote:
-> On Sun, Mar 07, 2021 at 05:24:21PM +0530, Anshuman Khandual wrote:
-> > On 3/5/21 8:21 PM, Mark Rutland wrote:
-> > > On Fri, Mar 05, 2021 at 08:06:09PM +0530, Anshuman Khandual wrote:
-
-> > >> +#define ID_AA64MMFR0_TGRAN_2_SUPPORTED_DEFAULT	0x0
-> > >> +#define ID_AA64MMFR0_TGRAN_2_SUPPORTED_NONE	0x1
-> > >> +#define ID_AA64MMFR0_TGRAN_2_SUPPORTED_MIN	0x2
-> > >> +#define ID_AA64MMFR0_TGRAN_2_SUPPORTED_MAX	0x7
-> > >
-> > > The TGRAN2 fields doesn't quite follow the usual ID scheme rules, so how
-> > > do we deteremine the max value? Does the ARM ARM say anything in
-> > > particular about them, like we do for some of the PMU ID fields?
-> > 
-> > Did not find anything in ARM ARM, regarding what scheme TGRAN2 fields
-> > actually follow. I had arrived at more restrictive 0x7 value, like the
-> > usual signed fields as the TGRAN4 fields definitely do not follow the
-> > unsigned ID scheme. Would restricting max value to 0x3 (i.e LPA2) be a
-> > better option instead ?
+On Mon, Jan 25, 2021 at 10:10:44PM +0800, Yanan Wang wrote:
+> After dirty-logging is stopped for a VM configured with huge mappings,
+> KVM will recover the table mappings back to block mappings. As we only
+> replace the existing page tables with a block entry and the cacheability
+> has not been changed, the cache maintenance opreations can be skipped.
 > 
-> I don't think it helps much, as TGRAN64_2 doesn't even define 0x3.
+> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
+> ---
+>  arch/arm64/kvm/mmu.c | 12 +++++++++---
+>  1 file changed, 9 insertions(+), 3 deletions(-)
 > 
-> So I think this patch is probably the best we can do, but the Arm ARM could
-> really do with describing the scheme here.
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 8e8549ea1d70..37b427dcbc4f 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -744,7 +744,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  {
+>  	int ret = 0;
+>  	bool write_fault, writable, force_pte = false;
+> -	bool exec_fault;
+> +	bool exec_fault, adjust_hugepage;
+>  	bool device = false;
+>  	unsigned long mmu_seq;
+>  	struct kvm *kvm = vcpu->kvm;
+> @@ -872,12 +872,18 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  		mark_page_dirty(kvm, gfn);
+>  	}
+>  
+> -	if (fault_status != FSC_PERM && !device)
+> +	/*
+> +	 * There is no necessity to perform cache maintenance operations if we
+> +	 * will only replace the existing table mappings with a block mapping.
+> +	 */
+> +	adjust_hugepage = fault_granule < vma_pagesize ? true : false;
 
-I agree, and I've filed a ticket internally to try to get this cleaned
-up.
+nit: you don't need the '? true : false' part
 
-I suspect that the answer is that these are basically unsigned, with
-0x2-0xf indicating presence, but I can't guarantee that.
+That said, your previous patch checks for 'fault_granule > vma_pagesize',
+so I'm not sure the local variable helps all that much here because it
+obscures the size checks in my opinion. It would be more straight-forward
+if we could structure the logic as:
 
-Thanks,
-Mark.
+
+	if (fault_granule < vma_pagesize) {
+
+	} else if (fault_granule > vma_page_size) {
+
+	} else {
+
+	}
+
+With some comments describing what we can infer about the memcache and cache
+maintenance requirements for each case.
+
+Will
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
