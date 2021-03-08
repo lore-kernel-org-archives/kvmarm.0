@@ -2,63 +2,61 @@ Return-Path: <SRS0=mzoY=IG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55A9AC433E0
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Mar 2021 16:52:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8466FC433DB
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Mar 2021 17:15:58 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id AD4386522C
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Mar 2021 16:52:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD4386522C
+	by mail.kernel.org (Postfix) with ESMTP id CD3B06522C
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Mar 2021 17:15:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD3B06522C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1993B4B6AC;
-	Mon,  8 Mar 2021 11:52:57 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 450064B70C;
+	Mon,  8 Mar 2021 12:15:57 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JCyBo3gKoZE4; Mon,  8 Mar 2021 11:52:55 -0500 (EST)
+	with ESMTP id o0HnKUPMSVT1; Mon,  8 Mar 2021 12:15:56 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 77C414B6AF;
-	Mon,  8 Mar 2021 11:52:55 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 112864B6AF;
+	Mon,  8 Mar 2021 12:15:56 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D58D54B6A3
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Mar 2021 11:52:53 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F57A4B6AF
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Mar 2021 12:15:54 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id J9tx05+UYDM1 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Mar 2021 11:52:51 -0500 (EST)
+ with ESMTP id FVNFf1cV7QtP for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Mar 2021 12:15:53 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2CF034B690
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Mar 2021 11:52:51 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 36D084B638
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Mar 2021 12:15:53 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 25D24D6E;
- Mon,  8 Mar 2021 08:52:50 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C3D7BD6E;
+ Mon,  8 Mar 2021 09:15:52 -0800 (PST)
 Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A83C93F71B;
- Mon,  8 Mar 2021 08:52:48 -0800 (PST)
-Subject: Re: [PATCH] KVM: arm64: Ensure I-cache isolation between vcpus of a
- same VM
-To: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>
-References: <20210303164505.68492-1-maz@kernel.org>
- <20210305190708.GL23855@arm.com> <877dmksgaw.wl-maz@kernel.org>
- <20210306141546.GB2932@arm.com>
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BFE243F71B;
+ Mon,  8 Mar 2021 09:15:51 -0800 (PST)
+Subject: Re: [PATCH kvmtool v2 06/22] hw/i8042: Refactor trap handler
+To: Andre Przywara <andre.przywara@arm.com>, Will Deacon <will@kernel.org>,
+ Julien Thierry <julien.thierry.kdev@gmail.com>
+References: <20210225005915.26423-1-andre.przywara@arm.com>
+ <20210225005915.26423-7-andre.przywara@arm.com>
 From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <db428d01-594c-edc3-8d4f-75061d22c3ef@arm.com>
-Date: Mon, 8 Mar 2021 16:53:09 +0000
+Message-ID: <e31b55d5-d61a-968f-9387-d0c3bbd09e2e@arm.com>
+Date: Mon, 8 Mar 2021 17:16:16 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.8.0
 MIME-Version: 1.0
-In-Reply-To: <20210306141546.GB2932@arm.com>
+In-Reply-To: <20210225005915.26423-7-andre.przywara@arm.com>
 Content-Language: en-US
-Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
- linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
- kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <maz@kernel.org>, Sami Mujawar <sami.mujawar@arm.com>,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -75,76 +73,133 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hello,
+Hi Andre,
 
-It's not clear to me why this patch is needed. If one VCPU in the VM is generating
-code, is it not the software running in the VM responsible for keeping track of
-the MMU state of the other VCPUs and making sure the new code is executed
-correctly? Why should KVM get involved?
-
-I don't see how this is different than running on bare metal (no hypervisor), and
-one CPU with the MMU on generates code that another CPU with the MMU off must execute.
-
-Some comments below.
-
-On 3/6/21 2:15 PM, Catalin Marinas wrote:
-> On Sat, Mar 06, 2021 at 10:54:47AM +0000, Marc Zyngier wrote:
->> On Fri, 05 Mar 2021 19:07:09 +0000,
->> Catalin Marinas <catalin.marinas@arm.com> wrote:
->>> On Wed, Mar 03, 2021 at 04:45:05PM +0000, Marc Zyngier wrote:
->>>> It recently became apparent that the ARMv8 architecture has interesting
->>>> rules regarding attributes being used when fetching instructions
->>>> if the MMU is off at Stage-1.
->>>>
->>>> In this situation, the CPU is allowed to fetch from the PoC and
->>>> allocate into the I-cache (unless the memory is mapped with
->>>> the XN attribute at Stage-2).
->>> Digging through the ARM ARM is hard. Do we have this behaviour with FWB
->>> as well?
->> The ARM ARM doesn't seem to mention FWB at all when it comes to
->> instruction fetch, which is sort of expected as it only covers the
->> D-side. I *think* we could sidestep this when CTR_EL0.DIC is set
->> though, as the I-side would then snoop the D-side.
-> Not sure this helps. CTR_EL0.DIC refers to the need for maintenance to
-> PoU while the SCTLR_EL1.M == 0 causes the I-cache to fetch from PoC. I
-> don't think I-cache snooping the D-cache would happen to the PoU when
-> the S1 MMU is off.
-
-FEAT_FWB requires that CLIDR_EL1.{LoUIS, LoUU} = {0, 0} which means that no dcache
-clean is required for instruction to data coherence (page D13-3086). I interpret
-that as saying that with FEAT_FWB, CTR_EL0.IDC is effectively 1, which means that
-dcache clean is not required for instruction generation, and icache invalidation
-is required only if CTR_EL0.DIC = 0 (according to B2-158).
-
-> My reading of D4.4.4 is that when SCTLR_EL1.M == 0 both I and D accesses
-> are Normal Non-cacheable with a note in D4.4.6 that Non-cacheable
-> accesses may be held in the I-cache.
-
-Nitpicking, but SCTLR_EL1.M == 0 and SCTLR_EL1.I == 1 means that instruction
-fetches are to Normal Cacheable, Inner and Outer Read-Allocate memory (ARM DDI
-0487G.a, pages D5-2709 and indirectly at D13-3586).
-
-Like you've pointed out, as mentioned in D4.4.6, it is always possible that
-instruction fetches are held in the instruction cache, regardless of the state of
-the SCTLR_EL1.M bit.
-
-> The FWB rules on combining S1 and S2 says that Normal Non-cacheable at
-> S1 is "upgraded" to cacheable. This should happen irrespective of
-> whether the S1 MMU is on or off and should apply to both I and D
-> accesses (since it does not explicitly says). So I think we could skip
-> this IC IALLU when FWB is present.
+On 2/25/21 12:58 AM, Andre Przywara wrote:
+> With the planned retirement of the special ioport emulation code, we
+> need to provide an emulation function compatible with the MMIO
+> prototype.
 >
-> The same logic should apply when the VMM copies the VM text. With FWB,
-> we probably only need D-cache maintenance to PoU and only if
-> CTR_EL0.IDC==0. I haven't checked what the code currently does.
+> Adjust the trap handler to use that new function, and provide shims to
+> implement the old ioport interface, for now.
+>
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+>  hw/i8042.c | 68 +++++++++++++++++++++++++++---------------------------
+>  1 file changed, 34 insertions(+), 34 deletions(-)
+>
+> diff --git a/hw/i8042.c b/hw/i8042.c
+> index 7d1f9772..ab866662 100644
+> --- a/hw/i8042.c
+> +++ b/hw/i8042.c
+> @@ -292,52 +292,52 @@ static void kbd_reset(void)
+>  	};
+>  }
+>  
+> -/*
+> - * Called when the OS has written to one of the keyboard's ports (0x60 or 0x64)
+> - */
+> -static bool kbd_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
+> +static void kbd_io(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len,
+> +		   u8 is_write, void *ptr)
+>  {
+> -	switch (port) {
+> -	case I8042_COMMAND_REG: {
+> -		u8 value = kbd_read_status();
+> -		ioport__write8(data, value);
+> +	u8 value;
+> +
+> +	if (is_write)
+> +		value = ioport__read8(data);
+> +
+> +	switch (addr) {
+> +	case I8042_COMMAND_REG:
+> +		if (is_write)
+> +			kbd_write_command(vcpu->kvm, value);
+> +		else
+> +			value = kbd_read_status();
+>  		break;
+> -	}
+> -	case I8042_DATA_REG: {
+> -		u8 value = kbd_read_data();
+> -		ioport__write8(data, value);
+> +	case I8042_DATA_REG:
+> +		if (is_write)
+> +			kbd_write_data(value);
+> +		else
+> +			value = kbd_read_data();
+>  		break;
+> -	}
+> -	case I8042_PORT_B_REG: {
+> -		ioport__write8(data, 0x20);
+> +	case I8042_PORT_B_REG:
+> +		if (!is_write)
+> +			value = 0x20;
+>  		break;
+> -	}
+>  	default:
+> -		return false;
+> +		return;
+>  	}
+>  
+> +	if (!is_write)
+> +		ioport__write8(data, value);
+> +}
+> +
+> +/*
+> + * Called when the OS has written to one of the keyboard's ports (0x60 or 0x64)
+> + */
+> +static bool kbd_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
+> +{
+> +	kbd_io(vcpu, port, data, size, 0, NULL);
+> +
+>  	return true;
+>  }
+>  
+>  static bool kbd_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
+>  {
+> -	switch (port) {
+> -	case I8042_COMMAND_REG: {
+> -		u8 value = ioport__read8(data);
+> -		kbd_write_command(vcpu->kvm, value);
+> -		break;
+> -	}
+> -	case I8042_DATA_REG: {
+> -		u8 value = ioport__read8(data);
+> -		kbd_write_data(value);
+> -		break;
+> -	}
+> -	case I8042_PORT_B_REG: {
+> -		break;
+> -	}
+> -	default:
+> -		return false;
+> -	}
+> +	kbd_io(vcpu, port, data, size, 1, NULL);
 
-When FEAT_FWB, CTR_EL0.IDC is effectively 1 (see above), so we don't need a dcache
-clean in this case.
+I think I made a mistake when I suggested that is_write should 0 or 1. I followed
+the emulation path in kvmtool and it turns out that is_write is supposed to
+represent the field with the same name from the anonymous struct mmio from struct
+kvm_run (more precisely, the struct defined at line 4980 from
+Documentation/virt/kvm/api.rst, Linux tag v5.11). I think the is_write field is
+declared in kvm_run as an u8 for compatibility with an userspace which might not
+know about the bool type. is_write is also treated as a bool in the MMIO exit path
+by KVM (see arch/arm64/kvm/mmio.c::io_mem_abort()).
+
+kvmtool assigns is_write a boolean value everywhere except in this file, would you
+mind changing it back to a bool? Sorry for suggesting the wrong thing.
+
+I checked that the code remains functionally identical, with the above change:
+
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
 Thanks,
 
 Alex
 
+>  
+>  	return true;
+>  }
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
