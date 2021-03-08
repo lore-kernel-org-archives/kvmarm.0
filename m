@@ -2,81 +2,78 @@ Return-Path: <SRS0=mzoY=IG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F261C433E0
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Mar 2021 18:43:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 662F6C433E0
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Mar 2021 20:03:51 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C928A6526C
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Mar 2021 18:43:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C928A6526C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id BDC3264F91
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Mar 2021 20:03:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDC3264F91
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 493E54B478;
-	Mon,  8 Mar 2021 13:43:58 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5BC2C4B1EA;
+	Mon,  8 Mar 2021 15:03:50 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id WUtz5SSAo16k; Mon,  8 Mar 2021 13:43:56 -0500 (EST)
+	with ESMTP id qz7bYjEkNurh; Mon,  8 Mar 2021 15:03:48 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D2E684B419;
-	Mon,  8 Mar 2021 13:43:56 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 889654B1EB;
+	Mon,  8 Mar 2021 15:03:48 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BF684B3D2
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Mar 2021 13:43:55 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ADB3F4B1FC
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Mar 2021 15:03:47 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id No5NmwW-RBO6 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Mar 2021 13:43:53 -0500 (EST)
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com
- [209.85.167.48])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D20164B108
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Mar 2021 13:43:52 -0500 (EST)
-Received: by mail-lf1-f48.google.com with SMTP id u4so22697429lfs.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 08 Mar 2021 10:43:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=oWJi9TTK3RpTTf/7yDpb3oKd8vTmZ+hAd/ZIvo399K0=;
- b=VDtPSQXlEcN+q/UYFT4QEKwBkymIGMbNymOpTZqlJp1yVZszjOrHhcSGx9SoKLjNHv
- vjU+4cVg3NgBi4iN4aWrHKfSupE3huSJ5oxnbVMdLKVlNtdW7gH3r0pnlQxXtvwBLzma
- 0l0hIsr07cNuqnswsLmBM3Gauey8bhBHBunRF28DNV48YBMtjmJxqtS5uhAB61E7/H3P
- HqbTxcX1jXT/pG138l1FiXJJZbp3yf8SWcFeMsF401pmqJ+ZFiCgtQLaG3y/ZT6FQa76
- yKWLOvST0TKWWT0+pS58+dcMSWRgqN60nODXwRKRF6U6gKoC4p/ywvSRi21HfY0+TwMJ
- qXCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=oWJi9TTK3RpTTf/7yDpb3oKd8vTmZ+hAd/ZIvo399K0=;
- b=fxN0r+YVTlyJAEv2HvKl1KrhBZq40wF//htIj+D+OGXBlu1QGxpYkA1UW1v+EfXy0g
- 3g9SpbgnIJC5Z2ty+ilmCtB/KWDHwsEyy4WezdsmGQMRiSICmOQ8zTdps3MDx7S8PPcx
- 2xGraMiO5SMW9dr5I99osxef/FD/zVE5QHYdw6C1DCFhmTAtE9P6weJDozL6KtqKTUuk
- Ku6LIkQ4oCgG/H/BXgXksx4409sEFe+EkZBKEP+By3nhdVPsW7wtS1Q2AToXiERDePLU
- Gv3huN5naij3XTYBv14xtXPDeO12wtXIdpkhvL8h2RdbHgKFL++sOCVDJYnavUTT9wPl
- 1vfw==
-X-Gm-Message-State: AOAM532XdJyph/lOE6AaV/O35YEZJOR7/RX4Dd5yOwJMerzNeWokMe7o
- sunK6hWHwzCi2PbHjz0cemvUf+XrM8ZP1qO8GrtucQ==
-X-Google-Smtp-Source: ABdhPJxNiNBgvk6wXCSYzNgULfRUBJt1pMh/Hd/bhT6XXmFMIkmzLRDwOxVJYiu9798wXBq4uKOEtpr5D7uRIIY6MY4=
-X-Received: by 2002:ac2:5ca7:: with SMTP id e7mr15135284lfq.646.1615229030939; 
- Mon, 08 Mar 2021 10:43:50 -0800 (PST)
-MIME-Version: 1.0
-References: <20210205044403.1559010-1-jingzhangos@google.com>
- <20210308164902.GA26772@willie-the-truck>
-In-Reply-To: <20210308164902.GA26772@willie-the-truck>
-From: Jing Zhang <jingzhangos@google.com>
-Date: Mon, 8 Mar 2021 12:43:40 -0600
-Message-ID: <CAAdAUtjhye2f5uHQjmYdfU8HD+c0WvxvbaLg3AKzu28tEDkDhQ@mail.gmail.com>
-Subject: Re: [PATCH] KVM: arm64: Remove redundant check for S2FWB
-To: Will Deacon <will@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
- Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu
+ with ESMTP id gGErnK20eL0b for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Mar 2021 15:03:43 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B9A534B1EA
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Mar 2021 15:03:43 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 45A0E64F91;
+ Mon,  8 Mar 2021 20:03:42 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1lJM6O-000Pct-4I; Mon, 08 Mar 2021 20:03:40 +0000
+Date: Mon, 08 Mar 2021 20:03:39 +0000
+Message-ID: <8735x5s99g.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH] KVM: arm64: Ensure I-cache isolation between vcpus of a
+ same VM
+In-Reply-To: <db428d01-594c-edc3-8d4f-75061d22c3ef@arm.com>
+References: <20210303164505.68492-1-maz@kernel.org>
+ <20210305190708.GL23855@arm.com> <877dmksgaw.wl-maz@kernel.org>
+ <20210306141546.GB2932@arm.com>
+ <db428d01-594c-edc3-8d4f-75061d22c3ef@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, catalin.marinas@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, kernel-team@android.com, james.morse@arm.com,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, will@kernel.org,
+ mark.rutland@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, kernel-team@android.com,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,93 +90,103 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Will,
+Hi Alex,
 
-On Mon, Mar 8, 2021 at 10:49 AM Will Deacon <will@kernel.org> wrote:
->
-> On Fri, Feb 05, 2021 at 04:44:03AM +0000, Jing Zhang wrote:
-> > Remove redundant check for CPU feature S2FWB in dcache flush code
-> > to save some CPU cycles for every memslot flush and unmapping.
-> > And move the S2FWB check to outer functions to avoid future
-> > redundancy and keep consistent with other usage like in
-> > access_dcsw and kvm_arch_prepare_memory_region.
+On Mon, 08 Mar 2021 16:53:09 +0000,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> Hello,
+> 
+> It's not clear to me why this patch is needed. If one VCPU in the VM is generating
+> code, is it not the software running in the VM responsible for keeping track of
+> the MMU state of the other VCPUs and making sure the new code is executed
+> correctly? Why should KVM get involved?
+> 
+> I don't see how this is different than running on bare metal (no
+> hypervisor), and one CPU with the MMU on generates code that another
+> CPU with the MMU off must execute.
+
+The difference is that so far, we have always considered i-caches to
+be private to each CPU. With a hypervisor that allows migration of
+vcpus from one physical CPU to another, the i-cache isn't private
+anymore from the perspective of the vcpus.
+
+> 
+> Some comments below.
+> 
+> On 3/6/21 2:15 PM, Catalin Marinas wrote:
+> > On Sat, Mar 06, 2021 at 10:54:47AM +0000, Marc Zyngier wrote:
+> >> On Fri, 05 Mar 2021 19:07:09 +0000,
+> >> Catalin Marinas <catalin.marinas@arm.com> wrote:
+> >>> On Wed, Mar 03, 2021 at 04:45:05PM +0000, Marc Zyngier wrote:
+> >>>> It recently became apparent that the ARMv8 architecture has interesting
+> >>>> rules regarding attributes being used when fetching instructions
+> >>>> if the MMU is off at Stage-1.
+> >>>>
+> >>>> In this situation, the CPU is allowed to fetch from the PoC and
+> >>>> allocate into the I-cache (unless the memory is mapped with
+> >>>> the XN attribute at Stage-2).
+> >>> Digging through the ARM ARM is hard. Do we have this behaviour with FWB
+> >>> as well?
+> >> The ARM ARM doesn't seem to mention FWB at all when it comes to
+> >> instruction fetch, which is sort of expected as it only covers the
+> >> D-side. I *think* we could sidestep this when CTR_EL0.DIC is set
+> >> though, as the I-side would then snoop the D-side.
+> > Not sure this helps. CTR_EL0.DIC refers to the need for maintenance to
+> > PoU while the SCTLR_EL1.M == 0 causes the I-cache to fetch from PoC. I
+> > don't think I-cache snooping the D-cache would happen to the PoU when
+> > the S1 MMU is off.
+> 
+> FEAT_FWB requires that CLIDR_EL1.{LoUIS, LoUU} = {0, 0} which means
+> that no dcache clean is required for instruction to data coherence
+> (page D13-3086). I interpret that as saying that with FEAT_FWB,
+> CTR_EL0.IDC is effectively 1, which means that dcache clean is not
+> required for instruction generation, and icache invalidation is
+> required only if CTR_EL0.DIC = 0 (according to B2-158).
+> 
+> > My reading of D4.4.4 is that when SCTLR_EL1.M == 0 both I and D accesses
+> > are Normal Non-cacheable with a note in D4.4.6 that Non-cacheable
+> > accesses may be held in the I-cache.
+> 
+> Nitpicking, but SCTLR_EL1.M == 0 and SCTLR_EL1.I == 1 means that
+> instruction fetches are to Normal Cacheable, Inner and Outer
+> Read-Allocate memory (ARM DDI 0487G.a, pages D5-2709 and indirectly
+> at D13-3586).
+
+I think that's the allocation in unified caches, and not necessarily
+the i-cache, given that it also mention things such as "Inner
+Write-Through", which makes no sense for the i-cache.
+
+> Like you've pointed out, as mentioned in D4.4.6, it is always
+> possible that instruction fetches are held in the instruction cache,
+> regardless of the state of the SCTLR_EL1.M bit.
+
+Exactly, and that's what breaks things.
+
+> > The FWB rules on combining S1 and S2 says that Normal Non-cacheable at
+> > S1 is "upgraded" to cacheable. This should happen irrespective of
+> > whether the S1 MMU is on or off and should apply to both I and D
+> > accesses (since it does not explicitly says). So I think we could skip
+> > this IC IALLU when FWB is present.
 > >
-> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> > ---
-> >  arch/arm64/kvm/hyp/pgtable.c | 9 ++-------
-> >  arch/arm64/kvm/mmu.c         | 3 ++-
-> >  2 files changed, 4 insertions(+), 8 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > index bdf8e55ed308..afd57564b1cb 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -642,9 +642,6 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
-> >
-> >  static void stage2_flush_dcache(void *addr, u64 size)
-> >  {
-> > -     if (cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
-> > -             return;
-> > -
-> >       __flush_dcache_area(addr, size);
-> >  }
-> >
-> > @@ -670,7 +667,8 @@ static int stage2_unmap_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
-> >
-> >               if (page_count(virt_to_page(childp)) != 1)
-> >                       return 0;
-> > -     } else if (stage2_pte_cacheable(pte)) {
-> > +     } else if (stage2_pte_cacheable(pte) &&
-> > +                     !cpus_have_const_cap(ARM64_HAS_STAGE2_FWB)) {
-> >               need_flush = true;
-> >       }
-> >
-> > @@ -846,9 +844,6 @@ int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size)
-> >               .flags  = KVM_PGTABLE_WALK_LEAF,
-> >       };
-> >
-> > -     if (cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
-> > -             return 0;
-> > -
-> >       return kvm_pgtable_walk(pgt, addr, size, &walker);
-> >  }
->
-> I think we should leave pgtable.c as it is: there's no benefit from this
-> change on the unmap path, and the other path involves the case where the
-> caller has asked for a flush and we can elide it.
-Agreed.
->
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index 7d2257cc5438..53130ed23304 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -1458,7 +1458,8 @@ void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled)
-> >        * If switching it off, need to clean the caches.
-> >        * Clean + invalidate does the trick always.
-> >        */
-> > -     if (now_enabled != was_enabled)
-> > +     if (now_enabled != was_enabled &&
-> > +                     !cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
-> >               stage2_flush_vm(vcpu->kvm);
->
-> This change looks fine, but I don't grok the justification in your follow-up
-> email. You say:
->
->   | The saving is from the code path of memslot flush. The S2FWB check was
->   | in stage2_flush_dcache, in which case, for a memslot flush, the check
->   | was done for every page.
->
-> but I don't see where this is called for every page. It looks to me like it's
-> called for every pgd in the range, which is a very different kettle of frogs.
->
-> What am I missing?
-You are right. It is called for every pgd in the range instead of for
-every page.
->
-> Will
+> > The same logic should apply when the VMM copies the VM text. With FWB,
+> > we probably only need D-cache maintenance to PoU and only if
+> > CTR_EL0.IDC==0. I haven't checked what the code currently does.
+> 
+> When FEAT_FWB, CTR_EL0.IDC is effectively 1 (see above), so we don't
+> need a dcache clean in this case.
+
+But that isn't what concerns me. FWB is exclusively documented in
+terms of d-cache, and doesn't describe how that affects the
+instruction fetch (which is why I'm reluctant to attribute any effect
+to it).
 
 Thanks,
-Jing
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
