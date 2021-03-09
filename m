@@ -2,61 +2,61 @@ Return-Path: <SRS0=aIiX=IH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DA94C433E0
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Mar 2021 14:52:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 424D3C433E0
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Mar 2021 15:12:49 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D016565244
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Mar 2021 14:52:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D016565244
+	by mail.kernel.org (Postfix) with ESMTP id 90D676526E
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Mar 2021 15:12:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90D676526E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 39BF24B33D;
-	Tue,  9 Mar 2021 09:52:16 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DB0794B46B;
+	Tue,  9 Mar 2021 10:12:47 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id zfDAjzgz2Euy; Tue,  9 Mar 2021 09:52:12 -0500 (EST)
+	with ESMTP id Jq4pEGe6eGcV; Tue,  9 Mar 2021 10:12:46 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 728224B3F9;
-	Tue,  9 Mar 2021 09:52:12 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 68FBE4B41C;
+	Tue,  9 Mar 2021 10:12:46 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D92204B3F9
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Mar 2021 09:52:10 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7CA7E4B3B6
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Mar 2021 10:12:45 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 47AOGPIsFll1 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 Mar 2021 09:52:06 -0500 (EST)
+ with ESMTP id H7uZq531i0hS for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Mar 2021 10:12:44 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E39E4B33D
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Mar 2021 09:52:06 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 03A0F4B376
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Mar 2021 10:12:43 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3A04C1042;
- Tue,  9 Mar 2021 06:52:06 -0800 (PST)
-Received: from [192.168.0.130] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7EA983F71B;
- Tue,  9 Mar 2021 06:52:02 -0800 (PST)
-Subject: Re: [PATCH] arm64/mm: Fix __enable_mmu() for new TGRAN range values
-To: Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>
-References: <1614954969-14338-1-git-send-email-anshuman.khandual@arm.com>
- <8735x5zozr.wl-maz@kernel.org> <20210309140527.GB28395@willie-the-truck>
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-Message-ID: <718f4b0c-20d9-8588-1268-e5b26690899d@arm.com>
-Date: Tue, 9 Mar 2021 20:22:38 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8D5FE1042;
+ Tue,  9 Mar 2021 07:12:43 -0800 (PST)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 973EC3F71B;
+ Tue,  9 Mar 2021 07:12:42 -0800 (PST)
+Subject: Re: [PATCH kvmtool v2 19/22] Remove ioport specific routines
+To: Andre Przywara <andre.przywara@arm.com>, Will Deacon <will@kernel.org>,
+ Julien Thierry <julien.thierry.kdev@gmail.com>
+References: <20210225005915.26423-1-andre.przywara@arm.com>
+ <20210225005915.26423-20-andre.przywara@arm.com>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <d2fff6fe-cd72-de50-0d20-2bf96338677c@arm.com>
+Date: Tue, 9 Mar 2021 15:13:08 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-In-Reply-To: <20210309140527.GB28395@willie-the-truck>
+In-Reply-To: <20210225005915.26423-20-andre.przywara@arm.com>
 Content-Language: en-US
-Cc: linux-efi@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <maz@kernel.org>, Sami Mujawar <sami.mujawar@arm.com>,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,72 +73,325 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+Hi Andre,
 
+On 2/25/21 12:59 AM, Andre Przywara wrote:
+> Now that all users of the dedicated ioport trap handler interface are
+> gone, we can retire the code associated with it.
+>
+> This removes ioport.c and ioport.h, along with removing prototypes from
+> other header files.
+>
+> This also transfers the responsibility for port I/O trap handling
+> entirely into the new routine in mmio.c.
 
-On 3/9/21 7:35 PM, Will Deacon wrote:
-> On Mon, Mar 08, 2021 at 02:42:00PM +0000, Marc Zyngier wrote:
->> On Fri, 05 Mar 2021 14:36:09 +0000,
->> Anshuman Khandual <anshuman.khandual@arm.com> wrote:
->>> -	switch (cpuid_feature_extract_unsigned_field(mmfr0, tgran_2)) {
->>> -	default:
->>> -	case 1:
->>> +	tgran_2 = cpuid_feature_extract_unsigned_field(mmfr0, tgran_2_shift);
->>> +	if (tgran_2 == ID_AA64MMFR0_TGRAN_2_SUPPORTED_NONE) {
->>>  		kvm_err("PAGE_SIZE not supported at Stage-2, giving up\n");
->>>  		return -EINVAL;
->>> -	case 0:
->>> +	} else if (tgran_2 == ID_AA64MMFR0_TGRAN_2_SUPPORTED_DEFAULT) {
->>>  		kvm_debug("PAGE_SIZE supported at Stage-2 (default)\n");
->>> -		break;
->>> -	case 2:
->>> +	} else if (tgran_2 >= ID_AA64MMFR0_TGRAN_2_SUPPORTED_MIN &&
->>> +		   tgran_2 <= ID_AA64MMFR0_TGRAN_2_SUPPORTED_MAX) {
->>>  		kvm_debug("PAGE_SIZE supported at Stage-2 (advertised)\n");
->>> -		break;
->>> +	} else {
->>> +		kvm_err("Unsupported value, giving up\n");
->>> +		return -EINVAL;
->>
->> nit: this doesn't say *what* value is unsupported, and I really
->> preferred the switch-case version, such as this:
->>
->> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
->> index 1f22b36a0eff..d267e4b1aec6 100644
->> --- a/arch/arm64/kvm/reset.c
->> +++ b/arch/arm64/kvm/reset.c
->> @@ -312,15 +312,18 @@ int kvm_set_ipa_limit(void)
->>  
->>  	switch (cpuid_feature_extract_unsigned_field(mmfr0, tgran_2)) {
->>  	default:
->> -	case 1:
->> +	case ID_AA64MMFR0_TGRAN_2_SUPPORTED_NONE:
->>  		kvm_err("PAGE_SIZE not supported at Stage-2, giving up\n");
->>  		return -EINVAL;
->> -	case 0:
->> +	case ID_AA64MMFR0_TGRAN_2_SUPPORTED_DEFAULT:
->>  		kvm_debug("PAGE_SIZE supported at Stage-2 (default)\n");
->>  		break;
->> -	case 2:
->> +	case ID_AA64MMFR0_TGRAN_2_SUPPORTED_MIN ... ID_AA64MMFR0_TGRAN_2_SUPPORTED_MAX:
->>  		kvm_debug("PAGE_SIZE supported at Stage-2 (advertised)\n");
->>  		break;
->> +	default:
->> +		kvm_err("Unsupported value for TGRAN_2, giving up\n");
->> +		return -EINVAL;
->>  	}
->>  
->>  	kvm_ipa_limit = id_aa64mmfr0_parange_to_phys_shift(parange);
->>
->>
->> Otherwise:
->>
->> Acked-by: Marc Zyngier <maz@kernel.org>
-> 
-> Anshuman -- please can you spin a v2 with the switch syntax as suggested
-> above by Marc?
+Looks good, and everything compiles on arm64 and x86-64:
 
-Sure, will do.
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
+Thanks,
+
+Alex
+
+>
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+>  Makefile             |   1 -
+>  include/kvm/ioport.h |  27 ------
+>  include/kvm/kvm.h    |   2 -
+>  ioport.c             | 195 -------------------------------------------
+>  mmio.c               |   2 +-
+>  5 files changed, 1 insertion(+), 226 deletions(-)
+>  delete mode 100644 ioport.c
+>
+> diff --git a/Makefile b/Makefile
+> index 35bb1182..94ff5da6 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -56,7 +56,6 @@ OBJS	+= framebuffer.o
+>  OBJS	+= guest_compat.o
+>  OBJS	+= hw/rtc.o
+>  OBJS	+= hw/serial.o
+> -OBJS	+= ioport.o
+>  OBJS	+= irq.o
+>  OBJS	+= kvm-cpu.o
+>  OBJS	+= kvm.o
+> diff --git a/include/kvm/ioport.h b/include/kvm/ioport.h
+> index a61038e2..b6f579cb 100644
+> --- a/include/kvm/ioport.h
+> +++ b/include/kvm/ioport.h
+> @@ -1,13 +1,8 @@
+>  #ifndef KVM__IOPORT_H
+>  #define KVM__IOPORT_H
+>  
+> -#include "kvm/devices.h"
+>  #include "kvm/kvm-cpu.h"
+> -#include "kvm/rbtree-interval.h"
+> -#include "kvm/fdt.h"
+>  
+> -#include <stdbool.h>
+> -#include <limits.h>
+>  #include <asm/types.h>
+>  #include <linux/types.h>
+>  #include <linux/byteorder.h>
+> @@ -15,30 +10,8 @@
+>  /* some ports we reserve for own use */
+>  #define IOPORT_DBG			0xe0
+>  
+> -struct kvm;
+> -
+> -struct ioport {
+> -	struct rb_int_node		node;
+> -	struct ioport_operations	*ops;
+> -	void				*priv;
+> -	struct device_header		dev_hdr;
+> -	u32				refcount;
+> -	bool				remove;
+> -};
+> -
+> -struct ioport_operations {
+> -	bool (*io_in)(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size);
+> -	bool (*io_out)(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size);
+> -};
+> -
+>  void ioport__map_irq(u8 *irq);
+>  
+> -int __must_check ioport__register(struct kvm *kvm, u16 port, struct ioport_operations *ops,
+> -				  int count, void *param);
+> -int ioport__unregister(struct kvm *kvm, u16 port);
+> -int ioport__init(struct kvm *kvm);
+> -int ioport__exit(struct kvm *kvm);
+> -
+>  static inline u8 ioport__read8(u8 *data)
+>  {
+>  	return *data;
+> diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
+> index 306b258a..6c28afa3 100644
+> --- a/include/kvm/kvm.h
+> +++ b/include/kvm/kvm.h
+> @@ -126,8 +126,6 @@ void kvm__irq_line(struct kvm *kvm, int irq, int level);
+>  void kvm__irq_trigger(struct kvm *kvm, int irq);
+>  bool kvm__emulate_io(struct kvm_cpu *vcpu, u16 port, void *data, int direction, int size, u32 count);
+>  bool kvm__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data, u32 len, u8 is_write);
+> -bool kvm__emulate_pio(struct kvm_cpu *vcpu, u16 port, void *data,
+> -		      int direction, int size, u32 count);
+>  int kvm__destroy_mem(struct kvm *kvm, u64 guest_phys, u64 size, void *userspace_addr);
+>  int kvm__register_mem(struct kvm *kvm, u64 guest_phys, u64 size, void *userspace_addr,
+>  		      enum kvm_mem_type type);
+> diff --git a/ioport.c b/ioport.c
+> deleted file mode 100644
+> index ce29e7e7..00000000
+> --- a/ioport.c
+> +++ /dev/null
+> @@ -1,195 +0,0 @@
+> -#include "kvm/ioport.h"
+> -
+> -#include "kvm/kvm.h"
+> -#include "kvm/util.h"
+> -#include "kvm/rbtree-interval.h"
+> -#include "kvm/mutex.h"
+> -
+> -#include <linux/kvm.h>	/* for KVM_EXIT_* */
+> -#include <linux/types.h>
+> -
+> -#include <stdbool.h>
+> -#include <limits.h>
+> -#include <stdlib.h>
+> -#include <stdio.h>
+> -
+> -#define ioport_node(n) rb_entry(n, struct ioport, node)
+> -
+> -static DEFINE_MUTEX(ioport_lock);
+> -
+> -static struct rb_root		ioport_tree = RB_ROOT;
+> -
+> -static struct ioport *ioport_search(struct rb_root *root, u64 addr)
+> -{
+> -	struct rb_int_node *node;
+> -
+> -	node = rb_int_search_single(root, addr);
+> -	if (node == NULL)
+> -		return NULL;
+> -
+> -	return ioport_node(node);
+> -}
+> -
+> -static int ioport_insert(struct rb_root *root, struct ioport *data)
+> -{
+> -	return rb_int_insert(root, &data->node);
+> -}
+> -
+> -static void ioport_remove(struct rb_root *root, struct ioport *data)
+> -{
+> -	rb_int_erase(root, &data->node);
+> -}
+> -
+> -static struct ioport *ioport_get(struct rb_root *root, u64 addr)
+> -{
+> -	struct ioport *ioport;
+> -
+> -	mutex_lock(&ioport_lock);
+> -	ioport = ioport_search(root, addr);
+> -	if (ioport)
+> -		ioport->refcount++;
+> -	mutex_unlock(&ioport_lock);
+> -
+> -	return ioport;
+> -}
+> -
+> -/* Called with ioport_lock held. */
+> -static void ioport_unregister(struct rb_root *root, struct ioport *data)
+> -{
+> -	ioport_remove(root, data);
+> -	free(data);
+> -}
+> -
+> -static void ioport_put(struct rb_root *root, struct ioport *data)
+> -{
+> -	mutex_lock(&ioport_lock);
+> -	data->refcount--;
+> -	if (data->remove && data->refcount == 0)
+> -		ioport_unregister(root, data);
+> -	mutex_unlock(&ioport_lock);
+> -}
+> -
+> -int ioport__register(struct kvm *kvm, u16 port, struct ioport_operations *ops, int count, void *param)
+> -{
+> -	struct ioport *entry;
+> -	int r;
+> -
+> -	entry = malloc(sizeof(*entry));
+> -	if (entry == NULL)
+> -		return -ENOMEM;
+> -
+> -	*entry = (struct ioport) {
+> -		.node		= RB_INT_INIT(port, port + count),
+> -		.ops		= ops,
+> -		.priv		= param,
+> -		/*
+> -		 * Start from 0 because ioport__unregister() doesn't decrement
+> -		 * the reference count.
+> -		 */
+> -		.refcount	= 0,
+> -		.remove		= false,
+> -	};
+> -
+> -	mutex_lock(&ioport_lock);
+> -	r = ioport_insert(&ioport_tree, entry);
+> -	if (r < 0)
+> -		goto out_free;
+> -	mutex_unlock(&ioport_lock);
+> -
+> -	return port;
+> -
+> -out_free:
+> -	free(entry);
+> -	mutex_unlock(&ioport_lock);
+> -	return r;
+> -}
+> -
+> -int ioport__unregister(struct kvm *kvm, u16 port)
+> -{
+> -	struct ioport *entry;
+> -
+> -	mutex_lock(&ioport_lock);
+> -	entry = ioport_search(&ioport_tree, port);
+> -	if (!entry) {
+> -		mutex_unlock(&ioport_lock);
+> -		return -ENOENT;
+> -	}
+> -	/* The same reasoning from kvm__deregister_mmio() applies. */
+> -	if (entry->refcount == 0)
+> -		ioport_unregister(&ioport_tree, entry);
+> -	else
+> -		entry->remove = true;
+> -	mutex_unlock(&ioport_lock);
+> -
+> -	return 0;
+> -}
+> -
+> -static void ioport__unregister_all(void)
+> -{
+> -	struct ioport *entry;
+> -	struct rb_node *rb;
+> -	struct rb_int_node *rb_node;
+> -
+> -	rb = rb_first(&ioport_tree);
+> -	while (rb) {
+> -		rb_node = rb_int(rb);
+> -		entry = ioport_node(rb_node);
+> -		ioport_unregister(&ioport_tree, entry);
+> -		rb = rb_first(&ioport_tree);
+> -	}
+> -}
+> -
+> -static const char *to_direction(int direction)
+> -{
+> -	if (direction == KVM_EXIT_IO_IN)
+> -		return "IN";
+> -	else
+> -		return "OUT";
+> -}
+> -
+> -static void ioport_error(u16 port, void *data, int direction, int size, u32 count)
+> -{
+> -	fprintf(stderr, "IO error: %s port=%x, size=%d, count=%u\n", to_direction(direction), port, size, count);
+> -}
+> -
+> -bool kvm__emulate_io(struct kvm_cpu *vcpu, u16 port, void *data, int direction, int size, u32 count)
+> -{
+> -	struct ioport_operations *ops;
+> -	bool ret = false;
+> -	struct ioport *entry;
+> -	void *ptr = data;
+> -	struct kvm *kvm = vcpu->kvm;
+> -
+> -	entry = ioport_get(&ioport_tree, port);
+> -	if (!entry)
+> -		return kvm__emulate_pio(vcpu, port, data, direction,
+> -					size, count);
+> -
+> -	ops	= entry->ops;
+> -
+> -	while (count--) {
+> -		if (direction == KVM_EXIT_IO_IN && ops->io_in)
+> -				ret = ops->io_in(entry, vcpu, port, ptr, size);
+> -		else if (direction == KVM_EXIT_IO_OUT && ops->io_out)
+> -				ret = ops->io_out(entry, vcpu, port, ptr, size);
+> -
+> -		ptr += size;
+> -	}
+> -
+> -	ioport_put(&ioport_tree, entry);
+> -
+> -	if (ret)
+> -		return true;
+> -
+> -	if (kvm->cfg.ioport_debug)
+> -		ioport_error(port, data, direction, size, count);
+> -
+> -	return !kvm->cfg.ioport_debug;
+> -}
+> -
+> -int ioport__exit(struct kvm *kvm)
+> -{
+> -	ioport__unregister_all();
+> -	return 0;
+> -}
+> -dev_base_exit(ioport__exit);
+> diff --git a/mmio.c b/mmio.c
+> index 75de04ad..9f731dcf 100644
+> --- a/mmio.c
+> +++ b/mmio.c
+> @@ -212,7 +212,7 @@ out:
+>  	return true;
+>  }
+>  
+> -bool kvm__emulate_pio(struct kvm_cpu *vcpu, u16 port, void *data,
+> +bool kvm__emulate_io(struct kvm_cpu *vcpu, u16 port, void *data,
+>  		     int direction, int size, u32 count)
+>  {
+>  	struct mmio_mapping *mmio;
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
