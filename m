@@ -2,78 +2,72 @@ Return-Path: <SRS0=aIiX=IH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 445CEC433E9
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Mar 2021 08:44:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A057C433DB
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Mar 2021 08:49:56 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id AFB7A65266
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Mar 2021 08:44:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFB7A65266
+	by mail.kernel.org (Postfix) with ESMTP id A49C664F30
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Mar 2021 08:49:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A49C664F30
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 331854B341;
-	Tue,  9 Mar 2021 03:44:01 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 316BB4B172;
+	Tue,  9 Mar 2021 03:49:55 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id KNtaoU0IS7+M; Tue,  9 Mar 2021 03:43:59 -0500 (EST)
+	with ESMTP id w8vBpyud80LM; Tue,  9 Mar 2021 03:49:54 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C3104B366;
-	Tue,  9 Mar 2021 03:43:59 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1947B4B178;
+	Tue,  9 Mar 2021 03:49:54 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 666344B341
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Mar 2021 03:43:58 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9214C4B178
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Mar 2021 03:49:52 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id oU6gEV8VGLX1 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 Mar 2021 03:43:57 -0500 (EST)
+ with ESMTP id bFY8xTPapocz for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Mar 2021 03:49:51 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 232104B33D
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Mar 2021 03:43:57 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 83F944B172
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Mar 2021 03:49:51 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id DB0FA6525D;
- Tue,  9 Mar 2021 08:43:55 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id BEF4A64F69;
+ Tue,  9 Mar 2021 08:49:48 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1lJXy5-000UxK-Rc; Tue, 09 Mar 2021 08:43:53 +0000
-Date: Tue, 09 Mar 2021 08:43:52 +0000
-Message-ID: <87y2ewyawn.wl-maz@kernel.org>
+ id 1lJY3m-000V3c-Js; Tue, 09 Mar 2021 08:49:46 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: "wangyanan (Y)" <wangyanan55@huawei.com>
-Subject: Re: [PATCH 2/2] KVM: arm64: Skip the cache flush when coalescing
- tables into a block
-In-Reply-To: <8a947c73-16e9-7ca7-c185-d4c951938505@huawei.com>
-References: <20210125141044.380156-1-wangyanan55@huawei.com>
- <20210125141044.380156-3-wangyanan55@huawei.com>
- <20210308163454.GA26561@willie-the-truck>
- <8a947c73-16e9-7ca7-c185-d4c951938505@huawei.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+To: Sami Tolvanen <samitolvanen@google.com>, James Morse <james.morse@arm.com>
+Subject: Re: [PATCH] KVM: arm64: Don't use cbz/adr with external symbols
+Date: Tue,  9 Mar 2021 08:49:42 +0000
+Message-Id: <161527976376.3767092.1284147699058848340.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.29.2
+In-Reply-To: <20210305202124.3768527-1-samitolvanen@google.com>
+References: <20210305202124.3768527-1-samitolvanen@google.com>
+MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: wangyanan55@huawei.com, will@kernel.org,
- catalin.marinas@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com,
- suzuki.poulose@arm.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, wanghaibin.wang@huawei.com, yuzenghui@huawei.com
+X-SA-Exim-Rcpt-To: samitolvanen@google.com, james.morse@arm.com,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ will@kernel.org, keescook@chromium.org, nathan@kernel.org,
+ ndesaulniers@google.com, linux-kernel@vger.kernel.org, catalin.marinas@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
+Cc: Kees Cook <keescook@chromium.org>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Nick Desaulniers <ndesaulniers@google.com>, linux-kernel@vger.kernel.org,
+ Nathan Chancellor <nathan@kernel.org>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -85,68 +79,35 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gVHVlLCAwOSBNYXIgMjAyMSAwODozNDo0MyArMDAwMCwKIndhbmd5YW5hbiAoWSkiIDx3YW5n
-eWFuYW41NUBodWF3ZWkuY29tPiB3cm90ZToKPiAKPiAKPiBPbiAyMDIxLzMvOSAwOjM0LCBXaWxs
-IERlYWNvbiB3cm90ZToKPiA+IE9uIE1vbiwgSmFuIDI1LCAyMDIxIGF0IDEwOjEwOjQ0UE0gKzA4
-MDAsIFlhbmFuIFdhbmcgd3JvdGU6Cj4gPj4gQWZ0ZXIgZGlydHktbG9nZ2luZyBpcyBzdG9wcGVk
-IGZvciBhIFZNIGNvbmZpZ3VyZWQgd2l0aCBodWdlIG1hcHBpbmdzLAo+ID4+IEtWTSB3aWxsIHJl
-Y292ZXIgdGhlIHRhYmxlIG1hcHBpbmdzIGJhY2sgdG8gYmxvY2sgbWFwcGluZ3MuIEFzIHdlIG9u
-bHkKPiA+PiByZXBsYWNlIHRoZSBleGlzdGluZyBwYWdlIHRhYmxlcyB3aXRoIGEgYmxvY2sgZW50
-cnkgYW5kIHRoZSBjYWNoZWFiaWxpdHkKPiA+PiBoYXMgbm90IGJlZW4gY2hhbmdlZCwgdGhlIGNh
-Y2hlIG1haW50ZW5hbmNlIG9wcmVhdGlvbnMgY2FuIGJlIHNraXBwZWQuCj4gPj4gCj4gPj4gU2ln
-bmVkLW9mZi1ieTogWWFuYW4gV2FuZyA8d2FuZ3lhbmFuNTVAaHVhd2VpLmNvbT4KPiA+PiAtLS0K
-PiA+PiAgIGFyY2gvYXJtNjQva3ZtL21tdS5jIHwgMTIgKysrKysrKysrLS0tCj4gPj4gICAxIGZp
-bGUgY2hhbmdlZCwgOSBpbnNlcnRpb25zKCspLCAzIGRlbGV0aW9ucygtKQo+ID4+IAo+ID4+IGRp
-ZmYgLS1naXQgYS9hcmNoL2FybTY0L2t2bS9tbXUuYyBiL2FyY2gvYXJtNjQva3ZtL21tdS5jCj4g
-Pj4gaW5kZXggOGU4NTQ5ZWExZDcwLi4zN2I0MjdkY2JjNGYgMTAwNjQ0Cj4gPj4gLS0tIGEvYXJj
-aC9hcm02NC9rdm0vbW11LmMKPiA+PiArKysgYi9hcmNoL2FybTY0L2t2bS9tbXUuYwo+ID4+IEBA
-IC03NDQsNyArNzQ0LDcgQEAgc3RhdGljIGludCB1c2VyX21lbV9hYm9ydChzdHJ1Y3Qga3ZtX3Zj
-cHUgKnZjcHUsIHBoeXNfYWRkcl90IGZhdWx0X2lwYSwKPiA+PiAgIHsKPiA+PiAgIAlpbnQgcmV0
-ID0gMDsKPiA+PiAgIAlib29sIHdyaXRlX2ZhdWx0LCB3cml0YWJsZSwgZm9yY2VfcHRlID0gZmFs
-c2U7Cj4gPj4gLQlib29sIGV4ZWNfZmF1bHQ7Cj4gPj4gKwlib29sIGV4ZWNfZmF1bHQsIGFkanVz
-dF9odWdlcGFnZTsKPiA+PiAgIAlib29sIGRldmljZSA9IGZhbHNlOwo+ID4+ICAgCXVuc2lnbmVk
-IGxvbmcgbW11X3NlcTsKPiA+PiAgIAlzdHJ1Y3Qga3ZtICprdm0gPSB2Y3B1LT5rdm07Cj4gPj4g
-QEAgLTg3MiwxMiArODcyLDE4IEBAIHN0YXRpYyBpbnQgdXNlcl9tZW1fYWJvcnQoc3RydWN0IGt2
-bV92Y3B1ICp2Y3B1LCBwaHlzX2FkZHJfdCBmYXVsdF9pcGEsCj4gPj4gICAJCW1hcmtfcGFnZV9k
-aXJ0eShrdm0sIGdmbik7Cj4gPj4gICAJfQo+ID4+ICAgLQlpZiAoZmF1bHRfc3RhdHVzICE9IEZT
-Q19QRVJNICYmICFkZXZpY2UpCj4gPj4gKwkvKgo+ID4+ICsJICogVGhlcmUgaXMgbm8gbmVjZXNz
-aXR5IHRvIHBlcmZvcm0gY2FjaGUgbWFpbnRlbmFuY2Ugb3BlcmF0aW9ucyBpZiB3ZQo+ID4+ICsJ
-ICogd2lsbCBvbmx5IHJlcGxhY2UgdGhlIGV4aXN0aW5nIHRhYmxlIG1hcHBpbmdzIHdpdGggYSBi
-bG9jayBtYXBwaW5nLgo+ID4+ICsJICovCj4gPj4gKwlhZGp1c3RfaHVnZXBhZ2UgPSBmYXVsdF9n
-cmFudWxlIDwgdm1hX3BhZ2VzaXplID8gdHJ1ZSA6IGZhbHNlOwo+ID4gbml0OiB5b3UgZG9uJ3Qg
-bmVlZCB0aGUgJz8gdHJ1ZSA6IGZhbHNlJyBwYXJ0Cj4gPiAKPiA+IFRoYXQgc2FpZCwgeW91ciBw
-cmV2aW91cyBwYXRjaCBjaGVja3MgZm9yICdmYXVsdF9ncmFudWxlID4gdm1hX3BhZ2VzaXplJywK
-PiA+IHNvIEknbSBub3Qgc3VyZSB0aGUgbG9jYWwgdmFyaWFibGUgaGVscHMgYWxsIHRoYXQgbXVj
-aCBoZXJlIGJlY2F1c2UgaXQKPiA+IG9ic2N1cmVzIHRoZSBzaXplIGNoZWNrcyBpbiBteSBvcGlu
-aW9uLiBJdCB3b3VsZCBiZSBtb3JlIHN0cmFpZ2h0LWZvcndhcmQKPiA+IGlmIHdlIGNvdWxkIHN0
-cnVjdHVyZSB0aGUgbG9naWMgYXM6Cj4gPiAKPiA+IAo+ID4gCWlmIChmYXVsdF9ncmFudWxlIDwg
-dm1hX3BhZ2VzaXplKSB7Cj4gPiAKPiA+IAl9IGVsc2UgaWYgKGZhdWx0X2dyYW51bGUgPiB2bWFf
-cGFnZV9zaXplKSB7Cj4gPiAKPiA+IAl9IGVsc2Ugewo+ID4gCj4gPiAJfQo+ID4gCj4gPiBXaXRo
-IHNvbWUgY29tbWVudHMgZGVzY3JpYmluZyB3aGF0IHdlIGNhbiBpbmZlciBhYm91dCB0aGUgbWVt
-Y2FjaGUgYW5kIGNhY2hlCj4gPiBtYWludGVuYW5jZSByZXF1aXJlbWVudHMgZm9yIGVhY2ggY2Fz
-ZS4KPiBUaGFua3MgZm9yIHlvdXIgc3VnZ2VzdGlvbiBoZXJlLCBXaWxsLgo+IEJ1dCBJIGhhdmUg
-cmVzZW50IGFub3RoZXIgbmV3ZXIgc2VyaWVzIFsxXSAoS1ZNOiBhcm02NDogSW1wcm92ZQo+IGVm
-ZmljaWVuY3kgb2Ygc3RhZ2UyIHBhZ2UgdGFibGUpCj4gcmVjZW50bHksIHdoaWNoIGhhcyB0aGUg
-c2FtZSB0aGVtZSBidXQgZGlmZmVyZW50IHNvbHV0aW9ucyB0aGF0IEkKPiB0aGluayBhcmUgYmV0
-dGVyLgo+IFsxXQo+IGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2xrbWwvMjAyMTAyMDgxMTIyNTAu
-MTYzNTY4LTEtd2FuZ3lhbmFuNTVAaHVhd2VpLmNvbS8KPiAKPiBDb3VsZCB5b3UgcGxlYXNlIGNv
-bW1lbnQgb24gdGhhdCBzZXJpZXMgP8KgIEkgdGhpbmsgaXQgY2FuIGJlIGZvdW5kIGluCj4geW91
-ciBpbmJveCA6KS4KClRoZXJlIHdlcmUgYWxyZWFkeSBhIGJ1bmNoIG9mIGNvbW1lbnRzIG9uIHRo
-YXQgc2VyaWVzLCBhbmQgSSBzdG9wcGVkCmF0IHRoZSBwb2ludCB3aGVyZSB0aGUgY2FjaGUgbWFp
-bnRlbmFuY2Ugd2FzIGJyb2tlbi4gUGxlYXNlIHJlc3Bpbgp0aGF0IHNlcmllcyBpZiB5b3Ugd2Fu
-dCBmdXJ0aGVyIGZlZWRiYWNrIG9uIGl0LgoKSW4gdGhlIGZ1dHVyZSwgaWYgeW91IGRlcHJlY2F0
-ZSBhIHNlcmllcyAod2hpY2ggaXMgY29tcGxldGVseQp1bmRlcnN0YW5kYWJsZSksIHBsZWFzZSBs
-ZWF2ZSBhIG5vdGUgb24gdGhlIGxpc3Qgd2l0aCBhIHBvaW50ZXIgdG8gdGhlCm5ldyBzZXJpZXMg
-c28gdGhhdCBwZW9wbGUgZG9uJ3Qgd2FzdGUgdGltZSByZXZpZXdpbmcgYW4gb2Jzb2xldGUKc2Vy
-aWVzLiBPciBwb3N0IHRoZSBuZXcgc2VyaWVzIHdpdGggYSBuZXcgdmVyc2lvbiBudW1iZXIgc28g
-dGhhdCBpdCBpcwpvYnZpb3VzIHRoYXQgdGhlIG9yaWdpbmFsIHNlcmllcyBoYXMgYmVlbiBzdXBl
-cnNlZGVkLgoKVGhhbmtzLAoKCU0uCgotLSAKV2l0aG91dCBkZXZpYXRpb24gZnJvbSB0aGUgbm9y
-bSwgcHJvZ3Jlc3MgaXMgbm90IHBvc3NpYmxlLgpfX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5j
-b2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5m
-by9rdm1hcm0K
+On Fri, 5 Mar 2021 12:21:24 -0800, Sami Tolvanen wrote:
+> allmodconfig + CONFIG_LTO_CLANG_THIN=y fails to build due to following
+> linker errors:
+> 
+>   ld.lld: error: irqbypass.c:(function __guest_enter: .text+0x21CC):
+>   relocation R_AARCH64_CONDBR19 out of range: 2031220 is not in
+>   [-1048576, 1048575]; references hyp_panic
+>   >>> defined in vmlinux.o
+> 
+> [...]
+
+Applied to next, thanks!
+
+[1/1] KVM: arm64: Don't use cbz/adr with external symbols
+      commit: dbaee836d60a8e1b03e7d53a37893235662ba124
+
+Cheers,
+
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
+
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
