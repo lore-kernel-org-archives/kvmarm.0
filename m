@@ -2,68 +2,72 @@ Return-Path: <SRS0=aIiX=IH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B765C433E6
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Mar 2021 13:27:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 365B7C433DB
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Mar 2021 13:43:55 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6F932650F5
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Mar 2021 13:27:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F932650F5
+	by mail.kernel.org (Postfix) with ESMTP id 7966C64F85
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Mar 2021 13:43:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7966C64F85
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E78774B409;
-	Tue,  9 Mar 2021 08:27:03 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EA4224B204;
+	Tue,  9 Mar 2021 08:43:53 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9tLEsc4mLreT; Tue,  9 Mar 2021 08:26:59 -0500 (EST)
+	with ESMTP id OQ7K85DeakKH; Tue,  9 Mar 2021 08:43:49 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D82B4B460;
-	Tue,  9 Mar 2021 08:26:59 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AC4A4A551;
+	Tue,  9 Mar 2021 08:43:49 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EC5384B409
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Mar 2021 08:26:57 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 006694A551
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Mar 2021 08:43:48 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 345pMnLIJMNV for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 Mar 2021 08:26:53 -0500 (EST)
+ with ESMTP id jhMLHI1fLMsL for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Mar 2021 08:43:45 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E25E84B1BA
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Mar 2021 08:26:52 -0500 (EST)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id BC30064D8F;
- Tue,  9 Mar 2021 13:26:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1615296411;
- bh=GW/0WIVybU+FKZci+pHzO6MpN/bNiJDrh5DoiKRhFGo=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=ZgLBDtYY4aIDeUHdlKwtssqYTc3uPuKrCzBJUYdtFYSrE1mQA2FiUxsEh6PX+DCf4
- SQrAAhLsr6Pp5qvvgoyWI5P4OLszI7f7dBuIkSx/g4+tIbeXcBEwybscpR3BJXjbQe
- uuLsBFErYny4EmsPbJkucFL+VYcY/CxXovHyidKU0C44zYl+siFpQp82qsoH1JfME3
- yLXglUMvBgDqhZde+oRzWHYWnMxUf700y8JIvPreQMpqzla1Pp6NDw1vvrqyb/+EKM
- RwbBN2UTIbmuxxZY2DTuX2F2tDTOh+5TY1tNK5oBp6Ot7+E4FgCnmeuhOulkcfjyBS
- +ndJVCHjsd5/A==
-Date: Tue, 9 Mar 2021 13:26:46 +0000
-From: Will Deacon <will@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH] KVM: arm64: Ensure I-cache isolation between vcpus of a
- same VM
-Message-ID: <20210309132645.GA28297@willie-the-truck>
-References: <20210303164505.68492-1-maz@kernel.org>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210303164505.68492-1-maz@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
- kvmarm@lists.cs.columbia.edu
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1F67D4A4C0
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Mar 2021 08:43:45 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 0BEDF64F51;
+ Tue,  9 Mar 2021 13:43:43 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1lJceC-000YiA-T1; Tue, 09 Mar 2021 13:43:41 +0000
+Date: Tue, 09 Mar 2021 13:43:40 +0000
+Message-ID: <87mtvcxx0z.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH] KVM: arm64: Cap default IPA size to the host's own size
+In-Reply-To: <20210309132021.7vuuf73joybhlhg3@kamzik.brq.redhat.com>
+References: <20210308174643.761100-1-maz@kernel.org>
+ <20210309132021.7vuuf73joybhlhg3@kamzik.brq.redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: drjones@redhat.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+ alexandru.elisei@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, kernel-team@android.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -80,45 +84,67 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Mar 03, 2021 at 04:45:05PM +0000, Marc Zyngier wrote:
-> It recently became apparent that the ARMv8 architecture has interesting
-> rules regarding attributes being used when fetching instructions
-> if the MMU is off at Stage-1.
-> 
-> In this situation, the CPU is allowed to fetch from the PoC and
-> allocate into the I-cache (unless the memory is mapped with
-> the XN attribute at Stage-2).
-> 
-> If we transpose this to vcpus sharing a single physical CPU,
-> it is possible for a vcpu running with its MMU off to influence
-> another vcpu running with its MMU on, as the latter is expected to
-> fetch from the PoU (and self-patching code doesn't flush below that
-> level).
-> 
-> In order to solve this, reuse the vcpu-private TLB invalidation
-> code to apply the same policy to the I-cache, nuking it every time
-> the vcpu runs on a physical CPU that ran another vcpu of the same
-> VM in the past.
-> 
-> This involve renaming __kvm_tlb_flush_local_vmid() to
-> __kvm_flush_cpu_context(), and inserting a local i-cache invalidation
-> there.
-> 
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_asm.h   | 4 ++--
->  arch/arm64/kvm/arm.c               | 7 ++++++-
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 6 +++---
->  arch/arm64/kvm/hyp/nvhe/tlb.c      | 3 ++-
->  arch/arm64/kvm/hyp/vhe/tlb.c       | 3 ++-
->  5 files changed, 15 insertions(+), 8 deletions(-)
+Hi Andrew,
 
-Since the FWB discussion doesn't affect the correctness of this patch:
+On Tue, 09 Mar 2021 13:20:21 +0000,
+Andrew Jones <drjones@redhat.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Mon, Mar 08, 2021 at 05:46:43PM +0000, Marc Zyngier wrote:
+> > KVM/arm64 has forever used a 40bit default IPA space, partially
+> > due to its 32bit heritage (where the only choice is 40bit).
+> > 
+> > However, there are implementations in the wild that have a *cough*
+> > much smaller *cough* IPA space, which leads to a misprogramming of
+> > VTCR_EL2, and a guest that is stuck on its first memory access
+> > if userspace dares to ask for the default IPA setting (which most
+> > VMMs do).
+> > 
+> > Instead, cap the default IPA size to what the host can actually
+> > do, and spit out a one-off message on the console. The boot warning
+> > is turned into a more meaningfull message, and the new behaviour
+> > is also documented.
+> > 
+> > Although this is a userspace ABI change, it doesn't really change
+> > much for userspace:
+> > 
+> > - the guest couldn't run before this change, while it now has
+> >   a chance to if the memory range fits the reduced IPA space
+> > 
+> > - a memory slot that was accepted because it did fit the default
+> >   IPA space but didn't fit the HW constraints is now properly
+> >   rejected
+> 
+> I'm not sure deferring the misconfiguration error until memslot
+> request time is better than just failing to create a VM. If
+> userspace doesn't use KVM_CAP_ARM_VM_IPA_SIZE to determine the
+> limit (which it hasn't been obliged to do) and it is able to
+> successfully create a VM, then it will assume up to 40-bit IPAs
+> are supported. Later, when it tries to add memslots and fails
+> it may be confused, especially if that later is much, much later
+> with memory hotplug.
 
-Acked-by: Will Deacon <will@kernel.org>
+That's a fair point. However, no existing userspace will work on these
+systems. Is that what we want to do? I don't care much, but having
+non-usable defaults feel a bit... odd. I do spit out a warning, but I
+agree this isn't great either.
 
-Will
+> > The other thing that's left doing is to convince userspace to
+> > actually use the IPA space setting instead of relying on the
+> > antiquated default.
+> 
+> Failing to create any VM which hasn't selected a valid IPA limit
+> should be pretty convincing :-)
+
+I'll make sure to redirect the reports your way! :D
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
