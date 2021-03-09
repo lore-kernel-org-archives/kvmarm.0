@@ -2,61 +2,76 @@ Return-Path: <SRS0=aIiX=IH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 296B4C433DB
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Mar 2021 12:09:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5373BC433E0
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Mar 2021 13:20:45 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7D8C96525B
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Mar 2021 12:09:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D8C96525B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id AF002650E6
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Mar 2021 13:20:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF002650E6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E0DA74B474;
-	Tue,  9 Mar 2021 07:09:31 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C2E1D4B346;
+	Tue,  9 Mar 2021 08:20:43 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id rtCX2En7DkFt; Tue,  9 Mar 2021 07:09:30 -0500 (EST)
+	with ESMTP id srBbMgOtAqsD; Tue,  9 Mar 2021 08:20:39 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B45D4B435;
-	Tue,  9 Mar 2021 07:09:30 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DE5FA4B45C;
+	Tue,  9 Mar 2021 08:20:39 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E29814B435
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Mar 2021 07:09:28 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BA5DF4B45A
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Mar 2021 08:20:38 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WFkJ65zucr15 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 Mar 2021 07:09:27 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 776BA4B3D3
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Mar 2021 07:09:27 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1B6571042;
- Tue,  9 Mar 2021 04:09:27 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 207B23F70D;
- Tue,  9 Mar 2021 04:09:26 -0800 (PST)
-Subject: Re: [PATCH kvmtool v2 09/22] x86/ioport: Switch to new trap handlers
-To: Andre Przywara <andre.przywara@arm.com>, Will Deacon <will@kernel.org>,
- Julien Thierry <julien.thierry.kdev@gmail.com>
-References: <20210225005915.26423-1-andre.przywara@arm.com>
- <20210225005915.26423-10-andre.przywara@arm.com>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <fb420e89-da92-2100-a12c-475152ff30d4@arm.com>
-Date: Tue, 9 Mar 2021 12:09:52 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
+ with ESMTP id uwhLQMd5KKBD for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Mar 2021 08:20:34 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [63.128.21.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 23FD64B409
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Mar 2021 08:20:34 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1615296033;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=vnG6VAZGUSIfQJb+HRGgF9NNG2xl2aHTWM0Qb7o+3ag=;
+ b=ghci+U1B5Wr2pTM2QCwNQGWBwkH65FM0rnAv4tLkPM9LQ1/oqqp1mBCCtS8phB0RIQUfzV
+ XZHdVR1I4ewM70++YeIsIcw1tfrO8i6Y1bVvWrec84dfB1Zc2piPUkjtoIus+qSfggRFBA
+ qaRvV8RrKqLa2NDYYO8OaEoHdJ51YOw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-558-1noFX22NOMKwnU5HOldGvg-1; Tue, 09 Mar 2021 08:20:29 -0500
+X-MC-Unique: 1noFX22NOMKwnU5HOldGvg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4024C101F013;
+ Tue,  9 Mar 2021 13:20:27 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.193.217])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8CE895C266;
+ Tue,  9 Mar 2021 13:20:24 +0000 (UTC)
+Date: Tue, 9 Mar 2021 14:20:21 +0100
+From: Andrew Jones <drjones@redhat.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH] KVM: arm64: Cap default IPA size to the host's own size
+Message-ID: <20210309132021.7vuuf73joybhlhg3@kamzik.brq.redhat.com>
+References: <20210308174643.761100-1-maz@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20210225005915.26423-10-andre.przywara@arm.com>
-Content-Language: en-US
-Cc: Marc Zyngier <maz@kernel.org>, Sami Mujawar <sami.mujawar@arm.com>,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Content-Disposition: inline
+In-Reply-To: <20210308174643.761100-1-maz@kernel.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Cc: kvm@vger.kernel.org, kernel-team@android.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,233 +88,53 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Andre,
+Hi Marc,
 
-On 2/25/21 12:59 AM, Andre Przywara wrote:
-> Now that the x86 I/O ports have trap handlers adhering to the MMIO fault
-> handler prototype, let's switch over to the joint registration routine.
->
-> This allows us to get rid of the ioport shim routines.
->
-> Since the debug output was done in ioport.c, we would lose this
-> functionality when moving over to the MMIO handlers. So bring this back
-> here explicitly, by introducing debug_mmio().
->
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
->  x86/ioport.c | 102 +++++++++++++++++++--------------------------------
->  1 file changed, 37 insertions(+), 65 deletions(-)
->
-> diff --git a/x86/ioport.c b/x86/ioport.c
-> index 78f9a863..9fcbb6c9 100644
-> --- a/x86/ioport.c
-> +++ b/x86/ioport.c
-> @@ -3,21 +3,35 @@
->  #include <stdlib.h>
->  #include <stdio.h>
->  
-> -static void dummy_mmio(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len,
-> +static void debug_mmio(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len,
->  		       u8 is_write, void *ptr)
+On Mon, Mar 08, 2021 at 05:46:43PM +0000, Marc Zyngier wrote:
+> KVM/arm64 has forever used a 40bit default IPA space, partially
+> due to its 32bit heritage (where the only choice is 40bit).
+> 
+> However, there are implementations in the wild that have a *cough*
+> much smaller *cough* IPA space, which leads to a misprogramming of
+> VTCR_EL2, and a guest that is stuck on its first memory access
+> if userspace dares to ask for the default IPA setting (which most
+> VMMs do).
+> 
+> Instead, cap the default IPA size to what the host can actually
+> do, and spit out a one-off message on the console. The boot warning
+> is turned into a more meaningfull message, and the new behaviour
+> is also documented.
+> 
+> Although this is a userspace ABI change, it doesn't really change
+> much for userspace:
+> 
+> - the guest couldn't run before this change, while it now has
+>   a chance to if the memory range fits the reduced IPA space
+> 
+> - a memory slot that was accepted because it did fit the default
+>   IPA space but didn't fit the HW constraints is now properly
+>   rejected
 
-Since the function is about ioports (it even checks cfg.ioport_debug), shouldn't
-something like debug_io/debug_pio/debug_ioport/<something else ioport related> be
-more appropriate?
+I'm not sure deferring the misconfiguration error until memslot
+request time is better than just failing to create a VM. If
+userspace doesn't use KVM_CAP_ARM_VM_IPA_SIZE to determine the
+limit (which it hasn't been obliged to do) and it is able to
+successfully create a VM, then it will assume up to 40-bit IPAs
+are supported. Later, when it tries to add memslots and fails
+it may be confused, especially if that later is much, much later
+with memory hotplug.
 
-Otherwise looks good: the only emulation callback that could fail was
-debug_ops->debug_io_out, which triggered a print if cfg.ioport_debug was set, and
-the callback is replaced by debug_mmio. With the name change:
+> 
+> The other thing that's left doing is to convince userspace to
+> actually use the IPA space setting instead of relying on the
+> antiquated default.
 
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Failing to create any VM which hasn't selected a valid IPA limit
+should be pretty convincing :-)
 
 Thanks,
+drew
 
-Alex
-
->  {
-> +	if (!vcpu->kvm->cfg.ioport_debug)
-> +		return;
-> +
-> +	fprintf(stderr, "debug port %s from VCPU%lu: port=0x%lx, size=%u",
-> +		is_write ? "write" : "read", vcpu->cpu_id,
-> +		(unsigned long)addr, len);
-> +	if (is_write) {
-> +		u32 value;
-> +
-> +		switch (len) {
-> +		case 1: value = ioport__read8(data); break;
-> +		case 2: value = ioport__read16((u16*)data); break;
-> +		case 4: value = ioport__read32((u32*)data); break;
-> +		default: value = 0; break;
-> +		}
-> +		fprintf(stderr, ", data: 0x%x\n", value);
-> +	} else {
-> +		fprintf(stderr, "\n");
-> +	}
->  }
->  
-> -static bool debug_io_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
-> +static void dummy_mmio(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len,
-> +		       u8 is_write, void *ptr)
->  {
-> -	dummy_mmio(vcpu, port, data, size, true, NULL);
-> -	return 0;
->  }
->  
-> -static struct ioport_operations debug_ops = {
-> -	.io_out		= debug_io_out,
-> -};
-> -
->  static void seabios_debug_mmio(struct kvm_cpu *vcpu, u64 addr, u8 *data,
->  			       u32 len, u8 is_write, void *ptr)
->  {
-> @@ -31,37 +45,6 @@ static void seabios_debug_mmio(struct kvm_cpu *vcpu, u64 addr, u8 *data,
->  	putchar(ch);
->  }
->  
-> -static bool seabios_debug_io_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
-> -{
-> -	seabios_debug_mmio(vcpu, port, data, size, true, NULL);
-> -	return 0;
-> -}
-> -
-> -static struct ioport_operations seabios_debug_ops = {
-> -	.io_out		= seabios_debug_io_out,
-> -};
-> -
-> -static bool dummy_io_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
-> -{
-> -	dummy_mmio(vcpu, port, data, size, false, NULL);
-> -	return true;
-> -}
-> -
-> -static bool dummy_io_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
-> -{
-> -	dummy_mmio(vcpu, port, data, size, true, NULL);
-> -	return true;
-> -}
-> -
-> -static struct ioport_operations dummy_read_write_ioport_ops = {
-> -	.io_in		= dummy_io_in,
-> -	.io_out		= dummy_io_out,
-> -};
-> -
-> -static struct ioport_operations dummy_write_only_ioport_ops = {
-> -	.io_out		= dummy_io_out,
-> -};
-> -
->  /*
->   * The "fast A20 gate"
->   */
-> @@ -76,17 +59,6 @@ static void ps2_control_mmio(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len,
->  		ioport__write8(data, 0x02);
->  }
->  
-> -static bool ps2_control_a_io_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
-> -{
-> -	ps2_control_mmio(vcpu, port, data, size, false, NULL);
-> -	return true;
-> -}
-> -
-> -static struct ioport_operations ps2_control_a_ops = {
-> -	.io_in		= ps2_control_a_io_in,
-> -	.io_out		= dummy_io_out,
-> -};
-> -
->  void ioport__map_irq(u8 *irq)
->  {
->  }
-> @@ -98,75 +70,75 @@ static int ioport__setup_arch(struct kvm *kvm)
->  	/* Legacy ioport setup */
->  
->  	/* 0000 - 001F - DMA1 controller */
-> -	r = ioport__register(kvm, 0x0000, &dummy_read_write_ioport_ops, 32, NULL);
-> +	r = kvm__register_pio(kvm, 0x0000, 32, dummy_mmio, NULL);
->  	if (r < 0)
->  		return r;
->  
->  	/* 0x0020 - 0x003F - 8259A PIC 1 */
-> -	r = ioport__register(kvm, 0x0020, &dummy_read_write_ioport_ops, 2, NULL);
-> +	r = kvm__register_pio(kvm, 0x0020, 2, dummy_mmio, NULL);
->  	if (r < 0)
->  		return r;
->  
->  	/* PORT 0040-005F - PIT - PROGRAMMABLE INTERVAL TIMER (8253, 8254) */
-> -	r = ioport__register(kvm, 0x0040, &dummy_read_write_ioport_ops, 4, NULL);
-> +	r = kvm__register_pio(kvm, 0x0040, 4, dummy_mmio, NULL);
->  	if (r < 0)
->  		return r;
->  
->  	/* 0092 - PS/2 system control port A */
-> -	r = ioport__register(kvm, 0x0092, &ps2_control_a_ops, 1, NULL);
-> +	r = kvm__register_pio(kvm, 0x0092, 1, ps2_control_mmio, NULL);
->  	if (r < 0)
->  		return r;
->  
->  	/* 0x00A0 - 0x00AF - 8259A PIC 2 */
-> -	r = ioport__register(kvm, 0x00A0, &dummy_read_write_ioport_ops, 2, NULL);
-> +	r = kvm__register_pio(kvm, 0x00A0, 2, dummy_mmio, NULL);
->  	if (r < 0)
->  		return r;
->  
->  	/* 00C0 - 001F - DMA2 controller */
-> -	r = ioport__register(kvm, 0x00C0, &dummy_read_write_ioport_ops, 32, NULL);
-> +	r = kvm__register_pio(kvm, 0x00c0, 32, dummy_mmio, NULL);
->  	if (r < 0)
->  		return r;
->  
->  	/* PORT 00E0-00EF are 'motherboard specific' so we use them for our
->  	   internal debugging purposes.  */
-> -	r = ioport__register(kvm, IOPORT_DBG, &debug_ops, 1, NULL);
-> +	r = kvm__register_pio(kvm, IOPORT_DBG, 1, debug_mmio, NULL);
->  	if (r < 0)
->  		return r;
->  
->  	/* PORT 00ED - DUMMY PORT FOR DELAY??? */
-> -	r = ioport__register(kvm, 0x00ED, &dummy_write_only_ioport_ops, 1, NULL);
-> +	r = kvm__register_pio(kvm, 0x00ed, 1, dummy_mmio, NULL);
->  	if (r < 0)
->  		return r;
->  
->  	/* 0x00F0 - 0x00FF - Math co-processor */
-> -	r = ioport__register(kvm, 0x00F0, &dummy_write_only_ioport_ops, 2, NULL);
-> +	r = kvm__register_pio(kvm, 0x00f0, 2, dummy_mmio, NULL);
->  	if (r < 0)
->  		return r;
->  
->  	/* PORT 0278-027A - PARALLEL PRINTER PORT (usually LPT1, sometimes LPT2) */
-> -	r = ioport__register(kvm, 0x0278, &dummy_read_write_ioport_ops, 3, NULL);
-> +	r = kvm__register_pio(kvm, 0x0278, 3, dummy_mmio, NULL);
->  	if (r < 0)
->  		return r;
->  
->  	/* PORT 0378-037A - PARALLEL PRINTER PORT (usually LPT2, sometimes LPT3) */
-> -	r = ioport__register(kvm, 0x0378, &dummy_read_write_ioport_ops, 3, NULL);
-> +	r = kvm__register_pio(kvm, 0x0378, 3, dummy_mmio, NULL);
->  	if (r < 0)
->  		return r;
->  
->  	/* PORT 03D4-03D5 - COLOR VIDEO - CRT CONTROL REGISTERS */
-> -	r = ioport__register(kvm, 0x03D4, &dummy_read_write_ioport_ops, 1, NULL);
-> +	r = kvm__register_pio(kvm, 0x03d4, 1, dummy_mmio, NULL);
->  	if (r < 0)
->  		return r;
-> -	r = ioport__register(kvm, 0x03D5, &dummy_write_only_ioport_ops, 1, NULL);
-> +	r = kvm__register_pio(kvm, 0x03d5, 1, dummy_mmio, NULL);
->  	if (r < 0)
->  		return r;
->  
-> -	r = ioport__register(kvm, 0x402, &seabios_debug_ops, 1, NULL);
-> +	r = kvm__register_pio(kvm, 0x0402, 1, seabios_debug_mmio, NULL);
->  	if (r < 0)
->  		return r;
->  
->  	/* 0510 - QEMU BIOS configuration register */
-> -	r = ioport__register(kvm, 0x510, &dummy_read_write_ioport_ops, 2, NULL);
-> +	r = kvm__register_pio(kvm, 0x0510, 2, dummy_mmio, NULL);
->  	if (r < 0)
->  		return r;
->  
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
