@@ -2,73 +2,73 @@ Return-Path: <SRS0=aIiX=IH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D7DBC433E0
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Mar 2021 09:02:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04B77C433E0
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Mar 2021 10:16:19 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9B03064F89
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Mar 2021 09:02:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B03064F89
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 40B0365267
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Mar 2021 10:16:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40B0365267
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CAC9F4B55E;
-	Tue,  9 Mar 2021 04:02:40 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C3E264B3D9;
+	Tue,  9 Mar 2021 05:16:17 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id bcAN8qBWHqIE; Tue,  9 Mar 2021 04:02:39 -0500 (EST)
+	with ESMTP id JLyf9zLyBLdY; Tue,  9 Mar 2021 05:16:14 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A83CE4B521;
-	Tue,  9 Mar 2021 04:02:39 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DDB064B3FE;
+	Tue,  9 Mar 2021 05:16:14 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 01E454B51A
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Mar 2021 04:02:38 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 180654B3D9
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Mar 2021 05:16:13 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fJGZO6TWyN02 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 Mar 2021 04:02:35 -0500 (EST)
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8E8BB4B2F6
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Mar 2021 04:02:34 -0500 (EST)
-Received: from DGGEMM402-HUB.china.huawei.com (unknown [172.30.72.55])
- by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4Dvq0C3dsFz143DX;
- Tue,  9 Mar 2021 16:59:39 +0800 (CST)
-Received: from dggpemm500023.china.huawei.com (7.185.36.83) by
- DGGEMM402-HUB.china.huawei.com (10.3.20.210) with Microsoft SMTP Server (TLS)
- id 14.3.498.0; Tue, 9 Mar 2021 17:02:30 +0800
-Received: from [10.174.187.128] (10.174.187.128) by
- dggpemm500023.china.huawei.com (7.185.36.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2106.2; Tue, 9 Mar 2021 17:02:30 +0800
-Subject: Re: [PATCH 2/2] KVM: arm64: Skip the cache flush when coalescing
- tables into a block
-To: Marc Zyngier <maz@kernel.org>
-References: <20210125141044.380156-1-wangyanan55@huawei.com>
- <20210125141044.380156-3-wangyanan55@huawei.com>
- <20210308163454.GA26561@willie-the-truck>
- <8a947c73-16e9-7ca7-c185-d4c951938505@huawei.com>
- <87y2ewyawn.wl-maz@kernel.org>
-From: "wangyanan (Y)" <wangyanan55@huawei.com>
-Message-ID: <fbdd19aa-fae6-0613-d5ec-dd062c66514a@huawei.com>
-Date: Tue, 9 Mar 2021 17:02:29 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
-MIME-Version: 1.0
-In-Reply-To: <87y2ewyawn.wl-maz@kernel.org>
-Content-Language: en-US
-X-Originating-IP: [10.174.187.128]
-X-ClientProxiedBy: dggeme712-chm.china.huawei.com (10.1.199.108) To
- dggpemm500023.china.huawei.com (7.185.36.83)
-X-CFilter-Loop: Reflected
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
+ with ESMTP id fv0L3orSKGuo for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Mar 2021 05:16:11 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EA1AD4B3BB
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Mar 2021 05:16:10 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id A0F0565267;
+ Tue,  9 Mar 2021 10:16:09 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1lJZPK-000Vyt-EP; Tue, 09 Mar 2021 10:16:07 +0000
+Date: Tue, 09 Mar 2021 10:16:04 +0000
+Message-ID: <87v9a0y6mz.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Daniel Kiss <daniel.kiss@arm.com>
+Subject: Re: [PATCH v3 1/1] kvm: arm64: Add SVE support for nVHE.
+In-Reply-To: <20210302164850.3553701-2-daniel.kiss@arm.com>
+References: <20210302164850.3553701-1-daniel.kiss@arm.com>
+ <20210302164850.3553701-2-daniel.kiss@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: daniel.kiss@arm.com, kvmarm@lists.cs.columbia.edu,
+ Dave.Martin@arm.com, broonie@kernel.org, james.morse@arm.com,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+ linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Dave.Martin@arm.com, broonie@kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -80,70 +80,511 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Ck9uIDIwMjEvMy85IDE2OjQzLCBNYXJjIFp5bmdpZXIgd3JvdGU6Cj4gT24gVHVlLCAwOSBNYXIg
-MjAyMSAwODozNDo0MyArMDAwMCwKPiAid2FuZ3lhbmFuIChZKSIgPHdhbmd5YW5hbjU1QGh1YXdl
-aS5jb20+IHdyb3RlOgo+Pgo+PiBPbiAyMDIxLzMvOSAwOjM0LCBXaWxsIERlYWNvbiB3cm90ZToK
-Pj4+IE9uIE1vbiwgSmFuIDI1LCAyMDIxIGF0IDEwOjEwOjQ0UE0gKzA4MDAsIFlhbmFuIFdhbmcg
-d3JvdGU6Cj4+Pj4gQWZ0ZXIgZGlydHktbG9nZ2luZyBpcyBzdG9wcGVkIGZvciBhIFZNIGNvbmZp
-Z3VyZWQgd2l0aCBodWdlIG1hcHBpbmdzLAo+Pj4+IEtWTSB3aWxsIHJlY292ZXIgdGhlIHRhYmxl
-IG1hcHBpbmdzIGJhY2sgdG8gYmxvY2sgbWFwcGluZ3MuIEFzIHdlIG9ubHkKPj4+PiByZXBsYWNl
-IHRoZSBleGlzdGluZyBwYWdlIHRhYmxlcyB3aXRoIGEgYmxvY2sgZW50cnkgYW5kIHRoZSBjYWNo
-ZWFiaWxpdHkKPj4+PiBoYXMgbm90IGJlZW4gY2hhbmdlZCwgdGhlIGNhY2hlIG1haW50ZW5hbmNl
-IG9wcmVhdGlvbnMgY2FuIGJlIHNraXBwZWQuCj4+Pj4KPj4+PiBTaWduZWQtb2ZmLWJ5OiBZYW5h
-biBXYW5nIDx3YW5neWFuYW41NUBodWF3ZWkuY29tPgo+Pj4+IC0tLQo+Pj4+ICAgIGFyY2gvYXJt
-NjQva3ZtL21tdS5jIHwgMTIgKysrKysrKysrLS0tCj4+Pj4gICAgMSBmaWxlIGNoYW5nZWQsIDkg
-aW5zZXJ0aW9ucygrKSwgMyBkZWxldGlvbnMoLSkKPj4+Pgo+Pj4+IGRpZmYgLS1naXQgYS9hcmNo
-L2FybTY0L2t2bS9tbXUuYyBiL2FyY2gvYXJtNjQva3ZtL21tdS5jCj4+Pj4gaW5kZXggOGU4NTQ5
-ZWExZDcwLi4zN2I0MjdkY2JjNGYgMTAwNjQ0Cj4+Pj4gLS0tIGEvYXJjaC9hcm02NC9rdm0vbW11
-LmMKPj4+PiArKysgYi9hcmNoL2FybTY0L2t2bS9tbXUuYwo+Pj4+IEBAIC03NDQsNyArNzQ0LDcg
-QEAgc3RhdGljIGludCB1c2VyX21lbV9hYm9ydChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHBoeXNf
-YWRkcl90IGZhdWx0X2lwYSwKPj4+PiAgICB7Cj4+Pj4gICAgCWludCByZXQgPSAwOwo+Pj4+ICAg
-IAlib29sIHdyaXRlX2ZhdWx0LCB3cml0YWJsZSwgZm9yY2VfcHRlID0gZmFsc2U7Cj4+Pj4gLQli
-b29sIGV4ZWNfZmF1bHQ7Cj4+Pj4gKwlib29sIGV4ZWNfZmF1bHQsIGFkanVzdF9odWdlcGFnZTsK
-Pj4+PiAgICAJYm9vbCBkZXZpY2UgPSBmYWxzZTsKPj4+PiAgICAJdW5zaWduZWQgbG9uZyBtbXVf
-c2VxOwo+Pj4+ICAgIAlzdHJ1Y3Qga3ZtICprdm0gPSB2Y3B1LT5rdm07Cj4+Pj4gQEAgLTg3Miwx
-MiArODcyLDE4IEBAIHN0YXRpYyBpbnQgdXNlcl9tZW1fYWJvcnQoc3RydWN0IGt2bV92Y3B1ICp2
-Y3B1LCBwaHlzX2FkZHJfdCBmYXVsdF9pcGEsCj4+Pj4gICAgCQltYXJrX3BhZ2VfZGlydHkoa3Zt
-LCBnZm4pOwo+Pj4+ICAgIAl9Cj4+Pj4gICAgLQlpZiAoZmF1bHRfc3RhdHVzICE9IEZTQ19QRVJN
-ICYmICFkZXZpY2UpCj4+Pj4gKwkvKgo+Pj4+ICsJICogVGhlcmUgaXMgbm8gbmVjZXNzaXR5IHRv
-IHBlcmZvcm0gY2FjaGUgbWFpbnRlbmFuY2Ugb3BlcmF0aW9ucyBpZiB3ZQo+Pj4+ICsJICogd2ls
-bCBvbmx5IHJlcGxhY2UgdGhlIGV4aXN0aW5nIHRhYmxlIG1hcHBpbmdzIHdpdGggYSBibG9jayBt
-YXBwaW5nLgo+Pj4+ICsJICovCj4+Pj4gKwlhZGp1c3RfaHVnZXBhZ2UgPSBmYXVsdF9ncmFudWxl
-IDwgdm1hX3BhZ2VzaXplID8gdHJ1ZSA6IGZhbHNlOwo+Pj4gbml0OiB5b3UgZG9uJ3QgbmVlZCB0
-aGUgJz8gdHJ1ZSA6IGZhbHNlJyBwYXJ0Cj4+Pgo+Pj4gVGhhdCBzYWlkLCB5b3VyIHByZXZpb3Vz
-IHBhdGNoIGNoZWNrcyBmb3IgJ2ZhdWx0X2dyYW51bGUgPiB2bWFfcGFnZXNpemUnLAo+Pj4gc28g
-SSdtIG5vdCBzdXJlIHRoZSBsb2NhbCB2YXJpYWJsZSBoZWxwcyBhbGwgdGhhdCBtdWNoIGhlcmUg
-YmVjYXVzZSBpdAo+Pj4gb2JzY3VyZXMgdGhlIHNpemUgY2hlY2tzIGluIG15IG9waW5pb24uIEl0
-IHdvdWxkIGJlIG1vcmUgc3RyYWlnaHQtZm9yd2FyZAo+Pj4gaWYgd2UgY291bGQgc3RydWN0dXJl
-IHRoZSBsb2dpYyBhczoKPj4+Cj4+Pgo+Pj4gCWlmIChmYXVsdF9ncmFudWxlIDwgdm1hX3BhZ2Vz
-aXplKSB7Cj4+Pgo+Pj4gCX0gZWxzZSBpZiAoZmF1bHRfZ3JhbnVsZSA+IHZtYV9wYWdlX3NpemUp
-IHsKPj4+Cj4+PiAJfSBlbHNlIHsKPj4+Cj4+PiAJfQo+Pj4KPj4+IFdpdGggc29tZSBjb21tZW50
-cyBkZXNjcmliaW5nIHdoYXQgd2UgY2FuIGluZmVyIGFib3V0IHRoZSBtZW1jYWNoZSBhbmQgY2Fj
-aGUKPj4+IG1haW50ZW5hbmNlIHJlcXVpcmVtZW50cyBmb3IgZWFjaCBjYXNlLgo+PiBUaGFua3Mg
-Zm9yIHlvdXIgc3VnZ2VzdGlvbiBoZXJlLCBXaWxsLgo+PiBCdXQgSSBoYXZlIHJlc2VudCBhbm90
-aGVyIG5ld2VyIHNlcmllcyBbMV0gKEtWTTogYXJtNjQ6IEltcHJvdmUKPj4gZWZmaWNpZW5jeSBv
-ZiBzdGFnZTIgcGFnZSB0YWJsZSkKPj4gcmVjZW50bHksIHdoaWNoIGhhcyB0aGUgc2FtZSB0aGVt
-ZSBidXQgZGlmZmVyZW50IHNvbHV0aW9ucyB0aGF0IEkKPj4gdGhpbmsgYXJlIGJldHRlci4KPj4g
-WzFdCj4+IGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2xrbWwvMjAyMTAyMDgxMTIyNTAuMTYzNTY4
-LTEtd2FuZ3lhbmFuNTVAaHVhd2VpLmNvbS8KPj4KPj4gQ291bGQgeW91IHBsZWFzZSBjb21tZW50
-IG9uIHRoYXQgc2VyaWVzID/CoCBJIHRoaW5rIGl0IGNhbiBiZSBmb3VuZCBpbgo+PiB5b3VyIGlu
-Ym94IDopLgo+IFRoZXJlIHdlcmUgYWxyZWFkeSBhIGJ1bmNoIG9mIGNvbW1lbnRzIG9uIHRoYXQg
-c2VyaWVzLCBhbmQgSSBzdG9wcGVkCj4gYXQgdGhlIHBvaW50IHdoZXJlIHRoZSBjYWNoZSBtYWlu
-dGVuYW5jZSB3YXMgYnJva2VuLiBQbGVhc2UgcmVzcGluCj4gdGhhdCBzZXJpZXMgaWYgeW91IHdh
-bnQgZnVydGhlciBmZWVkYmFjayBvbiBpdC4KT2ssIEkgd2lsbCBzZW5kIGEgbmV3IHZlcnNpb24g
-bGF0ZXIuCj4KPiBJbiB0aGUgZnV0dXJlLCBpZiB5b3UgZGVwcmVjYXRlIGEgc2VyaWVzICh3aGlj
-aCBpcyBjb21wbGV0ZWx5Cj4gdW5kZXJzdGFuZGFibGUpLCBwbGVhc2UgbGVhdmUgYSBub3RlIG9u
-IHRoZSBsaXN0IHdpdGggYSBwb2ludGVyIHRvIHRoZQo+IG5ldyBzZXJpZXMgc28gdGhhdCBwZW9w
-bGUgZG9uJ3Qgd2FzdGUgdGltZSByZXZpZXdpbmcgYW4gb2Jzb2xldGUKPiBzZXJpZXMuIE9yIHBv
-c3QgdGhlIG5ldyBzZXJpZXMgd2l0aCBhIG5ldyB2ZXJzaW9uIG51bWJlciBzbyB0aGF0IGl0IGlz
-Cj4gb2J2aW91cyB0aGF0IHRoZSBvcmlnaW5hbCBzZXJpZXMgaGFzIGJlZW4gc3VwZXJzZWRlZC4K
-SSBhcG9sb2dpemUgZm9yIHRoaXMsIEkgd2lsbCBiZSBtb3JlIGNhcmVmdWwgaW4gdGhlIGZ1dHVy
-ZS4KClRoYW5rcywKCllhbmFuCj4gVGhhbmtzLAo+Cj4gCU0uCj4KX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1A
-bGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxt
-YW4vbGlzdGluZm8va3ZtYXJtCg==
+Hi Daniel,.
+
+On Tue, 02 Mar 2021 16:48:50 +0000,
+Daniel Kiss <daniel.kiss@arm.com> wrote:
+> 
+> CPUs that support SVE are architecturally required to support the
+> Virtualization Host Extensions (VHE), so far the kernel supported
+> SVE alongside KVM with VHE enabled. In same cases it is desired to
+> run nVHE config even when VHE is available.
+> This patch add support for SVE for nVHE configuration too.
+> 
+> Tested on FVP with a Linux guest VM that run with a different VL than
+> the host system.
+> 
+> Signed-off-by: Daniel Kiss <daniel.kiss@arm.com>
+> ---
+>  arch/arm64/Kconfig                      |  7 -----
+>  arch/arm64/include/asm/el2_setup.h      |  2 +-
+>  arch/arm64/include/asm/fpsimd.h         |  6 ++++
+>  arch/arm64/include/asm/fpsimdmacros.h   | 24 ++++++++++++++--
+>  arch/arm64/include/asm/kvm_arm.h        |  6 ++++
+>  arch/arm64/include/asm/kvm_host.h       | 17 +++--------
+>  arch/arm64/kernel/entry-fpsimd.S        |  5 ----
+>  arch/arm64/kvm/arm.c                    |  5 ----
+>  arch/arm64/kvm/fpsimd.c                 | 38 ++++++++++++++++++++-----
+>  arch/arm64/kvm/hyp/fpsimd.S             | 15 ++++++++++
+>  arch/arm64/kvm/hyp/include/hyp/switch.h | 34 +++++++++++-----------
+>  arch/arm64/kvm/hyp/nvhe/switch.c        | 24 ++++++++++++++++
+>  arch/arm64/kvm/reset.c                  |  4 ---
+>  13 files changed, 127 insertions(+), 60 deletions(-)
+> 
+> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+> index f39568b28ec1..049428f1bf27 100644
+> --- a/arch/arm64/Kconfig
+> +++ b/arch/arm64/Kconfig
+> @@ -1676,7 +1676,6 @@ endmenu
+>  config ARM64_SVE
+>  	bool "ARM Scalable Vector Extension support"
+>  	default y
+> -	depends on !KVM || ARM64_VHE
+>  	help
+>  	  The Scalable Vector Extension (SVE) is an extension to the AArch64
+>  	  execution state which complements and extends the SIMD functionality
+> @@ -1705,12 +1704,6 @@ config ARM64_SVE
+>  	  booting the kernel.  If unsure and you are not observing these
+>  	  symptoms, you should assume that it is safe to say Y.
+>  
+> -	  CPUs that support SVE are architecturally required to support the
+> -	  Virtualization Host Extensions (VHE), so the kernel makes no
+> -	  provision for supporting SVE alongside KVM without VHE enabled.
+> -	  Thus, you will need to enable CONFIG_ARM64_VHE if you want to support
+> -	  KVM in the same kernel image.
+> -
+>  config ARM64_MODULE_PLTS
+>  	bool "Use PLTs to allow module memory to spill over into vmalloc area"
+>  	depends on MODULES
+> diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
+> index a7f5a1bbc8ac..0207393e67c3 100644
+> --- a/arch/arm64/include/asm/el2_setup.h
+> +++ b/arch/arm64/include/asm/el2_setup.h
+> @@ -133,7 +133,7 @@
+>  	bic	x0, x0, #CPTR_EL2_TZ		// Also disable SVE traps
+>  	msr	cptr_el2, x0			// Disable copro. traps to EL2
+>  	isb
+> -	mov	x1, #ZCR_ELx_LEN_MASK		// SVE: Enable full vector
+> +	mov	x1, #ZCR_EL2_LEN_HOST		// SVE: Enable full vector
+>  	msr_s	SYS_ZCR_EL2, x1			// length for EL1.
+>  1:
+>  .endm
+> diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
+> index bec5f14b622a..526d69f3eeb3 100644
+> --- a/arch/arm64/include/asm/fpsimd.h
+> +++ b/arch/arm64/include/asm/fpsimd.h
+> @@ -69,6 +69,12 @@ static inline void *sve_pffr(struct thread_struct *thread)
+>  extern void sve_save_state(void *state, u32 *pfpsr);
+>  extern void sve_load_state(void const *state, u32 const *pfpsr,
+>  			   unsigned long vq_minus_1);
+> +/*
+> + * sve_load_state_nvhe function for the hyp code where the SVE registers are
+> + * handled from the EL2, vector length is governed by ZCR_EL2.
+> + */
+> +extern void sve_load_state_nvhe(void const *state, u32 const *pfpsr,
+> +			   unsigned long vq_minus_1);
+>  extern void sve_flush_live(void);
+>  extern void sve_load_from_fpsimd_state(struct user_fpsimd_state const *state,
+>  				       unsigned long vq_minus_1);
+> diff --git a/arch/arm64/include/asm/fpsimdmacros.h b/arch/arm64/include/asm/fpsimdmacros.h
+> index af43367534c7..d309c6071bce 100644
+> --- a/arch/arm64/include/asm/fpsimdmacros.h
+> +++ b/arch/arm64/include/asm/fpsimdmacros.h
+> @@ -205,6 +205,17 @@
+>  921:
+>  .endm
+>  
+> +/* Update ZCR_EL2.LEN with the new VQ */
+> +.macro sve_load_vq_nvhe xvqminus1, xtmp, xtmp2
+> +		mrs_s		\xtmp, SYS_ZCR_EL2
+> +		bic		\xtmp2, \xtmp, ZCR_ELx_LEN_MASK
+> +		orr		\xtmp2, \xtmp2, \xvqminus1
+> +		cmp		\xtmp2, \xtmp
+> +		b.eq		922f
+> +		msr_s		SYS_ZCR_EL2, \xtmp2	//self-synchronising
+> +922:
+> +.endm
+
+No, please. There is strictly no need for a new macro that only
+differs by the EL1 vs EL2 register. That's why we have alternatives
+for. And actually, you should be able to use the ZCR_EL2 register at
+all times, including on VHE.
+
+Please get rid of this.
+
+> +
+>  /* Preserve the first 128-bits of Znz and zero the rest. */
+>  .macro _sve_flush_z nz
+>  	_sve_check_zreg \nz
+> @@ -230,8 +241,7 @@
+>  		str		w\nxtmp, [\xpfpsr, #4]
+>  .endm
+>  
+> -.macro sve_load nxbase, xpfpsr, xvqminus1, nxtmp, xtmp2
+> -		sve_load_vq	\xvqminus1, x\nxtmp, \xtmp2
+> +.macro _sve_load nxbase, xpfpsr, nxtmp
+>   _for n, 0, 31,	_sve_ldr_v	\n, \nxbase, \n - 34
+>  		_sve_ldr_p	0, \nxbase
+>  		_sve_wrffr	0
+> @@ -242,3 +252,13 @@
+>  		ldr		w\nxtmp, [\xpfpsr, #4]
+>  		msr		fpcr, x\nxtmp
+>  .endm
+> +
+> +.macro sve_load nxbase, xpfpsr, xvqminus1, nxtmp, xtmp2
+> +		sve_load_vq	\xvqminus1, x\nxtmp, \xtmp2
+> +		_sve_load	\nxbase, \xpfpsr, \nxtmp
+> +.endm
+> +
+> +.macro sve_load_nvhe nxbase, xpfpsr, xvqminus1, nxtmp, xtmp2
+> +		sve_load_vq_nvhe	\xvqminus1, x\nxtmp, \xtmp2
+> +		_sve_load	 \nxbase, \xpfpsr, \nxtmp
+> +.endm
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index 4e90c2debf70..24d02365cc24 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -332,4 +332,10 @@
+>  #define CPACR_EL1_TTA		(1 << 28)
+>  #define CPACR_EL1_DEFAULT	(CPACR_EL1_FPEN | CPACR_EL1_ZEN_EL1EN)
+>  
+> +/*
+> + * Always the maximum vector length is set for the host, because
+> + * it need to access the whole SVE register.
+> + */
+> +#define ZCR_EL2_LEN_HOST ZCR_ELx_LEN_MASK
+> +
+>  #endif /* __ARM64_KVM_ARM_H__ */
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 8fcfab0c2567..11a058c81c1d 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -376,6 +376,10 @@ struct kvm_vcpu_arch {
+>  #define vcpu_sve_pffr(vcpu) ((void *)((char *)((vcpu)->arch.sve_state) + \
+>  				      sve_ffr_offset((vcpu)->arch.sve_max_vl)))
+>  
+> +#define vcpu_sve_pffr_hyp(vcpu) ((void *)((char *) \
+> +			(kern_hyp_va((vcpu)->arch.sve_state)) + \
+> +			sve_ffr_offset((vcpu)->arch.sve_max_vl)))
+> +
+>  #define vcpu_sve_state_size(vcpu) ({					\
+>  	size_t __size_ret;						\
+>  	unsigned int __vcpu_vq;						\
+> @@ -693,19 +697,6 @@ static inline void kvm_init_host_cpu_context(struct kvm_cpu_context *cpu_ctxt)
+>  	ctxt_sys_reg(cpu_ctxt, MPIDR_EL1) = read_cpuid_mpidr();
+>  }
+>  
+> -static inline bool kvm_arch_requires_vhe(void)
+> -{
+> -	/*
+> -	 * The Arm architecture specifies that implementation of SVE
+> -	 * requires VHE also to be implemented.  The KVM code for arm64
+> -	 * relies on this when SVE is present:
+> -	 */
+> -	if (system_supports_sve())
+> -		return true;
+> -
+> -	return false;
+> -}
+> -
+>  void kvm_arm_vcpu_ptrauth_trap(struct kvm_vcpu *vcpu);
+>  
+>  static inline void kvm_arch_hardware_unsetup(void) {}
+> diff --git a/arch/arm64/kernel/entry-fpsimd.S b/arch/arm64/kernel/entry-fpsimd.S
+> index 2ca395c25448..e444b753c518 100644
+> --- a/arch/arm64/kernel/entry-fpsimd.S
+> +++ b/arch/arm64/kernel/entry-fpsimd.S
+> @@ -33,11 +33,6 @@ SYM_FUNC_END(fpsimd_load_state)
+>  
+>  #ifdef CONFIG_ARM64_SVE
+>  
+> -SYM_FUNC_START(sve_save_state)
+> -	sve_save 0, x1, 2
+> -	ret
+> -SYM_FUNC_END(sve_save_state)
+> -
+>  SYM_FUNC_START(sve_load_state)
+>  	sve_load 0, x1, x2, 3, x4
+>  	ret
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index fe60d25c000e..6284563b352a 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1890,11 +1890,6 @@ int kvm_arch_init(void *opaque)
+>  
+>  	in_hyp_mode = is_kernel_in_hyp_mode();
+>  
+> -	if (!in_hyp_mode && kvm_arch_requires_vhe()) {
+> -		kvm_pr_unimpl("CPU unsupported in non-VHE mode, not initializing\n");
+> -		return -ENODEV;
+> -	}
+> -
+>  	if (cpus_have_final_cap(ARM64_WORKAROUND_DEVICE_LOAD_ACQUIRE) ||
+>  	    cpus_have_final_cap(ARM64_WORKAROUND_1508412))
+>  		kvm_info("Guests without required CPU erratum workarounds can deadlock system!\n" \
+> diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
+> index 3e081d556e81..f5f648e78578 100644
+> --- a/arch/arm64/kvm/fpsimd.c
+> +++ b/arch/arm64/kvm/fpsimd.c
+> @@ -42,6 +42,16 @@ int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu)
+>  	if (ret)
+>  		goto error;
+>  
+> +	if (!has_vhe() && vcpu->arch.sve_state) {
+
+Why the !has_vhe() predicate? create_hyp_mappings() is equipped to
+deal with VHE vs nVHE.
+
+> +		void *sve_state_end = vcpu->arch.sve_state +
+> +					    SVE_SIG_REGS_SIZE(
+> +						sve_vq_from_vl(vcpu->arch.sve_max_vl));
+> +		ret = create_hyp_mappings(vcpu->arch.sve_state,
+> +					  sve_state_end,
+> +					  PAGE_HYP);
+> +		if (ret)
+> +			goto error;
+> +	}
+>  	vcpu->arch.host_thread_info = kern_hyp_va(ti);
+>  	vcpu->arch.host_fpsimd_state = kern_hyp_va(fpsimd);
+>  error:
+> @@ -109,10 +119,21 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
+>  	local_irq_save(flags);
+>  
+>  	if (vcpu->arch.flags & KVM_ARM64_FP_ENABLED) {
+> +		if (guest_has_sve) {
+> +			if (has_vhe())
+> +				__vcpu_sys_reg(vcpu, ZCR_EL1) = read_sysreg_s(SYS_ZCR_EL12);
+> +			else {
+> +				__vcpu_sys_reg(vcpu, ZCR_EL1) = read_sysreg_s(SYS_ZCR_EL1);
+
+The two cases can be made common by using the correct accessor:
+
+	__vpcu_sys_reg(vcpu, ZCR_EL1) = read_sysreg_el1(SYS_ZCR);
+
+> +				/*
+> +				 * vcpu could set ZCR_EL1 to a shorter VL than the max VL but
+> +				 * the context may be still valid there so the host should save
+> +				 * the whole context. In nVHE case the ZCR_EL1 need to be reset.
+> +				 */
+
+Please keep comments within 80 columns.
+
+> +				write_sysreg_s(sve_vq_from_vl(vcpu->arch.sve_max_vl) - 1,
+> +					       SYS_ZCR_EL1);
+
+Why is this a nVHE-only requirement?
+
+> +			}
+> +		}
+>  		fpsimd_save_and_flush_cpu_state();
+> -
+> -		if (guest_has_sve)
+> -			__vcpu_sys_reg(vcpu, ZCR_EL1) = read_sysreg_s(SYS_ZCR_EL12);
+>  	} else if (host_has_sve) {
+>  		/*
+>  		 * The FPSIMD/SVE state in the CPU has not been touched, and we
+> @@ -120,11 +141,14 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
+>  		 * reset to CPACR_EL1_DEFAULT by the Hyp code, disabling SVE
+>  		 * for EL0.  To avoid spurious traps, restore the trap state
+>  		 * seen by kvm_arch_vcpu_load_fp():
+> +		 * nVHE case the CPACR_EL1 is context switched.
+
+But if CPACR_EL1 is context switched earlier than ZCR_EL1, what makes
+it legal to postpone context-switching *some* of the state to a later
+point.
+
+I think that's the main issue I have with this patch: it tries to
+shove SVE on nVHE in the VHE model of using load/put rather than
+save/restore (which is in general the rule for nVHE) without any
+indication of *why* it can be done like this.
+
+>  		 */
+> -		if (vcpu->arch.flags & KVM_ARM64_HOST_SVE_ENABLED)
+> -			sysreg_clear_set(CPACR_EL1, 0, CPACR_EL1_ZEN_EL0EN);
+> -		else
+> -			sysreg_clear_set(CPACR_EL1, CPACR_EL1_ZEN_EL0EN, 0);
+> +		if (has_vhe()) {
+> +			if (vcpu->arch.flags & KVM_ARM64_HOST_SVE_ENABLED)
+> +				sysreg_clear_set(CPACR_EL1, 0, CPACR_EL1_ZEN_EL0EN);
+> +			else
+> +				sysreg_clear_set(CPACR_EL1, CPACR_EL1_ZEN_EL0EN, 0);
+> +		}
+>  	}
+>  
+>  	update_thread_flag(TIF_SVE,
+> diff --git a/arch/arm64/kvm/hyp/fpsimd.S b/arch/arm64/kvm/hyp/fpsimd.S
+> index 01f114aa47b0..da824b46b81b 100644
+> --- a/arch/arm64/kvm/hyp/fpsimd.S
+> +++ b/arch/arm64/kvm/hyp/fpsimd.S
+> @@ -6,6 +6,7 @@
+>  
+>  #include <linux/linkage.h>
+>  
+> +#include <asm/assembler.h>
+>  #include <asm/fpsimdmacros.h>
+>  
+>  	.text
+> @@ -19,3 +20,17 @@ SYM_FUNC_START(__fpsimd_restore_state)
+>  	fpsimd_restore	x0, 1
+>  	ret
+>  SYM_FUNC_END(__fpsimd_restore_state)
+> +
+> +#ifdef CONFIG_ARM64_SVE
+> +
+> +SYM_FUNC_START(sve_save_state)
+> +	sve_save 0, x1, 2
+> +	ret
+> +SYM_FUNC_END(sve_save_state)
+> +
+> +SYM_FUNC_START(sve_load_state_nvhe)
+> +	sve_load_nvhe 0, x1, x2, 3, x4
+> +	ret
+> +SYM_FUNC_END(sve_load_state_nvhe)
+> +
+> +#endif
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index 84473574c2e7..99e7f0d5bb64 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -205,19 +205,13 @@ static inline bool __hyp_handle_fpsimd(struct kvm_vcpu *vcpu)
+>  	if (!system_supports_fpsimd())
+>  		return false;
+>  
+> -	/*
+> -	 * Currently system_supports_sve() currently implies has_vhe(),
+> -	 * so the check is redundant. However, has_vhe() can be determined
+> -	 * statically and helps the compiler remove dead code.
+> -	 */
+> -	if (has_vhe() && system_supports_sve()) {
+> +	vhe = has_vhe();
+> +	if (system_supports_sve()) {
+>  		sve_guest = vcpu_has_sve(vcpu);
+>  		sve_host = vcpu->arch.flags & KVM_ARM64_HOST_SVE_IN_USE;
+> -		vhe = true;
+>  	} else {
+>  		sve_guest = false;
+>  		sve_host = false;
+> -		vhe = has_vhe();
+>  	}
+>  
+>  	esr_ec = kvm_vcpu_trap_get_class(vcpu);
+> @@ -240,17 +234,17 @@ static inline bool __hyp_handle_fpsimd(struct kvm_vcpu *vcpu)
+>  
+>  		write_sysreg(reg, cpacr_el1);
+>  	} else {
+> -		write_sysreg(read_sysreg(cptr_el2) & ~(u64)CPTR_EL2_TFP,
+> -			     cptr_el2);
+> +		u64 reg = read_sysreg(cptr_el2) & ~(u64)CPTR_EL2_TFP;
+> +
+> +		if (sve_guest)
+> +			reg &= ~(u64)CPTR_EL2_TZ;
+> +
+> +		write_sysreg(reg, cptr_el2);
+>  	}
+>  
+>  	isb();
+>  
+>  	if (vcpu->arch.flags & KVM_ARM64_FP_HOST) {
+> -		/*
+> -		 * In the SVE case, VHE is assumed: it is enforced by
+> -		 * Kconfig and kvm_arch_init().
+> -		 */
+>  		if (sve_host) {
+>  			struct thread_struct *thread = container_of(
+>  				vcpu->arch.host_fpsimd_state,
+> @@ -266,10 +260,18 @@ static inline bool __hyp_handle_fpsimd(struct kvm_vcpu *vcpu)
+>  	}
+>  
+>  	if (sve_guest) {
+> -		sve_load_state(vcpu_sve_pffr(vcpu),
+> +		if (vhe) {
+> +			sve_load_state(vcpu_sve_pffr(vcpu),
+> +			       &vcpu->arch.ctxt.fp_regs.fpsr,
+> +			       sve_vq_from_vl(vcpu->arch.sve_max_vl) - 1);
+> +			write_sysreg_s(__vcpu_sys_reg(vcpu, ZCR_EL1), SYS_ZCR_EL12);
+> +		} else {
+> +			sve_load_state_nvhe(vcpu_sve_pffr_hyp(vcpu),
+>  			       &vcpu->arch.ctxt.fp_regs.fpsr,
+>  			       sve_vq_from_vl(vcpu->arch.sve_max_vl) - 1);
+> -		write_sysreg_s(__vcpu_sys_reg(vcpu, ZCR_EL1), SYS_ZCR_EL12);
+> +			write_sysreg_s(__vcpu_sys_reg(vcpu, ZCR_EL1), SYS_ZCR_EL1);
+> +
+> +		}
+>  	} else {
+>  		__fpsimd_restore_state(&vcpu->arch.ctxt.fp_regs);
+>  	}
+> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+> index f3d0e9eca56c..b0ded27918ce 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+> @@ -45,6 +45,18 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+>  	if (!update_fp_enabled(vcpu)) {
+>  		val |= CPTR_EL2_TFP;
+>  		__activate_traps_fpsimd32(vcpu);
+> +	} else {
+> +		if (vcpu_has_sve(vcpu)) {
+> +			/*
+> +			 * The register access will not be trapped so restore
+> +			 * ZCR_EL1/ZCR_EL2 because those were set for the host.
+> +			 */
+> +			write_sysreg_s(__vcpu_sys_reg(vcpu, ZCR_EL1), SYS_ZCR_EL1);
+> +			write_sysreg_s(
+> +				sve_vq_from_vl(vcpu->arch.sve_max_vl) - 1,
+> +				SYS_ZCR_EL2);
+> +			val &= ~CPTR_EL2_TZ;
+> +		}
+>  	}
+>  
+>  	write_sysreg(val, cptr_el2);
+> @@ -110,6 +122,17 @@ static void __load_host_stage2(void)
+>  	write_sysreg(0, vttbr_el2);
+>  }
+>  
+> +static void __restore_host_sve_state(struct kvm_vcpu *vcpu)
+> +{
+> +	/*
+> +	 * If the guest uses SVE, the ZCR_EL2 was configured for the guest.
+> +	 * Host saves the context in EL1. That requires the ZCR_EL2 be set
+> +	 * to the default of the host.
+> +	 */
+> +	if (vcpu_has_sve(vcpu) && (vcpu->arch.flags |= KVM_ARM64_FP_ENABLED))
+
+Did you actually intend to write *that*?
+
+> +		write_sysreg_s(ZCR_EL2_LEN_HOST, SYS_ZCR_EL2);
+
+Apart from what I believe to be an obvious typo, you really need to
+explain what is your context switching strategy. You seem to have
+things both in save/restore and load/put. I can't really tell which
+one is correct in your case because you don't explain anything, but
+having *both* for a single mode of operation is definitely completely
+wrong.
+
+> +}
+> +
+>  /* Save VGICv3 state on non-VHE systems */
+>  static void __hyp_vgic_save_state(struct kvm_vcpu *vcpu)
+>  {
+> @@ -229,6 +252,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>  	__deactivate_traps(vcpu);
+>  	__load_host_stage2();
+>  
+> +	__restore_host_sve_state(vcpu);
+>  	__sysreg_restore_state_nvhe(host_ctxt);
+>  
+>  	if (vcpu->arch.flags & KVM_ARM64_FP_ENABLED)
+> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> index 47f3f035f3ea..f08b1e7ebf68 100644
+> --- a/arch/arm64/kvm/reset.c
+> +++ b/arch/arm64/kvm/reset.c
+> @@ -74,10 +74,6 @@ static int kvm_vcpu_enable_sve(struct kvm_vcpu *vcpu)
+>  	if (!system_supports_sve())
+>  		return -EINVAL;
+>  
+> -	/* Verify that KVM startup enforced this when SVE was detected: */
+> -	if (WARN_ON(!has_vhe()))
+> -		return -EINVAL;
+> -
+>  	vcpu->arch.sve_max_vl = kvm_sve_max_vl;
+>  
+>  	/*
+
+I expect that the main part of the next version of this patch will be
+a detailed explanation of the SVE nVHE context-switching strategy. At
+it stands, I cannot tell what this patch is trying to do.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
