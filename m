@@ -2,61 +2,73 @@ Return-Path: <SRS0=aIiX=IH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93BDAC433DB
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Mar 2021 14:21:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AECC6C433E9
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Mar 2021 14:25:18 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D5E7F64E21
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Mar 2021 14:21:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5E7F64E21
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id DBEBE651B9
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Mar 2021 14:25:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBEBE651B9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 406B64B3E2;
-	Tue,  9 Mar 2021 09:21:07 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 522934B363;
+	Tue,  9 Mar 2021 09:25:17 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id PFmj9SzjtP4l; Tue,  9 Mar 2021 09:21:03 -0500 (EST)
+	with ESMTP id GcQoumXzgOcr; Tue,  9 Mar 2021 09:25:13 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 653194B3E5;
-	Tue,  9 Mar 2021 09:21:03 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F1394B374;
+	Tue,  9 Mar 2021 09:25:13 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EDA124B3E5
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Mar 2021 09:21:01 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E527C4B369
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Mar 2021 09:25:11 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IRbMJm1bMc+X for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 Mar 2021 09:21:00 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E38E4B3E2
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Mar 2021 09:21:00 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AAEF931B;
- Tue,  9 Mar 2021 06:20:59 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AABC53F71B;
- Tue,  9 Mar 2021 06:20:58 -0800 (PST)
-Subject: Re: [PATCH kvmtool v2 15/22] vfio: Refactor ioport trap handler
-To: Andre Przywara <andre.przywara@arm.com>, Will Deacon <will@kernel.org>,
- Julien Thierry <julien.thierry.kdev@gmail.com>
-References: <20210225005915.26423-1-andre.przywara@arm.com>
- <20210225005915.26423-16-andre.przywara@arm.com>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <cb824a61-df42-5fb1-3209-fefc0eea3420@arm.com>
-Date: Tue, 9 Mar 2021 14:21:20 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
-MIME-Version: 1.0
-In-Reply-To: <20210225005915.26423-16-andre.przywara@arm.com>
-Content-Language: en-US
-Cc: Marc Zyngier <maz@kernel.org>, Sami Mujawar <sami.mujawar@arm.com>,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+ with ESMTP id L1PfyassR+WH for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Mar 2021 09:25:07 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B54FD4B363
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Mar 2021 09:25:07 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 71E15651B2;
+ Tue,  9 Mar 2021 14:25:06 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1lJdIG-000ZGV-Bc; Tue, 09 Mar 2021 14:25:04 +0000
+Date: Tue, 09 Mar 2021 14:25:03 +0000
+Message-ID: <87lfawxv40.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Suzuki Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH] KVM: arm64: Cap default IPA size to the host's own size
+In-Reply-To: <AB37EA2F-BAF2-4E0C-AD63-201CE480DFB2@arm.com>
+References: <20210308174643.761100-1-maz@kernel.org>
+ <AB37EA2F-BAF2-4E0C-AD63-201CE480DFB2@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com,
+ julien.thierry.kdev@gmail.com, alexandru.elisei@arm.com,
+ kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, kernel-team@android.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,121 +85,81 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Andre,
+Hi Suzuki,
 
-On 2/25/21 12:59 AM, Andre Przywara wrote:
-> With the planned retirement of the special ioport emulation code, we
-> need to provide an emulation function compatible with the MMIO prototype.
->
-> Adjust the I/O port trap handler to use that new function, and provide
-> shims to implement the old ioport interface, for now.
->
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
->  vfio/core.c | 51 ++++++++++++++++++++++++++++++++++++---------------
->  1 file changed, 36 insertions(+), 15 deletions(-)
->
-> diff --git a/vfio/core.c b/vfio/core.c
-> index 0b45e78b..ddd3c2c7 100644
-> --- a/vfio/core.c
-> +++ b/vfio/core.c
-> @@ -81,15 +81,12 @@ out_free_buf:
->  	return ret;
->  }
->  
-> -static bool vfio_ioport_in(struct ioport *ioport, struct kvm_cpu *vcpu,
-> -			   u16 port, void *data, int len)
-> +static bool _vfio_ioport_in(struct vfio_region *region, u32 offset,
-> +			    void *data, int len)
->  {
-> -	u32 val;
-> -	ssize_t nr;
-> -	struct vfio_region *region = ioport->priv;
->  	struct vfio_device *vdev = region->vdev;
-> -
-> -	u32 offset = port - region->port_base;
-> +	ssize_t nr;
-> +	u32 val;
->  
->  	if (!(region->info.flags & VFIO_REGION_INFO_FLAG_READ))
->  		return false;
-> @@ -97,7 +94,7 @@ static bool vfio_ioport_in(struct ioport *ioport, struct kvm_cpu *vcpu,
->  	nr = pread(vdev->fd, &val, len, region->info.offset + offset);
->  	if (nr != len) {
->  		vfio_dev_err(vdev, "could not read %d bytes from I/O port 0x%x\n",
-> -			     len, port);
-> +			     len, offset + region->port_base);
->  		return false;
->  	}
->  
-> @@ -118,15 +115,13 @@ static bool vfio_ioport_in(struct ioport *ioport, struct kvm_cpu *vcpu,
->  	return true;
->  }
->  
-> -static bool vfio_ioport_out(struct ioport *ioport, struct kvm_cpu *vcpu,
-> -			    u16 port, void *data, int len)
-> +static bool _vfio_ioport_out(struct vfio_region *region, u32 offset,
-> +			     void *data, int len)
->  {
-> -	u32 val;
-> -	ssize_t nr;
-> -	struct vfio_region *region = ioport->priv;
->  	struct vfio_device *vdev = region->vdev;
-> +	ssize_t nr;
-> +	u32 val;
->  
-> -	u32 offset = port - region->port_base;
->  
->  	if (!(region->info.flags & VFIO_REGION_INFO_FLAG_WRITE))
->  		return false;
-> @@ -148,11 +143,37 @@ static bool vfio_ioport_out(struct ioport *ioport, struct kvm_cpu *vcpu,
->  	nr = pwrite(vdev->fd, &val, len, region->info.offset + offset);
->  	if (nr != len)
->  		vfio_dev_err(vdev, "could not write %d bytes to I/O port 0x%x",
-> -			     len, port);
-> +			     len, offset + region->port_base);
->  
->  	return nr == len;
->  }
->  
-> +static void vfio_ioport_mmio(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len,
-> +			     u8 is_write, void *ptr)
-> +{
-> +	struct vfio_region *region = ptr;
-> +	u32 offset = addr - region->port_base;
-> +
-> +	if (is_write)
-> +		_vfio_ioport_out(region, offset, data, len);
-> +	else
-> +		_vfio_ioport_in(region, offset, data, len);
-> +}
-> +
-> +static bool vfio_ioport_out(struct ioport *ioport, struct kvm_cpu *vcpu,
-> +			    u16 port, void *data, int len)
-> +{
-> +	vfio_ioport_mmio(vcpu, port, data, len, true, ioport->priv);
-> +	return true;
-> +}
-> +
-> +static bool vfio_ioport_in(struct ioport *ioport, struct kvm_cpu *vcpu,
-> +			   u16 port, void *data, int len)
-> +{
-> +	vfio_ioport_mmio(vcpu, port, data, len, false, ioport->priv);
-> +	return true;
-> +}
-> +
->  static struct ioport_operations vfio_ioport_ops = {
->  	.io_in	= vfio_ioport_in,
->  	.io_out	= vfio_ioport_out,
+On Tue, 09 Mar 2021 11:09:48 +0000,
+Suzuki Poulose <suzuki.poulose@arm.com> wrote:
+> 
+> 
+> 
+> > On 8 Mar 2021, at 17:46, Marc Zyngier <maz@kernel.org> wrote:
+> > 
+> > KVM/arm64 has forever used a 40bit default IPA space, partially
+> > due to its 32bit heritage (where the only choice is 40bit).
+> > 
+> > However, there are implementations in the wild that have a *cough*
+> > much smaller *cough* IPA space, which leads to a misprogramming of
+> > VTCR_EL2, and a guest that is stuck on its first memory access
+> > if userspace dares to ask for the default IPA setting (which most
+> > VMMs do).
+> > 
+> > Instead, cap the default IPA size to what the host can actually
+> > do, and spit out a one-off message on the console. The boot warning
+> > is turned into a more meaningfull message, and the new behaviour
+> > is also documented.
+> > 
+> > Although this is a userspace ABI change, it doesn't really change
+> > much for userspace:
+> > 
+> > - the guest couldn't run before this change, while it now has
+> >  a chance to if the memory range fits the reduced IPA space
+> > 
+> > - a memory slot that was accepted because it did fit the default
+> >  IPA space but didn't fit the HW constraints is now properly
+> >  rejected
+> > 
+> > The other thing that's left doing is to convince userspace to
+> > actually use the IPA space setting instead of relying on the
+> > antiquated default.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> 
+> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-The new code looks functionally identical to the old one:
+Thanks for that. Whilst I have your attention and given that you are
+responsible for most of the variable IPA stuff... ;-)
 
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+I think we have another issue around the handling of our IPA
+size. Let's say I create a VM with a 32bit IPA space. If I register a
+2GB memslot at 0x8000000, I'm getting an error, which I think is
+bogus.
 
-Thanks,
+I came to the conclusion that kvm_arch_prepare_memory_region() is a
+bit overzealous when rejecting the memslot, and I used the following
+patchlet to address it.
 
-Alex
+Does this seem sensible to you?
 
+	M.
+
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 77cb2d28f2a4..8711894db8c2 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1312,8 +1312,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+ 	 * Prevent userspace from creating a memory region outside of the IPA
+ 	 * space addressable by the KVM guest IPA space.
+ 	 */
+-	if (memslot->base_gfn + memslot->npages >=
+-	    (kvm_phys_size(kvm) >> PAGE_SHIFT))
++	if ((memslot->base_gfn + memslot->npages) > (kvm_phys_size(kvm) >> PAGE_SHIFT))
+ 		return -EFAULT;
+ 
+ 	mmap_read_lock(current->mm);
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
