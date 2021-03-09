@@ -2,62 +2,81 @@ Return-Path: <SRS0=aIiX=IH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C7E7C433E0
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Mar 2021 16:06:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC5DDC433E0
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Mar 2021 17:06:33 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 79CB965237
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Mar 2021 16:06:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79CB965237
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 4DFA26522A
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Mar 2021 17:06:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DFA26522A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D317C4B2C4;
-	Tue,  9 Mar 2021 11:06:30 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D5DB24B2A7;
+	Tue,  9 Mar 2021 12:06:32 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id rilxqMiFBw46; Tue,  9 Mar 2021 11:06:29 -0500 (EST)
+	with ESMTP id UGVPwiKNsnKD; Tue,  9 Mar 2021 12:06:31 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C8C54B2F6;
-	Tue,  9 Mar 2021 11:06:29 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D9294B32C;
+	Tue,  9 Mar 2021 12:06:31 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 63A674B2CB
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Mar 2021 11:06:28 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 48A164B2FD
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Mar 2021 12:06:30 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nA2yL7oQYn1m for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 Mar 2021 11:06:27 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 070094B2C4
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Mar 2021 11:06:27 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6523E1042;
- Tue,  9 Mar 2021 08:06:26 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 606873F71B;
- Tue,  9 Mar 2021 08:06:25 -0800 (PST)
-Subject: Re: [PATCH kvmtool v2 22/22] hw/rtc: ARM/arm64: Use MMIO at higher
- addresses
-To: Andre Przywara <andre.przywara@arm.com>, Will Deacon <will@kernel.org>,
- Julien Thierry <julien.thierry.kdev@gmail.com>
-References: <20210225005915.26423-1-andre.przywara@arm.com>
- <20210225005915.26423-23-andre.przywara@arm.com>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <606d032e-d1f1-257f-eb1c-c471f2f20935@arm.com>
-Date: Tue, 9 Mar 2021 16:06:51 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
-MIME-Version: 1.0
-In-Reply-To: <20210225005915.26423-23-andre.przywara@arm.com>
-Content-Language: en-US
-Cc: Marc Zyngier <maz@kernel.org>, Sami Mujawar <sami.mujawar@arm.com>,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+ with ESMTP id DeEiNB9K90aV for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Mar 2021 12:06:29 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EE6054B2A7
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Mar 2021 12:06:28 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 39FE764F45;
+ Tue,  9 Mar 2021 17:06:26 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1lJfoO-000bDF-1a; Tue, 09 Mar 2021 17:06:24 +0000
+Date: Tue, 09 Mar 2021 17:06:23 +0000
+Message-ID: <87im60xnn4.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Steven Price <steven.price@arm.com>
+Subject: Re: [PATCH v9 2/6] arm64: kvm: Introduce MTE VM feature
+In-Reply-To: <20210301142315.30920-3-steven.price@arm.com>
+References: <20210301142315.30920-1-steven.price@arm.com>
+ <20210301142315.30920-3-steven.price@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: steven.price@arm.com, catalin.marinas@arm.com,
+ will@kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com,
+ suzuki.poulose@arm.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Dave.Martin@arm.com, mark.rutland@arm.com, tglx@linutronix.de,
+ qemu-devel@nongnu.org, quintela@redhat.com, dgilbert@redhat.com,
+ richard.henderson@linaro.org, peter.maydell@linaro.org, Haibo.Xu@arm.com,
+ drjones@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
+ Catalin Marinas <catalin.marinas@arm.com>, Juan Quintela <quintela@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
+ Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org,
+ Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -74,128 +93,149 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Andre,
+On Mon, 01 Mar 2021 14:23:11 +0000,
+Steven Price <steven.price@arm.com> wrote:
+> 
+> Add a new VM feature 'KVM_ARM_CAP_MTE' which enables memory tagging
+> for a VM. This will expose the feature to the guest and automatically
+> tag memory pages touched by the VM as PG_mte_tagged (and clear the tag
+> storage) to ensure that the guest cannot see stale tags, and so that
+> the tags are correctly saved/restored across swap.
+> 
+> Actually exposing the new capability to user space happens in a later
+> patch.
+> 
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+>  arch/arm64/include/asm/kvm_emulate.h |  3 +++
+>  arch/arm64/include/asm/kvm_host.h    |  3 +++
+>  arch/arm64/kvm/hyp/exception.c       |  3 ++-
+>  arch/arm64/kvm/mmu.c                 | 16 ++++++++++++++++
+>  arch/arm64/kvm/sys_regs.c            |  3 ++-
+>  include/uapi/linux/kvm.h             |  1 +
+>  6 files changed, 27 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index f612c090f2e4..6bf776c2399c 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -84,6 +84,9 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+>  	if (cpus_have_const_cap(ARM64_MISMATCHED_CACHE_TYPE) ||
+>  	    vcpu_el1_is_32bit(vcpu))
+>  		vcpu->arch.hcr_el2 |= HCR_TID2;
+> +
+> +	if (kvm_has_mte(vcpu->kvm))
+> +		vcpu->arch.hcr_el2 |= HCR_ATA;
+>  }
+>  
+>  static inline unsigned long *vcpu_hcr(struct kvm_vcpu *vcpu)
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 3d10e6527f7d..1170ee137096 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -132,6 +132,8 @@ struct kvm_arch {
+>  
+>  	u8 pfr0_csv2;
+>  	u8 pfr0_csv3;
+> +	/* Memory Tagging Extension enabled for the guest */
+> +	bool mte_enabled;
+>  };
+>  
+>  struct kvm_vcpu_fault_info {
+> @@ -767,6 +769,7 @@ bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
+>  #define kvm_arm_vcpu_sve_finalized(vcpu) \
+>  	((vcpu)->arch.flags & KVM_ARM64_VCPU_SVE_FINALIZED)
+>  
+> +#define kvm_has_mte(kvm) (system_supports_mte() && (kvm)->arch.mte_enabled)
+>  #define kvm_vcpu_has_pmu(vcpu)					\
+>  	(test_bit(KVM_ARM_VCPU_PMU_V3, (vcpu)->arch.features))
+>  
+> diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
+> index 73629094f903..56426565600c 100644
+> --- a/arch/arm64/kvm/hyp/exception.c
+> +++ b/arch/arm64/kvm/hyp/exception.c
+> @@ -112,7 +112,8 @@ static void enter_exception64(struct kvm_vcpu *vcpu, unsigned long target_mode,
+>  	new |= (old & PSR_C_BIT);
+>  	new |= (old & PSR_V_BIT);
+>  
+> -	// TODO: TCO (if/when ARMv8.5-MemTag is exposed to guests)
+> +	if (kvm_has_mte(vcpu->kvm))
+> +		new |= PSR_TCO_BIT;
+>  
+>  	new |= (old & PSR_DIT_BIT);
+>  
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 77cb2d28f2a4..fdb6ab604fd0 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -879,6 +879,22 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	if (vma_pagesize == PAGE_SIZE && !force_pte)
+>  		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
+>  							   &pfn, &fault_ipa);
+> +
+> +	if (kvm_has_mte(kvm) && pfn_valid(pfn)) {
+> +		/*
+> +		 * VM will be able to see the page's tags, so we must ensure
+> +		 * they have been initialised. if PG_mte_tagged is set, tags
+> +		 * have already been initialised.
+> +		 */
+> +		struct page *page = pfn_to_page(pfn);
+> +		unsigned long i, nr_pages = vma_pagesize >> PAGE_SHIFT;
+> +
+> +		for (i = 0; i < nr_pages; i++, page++) {
+> +			if (!test_and_set_bit(PG_mte_tagged, &page->flags))
+> +				mte_clear_page_tags(page_address(page));
+> +		}
+> +	}
 
-On 2/25/21 12:59 AM, Andre Przywara wrote:
-> Using the RTC device at its legacy I/O address as set by IBM in 1981
-> was a kludge we used for simplicity on ARM platforms as well.
-> However this imposes problems due to their missing alignment and overlap
-> with the PCI I/O address space.
->
-> Now that we can switch a device easily between using ioports and
-> MMIO, let's move the RTC out of the first 4K of memory on ARM platforms.
->
-> That should be transparent for well behaved guests, since the change is
-> naturally reflected in the device tree.
+Is there any reason to do this dance for anything but a translation
+fault?
 
-Everything looks correct, compile tested for arm64 and x86-64. Also grep'ed for
-0x70 (device ioport address) and DEVICE_BUS_IOPORT, no occurrence in the file
-other than in the defines:
+> +
+>  	if (writable)
+>  		prot |= KVM_PGTABLE_PROT_W;
+>  
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 4f2f1e3145de..e09dbc00b0a2 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1046,7 +1046,8 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+>  		val |= FIELD_PREP(FEATURE(ID_AA64PFR0_CSV3), (u64)vcpu->kvm->arch.pfr0_csv3);
+>  		break;
+>  	case SYS_ID_AA64PFR1_EL1:
+> -		val &= ~FEATURE(ID_AA64PFR1_MTE);
+> +		if (!kvm_has_mte(vcpu->kvm))
+> +			val &= ~FEATURE(ID_AA64PFR1_MTE);
 
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Are we happy to expose *any* of the MTE flavours? Or should we
+restrict it in any way?
+
+>  		break;
+>  	case SYS_ID_AA64ISAR1_EL1:
+>  		if (!vcpu_has_ptrauth(vcpu))
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 8b281f722e5b..05618a4abf7e 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1078,6 +1078,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_DIRTY_LOG_RING 192
+>  #define KVM_CAP_X86_BUS_LOCK_EXIT 193
+>  #define KVM_CAP_PPC_DAWR1 194
+> +#define KVM_CAP_ARM_MTE 195
+>  
+>  #ifdef KVM_CAP_IRQ_ROUTING
+>  
+> -- 
+> 2.20.1
+> 
+> 
 
 Thanks,
 
-Alex
+	M.
 
->
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
->  arm/include/arm-common/kvm-arch.h |  3 +++
->  hw/rtc.c                          | 24 ++++++++++++++++--------
->  2 files changed, 19 insertions(+), 8 deletions(-)
->
-> diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
-> index 633ea8fa..02100c48 100644
-> --- a/arm/include/arm-common/kvm-arch.h
-> +++ b/arm/include/arm-common/kvm-arch.h
-> @@ -31,6 +31,9 @@
->  #define ARM_UART_MMIO_BASE	ARM_MMIO_AREA
->  #define ARM_UART_MMIO_SIZE	0x10000
->  
-> +#define ARM_RTC_MMIO_BASE	(ARM_UART_MMIO_BASE + ARM_UART_MMIO_SIZE)
-> +#define ARM_RTC_MMIO_SIZE	0x10000
-> +
->  #define KVM_FLASH_MMIO_BASE	(ARM_MMIO_AREA + 0x1000000)
->  #define KVM_FLASH_MAX_SIZE	0x1000000
->  
-> diff --git a/hw/rtc.c b/hw/rtc.c
-> index ee4c9102..aec31c52 100644
-> --- a/hw/rtc.c
-> +++ b/hw/rtc.c
-> @@ -5,6 +5,15 @@
->  
->  #include <time.h>
->  
-> +#if defined(CONFIG_ARM) || defined(CONFIG_ARM64)
-> +#define RTC_BUS_TYPE		DEVICE_BUS_MMIO
-> +#define RTC_BASE_ADDRESS	ARM_RTC_MMIO_BASE
-> +#else
-> +/* PORT 0070-007F - CMOS RAM/RTC (REAL TIME CLOCK) */
-> +#define RTC_BUS_TYPE		DEVICE_BUS_IOPORT
-> +#define RTC_BASE_ADDRESS	0x70
-> +#endif
-> +
->  /*
->   * MC146818 RTC registers
->   */
-> @@ -49,7 +58,7 @@ static void cmos_ram_io(struct kvm_cpu *vcpu, u64 addr, u8 *data,
->  	time_t ti;
->  
->  	if (is_write) {
-> -		if (addr == 0x70) {	/* index register */
-> +		if (addr == RTC_BASE_ADDRESS) {	/* index register */
->  			u8 value = ioport__read8(data);
->  
->  			vcpu->kvm->nmi_disabled	= value & (1UL << 7);
-> @@ -70,7 +79,7 @@ static void cmos_ram_io(struct kvm_cpu *vcpu, u64 addr, u8 *data,
->  		return;
->  	}
->  
-> -	if (addr == 0x70)
-> +	if (addr == RTC_BASE_ADDRESS)	/* index register is write-only */
->  		return;
->  
->  	time(&ti);
-> @@ -127,7 +136,7 @@ static void generate_rtc_fdt_node(void *fdt,
->  							    u8 irq,
->  							    enum irq_type))
->  {
-> -	u64 reg_prop[2] = { cpu_to_fdt64(0x70), cpu_to_fdt64(2) };
-> +	u64 reg_prop[2] = { cpu_to_fdt64(RTC_BASE_ADDRESS), cpu_to_fdt64(2) };
->  
->  	_FDT(fdt_begin_node(fdt, "rtc"));
->  	_FDT(fdt_property_string(fdt, "compatible", "motorola,mc146818"));
-> @@ -139,7 +148,7 @@ static void generate_rtc_fdt_node(void *fdt,
->  #endif
->  
->  struct device_header rtc_dev_hdr = {
-> -	.bus_type = DEVICE_BUS_IOPORT,
-> +	.bus_type = RTC_BUS_TYPE,
->  	.data = generate_rtc_fdt_node,
->  };
->  
-> @@ -151,8 +160,8 @@ int rtc__init(struct kvm *kvm)
->  	if (r < 0)
->  		return r;
->  
-> -	/* PORT 0070-007F - CMOS RAM/RTC (REAL TIME CLOCK) */
-> -	r = kvm__register_pio(kvm, 0x0070, 2, cmos_ram_io, NULL);
-> +	r = kvm__register_iotrap(kvm, RTC_BASE_ADDRESS, 2, cmos_ram_io, NULL,
-> +				 RTC_BUS_TYPE);
->  	if (r < 0)
->  		goto out_device;
->  
-> @@ -170,8 +179,7 @@ dev_init(rtc__init);
->  
->  int rtc__exit(struct kvm *kvm)
->  {
-> -	/* PORT 0070-007F - CMOS RAM/RTC (REAL TIME CLOCK) */
-> -	kvm__deregister_pio(kvm, 0x0070);
-> +	kvm__deregister_iotrap(kvm, RTC_BASE_ADDRESS, RTC_BUS_TYPE);
->  
->  	return 0;
->  }
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
