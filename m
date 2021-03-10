@@ -2,46 +2,46 @@ Return-Path: <SRS0=f6Gw=II=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BD9DC43381
-	for <kvmarm@archiver.kernel.org>; Wed, 10 Mar 2021 09:43:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50C68C4332B
+	for <kvmarm@archiver.kernel.org>; Wed, 10 Mar 2021 09:43:42 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 55C7B64FE2
-	for <kvmarm@archiver.kernel.org>; Wed, 10 Mar 2021 09:43:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55C7B64FE2
+	by mail.kernel.org (Postfix) with ESMTP id 832B164DAF
+	for <kvmarm@archiver.kernel.org>; Wed, 10 Mar 2021 09:43:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 832B164DAF
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ADF344B5FB;
-	Wed, 10 Mar 2021 04:43:39 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 204704B5EC;
+	Wed, 10 Mar 2021 04:43:41 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id fxdhmElToXvb; Wed, 10 Mar 2021 04:43:38 -0500 (EST)
+	with ESMTP id Xe8NnQ+IGa5d; Wed, 10 Mar 2021 04:43:39 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 913734B305;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AACB64B569;
 	Wed, 10 Mar 2021 04:43:38 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AA1914B28F
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AC3944B29F
  for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Mar 2021 04:43:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nm9ZUjaJQ5G5 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 10 Mar 2021 04:43:36 -0500 (EST)
+ with ESMTP id mEVDmkIZFReP for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 10 Mar 2021 04:43:34 -0500 (EST)
 Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 40AE24B1E4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Mar 2021 04:43:35 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2CC9E4B1AF
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Mar 2021 04:43:34 -0500 (EST)
 Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.59])
- by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4DwRtg0c5szkX1y;
+ by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4DwRtg075xzkX1n;
  Wed, 10 Mar 2021 17:42:03 +0800 (CST)
 Received: from DESKTOP-TMVL5KK.china.huawei.com (10.174.187.128) by
  DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
- 14.3.498.0; Wed, 10 Mar 2021 17:43:23 +0800
+ 14.3.498.0; Wed, 10 Mar 2021 17:43:21 +0800
 From: Yanan Wang <wangyanan55@huawei.com>
 To: Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, "Catalin
  Marinas" <catalin.marinas@arm.com>, James Morse <james.morse@arm.com>,
@@ -50,13 +50,10 @@ To: Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, "Catalin
  <qperret@google.com>, <kvmarm@lists.cs.columbia.edu>,
  <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
  <linux-kernel@vger.kernel.org>
-Subject: [RFC PATCH v2 2/3] KVM: arm64: Install the block entry before
- unmapping the page mappings
-Date: Wed, 10 Mar 2021 17:43:18 +0800
-Message-ID: <20210310094319.18760-3-wangyanan55@huawei.com>
+Subject: [RFC PATCH v2 0/3] KVM: arm64: Improve efficiency of stage2 page table
+Date: Wed, 10 Mar 2021 17:43:16 +0800
+Message-ID: <20210310094319.18760-1-wangyanan55@huawei.com>
 X-Mailer: git-send-email 2.8.4.windows.1
-In-Reply-To: <20210310094319.18760-1-wangyanan55@huawei.com>
-References: <20210310094319.18760-1-wangyanan55@huawei.com>
 MIME-Version: 1.0
 X-Originating-IP: [10.174.187.128]
 X-CFilter-Loop: Reflected
@@ -76,23 +73,81 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-When KVM needs to coalesce the existing normal page mappings into a block
-mapping, we currently follow the following steps successively:
+Hi,
+This v2 series makes some efficiency improvement of stage2 page table code,
+and there are some test results to quantify the benefit of each patch.
+
+Changelogs:
+v1->v2:
+- rebased on top of mainline v5.12-rc2
+- also move CMOs of I-cache to the fault handlers
+- merge patch 2 and patch 3 together
+- retest this v2 series based on v5.12-rc2
+- v1: https://lore.kernel.org/lkml/20210208112250.163568-1-wangyanan55@huawei.com/
+
+About patch 1:
+We currently uniformly perform CMOs of D-cache and I-cache in user_mem_abort()
+before calling the fault handlers. If we get concurrent translation faults on
+the same IPA (page or block), CMOs for the first time is necessary while the
+others later are not.
+
+By moving CMOs to the fault handlers, we can easily identify conditions where
+they are really needed and avoid the unnecessary ones. As it's a time consuming
+process to perform CMOs especially when flushing a block range, so this solution
+reduces much load of kvm and improve efficiency of the stage2 page table code.
+
+So let's move both clean of D-cache and invalidation of I-cache to the map path
+and move only invalidation of I-cache to the permission path. Since the original
+APIs for CMOs in mmu.c are only called in function user_mem_abort(), we now also
+move them to pgtable.c.
+
+The following results represent the benefit of patch 1 alone, and they were
+tested by [1](kvm/selftest) that I have posted recently.
+[1] https://lore.kernel.org/lkml/20210302125751.19080-1-wangyanan55@huawei.com/
+
+When there are muitiple vcpus concurrently accessing the same memory region,
+we can test the execution time of KVM creating new mappings, updating the
+permissions of old mappings from RO to RW, and rebuilding the blocks after
+they have been split.
+
+hardware platform: HiSilicon Kunpeng920 Server
+host kernel: Linux mainline v5.12-rc2
+
+cmdline: ./kvm_page_table_test -m 4 -s anonymous -b 1G -v 80
+           (80 vcpus, 1G memory, page mappings(normal 4K))
+KVM_CREATE_MAPPINGS: before 104.63s -> after  97.30s  +7.00%
+KVM_UPDATE_MAPPINGS: before  78.47s -> after  77.18s  +1.64%
+
+cmdline: ./kvm_page_table_test -m 4 -s anonymous_thp -b 20G -v 40
+	   (40 vcpus, 20G memory, block mappings(THP 2M))
+KVM_CREATE_MAPPINGS: before  15.70s -> after   7.36s  +53.12%
+KVM_UPDATE_MAPPINGS: before 161.00s -> after 135.03s  +16.13%
+KVM_REBUILD_BLOCKS:  before 170.49s -> after 145.46s  +14.68%
+
+cmdline: ./kvm_page_table_test -m 4 -s anonymous_hugetlb_1gb -b 20G -v 40
+	   (40 vcpus, 20G memory, block mappings(HUGETLB 1G))
+KVM_CREATE_MAPPINGS: before 104.55s -> after   3.69s  +96.47%
+KVM_UPDATE_MAPPINGS: before 160.67s -> after 130.65s  +18.68%
+KVM_REBUILD_BLOCKS:  before 103.95s -> after   2.96s  +97.15%
+
+About patch 2:
+If KVM needs to coalesce the existing normal page mappings into a block mapping,
+we currently follow the following steps successively:
 1) invalidate the table entry in the PMD/PUD table
 2) flush TLB by VMID
 3) unmap the old sub-level tables
 4) install the new block entry to the PMD/PUD table
 
-It will cost a long time to unmap the old page mappings in step 3, which
-means there will be a long period when the PMD/PUD table entry could be
-found invalid (step 1, 2, 3). So the other vcpus have a really big chance
-to trigger unnecessary translations if they access any page within the
-block and find the table entry invalid.
+It will cost a long time to unmap the numerous old page mappings in step 3,
+which means there will be a long period when the PMD/PUD table entry could be
+found invalid (step 1, 2, 3). So the other vcpus have a really big chance to
+trigger unnecessary translations if they access any page within the block and
+find the table entry invalid.
 
-So let's quickly install the block entry at first to ensure uninterrupted
-memory access of the other vcpus, and then unmap the page mappings after
-installation. This will reduce most of the time when the table entry is
-invalid, and avoid most of the unnecessary translation faults.
+So let's quickly install the block entry at first to ensure uninterrupted memory
+access of the other vcpus, and then unmap the page mappings after installation.
+This will reduce most of the time when the table entry is invalid, and avoid most
+of the unnecessary translation faults.
 
 After this patch the steps can be like:
 1) invalidate the table entry in the PMD/PUD table
@@ -100,96 +155,49 @@ After this patch the steps can be like:
 3) install the new block entry to the PMD/PUD table
 4) unmap the old sub-level tables
 
-Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
----
- arch/arm64/kvm/hyp/pgtable.c | 44 ++++++++++++++++++++++++------------
- 1 file changed, 30 insertions(+), 14 deletions(-)
+As this patch only affects the rebuilding of block mappings, so we can test the
+execution time of KVM rebuilding the blocks after they have been split.
 
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 829a34eea526..b40b1f1615c7 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -434,6 +434,7 @@ struct stage2_map_data {
- 	kvm_pte_t			attr;
- 
- 	kvm_pte_t			*anchor;
-+	kvm_pte_t			*follow;
- 
- 	struct kvm_s2_mmu		*mmu;
- 	struct kvm_mmu_memory_cache	*memcache;
-@@ -545,6 +546,24 @@ static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
- 	return 0;
- }
- 
-+static void stage2_coalesce_tables_into_block(u64 addr, u32 level,
-+					      kvm_pte_t *ptep,
-+					      struct stage2_map_data *data)
-+{
-+	u64 granule = kvm_granule_size(level), phys = data->phys;
-+	kvm_pte_t new = kvm_init_valid_leaf_pte(phys, data->attr, level);
-+
-+	kvm_set_invalid_pte(ptep);
-+
-+	/*
-+	 * Invalidate the whole stage-2, as we may have numerous leaf entries
-+	 * below us which would otherwise need invalidating individually.
-+	 */
-+	kvm_call_hyp(__kvm_tlb_flush_vmid, data->mmu);
-+	smp_store_release(ptep, new);
-+	data->phys += granule;
-+}
-+
- static int stage2_map_walk_table_pre(u64 addr, u64 end, u32 level,
- 				     kvm_pte_t *ptep,
- 				     struct stage2_map_data *data)
-@@ -555,15 +574,14 @@ static int stage2_map_walk_table_pre(u64 addr, u64 end, u32 level,
- 	if (!kvm_block_mapping_supported(addr, end, data->phys, level))
- 		return 0;
- 
--	kvm_set_invalid_pte(ptep);
--
- 	/*
--	 * Invalidate the whole stage-2, as we may have numerous leaf
--	 * entries below us which would otherwise need invalidating
--	 * individually.
-+	 * If we need to coalesce existing table entries into a block here,
-+	 * then install the block entry first and the sub-level page mappings
-+	 * will be unmapped later.
- 	 */
--	kvm_call_hyp(__kvm_tlb_flush_vmid, data->mmu);
- 	data->anchor = ptep;
-+	data->follow = kvm_pte_follow(*ptep);
-+	stage2_coalesce_tables_into_block(addr, level, ptep, data);
- 	return 0;
- }
- 
-@@ -616,20 +634,18 @@ static int stage2_map_walk_table_post(u64 addr, u64 end, u32 level,
- 				      kvm_pte_t *ptep,
- 				      struct stage2_map_data *data)
- {
--	int ret = 0;
--
- 	if (!data->anchor)
- 		return 0;
- 
--	free_page((unsigned long)kvm_pte_follow(*ptep));
--	put_page(virt_to_page(ptep));
--
--	if (data->anchor == ptep) {
-+	if (data->anchor != ptep) {
-+		free_page((unsigned long)kvm_pte_follow(*ptep));
-+		put_page(virt_to_page(ptep));
-+	} else {
-+		free_page((unsigned long)data->follow);
- 		data->anchor = NULL;
--		ret = stage2_map_walk_leaf(addr, end, level, ptep, data);
- 	}
- 
--	return ret;
-+	return 0;
- }
- 
- /*
+hardware platform: HiSilicon Kunpeng920 Server
+host kernel: Linux mainline v5.12-rc2
+
+cmdline: ./kvm_page_table_test -m 4 -s anonymous_thp -b 20G -v 20
+	   (20 vcpus, 20G memory, block mappings(THP 2M))
+KVM_REBUILD_BLOCKS: before 73.64s -> after 57.75s  +21.58%
+
+cmdline: ./kvm_page_table_test -m 4 -s anonymous_thp -b 20G -v 40
+           (40 vcpus, 20G memory, block mappings(THP 2M))
+KVM_REBUILD_BLOCKS: before 145.4s -> after 130.8s  +10.62%
+
+cmdline: ./kvm_page_table_test -m 4 -s anonymous_hugetlb_1gb -b 1G -v 80
+           (80 vcpus, 1G memory, block mappings(HUGETLB 1G))
+KVM_REBUILD_BLOCKS: before 0.166s -> after 0.035s  +78.92%
+
+cmdline: ./kvm_page_table_test -m 4 -s anonymous_hugetlb_1gb -b 20G -v 20
+	   (20 vcpus, 20G memory, block mappings(HUGETLB 1G))
+KVM_REBUILD_BLOCKS: before 2.875s -> after 0.282s  +90.20%
+
+cmdline: ./kvm_page_table_test -m 4 -s anonymous_hugetlb_1gb -b 20G -v 40
+	   (40 vcpus, 20G memory, block mappings(HUGETLB 1G))
+KVM_REBUILD_BLOCKS: before 2.965s -> after 0.359s  +87.55%
+
+About patch 3:
+A new method to distinguish cases of memcache allocations is introduced.
+By comparing fault_granule and vma_pagesize, cases that require allocations
+from memcache and cases that don't can be distinguished completely.
+
+---
+
+Yanan Wang (3):
+  KVM: arm64: Move CMOs from user_mem_abort to the fault handlers
+  KVM: arm64: Install the block entry before unmapping the page mappings
+  KVM: arm64: Distinguish cases of memcache allocations completely
+
+ arch/arm64/include/asm/kvm_mmu.h |  31 ---------
+ arch/arm64/kvm/hyp/pgtable.c     | 112 +++++++++++++++++++++++--------
+ arch/arm64/kvm/mmu.c             |  48 +++++--------
+ 3 files changed, 99 insertions(+), 92 deletions(-)
+
 -- 
 2.19.1
 
