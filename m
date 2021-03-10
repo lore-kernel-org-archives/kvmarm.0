@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2E32C433DB
-	for <kvmarm@archiver.kernel.org>; Wed, 10 Mar 2021 17:58:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F3F4C433E9
+	for <kvmarm@archiver.kernel.org>; Wed, 10 Mar 2021 17:58:03 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 79A5664FB1
-	for <kvmarm@archiver.kernel.org>; Wed, 10 Mar 2021 17:58:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79A5664FB1
+	by mail.kernel.org (Postfix) with ESMTP id A31AC64FC1
+	for <kvmarm@archiver.kernel.org>; Wed, 10 Mar 2021 17:58:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A31AC64FC1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 178954B2AE;
-	Wed, 10 Mar 2021 12:58:01 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5516C4B61D;
+	Wed, 10 Mar 2021 12:58:02 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id XGSoZQ1QHMDO; Wed, 10 Mar 2021 12:58:00 -0500 (EST)
+	with ESMTP id dqD3VAm1ClZS; Wed, 10 Mar 2021 12:58:01 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1986F4B617;
-	Wed, 10 Mar 2021 12:58:00 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 389874B61F;
+	Wed, 10 Mar 2021 12:58:01 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ED5204B60D
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Mar 2021 12:57:58 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 62AE14B61D
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Mar 2021 12:58:00 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3uIwxVX2+WLO for <kvmarm@lists.cs.columbia.edu>;
- Wed, 10 Mar 2021 12:57:57 -0500 (EST)
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com
- [209.85.221.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C65DE4B2AE
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Mar 2021 12:57:57 -0500 (EST)
-Received: by mail-wr1-f74.google.com with SMTP id m23so3318095wrh.7
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Mar 2021 09:57:57 -0800 (PST)
+ with ESMTP id CSrWfIH6Vcue for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 10 Mar 2021 12:57:59 -0500 (EST)
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com
+ [209.85.222.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4EF064B608
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Mar 2021 12:57:59 -0500 (EST)
+Received: by mail-qk1-f202.google.com with SMTP id g18so13404116qki.15
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Mar 2021 09:57:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=AbQOhTo5qTBDcGKT4ROquEtU01mLpiQKpICJ+GOnoG0=;
- b=JzpUXZ4hpdoBvUyEsWDm2q1s1QRxAl2wx4lPyxgUQpUIJ7F0aVV92HnT2t7d2+gB78
- bUz/2TCUabh7EGBtNVRZShXzUflsBTbBP8+TtuPJERTGtDDbxvky8XAhZfj+cyxBTIOr
- VWwXSeTf22kfUPlEI+Gwhr+nqoB0tAKIffsGWkZdhNwdwyheRpKO2ypsVssGnl+iZBcG
- DoFVBZxFu50SG2HHLuRMrZtkXo9vsu4OjCirEILdzOmzM58CyNEo/DRyzmIvNtEoaf8R
- gisXQSUy9RC42Ahgk3HJDSsgTcaFEJri7l2kjGdD/YjK4DU4vgnl3B/RH4W0CV1cQkKX
- HAAQ==
+ :cc; bh=dxCzN3RMauKWh2fvqFWMKg2laCezvVx9+eyFyeOVXIM=;
+ b=Pb/keeFM6FLTObUZ0vCj8r+u4fGlhfurmJ1BDbmQmSEHz4lE1RmPC9dWhtSUH4ursS
+ dMPYP6E31+WNt7F1w+2XsVL1GTNJkRRfUu7PxKUuIp2JvUceMsSdTUIGueMRxU5SA+K0
+ 53rJE19I5YooOpMQfpqkoOid8LwrEUhstQoTEknAdifmfG417EI+b1y3EhsQfA+WLskR
+ LFQdY140E4mgZqa+6Tuxpk+zuxstuuf4LH97W+qopGdatwH8lkKy3DsR1kN7gDWuldJt
+ 3YAx44ZgdVrQNiMxH0VwJPb3tEtfDnjjZ64pJIWelpAwol/CTOYdpCy8JiYYnvQDewv+
+ Xliw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=AbQOhTo5qTBDcGKT4ROquEtU01mLpiQKpICJ+GOnoG0=;
- b=VkiGcEerX07b/U8oQu8o/nDMf7poOhDHRIfXo0klmlbMo3dj0mBIISywGF3wWb1VZB
- weUgRPAEtuAEhYoNy+TLPV6tWyqve/WS5UaRTE8rlfbMPtXM600mdILb5M/rEoOPziOZ
- H2frMeqVcQOe+F724Y3iuFQy8Z8A1og/r2zp4VdLLd+Of4ZJcy4ugt3H+Jt7jKJ2td/I
- bbmgyw6WpbOgjW7CzFKbTRfQVGrYuq6ve7/RF11b3kAiLOh0bGwtp2SPdRtxubBzMirr
- 5IcglYQnwQEiNu6DFYv5I2gVNOWKAGE3mtAXTcwa6qx44erUZJ5IE3IGDEC8zxKjtRPd
- 0H+Q==
-X-Gm-Message-State: AOAM530t/YrxYvpiFrMUn+Ivt5cDTw8HCh6jRM1UNS0xoh0z6ztt/FQg
- 8wDXTdJo5kGEHqB1Wk/bSF+AcaM7Rbyd
-X-Google-Smtp-Source: ABdhPJyoHV7k5VKRC4cMLOuiadpNjmOubi8A8GxCIf77avXZ6hUq1pIFK8fqsdVSlzJaLhL/5cbha4JM2YHV
+ bh=dxCzN3RMauKWh2fvqFWMKg2laCezvVx9+eyFyeOVXIM=;
+ b=cXCUCjC9B58xWoh/0HZf5rMb3gokvIAjGfRl+o9a/vzk1ipR3MEq1VIU9rFlknHdb+
+ /E0jOLSzOC4v6lppjEW2apstR+m3sv0HuVH4S31JG6A7o7kirDSwoY0paKfqA2gwdm/O
+ QOhyl8hhGbn5SL5ooiMUJk8actQVsfIs/yybjY2k6n6n7YJIIVK6DmsWocojBUdy7+R5
+ qpMubVas2rXiJmR0vVfAy+/OxDbiUh8eUGOTFbH/dIWny5HpbDWBCaogwxr0MfMzQbCL
+ SecJgF8fHCXpkxcgxNE50NJ39tmiPlW+8ZT4WBAG0FbVxwSjs5wTCAk8ER7dqBY4oxQc
+ +1PA==
+X-Gm-Message-State: AOAM531ILtfrZb5hOidWAUtHjv4VLubWdQVGMN+flPUOng2KoqxY0cjG
+ lpm1s+lkf0M9eN65VxUt4szJ4tuTezwt
+X-Google-Smtp-Source: ABdhPJzFbcnSuRhMeKDYXy6/C1z2diqQrt+imwRgbptD7Lg8gH79A2Af7xKDqf7ZkVXomhp6ER56ZqVFJa7D
 X-Received: from r2d2-qp.c.googlers.com ([fda3:e722:ac3:10:28:9cb1:c0a8:1652])
- (user=qperret job=sendgmr) by 2002:a1c:7210:: with SMTP id
- n16mr4388170wmc.13.1615399076669; Wed, 10 Mar 2021 09:57:56 -0800 (PST)
-Date: Wed, 10 Mar 2021 17:57:18 +0000
+ (user=qperret job=sendgmr) by 2002:ad4:4eae:: with SMTP id
+ ed14mr4180391qvb.52.1615399078778; Wed, 10 Mar 2021 09:57:58 -0800 (PST)
+Date: Wed, 10 Mar 2021 17:57:19 +0000
 In-Reply-To: <20210310175751.3320106-1-qperret@google.com>
-Message-Id: <20210310175751.3320106-2-qperret@google.com>
+Message-Id: <20210310175751.3320106-3-qperret@google.com>
 Mime-Version: 1.0
 References: <20210310175751.3320106-1-qperret@google.com>
 X-Mailer: git-send-email 2.30.1.766.gb4fecdf3b7-goog
-Subject: [PATCH v4 01/34] arm64: lib: Annotate {clear,
- copy}_page() as position-independent
+Subject: [PATCH v4 02/34] KVM: arm64: Link position-independent string
+ routines into .hyp.text
 From: Quentin Perret <qperret@google.com>
 To: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org, 
  james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
@@ -100,56 +100,75 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: Will Deacon <will@kernel.org>
 
-clear_page() and copy_page() are suitable for use outside of the kernel
-address space, so annotate them as position-independent code.
+Pull clear_page(), copy_page(), memcpy() and memset() into the nVHE hyp
+code and ensure that we always execute the '__pi_' entry point on the
+offchance that it changes in future.
+
+[ qperret: Commit title nits and added linker script alias ]
 
 Signed-off-by: Will Deacon <will@kernel.org>
 Signed-off-by: Quentin Perret <qperret@google.com>
 ---
- arch/arm64/lib/clear_page.S | 4 ++--
- arch/arm64/lib/copy_page.S  | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ arch/arm64/include/asm/hyp_image.h |  3 +++
+ arch/arm64/kernel/image-vars.h     | 11 +++++++++++
+ arch/arm64/kvm/hyp/nvhe/Makefile   |  4 ++++
+ 3 files changed, 18 insertions(+)
 
-diff --git a/arch/arm64/lib/clear_page.S b/arch/arm64/lib/clear_page.S
-index 073acbf02a7c..b84b179edba3 100644
---- a/arch/arm64/lib/clear_page.S
-+++ b/arch/arm64/lib/clear_page.S
-@@ -14,7 +14,7 @@
-  * Parameters:
-  *	x0 - dest
+diff --git a/arch/arm64/include/asm/hyp_image.h b/arch/arm64/include/asm/hyp_image.h
+index 737ded6b6d0d..78cd77990c9c 100644
+--- a/arch/arm64/include/asm/hyp_image.h
++++ b/arch/arm64/include/asm/hyp_image.h
+@@ -56,6 +56,9 @@
   */
--SYM_FUNC_START(clear_page)
-+SYM_FUNC_START_PI(clear_page)
- 	mrs	x1, dczid_el0
- 	and	w1, w1, #0xf
- 	mov	x2, #4
-@@ -25,5 +25,5 @@ SYM_FUNC_START(clear_page)
- 	tst	x0, #(PAGE_SIZE - 1)
- 	b.ne	1b
- 	ret
--SYM_FUNC_END(clear_page)
-+SYM_FUNC_END_PI(clear_page)
- EXPORT_SYMBOL(clear_page)
-diff --git a/arch/arm64/lib/copy_page.S b/arch/arm64/lib/copy_page.S
-index e7a793961408..29144f4cd449 100644
---- a/arch/arm64/lib/copy_page.S
-+++ b/arch/arm64/lib/copy_page.S
-@@ -17,7 +17,7 @@
-  *	x0 - dest
-  *	x1 - src
-  */
--SYM_FUNC_START(copy_page)
-+SYM_FUNC_START_PI(copy_page)
- alternative_if ARM64_HAS_NO_HW_PREFETCH
- 	// Prefetch three cache lines ahead.
- 	prfm	pldl1strm, [x1, #128]
-@@ -75,5 +75,5 @@ alternative_else_nop_endif
- 	stnp	x16, x17, [x0, #112 - 256]
+ #define KVM_NVHE_ALIAS(sym)	kvm_nvhe_sym(sym) = sym;
  
- 	ret
--SYM_FUNC_END(copy_page)
-+SYM_FUNC_END_PI(copy_page)
- EXPORT_SYMBOL(copy_page)
++/* Defines a linker script alias for KVM nVHE hyp symbols */
++#define KVM_NVHE_ALIAS_HYP(first, sec)	kvm_nvhe_sym(first) = kvm_nvhe_sym(sec);
++
+ #endif /* LINKER_SCRIPT */
+ 
+ #endif /* __ARM64_HYP_IMAGE_H__ */
+diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
+index 5aa9ed1e9ec6..4eb7a15c8b60 100644
+--- a/arch/arm64/kernel/image-vars.h
++++ b/arch/arm64/kernel/image-vars.h
+@@ -104,6 +104,17 @@ KVM_NVHE_ALIAS(kvm_arm_hyp_percpu_base);
+ /* PMU available static key */
+ KVM_NVHE_ALIAS(kvm_arm_pmu_available);
+ 
++/* Position-independent library routines */
++KVM_NVHE_ALIAS_HYP(clear_page, __pi_clear_page);
++KVM_NVHE_ALIAS_HYP(copy_page, __pi_copy_page);
++KVM_NVHE_ALIAS_HYP(memcpy, __pi_memcpy);
++KVM_NVHE_ALIAS_HYP(memset, __pi_memset);
++
++#ifdef CONFIG_KASAN
++KVM_NVHE_ALIAS_HYP(__memcpy, __pi_memcpy);
++KVM_NVHE_ALIAS_HYP(__memset, __pi_memset);
++#endif
++
+ #endif /* CONFIG_KVM */
+ 
+ #endif /* __ARM64_KERNEL_IMAGE_VARS_H */
+diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+index a6707df4f6c0..bc98f8e3d1da 100644
+--- a/arch/arm64/kvm/hyp/nvhe/Makefile
++++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+@@ -9,10 +9,14 @@ ccflags-y := -D__KVM_NVHE_HYPERVISOR__ -D__DISABLE_EXPORTS
+ hostprogs := gen-hyprel
+ HOST_EXTRACFLAGS += -I$(objtree)/include
+ 
++lib-objs := clear_page.o copy_page.o memcpy.o memset.o
++lib-objs := $(addprefix ../../../lib/, $(lib-objs))
++
+ obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o \
+ 	 hyp-main.o hyp-smp.o psci-relay.o
+ obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
+ 	 ../fpsimd.o ../hyp-entry.o ../exception.o
++obj-y += $(lib-objs)
+ 
+ ##
+ ## Build rules for compiling nVHE hyp code
 -- 
 2.30.1.766.gb4fecdf3b7-goog
 
