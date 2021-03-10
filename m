@@ -7,51 +7,59 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC31BC433E0
-	for <kvmarm@archiver.kernel.org>; Wed, 10 Mar 2021 05:52:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BD9DC43381
+	for <kvmarm@archiver.kernel.org>; Wed, 10 Mar 2021 09:43:41 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2514964FE7
-	for <kvmarm@archiver.kernel.org>; Wed, 10 Mar 2021 05:52:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2514964FE7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 55C7B64FE2
+	for <kvmarm@archiver.kernel.org>; Wed, 10 Mar 2021 09:43:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55C7B64FE2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 692EA4B59C;
-	Wed, 10 Mar 2021 00:52:52 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id ADF344B5FB;
+	Wed, 10 Mar 2021 04:43:39 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id m95JIJDvqWH5; Wed, 10 Mar 2021 00:52:51 -0500 (EST)
+	with ESMTP id fxdhmElToXvb; Wed, 10 Mar 2021 04:43:38 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 00D514B5A1;
-	Wed, 10 Mar 2021 00:52:51 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 913734B305;
+	Wed, 10 Mar 2021 04:43:38 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7ED514B59A
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Mar 2021 00:52:50 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AA1914B28F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Mar 2021 04:43:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nMp9cFLVRIGM for <kvmarm@lists.cs.columbia.edu>;
- Wed, 10 Mar 2021 00:52:48 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E6D74B557
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Mar 2021 00:52:48 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 09A491FB;
- Tue,  9 Mar 2021 21:52:48 -0800 (PST)
-Received: from p8cg001049571a15.arm.com (unknown [10.163.67.114])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id C791E3F70D;
- Tue,  9 Mar 2021 21:52:43 -0800 (PST)
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-To: linux-arm-kernel@lists.infradead.org
-Subject: [PATCH V2] arm64/mm: Fix __enable_mmu() for new TGRAN range values
-Date: Wed, 10 Mar 2021 11:23:10 +0530
-Message-Id: <1615355590-21102-1-git-send-email-anshuman.khandual@arm.com>
-X-Mailer: git-send-email 2.7.4
-Cc: linux-efi@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- Anshuman Khandual <anshuman.khandual@arm.com>, linux-kernel@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>
+ with ESMTP id nm9ZUjaJQ5G5 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 10 Mar 2021 04:43:36 -0500 (EST)
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 40AE24B1E4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Mar 2021 04:43:35 -0500 (EST)
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.59])
+ by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4DwRtg0c5szkX1y;
+ Wed, 10 Mar 2021 17:42:03 +0800 (CST)
+Received: from DESKTOP-TMVL5KK.china.huawei.com (10.174.187.128) by
+ DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
+ 14.3.498.0; Wed, 10 Mar 2021 17:43:23 +0800
+From: Yanan Wang <wangyanan55@huawei.com>
+To: Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, "Catalin
+ Marinas" <catalin.marinas@arm.com>, James Morse <james.morse@arm.com>,
+ "Julien Thierry" <julien.thierry.kdev@gmail.com>, Suzuki K Poulose
+ <suzuki.poulose@arm.com>, Gavin Shan <gshan@redhat.com>, Quentin Perret
+ <qperret@google.com>, <kvmarm@lists.cs.columbia.edu>,
+ <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: [RFC PATCH v2 2/3] KVM: arm64: Install the block entry before
+ unmapping the page mappings
+Date: Wed, 10 Mar 2021 17:43:18 +0800
+Message-ID: <20210310094319.18760-3-wangyanan55@huawei.com>
+X-Mailer: git-send-email 2.8.4.windows.1
+In-Reply-To: <20210310094319.18760-1-wangyanan55@huawei.com>
+References: <20210310094319.18760-1-wangyanan55@huawei.com>
+MIME-Version: 1.0
+X-Originating-IP: [10.174.187.128]
+X-CFilter-Loop: Reflected
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -63,150 +71,127 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: James Morse <james.morse@arm.com>
+When KVM needs to coalesce the existing normal page mappings into a block
+mapping, we currently follow the following steps successively:
+1) invalidate the table entry in the PMD/PUD table
+2) flush TLB by VMID
+3) unmap the old sub-level tables
+4) install the new block entry to the PMD/PUD table
 
-As per ARM ARM DDI 0487G.a, when FEAT_LPA2 is implemented, ID_AA64MMFR0_EL1
-might contain a range of values to describe supported translation granules
-(4K and 16K pages sizes in particular) instead of just enabled or disabled
-values. This changes __enable_mmu() function to handle complete acceptable
-range of values (depending on whether the field is signed or unsigned) now
-represented with ID_AA64MMFR0_TGRAN_SUPPORTED_[MIN..MAX] pair. While here,
-also fix similar situations in EFI stub and KVM as well.
+It will cost a long time to unmap the old page mappings in step 3, which
+means there will be a long period when the PMD/PUD table entry could be
+found invalid (step 1, 2, 3). So the other vcpus have a really big chance
+to trigger unnecessary translations if they access any page within the
+block and find the table entry invalid.
 
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: James Morse <james.morse@arm.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Ard Biesheuvel <ardb@kernel.org>
-Cc: Mark Rutland <mark.rutland@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org
-Cc: kvmarm@lists.cs.columbia.edu
-Cc: linux-efi@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Acked-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: James Morse <james.morse@arm.com>
-Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+So let's quickly install the block entry at first to ensure uninterrupted
+memory access of the other vcpus, and then unmap the page mappings after
+installation. This will reduce most of the time when the table entry is
+invalid, and avoid most of the unnecessary translation faults.
+
+After this patch the steps can be like:
+1) invalidate the table entry in the PMD/PUD table
+2) flush TLB by VMID
+3) install the new block entry to the PMD/PUD table
+4) unmap the old sub-level tables
+
+Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
 ---
-Changes in V2:
+ arch/arm64/kvm/hyp/pgtable.c | 44 ++++++++++++++++++++++++------------
+ 1 file changed, 30 insertions(+), 14 deletions(-)
 
-- Changes back to switch construct in kvm_set_ipa_limit() per Marc
-
-Changes in V1:
-
-https://patchwork.kernel.org/project/linux-arm-kernel/list/?series=442817
-
- arch/arm64/include/asm/sysreg.h           | 20 ++++++++++++++------
- arch/arm64/kernel/head.S                  |  6 ++++--
- arch/arm64/kvm/reset.c                    | 10 ++++++----
- drivers/firmware/efi/libstub/arm64-stub.c |  2 +-
- 4 files changed, 25 insertions(+), 13 deletions(-)
-
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index dfd4edb..d4a5fca9 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -796,6 +796,11 @@
- #define ID_AA64MMFR0_PARANGE_48		0x5
- #define ID_AA64MMFR0_PARANGE_52		0x6
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index 829a34eea526..b40b1f1615c7 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -434,6 +434,7 @@ struct stage2_map_data {
+ 	kvm_pte_t			attr;
  
-+#define ID_AA64MMFR0_TGRAN_2_SUPPORTED_DEFAULT	0x0
-+#define ID_AA64MMFR0_TGRAN_2_SUPPORTED_NONE	0x1
-+#define ID_AA64MMFR0_TGRAN_2_SUPPORTED_MIN	0x2
-+#define ID_AA64MMFR0_TGRAN_2_SUPPORTED_MAX	0x7
+ 	kvm_pte_t			*anchor;
++	kvm_pte_t			*follow;
+ 
+ 	struct kvm_s2_mmu		*mmu;
+ 	struct kvm_mmu_memory_cache	*memcache;
+@@ -545,6 +546,24 @@ static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
+ 	return 0;
+ }
+ 
++static void stage2_coalesce_tables_into_block(u64 addr, u32 level,
++					      kvm_pte_t *ptep,
++					      struct stage2_map_data *data)
++{
++	u64 granule = kvm_granule_size(level), phys = data->phys;
++	kvm_pte_t new = kvm_init_valid_leaf_pte(phys, data->attr, level);
 +
- #ifdef CONFIG_ARM64_PA_BITS_52
- #define ID_AA64MMFR0_PARANGE_MAX	ID_AA64MMFR0_PARANGE_52
- #else
-@@ -961,14 +966,17 @@
- #define ID_PFR1_PROGMOD_SHIFT		0
++	kvm_set_invalid_pte(ptep);
++
++	/*
++	 * Invalidate the whole stage-2, as we may have numerous leaf entries
++	 * below us which would otherwise need invalidating individually.
++	 */
++	kvm_call_hyp(__kvm_tlb_flush_vmid, data->mmu);
++	smp_store_release(ptep, new);
++	data->phys += granule;
++}
++
+ static int stage2_map_walk_table_pre(u64 addr, u64 end, u32 level,
+ 				     kvm_pte_t *ptep,
+ 				     struct stage2_map_data *data)
+@@ -555,15 +574,14 @@ static int stage2_map_walk_table_pre(u64 addr, u64 end, u32 level,
+ 	if (!kvm_block_mapping_supported(addr, end, data->phys, level))
+ 		return 0;
  
- #if defined(CONFIG_ARM64_4K_PAGES)
--#define ID_AA64MMFR0_TGRAN_SHIFT	ID_AA64MMFR0_TGRAN4_SHIFT
--#define ID_AA64MMFR0_TGRAN_SUPPORTED	ID_AA64MMFR0_TGRAN4_SUPPORTED
-+#define ID_AA64MMFR0_TGRAN_SHIFT		ID_AA64MMFR0_TGRAN4_SHIFT
-+#define ID_AA64MMFR0_TGRAN_SUPPORTED_MIN	ID_AA64MMFR0_TGRAN4_SUPPORTED
-+#define ID_AA64MMFR0_TGRAN_SUPPORTED_MAX	0x7
- #elif defined(CONFIG_ARM64_16K_PAGES)
--#define ID_AA64MMFR0_TGRAN_SHIFT	ID_AA64MMFR0_TGRAN16_SHIFT
--#define ID_AA64MMFR0_TGRAN_SUPPORTED	ID_AA64MMFR0_TGRAN16_SUPPORTED
-+#define ID_AA64MMFR0_TGRAN_SHIFT		ID_AA64MMFR0_TGRAN16_SHIFT
-+#define ID_AA64MMFR0_TGRAN_SUPPORTED_MIN	ID_AA64MMFR0_TGRAN16_SUPPORTED
-+#define ID_AA64MMFR0_TGRAN_SUPPORTED_MAX	0xF
- #elif defined(CONFIG_ARM64_64K_PAGES)
--#define ID_AA64MMFR0_TGRAN_SHIFT	ID_AA64MMFR0_TGRAN64_SHIFT
--#define ID_AA64MMFR0_TGRAN_SUPPORTED	ID_AA64MMFR0_TGRAN64_SUPPORTED
-+#define ID_AA64MMFR0_TGRAN_SHIFT		ID_AA64MMFR0_TGRAN64_SHIFT
-+#define ID_AA64MMFR0_TGRAN_SUPPORTED_MIN	ID_AA64MMFR0_TGRAN64_SUPPORTED
-+#define ID_AA64MMFR0_TGRAN_SUPPORTED_MAX	0x7
- #endif
+-	kvm_set_invalid_pte(ptep);
+-
+ 	/*
+-	 * Invalidate the whole stage-2, as we may have numerous leaf
+-	 * entries below us which would otherwise need invalidating
+-	 * individually.
++	 * If we need to coalesce existing table entries into a block here,
++	 * then install the block entry first and the sub-level page mappings
++	 * will be unmapped later.
+ 	 */
+-	kvm_call_hyp(__kvm_tlb_flush_vmid, data->mmu);
+ 	data->anchor = ptep;
++	data->follow = kvm_pte_follow(*ptep);
++	stage2_coalesce_tables_into_block(addr, level, ptep, data);
+ 	return 0;
+ }
  
- #define MVFR2_FPMISC_SHIFT		4
-diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
-index 66b0e0b..8b469f1 100644
---- a/arch/arm64/kernel/head.S
-+++ b/arch/arm64/kernel/head.S
-@@ -655,8 +655,10 @@ SYM_FUNC_END(__secondary_too_slow)
- SYM_FUNC_START(__enable_mmu)
- 	mrs	x2, ID_AA64MMFR0_EL1
- 	ubfx	x2, x2, #ID_AA64MMFR0_TGRAN_SHIFT, 4
--	cmp	x2, #ID_AA64MMFR0_TGRAN_SUPPORTED
--	b.ne	__no_granule_support
-+	cmp     x2, #ID_AA64MMFR0_TGRAN_SUPPORTED_MIN
-+	b.lt    __no_granule_support
-+	cmp     x2, #ID_AA64MMFR0_TGRAN_SUPPORTED_MAX
-+	b.gt    __no_granule_support
- 	update_early_cpu_boot_status 0, x2, x3
- 	adrp	x2, idmap_pg_dir
- 	phys_to_ttbr x1, x1
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index 47f3f03..e81c7ec 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -311,16 +311,18 @@ int kvm_set_ipa_limit(void)
+@@ -616,20 +634,18 @@ static int stage2_map_walk_table_post(u64 addr, u64 end, u32 level,
+ 				      kvm_pte_t *ptep,
+ 				      struct stage2_map_data *data)
+ {
+-	int ret = 0;
+-
+ 	if (!data->anchor)
+ 		return 0;
+ 
+-	free_page((unsigned long)kvm_pte_follow(*ptep));
+-	put_page(virt_to_page(ptep));
+-
+-	if (data->anchor == ptep) {
++	if (data->anchor != ptep) {
++		free_page((unsigned long)kvm_pte_follow(*ptep));
++		put_page(virt_to_page(ptep));
++	} else {
++		free_page((unsigned long)data->follow);
+ 		data->anchor = NULL;
+-		ret = stage2_map_walk_leaf(addr, end, level, ptep, data);
  	}
  
- 	switch (cpuid_feature_extract_unsigned_field(mmfr0, tgran_2)) {
--	default:
--	case 1:
-+	case ID_AA64MMFR0_TGRAN_2_SUPPORTED_NONE:
- 		kvm_err("PAGE_SIZE not supported at Stage-2, giving up\n");
- 		return -EINVAL;
--	case 0:
-+	case ID_AA64MMFR0_TGRAN_2_SUPPORTED_DEFAULT:
- 		kvm_debug("PAGE_SIZE supported at Stage-2 (default)\n");
- 		break;
--	case 2:
-+	case ID_AA64MMFR0_TGRAN_2_SUPPORTED_MIN ... ID_AA64MMFR0_TGRAN_2_SUPPORTED_MAX:
- 		kvm_debug("PAGE_SIZE supported at Stage-2 (advertised)\n");
- 		break;
-+	default:
-+		kvm_err("Unsupported value for TGRAN_2, giving up\n");
-+		return -EINVAL;
- 	}
+-	return ret;
++	return 0;
+ }
  
- 	kvm_ipa_limit = id_aa64mmfr0_parange_to_phys_shift(parange);
-diff --git a/drivers/firmware/efi/libstub/arm64-stub.c b/drivers/firmware/efi/libstub/arm64-stub.c
-index b69d631..7bf0a7a 100644
---- a/drivers/firmware/efi/libstub/arm64-stub.c
-+++ b/drivers/firmware/efi/libstub/arm64-stub.c
-@@ -24,7 +24,7 @@ efi_status_t check_platform_features(void)
- 		return EFI_SUCCESS;
- 
- 	tg = (read_cpuid(ID_AA64MMFR0_EL1) >> ID_AA64MMFR0_TGRAN_SHIFT) & 0xf;
--	if (tg != ID_AA64MMFR0_TGRAN_SUPPORTED) {
-+	if (tg < ID_AA64MMFR0_TGRAN_SUPPORTED_MIN || tg > ID_AA64MMFR0_TGRAN_SUPPORTED_MAX) {
- 		if (IS_ENABLED(CONFIG_ARM64_64K_PAGES))
- 			efi_err("This 64 KB granular kernel is not supported by your CPU\n");
- 		else
+ /*
 -- 
-2.7.4
+2.19.1
 
 _______________________________________________
 kvmarm mailing list
