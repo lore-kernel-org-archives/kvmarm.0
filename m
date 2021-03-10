@@ -2,67 +2,95 @@ Return-Path: <SRS0=f6Gw=II=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42795C433DB
-	for <kvmarm@archiver.kernel.org>; Wed, 10 Mar 2021 11:39:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3A17C433DB
+	for <kvmarm@archiver.kernel.org>; Wed, 10 Mar 2021 14:19:18 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7A03164FF2
-	for <kvmarm@archiver.kernel.org>; Wed, 10 Mar 2021 11:39:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A03164FF2
+	by mail.kernel.org (Postfix) with ESMTP id 1807B64FF4
+	for <kvmarm@archiver.kernel.org>; Wed, 10 Mar 2021 14:19:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1807B64FF4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 07C374B39A;
-	Wed, 10 Mar 2021 06:39:30 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9397A4B35D;
+	Wed, 10 Mar 2021 09:19:17 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id sFdE-gJFTQEI; Wed, 10 Mar 2021 06:39:28 -0500 (EST)
+	with ESMTP id qKRG0arxsatB; Wed, 10 Mar 2021 09:19:15 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BEF774B39F;
-	Wed, 10 Mar 2021 06:39:28 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 56CBE4B372;
+	Wed, 10 Mar 2021 09:19:15 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 050924B395
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Mar 2021 06:39:28 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E97494B367
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Mar 2021 09:19:13 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rUCsq3gkVsTZ for <kvmarm@lists.cs.columbia.edu>;
- Wed, 10 Mar 2021 06:39:27 -0500 (EST)
+ with ESMTP id HbJIscFOSRiJ for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 10 Mar 2021 09:19:12 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DE2D44B366
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Mar 2021 06:39:26 -0500 (EST)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 0D73564FE5;
- Wed, 10 Mar 2021 11:39:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1615376365;
- bh=aIsRlz8+KjMr611NkESIos4nUSuwP1XkbN6BEUu4+FI=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=HKpD+iC4jfRxdVMDbqZkqucj0bxrjDIFWVN85owR29Pt3ysbI1NUudEobXvDz7Exd
- slg48riqQXVtmI5EYhs6J5XkbCSZLzLVcZ+if+qGTw93plVMFpmm0xCh+GTSZ9wVsn
- cku85JAgoR+bPvCPCqb8eWlpnu3XFFuelvAFkXNswsGE3a3Pq0b41Ue2RJlTtRmDcq
- f+kE1cqSTsuAw9W5vUbwoaB+zfqR0m1Mru3GHTmk4pWTXwlkRyxRkCBXqwyjFrJEEp
- yyWeJ/3oX1ciIx9dAw8xzcCm7nRtzLOQAfxuKaFVGKbvepA9xeE7jgJNTaR12FBYyf
- 7fGjsb1ussc3g==
-From: Will Deacon <will@kernel.org>
-To: Anshuman Khandual <anshuman.khandual@arm.com>,
- linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH V2] arm64/mm: Fix __enable_mmu() for new TGRAN range values
-Date: Wed, 10 Mar 2021 11:39:16 +0000
-Message-Id: <161537411789.1674334.2037758954337206352.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <1615355590-21102-1-git-send-email-anshuman.khandual@arm.com>
-References: <1615355590-21102-1-git-send-email-anshuman.khandual@arm.com>
-MIME-Version: 1.0
-Cc: linux-efi@vger.kernel.org, Will Deacon <will@kernel.org>,
- catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
- Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
- kvmarm@lists.cs.columbia.edu
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id ABCF64B35A
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Mar 2021 09:19:12 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id EF53364FEF;
+ Wed, 10 Mar 2021 14:19:09 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1lJzg3-000mQq-PG; Wed, 10 Mar 2021 14:19:07 +0000
+Date: Wed, 10 Mar 2021 14:19:06 +0000
+Message-ID: <878s6vxfad.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Jing Zhang <jingzhangos@google.com>
+Subject: Re: [RFC PATCH 1/4] KVM: stats: Separate statistics name strings from
+ debugfs code
+In-Reply-To: <20210310003024.2026253-2-jingzhangos@google.com>
+References: <20210310003024.2026253-1-jingzhangos@google.com>
+ <20210310003024.2026253-2-jingzhangos@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
+ kvm-ppc@vger.kernel.org, linux-s390@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, pbonzini@redhat.com, james.morse@arm.com,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, will@kernel.org,
+ chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com,
+ tsbogend@alpha.franken.de, paulus@ozlabs.org, borntraeger@de.ibm.com,
+ frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
+ imbrenda@linux.ibm.com, seanjc@google.com, vkuznets@redhat.com,
+ jmattson@google.com, pshier@google.com, oupton@google.com, rientjes@google.com,
+ eesposit@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
+ Paul Mackerras <paulus@ozlabs.org>,
+ Linux kselftest <linux-kselftest@vger.kernel.org>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, Will Deacon <will@kernel.org>,
+ KVM ARM <kvmarm@lists.cs.columbia.edu>,
+ Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+ Linux S390 <linux-s390@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
+ Oliver Upton <oupton@google.com>, Huacai Chen <chenhuacai@kernel.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ David Rientjes <rientjes@google.com>, KVM PPC <kvm-ppc@vger.kernel.org>,
+ Jim Mattson <jmattson@google.com>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ Sean Christopherson <seanjc@google.com>, Cornelia Huck <cohuck@redhat.com>,
+ Peter Shier <pshier@google.com>, Linux MIPS <linux-mips@vger.kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -79,27 +107,151 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 10 Mar 2021 11:23:10 +0530, Anshuman Khandual wrote:
-> As per ARM ARM DDI 0487G.a, when FEAT_LPA2 is implemented, ID_AA64MMFR0_EL1
-> might contain a range of values to describe supported translation granules
-> (4K and 16K pages sizes in particular) instead of just enabled or disabled
-> values. This changes __enable_mmu() function to handle complete acceptable
-> range of values (depending on whether the field is signed or unsigned) now
-> represented with ID_AA64MMFR0_TGRAN_SUPPORTED_[MIN..MAX] pair. While here,
-> also fix similar situations in EFI stub and KVM as well.
+Hi Jing,
 
-Applied to arm64 (for-next/fixes), thanks!
+On Wed, 10 Mar 2021 00:30:21 +0000,
+Jing Zhang <jingzhangos@google.com> wrote:
+> 
+> Prepare the statistics name strings for supporting binary format
+> aggregated statistics data retrieval.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> ---
+>  arch/arm64/kvm/guest.c    |  47 ++++--
+>  arch/mips/kvm/mips.c      | 114 ++++++++++----
+>  arch/powerpc/kvm/book3s.c | 107 +++++++++----
+>  arch/powerpc/kvm/booke.c  |  84 +++++++---
+>  arch/s390/kvm/kvm-s390.c  | 320 ++++++++++++++++++++++++++------------
+>  arch/x86/kvm/x86.c        | 127 ++++++++++-----
+>  include/linux/kvm_host.h  |  31 +++-
+>  7 files changed, 589 insertions(+), 241 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> index 9bbd30e62799..fb3aafe76b52 100644
+> --- a/arch/arm64/kvm/guest.c
+> +++ b/arch/arm64/kvm/guest.c
+> @@ -28,19 +28,42 @@
+>  
+>  #include "trace.h"
+>  
+> +const char kvm_vm_stat_strings[][KVM_STATS_NAME_LEN] = {
+> +	"remote_tlb_flush",
+> +};
+> +static_assert(sizeof(kvm_vm_stat_strings) ==
+> +		VM_STAT_COUNT * KVM_STATS_NAME_LEN);
+> +
+> +const char kvm_vcpu_stat_strings[][KVM_STATS_NAME_LEN] = {
+> +	"halt_successful_poll",
+> +	"halt_attempted_poll",
+> +	"halt_poll_success_ns",
+> +	"halt_poll_fail_ns",
+> +	"halt_poll_invalid",
+> +	"halt_wakeup",
+> +	"hvc_exit_stat",
+> +	"wfe_exit_stat",
+> +	"wfi_exit_stat",
+> +	"mmio_exit_user",
+> +	"mmio_exit_kernel",
+> +	"exits",
+> +};
+> +static_assert(sizeof(kvm_vcpu_stat_strings) ==
+> +		VCPU_STAT_COUNT * KVM_STATS_NAME_LEN);
+> +
+>  struct kvm_stats_debugfs_item debugfs_entries[] = {
+> -	VCPU_STAT("halt_successful_poll", halt_successful_poll),
+> -	VCPU_STAT("halt_attempted_poll", halt_attempted_poll),
+> -	VCPU_STAT("halt_poll_invalid", halt_poll_invalid),
+> -	VCPU_STAT("halt_wakeup", halt_wakeup),
+> -	VCPU_STAT("hvc_exit_stat", hvc_exit_stat),
+> -	VCPU_STAT("wfe_exit_stat", wfe_exit_stat),
+> -	VCPU_STAT("wfi_exit_stat", wfi_exit_stat),
+> -	VCPU_STAT("mmio_exit_user", mmio_exit_user),
+> -	VCPU_STAT("mmio_exit_kernel", mmio_exit_kernel),
+> -	VCPU_STAT("exits", exits),
+> -	VCPU_STAT("halt_poll_success_ns", halt_poll_success_ns),
+> -	VCPU_STAT("halt_poll_fail_ns", halt_poll_fail_ns),
+> +	VCPU_STAT(halt_successful_poll),
+> +	VCPU_STAT(halt_attempted_poll),
+> +	VCPU_STAT(halt_poll_invalid),
+> +	VCPU_STAT(halt_wakeup),
+> +	VCPU_STAT(hvc_exit_stat),
+> +	VCPU_STAT(wfe_exit_stat),
+> +	VCPU_STAT(wfi_exit_stat),
+> +	VCPU_STAT(mmio_exit_user),
+> +	VCPU_STAT(mmio_exit_kernel),
+> +	VCPU_STAT(exits),
+> +	VCPU_STAT(halt_poll_success_ns),
+> +	VCPU_STAT(halt_poll_fail_ns),
 
-[1/1] arm64/mm: Fix __enable_mmu() for new TGRAN range values
-      https://git.kernel.org/arm64/c/26f55386f964
+So we now have two arrays that can easily deviate in their order,
+whilst we didn't have that risk before. What is the advantage of doing
+this? The commit message doesn't really say...
 
-Cheers,
+[...]
+
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 1b65e7204344..1ea297458306 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1162,6 +1162,18 @@ static inline bool kvm_is_error_gpa(struct kvm *kvm, gpa_t gpa)
+>  	return kvm_is_error_hva(hva);
+>  }
+>  
+> +#define VM_STAT_COUNT		(sizeof(struct kvm_vm_stat)/sizeof(ulong))
+> +#define VCPU_STAT_COUNT		(sizeof(struct kvm_vcpu_stat)/sizeof(u64))
+> +#define KVM_STATS_NAME_LEN	32
+> +
+> +/* Make sure it is synced with fields in struct kvm_vm_stat. */
+> +extern const char kvm_vm_stat_strings[][KVM_STATS_NAME_LEN];
+> +/* Make sure it is synced with fields in struct kvm_vcpu_stat. */
+> +extern const char kvm_vcpu_stat_strings[][KVM_STATS_NAME_LEN];
+> +
+> +#define VM_STAT_NAME(id)        (kvm_vm_stat_strings[id])
+> +#define VCPU_STAT_NAME(id)      (kvm_vcpu_stat_strings[id])
+> +
+>  enum kvm_stat_kind {
+>  	KVM_STAT_VM,
+>  	KVM_STAT_VCPU,
+> @@ -1182,10 +1194,21 @@ struct kvm_stats_debugfs_item {
+>  #define KVM_DBGFS_GET_MODE(dbgfs_item)                                         \
+>  	((dbgfs_item)->mode ? (dbgfs_item)->mode : 0644)
+>  
+> -#define VM_STAT(n, x, ...) 							\
+> -	{ n, offsetof(struct kvm, stat.x), KVM_STAT_VM, ## __VA_ARGS__ }
+> -#define VCPU_STAT(n, x, ...)							\
+> -	{ n, offsetof(struct kvm_vcpu, stat.x), KVM_STAT_VCPU, ## __VA_ARGS__ }
+> +#define VM_STAT(x, ...)                                                        \
+> +	{                                                                      \
+> +		VM_STAT_NAME(offsetof(struct kvm_vm_stat, x)/sizeof(ulong)),   \
+> +		offsetof(struct kvm, stat.x),                                  \
+> +		KVM_STAT_VM,                                                   \
+> +		## __VA_ARGS__                                                 \
+> +	}
+> +
+> +#define VCPU_STAT(x, ...)                                                      \
+> +	{                                                                      \
+> +		VCPU_STAT_NAME(offsetof(struct kvm_vcpu_stat, x)/sizeof(u64)), \
+> +		offsetof(struct kvm_vcpu, stat.x),                             \
+> +		KVM_STAT_VCPU,                                                 \
+> +		## __VA_ARGS__                                                 \
+> +	}
+
+Is there any reason why we want to keep kvm_vm_stat populated with
+ulong, while kvm_vcpu_stat is populated with u64? I have the feeling
+that this is a fairly pointless difference, and that some of the
+macros could be unified.
+
+Also, using names initialisers would help with the readability of the
+macros.
+
+Thanks,
+
+	M.
+
 -- 
-Will
-
-https://fixes.arm64.dev
-https://next.arm64.dev
-https://will.arm64.dev
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
