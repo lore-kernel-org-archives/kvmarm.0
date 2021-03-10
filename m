@@ -2,64 +2,68 @@ Return-Path: <SRS0=f6Gw=II=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51807C433E0
-	for <kvmarm@archiver.kernel.org>; Wed, 10 Mar 2021 09:43:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15EE3C433DB
+	for <kvmarm@archiver.kernel.org>; Wed, 10 Mar 2021 10:42:31 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CF4EF64DAF
-	for <kvmarm@archiver.kernel.org>; Wed, 10 Mar 2021 09:43:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF4EF64DAF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 309E664FE5
+	for <kvmarm@archiver.kernel.org>; Wed, 10 Mar 2021 10:42:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 309E664FE5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B7BC4B65D;
-	Wed, 10 Mar 2021 04:43:44 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A18B4B647;
+	Wed, 10 Mar 2021 05:42:29 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id uPa52pu-dR-B; Wed, 10 Mar 2021 04:43:43 -0500 (EST)
+	with ESMTP id axxbcfouweEn; Wed, 10 Mar 2021 05:42:28 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EEE854B5FA;
-	Wed, 10 Mar 2021 04:43:42 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 728284B63A;
+	Wed, 10 Mar 2021 05:42:28 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E3E54B28F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Mar 2021 04:43:41 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B9AC4B63E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Mar 2021 05:42:27 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mFL+kA3nuk0u for <kvmarm@lists.cs.columbia.edu>;
- Wed, 10 Mar 2021 04:43:38 -0500 (EST)
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 160254B1E4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Mar 2021 04:43:38 -0500 (EST)
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.60])
- by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4DwRtN0Syxz17J2q;
- Wed, 10 Mar 2021 17:41:48 +0800 (CST)
-Received: from DESKTOP-TMVL5KK.china.huawei.com (10.174.187.128) by
- DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
- 14.3.498.0; Wed, 10 Mar 2021 17:43:25 +0800
-From: Yanan Wang <wangyanan55@huawei.com>
-To: Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, "Catalin
- Marinas" <catalin.marinas@arm.com>, James Morse <james.morse@arm.com>,
- "Julien Thierry" <julien.thierry.kdev@gmail.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Gavin Shan <gshan@redhat.com>, Quentin Perret
- <qperret@google.com>, <kvmarm@lists.cs.columbia.edu>,
- <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>
-Subject: [RFC PATCH v2 3/3] KVM: arm64: Distinguish cases of memcache
- allocations completely
-Date: Wed, 10 Mar 2021 17:43:19 +0800
-Message-ID: <20210310094319.18760-4-wangyanan55@huawei.com>
-X-Mailer: git-send-email 2.8.4.windows.1
-In-Reply-To: <20210310094319.18760-1-wangyanan55@huawei.com>
-References: <20210310094319.18760-1-wangyanan55@huawei.com>
+ with ESMTP id lBlckRX-Ww-3 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 10 Mar 2021 05:42:26 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 611F04B5F1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Mar 2021 05:42:26 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 3B73564F51;
+ Wed, 10 Mar 2021 10:42:24 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1lJwII-000jdD-1H; Wed, 10 Mar 2021 10:42:22 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org
+Subject: [PATCH v2 0/2] KVM: arm64: Assorted IPA size fixes
+Date: Wed, 10 Mar 2021 10:42:06 +0000
+Message-Id: <20210310104208.3819061-1-maz@kernel.org>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-X-Originating-IP: [10.174.187.128]
-X-CFilter-Loop: Reflected
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, will@kernel.org,
+ drjones@redhat.com, eric.auger@redhat.com, alexandru.elisei@arm.com,
+ kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, Will Deacon <will@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -76,65 +80,44 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-With a guest translation fault, the memcache pages are not needed if KVM
-is only about to install a new leaf entry into the existing page table.
-And with a guest permission fault, the memcache pages are also not needed
-for a write_fault in dirty-logging time if KVM is only about to update
-the existing leaf entry instead of collapsing a block entry into a table.
+This is a rework of an initial patch posted a couple of days back[1]
 
-By comparing fault_granule and vma_pagesize, cases that require allocations
-from memcache and cases that don't can be distinguished completely.
+While working on enabling KVM on "reduced IPA size" systems, I realise
+we have a couple of issues, some of while do impact userspace.
 
-Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
----
- arch/arm64/kvm/mmu.c | 25 ++++++++++++-------------
- 1 file changed, 12 insertions(+), 13 deletions(-)
+The first issue is that we accept the creation of a "default IPA size"
+VM (40 bits) even when the HW doesn't support it. Not good.
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 1eec9f63bc6f..05af40dc60c1 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -810,19 +810,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	gfn = fault_ipa >> PAGE_SHIFT;
- 	mmap_read_unlock(current->mm);
- 
--	/*
--	 * Permission faults just need to update the existing leaf entry,
--	 * and so normally don't require allocations from the memcache. The
--	 * only exception to this is when dirty logging is enabled at runtime
--	 * and a write fault needs to collapse a block entry into a table.
--	 */
--	if (fault_status != FSC_PERM || (logging_active && write_fault)) {
--		ret = kvm_mmu_topup_memory_cache(memcache,
--						 kvm_mmu_cache_min_pages(kvm));
--		if (ret)
--			return ret;
--	}
--
- 	mmu_seq = vcpu->kvm->mmu_notifier_seq;
- 	/*
- 	 * Ensure the read of mmu_notifier_seq happens before we call
-@@ -880,6 +867,18 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	else if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC))
- 		prot |= KVM_PGTABLE_PROT_X;
- 
-+	/*
-+	 * Allocations from the memcache are required only when granule of the
-+	 * lookup level where the guest fault happened exceeds vma_pagesize,
-+	 * which means new page tables will be created in the fault handlers.
-+	 */
-+	if (fault_granule > vma_pagesize) {
-+		ret = kvm_mmu_topup_memory_cache(memcache,
-+						 kvm_mmu_cache_min_pages(kvm));
-+		if (ret)
-+			return ret;
-+	}
-+
- 	/*
- 	 * Under the premise of getting a FSC_PERM fault, we just need to relax
- 	 * permissions only if vma_pagesize equals fault_granule. Otherwise,
+The second one is that we disallow a memslot to end right where the
+IPA limit is. One page less and you're good, but that's not quite what
+it should be.
+
+I intend for both patches to be backported to -stable.
+
+Thanks,
+
+	M.
+
+* From v1:
+  - Don't try to cap the default IPA size. If userspace uses 0 with an
+    expectation that it will get 40bits, we should abide by it and
+    return an error immediately (noticed by Andrew)
+  - Added a new patch to fix the exclusive nature of the IPA limit
+  
+[1] https://lore.kernel.org/r/20210308174643.761100-1-maz@kernel.org
+
+Marc Zyngier (2):
+  KVM: arm64: Reject VM creation when the default IPA size is
+    unsupported
+  KVM: arm64: Fix exclusive limit for IPA size
+
+ Documentation/virt/kvm/api.rst |  3 +++
+ arch/arm64/kvm/mmu.c           |  3 +--
+ arch/arm64/kvm/reset.c         | 12 ++++++++----
+ 3 files changed, 12 insertions(+), 6 deletions(-)
+
 -- 
-2.19.1
+2.29.2
 
 _______________________________________________
 kvmarm mailing list
