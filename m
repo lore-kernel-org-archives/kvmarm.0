@@ -2,83 +2,106 @@ Return-Path: <SRS0=f6Gw=II=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C008C433E0
-	for <kvmarm@archiver.kernel.org>; Wed, 10 Mar 2021 17:32:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9A80C433DB
+	for <kvmarm@archiver.kernel.org>; Wed, 10 Mar 2021 17:44:39 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6D95A614A5
-	for <kvmarm@archiver.kernel.org>; Wed, 10 Mar 2021 17:32:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D95A614A5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 2A00464F3A
+	for <kvmarm@archiver.kernel.org>; Wed, 10 Mar 2021 17:44:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A00464F3A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 005F94B3D2;
-	Wed, 10 Mar 2021 12:32:11 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 950BE4B59C;
+	Wed, 10 Mar 2021 12:44:38 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id WHtFNKTZf4kp; Wed, 10 Mar 2021 12:32:09 -0500 (EST)
+	with ESMTP id FzawVDHGxLBV; Wed, 10 Mar 2021 12:44:37 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ECBBF4B60D;
-	Wed, 10 Mar 2021 12:32:09 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 95CE94B297;
+	Wed, 10 Mar 2021 12:44:37 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AD9DA4B57A
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Mar 2021 12:32:08 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BDC6C4B28C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Mar 2021 12:44:36 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jyEJH-gEyxPH for <kvmarm@lists.cs.columbia.edu>;
- Wed, 10 Mar 2021 12:32:07 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A2FE34B578
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Mar 2021 12:32:07 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 8038E600EF;
- Wed, 10 Mar 2021 17:32:06 +0000 (UTC)
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
- (envelope-from <maz@kernel.org>)
- id 1lK2gm-000oge-8P; Wed, 10 Mar 2021 17:32:04 +0000
-Date: Wed, 10 Mar 2021 17:31:56 +0000
-Message-ID: <871rcmhq43.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
+ with ESMTP id IVxsgCFxM5Nn for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 10 Mar 2021 12:44:35 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EB30C4B288
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Mar 2021 12:44:35 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1615398275;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=hU8ekKHxTbztMp+pHZxvBx516z1N7ENAuWaGaufXY5Q=;
+ b=M0nKwfWzqhzazwZTZoyLR5dfTH/VdD84Jp08AgmsK+luBt1inadsNcUK3IPvsgy3qeLJkz
+ DAV/PGnY2zOyBKbiZ/mj/Zm6/YSQoxDZU3pGyz2Q9Uc0FiMSahSbkPXO+IBUBai8GfL66V
+ yYnpc5SVsKHuCm27aJSD8VmrRnYUEqo=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-157-kHPu2rz6On-4-1kq_nwxUg-1; Wed, 10 Mar 2021 12:44:31 -0500
+X-MC-Unique: kHPu2rz6On-4-1kq_nwxUg-1
+Received: by mail-ej1-f72.google.com with SMTP id n25so7556612ejd.5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Mar 2021 09:44:31 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=hU8ekKHxTbztMp+pHZxvBx516z1N7ENAuWaGaufXY5Q=;
+ b=IhC65SeVIM+7IRh+L58e5HxNsVCmMymVNoNv/mNTt4hCbn0hrIPDIIqk5u9bl1r5nG
+ uRUHqfF+wt4XQNDsXJwSNzb7Ek8TNVARYf+FBFmmKidnNIIkNxkwvjz+82iMpsFnx0Qx
+ laxLVjjdGWvVtXCqJadEWwWwL0CPmPZMIb15A72ZbPt//DgQ0WlaEAOaOk/X287imNtG
+ jT0r8+P9AgG8LMsvn+pegEm6IYRIfj3oCONoi/S0TQPNdqC9idAmNlaYlILQfq2J09V3
+ wonOUGcnvTmiVgp0hV1SGCEF7YjLcTH/6WebSkpZRrVtdDz6ywqNI3eNr4fEEDebFngy
+ gevA==
+X-Gm-Message-State: AOAM531HXSjaytvA9WO4kfWJRMisIiocVDKnhzJEISYXXxR6E17tWZI6
+ xmp5OCF2GuosTR7dhhDsW7MTi49W9EjzHUqHLJ17TFP6Nyi7w/mLJNTNLdk/ntAQBS2dSP525iG
+ QQ729Vn60iSw7SKXoDNRY7Fhx
+X-Received: by 2002:aa7:ca02:: with SMTP id y2mr4748939eds.53.1615398270322;
+ Wed, 10 Mar 2021 09:44:30 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxG/7Jpsz0wHHG4vrGLPJ/mZ70rGmjD1p1cn8m5yCq4LyuA7dJeziZrVH9s6TVL8ShkHCSIiQ==
+X-Received: by 2002:aa7:ca02:: with SMTP id y2mr4748899eds.53.1615398270150;
+ Wed, 10 Mar 2021 09:44:30 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
+ ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+ by smtp.gmail.com with ESMTPSA id 90sm11387479edr.69.2021.03.10.09.44.28
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 10 Mar 2021 09:44:29 -0800 (PST)
 Subject: Re: [RFC PATCH 3/4] KVM: stats: Add ioctl commands to pull statistics
  in binary format
-In-Reply-To: <2749fe68-acbb-8f4d-dc76-4cb23edb9b35@redhat.com>
+To: Marc Zyngier <maz@kernel.org>
 References: <20210310003024.2026253-1-jingzhangos@google.com>
  <20210310003024.2026253-4-jingzhangos@google.com>
  <875z1zxb11.wl-maz@kernel.org>
  <a475d935-e404-93dd-4c6d-a5f8038d8f4d@redhat.com>
  <8735x3x7lu.wl-maz@kernel.org>
  <2749fe68-acbb-8f4d-dc76-4cb23edb9b35@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, jingzhangos@google.com,
- kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
- kvm-ppc@vger.kernel.org, linux-s390@vger.kernel.org,
- linux-kselftest@vger.kernel.org, james.morse@arm.com,
- julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, will@kernel.org,
- chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com,
- tsbogend@alpha.franken.de, paulus@ozlabs.org, borntraeger@de.ibm.com,
- frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
- imbrenda@linux.ibm.com, seanjc@google.com, vkuznets@redhat.com,
- jmattson@google.com, pshier@google.com, oupton@google.com, rientjes@google.com,
- eesposit@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+ <871rcmhq43.wl-maz@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <fd37d21f-f3ae-d370-f8e1-cf552be3b2ee@redhat.com>
+Date: Wed, 10 Mar 2021 18:44:27 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
+MIME-Version: 1.0
+In-Reply-To: <871rcmhq43.wl-maz@kernel.org>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
 Cc: KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
  Paul Mackerras <paulus@ozlabs.org>,
  Linux kselftest <linux-kselftest@vger.kernel.org>,
@@ -106,54 +129,34 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 10 Mar 2021 17:11:47 +0000,
-Paolo Bonzini <pbonzini@redhat.com> wrote:
-> 
-> On 10/03/21 18:05, Marc Zyngier wrote:
-> > On Wed, 10 Mar 2021 16:03:42 +0000,
-> > Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >> 
-> >> On 10/03/21 16:51, Marc Zyngier wrote:
-> >>>> +	kvm_for_each_vcpu(j, vcpu, kvm) {
-> >>>> +		pdata = data + VM_STAT_COUNT;
-> >>>> +		for (i = 0; i < VCPU_STAT_COUNT; i++, pdata++)
-> >>>> +			*pdata += *((u64 *)&vcpu->stat + i);
-> >>> Do you really need the in-kernel copy? Why not directly organise the
-> >>> data structures in a way that would allow a bulk copy using
-> >>> copy_to_user()?
-> >> 
-> >> The result is built by summing per-vCPU counters, so that the counter
-> >> updates are fast and do not require a lock.  So consistency basically
-> >> cannot be guaranteed.
-> > 
-> > Sure, but I wonder whether there is scope for VM-global counters to be
-> > maintained in parallel with per-vCPU counters if speed/efficiency is
-> > of the essence (and this seems to be how it is sold in the cover
-> > letter).
-> 
-> Maintaining VM-global counters would require an atomic instruction and
-> would suffer lots of cacheline bouncing even on architectures that
-> have relaxed atomic memory operations.
+On 10/03/21 18:31, Marc Zyngier wrote:
+>> Maintaining VM-global counters would require an atomic instruction and
+>> would suffer lots of cacheline bouncing even on architectures that
+>> have relaxed atomic memory operations.
+> Which is why we have per-cpu counters already. Making use of them
+> doesn't seem that outlandish.
 
-Which is why we have per-cpu counters already. Making use of them
-doesn't seem that outlandish.
+But you wouldn't be able to guarantee consistency anyway, would you? 
+You *could* copy N*M counters to userspace, but there's no guarantee 
+that they are consistent, neither within a single vCPU nor within a 
+single counter.
 
-> Speed/efficiency of retrieving statistics is important, but let's keep
-> in mind that the baseline for comparison is hundreds of syscalls and
-> filesystem lookups.
+>> Speed/efficiency of retrieving statistics is important, but let's keep
+>> in mind that the baseline for comparison is hundreds of syscalls and
+>> filesystem lookups.
+>
+> Having that baseline in the cover letter would be a good start, as
+> well as an indication of the frequency this is used at.
 
-Having that baseline in the cover letter would be a good start, as
-well as an indication of the frequency this is used at.
+Can't disagree, especially on the latter which I have no idea about.
 
-	M.
+Paolo
 
--- 
-Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
