@@ -7,73 +7,74 @@ X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4FB4C433DB
-	for <kvmarm@archiver.kernel.org>; Wed, 10 Mar 2021 17:58:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13A48C433E6
+	for <kvmarm@archiver.kernel.org>; Wed, 10 Mar 2021 17:58:28 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6C16064FB1
-	for <kvmarm@archiver.kernel.org>; Wed, 10 Mar 2021 17:58:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C16064FB1
+	by mail.kernel.org (Postfix) with ESMTP id B577264FB1
+	for <kvmarm@archiver.kernel.org>; Wed, 10 Mar 2021 17:58:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B577264FB1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DA554B650;
-	Wed, 10 Mar 2021 12:58:26 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 68AA84B642;
+	Wed, 10 Mar 2021 12:58:27 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id l571lYT61rIG; Wed, 10 Mar 2021 12:58:24 -0500 (EST)
+	with ESMTP id uV1fVcjWhqR9; Wed, 10 Mar 2021 12:58:26 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 95F344B52B;
-	Wed, 10 Mar 2021 12:58:24 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BCF414B643;
+	Wed, 10 Mar 2021 12:58:25 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9DEC44B3E7
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Mar 2021 12:58:22 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B1CF04B41F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Mar 2021 12:58:23 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vwVubMAheDnQ for <kvmarm@lists.cs.columbia.edu>;
- Wed, 10 Mar 2021 12:58:21 -0500 (EST)
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com
- [209.85.128.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C87564B1EB
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Mar 2021 12:58:20 -0500 (EST)
-Received: by mail-wm1-f73.google.com with SMTP id 73so2983186wma.3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Mar 2021 09:58:20 -0800 (PST)
+ with ESMTP id 8RX-TgewQxcM for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 10 Mar 2021 12:58:22 -0500 (EST)
+Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com
+ [209.85.219.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 61AD64B61A
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Mar 2021 12:58:22 -0500 (EST)
+Received: by mail-qv1-f73.google.com with SMTP id j3so13295238qvo.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Mar 2021 09:58:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=Vko/POQoG1louXL8h4WbFiMfH/TPQZb+EYjyQ3Qtr8o=;
- b=JZ4vd/uOQtdnCZc4VES1NJ1PCqVnXeUeXqc/NSTjZ7wp0hteQXI7f+7l27xo9jn/4B
- L0ffS4w4V9QZuPcWm5glyBq7Jnmv+tnvrAlK7GNSL9XYMRx8D0yp05BNXY/iJsin1Vr9
- 4/npWdKJziQE9P60yPDx88l8jE2G0pwOFxjVdJEULmaoJ7lSHYZvLMJyPTqmDOoD7st1
- mK3UyO0puiGbVL0XxnBUl089DoQ6+XKHO1sfzXAFL1ZQ6HBVKASqIAWr7yPE6/siIWXb
- RASfqoaZYb07YN2Wf2aJ34k4h8v2x9GE4g9mkFpH9mhZb70tNmCnwgHH3kVmHEeXGnbr
- tL9A==
+ :cc; bh=Nj4Lfx4RBIkW7BkT83ganNaPcX2b1UPE5UuHOUQIP/k=;
+ b=Lz9VNJNblKnJkWT5K4VU7PyB0b9hN+o7HyyDCG02NgZinEFB3SYgmxmsahuuavWMAi
+ NMSIyNG6PR+7/Dpgi4NqJJ9lMOzxnJUeVu+L2l42/1XOIHgwADvQNCgGozWki+5Udz3G
+ Gb8pHWYK9vUkD4pDjyL8w+KTfG6gC71qKyRpM6M356+sZsrprfr30mKvKz2QJV1mIZC5
+ atJlNJXZIZxNSv6wMPebfLOfqhAD29Vj17J93VlDbzo02RhuVVlJ5fdknlbakfTvqKpg
+ Caot5MfItt58v0EjXCYfi8xamJejyAMqpXDKR1I+BN54GVAE+f8AE32lOy9at7bE5faB
+ YZiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=Vko/POQoG1louXL8h4WbFiMfH/TPQZb+EYjyQ3Qtr8o=;
- b=btajVgcOtnvOyJ0F8f8YxtHF8arfsU25nYWJUdwB2Htk3pkKFtRV414UWYzC6fL4m0
- hnnWQk8NoRSbT45SZpjL999R+3R6P/C/H5YbGfiWXHNAdK1kEq4h2m1shpVfTaVaxIdh
- ykaehwWmIoMiy7Av1Jg+f23QAlrEubaKOZcE5h0wWM+OwBMFkTzKAaDda0bwM6aIlaKQ
- 9kaqqv/1mwYy5RSqQbt1YTjUG8nJrysreSwWnH+SxuqMZ4fOPyZTRcV33jbwKpUOyx7V
- kNq0n8wlMPhRTkFVxCH7MdDfjZP7rL+9YKHvb/giqc6Z5xoSzWF6l7AqjAkn4PMld2Bp
- IMew==
-X-Gm-Message-State: AOAM532Smpty/OXih5SmHbwUlqqjPTDFmDSpkWV3GdnLtwx73CfjOAYS
- oFWsn8mlpmIAbahR+9jOg1Fv5CwhD2VD
-X-Google-Smtp-Source: ABdhPJxE1hbjD87PPslcXEpix5TcSGI6ccD/wDw4HgvH86Qd17WFX2v/EbQIlsexm/uZqiDVevRwnmO/05tp
+ bh=Nj4Lfx4RBIkW7BkT83ganNaPcX2b1UPE5UuHOUQIP/k=;
+ b=UQgblCPYvXuvXjsJX7/t4xYmtMpPm9QfoMn4PJljej3M4ct22abuK0c5M0z9KEPBpq
+ GuIfbScWcl/8f19K1GC/ZCEeA+S63LTfqArXKvCOyzVDODKgZ4YTEGValJhnLWNn0Idr
+ BV6Elt0lQLOPg+jf1uvqChKV3FoPgJdU1C/HU13LvT7fRZQEhTeZ4qtJl3CnWT+NCRuK
+ 5TvE3dYvu+fGC9z4bbSYsDmNrRK3ZnNr/IvMZd0Jg/752LBffaD6c1vTEwD1jSgPXrZG
+ 060bMRZ6fVQg0kCtecaqWKVbQoHaSAmFJeC2cZFn0THMyyTJyRTaZ4Vj17UARq6U+r55
+ nehA==
+X-Gm-Message-State: AOAM533c7jKsQxB4to6AZX1oJ3k8FKZ0Gq6vjg3I2+7/ei0OCUWZ/UbE
+ ZaWFwHvqty87tNIh1Kvkef5XtRD5PpqE
+X-Google-Smtp-Source: ABdhPJw5PfRtzS1h/8o/TGI7ehwR04Ncd7VgemXreET/UNEe/4aGwCj/3ct3FaQSNnY4iFj0MwIQXVnNH6gT
 X-Received: from r2d2-qp.c.googlers.com ([fda3:e722:ac3:10:28:9cb1:c0a8:1652])
- (user=qperret job=sendgmr) by 2002:a1c:8041:: with SMTP id
- b62mr4669106wmd.0.1615399099962; Wed, 10 Mar 2021 09:58:19 -0800 (PST)
-Date: Wed, 10 Mar 2021 17:57:29 +0000
+ (user=qperret job=sendgmr) by 2002:ad4:44ef:: with SMTP id
+ p15mr4032818qvt.25.1615399101946; Wed, 10 Mar 2021 09:58:21 -0800 (PST)
+Date: Wed, 10 Mar 2021 17:57:30 +0000
 In-Reply-To: <20210310175751.3320106-1-qperret@google.com>
-Message-Id: <20210310175751.3320106-13-qperret@google.com>
+Message-Id: <20210310175751.3320106-14-qperret@google.com>
 Mime-Version: 1.0
 References: <20210310175751.3320106-1-qperret@google.com>
 X-Mailer: git-send-email 2.30.1.766.gb4fecdf3b7-goog
-Subject: [PATCH v4 12/34] KVM: arm64: Introduce a Hyp buddy page allocator
+Subject: [PATCH v4 13/34] KVM: arm64: Enable access to sanitized CPU features
+ at EL2
 From: Quentin Perret <qperret@google.com>
 To: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org, 
  james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
@@ -97,364 +98,200 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-When memory protection is enabled, the hyp code will require a basic
-form of memory management in order to allocate and free memory pages at
-EL2. This is needed for various use-cases, including the creation of hyp
-mappings or the allocation of stage 2 page tables.
+Introduce the infrastructure in KVM enabling to copy CPU feature
+registers into EL2-owned data-structures, to allow reading sanitised
+values directly at EL2 in nVHE.
 
-To address these use-case, introduce a simple memory allocator in the
-hyp code. The allocator is designed as a conventional 'buddy allocator',
-working with a page granularity. It allows to allocate and free
-physically contiguous pages from memory 'pools', with a guaranteed order
-alignment in the PA space. Each page in a memory pool is associated
-with a struct hyp_page which holds the page's metadata, including its
-refcount, as well as its current order, hence mimicking the kernel's
-buddy system in the GFP infrastructure. The hyp_page metadata are made
-accessible through a hyp_vmemmap, following the concept of
-SPARSE_VMEMMAP in the kernel.
+Given that only a subset of these features are being read by the
+hypervisor, the ones that need to be copied are to be listed under
+<asm/kvm_cpufeature.h> together with the name of the nVHE variable that
+will hold the copy.
+
+While at it, introduce the first user of this infrastructure by
+implementing __flush_dcache_area at EL2, which needs
+arm64_ftr_reg_ctrel0.
 
 Signed-off-by: Quentin Perret <qperret@google.com>
 ---
- arch/arm64/kvm/hyp/include/nvhe/gfp.h    |  68 ++++++++
- arch/arm64/kvm/hyp/include/nvhe/memory.h |  28 ++++
- arch/arm64/kvm/hyp/nvhe/Makefile         |   2 +-
- arch/arm64/kvm/hyp/nvhe/page_alloc.c     | 195 +++++++++++++++++++++++
- 4 files changed, 292 insertions(+), 1 deletion(-)
- create mode 100644 arch/arm64/kvm/hyp/include/nvhe/gfp.h
- create mode 100644 arch/arm64/kvm/hyp/nvhe/page_alloc.c
+ arch/arm64/include/asm/cpufeature.h     |  1 +
+ arch/arm64/include/asm/kvm_cpufeature.h | 17 +++++++++++++++++
+ arch/arm64/include/asm/kvm_host.h       |  4 ++++
+ arch/arm64/kernel/cpufeature.c          | 13 +++++++++++++
+ arch/arm64/kvm/hyp/nvhe/Makefile        |  3 ++-
+ arch/arm64/kvm/hyp/nvhe/cache.S         | 13 +++++++++++++
+ arch/arm64/kvm/hyp/nvhe/cpufeature.c    |  8 ++++++++
+ arch/arm64/kvm/sys_regs.c               | 21 +++++++++++++++++++++
+ 8 files changed, 79 insertions(+), 1 deletion(-)
+ create mode 100644 arch/arm64/include/asm/kvm_cpufeature.h
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/cache.S
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/cpufeature.c
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/gfp.h b/arch/arm64/kvm/hyp/include/nvhe/gfp.h
+diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+index 61177bac49fa..a85cea2cac57 100644
+--- a/arch/arm64/include/asm/cpufeature.h
++++ b/arch/arm64/include/asm/cpufeature.h
+@@ -607,6 +607,7 @@ void check_local_cpu_capabilities(void);
+ 
+ u64 read_sanitised_ftr_reg(u32 id);
+ u64 __read_sysreg_by_encoding(u32 sys_id);
++int copy_ftr_reg(u32 id, struct arm64_ftr_reg *dst);
+ 
+ static inline bool cpu_supports_mixed_endian_el0(void)
+ {
+diff --git a/arch/arm64/include/asm/kvm_cpufeature.h b/arch/arm64/include/asm/kvm_cpufeature.h
 new file mode 100644
-index 000000000000..55b3f0ce5bc8
+index 000000000000..d34f85cba358
 --- /dev/null
-+++ b/arch/arm64/kvm/hyp/include/nvhe/gfp.h
-@@ -0,0 +1,68 @@
++++ b/arch/arm64/include/asm/kvm_cpufeature.h
+@@ -0,0 +1,17 @@
 +/* SPDX-License-Identifier: GPL-2.0-only */
-+#ifndef __KVM_HYP_GFP_H
-+#define __KVM_HYP_GFP_H
-+
-+#include <linux/list.h>
-+
-+#include <nvhe/memory.h>
-+#include <nvhe/spinlock.h>
-+
-+#define HYP_NO_ORDER	UINT_MAX
-+
-+struct hyp_pool {
-+	/*
-+	 * Spinlock protecting concurrent changes to the memory pool as well as
-+	 * the struct hyp_page of the pool's pages until we have a proper atomic
-+	 * API at EL2.
-+	 */
-+	hyp_spinlock_t lock;
-+	struct list_head free_area[MAX_ORDER];
-+	phys_addr_t range_start;
-+	phys_addr_t range_end;
-+	unsigned int max_order;
-+};
-+
-+static inline void hyp_page_ref_inc(struct hyp_page *p)
-+{
-+	struct hyp_pool *pool = hyp_page_to_pool(p);
-+
-+	hyp_spin_lock(&pool->lock);
-+	p->refcount++;
-+	hyp_spin_unlock(&pool->lock);
-+}
-+
-+static inline int hyp_page_ref_dec_and_test(struct hyp_page *p)
-+{
-+	struct hyp_pool *pool = hyp_page_to_pool(p);
-+	int ret;
-+
-+	hyp_spin_lock(&pool->lock);
-+	p->refcount--;
-+	ret = (p->refcount == 0);
-+	hyp_spin_unlock(&pool->lock);
-+
-+	return ret;
-+}
-+
-+static inline void hyp_set_page_refcounted(struct hyp_page *p)
-+{
-+	struct hyp_pool *pool = hyp_page_to_pool(p);
-+
-+	hyp_spin_lock(&pool->lock);
-+	if (p->refcount) {
-+		hyp_spin_unlock(&pool->lock);
-+		hyp_panic();
-+	}
-+	p->refcount = 1;
-+	hyp_spin_unlock(&pool->lock);
-+}
-+
-+/* Allocation */
-+void *hyp_alloc_pages(struct hyp_pool *pool, unsigned int order);
-+void hyp_get_page(void *addr);
-+void hyp_put_page(void *addr);
-+
-+/* Used pages cannot be freed */
-+int hyp_pool_init(struct hyp_pool *pool, u64 pfn, unsigned int nr_pages,
-+		  unsigned int reserved_pages);
-+#endif /* __KVM_HYP_GFP_H */
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/memory.h b/arch/arm64/kvm/hyp/include/nvhe/memory.h
-index 3e49eaa7e682..d2fb307c5952 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/memory.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/memory.h
-@@ -6,7 +6,17 @@
- 
- #include <linux/types.h>
- 
-+struct hyp_pool;
-+struct hyp_page {
-+	unsigned int refcount;
-+	unsigned int order;
-+	struct hyp_pool *pool;
-+	struct list_head node;
-+};
-+
- extern s64 hyp_physvirt_offset;
-+extern u64 __hyp_vmemmap;
-+#define hyp_vmemmap ((struct hyp_page *)__hyp_vmemmap)
- 
- #define __hyp_pa(virt)	((phys_addr_t)(virt) + hyp_physvirt_offset)
- #define __hyp_va(phys)	((void *)((phys_addr_t)(phys) - hyp_physvirt_offset))
-@@ -21,4 +31,22 @@ static inline phys_addr_t hyp_virt_to_phys(void *addr)
- 	return __hyp_pa(addr);
- }
- 
-+#define hyp_phys_to_pfn(phys)	((phys) >> PAGE_SHIFT)
-+#define hyp_pfn_to_phys(pfn)	((phys_addr_t)((pfn) << PAGE_SHIFT))
-+#define hyp_phys_to_page(phys)	(&hyp_vmemmap[hyp_phys_to_pfn(phys)])
-+#define hyp_virt_to_page(virt)	hyp_phys_to_page(__hyp_pa(virt))
-+#define hyp_virt_to_pfn(virt)	hyp_phys_to_pfn(__hyp_pa(virt))
-+
-+#define hyp_page_to_pfn(page)	((struct hyp_page *)(page) - hyp_vmemmap)
-+#define hyp_page_to_phys(page)  hyp_pfn_to_phys((hyp_page_to_pfn(page)))
-+#define hyp_page_to_virt(page)	__hyp_va(hyp_page_to_phys(page))
-+#define hyp_page_to_pool(page)	(((struct hyp_page *)page)->pool)
-+
-+static inline int hyp_page_count(void *addr)
-+{
-+	struct hyp_page *p = hyp_virt_to_page(addr);
-+
-+	return p->refcount;
-+}
-+
- #endif /* __KVM_HYP_MEMORY_H */
-diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-index 144da72ad510..6894a917f290 100644
---- a/arch/arm64/kvm/hyp/nvhe/Makefile
-+++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-@@ -13,7 +13,7 @@ lib-objs := clear_page.o copy_page.o memcpy.o memset.o
- lib-objs := $(addprefix ../../../lib/, $(lib-objs))
- 
- obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o \
--	 hyp-main.o hyp-smp.o psci-relay.o early_alloc.o stub.o
-+	 hyp-main.o hyp-smp.o psci-relay.o early_alloc.o stub.o page_alloc.o
- obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
- 	 ../fpsimd.o ../hyp-entry.o ../exception.o
- obj-y += $(lib-objs)
-diff --git a/arch/arm64/kvm/hyp/nvhe/page_alloc.c b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
-new file mode 100644
-index 000000000000..237e03bf0cb1
---- /dev/null
-+++ b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
-@@ -0,0 +1,195 @@
-+// SPDX-License-Identifier: GPL-2.0-only
 +/*
-+ * Copyright (C) 2020 Google LLC
++ * Copyright (C) 2020 - Google LLC
 + * Author: Quentin Perret <qperret@google.com>
 + */
 +
-+#include <asm/kvm_hyp.h>
-+#include <nvhe/gfp.h>
++#include <asm/cpufeature.h>
 +
-+u64 __hyp_vmemmap;
++#ifndef KVM_HYP_CPU_FTR_REG
++#if defined(__KVM_NVHE_HYPERVISOR__)
++#define KVM_HYP_CPU_FTR_REG(id, name) extern struct arm64_ftr_reg name;
++#else
++#define KVM_HYP_CPU_FTR_REG(id, name) DECLARE_KVM_NVHE_SYM(name);
++#endif
++#endif
 +
-+/*
-+ * Index the hyp_vmemmap to find a potential buddy page, but make no assumption
-+ * about its current state.
-+ *
-+ * Example buddy-tree for a 4-pages physically contiguous pool:
-+ *
-+ *                 o : Page 3
-+ *                /
-+ *               o-o : Page 2
-+ *              /
-+ *             /   o : Page 1
-+ *            /   /
-+ *           o---o-o : Page 0
-+ *    Order  2   1 0
-+ *
-+ * Example of requests on this pool:
-+ *   __find_buddy_nocheck(pool, page 0, order 0) => page 1
-+ *   __find_buddy_nocheck(pool, page 0, order 1) => page 2
-+ *   __find_buddy_nocheck(pool, page 1, order 0) => page 0
-+ *   __find_buddy_nocheck(pool, page 2, order 0) => page 3
-+ */
-+static struct hyp_page *__find_buddy_nocheck(struct hyp_pool *pool,
-+					     struct hyp_page *p,
-+					     unsigned int order)
++KVM_HYP_CPU_FTR_REG(SYS_CTR_EL0, arm64_ftr_reg_ctrel0)
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 06ca4828005f..459ee557f87c 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -751,9 +751,13 @@ void kvm_clr_pmu_events(u32 clr);
+ 
+ void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu);
+ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
++
++void setup_kvm_el2_caps(void);
+ #else
+ static inline void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr) {}
+ static inline void kvm_clr_pmu_events(u32 clr) {}
++
++static inline void setup_kvm_el2_caps(void) {}
+ #endif
+ 
+ void kvm_vcpu_load_sysregs_vhe(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 066030717a4c..f2d8b479ff74 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -1154,6 +1154,18 @@ u64 read_sanitised_ftr_reg(u32 id)
+ }
+ EXPORT_SYMBOL_GPL(read_sanitised_ftr_reg);
+ 
++int copy_ftr_reg(u32 id, struct arm64_ftr_reg *dst)
 +{
-+	phys_addr_t addr = hyp_page_to_phys(p);
++	struct arm64_ftr_reg *regp = get_arm64_ftr_reg(id);
 +
-+	addr ^= (PAGE_SIZE << order);
++	if (!regp)
++		return -EINVAL;
 +
-+	/*
-+	 * Don't return a page outside the pool range -- it belongs to
-+	 * something else and may not be mapped in hyp_vmemmap.
-+	 */
-+	if (addr < pool->range_start || addr >= pool->range_end)
-+		return NULL;
-+
-+	return hyp_phys_to_page(addr);
-+}
-+
-+/* Find a buddy page currently available for allocation */
-+static struct hyp_page *__find_buddy_avail(struct hyp_pool *pool,
-+					   struct hyp_page *p,
-+					   unsigned int order)
-+{
-+	struct hyp_page *buddy = __find_buddy_nocheck(pool, p, order);
-+
-+	if (!buddy || buddy->order != order || list_empty(&buddy->node))
-+		return NULL;
-+
-+	return buddy;
-+
-+}
-+
-+static void __hyp_attach_page(struct hyp_pool *pool,
-+			      struct hyp_page *p)
-+{
-+	unsigned int order = p->order;
-+	struct hyp_page *buddy;
-+
-+	memset(hyp_page_to_virt(p), 0, PAGE_SIZE << p->order);
-+
-+	/*
-+	 * Only the first struct hyp_page of a high-order page (otherwise known
-+	 * as the 'head') should have p->order set. The non-head pages should
-+	 * have p->order = HYP_NO_ORDER. Here @p may no longer be the head
-+	 * after coallescing, so make sure to mark it HYP_NO_ORDER proactively.
-+	 */
-+	p->order = HYP_NO_ORDER;
-+	for (; (order + 1) < pool->max_order; order++) {
-+		buddy = __find_buddy_avail(pool, p, order);
-+		if (!buddy)
-+			break;
-+
-+		/* Take the buddy out of its list, and coallesce with @p */
-+		list_del_init(&buddy->node);
-+		buddy->order = HYP_NO_ORDER;
-+		p = min(p, buddy);
-+	}
-+
-+	/* Mark the new head, and insert it */
-+	p->order = order;
-+	list_add_tail(&p->node, &pool->free_area[order]);
-+}
-+
-+static void hyp_attach_page(struct hyp_page *p)
-+{
-+	struct hyp_pool *pool = hyp_page_to_pool(p);
-+
-+	hyp_spin_lock(&pool->lock);
-+	__hyp_attach_page(pool, p);
-+	hyp_spin_unlock(&pool->lock);
-+}
-+
-+static struct hyp_page *__hyp_extract_page(struct hyp_pool *pool,
-+					   struct hyp_page *p,
-+					   unsigned int order)
-+{
-+	struct hyp_page *buddy;
-+
-+	list_del_init(&p->node);
-+	while (p->order > order) {
-+		/*
-+		 * The buddy of order n - 1 currently has HYP_NO_ORDER as it
-+		 * is covered by a higher-level page (whose head is @p). Use
-+		 * __find_buddy_nocheck() to find it and inject it in the
-+		 * free_list[n - 1], effectively splitting @p in half.
-+		 */
-+		p->order--;
-+		buddy = __find_buddy_nocheck(pool, p, p->order);
-+		buddy->order = p->order;
-+		list_add_tail(&buddy->node, &pool->free_area[buddy->order]);
-+	}
-+
-+	return p;
-+}
-+
-+void hyp_put_page(void *addr)
-+{
-+	struct hyp_page *p = hyp_virt_to_page(addr);
-+
-+	if (hyp_page_ref_dec_and_test(p))
-+		hyp_attach_page(p);
-+}
-+
-+void hyp_get_page(void *addr)
-+{
-+	struct hyp_page *p = hyp_virt_to_page(addr);
-+
-+	hyp_page_ref_inc(p);
-+}
-+
-+void *hyp_alloc_pages(struct hyp_pool *pool, unsigned int order)
-+{
-+	unsigned int i = order;
-+	struct hyp_page *p;
-+
-+	hyp_spin_lock(&pool->lock);
-+
-+	/* Look for a high-enough-order page */
-+	while (i < pool->max_order && list_empty(&pool->free_area[i]))
-+		i++;
-+	if (i >= pool->max_order) {
-+		hyp_spin_unlock(&pool->lock);
-+		return NULL;
-+	}
-+
-+	/* Extract it from the tree at the right order */
-+	p = list_first_entry(&pool->free_area[i], struct hyp_page, node);
-+	p = __hyp_extract_page(pool, p, order);
-+
-+	hyp_spin_unlock(&pool->lock);
-+	hyp_set_page_refcounted(p);
-+
-+	return hyp_page_to_virt(p);
-+}
-+
-+int hyp_pool_init(struct hyp_pool *pool, u64 pfn, unsigned int nr_pages,
-+		  unsigned int reserved_pages)
-+{
-+	phys_addr_t phys = hyp_pfn_to_phys(pfn);
-+	struct hyp_page *p;
-+	int i;
-+
-+	hyp_spin_lock_init(&pool->lock);
-+	pool->max_order = min(MAX_ORDER, get_order(nr_pages << PAGE_SHIFT));
-+	for (i = 0; i < pool->max_order; i++)
-+		INIT_LIST_HEAD(&pool->free_area[i]);
-+	pool->range_start = phys;
-+	pool->range_end = phys + (nr_pages << PAGE_SHIFT);
-+
-+	/* Init the vmemmap portion */
-+	p = hyp_phys_to_page(phys);
-+	memset(p, 0, sizeof(*p) * nr_pages);
-+	for (i = 0; i < nr_pages; i++) {
-+		p[i].pool = pool;
-+		INIT_LIST_HEAD(&p[i].node);
-+	}
-+
-+	/* Attach the unused pages to the buddy tree */
-+	for (i = reserved_pages; i < nr_pages; i++)
-+		__hyp_attach_page(pool, &p[i]);
++	memcpy(dst, regp, sizeof(*regp));
 +
 +	return 0;
++}
++
+ #define read_sysreg_case(r)	\
+ 	case r:		val = read_sysreg_s(r); break;
+ 
+@@ -2773,6 +2785,7 @@ void __init setup_cpu_features(void)
+ 
+ 	setup_system_capabilities();
+ 	setup_elf_hwcaps(arm64_elf_hwcaps);
++	setup_kvm_el2_caps();
+ 
+ 	if (system_supports_32bit_el0())
+ 		setup_elf_hwcaps(compat_elf_hwcaps);
+diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+index 6894a917f290..0033591553fc 100644
+--- a/arch/arm64/kvm/hyp/nvhe/Makefile
++++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+@@ -13,7 +13,8 @@ lib-objs := clear_page.o copy_page.o memcpy.o memset.o
+ lib-objs := $(addprefix ../../../lib/, $(lib-objs))
+ 
+ obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o \
+-	 hyp-main.o hyp-smp.o psci-relay.o early_alloc.o stub.o page_alloc.o
++	 hyp-main.o hyp-smp.o psci-relay.o early_alloc.o stub.o page_alloc.o \
++	 cache.o cpufeature.o
+ obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
+ 	 ../fpsimd.o ../hyp-entry.o ../exception.o
+ obj-y += $(lib-objs)
+diff --git a/arch/arm64/kvm/hyp/nvhe/cache.S b/arch/arm64/kvm/hyp/nvhe/cache.S
+new file mode 100644
+index 000000000000..36cef6915428
+--- /dev/null
++++ b/arch/arm64/kvm/hyp/nvhe/cache.S
+@@ -0,0 +1,13 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Code copied from arch/arm64/mm/cache.S.
++ */
++
++#include <linux/linkage.h>
++#include <asm/assembler.h>
++#include <asm/alternative.h>
++
++SYM_FUNC_START_PI(__flush_dcache_area)
++	dcache_by_line_op civac, sy, x0, x1, x2, x3
++	ret
++SYM_FUNC_END_PI(__flush_dcache_area)
+diff --git a/arch/arm64/kvm/hyp/nvhe/cpufeature.c b/arch/arm64/kvm/hyp/nvhe/cpufeature.c
+new file mode 100644
+index 000000000000..a887508f996f
+--- /dev/null
++++ b/arch/arm64/kvm/hyp/nvhe/cpufeature.c
+@@ -0,0 +1,8 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright (C) 2020 - Google LLC
++ * Author: Quentin Perret <qperret@google.com>
++ */
++
++#define KVM_HYP_CPU_FTR_REG(id, name) struct arm64_ftr_reg name;
++#include <asm/kvm_cpufeature.h>
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 4f2f1e3145de..84be93df52fa 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -21,6 +21,7 @@
+ #include <asm/debug-monitors.h>
+ #include <asm/esr.h>
+ #include <asm/kvm_arm.h>
++#include <asm/kvm_cpufeature.h>
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_hyp.h>
+ #include <asm/kvm_mmu.h>
+@@ -2775,3 +2776,23 @@ void kvm_sys_reg_table_init(void)
+ 	/* Clear all higher bits. */
+ 	cache_levels &= (1 << (i*3))-1;
+ }
++
++#undef KVM_HYP_CPU_FTR_REG
++#define KVM_HYP_CPU_FTR_REG(id, name) \
++	{ .sys_id = id, .dst = (struct arm64_ftr_reg *)&kvm_nvhe_sym(name) },
++struct __ftr_reg_copy_entry {
++	u32			sys_id;
++	struct arm64_ftr_reg	*dst;
++} hyp_ftr_regs[] __initdata = {
++	#include <asm/kvm_cpufeature.h>
++};
++
++void __init setup_kvm_el2_caps(void)
++{
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(hyp_ftr_regs); i++) {
++		WARN(copy_ftr_reg(hyp_ftr_regs[i].sys_id, hyp_ftr_regs[i].dst),
++		     "%u feature register not found\n", hyp_ftr_regs[i].sys_id);
++	}
 +}
 -- 
 2.30.1.766.gb4fecdf3b7-goog
