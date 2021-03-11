@@ -2,79 +2,63 @@ Return-Path: <SRS0=mhFy=IJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99D16C433E0
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Mar 2021 11:15:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1D19C433DB
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Mar 2021 11:35:40 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D785264FA8
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Mar 2021 11:15:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D785264FA8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 318D564FCD
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Mar 2021 11:35:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 318D564FCD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 442DD4B4FA;
-	Thu, 11 Mar 2021 06:15:19 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 912E44B5C0;
+	Thu, 11 Mar 2021 06:35:39 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id oml7dNsX8Cbu; Thu, 11 Mar 2021 06:15:18 -0500 (EST)
+	with ESMTP id 9qpO60x0J5xp; Thu, 11 Mar 2021 06:35:38 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 164504B53E;
-	Thu, 11 Mar 2021 06:15:18 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5835F4B5DB;
+	Thu, 11 Mar 2021 06:35:38 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 34EE24B51E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Mar 2021 06:15:17 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 30C384B5C0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Mar 2021 06:35:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tPEaotXy2W7M for <kvmarm@lists.cs.columbia.edu>;
- Thu, 11 Mar 2021 06:15:16 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [63.128.21.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D1204B4FA
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Mar 2021 06:15:16 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1615461316;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=HLjJbWr4BucAiEq+UPFMlG+jYewhjm6x9TggCNo+wzk=;
- b=P7luaMEOg9x45dfQzDju/XGYYPDFYCkVnxF0rd9jAilnz4AW2gG4bOuB7MWYv4DoaT8xA6
- BS8XbwoLyhbHZDfN3b2b4/vjVN58Y1Q9ekDGVSc2+Iz9+mpLAF6/CCXG9UTXOD6BWweFrF
- 9sTbpgd3ZSzb/NseOreiYE6h93OTI5U=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-306-u3Nb2-jMM2qT9pMPrj0aJg-1; Thu, 11 Mar 2021 06:15:12 -0500
-X-MC-Unique: u3Nb2-jMM2qT9pMPrj0aJg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 48E8118460E1;
- Thu, 11 Mar 2021 11:15:10 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.193.217])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4BDC950D38;
- Thu, 11 Mar 2021 11:15:03 +0000 (UTC)
-Date: Thu, 11 Mar 2021 12:15:00 +0100
-From: Andrew Jones <drjones@redhat.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v3 2/2] KVM: arm64: Fix exclusive limit for IPA size
-Message-ID: <20210311111500.uqy4lolxtp7t4xd4@kamzik.brq.redhat.com>
-References: <20210311100016.3830038-1-maz@kernel.org>
- <20210311100016.3830038-3-maz@kernel.org>
+ with ESMTP id 2k1WHo+4vT-U for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Mar 2021 06:35:35 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AA5FF4B5B7
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Mar 2021 06:35:35 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 32AC431B;
+ Thu, 11 Mar 2021 03:35:35 -0800 (PST)
+Received: from C02TD0UTHF1T.local (unknown [10.57.54.221])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B82053F793;
+ Thu, 11 Mar 2021 03:35:32 -0800 (PST)
+Date: Thu, 11 Mar 2021 11:35:29 +0000
+From: Mark Rutland <mark.rutland@arm.com>
+To: Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 3/4] KVM: arm64: Rename SCTLR_ELx_FLAGS to SCTLR_EL2_FLAGS
+Message-ID: <20210311113529.GD37303@C02TD0UTHF1T.local>
+References: <20210310152656.3821253-1-maz@kernel.org>
+ <20210310152656.3821253-4-maz@kernel.org>
+ <20210310154625.GA29738@willie-the-truck>
+ <874khjxade.wl-maz@kernel.org>
+ <20210310161546.GC29834@willie-the-truck>
+ <87zgzagaqq.wl-maz@kernel.org>
+ <20210310182022.GA29969@willie-the-truck>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20210311100016.3830038-3-maz@kernel.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Cc: kernel-team@android.com, kvm@vger.kernel.org, stable@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20210310182022.GA29969@willie-the-truck>
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,56 +75,94 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Mar 11, 2021 at 10:00:16AM +0000, Marc Zyngier wrote:
-> When registering a memslot, we check the size and location of that
-> memslot against the IPA size to ensure that we can provide guest
-> access to the whole of the memory.
+On Wed, Mar 10, 2021 at 06:20:22PM +0000, Will Deacon wrote:
+> On Wed, Mar 10, 2021 at 05:49:17PM +0000, Marc Zyngier wrote:
+> > On Wed, 10 Mar 2021 16:15:47 +0000,
+> > Will Deacon <will@kernel.org> wrote:
+> > > On Wed, Mar 10, 2021 at 04:05:17PM +0000, Marc Zyngier wrote:
+> > > > On Wed, 10 Mar 2021 15:46:26 +0000,
+> > > > Will Deacon <will@kernel.org> wrote:
+> > > > > On Wed, Mar 10, 2021 at 03:26:55PM +0000, Marc Zyngier wrote:
+> > > > > > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> > > > > > index 4eb584ae13d9..7423f4d961a4 100644
+> > > > > > --- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> > > > > > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> > > > > > @@ -122,7 +122,7 @@ alternative_else_nop_endif
+> > > > > >  	 * as well as the EE bit on BE. Drop the A flag since the compiler
+> > > > > >  	 * is allowed to generate unaligned accesses.
+> > > > > >  	 */
+> > > > > > -	mov_q	x0, (SCTLR_EL2_RES1 | (SCTLR_ELx_FLAGS & ~SCTLR_ELx_A))
+> > > > > > +	mov_q	x0, (SCTLR_EL2_RES1 | (SCTLR_EL2_FLAGS & ~SCTLR_ELx_A))
+> > > > > 
+> > > > > Can we just drop SCTLR_ELx_A from SCTLR_EL2_FLAGS instead of clearing it
+> > > > > here?
+> > > > 
+> > > > Absolutely. That'd actually be an improvement.
+> > > 
+> > > In fact, maybe just define INIT_SCTLR_EL2_MMU_ON to mirror what we do for
+> > > EL1 (i.e. including the RES1 bits) and then use that here?
+> > 
+> > Like this?
+> > 
+> > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> > index dfd4edbfe360..593b9bf91bbd 100644
+> > --- a/arch/arm64/include/asm/sysreg.h
+> > +++ b/arch/arm64/include/asm/sysreg.h
+> > @@ -579,9 +579,6 @@
+> >  #define SCTLR_ELx_A	(BIT(1))
+> >  #define SCTLR_ELx_M	(BIT(0))
+> >  
+> > -#define SCTLR_ELx_FLAGS	(SCTLR_ELx_M  | SCTLR_ELx_A | SCTLR_ELx_C | \
+> > -			 SCTLR_ELx_SA | SCTLR_ELx_I | SCTLR_ELx_IESB)
+> > -
+> >  /* SCTLR_EL2 specific flags. */
+> >  #define SCTLR_EL2_RES1	((BIT(4))  | (BIT(5))  | (BIT(11)) | (BIT(16)) | \
+> >  			 (BIT(18)) | (BIT(22)) | (BIT(23)) | (BIT(28)) | \
+> > @@ -593,6 +590,10 @@
+> >  #define ENDIAN_SET_EL2		0
+> >  #endif
+> >  
+> > +#define INIT_SCTLR_EL2_MMU_ON						\
+> > +	(SCTLR_ELx_M  | SCTLR_ELx_C | SCTLR_ELx_SA | SCTLR_ELx_I |	\
+> > +	 SCTLR_ELx_IESB | ENDIAN_SET_EL2 | SCTLR_EL2_RES1)
+> > +
+> >  #define INIT_SCTLR_EL2_MMU_OFF \
+> >  	(SCTLR_EL2_RES1 | ENDIAN_SET_EL2)
+> >  
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> > index 4eb584ae13d9..2e16b2098bbd 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> > @@ -117,13 +117,7 @@ alternative_else_nop_endif
+> >  	tlbi	alle2
+> >  	dsb	sy
+> >  
+> > -	/*
+> > -	 * Preserve all the RES1 bits while setting the default flags,
+> > -	 * as well as the EE bit on BE. Drop the A flag since the compiler
+> > -	 * is allowed to generate unaligned accesses.
+> > -	 */
+> > -	mov_q	x0, (SCTLR_EL2_RES1 | (SCTLR_ELx_FLAGS & ~SCTLR_ELx_A))
+> > -CPU_BE(	orr	x0, x0, #SCTLR_ELx_EE)
+> > +	mov_q	x0, INIT_SCTLR_EL2_MMU_ON
+> >  alternative_if ARM64_HAS_ADDRESS_AUTH
+> >  	mov_q	x1, (SCTLR_ELx_ENIA | SCTLR_ELx_ENIB | \
+> >  		     SCTLR_ELx_ENDA | SCTLR_ELx_ENDB)
 > 
-> Unfortunately, this check rejects memslot that end-up at the exact
-> limit of the addressing capability for a given IPA size. For example,
-> it refuses the creation of a 2GB memslot at 0x8000000 with a 32bit
-> IPA space.
+> Beautiful!
 > 
-> Fix it by relaxing the check to accept a memslot reaching the
-> limit of the IPA space.
+> With that, you can have my ack on the whole series:
 > 
-> Fixes: e55cac5bf2a9 ("kvm: arm/arm64: Prepare for VM specific stage2 translations")
+> Acked-by: Will Deacon <will@kernel.org>
 
-Isn't this actually fixing commit c3058d5da222 ("arm/arm64: KVM: Ensure
-memslots are within KVM_PHYS_SIZE") ?
+FWIW, likewise:
 
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Cc: stable@vger.kernel.org
-> ---
->  arch/arm64/kvm/mmu.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 77cb2d28f2a4..8711894db8c2 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1312,8 +1312,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
->  	 * Prevent userspace from creating a memory region outside of the IPA
->  	 * space addressable by the KVM guest IPA space.
->  	 */
-> -	if (memslot->base_gfn + memslot->npages >=
-> -	    (kvm_phys_size(kvm) >> PAGE_SHIFT))
-> +	if ((memslot->base_gfn + memslot->npages) > (kvm_phys_size(kvm) >> PAGE_SHIFT))
->  		return -EFAULT;
->  
->  	mmap_read_lock(current->mm);
-> -- 
-> 2.29.2
-> 
+Acked-by: Mark Rutland <nark.rutland@arm.com>
 
-Otherwise
-
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+This is really nice!
 
 Thanks,
-drew
-
+Mark.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
