@@ -4,62 +4,63 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A1EEC433DB
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Mar 2021 16:14:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 842A1C43381
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Mar 2021 16:21:33 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C9EB564F90
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Mar 2021 16:14:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9EB564F90
+	by mail.kernel.org (Postfix) with ESMTP id CF1E16146B
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Mar 2021 16:21:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF1E16146B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C3E24B5A0;
-	Thu, 11 Mar 2021 11:14:55 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 366D94B548;
+	Thu, 11 Mar 2021 11:21:32 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id BTjbZcci4rGC; Thu, 11 Mar 2021 11:14:54 -0500 (EST)
+	with ESMTP id MTaiJzA3DUp2; Thu, 11 Mar 2021 11:21:28 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A6464B6D0;
-	Thu, 11 Mar 2021 11:14:54 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 398A44B6D8;
+	Thu, 11 Mar 2021 11:21:28 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 961D24B5A0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Mar 2021 11:14:53 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F3664B5EB
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Mar 2021 11:21:27 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7aRxehcK++7z for <kvmarm@lists.cs.columbia.edu>;
- Thu, 11 Mar 2021 11:14:50 -0500 (EST)
+ with ESMTP id hoiwOnujqMjC for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Mar 2021 11:21:22 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1EB2D4B59C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Mar 2021 11:14:50 -0500 (EST)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id AFD5464F88;
- Thu, 11 Mar 2021 16:14:45 +0000 (UTC)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4A5C94B548
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Mar 2021 11:21:22 -0500 (EST)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 753FC6146B;
+ Thu, 11 Mar 2021 16:21:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1615479288;
- bh=qYDGWCW64bxyZudXVN5dkVQ3DwMt7Dn8FEVKXvpunG4=;
+ s=k20201202; t=1615479681;
+ bh=T+Bt7gZGUjrxDrEQ2211vo0Svgs66BNqHKZT8ttELhs=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=i8MnI3+2/a4u7kdasK8yp0GaOhcv8jnkA0X0v12U8iXfzM0yXF00qlOJQJ8BLfxR5
- SnPL1CygmdEkO3n6m167qfRXk7n9zJx/PGswMJN3JnCgolPkglroyEnbPjel4Fq5LP
- 1yHs7VglYuyH6+Eh34R9mwABULkfgq9200BQns63jNQjRiJATlopDnbhkoPGNlq66y
- ruNVpmIy/icGq9PgJjCT8YCHy4irUwrh0eyvmpmb0QZt7fz/XlOMiRbrRVgbCud2js
- 0MrnSAz1IeSLEuIJbhrD54+im2PZkuBoIndFzApzln30phdH25lNkXlpxqIENZCiCV
- D+iGWJPBqZCCQ==
-Date: Thu, 11 Mar 2021 16:14:42 +0000
+ b=msyy8vEG3L5NnRfp90UsA3PFVsDk+faHyWPzudfFi2aM/2Lvau5b/GnFNFcjIXYZ4
+ /FPfplr6+dJ+Ygyxek9GF75aVSIKUAhjFY2DwV7sWVm97x5FwS8KoEB8jv0f+eOe5r
+ D+CB5H+c+4unbcsz4kmfZUKT6e4dOQsekhttSnJwJ+Gu+i2j6CiZKKViTJq3oSyeGj
+ 9AHJddEqOypI8jb3iT3JG8m/gWS/Dj0XdFiyEnFY3k24jWWUF64Kk2DzTpcsNKGuQO
+ DVxwDWaJDzz/tETwYwz9YuW6E9q1MifTBV3A3QBKQr83A1938NCDySQy65h8ppgjBl
+ 2vXAIC0pBrEsg==
+Date: Thu, 11 Mar 2021 16:21:13 +0000
 From: Will Deacon <will@kernel.org>
 To: Quentin Perret <qperret@google.com>
-Subject: Re: [PATCH v4 12/34] KVM: arm64: Introduce a Hyp buddy page allocator
-Message-ID: <20210311161441.GC31206@willie-the-truck>
+Subject: Re: [PATCH v4 16/34] KVM: arm64: Prepare the creation of s1 mappings
+ at EL2
+Message-ID: <20210311162112.GD31206@willie-the-truck>
 References: <20210310175751.3320106-1-qperret@google.com>
- <20210310175751.3320106-13-qperret@google.com>
+ <20210310175751.3320106-17-qperret@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20210310175751.3320106-13-qperret@google.com>
+In-Reply-To: <20210310175751.3320106-17-qperret@google.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Cc: android-kvm@google.com, catalin.marinas@arm.com, mate.toth-pal@arm.com,
  seanjc@google.com, tabba@google.com, linux-kernel@vger.kernel.org,
@@ -81,35 +82,66 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Mar 10, 2021 at 05:57:29PM +0000, Quentin Perret wrote:
-> When memory protection is enabled, the hyp code will require a basic
-> form of memory management in order to allocate and free memory pages at
-> EL2. This is needed for various use-cases, including the creation of hyp
-> mappings or the allocation of stage 2 page tables.
+On Wed, Mar 10, 2021 at 05:57:33PM +0000, Quentin Perret wrote:
+> When memory protection is enabled, the EL2 code needs the ability to
+> create and manage its own page-table. To do so, introduce a new set of
+> hypercalls to bootstrap a memory management system at EL2.
 > 
-> To address these use-case, introduce a simple memory allocator in the
-> hyp code. The allocator is designed as a conventional 'buddy allocator',
-> working with a page granularity. It allows to allocate and free
-> physically contiguous pages from memory 'pools', with a guaranteed order
-> alignment in the PA space. Each page in a memory pool is associated
-> with a struct hyp_page which holds the page's metadata, including its
-> refcount, as well as its current order, hence mimicking the kernel's
-> buddy system in the GFP infrastructure. The hyp_page metadata are made
-> accessible through a hyp_vmemmap, following the concept of
-> SPARSE_VMEMMAP in the kernel.
+> This leads to the following boot flow in nVHE Protected mode:
 > 
+>  1. the host allocates memory for the hypervisor very early on, using
+>     the memblock API;
+> 
+>  2. the host creates a set of stage 1 page-table for EL2, installs the
+>     EL2 vectors, and issues the __pkvm_init hypercall;
+> 
+>  3. during __pkvm_init, the hypervisor re-creates its stage 1 page-table
+>     and stores it in the memory pool provided by the host;
+> 
+>  4. the hypervisor then extends its stage 1 mappings to include a
+>     vmemmap in the EL2 VA space, hence allowing to use the buddy
+>     allocator introduced in a previous patch;
+> 
+>  5. the hypervisor jumps back in the idmap page, switches from the
+>     host-provided page-table to the new one, and wraps up its
+>     initialization by enabling the new allocator, before returning to
+>     the host.
+> 
+>  6. the host can free the now unused page-table created for EL2, and
+>     will now need to issue hypercalls to make changes to the EL2 stage 1
+>     mappings instead of modifying them directly.
+> 
+> Note that for the sake of simplifying the review, this patch focuses on
+> the hypervisor side of things. In other words, this only implements the
+> new hypercalls, but does not make use of them from the host yet. The
+> host-side changes will follow in a subsequent patch.
+> 
+> Credits to Will for __pkvm_init_switch_pgd.
+> 
+> Co-authored-by: Will Deacon <will@kernel.org>
+> Signed-off-by: Will Deacon <will@kernel.org>
 > Signed-off-by: Quentin Perret <qperret@google.com>
 > ---
->  arch/arm64/kvm/hyp/include/nvhe/gfp.h    |  68 ++++++++
->  arch/arm64/kvm/hyp/include/nvhe/memory.h |  28 ++++
->  arch/arm64/kvm/hyp/nvhe/Makefile         |   2 +-
->  arch/arm64/kvm/hyp/nvhe/page_alloc.c     | 195 +++++++++++++++++++++++
->  4 files changed, 292 insertions(+), 1 deletion(-)
->  create mode 100644 arch/arm64/kvm/hyp/include/nvhe/gfp.h
->  create mode 100644 arch/arm64/kvm/hyp/nvhe/page_alloc.c
-
-Eventually, we can replace the refcount with refcount_t, but for now this
-looks pretty good:
+>  arch/arm64/include/asm/kvm_asm.h     |   4 +
+>  arch/arm64/include/asm/kvm_host.h    |   7 +
+>  arch/arm64/include/asm/kvm_hyp.h     |   8 ++
+>  arch/arm64/include/asm/kvm_pgtable.h |   2 +
+>  arch/arm64/kernel/image-vars.h       |  16 +++
+>  arch/arm64/kvm/hyp/Makefile          |   2 +-
+>  arch/arm64/kvm/hyp/include/nvhe/mm.h |  71 ++++++++++
+>  arch/arm64/kvm/hyp/nvhe/Makefile     |   4 +-
+>  arch/arm64/kvm/hyp/nvhe/hyp-init.S   |  27 ++++
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c   |  49 +++++++
+>  arch/arm64/kvm/hyp/nvhe/mm.c         | 173 +++++++++++++++++++++++
+>  arch/arm64/kvm/hyp/nvhe/setup.c      | 197 +++++++++++++++++++++++++++
+>  arch/arm64/kvm/hyp/pgtable.c         |   2 -
+>  arch/arm64/kvm/hyp/reserved_mem.c    |  92 +++++++++++++
+>  arch/arm64/mm/init.c                 |   3 +
+>  15 files changed, 652 insertions(+), 5 deletions(-)
+>  create mode 100644 arch/arm64/kvm/hyp/include/nvhe/mm.h
+>  create mode 100644 arch/arm64/kvm/hyp/nvhe/mm.c
+>  create mode 100644 arch/arm64/kvm/hyp/nvhe/setup.c
+>  create mode 100644 arch/arm64/kvm/hyp/reserved_mem.c
 
 Acked-by: Will Deacon <will@kernel.org>
 
