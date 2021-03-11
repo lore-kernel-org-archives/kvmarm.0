@@ -1,104 +1,67 @@
-Return-Path: <SRS0=f6Gw=II=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=mhFy=IJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F230C433DB
-	for <kvmarm@archiver.kernel.org>; Wed, 10 Mar 2021 21:44:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C168C433DB
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Mar 2021 07:03:54 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 74F4D64FCD
-	for <kvmarm@archiver.kernel.org>; Wed, 10 Mar 2021 21:44:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74F4D64FCD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id A452764FC1
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Mar 2021 07:03:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A452764FC1
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E7D664B1B4;
-	Wed, 10 Mar 2021 16:44:08 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 13BDF4B306;
+	Thu, 11 Mar 2021 02:03:53 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Z+aS6rMnYO0M; Wed, 10 Mar 2021 16:44:07 -0500 (EST)
+	with ESMTP id 9Fbx4qxCwT8L; Thu, 11 Mar 2021 02:03:51 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CDB5C4B1C0;
-	Wed, 10 Mar 2021 16:44:07 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B892C4B238;
+	Thu, 11 Mar 2021 02:03:51 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3FC824B1B3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Mar 2021 16:44:07 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B6CF14B1C9
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Mar 2021 02:03:50 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id y5RNNmQRNMwC for <kvmarm@lists.cs.columbia.edu>;
- Wed, 10 Mar 2021 16:44:06 -0500 (EST)
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com
- [209.85.167.53])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3527D4B1A8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Mar 2021 16:44:06 -0500 (EST)
-Received: by mail-lf1-f53.google.com with SMTP id v2so23077161lft.9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Mar 2021 13:44:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=+At1OFsJvT0JOYczrtSDaeg1RlqRvgFnN9ibJip5xME=;
- b=qkR47YAxd7W+12meJHOokTY86zM5TK5Wusnmh13Uxu6NKYuWOWiLQGc+P2AFImuiLA
- ORloLJ5jSdrdT/bdHqp0DqklfhSIS7mEsK7M0vc6oJuwRJflhTJDhz132bRJTuHxQ+kO
- RInZN11KZCoVG6SxxC7xs6XJmagTxp4jzMdyWhd7EKrDtUQBY/A2tTYflsQ1uYhuPyd3
- zAAkVHP8jzsjKtNt8i07AloD2E4Y+rbcN6P6aA+VHiEEec2aQ0pLVAnU5FG2ZdTYiTPl
- Vuh0I/S8kIlI0b/tAdley4Z5qQ9yZunB4iev6lY8EGMaF3EkJrMb2vFP3F+H3DRihlGh
- rj2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=+At1OFsJvT0JOYczrtSDaeg1RlqRvgFnN9ibJip5xME=;
- b=Nh8flxytaBK1XTbRihSVnPQl2VrdbrxwHz5ou5qrJc1tYwY74eREJdr3PereyXgOjx
- 4IDcfCFEYJnxb2ehRCGMOOvjvSV6On3eBIuCXqAQ5gZIYPfugDXiw4YoY/U/AggJuz2S
- j9eatJg9v4lSOpp+6Hb7fjfMhogg2QINkHnDwr4fRMChGSVi9dA0oIptZr2L94apTw1M
- YK3izbf0I6MhMqTmISOfPU5y75PW33IW3KQaN7i3c8cN+nwmM1Ip2bg7U6eazTCMzzyp
- tBGryc+QWEJTWAObDKk+h1IWUNaKl7W+zwQSa16fJgP3q2iCkfr5vuIHB5iADrcIwcs0
- nEaA==
-X-Gm-Message-State: AOAM533mty73To+Cyqpptmke2yrBGAFyrFfdUijt03FpgantaW7+wp1U
- FcpJLIXqFKRl5vmtqVdTqI2cOrrauEtBr+jBkEG9sw==
-X-Google-Smtp-Source: ABdhPJzfPcaCkdhotikZXLd9A3857WsFY8DpxVP062dOT18HhG4a9S9hO0jkkklXHezJ/dUgXnUVkP98iZMz90iTzX0=
-X-Received: by 2002:a19:4345:: with SMTP id m5mr302440lfj.178.1615412644377;
- Wed, 10 Mar 2021 13:44:04 -0800 (PST)
+ with ESMTP id zYKah32cPBJ0 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Mar 2021 02:03:48 -0500 (EST)
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A0FA34B1B4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Mar 2021 02:03:47 -0500 (EST)
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.58])
+ by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Dx0Gt3QxszmVqH;
+ Thu, 11 Mar 2021 15:01:26 +0800 (CST)
+Received: from [10.174.184.135] (10.174.184.135) by
+ DGGEMS410-HUB.china.huawei.com (10.3.19.210) with Microsoft SMTP Server id
+ 14.3.498.0; Thu, 11 Mar 2021 15:03:32 +0800
+Subject: Re: [PATCH v3 0/4] KVM: arm64: Add VLPI migration support on GICv4.1
+From: Shenming Lu <lushenming@huawei.com>
+To: Marc Zyngier <maz@kernel.org>, Eric Auger <eric.auger@redhat.com>, "Will
+ Deacon" <will@kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+ <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+References: <20210127121337.1092-1-lushenming@huawei.com>
+ <4c2fdcc3-4189-6515-3a68-7bdf26e31973@huawei.com>
+Message-ID: <ba9511e7-a23f-f644-e310-f0bf1bce835a@huawei.com>
+Date: Thu, 11 Mar 2021 15:03:21 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.2.2
 MIME-Version: 1.0
-References: <20210310003024.2026253-1-jingzhangos@google.com>
- <20210310003024.2026253-4-jingzhangos@google.com>
- <875z1zxb11.wl-maz@kernel.org>
- <a475d935-e404-93dd-4c6d-a5f8038d8f4d@redhat.com>
- <8735x3x7lu.wl-maz@kernel.org>
- <2749fe68-acbb-8f4d-dc76-4cb23edb9b35@redhat.com>
- <871rcmhq43.wl-maz@kernel.org>
- <fd37d21f-f3ae-d370-f8e1-cf552be3b2ee@redhat.com>
-In-Reply-To: <fd37d21f-f3ae-d370-f8e1-cf552be3b2ee@redhat.com>
-From: Jing Zhang <jingzhangos@google.com>
-Date: Wed, 10 Mar 2021 15:43:53 -0600
-Message-ID: <CAAdAUtjQHh3CEedcjZ5qQ72JZiacjogPoaKBO03vNbiQo=u5+g@mail.gmail.com>
-Subject: Re: [RFC PATCH 3/4] KVM: stats: Add ioctl commands to pull statistics
- in binary format
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
- Paul Mackerras <paulus@ozlabs.org>,
- Linux kselftest <linux-kselftest@vger.kernel.org>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Will Deacon <will@kernel.org>,
- KVM ARM <kvmarm@lists.cs.columbia.edu>,
- Emanuele Giuseppe Esposito <eesposit@redhat.com>,
- Linux S390 <linux-s390@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
- Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>,
- Huacai Chen <chenhuacai@kernel.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- David Rientjes <rientjes@google.com>, KVM PPC <kvm-ppc@vger.kernel.org>,
- Jim Mattson <jmattson@google.com>,
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- Sean Christopherson <seanjc@google.com>, Cornelia Huck <cohuck@redhat.com>,
- Peter Shier <pshier@google.com>, Linux MIPS <linux-mips@vger.kernel.org>,
- Vitaly Kuznetsov <vkuznets@redhat.com>
+In-Reply-To: <4c2fdcc3-4189-6515-3a68-7bdf26e31973@huawei.com>
+Content-Language: en-US
+X-Originating-IP: [10.174.184.135]
+X-CFilter-Loop: Reflected
+Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -115,36 +78,99 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Mar 10, 2021 at 11:44 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 10/03/21 18:31, Marc Zyngier wrote:
-> >> Maintaining VM-global counters would require an atomic instruction and
-> >> would suffer lots of cacheline bouncing even on architectures that
-> >> have relaxed atomic memory operations.
-> > Which is why we have per-cpu counters already. Making use of them
-> > doesn't seem that outlandish.
->
-> But you wouldn't be able to guarantee consistency anyway, would you?
-> You *could* copy N*M counters to userspace, but there's no guarantee
-> that they are consistent, neither within a single vCPU nor within a
-> single counter.
->
-> >> Speed/efficiency of retrieving statistics is important, but let's keep
-> >> in mind that the baseline for comparison is hundreds of syscalls and
-> >> filesystem lookups.
-> >
-> > Having that baseline in the cover letter would be a good start, as
-> > well as an indication of the frequency this is used at.
->
-> Can't disagree, especially on the latter which I have no idea about.
->
-> Paolo
->
-Marc, Paolo, thanks for the comments. I will add some more information
-in the cover letter.
+Hi,
+
+Sorry to bother again, I am really hoping a response for this series. :-)
 
 Thanks,
-Jing
+Shenming
+
+On 2021/2/26 16:58, Shenming Lu wrote:
+> Hi Marc,
+> 
+> Gentle ping. Does this series need any further modification? Wish you can pick it up. :-)
+> 
+> Thanks,
+> Shenming
+> 
+> On 2021/1/27 20:13, Shenming Lu wrote:
+>> Hi Marc, sorry for the late commit.
+>>
+>> In GICv4.1, migration has been supported except for (directly-injected)
+>> VLPI. And GICv4.1 Spec explicitly gives a way to get the VLPI's pending
+>> state (which was crucially missing in GICv4.0). So we make VLPI migration
+>> capable on GICv4.1 in this patch set.
+>>
+>> In order to support VLPI migration, we need to save and restore all
+>> required configuration information and pending states of VLPIs. But
+>> in fact, the configuration information of VLPIs has already been saved
+>> (or will be reallocated on the dst host...) in vgic(kvm) migration.
+>> So we only have to migrate the pending states of VLPIs specially.
+>>
+>> Below is the related workflow in migration.
+>>
+>> On the save path:
+>> 	In migration completion:
+>> 		pause all vCPUs
+>> 				|
+>> 		call each VM state change handler:
+>> 			pause other devices (just keep from sending interrupts, and
+>> 			such as VFIO migration protocol has already realized it [1])
+>> 					|
+>> 			flush ITS tables into guest RAM
+>> 					|
+>> 			flush RDIST pending tables (also flush VLPI state here)
+>> 				|
+>> 		...
+>> On the resume path:
+>> 	load each device's state:
+>> 		restore ITS tables (include pending tables) from guest RAM
+>> 				|
+>> 		for other (PCI) devices (paused), if configured to have VLPIs,
+>> 		establish the forwarding paths of their VLPIs (and transfer
+>> 		the pending states from kvm's vgic to VPT here)
+>>
+>> We have tested this series in VFIO migration, and found some related
+>> issues in QEMU [2].
+>>
+>> Links:
+>> [1] vfio: UAPI for migration interface for device state:
+>>     https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a8a24f3f6e38103b77cf399c38eb54e1219d00d6
+>> [2] vfio: Some fixes and optimizations for VFIO migration:
+>>     https://patchwork.ozlabs.org/cover/1413263/
+>>
+>> History:
+>>
+>> v2 -> v3
+>>  - Add the vgic initialized check to ensure that the allocation and enabling
+>>    of the doorbells have already been done before unmapping the vPEs.
+>>  - Check all get_vlpi_state related conditions in save_pending_tables in one place.
+>>  - Nit fixes.
+>>
+>> v1 -> v2:
+>>  - Get the VLPI state from the KVM side.
+>>  - Nit fixes.
+>>
+>> Thanks,
+>> Shenming
+>>
+>>
+>> Shenming Lu (3):
+>>   KVM: arm64: GICv4.1: Add function to get VLPI state
+>>   KVM: arm64: GICv4.1: Try to save hw pending state in
+>>     save_pending_tables
+>>   KVM: arm64: GICv4.1: Give a chance to save VLPI's pending state
+>>
+>> Zenghui Yu (1):
+>>   KVM: arm64: GICv4.1: Restore VLPI's pending state to physical side
+>>
+>>  .../virt/kvm/devices/arm-vgic-its.rst         |  2 +-
+>>  arch/arm64/kvm/vgic/vgic-its.c                |  6 +-
+>>  arch/arm64/kvm/vgic/vgic-v3.c                 | 61 +++++++++++++++++--
+>>  arch/arm64/kvm/vgic/vgic-v4.c                 | 33 ++++++++++
+>>  arch/arm64/kvm/vgic/vgic.h                    |  1 +
+>>  5 files changed, 93 insertions(+), 10 deletions(-)
+>>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
