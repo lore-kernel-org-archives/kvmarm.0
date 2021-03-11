@@ -2,90 +2,80 @@ Return-Path: <SRS0=mhFy=IJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1C70C433E0
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Mar 2021 10:40:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7734C433DB
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Mar 2021 11:08:23 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 052C564FC3
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Mar 2021 10:40:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 052C564FC3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 11E6164FE7
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Mar 2021 11:08:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11E6164FE7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 787574B69C;
-	Thu, 11 Mar 2021 05:40:29 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D54C4B188;
+	Thu, 11 Mar 2021 06:08:20 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id dVu3hYOgKe2d; Thu, 11 Mar 2021 05:40:28 -0500 (EST)
+	with ESMTP id FzhP4QDaqWnd; Thu, 11 Mar 2021 06:08:19 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 70A784B6BD;
-	Thu, 11 Mar 2021 05:40:28 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 18B624A1AF;
+	Thu, 11 Mar 2021 06:08:19 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 87E0A4B691
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Mar 2021 05:40:27 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0ADF34B55E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Mar 2021 06:08:18 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id O4i7HoJDzRjO for <kvmarm@lists.cs.columbia.edu>;
- Thu, 11 Mar 2021 05:40:26 -0500 (EST)
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com
- [209.85.221.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5725D4B643
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Mar 2021 05:40:26 -0500 (EST)
-Received: by mail-wr1-f46.google.com with SMTP id j2so1255098wrx.9
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Mar 2021 02:40:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=x7dj7m0IqQSmVZy2aSDZleyuSlNYKW9a/ZCzpcFSLV0=;
- b=QzEiz4ezQniLybdnDy+B3onf6US6y74U1SgN5rHlI+ZmV58h4BldaYUhlmr8dq8coZ
- wsunQbmi5SFHla/8So7acDUTQX/m4FsR7kMYAQjeF1mDzcdsizwl6d12fD1CXRKrPJ0N
- eOetUItUfAD6t20hJDE0sKnabVZ3ABUWORz2YRqX+7NpPnJ56KCvxnsaphj/3k2coxO0
- WnmYp8pikyfkAFH1iMcfcOUY9LwSy0JRGcmVtjEXSgSuJvI5GsnQVU10VOm/Lf0iS4aR
- 84KS40Um1XlhHbwERidW1Tt8Lg4VfeeeXwf2LJwiAGO5BDO2y9kuU1TtuEAcKlhbw/y7
- xldA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=x7dj7m0IqQSmVZy2aSDZleyuSlNYKW9a/ZCzpcFSLV0=;
- b=h6bFggQI0LdYMxExHfXNXFyMypAOjXimvaU6j5Wdg7nTdT2OjK0d5HGEWSDw5KN2bG
- Avn5rqVBqTPS4NaSmKERtE58+VKT1w5Iw/68ysLzBxJ+5ZydhDddgXpJEoaDOgiO8ThW
- UBVQdp0FTSaK7cgqTjdjug8ECWTbhd9pjLIUmqGhV0KiuiN/bUZ7o2JMIPkyAYrWRM5n
- Z986sUCM25OUGosmSxqIlZxWSRYhKzSlaFGmiDy5kuorgqkJ5hSsXOSzoyW1jMO1qDww
- HI+PwafT82FAzoaU4a5QnuTJ7kBLMSAYCss09sL8vrHR0GHe+/nT3Ox8XDdLEHcIaFXr
- dO5Q==
-X-Gm-Message-State: AOAM5300CBkp+DPYl3YzpPWumTP8V65KB8xsj9i/3Y6qqoKdxvL8/NUx
- SY7pSGstLzBU4BMYMPN6pghJJA==
-X-Google-Smtp-Source: ABdhPJyiiKwT/A6ppgUs4f+GjLSsDKYEx9RQPlr5m0FVk84pobzrFg7Nh362DHAntJQuxuvZset3JA==
-X-Received: by 2002:adf:fbce:: with SMTP id d14mr7751922wrs.44.1615459225332; 
- Thu, 11 Mar 2021 02:40:25 -0800 (PST)
-Received: from google.com (230.69.233.35.bc.googleusercontent.com.
- [35.233.69.230])
- by smtp.gmail.com with ESMTPSA id f16sm3177531wrt.21.2021.03.11.02.40.25
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 11 Mar 2021 02:40:25 -0800 (PST)
-Date: Thu, 11 Mar 2021 10:40:22 +0000
-From: Quentin Perret <qperret@google.com>
-To: Andrew Scull <ascull@google.com>
-Subject: Re: [PATCH 05/10] KVM: arm64: Track where vcpu FP state was last
- loaded
-Message-ID: <YEnzlqnT8QdfpDpR@google.com>
-References: <20210304115454.3597879-1-ascull@google.com>
- <20210304115454.3597879-6-ascull@google.com>
- <YEny6LbBPmKpK95k@google.com>
+ with ESMTP id 008KSxE6YGWk for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Mar 2021 06:08:16 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E90ED4B556
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Mar 2021 06:08:16 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1615460896;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=DwM1zrj6y+SPq/Wn5uH5zHFoKtylvkdUobCwon2GWsw=;
+ b=NfoXz1EkRD6j3ZAHEOkePDqs3pX3bjhAqyM8X1X6C70QjgnKsCPqj1kaeqbsXEpfnkY0D4
+ spesZ5gheGhUw/r6MwqKij7GQZewrTVv3KqyBT0x4QBa8sSkMfQRXdxl5Y/rtjP6UKr3ss
+ c+N7c0dJJgXHO8ih3I6JUoWbTSxlMlQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-561-PwlpRNx-MOeUMqH7hXhblg-1; Thu, 11 Mar 2021 06:08:12 -0500
+X-MC-Unique: PwlpRNx-MOeUMqH7hXhblg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B4DE318460E0;
+ Thu, 11 Mar 2021 11:08:10 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.193.217])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1413F60BF3;
+ Thu, 11 Mar 2021 11:08:03 +0000 (UTC)
+Date: Thu, 11 Mar 2021 12:08:01 +0100
+From: Andrew Jones <drjones@redhat.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v3 1/2] KVM: arm64: Reject VM creation when the default
+ IPA size is unsupported
+Message-ID: <20210311110801.mcjhenee3e3dizoo@kamzik.brq.redhat.com>
+References: <20210311100016.3830038-1-maz@kernel.org>
+ <20210311100016.3830038-2-maz@kernel.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <YEny6LbBPmKpK95k@google.com>
-Cc: kernel-team@android.com, maz@kernel.org, Dave.Martin@arm.com,
- catalin.marinas@arm.com, will@kernel.org, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20210311100016.3830038-2-maz@kernel.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Cc: kernel-team@android.com, kvm@vger.kernel.org, stable@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -102,48 +92,101 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thursday 11 Mar 2021 at 10:37:28 (+0000), Quentin Perret wrote:
-> On Thursday 04 Mar 2021 at 11:54:48 (+0000), 'Andrew Scull' via kernel-team wrote:
-> > Keep track of the cpu that a vcpu's FP state was last loaded onto. This
-> > information is needed in order to tell whether a vcpu's latest FP state
-> > is already loaded on a cpu to avoid unnecessary reloading.
-> > 
-> > The method follows the pattern used by thread_struct whereby an
-> > fpsimd_cpu field is added and updated when the state is loaded.
-> > 
-> > Signed-off-by: Andrew Scull <ascull@google.com>
-> > Cc: Dave Martin <Dave.Martin@arm.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_host.h       | 1 +
-> >  arch/arm64/kvm/arm.c                    | 2 ++
-> >  arch/arm64/kvm/hyp/include/hyp/switch.h | 2 ++
-> >  3 files changed, 5 insertions(+)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index 8a559fa2f237..a01194371ae5 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -306,6 +306,7 @@ struct kvm_vcpu_arch {
-> >  	struct kvm_guest_debug_arch vcpu_debug_state;
-> >  	struct kvm_guest_debug_arch external_debug_state;
-> >  
-> > +	int fpsimd_cpu;
-> >  	struct user_fpsimd_state *host_fpsimd_state;	/* hyp VA */
-> >  
-> >  	struct {
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index e3edea8379f3..87141c8d63e6 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -313,6 +313,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
-> >  
-> >  	vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
-> >  
-> > +	vcpu->arch.fpsimd_cpu = NR_CPUS;
+On Thu, Mar 11, 2021 at 10:00:15AM +0000, Marc Zyngier wrote:
+> KVM/arm64 has forever used a 40bit default IPA space, partially
+> due to its 32bit heritage (where the only choice is 40bit).
 > 
-> Is this supposed to be an invalid CPU number? If so, then NR_CPUS + 1 ?
+> However, there are implementations in the wild that have a *cough*
+> much smaller *cough* IPA space, which leads to a misprogramming of
+> VTCR_EL2, and a guest that is stuck on its first memory access
+> if userspace dares to ask for the default IPA setting (which most
+> VMMs do).
+> 
+> Instead, blundly reject the creation of such VM, as we can't
+> satisfy the requirements from userspace (with a one-off warning).
+> Also clarify the boot warning, and document that the VM creation
+> will fail when an unsupported IPA size is probided.
 
-Obviously not, forget me.
+provided
+
+> 
+> Although this is an ABI change, it doesn't really change much
+> for userspace:
+> 
+> - the guest couldn't run before this change, but no error was
+>   returned. At least userspace knows what is happening.
+> 
+> - a memory slot that was accepted because it did fit the default
+>   IPA space now doesn't even get a chance to be registered.
+> 
+> The other thing that is left doing is to convince userspace to
+> actually use the IPA space setting instead of relying on the
+> antiquated default.
+> 
+> Fixes: 233a7cb23531 ("kvm: arm64: Allow tuning the physical address size for VM")
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Cc: stable@vger.kernel.org
+> ---
+>  Documentation/virt/kvm/api.rst |  3 +++
+>  arch/arm64/kvm/reset.c         | 12 ++++++++----
+>  2 files changed, 11 insertions(+), 4 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 1a2b5210cdbf..38e327d4b479 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -182,6 +182,9 @@ is dependent on the CPU capability and the kernel configuration. The limit can
+>  be retrieved using KVM_CAP_ARM_VM_IPA_SIZE of the KVM_CHECK_EXTENSION
+>  ioctl() at run-time.
+>  
+> +Creation of the VM will fail if the requested IPA size (whether it is
+> +implicit or explicit) is unsupported on the host.
+> +
+>  Please note that configuring the IPA size does not affect the capability
+>  exposed by the guest CPUs in ID_AA64MMFR0_EL1[PARange]. It only affects
+>  size of the address translated by the stage2 level (guest physical to
+> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> index 47f3f035f3ea..9d3d09a89894 100644
+> --- a/arch/arm64/kvm/reset.c
+> +++ b/arch/arm64/kvm/reset.c
+> @@ -324,10 +324,9 @@ int kvm_set_ipa_limit(void)
+>  	}
+>  
+>  	kvm_ipa_limit = id_aa64mmfr0_parange_to_phys_shift(parange);
+> -	WARN(kvm_ipa_limit < KVM_PHYS_SHIFT,
+> -	     "KVM IPA Size Limit (%d bits) is smaller than default size\n",
+> -	     kvm_ipa_limit);
+> -	kvm_info("IPA Size Limit: %d bits\n", kvm_ipa_limit);
+> +	kvm_info("IPA Size Limit: %d bits%s\n", kvm_ipa_limit,
+> +		 ((kvm_ipa_limit < KVM_PHYS_SHIFT) ?
+> +		  " (Reduced IPA size, limited VM/VMM compatibility)" : ""));
+
+nit: there's a couple pair of unnecessary ()
+
+>  
+>  	return 0;
+>  }
+> @@ -356,6 +355,11 @@ int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type)
+>  			return -EINVAL;
+>  	} else {
+>  		phys_shift = KVM_PHYS_SHIFT;
+> +		if (phys_shift > kvm_ipa_limit) {
+> +			pr_warn_once("%s using unsupported default IPA limit, upgrade your VMM\n",
+> +				     current->comm);
+> +			return -EINVAL;
+> +		}
+>  	}
+>  
+>  	mmfr0 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
+> -- 
+> 2.29.2
+> 
+
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+
+Thanks,
+drew
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
