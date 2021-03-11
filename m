@@ -3,81 +3,76 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D47EC433DB
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Mar 2021 08:43:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ED2AC433E0
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Mar 2021 08:57:57 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8FADE64FA8
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Mar 2021 08:43:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FADE64FA8
+	by mail.kernel.org (Postfix) with ESMTP id C023964FB1
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Mar 2021 08:57:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C023964FB1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D03194B69C;
-	Thu, 11 Mar 2021 03:43:16 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 405D94B6B4;
+	Thu, 11 Mar 2021 03:57:56 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id GZQmrpI1tE+G; Thu, 11 Mar 2021 03:43:15 -0500 (EST)
+	with ESMTP id QL-XabsMAGKA; Thu, 11 Mar 2021 03:57:54 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7BBE74B6A5;
-	Thu, 11 Mar 2021 03:43:15 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 712A54B6A7;
+	Thu, 11 Mar 2021 03:57:54 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DD9DD4B69D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Mar 2021 03:43:13 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 903094B69D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Mar 2021 03:57:53 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pEyzua1avDit for <kvmarm@lists.cs.columbia.edu>;
- Thu, 11 Mar 2021 03:43:12 -0500 (EST)
+ with ESMTP id LSYP0kHw6dMR for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Mar 2021 03:57:52 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 97B1C4B69C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Mar 2021 03:43:12 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 84BF84B6A5
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Mar 2021 03:57:52 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 90C0264FA7;
- Thu, 11 Mar 2021 08:43:09 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 2E84064FAF;
+ Thu, 11 Mar 2021 08:57:51 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1lKGuR-000wqz-A3; Thu, 11 Mar 2021 08:43:07 +0000
-Date: Thu, 11 Mar 2021 08:43:05 +0000
-Message-ID: <87y2euf5d2.wl-maz@kernel.org>
+ id 1lKH8e-000wyZ-Rr; Thu, 11 Mar 2021 08:57:48 +0000
+Date: Thu, 11 Mar 2021 08:57:48 +0000
+Message-ID: <87wnuef4oj.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Keqian Zhu <zhukeqian1@huawei.com>
-Subject: Re: [RFC PATCH] kvm: arm64: Try stage2 block mapping for host device
- MMIO
-In-Reply-To: <20210122083650.21812-1-zhukeqian1@huawei.com>
-References: <20210122083650.21812-1-zhukeqian1@huawei.com>
+To: Shenming Lu <lushenming@huawei.com>
+Subject: Re: [PATCH v3 1/4] KVM: arm64: GICv4.1: Add function to get VLPI state
+In-Reply-To: <20210127121337.1092-2-lushenming@huawei.com>
+References: <20210127121337.1092-1-lushenming@huawei.com>
+ <20210127121337.1092-2-lushenming@huawei.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: zhukeqian1@huawei.com, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, will@kernel.org, catalin.marinas@arm.com,
- mark.rutland@arm.com, james.morse@arm.com, robin.murphy@arm.com,
- joro@8bytes.org, daniel.lezcano@linaro.org, tglx@linutronix.de,
- suzuki.poulose@arm.com, julien.thierry.kdev@gmail.com,
- akpm@linux-foundation.org, alexios.zavras@intel.com,
- wanghaibin.wang@huawei.com, jiangkunkun@huawei.com
+X-SA-Exim-Rcpt-To: lushenming@huawei.com, eric.auger@redhat.com,
+ will@kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, alex.williamson@redhat.com, cohuck@redhat.com,
+ lorenzo.pieralisi@arm.com, wanghaibin.wang@huawei.com, yuzenghui@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org,
- Catalin Marinas <catalin.marinas@arm.com>, Joerg Roedel <joro@8bytes.org>,
- Daniel Lezcano <daniel.lezcano@linaro.org>, linux-kernel@vger.kernel.org,
- Alexios Zavras <alexios.zavras@intel.com>,
- Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- Robin Murphy <robin.murphy@arm.com>
+Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, kvm@vger.kernel.org,
+ Cornelia Huck <cohuck@redhat.com>, linux-kernel@vger.kernel.org,
+ Alex Williamson <alex.williamson@redhat.com>, Will
+ Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -94,123 +89,50 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Digging this patch back from my Inbox...
-
-On Fri, 22 Jan 2021 08:36:50 +0000,
-Keqian Zhu <zhukeqian1@huawei.com> wrote:
+On Wed, 27 Jan 2021 12:13:34 +0000,
+Shenming Lu <lushenming@huawei.com> wrote:
 > 
-> The MMIO region of a device maybe huge (GB level), try to use block
-> mapping in stage2 to speedup both map and unmap.
+> With GICv4.1 and the vPE unmapped, which indicates the invalidation
+> of any VPT caches associated with the vPE, we can get the VLPI state
+> by peeking at the VPT. So we add a function for this.
 > 
-> Especially for unmap, it performs TLBI right after each invalidation
-> of PTE. If all mapping is of PAGE_SIZE, it takes much time to handle
-> GB level range.
-> 
-> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+> Signed-off-by: Shenming Lu <lushenming@huawei.com>
 > ---
->  arch/arm64/include/asm/kvm_pgtable.h | 11 +++++++++++
->  arch/arm64/kvm/hyp/pgtable.c         | 15 +++++++++++++++
->  arch/arm64/kvm/mmu.c                 | 12 ++++++++----
->  3 files changed, 34 insertions(+), 4 deletions(-)
+>  arch/arm64/kvm/vgic/vgic-v4.c | 19 +++++++++++++++++++
+>  arch/arm64/kvm/vgic/vgic.h    |  1 +
+>  2 files changed, 20 insertions(+)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index 52ab38db04c7..2266ac45f10c 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -82,6 +82,17 @@ struct kvm_pgtable_walker {
->  	const enum kvm_pgtable_walk_flags	flags;
->  };
->  
-> +/**
-> + * kvm_supported_pgsize() - Get the max supported page size of a mapping.
-> + * @pgt:	Initialised page-table structure.
-> + * @addr:	Virtual address at which to place the mapping.
-> + * @end:	End virtual address of the mapping.
-> + * @phys:	Physical address of the memory to map.
-> + *
-> + * The smallest return value is PAGE_SIZE.
-> + */
-> +u64 kvm_supported_pgsize(struct kvm_pgtable *pgt, u64 addr, u64 end, u64 phys);
-> +
->  /**
->   * kvm_pgtable_hyp_init() - Initialise a hypervisor stage-1 page-table.
->   * @pgt:	Uninitialised page-table structure to initialise.
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index bdf8e55ed308..ab11609b9b13 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -81,6 +81,21 @@ static bool kvm_block_mapping_supported(u64 addr, u64 end, u64 phys, u32 level)
->  	return IS_ALIGNED(addr, granule) && IS_ALIGNED(phys, granule);
+> diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
+> index 66508b03094f..ac029ba3d337 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v4.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v4.c
+> @@ -203,6 +203,25 @@ void vgic_v4_configure_vsgis(struct kvm *kvm)
+>  	kvm_arm_resume_guest(kvm);
 >  }
 >  
-> +u64 kvm_supported_pgsize(struct kvm_pgtable *pgt, u64 addr, u64 end, u64 phys)
+> +/*
+> + * Must be called with GICv4.1 and the vPE unmapped, which
+> + * indicates the invalidation of any VPT caches associated
+> + * with the vPE, thus we can get the VLPI state by peeking
+> + * at the VPT.
+> + */
+> +void vgic_v4_get_vlpi_state(struct vgic_irq *irq, bool *val)
 > +{
-> +	u32 lvl;
-> +	u64 pgsize = PAGE_SIZE;
+> +	struct its_vpe *vpe = &irq->target_vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
+> +	int mask = BIT(irq->intid % BITS_PER_BYTE);
+> +	void *va;
+> +	u8 *ptr;
 > +
-> +	for (lvl = pgt->start_level; lvl < KVM_PGTABLE_MAX_LEVELS; lvl++) {
-> +		if (kvm_block_mapping_supported(addr, end, phys, lvl)) {
-> +			pgsize = kvm_granule_size(lvl);
-> +			break;
-> +		}
-> +	}
+> +	va = page_address(vpe->vpt_page);
+> +	ptr = va + irq->intid / BITS_PER_BYTE;
 > +
-> +	return pgsize;
-> +}
-> +
->  static u32 kvm_pgtable_idx(struct kvm_pgtable_walk_data *data, u32 level)
->  {
->  	u64 shift = kvm_granule_shift(level);
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 7d2257cc5438..80b403fc8e64 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -499,7 +499,8 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
->  int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
->  			  phys_addr_t pa, unsigned long size, bool writable)
->  {
-> -	phys_addr_t addr;
-> +	phys_addr_t addr, end;
-> +	unsigned long pgsize;
->  	int ret = 0;
->  	struct kvm_mmu_memory_cache cache = { 0, __GFP_ZERO, NULL, };
->  	struct kvm_pgtable *pgt = kvm->arch.mmu.pgt;
-> @@ -509,21 +510,24 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
->  
->  	size += offset_in_page(guest_ipa);
->  	guest_ipa &= PAGE_MASK;
-> +	end = guest_ipa + size;
->  
-> -	for (addr = guest_ipa; addr < guest_ipa + size; addr += PAGE_SIZE) {
-> +	for (addr = guest_ipa; addr < end; addr += pgsize) {
->  		ret = kvm_mmu_topup_memory_cache(&cache,
->  						 kvm_mmu_cache_min_pages(kvm));
->  		if (ret)
->  			break;
->  
-> +		pgsize = kvm_supported_pgsize(pgt, addr, end, pa);
-> +
->  		spin_lock(&kvm->mmu_lock);
-> -		ret = kvm_pgtable_stage2_map(pgt, addr, PAGE_SIZE, pa, prot,
-> +		ret = kvm_pgtable_stage2_map(pgt, addr, pgsize, pa, prot,
->  					     &cache);
->  		spin_unlock(&kvm->mmu_lock);
->  		if (ret)
->  			break;
->  
-> -		pa += PAGE_SIZE;
-> +		pa += pgsize;
->  	}
->  
->  	kvm_mmu_free_memory_cache(&cache);
+> +	*val = !!(*ptr & mask);
 
-There is one issue with this patch, which is that it only does half
-the job. A VM_PFNMAP VMA can definitely be faulted in dynamically, and
-in that case we force this to be a page mapping. This conflicts with
-what you are doing here.
+What guarantees that you can actually read anything valid? Yes, the
+VPT caches are clean. But that doesn't make them coherent with CPU
+caches.
 
-There is also the fact that if we can map things on demand, why are we
-still mapping these MMIO regions ahead of time?
+You need some level of cache maintenance here.
 
 Thanks,
 
