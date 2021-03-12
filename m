@@ -2,73 +2,83 @@ Return-Path: <SRS0=ChHZ=IK=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E7D0C433DB
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 11:18:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA59DC433DB
+	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 11:20:46 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C37CD64F78
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 11:18:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C37CD64F78
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 45C1C64FC3
+	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 11:20:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45C1C64FC3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5BCF74B5A0;
-	Fri, 12 Mar 2021 06:18:16 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AC0514B5A5;
+	Fri, 12 Mar 2021 06:20:45 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id R3Ynmz1Gm4w7; Fri, 12 Mar 2021 06:18:15 -0500 (EST)
+	with ESMTP id O+NYN1sJ1pH5; Fri, 12 Mar 2021 06:20:44 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2206A4B5C0;
-	Fri, 12 Mar 2021 06:18:15 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 887D34B5FB;
+	Fri, 12 Mar 2021 06:20:44 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9AA5A4B5A5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 06:18:13 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7712F4B5A5
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 06:20:42 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0iceftgpNm2f for <kvmarm@lists.cs.columbia.edu>;
- Fri, 12 Mar 2021 06:18:12 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4B7704B594
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 06:18:12 -0500 (EST)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 4EB0864F09;
- Fri, 12 Mar 2021 11:18:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1615547891;
- bh=4M8/d1QtvNV0W22nnWX2De2qfNZVr8K7C/taDssa2Ss=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=hvgY2ixxwgnMDRs6DayZDJfXR1VG+agFl/c5ryWLihtPZrXyiAITc3Z3DhwjhWKSr
- QixZ+cIFSfVRHu4wj4bqnJGhgTgoxG5Q0jiA/zFwgGZIAd9kbttdxrXMz+h8rc8DLf
- MDeAFCrDlcWQpHH4KXEY+shjNwnrtMK00t5f1QibG3Md/5LlHoA1oaIwqvgMnuJWJq
- uqmgObMsd6Ue5uqdFkktT4ksgWSGaYa+dit8HiN9xOqjsbTRGwR40tCGNsgeSqNRyX
- XKYql/ytfOCaQm3wnG3kpztMyXHP3ok0WEpLpAMsOBbBGibTvIk9DztGVRjgRRV51L
- JBSXW6eZQ3BHg==
-Date: Fri, 12 Mar 2021 11:18:05 +0000
-From: Will Deacon <will@kernel.org>
-To: Quentin Perret <qperret@google.com>
-Subject: Re: [PATCH v4 28/34] KVM: arm64: Use page-table to track page
- ownership
-Message-ID: <20210312111804.GB32208@willie-the-truck>
-References: <20210310175751.3320106-1-qperret@google.com>
- <20210310175751.3320106-29-qperret@google.com>
- <20210311183834.GC31378@willie-the-truck>
- <YEsIxA/fKaDlSaio@google.com>
- <20210312093205.GB32016@willie-the-truck>
- <YEs+xi6IDj3gwX10@google.com>
+ with ESMTP id 2bVzZ8drOIxb for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 12 Mar 2021 06:20:41 -0500 (EST)
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com
+ [209.85.160.171])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 532464B303
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 06:20:41 -0500 (EST)
+Received: by mail-qt1-f171.google.com with SMTP id c6so3427282qtc.1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 03:20:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=hDvoiYIvZQjBwY7AN04lqztmd7aF46gukokNYV7+rVA=;
+ b=aeQXH60EV3lRJ/CKOoL2AY3hkoyWoTVHDasaXwdmS4iG69am0GxYmSBCjtX7aVaJwH
+ RJGumDrAuSdueug8cWC/eiLWW5C3KWMjxSkn9Pep74mdm3m46v3PhxwUQfpZAS6x47of
+ eKK7GaC7Aj6UhPFa/J76f2rPokILxkqgfBgm1fyLhO/x0zo0I1FXYuIhfkWjILtRBsv6
+ fv74xMdy1qoDpM/dYOB8xVuGQu8OEXwCGlozcIJQZQLuvIGRiA6f3VvAu28LcH5RzSrw
+ H5vvmNvNqGJroc6BVbQRpY6zWAKfTAcoDieTc+hKOL7iite+dyxr/kh8fY1B1QMdFJ0u
+ 4gUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=hDvoiYIvZQjBwY7AN04lqztmd7aF46gukokNYV7+rVA=;
+ b=eSyMe2hLxob+gDXYpLoS88r1c5QUt9soTFZnbCWXKKaFYKJmaqLZsSYwnt5NXaqNdw
+ BDXqYN5aFCPQzKWMf4LxsO5yzmXR4AvF3g142VpGH6UXIL/VvmTUCVDNujbng2WncNkW
+ qkgKz4DkgnfEBkMfCsJu9oGFhfo81FpZ8bPWvZq2qj0R8r1vtvoABmvKLUD6NomHG8x6
+ pF+H8mfiAQIm4akcRfgQycoFNufBujULLOVerTn81xkCj3WWPgzttdAYk9p3qU4J8pjb
+ qdTz6BGz0DdO5kfjlz27I746J54jLIr3qJghs1Ykm5yLMxI0U37CIJg3GkY9dfeY8uMN
+ bQzA==
+X-Gm-Message-State: AOAM533ySs9gtdHbO5RxarLv3xcCeAurEIQdxYuTY0w6wc5dZuIFqBgz
+ kF7gDMq3agWTXI0HCt+Do7zFURnZ8RWCGozlJk3QHw==
+X-Google-Smtp-Source: ABdhPJwCliNdb+2Rr7IOS9aRM1YCko5CK+fm6hyFVKJyk+ri6KH5DF/mLT3bpUipG94nWWhoq+9D38sYwRUyOXkDG3I=
+X-Received: by 2002:aed:27d3:: with SMTP id m19mr11731390qtg.384.1615548040647; 
+ Fri, 12 Mar 2021 03:20:40 -0800 (PST)
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <YEs+xi6IDj3gwX10@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: android-kvm@google.com, catalin.marinas@arm.com, mate.toth-pal@arm.com,
- seanjc@google.com, tabba@google.com, linux-kernel@vger.kernel.org,
- robh+dt@kernel.org, linux-arm-kernel@lists.infradead.org, maz@kernel.org,
- kernel-team@android.com, kvmarm@lists.cs.columbia.edu
+References: <20210304115454.3597879-1-ascull@google.com>
+ <20210304115454.3597879-5-ascull@google.com>
+ <YEnyds3LmQBWSeO4@google.com>
+In-Reply-To: <YEnyds3LmQBWSeO4@google.com>
+From: Andrew Scull <ascull@google.com>
+Date: Fri, 12 Mar 2021 11:20:29 +0000
+Message-ID: <CADcWuH2QrnFzQ9NTf_oa+Tw8hZZqf5qOAw3zw5pdG-4Rbrq8ZQ@mail.gmail.com>
+Subject: Re: [PATCH 04/10] KVM: arm64: Support smp_processor_id() in nVHE hyp
+To: Quentin Perret <qperret@google.com>
+Cc: kernel-team@android.com, Marc Zyngier <maz@kernel.org>,
+ Dave Martin <Dave.Martin@arm.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -85,54 +95,63 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Mar 12, 2021 at 10:13:26AM +0000, Quentin Perret wrote:
-> On Friday 12 Mar 2021 at 09:32:06 (+0000), Will Deacon wrote:
-> > I'm not saying to use the VMID directly, just that allocating half of the
-> > pte feels a bit OTT given that the state of things after this patch series
-> > is that we're using exactly 1 bit.
-> 
-> Right, and that was the reason for the PROT_NONE approach in the
-> previous version, but we agreed it'd be worth generalizing to allow for
-> future use-cases :-)
+On Thu, 11 Mar 2021 at 10:35, Quentin Perret <qperret@google.com> wrote:
+>
+> On Thursday 04 Mar 2021 at 11:54:47 (+0000), 'Andrew Scull' via kernel-team wrote:
+> > smp_procesor_id() works off of the cpu_number per-cpu variable. Create
+> > an nVHE hyp version of cpu_number and initialize it to the same value as
+> > the host when creating the hyp per-cpu regions.
+> >
+> > Signed-off-by: Andrew Scull <ascull@google.com>
+> > ---
+> >  arch/arm64/kvm/arm.c              | 2 ++
+> >  arch/arm64/kvm/hyp/nvhe/hyp-smp.c | 2 ++
+> >  2 files changed, 4 insertions(+)
+> >
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 26ccc369cf11..e3edea8379f3 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -54,6 +54,7 @@ DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
+> >  static DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_page);
+> >  unsigned long kvm_arm_hyp_percpu_base[NR_CPUS];
+> >  DECLARE_KVM_NVHE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
+> > +DECLARE_KVM_NVHE_PER_CPU(int, cpu_number);
+> >
+> >  /* The VMID used in the VTTBR */
+> >  static atomic64_t kvm_vmid_gen = ATOMIC64_INIT(1);
+> > @@ -1740,6 +1741,7 @@ static int init_hyp_mode(void)
+> >               page_addr = page_address(page);
+> >               memcpy(page_addr, CHOOSE_NVHE_SYM(__per_cpu_start), nvhe_percpu_size());
+> >               kvm_arm_hyp_percpu_base[cpu] = (unsigned long)page_addr;
+> > +             *per_cpu_ptr_nvhe_sym(cpu_number, cpu) = cpu;
+> >       }
+> >
+> >       /*
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-smp.c b/arch/arm64/kvm/hyp/nvhe/hyp-smp.c
+> > index 879559057dee..86f952b1de18 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/hyp-smp.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-smp.c
+> > @@ -8,6 +8,8 @@
+> >  #include <asm/kvm_hyp.h>
+> >  #include <asm/kvm_mmu.h>
+> >
+> > +DEFINE_PER_CPU_READ_MOSTLY(int, cpu_number);
+>
+> Is smp_processor_id() going to work at EL2 with CONFIG_DEBUG_PREEMPT=y ?
+> If not, then maybe we should have out own hyp_smp_processor_id() macro?
 
-Yeah, just generalising to 32 bits feels like going too far! I dunno,
-make it a u8 for now, or define the hypervisor owner ID as 1 and reject
-owners greater than that? We can easily extend it later.
+It's not, preempt_count() won't work,= at a minimum. I got far too
+drawn into the other branch of that #ifdef.
 
-> > > > > @@ -517,28 +543,36 @@ static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
-> > > > >  	if (!kvm_block_mapping_supported(addr, end, phys, level))
-> > > > >  		return -E2BIG;
-> > > > >  
-> > > > > -	new = kvm_init_valid_leaf_pte(phys, data->attr, level);
-> > > > > -	if (kvm_pte_valid(old)) {
-> > > > > +	if (kvm_pte_valid(data->attr))
-> > > > 
-> > > > This feels like a bit of a hack to me: the 'attr' field in stage2_map_data
-> > > > is intended to correspond directly to the lower/upper attributes of the
-> > > > descriptor as per the architecture, so tagging the valid bit in there is
-> > > > pretty grotty. However, I can see the significant advantage in being able
-> > > > to re-use the stage2_map_walker functionality, so about instead of nobbling
-> > > > attr, you set phys to something invalid instead, e.g.:
-> > > > 
-> > > > 	#define KVM_PHYS_SET_OWNER	(-1ULL)
-> > > 
-> > > That'll confuse kvm_block_mapping_supported() and friends I think, at
-> > > least in their current form. If you _really_ don't like this, maybe we
-> > > could have an extra 'flags' field in stage2_map_data?
-> > 
-> > I was pondering this last night and I thought of two ways to do it:
-> > 
-> > 1. Add a 'bool valid' and then stick the owner and the phys in a union.
-> >    (yes, you'll need to update the block mapping checks to look at the
-> >     valid flag)
-> 
-> Right, though that is also used for the hyp s1 which doesn't use any of
-> this ATM. That shouldn't be too bad to change, I'll have a look.
+We only use __smp_processor_id() in hyp, but that might not play too
+nicely with VHE and forgetting the leading underscores will just lead
+to nVHE issues that might not be caught in the build.
 
-Oh, I meant stick the bool in the stage2_map_data so that should be limited
-to the stage2 path.
-
-Will
+So you might be right that this is a case where we need to break from
+standard APIs. And we can define `raw_smp_processor_id()` to something
+that will give a compile time error when used in hyp to try and
+prevent accidental misuse.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
