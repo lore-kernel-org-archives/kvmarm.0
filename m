@@ -2,61 +2,62 @@ Return-Path: <SRS0=ChHZ=IK=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 296F8C433E6
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 08:53:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72054C433E0
+	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 09:03:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9552664FD5
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 08:53:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9552664FD5
+	by mail.kernel.org (Postfix) with ESMTP id E23D364FF5
+	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 09:03:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E23D364FF5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 27D4B4B5A0;
-	Fri, 12 Mar 2021 03:53:07 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C7904B6FE;
+	Fri, 12 Mar 2021 04:03:05 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 216sczcqPvjE; Fri, 12 Mar 2021 03:53:05 -0500 (EST)
+	with ESMTP id eL+IaDO7A8-G; Fri, 12 Mar 2021 04:03:04 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F2264B615;
-	Fri, 12 Mar 2021 03:53:05 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A03B4B65C;
+	Fri, 12 Mar 2021 04:03:04 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 060FC4B44F
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 03:53:05 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B85364B6FE
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 04:03:03 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2eCxqGA8-+8j for <kvmarm@lists.cs.columbia.edu>;
- Fri, 12 Mar 2021 03:53:04 -0500 (EST)
+ with ESMTP id AiTnJIS4kf7C for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 12 Mar 2021 04:03:02 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E263A4B1E1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 03:53:03 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A388B4B2EE
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 04:03:02 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 184A264FCE;
- Fri, 12 Mar 2021 08:53:02 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 89D0064FE0;
+ Fri, 12 Mar 2021 09:03:01 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1lKdXX-001ATZ-Qc; Fri, 12 Mar 2021 08:52:59 +0000
-Date: Fri, 12 Mar 2021 08:52:59 +0000
-Message-ID: <87mtv8g3dg.wl-maz@kernel.org>
+ id 1lKdhD-001Ac7-Km; Fri, 12 Mar 2021 09:02:59 +0000
+Date: Fri, 12 Mar 2021 09:02:58 +0000
+Message-ID: <87lfasg2wt.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Shenming Lu <lushenming@huawei.com>
-Subject: Re: [PATCH v3 1/4] KVM: arm64: GICv4.1: Add function to get VLPI state
-In-Reply-To: <fc7dc4ec-e223-91ae-536f-1aa52c8a5739@huawei.com>
+Subject: Re: [PATCH v3 2/4] KVM: arm64: GICv4.1: Try to save hw pending state
+ in save_pending_tables
+In-Reply-To: <3b47598f-0795-a165-1a64-abe02258b306@huawei.com>
 References: <20210127121337.1092-1-lushenming@huawei.com>
- <20210127121337.1092-2-lushenming@huawei.com>
- <87wnuef4oj.wl-maz@kernel.org>
- <fc7dc4ec-e223-91ae-536f-1aa52c8a5739@huawei.com>
+ <20210127121337.1092-3-lushenming@huawei.com>
+ <87v99yf450.wl-maz@kernel.org>
+ <3b47598f-0795-a165-1a64-abe02258b306@huawei.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -90,78 +91,39 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 11 Mar 2021 12:26:38 +0000,
+On Thu, 11 Mar 2021 12:31:48 +0000,
 Shenming Lu <lushenming@huawei.com> wrote:
 > 
-> On 2021/3/11 16:57, Marc Zyngier wrote:
-> > On Wed, 27 Jan 2021 12:13:34 +0000,
-> > Shenming Lu <lushenming@huawei.com> wrote:
-> >>
-> >> With GICv4.1 and the vPE unmapped, which indicates the invalidation
-> >> of any VPT caches associated with the vPE, we can get the VLPI state
-> >> by peeking at the VPT. So we add a function for this.
-> >>
-> >> Signed-off-by: Shenming Lu <lushenming@huawei.com>
-> >> ---
-> >>  arch/arm64/kvm/vgic/vgic-v4.c | 19 +++++++++++++++++++
-> >>  arch/arm64/kvm/vgic/vgic.h    |  1 +
-> >>  2 files changed, 20 insertions(+)
-> >>
-> >> diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
-> >> index 66508b03094f..ac029ba3d337 100644
-> >> --- a/arch/arm64/kvm/vgic/vgic-v4.c
-> >> +++ b/arch/arm64/kvm/vgic/vgic-v4.c
-> >> @@ -203,6 +203,25 @@ void vgic_v4_configure_vsgis(struct kvm *kvm)
-> >>  	kvm_arm_resume_guest(kvm);
-> >>  }
-> >>  
-> >> +/*
-> >> + * Must be called with GICv4.1 and the vPE unmapped, which
-> >> + * indicates the invalidation of any VPT caches associated
-> >> + * with the vPE, thus we can get the VLPI state by peeking
-> >> + * at the VPT.
-> >> + */
-> >> +void vgic_v4_get_vlpi_state(struct vgic_irq *irq, bool *val)
-> >> +{
-> >> +	struct its_vpe *vpe = &irq->target_vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
-> >> +	int mask = BIT(irq->intid % BITS_PER_BYTE);
-> >> +	void *va;
-> >> +	u8 *ptr;
-> >> +
-> >> +	va = page_address(vpe->vpt_page);
-> >> +	ptr = va + irq->intid / BITS_PER_BYTE;
-> >> +
-> >> +	*val = !!(*ptr & mask);
-> > 
-> > What guarantees that you can actually read anything valid? Yes, the
-> > VPT caches are clean. But that doesn't make them coherent with CPU
-> > caches.
-> > 
-> > You need some level of cache maintenance here.
-> 
-> Yeah, and you have come up with some codes for this in v2:
-> 
-> diff --git a/drivers/irqchip/irq-gic-v3-its.c
-> b/drivers/irqchip/irq-gic-v3-its.c
-> index 7db602434ac5..2dbef127ca15 100644
-> --- a/drivers/irqchip/irq-gic-v3-its.c
-> +++ b/drivers/irqchip/irq-gic-v3-its.c
-> @@ -4552,6 +4552,10 @@ static void its_vpe_irq_domain_deactivate(struct
-> irq_domain *domain,
-> 
->   		its_send_vmapp(its, vpe, false);
->   	}
-> +
-> +	if (find_4_1_its() && !atomic_read(vpe->vmapp_count))
-> +		gic_flush_dcache_to_poc(page_address(vpe->vpt_page),
-> +					LPI_PENDBASE_SZ);
->   }
-> 
->   static const struct irq_domain_ops its_vpe_domain_ops = {
-> 
-> Could I add it to this series? :-)
+> On 2021/3/11 17:09, Marc Zyngier wrote:
 
-Yes, please.
+> > I have asked that question in the past: is it actually safe to remap
+> > the vPEs and expect them to be runnable
+> 
+> In my opinion, logically it can work, but there might be problems like the
+> one below that I didn't notice...
+
+One thing is that you will have lost interrupts in the meantime
+(assuming your devices are still alive). How will you make up for
+that?
+
+> 
+> > 
+> > Also, the current code assumes that VMAPP.PTZ can be advertised if a
+> > VPT is mapped for the first time. Clearly, it is unlikely that the VPT
+> > will be only populated with 0s, so you'll end up with state corruption
+> > on the first remap.
+> 
+> Oh, thanks for pointing it out.
+> And if we always signal PTZ when alloc = 1, does it mean that we
+> can't remap the vPE when the VPT is not empty, thus there is no
+> chance to get the VLPI state?  Could we just assume that the VPT is
+> not empty when first mapping the vPE?
+
+I think we should drop the setting of PTZ altogether. It is a silly
+micro-optimisation, and if the HW can't parse the VPT efficiently when
+it is empty, then the HW is pretty bad, PTZ or not.
+
+Thanks,
 
 	M.
 
