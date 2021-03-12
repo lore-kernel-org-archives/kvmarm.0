@@ -7,73 +7,72 @@ X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35040C433DB
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 15:00:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83AC5C433E0
+	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 15:16:19 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9197864FC3
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 15:00:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9197864FC3
+	by mail.kernel.org (Postfix) with ESMTP id B5D8E64FEE
+	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 15:16:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5D8E64FEE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 067FD4B3B1;
-	Fri, 12 Mar 2021 10:00:02 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 336594B518;
+	Fri, 12 Mar 2021 10:16:18 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id RS2f0GI+y9hS; Fri, 12 Mar 2021 10:00:00 -0500 (EST)
+	with ESMTP id i4JbK1TUYecr; Fri, 12 Mar 2021 10:16:17 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D15524B3BE;
-	Fri, 12 Mar 2021 10:00:00 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 161B94B4E0;
+	Fri, 12 Mar 2021 10:16:17 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 15D584B3B8
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 09:59:59 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 183564B4D7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 10:16:16 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vCQyHoH8jJal for <kvmarm@lists.cs.columbia.edu>;
- Fri, 12 Mar 2021 09:59:58 -0500 (EST)
+ with ESMTP id utW53gEpog+T for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 12 Mar 2021 10:16:14 -0500 (EST)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A1F94B3B1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 09:59:58 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DB2C24B4C6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 10:16:14 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1615561197;
+ s=mimecast20190719; t=1615562174;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=rjGcZs7Vy2maRevaHJ9Zv8LK1uzd9Lhozx0sgGCsnz8=;
- b=jHZ36SaI91dtcgPQFFvJN/jO7yknZ7sKqUvkUiaLFxwHP8OrTGpORi6bQbchQHcrEe9EXS
- 84Vii5si1T5FK2fRrpqRw+YFt2QFXoAlNCmlu907WAE/mcw7XjYukUQW63SrqN0JlHzGpY
- jhC7JKh5s3Hji1jDGM4k6n78OvZEYow=
+ bh=A5J2rJulblbgqoqRb92cPCJCQqD7ZFSeC+TL1fUNNCA=;
+ b=RzXVRvlYOHCKoU4AXf0FGL29zkarTvd/5onYKvJPaABSk3S/65+i/un2I5r9ePk70IgSWL
+ S6aIFzwGOzB9nW/c1gghnb7LPTpEiERtjjAcbgBSwjtkDJ53Wezrw6v2XGvRI/ovYYr7S/
+ D9Ds365daPLun+bvAWbd1JNvgWi/ejY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-178-JB7uhuwoOqSXK344pdd6bg-1; Fri, 12 Mar 2021 09:59:56 -0500
-X-MC-Unique: JB7uhuwoOqSXK344pdd6bg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-22-9H0tOIyEP7qpkoGZnRSVqg-1; Fri, 12 Mar 2021 10:16:12 -0500
+X-MC-Unique: 9H0tOIyEP7qpkoGZnRSVqg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C37FA81746C;
- Fri, 12 Mar 2021 14:59:54 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2078A107ACCD;
+ Fri, 12 Mar 2021 15:16:11 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.40.192.104])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C4A255D6D7;
- Fri, 12 Mar 2021 14:59:53 +0000 (UTC)
-Date: Fri, 12 Mar 2021 15:59:50 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8589619704;
+ Fri, 12 Mar 2021 15:16:09 +0000 (UTC)
+Date: Fri, 12 Mar 2021 16:16:06 +0100
 From: Andrew Jones <drjones@redhat.com>
 To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [kvm-unit-tests PATCH 3/6] arm/arm64: Remove unnecessary ISB
- when doing dcache maintenance
-Message-ID: <20210312145950.whq7ofrhbklwhprx@kamzik.brq.redhat.com>
-References: <20210227104201.14403-1-alexandru.elisei@arm.com>
- <20210227104201.14403-4-alexandru.elisei@arm.com>
+Subject: Re: [kvm-unit-tests PATCH] configure: arm/arm64: Add --earlycon
+ option to set UART type and address
+Message-ID: <20210312151606.qkfp7evsrpbw2wtq@kamzik.brq.redhat.com>
+References: <20210219163718.109101-1-alexandru.elisei@arm.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20210227104201.14403-4-alexandru.elisei@arm.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+In-Reply-To: <20210219163718.109101-1-alexandru.elisei@arm.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Cc: pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,78 +89,119 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sat, Feb 27, 2021 at 10:41:58AM +0000, Alexandru Elisei wrote:
-> The dcache_by_line_op macro executes a DSB to complete the cache
-> maintenance operations. According to ARM DDI 0487G.a, page B2-150:
+On Fri, Feb 19, 2021 at 04:37:18PM +0000, Alexandru Elisei wrote:
+> Currently, the UART early address is set indirectly with the --vmm option
+> and there are only two possible values: if the VMM is qemu (the default),
+> then the UART address is set to 0x09000000; if the VMM is kvmtool, then the
+> UART address is set to 0x3f8.
 > 
-> "In addition, no instruction that appears in program order after the DSB
-> instruction can alter any state of the system or perform any part of its
-> functionality until the DSB completes other than:
+> There several efforts under way to change the kvmtool UART address, and
+> kvm-unit-tests so far hasn't had mechanism to let the user set a specific
+> address, which means that the early UART won't be available.
 > 
-> - Being fetched from memory and decoded.
-> - Reading the general-purpose, SIMD and floating-point, Special-purpose, or
->   System registers that are directly or indirectly read without causing
->   side-effects."
+> This situation will only become worse as kvm-unit-tests gains support to
+> run as an EFI app, as each platform will have their own UART type and
+> address.
 > 
-> Similar definition for ARM in ARM DDI 0406C.d, page A3-150:
+> To address both issues, a new configure option is added, --earlycon. The
+> syntax and semantics are identical to the kernel parameter with the same
+> name. Specifying this option will overwrite the UART address set by --vmm.
 > 
-> "In addition, no instruction that appears in program order after the DSB
-> instruction can execute until the DSB completes."
-> 
-> This means that we don't need the ISB to prevent reordering of the cache
-> maintenance instructions.
-> 
-> We are also not doing icache maintenance, where an ISB would be required
-> for the PE to discard instructions speculated before the invalidation.
-> 
-> In conclusion, the ISB is unnecessary, so remove it.
-
-Hi Alexandru,
-
-We can go ahead and take this patch, since you've written quite a
-convincing commit message, but in general I'd prefer we be overly cautious
-in our common code. We'd like to ensure we don't introduce difficult to
-debug issues there, and we don't care about optimizations, let alone
-micro-optimizations. Testing barrier needs to the letter of the spec is a
-good idea, but it's probably better to do that in the test cases.
-
-Thanks,
-drew
-
+> At the moment, the UART type and register width parameters are ignored
+> since both qemu's and kvmtool's UART emulation use the same offset for the
+> TX register and no other registers are used by kvm-unit-tests, but the
+> parameters will become relevant once EFI support is added.
 > 
 > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 > ---
->  arm/cstart.S   | 1 -
->  arm/cstart64.S | 1 -
->  2 files changed, 2 deletions(-)
+> The kvmtool patches I was referring to are the patches to unify ioport and
+> MMIO emulation [1] and to allow the user to specify a custom memory layout
+> for the VM [2] (these patches are very old, but I plan to revive them after
+> the ioport and MMIO unification series are merged).
 > 
-> diff --git a/arm/cstart.S b/arm/cstart.S
-> index 954748b00f64..2d62c1e6d40d 100644
-> --- a/arm/cstart.S
-> +++ b/arm/cstart.S
-> @@ -212,7 +212,6 @@ asm_mmu_disable:
->  	ldr	r1, [r1]
->  	sub	r1, r1, r0
->  	dcache_by_line_op dccimvac, sy, r0, r1, r2, r3
-> -	isb
+> [1] https://lore.kernel.org/kvm/20201210142908.169597-1-andre.przywara@arm.com/T/#t
+> [2] https://lore.kernel.org/kvm/1569245722-23375-1-git-send-email-alexandru.elisei@arm.com/
+> 
+>  configure | 35 +++++++++++++++++++++++++++++++++++
+>  1 file changed, 35 insertions(+)
+> 
+> diff --git a/configure b/configure
+> index cdcd34e94030..d94b92255088 100755
+> --- a/configure
+> +++ b/configure
+> @@ -26,6 +26,7 @@ errata_force=0
+>  erratatxt="$srcdir/errata.txt"
+>  host_key_document=
+>  page_size=
+> +earlycon=
 >  
->  	mov     pc, lr
->  
-> diff --git a/arm/cstart64.S b/arm/cstart64.S
-> index 046bd3914098..c1deff842f03 100644
-> --- a/arm/cstart64.S
-> +++ b/arm/cstart64.S
-> @@ -219,7 +219,6 @@ asm_mmu_disable:
->  	ldr	x1, [x1, :lo12:__phys_end]
->  	sub	x1, x1, x0
->  	dcache_by_line_op civac, sy, x0, x1, x2, x3
-> -	isb
->  
->  	ret
->  
+>  usage() {
+>      cat <<-EOF
+> @@ -54,6 +55,17 @@ usage() {
+>  	    --page-size=PAGE_SIZE
+>  	                           Specify the page size (translation granule) (4k, 16k or
+>  	                           64k, default is 64k, arm64 only)
+> +	    --earlycon=EARLYCON
+> +	                           Specify the UART name, type and address (optional, arm and
+> +	                           arm64 only). The specified address will overwrite the UART
+> +	                           address set by the --vmm option. EARLYCON can be on of (case
+
+s/be on of/be one of/
+
+> +	                           sensitive):
+> +	               uart[8250],mmio,ADDR
+> +	                           Specify an 8250 compatible UART at address ADDR. Supported
+> +	                           register stride is 8 bit only.
+> +	               pl011,mmio,ADDR
+> +	                           Specify a PL011 compatible UART at address ADDR. Supported
+> +	                           register stride is 8 bit only.
+>  EOF
+>      exit 1
+>  }
+> @@ -112,6 +124,9 @@ while [[ "$1" = -* ]]; do
+>  	--page-size)
+>  	    page_size="$arg"
+>  	    ;;
+> +	--earlycon)
+> +	    earlycon="$arg"
+> +	    ;;
+>  	--help)
+>  	    usage
+>  	    ;;
+> @@ -170,6 +185,26 @@ elif [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
+>          echo '--vmm must be one of "qemu" or "kvmtool"!'
+>          usage
+>      fi
+> +
+> +    if [ "$earlycon" ]; then
+> +        name=$(echo $earlycon|cut -d',' -f1)
+> +        if [ "$name" != "uart" ] && [ "$name" != "uart8250" ] &&
+> +                [ "$name" != "pl011" ]; then
+> +            echo "unknown earlycon name: $name"
+> +            usage
+> +        fi
+> +        type=$(echo $earlycon|cut -d',' -f2)
+> +        if [ "$type" != "mmio" ]; then
+> +            echo "unknown earlycon type: $type"
+> +            usage
+> +        fi
+> +        addr=$(echo $earlycon|cut -d',' -f3)
+> +        if [ -z "$addr" ]; then
+> +            echo "missing earlycon address"
+> +            usage
+> +        fi
+> +        arm_uart_early_addr=$addr
+> +    fi
+>  elif [ "$arch" = "ppc64" ]; then
+>      testdir=powerpc
+>      firmware="$testdir/boot_rom.bin"
 > -- 
 > 2.30.1
-> 
+>
+
+Otherwise,
+ 
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 
 _______________________________________________
 kvmarm mailing list
