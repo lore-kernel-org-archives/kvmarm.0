@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2192C433DB
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 15:19:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3961CC433DB
+	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 15:19:24 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6985164FEA
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 15:19:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6985164FEA
+	by mail.kernel.org (Postfix) with ESMTP id A1A0364FF9
+	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 15:19:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1A0364FF9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DF7D14B4B2;
-	Fri, 12 Mar 2021 10:19:18 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 27F7C4B53D;
+	Fri, 12 Mar 2021 10:19:23 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id HhEcL1-hI3Ky; Fri, 12 Mar 2021 10:19:17 -0500 (EST)
+	with ESMTP id 5CxPWsyAOXeX; Fri, 12 Mar 2021 10:19:21 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A4AE74B285;
-	Fri, 12 Mar 2021 10:19:17 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C32704B457;
+	Fri, 12 Mar 2021 10:19:21 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BBC2A4B41D
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 10:19:16 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C0C74B457
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 10:19:20 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id l8AfT2EkNB3w for <kvmarm@lists.cs.columbia.edu>;
- Fri, 12 Mar 2021 10:19:15 -0500 (EST)
+ with ESMTP id tbpBWPAwH3DV for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 12 Mar 2021 10:19:18 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C1D24B225
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 10:19:15 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 20BFE4B418
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 10:19:18 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B59971063;
- Fri, 12 Mar 2021 07:19:14 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C9BB911B3;
+ Fri, 12 Mar 2021 07:19:17 -0800 (PST)
 Received: from e112269-lin.arm.com (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E5E283F7D7;
- Fri, 12 Mar 2021 07:19:11 -0800 (PST)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F382B3F7D7;
+ Fri, 12 Mar 2021 07:19:14 -0800 (PST)
 From: Steven Price <steven.price@arm.com>
 To: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Will Deacon <will@kernel.org>
-Subject: [PATCH v10 1/6] arm64: mte: Sync tags for pages where PTE is untagged
-Date: Fri, 12 Mar 2021 15:18:57 +0000
-Message-Id: <20210312151902.17853-2-steven.price@arm.com>
+Subject: [PATCH v10 2/6] arm64: kvm: Introduce MTE VM feature
+Date: Fri, 12 Mar 2021 15:18:58 +0000
+Message-Id: <20210312151902.17853-3-steven.price@arm.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20210312151902.17853-1-steven.price@arm.com>
 References: <20210312151902.17853-1-steven.price@arm.com>
@@ -73,77 +73,126 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-A KVM guest could store tags in a page even if the VMM hasn't mapped
-the page with PROT_MTE. So when restoring pages from swap we will
-need to check to see if there are any saved tags even if !pte_tagged().
+Add a new VM feature 'KVM_ARM_CAP_MTE' which enables memory tagging
+for a VM. This will expose the feature to the guest and automatically
+tag memory pages touched by the VM as PG_mte_tagged (and clear the tag
+storage) to ensure that the guest cannot see stale tags, and so that
+the tags are correctly saved/restored across swap.
 
-However don't check pages which are !pte_valid_user() as these will
-not have been swapped out.
+Actually exposing the new capability to user space happens in a later
+patch.
 
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
- arch/arm64/include/asm/pgtable.h |  2 +-
- arch/arm64/kernel/mte.c          | 16 ++++++++++++----
- 2 files changed, 13 insertions(+), 5 deletions(-)
+ arch/arm64/include/asm/kvm_emulate.h |  3 +++
+ arch/arm64/include/asm/kvm_host.h    |  3 +++
+ arch/arm64/kvm/hyp/exception.c       |  3 ++-
+ arch/arm64/kvm/mmu.c                 | 16 ++++++++++++++++
+ arch/arm64/kvm/sys_regs.c            |  3 +++
+ include/uapi/linux/kvm.h             |  1 +
+ 6 files changed, 28 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
-index e17b96d0e4b5..84166625c989 100644
---- a/arch/arm64/include/asm/pgtable.h
-+++ b/arch/arm64/include/asm/pgtable.h
-@@ -312,7 +312,7 @@ static inline void set_pte_at(struct mm_struct *mm, unsigned long addr,
- 		__sync_icache_dcache(pte);
- 
- 	if (system_supports_mte() &&
--	    pte_present(pte) && pte_tagged(pte) && !pte_special(pte))
-+	    pte_present(pte) && pte_valid_user(pte) && !pte_special(pte))
- 		mte_sync_tags(ptep, pte);
- 
- 	__check_racy_pte_update(mm, ptep, pte);
-diff --git a/arch/arm64/kernel/mte.c b/arch/arm64/kernel/mte.c
-index b3c70a612c7a..e016ab57ea36 100644
---- a/arch/arm64/kernel/mte.c
-+++ b/arch/arm64/kernel/mte.c
-@@ -26,17 +26,23 @@ u64 gcr_kernel_excl __ro_after_init;
- 
- static bool report_fault_once = true;
- 
--static void mte_sync_page_tags(struct page *page, pte_t *ptep, bool check_swap)
-+static void mte_sync_page_tags(struct page *page, pte_t *ptep, bool check_swap,
-+			       bool pte_is_tagged)
- {
- 	pte_t old_pte = READ_ONCE(*ptep);
- 
- 	if (check_swap && is_swap_pte(old_pte)) {
- 		swp_entry_t entry = pte_to_swp_entry(old_pte);
- 
--		if (!non_swap_entry(entry) && mte_restore_tags(entry, page))
-+		if (!non_swap_entry(entry) && mte_restore_tags(entry, page)) {
-+			set_bit(PG_mte_tagged, &page->flags);
- 			return;
-+		}
- 	}
- 
-+	if (!pte_is_tagged || test_and_set_bit(PG_mte_tagged, &page->flags))
-+		return;
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index f612c090f2e4..6bf776c2399c 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -84,6 +84,9 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+ 	if (cpus_have_const_cap(ARM64_MISMATCHED_CACHE_TYPE) ||
+ 	    vcpu_el1_is_32bit(vcpu))
+ 		vcpu->arch.hcr_el2 |= HCR_TID2;
 +
- 	page_kasan_tag_reset(page);
- 	/*
- 	 * We need smp_wmb() in between setting the flags and clearing the
-@@ -54,11 +60,13 @@ void mte_sync_tags(pte_t *ptep, pte_t pte)
- 	struct page *page = pte_page(pte);
- 	long i, nr_pages = compound_nr(page);
- 	bool check_swap = nr_pages == 1;
-+	bool pte_is_tagged = pte_tagged(pte);
- 
- 	/* if PG_mte_tagged is set, tags have already been initialised */
- 	for (i = 0; i < nr_pages; i++, page++) {
--		if (!test_and_set_bit(PG_mte_tagged, &page->flags))
--			mte_sync_page_tags(page, ptep, check_swap);
-+		if (!test_bit(PG_mte_tagged, &page->flags))
-+			mte_sync_page_tags(page, ptep, check_swap,
-+					   pte_is_tagged);
- 	}
++	if (kvm_has_mte(vcpu->kvm))
++		vcpu->arch.hcr_el2 |= HCR_ATA;
  }
+ 
+ static inline unsigned long *vcpu_hcr(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 3d10e6527f7d..1170ee137096 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -132,6 +132,8 @@ struct kvm_arch {
+ 
+ 	u8 pfr0_csv2;
+ 	u8 pfr0_csv3;
++	/* Memory Tagging Extension enabled for the guest */
++	bool mte_enabled;
+ };
+ 
+ struct kvm_vcpu_fault_info {
+@@ -767,6 +769,7 @@ bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
+ #define kvm_arm_vcpu_sve_finalized(vcpu) \
+ 	((vcpu)->arch.flags & KVM_ARM64_VCPU_SVE_FINALIZED)
+ 
++#define kvm_has_mte(kvm) (system_supports_mte() && (kvm)->arch.mte_enabled)
+ #define kvm_vcpu_has_pmu(vcpu)					\
+ 	(test_bit(KVM_ARM_VCPU_PMU_V3, (vcpu)->arch.features))
+ 
+diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
+index 73629094f903..56426565600c 100644
+--- a/arch/arm64/kvm/hyp/exception.c
++++ b/arch/arm64/kvm/hyp/exception.c
+@@ -112,7 +112,8 @@ static void enter_exception64(struct kvm_vcpu *vcpu, unsigned long target_mode,
+ 	new |= (old & PSR_C_BIT);
+ 	new |= (old & PSR_V_BIT);
+ 
+-	// TODO: TCO (if/when ARMv8.5-MemTag is exposed to guests)
++	if (kvm_has_mte(vcpu->kvm))
++		new |= PSR_TCO_BIT;
+ 
+ 	new |= (old & PSR_DIT_BIT);
+ 
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 77cb2d28f2a4..b31b7a821f90 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -879,6 +879,22 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	if (vma_pagesize == PAGE_SIZE && !force_pte)
+ 		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
+ 							   &pfn, &fault_ipa);
++
++	if (fault_status != FSC_PERM && kvm_has_mte(kvm) && pfn_valid(pfn)) {
++		/*
++		 * VM will be able to see the page's tags, so we must ensure
++		 * they have been initialised. if PG_mte_tagged is set, tags
++		 * have already been initialised.
++		 */
++		struct page *page = pfn_to_page(pfn);
++		unsigned long i, nr_pages = vma_pagesize >> PAGE_SHIFT;
++
++		for (i = 0; i < nr_pages; i++, page++) {
++			if (!test_and_set_bit(PG_mte_tagged, &page->flags))
++				mte_clear_page_tags(page_address(page));
++		}
++	}
++
+ 	if (writable)
+ 		prot |= KVM_PGTABLE_PROT_W;
+ 
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 4f2f1e3145de..18c87500a7a8 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1047,6 +1047,9 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+ 		break;
+ 	case SYS_ID_AA64PFR1_EL1:
+ 		val &= ~FEATURE(ID_AA64PFR1_MTE);
++		if (kvm_has_mte(vcpu->kvm))
++			val |= FIELD_PREP(FEATURE(ID_AA64PFR1_MTE),
++					  ID_AA64PFR1_MTE);
+ 		break;
+ 	case SYS_ID_AA64ISAR1_EL1:
+ 		if (!vcpu_has_ptrauth(vcpu))
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index f6afee209620..6dc16c09a2d1 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1078,6 +1078,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_DIRTY_LOG_RING 192
+ #define KVM_CAP_X86_BUS_LOCK_EXIT 193
+ #define KVM_CAP_PPC_DAWR1 194
++#define KVM_CAP_ARM_MTE 195
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
  
 -- 
 2.20.1
