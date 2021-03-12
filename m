@@ -2,93 +2,84 @@ Return-Path: <SRS0=ChHZ=IK=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5279BC433DB
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 06:34:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE355C433DB
+	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 08:52:20 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A1F2C64F82
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 06:34:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1F2C64F82
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 1C2AD64FCE
+	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 08:52:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C2AD64FCE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E7A7B4B40B;
-	Fri, 12 Mar 2021 01:34:19 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E8054B1E1;
+	Fri, 12 Mar 2021 03:52:19 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id YP6sFtLbHjnI; Fri, 12 Mar 2021 01:34:17 -0500 (EST)
+	with ESMTP id W+3zr0d3cyBX; Fri, 12 Mar 2021 03:52:18 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5846F4B656;
-	Fri, 12 Mar 2021 01:34:17 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 450DB4B702;
+	Fri, 12 Mar 2021 03:52:18 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D61A4B568
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 01:34:16 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 23B614B6FB
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 03:52:17 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id utlloh4bDmHC for <kvmarm@lists.cs.columbia.edu>;
- Fri, 12 Mar 2021 01:34:13 -0500 (EST)
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com
- [209.85.128.48])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7ED464B40B
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 01:34:13 -0500 (EST)
-Received: by mail-wm1-f48.google.com with SMTP id g25so3097283wmh.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Mar 2021 22:34:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=1/tfClp+7Xwws1Pzo0a1sfKu9YRenK6a+xVG2qklwd4=;
- b=HbVmTtEiViLLTmj5PsNXwihfohAn4IXar+c8rDArckbzttahoELkcZBLU3H5B53M/B
- yl8Qsl8vmYcFYPbNLm+E/5rs/XVU4JRHK+xzL83AabloXrgBHN7x2JmIjv8WIJWn5Lsq
- lsaS7UHui+qNtWlL1ZsDZ7/bXi/Qs0gL76SLst2hQL5e+3lvM+AatMVQRAgQeijKee10
- K2n1ny8KYwAdg60MLTf6jwBKv2SPzfS8if6SfxlCzOHublVVFvtMyjLX9iAXb0XND6Bf
- IT6GVVHlt4CWPXSvvX0XBMG3ls9F43VdruAt03ENP6+32alyb6S1sqAgZn9Q7yvRByZj
- QVYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=1/tfClp+7Xwws1Pzo0a1sfKu9YRenK6a+xVG2qklwd4=;
- b=igM0EVprsgAGO4vKPN3XoaZXX02gnV9+IvKAjRPfcUc069p8FDhsCGzwmshktYgNyl
- Xpi9yQ9AzbpUBaEo1w2JJwH0sA2gxVmkvROCE/udt1ZY7+B0axfELwkpme9K9xAX+4v9
- ldDsNDXgx/BynZ9fRz2AV1N97eiGyIc7HJb/ciKisCbNMjJy7Y0dyNFLg4x8XIBsLy55
- nzWqI9VnqZA5BWB/PmllSHSt2Ni7UKimhMpDY4QvtBUNgJfBVVFSWrkoPgUt7os53704
- n27o+Xnfv6zPqR/hXyqBoHy+yD3UdWrbF5xZpj7QAbdByOl+vzsMlegI2r+kOOI9x0QE
- mcGA==
-X-Gm-Message-State: AOAM533EdmqqbCM+RO8OvLq9FUuDBfrclNsf68/C4y12uGgDLY5LpsgT
- tN66ZHSCtNqQeZSY/7NYKyR+aw==
-X-Google-Smtp-Source: ABdhPJzA/b526bFotN9qw9enozEUd7huuW/LQlBGtEU+Rk9os7n745FhiM+n3ml6/wx92ZKbGriN1g==
-X-Received: by 2002:a05:600c:35c1:: with SMTP id
- r1mr11379120wmq.60.1615530852267; 
- Thu, 11 Mar 2021 22:34:12 -0800 (PST)
-Received: from google.com (230.69.233.35.bc.googleusercontent.com.
- [35.233.69.230])
- by smtp.gmail.com with ESMTPSA id s18sm7409255wrr.27.2021.03.11.22.34.11
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 11 Mar 2021 22:34:12 -0800 (PST)
-Date: Fri, 12 Mar 2021 06:34:09 +0000
-From: Quentin Perret <qperret@google.com>
-To: Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v4 13/34] KVM: arm64: Enable access to sanitized CPU
- features at EL2
-Message-ID: <YEsLYX2CjNMXF9TN@google.com>
-References: <20210310175751.3320106-1-qperret@google.com>
- <20210310175751.3320106-14-qperret@google.com>
- <20210311193638.GE31586@willie-the-truck>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210311193638.GE31586@willie-the-truck>
-Cc: android-kvm@google.com, catalin.marinas@arm.com, mate.toth-pal@arm.com,
- seanjc@google.com, tabba@google.com, linux-kernel@vger.kernel.org,
- robh+dt@kernel.org, linux-arm-kernel@lists.infradead.org, maz@kernel.org,
- kernel-team@android.com, kvmarm@lists.cs.columbia.edu
+ with ESMTP id j4lgYJTHI956 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 12 Mar 2021 03:52:15 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BB5EF4B6EA
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 03:52:15 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id A545660190;
+ Fri, 12 Mar 2021 08:52:13 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1lKdWl-001ASb-95; Fri, 12 Mar 2021 08:52:11 +0000
+Date: Fri, 12 Mar 2021 08:52:10 +0000
+Message-ID: <87o8fog3et.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Keqian Zhu <zhukeqian1@huawei.com>
+Subject: Re: [RFC PATCH] kvm: arm64: Try stage2 block mapping for host device
+ MMIO
+In-Reply-To: <e2a36913-2ded-71ff-d3ed-f7f8d831447c@huawei.com>
+References: <20210122083650.21812-1-zhukeqian1@huawei.com>
+ <87y2euf5d2.wl-maz@kernel.org>
+ <e2a36913-2ded-71ff-d3ed-f7f8d831447c@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: zhukeqian1@huawei.com, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, will@kernel.org, catalin.marinas@arm.com,
+ mark.rutland@arm.com, james.morse@arm.com, robin.murphy@arm.com,
+ joro@8bytes.org, daniel.lezcano@linaro.org, tglx@linutronix.de,
+ suzuki.poulose@arm.com, julien.thierry.kdev@gmail.com,
+ akpm@linux-foundation.org, alexios.zavras@intel.com,
+ wanghaibin.wang@huawei.com, jiangkunkun@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org,
+ Catalin Marinas <catalin.marinas@arm.com>, Joerg Roedel <joro@8bytes.org>,
+ Daniel Lezcano <daniel.lezcano@linaro.org>, linux-kernel@vger.kernel.org,
+ Alexios Zavras <alexios.zavras@intel.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ Robin Murphy <robin.murphy@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -105,104 +96,170 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thursday 11 Mar 2021 at 19:36:39 (+0000), Will Deacon wrote:
-> On Wed, Mar 10, 2021 at 05:57:30PM +0000, Quentin Perret wrote:
-> > diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> > index 066030717a4c..f2d8b479ff74 100644
-> > --- a/arch/arm64/kernel/cpufeature.c
-> > +++ b/arch/arm64/kernel/cpufeature.c
-> > @@ -1154,6 +1154,18 @@ u64 read_sanitised_ftr_reg(u32 id)
-> >  }
-> >  EXPORT_SYMBOL_GPL(read_sanitised_ftr_reg);
-> >  
-> > +int copy_ftr_reg(u32 id, struct arm64_ftr_reg *dst)
-> > +{
-> > +	struct arm64_ftr_reg *regp = get_arm64_ftr_reg(id);
-> > +
-> > +	if (!regp)
-> > +		return -EINVAL;
-> > +
-> > +	memcpy(dst, regp, sizeof(*regp));
+On Thu, 11 Mar 2021 14:28:17 +0000,
+Keqian Zhu <zhukeqian1@huawei.com> wrote:
 > 
-> Can you not just use struct assignment here?
+> Hi Marc,
+> 
+> On 2021/3/11 16:43, Marc Zyngier wrote:
+> > Digging this patch back from my Inbox...
+> Yeah, thanks ;-)
+> 
+> > 
+> > On Fri, 22 Jan 2021 08:36:50 +0000,
+> > Keqian Zhu <zhukeqian1@huawei.com> wrote:
+> >>
+> >> The MMIO region of a device maybe huge (GB level), try to use block
+> >> mapping in stage2 to speedup both map and unmap.
+> >>
+> >> Especially for unmap, it performs TLBI right after each invalidation
+> >> of PTE. If all mapping is of PAGE_SIZE, it takes much time to handle
+> >> GB level range.
+> >>
+> >> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+> >> ---
+> >>  arch/arm64/include/asm/kvm_pgtable.h | 11 +++++++++++
+> >>  arch/arm64/kvm/hyp/pgtable.c         | 15 +++++++++++++++
+> >>  arch/arm64/kvm/mmu.c                 | 12 ++++++++----
+> >>  3 files changed, 34 insertions(+), 4 deletions(-)
+> >>
+> >> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> >> index 52ab38db04c7..2266ac45f10c 100644
+> >> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> >> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> >> @@ -82,6 +82,17 @@ struct kvm_pgtable_walker {
+> >>  	const enum kvm_pgtable_walk_flags	flags;
+> >>  };
+> >>  
+> >> +/**
+> >> + * kvm_supported_pgsize() - Get the max supported page size of a mapping.
+> >> + * @pgt:	Initialised page-table structure.
+> >> + * @addr:	Virtual address at which to place the mapping.
+> >> + * @end:	End virtual address of the mapping.
+> >> + * @phys:	Physical address of the memory to map.
+> >> + *
+> >> + * The smallest return value is PAGE_SIZE.
+> >> + */
+> >> +u64 kvm_supported_pgsize(struct kvm_pgtable *pgt, u64 addr, u64 end, u64 phys);
+> >> +
+> >>  /**
+> >>   * kvm_pgtable_hyp_init() - Initialise a hypervisor stage-1 page-table.
+> >>   * @pgt:	Uninitialised page-table structure to initialise.
+> >> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> >> index bdf8e55ed308..ab11609b9b13 100644
+> >> --- a/arch/arm64/kvm/hyp/pgtable.c
+> >> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> >> @@ -81,6 +81,21 @@ static bool kvm_block_mapping_supported(u64 addr, u64 end, u64 phys, u32 level)
+> >>  	return IS_ALIGNED(addr, granule) && IS_ALIGNED(phys, granule);
+> >>  }
+> >>  
+> >> +u64 kvm_supported_pgsize(struct kvm_pgtable *pgt, u64 addr, u64 end, u64 phys)
+> >> +{
+> >> +	u32 lvl;
+> >> +	u64 pgsize = PAGE_SIZE;
+> >> +
+> >> +	for (lvl = pgt->start_level; lvl < KVM_PGTABLE_MAX_LEVELS; lvl++) {
+> >> +		if (kvm_block_mapping_supported(addr, end, phys, lvl)) {
+> >> +			pgsize = kvm_granule_size(lvl);
+> >> +			break;
+> >> +		}
+> >> +	}
+> >> +
+> >> +	return pgsize;
+> >> +}
+> >> +
+> >>  static u32 kvm_pgtable_idx(struct kvm_pgtable_walk_data *data, u32 level)
+> >>  {
+> >>  	u64 shift = kvm_granule_shift(level);
+> >> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> >> index 7d2257cc5438..80b403fc8e64 100644
+> >> --- a/arch/arm64/kvm/mmu.c
+> >> +++ b/arch/arm64/kvm/mmu.c
+> >> @@ -499,7 +499,8 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
+> >>  int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+> >>  			  phys_addr_t pa, unsigned long size, bool writable)
+> >>  {
+> >> -	phys_addr_t addr;
+> >> +	phys_addr_t addr, end;
+> >> +	unsigned long pgsize;
+> >>  	int ret = 0;
+> >>  	struct kvm_mmu_memory_cache cache = { 0, __GFP_ZERO, NULL, };
+> >>  	struct kvm_pgtable *pgt = kvm->arch.mmu.pgt;
+> >> @@ -509,21 +510,24 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+> >>  
+> >>  	size += offset_in_page(guest_ipa);
+> >>  	guest_ipa &= PAGE_MASK;
+> >> +	end = guest_ipa + size;
+> >>  
+> >> -	for (addr = guest_ipa; addr < guest_ipa + size; addr += PAGE_SIZE) {
+> >> +	for (addr = guest_ipa; addr < end; addr += pgsize) {
+> >>  		ret = kvm_mmu_topup_memory_cache(&cache,
+> >>  						 kvm_mmu_cache_min_pages(kvm));
+> >>  		if (ret)
+> >>  			break;
+> >>  
+> >> +		pgsize = kvm_supported_pgsize(pgt, addr, end, pa);
+> >> +
+> >>  		spin_lock(&kvm->mmu_lock);
+> >> -		ret = kvm_pgtable_stage2_map(pgt, addr, PAGE_SIZE, pa, prot,
+> >> +		ret = kvm_pgtable_stage2_map(pgt, addr, pgsize, pa, prot,
+> >>  					     &cache);
+> >>  		spin_unlock(&kvm->mmu_lock);
+> >>  		if (ret)
+> >>  			break;
+> >>  
+> >> -		pa += PAGE_SIZE;
+> >> +		pa += pgsize;
+> >>  	}
+> >>  
+> >>  	kvm_mmu_free_memory_cache(&cache);
+> > 
+> > There is one issue with this patch, which is that it only does half
+> > the job. A VM_PFNMAP VMA can definitely be faulted in dynamically, and
+> > in that case we force this to be a page mapping. This conflicts with
+> > what you are doing here.
+> Oh yes, these two paths should keep a same mapping logic.
+> 
+> I try to search the "force_pte" and find out some discussion [1]
+> between you and Christoffer.  And I failed to get a reason about
+> forcing pte mapping for device MMIO region (expect that we want to
+> keep a same logic with the eager mapping path). So if you don't
+> object to it, I will try to implement block mapping for device MMIO
+> in user_mem_abort().
+> 
+> > 
+> > There is also the fact that if we can map things on demand, why are we
+> > still mapping these MMIO regions ahead of time?
+>
+> Indeed. Though this provides good *startup* performance for guest
+> accessing MMIO, it's hard to keep the two paths in sync. We can keep
+> this minor optimization or delete it to avoid hard maintenance,
+> which one do you prefer?
 
-Sure.
+I think we should be able to get rid of the startup path. If we can do
+it for memory, I see no reason not to do it for MMIO.
 
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/cache.S b/arch/arm64/kvm/hyp/nvhe/cache.S
-> > new file mode 100644
-> > index 000000000000..36cef6915428
-> > --- /dev/null
-> > +++ b/arch/arm64/kvm/hyp/nvhe/cache.S
-> > @@ -0,0 +1,13 @@
-> > +/* SPDX-License-Identifier: GPL-2.0-only */
-> > +/*
-> > + * Code copied from arch/arm64/mm/cache.S.
-> > + */
-> > +
-> > +#include <linux/linkage.h>
-> > +#include <asm/assembler.h>
-> > +#include <asm/alternative.h>
-> > +
-> > +SYM_FUNC_START_PI(__flush_dcache_area)
-> > +	dcache_by_line_op civac, sy, x0, x1, x2, x3
-> > +	ret
-> > +SYM_FUNC_END_PI(__flush_dcache_area)
-> 
-> Separate patch for this? (or fold it into that one really near the start
-> that introduces some other PI helpers).
+> BTW, could you please have a look at my another patch series[2]
+> about HW/SW combined dirty log? ;)
 
-Right, I guess that'll make reverts and such easier so why not.
+I will eventually, but while I really appreciate your contributions in
+terms of features and bug fixes, I would really *love* it if you were
+a bit more active on the list when it comes to reviewing other
+people's code.
 
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index 4f2f1e3145de..84be93df52fa 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -21,6 +21,7 @@
-> >  #include <asm/debug-monitors.h>
-> >  #include <asm/esr.h>
-> >  #include <asm/kvm_arm.h>
-> > +#include <asm/kvm_cpufeature.h>
-> >  #include <asm/kvm_emulate.h>
-> >  #include <asm/kvm_hyp.h>
-> >  #include <asm/kvm_mmu.h>
-> > @@ -2775,3 +2776,23 @@ void kvm_sys_reg_table_init(void)
-> >  	/* Clear all higher bits. */
-> >  	cache_levels &= (1 << (i*3))-1;
-> >  }
-> > +
-> > +#undef KVM_HYP_CPU_FTR_REG
-> > +#define KVM_HYP_CPU_FTR_REG(id, name) \
-> > +	{ .sys_id = id, .dst = (struct arm64_ftr_reg *)&kvm_nvhe_sym(name) },
-> > +struct __ftr_reg_copy_entry {
-> > +	u32			sys_id;
-> > +	struct arm64_ftr_reg	*dst;
-> > +} hyp_ftr_regs[] __initdata = {
-> > +	#include <asm/kvm_cpufeature.h>
-> > +};
-> 
-> This looks a bit elaborate to me. Why can't you just spell things out here
-> like:
-> 
-> #define KVM_HYP_CPU_FTR_REG(id, name) \
-> 	{ .sys_id = id, .dst = (struct arm64_ftr_reg *)&kvm_nvhe_sym(name) }
-> 
-> struct __ftr_reg_copy_entry {
-> 	u32			sys_id;
-> 	struct arm64_ftr_reg	*dst;
-> } hyp_ftr_regs[] __initdata = {
-> 	KVM_HYP_CPU_FTR_REG(SYS_CTR_EL0, arm64_ftr_reg_ctrel0),
-> 	...
-> };
-> 
-> and then have the header file be a normal, guarded header which just
-> declares these things? The id parameter to the macro isn't used there.
+There is no shortage of patches that really need reviewing, and just
+pointing me in the direction of your favourite series doesn't really
+help. I have something like 200+ patches that need careful reviewing
+in my inbox, and they all deserve the same level of attention.
 
-I just tried to reduce the boilerplate as much as possible -- in the
-current form you only need to add additional features to the header
-it'll 'just work'.
+To make it short, help me to help you!
 
 Thanks,
-Quentin
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
