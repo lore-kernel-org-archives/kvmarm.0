@@ -2,61 +2,69 @@ Return-Path: <SRS0=ChHZ=IK=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2656DC433E6
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 11:29:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3215C433DB
+	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 11:34:42 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8DB2964F80
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 11:29:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DB2964F80
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id CF18D64FC3
+	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 11:34:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF18D64FC3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C0CA4B342;
-	Fri, 12 Mar 2021 06:29:26 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A3F54B2FD;
+	Fri, 12 Mar 2021 06:34:41 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id G9-NMmhM3KX2; Fri, 12 Mar 2021 06:29:24 -0500 (EST)
+	with ESMTP id G0HyASMAQ5co; Fri, 12 Mar 2021 06:34:37 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B53864B43A;
-	Fri, 12 Mar 2021 06:29:24 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C7F14B30B;
+	Fri, 12 Mar 2021 06:34:37 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E20F4B401
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 06:29:23 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A2CF84B30B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 06:34:36 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sUHfFXdVBWbH for <kvmarm@lists.cs.columbia.edu>;
- Fri, 12 Mar 2021 06:29:21 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D3B714B342
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 06:29:21 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4FF7EED1;
- Fri, 12 Mar 2021 03:29:21 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 544BC3F793;
- Fri, 12 Mar 2021 03:29:20 -0800 (PST)
-Subject: Re: [PATCH kvmtool v2 13/22] hw/serial: Refactor trap handler
-To: Andre Przywara <andre.przywara@arm.com>, Will Deacon <will@kernel.org>,
- Julien Thierry <julien.thierry.kdev@gmail.com>
-References: <20210225005915.26423-1-andre.przywara@arm.com>
- <20210225005915.26423-14-andre.przywara@arm.com>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <07b64ff1-a9d7-0393-36f4-8df4f87937f6@arm.com>
-Date: Fri, 12 Mar 2021 11:29:43 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+ with ESMTP id Amui+j9Zgd4m for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 12 Mar 2021 06:34:32 -0500 (EST)
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1F20E4B2FD
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 06:34:31 -0500 (EST)
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.59])
+ by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DxkDk5yxmzNlm9;
+ Fri, 12 Mar 2021 19:32:06 +0800 (CST)
+Received: from [10.174.184.135] (10.174.184.135) by
+ DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
+ 14.3.498.0; Fri, 12 Mar 2021 19:34:18 +0800
+Subject: Re: [PATCH v3 3/4] KVM: arm64: GICv4.1: Restore VLPI's pending state
+ to physical side
+To: Marc Zyngier <maz@kernel.org>
+References: <20210127121337.1092-1-lushenming@huawei.com>
+ <20210127121337.1092-4-lushenming@huawei.com> <87tupif3x3.wl-maz@kernel.org>
+ <0820f429-4c29-acd6-d9e0-af9f6deb68e4@huawei.com>
+ <87k0qcg2s6.wl-maz@kernel.org>
+ <aecfbf72-c653-e967-b539-89f629b52cde@huawei.com>
+ <87h7lgfwzu.wl-maz@kernel.org>
+From: Shenming Lu <lushenming@huawei.com>
+Message-ID: <df4b939d-27c1-be84-ea7e-327251958cde@huawei.com>
+Date: Fri, 12 Mar 2021 19:34:07 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.2.2
 MIME-Version: 1.0
-In-Reply-To: <20210225005915.26423-14-andre.przywara@arm.com>
+In-Reply-To: <87h7lgfwzu.wl-maz@kernel.org>
 Content-Language: en-US
-Cc: Marc Zyngier <maz@kernel.org>, Sami Mujawar <sami.mujawar@arm.com>,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+X-Originating-IP: [10.174.184.135]
+X-CFilter-Loop: Reflected
+Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, kvm@vger.kernel.org,
+ Cornelia Huck <cohuck@redhat.com>, linux-kernel@vger.kernel.org,
+ Alex Williamson <alex.williamson@redhat.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -68,258 +76,69 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Andre,
-
-On 2/25/21 12:59 AM, Andre Przywara wrote:
-> With the planned retirement of the special ioport emulation code, we
-> need to provide an emulation function compatible with the MMIO prototype.
->
-> Adjust the trap handler to use that new function, and provide shims to
-> implement the old ioport interface, for now.
->
-> We drop the usage of ioport__read8/write8 entirely, as this would only
-> be applicable for I/O port accesses, and does nothing for 8-bit wide
-> accesses anyway.
->
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
->  hw/serial.c | 93 +++++++++++++++++++++++++++++++++--------------------
->  1 file changed, 58 insertions(+), 35 deletions(-)
->
-> diff --git a/hw/serial.c b/hw/serial.c
-> index b0465d99..c495eac1 100644
-> --- a/hw/serial.c
-> +++ b/hw/serial.c
-> @@ -242,36 +242,31 @@ void serial8250__inject_sysrq(struct kvm *kvm, char sysrq)
->  	sysrq_pending = sysrq;
->  }
->  
-> -static bool serial8250_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port,
-> -			   void *data, int size)
-> +static bool serial8250_out(struct serial8250_device *dev, struct kvm_cpu *vcpu,
-> +			   u16 offset, u8 data)
->  {
-> -	struct serial8250_device *dev = ioport->priv;
-> -	u16 offset;
->  	bool ret = true;
-> -	char *addr = data;
->  
->  	mutex_lock(&dev->mutex);
->  
-> -	offset = port - dev->iobase;
-> -
->  	switch (offset) {
->  	case UART_TX:
->  		if (dev->lcr & UART_LCR_DLAB) {
-> -			dev->dll = ioport__read8(data);
-> +			dev->dll = data;
->  			break;
->  		}
->  
->  		/* Loopback mode */
->  		if (dev->mcr & UART_MCR_LOOP) {
->  			if (dev->rxcnt < FIFO_LEN) {
-> -				dev->rxbuf[dev->rxcnt++] = *addr;
-> +				dev->rxbuf[dev->rxcnt++] = data;
->  				dev->lsr |= UART_LSR_DR;
->  			}
->  			break;
->  		}
->  
->  		if (dev->txcnt < FIFO_LEN) {
-> -			dev->txbuf[dev->txcnt++] = *addr;
-> +			dev->txbuf[dev->txcnt++] = data;
->  			dev->lsr &= ~UART_LSR_TEMT;
->  			if (dev->txcnt == FIFO_LEN / 2)
->  				dev->lsr &= ~UART_LSR_THRE;
-> @@ -283,18 +278,18 @@ static bool serial8250_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port
->  		break;
->  	case UART_IER:
->  		if (!(dev->lcr & UART_LCR_DLAB))
-> -			dev->ier = ioport__read8(data) & 0x0f;
-> +			dev->ier = data & 0x0f;
->  		else
-> -			dev->dlm = ioport__read8(data);
-> +			dev->dlm = data;
->  		break;
->  	case UART_FCR:
-> -		dev->fcr = ioport__read8(data);
-> +		dev->fcr = data;
->  		break;
->  	case UART_LCR:
-> -		dev->lcr = ioport__read8(data);
-> +		dev->lcr = data;
->  		break;
->  	case UART_MCR:
-> -		dev->mcr = ioport__read8(data);
-> +		dev->mcr = data;
->  		break;
->  	case UART_LSR:
->  		/* Factory test */
-> @@ -303,7 +298,7 @@ static bool serial8250_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port
->  		/* Not used */
->  		break;
->  	case UART_SCR:
-> -		dev->scr = ioport__read8(data);
-> +		dev->scr = data;
->  		break;
->  	default:
->  		ret = false;
-> @@ -317,7 +312,7 @@ static bool serial8250_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port
->  	return ret;
->  }
->  
-> -static void serial8250_rx(struct serial8250_device *dev, void *data)
-> +static void serial8250_rx(struct serial8250_device *dev, u8 *data)
->  {
->  	if (dev->rxdone == dev->rxcnt)
->  		return;
-> @@ -325,57 +320,54 @@ static void serial8250_rx(struct serial8250_device *dev, void *data)
->  	/* Break issued ? */
->  	if (dev->lsr & UART_LSR_BI) {
->  		dev->lsr &= ~UART_LSR_BI;
-> -		ioport__write8(data, 0);
-> +		*data = 0;
->  		return;
->  	}
->  
-> -	ioport__write8(data, dev->rxbuf[dev->rxdone++]);
-> +	*data = dev->rxbuf[dev->rxdone++];
->  	if (dev->rxcnt == dev->rxdone) {
->  		dev->lsr &= ~UART_LSR_DR;
->  		dev->rxcnt = dev->rxdone = 0;
->  	}
->  }
->  
-> -static bool serial8250_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
-> +static bool serial8250_in(struct serial8250_device *dev, struct kvm_cpu *vcpu,
-> +			  u16 offset, u8 *data)
->  {
-> -	struct serial8250_device *dev = ioport->priv;
-> -	u16 offset;
->  	bool ret = true;
->  
->  	mutex_lock(&dev->mutex);
->  
-> -	offset = port - dev->iobase;
-> -
->  	switch (offset) {
->  	case UART_RX:
->  		if (dev->lcr & UART_LCR_DLAB)
-> -			ioport__write8(data, dev->dll);
-> +			*data = dev->dll;
->  		else
->  			serial8250_rx(dev, data);
->  		break;
->  	case UART_IER:
->  		if (dev->lcr & UART_LCR_DLAB)
-> -			ioport__write8(data, dev->dlm);
-> +			*data = dev->dlm;
->  		else
-> -			ioport__write8(data, dev->ier);
-> +			*data = dev->ier;
->  		break;
->  	case UART_IIR:
-> -		ioport__write8(data, dev->iir | UART_IIR_TYPE_BITS);
-> +		*data = dev->iir | UART_IIR_TYPE_BITS;
->  		break;
->  	case UART_LCR:
-> -		ioport__write8(data, dev->lcr);
-> +		*data = dev->lcr;
->  		break;
->  	case UART_MCR:
-> -		ioport__write8(data, dev->mcr);
-> +		*data = dev->mcr;
->  		break;
->  	case UART_LSR:
-> -		ioport__write8(data, dev->lsr);
-> +		*data = dev->lsr;
->  		break;
->  	case UART_MSR:
-> -		ioport__write8(data, dev->msr);
-> +		*data = dev->msr;
->  		break;
->  	case UART_SCR:
-> -		ioport__write8(data, dev->scr);
-> +		*data = dev->scr;
->  		break;
->  	default:
->  		ret = false;
-> @@ -389,6 +381,37 @@ static bool serial8250_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port,
->  	return ret;
->  }
-
-I'm not sure about replacing ioport_{read,write}8 with pointer dereferencing. They
-are functionally equivalent because big-endian and little-endian are about the
-order of bytes in memory, not the order of bits, but I don't think the change
-makes much sense because:
-
-1. All the other emulated devices use the ioport accessors, even in the case of 8
-bit accesses. For example, the RTC device uses ioport accessors and it too is
-converted in the end to a MMIO device, just like serial.
-
-2. The patch is about refactoring the emulation callbacks, other (non-trivial)
-changes should be a separate patch.
-
-Please let me know if it's something that I'm missing. Other than this change, the
-patch looks good.
-
-Thanks,
-
-Alex
-
->  
-> +static void serial8250_mmio(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len,
-> +			    u8 is_write, void *ptr)
-> +{
-> +	struct serial8250_device *dev = ptr;
-> +
-> +	if (is_write)
-> +		serial8250_out(dev, vcpu, addr - dev->iobase, *data);
-> +	else
-> +		serial8250_in(dev, vcpu, addr - dev->iobase, data);
-> +}
-> +
-> +static bool serial8250_ioport_out(struct ioport *ioport, struct kvm_cpu *vcpu,
-> +				  u16 port, void *data, int size)
-> +{
-> +	struct serial8250_device *dev = ioport->priv;
-> +
-> +	serial8250_mmio(vcpu, port, data, 1, true, dev);
-> +
-> +	return true;
-> +}
-> +
-> +static bool serial8250_ioport_in(struct ioport *ioport, struct kvm_cpu *vcpu,
-> +				 u16 port, void *data, int size)
-> +{
-> +	struct serial8250_device *dev = ioport->priv;
-> +
-> +	serial8250_mmio(vcpu, port, data, 1, false, dev);
-> +
-> +	return true;
-> +}
-> +
->  #ifdef CONFIG_HAS_LIBFDT
->  
->  char *fdt_stdout_path = NULL;
-> @@ -427,8 +450,8 @@ void serial8250_generate_fdt_node(void *fdt, struct device_header *dev_hdr,
->  #endif
->  
->  static struct ioport_operations serial8250_ops = {
-> -	.io_in			= serial8250_in,
-> -	.io_out			= serial8250_out,
-> +	.io_in			= serial8250_ioport_in,
-> +	.io_out			= serial8250_ioport_out,
->  };
->  
->  static int serial8250__device_init(struct kvm *kvm,
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gMjAyMS8zLzEyIDE5OjEwLCBNYXJjIFp5bmdpZXIgd3JvdGU6Cj4gT24gRnJpLCAxMiBNYXIg
+MjAyMSAxMDo0ODoyOSArMDAwMCwKPiBTaGVubWluZyBMdSA8bHVzaGVubWluZ0BodWF3ZWkuY29t
+PiB3cm90ZToKPj4KPj4gT24gMjAyMS8zLzEyIDE3OjA1LCBNYXJjIFp5bmdpZXIgd3JvdGU6Cj4+
+PiBPbiBUaHUsIDExIE1hciAyMDIxIDEyOjMyOjA3ICswMDAwLAo+Pj4gU2hlbm1pbmcgTHUgPGx1
+c2hlbm1pbmdAaHVhd2VpLmNvbT4gd3JvdGU6Cj4+Pj4KPj4+PiBPbiAyMDIxLzMvMTEgMTc6MTQs
+IE1hcmMgWnluZ2llciB3cm90ZToKPj4+Pj4gT24gV2VkLCAyNyBKYW4gMjAyMSAxMjoxMzozNiAr
+MDAwMCwKPj4+Pj4gU2hlbm1pbmcgTHUgPGx1c2hlbm1pbmdAaHVhd2VpLmNvbT4gd3JvdGU6Cj4+
+Pj4+Pgo+Pj4+Pj4gRnJvbTogWmVuZ2h1aSBZdSA8eXV6ZW5naHVpQGh1YXdlaS5jb20+Cj4+Pj4+
+Pgo+Pj4+Pj4gV2hlbiBzZXR0aW5nIHRoZSBmb3J3YXJkaW5nIHBhdGggb2YgYSBWTFBJIChzd2l0
+Y2ggdG8gdGhlIEhXIG1vZGUpLAo+Pj4+Pj4gd2UgY291bGQgYWxzbyB0cmFuc2ZlciB0aGUgcGVu
+ZGluZyBzdGF0ZSBmcm9tIGlycS0+cGVuZGluZ19sYXRjaCB0bwo+Pj4+Pj4gVlBUIChlc3BlY2lh
+bGx5IGluIG1pZ3JhdGlvbiwgdGhlIHBlbmRpbmcgc3RhdGVzIG9mIFZMUElzIGFyZSByZXN0b3Jl
+ZAo+Pj4+Pj4gaW50byBrdm3igJlzIHZnaWMgZmlyc3QpLiBBbmQgd2UgY3VycmVudGx5IHNlbmQg
+IklOVCtWU1lOQyIgdG8gdHJpZ2dlcgo+Pj4+Pj4gYSBWTFBJIHRvIHBlbmRpbmcuCj4+Pj4+Pgo+
+Pj4+Pj4gU2lnbmVkLW9mZi1ieTogWmVuZ2h1aSBZdSA8eXV6ZW5naHVpQGh1YXdlaS5jb20+Cj4+
+Pj4+PiBTaWduZWQtb2ZmLWJ5OiBTaGVubWluZyBMdSA8bHVzaGVubWluZ0BodWF3ZWkuY29tPgo+
+Pj4+Pj4gLS0tCj4+Pj4+PiAgYXJjaC9hcm02NC9rdm0vdmdpYy92Z2ljLXY0LmMgfCAxNCArKysr
+KysrKysrKysrKwo+Pj4+Pj4gIDEgZmlsZSBjaGFuZ2VkLCAxNCBpbnNlcnRpb25zKCspCj4+Pj4+
+Pgo+Pj4+Pj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL3ZnaWMvdmdpYy12NC5jIGIvYXJj
+aC9hcm02NC9rdm0vdmdpYy92Z2ljLXY0LmMKPj4+Pj4+IGluZGV4IGFjMDI5YmEzZDMzNy4uYTM1
+NDJhZjZmMDRhIDEwMDY0NAo+Pj4+Pj4gLS0tIGEvYXJjaC9hcm02NC9rdm0vdmdpYy92Z2ljLXY0
+LmMKPj4+Pj4+ICsrKyBiL2FyY2gvYXJtNjQva3ZtL3ZnaWMvdmdpYy12NC5jCj4+Pj4+PiBAQCAt
+NDQ5LDYgKzQ0OSwyMCBAQCBpbnQga3ZtX3ZnaWNfdjRfc2V0X2ZvcndhcmRpbmcoc3RydWN0IGt2
+bSAqa3ZtLCBpbnQgdmlycSwKPj4+Pj4+ICAJaXJxLT5ob3N0X2lycQk9IHZpcnE7Cj4+Pj4+PiAg
+CWF0b21pY19pbmMoJm1hcC52cGUtPnZscGlfY291bnQpOwo+Pj4+Pj4gIAo+Pj4+Pj4gKwkvKiBU
+cmFuc2ZlciBwZW5kaW5nIHN0YXRlICovCj4+Pj4+PiArCWlmIChpcnEtPnBlbmRpbmdfbGF0Y2gp
+IHsKPj4+Pj4+ICsJCXJldCA9IGlycV9zZXRfaXJxY2hpcF9zdGF0ZShpcnEtPmhvc3RfaXJxLAo+
+Pj4+Pj4gKwkJCQkJICAgIElSUUNISVBfU1RBVEVfUEVORElORywKPj4+Pj4+ICsJCQkJCSAgICBp
+cnEtPnBlbmRpbmdfbGF0Y2gpOwo+Pj4+Pj4gKwkJV0FSTl9SQVRFTElNSVQocmV0LCAiSVJRICVk
+IiwgaXJxLT5ob3N0X2lycSk7Cj4+Pj4+PiArCj4+Pj4+PiArCQkvKgo+Pj4+Pj4gKwkJICogTGV0
+IGl0IGJlIHBydW5lZCBmcm9tIGFwX2xpc3QgbGF0ZXIgYW5kIGRvbid0IGJvdGhlcgo+Pj4+Pj4g
+KwkJICogdGhlIExpc3QgUmVnaXN0ZXIuCj4+Pj4+PiArCQkgKi8KPj4+Pj4+ICsJCWlycS0+cGVu
+ZGluZ19sYXRjaCA9IGZhbHNlOwo+Pj4+Pgo+Pj4+PiBOQUsuIElmIHRoZSBpbnRlcnJ1cHQgaXMg
+b24gdGhlIEFQIGxpc3QsIGl0IG11c3QgYmUgcHJ1bmVkIGZyb20gaXQKPj4+Pj4gKmltbWVkaWF0
+ZWx5Ki4gVGhlIG9ubHkgY2FzZSB3aGVyZSBpdCBjYW4gYmUgIXBlbmRpbmcgYW5kIHN0aWxsIG9u
+IHRoZQo+Pj4+PiBBUCBsaXN0IGlzIGluIGludGVydmFsIGJldHdlZW4gc3luYyBhbmQgcHJ1bmUu
+IElmIHdlIHN0YXJ0IG1lc3NpbmcKPj4+Pj4gd2l0aCB0aGlzLCB3ZSBjYW4ndCByZWFzb24gYWJv
+dXQgdGhlIHN0YXRlIG9mIHRoaXMgbGlzdCBhbnltb3JlLgo+Pj4+Pgo+Pj4+PiBDb25zaWRlciBj
+YWxsaW5nIHZnaWNfcXVldWVfaXJxX3VubG9jaygpIGhlcmUuCj4+Pj4KPj4+PiBUaGFua3MgZm9y
+IGdpdmluZyBhIGhpbnQsIGJ1dCBpdCBzZWVtcyB0aGF0IHZnaWNfcXVldWVfaXJxX3VubG9jaygp
+IG9ubHkKPj4+PiBxdWV1ZXMgYW4gSVJRIGFmdGVyIGNoZWNraW5nLCBkaWQgeW91IG1lYW4gdmdp
+Y19wcnVuZV9hcF9saXN0KCkgaW5zdGVhZD8KPj4+Cj4+PiBObywgSSByZWFsbHkgbWVhbiB2Z2lj
+X3F1ZXVlX2lycV91bmxvY2soKS4gSXQgY2FuIGJlIHVzZWQgdG8gcmVtb3ZlCj4+PiB0aGUgcGVu
+ZGluZyBzdGF0ZSBmcm9tIGFuIGludGVycnVwdCwgYW5kIGRyb3AgaXQgZnJvbSB0aGUgQVAKPj4+
+IGxpc3QuIFRoaXMgaXMgZXhhY3RseSB3aGF0IGhhcHBlbnMgd2hlbiBjbGVhcmluZyB0aGUgcGVu
+ZGluZyBzdGF0ZSBvZgo+Pj4gYSBsZXZlbCBpbnRlcnJ1cHQsIGZvciBleGFtcGxlLgo+Pgo+PiBI
+aSwgSSBoYXZlIGdvbmUgdGhyb3VnaCB2Z2ljX3F1ZXVlX2lycV91bmxvY2sgbW9yZSB0aGFuIG9u
+Y2UsIGJ1dAo+PiBzdGlsbCBjYW4ndCBmaW5kIHRoZSBwbGFjZSBpbiBpdCB0byBkcm9wIGFuIElS
+USBmcm9tIHRoZSBBUAo+PiBsaXN0Li4uIERpZCBJIG1pc3Mgc29tZXRoaW5nID8uLi4gIE9yIGNv
+dWxkIHlvdSBoZWxwIHRvIHBvaW50IGl0Cj4+IG91dD8gVGhhbmtzIHZlcnkgbXVjaCBmb3IgdGhp
+cyEKPiAKPiBOTywgeW91IGFyZSByaWdodC4gSSB0aGluayB0aGlzIGlzIGEgbWlzc2luZyBvcHRp
+bWlzYXRpb24uIFBsZWFzZSBjYWxsCj4gdGhlIGZ1bmN0aW9uIGFueXdheSwgYXMgdGhhdCdzIHdo
+YXQgaXMgcmVxdWlyZWQgdG8gY29tbXVuaWNhdGUgYQo+IGNoYW5nZSBvZiBzdGF0ZSBpbiBnZW5l
+cmFsLj4KPiBJJ2xsIGhhdmUgYSB0aGluayBhYm91dCBpdC4KCk1heWJlIHdlIGNvdWxkIGNhbGwg
+dmdpY19wcnVuZV9hcF9saXN0KCkgaWYgKGlycS0+dmNwdSAmJiAhdmdpY190YXJnZXRfb3JhY2xl
+KGlycSkpIGluIHZnaWNfcXVldWVfaXJxX3VubG9jaygpLi4uCgpPSywgSSB3aWxsIHJldGVzdCB0
+aGlzIHNlcmllcyBhbmQgc2VuZCBhIHY0IHNvb24uIDotKQoKVGhhbmtzLApTaGVubWluZwoKPiAK
+PiBUaGFua3MsCj4gCj4gCU0uCj4gCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlh
+LmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFy
+bQo=
