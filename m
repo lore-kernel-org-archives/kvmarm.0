@@ -7,82 +7,84 @@ X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4E2FC433E0
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 05:32:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0D2EC433DB
+	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 06:23:11 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5C45064DAF
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 05:32:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C45064DAF
+	by mail.kernel.org (Postfix) with ESMTP id 2716E64F84
+	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 06:23:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2716E64F84
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DEF6F4B72A;
-	Fri, 12 Mar 2021 00:32:24 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 684434B678;
+	Fri, 12 Mar 2021 01:23:10 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id dbIUaCRUeY7B; Fri, 12 Mar 2021 00:32:23 -0500 (EST)
+	with ESMTP id G42YJGkKOmbw; Fri, 12 Mar 2021 01:23:08 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8035A4B651;
-	Fri, 12 Mar 2021 00:32:23 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CEECF4B698;
+	Fri, 12 Mar 2021 01:23:08 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 44E254B614
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 00:32:22 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C6FB44B698
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 01:23:06 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 34FPof5ASIvX for <kvmarm@lists.cs.columbia.edu>;
- Fri, 12 Mar 2021 00:32:18 -0500 (EST)
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com
- [209.85.221.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CF2344B604
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 00:32:17 -0500 (EST)
-Received: by mail-wr1-f46.google.com with SMTP id l11so4099937wrp.7
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Mar 2021 21:32:17 -0800 (PST)
+ with ESMTP id rvLkyzotW5Am for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 12 Mar 2021 01:23:05 -0500 (EST)
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com
+ [209.85.128.44])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 347A84B678
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 01:23:05 -0500 (EST)
+Received: by mail-wm1-f44.google.com with SMTP id
+ n11-20020a05600c4f8bb029010e5cf86347so3983278wmq.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Mar 2021 22:23:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=5A3nvq8VEOu9DY7gsHpSl1K1VDNI7/9L/4JQKSZqiFk=;
- b=FwsQ2M3NHGDruc9OHswIGsix60JeffjTo+HASUiHoIVGMqZuh/NDBR/+Sm2K7r2Okr
- 0nuM9xCtcIojBQDTEk4zDfABucbqWLTzvxJTR4JHoM+mCQP3rwca1tCUYEN0dToTvFah
- BALBINBUAND0Na5kKDkOoe1xhf66tJ4oVN3lGFX53Ygfum+Oq0kHyUQLw1aY2kQ7sKFq
- 88yTraHfeVAeRO/ps6wICW6P5fgM4QepeiI5Ec0sDFwKxhWoWvXnWjlZhcxSYAdSwmqv
- ETfPxVXZY+hDmS2hvIJSutKknMCtBRC+9+N6DT6HBrrp+HixWU5yNs057JYRs2nWut7c
- aVJA==
+ bh=wLF9+hllwZQb6lUbqKASy10z/RO/Q28UjMoBJgQA7tw=;
+ b=d6hKdxaB5cSq/6Ojr6GjVEwYC8cdV2akx9ggw9MewgFONAuVbQvzXMjU0gW6sn8BH+
+ 4x+NiaNHvcLwXI3GOJNrTl+F2Myp+3SMV3BIQ3VSn3tqAgz0/wT2kZwbbE1pwGKLJ6ho
+ 9o72x8YhyEH9/1qZ+4yWM7mTa+/Zgd5GomXPSfYlASrNzSfjbAjBH7DGBu78T+anhO+r
+ KBG+GEXi9+RJv3m40KAKZzZQ9q1VPC0xTYbxmZqcbhp4sKCPgpbuKcpLX+dkNYnOcDix
+ 4bR8xDHUDg36MY05KosYoFIBqIKLXUPJXip330atDQHi91ND4u4MEPXzUAJBlczXlujz
+ VCDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=5A3nvq8VEOu9DY7gsHpSl1K1VDNI7/9L/4JQKSZqiFk=;
- b=AYOt4DXWiXqocLoMDFA8D/HEMS3xf2TaGPMuMHekvpyVAutjq7gkZh8KyJE+cKiUHi
- R4THwm2cPZcXgpCcrQ+pzzyJj5VeVO19tKCqX9UfYbd+T5xjPcRKPfjQPavZ6soO14aT
- U8nClDr+UyHavdCIDVzlbSFRGQonnMtGFrAGPc3gFWcAlpbTU1+AwwTdmdw3d6CYFVRQ
- Tfw+0izjZUs8313uhVL3SlsrFu39sJmAQZbYt0eEGk5vp7f/QdqcHEblY/nHHi3GH3Ee
- URI/x7oL61PqtHE72wz1TQrXjbb/iSFX5L3FNgqMGub77GOgmItLZSMMmqvrzjoBRYRo
- 5YLA==
-X-Gm-Message-State: AOAM531V8Vt+ztCHprEzL3ZICxNaM94uIbaGiiJrYocLOG1RzieP9KOq
- f/QQLtbFviF+OAtPL4O3oNg4iQ==
-X-Google-Smtp-Source: ABdhPJyp7LwKuRx6QmT+XNuvJd5g+sgFjnxxVCZQWaPznIpQ4YgD0rwz4AVbfbvNkBDGHen6klohOQ==
-X-Received: by 2002:adf:b355:: with SMTP id k21mr12128350wrd.156.1615527136604; 
- Thu, 11 Mar 2021 21:32:16 -0800 (PST)
+ bh=wLF9+hllwZQb6lUbqKASy10z/RO/Q28UjMoBJgQA7tw=;
+ b=LQ2uAZTl4RJ36PSQtZPKX2286PKumnPqpyDJHUCFCl6pMhdSol1Xs6y5UG7vozfAyD
+ KC/Pgm1Gn9vrxly+1RrKSIWYSsKtz8pqqHD2YbMtgv+rq16TvPgWPiJlB+RiwX5Vr/Xc
+ +is+458JygnoIAR4Y7S688C41LcQXi58CKJzUcapbII6irQ0J2uKfhsHOO7Bhfzbscv9
+ DvYtN6KnqSJCbcQIPkP6kmX7tTLPuADlCFf5oq0o5eBzGetDZVNyh+a26zvOM2GNYJik
+ HiytXE+tlJHUJEezC7+reKFxxSJXdKmqnIW1HMSQrV4X3WyjdjaAC31tr8fi+GtuERpy
+ jUew==
+X-Gm-Message-State: AOAM5321pD2S6bSn/nx4/rTe/Cs8G513H6/ABx1aHV+aa6l8oJqqDaeK
+ wNFG4mwh30g1vnnP5JCs9U6Rmg==
+X-Google-Smtp-Source: ABdhPJxaXO91zCQUlIx8xgLdwTPSLHPfsTX4zhn7X3mh9DxDj5rmb+KW09JYdGkhJaRGSSoOpkR08Q==
+X-Received: by 2002:a7b:c308:: with SMTP id k8mr11274638wmj.54.1615530183931; 
+ Thu, 11 Mar 2021 22:23:03 -0800 (PST)
 Received: from google.com (230.69.233.35.bc.googleusercontent.com.
  [35.233.69.230])
- by smtp.gmail.com with ESMTPSA id v13sm7271586wrt.45.2021.03.11.21.32.16
+ by smtp.gmail.com with ESMTPSA id s12sm1021005wmj.28.2021.03.11.22.23.03
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 11 Mar 2021 21:32:16 -0800 (PST)
-Date: Fri, 12 Mar 2021 05:32:13 +0000
+ Thu, 11 Mar 2021 22:23:03 -0800 (PST)
+Date: Fri, 12 Mar 2021 06:23:00 +0000
 From: Quentin Perret <qperret@google.com>
 To: Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v4 30/34] KVM: arm64: Add kvm_pgtable_stage2_find_range()
-Message-ID: <YEr83QKZnEd4a6Ba@google.com>
+Subject: Re: [PATCH v4 28/34] KVM: arm64: Use page-table to track page
+ ownership
+Message-ID: <YEsIxA/fKaDlSaio@google.com>
 References: <20210310175751.3320106-1-qperret@google.com>
- <20210310175751.3320106-31-qperret@google.com>
- <20210311190406.GB31586@willie-the-truck>
+ <20210310175751.3320106-29-qperret@google.com>
+ <20210311183834.GC31378@willie-the-truck>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20210311190406.GB31586@willie-the-truck>
+In-Reply-To: <20210311183834.GC31378@willie-the-truck>
 Cc: android-kvm@google.com, catalin.marinas@arm.com, mate.toth-pal@arm.com,
  seanjc@google.com, tabba@google.com, linux-kernel@vger.kernel.org,
  robh+dt@kernel.org, linux-arm-kernel@lists.infradead.org, maz@kernel.org,
@@ -103,273 +105,310 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thursday 11 Mar 2021 at 19:04:07 (+0000), Will Deacon wrote:
-> On Wed, Mar 10, 2021 at 05:57:47PM +0000, Quentin Perret wrote:
-> > Since the host stage 2 will be identity mapped, and since it will own
-> > most of memory, it would preferable for performance to try and use large
-> > block mappings whenever that is possible. To ease this, introduce a new
-> > helper in the KVM page-table code which allows to search for large
-> > ranges of available IPA space. This will be used in the host memory
-> > abort path to greedily idmap large portion of the PA space.
+On Thursday 11 Mar 2021 at 18:38:36 (+0000), Will Deacon wrote:
+> On Wed, Mar 10, 2021 at 05:57:45PM +0000, Quentin Perret wrote:
+> > As the host stage 2 will be identity mapped, all the .hyp memory regions
+> > and/or memory pages donated to protected guestis will have to marked
+> > invalid in the host stage 2 page-table. At the same time, the hypervisor
+> > will need a way to track the ownership of each physical page to ensure
+> > memory sharing or donation between entities (host, guests, hypervisor) is
+> > legal.
+> > 
+> > In order to enable this tracking at EL2, let's use the host stage 2
+> > page-table itself. The idea is to use the top bits of invalid mappings
+> > to store the unique identifier of the page owner. The page-table owner
+> > (the host) gets identifier 0 such that, at boot time, it owns the entire
+> > IPA space as the pgd starts zeroed.
+> > 
+> > Provide kvm_pgtable_stage2_set_owner() which allows to modify the
+> > ownership of pages in the host stage 2. It re-uses most of the map()
+> > logic, but ends up creating invalid mappings instead. This impacts
+> > how we do refcount as we now need to count invalid mappings when they
+> > are used for ownership tracking.
 > > 
 > > Signed-off-by: Quentin Perret <qperret@google.com>
 > > ---
-> >  arch/arm64/include/asm/kvm_pgtable.h | 30 ++++++++++
-> >  arch/arm64/kvm/hyp/pgtable.c         | 90 +++++++++++++++++++++++++++-
-> >  2 files changed, 117 insertions(+), 3 deletions(-)
+> >  arch/arm64/include/asm/kvm_pgtable.h | 21 +++++++
+> >  arch/arm64/kvm/hyp/pgtable.c         | 92 ++++++++++++++++++++++++----
+> >  2 files changed, 101 insertions(+), 12 deletions(-)
 > > 
 > > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> > index b09af4612656..477bf10c48a9 100644
+> > index 4ae19247837b..b09af4612656 100644
 > > --- a/arch/arm64/include/asm/kvm_pgtable.h
 > > +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> > @@ -94,6 +94,16 @@ enum kvm_pgtable_prot {
-> >  #define PAGE_HYP_RO		(KVM_PGTABLE_PROT_R)
-> >  #define PAGE_HYP_DEVICE		(PAGE_HYP | KVM_PGTABLE_PROT_DEVICE)
+> > @@ -238,6 +238,27 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+> >  			   u64 phys, enum kvm_pgtable_prot prot,
+> >  			   void *mc);
 > >  
 > > +/**
-> > + * struct kvm_mem_range - Range of Intermediate Physical Addresses
-> > + * @start:	Start of the range.
-> > + * @end:	End of the range.
-> > + */
-> > +struct kvm_mem_range {
-> > +	u64 start;
-> > +	u64 end;
-> > +};
-> > +
-> >  /**
-> >   * enum kvm_pgtable_walk_flags - Flags to control a depth-first page-table walk.
-> >   * @KVM_PGTABLE_WALK_LEAF:		Visit leaf entries, including invalid
-> > @@ -398,4 +408,24 @@ int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size);
-> >  int kvm_pgtable_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
-> >  		     struct kvm_pgtable_walker *walker);
-> >  
-> > +/**
-> > + * kvm_pgtable_stage2_find_range() - Find a range of Intermediate Physical
-> > + *				     Addresses with compatible permission
-> > + *				     attributes.
+> > + * kvm_pgtable_stage2_set_owner() - Annotate invalid mappings with metadata
+> > + *				    encoding the ownership of a page in the
+> > + *				    IPA space.
 > > + * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init().
-> > + * @addr:	Address that must be covered by the range.
-> > + * @prot:	Protection attributes that the range must be compatible with.
-> > + * @range:	Range structure used to limit the search space at call time and
-> > + *		that will hold the result.
+> > + * @addr:	Intermediate physical address at which to place the annotation.
+> 
+> This confused me a bit, as the annotation is stored in the page-table, not
+> at the memory identified by @addr. How about:
+> 
+>   "Base intermediate physical address to annotate"
+> 
+> > + * @size:	Size of the IPA range to annotate.
+> 
+>   "Size of the annotated range"
+> 
+> > + * @mc:		Cache of pre-allocated and zeroed memory from which to allocate
+> > + *		page-table pages.
+> > + * @owner_id:	Unique identifier for the owner of the page.
 > > + *
-> > + * The offset of @addr within a page is ignored. An existing mapping is defined
-> > + * as compatible with @prot if it is invalid and not owned by another entity, or
-> > + * if its permission attributes are strictly similar to @prot and it has no
-> > + * software bits set.
+> > + * The page-table owner has identifier 0.
 > 
-> nit: I think the 'or' is ambigious here, as it makes it sound like an
-> invalid entry that _is_ owned by another entity is compatible if the
-> permissions attribute match. How about:
-> 
->   | An IPA is compatible with prot iff its corresponding stage-2 page-table
->   | entry has default ownership and, if valid, is mapped with protection
->   | attributes identical to @prot.
+> Perhaps, "By default, all page-tables are owned by identifier 0"
 
-Works for me.
+Ack all of the above.
 
 > > + *
 > > + * Return: 0 on success, negative error code on failure.
 > > + */
-> > +int kvm_pgtable_stage2_find_range(struct kvm_pgtable *pgt, u64 addr,
-> > +				  enum kvm_pgtable_prot prot,
-> > +				  struct kvm_mem_range *range);
-> >  #endif	/* __ARM64_KVM_PGTABLE_H__ */
+> > +int kvm_pgtable_stage2_set_owner(struct kvm_pgtable *pgt, u64 addr, u64 size,
+> > +				 void *mc, u32 owner_id);
+> 
+> Is there a need for the owner_id to be 32-bit rather than e.g. 16-bit? Just
+> strikes me that it might be difficult to recover these bits in future if we
+> give them out freely now.
+
+I figured we might want to use identifiers that are stable for the
+lifetime of protected VMs. I wasn't sure using e.g. VMIDs would be a
+better choice here as re-using them will cause a lot of pain for the
+host stage 2 pgtable maintenance.
+
+> > +
+> >  /**
+> >   * kvm_pgtable_stage2_unmap() - Remove a mapping from a guest stage-2 page-table.
+> >   * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init().
 > > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > index c16e0306dd9a..f20287bb3e41 100644
+> > index f37b4179b880..e4670b639726 100644
 > > --- a/arch/arm64/kvm/hyp/pgtable.c
 > > +++ b/arch/arm64/kvm/hyp/pgtable.c
 > > @@ -48,6 +48,8 @@
 > >  					 KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W | \
 > >  					 KVM_PTE_LEAF_ATTR_HI_S2_XN)
 > >  
-> > +#define KVM_PTE_LEAF_ATTR_S2_RES	GENMASK(58, 55)
+> > +#define KVM_INVALID_PTE_OWNER_MASK	GENMASK(63, 32)
 > 
-> Please make this IGN instead of RES, to match the architecture (and because
-> RES is usually used in the context of RES0 or RES1).
-
-Ack, maybe I'll even say 'IGNORED' in full to match the Arm ARM -- IGN
-sounds like an acronym otherwise.
-
-> >  #define KVM_INVALID_PTE_OWNER_MASK	GENMASK(63, 32)
-> >  
+> Ah, so that '02' earlier was a typo for '32'.
+> 
+> > +
 > >  struct kvm_pgtable_walk_data {
-> > @@ -69,10 +71,8 @@ static u64 kvm_granule_size(u32 level)
-> >  	return BIT(kvm_granule_shift(level));
+> >  	struct kvm_pgtable		*pgt;
+> >  	struct kvm_pgtable_walker	*walker;
+> > @@ -186,6 +188,11 @@ static kvm_pte_t kvm_init_valid_leaf_pte(u64 pa, kvm_pte_t attr, u32 level)
+> >  	return pte;
 > >  }
 > >  
-> > -static bool kvm_block_mapping_supported(u64 addr, u64 end, u64 phys, u32 level)
-> > +static bool kvm_level_support_block_mappings(u32 level)
-> >  {
-> > -	u64 granule = kvm_granule_size(level);
-> > -
-> >  	/*
-> >  	 * Reject invalid block mappings and don't bother with 4TB mappings for
-> >  	 * 52-bit PAs.
-> > @@ -80,6 +80,16 @@ static bool kvm_block_mapping_supported(u64 addr, u64 end, u64 phys, u32 level)
-> >  	if (level == 0 || (PAGE_SIZE != SZ_4K && level == 1))
-> >  		return false;
-> >  
-> > +	return true;
-> 
-> return !(level == 0 || (PAGE_SIZE != SZ_4K && level == 1));
-> 
-> > +static bool kvm_block_mapping_supported(u64 addr, u64 end, u64 phys, u32 level)
+> > +static kvm_pte_t kvm_init_invalid_leaf_owner(u32 owner_id)
 > > +{
-> > +	u64 granule = kvm_granule_size(level);
-> > +
-> > +	if (!kvm_level_support_block_mappings(level))
-> > +		return false;
-> > +
-> >  	if (granule > (end - addr))
-> >  		return false;
-> >  
-> > @@ -1042,3 +1052,77 @@ void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt)
-> >  	pgt->mm_ops->free_pages_exact(pgt->pgd, pgd_sz);
-> >  	pgt->pgd = NULL;
-> >  }
-> > +
-> > +#define KVM_PTE_LEAF_S2_COMPAT_MASK	(KVM_PTE_LEAF_ATTR_S2_PERMS | \
-> > +					 KVM_PTE_LEAF_ATTR_LO_S2_MEMATTR | \
-> > +					 KVM_PTE_LEAF_ATTR_S2_RES)
-> > +
-> > +static int stage2_check_permission_walker(u64 addr, u64 end, u32 level,
-> > +					  kvm_pte_t *ptep,
-> > +					  enum kvm_pgtable_walk_flags flag,
-> > +					  void * const arg)
-> > +{
-> > +	kvm_pte_t old_attr, pte = *ptep, *new_attr = arg;
-> > +
-> > +	/*
-> > +	 * Compatible mappings are either invalid and owned by the page-table
-> > +	 * owner (whose id is 0), or valid with matching permission attributes.
-> > +	 */
-> > +	if (kvm_pte_valid(pte)) {
-> > +		old_attr = pte & KVM_PTE_LEAF_S2_COMPAT_MASK;
-> > +		if (old_attr != *new_attr)
-> > +			return -EEXIST;
-> > +	} else if (pte) {
-> > +		return -EEXIST;
-> > +	}
-> > +
-> > +	return 0;
+> > +	return FIELD_PREP(KVM_INVALID_PTE_OWNER_MASK, owner_id);
 > > +}
 > > +
-> > +int kvm_pgtable_stage2_find_range(struct kvm_pgtable *pgt, u64 addr,
-> > +				  enum kvm_pgtable_prot prot,
-> > +				  struct kvm_mem_range *range)
+> >  static int kvm_pgtable_visitor_cb(struct kvm_pgtable_walk_data *data, u64 addr,
+> >  				  u32 level, kvm_pte_t *ptep,
+> >  				  enum kvm_pgtable_walk_flags flag)
+> > @@ -440,6 +447,7 @@ void kvm_pgtable_hyp_destroy(struct kvm_pgtable *pgt)
+> >  struct stage2_map_data {
+> >  	u64				phys;
+> >  	kvm_pte_t			attr;
+> > +	u32				owner_id;
+> >  
+> >  	kvm_pte_t			*anchor;
+> >  	kvm_pte_t			*childp;
+> > @@ -506,6 +514,24 @@ static int stage2_map_set_prot_attr(enum kvm_pgtable_prot prot,
+> >  	return 0;
+> >  }
+> >  
+> > +static bool stage2_is_permission_change(kvm_pte_t old, kvm_pte_t new)
 > > +{
-> > +	kvm_pte_t attr;
-> > +	struct kvm_pgtable_walker check_perm_walker = {
-> > +		.cb		= stage2_check_permission_walker,
-> > +		.flags		= KVM_PGTABLE_WALK_LEAF,
-> > +		.arg		= &attr,
-> > +	};
-> > +	u64 granule, start, end;
-> > +	u32 level;
+> > +	if (!kvm_pte_valid(old) || !kvm_pte_valid(new))
+> > +		return false;
+> > +
+> > +	return !((old ^ new) & (~KVM_PTE_LEAF_ATTR_S2_PERMS));
+> > +}
+> 
+> This new name throws me, because it will return true if old == new.
+
+How about I invert it and call it 'stage2_pte_needs_update()' or so?
+
+> > +static bool stage2_pte_is_counted(kvm_pte_t pte)
+> > +{
+> > +	/*
+> > +	 * The refcount tracks valid entries as well as invalid entries if they
+> > +	 * encode ownership of a page to another entity than the page-table
+> > +	 * owner, whose id is 0.
+> > +	 */
+> > +	return !!pte;
+> > +}
+> > +
+> >  static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
+> >  				      kvm_pte_t *ptep,
+> >  				      struct stage2_map_data *data)
+> > @@ -517,28 +543,36 @@ static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
+> >  	if (!kvm_block_mapping_supported(addr, end, phys, level))
+> >  		return -E2BIG;
+> >  
+> > -	new = kvm_init_valid_leaf_pte(phys, data->attr, level);
+> > -	if (kvm_pte_valid(old)) {
+> > +	if (kvm_pte_valid(data->attr))
+> 
+> This feels like a bit of a hack to me: the 'attr' field in stage2_map_data
+> is intended to correspond directly to the lower/upper attributes of the
+> descriptor as per the architecture, so tagging the valid bit in there is
+> pretty grotty. However, I can see the significant advantage in being able
+> to re-use the stage2_map_walker functionality, so about instead of nobbling
+> attr, you set phys to something invalid instead, e.g.:
+> 
+> 	#define KVM_PHYS_SET_OWNER	(-1ULL)
+
+That'll confuse kvm_block_mapping_supported() and friends I think, at
+least in their current form. If you _really_ don't like this, maybe we
+could have an extra 'flags' field in stage2_map_data?
+
+> > +		new = kvm_init_valid_leaf_pte(phys, data->attr, level);
+> > +	else
+> > +		new = kvm_init_invalid_leaf_owner(data->owner_id);
+> > +
+> > +	if (stage2_pte_is_counted(old)) {
+> >  		/*
+> >  		 * Skip updating the PTE if we are trying to recreate the exact
+> >  		 * same mapping or only change the access permissions. Instead,
+> >  		 * the vCPU will exit one more time from guest if still needed
+> >  		 * and then go through the path of relaxing permissions.
+> >  		 */
+> > -		if (!((old ^ new) & (~KVM_PTE_LEAF_ATTR_S2_PERMS)))
+> > +		if (stage2_is_permission_change(old, new))
+> >  			return -EAGAIN;
+> >  
+> >  		/*
+> > -		 * There's an existing different valid leaf entry, so perform
+> > -		 * break-before-make.
+> > +		 * Clear the existing PTE, and perform break-before-make with
+> > +		 * TLB maintenance if it was valid.
+> >  		 */
+> >  		kvm_clear_pte(ptep);
+> > -		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, data->mmu, addr, level);
+> > +		if (kvm_pte_valid(old)) {
+> > +			kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, data->mmu, addr,
+> > +				     level);
+> > +		}
+> 
+> Why do you clear the pte unconditionally here? I think you can move that
+> into the 'if' as well.
+
+Yep that should work.
+
+> >  		mm_ops->put_page(ptep);
+> >  	}
+> >  
+> >  	smp_store_release(ptep, new);
+> > -	mm_ops->get_page(ptep);
+> > +	if (stage2_pte_is_counted(new))
+> > +		mm_ops->get_page(ptep);
+> >  	data->phys += granule;
+> >  	return 0;
+> >  }
+> > @@ -574,7 +608,7 @@ static int stage2_map_walk_leaf(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+> >  	int ret;
+> >  
+> >  	if (data->anchor) {
+> > -		if (kvm_pte_valid(pte))
+> > +		if (stage2_pte_is_counted(pte))
+> >  			mm_ops->put_page(ptep);
+> >  
+> >  		return 0;
+> > @@ -599,9 +633,10 @@ static int stage2_map_walk_leaf(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+> >  	 * a table. Accesses beyond 'end' that fall within the new table
+> >  	 * will be mapped lazily.
+> >  	 */
+> > -	if (kvm_pte_valid(pte)) {
+> > +	if (stage2_pte_is_counted(pte)) {
+> >  		kvm_clear_pte(ptep);
+> > -		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, data->mmu, addr, level);
+> > +		if (kvm_pte_valid(pte))
+> > +			kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, data->mmu, addr, level);
+> 
+> Same here.
+> 
+> >  		mm_ops->put_page(ptep);
+> >  	}
+> >  
+> > @@ -683,6 +718,7 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+> >  		.mmu		= pgt->mmu,
+> >  		.memcache	= mc,
+> >  		.mm_ops		= pgt->mm_ops,
+> > +		.owner_id	= 0,
+> 
+> Not needed.
+> 
+> >  	};
+> >  	struct kvm_pgtable_walker walker = {
+> >  		.cb		= stage2_map_walker,
+> > @@ -696,6 +732,33 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+> >  	if (ret)
+> >  		return ret;
+> >  
+> > +	/* Set the valid flag to distinguish with the set_owner() path. */
+> > +	map_data.attr |= KVM_PTE_VALID;
+> 
+> (see earlier comments)
+> 
+> > +	ret = kvm_pgtable_walk(pgt, addr, size, &walker);
+> > +	dsb(ishst);
+> > +	return ret;
+> > +}
+> > +
+> > +int kvm_pgtable_stage2_set_owner(struct kvm_pgtable *pgt, u64 addr, u64 size,
+> > +				 void *mc, u32 owner_id)
+> > +{
 > > +	int ret;
-> > +
-> > +	ret = stage2_set_prot_attr(prot, &attr);
-> > +	if (ret)
-> > +		return ret;
-> > +	attr &= KVM_PTE_LEAF_S2_COMPAT_MASK;
-> > +
-> > +	for (level = pgt->start_level; level < KVM_PGTABLE_MAX_LEVELS; level++) {
-> > +		granule = kvm_granule_size(level);
-> > +		start = ALIGN_DOWN(addr, granule);
-> > +		end = start + granule;
-> > +
-> > +		if (!kvm_level_support_block_mappings(level))
-> > +			continue;
-> > +
-> > +		if (start < range->start || range->end < end)
-> > +			continue;
-> > +
-> > +		/*
-> > +		 * Check the presence of existing mappings with incompatible
-> > +		 * permissions within the current block range, and try one level
-> > +		 * deeper if one is found.
-> > +		 */
-> > +		ret = kvm_pgtable_walk(pgt, start, granule, &check_perm_walker);
-> > +		if (ret != -EEXIST)
-> > +			break;
-> > +	}
+> > +	struct stage2_map_data map_data = {
+> > +		.mmu		= pgt->mmu,
+> > +		.memcache	= mc,
+> > +		.mm_ops		= pgt->mm_ops,
+> > +		.owner_id	= owner_id,
+> > +		.attr		= 0,
 > 
-> Can you write this as a:
+> Not needed.
 > 
-> 	do {
-> 		...
-> 	} while (level < KVM_PGTABLE_MAX_LEVELS && ret == -EEXIST);
+> > +	};
+> > +	struct kvm_pgtable_walker walker = {
+> > +		.cb		= stage2_map_walker,
+> > +		.flags		= KVM_PGTABLE_WALK_TABLE_PRE |
+> > +				  KVM_PGTABLE_WALK_LEAF |
+> > +				  KVM_PGTABLE_WALK_TABLE_POST,
 > 
-> loop?
+> Oh man, now I see why phys is zero -- so that the table callbacks will
+> put down the largest possible block. That needs a comment because it's
+> pretty horrible, and also means my idea of using -1 won't help you. Hmm.
 
-I tried it but found it a little less pretty -- the pre-assignment of
-level and the increment at the end make it really feel like a for loop
-to me:
+We're creating invalid mappings which by definition don't map to
+physical pages (the annotation is purely in the _IPA_ space), so yeah
+the best thing to do was to take phys 'out of the way'. Setting it to
+e.g. @addr would be quite confusing IMO -- imagine if we ever decide to
+annotate the stage 2 of guests one day.
 
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -1098,26 +1098,23 @@ int kvm_pgtable_stage2_find_range(struct kvm_pgtable *pgt, u64 addr,
-                return ret;
-        attr &= KVM_PTE_LEAF_S2_COMPAT_MASK;
- 
--       for (level = pgt->start_level; level < KVM_PGTABLE_MAX_LEVELS; level++) {
-+       ret = -EEXIST;
-+       level = pgt->start_level;
-+       do {
-                granule = kvm_granule_size(level);
-                start = ALIGN_DOWN(addr, granule);
-                end = start + granule;
- 
--               if (!kvm_level_support_block_mappings(level))
--                       continue;
--
--               if (start < range->start || range->end < end)
--                       continue;
--
-                /*
-                 * Check the presence of existing mappings with incompatible
-                 * permissions within the current block range, and try one level
-                 * deeper if one is found.
-                 */
--               ret = kvm_pgtable_walk(pgt, start, granule, &check_perm_walker);
--               if (ret != -EEXIST)
--                       break;
--       }
-+               if (kvm_level_support_block_mappings(level) && start >= range->start && range->end >= end)
-+                       ret = kvm_pgtable_walk(pgt, start, granule, &check_perm_walker);
-+
-+               level++;
-+       } while (level < KVM_PGTABLE_MAX_LEVELS && ret == -EEXIST);
- 
-        if (!ret) {
+And as you noticed, weird values will also happen to confuse
+kvm_block_mapping_supported(), and/or to cause range issues, so 0 seemed
+like a reasonable choice.
 
+I'll stick a comment.
 
-I'm guessing you're not a fan of the break case in existing loop?
-Another option could be:
+> Is there ever a reason to use kvm_pgtable_stage2_set_owner() to set an
+> owner of 0, or should you just use the map/unmap APIs for that? If so,
+> then maybe the key is simply if owner_id is non-zero, then an invalid
+> entry is installed?
 
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -1098,7 +1098,7 @@ int kvm_pgtable_stage2_find_range(struct kvm_pgtable *pgt, u64 addr,
-                return ret;
-        attr &= KVM_PTE_LEAF_S2_COMPAT_MASK;
-
--       for (level = pgt->start_level; level < KVM_PGTABLE_MAX_LEVELS; level++) {
-+       for (ret = -EEXIST, level = pgt->start_level; level < KVM_PGTABLE_MAX_LEVELS && ret == -EEXIST; level++) {
-                granule = kvm_granule_size(level);
-                start = ALIGN_DOWN(addr, granule);
-                end = start + granule;
-@@ -1115,8 +1115,6 @@ int kvm_pgtable_stage2_find_range(struct kvm_pgtable *pgt, u64 addr,
-                 * deeper if one is found.
-                 */
-                ret = kvm_pgtable_walk(pgt, start, granule, &check_perm_walker);
--               if (ret != -EEXIST)
--                       break;
-        }
-
-        if (!ret) {
-
-No strong opinion either way. Thoughts?
+I couldn't find a good reason to restrict it, as that wouldn't change
+the implementation much anyway. Also, if we added the right CMOs, we
+could probably remove the unmap walker and re-express it in terms of
+set_owner(0) ... But I suppose that is for later :-)
 
 Thanks,
 Quentin
