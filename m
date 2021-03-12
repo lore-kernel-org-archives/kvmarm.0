@@ -2,69 +2,96 @@ Return-Path: <SRS0=ChHZ=IK=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3215C433DB
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 11:34:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6630C433E6
+	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 11:45:36 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CF18D64FC3
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 11:34:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF18D64FC3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 402A864FD9
+	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 11:45:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 402A864FD9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A3F54B2FD;
-	Fri, 12 Mar 2021 06:34:41 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B6F3C4B4FF;
+	Fri, 12 Mar 2021 06:45:35 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id G0HyASMAQ5co; Fri, 12 Mar 2021 06:34:37 -0500 (EST)
+	with ESMTP id wiZiR90h22mg; Fri, 12 Mar 2021 06:45:34 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C7F14B30B;
-	Fri, 12 Mar 2021 06:34:37 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F1784B691;
+	Fri, 12 Mar 2021 06:45:34 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A2CF84B30B
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 06:34:36 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3391E4B4CD
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 06:45:33 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Amui+j9Zgd4m for <kvmarm@lists.cs.columbia.edu>;
- Fri, 12 Mar 2021 06:34:32 -0500 (EST)
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1F20E4B2FD
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 06:34:31 -0500 (EST)
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.59])
- by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DxkDk5yxmzNlm9;
- Fri, 12 Mar 2021 19:32:06 +0800 (CST)
-Received: from [10.174.184.135] (10.174.184.135) by
- DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
- 14.3.498.0; Fri, 12 Mar 2021 19:34:18 +0800
-Subject: Re: [PATCH v3 3/4] KVM: arm64: GICv4.1: Restore VLPI's pending state
- to physical side
-To: Marc Zyngier <maz@kernel.org>
-References: <20210127121337.1092-1-lushenming@huawei.com>
- <20210127121337.1092-4-lushenming@huawei.com> <87tupif3x3.wl-maz@kernel.org>
- <0820f429-4c29-acd6-d9e0-af9f6deb68e4@huawei.com>
- <87k0qcg2s6.wl-maz@kernel.org>
- <aecfbf72-c653-e967-b539-89f629b52cde@huawei.com>
- <87h7lgfwzu.wl-maz@kernel.org>
-From: Shenming Lu <lushenming@huawei.com>
-Message-ID: <df4b939d-27c1-be84-ea7e-327251958cde@huawei.com>
-Date: Fri, 12 Mar 2021 19:34:07 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.2.2
+ with ESMTP id ReGTdPKWb9Ml for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 12 Mar 2021 06:45:30 -0500 (EST)
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com
+ [209.85.221.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7090F4B4C9
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 06:45:30 -0500 (EST)
+Received: by mail-wr1-f45.google.com with SMTP id b9so1609012wrt.8
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 03:45:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=ds53V4cY3JN7oKXrFWCOBzvFttSgaekliXgO0438ZQk=;
+ b=NaNqBxCg7RA8yrBFVfqbNfzzF4xqk2O2uZcCen2sIu+xVWsrfoqqK18rK40AkQAXYv
+ 4xPNke/FcZ8lN6k6CupjvgTlklHJDKVIZ/1phZihJOD2NGUrg+afORGarmTUzdDSGXgB
+ ioHwnQhNVHMbtnCl8nYqLFzaH8Kv1NEpm4PXXNoXMQZ79S6upOSplsRV+7o6DUtDjH4w
+ BZxP37/DIL9/FYr1oQpOE2zPswaNRenFpjhOIST/MeCMBL/SOLmOgprjYNl5r6PSe8df
+ /l0eiEQRPtMRcVfImTQfKvgekrhZm4ARlnX5P6+5KCKTvn4LCkNzPfa3I21C/sUNS9ZR
+ v61w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=ds53V4cY3JN7oKXrFWCOBzvFttSgaekliXgO0438ZQk=;
+ b=PpfcgRZH3PS4SkGaeYWjTzH9NX1OqJvoxyWM+JKLg9mnOsH7zfkR2YW98KIG0nCT03
+ pMiOQao45YSevjDRLd0rHkenbtughUnsNfJJqNm+b6mrx2hS6/fXmQqAHwyYMaAWpiw1
+ FZf2PwhtfHYxFIm7no1Blzu1gp63s67rMjc+F3kOQBBKwmqn+LErBeka0UiH2RpTj6XM
+ /V1nKc2qWNJLW3lA1bADqN0BvFP9TDlZQrujg519a5RHhOni5ZZVdN52JcWzLk9AshCA
+ Bw5kbNGidE9WosCMXCu4kHkjHwWNC2iLQI/R0JbjQqeSz9EkY1Zwd+WUYu+yAq2YY3/x
+ to7A==
+X-Gm-Message-State: AOAM532+7beEfnkp15s2vQUrctDYmlnpH050IXkHjKvc+MQI02GQByBM
+ r6qX6P9ndPoVfw0q58Zua5/FDA==
+X-Google-Smtp-Source: ABdhPJzAmI4E7/mrpYDo8qpBbI6XmHQnBQTiRQcL/26LsC9ALUUI0VO1SMvgcMoSDR1OehuPJKbnaw==
+X-Received: by 2002:a5d:56c9:: with SMTP id m9mr13234945wrw.422.1615549529236; 
+ Fri, 12 Mar 2021 03:45:29 -0800 (PST)
+Received: from google.com (230.69.233.35.bc.googleusercontent.com.
+ [35.233.69.230])
+ by smtp.gmail.com with ESMTPSA id 1sm1933768wmj.2.2021.03.12.03.45.28
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 12 Mar 2021 03:45:28 -0800 (PST)
+Date: Fri, 12 Mar 2021 11:45:26 +0000
+From: Quentin Perret <qperret@google.com>
+To: Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v4 28/34] KVM: arm64: Use page-table to track page
+ ownership
+Message-ID: <YEtUVriUSi/MFGit@google.com>
+References: <20210310175751.3320106-1-qperret@google.com>
+ <20210310175751.3320106-29-qperret@google.com>
+ <20210311183834.GC31378@willie-the-truck>
+ <YEsIxA/fKaDlSaio@google.com>
+ <20210312093205.GB32016@willie-the-truck>
+ <YEs+xi6IDj3gwX10@google.com>
+ <20210312111804.GB32208@willie-the-truck>
 MIME-Version: 1.0
-In-Reply-To: <87h7lgfwzu.wl-maz@kernel.org>
-Content-Language: en-US
-X-Originating-IP: [10.174.184.135]
-X-CFilter-Loop: Reflected
-Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, kvm@vger.kernel.org,
- Cornelia Huck <cohuck@redhat.com>, linux-kernel@vger.kernel.org,
- Alex Williamson <alex.williamson@redhat.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <20210312111804.GB32208@willie-the-truck>
+Cc: android-kvm@google.com, catalin.marinas@arm.com, mate.toth-pal@arm.com,
+ seanjc@google.com, tabba@google.com, linux-kernel@vger.kernel.org,
+ robh+dt@kernel.org, linux-arm-kernel@lists.infradead.org, maz@kernel.org,
+ kernel-team@android.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -76,69 +103,138 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gMjAyMS8zLzEyIDE5OjEwLCBNYXJjIFp5bmdpZXIgd3JvdGU6Cj4gT24gRnJpLCAxMiBNYXIg
-MjAyMSAxMDo0ODoyOSArMDAwMCwKPiBTaGVubWluZyBMdSA8bHVzaGVubWluZ0BodWF3ZWkuY29t
-PiB3cm90ZToKPj4KPj4gT24gMjAyMS8zLzEyIDE3OjA1LCBNYXJjIFp5bmdpZXIgd3JvdGU6Cj4+
-PiBPbiBUaHUsIDExIE1hciAyMDIxIDEyOjMyOjA3ICswMDAwLAo+Pj4gU2hlbm1pbmcgTHUgPGx1
-c2hlbm1pbmdAaHVhd2VpLmNvbT4gd3JvdGU6Cj4+Pj4KPj4+PiBPbiAyMDIxLzMvMTEgMTc6MTQs
-IE1hcmMgWnluZ2llciB3cm90ZToKPj4+Pj4gT24gV2VkLCAyNyBKYW4gMjAyMSAxMjoxMzozNiAr
-MDAwMCwKPj4+Pj4gU2hlbm1pbmcgTHUgPGx1c2hlbm1pbmdAaHVhd2VpLmNvbT4gd3JvdGU6Cj4+
-Pj4+Pgo+Pj4+Pj4gRnJvbTogWmVuZ2h1aSBZdSA8eXV6ZW5naHVpQGh1YXdlaS5jb20+Cj4+Pj4+
-Pgo+Pj4+Pj4gV2hlbiBzZXR0aW5nIHRoZSBmb3J3YXJkaW5nIHBhdGggb2YgYSBWTFBJIChzd2l0
-Y2ggdG8gdGhlIEhXIG1vZGUpLAo+Pj4+Pj4gd2UgY291bGQgYWxzbyB0cmFuc2ZlciB0aGUgcGVu
-ZGluZyBzdGF0ZSBmcm9tIGlycS0+cGVuZGluZ19sYXRjaCB0bwo+Pj4+Pj4gVlBUIChlc3BlY2lh
-bGx5IGluIG1pZ3JhdGlvbiwgdGhlIHBlbmRpbmcgc3RhdGVzIG9mIFZMUElzIGFyZSByZXN0b3Jl
-ZAo+Pj4+Pj4gaW50byBrdm3igJlzIHZnaWMgZmlyc3QpLiBBbmQgd2UgY3VycmVudGx5IHNlbmQg
-IklOVCtWU1lOQyIgdG8gdHJpZ2dlcgo+Pj4+Pj4gYSBWTFBJIHRvIHBlbmRpbmcuCj4+Pj4+Pgo+
-Pj4+Pj4gU2lnbmVkLW9mZi1ieTogWmVuZ2h1aSBZdSA8eXV6ZW5naHVpQGh1YXdlaS5jb20+Cj4+
-Pj4+PiBTaWduZWQtb2ZmLWJ5OiBTaGVubWluZyBMdSA8bHVzaGVubWluZ0BodWF3ZWkuY29tPgo+
-Pj4+Pj4gLS0tCj4+Pj4+PiAgYXJjaC9hcm02NC9rdm0vdmdpYy92Z2ljLXY0LmMgfCAxNCArKysr
-KysrKysrKysrKwo+Pj4+Pj4gIDEgZmlsZSBjaGFuZ2VkLCAxNCBpbnNlcnRpb25zKCspCj4+Pj4+
-Pgo+Pj4+Pj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL3ZnaWMvdmdpYy12NC5jIGIvYXJj
-aC9hcm02NC9rdm0vdmdpYy92Z2ljLXY0LmMKPj4+Pj4+IGluZGV4IGFjMDI5YmEzZDMzNy4uYTM1
-NDJhZjZmMDRhIDEwMDY0NAo+Pj4+Pj4gLS0tIGEvYXJjaC9hcm02NC9rdm0vdmdpYy92Z2ljLXY0
-LmMKPj4+Pj4+ICsrKyBiL2FyY2gvYXJtNjQva3ZtL3ZnaWMvdmdpYy12NC5jCj4+Pj4+PiBAQCAt
-NDQ5LDYgKzQ0OSwyMCBAQCBpbnQga3ZtX3ZnaWNfdjRfc2V0X2ZvcndhcmRpbmcoc3RydWN0IGt2
-bSAqa3ZtLCBpbnQgdmlycSwKPj4+Pj4+ICAJaXJxLT5ob3N0X2lycQk9IHZpcnE7Cj4+Pj4+PiAg
-CWF0b21pY19pbmMoJm1hcC52cGUtPnZscGlfY291bnQpOwo+Pj4+Pj4gIAo+Pj4+Pj4gKwkvKiBU
-cmFuc2ZlciBwZW5kaW5nIHN0YXRlICovCj4+Pj4+PiArCWlmIChpcnEtPnBlbmRpbmdfbGF0Y2gp
-IHsKPj4+Pj4+ICsJCXJldCA9IGlycV9zZXRfaXJxY2hpcF9zdGF0ZShpcnEtPmhvc3RfaXJxLAo+
-Pj4+Pj4gKwkJCQkJICAgIElSUUNISVBfU1RBVEVfUEVORElORywKPj4+Pj4+ICsJCQkJCSAgICBp
-cnEtPnBlbmRpbmdfbGF0Y2gpOwo+Pj4+Pj4gKwkJV0FSTl9SQVRFTElNSVQocmV0LCAiSVJRICVk
-IiwgaXJxLT5ob3N0X2lycSk7Cj4+Pj4+PiArCj4+Pj4+PiArCQkvKgo+Pj4+Pj4gKwkJICogTGV0
-IGl0IGJlIHBydW5lZCBmcm9tIGFwX2xpc3QgbGF0ZXIgYW5kIGRvbid0IGJvdGhlcgo+Pj4+Pj4g
-KwkJICogdGhlIExpc3QgUmVnaXN0ZXIuCj4+Pj4+PiArCQkgKi8KPj4+Pj4+ICsJCWlycS0+cGVu
-ZGluZ19sYXRjaCA9IGZhbHNlOwo+Pj4+Pgo+Pj4+PiBOQUsuIElmIHRoZSBpbnRlcnJ1cHQgaXMg
-b24gdGhlIEFQIGxpc3QsIGl0IG11c3QgYmUgcHJ1bmVkIGZyb20gaXQKPj4+Pj4gKmltbWVkaWF0
-ZWx5Ki4gVGhlIG9ubHkgY2FzZSB3aGVyZSBpdCBjYW4gYmUgIXBlbmRpbmcgYW5kIHN0aWxsIG9u
-IHRoZQo+Pj4+PiBBUCBsaXN0IGlzIGluIGludGVydmFsIGJldHdlZW4gc3luYyBhbmQgcHJ1bmUu
-IElmIHdlIHN0YXJ0IG1lc3NpbmcKPj4+Pj4gd2l0aCB0aGlzLCB3ZSBjYW4ndCByZWFzb24gYWJv
-dXQgdGhlIHN0YXRlIG9mIHRoaXMgbGlzdCBhbnltb3JlLgo+Pj4+Pgo+Pj4+PiBDb25zaWRlciBj
-YWxsaW5nIHZnaWNfcXVldWVfaXJxX3VubG9jaygpIGhlcmUuCj4+Pj4KPj4+PiBUaGFua3MgZm9y
-IGdpdmluZyBhIGhpbnQsIGJ1dCBpdCBzZWVtcyB0aGF0IHZnaWNfcXVldWVfaXJxX3VubG9jaygp
-IG9ubHkKPj4+PiBxdWV1ZXMgYW4gSVJRIGFmdGVyIGNoZWNraW5nLCBkaWQgeW91IG1lYW4gdmdp
-Y19wcnVuZV9hcF9saXN0KCkgaW5zdGVhZD8KPj4+Cj4+PiBObywgSSByZWFsbHkgbWVhbiB2Z2lj
-X3F1ZXVlX2lycV91bmxvY2soKS4gSXQgY2FuIGJlIHVzZWQgdG8gcmVtb3ZlCj4+PiB0aGUgcGVu
-ZGluZyBzdGF0ZSBmcm9tIGFuIGludGVycnVwdCwgYW5kIGRyb3AgaXQgZnJvbSB0aGUgQVAKPj4+
-IGxpc3QuIFRoaXMgaXMgZXhhY3RseSB3aGF0IGhhcHBlbnMgd2hlbiBjbGVhcmluZyB0aGUgcGVu
-ZGluZyBzdGF0ZSBvZgo+Pj4gYSBsZXZlbCBpbnRlcnJ1cHQsIGZvciBleGFtcGxlLgo+Pgo+PiBI
-aSwgSSBoYXZlIGdvbmUgdGhyb3VnaCB2Z2ljX3F1ZXVlX2lycV91bmxvY2sgbW9yZSB0aGFuIG9u
-Y2UsIGJ1dAo+PiBzdGlsbCBjYW4ndCBmaW5kIHRoZSBwbGFjZSBpbiBpdCB0byBkcm9wIGFuIElS
-USBmcm9tIHRoZSBBUAo+PiBsaXN0Li4uIERpZCBJIG1pc3Mgc29tZXRoaW5nID8uLi4gIE9yIGNv
-dWxkIHlvdSBoZWxwIHRvIHBvaW50IGl0Cj4+IG91dD8gVGhhbmtzIHZlcnkgbXVjaCBmb3IgdGhp
-cyEKPiAKPiBOTywgeW91IGFyZSByaWdodC4gSSB0aGluayB0aGlzIGlzIGEgbWlzc2luZyBvcHRp
-bWlzYXRpb24uIFBsZWFzZSBjYWxsCj4gdGhlIGZ1bmN0aW9uIGFueXdheSwgYXMgdGhhdCdzIHdo
-YXQgaXMgcmVxdWlyZWQgdG8gY29tbXVuaWNhdGUgYQo+IGNoYW5nZSBvZiBzdGF0ZSBpbiBnZW5l
-cmFsLj4KPiBJJ2xsIGhhdmUgYSB0aGluayBhYm91dCBpdC4KCk1heWJlIHdlIGNvdWxkIGNhbGwg
-dmdpY19wcnVuZV9hcF9saXN0KCkgaWYgKGlycS0+dmNwdSAmJiAhdmdpY190YXJnZXRfb3JhY2xl
-KGlycSkpIGluIHZnaWNfcXVldWVfaXJxX3VubG9jaygpLi4uCgpPSywgSSB3aWxsIHJldGVzdCB0
-aGlzIHNlcmllcyBhbmQgc2VuZCBhIHY0IHNvb24uIDotKQoKVGhhbmtzLApTaGVubWluZwoKPiAK
-PiBUaGFua3MsCj4gCj4gCU0uCj4gCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlh
-LmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFy
-bQo=
+On Friday 12 Mar 2021 at 11:18:05 (+0000), Will Deacon wrote:
+> On Fri, Mar 12, 2021 at 10:13:26AM +0000, Quentin Perret wrote:
+> > On Friday 12 Mar 2021 at 09:32:06 (+0000), Will Deacon wrote:
+> > > I'm not saying to use the VMID directly, just that allocating half of the
+> > > pte feels a bit OTT given that the state of things after this patch series
+> > > is that we're using exactly 1 bit.
+> > 
+> > Right, and that was the reason for the PROT_NONE approach in the
+> > previous version, but we agreed it'd be worth generalizing to allow for
+> > future use-cases :-)
+> 
+> Yeah, just generalising to 32 bits feels like going too far! I dunno,
+> make it a u8 for now, or define the hypervisor owner ID as 1 and reject
+> owners greater than that? We can easily extend it later.
+
+Alrighty I'll do _both_
+
+> > > > > > @@ -517,28 +543,36 @@ static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
+> > > > > >  	if (!kvm_block_mapping_supported(addr, end, phys, level))
+> > > > > >  		return -E2BIG;
+> > > > > >  
+> > > > > > -	new = kvm_init_valid_leaf_pte(phys, data->attr, level);
+> > > > > > -	if (kvm_pte_valid(old)) {
+> > > > > > +	if (kvm_pte_valid(data->attr))
+> > > > > 
+> > > > > This feels like a bit of a hack to me: the 'attr' field in stage2_map_data
+> > > > > is intended to correspond directly to the lower/upper attributes of the
+> > > > > descriptor as per the architecture, so tagging the valid bit in there is
+> > > > > pretty grotty. However, I can see the significant advantage in being able
+> > > > > to re-use the stage2_map_walker functionality, so about instead of nobbling
+> > > > > attr, you set phys to something invalid instead, e.g.:
+> > > > > 
+> > > > > 	#define KVM_PHYS_SET_OWNER	(-1ULL)
+> > > > 
+> > > > That'll confuse kvm_block_mapping_supported() and friends I think, at
+> > > > least in their current form. If you _really_ don't like this, maybe we
+> > > > could have an extra 'flags' field in stage2_map_data?
+> > > 
+> > > I was pondering this last night and I thought of two ways to do it:
+> > > 
+> > > 1. Add a 'bool valid' and then stick the owner and the phys in a union.
+> > >    (yes, you'll need to update the block mapping checks to look at the
+> > >     valid flag)
+> > 
+> > Right, though that is also used for the hyp s1 which doesn't use any of
+> > this ATM. That shouldn't be too bad to change, I'll have a look.
+> 
+> Oh, I meant stick the bool in the stage2_map_data so that should be limited
+> to the stage2 path.
+
+I mean I still want to use kvm_block_mapping_supported() but ignore the
+phys check when it's not valid. I find it ugly to add a 'valid'
+parameter to the function itself, so maybe we're better off with just
+special casing phys == -1ULL as you first suggested. How much do you hate
+the below (totally untested)?
+
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index 8e4599256969..9ec937462fd6 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -71,6 +71,13 @@ static u64 kvm_granule_size(u32 level)
+        return BIT(kvm_granule_shift(level));
+ }
+
++#define KVM_PHYS_INVALID (-1ULL)
++
++static bool kvm_phys_is_valid(u64 phys)
++{
++       return phys != KVM_PHYS_INVALID;
++}
++
+ static bool kvm_level_support_block_mappings(u32 level)
+ {
+        /*
+@@ -90,7 +97,10 @@ static bool kvm_block_mapping_supported(u64 addr, u64 end, u64 phys, u32 level)
+        if (granule > (end - addr))
+                return false;
+
+-       return IS_ALIGNED(addr, granule) && IS_ALIGNED(phys, granule);
++       if (kvm_phys_is_valid(phys) && !IS_ALIGNED(phys, granule))
++               return false;
++
++       return IS_ALIGNED(addr, granule);
+ }
+
+ static u32 kvm_pgtable_idx(struct kvm_pgtable_walk_data *data, u32 level)
+@@ -550,7 +560,7 @@ static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
+        if (!kvm_block_mapping_supported(addr, end, phys, level))
+                return -E2BIG;
+
+-       if (kvm_pte_valid(data->attr))
++       if (kvm_phys_is_valid(phys))
+                new = kvm_init_valid_leaf_pte(phys, data->attr, level);
+        else
+                new = kvm_init_invalid_leaf_owner(data->owner_id);
+@@ -580,7 +590,8 @@ static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
+        smp_store_release(ptep, new);
+        if (stage2_pte_is_counted(new))
+                mm_ops->get_page(ptep);
+-       data->phys += granule;
++       if (kvm_phys_is_valid(phys))
++               data->phys += granule;
+        return 0;
+ }
+
+@@ -739,9 +750,6 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+        if (ret)
+                return ret;
+
+-       /* Set the valid flag to distinguish with the set_owner() path. */
+-       map_data.attr |= KVM_PTE_VALID;
+-
+        ret = kvm_pgtable_walk(pgt, addr, size, &walker);
+        dsb(ishst);
+        return ret;
+@@ -752,6 +760,7 @@ int kvm_pgtable_stage2_set_owner(struct kvm_pgtable *pgt, u64 addr, u64 size,
+ {
+        int ret;
+        struct stage2_map_data map_data = {
++               .phys           = KVM_PHYS_INVALID,
+                .mmu            = pgt->mmu,
+                .memcache       = mc,
+                .mm_ops         = pgt->mm_ops,
+
+
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
