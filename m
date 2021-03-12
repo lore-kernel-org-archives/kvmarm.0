@@ -1,67 +1,90 @@
-Return-Path: <SRS0=mhFy=IJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=ChHZ=IK=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80D90C433DB
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Mar 2021 19:36:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BB06C433DB
+	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 05:10:18 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B8B3464F70
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Mar 2021 19:36:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8B3464F70
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id DCC8164F76
+	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 05:10:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCC8164F76
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C57B4B49A;
-	Thu, 11 Mar 2021 14:36:53 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 320974B41A;
+	Fri, 12 Mar 2021 00:10:17 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id G2ZsaNtie-cX; Thu, 11 Mar 2021 14:36:51 -0500 (EST)
+	with ESMTP id Y0hBeAuTPTSh; Fri, 12 Mar 2021 00:10:16 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D60F94B4B6;
-	Thu, 11 Mar 2021 14:36:51 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1FBD04B458;
+	Fri, 12 Mar 2021 00:10:16 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 65E344B49A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Mar 2021 14:36:50 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CB774B41A
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 00:10:14 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zCURyPkSGGlJ for <kvmarm@lists.cs.columbia.edu>;
- Thu, 11 Mar 2021 14:36:49 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 06D9D4B470
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Mar 2021 14:36:48 -0500 (EST)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id A466864F6A;
- Thu, 11 Mar 2021 19:36:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1615491406;
- bh=63tmpZ5mQVPPLqeqb+wmvXJ9fc25KQP2XqeO4yS0/jY=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=HZ4y5yX6mn85uBntb/Oq3wAGEJJCLmygUsHwJIFJt8aZbeHP68kV0RI1X2JsB6N5o
- 49c1rXqLbxLQbmSX6swwoqbCyZRSPEB5XKf5xgNmJ6QVeVgIQ8qggREs7IaM4rtLzD
- 0fbE0klrepnYrK7cXPJw2tPS5DMQwNll52VB1fVyq6/XUzfKJMX2GObPRra9MlA7O0
- +JipwV5Hd8BT5aiYHcUAin6pzlh6ulg+4b0xPV5IkdeNIFgVkwhQnryfq+z1Te5snW
- Wx+cY5oxlLYgXErbxu+iZmd0dn7QWDy6A4dcYHxYH6VLg5VbmVxb1GmhR1B6ykzYxu
- weHYTYT+NbqLQ==
-Date: Thu, 11 Mar 2021 19:36:39 +0000
-From: Will Deacon <will@kernel.org>
-To: Quentin Perret <qperret@google.com>
-Subject: Re: [PATCH v4 13/34] KVM: arm64: Enable access to sanitized CPU
- features at EL2
-Message-ID: <20210311193638.GE31586@willie-the-truck>
+ with ESMTP id d6aSTy7Xaa47 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 12 Mar 2021 00:10:13 -0500 (EST)
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com
+ [209.85.128.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 66B634B40B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 00:10:13 -0500 (EST)
+Received: by mail-wm1-f45.google.com with SMTP id
+ f22-20020a7bc8d60000b029010c024a1407so15031122wml.2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Mar 2021 21:10:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=8rin+aXdpiE+90osiPBBCiB/kzC/wvTFDlufzLkieLY=;
+ b=RLh9oG+E0NRrQf3D4jDx/361FM3yrK1EmWOIlmVfSLVlQ+cwHf8/nT+4l2Ked5A0jn
+ rPXhwUvZI8dZFd+C9S0oLI35nPymHdflaDiaKvMxBRzS9+7b2Rc7Wc0TED6EGeaxElzU
+ fuJDo6skHJcy8k+l0WkEvRYlNZW0yzvWkTmFTXZfa7dNNDtB8cfNhHFYqIJSFnKEaE7S
+ eknHTHSYo9aefxdnodvlaAGCvIGEq+///KeqOBK3+/RP8HIQ/8X78lRz7lcrdQpdBw3Z
+ UvcHOPEkT27Cpm0ySKV+1Z2QjbVJOd/YCDYoKUme+3IM6dUGRZir3YPt/iSDmXGquFSR
+ 6D2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=8rin+aXdpiE+90osiPBBCiB/kzC/wvTFDlufzLkieLY=;
+ b=idaaC718GhIta8ZFf/YZAgDuN13hqjcph2wRGCFCreDtxVR7mWDt71M9gK/dprsMW6
+ PUSJ8JmBnD74WNGvDuc4AenjPA8aPImeKW8hPe/OZVy2kWi9n4/dPJx8rQbCy4CFEYiP
+ hKQqNJeiLaeCb+YCgPP5wP4HV5H3Cu8kIEB/JRtq0Lgzvwsu/bVb3T09sqTUiONGVp0c
+ 5AVQ+lMZD62o5A8nBKhAM0oqgX+DRs+k+x7axi0xmOY8Pro6xuq1ZFgzYMR5Q4SxMEPb
+ YWEMy8O/AapxznHW8lgUDwO0Lb5SbLWI3fiP1kVBuGza62MyAQ6PTQdlO/6zIURlvpPX
+ +Bdw==
+X-Gm-Message-State: AOAM532jY2ZACSKmj2t2WOCv0K2PfIPSVoLFHKYe5pwpAnbz06Zbe6+D
+ u5R3TvharU+rJD/Llvxwz9UK0w==
+X-Google-Smtp-Source: ABdhPJyJGE0OAQ0hL9P4QLn56wDbAlpAsInbXKRuWm98JDjTcUCCOJER4MsvkY9zyWkTfWx2MDNxvw==
+X-Received: by 2002:a1c:a985:: with SMTP id
+ s127mr10952353wme.158.1615525812255; 
+ Thu, 11 Mar 2021 21:10:12 -0800 (PST)
+Received: from google.com (230.69.233.35.bc.googleusercontent.com.
+ [35.233.69.230])
+ by smtp.gmail.com with ESMTPSA id d85sm871075wmd.15.2021.03.11.21.10.11
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 11 Mar 2021 21:10:11 -0800 (PST)
+Date: Fri, 12 Mar 2021 05:10:09 +0000
+From: Quentin Perret <qperret@google.com>
+To: Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v4 29/34] KVM: arm64: Refactor stage2_map_set_prot_attr()
+Message-ID: <YEr3sa0U2NnXqGUP@google.com>
 References: <20210310175751.3320106-1-qperret@google.com>
- <20210310175751.3320106-14-qperret@google.com>
+ <20210310175751.3320106-30-qperret@google.com>
+ <20210311184836.GA31586@willie-the-truck>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20210310175751.3320106-14-qperret@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20210311184836.GA31586@willie-the-truck>
 Cc: android-kvm@google.com, catalin.marinas@arm.com, mate.toth-pal@arm.com,
  seanjc@google.com, tabba@google.com, linux-kernel@vger.kernel.org,
  robh+dt@kernel.org, linux-arm-kernel@lists.infradead.org, maz@kernel.org,
@@ -82,175 +105,57 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Mar 10, 2021 at 05:57:30PM +0000, Quentin Perret wrote:
-> Introduce the infrastructure in KVM enabling to copy CPU feature
-> registers into EL2-owned data-structures, to allow reading sanitised
-> values directly at EL2 in nVHE.
+On Thursday 11 Mar 2021 at 18:48:36 (+0000), Will Deacon wrote:
+> On Wed, Mar 10, 2021 at 05:57:46PM +0000, Quentin Perret wrote:
+> > In order to ease its re-use in other code paths, refactor
+> > stage2_map_set_prot_attr() to not depend on a stage2_map_data struct.
+> > No functional change intended.
+> > 
+> > Signed-off-by: Quentin Perret <qperret@google.com>
+> > ---
+> >  arch/arm64/kvm/hyp/pgtable.c | 8 ++++----
+> >  1 file changed, 4 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> > index e4670b639726..c16e0306dd9a 100644
+> > --- a/arch/arm64/kvm/hyp/pgtable.c
+> > +++ b/arch/arm64/kvm/hyp/pgtable.c
+> > @@ -489,8 +489,7 @@ u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift)
+> >  	return vtcr;
+> >  }
+> >  
+> > -static int stage2_map_set_prot_attr(enum kvm_pgtable_prot prot,
+> > -				    struct stage2_map_data *data)
+> > +static int stage2_set_prot_attr(enum kvm_pgtable_prot prot, kvm_pte_t *ptep)
+> >  {
+> >  	bool device = prot & KVM_PGTABLE_PROT_DEVICE;
+> >  	kvm_pte_t attr = device ? PAGE_S2_MEMATTR(DEVICE_nGnRE) :
+> > @@ -510,7 +509,8 @@ static int stage2_map_set_prot_attr(enum kvm_pgtable_prot prot,
+> >  
+> >  	attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S2_SH, sh);
+> >  	attr |= KVM_PTE_LEAF_ATTR_LO_S2_AF;
+> > -	data->attr = attr;
+> > +	*ptep = attr;
+> > +
+> >  	return 0;
+> >  }
+> >  
+> > @@ -728,7 +728,7 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+> >  		.arg		= &map_data,
+> >  	};
+> >  
+> > -	ret = stage2_map_set_prot_attr(prot, &map_data);
+> > +	ret = stage2_set_prot_attr(prot, &map_data.attr);
+> >  	if (ret)
+> >  		return ret;
 > 
-> Given that only a subset of these features are being read by the
-> hypervisor, the ones that need to be copied are to be listed under
-> <asm/kvm_cpufeature.h> together with the name of the nVHE variable that
-> will hold the copy.
-> 
-> While at it, introduce the first user of this infrastructure by
-> implementing __flush_dcache_area at EL2, which needs
-> arm64_ftr_reg_ctrel0.
-> 
-> Signed-off-by: Quentin Perret <qperret@google.com>
-> ---
->  arch/arm64/include/asm/cpufeature.h     |  1 +
->  arch/arm64/include/asm/kvm_cpufeature.h | 17 +++++++++++++++++
->  arch/arm64/include/asm/kvm_host.h       |  4 ++++
->  arch/arm64/kernel/cpufeature.c          | 13 +++++++++++++
->  arch/arm64/kvm/hyp/nvhe/Makefile        |  3 ++-
->  arch/arm64/kvm/hyp/nvhe/cache.S         | 13 +++++++++++++
->  arch/arm64/kvm/hyp/nvhe/cpufeature.c    |  8 ++++++++
->  arch/arm64/kvm/sys_regs.c               | 21 +++++++++++++++++++++
->  8 files changed, 79 insertions(+), 1 deletion(-)
->  create mode 100644 arch/arm64/include/asm/kvm_cpufeature.h
->  create mode 100644 arch/arm64/kvm/hyp/nvhe/cache.S
->  create mode 100644 arch/arm64/kvm/hyp/nvhe/cpufeature.c
-> 
-> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-> index 61177bac49fa..a85cea2cac57 100644
-> --- a/arch/arm64/include/asm/cpufeature.h
-> +++ b/arch/arm64/include/asm/cpufeature.h
-> @@ -607,6 +607,7 @@ void check_local_cpu_capabilities(void);
->  
->  u64 read_sanitised_ftr_reg(u32 id);
->  u64 __read_sysreg_by_encoding(u32 sys_id);
-> +int copy_ftr_reg(u32 id, struct arm64_ftr_reg *dst);
->  
->  static inline bool cpu_supports_mixed_endian_el0(void)
->  {
-> diff --git a/arch/arm64/include/asm/kvm_cpufeature.h b/arch/arm64/include/asm/kvm_cpufeature.h
-> new file mode 100644
-> index 000000000000..d34f85cba358
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/kvm_cpufeature.h
-> @@ -0,0 +1,17 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Copyright (C) 2020 - Google LLC
-> + * Author: Quentin Perret <qperret@google.com>
-> + */
-> +
-> +#include <asm/cpufeature.h>
-> +
-> +#ifndef KVM_HYP_CPU_FTR_REG
-> +#if defined(__KVM_NVHE_HYPERVISOR__)
-> +#define KVM_HYP_CPU_FTR_REG(id, name) extern struct arm64_ftr_reg name;
-> +#else
-> +#define KVM_HYP_CPU_FTR_REG(id, name) DECLARE_KVM_NVHE_SYM(name);
-> +#endif
-> +#endif
-> +
-> +KVM_HYP_CPU_FTR_REG(SYS_CTR_EL0, arm64_ftr_reg_ctrel0)
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 06ca4828005f..459ee557f87c 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -751,9 +751,13 @@ void kvm_clr_pmu_events(u32 clr);
->  
->  void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu);
->  void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
-> +
-> +void setup_kvm_el2_caps(void);
->  #else
->  static inline void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr) {}
->  static inline void kvm_clr_pmu_events(u32 clr) {}
-> +
-> +static inline void setup_kvm_el2_caps(void) {}
->  #endif
->  
->  void kvm_vcpu_load_sysregs_vhe(struct kvm_vcpu *vcpu);
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index 066030717a4c..f2d8b479ff74 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -1154,6 +1154,18 @@ u64 read_sanitised_ftr_reg(u32 id)
->  }
->  EXPORT_SYMBOL_GPL(read_sanitised_ftr_reg);
->  
-> +int copy_ftr_reg(u32 id, struct arm64_ftr_reg *dst)
-> +{
-> +	struct arm64_ftr_reg *regp = get_arm64_ftr_reg(id);
-> +
-> +	if (!regp)
-> +		return -EINVAL;
-> +
-> +	memcpy(dst, regp, sizeof(*regp));
+> (nit: this is now different to hyp_map_set_prot_attr() -- can we do the same
+> thing there, please?)
 
-Can you not just use struct assignment here?
+Will do.
 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/cache.S b/arch/arm64/kvm/hyp/nvhe/cache.S
-> new file mode 100644
-> index 000000000000..36cef6915428
-> --- /dev/null
-> +++ b/arch/arm64/kvm/hyp/nvhe/cache.S
-> @@ -0,0 +1,13 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Code copied from arch/arm64/mm/cache.S.
-> + */
-> +
-> +#include <linux/linkage.h>
-> +#include <asm/assembler.h>
-> +#include <asm/alternative.h>
-> +
-> +SYM_FUNC_START_PI(__flush_dcache_area)
-> +	dcache_by_line_op civac, sy, x0, x1, x2, x3
-> +	ret
-> +SYM_FUNC_END_PI(__flush_dcache_area)
-
-Separate patch for this? (or fold it into that one really near the start
-that introduces some other PI helpers).
-
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 4f2f1e3145de..84be93df52fa 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -21,6 +21,7 @@
->  #include <asm/debug-monitors.h>
->  #include <asm/esr.h>
->  #include <asm/kvm_arm.h>
-> +#include <asm/kvm_cpufeature.h>
->  #include <asm/kvm_emulate.h>
->  #include <asm/kvm_hyp.h>
->  #include <asm/kvm_mmu.h>
-> @@ -2775,3 +2776,23 @@ void kvm_sys_reg_table_init(void)
->  	/* Clear all higher bits. */
->  	cache_levels &= (1 << (i*3))-1;
->  }
-> +
-> +#undef KVM_HYP_CPU_FTR_REG
-> +#define KVM_HYP_CPU_FTR_REG(id, name) \
-> +	{ .sys_id = id, .dst = (struct arm64_ftr_reg *)&kvm_nvhe_sym(name) },
-> +struct __ftr_reg_copy_entry {
-> +	u32			sys_id;
-> +	struct arm64_ftr_reg	*dst;
-> +} hyp_ftr_regs[] __initdata = {
-> +	#include <asm/kvm_cpufeature.h>
-> +};
-
-This looks a bit elaborate to me. Why can't you just spell things out here
-like:
-
-#define KVM_HYP_CPU_FTR_REG(id, name) \
-	{ .sys_id = id, .dst = (struct arm64_ftr_reg *)&kvm_nvhe_sym(name) }
-
-struct __ftr_reg_copy_entry {
-	u32			sys_id;
-	struct arm64_ftr_reg	*dst;
-} hyp_ftr_regs[] __initdata = {
-	KVM_HYP_CPU_FTR_REG(SYS_CTR_EL0, arm64_ftr_reg_ctrel0),
-	...
-};
-
-and then have the header file be a normal, guarded header which just
-declares these things? The id parameter to the macro isn't used there.
-
-Will
+Thanks,
+Quentin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
