@@ -2,88 +2,67 @@ Return-Path: <SRS0=ChHZ=IK=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08E27C433E0
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 09:15:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ACE0C433DB
+	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 09:26:08 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 529E464FDD
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 09:15:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 529E464FDD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 9A0B964FD5
+	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 09:26:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A0B964FD5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B91EC4B502;
-	Fri, 12 Mar 2021 04:15:38 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DD2B4B6FE;
+	Fri, 12 Mar 2021 04:26:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id NEr4nvambAk4; Fri, 12 Mar 2021 04:15:37 -0500 (EST)
+	with ESMTP id nauNH7deYfLd; Fri, 12 Mar 2021 04:26:05 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C9284B518;
-	Fri, 12 Mar 2021 04:15:37 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E8EC34B5D9;
+	Fri, 12 Mar 2021 04:26:05 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AF8594B505
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 04:15:35 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9916E4B579
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 04:26:04 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Uf1cHqwI1zwB for <kvmarm@lists.cs.columbia.edu>;
- Fri, 12 Mar 2021 04:15:34 -0500 (EST)
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com
- [209.85.128.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9258F4B53C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 04:15:34 -0500 (EST)
-Received: by mail-wm1-f44.google.com with SMTP id
- n11-20020a05600c4f8bb029010e5cf86347so4189167wmq.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 01:15:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=8hyTObTnA8b0Pah5w5x3EX45G+4aGq3Qg+uSFkSPcCo=;
- b=jVs4+SZBOncaHTNZfrQPmfUwVYzNZgKm+iL7UkFzH2hi1esIn3UON4srQWsKqCTzIQ
- v8JzJSmZb/Dt5o4ziJlrUAEwS2Rozm3WkV8g21rcbXUuZHVDSd9g6MygPJfvd2G8gKRX
- 3xEtqIHBTd95yzydjWyupkUBpp0DkDmseSBNQCM/Y3SQORaEXSfQuWSVT+Wi/qtY403j
- YJ3N/tL9sTiVdHVw4vpjyxqiknFYfbN3qfQSohG7eu56ZkuMaenkzlbqQRqucppZa6wJ
- nURlMd0nasN1vXl7gtLFx739nu6Zg3c9ItV3TJWROADQH4DX2TjRm0RCnbCQlLC6+RnZ
- apjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=8hyTObTnA8b0Pah5w5x3EX45G+4aGq3Qg+uSFkSPcCo=;
- b=jIS7/paK1ohKnAK6acK4zLOFjAOBjZ6ZJ3KfIR4lzhkwEvO73wti7SqMLNQ7B0TWJQ
- 3fhmdYuzrlQoNkPmUp/5ftTfH6rmtG3KjdY8XsbwIi+ZWvrUuLfFhSm5xPcklbZrtp8L
- hmqkbVcCKPqkap8HyhXCm1n0dx/dAm5AOrsBU7mzcb4EF04iz3VMlCitMSzPr9ksOCj+
- CerXWKL6VZFxZ+hP5mEyfkRMsmedvm6SfB7IZuODtW4AbCDzLxDa9mvZj06P5TmM7PW6
- 4i/knP/mmD+Np26qmVqAdBiRLO4Gxm0j2aEQB+MSi5i/O/lbGv8+mMJ7jLg982CGEVr1
- S9dg==
-X-Gm-Message-State: AOAM532bkzoJoF9FfZj0xvrfNP+coROzv5VSfPXBXYehenIKiiD4P39L
- XKks++AlDrkUeXzUJBfWmlOEYA==
-X-Google-Smtp-Source: ABdhPJyo6oi+MSsftqzukHAyRgFvWhaTOLTqQm++oJ1mRSO/qD8ZSQ8ap6nF6e9hdN/8C+ctlvX1pg==
-X-Received: by 2002:a1c:8041:: with SMTP id b62mr12506853wmd.0.1615540533351; 
- Fri, 12 Mar 2021 01:15:33 -0800 (PST)
-Received: from google.com (230.69.233.35.bc.googleusercontent.com.
- [35.233.69.230])
- by smtp.gmail.com with ESMTPSA id j203sm1510033wmj.40.2021.03.12.01.15.33
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 12 Mar 2021 01:15:33 -0800 (PST)
-Date: Fri, 12 Mar 2021 09:15:30 +0000
-From: Quentin Perret <qperret@google.com>
-To: Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v4 27/34] KVM: arm64: Always zero invalid PTEs
-Message-ID: <YEsxMgNncoVLdkjo@google.com>
+ with ESMTP id AXWsRrC82Jxe for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 12 Mar 2021 04:26:03 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9AD3F4B577
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 04:26:03 -0500 (EST)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id B85FE64ED7;
+ Fri, 12 Mar 2021 09:25:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1615541162;
+ bh=lt1IwrNUaz19OAxDfxgi2aiw3GOvHySCHyMhts/ttlc=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=fj6Lfc2WDvpu5FN2uF4nmKoY/pKj+yD6c1fxrHH/2C9G+WxYhA5XcICxqbDZryfHb
+ UILcjc19PqDMIxnxPslMIKU2n5/nLiV1Ky0Z9E//xMmLGgTQbxgeTfZU2kAWYZBxoK
+ Rw0RHvov/Ewu9lspDaalDVnJc6UQlHkTT0o+ubMrV+1eER3D8uUTJ/+L6pVBO3wu1g
+ kIfJ2rWYtUX9JtkeoRaoE/+5gOfR4fv6xG95DkxlY7BkzgE1Yyi8ZdhqCgebkwanaU
+ mLNNKPkrM9JHPA5MDb6489q/r3qq5RVsRy0VwZST8KtNuShKhUgPjyWON19f6p7gH9
+ G9dOWm5SsN/+g==
+Date: Fri, 12 Mar 2021 09:25:56 +0000
+From: Will Deacon <will@kernel.org>
+To: Quentin Perret <qperret@google.com>
+Subject: Re: [PATCH v4 13/34] KVM: arm64: Enable access to sanitized CPU
+ features at EL2
+Message-ID: <20210312092556.GA32016@willie-the-truck>
 References: <20210310175751.3320106-1-qperret@google.com>
- <20210310175751.3320106-28-qperret@google.com>
- <20210311173338.GB31378@willie-the-truck>
+ <20210310175751.3320106-14-qperret@google.com>
+ <20210311193638.GE31586@willie-the-truck>
+ <YEsLYX2CjNMXF9TN@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20210311173338.GB31378@willie-the-truck>
+In-Reply-To: <YEsLYX2CjNMXF9TN@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Cc: android-kvm@google.com, catalin.marinas@arm.com, mate.toth-pal@arm.com,
  seanjc@google.com, tabba@google.com, linux-kernel@vger.kernel.org,
  robh+dt@kernel.org, linux-arm-kernel@lists.infradead.org, maz@kernel.org,
@@ -104,20 +83,61 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thursday 11 Mar 2021 at 17:33:38 (+0000), Will Deacon wrote:
-> On Wed, Mar 10, 2021 at 05:57:44PM +0000, Quentin Perret wrote:
-> > kvm_set_invalid_pte() currently only clears bit 0 from a PTE because
-> > stage2_map_walk_table_post() needs to be able to follow the anchor. In
-> > preparation for re-using bits 63-02 from invalid PTEs, make sure to zero
+On Fri, Mar 12, 2021 at 06:34:09AM +0000, Quentin Perret wrote:
+> On Thursday 11 Mar 2021 at 19:36:39 (+0000), Will Deacon wrote:
+> > On Wed, Mar 10, 2021 at 05:57:30PM +0000, Quentin Perret wrote:
+> > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > > index 4f2f1e3145de..84be93df52fa 100644
+> > > --- a/arch/arm64/kvm/sys_regs.c
+> > > +++ b/arch/arm64/kvm/sys_regs.c
+> > > @@ -21,6 +21,7 @@
+> > >  #include <asm/debug-monitors.h>
+> > >  #include <asm/esr.h>
+> > >  #include <asm/kvm_arm.h>
+> > > +#include <asm/kvm_cpufeature.h>
+> > >  #include <asm/kvm_emulate.h>
+> > >  #include <asm/kvm_hyp.h>
+> > >  #include <asm/kvm_mmu.h>
+> > > @@ -2775,3 +2776,23 @@ void kvm_sys_reg_table_init(void)
+> > >  	/* Clear all higher bits. */
+> > >  	cache_levels &= (1 << (i*3))-1;
+> > >  }
+> > > +
+> > > +#undef KVM_HYP_CPU_FTR_REG
+> > > +#define KVM_HYP_CPU_FTR_REG(id, name) \
+> > > +	{ .sys_id = id, .dst = (struct arm64_ftr_reg *)&kvm_nvhe_sym(name) },
+> > > +struct __ftr_reg_copy_entry {
+> > > +	u32			sys_id;
+> > > +	struct arm64_ftr_reg	*dst;
+> > > +} hyp_ftr_regs[] __initdata = {
+> > > +	#include <asm/kvm_cpufeature.h>
+> > > +};
+> > 
+> > This looks a bit elaborate to me. Why can't you just spell things out here
+> > like:
+> > 
+> > #define KVM_HYP_CPU_FTR_REG(id, name) \
+> > 	{ .sys_id = id, .dst = (struct arm64_ftr_reg *)&kvm_nvhe_sym(name) }
+> > 
+> > struct __ftr_reg_copy_entry {
+> > 	u32			sys_id;
+> > 	struct arm64_ftr_reg	*dst;
+> > } hyp_ftr_regs[] __initdata = {
+> > 	KVM_HYP_CPU_FTR_REG(SYS_CTR_EL0, arm64_ftr_reg_ctrel0),
+> > 	...
+> > };
+> > 
+> > and then have the header file be a normal, guarded header which just
+> > declares these things? The id parameter to the macro isn't used there.
 > 
-> Why do you exclude bit 1 from this range?
+> I just tried to reduce the boilerplate as much as possible -- in the
+> current form you only need to add additional features to the header
+> it'll 'just work'.
 
-Hmm, no good reason really. I wanted to play games with invalid table
-mappings at some point, but dropped the idea and forgot to update the
-commit message. My bad, I'll fix it up.
+I don't really think it's worth it -- people are used to having to add
+declarations for things, so keeping it simple should be fine.
 
-Thanks,
-Quentin
+Will
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
