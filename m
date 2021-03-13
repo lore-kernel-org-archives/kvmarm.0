@@ -1,101 +1,62 @@
-Return-Path: <SRS0=ChHZ=IK=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=9gNu=IL=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC224C433E0
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 22:27:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F0CBC433DB
+	for <kvmarm@archiver.kernel.org>; Sat, 13 Mar 2021 08:39:41 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D16D464F64
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Mar 2021 22:27:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D16D464F64
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 1DED664F1A
+	for <kvmarm@archiver.kernel.org>; Sat, 13 Mar 2021 08:39:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DED664F1A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A5FF4B4E4;
-	Fri, 12 Mar 2021 17:27:25 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 844154B48F;
+	Sat, 13 Mar 2021 03:39:39 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id UzXVxbqhz7x4; Fri, 12 Mar 2021 17:27:24 -0500 (EST)
+	with ESMTP id Ez3-tThywd2G; Sat, 13 Mar 2021 03:39:38 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 04CD54B4DA;
-	Fri, 12 Mar 2021 17:27:24 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 356344B4A3;
+	Sat, 13 Mar 2021 03:39:38 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D15744B4DA
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 17:27:22 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7FC754B480
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 13 Mar 2021 03:39:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sD4pYP+aOn9T for <kvmarm@lists.cs.columbia.edu>;
- Fri, 12 Mar 2021 17:27:21 -0500 (EST)
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com
- [209.85.208.176])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A12814B406
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 17:27:21 -0500 (EST)
-Received: by mail-lj1-f176.google.com with SMTP id u4so9236815ljo.6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Mar 2021 14:27:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=pUE5cPRj82pN6oWDtfrTyERGHLKsQg6bLu9MJ6uTUso=;
- b=FNFco3tIosoTdAF0Wn5QZPLnndHLHfuu5ZjcTO4lddmc1BnCcft1kp1aq/gnNi98u1
- 6ZLzdR+j6/KGh5DyWwV10oNbY+qwOhlcOgMhbTJcEMifuqfrn7mh90a7E9YcI+K+aDgn
- KZnD7ROKB5mN+d5Xld1AF6bwLayt8U/qx5SnZo2lcsY6WC34s18HysDE9eTziUSQ+sbo
- 0h31Me02VhrNbF9WI6eLeeoAdWAqWqYNdaWNj4Io9yrKEIr7HTSDIY1UJhRkxy0ap+0+
- 8MuZ0nNKyhnmK0apDZEm1gQh9uNUldn+69B59Wm6GXYhMvpwkC+Dw8Kaz6pUf8K3ve1H
- wMww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=pUE5cPRj82pN6oWDtfrTyERGHLKsQg6bLu9MJ6uTUso=;
- b=VQQcdgS8lT4fnKE+aZ1/P6DgJyT1nmuDymbjO5/UMjLZsSjFvBsdbDtqVZlEP2j2B6
- 0WmMuxL2kXt50aavPQ3omPUx0zqdTjhCymYZfCC4CWmI7qnKAXuUCMurMjr/UeW/w6OE
- 3YCzv6ajgRMKYQId27MeW51RoLHbTpilt7DOXD1xXKzzAUgGz6nGF7TZ+BAJ/W1eN+T+
- PyQU+skP5mCCeWU8157VhgtKDAhItI4lgFcA6ZxQgWOLxjtVyNe9yoVhiF6maZJsCTTH
- bi7cqwclSNSR7K12xeoXyPYIgSakGMh08tQka/dMyoTCoP4M3pPEzitGClHEEgFhCFyQ
- NzYw==
-X-Gm-Message-State: AOAM530Of+TxhdOySR3y3Y1GfUkwtTAfMcKQ+YLyLCYJ8IU4pZORdleK
- PJOt2h/qiVECat1R48eL0nT/iGrqpxX5C3N/36N0eg==
-X-Google-Smtp-Source: ABdhPJypcdjl26p+Fe6F+oyWMPjaNvoNfDYHRTkKiolYtZzG0+rkKu8Hda3ErL9OGzBCmPJ4OLdg2Yr71f2cJ/NFeoU=
-X-Received: by 2002:a2e:8e75:: with SMTP id t21mr3678642ljk.216.1615588039907; 
- Fri, 12 Mar 2021 14:27:19 -0800 (PST)
+ with ESMTP id 3+cunHF7gA3W for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 13 Mar 2021 03:39:34 -0500 (EST)
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4F81A4B49A
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 13 Mar 2021 03:39:34 -0500 (EST)
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
+ by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4DyGJz6DxKz8wxp;
+ Sat, 13 Mar 2021 16:37:39 +0800 (CST)
+Received: from DESKTOP-7FEPK9S.china.huawei.com (10.174.184.135) by
+ DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
+ 14.3.498.0; Sat, 13 Mar 2021 16:39:21 +0800
+From: Shenming Lu <lushenming@huawei.com>
+To: Marc Zyngier <maz@kernel.org>, Eric Auger <eric.auger@redhat.com>, "Will
+ Deacon" <will@kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+ <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: [PATCH v4 0/6] KVM: arm64: Add VLPI migration support on GICv4.1
+Date: Sat, 13 Mar 2021 16:38:54 +0800
+Message-ID: <20210313083900.234-1-lushenming@huawei.com>
+X-Mailer: git-send-email 2.27.0.windows.1
 MIME-Version: 1.0
-References: <20210310003024.2026253-1-jingzhangos@google.com>
- <20210310003024.2026253-4-jingzhangos@google.com>
- <bb03107c-a413-50da-e228-d338dd471fb3@redhat.com>
- <CAAdAUtjj52+cAhD4KUzAaqrMSJXHD0g=ecQNG-a92Mqn3BCxiQ@mail.gmail.com>
- <ac7462de-1531-5428-5dca-4e3dfb897000@redhat.com>
-In-Reply-To: <ac7462de-1531-5428-5dca-4e3dfb897000@redhat.com>
-From: Jing Zhang <jingzhangos@google.com>
-Date: Fri, 12 Mar 2021 16:27:08 -0600
-Message-ID: <CAAdAUtjV67hx5BAd31-RG6tjgfZ6tdyu_yLhkbR0d-3qm59mMA@mail.gmail.com>
-Subject: Re: [RFC PATCH 3/4] KVM: stats: Add ioctl commands to pull statistics
- in binary format
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
- Paul Mackerras <paulus@ozlabs.org>,
- Linux kselftest <linux-kselftest@vger.kernel.org>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Will Deacon <will@kernel.org>,
- KVM ARM <kvmarm@lists.cs.columbia.edu>,
- Emanuele Giuseppe Esposito <eesposit@redhat.com>,
- Linux S390 <linux-s390@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
- Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>,
- Huacai Chen <chenhuacai@kernel.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- David Rientjes <rientjes@google.com>, KVM PPC <kvm-ppc@vger.kernel.org>,
- Jim Mattson <jmattson@google.com>,
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- Sean Christopherson <seanjc@google.com>, Cornelia Huck <cohuck@redhat.com>,
- Peter Shier <pshier@google.com>, Linux MIPS <linux-mips@vger.kernel.org>,
- Vitaly Kuznetsov <vkuznets@redhat.com>
+X-Originating-IP: [10.174.184.135]
+X-CFilter-Loop: Reflected
+Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+ Cornelia Huck <cohuck@redhat.com>, lushenming@huawei.com,
+ Alex Williamson <alex.williamson@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -112,64 +73,100 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Paolo,
+Hi,
 
-On Fri, Mar 12, 2021 at 12:11 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 10/03/21 22:41, Jing Zhang wrote:
-> >> I would prefer a completely different interface, where you have a file
-> >> descriptor that can be created and associated to a vCPU or VM (or even
-> >> to /dev/kvm).  Having a file descriptor is important because the fd can
-> >> be passed to a less-privileged process that takes care of gathering the
-> >> metrics
-> > Separate file descriptor solution is very tempting. We are still considering it
-> > seriously. Our biggest concern is that the metrics gathering/handling process
-> > is not necessary running on the same node as the one file descriptor belongs to.
-> > It scales better to pass metrics data directly than to pass file descriptors.
->
-> If you want to pass metrics data directly, you can just read the file
-> descriptor from your VMM, just like you're using the ioctls now.
-> However the file descriptor also allows a privilege-separated same-host
-> interface.
-It makes sense.
->
-> >> 4 bytes flags (always zero)
-Could you give some potential use for this flag?
-> >> 4 bytes number of statistics
-> >> 4 bytes offset of the first stat description
-> >> 4 bytes offset of the first stat value
-> >> stat descriptions:
-> >>    - 4 bytes for the type (for now always zero: uint64_t)
-Potential use for this type? Should we move this outside descriptor? Since
-all stats probably have the same size.
-> >>    - 4 bytes for the flags (for now always zero)
-Potential use for this flag?
-> >>    - length of name
-> >>    - name
-> >> statistics in 64-bit format
-> >
-> > The binary format presented above is very flexible. I understand why it is
-> > organized this way.
-> > In our situation, the metrics data could be pulled periodically as short as
-> > half second. They are used by different kinds of monitors/triggers/alerts.
-> > To enhance efficiency and reduce traffic caused by metrics passing, we
-> > treat all metrics info/data as two kinds. One is immutable information,
-> > which doesn't change in a given system boot. The other is mutable
-> > data (statistics data), which is pulled/transferred periodically at a high
-> > frequency.
->
-> The format allows to place the values before the descriptions.  So you
-> could use pread to only read the first part of the file descriptor, and
-> the file_operations implementation would then skip the work of building
-> the immutable data.  It doesn't have to be implemented from the
-> beginning like that, but the above format supports it.
-Good point! I'll be working on the new fd-based interface and come back
-with new patchset.
->
-> Paolo
->
+In GICv4.1, migration has been supported except for (directly-injected)
+VLPI. And GICv4.1 Spec explicitly gives a way to get the VLPI's pending
+state (which was crucially missing in GICv4.0). So we make VLPI migration
+capable on GICv4.1 in this series.
+
+In order to support VLPI migration, we need to save and restore all
+required configuration information and pending states of VLPIs. But
+in fact, the configuration information of VLPIs has already been saved
+(or will be reallocated on the dst host...) in vgic(kvm) migration.
+So we only have to migrate the pending states of VLPIs specially.
+
+Below is the related workflow in migration.
+
+On the save path:
+	In migration completion:
+		pause all vCPUs
+				|
+		call each VM state change handler:
+			pause other devices (just keep from sending interrupts, and
+			such as VFIO migration protocol has already realized it [1])
+					|
+			flush ITS tables into guest RAM
+					|
+			flush RDIST pending tables (also flush VLPI pending states here)
+				|
+		...
+On the resume path:
+	load each device's state:
+		restore ITS tables (include pending tables) from guest RAM
+				|
+		for other (PCI) devices (paused), if configured to have VLPIs,
+		establish the forwarding paths of their VLPIs (and transfer
+		the pending states from kvm's vgic to VPT here)
+
+We have tested this series in VFIO migration, and found some related
+issues in QEMU [2].
+
+Links:
+[1] vfio: UAPI for migration interface for device state:
+    https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a8a24f3f6e38103b77cf399c38eb54e1219d00d6
+[2] vfio: Some fixes and optimizations for VFIO migration:
+    https://patchwork.ozlabs.org/project/qemu-devel/cover/20210310030233.1133-1-lushenming@huawei.com/
+
+History:
+
+v3 -> v4
+ - Nit fixes.
+ - Add a CPU cache invalidation right after unmapping the vPE. (Patch 1)
+ - Drop the setting of PTZ altogether. (Patch 2)
+ - Bail out if spot !vgic_initialized(). (in Patch 4)
+ - Communicate the state change (clear pending_latch) via
+   vgic_queue_irq_unlock. (in Patch 5)
+
+Thanks a lot for the suggestions from Marc!
+
+v2 -> v3
+ - Add the vgic initialized check to ensure that the allocation and enabling
+   of the doorbells have already been done before unmapping the vPEs.
+ - Check all get_vlpi_state related conditions in save_pending_tables in one place.
+ - Nit fixes.
+
+v1 -> v2:
+ - Get the VLPI state from the KVM side.
+ - Nit fixes.
+
 Thanks,
-Jing
+Shenming
+
+
+Marc Zyngier (1):
+  irqchip/gic-v3-its: Add a cache invalidation right after vPE unmapping
+
+Shenming Lu (4):
+  irqchip/gic-v3-its: Drop the setting of PTZ altogether
+  KVM: arm64: GICv4.1: Add function to get VLPI state
+  KVM: arm64: GICv4.1: Try to save VLPI state in save_pending_tables
+  KVM: arm64: GICv4.1: Give a chance to save VLPI state
+
+Zenghui Yu (1):
+  KVM: arm64: GICv4.1: Restore VLPI pending state to physical side
+
+ .../virt/kvm/devices/arm-vgic-its.rst         |  2 +-
+ arch/arm64/kvm/vgic/vgic-its.c                |  6 +-
+ arch/arm64/kvm/vgic/vgic-v3.c                 | 66 +++++++++++++++++--
+ arch/arm64/kvm/vgic/vgic-v4.c                 | 37 +++++++++++
+ arch/arm64/kvm/vgic/vgic.h                    |  1 +
+ drivers/irqchip/irq-gic-v3-its.c              | 21 +++++-
+ 6 files changed, 121 insertions(+), 12 deletions(-)
+
+-- 
+2.19.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
