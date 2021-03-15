@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1782C433E6
-	for <kvmarm@archiver.kernel.org>; Mon, 15 Mar 2021 14:36:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 308C8C433E0
+	for <kvmarm@archiver.kernel.org>; Mon, 15 Mar 2021 14:36:18 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4B6CE64FB2
-	for <kvmarm@archiver.kernel.org>; Mon, 15 Mar 2021 14:36:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B6CE64FB2
+	by mail.kernel.org (Postfix) with ESMTP id A9D2364FA5
+	for <kvmarm@archiver.kernel.org>; Mon, 15 Mar 2021 14:36:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9D2364FA5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F0D5C4B645;
-	Mon, 15 Mar 2021 10:36:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AA5F4B203;
+	Mon, 15 Mar 2021 10:36:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6lhBb3rdLoqH; Mon, 15 Mar 2021 10:36:14 -0400 (EDT)
+	with ESMTP id M4AneAY0qX9n; Mon, 15 Mar 2021 10:36:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4309F4B638;
-	Mon, 15 Mar 2021 10:36:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E75D4B665;
+	Mon, 15 Mar 2021 10:36:15 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6138F4B4FC
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 10:36:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DEA374B118
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 10:36:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id O4asscjibhjE for <kvmarm@lists.cs.columbia.edu>;
- Mon, 15 Mar 2021 10:36:10 -0400 (EDT)
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com
- [209.85.128.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 56E6A4B5FB
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 10:36:10 -0400 (EDT)
-Received: by mail-wm1-f73.google.com with SMTP id a68so2306294wme.1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 07:36:10 -0700 (PDT)
+ with ESMTP id moFk+4vDj+at for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 15 Mar 2021 10:36:13 -0400 (EDT)
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com
+ [209.85.221.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CCD484B5DE
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 10:36:12 -0400 (EDT)
+Received: by mail-wr1-f73.google.com with SMTP id p12so12607466wrn.18
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 07:36:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=82gUjSiOy75013Ao/6wOddaZLFu0pa6owwuj1ggeuy4=;
- b=CD9bFfHL7VhMeePH17RF85emad8M7ZhRkOPIKahkEZ7HAAfIyxJpxFRokWpU32rFK1
- CzmaNCf+CCicqi+lk0p6Kvc37kc5L8PrGXpJcG/3oWqxwsDB5902k+kIYrZlNy95lekM
- IzF3use+ujY9UWJXdWi56mWRemJDlG7Xu98WTdWA1GndJDFoMBWOXaNzo8YUBErWGIwp
- CoqIM3BZqmueTp6q1/MpOuU+qpqIOJpDiIHw0PyfeAoZ0zn5Rg0Q9nChCJG0uflFusau
- 3eMHJJHLViXpQmyPsZ8hZuLTpesIibwx+AcCBPlYjSON+7OmBlaQApjjCUAD5AfBNss+
- OlNg==
+ :cc; bh=3hA7tosEY4dPQwz7wIkxBpuvpX7Hy1acE9O5r7Hvk3A=;
+ b=VPdm53sxCIyfLckE3eCIPGFnhmYvji9+FFRac0tP5RFkNTeQjU3PyWF73wMpp3qHuq
+ MRq80VDnvyyJZtBXgaMd+6qwAuEqoVacMii3LnsVTDa6VXGxQd2FDcKgPXOQlfHbf2hr
+ 7jeLnfAWLaA5hmrMMDXGstV9vSBjjgFM2Iz2GsUR/MPprlCiITEsgWZZZvIbviMyi3ky
+ 4hUqbjDNdpbvNidGmiLsNlpyjlKOmgE7+fKcw7rBk8FUhXTO4oiZZPbiFgfRypFdEd6R
+ Fe+FdmnVguWbs048n5yF43ce39d2OX9fdmx8TfQzKJJ5yZWFdUKFlB0NqvPvJOJOzcez
+ BdaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=82gUjSiOy75013Ao/6wOddaZLFu0pa6owwuj1ggeuy4=;
- b=C7K5Bqea8H7xuQrly1C9j41V0h62Qh+5wWaMbr44Uc5fllu29oQyP7ywhauxhxTsuE
- uf9xi1LPaw57BEHBqsKcFgQhewtKD9dBoYuHvCbFAr8mmcyg37EzeWcgD41Jo+LdCg1e
- SL3L08Kdtne+HRYO+OZToFN4zEGxw9BduYFIPhTZyyAlZjKabaPAJXdqJZT4IO29gM1Z
- DgEcU+jKwnPox37Hwq9kCr8KXhynshQkIu80uU8L7T0EcQaGNvfMj1QMl06ZsDy3DQKm
- FNXZpdAo4ntn8kyMl2MbSaaUCfgnnPH8dGxk0g0b3fCVPVENxjtBKfiagh7rLrHMM/Sn
- J53A==
-X-Gm-Message-State: AOAM532igDF8ESsIW5MWovElXJ5G28KlMBu+7fyVWPx+YESaKyfjyZuv
- YXGnrMoHPY0MZNQPhM27xMC2wv6V4oES
-X-Google-Smtp-Source: ABdhPJx9xRKDOfRDFlI/TfqGPcgwP0Fg2uHLCHIdGqPsMxwfgsZghPG6ZkVnzBXOgz/h4g5be4yqugrc6gdm
+ bh=3hA7tosEY4dPQwz7wIkxBpuvpX7Hy1acE9O5r7Hvk3A=;
+ b=TQJWSLJawu0gtqYKF66yiybmbBuISDvbm/4UhIy5QtA9fJA2Ys86Th+yyMSc47qx9E
+ WHOyfwADdTL/gFHDRgKL/pUBnr5XT50NQHMuwcojYmYGf7xNT/bgECe8sIQFLsLUO2e+
+ zdZCuAfuzOgn9abgC4Va/O/wjh9Zjvzc6oPqCkflmHx6kyztCSm6spXB0kKa2mI8FesT
+ Nvs3buF4+uIxXx0JKlPRZW6ROSVvxnBrQSGB3pX3lZ1X97ap6WSAosExr7TOCVwCA9yD
+ MbsWblokSYC8N63FDtyh4uN6DjVgLTsYdMqQgz2yy5PMfu432cxBz1LwlOP6JF8z1qp+
+ 6r4w==
+X-Gm-Message-State: AOAM530ivpUXjFYIr5ZPc3ampIEn7b6VXZjEaRK7yulxGG3YCQAo5mj+
+ +GHUDsYQMuDy7CDCWvS43dS55azf+4Ie
+X-Google-Smtp-Source: ABdhPJzYhRfdIlEKb6klF7NPABZ+u2gjQiVHViCdjX1yjgBMKmlXOcLm5BOWaFgW0byaeWgbp83VIVYMf99n
 X-Received: from r2d2-qp.c.googlers.com ([fda3:e722:ac3:10:28:9cb1:c0a8:1652])
- (user=qperret job=sendgmr) by 2002:a7b:c188:: with SMTP id
- y8mr33590wmi.76.1615818969596; Mon, 15 Mar 2021 07:36:09 -0700 (PDT)
-Date: Mon, 15 Mar 2021 14:35:14 +0000
+ (user=qperret job=sendgmr) by 2002:a7b:c18e:: with SMTP id
+ y14mr1121168wmi.1.1615818971570; Mon, 15 Mar 2021 07:36:11 -0700 (PDT)
+Date: Mon, 15 Mar 2021 14:35:15 +0000
 In-Reply-To: <20210315143536.214621-1-qperret@google.com>
-Message-Id: <20210315143536.214621-15-qperret@google.com>
+Message-Id: <20210315143536.214621-16-qperret@google.com>
 Mime-Version: 1.0
 References: <20210315143536.214621-1-qperret@google.com>
 X-Mailer: git-send-email 2.31.0.rc2.261.g7f71774620-goog
-Subject: [PATCH v5 14/36] KVM: arm64: Provide __flush_dcache_area at EL2
+Subject: [PATCH v5 15/36] KVM: arm64: Factor out vector address calculation
 From: Quentin Perret <qperret@google.com>
 To: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org, 
  james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
@@ -97,74 +97,58 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-We will need to do cache maintenance at EL2 soon, so compile a copy of
-__flush_dcache_area at EL2, and provide a copy of arm64_ftr_reg_ctrel0
-as it is needed by the read_ctr macro.
+In order to re-map the guest vectors at EL2 when pKVM is enabled,
+refactor __kvm_vector_slot2idx() and kvm_init_vector_slot() to move all
+the address calculation logic in a static inline function.
 
+Acked-by: Will Deacon <will@kernel.org>
 Signed-off-by: Quentin Perret <qperret@google.com>
 ---
- arch/arm64/include/asm/kvm_cpufeature.h |  2 ++
- arch/arm64/kvm/hyp/nvhe/Makefile        |  3 ++-
- arch/arm64/kvm/hyp/nvhe/cache.S         | 13 +++++++++++++
- arch/arm64/kvm/sys_regs.c               |  1 +
- 4 files changed, 18 insertions(+), 1 deletion(-)
- create mode 100644 arch/arm64/kvm/hyp/nvhe/cache.S
+ arch/arm64/include/asm/kvm_mmu.h | 8 ++++++++
+ arch/arm64/kvm/arm.c             | 9 +--------
+ 2 files changed, 9 insertions(+), 8 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_cpufeature.h b/arch/arm64/include/asm/kvm_cpufeature.h
-index 3fd9f60d2180..efba1b89b8a4 100644
---- a/arch/arm64/include/asm/kvm_cpufeature.h
-+++ b/arch/arm64/include/asm/kvm_cpufeature.h
-@@ -13,3 +13,5 @@
- #define KVM_HYP_CPU_FTR_REG(name) extern struct arm64_ftr_reg kvm_nvhe_sym(name)
- #endif
- #endif
-+
-+KVM_HYP_CPU_FTR_REG(arm64_ftr_reg_ctrel0);
-diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-index 6894a917f290..42dde4bb80b1 100644
---- a/arch/arm64/kvm/hyp/nvhe/Makefile
-+++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-@@ -13,7 +13,8 @@ lib-objs := clear_page.o copy_page.o memcpy.o memset.o
- lib-objs := $(addprefix ../../../lib/, $(lib-objs))
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 90873851f677..5c42ec023cc7 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -168,6 +168,14 @@ phys_addr_t kvm_mmu_get_httbr(void);
+ phys_addr_t kvm_get_idmap_vector(void);
+ int kvm_mmu_init(void);
  
- obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o \
--	 hyp-main.o hyp-smp.o psci-relay.o early_alloc.o stub.o page_alloc.o
-+	 hyp-main.o hyp-smp.o psci-relay.o early_alloc.o stub.o page_alloc.o \
-+	 cache.o
- obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
- 	 ../fpsimd.o ../hyp-entry.o ../exception.o
- obj-y += $(lib-objs)
-diff --git a/arch/arm64/kvm/hyp/nvhe/cache.S b/arch/arm64/kvm/hyp/nvhe/cache.S
-new file mode 100644
-index 000000000000..36cef6915428
---- /dev/null
-+++ b/arch/arm64/kvm/hyp/nvhe/cache.S
-@@ -0,0 +1,13 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Code copied from arch/arm64/mm/cache.S.
-+ */
++static inline void *__kvm_vector_slot2addr(void *base,
++					   enum arm64_hyp_spectre_vector slot)
++{
++	int idx = slot - (slot != HYP_VECTOR_DIRECT);
 +
-+#include <linux/linkage.h>
-+#include <asm/assembler.h>
-+#include <asm/alternative.h>
++	return base + (idx * SZ_2K);
++}
 +
-+SYM_FUNC_START_PI(__flush_dcache_area)
-+	dcache_by_line_op civac, sy, x0, x1, x2, x3
-+	ret
-+SYM_FUNC_END_PI(__flush_dcache_area)
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 6c5d133689ae..3ec34c25e877 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2783,6 +2783,7 @@ struct __ftr_reg_copy_entry {
- 	u32			sys_id;
- 	struct arm64_ftr_reg	*dst;
- } hyp_ftr_regs[] __initdata = {
-+	CPU_FTR_REG_HYP_COPY(SYS_CTR_EL0, arm64_ftr_reg_ctrel0),
- };
+ struct kvm;
  
- void __init setup_kvm_el2_caps(void)
+ #define kvm_flush_dcache_to_poc(a,l)	__flush_dcache_area((a), (l))
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 3f8bcf8db036..26e573cdede3 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1345,16 +1345,9 @@ static unsigned long nvhe_percpu_order(void)
+ /* A lookup table holding the hypervisor VA for each vector slot */
+ static void *hyp_spectre_vector_selector[BP_HARDEN_EL2_SLOTS];
+ 
+-static int __kvm_vector_slot2idx(enum arm64_hyp_spectre_vector slot)
+-{
+-	return slot - (slot != HYP_VECTOR_DIRECT);
+-}
+-
+ static void kvm_init_vector_slot(void *base, enum arm64_hyp_spectre_vector slot)
+ {
+-	int idx = __kvm_vector_slot2idx(slot);
+-
+-	hyp_spectre_vector_selector[slot] = base + (idx * SZ_2K);
++	hyp_spectre_vector_selector[slot] = __kvm_vector_slot2addr(base, slot);
+ }
+ 
+ static int kvm_init_vector_slots(void)
 -- 
 2.31.0.rc2.261.g7f71774620-goog
 
