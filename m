@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D685CC433E6
-	for <kvmarm@archiver.kernel.org>; Mon, 15 Mar 2021 14:35:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1FBEC433E9
+	for <kvmarm@archiver.kernel.org>; Mon, 15 Mar 2021 14:35:57 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5CD646500A
-	for <kvmarm@archiver.kernel.org>; Mon, 15 Mar 2021 14:35:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CD646500A
+	by mail.kernel.org (Postfix) with ESMTP id 8791A64F84
+	for <kvmarm@archiver.kernel.org>; Mon, 15 Mar 2021 14:35:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8791A64F84
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 020524B5BB;
-	Mon, 15 Mar 2021 10:35:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3BAAD4B5A3;
+	Mon, 15 Mar 2021 10:35:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id rADfLxF0poiB; Mon, 15 Mar 2021 10:35:54 -0400 (EDT)
+	with ESMTP id QupRf9KqUfqp; Mon, 15 Mar 2021 10:35:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 010584B5A7;
-	Mon, 15 Mar 2021 10:35:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 204714B5DC;
+	Mon, 15 Mar 2021 10:35:56 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C0E224B5FA
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 10:35:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DA98D4B5A3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 10:35:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id flqhTcz75EMx for <kvmarm@lists.cs.columbia.edu>;
- Mon, 15 Mar 2021 10:35:51 -0400 (EDT)
+ with ESMTP id WDG0AGv52J1n for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 15 Mar 2021 10:35:53 -0400 (EDT)
 Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com
  [209.85.221.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E72414B5B1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 10:35:49 -0400 (EDT)
-Received: by mail-wr1-f73.google.com with SMTP id i5so15188773wrp.8
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 07:35:49 -0700 (PDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D6FD14B5DE
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 10:35:51 -0400 (EDT)
+Received: by mail-wr1-f73.google.com with SMTP id e29so15179834wra.12
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 07:35:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=CWD0ZTykbS9rpgPcDzjldFEhYHHZjk+W/M1Qg3Ptvcw=;
- b=YH68EwOClBXGIJmeGqCUN2dhjlTkG1F/UlBsPGBdkrfbjGJ/wKGnavp/Cs02ZJyOnA
- i9zS8UvlY5ht/Sq8FBKuH8o7kQzDd9aRtAZB0T6BuYdPfO2/PZ5iLEWx3SDEdYDHSyOh
- dczI07hP20xwCKm4zmlPWwLc2zRwazuu0pxdK0MlOIAasdPOq29Fld+MgcxnMs/WHnHO
- HOSy4YvbCExvOeq9JGAP8qvzGB6+CrW/eN35hN4MDI0unThGS3JFrIFcZiM6TXLYw1F5
- q7IyUQGmMGC0Mo9hAE3MU6bekn5puwnNhVM6fJSQlGmCLzTdiwBtuBi4J5gRMFdsuId4
- wIig==
+ :cc; bh=XM9Fqo9BFURTmcHtiI6lmQ6Zl1fY1T+F2S1cS3+zeUo=;
+ b=bKIIrxzhrczRyndajmokRMPtSQEcu111oQ9npGw7bv47pkRLemXtMvq2xN5IA1Aazi
+ Ve0fnnavrRoBroulLIEYvCdbI+rkDswIW/n81LueYuK7CcZyMiFXX7U4oSYVdFEosFVO
+ 4XDSOgSw7gCG/kU4oeUYSRSQoLezMQ+UwrReoibt2dY+MxmCc+RvGbVpjPdSsoW8VLzj
+ iFZBZlyR8MGLq1rQuv2SibuG3kjnxzYISkCwTYfxQPReIZ2cwW+ihzzADXECtDCYqPWA
+ Gii9VDQBgd45ZTkbNe558j9x0S9QG2jCoPdSr79fzn2jVoDPjMVZFLOK8JKloJGNd08Y
+ SqdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=CWD0ZTykbS9rpgPcDzjldFEhYHHZjk+W/M1Qg3Ptvcw=;
- b=ifQSBqUT/zLJhl84jA+aSpq8KZCLTeS+rb/mFOB/LtZnbeBWqQG3b7P7/GgEEgLvto
- JrP25Ezm9nbluJnjWnBA8Jk5IkJ/7LCvgG7FO6nNaCUFrE9KGDY0OTkqcYmwL98dbq3X
- 0YEo30CAE9vCOi6tBx04O0zVca1kneHHPtsGUPIr1K0LCi8rFxtYloWB4Kbpb+HXf3hW
- WoF4m4tMysgJFU752wD5EMzaTYJUhhlFiLMwf3guYqAo5lrE+R/uPW9NrK5XhQ9j36VV
- z+R1yNWUiYI5lemO6F2e+WOIkBkaNnGDEuR7B1NB52AGl9yeMHq/aUQPgMOJ5n3c+dtB
- M06w==
-X-Gm-Message-State: AOAM530o61XypaREEL1y2s0wE4sNWMOgoG2caNE5DvBCMcpbiqnzNrmt
- lf8mmSTdyXMjyCFH48m2f9F6LqOs1/33
-X-Google-Smtp-Source: ABdhPJxyely57bJXbfq5qywc89TBRX65VoRvNM5+Je7YF6yjHB3oFwlqb826w0urpEOUPJE9/f/45AdrETx6
+ bh=XM9Fqo9BFURTmcHtiI6lmQ6Zl1fY1T+F2S1cS3+zeUo=;
+ b=d8CEUXoDXNMUQrAzHq+SLqkpIcpYkzRbt9MK3EsOFNWtKcZ0B0W0membgeU8Cn0o5U
+ ewxLveKsfjj8MiWAmuSnQ9EWfRubDT1jPu1YPrjNdB8yjskxxplSZUyQvRXA/tZNsYVZ
+ pyYA12PhPhfZhIxzFqNPlvOHnbMmwUW8Bv6Ib6mAQ8EIbr7MC5ogBGkwuq1NLCpenkq9
+ 4vgFIWZSs8BlaePV/3SZRjKbcJlLxpL3DhXxyp2UE3B5S0R2pPkSuZOjuMJXuP3SvZfa
+ P2RGBnQV85it0U97VnAZRt678iHBJ3uDWqrGUciqL8ee1qMpi7jy2kNCFuBLqf/yA046
+ LLBg==
+X-Gm-Message-State: AOAM533VXcwvmNkh19CB84r3WbHiC7mYGPN6jE4JJN1c8vv5R9vUzN22
+ hVDLyHBbD+ObjUo0NLIoajkSUqBg7EHa
+X-Google-Smtp-Source: ABdhPJyH7PRqGoLoUvKE1E9rOxfevMyBMCizkYPSX3DRJyQ4kkfYKppPwBjw5T8gP92kUTM7iCiidaEXdjph
 X-Received: from r2d2-qp.c.googlers.com ([fda3:e722:ac3:10:28:9cb1:c0a8:1652])
- (user=qperret job=sendgmr) by 2002:a1c:a504:: with SMTP id
- o4mr12766wme.174.1615818948988; Mon, 15 Mar 2021 07:35:48 -0700 (PDT)
-Date: Mon, 15 Mar 2021 14:35:04 +0000
+ (user=qperret job=sendgmr) by 2002:a1c:43c5:: with SMTP id
+ q188mr28699wma.94.1615818951131; Mon, 15 Mar 2021 07:35:51 -0700 (PDT)
+Date: Mon, 15 Mar 2021 14:35:05 +0000
 In-Reply-To: <20210315143536.214621-1-qperret@google.com>
-Message-Id: <20210315143536.214621-5-qperret@google.com>
+Message-Id: <20210315143536.214621-6-qperret@google.com>
 Mime-Version: 1.0
 References: <20210315143536.214621-1-qperret@google.com>
 X-Mailer: git-send-email 2.31.0.rc2.261.g7f71774620-goog
-Subject: [PATCH v5 04/36] KVM: arm64: Initialize kvm_nvhe_init_params early
+Subject: [PATCH v5 05/36] KVM: arm64: Avoid free_page() in page-table allocator
 From: Quentin Perret <qperret@google.com>
 To: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org, 
  james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
@@ -97,107 +97,70 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Move the initialization of kvm_nvhe_init_params in a dedicated function
-that is run early, and only once during KVM init, rather than every time
-the KVM vectors are set and reset.
+Currently, the KVM page-table allocator uses a mix of put_page() and
+free_page() calls depending on the context even though page-allocation
+is always achieved using variants of __get_free_page().
 
-This also opens the opportunity for the hypervisor to change the init
-structs during boot, hence simplifying the replacement of host-provided
-page-table by the one the hypervisor will create for itself.
+Make the code consistent by using put_page() throughout, and reduce the
+memory management API surface used by the page-table code. This will
+ease factoring out page-allocation from pgtable.c, which is a
+pre-requisite to creating page-tables at EL2.
 
 Acked-by: Will Deacon <will@kernel.org>
 Signed-off-by: Quentin Perret <qperret@google.com>
 ---
- arch/arm64/kvm/arm.c | 30 ++++++++++++++++++------------
- 1 file changed, 18 insertions(+), 12 deletions(-)
+ arch/arm64/kvm/hyp/pgtable.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index fc4c95dd2d26..2d1e7ef69c04 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1383,22 +1383,18 @@ static int kvm_init_vector_slots(void)
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index 4d177ce1d536..81fe032f34d1 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -413,7 +413,7 @@ int kvm_pgtable_hyp_init(struct kvm_pgtable *pgt, u32 va_bits)
+ static int hyp_free_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+ 			   enum kvm_pgtable_walk_flags flag, void * const arg)
+ {
+-	free_page((unsigned long)kvm_pte_follow(*ptep));
++	put_page(virt_to_page(kvm_pte_follow(*ptep)));
  	return 0;
  }
  
--static void cpu_init_hyp_mode(void)
-+static void cpu_prepare_hyp_mode(int cpu)
- {
--	struct kvm_nvhe_init_params *params = this_cpu_ptr_nvhe_sym(kvm_init_params);
--	struct arm_smccc_res res;
-+	struct kvm_nvhe_init_params *params = per_cpu_ptr_nvhe_sym(kvm_init_params, cpu);
- 	unsigned long tcr;
+@@ -425,7 +425,7 @@ void kvm_pgtable_hyp_destroy(struct kvm_pgtable *pgt)
+ 	};
  
--	/* Switch from the HYP stub to our own HYP init vector */
--	__hyp_set_vectors(kvm_get_idmap_vector());
--
- 	/*
- 	 * Calculate the raw per-cpu offset without a translation from the
- 	 * kernel's mapping to the linear mapping, and store it in tpidr_el2
- 	 * so that we can use adr_l to access per-cpu variables in EL2.
- 	 * Also drop the KASAN tag which gets in the way...
- 	 */
--	params->tpidr_el2 = (unsigned long)kasan_reset_tag(this_cpu_ptr_nvhe_sym(__per_cpu_start)) -
-+	params->tpidr_el2 = (unsigned long)kasan_reset_tag(per_cpu_ptr_nvhe_sym(__per_cpu_start, cpu)) -
- 			    (unsigned long)kvm_ksym_ref(CHOOSE_NVHE_SYM(__per_cpu_start));
+ 	WARN_ON(kvm_pgtable_walk(pgt, 0, BIT(pgt->ia_bits), &walker));
+-	free_page((unsigned long)pgt->pgd);
++	put_page(virt_to_page(pgt->pgd));
+ 	pgt->pgd = NULL;
+ }
  
- 	params->mair_el2 = read_sysreg(mair_el1);
-@@ -1422,7 +1418,7 @@ static void cpu_init_hyp_mode(void)
- 	tcr |= (idmap_t0sz & GENMASK(TCR_TxSZ_WIDTH - 1, 0)) << TCR_T0SZ_OFFSET;
- 	params->tcr_el2 = tcr;
+@@ -577,7 +577,7 @@ static int stage2_map_walk_table_post(u64 addr, u64 end, u32 level,
+ 	if (!data->anchor)
+ 		return 0;
  
--	params->stack_hyp_va = kern_hyp_va(__this_cpu_read(kvm_arm_hyp_stack_page) + PAGE_SIZE);
-+	params->stack_hyp_va = kern_hyp_va(per_cpu(kvm_arm_hyp_stack_page, cpu) + PAGE_SIZE);
- 	params->pgd_pa = kvm_mmu_get_httbr();
+-	free_page((unsigned long)kvm_pte_follow(*ptep));
++	put_page(virt_to_page(kvm_pte_follow(*ptep)));
+ 	put_page(virt_to_page(ptep));
  
- 	/*
-@@ -1430,6 +1426,15 @@ static void cpu_init_hyp_mode(void)
- 	 * be read while the MMU is off.
- 	 */
- 	kvm_flush_dcache_to_poc(params, sizeof(*params));
-+}
-+
-+static void cpu_init_hyp_mode(void)
-+{
-+	struct kvm_nvhe_init_params *params;
-+	struct arm_smccc_res res;
-+
-+	/* Switch from the HYP stub to our own HYP init vector */
-+	__hyp_set_vectors(kvm_get_idmap_vector());
- 
- 	/*
- 	 * Call initialization code, and switch to the full blown HYP code.
-@@ -1438,6 +1443,7 @@ static void cpu_init_hyp_mode(void)
- 	 * cpus_have_const_cap() wrapper.
- 	 */
- 	BUG_ON(!system_capabilities_finalized());
-+	params = this_cpu_ptr_nvhe_sym(kvm_init_params);
- 	arm_smccc_1_1_hvc(KVM_HOST_SMCCC_FUNC(__kvm_hyp_init), virt_to_phys(params), &res);
- 	WARN_ON(res.a0 != SMCCC_RET_SUCCESS);
- 
-@@ -1785,19 +1791,19 @@ static int init_hyp_mode(void)
- 		}
+ 	if (data->anchor == ptep) {
+@@ -700,7 +700,7 @@ static int stage2_unmap_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
  	}
  
--	/*
--	 * Map Hyp percpu pages
--	 */
- 	for_each_possible_cpu(cpu) {
- 		char *percpu_begin = (char *)kvm_arm_hyp_percpu_base[cpu];
- 		char *percpu_end = percpu_begin + nvhe_percpu_size();
+ 	if (childp)
+-		free_page((unsigned long)childp);
++		put_page(virt_to_page(childp));
  
-+		/* Map Hyp percpu pages */
- 		err = create_hyp_mappings(percpu_begin, percpu_end, PAGE_HYP);
--
- 		if (err) {
- 			kvm_err("Cannot map hyp percpu region\n");
- 			goto out_err;
- 		}
-+
-+		/* Prepare the CPU initialization parameters */
-+		cpu_prepare_hyp_mode(cpu);
- 	}
+ 	return 0;
+ }
+@@ -897,7 +897,7 @@ static int stage2_free_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+ 	put_page(virt_to_page(ptep));
  
- 	if (is_protected_kvm_enabled()) {
+ 	if (kvm_pte_table(pte, level))
+-		free_page((unsigned long)kvm_pte_follow(pte));
++		put_page(virt_to_page(kvm_pte_follow(pte)));
+ 
+ 	return 0;
+ }
 -- 
 2.31.0.rc2.261.g7f71774620-goog
 
