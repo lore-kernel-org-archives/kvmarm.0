@@ -2,71 +2,76 @@ Return-Path: <SRS0=nsVm=IN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCA66C433E0
-	for <kvmarm@archiver.kernel.org>; Mon, 15 Mar 2021 17:03:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24F08C433DB
+	for <kvmarm@archiver.kernel.org>; Mon, 15 Mar 2021 17:57:31 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5A22164DE0
-	for <kvmarm@archiver.kernel.org>; Mon, 15 Mar 2021 17:03:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A22164DE0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 8BE7B64F17
+	for <kvmarm@archiver.kernel.org>; Mon, 15 Mar 2021 17:57:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BE7B64F17
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E38524B3FF;
-	Mon, 15 Mar 2021 13:03:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 064384B487;
+	Mon, 15 Mar 2021 13:57:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id YRssiZcRG3MZ; Mon, 15 Mar 2021 13:03:20 -0400 (EDT)
+	with ESMTP id dEck0b9RW3lZ; Mon, 15 Mar 2021 13:57:27 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 003164B3CE;
-	Mon, 15 Mar 2021 13:03:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EE9A84B486;
+	Mon, 15 Mar 2021 13:57:27 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C1D44B3CE
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 13:03:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F05C4B3EF
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 13:57:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mcs0FV69t3eZ for <kvmarm@lists.cs.columbia.edu>;
- Mon, 15 Mar 2021 13:03:17 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6CFB44B2F3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 13:03:17 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 8F83764D9A;
- Mon, 15 Mar 2021 17:03:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1615827796;
- bh=mQMzN2WAIpvMXAy9wRcyfDHn8betfQjTx6sPWE5hfOY=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=OauwNRykO0ltPWn1LrX9v3BP/5+tkjyQSzPhZ5T4OCEZvlIqijFKy/3lKoBsmOF2U
- rl0izM5DcoKA893WVk1Iu9srMke7oltRYGYKPo/dzCewyArFSbMlT5rtxXUfoBvEgK
- 1cu83oCMRijYcrO3tEv50MnKxkwfJDIzQQZ2D1K+vQoIQWujzpFcCbfoQl94BLW3/V
- Zewyd9EV+odYwtSeUOaqiWSO3WSe8qYjnajRMlPwxTAzT+iHmAIqccNDNLtulypqZ9
- wbzy/dqMJvcG/f1pcie66L/IV8n+sGowT4+xQbk6fwHRs1zPVlF1fvjtXSr+xBwD7y
- NAfPddGD3+6Dg==
-Date: Mon, 15 Mar 2021 17:03:10 +0000
-From: Will Deacon <will@kernel.org>
-To: Quentin Perret <qperret@google.com>
-Subject: Re: [PATCH v5 14/36] KVM: arm64: Provide __flush_dcache_area at EL2
-Message-ID: <20210315170310.GI3430@willie-the-truck>
-References: <20210315143536.214621-1-qperret@google.com>
- <20210315143536.214621-15-qperret@google.com>
- <20210315163322.GE3430@willie-the-truck>
- <YE+RtegUL4ki2qa/@google.com>
+ with ESMTP id B3ZODu+mK0Qr for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 15 Mar 2021 13:57:26 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [63.128.21.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D93D4B3EB
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 13:57:26 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1615831046;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=h+y0usr72Ee/zjTmbgFGxyDSJMLMasj+Kgfz5NATV/w=;
+ b=ZwVfuCJYF4Jn4N8xU6jYIbU88LIpZyXGfGphunCLbsUZjVvPvXG9ONtxDm/8gdhfs4tYts
+ p1MgEY1qoDZ6wNYZvTKNsU8k5mA9dJ0yqbYzqziPMohw5L/8/OKhmu5BCd35TtV47MrfJv
+ /JO1yRuFmNjiQlJ/2XGapEZNI6iioog=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-228-2PQ3uPSWOJ2pTIZ1PdP8Qw-1; Mon, 15 Mar 2021 13:57:24 -0400
+X-MC-Unique: 2PQ3uPSWOJ2pTIZ1PdP8Qw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 37066881282;
+ Mon, 15 Mar 2021 17:57:23 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.195.151])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 006295D9C0;
+ Mon, 15 Mar 2021 17:57:14 +0000 (UTC)
+Date: Mon, 15 Mar 2021 18:57:11 +0100
+From: Andrew Jones <drjones@redhat.com>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [kvm-unit-tests PATCH v4 00/11] GIC fixes and improvements
+Message-ID: <20210315175711.qs3ksosr7smtjgs6@kamzik.brq.redhat.com>
+References: <20210219121337.76533-1-alexandru.elisei@arm.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <YE+RtegUL4ki2qa/@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: android-kvm@google.com, catalin.marinas@arm.com, mate.toth-pal@arm.com,
- seanjc@google.com, tabba@google.com, linux-kernel@vger.kernel.org,
- robh+dt@kernel.org, linux-arm-kernel@lists.infradead.org, maz@kernel.org,
- kernel-team@android.com, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20210219121337.76533-1-alexandru.elisei@arm.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Cc: andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -83,50 +88,35 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Mar 15, 2021 at 04:56:21PM +0000, Quentin Perret wrote:
-> On Monday 15 Mar 2021 at 16:33:23 (+0000), Will Deacon wrote:
-> > On Mon, Mar 15, 2021 at 02:35:14PM +0000, Quentin Perret wrote:
-> > > We will need to do cache maintenance at EL2 soon, so compile a copy of
-> > > __flush_dcache_area at EL2, and provide a copy of arm64_ftr_reg_ctrel0
-> > > as it is needed by the read_ctr macro.
-> > > 
-> > > Signed-off-by: Quentin Perret <qperret@google.com>
-> > > ---
-> > >  arch/arm64/include/asm/kvm_cpufeature.h |  2 ++
-> > >  arch/arm64/kvm/hyp/nvhe/Makefile        |  3 ++-
-> > >  arch/arm64/kvm/hyp/nvhe/cache.S         | 13 +++++++++++++
-> > >  arch/arm64/kvm/sys_regs.c               |  1 +
-> > >  4 files changed, 18 insertions(+), 1 deletion(-)
-> > >  create mode 100644 arch/arm64/kvm/hyp/nvhe/cache.S
-> > > 
-> > > diff --git a/arch/arm64/include/asm/kvm_cpufeature.h b/arch/arm64/include/asm/kvm_cpufeature.h
-> > > index 3fd9f60d2180..efba1b89b8a4 100644
-> > > --- a/arch/arm64/include/asm/kvm_cpufeature.h
-> > > +++ b/arch/arm64/include/asm/kvm_cpufeature.h
-> > > @@ -13,3 +13,5 @@
-> > >  #define KVM_HYP_CPU_FTR_REG(name) extern struct arm64_ftr_reg kvm_nvhe_sym(name)
-> > >  #endif
-> > >  #endif
-> > > +
-> > > +KVM_HYP_CPU_FTR_REG(arm64_ftr_reg_ctrel0);
-> > 
-> > I still think this is a bit weird. If you really want to macro-ise stuff,
-> > then why not follow the sort of thing we do for e.g. per-cpu variables and
-> > have separate DECLARE_HYP_CPU_FTR_REG and DEFINE_HYP_CPU_FTR_REG macros.
-> > 
-> > That way kvm_cpufeature.h can have header guards like a normal header and
-> > we can drop the '#ifndef KVM_HYP_CPU_FTR_REG' altogether. I don't think
-> > the duplication of the symbol name really matters -- it should fail at
-> > build time if something is missing.
+On Fri, Feb 19, 2021 at 12:13:26PM +0000, Alexandru Elisei wrote:
+> What started this series is Andre's SPI and group interrupts tests [1],
+> which prompted me to attempt to rewrite check_acked() so it's more flexible
+> and not so complicated to review. When I was doing that I noticed that the
+> message passing pattern for accesses to the acked, bad_irq and bad_sender
+> arrays didn't look quite right, and that turned into the first 7 patches of
+> the series. Even though the diffs are relatively small, they are not
+> trivial and the reviewer can skip them for the more palatable patches that
+> follow. I would still appreciate someone having a look at the memory
+> ordering fixes.
 > 
-> I just tend to hate unnecessary boilerplate, but if you feel strongly
-> about it, happy to change :)
+> Patch #8 ("Split check_acked() into two functions") is where check_acked()
+> is reworked with an eye towards supporting different timeout values or
+> silent reporting without adding too many arguments to check_acked().
+> 
+> After changing the IPI tests, I turned my attention to the LPI tests, which
+> followed the same memory synchronization patterns, but invented their own
+> interrupt handler and testing functions. Instead of redoing the work that I
+> did for the IPI tests, I decided to convert the LPI tests to use the same
+> infrastructure.
+>
 
-I don't like it either, but I prefer it to overriding macros like this! I
-think having the "boilerplate" is a better starting point should we decide
-to consolidate the definitions somehow.
+Applied to arm/queue
 
-Will
+https://gitlab.com/rhdrjones/kvm-unit-tests/-/tree/arm/queue
+
+Thanks,
+drew
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
