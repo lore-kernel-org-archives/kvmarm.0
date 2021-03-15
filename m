@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 308C8C433E0
-	for <kvmarm@archiver.kernel.org>; Mon, 15 Mar 2021 14:36:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 546EEC433DB
+	for <kvmarm@archiver.kernel.org>; Mon, 15 Mar 2021 14:36:20 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A9D2364FA5
-	for <kvmarm@archiver.kernel.org>; Mon, 15 Mar 2021 14:36:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9D2364FA5
+	by mail.kernel.org (Postfix) with ESMTP id E47D464FC0
+	for <kvmarm@archiver.kernel.org>; Mon, 15 Mar 2021 14:36:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E47D464FC0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AA5F4B203;
-	Mon, 15 Mar 2021 10:36:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8AF804B667;
+	Mon, 15 Mar 2021 10:36:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id M4AneAY0qX9n; Mon, 15 Mar 2021 10:36:16 -0400 (EDT)
+	with ESMTP id 8YGizDXpdlBu; Mon, 15 Mar 2021 10:36:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E75D4B665;
-	Mon, 15 Mar 2021 10:36:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 895644B607;
+	Mon, 15 Mar 2021 10:36:18 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DEA374B118
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 10:36:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 110314B4FC
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 10:36:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id moFk+4vDj+at for <kvmarm@lists.cs.columbia.edu>;
- Mon, 15 Mar 2021 10:36:13 -0400 (EDT)
-Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com
- [209.85.221.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CCD484B5DE
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 10:36:12 -0400 (EDT)
-Received: by mail-wr1-f73.google.com with SMTP id p12so12607466wrn.18
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 07:36:12 -0700 (PDT)
+ with ESMTP id kyqXrKnrqR98 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 15 Mar 2021 10:36:16 -0400 (EDT)
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com
+ [209.85.221.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7519F4B203
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 10:36:14 -0400 (EDT)
+Received: by mail-wr1-f74.google.com with SMTP id r6so1913915wrt.20
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 07:36:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=3hA7tosEY4dPQwz7wIkxBpuvpX7Hy1acE9O5r7Hvk3A=;
- b=VPdm53sxCIyfLckE3eCIPGFnhmYvji9+FFRac0tP5RFkNTeQjU3PyWF73wMpp3qHuq
- MRq80VDnvyyJZtBXgaMd+6qwAuEqoVacMii3LnsVTDa6VXGxQd2FDcKgPXOQlfHbf2hr
- 7jeLnfAWLaA5hmrMMDXGstV9vSBjjgFM2Iz2GsUR/MPprlCiITEsgWZZZvIbviMyi3ky
- 4hUqbjDNdpbvNidGmiLsNlpyjlKOmgE7+fKcw7rBk8FUhXTO4oiZZPbiFgfRypFdEd6R
- Fe+FdmnVguWbs048n5yF43ce39d2OX9fdmx8TfQzKJJ5yZWFdUKFlB0NqvPvJOJOzcez
- BdaQ==
+ :cc; bh=4ECUgkoGREkKZOm9t4R+RTCdTGWy+OUrTPPjtPvrKJ0=;
+ b=ubKVY94FZBxte3JOLscmnNINlz5Nath/F12j0Cj6ICBvQmZcfxjvhk6cq9NMCBiB8h
+ 849RZc1HpGcF9S9YCX8dNdvQ0ekSiBbJKhiL6Qp2tDk3YQfK1H5WKrScnbp++ztGk/es
+ yo7w9oFa4El4KU8zHQuYK/qoqZWhCN+gCza5SCjh2fR4Cmz8QRIXEHo3meb6rHTxu4hn
+ 6fc4AIskyZcoV1LAKAGm1UUhFfOEQdFD/fRlfyc9r749cSxliO7lk39yFAOIHx3cRZ23
+ ilI4MKg6XcHIcO4MFihwQvA7hwUKHnGgxUEFA/ti9wuelBrWwrTPxSlGppQbg5MlFyH4
+ AFLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=3hA7tosEY4dPQwz7wIkxBpuvpX7Hy1acE9O5r7Hvk3A=;
- b=TQJWSLJawu0gtqYKF66yiybmbBuISDvbm/4UhIy5QtA9fJA2Ys86Th+yyMSc47qx9E
- WHOyfwADdTL/gFHDRgKL/pUBnr5XT50NQHMuwcojYmYGf7xNT/bgECe8sIQFLsLUO2e+
- zdZCuAfuzOgn9abgC4Va/O/wjh9Zjvzc6oPqCkflmHx6kyztCSm6spXB0kKa2mI8FesT
- Nvs3buF4+uIxXx0JKlPRZW6ROSVvxnBrQSGB3pX3lZ1X97ap6WSAosExr7TOCVwCA9yD
- MbsWblokSYC8N63FDtyh4uN6DjVgLTsYdMqQgz2yy5PMfu432cxBz1LwlOP6JF8z1qp+
- 6r4w==
-X-Gm-Message-State: AOAM530ivpUXjFYIr5ZPc3ampIEn7b6VXZjEaRK7yulxGG3YCQAo5mj+
- +GHUDsYQMuDy7CDCWvS43dS55azf+4Ie
-X-Google-Smtp-Source: ABdhPJzYhRfdIlEKb6klF7NPABZ+u2gjQiVHViCdjX1yjgBMKmlXOcLm5BOWaFgW0byaeWgbp83VIVYMf99n
+ bh=4ECUgkoGREkKZOm9t4R+RTCdTGWy+OUrTPPjtPvrKJ0=;
+ b=GomHUGd9heqczO6xoP/oNgN7J+uQkanbJEZdXo8MgiT1+ikqRhV7uJah7FEb1/MQK+
+ cLYwXR0TJUhMphL232NmOh2sk/sEzwCwYWIuahpw1LGhIrV9CXkyQ2xIHACfQ6xP5nr7
+ hUgSQANxx48W2kP9F3H+GD79G64WeCvLL3J4sTKDIQfgcTsm+1QEr2UX/wV9O4A6EyPM
+ pngA95Vuckd5Xotu45KGwQ5CIjgNH4plzbbz2Ngmr91aLQ13PnLf50Lk4SVpYQDu7Xvc
+ MN63Pde9O7XPmzSlVTK0zlMkntlKJf2f41iEo1I8Fg+6GBG7uBOBRoiMTbNM4MjTJAAU
+ 1XsQ==
+X-Gm-Message-State: AOAM531Qryxny9aWcCL8AxwCm74FEbPnpEJib+vtcHVSMimVscC34+AD
+ vNPhgrgcbUL/hOpyYqPxpxVZt7KSLFhM
+X-Google-Smtp-Source: ABdhPJzYehOnz8tCTfBHour34wAjOBD226lW09MVR9xTEXwscem/T/fZ6V3Usp4MMihrNAsA/4FgAQyZpAB1
 X-Received: from r2d2-qp.c.googlers.com ([fda3:e722:ac3:10:28:9cb1:c0a8:1652])
- (user=qperret job=sendgmr) by 2002:a7b:c18e:: with SMTP id
- y14mr1121168wmi.1.1615818971570; Mon, 15 Mar 2021 07:36:11 -0700 (PDT)
-Date: Mon, 15 Mar 2021 14:35:15 +0000
+ (user=qperret job=sendgmr) by 2002:a1c:6a05:: with SMTP id
+ f5mr14281wmc.184.1615818973676; Mon, 15 Mar 2021 07:36:13 -0700 (PDT)
+Date: Mon, 15 Mar 2021 14:35:16 +0000
 In-Reply-To: <20210315143536.214621-1-qperret@google.com>
-Message-Id: <20210315143536.214621-16-qperret@google.com>
+Message-Id: <20210315143536.214621-17-qperret@google.com>
 Mime-Version: 1.0
 References: <20210315143536.214621-1-qperret@google.com>
 X-Mailer: git-send-email 2.31.0.rc2.261.g7f71774620-goog
-Subject: [PATCH v5 15/36] KVM: arm64: Factor out vector address calculation
+Subject: [PATCH v5 16/36] arm64: asm: Provide set_sctlr_el2 macro
 From: Quentin Perret <qperret@google.com>
 To: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org, 
  james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
@@ -97,58 +97,51 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In order to re-map the guest vectors at EL2 when pKVM is enabled,
-refactor __kvm_vector_slot2idx() and kvm_init_vector_slot() to move all
-the address calculation logic in a static inline function.
+We will soon need to turn the EL2 stage 1 MMU on and off in nVHE
+protected mode, so refactor the set_sctlr_el1 macro to make it usable
+for that purpose.
 
 Acked-by: Will Deacon <will@kernel.org>
+Suggested-by: Will Deacon <will@kernel.org>
 Signed-off-by: Quentin Perret <qperret@google.com>
 ---
- arch/arm64/include/asm/kvm_mmu.h | 8 ++++++++
- arch/arm64/kvm/arm.c             | 9 +--------
- 2 files changed, 9 insertions(+), 8 deletions(-)
+ arch/arm64/include/asm/assembler.h | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 90873851f677..5c42ec023cc7 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -168,6 +168,14 @@ phys_addr_t kvm_mmu_get_httbr(void);
- phys_addr_t kvm_get_idmap_vector(void);
- int kvm_mmu_init(void);
+diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
+index ca31594d3d6c..fb651c1f26e9 100644
+--- a/arch/arm64/include/asm/assembler.h
++++ b/arch/arm64/include/asm/assembler.h
+@@ -676,11 +676,11 @@ USER(\label, ic	ivau, \tmp2)			// invalidate I line PoU
+ 	.endm
  
-+static inline void *__kvm_vector_slot2addr(void *base,
-+					   enum arm64_hyp_spectre_vector slot)
-+{
-+	int idx = slot - (slot != HYP_VECTOR_DIRECT);
+ /*
+- * Set SCTLR_EL1 to the passed value, and invalidate the local icache
++ * Set SCTLR_ELx to the @reg value, and invalidate the local icache
+  * in the process. This is called when setting the MMU on.
+  */
+-.macro set_sctlr_el1, reg
+-	msr	sctlr_el1, \reg
++.macro set_sctlr, sreg, reg
++	msr	\sreg, \reg
+ 	isb
+ 	/*
+ 	 * Invalidate the local I-cache so that any instructions fetched
+@@ -692,6 +692,14 @@ USER(\label, ic	ivau, \tmp2)			// invalidate I line PoU
+ 	isb
+ .endm
+ 
++.macro set_sctlr_el1, reg
++	set_sctlr sctlr_el1, \reg
++.endm
 +
-+	return base + (idx * SZ_2K);
-+}
++.macro set_sctlr_el2, reg
++	set_sctlr sctlr_el2, \reg
++.endm
 +
- struct kvm;
- 
- #define kvm_flush_dcache_to_poc(a,l)	__flush_dcache_area((a), (l))
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 3f8bcf8db036..26e573cdede3 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1345,16 +1345,9 @@ static unsigned long nvhe_percpu_order(void)
- /* A lookup table holding the hypervisor VA for each vector slot */
- static void *hyp_spectre_vector_selector[BP_HARDEN_EL2_SLOTS];
- 
--static int __kvm_vector_slot2idx(enum arm64_hyp_spectre_vector slot)
--{
--	return slot - (slot != HYP_VECTOR_DIRECT);
--}
--
- static void kvm_init_vector_slot(void *base, enum arm64_hyp_spectre_vector slot)
- {
--	int idx = __kvm_vector_slot2idx(slot);
--
--	hyp_spectre_vector_selector[slot] = base + (idx * SZ_2K);
-+	hyp_spectre_vector_selector[slot] = __kvm_vector_slot2addr(base, slot);
- }
- 
- static int kvm_init_vector_slots(void)
+ /*
+  * Check whether to yield to another runnable task from kernel mode NEON code
+  * (which runs with preemption disabled).
 -- 
 2.31.0.rc2.261.g7f71774620-goog
 
