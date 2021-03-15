@@ -2,87 +2,68 @@ Return-Path: <SRS0=nsVm=IN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAFFCC433E0
-	for <kvmarm@archiver.kernel.org>; Mon, 15 Mar 2021 16:56:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2809C433DB
+	for <kvmarm@archiver.kernel.org>; Mon, 15 Mar 2021 17:01:46 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5853964F33
-	for <kvmarm@archiver.kernel.org>; Mon, 15 Mar 2021 16:56:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5853964F33
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 4E97964DE2
+	for <kvmarm@archiver.kernel.org>; Mon, 15 Mar 2021 17:01:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E97964DE2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CFF494B3CE;
-	Mon, 15 Mar 2021 12:56:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CD3474B3D4;
+	Mon, 15 Mar 2021 13:01:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id zHuJ5eBAKSlE; Mon, 15 Mar 2021 12:56:27 -0400 (EDT)
+	with ESMTP id YyuZU3jw9cfl; Mon, 15 Mar 2021 13:01:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C6FA14B442;
-	Mon, 15 Mar 2021 12:56:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B056A4B440;
+	Mon, 15 Mar 2021 13:01:44 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D0BCF4B1BE
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 12:56:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BD8D4B3D4
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 13:01:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DAzdfo8458vc for <kvmarm@lists.cs.columbia.edu>;
- Mon, 15 Mar 2021 12:56:25 -0400 (EDT)
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com
- [209.85.128.52])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D80D34B340
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 12:56:25 -0400 (EDT)
-Received: by mail-wm1-f52.google.com with SMTP id g25so8522898wmh.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 09:56:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=Y+xprG6vtxLrLveW5ZtmXkAhTW+9ve7ImVtbj1EZZHk=;
- b=mrnugUQmzKMeO4p3w/jnYU3L1WrHmqn69Ewz5QiylBU/GCQ7x2L5iCA/2VLhI22o1f
- W7jrrGpK5WWx3YVj7oM5uobQdYkmkHBrkxM8eBM/wtyNCQ4B3xtYrO0pRfS2MHwwMm/i
- r/yLef5VBQeLl5z7LufUnSYeT6PSQvb4YAx4eHzXliCNP0KVZVVrmT2OE9ql2ZoUCj4h
- 6qLCrwsSJSS8Y7DinACPvae2jg3sDwxPbWHNSNB+c75KtEIH5lOiOTB+Tpk/HrTM4ABe
- gEjS0u885Zc+dHqAvZDyTfOraMGPj1KodeE4dzb6MOdSO+ppf8lS43Ce2F1tOKysy4CZ
- VMKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=Y+xprG6vtxLrLveW5ZtmXkAhTW+9ve7ImVtbj1EZZHk=;
- b=dBqOGoP5nbMi0STJ5H1FudS3JM5eJnvNVfW3uYn5W451J0GYY5kt5n4Kx87kR2TTpK
- gKfOObktNAHIFW+d4z00kh9cWQsM7uWFozg1gUhkxB7c7VwbTd5n69RApQ9IyZK3q4pr
- AnyW39P5YTiUsPUzqaliNnmlS6nKpQrmz2LClgKnfKYVNMuGEV39zHr15LKAGsg/i8IE
- pRWgeBf2hH5wHBs/McYuRap3JPJEYqi1Ly9MP7eRBIpzMR8lLsH2DyVKjKSYWLjIYqT2
- 80K1Tvxsu3xGTE0lh9PcbCJdjjnUYxnMldHdLudW7JsjZo5wfildewvAMHsPrbN75xEh
- I+7g==
-X-Gm-Message-State: AOAM533XdVOVqz9Y0TL70H/FPJGeetsxj0nYMXW0BAnzsigDbnodxN8e
- zWiKIm9pH8fyTleUTplbh9S50w==
-X-Google-Smtp-Source: ABdhPJxvHGew9n7ZzD/LWAiEsnPZPO/Aweogz7praM5dvQpdXhh8dOt7XfTLD17acpcb9/3p3JioXA==
-X-Received: by 2002:a1c:c206:: with SMTP id s6mr563841wmf.77.1615827384635;
- Mon, 15 Mar 2021 09:56:24 -0700 (PDT)
-Received: from google.com (230.69.233.35.bc.googleusercontent.com.
- [35.233.69.230])
- by smtp.gmail.com with ESMTPSA id s18sm22046028wrr.27.2021.03.15.09.56.24
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 15 Mar 2021 09:56:24 -0700 (PDT)
-Date: Mon, 15 Mar 2021 16:56:21 +0000
-From: Quentin Perret <qperret@google.com>
-To: Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v5 14/36] KVM: arm64: Provide __flush_dcache_area at EL2
-Message-ID: <YE+RtegUL4ki2qa/@google.com>
+ with ESMTP id GfBMFmizq9Yv for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 15 Mar 2021 13:01:42 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6C54B4B3CE
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 13:01:42 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id E790E64D9D;
+ Mon, 15 Mar 2021 17:01:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1615827699;
+ bh=XZi122AEwWqMj9ZZvX8bMJnPSkj+5a7gkjWIRRfb/CU=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=PU/i5m3ktp2+u0LV2ng5ubQko8BQTNYwC8oH77rIUeWFethPfizyDHZJ7kg5J9JDH
+ fefW0YFTxENH9St6Yw3CPnDMziw0oHa6O5pDbK9J1e2ska7lWn34WWnMixQzlFtv41
+ FXhGQYpSEIouonp1bTdKF3BKCCScBXfbKRAE0D5LitzG9zJ2boQH50Yy5i5wPvtyB1
+ l6gW/DcFs8YgsE/cbGjcc9LSUdOTLXNupoReYd5JPAb8xxWHGkmklvgyFP1I5KxHC7
+ vbj6mbYmAQ4ljsuEwDzLmoC684rEn85CbNHBxQfX2BqpKyOgi7VeU83c2mW7nwniSs
+ Y13WQwjtm1oLQ==
+Date: Mon, 15 Mar 2021 17:01:33 +0000
+From: Will Deacon <will@kernel.org>
+To: Quentin Perret <qperret@google.com>
+Subject: Re: [PATCH v5 29/36] KVM: arm64: Use page-table to track page
+ ownership
+Message-ID: <20210315170133.GH3430@willie-the-truck>
 References: <20210315143536.214621-1-qperret@google.com>
- <20210315143536.214621-15-qperret@google.com>
- <20210315163322.GE3430@willie-the-truck>
+ <20210315143536.214621-30-qperret@google.com>
+ <20210315163618.GF3430@willie-the-truck>
+ <YE+Q/vFpSaAO5vZS@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20210315163322.GE3430@willie-the-truck>
+In-Reply-To: <YE+Q/vFpSaAO5vZS@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Cc: android-kvm@google.com, catalin.marinas@arm.com, mate.toth-pal@arm.com,
  seanjc@google.com, tabba@google.com, linux-kernel@vger.kernel.org,
  robh+dt@kernel.org, linux-arm-kernel@lists.infradead.org, maz@kernel.org,
@@ -103,46 +84,63 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Monday 15 Mar 2021 at 16:33:23 (+0000), Will Deacon wrote:
-> On Mon, Mar 15, 2021 at 02:35:14PM +0000, Quentin Perret wrote:
-> > We will need to do cache maintenance at EL2 soon, so compile a copy of
-> > __flush_dcache_area at EL2, and provide a copy of arm64_ftr_reg_ctrel0
-> > as it is needed by the read_ctr macro.
+On Mon, Mar 15, 2021 at 04:53:18PM +0000, Quentin Perret wrote:
+> On Monday 15 Mar 2021 at 16:36:19 (+0000), Will Deacon wrote:
+> > On Mon, Mar 15, 2021 at 02:35:29PM +0000, Quentin Perret wrote:
+> > > As the host stage 2 will be identity mapped, all the .hyp memory regions
+> > > and/or memory pages donated to protected guestis will have to marked
+> > > invalid in the host stage 2 page-table. At the same time, the hypervisor
+> > > will need a way to track the ownership of each physical page to ensure
+> > > memory sharing or donation between entities (host, guests, hypervisor) is
+> > > legal.
+> > > 
+> > > In order to enable this tracking at EL2, let's use the host stage 2
+> > > page-table itself. The idea is to use the top bits of invalid mappings
+> > > to store the unique identifier of the page owner. The page-table owner
+> > > (the host) gets identifier 0 such that, at boot time, it owns the entire
+> > > IPA space as the pgd starts zeroed.
+> > > 
+> > > Provide kvm_pgtable_stage2_set_owner() which allows to modify the
+> > > ownership of pages in the host stage 2. It re-uses most of the map()
+> > > logic, but ends up creating invalid mappings instead. This impacts
+> > > how we do refcount as we now need to count invalid mappings when they
+> > > are used for ownership tracking.
+> > > 
+> > > Signed-off-by: Quentin Perret <qperret@google.com>
+> > > ---
+> > >  arch/arm64/include/asm/kvm_pgtable.h |  21 +++++
+> > >  arch/arm64/kvm/hyp/pgtable.c         | 127 ++++++++++++++++++++++-----
+> > >  2 files changed, 124 insertions(+), 24 deletions(-)
+> > > 
+> > > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> > > index 4ae19247837b..683e96abdc24 100644
+> > > --- a/arch/arm64/include/asm/kvm_pgtable.h
+> > > +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> > > @@ -238,6 +238,27 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+> > >  			   u64 phys, enum kvm_pgtable_prot prot,
+> > >  			   void *mc);
+> > >  
+> > > +/**
+> > > + * kvm_pgtable_stage2_set_owner() - Annotate invalid mappings with metadata
+> > > + *				    encoding the ownership of a page in the
+> > > + *				    IPA space.
 > > 
-> > Signed-off-by: Quentin Perret <qperret@google.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_cpufeature.h |  2 ++
-> >  arch/arm64/kvm/hyp/nvhe/Makefile        |  3 ++-
-> >  arch/arm64/kvm/hyp/nvhe/cache.S         | 13 +++++++++++++
-> >  arch/arm64/kvm/sys_regs.c               |  1 +
-> >  4 files changed, 18 insertions(+), 1 deletion(-)
-> >  create mode 100644 arch/arm64/kvm/hyp/nvhe/cache.S
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_cpufeature.h b/arch/arm64/include/asm/kvm_cpufeature.h
-> > index 3fd9f60d2180..efba1b89b8a4 100644
-> > --- a/arch/arm64/include/asm/kvm_cpufeature.h
-> > +++ b/arch/arm64/include/asm/kvm_cpufeature.h
-> > @@ -13,3 +13,5 @@
-> >  #define KVM_HYP_CPU_FTR_REG(name) extern struct arm64_ftr_reg kvm_nvhe_sym(name)
-> >  #endif
-> >  #endif
-> > +
-> > +KVM_HYP_CPU_FTR_REG(arm64_ftr_reg_ctrel0);
+> > The function does more than this, though, as it will also go ahead and unmap
+> > existing valid mappings which I think should be mentioned here, no?
 > 
-> I still think this is a bit weird. If you really want to macro-ise stuff,
-> then why not follow the sort of thing we do for e.g. per-cpu variables and
-> have separate DECLARE_HYP_CPU_FTR_REG and DEFINE_HYP_CPU_FTR_REG macros.
+> Right, I see why you mean. How about:
 > 
-> That way kvm_cpufeature.h can have header guards like a normal header and
-> we can drop the '#ifndef KVM_HYP_CPU_FTR_REG' altogether. I don't think
-> the duplication of the symbol name really matters -- it should fail at
-> build time if something is missing.
+> 'Unmap and annotate pages in the IPA space to track ownership'
 
-I just tend to hate unnecessary boilerplate, but if you feel strongly
-about it, happy to change :)
+I think I'd go with:
 
-Cheers,
-Quentin
+'Unmap pages and annotate the invalid mappings with ownership metadata for
+ the unmapped IPA range.'
+
+as it's the page-table which is annotated, not the actual pages (which could
+potentially be mapped by other page-tables).
+
+Will
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
