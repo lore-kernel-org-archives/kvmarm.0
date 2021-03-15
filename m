@@ -2,60 +2,93 @@ Return-Path: <SRS0=nsVm=IN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67A50C433DB
-	for <kvmarm@archiver.kernel.org>; Mon, 15 Mar 2021 16:38:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 434EDC433E0
+	for <kvmarm@archiver.kernel.org>; Mon, 15 Mar 2021 16:53:27 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CA21564F26
-	for <kvmarm@archiver.kernel.org>; Mon, 15 Mar 2021 16:38:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA21564F26
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 9D83364F36
+	for <kvmarm@archiver.kernel.org>; Mon, 15 Mar 2021 16:53:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D83364F36
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5793B4B274;
-	Mon, 15 Mar 2021 12:38:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 00FC14B659;
+	Mon, 15 Mar 2021 12:53:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id gqIJ2G61PSwc; Mon, 15 Mar 2021 12:38:45 -0400 (EDT)
+	with ESMTP id ak5TtrW2RqIm; Mon, 15 Mar 2021 12:53:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 001524B2CB;
-	Mon, 15 Mar 2021 12:38:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F1CEF4B622;
+	Mon, 15 Mar 2021 12:53:24 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 982844B274
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 12:38:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AFFD84B5E9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 12:53:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Jgqrnml2ix06 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 15 Mar 2021 12:38:41 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A74C44B2B4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 12:38:41 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 44B201FB;
- Mon, 15 Mar 2021 09:38:41 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 831E93F718;
- Mon, 15 Mar 2021 09:38:40 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH] configure: arm/arm64: Add --earlycon
- option to set UART type and address
-To: Andre Przywara <andre.przywara@arm.com>
-References: <20210219163718.109101-1-alexandru.elisei@arm.com>
- <20210303141846.0bcc0d2c@slackpad.fritz.box>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <2b6a2ee0-d8de-e408-ad9b-116c4e574174@arm.com>
-Date: Mon, 15 Mar 2021 16:38:37 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+ with ESMTP id CepeWf-SP7zK for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 15 Mar 2021 12:53:22 -0400 (EDT)
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com
+ [209.85.128.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8D9AA4B5B8
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 12:53:22 -0400 (EDT)
+Received: by mail-wm1-f50.google.com with SMTP id
+ m20-20020a7bcb940000b029010cab7e5a9fso20685225wmi.3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 09:53:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=8jtK4LvHkQIstlrA5wZLxNvqJwLdyrOtIEuLebCwaq4=;
+ b=gzyooPr/RXjEiOoZImRlh/c4wGsriorODrbvY7BTIMjGIhjq4kfsyJ2yVtFCBuzuAn
+ j5bh7TXHhr736yFDkanUNL0+cANtSiwUSsO2SeJDXlOSqPzqDUY+C680a4s9L/10R6av
+ xC7ngG6hErYLUCNHi7rRrY+6hi2OZR8jKUNd+He5swRuREZ1qpz5Hy7w94k6C1k8CGc0
+ JPFP6RNl7DHjOYhI0NxQ9TxXSHvNYjzSaKZN8y1shjslUL+rrzWFUrePgvUtmrmxZELP
+ RfwHJFHGqZx9d4V2qG+XFuAMTHPdbmIvepOCSlZEkTCyKSgguFqeAUv3/s0Cq9lmlxp/
+ bOjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=8jtK4LvHkQIstlrA5wZLxNvqJwLdyrOtIEuLebCwaq4=;
+ b=CwnBlXLl7aJ8Ur4auVmevxuMN+2zW+4twFITX9wDx8n08A2peRUBqD3AVUANZBKCfb
+ TCV/ynR7PNicTvF6JmwhCHDK6xFnBWJInj/GrGj8MDePPb5QmU/v5+7uN4K78lr+4E6L
+ IUgXUpYTO1gdPW2q9LVLejCdPAyMVbPWGgsJa8X6BUY1ZondQbP46Q445Qym8zmUf2hS
+ fnchsVuc9y8LqhKwyTTrb1wMNRGMMvjlipIgIQ7spZFuxXZsglDzjBegRvmGSyc/LyDb
+ S/DpGsCmyNk01PftuNuGcvoXTBmad2JgpuFXATYnhPn0NF6ooosXjD3VUtWSVrIEcbLv
+ Yduw==
+X-Gm-Message-State: AOAM532l+lIZ3T/fiPbDP5E/Q7SXqnQDL5dn2tKKqGzbuJuiECsAi5hb
+ ln4FubaQRr7Dcpgh0H+E5LLgdA==
+X-Google-Smtp-Source: ABdhPJzyCUjEeIdn7MkxvV/Kzfaapb7kOKbdOTz0f/wFjhROoS2sYscMCclWPUTXv0qdQaa+Htk3kQ==
+X-Received: by 2002:a1c:6707:: with SMTP id b7mr563679wmc.185.1615827201290;
+ Mon, 15 Mar 2021 09:53:21 -0700 (PDT)
+Received: from google.com (230.69.233.35.bc.googleusercontent.com.
+ [35.233.69.230])
+ by smtp.gmail.com with ESMTPSA id j6sm218657wmq.16.2021.03.15.09.53.20
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 15 Mar 2021 09:53:20 -0700 (PDT)
+Date: Mon, 15 Mar 2021 16:53:18 +0000
+From: Quentin Perret <qperret@google.com>
+To: Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v5 29/36] KVM: arm64: Use page-table to track page
+ ownership
+Message-ID: <YE+Q/vFpSaAO5vZS@google.com>
+References: <20210315143536.214621-1-qperret@google.com>
+ <20210315143536.214621-30-qperret@google.com>
+ <20210315163618.GF3430@willie-the-truck>
 MIME-Version: 1.0
-In-Reply-To: <20210303141846.0bcc0d2c@slackpad.fritz.box>
-Content-Language: en-US
-Cc: pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Content-Disposition: inline
+In-Reply-To: <20210315163618.GF3430@willie-the-truck>
+Cc: android-kvm@google.com, catalin.marinas@arm.com, mate.toth-pal@arm.com,
+ seanjc@google.com, tabba@google.com, linux-kernel@vger.kernel.org,
+ robh+dt@kernel.org, linux-arm-kernel@lists.infradead.org, maz@kernel.org,
+ kernel-team@android.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -72,152 +105,86 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Andre,
+On Monday 15 Mar 2021 at 16:36:19 (+0000), Will Deacon wrote:
+> On Mon, Mar 15, 2021 at 02:35:29PM +0000, Quentin Perret wrote:
+> > As the host stage 2 will be identity mapped, all the .hyp memory regions
+> > and/or memory pages donated to protected guestis will have to marked
+> > invalid in the host stage 2 page-table. At the same time, the hypervisor
+> > will need a way to track the ownership of each physical page to ensure
+> > memory sharing or donation between entities (host, guests, hypervisor) is
+> > legal.
+> > 
+> > In order to enable this tracking at EL2, let's use the host stage 2
+> > page-table itself. The idea is to use the top bits of invalid mappings
+> > to store the unique identifier of the page owner. The page-table owner
+> > (the host) gets identifier 0 such that, at boot time, it owns the entire
+> > IPA space as the pgd starts zeroed.
+> > 
+> > Provide kvm_pgtable_stage2_set_owner() which allows to modify the
+> > ownership of pages in the host stage 2. It re-uses most of the map()
+> > logic, but ends up creating invalid mappings instead. This impacts
+> > how we do refcount as we now need to count invalid mappings when they
+> > are used for ownership tracking.
+> > 
+> > Signed-off-by: Quentin Perret <qperret@google.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_pgtable.h |  21 +++++
+> >  arch/arm64/kvm/hyp/pgtable.c         | 127 ++++++++++++++++++++++-----
+> >  2 files changed, 124 insertions(+), 24 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> > index 4ae19247837b..683e96abdc24 100644
+> > --- a/arch/arm64/include/asm/kvm_pgtable.h
+> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> > @@ -238,6 +238,27 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+> >  			   u64 phys, enum kvm_pgtable_prot prot,
+> >  			   void *mc);
+> >  
+> > +/**
+> > + * kvm_pgtable_stage2_set_owner() - Annotate invalid mappings with metadata
+> > + *				    encoding the ownership of a page in the
+> > + *				    IPA space.
+> 
+> The function does more than this, though, as it will also go ahead and unmap
+> existing valid mappings which I think should be mentioned here, no?
 
-On 3/3/21 2:18 PM, Andre Przywara wrote:
-> On Fri, 19 Feb 2021 16:37:18 +0000
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
->
->> Currently, the UART early address is set indirectly with the --vmm option
->> and there are only two possible values: if the VMM is qemu (the default),
->> then the UART address is set to 0x09000000; if the VMM is kvmtool, then the
->> UART address is set to 0x3f8.
->>
->> There several efforts under way to change the kvmtool UART address, and
->> kvm-unit-tests so far hasn't had mechanism to let the user set a specific
->> address, which means that the early UART won't be available.
->>
->> This situation will only become worse as kvm-unit-tests gains support to
->> run as an EFI app, as each platform will have their own UART type and
->> address.
->>
->> To address both issues, a new configure option is added, --earlycon. The
->> syntax and semantics are identical to the kernel parameter with the same
->> name.
-> Nice one! I like that reusing of an existing scheme.
->
->> Specifying this option will overwrite the UART address set by --vmm.
->>
->> At the moment, the UART type and register width parameters are ignored
->> since both qemu's and kvmtool's UART emulation use the same offset for the
->> TX register and no other registers are used by kvm-unit-tests, but the
->> parameters will become relevant once EFI support is added.
->>
->> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
->> ---
->> The kvmtool patches I was referring to are the patches to unify ioport and
->> MMIO emulation [1] and to allow the user to specify a custom memory layout
->> for the VM [2] (these patches are very old, but I plan to revive them after
->> the ioport and MMIO unification series are merged).
->>
->> [1] https://lore.kernel.org/kvm/20201210142908.169597-1-andre.przywara@arm.com/T/#t
->> [2] https://lore.kernel.org/kvm/1569245722-23375-1-git-send-email-alexandru.elisei@arm.com/
->>
->>  configure | 35 +++++++++++++++++++++++++++++++++++
->>  1 file changed, 35 insertions(+)
->>
->> diff --git a/configure b/configure
->> index cdcd34e94030..d94b92255088 100755
->> --- a/configure
->> +++ b/configure
->> @@ -26,6 +26,7 @@ errata_force=0
->>  erratatxt="$srcdir/errata.txt"
->>  host_key_document=
->>  page_size=
->> +earlycon=
->>  
->>  usage() {
->>      cat <<-EOF
->> @@ -54,6 +55,17 @@ usage() {
->>  	    --page-size=PAGE_SIZE
->>  	                           Specify the page size (translation granule) (4k, 16k or
->>  	                           64k, default is 64k, arm64 only)
->> +	    --earlycon=EARLYCON
->> +	                           Specify the UART name, type and address (optional, arm and
->> +	                           arm64 only). The specified address will overwrite the UART
->> +	                           address set by the --vmm option. EARLYCON can be on of (case
->> +	                           sensitive):
->> +	               uart[8250],mmio,ADDR
->> +	                           Specify an 8250 compatible UART at address ADDR. Supported
->> +	                           register stride is 8 bit only.
->> +	               pl011,mmio,ADDR
->> +	                           Specify a PL011 compatible UART at address ADDR. Supported
->> +	                           register stride is 8 bit only.
-> I think the PL011 only ever specified 32-bit register accesses? I just
+Right, I see why you mean. How about:
 
-You are correct, according to Arm Base System Architecture 1.0 (DEN0094A), page 43:
+'Unmap and annotate pages in the IPA space to track ownership'
 
-"The registers that are described in this specification are a subset of the Arm
-PL011 r1p5 UART. [..] The Generic UART is specified as a set of 32-bit registers.
-[..] The Generic UART is little-endian."
+> > +int kvm_pgtable_stage2_set_owner(struct kvm_pgtable *pgt, u64 addr, u64 size,
+> > +				 void *mc, u8 owner_id)
+> > +{
+> > +	int ret;
+> > +	struct stage2_map_data map_data = {
+> > +		.phys		= KVM_PHYS_INVALID,
+> > +		.mmu		= pgt->mmu,
+> > +		.memcache	= mc,
+> > +		.mm_ops		= pgt->mm_ops,
+> > +		.owner_id	= owner_id,
+> > +	};
+> > +	struct kvm_pgtable_walker walker = {
+> > +		.cb		= stage2_map_walker,
+> > +		.flags		= KVM_PGTABLE_WALK_TABLE_PRE |
+> > +				  KVM_PGTABLE_WALK_LEAF |
+> > +				  KVM_PGTABLE_WALK_TABLE_POST,
+> > +		.arg		= &map_data,
+> > +	};
+> > +
+> > +	if (owner_id > KVM_MAX_OWNER_ID)
+> > +		return -EINVAL;
+> > +
+> > +	ret = kvm_pgtable_walk(pgt, addr, size, &walker);
+> > +	dsb(ishst);
+> 
+> Why is the DSB needed here? afaict, we only ever unmap a valid entry (which
+> will have a DSB as part of the TLBI sequence) or we update the owner for an
+> existing invalid entry, in which case the walker doesn't care.
 
-> see that we actually do a writeb() for puts, that is not guaranteed to
-> work on a hardware PL011, AFAIK. I guess QEMU just doesn't care ...
-
-Table 19, page 43 of DEN0094A, says that permitted accesses sizes for the UARTDR
-register are 8, 16 and 32 bits. I think using writeb() at address 0 of the UART
-memory region to write a character is correct.
-
-> Looks like we should fix this, maybe we get mmio32 for uart8250 for
-> free, then.
->
-> The kernel specifies "pl011,mmio32,ADDR" or "pl011,ADDR", so I think we
-> should keep it compatible. "mmio[32]" is pretty much redundant on the
-> PL011 (no port I/O), I think it's just for consistency with the 8250.
-> Can you tweak the routine below to make this optional, and also accept
-> mmio32?
-
-Definitely, my intention was to make it as close as possible to what Linux does. I
-made a mistake when I allowed this value, I will change it in the next version.
+Indeed, that is now unnecessary. I'll remove it.
 
 Thanks,
-
-Alex
-
->
-> Cheers,
-> Andre
->
->>  EOF
->>      exit 1
->>  }
->> @@ -112,6 +124,9 @@ while [[ "$1" = -* ]]; do
->>  	--page-size)
->>  	    page_size="$arg"
->>  	    ;;
->> +	--earlycon)
->> +	    earlycon="$arg"
->> +	    ;;
->>  	--help)
->>  	    usage
->>  	    ;;
->> @@ -170,6 +185,26 @@ elif [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
->>          echo '--vmm must be one of "qemu" or "kvmtool"!'
->>          usage
->>      fi
->> +
->> +    if [ "$earlycon" ]; then
->> +        name=$(echo $earlycon|cut -d',' -f1)
->> +        if [ "$name" != "uart" ] && [ "$name" != "uart8250" ] &&
->> +                [ "$name" != "pl011" ]; then
->> +            echo "unknown earlycon name: $name"
->> +            usage
->> +        fi
->> +        type=$(echo $earlycon|cut -d',' -f2)
->> +        if [ "$type" != "mmio" ]; then
->> +            echo "unknown earlycon type: $type"
->> +            usage
->> +        fi
->> +        addr=$(echo $earlycon|cut -d',' -f3)
->> +        if [ -z "$addr" ]; then
->> +            echo "missing earlycon address"
->> +            usage
->> +        fi
->> +        arm_uart_early_addr=$addr
->> +    fi
->>  elif [ "$arch" = "ppc64" ]; then
->>      testdir=powerpc
->>      firmware="$testdir/boot_rom.bin"
+Quentin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
