@@ -2,78 +2,79 @@ Return-Path: <SRS0=nsVm=IN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD7AEC433DB
-	for <kvmarm@archiver.kernel.org>; Mon, 15 Mar 2021 14:36:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E00EC433E6
+	for <kvmarm@archiver.kernel.org>; Mon, 15 Mar 2021 14:36:38 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 87A5B6502D
+	by mail.kernel.org (Postfix) with ESMTP id DED6365037
 	for <kvmarm@archiver.kernel.org>; Mon, 15 Mar 2021 14:36:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87A5B6502D
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DED6365037
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C37B4B5AA;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 946604B5CC;
 	Mon, 15 Mar 2021 10:36:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id nUZKbDq+A53S; Mon, 15 Mar 2021 10:36:35 -0400 (EDT)
+	with ESMTP id LQ+wxwv7zIPS; Mon, 15 Mar 2021 10:36:32 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C34054B6FD;
-	Mon, 15 Mar 2021 10:36:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 906474B5D2;
+	Mon, 15 Mar 2021 10:36:32 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E5A24B223
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 10:36:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3511F4B223
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 10:36:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hAJPJyLC85Kp for <kvmarm@lists.cs.columbia.edu>;
- Mon, 15 Mar 2021 10:36:34 -0400 (EDT)
-Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com
- [209.85.219.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5F5004B649
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 10:36:34 -0400 (EDT)
-Received: by mail-qv1-f73.google.com with SMTP id j3so23192483qvo.1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 07:36:34 -0700 (PDT)
+ with ESMTP id B7pTzo8pn6jU for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 15 Mar 2021 10:36:30 -0400 (EDT)
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com
+ [209.85.222.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 56DA74B5B8
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 10:36:30 -0400 (EDT)
+Received: by mail-qk1-f202.google.com with SMTP id u5so24574184qkj.10
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 07:36:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=XmlXvszH/b/asNjtzAQpiqetpKnqM2IpsKRJDC1QZ6Q=;
- b=PLWGPtcPO447N2pO6R95sG7rL4oGVx0r8DVGs09d8RPZ+UAk/bpKyLsvpYEO7Jr09W
- 7vEOA1LoSW6Vkbkkl04YI7eIQ4wLahgyU6ZvMQD2jorBU0h/hUzKifbMFLIt+3GiJgY8
- epbInKMYcsNC4twnTe4fVnovvofLaYfBIw1i7LfW+snvn5MmVBLdV6JJnWtIo8MjwYma
- CcmiweMhEBu/HkjjmDOKMIU5C4XDBW9B0Ok0x0S4nOebQEBLt+JaZ7H+IZlKTwf/qZVS
- gpVWR87Eawg6/JYS5YCefIwizWgjMpbV7Jy1xpLuE7E6qI96JG1o98zxfOf7wporssQb
- lUhQ==
+ :cc; bh=4Rx7gWcwKaPhXLY5lvXa6du15Qxy17H39RlntOQF/eE=;
+ b=JtSiHC2TC4X/MGPjI48Y4GobrRWomFGcriDZR5/63bf/t4F9faT8FZfr//6DW2bCqE
+ vFrQ3UF8RHabwi5h1YoRFY7n7t3sRGh5jsoMOeRAZOTld0V4I9tXFZLeV1n0EmHbt8Kb
+ RJaPzGu5/a3hf3sPxQSFikbVhfHl+o+9mr4BIvN0aficfCWF3qeZU7/UQ9aeFDZktDAq
+ uZIWaIDSFqM8dyvJAQnJIDGmp1gIm1sZkCyULLN1PQl7hmCNtGUWwFnz2nmJG25iGfTE
+ WPCsobnVYUH3ALp6t8+NG+2cPnRt01bGC8tR03xb8jzGrpRIPpD70ypkrxqa11f85FB1
+ 55JQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=XmlXvszH/b/asNjtzAQpiqetpKnqM2IpsKRJDC1QZ6Q=;
- b=H5LQgSpnzczEc2zXPoI1pSuCjuY+Jn3tdxr0auHt8ZjPHTV6ohZZZ2U64Sem/R+wFH
- f59twV673HUEnM4ulj8n/hASFt0FMpCw7jQUGaFtBCVJLKHmdA0JnwNFRvBCkv23vrhE
- kxxNjtaGwAORMR4ruRyFjJO/vMqlwNKy4wkv8faBdUOU5ijs8Nownq8KIptjeLnEC4In
- LIVg5FrRruunbsKRXY0/nQUto07aSLM6i2OGDQAt3FTcYV4js9m9kVX1GYLijThcoXaC
- fq3DmwEWfH1jYj31TsF4aCWNKnvSgKTrV2D8Qpd4R00vwi9Tq7PPFQQCIIarJPIbr+w4
- Dgaw==
-X-Gm-Message-State: AOAM532tIftcPKyeDiom38SzqQT4EnZ5q7EBD8NWomJ5+KzKx5K9QpzH
- qhCoeJDF7vKapam5F2zK0GE73RHmKxtV
-X-Google-Smtp-Source: ABdhPJwAA7/qi6bGmFDF6ghn4cxNNtvfeiI/Bx71D4jefC9+P79Vwc6+UC2XJmXdxS1pinufzNuW1KMAGW0e
+ bh=4Rx7gWcwKaPhXLY5lvXa6du15Qxy17H39RlntOQF/eE=;
+ b=WHfZ+NAH83PlbYwVHU5ET+CwQd+TnTyFKaVion3UA/9Zw6vmmXrUtDpCD9m6a+G1zm
+ N4Tnah9zovU6NlNDtrpMQW7DiJTuH5BTVmjRvfD3LyvcJSvOTYYfvYZdB0HDTaq9eKLo
+ m6mo6wiZOJJw3/5gxueTParrj9KZZUb3JK8dUO39Jhwbb+HlI0Bs+NIMRckvSJdu9W7/
+ gEXJAdvCCDOQFBMK6Zq1/dEf9trW0eXtb1n2Byt+9Cciweq5NoQrZbwPok/nFSW4xmb9
+ tZvkgsCpwToTokWd3HUrPWJ7i8UJgFYxFXcGrZ00KU6wM9X+8sQf1vD7WnwrX6NKhptT
+ 9cXA==
+X-Gm-Message-State: AOAM531jgDqT6HWU7DJHT2tM+hIiYE5HQJ0ftzbTyrNk9kWDLY14XtNx
+ OGATWgGkiNt23YIWNNEhuRN+TWsgtSDN
+X-Google-Smtp-Source: ABdhPJwDuWrOGL4ZNg/gQX5rsFfklI3IYwIn1ywA0KCJ73UhqJaMFBFoK5+FmaaLDaHwrFinuC9riTG6A1yy
 X-Received: from r2d2-qp.c.googlers.com ([fda3:e722:ac3:10:28:9cb1:c0a8:1652])
- (user=qperret job=sendgmr) by 2002:a0c:f946:: with SMTP id
- i6mr24752203qvo.40.1615818993951; Mon, 15 Mar 2021 07:36:33 -0700 (PDT)
-Date: Mon, 15 Mar 2021 14:35:26 +0000
+ (user=qperret job=sendgmr) by 2002:a05:6214:262a:: with SMTP id
+ gv10mr11184211qvb.50.1615818989939; Mon, 15 Mar 2021 07:36:29 -0700 (PDT)
+Date: Mon, 15 Mar 2021 14:35:24 +0000
 In-Reply-To: <20210315143536.214621-1-qperret@google.com>
-Message-Id: <20210315143536.214621-27-qperret@google.com>
+Message-Id: <20210315143536.214621-25-qperret@google.com>
 Mime-Version: 1.0
 References: <20210315143536.214621-1-qperret@google.com>
 X-Mailer: git-send-email 2.31.0.rc2.261.g7f71774620-goog
-Subject: [PATCH v5 26/36] KVM: arm64: Reserve memory for host stage 2
+Subject: [PATCH v5 24/36] KVM: arm64: Refactor __populate_fault_info()
 From: Quentin Perret <qperret@google.com>
 To: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org, 
  james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
@@ -97,109 +98,75 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Extend the memory pool allocated for the hypervisor to include enough
-pages to map all of memory at page granularity for the host stage 2.
-While at it, also reserve some memory for device mappings.
+Refactor __populate_fault_info() to introduce __get_fault_info() which
+will be used once the host is wrapped in a stage 2.
 
 Acked-by: Will Deacon <will@kernel.org>
 Signed-off-by: Quentin Perret <qperret@google.com>
 ---
- arch/arm64/kvm/hyp/include/nvhe/mm.h | 27 ++++++++++++++++++++++++++-
- arch/arm64/kvm/hyp/nvhe/setup.c      | 12 ++++++++++++
- arch/arm64/kvm/hyp/reserved_mem.c    |  2 ++
- 3 files changed, 40 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 34 +++++++++++++------------
+ 1 file changed, 18 insertions(+), 16 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/mm.h b/arch/arm64/kvm/hyp/include/nvhe/mm.h
-index ac0f7fcffd08..0095f6289742 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/mm.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/mm.h
-@@ -53,7 +53,7 @@ static inline unsigned long __hyp_pgtable_max_pages(unsigned long nr_pages)
- 	return total;
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 6c1f51f25eb3..40c274da5a7c 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -160,19 +160,9 @@ static inline bool __translate_far_to_hpfar(u64 far, u64 *hpfar)
+ 	return true;
  }
  
--static inline unsigned long hyp_s1_pgtable_pages(void)
-+static inline unsigned long __hyp_pgtable_total_pages(void)
+-static inline bool __populate_fault_info(struct kvm_vcpu *vcpu)
++static inline bool __get_fault_info(u64 esr, struct kvm_vcpu_fault_info *fault)
  {
- 	unsigned long res = 0, i;
- 
-@@ -63,9 +63,34 @@ static inline unsigned long hyp_s1_pgtable_pages(void)
- 		res += __hyp_pgtable_max_pages(reg->size >> PAGE_SHIFT);
- 	}
- 
-+	return res;
-+}
-+
-+static inline unsigned long hyp_s1_pgtable_pages(void)
-+{
-+	unsigned long res;
-+
-+	res = __hyp_pgtable_total_pages();
-+
- 	/* Allow 1 GiB for private mappings */
- 	res += __hyp_pgtable_max_pages(SZ_1G >> PAGE_SHIFT);
- 
- 	return res;
- }
-+
-+static inline unsigned long host_s2_mem_pgtable_pages(void)
-+{
-+	/*
-+	 * Include an extra 16 pages to safely upper-bound the worst case of
-+	 * concatenated pgds.
-+	 */
-+	return __hyp_pgtable_total_pages() + 16;
-+}
-+
-+static inline unsigned long host_s2_dev_pgtable_pages(void)
-+{
-+	/* Allow 1 GiB for MMIO mappings */
-+	return __hyp_pgtable_max_pages(SZ_1G >> PAGE_SHIFT);
-+}
-+
- #endif /* __KVM_HYP_MM_H */
-diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-index 1e8bcd8b0299..c1a3e7e0ebbc 100644
---- a/arch/arm64/kvm/hyp/nvhe/setup.c
-+++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-@@ -24,6 +24,8 @@ unsigned long hyp_nr_cpus;
- 
- static void *vmemmap_base;
- static void *hyp_pgt_base;
-+static void *host_s2_mem_pgt_base;
-+static void *host_s2_dev_pgt_base;
- 
- static int divide_memory_pool(void *virt, unsigned long size)
- {
-@@ -42,6 +44,16 @@ static int divide_memory_pool(void *virt, unsigned long size)
- 	if (!hyp_pgt_base)
- 		return -ENOMEM;
- 
-+	nr_pages = host_s2_mem_pgtable_pages();
-+	host_s2_mem_pgt_base = hyp_early_alloc_contig(nr_pages);
-+	if (!host_s2_mem_pgt_base)
-+		return -ENOMEM;
-+
-+	nr_pages = host_s2_dev_pgtable_pages();
-+	host_s2_dev_pgt_base = hyp_early_alloc_contig(nr_pages);
-+	if (!host_s2_dev_pgt_base)
-+		return -ENOMEM;
-+
- 	return 0;
- }
- 
-diff --git a/arch/arm64/kvm/hyp/reserved_mem.c b/arch/arm64/kvm/hyp/reserved_mem.c
-index 9bc6a6d27904..fd42705a3c26 100644
---- a/arch/arm64/kvm/hyp/reserved_mem.c
-+++ b/arch/arm64/kvm/hyp/reserved_mem.c
-@@ -52,6 +52,8 @@ void __init kvm_hyp_reserve(void)
- 	}
- 
- 	hyp_mem_pages += hyp_s1_pgtable_pages();
-+	hyp_mem_pages += host_s2_mem_pgtable_pages();
-+	hyp_mem_pages += host_s2_dev_pgtable_pages();
+-	u8 ec;
+-	u64 esr;
+-	u64 hpfar, far;
+-
+-	esr = vcpu->arch.fault.esr_el2;
+-	ec = ESR_ELx_EC(esr);
+-
+-	if (ec != ESR_ELx_EC_DABT_LOW && ec != ESR_ELx_EC_IABT_LOW)
+-		return true;
+-
+-	far = read_sysreg_el2(SYS_FAR);
++	fault->far_el2 = read_sysreg_el2(SYS_FAR);
  
  	/*
- 	 * The hyp_vmemmap needs to be backed by pages, but these pages
+ 	 * The HPFAR can be invalid if the stage 2 fault did not
+@@ -188,17 +178,29 @@ static inline bool __populate_fault_info(struct kvm_vcpu *vcpu)
+ 	if (!(esr & ESR_ELx_S1PTW) &&
+ 	    (cpus_have_final_cap(ARM64_WORKAROUND_834220) ||
+ 	     (esr & ESR_ELx_FSC_TYPE) == FSC_PERM)) {
+-		if (!__translate_far_to_hpfar(far, &hpfar))
++		if (!__translate_far_to_hpfar(fault->far_el2, &fault->hpfar_el2))
+ 			return false;
+ 	} else {
+-		hpfar = read_sysreg(hpfar_el2);
++		fault->hpfar_el2 = read_sysreg(hpfar_el2);
+ 	}
+ 
+-	vcpu->arch.fault.far_el2 = far;
+-	vcpu->arch.fault.hpfar_el2 = hpfar;
+ 	return true;
+ }
+ 
++static inline bool __populate_fault_info(struct kvm_vcpu *vcpu)
++{
++	u8 ec;
++	u64 esr;
++
++	esr = vcpu->arch.fault.esr_el2;
++	ec = ESR_ELx_EC(esr);
++
++	if (ec != ESR_ELx_EC_DABT_LOW && ec != ESR_ELx_EC_IABT_LOW)
++		return true;
++
++	return __get_fault_info(esr, &vcpu->arch.fault);
++}
++
+ /* Check for an FPSIMD/SVE trap and handle as appropriate */
+ static inline bool __hyp_handle_fpsimd(struct kvm_vcpu *vcpu)
+ {
 -- 
 2.31.0.rc2.261.g7f71774620-goog
 
