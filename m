@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F91CC433E0
-	for <kvmarm@archiver.kernel.org>; Mon, 15 Mar 2021 11:10:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 679B9C4332D
+	for <kvmarm@archiver.kernel.org>; Mon, 15 Mar 2021 11:11:21 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D162164E10
-	for <kvmarm@archiver.kernel.org>; Mon, 15 Mar 2021 11:10:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D162164E10
+	by mail.kernel.org (Postfix) with ESMTP id 0024A64EAE
+	for <kvmarm@archiver.kernel.org>; Mon, 15 Mar 2021 11:11:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0024A64EAE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 741914B51F;
-	Mon, 15 Mar 2021 07:10:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9EDAE4B508;
+	Mon, 15 Mar 2021 07:11:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id aKymAAwmsIwO; Mon, 15 Mar 2021 07:10:23 -0400 (EDT)
+	with ESMTP id 0kM9KqiP9IW5; Mon, 15 Mar 2021 07:11:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 346564B50B;
-	Mon, 15 Mar 2021 07:10:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6ABB94B50D;
+	Mon, 15 Mar 2021 07:11:19 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D945F4B548
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 07:10:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 904394B508
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 07:11:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MQVsM17e8Q6X for <kvmarm@lists.cs.columbia.edu>;
- Mon, 15 Mar 2021 07:10:20 -0400 (EDT)
+ with ESMTP id F84X989nw-m5 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 15 Mar 2021 07:11:17 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7E8754B501
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 07:10:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 286A74B501
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 07:11:17 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id C3ED864E90;
- Mon, 15 Mar 2021 11:10:18 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 1D1E464E99;
+ Mon, 15 Mar 2021 11:11:16 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1lLl73-001da4-3Q; Mon, 15 Mar 2021 11:10:17 +0000
+ id 1lLl7y-001db8-1F; Mon, 15 Mar 2021 11:11:14 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: gregkh@linuxfoundation.org
-Subject: [PATCH][stable-5.4] KVM: arm64: Ensure I-cache isolation between
+Subject: [PATCH][stable-5.10] KVM: arm64: Ensure I-cache isolation between
  vcpus of a same VM
-Date: Mon, 15 Mar 2021 11:10:00 +0000
-Message-Id: <20210315111000.4136196-1-maz@kernel.org>
+Date: Mon, 15 Mar 2021 11:11:11 +0000
+Message-Id: <20210315111111.4136402-1-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 62.31.163.78
@@ -110,90 +110,45 @@ Signed-off-by: Marc Zyngier <maz@kernel.org>
 Acked-by: Will Deacon <will@kernel.org>
 Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 Link: https://lore.kernel.org/r/20210303164505.68492-1-maz@kernel.org
-[maz: added 32bit ARM support]
-Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm/include/asm/kvm_asm.h   | 2 +-
- arch/arm/kvm/hyp/tlb.c           | 3 ++-
- arch/arm64/include/asm/kvm_asm.h | 2 +-
- arch/arm64/kvm/hyp/tlb.c         | 3 ++-
- virt/kvm/arm/arm.c               | 8 +++++++-
- 5 files changed, 13 insertions(+), 5 deletions(-)
+ arch/arm64/include/asm/kvm_asm.h   | 4 ++--
+ arch/arm64/kvm/arm.c               | 7 ++++++-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c | 4 ++--
+ arch/arm64/kvm/hyp/nvhe/tlb.c      | 3 ++-
+ arch/arm64/kvm/hyp/vhe/tlb.c       | 3 ++-
+ 5 files changed, 14 insertions(+), 7 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_asm.h b/arch/arm/include/asm/kvm_asm.h
-index f615830f9f57..9d0b7e677faa 100644
---- a/arch/arm/include/asm/kvm_asm.h
-+++ b/arch/arm/include/asm/kvm_asm.h
-@@ -56,7 +56,7 @@ extern char __kvm_hyp_init_end[];
- extern void __kvm_flush_vm_context(void);
- extern void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa);
- extern void __kvm_tlb_flush_vmid(struct kvm *kvm);
--extern void __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu);
-+extern void __kvm_flush_cpu_context(struct kvm_vcpu *vcpu);
- 
- extern void __kvm_timer_set_cntvoff(u32 cntvoff_low, u32 cntvoff_high);
- 
-diff --git a/arch/arm/kvm/hyp/tlb.c b/arch/arm/kvm/hyp/tlb.c
-index 848f27bbad9d..80e67108d39d 100644
---- a/arch/arm/kvm/hyp/tlb.c
-+++ b/arch/arm/kvm/hyp/tlb.c
-@@ -45,7 +45,7 @@ void __hyp_text __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
- 	__kvm_tlb_flush_vmid(kvm);
- }
- 
--void __hyp_text __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu)
-+void __hyp_text __kvm_flush_cpu_context(struct kvm_vcpu *vcpu)
- {
- 	struct kvm *kvm = kern_hyp_va(kern_hyp_va(vcpu)->kvm);
- 
-@@ -54,6 +54,7 @@ void __hyp_text __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu)
- 	isb();
- 
- 	write_sysreg(0, TLBIALL);
-+	write_sysreg(0, ICIALLU);
- 	dsb(nsh);
- 	isb();
- 
 diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 64d79b288434..c54e759896c1 100644
+index 54387ccd1ab2..044bb9e2cd74 100644
 --- a/arch/arm64/include/asm/kvm_asm.h
 +++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -60,7 +60,7 @@ extern char __kvm_hyp_vector[];
+@@ -49,7 +49,7 @@
+ #define __KVM_HOST_SMCCC_FUNC___kvm_flush_vm_context		2
+ #define __KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa		3
+ #define __KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid		4
+-#define __KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_local_vmid	5
++#define __KVM_HOST_SMCCC_FUNC___kvm_flush_cpu_context		5
+ #define __KVM_HOST_SMCCC_FUNC___kvm_timer_set_cntvoff		6
+ #define __KVM_HOST_SMCCC_FUNC___kvm_enable_ssbs			7
+ #define __KVM_HOST_SMCCC_FUNC___vgic_v3_get_ich_vtr_el2		8
+@@ -180,10 +180,10 @@ DECLARE_KVM_HYP_SYM(__bp_harden_hyp_vecs);
+ #define __bp_harden_hyp_vecs	CHOOSE_HYP_SYM(__bp_harden_hyp_vecs)
+ 
  extern void __kvm_flush_vm_context(void);
- extern void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa);
- extern void __kvm_tlb_flush_vmid(struct kvm *kvm);
--extern void __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu);
-+extern void __kvm_flush_cpu_context(struct kvm_vcpu *vcpu);
++extern void __kvm_flush_cpu_context(struct kvm_s2_mmu *mmu);
+ extern void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa,
+ 				     int level);
+ extern void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu);
+-extern void __kvm_tlb_flush_local_vmid(struct kvm_s2_mmu *mmu);
  
- extern void __kvm_timer_set_cntvoff(u32 cntvoff_low, u32 cntvoff_high);
+ extern void __kvm_timer_set_cntvoff(u64 cntvoff);
  
-diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
-index eb0efc5557f3..7b7213fc17d9 100644
---- a/arch/arm64/kvm/hyp/tlb.c
-+++ b/arch/arm64/kvm/hyp/tlb.c
-@@ -182,7 +182,7 @@ void __hyp_text __kvm_tlb_flush_vmid(struct kvm *kvm)
- 	__tlb_switch_to_host(kvm, &cxt);
- }
- 
--void __hyp_text __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu)
-+void __hyp_text __kvm_flush_cpu_context(struct kvm_vcpu *vcpu)
- {
- 	struct kvm *kvm = kern_hyp_va(kern_hyp_va(vcpu)->kvm);
- 	struct tlb_inv_context cxt;
-@@ -191,6 +191,7 @@ void __hyp_text __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu)
- 	__tlb_switch_to_guest(kvm, &cxt);
- 
- 	__tlbi(vmalle1);
-+	asm volatile("ic iallu");
- 	dsb(nsh);
- 	isb();
- 
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 986fbc3cf667..2e7d2b3f2907 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -373,11 +373,17 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 	cpu_data = this_cpu_ptr(&kvm_host_data);
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index c0ffb019ca8b..a1c2c955474e 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -352,11 +352,16 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 	last_ran = this_cpu_ptr(mmu->last_vcpu_ran);
  
  	/*
 +	 * We guarantee that both TLBs and I-cache are private to each
@@ -201,15 +156,74 @@ index 986fbc3cf667..2e7d2b3f2907 100644
 +	 * previously run on the same physical CPU, call into the
 +	 * hypervisor code to nuke the relevant contexts.
 +	 *
-+         * We might get preempted before the vCPU actually runs, but
  	 * We might get preempted before the vCPU actually runs, but
  	 * over-invalidation doesn't affect correctness.
  	 */
  	if (*last_ran != vcpu->vcpu_id) {
--		kvm_call_hyp(__kvm_tlb_flush_local_vmid, vcpu);
-+		kvm_call_hyp(__kvm_flush_cpu_context, vcpu);
+-		kvm_call_hyp(__kvm_tlb_flush_local_vmid, mmu);
++		kvm_call_hyp(__kvm_flush_cpu_context, mmu);
  		*last_ran = vcpu->vcpu_id;
  	}
+ 
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index e2eafe2c93af..3df30b459215 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -46,11 +46,11 @@ static void handle_host_hcall(unsigned long func_id,
+ 		__kvm_tlb_flush_vmid(kern_hyp_va(mmu));
+ 		break;
+ 	}
+-	case KVM_HOST_SMCCC_FUNC(__kvm_tlb_flush_local_vmid): {
++	case KVM_HOST_SMCCC_FUNC(__kvm_flush_cpu_context): {
+ 		unsigned long r1 = host_ctxt->regs.regs[1];
+ 		struct kvm_s2_mmu *mmu = (struct kvm_s2_mmu *)r1;
+ 
+-		__kvm_tlb_flush_local_vmid(kern_hyp_va(mmu));
++		__kvm_flush_cpu_context(kern_hyp_va(mmu));
+ 		break;
+ 	}
+ 	case KVM_HOST_SMCCC_FUNC(__kvm_timer_set_cntvoff): {
+diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
+index fbde89a2c6e8..229b06748c20 100644
+--- a/arch/arm64/kvm/hyp/nvhe/tlb.c
++++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
+@@ -123,7 +123,7 @@ void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu)
+ 	__tlb_switch_to_host(&cxt);
+ }
+ 
+-void __kvm_tlb_flush_local_vmid(struct kvm_s2_mmu *mmu)
++void __kvm_flush_cpu_context(struct kvm_s2_mmu *mmu)
+ {
+ 	struct tlb_inv_context cxt;
+ 
+@@ -131,6 +131,7 @@ void __kvm_tlb_flush_local_vmid(struct kvm_s2_mmu *mmu)
+ 	__tlb_switch_to_guest(mmu, &cxt);
+ 
+ 	__tlbi(vmalle1);
++	asm volatile("ic iallu");
+ 	dsb(nsh);
+ 	isb();
+ 
+diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
+index fd7895945bbc..66f17349f0c3 100644
+--- a/arch/arm64/kvm/hyp/vhe/tlb.c
++++ b/arch/arm64/kvm/hyp/vhe/tlb.c
+@@ -127,7 +127,7 @@ void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu)
+ 	__tlb_switch_to_host(&cxt);
+ }
+ 
+-void __kvm_tlb_flush_local_vmid(struct kvm_s2_mmu *mmu)
++void __kvm_flush_cpu_context(struct kvm_s2_mmu *mmu)
+ {
+ 	struct tlb_inv_context cxt;
+ 
+@@ -135,6 +135,7 @@ void __kvm_tlb_flush_local_vmid(struct kvm_s2_mmu *mmu)
+ 	__tlb_switch_to_guest(mmu, &cxt);
+ 
+ 	__tlbi(vmalle1);
++	asm volatile("ic iallu");
+ 	dsb(nsh);
+ 	isb();
  
 -- 
 2.29.2
