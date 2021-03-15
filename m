@@ -7,58 +7,58 @@ X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F119CC433DB
-	for <kvmarm@archiver.kernel.org>; Mon, 15 Mar 2021 12:05:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B777C433E6
+	for <kvmarm@archiver.kernel.org>; Mon, 15 Mar 2021 12:07:47 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 72D8864E90
-	for <kvmarm@archiver.kernel.org>; Mon, 15 Mar 2021 12:05:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72D8864E90
+	by mail.kernel.org (Postfix) with ESMTP id DE4CE64E98
+	for <kvmarm@archiver.kernel.org>; Mon, 15 Mar 2021 12:07:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE4CE64E98
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linuxfoundation.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A7794B3B7;
-	Mon, 15 Mar 2021 08:05:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 73CDA4B57B;
+	Mon, 15 Mar 2021 08:07:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@linuxfoundation.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id SYUOhaMwjR0S; Mon, 15 Mar 2021 08:05:20 -0400 (EDT)
+	with ESMTP id tWcFsAeulOEk; Mon, 15 Mar 2021 08:07:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EB0C64B4AD;
-	Mon, 15 Mar 2021 08:05:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4FA5A4B56E;
+	Mon, 15 Mar 2021 08:07:45 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E0CE4B3B7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 08:05:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 99FAB4B503
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 08:07:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qpIWqli7Ne1p for <kvmarm@lists.cs.columbia.edu>;
- Mon, 15 Mar 2021 08:05:18 -0400 (EDT)
+ with ESMTP id fhVMnlQyCmHR for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 15 Mar 2021 08:07:43 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 353ED4B303
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 08:05:18 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id BE0D164E27;
- Mon, 15 Mar 2021 12:05:16 +0000 (UTC)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 572194B4AD
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 08:07:43 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 97E4764E27;
+ Mon, 15 Mar 2021 12:07:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
- s=korg; t=1615809917;
- bh=Ucgr26O655G9zvpy/2yT7RFG7mpvNolazblT4bHOwq8=;
- h=Subject:To:Cc:From:Date:In-Reply-To:From;
- b=ojKvNqPwsQh0g3iQs/BLw5uEMrvvEMEoArg4KXl/BzOC7oleicvHpclSI6i3nbLex
- zchzr/QJwBMuMXzSBvnYQ+1spRe2aMe8veSGr5/FrdwgAMCdHWnOF4crH2Wme4tbag
- eHEK0ziYnycC+rScW9VQW/WO4+ZyD3pLBc6HLasw=
-Subject: Patch "KVM: arm64: Fix exclusive limit for IPA size" has been added
- to the 4.9-stable tree
-To: drjones@redhat.com, eric.auger@redhat.com, gregkh@linuxfoundation.org,
- kernel-team@android.com, kvmarm@lists.cs.columbia.edu, maz@kernel.org
-From: <gregkh@linuxfoundation.org>
-Date: Mon, 15 Mar 2021 13:05:14 +0100
-In-Reply-To: <20210315114646.4137198-1-maz@kernel.org>
-Message-ID: <1615809914198247@kroah.com>
+ s=korg; t=1615810062;
+ bh=vM8x/V/80btoDH0FlvPjCge1t8yEhaW77QScR8zl05Y=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=bdbJOgCbj1xEP2D3DEilMOIjRGD4jB58O0KhLJFQsQgswxgh3sm1F59ffHk6H3ehP
+ WMNmpbonXrH6IjjlVXJMTmDJGnH6uq1Q/YsVLzrAHg0WCPoQpR3rclukYgz0VZesyM
+ Yj4O0evrVxDWCkcjWG0Zx1IzGgk7t/aUizT1IHtM=
+Date: Mon, 15 Mar 2021 13:07:39 +0100
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH][stable-4.{4,9}] KVM: arm64: Fix exclusive limit for IPA
+ size
+Message-ID: <YE9OCxeXXilxCjhB@kroah.com>
+References: <20210315114646.4137198-1-maz@kernel.org>
 MIME-Version: 1.0
-X-stable: commit
-X-Patchwork-Hint: ignore 
-Cc: stable-commits@vger.kernel.org
+Content-Disposition: inline
+In-Reply-To: <20210315114646.4137198-1-maz@kernel.org>
+Cc: kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ stable@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -75,73 +75,34 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+On Mon, Mar 15, 2021 at 11:46:46AM +0000, Marc Zyngier wrote:
+> Commit 262b003d059c6671601a19057e9fe1a5e7f23722 upstream.
+> 
+> When registering a memslot, we check the size and location of that
+> memslot against the IPA size to ensure that we can provide guest
+> access to the whole of the memory.
+> 
+> Unfortunately, this check rejects memslot that end-up at the exact
+> limit of the addressing capability for a given IPA size. For example,
+> it refuses the creation of a 2GB memslot at 0x8000000 with a 32bit
+> IPA space.
+> 
+> Fix it by relaxing the check to accept a memslot reaching the
+> limit of the IPA space.
+> 
+> Fixes: c3058d5da222 ("arm/arm64: KVM: Ensure memslots are within KVM_PHYS_SIZE")
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Cc: stable@vger.kernel.org # 4.4, 4.9
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
+> Link: https://lore.kernel.org/r/20210311100016.3830038-3-maz@kernel.org
+> ---
+>  arch/arm/kvm/mmu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-This is a note to let you know that I've just added the patch titled
+That worked, now queued up, thanks!
 
-    KVM: arm64: Fix exclusive limit for IPA size
-
-to the 4.9-stable tree which can be found at:
-    http://www.kernel.org/git/?p=linux/kernel/git/stable/stable-queue.git;a=summary
-
-The filename of the patch is:
-     kvm-arm64-fix-exclusive-limit-for-ipa-size.patch
-and it can be found in the queue-4.9 subdirectory.
-
-If you, or anyone else, feels it should not be added to the stable tree,
-please let <stable@vger.kernel.org> know about it.
-
-
-From foo@baz Mon Mar 15 01:04:48 PM CET 2021
-From: Marc Zyngier <maz@kernel.org>
-Date: Mon, 15 Mar 2021 11:46:46 +0000
-Subject: KVM: arm64: Fix exclusive limit for IPA size
-To: gregkh@linuxfoundation.org
-Cc: kernel-team@android.com, kvmarm@lists.cs.columbia.edu, Eric Auger <eric.auger@redhat.com>, stable@vger.kernel.org, Andrew Jones <drjones@redhat.com>
-Message-ID: <20210315114646.4137198-1-maz@kernel.org>
-
-From: Marc Zyngier <maz@kernel.org>
-
-Commit 262b003d059c6671601a19057e9fe1a5e7f23722 upstream.
-
-When registering a memslot, we check the size and location of that
-memslot against the IPA size to ensure that we can provide guest
-access to the whole of the memory.
-
-Unfortunately, this check rejects memslot that end-up at the exact
-limit of the addressing capability for a given IPA size. For example,
-it refuses the creation of a 2GB memslot at 0x8000000 with a 32bit
-IPA space.
-
-Fix it by relaxing the check to accept a memslot reaching the
-limit of the IPA space.
-
-Fixes: c3058d5da222 ("arm/arm64: KVM: Ensure memslots are within KVM_PHYS_SIZE")
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Cc: stable@vger.kernel.org # 4.4, 4.9
-Reviewed-by: Andrew Jones <drjones@redhat.com>
-Link: https://lore.kernel.org/r/20210311100016.3830038-3-maz@kernel.org
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- arch/arm/kvm/mmu.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
---- a/arch/arm/kvm/mmu.c
-+++ b/arch/arm/kvm/mmu.c
-@@ -1834,7 +1834,7 @@ int kvm_arch_prepare_memory_region(struc
- 	 * Prevent userspace from creating a memory region outside of the IPA
- 	 * space addressable by the KVM guest IPA space.
- 	 */
--	if (memslot->base_gfn + memslot->npages >=
-+	if (memslot->base_gfn + memslot->npages >
- 	    (KVM_PHYS_SIZE >> PAGE_SHIFT))
- 		return -EFAULT;
- 
-
-
-Patches currently in stable-queue which might be from maz@kernel.org are
-
-queue-4.9/kvm-arm64-fix-exclusive-limit-for-ipa-size.patch
+greg k-h
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
