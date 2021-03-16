@@ -6,52 +6,53 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83D0CC433E0
-	for <kvmarm@archiver.kernel.org>; Tue, 16 Mar 2021 10:13:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9A23C43381
+	for <kvmarm@archiver.kernel.org>; Tue, 16 Mar 2021 10:13:46 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0D22664F8A
-	for <kvmarm@archiver.kernel.org>; Tue, 16 Mar 2021 10:13:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D22664F8A
+	by mail.kernel.org (Postfix) with ESMTP id 5B94265023
+	for <kvmarm@archiver.kernel.org>; Tue, 16 Mar 2021 10:13:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B94265023
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A61514B648;
-	Tue, 16 Mar 2021 06:13:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 04B0F4B3C1;
+	Tue, 16 Mar 2021 06:13:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id fmGVdLmiP8Vs; Tue, 16 Mar 2021 06:13:43 -0400 (EDT)
+	with ESMTP id xghFI4uC5hDl; Tue, 16 Mar 2021 06:13:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2ADAE4B61D;
-	Tue, 16 Mar 2021 06:13:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 50C334B60C;
+	Tue, 16 Mar 2021 06:13:42 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 52E994B21C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Mar 2021 06:13:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 93EB14B3C3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Mar 2021 06:13:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Q5YALY+E0awp for <kvmarm@lists.cs.columbia.edu>;
- Tue, 16 Mar 2021 06:13:34 -0400 (EDT)
+ with ESMTP id 3hsFrHMsp2rJ for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 16 Mar 2021 06:13:37 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 39ED04B224
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Mar 2021 06:13:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8A86E4B508
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Mar 2021 06:13:36 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 4867B65023;
- Tue, 16 Mar 2021 10:13:33 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 9EC2F65028;
+ Tue, 16 Mar 2021 10:13:35 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1lM6hf-001uep-Gk; Tue, 16 Mar 2021 10:13:31 +0000
+ id 1lM6hh-001uep-Sn; Tue, 16 Mar 2021 10:13:34 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
  kvm@vger.kernel.org
-Subject: [PATCH 03/10] KVM: arm64: Let vcpu_sve_pffr() handle HYP VAs
-Date: Tue, 16 Mar 2021 10:13:05 +0000
-Message-Id: <20210316101312.102925-4-maz@kernel.org>
+Subject: [PATCH 07/10] KVM: arm64: Save guest's ZCR_EL1 before saving the
+ FPSIMD state
+Date: Tue, 16 Mar 2021 10:13:09 +0000
+Message-Id: <20210316101312.102925-8-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210316101312.102925-1-maz@kernel.org>
 References: <20210316101312.102925-1-maz@kernel.org>
@@ -84,31 +85,31 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The vcpu_sve_pffr() returns a pointer, which can be an interesting
-thing to do on nVHE. Wrap the pointer with kern_hyp_va(), and
-take this opportunity to remove the unnecessary casts (sve_state
-being a void *).
+Make sure the guest's ZCR_EL1 is saved before we save/flush the
+state. This will be useful in later patches.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h | 4 ++--
+ arch/arm64/kvm/fpsimd.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 3d10e6527f7d..fb1d78299ba0 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -372,8 +372,8 @@ struct kvm_vcpu_arch {
- };
+diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
+index 84afca5ed6f2..b5f95abd23f5 100644
+--- a/arch/arm64/kvm/fpsimd.c
++++ b/arch/arm64/kvm/fpsimd.c
+@@ -121,10 +121,10 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
+ 	local_irq_save(flags);
  
- /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
--#define vcpu_sve_pffr(vcpu) ((void *)((char *)((vcpu)->arch.sve_state) + \
--				      sve_ffr_offset((vcpu)->arch.sve_max_vl)))
-+#define vcpu_sve_pffr(vcpu) (kern_hyp_va((vcpu)->arch.sve_state) +	\
-+			     sve_ffr_offset((vcpu)->arch.sve_max_vl))
- 
- #define vcpu_sve_state_size(vcpu) ({					\
- 	size_t __size_ret;						\
+ 	if (vcpu->arch.flags & KVM_ARM64_FP_ENABLED) {
+-		fpsimd_save_and_flush_cpu_state();
+-
+ 		if (guest_has_sve)
+ 			__vcpu_sys_reg(vcpu, ZCR_EL1) = read_sysreg_el1(SYS_ZCR);
++
++		fpsimd_save_and_flush_cpu_state();
+ 	} else if (host_has_sve) {
+ 		/*
+ 		 * The FPSIMD/SVE state in the CPU has not been touched, and we
 -- 
 2.29.2
 
