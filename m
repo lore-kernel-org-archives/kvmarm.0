@@ -2,64 +2,94 @@ Return-Path: <SRS0=Oq5u=IO=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
 	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 626F5C433DB
-	for <kvmarm@archiver.kernel.org>; Tue, 16 Mar 2021 04:20:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DEDDC433E6
+	for <kvmarm@archiver.kernel.org>; Tue, 16 Mar 2021 08:22:33 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C583D650EF
-	for <kvmarm@archiver.kernel.org>; Tue, 16 Mar 2021 04:20:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C583D650EF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id D5D9664FF5
+	for <kvmarm@archiver.kernel.org>; Tue, 16 Mar 2021 08:22:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5D9664FF5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 518254B4DB;
-	Tue, 16 Mar 2021 00:20:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 24FD14B5E5;
+	Tue, 16 Mar 2021 04:22:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id b+WlC7AaK-hm; Tue, 16 Mar 2021 00:20:29 -0400 (EDT)
+	with ESMTP id Maxc7NGzIW6t; Tue, 16 Mar 2021 04:22:31 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4DA414B4EF;
-	Tue, 16 Mar 2021 00:20:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 203FF4B5D5;
+	Tue, 16 Mar 2021 04:22:31 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E642C4B400
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Mar 2021 00:20:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 343DB4B4FE
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Mar 2021 04:22:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pIcaT-glH0Or for <kvmarm@lists.cs.columbia.edu>;
- Tue, 16 Mar 2021 00:20:25 -0400 (EDT)
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 78AD54B39B
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Mar 2021 00:20:25 -0400 (EDT)
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
- by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4F00Qw4RtQzkZKl;
- Tue, 16 Mar 2021 12:18:48 +0800 (CST)
-Received: from [10.174.184.42] (10.174.184.42) by
- DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
- 14.3.498.0; Tue, 16 Mar 2021 12:20:16 +0800
-Subject: Re: [PATCH 2/4] KVM: arm64: Use find_vma_intersection()
-To: Gavin Shan <gshan@redhat.com>, <kvmarm@lists.cs.columbia.edu>
-References: <20210315041844.64915-1-gshan@redhat.com>
- <20210315041844.64915-3-gshan@redhat.com>
- <65dfdca3-af94-7d5a-86fe-24825301655b@huawei.com>
- <2eef2b42-13bd-2414-f748-551039677bf5@redhat.com>
- <d46320a2-7381-a46a-42e5-6bfa75321d31@redhat.com>
-From: Keqian Zhu <zhukeqian1@huawei.com>
-Message-ID: <05f08046-9c18-bbef-f502-47733000e9ff@huawei.com>
-Date: Tue, 16 Mar 2021 12:20:16 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+ with ESMTP id egvWy+gjyxnc for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 16 Mar 2021 04:22:28 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 628E24B417
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Mar 2021 04:22:28 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1615882948;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=jgBW73IfZOFUYHFY6ABzyMEw2s2SPKAK0wW2bLnOaus=;
+ b=FelNlBrixo0CiaHLtxrv5As8eEjguBKaU35YmQAmfUpt1+wHbHF8JWyz7AFDJe5G2yjELt
+ W69ML380YnQ9J0o7BY/C0V/q4BgZqGm8zN8LU+6yWRz4h3VwcDEi3UD/uTdWFcf/xDTjpI
+ zwuOqttYA3F7xU34cN49X105S0wDzEU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-579-7iVAxc8DNEu8pHjCZoVk6w-1; Tue, 16 Mar 2021 04:22:23 -0400
+X-MC-Unique: 7iVAxc8DNEu8pHjCZoVk6w-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A4F0993920;
+ Tue, 16 Mar 2021 08:22:20 +0000 (UTC)
+Received: from [10.36.112.254] (ovpn-112-254.ams2.redhat.com [10.36.112.254])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BB6BF690F0;
+ Tue, 16 Mar 2021 08:22:12 +0000 (UTC)
+Subject: Re: [PATCH v13 00/15] SMMUv3 Nested Stage Setup (IOMMU part)
+To: Krishna Reddy <vdumpa@nvidia.com>,
+ "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
+ "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+ "will@kernel.org" <will@kernel.org>, "joro@8bytes.org" <joro@8bytes.org>,
+ "maz@kernel.org" <maz@kernel.org>,
+ "robin.murphy@arm.com" <robin.murphy@arm.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>
+References: <20201118112151.25412-1-eric.auger@redhat.com>
+ <BY5PR12MB3764285E7E8064B636132C65B36C9@BY5PR12MB3764.namprd12.prod.outlook.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <d9934ef7-3bf0-b004-3fe9-e0adbcae5c05@redhat.com>
+Date: Tue, 16 Mar 2021 09:22:11 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-In-Reply-To: <d46320a2-7381-a46a-42e5-6bfa75321d31@redhat.com>
-X-Originating-IP: [10.174.184.42]
-X-CFilter-Loop: Reflected
-Cc: maz@kernel.org, will@kernel.org, linux-kernel@vger.kernel.org,
- shan.gavin@gmail.com
+In-Reply-To: <BY5PR12MB3764285E7E8064B636132C65B36C9@BY5PR12MB3764.namprd12.prod.outlook.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+ Bryan Huntsman <bhuntsman@nvidia.com>, Yu-Huan Hsu <YHsu@nvidia.com>,
+ Vikram Sethi <vsethi@nvidia.com>,
+ "vivek.gautam@arm.com" <vivek.gautam@arm.com>,
+ Sachin Nikam <Snikam@nvidia.com>,
+ "zhangfei.gao@linaro.org" <zhangfei.gao@linaro.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -76,80 +106,31 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Gavin,
+Hi Krishna,
+On 3/15/21 7:04 PM, Krishna Reddy wrote:
+> Tested-by: Krishna Reddy <vdumpa@nvidia.com>
+> 
+>> 1) pass the guest stage 1 configuration
+> 
+> Validated Nested SMMUv3 translations for NVMe PCIe device from Guest VM along with patch series "v11 SMMUv3 Nested Stage Setup (VFIO part)" and QEMU patch series "vSMMUv3/pSMMUv3 2 stage VFIO integration" from v5.2.0-2stage-rfcv8. 
+> NVMe PCIe device is functional with 2-stage translations and no issues observed.
+Thank you very much for your testing efforts. For your info, there are
+more recent kernel series:
+[PATCH v14 00/13] SMMUv3 Nested Stage Setup (IOMMU part) (Feb 23)
+[PATCH v12 00/13] SMMUv3 Nested Stage Setup (VFIO part) (Feb 23)
 
-On 2021/3/16 11:52, Gavin Shan wrote:
-> Hi Keqian,
-> 
-> On 3/15/21 8:42 PM, Gavin Shan wrote:
->> On 3/15/21 7:04 PM, Keqian Zhu wrote:
->>> On 2021/3/15 12:18, Gavin Shan wrote:
->>>> find_vma_intersection() has been existing to search the intersected
->>>> vma. This uses the function where it's applicable, to simplify the
->>>> code.
->>>>
->>>> Signed-off-by: Gavin Shan <gshan@redhat.com>
->>>> ---
->>>>   arch/arm64/kvm/mmu.c | 10 ++++++----
->>>>   1 file changed, 6 insertions(+), 4 deletions(-)
->>>>
->>>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
->>>> index 84e70f953de6..286b603ed0d3 100644
->>>> --- a/arch/arm64/kvm/mmu.c
->>>> +++ b/arch/arm64/kvm/mmu.c
->>>> @@ -421,10 +421,11 @@ static void stage2_unmap_memslot(struct kvm *kvm,
->>>>        *     +--------------------------------------------+
->>>>        */
->>>>       do {
->>>> -        struct vm_area_struct *vma = find_vma(current->mm, hva);
->>>> +        struct vm_area_struct *vma;
->>>>           hva_t vm_start, vm_end;
->>>> -        if (!vma || vma->vm_start >= reg_end)
->>>> +        vma = find_vma_intersection(current->mm, hva, reg_end);
->>> Nit: Keep a same style may be better(Assign vma when declare it).
->>> Other looks good to me.
->>>
->>
->> Yeah, I agree. I will adjust the code in v2 and included your r-b.
->> Thanks for your time to review.
->>
-> 
-> After rechecking the code, I think it'd better to keep current style
-> because there is a follow-on validation on @vma. Keeping them together
-> seems a good idea. I think it wouldn't a big deal to you. So I will
-> keep current style with your r-b in v2.
-Sure, both is OK. ;-)
+working along with QEMU RFC
+[RFC v8 00/28] vSMMUv3/pSMMUv3 2 stage VFIO integration (Feb 25)
 
-Thanks,
-Keqian
+If you have cycles to test with those, this would be higly appreciated.
+
+Thanks
+
+Eric
 > 
->     vma = find_vma_intersection(current->mm, hva, reg_end);
->         if (!vma)
->              break;
-> Thanks,
-> Gavin
->  
->>>> +        if (!vma)
->>>>               break;
->>>>           /*
->>>> @@ -1330,10 +1331,11 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
->>>>        *     +--------------------------------------------+
->>>>        */
->>>>       do {
->>>> -        struct vm_area_struct *vma = find_vma(current->mm, hva);
->>>> +        struct vm_area_struct *vma;
->>>>           hva_t vm_start, vm_end;
->>>> -        if (!vma || vma->vm_start >= reg_end)
->>>> +        vma = find_vma_intersection(current->mm, hva, reg_end);
->>>> +        if (!vma)
->>>>               break;
->>>>           /*
->>>>
->>>
->>
+> -KR
 > 
-> .
-> 
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
