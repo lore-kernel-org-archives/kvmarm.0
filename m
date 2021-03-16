@@ -1,102 +1,89 @@
-Return-Path: <SRS0=nsVm=IN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=Oq5u=IO=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4AA4C433E0
-	for <kvmarm@archiver.kernel.org>; Mon, 15 Mar 2021 22:31:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BE8BC433E0
+	for <kvmarm@archiver.kernel.org>; Tue, 16 Mar 2021 03:52:45 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 130C864F4D
-	for <kvmarm@archiver.kernel.org>; Mon, 15 Mar 2021 22:31:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 130C864F4D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 5D197650CA
+	for <kvmarm@archiver.kernel.org>; Tue, 16 Mar 2021 03:52:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D197650CA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E3524B5E2;
-	Mon, 15 Mar 2021 18:31:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B49DE4B38A;
+	Mon, 15 Mar 2021 23:52:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id apuKCR86E9Cm; Mon, 15 Mar 2021 18:31:31 -0400 (EDT)
+	with ESMTP id 5QpmTXXcb82h; Mon, 15 Mar 2021 23:52:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C87D4B5D6;
-	Mon, 15 Mar 2021 18:31:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C28A4B38B;
+	Mon, 15 Mar 2021 23:52:42 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 027F04B5D1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 18:31:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D58A94B370
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 23:52:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QWMWmxhdtiUo for <kvmarm@lists.cs.columbia.edu>;
- Mon, 15 Mar 2021 18:31:28 -0400 (EDT)
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com
- [209.85.208.182])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9F0E64B5CF
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 18:31:28 -0400 (EDT)
-Received: by mail-lj1-f182.google.com with SMTP id u4so18190395ljo.6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 15:31:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=t48JfE/I+ydsOOfkocl4ExwOYD4Cwrny9/Xf4iuVVeE=;
- b=YzOHwW9gU+2CCoT9hKyxcZQ9g6o779atEw1QSJLPBRAVTj7Gc0vDffISoB/Cd9mLvk
- keJsigpwHmgy2X42PpmONt7PB65J85QkeCx9fHcaIGkNovhredA86swM4cAXZwH+PSi8
- lRrPBaNDuKAYAs9HX13mcFnjNF4HVRXNtJQ97EfCuIjTjC3+fdoJesfZFgSy75Qsy3h5
- 3KMoc/MoTsK7c1+mpTCTSVgVngYK9wFNZHp/tgw8qVex1AQ+P9QYvrUzbu9XpmNTz0v7
- 2GyGh2j9ZBeGQ8E+jCJEwyRovr3E+WurRkyCDBICw0iCS9XJ4oKdl+9A7ZLiVshUP9R/
- VTaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=t48JfE/I+ydsOOfkocl4ExwOYD4Cwrny9/Xf4iuVVeE=;
- b=A7CATll6TNJfc/bpywX8rsiILUNgxhJiU9MHtgXUayf8mCMmEI2tZXfWS7YmPsr2gD
- qo5WMTdpJ6LHIEHECyLiXz70Tw/4FaHDj4CvLe/RJj4UtWUmSmR+kuFGLyzAQLhIjqwv
- Fvnd/WlRsJPACZoz6XMIAU0mjObPgSYzEdvM9u/+/jhJLKDKJohr/nLcV//1amjbe9ND
- 7XkKxVtX/F4WTuTQ+eywW/LR4PSDD7z0meIQ0yF94CZcsp04paKTXx8mvBTQPwVvIqqh
- blf15PUuDqKOCkC2LsPfuJQ1W/Ng/cMJs3t1+D4GgbvXsMJfJRU6ugOqXefU+gL6zY8S
- V+Gw==
-X-Gm-Message-State: AOAM530JvfSAyxBxuWf2HUCatguh1i36kILYHRVFhNDGQDgyXFHoleZV
- v7P/KlkQk6kQPs2anfJJ9nRopVTAmBPSl9wb7cZUrQ==
-X-Google-Smtp-Source: ABdhPJxjr/et45iqQeRMTErI0LQhEQm42DqVbpHRSpcjhEUlWFO96pLBoZaf9saYhs4q/r0gUqfHvBityBsZA51vteE=
-X-Received: by 2002:a2e:988f:: with SMTP id b15mr751964ljj.394.1615847486669; 
- Mon, 15 Mar 2021 15:31:26 -0700 (PDT)
+ with ESMTP id ZYqIBTr+XIQU for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 15 Mar 2021 23:52:39 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CAEC54B369
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Mar 2021 23:52:39 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1615866759;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=V40kaFfpUEyV4ZKdYetesb/NkWxPeo4GP3hb5Jwdckc=;
+ b=dFks9dscLGWEDOl1HV1ua/16r4UEqq0oNBQ1s5phU1GLKfDbuJDTFBYkfFM3fPunEmrM/R
+ kBFxw07O6ybDzeR4aqYDzFtnCorgycaqYEdP0LZ9S86VzV3hz/16OyzApSU3M/Jq3rBjtD
+ r+3uRv0Sq4RwvFb8hfbSCzpR/Tit+aI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-59-Pu0pn-o-OkaHyKopJf4Ndg-1; Mon, 15 Mar 2021 23:52:37 -0400
+X-MC-Unique: Pu0pn-o-OkaHyKopJf4Ndg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4DA8239381;
+ Tue, 16 Mar 2021 03:52:36 +0000 (UTC)
+Received: from [10.64.54.175] (vpn2-54-175.bne.redhat.com [10.64.54.175])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 46FE461F5C;
+ Tue, 16 Mar 2021 03:52:32 +0000 (UTC)
+Subject: Re: [PATCH 2/4] KVM: arm64: Use find_vma_intersection()
+From: Gavin Shan <gshan@redhat.com>
+To: Keqian Zhu <zhukeqian1@huawei.com>, kvmarm@lists.cs.columbia.edu
+References: <20210315041844.64915-1-gshan@redhat.com>
+ <20210315041844.64915-3-gshan@redhat.com>
+ <65dfdca3-af94-7d5a-86fe-24825301655b@huawei.com>
+ <2eef2b42-13bd-2414-f748-551039677bf5@redhat.com>
+Message-ID: <d46320a2-7381-a46a-42e5-6bfa75321d31@redhat.com>
+Date: Tue, 16 Mar 2021 14:52:28 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-References: <20210310003024.2026253-1-jingzhangos@google.com>
- <20210310003024.2026253-4-jingzhangos@google.com>
- <bb03107c-a413-50da-e228-d338dd471fb3@redhat.com>
-In-Reply-To: <bb03107c-a413-50da-e228-d338dd471fb3@redhat.com>
-From: Jing Zhang <jingzhangos@google.com>
-Date: Mon, 15 Mar 2021 17:31:15 -0500
-Message-ID: <CAAdAUth0J6z7fFpOkkmzKc83Bj+MST-jhsZ0uU0iYdRcE_-gMA@mail.gmail.com>
-Subject: Re: [RFC PATCH 3/4] KVM: stats: Add ioctl commands to pull statistics
- in binary format
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
- Paul Mackerras <paulus@ozlabs.org>,
- Linux kselftest <linux-kselftest@vger.kernel.org>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Will Deacon <will@kernel.org>,
- KVM ARM <kvmarm@lists.cs.columbia.edu>,
- Emanuele Giuseppe Esposito <eesposit@redhat.com>,
- Linux S390 <linux-s390@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
- Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>,
- Huacai Chen <chenhuacai@kernel.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- David Rientjes <rientjes@google.com>, KVM PPC <kvm-ppc@vger.kernel.org>,
- Jim Mattson <jmattson@google.com>,
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- Sean Christopherson <seanjc@google.com>, Cornelia Huck <cohuck@redhat.com>,
- Peter Shier <pshier@google.com>, Linux MIPS <linux-mips@vger.kernel.org>,
- Vitaly Kuznetsov <vkuznets@redhat.com>
+In-Reply-To: <2eef2b42-13bd-2414-f748-551039677bf5@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Cc: maz@kernel.org, will@kernel.org, linux-kernel@vger.kernel.org,
+ shan.gavin@gmail.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
+Reply-To: Gavin Shan <gshan@redhat.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -105,95 +92,87 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="windows-1252"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Paolo,
+Hi Keqian,
 
-On Wed, Mar 10, 2021 at 8:55 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 10/03/21 01:30, Jing Zhang wrote:
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index 383df23514b9..87dd62516c8b 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -3464,6 +3464,51 @@ static long kvm_vcpu_ioctl(struct file *filp,
-> >               r = kvm_arch_vcpu_ioctl_set_fpu(vcpu, fpu);
-> >               break;
-> >       }
-> > +     case KVM_STATS_GET_INFO: {
-> > +             struct kvm_stats_info stats_info;
-> > +
-> > +             r = -EFAULT;
-> > +             stats_info.num_stats = VCPU_STAT_COUNT;
-> > +             if (copy_to_user(argp, &stats_info, sizeof(stats_info)))
-> > +                     goto out;
-> > +             r = 0;
-> > +             break;
-> > +     }
-> > +     case KVM_STATS_GET_NAMES: {
-> > +             struct kvm_stats_names stats_names;
-> > +
-> > +             r = -EFAULT;
-> > +             if (copy_from_user(&stats_names, argp, sizeof(stats_names)))
-> > +                     goto out;
-> > +             r = -EINVAL;
-> > +             if (stats_names.size < VCPU_STAT_COUNT * KVM_STATS_NAME_LEN)
-> > +                     goto out;
-> > +
-> > +             r = -EFAULT;
-> > +             if (copy_to_user(argp + sizeof(stats_names),
-> > +                             kvm_vcpu_stat_strings,
-> > +                             VCPU_STAT_COUNT * KVM_STATS_NAME_LEN))
->
-> The only reason to separate the strings in patch 1 is to pass them here.
->   But this is a poor API because it imposes a limit on the length of the
-> statistics, and makes that length part of the binary interface.
->
-> I would prefer a completely different interface, where you have a file
-> descriptor that can be created and associated to a vCPU or VM (or even
-> to /dev/kvm).  Having a file descriptor is important because the fd can
-We are considering about how to create the file descriptor. It might be risky
-to create an extra fd for every vCPU. It will easily hit the fd limit for the
-process or the system for machines running a ton of small VMs.
-Looks like creating an extra file descriptor for every VM is a better option.
-And then we can check per vCPU stats through Ioctl of this VM fd by
-passing the vCPU index.
-What do you think?
-> be passed to a less-privileged process that takes care of gathering the
-> metrics
->
-> The result of reading the file descriptor could be either ASCII or
-> binary.  IMO the real cost lies in opening and reading a multitude of
-> files rather than in the ASCII<->binary conversion.
->
-> The format could be one of the following:
->
-> * binary:
->
-> 4 bytes flags (always zero)
-> 4 bytes number of statistics
-> 4 bytes offset of the first stat description
-> 4 bytes offset of the first stat value
-> stat descriptions:
->    - 4 bytes for the type (for now always zero: uint64_t)
->    - 4 bytes for the flags (for now always zero)
->    - length of name
->    - name
-> statistics in 64-bit format
->
-> * text:
->
-> stat1_name uint64 123
-> stat2_name uint64 456
-> ...
->
-> What do you think?
->
-> Paolo
->
+On 3/15/21 8:42 PM, Gavin Shan wrote:
+> On 3/15/21 7:04 PM, Keqian Zhu wrote:
+>> On 2021/3/15 12:18, Gavin Shan wrote:
+>>> find_vma_intersection() has been existing to search the intersected
+>>> vma. This uses the function where it's applicable, to simplify the
+>>> code.
+>>>
+>>> Signed-off-by: Gavin Shan <gshan@redhat.com>
+>>> ---
+>>> =A0 arch/arm64/kvm/mmu.c | 10 ++++++----
+>>> =A0 1 file changed, 6 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>>> index 84e70f953de6..286b603ed0d3 100644
+>>> --- a/arch/arm64/kvm/mmu.c
+>>> +++ b/arch/arm64/kvm/mmu.c
+>>> @@ -421,10 +421,11 @@ static void stage2_unmap_memslot(struct kvm *kvm,
+>>> =A0=A0=A0=A0=A0=A0 *=A0=A0=A0=A0 +-------------------------------------=
+-------+
+>>> =A0=A0=A0=A0=A0=A0 */
+>>> =A0=A0=A0=A0=A0 do {
+>>> -=A0=A0=A0=A0=A0=A0=A0 struct vm_area_struct *vma =3D find_vma(current-=
+>mm, hva);
+>>> +=A0=A0=A0=A0=A0=A0=A0 struct vm_area_struct *vma;
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 hva_t vm_start, vm_end;
+>>> -=A0=A0=A0=A0=A0=A0=A0 if (!vma || vma->vm_start >=3D reg_end)
+>>> +=A0=A0=A0=A0=A0=A0=A0 vma =3D find_vma_intersection(current->mm, hva, =
+reg_end);
+>> Nit: Keep a same style may be better(Assign vma when declare it).
+>> Other looks good to me.
+>>
+> =
+
+> Yeah, I agree. I will adjust the code in v2 and included your r-b.
+> Thanks for your time to review.
+> =
+
+
+After rechecking the code, I think it'd better to keep current style
+because there is a follow-on validation on @vma. Keeping them together
+seems a good idea. I think it wouldn't a big deal to you. So I will
+keep current style with your r-b in v2.
+
+	vma =3D find_vma_intersection(current->mm, hva, reg_end);
+         if (!vma)
+              break;
+Thanks,
+Gavin
+  =
+
+>>> +=A0=A0=A0=A0=A0=A0=A0 if (!vma)
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 break;
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 /*
+>>> @@ -1330,10 +1331,11 @@ int kvm_arch_prepare_memory_region(struct kvm *=
+kvm,
+>>> =A0=A0=A0=A0=A0=A0 *=A0=A0=A0=A0 +-------------------------------------=
+-------+
+>>> =A0=A0=A0=A0=A0=A0 */
+>>> =A0=A0=A0=A0=A0 do {
+>>> -=A0=A0=A0=A0=A0=A0=A0 struct vm_area_struct *vma =3D find_vma(current-=
+>mm, hva);
+>>> +=A0=A0=A0=A0=A0=A0=A0 struct vm_area_struct *vma;
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 hva_t vm_start, vm_end;
+>>> -=A0=A0=A0=A0=A0=A0=A0 if (!vma || vma->vm_start >=3D reg_end)
+>>> +=A0=A0=A0=A0=A0=A0=A0 vma =3D find_vma_intersection(current->mm, hva, =
+reg_end);
+>>> +=A0=A0=A0=A0=A0=A0=A0 if (!vma)
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 break;
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 /*
+>>>
+>>
+> =
+
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
