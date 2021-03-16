@@ -6,53 +6,53 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26137C43331
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1BC2C43333
 	for <kvmarm@archiver.kernel.org>; Tue, 16 Mar 2021 17:46:51 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A74276512A
-	for <kvmarm@archiver.kernel.org>; Tue, 16 Mar 2021 17:46:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A74276512A
+	by mail.kernel.org (Postfix) with ESMTP id 6B2AA65125
+	for <kvmarm@archiver.kernel.org>; Tue, 16 Mar 2021 17:46:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B2AA65125
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5268A4B483;
-	Tue, 16 Mar 2021 13:46:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 179B94B5F9;
+	Tue, 16 Mar 2021 13:46:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9o+S7rvECLjW; Tue, 16 Mar 2021 13:46:47 -0400 (EDT)
+	with ESMTP id wB7+6RPN-51c; Tue, 16 Mar 2021 13:46:49 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 556514B58C;
-	Tue, 16 Mar 2021 13:46:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C2974B4FE;
+	Tue, 16 Mar 2021 13:46:48 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6119B4B456
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E7D124B455
  for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Mar 2021 13:46:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8Jc5r91tYWHn for <kvmarm@lists.cs.columbia.edu>;
- Tue, 16 Mar 2021 13:46:43 -0400 (EDT)
+ with ESMTP id QON0q23EdWNp for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 16 Mar 2021 13:46:44 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D83144B3AF
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Mar 2021 13:46:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D00D24B48B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Mar 2021 13:46:43 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 269FD6511D;
- Tue, 16 Mar 2021 17:46:41 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id E9FBF65128;
+ Tue, 16 Mar 2021 17:46:42 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1lMDmB-0021ao-C8; Tue, 16 Mar 2021 17:46:39 +0000
+ id 1lMDmD-0021ao-5B; Tue, 16 Mar 2021 17:46:41 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
  kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 01/11] irqchip/gic: Split vGIC probing information from the
- GIC code
-Date: Tue, 16 Mar 2021 17:46:06 +0000
-Message-Id: <20210316174617.173033-2-maz@kernel.org>
+Subject: [PATCH 04/11] KVM: arm64: vgic: Let an interrupt controller advertise
+ lack of HW deactivation
+Date: Tue, 16 Mar 2021 17:46:09 +0000
+Message-Id: <20210316174617.173033-5-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210316174617.173033-1-maz@kernel.org>
 References: <20210316174617.173033-1-maz@kernel.org>
@@ -83,260 +83,71 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The vGIC advertising code is unsurprisingly very much tied to
-the GIC implementations. However, we are about to extend the
-support to lesser implementations.
+The vGIC, as architected by ARM, allows a virtual interrupt to
+trigger the deactivation of a physical interrupt. This allows
+the following interrupt to be delivered without requiring an exit.
 
-Let's dissociate the vgic registration from the GIC code and
-move it into KVM, where it makes a bit more sense. This also
-allows us to mark the gic_kvm_info structures as __initdata.
+However, some implementations have choosen not to implement this,
+meaning that we will need some unsavoury workarounds to deal with this.
+
+On detecting such a case, taint the kernel and spit a nastygram.
+We'll deal with this in later patches.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/vgic/vgic-init.c        | 17 +++++++++--
- drivers/irqchip/irq-gic-common.c       | 13 --------
- drivers/irqchip/irq-gic-common.h       |  2 --
- drivers/irqchip/irq-gic-v3.c           |  6 ++--
- drivers/irqchip/irq-gic.c              |  6 ++--
- include/linux/irqchip/arm-gic-common.h | 25 +---------------
- include/linux/irqchip/arm-vgic-info.h  | 41 ++++++++++++++++++++++++++
- 7 files changed, 62 insertions(+), 48 deletions(-)
- create mode 100644 include/linux/irqchip/arm-vgic-info.h
+ arch/arm64/kvm/vgic/vgic-init.c       | 10 ++++++++++
+ include/kvm/arm_vgic.h                |  3 +++
+ include/linux/irqchip/arm-vgic-info.h |  2 ++
+ 3 files changed, 15 insertions(+)
 
 diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-index 052917deb149..9b491263f5f7 100644
+index 00c75495fd0c..0c8637a58535 100644
 --- a/arch/arm64/kvm/vgic/vgic-init.c
 +++ b/arch/arm64/kvm/vgic/vgic-init.c
-@@ -480,6 +480,15 @@ static irqreturn_t vgic_maintenance_handler(int irq, void *data)
- 	return IRQ_HANDLED;
- }
- 
-+static struct gic_kvm_info *gic_kvm_info;
-+
-+void __init vgic_set_kvm_info(const struct gic_kvm_info *info)
-+{
-+	BUG_ON(gic_kvm_info != NULL);
-+	gic_kvm_info = kmalloc(sizeof(*info), GFP_KERNEL);
-+	*gic_kvm_info = *info;
-+}
-+
- /**
-  * kvm_vgic_init_cpu_hardware - initialize the GIC VE hardware
-  *
-@@ -507,10 +516,8 @@ void kvm_vgic_init_cpu_hardware(void)
-  */
- int kvm_vgic_hyp_init(void)
- {
--	const struct gic_kvm_info *gic_kvm_info;
- 	int ret;
- 
--	gic_kvm_info = gic_get_kvm_info();
+@@ -521,6 +521,16 @@ int kvm_vgic_hyp_init(void)
  	if (!gic_kvm_info)
  		return -ENODEV;
  
-@@ -534,10 +541,14 @@ int kvm_vgic_hyp_init(void)
- 		ret = -ENODEV;
- 	}
- 
-+	kvm_vgic_global_state.maint_irq = gic_kvm_info->maint_irq;
++	/*
++	 * If we get one of these oddball non-GICs, taint the kernel,
++	 * as we have no idea of how they *really* behave.
++	 */
++	if (gic_kvm_info->no_hw_deactivation) {
++		kvm_info("Non-architectural vgic, tainting kernel\n");
++		add_taint(TAINT_CPU_OUT_OF_SPEC, LOCKDEP_STILL_OK);
++		kvm_vgic_global_state.no_hw_deactivation = true;
++	}
 +
-+	kfree(gic_kvm_info);
-+	gic_kvm_info = NULL;
+ 	switch (gic_kvm_info->type) {
+ 	case GIC_V2:
+ 		ret = vgic_v2_probe(gic_kvm_info);
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 3d74f1060bd1..7afe789194d8 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -72,6 +72,9 @@ struct vgic_global {
+ 	bool			has_gicv4;
+ 	bool			has_gicv4_1;
+ 
++	/* Pseudo GICv3 from outer space */
++	bool			no_hw_deactivation;
 +
- 	if (ret)
- 		return ret;
+ 	/* GIC system register CPU interface */
+ 	struct static_key_false gicv3_cpuif;
  
--	kvm_vgic_global_state.maint_irq = gic_kvm_info->maint_irq;
- 	ret = request_percpu_irq(kvm_vgic_global_state.maint_irq,
- 				 vgic_maintenance_handler,
- 				 "vgic", kvm_get_running_vcpus());
-diff --git a/drivers/irqchip/irq-gic-common.c b/drivers/irqchip/irq-gic-common.c
-index f47b41dfd023..a610821c8ff2 100644
---- a/drivers/irqchip/irq-gic-common.c
-+++ b/drivers/irqchip/irq-gic-common.c
-@@ -12,19 +12,6 @@
- 
- static DEFINE_RAW_SPINLOCK(irq_controller_lock);
- 
--static const struct gic_kvm_info *gic_kvm_info;
--
--const struct gic_kvm_info *gic_get_kvm_info(void)
--{
--	return gic_kvm_info;
--}
--
--void gic_set_kvm_info(const struct gic_kvm_info *info)
--{
--	BUG_ON(gic_kvm_info != NULL);
--	gic_kvm_info = info;
--}
--
- void gic_enable_of_quirks(const struct device_node *np,
- 			  const struct gic_quirk *quirks, void *data)
- {
-diff --git a/drivers/irqchip/irq-gic-common.h b/drivers/irqchip/irq-gic-common.h
-index ccba8b0fe0f5..27e3d4ed4f32 100644
---- a/drivers/irqchip/irq-gic-common.h
-+++ b/drivers/irqchip/irq-gic-common.h
-@@ -28,6 +28,4 @@ void gic_enable_quirks(u32 iidr, const struct gic_quirk *quirks,
- void gic_enable_of_quirks(const struct device_node *np,
- 			  const struct gic_quirk *quirks, void *data);
- 
--void gic_set_kvm_info(const struct gic_kvm_info *info);
--
- #endif /* _IRQ_GIC_COMMON_H */
-diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
-index eb0ee356a629..3bd0f25a342f 100644
---- a/drivers/irqchip/irq-gic-v3.c
-+++ b/drivers/irqchip/irq-gic-v3.c
-@@ -103,7 +103,7 @@ EXPORT_SYMBOL(gic_nonsecure_priorities);
- /* ppi_nmi_refs[n] == number of cpus having ppi[n + 16] set as NMI */
- static refcount_t *ppi_nmi_refs;
- 
--static struct gic_kvm_info gic_v3_kvm_info;
-+static struct gic_kvm_info gic_v3_kvm_info __initdata;
- static DEFINE_PER_CPU(bool, has_rss);
- 
- #define MPIDR_RS(mpidr)			(((mpidr) & 0xF0UL) >> 4)
-@@ -1852,7 +1852,7 @@ static void __init gic_of_setup_kvm_info(struct device_node *node)
- 
- 	gic_v3_kvm_info.has_v4 = gic_data.rdists.has_vlpis;
- 	gic_v3_kvm_info.has_v4_1 = gic_data.rdists.has_rvpeid;
--	gic_set_kvm_info(&gic_v3_kvm_info);
-+	vgic_set_kvm_info(&gic_v3_kvm_info);
- }
- 
- static int __init gic_of_init(struct device_node *node, struct device_node *parent)
-@@ -2168,7 +2168,7 @@ static void __init gic_acpi_setup_kvm_info(void)
- 
- 	gic_v3_kvm_info.has_v4 = gic_data.rdists.has_vlpis;
- 	gic_v3_kvm_info.has_v4_1 = gic_data.rdists.has_rvpeid;
--	gic_set_kvm_info(&gic_v3_kvm_info);
-+	vgic_set_kvm_info(&gic_v3_kvm_info);
- }
- 
- static int __init
-diff --git a/drivers/irqchip/irq-gic.c b/drivers/irqchip/irq-gic.c
-index b1d9c22caf2e..2de9ec8ece0c 100644
---- a/drivers/irqchip/irq-gic.c
-+++ b/drivers/irqchip/irq-gic.c
-@@ -119,7 +119,7 @@ static DEFINE_STATIC_KEY_TRUE(supports_deactivate_key);
- 
- static struct gic_chip_data gic_data[CONFIG_ARM_GIC_MAX_NR] __read_mostly;
- 
--static struct gic_kvm_info gic_v2_kvm_info;
-+static struct gic_kvm_info gic_v2_kvm_info __initdata;
- 
- static DEFINE_PER_CPU(u32, sgi_intid);
- 
-@@ -1451,7 +1451,7 @@ static void __init gic_of_setup_kvm_info(struct device_node *node)
- 		return;
- 
- 	if (static_branch_likely(&supports_deactivate_key))
--		gic_set_kvm_info(&gic_v2_kvm_info);
-+		vgic_set_kvm_info(&gic_v2_kvm_info);
- }
- 
- int __init
-@@ -1618,7 +1618,7 @@ static void __init gic_acpi_setup_kvm_info(void)
- 
- 	gic_v2_kvm_info.maint_irq = irq;
- 
--	gic_set_kvm_info(&gic_v2_kvm_info);
-+	vgic_set_kvm_info(&gic_v2_kvm_info);
- }
- 
- static int __init gic_v2_acpi_init(union acpi_subtable_headers *header,
-diff --git a/include/linux/irqchip/arm-gic-common.h b/include/linux/irqchip/arm-gic-common.h
-index fa8c0455c352..1177f3a1aed5 100644
---- a/include/linux/irqchip/arm-gic-common.h
-+++ b/include/linux/irqchip/arm-gic-common.h
-@@ -7,8 +7,7 @@
- #ifndef __LINUX_IRQCHIP_ARM_GIC_COMMON_H
- #define __LINUX_IRQCHIP_ARM_GIC_COMMON_H
- 
--#include <linux/types.h>
--#include <linux/ioport.h>
-+#include <linux/irqchip/arm-vgic-info.h>
- 
- #define GICD_INT_DEF_PRI		0xa0
- #define GICD_INT_DEF_PRI_X4		((GICD_INT_DEF_PRI << 24) |\
-@@ -16,28 +15,6 @@
- 					(GICD_INT_DEF_PRI << 8) |\
- 					GICD_INT_DEF_PRI)
- 
--enum gic_type {
--	GIC_V2,
--	GIC_V3,
--};
--
--struct gic_kvm_info {
--	/* GIC type */
--	enum gic_type	type;
--	/* Virtual CPU interface */
--	struct resource vcpu;
--	/* Interrupt number */
--	unsigned int	maint_irq;
--	/* Virtual control interface */
--	struct resource vctrl;
--	/* vlpi support */
--	bool		has_v4;
--	/* rvpeid support */
--	bool		has_v4_1;
--};
--
--const struct gic_kvm_info *gic_get_kvm_info(void);
--
- struct irq_domain;
- struct fwnode_handle;
- int gicv2m_init(struct fwnode_handle *parent_handle,
 diff --git a/include/linux/irqchip/arm-vgic-info.h b/include/linux/irqchip/arm-vgic-info.h
-new file mode 100644
-index 000000000000..0319636be928
---- /dev/null
+index 0319636be928..d39d0b591c5a 100644
+--- a/include/linux/irqchip/arm-vgic-info.h
 +++ b/include/linux/irqchip/arm-vgic-info.h
-@@ -0,0 +1,41 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * include/linux/irqchip/arm-vgic-info.h
-+ *
-+ * Copyright (C) 2016 ARM Limited, All Rights Reserved.
-+ */
-+#ifndef __ARM_VGIC_INFO_H
-+#define __ARM_VGIC_INFO_H
-+
-+#include <linux/types.h>
-+#include <linux/ioport.h>
-+
-+enum gic_type {
-+	/* Full GICv2 */
-+	GIC_V2,
-+	/* Full GICv3, optionally with v2 compat */
-+	GIC_V3,
-+};
-+
-+struct gic_kvm_info {
-+	/* GIC type */
-+	enum gic_type	type;
-+	/* Virtual CPU interface */
-+	struct resource vcpu;
-+	/* Interrupt number */
-+	unsigned int	maint_irq;
-+	/* Virtual control interface */
-+	struct resource vctrl;
-+	/* vlpi support */
-+	bool		has_v4;
-+	/* rvpeid support */
-+	bool		has_v4_1;
-+};
-+
-+#ifdef CONFIG_KVM
-+void vgic_set_kvm_info(const struct gic_kvm_info *info);
-+#else
-+static inline void vgic_set_kvm_info(const struct gic_kvm_info *info) {}
-+#endif
-+
-+#endif
+@@ -30,6 +30,8 @@ struct gic_kvm_info {
+ 	bool		has_v4;
+ 	/* rvpeid support */
+ 	bool		has_v4_1;
++	/* Deactivation impared, subpar stuff */
++	bool		no_hw_deactivation;
+ };
+ 
+ #ifdef CONFIG_KVM
 -- 
 2.29.2
 
