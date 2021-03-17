@@ -2,68 +2,80 @@ Return-Path: <SRS0=pwNx=IP=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71418C433E0
-	for <kvmarm@archiver.kernel.org>; Wed, 17 Mar 2021 14:32:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24AACC433E0
+	for <kvmarm@archiver.kernel.org>; Wed, 17 Mar 2021 14:41:41 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BC9D864E13
-	for <kvmarm@archiver.kernel.org>; Wed, 17 Mar 2021 14:32:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC9D864E13
+	by mail.kernel.org (Postfix) with ESMTP id 5AA6C64F77
+	for <kvmarm@archiver.kernel.org>; Wed, 17 Mar 2021 14:41:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AA6C64F77
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EB104B441;
-	Wed, 17 Mar 2021 10:32:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D3EA24B5F2;
+	Wed, 17 Mar 2021 10:41:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id NkaG9PyFuYpW; Wed, 17 Mar 2021 10:32:08 -0400 (EDT)
+	with ESMTP id iItzteDM8yr0; Wed, 17 Mar 2021 10:41:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 32D6A4B578;
-	Wed, 17 Mar 2021 10:32:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 782184B63A;
+	Wed, 17 Mar 2021 10:41:38 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 09DE84B40F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Mar 2021 10:32:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BB68A4B5F2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Mar 2021 10:41:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id z++G1pbwIYGc for <kvmarm@lists.cs.columbia.edu>;
- Wed, 17 Mar 2021 10:32:06 -0400 (EDT)
+ with ESMTP id AMzUtWY+LOwp for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 17 Mar 2021 10:41:36 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0E1B04B3EE
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Mar 2021 10:32:06 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 0EAD664E13;
- Wed, 17 Mar 2021 14:32:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1615991523;
- bh=9PV7SAdG8UI+hcTymUc6iMtrRcc/ff/6MFt24sMoR4c=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=jphF1XmayKtQgSAtPuUftY5Qv/YT6yoj383uQjZE9zvLm8jWI0tGF3DKhJvZHyA51
- VnqyWU7ZTXljYlMjbty/RyYjFGXE0grk9sDvV7aa8J5Uvr/IADhNbo5vB3vIhLTqMW
- b7w/nLO7cbrpcFlk1s6mUXORXdd+LGgUmFOcBwSZ4Wei55J8dDDJQwlAlr824DnzuB
- l5rhJxilxB0D0sR1G711IZs0i4BocWJo8eBBZEFnF+2AWPkXIyFOBT8yK3b0zr8L2S
- qKkM4NSqSu5LucgAZEYY/jHlcF8flGsXAnjXOvZQef+nOE2VduRVqOy/asdAIsAXqK
- BwfJLxLH6a8VQ==
-Date: Wed, 17 Mar 2021 14:31:57 +0000
-From: Will Deacon <will@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 03/10] KVM: arm64: Let vcpu_sve_pffr() handle HYP VAs
-Message-ID: <20210317143157.GD5393@willie-the-truck>
-References: <20210316101312.102925-1-maz@kernel.org>
- <20210316101312.102925-4-maz@kernel.org>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210316101312.102925-4-maz@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- kvmarm@lists.cs.columbia.edu, broonie@kernel.org, kernel-team@android.com,
- dave.martin@arm.com, linux-arm-kernel@lists.infradead.org, daniel.kiss@arm.com
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4CB504B581
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Mar 2021 10:41:36 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 01BC864F70;
+ Wed, 17 Mar 2021 14:41:35 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1lMXMa-002EI2-PA; Wed, 17 Mar 2021 14:41:32 +0000
+Date: Wed, 17 Mar 2021 14:41:31 +0000
+Message-ID: <87a6r1j10k.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Quentin Perret <qperret@google.com>
+Subject: Re: [PATCH 1/2] KVM: arm64: Introduce KVM_PGTABLE_S2_NOFWB Stage-2
+ flag
+In-Reply-To: <20210317141714.383046-2-qperret@google.com>
+References: <20210315143536.214621-34-qperret@google.com>
+ <20210317141714.383046-1-qperret@google.com>
+ <20210317141714.383046-2-qperret@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: qperret@google.com, catalin.marinas@arm.com, will@kernel.org,
+ james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+ android-kvm@google.com, seanjc@google.com, linux-kernel@vger.kernel.org,
+ robh+dt@kernel.org, linux-arm-kernel@lists.infradead.org,
+ kernel-team@android.com, kvmarm@lists.cs.columbia.edu, tabba@google.com,
+ ardb@kernel.org, mark.rutland@arm.com, dbrazdil@google.com,
+ mate.toth-pal@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, android-kvm@google.com, catalin.marinas@arm.com,
+ mate.toth-pal@arm.com, tabba@google.com, linux-kernel@vger.kernel.org,
+ robh+dt@kernel.org, linux-arm-kernel@lists.infradead.org, seanjc@google.com,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -80,36 +92,266 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Mar 16, 2021 at 10:13:05AM +0000, Marc Zyngier wrote:
-> The vcpu_sve_pffr() returns a pointer, which can be an interesting
-> thing to do on nVHE. Wrap the pointer with kern_hyp_va(), and
-> take this opportunity to remove the unnecessary casts (sve_state
-> being a void *).
+Hi Quentin,
+
+On Wed, 17 Mar 2021 14:17:13 +0000,
+Quentin Perret <qperret@google.com> wrote:
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> In order to further configure stage-2 page-tables, pass flags to the
+> init function using a new enum.
+> 
+> The first of these flags allows to disable FWB even if the hardware
+> supports it as we will need to do so for the host stage-2.
+> 
+> Signed-off-by: Quentin Perret <qperret@google.com>
+> 
 > ---
->  arch/arm64/include/asm/kvm_host.h | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 3d10e6527f7d..fb1d78299ba0 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -372,8 +372,8 @@ struct kvm_vcpu_arch {
+> One question is, do we want to use stage2_has_fwb() everywhere, including
+> guest-specific paths (e.g. kvm_arch_prepare_memory_region(), ...) ?
+> 
+> That'd make this patch more intrusive, but would make the whole codebase
+> work with FWB enabled on a guest by guest basis. I don't see us use that
+> anytime soon (other than maybe debug of some sort?) but it'd be good to
+> have an agreement.
+
+I'm not sure how useful that would be. We fought long and hard to get
+FWB, and I can't see a good reason to disable it for guests unless the
+HW was buggy (but in which case that'd be for everyone). I'd rather
+keep the changes small for now (this whole series is invasive
+enough!).
+
+As for this patch, I only have a few cosmetic comments:
+
+> ---
+>  arch/arm64/include/asm/kvm_pgtable.h  | 19 +++++++++--
+>  arch/arm64/include/asm/pgtable-prot.h |  4 +--
+>  arch/arm64/kvm/hyp/pgtable.c          | 49 +++++++++++++++++----------
+>  3 files changed, 50 insertions(+), 22 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index b93a2a3526ab..7382bdfb6284 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -56,6 +56,15 @@ struct kvm_pgtable_mm_ops {
+>  	phys_addr_t	(*virt_to_phys)(void *addr);
 >  };
 >  
->  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
-> -#define vcpu_sve_pffr(vcpu) ((void *)((char *)((vcpu)->arch.sve_state) + \
-> -				      sve_ffr_offset((vcpu)->arch.sve_max_vl)))
-> +#define vcpu_sve_pffr(vcpu) (kern_hyp_va((vcpu)->arch.sve_state) +	\
-> +			     sve_ffr_offset((vcpu)->arch.sve_max_vl))
+> +/**
+> + * enum kvm_pgtable_stage2_flags - Stage-2 page-table flags.
+> + * @KVM_PGTABLE_S2_NOFWB:	Don't enforce Normal-WB even if the CPUs have
+> + *				ARM64_HAS_STAGE2_FWB.
+> + */
+> +enum kvm_pgtable_stage2_flags {
+> +	KVM_PGTABLE_S2_NOFWB			= BIT(0),
+> +};
+> +
+>  /**
+>   * struct kvm_pgtable - KVM page-table.
+>   * @ia_bits:		Maximum input address size, in bits.
+> @@ -72,6 +81,7 @@ struct kvm_pgtable {
 >  
->  #define vcpu_sve_state_size(vcpu) ({					\
->  	size_t __size_ret;						\
+>  	/* Stage-2 only */
+>  	struct kvm_s2_mmu			*mmu;
+> +	enum kvm_pgtable_stage2_flags		flags;
+>  };
+>  
+>  /**
+> @@ -201,11 +211,16 @@ u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift);
+>   * @arch:	Arch-specific KVM structure representing the guest virtual
+>   *		machine.
+>   * @mm_ops:	Memory management callbacks.
+> + * @flags:	Stage-2 configuration flags.
+>   *
+>   * Return: 0 on success, negative error code on failure.
+>   */
+> -int kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_arch *arch,
+> -			    struct kvm_pgtable_mm_ops *mm_ops);
+> +int kvm_pgtable_stage2_init_flags(struct kvm_pgtable *pgt, struct kvm_arch *arch,
+> +				  struct kvm_pgtable_mm_ops *mm_ops,
+> +				  enum kvm_pgtable_stage2_flags flags);
+> +
+> +#define kvm_pgtable_stage2_init(pgt, arch, mm_ops) \
+> +	kvm_pgtable_stage2_init_flags(pgt, arch, mm_ops, 0)
+>  
+>  /**
+>   * kvm_pgtable_stage2_destroy() - Destroy an unused guest stage-2 page-table.
+> diff --git a/arch/arm64/include/asm/pgtable-prot.h b/arch/arm64/include/asm/pgtable-prot.h
+> index 046be789fbb4..beeb722a82d3 100644
+> --- a/arch/arm64/include/asm/pgtable-prot.h
+> +++ b/arch/arm64/include/asm/pgtable-prot.h
+> @@ -72,10 +72,10 @@ extern bool arm64_use_ng_mappings;
+>  #define PAGE_KERNEL_EXEC	__pgprot(PROT_NORMAL & ~PTE_PXN)
+>  #define PAGE_KERNEL_EXEC_CONT	__pgprot((PROT_NORMAL & ~PTE_PXN) | PTE_CONT)
+>  
+> -#define PAGE_S2_MEMATTR(attr)						\
+> +#define PAGE_S2_MEMATTR(attr, has_fwb)					\
+>  	({								\
+>  		u64 __val;						\
+> -		if (cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))		\
+> +		if (has_fwb)						\
+>  			__val = PTE_S2_MEMATTR(MT_S2_FWB_ ## attr);	\
+>  		else							\
+>  			__val = PTE_S2_MEMATTR(MT_S2_ ## attr);		\
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index 3a971df278bd..dee8aaeaf13e 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -507,12 +507,25 @@ u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift)
+>  	return vtcr;
+>  }
+>  
+> -static int stage2_set_prot_attr(enum kvm_pgtable_prot prot, kvm_pte_t *ptep)
+> +static bool stage2_has_fwb(struct kvm_pgtable *pgt)
+> +{
+> +	if (!cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
+> +		return false;
+> +
+> +	return !(pgt->flags & KVM_PGTABLE_S2_NOFWB);
+> +}
+> +
+> +static int stage2_set_prot_attr(enum kvm_pgtable_prot prot, kvm_pte_t *ptep,
+> +				struct kvm_pgtable *pgt)
 
-Acked-by: Will Deacon <will@kernel.org>
+nit: make pgt the first parameter, as it defines the context in which
+the rest applies.
 
-Will
+>  {
+>  	bool device = prot & KVM_PGTABLE_PROT_DEVICE;
+> -	kvm_pte_t attr = device ? PAGE_S2_MEMATTR(DEVICE_nGnRE) :
+> -			    PAGE_S2_MEMATTR(NORMAL);
+>  	u32 sh = KVM_PTE_LEAF_ATTR_LO_S2_SH_IS;
+> +	kvm_pte_t attr;
+> +
+> +	if (device)
+> +		attr = PAGE_S2_MEMATTR(DEVICE_nGnRE, stage2_has_fwb(pgt));
+> +	else
+> +		attr = PAGE_S2_MEMATTR(NORMAL, stage2_has_fwb(pgt));
+
+Maybe define a new helper:
+
+#define KVM_S2_MEMATTR(pgt, attr) PAGE_S2_MEMATTR(attr, stage2_has_fwb(pgt))
+
+to avoid the constant stage2_has_fwb() repetition.
+
+>  
+>  	if (!(prot & KVM_PGTABLE_PROT_X))
+>  		attr |= KVM_PTE_LEAF_ATTR_HI_S2_XN;
+> @@ -748,7 +761,7 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+>  		.arg		= &map_data,
+>  	};
+>  
+> -	ret = stage2_set_prot_attr(prot, &map_data.attr);
+> +	ret = stage2_set_prot_attr(prot, &map_data.attr, pgt);
+>  	if (ret)
+>  		return ret;
+>  
+> @@ -786,16 +799,13 @@ int kvm_pgtable_stage2_set_owner(struct kvm_pgtable *pgt, u64 addr, u64 size,
+>  
+>  static void stage2_flush_dcache(void *addr, u64 size)
+>  {
+> -	if (cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
+> -		return;
+> -
+>  	__flush_dcache_area(addr, size);
+>  }
+
+Consider dropping the function altogether and use __flush_dcache_area
+directly (assuming the prototypes are identical).
+
+>  
+> -static bool stage2_pte_cacheable(kvm_pte_t pte)
+> +static bool stage2_pte_cacheable(kvm_pte_t pte, struct kvm_pgtable *pgt)
+
+Same comment about pgt being the first argument.
+
+>  {
+>  	u64 memattr = pte & KVM_PTE_LEAF_ATTR_LO_S2_MEMATTR;
+> -	return memattr == PAGE_S2_MEMATTR(NORMAL);
+> +	return memattr == PAGE_S2_MEMATTR(NORMAL, stage2_has_fwb(pgt));
+>  }
+>  
+>  static int stage2_unmap_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+> @@ -821,8 +831,8 @@ static int stage2_unmap_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+>  
+>  		if (mm_ops->page_count(childp) != 1)
+>  			return 0;
+> -	} else if (stage2_pte_cacheable(pte)) {
+> -		need_flush = true;
+> +	} else if (stage2_pte_cacheable(pte, pgt)) {
+> +		need_flush = !stage2_has_fwb(pgt);
+>  	}
+>  
+>  	/*
+> @@ -979,10 +989,11 @@ static int stage2_flush_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+>  			       enum kvm_pgtable_walk_flags flag,
+>  			       void * const arg)
+>  {
+> -	struct kvm_pgtable_mm_ops *mm_ops = arg;
+> +	struct kvm_pgtable *pgt = arg;
+> +	struct kvm_pgtable_mm_ops *mm_ops = pgt->mm_ops;
+>  	kvm_pte_t pte = *ptep;
+>  
+> -	if (!kvm_pte_valid(pte) || !stage2_pte_cacheable(pte))
+> +	if (!kvm_pte_valid(pte) || !stage2_pte_cacheable(pte, pgt))
+>  		return 0;
+>  
+>  	stage2_flush_dcache(kvm_pte_follow(pte, mm_ops), kvm_granule_size(level));
+> @@ -994,17 +1005,18 @@ int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size)
+>  	struct kvm_pgtable_walker walker = {
+>  		.cb	= stage2_flush_walker,
+>  		.flags	= KVM_PGTABLE_WALK_LEAF,
+> -		.arg	= pgt->mm_ops,
+> +		.arg	= pgt,
+>  	};
+>  
+> -	if (cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
+> +	if (stage2_has_fwb(pgt))
+>  		return 0;
+>  
+>  	return kvm_pgtable_walk(pgt, addr, size, &walker);
+>  }
+>  
+> -int kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_arch *arch,
+> -			    struct kvm_pgtable_mm_ops *mm_ops)
+> +int kvm_pgtable_stage2_init_flags(struct kvm_pgtable *pgt, struct kvm_arch *arch,
+> +				  struct kvm_pgtable_mm_ops *mm_ops,
+> +				  enum kvm_pgtable_stage2_flags flags)
+>  {
+>  	size_t pgd_sz;
+>  	u64 vtcr = arch->vtcr;
+> @@ -1017,6 +1029,7 @@ int kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_arch *arch,
+>  	if (!pgt->pgd)
+>  		return -ENOMEM;
+>  
+> +	pgt->flags		= flags;
+
+Try and keep the initialisation order similar to the definition of the
+structure if possible.
+
+>  	pgt->ia_bits		= ia_bits;
+>  	pgt->start_level	= start_level;
+>  	pgt->mm_ops		= mm_ops;
+> @@ -1101,7 +1114,7 @@ int kvm_pgtable_stage2_find_range(struct kvm_pgtable *pgt, u64 addr,
+>  	u32 level;
+>  	int ret;
+>  
+> -	ret = stage2_set_prot_attr(prot, &attr);
+> +	ret = stage2_set_prot_attr(prot, &attr, pgt);
+>  	if (ret)
+>  		return ret;
+>  	attr &= KVM_PTE_LEAF_S2_COMPAT_MASK;
+> -- 
+> 2.31.0.rc2.261.g7f71774620-goog
+> 
+> 
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
