@@ -6,53 +6,52 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5DA1C433E6
-	for <kvmarm@archiver.kernel.org>; Thu, 18 Mar 2021 12:25:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 645A7C433E9
+	for <kvmarm@archiver.kernel.org>; Thu, 18 Mar 2021 12:25:53 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0BD0364F65
-	for <kvmarm@archiver.kernel.org>; Thu, 18 Mar 2021 12:25:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BD0364F65
+	by mail.kernel.org (Postfix) with ESMTP id B049E64F53
+	for <kvmarm@archiver.kernel.org>; Thu, 18 Mar 2021 12:25:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B049E64F53
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A42D4B75D;
-	Thu, 18 Mar 2021 08:25:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EB344B74C;
+	Thu, 18 Mar 2021 08:25:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id zMRmRaA-0kWn; Thu, 18 Mar 2021 08:25:50 -0400 (EDT)
+	with ESMTP id LbxATlj18uzS; Thu, 18 Mar 2021 08:25:51 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 82A454B756;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 995F44B75E;
 	Thu, 18 Mar 2021 08:25:49 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4BBFE4B6C8
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D07C4B644
  for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Mar 2021 08:25:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id l-Hgr15+ow5w for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id 6221V-3AQH6K for <kvmarm@lists.cs.columbia.edu>;
  Thu, 18 Mar 2021 08:25:47 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 263154B746
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5FD1D4B74B
  for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Mar 2021 08:25:47 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 2B7A464F53;
- Thu, 18 Mar 2021 12:25:45 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 5AF7964F62;
+ Thu, 18 Mar 2021 12:25:46 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1lMrih-002OZW-E6; Thu, 18 Mar 2021 12:25:43 +0000
+ id 1lMrii-002OZW-IE; Thu, 18 Mar 2021 12:25:44 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
  kvm@vger.kernel.org
-Subject: [PATCH v2 01/11] KVM: arm64: Provide KVM's own save/restore SVE
- primitives
-Date: Thu, 18 Mar 2021 12:25:22 +0000
-Message-Id: <20210318122532.505263-2-maz@kernel.org>
+Subject: [PATCH v2 03/11] KVM: arm64: Let vcpu_sve_pffr() handle HYP VAs
+Date: Thu, 18 Mar 2021 12:25:24 +0000
+Message-Id: <20210318122532.505263-4-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210318122532.505263-1-maz@kernel.org>
 References: <20210318122532.505263-1-maz@kernel.org>
@@ -86,92 +85,32 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-as we are about to change the way KVM deals with SVE, provide
-KVM with its own save/restore SVE primitives.
-
-No functional change intended.
+The vcpu_sve_pffr() returns a pointer, which can be an interesting
+thing to do on nVHE. Wrap the pointer with kern_hyp_va(), and
+take this opportunity to remove the unnecessary casts (sve_state
+being a void *).
 
 Acked-by: Will Deacon <will@kernel.org>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/fpsimdmacros.h   |  2 ++
- arch/arm64/include/asm/kvm_hyp.h        |  2 ++
- arch/arm64/kvm/hyp/fpsimd.S             | 10 ++++++++++
- arch/arm64/kvm/hyp/include/hyp/switch.h | 10 +++++-----
- 4 files changed, 19 insertions(+), 5 deletions(-)
+ arch/arm64/include/asm/kvm_host.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/include/asm/fpsimdmacros.h b/arch/arm64/include/asm/fpsimdmacros.h
-index af43367534c7..e9b72d35b867 100644
---- a/arch/arm64/include/asm/fpsimdmacros.h
-+++ b/arch/arm64/include/asm/fpsimdmacros.h
-@@ -6,6 +6,8 @@
-  * Author: Catalin Marinas <catalin.marinas@arm.com>
-  */
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 3d10e6527f7d..fb1d78299ba0 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -372,8 +372,8 @@ struct kvm_vcpu_arch {
+ };
  
-+#include <asm/assembler.h>
-+
- .macro fpsimd_save state, tmpnr
- 	stp	q0, q1, [\state, #16 * 0]
- 	stp	q2, q3, [\state, #16 * 2]
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index c0450828378b..e8b0f7fcd86b 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -85,6 +85,8 @@ void __debug_switch_to_host(struct kvm_vcpu *vcpu);
+ /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
+-#define vcpu_sve_pffr(vcpu) ((void *)((char *)((vcpu)->arch.sve_state) + \
+-				      sve_ffr_offset((vcpu)->arch.sve_max_vl)))
++#define vcpu_sve_pffr(vcpu) (kern_hyp_va((vcpu)->arch.sve_state) +	\
++			     sve_ffr_offset((vcpu)->arch.sve_max_vl))
  
- void __fpsimd_save_state(struct user_fpsimd_state *fp_regs);
- void __fpsimd_restore_state(struct user_fpsimd_state *fp_regs);
-+void __sve_save_state(void *sve_pffr, u32 *fpsr);
-+void __sve_restore_state(void *sve_pffr, u32 *fpsr, unsigned int vqminus1);
- 
- #ifndef __KVM_NVHE_HYPERVISOR__
- void activate_traps_vhe_load(struct kvm_vcpu *vcpu);
-diff --git a/arch/arm64/kvm/hyp/fpsimd.S b/arch/arm64/kvm/hyp/fpsimd.S
-index 01f114aa47b0..95b22e10996c 100644
---- a/arch/arm64/kvm/hyp/fpsimd.S
-+++ b/arch/arm64/kvm/hyp/fpsimd.S
-@@ -19,3 +19,13 @@ SYM_FUNC_START(__fpsimd_restore_state)
- 	fpsimd_restore	x0, 1
- 	ret
- SYM_FUNC_END(__fpsimd_restore_state)
-+
-+SYM_FUNC_START(__sve_restore_state)
-+	sve_load 0, x1, x2, 3, x4
-+	ret
-+SYM_FUNC_END(__sve_restore_state)
-+
-+SYM_FUNC_START(__sve_save_state)
-+	sve_save 0, x1, 2
-+	ret
-+SYM_FUNC_END(__sve_save_state)
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 54f4860cd87c..807bc4734828 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -256,8 +256,8 @@ static inline bool __hyp_handle_fpsimd(struct kvm_vcpu *vcpu)
- 				vcpu->arch.host_fpsimd_state,
- 				struct thread_struct, uw.fpsimd_state);
- 
--			sve_save_state(sve_pffr(thread),
--				       &vcpu->arch.host_fpsimd_state->fpsr);
-+			__sve_save_state(sve_pffr(thread),
-+					 &vcpu->arch.host_fpsimd_state->fpsr);
- 		} else {
- 			__fpsimd_save_state(vcpu->arch.host_fpsimd_state);
- 		}
-@@ -266,9 +266,9 @@ static inline bool __hyp_handle_fpsimd(struct kvm_vcpu *vcpu)
- 	}
- 
- 	if (sve_guest) {
--		sve_load_state(vcpu_sve_pffr(vcpu),
--			       &vcpu->arch.ctxt.fp_regs.fpsr,
--			       sve_vq_from_vl(vcpu->arch.sve_max_vl) - 1);
-+		__sve_restore_state(vcpu_sve_pffr(vcpu),
-+				    &vcpu->arch.ctxt.fp_regs.fpsr,
-+				    sve_vq_from_vl(vcpu->arch.sve_max_vl) - 1);
- 		write_sysreg_s(__vcpu_sys_reg(vcpu, ZCR_EL1), SYS_ZCR_EL12);
- 	} else {
- 		__fpsimd_restore_state(&vcpu->arch.ctxt.fp_regs);
+ #define vcpu_sve_state_size(vcpu) ({					\
+ 	size_t __size_ret;						\
 -- 
 2.29.2
 
