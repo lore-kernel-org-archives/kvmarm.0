@@ -1,66 +1,74 @@
-Return-Path: <SRS0=pwNx=IP=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=/u//=IQ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EE7CC433DB
-	for <kvmarm@archiver.kernel.org>; Wed, 17 Mar 2021 18:00:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07EE9C433DB
+	for <kvmarm@archiver.kernel.org>; Thu, 18 Mar 2021 08:56:43 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D52B264F2A
-	for <kvmarm@archiver.kernel.org>; Wed, 17 Mar 2021 18:00:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D52B264F2A
+	by mail.kernel.org (Postfix) with ESMTP id 6046964F18
+	for <kvmarm@archiver.kernel.org>; Thu, 18 Mar 2021 08:56:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6046964F18
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 647464B68A;
-	Wed, 17 Mar 2021 14:00:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E36E74B6F1;
+	Thu, 18 Mar 2021 04:56:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id rFUi3vUya+RA; Wed, 17 Mar 2021 14:00:26 -0400 (EDT)
+	with ESMTP id QEyr8NYdenVw; Thu, 18 Mar 2021 04:56:40 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 56C364B64D;
-	Wed, 17 Mar 2021 14:00:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CD3644B6D1;
+	Thu, 18 Mar 2021 04:56:40 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E89094B5B8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Mar 2021 14:00:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 44B974B677
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Mar 2021 04:56:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dJ+DXm+dQXMr for <kvmarm@lists.cs.columbia.edu>;
- Wed, 17 Mar 2021 14:00:24 -0400 (EDT)
+ with ESMTP id XyOFVFLWpmGi for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 18 Mar 2021 04:56:38 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 136A34B4E4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Mar 2021 14:00:24 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id EFD5264F21;
- Wed, 17 Mar 2021 18:00:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1616004023;
- bh=19/EHa8tqrBvjr5N+17FlDNPaZq4lw493X2jfLFSXMU=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=qmtsr6jfQGZvpiPtqAKOYAJGAFJD/3AieD2zGweFccZ92UmjEDsr47puog4UPWImD
- jL423PnqghvSY69wUYdL60Zq3mOq3jAh3t4deDklE6s7quCvhuz6CcBAwOzGyHqq+3
- 5AsJZo9WM7OkYmHZHutAgu3lCGyF/2AJchbrEb8zrWfchIzb6SujeKEbYjmMjl2yPi
- L11n1lRaoZlIgP+KHv/yt2TZeVBJekNsyNQYghmVeONuOr9Lpcl290whyZaoQAR2wZ
- 9SGFNkG1qdacKrB/ceUun0OuG0dSEinmoliDwo1IlsZBvyJnSgNWTQitAYeD1TNUhB
- q+8m8ZGZASQMg==
-Date: Wed, 17 Mar 2021 18:00:17 +0000
-From: Will Deacon <will@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 10/10] KVM: arm64: Enable SVE support for nVHE
-Message-ID: <20210317180017.GB5713@willie-the-truck>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1D3AA4B340
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Mar 2021 04:56:38 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 3891164F01;
+ Thu, 18 Mar 2021 08:56:36 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1lMoSH-002MY8-4W; Thu, 18 Mar 2021 08:56:33 +0000
+Date: Thu, 18 Mar 2021 08:56:32 +0000
+Message-ID: <877dm4j0vz.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 06/10] KVM: arm64: Map SVE context at EL2 when available
+In-Reply-To: <20210317160112.GA5556@willie-the-truck>
 References: <20210316101312.102925-1-maz@kernel.org>
- <20210316101312.102925-11-maz@kernel.org>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210316101312.102925-11-maz@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+ <20210316101312.102925-7-maz@kernel.org>
+ <20210317160112.GA5556@willie-the-truck>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, dave.martin@arm.com,
+ daniel.kiss@arm.com, catalin.marinas@arm.com, james.morse@arm.com,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, broonie@kernel.org,
+ kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
  kvmarm@lists.cs.columbia.edu, broonie@kernel.org, kernel-team@android.com,
  dave.martin@arm.com, linux-arm-kernel@lists.infradead.org, daniel.kiss@arm.com
@@ -80,28 +88,42 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Mar 16, 2021 at 10:13:12AM +0000, Marc Zyngier wrote:
-> From: Daniel Kiss <daniel.kiss@arm.com>
+On Wed, 17 Mar 2021 16:01:12 +0000,
+Will Deacon <will@kernel.org> wrote:
 > 
-> Now that KVM is equipped to deal with SVE on nVHE, remove the code
-> preventing it from being used as well as the bits of documentation
-> that were mentioning the incompatibility.
+> On Tue, Mar 16, 2021 at 10:13:08AM +0000, Marc Zyngier wrote:
+> > When running on nVHE, and that the vcpu supports SVE, map the
+> > SVE state at EL2 so that KVM can access it.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/fpsimd.c | 11 +++++++++++
+> >  1 file changed, 11 insertions(+)
+> > 
+> > diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
+> > index b7e36a506d3d..84afca5ed6f2 100644
+> > --- a/arch/arm64/kvm/fpsimd.c
+> > +++ b/arch/arm64/kvm/fpsimd.c
+> > @@ -43,6 +43,17 @@ int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu)
+> >  	if (ret)
+> >  		goto error;
+> >  
+> > +	if (vcpu->arch.sve_state) {
+> > +		void *sve_end;
+> > +
+> > +		sve_end = vcpu->arch.sve_state + vcpu_sve_state_size(vcpu) + 1;
 > 
-> Signed-off-by: Daniel Kiss <daniel.kiss@arm.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/Kconfig                |  7 -------
->  arch/arm64/include/asm/kvm_host.h | 13 -------------
->  arch/arm64/kvm/arm.c              |  5 -----
->  arch/arm64/kvm/reset.c            |  4 ----
->  4 files changed, 29 deletions(-)
+> Why do you need the '+ 1' here?
 
-Acked-by: Will Deacon <will@kernel.org>
+Only the need to add off-by-one bugs once in a while. I'll fix that in
+the next round.
 
-I thought we might need to update the documentation too, but I couldn't
-actually find anywhere that needed it when I looked.
+Thanks,
 
-Will
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
