@@ -2,65 +2,74 @@ Return-Path: <SRS0=/u//=IQ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE468C433DB
-	for <kvmarm@archiver.kernel.org>; Thu, 18 Mar 2021 14:14:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32C9BC433DB
+	for <kvmarm@archiver.kernel.org>; Thu, 18 Mar 2021 14:29:11 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3B9FD64EF9
-	for <kvmarm@archiver.kernel.org>; Thu, 18 Mar 2021 14:14:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B9FD64EF9
+	by mail.kernel.org (Postfix) with ESMTP id 7AE0664EF9
+	for <kvmarm@archiver.kernel.org>; Thu, 18 Mar 2021 14:29:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AE0664EF9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C57E34B74F;
-	Thu, 18 Mar 2021 10:14:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0AD614B676;
+	Thu, 18 Mar 2021 10:29:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 5cxl+gAEeOw6; Thu, 18 Mar 2021 10:14:09 -0400 (EDT)
+	with ESMTP id pexiKy4SDWzV; Thu, 18 Mar 2021 10:29:08 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B98454B6C8;
-	Thu, 18 Mar 2021 10:14:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EC1574B743;
+	Thu, 18 Mar 2021 10:29:08 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B1D24B3EA
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Mar 2021 10:14:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 99D554B73E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Mar 2021 10:29:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FIOq5Hweu82C for <kvmarm@lists.cs.columbia.edu>;
- Thu, 18 Mar 2021 10:14:07 -0400 (EDT)
+ with ESMTP id TnHufaubxYRk for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 18 Mar 2021 10:29:06 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 475474B399
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Mar 2021 10:14:07 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 4DE7464E01;
- Thu, 18 Mar 2021 14:14:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1616076844;
- bh=aUVF0Ydr7cFuRiZVzu9loYt6i7SML2c2a9mIIBakwxs=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=XffV7mEr8cWu7NBXBLOufsNJUerPiVzf6ncfT+/kpr+PJChg1Io5bvtS036WzRaF6
- HbloftOXtPrFEKvbjOnaas3BiPyBf6bHzDmOJcC/GOIvdnn/kXRs//4JZLfYdiSXzL
- vHDGgsH05fJqFJbAh9I2ox/dCANiytHXoGUyAHenReMUnxktogaenPEXMJUuQm74yY
- XOhmBOrKmqHILKnmJrSOOAvVIlgDrxNQh37XYft851Y6hJjgKH0+yGY8usdokklTlU
- F8h5GuqDACqlfK6VS2gtP+NcrwPsSa2mjhENjemy3Zz3M3WAuGD3vLiHBw2G5/a9na
- FNR6nuH3RyUFg==
-Date: Thu, 18 Mar 2021 14:13:58 +0000
-From: Will Deacon <will@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v2 10/11] KVM: arm64: Save/restore SVE state for nVHE
-Message-ID: <20210318141358.GF7055@willie-the-truck>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A56A04B676
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Mar 2021 10:29:06 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 619D964EE1;
+ Thu, 18 Mar 2021 14:29:05 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1lMte3-002Q6d-FD; Thu, 18 Mar 2021 14:29:03 +0000
+Date: Thu, 18 Mar 2021 14:29:02 +0000
+Message-ID: <871rccilht.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v2 09/11] KVM: arm64: Trap host SVE accesses when the
+ FPSIMD state is dirty
+In-Reply-To: <20210318141144.GE7055@willie-the-truck>
 References: <20210318122532.505263-1-maz@kernel.org>
- <20210318122532.505263-11-maz@kernel.org>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210318122532.505263-11-maz@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+ <20210318122532.505263-10-maz@kernel.org>
+ <20210318141144.GE7055@willie-the-truck>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, dave.martin@arm.com,
+ daniel.kiss@arm.com, catalin.marinas@arm.com, james.morse@arm.com,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, broonie@kernel.org,
+ ascull@google.com, qperret@google.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
  kvmarm@lists.cs.columbia.edu, broonie@kernel.org, kernel-team@android.com,
  dave.martin@arm.com, linux-arm-kernel@lists.infradead.org, daniel.kiss@arm.com
@@ -80,51 +89,28 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Mar 18, 2021 at 12:25:31PM +0000, Marc Zyngier wrote:
-> Implement the SVE save/restore for nVHE, following a similar
-> logic to that of the VHE implementation:
+On Thu, 18 Mar 2021 14:11:44 +0000,
+Will Deacon <will@kernel.org> wrote:
 > 
-> - the SVE state is switched on trap from EL1 to EL2
+> On Thu, Mar 18, 2021 at 12:25:30PM +0000, Marc Zyngier wrote:
+> > ZCR_EL2 controls the upper bound for ZCR_EL1, and is set to
+> > a potentially lower limit when the guest uses SVE. In order
+> > to restore the SVE state on the EL1 host, we must first
+> > reset ZCR_EL2 to its original value.
+> > 
+> > To make it as lazy as possible on the EL1 host side, set
+> > the SVE trapping in place when returning exiting from
 > 
-> - no further changes to ZCR_EL2 occur as long as the guest isn't
->   preempted or exit to userspace
-> 
-> - ZCR_EL2 is reset to its default value on the first SVE access from
->   the host EL1, and ZCR_EL1 restored to the default guest value in
->   vcpu_put()
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/fpsimd.c                 | 10 +++++--
->  arch/arm64/kvm/hyp/include/hyp/switch.h | 37 +++++++++----------------
->  arch/arm64/kvm/hyp/nvhe/switch.c        |  4 +--
->  3 files changed, 23 insertions(+), 28 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-> index 14ea05c5134a..5621020b28de 100644
-> --- a/arch/arm64/kvm/fpsimd.c
-> +++ b/arch/arm64/kvm/fpsimd.c
-> @@ -121,11 +121,17 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
->  	local_irq_save(flags);
->  
->  	if (vcpu->arch.flags & KVM_ARM64_FP_ENABLED) {
-> -		if (guest_has_sve)
-> +		if (guest_has_sve) {
->  			__vcpu_sys_reg(vcpu, ZCR_EL1) = read_sysreg_el1(SYS_ZCR);
->  
-> +			/* Restore the VL that was saved when bound to the CPU */
-> +			if (!has_vhe())
-> +				sve_cond_update_zcr_vq(vcpu_sve_max_vq(vcpu) - 1,
-> +						       SYS_ZCR_EL1);
+> "returning exiting"?
 
-You end up reading ZCR_EL1 twice here, but it's probably not the end of the
-world.
+Meh. Kept the latter.
 
-Anyway:
+Thanks,
 
-Acked-by: Will Deacon <will@kernel.org>
+	M.
 
-Will
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
