@@ -1,79 +1,74 @@
-Return-Path: <SRS0=/u//=IQ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=QSSN=IR=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72CC2C433E6
-	for <kvmarm@archiver.kernel.org>; Thu, 18 Mar 2021 18:40:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4392AC433E0
+	for <kvmarm@archiver.kernel.org>; Fri, 19 Mar 2021 09:51:39 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E38BC64F38
-	for <kvmarm@archiver.kernel.org>; Thu, 18 Mar 2021 18:40:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E38BC64F38
+	by mail.kernel.org (Postfix) with ESMTP id AAC4A64F6A
+	for <kvmarm@archiver.kernel.org>; Fri, 19 Mar 2021 09:51:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAC4A64F6A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 784854B75E;
-	Thu, 18 Mar 2021 14:40:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C97F4B615;
+	Fri, 19 Mar 2021 05:51:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id FNbs6168jfcj; Thu, 18 Mar 2021 14:40:20 -0400 (EDT)
+	with ESMTP id rtz6XCMOsgPT; Fri, 19 Mar 2021 05:51:37 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 572974B760;
-	Thu, 18 Mar 2021 14:40:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 003B84B562;
+	Fri, 19 Mar 2021 05:51:37 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CB0EA4B756
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Mar 2021 14:40:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2CA694B53A
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Mar 2021 05:51:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mDXJDxiiEC04 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 18 Mar 2021 14:40:18 -0400 (EDT)
+ with ESMTP id pXodEAnFFVQZ for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 19 Mar 2021 05:51:35 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9CAAE4B379
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Mar 2021 14:40:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CE04A4B444
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Mar 2021 05:51:34 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 4421D64F30;
- Thu, 18 Mar 2021 18:40:17 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 229FC64F6A;
+ Fri, 19 Mar 2021 09:51:32 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1lMxZ9-002St3-20; Thu, 18 Mar 2021 18:40:15 +0000
-Date: Thu, 18 Mar 2021 18:40:13 +0000
-Message-ID: <87y2ekgvaq.wl-maz@kernel.org>
+ id 1lNBn0-002Zpt-2W; Fri, 19 Mar 2021 09:51:30 +0000
+Date: Fri, 19 Mar 2021 09:51:29 +0000
+Message-ID: <87v99nh3oe.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- kvm@vger.kernel.org
-Subject: Re: [PATCH v2 09/11] KVM: arm64: Trap host SVE accesses when the
- FPSIMD state is dirty
-In-Reply-To: <20210318122532.505263-10-maz@kernel.org>
-References: <20210318122532.505263-1-maz@kernel.org>
- <20210318122532.505263-10-maz@kernel.org>
+To: Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v3 5/5] KVM: arm64: Log source when panicking from nVHE hyp
+In-Reply-To: <20210318165946.GA7656@willie-the-truck>
+References: <20210318143311.839894-1-ascull@google.com>
+ <20210318143311.839894-6-ascull@google.com>
+ <20210318165946.GA7656@willie-the-truck>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, dave.martin@arm.com,
- daniel.kiss@arm.com, will@kernel.org, catalin.marinas@arm.com,
- james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
- broonie@kernel.org, ascull@google.com, qperret@google.com,
+X-SA-Exim-Rcpt-To: will@kernel.org, ascull@google.com,
+ kvmarm@lists.cs.columbia.edu, james.morse@arm.com, suzuki.poulose@arm.com,
+ julien.thierry.kdev@gmail.com, catalin.marinas@arm.com,
  kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kernel-team@android.com, Catalin Marinas <catalin.marinas@arm.com>,
- broonie@kernel.org, Will Deacon <will@kernel.org>, dave.martin@arm.com,
- daniel.kiss@arm.com
+Cc: catalin.marinas@arm.com, kernel-team@android.com,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,90 +85,98 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 18 Mar 2021 12:25:30 +0000,
-Marc Zyngier <maz@kernel.org> wrote:
+On Thu, 18 Mar 2021 16:59:47 +0000,
+Will Deacon <will@kernel.org> wrote:
 > 
-> ZCR_EL2 controls the upper bound for ZCR_EL1, and is set to
-> a potentially lower limit when the guest uses SVE. In order
-> to restore the SVE state on the EL1 host, we must first
-> reset ZCR_EL2 to its original value.
+> On Thu, Mar 18, 2021 at 02:33:11PM +0000, Andrew Scull wrote:
+> > To aid with debugging, add details of the source of a panic from nVHE
+> > hyp. This is done by having nVHE hyp exit to nvhe_hyp_panic_handler()
+> > rather than directly to panic(). The handler will then add the extra
+> > details for debugging before panicking the kernel.
+> > 
+> > If the panic was due to a BUG(), look up the metadata to log the file
+> > and line, if available, otherwise log an address that can be looked up
+> > in vmlinux. The hyp offset is also logged to allow other hyp VAs to be
+> > converted, similar to how the kernel offset is logged during a panic.
+> > 
+> > __hyp_panic_string is now inlined since it no longer needs to be
+> > referenced as a symbol and the message is free to diverge between VHE
+> > and nVHE.
+> > 
+> > The following is an example of the logs generated by a BUG in nVHE hyp.
+> > 
+> > [   46.754840] kvm [307]: nVHE hyp BUG at: arch/arm64/kvm/hyp/nvhe/switch.c:242!
+> > [   46.755357] kvm [307]: Hyp Offset: 0xfffea6c58e1e0000
+> > [   46.755824] Kernel panic - not syncing: HYP panic:
+> > [   46.755824] PS:400003c9 PC:0000d93a82c705ac ESR:f2000800
+> > [   46.755824] FAR:0000000080080000 HPFAR:0000000000800800 PAR:0000000000000000
+> > [   46.755824] VCPU:0000d93a880d0000
+> > [   46.756960] CPU: 3 PID: 307 Comm: kvm-vcpu-0 Not tainted 5.12.0-rc3-00005-gc572b99cf65b-dirty #133
+> > [   46.757459] Hardware name: QEMU QEMU Virtual Machine, BIOS 0.0.0 02/06/2015
+> > [   46.758366] Call trace:
+> > [   46.758601]  dump_backtrace+0x0/0x1b0
+> > [   46.758856]  show_stack+0x18/0x70
+> > [   46.759057]  dump_stack+0xd0/0x12c
+> > [   46.759236]  panic+0x16c/0x334
+> > [   46.759426]  arm64_kernel_unmapped_at_el0+0x0/0x30
+> > [   46.759661]  kvm_arch_vcpu_ioctl_run+0x134/0x750
+> > [   46.759936]  kvm_vcpu_ioctl+0x2f0/0x970
+> > [   46.760156]  __arm64_sys_ioctl+0xa8/0xec
+> > [   46.760379]  el0_svc_common.constprop.0+0x60/0x120
+> > [   46.760627]  do_el0_svc+0x24/0x90
+> > [   46.760766]  el0_svc+0x2c/0x54
+> > [   46.760915]  el0_sync_handler+0x1a4/0x1b0
+> > [   46.761146]  el0_sync+0x170/0x180
+> > [   46.761889] SMP: stopping secondary CPUs
+> > [   46.762786] Kernel Offset: 0x3e1cd2820000 from 0xffff800010000000
+> > [   46.763142] PHYS_OFFSET: 0xffffa9f680000000
+> > [   46.763359] CPU features: 0x00240022,61806008
+> > [   46.763651] Memory Limit: none
 > 
-> To make it as lazy as possible on the EL1 host side, set
-> the SVE trapping in place when returning exiting from
-> the guest. On the first EL1 access to SVE, ZCR_EL2 will
-> be restored to its full glory.
+> Nice!
 > 
-> Suggested-by: Andrew Scull <ascull@google.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 4 ++++
->  arch/arm64/kvm/hyp/nvhe/switch.c   | 9 +++++++--
->  2 files changed, 11 insertions(+), 2 deletions(-)
+> > [   46.813867] ---[ end Kernel panic - not syncing: HYP panic:
+> > [   46.813867] PS:400003c9 PC:0000d93a82c705ac ESR:f2000800
+> > [   46.813867] FAR:0000000080080000 HPFAR:0000000000800800 PAR:0000000000000000
+> > [   46.813867] VCPU:0000d93a880d0000 ]---
 > 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index f012f8665ecc..8d04d69edd15 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -177,6 +177,10 @@ void handle_trap(struct kvm_cpu_context *host_ctxt)
->  	case ESR_ELx_EC_SMC64:
->  		handle_host_smc(host_ctxt);
->  		break;
-> +	case ESR_ELx_EC_SVE:
-> +		sve_cond_update_zcr_vq(ZCR_ELx_LEN_MASK, SYS_ZCR_EL2);
-> +		sysreg_clear_set(cptr_el2, CPTR_EL2_TZ, 0);
-> +		break;
+> Why did these last three lines get printed twice?
 
-It turns out that my last test-run was flawed, as my model was stuck
-with VHE, meaning this snippet was never run. If it ran, I would have
-noticed that CPTR_EL2.TZ being set results in the ZCR_EL2 access to
-trap at EL2, meaning the above explodes very quickly.
+That's the panic string that gets repeated, a standard "feature" of
+the panic code:
 
-I've queued the below patch on top of the existing series, which cures
-the issue and let the tests run for real this time.
+root@tiger-roach:~# echo -n 'c' > /proc/sysrq-trigger 
+[250622.941867] sysrq: Trigger a crash
+[250622.941903] Kernel panic - not syncing: sysrq triggered crash
+[250622.945515] CPU: 0 PID: 4890 Comm: bash Tainted: G            E     5.11.0 #3124
+[250622.952930] Hardware name:  , BIOS 2021.01-rc2-00012-gde865f7ee1 11/16/2020
+[250622.959917] Call trace:
+[250622.962417]  dump_backtrace+0x0/0x1e4
+[250622.966126]  show_stack+0x24/0x80
+[250622.969490]  dump_stack+0xc8/0x120
+[250622.972940]  panic+0x178/0x38c
+[250622.976045]  sysrq_handle_crash+0x28/0x30
+[250622.980098]  __handle_sysrq+0x98/0x1a4
+[250622.983893]  write_sysrq_trigger+0x94/0x12c
+[250622.988120]  proc_reg_write+0xb4/0xf0
+[250622.991828]  vfs_write+0xfc/0x29c
+[250622.995192]  ksys_write+0x74/0x100
+[250622.998642]  __arm64_sys_write+0x28/0x3c
+[250623.002610]  el0_svc_common.constprop.0+0x80/0x1c0
+[250623.007440]  do_el0_svc+0x30/0xa0
+[250623.010803]  el0_svc+0x28/0x70
+[250623.013908]  el0_sync_handler+0x1a8/0x1ac
+[250623.017962]  el0_sync+0x174/0x180
+[250623.021331] SMP: stopping secondary CPUs
+[250623.025301] Kernel Offset: 0x435917bf0000 from 0xffff800010000000
+[250623.031417] PHYS_OFFSET: 0xffff9bc5c0000000
+[250623.035643] CPU features: 0x08240022,2aa0a830
+[250623.040042] Memory Limit: none
+[250623.043153] ---[ end Kernel panic - not syncing: sysrq triggered crash ]---
 
-Thanks to Will for the timely report, and apologies for the lousy
-testing...
+KVM just happens to have a fairly large, multi line panic string.
 
 	M.
-
-From 5b08709313718e95ba06ef49aa82f964a605bd9c Mon Sep 17 00:00:00 2001
-From: Marc Zyngier <maz@kernel.org>
-Date: Thu, 18 Mar 2021 18:30:26 +0000
-Subject: [PATCH] KVM: arm64: Fix host's ZCR_EL2 restore on nVHE
-
-We re-enter the EL1 host with CPTR_EL2.TZ set in order to
-be able to lazily restore ZCR_EL2 when required.
-
-However, the same CPTR_EL2 configuration also leads to trapping
-when ZCR_EL2 is accessed from EL2. Duh!
-
-Clear CPTR_EL2.TZ *before* writing to ZCR_EL2.
-
-Fixes: beed09067b42 ("KVM: arm64: Trap host SVE accesses when the FPSIMD state is dirty")
-Reported-by: Will Deacon <will@kernel.org>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/hyp/nvhe/hyp-main.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 8d04d69edd15..84a702dc4a92 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -178,8 +178,9 @@ void handle_trap(struct kvm_cpu_context *host_ctxt)
- 		handle_host_smc(host_ctxt);
- 		break;
- 	case ESR_ELx_EC_SVE:
--		sve_cond_update_zcr_vq(ZCR_ELx_LEN_MASK, SYS_ZCR_EL2);
- 		sysreg_clear_set(cptr_el2, CPTR_EL2_TZ, 0);
-+		isb();
-+		sve_cond_update_zcr_vq(ZCR_ELx_LEN_MASK, SYS_ZCR_EL2);
- 		break;
- 	default:
- 		hyp_panic();
--- 
-2.29.2
-
 
 -- 
 Without deviation from the norm, progress is not possible.
