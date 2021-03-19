@@ -1,68 +1,59 @@
-Return-Path: <SRS0=QSSN=IR=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=Zs50=IS=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D24CC433C1
-	for <kvmarm@archiver.kernel.org>; Fri, 19 Mar 2021 17:53:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E466BC433DB
+	for <kvmarm@archiver.kernel.org>; Sat, 20 Mar 2021 13:28:56 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DD50061941
-	for <kvmarm@archiver.kernel.org>; Fri, 19 Mar 2021 17:53:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD50061941
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 2FF9A61970
+	for <kvmarm@archiver.kernel.org>; Sat, 20 Mar 2021 13:28:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FF9A61970
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 576764B36A;
-	Fri, 19 Mar 2021 13:53:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CC4E4B267;
+	Sat, 20 Mar 2021 09:28:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id KCDq67qEF1L3; Fri, 19 Mar 2021 13:53:57 -0400 (EDT)
+	with ESMTP id buVHYOyprWmX; Sat, 20 Mar 2021 09:28:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DA824B295;
-	Fri, 19 Mar 2021 13:53:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 42AC84B272;
+	Sat, 20 Mar 2021 09:28:54 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CD6B4B27C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Mar 2021 13:53:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F14A14B664
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Mar 2021 12:18:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ePY-uPFhymO6 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 19 Mar 2021 13:53:55 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7D8A54B276
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Mar 2021 13:53:55 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 0D6BF61941;
- Fri, 19 Mar 2021 17:53:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1616176433;
- bh=zrcL9MRIFXU8BSdXA3iKVsYRz6r0TE1XU84YXfluHhs=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=JleX4Ku9BTUuHpkzuztNMHZyK1I2gm5G53d+jG4H7cBYdMIjEiP67A5Tsti0YJwcE
- +2vFKmppEYuF8Ys8Iedf6E1rDo2tJfOjSGi5f7ZCrbfOLiFmXyU6Rv8lfh100O9cGj
- Y2SU9l+MGa64aSPP03m7Izg/2nj+qrNf9WxtqVA8Rio8bVfL0x2K12RTlSqXFZWYRF
- HgA0Rn+IkXa8HCboaJP1wDgpSdjXAyhh98yyGNOkC7s49JGayvEwdXuUruBs2xxTIi
- w+5zqc9aAFJFDVkhek2UGBZuw7yRknjLO1W7bnmzHcy9ZmjKfeHhBa6mdedqVpSNjw
- mXPZikZXDBn+Q==
-Date: Fri, 19 Mar 2021 17:53:49 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v2 00/11] KVM: arm64: Enable SVE support on nVHE systems
-Message-ID: <20210319175349.GK5619@sirena.org.uk>
-References: <20210318122532.505263-1-maz@kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20210318122532.505263-1-maz@kernel.org>
-X-Cookie: No purchase necessary.
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: kernel-team@android.com, kvm@vger.kernel.org,
- Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu,
- Will Deacon <will@kernel.org>, dave.martin@arm.com,
- linux-arm-kernel@lists.infradead.org, daniel.kiss@arm.com
+ with ESMTP id XZH-Z1GaxQmP for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 19 Mar 2021 12:17:59 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E1C184B606
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Mar 2021 12:17:59 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 88794101E;
+ Fri, 19 Mar 2021 09:17:59 -0700 (PDT)
+Received: from yoan-MS-7758.Home (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 32F343F718;
+ Fri, 19 Mar 2021 09:17:58 -0700 (PDT)
+From: Yoan Picchi <yoan.picchi@arm.com>
+To: maz@kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com,
+ suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu
+Subject: [PATCH 1/7] KVM: arm64: Add two page mapping counters for kvm_stat
+Date: Fri, 19 Mar 2021 16:17:05 +0000
+Message-Id: <20210319161711.24972-2-yoan.picchi@arm.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20210319161711.24972-1-yoan.picchi@arm.com>
+References: <20210319161711.24972-1-yoan.picchi@arm.com>
+X-Mailman-Approved-At: Sat, 20 Mar 2021 09:28:53 -0400
+Cc: catalin.marinas@arm.com, Yoan Picchi <yoan.picchi@arm.com>, will@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -74,69 +65,70 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============7337390302713275998=="
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+Add a counter for when a regular page is mapped, and another
+for when a huge page is mapped.
 
---===============7337390302713275998==
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="aqWxf8ydqYKP8htK"
-Content-Disposition: inline
+Signed-off-by: Yoan Picchi <yoan.picchi@arm.com>
+---
+ arch/arm64/include/asm/kvm_host.h | 2 ++
+ arch/arm64/kvm/guest.c            | 2 ++
+ arch/arm64/kvm/mmu.c              | 7 +++++++
+ 3 files changed, 11 insertions(+)
 
-
---aqWxf8ydqYKP8htK
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On Thu, Mar 18, 2021 at 12:25:21PM +0000, Marc Zyngier wrote:
-
-> Most of this series only repaints things so that VHE and nVHE look as
-> similar as possible, the ZCR_EL2 management being the most visible
-> exception. This results in a bunch of preparatory patches that aim at
-> making the code slightly more readable.
-
-That readability stuff is definitely helping from my PoV.
-
-Reviewed-by: Mark Brown <broonie@kernel.org>
-
-(FWIW, from the SVE side)
-
-> This has been tested on a FVP model with both VHE/nVHE configurations
-> using the string tests included with the "optimized-routines"
-> library[2].
-
-There's also some tests Dave wrote which got upstreamed in kselftest
-now, some normal kselftests and also a stress test that sits and
-writes/reads bit patterns into the registers and is pretty good at
-picking up any context switch issues.
-
---aqWxf8ydqYKP8htK
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmBU5SwACgkQJNaLcl1U
-h9AN5wf+P7ae7UEos5cVKTOeBLoAWzSixqcgUVEwBW/KICbwvz0XROUxMt7whp9r
-3Tw/PL3WZ4lUkWYFvvB3tVnjQk1JvolP4ZD07/28uKOuokUk1lCitqDpEwpi3y58
-TTfo6q89G0Z8n6bMMeRPe1WrajTzkfkGHsScPrOaH2OWWjPwv4YfgtfsLCtXTiWH
-XI+Jd6NOtPjSMMSYTnje4qFyPmn9Y7OzkbEXj/3wKP4qBYw4lhQ4pZ4jF38ngSve
-SvXbki6zREpP5U4BpqQcMzu1D1/DN/Xz0YeBi2MKNQrIrEVY+z8kQZ1BMSXZ5xi/
-sQ3P3aJ6VfsbW0AQmgZoAknknjcdaw==
-=Q9m5
------END PGP SIGNATURE-----
-
---aqWxf8ydqYKP8htK--
-
---===============7337390302713275998==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 3d10e6527..863603285 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -561,6 +561,8 @@ struct kvm_vcpu_stat {
+ 	u64 wfi_exit_stat;
+ 	u64 mmio_exit_user;
+ 	u64 mmio_exit_kernel;
++	u64 regular_page_mapped;
++	u64 huge_page_mapped;
+ 	u64 exits;
+ };
+ 
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index 9bbd30e62..14b15fb8f 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -38,6 +38,8 @@ struct kvm_stats_debugfs_item debugfs_entries[] = {
+ 	VCPU_STAT("wfi_exit_stat", wfi_exit_stat),
+ 	VCPU_STAT("mmio_exit_user", mmio_exit_user),
+ 	VCPU_STAT("mmio_exit_kernel", mmio_exit_kernel),
++	VCPU_STAT("regular_page_mapped", regular_page_mapped),
++	VCPU_STAT("huge_page_mapped", huge_page_mapped),
+ 	VCPU_STAT("exits", exits),
+ 	VCPU_STAT("halt_poll_success_ns", halt_poll_success_ns),
+ 	VCPU_STAT("halt_poll_fail_ns", halt_poll_fail_ns),
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 77cb2d28f..3996b28da 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -914,6 +914,13 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 		mark_page_dirty(kvm, gfn);
+ 	}
+ 
++	if (ret >= 0) {
++		if (vma_pagesize == PAGE_SIZE) {
++			vcpu->stat.regular_page_mapped++;
++		} else {
++			vcpu->stat.huge_page_mapped++;
++		}
++	}
+ out_unlock:
+ 	spin_unlock(&kvm->mmu_lock);
+ 	kvm_set_pfn_accessed(pfn);
+-- 
+2.17.1
 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============7337390302713275998==--
