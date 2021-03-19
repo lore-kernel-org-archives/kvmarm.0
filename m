@@ -2,78 +2,78 @@ Return-Path: <SRS0=QSSN=IR=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B85C5C433E0
-	for <kvmarm@archiver.kernel.org>; Fri, 19 Mar 2021 10:03:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A66EC433DB
+	for <kvmarm@archiver.kernel.org>; Fri, 19 Mar 2021 10:03:12 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 33A5B64F6A
-	for <kvmarm@archiver.kernel.org>; Fri, 19 Mar 2021 10:03:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33A5B64F6A
+	by mail.kernel.org (Postfix) with ESMTP id 059D964F6C
+	for <kvmarm@archiver.kernel.org>; Fri, 19 Mar 2021 10:03:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 059D964F6C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DB2084B795;
-	Fri, 19 Mar 2021 06:03:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FBD94B77F;
+	Fri, 19 Mar 2021 06:03:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id UATZex91ZYPI; Fri, 19 Mar 2021 06:03:12 -0400 (EDT)
+	with ESMTP id R-NZIwTfvXec; Fri, 19 Mar 2021 06:03:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BB2904B787;
-	Fri, 19 Mar 2021 06:03:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9260D4B78A;
+	Fri, 19 Mar 2021 06:03:10 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9DE834B72A
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Mar 2021 06:03:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B7AAD4B705
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Mar 2021 06:03:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id U1MEEYWZRM0w for <kvmarm@lists.cs.columbia.edu>;
- Fri, 19 Mar 2021 06:03:10 -0400 (EDT)
-Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com
- [209.85.221.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7E9F94B786
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Mar 2021 06:03:10 -0400 (EDT)
-Received: by mail-wr1-f73.google.com with SMTP id z6so21531860wrh.11
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Mar 2021 03:03:10 -0700 (PDT)
+ with ESMTP id xfFtUffDk1-8 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 19 Mar 2021 06:03:08 -0400 (EDT)
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com
+ [209.85.128.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A6EB74B78C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Mar 2021 06:03:08 -0400 (EDT)
+Received: by mail-wm1-f73.google.com with SMTP id i14so12665111wmq.7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Mar 2021 03:03:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=B1o/tWAgXq2CfBeEXWR8qd9iUkNYsN5CjCSGu1Kqq9M=;
- b=IIpYdevqjuz3Dt+0g749eHxi3/lKZ6lv2eB7vGkp8aylMJTha2kBOFJ33jcWwBBvbL
- fsYtpnkTHIvNCNR0QP/MFIHW12ET3w3p0A83KgJqStIL+kvekjM0pCp9O8inXFXKFaIT
- W89OAcxQWgjL8SdmPz+W5k6C6SUW7hFE6tgaj6uVOMXOFVcl8hiv0SdT9ikV4oEM+SCO
- YAL8MIoUnRpPnSpMyXthiAIg/5Nb5gNforc+Um021Yg3JWTAgOU6VHrt3djShKLi8kvK
- /jtr509scpifThJdhix+/zlgXKjF+OwzpsugsoXeGUIBqsmrbpOlZ3r6Q5y29wyATsd6
- bynw==
+ :cc; bh=AA7WNBlUpAMSn2MPgzLs0H4xGSlUKHXKOJZW0a7DVr8=;
+ b=g6COKlYT+eckZdu5xAOckwGpUXKA9H6Qgud4TFedl+pq2YS9z0gDuP+KNGqmM+ZTED
+ ht7R/jAxdq01sOoYtLegobcdL/BF4TLsBHewEY7qhv3/Ob2uLkuy/dFaqNWUtUxXPDW4
+ Ik8ybK59zS1JZ/59bk91tr0PVu6Ab6kfoJ9TkSQ9a+LACl8aC1AXyL8bGVFi6TgxbhvP
+ Re24YoLaRJt6Z1lunO6V0LZdNPjWpeRaLzn5ITQasNnPF5QzgNYAZYgsDY7EuS8jZmxz
+ bjZ/pEV0OsrP0ehBWaOvArfR/BzilI9l9ZLsphurimgP4WEXDXAcfiqpC02XwUt1Ky9O
+ KPRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=B1o/tWAgXq2CfBeEXWR8qd9iUkNYsN5CjCSGu1Kqq9M=;
- b=P1I9OemH6cOaoiKcQ301nf9T+EQriDhvzIo/M3aUQcy3/1ESf8J6N32XCR+IijYZJS
- F3ER5QPOeuq/TjqRFBxNEgH3lpXZUzRSgQ7Wt9SLkxkGKUOR8RJFb1sbWOTKJNEJ6yCN
- HdHuabSL8PkSM9I+BAQsyA9Qrm1LcE5fEnqyKtsFhAYdrCrHIjNpm52ogMmTCxLHy9Q4
- OsCOgXogUDFmAglRb4J1vMitz6cjSH2LAqhFsl/841GFwAbfhLCal3vJvbWtyhUnKwi1
- RFtP5HqvBAQatUoUJKYoE3bD/jPdvGEh+SSme0f5x+U3Lqc7zrr+Q5wqONbAbFV1tdti
- GwNw==
-X-Gm-Message-State: AOAM530oAsQm33MvURC0pdbKiL/cS72sZa2Fs2rZ7+2gB/e6h+Ewo9Zh
- pBHJXrzTvKpGQhjB2yK811DSn95giTKx
-X-Google-Smtp-Source: ABdhPJzyJ6jBqZnIFYxLIb1hQMYw/VHqB942OhtZTNlNumNwml6dV0RIjHk4MQe4PNbig7/dbzfGrtulqVAG
+ bh=AA7WNBlUpAMSn2MPgzLs0H4xGSlUKHXKOJZW0a7DVr8=;
+ b=O7v5W2Qm2SUqSqAeUvBXNhyPlVc/RkZhWcec14thnBe8CuC1VPNhw5s6ihJAOPMqhZ
+ pu/9iedVeQmrDh+9oL6tqZevY47qM0BMVVWKbkliNlHO3QvAyNxg6hdUB8KWyNpDZ5xN
+ j6SeseaL/xk7/rS8PB8jivJ3Do/+M77ZS3V4mfymKiJBHCmyAPEMhGEgN3k0tlOdgyM6
+ JJJv3po3FDyx/ORVwwrfPrbnoZql0FudVLBtjSOwQJS1v2tQEb3veF4ApkkQrpTiomBg
+ Jzl5vWBG9FU3LU1bSuwlNUzQDfHEw3g5J3DF6NlDgJeGn++CQbS/fhnIn+U8saVEOGEn
+ kk5w==
+X-Gm-Message-State: AOAM533cJZh8LGnYvkekAVlP95gyYOVhIqeEbfr/45v5R+0zLKNPjHt8
+ B9el2HCZes5SHb6Tw8AztJpWepp54aAu
+X-Google-Smtp-Source: ABdhPJxdoamqBPvUaIPZGeaUvK2O5XS8PpgugDa2anPwgCns8QoOGnR1vBU/siA6pmqWqUz4MxMaMhNseFSJ
 X-Received: from r2d2-qp.c.googlers.com ([fda3:e722:ac3:10:28:9cb1:c0a8:1652])
- (user=qperret job=sendgmr) by 2002:a05:600c:3553:: with SMTP id
- i19mr3005427wmq.1.1616148189759; Fri, 19 Mar 2021 03:03:09 -0700 (PDT)
-Date: Fri, 19 Mar 2021 10:01:45 +0000
+ (user=qperret job=sendgmr) by 2002:a7b:c18e:: with SMTP id
+ y14mr1312625wmi.1.1616148187003; Fri, 19 Mar 2021 03:03:07 -0700 (PDT)
+Date: Fri, 19 Mar 2021 10:01:44 +0000
 In-Reply-To: <20210319100146.1149909-1-qperret@google.com>
-Message-Id: <20210319100146.1149909-38-qperret@google.com>
+Message-Id: <20210319100146.1149909-37-qperret@google.com>
 Mime-Version: 1.0
 References: <20210319100146.1149909-1-qperret@google.com>
 X-Mailer: git-send-email 2.31.0.rc2.261.g7f71774620-goog
-Subject: [PATCH v6 37/38] KVM: arm64: Disable PMU support in protected mode
+Subject: [PATCH v6 36/38] KVM: arm64: Page-align the .hyp sections
 From: Quentin Perret <qperret@google.com>
 To: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org, 
  james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
@@ -97,72 +97,73 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The host currently writes directly in EL2 per-CPU data sections from
-the PMU code when running in nVHE. In preparation for unmapping the EL2
-sections from the host stage 2, disable PMU support in protected mode as
-we currently do not have a use-case for it.
+We will soon unmap the .hyp sections from the host stage 2 in Protected
+nVHE mode, which obviously works with at least page granularity, so make
+sure to align them correctly.
 
 Acked-by: Will Deacon <will@kernel.org>
 Signed-off-by: Quentin Perret <qperret@google.com>
 ---
- arch/arm64/kvm/perf.c | 3 ++-
- arch/arm64/kvm/pmu.c  | 8 ++++----
- 2 files changed, 6 insertions(+), 5 deletions(-)
+ arch/arm64/kernel/vmlinux.lds.S | 22 +++++++++-------------
+ 1 file changed, 9 insertions(+), 13 deletions(-)
 
-diff --git a/arch/arm64/kvm/perf.c b/arch/arm64/kvm/perf.c
-index 739164324afe..8f860ae56bb7 100644
---- a/arch/arm64/kvm/perf.c
-+++ b/arch/arm64/kvm/perf.c
-@@ -55,7 +55,8 @@ int kvm_perf_init(void)
- 	 * hardware performance counters. This could ensure the presence of
- 	 * a physical PMU and CONFIG_PERF_EVENT is selected.
- 	 */
--	if (IS_ENABLED(CONFIG_ARM_PMU) && perf_num_counters() > 0)
-+	if (IS_ENABLED(CONFIG_ARM_PMU) && perf_num_counters() > 0
-+				       && !is_protected_kvm_enabled())
- 		static_branch_enable(&kvm_arm_pmu_available);
+diff --git a/arch/arm64/kernel/vmlinux.lds.S b/arch/arm64/kernel/vmlinux.lds.S
+index e96173ce211b..709d2c433c5e 100644
+--- a/arch/arm64/kernel/vmlinux.lds.S
++++ b/arch/arm64/kernel/vmlinux.lds.S
+@@ -15,9 +15,11 @@
  
- 	return perf_register_guest_info_callbacks(&kvm_guest_cbs);
-diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
-index faf32a44ba04..03a6c1f4a09a 100644
---- a/arch/arm64/kvm/pmu.c
-+++ b/arch/arm64/kvm/pmu.c
-@@ -33,7 +33,7 @@ void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr)
- {
- 	struct kvm_host_data *ctx = this_cpu_ptr_hyp_sym(kvm_host_data);
+ #define HYPERVISOR_DATA_SECTIONS				\
+ 	HYP_SECTION_NAME(.rodata) : {				\
++		. = ALIGN(PAGE_SIZE);				\
+ 		__hyp_rodata_start = .;				\
+ 		*(HYP_SECTION_NAME(.data..ro_after_init))	\
+ 		*(HYP_SECTION_NAME(.rodata))			\
++		. = ALIGN(PAGE_SIZE);				\
+ 		__hyp_rodata_end = .;				\
+ 	}
  
--	if (!ctx || !kvm_pmu_switch_needed(attr))
-+	if (!kvm_arm_support_pmu_v3() || !ctx || !kvm_pmu_switch_needed(attr))
- 		return;
+@@ -72,21 +74,14 @@ ENTRY(_text)
+ jiffies = jiffies_64;
  
- 	if (!attr->exclude_host)
-@@ -49,7 +49,7 @@ void kvm_clr_pmu_events(u32 clr)
- {
- 	struct kvm_host_data *ctx = this_cpu_ptr_hyp_sym(kvm_host_data);
+ #define HYPERVISOR_TEXT					\
+-	/*						\
+-	 * Align to 4 KB so that			\
+-	 * a) the HYP vector table is at its minimum	\
+-	 *    alignment of 2048 bytes			\
+-	 * b) the HYP init code will not cross a page	\
+-	 *    boundary if its size does not exceed	\
+-	 *    4 KB (see related ASSERT() below)		\
+-	 */						\
+-	. = ALIGN(SZ_4K);				\
++	. = ALIGN(PAGE_SIZE);				\
+ 	__hyp_idmap_text_start = .;			\
+ 	*(.hyp.idmap.text)				\
+ 	__hyp_idmap_text_end = .;			\
+ 	__hyp_text_start = .;				\
+ 	*(.hyp.text)					\
+ 	HYPERVISOR_EXTABLE				\
++	. = ALIGN(PAGE_SIZE);				\
+ 	__hyp_text_end = .;
  
--	if (!ctx)
-+	if (!kvm_arm_support_pmu_v3() || !ctx)
- 		return;
+ #define IDMAP_TEXT					\
+@@ -322,11 +317,12 @@ SECTIONS
+ #include "image-vars.h"
  
- 	ctx->pmu_events.events_host &= ~clr;
-@@ -172,7 +172,7 @@ void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu)
- 	struct kvm_host_data *host;
- 	u32 events_guest, events_host;
- 
--	if (!has_vhe())
-+	if (!kvm_arm_support_pmu_v3() || !has_vhe())
- 		return;
- 
- 	preempt_disable();
-@@ -193,7 +193,7 @@ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu)
- 	struct kvm_host_data *host;
- 	u32 events_guest, events_host;
- 
--	if (!has_vhe())
-+	if (!kvm_arm_support_pmu_v3() || !has_vhe())
- 		return;
- 
- 	host = this_cpu_ptr_hyp_sym(kvm_host_data);
+ /*
+- * The HYP init code and ID map text can't be longer than a page each,
+- * and should not cross a page boundary.
++ * The HYP init code and ID map text can't be longer than a page each. The
++ * former is page-aligned, but the latter may not be with 16K or 64K pages, so
++ * it should also not cross a page boundary.
+  */
+-ASSERT(__hyp_idmap_text_end - (__hyp_idmap_text_start & ~(SZ_4K - 1)) <= SZ_4K,
+-	"HYP init code too big or misaligned")
++ASSERT(__hyp_idmap_text_end - __hyp_idmap_text_start <= PAGE_SIZE,
++	"HYP init code too big")
+ ASSERT(__idmap_text_end - (__idmap_text_start & ~(SZ_4K - 1)) <= SZ_4K,
+ 	"ID map text too big or misaligned")
+ #ifdef CONFIG_HIBERNATION
 -- 
 2.31.0.rc2.261.g7f71774620-goog
 
