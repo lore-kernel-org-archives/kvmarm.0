@@ -7,73 +7,74 @@ X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 068C8C4332B
-	for <kvmarm@archiver.kernel.org>; Fri, 19 Mar 2021 10:02:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C90DC433E6
+	for <kvmarm@archiver.kernel.org>; Fri, 19 Mar 2021 10:02:40 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 97C3064F85
-	for <kvmarm@archiver.kernel.org>; Fri, 19 Mar 2021 10:02:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97C3064F85
+	by mail.kernel.org (Postfix) with ESMTP id CA00064F45
+	for <kvmarm@archiver.kernel.org>; Fri, 19 Mar 2021 10:02:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA00064F45
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A5D74B73F;
-	Fri, 19 Mar 2021 06:02:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6EA284B74E;
+	Fri, 19 Mar 2021 06:02:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id xo7e7IgMieen; Fri, 19 Mar 2021 06:02:34 -0400 (EDT)
+	with ESMTP id 207uKjbjyyAw; Fri, 19 Mar 2021 06:02:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 27AFE4B72C;
-	Fri, 19 Mar 2021 06:02:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 58D864B6A8;
+	Fri, 19 Mar 2021 06:02:38 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1FA354B4E2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Mar 2021 06:02:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E8E94B667
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Mar 2021 06:02:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dlwk9FQqoVFl for <kvmarm@lists.cs.columbia.edu>;
- Fri, 19 Mar 2021 06:02:32 -0400 (EDT)
-Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com
- [209.85.219.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6F7294B6FD
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Mar 2021 06:02:30 -0400 (EDT)
-Received: by mail-qv1-f73.google.com with SMTP id x20so22613079qvd.21
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Mar 2021 03:02:30 -0700 (PDT)
+ with ESMTP id MdFD0ivyQT45 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 19 Mar 2021 06:02:35 -0400 (EDT)
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com
+ [209.85.221.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 53BE14B714
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Mar 2021 06:02:35 -0400 (EDT)
+Received: by mail-wr1-f73.google.com with SMTP id 75so21406674wrl.3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Mar 2021 03:02:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=egb02c7V9fvdN7WOXzwFb5kKzAOfcqS5h587DWzcb1I=;
- b=RHzxQVC7PH0LASuJE6U3fv++yW5YHh8BJCOwMVgSyTDZQFMzMQvrM7TpUSeKOT+Nnu
- TGk4thOV33wh5AfReIMRUKsd8Zca+cuku8eMOaJNPj7xHz7/Z2ejyA8xxkB6JDZ/79ud
- 3bOMqu3ibXrt2O4F3R+mUBLNVJjYE5cTuyvaz4DRrwmHLFP7XlK5sKr8YOyEoXdeHzqz
- x1z6IxJ1fINSyUYVdeGIFAsDHC/iZEwNLUGNVxaptnk6ZuTbnBYrARoCi5ZQNZwPMtoK
- a2nLj4yuXlwk4j9G2v3LdE2ri9DYCPkHH2PcMi1YjOZ3JyY7845lgbcbe4Npw/pbIdtW
- 0ifg==
+ :cc; bh=X4e6yqN5vEM6ig+lsACBvXLz9YG8MQ5drnugDp/WjOE=;
+ b=L2PYNSw/ngaYLU3t3NCsL7XXxNbaPgAlx9F44HdhNJBT+GTFmKV7hKSh9FGTtzSkIA
+ azkAh+WNGCYNVfyNkBVEeKIC38Lmsz59+IpYIuU8szokpDyixG1hOtPxhgsm1SBJKLRb
+ Rl5jG6hhTZ6wWzokHkoww/VzazI8poanIu/ZZJosqAnKz12FMQeZ2URHZ+p91Z2ulknw
+ JLtYjzoQOmo0OC6FHy+cQQGBKNh8byKGKTk2ZMBK+9NaO0My43DETWJ6AsCKtYlBO4Ys
+ yYEpZ9OMYjKLxRs2HPz2cYUKhKX86+8/xTiV4JL2dOrgSqP/lZCK3Z2MN85d5d8wUrhM
+ 0rEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=egb02c7V9fvdN7WOXzwFb5kKzAOfcqS5h587DWzcb1I=;
- b=C30TqYRRuZcbVtyXbuT73NXH1ymv2zboMFADEf2nK1BT7St9qMngdYS60+hWzwzN++
- wcDPn2/fky/97IHnlrU/L3ik3tIJtQP3Fy43CJzNspdExGXrwRZ18ZAOTU1Cdghh18EH
- 6h2n3T4uhn54sedYfdwtMvHuSKcx+87xBayrvSgaUckR6MQVv/KQBLR1+xPz2+0arX7I
- bhzUBhQkyEE8Tnwc7ZanlWnga51GbnSDFAVLZnj2lK9QkYZhLPswiFtkTEPvpLfLQtoc
- PFrf8RBgS61qjW5YXvIOcw6RcEsFIv4Y1x8XCE6FEeaByTeb8D8tnQxyaclEJXHW1rDf
- Tvbw==
-X-Gm-Message-State: AOAM531QwxQF6Ovz99fNo0+maUk+oXIUkkFmXqhaIeku+pQD4TTNtsuq
- w2T+X+70fRikbJMtK5Dcmhoph0+KL6/w
-X-Google-Smtp-Source: ABdhPJz0+lRse/fC/9bfjvhPpWRqFXSdRhXcvHkUB+NIzOTvxstqkUj+p5UmowzmUqVZALblAELLxYV022ha
+ bh=X4e6yqN5vEM6ig+lsACBvXLz9YG8MQ5drnugDp/WjOE=;
+ b=I3F29+Zfvt5SJKNViJP+V6oB34eBWU/zHGK8jcf9lM2G8tU7lbUibr8VtEExDcUBJJ
+ MTdDjB3ZkopMnOu//v8cD3EKv4r/i+C5BwPvVNi1I8jwO0ft4xdhSU76ux6ChkaTqekU
+ UtlbjzL/gY7xYKuXp2C6FfZlxK+FpWAOxHzpORAxd615s8+o8OsbUsST0+9SBYx1m7Ob
+ S5wYnVTEEMC+xaANWwD3MOPsppDFLs0OibJTGZ8ecye4/guQfYgx8MWRvlI9M/SIMaGa
+ 0F3gpAigDv4nFO8p+nKpdiLr/Dg91w9dw5uBUQyzlMK+F+FN31F0hA5gj3yJshpiAHsh
+ 40Cw==
+X-Gm-Message-State: AOAM530wALphg6W5bqoio3VOVpm6DxqlyWrJxhaMPkwX/qlWbGzJWaAw
+ Jx7/ozMMAeY143dkjOaRg3Iq8cqz5+OD
+X-Google-Smtp-Source: ABdhPJxPNWwcgcTByHoYrYF3W80lhBdvd5qLXFmSvuqb4PmhFGrJuyidxS7+Vn/9Koy7nSm7V9FunK8POnT2
 X-Received: from r2d2-qp.c.googlers.com ([fda3:e722:ac3:10:28:9cb1:c0a8:1652])
- (user=qperret job=sendgmr) by 2002:a0c:bd82:: with SMTP id
- n2mr8548505qvg.62.1616148150010; Fri, 19 Mar 2021 03:02:30 -0700 (PDT)
-Date: Fri, 19 Mar 2021 10:01:27 +0000
+ (user=qperret job=sendgmr) by 2002:a1c:6243:: with SMTP id
+ w64mr1313293wmb.0.1616148154115; Fri, 19 Mar 2021 03:02:34 -0700 (PDT)
+Date: Fri, 19 Mar 2021 10:01:29 +0000
 In-Reply-To: <20210319100146.1149909-1-qperret@google.com>
-Message-Id: <20210319100146.1149909-20-qperret@google.com>
+Message-Id: <20210319100146.1149909-22-qperret@google.com>
 Mime-Version: 1.0
 References: <20210319100146.1149909-1-qperret@google.com>
 X-Mailer: git-send-email 2.31.0.rc2.261.g7f71774620-goog
-Subject: [PATCH v6 19/38] KVM: arm64: Use kvm_arch for stage 2 pgtable
+Subject: [PATCH v6 21/38] KVM: arm64: Set host stage 2 using
+ kvm_nvhe_init_params
 From: Quentin Perret <qperret@google.com>
 To: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org, 
  james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
@@ -97,78 +98,112 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In order to make use of the stage 2 pgtable code for the host stage 2,
-use struct kvm_arch in lieu of struct kvm as the host will have the
-former but not the latter.
+Move the registers relevant to host stage 2 enablement to
+kvm_nvhe_init_params to prepare the ground for enabling it in later
+patches.
 
 Acked-by: Will Deacon <will@kernel.org>
 Signed-off-by: Quentin Perret <qperret@google.com>
 ---
- arch/arm64/include/asm/kvm_pgtable.h | 5 +++--
- arch/arm64/kvm/hyp/pgtable.c         | 6 +++---
- arch/arm64/kvm/mmu.c                 | 2 +-
- 3 files changed, 7 insertions(+), 6 deletions(-)
+ arch/arm64/include/asm/kvm_asm.h   |  3 +++
+ arch/arm64/kernel/asm-offsets.c    |  3 +++
+ arch/arm64/kvm/arm.c               |  5 +++++
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S | 14 +++++++++-----
+ arch/arm64/kvm/hyp/nvhe/switch.c   |  5 +----
+ 5 files changed, 21 insertions(+), 9 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index bf7a3cc49420..7945ec87eaec 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -162,12 +162,13 @@ int kvm_pgtable_hyp_map(struct kvm_pgtable *pgt, u64 addr, u64 size, u64 phys,
- /**
-  * kvm_pgtable_stage2_init() - Initialise a guest stage-2 page-table.
-  * @pgt:	Uninitialised page-table structure to initialise.
-- * @kvm:	KVM structure representing the guest virtual machine.
-+ * @arch:	Arch-specific KVM structure representing the guest virtual
-+ *		machine.
-  * @mm_ops:	Memory management callbacks.
-  *
-  * Return: 0 on success, negative error code on failure.
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index ebe7007b820b..08f63c09cd11 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -158,6 +158,9 @@ struct kvm_nvhe_init_params {
+ 	unsigned long tpidr_el2;
+ 	unsigned long stack_hyp_va;
+ 	phys_addr_t pgd_pa;
++	unsigned long hcr_el2;
++	unsigned long vttbr;
++	unsigned long vtcr;
+ };
+ 
+ /* Translate a kernel address @ptr into its equivalent linear mapping */
+diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
+index a36e2fc330d4..8930b42f6418 100644
+--- a/arch/arm64/kernel/asm-offsets.c
++++ b/arch/arm64/kernel/asm-offsets.c
+@@ -120,6 +120,9 @@ int main(void)
+   DEFINE(NVHE_INIT_TPIDR_EL2,	offsetof(struct kvm_nvhe_init_params, tpidr_el2));
+   DEFINE(NVHE_INIT_STACK_HYP_VA,	offsetof(struct kvm_nvhe_init_params, stack_hyp_va));
+   DEFINE(NVHE_INIT_PGD_PA,	offsetof(struct kvm_nvhe_init_params, pgd_pa));
++  DEFINE(NVHE_INIT_HCR_EL2,	offsetof(struct kvm_nvhe_init_params, hcr_el2));
++  DEFINE(NVHE_INIT_VTTBR,	offsetof(struct kvm_nvhe_init_params, vttbr));
++  DEFINE(NVHE_INIT_VTCR,	offsetof(struct kvm_nvhe_init_params, vtcr));
+ #endif
+ #ifdef CONFIG_CPU_PM
+   DEFINE(CPU_CTX_SP,		offsetof(struct cpu_suspend_ctx, sp));
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index d93ea0b82491..a6b5ba195ca9 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1418,6 +1418,11 @@ static void cpu_prepare_hyp_mode(int cpu)
+ 
+ 	params->stack_hyp_va = kern_hyp_va(per_cpu(kvm_arm_hyp_stack_page, cpu) + PAGE_SIZE);
+ 	params->pgd_pa = kvm_mmu_get_httbr();
++	if (is_protected_kvm_enabled())
++		params->hcr_el2 = HCR_HOST_NVHE_PROTECTED_FLAGS;
++	else
++		params->hcr_el2 = HCR_HOST_NVHE_FLAGS;
++	params->vttbr = params->vtcr = 0;
+ 
+ 	/*
+ 	 * Flush the init params from the data cache because the struct will
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+index 557fb79b29cf..60d51515153e 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+@@ -83,11 +83,6 @@ SYM_CODE_END(__kvm_hyp_init)
+  * x0: struct kvm_nvhe_init_params PA
   */
--int kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm *kvm,
-+int kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_arch *arch,
- 			    struct kvm_pgtable_mm_ops *mm_ops);
+ SYM_CODE_START_LOCAL(___kvm_hyp_init)
+-alternative_if ARM64_KVM_PROTECTED_MODE
+-	mov_q	x1, HCR_HOST_NVHE_PROTECTED_FLAGS
+-	msr	hcr_el2, x1
+-alternative_else_nop_endif
+-
+ 	ldr	x1, [x0, #NVHE_INIT_TPIDR_EL2]
+ 	msr	tpidr_el2, x1
  
- /**
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 82aca35a22f6..ea95bbc6ba80 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -880,11 +880,11 @@ int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size)
- 	return kvm_pgtable_walk(pgt, addr, size, &walker);
- }
+@@ -97,6 +92,15 @@ alternative_else_nop_endif
+ 	ldr	x1, [x0, #NVHE_INIT_MAIR_EL2]
+ 	msr	mair_el2, x1
  
--int kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm *kvm,
-+int kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_arch *arch,
- 			    struct kvm_pgtable_mm_ops *mm_ops)
- {
- 	size_t pgd_sz;
--	u64 vtcr = kvm->arch.vtcr;
-+	u64 vtcr = arch->vtcr;
- 	u32 ia_bits = VTCR_EL2_IPA(vtcr);
- 	u32 sl0 = FIELD_GET(VTCR_EL2_SL0_MASK, vtcr);
- 	u32 start_level = VTCR_EL2_TGRAN_SL0_BASE - sl0;
-@@ -897,7 +897,7 @@ int kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm *kvm,
- 	pgt->ia_bits		= ia_bits;
- 	pgt->start_level	= start_level;
- 	pgt->mm_ops		= mm_ops;
--	pgt->mmu		= &kvm->arch.mmu;
-+	pgt->mmu		= &arch->mmu;
++	ldr	x1, [x0, #NVHE_INIT_HCR_EL2]
++	msr	hcr_el2, x1
++
++	ldr	x1, [x0, #NVHE_INIT_VTTBR]
++	msr	vttbr_el2, x1
++
++	ldr	x1, [x0, #NVHE_INIT_VTCR]
++	msr	vtcr_el2, x1
++
+ 	ldr	x1, [x0, #NVHE_INIT_PGD_PA]
+ 	phys_to_ttbr x2, x1
+ alternative_if ARM64_HAS_CNP
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index f6d542ecf6a7..99323563022a 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -97,10 +97,7 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
+ 	mdcr_el2 |= MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT;
  
- 	/* Ensure zeroed PGD pages are visible to the hardware walker */
- 	dsb(ishst);
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index de0ad79d2c90..d6eb1fb21232 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -457,7 +457,7 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
- 	if (!pgt)
- 		return -ENOMEM;
+ 	write_sysreg(mdcr_el2, mdcr_el2);
+-	if (is_protected_kvm_enabled())
+-		write_sysreg(HCR_HOST_NVHE_PROTECTED_FLAGS, hcr_el2);
+-	else
+-		write_sysreg(HCR_HOST_NVHE_FLAGS, hcr_el2);
++	write_sysreg(this_cpu_ptr(&kvm_init_params)->hcr_el2, hcr_el2);
  
--	err = kvm_pgtable_stage2_init(pgt, kvm, &kvm_s2_mm_ops);
-+	err = kvm_pgtable_stage2_init(pgt, &kvm->arch, &kvm_s2_mm_ops);
- 	if (err)
- 		goto out_free_pgtable;
- 
+ 	cptr = CPTR_EL2_DEFAULT;
+ 	if (vcpu_has_sve(vcpu) && (vcpu->arch.flags & KVM_ARM64_FP_ENABLED))
 -- 
 2.31.0.rc2.261.g7f71774620-goog
 
