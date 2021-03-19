@@ -7,73 +7,74 @@ X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA380C433E6
-	for <kvmarm@archiver.kernel.org>; Fri, 19 Mar 2021 10:02:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC32CC433DB
+	for <kvmarm@archiver.kernel.org>; Fri, 19 Mar 2021 10:02:13 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5AA8B64F53
-	for <kvmarm@archiver.kernel.org>; Fri, 19 Mar 2021 10:02:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AA8B64F53
+	by mail.kernel.org (Postfix) with ESMTP id 3E2E664F6A
+	for <kvmarm@archiver.kernel.org>; Fri, 19 Mar 2021 10:02:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E2E664F6A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 00CDF4B3AF;
-	Fri, 19 Mar 2021 06:02:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E65404B689;
+	Fri, 19 Mar 2021 06:02:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Wa7OE11rgFe2; Fri, 19 Mar 2021 06:02:09 -0400 (EDT)
+	with ESMTP id G-w4Z9Gvr+Bo; Fri, 19 Mar 2021 06:02:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D1554B673;
-	Fri, 19 Mar 2021 06:02:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BEDB34B39B;
+	Fri, 19 Mar 2021 06:02:11 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B8DB4B5CC
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Mar 2021 06:02:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 369674B611
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Mar 2021 06:02:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Xb5BIbpNXjE1 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 19 Mar 2021 06:02:06 -0400 (EDT)
-Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com
- [209.85.221.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 05B5F4B662
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Mar 2021 06:02:06 -0400 (EDT)
-Received: by mail-wr1-f73.google.com with SMTP id z17so21552587wrv.23
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Mar 2021 03:02:05 -0700 (PDT)
+ with ESMTP id b3-+Iq98842F for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 19 Mar 2021 06:02:09 -0400 (EDT)
+Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com
+ [209.85.219.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AC52F4B671
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Mar 2021 06:02:07 -0400 (EDT)
+Received: by mail-qv1-f73.google.com with SMTP id bt20so22809430qvb.0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Mar 2021 03:02:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=oul0y1YRwu6Xp/Stomf5Vmvh7DCtXCVsizSXHMFv9oc=;
- b=gpEARtig1c/yAeen7RZ7yreYc0sx0xJY1WDhAzbU9tn6sWOwkZH9IdOPsMww/3IgYC
- GNhizOETCs5hJWyJ7sEOb7MjOenRZMyjVFg6+aqfoe3SjbijZfgpl3IQStUEp41tpvQv
- EKalXJyimZ5tI+NC4c4MYyMLgv6o8EkbuSSueWNu2rYKxx4JlD7DftB6A6IfDar+Q1Ot
- jSlJN4hpK9H0b07jlJTikhwiFDvLj1fv1GPo/joERhFY6eqS46OZj+uKJa2Mva75LF12
- DF0t/XOGl+dPNqB8Y5+W2E26R4ohQf+0k9C+GBYe7LTAJU00tz88gKsgIis+RmC3EkF5
- voQA==
+ :cc; bh=FHhOKlvH8BUgvSu8w1ogZTH6l5iURXLk02Ie2JUxorI=;
+ b=qixyVDp2kzHvkmDWySq9jBUdHw1gl4owgBvaGaZcBZnZJ3t0tbfIPvpnr/l0h2deyl
+ 2EPkGOTsbSATaWOR5f/vBI+kFfGMcSFOmltFzs6oJl8frXJEaIW57uVoBFzxvj7efpej
+ Km7kaJymPI6YHaaotbR7/CKArmpzCXEg7pMb+NNE62MGwntXknqbQwbUqCfwZeVJpOxO
+ DGXawS5F6hpYD/m+wgEUgM3jp8DdXp7e4Jdtcs7QpjJM9H5atLC5LViAK6E791VUrkia
+ lkGv1U5aVDqEVnL5hIxnUiyIOmLtYxelT+qUAgnrR32tl3EQE5CDB5VPnBGGC++t2uNL
+ 8iSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=oul0y1YRwu6Xp/Stomf5Vmvh7DCtXCVsizSXHMFv9oc=;
- b=c5/FjtuJeM9a3TaC6sSNOzYaQl2wOo6vLt/mDn8fjKDAnxoqTnferFMKIGiNzozYwm
- uE712Lx+lL5qOm2quSYy3ERqqeNsy/vf5BeYyaIVKV/ZjBCzuA1yMKOLR2EjaoXLmO80
- cpYcFCJmy/hWMJr7pwvtjE0WqtRqZoxGFGRyaKCszPNcKfLKZwEUpYYvNoQF9qqZ7w06
- 2tPIHzrntZs3MerbGyo8l9ES7NDiLDIgyLT4pX+a+KqJKJP1fYqMjCYThZiPwS9KSTPc
- laT51sMuU7JeFj+WdxYQraqkLWpFng2o73/+2JGsXSHUMFb8W4aCgFnFvc6bOpgPmVX2
- zF5A==
-X-Gm-Message-State: AOAM531fnoWsh5dyACIMZD4nZiDKnsloRC42SYGSed3AaxCeDWXawpSu
- hKtp/NDhX7LLpABTnk+zGNU1NIMyoxB0
-X-Google-Smtp-Source: ABdhPJxTCVkd35ftfSx/StLzKJXeTz5bBgJWKVmT5cQ4QgJGcv0Ne1fDUB89kkpZtO34Y+P+VpxOx4uHw9//
+ bh=FHhOKlvH8BUgvSu8w1ogZTH6l5iURXLk02Ie2JUxorI=;
+ b=XNYUrqOS8H1aHwu2yZOC5ry7m3NwkVBlH9zAf+QemYwGOEzhliJUPc6TE+omGCK9fQ
+ 6vZoPFBgxP7gMAM2YZV+O1ZIiLI+/6Pk9qaqf3FfdoP4KWeR9NwkAxP4FmbG7swfP/3H
+ DI+TmA4kWx+2pLhQn1NZ0wwL0esEdx+qsSS1WXyZwRy5rNGZ94+QjOeLeEjk1E1Nq4T3
+ UoJ1i5Ezj0YLG0ah8CudOO1c7HB6ebCefTNg/bdnTOAvPC17j6l3iujUkZV9JVn9j8L+
+ PnY1YJBlAYkErPostA7b4QRcdCONStWBpNPjd6lCBblXBGXKfm1VYi6IBGpAazcG4e4c
+ CeZg==
+X-Gm-Message-State: AOAM531KeWyV7Xct0KKJkl5p0UFl7Iw14C/qQYUhK+mmi4j4hys47r27
+ Ib1YU0/PfwaCz6hfBlcKpxqSapt2obHm
+X-Google-Smtp-Source: ABdhPJwIqnMAXTy7s8n+By8NiJmpTPklRN++6V786HQ3MT5zF6JnhYEfpESJplTXQGrKlaX51KwO3bZurPTZ
 X-Received: from r2d2-qp.c.googlers.com ([fda3:e722:ac3:10:28:9cb1:c0a8:1652])
- (user=qperret job=sendgmr) by 2002:a05:600c:198c:: with SMTP id
- t12mr2920666wmq.183.1616148125189; Fri, 19 Mar 2021 03:02:05 -0700 (PDT)
-Date: Fri, 19 Mar 2021 10:01:15 +0000
+ (user=qperret job=sendgmr) by 2002:a0c:b410:: with SMTP id
+ u16mr8628046qve.8.1616148127254; Fri, 19 Mar 2021 03:02:07 -0700 (PDT)
+Date: Fri, 19 Mar 2021 10:01:16 +0000
 In-Reply-To: <20210319100146.1149909-1-qperret@google.com>
-Message-Id: <20210319100146.1149909-8-qperret@google.com>
+Message-Id: <20210319100146.1149909-9-qperret@google.com>
 Mime-Version: 1.0
 References: <20210319100146.1149909-1-qperret@google.com>
 X-Mailer: git-send-email 2.31.0.rc2.261.g7f71774620-goog
-Subject: [PATCH v6 07/38] KVM: arm64: Introduce a BSS section for use at Hyp
+Subject: [PATCH v6 08/38] KVM: arm64: Make kvm_call_hyp() a function call at
+ Hyp
 From: Quentin Perret <qperret@google.com>
 To: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org, 
  james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
@@ -97,162 +98,43 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Currently, the hyp code cannot make full use of a bss, as the kernel
-section is mapped read-only.
+kvm_call_hyp() has some logic to issue a function call or a hypercall
+depending on the EL at which the kernel is running. However, all the
+code compiled under __KVM_NVHE_HYPERVISOR__ is guaranteed to only run
+at EL2 which allows us to simplify.
 
-While this mapping could simply be changed to read-write, it would
-intermingle even more the hyp and kernel state than they currently are.
-Instead, introduce a __hyp_bss section, that uses reserved pages, and
-create the appropriate RW hyp mappings during KVM init.
+Add ifdefery to kvm_host.h to simplify kvm_call_hyp() in .hyp.text.
 
 Acked-by: Will Deacon <will@kernel.org>
 Signed-off-by: Quentin Perret <qperret@google.com>
 ---
- arch/arm64/include/asm/sections.h |  1 +
- arch/arm64/kernel/vmlinux.lds.S   | 52 ++++++++++++++++++++-----------
- arch/arm64/kvm/arm.c              | 14 ++++++++-
- arch/arm64/kvm/hyp/nvhe/hyp.lds.S |  1 +
- 4 files changed, 49 insertions(+), 19 deletions(-)
+ arch/arm64/include/asm/kvm_host.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/arch/arm64/include/asm/sections.h b/arch/arm64/include/asm/sections.h
-index 2f36b16a5b5d..e4ad9db53af1 100644
---- a/arch/arm64/include/asm/sections.h
-+++ b/arch/arm64/include/asm/sections.h
-@@ -13,6 +13,7 @@ extern char __hyp_idmap_text_start[], __hyp_idmap_text_end[];
- extern char __hyp_text_start[], __hyp_text_end[];
- extern char __hyp_rodata_start[], __hyp_rodata_end[];
- extern char __hyp_reloc_begin[], __hyp_reloc_end[];
-+extern char __hyp_bss_start[], __hyp_bss_end[];
- extern char __idmap_text_start[], __idmap_text_end[];
- extern char __initdata_begin[], __initdata_end[];
- extern char __inittext_begin[], __inittext_end[];
-diff --git a/arch/arm64/kernel/vmlinux.lds.S b/arch/arm64/kernel/vmlinux.lds.S
-index 7eea7888bb02..e96173ce211b 100644
---- a/arch/arm64/kernel/vmlinux.lds.S
-+++ b/arch/arm64/kernel/vmlinux.lds.S
-@@ -5,24 +5,7 @@
-  * Written by Martin Mares <mj@atrey.karlin.mff.cuni.cz>
-  */
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 08f500b2551a..6a2031af9562 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -593,6 +593,7 @@ int kvm_test_age_hva(struct kvm *kvm, unsigned long hva);
+ void kvm_arm_halt_guest(struct kvm *kvm);
+ void kvm_arm_resume_guest(struct kvm *kvm);
  
--#define RO_EXCEPTION_TABLE_ALIGN	8
--#define RUNTIME_DISCARD_EXIT
--
--#include <asm-generic/vmlinux.lds.h>
--#include <asm/cache.h>
- #include <asm/hyp_image.h>
--#include <asm/kernel-pgtable.h>
--#include <asm/memory.h>
--#include <asm/page.h>
--
--#include "image.h"
--
--OUTPUT_ARCH(aarch64)
--ENTRY(_text)
--
--jiffies = jiffies_64;
--
--
- #ifdef CONFIG_KVM
- #define HYPERVISOR_EXTABLE					\
- 	. = ALIGN(SZ_8);					\
-@@ -51,13 +34,43 @@ jiffies = jiffies_64;
- 		__hyp_reloc_end = .;				\
- 	}
++#ifndef __KVM_NVHE_HYPERVISOR__
+ #define kvm_call_hyp_nvhe(f, ...)						\
+ 	({								\
+ 		struct arm_smccc_res res;				\
+@@ -632,6 +633,11 @@ void kvm_arm_resume_guest(struct kvm *kvm);
+ 									\
+ 		ret;							\
+ 	})
++#else /* __KVM_NVHE_HYPERVISOR__ */
++#define kvm_call_hyp(f, ...) f(__VA_ARGS__)
++#define kvm_call_hyp_ret(f, ...) f(__VA_ARGS__)
++#define kvm_call_hyp_nvhe(f, ...) f(__VA_ARGS__)
++#endif /* __KVM_NVHE_HYPERVISOR__ */
  
-+#define BSS_FIRST_SECTIONS					\
-+	__hyp_bss_start = .;					\
-+	*(HYP_SECTION_NAME(.bss))				\
-+	. = ALIGN(PAGE_SIZE);					\
-+	__hyp_bss_end = .;
-+
-+/*
-+ * We require that __hyp_bss_start and __bss_start are aligned, and enforce it
-+ * with an assertion. But the BSS_SECTION macro places an empty .sbss section
-+ * between them, which can in some cases cause the linker to misalign them. To
-+ * work around the issue, force a page alignment for __bss_start.
-+ */
-+#define SBSS_ALIGN			PAGE_SIZE
- #else /* CONFIG_KVM */
- #define HYPERVISOR_EXTABLE
- #define HYPERVISOR_DATA_SECTIONS
- #define HYPERVISOR_PERCPU_SECTION
- #define HYPERVISOR_RELOC_SECTION
-+#define SBSS_ALIGN			0
- #endif
- 
-+#define RO_EXCEPTION_TABLE_ALIGN	8
-+#define RUNTIME_DISCARD_EXIT
-+
-+#include <asm-generic/vmlinux.lds.h>
-+#include <asm/cache.h>
-+#include <asm/kernel-pgtable.h>
-+#include <asm/memory.h>
-+#include <asm/page.h>
-+
-+#include "image.h"
-+
-+OUTPUT_ARCH(aarch64)
-+ENTRY(_text)
-+
-+jiffies = jiffies_64;
-+
- #define HYPERVISOR_TEXT					\
- 	/*						\
- 	 * Align to 4 KB so that			\
-@@ -276,7 +289,7 @@ SECTIONS
- 	__pecoff_data_rawsize = ABSOLUTE(. - __initdata_begin);
- 	_edata = .;
- 
--	BSS_SECTION(0, 0, 0)
-+	BSS_SECTION(SBSS_ALIGN, 0, 0)
- 
- 	. = ALIGN(PAGE_SIZE);
- 	init_pg_dir = .;
-@@ -324,6 +337,9 @@ ASSERT(__hibernate_exit_text_end - (__hibernate_exit_text_start & ~(SZ_4K - 1))
- ASSERT((__entry_tramp_text_end - __entry_tramp_text_start) == PAGE_SIZE,
- 	"Entry trampoline text too big")
- #endif
-+#ifdef CONFIG_KVM
-+ASSERT(__hyp_bss_start == __bss_start, "HYP and Host BSS are misaligned")
-+#endif
- /*
-  * If padding is applied before .head.text, virt<->phys conversions will fail.
-  */
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 2adb8d878bb9..22d6df525254 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1775,7 +1775,19 @@ static int init_hyp_mode(void)
- 		goto out_err;
- 	}
- 
--	err = create_hyp_mappings(kvm_ksym_ref(__bss_start),
-+	/*
-+	 * .hyp.bss is guaranteed to be placed at the beginning of the .bss
-+	 * section thanks to an assertion in the linker script. Map it RW and
-+	 * the rest of .bss RO.
-+	 */
-+	err = create_hyp_mappings(kvm_ksym_ref(__hyp_bss_start),
-+				  kvm_ksym_ref(__hyp_bss_end), PAGE_HYP);
-+	if (err) {
-+		kvm_err("Cannot map hyp bss section: %d\n", err);
-+		goto out_err;
-+	}
-+
-+	err = create_hyp_mappings(kvm_ksym_ref(__hyp_bss_end),
- 				  kvm_ksym_ref(__bss_stop), PAGE_HYP_RO);
- 	if (err) {
- 		kvm_err("Cannot map bss section\n");
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp.lds.S b/arch/arm64/kvm/hyp/nvhe/hyp.lds.S
-index cd119d82d8e3..f4562f417d3f 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp.lds.S
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp.lds.S
-@@ -25,4 +25,5 @@ SECTIONS {
- 	BEGIN_HYP_SECTION(.data..percpu)
- 		PERCPU_INPUT(L1_CACHE_BYTES)
- 	END_HYP_SECTION
-+	HYP_SECTION(.bss)
- }
+ void force_vm_exit(const cpumask_t *mask);
+ void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot);
 -- 
 2.31.0.rc2.261.g7f71774620-goog
 
