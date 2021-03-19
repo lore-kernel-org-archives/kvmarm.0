@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 746BAC433E0
-	for <kvmarm@archiver.kernel.org>; Fri, 19 Mar 2021 10:02:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C968EC433E0
+	for <kvmarm@archiver.kernel.org>; Fri, 19 Mar 2021 10:02:21 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0025A64DFB
-	for <kvmarm@archiver.kernel.org>; Fri, 19 Mar 2021 10:02:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0025A64DFB
+	by mail.kernel.org (Postfix) with ESMTP id 5415D64F6A
+	for <kvmarm@archiver.kernel.org>; Fri, 19 Mar 2021 10:02:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5415D64F6A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 941DD4B691;
-	Fri, 19 Mar 2021 06:02:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EAF624B611;
+	Fri, 19 Mar 2021 06:02:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id b+HGGHX0FxI0; Fri, 19 Mar 2021 06:02:17 -0400 (EDT)
+	with ESMTP id IC4sq-TIDoPw; Fri, 19 Mar 2021 06:02:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1CA854B6A8;
-	Fri, 19 Mar 2021 06:02:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B39B4B6BA;
+	Fri, 19 Mar 2021 06:02:19 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8505F4B5D8
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Mar 2021 06:02:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 006754B671
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Mar 2021 06:02:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xlnuKhbRWvHc for <kvmarm@lists.cs.columbia.edu>;
- Fri, 19 Mar 2021 06:02:13 -0400 (EDT)
-Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com
- [209.85.219.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AA12D4B610
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Mar 2021 06:02:13 -0400 (EDT)
-Received: by mail-qv1-f73.google.com with SMTP id u17so31771823qvq.23
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Mar 2021 03:02:13 -0700 (PDT)
+ with ESMTP id 8LIqqi7BBfeD for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 19 Mar 2021 06:02:17 -0400 (EDT)
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com
+ [209.85.221.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 325534B6BA
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Mar 2021 06:02:16 -0400 (EDT)
+Received: by mail-wr1-f73.google.com with SMTP id p15so21380077wre.13
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Mar 2021 03:02:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=42VsnebBx6wd/dLld12y5OO2eqBs86RA5vT5YbLHhII=;
- b=dpjDBn6OQpH5nXPKZsRJwReQXwbupeBLtYsMpd576nHxHjvnVc9vqmVeYVqLuoneaK
- 2/gC7yD7I/DtFOk15LofKF36Dw24Wv6Sv8dC52KQRYF1DluXut/IFYKkV108Ni5SSv+h
- BAgmE0xLosT42H7aMLk+Rm+1LHDumfxog8gA7y5gWlN03GqE5TOZ2qFMFfz25+hy+st3
- iOzPFZ2VmH2IhadveRw5E5FJi8M+fyQ5mb46COqCD7HHx6+pZVmAtnrdXzyD88leRm5f
- cegleOOJQIjNH3rHYuIjh1XtNE9mCawnKwxERwDK7stiTysr5C9UpfJ63Peg7UUGKxAV
- z5Mg==
+ :cc; bh=JFVgQfdZR3t4wFPbw0y7EcWRf567Mo4BKDT6hmRzVw0=;
+ b=uC4I+Adqywaa1+/YF9/p/jYvqaxZ8qWCIRedY8B78OhA0y/o1ywd+e1B6iOpldehhs
+ z4Y135SUDFFc04025qo6D3o9sMCOa24gzfbXZOBPzIkZoMCJMJRRWcfwj3fQRN6JqH8q
+ xE6RYZwuLWywGG/7G45xXBZDpugTGLZlmBj0Eegy+yMHT6fYnhx+aY0BaHHEx7KxzGPR
+ yjgdSr3XJgUjrIvfX5l0HBtDDmq54TJZ1/nOOiKWX0p1QR21MgdF837LCecSGdcEdijc
+ RYHjZeP7q31QhmmHJZ4x/UY4gxZhFB5pbCh0OnMqlrpvpDnFOV4++7h3BvMcQFOzUO5I
+ +rFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=42VsnebBx6wd/dLld12y5OO2eqBs86RA5vT5YbLHhII=;
- b=L4qbkYp4W+xL2Ly85qRMMBuo85cyf6bdP5zUW8FCDcukq+cR6ceye8A1/1pqIv8Pjo
- ipuJcXC8POaP5kQH8Vy2ZJnVx63i8cBzFqUB1OqbqXprv3Jo61JxHr25SxEY4t6TrtAp
- Zx53rtKtUrQO+UGcXc/EuJszbXDaqp9oQpWlDv5L6XudhjPs2oFle4ZCWtDX+/ZC7aa+
- afWcajezTwSMGvbZ/FyOnuLUCxQkMoAsPZ2lphxkxgHX/wr0bcLY+CsmKP0fqPN8A2Tb
- U3xKUeflSNpfjhqwSmon9ugH3EZmjhOo7IFSh0EB4fPuCPJhlwUwRy9/zrGjrQXxTjkO
- B2Yg==
-X-Gm-Message-State: AOAM531uFSI4LdjQUgu8IyS4bN98sR0eQ2BGasjcWIHogNtFJ6lQS9dt
- cTdLC1KGRN3SghkYjUA/JghPaj24P+ZD
-X-Google-Smtp-Source: ABdhPJy40vcJgyO4z2WwwLPNXTxcJo3PmnLkzvLiVsroYLI2jeLnpRpxAFfdfa6RyPy0NgQ4uvhb7terjePA
+ bh=JFVgQfdZR3t4wFPbw0y7EcWRf567Mo4BKDT6hmRzVw0=;
+ b=d1X9o3muovLDiYwgC+b5ctR/eZTbf5yPKUlg719bJpjYES8owhSvqh+Bvl7O5yul32
+ Fk9KZh9nPqlIbbkWW1h8InFwuBYoTgB7FYoMhdh/pIsWBkYHNMnRq7ztMFAhMoCKeIgX
+ NuyLGHSX6fsO4H8hsCU+hO1FQLayRhoo+3pRztXB/bKEWhik5r77QEpX2sZCwkh0myd3
+ ssl8WH4h2Lv54XLknTlHNwOUL1kqeRPnSXe/4zh7pDbS2F2ujDROfjD5G11/G84JHGze
+ 8hrYOpHR4VurZNT0llmA2n/XErtmSRVI5qNGcYI+osCKDEETIFQvSQW1QllFcOl5U1TR
+ Bh0w==
+X-Gm-Message-State: AOAM5316HkSJn2LxNK8RW3MTcvUl5CjgmXeIzy3jzsfshm8YFs1cYy3G
+ e3Cpmr9Lodg3hympe7hxrudTfn6xANcn
+X-Google-Smtp-Source: ABdhPJw0Wg2RVgEUXpb1r4+Vch/mSQU4xORLnkKvgeh9Qe1yvdhUVnYvo241i0FCnsVTaXOHfqk9Y/Ulgfyg
 X-Received: from r2d2-qp.c.googlers.com ([fda3:e722:ac3:10:28:9cb1:c0a8:1652])
- (user=qperret job=sendgmr) by 2002:a0c:eb87:: with SMTP id
- x7mr8762653qvo.14.1616148133288; Fri, 19 Mar 2021 03:02:13 -0700 (PDT)
-Date: Fri, 19 Mar 2021 10:01:19 +0000
+ (user=qperret job=sendgmr) by 2002:a1c:a958:: with SMTP id
+ s85mr2901863wme.138.1616148135430; Fri, 19 Mar 2021 03:02:15 -0700 (PDT)
+Date: Fri, 19 Mar 2021 10:01:20 +0000
 In-Reply-To: <20210319100146.1149909-1-qperret@google.com>
-Message-Id: <20210319100146.1149909-12-qperret@google.com>
+Message-Id: <20210319100146.1149909-13-qperret@google.com>
 Mime-Version: 1.0
 References: <20210319100146.1149909-1-qperret@google.com>
 X-Mailer: git-send-email 2.31.0.rc2.261.g7f71774620-goog
-Subject: [PATCH v6 11/38] KVM: arm64: Stub CONFIG_DEBUG_LIST at Hyp
+Subject: [PATCH v6 12/38] KVM: arm64: Introduce a Hyp buddy page allocator
 From: Quentin Perret <qperret@google.com>
 To: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org, 
  james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
@@ -97,58 +97,366 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In order to use the kernel list library at EL2, introduce stubs for the
-CONFIG_DEBUG_LIST out-of-lines calls.
+When memory protection is enabled, the hyp code will require a basic
+form of memory management in order to allocate and free memory pages at
+EL2. This is needed for various use-cases, including the creation of hyp
+mappings or the allocation of stage 2 page tables.
+
+To address these use-case, introduce a simple memory allocator in the
+hyp code. The allocator is designed as a conventional 'buddy allocator',
+working with a page granularity. It allows to allocate and free
+physically contiguous pages from memory 'pools', with a guaranteed order
+alignment in the PA space. Each page in a memory pool is associated
+with a struct hyp_page which holds the page's metadata, including its
+refcount, as well as its current order, hence mimicking the kernel's
+buddy system in the GFP infrastructure. The hyp_page metadata are made
+accessible through a hyp_vmemmap, following the concept of
+SPARSE_VMEMMAP in the kernel.
 
 Acked-by: Will Deacon <will@kernel.org>
 Signed-off-by: Quentin Perret <qperret@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/Makefile |  2 +-
- arch/arm64/kvm/hyp/nvhe/stub.c   | 22 ++++++++++++++++++++++
- 2 files changed, 23 insertions(+), 1 deletion(-)
- create mode 100644 arch/arm64/kvm/hyp/nvhe/stub.c
+ arch/arm64/kvm/hyp/include/nvhe/gfp.h    |  68 ++++++++
+ arch/arm64/kvm/hyp/include/nvhe/memory.h |  28 ++++
+ arch/arm64/kvm/hyp/nvhe/Makefile         |   2 +-
+ arch/arm64/kvm/hyp/nvhe/page_alloc.c     | 195 +++++++++++++++++++++++
+ 4 files changed, 292 insertions(+), 1 deletion(-)
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/gfp.h
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/page_alloc.c
 
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/gfp.h b/arch/arm64/kvm/hyp/include/nvhe/gfp.h
+new file mode 100644
+index 000000000000..55b3f0ce5bc8
+--- /dev/null
++++ b/arch/arm64/kvm/hyp/include/nvhe/gfp.h
+@@ -0,0 +1,68 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++#ifndef __KVM_HYP_GFP_H
++#define __KVM_HYP_GFP_H
++
++#include <linux/list.h>
++
++#include <nvhe/memory.h>
++#include <nvhe/spinlock.h>
++
++#define HYP_NO_ORDER	UINT_MAX
++
++struct hyp_pool {
++	/*
++	 * Spinlock protecting concurrent changes to the memory pool as well as
++	 * the struct hyp_page of the pool's pages until we have a proper atomic
++	 * API at EL2.
++	 */
++	hyp_spinlock_t lock;
++	struct list_head free_area[MAX_ORDER];
++	phys_addr_t range_start;
++	phys_addr_t range_end;
++	unsigned int max_order;
++};
++
++static inline void hyp_page_ref_inc(struct hyp_page *p)
++{
++	struct hyp_pool *pool = hyp_page_to_pool(p);
++
++	hyp_spin_lock(&pool->lock);
++	p->refcount++;
++	hyp_spin_unlock(&pool->lock);
++}
++
++static inline int hyp_page_ref_dec_and_test(struct hyp_page *p)
++{
++	struct hyp_pool *pool = hyp_page_to_pool(p);
++	int ret;
++
++	hyp_spin_lock(&pool->lock);
++	p->refcount--;
++	ret = (p->refcount == 0);
++	hyp_spin_unlock(&pool->lock);
++
++	return ret;
++}
++
++static inline void hyp_set_page_refcounted(struct hyp_page *p)
++{
++	struct hyp_pool *pool = hyp_page_to_pool(p);
++
++	hyp_spin_lock(&pool->lock);
++	if (p->refcount) {
++		hyp_spin_unlock(&pool->lock);
++		hyp_panic();
++	}
++	p->refcount = 1;
++	hyp_spin_unlock(&pool->lock);
++}
++
++/* Allocation */
++void *hyp_alloc_pages(struct hyp_pool *pool, unsigned int order);
++void hyp_get_page(void *addr);
++void hyp_put_page(void *addr);
++
++/* Used pages cannot be freed */
++int hyp_pool_init(struct hyp_pool *pool, u64 pfn, unsigned int nr_pages,
++		  unsigned int reserved_pages);
++#endif /* __KVM_HYP_GFP_H */
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/memory.h b/arch/arm64/kvm/hyp/include/nvhe/memory.h
+index 3e49eaa7e682..d2fb307c5952 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/memory.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/memory.h
+@@ -6,7 +6,17 @@
+ 
+ #include <linux/types.h>
+ 
++struct hyp_pool;
++struct hyp_page {
++	unsigned int refcount;
++	unsigned int order;
++	struct hyp_pool *pool;
++	struct list_head node;
++};
++
+ extern s64 hyp_physvirt_offset;
++extern u64 __hyp_vmemmap;
++#define hyp_vmemmap ((struct hyp_page *)__hyp_vmemmap)
+ 
+ #define __hyp_pa(virt)	((phys_addr_t)(virt) + hyp_physvirt_offset)
+ #define __hyp_va(phys)	((void *)((phys_addr_t)(phys) - hyp_physvirt_offset))
+@@ -21,4 +31,22 @@ static inline phys_addr_t hyp_virt_to_phys(void *addr)
+ 	return __hyp_pa(addr);
+ }
+ 
++#define hyp_phys_to_pfn(phys)	((phys) >> PAGE_SHIFT)
++#define hyp_pfn_to_phys(pfn)	((phys_addr_t)((pfn) << PAGE_SHIFT))
++#define hyp_phys_to_page(phys)	(&hyp_vmemmap[hyp_phys_to_pfn(phys)])
++#define hyp_virt_to_page(virt)	hyp_phys_to_page(__hyp_pa(virt))
++#define hyp_virt_to_pfn(virt)	hyp_phys_to_pfn(__hyp_pa(virt))
++
++#define hyp_page_to_pfn(page)	((struct hyp_page *)(page) - hyp_vmemmap)
++#define hyp_page_to_phys(page)  hyp_pfn_to_phys((hyp_page_to_pfn(page)))
++#define hyp_page_to_virt(page)	__hyp_va(hyp_page_to_phys(page))
++#define hyp_page_to_pool(page)	(((struct hyp_page *)page)->pool)
++
++static inline int hyp_page_count(void *addr)
++{
++	struct hyp_page *p = hyp_virt_to_page(addr);
++
++	return p->refcount;
++}
++
+ #endif /* __KVM_HYP_MEMORY_H */
 diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-index 24ff99e2eac5..144da72ad510 100644
+index 144da72ad510..6894a917f290 100644
 --- a/arch/arm64/kvm/hyp/nvhe/Makefile
 +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
 @@ -13,7 +13,7 @@ lib-objs := clear_page.o copy_page.o memcpy.o memset.o
  lib-objs := $(addprefix ../../../lib/, $(lib-objs))
  
  obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o \
--	 hyp-main.o hyp-smp.o psci-relay.o early_alloc.o
-+	 hyp-main.o hyp-smp.o psci-relay.o early_alloc.o stub.o
+-	 hyp-main.o hyp-smp.o psci-relay.o early_alloc.o stub.o
++	 hyp-main.o hyp-smp.o psci-relay.o early_alloc.o stub.o page_alloc.o
  obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
  	 ../fpsimd.o ../hyp-entry.o ../exception.o
  obj-y += $(lib-objs)
-diff --git a/arch/arm64/kvm/hyp/nvhe/stub.c b/arch/arm64/kvm/hyp/nvhe/stub.c
+diff --git a/arch/arm64/kvm/hyp/nvhe/page_alloc.c b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
 new file mode 100644
-index 000000000000..c0aa6bbfd79d
+index 000000000000..237e03bf0cb1
 --- /dev/null
-+++ b/arch/arm64/kvm/hyp/nvhe/stub.c
-@@ -0,0 +1,22 @@
++++ b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
+@@ -0,0 +1,195 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +/*
-+ * Stubs for out-of-line function calls caused by re-using kernel
-+ * infrastructure at EL2.
-+ *
-+ * Copyright (C) 2020 - Google LLC
++ * Copyright (C) 2020 Google LLC
++ * Author: Quentin Perret <qperret@google.com>
 + */
 +
-+#include <linux/list.h>
++#include <asm/kvm_hyp.h>
++#include <nvhe/gfp.h>
 +
-+#ifdef CONFIG_DEBUG_LIST
-+bool __list_add_valid(struct list_head *new, struct list_head *prev,
-+		      struct list_head *next)
++u64 __hyp_vmemmap;
++
++/*
++ * Index the hyp_vmemmap to find a potential buddy page, but make no assumption
++ * about its current state.
++ *
++ * Example buddy-tree for a 4-pages physically contiguous pool:
++ *
++ *                 o : Page 3
++ *                /
++ *               o-o : Page 2
++ *              /
++ *             /   o : Page 1
++ *            /   /
++ *           o---o-o : Page 0
++ *    Order  2   1 0
++ *
++ * Example of requests on this pool:
++ *   __find_buddy_nocheck(pool, page 0, order 0) => page 1
++ *   __find_buddy_nocheck(pool, page 0, order 1) => page 2
++ *   __find_buddy_nocheck(pool, page 1, order 0) => page 0
++ *   __find_buddy_nocheck(pool, page 2, order 0) => page 3
++ */
++static struct hyp_page *__find_buddy_nocheck(struct hyp_pool *pool,
++					     struct hyp_page *p,
++					     unsigned int order)
 +{
-+		return true;
++	phys_addr_t addr = hyp_page_to_phys(p);
++
++	addr ^= (PAGE_SIZE << order);
++
++	/*
++	 * Don't return a page outside the pool range -- it belongs to
++	 * something else and may not be mapped in hyp_vmemmap.
++	 */
++	if (addr < pool->range_start || addr >= pool->range_end)
++		return NULL;
++
++	return hyp_phys_to_page(addr);
 +}
 +
-+bool __list_del_entry_valid(struct list_head *entry)
++/* Find a buddy page currently available for allocation */
++static struct hyp_page *__find_buddy_avail(struct hyp_pool *pool,
++					   struct hyp_page *p,
++					   unsigned int order)
 +{
-+		return true;
++	struct hyp_page *buddy = __find_buddy_nocheck(pool, p, order);
++
++	if (!buddy || buddy->order != order || list_empty(&buddy->node))
++		return NULL;
++
++	return buddy;
++
 +}
-+#endif
++
++static void __hyp_attach_page(struct hyp_pool *pool,
++			      struct hyp_page *p)
++{
++	unsigned int order = p->order;
++	struct hyp_page *buddy;
++
++	memset(hyp_page_to_virt(p), 0, PAGE_SIZE << p->order);
++
++	/*
++	 * Only the first struct hyp_page of a high-order page (otherwise known
++	 * as the 'head') should have p->order set. The non-head pages should
++	 * have p->order = HYP_NO_ORDER. Here @p may no longer be the head
++	 * after coallescing, so make sure to mark it HYP_NO_ORDER proactively.
++	 */
++	p->order = HYP_NO_ORDER;
++	for (; (order + 1) < pool->max_order; order++) {
++		buddy = __find_buddy_avail(pool, p, order);
++		if (!buddy)
++			break;
++
++		/* Take the buddy out of its list, and coallesce with @p */
++		list_del_init(&buddy->node);
++		buddy->order = HYP_NO_ORDER;
++		p = min(p, buddy);
++	}
++
++	/* Mark the new head, and insert it */
++	p->order = order;
++	list_add_tail(&p->node, &pool->free_area[order]);
++}
++
++static void hyp_attach_page(struct hyp_page *p)
++{
++	struct hyp_pool *pool = hyp_page_to_pool(p);
++
++	hyp_spin_lock(&pool->lock);
++	__hyp_attach_page(pool, p);
++	hyp_spin_unlock(&pool->lock);
++}
++
++static struct hyp_page *__hyp_extract_page(struct hyp_pool *pool,
++					   struct hyp_page *p,
++					   unsigned int order)
++{
++	struct hyp_page *buddy;
++
++	list_del_init(&p->node);
++	while (p->order > order) {
++		/*
++		 * The buddy of order n - 1 currently has HYP_NO_ORDER as it
++		 * is covered by a higher-level page (whose head is @p). Use
++		 * __find_buddy_nocheck() to find it and inject it in the
++		 * free_list[n - 1], effectively splitting @p in half.
++		 */
++		p->order--;
++		buddy = __find_buddy_nocheck(pool, p, p->order);
++		buddy->order = p->order;
++		list_add_tail(&buddy->node, &pool->free_area[buddy->order]);
++	}
++
++	return p;
++}
++
++void hyp_put_page(void *addr)
++{
++	struct hyp_page *p = hyp_virt_to_page(addr);
++
++	if (hyp_page_ref_dec_and_test(p))
++		hyp_attach_page(p);
++}
++
++void hyp_get_page(void *addr)
++{
++	struct hyp_page *p = hyp_virt_to_page(addr);
++
++	hyp_page_ref_inc(p);
++}
++
++void *hyp_alloc_pages(struct hyp_pool *pool, unsigned int order)
++{
++	unsigned int i = order;
++	struct hyp_page *p;
++
++	hyp_spin_lock(&pool->lock);
++
++	/* Look for a high-enough-order page */
++	while (i < pool->max_order && list_empty(&pool->free_area[i]))
++		i++;
++	if (i >= pool->max_order) {
++		hyp_spin_unlock(&pool->lock);
++		return NULL;
++	}
++
++	/* Extract it from the tree at the right order */
++	p = list_first_entry(&pool->free_area[i], struct hyp_page, node);
++	p = __hyp_extract_page(pool, p, order);
++
++	hyp_spin_unlock(&pool->lock);
++	hyp_set_page_refcounted(p);
++
++	return hyp_page_to_virt(p);
++}
++
++int hyp_pool_init(struct hyp_pool *pool, u64 pfn, unsigned int nr_pages,
++		  unsigned int reserved_pages)
++{
++	phys_addr_t phys = hyp_pfn_to_phys(pfn);
++	struct hyp_page *p;
++	int i;
++
++	hyp_spin_lock_init(&pool->lock);
++	pool->max_order = min(MAX_ORDER, get_order(nr_pages << PAGE_SHIFT));
++	for (i = 0; i < pool->max_order; i++)
++		INIT_LIST_HEAD(&pool->free_area[i]);
++	pool->range_start = phys;
++	pool->range_end = phys + (nr_pages << PAGE_SHIFT);
++
++	/* Init the vmemmap portion */
++	p = hyp_phys_to_page(phys);
++	memset(p, 0, sizeof(*p) * nr_pages);
++	for (i = 0; i < nr_pages; i++) {
++		p[i].pool = pool;
++		INIT_LIST_HEAD(&p[i].node);
++	}
++
++	/* Attach the unused pages to the buddy tree */
++	for (i = reserved_pages; i < nr_pages; i++)
++		__hyp_attach_page(pool, &p[i]);
++
++	return 0;
++}
 -- 
 2.31.0.rc2.261.g7f71774620-goog
 
