@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 868C5C433DB
-	for <kvmarm@archiver.kernel.org>; Mon, 22 Mar 2021 11:27:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4C17C433C1
+	for <kvmarm@archiver.kernel.org>; Mon, 22 Mar 2021 11:33:32 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id F13C56198E
-	for <kvmarm@archiver.kernel.org>; Mon, 22 Mar 2021 11:27:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F13C56198E
+	by mail.kernel.org (Postfix) with ESMTP id 4F75961992
+	for <kvmarm@archiver.kernel.org>; Mon, 22 Mar 2021 11:33:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F75961992
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7DF814B422;
-	Mon, 22 Mar 2021 07:27:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E34C04B411;
+	Mon, 22 Mar 2021 07:33:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ulEoJTwqPK8I; Mon, 22 Mar 2021 07:27:50 -0400 (EDT)
+	with ESMTP id inb3QizwnsdG; Mon, 22 Mar 2021 07:33:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 752A04B1DC;
-	Mon, 22 Mar 2021 07:27:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DACCF4B41A;
+	Mon, 22 Mar 2021 07:33:29 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A17B4B411
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Mar 2021 07:27:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 91C8F4B3B5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Mar 2021 07:33:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UsrjaJyISsl5 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 22 Mar 2021 07:27:48 -0400 (EDT)
+ with ESMTP id bCXtBhcbDIRX for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 22 Mar 2021 07:33:27 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 685B54B0E4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Mar 2021 07:27:48 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 7C85F6191F;
- Mon, 22 Mar 2021 11:27:44 +0000 (UTC)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8F9404B2BF
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Mar 2021 07:33:27 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id BC56061984;
+ Mon, 22 Mar 2021 11:33:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1616412467;
- bh=2rQCKuAt/izeJLTYF4MTljlVoBabkTjdYFUOiQ846kg=;
+ s=k20201202; t=1616412806;
+ bh=6NU8CoeVuy+xBCKoKihnD9B6AGKpzEVVYiFH3UaLDyk=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=hCdtEo/cGqar4OAPPbwzZ28D6YUm9xkGkk1tyTKkmhP5BD0PvzRwzSgkiCBHJAHi3
- 0Oi+rd9f0hcStg2vT2O9d7ZbUfYzXiJdeqZcXb9Ep/TxIScPofF1zjqC16ZAlJeIxt
- QsT72YQmboZA/spmbvmXpElGMuaRW9TfpgpoP5EL2NSZNf8MFAJYAM98BddOjwfg2f
- C1oL7A2WJbicW71oOLiWXHvVnxBpNesdUlv2Gek+l4o+2ydE6+/ijgQs+EiILfSYm+
- lPzMM8JFbFyGUpV+oX40F9xnPg1R8+0vIof9WNSw2uQxt47WjJFWBpJdWbMGLtz9xw
- 1NDgNzSETgyYg==
-Date: Mon, 22 Mar 2021 11:27:41 +0000
+ b=hcbvPInN/ygnKoUF6quhfsskpgiEr0UaC3QmE06DLMyacDxFWj+MwPETGfaf9kYGu
+ zDo7TsVsbSvfUWsGBeSSHa9NyS/b4HH7jpnn3sLEfg//A5Eu11MfxLgCgLccuEy8l9
+ HHFt9/qD3rDSNTFpTLaVB0DvvTqwAYO0/OH5HnZk97F8bkKwggzVb/95O5141sXFfJ
+ ZsHoZoZBw546UT6xSQXDl3llEHxCXeuKrqtmzQP9SeREnlannavgbOwyGo22j6F608
+ mMAMYez9XflctPuRnTyskBuBxYBCX38k0pvKQVqVymzOsx6ApySA67mKOWOgLMYPBh
+ 7lY6nKkCYnOXw==
+Date: Mon, 22 Mar 2021 11:33:20 +0000
 From: Will Deacon <will@kernel.org>
 To: Quentin Perret <qperret@google.com>
-Subject: Re: [PATCH v6 29/38] KVM: arm64: Use page-table to track page
- ownership
-Message-ID: <20210322112741.GC10318@willie-the-truck>
+Subject: Re: [PATCH v6 33/38] KVM: arm64: Introduce KVM_PGTABLE_S2_IDMAP
+ stage 2 flag
+Message-ID: <20210322113320.GD10318@willie-the-truck>
 References: <20210319100146.1149909-1-qperret@google.com>
- <20210319100146.1149909-30-qperret@google.com>
+ <20210319100146.1149909-34-qperret@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20210319100146.1149909-30-qperret@google.com>
+In-Reply-To: <20210319100146.1149909-34-qperret@google.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Cc: android-kvm@google.com, catalin.marinas@arm.com, mate.toth-pal@arm.com,
  seanjc@google.com, tabba@google.com, linux-kernel@vger.kernel.org,
@@ -82,31 +82,45 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Mar 19, 2021 at 10:01:37AM +0000, Quentin Perret wrote:
-> As the host stage 2 will be identity mapped, all the .hyp memory regions
-> and/or memory pages donated to protected guestis will have to marked
-> invalid in the host stage 2 page-table. At the same time, the hypervisor
-> will need a way to track the ownership of each physical page to ensure
-> memory sharing or donation between entities (host, guests, hypervisor) is
-> legal.
+On Fri, Mar 19, 2021 at 10:01:41AM +0000, Quentin Perret wrote:
+> Introduce a new stage 2 configuration flag to specify that all mappings
+> in a given page-table will be identity-mapped, as will be the case for
+> the host. This allows to introduce sanity checks in the map path and to
+> avoid programming errors.
 > 
-> In order to enable this tracking at EL2, let's use the host stage 2
-> page-table itself. The idea is to use the top bits of invalid mappings
-> to store the unique identifier of the page owner. The page-table owner
-> (the host) gets identifier 0 such that, at boot time, it owns the entire
-> IPA space as the pgd starts zeroed.
-> 
-> Provide kvm_pgtable_stage2_set_owner() which allows to modify the
-> ownership of pages in the host stage 2. It re-uses most of the map()
-> logic, but ends up creating invalid mappings instead. This impacts
-> how we do refcount as we now need to count invalid mappings when they
-> are used for ownership tracking.
-> 
+> Suggested-by: Will Deacon <will@kernel.org>
 > Signed-off-by: Quentin Perret <qperret@google.com>
 > ---
->  arch/arm64/include/asm/kvm_pgtable.h |  20 +++++
->  arch/arm64/kvm/hyp/pgtable.c         | 126 ++++++++++++++++++++++-----
->  2 files changed, 122 insertions(+), 24 deletions(-)
+>  arch/arm64/include/asm/kvm_pgtable.h | 2 ++
+>  arch/arm64/kvm/hyp/pgtable.c         | 3 +++
+>  2 files changed, 5 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index 55452f4831d2..c3674c47d48c 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -60,9 +60,11 @@ struct kvm_pgtable_mm_ops {
+>   * enum kvm_pgtable_stage2_flags - Stage-2 page-table flags.
+>   * @KVM_PGTABLE_S2_NOFWB:	Don't enforce Normal-WB even if the CPUs have
+>   *				ARM64_HAS_STAGE2_FWB.
+> + * @KVM_PGTABLE_S2_IDMAP:	Only use identity mappings.
+>   */
+>  enum kvm_pgtable_stage2_flags {
+>  	KVM_PGTABLE_S2_NOFWB			= BIT(0),
+> +	KVM_PGTABLE_S2_IDMAP			= BIT(1),
+>  };
+>  
+>  /**
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index b22b4860630c..c37c1dc4feaf 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -760,6 +760,9 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+>  		.arg		= &map_data,
+>  	};
+>  
+> +	if (WARN_ON((pgt->flags & KVM_PGTABLE_S2_IDMAP) && (addr != phys)))
+> +		return -EINVAL;
 
 Acked-by: Will Deacon <will@kernel.org>
 
