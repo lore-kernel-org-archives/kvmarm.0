@@ -3,87 +3,87 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A093C433C1
-	for <kvmarm@archiver.kernel.org>; Tue, 23 Mar 2021 09:47:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63481C433E0
+	for <kvmarm@archiver.kernel.org>; Tue, 23 Mar 2021 09:47:58 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D26E6619C0
-	for <kvmarm@archiver.kernel.org>; Tue, 23 Mar 2021 09:47:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D26E6619C0
+	by mail.kernel.org (Postfix) with ESMTP id D8495619C2
+	for <kvmarm@archiver.kernel.org>; Tue, 23 Mar 2021 09:47:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8495619C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 46FCE4B401;
-	Tue, 23 Mar 2021 05:47:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E49E4B414;
+	Tue, 23 Mar 2021 05:47:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id hKZvsCwvAe1d; Tue, 23 Mar 2021 05:47:15 -0400 (EDT)
+	with ESMTP id Twm8YStFo41y; Tue, 23 Mar 2021 05:47:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 474D94B3E8;
-	Tue, 23 Mar 2021 05:47:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7304F4B3E8;
+	Tue, 23 Mar 2021 05:47:56 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C7924B3E5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Mar 2021 05:47:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D5C724B3E8
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Mar 2021 05:47:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OULiGgk9UEix for <kvmarm@lists.cs.columbia.edu>;
- Tue, 23 Mar 2021 05:47:13 -0400 (EDT)
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com
- [209.85.221.48])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EE5484B3B0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Mar 2021 05:47:12 -0400 (EDT)
-Received: by mail-wr1-f48.google.com with SMTP id v4so20054934wrp.13
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Mar 2021 02:47:12 -0700 (PDT)
+ with ESMTP id svhVcfUY+EI8 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 23 Mar 2021 05:47:54 -0400 (EDT)
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com
+ [209.85.221.41])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E6E3E4B3E5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Mar 2021 05:47:53 -0400 (EDT)
+Received: by mail-wr1-f41.google.com with SMTP id e9so20055060wrw.10
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Mar 2021 02:47:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=oEiL3agt/74r7enmoTbEE0QlFnF8CJn1Y4avzKhgTiU=;
- b=YUFx/qgDiqyZgnG8fBQV5CEOQ9+BCRiJTNLw0U/Sjtwv7xDzYaCvOnt/DijlqjJDeq
- 4gQ1ijgTeZbWSdb+trVyRWjQKbmgFIyw4kGzPHLfck/FJdRXsv6bJpcjqeUqY7ghYvwq
- pRcEi12K2xC6zj3zsdQHR7GQAz649sWNk0M5X3vcihlgBrPbW/ysFTU3zhgqPGfOiyln
- Ce/J3a+l+5yKFk7jm7otSR8CvCnQGsnVqlJVGNBKTlVXojSRlpjhpm+gC9AtYVeX6D4+
- uJijgatuuL+mfS0/3DkfrCgbc1Hn0xyCXdplBpsN8aHekogkBv5nmPi8VJ893Vsd2gbg
- iDTA==
+ bh=CFy34a5oRP6FBo34jkzCBDrM18ET5oxeV6C09KGor/M=;
+ b=fLnTZIW+ncV0V4pak/1zB/4eGA2vCG0u8582JlaRuKJaekepck3Hi51f15dz/ZWlxz
+ sQUvU6WQ+PnQl5ejeXthi6pN4WHunjYv9+RVag/vl+JjIlaFfcjUiJj2SdcFMJdSpcEN
+ 4fbKMtXCvaxkH5oqnf983GkVGeMgxjerVGs3H0Xnw48l0XHHV5AgEkQisTeP3US4wJ1i
+ M+MOMHNzAbxPAZ1zFxg5Qx8q7oLZhxqoomj51Gs9va0UXqRKA9cDLvg/wDDQO7/9rCI2
+ aYm0pJQgp8mSu9HyMPZBMGm3YhgaA2hVcvcQWQrBNUheqOFP+G6LTR1Y+m4Bp5w1e9+H
+ feMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=oEiL3agt/74r7enmoTbEE0QlFnF8CJn1Y4avzKhgTiU=;
- b=oPGdRgDf7oDEEma4uE4ZGRCpRFwfwAInqG29cTVXatt7x3difMuPiqAGK64Vx2ZB89
- n7Z6urWseoMRYWHDTztT4x2CWoA7UZAsyBlRKOgk21pkuVGgrBADm1pRPyITvSBN5HA6
- ZVWz1PRIOvI4WksOhyISkK7IAvdEzabAFk7NeuiIpJ5C/iptLqM4A+86hHrBXrzExv1Y
- AW1uM4FT3pKLDaY4O/PHMqPhCt0+cuL0xG6pId4s43RuNGs5WEMVDHVM0DvBzpW1Ghlt
- gPjzASvnOr6xtcpc+Ir+R+a/m7EsB4IGUBbNZXe5dzAWB6hXTVvSHsuh4R6H8pYPDIh+
- 41Vg==
-X-Gm-Message-State: AOAM532CoP6YCCb5Sc3bQv2GLv2rgTgHvG5Gz/1Bd2IeXAcyexgRMZ5c
- 2mn0l0oYp6PgtfYzHhbyTDS2Cw==
-X-Google-Smtp-Source: ABdhPJwZod2yQE1XjdtryqkkNyVhfuXXaVYhV4/ZQg1dkULLQ1uIrVQJ3DN+46T9qwKAV2wA8h4DIw==
-X-Received: by 2002:adf:ee4f:: with SMTP id w15mr3039063wro.199.1616492831791; 
- Tue, 23 Mar 2021 02:47:11 -0700 (PDT)
+ bh=CFy34a5oRP6FBo34jkzCBDrM18ET5oxeV6C09KGor/M=;
+ b=BLoeM01rVTZClkPC9Npk75rXfNnlem+P1S2FHLTEChBxLLgEY+xzRM/wT2fb4VzQKc
+ NRx1UZ6XLC5HC3OB/BqIglsgIedKYbAlaTZLStjTxoLDRWxQpEowkAo8r5n7WCIYd0jS
+ OLNW5Y/8p/YjKVKCXoZa2UAlwgREGh9oR8w3oxBLiqzGJjHaq90PcUOvPZe0StfQmEbU
+ oIdyHKY1X1CAUlXRtLIYH+7jj2RXCoHH2O/YnpXW5C/tPMz1+uTrI3CvwvoHIzcExSGb
+ x4pcqnP+n6u6JukGZYgOhWLWuBpT8uC9i/6XZmuGLRhUmFv3qXhqJphFmweGSAsZpGyT
+ xBmg==
+X-Gm-Message-State: AOAM5304v7QLucBSqXCIOgV6JyGQR/XWbMWgyjALZk5MPw+pNV9r4a99
+ hAIsJW97FnTNr6BBkvdj0DqcJA==
+X-Google-Smtp-Source: ABdhPJy48bd7zMN/7IQI/7qwsmEMtZoUKMwW7NIyR6X4/+xBeETwQsu0Z7rjmuADJ6dWg+IBGOQErA==
+X-Received: by 2002:a05:6000:4b:: with SMTP id
+ k11mr3023308wrx.35.1616492873041; 
+ Tue, 23 Mar 2021 02:47:53 -0700 (PDT)
 Received: from google.com (230.69.233.35.bc.googleusercontent.com.
  [35.233.69.230])
- by smtp.gmail.com with ESMTPSA id k4sm29442912wrd.9.2021.03.23.02.47.11
+ by smtp.gmail.com with ESMTPSA id h62sm2322264wmf.37.2021.03.23.02.47.52
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 23 Mar 2021 02:47:11 -0700 (PDT)
-Date: Tue, 23 Mar 2021 09:47:08 +0000
+ Tue, 23 Mar 2021 02:47:52 -0700 (PDT)
+Date: Tue, 23 Mar 2021 09:47:50 +0000
 From: Quentin Perret <qperret@google.com>
 To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 2/3] KVM: arm64: Generate final CTR_EL0 value when
- running in Protected mode
-Message-ID: <YFm5HIC/2Toowhnx@google.com>
-References: <20210322164828.800662-1-maz@kernel.org>
- <20210322164828.800662-3-maz@kernel.org>
- <YFjWmHerKk7+9d7N@google.com> <87k0pzghlx.wl-maz@kernel.org>
+Subject: Re: [PATCH v2 3/3] KVM: arm64: Drop the CPU_FTR_REG_HYP_COPY
+ infrastructure
+Message-ID: <YFm5Rsz8HlKo2sss@google.com>
+References: <20210322175639.801566-1-maz@kernel.org>
+ <20210322175639.801566-4-maz@kernel.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <87k0pzghlx.wl-maz@kernel.org>
+In-Reply-To: <20210322175639.801566-4-maz@kernel.org>
 Cc: android-kvm@google.com, catalin.marinas@arm.com, mate.toth-pal@arm.com,
  tabba@google.com, linux-kernel@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org, seanjc@google.com,
@@ -104,35 +104,17 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+On Monday 22 Mar 2021 at 17:56:39 (+0000), Marc Zyngier wrote:
+> Now that the read_ctr macro has been specialised for nVHE,
+> the whole CPU_FTR_REG_HYP_COPY infrastrcture looks completely
+> overengineered.
+> 
+> Simplify it by populating the two u64 quantities (MMFR0 and 1)
+> that the hypervisor need.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-On Monday 22 Mar 2021 at 18:37:14 (+0000), Marc Zyngier wrote:
-> Can't say I'm keen on the yucky bit, but here's an alternative (ha!)
-> for you:
-> 
-> diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
-> index 1a4cee7eb3c9..7582c3bd2f05 100644
-> --- a/arch/arm64/include/asm/assembler.h
-> +++ b/arch/arm64/include/asm/assembler.h
-> @@ -278,6 +278,9 @@ alternative_else
->  	ldr_l	\reg, arm64_ftr_reg_ctrel0 + ARM64_FTR_SYSVAL
->  alternative_endif
->  #else
-> +alternative_if_not ARM64_KVM_PROTECTED_MODE
-> +	ASM_BUG()
-> +alternative_else_nop_endif
->  alternative_cb kvm_compute_final_ctr_el0
->  	movz	\reg, #0
->  	movk	\reg, #0, lsl #16
-> 
-> Yes, it is one more instruction, but it is cleaner and allows us to
-> from the first patch of the series.
-> 
-> What do you think?
-
-Yes, I think having the ASM_BUG() in this macro is bit nicer and I doubt
-the additional nop will make any difference, so this is looking good to
-me!
+Reviewed-by: Quentin Perret <qperret@google.com>
 
 Thanks,
 Quentin
