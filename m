@@ -2,59 +2,74 @@ Return-Path: <SRS0=T+on=IV=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=ham
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36B1DC433C1
-	for <kvmarm@archiver.kernel.org>; Tue, 23 Mar 2021 16:33:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B3FBC433DB
+	for <kvmarm@archiver.kernel.org>; Tue, 23 Mar 2021 17:03:17 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 995E9619BB
-	for <kvmarm@archiver.kernel.org>; Tue, 23 Mar 2021 16:33:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 995E9619BB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id B2A48619BB
+	for <kvmarm@archiver.kernel.org>; Tue, 23 Mar 2021 17:03:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2A48619BB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D9AB4B382;
-	Tue, 23 Mar 2021 12:33:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DB1E4B3D7;
+	Tue, 23 Mar 2021 13:03:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id UymwKy9qiwO5; Tue, 23 Mar 2021 12:33:04 -0400 (EDT)
+	with ESMTP id lhMV9qiPGANj; Tue, 23 Mar 2021 13:03:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CCE04B3D7;
-	Tue, 23 Mar 2021 12:33:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D0A4C4B2B4;
+	Tue, 23 Mar 2021 13:03:14 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 46C584B39E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Mar 2021 12:33:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4834F4B376
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Mar 2021 13:03:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4xjvhuFn0h4t for <kvmarm@lists.cs.columbia.edu>;
- Tue, 23 Mar 2021 12:33:01 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A64004B382
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Mar 2021 12:33:01 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 31778D6E;
- Tue, 23 Mar 2021 09:33:01 -0700 (PDT)
-Received: from slackpad.fritz.box (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 50F9B3F718;
- Tue, 23 Mar 2021 09:33:00 -0700 (PDT)
-Date: Tue, 23 Mar 2021 16:32:54 +0000
-From: Andre Przywara <andre.przywara@arm.com>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [kvm-unit-tests PATCH v2 2/6] arm/arm64: Remove
- dcache_line_size global variable
-Message-ID: <20210323163254.76a1e35a@slackpad.fritz.box>
-In-Reply-To: <20210322150641.58878-3-alexandru.elisei@arm.com>
-References: <20210322150641.58878-1-alexandru.elisei@arm.com>
- <20210322150641.58878-3-alexandru.elisei@arm.com>
-Organization: Arm Ltd.
-X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
-MIME-Version: 1.0
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+ with ESMTP id QdtSFn0nN7Gl for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 23 Mar 2021 13:03:12 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 315C34B28C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Mar 2021 13:03:12 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 32DFD619BA;
+ Tue, 23 Mar 2021 17:03:10 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1lOkQu-003LrN-7H; Tue, 23 Mar 2021 17:03:08 +0000
+Date: Tue, 23 Mar 2021 17:03:02 +0000
+Message-ID: <87tup1kdkp.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Keqian Zhu <zhukeqian1@huawei.com>,  Yoan Picchi <yoan.picchi@arm.com>
+Subject: Re: [PATCH 1/7] KVM: arm64: Add two page mapping counters for kvm_stat
+In-Reply-To: <fe120fea-b2a3-d80f-38df-2430a0b2029e@huawei.com>
+References: <20210319161711.24972-1-yoan.picchi@arm.com>
+ <20210319161711.24972-2-yoan.picchi@arm.com>
+ <fe120fea-b2a3-d80f-38df-2430a0b2029e@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: zhukeqian1@huawei.com, yoan.picchi@arm.com,
+ james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ catalin.marinas@arm.com, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: catalin.marinas@arm.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,317 +86,81 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 22 Mar 2021 15:06:37 +0000
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-
-> Compute the dcache line size when doing dcache maintenance instead of using
-> a global variable computed in setup(), which allows us to do dcache
-> maintenance at any point in the boot process. This will be useful for
-> running as an EFI app and it also aligns our implementation to that of the
-> Linux kernel. As a result, the dcache_by_line_op assembly has been modified
-> to take a range described by start address and size, instead of start and
-> end addresses.
+On Tue, 23 Mar 2021 11:52:38 +0000,
+Keqian Zhu <zhukeqian1@huawei.com> wrote:
 > 
-> For consistency, the arm code has been similary modified.
+> Hi Yoan,
 > 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> On 2021/3/20 0:17, Yoan Picchi wrote:
+> > Add a counter for when a regular page is mapped, and another
+> > for when a huge page is mapped.
+> > 
+> > Signed-off-by: Yoan Picchi <yoan.picchi@arm.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h | 2 ++
+> >  arch/arm64/kvm/guest.c            | 2 ++
+> >  arch/arm64/kvm/mmu.c              | 7 +++++++
+> >  3 files changed, 11 insertions(+)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 3d10e6527..863603285 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -561,6 +561,8 @@ struct kvm_vcpu_stat {
+> >  	u64 wfi_exit_stat;
+> >  	u64 mmio_exit_user;
+> >  	u64 mmio_exit_kernel;
+> > +	u64 regular_page_mapped;
+> > +	u64 huge_page_mapped;
+> >  	u64 exits;
+> >  };
+> >  
+> > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> > index 9bbd30e62..14b15fb8f 100644
+> > --- a/arch/arm64/kvm/guest.c
+> > +++ b/arch/arm64/kvm/guest.c
+> > @@ -38,6 +38,8 @@ struct kvm_stats_debugfs_item debugfs_entries[] = {
+> >  	VCPU_STAT("wfi_exit_stat", wfi_exit_stat),
+> >  	VCPU_STAT("mmio_exit_user", mmio_exit_user),
+> >  	VCPU_STAT("mmio_exit_kernel", mmio_exit_kernel),
+> > +	VCPU_STAT("regular_page_mapped", regular_page_mapped),
+> > +	VCPU_STAT("huge_page_mapped", huge_page_mapped),
+> >  	VCPU_STAT("exits", exits),
+> >  	VCPU_STAT("halt_poll_success_ns", halt_poll_success_ns),
+> >  	VCPU_STAT("halt_poll_fail_ns", halt_poll_fail_ns),
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index 77cb2d28f..3996b28da 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -914,6 +914,13 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >  		mark_page_dirty(kvm, gfn);
+> >  	}
+> >  
+> > +	if (ret >= 0) {
+> > +		if (vma_pagesize == PAGE_SIZE) {
+> > +			vcpu->stat.regular_page_mapped++;
+> > +		} else {
+> > +			vcpu->stat.huge_page_mapped++;
+> > +		}
+> > +	}
+> This looks too simple, as we don't always map a new regular_page or
+> huge_page here.  We may just relax permission or change mapping
+> size, etc. If we mix these operations, the stat result seems not
+> very valuable...
 
-Thanks for the changes, looks good now.
+I can only agree. There is no such thing as a *huge page*. We have a
+whole gamut of block mappings depending on the base granule size, and
+we even have concatenation of pages/blocks (not yet implemented at S2,
+but there is hope...).
 
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+What is this trying to express?
 
-Cheers,
-Andre
+Thanks,
 
-> ---
->  lib/arm/asm/assembler.h   | 53 ++++++++++++++++++++++++++++++++++++++
->  lib/arm/asm/processor.h   |  7 -----
->  lib/arm64/asm/assembler.h | 54 +++++++++++++++++++++++++++++++++++++++
->  lib/arm64/asm/processor.h |  7 -----
->  lib/arm/setup.c           |  7 -----
->  arm/cstart.S              | 18 +++----------
->  arm/cstart64.S            | 16 ++----------
->  7 files changed, 112 insertions(+), 50 deletions(-)
->  create mode 100644 lib/arm/asm/assembler.h
->  create mode 100644 lib/arm64/asm/assembler.h
-> 
-> diff --git a/lib/arm/asm/assembler.h b/lib/arm/asm/assembler.h
-> new file mode 100644
-> index 000000000000..dfd3c51bf6ad
-> --- /dev/null
-> +++ b/lib/arm/asm/assembler.h
-> @@ -0,0 +1,53 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Based on several files from Linux version v5.10: arch/arm/mm/proc-macros.S,
-> + * arch/arm/mm/proc-v7.S.
-> + */
-> +
-> +#ifndef __ASSEMBLY__
-> +#error "Only include this from assembly code"
-> +#endif
-> +
-> +#ifndef __ASM_ASSEMBLER_H
-> +#define __ASM_ASSEMBLER_H
-> +
-> +/*
-> + * dcache_line_size - get the minimum D-cache line size from the CTR register
-> + * on ARMv7.
-> + */
-> +	.macro	dcache_line_size, reg, tmp
-> +	mrc	p15, 0, \tmp, c0, c0, 1		// read ctr
-> +	lsr	\tmp, \tmp, #16
-> +	and	\tmp, \tmp, #0xf		// cache line size encoding
-> +	mov	\reg, #4			// bytes per word
-> +	mov	\reg, \reg, lsl \tmp		// actual cache line size
-> +	.endm
-> +
-> +/*
-> + * Macro to perform a data cache maintenance for the interval
-> + * [addr, addr + size).
-> + *
-> + * 	op:		operation to execute
-> + * 	domain		domain used in the dsb instruction
-> + * 	addr:		starting virtual address of the region
-> + * 	size:		size of the region
-> + * 	Corrupts:	addr, size, tmp1, tmp2
-> + */
-> +	.macro dcache_by_line_op op, domain, addr, size, tmp1, tmp2
-> +	dcache_line_size \tmp1, \tmp2
-> +	add	\size, \addr, \size
-> +	sub	\tmp2, \tmp1, #1
-> +	bic	\addr, \addr, \tmp2
-> +9998:
-> +	.ifc	\op, dccimvac
-> +	mcr	p15, 0, \addr, c7, c14, 1
-> +	.else
-> +	.err
-> +	.endif
-> +	add	\addr, \addr, \tmp1
-> +	cmp	\addr, \size
-> +	blo	9998b
-> +	dsb	\domain
-> +	.endm
-> +
-> +#endif	/* __ASM_ASSEMBLER_H */
-> diff --git a/lib/arm/asm/processor.h b/lib/arm/asm/processor.h
-> index 273366d1fe1c..3c36eac903f0 100644
-> --- a/lib/arm/asm/processor.h
-> +++ b/lib/arm/asm/processor.h
-> @@ -9,11 +9,6 @@
->  #include <asm/sysreg.h>
->  #include <asm/barrier.h>
->  
-> -#define CTR_DMINLINE_SHIFT	16
-> -#define CTR_DMINLINE_MASK	(0xf << 16)
-> -#define CTR_DMINLINE(x)	\
-> -	(((x) & CTR_DMINLINE_MASK) >> CTR_DMINLINE_SHIFT)
-> -
->  enum vector {
->  	EXCPTN_RST,
->  	EXCPTN_UND,
-> @@ -89,6 +84,4 @@ static inline u32 get_ctr(void)
->  	return read_sysreg(CTR);
->  }
->  
-> -extern unsigned long dcache_line_size;
-> -
->  #endif /* _ASMARM_PROCESSOR_H_ */
-> diff --git a/lib/arm64/asm/assembler.h b/lib/arm64/asm/assembler.h
-> new file mode 100644
-> index 000000000000..0a6ab9720bdd
-> --- /dev/null
-> +++ b/lib/arm64/asm/assembler.h
-> @@ -0,0 +1,54 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Based on the file arch/arm64/include/asm/assembled.h from Linux v5.10, which
-> + * in turn is based on arch/arm/include/asm/assembler.h and
-> + * arch/arm/mm/proc-macros.S
-> + *
-> + * Copyright (C) 1996-2000 Russell King
-> + * Copyright (C) 2012 ARM Ltd.
-> + */
-> +
-> +#ifndef __ASSEMBLY__
-> +#error "Only include this from assembly code"
-> +#endif
-> +
-> +#ifndef __ASM_ASSEMBLER_H
-> +#define __ASM_ASSEMBLER_H
-> +
-> +/*
-> + * raw_dcache_line_size - get the minimum D-cache line size on this CPU
-> + * from the CTR register.
-> + */
-> +	.macro	raw_dcache_line_size, reg, tmp
-> +	mrs	\tmp, ctr_el0			// read CTR
-> +	ubfx	\tmp, \tmp, #16, #4		// cache line size encoding
-> +	mov	\reg, #4			// bytes per word
-> +	lsl	\reg, \reg, \tmp		// actual cache line size
-> +	.endm
-> +
-> +/*
-> + * Macro to perform a data cache maintenance for the interval
-> + * [addr, addr + size). Use the raw value for the dcache line size because
-> + * kvm-unit-tests has no concept of scheduling.
-> + *
-> + * 	op:		operation passed to dc instruction
-> + * 	domain:		domain used in dsb instruciton
-> + * 	addr:		starting virtual address of the region
-> + * 	size:		size of the region
-> + * 	Corrupts:	addr, size, tmp1, tmp2
-> + */
-> +
-> +	.macro dcache_by_line_op op, domain, addr, size, tmp1, tmp2
-> +	raw_dcache_line_size \tmp1, \tmp2
-> +	add	\size, \addr, \size
-> +	sub	\tmp2, \tmp1, #1
-> +	bic	\addr, \addr, \tmp2
-> +9998:
-> +	dc	\op, \addr
-> +	add	\addr, \addr, \tmp1
-> +	cmp	\addr, \size
-> +	b.lo	9998b
-> +	dsb	\domain
-> +	.endm
-> +
-> +#endif	/* __ASM_ASSEMBLER_H */
-> diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
-> index 771b2d1e0c94..cdc2463e1981 100644
-> --- a/lib/arm64/asm/processor.h
-> +++ b/lib/arm64/asm/processor.h
-> @@ -16,11 +16,6 @@
->  #define SCTLR_EL1_A	(1 << 1)
->  #define SCTLR_EL1_M	(1 << 0)
->  
-> -#define CTR_DMINLINE_SHIFT	16
-> -#define CTR_DMINLINE_MASK	(0xf << 16)
-> -#define CTR_DMINLINE(x)	\
-> -	(((x) & CTR_DMINLINE_MASK) >> CTR_DMINLINE_SHIFT)
-> -
->  #ifndef __ASSEMBLY__
->  #include <asm/ptrace.h>
->  #include <asm/esr.h>
-> @@ -115,8 +110,6 @@ static inline u64 get_ctr(void)
->  	return read_sysreg(ctr_el0);
->  }
->  
-> -extern unsigned long dcache_line_size;
-> -
->  static inline unsigned long get_id_aa64mmfr0_el1(void)
->  {
->  	return read_sysreg(id_aa64mmfr0_el1);
-> diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-> index 066524f8bf61..751ba980000a 100644
-> --- a/lib/arm/setup.c
-> +++ b/lib/arm/setup.c
-> @@ -42,8 +42,6 @@ static struct mem_region __initial_mem_regions[NR_INITIAL_MEM_REGIONS + 1];
->  struct mem_region *mem_regions = __initial_mem_regions;
->  phys_addr_t __phys_offset, __phys_end;
->  
-> -unsigned long dcache_line_size;
-> -
->  int mpidr_to_cpu(uint64_t mpidr)
->  {
->  	int i;
-> @@ -72,11 +70,6 @@ static void cpu_init(void)
->  	ret = dt_for_each_cpu_node(cpu_set, NULL);
->  	assert(ret == 0);
->  	set_cpu_online(0, true);
-> -	/*
-> -	 * DminLine is log2 of the number of words in the smallest cache line; a
-> -	 * word is 4 bytes.
-> -	 */
-> -	dcache_line_size = 1 << (CTR_DMINLINE(get_ctr()) + 2);
->  }
->  
->  unsigned int mem_region_get_flags(phys_addr_t paddr)
-> diff --git a/arm/cstart.S b/arm/cstart.S
-> index ef936ae2f874..954748b00f64 100644
-> --- a/arm/cstart.S
-> +++ b/arm/cstart.S
-> @@ -7,6 +7,7 @@
->   */
->  #define __ASSEMBLY__
->  #include <auxinfo.h>
-> +#include <asm/assembler.h>
->  #include <asm/thread_info.h>
->  #include <asm/asm-offsets.h>
->  #include <asm/pgtable-hwdef.h>
-> @@ -197,20 +198,6 @@ asm_mmu_enable:
->  
->  	mov     pc, lr
->  
-> -.macro dcache_clean_inval domain, start, end, tmp1, tmp2
-> -	ldr	\tmp1, =dcache_line_size
-> -	ldr	\tmp1, [\tmp1]
-> -	sub	\tmp2, \tmp1, #1
-> -	bic	\start, \start, \tmp2
-> -9998:
-> -	/* DCCIMVAC */
-> -	mcr	p15, 0, \start, c7, c14, 1
-> -	add	\start, \start, \tmp1
-> -	cmp	\start, \end
-> -	blo	9998b
-> -	dsb	\domain
-> -.endm
-> -
->  .globl asm_mmu_disable
->  asm_mmu_disable:
->  	/* SCTLR */
-> @@ -223,7 +210,8 @@ asm_mmu_disable:
->  	ldr	r0, [r0]
->  	ldr	r1, =__phys_end
->  	ldr	r1, [r1]
-> -	dcache_clean_inval sy, r0, r1, r2, r3
-> +	sub	r1, r1, r0
-> +	dcache_by_line_op dccimvac, sy, r0, r1, r2, r3
->  	isb
->  
->  	mov     pc, lr
-> diff --git a/arm/cstart64.S b/arm/cstart64.S
-> index fc1930bcdb53..046bd3914098 100644
-> --- a/arm/cstart64.S
-> +++ b/arm/cstart64.S
-> @@ -8,6 +8,7 @@
->  #define __ASSEMBLY__
->  #include <auxinfo.h>
->  #include <asm/asm-offsets.h>
-> +#include <asm/assembler.h>
->  #include <asm/ptrace.h>
->  #include <asm/processor.h>
->  #include <asm/page.h>
-> @@ -204,20 +205,6 @@ asm_mmu_enable:
->  
->  	ret
->  
-> -/* Taken with small changes from arch/arm64/incluse/asm/assembler.h */
-> -.macro dcache_by_line_op op, domain, start, end, tmp1, tmp2
-> -	adrp	\tmp1, dcache_line_size
-> -	ldr	\tmp1, [\tmp1, :lo12:dcache_line_size]
-> -	sub	\tmp2, \tmp1, #1
-> -	bic	\start, \start, \tmp2
-> -9998:
-> -	dc	\op , \start
-> -	add	\start, \start, \tmp1
-> -	cmp	\start, \end
-> -	b.lo	9998b
-> -	dsb	\domain
-> -.endm
-> -
->  .globl asm_mmu_disable
->  asm_mmu_disable:
->  	mrs	x0, sctlr_el1
-> @@ -230,6 +217,7 @@ asm_mmu_disable:
->  	ldr	x0, [x0, :lo12:__phys_offset]
->  	adrp	x1, __phys_end
->  	ldr	x1, [x1, :lo12:__phys_end]
-> +	sub	x1, x1, x0
->  	dcache_by_line_op civac, sy, x0, x1, x2, x3
->  	isb
->  
+	M.
 
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
