@@ -2,58 +2,59 @@ Return-Path: <SRS0=T+on=IV=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B884C433DB
-	for <kvmarm@archiver.kernel.org>; Tue, 23 Mar 2021 17:34:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05F33C433C1
+	for <kvmarm@archiver.kernel.org>; Tue, 23 Mar 2021 17:37:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A00C6619C5
-	for <kvmarm@archiver.kernel.org>; Tue, 23 Mar 2021 17:34:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A00C6619C5
+	by mail.kernel.org (Postfix) with ESMTP id 5180E619C3
+	for <kvmarm@archiver.kernel.org>; Tue, 23 Mar 2021 17:37:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5180E619C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 35B4D4B217;
-	Tue, 23 Mar 2021 13:34:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E2F934B28B;
+	Tue, 23 Mar 2021 13:37:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id VcM+htfv2w0S; Tue, 23 Mar 2021 13:34:03 -0400 (EDT)
+	with ESMTP id hY46rpNRMjNI; Tue, 23 Mar 2021 13:37:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 310474B223;
-	Tue, 23 Mar 2021 13:34:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B7B9A4B304;
+	Tue, 23 Mar 2021 13:37:48 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 906734B217
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Mar 2021 13:34:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CF2494B298
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Mar 2021 13:37:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Xjv9ZhBAqHXS for <kvmarm@lists.cs.columbia.edu>;
- Tue, 23 Mar 2021 13:34:00 -0400 (EDT)
+ with ESMTP id 5cnjDNIcaXqv for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 23 Mar 2021 13:37:45 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A60F84B211
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Mar 2021 13:34:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 89EC64B28B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Mar 2021 13:37:45 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 94EB1619C1;
- Tue, 23 Mar 2021 17:33:59 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 7B8F2600EF;
+ Tue, 23 Mar 2021 17:37:43 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1lOkuj-003MBV-Pp; Tue, 23 Mar 2021 17:33:57 +0000
-Date: Tue, 23 Mar 2021 17:33:57 +0000
-Message-ID: <87mtutkc56.wl-maz@kernel.org>
+ id 1lOkyL-003MEC-Dt; Tue, 23 Mar 2021 17:37:41 +0000
+Date: Tue, 23 Mar 2021 17:37:40 +0000
+Message-ID: <87lfadkbyz.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Yoan Picchi <yoan.picchi@arm.com>
-Subject: Re: [PATCH 6/7] KVM: arm64: Add stage2_unmap_vm counter for kvm_stat
-In-Reply-To: <20210319161711.24972-7-yoan.picchi@arm.com>
+Subject: Re: [PATCH 7/7] KVM: arm64: Add irq_inject counter for kvm_stat
+In-Reply-To: <20210319161711.24972-8-yoan.picchi@arm.com>
 References: <20210319161711.24972-1-yoan.picchi@arm.com>
- <20210319161711.24972-7-yoan.picchi@arm.com>
+ <20210319161711.24972-8-yoan.picchi@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -84,15 +85,82 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 19 Mar 2021 16:17:10 +0000,
+On Fri, 19 Mar 2021 16:17:11 +0000,
 Yoan Picchi <yoan.picchi@arm.com> wrote:
 > 
-> Add a counter for when the one want to unmap all the ram of a VM.
-> This mostly happens when one restart a VM so we make sure to clear
-> the ram and free the memory for other VMs.
+> Add a counter for interrupt injections. That is when kvm relay an
+> interrupt to the guest (for instance a timer, or a device interrupt
+> like from a network card)
+> 
+> Signed-off-by: Yoan Picchi <yoan.picchi@arm.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 2 ++
+>  arch/arm64/kvm/arm.c              | 2 ++
+>  arch/arm64/kvm/guest.c            | 2 ++
+>  arch/arm64/kvm/vgic/vgic.c        | 2 ++
+>  4 files changed, 8 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index fa59b669c..253acb8c2 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -551,6 +551,7 @@ struct kvm_vm_stat {
+>  	ulong memory_slot_unmaped;
+>  	ulong stage2_unmap_vm;
+>  	ulong cached_page_invalidated;
+> +	ulong irq_inject;
+>  };
+>  
+>  struct kvm_vcpu_stat {
+> @@ -567,6 +568,7 @@ struct kvm_vcpu_stat {
+>  	u64 mmio_exit_kernel;
+>  	u64 regular_page_mapped;
+>  	u64 huge_page_mapped;
+> +	u64 irq_inject;
+>  	u64 exits;
+>  };
+>  
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index fc4c95dd2..841551f14 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -895,6 +895,8 @@ static int vcpu_interrupt_line(struct kvm_vcpu *vcpu, int number, bool level)
+>  	bool set;
+>  	unsigned long *hcr;
+>  
+> +	vcpu->stat.irq_inject++;
+> +
+>  	if (number == KVM_ARM_IRQ_CPU_IRQ)
+>  		bit_index = __ffs(HCR_VI);
+>  	else /* KVM_ARM_IRQ_CPU_FIQ */
+> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> index 129c0d53d..f663b03ae 100644
+> --- a/arch/arm64/kvm/guest.c
+> +++ b/arch/arm64/kvm/guest.c
+> @@ -45,6 +45,8 @@ struct kvm_stats_debugfs_item debugfs_entries[] = {
+>  	VM_STAT("memory_slot_unmaped", memory_slot_unmaped),
+>  	VM_STAT("stage2_unmap_vm", stage2_unmap_vm),
+>  	VM_STAT("cached_page_invalidated", cached_page_invalidated),
+> +	VM_STAT("irq_inject", irq_inject),
+> +	VCPU_STAT("irq_inject", irq_inject),
+>  	VCPU_STAT("exits", exits),
+>  	VCPU_STAT("halt_poll_success_ns", halt_poll_success_ns),
+>  	VCPU_STAT("halt_poll_fail_ns", halt_poll_fail_ns),
+> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+> index 1c597c988..9e504243b 100644
+> --- a/arch/arm64/kvm/vgic/vgic.c
+> +++ b/arch/arm64/kvm/vgic/vgic.c
+> @@ -458,6 +458,8 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+>  
+>  	raw_spin_lock_irqsave(&irq->irq_lock, flags);
+>  
+> +	kvm->stat.irq_inject++;
+> +
+>  	if (!vgic_validate_injection(irq, level, owner)) {
 
-Again: unmapping memory from a VM doesn't make it free for anyone
-else.
+So even if the injection failed, you report an injection? And what
+about injection that occur via the MMIO interface? What about direct
+injection? What about a level interrupt that is forever high?
 
 	M.
 
