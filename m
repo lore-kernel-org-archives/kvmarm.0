@@ -2,57 +2,61 @@ Return-Path: <SRS0=T+on=IV=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A01FC433DB
-	for <kvmarm@archiver.kernel.org>; Tue, 23 Mar 2021 18:04:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31570C433C1
+	for <kvmarm@archiver.kernel.org>; Tue, 23 Mar 2021 18:36:43 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id EFA346192B
-	for <kvmarm@archiver.kernel.org>; Tue, 23 Mar 2021 18:04:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFA346192B
+	by mail.kernel.org (Postfix) with ESMTP id A1CB361963
+	for <kvmarm@archiver.kernel.org>; Tue, 23 Mar 2021 18:36:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1CB361963
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F14F4B2A6;
-	Tue, 23 Mar 2021 14:04:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 11B7A4B3D2;
+	Tue, 23 Mar 2021 14:36:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id eXPlDuJ4IN6p; Tue, 23 Mar 2021 14:04:14 -0400 (EDT)
+	with ESMTP id 9e1EZ0G7U1vp; Tue, 23 Mar 2021 14:36:40 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 516F54B2AD;
-	Tue, 23 Mar 2021 14:04:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DEDBA4B3A0;
+	Tue, 23 Mar 2021 14:36:40 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3AD194B298
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Mar 2021 14:04:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 638A74B39D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Mar 2021 14:36:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nDdu2c3YAOpD for <kvmarm@lists.cs.columbia.edu>;
- Tue, 23 Mar 2021 14:04:12 -0400 (EDT)
+ with ESMTP id 9hGpmxWXxmGw for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 23 Mar 2021 14:36:36 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D90104B2A2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Mar 2021 14:04:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8F6F94B351
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Mar 2021 14:36:36 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id A377061920;
- Tue, 23 Mar 2021 18:04:10 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id DB8D461963;
+ Tue, 23 Mar 2021 18:36:33 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1lOlNw-003MUB-Mv; Tue, 23 Mar 2021 18:04:08 +0000
-Date: Tue, 23 Mar 2021 18:04:08 +0000
-Message-ID: <87k0pxkaqv.wl-maz@kernel.org>
+ id 1lOltH-003MqI-UI; Tue, 23 Mar 2021 18:36:32 +0000
+Date: Tue, 23 Mar 2021 18:36:31 +0000
+Message-ID: <87ft0lk98w.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Yoan Picchi <yoan.picchi@arm.com>
-Subject: Re: [PATCH 0/7] KVM: arm64: add more event counters for kvm_stat
-In-Reply-To: <20210319161711.24972-1-yoan.picchi@arm.com>
+Subject: Re: [PATCH 7/7] KVM: arm64: Add irq_inject counter for kvm_stat
+In-Reply-To: <c1ca65a5-1b7e-8ec2-ecbb-8ceda973bb14@arm.com>
 References: <20210319161711.24972-1-yoan.picchi@arm.com>
+ <20210319161711.24972-8-yoan.picchi@arm.com>
+ <87lfadkbyz.wl-maz@kernel.org>
+ <c1ca65a5-1b7e-8ec2-ecbb-8ceda973bb14@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -83,67 +87,64 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Yoan,
-
-On Fri, 19 Mar 2021 16:17:04 +0000,
+On Tue, 23 Mar 2021 17:53:42 +0000,
 Yoan Picchi <yoan.picchi@arm.com> wrote:
 > 
-> Hi all,
+> Hi Mark.
+
+s/k/c/, please!
+
 > 
-> As mentioned in the KVM forum talk from 2019
-> (https://kvmforum2019.sched.com/event/Tmwf/kvmstat-and-beyond-past-present-and-future-of-performance-monitoring-christian-borntrager-ibm
-> page 10), there is few event counters for kvm_stat in the arm64
-> version of kvm when you compare it to something like the x86
-> version.
+> Thanks for all the reviews. I am a beginner and you gave me a lot to
+> learn about.  I will reply to the other patch progressively once I
+> understand better the issues.
 
-Crucially, these differences exist because there is no universal
-equivalence between architecture features. A TLB invalidation on x86
-doesn't do the same thing as on PPC nor arm64.
+I think you should consider what I said in my reply to the cover
+letter before going all out on every counter you have introduced in
+this series.
 
-> Those counters are used in kvm_stat by kernel/driver developers to
-> have a rough idea of the impact of their patches on the general performance.
-> An example would be to make sure a patch don't increase to much the amount
-> of interruptions. Those patches aim to add more counters to make the use of
-> kvm_stat more relevant when measuring performance impact.
+[...]
 
-Adding more counters only make sense if the semantic of these counters
-is clearly defined. In this series, you have sprayed a bunch of x++ in
-random places, without defining what you were trying to count.
+> >> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+> >> index 1c597c988..9e504243b 100644
+> >> --- a/arch/arm64/kvm/vgic/vgic.c
+> >> +++ b/arch/arm64/kvm/vgic/vgic.c
+> >> @@ -458,6 +458,8 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+> >>     	raw_spin_lock_irqsave(&irq->irq_lock, flags);
+> >>   +	kvm->stat.irq_inject++;
+> >> +
+> >>   	if (!vgic_validate_injection(irq, level, owner)) {
+> > So even if the injection failed, you report an injection? And what
+> > about injection that occur via the MMIO interface? What about direct
+> > injection? What about a level interrupt that is forever high?
+> > 
+> > 	M.
+> > 
+> This one I actually started to fix this afternoon by moving the
+> counter into vgic_queue_irq_unlock().  This way it is only
+> incremented when the interrupt is inserted into a vcpu, and it also
+> takes care of the vgic_mmio injections. I also fixed the issue with
+> the interrupt line so it only increment when the line change of
+> level.
 
-> I am new in working on kernel-related things and I am learning kvm as I go.
-> Some of the counter I added early (memory_slot_unmaped, stage2_unmap_vm)
-> no longer seems relevant because while they do interesting things, they
-> happens in very specific scenarios. Instead of just deleting them, I prefer
-> to ask weither a little-used counter or no counter is the best.
+But if you do that, you start counting interrupts the guest itself
+generates. What is the exact semantic of this counter? userspace
+injected interrupts? Acked interrupts? Any interrupt?
 
-It works the other way around: the onus is on you to explain *why* we
-should even consider a counter or another.
+Take my level interrupt example. The interrupt will be forever
+pending, the guest will take as many interrupt as it can process, and
+yet your counter will have been incremented *once*. What does your
+counter mean then?
 
-May I suggest that you start by picking exactly *one* metric, work out
-exactly what it is supposed to count, what significance it has at the
-architectural level, what it actually brings to the user? Then try and
-make a good job at implementing these semantics. You will learn about
-the arm64 architecture and KVM in one swift go, one area at a time.
+> I'm not sure about what you mean by direct injection yet though.
 
-> I can also use some suggestion on how to test those counters as some like
-> remote_tlb_flush which mostly happen when fixing up a race condition; or
-> what uncovered event could be worth adding in a future patch set.
+GICv4.{0,1}, where an interrupt gets directly delivered to the guest
+without (too much) SW intervention. With this, directly injected LPIs
+will never result in the counter being incremented, and yet can pin
+the guest to the ground under interrupt load.
 
-remote_tlb_flush is a great example of something that really *doesn't*
-make much sense on KVM/arm64. We don't deal with remote TLBs
-independently of the local ones outside of vcpu migration (which you
-don't cover either).
-
-I can only urge you to focus on the architectural meaning of the
-metric you picked, and see how it maps across the hypervisor.
-
-Finally, there is the question of the general availability of these
-counters. They live in debugfs, which isn't a proper userspace
-ABI. There is work going on around making this a more palatable
-interface, and I'd rather see where this is going before expanding the
-number of counters.
-
-Thanks,
+Again, defining the exact behaviour of the counter would avoid me
+ranting away...
 
 	M.
 
