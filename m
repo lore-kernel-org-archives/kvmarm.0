@@ -2,75 +2,76 @@ Return-Path: <SRS0=IgiY=IW=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F9F0C433DB
-	for <kvmarm@archiver.kernel.org>; Wed, 24 Mar 2021 15:47:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75DF0C433DB
+	for <kvmarm@archiver.kernel.org>; Wed, 24 Mar 2021 16:17:34 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C2D0961A0F
-	for <kvmarm@archiver.kernel.org>; Wed, 24 Mar 2021 15:47:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2D0961A0F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id BA59B61A0E
+	for <kvmarm@archiver.kernel.org>; Wed, 24 Mar 2021 16:17:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA59B61A0E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 38A734B462;
-	Wed, 24 Mar 2021 11:47:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A6144B483;
+	Wed, 24 Mar 2021 12:17:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id bGjQZyNAXZhJ; Wed, 24 Mar 2021 11:47:44 -0400 (EDT)
+	with ESMTP id 0sHGK0XaLNjF; Wed, 24 Mar 2021 12:17:32 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2CFFB4B455;
-	Wed, 24 Mar 2021 11:47:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B8BF4B488;
+	Wed, 24 Mar 2021 12:17:32 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7BADC4B452
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Mar 2021 11:47:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C96D94B482
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Mar 2021 12:17:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zKl9zx8GuQJi for <kvmarm@lists.cs.columbia.edu>;
- Wed, 24 Mar 2021 11:47:40 -0400 (EDT)
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com
- [185.176.79.56])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5BA164B299
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Mar 2021 11:47:40 -0400 (EDT)
-Received: from fraeml701-chm.china.huawei.com (unknown [172.18.147.226])
- by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4F5CDX6fSSz683Wv;
- Wed, 24 Mar 2021 23:42:52 +0800 (CST)
-Received: from lhreml720-chm.china.huawei.com (10.201.108.71) by
- fraeml701-chm.china.huawei.com (10.206.15.50) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2106.2; Wed, 24 Mar 2021 16:47:37 +0100
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- lhreml720-chm.china.huawei.com (10.201.108.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2106.2; Wed, 24 Mar 2021 15:47:37 +0000
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.2106.013; Wed, 24 Mar 2021 15:47:37 +0000
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: Marc Zyngier <maz@kernel.org>, "kvmarm@lists.cs.columbia.edu"
- <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
-Subject: RE: [PATCH] KVM: arm64: Fix CPU interface MMIO compatibility detection
-Thread-Topic: [PATCH] KVM: arm64: Fix CPU interface MMIO compatibility
- detection
-Thread-Index: AQHXIADnSRTuVbDHwkyLZJ68PSrFKqqTR4Mw
-Date: Wed, 24 Mar 2021 15:47:37 +0000
-Message-ID: <e7cb67d609924108ae944935f8493745@huawei.com>
-References: <20210323162301.2049595-1-maz@kernel.org>
-In-Reply-To: <20210323162301.2049595-1-maz@kernel.org>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.47.93.221]
-MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-Cc: "kernel-team@android.com" <kernel-team@android.com>
+ with ESMTP id Pk+0fwlRHzGd for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 24 Mar 2021 12:17:29 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BFFA34B488
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Mar 2021 12:17:29 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id C3BB861A0E;
+ Wed, 24 Mar 2021 16:17:27 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1lP6CD-003YTU-Ff; Wed, 24 Mar 2021 16:17:25 +0000
+Date: Wed, 24 Mar 2021 16:17:24 +0000
+Message-ID: <87zgysil0r.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Andrew Jones <drjones@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH] arm: pmu: Fix failing PMU test when no PMU
+ is available
+In-Reply-To: <20210324151058.7as6ndvaz7ocho7y@kamzik.brq.redhat.com>
+References: <20210324143856.2079220-1-maz@kernel.org>
+ <23046a95-5876-e7a2-e4a4-6012a760815d@arm.com>
+ <20210324151058.7as6ndvaz7ocho7y@kamzik.brq.redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: drjones@redhat.com, alexandru.elisei@arm.com,
+ kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com,
+ eric.auger@redhat.com, qperret@google.com, kernel-team@android.com,
+ qwandor@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Andrew Walbran <qwandor@google.com>, kvm@vger.kernel.org,
+ kernel-team@android.com, Paolo Bonzini <pbonzini@redhat.com>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,81 +88,30 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+On Wed, 24 Mar 2021 15:10:58 +0000,
+Andrew Jones <drjones@redhat.com> wrote:
+> 
+> On Wed, Mar 24, 2021 at 02:50:05PM +0000, Alexandru Elisei wrote:
+> > Hi Marc,
+> > 
+> > Thank you for the patch! I have already sent a patch for this [1], which was
+> > queued by Drew [2], but apparently has not landed in master yet.
+> > 
+> > [1] https://www.spinics.net/lists/kvm-arm/msg44084.html
+> > [2]
+> > https://gitlab.com/rhdrjones/kvm-unit-tests/-/commit/241dac4cadfd7d7ace8c8c3f0613376311b4e785
+> 
+> Thanks to you both for the patch and sorry for not getting Alexandru's
+> patch in early enough to avoid the double reporting and fixing. I
+> plan to send Paolo an MR as soon as tomorrow that includes the
+> patch and many others.
 
+No worries. Thanks both!
 
-> -----Original Message-----
-> From: Marc Zyngier [mailto:maz@kernel.org]
-> Sent: 23 March 2021 16:23
-> To: kvmarm@lists.cs.columbia.edu; kvm@vger.kernel.org;
-> linux-arm-kernel@lists.infradead.org
-> Cc: Ard Biesheuvel <ardb@kernel.org>; kernel-team@android.com; Shameerali
-> Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-> Subject: [PATCH] KVM: arm64: Fix CPU interface MMIO compatibility detection
-> 
-> In order to detect whether a GICv3 CPU interface is MMIO capable,
-> we switch ICC_SRE_EL1.SRE to 0 and check whether it sticks.
-> 
-> However, this is only possible if *ALL* of the HCR_EL2 interrupt
-> overrides are set, and the CPU is perfectly allowed to ignore
-> the write to ICC_SRE_EL1 otherwise. This leads KVM to pretend
-> that a whole bunch of ARMv8.0 CPUs aren't MMIO-capable, and
-> breaks VMs that should work correctly otherwise.
-> 
-> Fix this by setting IMO/FMO/IMO before touching ICC_SRE_EL1,
-> and clear them afterwards. This allows us to reliably detect
-> the CPU interface capabilities.
-> 
+	M.
 
-Tested on HiSilicon D06 platform where the original issue(firmware wrongly
-advertising GICv2-on-v3 compatibility) was reported and all seems to be fine.
-
-Though not sure whether this fix is relevant to this particular platform,
-FWIW,
-
-  Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-
-Thanks,
-Shameer
-
-> Cc: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-> Fixes: 9739f6ef053f ("KVM: arm64: Workaround firmware wrongly advertising
-> GICv2-on-v3 compatibility")
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/hyp/vgic-v3-sr.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> index ee3682b9873c..39f8f7f9227c 100644
-> --- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> +++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> @@ -429,6 +429,13 @@ u64 __vgic_v3_get_gic_config(void)
->  	if (has_vhe())
->  		flags = local_daif_save();
-> 
-> +	/*
-> +	 * Table 11-2 "Permitted ICC_SRE_ELx.SRE settings" indicates
-> +	 * that to be able to set ICC_SRE_EL1.SRE to 0, all the
-> +	 * interrupt overrides must be set. You've got to love this.
-> +	 */
-> +	sysreg_clear_set(hcr_el2, 0, HCR_AMO | HCR_FMO | HCR_IMO);
-> +	isb();
->  	write_gicreg(0, ICC_SRE_EL1);
->  	isb();
-> 
-> @@ -436,6 +443,8 @@ u64 __vgic_v3_get_gic_config(void)
-> 
->  	write_gicreg(sre, ICC_SRE_EL1);
->  	isb();
-> +	sysreg_clear_set(hcr_el2, HCR_AMO | HCR_FMO | HCR_IMO, 0);
-> +	isb();
-> 
->  	if (has_vhe())
->  		local_daif_restore(flags);
-> --
-> 2.30.0
-
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
