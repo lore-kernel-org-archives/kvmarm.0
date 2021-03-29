@@ -1,55 +1,60 @@
-Return-Path: <SRS0=YeVi=I2=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=05AC=I3=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04B4BC433C1
-	for <kvmarm@archiver.kernel.org>; Sun, 28 Mar 2021 12:21:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40AEEC433C1
+	for <kvmarm@archiver.kernel.org>; Mon, 29 Mar 2021 15:55:36 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 599EC6196E
-	for <kvmarm@archiver.kernel.org>; Sun, 28 Mar 2021 12:21:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 599EC6196E
+	by mail.kernel.org (Postfix) with ESMTP id 784F66195B
+	for <kvmarm@archiver.kernel.org>; Mon, 29 Mar 2021 15:55:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 784F66195B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E0DC54B1F5;
-	Sun, 28 Mar 2021 08:21:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CF6A74B23E;
+	Mon, 29 Mar 2021 11:55:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id HwDzoLs+Ijtn; Sun, 28 Mar 2021 08:21:43 -0400 (EDT)
+	with ESMTP id Ujf6CnRwYZXv; Mon, 29 Mar 2021 11:55:33 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D98B64B1EB;
-	Sun, 28 Mar 2021 08:21:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 78E894B241;
+	Mon, 29 Mar 2021 11:55:33 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3BF584B1E3
- for <kvmarm@lists.cs.columbia.edu>; Sun, 28 Mar 2021 08:21:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B7BED4B16D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Mar 2021 11:55:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GrIQ1hHhTxcd for <kvmarm@lists.cs.columbia.edu>;
- Sun, 28 Mar 2021 08:21:41 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0629C4B1E1
- for <kvmarm@lists.cs.columbia.edu>; Sun, 28 Mar 2021 08:21:40 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 80ACF6196C;
- Sun, 28 Mar 2021 12:21:35 +0000 (UTC)
-Date: Sun, 28 Mar 2021 13:21:33 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Steven Price <steven.price@arm.com>
-Subject: Re: [PATCH v10 2/6] arm64: kvm: Introduce MTE VM feature
-Message-ID: <20210328122131.GB17535@arm.com>
+ with ESMTP id S-cEhJ2sPAOh for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 29 Mar 2021 11:55:31 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 653B84B241
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Mar 2021 11:55:31 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E0F36142F;
+ Mon, 29 Mar 2021 08:55:30 -0700 (PDT)
+Received: from [192.168.1.179] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BAA313F719;
+ Mon, 29 Mar 2021 08:55:27 -0700 (PDT)
+Subject: Re: [PATCH v10 1/6] arm64: mte: Sync tags for pages where PTE is
+ untagged
+To: Catalin Marinas <catalin.marinas@arm.com>
 References: <20210312151902.17853-1-steven.price@arm.com>
- <20210312151902.17853-3-steven.price@arm.com>
- <20210327152324.GA28167@arm.com>
+ <20210312151902.17853-2-steven.price@arm.com> <20210326185653.GG5126@arm.com>
+From: Steven Price <steven.price@arm.com>
+Message-ID: <21842e4d-7935-077c-3d6f-fced89b7f2bb@arm.com>
+Date: Mon, 29 Mar 2021 16:55:29 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.1
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210327152324.GA28167@arm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20210326185653.GG5126@arm.com>
+Content-Language: en-GB
 Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
  Marc Zyngier <maz@kernel.org>, Juan Quintela <quintela@redhat.com>,
  Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
@@ -67,65 +72,76 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sat, Mar 27, 2021 at 03:23:24PM +0000, Catalin Marinas wrote:
-> On Fri, Mar 12, 2021 at 03:18:58PM +0000, Steven Price wrote:
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index 77cb2d28f2a4..b31b7a821f90 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -879,6 +879,22 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> >  	if (vma_pagesize == PAGE_SIZE && !force_pte)
-> >  		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
-> >  							   &pfn, &fault_ipa);
-> > +
-> > +	if (fault_status != FSC_PERM && kvm_has_mte(kvm) && pfn_valid(pfn)) {
-> > +		/*
-> > +		 * VM will be able to see the page's tags, so we must ensure
-> > +		 * they have been initialised. if PG_mte_tagged is set, tags
-> > +		 * have already been initialised.
-> > +		 */
-> > +		struct page *page = pfn_to_page(pfn);
-> > +		unsigned long i, nr_pages = vma_pagesize >> PAGE_SHIFT;
-> > +
-> > +		for (i = 0; i < nr_pages; i++, page++) {
-> > +			if (!test_and_set_bit(PG_mte_tagged, &page->flags))
-> > +				mte_clear_page_tags(page_address(page));
-> > +		}
-> > +	}
+On 26/03/2021 18:56, Catalin Marinas wrote:
+> Hi Steven,
 > 
-> This pfn_valid() check may be problematic. Following commit eeb0753ba27b
-> ("arm64/mm: Fix pfn_valid() for ZONE_DEVICE based memory"), it returns
-> true for ZONE_DEVICE memory but such memory is allowed not to support
-> MTE.
+> On Fri, Mar 12, 2021 at 03:18:57PM +0000, Steven Price wrote:
+>> A KVM guest could store tags in a page even if the VMM hasn't mapped
+>> the page with PROT_MTE. So when restoring pages from swap we will
+>> need to check to see if there are any saved tags even if !pte_tagged().
+>>
+>> However don't check pages which are !pte_valid_user() as these will
+>> not have been swapped out.
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>>   arch/arm64/include/asm/pgtable.h |  2 +-
+>>   arch/arm64/kernel/mte.c          | 16 ++++++++++++----
+>>   2 files changed, 13 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
+>> index e17b96d0e4b5..84166625c989 100644
+>> --- a/arch/arm64/include/asm/pgtable.h
+>> +++ b/arch/arm64/include/asm/pgtable.h
+>> @@ -312,7 +312,7 @@ static inline void set_pte_at(struct mm_struct *mm, unsigned long addr,
+>>   		__sync_icache_dcache(pte);
+>>   
+>>   	if (system_supports_mte() &&
+>> -	    pte_present(pte) && pte_tagged(pte) && !pte_special(pte))
+>> +	    pte_present(pte) && pte_valid_user(pte) && !pte_special(pte))
+>>   		mte_sync_tags(ptep, pte);
+> 
+> With the EPAN patches queued in for-next/epan, pte_valid_user()
+> disappeared as its semantics weren't very clear.
 
-Some more thinking, this should be safe as any ZONE_DEVICE would be
-mapped as untagged memory in the kernel linear map. It could be slightly
-inefficient if it unnecessarily tries to clear tags in ZONE_DEVICE,
-untagged memory. Another overhead is pfn_valid() which will likely end
-up calling memblock_is_map_memory().
+Thanks for pointing that out.
 
-However, the bigger issue is that Stage 2 cannot disable tagging for
-Stage 1 unless the memory is Non-cacheable or Device at S2. Is there a
-way to detect what gets mapped in the guest as Normal Cacheable memory
-and make sure it's only early memory or hotplug but no ZONE_DEVICE (or
-something else like on-chip memory)?  If we can't guarantee that all
-Cacheable memory given to a guest supports tags, we should disable the
-feature altogether.
+> So this relies on the set_pte_at() being done on the VMM address space.
+> I wonder, if the VMM did an mprotect(PROT_NONE), can the VM still access
+> it via stage 2? If yes, the pte_valid_user() test wouldn't work. We need
+> something like pte_present() && addr <= user_addr_max().
 
-> I now wonder if we can get a MAP_ANONYMOUS mapping of ZONE_DEVICE pfn
-> even without virtualisation.
+AFAIUI the stage 2 matches the VMM's address space (for the subset that 
+has memslots). So mprotect(PROT_NONE) would cause the stage 2 mapping to 
+be invalidated and a subsequent fault would exit to the VMM to sort out. 
+This sort of thing is done for the lazy migration use case (i.e. pages 
+are fetched as the VM tries to access them).
 
-I haven't checked all the code paths but I don't think we can get a
-MAP_ANONYMOUS mapping of ZONE_DEVICE memory as we normally need a file
-descriptor.
+> BTW, ignoring virtualisation, can we ever bring a page in from swap on a
+> PROT_NONE mapping (say fault-around)? It's not too bad if we keep the
+> metadata around for when the pte becomes accessible but I suspect we
+> remove it if the page is removed from swap.
 
--- 
-Catalin
+There are two stages of bringing data from swap. First is populating the 
+swap cache by doing the physical read from swap. The second is actually 
+restoring the page table entries.
+
+Clearly the first part can happen even with PROT_NONE (the simple case 
+is there's another mapping which is !PROT_NONE).
+
+For the second I'm a little hazy on exactly what happens when you do a 
+'swapoff' - that may cause a page to be re-inserted into a page table 
+without a fault. If you follow the chain down from try_to_unuse() you 
+end up at a call to set_pte_at(). So we need set_pte_at() to handle a 
+PROT_NONE mapping. So I guess the test we really want here is just 
+(pte_val() & PTE_USER).
+
+Steve
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
