@@ -2,82 +2,76 @@ Return-Path: <SRS0=NHQQ=I4=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1445C433C1
-	for <kvmarm@archiver.kernel.org>; Tue, 30 Mar 2021 14:24:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87E5FC433E0
+	for <kvmarm@archiver.kernel.org>; Tue, 30 Mar 2021 14:54:53 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 13305619C8
-	for <kvmarm@archiver.kernel.org>; Tue, 30 Mar 2021 14:24:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13305619C8
+	by mail.kernel.org (Postfix) with ESMTP id E7DA4619D3
+	for <kvmarm@archiver.kernel.org>; Tue, 30 Mar 2021 14:54:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7DA4619D3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C78F4B177;
-	Tue, 30 Mar 2021 10:24:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 901D94B1B4;
+	Tue, 30 Mar 2021 10:54:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id GtNPdMDAHWlp; Tue, 30 Mar 2021 10:24:18 -0400 (EDT)
+	with ESMTP id pYsPmoUB+hs5; Tue, 30 Mar 2021 10:54:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E21904B21E;
-	Tue, 30 Mar 2021 10:24:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0DF434B306;
+	Tue, 30 Mar 2021 10:54:50 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E7724B227
- for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Mar 2021 10:24:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CA47B4B2FA
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Mar 2021 10:54:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ERs82rw-inZ4 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 30 Mar 2021 10:24:16 -0400 (EDT)
+ with ESMTP id KzQokRe3vlWP for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 30 Mar 2021 10:54:47 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6F7F54B222
- for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Mar 2021 10:24:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8C2CC4B1B4
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Mar 2021 10:54:47 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 23C14619BD;
- Tue, 30 Mar 2021 14:24:15 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id A5B6961921;
+ Tue, 30 Mar 2021 14:54:45 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1lRFHx-004hMq-0o; Tue, 30 Mar 2021 15:24:13 +0100
-Date: Tue, 30 Mar 2021 15:24:12 +0100
-Message-ID: <87czvgra7n.wl-maz@kernel.org>
+ id 1lRFlT-004hoo-ML; Tue, 30 Mar 2021 15:54:43 +0100
 From: Marc Zyngier <maz@kernel.org>
-To: Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH] arm64: kvm: handle 52-bit VA regions correctly under nVHE
-In-Reply-To: <CAMj1kXHNHV8aoKykjE1mcsCLc9jfnZ5z1RLS0xdF8pM9XFFpZQ@mail.gmail.com>
-References: <20210330112126.463336-1-ardb@kernel.org>
- <87lfa4rety.wl-maz@kernel.org>
- <CAMj1kXEL569SDFAR2PGJhAvJmYMDZm-Aumr0q6g2gnAMC0avxA@mail.gmail.com>
- <87k0pordvw.wl-maz@kernel.org>
- <CAMj1kXHx90pOUcG8YyLcvaYdv+2uPSUVy7rBoEu72eQo3xUVKg@mail.gmail.com>
- <87h7ksrbih.wl-maz@kernel.org>
- <CAMj1kXHNHV8aoKykjE1mcsCLc9jfnZ5z1RLS0xdF8pM9XFFpZQ@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+To: netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
+ tglx@linutronix.de, pbonzini@redhat.com, seanjc@google.com,
+ richardcochran@gmail.com, Mark.Rutland@arm.com, will@kernel.org,
+ suzuki.poulose@arm.com, Andre.Przywara@arm.com, steven.price@arm.com,
+ lorenzo.pieralisi@arm.com, sudeep.holla@arm.com
+Subject: [PATCH v19 0/7] KVM: arm64: Add host/guest KVM-PTP support
+Date: Tue, 30 Mar 2021 15:54:23 +0100
+Message-Id: <20210330145430.996981-1-maz@kernel.org>
+X-Mailer: git-send-email 2.29.2
+MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: ardb@kernel.org, linux-arm-kernel@lists.infradead.org,
- will@kernel.org, kernel-team@android.com, anshuman.khandual@arm.com,
- steve.capper@arm.com, catalin.marinas@arm.com, kvmarm@lists.cs.columbia.edu,
- qperret@google.com
+X-SA-Exim-Rcpt-To: netdev@vger.kernel.org, yangbo.lu@nxp.com,
+ john.stultz@linaro.org, tglx@linutronix.de, pbonzini@redhat.com,
+ seanjc@google.com, richardcochran@gmail.com, Mark.Rutland@arm.com,
+ will@kernel.org, suzuki.poulose@arm.com, Andre.Przywara@arm.com,
+ steven.price@arm.com, lorenzo.pieralisi@arm.com, sudeep.holla@arm.com,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Steve.Capper@arm.com,
+ justin.he@arm.com, jianyong.wu@arm.com, kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: Will Deacon <will@kernel.org>,
- Anshuman Khandual <anshuman.khandual@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Android Kernel Team <kernel-team@android.com>,
- kvmarm <kvmarm@lists.cs.columbia.edu>,
- Linux ARM <linux-arm-kernel@lists.infradead.org>
+Cc: justin.he@arm.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -94,43 +88,98 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 30 Mar 2021 14:58:39 +0100,
-Ard Biesheuvel <ardb@kernel.org> wrote:
-> 
-> On Tue, 30 Mar 2021 at 15:56, Marc Zyngier <maz@kernel.org> wrote:
-> >
-> > On Tue, 30 Mar 2021 14:15:19 +0100,
-> > Ard Biesheuvel <ardb@kernel.org> wrote:
+Given that this series[0] has languished in my Inbox for the best of the
+past two years, and in an effort to eventually get it merged, I've
+taken the liberty to pick it up and do the changes I wanted to see
+instead of waiting to go through yet another round.
 
-[...]
+All the patches have a link to their original counterpart (though I
+have squashed a couple of them where it made sense). Tested both 64
+and 32bit guests for a good measure. Of course, I claim full
+responsibility for any bug introduced here.
 
-> > > It seems to me that the only way to solve this is to permit the idmap
-> > > and the hyp linear region to overlap, and use the 2^47 byte window at
-> > > the top of the address space for the hyp private mappings instead of
-> > > the one at the bottom.
-> >
-> > But that's the hard problem I want to avoid thinking of.
-> >
-> > We need to ensure that there is no EL1 VA that is congruent with the
-> > idmap over the kern_hyp_va() transformation. It means imposing
-> > restrictions over the EL1 linear map, and prevent any allocation that
-> > would result in this overlap (and that is including text).
-> >
-> > How do we do that?
-> >
-> 
-> A phys to virt offset of 0x0 is perfectly acceptable, no? The only
-> difference is that the idmapped bits are in another part of the VA
-> space.
+Unless someone screams now, this is going in 5.13, because I'm frankly
+fed up with it! ;-)
 
-What do we lose by doing that? If that's acceptable for LVA, why don't
-we do it across the board? It feels like KASLR and EL2 randomisation
-are in the way...
+* From v18 [2]
+  - Fix kvm_hypercall2() return type
+  - Rebased on top of 5.12-rc3
+  - Added RBs
 
-	M.
+* From v17 [1]:
+  - Fixed compilation issue on 32bit systems not selecting
+    CONFIG_HAVE_ARM_SMCCC_DISCOVERY
+  - Fixed KVM service discovery not properly parsing the reply
+    from the hypervisor
+
+* From v16 [0]:
+  - Moved the KVM service discovery to its own file, plugged it into
+    PSCI instead of the arch code, dropped the inlining, made use of
+    asm/hypervisor.h.
+  - Tidied-up the namespacing
+  - Cleanup the hypercall handler
+  - De-duplicate the guest code
+  - Tidied-up arm64-specific documentation
+  - Dropped the generic PTP documentation as it needs a new location,
+    and some cleanup
+  - Squashed hypercall documentation and capability into the
+    main KVM patch
+  - Rebased on top of 5.11-rc4
+
+[0] https://lore.kernel.org/r/20201209060932.212364-1-jianyong.wu@arm.com
+[1] https://lore.kernel.org/r/20210202141204.3134855-1-maz@kernel.org
+[2] https://lore.kernel.org/r/20210208134029.3269384-1-maz@kernel.org
+
+Jianyong Wu (4):
+  ptp: Reorganize ptp_kvm.c to make it arch-independent
+  clocksource: Add clocksource id for arm arch counter
+  KVM: arm64: Add support for the KVM PTP service
+  ptp: arm/arm64: Enable ptp_kvm for arm/arm64
+
+Thomas Gleixner (1):
+  time: Add mechanism to recognize clocksource in time_get_snapshot
+
+Will Deacon (2):
+  arm/arm64: Probe for the presence of KVM hypervisor
+  KVM: arm64: Advertise KVM UID to guests via SMCCC
+
+ Documentation/virt/kvm/api.rst              | 10 +++
+ Documentation/virt/kvm/arm/index.rst        |  1 +
+ Documentation/virt/kvm/arm/ptp_kvm.rst      | 25 ++++++
+ arch/arm/include/asm/hypervisor.h           |  3 +
+ arch/arm64/include/asm/hypervisor.h         |  3 +
+ arch/arm64/kvm/arm.c                        |  1 +
+ arch/arm64/kvm/hypercalls.c                 | 80 +++++++++++++++--
+ drivers/clocksource/arm_arch_timer.c        | 36 ++++++++
+ drivers/firmware/psci/psci.c                |  2 +
+ drivers/firmware/smccc/Makefile             |  2 +-
+ drivers/firmware/smccc/kvm_guest.c          | 50 +++++++++++
+ drivers/firmware/smccc/smccc.c              |  1 +
+ drivers/ptp/Kconfig                         |  2 +-
+ drivers/ptp/Makefile                        |  2 +
+ drivers/ptp/ptp_kvm_arm.c                   | 28 ++++++
+ drivers/ptp/{ptp_kvm.c => ptp_kvm_common.c} | 84 +++++-------------
+ drivers/ptp/ptp_kvm_x86.c                   | 97 +++++++++++++++++++++
+ include/linux/arm-smccc.h                   | 41 +++++++++
+ include/linux/clocksource.h                 |  6 ++
+ include/linux/clocksource_ids.h             | 12 +++
+ include/linux/ptp_kvm.h                     | 19 ++++
+ include/linux/timekeeping.h                 | 12 +--
+ include/uapi/linux/kvm.h                    |  1 +
+ kernel/time/clocksource.c                   |  2 +
+ kernel/time/timekeeping.c                   |  1 +
+ 25 files changed, 443 insertions(+), 78 deletions(-)
+ create mode 100644 Documentation/virt/kvm/arm/ptp_kvm.rst
+ create mode 100644 drivers/firmware/smccc/kvm_guest.c
+ create mode 100644 drivers/ptp/ptp_kvm_arm.c
+ rename drivers/ptp/{ptp_kvm.c => ptp_kvm_common.c} (60%)
+ create mode 100644 drivers/ptp/ptp_kvm_x86.c
+ create mode 100644 include/linux/clocksource_ids.h
+ create mode 100644 include/linux/ptp_kvm.h
 
 -- 
-Without deviation from the norm, progress is not possible.
+2.29.2
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
