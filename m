@@ -2,68 +2,68 @@ Return-Path: <SRS0=NHQQ=I4=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 617D3C433C1
-	for <kvmarm@archiver.kernel.org>; Tue, 30 Mar 2021 19:57:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2126C433C1
+	for <kvmarm@archiver.kernel.org>; Tue, 30 Mar 2021 20:07:31 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CCCBA619C0
-	for <kvmarm@archiver.kernel.org>; Tue, 30 Mar 2021 19:57:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCCBA619C0
+	by mail.kernel.org (Postfix) with ESMTP id 36212619CC
+	for <kvmarm@archiver.kernel.org>; Tue, 30 Mar 2021 20:07:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36212619CC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F1D44B326;
-	Tue, 30 Mar 2021 15:57:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B18B14B32E;
+	Tue, 30 Mar 2021 16:07:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6bWjfqkifrT2; Tue, 30 Mar 2021 15:57:26 -0400 (EDT)
+	with ESMTP id SXP75fwxbc-Z; Tue, 30 Mar 2021 16:07:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E1AA74B327;
-	Tue, 30 Mar 2021 15:57:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4992B4B326;
+	Tue, 30 Mar 2021 16:07:29 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DFB314B323
- for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Mar 2021 15:57:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 97C3F4B323
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Mar 2021 16:07:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WOLDrVsIh68R for <kvmarm@lists.cs.columbia.edu>;
- Tue, 30 Mar 2021 15:57:24 -0400 (EDT)
+ with ESMTP id izw7m8m5Muil for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 30 Mar 2021 16:07:26 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9989A4B1F3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Mar 2021 15:57:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E7DD24B309
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Mar 2021 16:07:25 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id A07C9619B9;
- Tue, 30 Mar 2021 19:57:22 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id AF06361864;
+ Tue, 30 Mar 2021 20:07:24 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1lRKUK-004l9U-Gw; Tue, 30 Mar 2021 20:57:20 +0100
-Date: Tue, 30 Mar 2021 20:57:21 +0100
-Message-ID: <87lfa4fm8u.wl-maz@kernel.org>
+ id 1lRKe2-004lFo-Iy; Tue, 30 Mar 2021 21:07:22 +0100
+Date: Tue, 30 Mar 2021 21:07:21 +0100
+Message-ID: <87k0pofls6.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Alexandru Elisei <alexandru.elisei@arm.com>
 Subject: Re: [PATCH v2] KVM: arm64: Initialize VCPU mdcr_el2 before loading it
-In-Reply-To: <5c90a3b2-c9a8-640b-fb6a-7a09d397ba7f@arm.com>
+In-Reply-To: <5cfd4870-db31-cd7d-699f-bd70a1ab90fe@arm.com>
 References: <20210323180057.263356-1-alexandru.elisei@arm.com>
  <87sg4dq83r.wl-maz@kernel.org>
  <5cfd4870-db31-cd7d-699f-bd70a1ab90fe@arm.com>
- <5c90a3b2-c9a8-640b-fb6a-7a09d397ba7f@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
@@ -79,113 +79,221 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gVHVlLCAzMCBNYXIgMjAyMSAxODo0OTo1NCArMDEwMCwKQWxleGFuZHJ1IEVsaXNlaSA8YWxl
-eGFuZHJ1LmVsaXNlaUBhcm0uY29tPiB3cm90ZToKPiAKPiBIaSBNYXJjLAo+IAo+IE9uIDMvMzAv
-MjEgNjoxMyBQTSwgQWxleGFuZHJ1IEVsaXNlaSB3cm90ZToKPiA+IFsuLl0KPiA+Pj4gK30KPiA+
-Pj4gKwo+ID4+PiAgLyoqCj4gPj4+ICAgKiBrdm1fYXJtX3Jlc2V0X2RlYnVnX3B0ciAtIHJlc2V0
-IHRoZSBkZWJ1ZyBwdHIgdG8gcG9pbnQgdG8gdGhlIHZjcHUgc3RhdGUKPiA+Pj4gICAqLwo+ID4+
-PiBAQCAtODMsMTIgKzEzNyw3IEBAIHZvaWQga3ZtX2FybV9yZXNldF9kZWJ1Z19wdHIoc3RydWN0
-IGt2bV92Y3B1ICp2Y3B1KQo+ID4+PiAgICogQHZjcHU6CXRoZSB2Y3B1IHBvaW50ZXIKPiA+Pj4g
-ICAqCj4gPj4+ICAgKiBUaGlzIGlzIGNhbGxlZCBiZWZvcmUgZWFjaCBlbnRyeSBpbnRvIHRoZSBo
-eXBlcnZpc29yIHRvIHNldHVwIGFueQo+ID4+PiAtICogZGVidWcgcmVsYXRlZCByZWdpc3RlcnMu
-IEN1cnJlbnRseSB0aGlzIGp1c3QgZW5zdXJlcyB3ZSB3aWxsIHRyYXAKPiA+Pj4gLSAqIGFjY2Vz
-cyB0bzoKPiA+Pj4gLSAqICAtIFBlcmZvcm1hbmNlIG1vbml0b3JzIChNRENSX0VMMl9UUE0vTURD
-Ul9FTDJfVFBNQ1IpCj4gPj4+IC0gKiAgLSBEZWJ1ZyBST00gQWRkcmVzcyAoTURDUl9FTDJfVERS
-QSkKPiA+Pj4gLSAqICAtIE9TIHJlbGF0ZWQgcmVnaXN0ZXJzIChNRENSX0VMMl9URE9TQSkKPiA+
-Pj4gLSAqICAtIFN0YXRpc3RpY2FsIHByb2ZpbGVyIChNRENSX0VMMl9UUE1TL01EQ1JfRUwyX0Uy
-UEIpCj4gPj4+ICsgKiBkZWJ1ZyByZWxhdGVkIHJlZ2lzdGVycy4KPiA+Pj4gICAqCj4gPj4+ICAg
-KiBBZGRpdGlvbmFsbHksIEtWTSBvbmx5IHRyYXBzIGd1ZXN0IGFjY2Vzc2VzIHRvIHRoZSBkZWJ1
-ZyByZWdpc3RlcnMgaWYKPiA+Pj4gICAqIHRoZSBndWVzdCBpcyBub3QgYWN0aXZlbHkgdXNpbmcg
-dGhlbSAoc2VlIHRoZSBLVk1fQVJNNjRfREVCVUdfRElSVFkKPiA+Pj4gQEAgLTEwMCwyNyArMTQ5
-LDE0IEBAIHZvaWQga3ZtX2FybV9yZXNldF9kZWJ1Z19wdHIoc3RydWN0IGt2bV92Y3B1ICp2Y3B1
-KQo+ID4+PiAgCj4gPj4+ICB2b2lkIGt2bV9hcm1fc2V0dXBfZGVidWcoc3RydWN0IGt2bV92Y3B1
-ICp2Y3B1KQo+ID4+PiAgewo+ID4+PiAtCWJvb2wgdHJhcF9kZWJ1ZyA9ICEodmNwdS0+YXJjaC5m
-bGFncyAmIEtWTV9BUk02NF9ERUJVR19ESVJUWSk7Cj4gPj4+ICAJdW5zaWduZWQgbG9uZyBtZHNj
-ciwgb3JpZ19tZGNyX2VsMiA9IHZjcHUtPmFyY2gubWRjcl9lbDI7Cj4gPj4+ICAKPiA+Pj4gIAl0
-cmFjZV9rdm1fYXJtX3NldHVwX2RlYnVnKHZjcHUsIHZjcHUtPmd1ZXN0X2RlYnVnKTsKPiA+Pj4g
-IAo+ID4+PiAtCS8qCj4gPj4+IC0JICogVGhpcyBhbHNvIGNsZWFycyBNRENSX0VMMl9FMlBCX01B
-U0sgdG8gZGlzYWJsZSBndWVzdCBhY2Nlc3MKPiA+Pj4gLQkgKiB0byB0aGUgcHJvZmlsaW5nIGJ1
-ZmZlci4KPiA+Pj4gLQkgKi8KPiA+Pj4gLQl2Y3B1LT5hcmNoLm1kY3JfZWwyID0gX190aGlzX2Nw
-dV9yZWFkKG1kY3JfZWwyKSAmIE1EQ1JfRUwyX0hQTU5fTUFTSzsKPiA+Pj4gLQl2Y3B1LT5hcmNo
-Lm1kY3JfZWwyIHw9IChNRENSX0VMMl9UUE0gfAo+ID4+PiAtCQkJCU1EQ1JfRUwyX1RQTVMgfAo+
-ID4+PiAtCQkJCU1EQ1JfRUwyX1RQTUNSIHwKPiA+Pj4gLQkJCQlNRENSX0VMMl9URFJBIHwKPiA+
-Pj4gLQkJCQlNRENSX0VMMl9URE9TQSk7Cj4gPj4+ICsJa3ZtX2FybV9zZXR1cF9tZGNyX2VsMih2
-Y3B1LCBfX3RoaXNfY3B1X3JlYWQobWRjcl9lbDIpKTsKPiA+Pj4gIAo+ID4+PiAgCS8qIElzIEd1
-ZXN0IGRlYnVnZ2luZyBpbiBlZmZlY3Q/ICovCj4gPj4+ICAJaWYgKHZjcHUtPmd1ZXN0X2RlYnVn
-KSB7Cj4gPj4+IC0JCS8qIFJvdXRlIGFsbCBzb2Z0d2FyZSBkZWJ1ZyBleGNlcHRpb25zIHRvIEVM
-MiAqLwo+ID4+PiAtCQl2Y3B1LT5hcmNoLm1kY3JfZWwyIHw9IE1EQ1JfRUwyX1RERTsKPiA+Pj4g
-LQo+ID4+PiAgCQkvKiBTYXZlIGd1ZXN0IGRlYnVnIHN0YXRlICovCj4gPj4+ICAJCXNhdmVfZ3Vl
-c3RfZGVidWdfcmVncyh2Y3B1KTsKPiA+Pj4gIAo+ID4+PiBAQCAtMTc0LDcgKzIxMCw2IEBAIHZv
-aWQga3ZtX2FybV9zZXR1cF9kZWJ1ZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCj4gPj4+ICAKPiA+
-Pj4gIAkJCXZjcHUtPmFyY2guZGVidWdfcHRyID0gJnZjcHUtPmFyY2guZXh0ZXJuYWxfZGVidWdf
-c3RhdGU7Cj4gPj4+ICAJCQl2Y3B1LT5hcmNoLmZsYWdzIHw9IEtWTV9BUk02NF9ERUJVR19ESVJU
-WTsKPiA+Pj4gLQkJCXRyYXBfZGVidWcgPSB0cnVlOwo+ID4+IFRoZXJlIGlzIHNvbWV0aGluZyB0
-aGF0IHNsaWdodGx5IHdvcnJpZXMgbWUgaGVyZTogdGhlcmUgaXMgbm93IGEKPiA+PiBkaXNjb25u
-ZWN0IGJldHdlZW4gZmxhZ2dpbmcgZGVidWcgYXMgZGlydHkgYW5kIHNldHRpbmcgdGhlCj4gPj4g
-dHJhcHBpbmcuIEFuZCBhY3R1YWxseSwgeW91IG5vdyBjaGVjayBmb3IgS1ZNX0FSTTY0X0RFQlVH
-X0RJUlRZIGFuZAo+ID4+IHNldCB0aGUgdHJhcCBiaXRzICpiZWZvcmUqIHNldHRpbmcgdGhlIGRp
-cnR5IGJpdCBpdHNlbGYuCj4gPj4KPiA+PiBIZXJlLCBJIGJlbGlldmUgeW91IGVuZCB1cCB3aXRo
-IGd1ZXN0L2hvc3QgY29uZnVzaW9uIG9mIGJyZWFrcG9pbnRzLAo+ID4+IHdoaWNoIGlzbid0IGdy
-ZWF0LiBPciBkaWQgSSBtaXNzIHNvbWV0aGluZz8KPiA+IEknbSBzb3JyeSwgYnV0IEkgZG9uJ3Qg
-dW5kZXJzdGFuZCB3aGF0IHlvdSBtZWFuLiBUaGlzIGlzIG15IHVuZGVyc3RhbmRpbmcgb2Ygd2hh
-dAo+ID4gaXMgaGFwcGVuaW5nLgo+ID4KPiA+IFdpdGhvdXQgdGhpcyBwYXRjaCwgdHJhcF9kZWJ1
-ZyBpcyBzZXQgdG8gdHJ1ZSBhbmQgdGhlIEtWTV9BUk02NF9ERUJVR19ESVJUWSBmbGFnCj4gPiBp
-cyBzZXQgaWYgdmNwdS0+Z3Vlc3RfZGVidWcgJiBLVk1fR1VFU1REQkdfVVNFX0hXLiBGdXJ0aGVy
-IGRvd24sIHRyYXAgZGVidWcgaXMKPiA+IG9ubHkgdXNlZCB3aGVuIGNvbXB1dGluZyBtZGNyX2Vs
-Mi4KPiA+Cj4gPiBXaXRoIHRoaXMgcGF0Y2gsIHRyYXBfZGVidWcgaXMgc2V0IHRvIHRydWUgaWYg
-dmNwdS0+Z3Vlc3RfZGVidWcgJgo+ID4gS1ZNX0dVRVNUREJHX1VTRV9IVyBhbmQgaXQncyBhbHNv
-IHVzZWQgZm9yIGNvbXB1dGluZyBtZGNyX2VsMiwgYnV0IHRoaXMgaGFwcGVucyBpbgo+ID4ga3Zt
-X2FybV9zZXR1cF9tZGNyX2VsMigpLCB3aGljaCBpcyBjYWxsZWQgYXQgdGhlIHN0YXJ0IG9mIGt2
-bV9hcm1fc2V0dXBfZGVidWcoKS4KPiA+IFRoZSBLVk1fQVJNX0RFQlVHX0RJUlRZIGZsYWdzIGlz
-IHN0aWxsIHNldCBpbiBrdm1fYXJtX3NldHVwX2RlYnVnKCkgaWYKPiA+IHZjcHUtPmd1ZXN0X2Rl
-YnVnICYgS1ZNX0dVRVNUREJHX1VTRV9IVywgbGlrZSBiZWZvcmUuCj4gPgo+ID4gVGhlIGd1ZXN0
-IG5ldmVyIHJ1bnMgd2l0aCB0aGUgdmFsdWUgY29tcHV0ZWQgaW4ga3ZtX3ZjcHVfZmlyc3RfcnVu
-X2luaXQoKSB1bmxlc3MKPiA+IGl0J3MgaWRlbnRpY2FsIHdpdGggdGhlIHZhbHVlIHJlY29tcHV0
-ZWQgaW4ga3ZtX2FybV9zZXR1cF9kZWJ1ZygpLgo+ID4KPiA+IFRoZSBvbmx5IGRpZmZlcmVuY2Ug
-SSBzZWUgaXMgdGhhdCBtZGNyX2VsMiBpcyBjb21wdXRlZCBhdCB0aGUgc3RhcnQgb2YKPiA+IGt2
-bV9hcm1fc2V0dXBfZGVidWcoKS4gSSBnZXQgdGhlIGZlZWxpbmcgSSdtIGFsc28gbWlzc2luZyBz
-b21ldGhpbmcuCj4gCj4gSSB0aGluayBJIHVuZGVyc3RhbmQgd2hhdCB5b3UgbWVhbiwgeW91IGFy
-ZSB3b3JyaWVkIHRoYXQgd2Ugd29uJ3QKPiBzZXQgdGhlIGJpdCBpbiBtZGNyX2VsMiB0byB0cmFw
-IGRlYnVnIGluIHRoZSBzYW1lIHBsYWNlIHdoZXJlIHdlIHNldAo+IHRoZSBkZWJ1ZyBkaXJ0eSBm
-bGFnLgoKWWVzLCB0aGF0J3Mgd2hhdCBJIG1lYW4uIFRoZSBjb2RlIGlzIGNvbmNlcHR1YWxseSBh
-cyBzdWNoIEFUTToKCglkZWJ1Z190cmFwID0gKHNvbWV0aGluZyBiYXNlZCBvbiB2Y3B1LT5mbGFn
-cyk7CglpZiAoc29tZXRoaW5nIGVsc2UpIHsKCQljaGVjayBzdHVmZjsKCQl2Y3B1LT5mbGFncyB8
-PSBzdHVmZjsKCQlkZWJ1Z190cmFwID0gdHJ1ZTsKCX0KCglpZiAoZGVidWdfdHJhcCkKCQlzZXQg
-dHJhcCBjb25kaXRpb25zOwoKWW91IGFyZSB0dXJuaW5nIHRoaXMgaW50bzoKCglkZWJ1Z190cmFw
-ID0gKHNvbWV0aGluZyBiYXNlZCBvbiB2Y3B1LT5mbGFncyk7CglpZiAoZGVidWdfdHJhcCkgewoJ
-CXNldCB0cmFwIGNvbmRpdGlvbnM7Cgl9CglpZiAoc29tZXRoaW5nIGVsc2UpIHsKCQljaGVjayBz
-dHVmZjsKCQl2Y3B1LT5mbGFncyB8PSBzdHVmZjsKCX0KCndoaWNoIGlzbid0IHRoZSBzYW1lIHRo
-aW5nLiBJbiB5b3VyIGNhc2UsIGl0IHByb2JhYmx5IHdvcmtzIGJlY2F1c2Ugb2YKS1ZNX0dVRVNU
-REJHX1VTRV9IVywgYnV0IHRoYXQncyByZWFsbHkgaGFyZCB0byBmb2xsb3csIGFuZCB3ZSBoYXZl
-IGhhZApzbyBtYW55IGJ1Z3MgaW4gdGhlIGRlYnVnIGNvZGUgdGhhdCBpdCByZWFsbHkgbmVlZHMg
-dG8gYmUga2VwdCBhcwpzdHVwaWQgYXMgcG9zc2libGUuCgo+IElmIHRoYXQncyB0aGUgY2FzZSwg
-dGhlbiBJIGNhbiBtb3ZlIGt2bV9hcm1fc2V0dXBfbWRjcl9lbDIgcmlnaHQKPiBhZnRlciB0aGUg
-QlVHX09OKCkgYW5kIHJlbW92ZSB0aGUgS1ZNX0dVRVNUREJHX1VTRV9IVyBjaGVjayBiZWNhdXNl
-Cj4gdGhlIEtWTV9BUk1fREVCVUdfRElSVFkgd291bGQgYmUgYWxyZWFkeSBzZXQuCgpZZXMsIEkg
-dGhpbmsgdGhhdCdkIGJlIGJldHRlci4KCj4gUXVlc3Rpb24gdGhvdWdoLCBpZiBtZGNyX2VsMiBp
-cyB0aWVkIHRvIHRoZSBkZWJ1ZyBkaXJ0eSBmbGFnLCB3ZQo+IGlnbm9yZSB0aGUgZmxhZyBoZXJl
-IChjb2RlIHdpdGhvdXQgdGhpcyBwYXRjaCk6Cj4gCj4gwqDCoMKgIEJVR19PTighdmNwdS0+Z3Vl
-c3RfZGVidWcgJiYKPiDCoMKgwqAgwqDCoMKgIHZjcHUtPmFyY2guZGVidWdfcHRyICE9ICZ2Y3B1
-LT5hcmNoLnZjcHVfZGVidWdfc3RhdGUpOwo+IAo+IMKgwqDCoCAvKiBUcmFwIGRlYnVnIHJlZ2lz
-dGVyIGFjY2VzcyAqLwo+IMKgwqDCoCBpZiAodHJhcF9kZWJ1ZykKPiDCoMKgwqAgwqDCoMKgIHZj
-cHUtPmFyY2gubWRjcl9lbDIgfD0gTURDUl9FTDJfVERBOwo+IAo+IMKgwqDCoCAvKiBJZiBLREUg
-b3IgTURFIGFyZSBzZXQsIHBlcmZvcm0gYSBmdWxsIHNhdmUvcmVzdG9yZSBjeWNsZS4gKi8KPiDC
-oMKgwqAgaWYgKHZjcHVfcmVhZF9zeXNfcmVnKHZjcHUsIE1EU0NSX0VMMSkgJiAoREJHX01EU0NS
-X0tERSB8IERCR19NRFNDUl9NREUpKQo+IMKgwqDCoCDCoMKgwqAgdmNwdS0+YXJjaC5mbGFncyB8
-PSBLVk1fQVJNNjRfREVCVUdfRElSVFk7Cj4gCj4gSSBzdXBwb3NlIHRoZXJlJ3Mgc29tZXRoaW5n
-IEkgZG9uJ3QgdW5kZXJzdGFuZCB5ZXQgYWJvdXQgaG93IHRoaXMgaXMKPiBzdXBwb3NlZCB0byB3
-b3JrLgoKVGhlIGlkZWEgKElJUkMpIGlzIHRoYXQgaWYgTURTQ1JfRUwxLktERSBvciBNRFNDUl9F
-TDEuTURFIGFyZSBzZXQsCnRoYXQncyBiZWNhdXNlIHRoZSBndWVzdCBpcyBjdXJyZW50bHkgZGVi
-dWdnaW5nLCBhbmQgdGhhdCB3ZSBhcmUKYmV0dGVyIG9mZiBzYXlpbmcgdGhhdCB0aGUgZGVidWcg
-c3RhdGUgaXMgZGlydHksIGZvcmNpbmcgYQpzYXZlL3Jlc3RvcmUgY3ljbGUgb24gZW50cnkuCgpZ
-b3UgbWF5IHdhbnQgdG8gZGlnIGludG8gdGhlIGdpdCBoaXN0b3J5IGZvciBtb3JlIGFjY3VyYXRl
-CmluZm9ybWF0aW9uLi4uCgpIb3BlIHRoaXMgaGVscHMsCgoJTS4KCi0tIApXaXRob3V0IGRldmlh
-dGlvbiBmcm9tIHRoZSBub3JtLCBwcm9ncmVzcyBpcyBub3QgcG9zc2libGUuCl9fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QK
-a3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVk
-dS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+On Tue, 30 Mar 2021 18:13:07 +0100,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> Hi Marc,
+> 
+> Thanks for having a look!
+> 
+> On 3/30/21 10:55 AM, Marc Zyngier wrote:
+> > Hi Alex,
+> >
+> > On Tue, 23 Mar 2021 18:00:57 +0000,
+> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> >> When a VCPU is created, the kvm_vcpu struct is initialized to zero in
+> >> kvm_vm_ioctl_create_vcpu(). On VHE systems, the first time
+> >> vcpu.arch.mdcr_el2 is loaded on hardware is in vcpu_load(), before it is
+> >> set to a sensible value in kvm_arm_setup_debug() later in the run loop. The
+> >> result is that KVM executes for a short time with MDCR_EL2 set to zero.
+> >>
+> >> This has several unintended consequences:
+> >>
+> >> * Setting MDCR_EL2.HPMN to 0 is constrained unpredictable according to ARM
+> >>   DDI 0487G.a, page D13-3820. The behavior specified by the architecture
+> >>   in this case is for the PE to behave as if MDCR_EL2.HPMN is set to a
+> >>   value less than or equal to PMCR_EL0.N, which means that an unknown
+> >>   number of counters are now disabled by MDCR_EL2.HPME, which is zero.
+> >>
+> >> * The host configuration for the other debug features controlled by
+> >>   MDCR_EL2 is temporarily lost. This has been harmless so far, as Linux
+> >>   doesn't use the other fields, but that might change in the future.
+> >>
+> >> Let's avoid both issues by initializing the VCPU's mdcr_el2 field in
+> >> kvm_vcpu_vcpu_first_run_init(), thus making sure that the MDCR_EL2 register
+> >> has a consistent value after each vcpu_load().
+> >>
+> >> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > This looks strangely similar to 4942dc6638b0 ("KVM: arm64: Write
+> > arch.mdcr_el2 changes since last vcpu_load on VHE"), just at a
+> > different point. Probably worth a Fixes tag.
+> 
+> This bug is present in the commit you are mentioning, and from what
+> I can tell it's also present in the commit it's fixing (d5a21bcc2995
+> ("KVM: arm64: Move common VHE/non-VHE trap config in separate
+> functions")) - vcpu->arch.mdcr_el2 is computed in
+> kvm_arm_setup_debug(), which is called after vcpu_load(). My guess
+> is that this bug is from VHE support was added (or soon after).
+
+Right. Can you please add a Fixes: tag for the same commit? At least
+that'd be consistent.
+
+> I can dig further, how far back in time should I aim for?
+> 
+> >
+> >> ---
+> >> Found by code inspection. Based on v5.12-rc4.
+> >>
+> >> Tested on an odroid-c4 with VHE. vcpu->arch.mdcr_el2 is calculated to be
+> >> 0x4e66. Without this patch, reading MDCR_EL2 after the first vcpu_load() in
+> >> kvm_arch_vcpu_ioctl_run() returns 0; with this patch it returns the correct
+> >> value, 0xe66 (FEAT_SPE is not implemented by the PE).
+> >>
+> >> This patch was initially part of the KVM SPE series [1], but those patches
+> >> haven't seen much activity, so I thought it would be a good idea to send
+> >> this patch separately to draw more attention to it.
+> >>
+> >> Changes in v2:
+> >> * Moved kvm_arm_vcpu_init_debug() earlier in kvm_vcpu_first_run_init() so
+> >>   vcpu->arch.mdcr_el2 is calculated even if kvm_vgic_map_resources() fails.
+> >> * Added comment to kvm_arm_setup_mdcr_el2 to explain what testing
+> >>   vcpu->guest_debug means.
+> >>
+> >> [1] https://www.spinics.net/lists/kvm-arm/msg42959.html
+> >>
+> >>  arch/arm64/include/asm/kvm_host.h |  1 +
+> >>  arch/arm64/kvm/arm.c              |  3 +-
+> >>  arch/arm64/kvm/debug.c            | 82 +++++++++++++++++++++----------
+> >>  3 files changed, 59 insertions(+), 27 deletions(-)
+> >>
+> >> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> >> index 3d10e6527f7d..858c2fcfc043 100644
+> >> --- a/arch/arm64/include/asm/kvm_host.h
+> >> +++ b/arch/arm64/include/asm/kvm_host.h
+> >> @@ -713,6 +713,7 @@ static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
+> >>  static inline void kvm_arch_vcpu_block_finish(struct kvm_vcpu *vcpu) {}
+> >>  
+> >>  void kvm_arm_init_debug(void);
+> >> +void kvm_arm_vcpu_init_debug(struct kvm_vcpu *vcpu);
+> >>  void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
+> >>  void kvm_arm_clear_debug(struct kvm_vcpu *vcpu);
+> >>  void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu);
+> >> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> >> index 7f06ba76698d..7088d8fe7186 100644
+> >> --- a/arch/arm64/kvm/arm.c
+> >> +++ b/arch/arm64/kvm/arm.c
+> >> @@ -580,6 +580,8 @@ static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
+> >>  
+> >>  	vcpu->arch.has_run_once = true;
+> >>  
+> >> +	kvm_arm_vcpu_init_debug(vcpu);
+> >> +
+> >>  	if (likely(irqchip_in_kernel(kvm))) {
+> >>  		/*
+> >>  		 * Map the VGIC hardware resources before running a vcpu the
+> >> @@ -791,7 +793,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+> >>  		}
+> >>  
+> >>  		kvm_arm_setup_debug(vcpu);
+> >> -
+> > Spurious change?
+> 
+> Definitely, thank you for spotting it.
+> 
+> >
+> >>  		/**************************************************************
+> >>  		 * Enter the guest
+> >>  		 */
+> >> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+> >> index 7a7e425616b5..3626d03354f6 100644
+> >> --- a/arch/arm64/kvm/debug.c
+> >> +++ b/arch/arm64/kvm/debug.c
+> >> @@ -68,6 +68,60 @@ void kvm_arm_init_debug(void)
+> >>  	__this_cpu_write(mdcr_el2, kvm_call_hyp_ret(__kvm_get_mdcr_el2));
+> >>  }
+> >>  
+> >> +/**
+> >> + * kvm_arm_setup_mdcr_el2 - configure vcpu mdcr_el2 value
+> >> + *
+> >> + * @vcpu:	the vcpu pointer
+> >> + * @host_mdcr:  host mdcr_el2 value
+> >> + *
+> >> + * This ensures we will trap access to:
+> >> + *  - Performance monitors (MDCR_EL2_TPM/MDCR_EL2_TPMCR)
+> >> + *  - Debug ROM Address (MDCR_EL2_TDRA)
+> >> + *  - OS related registers (MDCR_EL2_TDOSA)
+> >> + *  - Statistical profiler (MDCR_EL2_TPMS/MDCR_EL2_E2PB)
+> >> + */
+> >> +static void kvm_arm_setup_mdcr_el2(struct kvm_vcpu *vcpu, u32 host_mdcr)
+> >> +{
+> >> +	bool trap_debug = !(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY);
+> >> +
+> >> +	/*
+> >> +	 * This also clears MDCR_EL2_E2PB_MASK to disable guest access
+> >> +	 * to the profiling buffer.
+> >> +	 */
+> >> +	vcpu->arch.mdcr_el2 = host_mdcr & MDCR_EL2_HPMN_MASK;
+> >> +	vcpu->arch.mdcr_el2 |= (MDCR_EL2_TPM |
+> >> +				MDCR_EL2_TPMS |
+> >> +				MDCR_EL2_TPMCR |
+> >> +				MDCR_EL2_TDRA |
+> >> +				MDCR_EL2_TDOSA);
+> >> +
+> >> +	/* Is the VM being debugged by userspace? */
+> >> +	if (vcpu->guest_debug) {
+> >> +		/* Route all software debug exceptions to EL2 */
+> >> +		vcpu->arch.mdcr_el2 |= MDCR_EL2_TDE;
+> >> +		if (vcpu->guest_debug & KVM_GUESTDBG_USE_HW)
+> >> +			trap_debug = true;
+> >> +	}
+> >> +
+> >> +	/* Trap debug register access */
+> >> +	if (trap_debug)
+> >> +		vcpu->arch.mdcr_el2 |= MDCR_EL2_TDA;
+> >> +
+> >> +	trace_kvm_arm_set_dreg32("MDCR_EL2", vcpu->arch.mdcr_el2);
+> >> +}
+> >> +
+> >> +/**
+> >> + * kvm_arm_vcpu_init_debug - setup vcpu debug traps
+> >> + *
+> >> + * @vcpu:	the vcpu pointer
+> >> + *
+> >> + * Set vcpu initial mdcr_el2 value.
+> >> + */
+> >> +void kvm_arm_vcpu_init_debug(struct kvm_vcpu *vcpu)
+> >> +{
+> >> +	kvm_arm_setup_mdcr_el2(vcpu, this_cpu_read(mdcr_el2));
+> > Given that kvm_arm_setup_mdcr_el2() always takes the current host
+> > value for mdcr_el2, why not moving the read into it and be done with
+> > it?
+> 
+> kvm_arm_setup_debug() is called with preemption disabled, and it can
+> use __this_cpu_read(). kvm_arm_vcpu_init_debug() is called with
+> preemption enabled, so it must use this_cpu_read(). I wanted to make
+> the distinction because kvm_arm_setup_debug() is in the run loop.
+
+I think it would be absolutely fine to make the slow path of
+kvm_vcpu_first_run_init() run with preempt disabled. This happens so
+rarely that that it isn't worth thinking about it.
+
+Please give it a lockdep run though! ;-)
+
+> 
+> >
+> > Also, do we really need an extra wrapper?
+> 
+> I can remove the wrapper and have kvm_arm_setup_mdcr_el2() use
+> this_cpu_read() for the host's mdcr_el2 value at the cost of a
+> preempt disable/enable in the run loop when preemption is
+> disabled. If you think that would make the code easier to follow, I
+> can certainly do that.
+
+As explained above, I'd rather you keep the __this_cpu_read() and make
+kvm_vcpu_first_run_init() preemption safe.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
