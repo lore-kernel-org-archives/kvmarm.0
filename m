@@ -2,59 +2,61 @@ Return-Path: <SRS0=NHQQ=I4=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CA5DC433DB
-	for <kvmarm@archiver.kernel.org>; Tue, 30 Mar 2021 10:23:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 230ADC433C1
+	for <kvmarm@archiver.kernel.org>; Tue, 30 Mar 2021 10:30:28 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 62341619AD
-	for <kvmarm@archiver.kernel.org>; Tue, 30 Mar 2021 10:23:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62341619AD
+	by mail.kernel.org (Postfix) with ESMTP id 6666F619A6
+	for <kvmarm@archiver.kernel.org>; Tue, 30 Mar 2021 10:30:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6666F619A6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AE0A64B2E4;
-	Tue, 30 Mar 2021 06:23:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D7A314B2DF;
+	Tue, 30 Mar 2021 06:30:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id SaijFxtkZr6z; Tue, 30 Mar 2021 06:23:14 -0400 (EDT)
+	with ESMTP id 16QE5ZpPUTmg; Tue, 30 Mar 2021 06:30:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 96E164B299;
-	Tue, 30 Mar 2021 06:23:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 977F74B29C;
+	Tue, 30 Mar 2021 06:30:25 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C20E4B23E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Mar 2021 06:23:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 58A7F4B281
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Mar 2021 06:30:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id y8SSvAr9nZYb for <kvmarm@lists.cs.columbia.edu>;
- Tue, 30 Mar 2021 06:23:12 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B3F8B4B1DD
- for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Mar 2021 06:23:12 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3193EED1;
- Tue, 30 Mar 2021 03:23:12 -0700 (PDT)
-Received: from [192.168.2.22] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C59BE3F792;
- Tue, 30 Mar 2021 03:23:11 -0700 (PDT)
-Subject: Re: KVM/ARM64: Booting KVM on FVP/fastmodels
-To: "yinhua_chen@outlook.com" <yinhua_chen@outlook.com>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
-References: <OSYPR01MB54317CECC49E872ACFD9D84B817E9@OSYPR01MB5431.jpnprd01.prod.outlook.com>
-From: =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
-Organization: ARM Ltd.
-Message-ID: <0bbea123-7bea-3a2e-70ae-30f43df3000e@arm.com>
-Date: Tue, 30 Mar 2021 11:22:50 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+ with ESMTP id 7ViwU8skV+o5 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 30 Mar 2021 06:30:23 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F0C114B23E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Mar 2021 06:30:22 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id F15E76195C;
+ Tue, 30 Mar 2021 10:30:17 +0000 (UTC)
+Date: Tue, 30 Mar 2021 11:30:15 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Steven Price <steven.price@arm.com>
+Subject: Re: [PATCH v10 2/6] arm64: kvm: Introduce MTE VM feature
+Message-ID: <20210330103013.GD18075@arm.com>
+References: <20210312151902.17853-1-steven.price@arm.com>
+ <20210312151902.17853-3-steven.price@arm.com>
+ <20210327152324.GA28167@arm.com> <20210328122131.GB17535@arm.com>
+ <e0b88560-34e1-dcc4-aaa7-9a7a5b771824@arm.com>
 MIME-Version: 1.0
-In-Reply-To: <OSYPR01MB54317CECC49E872ACFD9D84B817E9@OSYPR01MB5431.jpnprd01.prod.outlook.com>
-Content-Language: en-GB
+Content-Disposition: inline
+In-Reply-To: <e0b88560-34e1-dcc4-aaa7-9a7a5b771824@arm.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
+ Marc Zyngier <maz@kernel.org>, Juan Quintela <quintela@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
+ Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org,
+ Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,47 +73,93 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 29/03/2021 13:13, yinhua_chen@outlook.com wrote:
-
-Hi,
-
-> I want to boot KVM on simulators.
+On Mon, Mar 29, 2021 at 05:06:51PM +0100, Steven Price wrote:
+> On 28/03/2021 13:21, Catalin Marinas wrote:
+> > On Sat, Mar 27, 2021 at 03:23:24PM +0000, Catalin Marinas wrote:
+> > > On Fri, Mar 12, 2021 at 03:18:58PM +0000, Steven Price wrote:
+> > > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > > > index 77cb2d28f2a4..b31b7a821f90 100644
+> > > > --- a/arch/arm64/kvm/mmu.c
+> > > > +++ b/arch/arm64/kvm/mmu.c
+> > > > @@ -879,6 +879,22 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> > > >   	if (vma_pagesize == PAGE_SIZE && !force_pte)
+> > > >   		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
+> > > >   							   &pfn, &fault_ipa);
+> > > > +
+> > > > +	if (fault_status != FSC_PERM && kvm_has_mte(kvm) && pfn_valid(pfn)) {
+> > > > +		/*
+> > > > +		 * VM will be able to see the page's tags, so we must ensure
+> > > > +		 * they have been initialised. if PG_mte_tagged is set, tags
+> > > > +		 * have already been initialised.
+> > > > +		 */
+> > > > +		struct page *page = pfn_to_page(pfn);
+> > > > +		unsigned long i, nr_pages = vma_pagesize >> PAGE_SHIFT;
+> > > > +
+> > > > +		for (i = 0; i < nr_pages; i++, page++) {
+> > > > +			if (!test_and_set_bit(PG_mte_tagged, &page->flags))
+> > > > +				mte_clear_page_tags(page_address(page));
+> > > > +		}
+> > > > +	}
+> > > 
+> > > This pfn_valid() check may be problematic. Following commit eeb0753ba27b
+> > > ("arm64/mm: Fix pfn_valid() for ZONE_DEVICE based memory"), it returns
+> > > true for ZONE_DEVICE memory but such memory is allowed not to support
+> > > MTE.
+> > 
+> > Some more thinking, this should be safe as any ZONE_DEVICE would be
+> > mapped as untagged memory in the kernel linear map. It could be slightly
+> > inefficient if it unnecessarily tries to clear tags in ZONE_DEVICE,
+> > untagged memory. Another overhead is pfn_valid() which will likely end
+> > up calling memblock_is_map_memory().
+> > 
+> > However, the bigger issue is that Stage 2 cannot disable tagging for
+> > Stage 1 unless the memory is Non-cacheable or Device at S2. Is there a
+> > way to detect what gets mapped in the guest as Normal Cacheable memory
+> > and make sure it's only early memory or hotplug but no ZONE_DEVICE (or
+> > something else like on-chip memory)?  If we can't guarantee that all
+> > Cacheable memory given to a guest supports tags, we should disable the
+> > feature altogether.
 > 
-> I don't want to use QEMU since some features are only supported on
-> FVP/fastmodels now.
+> In stage 2 I believe we only have two types of mapping - 'normal' or
+> DEVICE_nGnRE (see stage2_map_set_prot_attr()). Filtering out the latter is a
+> case of checking the 'device' variable, and makes sense to avoid the
+> overhead you describe.
 > 
-> However, I cannot find documents/blogs/wiki about booting KVM on
-> FVP/fastmodels.
-> 
-> Does KVM support running on FVP?
+> This should also guarantee that all stage-2 cacheable memory supports tags,
+> as kvm_is_device_pfn() is simply !pfn_valid(), and pfn_valid() should only
+> be true for memory that Linux considers "normal".
 
-The FVP emulates the full architecture, including all exception levels
-(so also EL2), and the virtualization support of the GIC and the Generic
-Timer.
-So yes, the models fully support KVM (or any other hypervisor, for that
-matter), and are in fact often used for developing KVM support of new
-hardware features.
+That's the problem. With Anshuman's commit I mentioned above,
+pfn_valid() returns true for ZONE_DEVICE mappings (e.g. persistent
+memory, not talking about some I/O mapping that requires Device_nGnRE).
+So kvm_is_device_pfn() is false for such memory and it may be mapped as
+Normal but it is not guaranteed to support tagging.
 
-So what are the problems that you are facing? Just running a kernel like
-you would normally do on the model should work out of the box.
-If you describe your setup and the error messages, we can probably help
-you better.
+For user MTE, we get away with this as the MAP_ANONYMOUS requirement
+would filter it out while arch_add_memory() will ensure it's mapped as
+untagged in the linear map. See another recent fix for hotplugged
+memory: d15dfd31384b ("arm64: mte: Map hotplugged memory as Normal
+Tagged"). We needed to ensure that ZONE_DEVICE doesn't end up as tagged,
+only hoplugged memory. Both handled via arch_add_memory() in the arch
+code with ZONE_DEVICE starting at devm_memremap_pages().
 
-Cheers,
-Andre
+> > > I now wonder if we can get a MAP_ANONYMOUS mapping of ZONE_DEVICE pfn
+> > > even without virtualisation.
+> > 
+> > I haven't checked all the code paths but I don't think we can get a
+> > MAP_ANONYMOUS mapping of ZONE_DEVICE memory as we normally need a file
+> > descriptor.
+> 
+> I certainly hope this is the case - it's the weird corner cases of device
+> drivers that worry me. E.g. I know i915 has a "hidden" mmap behind an ioctl
+> (see i915_gem_mmap_ioctl(), although this case is fine - it's MAP_SHARED).
+> Mali's kbase did something similar in the past.
 
-> 
-> Appreciate for your help!
-> 
-> Sincerely,
-> Yinhua
-> 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-> 
+I think this should be fine since it's not a MAP_ANONYMOUS (we do allow
+MAP_SHARED to be tagged).
 
+-- 
+Catalin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
