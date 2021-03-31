@@ -7,95 +7,95 @@ X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EA71C433B4
-	for <kvmarm@archiver.kernel.org>; Wed, 31 Mar 2021 16:36:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 890D9C433B4
+	for <kvmarm@archiver.kernel.org>; Wed, 31 Mar 2021 16:47:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8F4BE61008
-	for <kvmarm@archiver.kernel.org>; Wed, 31 Mar 2021 16:36:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F4BE61008
+	by mail.kernel.org (Postfix) with ESMTP id 026F96103D
+	for <kvmarm@archiver.kernel.org>; Wed, 31 Mar 2021 16:47:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 026F96103D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F17804B43F;
-	Wed, 31 Mar 2021 12:36:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6436C4B467;
+	Wed, 31 Mar 2021 12:47:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ELIZKcjfBsn9; Wed, 31 Mar 2021 12:36:51 -0400 (EDT)
+	with ESMTP id 6h0zDWdoCWzj; Wed, 31 Mar 2021 12:47:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E9CC64B48A;
-	Wed, 31 Mar 2021 12:36:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E0C34B473;
+	Wed, 31 Mar 2021 12:47:50 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 99AB54B43F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 31 Mar 2021 12:36:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D3E624B465
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 31 Mar 2021 12:47:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3nyp7ipsqjMm for <kvmarm@lists.cs.columbia.edu>;
- Wed, 31 Mar 2021 12:36:49 -0400 (EDT)
+ with ESMTP id GKAsiIMhBEdY for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 31 Mar 2021 12:47:47 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9431E4B0C7
- for <kvmarm@lists.cs.columbia.edu>; Wed, 31 Mar 2021 12:36:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D8D604B3A4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 31 Mar 2021 12:47:47 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1617208609;
+ s=mimecast20190719; t=1617209267;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=QVCeiltaTGJXJYSW6dhbkobIMYPQfKpSFl3XbU9a+wA=;
- b=Z1Foasehn2XmvJG751Vlb333YRRv2hQxD96MGHmWTyGD0khQBB4hFtKKd7u8BvMNlY28HQ
- 6Dah9a+l/mVY69//hjUn179zF4HzhcRzzGXLQN5s42ATAhojMOZ9UO1QBsv/+eFG34oeQ6
- +T1tKhEUDIFdZ9cW4OpQAUqSsKm3dGc=
+ bh=0ix2mfUcEg/DOypNDwaacoOT966lSJ+UT8pzFrJ6uHI=;
+ b=VTPeHIDD/uPp9CsY4tysGMAe6xtFzZpTYWx0dq2IW5mjsKc0ik6xI/z80di2ozirgxoLIx
+ yRy7fPZdZLv0MHj0BeVxgg0rTjImk8q2TzW2nIoG+JogbTZMW5Upyg4IW1FOVXn1mtZR2J
+ /3ZEI6JPQoVRtn39GxAzebkkrjrwRM4=
 Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
  [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-322-tDi7BbrWOdGKZnN1e1vs3A-1; Wed, 31 Mar 2021 12:36:47 -0400
-X-MC-Unique: tDi7BbrWOdGKZnN1e1vs3A-1
-Received: by mail-ej1-f72.google.com with SMTP id jo6so1042288ejb.13
- for <kvmarm@lists.cs.columbia.edu>; Wed, 31 Mar 2021 09:36:47 -0700 (PDT)
+ us-mta-170-bms1F1X1MvmYEa5xziLiUA-1; Wed, 31 Mar 2021 12:47:45 -0400
+X-MC-Unique: bms1F1X1MvmYEa5xziLiUA-1
+Received: by mail-ej1-f72.google.com with SMTP id gn30so1064021ejc.3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 31 Mar 2021 09:47:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=QVCeiltaTGJXJYSW6dhbkobIMYPQfKpSFl3XbU9a+wA=;
- b=OYc0UkMup4C88RwXOaiSoFRfNXgMzZzJKi/5Nj/twsrwH+FVdI55BNKTcwX44+lhBm
- dR1+jxstJX0ElBKZgu5TczBsE6AvzlUXUsa9mff+JPh3HGetWM0G3P57soW2WpxdEFG9
- U/IMNswCan2En1okAFLNJXYo9Da/R7K5NsidyCykWa+somYIiQMfHP3OHoS3ZCSqteWB
- ZX0w4JSOuFsBopIv7ewdmsl1jVTHh0jhFDzL8mXl/2xdMQNm8FBVChwUhnuQyyIxH/VA
- +TxvBtofSoGAQaqHuqxir5N4DaJ60am0IDnxT1yfpAQr4MVCtfy2qhXLpMmeGl9AhRse
- EzIw==
-X-Gm-Message-State: AOAM530XCd7EdYrJbb96vPLs0JhnPq/bJNpnXP9VZHdsvvPI3FL2E4wA
- aLbtJc46zaThTdy5hckFkyGbrr6fD5swKTVDI1N43S78KNzCPvci/3SJuUQu0r6bHblg30JR5C8
- /aJNKF7YX2pvGOX5HAXYe95Bb
-X-Received: by 2002:a17:906:2786:: with SMTP id
- j6mr4459328ejc.157.1617208606698; 
- Wed, 31 Mar 2021 09:36:46 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyH0TubmRiztxbbKWWpE6U/9a4Jmz4SSbDeZziJUjL7bKl7L31NfjvonwQzH04qoJmbwktymw==
-X-Received: by 2002:a17:906:2786:: with SMTP id
- j6mr4459281ejc.157.1617208606447; 
- Wed, 31 Mar 2021 09:36:46 -0700 (PDT)
+ bh=0ix2mfUcEg/DOypNDwaacoOT966lSJ+UT8pzFrJ6uHI=;
+ b=dPNb+AA32Sj17L175qtOrKafhuMKJFD9EbPuHvgmaj2wQzmtTg2gDTzxsMsQj57cxu
+ sLixg/wLFJqKyWWG8UeINHptF8rM7WyyNDiSciOtzLfoZ0/P2G0cM20O3w/sFVwbFL8y
+ xpTQdUuwzOtwuW0JestnvoQLzrQrGBkV3rYXR+9q84+a+X0oFE+1qIgW4SLKFnSv1QVr
+ 8gJu+y34b9FZqVghYPMG+WuPbvikVjEmdRNkUq9085bvzLnB/X1tUUMpEOrgbWQF5br0
+ 4546GzVXvCFZMg0BHezFBcvQnHi1hnJS99aHsB94T9Q4p6jAUykMVhBfUcII1MVBFmfv
+ 0rNA==
+X-Gm-Message-State: AOAM530538dH0bf5qP8sFo4NTulfRvxOHpd5np1ckLKhrCYy98EFujqd
+ uQm9EZL53fxVFWv7wl6VUMcbw8TTrhXYF2N7f1fOQXmYxMO6Sg/S7vPKhnshyEc0IRANVp7Xvt9
+ V4HCxNpxc/RXXAszsbIvVYIFF
+X-Received: by 2002:a17:906:1182:: with SMTP id
+ n2mr4597710eja.234.1617209264780; 
+ Wed, 31 Mar 2021 09:47:44 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJymG2hf8oxiTqtfGgyXFzM/nXfYjs4CdYmJnVTC5zNGPoNEIpchzu0nS+pvIuCk4GHAjhT9jA==
+X-Received: by 2002:a17:906:1182:: with SMTP id
+ n2mr4597673eja.234.1617209264605; 
+ Wed, 31 Mar 2021 09:47:44 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
  ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
- by smtp.gmail.com with ESMTPSA id hb19sm1500893ejb.11.2021.03.31.09.36.45
+ by smtp.gmail.com with ESMTPSA id p24sm2057269edt.5.2021.03.31.09.47.43
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 31 Mar 2021 09:36:45 -0700 (PDT)
+ Wed, 31 Mar 2021 09:47:43 -0700 (PDT)
+Subject: Re: [PATCH 16/18] KVM: Don't take mmu_lock for range invalidation
+ unless necessary
 To: Sean Christopherson <seanjc@google.com>
 References: <20210326021957.1424875-1-seanjc@google.com>
- <20210326021957.1424875-11-seanjc@google.com>
- <ba3f7a9c-0b59-cbeb-5d46-4236cde2c51f@redhat.com>
- <YGShRP9E49p3vcos@google.com>
+ <20210326021957.1424875-17-seanjc@google.com>
+ <6e7dc7d0-f5dc-85d9-1c50-d23b761b5ff3@redhat.com>
+ <YGSmMeSOPcjxRwf6@google.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 10/18] KVM: Move x86's MMU notifier memslot walkers to
- generic code
-Message-ID: <d843bbd5-d3f0-3cda-aaa5-8e0fb1d69554@redhat.com>
-Date: Wed, 31 Mar 2021 18:36:44 +0200
+Message-ID: <56ea69fe-87b0-154b-e286-efce9233864e@redhat.com>
+Date: Wed, 31 Mar 2021 18:47:42 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.7.0
 MIME-Version: 1.0
-In-Reply-To: <YGShRP9E49p3vcos@google.com>
+In-Reply-To: <YGSmMeSOPcjxRwf6@google.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -126,40 +126,55 @@ Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 31/03/21 18:20, Sean Christopherson wrote:
-> Every call
-> to .change_pte() is bookended by .invalidate_range_{start,end}(), i.e. the above
-> missing kvm->mmu_notifier_seq++ is benign because kvm->mmu_notifier_count is
-> guaranteed to be non-zero.
+On 31/03/21 18:41, Sean Christopherson wrote:
+>> That said, the easiest way to avoid this would be to always update
+>> mmu_notifier_count.
+> Updating mmu_notifier_count requires taking mmu_lock, which would defeat the
+> purpose of these shenanigans.
 
-In fact ARM even relies on invalidate wrapping the change_pte handler.
+Okay; I wasn't sure if the problem was contention with page faults in 
+general, or just the long critical sections from the MMU notifier 
+callbacks.  Still updating mmu_notifier_count unconditionally is a good 
+way to break up the patch in two and keep one commit just for the rwsem 
+nastiness.
 
-         /*
-          * The MMU notifiers will have unmapped a huge PMD before calling
-          * ->change_pte() (which in turn calls kvm_set_spte_hva()) and
-          * therefore we never need to clear out a huge PMD through this
-          * calling path and a memcache is not required.
-          */
+>>> +#if defined(CONFIG_MMU_NOTIFIER) && defined(KVM_ARCH_WANT_MMU_NOTIFIER)
+>>> +	down_write(&kvm->mmu_notifier_slots_lock);
+>>> +#endif
+>>>   	rcu_assign_pointer(kvm->memslots[as_id], slots);
+>>> +#if defined(CONFIG_MMU_NOTIFIER) && defined(KVM_ARCH_WANT_MMU_NOTIFIER)
+>>> +	up_write(&kvm->mmu_notifier_slots_lock);
+>>> +#endif
+>> Please do this unconditionally, the cost is minimal if the rwsem is not
+>> contended (as is the case if the architecture doesn't use MMU notifiers at
+>> all).
+> It's not the cost, it's that mmu_notifier_slots_lock doesn't exist.  That's an
+> easily solved problem, but then the lock wouldn't be initialized since
+> kvm_init_mmu_notifier() is a nop.  That's again easy to solve, but IMO would
+> look rather weird.  I guess the counter argument is that __kvm_memslots()
+> wouldn't need #ifdeffery.
 
-> Assuming all of the above is correct, I'm very tempted to rip out .change_pte()
-> entirely.
+Yep.  Less #ifdefs usually wins. :)
 
-There is still the performance benefit from immediately remapping the 
-page to the new destination without waiting for a fault.  Yes it's 
-hypothetical but I would prefer to leave that change for later.
+> These are the to ideas I've come up with:
+> 
+> Option 1:
+> 	static int kvm_init_mmu_notifier(struct kvm *kvm)
+> 	{
+> 		init_rwsem(&kvm->mmu_notifier_slots_lock);
+> 
+> 	#if defined(CONFIG_MMU_NOTIFIER) && defined(KVM_ARCH_WANT_MMU_NOTIFIER)
+> 		kvm->mmu_notifier.ops = &kvm_mmu_notifier_ops;
+> 		return mmu_notifier_register(&kvm->mmu_notifier, current->mm);
+> 	#else
+> 		return 0;
+> 	#endif
+> 	}
 
-The fact that the count is nonzero means that you will not even have to 
-complicate kvm_mmu_notifier_change_pte to handle the removal of 
-mmu_notifier_seq; just add a patch before this one to WARN if it is 
-zero.  (The rest of my review to patch 16 still holds).
+Option 2 is also okay I guess, but the simplest is option 1 + just init 
+it in kvm_create_vm.
 
 Paolo
-
-> It's been dead weight for 8+ years and no one has complained about
-> KSM+KVM performance (I'd also be curious to know how much performance was gained
-> by shaving VM-Exits).  As KVM is the only user of .change_pte(), dropping it in
-> KVM would mean the entire MMU notifier could also go away.
-> 
 
 _______________________________________________
 kvmarm mailing list
