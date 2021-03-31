@@ -1,97 +1,91 @@
-Return-Path: <SRS0=NHQQ=I4=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=69BX=I5=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93AD7C433E0
-	for <kvmarm@archiver.kernel.org>; Tue, 30 Mar 2021 20:21:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1334FC433E1
+	for <kvmarm@archiver.kernel.org>; Wed, 31 Mar 2021 07:35:00 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0836F61883
-	for <kvmarm@archiver.kernel.org>; Tue, 30 Mar 2021 20:21:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0836F61883
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 74560619DB
+	for <kvmarm@archiver.kernel.org>; Wed, 31 Mar 2021 07:34:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74560619DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 966E34B339;
-	Tue, 30 Mar 2021 16:21:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E67114B3E2;
+	Wed, 31 Mar 2021 03:34:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id l8nhBTskAHA8; Tue, 30 Mar 2021 16:21:06 -0400 (EDT)
+	with ESMTP id lPik6as85Mw2; Wed, 31 Mar 2021 03:34:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E9714B338;
-	Tue, 30 Mar 2021 16:21:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 949084B3D2;
+	Wed, 31 Mar 2021 03:34:57 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 970244B326
- for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Mar 2021 15:58:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C3E874B3B6
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 31 Mar 2021 03:34:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NnvwNpt+7xm1 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 30 Mar 2021 15:58:25 -0400 (EDT)
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com
- [209.85.210.173])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 765244B325
- for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Mar 2021 15:58:25 -0400 (EDT)
-Received: by mail-pf1-f173.google.com with SMTP id g15so12902180pfq.3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Mar 2021 12:58:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=wTEyxuaapP4d1SHF7RcerzFayP475kgkIctZEDORCvY=;
- b=envgQwKOhZLGzYbrjTo3+nEI/ILCJz7AV2GNZ37sA4tCFJ/jO9jwiK5voJwg3r/eds
- n/zOAXzsVLcOacfLuS5VHUc/Z+MqB19zQ52tsRetZLD7hBDRRdqbtww6YeIzEisRIyMw
- UnfTrppUFQicAdk3Yb3QZQbrg/qIsNA3dGPVEIftHW0s1SOq7Hgyee3Ke9l4JB7cfcim
- WfxyAvKImmJ2KZPyBj2tHvhaebrjJjZxU5509A9Ch4WA/EkIVJwDkd6/BmVOdrShBU9j
- tfeAKC2/dsPTX8UPAidLNUSrGVz0OIl962YLH0QZ9VroDrpQvyJk5f+1O5KmnTp/LVWY
- h0QA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=wTEyxuaapP4d1SHF7RcerzFayP475kgkIctZEDORCvY=;
- b=BUbMfew+eleK5vHebpx4PwnbbIj56O52DJ0mj0m8LOr6wNNNSO9q/C6FE7Cs9TcmHK
- KVEp0ZqK72LcP9qXGMxjrYgtvxHfa1jTxXxBNq9vHweHZZiPTpdM133hPNqSVdnA+FIs
- td+C5eB2iOgvSCta9WwPWAAJGeKbaGLdO0DbKasCLYsTVa4FWVQewSwPNY3/5fc085Nx
- +YM11ZAINIhdmDXiPm3zMaMbfrWkcQxgC6khYpQNC37PwOxDRk6ETFqW6WdqNu1JETxd
- kYv/wLOymM6NGlDp8XQE2i8cbS+NbSVoPs9PcrxzNBMCukfSc1Vbf0ZtOwZYrmawf5Va
- 0FNg==
-X-Gm-Message-State: AOAM530XkSqZPkdiQIeM4hsc2a8yS99ZF+B0abLx+VEg2ZsSp5Kqevkp
- Aj4wKo90pDUYPb/eAcb0m/TMIA==
-X-Google-Smtp-Source: ABdhPJy/H3xYrm77zteXXmXwOlrnRIg3rQpdyEYIba7syOVncG/8FqBI2t2hNnALYH3MbklxzEVjZA==
-X-Received: by 2002:a63:5361:: with SMTP id t33mr29952003pgl.439.1617134304318; 
- Tue, 30 Mar 2021 12:58:24 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com.
- [35.247.111.240])
- by smtp.gmail.com with ESMTPSA id f16sm10723866pfj.220.2021.03.30.12.58.23
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 30 Mar 2021 12:58:23 -0700 (PDT)
-Date: Tue, 30 Mar 2021 19:58:19 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Ben Gardon <bgardon@google.com>
-Subject: Re: [PATCH 00/18] KVM: Consolidate and optimize MMU notifiers
-Message-ID: <YGOC2wqn5k9WkY39@google.com>
-References: <20210326021957.1424875-1-seanjc@google.com>
- <CANgfPd_gpWsa4F3VdcpoBYqPR4dSBWNYCW1YdeOnu1wQdUz+0A@mail.gmail.com>
+ with ESMTP id wNy4LTgRcRYy for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 31 Mar 2021 03:34:55 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A5AB14B3B0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 31 Mar 2021 03:34:55 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1617176095;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Rw79CBvMLi5mEY0tcvp9kTn6CghMbW3t144/yxRDUX4=;
+ b=HvURMu1hUDFg7UEMiYVY4j7YvBeOgTeyQEAZ7Q1eG9jmWhni9ntk9RV4nzdd988o4QXnSr
+ ezxT42ztPe4w11EqctwdLowVCBvliDNyoRdiFSdqLOg0EEos8qvkqFQGZUyFghuy/2Ctj7
+ MujZpK9uFLuHNNZrAE712v83HG/N3Ns=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-260-Q4AVGFAoNCuvO8_eHBIvbQ-1; Wed, 31 Mar 2021 03:34:52 -0400
+X-MC-Unique: Q4AVGFAoNCuvO8_eHBIvbQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 87C43108BD09;
+ Wed, 31 Mar 2021 07:34:50 +0000 (UTC)
+Received: from [10.36.113.60] (ovpn-113-60.ams2.redhat.com [10.36.113.60])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5582D5C5AE;
+ Wed, 31 Mar 2021 07:34:45 +0000 (UTC)
+To: Catalin Marinas <catalin.marinas@arm.com>,
+ Steven Price <steven.price@arm.com>
+References: <20210312151902.17853-1-steven.price@arm.com>
+ <20210312151902.17853-3-steven.price@arm.com>
+ <20210327152324.GA28167@arm.com> <20210328122131.GB17535@arm.com>
+ <e0b88560-34e1-dcc4-aaa7-9a7a5b771824@arm.com>
+ <20210330103013.GD18075@arm.com>
+From: David Hildenbrand <david@redhat.com>
+Organization: Red Hat GmbH
+Subject: Re: [PATCH v10 2/6] arm64: kvm: Introduce MTE VM feature
+Message-ID: <8977120b-841d-4882-2472-6e403bc9c797@redhat.com>
+Date: Wed, 31 Mar 2021 09:34:44 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <CANgfPd_gpWsa4F3VdcpoBYqPR4dSBWNYCW1YdeOnu1wQdUz+0A@mail.gmail.com>
-X-Mailman-Approved-At: Tue, 30 Mar 2021 16:21:03 -0400
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm <kvm@vger.kernel.org>,
- Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
- Huacai Chen <chenhuacai@kernel.org>, linux-mips@vger.kernel.org,
- kvm-ppc@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
- Paul Mackerras <paulus@ozlabs.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- linux-arm-kernel@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>, kvmarm@lists.cs.columbia.edu,
- Jim Mattson <jmattson@google.com>
+In-Reply-To: <20210330103013.GD18075@arm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Cc: Marc Zyngier <maz@kernel.org>, Juan Quintela <quintela@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+ Dave Martin <Dave.Martin@arm.com>, linux-kernel@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -103,75 +97,114 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Mar 30, 2021, Ben Gardon wrote:
-> On Thu, Mar 25, 2021 at 7:20 PM Sean Christopherson <seanjc@google.com> wrote:
-> > Patch 10 moves x86's memslot walkers into common KVM.  I chose x86 purely
-> > because I could actually test it.  All architectures use nearly identical
-> > code, so I don't think it actually matters in the end.
+On 30.03.21 12:30, Catalin Marinas wrote:
+> On Mon, Mar 29, 2021 at 05:06:51PM +0100, Steven Price wrote:
+>> On 28/03/2021 13:21, Catalin Marinas wrote:
+>>> On Sat, Mar 27, 2021 at 03:23:24PM +0000, Catalin Marinas wrote:
+>>>> On Fri, Mar 12, 2021 at 03:18:58PM +0000, Steven Price wrote:
+>>>>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>>>>> index 77cb2d28f2a4..b31b7a821f90 100644
+>>>>> --- a/arch/arm64/kvm/mmu.c
+>>>>> +++ b/arch/arm64/kvm/mmu.c
+>>>>> @@ -879,6 +879,22 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>>>>>    	if (vma_pagesize == PAGE_SIZE && !force_pte)
+>>>>>    		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
+>>>>>    							   &pfn, &fault_ipa);
+>>>>> +
+>>>>> +	if (fault_status != FSC_PERM && kvm_has_mte(kvm) && pfn_valid(pfn)) {
+>>>>> +		/*
+>>>>> +		 * VM will be able to see the page's tags, so we must ensure
+>>>>> +		 * they have been initialised. if PG_mte_tagged is set, tags
+>>>>> +		 * have already been initialised.
+>>>>> +		 */
+>>>>> +		struct page *page = pfn_to_page(pfn);
+>>>>> +		unsigned long i, nr_pages = vma_pagesize >> PAGE_SHIFT;
+>>>>> +
+>>>>> +		for (i = 0; i < nr_pages; i++, page++) {
+>>>>> +			if (!test_and_set_bit(PG_mte_tagged, &page->flags))
+>>>>> +				mte_clear_page_tags(page_address(page));
+>>>>> +		}
+>>>>> +	}
+>>>>
+>>>> This pfn_valid() check may be problematic. Following commit eeb0753ba27b
+>>>> ("arm64/mm: Fix pfn_valid() for ZONE_DEVICE based memory"), it returns
+>>>> true for ZONE_DEVICE memory but such memory is allowed not to support
+>>>> MTE.
+>>>
+>>> Some more thinking, this should be safe as any ZONE_DEVICE would be
+>>> mapped as untagged memory in the kernel linear map. It could be slightly
+>>> inefficient if it unnecessarily tries to clear tags in ZONE_DEVICE,
+>>> untagged memory. Another overhead is pfn_valid() which will likely end
+>>> up calling memblock_is_map_memory().
+>>>
+>>> However, the bigger issue is that Stage 2 cannot disable tagging for
+>>> Stage 1 unless the memory is Non-cacheable or Device at S2. Is there a
+>>> way to detect what gets mapped in the guest as Normal Cacheable memory
+>>> and make sure it's only early memory or hotplug but no ZONE_DEVICE (or
+>>> something else like on-chip memory)?  If we can't guarantee that all
+>>> Cacheable memory given to a guest supports tags, we should disable the
+>>> feature altogether.
+>>
+>> In stage 2 I believe we only have two types of mapping - 'normal' or
+>> DEVICE_nGnRE (see stage2_map_set_prot_attr()). Filtering out the latter is a
+>> case of checking the 'device' variable, and makes sense to avoid the
+>> overhead you describe.
+>>
+>> This should also guarantee that all stage-2 cacheable memory supports tags,
+>> as kvm_is_device_pfn() is simply !pfn_valid(), and pfn_valid() should only
+>> be true for memory that Linux considers "normal".
+
+If you think "normal" == "normal System RAM", that's wrong; see below.
+
 > 
-> I'm still reviewing 10 and 14-18. 10 is a huge change and the diff is
-> pretty hard to parse.
+> That's the problem. With Anshuman's commit I mentioned above,
+> pfn_valid() returns true for ZONE_DEVICE mappings (e.g. persistent
+> memory, not talking about some I/O mapping that requires Device_nGnRE).
+> So kvm_is_device_pfn() is false for such memory and it may be mapped as
+> Normal but it is not guaranteed to support tagging.
 
-Ya :-/  I don't see an easy way to break it up without creating a massive diff,
-e.g. it could be staged in x86 and moved to common, but I don't think that would
-fundamentally change the diff.  Although I admittedly didn't spend _that_ much
-time thinking about how to break it up.
+pfn_valid() means "there is a struct page"; if you do pfn_to_page() and 
+touch the page, you won't fault. So Anshuman's commit is correct.
 
-> > Patches 11-13 move arm64, MIPS, and PPC to the new APIs.
-> >
-> > Patch 14 yanks out the old APIs.
-> >
-> > Patch 15 adds the mmu_lock elision, but only for unpaired notifications.
+pfn_to_online_page() means, "there is a struct page and it's system RAM 
+that's in use; the memmap has a sane content"
+
 > 
-> Reading through all this code and considering the changes I'm
-> preparing for the TDP MMU have me wondering if it might help to have a
-> more general purpose MMU lock context struct which could be embedded
-> in the structs added in this patch. I'm thinking something like:
-> enum kvm_mmu_lock_mode {
->     KVM_MMU_LOCK_NONE,
->     KVM_MMU_LOCK_READ,
->     KVM_MMU_LOCK_WRITE,
-> };
+> For user MTE, we get away with this as the MAP_ANONYMOUS requirement
+> would filter it out while arch_add_memory() will ensure it's mapped as
+> untagged in the linear map. See another recent fix for hotplugged
+> memory: d15dfd31384b ("arm64: mte: Map hotplugged memory as Normal
+> Tagged"). We needed to ensure that ZONE_DEVICE doesn't end up as tagged,
+> only hoplugged memory. Both handled via arch_add_memory() in the arch
+> code with ZONE_DEVICE starting at devm_memremap_pages().
 > 
-> struct kvm_mmu_lock_context {
->     enum kvm_mmu_lock_mode lock_mode;
->     bool can_block;
->     bool can_yield;
-
-Not that it matters right now, but can_block and can_yield are the same thing.
-I considered s/can_yield/can_block to make it all consistent, but that felt like
-unnecessary thrash.
-
->     bool flush;
-
-Drat.  This made me realize that the 'struct kvm_gfn_range' passed to arch code
-isn't tagged 'const'.  I thought I had done that, but obviously not.
-
-Anyways, what I was going to say before that realization is that the downside to
-putting flush into kvm_gfn_range is that it would have to lose its 'const'
-qualifier.  That's all a moot point if it's not easily constified though.
-
-Const aside, my gut reaction is that it will probably be cleaner to keep the
-flush stuff in arch code, separate from the kvm_gfn_range passed in by common
-KVM.  Looping 'flush' back into the helpers is x86 specific at this point, and
-AFAICT that's not likely to change any time soon.
-
-For rwlock support, if we get to the point where kvm_age_gfn() and/or
-kvm_test_age_gfn() can take mmu_lock for read, then it definitely makes sense to
-track locking in kvm_gfn_range, assuming it isn't the sole entity that prevents
-consifying kvm_range_range.
-
-> };
+>>>> I now wonder if we can get a MAP_ANONYMOUS mapping of ZONE_DEVICE pfn
+>>>> even without virtualisation.
+>>>
+>>> I haven't checked all the code paths but I don't think we can get a
+>>> MAP_ANONYMOUS mapping of ZONE_DEVICE memory as we normally need a file
+>>> descriptor.
+>>
+>> I certainly hope this is the case - it's the weird corner cases of device
+>> drivers that worry me. E.g. I know i915 has a "hidden" mmap behind an ioctl
+>> (see i915_gem_mmap_ioctl(), although this case is fine - it's MAP_SHARED).
+>> Mali's kbase did something similar in the past.
 > 
-> This could yield some grossly long lines, but it would also have
-> potential to unify a bunch of ad-hoc handling.
-> The above struct could also fit into a single byte, so it'd be pretty
-> easy to pass it around.
+> I think this should be fine since it's not a MAP_ANONYMOUS (we do allow
+> MAP_SHARED to be tagged).
+> 
+
+
+-- 
+Thanks,
+
+David / dhildenb
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
