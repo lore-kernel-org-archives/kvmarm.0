@@ -2,80 +2,59 @@ Return-Path: <SRS0=69BX=I5=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D98EC433C1
-	for <kvmarm@archiver.kernel.org>; Wed, 31 Mar 2021 09:34:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6136C433C1
+	for <kvmarm@archiver.kernel.org>; Wed, 31 Mar 2021 09:38:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 119F26190A
-	for <kvmarm@archiver.kernel.org>; Wed, 31 Mar 2021 09:34:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 119F26190A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 2FD3A61968
+	for <kvmarm@archiver.kernel.org>; Wed, 31 Mar 2021 09:38:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FD3A61968
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9216E4B395;
-	Wed, 31 Mar 2021 05:34:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 829284B41A;
+	Wed, 31 Mar 2021 05:38:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id qrkbouNnj0i3; Wed, 31 Mar 2021 05:34:12 -0400 (EDT)
+	with ESMTP id 8xCYLoObxVle; Wed, 31 Mar 2021 05:38:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5999E4B3A3;
-	Wed, 31 Mar 2021 05:34:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6AE364B41C;
+	Wed, 31 Mar 2021 05:38:50 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BDD44B3A3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 31 Mar 2021 05:34:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 975C54B3D2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 31 Mar 2021 03:36:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fsApYpn9xq6R for <kvmarm@lists.cs.columbia.edu>;
- Wed, 31 Mar 2021 05:34:05 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B4F324B395
- for <kvmarm@lists.cs.columbia.edu>; Wed, 31 Mar 2021 05:34:05 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id BC20061874;
- Wed, 31 Mar 2021 09:34:04 +0000 (UTC)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
- TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94)
- (envelope-from <maz@kernel.org>)
- id 1lRXEg-004ruN-N0; Wed, 31 Mar 2021 10:34:02 +0100
+ with ESMTP id MB4bJIk13AyZ for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 31 Mar 2021 03:36:52 -0400 (EDT)
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 041BF4B3B0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 31 Mar 2021 03:36:51 -0400 (EDT)
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
+ by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4F9J3M0D0tzPmjQ;
+ Wed, 31 Mar 2021 15:34:07 +0800 (CST)
+Received: from mdc.localdomain (10.175.104.57) by
+ DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
+ 14.3.498.0; Wed, 31 Mar 2021 15:36:34 +0800
+From: Xu Jia <xujia39@huawei.com>
+To: <xujia39@huawei.com>, Marc Zyngier <maz@kernel.org>, Catalin Marinas
+ <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+Subject: [PATCH -next] KVM: arm64: Make symbol '_kvm_host_prot_finalize' static
+Date: Wed, 31 Mar 2021 15:36:19 +0800
+Message-ID: <1617176179-31931-1-git-send-email-xujia39@huawei.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-Date: Wed, 31 Mar 2021 10:34:02 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 00/18] KVM: Consolidate and optimize MMU notifiers
-In-Reply-To: <a2ca8cb2-5c91-b971-9b6e-65cf9ee97ffa@redhat.com>
-References: <20210326021957.1424875-1-seanjc@google.com>
- <a2ca8cb2-5c91-b971-9b6e-65cf9ee97ffa@redhat.com>
-User-Agent: Roundcube Webmail/1.4.11
-Message-ID: <e50f6f28c0446cd328e475859ef05dc4@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, seanjc@google.com,
- chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, paulus@ozlabs.org,
- james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
- vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
- joro@8bytes.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org, kvm@vger.kernel.org,
- kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org, bgardon@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- Sean Christopherson <seanjc@google.com>, Joerg Roedel <joro@8bytes.org>,
- Huacai Chen <chenhuacai@kernel.org>, linux-mips@vger.kernel.org,
- kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
- Paul Mackerras <paulus@ozlabs.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- linux-arm-kernel@lists.infradead.org, Ben Gardon <bgardon@google.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>, kvmarm@lists.cs.columbia.edu,
- Jim Mattson <jmattson@google.com>
+X-Originating-IP: [10.175.104.57]
+X-CFilter-Loop: Reflected
+X-Mailman-Approved-At: Wed, 31 Mar 2021 05:38:49 -0400
+Cc: kernel-janitors@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,28 +66,39 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2021-03-31 08:57, Paolo Bonzini wrote:
+The sparse tool complains as follows:
 
-> Queued and 1-9 and 18, thanks.  There's a small issue in patch 10 that
-> prevented me from committing 10-15, but they mostly look good.
+arch/arm64/kvm/arm.c:1900:6: warning:
+ symbol '_kvm_host_prot_finalize' was not declared. Should it be static?
 
-Can you please push the resulting merge somewhere?
+This symbol is not used outside of arm.c, so this
+commit marks it static.
 
-I'm concerned that it will conflict in interesting way with other stuff
-that is on its way on the arm64 side, not to mentiobn that this hasn't
-been tested at all on anything but x86 (and given the series was posted
-on Friday, that's a bit of a short notice).
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Signed-off-by: Xu Jia <xujia39@huawei.com>
+---
+ arch/arm64/kvm/arm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks,
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 2835400fd298..76a7de16e5a6 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1897,7 +1897,7 @@ static int init_hyp_mode(void)
+ 	return err;
+ }
+ 
+-void _kvm_host_prot_finalize(void *discard)
++static void _kvm_host_prot_finalize(void *discard)
+ {
+ 	WARN_ON(kvm_call_hyp_nvhe(__pkvm_prot_finalize));
+ }
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
