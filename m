@@ -2,83 +2,60 @@ Return-Path: <SRS0=69BX=I5=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B841FC433B4
-	for <kvmarm@archiver.kernel.org>; Wed, 31 Mar 2021 15:07:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D08CBC433ED
+	for <kvmarm@archiver.kernel.org>; Wed, 31 Mar 2021 15:25:25 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 288666101B
-	for <kvmarm@archiver.kernel.org>; Wed, 31 Mar 2021 15:07:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 288666101B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id E80E660725
+	for <kvmarm@archiver.kernel.org>; Wed, 31 Mar 2021 15:25:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E80E660725
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 96C314B47D;
-	Wed, 31 Mar 2021 11:07:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 216974B47A;
+	Wed, 31 Mar 2021 11:25:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pJkVQnnG8GyT; Wed, 31 Mar 2021 11:07:49 -0400 (EDT)
+	with ESMTP id tKB2nO7Ylyd1; Wed, 31 Mar 2021 11:25:22 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EDA224B470;
-	Wed, 31 Mar 2021 11:07:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9AC8F4B47D;
+	Wed, 31 Mar 2021 11:25:22 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 21D4B4B410
- for <kvmarm@lists.cs.columbia.edu>; Wed, 31 Mar 2021 11:07:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 80DB64B47A
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 31 Mar 2021 11:25:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id x-sjK+-49zX4 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 31 Mar 2021 11:07:47 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [63.128.21.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F192C4B321
- for <kvmarm@lists.cs.columbia.edu>; Wed, 31 Mar 2021 11:07:46 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1617203266;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=PhXu7cfDspHbssfAK47osTKuUwbyRGied+QM1+oo1/I=;
- b=HUryfh2ySyQShUYmZGJ234L7UEK2p7jxlbEj3wVky0loHBnzVgV5YxRooWRC1bk8lRUUk3
- OMP+DWHRfuqf1HppI73yaqEww81bM3cwvQWCqiEIXBiNTzv5CU5VfpGw1frtPS4ayZIt1T
- +pLQoWXqIj0HTijIWRXhnRJSBwGkQjg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-458-BTXOnMtZMZmDUA3PRjmwwg-1; Wed, 31 Mar 2021 11:07:42 -0400
-X-MC-Unique: BTXOnMtZMZmDUA3PRjmwwg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 862CE107ACCA;
- Wed, 31 Mar 2021 15:07:40 +0000 (UTC)
-Received: from [10.36.112.13] (ovpn-112-13.ams2.redhat.com [10.36.112.13])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 594AB19C44;
- Wed, 31 Mar 2021 15:07:37 +0000 (UTC)
-Subject: Re: [PATCH v3 8/8] KVM: selftests: aarch64/vgic-v3 init sequence tests
-To: Andrew Jones <drjones@redhat.com>
-References: <20210312173202.89576-1-eric.auger@redhat.com>
- <20210312173202.89576-9-eric.auger@redhat.com>
- <20210322183206.2jcqu7g3ou5vpr2j@kamzik.brq.redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <d7e2ac73-250d-6807-2b22-649c96403fa4@redhat.com>
-Date: Wed, 31 Mar 2021 17:07:35 +0200
+ with ESMTP id Z6CmnEIEAA1T for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 31 Mar 2021 11:25:19 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D2A424B478
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 31 Mar 2021 11:25:19 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 61799D6E;
+ Wed, 31 Mar 2021 08:25:19 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 86CD43F792;
+ Wed, 31 Mar 2021 08:25:18 -0700 (PDT)
+Subject: Re: [PATCH v2] KVM: arm64: Initialize VCPU mdcr_el2 before loading it
+To: Marc Zyngier <maz@kernel.org>
+References: <20210323180057.263356-1-alexandru.elisei@arm.com>
+ <87sg4dq83r.wl-maz@kernel.org> <5cfd4870-db31-cd7d-699f-bd70a1ab90fe@arm.com>
+ <87k0pofls6.wl-maz@kernel.org>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <d146cd29-7e0e-02d9-66fe-a6bbcf55725a@arm.com>
+Date: Wed, 31 Mar 2021 16:25:46 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+ Thunderbird/78.9.0
 MIME-Version: 1.0
-In-Reply-To: <20210322183206.2jcqu7g3ou5vpr2j@kamzik.brq.redhat.com>
+In-Reply-To: <87k0pofls6.wl-maz@kernel.org>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Cc: shuah@kernel.org, kvm@vger.kernel.org, maz@kernel.org,
- linux-kernel@vger.kernel.org, pbonzini@redhat.com,
- kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,969 +67,180 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Drew,
-
-On 3/22/21 7:32 PM, Andrew Jones wrote:
-> On Fri, Mar 12, 2021 at 06:32:02PM +0100, Eric Auger wrote:
->> The tests exercise the VGIC_V3 device creation including the
->> associated KVM_DEV_ARM_VGIC_GRP_ADDR group attributes:
->>
->> - KVM_VGIC_V3_ADDR_TYPE_DIST/REDIST
->> - KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION
->>
->> Some other tests dedicate to KVM_DEV_ARM_VGIC_GRP_REDIST_REGS group
->> and especially the GICR_TYPER read. The goal was to test the case
->> recently fixed by commit 23bde34771f1
->> ("KVM: arm64: vgic-v3: Drop the reporting of GICR_TYPER.Last for userspace").
->>
->> The API under test can be found at
->> Documentation/virt/kvm/devices/arm-vgic-v3.rst
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> ---
->>  arch/arm64/kvm/vgic/vgic-mmio-v3.c            |   2 +-
->>  tools/testing/selftests/kvm/Makefile          |   1 +
->>  .../testing/selftests/kvm/aarch64/vgic_init.c | 672 ++++++++++++++++++
->>  .../testing/selftests/kvm/include/kvm_util.h  |   5 +
->>  tools/testing/selftests/kvm/lib/kvm_util.c    |  51 ++
->>  5 files changed, 730 insertions(+), 1 deletion(-)
->>  create mode 100644 tools/testing/selftests/kvm/aarch64/vgic_init.c
->>
->> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
->> index 652998ed0b55..f6a7eed1d6ad 100644
->> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
->> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
->> @@ -260,7 +260,7 @@ static bool vgic_mmio_vcpu_rdist_is_last(struct kvm_vcpu *vcpu)
->>  	if (!rdreg)
->>  		return false;
->>  
->> -	if (!rdreg->count && vgic_cpu->rdreg_index == (rdreg->count - 1)) {
->> +	if (rdreg->count && vgic_cpu->rdreg_index == (rdreg->count - 1)) {
-> 
-> I guess this is an accidental change?
-this change should be squashed into the previous patch
-> 
->>  		/* check whether there is no other contiguous rdist region */
->>  		struct list_head *rd_regions = &vgic->rd_regions;
->>  		struct vgic_redist_region *iter;
->> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
->> index a6d61f451f88..4e548d7ab0ab 100644
->> --- a/tools/testing/selftests/kvm/Makefile
->> +++ b/tools/testing/selftests/kvm/Makefile
->> @@ -75,6 +75,7 @@ TEST_GEN_PROGS_x86_64 += steal_time
->>  
->>  TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
->>  TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list-sve
->> +TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
->>  TEST_GEN_PROGS_aarch64 += demand_paging_test
->>  TEST_GEN_PROGS_aarch64 += dirty_log_test
->>  TEST_GEN_PROGS_aarch64 += dirty_log_perf_test
-> 
-> Missing .gitignore change
-OK
-> 
->> diff --git a/tools/testing/selftests/kvm/aarch64/vgic_init.c b/tools/testing/selftests/kvm/aarch64/vgic_init.c
->> new file mode 100644
->> index 000000000000..12205ab9fb10
->> --- /dev/null
->> +++ b/tools/testing/selftests/kvm/aarch64/vgic_init.c
->> @@ -0,0 +1,672 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +/*
->> + * vgic init sequence tests
->> + *
->> + * Copyright (C) 2020, Red Hat, Inc.
->> + */
->> +#define _GNU_SOURCE
->> +#include <linux/kernel.h>
->> +#include <sys/syscall.h>
->> +#include <asm/kvm.h>
->> +#include <asm/kvm_para.h>
->> +
->> +#include "test_util.h"
->> +#include "kvm_util.h"
->> +#include "processor.h"
->> +
->> +#define NR_VCPUS		4
->> +
->> +#define REDIST_REGION_ATTR_ADDR(count, base, flags, index) (((uint64_t)(count) << 52) | \
->> +	((uint64_t)((base) >> 16) << 16) | ((uint64_t)(flags) << 12) | index)
->> +#define REG_OFFSET(vcpu, offset) (((uint64_t)vcpu << 32) | offset)
->> +
->> +#define GICR_TYPER 0x8
->> +
->> +/* helper to access a redistributor register */
->> +static int access_redist_reg(int gicv3_fd, int vcpu, int offset,
->> +			     uint32_t *val, bool write)
->> +{
->> +	uint64_t attr = REG_OFFSET(vcpu, offset);
->> +
->> +	return kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_REDIST_REGS,
->> +				 attr, val, write);
->> +}
->> +
->> +/* dummy guest code */
->> +static void guest_code(int cpu)
-> 
-> cpu is unused, no need for it
-sure
-> 
->> +{
->> +	GUEST_SYNC(0);
->> +	GUEST_SYNC(1);
->> +	GUEST_SYNC(2);
->> +	GUEST_DONE();
->> +}
->> +
->> +/* we don't want to assert on run execution, hence that helper */
->> +static int run_vcpu(struct kvm_vm *vm, uint32_t vcpuid)
->> +{
->> +	static int run;
->> +	struct ucall uc;
->> +	int ret;
->> +
->> +	vcpu_args_set(vm, vcpuid, 1, vcpuid);
-> 
-> The cpu index is unused, so you need to pass it in
-removed
-> 
->> +	ret = _vcpu_ioctl(vm, vcpuid, KVM_RUN, NULL);
->> +	get_ucall(vm, vcpuid, &uc);
-> 
-> uc is unused, so you can pass NULL for it
-OK
-> 
->> +	run++;
-> 
-> What good is this counter? Nobody reads it.
-removed
-> 
->> +
->> +	if (ret)
->> +		return -errno;
->> +	return 0;
->> +}
->> +
->> +/**
->> + * Helper routine that performs KVM device tests in general and
->> + * especially ARM_VGIC_V3 ones. Eventually the ARM_VGIC_V3
->> + * device gets created, a legacy RDIST region is set at @0x0
->> + * and a DIST region is set @0x60000
->> + */
->> +int fuzz_dist_rdist(struct kvm_vm *vm)
-> 
-> Missing static
-sure
-> 
->> +{
->> +	int ret, gicv3_fd, max_ipa_bits;
->> +	uint64_t addr;
->> +
->> +	max_ipa_bits = kvm_check_cap(KVM_CAP_ARM_VM_IPA_SIZE);
->> +
->> +	/* check ARM_VGIC_V3 device exists */
->> +	ret = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, true);
->> +	if (ret) {
->> +		print_skip("GICv3 not supported");
->> +		exit(KSFT_SKIP);
->> +	}
->> +
->> +	/* try to create a non existing KVM device */
->> +	ret = kvm_create_device(vm, 0, true);
->> +	TEST_ASSERT(ret == -ENODEV, "unsupported device");
->> +
->> +	/* Create the ARM_VGIC_V3 device */
->> +	gicv3_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
->> +	TEST_ASSERT(gicv3_fd > 0, "GICv3 device created");
->> +
->> +	/* Check existing group/attributes */
->> +	ret = kvm_device_check_attr(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +				    KVM_VGIC_V3_ADDR_TYPE_DIST);
->> +	TEST_ASSERT(!ret, "KVM_DEV_ARM_VGIC_GRP_ADDR/KVM_VGIC_V3_ADDR_TYPE_DIST supported");
->> +
->> +	ret = kvm_device_check_attr(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +				    KVM_VGIC_V3_ADDR_TYPE_REDIST);
->> +	TEST_ASSERT(!ret, "KVM_DEV_ARM_VGIC_GRP_ADDR/KVM_VGIC_V3_ADDR_TYPE_REDIST supported");
->> +
->> +	/* check non existing attribute */
->> +	ret = kvm_device_check_attr(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR, 0);
->> +	TEST_ASSERT(ret == -ENXIO, "attribute not supported");
->> +
->> +	/* misaligned DIST and REDIST address settings */
->> +	addr = 0x1000;
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +				KVM_VGIC_V3_ADDR_TYPE_DIST, &addr, true);
->> +	TEST_ASSERT(ret == -EINVAL, "GICv3 dist base not 64kB aligned");
->> +
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +				KVM_VGIC_V3_ADDR_TYPE_REDIST, &addr, true);
->> +	TEST_ASSERT(ret == -EINVAL, "GICv3 redist base not 64kB aligned");
->> +
->> +	/* out of range address */
->> +	if (max_ipa_bits) {
->> +		addr = 1ULL << max_ipa_bits;
->> +		ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +					KVM_VGIC_V3_ADDR_TYPE_DIST, &addr, true);
->> +		TEST_ASSERT(ret == -E2BIG, "dist address beyond IPA limit");
->> +
->> +		ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +					KVM_VGIC_V3_ADDR_TYPE_REDIST, &addr, true);
->> +		TEST_ASSERT(ret == -E2BIG, "redist address beyond IPA limit");
->> +	}
->> +
->> +	/* set REDIST base address @0x0*/
->> +	addr = 0x00000;
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +				KVM_VGIC_V3_ADDR_TYPE_REDIST, &addr, true);
->> +	TEST_ASSERT(!ret, "GICv3 redist base set");
->> +
->> +	/* Attempt to create a second legacy redistributor region */
->> +	addr = 0xE0000;
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +				KVM_VGIC_V3_ADDR_TYPE_REDIST, &addr, true);
->> +	TEST_ASSERT(ret == -EEXIST, "GICv3 redist base set again");
->> +
->> +	/* Attempt to mix legacy and new redistributor regions */
->> +	addr = REDIST_REGION_ATTR_ADDR(NR_VCPUS, 0x100000, 0, 0);
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +				KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
->> +	TEST_ASSERT(ret == -EINVAL, "attempt to mix GICv3 REDIST and REDIST_REGION");
->> +
->> +	/*
->> +	 * Set overlapping DIST / REDIST, cannot be detected here. Will be detected
->> +	 * on first vcpu run instead.
->> +	 */
->> +	addr = 3 * 2 * 0x10000;
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR, KVM_VGIC_V3_ADDR_TYPE_DIST,
->> +				&addr, true);
->> +	TEST_ASSERT(!ret, "dist overlapping rdist");
->> +
->> +	ret = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
->> +	TEST_ASSERT(ret == -EEXIST, "create GICv3 device twice");
->> +
->> +	ret = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, true);
->> +	TEST_ASSERT(!ret, "create GICv3 in test mode while the same already is created");
->> +
->> +	if (!kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V2, true)) {
->> +		ret = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V2, true);
->> +		TEST_ASSERT(ret == -EINVAL, "create GICv2 while v3 exists");
->> +	}
->> +
->> +	return gicv3_fd;
-> 
-> I don't like mixing the tests and the creation of the device. How about
-> making this function a void function and closing the fd here and then
-> creating another function that just opens an fd without the tests?
-
-OK, I now implement your suggestion below, namely vm_gic vm_gic_create()
-> 
-> Also, I don't think this is a fuzzer, as the function name indicates.
-> It looks to me more like requirements based tests. A fuzzer would
-> select (possibly randomly) a bunch of inputs, usually NULL pointers,
-> unmapped pointers, and other garbage and then see what happens.
-
-Fair enough, I will rename it
-> 
->> +}
->> +
->> +/* Test the new REDIST region API */
->> +static int fuzz_redist_regions(struct kvm_vm *vm)
->> +{
->> +	int ret, max_ipa_bits, gicv3_fd;
->> +	uint64_t addr, expected_addr;
->> +
->> +	max_ipa_bits = kvm_check_cap(KVM_CAP_ARM_VM_IPA_SIZE);
-> 
-> Could make this global and just set it once in main()
-yep
-> 
->> +
->> +	/* trial mode */
->> +	ret = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, true);
->> +	if (ret) {
->> +		print_skip("GICv3 not supported");
->> +		exit(KSFT_SKIP);
->> +	}
->> +
->> +	/* Create the actual gicv3 device */
->> +	gicv3_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
->> +	TEST_ASSERT(gicv3_fd >= 0, "VGIC_V3 device created");
->> +
->> +	ret = kvm_device_check_attr(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +				    KVM_VGIC_V3_ADDR_TYPE_REDIST);
->> +	TEST_ASSERT(!ret, "Multiple redist regions advertised");
->> +
->> +	addr = REDIST_REGION_ATTR_ADDR(NR_VCPUS, 0x100000, 2, 0);
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +				KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
->> +	TEST_ASSERT(ret == -EINVAL, "redist region attr value with flags != 0");
->> +
->> +	addr = REDIST_REGION_ATTR_ADDR(0, 0x100000, 0, 0);
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +				KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
->> +	TEST_ASSERT(ret == -EINVAL, "redist region attr value with count== 0");
->> +
->> +	addr = REDIST_REGION_ATTR_ADDR(2, 0x200000, 0, 1);
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +				KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
->> +	TEST_ASSERT(ret == -EINVAL, "attempt to register the first rdist region with index != 0");
->> +
->> +	addr = REDIST_REGION_ATTR_ADDR(2, 0x201000, 0, 1);
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +				KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
->> +	TEST_ASSERT(ret == -EINVAL, "rdist region with misaligned address");
->> +
->> +	addr = REDIST_REGION_ATTR_ADDR(2, 0x200000, 0, 0);
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +				KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
->> +	TEST_ASSERT(!ret, "First valid redist region with 2 rdist @ 0x200000, index 0");
->> +
->> +	addr = REDIST_REGION_ATTR_ADDR(2, 0x200000, 0, 1);
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +				KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
->> +	TEST_ASSERT(ret == -EINVAL, "register an rdist region with already used index");
->> +
->> +	addr = REDIST_REGION_ATTR_ADDR(1, 0x210000, 0, 2);
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +				KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
->> +	TEST_ASSERT(ret == -EINVAL, "register an rdist region overlapping with another one");
->> +
->> +	addr = REDIST_REGION_ATTR_ADDR(1, 0x240000, 0, 2);
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +				KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
->> +	TEST_ASSERT(ret == -EINVAL, "register redist region with index not +1");
->> +
->> +	addr = REDIST_REGION_ATTR_ADDR(1, 0x240000, 0, 1);
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +				KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
->> +	TEST_ASSERT(!ret, "register valid redist region with 1 rdist @ 0x220000, index 1");
->> +
->> +	addr = REDIST_REGION_ATTR_ADDR(1, 1ULL << max_ipa_bits, 0, 2);
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +				KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
->> +	TEST_ASSERT(ret == -E2BIG, "register redist region with base address beyond IPA range");
->> +
->> +	addr = 0x260000;
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +				KVM_VGIC_V3_ADDR_TYPE_REDIST, &addr, true);
->> +	TEST_ASSERT(ret == -EINVAL, "Mix KVM_VGIC_V3_ADDR_TYPE_REDIST and REDIST_REGION");
->> +
->> +	/*
->> +	 * Now there are 2 redist regions:
->> +	 * region 0 @ 0x200000 2 redists
->> +	 * region 1 @ 0x240000 1 redist
->> +	 * now attempt to read their characteristics
->> +	 */
->> +
->> +	addr = REDIST_REGION_ATTR_ADDR(0, 0, 0, 0);
->> +	expected_addr = REDIST_REGION_ATTR_ADDR(2, 0x200000, 0, 0);
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +				KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, false);
->> +	TEST_ASSERT(!ret && addr == expected_addr, "read characteristics of region #0");
->> +
->> +	addr = REDIST_REGION_ATTR_ADDR(0, 0, 0, 1);
->> +	expected_addr = REDIST_REGION_ATTR_ADDR(1, 0x240000, 0, 1);
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +				KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, false);
->> +	TEST_ASSERT(!ret && addr == expected_addr, "read characteristics of region #1");
->> +
->> +	addr = REDIST_REGION_ATTR_ADDR(0, 0, 0, 2);
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +				KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, false);
->> +	TEST_ASSERT(ret == -ENOENT, "read characteristics of non existing region");
->> +
->> +	addr = 0x260000;
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +				KVM_VGIC_V3_ADDR_TYPE_DIST, &addr, true);
->> +	TEST_ASSERT(!ret, "set dist region");
->> +
->> +	addr = REDIST_REGION_ATTR_ADDR(1, 0x260000, 0, 2);
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +				KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
->> +	TEST_ASSERT(ret == -EINVAL, "register redist region colliding with dist");
->> +
->> +	return gicv3_fd;
-> 
-> Same comment as above about mixing the fd acquisition with the tests.
-ok
-> 
->> +}
->> +
->> +/*
->> + * VGIC KVM device is created and initialized before the secondary CPUs
->> + * get created
->> + */
->> +static void test_vgic_then_vcpus(void)
->> +{
->> +	int ret, i, gicv3_fd;
->> +	struct kvm_vm *vm;
->> +
->> +	vm = vm_create_default(0, 0, guest_code);
->> +
->> +	gicv3_fd = fuzz_dist_rdist(vm);
->> +
->> +	/* Add the rest of the VCPUs */
->> +	for (i = 1; i < NR_VCPUS; ++i)
->> +		vm_vcpu_add_default(vm, i, guest_code);
->> +
->> +	ret = run_vcpu(vm, 3);
->> +	TEST_ASSERT(ret == -EINVAL, "dist/rdist overlap detected on 1st vcpu run");
->> +
->> +	close(gicv3_fd);
->> +	kvm_vm_free(vm);
->> +}
->> +
->> +
->> +/* All the VCPUs are created before the VGIC KVM device gets initialized */
->> +static void test_vcpus_then_vgic(void)
->> +{
->> +	int ret, i, gicv3_fd;
->> +	struct kvm_vm *vm;
->> +
->> +	vm = vm_create_default(0, 0, guest_code);
->> +
->> +	/* Add the rest of the VCPUs */
->> +	for (i = 1; i < NR_VCPUS; ++i)
->> +		vm_vcpu_add_default(vm, i, guest_code);
->> +
->> +	gicv3_fd = fuzz_dist_rdist(vm);
->> +
->> +	ret = run_vcpu(vm, 3);
->> +	TEST_ASSERT(ret == -EINVAL, "dist/rdist overlap detected on 1st vcpu run");
->> +
->> +	close(gicv3_fd);
->> +	kvm_vm_free(vm);
->> +}
->> +
->> +static void redist_regions_setup(struct kvm_vm **vm, int *gicv3_fd)
->> +{
->> +	int i;
->> +
->> +	*vm = vm_create_default(0, 0, guest_code);
->> +	ucall_init(*vm, NULL);
-> 
-> It's best to call this last, so it can find an unmapped memory region (in
-> case mappings are being done, like I think fuzz_redist_regions does)
-OK
-> 
->> +
->> +	/* Add the rest of the VCPUs */
->> +	for (i = 1; i < NR_VCPUS; ++i)
->> +		vm_vcpu_add_default(*vm, i, guest_code);
-> 
-> vm_create_default_with_vcpus(NR_VCPUS, 0, 0, guest_code, NULL)
-OK
-> 
->> +
->> +	*gicv3_fd = fuzz_redist_regions(*vm);
->> +}
-> 
-> How about returning a vm_gic structure instead of taking two
-> pointers as arguments?
-done
-> 
-> struct vm_gic {
->   struct kvm_vm *vm;
->   int gic_fd;
-> };
-> 
-> static struct vm_gic vm_gic_create(void)
-> {
->    struct vm_gic v;
-> 
->    v.vm = vm_create_default_with_vcpus(NR_VCPUS, 0, 0, guest_code, NULL);
->    v.gic_fd = gic_create(...);
->    ucall_init(v.vm, NULL);
-> 
->    return v;
-> }
-> 
-> static void vm_gic_destroy(struct vm_gic *v)
-> {
->    kvm_vm_free(v.vm);
->    close(v.gic_fd);
-> }
-> 
->> +
->> +static void test_new_redist_regions(void)
->> +{
->> +	int ret, gicv3_fd;
->> +	struct kvm_vm *vm;
->> +	uint64_t addr;
->> +	void *dummy = NULL;
->> +
->> +	redist_regions_setup(&vm, &gicv3_fd);
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
->> +				KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true);
->> +	TEST_ASSERT(!ret, "init the vgic");
->> +
->> +	ret = run_vcpu(vm, 3);
->> +	TEST_ASSERT(ret == -ENXIO, "running without sufficient number of rdists");
->> +
->> +	close(gicv3_fd);
->> +	kvm_vm_free(vm);
->> +
->> +	/* step2 */
->> +
->> +	redist_regions_setup(&vm, &gicv3_fd);
->> +
->> +	addr = REDIST_REGION_ATTR_ADDR(1, 0x280000, 0, 2);
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +				KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
->> +	TEST_ASSERT(!ret, "register a third region allowing to cover the 4 vcpus");
->> +
->> +	ret = run_vcpu(vm, 3);
->> +	TEST_ASSERT(ret == -EBUSY, "running without vgic explicit init");
->> +
->> +	close(gicv3_fd);
->> +	kvm_vm_free(vm);
->> +
->> +	/* step 3 */
->> +
->> +	redist_regions_setup(&vm, &gicv3_fd);
->> +
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +				KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, dummy, true);
->> +	TEST_ASSERT(ret == -EFAULT, "register a third region allowing to cover the 4 vcpus");
->> +
->> +	addr = REDIST_REGION_ATTR_ADDR(1, 0x280000, 0, 2);
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +				KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
->> +	TEST_ASSERT(!ret, "register a third region allowing to cover the 4 vcpus");
->> +
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
->> +				KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true);
->> +	TEST_ASSERT(!ret, "init the vgic");
->> +
->> +	ret = run_vcpu(vm, 3);
->> +	TEST_ASSERT(!ret, "vcpu run");
->> +
->> +	close(gicv3_fd);
->> +	kvm_vm_free(vm);
->> +}
->> +
->> +static void test_typer_accesses(void)
->> +{
->> +	int ret, i, gicv3_fd = -1;
->> +	uint64_t addr;
->> +	struct kvm_vm *vm;
->> +	uint32_t val;
->> +
->> +	vm = vm_create_default(0, 0, guest_code);
->> +	ucall_init(vm, NULL);
->> +
->> +	gicv3_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
->> +	TEST_ASSERT(gicv3_fd >= 0, "VGIC_V3 device created");
->> +
->> +	vm_vcpu_add_default(vm, 3, guest_code);
->> +
->> +	ret = access_redist_reg(gicv3_fd, 1, GICR_TYPER, &val, false);
->> +	TEST_ASSERT(ret == -EINVAL, "attempting to read GICR_TYPER of non created vcpu");
->> +
->> +	vm_vcpu_add_default(vm, 1, guest_code);
->> +
->> +	ret = access_redist_reg(gicv3_fd, 1, GICR_TYPER, &val, false);
->> +	TEST_ASSERT(ret == -EBUSY, "read GICR_TYPER before GIC initialized");
->> +
->> +	vm_vcpu_add_default(vm, 2, guest_code);
->> +
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
->> +				KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true);
->> +	TEST_ASSERT(!ret, "init the vgic after the vcpu creations");
->> +
->> +	for (i = 0; i < NR_VCPUS ; i++) {
->> +		ret = access_redist_reg(gicv3_fd, 0, GICR_TYPER, &val, false);
->> +		TEST_ASSERT(!ret && !val, "read GICR_TYPER before rdist region setting");
->> +	}
->> +
->> +	addr = REDIST_REGION_ATTR_ADDR(2, 0x200000, 0, 0);
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +				KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
->> +	TEST_ASSERT(!ret, "first rdist region with a capacity of 2 rdists");
->> +
->> +	/* The 2 first rdists should be put there (vcpu 0 and 3) */
->> +	ret = access_redist_reg(gicv3_fd, 0, GICR_TYPER, &val, false);
->> +	TEST_ASSERT(!ret && !val, "read typer of rdist #0");
->> +
->> +	ret = access_redist_reg(gicv3_fd, 3, GICR_TYPER, &val, false);
->> +	TEST_ASSERT(!ret && val == 0x310, "read typer of rdist #1");
->> +
->> +	addr = REDIST_REGION_ATTR_ADDR(10, 0x100000, 0, 1);
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +				KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
->> +	TEST_ASSERT(ret == -EINVAL, "collision with previous rdist region");
->> +
->> +	ret = access_redist_reg(gicv3_fd, 1, GICR_TYPER, &val, false);
->> +	TEST_ASSERT(!ret && val == 0x100,
->> +		    "no redist region attached to vcpu #1 yet, last cannot be returned");
->> +
->> +	ret = access_redist_reg(gicv3_fd, 2, GICR_TYPER, &val, false);
->> +	TEST_ASSERT(!ret && val == 0x200,
->> +		    "no redist region attached to vcpu #2, last cannot be returned");
->> +
->> +	addr = REDIST_REGION_ATTR_ADDR(10, 0x20000, 0, 1);
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +				KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
->> +	TEST_ASSERT(!ret, "second rdist region");
->> +
->> +	ret = access_redist_reg(gicv3_fd, 1, GICR_TYPER, &val, false);
->> +	TEST_ASSERT(!ret && val == 0x100, "read typer of rdist #1");
->> +
->> +	ret = access_redist_reg(gicv3_fd, 2, GICR_TYPER, &val, false);
->> +	TEST_ASSERT(!ret && val == 0x210,
->> +		    "read typer of rdist #1, last properly returned");
->> +
->> +	close(gicv3_fd);
->> +	kvm_vm_free(vm);
->> +}
->> +
->> +/**
->> + * Test GICR_TYPER last bit with new redist regions
->> + * 2 rdist regions that are contiguous
->> + * rdist region #0 @0x200000 3 rdist capacity
->> + *     rdists: 0, 2 (Last), 1
->> + * rdist region #1 @0x260000 10 rdist capacity
->> + *     rdists: 3, 5 (Last), 4 (Last)
->> + */
->> +static void test_last_bit_1(void)
->> +{
->> +	int ret, gicv3_fd = -1;
->> +	uint64_t addr;
->> +	struct kvm_vm *vm;
->> +	uint32_t val;
->> +
->> +	vm = vm_create_default(0, 0, guest_code);
->> +	ucall_init(vm, NULL);
->> +
->> +	gicv3_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
->> +	TEST_ASSERT(gicv3_fd >= 0, "VGIC_V3 device created");
->> +
->> +	vm_vcpu_add_default(vm, 2, guest_code);
->> +	vm_vcpu_add_default(vm, 1, guest_code);
->> +	vm_vcpu_add_default(vm, 3, guest_code);
->> +	vm_vcpu_add_default(vm, 5, guest_code);
->> +	vm_vcpu_add_default(vm, 4, guest_code);
-> 
-> You can still use vm_create_default_with_vcpus, just provide a vcpuids
-> array
-> 
->  uint32_t vcpuids[] = { 0, 2, 1, 3, 5, 4 };
->  vm = vm_create_default_with_vcpus(NR_VCPUS, 0, 0, guest_code, vcpuids);
-OK
-> 
->> +
->> +	ret = access_redist_reg(gicv3_fd, 0, GICR_TYPER, &val, false);
->> +	TEST_ASSERT(ret, "read typer of rdist #0 before redist reg creation");
->> +
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
->> +				KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true);
->> +	TEST_ASSERT(!ret, "init the vgic after the vcpu creations");
->> +
->> +	addr = REDIST_REGION_ATTR_ADDR(3, 0x200000, 0, 0);
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +				KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
->> +	TEST_ASSERT(!ret, "rdist region #0 with a capacity of 3 rdists");
->> +
->> +	addr = REDIST_REGION_ATTR_ADDR(10, 0x260000, 0, 1);
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +				KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
->> +	TEST_ASSERT(!ret, "rdist region #1 (1 rdist) contiguous with the 1st one");
->> +
->> +	/*
->> +	 * rdist_region #0 should contain rdists 0, 2, 1
->> +	 * rdist region #1 should contain rdists 3, 5, 4
->> +	 */
->> +	ret = access_redist_reg(gicv3_fd, 0, GICR_TYPER, &val, false);
->> +	TEST_ASSERT(!ret && !val, "read typer of rdist #0");
->> +
->> +	ret = access_redist_reg(gicv3_fd, 2, GICR_TYPER, &val, false);
->> +	TEST_ASSERT(!ret && val == 0x210, "read typer of rdist #2");
->> +
->> +	ret = access_redist_reg(gicv3_fd, 1, GICR_TYPER, &val, false);
->> +	TEST_ASSERT(!ret && val == 0x100, "read typer of rdist #1");
->> +
->> +	ret = access_redist_reg(gicv3_fd, 3, GICR_TYPER, &val, false);
->> +	TEST_ASSERT(!ret && val == 0x300, "read typer of rdist #3");
->> +
->> +	ret = access_redist_reg(gicv3_fd, 5, GICR_TYPER, &val, false);
->> +	TEST_ASSERT(!ret && val == 0x510, "read typer of rdist #3");
->> +
->> +	ret = access_redist_reg(gicv3_fd, 4, GICR_TYPER, &val, false);
->> +	TEST_ASSERT(!ret && val == 0x410, "read typer of rdist #3");
->> +
->> +	close(gicv3_fd);
->> +	kvm_vm_free(vm);
->> +}
->> +
->> +/**
->> + * Test GICR_TYPER last bit with new redist regions
->> + * rdist regions #1 and #2 are contiguous
->> + * rdist region #0 @0x100000 1 rdist capacity
->> + *     rdists: 0 (Last)
->> + * rdist region #1 @0x240000 3 rdist capacity
->> + *     rdists: 3, 5 (Last), 4 (Last)
->> + * rdist region #2 @0x200000 2 rdist capacity
->> + *     rdists: 1, 2
->> + */
->> +static void test_last_bit_2(void)
->> +{
->> +	int ret, gicv3_fd;
->> +	uint64_t addr;
->> +	struct kvm_vm *vm;
->> +	uint32_t val;
->> +
->> +	vm = vm_create_default(0, 0, guest_code);
->> +	vm_vcpu_add_default(vm, 3, guest_code);
->> +	vm_vcpu_add_default(vm, 5, guest_code);
->> +	vm_vcpu_add_default(vm, 4, guest_code);
->> +	vm_vcpu_add_default(vm, 1, guest_code);
->> +	vm_vcpu_add_default(vm, 2, guest_code);
->> +
->> +	ucall_init(vm, NULL);
->> +
->> +	gicv3_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
->> +	TEST_ASSERT(gicv3_fd >= 0, "VGIC_V3 device created");
->> +
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
->> +				KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true);
->> +	TEST_ASSERT(!ret, "init the vgic after the vcpu creations");
->> +
->> +	addr = REDIST_REGION_ATTR_ADDR(1, 0x100000, 0, 0);
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +				KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
->> +	TEST_ASSERT(!ret, "rdist region #0 (1 rdist)");
->> +
->> +	addr = REDIST_REGION_ATTR_ADDR(3, 0x240000, 0, 1);
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +				KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
->> +	TEST_ASSERT(!ret, "rdist region #1 (1 rdist) contiguous with #2");
->> +
->> +	addr = REDIST_REGION_ATTR_ADDR(2, 0x200000, 0, 2);
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +				KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
->> +	TEST_ASSERT(!ret, "rdist region #2 with a capacity of 3 rdists");
->> +
->> +
->> +	ret = access_redist_reg(gicv3_fd, 0, GICR_TYPER, &val, false);
->> +	TEST_ASSERT(!ret && val == 0x010, "read typer of rdist #0");
->> +
->> +	ret = access_redist_reg(gicv3_fd, 1, GICR_TYPER, &val, false);
->> +	TEST_ASSERT(!ret && val == 0x100, "read typer of rdist #1");
->> +
->> +	ret = access_redist_reg(gicv3_fd, 2, GICR_TYPER, &val, false);
->> +	TEST_ASSERT(!ret && val == 0x200, "read typer of rdist #2");
->> +
->> +	ret = access_redist_reg(gicv3_fd, 3, GICR_TYPER, &val, false);
->> +	TEST_ASSERT(!ret && val == 0x300, "read typer of rdist #3");
->> +
->> +	ret = access_redist_reg(gicv3_fd, 5, GICR_TYPER, &val, false);
->> +	TEST_ASSERT(!ret && val == 0x510, "read typer of rdist #3");
->> +
->> +	ret = access_redist_reg(gicv3_fd, 4, GICR_TYPER, &val, false);
->> +	TEST_ASSERT(!ret && val == 0x410, "read typer of rdist #3");
->> +
->> +	close(gicv3_fd);
->> +	kvm_vm_free(vm);
->> +}
->> +
->> +/* Test last bit with legacy region */
->> +static void test_last_bit_3(void)
->> +{
->> +	int ret, gicv3_fd;
->> +	uint64_t addr;
->> +	struct kvm_vm *vm;
->> +	uint32_t val;
->> +
->> +	vm = vm_create_default(0, 0, guest_code);
->> +	vm_vcpu_add_default(vm, 3, guest_code);
->> +	vm_vcpu_add_default(vm, 5, guest_code);
->> +	vm_vcpu_add_default(vm, 4, guest_code);
->> +	vm_vcpu_add_default(vm, 1, guest_code);
->> +	vm_vcpu_add_default(vm, 2, guest_code);
->> +
->> +	ucall_init(vm, NULL);
->> +
->> +	gicv3_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
->> +	TEST_ASSERT(gicv3_fd >= 0, "VGIC_V3 device created");
->> +
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
->> +				KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true);
->> +	TEST_ASSERT(!ret, "init the vgic after the vcpu creations");
->> +
->> +	addr = 0x10000;
->> +	ret = kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +				KVM_VGIC_V3_ADDR_TYPE_REDIST, &addr, true);
->> +
->> +	ret = access_redist_reg(gicv3_fd, 0, GICR_TYPER, &val, false);
->> +	TEST_ASSERT(!ret && val == 0x000, "read typer of rdist #0");
->> +
->> +	ret = access_redist_reg(gicv3_fd, 3, GICR_TYPER, &val, false);
->> +	TEST_ASSERT(!ret && val == 0x300, "read typer of rdist #1");
->> +
->> +	ret = access_redist_reg(gicv3_fd, 5, GICR_TYPER, &val, false);
->> +	TEST_ASSERT(!ret && val == 0x510, "read typer of rdist #2");
->> +
->> +	ret = access_redist_reg(gicv3_fd, 1, GICR_TYPER, &val, false);
->> +	TEST_ASSERT(!ret && val == 0x100, "read typer of rdist #3");
->> +
->> +	ret = access_redist_reg(gicv3_fd, 2, GICR_TYPER, &val, false);
->> +	TEST_ASSERT(!ret && val == 0x210, "read typer of rdist #3");
->> +
->> +	close(gicv3_fd);
->> +	kvm_vm_free(vm);
->> +}
->> +
->> +int main(int ac, char **av)
->> +{
->> +	test_vcpus_then_vgic();
->> +	test_vgic_then_vcpus();
->> +	test_new_redist_regions();
->> +	test_typer_accesses();
->> +	test_last_bit_1();
->> +	test_last_bit_2();
->> +	test_last_bit_3();
->> +
->> +	return 0;
->> +}
->> +
->> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
->> index 2d7eb6989e83..f82277cadc6b 100644
->> --- a/tools/testing/selftests/kvm/include/kvm_util.h
->> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
->> @@ -223,6 +223,11 @@ int vcpu_nested_state_set(struct kvm_vm *vm, uint32_t vcpuid,
->>  #endif
->>  void *vcpu_map_dirty_ring(struct kvm_vm *vm, uint32_t vcpuid);
->>  
->> +int kvm_device_check_attr(int dev_fd, uint32_t group, uint64_t attr);
->> +int kvm_create_device(struct kvm_vm *vm, uint64_t type, bool test);
->> +int kvm_device_access(int dev_fd, uint32_t group, uint64_t attr,
->> +		      void *val, bool write);
->> +
->>  const char *exit_reason_str(unsigned int exit_reason);
->>  
->>  void virt_pgd_alloc(struct kvm_vm *vm, uint32_t pgd_memslot);
->> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
->> index e5fbf16f725b..da43c1f5730e 100644
->> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
->> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
->> @@ -1728,6 +1728,57 @@ int _kvm_ioctl(struct kvm_vm *vm, unsigned long cmd, void *arg)
->>  	return ioctl(vm->kvm_fd, cmd, arg);
->>  }
->>  
->> +/*
->> + * Device Ioctl
->> + */
->> +
->> +int kvm_device_check_attr(int dev_fd, uint32_t group, uint64_t attr)
->> +{
->> +	struct kvm_device_attr attribute = {
->> +		.group = group,
->> +		.attr = attr,
->> +		.flags = 0,
->> +	};
->> +	int ret;
->> +
->> +	ret = ioctl(dev_fd, KVM_HAS_DEVICE_ATTR, &attribute);
->> +	if (ret == -1)
->> +		return -errno;
-> 
-> This isn't are usual style. We usually assert on error in these
-> helpers and we create an _ variant, like _kvm_device_check_attr,
-> if we want the return value and errno to be returned. Something
-> like
-> 
->  int _kvm_device_check_attr(int dev_fd, uint32_t group, uint64_t attr)
->  {
->      struct kvm_device_attr attribute = {
->              .group = group,
->              .attr = attr,
->              .flags = 0,
->      };
-> 
->      return ioctl(dev_fd, KVM_HAS_DEVICE_ATTR, &attribute);
-> }
-> 
->  void kvm_device_check_attr(int dev_fd, uint32_t group, uint64_t attr)
->  {
->    int ret = _kvm_device_check_attr(dev_fd, group, attr);
->    TEST_ASSERT(ret == 0, ...);
->  }
-> 
-> Or, if you want the check to be useful for probing, then maybe
-> 
->  bool kvm_device_check_attr(int dev_fd, uint32_t group, uint64_t attr)
->  {
->    int ret = _kvm_device_check_attr(dev_fd, group, attr);
->    TEST_ASSERT(ret == 0 || errno == ENXIO, ...);
->    return !ret;
->  }
-> 
-> Same comment for the other new device API below.
-
-OK. However my tests check the errno so I will rather use the "_"
-variant and return -errno there.
-> 
->> +	return ret;
->> +}
->> +
->> +int kvm_create_device(struct kvm_vm *vm, uint64_t type, bool test)
->> +{
->> +	struct kvm_create_device create_dev;
->> +	int ret;
->> +
->> +	create_dev.type = type;
->> +	create_dev.fd = -1;
->> +	create_dev.flags = test ? KVM_CREATE_DEVICE_TEST : 0;
->> +	ret = ioctl(vm_get_fd(vm), KVM_CREATE_DEVICE, &create_dev);
->> +	if (ret == -1)
->> +		return -errno;
->> +	return test ? 0 : create_dev.fd;
->> +}
->> +
->> +int kvm_device_access(int dev_fd, uint32_t group, uint64_t attr,
->> +		      void *val, bool write)
->> +{
->> +	struct kvm_device_attr kvmattr = {
->> +		.group = group,
->> +		.attr = attr,
->> +		.flags = 0,
->> +		.addr = (uintptr_t)val,
->> +	};
->> +	int ret;
->> +
->> +	ret = ioctl(dev_fd, write ? KVM_SET_DEVICE_ATTR : KVM_GET_DEVICE_ATTR,
->> +		    &kvmattr);
->> +	if (ret)
->> +		return -errno;
->> +	return ret;
->> +}
->> +
->>  /*
->>   * VM Dump
->>   *
->> -- 
->> 2.26.2
->>
-> 
-> Thanks for the test! I only looked at it from a framework perspective, not
-> from a "how to test the vgic" perspective.
-
-Thank you for the review!
-
-Thanks
-
-Eric
-> 
-> Thanks,
-> drew 
-> 
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgTWFyYywKCk9uIDMvMzAvMjEgOTowNyBQTSwgTWFyYyBaeW5naWVyIHdyb3RlOgo+IE9uIFR1
+ZSwgMzAgTWFyIDIwMjEgMTg6MTM6MDcgKzAxMDAsCj4gQWxleGFuZHJ1IEVsaXNlaSA8YWxleGFu
+ZHJ1LmVsaXNlaUBhcm0uY29tPiB3cm90ZToKPj4gSGkgTWFyYywKPj4KPj4gVGhhbmtzIGZvciBo
+YXZpbmcgYSBsb29rIQo+Pgo+PiBPbiAzLzMwLzIxIDEwOjU1IEFNLCBNYXJjIFp5bmdpZXIgd3Jv
+dGU6Cj4+PiBIaSBBbGV4LAo+Pj4KPj4+IE9uIFR1ZSwgMjMgTWFyIDIwMjEgMTg6MDA6NTcgKzAw
+MDAsCj4+PiBBbGV4YW5kcnUgRWxpc2VpIDxhbGV4YW5kcnUuZWxpc2VpQGFybS5jb20+IHdyb3Rl
+Ogo+Pj4+IFdoZW4gYSBWQ1BVIGlzIGNyZWF0ZWQsIHRoZSBrdm1fdmNwdSBzdHJ1Y3QgaXMgaW5p
+dGlhbGl6ZWQgdG8gemVybyBpbgo+Pj4+IGt2bV92bV9pb2N0bF9jcmVhdGVfdmNwdSgpLiBPbiBW
+SEUgc3lzdGVtcywgdGhlIGZpcnN0IHRpbWUKPj4+PiB2Y3B1LmFyY2gubWRjcl9lbDIgaXMgbG9h
+ZGVkIG9uIGhhcmR3YXJlIGlzIGluIHZjcHVfbG9hZCgpLCBiZWZvcmUgaXQgaXMKPj4+PiBzZXQg
+dG8gYSBzZW5zaWJsZSB2YWx1ZSBpbiBrdm1fYXJtX3NldHVwX2RlYnVnKCkgbGF0ZXIgaW4gdGhl
+IHJ1biBsb29wLiBUaGUKPj4+PiByZXN1bHQgaXMgdGhhdCBLVk0gZXhlY3V0ZXMgZm9yIGEgc2hv
+cnQgdGltZSB3aXRoIE1EQ1JfRUwyIHNldCB0byB6ZXJvLgo+Pj4+Cj4+Pj4gVGhpcyBoYXMgc2V2
+ZXJhbCB1bmludGVuZGVkIGNvbnNlcXVlbmNlczoKPj4+Pgo+Pj4+ICogU2V0dGluZyBNRENSX0VM
+Mi5IUE1OIHRvIDAgaXMgY29uc3RyYWluZWQgdW5wcmVkaWN0YWJsZSBhY2NvcmRpbmcgdG8gQVJN
+Cj4+Pj4gICBEREkgMDQ4N0cuYSwgcGFnZSBEMTMtMzgyMC4gVGhlIGJlaGF2aW9yIHNwZWNpZmll
+ZCBieSB0aGUgYXJjaGl0ZWN0dXJlCj4+Pj4gICBpbiB0aGlzIGNhc2UgaXMgZm9yIHRoZSBQRSB0
+byBiZWhhdmUgYXMgaWYgTURDUl9FTDIuSFBNTiBpcyBzZXQgdG8gYQo+Pj4+ICAgdmFsdWUgbGVz
+cyB0aGFuIG9yIGVxdWFsIHRvIFBNQ1JfRUwwLk4sIHdoaWNoIG1lYW5zIHRoYXQgYW4gdW5rbm93
+bgo+Pj4+ICAgbnVtYmVyIG9mIGNvdW50ZXJzIGFyZSBub3cgZGlzYWJsZWQgYnkgTURDUl9FTDIu
+SFBNRSwgd2hpY2ggaXMgemVyby4KPj4+Pgo+Pj4+ICogVGhlIGhvc3QgY29uZmlndXJhdGlvbiBm
+b3IgdGhlIG90aGVyIGRlYnVnIGZlYXR1cmVzIGNvbnRyb2xsZWQgYnkKPj4+PiAgIE1EQ1JfRUwy
+IGlzIHRlbXBvcmFyaWx5IGxvc3QuIFRoaXMgaGFzIGJlZW4gaGFybWxlc3Mgc28gZmFyLCBhcyBM
+aW51eAo+Pj4+ICAgZG9lc24ndCB1c2UgdGhlIG90aGVyIGZpZWxkcywgYnV0IHRoYXQgbWlnaHQg
+Y2hhbmdlIGluIHRoZSBmdXR1cmUuCj4+Pj4KPj4+PiBMZXQncyBhdm9pZCBib3RoIGlzc3VlcyBi
+eSBpbml0aWFsaXppbmcgdGhlIFZDUFUncyBtZGNyX2VsMiBmaWVsZCBpbgo+Pj4+IGt2bV92Y3B1
+X3ZjcHVfZmlyc3RfcnVuX2luaXQoKSwgdGh1cyBtYWtpbmcgc3VyZSB0aGF0IHRoZSBNRENSX0VM
+MiByZWdpc3Rlcgo+Pj4+IGhhcyBhIGNvbnNpc3RlbnQgdmFsdWUgYWZ0ZXIgZWFjaCB2Y3B1X2xv
+YWQoKS4KPj4+Pgo+Pj4+IFNpZ25lZC1vZmYtYnk6IEFsZXhhbmRydSBFbGlzZWkgPGFsZXhhbmRy
+dS5lbGlzZWlAYXJtLmNvbT4KPj4+IFRoaXMgbG9va3Mgc3RyYW5nZWx5IHNpbWlsYXIgdG8gNDk0
+MmRjNjYzOGIwICgiS1ZNOiBhcm02NDogV3JpdGUKPj4+IGFyY2gubWRjcl9lbDIgY2hhbmdlcyBz
+aW5jZSBsYXN0IHZjcHVfbG9hZCBvbiBWSEUiKSwganVzdCBhdCBhCj4+PiBkaWZmZXJlbnQgcG9p
+bnQuIFByb2JhYmx5IHdvcnRoIGEgRml4ZXMgdGFnLgo+PiBUaGlzIGJ1ZyBpcyBwcmVzZW50IGlu
+IHRoZSBjb21taXQgeW91IGFyZSBtZW50aW9uaW5nLCBhbmQgZnJvbSB3aGF0Cj4+IEkgY2FuIHRl
+bGwgaXQncyBhbHNvIHByZXNlbnQgaW4gdGhlIGNvbW1pdCBpdCdzIGZpeGluZyAoZDVhMjFiY2My
+OTk1Cj4+ICgiS1ZNOiBhcm02NDogTW92ZSBjb21tb24gVkhFL25vbi1WSEUgdHJhcCBjb25maWcg
+aW4gc2VwYXJhdGUKPj4gZnVuY3Rpb25zIikpIC0gdmNwdS0+YXJjaC5tZGNyX2VsMiBpcyBjb21w
+dXRlZCBpbgo+PiBrdm1fYXJtX3NldHVwX2RlYnVnKCksIHdoaWNoIGlzIGNhbGxlZCBhZnRlciB2
+Y3B1X2xvYWQoKS4gTXkgZ3Vlc3MKPj4gaXMgdGhhdCB0aGlzIGJ1ZyBpcyBmcm9tIFZIRSBzdXBw
+b3J0IHdhcyBhZGRlZCAob3Igc29vbiBhZnRlcikuCj4gUmlnaHQuIENhbiB5b3UgcGxlYXNlIGFk
+ZCBhIEZpeGVzOiB0YWcgZm9yIHRoZSBzYW1lIGNvbW1pdD8gQXQgbGVhc3QKPiB0aGF0J2QgYmUg
+Y29uc2lzdGVudC4KClllcywgSSdsbCBkbyB0aGF0LgoKPgo+PiBJIGNhbiBkaWcgZnVydGhlciwg
+aG93IGZhciBiYWNrIGluIHRpbWUgc2hvdWxkIEkgYWltIGZvcj8KPj4KPj4+PiAtLS0KPj4+PiBG
+b3VuZCBieSBjb2RlIGluc3BlY3Rpb24uIEJhc2VkIG9uIHY1LjEyLXJjNC4KPj4+Pgo+Pj4+IFRl
+c3RlZCBvbiBhbiBvZHJvaWQtYzQgd2l0aCBWSEUuIHZjcHUtPmFyY2gubWRjcl9lbDIgaXMgY2Fs
+Y3VsYXRlZCB0byBiZQo+Pj4+IDB4NGU2Ni4gV2l0aG91dCB0aGlzIHBhdGNoLCByZWFkaW5nIE1E
+Q1JfRUwyIGFmdGVyIHRoZSBmaXJzdCB2Y3B1X2xvYWQoKSBpbgo+Pj4+IGt2bV9hcmNoX3ZjcHVf
+aW9jdGxfcnVuKCkgcmV0dXJucyAwOyB3aXRoIHRoaXMgcGF0Y2ggaXQgcmV0dXJucyB0aGUgY29y
+cmVjdAo+Pj4+IHZhbHVlLCAweGU2NiAoRkVBVF9TUEUgaXMgbm90IGltcGxlbWVudGVkIGJ5IHRo
+ZSBQRSkuCj4+Pj4KPj4+PiBUaGlzIHBhdGNoIHdhcyBpbml0aWFsbHkgcGFydCBvZiB0aGUgS1ZN
+IFNQRSBzZXJpZXMgWzFdLCBidXQgdGhvc2UgcGF0Y2hlcwo+Pj4+IGhhdmVuJ3Qgc2VlbiBtdWNo
+IGFjdGl2aXR5LCBzbyBJIHRob3VnaHQgaXQgd291bGQgYmUgYSBnb29kIGlkZWEgdG8gc2VuZAo+
+Pj4+IHRoaXMgcGF0Y2ggc2VwYXJhdGVseSB0byBkcmF3IG1vcmUgYXR0ZW50aW9uIHRvIGl0Lgo+
+Pj4+Cj4+Pj4gQ2hhbmdlcyBpbiB2MjoKPj4+PiAqIE1vdmVkIGt2bV9hcm1fdmNwdV9pbml0X2Rl
+YnVnKCkgZWFybGllciBpbiBrdm1fdmNwdV9maXJzdF9ydW5faW5pdCgpIHNvCj4+Pj4gICB2Y3B1
+LT5hcmNoLm1kY3JfZWwyIGlzIGNhbGN1bGF0ZWQgZXZlbiBpZiBrdm1fdmdpY19tYXBfcmVzb3Vy
+Y2VzKCkgZmFpbHMuCj4+Pj4gKiBBZGRlZCBjb21tZW50IHRvIGt2bV9hcm1fc2V0dXBfbWRjcl9l
+bDIgdG8gZXhwbGFpbiB3aGF0IHRlc3RpbmcKPj4+PiAgIHZjcHUtPmd1ZXN0X2RlYnVnIG1lYW5z
+Lgo+Pj4+Cj4+Pj4gWzFdIGh0dHBzOi8vd3d3LnNwaW5pY3MubmV0L2xpc3RzL2t2bS1hcm0vbXNn
+NDI5NTkuaHRtbAo+Pj4+Cj4+Pj4gIGFyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaCB8
+ICAxICsKPj4+PiAgYXJjaC9hcm02NC9rdm0vYXJtLmMgICAgICAgICAgICAgIHwgIDMgKy0KPj4+
+PiAgYXJjaC9hcm02NC9rdm0vZGVidWcuYyAgICAgICAgICAgIHwgODIgKysrKysrKysrKysrKysr
+KysrKysrLS0tLS0tLS0tLQo+Pj4+ICAzIGZpbGVzIGNoYW5nZWQsIDU5IGluc2VydGlvbnMoKyks
+IDI3IGRlbGV0aW9ucygtKQo+Pj4+Cj4+Pj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQvaW5jbHVk
+ZS9hc20va3ZtX2hvc3QuaCBiL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaAo+Pj4+
+IGluZGV4IDNkMTBlNjUyN2Y3ZC4uODU4YzJmY2ZjMDQzIDEwMDY0NAo+Pj4+IC0tLSBhL2FyY2gv
+YXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaAo+Pj4+ICsrKyBiL2FyY2gvYXJtNjQvaW5jbHVk
+ZS9hc20va3ZtX2hvc3QuaAo+Pj4+IEBAIC03MTMsNiArNzEzLDcgQEAgc3RhdGljIGlubGluZSB2
+b2lkIGt2bV9hcmNoX3NjaGVkX2luKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgaW50IGNwdSkge30K
+Pj4+PiAgc3RhdGljIGlubGluZSB2b2lkIGt2bV9hcmNoX3ZjcHVfYmxvY2tfZmluaXNoKHN0cnVj
+dCBrdm1fdmNwdSAqdmNwdSkge30KPj4+PiAgCj4+Pj4gIHZvaWQga3ZtX2FybV9pbml0X2RlYnVn
+KHZvaWQpOwo+Pj4+ICt2b2lkIGt2bV9hcm1fdmNwdV9pbml0X2RlYnVnKHN0cnVjdCBrdm1fdmNw
+dSAqdmNwdSk7Cj4+Pj4gIHZvaWQga3ZtX2FybV9zZXR1cF9kZWJ1ZyhzdHJ1Y3Qga3ZtX3ZjcHUg
+KnZjcHUpOwo+Pj4+ICB2b2lkIGt2bV9hcm1fY2xlYXJfZGVidWcoc3RydWN0IGt2bV92Y3B1ICp2
+Y3B1KTsKPj4+PiAgdm9pZCBrdm1fYXJtX3Jlc2V0X2RlYnVnX3B0cihzdHJ1Y3Qga3ZtX3ZjcHUg
+KnZjcHUpOwo+Pj4+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2t2bS9hcm0uYyBiL2FyY2gvYXJt
+NjQva3ZtL2FybS5jCj4+Pj4gaW5kZXggN2YwNmJhNzY2OThkLi43MDg4ZDhmZTcxODYgMTAwNjQ0
+Cj4+Pj4gLS0tIGEvYXJjaC9hcm02NC9rdm0vYXJtLmMKPj4+PiArKysgYi9hcmNoL2FybTY0L2t2
+bS9hcm0uYwo+Pj4+IEBAIC01ODAsNiArNTgwLDggQEAgc3RhdGljIGludCBrdm1fdmNwdV9maXJz
+dF9ydW5faW5pdChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCj4+Pj4gIAo+Pj4+ICAJdmNwdS0+YXJj
+aC5oYXNfcnVuX29uY2UgPSB0cnVlOwo+Pj4+ICAKPj4+PiArCWt2bV9hcm1fdmNwdV9pbml0X2Rl
+YnVnKHZjcHUpOwo+Pj4+ICsKPj4+PiAgCWlmIChsaWtlbHkoaXJxY2hpcF9pbl9rZXJuZWwoa3Zt
+KSkpIHsKPj4+PiAgCQkvKgo+Pj4+ICAJCSAqIE1hcCB0aGUgVkdJQyBoYXJkd2FyZSByZXNvdXJj
+ZXMgYmVmb3JlIHJ1bm5pbmcgYSB2Y3B1IHRoZQo+Pj4+IEBAIC03OTEsNyArNzkzLDYgQEAgaW50
+IGt2bV9hcmNoX3ZjcHVfaW9jdGxfcnVuKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKPj4+PiAgCQl9
+Cj4+Pj4gIAo+Pj4+ICAJCWt2bV9hcm1fc2V0dXBfZGVidWcodmNwdSk7Cj4+Pj4gLQo+Pj4gU3B1
+cmlvdXMgY2hhbmdlPwo+PiBEZWZpbml0ZWx5LCB0aGFuayB5b3UgZm9yIHNwb3R0aW5nIGl0Lgo+
+Pgo+Pj4+ICAJCS8qKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioq
+KioqKioqKioqKioqKioqKgo+Pj4+ICAJCSAqIEVudGVyIHRoZSBndWVzdAo+Pj4+ICAJCSAqLwo+
+Pj4+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2t2bS9kZWJ1Zy5jIGIvYXJjaC9hcm02NC9rdm0v
+ZGVidWcuYwo+Pj4+IGluZGV4IDdhN2U0MjU2MTZiNS4uMzYyNmQwMzM1NGY2IDEwMDY0NAo+Pj4+
+IC0tLSBhL2FyY2gvYXJtNjQva3ZtL2RlYnVnLmMKPj4+PiArKysgYi9hcmNoL2FybTY0L2t2bS9k
+ZWJ1Zy5jCj4+Pj4gQEAgLTY4LDYgKzY4LDYwIEBAIHZvaWQga3ZtX2FybV9pbml0X2RlYnVnKHZv
+aWQpCj4+Pj4gIAlfX3RoaXNfY3B1X3dyaXRlKG1kY3JfZWwyLCBrdm1fY2FsbF9oeXBfcmV0KF9f
+a3ZtX2dldF9tZGNyX2VsMikpOwo+Pj4+ICB9Cj4+Pj4gIAo+Pj4+ICsvKioKPj4+PiArICoga3Zt
+X2FybV9zZXR1cF9tZGNyX2VsMiAtIGNvbmZpZ3VyZSB2Y3B1IG1kY3JfZWwyIHZhbHVlCj4+Pj4g
+KyAqCj4+Pj4gKyAqIEB2Y3B1Ogl0aGUgdmNwdSBwb2ludGVyCj4+Pj4gKyAqIEBob3N0X21kY3I6
+ICBob3N0IG1kY3JfZWwyIHZhbHVlCj4+Pj4gKyAqCj4+Pj4gKyAqIFRoaXMgZW5zdXJlcyB3ZSB3
+aWxsIHRyYXAgYWNjZXNzIHRvOgo+Pj4+ICsgKiAgLSBQZXJmb3JtYW5jZSBtb25pdG9ycyAoTURD
+Ul9FTDJfVFBNL01EQ1JfRUwyX1RQTUNSKQo+Pj4+ICsgKiAgLSBEZWJ1ZyBST00gQWRkcmVzcyAo
+TURDUl9FTDJfVERSQSkKPj4+PiArICogIC0gT1MgcmVsYXRlZCByZWdpc3RlcnMgKE1EQ1JfRUwy
+X1RET1NBKQo+Pj4+ICsgKiAgLSBTdGF0aXN0aWNhbCBwcm9maWxlciAoTURDUl9FTDJfVFBNUy9N
+RENSX0VMMl9FMlBCKQo+Pj4+ICsgKi8KPj4+PiArc3RhdGljIHZvaWQga3ZtX2FybV9zZXR1cF9t
+ZGNyX2VsMihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHUzMiBob3N0X21kY3IpCj4+Pj4gK3sKPj4+
+PiArCWJvb2wgdHJhcF9kZWJ1ZyA9ICEodmNwdS0+YXJjaC5mbGFncyAmIEtWTV9BUk02NF9ERUJV
+R19ESVJUWSk7Cj4+Pj4gKwo+Pj4+ICsJLyoKPj4+PiArCSAqIFRoaXMgYWxzbyBjbGVhcnMgTURD
+Ul9FTDJfRTJQQl9NQVNLIHRvIGRpc2FibGUgZ3Vlc3QgYWNjZXNzCj4+Pj4gKwkgKiB0byB0aGUg
+cHJvZmlsaW5nIGJ1ZmZlci4KPj4+PiArCSAqLwo+Pj4+ICsJdmNwdS0+YXJjaC5tZGNyX2VsMiA9
+IGhvc3RfbWRjciAmIE1EQ1JfRUwyX0hQTU5fTUFTSzsKPj4+PiArCXZjcHUtPmFyY2gubWRjcl9l
+bDIgfD0gKE1EQ1JfRUwyX1RQTSB8Cj4+Pj4gKwkJCQlNRENSX0VMMl9UUE1TIHwKPj4+PiArCQkJ
+CU1EQ1JfRUwyX1RQTUNSIHwKPj4+PiArCQkJCU1EQ1JfRUwyX1REUkEgfAo+Pj4+ICsJCQkJTURD
+Ul9FTDJfVERPU0EpOwo+Pj4+ICsKPj4+PiArCS8qIElzIHRoZSBWTSBiZWluZyBkZWJ1Z2dlZCBi
+eSB1c2Vyc3BhY2U/ICovCj4+Pj4gKwlpZiAodmNwdS0+Z3Vlc3RfZGVidWcpIHsKPj4+PiArCQkv
+KiBSb3V0ZSBhbGwgc29mdHdhcmUgZGVidWcgZXhjZXB0aW9ucyB0byBFTDIgKi8KPj4+PiArCQl2
+Y3B1LT5hcmNoLm1kY3JfZWwyIHw9IE1EQ1JfRUwyX1RERTsKPj4+PiArCQlpZiAodmNwdS0+Z3Vl
+c3RfZGVidWcgJiBLVk1fR1VFU1REQkdfVVNFX0hXKQo+Pj4+ICsJCQl0cmFwX2RlYnVnID0gdHJ1
+ZTsKPj4+PiArCX0KPj4+PiArCj4+Pj4gKwkvKiBUcmFwIGRlYnVnIHJlZ2lzdGVyIGFjY2VzcyAq
+Lwo+Pj4+ICsJaWYgKHRyYXBfZGVidWcpCj4+Pj4gKwkJdmNwdS0+YXJjaC5tZGNyX2VsMiB8PSBN
+RENSX0VMMl9UREE7Cj4+Pj4gKwo+Pj4+ICsJdHJhY2Vfa3ZtX2FybV9zZXRfZHJlZzMyKCJNRENS
+X0VMMiIsIHZjcHUtPmFyY2gubWRjcl9lbDIpOwo+Pj4+ICt9Cj4+Pj4gKwo+Pj4+ICsvKioKPj4+
+PiArICoga3ZtX2FybV92Y3B1X2luaXRfZGVidWcgLSBzZXR1cCB2Y3B1IGRlYnVnIHRyYXBzCj4+
+Pj4gKyAqCj4+Pj4gKyAqIEB2Y3B1Ogl0aGUgdmNwdSBwb2ludGVyCj4+Pj4gKyAqCj4+Pj4gKyAq
+IFNldCB2Y3B1IGluaXRpYWwgbWRjcl9lbDIgdmFsdWUuCj4+Pj4gKyAqLwo+Pj4+ICt2b2lkIGt2
+bV9hcm1fdmNwdV9pbml0X2RlYnVnKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKPj4+PiArewo+Pj4+
+ICsJa3ZtX2FybV9zZXR1cF9tZGNyX2VsMih2Y3B1LCB0aGlzX2NwdV9yZWFkKG1kY3JfZWwyKSk7
+Cj4+PiBHaXZlbiB0aGF0IGt2bV9hcm1fc2V0dXBfbWRjcl9lbDIoKSBhbHdheXMgdGFrZXMgdGhl
+IGN1cnJlbnQgaG9zdAo+Pj4gdmFsdWUgZm9yIG1kY3JfZWwyLCB3aHkgbm90IG1vdmluZyB0aGUg
+cmVhZCBpbnRvIGl0IGFuZCBiZSBkb25lIHdpdGgKPj4+IGl0Pwo+PiBrdm1fYXJtX3NldHVwX2Rl
+YnVnKCkgaXMgY2FsbGVkIHdpdGggcHJlZW1wdGlvbiBkaXNhYmxlZCwgYW5kIGl0IGNhbgo+PiB1
+c2UgX190aGlzX2NwdV9yZWFkKCkuIGt2bV9hcm1fdmNwdV9pbml0X2RlYnVnKCkgaXMgY2FsbGVk
+IHdpdGgKPj4gcHJlZW1wdGlvbiBlbmFibGVkLCBzbyBpdCBtdXN0IHVzZSB0aGlzX2NwdV9yZWFk
+KCkuIEkgd2FudGVkIHRvIG1ha2UKPj4gdGhlIGRpc3RpbmN0aW9uIGJlY2F1c2Uga3ZtX2FybV9z
+ZXR1cF9kZWJ1ZygpIGlzIGluIHRoZSBydW4gbG9vcC4KPiBJIHRoaW5rIGl0IHdvdWxkIGJlIGFi
+c29sdXRlbHkgZmluZSB0byBtYWtlIHRoZSBzbG93IHBhdGggb2YKPiBrdm1fdmNwdV9maXJzdF9y
+dW5faW5pdCgpIHJ1biB3aXRoIHByZWVtcHQgZGlzYWJsZWQuIFRoaXMgaGFwcGVucyBzbwo+IHJh
+cmVseSB0aGF0IHRoYXQgaXQgaXNuJ3Qgd29ydGggdGhpbmtpbmcgYWJvdXQgaXQuCgpJdCBsb29r
+cyB0byBtZSBsaWtlIGl0J3MgYSBiaXQgdG9vIGhlYXZ5LWhhbmRlZCB0byBydW4gdGhlIGVudGly
+ZSBmdW5jdGlvbgprdm1fdmNwdV9maXJzdF9ydW5faW5pdCgpIHdpdGggcHJlZW1wdGlvbiBkaXNh
+YmxlZCBqdXN0IGZvciBfX3RoaXNfY3B1X3JlYWQoKSBpbgprdm1fYXJtX3NldHVwX21kY3JfZWwy
+KCkuIE5vdCBiZWNhdXNlIG9mIHRoZSBwZXJmb3JtYW5jZSBjb3N0IChpdCdzIG5lZ2xpZ2libGUs
+IGFzCml0J3MgY2FsbGVkIGV4YWN0bHkgb25jZSBpbiB0aGUgVkNQVSBsaWZldGltZSksIGJ1dCBi
+ZWNhdXNlIGl0J3Mgbm90IG9idmlvdXMgd2h5Cml0IGlzIG5lZWRlZC4KCkkgdHJpZWQgdGhpczoK
+CkBAIC01ODAsNyArNTgwLDkgQEAgc3RhdGljIGludCBrdm1fdmNwdV9maXJzdF9ydW5faW5pdChz
+dHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCsKgCsKgwqDCoMKgwqDCoMKgIHZjcHUtPmFyY2guaGFzX3J1
+bl9vbmNlID0gdHJ1ZTsKwqAKLcKgwqDCoMKgwqDCoCBrdm1fYXJtX3ZjcHVfaW5pdF9kZWJ1Zyh2
+Y3B1KTsKK8KgwqDCoMKgwqDCoCBwcmVlbXB0X2Rpc2FibGUoKTsKK8KgwqDCoMKgwqDCoCBrdm1f
+YXJtX3NldHVwX21kY3JfZWwyKHZjcHUpOworwqDCoMKgwqDCoMKgIHByZWVtcHRfZW5hYmxlKCk7
+CsKgCsKgwqDCoMKgwqDCoMKgIGlmIChsaWtlbHkoaXJxY2hpcF9pbl9rZXJuZWwoa3ZtKSkpIHsK
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIC8qCgphbmQgaXQgc3RpbGwgbG9va3MgYSBi
+aXQgb2ZmIHRvIG1lIGJlY2F1c2UgcHJlZW1wdGlvbiBuZWVkcyB0byBiZSBkaXNhYmxlZCBiZWNh
+dXNlCm9mIGFuIGltcGxlbWVudGF0aW9uIGRldGFpbCBpbiBrdm1fYXJtX3NldHVwX21kY3JfZWwy
+KCksIGFzIHRoZSBmdW5jdGlvbiBvcGVyYXRlcwpvbiB0aGUgVkNQVSBzdHJ1Y3QgYW5kIHByZWVt
+cHRpb24gY2FuIGJlIGVuYWJsZWQgZm9yIHRoYXQuCgpJIHdhcyB0aGlua2luZyBzb21ldGhpbmcg
+bGlrZSB0aGlzOgoKQEAgLTExOSw3ICsxMTksOSBAQCBzdGF0aWMgdm9pZCBrdm1fYXJtX3NldHVw
+X21kY3JfZWwyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgdTMyCmhvc3RfbWRjcikKwqAgKi8KwqB2
+b2lkIGt2bV9hcm1fdmNwdV9pbml0X2RlYnVnKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKwqB7Ci3C
+oMKgwqDCoMKgwqAga3ZtX2FybV9zZXR1cF9tZGNyX2VsMih2Y3B1LCB0aGlzX2NwdV9yZWFkKG1k
+Y3JfZWwyKSk7CivCoMKgwqDCoMKgwqAgcHJlZW1wdF9kaXNhYmxlKCk7CivCoMKgwqDCoMKgwqAg
+a3ZtX2FybV9zZXR1cF9tZGNyX2VsMih2Y3B1KTsKK8KgwqDCoMKgwqDCoCBwcmVlbXB0X2VuYWJs
+ZSgpOwrCoH0KwqAKwqAvKioKCldoYXQgZG8geW91IHRoaW5rPwoKVGhhbmtzLAoKQWxleAoKPgo+
+IFBsZWFzZSBnaXZlIGl0IGEgbG9ja2RlcCBydW4gdGhvdWdoISA7LSkKPgo+Pj4gQWxzbywgZG8g
+d2UgcmVhbGx5IG5lZWQgYW4gZXh0cmEgd3JhcHBlcj8KPj4gSSBjYW4gcmVtb3ZlIHRoZSB3cmFw
+cGVyIGFuZCBoYXZlIGt2bV9hcm1fc2V0dXBfbWRjcl9lbDIoKSB1c2UKPj4gdGhpc19jcHVfcmVh
+ZCgpIGZvciB0aGUgaG9zdCdzIG1kY3JfZWwyIHZhbHVlIGF0IHRoZSBjb3N0IG9mIGEKPj4gcHJl
+ZW1wdCBkaXNhYmxlL2VuYWJsZSBpbiB0aGUgcnVuIGxvb3Agd2hlbiBwcmVlbXB0aW9uIGlzCj4+
+IGRpc2FibGVkLiBJZiB5b3UgdGhpbmsgdGhhdCB3b3VsZCBtYWtlIHRoZSBjb2RlIGVhc2llciB0
+byBmb2xsb3csIEkKPj4gY2FuIGNlcnRhaW5seSBkbyB0aGF0Lgo+IEFzIGV4cGxhaW5lZCBhYm92
+ZSwgSSdkIHJhdGhlciB5b3Uga2VlcCB0aGUgX190aGlzX2NwdV9yZWFkKCkgYW5kIG1ha2UKPiBr
+dm1fdmNwdV9maXJzdF9ydW5faW5pdCgpIHByZWVtcHRpb24gc2FmZS4KPgo+IFRoYW5rcywKPgo+
+IAlNLgo+Cl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2
+bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xp
+c3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
