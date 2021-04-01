@@ -2,67 +2,80 @@ Return-Path: <SRS0=odEw=I6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82DCFC433ED
-	for <kvmarm@archiver.kernel.org>; Thu,  1 Apr 2021 06:12:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E42BC43460
+	for <kvmarm@archiver.kernel.org>; Thu,  1 Apr 2021 08:52:56 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A34546105A
-	for <kvmarm@archiver.kernel.org>; Thu,  1 Apr 2021 06:12:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A34546105A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 5B886610CC
+	for <kvmarm@archiver.kernel.org>; Thu,  1 Apr 2021 08:52:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B886610CC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0286A4B5CE;
-	Thu,  1 Apr 2021 02:12:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id ED4FB4B5FE;
+	Thu,  1 Apr 2021 04:52:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id BVGLooPy081Q; Thu,  1 Apr 2021 02:12:17 -0400 (EDT)
+	with ESMTP id WFNKBXMN-Jik; Thu,  1 Apr 2021 04:52:53 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F3F2F4B5C6;
-	Thu,  1 Apr 2021 02:12:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E03244B605;
+	Thu,  1 Apr 2021 04:52:53 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 79CA04B5B6
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Apr 2021 02:12:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8878F4B60A
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Apr 2021 04:52:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 985hrULg7wz6 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  1 Apr 2021 02:12:13 -0400 (EDT)
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5FE164B5B7
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Apr 2021 02:12:13 -0400 (EDT)
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.58])
- by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4F9t7w29PWz9v7J;
- Thu,  1 Apr 2021 14:10:04 +0800 (CST)
-Received: from [10.174.185.179] (10.174.185.179) by
- DGGEMS405-HUB.china.huawei.com (10.3.19.205) with Microsoft SMTP Server id
- 14.3.498.0; Thu, 1 Apr 2021 14:12:02 +0800
-Subject: Re: [PATCH v14 07/13] iommu/smmuv3: Implement cache_invalidate
-To: Eric Auger <eric.auger@redhat.com>
-References: <20210223205634.604221-1-eric.auger@redhat.com>
- <20210223205634.604221-8-eric.auger@redhat.com>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <95a178f0-fc84-b9a2-d824-c09ea91c9d30@huawei.com>
-Date: Thu, 1 Apr 2021 14:11:59 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ with ESMTP id ivZdZJTxp3aF for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  1 Apr 2021 04:52:51 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AB60C4B5C7
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Apr 2021 04:52:51 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1617267171;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=uFDgWrjWMSMk4v/p6l+GMMcTkNEPFqFBG4PiCpy+Kw0=;
+ b=d/wuCJFZYv0UnnB3OHCMqfXX09C9hyig/1F4xlb0VXkBW+vC+Tq62JdwKWue3gEZ7eU9St
+ nZcisXiv0fyM2nWl6g1U2fUCNm4+9ywWSZUp6YBBjhMovPXSDxOF6FW+y+jv6oyDTZALSG
+ T5WSCq2IqpAuNCsarT56QrRRyfkdDGM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-278-p5EPH6ZUNQKtzQKx8K0sdQ-1; Thu, 01 Apr 2021 04:52:47 -0400
+X-MC-Unique: p5EPH6ZUNQKtzQKx8K0sdQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71D751005D54;
+ Thu,  1 Apr 2021 08:52:46 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-112-13.ams2.redhat.com [10.36.112.13])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 692A45D9CC;
+ Thu,  1 Apr 2021 08:52:43 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, maz@kernel.org, drjones@redhat.com,
+ alexandru.elisei@arm.com
+Subject: [PATCH v4 1/8] KVM: arm64: vgic-v3: Fix some error codes when setting
+ RDIST base
+Date: Thu,  1 Apr 2021 10:52:31 +0200
+Message-Id: <20210401085238.477270-2-eric.auger@redhat.com>
+In-Reply-To: <20210401085238.477270-1-eric.auger@redhat.com>
+References: <20210401085238.477270-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210223205634.604221-8-eric.auger@redhat.com>
-Content-Language: en-US
-X-Originating-IP: [10.174.185.179]
-X-CFilter-Loop: Reflected
-Cc: kvm@vger.kernel.org, vivek.gautam@arm.com, kvmarm@lists.cs.columbia.edu,
- eric.auger.pro@gmail.com, jean-philippe@linaro.org, yi.l.liu@intel.com,
- wangxingang5@huawei.com, maz@kernel.org, joro@8bytes.org, vsethi@nvidia.com,
- zhangfei.gao@linaro.org, jacob.jun.pan@linux.intel.com, will@kernel.org,
- nicoleotsuka@gmail.com, alex.williamson@redhat.com,
- linux-kernel@vger.kernel.org, lushenming@huawei.com,
- iommu@lists.linux-foundation.org, robin.murphy@arm.com
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Cc: shuah@kernel.org, pbonzini@redhat.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -74,79 +87,66 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Eric,
+KVM_DEV_ARM_VGIC_GRP_ADDR group doc says we should return
+-EEXIST in case the base address of the redist is already set.
+We currently return -EINVAL.
 
-On 2021/2/24 4:56, Eric Auger wrote:
-> +static int
-> +arm_smmu_cache_invalidate(struct iommu_domain *domain, struct device *dev,
-> +			  struct iommu_cache_invalidate_info *inv_info)
-> +{
-> +	struct arm_smmu_cmdq_ent cmd = {.opcode = CMDQ_OP_TLBI_NSNH_ALL};
-> +	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
-> +	struct arm_smmu_device *smmu = smmu_domain->smmu;
-> +
-> +	if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
-> +		return -EINVAL;
-> +
-> +	if (!smmu)
-> +		return -EINVAL;
-> +
-> +	if (inv_info->version != IOMMU_CACHE_INVALIDATE_INFO_VERSION_1)
-> +		return -EINVAL;
-> +
-> +	if (inv_info->cache & IOMMU_CACHE_INV_TYPE_PASID ||
+However we need to return -EINVAL in case a legacy REDIST address
+is attempted to be set while REDIST_REGIONS were set. This case
+is discriminated by looking at the count field.
 
-I didn't find any code where we would emulate the CFGI_CD{_ALL} commands
-for guest and invalidate the stale CD entries on the physical side. Is
-PASID-cache type designed for that effect?
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-> +	    inv_info->cache & IOMMU_CACHE_INV_TYPE_DEV_IOTLB) {
-> +		return -ENOENT;
-> +	}
-> +
-> +	if (!(inv_info->cache & IOMMU_CACHE_INV_TYPE_IOTLB))
-> +		return -EINVAL;
-> +
-> +	/* IOTLB invalidation */
-> +
-> +	switch (inv_info->granularity) {
-> +	case IOMMU_INV_GRANU_PASID:
-> +	{
-> +		struct iommu_inv_pasid_info *info =
-> +			&inv_info->granu.pasid_info;
-> +
-> +		if (info->flags & IOMMU_INV_ADDR_FLAGS_PASID)
-> +			return -ENOENT;
-> +		if (!(info->flags & IOMMU_INV_PASID_FLAGS_ARCHID))
-> +			return -EINVAL;
-> +
-> +		__arm_smmu_tlb_inv_context(smmu_domain, info->archid);
-> +		return 0;
-> +	}
-> +	case IOMMU_INV_GRANU_ADDR:
-> +	{
-> +		struct iommu_inv_addr_info *info = &inv_info->granu.addr_info;
-> +		size_t size = info->nb_granules * info->granule_size;
-> +		bool leaf = info->flags & IOMMU_INV_ADDR_FLAGS_LEAF;
-> +
-> +		if (info->flags & IOMMU_INV_ADDR_FLAGS_PASID)
-> +			return -ENOENT;
-> +
-> +		if (!(info->flags & IOMMU_INV_ADDR_FLAGS_ARCHID))
-> +			break;
-> +
-> +		arm_smmu_tlb_inv_range_domain(info->addr, size,
-> +					      info->granule_size, leaf,
-> +					      info->archid, smmu_domain);
-> +
-> +		arm_smmu_cmdq_issue_sync(smmu);
+---
 
-There is no need to issue one more SYNC.
+v1 -> v2:
+- simplify the check sequence
+---
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
+
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+index 15a6c98ee92f0..013b737b658f8 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+@@ -791,10 +791,6 @@ static int vgic_v3_insert_redist_region(struct kvm *kvm, uint32_t index,
+ 	size_t size = count * KVM_VGIC_V3_REDIST_SIZE;
+ 	int ret;
+ 
+-	/* single rdist region already set ?*/
+-	if (!count && !list_empty(rd_regions))
+-		return -EINVAL;
+-
+ 	/* cross the end of memory ? */
+ 	if (base + size < base)
+ 		return -EINVAL;
+@@ -805,11 +801,14 @@ static int vgic_v3_insert_redist_region(struct kvm *kvm, uint32_t index,
+ 	} else {
+ 		rdreg = list_last_entry(rd_regions,
+ 					struct vgic_redist_region, list);
+-		if (index != rdreg->index + 1)
+-			return -EINVAL;
+ 
+-		/* Cannot add an explicitly sized regions after legacy region */
+-		if (!rdreg->count)
++		if ((!count) != (!rdreg->count))
++			return -EINVAL; /* Mix REDIST and REDIST_REGION */
++
++		if (!count)
++			return -EEXIST;
++
++		if (index != rdreg->index + 1)
+ 			return -EINVAL;
+ 	}
+ 
+-- 
+2.26.3
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
