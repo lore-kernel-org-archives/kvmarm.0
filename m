@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF8D0C43462
-	for <kvmarm@archiver.kernel.org>; Thu,  1 Apr 2021 14:08:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2434C433ED
+	for <kvmarm@archiver.kernel.org>; Thu,  1 Apr 2021 14:08:20 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 58143611CE
-	for <kvmarm@archiver.kernel.org>; Thu,  1 Apr 2021 14:08:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58143611CE
+	by mail.kernel.org (Postfix) with ESMTP id 644D1611CE
+	for <kvmarm@archiver.kernel.org>; Thu,  1 Apr 2021 14:08:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 644D1611CE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0923B4B584;
-	Thu,  1 Apr 2021 10:08:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 176ED4B6A7;
+	Thu,  1 Apr 2021 10:08:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id xlyVPWDZy9F7; Thu,  1 Apr 2021 10:08:18 -0400 (EDT)
+	with ESMTP id yQeZcfQqHYxb; Thu,  1 Apr 2021 10:08:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C55494B6AB;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E75684B65B;
 	Thu,  1 Apr 2021 10:08:11 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AC0A94B64D
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Apr 2021 09:56:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 463904B604
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Apr 2021 09:56:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uUMTcVB7GUqv for <kvmarm@lists.cs.columbia.edu>;
- Thu,  1 Apr 2021 09:56:19 -0400 (EDT)
+ with ESMTP id 7R-jI3Q0ZM58 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  1 Apr 2021 09:56:22 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [63.128.21.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C5C3F4B604
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Apr 2021 09:56:19 -0400 (EDT)
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 469B14B64D
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Apr 2021 09:56:22 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1617285379;
+ s=mimecast20190719; t=1617285382;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=YJJ/VJwoWhfLVBiD22ep1zPpQ5T3CblMOlviKAdv9s8=;
- b=PP9gfJZVXnYgJUKaoT182ou6HXAJqnBAxAnImbRZl1gfzsRcbpfHnS0VKTBBjdVp5Miahs
- DEeDDO8+xRhAktc29vJ2qs4ptUhgoZyG1m0R1rEAIyGBIMXaCPv2I388zATvnXvjz5Uz8t
- 3mPW6e6XfMda5H4t5esfV+KYaha1/78=
+ bh=hpXKaWdM30cWIaQVbyhFPNqGgFNQZTFU9RkGsXLMuug=;
+ b=Nc2NUmgMMKSOEOnDLlwb2O4DmCiqg130BjxbqvAnfNAcspwmKKqxnNfGgvLPS9a3AwA3L9
+ TN9mILI176lPXCOV7Ter5sz3SfqHNsDD3r+x1oj+epmkJe5r+jiRA0/ChU4EchAdHdkzoK
+ yxnAXgD2usSEGqloE1BVp//2/7QWczE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-266-zfj5oBFjNH2EltbB_XYNcA-1; Thu, 01 Apr 2021 09:55:30 -0400
-X-MC-Unique: zfj5oBFjNH2EltbB_XYNcA-1
+ us-mta-8-Ef-wpVs8NMa8pPkjpC2bKA-1; Thu, 01 Apr 2021 09:56:18 -0400
+X-MC-Unique: Ef-wpVs8NMa8pPkjpC2bKA-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 54D93108598B;
- Thu,  1 Apr 2021 13:55:23 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4AE9B10866A5;
+ Thu,  1 Apr 2021 13:56:15 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.35.206.58])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9288A5D6B1;
- Thu,  1 Apr 2021 13:55:11 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 342705D6B1;
+ Thu,  1 Apr 2021 13:56:07 +0000 (UTC)
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: kvm@vger.kernel.org
-Subject: [PATCH v2 2/9] KVM: introduce KVM_CAP_SET_GUEST_DEBUG2
-Date: Thu,  1 Apr 2021 16:54:44 +0300
-Message-Id: <20210401135451.1004564-3-mlevitsk@redhat.com>
+Subject: [PATCH v2 7/9] KVM: SVM: split svm_handle_invalid_exit
+Date: Thu,  1 Apr 2021 16:54:49 +0300
+Message-Id: <20210401135451.1004564-8-mlevitsk@redhat.com>
 In-Reply-To: <20210401135451.1004564-1-mlevitsk@redhat.com>
 References: <20210401135451.1004564-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -109,41 +109,56 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This capability will allow the user to know which KVM_GUESTDBG_* bits
-are supported.
+Split the check for having a vmexit handler to
+svm_check_exit_valid, and make svm_handle_invalid_exit
+only handle a vmexit that is already not valid.
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- Documentation/virt/kvm/api.rst | 3 +++
- include/uapi/linux/kvm.h       | 1 +
- 2 files changed, 4 insertions(+)
+ arch/x86/kvm/svm/svm.c | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 38e327d4b479..9778b2434c03 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -3357,6 +3357,9 @@ indicating the number of supported registers.
- For ppc, the KVM_CAP_PPC_GUEST_DEBUG_SSTEP capability indicates whether
- the single-step debug event (KVM_GUESTDBG_SINGLESTEP) is supported.
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 271196400495..2aa951bc470c 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -3220,12 +3220,14 @@ static void dump_vmcb(struct kvm_vcpu *vcpu)
+ 	       "excp_to:", save->last_excp_to);
+ }
  
-+Also when supported, KVM_CAP_SET_GUEST_DEBUG2 capability indicates the
-+supported KVM_GUESTDBG_* bits in the control field.
-+
- When debug events exit the main run loop with the reason
- KVM_EXIT_DEBUG with the kvm_debug_exit_arch part of the kvm_run
- structure containing architecture specific debug information.
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index f6afee209620..727010788eff 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1078,6 +1078,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_DIRTY_LOG_RING 192
- #define KVM_CAP_X86_BUS_LOCK_EXIT 193
- #define KVM_CAP_PPC_DAWR1 194
-+#define KVM_CAP_SET_GUEST_DEBUG2 195
+-static int svm_handle_invalid_exit(struct kvm_vcpu *vcpu, u64 exit_code)
++static bool svm_check_exit_valid(struct kvm_vcpu *vcpu, u64 exit_code)
+ {
+-	if (exit_code < ARRAY_SIZE(svm_exit_handlers) &&
+-	    svm_exit_handlers[exit_code])
+-		return 0;
++	return (exit_code < ARRAY_SIZE(svm_exit_handlers) &&
++		svm_exit_handlers[exit_code]);
++}
  
- #ifdef KVM_CAP_IRQ_ROUTING
++static int svm_handle_invalid_exit(struct kvm_vcpu *vcpu, u64 exit_code)
++{
+ 	vcpu_unimpl(vcpu, "svm: unexpected exit reason 0x%llx\n", exit_code);
+ 	dump_vmcb(vcpu);
+ 	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
+@@ -3233,14 +3235,13 @@ static int svm_handle_invalid_exit(struct kvm_vcpu *vcpu, u64 exit_code)
+ 	vcpu->run->internal.ndata = 2;
+ 	vcpu->run->internal.data[0] = exit_code;
+ 	vcpu->run->internal.data[1] = vcpu->arch.last_vmentry_cpu;
+-
+-	return -EINVAL;
++	return 0;
+ }
  
+ int svm_invoke_exit_handler(struct kvm_vcpu *vcpu, u64 exit_code)
+ {
+-	if (svm_handle_invalid_exit(vcpu, exit_code))
+-		return 0;
++	if (!svm_check_exit_valid(vcpu, exit_code))
++		return svm_handle_invalid_exit(vcpu, exit_code);
+ 
+ #ifdef CONFIG_RETPOLINE
+ 	if (exit_code == SVM_EXIT_MSR)
 -- 
 2.26.2
 
