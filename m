@@ -4,69 +4,69 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BF4CC43461
-	for <kvmarm@archiver.kernel.org>; Thu,  1 Apr 2021 14:08:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC018C433ED
+	for <kvmarm@archiver.kernel.org>; Thu,  1 Apr 2021 14:08:16 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D39A361286
-	for <kvmarm@archiver.kernel.org>; Thu,  1 Apr 2021 14:08:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D39A361286
+	by mail.kernel.org (Postfix) with ESMTP id 43C3061286
+	for <kvmarm@archiver.kernel.org>; Thu,  1 Apr 2021 14:08:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43C3061286
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 739C04B6A4;
-	Thu,  1 Apr 2021 10:08:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E8F354B6DE;
+	Thu,  1 Apr 2021 10:08:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id D8xZg24kmx12; Thu,  1 Apr 2021 10:08:13 -0400 (EDT)
+	with ESMTP id Qr62RtNLp8up; Thu,  1 Apr 2021 10:08:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F9774B6C3;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5846D4B6A8;
 	Thu,  1 Apr 2021 10:08:11 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A6B44B5E3
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Apr 2021 09:55:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ACEB74B604
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Apr 2021 09:56:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1maHS4b7CMAv for <kvmarm@lists.cs.columbia.edu>;
- Thu,  1 Apr 2021 09:55:51 -0400 (EDT)
+ with ESMTP id SbVYnbShCmgj for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  1 Apr 2021 09:55:59 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D1BA4B604
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Apr 2021 09:55:51 -0400 (EDT)
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D83A04B5E3
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Apr 2021 09:55:59 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1617285351;
+ s=mimecast20190719; t=1617285359;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Beke6p3SuuLc9PEBd5EVBwfI5FcHk7u5ME5KWl6tIhg=;
- b=ddgGlG5WXKWE7cVfbO212WD6HRDPX4PmTVBF6NUxBG6D2cLANpOcTQX1j9gHhXsEPOxt4G
- J78VLe4ly//U5Cgz3uJX46cTL1f4Io5gnASe71RQhAZ4+nkC+zDOO7NB4WxeIYdl5n3ajA
- T4trUbt8fwcG3ixVV2ho7Ye6tymYp5c=
+ bh=NuvXglGlpdJ/QEHoOnrFCNfTazwjmv2hUiB2qqpR7J0=;
+ b=HTs+2QggdPEVBKhv+9s9SQdWcvIW9Dhmh7ii+7Jn4L0bguKNpddzpNwx+DnxEKi0s8pBBG
+ 4+lLl4KtMwcv4GOcXw+rJwclVv5L3jvQJZ+JkQk0DrJylSPyAgE7WTb6X3U4TTBo3p/ERC
+ 4f7BPWDxtdlkFxGYKxGo/A8SOuaLRBA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-99-_HcijJiUNj-mXO3Df2jx2A-1; Thu, 01 Apr 2021 09:55:49 -0400
-X-MC-Unique: _HcijJiUNj-mXO3Df2jx2A-1
+ us-mta-394-YmW1MhWNNkGN89uyV9ZwLg-1; Thu, 01 Apr 2021 09:55:56 -0400
+X-MC-Unique: YmW1MhWNNkGN89uyV9ZwLg-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C75BD107BEF6;
- Thu,  1 Apr 2021 13:55:44 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 363BA802690;
+ Thu,  1 Apr 2021 13:55:53 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.35.206.58])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 32E505D6B1;
- Thu,  1 Apr 2021 13:55:32 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2FC8D5D6B1;
+ Thu,  1 Apr 2021 13:55:44 +0000 (UTC)
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: kvm@vger.kernel.org
-Subject: [PATCH v2 4/9] KVM: aarch64: implement KVM_CAP_SET_GUEST_DEBUG2
-Date: Thu,  1 Apr 2021 16:54:46 +0300
-Message-Id: <20210401135451.1004564-5-mlevitsk@redhat.com>
+Subject: [PATCH v2 5/9] KVM: s390x: implement KVM_CAP_SET_GUEST_DEBUG2
+Date: Thu,  1 Apr 2021 16:54:47 +0300
+Message-Id: <20210401135451.1004564-6-mlevitsk@redhat.com>
 In-Reply-To: <20210401135451.1004564-1-mlevitsk@redhat.com>
 References: <20210401135451.1004564-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -109,61 +109,44 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Move KVM_GUESTDBG_VALID_MASK to kvm_host.h
-and use it to return the value of this capability.
+Define KVM_GUESTDBG_VALID_MASK and use it to implement this capabiity.
 Compile tested only.
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- arch/arm64/include/asm/kvm_host.h | 4 ++++
- arch/arm64/kvm/arm.c              | 2 ++
- arch/arm64/kvm/guest.c            | 5 -----
- 3 files changed, 6 insertions(+), 5 deletions(-)
+ arch/s390/include/asm/kvm_host.h | 4 ++++
+ arch/s390/kvm/kvm-s390.c         | 3 +++
+ 2 files changed, 7 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 3d10e6527f7d..613421454ab6 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -401,6 +401,10 @@ struct kvm_vcpu_arch {
- #define KVM_ARM64_PENDING_EXCEPTION	(1 << 8) /* Exception pending */
- #define KVM_ARM64_EXCEPT_MASK		(7 << 9) /* Target EL/MODE */
+diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+index 6bcfc5614bbc..a3902b57b825 100644
+--- a/arch/s390/include/asm/kvm_host.h
++++ b/arch/s390/include/asm/kvm_host.h
+@@ -700,6 +700,10 @@ struct kvm_hw_bp_info_arch {
+ #define guestdbg_exit_pending(vcpu) (guestdbg_enabled(vcpu) && \
+ 		(vcpu->guest_debug & KVM_GUESTDBG_EXIT_PENDING))
  
-+#define KVM_GUESTDBG_VALID_MASK (KVM_GUESTDBG_ENABLE | \
-+				 KVM_GUESTDBG_USE_SW_BP | \
-+				 KVM_GUESTDBG_USE_HW | \
-+				 KVM_GUESTDBG_SINGLESTEP)
- /*
-  * When KVM_ARM64_PENDING_EXCEPTION is set, KVM_ARM64_EXCEPT_MASK can
-  * take the following values:
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 7f06ba76698d..e575eff76e97 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -208,6 +208,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_VCPU_ATTRIBUTES:
++#define KVM_GUESTDBG_VALID_MASK \
++		(KVM_GUESTDBG_ENABLE | KVM_GUESTDBG_SINGLESTEP |\
++		KVM_GUESTDBG_USE_HW_BP | KVM_GUESTDBG_EXIT_PENDING)
++
+ struct kvm_guestdbg_info_arch {
+ 	unsigned long cr0;
+ 	unsigned long cr9;
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 2f09e9d7dc95..2049fc8c222a 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -544,6 +544,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_S390_DIAG318:
  		r = 1;
  		break;
 +	case KVM_CAP_SET_GUEST_DEBUG2:
-+		return KVM_GUESTDBG_VALID_MASK;
- 	case KVM_CAP_ARM_SET_DEVICE_ADDR:
- 		r = 1;
- 		break;
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 9bbd30e62799..6cb39ee74acd 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -888,11 +888,6 @@ int kvm_arch_vcpu_ioctl_translate(struct kvm_vcpu *vcpu,
- 	return -EINVAL;
- }
- 
--#define KVM_GUESTDBG_VALID_MASK (KVM_GUESTDBG_ENABLE |    \
--			    KVM_GUESTDBG_USE_SW_BP | \
--			    KVM_GUESTDBG_USE_HW | \
--			    KVM_GUESTDBG_SINGLESTEP)
--
- /**
-  * kvm_arch_vcpu_ioctl_set_guest_debug - set up guest debugging
-  * @kvm:	pointer to the KVM struct
++		r = KVM_GUESTDBG_VALID_MASK;
++		break;
+ 	case KVM_CAP_S390_HPAGE_1M:
+ 		r = 0;
+ 		if (hpage && !kvm_is_ucontrol(kvm))
 -- 
 2.26.2
 
