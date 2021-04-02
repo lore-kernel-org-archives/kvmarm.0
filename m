@@ -2,122 +2,99 @@ Return-Path: <SRS0=9BEn=I7=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0321C433ED
-	for <kvmarm@archiver.kernel.org>; Fri,  2 Apr 2021 17:07:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6EB2C433ED
+	for <kvmarm@archiver.kernel.org>; Fri,  2 Apr 2021 17:37:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0884E61158
-	for <kvmarm@archiver.kernel.org>; Fri,  2 Apr 2021 17:07:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0884E61158
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 007996113E
+	for <kvmarm@archiver.kernel.org>; Fri,  2 Apr 2021 17:37:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 007996113E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A2024B371;
-	Fri,  2 Apr 2021 13:07:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 332824B2EA;
+	Fri,  2 Apr 2021 13:37:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id RBjI3dLE-vPq; Fri,  2 Apr 2021 13:07:42 -0400 (EDT)
+	with ESMTP id 6PRveEH3nU+E; Fri,  2 Apr 2021 13:37:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E8A934B343;
-	Fri,  2 Apr 2021 13:07:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 33C344B354;
+	Fri,  2 Apr 2021 13:37:04 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E1CAF4B343
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Apr 2021 13:07:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D9244AED4
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Apr 2021 10:59:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ckuLsJnoc53J for <kvmarm@lists.cs.columbia.edu>;
- Fri,  2 Apr 2021 13:07:39 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [63.128.21.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C9CCC4B2EF
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Apr 2021 13:07:39 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1617383259;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=pay6FFP22GZUza5aFGS6CFJxV2F4MgiZsF6UU6/dhI8=;
- b=ATPcKbtHy6g4Ua0i/mWArcrbdGqgCyPxF8ZWPn+cprx4iqJvFfQFEi8EUdNBD1wwuWW+Ye
- Cv9Z5VHa6IU9RIcWDtWE0PAHnzWBMcfDwerw4E6FOKHQ1vzhsnLymPzKKlFPkvXUssxKrY
- eeXuDYbBLPX4DVx6SMBe1bzIMJE4S6g=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-468-liQu17DGOlGmQuR_1AuYgQ-1; Fri, 02 Apr 2021 13:07:37 -0400
-X-MC-Unique: liQu17DGOlGmQuR_1AuYgQ-1
-Received: by mail-ej1-f71.google.com with SMTP id p11so3333520eju.2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 02 Apr 2021 10:07:36 -0700 (PDT)
+ with ESMTP id uqysWzE12MP9 for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  2 Apr 2021 10:59:24 -0400 (EDT)
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com
+ [209.85.210.177])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 02F3A4A5A0
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Apr 2021 10:59:23 -0400 (EDT)
+Received: by mail-pf1-f177.google.com with SMTP id c204so3378pfc.4
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 02 Apr 2021 07:59:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=hrWlBAMIox9uyp5vA/6pgwPUQG03jLxXChap4JWk798=;
+ b=Wis80br4QxI0udXSM5bgb12ub29OxkCYgsG+Q5MaHbKjRYNZTxX2dKGqJxK+5x27Ec
+ bCjK5MvvUurkyJh+2dVl5bUVlOF+S5kkzM86t1vFaJEMUN3T8Kr2U41JVg3ikRq9VsY9
+ bmvTxU20lmUiRhm6QGV5OSagHM6CMIS3zcbQPID23xudkFfFOfaNfDFrfAAV9MBGBCbG
+ 4fo9i95YmINHH5yrkVF5nSKywYI/L+Mv9lKQ9OfuRtFbwYvD08rHo26eFSvgUFwVqUjF
+ 9D9+2OjiT3WWi7P0x9fBHYTDN17PeeBVM5FGjv80+DwDvYvLLhKy7ATI6OvoR6zd0tW3
+ xYMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=pay6FFP22GZUza5aFGS6CFJxV2F4MgiZsF6UU6/dhI8=;
- b=ZeRh/t+0cvuCpNI3yChbJdHpNnuGuz4qe++yoD9jD/4kmfKk7ZH2ZOAUTNan+72+nZ
- XWI7DelLereRXu2KwrUIK5FFSKKx8V+tmKZ9MkX2jdUqSYVIl8OcT+Pq90Qe6EPARxbX
- LOcPNvQvzW26e+Cl9NmGpUQkfOyyQPjf2G9OGgpoOqiHkbso/12bEzjCQ8lFNwkYbUK5
- ylyfVNhYH8gWx9YS6zDcCJV2K5BaPNCLD+I3IdiwnV6WuatejMziuM5EE7rdYVmnRJtz
- pUg5URYm7kWBu/gi5hvTNfqp/4ooRimEAgBNy8ebCxos9mzRLXuqimk3s1xtRju8VkVD
- Sl9A==
-X-Gm-Message-State: AOAM532zF46fTTvrXfTYeL/L5igSmMkPjuj8R3/T/gpXikeuTHj9Ap2k
- cLPxPsqsi3cL8n31Gd5FTFoUq5ExNPI2x7jqwPU3uEQVlilJwhk7D8dSFJ3LS4USXq6Ua+UBWE4
- Nceh/lHBEZa1hAUYtdgX8LE0c
-X-Received: by 2002:a17:906:b7d1:: with SMTP id
- fy17mr1377115ejb.110.1617383255827; 
- Fri, 02 Apr 2021 10:07:35 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwXsPPad+p73EMnvJYFjYKnSnzORC6vJi4cBRKTJqD3MK+cq9HDx86dIhXgIO61njm5wpECng==
-X-Received: by 2002:a17:906:b7d1:: with SMTP id
- fy17mr1377082ejb.110.1617383255634; 
- Fri, 02 Apr 2021 10:07:35 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
- ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
- by smtp.gmail.com with ESMTPSA id k12sm5638463edo.50.2021.04.02.10.07.33
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 02 Apr 2021 10:07:34 -0700 (PDT)
-Subject: Re: [PATCH v2 6/9] KVM: x86: implement KVM_GUESTDBG_BLOCKEVENTS
-To: Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
-References: <20210401135451.1004564-1-mlevitsk@redhat.com>
- <20210401135451.1004564-7-mlevitsk@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f9e1ca0c-d6cb-7477-55f2-c4861d8f8704@redhat.com>
-Date: Fri, 2 Apr 2021 19:07:32 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=hrWlBAMIox9uyp5vA/6pgwPUQG03jLxXChap4JWk798=;
+ b=TNwM0baLOYRZB6fulXPzVBP/Apg3BqYmCaG8cbVGf6qIS1EaFxFrVpMkv+5GjmlpbI
+ 2MmN9Mt4zZBMDKrUesMnTjT2+ov9IX8sQYqLizk4XrKQdGTTnr24WnY0dR50sQ7lARJD
+ 5/bPcnaboBoKj1uq9+TXq9uPo4UR6msP/xmSSwowUT33K9v++Qy18DZphZkAgAMUC0A/
+ W2gp5tGkKpfbhfTYYzhhgYZ71+5zTJDiRP/Sk19SAIMJ6WNnC3QGHKIN0fdz9kXrmd+W
+ kWEO2m9sOn3wcqxu7WA0hmE+GZoTp9WN+sWvOg4VNuvVlbSaGx2mmEQVacvwHqVcKeIv
+ EmtQ==
+X-Gm-Message-State: AOAM5323hxROi0NIwfcVc2AzAIF2Loj+Ee0SAkHuZLxOVH7aYb9Ko7pp
+ 9BNTPFn7MDaQqV8lvGlZfjrXyw==
+X-Google-Smtp-Source: ABdhPJwt/NANo8uiyFDGCSZL9IUa09CiSHlR3SZWQT4n9NqXGj8DMBBrtVhreCbJVQp+DfbrA8SQSg==
+X-Received: by 2002:a62:7708:0:b029:1ee:f656:51d5 with SMTP id
+ s8-20020a6277080000b02901eef65651d5mr12750775pfc.59.1617375562873; 
+ Fri, 02 Apr 2021 07:59:22 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com.
+ [35.247.111.240])
+ by smtp.gmail.com with ESMTPSA id b186sm8540014pfb.170.2021.04.02.07.59.22
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 02 Apr 2021 07:59:22 -0700 (PDT)
+Date: Fri, 2 Apr 2021 14:59:18 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v2 09/10] KVM: Don't take mmu_lock for range invalidation
+ unless necessary
+Message-ID: <YGcxRmzbEr3kPsWE@google.com>
+References: <20210402005658.3024832-1-seanjc@google.com>
+ <20210402005658.3024832-10-seanjc@google.com>
+ <417bd6b5-b7d0-ed22-adae-02150cdbfebe@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210401135451.1004564-7-mlevitsk@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Cc: Wanpeng Li <wanpengli@tencent.com>, David Hildenbrand <david@redhat.com>,
- Catalin Marinas <catalin.marinas@arm.com>, "H. Peter Anvin" <hpa@zytor.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Will Deacon <will@kernel.org>,
- "open list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
- <kvmarm@lists.cs.columbia.edu>, "open list:S390" <linux-s390@vger.kernel.org>,
- Janosch Frank <frankja@linux.ibm.com>, Jonathan Corbet <corbet@lwn.net>,
+Content-Disposition: inline
+In-Reply-To: <417bd6b5-b7d0-ed22-adae-02150cdbfebe@redhat.com>
+X-Mailman-Approved-At: Fri, 02 Apr 2021 13:37:03 -0400
+Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
  Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
- "maintainer:X86 ARCHITECTURE \(32-BIT AND 64-BIT\)" <x86@kernel.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>, Ingo Molnar <mingo@redhat.com>,
- Jan Kiszka <jan.kiszka@siemens.com>, Stefano Garzarella <sgarzare@redhat.com>,
- Vasily Gorbik <gor@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>,
- Kieran Bingham <kbingham@kernel.org>, Borislav Petkov <bp@alien8.de>,
- Thomas Gleixner <tglx@linutronix.de>,
- Andrew Morton <akpm@linux-foundation.org>,
- "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
- <linux-arm-kernel@lists.infradead.org>, Jim Mattson <jmattson@google.com>,
- Sean Christopherson <seanjc@google.com>, Cornelia Huck <cohuck@redhat.com>,
- "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
- open list <linux-kernel@vger.kernel.org>, Jessica Yu <jeyu@kernel.org>,
- Vitaly Kuznetsov <vkuznets@redhat.com>
+ Huacai Chen <chenhuacai@kernel.org>, linux-mips@vger.kernel.org,
+ kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Paul Mackerras <paulus@ozlabs.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ linux-arm-kernel@lists.infradead.org, Ben Gardon <bgardon@google.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -129,113 +106,64 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 01/04/21 15:54, Maxim Levitsky wrote:
-> KVM_GUESTDBG_BLOCKEVENTS is a guest debug feature that
-> will allow KVM to block all interrupts while running.
-> It is mostly intended to be used together with single stepping,
-> to make it more robust, and has the following benefits:
+On Fri, Apr 02, 2021, Paolo Bonzini wrote:
+> On 02/04/21 02:56, Sean Christopherson wrote:
+> > Avoid taking mmu_lock for unrelated .invalidate_range_{start,end}()
+> > notifications.  Because mmu_notifier_count must be modified while holding
+> > mmu_lock for write, and must always be paired across start->end to stay
+> > balanced, lock elision must happen in both or none.  To meet that
+> > requirement, add a rwsem to prevent memslot updates across range_start()
+> > and range_end().
+> > 
+> > Use a rwsem instead of a rwlock since most notifiers _allow_ blocking,
+> > and the lock will be endl across the entire start() ... end() sequence.
+> > If anything in the sequence sleeps, including the caller or a different
+> > notifier, holding the spinlock would be disastrous.
+> > 
+> > For notifiers that _disallow_ blocking, e.g. OOM reaping, simply go down
+> > the slow path of unconditionally acquiring mmu_lock.  The sane
+> > alternative would be to try to acquire the lock and force the notifier
+> > to retry on failure.  But since OOM is currently the _only_ scenario
+> > where blocking is disallowed attempting to optimize a guest that has been
+> > marked for death is pointless.
+> > 
+> > Unconditionally define and use mmu_notifier_slots_lock in the memslots
+> > code, purely to avoid more #ifdefs.  The overhead of acquiring the lock
+> > is negligible when the lock is uncontested, which will always be the case
+> > when the MMU notifiers are not used.
+> > 
+> > Note, technically flag-only memslot updates could be allowed in parallel,
+> > but stalling a memslot update for a relatively short amount of time is
+> > not a scalability issue, and this is all more than complex enough.
 > 
-> * Resuming from a breakpoint is much more reliable:
->    When resuming execution from a breakpoint, with interrupts enabled,
->    more often than not, KVM would inject an interrupt and make the CPU
->    jump immediately to the interrupt handler and eventually return to
->    the breakpoint, only to trigger it again.
-> 
->    From the gdb's user point of view it looks like the CPU has never
->    executed a single instruction and in some cases that can even
->    prevent forward progress, for example, when the breakpoint
->    is placed by an automated script (e.g lx-symbols), which does
->    something in response to the breakpoint and then continues
->    the guest automatically.
->    If the script execution takes enough time for another interrupt to
->    arrive, the guest will be stuck on the same breakpoint forever.
-> 
-> * Normal single stepping is much more predictable, since it won't
->    land the debugger into an interrupt handler.
-> 
-> * Chances of RFLAGS.TF being leaked to the guest are reduced:
-> 
->    KVM sets that flag behind the guest's back to single step it,
->    but if the single step lands the vCPU into an
->    interrupt/exception handler the RFLAGS.TF will be leaked to the
->    guest in the form of being pushed to the stack.
->    This doesn't completely eliminate this problem as exceptions
->    can still happen, but at least this eliminates the common
->    case.
-> 
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> Proposal for the locking documentation:
 
-The patch uses BLOCKIRQ instead of BLOCKEVENTS.
+Argh, sorry!  Looks great, I owe you.
 
-Paolo
-
-> ---
->   Documentation/virt/kvm/api.rst  | 1 +
->   arch/x86/include/asm/kvm_host.h | 3 ++-
->   arch/x86/include/uapi/asm/kvm.h | 1 +
->   arch/x86/kvm/x86.c              | 4 ++++
->   4 files changed, 8 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 9778b2434c03..a4f2dc84741f 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -3338,6 +3338,7 @@ flags which can include the following:
->     - KVM_GUESTDBG_INJECT_DB:     inject DB type exception [x86]
->     - KVM_GUESTDBG_INJECT_BP:     inject BP type exception [x86]
->     - KVM_GUESTDBG_EXIT_PENDING:  trigger an immediate guest exit [s390]
-> +  - KVM_GUESTDBG_BLOCKIRQ:      avoid injecting interrupts/NMI/SMI [x86]
->   
->   For example KVM_GUESTDBG_USE_SW_BP indicates that software breakpoints
->   are enabled in memory so we need to ensure breakpoint exceptions are
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index cc7c82a449d5..8c529ae9dbbe 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -227,7 +227,8 @@ enum x86_intercept_stage;
->   	KVM_GUESTDBG_USE_HW_BP | \
->   	KVM_GUESTDBG_USE_SW_BP | \
->   	KVM_GUESTDBG_INJECT_BP | \
-> -	KVM_GUESTDBG_INJECT_DB)
-> +	KVM_GUESTDBG_INJECT_DB | \
-> +	KVM_GUESTDBG_BLOCKIRQ)
->   
->   
->   #define PFERR_PRESENT_BIT 0
-> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-> index 5a3022c8af82..b0f9945067f7 100644
-> --- a/arch/x86/include/uapi/asm/kvm.h
-> +++ b/arch/x86/include/uapi/asm/kvm.h
-> @@ -282,6 +282,7 @@ struct kvm_debug_exit_arch {
->   #define KVM_GUESTDBG_USE_HW_BP		0x00020000
->   #define KVM_GUESTDBG_INJECT_DB		0x00040000
->   #define KVM_GUESTDBG_INJECT_BP		0x00080000
-> +#define KVM_GUESTDBG_BLOCKIRQ		0x00100000
->   
->   /* for KVM_SET_GUEST_DEBUG */
->   struct kvm_guest_debug_arch {
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 956e8e0bd6af..3627ce8fe5bb 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -8460,6 +8460,10 @@ static void inject_pending_event(struct kvm_vcpu *vcpu, bool *req_immediate_exit
->   		can_inject = false;
->   	}
->   
-> +	/* Don't inject interrupts if the user asked to avoid doing so */
-> +	if (vcpu->guest_debug & KVM_GUESTDBG_BLOCKIRQ)
-> +		return;
+> diff --git a/Documentation/virt/kvm/locking.rst b/Documentation/virt/kvm/locking.rst
+> index b21a34c34a21..3e4ad7de36cb 100644
+> --- a/Documentation/virt/kvm/locking.rst
+> +++ b/Documentation/virt/kvm/locking.rst
+> @@ -16,6 +16,13 @@ The acquisition orders for mutexes are as follows:
+>  - kvm->slots_lock is taken outside kvm->irq_lock, though acquiring
+>    them together is quite rare.
+> +- The kvm->mmu_notifier_slots_lock rwsem ensures that pairs of
+> +  invalidate_range_start() and invalidate_range_end() callbacks
+> +  use the same memslots array.  kvm->slots_lock is taken outside the
+> +  write-side critical section of kvm->mmu_notifier_slots_lock, so
+> +  MMU notifiers must not take kvm->slots_lock.  No other write-side
+> +  critical sections should be added.
 > +
->   	/*
->   	 * Finally, inject interrupt events.  If an event cannot be injected
->   	 * due to architectural conditions (e.g. IF=0) a window-open exit
+>  On x86, vcpu->mutex is taken outside kvm->arch.hyperv.hv_lock.
+>  Everything else is a leaf: no other lock is taken inside the critical
 > 
-
+> Paolo
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
