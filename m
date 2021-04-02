@@ -2,97 +2,82 @@ Return-Path: <SRS0=9BEn=I7=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A302C43617
-	for <kvmarm@archiver.kernel.org>; Fri,  2 Apr 2021 09:20:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BE2AC433B4
+	for <kvmarm@archiver.kernel.org>; Fri,  2 Apr 2021 09:33:05 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1406060FF3
-	for <kvmarm@archiver.kernel.org>; Fri,  2 Apr 2021 09:20:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1406060FF3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id F009C61103
+	for <kvmarm@archiver.kernel.org>; Fri,  2 Apr 2021 09:33:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F009C61103
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A66074B2C2;
-	Fri,  2 Apr 2021 05:20:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9102D4B2C3;
+	Fri,  2 Apr 2021 05:33:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id iTZTGewqY4M5; Fri,  2 Apr 2021 05:20:47 -0400 (EDT)
+	with ESMTP id c2JLd0PnlW4K; Fri,  2 Apr 2021 05:33:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F7604B304;
-	Fri,  2 Apr 2021 05:20:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3835D4B294;
+	Fri,  2 Apr 2021 05:33:03 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9AC3A4B744
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Apr 2021 20:57:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 19D744B230
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Apr 2021 05:33:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CHPnjzRp1L+i for <kvmarm@lists.cs.columbia.edu>;
- Thu,  1 Apr 2021 20:57:23 -0400 (EDT)
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com
- [209.85.219.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BA0484B6D6
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Apr 2021 20:57:23 -0400 (EDT)
-Received: by mail-yb1-f201.google.com with SMTP id w5so1275591ybs.22
- for <kvmarm@lists.cs.columbia.edu>; Thu, 01 Apr 2021 17:57:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=reply-to:date:in-reply-to:message-id:mime-version:references
- :subject:from:to:cc;
- bh=FTDHlh7r2o77AAwrA0E9qeoNYgpcbLuRaDEVNkBVwHg=;
- b=PRhdN0c+oVeC84FkNtK2OfzN4+x6lsMyI2b4OVZY6LEzjuMMZ4+EfdsvsDxWmIs9Nq
- zAmlFPOUqakGcwtEzlGlIW87jbHzydFRrCawVR4WJj9ElDeMOXggR/xUf8WnMbUKoAh3
- lEpJ//3eALC8qqX6jN5ZPFveFaoAcp0W8wTiEBs2aObLKZCHeuoH095sVwHNZJ/PswMS
- FVyxeb81nksnb4YTup/Ov7PJ2+WqfzrIlxJ8okqoIMrlmmVrp7U8IQ90sZ+PuN+Ped4m
- oTDFOV8oL/hOxYcLRJggJQ+r9Hb1KLnULxlCGV+FPKgt3oJpOweN7336d7VL5zPVquco
- 5veQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:reply-to:date:in-reply-to:message-id
- :mime-version:references:subject:from:to:cc;
- bh=FTDHlh7r2o77AAwrA0E9qeoNYgpcbLuRaDEVNkBVwHg=;
- b=AG0QAMvZ1qEukYsC5w0asW/WoaTtZJqg2oH34/7T+9k29Oq67hues93BJ0v7Vhwtrv
- llbfF6ClmzQSzyRgI/V+ajf967MGDUo1EJWliy0MbNAIq2xK4nf0D1CUJmOLnaN5TGgR
- /cyJutiGBhFf6WmgQpVFr1SPNaQolawezu9umT4N2hc3nDwF6f8HiV8kRvq613/EwLH2
- WqUEZuTr6EvDLb6p06Hcs/OGwgMSU86HqbqAHj3FrsSZy6bZG6/8RVX2b4ziPwh4Nqp4
- qWrwY40jp6tZt3KTtjvKVgiW8/t3uxcYIadjiD+dilxqTgRK19l0J/Hh6P4lQ52hWfbY
- SECQ==
-X-Gm-Message-State: AOAM532EvcwifsnhInz8G7b+t8ctfRWCwVEOy0QfZACeZ0ATcRQXHv4E
- 1vKshF18YrYAxDg/OvIwsCK8MQr4OpM=
-X-Google-Smtp-Source: ABdhPJwqaRwScDcukbswHxcp5MoAwCeA4G6inLsOkqCP5OYhV3sDapC/0YKNmrNh7+I1S9Rwld4HhjfDqxk=
-X-Received: from seanjc798194.pdx.corp.google.com
- ([2620:15c:f:10:c0b4:8b8:bb34:6a56])
- (user=seanjc job=sendgmr) by 2002:a25:cc81:: with SMTP id
- l123mr8448930ybf.272.1617325043283; 
- Thu, 01 Apr 2021 17:57:23 -0700 (PDT)
-Date: Thu,  1 Apr 2021 17:56:58 -0700
-In-Reply-To: <20210402005658.3024832-1-seanjc@google.com>
-Message-Id: <20210402005658.3024832-11-seanjc@google.com>
-Mime-Version: 1.0
-References: <20210402005658.3024832-1-seanjc@google.com>
-X-Mailer: git-send-email 2.31.0.208.g409f899ff0-goog
-Subject: [PATCH v2 10/10] KVM: x86/mmu: Allow yielding during MMU notifier
- unmap/zap, if possible
-From: Sean Christopherson <seanjc@google.com>
-To: Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>, 
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Paul Mackerras <paulus@ozlabs.org>, Paolo Bonzini <pbonzini@redhat.com>
-X-Mailman-Approved-At: Fri, 02 Apr 2021 05:20:36 -0400
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- Sean Christopherson <seanjc@google.com>, Joerg Roedel <joro@8bytes.org>,
- linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Ben Gardon <bgardon@google.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
- kvmarm@lists.cs.columbia.edu, Jim Mattson <jmattson@google.com>
+ with ESMTP id Paba0tkoFzIo for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  2 Apr 2021 05:33:00 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AB0894B22F
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Apr 2021 05:33:00 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id CCD3A60FED;
+ Fri,  2 Apr 2021 09:32:58 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1lSGAi-005HmP-Ly; Fri, 02 Apr 2021 10:32:56 +0100
+Date: Fri, 02 Apr 2021 10:32:55 +0100
+Message-ID: <87eeftf2uw.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v4 7/8] KVM: arm64: vgic-v3: Expose GICR_TYPER.Last for
+ userspace
+In-Reply-To: <b913bde9-9f63-919f-3895-973c62452653@redhat.com>
+References: <20210401085238.477270-1-eric.auger@redhat.com>
+ <20210401085238.477270-8-eric.auger@redhat.com>
+ <87tuoqp1du.wl-maz@kernel.org>
+ <b2458147-cd53-8712-9120-7ee9b84152aa@redhat.com>
+ <87ft09gbeo.wl-maz@kernel.org>
+ <b913bde9-9f63-919f-3895-973c62452653@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: eric.auger@redhat.com, eric.auger.pro@gmail.com,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, drjones@redhat.com, alexandru.elisei@arm.com,
+ james.morse@arm.com, suzuki.poulose@arm.com, shuah@kernel.org,
+ pbonzini@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, shuah@kernel.org, linux-kernel@vger.kernel.org,
+ pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
-Reply-To: Sean Christopherson <seanjc@google.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -106,44 +91,192 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Let the TDP MMU yield when unmapping a range in response to a MMU
-notification, if yielding is allowed by said notification.  There is no
-reason to disallow yielding in this case, and in theory the range being
-invalidated could be quite large.
+Hi Eric,
 
-Cc: Ben Gardon <bgardon@google.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/mmu/tdp_mmu.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+On Thu, 01 Apr 2021 20:16:53 +0100,
+Auger Eric <eric.auger@redhat.com> wrote:
+> 
+> Hi Marc,
+> 
+> On 4/1/21 7:30 PM, Marc Zyngier wrote:
+> > On Thu, 01 Apr 2021 18:03:25 +0100,
+> > Auger Eric <eric.auger@redhat.com> wrote:
+> >>
+> >> Hi Marc,
+> >>
+> >> On 4/1/21 3:42 PM, Marc Zyngier wrote:
+> >>> Hi Eric,
+> >>>
+> >>> On Thu, 01 Apr 2021 09:52:37 +0100,
+> >>> Eric Auger <eric.auger@redhat.com> wrote:
+> >>>>
+> >>>> Commit 23bde34771f1 ("KVM: arm64: vgic-v3: Drop the
+> >>>> reporting of GICR_TYPER.Last for userspace") temporarily fixed
+> >>>> a bug identified when attempting to access the GICR_TYPER
+> >>>> register before the redistributor region setting, but dropped
+> >>>> the support of the LAST bit.
+> >>>>
+> >>>> Emulating the GICR_TYPER.Last bit still makes sense for
+> >>>> architecture compliance though. This patch restores its support
+> >>>> (if the redistributor region was set) while keeping the code safe.
+> >>>>
+> >>>> We introduce a new helper, vgic_mmio_vcpu_rdist_is_last() which
+> >>>> computes whether a redistributor is the highest one of a series
+> >>>> of redistributor contributor pages.
+> >>>>
+> >>>> The spec says "Indicates whether this Redistributor is the
+> >>>> highest-numbered Redistributor in a series of contiguous
+> >>>> Redistributor pages."
+> >>>>
+> >>>> The code is a bit convulated since there is no guarantee
+> >>>
+> >>> nit: convoluted
+> >>>
+> >>>> redistributors are added in a given reditributor region in
+> >>>> ascending order. In that case the current implementation was
+> >>>> wrong. Also redistributor regions can be contiguous
+> >>>> and registered in non increasing base address order.
+> >>>>
+> >>>> So the index of redistributors are stored in an array within
+> >>>> the redistributor region structure.
+> >>>>
+> >>>> With this new implementation we do not need to have a uaccess
+> >>>> read accessor anymore.
+> >>>>
+> >>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> >>>
+> >>> This patch also hurt my head, a lot more than the first one.  See
+> >>> below.
+> >>>
+> >>>> ---
+> >>>>  arch/arm64/kvm/vgic/vgic-init.c    |  7 +--
+> >>>>  arch/arm64/kvm/vgic/vgic-mmio-v3.c | 97 ++++++++++++++++++++----------
+> >>>>  arch/arm64/kvm/vgic/vgic.h         |  1 +
+> >>>>  include/kvm/arm_vgic.h             |  3 +
+> >>>>  4 files changed, 73 insertions(+), 35 deletions(-)
+> >>>>
+> >>>> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+> >>>> index cf6faa0aeddb2..61150c34c268c 100644
+> >>>> --- a/arch/arm64/kvm/vgic/vgic-init.c
+> >>>> +++ b/arch/arm64/kvm/vgic/vgic-init.c
+> >>>> @@ -190,6 +190,7 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
+> >>>>  	int i;
+> >>>>  
+> >>>>  	vgic_cpu->rd_iodev.base_addr = VGIC_ADDR_UNDEF;
+> >>>> +	vgic_cpu->index = vcpu->vcpu_id;
+> >>>
+> >>> Is it so that vgic_cpu->index is always equal to vcpu_id? If so, why
+> >>> do we need another field? We can always get to the vcpu using a
+> >>> container_of().
+> >>>
+> >>>>  
+> >>>>  	INIT_LIST_HEAD(&vgic_cpu->ap_list_head);
+> >>>>  	raw_spin_lock_init(&vgic_cpu->ap_list_lock);
+> >>>> @@ -338,10 +339,8 @@ static void kvm_vgic_dist_destroy(struct kvm *kvm)
+> >>>>  	dist->vgic_dist_base = VGIC_ADDR_UNDEF;
+> >>>>  
+> >>>>  	if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
+> >>>> -		list_for_each_entry_safe(rdreg, next, &dist->rd_regions, list) {
+> >>>> -			list_del(&rdreg->list);
+> >>>> -			kfree(rdreg);
+> >>>> -		}
+> >>>> +		list_for_each_entry_safe(rdreg, next, &dist->rd_regions, list)
+> >>>> +			vgic_v3_free_redist_region(rdreg);
+> >>>
+> >>> Consider moving the introduction of vgic_v3_free_redist_region() into
+> >>> a separate patch. On its own, that's a good readability improvement.
+> >>>
+> >>>>  		INIT_LIST_HEAD(&dist->rd_regions);
+> >>>>  	} else {
+> >>>>  		dist->vgic_cpu_base = VGIC_ADDR_UNDEF;
+> >>>> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> >>>> index 987e366c80008..f6a7eed1d6adb 100644
+> >>>> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> >>>> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> >>>> @@ -251,45 +251,57 @@ static void vgic_mmio_write_v3r_ctlr(struct kvm_vcpu *vcpu,
+> >>>>  		vgic_enable_lpis(vcpu);
+> >>>>  }
+> >>>>  
+> >>>> +static bool vgic_mmio_vcpu_rdist_is_last(struct kvm_vcpu *vcpu)
+> >>>> +{
+> >>>> +	struct vgic_dist *vgic = &vcpu->kvm->arch.vgic;
+> >>>> +	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+> >>>> +	struct vgic_redist_region *rdreg = vgic_cpu->rdreg;
+> >>>> +
+> >>>> +	if (!rdreg)
+> >>>> +		return false;
+> >>>> +
+> >>>> +	if (rdreg->count && vgic_cpu->rdreg_index == (rdreg->count - 1)) {
+> >>>> +		/* check whether there is no other contiguous rdist region */
+> >>>> +		struct list_head *rd_regions = &vgic->rd_regions;
+> >>>> +		struct vgic_redist_region *iter;
+> >>>> +
+> >>>> +		list_for_each_entry(iter, rd_regions, list) {
+> >>>> +			if (iter->base == rdreg->base + rdreg->count * KVM_VGIC_V3_REDIST_SIZE &&
+> >>>> +				iter->free_index > 0) {
+> >>>> +			/* check the first rdist index of this region, if any */
+> >>>> +				if (vgic_cpu->index < iter->rdist_indices[0])
+> >>>> +					return false;
+> >>>
+> >>> rdist_indices[] contains the vcpu_id of the vcpu associated with a
+> >>> given RD in the region. At this stage, you have established that there
+> >>> is another region that is contiguous with the one associated with our
+> >>> vcpu. You also know that this adjacent region has a vcpu mapped in
+> >>> (free_index isn't 0). Isn't that enough to declare that our vcpu isn't
+> >>> last?  I definitely don't understand what the index comparison does
+> >>> here.
+> >> Assume the following case:
+> >> 2 RDIST region
+> >> region #0 contains rdist 1, 2, 4
+> >> region #1, adjacent to #0 contains rdist 3
+> >>
+> >> Spec days:
+> >> "Indicates whether this Redistributor is the
+> >> highest-numbered Redistributor in a series of contiguous
+> >> Redistributor pages."
+> >>
+> >> To me 4 is last and 3 is last too.
+> > 
+> > No, only 3 is last, assuming that region 0 is full. I think the
+> > phrasing in the spec is just really bad. What this describes is that
+> > at the end of a set of contiguous set of RDs, that last RD has Last
+> > set. If two regions are contiguous, that's undistinguishable from a
+> > single, larger region.
+> > 
+> > There is no such thing as a "redistributor number" anyway. The closest
+> > thing there is would be "processor number", but that has nothing to do
+> > with the RD itself.
+> 
+> Hum OK. That's a different understanding of the spec wording indeed. For
+> me redistributor number was the index of the vcpu.
 
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 7797d24f0937..dd17d9673ff2 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -885,7 +885,7 @@ bool kvm_tdp_mmu_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range,
- 
- 	for_each_tdp_mmu_root(kvm, root, range->slot->as_id)
- 		flush |= zap_gfn_range(kvm, root, range->start, range->end,
--				       false, flush);
-+				       range->may_block, flush);
- 
- 	return flush;
- }
-@@ -903,6 +903,10 @@ static __always_inline bool kvm_tdp_mmu_handle_gfn(struct kvm *kvm,
- 
- 	rcu_read_lock();
- 
-+	/*
-+	 * Don't support rescheduling, none of the MMU notifiers that funnel
-+	 * into this helper allow blocking; it'd be dead, wasteful code.
-+	 */
- 	for_each_tdp_mmu_root(kvm, root, range->slot->as_id) {
- 		tdp_root_for_each_leaf_pte(iter, root, range->start, range->end)
- 			ret |= handler(kvm, &iter, range);
+I think that's the source of the confusion. There really is nothing
+like a redistributor number. There is a processor number when
+GICR_TYPER.PTA=0 (that the guest uses as the target CPU when moving a
+LPI), but that's it. The layout is totally dumb, and the last frame in
+a contiguous sequence of frames is, well, last. The content of the
+frames doesn't matter in the least.
+
+> But well, you're understanding is definitively simpler to implement and
+> also matches what was implemented for single RDIST region.
+
+That's a key insight. There is no reason why the RD layout would defer
+between a single region and multiple regions.
+
+Think of it from a HW perspective. You design a SoC that has
+"clusters" of CPUs, and you lay down a bunch of RDs, one set per
+cluster. Each set has a "Last" RD frame, and that's all there is to
+it.
+
+I'll try and see if ARM people are willing to clarify the spec (for
+which an update is long overdue).
+
+Thanks,
+
+	M.
+
 -- 
-2.31.0.208.g409f899ff0-goog
-
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
