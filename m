@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2316BC43462
-	for <kvmarm@archiver.kernel.org>; Fri,  2 Apr 2021 09:20:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 986B3C43460
+	for <kvmarm@archiver.kernel.org>; Fri,  2 Apr 2021 09:20:43 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 808B460FF3
-	for <kvmarm@archiver.kernel.org>; Fri,  2 Apr 2021 09:20:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 808B460FF3
+	by mail.kernel.org (Postfix) with ESMTP id 1A0EB610FC
+	for <kvmarm@archiver.kernel.org>; Fri,  2 Apr 2021 09:20:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A0EB610FC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 29F4A4B294;
-	Fri,  2 Apr 2021 05:20:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B8A834B2C0;
+	Fri,  2 Apr 2021 05:20:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id bRfgdAXvoQyQ; Fri,  2 Apr 2021 05:20:40 -0400 (EDT)
+	with ESMTP id un6Lo6ArlzTV; Fri,  2 Apr 2021 05:20:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 811294B2E9;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A1B4B4B2EC;
 	Fri,  2 Apr 2021 05:20:37 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F76B4B6D6
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Apr 2021 20:57:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 281104B785
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Apr 2021 20:57:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2DbO22rqWG7I for <kvmarm@lists.cs.columbia.edu>;
- Thu,  1 Apr 2021 20:57:08 -0400 (EDT)
+ with ESMTP id LtzvYtn++Ldc for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  1 Apr 2021 20:57:10 -0400 (EDT)
 Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com
  [209.85.219.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id ED4784B758
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Apr 2021 20:57:07 -0400 (EDT)
-Received: by mail-yb1-f201.google.com with SMTP id n13so7634407ybp.14
- for <kvmarm@lists.cs.columbia.edu>; Thu, 01 Apr 2021 17:57:07 -0700 (PDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1F61F4B6D6
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Apr 2021 20:57:10 -0400 (EDT)
+Received: by mail-yb1-f201.google.com with SMTP id n13so7634492ybp.14
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 01 Apr 2021 17:57:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=reply-to:date:in-reply-to:message-id:mime-version:references
  :subject:from:to:cc;
- bh=tDfPmXbzjuXYEj7QinrksosPu+0bJFiZwViEuyBfiPM=;
- b=lb+qs0QKm/vKplDLvVTszodx9+lPNY1WATK8sX84CSZq8tI076ayThzvRmFWIC9ppR
- d8t9FSZnygTkkAg2cJC4qgr46yFW8WrEbI1c93uYTd4Tq+C40f7GmYGNn76no2eydFJm
- ELg1MV/l2E2VRXKBw+OxLEfDEUoMG2hdu1QZaxqsLn0ey5+2k2aTKxqSaN8KYwbGGpJZ
- LU2s/Dk7xnQsZ63ZuMGE1MCLqdVTzwBfjQTtDty7A1SwD1F+T3rYvXnjE6NGc0WaI/Wh
- rjmoa/1Y5xAuK8JFh3YXhP45SEhEa+DdFoZy2vyAMj8oY/jTXPmptXAWwzLudr/mz6DL
- n6Qg==
+ bh=noWYqCUZelFCMUSh7ZeHZ6bmzNaY4TJIP5y7J4PJixc=;
+ b=ouD3RUjogj41I7jReVrpeXQU9Bb0xL3P8VWkyehuZzBOD88/Sc2uhZmTxennNsvLyT
+ OqfLWztGLspvOdSW9kUrSN0V3oNghubKE1biSAWV6nMl4oHzXS716JlpFhiROhcyTwUH
+ NbcktbtPM4RWwmh6SH9O64kxWxqQkxV/u5DbK70BqtuIOFBh4yhMHK2ChGOdkkS6Gv+I
+ XgV7IbTc96h8bZePPBN13sw/RuQbx0zYdA+eYXja8N9DsEKEjoB1bbXu4L2tpOK43+zU
+ jeK6OjT+/p9isY2SbCwiLQt0ceFPR6OFbFpaeX02nzYeRp1bvono9LbgC7yf01qw7JRI
+ 8G3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:reply-to:date:in-reply-to:message-id
  :mime-version:references:subject:from:to:cc;
- bh=tDfPmXbzjuXYEj7QinrksosPu+0bJFiZwViEuyBfiPM=;
- b=L2c/sSIfiBTTtVL9Yf2VvFWR8gtfzQOMpt61ujWviwEox+ZopAmMJ2npGYKO7nx4gU
- xKqdMLs4qoyT1jVjE3IpRmSavkvfI/AjKX+v1P7l0rTPr4J0eEl/8Ou9LaWm8GNprnwg
- vRs8MvrAVL3fXkE/2n70oYmXPmX+kXgXsSDvY6Vx/mYmWQvsUPrENy1mhbszX//2NY01
- 0NaIYVGd20A8nTFLeH7c2VxN+jdS3gRHqmm4qFfj8JYsAmb5B8QFfT1VSLcBgqRA3VSO
- qVj24Q5E00WKtjQlp/KV6q6ufMzEpc0Lk/N4g6liiqNhn11rvmQeHH/cIx9bXQxgg5bT
- IHCg==
-X-Gm-Message-State: AOAM531McC2iFlPE2hvk8NGE8qhveVSK6EbuFrP9XerXd5iexg0ABngk
- yr5auqFKuZ8MxJExetxZYqMcBFetNsI=
-X-Google-Smtp-Source: ABdhPJxbKr645X0CcfRDIWTDLNH8a38GjXA6vUJ3jECMSWadG+jHX2J4YQiJuT8sNhsO5srQAIOw4KIsjrs=
+ bh=noWYqCUZelFCMUSh7ZeHZ6bmzNaY4TJIP5y7J4PJixc=;
+ b=XX2nccyR/O2XeV7e9j432FMSaeD1tCy6WwasoCueA7I8QziUcRdLA4LXE6SA9bBnc4
+ N8oawBKA9mCd6bHuxTcGum8/pLjglN5Ou3/5/0qWVkpEzouBUwrGy2RcynFAzErW5LVq
+ idfFxfuDhWK8/4OJ2PX3jMZvxOE0d+yqfU59kuyg5rq4XKZIVNPbfBMVMsJg/X5a3PKk
+ 5JiNsNWHG0P/YeYnx7tkFvCC3hrwX6n73iKEw0umqNTkOpdA+N5lMY8UYdh5K1DEQKK0
+ TDxY3lbeieISwxNN+SnstobBln5T+8RvfzBnh6CiFPq5QR82hlal6m8S6HI5i5oMLqi+
+ aqmQ==
+X-Gm-Message-State: AOAM530u8Udt8MLS5a5YgAbrYNBganRABbvRmiEwk22rsSHzKkyMjRmp
+ K4mdlSWmZmpTRka7pFHid9otn2DnU2w=
+X-Google-Smtp-Source: ABdhPJydkmZrVRRl/TCK20DP5D2eCr2nOcpte6dzBOlW4oeOa5/178wYriGJI5XuziulLinORup7GUWeoVI=
 X-Received: from seanjc798194.pdx.corp.google.com
  ([2620:15c:f:10:c0b4:8b8:bb34:6a56])
- (user=seanjc job=sendgmr) by 2002:a25:f608:: with SMTP id
- t8mr16151942ybd.496.1617325027509; 
- Thu, 01 Apr 2021 17:57:07 -0700 (PDT)
-Date: Thu,  1 Apr 2021 17:56:51 -0700
+ (user=seanjc job=sendgmr) by 2002:a25:5146:: with SMTP id
+ f67mr15369859ybb.332.1617325029648; 
+ Thu, 01 Apr 2021 17:57:09 -0700 (PDT)
+Date: Thu,  1 Apr 2021 17:56:52 -0700
 In-Reply-To: <20210402005658.3024832-1-seanjc@google.com>
-Message-Id: <20210402005658.3024832-4-seanjc@google.com>
+Message-Id: <20210402005658.3024832-5-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210402005658.3024832-1-seanjc@google.com>
 X-Mailer: git-send-email 2.31.0.208.g409f899ff0-goog
-Subject: [PATCH v2 03/10] KVM: arm64: Convert to the gfn-based MMU notifier
+Subject: [PATCH v2 04/10] KVM: MIPS/MMU: Convert to the gfn-based MMU notifier
  callbacks
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>, 
@@ -106,8 +106,9 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Move arm64 to the gfn-base MMU notifier APIs, which do the hva->gfn
-lookup in common code.
+Move MIPS to the gfn-based MMU notifier APIs, which do the hva->gfn
+lookup in common code, and whose code is nearly identical to MIPS'
+lookup.
 
 No meaningful functional change intended, though the exact order of
 operations is slightly different since the memslot lookups occur before
@@ -115,47 +116,40 @@ calling into arch code.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/arm64/include/asm/kvm_host.h |   1 +
- arch/arm64/kvm/mmu.c              | 117 ++++++++----------------------
- 2 files changed, 33 insertions(+), 85 deletions(-)
+ arch/mips/include/asm/kvm_host.h |  1 +
+ arch/mips/kvm/mmu.c              | 97 ++++++--------------------------
+ 2 files changed, 17 insertions(+), 81 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 72e6b4600264..1ad729cf7b0d 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -582,6 +582,7 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
- 			      struct kvm_vcpu_events *events);
+diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
+index feaa77036b67..374a3c8806e8 100644
+--- a/arch/mips/include/asm/kvm_host.h
++++ b/arch/mips/include/asm/kvm_host.h
+@@ -967,6 +967,7 @@ enum kvm_mips_fault_result kvm_trap_emul_gva_fault(struct kvm_vcpu *vcpu,
+ 						   bool write);
  
  #define KVM_ARCH_WANT_MMU_NOTIFIER
 +#define KVM_ARCH_WANT_NEW_MMU_NOTIFIER_APIS
  
- void kvm_arm_halt_guest(struct kvm *kvm);
- void kvm_arm_resume_guest(struct kvm *kvm);
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 4b7e1e327337..35728231e9a0 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -839,7 +839,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	 * gfn_to_pfn_prot (which calls get_user_pages), so that we don't risk
- 	 * the page we just got a reference to gets unmapped before we have a
- 	 * chance to grab the mmu_lock, which ensure that if the page gets
--	 * unmapped afterwards, the call to kvm_unmap_hva will take it away
-+	 * unmapped afterwards, the call to kvm_unmap_gfn will take it away
- 	 * from us again properly. This smp_rmb() interacts with the smp_wmb()
- 	 * in kvm_mmu_notifier_invalidate_<page|range_end>.
- 	 */
-@@ -1064,123 +1064,70 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
- 	return ret;
+ /* Emulation */
+ int kvm_get_inst(u32 *opc, struct kvm_vcpu *vcpu, u32 *out);
+diff --git a/arch/mips/kvm/mmu.c b/arch/mips/kvm/mmu.c
+index 3dabeda82458..3dc885df2e32 100644
+--- a/arch/mips/kvm/mmu.c
++++ b/arch/mips/kvm/mmu.c
+@@ -439,85 +439,36 @@ static int kvm_mips_mkold_gpa_pt(struct kvm *kvm, gfn_t start_gfn,
+ 				  end_gfn << PAGE_SHIFT);
  }
  
 -static int handle_hva_to_gpa(struct kvm *kvm,
 -			     unsigned long start,
 -			     unsigned long end,
--			     int (*handler)(struct kvm *kvm,
--					    gpa_t gpa, u64 size,
+-			     int (*handler)(struct kvm *kvm, gfn_t gfn,
+-					    gpa_t gfn_end,
+-					    struct kvm_memory_slot *memslot,
 -					    void *data),
 -			     void *data)
--{
++bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
 -	struct kvm_memslots *slots;
 -	struct kvm_memory_slot *memslot;
 -	int ret = 0;
@@ -165,7 +159,7 @@ index 4b7e1e327337..35728231e9a0 100644
 -	/* we only care about the pages that the guest sees */
 -	kvm_for_each_memslot(memslot, slots) {
 -		unsigned long hva_start, hva_end;
--		gfn_t gpa;
+-		gfn_t gfn, gfn_end;
 -
 -		hva_start = max(start, memslot->userspace_addr);
 -		hva_end = min(end, memslot->userspace_addr +
@@ -173,132 +167,122 @@ index 4b7e1e327337..35728231e9a0 100644
 -		if (hva_start >= hva_end)
 -			continue;
 -
--		gpa = hva_to_gfn_memslot(hva_start, memslot) << PAGE_SHIFT;
--		ret |= handler(kvm, gpa, (u64)(hva_end - hva_start), data);
+-		/*
+-		 * {gfn(page) | page intersects with [hva_start, hva_end)} =
+-		 * {gfn_start, gfn_start+1, ..., gfn_end-1}.
+-		 */
+-		gfn = hva_to_gfn_memslot(hva_start, memslot);
+-		gfn_end = hva_to_gfn_memslot(hva_end + PAGE_SIZE - 1, memslot);
+-
+-		ret |= handler(kvm, gfn, gfn_end, memslot, data);
 -	}
 -
 -	return ret;
 -}
 -
--static int kvm_unmap_hva_handler(struct kvm *kvm, gpa_t gpa, u64 size, void *data)
--{
--	unsigned flags = *(unsigned *)data;
--	bool may_block = flags & MMU_NOTIFIER_RANGE_BLOCKABLE;
 -
--	__unmap_stage2_range(&kvm->arch.mmu, gpa, size, may_block);
--	return 0;
+-static int kvm_unmap_hva_handler(struct kvm *kvm, gfn_t gfn, gfn_t gfn_end,
+-				 struct kvm_memory_slot *memslot, void *data)
+-{
+-	kvm_mips_flush_gpa_pt(kvm, gfn, gfn_end);
+-	return 1;
 -}
 -
--int kvm_unmap_hva_range(struct kvm *kvm,
--			unsigned long start, unsigned long end, unsigned flags)
-+bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
- {
- 	if (!kvm->arch.mmu.pgt)
- 		return 0;
- 
--	handle_hva_to_gpa(kvm, start, end, &kvm_unmap_hva_handler, &flags);
--	return 0;
--}
-+	__unmap_stage2_range(&kvm->arch.mmu, range->start << PAGE_SHIFT,
-+			     (range->end - range->start) << PAGE_SHIFT,
-+			     range->may_block);
- 
--static int kvm_set_spte_handler(struct kvm *kvm, gpa_t gpa, u64 size, void *data)
+-int kvm_unmap_hva_range(struct kvm *kvm, unsigned long start, unsigned long end,
+-			unsigned flags)
 -{
--	kvm_pfn_t *pfn = (kvm_pfn_t *)data;
--
--	WARN_ON(size != PAGE_SIZE);
--
--	/*
--	 * The MMU notifiers will have unmapped a huge PMD before calling
--	 * ->change_pte() (which in turn calls kvm_set_spte_hva()) and
--	 * therefore we never need to clear out a huge PMD through this
--	 * calling path and a memcache is not required.
--	 */
--	kvm_pgtable_stage2_map(kvm->arch.mmu.pgt, gpa, PAGE_SIZE,
--			       __pfn_to_phys(*pfn), KVM_PGTABLE_PROT_R, NULL);
+-	handle_hva_to_gpa(kvm, start, end, &kvm_unmap_hva_handler, NULL);
++	kvm_mips_flush_gpa_pt(kvm, range->start, range->end);
+ 
+ 	kvm_mips_callbacks->flush_shadow_all(kvm);
  	return 0;
+ }
+ 
+-static int kvm_set_spte_handler(struct kvm *kvm, gfn_t gfn, gfn_t gfn_end,
+-				struct kvm_memory_slot *memslot, void *data)
++static bool __kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+-	gpa_t gpa = gfn << PAGE_SHIFT;
+-	pte_t hva_pte = *(pte_t *)data;
++	gpa_t gpa = range->start << PAGE_SHIFT;
++	pte_t hva_pte = range->pte;
+ 	pte_t *gpa_pte = kvm_mips_pte_for_gpa(kvm, NULL, gpa);
+ 	pte_t old_pte;
+ 
+ 	if (!gpa_pte)
+-		return 0;
++		return false;
+ 
+ 	/* Mapping may need adjusting depending on memslot flags */
+ 	old_pte = *gpa_pte;
+-	if (memslot->flags & KVM_MEM_LOG_DIRTY_PAGES && !pte_dirty(old_pte))
++	if (range->slot->flags & KVM_MEM_LOG_DIRTY_PAGES && !pte_dirty(old_pte))
+ 		hva_pte = pte_mkclean(hva_pte);
+-	else if (memslot->flags & KVM_MEM_READONLY)
++	else if (range->slot->flags & KVM_MEM_READONLY)
+ 		hva_pte = pte_wrprotect(hva_pte);
+ 
+ 	set_pte(gpa_pte, hva_pte);
+ 
+ 	/* Replacing an absent or old page doesn't need flushes */
+ 	if (!pte_present(old_pte) || !pte_young(old_pte))
+-		return 0;
++		return false;
+ 
+ 	/* Pages swapped, aged, moved, or cleaned require flushes */
+ 	return !pte_present(hva_pte) ||
+@@ -526,27 +477,21 @@ static int kvm_set_spte_handler(struct kvm *kvm, gfn_t gfn, gfn_t gfn_end,
+ 	       (pte_dirty(old_pte) && !pte_dirty(hva_pte));
  }
  
 -int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte)
 +bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
  {
 -	unsigned long end = hva + PAGE_SIZE;
--	kvm_pfn_t pfn = pte_pfn(pte);
-+	kvm_pfn_t pfn = pte_pfn(range->pte);
- 
- 	if (!kvm->arch.mmu.pgt)
- 		return 0;
- 
-+	WARN_ON(range->end - range->start != 1);
-+
- 	/*
- 	 * We've moved a page around, probably through CoW, so let's treat it
- 	 * just like a translation fault and clean the cache to the PoC.
- 	 */
- 	clean_dcache_guest_page(pfn, PAGE_SIZE);
--	handle_hva_to_gpa(kvm, hva, end, &kvm_set_spte_handler, &pfn);
-+
-+	/*
-+	 * The MMU notifiers will have unmapped a huge PMD before calling
-+	 * ->change_pte() (which in turn calls kvm_set_spte_gfn()) and
-+	 * therefore we never need to clear out a huge PMD through this
-+	 * calling path and a memcache is not required.
-+	 */
-+	kvm_pgtable_stage2_map(kvm->arch.mmu.pgt, range->start << PAGE_SHIFT,
-+			       PAGE_SIZE, __pfn_to_phys(pfn),
-+			       KVM_PGTABLE_PROT_R, NULL);
-+
- 	return 0;
+-	int ret;
+-
+-	ret = handle_hva_to_gpa(kvm, hva, end, &kvm_set_spte_handler, &pte);
+-	if (ret)
++	if (__kvm_set_spte_gfn(kvm, range))
+ 		kvm_mips_callbacks->flush_shadow_all(kvm);
+-	return 0;
++	return false;
  }
  
--static int kvm_age_hva_handler(struct kvm *kvm, gpa_t gpa, u64 size, void *data)
+-static int kvm_age_hva_handler(struct kvm *kvm, gfn_t gfn, gfn_t gfn_end,
+-			       struct kvm_memory_slot *memslot, void *data)
 +bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
  {
--	pte_t pte;
-+	u64 size = (range->end - range->start) << PAGE_SHIFT;
- 	kvm_pte_t kpte;
-+	pte_t pte;
-+
-+	if (!kvm->arch.mmu.pgt)
-+		return 0;
- 
- 	WARN_ON(size != PAGE_SIZE && size != PMD_SIZE && size != PUD_SIZE);
--	kpte = kvm_pgtable_stage2_mkold(kvm->arch.mmu.pgt, gpa);
-+
-+	kpte = kvm_pgtable_stage2_mkold(kvm->arch.mmu.pgt,
-+					range->start << PAGE_SHIFT);
- 	pte = __pte(kpte);
- 	return pte_valid(pte) && pte_young(pte);
+-	return kvm_mips_mkold_gpa_pt(kvm, gfn, gfn_end);
++	return kvm_mips_mkold_gpa_pt(kvm, range->start, range->end);
  }
  
--static int kvm_test_age_hva_handler(struct kvm *kvm, gpa_t gpa, u64 size, void *data)
--{
--	WARN_ON(size != PAGE_SIZE && size != PMD_SIZE && size != PUD_SIZE);
--	return kvm_pgtable_stage2_is_young(kvm->arch.mmu.pgt, gpa);
--}
--
+-static int kvm_test_age_hva_handler(struct kvm *kvm, gfn_t gfn, gfn_t gfn_end,
+-				    struct kvm_memory_slot *memslot, void *data)
++bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+-	gpa_t gpa = gfn << PAGE_SHIFT;
++	gpa_t gpa = range->start << PAGE_SHIFT;
+ 	pte_t *gpa_pte = kvm_mips_pte_for_gpa(kvm, NULL, gpa);
+ 
+ 	if (!gpa_pte)
+@@ -554,16 +499,6 @@ static int kvm_test_age_hva_handler(struct kvm *kvm, gfn_t gfn, gfn_t gfn_end,
+ 	return pte_young(*gpa_pte);
+ }
+ 
 -int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end)
 -{
--	if (!kvm->arch.mmu.pgt)
--		return 0;
--
 -	return handle_hva_to_gpa(kvm, start, end, kvm_age_hva_handler, NULL);
 -}
 -
 -int kvm_test_age_hva(struct kvm *kvm, unsigned long hva)
-+bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
- {
- 	if (!kvm->arch.mmu.pgt)
- 		return 0;
- 
--	return handle_hva_to_gpa(kvm, hva, hva + PAGE_SIZE,
--				 kvm_test_age_hva_handler, NULL);
-+	return kvm_pgtable_stage2_is_young(kvm->arch.mmu.pgt,
-+					   range->start << PAGE_SHIFT);
- }
- 
- phys_addr_t kvm_mmu_get_httbr(void)
+-{
+-	return handle_hva_to_gpa(kvm, hva, hva, kvm_test_age_hva_handler, NULL);
+-}
+-
+ /**
+  * _kvm_mips_map_page_fast() - Fast path GPA fault handler.
+  * @vcpu:		VCPU pointer.
 -- 
 2.31.0.208.g409f899ff0-goog
 
