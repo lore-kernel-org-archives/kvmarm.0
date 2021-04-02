@@ -1,89 +1,94 @@
-Return-Path: <SRS0=odEw=I6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=9BEn=I7=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDA77C433ED
-	for <kvmarm@archiver.kernel.org>; Thu,  1 Apr 2021 19:17:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98168C433B4
+	for <kvmarm@archiver.kernel.org>; Fri,  2 Apr 2021 09:20:39 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3F490610A0
-	for <kvmarm@archiver.kernel.org>; Thu,  1 Apr 2021 19:17:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F490610A0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id ED72160FF3
+	for <kvmarm@archiver.kernel.org>; Fri,  2 Apr 2021 09:20:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED72160FF3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 985A64B709;
-	Thu,  1 Apr 2021 15:17:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F6EF4B303;
+	Fri,  2 Apr 2021 05:20:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id EsjSK4ir8U4Z; Thu,  1 Apr 2021 15:17:12 -0400 (EDT)
+	with ESMTP id ADTiqs-LcK-L; Fri,  2 Apr 2021 05:20:37 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 366CB4B70F;
-	Thu,  1 Apr 2021 15:17:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 240844B2CF;
+	Fri,  2 Apr 2021 05:20:37 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 246E24B70B
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Apr 2021 15:17:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C8E4C4B722
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Apr 2021 20:57:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zQXY3XTq4XLZ for <kvmarm@lists.cs.columbia.edu>;
- Thu,  1 Apr 2021 15:17:09 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [63.128.21.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E52094B709
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Apr 2021 15:17:09 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1617304629;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=0sXsEpyuLPqPsJXizrEkDnBgF4FIEnwsiOddG5WaZg4=;
- b=IZbFUxusdNVmfD5o0JX9WKc2QoF7fds3Nj4R+eG5FfhUgCUMx8eBFeNhMJhJH0/iSwL6MM
- KHOlZ4Fc6q+N1fKTiuTcphZM/ku9Xez96xIdQmu4pTRLrT8Y1bSM+WwVTW+M8K4k9Ol7is
- caHslEmLcJ06+yKE/onsPP540+UqmcI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-448-xlEWW-Z2PBmzqhsqwv00_g-1; Thu, 01 Apr 2021 15:16:59 -0400
-X-MC-Unique: xlEWW-Z2PBmzqhsqwv00_g-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 427361018F70;
- Thu,  1 Apr 2021 19:16:58 +0000 (UTC)
-Received: from [10.36.112.13] (ovpn-112-13.ams2.redhat.com [10.36.112.13])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 73F266F130;
- Thu,  1 Apr 2021 19:16:55 +0000 (UTC)
-Subject: Re: [PATCH v4 7/8] KVM: arm64: vgic-v3: Expose GICR_TYPER.Last for
- userspace
-To: Marc Zyngier <maz@kernel.org>
-References: <20210401085238.477270-1-eric.auger@redhat.com>
- <20210401085238.477270-8-eric.auger@redhat.com>
- <87tuoqp1du.wl-maz@kernel.org>
- <b2458147-cd53-8712-9120-7ee9b84152aa@redhat.com>
- <87ft09gbeo.wl-maz@kernel.org>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <b913bde9-9f63-919f-3895-973c62452653@redhat.com>
-Date: Thu, 1 Apr 2021 21:16:53 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
-MIME-Version: 1.0
-In-Reply-To: <87ft09gbeo.wl-maz@kernel.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Cc: kvm@vger.kernel.org, shuah@kernel.org, linux-kernel@vger.kernel.org,
- pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
+ with ESMTP id NMv4iw121dgi for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  1 Apr 2021 20:57:01 -0400 (EDT)
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com
+ [209.85.219.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A2AB04B6D6
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Apr 2021 20:57:01 -0400 (EDT)
+Received: by mail-yb1-f202.google.com with SMTP id f18so4724038ybq.3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 01 Apr 2021 17:57:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+ bh=FViJNMuAQXVG92IcJ9ASyfw+gqYDqmookinTy4APMz8=;
+ b=tM5HW6/xk4O5sMn2fgKiWu76aEhiiETLruJpg/eDqJDR4WtSvS9+XoKICGLJgo/aR9
+ PHUygm3nt6Iyd9H+hRkE+aN2uWXSniHsrGAukhueCHEWKNiGLvDdvm/C35c51KL7qq/J
+ fgt3utJuyw2N+OiFjKc36bNdeTZMCG2OXJjHEkQxFIqyXipTvjAOsKRQR3H93WpjXiTJ
+ zZlKgCHu1/48AstcZ0TNb2v8J6l74NmyyCG68O3osE84/6JpVuFsdO2EgEGawRt1qn/R
+ MTRQMS94V9rHBAev+i0CHpGE75U1N9vbPoIhstygJ3ud1d//b6oFND6DleWTsUfEpKQo
+ REdQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+ :from:to:cc;
+ bh=FViJNMuAQXVG92IcJ9ASyfw+gqYDqmookinTy4APMz8=;
+ b=fGVduGWJQmqUEMFkCmQsVdrGt3TB+O9Vzs2b8KaPOi2lWOBA9JXGLHxAczwpvgA0Pn
+ S/KgRYJfd/Pxi2WL3Yhi8XYWr+RhWmurDTUBg/oEJT2JB/SfAYCb5awU/PC5A9erPrY/
+ KawkZ99eopYTR5MH/kzlC4HKdaTbwLt+Y2I4b8jXifebYx4MSSKKQjKTP+sPzGt+ywLf
+ KXKOsEeX1T3K3XMZY6mgNBfwdmT5u3RGeMNbHJ2oKAggpSOJuvDmzs+z6g99z47GnW65
+ l9Uyk0daZDT7Y1zLTevy9Hpofw06N6xtbHOWwIsVW1aKUx3cwqLyHSxrrUgCnCsXO0tm
+ 2Tfg==
+X-Gm-Message-State: AOAM532b0jy1sSee2Jmf/wt9VngcWB+QO5Z80mbwaqK2M8Awmitts/Oi
+ b7G11o/UkWOHyM6gYJHjNoOyZvMf154=
+X-Google-Smtp-Source: ABdhPJzX9kzo85wBh2DvMcR2Y9UxX/gVfIA/wY1qXyxNt7lm9J3jjA4HAyWrYbcDrQf6yDOm390BaT3pn8k=
+X-Received: from seanjc798194.pdx.corp.google.com
+ ([2620:15c:f:10:c0b4:8b8:bb34:6a56])
+ (user=seanjc job=sendgmr) by 2002:a25:a187:: with SMTP id
+ a7mr8464267ybi.377.1617325020964; 
+ Thu, 01 Apr 2021 17:57:00 -0700 (PDT)
+Date: Thu,  1 Apr 2021 17:56:48 -0700
+Message-Id: <20210402005658.3024832-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.31.0.208.g409f899ff0-goog
+Subject: [PATCH v2 00/10] KVM: Consolidate and optimize MMU notifiers
+From: Sean Christopherson <seanjc@google.com>
+To: Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>, 
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Paul Mackerras <paulus@ozlabs.org>, Paolo Bonzini <pbonzini@redhat.com>
+X-Mailman-Approved-At: Fri, 02 Apr 2021 05:20:36 -0400
+Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+ Sean Christopherson <seanjc@google.com>, Joerg Roedel <joro@8bytes.org>,
+ linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ Ben Gardon <bgardon@google.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ kvmarm@lists.cs.columbia.edu, Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
+Reply-To: Sean Christopherson <seanjc@google.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -97,207 +102,77 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+The end goal of this series is to optimize the MMU notifiers to take
+mmu_lock if and only if the notification is relevant to KVM, i.e. the hva
+range overlaps a memslot.   Large VMs (hundreds of vCPUs) are very
+sensitive to mmu_lock being taken for write at inopportune times, and
+such VMs also tend to be "static", e.g. backed by HugeTLB with minimal
+page shenanigans.  The vast majority of notifications for these VMs will
+be spurious (for KVM), and eliding mmu_lock for spurious notifications
+avoids an otherwise unacceptable disruption to the guest.
 
-On 4/1/21 7:30 PM, Marc Zyngier wrote:
-> On Thu, 01 Apr 2021 18:03:25 +0100,
-> Auger Eric <eric.auger@redhat.com> wrote:
->>
->> Hi Marc,
->>
->> On 4/1/21 3:42 PM, Marc Zyngier wrote:
->>> Hi Eric,
->>>
->>> On Thu, 01 Apr 2021 09:52:37 +0100,
->>> Eric Auger <eric.auger@redhat.com> wrote:
->>>>
->>>> Commit 23bde34771f1 ("KVM: arm64: vgic-v3: Drop the
->>>> reporting of GICR_TYPER.Last for userspace") temporarily fixed
->>>> a bug identified when attempting to access the GICR_TYPER
->>>> register before the redistributor region setting, but dropped
->>>> the support of the LAST bit.
->>>>
->>>> Emulating the GICR_TYPER.Last bit still makes sense for
->>>> architecture compliance though. This patch restores its support
->>>> (if the redistributor region was set) while keeping the code safe.
->>>>
->>>> We introduce a new helper, vgic_mmio_vcpu_rdist_is_last() which
->>>> computes whether a redistributor is the highest one of a series
->>>> of redistributor contributor pages.
->>>>
->>>> The spec says "Indicates whether this Redistributor is the
->>>> highest-numbered Redistributor in a series of contiguous
->>>> Redistributor pages."
->>>>
->>>> The code is a bit convulated since there is no guarantee
->>>
->>> nit: convoluted
->>>
->>>> redistributors are added in a given reditributor region in
->>>> ascending order. In that case the current implementation was
->>>> wrong. Also redistributor regions can be contiguous
->>>> and registered in non increasing base address order.
->>>>
->>>> So the index of redistributors are stored in an array within
->>>> the redistributor region structure.
->>>>
->>>> With this new implementation we do not need to have a uaccess
->>>> read accessor anymore.
->>>>
->>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>>
->>> This patch also hurt my head, a lot more than the first one.  See
->>> below.
->>>
->>>> ---
->>>>  arch/arm64/kvm/vgic/vgic-init.c    |  7 +--
->>>>  arch/arm64/kvm/vgic/vgic-mmio-v3.c | 97 ++++++++++++++++++++----------
->>>>  arch/arm64/kvm/vgic/vgic.h         |  1 +
->>>>  include/kvm/arm_vgic.h             |  3 +
->>>>  4 files changed, 73 insertions(+), 35 deletions(-)
->>>>
->>>> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
->>>> index cf6faa0aeddb2..61150c34c268c 100644
->>>> --- a/arch/arm64/kvm/vgic/vgic-init.c
->>>> +++ b/arch/arm64/kvm/vgic/vgic-init.c
->>>> @@ -190,6 +190,7 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
->>>>  	int i;
->>>>  
->>>>  	vgic_cpu->rd_iodev.base_addr = VGIC_ADDR_UNDEF;
->>>> +	vgic_cpu->index = vcpu->vcpu_id;
->>>
->>> Is it so that vgic_cpu->index is always equal to vcpu_id? If so, why
->>> do we need another field? We can always get to the vcpu using a
->>> container_of().
->>>
->>>>  
->>>>  	INIT_LIST_HEAD(&vgic_cpu->ap_list_head);
->>>>  	raw_spin_lock_init(&vgic_cpu->ap_list_lock);
->>>> @@ -338,10 +339,8 @@ static void kvm_vgic_dist_destroy(struct kvm *kvm)
->>>>  	dist->vgic_dist_base = VGIC_ADDR_UNDEF;
->>>>  
->>>>  	if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
->>>> -		list_for_each_entry_safe(rdreg, next, &dist->rd_regions, list) {
->>>> -			list_del(&rdreg->list);
->>>> -			kfree(rdreg);
->>>> -		}
->>>> +		list_for_each_entry_safe(rdreg, next, &dist->rd_regions, list)
->>>> +			vgic_v3_free_redist_region(rdreg);
->>>
->>> Consider moving the introduction of vgic_v3_free_redist_region() into
->>> a separate patch. On its own, that's a good readability improvement.
->>>
->>>>  		INIT_LIST_HEAD(&dist->rd_regions);
->>>>  	} else {
->>>>  		dist->vgic_cpu_base = VGIC_ADDR_UNDEF;
->>>> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
->>>> index 987e366c80008..f6a7eed1d6adb 100644
->>>> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
->>>> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
->>>> @@ -251,45 +251,57 @@ static void vgic_mmio_write_v3r_ctlr(struct kvm_vcpu *vcpu,
->>>>  		vgic_enable_lpis(vcpu);
->>>>  }
->>>>  
->>>> +static bool vgic_mmio_vcpu_rdist_is_last(struct kvm_vcpu *vcpu)
->>>> +{
->>>> +	struct vgic_dist *vgic = &vcpu->kvm->arch.vgic;
->>>> +	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
->>>> +	struct vgic_redist_region *rdreg = vgic_cpu->rdreg;
->>>> +
->>>> +	if (!rdreg)
->>>> +		return false;
->>>> +
->>>> +	if (rdreg->count && vgic_cpu->rdreg_index == (rdreg->count - 1)) {
->>>> +		/* check whether there is no other contiguous rdist region */
->>>> +		struct list_head *rd_regions = &vgic->rd_regions;
->>>> +		struct vgic_redist_region *iter;
->>>> +
->>>> +		list_for_each_entry(iter, rd_regions, list) {
->>>> +			if (iter->base == rdreg->base + rdreg->count * KVM_VGIC_V3_REDIST_SIZE &&
->>>> +				iter->free_index > 0) {
->>>> +			/* check the first rdist index of this region, if any */
->>>> +				if (vgic_cpu->index < iter->rdist_indices[0])
->>>> +					return false;
->>>
->>> rdist_indices[] contains the vcpu_id of the vcpu associated with a
->>> given RD in the region. At this stage, you have established that there
->>> is another region that is contiguous with the one associated with our
->>> vcpu. You also know that this adjacent region has a vcpu mapped in
->>> (free_index isn't 0). Isn't that enough to declare that our vcpu isn't
->>> last?  I definitely don't understand what the index comparison does
->>> here.
->> Assume the following case:
->> 2 RDIST region
->> region #0 contains rdist 1, 2, 4
->> region #1, adjacent to #0 contains rdist 3
->>
->> Spec days:
->> "Indicates whether this Redistributor is the
->> highest-numbered Redistributor in a series of contiguous
->> Redistributor pages."
->>
->> To me 4 is last and 3 is last too.
-> 
-> No, only 3 is last, assuming that region 0 is full. I think the
-> phrasing in the spec is just really bad. What this describes is that
-> at the end of a set of contiguous set of RDs, that last RD has Last
-> set. If two regions are contiguous, that's undistinguishable from a
-> single, larger region.
-> 
-> There is no such thing as a "redistributor number" anyway. The closest
-> thing there is would be "processor number", but that has nothing to do
-> with the RD itself.
+To get there without potentially degrading performance, e.g. due to
+multiple memslot lookups, especially on non-x86 where the use cases are
+largely unknown (from my perspective), first consolidate the MMU notifier
+logic by moving the hva->gfn lookups into common KVM.
 
-Hum OK. That's a different understanding of the spec wording indeed. For
-me redistributor number was the index of the vcpu.
+Based on kvm/queue, commit 5f986f748438 ("KVM: x86: dump_vmcs should
+include the autoload/autostore MSR lists").
 
-But well, you're understanding is definitively simpler to implement and
-also matches what was implemented for single RDIST region.
+Well tested on Intel and AMD.  Compile tested for arm64, MIPS, PPC,
+PPC e500, and s390.  Absolutely needs to be tested for real on non-x86,
+I give it even odds that I introduced an off-by-one bug somewhere.
 
-> 
->>
->>
->>>
->>> It also seem to me that some of the complexity could be eliminated if
->>> the regions were kept ordered at list insertion time.
->> yes
->>>
->>>> +			}
->>>> +		}
->>>> +	} else if (vgic_cpu->rdreg_index < rdreg->free_index - 1) {
->>>> +		/* look at the index of next rdist */
->>>> +		int next_rdist_index = rdreg->rdist_indices[vgic_cpu->rdreg_index + 1];
->>>> +
->>>> +		if (vgic_cpu->index < next_rdist_index)
->>>> +			return false;
->>>
->>> Same thing here. We are in the middle of the allocated part of a
->>> region, which means we cannot be last. I still don't get the index
->>> check.
->> Because within a region, nothing hinders rdist from being allocated in
->> non ascending order. I exercise those cases in the kvmselftests
->>
->> one single RDIST region with the following rdists allocated there:
->> 1, 3, 2
->>
->> 3 and 2 are "last", right? Or did I miss something. Yes that's totally
->> not natural to do that kind of allocation but the API allows to do that.
-> 
-> No, only 2 is last. I think you got tripped by the bizarre language in
-> the spec, and the behaviour of this Last bit is much simpler than what
-> you ended up with.
+v2:
+ - Drop the patches that have already been pushed to kvm/queue.
+ - Drop two selftest changes that had snuck in via "git commit -a".
+ - Add a patch to assert that mmu_notifier_count is elevated when
+   .change_pte() runs. [Paolo]
+ - Split out moving KVM_MMU_(UN)LOCK() to __kvm_handle_hva_range() to a
+   separate patch.  Opted not to squash it with the introduction of the
+   common hva walkers (patch 02), as that prevented sharing code between
+   the old and new APIs. [Paolo]
+ - Tweak the comment in kvm_vm_destroy() above the smashing of the new
+   slots lock. [Paolo]
+ - Make mmu_notifier_slots_lock unconditional to avoid #ifdefs. [Paolo]
 
+v1:
+ - https://lkml.kernel.org/r/20210326021957.1424875-1-seanjc@google.com
 
-OK, I will respin according to your suggestion then.
+Sean Christopherson (10):
+  KVM: Assert that notifier count is elevated in .change_pte()
+  KVM: Move x86's MMU notifier memslot walkers to generic code
+  KVM: arm64: Convert to the gfn-based MMU notifier callbacks
+  KVM: MIPS/MMU: Convert to the gfn-based MMU notifier callbacks
+  KVM: PPC: Convert to the gfn-based MMU notifier callbacks
+  KVM: Kill off the old hva-based MMU notifier callbacks
+  KVM: Move MMU notifier's mmu_lock acquisition into common helper
+  KVM: Take mmu_lock when handling MMU notifier iff the hva hits a
+    memslot
+  KVM: Don't take mmu_lock for range invalidation unless necessary
+  KVM: x86/mmu: Allow yielding during MMU notifier unmap/zap, if
+    possible
 
-Thanks
+ arch/arm64/kvm/mmu.c                   | 117 +++------
+ arch/mips/kvm/mmu.c                    |  97 ++------
+ arch/powerpc/include/asm/kvm_book3s.h  |  12 +-
+ arch/powerpc/include/asm/kvm_ppc.h     |   9 +-
+ arch/powerpc/kvm/book3s.c              |  18 +-
+ arch/powerpc/kvm/book3s.h              |  10 +-
+ arch/powerpc/kvm/book3s_64_mmu_hv.c    |  98 ++------
+ arch/powerpc/kvm/book3s_64_mmu_radix.c |  25 +-
+ arch/powerpc/kvm/book3s_hv.c           |  12 +-
+ arch/powerpc/kvm/book3s_pr.c           |  56 ++---
+ arch/powerpc/kvm/e500_mmu_host.c       |  27 +-
+ arch/x86/kvm/mmu/mmu.c                 | 127 ++++------
+ arch/x86/kvm/mmu/tdp_mmu.c             | 245 +++++++------------
+ arch/x86/kvm/mmu/tdp_mmu.h             |  14 +-
+ include/linux/kvm_host.h               |  22 +-
+ virt/kvm/kvm_main.c                    | 325 +++++++++++++++++++------
+ 16 files changed, 552 insertions(+), 662 deletions(-)
 
-Eric
-> 
-> Thanks,
-> 
-> 	M.
-> 
+-- 
+2.31.0.208.g409f899ff0-goog
 
 _______________________________________________
 kvmarm mailing list
