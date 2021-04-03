@@ -4,55 +4,55 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC1C8C43460
-	for <kvmarm@archiver.kernel.org>; Sat,  3 Apr 2021 11:30:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA057C433B4
+	for <kvmarm@archiver.kernel.org>; Sat,  3 Apr 2021 11:30:07 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 47E0B61241
-	for <kvmarm@archiver.kernel.org>; Sat,  3 Apr 2021 11:30:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47E0B61241
+	by mail.kernel.org (Postfix) with ESMTP id 810A261210
+	for <kvmarm@archiver.kernel.org>; Sat,  3 Apr 2021 11:30:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 810A261210
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F00BC4B541;
-	Sat,  3 Apr 2021 07:30:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 34C1A4B56F;
+	Sat,  3 Apr 2021 07:30:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id f8utKZjh+VpB; Sat,  3 Apr 2021 07:30:04 -0400 (EDT)
+	with ESMTP id e71xZHquVbW2; Sat,  3 Apr 2021 07:30:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 306144B589;
-	Sat,  3 Apr 2021 07:30:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E27A4B58C;
+	Sat,  3 Apr 2021 07:30:03 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 953EC4B564
- for <kvmarm@lists.cs.columbia.edu>; Sat,  3 Apr 2021 07:30:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A36EE4B57B
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  3 Apr 2021 07:30:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id InXoUnHIGkty for <kvmarm@lists.cs.columbia.edu>;
- Sat,  3 Apr 2021 07:29:58 -0400 (EDT)
+ with ESMTP id AX12snnWiJkk for <kvmarm@lists.cs.columbia.edu>;
+ Sat,  3 Apr 2021 07:30:00 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6B4514B4EB
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DBD864B571
  for <kvmarm@lists.cs.columbia.edu>; Sat,  3 Apr 2021 07:29:56 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id A96A761244;
- Sat,  3 Apr 2021 11:29:55 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 2532461246;
+ Sat,  3 Apr 2021 11:29:56 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1lSeTS-005R95-2C; Sat, 03 Apr 2021 12:29:54 +0100
+ id 1lSeTS-005R95-Go; Sat, 03 Apr 2021 12:29:54 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
  kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v2 8/9] KVM: arm64: timer: Add support for SW-based
- deactivation
-Date: Sat,  3 Apr 2021 12:29:30 +0100
-Message-Id: <20210403112931.1043452-9-maz@kernel.org>
+Subject: [PATCH v2 9/9] irqchip/apple-aic: Advertise some level of vGICv3
+ compatibility
+Date: Sat,  3 Apr 2021 12:29:31 +0100
+Message-Id: <20210403112931.1043452-10-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210403112931.1043452-1-maz@kernel.org>
 References: <20210403112931.1043452-1-maz@kernel.org>
@@ -82,160 +82,50 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In order to deal with the lack of active state, we need to use
-the mask/unmask primitives (after all, the active state is just an
-additional mask on top of the normal one).
+The CPUs in the Apple M1 SoC partially implement a virtual GICv3
+CPU interface, although one that is incapable of HW deactivation
+of interrupts.
 
-To avoid adding a bunch of ugly conditionals in the timer and vgic
-code, let's use a timer-specific irqdomain to deal with the state
-conversion. Yes, this is an unexpected use of irqdomains, but
-there is no reason not to be just as creative as the designers
-of the HW...
-
-This involves overloading the vcpu_affinity, set_irqchip_state
-and eoi callbacks so that the rest of the KVM code can continue
-ignoring the oddities of the underlying platform.
+Advertise the support to KVM.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/arch_timer.c | 100 ++++++++++++++++++++++++++++++++++--
- 1 file changed, 96 insertions(+), 4 deletions(-)
+ drivers/irqchip/irq-apple-aic.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index 7fa4f446456a..4c24cbb19ba1 100644
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -9,6 +9,7 @@
- #include <linux/kvm_host.h>
- #include <linux/interrupt.h>
- #include <linux/irq.h>
-+#include <linux/irqdomain.h>
- #include <linux/uaccess.h>
- 
- #include <clocksource/arm_arch_timer.h>
-@@ -973,6 +974,77 @@ static int kvm_timer_dying_cpu(unsigned int cpu)
+diff --git a/drivers/irqchip/irq-apple-aic.c b/drivers/irqchip/irq-apple-aic.c
+index ed16b6cc00d7..65067b2c746b 100644
+--- a/drivers/irqchip/irq-apple-aic.c
++++ b/drivers/irqchip/irq-apple-aic.c
+@@ -50,6 +50,7 @@
+ #include <linux/cpuhotplug.h>
+ #include <linux/io.h>
+ #include <linux/irqchip.h>
++#include <linux/irqchip/arm-vgic-info.h>
+ #include <linux/irqdomain.h>
+ #include <linux/limits.h>
+ #include <linux/of_address.h>
+@@ -772,6 +773,11 @@ static int aic_init_cpu(unsigned int cpu)
  	return 0;
  }
  
-+static int timer_irq_set_vcpu_affinity(struct irq_data *d, void *vcpu)
-+{
-+	if (vcpu)
-+		irqd_set_forwarded_to_vcpu(d);
-+	else
-+		irqd_clr_forwarded_to_vcpu(d);
-+
-+	return 0;
-+}
-+
-+static int timer_irq_set_irqchip_state(struct irq_data *d,
-+				       enum irqchip_irq_state which, bool val)
-+{
-+	if (which != IRQCHIP_STATE_ACTIVE || !irqd_is_forwarded_to_vcpu(d))
-+		return irq_chip_set_parent_state(d, which, val);
-+
-+	if (val)
-+		irq_chip_mask_parent(d);
-+	else
-+		irq_chip_unmask_parent(d);
-+
-+	return 0;
-+}
-+
-+static void timer_irq_eoi(struct irq_data *d)
-+{
-+	if (!irqd_is_forwarded_to_vcpu(d))
-+		irq_chip_eoi_parent(d);
-+}
-+
-+static void timer_irq_ack(struct irq_data *d)
-+{
-+	d = d->parent_data;
-+	if (d->chip->irq_ack)
-+		d->chip->irq_ack(d);
-+}
-+
-+static struct irq_chip timer_chip = {
-+	.name			= "KVM",
-+	.irq_ack		= timer_irq_ack,
-+	.irq_mask		= irq_chip_mask_parent,
-+	.irq_unmask		= irq_chip_unmask_parent,
-+	.irq_eoi		= timer_irq_eoi,
-+	.irq_set_type		= irq_chip_set_type_parent,
-+	.irq_set_vcpu_affinity	= timer_irq_set_vcpu_affinity,
-+	.irq_set_irqchip_state	= timer_irq_set_irqchip_state,
++static struct gic_kvm_info vgic_info __initdata = {
++	.type			= GIC_V3,
++	.no_hw_deactivation	= true,
 +};
 +
-+static int timer_irq_domain_alloc(struct irq_domain *domain, unsigned int virq,
-+				  unsigned int nr_irqs, void *arg)
-+{
-+	irq_hw_number_t hwirq = (uintptr_t)arg;
-+
-+	return irq_domain_set_hwirq_and_chip(domain, virq, hwirq,
-+					     &timer_chip, NULL);
-+}
-+
-+static void timer_irq_domain_free(struct irq_domain *domain, unsigned int virq,
-+				  unsigned int nr_irqs)
-+{
-+}
-+
-+static const struct irq_domain_ops timer_domain_ops = {
-+	.alloc	= timer_irq_domain_alloc,
-+	.free	= timer_irq_domain_free,
-+};
-+
-+static struct irq_ops arch_timer_irq_ops = {
-+	.get_input_level = kvm_arch_timer_get_input_level,
-+};
-+
- static void kvm_irq_fixup_flags(unsigned int virq, u32 *flags)
+ static int __init aic_of_ic_init(struct device_node *node, struct device_node *parent)
  {
- 	*flags = irq_get_trigger_type(virq);
-@@ -998,9 +1070,33 @@ static int kvm_irq_init(struct arch_timer_kvm_info *info)
- 	host_vtimer_irq = info->virtual_irq;
- 	kvm_irq_fixup_flags(host_vtimer_irq, &host_vtimer_irq_flags);
+ 	int i;
+@@ -828,6 +834,8 @@ static int __init aic_of_ic_init(struct device_node *node, struct device_node *p
+ 			  "irqchip/apple-aic/ipi:starting",
+ 			  aic_init_cpu, NULL);
  
-+	if (kvm_vgic_global_state.no_hw_deactivation) {
-+		fwnode = irq_domain_alloc_named_fwnode("kvm-timer");
-+		if (!fwnode)
-+			return -ENOMEM;
++	vgic_set_kvm_info(&vgic_info);
 +
-+		/* Assume both vtimer and ptimer in the same parent */
-+		data = irq_get_irq_data(host_vtimer_irq);
-+		domain = irq_domain_create_hierarchy(data->domain, 0,
-+						     NR_KVM_TIMERS, fwnode,
-+						     &timer_domain_ops, NULL);
-+		if (!domain) {
-+			irq_domain_free_fwnode(fwnode);
-+			return -ENOMEM;
-+		}
-+
-+		arch_timer_irq_ops.flags |= VGIC_IRQ_SW_RESAMPLE;
-+		WARN_ON(irq_domain_push_irq(domain, host_vtimer_irq,
-+					    (void *)TIMER_VTIMER));
-+	}
-+
- 	if (info->physical_irq > 0) {
- 		host_ptimer_irq = info->physical_irq;
- 		kvm_irq_fixup_flags(host_ptimer_irq, &host_ptimer_irq_flags);
-+
-+		if (domain)
-+			WARN_ON(irq_domain_push_irq(domain, host_ptimer_irq,
-+						    (void *)TIMER_PTIMER));
- 	}
+ 	pr_info("Initialized with %d IRQs, %d FIQs, %d vIPIs\n",
+ 		irqc->nr_hw, AIC_NR_FIQ, AIC_NR_SWIPI);
  
- 	return 0;
-@@ -1129,10 +1225,6 @@ bool kvm_arch_timer_get_input_level(int vintid)
- 	return kvm_timer_should_fire(timer);
- }
- 
--static struct irq_ops arch_timer_irq_ops = {
--	.get_input_level = kvm_arch_timer_get_input_level,
--};
--
- int kvm_timer_enable(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
 -- 
 2.29.2
 
