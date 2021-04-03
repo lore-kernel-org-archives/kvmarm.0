@@ -6,52 +6,53 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05F71C433B4
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23B63C433ED
 	for <kvmarm@archiver.kernel.org>; Sat,  3 Apr 2021 11:30:05 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A763C61243
+	by mail.kernel.org (Postfix) with ESMTP id A6E9161151
 	for <kvmarm@archiver.kernel.org>; Sat,  3 Apr 2021 11:30:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A763C61243
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6E9161151
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 484D74B57D;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 428954B59D;
 	Sat,  3 Apr 2021 07:30:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id yjhcX94G1Z11; Sat,  3 Apr 2021 07:30:03 -0400 (EDT)
+	with ESMTP id nqmRl3cLk8Zr; Sat,  3 Apr 2021 07:30:01 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EA5014B580;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C80E04B5A7;
 	Sat,  3 Apr 2021 07:29:58 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D56A4B57D
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 26EB84B55E
  for <kvmarm@lists.cs.columbia.edu>; Sat,  3 Apr 2021 07:29:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fejgYpCJEPFl for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id tOAK+MHiu0th for <kvmarm@lists.cs.columbia.edu>;
  Sat,  3 Apr 2021 07:29:55 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 512BB4B1DA
- for <kvmarm@lists.cs.columbia.edu>; Sat,  3 Apr 2021 07:29:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DE1C94B4EB
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  3 Apr 2021 07:29:54 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 8F03461247;
+ by mail.kernel.org (Postfix) with ESMTPSA id 189E961245;
  Sat,  3 Apr 2021 11:29:54 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1lSeTQ-005R95-Ua; Sat, 03 Apr 2021 12:29:53 +0100
+ id 1lSeTQ-005R95-F4; Sat, 03 Apr 2021 12:29:52 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
  kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v2 6/9] KVM: arm64: vgic: Implement SW-driven deactivation
-Date: Sat,  3 Apr 2021 12:29:28 +0100
-Message-Id: <20210403112931.1043452-7-maz@kernel.org>
+Subject: [PATCH v2 5/9] KVM: arm64: vgic: move irq->get_input_level into an
+ ops structure
+Date: Sat,  3 Apr 2021 12:29:27 +0100
+Message-Id: <20210403112931.1043452-6-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210403112931.1043452-1-maz@kernel.org>
 References: <20210403112931.1043452-1-maz@kernel.org>
@@ -81,130 +82,161 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In order to deal with these systems that do not offer HW-based
-deactivation of interrupts, let implement a SW-based approach:
+We already have the option to attach a callback to an interrupt
+to retrieve its pending state. As we are planning to expand this
+facility, move this callback into its own data structure.
 
-- When the irq is queued into a LR, treat it as a pure virtual
-  interrupt and set the EOI flag in the LR.
-
-- When the interrupt state is read back from the LR, force a
-  deactivation when the state is invalid (neither active nor
-  pending)
-
-Interrupts requiring such treatment get the VGIC_SW_RESAMPLE flag.
+This will limit the size of individual interrupts as the ops
+structures can be shared across multiple interrupts.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/vgic/vgic-v2.c | 19 +++++++++++++++----
- arch/arm64/kvm/vgic/vgic-v3.c | 19 +++++++++++++++----
- include/kvm/arm_vgic.h        | 10 ++++++++++
- 3 files changed, 40 insertions(+), 8 deletions(-)
+ arch/arm64/kvm/arch_timer.c |  8 ++++++--
+ arch/arm64/kvm/vgic/vgic.c  | 14 +++++++-------
+ include/kvm/arm_vgic.h      | 28 +++++++++++++++++-----------
+ 3 files changed, 30 insertions(+), 20 deletions(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-v2.c b/arch/arm64/kvm/vgic/vgic-v2.c
-index 11934c2af2f4..2c580204f1dc 100644
---- a/arch/arm64/kvm/vgic/vgic-v2.c
-+++ b/arch/arm64/kvm/vgic/vgic-v2.c
-@@ -108,11 +108,22 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
- 		 * If this causes us to lower the level, we have to also clear
- 		 * the physical active state, since we will otherwise never be
- 		 * told when the interrupt becomes asserted again.
-+		 *
-+		 * Another case is when the interrupt requires a helping hand
-+		 * on deactivation (no HW deactivation, for example).
- 		 */
--		if (vgic_irq_is_mapped_level(irq) && (val & GICH_LR_PENDING_BIT)) {
--			irq->line_level = vgic_get_phys_line_level(irq);
-+		if (vgic_irq_is_mapped_level(irq)) {
-+			bool resample = false;
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index 74e0699661e9..e2288b6bf435 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -1116,6 +1116,10 @@ bool kvm_arch_timer_get_input_level(int vintid)
+ 	return kvm_timer_should_fire(timer);
+ }
+ 
++static struct irq_ops arch_timer_irq_ops = {
++	.get_input_level = kvm_arch_timer_get_input_level,
++};
 +
-+			if (val & GICH_LR_PENDING_BIT) {
-+				irq->line_level = vgic_get_phys_line_level(irq);
-+				resample = !irq->line_level;
-+			} else if (vgic_irq_needs_resampling(irq) &&
-+				   !(irq->active || irq->pending_latch)) {
-+				resample = true;
-+			}
+ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+ {
+ 	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
+@@ -1143,7 +1147,7 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+ 	ret = kvm_vgic_map_phys_irq(vcpu,
+ 				    map.direct_vtimer->host_timer_irq,
+ 				    map.direct_vtimer->irq.irq,
+-				    kvm_arch_timer_get_input_level);
++				    &arch_timer_irq_ops);
+ 	if (ret)
+ 		return ret;
  
--			if (!irq->line_level)
-+			if (resample)
- 				vgic_irq_set_phys_active(irq, false);
- 		}
- 
-@@ -152,7 +163,7 @@ void vgic_v2_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
- 	if (irq->group)
- 		val |= GICH_LR_GROUP1;
- 
--	if (irq->hw) {
-+	if (irq->hw && !vgic_irq_needs_resampling(irq)) {
- 		val |= GICH_LR_HW;
- 		val |= irq->hwintid << GICH_LR_PHYSID_CPUID_SHIFT;
- 		/*
-diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-index 6f530925a231..d7ee88de3a5c 100644
---- a/arch/arm64/kvm/vgic/vgic-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3.c
-@@ -99,11 +99,22 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
- 		 * If this causes us to lower the level, we have to also clear
- 		 * the physical active state, since we will otherwise never be
- 		 * told when the interrupt becomes asserted again.
-+		 *
-+		 * Another case is when the interrupt requires a helping hand
-+		 * on deactivation (no HW deactivation, for example).
- 		 */
--		if (vgic_irq_is_mapped_level(irq) && (val & ICH_LR_PENDING_BIT)) {
--			irq->line_level = vgic_get_phys_line_level(irq);
-+		if (vgic_irq_is_mapped_level(irq)) {
-+			bool resample = false;
-+
-+			if (val & ICH_LR_PENDING_BIT) {
-+				irq->line_level = vgic_get_phys_line_level(irq);
-+				resample = !irq->line_level;
-+			} else if (vgic_irq_needs_resampling(irq) &&
-+				   !(irq->active || irq->pending_latch)) {
-+				resample = true;
-+			}
- 
--			if (!irq->line_level)
-+			if (resample)
- 				vgic_irq_set_phys_active(irq, false);
- 		}
- 
-@@ -134,7 +145,7 @@ void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
- 		}
+@@ -1151,7 +1155,7 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+ 		ret = kvm_vgic_map_phys_irq(vcpu,
+ 					    map.direct_ptimer->host_timer_irq,
+ 					    map.direct_ptimer->irq.irq,
+-					    kvm_arch_timer_get_input_level);
++					    &arch_timer_irq_ops);
  	}
  
--	if (irq->hw) {
-+	if (irq->hw && !vgic_irq_needs_resampling(irq)) {
- 		val |= ICH_LR_HW;
- 		val |= ((u64)irq->hwintid) << ICH_LR_PHYS_ID_SHIFT;
- 		/*
+ 	if (ret)
+diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+index 1c597c9885fa..1d22365c68e2 100644
+--- a/arch/arm64/kvm/vgic/vgic.c
++++ b/arch/arm64/kvm/vgic/vgic.c
+@@ -182,8 +182,8 @@ bool vgic_get_phys_line_level(struct vgic_irq *irq)
+ 
+ 	BUG_ON(!irq->hw);
+ 
+-	if (irq->get_input_level)
+-		return irq->get_input_level(irq->intid);
++	if (irq->ops && irq->ops->get_input_level)
++		return irq->ops->get_input_level(irq->intid);
+ 
+ 	WARN_ON(irq_get_irqchip_state(irq->host_irq,
+ 				      IRQCHIP_STATE_PENDING,
+@@ -479,7 +479,7 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+ /* @irq->irq_lock must be held */
+ static int kvm_vgic_map_irq(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
+ 			    unsigned int host_irq,
+-			    bool (*get_input_level)(int vindid))
++			    struct irq_ops *ops)
+ {
+ 	struct irq_desc *desc;
+ 	struct irq_data *data;
+@@ -499,7 +499,7 @@ static int kvm_vgic_map_irq(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
+ 	irq->hw = true;
+ 	irq->host_irq = host_irq;
+ 	irq->hwintid = data->hwirq;
+-	irq->get_input_level = get_input_level;
++	irq->ops = ops;
+ 	return 0;
+ }
+ 
+@@ -508,11 +508,11 @@ static inline void kvm_vgic_unmap_irq(struct vgic_irq *irq)
+ {
+ 	irq->hw = false;
+ 	irq->hwintid = 0;
+-	irq->get_input_level = NULL;
++	irq->ops = NULL;
+ }
+ 
+ int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
+-			  u32 vintid, bool (*get_input_level)(int vindid))
++			  u32 vintid, struct irq_ops *ops)
+ {
+ 	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, vintid);
+ 	unsigned long flags;
+@@ -521,7 +521,7 @@ int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
+ 	BUG_ON(!irq);
+ 
+ 	raw_spin_lock_irqsave(&irq->irq_lock, flags);
+-	ret = kvm_vgic_map_irq(vcpu, irq, host_irq, get_input_level);
++	ret = kvm_vgic_map_irq(vcpu, irq, host_irq, ops);
+ 	raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
+ 	vgic_put_irq(vcpu->kvm, irq);
+ 
 diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index a7130f1b5ab9..379ee0c97ede 100644
+index 7afe789194d8..a7130f1b5ab9 100644
 --- a/include/kvm/arm_vgic.h
 +++ b/include/kvm/arm_vgic.h
-@@ -99,6 +99,11 @@ enum vgic_irq_config {
-  * kvm_arm_get_running_vcpu() to get the vcpu pointer for private IRQs.
-  */
- struct irq_ops {
-+	/* Per interrupt flags for special-cased interrupts */
-+	unsigned long flags;
-+
-+#define VGIC_IRQ_SW_RESAMPLE	BIT(0)	/* Clear the active state for resampling */
-+
- 	/*
- 	 * Callback function pointer to in-kernel devices that can tell us the
- 	 * state of the input level of mapped level-triggered IRQ faster than
-@@ -150,6 +155,11 @@ struct vgic_irq {
- 					   for in-kernel devices. */
+@@ -92,6 +92,21 @@ enum vgic_irq_config {
+ 	VGIC_CONFIG_LEVEL
  };
  
-+static inline bool vgic_irq_needs_resampling(struct vgic_irq *irq)
-+{
-+	return irq->ops && (irq->ops->flags & VGIC_IRQ_SW_RESAMPLE);
-+}
++/*
++ * Per-irq ops overriding some common behavious.
++ *
++ * Always called in non-preemptible section and the functions can use
++ * kvm_arm_get_running_vcpu() to get the vcpu pointer for private IRQs.
++ */
++struct irq_ops {
++	/*
++	 * Callback function pointer to in-kernel devices that can tell us the
++	 * state of the input level of mapped level-triggered IRQ faster than
++	 * peaking into the physical GIC.
++	 */
++	bool (*get_input_level)(int vintid);
++};
 +
- struct vgic_register_region;
- struct vgic_its;
+ struct vgic_irq {
+ 	raw_spinlock_t irq_lock;	/* Protects the content of the struct */
+ 	struct list_head lpi_list;	/* Used to link all LPIs together */
+@@ -129,16 +144,7 @@ struct vgic_irq {
+ 	u8 group;			/* 0 == group 0, 1 == group 1 */
+ 	enum vgic_irq_config config;	/* Level or edge */
+ 
+-	/*
+-	 * Callback function pointer to in-kernel devices that can tell us the
+-	 * state of the input level of mapped level-triggered IRQ faster than
+-	 * peaking into the physical GIC.
+-	 *
+-	 * Always called in non-preemptible section and the functions can use
+-	 * kvm_arm_get_running_vcpu() to get the vcpu pointer for private
+-	 * IRQs.
+-	 */
+-	bool (*get_input_level)(int vintid);
++	struct irq_ops *ops;
+ 
+ 	void *owner;			/* Opaque pointer to reserve an interrupt
+ 					   for in-kernel devices. */
+@@ -354,7 +360,7 @@ void kvm_vgic_init_cpu_hardware(void);
+ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+ 			bool level, void *owner);
+ int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
+-			  u32 vintid, bool (*get_input_level)(int vindid));
++			  u32 vintid, struct irq_ops *ops);
+ int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int vintid);
+ bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int vintid);
  
 -- 
 2.29.2
