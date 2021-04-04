@@ -7,70 +7,70 @@ X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7871C43461
-	for <kvmarm@archiver.kernel.org>; Sun,  4 Apr 2021 17:23:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CB2EC433ED
+	for <kvmarm@archiver.kernel.org>; Sun,  4 Apr 2021 17:23:11 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5914F61380
-	for <kvmarm@archiver.kernel.org>; Sun,  4 Apr 2021 17:23:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5914F61380
+	by mail.kernel.org (Postfix) with ESMTP id 8E60061369
+	for <kvmarm@archiver.kernel.org>; Sun,  4 Apr 2021 17:23:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E60061369
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C8484BB3B;
-	Sun,  4 Apr 2021 13:23:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3CCBF4BBF8;
+	Sun,  4 Apr 2021 13:23:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 5mspWR6Zp+EW; Sun,  4 Apr 2021 13:23:07 -0400 (EDT)
+	with ESMTP id 8TEP04CkG+Rr; Sun,  4 Apr 2021 13:23:09 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 18C604BBA3;
-	Sun,  4 Apr 2021 13:23:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 35F1B4BBC3;
+	Sun,  4 Apr 2021 13:23:09 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D4D7A4B949
- for <kvmarm@lists.cs.columbia.edu>; Sun,  4 Apr 2021 13:23:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D4A9C4BBB3
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  4 Apr 2021 13:23:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id enQqMUIP-57B for <kvmarm@lists.cs.columbia.edu>;
- Sun,  4 Apr 2021 13:23:05 -0400 (EDT)
+ with ESMTP id MtRigufSleDo for <kvmarm@lists.cs.columbia.edu>;
+ Sun,  4 Apr 2021 13:23:07 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C34A4BC11
- for <kvmarm@lists.cs.columbia.edu>; Sun,  4 Apr 2021 13:23:04 -0400 (EDT)
+ (us-smtp-delivery-124.mimecast.com [63.128.21.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 10AA74B90A
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  4 Apr 2021 13:23:07 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1617556984;
+ s=mimecast20190719; t=1617556986;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=/zxucnPItRI/WVimK5acRn5RS6yMBNn5B7shhgyqn64=;
- b=W2o6+6D5FB2vVbCd9ImJypBV9aFBw8Fg1kfDH+Ks780Z3+OlELwylAUQIfB+ZWZgQKdwt2
- 8HLQMU+F+XvDnx4wQU0/AU4DP0DySJrSTWaocanH6khiNYW95xD9pQMMafLmDlRYCMq8BG
- AdJLlOMhBy8GerkCivohlV+yUfABksM=
+ bh=q2vyb2KEZ7b1rOARt2VnTGJGBkqDHtOIhkMjjuhsVvY=;
+ b=ZyUXkrBsf5gateVw4tk2XUxpxCTW2uB+7pr76ne4w7obbxXsWPKVPwtnqWbvnMwIrAS5kb
+ zQ7Do+GIzfNwFdhNwE2JMYwA9qz4Fpkv9lL3QnCV4Mv5laWOLZuFyOE07TTHmeE84Qw25B
+ pmsICtwjre5DuMw8CfoCSIU/1p4MoKM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-293-7yl-BI6HOxOA_teR_ti3ng-1; Sun, 04 Apr 2021 13:23:02 -0400
-X-MC-Unique: 7yl-BI6HOxOA_teR_ti3ng-1
+ us-mta-528-7jpR_ORuOymklGEQLKxuiA-1; Sun, 04 Apr 2021 13:23:05 -0400
+X-MC-Unique: 7jpR_ORuOymklGEQLKxuiA-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED85E10CE790;
- Sun,  4 Apr 2021 17:23:00 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F17348030A0;
+ Sun,  4 Apr 2021 17:23:03 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-112-13.ams2.redhat.com [10.36.112.13])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4EE4510027C4;
- Sun,  4 Apr 2021 17:22:58 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 50BEB10027C4;
+ Sun,  4 Apr 2021 17:23:01 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com,
  linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
  kvmarm@lists.cs.columbia.edu, maz@kernel.org, drjones@redhat.com,
  alexandru.elisei@arm.com
-Subject: [PATCH v5 3/8] KVM: arm/arm64: vgic: Reset base address on
- kvm_vgic_dist_destroy()
-Date: Sun,  4 Apr 2021 19:22:38 +0200
-Message-Id: <20210404172243.504309-4-eric.auger@redhat.com>
+Subject: [PATCH v5 4/8] docs: kvm: devices/arm-vgic-v3: enhance
+ KVM_DEV_ARM_VGIC_CTRL_INIT doc
+Date: Sun,  4 Apr 2021 19:22:39 +0200
+Message-Id: <20210404172243.504309-5-eric.auger@redhat.com>
 In-Reply-To: <20210404172243.504309-1-eric.auger@redhat.com>
 References: <20210404172243.504309-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -92,51 +92,35 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On vgic_dist_destroy(), the addresses are not reset. However for
-kvm selftest purpose this would allow to continue the test execution
-even after a failure when running KVM_RUN. So let's reset the
-base addresses.
+kvm_arch_vcpu_precreate() returns -EBUSY if the vgic is
+already initialized. So let's document that KVM_DEV_ARM_VGIC_CTRL_INIT
+must be called after all vcpu creations.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
 
 v1 -> v2:
-- use dist-> in the else and add braces
+- Must be called after all vcpu creations ->
+  Must be called after all VCPUs have been created as per
+  Alexandru's suggestion
 ---
- arch/arm64/kvm/vgic/vgic-init.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ Documentation/virt/kvm/devices/arm-vgic-v3.rst | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-index 052917deb149..cf6faa0aeddb 100644
---- a/arch/arm64/kvm/vgic/vgic-init.c
-+++ b/arch/arm64/kvm/vgic/vgic-init.c
-@@ -335,13 +335,16 @@ static void kvm_vgic_dist_destroy(struct kvm *kvm)
- 	kfree(dist->spis);
- 	dist->spis = NULL;
- 	dist->nr_spis = 0;
-+	dist->vgic_dist_base = VGIC_ADDR_UNDEF;
+diff --git a/Documentation/virt/kvm/devices/arm-vgic-v3.rst b/Documentation/virt/kvm/devices/arm-vgic-v3.rst
+index 5dd3bff51978..51e5e5762571 100644
+--- a/Documentation/virt/kvm/devices/arm-vgic-v3.rst
++++ b/Documentation/virt/kvm/devices/arm-vgic-v3.rst
+@@ -228,7 +228,7 @@ Groups:
  
--	if (kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
-+	if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
- 		list_for_each_entry_safe(rdreg, next, &dist->rd_regions, list) {
- 			list_del(&rdreg->list);
- 			kfree(rdreg);
- 		}
- 		INIT_LIST_HEAD(&dist->rd_regions);
-+	} else {
-+		dist->vgic_cpu_base = VGIC_ADDR_UNDEF;
- 	}
+     KVM_DEV_ARM_VGIC_CTRL_INIT
+       request the initialization of the VGIC, no additional parameter in
+-      kvm_device_attr.addr.
++      kvm_device_attr.addr. Must be called after all VCPUs have been created.
+     KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES
+       save all LPI pending bits into guest RAM pending tables.
  
- 	if (vgic_has_its(kvm))
-@@ -362,6 +365,7 @@ void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
- 	vgic_flush_pending_lpis(vcpu);
- 
- 	INIT_LIST_HEAD(&vgic_cpu->ap_list_head);
-+	vgic_cpu->rd_iodev.base_addr = VGIC_ADDR_UNDEF;
- }
- 
- /* To be called with kvm->lock held */
 -- 
 2.26.3
 
