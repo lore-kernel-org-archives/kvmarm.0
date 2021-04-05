@@ -2,60 +2,59 @@ Return-Path: <SRS0=Uj0Q=JC=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F231C433ED
-	for <kvmarm@archiver.kernel.org>; Mon,  5 Apr 2021 10:10:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8912C433B4
+	for <kvmarm@archiver.kernel.org>; Mon,  5 Apr 2021 10:12:49 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id EF26861278
-	for <kvmarm@archiver.kernel.org>; Mon,  5 Apr 2021 10:10:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF26861278
+	by mail.kernel.org (Postfix) with ESMTP id 2DAC461393
+	for <kvmarm@archiver.kernel.org>; Mon,  5 Apr 2021 10:12:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DAC461393
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 830264BAA9;
-	Mon,  5 Apr 2021 06:10:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B4734B629;
+	Mon,  5 Apr 2021 06:12:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ZVOqQ+luX66s; Mon,  5 Apr 2021 06:10:25 -0400 (EDT)
+	with ESMTP id dlL316ZRk0gK; Mon,  5 Apr 2021 06:12:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E2C044BAA1;
-	Mon,  5 Apr 2021 06:10:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 72DDC4BAAC;
+	Mon,  5 Apr 2021 06:12:47 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 27D0E4BA24
- for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Apr 2021 06:10:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BEAD4BAAC
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Apr 2021 06:12:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TpxVDtjB0A0V for <kvmarm@lists.cs.columbia.edu>;
- Mon,  5 Apr 2021 06:10:24 -0400 (EDT)
+ with ESMTP id S3sVFzvh3wlK for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  5 Apr 2021 06:12:45 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 18EDD4BAA1
- for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Apr 2021 06:10:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2112D4BA24
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Apr 2021 06:12:45 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 612AB611CC;
- Mon,  5 Apr 2021 10:10:21 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 17B7A61278;
+ Mon,  5 Apr 2021 10:12:44 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1lTMBX-005eqm-5T; Mon, 05 Apr 2021 11:10:19 +0100
-Date: Mon, 05 Apr 2021 11:10:18 +0100
-Message-ID: <878s5xf3ed.wl-maz@kernel.org>
+ id 1lTMDq-005es2-39; Mon, 05 Apr 2021 11:12:42 +0100
+Date: Mon, 05 Apr 2021 11:12:41 +0100
+Message-ID: <877dlhf3ae.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v5 7/8] KVM: arm64: vgic-v3: Expose GICR_TYPER.Last for
- userspace
-In-Reply-To: <20210404172243.504309-8-eric.auger@redhat.com>
+Subject: Re: [PATCH v5 0/8] KVM/ARM: Some vgic fixes and init sequence KVM
+ selftests
+In-Reply-To: <20210404172243.504309-1-eric.auger@redhat.com>
 References: <20210404172243.504309-1-eric.auger@redhat.com>
- <20210404172243.504309-8-eric.auger@redhat.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -87,78 +86,33 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sun, 04 Apr 2021 18:22:42 +0100,
+Hi Eric,
+
+On Sun, 04 Apr 2021 18:22:35 +0100,
 Eric Auger <eric.auger@redhat.com> wrote:
 > 
-> Commit 23bde34771f1 ("KVM: arm64: vgic-v3: Drop the
-> reporting of GICR_TYPER.Last for userspace") temporarily fixed
-> a bug identified when attempting to access the GICR_TYPER
-> register before the redistributor region setting, but dropped
-> the support of the LAST bit.
+> While writting vgic v3 init sequence KVM selftests I noticed some
+> relatively minor issues. This was also the opportunity to try to
+> fix the issue laterly reported by Zenghui, related to the RDIST_TYPER
+> last bit emulation. The final patch is a first batch of VGIC init
+> sequence selftests. Of course they can be augmented with a lot more
+> register access tests, but let's try to move forward incrementally ...
 > 
-> Emulating the GICR_TYPER.Last bit still makes sense for
-> architecture compliance though. This patch restores its support
-> (if the redistributor region was set) while keeping the code safe.
+> Best Regards
 > 
-> We introduce a new helper, vgic_mmio_vcpu_rdist_is_last() which
-> computes whether a redistributor is the highest one of a series
-> of redistributor contributor pages.
+> Eric
 > 
-> With this new implementation we do not need to have a uaccess
-> read accessor anymore.
+> This series can be found at:
+> https://github.com/eauger/linux/tree/vgic_kvmselftests_v5
 > 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> 
-> ---
-> 
+> History:
 > v4 -> v5:
-> - redist region list now is sorted by @base
-> - change the implementation according to Marc's understanding of
->   the spec
-> ---
->  arch/arm64/kvm/vgic/vgic-mmio-v3.c | 58 +++++++++++++++++-------------
->  include/kvm/arm_vgic.h             |  1 +
->  2 files changed, 34 insertions(+), 25 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> index e1ed0c5a8eaa..03a253785700 100644
-> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> @@ -251,45 +251,52 @@ static void vgic_mmio_write_v3r_ctlr(struct kvm_vcpu *vcpu,
->  		vgic_enable_lpis(vcpu);
->  }
->  
-> +static bool vgic_mmio_vcpu_rdist_is_last(struct kvm_vcpu *vcpu)
-> +{
-> +	struct vgic_dist *vgic = &vcpu->kvm->arch.vgic;
-> +	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-> +	struct vgic_redist_region *iter, *rdreg = vgic_cpu->rdreg;
-> +
-> +	if (!rdreg)
-> +		return false;
-> +
-> +	if (vgic_cpu->rdreg_index < rdreg->free_index - 1) {
-> +		return false;
-> +	} else if (rdreg->count && vgic_cpu->rdreg_index == (rdreg->count - 1)) {
-> +		struct list_head *rd_regions = &vgic->rd_regions;
-> +		gpa_t end = rdreg->base + rdreg->count * KVM_VGIC_V3_REDIST_SIZE;
-> +
-> +		/*
-> +		 * the rdist is the last one of the redist region,
-> +		 * check whether there is no other contiguous rdist region
-> +		 */
-> +		list_for_each_entry(iter, rd_regions, list) {
-> +			if (iter->base == end && iter->free_index > 0)
-> +				return false;
-> +		}
+> - rewrite the last bit detection according to Marc's
+>   interpretation of the spec and modify the kvm selftests
+>   accordingly
 
-In the above notes, you state that the region list is now sorted by
-base address, but I really can't see what sorts that list. And the
-lines above indicate that you are still iterating over the whole RD
-regions.
-
-It's not a big deal (the code is now simple enough), but that's just
-to confirm that I understand what is going on here.
+Have you dropped v4's patch #1? It did seem to fix an actual issue,
+didn't it?
 
 Thanks,
 
