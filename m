@@ -4,62 +4,62 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D5A8C43462
-	for <kvmarm@archiver.kernel.org>; Mon,  5 Apr 2021 16:05:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2640C433B4
+	for <kvmarm@archiver.kernel.org>; Mon,  5 Apr 2021 16:05:34 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9C9A0613F0
-	for <kvmarm@archiver.kernel.org>; Mon,  5 Apr 2021 16:05:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C9A0613F0
+	by mail.kernel.org (Postfix) with ESMTP id 6303D613E3
+	for <kvmarm@archiver.kernel.org>; Mon,  5 Apr 2021 16:05:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6303D613E3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0BA254BA85;
-	Mon,  5 Apr 2021 12:05:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 176A74B7DC;
+	Mon,  5 Apr 2021 12:05:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id afbBmrh5ivK2; Mon,  5 Apr 2021 12:05:21 -0400 (EDT)
+	with ESMTP id 74KBsY+k6Rn4; Mon,  5 Apr 2021 12:05:32 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C3DC14B3D9;
-	Mon,  5 Apr 2021 12:05:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EA5AE4B9ED;
+	Mon,  5 Apr 2021 12:05:32 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 10E954B38B
- for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Apr 2021 12:05:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 55F134B7DC
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Apr 2021 12:05:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zJmFZKa9vbsI for <kvmarm@lists.cs.columbia.edu>;
- Mon,  5 Apr 2021 12:05:20 -0400 (EDT)
+ with ESMTP id jIjwWM2EwjDY for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  5 Apr 2021 12:05:31 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0F1874B389
- for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Apr 2021 12:05:20 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 240E6613EE;
- Mon,  5 Apr 2021 16:05:18 +0000 (UTC)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 371A94B38B
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Apr 2021 12:05:31 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 6A6B5613E0;
+ Mon,  5 Apr 2021 16:05:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1617638719;
- bh=U0NkCqrtt2/5zmQhJfG2/sgeLgus2MBC9ny/6oHh/0c=;
+ s=k20201202; t=1617638730;
+ bh=6upIme9NTn4kmRIF1WoJlNw5F51QogKQSHyzMkHD3m4=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=cO8TdGzRw58OdpcUPQvXwhToA7XW285ZAJGZGiqKeDSiRyoDuEt19bN0msKoOA/RV
- ISDVWy/D6FY7ZfQIptNanWY7SYLgbcZl0GdvflJpkM0gkhfzVF4qq3QAKxDscWqWiL
- TfTY381yvmaBxFSPE8j0MN8VaSJK9d3h6UXxZylaP5fvOy4PU19MefTGZ3r8Gkx8TF
- 2xvqKjl3Hk0evZt4A1KvtkmJW5lX6S5uk6bAAnKYlpz9m3gRQcvZpEryw6ZA/YFNZH
- D3F4IWJvjgQNe3y0Wj1+Dg306iz80yyA/JIYsSpXfCFsuNT4dmkUnVnpqD1QtCQQ7X
- GqD4oFv3tTPDg==
+ b=MvUYBP0Sul+9nUdyZ9U117OKirbuoWnOfVLxUQsgxd1jlyzpIAI7wHG2l+lyOak6J
+ dw7POqmJjP3OeKEaAOe5IlQ40rEhIy0R3wz4pzXRJICN+y2euiFXarTg24OTCDSAuN
+ Fjp42x8G/iVC/UKVI9qed3NtflxSQhRYfEyTAsZCJqNiNLDDznE+DuavxCyjH7wZGj
+ dJ2UzmUcjiJ4Z0k347oVAj7oGHm/8R+POUAN1UZ+9jhBH7FT+JiSqEie9nPDHYDiD9
+ Kxrj3nvLuJO1m/WCZceni00a65F+rSWjG4ttKcVv3Jt3YxOgp1Maclrts5oqfsQ+7Z
+ BA7JEt6JpiwfQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 2/8] KVM: arm64: Disable guest access to trace
+Subject: [PATCH AUTOSEL 4.14 2/5] KVM: arm64: Disable guest access to trace
  filter controls
-Date: Mon,  5 Apr 2021 12:05:09 -0400
-Message-Id: <20210405160515.269020-2-sashal@kernel.org>
+Date: Mon,  5 Apr 2021 12:05:23 -0400
+Message-Id: <20210405160526.269140-2-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210405160515.269020-1-sashal@kernel.org>
-References: <20210405160515.269020-1-sashal@kernel.org>
+In-Reply-To: <20210405160526.269140-1-sashal@kernel.org>
+References: <20210405160526.269140-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -108,11 +108,11 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  2 files changed, 3 insertions(+)
 
 diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index a3b6f58d188c..6d43f7901da2 100644
+index f88611e241f0..72ed11292df3 100644
 --- a/arch/arm64/include/asm/kvm_arm.h
 +++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -198,6 +198,7 @@
- #define CPTR_EL2_DEFAULT	CPTR_EL2_RES1
+@@ -191,6 +191,7 @@
+ #define CPTR_EL2_DEFAULT	0x000033ff
  
  /* Hyp Debug Configuration Register bits */
 +#define MDCR_EL2_TTRF		(1 << 19)
@@ -120,10 +120,10 @@ index a3b6f58d188c..6d43f7901da2 100644
  #define MDCR_EL2_E2PB_MASK	(UL(0x3))
  #define MDCR_EL2_E2PB_SHIFT	(UL(12))
 diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-index 4e722d73a3c3..3606f6b89094 100644
+index dbadfaf850a7..2da4f45ab0bb 100644
 --- a/arch/arm64/kvm/debug.c
 +++ b/arch/arm64/kvm/debug.c
-@@ -100,6 +100,7 @@ void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu)
+@@ -96,6 +96,7 @@ void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu)
   *  - Debug ROM Address (MDCR_EL2_TDRA)
   *  - OS related registers (MDCR_EL2_TDOSA)
   *  - Statistical profiler (MDCR_EL2_TPMS/MDCR_EL2_E2PB)
@@ -131,7 +131,7 @@ index 4e722d73a3c3..3606f6b89094 100644
   *
   * Additionally, KVM only traps guest accesses to the debug registers if
   * the guest is not actively using them (see the KVM_ARM64_DEBUG_DIRTY
-@@ -123,6 +124,7 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+@@ -118,6 +119,7 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
  	vcpu->arch.mdcr_el2 = __this_cpu_read(mdcr_el2) & MDCR_EL2_HPMN_MASK;
  	vcpu->arch.mdcr_el2 |= (MDCR_EL2_TPM |
  				MDCR_EL2_TPMS |
