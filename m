@@ -2,62 +2,74 @@ Return-Path: <SRS0=nct1=JE=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B10E0C43460
-	for <kvmarm@archiver.kernel.org>; Wed,  7 Apr 2021 15:35:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38C89C433ED
+	for <kvmarm@archiver.kernel.org>; Wed,  7 Apr 2021 15:50:32 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2C5FA613CE
-	for <kvmarm@archiver.kernel.org>; Wed,  7 Apr 2021 15:35:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C5FA613CE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 9EA6C61382
+	for <kvmarm@archiver.kernel.org>; Wed,  7 Apr 2021 15:50:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EA6C61382
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 87D744B918;
-	Wed,  7 Apr 2021 11:35:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 281E64B637;
+	Wed,  7 Apr 2021 11:50:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id amuQr7-mLmZB; Wed,  7 Apr 2021 11:35:26 -0400 (EDT)
+	with ESMTP id jUrA3bKVLzBH; Wed,  7 Apr 2021 11:50:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 489754B888;
-	Wed,  7 Apr 2021 11:35:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E85A34B8D8;
+	Wed,  7 Apr 2021 11:50:29 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BD8B4B7ED
- for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Apr 2021 11:35:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BCDDD4B701
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Apr 2021 11:50:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id K7cl2UcwuSWr for <kvmarm@lists.cs.columbia.edu>;
- Wed,  7 Apr 2021 11:35:23 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F9774B7CD
- for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Apr 2021 11:35:23 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 470861424;
- Wed,  7 Apr 2021 08:35:23 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 402603F792;
- Wed,  7 Apr 2021 08:35:21 -0700 (PDT)
-Subject: Re: [RFC PATCH v3 2/2] KVM: arm64: Distinguish cases of memcache
- allocations completely
-To: Yanan Wang <wangyanan55@huawei.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210326031654.3716-1-wangyanan55@huawei.com>
- <20210326031654.3716-3-wangyanan55@huawei.com>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <4348b555-2a38-6f00-8ef0-0d5fd801d753@arm.com>
-Date: Wed, 7 Apr 2021 16:35:55 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.9.0
-MIME-Version: 1.0
-In-Reply-To: <20210326031654.3716-3-wangyanan55@huawei.com>
-Content-Language: en-US
+ with ESMTP id O1NTmKQd0nGj for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  7 Apr 2021 11:50:27 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B8C554B637
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Apr 2021 11:50:27 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id ACF8C61262;
+ Wed,  7 Apr 2021 15:50:26 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1lUARk-0066qv-IZ; Wed, 07 Apr 2021 16:50:24 +0100
+Date: Wed, 07 Apr 2021 16:50:23 +0100
+Message-ID: <875z0yp000.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH v3 1/2] Documentation: KVM: Document KVM_GUESTDBG_USE_HW
+ control flag for arm64
+In-Reply-To: <20210407144857.199746-2-alexandru.elisei@arm.com>
+References: <20210407144857.199746-1-alexandru.elisei@arm.com>
+ <20210407144857.199746-2-alexandru.elisei@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+ pbonzini@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: linux-arm-kernel@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -74,77 +86,47 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Yanan,
-
-On 3/26/21 3:16 AM, Yanan Wang wrote:
-> With a guest translation fault, the memcache pages are not needed if KVM
-> is only about to install a new leaf entry into the existing page table.
-> And with a guest permission fault, the memcache pages are also not needed
-> for a write_fault in dirty-logging time if KVM is only about to update
-> the existing leaf entry instead of collapsing a block entry into a table.
->
-> By comparing fault_granule and vma_pagesize, cases that require allocations
-> from memcache and cases that don't can be distinguished completely.
->
-> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
+On Wed, 07 Apr 2021 15:48:56 +0100,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> Commit 21b6f32f9471 ("KVM: arm64: guest debug, define API headers") added
+> the arm64 KVM_GUESTDBG_USE_HW flag for the KVM_SET_GUEST_DEBUG ioctl and
+> commit 834bf88726f0 ("KVM: arm64: enable KVM_CAP_SET_GUEST_DEBUG")
+> documented and implemented the flag functionality. Since its introduction,
+> at no point was the flag known by any name other than KVM_GUESTDBG_USE_HW
+> for the arm64 architecture, so refer to it as such in the documentation.
+> 
+> CC: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 > ---
->  arch/arm64/kvm/mmu.c | 25 ++++++++++++-------------
->  1 file changed, 12 insertions(+), 13 deletions(-)
->
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 1eec9f63bc6f..05af40dc60c1 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -810,19 +810,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	gfn = fault_ipa >> PAGE_SHIFT;
->  	mmap_read_unlock(current->mm);
+>  Documentation/virt/kvm/api.rst | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 307f2fcf1b02..ffe15e02caca 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -3335,7 +3335,8 @@ The top 16 bits of the control field are architecture specific control
+>  flags which can include the following:
 >  
-> -	/*
-> -	 * Permission faults just need to update the existing leaf entry,
-> -	 * and so normally don't require allocations from the memcache. The
-> -	 * only exception to this is when dirty logging is enabled at runtime
-> -	 * and a write fault needs to collapse a block entry into a table.
-> -	 */
-> -	if (fault_status != FSC_PERM || (logging_active && write_fault)) {
-> -		ret = kvm_mmu_topup_memory_cache(memcache,
-> -						 kvm_mmu_cache_min_pages(kvm));
-> -		if (ret)
-> -			return ret;
-> -	}
-> -
->  	mmu_seq = vcpu->kvm->mmu_notifier_seq;
->  	/*
->  	 * Ensure the read of mmu_notifier_seq happens before we call
-> @@ -880,6 +867,18 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	else if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC))
->  		prot |= KVM_PGTABLE_PROT_X;
->  
-> +	/*
-> +	 * Allocations from the memcache are required only when granule of the
-> +	 * lookup level where the guest fault happened exceeds vma_pagesize,
-> +	 * which means new page tables will be created in the fault handlers.
-> +	 */
-> +	if (fault_granule > vma_pagesize) {
-> +		ret = kvm_mmu_topup_memory_cache(memcache,
-> +						 kvm_mmu_cache_min_pages(kvm));
-> +		if (ret)
-> +			return ret;
-> +	}
+>    - KVM_GUESTDBG_USE_SW_BP:     using software breakpoints [x86, arm64]
+> -  - KVM_GUESTDBG_USE_HW_BP:     using hardware breakpoints [x86, s390, arm64]
+> +  - KVM_GUESTDBG_USE_HW_BP:     using hardware breakpoints [x86, s390]
+> +  - KVM_GUESTDBG_USE_HW:        using hardware debug events [arm64]
+>    - KVM_GUESTDBG_INJECT_DB:     inject DB type exception [x86]
+>    - KVM_GUESTDBG_INJECT_BP:     inject BP type exception [x86]
+>    - KVM_GUESTDBG_EXIT_PENDING:  trigger an immediate guest exit [s390]
 
-As I explained in v1 [1], this looks correct to me. I still think that someone
-else should have a look, but if Marc decides to pick up this patch as-is, he can
-add my Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>.
-
-[1] https://lore.kernel.org/lkml/2c65bff2-be7f-b20c-9265-939bc73185b6@arm.com/
+Huh, nice catch. I wonder why we had that difference. It clearly
+wasn't intentional. Eventually, we probably should introduce the same
+definition for arm64, and keep the old one as an unfortunate legacy.
 
 Thanks,
 
-Alex
+	M.
 
-> +
->  	/*
->  	 * Under the premise of getting a FSC_PERM fault, we just need to relax
->  	 * permissions only if vma_pagesize equals fault_granule. Otherwise,
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
