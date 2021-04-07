@@ -2,67 +2,67 @@ Return-Path: <SRS0=nct1=JE=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64D42C433B4
-	for <kvmarm@archiver.kernel.org>; Wed,  7 Apr 2021 15:59:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABA7EC433B4
+	for <kvmarm@archiver.kernel.org>; Wed,  7 Apr 2021 17:26:45 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BFED961279
-	for <kvmarm@archiver.kernel.org>; Wed,  7 Apr 2021 15:58:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFED961279
+	by mail.kernel.org (Postfix) with ESMTP id 1F1F96128D
+	for <kvmarm@archiver.kernel.org>; Wed,  7 Apr 2021 17:26:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F1F96128D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C62B4B703;
-	Wed,  7 Apr 2021 11:58:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A196E4B942;
+	Wed,  7 Apr 2021 13:26:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id YJDXABqiteLB; Wed,  7 Apr 2021 11:58:58 -0400 (EDT)
+	with ESMTP id wInoB3H6it4b; Wed,  7 Apr 2021 13:26:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DAB54B8DE;
-	Wed,  7 Apr 2021 11:58:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D8F84B944;
+	Wed,  7 Apr 2021 13:26:43 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7BE3D4B8DE
- for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Apr 2021 11:58:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CCA6D4B942
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Apr 2021 13:26:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id l-k6iYxMB8Z2 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  7 Apr 2021 11:58:56 -0400 (EDT)
+ with ESMTP id jzn-vsV7Gfzz for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  7 Apr 2021 13:26:42 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 876E04B703
- for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Apr 2021 11:58:56 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id B179861154;
- Wed,  7 Apr 2021 15:58:53 +0000 (UTC)
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=hot-poop.lan)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
- (envelope-from <maz@kernel.org>)
- id 1lUAZv-0066z6-PJ; Wed, 07 Apr 2021 16:58:51 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Subject: Re: [PATCH v3 0/2] KVM: arm64: Debug fixes
-Date: Wed,  7 Apr 2021 16:58:48 +0100
-Message-Id: <161781112106.1984801.2208066478824922199.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210407144857.199746-1-alexandru.elisei@arm.com>
-References: <20210407144857.199746-1-alexandru.elisei@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DFBE94B93C
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Apr 2021 13:26:41 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id C1CB761245;
+ Wed,  7 Apr 2021 17:26:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1617816400;
+ bh=X0TznhRQ1rNxYkaGVTvSVgcMdtW1s20eY3i7PGc1DyI=;
+ h=From:To:Cc:Subject:Date:From;
+ b=kIKMCnKJHZUhcF0j7TRm268bp2eLc+q8uBA03fX/4M51X2fyLiGbYbJgsb9Uo6I21
+ HPBaSbHjaY8Mt3/O+jXaBNnl3BEfPKofjxGs0J75TytOzfeyrX0HvfdhsOZPqUkttf
+ Fgy+TmPa8WFe0YIEAphXWes1GOYabuwCcpMq7ZNwXyik97KHKI+djm/2MmvE77Rvdh
+ vj6VilT6ua5X/fbpSGuFEuS+maCIfhyV4iKeBsfNa1No+2Z3MtRYTEBE9SkwsE9EnL
+ nz6LnCgVALJzCe0wx0D5RN8cd6PH273SeFkyj0yLGbNbbzxsOCgrxMG6SjEeW5+yE8
+ ka5t4bs9ftKMg==
+From: Mike Rapoport <rppt@kernel.org>
+To: linux-arm-kernel@lists.infradead.org
+Subject: [RFC/RFT PATCH 0/3] arm64: drop pfn_valid_within() and simplify
+ pfn_valid()
+Date: Wed,  7 Apr 2021 20:26:04 +0300
+Message-Id: <20210407172607.8812-1-rppt@kernel.org>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+Cc: David Hildenbrand <david@redhat.com>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Anshuman Khandual <anshuman.khandual@arm.com>, linux-kernel@vger.kernel.org,
+ Mike Rapoport <rppt@linux.ibm.com>, linux-mm@kvack.org,
+ kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, Mike Rapoport <rppt@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -79,30 +79,46 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 7 Apr 2021 15:48:55 +0100, Alexandru Elisei wrote:
-> v2 can be found at [1]. Patch #1 in this series is new.
-> 
-> Tested on an odroid-c4 with VHE. vcpu->arch.mdcr_el2 is calculated to be
-> 0x84e66. Without this patch, reading MDCR_EL2 after the first vcpu_load() in
-> kvm_arch_vcpu_ioctl_run() returns 0, subsequent reads return 0xe66
-> (FEAT_TFF and FEAT_SPE are not implemented by the PE). With this patch, all
-> reads, including the first time the VCPU is run, return 0xe66.
-> 
-> [...]
+From: Mike Rapoport <rppt@linux.ibm.com>
 
-Applied to kvm-arm64/debug-5.13, thanks!
+Hi,
 
-[1/2] Documentation: KVM: Document KVM_GUESTDBG_USE_HW control flag for arm64
-      commit: feb5dc3de03711d846f0b729cb12fc05cbe49ccb
-[2/2] KVM: arm64: Initialize VCPU mdcr_el2 before loading it
-      commit: 263d6287da1433aba11c5b4046388f2cdf49675c
+These patches aim to remove CONFIG_HOLES_IN_ZONE and essentially hardwire
+pfn_valid_within() to 1. 
 
-Cheers,
+The idea is to mark NOMAP pages as reserved in the memory map and restore
+the intended semantics of pfn_valid() to designate availability of struct
+page for a pfn.
 
-	M.
+With this the core mm will be able to cope with the fact that it cannot use
+NOMAP pages and the holes created by NOMAP ranges within MAX_ORDER blocks
+will be treated correctly even without the need for pfn_valid_within.
+
+The patches are only boot tested on qemu-system-aarch64 so I'd really
+appreciate memory stress tests on real hardware.
+
+If this actually works we'll be one step closer to drop custom pfn_valid()
+on arm64 altogether.
+
+Mike Rapoport (3):
+  memblock: update initialization of reserved pages
+  arm64: decouple check whether pfn is normal memory from pfn_valid()
+  arm64: drop pfn_valid_within() and simplify pfn_valid()
+
+ arch/arm64/Kconfig              |  3 ---
+ arch/arm64/include/asm/memory.h |  2 +-
+ arch/arm64/include/asm/page.h   |  1 +
+ arch/arm64/kvm/mmu.c            |  2 +-
+ arch/arm64/mm/init.c            | 10 ++++++++--
+ arch/arm64/mm/ioremap.c         |  4 ++--
+ arch/arm64/mm/mmu.c             |  2 +-
+ mm/memblock.c                   | 23 +++++++++++++++++++++--
+ 8 files changed, 35 insertions(+), 12 deletions(-)
+
+
+base-commit: e49d033bddf5b565044e2abe4241353959bc9120
 -- 
-Without deviation from the norm, progress is not possible.
-
+2.28.0
 
 _______________________________________________
 kvmarm mailing list
