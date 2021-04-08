@@ -2,67 +2,59 @@ Return-Path: <SRS0=McpZ=JF=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46169C433B4
-	for <kvmarm@archiver.kernel.org>; Thu,  8 Apr 2021 14:19:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD86CC433B4
+	for <kvmarm@archiver.kernel.org>; Thu,  8 Apr 2021 15:36:22 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B164A61151
-	for <kvmarm@archiver.kernel.org>; Thu,  8 Apr 2021 14:19:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B164A61151
+	by mail.kernel.org (Postfix) with ESMTP id 0D84B610A3
+	for <kvmarm@archiver.kernel.org>; Thu,  8 Apr 2021 15:36:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D84B610A3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 381544B94A;
-	Thu,  8 Apr 2021 10:19:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C18A4BA6F;
+	Thu,  8 Apr 2021 11:36:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 2GcqtgQWWJFI; Thu,  8 Apr 2021 10:19:04 -0400 (EDT)
+	with ESMTP id IXMJVcHNZ2VD; Thu,  8 Apr 2021 11:36:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A3814B968;
-	Thu,  8 Apr 2021 10:19:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D7434BA8C;
+	Thu,  8 Apr 2021 11:36:20 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 244C84B94A
- for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Apr 2021 10:19:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B1F6D4BA6F
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Apr 2021 11:36:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id d8gjPC2JQrRu for <kvmarm@lists.cs.columbia.edu>;
- Thu,  8 Apr 2021 10:19:02 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CF8BA4B74C
- for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Apr 2021 10:19:01 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id B87866024A;
- Thu,  8 Apr 2021 14:18:57 +0000 (UTC)
-Date: Thu, 8 Apr 2021 15:18:55 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Steven Price <steven.price@arm.com>
-Subject: Re: [PATCH v10 2/6] arm64: kvm: Introduce MTE VM feature
-Message-ID: <20210408141853.GA7676@arm.com>
-References: <e0b88560-34e1-dcc4-aaa7-9a7a5b771824@arm.com>
- <20210330103013.GD18075@arm.com>
- <8977120b-841d-4882-2472-6e403bc9c797@redhat.com>
- <20210331092109.GA21921@arm.com>
- <d545a051-a02a-4c3a-0afe-66612839ba32@redhat.com>
- <86a968c8-7a0e-44a4-28c3-bac62c2b7d65@arm.com>
- <20210331184311.GA10737@arm.com>
- <e2612bd8-b356-a9cd-cfdf-26f4aa813578@arm.com>
- <20210407151458.GC21451@arm.com>
- <5e5bf772-1e4d-ca59-a9d8-058a72dfad4f@arm.com>
+ with ESMTP id AZ8hQteqBy4c for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  8 Apr 2021 11:36:18 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F4194B42F
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Apr 2021 11:36:18 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 64F18D6E;
+ Thu,  8 Apr 2021 08:36:17 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 52BE03F694;
+ Thu,  8 Apr 2021 08:36:16 -0700 (PDT)
+Subject: Re: [PATCH] KVM: arm64: Fully zero the vcpu state on reset
+To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+References: <20210407181308.2265808-1-maz@kernel.org>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <c34842b2-215a-e9d0-7d9d-a8cd64ed1171@arm.com>
+Date: Thu, 8 Apr 2021 16:36:40 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.9.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <5e5bf772-1e4d-ca59-a9d8-058a72dfad4f@arm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: David Hildenbrand <david@redhat.com>, Marc Zyngier <maz@kernel.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
- Juan Quintela <quintela@redhat.com>, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, Thomas Gleixner <tglx@linutronix.de>,
- Will Deacon <will@kernel.org>, Dave Martin <Dave.Martin@arm.com>,
- linux-kernel@vger.kernel.org
+In-Reply-To: <20210407181308.2265808-1-maz@kernel.org>
+Content-Language: en-US
+Cc: kernel-team@android.com, stable@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -79,71 +71,60 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Apr 07, 2021 at 04:52:54PM +0100, Steven Price wrote:
-> On 07/04/2021 16:14, Catalin Marinas wrote:
-> > On Wed, Apr 07, 2021 at 11:20:18AM +0100, Steven Price wrote:
-> > > On 31/03/2021 19:43, Catalin Marinas wrote:
-> > > > When a slot is added by the VMM, if it asked for MTE in guest (I guess
-> > > > that's an opt-in by the VMM, haven't checked the other patches), can we
-> > > > reject it if it's is going to be mapped as Normal Cacheable but it is a
-> > > > ZONE_DEVICE (i.e. !kvm_is_device_pfn() + one of David's suggestions to
-> > > > check for ZONE_DEVICE)? This way we don't need to do more expensive
-> > > > checks in set_pte_at().
-> > > 
-> > > The problem is that KVM allows the VMM to change the memory backing a slot
-> > > while the guest is running. This is obviously useful for the likes of
-> > > migration, but ultimately means that even if you were to do checks at the
-> > > time of slot creation, you would need to repeat the checks at set_pte_at()
-> > > time to ensure a mischievous VMM didn't swap the page for a problematic one.
-> > 
-> > Does changing the slot require some KVM API call? Can we intercept it
-> > and do the checks there?
-> 
-> As David has already replied - KVM uses MMU notifiers, so there's not really
-> a good place to intercept this before the fault.
-> 
-> > Maybe a better alternative for the time being is to add a new
-> > kvm_is_zone_device_pfn() and force KVM_PGTABLE_PROT_DEVICE if it returns
-> > true _and_ the VMM asked for MTE in guest. We can then only set
-> > PG_mte_tagged if !device.
-> 
-> KVM already has a kvm_is_device_pfn(), and yes I agree restricting the MTE
-> checks to only !kvm_is_device_pfn() makes sense (I have the fix in my branch
-> locally).
+Hi Marc,
 
-Indeed, you can skip it if kvm_is_device_pfn(). In addition, with MTE,
-I'd also mark a pfn as 'device' in user_mem_abort() if
-pfn_to_online_page() is NULL as we don't want to map it as Cacheable in
-Stage 2. It's unlikely that we'll trip over this path but just in case.
+On 4/7/21 7:13 PM, Marc Zyngier wrote:
+> On vcpu reset, we expect all the registers to be brought back
+> to their initial state, which happens to be a bunch of zeroes.
+>
+> However, some recent commit broke this, and is now leaving a bunch
+> of registers (such as a FP state) with whatever was left by the
+> guest. My bad.
+>
+> Just zero the whole vcpu context on reset. It is more than we
+> strictly need, but at least we won't miss anything. This also
+> zeroes the __hyp_running_vcpu pointer, which is always NULL
+> for a vcpu anyway.
 
-(can we have a ZONE_DEVICE _online_ pfn or by definition they are
-considered offline?)
+Had a look at struct kvm_cpu_context and indeed the only field which doesn't
+represent a guest register is __hyp_running_vcpu. Did a grep for all the places
+where __hyp_running_vcpu is used, and indeed the assumption is that for a guest
+the pointer is NULL, as __sysreg_restore_el1_state() relies on it.
 
-> > BTW, after a page is restored from swap, how long do we keep the
-> > metadata around? I think we can delete it as soon as it was restored and
-> > PG_mte_tagged was set. Currently it looks like we only do this when the
-> > actual page was freed or swapoff. I haven't convinced myself that it's
-> > safe to do this for swapoff unless it guarantees that all the ptes
-> > sharing a page have been restored.
-> 
-> My initial thought was to free the metadata immediately. However it turns
-> out that the following sequence can happen:
-> 
->  1. Swap out a page
->  2. Swap the page in *read only*
->  3. Discard the page
->  4. Swap the page in again
-> 
-> So there's no writing of the swap data again before (3). This works nicely
-> with a swap device because after writing a page it stays there forever, so
-> if you know it hasn't been modified it's pointless rewriting it. Sadly it's
-> not quite so ideal with the MTE tags which are currently kept in RAM.
+>
+> Cc: stable@vger.kernel.org
+> Fixes: e47c2055c68e ("KVM: arm64: Make struct kvm_regs userspace-only")
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/reset.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> index bd354cd45d28..ef1c49a1a3ad 100644
+> --- a/arch/arm64/kvm/reset.c
+> +++ b/arch/arm64/kvm/reset.c
+> @@ -240,8 +240,8 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+>  		break;
+>  	}
+>  
+> -	/* Reset core registers */
+> -	memset(vcpu_gp_regs(vcpu), 0, sizeof(*vcpu_gp_regs(vcpu)));
+> +	/* Zero all registers */
+> +	memset(&vcpu->arch.ctxt, 0, sizeof(vcpu->arch.ctxt));
 
-I missed this scenario. So we need to keep it around as long as the
-corresponding swap storage is still valid.
+Checked that code earlier in the function does not touch the guest registers from
+vcpu->arch.ctxt, to make sure we're not overwriting other reset values by mistake.
+Looks good to me:
 
--- 
-Catalin
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+Thanks,
+
+Alex
+
+>  	vcpu_gp_regs(vcpu)->pstate = pstate;
+>  
+>  	/* Reset system registers */
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
