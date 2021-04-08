@@ -1,70 +1,65 @@
-Return-Path: <SRS0=nct1=JE=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=McpZ=JF=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2A13C433B4
-	for <kvmarm@archiver.kernel.org>; Wed,  7 Apr 2021 20:57:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED971C433B4
+	for <kvmarm@archiver.kernel.org>; Thu,  8 Apr 2021 05:12:04 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6A71961205
-	for <kvmarm@archiver.kernel.org>; Wed,  7 Apr 2021 20:57:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A71961205
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 3F049610F7
+	for <kvmarm@archiver.kernel.org>; Thu,  8 Apr 2021 05:12:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F049610F7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D9B904B847;
-	Wed,  7 Apr 2021 16:57:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 921824BA2A;
+	Thu,  8 Apr 2021 01:12:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ylVebirAd61l; Wed,  7 Apr 2021 16:57:13 -0400 (EDT)
+	with ESMTP id fr5fbPU25rTW; Thu,  8 Apr 2021 01:12:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 116FA4B89F;
-	Wed,  7 Apr 2021 16:57:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 62DC74BA02;
+	Thu,  8 Apr 2021 01:12:02 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D6DA44B89F
- for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Apr 2021 16:57:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 06D6D4B9EE
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Apr 2021 01:12:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nLVjTFgQIPcE for <kvmarm@lists.cs.columbia.edu>;
- Wed,  7 Apr 2021 16:57:10 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 78AF14B895
- for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Apr 2021 16:57:10 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 2258661131;
- Wed,  7 Apr 2021 20:57:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1617829027;
- bh=1Q2oOXUjRJwdCV+qOUNBymw/y9FGIdzI1jb6hvbjuZc=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=jJg/YWZzVoLd0kBX/rSjkyXLycEWYmylXQ1cHt7V/whjGUBXNxjAc3sv9P5XuEiwm
- ZBGB2LMPwY8/fh4rqU6SuG8gck+wGF6mabpwZ38fKlVyQp6aZTL5+u4uSQwjP3m4l/
- GJaJFuEWSt6jJcXQtwFv45OT1478G3MES4y6mB1C6tdYBH3NJAUaO82M89AFI6yZ4u
- KkMH3yVUQqvV3vNWuYg3SzLN4uu0ISzfxEzctlSDWUjwA/Y+htRSGkeKoEkdxRTN5R
- SqLk3D1uLeLFmRwDIXyZMtCEL0h3U2jv3OZT9cGnMFG+YNR2kqWcP5Pw4Jw4szZKes
- WmJiDe4QKNKqg==
-Date: Wed, 7 Apr 2021 21:57:02 +0100
-From: Will Deacon <will@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [RFC PATCH v3 1/2] KVM: arm64: Move CMOs from user_mem_abort to
- the fault handlers
-Message-ID: <20210407205701.GA16198@willie-the-truck>
-References: <20210326031654.3716-1-wangyanan55@huawei.com>
- <20210326031654.3716-2-wangyanan55@huawei.com>
- <cd6c8a86-b7b2-3d3e-121a-c9d1cb23c4b3@arm.com>
+ with ESMTP id yGHQ0AKeiqUP for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  8 Apr 2021 01:11:59 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A95404B9EB
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Apr 2021 01:11:59 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C3EE81424;
+ Wed,  7 Apr 2021 22:11:58 -0700 (PDT)
+Received: from [10.163.67.84] (unknown [10.163.67.84])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 29B6E3F73D;
+ Wed,  7 Apr 2021 22:11:54 -0700 (PDT)
+Subject: Re: [RFC/RFT PATCH 3/3] arm64: drop pfn_valid_within() and simplify
+ pfn_valid()
+To: Mike Rapoport <rppt@kernel.org>, linux-arm-kernel@lists.infradead.org
+References: <20210407172607.8812-1-rppt@kernel.org>
+ <20210407172607.8812-4-rppt@kernel.org>
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+Message-ID: <7bc09505-72f1-e297-40a9-639b3e9b1c61@arm.com>
+Date: Thu, 8 Apr 2021 10:42:43 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <cd6c8a86-b7b2-3d3e-121a-c9d1cb23c4b3@arm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20210407172607.8812-4-rppt@kernel.org>
+Content-Language: en-US
+Cc: David Hildenbrand <david@redhat.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+ Mike Rapoport <rppt@linux.ibm.com>, linux-mm@kvack.org,
+ kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -81,19 +76,87 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Apr 07, 2021 at 04:31:31PM +0100, Alexandru Elisei wrote:
-> On 3/26/21 3:16 AM, Yanan Wang wrote:
-> > We currently uniformly permorm CMOs of D-cache and I-cache in function
-> > user_mem_abort before calling the fault handlers. If we get concurrent
-> > guest faults(e.g. translation faults, permission faults) or some really
-> > unnecessary guest faults caused by BBM, CMOs for the first vcpu are
+
+On 4/7/21 10:56 PM, Mike Rapoport wrote:
+> From: Mike Rapoport <rppt@linux.ibm.com>
 > 
-> I can't figure out what BBM means.
+> The arm64's version of pfn_valid() differs from the generic because of two
+> reasons:
+> 
+> * Parts of the memory map are freed during boot. This makes it necessary to
+>   verify that there is actual physical memory that corresponds to a pfn
+>   which is done by querying memblock.
+> 
+> * There are NOMAP memory regions. These regions are not mapped in the
+>   linear map and until the previous commit the struct pages representing
+>   these areas had default values.
+> 
+> As the consequence of absence of the special treatment of NOMAP regions in
+> the memory map it was necessary to use memblock_is_map_memory() in
+> pfn_valid() and to have pfn_valid_within() aliased to pfn_valid() so that
+> generic mm functionality would not treat a NOMAP page as a normal page.
+> 
+> Since the NOMAP regions are now marked as PageReserved(), pfn walkers and
+> the rest of core mm will treat them as unusable memory and thus
+> pfn_valid_within() is no longer required at all and can be disabled by
+> removing CONFIG_HOLES_IN_ZONE on arm64.
 
-Oh, I know that one! BBM means "Break Before Make". Not to be confused with
-DBM (Dirty Bit Management) or BFM (Bit Field Move).
+But what about the memory map that are freed during boot (mentioned above).
+Would not they still cause CONFIG_HOLES_IN_ZONE to be applicable and hence
+pfn_valid_within() ?
 
-Will
+> 
+> pfn_valid() can be slightly simplified by replacing
+> memblock_is_map_memory() with memblock_is_memory().
+
+Just to understand this better, pfn_valid() will now return true for all
+MEMBLOCK_NOMAP based memory but that is okay as core MM would still ignore
+them as unusable memory for being PageReserved().
+
+> 
+> Signed-off-by: Mike Rapoport <rppt@linux.ibm.com>
+> ---
+>  arch/arm64/Kconfig   | 3 ---
+>  arch/arm64/mm/init.c | 4 ++--
+>  2 files changed, 2 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+> index e4e1b6550115..58e439046d05 100644
+> --- a/arch/arm64/Kconfig
+> +++ b/arch/arm64/Kconfig
+> @@ -1040,9 +1040,6 @@ config NEED_PER_CPU_EMBED_FIRST_CHUNK
+>  	def_bool y
+>  	depends on NUMA
+>  
+> -config HOLES_IN_ZONE
+> -	def_bool y
+> -
+>  source "kernel/Kconfig.hz"
+>  
+>  config ARCH_SPARSEMEM_ENABLE
+> diff --git a/arch/arm64/mm/init.c b/arch/arm64/mm/init.c
+> index 258b1905ed4a..bb6dd406b1f0 100644
+> --- a/arch/arm64/mm/init.c
+> +++ b/arch/arm64/mm/init.c
+> @@ -243,7 +243,7 @@ int pfn_valid(unsigned long pfn)
+>  
+>  	/*
+>  	 * ZONE_DEVICE memory does not have the memblock entries.
+> -	 * memblock_is_map_memory() check for ZONE_DEVICE based
+> +	 * memblock_is_memory() check for ZONE_DEVICE based
+>  	 * addresses will always fail. Even the normal hotplugged
+>  	 * memory will never have MEMBLOCK_NOMAP flag set in their
+>  	 * memblock entries. Skip memblock search for all non early
+> @@ -254,7 +254,7 @@ int pfn_valid(unsigned long pfn)
+>  		return pfn_section_valid(ms, pfn);
+>  }
+>  #endif
+> -	return memblock_is_map_memory(addr);
+> +	return memblock_is_memory(addr);
+>  }
+>  EXPORT_SYMBOL(pfn_valid);
+>  
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
