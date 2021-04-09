@@ -1,69 +1,60 @@
-Return-Path: <SRS0=McpZ=JF=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=dNnP=JG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AC3BC433B4
-	for <kvmarm@archiver.kernel.org>; Thu,  8 Apr 2021 18:21:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3664C433ED
+	for <kvmarm@archiver.kernel.org>; Fri,  9 Apr 2021 03:37:12 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9E48361131
-	for <kvmarm@archiver.kernel.org>; Thu,  8 Apr 2021 18:21:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E48361131
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 28E9061175
+	for <kvmarm@archiver.kernel.org>; Fri,  9 Apr 2021 03:37:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28E9061175
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 215B64BB3E;
-	Thu,  8 Apr 2021 14:21:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A7A344BCC4;
+	Thu,  8 Apr 2021 23:37:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id yRj80giUJqPW; Thu,  8 Apr 2021 14:21:22 -0400 (EDT)
+	with ESMTP id a1g0A4b+xgo9; Thu,  8 Apr 2021 23:37:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E42CE4B924;
-	Thu,  8 Apr 2021 14:21:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6433E4BC93;
+	Thu,  8 Apr 2021 23:37:10 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C32854B921
- for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Apr 2021 14:21:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2198C4B8A4
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Apr 2021 23:37:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8GCfBfpDuya8 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  8 Apr 2021 14:21:20 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5FCD84B914
- for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Apr 2021 14:21:20 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 5B5F561130;
- Thu,  8 Apr 2021 18:21:15 +0000 (UTC)
-Date: Thu, 8 Apr 2021 19:21:12 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH v10 2/6] arm64: kvm: Introduce MTE VM feature
-Message-ID: <20210408182112.GC7676@arm.com>
-References: <8977120b-841d-4882-2472-6e403bc9c797@redhat.com>
- <20210331092109.GA21921@arm.com>
- <d545a051-a02a-4c3a-0afe-66612839ba32@redhat.com>
- <86a968c8-7a0e-44a4-28c3-bac62c2b7d65@arm.com>
- <20210331184311.GA10737@arm.com>
- <e2612bd8-b356-a9cd-cfdf-26f4aa813578@arm.com>
- <20210407151458.GC21451@arm.com>
- <5e5bf772-1e4d-ca59-a9d8-058a72dfad4f@arm.com>
- <20210408141853.GA7676@arm.com>
- <bfcd1c41-92fb-d4ee-34b1-7beb6b6c9fd8@redhat.com>
+ with ESMTP id 2-Byzcf+B-CJ for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  8 Apr 2021 23:37:06 -0400 (EDT)
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 210234B78D
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Apr 2021 23:37:06 -0400 (EDT)
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.60])
+ by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4FGkK515WQz9xgL;
+ Fri,  9 Apr 2021 11:34:49 +0800 (CST)
+Received: from DESKTOP-TMVL5KK.china.huawei.com (10.174.187.128) by
+ DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
+ 14.3.498.0; Fri, 9 Apr 2021 11:36:54 +0800
+From: Yanan Wang <wangyanan55@huawei.com>
+To: Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, "Alexandru
+ Elisei" <alexandru.elisei@arm.com>, Catalin Marinas
+ <catalin.marinas@arm.com>, <kvmarm@lists.cs.columbia.edu>,
+ <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: [PATCH v4 0/2] KVM: arm64: Improve efficiency of stage2 page table
+Date: Fri, 9 Apr 2021 11:36:50 +0800
+Message-ID: <20210409033652.28316-1-wangyanan55@huawei.com>
+X-Mailer: git-send-email 2.8.4.windows.1
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <bfcd1c41-92fb-d4ee-34b1-7beb6b6c9fd8@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: qemu-devel@nongnu.org, Marc Zyngier <maz@kernel.org>,
- Juan Quintela <quintela@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Steven Price <steven.price@arm.com>, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, Thomas Gleixner <tglx@linutronix.de>,
- Will Deacon <will@kernel.org>, Dave Martin <Dave.Martin@arm.com>,
- linux-kernel@vger.kernel.org
+X-Originating-IP: [10.174.187.128]
+X-CFilter-Loop: Reflected
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -80,59 +71,100 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Apr 08, 2021 at 08:16:17PM +0200, David Hildenbrand wrote:
-> On 08.04.21 16:18, Catalin Marinas wrote:
-> > On Wed, Apr 07, 2021 at 04:52:54PM +0100, Steven Price wrote:
-> > > On 07/04/2021 16:14, Catalin Marinas wrote:
-> > > > On Wed, Apr 07, 2021 at 11:20:18AM +0100, Steven Price wrote:
-> > > > > On 31/03/2021 19:43, Catalin Marinas wrote:
-> > > > > > When a slot is added by the VMM, if it asked for MTE in guest (I guess
-> > > > > > that's an opt-in by the VMM, haven't checked the other patches), can we
-> > > > > > reject it if it's is going to be mapped as Normal Cacheable but it is a
-> > > > > > ZONE_DEVICE (i.e. !kvm_is_device_pfn() + one of David's suggestions to
-> > > > > > check for ZONE_DEVICE)? This way we don't need to do more expensive
-> > > > > > checks in set_pte_at().
-> > > > > 
-> > > > > The problem is that KVM allows the VMM to change the memory backing a slot
-> > > > > while the guest is running. This is obviously useful for the likes of
-> > > > > migration, but ultimately means that even if you were to do checks at the
-> > > > > time of slot creation, you would need to repeat the checks at set_pte_at()
-> > > > > time to ensure a mischievous VMM didn't swap the page for a problematic one.
-> > > > 
-> > > > Does changing the slot require some KVM API call? Can we intercept it
-> > > > and do the checks there?
-> > > 
-> > > As David has already replied - KVM uses MMU notifiers, so there's not really
-> > > a good place to intercept this before the fault.
-> > > 
-> > > > Maybe a better alternative for the time being is to add a new
-> > > > kvm_is_zone_device_pfn() and force KVM_PGTABLE_PROT_DEVICE if it returns
-> > > > true _and_ the VMM asked for MTE in guest. We can then only set
-> > > > PG_mte_tagged if !device.
-> > > 
-> > > KVM already has a kvm_is_device_pfn(), and yes I agree restricting the MTE
-> > > checks to only !kvm_is_device_pfn() makes sense (I have the fix in my branch
-> > > locally).
-> > 
-> > Indeed, you can skip it if kvm_is_device_pfn(). In addition, with MTE,
-> > I'd also mark a pfn as 'device' in user_mem_abort() if
-> > pfn_to_online_page() is NULL as we don't want to map it as Cacheable in
-> > Stage 2. It's unlikely that we'll trip over this path but just in case.
-> > 
-> > (can we have a ZONE_DEVICE _online_ pfn or by definition they are
-> > considered offline?)
-> 
-> By definition (and implementation) offline. When you get a page =
-> pfn_to_online_page() with page != NULL, that one should never be ZONE_DEVICE
-> (otherwise it would be a BUG).
-> 
-> As I said, things are different when exposing dax memory via dax/kmem to the
-> buddy. But then, we are no longer talking about ZONE_DEVICE.
+Hi,
 
-Thanks David, it's clear now.
+This series makes some efficiency improvement of stage2 page table code,
+and there are some test results to quantify the benefit of each patch.
+
+Changelogs:
+v3->v4:
+- perform D-cache flush if we are not mapping device memory
+- rebased on top of mainline v5.12-rc6
+- v3: https://lore.kernel.org/lkml/20210326031654.3716-1-wangyanan55@huawei.com/
+
+v2->v3:
+- drop patch #3 in v2
+- retest v3 based on v5.12-rc2
+- v2: https://lore.kernel.org/lkml/20210310094319.18760-1-wangyanan55@huawei.com/
+
+v1->v2:
+- rebased on top of mainline v5.12-rc2
+- also move CMOs of I-cache to the fault handlers
+- retest v2 based on v5.12-rc2
+- v1: https://lore.kernel.org/lkml/20210208112250.163568-1-wangyanan55@huawei.com/
+
+About this v4 series:
+Patch #1:
+We currently uniformly permorm CMOs of D-cache and I-cache in function
+user_mem_abort before calling the fault handlers. If we get concurrent
+guest faults(e.g. translation faults, permission faults) or some really
+unnecessary guest faults caused by BBM, CMOs for the first vcpu are
+necessary while the others later are not.
+
+By moving CMOs to the fault handlers, we can easily identify conditions
+where they are really needed and avoid the unnecessary ones. As it's a
+time consuming process to perform CMOs especially when flushing a block
+range, so this solution reduces much load of kvm and improve efficiency
+of the page table code.
+
+So let's move both clean of D-cache and invalidation of I-cache to the
+map path and move only invalidation of I-cache to the permission path.
+Since the original APIs for CMOs in mmu.c are only called in function
+user_mem_abort, we now also move them to pgtable.c.
+
+After this patch, in function stage2_map_walker_try_leaf (map path),
+we flush D-cache if we are not mapping device memory and invalidate
+I-cache if we are adding executable permission. And in the function
+stage2_attr_walker (permission path), we invalidate I-cache if we are
+adding executable permission. The logic is consistent with current
+code in user_mem_abort (without this patch).
+
+The following results represent the benefit of patch #1 alone, and they
+were tested by [1] (kvm/selftest) that I have posted recently.
+[1] https://lore.kernel.org/lkml/20210302125751.19080-1-wangyanan55@huawei.com/
+
+When there are muitiple vcpus concurrently accessing the same memory region,
+we can test the execution time of KVM creating new mappings, updating the
+permissions of old mappings from RO to RW, and rebuilding the blocks after
+they have been split.
+
+hardware platform: HiSilicon Kunpeng920 Server
+host kernel: Linux mainline v5.12-rc2
+
+cmdline: ./kvm_page_table_test -m 4 -s anonymous -b 1G -v 80
+           (80 vcpus, 1G memory, page mappings(normal 4K))
+KVM_CREATE_MAPPINGS: before 104.35s -> after  90.42s  +13.35%
+KVM_UPDATE_MAPPINGS: before  78.64s -> after  75.45s  + 4.06%
+
+cmdline: ./kvm_page_table_test -m 4 -s anonymous_thp -b 20G -v 40
+           (40 vcpus, 20G memory, block mappings(THP 2M))
+KVM_CREATE_MAPPINGS: before  15.66s -> after   6.92s  +55.80%
+KVM_UPDATE_MAPPINGS: before 178.80s -> after 123.35s  +31.00%
+KVM_REBUILD_BLOCKS:  before 187.34s -> after 131.76s  +30.65%
+
+cmdline: ./kvm_page_table_test -m 4 -s anonymous_hugetlb_1gb -b 20G -v 40
+           (40 vcpus, 20G memory, block mappings(HUGETLB 1G))
+KVM_CREATE_MAPPINGS: before 104.54s -> after   3.70s  +96.46%
+KVM_UPDATE_MAPPINGS: before 174.20s -> after 115.94s  +33.44%
+KVM_REBUILD_BLOCKS:  before 103.95s -> after   2.96s  +97.15%
+
+Patch #2:
+A new method to distinguish cases of memcache allocations is introduced.
+By comparing fault_granule and vma_pagesize, cases that require allocations
+from memcache and cases that don't can be distinguished completely.
+
+Yanan Wang (2):
+  KVM: arm64: Move CMOs from user_mem_abort to the fault handlers
+  KVM: arm64: Distinguish cases of memcache allocations completely
+
+ arch/arm64/include/asm/kvm_mmu.h | 31 ---------------
+ arch/arm64/kvm/hyp/pgtable.c     | 68 +++++++++++++++++++++++++-------
+ arch/arm64/kvm/mmu.c             | 48 ++++++++--------------
+ 3 files changed, 69 insertions(+), 78 deletions(-)
 
 -- 
-Catalin
+2.19.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
