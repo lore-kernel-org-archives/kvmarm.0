@@ -2,55 +2,52 @@ Return-Path: <SRS0=dNnP=JG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66F2BC433B4
-	for <kvmarm@archiver.kernel.org>; Fri,  9 Apr 2021 15:21:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A3E9C433ED
+	for <kvmarm@archiver.kernel.org>; Fri,  9 Apr 2021 15:21:41 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 05834610CF
-	for <kvmarm@archiver.kernel.org>; Fri,  9 Apr 2021 15:21:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05834610CF
+	by mail.kernel.org (Postfix) with ESMTP id F22D0610D1
+	for <kvmarm@archiver.kernel.org>; Fri,  9 Apr 2021 15:21:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F22D0610D1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A3B434BB96;
-	Fri,  9 Apr 2021 11:21:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CEDB4BB90;
+	Fri,  9 Apr 2021 11:21:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 4xeLVCU+F8m2; Fri,  9 Apr 2021 11:21:36 -0400 (EDT)
+	with ESMTP id QHLYv-pfEUEn; Fri,  9 Apr 2021 11:21:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 496984BC80;
-	Fri,  9 Apr 2021 11:21:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F92D4BB93;
+	Fri,  9 Apr 2021 11:21:39 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 132B74BB8D
- for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Apr 2021 11:21:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D56E4BB8E
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Apr 2021 11:21:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BQUeOjCZkHUA for <kvmarm@lists.cs.columbia.edu>;
- Fri,  9 Apr 2021 11:21:34 -0400 (EDT)
+ with ESMTP id SfsZx3fvY4XA for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  9 Apr 2021 11:21:36 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EA8CC4BB8E
- for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Apr 2021 11:21:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8EEA44BC9A
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Apr 2021 11:21:36 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 987BE11B3;
- Fri,  9 Apr 2021 08:21:33 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 264A51FB;
+ Fri,  9 Apr 2021 08:21:31 -0700 (PDT)
 Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 80FB83F694;
- Fri,  9 Apr 2021 08:21:32 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 21E773F694;
+ Fri,  9 Apr 2021 08:21:30 -0700 (PDT)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: maz@kernel.org, linux-arm-kernel@lists.infradead.org,
  kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 2/2] KVM: arm64: Don't advertise FEAT_SPE to guests
-Date: Fri,  9 Apr 2021 16:21:54 +0100
-Message-Id: <20210409152154.198566-3-alexandru.elisei@arm.com>
+Subject: [PATCH 0/2] KVM: arm64: Hide SPE from guests
+Date: Fri,  9 Apr 2021 16:21:52 +0100
+Message-Id: <20210409152154.198566-1-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210409152154.198566-1-alexandru.elisei@arm.com>
-References: <20210409152154.198566-1-alexandru.elisei@arm.com>
 MIME-Version: 1.0
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -68,34 +65,26 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Even though KVM sets up MDCR_EL2 to trap accesses to the SPE buffer and
-sampling control registers and to inject an undefined exception, the
-presence of FEAT_SPE is still advertised in the ID_AA64DFR0_EL1 register,
-if the hardware supports it. Getting an undefined exception when accessing
-a register usually happens for a hardware feature which is not implemented,
-and indeed this is how PMU emulation is handled when the virtual machine
-has been created without the KVM_ARM_VCPU_PMU_V3 feature. Let's be
-consistent and never advertise FEAT_SPE, because KVM doesn't have support
-for emulating it yet.
+This was part of the KVM SPE series that I posted some time ago [1]. The
+series didn't get too much attention, so I've decided to send this
+fix/cleanup/improvement separately, to make it easier to review.
 
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
- arch/arm64/kvm/sys_regs.c | 2 ++
- 1 file changed, 2 insertions(+)
+I've split the original patch into two because it makes more sense to me
+this way, but I'm not opposed to squashing the series back into a single
+patch if that is preferred.
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 402cd11aa4fc..61ee9bfb8826 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1063,6 +1063,8 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
- 		val = cpuid_feature_cap_perfmon_field(val,
- 						      ID_AA64DFR0_PMUVER_SHIFT,
- 						      kvm_vcpu_has_pmu(vcpu) ? ID_AA64DFR0_PMUVER_8_4 : 0);
-+		/* Hide SPE from guests */
-+		val &= ~FEATURE(ID_AA64DFR0_PMSVER);
- 		break;
- 	case SYS_ID_DFR0_EL1:
- 		/* Limit guests to PMUv3 for ARMv8.4 */
+Based on v5.12-rc6.
+
+[1] https://www.spinics.net/lists/kvm-arm/msg42962.html
+
+Alexandru Elisei (2):
+  KVM: arm64: Don't print warning when trapping SPE registers
+  KVM: arm64: Don't advertise FEAT_SPE to guests
+
+ arch/arm64/include/asm/sysreg.h |  2 ++
+ arch/arm64/kvm/sys_regs.c       | 15 +++++++++++++++
+ 2 files changed, 17 insertions(+)
+
 -- 
 2.31.1
 
