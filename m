@@ -2,53 +2,74 @@ Return-Path: <SRS0=dNnP=JG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A3E9C433ED
-	for <kvmarm@archiver.kernel.org>; Fri,  9 Apr 2021 15:21:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 594CAC433B4
+	for <kvmarm@archiver.kernel.org>; Fri,  9 Apr 2021 17:19:07 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id F22D0610D1
-	for <kvmarm@archiver.kernel.org>; Fri,  9 Apr 2021 15:21:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F22D0610D1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id C492861106
+	for <kvmarm@archiver.kernel.org>; Fri,  9 Apr 2021 17:19:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C492861106
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CEDB4BB90;
-	Fri,  9 Apr 2021 11:21:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F9DC4BBA4;
+	Fri,  9 Apr 2021 13:19:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QHLYv-pfEUEn; Fri,  9 Apr 2021 11:21:39 -0400 (EDT)
+	with ESMTP id keTeOKaojKSF; Fri,  9 Apr 2021 13:19:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F92D4BB93;
-	Fri,  9 Apr 2021 11:21:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DB554BAB7;
+	Fri,  9 Apr 2021 13:19:05 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D56E4BB8E
- for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Apr 2021 11:21:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 385434B625
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Apr 2021 13:19:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SfsZx3fvY4XA for <kvmarm@lists.cs.columbia.edu>;
- Fri,  9 Apr 2021 11:21:36 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8EEA44BC9A
- for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Apr 2021 11:21:36 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 264A51FB;
- Fri,  9 Apr 2021 08:21:31 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 21E773F694;
- Fri,  9 Apr 2021 08:21:30 -0700 (PDT)
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: maz@kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 0/2] KVM: arm64: Hide SPE from guests
-Date: Fri,  9 Apr 2021 16:21:52 +0100
-Message-Id: <20210409152154.198566-1-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.31.1
-MIME-Version: 1.0
+ with ESMTP id kPQa3EXL0fhV for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  9 Apr 2021 13:19:03 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D680A4BAB7
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Apr 2021 13:19:02 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 184006113A;
+ Fri,  9 Apr 2021 17:19:00 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1lUumY-006aai-5g; Fri, 09 Apr 2021 18:18:58 +0100
+Date: Fri, 09 Apr 2021 18:18:57 +0100
+Message-ID: <87im4vnzpa.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH] KVM: arm64: Fully zero the vcpu state on reset
+In-Reply-To: <c34842b2-215a-e9d0-7d9d-a8cd64ed1171@arm.com>
+References: <20210407181308.2265808-1-maz@kernel.org>
+ <c34842b2-215a-e9d0-7d9d-a8cd64ed1171@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, james.morse@arm.com, suzuki.poulose@arm.com,
+ kernel-team@android.com, stable@vger.kernel.org, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>, stable@vger.kernel.org,
+ kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -65,29 +86,78 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This was part of the KVM SPE series that I posted some time ago [1]. The
-series didn't get too much attention, so I've decided to send this
-fix/cleanup/improvement separately, to make it easier to review.
+On Thu, 08 Apr 2021 16:36:40 +0100,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> Hi Marc,
+> 
+> On 4/7/21 7:13 PM, Marc Zyngier wrote:
+> > On vcpu reset, we expect all the registers to be brought back
+> > to their initial state, which happens to be a bunch of zeroes.
+> >
+> > However, some recent commit broke this, and is now leaving a bunch
+> > of registers (such as a FP state) with whatever was left by the
+> > guest. My bad.
+> >
+> > Just zero the whole vcpu context on reset. It is more than we
+> > strictly need, but at least we won't miss anything. This also
+> > zeroes the __hyp_running_vcpu pointer, which is always NULL
+> > for a vcpu anyway.
+> 
+> Had a look at struct kvm_cpu_context and indeed the only field which doesn't
+> represent a guest register is __hyp_running_vcpu. Did a grep for all the places
+> where __hyp_running_vcpu is used, and indeed the assumption is that for a guest
+> the pointer is NULL, as __sysreg_restore_el1_state() relies on it.
+> 
+> >
+> > Cc: stable@vger.kernel.org
+> > Fixes: e47c2055c68e ("KVM: arm64: Make struct kvm_regs userspace-only")
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/reset.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> > index bd354cd45d28..ef1c49a1a3ad 100644
+> > --- a/arch/arm64/kvm/reset.c
+> > +++ b/arch/arm64/kvm/reset.c
+> > @@ -240,8 +240,8 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+> >  		break;
+> >  	}
+> >  
+> > -	/* Reset core registers */
+> > -	memset(vcpu_gp_regs(vcpu), 0, sizeof(*vcpu_gp_regs(vcpu)));
+> > +	/* Zero all registers */
+> > +	memset(&vcpu->arch.ctxt, 0, sizeof(vcpu->arch.ctxt));
+> 
+> Checked that code earlier in the function does not touch the guest
+> registers from vcpu->arch.ctxt, to make sure we're not overwriting
+> other reset values by mistake.
+> Looks good to me:
+> 
+> Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
-I've split the original patch into two because it makes more sense to me
-this way, but I'm not opposed to squashing the series back into a single
-patch if that is preferred.
+Scratch that, this is breaks the setting of CNTVOFF, which gets
+populated when we create the vcpu. The gotcha is that creating a vcpu
+resets CNTVOFF for *all* vcpus:
 
-Based on v5.12-rc6.
+* If the VMM creates all vcpus, then reset them all, this works
+  "fine": all the vcpus have CNTVOFF==0, which is an acceptable
+  departure from the current behaviour (where vtime starts at 0).
 
-[1] https://www.spinics.net/lists/kvm-arm/msg42962.html
+* If the VMM alternates vcpu creation and reset, then the last vcpu
+  ends up with a CNTVOFF set to 0, while all the others have a
+  different offset.
 
-Alexandru Elisei (2):
-  KVM: arm64: Don't print warning when trapping SPE registers
-  KVM: arm64: Don't advertise FEAT_SPE to guests
+QEMU does the former, and kvmtool the latter. Thanks to Will for the
+heads up. I'll drop the patch from -next and post a v2 shortly.
 
- arch/arm64/include/asm/sysreg.h |  2 ++
- arch/arm64/kvm/sys_regs.c       | 15 +++++++++++++++
- 2 files changed, 17 insertions(+)
+Thanks,
+
+	M.
 
 -- 
-2.31.1
-
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
