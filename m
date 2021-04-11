@@ -7,70 +7,70 @@ X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECB20C4360C
-	for <kvmarm@archiver.kernel.org>; Sun, 11 Apr 2021 11:48:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42064C43460
+	for <kvmarm@archiver.kernel.org>; Sun, 11 Apr 2021 11:48:39 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8BCEA6100B
-	for <kvmarm@archiver.kernel.org>; Sun, 11 Apr 2021 11:48:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BCEA6100B
+	by mail.kernel.org (Postfix) with ESMTP id D198D611CE
+	for <kvmarm@archiver.kernel.org>; Sun, 11 Apr 2021 11:48:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D198D611CE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 400F54B8ED;
-	Sun, 11 Apr 2021 07:48:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DAEB4B95E;
+	Sun, 11 Apr 2021 07:48:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id wSXaX9wZNUqZ; Sun, 11 Apr 2021 07:48:20 -0400 (EDT)
+	with ESMTP id xqVQ4qL7VhKZ; Sun, 11 Apr 2021 07:48:37 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 20ED04B92A;
-	Sun, 11 Apr 2021 07:48:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 495DC4B922;
+	Sun, 11 Apr 2021 07:48:37 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 44FF64B8ED
- for <kvmarm@lists.cs.columbia.edu>; Sun, 11 Apr 2021 07:48:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 64DE54B92C
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 11 Apr 2021 07:48:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PYPGfWWYqt7x for <kvmarm@lists.cs.columbia.edu>;
- Sun, 11 Apr 2021 07:48:18 -0400 (EDT)
+ with ESMTP id JODvF4nDrEGv for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 11 Apr 2021 07:48:34 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3AA024B6FF
- for <kvmarm@lists.cs.columbia.edu>; Sun, 11 Apr 2021 07:48:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5FE184B940
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 11 Apr 2021 07:48:34 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1618141697;
+ s=mimecast20190719; t=1618141714;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=uCo3xDZ5c+S4RyquMkLA7C9gsGABiuJwUVzp5ZRg8rc=;
- b=ShHNxFxzwBKbJ2QcG9OyUkcdqjhZv1n2sdtr/V27WpBHWaygT5zN32KjA9o3FZz6oxEMmu
- pYeVMjbrs9rxaAjI0uBLlTGsniLY+OAugLM2Pp8eo830mT1SWg58M3ajZ2lRRnZqS2zSGk
- 3N8YpcbqfGUVzznC5REe286DSdPrxvY=
+ bh=kl92JSFUmr54sQGQm/qSu5dfw55todExal9C+Uk7tHw=;
+ b=JOBWW2Bp5KE2RtFq08IsMTw15GvClBbWw25rL/rCwS+2o3DXEB0TsZSd2h/DYGgBwWv3/h
+ KEJEGk8/BnScSi56yGpBZ3lAmom1USUR6EwJMYJqViG409V1EEhXOvKIglXYZ7UKSC2lca
+ IwAXfvh3t2cm7q0iJPteo+YU908E9mI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-172-m5a4zVrMO3q3jZCzFDXXjw-1; Sun, 11 Apr 2021 07:48:16 -0400
-X-MC-Unique: m5a4zVrMO3q3jZCzFDXXjw-1
+ us-mta-168-c4vEzBzpN1mLExPzqiBEDQ-1; Sun, 11 Apr 2021 07:48:29 -0400
+X-MC-Unique: c4vEzBzpN1mLExPzqiBEDQ-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7DBA581744F;
- Sun, 11 Apr 2021 11:48:13 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 224C618397A3;
+ Sun, 11 Apr 2021 11:48:27 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-112-22.ams2.redhat.com [10.36.112.22])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 92F8F5C266;
- Sun, 11 Apr 2021 11:48:05 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D21B55C3E4;
+ Sun, 11 Apr 2021 11:48:13 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com,
  iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
  kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, will@kernel.org,
  maz@kernel.org, robin.murphy@arm.com, joro@8bytes.org,
  alex.williamson@redhat.com, tn@semihalf.com, zhukeqian1@huawei.com
-Subject: [PATCH v13 05/13] vfio/pci: Register an iommu fault handler
-Date: Sun, 11 Apr 2021 13:46:51 +0200
-Message-Id: <20210411114659.15051-6-eric.auger@redhat.com>
+Subject: [PATCH v13 06/13] vfio/pci: Allow to mmap the fault queue
+Date: Sun, 11 Apr 2021 13:46:52 +0200
+Message-Id: <20210411114659.15051-7-eric.auger@redhat.com>
 In-Reply-To: <20210411114659.15051-1-eric.auger@redhat.com>
 References: <20210411114659.15051-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -95,125 +95,121 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Register an IOMMU fault handler which records faults in
-the DMA FAULT region ring buffer. In a subsequent patch, we
-will add the signaling of a specific eventfd to allow the
-userspace to be notified whenever a new fault has shown up.
+The DMA FAULT region contains the fault ring buffer.
+There is benefit to let the userspace mmap this area.
+Expose this mmappable area through a sparse mmap entry
+and implement the mmap operation.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
-v11 -> v12:
-- take the fault_queue_lock before reading header (Zenghui)
-- also record recoverable errors
-- only WARN_ON if the unregistration returns -EBUSY
-- make vfio_pci_iommu_dev_fault_handler static
-
-v10 -> v11:
-- move iommu_unregister_device_fault_handler into
-  vfio_pci_disable
-- check fault_pages != 0
 
 v8 -> v9:
-- handler now takes an iommu_fault handle
-- eventfd signaling moved to a subsequent patch
-- check the fault type and return an error if != UNRECOV
-- still the fault handler registration can fail. We need to
-  reach an agreement about how to deal with the situation
-
-v3 -> v4:
-- move iommu_unregister_device_fault_handler to vfio_pci_release
+- remove unused index local variable in vfio_pci_fault_mmap
 ---
- drivers/vfio/pci/vfio_pci.c | 48 ++++++++++++++++++++++++++++++++++++-
- 1 file changed, 47 insertions(+), 1 deletion(-)
+ drivers/vfio/pci/vfio_pci.c | 61 +++++++++++++++++++++++++++++++++++--
+ 1 file changed, 58 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index f37cabddf1d6..92840e0f46bf 100644
+index 92840e0f46bf..eef76560be55 100644
 --- a/drivers/vfio/pci/vfio_pci.c
 +++ b/drivers/vfio/pci/vfio_pci.c
-@@ -27,6 +27,7 @@
- #include <linux/vgaarb.h>
- #include <linux/nospec.h>
- #include <linux/sched/mm.h>
-+#include <linux/circ_buf.h>
+@@ -316,21 +316,75 @@ static void vfio_pci_dma_fault_release(struct vfio_pci_device *vdev,
+ 	kfree(vdev->fault_pages);
+ }
  
- #include "vfio_pci_private.h"
- 
-@@ -333,6 +334,41 @@ static const struct vfio_pci_regops vfio_pci_dma_fault_regops = {
- 	.add_capability = vfio_pci_dma_fault_add_capability,
- };
- 
-+static int
-+vfio_pci_iommu_dev_fault_handler(struct iommu_fault *fault, void *data)
++static int vfio_pci_dma_fault_mmap(struct vfio_pci_device *vdev,
++				   struct vfio_pci_region *region,
++				   struct vm_area_struct *vma)
 +{
-+	struct vfio_pci_device *vdev = (struct vfio_pci_device *)data;
-+	struct vfio_region_dma_fault *reg =
-+		(struct vfio_region_dma_fault *)vdev->fault_pages;
-+	struct iommu_fault *new;
-+	u32 head, tail, size;
-+	int ret = -EINVAL;
++	u64 phys_len, req_len, pgoff, req_start;
++	unsigned long long addr;
++	unsigned int ret;
 +
-+	if (WARN_ON(!reg))
-+		return ret;
++	phys_len = region->size;
 +
-+	mutex_lock(&vdev->fault_queue_lock);
++	req_len = vma->vm_end - vma->vm_start;
++	pgoff = vma->vm_pgoff &
++		((1U << (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
++	req_start = pgoff << PAGE_SHIFT;
 +
-+	head = reg->head;
-+	tail = reg->tail;
-+	size = reg->nb_entries;
++	/* only the second page of the producer fault region is mmappable */
++	if (req_start < PAGE_SIZE)
++		return -EINVAL;
 +
-+	new = (struct iommu_fault *)(vdev->fault_pages + reg->offset +
-+				     head * reg->entry_size);
++	if (req_start + req_len > phys_len)
++		return -EINVAL;
 +
-+	if (CIRC_SPACE(head, tail, size) < 1) {
-+		ret = -ENOSPC;
-+		goto unlock;
-+	}
++	addr = virt_to_phys(vdev->fault_pages);
++	vma->vm_private_data = vdev;
++	vma->vm_pgoff = (addr >> PAGE_SHIFT) + pgoff;
 +
-+	*new = *fault;
-+	reg->head = (head + 1) % size;
-+	ret = 0;
-+unlock:
-+	mutex_unlock(&vdev->fault_queue_lock);
++	ret = remap_pfn_range(vma, vma->vm_start, vma->vm_pgoff,
++			      req_len, vma->vm_page_prot);
 +	return ret;
 +}
 +
- #define DMA_FAULT_RING_LENGTH 512
+ static int vfio_pci_dma_fault_add_capability(struct vfio_pci_device *vdev,
+ 					     struct vfio_pci_region *region,
+ 					     struct vfio_info_cap *caps)
+ {
++	struct vfio_region_info_cap_sparse_mmap *sparse = NULL;
+ 	struct vfio_region_info_cap_fault cap = {
+ 		.header.id = VFIO_REGION_INFO_CAP_DMA_FAULT,
+ 		.header.version = 1,
+ 		.version = 1,
+ 	};
+-	return vfio_info_add_capability(caps, &cap.header, sizeof(cap));
++	size_t size = sizeof(*sparse) + sizeof(*sparse->areas);
++	int ret;
++
++	ret = vfio_info_add_capability(caps, &cap.header, sizeof(cap));
++	if (ret)
++		return ret;
++
++	sparse = kzalloc(size, GFP_KERNEL);
++	if (!sparse)
++		return -ENOMEM;
++
++	sparse->header.id = VFIO_REGION_INFO_CAP_SPARSE_MMAP;
++	sparse->header.version = 1;
++	sparse->nr_areas = 1;
++	sparse->areas[0].offset = PAGE_SIZE;
++	sparse->areas[0].size = region->size - PAGE_SIZE;
++
++	ret = vfio_info_add_capability(caps, &sparse->header, size);
++	if (ret)
++		kfree(sparse);
++
++	return ret;
+ }
  
- static int vfio_pci_dma_fault_init(struct vfio_pci_device *vdev)
-@@ -377,6 +413,13 @@ static int vfio_pci_dma_fault_init(struct vfio_pci_device *vdev)
+ static const struct vfio_pci_regops vfio_pci_dma_fault_regops = {
+ 	.rw		= vfio_pci_dma_fault_rw,
+ 	.release	= vfio_pci_dma_fault_release,
++	.mmap		= vfio_pci_dma_fault_mmap,
+ 	.add_capability = vfio_pci_dma_fault_add_capability,
+ };
+ 
+@@ -404,7 +458,8 @@ static int vfio_pci_dma_fault_init(struct vfio_pci_device *vdev)
+ 		VFIO_REGION_TYPE_NESTED,
+ 		VFIO_REGION_SUBTYPE_NESTED_DMA_FAULT,
+ 		&vfio_pci_dma_fault_regops, size,
+-		VFIO_REGION_INFO_FLAG_READ | VFIO_REGION_INFO_FLAG_WRITE,
++		VFIO_REGION_INFO_FLAG_READ | VFIO_REGION_INFO_FLAG_WRITE |
++		VFIO_REGION_INFO_FLAG_MMAP,
+ 		vdev->fault_pages);
+ 	if (ret)
+ 		goto out;
+@@ -412,7 +467,7 @@ static int vfio_pci_dma_fault_init(struct vfio_pci_device *vdev)
+ 	header = (struct vfio_region_dma_fault *)vdev->fault_pages;
  	header->entry_size = sizeof(struct iommu_fault);
  	header->nb_entries = DMA_FAULT_RING_LENGTH;
- 	header->offset = sizeof(struct vfio_region_dma_fault);
-+
-+	ret = iommu_register_device_fault_handler(&vdev->pdev->dev,
-+					vfio_pci_iommu_dev_fault_handler,
-+					vdev);
-+	if (ret) /* the dma fault region is freed in vfio_pci_disable() */
-+		goto out;
-+
- 	return 0;
- out:
- 	kfree(vdev->fault_pages);
-@@ -500,7 +543,7 @@ static void vfio_pci_disable(struct vfio_pci_device *vdev)
- 	struct pci_dev *pdev = vdev->pdev;
- 	struct vfio_pci_dummy_resource *dummy_res, *tmp;
- 	struct vfio_pci_ioeventfd *ioeventfd, *ioeventfd_tmp;
--	int i, bar;
-+	int i, bar, ret;
+-	header->offset = sizeof(struct vfio_region_dma_fault);
++	header->offset = PAGE_SIZE;
  
- 	/* Stop the device from further DMA */
- 	pci_clear_master(pdev);
-@@ -509,6 +552,9 @@ static void vfio_pci_disable(struct vfio_pci_device *vdev)
- 				VFIO_IRQ_SET_ACTION_TRIGGER,
- 				vdev->irq_type, 0, 0, NULL);
- 
-+	ret = iommu_unregister_device_fault_handler(&vdev->pdev->dev);
-+	WARN_ON(ret == -EBUSY);
-+
- 	/* Device closed, don't need mutex here */
- 	list_for_each_entry_safe(ioeventfd, ioeventfd_tmp,
- 				 &vdev->ioeventfds_list, next) {
+ 	ret = iommu_register_device_fault_handler(&vdev->pdev->dev,
+ 					vfio_pci_iommu_dev_fault_handler,
 -- 
 2.26.3
 
