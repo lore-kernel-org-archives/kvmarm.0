@@ -2,76 +2,75 @@ Return-Path: <SRS0=aSj2=JI=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,URIBL_BLOCKED autolearn=ham
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CF0EC43461
-	for <kvmarm@archiver.kernel.org>; Sun, 11 Apr 2021 11:14:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD305C433B4
+	for <kvmarm@archiver.kernel.org>; Sun, 11 Apr 2021 11:15:03 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E841C611C9
-	for <kvmarm@archiver.kernel.org>; Sun, 11 Apr 2021 11:14:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E841C611C9
+	by mail.kernel.org (Postfix) with ESMTP id 4BBF2610CB
+	for <kvmarm@archiver.kernel.org>; Sun, 11 Apr 2021 11:15:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BBF2610CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F0AF4B91D;
-	Sun, 11 Apr 2021 07:14:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D1A754B92B;
+	Sun, 11 Apr 2021 07:15:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id YLEB2T7PXHUU; Sun, 11 Apr 2021 07:14:49 -0400 (EDT)
+	with ESMTP id zP8iCkK-L8iF; Sun, 11 Apr 2021 07:15:01 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8599E4B6C1;
-	Sun, 11 Apr 2021 07:14:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B94B34B606;
+	Sun, 11 Apr 2021 07:15:01 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ADE064B606
- for <kvmarm@lists.cs.columbia.edu>; Sun, 11 Apr 2021 07:14:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 22E864B4EE
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 11 Apr 2021 07:15:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ivcO9gJfRmkt for <kvmarm@lists.cs.columbia.edu>;
- Sun, 11 Apr 2021 07:14:47 -0400 (EDT)
+ with ESMTP id KQhIP0Q6o7C9 for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 11 Apr 2021 07:14:59 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C79374B55D
- for <kvmarm@lists.cs.columbia.edu>; Sun, 11 Apr 2021 07:14:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C3044B6E7
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 11 Apr 2021 07:14:59 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1618139687;
+ s=mimecast20190719; t=1618139699;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=nKOUQdjGGvMFd2q1Io59u7XNZkuFm/YEdxRPelfei3A=;
- b=IB/hMgTccgzW1PpJVgtby/MhJeWl4GHSw/q1jw6YwfHODtNNWII2CiWMXbNlwvLIAkoO7X
- NFwOtoptZugSyUpdXVBJKOkjJcuUZ6H23RKyHu4VUzEzIQu63NoomY7AGUrpvjnWqg9ZRj
- TN9xQ/xs+WTg+qBBMhLOxxgR2H/9Uq0=
+ bh=AJ2uVw0SKCZA1R1QtizkUP+QI1DO9DSYoJPpxdgJKAc=;
+ b=B0oo6NRcPSZwnkK2tlRZ8r/7dhErXrqsZhHyh5Ec/UdT4fLrbt9Q9WnQDF51sWbzx7uIsl
+ h3y7UJ2m9qPluYTYtzEmCjEruefCGdfyiNYkpmtzdgzItkW35R95YcWuIlKzoZqVBtQFtc
+ PKFtOXhVr0lp4lcX1vwFZEOM8bs3XlA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-393-ptZu9ssMPfa_XYGZfhaTpg-1; Sun, 11 Apr 2021 07:14:46 -0400
-X-MC-Unique: ptZu9ssMPfa_XYGZfhaTpg-1
+ us-mta-87-7xPYwrytPdm5RHBhYO5ZMg-1; Sun, 11 Apr 2021 07:14:55 -0400
+X-MC-Unique: 7xPYwrytPdm5RHBhYO5ZMg-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A5720188E3C4;
- Sun, 11 Apr 2021 11:14:42 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C378B802B5B;
+ Sun, 11 Apr 2021 11:14:51 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-112-22.ams2.redhat.com [10.36.112.22])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5368D100164A;
- Sun, 11 Apr 2021 11:14:29 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 29312100164A;
+ Sun, 11 Apr 2021 11:14:42 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com,
  iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
  kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, will@kernel.org,
  maz@kernel.org, robin.murphy@arm.com, joro@8bytes.org,
  alex.williamson@redhat.com, tn@semihalf.com, zhukeqian1@huawei.com
-Subject: [PATCH v15 10/12] iommu/smmuv3: Enforce incompatibility between
- nested mode and HW MSI regions
-Date: Sun, 11 Apr 2021 13:12:26 +0200
-Message-Id: <20210411111228.14386-11-eric.auger@redhat.com>
+Subject: [PATCH v15 11/12] iommu/smmuv3: Implement bind/unbind_guest_msi
+Date: Sun, 11 Apr 2021 13:12:27 +0200
+Message-Id: <20210411111228.14386-12-eric.auger@redhat.com>
 In-Reply-To: <20210411111228.14386-1-eric.auger@redhat.com>
 References: <20210411111228.14386-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -96,59 +95,80 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Nested mode currently is not compatible with HW MSI reserved regions.
-Indeed MSI transactions targeting this MSI doorbells bypass the SMMU.
-
-Let's check nested mode is not attempted in such configuration.
+The bind/unbind_guest_msi() callbacks check the domain
+is NESTED and redirect to the dma-iommu implementation.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
+
 ---
- drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 23 +++++++++++++++++++--
- 1 file changed, 21 insertions(+), 2 deletions(-)
+
+v6 -> v7:
+- remove device handle argument
+---
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 43 +++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
 
 diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-index c4794c21c35f..ec75219d6a52 100644
+index ec75219d6a52..3b0a67434f7d 100644
 --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
 +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-@@ -2472,6 +2472,23 @@ static bool arm_smmu_share_msi_domain(struct iommu_domain *domain,
- 	return share;
+@@ -2934,6 +2934,47 @@ static void arm_smmu_get_resv_regions(struct device *dev,
+ 	iommu_dma_get_resv_regions(dev, head);
  }
  
-+static bool arm_smmu_has_hw_msi_resv_region(struct device *dev)
++static int
++arm_smmu_bind_guest_msi(struct iommu_domain *domain,
++			dma_addr_t giova, phys_addr_t gpa, size_t size)
 +{
-+	struct iommu_resv_region *region;
-+	bool has_msi_resv_region = false;
-+	LIST_HEAD(resv_regions);
++	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
++	struct arm_smmu_device *smmu;
++	int ret = -EINVAL;
 +
-+	iommu_get_resv_regions(dev, &resv_regions);
-+	list_for_each_entry(region, &resv_regions, list) {
-+		if (region->type == IOMMU_RESV_MSI) {
-+			has_msi_resv_region = true;
-+			break;
-+		}
-+	}
-+	iommu_put_resv_regions(dev, &resv_regions);
-+	return has_msi_resv_region;
++	mutex_lock(&smmu_domain->init_mutex);
++	smmu = smmu_domain->smmu;
++	if (!smmu)
++		goto out;
++
++	if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
++		goto out;
++
++	ret = iommu_dma_bind_guest_msi(domain, giova, gpa, size);
++out:
++	mutex_unlock(&smmu_domain->init_mutex);
++	return ret;
 +}
 +
- static int arm_smmu_attach_dev(struct iommu_domain *domain, struct device *dev)
++static void
++arm_smmu_unbind_guest_msi(struct iommu_domain *domain, dma_addr_t giova)
++{
++	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
++	struct arm_smmu_device *smmu;
++
++	mutex_lock(&smmu_domain->init_mutex);
++	smmu = smmu_domain->smmu;
++	if (!smmu)
++		goto unlock;
++
++	if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
++		goto unlock;
++
++	iommu_dma_unbind_guest_msi(domain, giova);
++unlock:
++	mutex_unlock(&smmu_domain->init_mutex);
++}
++
+ static int arm_smmu_attach_pasid_table(struct iommu_domain *domain,
+ 				       struct iommu_pasid_table_config *cfg)
  {
- 	int ret = 0;
-@@ -2532,10 +2549,12 @@ static int arm_smmu_attach_dev(struct iommu_domain *domain, struct device *dev)
- 	/*
- 	 * In nested mode we must check all devices belonging to the
- 	 * domain share the same physical MSI doorbell. Otherwise nested
--	 * stage MSI binding is not supported.
-+	 * stage MSI binding is not supported. Also nested mode is not
-+	 * compatible with MSI HW reserved regions.
- 	 */
- 	if (smmu_domain->stage == ARM_SMMU_DOMAIN_NESTED &&
--		!arm_smmu_share_msi_domain(domain, dev)) {
-+		(!arm_smmu_share_msi_domain(domain, dev) ||
-+		 arm_smmu_has_hw_msi_resv_region(dev))) {
- 		ret = -EINVAL;
- 		goto out_unlock;
- 	}
+@@ -3209,6 +3250,8 @@ static struct iommu_ops arm_smmu_ops = {
+ 	.attach_pasid_table	= arm_smmu_attach_pasid_table,
+ 	.detach_pasid_table	= arm_smmu_detach_pasid_table,
+ 	.cache_invalidate	= arm_smmu_cache_invalidate,
++	.bind_guest_msi		= arm_smmu_bind_guest_msi,
++	.unbind_guest_msi	= arm_smmu_unbind_guest_msi,
+ 	.dev_has_feat		= arm_smmu_dev_has_feature,
+ 	.dev_feat_enabled	= arm_smmu_dev_feature_enabled,
+ 	.dev_enable_feat	= arm_smmu_dev_enable_feature,
 -- 
 2.26.3
 
