@@ -2,83 +2,75 @@ Return-Path: <SRS0=mbOA=JJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11497C433B4
-	for <kvmarm@archiver.kernel.org>; Mon, 12 Apr 2021 10:27:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F678C433ED
+	for <kvmarm@archiver.kernel.org>; Mon, 12 Apr 2021 15:00:54 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7AAB16121E
-	for <kvmarm@archiver.kernel.org>; Mon, 12 Apr 2021 10:27:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AAB16121E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id D0FC060FDA
+	for <kvmarm@archiver.kernel.org>; Mon, 12 Apr 2021 15:00:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0FC060FDA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 23EBD4B7FD;
-	Mon, 12 Apr 2021 06:27:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D5484B9B0;
+	Mon, 12 Apr 2021 11:00:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ReSGEdA9xZaD; Mon, 12 Apr 2021 06:27:11 -0400 (EDT)
+	with ESMTP id lV1-4BkEYBA5; Mon, 12 Apr 2021 11:00:52 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E5D2A4B80D;
-	Mon, 12 Apr 2021 06:27:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3121B4B8BC;
+	Mon, 12 Apr 2021 11:00:52 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 622B54B7FD
- for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Apr 2021 06:27:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 678B64B8B9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Apr 2021 11:00:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id B8gZ7ObuBmrl for <kvmarm@lists.cs.columbia.edu>;
- Mon, 12 Apr 2021 06:27:09 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F08C94B786
- for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Apr 2021 06:27:08 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ with ESMTP id LICnentQ0zN0 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 12 Apr 2021 11:00:49 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 32BCA4B8B0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Apr 2021 11:00:49 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1618239649;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=VNdKS9KNgagmrHQvjGL4Hvng5mswnO3U1Do4oQAu2Vo=;
+ b=RE0irDQIOBvmFEXB9ZjTIecA+9pQ5h+OMUMhFQESTMcYMa4o2itRfnjpx/DUxbxsKK+IAa
+ S6xDbGD7oVggk2P9vwjKSQ210YNk5IrlDs6mbHmQtoGQ6v3GSqplnsPZVipxVDe7OiVGxn
+ ZhFy0t9D1hzC/LLG+Vh9KLCq1IdIq2k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-290-zHNgWqTNMCqnuTnLJSnPSQ-1; Mon, 12 Apr 2021 11:00:47 -0400
+X-MC-Unique: zHNgWqTNMCqnuTnLJSnPSQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id C93BB6134F;
- Mon, 12 Apr 2021 10:27:07 +0000 (UTC)
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
- (envelope-from <maz@kernel.org>)
- id 1lVtmb-006yxo-LA; Mon, 12 Apr 2021 11:27:05 +0100
-Date: Mon, 12 Apr 2021 11:27:04 +0100
-Message-ID: <87czuzol1j.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2 00/10] KVM: Consolidate and optimize MMU notifiers
-In-Reply-To: <9376b453-be3a-f8b7-d53a-7e54c25161ce@redhat.com>
-References: <20210402005658.3024832-1-seanjc@google.com>
- <9376b453-be3a-f8b7-d53a-7e54c25161ce@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, seanjc@google.com,
- chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, paulus@ozlabs.org,
- james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
- vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
- joro@8bytes.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org, kvm@vger.kernel.org,
- kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org, bgardon@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- Sean Christopherson <seanjc@google.com>, Joerg Roedel <joro@8bytes.org>,
- Huacai Chen <chenhuacai@kernel.org>, linux-mips@vger.kernel.org,
- kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
- Paul Mackerras <paulus@ozlabs.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- linux-arm-kernel@lists.infradead.org, Ben Gardon <bgardon@google.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>, kvmarm@lists.cs.columbia.edu,
- Jim Mattson <jmattson@google.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6E157108C317;
+ Mon, 12 Apr 2021 15:00:43 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-113-253.ams2.redhat.com [10.36.113.253])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 95F165D6D1;
+ Mon, 12 Apr 2021 15:00:39 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, maz@kernel.org, alexandru.elisei@arm.com,
+ suzuki.poulose@arm.com, james.morse@arm.com
+Subject: [PATCH] KVM: arm/arm64: Fix KVM_VGIC_V3_ADDR_TYPE_REDIST read
+Date: Mon, 12 Apr 2021 17:00:34 +0200
+Message-Id: <20210412150034.29185-1-eric.auger@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -95,101 +87,41 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 02 Apr 2021 13:17:45 +0100,
-Paolo Bonzini <pbonzini@redhat.com> wrote:
-> 
-> On 02/04/21 02:56, Sean Christopherson wrote:
-> > The end goal of this series is to optimize the MMU notifiers to take
-> > mmu_lock if and only if the notification is relevant to KVM, i.e. the hva
-> > range overlaps a memslot.   Large VMs (hundreds of vCPUs) are very
-> > sensitive to mmu_lock being taken for write at inopportune times, and
-> > such VMs also tend to be "static", e.g. backed by HugeTLB with minimal
-> > page shenanigans.  The vast majority of notifications for these VMs will
-> > be spurious (for KVM), and eliding mmu_lock for spurious notifications
-> > avoids an otherwise unacceptable disruption to the guest.
-> > 
-> > To get there without potentially degrading performance, e.g. due to
-> > multiple memslot lookups, especially on non-x86 where the use cases are
-> > largely unknown (from my perspective), first consolidate the MMU notifier
-> > logic by moving the hva->gfn lookups into common KVM.
-> > 
-> > Based on kvm/queue, commit 5f986f748438 ("KVM: x86: dump_vmcs should
-> > include the autoload/autostore MSR lists").
-> > 
-> > Well tested on Intel and AMD.  Compile tested for arm64, MIPS, PPC,
-> > PPC e500, and s390.  Absolutely needs to be tested for real on non-x86,
-> > I give it even odds that I introduced an off-by-one bug somewhere.
-> > 
-> > v2:
-> >   - Drop the patches that have already been pushed to kvm/queue.
-> >   - Drop two selftest changes that had snuck in via "git commit -a".
-> >   - Add a patch to assert that mmu_notifier_count is elevated when
-> >     .change_pte() runs. [Paolo]
-> >   - Split out moving KVM_MMU_(UN)LOCK() to __kvm_handle_hva_range() to a
-> >     separate patch.  Opted not to squash it with the introduction of the
-> >     common hva walkers (patch 02), as that prevented sharing code between
-> >     the old and new APIs. [Paolo]
-> >   - Tweak the comment in kvm_vm_destroy() above the smashing of the new
-> >     slots lock. [Paolo]
-> >   - Make mmu_notifier_slots_lock unconditional to avoid #ifdefs. [Paolo]
-> > 
-> > v1:
-> >   - https://lkml.kernel.org/r/20210326021957.1424875-1-seanjc@google.com
-> > 
-> > Sean Christopherson (10):
-> >    KVM: Assert that notifier count is elevated in .change_pte()
-> >    KVM: Move x86's MMU notifier memslot walkers to generic code
-> >    KVM: arm64: Convert to the gfn-based MMU notifier callbacks
-> >    KVM: MIPS/MMU: Convert to the gfn-based MMU notifier callbacks
-> >    KVM: PPC: Convert to the gfn-based MMU notifier callbacks
-> >    KVM: Kill off the old hva-based MMU notifier callbacks
-> >    KVM: Move MMU notifier's mmu_lock acquisition into common helper
-> >    KVM: Take mmu_lock when handling MMU notifier iff the hva hits a
-> >      memslot
-> >    KVM: Don't take mmu_lock for range invalidation unless necessary
-> >    KVM: x86/mmu: Allow yielding during MMU notifier unmap/zap, if
-> >      possible
-> > 
-> >   arch/arm64/kvm/mmu.c                   | 117 +++------
-> >   arch/mips/kvm/mmu.c                    |  97 ++------
-> >   arch/powerpc/include/asm/kvm_book3s.h  |  12 +-
-> >   arch/powerpc/include/asm/kvm_ppc.h     |   9 +-
-> >   arch/powerpc/kvm/book3s.c              |  18 +-
-> >   arch/powerpc/kvm/book3s.h              |  10 +-
-> >   arch/powerpc/kvm/book3s_64_mmu_hv.c    |  98 ++------
-> >   arch/powerpc/kvm/book3s_64_mmu_radix.c |  25 +-
-> >   arch/powerpc/kvm/book3s_hv.c           |  12 +-
-> >   arch/powerpc/kvm/book3s_pr.c           |  56 ++---
-> >   arch/powerpc/kvm/e500_mmu_host.c       |  27 +-
-> >   arch/x86/kvm/mmu/mmu.c                 | 127 ++++------
-> >   arch/x86/kvm/mmu/tdp_mmu.c             | 245 +++++++------------
-> >   arch/x86/kvm/mmu/tdp_mmu.h             |  14 +-
-> >   include/linux/kvm_host.h               |  22 +-
-> >   virt/kvm/kvm_main.c                    | 325 +++++++++++++++++++------
-> >   16 files changed, 552 insertions(+), 662 deletions(-)
-> > 
-> 
-> For MIPS, I am going to post a series that simplifies TLB flushing
-> further.  I applied it, and rebased this one on top, to
-> kvm/mmu-notifier-queue.
-> 
-> Architecture maintainers, please look at the branch and
-> review/test/ack your parts.
+When reading the base address of the a REDIST region
+through KVM_VGIC_V3_ADDR_TYPE_REDIST we expect the
+redistributor region list to be populated with a single
+element.
 
-I've given this a reasonably good beating on arm64 for both VHE and
-nVHE HW, and nothing caught fire, although I was left with a conflict
-in the x86 code after merging with linux/master.
+However list_first_entry() expects the list to be non empty.
+Instead we should use list_first_entry_or_null which effectively
+returns NULL if the list is empty.
 
-Feel free to add a
+Fixes: dbd9733ab674 ("KVM: arm/arm64: Replace the single rdist region by a list")
+Cc: <Stable@vger.kernel.org> # v4.18+
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Reported-by: Gavin Shan <gshan@redhat.com>
+---
+ arch/arm64/kvm/vgic/vgic-kvm-device.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Tested-by: Marc Zyngier <maz@kernel.org>
-
-for the arm64 side.
-
-	M.
-
+diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+index 44419679f91a..5eaede3e3b5a 100644
+--- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
++++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+@@ -87,8 +87,8 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
+ 			r = vgic_v3_set_redist_base(kvm, 0, *addr, 0);
+ 			goto out;
+ 		}
+-		rdreg = list_first_entry(&vgic->rd_regions,
+-					 struct vgic_redist_region, list);
++		rdreg = list_first_entry_or_null(&vgic->rd_regions,
++						 struct vgic_redist_region, list);
+ 		if (!rdreg)
+ 			addr_ptr = &undef_value;
+ 		else
 -- 
-Without deviation from the norm, progress is not possible.
+2.26.3
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
