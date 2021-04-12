@@ -2,75 +2,60 @@ Return-Path: <SRS0=mbOA=JJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F678C433ED
-	for <kvmarm@archiver.kernel.org>; Mon, 12 Apr 2021 15:00:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D1DEC433B4
+	for <kvmarm@archiver.kernel.org>; Mon, 12 Apr 2021 16:51:46 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D0FC060FDA
-	for <kvmarm@archiver.kernel.org>; Mon, 12 Apr 2021 15:00:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0FC060FDA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 705276044F
+	for <kvmarm@archiver.kernel.org>; Mon, 12 Apr 2021 16:51:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 705276044F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D5484B9B0;
-	Mon, 12 Apr 2021 11:00:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DB6224B70A;
+	Mon, 12 Apr 2021 12:51:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id lV1-4BkEYBA5; Mon, 12 Apr 2021 11:00:52 -0400 (EDT)
+	with ESMTP id 2rfHJKrpX4rA; Mon, 12 Apr 2021 12:51:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3121B4B8BC;
-	Mon, 12 Apr 2021 11:00:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A3364B750;
+	Mon, 12 Apr 2021 12:51:43 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 678B64B8B9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Apr 2021 11:00:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 815784B750
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Apr 2021 12:51:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LICnentQ0zN0 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 12 Apr 2021 11:00:49 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 32BCA4B8B0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Apr 2021 11:00:49 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1618239649;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding;
- bh=VNdKS9KNgagmrHQvjGL4Hvng5mswnO3U1Do4oQAu2Vo=;
- b=RE0irDQIOBvmFEXB9ZjTIecA+9pQ5h+OMUMhFQESTMcYMa4o2itRfnjpx/DUxbxsKK+IAa
- S6xDbGD7oVggk2P9vwjKSQ210YNk5IrlDs6mbHmQtoGQ6v3GSqplnsPZVipxVDe7OiVGxn
- ZhFy0t9D1hzC/LLG+Vh9KLCq1IdIq2k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-290-zHNgWqTNMCqnuTnLJSnPSQ-1; Mon, 12 Apr 2021 11:00:47 -0400
-X-MC-Unique: zHNgWqTNMCqnuTnLJSnPSQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6E157108C317;
- Mon, 12 Apr 2021 15:00:43 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-113-253.ams2.redhat.com [10.36.113.253])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 95F165D6D1;
- Mon, 12 Apr 2021 15:00:39 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, maz@kernel.org, alexandru.elisei@arm.com,
- suzuki.poulose@arm.com, james.morse@arm.com
-Subject: [PATCH] KVM: arm/arm64: Fix KVM_VGIC_V3_ADDR_TYPE_REDIST read
-Date: Mon, 12 Apr 2021 17:00:34 +0200
-Message-Id: <20210412150034.29185-1-eric.auger@redhat.com>
+ with ESMTP id elNTOgjWVbNZ for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 12 Apr 2021 12:51:41 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 41F224B70A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Apr 2021 12:51:41 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AF20512FC;
+ Mon, 12 Apr 2021 09:51:40 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4CB453F73B;
+ Mon, 12 Apr 2021 09:51:38 -0700 (PDT)
+Subject: Re: [PATCH v2] KVM: arm64: Fully zero the vcpu state on reset
+To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+References: <20210409173257.3031729-1-maz@kernel.org>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <977338ef-9b06-1fec-9075-5e9cbdb89bc2@arm.com>
+Date: Mon, 12 Apr 2021 17:51:53 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.9.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20210409173257.3031729-1-maz@kernel.org>
+Content-Language: en-US
+Cc: Will Deacon <will@kernel.org>, kernel-team@android.com,
+ stable@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,41 +72,75 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-When reading the base address of the a REDIST region
-through KVM_VGIC_V3_ADDR_TYPE_REDIST we expect the
-redistributor region list to be populated with a single
-element.
+Hi Marc,
 
-However list_first_entry() expects the list to be non empty.
-Instead we should use list_first_entry_or_null which effectively
-returns NULL if the list is empty.
+On 4/9/21 6:32 PM, Marc Zyngier wrote:
+> On vcpu reset, we expect all the registers to be brought back
+> to their initial state, which happens to be a bunch of zeroes.
+>
+> However, some recent commit broke this, and is now leaving a bunch
+> of registers (such as the FP state) with whatever was left by the
+> guest. My bad.
+>
+> Zero the reset of the state (32bit SPSRs and FPSIMD state).
+>
+> Cc: stable@vger.kernel.org
+> Fixes: e47c2055c68e ("KVM: arm64: Make struct kvm_regs userspace-only")
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>
+> Notes:
+>     v2: Only reset the FPSIMD state and the AArch32 SPSRs to avoid
+>     corrupting CNTVOFF in creative ways.
 
-Fixes: dbd9733ab674 ("KVM: arm/arm64: Replace the single rdist region by a list")
-Cc: <Stable@vger.kernel.org> # v4.18+
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reported-by: Gavin Shan <gshan@redhat.com>
----
- arch/arm64/kvm/vgic/vgic-kvm-device.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+I missed that last time, sorry.
 
-diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-index 44419679f91a..5eaede3e3b5a 100644
---- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
-+++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-@@ -87,8 +87,8 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
- 			r = vgic_v3_set_redist_base(kvm, 0, *addr, 0);
- 			goto out;
- 		}
--		rdreg = list_first_entry(&vgic->rd_regions,
--					 struct vgic_redist_region, list);
-+		rdreg = list_first_entry_or_null(&vgic->rd_regions,
-+						 struct vgic_redist_region, list);
- 		if (!rdreg)
- 			addr_ptr = &undef_value;
- 		else
--- 
-2.26.3
+>
+>  arch/arm64/kvm/reset.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+>
+> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> index bd354cd45d28..4b5acd84b8c8 100644
+> --- a/arch/arm64/kvm/reset.c
+> +++ b/arch/arm64/kvm/reset.c
+> @@ -242,6 +242,11 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+>  
+>  	/* Reset core registers */
+>  	memset(vcpu_gp_regs(vcpu), 0, sizeof(*vcpu_gp_regs(vcpu)));
+> +	memset(&vcpu->arch.ctxt.fp_regs, 0, sizeof(vcpu->arch.ctxt.fp_regs));
+> +	vcpu->arch.ctxt.spsr_abt = 0;
+> +	vcpu->arch.ctxt.spsr_und = 0;
+> +	vcpu->arch.ctxt.spsr_irq = 0;
+> +	vcpu->arch.ctxt.spsr_fiq = 0;
 
+Checked, and the only fields not touched by the change from struct kvm_cpu_context
+are sys_regs and __hyp_running_cpu. __hyp_running_cpu is assumed to be NULL for a
+guest and it doesn't change during the lifetime of a VCPU; it is set to NULL when
+struct kvm_vcpu is allocated.
+
+CNTVOFF_EL2 is not accessible to userspace (it's not in the sys_reg_descs and in
+the invariant_sys_regs arrays), so it's not necessary to reset it in case
+userspace changed it. Same for the other registers that are part of the VCPU
+context, but are not in sys_reg_descs.
+
+I think it's a good choice to skip zeroing the system registers. I compared
+vcpu->arch.ctxt.sys_regs with sys_regs_descs, there were quite a few registers
+that were part of the vcpu context (pointer authentication registers, virtual
+timer registers, and others) and not part of sys_regs_descs. If someone adds a
+register to the VCPU context, but not to sys_regs_descs, I think it would have
+been easy to miss the fact that KVM_ARM_VCPU_INIT zeroes it.
+
+Hopefully I haven't missed anything:
+
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+Thanks,
+
+Alex
+
+>  	vcpu_gp_regs(vcpu)->pstate = pstate;
+>  
+>  	/* Reset system registers */
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
