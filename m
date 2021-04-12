@@ -2,72 +2,83 @@ Return-Path: <SRS0=mbOA=JJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE8FEC433B4
-	for <kvmarm@archiver.kernel.org>; Mon, 12 Apr 2021 07:49:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E23DC433B4
+	for <kvmarm@archiver.kernel.org>; Mon, 12 Apr 2021 10:13:03 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 207DC6135F
-	for <kvmarm@archiver.kernel.org>; Mon, 12 Apr 2021 07:49:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 207DC6135F
+	by mail.kernel.org (Postfix) with ESMTP id CC6C06128B
+	for <kvmarm@archiver.kernel.org>; Mon, 12 Apr 2021 10:13:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC6C06128B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A54D54B50F;
-	Mon, 12 Apr 2021 03:49:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 46CCC4B868;
+	Mon, 12 Apr 2021 06:13:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id hSHTI3WshMBL; Mon, 12 Apr 2021 03:49:29 -0400 (EDT)
+	with ESMTP id NyXqMpqAfUsb; Mon, 12 Apr 2021 06:13:01 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B19B4B4B1;
-	Mon, 12 Apr 2021 03:49:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1271B4B880;
+	Mon, 12 Apr 2021 06:13:01 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C71E84B496
- for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Apr 2021 03:49:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BC1C44B858
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Apr 2021 06:12:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vQP7YQ9p1QeQ for <kvmarm@lists.cs.columbia.edu>;
- Mon, 12 Apr 2021 03:49:25 -0400 (EDT)
+ with ESMTP id Y0Ctp1UdRfqd for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 12 Apr 2021 06:12:58 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BDDFB4B483
- for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Apr 2021 03:49:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A08E74B7E2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Apr 2021 06:12:57 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id DBC6561360;
- Mon, 12 Apr 2021 07:49:22 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 1878761278;
+ Mon, 12 Apr 2021 10:12:55 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1lVrJw-006vIv-N7; Mon, 12 Apr 2021 08:49:20 +0100
-Date: Mon, 12 Apr 2021 08:49:19 +0100
-Message-ID: <87h7kcnds0.wl-maz@kernel.org>
+ id 1lVtYq-006yXm-Kb; Mon, 12 Apr 2021 11:12:52 +0100
+Date: Mon, 12 Apr 2021 11:12:51 +0100
+Message-ID: <87eeffolp8.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Shaokun Zhang <zhangshaokun@hisilicon.com>
-Subject: Re: [RFC] KVM: arm64: Support FEAT_CCIDX
-In-Reply-To: <f605f8cd-71a4-7f4e-ffb7-7b5af738e85e@hisilicon.com>
-References: <1618042597-59294-1-git-send-email-zhangshaokun@hisilicon.com>
- <875z0ufori.wl-maz@kernel.org>
- <f605f8cd-71a4-7f4e-ffb7-7b5af738e85e@hisilicon.com>
+To: Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH v2 03/10] KVM: arm64: Convert to the gfn-based MMU
+ notifier callbacks
+In-Reply-To: <20210402005658.3024832-4-seanjc@google.com>
+References: <20210402005658.3024832-1-seanjc@google.com>
+ <20210402005658.3024832-4-seanjc@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: zhangshaokun@hisilicon.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com
+X-SA-Exim-Rcpt-To: seanjc@google.com, chenhuacai@kernel.org,
+ aleksandar.qemu.devel@gmail.com, paulus@ozlabs.org, pbonzini@redhat.com,
+ james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+ vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+ joro@8bytes.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+ kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org, bgardon@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+ Joerg Roedel <joro@8bytes.org>, Huacai Chen <chenhuacai@kernel.org>,
+ linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ linux-arm-kernel@lists.infradead.org, Ben Gardon <bgardon@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ kvmarm@lists.cs.columbia.edu, Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -84,180 +95,19 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Shaokun,
+On Fri, 02 Apr 2021 01:56:51 +0100,
+Sean Christopherson <seanjc@google.com> wrote:
+> 
+> Move arm64 to the gfn-base MMU notifier APIs, which do the hva->gfn
+> lookup in common code.
+> 
+> No meaningful functional change intended, though the exact order of
+> operations is slightly different since the memslot lookups occur before
+> calling into arch code.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-On Mon, 12 Apr 2021 03:22:03 +0100,
-Shaokun Zhang <zhangshaokun@hisilicon.com> wrote:
-> 
-> Hi Marc,
-> 
-> On 2021/4/10 17:54, Marc Zyngier wrote:
-> > On Sat, 10 Apr 2021 09:16:37 +0100,
-> > Shaokun Zhang <zhangshaokun@hisilicon.com> wrote:
-> >>
-> >> CCSIDR_EL1 can be implemented as 64-bit format inferred by CCIDX field
-> >> in ID_AA64MMFR2_EL1. The bits of Numsets and Associativity are different
-> >> from the 32-bit format. Let's support this feature.
-> >>
-> >> Cc: Marc Zyngier <maz@kernel.org>
-> >> Cc: James Morse <james.morse@arm.com>
-> >> Cc: Alexandru Elisei <alexandru.elisei@arm.com>
-> >> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-> >> Signed-off-by: Shaokun Zhang <zhangshaokun@hisilicon.com>
-> >> ---
-> >>  arch/arm64/kvm/sys_regs.c | 27 +++++++++++++++++++--------
-> >>  1 file changed, 19 insertions(+), 8 deletions(-)
-> >>
-> >> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> >> index 52fdb9a015a4..0dc822cef20b 100644
-> >> --- a/arch/arm64/kvm/sys_regs.c
-> >> +++ b/arch/arm64/kvm/sys_regs.c
-> >> @@ -18,6 +18,7 @@
-> >>  
-> >>  #include <asm/cacheflush.h>
-> >>  #include <asm/cputype.h>
-> >> +#include <asm/cpufeature.h>
-> > 
-> > If you are going to add this (why?), at least add it in alphabetic order.
-> 
-> cpuid_feature_extract_unsigned_field will be used later.
-> It shall do in alphabetic order.
-
-We already use this function all over the place, and it is already
-dragged in via many other paths. Anyway, that's not the biggest
-problem.
-
-> 
-> > 
-> >>  #include <asm/debug-monitors.h>
-> >>  #include <asm/esr.h>
-> >>  #include <asm/kvm_arm.h>
-> >> @@ -95,9 +96,9 @@ static u32 cache_levels;
-> >>  #define CSSELR_MAX 14
-> >>  
-> >>  /* Which cache CCSIDR represents depends on CSSELR value. */
-> >> -static u32 get_ccsidr(u32 csselr)
-> >> +static u64 get_ccsidr(u32 csselr)
-> >>  {
-> >> -	u32 ccsidr;
-> >> +	u64 ccsidr;
-> >>  
-> >>  	/* Make sure noone else changes CSSELR during this! */
-> >>  	local_irq_disable();
-> >> @@ -1275,12 +1276,16 @@ static bool access_csselr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> >>  static bool access_ccsidr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> >>  			  const struct sys_reg_desc *r)
-> >>  {
-> >> -	u32 csselr;
-> >> +	u32 csselr, ccidx;
-> >> +	u64 mmfr2;
-> >>  
-> >>  	if (p->is_write)
-> >>  		return write_to_read_only(vcpu, p, r);
-> >>  
-> >>  	csselr = vcpu_read_sys_reg(vcpu, CSSELR_EL1);
-> >> +	mmfr2 = read_sysreg_s(SYS_ID_AA64MMFR2_EL1);
-> >> +	ccidx = cpuid_feature_extract_unsigned_field(mmfr2,
-> >> +						     ID_AA64MMFR2_CCIDX_SHIFT);
-> > 
-> > What happens on an asymmetric system where only some of the CPUs have
-> > FEAT_CCIDX?
-> 
-> If other CPUs don't have FEAT_CCIDX, its value is 0b0000 while
-> CCSIDR_EL1 is 32-bit format.
->
-
-You are missing the point: CPU-A has CCIDX, CPU-B doesn't. My vcpu
-runs on CPU-A, gets preempted right after the read of
-ID_AA64MMFR2_EL1, and then scheduled on CPU-B. You will now compute
-the guest view of CCSIDR_EL1 with CPU-B's value, but interpreting it
-with CPU-A's configuration. That's totally broken.
-
-> > 
-> >>  	p->regval = get_ccsidr(csselr);
-> >>  
-> >>  	/*
-> >> @@ -1295,8 +1300,13 @@ static bool access_ccsidr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> >>  	 * geometry (which is not permitted by the architecture), they would
-> >>  	 * only do so for virtually indexed caches.]
-> >>  	 */
-> >> -	if (!(csselr & 1)) // data or unified cache
-> >> -		p->regval &= ~GENMASK(27, 3);
-> >> +	if (!(csselr & 1)) { // data or unified cache
-> >> +		if (ccidx)
-> >> +			p->regval &= ~(GENMASK(23, 3) | GENMASK(55, 32));
-> >> +		else
-> >> +			p->regval &= ~GENMASK(27, 3);
-> >> +	}
-> >> +
-> >>  	return true;
-> >>  }
-> >>  
-> >> @@ -2521,7 +2531,7 @@ static bool is_valid_cache(u32 val)
-> >>  static int demux_c15_get(u64 id, void __user *uaddr)
-> >>  {
-> >>  	u32 val;
-> >> -	u32 __user *uval = uaddr;
-> >> +	u64 __user *uval = uaddr;
-> > 
-> > What? Has the user API changed while I wasn't looking? Getting CCSIDR
-> > can only return a 32bit quantity on AArch32. In fact, CCSIDR is
-> > *always* 32bit, CCIDX or not. I have no idea what you are trying to do
-> > here, but at best you are now corrupting 32bit of userspace.
-> > 
-> 
-> Oops, I really missed this.
-> 
-> >>  
-> >>  	/* Fail if we have unknown bits set. */
-> >>  	if (id & ~(KVM_REG_ARCH_MASK|KVM_REG_SIZE_MASK|KVM_REG_ARM_COPROC_MASK
-> >> @@ -2545,8 +2555,9 @@ static int demux_c15_get(u64 id, void __user *uaddr)
-> >>  
-> >>  static int demux_c15_set(u64 id, void __user *uaddr)
-> >>  {
-> >> -	u32 val, newval;
-> >> -	u32 __user *uval = uaddr;
-> >> +	u32 val;
-> >> +	u64 newval;
-> >> +	u64 __user *uval = uaddr;
-> > 
-> > Same brokenness.
-> > 
-> >>  
-> >>  	/* Fail if we have unknown bits set. */
-> >>  	if (id & ~(KVM_REG_ARCH_MASK|KVM_REG_SIZE_MASK|KVM_REG_ARM_COPROC_MASK
-> > 
-> > What about CCSIDR2_EL1, which is mandatory when FEAT_CCSIDX is
-> > present? How about the AArch32 handling of that register? I don't
-> > think you have though this one through.
-> 
-> To be honest, AArch32 is not considered directly and I sent this only
-> as RFC.
-
-If you don't consider AArch32 when writing a patch, please don't send
-it. AArch32 guests are fully supported, and a patch that breaks them
-isn't acceptable.
-
-Also, a RFC patch doesn't mean things are allowed to break. We use RFC
-as way to ask for people feedback on a design, but the proposed
-implementation has to be a valid one. That's not a license to send
-broken stuff.
-
-> When I wrote some flush cache code using by set/way mode and
-> noticed that CCSIDR_EL1 is used here.
->
-> > 
-> > Another question is: why should we care at all? Why don't we drop all
-> > that and only implement a virtual cache topology? A VM shouldn't care
-> > at all about this, and we are already lying about the topology anyway.
-> > We could even get the VMM to set whatever stupid topology it wants for
-> > the sake of it (and to restore previously created VMs).
-> 
-> Got it,
-> 
-> Thanks for your detailed comments.
-
-Thanks,
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
 	M.
 
