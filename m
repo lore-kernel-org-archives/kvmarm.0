@@ -7,48 +7,48 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87064C433B4
-	for <kvmarm@archiver.kernel.org>; Wed, 14 Apr 2021 11:24:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E424C433ED
+	for <kvmarm@archiver.kernel.org>; Wed, 14 Apr 2021 11:24:45 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E9A19613C4
-	for <kvmarm@archiver.kernel.org>; Wed, 14 Apr 2021 11:24:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9A19613C4
+	by mail.kernel.org (Postfix) with ESMTP id E1148613C4
+	for <kvmarm@archiver.kernel.org>; Wed, 14 Apr 2021 11:24:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1148613C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 88A374B56E;
-	Wed, 14 Apr 2021 07:24:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 93ED24B583;
+	Wed, 14 Apr 2021 07:24:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id o8KGmT5ggGhb; Wed, 14 Apr 2021 07:24:33 -0400 (EDT)
+	with ESMTP id FvgG1v6hPqPo; Wed, 14 Apr 2021 07:24:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 35DF64B583;
-	Wed, 14 Apr 2021 07:24:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 597C14B619;
+	Wed, 14 Apr 2021 07:24:43 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 607E24B583
- for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Apr 2021 07:24:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7613A4B56E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Apr 2021 07:24:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qQiStgOO8Hlj for <kvmarm@lists.cs.columbia.edu>;
- Wed, 14 Apr 2021 07:24:29 -0400 (EDT)
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 690A24B56E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Apr 2021 07:24:29 -0400 (EDT)
+ with ESMTP id v2o0Il5ghuFz for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 14 Apr 2021 07:24:41 -0400 (EDT)
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CDD4E4B49C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Apr 2021 07:24:40 -0400 (EDT)
 Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.60])
- by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4FL0Ry0MWVzB0mp;
- Wed, 14 Apr 2021 19:22:06 +0800 (CST)
+ by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4FL0SF5yLyz18Hbh;
+ Wed, 14 Apr 2021 19:22:21 +0800 (CST)
 Received: from S00345302A-PC.china.huawei.com (10.47.82.32) by
  DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
- 14.3.498.0; Wed, 14 Apr 2021 19:24:13 +0800
+ 14.3.498.0; Wed, 14 Apr 2021 19:24:31 +0800
 From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 To: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.cs.columbia.edu>,
  <linux-kernel@vger.kernel.org>
-Subject: [PATCH v4 01/16] arm64/mm: Introduce asid_info structure and move
- asid_generation/asid_map to it
-Date: Wed, 14 Apr 2021 12:22:57 +0100
-Message-ID: <20210414112312.13704-2-shameerali.kolothum.thodi@huawei.com>
+Subject: [PATCH v4 02/16] arm64/mm: Move active_asids and reserved_asids to
+ asid_info
+Date: Wed, 14 Apr 2021 12:22:58 +0100
+Message-ID: <20210414112312.13704-3-shameerali.kolothum.thodi@huawei.com>
 X-Mailer: git-send-email 2.12.0.windows.1
 In-Reply-To: <20210414112312.13704-1-shameerali.kolothum.thodi@huawei.com>
 References: <20210414112312.13704-1-shameerali.kolothum.thodi@huawei.com>
@@ -75,221 +75,135 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: Julien Grall <julien.grall@arm.com>
 
-In an attempt to make the ASID allocator generic, create a new structure
-asid_info to store all the information necessary for the allocator.
+The variables active_asids and reserved_asids hold information for a
+given ASID allocator. So move them to the structure asid_info.
 
-For now, move the variables asid_generation, asid_map, cur_idx to the
-new structure asid_info. Follow-up patches will move more variables.
+At the same time, introduce wrappers to access the active and reserved
+ASIDs to make the code clearer.
 
-Note to avoid more renaming aftwards, a local variable 'info' has been
-created and is a pointer to the ASID allocator structure.
 
 Signed-off-by: Julien Grall <julien.grall@arm.com>
 Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 ---
-v3-->v4:
-  Move cur_idx into asid_info.
+v3-->v4
+  keep the this_cpu_ptr in fastpath. See c4885bbb3afe("arm64/mm: save
+memory access in check_and_switch_context() fast switch path")
+
 ---
- arch/arm64/mm/context.c | 71 +++++++++++++++++++++++------------------
- 1 file changed, 40 insertions(+), 31 deletions(-)
+ arch/arm64/mm/context.c | 32 ++++++++++++++++++++------------
+ 1 file changed, 20 insertions(+), 12 deletions(-)
 
 diff --git a/arch/arm64/mm/context.c b/arch/arm64/mm/context.c
-index 001737a8f309..783f8bdb91ee 100644
+index 783f8bdb91ee..42e011094571 100644
 --- a/arch/arm64/mm/context.c
 +++ b/arch/arm64/mm/context.c
-@@ -20,8 +20,12 @@
- static u32 asid_bits;
- static DEFINE_RAW_SPINLOCK(cpu_asid_lock);
+@@ -25,8 +25,13 @@ static struct asid_info
+ 	atomic64_t	generation;
+ 	unsigned long	*map;
+ 	unsigned int	map_idx;
++	atomic64_t __percpu	*active;
++	u64 __percpu		*reserved;
+ } asid_info;
  
--static atomic64_t asid_generation;
--static unsigned long *asid_map;
-+static struct asid_info
-+{
-+	atomic64_t	generation;
-+	unsigned long	*map;
-+	unsigned int	map_idx;
-+} asid_info;
- 
++#define active_asid(info, cpu)	 (*per_cpu_ptr((info)->active, cpu))
++#define reserved_asid(info, cpu) (*per_cpu_ptr((info)->reserved, cpu))
++
  static DEFINE_PER_CPU(atomic64_t, active_asids);
  static DEFINE_PER_CPU(u64, reserved_asids);
-@@ -88,26 +92,26 @@ static void set_kpti_asid_bits(unsigned long *map)
- 	memset(map, 0xaa, len);
- }
- 
--static void set_reserved_asid_bits(void)
-+static void set_reserved_asid_bits(struct asid_info *info)
- {
- 	if (pinned_asid_map)
--		bitmap_copy(asid_map, pinned_asid_map, NUM_USER_ASIDS);
-+		bitmap_copy(info->map, pinned_asid_map, NUM_USER_ASIDS);
- 	else if (arm64_kernel_unmapped_at_el0())
--		set_kpti_asid_bits(asid_map);
-+		set_kpti_asid_bits(info->map);
- 	else
--		bitmap_clear(asid_map, 0, NUM_USER_ASIDS);
-+		bitmap_clear(info->map, 0, NUM_USER_ASIDS);
- }
- 
--#define asid_gen_match(asid) \
--	(!(((asid) ^ atomic64_read(&asid_generation)) >> asid_bits))
-+#define asid_gen_match(asid, info) \
-+	(!(((asid) ^ atomic64_read(&(info)->generation)) >> asid_bits))
- 
--static void flush_context(void)
-+static void flush_context(struct asid_info *info)
- {
- 	int i;
- 	u64 asid;
- 
- 	/* Update the list of reserved ASIDs and the ASID bitmap. */
--	set_reserved_asid_bits();
-+	set_reserved_asid_bits(info);
+ static cpumask_t tlb_flush_pending;
+@@ -114,7 +119,7 @@ static void flush_context(struct asid_info *info)
+ 	set_reserved_asid_bits(info);
  
  	for_each_possible_cpu(i) {
- 		asid = atomic64_xchg_relaxed(&per_cpu(active_asids, i), 0);
-@@ -120,7 +124,7 @@ static void flush_context(void)
+-		asid = atomic64_xchg_relaxed(&per_cpu(active_asids, i), 0);
++		asid = atomic64_xchg_relaxed(&active_asid(info, i), 0);
+ 		/*
+ 		 * If this CPU has already been through a
+ 		 * rollover, but hasn't run another task in
+@@ -123,9 +128,9 @@ static void flush_context(struct asid_info *info)
+ 		 * the process it is still running.
  		 */
  		if (asid == 0)
- 			asid = per_cpu(reserved_asids, i);
--		__set_bit(asid2idx(asid), asid_map);
-+		__set_bit(asid2idx(asid), info->map);
- 		per_cpu(reserved_asids, i) = asid;
+-			asid = per_cpu(reserved_asids, i);
++			asid = reserved_asid(info, i);
+ 		__set_bit(asid2idx(asid), info->map);
+-		per_cpu(reserved_asids, i) = asid;
++		reserved_asid(info, i) = asid;
  	}
  
-@@ -155,11 +159,10 @@ static bool check_update_reserved_asid(u64 asid, u64 newasid)
- 	return hit;
+ 	/*
+@@ -135,7 +140,8 @@ static void flush_context(struct asid_info *info)
+ 	cpumask_setall(&tlb_flush_pending);
  }
  
--static u64 new_context(struct mm_struct *mm)
-+static u64 new_context(struct asid_info *info, struct mm_struct *mm)
+-static bool check_update_reserved_asid(u64 asid, u64 newasid)
++static bool check_update_reserved_asid(struct asid_info *info, u64 asid,
++				       u64 newasid)
  {
--	static u32 cur_idx = 1;
- 	u64 asid = atomic64_read(&mm->context.id);
--	u64 generation = atomic64_read(&asid_generation);
-+	u64 generation = atomic64_read(&info->generation);
- 
- 	if (asid != 0) {
- 		u64 newasid = generation | (asid & ~ASID_MASK);
-@@ -183,7 +186,7 @@ static u64 new_context(struct mm_struct *mm)
- 		 * We had a valid ASID in a previous life, so try to re-use
- 		 * it if possible.
- 		 */
--		if (!__test_and_set_bit(asid2idx(asid), asid_map))
-+		if (!__test_and_set_bit(asid2idx(asid), info->map))
- 			return newasid;
+ 	int cpu;
+ 	bool hit = false;
+@@ -150,9 +156,9 @@ static bool check_update_reserved_asid(u64 asid, u64 newasid)
+ 	 * generation.
+ 	 */
+ 	for_each_possible_cpu(cpu) {
+-		if (per_cpu(reserved_asids, cpu) == asid) {
++		if (reserved_asid(info, cpu) == asid) {
+ 			hit = true;
+-			per_cpu(reserved_asids, cpu) = newasid;
++			reserved_asid(info, cpu) = newasid;
+ 		}
  	}
  
-@@ -194,21 +197,21 @@ static u64 new_context(struct mm_struct *mm)
- 	 * a reserved TTBR0 for the init_mm and we allocate ASIDs in even/odd
- 	 * pairs.
- 	 */
--	asid = find_next_zero_bit(asid_map, NUM_USER_ASIDS, cur_idx);
-+	asid = find_next_zero_bit(info->map, NUM_USER_ASIDS, info->map_idx);
- 	if (asid != NUM_USER_ASIDS)
- 		goto set_asid;
+@@ -171,7 +177,7 @@ static u64 new_context(struct asid_info *info, struct mm_struct *mm)
+ 		 * If our current ASID was active during a rollover, we
+ 		 * can continue to use it and this was just a false alarm.
+ 		 */
+-		if (check_update_reserved_asid(asid, newasid))
++		if (check_update_reserved_asid(info, asid, newasid))
+ 			return newasid;
  
- 	/* We're out of ASIDs, so increment the global generation count */
- 	generation = atomic64_add_return_relaxed(ASID_FIRST_VERSION,
--						 &asid_generation);
--	flush_context();
-+						 &info->generation);
-+	flush_context(info);
+ 		/*
+@@ -229,8 +235,8 @@ void check_and_switch_context(struct mm_struct *mm)
  
- 	/* We have more ASIDs than CPUs, so this will always succeed */
--	asid = find_next_zero_bit(asid_map, NUM_USER_ASIDS, 1);
-+	asid = find_next_zero_bit(info->map, NUM_USER_ASIDS, 1);
- 
- set_asid:
--	__set_bit(asid, asid_map);
--	cur_idx = asid;
-+	__set_bit(asid, info->map);
-+	info->map_idx = asid;
- 	return idx2asid(asid) | generation;
- }
- 
-@@ -217,6 +220,7 @@ void check_and_switch_context(struct mm_struct *mm)
- 	unsigned long flags;
- 	unsigned int cpu;
- 	u64 asid, old_active_asid;
-+	struct asid_info *info = &asid_info;
- 
- 	if (system_supports_cnp())
- 		cpu_set_reserved_ttbr0();
-@@ -238,7 +242,7 @@ void check_and_switch_context(struct mm_struct *mm)
+ 	/*
+ 	 * The memory ordering here is subtle.
+-	 * If our active_asids is non-zero and the ASID matches the current
+-	 * generation, then we update the active_asids entry with a relaxed
++	 * If our active_asid is non-zero and the ASID matches the current
++	 * generation, then we update the active_asid entry with a relaxed
+ 	 * cmpxchg. Racing with a concurrent rollover means that either:
+ 	 *
+ 	 * - We get a zero back from the cmpxchg and end up waiting on the
+@@ -241,9 +247,9 @@ void check_and_switch_context(struct mm_struct *mm)
+ 	 *   relaxed xchg in flush_context will treat us as reserved
  	 *   because atomic RmWs are totally ordered for a given location.
  	 */
- 	old_active_asid = atomic64_read(this_cpu_ptr(&active_asids));
--	if (old_active_asid && asid_gen_match(asid) &&
-+	if (old_active_asid && asid_gen_match(asid, info) &&
- 	    atomic64_cmpxchg_relaxed(this_cpu_ptr(&active_asids),
+-	old_active_asid = atomic64_read(this_cpu_ptr(&active_asids));
++	old_active_asid = atomic64_read(this_cpu_ptr(info->active));
+ 	if (old_active_asid && asid_gen_match(asid, info) &&
+-	    atomic64_cmpxchg_relaxed(this_cpu_ptr(&active_asids),
++	    atomic64_cmpxchg_relaxed(this_cpu_ptr(info->active),
  				     old_active_asid, asid))
  		goto switch_mm_fastpath;
-@@ -246,8 +250,8 @@ void check_and_switch_context(struct mm_struct *mm)
- 	raw_spin_lock_irqsave(&cpu_asid_lock, flags);
- 	/* Check that our ASID belongs to the current generation. */
- 	asid = atomic64_read(&mm->context.id);
--	if (!asid_gen_match(asid)) {
--		asid = new_context(mm);
-+	if (!asid_gen_match(asid, info)) {
-+		asid = new_context(info, mm);
- 		atomic64_set(&mm->context.id, asid);
- 	}
  
-@@ -274,6 +278,7 @@ unsigned long arm64_mm_context_get(struct mm_struct *mm)
- {
- 	unsigned long flags;
- 	u64 asid;
-+	struct asid_info *info = &asid_info;
+@@ -259,7 +265,7 @@ void check_and_switch_context(struct mm_struct *mm)
+ 	if (cpumask_test_and_clear_cpu(cpu, &tlb_flush_pending))
+ 		local_flush_tlb_all();
  
- 	if (!pinned_asid_map)
- 		return 0;
-@@ -290,12 +295,12 @@ unsigned long arm64_mm_context_get(struct mm_struct *mm)
- 		goto out_unlock;
- 	}
+-	atomic64_set(this_cpu_ptr(&active_asids), asid);
++	atomic64_set(&active_asid(info, cpu), asid);
+ 	raw_spin_unlock_irqrestore(&cpu_asid_lock, flags);
  
--	if (!asid_gen_match(asid)) {
-+	if (!asid_gen_match(asid, info)) {
- 		/*
- 		 * We went through one or more rollover since that ASID was
- 		 * used. Ensure that it is still valid, or generate a new one.
- 		 */
--		asid = new_context(mm);
-+		asid = new_context(info, mm);
- 		atomic64_set(&mm->context.id, asid);
- 	}
- 
-@@ -400,14 +405,18 @@ arch_initcall(asids_update_limit);
- 
- static int asids_init(void)
- {
-+	struct asid_info *info = &asid_info;
-+
- 	asid_bits = get_cpu_asid_bits();
--	atomic64_set(&asid_generation, ASID_FIRST_VERSION);
--	asid_map = kcalloc(BITS_TO_LONGS(NUM_USER_ASIDS), sizeof(*asid_map),
--			   GFP_KERNEL);
--	if (!asid_map)
-+	atomic64_set(&info->generation, ASID_FIRST_VERSION);
-+	info->map = kcalloc(BITS_TO_LONGS(NUM_USER_ASIDS), sizeof(*info->map),
-+			    GFP_KERNEL);
-+	if (!info->map)
- 		panic("Failed to allocate bitmap for %lu ASIDs\n",
+ switch_mm_fastpath:
+@@ -416,6 +422,8 @@ static int asids_init(void)
  		      NUM_USER_ASIDS);
  
-+	info->map_idx = 1;
-+
+ 	info->map_idx = 1;
++	info->active = &active_asids;
++	info->reserved = &reserved_asids;
+ 
  	pinned_asid_map = kcalloc(BITS_TO_LONGS(NUM_USER_ASIDS),
  				  sizeof(*pinned_asid_map), GFP_KERNEL);
- 	nr_pinned_asids = 0;
-@@ -418,7 +427,7 @@ static int asids_init(void)
- 	 * and reserve kernel ASID's from beginning.
- 	 */
- 	if (IS_ENABLED(CONFIG_UNMAP_KERNEL_AT_EL0))
--		set_kpti_asid_bits(asid_map);
-+		set_kpti_asid_bits(info->map);
- 	return 0;
- }
- early_initcall(asids_init);
 -- 
 2.17.1
 
