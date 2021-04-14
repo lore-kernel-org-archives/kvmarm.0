@@ -7,48 +7,48 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DEB8C43460
-	for <kvmarm@archiver.kernel.org>; Wed, 14 Apr 2021 11:25:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B9F4C433B4
+	for <kvmarm@archiver.kernel.org>; Wed, 14 Apr 2021 11:25:41 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8BD50613C8
-	for <kvmarm@archiver.kernel.org>; Wed, 14 Apr 2021 11:25:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BD50613C8
+	by mail.kernel.org (Postfix) with ESMTP id ACDC9613C3
+	for <kvmarm@archiver.kernel.org>; Wed, 14 Apr 2021 11:25:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACDC9613C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2EC654B6E8;
-	Wed, 14 Apr 2021 07:25:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 513B74B60E;
+	Wed, 14 Apr 2021 07:25:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6YCZOQSp1O9x; Wed, 14 Apr 2021 07:25:35 -0400 (EDT)
+	with ESMTP id 6CmMB+TXD+NP; Wed, 14 Apr 2021 07:25:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B9254B6A7;
-	Wed, 14 Apr 2021 07:25:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 275C14B6B6;
+	Wed, 14 Apr 2021 07:25:39 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 023814B49C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Apr 2021 07:25:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A0B464B34F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Apr 2021 07:25:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CN9-uVIpQQus for <kvmarm@lists.cs.columbia.edu>;
- Wed, 14 Apr 2021 07:25:33 -0400 (EDT)
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E12AA4B34F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Apr 2021 07:25:32 -0400 (EDT)
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.58])
- by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4FL0Tj4nTczkjyc;
- Wed, 14 Apr 2021 19:23:37 +0800 (CST)
+ with ESMTP id r927YAN996wh for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 14 Apr 2021 07:25:36 -0400 (EDT)
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 73DE24B60D
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Apr 2021 07:25:36 -0400 (EDT)
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.60])
+ by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4FL0TK1HXvzB0mw;
+ Wed, 14 Apr 2021 19:23:17 +0800 (CST)
 Received: from S00345302A-PC.china.huawei.com (10.47.82.32) by
  DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
- 14.3.498.0; Wed, 14 Apr 2021 19:25:20 +0800
+ 14.3.498.0; Wed, 14 Apr 2021 19:25:24 +0800
 From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 To: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.cs.columbia.edu>,
  <linux-kernel@vger.kernel.org>
-Subject: [PATCH v4 14/16] arm64/lib: Add an helper to free memory allocated by
- the ASID allocator
-Date: Wed, 14 Apr 2021 12:23:10 +0100
-Message-ID: <20210414112312.13704-15-shameerali.kolothum.thodi@huawei.com>
+Subject: [PATCH v4 15/16] arch/arm64: Introduce a capability to tell whether
+ 16-bit VMID is available
+Date: Wed, 14 Apr 2021 12:23:11 +0100
+Message-ID: <20210414112312.13704-16-shameerali.kolothum.thodi@huawei.com>
 X-Mailer: git-send-email 2.12.0.windows.1
 In-Reply-To: <20210414112312.13704-1-shameerali.kolothum.thodi@huawei.com>
 References: <20210414112312.13704-1-shameerali.kolothum.thodi@huawei.com>
@@ -75,42 +75,73 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: Julien Grall <julien.grall@arm.com>
 
-Some users of the ASID allocator (e.g VMID) may need to free any
-resources if the initialization fail. So introduce a function that
-allows freeing of any memory allocated by the ASID allocator.
+At the moment, the function kvm_get_vmid_bits() is looking up for the
+sanitized value of ID_AA64MMFR1_EL1 and extract the information
+regarding the number of VMID bits supported.
+
+This is fine as the function is mainly used during VMID roll-over. New
+use in a follow-up patch will require the function to be called a every
+context switch so we want the function to be more efficient.
+
+A new capability is introduced to tell whether 16-bit VMID is
+available.
 
 Signed-off-by: Julien Grall <julien.grall@arm.com>
-Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 ---
- arch/arm64/include/asm/lib_asid.h | 2 ++
- arch/arm64/lib/asid.c             | 6 ++++++
- 2 files changed, 8 insertions(+)
+ arch/arm64/include/asm/cpucaps.h | 3 ++-
+ arch/arm64/include/asm/kvm_mmu.h | 4 +---
+ arch/arm64/kernel/cpufeature.c   | 9 +++++++++
+ 3 files changed, 12 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/include/asm/lib_asid.h b/arch/arm64/include/asm/lib_asid.h
-index acae8d243d17..4dbc0a3f19a6 100644
---- a/arch/arm64/include/asm/lib_asid.h
-+++ b/arch/arm64/include/asm/lib_asid.h
-@@ -82,4 +82,6 @@ void asid_context_pinned_put(struct asid_info *info, atomic64_t *pasid,
- 			     refcount_t *pinned);
- int asid_allocator_init(struct asid_info *info, u32 bits, bool pinned);
+diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
+index c40f2490cd7b..acb92da5c254 100644
+--- a/arch/arm64/include/asm/cpucaps.h
++++ b/arch/arm64/include/asm/cpucaps.h
+@@ -67,7 +67,8 @@
+ #define ARM64_HAS_LDAPR				59
+ #define ARM64_KVM_PROTECTED_MODE		60
+ #define ARM64_WORKAROUND_NVIDIA_CARMEL_CNP	61
++#define ARM64_HAS_16BIT_VMID			62
  
-+void asid_allocator_free(struct asid_info *info);
-+
- #endif
-diff --git a/arch/arm64/lib/asid.c b/arch/arm64/lib/asid.c
-index 286285616f65..7bd031f9516a 100644
---- a/arch/arm64/lib/asid.c
-+++ b/arch/arm64/lib/asid.c
-@@ -256,3 +256,9 @@ int asid_allocator_init(struct asid_info *info, u32 bits, bool pinned)
+-#define ARM64_NCAPS				62
++#define ARM64_NCAPS				63
  
- 	return 0;
+ #endif /* __ASM_CPUCAPS_H */
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 90873851f677..c3080966ef83 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -213,9 +213,7 @@ void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled);
+ 
+ static inline unsigned int kvm_get_vmid_bits(void)
+ {
+-	int reg = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
+-
+-	return get_vmid_bits(reg);
++	return cpus_have_const_cap(ARM64_HAS_16BIT_VMID) ? 16 : 8;
  }
-+
-+void asid_allocator_free(struct asid_info *info)
-+{
-+	kfree(info->map);
-+	kfree(info->pinned_map);
-+}
+ 
+ /*
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index e5281e1c8f1d..ff956fb2f712 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -2203,6 +2203,15 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.matches = has_cpuid_feature,
+ 		.min_field_value = 1,
+ 	},
++	{
++		.capability = ARM64_HAS_16BIT_VMID,
++		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
++		.sys_reg = SYS_ID_AA64MMFR1_EL1,
++		.field_pos = ID_AA64MMFR1_VMIDBITS_SHIFT,
++		.sign = FTR_UNSIGNED,
++		.min_field_value = ID_AA64MMFR1_VMIDBITS_16,
++		.matches = has_cpuid_feature,
++	},
+ 	{},
+ };
+ 
 -- 
 2.17.1
 
