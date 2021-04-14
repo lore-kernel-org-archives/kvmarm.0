@@ -2,81 +2,78 @@ Return-Path: <SRS0=hZsu=JL=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,
+	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F3C3C43460
-	for <kvmarm@archiver.kernel.org>; Wed, 14 Apr 2021 07:20:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F1EEC433B4
+	for <kvmarm@archiver.kernel.org>; Wed, 14 Apr 2021 08:28:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 020A8613B1
-	for <kvmarm@archiver.kernel.org>; Wed, 14 Apr 2021 07:20:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 020A8613B1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 0CD1D613C4
+	for <kvmarm@archiver.kernel.org>; Wed, 14 Apr 2021 08:28:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CD1D613C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9975A4B6A7;
-	Wed, 14 Apr 2021 03:20:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C9EA4B663;
+	Wed, 14 Apr 2021 04:28:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id tsKKB4hpoUAX; Wed, 14 Apr 2021 03:20:07 -0400 (EDT)
+	with ESMTP id DvZgGQPlISqC; Wed, 14 Apr 2021 04:27:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E23BC4B6D3;
-	Wed, 14 Apr 2021 03:20:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F14B14B652;
+	Wed, 14 Apr 2021 04:27:58 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 53B8A4B666
- for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Apr 2021 03:09:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AC0F64B652
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Apr 2021 04:27:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id e-qCCSbHbVrp for <kvmarm@lists.cs.columbia.edu>;
- Wed, 14 Apr 2021 03:09:18 -0400 (EDT)
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4CE984B648
- for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Apr 2021 03:09:18 -0400 (EDT)
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
- by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4FKtnX0Pphz9yT7;
- Wed, 14 Apr 2021 15:06:56 +0800 (CST)
-Received: from [10.174.185.226] (10.174.185.226) by
- DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
- 14.3.498.0; Wed, 14 Apr 2021 15:09:05 +0800
-Subject: Re: [PATCH v15 00/12] SMMUv3 Nested Stage Setup (IOMMU part)
-To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, "Eric
- Auger" <eric.auger@redhat.com>, "eric.auger.pro@gmail.com"
- <eric.auger.pro@gmail.com>, "jean-philippe@linaro.org"
- <jean-philippe@linaro.org>, "iommu@lists.linux-foundation.org"
- <iommu@lists.linux-foundation.org>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- "will@kernel.org" <will@kernel.org>, "maz@kernel.org" <maz@kernel.org>,
- "robin.murphy@arm.com" <robin.murphy@arm.com>, "joro@8bytes.org"
- <joro@8bytes.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, 
- "tn@semihalf.com" <tn@semihalf.com>, zhukeqian <zhukeqian1@huawei.com>
-References: <20210411111228.14386-1-eric.auger@redhat.com>
- <55930e46-0a45-0d43-b34e-432cf332b42c@huawei.com>
- <f6b0bcd156e04d0f958cf79a50ac69e2@huawei.com>
-From: Xingang Wang <wangxingang5@huawei.com>
-Message-ID: <2b8aa93c-1c66-fb0c-f98a-0b59980919d3@huawei.com>
-Date: Wed, 14 Apr 2021 15:08:53 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.1
-MIME-Version: 1.0
-In-Reply-To: <f6b0bcd156e04d0f958cf79a50ac69e2@huawei.com>
-Content-Language: en-US
-X-Originating-IP: [10.174.185.226]
-X-CFilter-Loop: Reflected
-X-Mailman-Approved-At: Wed, 14 Apr 2021 03:20:04 -0400
-Cc: xieyingtai@huawei.com, "vsethi@nvidia.com" <vsethi@nvidia.com>,
- cenjiahui@huawei.com,
- "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
- lushenming <lushenming@huawei.com>,
- "chenxiang \(M\)" <chenxiang66@hisilicon.com>,
- "nicoleotsuka@gmail.com" <nicoleotsuka@gmail.com>,
- "vivek.gautam@arm.com" <vivek.gautam@arm.com>,
- "vdumpa@nvidia.com" <vdumpa@nvidia.com>,
- "yi.l.liu@intel.com" <yi.l.liu@intel.com>,
- "zhangfei.gao@linaro.org" <zhangfei.gao@linaro.org>
+ with ESMTP id Nx3xpAVtvFXt for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 14 Apr 2021 04:27:56 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BAFCC4B4A0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Apr 2021 04:27:56 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 002D2613C8;
+ Wed, 14 Apr 2021 08:27:55 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1lWasK-007ORA-MX; Wed, 14 Apr 2021 09:27:52 +0100
+Date: Wed, 14 Apr 2021 09:27:51 +0100
+Message-ID: <87r1jdmfso.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mathieu Poirier <mathieu.poirier@linaro.org>
+Subject: Re: [GIT PULL] coresight: Fixes for ETE and TRBE
+In-Reply-To: <CANLsYkyyqSAe=9O2MyeX0z0sS501uD2+7NuDVv5V9LeAbbMDoQ@mail.gmail.com>
+References: <20210413161952.750262-1-mathieu.poirier@linaro.org>
+ <87sg3um8j1.wl-maz@kernel.org>
+ <CANLsYkyyqSAe=9O2MyeX0z0sS501uD2+7NuDVv5V9LeAbbMDoQ@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: mathieu.poirier@linaro.org, suzuki.poulose@arm.com,
+ anshuman.khandual@arm.com, gregkh@linuxfoundation.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, coresight@lists.linaro.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
+ Greg KH <gregkh@linuxfoundation.org>,
+ Coresight ML <coresight@lists.linaro.org>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -88,125 +85,54 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Shameer,
-
-On 2021/4/14 14:56, Shameerali Kolothum Thodi wrote:
+On Tue, 13 Apr 2021 20:45:00 +0100,
+Mathieu Poirier <mathieu.poirier@linaro.org> wrote:
 > 
+> On Tue, 13 Apr 2021 at 10:52, Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > Hi Mathieu,
+> >
+> > On Tue, 13 Apr 2021 17:19:52 +0100,
+> > Mathieu Poirier <mathieu.poirier@linaro.org> wrote:
+> > >
+> > > The following changes since commit 4fb13790417a7bf726f3867a5d2b9723efde488b:
+> > >
+> > >   dts: bindings: Document device tree bindings for Arm TRBE (2021-04-06 16:05:38 -0600)
+> > >
+> > > are available in the Git repository at:
+> > >
+> > >   git@gitolite.kernel.org:pub/scm/linux/kernel/git/coresight/linux.git next-ETE-TRBE
+> > >
+> > > for you to fetch changes up to 68d400c079978f649e7f63aba966d219743edd64:
+> > >
+> > >   coresight: trbe: Fix return value check in arm_trbe_register_coresight_cpu() (2021-04-13 09:46:27 -0600)
+> > >
+> > > ----------------------------------------------------------------
+> > > Hi Marc,
+> > >
+> > > Please consider these two patches, they are ETE/TRBE fixes found by bots.
+> > >
+> > > Let me know if you want me to rebase on your next branch and send the
+> > > pull request from that.
+> >
+> > I've now pulled this into kvmarm/next. If you have additional fixes,
+> > just stick them on top of your next-ETE-TRBE branch like you did with
+> > these two patches.
+> >
 > 
->> -----Original Message-----
->> From: wangxingang
->> Sent: 14 April 2021 03:36
->> To: Eric Auger <eric.auger@redhat.com>; eric.auger.pro@gmail.com;
->> jean-philippe@linaro.org; iommu@lists.linux-foundation.org;
->> linux-kernel@vger.kernel.org; kvm@vger.kernel.org;
->> kvmarm@lists.cs.columbia.edu; will@kernel.org; maz@kernel.org;
->> robin.murphy@arm.com; joro@8bytes.org; alex.williamson@redhat.com;
->> tn@semihalf.com; zhukeqian <zhukeqian1@huawei.com>
->> Cc: jacob.jun.pan@linux.intel.com; yi.l.liu@intel.com; zhangfei.gao@linaro.org;
->> zhangfei.gao@gmail.com; vivek.gautam@arm.com; Shameerali Kolothum
->> Thodi <shameerali.kolothum.thodi@huawei.com>; yuzenghui
->> <yuzenghui@huawei.com>; nicoleotsuka@gmail.com; lushenming
->> <lushenming@huawei.com>; vsethi@nvidia.com; chenxiang (M)
->> <chenxiang66@hisilicon.com>; vdumpa@nvidia.com; jiangkunkun
->> <jiangkunkun@huawei.com>
->> Subject: Re: [PATCH v15 00/12] SMMUv3 Nested Stage Setup (IOMMU part)
->>
->> Hi Eric, Jean-Philippe
->>
->> On 2021/4/11 19:12, Eric Auger wrote:
->>> SMMUv3 Nested Stage Setup (IOMMU part)
->>>
->>> This series brings the IOMMU part of HW nested paging support
->>> in the SMMUv3. The VFIO part is submitted separately.
->>>
->>> This is based on Jean-Philippe's
->>> [PATCH v14 00/10] iommu: I/O page faults for SMMUv3
->>> https://www.spinics.net/lists/arm-kernel/msg886518.html
->>> (including the patches that were not pulled for 5.13)
->>>
->>> The IOMMU API is extended to support 2 new API functionalities:
->>> 1) pass the guest stage 1 configuration
->>> 2) pass stage 1 MSI bindings
->>>
->>> Then those capabilities gets implemented in the SMMUv3 driver.
->>>
->>> The virtualizer passes information through the VFIO user API
->>> which cascades them to the iommu subsystem. This allows the guest
->>> to own stage 1 tables and context descriptors (so-called PASID
->>> table) while the host owns stage 2 tables and main configuration
->>> structures (STE).
->>>
->>> Best Regards
->>>
->>> Eric
->>>
->>> This series can be found at:
->>> v5.12-rc6-jean-iopf-14-2stage-v15
->>> (including the VFIO part in its last version: v13)
->>>
->>
->> I am testing the performance of an accelerator with/without SVA/vSVA,
->> and found there might be some potential performance loss risk for SVA/vSVA.
->>
->> I use a Network and computing encryption device (SEC), and send 1MB
->> request for 10000 times.
->>
->> I trigger mm fault before I send the request, so there should be no iopf.
->>
->> Here's what I got:
->>
->> physical scenario:
->> performance:		SVA:9MB/s  	NOSVA:9MB/s
->> tlb_miss: 		SVA:302,651	NOSVA:1,223
->> trans_table_walk_access:SVA:302,276	NOSVA:1,237
->>
->> VM scenario:
->> performance:		vSVA:9MB/s  	NOvSVA:6MB/s  about 30~40% loss
->> tlb_miss: 		vSVA:4,423,897	NOvSVA:1,907
->> trans_table_walk_access:vSVA:61,928,430	NOvSVA:21,948
->>
->> In physical scenario, there's almost no performance loss, but the
->> tlb_miss and trans_table_walk_access of stage 1 for SVA is quite high,
->> comparing to NOSVA.
->>
->> In VM scenario, there's about 30~40% performance loss, this is because
->> the two stage tlb_miss and trans_table_walk_access is even higher, and
->> impact the performance.
->>
->> I compare the procedure of building page table of SVA and NOSVA, and
->> found that NOSVA uses 2MB mapping as far as possible, while SVA uses
->> only 4KB.
->>
->> I retest with huge page, and huge page could solve this problem, the
->> performance of SVA/vSVA is almost the same as NOSVA.
->>
->> I am wondering do you have any other solution for the performance loss
->> of vSVA, or any other method to reduce the tlb_miss/trans_table_walk.
-> 
-> Hi Xingang,
-> 
-> Just curious, do you have DVM enabled on this board or does it use explicit
-> SMMU TLB invalidations?
-> 
-> Thanks,
-> Shameer
-> 
+> Much appreciated - I owe you a beer.
 
-For now, DVM is enabled and TLBI is not explicit used.
+One day, my friend. One day...
 
-And by the way the performance data above is
-performance:	vSVA:9GB/s(not 9MB/s)  NOvSVA:6GB/s(not 6GB/s)
+	M.
 
-Thanks
-
-Xingang
-
-.
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
