@@ -2,58 +2,74 @@ Return-Path: <SRS0=hZsu=JL=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A173C433ED
-	for <kvmarm@archiver.kernel.org>; Wed, 14 Apr 2021 08:50:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74F44C433ED
+	for <kvmarm@archiver.kernel.org>; Wed, 14 Apr 2021 09:05:16 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 888A561153
-	for <kvmarm@archiver.kernel.org>; Wed, 14 Apr 2021 08:50:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 888A561153
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id E1434613C8
+	for <kvmarm@archiver.kernel.org>; Wed, 14 Apr 2021 09:05:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1434613C8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F3B614B685;
-	Wed, 14 Apr 2021 04:50:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7216F4B4BE;
+	Wed, 14 Apr 2021 05:05:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id VSzljCjzaSPQ; Wed, 14 Apr 2021 04:50:51 -0400 (EDT)
+	with ESMTP id ufNdFAv3GEj8; Wed, 14 Apr 2021 05:05:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DA7734B682;
-	Wed, 14 Apr 2021 04:50:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 23AAB4B666;
+	Wed, 14 Apr 2021 05:05:13 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BFBFB4B673
- for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Apr 2021 04:50:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5315E4B5CE
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Apr 2021 05:05:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id i+4GDJbBSAr6 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 14 Apr 2021 04:50:49 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 749B04B482
- for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Apr 2021 04:50:49 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 13B20113E;
- Wed, 14 Apr 2021 01:50:49 -0700 (PDT)
-Received: from slackpad.fritz.box (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8AE153F73B;
- Wed, 14 Apr 2021 01:50:48 -0700 (PDT)
-Date: Wed, 14 Apr 2021 09:50:28 +0100
-From: Andre Przywara <andre.przywara@arm.com>
-To: =?UTF-8?B?6IOk5qGmIOmZiA==?= <yinhua_chen@outlook.com>
-Subject: Re: KVM/ARM64: Booting KVM on FVP/fastmodels
-Message-ID: <20210414095028.0bb75aaa@slackpad.fritz.box>
-In-Reply-To: <OS0PR01MB54283E4CF20EF0D2E423E366814E9@OS0PR01MB5428.jpnprd01.prod.outlook.com>
-References: <OSYPR01MB54317CECC49E872ACFD9D84B817E9@OSYPR01MB5431.jpnprd01.prod.outlook.com>
- <0bbea123-7bea-3a2e-70ae-30f43df3000e@arm.com>
- <OS0PR01MB54283E4CF20EF0D2E423E366814E9@OS0PR01MB5428.jpnprd01.prod.outlook.com>
-Organization: Arm Ltd.
-X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
-MIME-Version: 1.0
-Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+ with ESMTP id I9ISK7LI4zqW for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 14 Apr 2021 05:05:10 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CC97F4B4EC
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Apr 2021 05:05:09 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 034A761166;
+ Wed, 14 Apr 2021 09:05:08 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1lWbSL-007OqK-TI; Wed, 14 Apr 2021 10:05:06 +0100
+Date: Wed, 14 Apr 2021 10:05:05 +0100
+Message-ID: <87pmyxme2m.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Keqian Zhu <zhukeqian1@huawei.com>
+Subject: Re: [PATCH v3 2/2] kvm/arm64: Try stage2 block mapping for host
+ device MMIO
+In-Reply-To: <20210414065109.8616-3-zhukeqian1@huawei.com>
+References: <20210414065109.8616-1-zhukeqian1@huawei.com>
+ <20210414065109.8616-3-zhukeqian1@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: zhukeqian1@huawei.com, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, wanghaibin.wang@huawei.com, sashukla@nvidia.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Santosh Shukla <sashukla@nvidia.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -65,44 +81,146 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gV2VkLCAxNCBBcHIgMjAyMSAwMjozNzowNyArMDAwMArog6TmoaYg6ZmIIDx5aW5odWFfY2hl
-bkBvdXRsb29rLmNvbT4gd3JvdGU6Cgo+IEhpLCBBbmRyZQo+IAo+IERvIHlvdSBtZWFuIHRoYXQg
-aWYgSSBib290IExpbnV4IG9uIEZWUCwgdGhlbiBJIGNhbiBydW4gS1ZNIG9uIEZWUD8gU2luY2Ug
-S1ZNIGlzIGp1c3QgYSBtb2R1bGUgaW4gTGludXg/CgpXZWxsLCBvbiBBUk0gaXQncyBub3QgYSBr
-ZXJuZWwgbW9kdWxlLCBidXQgYnVpbHQtaW4gdG8gdGhlIGtlcm5lbAppbWFnZSwgYnV0IHllczog
-WW91IGNhbiBydW4gYW55IG5vcm1hbCBLVk0gZW5hYmxlZCBrZXJuZWwgb24KaXQuIFNvIGp1c3Qg
-dXNlIHRoZSBzYW1lIHJlY2lwZSB5b3Ugd291bGQgdXNlIG9uIGFueSBvdGhlciBzeXN0ZW0gdG8K
-cnVuIEtWTSBndWVzdHMuCgpDaGVlcnMsCkFuZHJlCiAKPiBfX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fXwo+IEZyb206IEFuZHLDqSBQcnp5d2FyYSA8YW5kcmUucHJ6eXdhcmFAYXJtLmNv
-bT4KPiBTZW50OiBUdWVzZGF5LCBNYXJjaCAzMCwgMjAyMSAxODoyMgo+IFRvOiB5aW5odWFfY2hl
-bkBvdXRsb29rLmNvbSA8eWluaHVhX2NoZW5Ab3V0bG9vay5jb20+OyBrdm1hcm1AbGlzdHMuY3Mu
-Y29sdW1iaWEuZWR1IDxrdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Pgo+IFN1YmplY3Q6IFJl
-OiBLVk0vQVJNNjQ6IEJvb3RpbmcgS1ZNIG9uIEZWUC9mYXN0bW9kZWxzCj4gCj4gT24gMjkvMDMv
-MjAyMSAxMzoxMywgeWluaHVhX2NoZW5Ab3V0bG9vay5jb20gd3JvdGU6Cj4gCj4gSGksCj4gCj4g
-PiBJIHdhbnQgdG8gYm9vdCBLVk0gb24gc2ltdWxhdG9ycy4KPiA+Cj4gPiBJIGRvbid0IHdhbnQg
-dG8gdXNlIFFFTVUgc2luY2Ugc29tZSBmZWF0dXJlcyBhcmUgb25seSBzdXBwb3J0ZWQgb24KPiA+
-IEZWUC9mYXN0bW9kZWxzIG5vdy4KPiA+Cj4gPiBIb3dldmVyLCBJIGNhbm5vdCBmaW5kIGRvY3Vt
-ZW50cy9ibG9ncy93aWtpIGFib3V0IGJvb3RpbmcgS1ZNIG9uCj4gPiBGVlAvZmFzdG1vZGVscy4K
-PiA+Cj4gPiBEb2VzIEtWTSBzdXBwb3J0IHJ1bm5pbmcgb24gRlZQPyAgCj4gCj4gVGhlIEZWUCBl
-bXVsYXRlcyB0aGUgZnVsbCBhcmNoaXRlY3R1cmUsIGluY2x1ZGluZyBhbGwgZXhjZXB0aW9uIGxl
-dmVscwo+IChzbyBhbHNvIEVMMiksIGFuZCB0aGUgdmlydHVhbGl6YXRpb24gc3VwcG9ydCBvZiB0
-aGUgR0lDIGFuZCB0aGUgR2VuZXJpYwo+IFRpbWVyLgo+IFNvIHllcywgdGhlIG1vZGVscyBmdWxs
-eSBzdXBwb3J0IEtWTSAob3IgYW55IG90aGVyIGh5cGVydmlzb3IsIGZvciB0aGF0Cj4gbWF0dGVy
-KSwgYW5kIGFyZSBpbiBmYWN0IG9mdGVuIHVzZWQgZm9yIGRldmVsb3BpbmcgS1ZNIHN1cHBvcnQg
-b2YgbmV3Cj4gaGFyZHdhcmUgZmVhdHVyZXMuCj4gCj4gU28gd2hhdCBhcmUgdGhlIHByb2JsZW1z
-IHRoYXQgeW91IGFyZSBmYWNpbmc/IEp1c3QgcnVubmluZyBhIGtlcm5lbCBsaWtlCj4geW91IHdv
-dWxkIG5vcm1hbGx5IGRvIG9uIHRoZSBtb2RlbCBzaG91bGQgd29yayBvdXQgb2YgdGhlIGJveC4K
-PiBJZiB5b3UgZGVzY3JpYmUgeW91ciBzZXR1cCBhbmQgdGhlIGVycm9yIG1lc3NhZ2VzLCB3ZSBj
-YW4gcHJvYmFibHkgaGVscAo+IHlvdSBiZXR0ZXIuCj4gCj4gQ2hlZXJzLAo+IEFuZHJlCj4gCj4g
-Pgo+ID4gQXBwcmVjaWF0ZSBmb3IgeW91ciBoZWxwIQo+ID4KPiA+IFNpbmNlcmVseSwKPiA+IFlp
-bmh1YQo+ID4KPiA+IF9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fCj4gPiBrdm1hcm0gbWFpbGluZyBsaXN0Cj4gPiBrdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEu
-ZWR1Cj4gPiBodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2
-bWFybQo+ID4gIAo+IAoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0
-dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
++ Santosh, who found some interesting bugs in that area before.
+
+On Wed, 14 Apr 2021 07:51:09 +0100,
+Keqian Zhu <zhukeqian1@huawei.com> wrote:
+> 
+> The MMIO region of a device maybe huge (GB level), try to use
+> block mapping in stage2 to speedup both map and unmap.
+> 
+> Compared to normal memory mapping, we should consider two more
+> points when try block mapping for MMIO region:
+> 
+> 1. For normal memory mapping, the PA(host physical address) and
+> HVA have same alignment within PUD_SIZE or PMD_SIZE when we use
+> the HVA to request hugepage, so we don't need to consider PA
+> alignment when verifing block mapping. But for device memory
+> mapping, the PA and HVA may have different alignment.
+> 
+> 2. For normal memory mapping, we are sure hugepage size properly
+> fit into vma, so we don't check whether the mapping size exceeds
+> the boundary of vma. But for device memory mapping, we should pay
+> attention to this.
+> 
+> This adds device_rough_page_shift() to check these two points when
+> selecting block mapping size.
+> 
+> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+> ---
+>  arch/arm64/kvm/mmu.c | 37 +++++++++++++++++++++++++++++++++----
+>  1 file changed, 33 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index c59af5ca01b0..1a6d96169d60 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -624,6 +624,31 @@ static void kvm_send_hwpoison_signal(unsigned long address, short lsb)
+>  	send_sig_mceerr(BUS_MCEERR_AR, (void __user *)address, lsb, current);
+>  }
+>  
+> +/*
+> + * Find a max mapping size that properly insides the vma. And hva and pa must
+> + * have the same alignment to this mapping size. It's rough as there are still
+> + * other restrictions, will be checked by fault_supports_stage2_huge_mapping().
+> + */
+> +static short device_rough_page_shift(struct vm_area_struct *vma,
+> +				     unsigned long hva)
+
+My earlier question still stands. Under which circumstances would this
+function return something that is *not* the final mapping size? I
+really don't see a reason why this would not return the final mapping
+size.
+
+> +{
+> +	phys_addr_t pa = (vma->vm_pgoff << PAGE_SHIFT) + (hva - vma->vm_start);
+> +
+> +#ifndef __PAGETABLE_PMD_FOLDED
+> +	if ((hva & (PUD_SIZE - 1)) == (pa & (PUD_SIZE - 1)) &&
+> +	    ALIGN_DOWN(hva, PUD_SIZE) >= vma->vm_start &&
+> +	    ALIGN(hva, PUD_SIZE) <= vma->vm_end)
+> +		return PUD_SHIFT;
+> +#endif
+> +
+> +	if ((hva & (PMD_SIZE - 1)) == (pa & (PMD_SIZE - 1)) &&
+> +	    ALIGN_DOWN(hva, PMD_SIZE) >= vma->vm_start &&
+> +	    ALIGN(hva, PMD_SIZE) <= vma->vm_end)
+> +		return PMD_SHIFT;
+> +
+> +	return PAGE_SHIFT;
+> +}
+> +
+>  static bool fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
+>  					       unsigned long hva,
+>  					       unsigned long map_size)
+> @@ -769,7 +794,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  		return -EFAULT;
+>  	}
+>  
+> -	/* Let's check if we will get back a huge page backed by hugetlbfs */
+> +	/*
+> +	 * Let's check if we will get back a huge page backed by hugetlbfs, or
+> +	 * get block mapping for device MMIO region.
+> +	 */
+>  	mmap_read_lock(current->mm);
+>  	vma = find_vma_intersection(current->mm, hva, hva + 1);
+>  	if (unlikely(!vma)) {
+> @@ -780,11 +808,12 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  
+>  	if (is_vm_hugetlb_page(vma))
+>  		vma_shift = huge_page_shift(hstate_vma(vma));
+> +	else if (vma->vm_flags & VM_PFNMAP)
+> +		vma_shift = device_rough_page_shift(vma, hva);
+
+What prevents a VMA from having both VM_HUGETLB and VM_PFNMAP? This is
+pretty unlikely, but I'd like to see this case catered for.
+
+>  	else
+>  		vma_shift = PAGE_SHIFT;
+>  
+> -	if (logging_active ||
+> -	    (vma->vm_flags & VM_PFNMAP)) {
+> +	if (logging_active) {
+>  		force_pte = true;
+>  		vma_shift = PAGE_SHIFT;
+>  	}
+> @@ -855,7 +884,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  
+>  	if (kvm_is_device_pfn(pfn)) {
+>  		device = true;
+> -		force_pte = true;
+> +		force_pte = (vma_pagesize == PAGE_SIZE);
+
+Why do we need to set force_pte if we are already dealing with
+PAGE_SIZE? I guess you are doing this for the sake of avoiding the
+call to transparent_hugepage_adjust(), right?
+
+I'd rather you simply don't try to upgrade a device mapping by
+explicitly checking for this and keep force_pte for *memory*
+exclusively.
+
+Santosh, can you please take a look at this series and try to see if
+the problem you fixed in [1] (which ended up as commit 91a2c34b7d6f)
+is still OK with this series?
+
+>  	} else if (logging_active && !write_fault) {
+>  		/*
+>  		 * Only actually map the page as writable if this was a write
+
+Thanks,
+
+	M.
+
+[1] https://lore.kernel.org/kvmarm/1603711447-11998-1-git-send-email-sashukla@nvidia.com/
+
+-- 
+Without deviation from the norm, progress is not possible.
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
