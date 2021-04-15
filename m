@@ -2,69 +2,115 @@ Return-Path: <SRS0=5CXi=JM=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3C72C433B4
-	for <kvmarm@archiver.kernel.org>; Thu, 15 Apr 2021 06:59:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91EC4C433ED
+	for <kvmarm@archiver.kernel.org>; Thu, 15 Apr 2021 09:30:25 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 10EDB6117A
-	for <kvmarm@archiver.kernel.org>; Thu, 15 Apr 2021 06:59:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10EDB6117A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id E68D461222
+	for <kvmarm@archiver.kernel.org>; Thu, 15 Apr 2021 09:30:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E68D461222
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 84E2A4B3F5;
-	Thu, 15 Apr 2021 02:59:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E3B34B63C;
+	Thu, 15 Apr 2021 05:30:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id o4cL7z1-m02n; Thu, 15 Apr 2021 02:59:36 -0400 (EDT)
+	with ESMTP id sLBhhaASBHYa; Thu, 15 Apr 2021 05:30:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8DE7A4B3B4;
-	Thu, 15 Apr 2021 02:59:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 57D1C4B646;
+	Thu, 15 Apr 2021 05:30:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 78E0B4B375
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Apr 2021 02:59:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 293774B626
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Apr 2021 05:30:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Qqes8KVHaGYi for <kvmarm@lists.cs.columbia.edu>;
- Thu, 15 Apr 2021 02:59:32 -0400 (EDT)
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AC58E4A19F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Apr 2021 02:59:32 -0400 (EDT)
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.60])
- by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4FLVXK11HGzjYhv;
- Thu, 15 Apr 2021 14:57:37 +0800 (CST)
-Received: from [10.174.187.224] (10.174.187.224) by
- DGGEMS405-HUB.china.huawei.com (10.3.19.205) with Microsoft SMTP Server id
- 14.3.498.0; Thu, 15 Apr 2021 14:59:26 +0800
-Subject: Re: [PATCH 1/5] KVM: arm64: Divorce the perf code from oprofile
- helpers
-To: Marc Zyngier <maz@kernel.org>, <kvm@vger.kernel.org>,
- <kvmarm@lists.cs.columbia.edu>, <linux-arm-kernel@lists.infradead.org>,
- <linux-kernel@vger.kernel.org>, <linux-s390@vger.kernel.org>,
- <linux-sh@vger.kernel.org>
-References: <20210414134409.1266357-1-maz@kernel.org>
- <20210414134409.1266357-2-maz@kernel.org>
-From: Keqian Zhu <zhukeqian1@huawei.com>
-Message-ID: <baa268cf-c92d-6b97-da4c-e7da2a9ccb7a@huawei.com>
-Date: Thu, 15 Apr 2021 14:59:26 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+ with ESMTP id W1KQzW7ifKtq for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 15 Apr 2021 05:30:18 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B0DDF4B455
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Apr 2021 05:30:18 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1618479018;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=MW/mRgvf+zkYoiSHfMZp2dDTVVI25+tYOHvOtleD70I=;
+ b=VVIZREslz8VzRQq7MhrD1H6qoFA1+3UgOAU+aCmpMmjV0bdEhP8Yt9oSaMDi2NxS1evinQ
+ x8bLztxrduY7G4cxC57MM3U8rAe7ARqBz+CAhLT4xpeLJT0uOYIP/Ndrt2ak0d0YfrJ9MX
+ c3MugtSjGncvX718ac8PouQhCVC03Ng=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-101-kvJGFWpLPmW0drWNojwAjg-1; Thu, 15 Apr 2021 05:30:14 -0400
+X-MC-Unique: kvJGFWpLPmW0drWNojwAjg-1
+Received: by mail-wm1-f69.google.com with SMTP id
+ x20-20020a7bc2140000b029012bb4d2b5d6so2683330wmi.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Apr 2021 02:30:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:organization
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=MW/mRgvf+zkYoiSHfMZp2dDTVVI25+tYOHvOtleD70I=;
+ b=jYaulIJxxJJ1pv1DEHPK++z9bSov5gMdePmCXlQTqricEBvOvIvuGfK4/Lh0U/xPrr
+ BI6kpk3YgpcSGvoHrir87t2wXK3O2L/L5oKjzbNMu7LhE6MXIUi6/5t9ZtOCE7CWqMwK
+ 3/uqlpqFE6nuj2+fWfS5upmIRrybxFm21zBVnW8sl3YYIMWX8dxywGw42Qj39WYU8n6G
+ yUQ9Y8xHsUkUxQcEwk3VXiEYqpyNamsMwFiUqH+UB0Ejyb1iNid0m5qqQiNFEzzvh143
+ MN/ne/+9IJrz9jMvuYNUy544Nj+eMtBwvu4RmsT3+hifNXY8pdptzg+PmrVnJH4gebVz
+ p8IA==
+X-Gm-Message-State: AOAM531xmFHOE8k9oIJZVopeQ9B82XMP2kqSfQAaImkq6tGaA2hVEUqW
+ 1fARPphgMSblfYIHJH04E62sRbGKS1W14zET4HyxIZZHwwwVEW+Fg8M6Mzcw05rvAogTrzrSRjM
+ a/Hzh0NjKBaxdqMOx1jPbCKVR
+X-Received: by 2002:a5d:6a84:: with SMTP id s4mr2472825wru.92.1618479013339;
+ Thu, 15 Apr 2021 02:30:13 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw8b0HIW4SQWI0F4SN4CcB7oMoecgIFl/eiaSw1ft7FPToZP8/z36BeeQADlUaxJ82PzDz6Hg==
+X-Received: by 2002:a5d:6a84:: with SMTP id s4mr2472795wru.92.1618479013135;
+ Thu, 15 Apr 2021 02:30:13 -0700 (PDT)
+Received: from [192.168.3.132] (p5b0c6392.dip0.t-ipconnect.de. [91.12.99.146])
+ by smtp.gmail.com with ESMTPSA id
+ p17sm1659280wmq.47.2021.04.15.02.30.12
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 15 Apr 2021 02:30:12 -0700 (PDT)
+Subject: Re: [RFC/RFT PATCH 1/3] memblock: update initialization of reserved
+ pages
+To: Mike Rapoport <rppt@kernel.org>
+References: <20210407172607.8812-1-rppt@kernel.org>
+ <20210407172607.8812-2-rppt@kernel.org>
+ <0c48f98c-7454-1458-15a5-cc5a7e1fb7cd@redhat.com>
+ <CAMj1kXGw97epyP2HdHjA8Yp6+VF1j5xmd0AgVBBv3k+h_B610w@mail.gmail.com>
+ <3811547a-9057-3c80-3805-2e658488ac99@redhat.com>
+ <YHdPmtpzFxHE9mAt@kernel.org>
+From: David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+Message-ID: <f5503130-c0e7-329f-86c4-727ece1c860f@redhat.com>
+Date: Thu, 15 Apr 2021 11:30:12 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-In-Reply-To: <20210414134409.1266357-2-maz@kernel.org>
-X-Originating-IP: [10.174.187.224]
-X-CFilter-Loop: Reflected
-Cc: Rich Felker <dalias@libc.org>, Yoshinori Sato <ysato@users.sourceforge.jp>,
- Peter Zijlstra <peterz@infradead.org>, Viresh
- Kumar <viresh.kumar@linaro.org>, Heiko Carstens <hca@linux.ibm.com>,
- Arnaldo Carvalho de Melo <acme@kernel.org>, nathan@kernel.org,
- Christian Borntraeger <borntraeger@de.ibm.com>, Will Deacon <will@kernel.org>,
- kernel-team@android.com
+In-Reply-To: <YHdPmtpzFxHE9mAt@kernel.org>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=david@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Mike Rapoport <rppt@linux.ibm.com>,
+ Linux Memory Management List <linux-mm@kvack.org>,
+ kvmarm <kvmarm@lists.cs.columbia.edu>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>,
+ Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -76,46 +122,34 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
-
-On 2021/4/14 21:44, Marc Zyngier wrote:
-> KVM/arm64 is the sole user of perf_num_counters(), and really
-> could do without it. Stop using the obsolete API by relying on
-> the existing probing code.
+> Not sure we really need a new pagetype here, PG_Reserved seems to be quite
+> enough to say "don't touch this".  I generally agree that we could make
+> PG_Reserved a PageType and then have several sub-types for reserved memory.
+> This definitely will add clarity but I'm not sure that this justifies
+> amount of churn and effort required to audit uses of PageResrved().
+>   
+>> Then, we could mostly avoid having to query memblock at runtime to figure
+>> out that this is special memory. This would obviously be an extension to
+>> this series. Just a thought.
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/perf.c     | 7 +------
->  arch/arm64/kvm/pmu-emul.c | 2 +-
->  include/kvm/arm_pmu.h     | 4 ++++
->  3 files changed, 6 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/perf.c b/arch/arm64/kvm/perf.c
-> index 739164324afe..b8b398670ef2 100644
-> --- a/arch/arm64/kvm/perf.c
-> +++ b/arch/arm64/kvm/perf.c
-> @@ -50,12 +50,7 @@ static struct perf_guest_info_callbacks kvm_guest_cbs = {
->  
->  int kvm_perf_init(void)
->  {
-> -	/*
-> -	 * Check if HW_PERF_EVENTS are supported by checking the number of
-> -	 * hardware performance counters. This could ensure the presence of
-> -	 * a physical PMU and CONFIG_PERF_EVENT is selected.
-> -	 */
-> -	if (IS_ENABLED(CONFIG_ARM_PMU) && perf_num_counters() > 0)
-> +	if (kvm_pmu_probe_pmuver() != 0xf)
-The probe() function may be called many times (kvm_arm_pmu_v3_set_attr also calls it).
-I don't know whether the first calling is enough. If so, can we use a static variable
-in it, so the following calling can return the result right away?
+> Stop pushing memblock out of kernel! ;-)
 
+Can't stop. Won't stop. :D
+
+It's lovely for booting up a kernel until we have other data-structures 
+in place ;)
+
+
+-- 
 Thanks,
-Keqian
+
+David / dhildenb
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
