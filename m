@@ -2,55 +2,55 @@ Return-Path: <SRS0=5CXi=JM=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09C94C433ED
-	for <kvmarm@archiver.kernel.org>; Thu, 15 Apr 2021 11:50:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D761C43460
+	for <kvmarm@archiver.kernel.org>; Thu, 15 Apr 2021 11:50:57 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 603CB613B6
-	for <kvmarm@archiver.kernel.org>; Thu, 15 Apr 2021 11:50:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 603CB613B6
+	by mail.kernel.org (Postfix) with ESMTP id A8C21613BB
+	for <kvmarm@archiver.kernel.org>; Thu, 15 Apr 2021 11:50:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8C21613BB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D8424B6A5;
-	Thu, 15 Apr 2021 07:50:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 49B064B6C6;
+	Thu, 15 Apr 2021 07:50:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 0Vjb2WG46esp; Thu, 15 Apr 2021 07:50:54 -0400 (EDT)
+	with ESMTP id jk8QHVvo-Wyl; Thu, 15 Apr 2021 07:50:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C1C94B721;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 986EE4B766;
 	Thu, 15 Apr 2021 07:50:51 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 98D3A4B6C6
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EF11A4B6C6
  for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Apr 2021 07:50:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TI7R5n4JIGBy for <kvmarm@lists.cs.columbia.edu>;
- Thu, 15 Apr 2021 07:50:49 -0400 (EDT)
+ with ESMTP id TUT8k7m2hQsd for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 15 Apr 2021 07:50:50 -0400 (EDT)
 Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 542BA4B6A5
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E28914B724
  for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Apr 2021 07:50:49 -0400 (EDT)
 Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.58])
- by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4FLczw63WhzB10g;
+ by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4FLczw6xrNzB178;
  Thu, 15 Apr 2021 19:48:28 +0800 (CST)
 Received: from DESKTOP-TMVL5KK.china.huawei.com (10.174.187.128) by
  DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
- 14.3.498.0; Thu, 15 Apr 2021 19:50:38 +0800
+ 14.3.498.0; Thu, 15 Apr 2021 19:50:37 +0800
 From: Yanan Wang <wangyanan55@huawei.com>
 To: Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, "Quentin
  Perret" <qperret@google.com>, Alexandru Elisei <alexandru.elisei@arm.com>,
  <kvmarm@lists.cs.columbia.edu>, <linux-arm-kernel@lists.infradead.org>,
  <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH v5 4/6] KVM: arm64: Provide invalidate_icache_range at non-VHE
- EL2
-Date: Thu, 15 Apr 2021 19:50:30 +0800
-Message-ID: <20210415115032.35760-5-wangyanan55@huawei.com>
+Subject: [PATCH v5 3/6] KVM: arm64: Add mm_ops member for structure
+ stage2_attr_data
+Date: Thu, 15 Apr 2021 19:50:29 +0800
+Message-ID: <20210415115032.35760-4-wangyanan55@huawei.com>
 X-Mailer: git-send-email 2.8.4.windows.1
 In-Reply-To: <20210415115032.35760-1-wangyanan55@huawei.com>
 References: <20210415115032.35760-1-wangyanan55@huawei.com>
@@ -74,41 +74,43 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-We want to move I-cache maintenance for the guest to the stage-2
-page table code for performance improvement. Before it can work,
-we should first make function invalidate_icache_range available
-to non-VHE EL2 to avoid compiling or program running error, as
-pgtable.c is now linked into the non-VHE EL2 code for pKVM mode.
-
-In this patch, we only introduce symbol of invalidate_icache_range
-with no real functionality in nvhe/cache.S, because there haven't
-been situations found currently where I-cache maintenance is also
-needed in non-VHE EL2 for pKVM mode.
+Also add a mm_ops member for structure stage2_attr_data, since we
+will move I-cache maintenance for guest stage-2 to the permission
+path and as a result will need mm_ops for address transformation.
 
 Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
 ---
- arch/arm64/kvm/hyp/nvhe/cache.S | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ arch/arm64/kvm/hyp/pgtable.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/cache.S b/arch/arm64/kvm/hyp/nvhe/cache.S
-index 36cef6915428..a125ec9aeed2 100644
---- a/arch/arm64/kvm/hyp/nvhe/cache.S
-+++ b/arch/arm64/kvm/hyp/nvhe/cache.S
-@@ -11,3 +11,14 @@ SYM_FUNC_START_PI(__flush_dcache_area)
- 	dcache_by_line_op civac, sy, x0, x1, x2, x3
- 	ret
- SYM_FUNC_END_PI(__flush_dcache_area)
-+
-+/*
-+ *	invalidate_icache_range(start,end)
-+ *
-+ *	Ensure that the I cache is invalid within specified region.
-+ *
-+ *	- start   - virtual start address of region
-+ *	- end     - virtual end address of region
-+ */
-+SYM_FUNC_START(invalidate_icache_range)
-+SYM_FUNC_END(invalidate_icache_range)
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index e3606c9dcec7..b480f6d1171e 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -869,10 +869,11 @@ int kvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size)
+ }
+ 
+ struct stage2_attr_data {
+-	kvm_pte_t	attr_set;
+-	kvm_pte_t	attr_clr;
+-	kvm_pte_t	pte;
+-	u32		level;
++	kvm_pte_t			attr_set;
++	kvm_pte_t			attr_clr;
++	kvm_pte_t			pte;
++	u32				level;
++	struct kvm_pgtable_mm_ops	*mm_ops;
+ };
+ 
+ static int stage2_attr_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+@@ -911,6 +912,7 @@ static int stage2_update_leaf_attrs(struct kvm_pgtable *pgt, u64 addr,
+ 	struct stage2_attr_data data = {
+ 		.attr_set	= attr_set & attr_mask,
+ 		.attr_clr	= attr_clr & attr_mask,
++		.mm_ops		= pgt->mm_ops,
+ 	};
+ 	struct kvm_pgtable_walker walker = {
+ 		.cb		= stage2_attr_walker,
 -- 
 2.23.0
 
