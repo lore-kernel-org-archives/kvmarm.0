@@ -2,54 +2,78 @@ Return-Path: <SRS0=5CXi=JM=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0511AC433B4
-	for <kvmarm@archiver.kernel.org>; Thu, 15 Apr 2021 13:17:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08F88C433B4
+	for <kvmarm@archiver.kernel.org>; Thu, 15 Apr 2021 13:46:42 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6BC8A611CD
-	for <kvmarm@archiver.kernel.org>; Thu, 15 Apr 2021 13:17:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BC8A611CD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 7647B613C0
+	for <kvmarm@archiver.kernel.org>; Thu, 15 Apr 2021 13:46:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7647B613C0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BEA3D4B685;
-	Thu, 15 Apr 2021 09:17:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D361A4B4A7;
+	Thu, 15 Apr 2021 09:46:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id stc3qfRivDUk; Thu, 15 Apr 2021 09:17:00 -0400 (EDT)
+	with ESMTP id QV1-OH6GYcXJ; Thu, 15 Apr 2021 09:46:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8DABE4B65A;
-	Thu, 15 Apr 2021 09:17:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3AA864B583;
+	Thu, 15 Apr 2021 09:46:39 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D95224B646
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Apr 2021 09:16:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 652874B497
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Apr 2021 09:46:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nyMXI5KlhGRB for <kvmarm@lists.cs.columbia.edu>;
- Thu, 15 Apr 2021 09:16:58 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A20254B642
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Apr 2021 09:16:58 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EE92311B3;
- Thu, 15 Apr 2021 06:16:57 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3B0E33F694;
- Thu, 15 Apr 2021 06:16:57 -0700 (PDT)
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: will@kernel.org, julien.thierry.kdev@gmail.com, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu
-Subject: [PATCH kvmtool] arm: Fail early if KVM_CAP_ARM_PMU_V3 is not supported
-Date: Thu, 15 Apr 2021 14:17:25 +0100
-Message-Id: <20210415131725.105675-1-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.31.1
-MIME-Version: 1.0
+ with ESMTP id H3xHXS28hJQN for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 15 Apr 2021 09:46:36 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C75084B42E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Apr 2021 09:46:36 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id AAF116113B;
+ Thu, 15 Apr 2021 13:46:35 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1lX2KH-007ehD-Ke; Thu, 15 Apr 2021 14:46:33 +0100
+Date: Thu, 15 Apr 2021 14:46:32 +0100
+Message-ID: <87eefbmzif.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Keqian Zhu <zhukeqian1@huawei.com>
+Subject: Re: [PATCH v3 2/2] kvm/arm64: Try stage2 block mapping for host
+ device MMIO
+In-Reply-To: <7b5789fb-920d-e797-ba7a-49780bd3d587@huawei.com>
+References: <20210414065109.8616-1-zhukeqian1@huawei.com>
+ <20210414065109.8616-3-zhukeqian1@huawei.com>
+ <87pmyxme2m.wl-maz@kernel.org>
+ <b434317f-ef6d-1d91-0189-8343c404c88c@huawei.com>
+ <87im4nn8wf.wl-maz@kernel.org>
+ <7b5789fb-920d-e797-ba7a-49780bd3d587@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: zhukeqian1@huawei.com, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, wanghaibin.wang@huawei.com, sashukla@nvidia.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Santosh Shukla <sashukla@nvidia.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -66,61 +90,326 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-pmu__generate_fdt_nodes() checks if the host has support for PMU in a guest
-and prints a warning if that's not the case. However, this check is too
-late because the function is called after the VCPU has been created, and
-VCPU creation fails if KVM_CAP_ARM_PMU_V3 is not available with a rather
-unhelpful error:
+On Thu, 15 Apr 2021 12:26:26 +0100,
+Keqian Zhu <zhukeqian1@huawei.com> wrote:
+> 
+> Hi Marc,
+> 
+> On 2021/4/15 18:23, Marc Zyngier wrote:
+> > On Thu, 15 Apr 2021 03:20:52 +0100,
+> > Keqian Zhu <zhukeqian1@huawei.com> wrote:
+> >>
+> >> Hi Marc,
+> >>
+> >> On 2021/4/14 17:05, Marc Zyngier wrote:
+> >>> + Santosh, who found some interesting bugs in that area before.
+> >>>
+> >>> On Wed, 14 Apr 2021 07:51:09 +0100,
+> >>> Keqian Zhu <zhukeqian1@huawei.com> wrote:
+> >>>>
+> >>>> The MMIO region of a device maybe huge (GB level), try to use
+> >>>> block mapping in stage2 to speedup both map and unmap.
+> >>>>
+> >>>> Compared to normal memory mapping, we should consider two more
+> >>>> points when try block mapping for MMIO region:
+> >>>>
+> >>>> 1. For normal memory mapping, the PA(host physical address) and
+> >>>> HVA have same alignment within PUD_SIZE or PMD_SIZE when we use
+> >>>> the HVA to request hugepage, so we don't need to consider PA
+> >>>> alignment when verifing block mapping. But for device memory
+> >>>> mapping, the PA and HVA may have different alignment.
+> >>>>
+> >>>> 2. For normal memory mapping, we are sure hugepage size properly
+> >>>> fit into vma, so we don't check whether the mapping size exceeds
+> >>>> the boundary of vma. But for device memory mapping, we should pay
+> >>>> attention to this.
+> >>>>
+> >>>> This adds device_rough_page_shift() to check these two points when
+> >>>> selecting block mapping size.
+> >>>>
+> >>>> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+> >>>> ---
+> >>>>  arch/arm64/kvm/mmu.c | 37 +++++++++++++++++++++++++++++++++----
+> >>>>  1 file changed, 33 insertions(+), 4 deletions(-)
+> >>>>
+> >>>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> >>>> index c59af5ca01b0..1a6d96169d60 100644
+> >>>> --- a/arch/arm64/kvm/mmu.c
+> >>>> +++ b/arch/arm64/kvm/mmu.c
+> >>>> @@ -624,6 +624,31 @@ static void kvm_send_hwpoison_signal(unsigned long address, short lsb)
+> >>>>  	send_sig_mceerr(BUS_MCEERR_AR, (void __user *)address, lsb, current);
+> >>>>  }
+> >>>>  
+> >>>> +/*
+> >>>> + * Find a max mapping size that properly insides the vma. And hva and pa must
+> >>>> + * have the same alignment to this mapping size. It's rough as there are still
+> >>>> + * other restrictions, will be checked by fault_supports_stage2_huge_mapping().
+> >>>> + */
+> >>>> +static short device_rough_page_shift(struct vm_area_struct *vma,
+> >>>> +				     unsigned long hva)
+> >>>
+> >>> My earlier question still stands. Under which circumstances would this
+> >>> function return something that is *not* the final mapping size? I
+> >>> really don't see a reason why this would not return the final mapping
+> >>> size.
+> >>
+> >> IIUC, all the restrictions are about alignment and area boundary.
+> >>
+> >> That's to say, HVA, IPA and PA must have same alignment within the
+> >> mapping size.  And the areas are memslot and vma, which means the
+> >> mapping size must properly fit into the memslot and vma.
+> >>
+> >> In this function, we just checked the alignment of HVA and PA, and
+> >> the boundary of vma.  So we still need to check the alignment of HVA
+> >> and IPA, and the boundary of memslot.  These will be checked by
+> >> fault_supports_stage2_huge_mapping().
+> > 
+> > But that's no different from what we do with normal memory, is it? So
+> > it really feels like we should have *one* function that deals with
+> > establishing the basic mapping size from the VMA (see below for what I
+> > have in mind).
+> Right. And it looks better.
+> 
+> > 
+> >>
+> >>>
+> >>>> +{
+> >>>> +	phys_addr_t pa = (vma->vm_pgoff << PAGE_SHIFT) + (hva - vma->vm_start);
+> >>>> +
+> >>>> +#ifndef __PAGETABLE_PMD_FOLDED
+> >>>> +	if ((hva & (PUD_SIZE - 1)) == (pa & (PUD_SIZE - 1)) &&
+> >>>> +	    ALIGN_DOWN(hva, PUD_SIZE) >= vma->vm_start &&
+> >>>> +	    ALIGN(hva, PUD_SIZE) <= vma->vm_end)
+> >>>> +		return PUD_SHIFT;
+> >>>> +#endif
+> >>>> +
+> >>>> +	if ((hva & (PMD_SIZE - 1)) == (pa & (PMD_SIZE - 1)) &&
+> >>>> +	    ALIGN_DOWN(hva, PMD_SIZE) >= vma->vm_start &&
+> >>>> +	    ALIGN(hva, PMD_SIZE) <= vma->vm_end)
+> >>>> +		return PMD_SHIFT;
+> >>>> +
+> >>>> +	return PAGE_SHIFT;
+> >>>> +}
+> >>>> +
+> >>>>  static bool fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
+> >>>>  					       unsigned long hva,
+> >>>>  					       unsigned long map_size)
+> >>>> @@ -769,7 +794,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >>>>  		return -EFAULT;
+> >>>>  	}
+> >>>>  
+> >>>> -	/* Let's check if we will get back a huge page backed by hugetlbfs */
+> >>>> +	/*
+> >>>> +	 * Let's check if we will get back a huge page backed by hugetlbfs, or
+> >>>> +	 * get block mapping for device MMIO region.
+> >>>> +	 */
+> >>>>  	mmap_read_lock(current->mm);
+> >>>>  	vma = find_vma_intersection(current->mm, hva, hva + 1);
+> >>>>  	if (unlikely(!vma)) {
+> >>>> @@ -780,11 +808,12 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >>>>  
+> >>>>  	if (is_vm_hugetlb_page(vma))
+> >>>>  		vma_shift = huge_page_shift(hstate_vma(vma));
+> >>>> +	else if (vma->vm_flags & VM_PFNMAP)
+> >>>> +		vma_shift = device_rough_page_shift(vma, hva);
+> >>>
+> >>> What prevents a VMA from having both VM_HUGETLB and VM_PFNMAP? This is
+> >>> pretty unlikely, but I'd like to see this case catered for.
+> >>>
+> >> I'm not sure whether VM_HUGETLB and VM_PFNMAP are compatible, and I
+> >> failed to find a case.
+> >>
+> >> VM_PFNMAP is used for page-ranges managed without "struct page",
+> >> just pure PFN.  IIUC, VM_HUGETLB is used for hugetlbfs, which always
+> >> has "struct page".  So I think they should not be compatible,
+> >> otherwise it's a bug of driver.
+> > 
+> > For now, maybe. But huge mappings of PFN could land at some point, and
+> > it'd be hard to catch. I think this case deserves a VM_BUG_ON().
+> OK.
+> 
+> > 
+> >>
+> >>>>  	else
+> >>>>  		vma_shift = PAGE_SHIFT;
+> >>>>  
+> >>>> -	if (logging_active ||
+> >>>> -	    (vma->vm_flags & VM_PFNMAP)) {
+> >>>> +	if (logging_active) {
+> > 
+> > BTW, don't you introduce a bug here? Logging shouldn't affect device
+> > mappings.
+> I think it's not a bug, because for memlsot with VM_PFNMAP, the
+> logging_active is always false.
+>
+> In kvm_arch_prepare_memory_region(), we make sure
+> KVM_MEM_LOG_DIRTY_PAGES can't be set for a VM_PFNMAP memslot.  Then
+> in __kvm_set_memory_region(), we're sure dirty_bitmap is not
+> allocated for this memslot.  Then memslot_is_logging() will return
+> false for this memslot.
 
-$ ./vm run -c1 -m64 -f selftest.flat --pmu
-  # lkvm run --firmware selftest.flat -m 64 -c 1 --name guest-1039
-  Info: Placing fdt at 0x80200000 - 0x80210000
-  Fatal: Unable to initialise vcpu
+Fair enough. I think the first part is what makes it safe.
 
-Move the check for KVM_CAP_ARM_PMU_V3 to kvm_cpu__arch_init() before the
-VCPU is created so the user can get a more useful error message. This
-also matches the behaviour of KVM_CAP_ARM_EL1_32BIT.
+> 
+> > 
+> > 
+> >>>>  		force_pte = true;
+> >>>>  		vma_shift = PAGE_SHIFT;
+> >>>>  	}
+> >>>> @@ -855,7 +884,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >>>>  
+> >>>>  	if (kvm_is_device_pfn(pfn)) {
+> >>>>  		device = true;
+> >>>> -		force_pte = true;
+> >>>> +		force_pte = (vma_pagesize == PAGE_SIZE);
+> >>>
+> >>> Why do we need to set force_pte if we are already dealing with
+> >>> PAGE_SIZE? I guess you are doing this for the sake of avoiding the
+> >>> call to transparent_hugepage_adjust(), right?
+> >> Yes.
+> >>
+> >>>
+> >>> I'd rather you simply don't try to upgrade a device mapping by
+> >>> explicitly checking for this and keep force_pte for *memory*
+> >>> exclusively.
+> >> Agree, that's better.
+> >>
+> >>>
+> >>> Santosh, can you please take a look at this series and try to see if
+> >>> the problem you fixed in [1] (which ended up as commit 91a2c34b7d6f)
+> >>> is still OK with this series?
+> >> I searched the initial version[*], VM_PFNMAP is set when we call
+> >> gfn_to_pfn_prot()->vma_mmio_fault()->remap_pfn_range().  Then the
+> >> check of VM_PFNMAP in user_mem_abort() failed, so we will try to
+> >> call transparent_hugepage_adjust() for device pfn.
+> >>
+> >> In that case, our logic of trying block mapping for MMIO is not
+> >> used. And we still set force_pte for device pfn, so this bugfix is
+> >> not affected. Santosh, do you agree that?
+> > 
+> > But isn't what we just agreed to get rid of just above?
+> Yes, I agree to get rid of force_pte for device. I'm sure your code
+> doesn't break the bugfix.
+> 
+> > 
+> >>
+> >> I still found that the reason vfio_pci does not have this
+> >> bug. vfio_pci set VM_PFNMAP for vma when userspace calls mmap().  I
+> >> will apply this logic for vfio_mdev too, let's see what vfio
+> >> maintainer think about it.
+> > 
+> > I think that'd be good to see what Alex thinks about it...
+> > 
+> > Here's the changes I propose. It is completely untested, of course.
+> > 
+> > Thanks,
+> > 
+> > 	M.
+> > 
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index 8711894db8c2..f32d956cc199 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -738,6 +738,35 @@ transparent_hugepage_adjust(struct kvm_memory_slot *memslot,
+> >  	return PAGE_SIZE;
+> >  }
+> >  
+> > +static int get_vma_page_shift(struct vm_area_struct *vma, unsigned long hva)
+> > +{
+> > +	unsigned long pa;
+> > +
+> > +	if (is_vm_hugetlb_page(vma) && !(vma->vm_flags & VM_PFNMAP))
+> > +		return huge_page_shift(hstate_vma(vma));
+> > +
+> > +	if (!(vma->vm_flags & VM_PFNMAP))
+> > +		return PAGE_SHIFT;
+> > +
+> > +	VM_BUG_ON(is_vm_hugetlb_page(vma));
+> > +
+> > +	pa = (vma->vm_pgoff << PAGE_SHIFT) + (hva - vma->vm_start);
+> > +
+> > +#ifndef __PAGETABLE_PMD_FOLDED
+> > +	if ((hva & (PUD_SIZE - 1)) == (pa & (PUD_SIZE - 1)) &&
+> > +	    ALIGN_DOWN(hva, PUD_SIZE) >= vma->vm_start &&
+> > +	    ALIGN(hva, PUD_SIZE) <= vma->vm_end)
+> > +		return PUD_SHIFT;
+> > +#endif
+> > +
+> > +	if ((hva & (PMD_SIZE - 1)) == (pa & (PMD_SIZE - 1)) &&
+> > +	    ALIGN_DOWN(hva, PMD_SIZE) >= vma->vm_start &&
+> > +	    ALIGN(hva, PMD_SIZE) <= vma->vm_end)
+> > +		return PMD_SHIFT;
+> > +
+> > +	return PAGE_SHIFT;
+> > +}
+> > +
+> >  static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >  			  struct kvm_memory_slot *memslot, unsigned long hva,
+> >  			  unsigned long fault_status)
+> > @@ -778,13 +807,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >  		return -EFAULT;
+> >  	}
+> >  
+> > -	if (is_vm_hugetlb_page(vma))
+> > -		vma_shift = huge_page_shift(hstate_vma(vma));
+> > -	else
+> > -		vma_shift = PAGE_SHIFT;
+> > +	vma_shift = get_vma_page_shift(vma, hva);
+> >  
+> > -	if (logging_active ||
+> > -	    (vma->vm_flags & VM_PFNMAP)) {
+> > +	if (logging_active && !(vma->vm_flags & VM_PFNMAP)) {
+> Maybe we don't need this. I can add some comments to explain it.
 
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
- arm/kvm-cpu.c | 4 ++++
- arm/pmu.c     | 5 -----
- 2 files changed, 4 insertions(+), 5 deletions(-)
+Yeah. Please add something along the lines of:
 
-diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
-index 2acecaecb696..6a2408c632df 100644
---- a/arm/kvm-cpu.c
-+++ b/arm/kvm-cpu.c
-@@ -50,6 +50,10 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
- 	    !kvm__supports_extension(kvm, KVM_CAP_ARM_EL1_32BIT))
- 		die("32bit guests are not supported\n");
- 
-+	if (kvm->cfg.arch.has_pmuv3 &&
-+	    !kvm__supports_extension(kvm, KVM_CAP_ARM_PMU_V3))
-+		die("PMUv3 is not supported");
-+
- 	vcpu = calloc(1, sizeof(struct kvm_cpu));
- 	if (!vcpu)
- 		return NULL;
-diff --git a/arm/pmu.c b/arm/pmu.c
-index ffd152e27447..5b058eabb49d 100644
---- a/arm/pmu.c
-+++ b/arm/pmu.c
-@@ -43,11 +43,6 @@ void pmu__generate_fdt_nodes(void *fdt, struct kvm *kvm)
- 	if (!kvm->cfg.arch.has_pmuv3)
- 		return;
- 
--	if (!kvm__supports_extension(kvm, KVM_CAP_ARM_PMU_V3)) {
--		pr_info("PMU unsupported\n");
--		return;
--	}
--
- 	for (i = 0; i < kvm->nrcpus; i++) {
- 		struct kvm_device_attr pmu_attr;
- 
+/* logging_active is guaranteed to never be true for VM_PFNMAP memslots */
+
+> 
+> >  		force_pte = true;
+> >  		vma_shift = PAGE_SHIFT;
+> >  	}
+> > @@ -854,8 +879,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >  		return -EFAULT;
+> >  
+> >  	if (kvm_is_device_pfn(pfn)) {
+> > +		/*
+> > +		 * If the page was identified as device early by looking at
+> > +		 * the VMA flags, vma_pagesize is already representing the
+> > +		 * largest quantity we can map.  If instead it was mapped
+> > +		 * via gfn_to_pfn_prot(), vma_pagesize is set to PAGE_SIZE
+> > +		 * and must not be upgraded.
+> > +		 *
+> > +		 * In both cases, we don't let transparent_hugepage_adjust()
+> > +		 * change things at the last minute.
+> > +		 */
+> >  		device = true;
+> > -		force_pte = true;
+> >  	} else if (logging_active && !write_fault) {
+> >  		/*
+> >  		 * Only actually map the page as writable if this was a write
+> > @@ -876,7 +910,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >  	 * If we are not forced to use page mapping, check if we are
+> >  	 * backed by a THP and thus use block mapping if possible.
+> >  	 */
+> > -	if (vma_pagesize == PAGE_SIZE && !force_pte)
+> > +	if (vma_pagesize == PAGE_SIZE && !(force_pte || device))
+> >  		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
+> >  							   &pfn, &fault_ipa);
+> >  	if (writable)
+> > 
+> Looks good to me. :)
+> 
+> I will test it. And when I send v4, should I add your Suggested-by or SoB?
+
+No need.
+
+Thanks,
+
+	M.
+
 -- 
-2.31.1
-
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
