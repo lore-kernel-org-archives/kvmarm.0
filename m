@@ -2,53 +2,56 @@ Return-Path: <SRS0=n9q4=JN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2688CC433ED
-	for <kvmarm@archiver.kernel.org>; Fri, 16 Apr 2021 15:43:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22165C433B4
+	for <kvmarm@archiver.kernel.org>; Fri, 16 Apr 2021 15:43:30 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8A55D6124B
-	for <kvmarm@archiver.kernel.org>; Fri, 16 Apr 2021 15:43:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A55D6124B
+	by mail.kernel.org (Postfix) with ESMTP id AEB9B613A9
+	for <kvmarm@archiver.kernel.org>; Fri, 16 Apr 2021 15:43:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEB9B613A9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EA00C4B42D;
-	Fri, 16 Apr 2021 11:43:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 632A84B42F;
+	Fri, 16 Apr 2021 11:43:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id GutbvDicEJKn; Fri, 16 Apr 2021 11:43:26 -0400 (EDT)
+	with ESMTP id cIfS1MyOombj; Fri, 16 Apr 2021 11:43:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D3CD4B43A;
-	Fri, 16 Apr 2021 11:43:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 29B654B43B;
+	Fri, 16 Apr 2021 11:43:28 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3BB314B434
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Apr 2021 11:43:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 00A584B42F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Apr 2021 11:43:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sC5d6i+FsKzT for <kvmarm@lists.cs.columbia.edu>;
- Fri, 16 Apr 2021 11:43:23 -0400 (EDT)
+ with ESMTP id ZQ8dkzh-QtvV for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 16 Apr 2021 11:43:25 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E9C294B432
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Apr 2021 11:43:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A78D64B403
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Apr 2021 11:43:25 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4AAD311B3;
- Fri, 16 Apr 2021 08:43:22 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5113612FC;
+ Fri, 16 Apr 2021 08:43:25 -0700 (PDT)
 Received: from e112269-lin.arm.com (autoplooker.cambridge.arm.com
  [10.1.194.57])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7F0DD3F99C;
- Fri, 16 Apr 2021 08:43:19 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 854F53F99C;
+ Fri, 16 Apr 2021 08:43:22 -0700 (PDT)
 From: Steven Price <steven.price@arm.com>
 To: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Will Deacon <will@kernel.org>
-Subject: [PATCH v11 0/6] MTE support for KVM guest
-Date: Fri, 16 Apr 2021 16:43:03 +0100
-Message-Id: <20210416154309.22129-1-steven.price@arm.com>
+Subject: [PATCH v11 1/6] arm64: mte: Sync tags for pages where PTE is untagged
+Date: Fri, 16 Apr 2021 16:43:04 +0100
+Message-Id: <20210416154309.22129-2-steven.price@arm.com>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20210416154309.22129-1-steven.price@arm.com>
+References: <20210416154309.22129-1-steven.price@arm.com>
 MIME-Version: 1.0
 Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
  Dave Martin <Dave.Martin@arm.com>, Juan Quintela <quintela@redhat.com>,
@@ -71,55 +74,78 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-I know it's likely to be the merge window next week, but since there
-were a couple of changes from Catalin's review I thought I'd send
-another version out - there are some minor conflicts with what's
-currently in -next so I'll rebase after -rc1.
+A KVM guest could store tags in a page even if the VMM hasn't mapped
+the page with PROT_MTE. So when restoring pages from swap we will
+need to check to see if there are any saved tags even if !pte_tagged().
 
-This series adds support for using the Arm Memory Tagging Extensions
-(MTE) in a KVM guest.
+However don't check pages which are !pte_valid_user() as these will
+not have been swapped out.
 
-This version is rebased on v5.12-rc2.
+Signed-off-by: Steven Price <steven.price@arm.com>
+---
+ arch/arm64/include/asm/pgtable.h |  2 +-
+ arch/arm64/kernel/mte.c          | 16 ++++++++++++----
+ 2 files changed, 13 insertions(+), 5 deletions(-)
 
-Changes since v10[1]:
-
- * Replace pte_valid_user() with (pte_val(pte) & PTE_USER) in
-   set_pte_at() as the former has been removed with the EPAN patches.
- * Don't attempt to check tags on memory which is going to be mapped in
-   stage 2 as DEVICE as the guest won't be able to see the tags.
- * Use pfn_to_online_page() instead of pfn_to_page() in user_mem_abort()
-   to prevent ZONE_DEVICE memory being populated in stage 2 if tags are
-   enabled.
-
-[1] https://lore.kernel.org/r/20210312151902.17853-1-steven.price%40arm.com
-
-Steven Price (6):
-  arm64: mte: Sync tags for pages where PTE is untagged
-  arm64: kvm: Introduce MTE VM feature
-  arm64: kvm: Save/restore MTE registers
-  arm64: kvm: Expose KVM_ARM_CAP_MTE
-  KVM: arm64: ioctl to fetch/store tags in a guest
-  KVM: arm64: Document MTE capability and ioctl
-
- Documentation/virt/kvm/api.rst             | 53 +++++++++++++++
- arch/arm64/include/asm/kvm_emulate.h       |  3 +
- arch/arm64/include/asm/kvm_host.h          |  9 +++
- arch/arm64/include/asm/kvm_mte.h           | 66 ++++++++++++++++++
- arch/arm64/include/asm/pgtable.h           |  2 +-
- arch/arm64/include/asm/sysreg.h            |  3 +-
- arch/arm64/include/uapi/asm/kvm.h          | 14 ++++
- arch/arm64/kernel/asm-offsets.c            |  3 +
- arch/arm64/kernel/mte.c                    | 16 +++--
- arch/arm64/kvm/arm.c                       | 78 ++++++++++++++++++++++
- arch/arm64/kvm/hyp/entry.S                 |  7 ++
- arch/arm64/kvm/hyp/exception.c             |  3 +-
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 21 ++++++
- arch/arm64/kvm/mmu.c                       | 20 ++++++
- arch/arm64/kvm/sys_regs.c                  | 28 ++++++--
- include/uapi/linux/kvm.h                   |  2 +
- 16 files changed, 317 insertions(+), 11 deletions(-)
- create mode 100644 arch/arm64/include/asm/kvm_mte.h
-
+diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
+index e17b96d0e4b5..cf4b52a33b3c 100644
+--- a/arch/arm64/include/asm/pgtable.h
++++ b/arch/arm64/include/asm/pgtable.h
+@@ -312,7 +312,7 @@ static inline void set_pte_at(struct mm_struct *mm, unsigned long addr,
+ 		__sync_icache_dcache(pte);
+ 
+ 	if (system_supports_mte() &&
+-	    pte_present(pte) && pte_tagged(pte) && !pte_special(pte))
++	    pte_present(pte) && (pte_val(pte) & PTE_USER) && !pte_special(pte))
+ 		mte_sync_tags(ptep, pte);
+ 
+ 	__check_racy_pte_update(mm, ptep, pte);
+diff --git a/arch/arm64/kernel/mte.c b/arch/arm64/kernel/mte.c
+index b3c70a612c7a..e016ab57ea36 100644
+--- a/arch/arm64/kernel/mte.c
++++ b/arch/arm64/kernel/mte.c
+@@ -26,17 +26,23 @@ u64 gcr_kernel_excl __ro_after_init;
+ 
+ static bool report_fault_once = true;
+ 
+-static void mte_sync_page_tags(struct page *page, pte_t *ptep, bool check_swap)
++static void mte_sync_page_tags(struct page *page, pte_t *ptep, bool check_swap,
++			       bool pte_is_tagged)
+ {
+ 	pte_t old_pte = READ_ONCE(*ptep);
+ 
+ 	if (check_swap && is_swap_pte(old_pte)) {
+ 		swp_entry_t entry = pte_to_swp_entry(old_pte);
+ 
+-		if (!non_swap_entry(entry) && mte_restore_tags(entry, page))
++		if (!non_swap_entry(entry) && mte_restore_tags(entry, page)) {
++			set_bit(PG_mte_tagged, &page->flags);
+ 			return;
++		}
+ 	}
+ 
++	if (!pte_is_tagged || test_and_set_bit(PG_mte_tagged, &page->flags))
++		return;
++
+ 	page_kasan_tag_reset(page);
+ 	/*
+ 	 * We need smp_wmb() in between setting the flags and clearing the
+@@ -54,11 +60,13 @@ void mte_sync_tags(pte_t *ptep, pte_t pte)
+ 	struct page *page = pte_page(pte);
+ 	long i, nr_pages = compound_nr(page);
+ 	bool check_swap = nr_pages == 1;
++	bool pte_is_tagged = pte_tagged(pte);
+ 
+ 	/* if PG_mte_tagged is set, tags have already been initialised */
+ 	for (i = 0; i < nr_pages; i++, page++) {
+-		if (!test_and_set_bit(PG_mte_tagged, &page->flags))
+-			mte_sync_page_tags(page, ptep, check_swap);
++		if (!test_bit(PG_mte_tagged, &page->flags))
++			mte_sync_page_tags(page, ptep, check_swap,
++					   pte_is_tagged);
+ 	}
+ }
+ 
 -- 
 2.20.1
 
