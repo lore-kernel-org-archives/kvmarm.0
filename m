@@ -2,116 +2,74 @@ Return-Path: <SRS0=n9q4=JN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 373EBC433B4
-	for <kvmarm@archiver.kernel.org>; Fri, 16 Apr 2021 11:54:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 982E9C433B4
+	for <kvmarm@archiver.kernel.org>; Fri, 16 Apr 2021 14:44:38 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id ABEBC611AC
-	for <kvmarm@archiver.kernel.org>; Fri, 16 Apr 2021 11:54:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABEBC611AC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id F1298610FC
+	for <kvmarm@archiver.kernel.org>; Fri, 16 Apr 2021 14:44:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1298610FC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 39EB14B476;
-	Fri, 16 Apr 2021 07:54:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 80DF74B407;
+	Fri, 16 Apr 2021 10:44:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id W19sn9r9kgDn; Fri, 16 Apr 2021 07:54:09 -0400 (EDT)
+	with ESMTP id 9mNOsWosRE-N; Fri, 16 Apr 2021 10:44:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B3F24B496;
-	Fri, 16 Apr 2021 07:54:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F6FF4B21E;
+	Fri, 16 Apr 2021 10:44:35 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 66D844B476
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Apr 2021 07:54:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 925204B1D4
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Apr 2021 10:44:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id D9XPgkt2N7YO for <kvmarm@lists.cs.columbia.edu>;
- Fri, 16 Apr 2021 07:54:07 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 71B194B3FB
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Apr 2021 07:54:07 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1618574047;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=xRi3iLx/d1dCutzOrV2diewuBUaVQYIWtJjdL4DqXrA=;
- b=U5kduDFXJ13rnyBzQXObLRY1jPYsKAV1g65VpM6qPfF3+Wa0T2ZK2ZkNkRLfgO1Ys4bmPZ
- gLxUlb+Vs/CsjO8SiqXVa4gYw72JEC0Uie0JA+D+YX3BQgDrjWff9cvR5SriDfRN1sPKRp
- VxG/3Ct52FQG/fMmTTwgp4uSJ12DnQs=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-403-a_gQaE1hObSkOJITUoJ4jQ-1; Fri, 16 Apr 2021 07:54:03 -0400
-X-MC-Unique: a_gQaE1hObSkOJITUoJ4jQ-1
-Received: by mail-wr1-f69.google.com with SMTP id
- d15-20020a5d538f0000b02901027c18c581so4311561wrv.3
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Apr 2021 04:54:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:organization
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=xRi3iLx/d1dCutzOrV2diewuBUaVQYIWtJjdL4DqXrA=;
- b=pEFnXLNhpoaJCbM3rGkMWs9Afll/sHlxYnYazlZXqUnOkEE41FThlnncB3zCke+1hL
- tAwV2aLtp1YCqC+W2c9jiPCYy1rpEMxYeTviOgi+fSDrSLGrQjBKI8ktbsSJifLQ8ZmE
- 12jmRidTmZd7LMqQKEWeZWqaq7ZTGkcXGsXUz9k063xHCJWlVw/Ep+EydvqhgKnB0Zcb
- c6JLZfwuiD7IkXM+PnDRtfUVpDWuW6Hw7ueVY9W2a0mlejxKj1/dgT72PdL8xzAo13E5
- TmdW+WtdTYJo0jFD++qclyRqj1OI5RjSdTpwBf30sWLYEQfrPI/to6NMBLxQ9vsBzcOO
- QqPg==
-X-Gm-Message-State: AOAM531KikyO7tRlmOvl3eD9ctnmN+ZWmbRd7m1LY5iAlqV6s1Q8L5P0
- IZuPWxejwLkrnnMJ6i6ivQDbDZDk0ZHjJuX4RaxuegrMPyEd8REOH9xgfZUVtXW4ZeMBaqpLJAm
- OUTonMMcCwtfoRAyZ9AnOWY/m
-X-Received: by 2002:adf:bc49:: with SMTP id a9mr8859073wrh.109.1618574042168; 
- Fri, 16 Apr 2021 04:54:02 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz45TPUrdRBbQjp6UKDSX/x4TG0TTzsbY/zQUnfTmbSPTX9s6AXQGbir4RRmOHT+616Hu9Ffw==
-X-Received: by 2002:adf:bc49:: with SMTP id a9mr8859040wrh.109.1618574041925; 
- Fri, 16 Apr 2021 04:54:01 -0700 (PDT)
-Received: from [192.168.3.132] (p5b0c64fb.dip0.t-ipconnect.de. [91.12.100.251])
- by smtp.gmail.com with ESMTPSA id b1sm10150075wru.90.2021.04.16.04.54.01
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 16 Apr 2021 04:54:01 -0700 (PDT)
-Subject: Re: [RFC/RFT PATCH 1/3] memblock: update initialization of reserved
- pages
-To: Mike Rapoport <rppt@kernel.org>
-References: <20210407172607.8812-1-rppt@kernel.org>
- <20210407172607.8812-2-rppt@kernel.org>
- <0c48f98c-7454-1458-15a5-cc5a7e1fb7cd@redhat.com>
- <CAMj1kXGw97epyP2HdHjA8Yp6+VF1j5xmd0AgVBBv3k+h_B610w@mail.gmail.com>
- <3811547a-9057-3c80-3805-2e658488ac99@redhat.com>
- <YHdPmtpzFxHE9mAt@kernel.org>
- <f5503130-c0e7-329f-86c4-727ece1c860f@redhat.com>
- <YHl4mqgh5CtNk1l7@kernel.org>
-From: David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-Message-ID: <1065c0ac-f9e3-2d3a-1ec4-a5c28f98c6ae@redhat.com>
-Date: Fri, 16 Apr 2021 13:54:00 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
-MIME-Version: 1.0
-In-Reply-To: <YHl4mqgh5CtNk1l7@kernel.org>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=david@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Mike Rapoport <rppt@linux.ibm.com>,
- Linux Memory Management List <linux-mm@kvack.org>,
- kvmarm <kvmarm@lists.cs.columbia.edu>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>,
- Linux ARM <linux-arm-kernel@lists.infradead.org>
+ with ESMTP id 35MTFUQgfPi1 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 16 Apr 2021 10:44:32 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5D52D4B1E5
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Apr 2021 10:44:32 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 9800161073;
+ Fri, 16 Apr 2021 14:44:29 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1lXPhr-007sW3-CZ; Fri, 16 Apr 2021 15:44:27 +0100
+Date: Fri, 16 Apr 2021 15:44:22 +0100
+Message-ID: <87a6py2ss9.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Keqian Zhu <zhukeqian1@huawei.com>
+Subject: Re: [PATCH v4 2/2] kvm/arm64: Try stage2 block mapping for host
+ device MMIO
+In-Reply-To: <8f55b64f-b4dd-700e-c997-8de9c5ea282f@huawei.com>
+References: <20210415140328.24200-1-zhukeqian1@huawei.com>
+ <20210415140328.24200-3-zhukeqian1@huawei.com>
+ <8f55b64f-b4dd-700e-c997-8de9c5ea282f@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: zhukeqian1@huawei.com, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, wanghaibin.wang@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -123,47 +81,128 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 16.04.21 13:44, Mike Rapoport wrote:
-> On Thu, Apr 15, 2021 at 11:30:12AM +0200, David Hildenbrand wrote:
->>> Not sure we really need a new pagetype here, PG_Reserved seems to be quite
->>> enough to say "don't touch this".  I generally agree that we could make
->>> PG_Reserved a PageType and then have several sub-types for reserved memory.
->>> This definitely will add clarity but I'm not sure that this justifies
->>> amount of churn and effort required to audit uses of PageResrved().
->>>> Then, we could mostly avoid having to query memblock at runtime to figure
->>>> out that this is special memory. This would obviously be an extension to
->>>> this series. Just a thought.
->>>
->>> Stop pushing memblock out of kernel! ;-)
->>
->> Can't stop. Won't stop. :D
->>
->> It's lovely for booting up a kernel until we have other data-structures in
->> place ;)
+On Thu, 15 Apr 2021 15:08:09 +0100,
+Keqian Zhu <zhukeqian1@huawei.com> wrote:
 > 
-> A bit more seriously, we don't have any data structure that reliably
-> represents physical memory layout and arch-independent fashion.
-> memblock is probably the best starting point for eventually having one.
+> Hi Marc,
+> 
+> On 2021/4/15 22:03, Keqian Zhu wrote:
+> > The MMIO region of a device maybe huge (GB level), try to use
+> > block mapping in stage2 to speedup both map and unmap.
+> > 
+> > Compared to normal memory mapping, we should consider two more
+> > points when try block mapping for MMIO region:
+> > 
+> > 1. For normal memory mapping, the PA(host physical address) and
+> > HVA have same alignment within PUD_SIZE or PMD_SIZE when we use
+> > the HVA to request hugepage, so we don't need to consider PA
+> > alignment when verifing block mapping. But for device memory
+> > mapping, the PA and HVA may have different alignment.
+> > 
+> > 2. For normal memory mapping, we are sure hugepage size properly
+> > fit into vma, so we don't check whether the mapping size exceeds
+> > the boundary of vma. But for device memory mapping, we should pay
+> > attention to this.
+> > 
+> > This adds get_vma_page_shift() to get page shift for both normal
+> > memory and device MMIO region, and check these two points when
+> > selecting block mapping size for MMIO region.
+> > 
+> > Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+> > ---
+> >  arch/arm64/kvm/mmu.c | 61 ++++++++++++++++++++++++++++++++++++--------
+> >  1 file changed, 51 insertions(+), 10 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index c59af5ca01b0..5a1cc7751e6d 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -738,6 +738,35 @@ transparent_hugepage_adjust(struct kvm_memory_slot *memslot,
+> >  	return PAGE_SIZE;
+> >  }
+> >  
+> > +static int get_vma_page_shift(struct vm_area_struct *vma, unsigned long hva)
+> > +{
+> > +	unsigned long pa;
+> > +
+> > +	if (is_vm_hugetlb_page(vma) && !(vma->vm_flags & VM_PFNMAP))
+> > +		return huge_page_shift(hstate_vma(vma));
+> > +
+> > +	if (!(vma->vm_flags & VM_PFNMAP))
+> > +		return PAGE_SHIFT;
+> > +
+> > +	VM_BUG_ON(is_vm_hugetlb_page(vma));
+> > +
+> > +	pa = (vma->vm_pgoff << PAGE_SHIFT) + (hva - vma->vm_start);
+> > +
+> > +#ifndef __PAGETABLE_PMD_FOLDED
+> > +	if ((hva & (PUD_SIZE - 1)) == (pa & (PUD_SIZE - 1)) &&
+> > +	    ALIGN_DOWN(hva, PUD_SIZE) >= vma->vm_start &&
+> > +	    ALIGN(hva, PUD_SIZE) <= vma->vm_end)
+> > +		return PUD_SHIFT;
+> > +#endif
+> > +
+> > +	if ((hva & (PMD_SIZE - 1)) == (pa & (PMD_SIZE - 1)) &&
+> > +	    ALIGN_DOWN(hva, PMD_SIZE) >= vma->vm_start &&
+> > +	    ALIGN(hva, PMD_SIZE) <= vma->vm_end)
+> > +		return PMD_SHIFT;
+> > +
+> > +	return PAGE_SHIFT;
+> > +}
+> > +
+> >  static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >  			  struct kvm_memory_slot *memslot, unsigned long hva,
+> >  			  unsigned long fault_status)
+> > @@ -769,7 +798,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >  		return -EFAULT;
+> >  	}
+> >  
+> > -	/* Let's check if we will get back a huge page backed by hugetlbfs */
+> > +	/*
+> > +	 * Let's check if we will get back a huge page backed by hugetlbfs, or
+> > +	 * get block mapping for device MMIO region.
+> > +	 */
+> >  	mmap_read_lock(current->mm);
+> >  	vma = find_vma_intersection(current->mm, hva, hva + 1);
+> >  	if (unlikely(!vma)) {
+> > @@ -778,15 +810,15 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >  		return -EFAULT;
+> >  	}
+> >  
+> > -	if (is_vm_hugetlb_page(vma))
+> > -		vma_shift = huge_page_shift(hstate_vma(vma));
+> > -	else
+> > -		vma_shift = PAGE_SHIFT;
+> > -
+> > -	if (logging_active ||
+> > -	    (vma->vm_flags & VM_PFNMAP)) {
+> > +	/*
+> > +	 * logging_active is guaranteed to never be true for VM_PFNMAP
+> > +	 * memslots.
+> > +	 */
+> > +	if (logging_active) {
+> >  		force_pte = true;
+> >  		vma_shift = PAGE_SHIFT;
+> > +	} else {
+> > +		vma_shift = get_vma_page_shift(vma, hva);
+> >  	}
+> I use a if/else manner in v4, please check that. Thanks very much!
 
-We have the (slowish) kernel resource tree after boot and the (faster) 
-memmap. I really don't see why we really need another slowish variant.
+That's fine. However, it is getting a bit late for 5.13, and we don't
+have much time to left it simmer in -next. I'll probably wait until
+after the merge window to pick it up.
 
-We might be better off to just extend and speed up the kernel resource tree.
-
-Memblock as is is not a reasonable datastructure to keep around after 
-boot: for example, how we handle boottime allocations and reserve 
-regions both as reserved.
-
--- 
 Thanks,
 
-David / dhildenb
+	M.
 
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
