@@ -2,74 +2,77 @@ Return-Path: <SRS0=n9q4=JN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08589C43460
-	for <kvmarm@archiver.kernel.org>; Fri, 16 Apr 2021 11:40:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D5FDC43461
+	for <kvmarm@archiver.kernel.org>; Fri, 16 Apr 2021 11:44:43 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 775D26115B
-	for <kvmarm@archiver.kernel.org>; Fri, 16 Apr 2021 11:40:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 775D26115B
+	by mail.kernel.org (Postfix) with ESMTP id E3E3A61184
+	for <kvmarm@archiver.kernel.org>; Fri, 16 Apr 2021 11:44:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3E3A61184
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 02FAB4B486;
-	Fri, 16 Apr 2021 07:40:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 83A9E4B2AE;
+	Fri, 16 Apr 2021 07:44:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id e4SMqv+fNccw; Fri, 16 Apr 2021 07:40:44 -0400 (EDT)
+	with ESMTP id 97y9Z0ZXlhRE; Fri, 16 Apr 2021 07:44:40 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A85E74B409;
-	Fri, 16 Apr 2021 07:40:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A5934B2AF;
+	Fri, 16 Apr 2021 07:44:40 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F6CC4B3D2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Apr 2021 07:40:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 909724B29B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Apr 2021 07:44:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EG8ud-VUQbLS for <kvmarm@lists.cs.columbia.edu>;
- Fri, 16 Apr 2021 07:40:42 -0400 (EDT)
+ with ESMTP id C6e1f7Yj+tmo for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 16 Apr 2021 07:44:37 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0AF2A4B384
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Apr 2021 07:40:42 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 89260610F7;
- Fri, 16 Apr 2021 11:40:33 +0000 (UTC)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 963394B28B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Apr 2021 07:44:37 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 1D13161057;
+ Fri, 16 Apr 2021 11:44:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1618573239;
- bh=3OCC+s3KXL3CRYXcQVOMoxBoZGtDVHKh4WAw7RykLgQ=;
+ s=k20201202; t=1618573476;
+ bh=g1GQ3fMRsXXUxb3TziyhacMOOpriyOWdQMsWa6+jGug=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=pDOaH7UQSaGo/ZCEp5A6OFR9uKMDuK6uGnOs2vHTEXGRtAtsQKGjkGGsk3PWg0Rzz
- fg5+KAwrz0HnwaACc7tBFZJ0FiU+6QY7Mde5xF2bzgD5zKfq/0GkWvGZ39EIc0HE+g
- tlqJxhMX4svoPScIQ+NGKWutY1J3JP937aGi8BuabkOZ8RMt2ezysxFP/7zD0dNvZK
- XbxNl1K61A4bZMmOBWAoDp7p997vg1b6XUfa5J4Z770LWLkdcLFOcY1vZqHi2ZHjEw
- oeYfAwmsxCuYLBl5rTkg+43fXyLPqRl2huPLf6sA4MxYe08eveLy7DEAKMjqBLXamR
- eC3XO8P7cO9bw==
-Date: Fri, 16 Apr 2021 14:40:28 +0300
+ b=BJi5NHc+XLro4v3JuXfxVimD3qTxlRIlEQW0jKcbC1fkOeMbhX+QD36Vpgv/m5ZWS
+ w9k0pCOsSSy5e1rtpgZ6meO2kxgPq/nHRJ8xHTAE/3ueN6qs6pqlukQ1HUBO0cBT9Z
+ 1AQShBFk27Hug5dFGtBphwLSnqUSmscREcGT3KDTwjeLt7aURG5nZp5OsnGRS8Tf1v
+ cyIiJ5wZAAlMJuC7YOXtzgBlbuPlBe1viVwrvSNQ2ApaD5WM28tOf9xQWfW9Tzj99G
+ Xv0t+SbyVly+TfTJMs7hkGCjxMV0CtCIjWPw5NkGbs+NBYqqEsV1nMMDioVyRJhgy+
+ nG5AVY/FWbnzA==
+Date: Fri, 16 Apr 2021 14:44:26 +0300
 From: Mike Rapoport <rppt@kernel.org>
 To: David Hildenbrand <david@redhat.com>
-Subject: Re: [RFC/RFT PATCH 2/3] arm64: decouple check whether pfn is normal
- memory from pfn_valid()
-Message-ID: <YHl3rM6D6/Y2rtru@kernel.org>
+Subject: Re: [RFC/RFT PATCH 1/3] memblock: update initialization of reserved
+ pages
+Message-ID: <YHl4mqgh5CtNk1l7@kernel.org>
 References: <20210407172607.8812-1-rppt@kernel.org>
- <20210407172607.8812-3-rppt@kernel.org>
- <4a788546-b854-fd35-644a-f1d9075a9a78@arm.com>
- <9c0956f0-494e-5c6b-bdc2-d4213afd5e2f@redhat.com>
- <YHdQtmuxpqi4wCE/@kernel.org>
- <62161846-4f03-e4b1-ae0b-fdf96f78d97c@redhat.com>
+ <20210407172607.8812-2-rppt@kernel.org>
+ <0c48f98c-7454-1458-15a5-cc5a7e1fb7cd@redhat.com>
+ <CAMj1kXGw97epyP2HdHjA8Yp6+VF1j5xmd0AgVBBv3k+h_B610w@mail.gmail.com>
+ <3811547a-9057-3c80-3805-2e658488ac99@redhat.com>
+ <YHdPmtpzFxHE9mAt@kernel.org>
+ <f5503130-c0e7-329f-86c4-727ece1c860f@redhat.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <62161846-4f03-e4b1-ae0b-fdf96f78d97c@redhat.com>
+In-Reply-To: <f5503130-c0e7-329f-86c4-727ece1c860f@redhat.com>
 Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
- Mike Rapoport <rppt@linux.ibm.com>, linux-mm@kvack.org,
- kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Mike Rapoport <rppt@linux.ibm.com>,
+ Linux Memory Management List <linux-mm@kvack.org>,
+ kvmarm <kvmarm@lists.cs.columbia.edu>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>,
+ Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -86,111 +89,26 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Apr 15, 2021 at 11:31:26AM +0200, David Hildenbrand wrote:
-> On 14.04.21 22:29, Mike Rapoport wrote:
-> > On Wed, Apr 14, 2021 at 05:58:26PM +0200, David Hildenbrand wrote:
-> > > On 08.04.21 07:14, Anshuman Khandual wrote:
-> > > > 
-> > > > On 4/7/21 10:56 PM, Mike Rapoport wrote:
-> > > > > From: Mike Rapoport <rppt@linux.ibm.com>
-> > > > > 
-> > > > > The intended semantics of pfn_valid() is to verify whether there is a
-> > > > > struct page for the pfn in question and nothing else.
-> > > > 
-> > > > Should there be a comment affirming this semantics interpretation, above the
-> > > > generic pfn_valid() in include/linux/mmzone.h ?
-> > > > 
-> > > > > 
-> > > > > Yet, on arm64 it is used to distinguish memory areas that are mapped in the
-> > > > > linear map vs those that require ioremap() to access them.
-> > > > > 
-> > > > > Introduce a dedicated pfn_is_memory() to perform such check and use it
-> > > > > where appropriate.
-> > > > > 
-> > > > > Signed-off-by: Mike Rapoport <rppt@linux.ibm.com>
-> > > > > ---
-> > > > >    arch/arm64/include/asm/memory.h | 2 +-
-> > > > >    arch/arm64/include/asm/page.h   | 1 +
-> > > > >    arch/arm64/kvm/mmu.c            | 2 +-
-> > > > >    arch/arm64/mm/init.c            | 6 ++++++
-> > > > >    arch/arm64/mm/ioremap.c         | 4 ++--
-> > > > >    arch/arm64/mm/mmu.c             | 2 +-
-> > > > >    6 files changed, 12 insertions(+), 5 deletions(-)
-> > > > > 
-> > > > > diff --git a/arch/arm64/include/asm/memory.h b/arch/arm64/include/asm/memory.h
-> > > > > index 0aabc3be9a75..7e77fdf71b9d 100644
-> > > > > --- a/arch/arm64/include/asm/memory.h
-> > > > > +++ b/arch/arm64/include/asm/memory.h
-> > > > > @@ -351,7 +351,7 @@ static inline void *phys_to_virt(phys_addr_t x)
-> > > > >    #define virt_addr_valid(addr)	({					\
-> > > > >    	__typeof__(addr) __addr = __tag_reset(addr);			\
-> > > > > -	__is_lm_address(__addr) && pfn_valid(virt_to_pfn(__addr));	\
-> > > > > +	__is_lm_address(__addr) && pfn_is_memory(virt_to_pfn(__addr));	\
-> > > > >    })
-> > > > >    void dump_mem_limit(void);
-> > > > > diff --git a/arch/arm64/include/asm/page.h b/arch/arm64/include/asm/page.h
-> > > > > index 012cffc574e8..32b485bcc6ff 100644
-> > > > > --- a/arch/arm64/include/asm/page.h
-> > > > > +++ b/arch/arm64/include/asm/page.h
-> > > > > @@ -38,6 +38,7 @@ void copy_highpage(struct page *to, struct page *from);
-> > > > >    typedef struct page *pgtable_t;
-> > > > >    extern int pfn_valid(unsigned long);
-> > > > > +extern int pfn_is_memory(unsigned long);
-> > > > >    #include <asm/memory.h>
-> > > > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > > > > index 8711894db8c2..ad2ea65a3937 100644
-> > > > > --- a/arch/arm64/kvm/mmu.c
-> > > > > +++ b/arch/arm64/kvm/mmu.c
-> > > > > @@ -85,7 +85,7 @@ void kvm_flush_remote_tlbs(struct kvm *kvm)
-> > > > >    static bool kvm_is_device_pfn(unsigned long pfn)
-> > > > >    {
-> > > > > -	return !pfn_valid(pfn);
-> > > > > +	return !pfn_is_memory(pfn);
-> > > > >    }
-> > > > >    /*
-> > > > > diff --git a/arch/arm64/mm/init.c b/arch/arm64/mm/init.c
-> > > > > index 3685e12aba9b..258b1905ed4a 100644
-> > > > > --- a/arch/arm64/mm/init.c
-> > > > > +++ b/arch/arm64/mm/init.c
-> > > > > @@ -258,6 +258,12 @@ int pfn_valid(unsigned long pfn)
-> > > > >    }
-> > > > >    EXPORT_SYMBOL(pfn_valid);
-> > > > > +int pfn_is_memory(unsigned long pfn)
-> > > > > +{
-> > > > > +	return memblock_is_map_memory(PFN_PHYS(pfn));
-> > > > > +}
-> > > > > +EXPORT_SYMBOL(pfn_is_memory);> +
-> > > > 
-> > > > Should not this be generic though ? There is nothing platform or arm64
-> > > > specific in here. Wondering as pfn_is_memory() just indicates that the
-> > > > pfn is linear mapped, should not it be renamed as pfn_is_linear_memory()
-> > > > instead ? Regardless, it's fine either way.
-> > > 
-> > > TBH, I dislike (generic) pfn_is_memory(). It feels like we're mixing
-> > > concepts.
+On Thu, Apr 15, 2021 at 11:30:12AM +0200, David Hildenbrand wrote:
+> > Not sure we really need a new pagetype here, PG_Reserved seems to be quite
+> > enough to say "don't touch this".  I generally agree that we could make
+> > PG_Reserved a PageType and then have several sub-types for reserved memory.
+> > This definitely will add clarity but I'm not sure that this justifies
+> > amount of churn and effort required to audit uses of PageResrved().
+> > > Then, we could mostly avoid having to query memblock at runtime to figure
+> > > out that this is special memory. This would obviously be an extension to
+> > > this series. Just a thought.
 > > 
-> > Yeah, at the moment NOMAP is very much arm specific so I'd keep it this way
-> > for now.
-> > 
-> > >   NOMAP memory vs !NOMAP memory; even NOMAP is some kind of memory
-> > > after all. pfn_is_map_memory() would be more expressive, although still
-> > > sub-optimal.
-> > > 
-> > > We'd actually want some kind of arm64-specific pfn_is_system_memory() or the
-> > > inverse pfn_is_device_memory() -- to be improved.
-> > 
-> > In my current version (to be posted soon) I've started with
-> > pfn_lineary_mapped() but then ended up with pfn_mapped() to make it
-> > "upward" compatible with architectures that use direct rather than linear
-> > map :)
+> > Stop pushing memblock out of kernel! ;-)
 > 
-> And even that is moot. It doesn't tell you if a PFN is *actually* mapped
-> (hello secretmem).
+> Can't stop. Won't stop. :D
 > 
-> I'd suggest to just use memblock_is_map_memory() in arch specific code. Then
-> it's clear what we are querying exactly and what the semantics might be.
+> It's lovely for booting up a kernel until we have other data-structures in
+> place ;)
 
-Ok, let's export memblock_is_map_memory() for the KEEP_MEMBLOCK case.
+A bit more seriously, we don't have any data structure that reliably
+represents physical memory layout and arch-independent fashion. 
+memblock is probably the best starting point for eventually having one.
 
 -- 
 Sincerely yours,
