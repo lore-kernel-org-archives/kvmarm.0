@@ -1,115 +1,75 @@
-Return-Path: <SRS0=5CXi=JM=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=n9q4=JN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00984C433B4
-	for <kvmarm@archiver.kernel.org>; Thu, 15 Apr 2021 17:21:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08589C43460
+	for <kvmarm@archiver.kernel.org>; Fri, 16 Apr 2021 11:40:47 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5BDF261184
-	for <kvmarm@archiver.kernel.org>; Thu, 15 Apr 2021 17:21:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BDF261184
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTP id 775D26115B
+	for <kvmarm@archiver.kernel.org>; Fri, 16 Apr 2021 11:40:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 775D26115B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CE38A4B6FC;
-	Thu, 15 Apr 2021 13:21:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 02FAB4B486;
+	Fri, 16 Apr 2021 07:40:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@ibm.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ahhFrBOdssXX; Thu, 15 Apr 2021 13:21:00 -0400 (EDT)
+	with ESMTP id e4SMqv+fNccw; Fri, 16 Apr 2021 07:40:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CE4C04B6F5;
-	Thu, 15 Apr 2021 13:21:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A85E74B409;
+	Fri, 16 Apr 2021 07:40:44 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F76C4B6E3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Apr 2021 08:12:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F6CC4B3D2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Apr 2021 07:40:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kU7zK1ddItUl for <kvmarm@lists.cs.columbia.edu>;
- Thu, 15 Apr 2021 08:12:27 -0400 (EDT)
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com
- [148.163.158.5])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1C01E4B6D6
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Apr 2021 08:12:27 -0400 (EDT)
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id
- 13FC4982064386; Thu, 15 Apr 2021 08:12:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
- h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=0qmyfG6khRpUOKcXpSEaC/J9TizHeX8zVO1F8w3sqWk=;
- b=joVs24R/42uPu6TAZl2eclklMxA31xdJPYE3bnVojAVNlLlmuCn/T+gxGAbCj1xALnMD
- BnGRroXfmU7QqX4j6AOj2BlraPJ0PxJz5Hy3Lee9ltHLDfvttJuFhTjMukZNU2DIsjtj
- MBJq25gtWdgS5GrCuFRwdO3ESuwnrIh+a4z8P1+WsncktYlGaYnSLU36c/EFay/thW/3
- sSs3/Jb1eJH0+AQUASbvpBKHIPHv2LoWRyRobQI1WCghg9uJGid4K5+0j8qIFhUfF5I5
- +gbHiv85aRMdgwb5GhAAHF7fzMRv4UtRYUIfR1IdLAiR2DWKyTev1sSR8qtWloR23zCq CA== 
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com
- [169.51.49.98])
- by mx0b-001b2d01.pphosted.com with ESMTP id 37xbqb6dv5-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 15 Apr 2021 08:12:16 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
- by ppma03ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13FC7YAO007426;
- Thu, 15 Apr 2021 12:12:15 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com
- (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
- by ppma03ams.nl.ibm.com with ESMTP id 37u3n8bv3s-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 15 Apr 2021 12:12:14 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
- by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 13FCCCQV26018220
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 15 Apr 2021 12:12:12 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 86AB042041;
- Thu, 15 Apr 2021 12:12:12 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id AC84E4203F;
- Thu, 15 Apr 2021 12:12:11 +0000 (GMT)
-Received: from osiris (unknown [9.171.3.254])
- by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
- Thu, 15 Apr 2021 12:12:11 +0000 (GMT)
-Date: Thu, 15 Apr 2021 14:12:10 +0200
-From: Heiko Carstens <hca@linux.ibm.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 3/5] s390: Get rid of oprofile leftovers
-Message-ID: <YHgtmjjtk9dDa7/R@osiris>
-References: <20210414134409.1266357-1-maz@kernel.org>
- <20210414134409.1266357-4-maz@kernel.org> <YHgXvFCLh0Ls0b9t@osiris>
- <87fszrn7sx.wl-maz@kernel.org>
+ with ESMTP id EG8ud-VUQbLS for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 16 Apr 2021 07:40:42 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0AF2A4B384
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Apr 2021 07:40:42 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 89260610F7;
+ Fri, 16 Apr 2021 11:40:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1618573239;
+ bh=3OCC+s3KXL3CRYXcQVOMoxBoZGtDVHKh4WAw7RykLgQ=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=pDOaH7UQSaGo/ZCEp5A6OFR9uKMDuK6uGnOs2vHTEXGRtAtsQKGjkGGsk3PWg0Rzz
+ fg5+KAwrz0HnwaACc7tBFZJ0FiU+6QY7Mde5xF2bzgD5zKfq/0GkWvGZ39EIc0HE+g
+ tlqJxhMX4svoPScIQ+NGKWutY1J3JP937aGi8BuabkOZ8RMt2ezysxFP/7zD0dNvZK
+ XbxNl1K61A4bZMmOBWAoDp7p997vg1b6XUfa5J4Z770LWLkdcLFOcY1vZqHi2ZHjEw
+ oeYfAwmsxCuYLBl5rTkg+43fXyLPqRl2huPLf6sA4MxYe08eveLy7DEAKMjqBLXamR
+ eC3XO8P7cO9bw==
+Date: Fri, 16 Apr 2021 14:40:28 +0300
+From: Mike Rapoport <rppt@kernel.org>
+To: David Hildenbrand <david@redhat.com>
+Subject: Re: [RFC/RFT PATCH 2/3] arm64: decouple check whether pfn is normal
+ memory from pfn_valid()
+Message-ID: <YHl3rM6D6/Y2rtru@kernel.org>
+References: <20210407172607.8812-1-rppt@kernel.org>
+ <20210407172607.8812-3-rppt@kernel.org>
+ <4a788546-b854-fd35-644a-f1d9075a9a78@arm.com>
+ <9c0956f0-494e-5c6b-bdc2-d4213afd5e2f@redhat.com>
+ <YHdQtmuxpqi4wCE/@kernel.org>
+ <62161846-4f03-e4b1-ae0b-fdf96f78d97c@redhat.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <87fszrn7sx.wl-maz@kernel.org>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: vARCqOoco7d3n4Ke2RUPNWmaue1niUQS
-X-Proofpoint-ORIG-GUID: vARCqOoco7d3n4Ke2RUPNWmaue1niUQS
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391, 18.0.761
- definitions=2021-04-15_04:2021-04-15,
- 2021-04-15 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 mlxlogscore=714
- suspectscore=0 phishscore=0 mlxscore=0 clxscore=1015 spamscore=0
- impostorscore=0 malwarescore=0 priorityscore=1501 lowpriorityscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104060000 definitions=main-2104150081
-X-Mailman-Approved-At: Thu, 15 Apr 2021 13:20:59 -0400
-Cc: linux-s390@vger.kernel.org, Rich Felker <dalias@libc.org>,
- Yoshinori Sato <ysato@users.sourceforge.jp>, kvm@vger.kernel.org,
- linux-sh@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>,
- Viresh Kumar <viresh.kumar@linaro.org>, linux-kernel@vger.kernel.org,
- Arnaldo Carvalho de Melo <acme@kernel.org>, nathan@kernel.org,
- Christian Borntraeger <borntraeger@de.ibm.com>, kernel-team@android.com,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+In-Reply-To: <62161846-4f03-e4b1-ae0b-fdf96f78d97c@redhat.com>
+Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+ Mike Rapoport <rppt@linux.ibm.com>, linux-mm@kvack.org,
+ kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -126,26 +86,115 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Apr 15, 2021 at 11:47:26AM +0100, Marc Zyngier wrote:
-> On Thu, 15 Apr 2021 11:38:52 +0100,
-> Heiko Carstens <hca@linux.ibm.com> wrote:
-> > 
-> > On Wed, Apr 14, 2021 at 02:44:07PM +0100, Marc Zyngier wrote:
-> > > perf_pmu_name() and perf_num_counters() are unused. Drop them.
+On Thu, Apr 15, 2021 at 11:31:26AM +0200, David Hildenbrand wrote:
+> On 14.04.21 22:29, Mike Rapoport wrote:
+> > On Wed, Apr 14, 2021 at 05:58:26PM +0200, David Hildenbrand wrote:
+> > > On 08.04.21 07:14, Anshuman Khandual wrote:
+> > > > 
+> > > > On 4/7/21 10:56 PM, Mike Rapoport wrote:
+> > > > > From: Mike Rapoport <rppt@linux.ibm.com>
+> > > > > 
+> > > > > The intended semantics of pfn_valid() is to verify whether there is a
+> > > > > struct page for the pfn in question and nothing else.
+> > > > 
+> > > > Should there be a comment affirming this semantics interpretation, above the
+> > > > generic pfn_valid() in include/linux/mmzone.h ?
+> > > > 
+> > > > > 
+> > > > > Yet, on arm64 it is used to distinguish memory areas that are mapped in the
+> > > > > linear map vs those that require ioremap() to access them.
+> > > > > 
+> > > > > Introduce a dedicated pfn_is_memory() to perform such check and use it
+> > > > > where appropriate.
+> > > > > 
+> > > > > Signed-off-by: Mike Rapoport <rppt@linux.ibm.com>
+> > > > > ---
+> > > > >    arch/arm64/include/asm/memory.h | 2 +-
+> > > > >    arch/arm64/include/asm/page.h   | 1 +
+> > > > >    arch/arm64/kvm/mmu.c            | 2 +-
+> > > > >    arch/arm64/mm/init.c            | 6 ++++++
+> > > > >    arch/arm64/mm/ioremap.c         | 4 ++--
+> > > > >    arch/arm64/mm/mmu.c             | 2 +-
+> > > > >    6 files changed, 12 insertions(+), 5 deletions(-)
+> > > > > 
+> > > > > diff --git a/arch/arm64/include/asm/memory.h b/arch/arm64/include/asm/memory.h
+> > > > > index 0aabc3be9a75..7e77fdf71b9d 100644
+> > > > > --- a/arch/arm64/include/asm/memory.h
+> > > > > +++ b/arch/arm64/include/asm/memory.h
+> > > > > @@ -351,7 +351,7 @@ static inline void *phys_to_virt(phys_addr_t x)
+> > > > >    #define virt_addr_valid(addr)	({					\
+> > > > >    	__typeof__(addr) __addr = __tag_reset(addr);			\
+> > > > > -	__is_lm_address(__addr) && pfn_valid(virt_to_pfn(__addr));	\
+> > > > > +	__is_lm_address(__addr) && pfn_is_memory(virt_to_pfn(__addr));	\
+> > > > >    })
+> > > > >    void dump_mem_limit(void);
+> > > > > diff --git a/arch/arm64/include/asm/page.h b/arch/arm64/include/asm/page.h
+> > > > > index 012cffc574e8..32b485bcc6ff 100644
+> > > > > --- a/arch/arm64/include/asm/page.h
+> > > > > +++ b/arch/arm64/include/asm/page.h
+> > > > > @@ -38,6 +38,7 @@ void copy_highpage(struct page *to, struct page *from);
+> > > > >    typedef struct page *pgtable_t;
+> > > > >    extern int pfn_valid(unsigned long);
+> > > > > +extern int pfn_is_memory(unsigned long);
+> > > > >    #include <asm/memory.h>
+> > > > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > > > > index 8711894db8c2..ad2ea65a3937 100644
+> > > > > --- a/arch/arm64/kvm/mmu.c
+> > > > > +++ b/arch/arm64/kvm/mmu.c
+> > > > > @@ -85,7 +85,7 @@ void kvm_flush_remote_tlbs(struct kvm *kvm)
+> > > > >    static bool kvm_is_device_pfn(unsigned long pfn)
+> > > > >    {
+> > > > > -	return !pfn_valid(pfn);
+> > > > > +	return !pfn_is_memory(pfn);
+> > > > >    }
+> > > > >    /*
+> > > > > diff --git a/arch/arm64/mm/init.c b/arch/arm64/mm/init.c
+> > > > > index 3685e12aba9b..258b1905ed4a 100644
+> > > > > --- a/arch/arm64/mm/init.c
+> > > > > +++ b/arch/arm64/mm/init.c
+> > > > > @@ -258,6 +258,12 @@ int pfn_valid(unsigned long pfn)
+> > > > >    }
+> > > > >    EXPORT_SYMBOL(pfn_valid);
+> > > > > +int pfn_is_memory(unsigned long pfn)
+> > > > > +{
+> > > > > +	return memblock_is_map_memory(PFN_PHYS(pfn));
+> > > > > +}
+> > > > > +EXPORT_SYMBOL(pfn_is_memory);> +
+> > > > 
+> > > > Should not this be generic though ? There is nothing platform or arm64
+> > > > specific in here. Wondering as pfn_is_memory() just indicates that the
+> > > > pfn is linear mapped, should not it be renamed as pfn_is_linear_memory()
+> > > > instead ? Regardless, it's fine either way.
 > > > 
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > ---
-> > >  arch/s390/kernel/perf_event.c | 21 ---------------------
-> > >  1 file changed, 21 deletions(-)
+> > > TBH, I dislike (generic) pfn_is_memory(). It feels like we're mixing
+> > > concepts.
 > > 
-> > Acked-by: Heiko Carstens <hca@linux.ibm.com>
+> > Yeah, at the moment NOMAP is very much arm specific so I'd keep it this way
+> > for now.
 > > 
-> > ...or do you want me to pick this up and route via the s390 tree(?).
+> > >   NOMAP memory vs !NOMAP memory; even NOMAP is some kind of memory
+> > > after all. pfn_is_map_memory() would be more expressive, although still
+> > > sub-optimal.
+> > > 
+> > > We'd actually want some kind of arm64-specific pfn_is_system_memory() or the
+> > > inverse pfn_is_device_memory() -- to be improved.
+> > 
+> > In my current version (to be posted soon) I've started with
+> > pfn_lineary_mapped() but then ended up with pfn_mapped() to make it
+> > "upward" compatible with architectures that use direct rather than linear
+> > map :)
 > 
-> Either way work for me, but I just want to make sure the last patch
-> doesn't get applied before the previous ones.
+> And even that is moot. It doesn't tell you if a PFN is *actually* mapped
+> (hello secretmem).
+> 
+> I'd suggest to just use memblock_is_map_memory() in arch specific code. Then
+> it's clear what we are querying exactly and what the semantics might be.
 
-Ok, I applied this one to the s390 tree. Thanks!
+Ok, let's export memblock_is_map_memory() for the KEEP_MEMBLOCK case.
+
+-- 
+Sincerely yours,
+Mike.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
