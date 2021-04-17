@@ -7,53 +7,54 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BF15C433ED
-	for <kvmarm@archiver.kernel.org>; Sat, 17 Apr 2021 09:49:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EABB4C43460
+	for <kvmarm@archiver.kernel.org>; Sat, 17 Apr 2021 10:25:20 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C5D2A613D2
-	for <kvmarm@archiver.kernel.org>; Sat, 17 Apr 2021 09:49:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5D2A613D2
+	by mail.kernel.org (Postfix) with ESMTP id 6417561210
+	for <kvmarm@archiver.kernel.org>; Sat, 17 Apr 2021 10:25:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6417561210
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3FF694B336;
-	Sat, 17 Apr 2021 05:49:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C37C04B327;
+	Sat, 17 Apr 2021 06:25:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id xKOHfTcGM5md; Sat, 17 Apr 2021 05:49:27 -0400 (EDT)
+	with ESMTP id 7zoajgbvrwkh; Sat, 17 Apr 2021 06:25:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4769C4B2E0;
-	Sat, 17 Apr 2021 05:49:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 11A4B4B351;
+	Sat, 17 Apr 2021 06:25:16 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E99DF4B2CB
- for <kvmarm@lists.cs.columbia.edu>; Sat, 17 Apr 2021 05:49:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E98F54B319
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 17 Apr 2021 06:25:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nWZVSn3yghAx for <kvmarm@lists.cs.columbia.edu>;
- Sat, 17 Apr 2021 05:49:25 -0400 (EDT)
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4CF364A19A
- for <kvmarm@lists.cs.columbia.edu>; Sat, 17 Apr 2021 05:49:25 -0400 (EDT)
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
- by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4FMpB965xkzpVg3;
- Sat, 17 Apr 2021 17:46:25 +0800 (CST)
+ with ESMTP id s-MqYs514xcg for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 17 Apr 2021 06:25:10 -0400 (EDT)
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B10904B30F
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 17 Apr 2021 06:25:10 -0400 (EDT)
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
+ by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4FMpzP41D7zPr3L;
+ Sat, 17 Apr 2021 18:22:09 +0800 (CST)
 Received: from [10.174.185.179] (10.174.185.179) by
- DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
- 14.3.498.0; Sat, 17 Apr 2021 17:49:11 +0800
-Subject: Re: [PATCH v19 1/7] arm/arm64: Probe for the presence of KVM
- hypervisor
+ DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
+ 14.3.498.0; Sat, 17 Apr 2021 18:24:55 +0800
+Subject: Re: [PATCH v19 6/7] KVM: arm64: Add support for the KVM PTP service
 To: Marc Zyngier <maz@kernel.org>
 References: <20210330145430.996981-1-maz@kernel.org>
- <20210330145430.996981-2-maz@kernel.org>
+ <20210330145430.996981-7-maz@kernel.org>
+ <5aadf0b4-b9e5-8521-db60-52a0f319cf28@huawei.com>
+ <87v98ls2co.wl-maz@kernel.org>
 From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <41707ee7-da5e-896b-6362-18cfcf272b5c@huawei.com>
-Date: Sat, 17 Apr 2021 17:49:09 +0800
+Message-ID: <e4130244-10a6-3251-227b-6f99c3c5899b@huawei.com>
+Date: Sat, 17 Apr 2021 18:24:49 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20210330145430.996981-2-maz@kernel.org>
+In-Reply-To: <87v98ls2co.wl-maz@kernel.org>
 Content-Language: en-US
 X-Originating-IP: [10.174.185.179]
 X-CFilter-Loop: Reflected
@@ -80,11 +81,26 @@ Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2021/3/30 22:54, Marc Zyngier wrote:
->  #define SMCCC_ARCH_WORKAROUND_RET_UNAFFECTED	1
+On 2021/4/17 17:10, Marc Zyngier wrote:
+> On Sat, 17 Apr 2021 09:59:39 +0100,
+> Zenghui Yu <yuzenghui@huawei.com> wrote:
+>>
+>> On 2021/3/30 22:54, Marc Zyngier wrote:
+>>> +PTP_KVM support for arm/arm64
+>>> +=============================
+>>> +
+>>> +PTP_KVM is used for high precision time sync between host and guests.
+>>> +It relies on transferring the wall clock and counter value from the
+>>> +host to the guest using a KVM-specific hypercall.
+>>> +
+>>> +* ARM_SMCCC_HYP_KVM_PTP_FUNC_ID: 0x86000001
+>>
+>> Per include/linux/arm-smccc.h, this should be
+>> ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID.
+> 
+> Well spotted. Care to send a patch on top of my kvm-arm64/ptp branch?
 
-I think it'd be better to keep this definition together with other
-wa Function IDs. It's only a cosmetic comment anyway.
+Okay. I'll have a patch for that.
 
 
 Zenghui
