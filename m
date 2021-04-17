@@ -7,53 +7,53 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18D74C433ED
-	for <kvmarm@archiver.kernel.org>; Sat, 17 Apr 2021 09:27:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BF15C433ED
+	for <kvmarm@archiver.kernel.org>; Sat, 17 Apr 2021 09:49:29 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7068F611ED
-	for <kvmarm@archiver.kernel.org>; Sat, 17 Apr 2021 09:27:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7068F611ED
+	by mail.kernel.org (Postfix) with ESMTP id C5D2A613D2
+	for <kvmarm@archiver.kernel.org>; Sat, 17 Apr 2021 09:49:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5D2A613D2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D6A384B351;
-	Sat, 17 Apr 2021 05:27:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3FF694B336;
+	Sat, 17 Apr 2021 05:49:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 5HNUIqh9cfBe; Sat, 17 Apr 2021 05:27:30 -0400 (EDT)
+	with ESMTP id xKOHfTcGM5md; Sat, 17 Apr 2021 05:49:27 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 06DF14B30D;
-	Sat, 17 Apr 2021 05:27:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4769C4B2E0;
+	Sat, 17 Apr 2021 05:49:27 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DF0384B346
- for <kvmarm@lists.cs.columbia.edu>; Sat, 17 Apr 2021 05:27:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E99DF4B2CB
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 17 Apr 2021 05:49:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Z6nDQbha9d8L for <kvmarm@lists.cs.columbia.edu>;
- Sat, 17 Apr 2021 05:27:25 -0400 (EDT)
+ with ESMTP id nWZVSn3yghAx for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 17 Apr 2021 05:49:25 -0400 (EDT)
 Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AD36A4B30D
- for <kvmarm@lists.cs.columbia.edu>; Sat, 17 Apr 2021 05:27:25 -0400 (EDT)
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.60])
- by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4FMnjW26hXz17Qt9;
- Sat, 17 Apr 2021 17:25:03 +0800 (CST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4CF364A19A
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 17 Apr 2021 05:49:25 -0400 (EDT)
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
+ by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4FMpB965xkzpVg3;
+ Sat, 17 Apr 2021 17:46:25 +0800 (CST)
 Received: from [10.174.185.179] (10.174.185.179) by
- DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
- 14.3.498.0; Sat, 17 Apr 2021 17:27:13 +0800
-Subject: Re: [PATCH v19 4/7] time: Add mechanism to recognize clocksource in
- time_get_snapshot
+ DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
+ 14.3.498.0; Sat, 17 Apr 2021 17:49:11 +0800
+Subject: Re: [PATCH v19 1/7] arm/arm64: Probe for the presence of KVM
+ hypervisor
 To: Marc Zyngier <maz@kernel.org>
 References: <20210330145430.996981-1-maz@kernel.org>
- <20210330145430.996981-5-maz@kernel.org>
+ <20210330145430.996981-2-maz@kernel.org>
 From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <6e5fb440-156d-2b18-b3cd-89b1a09b0239@huawei.com>
-Date: Sat, 17 Apr 2021 17:27:11 +0800
+Message-ID: <41707ee7-da5e-896b-6362-18cfcf272b5c@huawei.com>
+Date: Sat, 17 Apr 2021 17:49:09 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20210330145430.996981-5-maz@kernel.org>
+In-Reply-To: <20210330145430.996981-2-maz@kernel.org>
 Content-Language: en-US
 X-Originating-IP: [10.174.185.179]
 X-CFilter-Loop: Reflected
@@ -81,20 +81,13 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On 2021/3/30 22:54, Marc Zyngier wrote:
-> -	u64		cycles;
-> -	ktime_t		real;
-> -	ktime_t		raw;
-> -	unsigned int	clock_was_set_seq;
-> -	u8		cs_was_changed_seq;
-> +	u64			cycles;
-> +	ktime_t			real;
-> +	ktime_t			raw;
-> +	enum clocksource_ids	cs_id;
+>  #define SMCCC_ARCH_WORKAROUND_RET_UNAFFECTED	1
 
-nit: worth adding a description for it (on top of the structure)?
+I think it'd be better to keep this definition together with other
+wa Function IDs. It's only a cosmetic comment anyway.
 
-> +	unsigned int		clock_was_set_seq;
-> +	u8			cs_was_changed_seq;
+
+Zenghui
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
