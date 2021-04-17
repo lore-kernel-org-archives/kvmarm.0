@@ -1,63 +1,65 @@
-Return-Path: <SRS0=n9q4=JN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=JEd/=JO=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC4E6C433B4
-	for <kvmarm@archiver.kernel.org>; Fri, 16 Apr 2021 15:43:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07989C433ED
+	for <kvmarm@archiver.kernel.org>; Sat, 17 Apr 2021 01:05:29 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8C8EE61222
-	for <kvmarm@archiver.kernel.org>; Fri, 16 Apr 2021 15:43:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C8EE61222
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 4170F610FC
+	for <kvmarm@archiver.kernel.org>; Sat, 17 Apr 2021 01:05:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4170F610FC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 408F14B414;
-	Fri, 16 Apr 2021 11:43:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B2DC64B426;
+	Fri, 16 Apr 2021 21:05:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id WvKpOnFiGfTI; Fri, 16 Apr 2021 11:43:44 -0400 (EDT)
+	with ESMTP id Hij0Bh3lRLRd; Fri, 16 Apr 2021 21:05:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E52714B434;
-	Fri, 16 Apr 2021 11:43:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0783C4B3C7;
+	Fri, 16 Apr 2021 21:05:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 070F84B479
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Apr 2021 11:43:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 878E94B38B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Apr 2021 21:05:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HVlLdCpiuImH for <kvmarm@lists.cs.columbia.edu>;
- Fri, 16 Apr 2021 11:43:40 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CA35E4B482
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Apr 2021 11:43:40 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 895981396;
- Fri, 16 Apr 2021 08:43:40 -0700 (PDT)
-Received: from e112269-lin.arm.com (autoplooker.cambridge.arm.com
- [10.1.194.57])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BBBE13F99C;
- Fri, 16 Apr 2021 08:43:37 -0700 (PDT)
-From: Steven Price <steven.price@arm.com>
-To: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>
-Subject: [PATCH v11 6/6] KVM: arm64: Document MTE capability and ioctl
-Date: Fri, 16 Apr 2021 16:43:09 +0100
-Message-Id: <20210416154309.22129-7-steven.price@arm.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20210416154309.22129-1-steven.price@arm.com>
-References: <20210416154309.22129-1-steven.price@arm.com>
+ with ESMTP id RDQWnqBMTOvz for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 16 Apr 2021 21:05:17 -0400 (EDT)
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4C4BA4B420
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Apr 2021 21:05:17 -0400 (EDT)
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.60])
+ by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4FMZYP6ZQxzpZ7j;
+ Sat, 17 Apr 2021 09:02:17 +0800 (CST)
+Received: from [10.174.187.224] (10.174.187.224) by
+ DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
+ 14.3.498.0; Sat, 17 Apr 2021 09:05:05 +0800
+Subject: Re: [PATCH v4 2/2] kvm/arm64: Try stage2 block mapping for host
+ device MMIO
+To: Marc Zyngier <maz@kernel.org>
+References: <20210415140328.24200-1-zhukeqian1@huawei.com>
+ <20210415140328.24200-3-zhukeqian1@huawei.com>
+ <8f55b64f-b4dd-700e-c997-8de9c5ea282f@huawei.com>
+ <87a6py2ss9.wl-maz@kernel.org>
+From: Keqian Zhu <zhukeqian1@huawei.com>
+Message-ID: <d8af7360-ee96-2344-336d-bfaf8828fc8e@huawei.com>
+Date: Sat, 17 Apr 2021 09:05:05 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
- Dave Martin <Dave.Martin@arm.com>, Juan Quintela <quintela@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
- Steven Price <steven.price@arm.com>, Thomas Gleixner <tglx@linutronix.de>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <87a6py2ss9.wl-maz@kernel.org>
+X-Originating-IP: [10.174.187.224]
+X-CFilter-Loop: Reflected
+Cc: kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -74,93 +76,70 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-A new capability (KVM_CAP_ARM_MTE) identifies that the kernel supports
-granting a guest access to the tags, and provides a mechanism for the
-VMM to enable it.
+Hi Marc,
 
-A new ioctl (KVM_ARM_MTE_COPY_TAGS) provides a simple way for a VMM to
-access the tags of a guest without having to maintain a PROT_MTE mapping
-in userspace. The above capability gates access to the ioctl.
+On 2021/4/16 22:44, Marc Zyngier wrote:
+> On Thu, 15 Apr 2021 15:08:09 +0100,
+> Keqian Zhu <zhukeqian1@huawei.com> wrote:
+>>
+>> Hi Marc,
+>>
+>> On 2021/4/15 22:03, Keqian Zhu wrote:
+>>> The MMIO region of a device maybe huge (GB level), try to use
+>>> block mapping in stage2 to speedup both map and unmap.
+>>>
+>>> Compared to normal memory mapping, we should consider two more
+>>> points when try block mapping for MMIO region:
+>>>
+>>> 1. For normal memory mapping, the PA(host physical address) and
+>>> HVA have same alignment within PUD_SIZE or PMD_SIZE when we use
+>>> the HVA to request hugepage, so we don't need to consider PA
+>>> alignment when verifing block mapping. But for device memory
+>>> mapping, the PA and HVA may have different alignment.
+>>>
+>>> 2. For normal memory mapping, we are sure hugepage size properly
+>>> fit into vma, so we don't check whether the mapping size exceeds
+>>> the boundary of vma. But for device memory mapping, we should pay
+>>> attention to this.
+>>>
+>>> This adds get_vma_page_shift() to get page shift for both normal
+>>> memory and device MMIO region, and check these two points when
+>>> selecting block mapping size for MMIO region.
+>>>
+>>> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+>>> ---
+>>>  arch/arm64/kvm/mmu.c | 61 ++++++++++++++++++++++++++++++++++++--------
+>>>  1 file changed, 51 insertions(+), 10 deletions(-)
+>>>
+>>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>>> index c59af5ca01b0..5a1cc7751e6d 100644
+>>> --- a/arch/arm64/kvm/mmu.c
+>>> +++ b/arch/arm64/kvm/mmu.c
+>>> @@ -738,6 +738,35 @@ transparent_hugepage_adjust(struct kvm_memory_slot *memslot,
+>>>  	return PAGE_SIZE;
+>>>  }
+>>>  
+[...]
 
-Signed-off-by: Steven Price <steven.price@arm.com>
----
- Documentation/virt/kvm/api.rst | 53 ++++++++++++++++++++++++++++++++++
- 1 file changed, 53 insertions(+)
+>>> +	/*
+>>> +	 * logging_active is guaranteed to never be true for VM_PFNMAP
+>>> +	 * memslots.
+>>> +	 */
+>>> +	if (logging_active) {
+>>>  		force_pte = true;
+>>>  		vma_shift = PAGE_SHIFT;
+>>> +	} else {
+>>> +		vma_shift = get_vma_page_shift(vma, hva);
+>>>  	}
+>> I use a if/else manner in v4, please check that. Thanks very much!
+> 
+> That's fine. However, it is getting a bit late for 5.13, and we don't
+> have much time to left it simmer in -next. I'll probably wait until
+> after the merge window to pick it up.
+OK, no problem. Thanks! :)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 1a2b5210cdbf..ccc84f21ba5e 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -4938,6 +4938,40 @@ see KVM_XEN_VCPU_SET_ATTR above.
- The KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_ADJUST type may not be used
- with the KVM_XEN_VCPU_GET_ATTR ioctl.
- 
-+4.131 KVM_ARM_MTE_COPY_TAGS
-+---------------------------
-+
-+:Capability: KVM_CAP_ARM_MTE
-+:Architectures: arm64
-+:Type: vm ioctl
-+:Parameters: struct kvm_arm_copy_mte_tags
-+:Returns: 0 on success, < 0 on error
-+
-+::
-+
-+  struct kvm_arm_copy_mte_tags {
-+	__u64 guest_ipa;
-+	__u64 length;
-+	union {
-+		void __user *addr;
-+		__u64 padding;
-+	};
-+	__u64 flags;
-+	__u64 reserved[2];
-+  };
-+
-+Copies Memory Tagging Extension (MTE) tags to/from guest tag memory. The
-+``guest_ipa`` and ``length`` fields must be ``PAGE_SIZE`` aligned. The ``addr``
-+fieldmust point to a buffer which the tags will be copied to or from.
-+
-+``flags`` specifies the direction of copy, either ``KVM_ARM_TAGS_TO_GUEST`` or
-+``KVM_ARM_TAGS_FROM_GUEST``.
-+
-+The size of the buffer to store the tags is ``(length / MTE_GRANULE_SIZE)``
-+bytes (i.e. 1/16th of the corresponding size). Each byte contains a single tag
-+value. This matches the format of ``PTRACE_PEEKMTETAGS`` and
-+``PTRACE_POKEMTETAGS``.
-+
- 5. The kvm_run structure
- ========================
- 
-@@ -6227,6 +6261,25 @@ KVM_RUN_BUS_LOCK flag is used to distinguish between them.
- This capability can be used to check / enable 2nd DAWR feature provided
- by POWER10 processor.
- 
-+7.23 KVM_CAP_ARM_MTE
-+--------------------
-+
-+:Architectures: arm64
-+:Parameters: none
-+
-+This capability indicates that KVM (and the hardware) supports exposing the
-+Memory Tagging Extensions (MTE) to the guest. It must also be enabled by the
-+VMM before the guest will be granted access.
-+
-+When enabled the guest is able to access tags associated with any memory given
-+to the guest. KVM will ensure that the pages are flagged ``PG_mte_tagged`` so
-+that the tags are maintained during swap or hibernation of the host; however
-+the VMM needs to manually save/restore the tags as appropriate if the VM is
-+migrated.
-+
-+When enabled the VMM may make use of the ``KVM_ARM_MTE_COPY_TAGS`` ioctl to
-+perform a bulk copy of tags to/from the guest.
-+
- 8. Other capabilities.
- ======================
- 
--- 
-2.20.1
-
+BRs,
+Keqian
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
