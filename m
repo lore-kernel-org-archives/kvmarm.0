@@ -2,108 +2,59 @@ Return-Path: <SRS0=sayA=JR=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4EB2C43460
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Apr 2021 16:01:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6720C433ED
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Apr 2021 16:13:20 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E6E98613C4
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Apr 2021 16:01:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6E98613C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id D0A36613C9
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Apr 2021 16:13:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0A36613C9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A5EE4B39C;
-	Tue, 20 Apr 2021 12:01:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B93F4B3C7;
+	Tue, 20 Apr 2021 12:13:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id yzjqRVnbpuW6; Tue, 20 Apr 2021 12:01:04 -0400 (EDT)
+	with ESMTP id iyfSsTdyyzan; Tue, 20 Apr 2021 12:13:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EB8D24B3BF;
-	Tue, 20 Apr 2021 12:01:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 58AC34B3CA;
+	Tue, 20 Apr 2021 12:13:15 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5BF5B4B3A2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Apr 2021 12:01:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C2664B3C3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Apr 2021 12:13:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BsTJJHPfDr0z for <kvmarm@lists.cs.columbia.edu>;
- Tue, 20 Apr 2021 12:01:02 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 202874B39C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Apr 2021 12:01:02 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1618934462;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=1VLwDHA1T1kECXFVXDoESN93Xu3CIGiC8uj+j3Bh2ag=;
- b=OVJt8vxLRxX1RPh2uCKKaBjF/u8knBUuGmri9JdijQj8jHZM6tvLm/gt57XZI2Nud4OWUW
- G8D+/NCn/T8frXvVC2k5qNB11iPw5rUT/ucb6JRJvjdh4GpI2jNe2Pat4Y6JkTjR2vqDEv
- pglPVvKfuanWK1QpUxYPt9qTcLypdkU=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-71-1RmknzwwPy25pL0HWbaYgA-1; Tue, 20 Apr 2021 12:00:57 -0400
-X-MC-Unique: 1RmknzwwPy25pL0HWbaYgA-1
-Received: by mail-wm1-f70.google.com with SMTP id
- y82-20020a1ce1550000b02901262158f1e9so5844797wmg.8
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Apr 2021 09:00:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:organization
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=1VLwDHA1T1kECXFVXDoESN93Xu3CIGiC8uj+j3Bh2ag=;
- b=nl4ybj6ASsbB1g9+GhBt2ObBZ6O7nFxffRTSYGaxxfKDY9iVwl2vvFAge52dBeNSlQ
- vbzMiJS2QUf28a6byiLVdrOS3Lkgh4j5P6AlKGIy+VwYXf+Ja32mqDzXvQBVZ4XrFijF
- jRvaWXh5d42/if3nneAQB6AwF1219BPmwPb1YHm/mmIHPhfcmR2/8SLHt7P/LZ98vD0y
- uTQ0NScdnVP3jGqE92B0C/GS5Do8SsNN7RLBEmdKURDOkA19i1k9qoKa7H04r15CtVEN
- wM2JHJV5ALuZsbK9jYsYaCKofhiLYb+wQlNW5wSEL01JWo7IMdHo74D5caH/RNe8o1XL
- UkTQ==
-X-Gm-Message-State: AOAM532QfcDeT6PAxMz0lgqn6ncLZk6Ak9PMOaY+FhtdWbOTzz5tcRlU
- HcqFJ4JhHuVL6ibG4et5f+9jSo3dY/be9SuSp56NmapxOwVIKnztD2hMH/4SiaCcMTPtXvISADv
- m8XR2Tr/Er2ChMA70Bjhnv8gA
-X-Received: by 2002:adf:d0cc:: with SMTP id z12mr21739747wrh.18.1618934456651; 
- Tue, 20 Apr 2021 09:00:56 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxr5kh0sjqy8wW7F/IAJRwsgXm3O7rTTKuYEi9XNs0Np8ms/WxZijQLIJublkxDKy/HuPS98A==
-X-Received: by 2002:adf:d0cc:: with SMTP id z12mr21739705wrh.18.1618934456321; 
- Tue, 20 Apr 2021 09:00:56 -0700 (PDT)
-Received: from [192.168.3.132] (p4ff2390a.dip0.t-ipconnect.de. [79.242.57.10])
- by smtp.gmail.com with ESMTPSA id
- o4sm9592968wrn.81.2021.04.20.09.00.55
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 20 Apr 2021 09:00:56 -0700 (PDT)
-Subject: Re: [PATCH v1 4/4] arm64: drop pfn_valid_within() and simplify
- pfn_valid()
-To: Mike Rapoport <rppt@kernel.org>, linux-arm-kernel@lists.infradead.org
-References: <20210420090925.7457-1-rppt@kernel.org>
- <20210420090925.7457-5-rppt@kernel.org>
-From: David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-Message-ID: <8e7171e7-a85c-6066-4ab6-d2bc98ec103b@redhat.com>
-Date: Tue, 20 Apr 2021 18:00:55 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+ with ESMTP id eM7NA+wmiZ0w for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 20 Apr 2021 12:13:11 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A15D04B3BB
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Apr 2021 12:13:11 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EAC3214BF;
+ Tue, 20 Apr 2021 09:13:10 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 280633F73B;
+ Tue, 20 Apr 2021 09:13:10 -0700 (PDT)
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: drjones@redhat.com,
+	kvm@vger.kernel.org,
+	kvmarm@lists.cs.columbia.edu
+Subject: [kvm-unit-tests RFC PATCH 1/1] configure: arm: Replace --vmm with
+ --target
+Date: Tue, 20 Apr 2021 17:13:38 +0100
+Message-Id: <20210420161338.70914-2-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20210420161338.70914-1-alexandru.elisei@arm.com>
+References: <20210420161338.70914-1-alexandru.elisei@arm.com>
 MIME-Version: 1.0
-In-Reply-To: <20210420090925.7457-5-rppt@kernel.org>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=david@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
- Mike Rapoport <rppt@linux.ibm.com>, linux-mm@kvack.org,
- kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>
+Cc: pbonzini@redhat.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -115,92 +66,113 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 20.04.21 11:09, Mike Rapoport wrote:
-> From: Mike Rapoport <rppt@linux.ibm.com>
-> 
-> The arm64's version of pfn_valid() differs from the generic because of two
-> reasons:
-> 
-> * Parts of the memory map are freed during boot. This makes it necessary to
->    verify that there is actual physical memory that corresponds to a pfn
->    which is done by querying memblock.
-> 
-> * There are NOMAP memory regions. These regions are not mapped in the
->    linear map and until the previous commit the struct pages representing
->    these areas had default values.
-> 
-> As the consequence of absence of the special treatment of NOMAP regions in
-> the memory map it was necessary to use memblock_is_map_memory() in
-> pfn_valid() and to have pfn_valid_within() aliased to pfn_valid() so that
-> generic mm functionality would not treat a NOMAP page as a normal page.
-> 
-> Since the NOMAP regions are now marked as PageReserved(), pfn walkers and
-> the rest of core mm will treat them as unusable memory and thus
-> pfn_valid_within() is no longer required at all and can be disabled by
-> removing CONFIG_HOLES_IN_ZONE on arm64.
-> 
-> pfn_valid() can be slightly simplified by replacing
-> memblock_is_map_memory() with memblock_is_memory().
-> 
-> Signed-off-by: Mike Rapoport <rppt@linux.ibm.com>
-> ---
->   arch/arm64/Kconfig   | 3 ---
->   arch/arm64/mm/init.c | 4 ++--
->   2 files changed, 2 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-> index e4e1b6550115..58e439046d05 100644
-> --- a/arch/arm64/Kconfig
-> +++ b/arch/arm64/Kconfig
-> @@ -1040,9 +1040,6 @@ config NEED_PER_CPU_EMBED_FIRST_CHUNK
->   	def_bool y
->   	depends on NUMA
->   
-> -config HOLES_IN_ZONE
-> -	def_bool y
-> -
->   source "kernel/Kconfig.hz"
->   
->   config ARCH_SPARSEMEM_ENABLE
-> diff --git a/arch/arm64/mm/init.c b/arch/arm64/mm/init.c
-> index c54e329aca15..370f33765b64 100644
-> --- a/arch/arm64/mm/init.c
-> +++ b/arch/arm64/mm/init.c
-> @@ -243,7 +243,7 @@ int pfn_valid(unsigned long pfn)
->   
->   	/*
->   	 * ZONE_DEVICE memory does not have the memblock entries.
-> -	 * memblock_is_map_memory() check for ZONE_DEVICE based
-> +	 * memblock_is_memory() check for ZONE_DEVICE based
->   	 * addresses will always fail. Even the normal hotplugged
->   	 * memory will never have MEMBLOCK_NOMAP flag set in their
->   	 * memblock entries. Skip memblock search for all non early
-> @@ -254,7 +254,7 @@ int pfn_valid(unsigned long pfn)
->   		return pfn_section_valid(ms, pfn);
->   }
->   #endif
-> -	return memblock_is_map_memory(addr);
-> +	return memblock_is_memory(addr);
->   }
->   EXPORT_SYMBOL(pfn_valid);
->   
-> 
+The --vmm configure option was added to distinguish between the two virtual
+machine managers that kvm-unit-tests supports, qemu or kvmtool. There are
+plans to make kvm-unit-tests work as an EFI app, which will require changes
+to the way tests are compiled. Instead of adding a new configure option
+specifically for EFI and have it coexist with --vmm, or overloading the
+semantics of the existing --vmm option, let's replace --vmm with the more
+generic name --target.
 
-What are the steps needed to get rid of custom pfn_valid() completely?
+--vmm has been kept for now as to avoid breaking existing users, but it has
+been modified to shadow value of --target and a message will be displayed
+to notify users that it will be removed at some point in the future.
 
-I'd assume we would have to stop freeing parts of the mem map during 
-boot. How relevant is that for arm64 nowadays, especially with reduced 
-section sizes?
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+---
+ configure | 30 +++++++++++++++++++++++-------
+ 1 file changed, 23 insertions(+), 7 deletions(-)
 
+diff --git a/configure b/configure
+index 01a0b262a9f2..71d6dc9490df 100755
+--- a/configure
++++ b/configure
+@@ -21,7 +21,8 @@ pretty_print_stacks=yes
+ environ_default=yes
+ u32_long=
+ wa_divide=
+-vmm="qemu"
++vmm=
++target="qemu"
+ errata_force=0
+ erratatxt="$srcdir/errata.txt"
+ host_key_document=
+@@ -35,8 +36,11 @@ usage() {
+ 	Options include:
+ 	    --arch=ARCH            architecture to compile for ($arch)
+ 	    --processor=PROCESSOR  processor to compile for ($arch)
+-	    --vmm=VMM              virtual machine monitor to compile for (qemu
+-	                           or kvmtool, default is qemu) (arm/arm64 only)
++	    --target=TARGET        target platform that the tests will be running on (qemu or
++	                           kvmtool, default is qemu) (arm/arm64 only)
++	    --vmm=VMM              virtual machine monitor to compile for (qemu or kvmtool).
++	                           If specified, it must have the same value as the --target
++	                           option (arm/arm64 only) (deprecated)
+ 	    --cross-prefix=PREFIX  cross compiler prefix
+ 	    --cc=CC		   c compiler to use ($cc)
+ 	    --ld=LD		   ld linker to use ($ld)
+@@ -58,7 +62,7 @@ usage() {
+ 	    --earlycon=EARLYCON
+ 	                           Specify the UART name, type and address (optional, arm and
+ 	                           arm64 only). The specified address will overwrite the UART
+-	                           address set by the --vmm option. EARLYCON can be one of
++	                           address set by the --target option. EARLYCON can be one of
+ 	                           (case sensitive):
+ 	               uart[8250],mmio,ADDR
+ 	                           Specify an 8250 compatible UART at address ADDR. Supported
+@@ -91,6 +95,9 @@ while [[ "$1" = -* ]]; do
+ 	--vmm)
+ 	    vmm="$arg"
+ 	    ;;
++	--target)
++	    target="$arg"
++	    ;;
+ 	--cross-prefix)
+ 	    cross_prefix="$arg"
+ 	    ;;
+@@ -177,16 +184,24 @@ if [ "$arch" = "i386" ] || [ "$arch" = "x86_64" ]; then
+     testdir=x86
+ elif [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
+     testdir=arm
+-    if [ "$vmm" = "qemu" ]; then
++    if [ "$target" = "qemu" ]; then
+         arm_uart_early_addr=0x09000000
+-    elif [ "$vmm" = "kvmtool" ]; then
++    elif [ "$target" = "kvmtool" ]; then
+         arm_uart_early_addr=0x3f8
+         errata_force=1
+     else
+-        echo '--vmm must be one of "qemu" or "kvmtool"!'
++        echo '--target must be one of "qemu" or "kvmtool"!'
+         usage
+     fi
+ 
++    if [ -n "$vmm" ]; then
++        echo "INFO: --vmm is deprecated and will be removed in future versions"
++        if [  "$vmm" != "$target" ]; then
++            echo "--vmm must have the same value as --target ($target)"
++            usage
++        fi
++    fi
++
+     if [ "$earlycon" ]; then
+         IFS=, read -r name type_addr addr <<<"$earlycon"
+         if [ "$name" != "uart" ] && [ "$name" != "uart8250" ] &&
+@@ -317,6 +332,7 @@ U32_LONG_FMT=$u32_long
+ WA_DIVIDE=$wa_divide
+ GENPROTIMG=${GENPROTIMG-genprotimg}
+ HOST_KEY_DOCUMENT=$host_key_document
++TARGET=$target
+ EOF
+ 
+ cat <<EOF > lib/config.h
 -- 
-Thanks,
-
-David / dhildenb
+2.31.1
 
 _______________________________________________
 kvmarm mailing list
