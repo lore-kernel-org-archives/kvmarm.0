@@ -2,59 +2,63 @@ Return-Path: <SRS0=sayA=JR=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F155EC433B4
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Apr 2021 09:09:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49E71C43460
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Apr 2021 09:14:33 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 49CC36101E
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Apr 2021 09:09:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49CC36101E
+	by mail.kernel.org (Postfix) with ESMTP id A2932613AF
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Apr 2021 09:14:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2932613AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AA71D4B37D;
-	Tue, 20 Apr 2021 05:09:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FD364B21D;
+	Tue, 20 Apr 2021 05:14:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 0d04zusnSsfo; Tue, 20 Apr 2021 05:09:43 -0400 (EDT)
+	with ESMTP id IcJV+vgpE0yG; Tue, 20 Apr 2021 05:14:27 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D3BDD4B377;
-	Tue, 20 Apr 2021 05:09:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D9BE4B22A;
+	Tue, 20 Apr 2021 05:14:27 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 377634B377
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Apr 2021 05:09:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 59A754B228
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Apr 2021 05:14:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PKPSJ0O-Ap3L for <kvmarm@lists.cs.columbia.edu>;
- Tue, 20 Apr 2021 05:09:37 -0400 (EDT)
+ with ESMTP id LMMD5783tCtU for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 20 Apr 2021 05:14:24 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2B3034B319
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Apr 2021 05:09:37 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id CA915611F2;
- Tue, 20 Apr 2021 09:09:30 +0000 (UTC)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2BC1D4B31B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Apr 2021 05:14:24 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 5D0F46127C;
+ Tue, 20 Apr 2021 09:14:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1618909774;
- bh=TVJDUXhJ6CplL+qBeAb0uQbwAMiGJwKZzeHI/o52vzg=;
- h=From:To:Cc:Subject:Date:From;
- b=WP/6RRsHt1xJ6WubZpF0wiLM/Q+b+naQEzZ9T1AGJ7I0BrkiWYXWhBz4D5la8KdBE
- 3tyOyGNKIATejyXsplTnTMyCyjbGuqsDRQtl829ReQkddr0kEaMvfMTFMBM9IwSwpk
- OmOHdm7PwLHL+Z526d1n9TFE5nAWi4VMpSdkFbYMj2qKam5pl60VYuh9eqqyfzVCoT
- hyXIqd2uIG/B7n90ABXMRR6OkADFhavU1Rlbj50ScGK/SJsOEWHkSTkd83uVoC50W2
- Yslw+v/GG2aCgoSGiIMHQYouLKY566vD9Y35qh6bnON6EN5opk/p+7jGlYESv2IgbX
- kEzFt62nV8TLQ==
+ s=k20201202; t=1618910062;
+ bh=Qi6LdBTlLuOVuNcp6ddeBrW8xIediedEVTnPkga7Anc=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=NjQaTi2NPjKcqKKvsYV3AmdeFc4aJ06NeVVcgljxzAA2R/71Ieq+kJB+3VpFqwPKI
+ 56nXcvMvXupc1NeXj0amqlT1ZoRu7lIi9OQKbdce/DTJJEJ7xdwKoZEO33dFk4Mmfi
+ LUqs+CwBnRHs8VBsS4xPKSnjyNZciJnwjW8vtTb9xXlxuFq09TRLAe4ThBoK8y/iJ9
+ zGNmKXgjFG/IA+VQgp21vUTukTLoAsqFnI0JLzHrEUnd0NYzyjK1qx5UpHv5nMLApx
+ LOhQiaP9O3bebjlDSrdgdqkBGukfxYEccuoLGz41r2owMNgQYIOZ2g27IINZuOq+gN
+ DVNxoRtFiXHAA==
 From: Mike Rapoport <rppt@kernel.org>
 To: linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v1 0/4] arm64: drop pfn_valid_within() and simplify pfn_valid()
-Date: Tue, 20 Apr 2021 12:09:21 +0300
-Message-Id: <20210420090925.7457-1-rppt@kernel.org>
+Subject: [PATCH v1 1/4] include/linux/mmzone.h: add documentation for
+ pfn_valid()
+Date: Tue, 20 Apr 2021 12:09:22 +0300
+Message-Id: <20210420090925.7457-2-rppt@kernel.org>
 X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20210420090925.7457-1-rppt@kernel.org>
+References: <20210420090925.7457-1-rppt@kernel.org>
 MIME-Version: 1.0
 Cc: David Hildenbrand <david@redhat.com>,
  Catalin Marinas <catalin.marinas@arm.com>,
@@ -80,53 +84,42 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: Mike Rapoport <rppt@linux.ibm.com>
 
-Hi,
+Add comment describing the semantics of pfn_valid() that clarifies that
+pfn_valid() only checks for availability of a memory map entry (i.e. struct
+page) for a PFN rather than availability of usable memory backing that PFN.
 
-These patches aim to remove CONFIG_HOLES_IN_ZONE and essentially hardwire
-pfn_valid_within() to 1. 
+The most "generic" version of pfn_valid() used by the configurations with
+SPARSEMEM enabled resides in include/linux/mmzone.h so this is the most
+suitable place for documentation about semantics of pfn_valid().
 
-The idea is to mark NOMAP pages as reserved in the memory map and restore
-the intended semantics of pfn_valid() to designate availability of struct
-page for a pfn.
+Suggested-by: Anshuman Khandual <anshuman.khandual@arm.com>
+Signed-off-by: Mike Rapoport <rppt@linux.ibm.com>
+---
+ include/linux/mmzone.h | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-With this the core mm will be able to cope with the fact that it cannot use
-NOMAP pages and the holes created by NOMAP ranges within MAX_ORDER blocks
-will be treated correctly even without the need for pfn_valid_within.
-
-The patches are only boot tested on qemu-system-aarch64 so I'd really
-appreciate memory stress tests on real hardware.
-
-If this actually works we'll be one step closer to drop custom pfn_valid()
-on arm64 altogether.
-
-Changes since RFC
-Link: https://lore.kernel.org/lkml/20210407172607.8812-1-rppt@kernel.org
-
-* Add comment about the semantics of pfn_valid() as Anshuman suggested
-* Extend comments about MEMBLOCK_NOMAP, per Anshuman
-* Use pfn_is_map_memory() name for the exported wrapper for
-  memblock_is_map_memory(). It is still local to arch/arm64 in the end
-  because of header dependency issues.
-
-Mike Rapoport (4):
-  include/linux/mmzone.h: add documentation for pfn_valid()
-  memblock: update initialization of reserved pages
-  arm64: decouple check whether pfn is in linear map from pfn_valid()
-  arm64: drop pfn_valid_within() and simplify pfn_valid()
-
- arch/arm64/Kconfig              |  3 ---
- arch/arm64/include/asm/memory.h |  2 +-
- arch/arm64/include/asm/page.h   |  1 +
- arch/arm64/kvm/mmu.c            |  2 +-
- arch/arm64/mm/init.c            | 10 ++++++++--
- arch/arm64/mm/ioremap.c         |  4 ++--
- arch/arm64/mm/mmu.c             |  2 +-
- include/linux/memblock.h        |  4 +++-
- include/linux/mmzone.h          | 11 +++++++++++
- mm/memblock.c                   | 28 ++++++++++++++++++++++++++--
- 10 files changed, 54 insertions(+), 13 deletions(-)
-
-base-commit: e49d033bddf5b565044e2abe4241353959bc9120
+diff --git a/include/linux/mmzone.h b/include/linux/mmzone.h
+index 47946cec7584..961f0eeefb62 100644
+--- a/include/linux/mmzone.h
++++ b/include/linux/mmzone.h
+@@ -1410,6 +1410,17 @@ static inline int pfn_section_valid(struct mem_section *ms, unsigned long pfn)
+ #endif
+ 
+ #ifndef CONFIG_HAVE_ARCH_PFN_VALID
++/**
++ * pfn_valid - check if there is a valid memory map entry for a PFN
++ * @pfn: the page frame number to check
++ *
++ * Check if there is a valid memory map entry aka struct page for the @pfn.
++ * Note, that availability of the memory map entry does not imply that
++ * there is actual usable memory at that @pfn. The struct page may
++ * represent a hole or an unusable page frame.
++ *
++ * Return: 1 for PFNs that have memory map entries and 0 otherwise
++ */
+ static inline int pfn_valid(unsigned long pfn)
+ {
+ 	struct mem_section *ms;
 -- 
 2.28.0
 
