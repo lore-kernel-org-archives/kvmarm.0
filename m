@@ -7,54 +7,55 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E37AC433ED
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Apr 2021 09:14:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69864C433B4
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Apr 2021 09:14:46 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0469D6127C
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Apr 2021 09:14:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0469D6127C
+	by mail.kernel.org (Postfix) with ESMTP id DAD0461363
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Apr 2021 09:14:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAD0461363
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F8F94B21D;
-	Tue, 20 Apr 2021 05:14:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 769694B20E;
+	Tue, 20 Apr 2021 05:14:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pp5AYu8J+vjp; Tue, 20 Apr 2021 05:14:37 -0400 (EDT)
+	with ESMTP id 7A3ONK-uyZoY; Tue, 20 Apr 2021 05:14:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A04324B22A;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C2F934B384;
 	Tue, 20 Apr 2021 05:14:37 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 71CDB4B22A
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Apr 2021 05:14:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3AC6F4B377
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Apr 2021 05:14:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7oHtL45JMVD8 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 20 Apr 2021 05:14:31 -0400 (EDT)
+ with ESMTP id W69BZT0TWrog for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 20 Apr 2021 05:14:32 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E8EFC4B31B
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Apr 2021 05:14:27 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 770D36135F;
- Tue, 20 Apr 2021 09:14:23 +0000 (UTC)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1868D4B228
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Apr 2021 05:14:32 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 94DCB613C0;
+ Tue, 20 Apr 2021 09:14:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1618910067;
- bh=WwPLwPVXamxGwz3XnxJZtbBgxUcm37L12EyoniuS4KM=;
+ s=k20201202; t=1618910071;
+ bh=I4+h/ALipOTPP6DVYApUM93ogLgtliC1nXYZbDm499c=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=HQuBrWtsFY35580qnY0m0xh758nHPmZtzT/yTDPUtXrkAxMowblsbWQZJD13xKBLi
- DNgWVsi3LZsRyHbdXOxxsFzsKmvdJOsReo+3chUqqteK9dxxqfR6HwLZIReFI13FJz
- wuoL1FlqV/cjYNB1CmX/BpUCp9d7Eso2xQ6e0ns+9LeusQXLAFkjA0jIx+kJU1jVvY
- pLZEHrvQdIucq4Zil7l7kWnUBOeilkmSNLxgdM8nr8f8K6WhH7SziNi4E5kE5KihuF
- 1Rm5NloFP2X7+mEcwKEgEd5iyOSwYcNJXtsuXTc6n5Ne8MnlrornPFBlGMXEqgqU1O
- OxbaIeS3r4gUg==
+ b=F/3KzwBNbvMZ9vKiinkZ0txuvP4OiZKHL8BEzNUWy7Wzf65zexnSIHJBEGIoSngC4
+ yMxMN0SEdFoJL37GE9t4jHYb9euOV8VZDjNgd8XOSQzdgroqsi5NoO6QUCbrNiqGs2
+ pgL3QVdxygB6k7DNnxjxPVoGmvhGSQLgh09nHa6seG/x+CuGow1LABULJWa16oDE4k
+ CD+esqvI0QLFr3H+jI5eUBq8GtGf/ho7SZuzzvCtwTHL7ITBFP+u3mGbi1X6rd4Q5g
+ YJ4nRYOotTP/1slJAwU2btpOdddzyS6wwIrn1dk64jMJ8J+WH8Cuw3oiQnQpenoOe0
+ 86WsTb3PXhoDA==
 From: Mike Rapoport <rppt@kernel.org>
 To: linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v1 2/4] memblock: update initialization of reserved pages
-Date: Tue, 20 Apr 2021 12:09:23 +0300
-Message-Id: <20210420090925.7457-3-rppt@kernel.org>
+Subject: [PATCH v1 3/4] arm64: decouple check whether pfn is in linear map
+ from pfn_valid()
+Date: Tue, 20 Apr 2021 12:09:24 +0300
+Message-Id: <20210420090925.7457-4-rppt@kernel.org>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20210420090925.7457-1-rppt@kernel.org>
 References: <20210420090925.7457-1-rppt@kernel.org>
@@ -83,95 +84,118 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: Mike Rapoport <rppt@linux.ibm.com>
 
-The struct pages representing a reserved memory region are initialized
-using reserve_bootmem_range() function. This function is called for each
-reserved region just before the memory is freed from memblock to the buddy
-page allocator.
+The intended semantics of pfn_valid() is to verify whether there is a
+struct page for the pfn in question and nothing else.
 
-The struct pages for MEMBLOCK_NOMAP regions are kept with the default
-values set by the memory map initialization which makes it necessary to
-have a special treatment for such pages in pfn_valid() and
-pfn_valid_within().
+Yet, on arm64 it is used to distinguish memory areas that are mapped in the
+linear map vs those that require ioremap() to access them.
 
-Split out initialization of the reserved pages to a function with a
-meaningful name and treat the MEMBLOCK_NOMAP regions the same way as the
-reserved regions and mark struct pages for the NOMAP regions as
-PageReserved.
+Introduce a dedicated pfn_is_map_memory() wrapper for
+memblock_is_map_memory() to perform such check and use it where
+appropriate.
+
+Using a wrapper allows to avoid cyclic include dependencies.
 
 Signed-off-by: Mike Rapoport <rppt@linux.ibm.com>
 ---
- include/linux/memblock.h |  4 +++-
- mm/memblock.c            | 28 ++++++++++++++++++++++++++--
- 2 files changed, 29 insertions(+), 3 deletions(-)
+ arch/arm64/include/asm/memory.h | 2 +-
+ arch/arm64/include/asm/page.h   | 1 +
+ arch/arm64/kvm/mmu.c            | 2 +-
+ arch/arm64/mm/init.c            | 6 ++++++
+ arch/arm64/mm/ioremap.c         | 4 ++--
+ arch/arm64/mm/mmu.c             | 2 +-
+ 6 files changed, 12 insertions(+), 5 deletions(-)
 
-diff --git a/include/linux/memblock.h b/include/linux/memblock.h
-index 5984fff3f175..634c1a578db8 100644
---- a/include/linux/memblock.h
-+++ b/include/linux/memblock.h
-@@ -30,7 +30,9 @@ extern unsigned long long max_possible_pfn;
-  * @MEMBLOCK_NONE: no special request
-  * @MEMBLOCK_HOTPLUG: hotpluggable region
-  * @MEMBLOCK_MIRROR: mirrored region
-- * @MEMBLOCK_NOMAP: don't add to kernel direct mapping
-+ * @MEMBLOCK_NOMAP: don't add to kernel direct mapping and treat as
-+ * reserved in the memory map; refer to memblock_mark_nomap() description
-+ * for futher details
-  */
- enum memblock_flags {
- 	MEMBLOCK_NONE		= 0x0,	/* No special request */
-diff --git a/mm/memblock.c b/mm/memblock.c
-index afaefa8fc6ab..3abf2c3fea7f 100644
---- a/mm/memblock.c
-+++ b/mm/memblock.c
-@@ -906,6 +906,11 @@ int __init_memblock memblock_mark_mirror(phys_addr_t base, phys_addr_t size)
-  * @base: the base phys addr of the region
-  * @size: the size of the region
-  *
-+ * The memory regions marked with %MEMBLOCK_NOMAP will not be added to the
-+ * direct mapping of the physical memory. These regions will still be
-+ * covered by the memory map. The struct page representing NOMAP memory
-+ * frames in the memory map will be PageReserved()
-+ *
-  * Return: 0 on success, -errno on failure.
-  */
- int __init_memblock memblock_mark_nomap(phys_addr_t base, phys_addr_t size)
-@@ -2002,6 +2007,26 @@ static unsigned long __init __free_memory_core(phys_addr_t start,
- 	return end_pfn - start_pfn;
+diff --git a/arch/arm64/include/asm/memory.h b/arch/arm64/include/asm/memory.h
+index 0aabc3be9a75..194f9f993d30 100644
+--- a/arch/arm64/include/asm/memory.h
++++ b/arch/arm64/include/asm/memory.h
+@@ -351,7 +351,7 @@ static inline void *phys_to_virt(phys_addr_t x)
+ 
+ #define virt_addr_valid(addr)	({					\
+ 	__typeof__(addr) __addr = __tag_reset(addr);			\
+-	__is_lm_address(__addr) && pfn_valid(virt_to_pfn(__addr));	\
++	__is_lm_address(__addr) && pfn_is_map_memory(virt_to_pfn(__addr));	\
+ })
+ 
+ void dump_mem_limit(void);
+diff --git a/arch/arm64/include/asm/page.h b/arch/arm64/include/asm/page.h
+index 012cffc574e8..99a6da91f870 100644
+--- a/arch/arm64/include/asm/page.h
++++ b/arch/arm64/include/asm/page.h
+@@ -38,6 +38,7 @@ void copy_highpage(struct page *to, struct page *from);
+ typedef struct page *pgtable_t;
+ 
+ extern int pfn_valid(unsigned long);
++extern int pfn_is_map_memory(unsigned long);
+ 
+ #include <asm/memory.h>
+ 
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 8711894db8c2..23dd99e29b23 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -85,7 +85,7 @@ void kvm_flush_remote_tlbs(struct kvm *kvm)
+ 
+ static bool kvm_is_device_pfn(unsigned long pfn)
+ {
+-	return !pfn_valid(pfn);
++	return !pfn_is_map_memory(pfn);
  }
  
-+static void __init memmap_init_reserved_pages(void)
+ /*
+diff --git a/arch/arm64/mm/init.c b/arch/arm64/mm/init.c
+index 3685e12aba9b..c54e329aca15 100644
+--- a/arch/arm64/mm/init.c
++++ b/arch/arm64/mm/init.c
+@@ -258,6 +258,12 @@ int pfn_valid(unsigned long pfn)
+ }
+ EXPORT_SYMBOL(pfn_valid);
+ 
++int pfn_is_map_memory(unsigned long pfn)
 +{
-+	struct memblock_region *region;
-+	phys_addr_t start, end;
-+	u64 i;
-+
-+	/* initialize struct pages for the reserved regions */
-+	for_each_reserved_mem_range(i, &start, &end)
-+		reserve_bootmem_region(start, end);
-+
-+	/* and also treat struct pages for the NOMAP regions as PageReserved */
-+	for_each_mem_region(region) {
-+		if (memblock_is_nomap(region)) {
-+			start = region->base;
-+			end = start + region->size;
-+			reserve_bootmem_region(start, end);
-+		}
-+	}
++	return memblock_is_map_memory(PFN_PHYS(pfn));
 +}
++EXPORT_SYMBOL(pfn_is_map_memory);
 +
- static unsigned long __init free_low_memory_core_early(void)
- {
- 	unsigned long count = 0;
-@@ -2010,8 +2035,7 @@ static unsigned long __init free_low_memory_core_early(void)
+ static phys_addr_t memory_limit = PHYS_ADDR_MAX;
  
- 	memblock_clear_hotplug(0, -1);
- 
--	for_each_reserved_mem_range(i, &start, &end)
--		reserve_bootmem_region(start, end);
-+	memmap_init_reserved_pages();
- 
+ /*
+diff --git a/arch/arm64/mm/ioremap.c b/arch/arm64/mm/ioremap.c
+index b5e83c46b23e..b7c81dacabf0 100644
+--- a/arch/arm64/mm/ioremap.c
++++ b/arch/arm64/mm/ioremap.c
+@@ -43,7 +43,7 @@ static void __iomem *__ioremap_caller(phys_addr_t phys_addr, size_t size,
  	/*
- 	 * We need to use NUMA_NO_NODE instead of NODE_DATA(0)->node_id
+ 	 * Don't allow RAM to be mapped.
+ 	 */
+-	if (WARN_ON(pfn_valid(__phys_to_pfn(phys_addr))))
++	if (WARN_ON(pfn_is_map_memory(__phys_to_pfn(phys_addr))))
+ 		return NULL;
+ 
+ 	area = get_vm_area_caller(size, VM_IOREMAP, caller);
+@@ -84,7 +84,7 @@ EXPORT_SYMBOL(iounmap);
+ void __iomem *ioremap_cache(phys_addr_t phys_addr, size_t size)
+ {
+ 	/* For normal memory we already have a cacheable mapping. */
+-	if (pfn_valid(__phys_to_pfn(phys_addr)))
++	if (pfn_is_map_memory(__phys_to_pfn(phys_addr)))
+ 		return (void __iomem *)__phys_to_virt(phys_addr);
+ 
+ 	return __ioremap_caller(phys_addr, size, __pgprot(PROT_NORMAL),
+diff --git a/arch/arm64/mm/mmu.c b/arch/arm64/mm/mmu.c
+index 5d9550fdb9cf..26045e9adbd7 100644
+--- a/arch/arm64/mm/mmu.c
++++ b/arch/arm64/mm/mmu.c
+@@ -81,7 +81,7 @@ void set_swapper_pgd(pgd_t *pgdp, pgd_t pgd)
+ pgprot_t phys_mem_access_prot(struct file *file, unsigned long pfn,
+ 			      unsigned long size, pgprot_t vma_prot)
+ {
+-	if (!pfn_valid(pfn))
++	if (!pfn_is_map_memory(pfn))
+ 		return pgprot_noncached(vma_prot);
+ 	else if (file->f_flags & O_SYNC)
+ 		return pgprot_writecombine(vma_prot);
 -- 
 2.28.0
 
