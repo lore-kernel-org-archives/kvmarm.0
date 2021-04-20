@@ -2,58 +2,60 @@ Return-Path: <SRS0=sayA=JR=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60820C433B4
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Apr 2021 13:27:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2836C433ED
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Apr 2021 13:31:20 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9DADF61003
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Apr 2021 13:27:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DADF61003
+	by mail.kernel.org (Postfix) with ESMTP id 3697061026
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Apr 2021 13:31:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3697061026
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D045A4B353;
-	Tue, 20 Apr 2021 09:27:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AC0784B393;
+	Tue, 20 Apr 2021 09:31:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 7tcJk335kZw6; Tue, 20 Apr 2021 09:27:02 -0400 (EDT)
+	with ESMTP id pG1ofdrcodTU; Tue, 20 Apr 2021 09:31:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 344E24B396;
-	Tue, 20 Apr 2021 09:27:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DD7684B39B;
+	Tue, 20 Apr 2021 09:31:14 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8176C4B353
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Apr 2021 09:27:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5572D4B369
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Apr 2021 09:31:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hzBVYF3R+X9W for <kvmarm@lists.cs.columbia.edu>;
- Tue, 20 Apr 2021 09:26:57 -0400 (EDT)
+ with ESMTP id lMYNuQLHDC5j for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 20 Apr 2021 09:31:09 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6854A4B324
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Apr 2021 09:26:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1AD9D4B354
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Apr 2021 09:31:09 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 363D3610A1;
- Tue, 20 Apr 2021 13:26:56 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id E56606101C;
+ Tue, 20 Apr 2021 13:31:07 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1lYqOy-008UxS-VS; Tue, 20 Apr 2021 14:26:53 +0100
-Date: Tue, 20 Apr 2021 14:26:52 +0100
-Message-ID: <878s5dqe77.wl-maz@kernel.org>
+ id 1lYqT3-008V1Z-QB; Tue, 20 Apr 2021 14:31:06 +0100
+Date: Tue, 20 Apr 2021 14:31:05 +0100
+Message-ID: <877dkxqe06.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Yoan Picchi <yoan.picchi@arm.com>
-Subject: Re: [PATCH v2 3/3] KVM: arm64: Add irq_exit counter for kvm_stat
-In-Reply-To: <20210420130825.15585-4-yoan.picchi@arm.com>
+Subject: Re: [PATCH v2 1/3] KVM: arm64: Add a stage2 page fault counter for
+ kvm_stat
+In-Reply-To: <20210420130825.15585-2-yoan.picchi@arm.com>
 References: <20210420130825.15585-1-yoan.picchi@arm.com>
- <20210420130825.15585-4-yoan.picchi@arm.com>
+ <20210420130825.15585-2-yoan.picchi@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -84,29 +86,76 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 20 Apr 2021 14:08:25 +0100,
+On Tue, 20 Apr 2021 14:08:23 +0100,
 Yoan Picchi <yoan.picchi@arm.com> wrote:
 > 
-> This counter is meant to detect when the guest vm exits due to an
-> interrupt. Those interrupts might be unrelated to the guest VM (say, some
-> network packet arrived, and such) but they still trigger an exit which is
-> recorded by the "exit" counter. The main purpose of this counter is to
-> give some more granularity to this base exit counter so that one can have
-> a rough idea of where those exits comes from and so, if those general
-> exits happen because of the host or of the guest.
+> This counter is meant to detect stage 2 page fault exits. This is meant to
+> measure how much those page fault influence the performance (by comparing
+> this number of exits to some other exit causes).
+> For now this counter is generic, but some more granularity is planned in
+> the next commits so that one know how much of the page fault are for memory
+> allocation, or for mmio for instance. The idea being that one using this
+> counter can get a better idea of what is trigerring those exits to try to
+> fix it.
+> 
+> Signed-off-by: Yoan Picchi <yoan.picchi@arm.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 1 +
+>  arch/arm64/kvm/guest.c            | 1 +
+>  arch/arm64/kvm/mmu.c              | 2 ++
+>  3 files changed, 4 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 3d10e6527..02891ce94 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -561,6 +561,7 @@ struct kvm_vcpu_stat {
+>  	u64 wfi_exit_stat;
+>  	u64 mmio_exit_user;
+>  	u64 mmio_exit_kernel;
+> +	u64 stage2_abort_exit;
+>  	u64 exits;
+>  };
+>  
+> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> index 9bbd30e62..82a4b6275 100644
+> --- a/arch/arm64/kvm/guest.c
+> +++ b/arch/arm64/kvm/guest.c
+> @@ -38,6 +38,7 @@ struct kvm_stats_debugfs_item debugfs_entries[] = {
+>  	VCPU_STAT("wfi_exit_stat", wfi_exit_stat),
+>  	VCPU_STAT("mmio_exit_user", mmio_exit_user),
+>  	VCPU_STAT("mmio_exit_kernel", mmio_exit_kernel),
+> +	VCPU_STAT("stage2_abort_exit", stage2_abort_exit),
+>  	VCPU_STAT("exits", exits),
+>  	VCPU_STAT("halt_poll_success_ns", halt_poll_success_ns),
+>  	VCPU_STAT("halt_poll_fail_ns", halt_poll_fail_ns),
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 77cb2d28f..c3527ccf6 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -966,6 +966,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+>  	fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
+>  	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
+>  
+> +
 
-I don't think this makes much sense. Why should we account interrupts
-for the guest when the interrupts don't have anything to do with it?
-And guess what, they almost *never* do. The only interrupt that could
-be accountable to the vcpu is the vPE doorbell, and that one can never
-causes an exit, by definition.
+Please proofread your patches, and don't add spurious blank lines.
 
-The kernel already provides quite a lot around interrupt accounting
-already, and I don't think we need to do add more for the guest. If
-this made any sense, it should be applicable to any userspace task,
-not just vcpus.
+>  	/* Synchronous External Abort? */
+>  	if (kvm_vcpu_abt_issea(vcpu)) {
+>  		/*
+> @@ -980,6 +981,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+>  
+>  	trace_kvm_guest_fault(*vcpu_pc(vcpu), kvm_vcpu_get_esr(vcpu),
+>  			      kvm_vcpu_get_hfar(vcpu), fault_ipa);
+> +	vcpu->stat.stage2_abort_exit++;
 
-Thanks,
+What is the benefit of this counter over, say, the tracepoint that is
+already in place? This tracepoint allows you to count these exits, and
+to actually find *why* you are exiting.
+
+If the purpose of this patch is to identify exit reasons, I'd say that
+the tracepoint is vastly superior in that respect.
 
 	M.
 
