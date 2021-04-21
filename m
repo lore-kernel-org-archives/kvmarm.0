@@ -2,74 +2,87 @@ Return-Path: <SRS0=bsip=JS=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE940C433ED
-	for <kvmarm@archiver.kernel.org>; Wed, 21 Apr 2021 05:52:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78332C43460
+	for <kvmarm@archiver.kernel.org>; Wed, 21 Apr 2021 05:53:07 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 61EF861419
-	for <kvmarm@archiver.kernel.org>; Wed, 21 Apr 2021 05:52:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61EF861419
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 105D26140C
+	for <kvmarm@archiver.kernel.org>; Wed, 21 Apr 2021 05:53:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 105D26140C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DD1D14B381;
-	Wed, 21 Apr 2021 01:52:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 844074B369;
+	Wed, 21 Apr 2021 01:53:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pGivqR0QkDCv; Wed, 21 Apr 2021 01:52:45 -0400 (EDT)
+	with ESMTP id 7hC0tKAWlCXZ; Wed, 21 Apr 2021 01:53:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A5B224B369;
-	Wed, 21 Apr 2021 01:52:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CDD5A4B3D2;
+	Wed, 21 Apr 2021 01:53:00 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0EEA74B369
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Apr 2021 01:52:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 63BA84B369
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Apr 2021 01:52:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GphBCDiraTaF for <kvmarm@lists.cs.columbia.edu>;
- Wed, 21 Apr 2021 01:52:39 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CCE7E4B35E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Apr 2021 01:52:38 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id D42916140C;
- Wed, 21 Apr 2021 05:52:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1618984357;
- bh=g72o3X3Q6Y/a2mSNpa0HjIO9b/1mdQbo0EaTxru/zZU=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=lDwRsR/E5mE9ve2Akk/3k+XO8YXnjrfevy9BmPLxs+lWkLg/W8jvzL1dYtVYW+3Rf
- c0TNDace3LJilMFVznrYeCRDwGrbHzJWGhCicEdzHL6l8Ssmr+GPd2k1tR0J/Oz8gY
- HNlkCXKomx+V/ot9YHj+QTDszjYr8FZyUKXC3ov3JbPn6ar8+9fn4C2rsNGgfwD1xK
- jxVIemH8Bz2l6DRPlexUeyQ5bNbq1sXxlzRv+Ip3azOMMDa2+YNNQtjVpoPrF/KHOO
- C7w6maQQFuV4pFX+kZC5rXtQY8I5cntBPjYPkw4E8WX1mZ5dZcqHIin3LRMZrwh4pk
- FPk4mfTeux5gA==
-Date: Wed, 21 Apr 2021 08:52:29 +0300
-From: Mike Rapoport <rppt@kernel.org>
-To: David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH v1 4/4] arm64: drop pfn_valid_within() and simplify
- pfn_valid()
-Message-ID: <YH+9nbDkPyVav3xn@kernel.org>
-References: <20210420090925.7457-1-rppt@kernel.org>
- <20210420090925.7457-5-rppt@kernel.org>
- <8e7171e7-a85c-6066-4ab6-d2bc98ec103b@redhat.com>
+ with ESMTP id aOst8-JLOyrQ for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 21 Apr 2021 01:52:55 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C7304B35E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Apr 2021 01:52:55 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1618984375;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=vqV3nZmtiS3HiblM9X32LHWFH0pNEm2EPbe6NxcNwks=;
+ b=BDB5dfpLJOCoiB/tCoDV3QctjgWB4FJM3K8E89T6yzUenBF0qRyT+5LmXQrCCNroJ0xGpj
+ xhAFmGt4rkndIfnW+wH2R1e1jT3fpetyimq076xNvsBv2tU5iWRly+CyJsY+ejQWE/fGFw
+ aC5LItUzPkXRJJ5WRtgT+npIB9zdiu0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-512-AufqBBdtMVaojJyOUvcMWw-1; Wed, 21 Apr 2021 01:52:53 -0400
+X-MC-Unique: AufqBBdtMVaojJyOUvcMWw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 05E118030A0;
+ Wed, 21 Apr 2021 05:52:52 +0000 (UTC)
+Received: from [10.64.54.47] (vpn2-54-47.bne.redhat.com [10.64.54.47])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 39B086064B;
+ Wed, 21 Apr 2021 05:52:48 +0000 (UTC)
+Subject: Re: [PATCH v4 2/2] kvm/arm64: Try stage2 block mapping for host
+ device MMIO
+To: Keqian Zhu <zhukeqian1@huawei.com>, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>
+References: <20210415140328.24200-1-zhukeqian1@huawei.com>
+ <20210415140328.24200-3-zhukeqian1@huawei.com>
+From: Gavin Shan <gshan@redhat.com>
+Message-ID: <960e097d-818b-00bc-b2ee-0da17857f862@redhat.com>
+Date: Wed, 21 Apr 2021 17:52:58 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <8e7171e7-a85c-6066-4ab6-d2bc98ec103b@redhat.com>
-Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
- Mike Rapoport <rppt@linux.ibm.com>, linux-mm@kvack.org,
- kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20210415140328.24200-3-zhukeqian1@huawei.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
+Reply-To: Gavin Shan <gshan@redhat.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -78,100 +91,164 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Apr 20, 2021 at 06:00:55PM +0200, David Hildenbrand wrote:
-> On 20.04.21 11:09, Mike Rapoport wrote:
-> > From: Mike Rapoport <rppt@linux.ibm.com>
-> > 
-> > The arm64's version of pfn_valid() differs from the generic because of two
-> > reasons:
-> > 
-> > * Parts of the memory map are freed during boot. This makes it necessary to
-> >    verify that there is actual physical memory that corresponds to a pfn
-> >    which is done by querying memblock.
-> > 
-> > * There are NOMAP memory regions. These regions are not mapped in the
-> >    linear map and until the previous commit the struct pages representing
-> >    these areas had default values.
-> > 
-> > As the consequence of absence of the special treatment of NOMAP regions in
-> > the memory map it was necessary to use memblock_is_map_memory() in
-> > pfn_valid() and to have pfn_valid_within() aliased to pfn_valid() so that
-> > generic mm functionality would not treat a NOMAP page as a normal page.
-> > 
-> > Since the NOMAP regions are now marked as PageReserved(), pfn walkers and
-> > the rest of core mm will treat them as unusable memory and thus
-> > pfn_valid_within() is no longer required at all and can be disabled by
-> > removing CONFIG_HOLES_IN_ZONE on arm64.
-> > 
-> > pfn_valid() can be slightly simplified by replacing
-> > memblock_is_map_memory() with memblock_is_memory().
-> > 
-> > Signed-off-by: Mike Rapoport <rppt@linux.ibm.com>
-> > ---
-> >   arch/arm64/Kconfig   | 3 ---
-> >   arch/arm64/mm/init.c | 4 ++--
-> >   2 files changed, 2 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-> > index e4e1b6550115..58e439046d05 100644
-> > --- a/arch/arm64/Kconfig
-> > +++ b/arch/arm64/Kconfig
-> > @@ -1040,9 +1040,6 @@ config NEED_PER_CPU_EMBED_FIRST_CHUNK
-> >   	def_bool y
-> >   	depends on NUMA
-> > -config HOLES_IN_ZONE
-> > -	def_bool y
-> > -
-> >   source "kernel/Kconfig.hz"
-> >   config ARCH_SPARSEMEM_ENABLE
-> > diff --git a/arch/arm64/mm/init.c b/arch/arm64/mm/init.c
-> > index c54e329aca15..370f33765b64 100644
-> > --- a/arch/arm64/mm/init.c
-> > +++ b/arch/arm64/mm/init.c
-> > @@ -243,7 +243,7 @@ int pfn_valid(unsigned long pfn)
-> >   	/*
-> >   	 * ZONE_DEVICE memory does not have the memblock entries.
-> > -	 * memblock_is_map_memory() check for ZONE_DEVICE based
-> > +	 * memblock_is_memory() check for ZONE_DEVICE based
-> >   	 * addresses will always fail. Even the normal hotplugged
-> >   	 * memory will never have MEMBLOCK_NOMAP flag set in their
-> >   	 * memblock entries. Skip memblock search for all non early
-> > @@ -254,7 +254,7 @@ int pfn_valid(unsigned long pfn)
-> >   		return pfn_section_valid(ms, pfn);
-> >   }
-> >   #endif
-> > -	return memblock_is_map_memory(addr);
-> > +	return memblock_is_memory(addr);
-> >   }
-> >   EXPORT_SYMBOL(pfn_valid);
-> > 
+Hi Keqian,
+
+On 4/16/21 12:03 AM, Keqian Zhu wrote:
+> The MMIO region of a device maybe huge (GB level), try to use
+> block mapping in stage2 to speedup both map and unmap.
 > 
-> What are the steps needed to get rid of custom pfn_valid() completely?
+> Compared to normal memory mapping, we should consider two more
+> points when try block mapping for MMIO region:
 > 
-> I'd assume we would have to stop freeing parts of the mem map during boot.
-> How relevant is that for arm64 nowadays, especially with reduced section
-> sizes?
+> 1. For normal memory mapping, the PA(host physical address) and
+> HVA have same alignment within PUD_SIZE or PMD_SIZE when we use
+> the HVA to request hugepage, so we don't need to consider PA
+> alignment when verifing block mapping. But for device memory
+> mapping, the PA and HVA may have different alignment.
+> 
+> 2. For normal memory mapping, we are sure hugepage size properly
+> fit into vma, so we don't check whether the mapping size exceeds
+> the boundary of vma. But for device memory mapping, we should pay
+> attention to this.
+> 
+> This adds get_vma_page_shift() to get page shift for both normal
+> memory and device MMIO region, and check these two points when
+> selecting block mapping size for MMIO region.
+> 
+> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+> ---
+>   arch/arm64/kvm/mmu.c | 61 ++++++++++++++++++++++++++++++++++++--------
+>   1 file changed, 51 insertions(+), 10 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index c59af5ca01b0..5a1cc7751e6d 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -738,6 +738,35 @@ transparent_hugepage_adjust(struct kvm_memory_slot *memslot,
+>   	return PAGE_SIZE;
+>   }
+>   
+> +static int get_vma_page_shift(struct vm_area_struct *vma, unsigned long hva)
+> +{
+> +	unsigned long pa;
+> +
+> +	if (is_vm_hugetlb_page(vma) && !(vma->vm_flags & VM_PFNMAP))
+> +		return huge_page_shift(hstate_vma(vma));
+> +
+> +	if (!(vma->vm_flags & VM_PFNMAP))
+> +		return PAGE_SHIFT;
+> +
+> +	VM_BUG_ON(is_vm_hugetlb_page(vma));
+> +
 
-Yes, for arm64 to use the generic pfn_valid() it'd need to stop freeing
-parts of the memory map.
+I don't understand how VM_PFNMAP is set for hugetlbfs related vma.
+I think they are exclusive, meaning the flag is never set for
+hugetlbfs vma. If it's true, VM_PFNMAP needn't be checked on hugetlbfs
+vma and the VM_BUG_ON() becomes unnecessary.
 
-Presuming struct page is 64 bytes, the memory map takes 2M per section in
-the worst case (128M per section, 4k pages). 
+> +	pa = (vma->vm_pgoff << PAGE_SHIFT) + (hva - vma->vm_start);
+> +
+> +#ifndef __PAGETABLE_PMD_FOLDED
+> +	if ((hva & (PUD_SIZE - 1)) == (pa & (PUD_SIZE - 1)) &&
+> +	    ALIGN_DOWN(hva, PUD_SIZE) >= vma->vm_start &&
+> +	    ALIGN(hva, PUD_SIZE) <= vma->vm_end)
+> +		return PUD_SHIFT;
+> +#endif
+> +
+> +	if ((hva & (PMD_SIZE - 1)) == (pa & (PMD_SIZE - 1)) &&
+> +	    ALIGN_DOWN(hva, PMD_SIZE) >= vma->vm_start &&
+> +	    ALIGN(hva, PMD_SIZE) <= vma->vm_end)
+> +		return PMD_SHIFT;
+> +
+> +	return PAGE_SHIFT;
+> +}
+> +
 
-So for systems that have less than 128M populated in each section freeing
-unused memory map would mean significant savings.
+There is "switch(...)" fallback mechanism in user_mem_abort(). PUD_SIZE/PMD_SIZE
+can be downgraded accordingly if the addresses fails in the alignment check
+by fault_supports_stage2_huge_mapping(). I think it would make user_mem_abort()
+simplified if the logic can be moved to get_vma_page_shift().
 
-But nowadays when a clock has at least 1G of RAM I doubt this is relevant
-to many systems if at all.
+Another question if we need the check from fault_supports_stage2_huge_mapping()
+if VM_PFNMAP area is going to be covered by block mapping. If so, the "switch(...)"
+fallback mechanism needs to be part of get_vma_page_shift().
 
--- 
-Sincerely yours,
-Mike.
+>   static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>   			  struct kvm_memory_slot *memslot, unsigned long hva,
+>   			  unsigned long fault_status)
+> @@ -769,7 +798,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>   		return -EFAULT;
+>   	}
+>   
+> -	/* Let's check if we will get back a huge page backed by hugetlbfs */
+> +	/*
+> +	 * Let's check if we will get back a huge page backed by hugetlbfs, or
+> +	 * get block mapping for device MMIO region.
+> +	 */
+>   	mmap_read_lock(current->mm);
+>   	vma = find_vma_intersection(current->mm, hva, hva + 1);
+>   	if (unlikely(!vma)) {
+> @@ -778,15 +810,15 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>   		return -EFAULT;
+>   	}
+>   
+> -	if (is_vm_hugetlb_page(vma))
+> -		vma_shift = huge_page_shift(hstate_vma(vma));
+> -	else
+> -		vma_shift = PAGE_SHIFT;
+> -
+> -	if (logging_active ||
+> -	    (vma->vm_flags & VM_PFNMAP)) {
+> +	/*
+> +	 * logging_active is guaranteed to never be true for VM_PFNMAP
+> +	 * memslots.
+> +	 */
+> +	if (logging_active) {
+>   		force_pte = true;
+>   		vma_shift = PAGE_SHIFT;
+> +	} else {
+> +		vma_shift = get_vma_page_shift(vma, hva);
+>   	}
+>   
+>   	switch (vma_shift) {
+> @@ -854,8 +886,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>   		return -EFAULT;
+>   
+>   	if (kvm_is_device_pfn(pfn)) {
+> +		/*
+> +		 * If the page was identified as device early by looking at
+> +		 * the VMA flags, vma_pagesize is already representing the
+> +		 * largest quantity we can map.  If instead it was mapped
+> +		 * via gfn_to_pfn_prot(), vma_pagesize is set to PAGE_SIZE
+> +		 * and must not be upgraded.
+> +		 *
+> +		 * In both cases, we don't let transparent_hugepage_adjust()
+> +		 * change things at the last minute.
+> +		 */
+>   		device = true;
+> -		force_pte = true;
+>   	} else if (logging_active && !write_fault) {
+>   		/*
+>   		 * Only actually map the page as writable if this was a write
+> @@ -876,7 +917,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>   	 * If we are not forced to use page mapping, check if we are
+>   	 * backed by a THP and thus use block mapping if possible.
+>   	 */
+> -	if (vma_pagesize == PAGE_SIZE && !force_pte)
+> +	if (vma_pagesize == PAGE_SIZE && !(force_pte || device))
+>   		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
+>   							   &pfn, &fault_ipa);
+>   	if (writable)
+> 
+
+Thanks,
+Gavin
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
