@@ -2,67 +2,74 @@ Return-Path: <SRS0=xlfr=JT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF139C433ED
-	for <kvmarm@archiver.kernel.org>; Thu, 22 Apr 2021 10:12:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 566A2C433B4
+	for <kvmarm@archiver.kernel.org>; Thu, 22 Apr 2021 10:43:41 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 58E196143B
-	for <kvmarm@archiver.kernel.org>; Thu, 22 Apr 2021 10:12:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58E196143B
+	by mail.kernel.org (Postfix) with ESMTP id 87263613C3
+	for <kvmarm@archiver.kernel.org>; Thu, 22 Apr 2021 10:43:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87263613C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D0134B501;
-	Thu, 22 Apr 2021 06:12:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0BB174B4F4;
+	Thu, 22 Apr 2021 06:43:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 3gBRnqAF5ENW; Thu, 22 Apr 2021 06:12:46 -0400 (EDT)
+	with ESMTP id 62kjqeBYHECt; Thu, 22 Apr 2021 06:43:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8FE8D4B4DE;
-	Thu, 22 Apr 2021 06:12:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 07F2C4B47E;
+	Thu, 22 Apr 2021 06:43:39 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 390334B4D3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Apr 2021 06:12:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F0F34B43E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Apr 2021 06:43:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lmzh7pVUtbTq for <kvmarm@lists.cs.columbia.edu>;
- Thu, 22 Apr 2021 06:12:44 -0400 (EDT)
+ with ESMTP id C5KacMg1c8bD for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 22 Apr 2021 06:43:37 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3E5B04B4EE
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Apr 2021 06:12:44 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 774D36143B;
- Thu, 22 Apr 2021 10:12:40 +0000 (UTC)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 43C174B413
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Apr 2021 06:43:37 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id EC3FB613C3;
+ Thu, 22 Apr 2021 10:43:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1619086363;
- bh=xHKPEQ4rcxCoaoX7HHU+f4xF6ZurqSwjiO2kgl0XZEM=;
+ s=k20201202; t=1619088214;
+ bh=R8WtOHNj+/vk47cusAz7Di0unsa6rOD5nce0ZJvBbNA=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=nmD0vSGiage1GdxJRvwvfMgbsweu+fvjzpGgnfBeZ/qVftWHsKa9wke+gTlCUot7K
- v7XGRPs7rBQYnbPPw5ieWm1HjPTgaSCNX/5I0IGtXFfGIVWwr05s2XBJ/7jtHTxSD+
- bKD3QEbhHJLoKrUxpEwSfjpkLU/tybGDO66L+4fl22k+sZSnMHbp+NRNPEs3P1noZe
- Eq3C+ZA+8XObEa+GKzwK/jARmOcp+RAm6teSB92lraAcrG2kOPwYnRlPgdEX31fc9O
- r0urkIQXyPphlxPoEvSsjmH/aG5H7MjTso5pMZ1v88fB4RMJlAljKXDSo8AcSV77s0
- pE2cBelCj/uVA==
-Date: Thu, 22 Apr 2021 11:12:37 +0100
+ b=Pv3lOJjOC3h2kDfka9ri27gZcUMB8VEyrTNgwHgulcfk5rxqf4vWQAs+9f4/gOkt4
+ q1K3IywZtSZmfuAuIV1QlMAUjPELcnGmE+E6Q026430OI045oc9fdo7XHAtntCWx98
+ HrWrGalnCPFn5nmiuwtowUrC/HJgymZi/N/SPpHeF+WemaKXveP8zNQFVsLG2r+1U5
+ HbcS8855VzvPFetj1B3nDnzltb2SYqfePUXA1jdPD22flPn/kWQngnV9RR9Z/YwqoY
+ 26f/HjDjK0J7nMqMw15ZClfInqScIhZ30PQLcQAPeEphwJqk8EnwbzQZC3oFbWjVKj
+ m58DmUXn1KEpQ==
+Date: Thu, 22 Apr 2021 11:43:27 +0100
 From: Will Deacon <will@kernel.org>
 To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH] KVM: arm64: build perf support only when enabled
-Message-ID: <20210422101236.GB1039@willie-the-truck>
-References: <20210421134922.3309033-1-arnd@kernel.org>
- <87y2dbpwqn.wl-maz@kernel.org>
+Subject: Re: [PATCH 1/5] KVM: arm64: Divorce the perf code from oprofile
+ helpers
+Message-ID: <20210422104327.GC1442@willie-the-truck>
+References: <20210414134409.1266357-1-maz@kernel.org>
+ <20210414134409.1266357-2-maz@kernel.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <87y2dbpwqn.wl-maz@kernel.org>
+In-Reply-To: <20210414134409.1266357-2-maz@kernel.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: linux-arm-kernel@lists.infradead.org, Arnd Bergmann <arnd@kernel.org>,
- Arnd Bergmann <arnd@arndb.de>, Catalin Marinas <catalin.marinas@arm.com>,
- linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: linux-s390@vger.kernel.org, Rich Felker <dalias@libc.org>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>, kvm@vger.kernel.org,
+ linux-sh@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>,
+ Viresh Kumar <viresh.kumar@linaro.org>, Heiko Carstens <hca@linux.ibm.com>,
+ linux-kernel@vger.kernel.org, Arnaldo Carvalho de Melo <acme@kernel.org>,
+ nathan@kernel.org, Christian Borntraeger <borntraeger@de.ibm.com>,
+ kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -79,34 +86,38 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Apr 21, 2021 at 02:56:16PM +0100, Marc Zyngier wrote:
-> On Wed, 21 Apr 2021 14:49:01 +0100,
-> Arnd Bergmann <arnd@kernel.org> wrote:
-> > 
-> > From: Arnd Bergmann <arnd@arndb.de>
-> > 
-> > The perf_num_counters() function is only defined when CONFIG_PERF_EVENTS
-> > is enabled:
-> > 
-> > arch/arm64/kvm/perf.c: In function 'kvm_perf_init':
-> > arch/arm64/kvm/perf.c:58:43: error: implicit declaration of function 'perf_num_counters'; did you mean 'dec_mm_counter'? [-Werror=implicit-function-declaration]
-> >    58 |         if (IS_ENABLED(CONFIG_ARM_PMU) && perf_num_counters() > 0
-> >       |                                           ^~~~~~~~~~~~~~~~~
-> > 
-> > Use conditional compilation to disable this feature entirely when
-> > CONFIG_PERF_EVENTS is disabled in the host.
-> > 
-> > Fixes: 6b5b368fccd7 ("KVM: arm64: Turn kvm_arm_support_pmu_v3() into a static key")
-> > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> > ---
-> > Not sure if this is the correct symbol to check for, but this is
-> > one way to avoid the build failure.
+On Wed, Apr 14, 2021 at 02:44:05PM +0100, Marc Zyngier wrote:
+> KVM/arm64 is the sole user of perf_num_counters(), and really
+> could do without it. Stop using the obsolete API by relying on
+> the existing probing code.
 > 
-> I think a better way is to get rid of perf_num_counters() entirely,
-> see [1]. If someone acks the second and last patches, I'll even take
-> the whole series in (nudge nudge...).
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/perf.c     | 7 +------
+>  arch/arm64/kvm/pmu-emul.c | 2 +-
+>  include/kvm/arm_pmu.h     | 4 ++++
+>  3 files changed, 6 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/perf.c b/arch/arm64/kvm/perf.c
+> index 739164324afe..b8b398670ef2 100644
+> --- a/arch/arm64/kvm/perf.c
+> +++ b/arch/arm64/kvm/perf.c
+> @@ -50,12 +50,7 @@ static struct perf_guest_info_callbacks kvm_guest_cbs = {
+>  
+>  int kvm_perf_init(void)
+>  {
+> -	/*
+> -	 * Check if HW_PERF_EVENTS are supported by checking the number of
+> -	 * hardware performance counters. This could ensure the presence of
+> -	 * a physical PMU and CONFIG_PERF_EVENT is selected.
+> -	 */
+> -	if (IS_ENABLED(CONFIG_ARM_PMU) && perf_num_counters() > 0)
+> +	if (kvm_pmu_probe_pmuver() != 0xf)
 
-Sorry, behind at the moment! Will get to it today.
+Took me a while to figure out that this returns 0xf if the hardware has a
+PMUVer of 0x0, so it's all good:
+
+Acked-by: Will Deacon <will@kernel.org>
 
 Will
 _______________________________________________
