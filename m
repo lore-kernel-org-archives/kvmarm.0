@@ -2,74 +2,75 @@ Return-Path: <SRS0=xlfr=JT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0FDBC433ED
-	for <kvmarm@archiver.kernel.org>; Thu, 22 Apr 2021 06:50:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D34C3C433B4
+	for <kvmarm@archiver.kernel.org>; Thu, 22 Apr 2021 06:51:48 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2C81261459
-	for <kvmarm@archiver.kernel.org>; Thu, 22 Apr 2021 06:50:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C81261459
+	by mail.kernel.org (Postfix) with ESMTP id 2FA016144D
+	for <kvmarm@archiver.kernel.org>; Thu, 22 Apr 2021 06:51:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FA016144D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ACF994B3BD;
-	Thu, 22 Apr 2021 02:50:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A996E4B3E3;
+	Thu, 22 Apr 2021 02:51:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id aT4vT4yHmGBr; Thu, 22 Apr 2021 02:50:10 -0400 (EDT)
+	with ESMTP id Akub1D2c3XWw; Thu, 22 Apr 2021 02:51:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7AC584B3E3;
-	Thu, 22 Apr 2021 02:50:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D45ED4B3EE;
+	Thu, 22 Apr 2021 02:51:43 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C6A024B3BD
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Apr 2021 02:50:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B6764B3E1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Apr 2021 02:51:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9QPZ9-zhXDaK for <kvmarm@lists.cs.columbia.edu>;
- Thu, 22 Apr 2021 02:50:06 -0400 (EDT)
+ with ESMTP id 54C4SXYEZ9nc for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 22 Apr 2021 02:51:41 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 64C8F4B3DE
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Apr 2021 02:50:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 29E914B3DE
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Apr 2021 02:51:41 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 54CC561448;
- Thu, 22 Apr 2021 06:50:05 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 40C196144D;
+ Thu, 22 Apr 2021 06:51:39 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1lZTA3-008paW-5p; Thu, 22 Apr 2021 07:50:03 +0100
-Date: Thu, 22 Apr 2021 07:50:02 +0100
-Message-ID: <87v98eq0dh.wl-maz@kernel.org>
+ id 1lZTBZ-008pcR-8I; Thu, 22 Apr 2021 07:51:37 +0100
+Date: Thu, 22 Apr 2021 07:51:36 +0100
+Message-ID: <87tunyq0av.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH] KVM: arm64: Correctly handle the mmio faulting
-In-Reply-To: <b97415a2-7970-a741-9690-3e4514b4aa7d@redhat.com>
-References: <1603297010-18787-1-git-send-email-sashukla@nvidia.com>
- <8b20dfc0-3b5e-c658-c47d-ebc50d20568d@huawei.com>
- <2e23aaa7-0c8d-13ba-2eae-9e6ab2adc587@redhat.com>
- <ed8a8b90-8b96-4967-01f5-cd0f536c38d2@huawei.com>
- <871rb3rgpl.wl-maz@kernel.org>
- <b97415a2-7970-a741-9690-3e4514b4aa7d@redhat.com>
+Subject: Re: [PATCH v4 2/2] kvm/arm64: Try stage2 block mapping for host
+ device MMIO
+In-Reply-To: <46606f3e-ef41-6520-6647-88c0f76a83e0@redhat.com>
+References: <20210415140328.24200-1-zhukeqian1@huawei.com>
+ <20210415140328.24200-3-zhukeqian1@huawei.com>
+ <960e097d-818b-00bc-b2ee-0da17857f862@redhat.com>
+ <105a403a-e48b-15bc-44ff-0ff34f7d2194@huawei.com>
+ <46606f3e-ef41-6520-6647-88c0f76a83e0@redhat.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: gshan@redhat.com, zhukeqian1@huawei.com, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, cjia@nvidia.com,
- linux-arm-kernel@lists.infradead.org, wanghaibin.wang@huawei.com
+X-SA-Exim-Rcpt-To: gshan@redhat.com, zhukeqian1@huawei.com,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, wanghaibin.wang@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: cjia@nvidia.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -87,81 +88,82 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 22 Apr 2021 03:02:00 +0100,
+On Thu, 22 Apr 2021 03:25:23 +0100,
 Gavin Shan <gshan@redhat.com> wrote:
 > 
-> Hi Marc,
+> Hi Keqian,
 > 
-> On 4/21/21 9:59 PM, Marc Zyngier wrote:
-> > On Wed, 21 Apr 2021 07:17:44 +0100,
-> > Keqian Zhu <zhukeqian1@huawei.com> wrote:
-> >> On 2021/4/21 14:20, Gavin Shan wrote:
-> >>> On 4/21/21 12:59 PM, Keqian Zhu wrote:
-> >>>> On 2020/10/22 0:16, Santosh Shukla wrote:
-> >>>>> The Commit:6d674e28 introduces a notion to detect and handle the
-> >>>>> device mapping. The commit checks for the VM_PFNMAP flag is set
-> >>>>> in vma->flags and if set then marks force_pte to true such that
-> >>>>> if force_pte is true then ignore the THP function check
-> >>>>> (/transparent_hugepage_adjust()).
-> >>>>> 
-> >>>>> There could be an issue with the VM_PFNMAP flag setting and checking.
-> >>>>> For example consider a case where the mdev vendor driver register's
-> >>>>> the vma_fault handler named vma_mmio_fault(), which maps the
-> >>>>> host MMIO region in-turn calls remap_pfn_range() and maps
-> >>>>> the MMIO's vma space. Where, remap_pfn_range implicitly sets
-> >>>>> the VM_PFNMAP flag into vma->flags.
-> >>>> Could you give the name of the mdev vendor driver that triggers this issue?
-> >>>> I failed to find one according to your description. Thanks.
-> >>>> 
+> On 4/21/21 4:36 PM, Keqian Zhu wrote:
+> > On 2021/4/21 15:52, Gavin Shan wrote:
+> >> On 4/16/21 12:03 AM, Keqian Zhu wrote:
+> >>> The MMIO region of a device maybe huge (GB level), try to use
+> >>> block mapping in stage2 to speedup both map and unmap.
 > >>> 
-> >>> I think it would be fixed in driver side to set VM_PFNMAP in
-> >>> its mmap() callback (call_mmap()), like vfio PCI driver does.
-> >>> It means it won't be delayed until page fault is issued and
-> >>> remap_pfn_range() is called. It's determined from the beginning
-> >>> that the vma associated the mdev vendor driver is serving as
-> >>> PFN remapping purpose. So the vma should be populated completely,
-> >>> including the VM_PFNMAP flag before it becomes visible to user
-> >>> space.
+> >>> Compared to normal memory mapping, we should consider two more
+> >>> points when try block mapping for MMIO region:
+> >>> 
+> >>> 1. For normal memory mapping, the PA(host physical address) and
+> >>> HVA have same alignment within PUD_SIZE or PMD_SIZE when we use
+> >>> the HVA to request hugepage, so we don't need to consider PA
+> >>> alignment when verifing block mapping. But for device memory
+> >>> mapping, the PA and HVA may have different alignment.
+> >>> 
+> >>> 2. For normal memory mapping, we are sure hugepage size properly
+> >>> fit into vma, so we don't check whether the mapping size exceeds
+> >>> the boundary of vma. But for device memory mapping, we should pay
+> >>> attention to this.
+> >>> 
+> >>> This adds get_vma_page_shift() to get page shift for both normal
+> >>> memory and device MMIO region, and check these two points when
+> >>> selecting block mapping size for MMIO region.
+> >>> 
+> >>> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+> >>> ---
+> >>>    arch/arm64/kvm/mmu.c | 61 ++++++++++++++++++++++++++++++++++++--------
+> >>>    1 file changed, 51 insertions(+), 10 deletions(-)
+> >>> 
+> >>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> >>> index c59af5ca01b0..5a1cc7751e6d 100644
+> >>> --- a/arch/arm64/kvm/mmu.c
+> >>> +++ b/arch/arm64/kvm/mmu.c
+> >>> @@ -738,6 +738,35 @@ transparent_hugepage_adjust(struct kvm_memory_slot *memslot,
+> >>>        return PAGE_SIZE;
+> >>>    }
+> >>>    +static int get_vma_page_shift(struct vm_area_struct *vma, unsigned long hva)
+> >>> +{
+> >>> +    unsigned long pa;
+> >>> +
+> >>> +    if (is_vm_hugetlb_page(vma) && !(vma->vm_flags & VM_PFNMAP))
+> >>> +        return huge_page_shift(hstate_vma(vma));
+> >>> +
+> >>> +    if (!(vma->vm_flags & VM_PFNMAP))
+> >>> +        return PAGE_SHIFT;
+> >>> +
+> >>> +    VM_BUG_ON(is_vm_hugetlb_page(vma));
+> >>> +
+> >> 
+> >> I don't understand how VM_PFNMAP is set for hugetlbfs related vma.
+> >> I think they are exclusive, meaning the flag is never set for
+> >> hugetlbfs vma. If it's true, VM_PFNMAP needn't be checked on hugetlbfs
+> >> vma and the VM_BUG_ON() becomes unnecessary.
+> > Yes, but we're not sure all drivers follow this rule. Add a BUG_ON() is
+> > a way to catch issue.
 > > 
-> > Why should that be a requirement? Lazy populating of the VMA should be
-> > perfectly acceptable if the fault can only happen on the CPU side.
-> > 
 > 
-> It isn't a requirement and the drivers needn't follow strictly. I checked
-> several drivers before looking into the patch and found almost all the
-> drivers have VM_PFNMAP set at mmap() time. In drivers/vfio/vfio-pci.c,
-> there is a comment as below, but it doesn't reveal too much about why
-> we can't set VM_PFNMAP at fault time.
+> I think I didn't make things clear. What I meant is VM_PFNMAP can't
+> be set for hugetlbfs VMAs. So the checks here can be simplified as
+> below if you agree:
 > 
-> static int vfio_pci_mmap(void *device_data, struct vm_area_struct *vma)
-> {
->       :
->         /*
->          * See remap_pfn_range(), called from vfio_pci_fault() but we can't
->          * change vm_flags within the fault handler.  Set them now.
->          */
->         vma->vm_flags |= VM_IO | VM_PFNMAP | VM_DONTEXPAND | VM_DONTDUMP;
->         vma->vm_ops = &vfio_pci_mmap_ops;
+>     if (is_vm_hugetlb_page(vma))
+>         return huge_page_shift(hstate_vma(vma));
 > 
->         return 0;
-> }
+>     if (!(vma->vm_flags & VM_PFNMAP))
+>         return PAGE_SHIFT;
 > 
-> To set these flags in advance does have advantages. For example,
-> VM_DONTEXPAND prevents the vma to be merged with another
-> one. VM_DONTDUMP make this vma isn't eligible for
-> coredump. Otherwise, the address space, which is associated with the
-> vma is accessed and unnecessary page faults are triggered on
-> coredump.  VM_IO and VM_PFNMAP avoids to walk the page frames
-> associated with the vma since we don't have valid PFN in the
-> mapping.
+>     VM_BUG_ON(is_vm_hugetlb_page(vma));       /* Can be dropped */
 
-But PCI clearly isn't the case we are dealing with here, and not
-everything is VFIO either. I can *today* create a driver that
-implements a mmap+fault handler, call mmap() on it, pass the result to
-a memslot, and get to the exact same result Santosh describes.
-
-No PCI, no VFIO, just a random driver. We are *required* to handle
-that.
+No. If this case happens, I want to see it. I have explicitly asked
+for it, and this check stays.
 
 	M.
 
