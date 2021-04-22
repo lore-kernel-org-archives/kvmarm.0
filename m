@@ -2,66 +2,128 @@ Return-Path: <SRS0=xlfr=JT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4138C433ED
-	for <kvmarm@archiver.kernel.org>; Thu, 22 Apr 2021 14:09:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2161CC433B4
+	for <kvmarm@archiver.kernel.org>; Thu, 22 Apr 2021 14:09:33 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 04B1E613DC
-	for <kvmarm@archiver.kernel.org>; Thu, 22 Apr 2021 14:09:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04B1E613DC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 7FDB66142F
+	for <kvmarm@archiver.kernel.org>; Thu, 22 Apr 2021 14:09:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FDB66142F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 504294B370;
-	Thu, 22 Apr 2021 10:09:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 00F564B388;
+	Thu, 22 Apr 2021 10:09:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@nvidia.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id yW75OkPDPlOp; Thu, 22 Apr 2021 10:09:27 -0400 (EDT)
+	with ESMTP id XyArb7DqN7nG; Thu, 22 Apr 2021 10:09:30 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A58914B434;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C82C84B4F5;
 	Thu, 22 Apr 2021 10:09:27 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ED4494B425
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Apr 2021 03:00:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 566894B3C3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Apr 2021 03:36:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NG4zI8kvsJK1 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 22 Apr 2021 03:00:29 -0400 (EDT)
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 880B64B417
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Apr 2021 03:00:28 -0400 (EDT)
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.59])
- by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4FQpCV628sz7vy7;
- Thu, 22 Apr 2021 14:57:58 +0800 (CST)
-Received: from [10.174.177.244] (10.174.177.244) by
- DGGEMS405-HUB.china.huawei.com (10.3.19.205) with Microsoft SMTP Server id
- 14.3.498.0; Thu, 22 Apr 2021 15:00:20 +0800
-Subject: Re: [PATCH v2 0/4] arm64: drop pfn_valid_within() and simplify
- pfn_valid()
-To: Mike Rapoport <rppt@kernel.org>, <linux-arm-kernel@lists.infradead.org>
-References: <20210421065108.1987-1-rppt@kernel.org>
-From: Kefeng Wang <wangkefeng.wang@huawei.com>
-Message-ID: <9aa68d26-d736-3b75-4828-f148964eb7f0@huawei.com>
-Date: Thu, 22 Apr 2021 15:00:20 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ with ESMTP id h3ty970LqShZ for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 22 Apr 2021 03:36:22 -0400 (EDT)
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com
+ (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C40B94B3B4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Apr 2021 03:36:22 -0400 (EDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eHMVOihpAINObQ76PlrxYuP8DlUkICL5NbWbPNk31h3T3Tq/0HY8PmgQrAdwxB13TLQNf5O1mPWttmZpc+aMxCBtSAYTBC16G4KfgCafHyVLhGykySOJZyWyLJDQsPvOj5AMtXhhrXpJa5tsfvg9NqwQstTyfqAN9bo8Zq965T7K8lAto+GTQ8OiPlvZF+WQEvQB+YDagOrFJnQ33LS1xJR4cun95Ait1BnfLZY8XpAL7Pf+QM1dXP0pN6VmXHl7c0sRBSDPV/W2cvK9zOQonBaRGrP3prvtUaRsfFagQN66XIt17HOJAg3NjcDc6o8BvfiNFl48KLUbk3K8fx2gFg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/u9zBNpjMkgwed0K8Uwqx09QjcgwWYkfb3hzBaB6UXs=;
+ b=e0YI4MJcqbjVVuADD59hYjY4fB4Uy80borqdBNOwYJlrs5tk4TtUgspslvTvfsAB4K3iH4+fOJcXmyG/+8Jb/hpKdW1LZi+wCl4m9uSKawYHTfTC1u12PVfO1dDS/7b+w2g38ISvUX6R9d2xsnmTYwATinR5u4UyBtvXqJjIezMV9NlA1lZ3Zrs5RNhkShZed2rKGFWmuvseCkkbrnAlvtF250S9nxfDdWbtkk4QVr1XUAFqkdr77Egz5MDMI6vpvsuFhTLeQyDvjVoSguwjKrn9EdKdCpbPMt25RpK0474RfPrqakmdxXscmX6y6NItp79LyxNqzdw49iVtyhuKVA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.34) smtp.rcpttodomain=huawei.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=none sp=none pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/u9zBNpjMkgwed0K8Uwqx09QjcgwWYkfb3hzBaB6UXs=;
+ b=idvu6cGfYPMY2qoL1Q6rlOvsMr1UrcmrYOYIQrIhiKHfkUz1Yhr0/2F2EuPVd3Dt0Om4Q4GUHQqrZSGUk5v8ug5dqBGXD8nsXt7jImFrayPN+rVNY5jZLEfj6YQILOZnCpkDtnrZt9hpFCTqxIHBo85QxnnlrpRnCO9dfDMo8F5WWAC37hRv7kIEvsYTFnV+qJZNgTp8IXqxskOKc8RRuC4yD/+fC555nftSHKpqFxWkysRBZcQLwEi4YR63PgrmEw1lYpzH1Ltz7sMm2J9D/O7cCcmSVBcW/tN05p3NXWVGNG3ndYSmc7lhtMcyL8lgdEchK5JXNt3zzEINu1ximA==
+Received: from BN0PR04CA0207.namprd04.prod.outlook.com (2603:10b6:408:e9::32)
+ by CH2PR12MB4325.namprd12.prod.outlook.com (2603:10b6:610:a9::14)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4065.21; Thu, 22 Apr
+ 2021 07:36:21 +0000
+Received: from BN8NAM11FT068.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:e9:cafe::65) by BN0PR04CA0207.outlook.office365.com
+ (2603:10b6:408:e9::32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4065.22 via Frontend
+ Transport; Thu, 22 Apr 2021 07:36:21 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
+ smtp.mailfrom=nvidia.com; huawei.com; dkim=none (message not signed)
+ header.d=none;huawei.com; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.34; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.34) by
+ BN8NAM11FT068.mail.protection.outlook.com (10.13.177.69) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.4065.21 via Frontend Transport; Thu, 22 Apr 2021 07:36:21 +0000
+Received: from [10.40.103.59] (172.20.145.6) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 22 Apr
+ 2021 07:36:17 +0000
+Subject: Re: [PATCH] KVM: arm64: Correctly handle the mmio faulting
+To: Marc Zyngier <maz@kernel.org>, Gavin Shan <gshan@redhat.com>
+References: <1603297010-18787-1-git-send-email-sashukla@nvidia.com>
+ <8b20dfc0-3b5e-c658-c47d-ebc50d20568d@huawei.com>
+ <2e23aaa7-0c8d-13ba-2eae-9e6ab2adc587@redhat.com>
+ <ed8a8b90-8b96-4967-01f5-cd0f536c38d2@huawei.com>
+ <871rb3rgpl.wl-maz@kernel.org>
+ <b97415a2-7970-a741-9690-3e4514b4aa7d@redhat.com>
+ <87v98eq0dh.wl-maz@kernel.org>
+From: "Tarun Gupta (SW-GPU)" <targupta@nvidia.com>
+Message-ID: <bf782ec1-71da-5a8e-f250-20ed88677b8c@nvidia.com>
+Date: Thu, 22 Apr 2021 13:06:13 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-In-Reply-To: <20210421065108.1987-1-rppt@kernel.org>
+In-Reply-To: <87v98eq0dh.wl-maz@kernel.org>
 Content-Language: en-US
-X-Originating-IP: [10.174.177.244]
-X-CFilter-Loop: Reflected
+X-Originating-IP: [172.20.145.6]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: fd5ebe0b-4c30-4276-6ca1-08d90561532a
+X-MS-TrafficTypeDiagnostic: CH2PR12MB4325:
+X-Microsoft-Antispam-PRVS: <CH2PR12MB43250D71E74E7ECEE0845676B8469@CH2PR12MB4325.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: q6qhcFvzr4RosMmURsugpE92v3NqJJ18pY+6+Z26zcfeeWsUpc4dRNylz0uJuyVv77sBkfykhBORkUkrtL1/rxkvpto8g+hMHTlz5PzwJdDCTfshLenHLu0aILPWtQuf8RbGZuu7W5U6p9mSV+il27xFtMoqWtS9c12z6+225SH3M69WroSNR+3kUaCyHI89vZd/3ldNXb2O6NosTFLCk0tHe/f17iBEXkEmo4B8aK17AWHTK8NQ3yvfYPMFca5aKP52ip8himooqQX00IJ7L47UHQKwLbQgmWVPLLRVSoqHdk7QNMTa5mvQu9A8gRDkgdwW7hdEL+MDZqspvxFk4eJ0Hh/cQAHXCV+q9zseqcYH+DI3Px7CM4MHNU0K12P9lkIAwXbgtXlHcewwh1b/qFfVKgGMvcOoPoMtprqbw7obRruvWpAr5Gkh2L40y0eZCyZB7utfu8hJG0LROdY+TDbtFtIxxYLHfKjlhgM/bA18D4MPaKSCKkGi90/Vy5CaJMMB03TjUeBjrjnU/Ccsk+ofupbdrrDTkI/HjtB9n6aG50FBzpbz/Gl+DKfsNKUytOTAMnKckr3JAyI565Trk02v9M4CdDDJvwjC2SQfhnwmjq5PfQP4NiLbaXA4EnTF8HJ/oH+hy3W47IqUaV5+mTRt2nEXK45nNK+XeZzC2q17CwGGHANGVsQZnMSPLw1sz1zWSJH8A1l/XFvUj6c0/T9CW9aBorGmDAPn2x28B8Lx5EBPjfxgoF0Fcla4+dPWx8N//JKAiDMluDCOylmdqw==
+X-Forefront-Antispam-Report: CIP:216.228.112.34; CTRY:US; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:mail.nvidia.com; PTR:schybrid03.nvidia.com; CAT:NONE;
+ SFS:(4636009)(346002)(136003)(376002)(396003)(39860400002)(36840700001)(46966006)(186003)(336012)(31696002)(36756003)(426003)(31686004)(26005)(2906002)(5660300002)(316002)(16576012)(70586007)(36906005)(16526019)(82740400003)(356005)(8676002)(83380400001)(70206006)(966005)(2616005)(8936002)(7636003)(47076005)(82310400003)(36860700001)(4326008)(6666004)(86362001)(54906003)(110136005)(478600001)(53546011)(43740500002);
+ DIR:OUT; SFP:1101; 
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Apr 2021 07:36:21.3192 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: fd5ebe0b-4c30-4276-6ca1-08d90561532a
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a; Ip=[216.228.112.34];
+ Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT068.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4325
 X-Mailman-Approved-At: Thu, 22 Apr 2021 10:09:27 -0400
-Cc: David Hildenbrand <david@redhat.com>, Catalin
- Marinas <catalin.marinas@arm.com>,
- Anshuman Khandual <anshuman.khandual@arm.com>, linux-kernel@vger.kernel.org,
- Mike Rapoport <rppt@linux.ibm.com>, linux-mm@kvack.org,
- kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
- Andrew Morton <akpm@linux-foundation.org>, Will Deacon <will@kernel.org>
+Cc: cjia@nvidia.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,40 +135,107 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Ck9uIDIwMjEvNC8yMSAxNDo1MSwgTWlrZSBSYXBvcG9ydCB3cm90ZToKPiBGcm9tOiBNaWtlIFJh
-cG9wb3J0IDxycHB0QGxpbnV4LmlibS5jb20+Cj4KPiBIaSwKPgo+IFRoZXNlIHBhdGNoZXMgYWlt
-IHRvIHJlbW92ZSBDT05GSUdfSE9MRVNfSU5fWk9ORSBhbmQgZXNzZW50aWFsbHkgaGFyZHdpcmUK
-PiBwZm5fdmFsaWRfd2l0aGluKCkgdG8gMS4KPgo+IFRoZSBpZGVhIGlzIHRvIG1hcmsgTk9NQVAg
-cGFnZXMgYXMgcmVzZXJ2ZWQgaW4gdGhlIG1lbW9yeSBtYXAgYW5kIHJlc3RvcmUKPiB0aGUgaW50
-ZW5kZWQgc2VtYW50aWNzIG9mIHBmbl92YWxpZCgpIHRvIGRlc2lnbmF0ZSBhdmFpbGFiaWxpdHkg
-b2Ygc3RydWN0Cj4gcGFnZSBmb3IgYSBwZm4uCj4KPiBXaXRoIHRoaXMgdGhlIGNvcmUgbW0gd2ls
-bCBiZSBhYmxlIHRvIGNvcGUgd2l0aCB0aGUgZmFjdCB0aGF0IGl0IGNhbm5vdCB1c2UKPiBOT01B
-UCBwYWdlcyBhbmQgdGhlIGhvbGVzIGNyZWF0ZWQgYnkgTk9NQVAgcmFuZ2VzIHdpdGhpbiBNQVhf
-T1JERVIgYmxvY2tzCj4gd2lsbCBiZSB0cmVhdGVkIGNvcnJlY3RseSBldmVuIHdpdGhvdXQgdGhl
-IG5lZWQgZm9yIHBmbl92YWxpZF93aXRoaW4uCj4KPiBUaGUgcGF0Y2hlcyBhcmUgb25seSBib290
-IHRlc3RlZCBvbiBxZW11LXN5c3RlbS1hYXJjaDY0IHNvIEknZCByZWFsbHkKPiBhcHByZWNpYXRl
-IG1lbW9yeSBzdHJlc3MgdGVzdHMgb24gcmVhbCBoYXJkd2FyZS4KPgo+IElmIHRoaXMgYWN0dWFs
-bHkgd29ya3Mgd2UnbGwgYmUgb25lIHN0ZXAgY2xvc2VyIHRvIGRyb3AgY3VzdG9tIHBmbl92YWxp
-ZCgpCj4gb24gYXJtNjQgYWx0b2dldGhlci4KCkhpIE1pa2XvvIxJIGhhdmUgYSBxdWVzdGlvbiwg
-d2l0aG91dCBIT0xFU19JTl9aT05FLCB0aGUgcGZuX3ZhbGlkX3dpdGhpbigpIAppbiBtb3ZlX2Zy
-ZWVwYWdlc19ibG9jaygpLT5tb3ZlX2ZyZWVwYWdlcygpCndpbGwgYmUgb3B0aW1pemVkLCBpZiB0
-aGVyZSBhcmUgaG9sZXMgaW4gem9uZSwgdGhlICdzdHJ1Y2UgcGFnZScobWVtb3J5IAptYXApIGZv
-ciBwZm4gcmFuZ2Ugb2YgaG9sZSB3aWxsIGJlIGZyZWUgYnkKZnJlZV9tZW1tYXAoKSwgYW5kIHRo
-ZW4gdGhlIHBhZ2UgdHJhdmVyc2UgaW4gdGhlIHpvbmUod2l0aCBob2xlcykgZnJvbSAKbW92ZV9m
-cmVlcGFnZXMoKSB3aWxsIG1lZXQgdGhlIHdyb25nIHBhZ2XvvIwKdGhlbiBpdCBjb3VsZCBwYW5p
-YyBhdCBQYWdlTFJVKHBhZ2UpIHRlc3QsIGNoZWNrIGxpbmtbMV0sCgoiVGhlIGlkZWEgaXMgdG8g
-bWFyayBOT01BUCBwYWdlcyBhcyByZXNlcnZlZCBpbiB0aGUgbWVtb3J5IG1hcCIsIEkgc2VlIAp0
-aGUgcGF0Y2gyIGNoZWNrIG1lbWJsb2NrX2lzX25vbWFwKCkgaW4gbWVtb3J5IHJlZ2lvbgpvZiBt
-ZW1ibG9jaywgYnV0IGl0IHNlZW1zIHRoYXQgbWVtYmxvY2tfbWFya19ub21hcCgpIGlzIG5vdCBj
-YWxsZWQobWF5YmUgCkkgbWlzc2VkKSwgdGhlbiBtZW1tYXBfaW5pdF9yZXNlcnZlZF9wYWdlcygp
-IHdvbid0CndvcmssIHNvIHNob3VsZCB0aGUgSE9MRVNfSU5fWk9ORSBzdGlsbCBiZSBuZWVkZWQg
-Zm9yIGdlbmVyaWMgbW0gY29kZT8KClsxXSAKaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcvbGludXgt
-YXJtLWtlcm5lbC81NDExOTNhNi0yYmNlLWYwNDItNWJiMi04ODkxM2Q1ZjEwNDdAYXJtLmNvbS8K
-Cl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBt
-YWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNz
-LmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+
+
+On 4/22/2021 12:20 PM, Marc Zyngier wrote:
+> External email: Use caution opening links or attachments
+> 
+> 
+> On Thu, 22 Apr 2021 03:02:00 +0100,
+> Gavin Shan <gshan@redhat.com> wrote:
+>>
+>> Hi Marc,
+>>
+>> On 4/21/21 9:59 PM, Marc Zyngier wrote:
+>>> On Wed, 21 Apr 2021 07:17:44 +0100,
+>>> Keqian Zhu <zhukeqian1@huawei.com> wrote:
+>>>> On 2021/4/21 14:20, Gavin Shan wrote:
+>>>>> On 4/21/21 12:59 PM, Keqian Zhu wrote:
+>>>>>> On 2020/10/22 0:16, Santosh Shukla wrote:
+>>>>>>> The Commit:6d674e28 introduces a notion to detect and handle the
+>>>>>>> device mapping. The commit checks for the VM_PFNMAP flag is set
+>>>>>>> in vma->flags and if set then marks force_pte to true such that
+>>>>>>> if force_pte is true then ignore the THP function check
+>>>>>>> (/transparent_hugepage_adjust()).
+>>>>>>>
+>>>>>>> There could be an issue with the VM_PFNMAP flag setting and checking.
+>>>>>>> For example consider a case where the mdev vendor driver register's
+>>>>>>> the vma_fault handler named vma_mmio_fault(), which maps the
+>>>>>>> host MMIO region in-turn calls remap_pfn_range() and maps
+>>>>>>> the MMIO's vma space. Where, remap_pfn_range implicitly sets
+>>>>>>> the VM_PFNMAP flag into vma->flags.
+>>>>>> Could you give the name of the mdev vendor driver that triggers this issue?
+>>>>>> I failed to find one according to your description. Thanks.
+>>>>>>
+>>>>>
+>>>>> I think it would be fixed in driver side to set VM_PFNMAP in
+>>>>> its mmap() callback (call_mmap()), like vfio PCI driver does.
+>>>>> It means it won't be delayed until page fault is issued and
+>>>>> remap_pfn_range() is called. It's determined from the beginning
+>>>>> that the vma associated the mdev vendor driver is serving as
+>>>>> PFN remapping purpose. So the vma should be populated completely,
+>>>>> including the VM_PFNMAP flag before it becomes visible to user
+>>>>> space.
+>>>
+>>> Why should that be a requirement? Lazy populating of the VMA should be
+>>> perfectly acceptable if the fault can only happen on the CPU side.
+>>>
+>>
+>> It isn't a requirement and the drivers needn't follow strictly. I checked
+>> several drivers before looking into the patch and found almost all the
+>> drivers have VM_PFNMAP set at mmap() time. In drivers/vfio/vfio-pci.c,
+>> there is a comment as below, but it doesn't reveal too much about why
+>> we can't set VM_PFNMAP at fault time.
+>>
+>> static int vfio_pci_mmap(void *device_data, struct vm_area_struct *vma)
+>> {
+>>        :
+>>          /*
+>>           * See remap_pfn_range(), called from vfio_pci_fault() but we can't
+>>           * change vm_flags within the fault handler.  Set them now.
+>>           */
+>>          vma->vm_flags |= VM_IO | VM_PFNMAP | VM_DONTEXPAND | VM_DONTDUMP;
+>>          vma->vm_ops = &vfio_pci_mmap_ops;
+>>
+>>          return 0;
+>> }
+>>
+>> To set these flags in advance does have advantages. For example,
+>> VM_DONTEXPAND prevents the vma to be merged with another
+>> one. VM_DONTDUMP make this vma isn't eligible for
+>> coredump. Otherwise, the address space, which is associated with the
+>> vma is accessed and unnecessary page faults are triggered on
+>> coredump.  VM_IO and VM_PFNMAP avoids to walk the page frames
+>> associated with the vma since we don't have valid PFN in the
+>> mapping.
+> 
+> But PCI clearly isn't the case we are dealing with here, and not
+> everything is VFIO either. I can *today* create a driver that
+> implements a mmap+fault handler, call mmap() on it, pass the result to
+> a memslot, and get to the exact same result Santosh describes.
+> 
+> No PCI, no VFIO, just a random driver. We are *required* to handle
+> that.
+
+Agree with Marc here, that kernel should be able to handle it without 
+VM_PFNMAP flag set in driver.
+
+For driver reference, you could check the V2 version of this patch that 
+got accepted upstream and has details as-to how this can be reproduced 
+using vfio-pci: https://www.spinics.net/lists/arm-kernel/msg848491.html
+
+> 
+>          M.
+> 
+> --
+> Without deviation from the norm, progress is not possible.
+> 
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
