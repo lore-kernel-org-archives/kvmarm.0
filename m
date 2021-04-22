@@ -2,124 +2,60 @@ Return-Path: <SRS0=xlfr=JT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24807C433B4
-	for <kvmarm@archiver.kernel.org>; Thu, 22 Apr 2021 15:13:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D65E5C433ED
+	for <kvmarm@archiver.kernel.org>; Thu, 22 Apr 2021 15:16:57 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4DF6D6144A
-	for <kvmarm@archiver.kernel.org>; Thu, 22 Apr 2021 15:13:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DF6D6144A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
+	by mail.kernel.org (Postfix) with ESMTP id 2E15C613F5
+	for <kvmarm@archiver.kernel.org>; Thu, 22 Apr 2021 15:16:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E15C613F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9EA4A4B4FC;
-	Thu, 22 Apr 2021 11:13:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CD9F4B3DF;
+	Thu, 22 Apr 2021 11:16:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@nvidia.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id SPNqECRyp30h; Thu, 22 Apr 2021 11:13:34 -0400 (EDT)
+	with ESMTP id vD4SXCfmT9pz; Thu, 22 Apr 2021 11:16:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E67774B4F4;
-	Thu, 22 Apr 2021 11:13:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 59BB44B407;
+	Thu, 22 Apr 2021 11:16:55 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 200534B0C8
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Apr 2021 11:04:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EC4664B3DF
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Apr 2021 11:16:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id oTLQ7xtoudaL for <kvmarm@lists.cs.columbia.edu>;
- Thu, 22 Apr 2021 11:04:50 -0400 (EDT)
-Received: from NAM04-CO1-obe.outbound.protection.outlook.com
- (mail-eopbgr690073.outbound.protection.outlook.com [40.107.69.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F3A9F4B0C6
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Apr 2021 11:04:49 -0400 (EDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fXUrXJhs52xekZYmEeTD725q6/Fby/u2/8c47jm7nvnW3/xqq8k0CmLbyZa/8xjTxjQTgx9rz/kZ0GY79ukIJi0auuIschKZthc5jt/igoftmxTje+yBS1aNSy+c+tq0XtE3W7LJ/GDatX5he9+QOJoUvkaBS2m9E2xaJ+4pwtk315CjtB/JnSt+YowfcBV//Sw5sznLkgpqVhClV4irVlX8JPVzkfJL5WZ11lBa5Io4f+fxrrT6LE2OoAdbh01lopaGf6LZVoDFqJjKPu0mBkSk+b91Qyem942mrie9C/IACcOfJkOFWQU856sWholEc4+zbC1QX9hVXmWcmLd6lg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WSqcADhvlVJ7LO0LRcox2vn8jpKEVTOjLBlNWYARao8=;
- b=NticaE/O+TOQQr/02I9PPxkdnSN15XlV1/JIrczvzzhJe2+7owCY20elKY/YBOiOTEYET5EAxfJvmxgBfy4JUvpHEoUS/seeQioLHcHvd+bdizGH8ZQvqoNyFNN049yKekwknSH5eAfOjpayTtu1A5ZwjgllimlvLTTJbXYJFyKtrEdnIgytx3YO62jU/77j7Ns7+bK7moNjSpHg57l+eGeLzHHseNK6sNwiTzMEROrg4fbGywcnSpLihIg6B8X4NQ9gi9QIswIuf6cRoRdALiL07Q+mKjEeJRt7i+3uJsICTb1QE2yl6RpB4mql2ty6K2KEJlLzCJMCOdjxTVNbYw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.112.32) smtp.rcpttodomain=arm.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=none sp=none pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WSqcADhvlVJ7LO0LRcox2vn8jpKEVTOjLBlNWYARao8=;
- b=JNyVv/PABV8SjM6+GBmsOEcZqwkRWtBeIBolgQ+P1xiLzLrZqf8u27E0i4DTf6PUwoSwiKFfdGP4LtZWyE0y38to1SqWVODLn1NNaSQQ+r/G7o26RV1ru+2MluolaqStUnkhHThdAJBdffUUxq9nMyXuU8I8Z0o+Hro9BbD8v2riOHlQ0N96618XLMJtkTFjEKEM5T2gvP63dJxy44G44tRqkL/x8iTE+c9yN/2OqJUX/0CBwQT3EmQVhDaKs3Uz7VotWAlxbWQxK1JaWbUUPEBp0OdqS5KyTeaJzKArveyOReWPf8AV0BWXBQfEOSCvGqjflfO6/HZShD6vEtHkGw==
-Received: from BN8PR04CA0016.namprd04.prod.outlook.com (2603:10b6:408:70::29)
- by CH2PR12MB4039.namprd12.prod.outlook.com (2603:10b6:610:a8::11)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4065.21; Thu, 22 Apr
- 2021 15:04:46 +0000
-Received: from BN8NAM11FT045.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:70:cafe::73) by BN8PR04CA0016.outlook.office365.com
- (2603:10b6:408:70::29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4065.20 via Frontend
- Transport; Thu, 22 Apr 2021 15:04:46 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.32)
- smtp.mailfrom=nvidia.com; arm.com; dkim=none (message not signed)
- header.d=none;arm.com; dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.112.32 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.112.32; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (216.228.112.32) by
- BN8NAM11FT045.mail.protection.outlook.com (10.13.177.47) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.4065.21 via Frontend Transport; Thu, 22 Apr 2021 15:04:46 +0000
-Received: from HQMAIL101.nvidia.com (172.20.187.10) by HQMAIL109.nvidia.com
- (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 22 Apr
- 2021 08:04:45 -0700
-Received: from sumitg-l4t.nvidia.com (172.20.145.6) by mail.nvidia.com
- (172.20.187.10) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Thu, 22 Apr 2021 15:04:40 +0000
-From: Sumit Gupta <sumitg@nvidia.com>
-To: <eric.auger@redhat.com>
-Subject: Re: [PATCH v14 00/13] SMMUv3 Nested Stage Setup (IOMMU part)
-Date: Thu, 22 Apr 2021 20:34:38 +0530
-Message-ID: <1619103878-6664-1-git-send-email-sumitg@nvidia.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <f99d8af1-425b-f1d5-83db-20e32b856143@redhat.com>
-References: <f99d8af1-425b-f1d5-83db-20e32b856143@redhat.com>
+ with ESMTP id E7PeivmIP5Kv for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 22 Apr 2021 11:16:52 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 94CE44B3D1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Apr 2021 11:16:52 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2731D13A1;
+ Thu, 22 Apr 2021 08:16:52 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 838F33F73B;
+ Thu, 22 Apr 2021 08:16:51 -0700 (PDT)
+Subject: Re: [kvm-unit-tests RFC PATCH 0/1] configure: arm: Replace --vmm with
+ --target
+To: Andrew Jones <drjones@redhat.com>
+References: <20210420161338.70914-1-alexandru.elisei@arm.com>
+ <20210420165101.irbx2upgqbazkvlt@gator.home>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <ed3ba802-fee7-4c58-9d73-d33dfbd44d7f@arm.com>
+Date: Thu, 22 Apr 2021 16:17:27 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.9.1
 MIME-Version: 1.0
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 02cb4a85-3f6a-42dc-d239-08d9059ff7ed
-X-MS-TrafficTypeDiagnostic: CH2PR12MB4039:
-X-Microsoft-Antispam-PRVS: <CH2PR12MB4039EE93B47B1378B1A539B2B9469@CH2PR12MB4039.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6108;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: aS7IBfHHoR+5HubceEs+Qh/RrdKpvrqz7PiCvNrgIZPXqgjJRsnzC4YrjGid1lVDvr2tM0N9zR0SSA1meD7MTA3FAWhVzpBNTmvN422T+yqoIbeSoWaMHlTGFEqWj8OSnQYd/K3XSi8TAP4Z4Hw8I6NmTj1kxFFlmerzTnVWYLdfP7F+2OSqxInSVBC/G/nJIO4x2CcJsMCO2Bbp1fb+p7rzN2lreXXgzLCNclRNznARX+fbjGV/rma60puwynxQkHyrFXE+QPOaiwhpibD79XsFmjl/vLLbdlrruienLV1aa9V8/aqS93DCsh8E0fdC4Xwn0zFW4mpBvTKtZbBmMdejFo4dUQdCzlTgpLQosOzSK08MURkmPkuJgy5eqG3c/8z0ZONXUQfHyD9pf1eL6WIBkzvdLdkE4GtFOvG2/FtHFNNEhGT7U69t66zFaLTE28eeg1f8eqC3OcaM7acW4Aj8bkHXPNzlHIgtjFgWmXnwtNdcfUfXIMBAOTNsEKoLfEweclxFMOIVO+noxc4VEvWw8r7lS5MzgtD7+RiJdjITOZFkCLTlXzDeVnpzEsHUgQ5dR37QB5bTR92gAt3ATjveQ2XE7vJwFOCSpRalCWXXaVQrVgP8pxsSkQllzFQwrQrBtKx3ThKCdPwKoGMR0w==
-X-Forefront-Antispam-Report: CIP:216.228.112.32; CTRY:US; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:mail.nvidia.com; PTR:schybrid01.nvidia.com; CAT:NONE;
- SFS:(4636009)(346002)(136003)(39860400002)(376002)(396003)(36840700001)(46966006)(36756003)(558084003)(186003)(7416002)(426003)(26005)(8936002)(107886003)(8676002)(316002)(2906002)(6916009)(356005)(336012)(70206006)(82740400003)(70586007)(7636003)(83380400001)(36860700001)(82310400003)(4326008)(47076005)(7696005)(2616005)(5660300002)(54906003)(86362001)(478600001);
- DIR:OUT; SFP:1101; 
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Apr 2021 15:04:46.5264 (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 02cb4a85-3f6a-42dc-d239-08d9059ff7ed
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a; Ip=[216.228.112.32];
- Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT045.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4039
-X-Mailman-Approved-At: Thu, 22 Apr 2021 11:13:34 -0400
-Cc: vdumpa@nvidia.com, jean-philippe@linaro.org, wangxingang5@huawei.com,
- kvm@vger.kernel.org, vivek.gautam@arm.com, maz@kernel.org, joro@8bytes.org,
- will@kernel.org, iommu@lists.linux-foundation.org,
- linux-kernel@vger.kernel.org, vsethi@nvidia.com, lushenming@huawei.com,
- alex.williamson@redhat.com, zhangfei.gao@linaro.org, sumitg@nvidia.com,
- robin.murphy@arm.com, kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
+In-Reply-To: <20210420165101.irbx2upgqbazkvlt@gator.home>
+Content-Language: en-US
+Cc: pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -136,12 +72,94 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Eric,
-I have validated the v14 of the patch series from branch "jean_sva_current_2stage_v14".
-Verfied nested translations with NVMe PCI device assigned to Qemu 5.2 Guest.
-Had to revert patch "mm: notify remote TLBs when dirtying a PTE".
+Hi Drew,
 
-Tested-by: Sumit Gupta <sumitg@nvidia.com>
+On 4/20/21 5:51 PM, Andrew Jones wrote:
+> Hi Alex,
+>
+> On Tue, Apr 20, 2021 at 05:13:37PM +0100, Alexandru Elisei wrote:
+>> This is an RFC because it's not exactly clear to me that this is the best
+>> approach. I'm also open to using a different name for the new option, maybe
+>> something like --platform if it makes more sense.
+> I like 'target'.
+>
+>> I see two use cases for the patch:
+>>
+>> 1. Using different files when compiling kvm-unit-tests to run as an EFI app
+>> as opposed to a KVM guest (described in the commit message).
+>>
+>> 2. This is speculation on my part, but I can see extending
+>> arm/unittests.cfg with a "target" test option which can be used to decide
+>> which tests need to be run based on the configure --target value. For
+>> example, migration tests don't make much sense on kvmtool, which doesn't
+>> have migration support. Similarly, the micro-bench test doesn't make much
+>> sense (to me, at least) as an EFI app. Of course, this is only useful if
+>> there are automated scripts to run the tests under kvmtool or EFI, which
+>> doesn't look likely at the moment, so I left it out of the commit message.
+> Sounds like a good idea. unittests.cfg could get a new option 'targets'
+> where a list of targets is given. If targets is not present, then the
+> test assumes it's for all targets. Might be nice to also accept !<target>
+> syntax. E.g.
+>
+> # builds/runs for all targets
+> [mytest]
+> file = mytest.flat
+>
+> # builds/runs for given targets
+> [mytest2]
+> file = mytest2.flat
+> targets = qemu,kvmtool
+>
+> # builds/runs for all targets except disabled targets
+> [mytest3]
+> file = mytest3.flat
+> targets = !kvmtool
+
+That's sounds like a good idea, but to be honest, I would wait until someone
+actually needs it before implementing it. That way we don't risk not taking a use
+case into account and then having to rework it.
+
+>
+> And it wouldn't bother me to have special logic for kvmtool's lack of
+> migration put directly in scripts/runtime.bash
+
+Good to keep in mind when support is added.
+
+>
+> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+> index 132389c7dd59..0d5cb51df4f4 100644
+> --- a/scripts/runtime.bash
+> +++ b/scripts/runtime.bash
+> @@ -132,7 +132,7 @@ function run()
+>      }
+>  
+>      cmdline=$(get_cmdline $kernel)
+> -    if grep -qw "migration" <<<$groups ; then
+> +    if grep -qw "migration" <<<$groups && [ "$TARGET" != "kvmtool" ]; then
+>          cmdline="MIGRATION=yes $cmdline"
+>      fi
+>      if [ "$verbose" = "yes" ]; then
+>
+>> Using --vmm will trigger a warning. I was thinking about removing it entirely in
+>> a about a year's time, but that's not set in stone. Note that qemu users
+>> (probably the vast majority of people) will not be affected by this change as
+>> long as they weren't setting --vmm explicitely to its default value of "qemu".
+>>
+> While we'd risk automated configure+build tools, like git{hub,lab} CI,
+> failing, I think the risk is pretty low right now that anybody is using
+> the option. Also, we might as well make them change sooner than later by
+> failing configure. IOW, I'd just do s/vmm/target/g to rename it now. If
+> we are concerned about the disruption, then I'd just make vmm an alias
+> for target and not bother deprecating it ever.
+
+I also think it will not be too bad if we make the change now, but I'm not sure
+what you mean by making vmm an alias of target. The patch ignores --vmm is it's
+not specified, and if it is specified on the configure command line, then it must
+match the value of --target, otherwise configure fails.
+
+Thanks,
+
+Alex
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
