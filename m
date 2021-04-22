@@ -2,69 +2,75 @@ Return-Path: <SRS0=xlfr=JT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E519FC43462
-	for <kvmarm@archiver.kernel.org>; Thu, 22 Apr 2021 06:19:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0FDBC433ED
+	for <kvmarm@archiver.kernel.org>; Thu, 22 Apr 2021 06:50:12 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 67EC8613CE
-	for <kvmarm@archiver.kernel.org>; Thu, 22 Apr 2021 06:19:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67EC8613CE
+	by mail.kernel.org (Postfix) with ESMTP id 2C81261459
+	for <kvmarm@archiver.kernel.org>; Thu, 22 Apr 2021 06:50:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C81261459
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ED3A04B4FD;
-	Thu, 22 Apr 2021 02:19:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id ACF994B3BD;
+	Thu, 22 Apr 2021 02:50:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id hIpiVup1twoZ; Thu, 22 Apr 2021 02:19:31 -0400 (EDT)
+	with ESMTP id aT4vT4yHmGBr; Thu, 22 Apr 2021 02:50:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D987E4B4E8;
-	Thu, 22 Apr 2021 02:19:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7AC584B3E3;
+	Thu, 22 Apr 2021 02:50:10 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0CC9F4B255
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Apr 2021 02:19:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C6A024B3BD
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Apr 2021 02:50:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4790RfS1l+A7 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 22 Apr 2021 02:19:30 -0400 (EDT)
+ with ESMTP id 9QPZ9-zhXDaK for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 22 Apr 2021 02:50:06 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 80FED4B396
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Apr 2021 02:19:29 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 4CDF86145A;
- Thu, 22 Apr 2021 06:19:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1619072367;
- bh=5pv19/zw6k97y2VFoD7tQZ9uQemSm8OSk2DzdouBBz8=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=lRqB+e3jDktyHVncSv2EVQ7vnSkGOi8MCTVL1PoGUfGbpMvYA/EF9yl6xQDYcIM81
- jivV+9fC8+krtFB7qJqeN2qoLwABPCk8lp2L6Ng6FEVG35NPRMkd5yj4rF/Egqwrg4
- Dr84oFWd0BnfPcFD/QQWJaBm7tj3EbMKhpKu/oPfC3CEWX0RJSseTwqkb8XV08pm7T
- NSK/zDggVENJVpjJI0FqoTgHmQh4N/4j6XT9eUzghketH0zek7du2QBJlzoSGMTHDY
- JrLT07j4mPVTO9xZnnDueXjmXuGmP11FZ7RI8uvBILUSmJRGfVahjmRG7dZ6OIWzTo
- VS1h3VMV3f0ww==
-From: Mike Rapoport <rppt@kernel.org>
-To: linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v3 4/4] arm64: drop pfn_valid_within() and simplify pfn_valid()
-Date: Thu, 22 Apr 2021 09:19:02 +0300
-Message-Id: <20210422061902.21614-5-rppt@kernel.org>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20210422061902.21614-1-rppt@kernel.org>
-References: <20210422061902.21614-1-rppt@kernel.org>
-MIME-Version: 1.0
-Cc: David Hildenbrand <david@redhat.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Anshuman Khandual <anshuman.khandual@arm.com>, linux-kernel@vger.kernel.org,
- Mike Rapoport <rppt@linux.ibm.com>, linux-mm@kvack.org,
- kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
- Andrew Morton <akpm@linux-foundation.org>, Will Deacon <will@kernel.org>,
- Mike Rapoport <rppt@kernel.org>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 64C8F4B3DE
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Apr 2021 02:50:06 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 54CC561448;
+ Thu, 22 Apr 2021 06:50:05 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1lZTA3-008paW-5p; Thu, 22 Apr 2021 07:50:03 +0100
+Date: Thu, 22 Apr 2021 07:50:02 +0100
+Message-ID: <87v98eq0dh.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH] KVM: arm64: Correctly handle the mmio faulting
+In-Reply-To: <b97415a2-7970-a741-9690-3e4514b4aa7d@redhat.com>
+References: <1603297010-18787-1-git-send-email-sashukla@nvidia.com>
+ <8b20dfc0-3b5e-c658-c47d-ebc50d20568d@huawei.com>
+ <2e23aaa7-0c8d-13ba-2eae-9e6ab2adc587@redhat.com>
+ <ed8a8b90-8b96-4967-01f5-cd0f536c38d2@huawei.com>
+ <871rb3rgpl.wl-maz@kernel.org>
+ <b97415a2-7970-a741-9690-3e4514b4aa7d@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: gshan@redhat.com, zhukeqian1@huawei.com, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, cjia@nvidia.com,
+ linux-arm-kernel@lists.infradead.org, wanghaibin.wang@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: cjia@nvidia.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -81,78 +87,86 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Mike Rapoport <rppt@linux.ibm.com>
+On Thu, 22 Apr 2021 03:02:00 +0100,
+Gavin Shan <gshan@redhat.com> wrote:
+> 
+> Hi Marc,
+> 
+> On 4/21/21 9:59 PM, Marc Zyngier wrote:
+> > On Wed, 21 Apr 2021 07:17:44 +0100,
+> > Keqian Zhu <zhukeqian1@huawei.com> wrote:
+> >> On 2021/4/21 14:20, Gavin Shan wrote:
+> >>> On 4/21/21 12:59 PM, Keqian Zhu wrote:
+> >>>> On 2020/10/22 0:16, Santosh Shukla wrote:
+> >>>>> The Commit:6d674e28 introduces a notion to detect and handle the
+> >>>>> device mapping. The commit checks for the VM_PFNMAP flag is set
+> >>>>> in vma->flags and if set then marks force_pte to true such that
+> >>>>> if force_pte is true then ignore the THP function check
+> >>>>> (/transparent_hugepage_adjust()).
+> >>>>> 
+> >>>>> There could be an issue with the VM_PFNMAP flag setting and checking.
+> >>>>> For example consider a case where the mdev vendor driver register's
+> >>>>> the vma_fault handler named vma_mmio_fault(), which maps the
+> >>>>> host MMIO region in-turn calls remap_pfn_range() and maps
+> >>>>> the MMIO's vma space. Where, remap_pfn_range implicitly sets
+> >>>>> the VM_PFNMAP flag into vma->flags.
+> >>>> Could you give the name of the mdev vendor driver that triggers this issue?
+> >>>> I failed to find one according to your description. Thanks.
+> >>>> 
+> >>> 
+> >>> I think it would be fixed in driver side to set VM_PFNMAP in
+> >>> its mmap() callback (call_mmap()), like vfio PCI driver does.
+> >>> It means it won't be delayed until page fault is issued and
+> >>> remap_pfn_range() is called. It's determined from the beginning
+> >>> that the vma associated the mdev vendor driver is serving as
+> >>> PFN remapping purpose. So the vma should be populated completely,
+> >>> including the VM_PFNMAP flag before it becomes visible to user
+> >>> space.
+> > 
+> > Why should that be a requirement? Lazy populating of the VMA should be
+> > perfectly acceptable if the fault can only happen on the CPU side.
+> > 
+> 
+> It isn't a requirement and the drivers needn't follow strictly. I checked
+> several drivers before looking into the patch and found almost all the
+> drivers have VM_PFNMAP set at mmap() time. In drivers/vfio/vfio-pci.c,
+> there is a comment as below, but it doesn't reveal too much about why
+> we can't set VM_PFNMAP at fault time.
+> 
+> static int vfio_pci_mmap(void *device_data, struct vm_area_struct *vma)
+> {
+>       :
+>         /*
+>          * See remap_pfn_range(), called from vfio_pci_fault() but we can't
+>          * change vm_flags within the fault handler.  Set them now.
+>          */
+>         vma->vm_flags |= VM_IO | VM_PFNMAP | VM_DONTEXPAND | VM_DONTDUMP;
+>         vma->vm_ops = &vfio_pci_mmap_ops;
+> 
+>         return 0;
+> }
+> 
+> To set these flags in advance does have advantages. For example,
+> VM_DONTEXPAND prevents the vma to be merged with another
+> one. VM_DONTDUMP make this vma isn't eligible for
+> coredump. Otherwise, the address space, which is associated with the
+> vma is accessed and unnecessary page faults are triggered on
+> coredump.  VM_IO and VM_PFNMAP avoids to walk the page frames
+> associated with the vma since we don't have valid PFN in the
+> mapping.
 
-The arm64's version of pfn_valid() differs from the generic because of two
-reasons:
+But PCI clearly isn't the case we are dealing with here, and not
+everything is VFIO either. I can *today* create a driver that
+implements a mmap+fault handler, call mmap() on it, pass the result to
+a memslot, and get to the exact same result Santosh describes.
 
-* Parts of the memory map are freed during boot. This makes it necessary to
-  verify that there is actual physical memory that corresponds to a pfn
-  which is done by querying memblock.
+No PCI, no VFIO, just a random driver. We are *required* to handle
+that.
 
-* There are NOMAP memory regions. These regions are not mapped in the
-  linear map and until the previous commit the struct pages representing
-  these areas had default values.
+	M.
 
-As the consequence of absence of the special treatment of NOMAP regions in
-the memory map it was necessary to use memblock_is_map_memory() in
-pfn_valid() and to have pfn_valid_within() aliased to pfn_valid() so that
-generic mm functionality would not treat a NOMAP page as a normal page.
-
-Since the NOMAP regions are now marked as PageReserved(), pfn walkers and
-the rest of core mm will treat them as unusable memory and thus
-pfn_valid_within() is no longer required at all and can be disabled by
-removing CONFIG_HOLES_IN_ZONE on arm64.
-
-pfn_valid() can be slightly simplified by replacing
-memblock_is_map_memory() with memblock_is_memory().
-
-Signed-off-by: Mike Rapoport <rppt@linux.ibm.com>
-Acked-by: David Hildenbrand <david@redhat.com>
----
- arch/arm64/Kconfig   | 3 ---
- arch/arm64/mm/init.c | 4 ++--
- 2 files changed, 2 insertions(+), 5 deletions(-)
-
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index e4e1b6550115..58e439046d05 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -1040,9 +1040,6 @@ config NEED_PER_CPU_EMBED_FIRST_CHUNK
- 	def_bool y
- 	depends on NUMA
- 
--config HOLES_IN_ZONE
--	def_bool y
--
- source "kernel/Kconfig.hz"
- 
- config ARCH_SPARSEMEM_ENABLE
-diff --git a/arch/arm64/mm/init.c b/arch/arm64/mm/init.c
-index 966a7a18d528..f431b38d0837 100644
---- a/arch/arm64/mm/init.c
-+++ b/arch/arm64/mm/init.c
-@@ -243,7 +243,7 @@ int pfn_valid(unsigned long pfn)
- 
- 	/*
- 	 * ZONE_DEVICE memory does not have the memblock entries.
--	 * memblock_is_map_memory() check for ZONE_DEVICE based
-+	 * memblock_is_memory() check for ZONE_DEVICE based
- 	 * addresses will always fail. Even the normal hotplugged
- 	 * memory will never have MEMBLOCK_NOMAP flag set in their
- 	 * memblock entries. Skip memblock search for all non early
-@@ -254,7 +254,7 @@ int pfn_valid(unsigned long pfn)
- 		return pfn_section_valid(ms, pfn);
- }
- #endif
--	return memblock_is_map_memory(addr);
-+	return memblock_is_memory(addr);
- }
- EXPORT_SYMBOL(pfn_valid);
- 
 -- 
-2.28.0
-
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
