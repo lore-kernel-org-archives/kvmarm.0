@@ -2,86 +2,87 @@ Return-Path: <SRS0=xlfr=JT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D469C433B4
-	for <kvmarm@archiver.kernel.org>; Thu, 22 Apr 2021 22:42:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 911B3C43461
+	for <kvmarm@archiver.kernel.org>; Thu, 22 Apr 2021 23:35:25 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BE39E60BBB
-	for <kvmarm@archiver.kernel.org>; Thu, 22 Apr 2021 22:42:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE39E60BBB
+	by mail.kernel.org (Postfix) with ESMTP id C29FA6142F
+	for <kvmarm@archiver.kernel.org>; Thu, 22 Apr 2021 23:35:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C29FA6142F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 31A484B425;
-	Thu, 22 Apr 2021 18:42:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F27C4B4D6;
+	Thu, 22 Apr 2021 19:35:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id qbKBBym8qFIW; Thu, 22 Apr 2021 18:42:08 -0400 (EDT)
+	with ESMTP id 9KxBY7yB9eeJ; Thu, 22 Apr 2021 19:35:22 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D63C64B3E3;
-	Thu, 22 Apr 2021 18:42:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E6C3B4B3BB;
+	Thu, 22 Apr 2021 19:35:22 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 874B94B3E3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Apr 2021 18:42:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A96014B289
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Apr 2021 19:35:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tG-NMYmAy8Qk for <kvmarm@lists.cs.columbia.edu>;
- Thu, 22 Apr 2021 18:42:06 -0400 (EDT)
+ with ESMTP id llvBUfsX9BI6 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 22 Apr 2021 19:35:21 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 839654B3DE
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Apr 2021 18:42:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B85114B288
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Apr 2021 19:35:21 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1619131326;
+ s=mimecast20190719; t=1619134521;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=MXWelGrKJsOVHMNa4BvG+vmhagOlpndp+VmZanYIb8Y=;
- b=dRLtZw70s1VYvOJvQ79LztlFpOYZ/wHdLpvaVkdH1f/ZufUPRG7GEmIh9ePPM5gP+5qphI
- oEyash4vANzLDUzm9k6SvpBt+rtfNaKCjYX+Ao/fTwm9AlZnL8eqMnp/0HNr5Rs/Lk1xOc
- DJtSUq8U0GnQMR+CU4WnoDBMiJwt4oI=
+ bh=WXUjBiBtw/xQjxnogOOcI5Cr8lsqNo0d3Mm0tliIk0s=;
+ b=LVOKxKsrkgBCg1K9P4k8+RPYvvVcppcNVH7MQlQmC5xzry1wjWW5XtDB4fri+dRBOKVVwl
+ tCqcRx/RBzoAQov0iYKYs9kpMqS8GZxIeTIR0dgDc8ZW9DTG992Z6h45FsK4sgtaR41zSm
+ ZrOTBUFIo+Tgh/QtBsN3tI/VLfcjtOw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-333-Bj5_orOsNDCDYpVONoT8NA-1; Thu, 22 Apr 2021 18:42:02 -0400
-X-MC-Unique: Bj5_orOsNDCDYpVONoT8NA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-503-qQjUnm5-PBiLLxQUT-gf4w-1; Thu, 22 Apr 2021 19:35:19 -0400
+X-MC-Unique: qQjUnm5-PBiLLxQUT-gf4w-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F410B801814;
- Thu, 22 Apr 2021 22:42:00 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D7FFD343A3;
+ Thu, 22 Apr 2021 23:35:17 +0000 (UTC)
 Received: from [10.64.54.94] (vpn2-54-94.bne.redhat.com [10.64.54.94])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1B2F85C3E0;
- Thu, 22 Apr 2021 22:41:57 +0000 (UTC)
-Subject: Re: [PATCH v4 2/2] kvm/arm64: Try stage2 block mapping for host
- device MMIO
-To: Marc Zyngier <maz@kernel.org>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1AA4C19C71;
+ Thu, 22 Apr 2021 23:35:14 +0000 (UTC)
+Subject: Re: [PATCH v4 1/2] kvm/arm64: Remove the creation time's mapping of
+ MMIO regions
+To: Keqian Zhu <zhukeqian1@huawei.com>
 References: <20210415140328.24200-1-zhukeqian1@huawei.com>
- <20210415140328.24200-3-zhukeqian1@huawei.com>
- <960e097d-818b-00bc-b2ee-0da17857f862@redhat.com>
- <105a403a-e48b-15bc-44ff-0ff34f7d2194@huawei.com>
- <46606f3e-ef41-6520-6647-88c0f76a83e0@redhat.com>
- <87tunyq0av.wl-maz@kernel.org>
+ <20210415140328.24200-2-zhukeqian1@huawei.com>
+ <ad39c796-2778-df26-b0c6-231e7626a747@redhat.com>
+ <bd4d2cfc-37b9-f20a-5a5c-ed352d1a46dc@huawei.com>
+ <f13bfc39-bee6-4562-fefc-76051bbf9735@redhat.com>
+ <9eb47a6c-3c5c-cb4a-d1de-1a3ce1b60a87@huawei.com>
 From: Gavin Shan <gshan@redhat.com>
-Message-ID: <b39cb015-39bb-cb03-e095-414e323fd6aa@redhat.com>
-Date: Fri, 23 Apr 2021 10:42:08 +1000
+Message-ID: <d185bbe1-4bb3-6a38-7a94-b0c52126e583@redhat.com>
+Date: Fri, 23 Apr 2021 11:35:22 +1000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <87tunyq0av.wl-maz@kernel.org>
+In-Reply-To: <9eb47a6c-3c5c-cb4a-d1de-1a3ce1b60a87@huawei.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ linux-kernel@vger.kernel.org, Santosh Shukla <sashukla@nvidia.com>,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -100,85 +101,53 @@ Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+Hi Keqian,
 
-On 4/22/21 4:51 PM, Marc Zyngier wrote:
-> On Thu, 22 Apr 2021 03:25:23 +0100,
-> Gavin Shan <gshan@redhat.com> wrote:
->> On 4/21/21 4:36 PM, Keqian Zhu wrote:
->>> On 2021/4/21 15:52, Gavin Shan wrote:
+On 4/22/21 5:41 PM, Keqian Zhu wrote:
+> On 2021/4/22 10:12, Gavin Shan wrote:
+>> On 4/21/21 4:28 PM, Keqian Zhu wrote:
+>>> On 2021/4/21 14:38, Gavin Shan wrote:
 >>>> On 4/16/21 12:03 AM, Keqian Zhu wrote:
->>>>> The MMIO region of a device maybe huge (GB level), try to use
->>>>> block mapping in stage2 to speedup both map and unmap.
->>>>>
->>>>> Compared to normal memory mapping, we should consider two more
->>>>> points when try block mapping for MMIO region:
->>>>>
->>>>> 1. For normal memory mapping, the PA(host physical address) and
->>>>> HVA have same alignment within PUD_SIZE or PMD_SIZE when we use
->>>>> the HVA to request hugepage, so we don't need to consider PA
->>>>> alignment when verifing block mapping. But for device memory
->>>>> mapping, the PA and HVA may have different alignment.
->>>>>
->>>>> 2. For normal memory mapping, we are sure hugepage size properly
->>>>> fit into vma, so we don't check whether the mapping size exceeds
->>>>> the boundary of vma. But for device memory mapping, we should pay
->>>>> attention to this.
->>>>>
->>>>> This adds get_vma_page_shift() to get page shift for both normal
->>>>> memory and device MMIO region, and check these two points when
->>>>> selecting block mapping size for MMIO region.
->>>>>
->>>>> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
->>>>> ---
->>>>>     arch/arm64/kvm/mmu.c | 61 ++++++++++++++++++++++++++++++++++++--------
->>>>>     1 file changed, 51 insertions(+), 10 deletions(-)
->>>>>
->>>>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
->>>>> index c59af5ca01b0..5a1cc7751e6d 100644
->>>>> --- a/arch/arm64/kvm/mmu.c
->>>>> +++ b/arch/arm64/kvm/mmu.c
->>>>> @@ -738,6 +738,35 @@ transparent_hugepage_adjust(struct kvm_memory_slot *memslot,
->>>>>         return PAGE_SIZE;
->>>>>     }
->>>>>     +static int get_vma_page_shift(struct vm_area_struct *vma, unsigned long hva)
->>>>> +{
->>>>> +    unsigned long pa;
->>>>> +
->>>>> +    if (is_vm_hugetlb_page(vma) && !(vma->vm_flags & VM_PFNMAP))
->>>>> +        return huge_page_shift(hstate_vma(vma));
->>>>> +
->>>>> +    if (!(vma->vm_flags & VM_PFNMAP))
->>>>> +        return PAGE_SHIFT;
->>>>> +
->>>>> +    VM_BUG_ON(is_vm_hugetlb_page(vma));
->>>>> +
->>>>
->>>> I don't understand how VM_PFNMAP is set for hugetlbfs related vma.
->>>> I think they are exclusive, meaning the flag is never set for
->>>> hugetlbfs vma. If it's true, VM_PFNMAP needn't be checked on hugetlbfs
->>>> vma and the VM_BUG_ON() becomes unnecessary.
->>> Yes, but we're not sure all drivers follow this rule. Add a BUG_ON() is
->>> a way to catch issue.
->>>
+
+[...]
+
 >>
->> I think I didn't make things clear. What I meant is VM_PFNMAP can't
->> be set for hugetlbfs VMAs. So the checks here can be simplified as
->> below if you agree:
+>> Yeah, Sorry that I missed that part. Something associated with Santosh's
+>> patch. The flag can be not existing until the page fault happened on
+>> the vma. In this case, the check could be not working properly.
 >>
->>      if (is_vm_hugetlb_page(vma))
->>          return huge_page_shift(hstate_vma(vma));
->>
->>      if (!(vma->vm_flags & VM_PFNMAP))
->>          return PAGE_SHIFT;
->>
->>      VM_BUG_ON(is_vm_hugetlb_page(vma));       /* Can be dropped */
+>>    [PATCH] KVM: arm64: Correctly handle the mmio faulting
+> Yeah, you are right.
 > 
-> No. If this case happens, I want to see it. I have explicitly asked
-> for it, and this check stays.
+> If that happens, we won't try to use block mapping for memslot with VM_PFNMAP.
+> But it keeps a same logic with old code.
+> 
+> 1. When without dirty-logging, we won't try block mapping for it, and we'll
+> finally know that it's device, so won't try to do adjust THP (Transparent Huge Page)
+> for it.
+> 2. If userspace wrongly enables dirty logging for this memslot, we'll force_pte for it.
 > 
 
-Thanks for the explanation. To keep VM_BUG_ON() sounds good to me too :)
+It's not about the patch itself and just want more discussion to get more details.
+The patch itself looks good to me. I got two questions as below:
+
+(1) The memslot fails to be added if it's backed by MMIO region and dirty logging is
+enabled in kvm_arch_prepare_memory_region(). As Santosh reported, the corresponding
+vma could be associated with MMIO region and VM_PFNMAP is missed. In this case,
+kvm_arch_prepare_memory_region() isn't returning error, meaning the memslot can be
+added successfully and block mapping isn't used, as you mentioned. The question is
+the memslot is added, but the expected result would be failure.
+
+(2) If dirty logging is enabled on the MMIO memslot, everything should be fine. If
+the dirty logging isn't enabled and VM_PFNMAP isn't set yet in user_mem_abort(),
+block mapping won't be used and PAGE_SIZE is picked, but the failing IPA might
+be good candidate for block mapping. It means we miss something for blocking
+mapping?
+
+By the way, do you have idea why dirty logging can't be enabled on MMIO memslot?
+I guess Marc might know the history. For example, QEMU is taking "/dev/mem" or
+"/dev/kmem" to back guest's memory, the vma is marked as MMIO, but dirty logging
+and migration isn't supported?
 
 Thanks,
 Gavin
