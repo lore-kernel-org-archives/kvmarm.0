@@ -2,71 +2,99 @@ Return-Path: <SRS0=8Q7i=JU=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DDC5C433ED
-	for <kvmarm@archiver.kernel.org>; Fri, 23 Apr 2021 09:14:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64007C433ED
+	for <kvmarm@archiver.kernel.org>; Fri, 23 Apr 2021 10:46:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8EBA66145A
-	for <kvmarm@archiver.kernel.org>; Fri, 23 Apr 2021 09:14:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EBA66145A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 988EC61452
+	for <kvmarm@archiver.kernel.org>; Fri, 23 Apr 2021 10:45:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 988EC61452
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EB2614B2B5;
-	Fri, 23 Apr 2021 05:14:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E841D4B3B1;
+	Fri, 23 Apr 2021 06:45:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id bwFKkNIRm2fx; Fri, 23 Apr 2021 05:14:28 -0400 (EDT)
+	with ESMTP id R9OkySk5AhXB; Fri, 23 Apr 2021 06:45:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7BD6A4B35A;
-	Fri, 23 Apr 2021 05:14:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DC06F4B380;
+	Fri, 23 Apr 2021 06:45:54 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B7F8D4B369
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Apr 2021 04:11:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 653E84B380
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Apr 2021 06:45:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HoJ43O1MUUjM for <kvmarm@lists.cs.columbia.edu>;
- Fri, 23 Apr 2021 04:11:26 -0400 (EDT)
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2C7254B366
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Apr 2021 04:11:26 -0400 (EDT)
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.60])
- by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4FRRlQ6dgTzlZ9n;
- Fri, 23 Apr 2021 16:09:22 +0800 (CST)
-Received: from [10.174.177.244] (10.174.177.244) by
- DGGEMS406-HUB.china.huawei.com (10.3.19.206) with Microsoft SMTP Server id
- 14.3.498.0; Fri, 23 Apr 2021 16:11:17 +0800
-Subject: Re: [PATCH v2 0/4] arm64: drop pfn_valid_within() and simplify
- pfn_valid()
-From: Kefeng Wang <wangkefeng.wang@huawei.com>
-To: Mike Rapoport <rppt@kernel.org>
-References: <20210421065108.1987-1-rppt@kernel.org>
- <9aa68d26-d736-3b75-4828-f148964eb7f0@huawei.com>
- <YIEl8aKr8Ly0Zd3O@kernel.org>
- <33fa74c2-f32d-f224-eb30-acdb717179ff@huawei.com>
-Message-ID: <2a1592ad-bc9d-4664-fd19-f7448a37edc0@huawei.com>
-Date: Fri, 23 Apr 2021 16:11:16 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ with ESMTP id cCkpoqIgoo7c for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 23 Apr 2021 06:45:52 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 730084B2DB
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Apr 2021 06:45:52 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1619174752;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=6QtPk8mqfGCCjiJxQkyFECGv6tkF4PR5uLMRyrjcM1s=;
+ b=FndYtML8xDtwLe7TVqdYXPkyvxq4KJqAmFeMSRWncNfM6u+v6H6t7d7JdpuYhBtq5fc9F0
+ fmKlZu0rWe0Y9wYNEuMMCnzp5Sur5LJlikDHJGE+Z1xxk6NM26p36I5OYulyWD9Z2O9kWO
+ ebkfu6HEmv9Nbf0zoSaXGpThGHvAxR8=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-370-Af74E_xtOqqvMdnWBBAf0w-1; Fri, 23 Apr 2021 06:45:50 -0400
+X-MC-Unique: Af74E_xtOqqvMdnWBBAf0w-1
+Received: by mail-wm1-f71.google.com with SMTP id
+ g21-20020a1c4e150000b0290125a227e5bbso6877534wmh.0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Apr 2021 03:45:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=6QtPk8mqfGCCjiJxQkyFECGv6tkF4PR5uLMRyrjcM1s=;
+ b=QU0UePzMVZMa7dvd6QEM8LP6gBgZO75eHTuBox3HwC3nAN9E/2Oe6AIFCEyQJYRp9E
+ d4VtpMwPAjHH7uUDfBbWoScM9IxQ2sHT8/CwI8F5P1+dNUkyIx83NUhnY6KGLK/bEC6r
+ eKzSjqGQoaFx2Xh3IyV6ovRHKOI+OqkgPOvVA+/HFfAkjUecyQpYbnB7kwWCrjpkRZwP
+ akKkTATPNbPnd1/NQlvywoltIhWtDWmats7+8C9Rpk7gEusHTGYyooe6pxwcRqLEZftt
+ RxlYIouY4yZsD5OtQb2L7DfppYJSQMvtDBUQAEMLwrWZ48IX689LGWvilnqg2Aby6Gd3
+ GXPg==
+X-Gm-Message-State: AOAM531qoKzIr1ct6EbuKNRe528nFR+cJLvSCmsi0S56O8J1bmOURHDK
+ LZITpXBxoSGvxBEcouvs/1iD1dMwuI4Tw4Giongffp5ONGHB29CG0tVLED98urnKSqV66656+IA
+ 2P0sjn7njhMPaKfuusFkYFS/J
+X-Received: by 2002:adf:d1cd:: with SMTP id b13mr3909870wrd.126.1619174749100; 
+ Fri, 23 Apr 2021 03:45:49 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyiTCIXkknwotYShXVUIfCR1XjC5N9LEkvoMraN8zKz1jILoa5ubv9ZrlbWmnmcXme3CJv+uQ==
+X-Received: by 2002:adf:d1cd:: with SMTP id b13mr3909838wrd.126.1619174748828; 
+ Fri, 23 Apr 2021 03:45:48 -0700 (PDT)
+Received: from gator (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
+ by smtp.gmail.com with ESMTPSA id 66sm12106746wmb.36.2021.04.23.03.45.47
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 23 Apr 2021 03:45:47 -0700 (PDT)
+Date: Fri, 23 Apr 2021 12:45:45 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Ricardo Koller <ricarkol@google.com>
+Subject: Re: [PATCH 3/3] KVM: selftests: Use a ucall for x86 unhandled vector
+ reporting
+Message-ID: <20210423104545.dthezamjvogcpwbt@gator>
+References: <20210423040351.1132218-1-ricarkol@google.com>
+ <20210423040351.1132218-4-ricarkol@google.com>
 MIME-Version: 1.0
-In-Reply-To: <33fa74c2-f32d-f224-eb30-acdb717179ff@huawei.com>
-Content-Language: en-US
-X-Originating-IP: [10.174.177.244]
-X-CFilter-Loop: Reflected
-X-Mailman-Approved-At: Fri, 23 Apr 2021 05:14:27 -0400
-Cc: David Hildenbrand <david@redhat.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Anshuman Khandual <anshuman.khandual@arm.com>, linux-kernel@vger.kernel.org,
- Mike Rapoport <rppt@linux.ibm.com>, linux-mm@kvack.org,
- kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
- Andrew Morton <akpm@linux-foundation.org>, Will
- Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20210423040351.1132218-4-ricarkol@google.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Disposition: inline
+Cc: kvm@vger.kernel.org, maz@kernel.org, pbonzini@redhat.com,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -78,78 +106,96 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Ck9uIDIwMjEvNC8yMiAyMzoyOCwgS2VmZW5nIFdhbmcgd3JvdGU6Cj4KPiBPbiAyMDIxLzQvMjIg
-MTU6MjksIE1pa2UgUmFwb3BvcnQgd3JvdGU6Cj4+IE9uIFRodSwgQXByIDIyLCAyMDIxIGF0IDAz
-OjAwOjIwUE0gKzA4MDAsIEtlZmVuZyBXYW5nIHdyb3RlOgo+Pj4gT24gMjAyMS80LzIxIDE0OjUx
-LCBNaWtlIFJhcG9wb3J0IHdyb3RlOgo+Pj4+IEZyb206IE1pa2UgUmFwb3BvcnQgPHJwcHRAbGlu
-dXguaWJtLmNvbT4KPj4+Pgo+Pj4+IEhpLAo+Pj4+Cj4+Pj4gVGhlc2UgcGF0Y2hlcyBhaW0gdG8g
-cmVtb3ZlIENPTkZJR19IT0xFU19JTl9aT05FIGFuZCBlc3NlbnRpYWxseSAKPj4+PiBoYXJkd2ly
-ZQo+Pj4+IHBmbl92YWxpZF93aXRoaW4oKSB0byAxLgo+Pj4+Cj4+Pj4gVGhlIGlkZWEgaXMgdG8g
-bWFyayBOT01BUCBwYWdlcyBhcyByZXNlcnZlZCBpbiB0aGUgbWVtb3J5IG1hcCBhbmQgCj4+Pj4g
-cmVzdG9yZQo+Pj4+IHRoZSBpbnRlbmRlZCBzZW1hbnRpY3Mgb2YgcGZuX3ZhbGlkKCkgdG8gZGVz
-aWduYXRlIGF2YWlsYWJpbGl0eSBvZiAKPj4+PiBzdHJ1Y3QKPj4+PiBwYWdlIGZvciBhIHBmbi4K
-Pj4+Pgo+Pj4+IFdpdGggdGhpcyB0aGUgY29yZSBtbSB3aWxsIGJlIGFibGUgdG8gY29wZSB3aXRo
-IHRoZSBmYWN0IHRoYXQgaXQgCj4+Pj4gY2Fubm90IHVzZQo+Pj4+IE5PTUFQIHBhZ2VzIGFuZCB0
-aGUgaG9sZXMgY3JlYXRlZCBieSBOT01BUCByYW5nZXMgd2l0aGluIE1BWF9PUkRFUiAKPj4+PiBi
-bG9ja3MKPj4+PiB3aWxsIGJlIHRyZWF0ZWQgY29ycmVjdGx5IGV2ZW4gd2l0aG91dCB0aGUgbmVl
-ZCBmb3IgcGZuX3ZhbGlkX3dpdGhpbi4KPj4+Pgo+Pj4+IFRoZSBwYXRjaGVzIGFyZSBvbmx5IGJv
-b3QgdGVzdGVkIG9uIHFlbXUtc3lzdGVtLWFhcmNoNjQgc28gSSdkIHJlYWxseQo+Pj4+IGFwcHJl
-Y2lhdGUgbWVtb3J5IHN0cmVzcyB0ZXN0cyBvbiByZWFsIGhhcmR3YXJlLgo+Pj4+Cj4+Pj4gSWYg
-dGhpcyBhY3R1YWxseSB3b3JrcyB3ZSdsbCBiZSBvbmUgc3RlcCBjbG9zZXIgdG8gZHJvcCBjdXN0
-b20gCj4+Pj4gcGZuX3ZhbGlkKCkKPj4+PiBvbiBhcm02NCBhbHRvZ2V0aGVyLgouLi4KPgo+IE9r
-LCB0aGFua3MsIHdlIG1ldCBhIHNhbWUgcGFuaWMgbGlrZSB0aGUgbGluayBvbiBhcm0zMih3aXRo
-b3V0IAo+IEhPTEVTX0lOX1pPTkUpLAo+Cj4gdGhlIHNjaGVtZSBmb3IgYXJtNjQgY291bGQgYmUg
-c3VpdCBmb3IgYXJtMzIsIHJpZ2h0P8KgIEkgd2lsbCB0cnkgdGhlIAo+IHBhdGNoc2V0IHdpdGgK
-Pgo+IHNvbWUgY2hhbmdlcyBvbiBhcm0zMiBhbmQgZ2l2ZSBzb21lIGZlZWRiYWNrLgoKSSB0ZXN0
-ZWQgdGhpcyBwYXRjaHNldChwbHVzIGFybTMyIGNoYW5nZSwgbGlrZSBhcm02NCBkb2VzKSBiYXNl
-ZCBvbiBsdHMgCjUuMTDvvIxhZGQKCnNvbWUgZGVidWcgbG9nLCB0aGUgdXNlZnVsIGluZm8gc2hv
-d3MgYmVsb3csIGlmIHdlIGVuYWJsZSBIT0xFU19JTl9aT05FLCAKbm8gcGFuaWMsCgphbnkgaWRl
-YSwgdGhhbmtzLgoKWm9uZSByYW5nZXM6CiDCoCBOb3JtYWzCoMKgIFttZW0gMHgwMDAwMDAwMDgw
-YTAwMDAwLTB4MDAwMDAwMDBiMDFmZmZmZl0KIMKgIEhpZ2hNZW3CoCBbbWVtIDB4MDAwMDAwMDBi
-MDIwMDAwMC0weDAwMDAwMDAwZmZmZmVmZmZdCk1vdmFibGUgem9uZSBzdGFydCBmb3IgZWFjaCBu
-b2RlCkVhcmx5IG1lbW9yeSBub2RlIHJhbmdlcwogwqAgbm9kZcKgwqAgMDogW21lbSAweDAwMDAw
-MDAwODBhMDAwMDAtMHgwMDAwMDAwMDg1NWZmZmZmXQogwqAgbm9kZcKgwqAgMDogW21lbSAweDAw
-MDAwMDAwODZhMDAwMDAtMHgwMDAwMDAwMDg3ZGZmZmZmXQogwqAgbm9kZcKgwqAgMDogW21lbSAw
-eDAwMDAwMDAwOGJkMDAwMDAtMHgwMDAwMDAwMDhjNGZmZmZmXQogwqAgbm9kZcKgwqAgMDogW21l
-bSAweDAwMDAwMDAwOGUzMDAwMDAtMHgwMDAwMDAwMDhlY2ZmZmZmXQogwqAgbm9kZcKgwqAgMDog
-W21lbSAweDAwMDAwMDAwOTBkMDAwMDAtMHgwMDAwMDAwMGJmZmZmZmZmXQogwqAgbm9kZcKgwqAg
-MDogW21lbSAweDAwMDAwMDAwY2MwMDAwMDAtMHgwMDAwMDAwMGRjOWZmZmZmXQogwqAgbm9kZcKg
-wqAgMDogW21lbSAweDAwMDAwMDAwZGU3MDAwMDAtMHgwMDAwMDAwMGRlOWZmZmZmXQogwqAgbm9k
-ZcKgwqAgMDogW21lbSAweDAwMDAwMDAwZTA4MDAwMDAtMHgwMDAwMDAwMGUwYmZmZmZmXQogwqAg
-bm9kZcKgwqAgMDogW21lbSAweDAwMDAwMDAwZjRiMDAwMDAtMHgwMDAwMDAwMGY2ZmZmZmZmXQog
-wqAgbm9kZcKgwqAgMDogW21lbSAweDAwMDAwMDAwZmRhMDAwMDAtMHgwMDAwMDAwMGZmZmZlZmZm
-XQoKLS0tLT4gZnJlZV9tZW1tYXAsIHN0YXJ0X3BmbiA9IDg1ODAwLMKgIDg1ODAwMDAwIGVuZF9w
-Zm4gPSA4NmEwMCwgODZhMDAwMDAKLS0tLT4gZnJlZV9tZW1tYXAsIHN0YXJ0X3BmbiA9IDhjODAw
-LMKgIDhjODAwMDAwIGVuZF9wZm4gPSA4ZTMwMCwgOGUzMDAwMDAKLS0tLT4gZnJlZV9tZW1tYXAs
-IHN0YXJ0X3BmbiA9IDhmMDAwLMKgIDhmMDAwMDAwIGVuZF9wZm4gPSA5MDAwMCwgOTAwMDAwMDAK
-LS0tLT4gZnJlZV9tZW1tYXAsIHN0YXJ0X3BmbiA9IGRjYzAwLMKgIGRjYzAwMDAwIGVuZF9wZm4g
-PSBkZTcwMCwgZGU3MDAwMDAKLS0tLT4gZnJlZV9tZW1tYXAsIHN0YXJ0X3BmbiA9IGRlYzAwLMKg
-IGRlYzAwMDAwIGVuZF9wZm4gPSBlMDAwMCwgZTAwMDAwMDAKLS0tLT4gZnJlZV9tZW1tYXAsIHN0
-YXJ0X3BmbiA9IGUwYzAwLMKgIGUwYzAwMDAwIGVuZF9wZm4gPSBlNDAwMCwgZTQwMDAwMDAKLS0t
-LT4gZnJlZV9tZW1tYXAsIHN0YXJ0X3BmbiA9IGY3MDAwLMKgIGY3MDAwMDAwIGVuZF9wZm4gPSBm
-ODAwMCwgZjgwMDAwMDAKPT09ID5tb3ZlX2ZyZWVwYWdlczogc3RhcnRfcGZuL2VuZF9wZm4gW2Rl
-NjAwLCBkZTdmZl0sIFtkZTYwMDAwMCwgCmRlN2ZmMDAwXSA6wqAgcGZuID1kZTYwMCBwZm4ycGh5
-ID0gZGU2MDAwMDAgLCBwYWdlID0gZWYzY2MwMDAsIHBhZ2UtZmxhZ3MgCj0gZmZmZmZmZmYKODwt
-LS0gY3V0IGhlcmUgLS0tClVuYWJsZSB0byBoYW5kbGUga2VybmVsIHBhZ2luZyByZXF1ZXN0IGF0
-IHZpcnR1YWwgYWRkcmVzcyBmZmZmZmZmZQpwZ2QgPSA1ZGQ1MGRmNQpbZmZmZmZmZmVdICpwZ2Q9
-YWZmZmY4NjEsICpwdGU9MDAwMDAwMDAsICpwcHRlPTAwMDAwMDAwCkludGVybmFsIGVycm9yOiBP
-b3BzOiAzNyBbIzFdIFNNUCBBUk0KTW9kdWxlcyBsaW5rZWQgaW46IGdtYWMoTykKQ1BVOiAyIFBJ
-RDogNjM1IENvbW06IHRlc3Qtb29tIFRhaW50ZWQ6IEfCoMKgwqDCoMKgwqDCoMKgwqDCoCBPwqDC
-oMKgwqDCoCA1LjEwLjArICMzMQpIYXJkd2FyZSBuYW1lOiBIaXNpbGljb24gQTkKUEMgaXMgYXQg
-bW92ZV9mcmVlcGFnZXNfYmxvY2srMHgxNTAvMHgyNzgKTFIgaXMgYXQgbW92ZV9mcmVlcGFnZXNf
-YmxvY2srMHgxNTAvMHgyNzgKcGMgOiBbPGMwMjM4M2E0Pl3CoMKgwqAgbHIgOiBbPGMwMjM4M2E0
-Pl3CoMKgwqAgcHNyOiAyMDBlMDM5MwpzcCA6IGM0MTc5Y2Y4wqAgaXAgOiAwMDAwMDAwMMKgIGZw
-IDogMDAwMDAwMDEKcjEwOiBjNDE3OWQ1OMKgIHI5IDogMDAwZGU3ZmbCoCByOCA6IDAwMDAwMDAw
-CnI3IDogYzA4NjMyODDCoCByNiA6IDAwMGRlNjAwwqAgcjUgOiAwMDBkZTYwMMKgIHI0IDogZWYz
-Y2MwMDAKcjMgOiBmZmZmZmZmZsKgIHIyIDogMDAwMDAwMDDCoCByMSA6IGVmNWQwNjljwqAgcjAg
-OiBmZmZmZmZmZQpGbGFnczogbnpDdsKgIElSUXMgb2ZmwqAgRklRcyBvbsKgIE1vZGUgU1ZDXzMy
-wqAgSVNBIEFSTcKgIFNlZ21lbnQgdXNlcgpDb250cm9sOiAxYWM1Mzg3ZMKgIFRhYmxlOiA4M2Iw
-YzA0YcKgIERBQzogNTU1NTU1NTUKUHJvY2VzcyB0ZXN0LW9vbSAocGlkOiA2MzUsIHN0YWNrIGxp
-bWl0ID0gMHgyNWQ2NjdkZikKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVk
-dQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+
+Hi Ricardo,
+
+It may be nicer to introduce UCALL_UNHANDLED with this patch and have it
+come fist in the series.
+
+Thanks,
+drew
+
+
+On Thu, Apr 22, 2021 at 09:03:51PM -0700, Ricardo Koller wrote:
+> x86 reports unhandled vectors using port IO at a specific port number,
+> which is replicating what ucall already does for x86.  Aarch64, on the
+> other hand, reports unhandled vector exceptions with a ucall using a
+> recently added UCALL_UNHANDLED ucall type.
+> 
+> Replace the x86 unhandled vector exception handling to use ucall
+> UCALL_UNHANDLED instead of port IO.
+> 
+> Tested: Forcing a page fault in the ./x86_64/xapic_ipi_test
+> 	halter_guest_code() shows this:
+> 
+> 	$ ./x86_64/xapic_ipi_test
+> 	...
+> 	  Unexpected vectored event in guest (vector:0xe)
+> 
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> ---
+>  .../selftests/kvm/include/x86_64/processor.h      |  2 --
+>  .../testing/selftests/kvm/lib/x86_64/processor.c  | 15 ++++++---------
+>  2 files changed, 6 insertions(+), 11 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> index 0b30b4e15c38..379f12cbdc06 100644
+> --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
+> +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> @@ -53,8 +53,6 @@
+>  #define CPUID_PKU		(1ul << 3)
+>  #define CPUID_LA57		(1ul << 16)
+>  
+> -#define UNEXPECTED_VECTOR_PORT 0xfff0u
+> -
+>  /* General Registers in 64-Bit Mode */
+>  struct gpr64_regs {
+>  	u64 rax;
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> index a8906e60a108..284d26a25cd3 100644
+> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> @@ -1207,7 +1207,7 @@ static void set_idt_entry(struct kvm_vm *vm, int vector, unsigned long addr,
+>  
+>  void kvm_exit_unexpected_vector(uint32_t value)
+>  {
+> -	outl(UNEXPECTED_VECTOR_PORT, value);
+> +	ucall(UCALL_UNHANDLED, 1, value);
+>  }
+>  
+>  void route_exception(struct ex_regs *regs)
+> @@ -1260,16 +1260,13 @@ void vm_handle_exception(struct kvm_vm *vm, int vector,
+>  
+>  void assert_on_unhandled_exception(struct kvm_vm *vm, uint32_t vcpuid)
+>  {
+> -	if (vcpu_state(vm, vcpuid)->exit_reason == KVM_EXIT_IO
+> -		&& vcpu_state(vm, vcpuid)->io.port == UNEXPECTED_VECTOR_PORT
+> -		&& vcpu_state(vm, vcpuid)->io.size == 4) {
+> -		/* Grab pointer to io data */
+> -		uint32_t *data = (void *)vcpu_state(vm, vcpuid)
+> -			+ vcpu_state(vm, vcpuid)->io.data_offset;
+> +	struct ucall uc;
+>  
+> +	if (get_ucall(vm, vcpuid, &uc) == UCALL_UNHANDLED) {
+> +		uint64_t vector = uc.args[0];
+>  		TEST_ASSERT(false,
+> -			    "Unexpected vectored event in guest (vector:0x%x)",
+> -			    *data);
+> +			    "Unexpected vectored event in guest (vector:0x%lx)",
+> +			    vector);
+>  	}
+>  }
+>  
+> -- 
+> 2.31.1.498.g6c1eba8ee3d-goog
+> 
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
