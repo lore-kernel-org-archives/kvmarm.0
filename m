@@ -2,99 +2,99 @@ Return-Path: <SRS0=8Q7i=JU=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64007C433ED
-	for <kvmarm@archiver.kernel.org>; Fri, 23 Apr 2021 10:46:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAFD6C433B4
+	for <kvmarm@archiver.kernel.org>; Fri, 23 Apr 2021 11:05:40 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 988EC61452
-	for <kvmarm@archiver.kernel.org>; Fri, 23 Apr 2021 10:45:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 988EC61452
+	by mail.kernel.org (Postfix) with ESMTP id D75656146B
+	for <kvmarm@archiver.kernel.org>; Fri, 23 Apr 2021 11:05:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D75656146B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E841D4B3B1;
-	Fri, 23 Apr 2021 06:45:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3844C4B4F6;
+	Fri, 23 Apr 2021 07:05:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id R9OkySk5AhXB; Fri, 23 Apr 2021 06:45:54 -0400 (EDT)
+	with ESMTP id P+Gi4vCFaNCY; Fri, 23 Apr 2021 07:05:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DC06F4B380;
-	Fri, 23 Apr 2021 06:45:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E65E4B380;
+	Fri, 23 Apr 2021 07:05:38 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 653E84B380
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Apr 2021 06:45:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 73E4E4B380
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Apr 2021 07:05:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cCkpoqIgoo7c for <kvmarm@lists.cs.columbia.edu>;
- Fri, 23 Apr 2021 06:45:52 -0400 (EDT)
+ with ESMTP id mjvVxi7KT0Sc for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 23 Apr 2021 07:05:35 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 730084B2DB
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Apr 2021 06:45:52 -0400 (EDT)
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 793104B30D
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Apr 2021 07:05:35 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1619174752;
+ s=mimecast20190719; t=1619175935;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=6QtPk8mqfGCCjiJxQkyFECGv6tkF4PR5uLMRyrjcM1s=;
- b=FndYtML8xDtwLe7TVqdYXPkyvxq4KJqAmFeMSRWncNfM6u+v6H6t7d7JdpuYhBtq5fc9F0
- fmKlZu0rWe0Y9wYNEuMMCnzp5Sur5LJlikDHJGE+Z1xxk6NM26p36I5OYulyWD9Z2O9kWO
- ebkfu6HEmv9Nbf0zoSaXGpThGHvAxR8=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-370-Af74E_xtOqqvMdnWBBAf0w-1; Fri, 23 Apr 2021 06:45:50 -0400
-X-MC-Unique: Af74E_xtOqqvMdnWBBAf0w-1
-Received: by mail-wm1-f71.google.com with SMTP id
- g21-20020a1c4e150000b0290125a227e5bbso6877534wmh.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Apr 2021 03:45:50 -0700 (PDT)
+ bh=6XHVicoTLSbHdWA8XFB+/kkN/O1wDN0Ij2er34FmuFw=;
+ b=cuJdS2HvxhGX18baCGAOBtBUk5+UEt5wNpjaGe0GYGJi8ysPQSVbKJEb0pKMNHM3qEZTNH
+ gIWBTBpE1Rg+ayaIJYBaiFsnyRH8MyedOCOR3B7xrQKeiLGYc+4Iisssxm00x/UMDIL0IN
+ HDbsMXn+nyW+sk2lslsDRLyxI6x89G0=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-573-FtAO3zCMPemDdl5ZwLRz_Q-1; Fri, 23 Apr 2021 07:05:33 -0400
+X-MC-Unique: FtAO3zCMPemDdl5ZwLRz_Q-1
+Received: by mail-wm1-f70.google.com with SMTP id
+ y82-20020a1ce1550000b02901262158f1e9so521078wmg.8
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Apr 2021 04:05:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=6QtPk8mqfGCCjiJxQkyFECGv6tkF4PR5uLMRyrjcM1s=;
- b=QU0UePzMVZMa7dvd6QEM8LP6gBgZO75eHTuBox3HwC3nAN9E/2Oe6AIFCEyQJYRp9E
- d4VtpMwPAjHH7uUDfBbWoScM9IxQ2sHT8/CwI8F5P1+dNUkyIx83NUhnY6KGLK/bEC6r
- eKzSjqGQoaFx2Xh3IyV6ovRHKOI+OqkgPOvVA+/HFfAkjUecyQpYbnB7kwWCrjpkRZwP
- akKkTATPNbPnd1/NQlvywoltIhWtDWmats7+8C9Rpk7gEusHTGYyooe6pxwcRqLEZftt
- RxlYIouY4yZsD5OtQb2L7DfppYJSQMvtDBUQAEMLwrWZ48IX689LGWvilnqg2Aby6Gd3
- GXPg==
-X-Gm-Message-State: AOAM531qoKzIr1ct6EbuKNRe528nFR+cJLvSCmsi0S56O8J1bmOURHDK
- LZITpXBxoSGvxBEcouvs/1iD1dMwuI4Tw4Giongffp5ONGHB29CG0tVLED98urnKSqV66656+IA
- 2P0sjn7njhMPaKfuusFkYFS/J
-X-Received: by 2002:adf:d1cd:: with SMTP id b13mr3909870wrd.126.1619174749100; 
- Fri, 23 Apr 2021 03:45:49 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyiTCIXkknwotYShXVUIfCR1XjC5N9LEkvoMraN8zKz1jILoa5ubv9ZrlbWmnmcXme3CJv+uQ==
-X-Received: by 2002:adf:d1cd:: with SMTP id b13mr3909838wrd.126.1619174748828; 
- Fri, 23 Apr 2021 03:45:48 -0700 (PDT)
+ bh=6XHVicoTLSbHdWA8XFB+/kkN/O1wDN0Ij2er34FmuFw=;
+ b=f4hE2kL9ZC+VgzE8zj5OFWlFUKyphDeWgeld8UsDo3LyqGGL5HZ2fCAPM5ZC74CeRq
+ 0EOd4j2L7cRlPF8bo3qmWOtYnvLwVWF83dogCNc8rQmOpffsFHp2MChWqPy+HAl21Nmd
+ R8KBKmgRNYbU+KSq5zwSAbef5HIb6na0y7icKl6dN54hzN+YEfLhq6EGuSXBQ5lOqo/m
+ ZqQESm3fmpZv8cu4pVcFwnDmivcDGr39VRsHQhLYldpUWm/nF2yowArbdoN/S/rEKWy8
+ K7Qa2dBxjvdPedHrfkpDHjcmtuhVL9vIJWmWbFK9IZxHh9C85TBBlmhyswv3FlBkaLT6
+ 02NQ==
+X-Gm-Message-State: AOAM533WL9gIplmxlKy+H1Wg94i65udjdJhSfDph3Tjn1QHs6bA/AslS
+ iTWPg/lOQgPvYPrExnkoJJX/MCMX7czGx83s/vLhXXnyrQRw+jtd9bIzj+Aibf7EDDLaw696yYR
+ JnUCiAgn30sjHjyhmrVbqfq1L
+X-Received: by 2002:adf:fbc8:: with SMTP id d8mr4047384wrs.94.1619175932455;
+ Fri, 23 Apr 2021 04:05:32 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyaM5Q2HLo8IcL7t4s/2HBHOYjkBuXbza4hD224Lf6gP3ljhm2fIkz6OihGk76gpoAQzPHP4Q==
+X-Received: by 2002:adf:fbc8:: with SMTP id d8mr4047365wrs.94.1619175932257;
+ Fri, 23 Apr 2021 04:05:32 -0700 (PDT)
 Received: from gator (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
- by smtp.gmail.com with ESMTPSA id 66sm12106746wmb.36.2021.04.23.03.45.47
+ by smtp.gmail.com with ESMTPSA id y11sm8976445wro.37.2021.04.23.04.05.31
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 23 Apr 2021 03:45:47 -0700 (PDT)
-Date: Fri, 23 Apr 2021 12:45:45 +0200
+ Fri, 23 Apr 2021 04:05:31 -0700 (PDT)
+Date: Fri, 23 Apr 2021 13:05:29 +0200
 From: Andrew Jones <drjones@redhat.com>
-To: Ricardo Koller <ricarkol@google.com>
-Subject: Re: [PATCH 3/3] KVM: selftests: Use a ucall for x86 unhandled vector
- reporting
-Message-ID: <20210423104545.dthezamjvogcpwbt@gator>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH 1/3] KVM: selftests: Add exception handling support for
+ aarch64
+Message-ID: <20210423110529.vivemdwnznhblhyf@gator>
 References: <20210423040351.1132218-1-ricarkol@google.com>
- <20210423040351.1132218-4-ricarkol@google.com>
+ <20210423040351.1132218-2-ricarkol@google.com>
+ <87sg3hnzrj.wl-maz@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20210423040351.1132218-4-ricarkol@google.com>
+In-Reply-To: <87sg3hnzrj.wl-maz@kernel.org>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Disposition: inline
-Cc: kvm@vger.kernel.org, maz@kernel.org, pbonzini@redhat.com,
- kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -111,89 +111,94 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+On Fri, Apr 23, 2021 at 09:58:24AM +0100, Marc Zyngier wrote:
+> Hi Ricardo,
+> 
+> Thanks for starting this.
 
-Hi Ricardo,
+Indeed! Thank you for contributing to AArch64 kvm selftests!
 
-It may be nicer to introduce UCALL_UNHANDLED with this patch and have it
-come fist in the series.
+> > +void vm_handle_exception(struct kvm_vm *vm, int vector, int ec,
+> > +			void (*handler)(struct ex_regs *));
+> > +
+> > +#define SPSR_D          (1 << 9)
+> > +#define SPSR_SS         (1 << 21)
+> > +
+> > +#define write_sysreg(reg, val)						  \
+> > +({									  \
+> > +	asm volatile("msr "__stringify(reg)", %0" : : "r"(val));	  \
+> > +})
+
+Linux does fancy stuff with the Z constraint to allow xzr. We might as
+well copy that.
+
+> > diff --git a/tools/testing/selftests/kvm/lib/aarch64/handlers.S b/tools/testing/selftests/kvm/lib/aarch64/handlers.S
+> > new file mode 100644
+> > index 000000000000..c920679b87c0
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/kvm/lib/aarch64/handlers.S
+> > @@ -0,0 +1,104 @@
+> > +/* SPDX-License-Identifier: GPL-2.0 */
+> > +.macro save_registers, el
+> > +	stp	x28, x29, [sp, #-16]!
+> > +	stp	x26, x27, [sp, #-16]!
+> > +	stp	x24, x25, [sp, #-16]!
+> > +	stp	x22, x23, [sp, #-16]!
+> > +	stp	x20, x21, [sp, #-16]!
+> > +	stp	x18, x19, [sp, #-16]!
+> > +	stp	x16, x17, [sp, #-16]!
+> > +	stp	x14, x15, [sp, #-16]!
+> > +	stp	x12, x13, [sp, #-16]!
+> > +	stp	x10, x11, [sp, #-16]!
+> > +	stp	x8, x9, [sp, #-16]!
+> > +	stp	x6, x7, [sp, #-16]!
+> > +	stp	x4, x5, [sp, #-16]!
+> > +	stp	x2, x3, [sp, #-16]!
+> > +	stp	x0, x1, [sp, #-16]!
+> > +
+> > +	.if \el == 0
+> > +	mrs	x1, sp_el0
+> > +	.else
+> > +	mov	x1, sp
+> > +	.endif
+> 
+> It there any point in saving SP_EL1, given that you already have
+> altered it significantly and will not be restoring it? I don't care
+> much, and maybe it is useful as debug information, but a comment would
+> certainly make the intent clearer.
+
+kvm-unit-tests takes some pains to save the original sp. We may be able to
+take some inspiration from there for this save and restore.
+
+> > +void kvm_exit_unexpected_vector(int vector, uint64_t ec)
+> > +{
+> > +	ucall(UCALL_UNHANDLED, 2, vector, ec);
+> > +}
+> > +
+> > +#define HANDLERS_IDX(_vector, _ec)	((_vector * ESR_EC_NUM) + _ec)
+> 
+> This is definitely odd. Not all the ECs are valid for all vector entry
+> points. Actually, ECs only make sense for synchronous exceptions, and
+> asynchronous events (IRQ, FIQ, SError) cannot populate ESR_ELx.
+
+For this, kvm-unit-tests provides a separate API for interrupt handler
+installation, which ensures ec is not used. Also, kvm-unit-tests uses
+a 2-D array [vector][ec] for the synchronous exceptions. I think we
+should be able to use a 2-D array here too, instead of the IDX macro.
+
+> > +void vm_handle_exception(struct kvm_vm *vm, int vector, int ec,
+> > +			 void (*handler)(struct ex_regs *))
+> 
+> The name seems to be slightly ill defined. To me "handle exception" is
+> the action of handling the exception. Here, you are merely installing
+> an exception handler.
+>
+
+I agree. Please rename this for all of kvm selftests to something with
+'install' in the name with the first patch of this series.
 
 Thanks,
 drew
-
-
-On Thu, Apr 22, 2021 at 09:03:51PM -0700, Ricardo Koller wrote:
-> x86 reports unhandled vectors using port IO at a specific port number,
-> which is replicating what ucall already does for x86.  Aarch64, on the
-> other hand, reports unhandled vector exceptions with a ucall using a
-> recently added UCALL_UNHANDLED ucall type.
-> 
-> Replace the x86 unhandled vector exception handling to use ucall
-> UCALL_UNHANDLED instead of port IO.
-> 
-> Tested: Forcing a page fault in the ./x86_64/xapic_ipi_test
-> 	halter_guest_code() shows this:
-> 
-> 	$ ./x86_64/xapic_ipi_test
-> 	...
-> 	  Unexpected vectored event in guest (vector:0xe)
-> 
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> ---
->  .../selftests/kvm/include/x86_64/processor.h      |  2 --
->  .../testing/selftests/kvm/lib/x86_64/processor.c  | 15 ++++++---------
->  2 files changed, 6 insertions(+), 11 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-> index 0b30b4e15c38..379f12cbdc06 100644
-> --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-> +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-> @@ -53,8 +53,6 @@
->  #define CPUID_PKU		(1ul << 3)
->  #define CPUID_LA57		(1ul << 16)
->  
-> -#define UNEXPECTED_VECTOR_PORT 0xfff0u
-> -
->  /* General Registers in 64-Bit Mode */
->  struct gpr64_regs {
->  	u64 rax;
-> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> index a8906e60a108..284d26a25cd3 100644
-> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> @@ -1207,7 +1207,7 @@ static void set_idt_entry(struct kvm_vm *vm, int vector, unsigned long addr,
->  
->  void kvm_exit_unexpected_vector(uint32_t value)
->  {
-> -	outl(UNEXPECTED_VECTOR_PORT, value);
-> +	ucall(UCALL_UNHANDLED, 1, value);
->  }
->  
->  void route_exception(struct ex_regs *regs)
-> @@ -1260,16 +1260,13 @@ void vm_handle_exception(struct kvm_vm *vm, int vector,
->  
->  void assert_on_unhandled_exception(struct kvm_vm *vm, uint32_t vcpuid)
->  {
-> -	if (vcpu_state(vm, vcpuid)->exit_reason == KVM_EXIT_IO
-> -		&& vcpu_state(vm, vcpuid)->io.port == UNEXPECTED_VECTOR_PORT
-> -		&& vcpu_state(vm, vcpuid)->io.size == 4) {
-> -		/* Grab pointer to io data */
-> -		uint32_t *data = (void *)vcpu_state(vm, vcpuid)
-> -			+ vcpu_state(vm, vcpuid)->io.data_offset;
-> +	struct ucall uc;
->  
-> +	if (get_ucall(vm, vcpuid, &uc) == UCALL_UNHANDLED) {
-> +		uint64_t vector = uc.args[0];
->  		TEST_ASSERT(false,
-> -			    "Unexpected vectored event in guest (vector:0x%x)",
-> -			    *data);
-> +			    "Unexpected vectored event in guest (vector:0x%lx)",
-> +			    vector);
->  	}
->  }
->  
-> -- 
-> 2.31.1.498.g6c1eba8ee3d-goog
-> 
 
 _______________________________________________
 kvmarm mailing list
