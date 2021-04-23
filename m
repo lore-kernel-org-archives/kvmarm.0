@@ -7,65 +7,63 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8824EC433ED
-	for <kvmarm@archiver.kernel.org>; Fri, 23 Apr 2021 01:06:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFD0DC433B4
+	for <kvmarm@archiver.kernel.org>; Fri, 23 Apr 2021 01:36:21 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B760E61437
-	for <kvmarm@archiver.kernel.org>; Fri, 23 Apr 2021 01:06:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B760E61437
+	by mail.kernel.org (Postfix) with ESMTP id 0FC3B6144A
+	for <kvmarm@archiver.kernel.org>; Fri, 23 Apr 2021 01:36:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FC3B6144A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BBB34B434;
-	Thu, 22 Apr 2021 21:06:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 77C894B433;
+	Thu, 22 Apr 2021 21:36:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id fuzZ+PRITYJj; Thu, 22 Apr 2021 21:06:38 -0400 (EDT)
+	with ESMTP id oPmWI94kIGgh; Thu, 22 Apr 2021 21:36:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EFCF94B38F;
-	Thu, 22 Apr 2021 21:06:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 937984B436;
+	Thu, 22 Apr 2021 21:36:18 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C79304B36F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Apr 2021 21:06:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B157F4B433
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Apr 2021 21:36:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5uOfBD++GLZf for <kvmarm@lists.cs.columbia.edu>;
- Thu, 22 Apr 2021 21:06:35 -0400 (EDT)
+ with ESMTP id oBRWmm3ea7zz for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 22 Apr 2021 21:36:15 -0400 (EDT)
 Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 321AD4B36B
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Apr 2021 21:06:35 -0400 (EDT)
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.60])
- by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4FRGKF14mpzlZ7r;
- Fri, 23 Apr 2021 09:04:33 +0800 (CST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 538064B404
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Apr 2021 21:36:14 -0400 (EDT)
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
+ by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4FRGzR4CGGzlZ8N;
+ Fri, 23 Apr 2021 09:34:11 +0800 (CST)
 Received: from [10.174.187.224] (10.174.187.224) by
- DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
- 14.3.498.0; Fri, 23 Apr 2021 09:06:21 +0800
-Subject: Re: [PATCH] KVM: arm64: Correctly handle the mmio faulting
-To: Santosh Shukla <santosh.shukla1982@gmail.com>, "Tarun Gupta (SW-GPU)"
- <targupta@nvidia.com>
-References: <1603297010-18787-1-git-send-email-sashukla@nvidia.com>
- <8b20dfc0-3b5e-c658-c47d-ebc50d20568d@huawei.com>
- <2e23aaa7-0c8d-13ba-2eae-9e6ab2adc587@redhat.com>
- <ed8a8b90-8b96-4967-01f5-cd0f536c38d2@huawei.com>
- <871rb3rgpl.wl-maz@kernel.org>
- <b97415a2-7970-a741-9690-3e4514b4aa7d@redhat.com>
- <87v98eq0dh.wl-maz@kernel.org>
- <bf782ec1-71da-5a8e-f250-20ed88677b8c@nvidia.com>
- <CACpj22xhXHMgsZHrL_2AbEzy=zzz=jXz0s6pRb0=zpJUai1ufg@mail.gmail.com>
+ DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
+ 14.3.498.0; Fri, 23 Apr 2021 09:36:05 +0800
+Subject: Re: [PATCH v4 1/2] kvm/arm64: Remove the creation time's mapping of
+ MMIO regions
+To: Gavin Shan <gshan@redhat.com>
+References: <20210415140328.24200-1-zhukeqian1@huawei.com>
+ <20210415140328.24200-2-zhukeqian1@huawei.com>
+ <ad39c796-2778-df26-b0c6-231e7626a747@redhat.com>
+ <bd4d2cfc-37b9-f20a-5a5c-ed352d1a46dc@huawei.com>
+ <f13bfc39-bee6-4562-fefc-76051bbf9735@redhat.com>
+ <9eb47a6c-3c5c-cb4a-d1de-1a3ce1b60a87@huawei.com>
+ <d185bbe1-4bb3-6a38-7a94-b0c52126e583@redhat.com>
 From: Keqian Zhu <zhukeqian1@huawei.com>
-Message-ID: <c8b479d0-0766-ecb7-49fb-d94b715b0922@huawei.com>
-Date: Fri, 23 Apr 2021 09:06:20 +0800
+Message-ID: <f521c845-610f-3efc-1713-9a01fb26f22f@huawei.com>
+Date: Fri, 23 Apr 2021 09:36:05 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
  Thunderbird/45.7.1
 MIME-Version: 1.0
-In-Reply-To: <CACpj22xhXHMgsZHrL_2AbEzy=zzz=jXz0s6pRb0=zpJUai1ufg@mail.gmail.com>
+In-Reply-To: <d185bbe1-4bb3-6a38-7a94-b0c52126e583@redhat.com>
 X-Originating-IP: [10.174.187.224]
 X-CFilter-Loop: Reflected
-Cc: cjia@nvidia.com, kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ linux-kernel@vger.kernel.org, Santosh Shukla <sashukla@nvidia.com>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -82,67 +80,75 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+Hi Gavin,
 
-
-On 2021/4/22 16:00, Santosh Shukla wrote:
-> On Thu, Apr 22, 2021 at 1:07 PM Tarun Gupta (SW-GPU)
-> <targupta@nvidia.com> wrote:
->>
->>
->>
->> On 4/22/2021 12:20 PM, Marc Zyngier wrote:
->>> External email: Use caution opening links or attachments
->>>
->>>
->>> On Thu, 22 Apr 2021 03:02:00 +0100,
->>> Gavin Shan <gshan@redhat.com> wrote:
->>>>
->>>> Hi Marc,
->>>>
->>>> On 4/21/21 9:59 PM, Marc Zyngier wrote:
->>>>> On Wed, 21 Apr 2021 07:17:44 +0100,
->>>>> Keqian Zhu <zhukeqian1@huawei.com> wrote:
->>>>>> On 2021/4/21 14:20, Gavin Shan wrote:
->>>>>>> On 4/21/21 12:59 PM, Keqian Zhu wrote:
->>>>>>>> On 2020/10/22 0:16, Santosh Shukla wrote:
->>>>>>>>> The Commit:6d674e28 introduces a notion to detect and handle the
->>>>>>>>> device mapping. The commit checks for the VM_PFNMAP flag is set
->>>>>>>>> in vma->flags and if set then marks force_pte to true such that
->>>>>>>>> if force_pte is true then ignore the THP function check
->>>>>>>>> (/transparent_hugepage_adjust()).
->>>>>>>>>
->>>>>>>>> There could be an issue with the VM_PFNMAP flag setting and checking.
->>>>>>>>> For example consider a case where the mdev vendor driver register's
->>>>>>>>> the vma_fault handler named vma_mmio_fault(), which maps the
->>>>>>>>> host MMIO region in-turn calls remap_pfn_range() and maps
->>>>>>>>> the MMIO's vma space. Where, remap_pfn_range implicitly sets
->>>>>>>>> the VM_PFNMAP flag into vma->flags.
->>>>>>>> Could you give the name of the mdev vendor driver that triggers this issue?
->>>>>>>> I failed to find one according to your description. Thanks.
->>>>>>>>
->>>>>>>
->>>>>>> I think it would be fixed in driver side to set VM_PFNMAP in
->>>>>>> its mmap() callback (call_mmap()), like vfio PCI driver does.
->>>>>>> It means it won't be delayed until page fault is issued and
->>>>>>> remap_pfn_range() is called. It's determined from the beginning
->>>>>>> that the vma associated the mdev vendor driver is serving as
->>>>>>> PFN remapping purpose. So the vma should be populated completely,
->>>>>>> including the VM_PFNMAP flag before it becomes visible to user
->>>>>>> space.
->>>>>
->>>>> Why should that be a requirement? Lazy populating of the VMA should be
->>>>> perfectly acceptable if the fault can only happen on the CPU side.
->>>>>
+On 2021/4/23 9:35, Gavin Shan wrote:
+> Hi Keqian,
 > 
-> Right.
-> Hi keqian,
-> You can refer to case
-> http://lkml.iu.edu/hypermail/linux/kernel/2010.3/00952.html
-Hi Santosh,
+> On 4/22/21 5:41 PM, Keqian Zhu wrote:
+>> On 2021/4/22 10:12, Gavin Shan wrote:
+>>> On 4/21/21 4:28 PM, Keqian Zhu wrote:
+>>>> On 2021/4/21 14:38, Gavin Shan wrote:
+>>>>> On 4/16/21 12:03 AM, Keqian Zhu wrote:
+> 
+> [...]
+> 
+>>>
+>>> Yeah, Sorry that I missed that part. Something associated with Santosh's
+>>> patch. The flag can be not existing until the page fault happened on
+>>> the vma. In this case, the check could be not working properly.
+>>>
+>>>    [PATCH] KVM: arm64: Correctly handle the mmio faulting
+>> Yeah, you are right.
+>>
+>> If that happens, we won't try to use block mapping for memslot with VM_PFNMAP.
+>> But it keeps a same logic with old code.
+>>
+>> 1. When without dirty-logging, we won't try block mapping for it, and we'll
+>> finally know that it's device, so won't try to do adjust THP (Transparent Huge Page)
+>> for it.
+>> 2. If userspace wrongly enables dirty logging for this memslot, we'll force_pte for it.
+>>
+> 
+> It's not about the patch itself and just want more discussion to get more details.
+> The patch itself looks good to me. I got two questions as below:
+> 
+> (1) The memslot fails to be added if it's backed by MMIO region and dirty logging is
+> enabled in kvm_arch_prepare_memory_region(). As Santosh reported, the corresponding
+> vma could be associated with MMIO region and VM_PFNMAP is missed. In this case,
+> kvm_arch_prepare_memory_region() isn't returning error, meaning the memslot can be
+> added successfully and block mapping isn't used, as you mentioned. The question is
+> the memslot is added, but the expected result would be failure.
+Sure. I think we could try to populate the final flag of vma in kvm_arch_prepare_memory_region().
+Maybe through GUP or any better method? It's nice if you can try to solve this. :)
 
-Yeah, thanks for that.
+> 
+> (2) If dirty logging is enabled on the MMIO memslot, everything should be fine. If
+> the dirty logging isn't enabled and VM_PFNMAP isn't set yet in user_mem_abort(),
+> block mapping won't be used and PAGE_SIZE is picked, but the failing IPA might
+> be good candidate for block mapping. It means we miss something for blocking
+> mapping?
+Right. This issue also can be solved by populating the final flag of vma in kvm_arch_prepare_memory_region().
 
-BRs,
+
+> 
+> By the way, do you have idea why dirty logging can't be enabled on MMIO memslot?
+IIUC, MMIO region is of device memory type, it's associated with device state and action.
+For normal memory type, we can write it out-of-order and repeatedly, but for device memory
+type, we can't do that. The write to MMIO will trigger device action based on current device
+state, also what we can read from MMIO based on current device state. Thus the policy of
+dirty logging for normal memory can't be applied to MMIO.
+
+
+
+> I guess Marc might know the history. For example, QEMU is taking "/dev/mem" or
+> "/dev/kmem" to back guest's memory, the vma is marked as MMIO, but dirty logging
+> and migration isn't supported?
+The MMIO region is a part of device state. We need extra kernel driver to support migration
+of pass-through device, as how to save and restore the device state is closely related to
+a specific type of device. You can refer VFIO migration for more detail.
+
+Thanks,
 Keqian
 _______________________________________________
 kvmarm mailing list
