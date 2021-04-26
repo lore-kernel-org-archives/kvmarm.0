@@ -2,64 +2,100 @@ Return-Path: <SRS0=roT/=JX=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 189A1C433B4
-	for <kvmarm@archiver.kernel.org>; Mon, 26 Apr 2021 14:11:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5AEFC433B4
+	for <kvmarm@archiver.kernel.org>; Mon, 26 Apr 2021 14:30:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5B4316101B
-	for <kvmarm@archiver.kernel.org>; Mon, 26 Apr 2021 14:11:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B4316101B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id D8F086101B
+	for <kvmarm@archiver.kernel.org>; Mon, 26 Apr 2021 14:30:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8F086101B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B24914B0A1;
-	Mon, 26 Apr 2021 10:11:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E61A4AC80;
+	Mon, 26 Apr 2021 10:30:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, body has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id rGYa7+JJypX0; Mon, 26 Apr 2021 10:11:25 -0400 (EDT)
+	with ESMTP id mWkj+3jjCke0; Mon, 26 Apr 2021 10:30:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 398AF4B093;
-	Mon, 26 Apr 2021 10:11:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DB7CE4AEF8;
+	Mon, 26 Apr 2021 10:30:48 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CC8494AEDC
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Apr 2021 10:11:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4087F4A98B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Apr 2021 10:30:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id t1LaTzlrPPT8 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 26 Apr 2021 10:11:22 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 37DE74A4E5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Apr 2021 10:11:22 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9DDE531B;
- Mon, 26 Apr 2021 07:11:21 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0525A3F70D;
- Mon, 26 Apr 2021 07:11:20 -0700 (PDT)
-Subject: Re: [kvm-unit-tests RFC PATCH 0/1] configure: arm: Replace --vmm with
- --target
-To: Andrew Jones <drjones@redhat.com>
-References: <20210420161338.70914-1-alexandru.elisei@arm.com>
- <20210420165101.irbx2upgqbazkvlt@gator.home>
- <ed3ba802-fee7-4c58-9d73-d33dfbd44d7f@arm.com>
- <20210422155757.t4pvv6blkvoyi2oy@gator>
- <854c2d33-0b20-b7e3-c522-b01a53fcbbb3@arm.com>
- <20210426085911.jkkuj53jsajbjmi5@gator>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <d2004fdc-9506-32f5-cb11-fa9c5a7fe0c3@arm.com>
-Date: Mon, 26 Apr 2021 15:11:43 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.0
+ with ESMTP id cTzDYW1yEn9T for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 26 Apr 2021 10:30:46 -0400 (EDT)
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com
+ [209.85.208.170])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BFCB34A3A5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Apr 2021 10:30:45 -0400 (EDT)
+Received: by mail-lj1-f170.google.com with SMTP id a13so10506676ljp.2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Apr 2021 07:30:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+ bh=ZKaosWaIcl4S3h5U34oROUNL1g0vRhdQAFNE5cp/uMw=;
+ b=gjrZAY2cw3hbaO4flBSGHEe+cdFORnuQLxeLbpD1TzDytiwF/Oe4PkfW4aRCYkWp5z
+ 0lkaJuJs4cJTJ9y+qUp27mRhU5+NgvsPnKxGfDhzR6LTZ+FyjIlZTlRt0mbqI5uFEah8
+ JxxJ5thQckBqsLE/QVIAzohM3gHpkexNaQYJie+tH6uG47Zorvc2iQKznKQPI+r40jc+
+ 3Fgj4stSeDPtDTFdMK5h4wbeIBydPNAT4lhDtr5Npjvwue3vxTBM6BtizwTOPMfpfeUi
+ 459XUld3ic04xztlpNR/fT0ok9MoYtk3r2F+nZ9DSfrT5DpuvDkku8aWZ6DeT6SKikD4
+ iSzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to;
+ bh=ZKaosWaIcl4S3h5U34oROUNL1g0vRhdQAFNE5cp/uMw=;
+ b=Ws31oUmZ+Sa19ylXU85KyRlFYBwFnRovcKEJHSGkFn+vvHQXuqCihJVuaHtbv7gCoW
+ Zio1iz+yR8ViHc/8XAVJ7sms6WyiOKjqnTTJWoo2QXqi2hMYSLG8/dliKkj5RzytlmoM
+ Yn27miRKIHykvDFsbZk9U8tVSVeFxUNKcyjmiMGFwFB7bVO0wWWxJL+SSdXDbjpuA2/C
+ jlAL5fiaCXySFfXJcwWLgQUp+x2WEFs2cVYCqoGxr0OpryiqrSI3t4r9/TxcIPj8pcCP
+ XxAp0gUDb/cTsvxXPzVtYSS2z4N1+EARivgjVdDZDveaDL1TmqLoYO00I3JKyqonbNiB
+ MIuQ==
+X-Gm-Message-State: AOAM533jRL5TJl8v45/jFe56rn0EEJrBoxoFCNAVDsR87z6Rj36EmGDU
+ Wvhu9iu4nNKpMcmJ6Pb4ypBCCRuU9kNCFtk60glddQ==
+X-Google-Smtp-Source: ABdhPJy7Z72ilGccQRker2+1nI1mlcd25MVLv0Q2OD9ATZhW66X3flwyfNa2F3WJA/hb6qm3tkCkUf4TG6Db1HNqpdQ=
+X-Received: by 2002:a2e:b4e7:: with SMTP id s7mr13666493ljm.215.1619447443748; 
+ Mon, 26 Apr 2021 07:30:43 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20210426085911.jkkuj53jsajbjmi5@gator>
-Content-Language: en-US
-Cc: pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+References: <20210423181727.596466-1-jingzhangos@google.com>
+ <20210423181727.596466-3-jingzhangos@google.com>
+In-Reply-To: <20210423181727.596466-3-jingzhangos@google.com>
+From: Jing Zhang <jingzhangos@google.com>
+Date: Mon, 26 Apr 2021 09:30:31 -0500
+Message-ID: <CAAdAUtg+z4cj-u-7QQYPfULG81N-Q8LhVFVS5RABPxCHdpBaag@mail.gmail.com>
+Subject: Re: [PATCH v3 2/4] KVM: stats: Add fd-based API to read binary stats
+ data
+To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>, 
+ LinuxMIPS <linux-mips@vger.kernel.org>, KVMPPC <kvm-ppc@vger.kernel.org>, 
+ LinuxS390 <linux-s390@vger.kernel.org>, 
+ Linuxkselftest <linux-kselftest@vger.kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, 
+ Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
+ Julien Thierry <julien.thierry.kdev@gmail.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Will Deacon <will@kernel.org>, Huacai Chen <chenhuacai@kernel.org>, 
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, 
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ Paul Mackerras <paulus@ozlabs.org>, 
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>, 
+ David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, 
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ Sean Christopherson <seanjc@google.com>, 
+ Vitaly Kuznetsov <vkuznets@redhat.com>, Jim Mattson <jmattson@google.com>, 
+ Peter Shier <pshier@google.com>, Oliver Upton <oupton@google.com>, 
+ David Rientjes <rientjes@google.com>,
+ Emanuele Giuseppe Esposito <eesposit@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,177 +107,947 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SGkgRHJldywKCk9uIDQvMjYvMjEgOTo1OSBBTSwgQW5kcmV3IEpvbmVzIHdyb3RlOgo+IE9uIEZy
-aSwgQXByIDIzLCAyMDIxIGF0IDA0OjQzOjE0UE0gKzAxMDAsIEFsZXhhbmRydSBFbGlzZWkgd3Jv
-dGU6Cj4+IEhpIERyZXcsCj4+Cj4+IE9uIDQvMjIvMjEgNDo1NyBQTSwgQW5kcmV3IEpvbmVzIHdy
-b3RlOgo+Pj4gT24gVGh1LCBBcHIgMjIsIDIwMjEgYXQgMDQ6MTc6MjdQTSArMDEwMCwgQWxleGFu
-ZHJ1IEVsaXNlaSB3cm90ZToKPj4+PiBIaSBEcmV3LAo+Pj4+Cj4+Pj4gT24gNC8yMC8yMSA1OjUx
-IFBNLCBBbmRyZXcgSm9uZXMgd3JvdGU6Cj4+Pj4+IEhpIEFsZXgsCj4+Pj4+Cj4+Pj4+IE9uIFR1
-ZSwgQXByIDIwLCAyMDIxIGF0IDA1OjEzOjM3UE0gKzAxMDAsIEFsZXhhbmRydSBFbGlzZWkgd3Jv
-dGU6Cj4+Pj4+PiBUaGlzIGlzIGFuIFJGQyBiZWNhdXNlIGl0J3Mgbm90IGV4YWN0bHkgY2xlYXIg
-dG8gbWUgdGhhdCB0aGlzIGlzIHRoZSBiZXN0Cj4+Pj4+PiBhcHByb2FjaC4gSSdtIGFsc28gb3Bl
-biB0byB1c2luZyBhIGRpZmZlcmVudCBuYW1lIGZvciB0aGUgbmV3IG9wdGlvbiwgbWF5YmUKPj4+
-Pj4+IHNvbWV0aGluZyBsaWtlIC0tcGxhdGZvcm0gaWYgaXQgbWFrZXMgbW9yZSBzZW5zZS4KPj4+
-Pj4gSSBsaWtlICd0YXJnZXQnLgo+Pj4+Pgo+Pj4+Pj4gSSBzZWUgdHdvIHVzZSBjYXNlcyBmb3Ig
-dGhlIHBhdGNoOgo+Pj4+Pj4KPj4+Pj4+IDEuIFVzaW5nIGRpZmZlcmVudCBmaWxlcyB3aGVuIGNv
-bXBpbGluZyBrdm0tdW5pdC10ZXN0cyB0byBydW4gYXMgYW4gRUZJIGFwcAo+Pj4+Pj4gYXMgb3Bw
-b3NlZCB0byBhIEtWTSBndWVzdCAoZGVzY3JpYmVkIGluIHRoZSBjb21taXQgbWVzc2FnZSkuCj4+
-Pj4+Pgo+Pj4+Pj4gMi4gVGhpcyBpcyBzcGVjdWxhdGlvbiBvbiBteSBwYXJ0LCBidXQgSSBjYW4g
-c2VlIGV4dGVuZGluZwo+Pj4+Pj4gYXJtL3VuaXR0ZXN0cy5jZmcgd2l0aCBhICJ0YXJnZXQiIHRl
-c3Qgb3B0aW9uIHdoaWNoIGNhbiBiZSB1c2VkIHRvIGRlY2lkZQo+Pj4+Pj4gd2hpY2ggdGVzdHMg
-bmVlZCB0byBiZSBydW4gYmFzZWQgb24gdGhlIGNvbmZpZ3VyZSAtLXRhcmdldCB2YWx1ZS4gRm9y
-Cj4+Pj4+PiBleGFtcGxlLCBtaWdyYXRpb24gdGVzdHMgZG9uJ3QgbWFrZSBtdWNoIHNlbnNlIG9u
-IGt2bXRvb2wsIHdoaWNoIGRvZXNuJ3QKPj4+Pj4+IGhhdmUgbWlncmF0aW9uIHN1cHBvcnQuIFNp
-bWlsYXJseSwgdGhlIG1pY3JvLWJlbmNoIHRlc3QgZG9lc24ndCBtYWtlIG11Y2gKPj4+Pj4+IHNl
-bnNlICh0byBtZSwgYXQgbGVhc3QpIGFzIGFuIEVGSSBhcHAuIE9mIGNvdXJzZSwgdGhpcyBpcyBv
-bmx5IHVzZWZ1bCBpZgo+Pj4+Pj4gdGhlcmUgYXJlIGF1dG9tYXRlZCBzY3JpcHRzIHRvIHJ1biB0
-aGUgdGVzdHMgdW5kZXIga3ZtdG9vbCBvciBFRkksIHdoaWNoCj4+Pj4+PiBkb2Vzbid0IGxvb2sg
-bGlrZWx5IGF0IHRoZSBtb21lbnQsIHNvIEkgbGVmdCBpdCBvdXQgb2YgdGhlIGNvbW1pdCBtZXNz
-YWdlLgo+Pj4+PiBTb3VuZHMgbGlrZSBhIGdvb2QgaWRlYS4gdW5pdHRlc3RzLmNmZyBjb3VsZCBn
-ZXQgYSBuZXcgb3B0aW9uICd0YXJnZXRzJwo+Pj4+PiB3aGVyZSBhIGxpc3Qgb2YgdGFyZ2V0cyBp
-cyBnaXZlbi4gSWYgdGFyZ2V0cyBpcyBub3QgcHJlc2VudCwgdGhlbiB0aGUKPj4+Pj4gdGVzdCBh
-c3N1bWVzIGl0J3MgZm9yIGFsbCB0YXJnZXRzLiBNaWdodCBiZSBuaWNlIHRvIGFsc28gYWNjZXB0
-ICE8dGFyZ2V0Pgo+Pj4+PiBzeW50YXguIEUuZy4KPj4+Pj4KPj4+Pj4gIyBidWlsZHMvcnVucyBm
-b3IgYWxsIHRhcmdldHMKPj4+Pj4gW215dGVzdF0KPj4+Pj4gZmlsZSA9IG15dGVzdC5mbGF0Cj4+
-Pj4+Cj4+Pj4+ICMgYnVpbGRzL3J1bnMgZm9yIGdpdmVuIHRhcmdldHMKPj4+Pj4gW215dGVzdDJd
-Cj4+Pj4+IGZpbGUgPSBteXRlc3QyLmZsYXQKPj4+Pj4gdGFyZ2V0cyA9IHFlbXUsa3ZtdG9vbAo+
-Pj4+Pgo+Pj4+PiAjIGJ1aWxkcy9ydW5zIGZvciBhbGwgdGFyZ2V0cyBleGNlcHQgZGlzYWJsZWQg
-dGFyZ2V0cwo+Pj4+PiBbbXl0ZXN0M10KPj4+Pj4gZmlsZSA9IG15dGVzdDMuZmxhdAo+Pj4+PiB0
-YXJnZXRzID0gIWt2bXRvb2wKPj4+PiBUaGF0J3Mgc291bmRzIGxpa2UgYSBnb29kIGlkZWEsIGJ1
-dCB0byBiZSBob25lc3QsIEkgd291bGQgd2FpdCB1bnRpbCBzb21lb25lCj4+Pj4gYWN0dWFsbHkg
-bmVlZHMgaXQgYmVmb3JlIGltcGxlbWVudGluZyBpdC4gVGhhdCB3YXkgd2UgZG9uJ3QgcmlzayBu
-b3QgdGFraW5nIGEgdXNlCj4+Pj4gY2FzZSBpbnRvIGFjY291bnQgYW5kIHRoZW4gaGF2aW5nIHRv
-IHJld29yayBpdC4KPj4+IERvbid0IHdlIGhhdmUgYSB1c2VjYXNlPyBBYm92ZSB5b3Ugc2FpZCB0
-aGF0IGt2bXRvb2wgc2hvdWxkIGF0IGxlYXN0IHNraXAKPj4+IHRoZSBtaWdyYXRpb24gdGVzdHMu
-Cj4+IFNvcnJ5IGZvciBub3QgbWFraW5nIG15c2VsZiBjbGVhciwgd2hlbiBJIHdhcyB0YWxraW5n
-IGFib3V0IGFkZGluZyBhICJ0YXJnZXRzIgo+PiBwYXJhbWV0ZXIgdG8gYSB0ZXN0LCBJIHdhcyB0
-aGlua2luZyB0aGF0IGl0IHdpbGwgb25seSBiZSB1c2VkIGJ5IHRoZSBydW4gc2NyaXB0cy4KPj4g
-QWxsIHRoZSB0ZXN0cyBjYW4gcnVuIHVuZGVyIHFlbXUsIGFuZCBydW5fdGVzdHMuc2ggb25seSBr
-bm93cyBhYm91dCBxZW11LCBzbywgZnJvbQo+PiB0aGF0IHBvaW50IG9mIHZpZXcsIHRoYXQncyB3
-aHkgSSB0aGluayB0aGUgInRhcmdldHMiIGFyZ3VtZW50IGlzIG5vdCB1c2VmdWwgYXQgdGhlCj4+
-IG1vbWVudC4KPj4KPj4gQXMgZm9yIHRoZSBtaWdyYXRpb24gdGVzdCBzcGVjaWZpY2FsbHksIHRo
-ZSBWTSBtaWdyYXRpb24gaXMgaW1wbGVtZW50ZWQgaW4gdGhlIHJ1bgo+PiBzY3JpcHRzLCBub3Qg
-aW4gdGhlIHRlc3QgaXRzZWxmOyB0aGUgdGVzdCB3YWl0cyBmb3IgdGhlIFVBUlQgdG8gc2lnbmFs
-IHRoYXQKPj4gbWlncmF0aW9uIGlzIGNvbXBsZXRlLiBUaGF0IHRlc3QgcnVucyBqdXN0IGZpbmUg
-dW5kZXIga3ZtdG9vbCwgYnV0IG5vIG1pZ3JhdGlvbiBpcwo+PiB0YWtpbmcgcGxhY2U6Cj4+Cj4+
-ICQgLi92bSBydW4gLS1pcnFjaGlwPWdpY3YzLWl0cyAtYzYgLW0xMjggLWYgYXJtL2dpYy5mbGF0
-IC0tcGFyYW1zIGl0cy1taWdyYXRpb24KPj4gw6/Cv8K9ICMgbGt2bSBydW4gLS1maXJtd2FyZSBh
-cm0vZ2ljLmZsYXQgLW0gMTI4IC1jIDYgLS1uYW1lIGd1ZXN0LTE0NDAKPj4gw6/Cv8K9IEluZm86
-IFBsYWNpbmcgZmR0IGF0IDB4ODAyMDAwMDAgLSAweDgwMjEwMDAwCj4+IGNocl90ZXN0ZGV2X2lu
-aXQ6IGNoci10ZXN0ZGV2OiBjYW4ndCBmaW5kIGEgdmlydGlvLWNvbnNvbGUKPj4gSVRTOiBNQVBE
-IGRldmlkPTIgc2l6ZSA9IDB4OCBpdHQ9MHg4MDFlMDAwMCB2YWxpZD0xCj4+IElUUzogTUFQRCBk
-ZXZpZD03IHNpemUgPSAweDggaXR0PTB4ODAxZjAwMDAgdmFsaWQ9MQo+PiBNQVBDIGNvbF9pZD0z
-IHRhcmdldF9hZGRyID0gMHgzMDAwMCB2YWxpZD0xCj4+IE1BUEMgY29sX2lkPTIgdGFyZ2V0X2Fk
-ZHIgPSAweDIwMDAwIHZhbGlkPTEKPj4gSU5WQUxMIGNvbF9pZD0yCj4+IElOVkFMTCBjb2xfaWQ9
-Mwo+PiBNQVBUSSBkZXZfaWQ9MiBldmVudF9pZD0yMCAtPiBwaHlzX2lkPTgxOTUsIGNvbF9pZD0z
-Cj4+IE1BUFRJIGRldl9pZD03IGV2ZW50X2lkPTI1NSAtPiBwaHlzX2lkPTgxOTYsIGNvbF9pZD0y
-Cj4+IE5vdyBtaWdyYXRlIHRoZSBWTSwgdGhlbiBwcmVzcyBhIGtleSB0byBjb250aW51ZS4uLgo+
-PiBJTkZPOiBnaWN2MzogaXRzLW1pZ3JhdGlvbjogTWlncmF0aW9uIGNvbXBsZXRlCj4+IElOVCBk
-ZXZfaWQ9MiBldmVudF9pZD0yMAo+PiBQQVNTOiBnaWN2MzogaXRzLW1pZ3JhdGlvbjogZGV2Mi9l
-dmVudGlkPTIwIHRyaWdnZXJzIExQSSA4MTk1IG9uIFBFICMzIGFmdGVyIG1pZ3JhdGlvbgo+PiBJ
-TlQgZGV2X2lkPTcgZXZlbnRfaWQ9MjU1Cj4+IFBBU1M6IGdpY3YzOiBpdHMtbWlncmF0aW9uOiBk
-ZXY3L2V2ZW50aWQ9MjU1IHRyaWdnZXJzIExQSSA4MTk2IG9uIFBFICMyIGFmdGVyCj4+IG1pZ3Jh
-dGlvbgo+PiBTVU1NQVJZOiAyIHRlc3RzCj4+Cj4+IEV2ZW4gdGhlIHBjaS10ZXN0IHdvcmtzIHVu
-ZGVyIGt2bXRvb2wsIGV2ZW4gdGhvdWdoIGl0IHRhcmdldHMgcWVtdSdzIHBjaS10ZXN0ZGV2Ogo+
-Pgo+PiAkIC4vdm0gcnVuIC0taXJxY2hpcD1naWN2My1pdHMgLWM2IC1tMTI4IC1mIGFybS9wY2kt
-dGVzdC5mbGF0Cj4+IMOvwr/CvSAjIGxrdm0gcnVuIC0tZmlybXdhcmUgYXJtL3BjaS10ZXN0LmZs
-YXQgLW0gMTI4IC1jIDYgLS1uYW1lIGd1ZXN0LTE0NjgKPj4gw6/Cv8K9IEluZm86IFBsYWNpbmcg
-ZmR0IGF0IDB4ODAyMDAwMDAgLSAweDgwMjEwMDAwCj4+IGNocl90ZXN0ZGV2X2luaXQ6IGNoci10
-ZXN0ZGV2OiBjYW4ndCBmaW5kIGEgdmlydGlvLWNvbnNvbGUKPj4gTm8gUENJZSBFQ0FNIGNvbXBh
-dGlibGUgY29udHJvbGxlciBmb3VuZAo+PiBQQ0kgYnVzIHByb2JpbmcgZmFpbGVkLCBza2lwcGlu
-ZyB0ZXN0cy4uLgo+PiBTVU1NQVJZOiAwIHRlc3RzCj4+Cj4+IFRoZSB0ZXN0IGlzIHN0aWxsIHVz
-ZWZ1bCBmb3Iga3ZtdG9vbCwgYmVjYXVzZSBpdCB0ZXN0cyB0aGF0IHRoZSBQQ0kgbm9kZSBpbiB0
-aGUKPj4gRFRCIGlzIGdlbmVyYXRlZCBhcyBleHBlY3RlZC4gQW5kIGFmdGVyIGt2bXRvb2wgZ2V0
-cyBzdXBwb3J0IGZvciBQQ0lFICh3b3JrIGluCj4+IHByb2dyZXNzKSwgaXQgd2lsbCB0ZXN0IFBD
-SSBkZXZpY2UgcHJvYmluZywgd2hpY2ggbWFrZXMgaXQgZXZlbiBtb3JlIHVzZWZ1bCB0aGFuCj4+
-IGl0IGlzIHRvZGF5Lgo+Pgo+PiBTbyBJIGd1ZXNzIHRoZSBxdWVzdGlvbiBpcywgZG8gd2hhdCBz
-aG91bGQgInRhcmdldHMiIHJlcHJlc2VudCwgaG93IHNob3VsZCBpdCBiZQo+PiB1c2VkIGFuZCBk
-byB3ZSBuZWVkIGl0IG5vdz8KPiBJJ2xsIGxlYXZlIHRoYXQgdXAgdG8geW91LCBzaW5jZSB5b3Un
-cmUgdGhlIG9uZSBkcml2aW5nIHN1cHBvcnQgZm9yCj4ga3ZtdG9vbCBhbmQsIGhvcGVmdWxseSBz
-b29uLCBiYXJlLW1ldGFsIEFBcmNoNjQuIEJUVywgSSB0aGluayB3ZSdyZSBsb25nCgpJZiBpdCdz
-IHVwIHRvIG1lLCB0aGVuIEkgd291bGQgcHJlZmVyIHRoaXMgZ2V0cyBhZGRlZCB0byB0aGUgdGVz
-dCBkZWZpbml0aW9ucwphbG9uZyB3aXRoIGt2bXRvb2wgKG9yIGJhcmVtZXRhbCkgcnVuc2NyaXB0
-IHN1cHBvcnQsIHdoZW4gd2UgaGF2ZSBhIHdlbGwgZGVmaW5lZAp1c2VjYXNlIGZvciBpdC4KCj4g
-b3ZlcmR1ZSBmb3IgYWRkaW5nIGt2bXRvb2wgcnVubmVyIGZ1bmN0aW9uYWxpdHksIGVpdGhlciBi
-eSBhZGFwdGluZyB3aGF0Cj4gd2UgaGF2ZSAocG9zc2libHkgYnkgYXBwbHlpbmcgYSBUQVJHRVQg
-dmFyaWFibGUgOi0pIG9yIGJ5IHNpbXBseSBhZGRpbmcKPiBuZXcgcnVubmVyIHNjcmlwdHMuIEkg
-cGVyc29uYWxseSB3b3VsZCBsaWtlIHRvIGVhc2lseSBydW4ga3ZtdG9vbCB3aGVuCj4gSSdtIHRl
-c3RpbmcgYXJtL3F1ZXVlLCBhbmQgSSBkb24ndCB3YW50IHRvIGhhdmUgbXkgb3duIHBlcnNvbmFs
-IGt2bXRvb2wKPiBydW5uZXIgc2NyaXB0IHRvIGRvIHRoYXQuCgpJIGFncmVlLCB0aGlzIGlzIHNv
-cmVseSBuZWVkZWQuIFRoZXJlIHdhcyBzb21lb25lIGZyb20gQXJtIHRoYXQgd2FzIGludGVyZXN0
-ZWQgaW4KYWRkaW5nIGl0LCBidXQgdGhhdCBoYXNuJ3QgbWF0ZXJpYWxpemVkIHlldC4gUmVnYXJk
-bGVzcywgSSdsbCBhZGRlZCBpdCB0byBteQoocmF0aGVyIGxvbmcpIGxpc3Qgb2YgdG9kbydzLgoK
-Pgo+Pj4+PiBBbmQgaXQgd291bGRuJ3QgYm90aGVyIG1lIHRvIGhhdmUgc3BlY2lhbCBsb2dpYyBm
-b3Iga3ZtdG9vbCdzIGxhY2sgb2YKPj4+Pj4gbWlncmF0aW9uIHB1dCBkaXJlY3RseSBpbiBzY3Jp
-cHRzL3J1bnRpbWUuYmFzaAo+Pj4+IEdvb2QgdG8ga2VlcCBpbiBtaW5kIHdoZW4gc3VwcG9ydCBp
-cyBhZGRlZC4KPj4+Pgo+Pj4+PiBkaWZmIC0tZ2l0IGEvc2NyaXB0cy9ydW50aW1lLmJhc2ggYi9z
-Y3JpcHRzL3J1bnRpbWUuYmFzaAo+Pj4+PiBpbmRleCAxMzIzODljN2RkNTkuLjBkNWNiNTFkZjRm
-NCAxMDA2NDQKPj4+Pj4gLS0tIGEvc2NyaXB0cy9ydW50aW1lLmJhc2gKPj4+Pj4gKysrIGIvc2Ny
-aXB0cy9ydW50aW1lLmJhc2gKPj4+Pj4gQEAgLTEzMiw3ICsxMzIsNyBAQCBmdW5jdGlvbiBydW4o
-KQo+Pj4+PiAgICAgIH0KPj4+Pj4gIAo+Pj4+PiAgICAgIGNtZGxpbmU9JChnZXRfY21kbGluZSAk
-a2VybmVsKQo+Pj4+PiAtICAgIGlmIGdyZXAgLXF3ICJtaWdyYXRpb24iIDw8PCRncm91cHMgOyB0
-aGVuCj4+Pj4+ICsgICAgaWYgZ3JlcCAtcXcgIm1pZ3JhdGlvbiIgPDw8JGdyb3VwcyAmJiBbICIk
-VEFSR0VUIiAhPSAia3ZtdG9vbCIgXTsgdGhlbgo+Pj4+PiAgICAgICAgICBjbWRsaW5lPSJNSUdS
-QVRJT049eWVzICRjbWRsaW5lIgo+Pj4+PiAgICAgIGZpCj4+Pj4+ICAgICAgaWYgWyAiJHZlcmJv
-c2UiID0gInllcyIgXTsgdGhlbgo+Pj4+Pgo+Pj4+Pj4gVXNpbmcgLS12bW0gd2lsbCB0cmlnZ2Vy
-IGEgd2FybmluZy4gSSB3YXMgdGhpbmtpbmcgYWJvdXQgcmVtb3ZpbmcgaXQgZW50aXJlbHkgaW4K
-Pj4+Pj4+IGEgYWJvdXQgYSB5ZWFyJ3MgdGltZSwgYnV0IHRoYXQncyBub3Qgc2V0IGluIHN0b25l
-LiBOb3RlIHRoYXQgcWVtdSB1c2Vycwo+Pj4+Pj4gKHByb2JhYmx5IHRoZSB2YXN0IG1ham9yaXR5
-IG9mIHBlb3BsZSkgd2lsbCBub3QgYmUgYWZmZWN0ZWQgYnkgdGhpcyBjaGFuZ2UgYXMKPj4+Pj4+
-IGxvbmcgYXMgdGhleSB3ZXJlbid0IHNldHRpbmcgLS12bW0gZXhwbGljaXRlbHkgdG8gaXRzIGRl
-ZmF1bHQgdmFsdWUgb2YgInFlbXUiLgo+Pj4+Pj4KPj4+Pj4gV2hpbGUgd2UnZCByaXNrIGF1dG9t
-YXRlZCBjb25maWd1cmUrYnVpbGQgdG9vbHMsIGxpa2UgZ2l0e2h1YixsYWJ9IENJLAo+Pj4+PiBm
-YWlsaW5nLCBJIHRoaW5rIHRoZSByaXNrIGlzIHByZXR0eSBsb3cgcmlnaHQgbm93IHRoYXQgYW55
-Ym9keSBpcyB1c2luZwo+Pj4+PiB0aGUgb3B0aW9uLiBBbHNvLCB3ZSBtaWdodCBhcyB3ZWxsIG1h
-a2UgdGhlbSBjaGFuZ2Ugc29vbmVyIHRoYW4gbGF0ZXIgYnkKPj4+Pj4gZmFpbGluZyBjb25maWd1
-cmUuIElPVywgSSdkIGp1c3QgZG8gcy92bW0vdGFyZ2V0L2cgdG8gcmVuYW1lIGl0IG5vdy4gSWYK
-Pj4+Pj4gd2UgYXJlIGNvbmNlcm5lZCBhYm91dCB0aGUgZGlzcnVwdGlvbiwgdGhlbiBJJ2QganVz
-dCBtYWtlIHZtbSBhbiBhbGlhcwo+Pj4+PiBmb3IgdGFyZ2V0IGFuZCBub3QgYm90aGVyIGRlcHJl
-Y2F0aW5nIGl0IGV2ZXIuCj4+Pj4gSSBhbHNvIHRoaW5rIGl0IHdpbGwgbm90IGJlIHRvbyBiYWQg
-aWYgd2UgbWFrZSB0aGUgY2hhbmdlIG5vdywgYnV0IEknbSBub3Qgc3VyZQo+Pj4+IHdoYXQgeW91
-IG1lYW4gYnkgbWFraW5nIHZtbSBhbiBhbGlhcyBvZiB0YXJnZXQuIFRoZSBwYXRjaCBpZ25vcmVz
-IC0tdm1tIGlzIGl0J3MKPj4+PiBub3Qgc3BlY2lmaWVkLCBhbmQgaWYgaXQgaXMgc3BlY2lmaWVk
-IG9uIHRoZSBjb25maWd1cmUgY29tbWFuZCBsaW5lLCB0aGVuIGl0IG11c3QKPj4+PiBtYXRjaCB0
-aGUgdmFsdWUgb2YgLS10YXJnZXQsIG90aGVyd2lzZSBjb25maWd1cmUgZmFpbHMuCj4+Pj4KPj4+
-IFRoZSBjdXJyZW50IHBhdGNoIGRvZXMgYm90aCB0aGluZ3M7IGl0IHNheXMgZG9uJ3QgdXNlIC0t
-dm1tIGFuZCBpdCBzYXlzCj4+PiB0aGUgbmV3IC0tdm1tIGlzIC0tdGFyZ2V0LiBJJ20gc2F5aW5n
-IGRvIG9uZSBvciB0aGUgb3RoZXIuIEVpdGhlcgo+Pj4gY29tcGxldGVseSByZW5hbWUgdm1tIHRv
-IHRhcmdldCwgd2hpY2ggd2lsbCB0aGVuIGVycm9yIG91dCB3aGVuIHZtbSBpcwo+Pj4gc3BlY2lm
-aWVkIGFzIGFuIHVua25vd24gb3B0aW9uIG9yIGFsbG93IHRoZSB1c2VyIHRvIHVzZSBlaXRoZXIg
-LS12bW0gb3IKPj4+IC0tdGFyZ2V0IHdpdGggbm8gZXJyb3IgYW5kIHdoZXJlIGJvdGggbWVhbiB0
-byBkbyB0aGUgc2FtZSB0aGluZywgd2hpY2ggaXMKPj4+IHRvIHNldCB0aGUgVEFSR0VUIHZhcmlh
-YmxlLgo+PiBJJ20gc29ycnksIGJ1dCBpdCdzIHN0aWxsIG5vdCBjbGVhciB0byBtZSB3aGF0IHlv
-dSBhcmUgdHJ5aW5nIHRvIHNheS4KPj4KPj4gVGhlIGN1cnJlbnQgYmVoYXZpb3VyOgo+Pgo+PiAk
-IC4vY29uZmlndXJlIC0tYXJjaD1hcm02NCAtLWNyb3NzLXByZWZpeD1hYXJjaDY0LWxpbnV4LWdu
-dS0gLS12bW09cWVtdQo+PiBJTkZPOiAtLXZtbSBpcyBkZXByZWNhdGVkIGFuZCB3aWxsIGJlIHJl
-bW92ZWQgaW4gZnV0dXJlIHZlcnNpb25zCj4+ICQgLi9jb25maWd1cmUgLS1hcmNoPWFybTY0IC0t
-Y3Jvc3MtcHJlZml4PWFhcmNoNjQtbGludXgtZ251LSAtLXZtbT1xZW11IC0tdGFyZ2V0PXFlbXUK
-Pj4gSU5GTzogLS12bW0gaXMgZGVwcmVjYXRlZCBhbmQgd2lsbCBiZSByZW1vdmVkIGluIGZ1dHVy
-ZSB2ZXJzaW9ucwo+PiAkIC4vY29uZmlndXJlIC0tYXJjaD1hcm02NCAtLWNyb3NzLXByZWZpeD1h
-YXJjaDY0LWxpbnV4LWdudS0gLS12bW09a3ZtdG9vbAo+PiAtLXRhcmdldD1xZW11Cj4+IElORk86
-IC0tdm1tIGlzIGRlcHJlY2F0ZWQgYW5kIHdpbGwgYmUgcmVtb3ZlZCBpbiBmdXR1cmUgdmVyc2lv
-bnMKPj4gLS12bW0gbXVzdCBoYXZlIHRoZSBzYW1lIHZhbHVlIGFzIC0tdGFyZ2V0IChxZW11KQo+
-PiBVc2FnZTogLi9jb25maWd1cmUgW29wdGlvbnNdCj4+IFsuLl0KPj4gJCAuL2NvbmZpZ3VyZSAt
-LWFyY2g9YXJtNjQgLS1jcm9zcy1wcmVmaXg9YWFyY2g2NC1saW51eC1nbnUtIC0tdm1tPWt2bXRv
-b2wKPj4gLS10YXJnZXQ9a3ZtdG9vbAo+PiBJTkZPOiAtLXZtbSBpcyBkZXByZWNhdGVkIGFuZCB3
-aWxsIGJlIHJlbW92ZWQgaW4gZnV0dXJlIHZlcnNpb25zCj4+Cj4+IENhbiB5b3UgcG9pbnQgb3V0
-IHdoYXQgbWFrZXMgeW91IHRoaW5rIHRoYXQgdGhlIHBhdGNoIHRyaWVzIHRvIGRvIHR3byB0aGlu
-Z3MgYXQgb25jZT8KPiBEZXByZWNhdGlvbiByZXF1aXJlcyB5b3UgZG8gdHdvIHRoaW5ncyBhdCBv
-bmNlOyBhZGQgYSB3YXJuaW5nIHRvIHRoZSBvbGQKPiBhbmQgYWRkIHRoZSBuZXcuIEknbSBzYXlp
-bmcgd2UgZG9uJ3QgbmVlZCB0byBkZXByZWNhdGUgLS12bW0uIEVpdGhlciBqdXN0Cj4gZG8gdGhl
-IG5ldyAocy92bW0vdGFyZ2V0L2cpIG9yIGFsd2F5cyBhbGxvdyB0aGUgb2xkIChzL3ZtbS90YXJn
-ZXQvZyBwbHVzCj4gbWFrZSAtLXZtbSBhbiBhbGlhcyBmb3IgLS10YXJnZXQgd2l0aG91dCBhbnkg
-d2FybmluZykuIEknZCBwcmVmZXIgdGhlCj4gZmlyc3Qgb25lLCBzaW5jZSBJJ20gbm90IHRvbyB3
-b3JyaWVkIGFib3V0IGEgZmV3IHVzZXJzIGhhdmluZyB0byBmaWd1cmUKPiBvdXQgaG93IHRvIGNo
-YW5nZSB0aGVpciBtdXNjbGUgbWVtb3J5IGFuZCBDSSBzY3JpcHRzIHdoZW4gdGhleSBzdGFydAo+
-IGdldHRpbmcgdW5rbm93biBvcHRpb24gZXJyb3JzIGF0IGNvbmZpZ3VyZSB0aW1lLgoKT2ssIEkg
-c2VlIG5vdywgSSBwcmVmZXIgdGhlIGZpcnN0IGFwcHJvYWNoLCBJJ2xsIHJlbW92ZSAtLXZtbSBl
-bnRpcmVseSBhbmQgcmVwbGFjZQppdCB3aXRoIC0tdGFyZ2V0LgoKVGhhbmtzLAoKQWxleAoKX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxp
-bmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29s
-dW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+On Fri, Apr 23, 2021 at 1:17 PM Jing Zhang <jingzhangos@google.com> wrote:
+>
+> Provides a file descriptor per VM to read VM stats info/data.
+> Provides a file descriptor per vCPU to read vCPU stats info/data.
+>
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> ---
+>  arch/arm64/kvm/guest.c    |  30 +++++
+>  arch/mips/kvm/mips.c      |  55 ++++++++++
+>  arch/powerpc/kvm/book3s.c |  56 ++++++++++
+>  arch/powerpc/kvm/booke.c  |  49 +++++++++
+>  arch/s390/kvm/kvm-s390.c  | 121 +++++++++++++++++++++
+>  arch/x86/kvm/x86.c        |  57 ++++++++++
+>  include/linux/kvm_host.h  | 127 +++++++++++++++++++++-
+>  include/uapi/linux/kvm.h  |  50 +++++++++
+>  virt/kvm/kvm_main.c       | 223 ++++++++++++++++++++++++++++++++++++++
+>  9 files changed, 766 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> index 6ed28144666e..5e37c842e4a5 100644
+> --- a/arch/arm64/kvm/guest.c
+> +++ b/arch/arm64/kvm/guest.c
+> @@ -28,6 +28,36 @@
+>
+>  #include "trace.h"
+>
+> +struct _kvm_stats_desc kvm_vm_stats_desc[] = {
+> +       STATS_VM_COMMON,
+> +};
+> +
+> +struct _kvm_stats_header kvm_vm_stats_header = {
+> +       .name_size = KVM_STATS_NAME_LEN,
+> +       .count = ARRAY_SIZE(kvm_vm_stats_desc),
+> +       .desc_offset = sizeof(struct kvm_stats_header),
+> +       .data_offset = sizeof(struct kvm_stats_header) +
+> +               sizeof(kvm_vm_stats_desc),
+> +};
+> +
+> +struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
+> +       STATS_VCPU_COMMON,
+> +       STATS_DESC_COUNTER("hvc_exit_stat"),
+> +       STATS_DESC_COUNTER("wfe_exit_stat"),
+> +       STATS_DESC_COUNTER("wfi_exit_stat"),
+> +       STATS_DESC_COUNTER("mmio_exit_user"),
+> +       STATS_DESC_COUNTER("mmio_exit_kernel"),
+> +       STATS_DESC_COUNTER("exits"),
+> +};
+> +
+> +struct _kvm_stats_header kvm_vcpu_stats_header = {
+> +       .name_size = KVM_STATS_NAME_LEN,
+> +       .count = ARRAY_SIZE(kvm_vcpu_stats_desc),
+> +       .desc_offset = sizeof(struct kvm_stats_header),
+> +       .data_offset = sizeof(struct kvm_stats_header) +
+> +               sizeof(kvm_vcpu_stats_desc),
+> +};
+> +
+>  struct kvm_stats_debugfs_item debugfs_entries[] = {
+>         VCPU_STAT_COM("halt_successful_poll", halt_successful_poll),
+>         VCPU_STAT_COM("halt_attempted_poll", halt_attempted_poll),
+> diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+> index 011c59acd606..ced50e8c1bb2 100644
+> --- a/arch/mips/kvm/mips.c
+> +++ b/arch/mips/kvm/mips.c
+> @@ -39,6 +39,61 @@
+>  #define VECTORSPACING 0x100    /* for EI/VI mode */
+>  #endif
+>
+> +struct _kvm_stats_desc kvm_vm_stats_desc[] = {
+> +       STATS_VM_COMMON,
+> +};
+> +
+> +struct _kvm_stats_header kvm_vm_stats_header = {
+> +       .name_size = KVM_STATS_NAME_LEN,
+> +       .count = ARRAY_SIZE(kvm_vm_stats_desc),
+> +       .desc_offset = sizeof(struct kvm_stats_header),
+> +       .data_offset = sizeof(struct kvm_stats_header) +
+> +               sizeof(kvm_vm_stats_desc),
+> +};
+> +
+> +struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
+> +       STATS_VCPU_COMMON,
+> +       STATS_DESC_COUNTER("wait_exits"),
+> +       STATS_DESC_COUNTER("cache_exits"),
+> +       STATS_DESC_COUNTER("signal_exits"),
+> +       STATS_DESC_COUNTER("int_exits"),
+> +       STATS_DESC_COUNTER("cop_unusable_exits"),
+> +       STATS_DESC_COUNTER("tlbmod_exits"),
+> +       STATS_DESC_COUNTER("tlbmiss_ld_exits"),
+> +       STATS_DESC_COUNTER("tlbmiss_st_exits"),
+> +       STATS_DESC_COUNTER("addrerr_st_exits"),
+> +       STATS_DESC_COUNTER("addrerr_ld_exits"),
+> +       STATS_DESC_COUNTER("syscall_exits"),
+> +       STATS_DESC_COUNTER("resvd_inst_exits"),
+> +       STATS_DESC_COUNTER("break_inst_exits"),
+> +       STATS_DESC_COUNTER("trap_inst_exits"),
+> +       STATS_DESC_COUNTER("msa_fpe_exits"),
+> +       STATS_DESC_COUNTER("fpe_exits"),
+> +       STATS_DESC_COUNTER("msa_disabled_exits"),
+> +       STATS_DESC_COUNTER("flush_dcache_exits"),
+> +#ifdef CONFIG_KVM_MIPS_VZ
+> +       STATS_DESC_COUNTER("vz_gpsi_exits"),
+> +       STATS_DESC_COUNTER("vz_gsfc_exits"),
+> +       STATS_DESC_COUNTER("vz_hc_exits"),
+> +       STATS_DESC_COUNTER("vz_grr_exits"),
+> +       STATS_DESC_COUNTER("vz_gva_exits"),
+> +       STATS_DESC_COUNTER("vz_ghfc_exits"),
+> +       STATS_DESC_COUNTER("vz_gpa_exits"),
+> +       STATS_DESC_COUNTER("vz_resvd_exits"),
+> +#ifdef CONFIG_CPU_LOONGSON64
+> +       STATS_DESC_COUNTER("vz_cpucfg_exits"),
+> +#endif
+> +#endif
+> +};
+> +
+> +struct _kvm_stats_header kvm_vcpu_stats_header = {
+> +       .name_size = KVM_STATS_NAME_LEN,
+> +       .count = ARRAY_SIZE(kvm_vcpu_stats_desc),
+> +       .desc_offset = sizeof(struct kvm_stats_header),
+> +       .data_offset = sizeof(struct kvm_stats_header) +
+> +               sizeof(kvm_vcpu_stats_desc),
+> +};
+> +
+>  struct kvm_stats_debugfs_item debugfs_entries[] = {
+>         VCPU_STAT("wait", wait_exits),
+>         VCPU_STAT("cache", cache_exits),
+> diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
+> index bd3a10e1fdaf..9dc2510537ce 100644
+> --- a/arch/powerpc/kvm/book3s.c
+> +++ b/arch/powerpc/kvm/book3s.c
+> @@ -38,6 +38,62 @@
+>
+>  /* #define EXIT_DEBUG */
+>
+> +struct _kvm_stats_desc kvm_vm_stats_desc[] = {
+> +       STATS_VM_COMMON,
+> +       STATS_DESC_ICOUNTER("num_2M_pages"),
+> +       STATS_DESC_ICOUNTER("num_1G_pages"),
+> +};
+> +
+> +struct _kvm_stats_header kvm_vm_stats_header = {
+> +       .name_size = KVM_STATS_NAME_LEN,
+> +       .count = ARRAY_SIZE(kvm_vm_stats_desc),
+> +       .desc_offset = sizeof(struct kvm_stats_header),
+> +       .data_offset = sizeof(struct kvm_stats_header) +
+> +               sizeof(kvm_vm_stats_desc),
+> +};
+> +
+> +struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
+> +       STATS_VCPU_COMMON,
+> +       STATS_DESC_COUNTER("sum_exits"),
+> +       STATS_DESC_COUNTER("mmio_exits"),
+> +       STATS_DESC_COUNTER("signal_exits"),
+> +       STATS_DESC_COUNTER("light_exits"),
+> +       STATS_DESC_COUNTER("itlb_real_miss_exits"),
+> +       STATS_DESC_COUNTER("itlb_virt_miss_exits"),
+> +       STATS_DESC_COUNTER("dtlb_real_miss_exits"),
+> +       STATS_DESC_COUNTER("dtlb_virt_miss_exits"),
+> +       STATS_DESC_COUNTER("syscall_exits"),
+> +       STATS_DESC_COUNTER("isi_exits"),
+> +       STATS_DESC_COUNTER("dsi_exits"),
+> +       STATS_DESC_COUNTER("emulated_inst_exits"),
+> +       STATS_DESC_COUNTER("dec_exits"),
+> +       STATS_DESC_COUNTER("ext_intr_exits"),
+> +       STATS_DESC_TIME_NSEC("halt_wait_ns"),
+> +       STATS_DESC_COUNTER("halt_successful_wait"),
+> +       STATS_DESC_COUNTER("dbell_exits"),
+> +       STATS_DESC_COUNTER("gdbell_exits"),
+> +       STATS_DESC_COUNTER("ld"),
+> +       STATS_DESC_COUNTER("st"),
+> +       STATS_DESC_COUNTER("pf_storage"),
+> +       STATS_DESC_COUNTER("pf_instruc"),
+> +       STATS_DESC_COUNTER("sp_storage"),
+> +       STATS_DESC_COUNTER("sp_instruc"),
+> +       STATS_DESC_COUNTER("queue_intr"),
+> +       STATS_DESC_COUNTER("ld_slow"),
+> +       STATS_DESC_COUNTER("st_slow"),
+> +       STATS_DESC_COUNTER("pthru_all"),
+> +       STATS_DESC_COUNTER("pthru_host"),
+> +       STATS_DESC_COUNTER("pthru_bad_aff"),
+> +};
+> +
+> +struct _kvm_stats_header kvm_vcpu_stats_header = {
+> +       .name_size = KVM_STATS_NAME_LEN,
+> +       .count = ARRAY_SIZE(kvm_vcpu_stats_desc),
+> +       .desc_offset = sizeof(struct kvm_stats_header),
+> +       .data_offset = sizeof(struct kvm_stats_header) +
+> +               sizeof(kvm_vcpu_stats_desc),
+> +};
+> +
+>  struct kvm_stats_debugfs_item debugfs_entries[] = {
+>         VCPU_STAT("exits", sum_exits),
+>         VCPU_STAT("mmio", mmio_exits),
+> diff --git a/arch/powerpc/kvm/booke.c b/arch/powerpc/kvm/booke.c
+> index 07fdd7a1254a..e9ffcf0f022d 100644
+> --- a/arch/powerpc/kvm/booke.c
+> +++ b/arch/powerpc/kvm/booke.c
+> @@ -36,6 +36,55 @@
+>
+>  unsigned long kvmppc_booke_handlers;
+>
+> +struct _kvm_stats_desc kvm_vm_stats_desc[] = {
+> +       STATS_VM_COMMON,
+> +       STATS_DESC_ICOUNTER("num_2M_pages",),
+> +       STATS_DESC_ICOUNTER("num_1G_pages",),
+> +};
+> +
+> +struct _kvm_stats_header kvm_vm_stats_header = {
+> +       .name_size = KVM_STATS_NAME_LEN,
+> +       .count = ARRAY_SIZE(kvm_vm_stats_desc),
+> +       .desc_offset = sizeof(struct kvm_stats_header),
+> +       .data_offset = sizeof(struct kvm_stats_header) +
+> +               sizeof(kvm_vm_stats_desc),
+> +};
+> +
+> +struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
+> +       STATS_VCPU_COMMON,
+> +       STATS_DESC_COUNTER("sum_exits"),
+> +       STATS_DESC_COUNTER("mmio_exits"),
+> +       STATS_DESC_COUNTER("signal_exits"),
+> +       STATS_DESC_COUNTER("light_exits"),
+> +       STATS_DESC_COUNTER("itlb_real_miss_exits"),
+> +       STATS_DESC_COUNTER("itlb_virt_miss_exits"),
+> +       STATS_DESC_COUNTER("dtlb_real_miss_exits"),
+> +       STATS_DESC_COUNTER("dtlb_virt_miss_exits"),
+> +       STATS_DESC_COUNTER("syscall_exits"),
+> +       STATS_DESC_COUNTER("isi_exits"),
+> +       STATS_DESC_COUNTER("dsi_exits"),
+> +       STATS_DESC_COUNTER("emulated_inst_exits"),
+> +       STATS_DESC_COUNTER("dec_exits"),
+> +       STATS_DESC_COUNTER("ext_intr_exits"),
+> +       STATS_DESC_TIME_NSEC("halt_wait_ns"),
+> +       STATS_DESC_COUNTER("halt_successful_wait"),
+> +       STATS_DESC_COUNTER("dbell_exits"),
+> +       STATS_DESC_COUNTER("gdbell_exits"),
+> +       STATS_DESC_COUNTER("ld"),
+> +       STATS_DESC_COUNTER("st"),
+> +       STATS_DESC_COUNTER("pthru_all"),
+> +       STATS_DESC_COUNTER("pthru_host"),
+> +       STATS_DESC_COUNTER("pthru_bad_aff"),
+> +};
+> +
+> +struct _kvm_stats_header kvm_vcpu_stats_header = {
+> +       .name_size = KVM_STATS_NAME_LEN,
+> +       .count = ARRAY_SIZE(kvm_vcpu_stats_desc),
+> +       .desc_offset = sizeof(struct kvm_stats_header),
+> +       .data_offset = sizeof(struct kvm_stats_header) +
+> +               sizeof(kvm_vcpu_stats_desc),
+> +};
+> +
+>  struct kvm_stats_debugfs_item debugfs_entries[] = {
+>         VCPU_STAT("mmio", mmio_exits),
+>         VCPU_STAT("sig", signal_exits),
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index d6bf3372bb10..2c91d70754a9 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -58,6 +58,127 @@
+>  #define VCPU_IRQS_MAX_BUF (sizeof(struct kvm_s390_irq) * \
+>                            (KVM_MAX_VCPUS + LOCAL_IRQS))
+>
+> +struct _kvm_stats_desc kvm_vm_stats_desc[] = {
+> +       STATS_VM_COMMON,
+> +       STATS_DESC_COUNTER("inject_io"),
+> +       STATS_DESC_COUNTER("inject_float_mchk"),
+> +       STATS_DESC_COUNTER("inject_pfault_done"),
+> +       STATS_DESC_COUNTER("inject_service_signal"),
+> +       STATS_DESC_COUNTER("inject_virtio"),
+> +};
+> +
+> +struct _kvm_stats_header kvm_vm_stats_header = {
+> +       .name_size = KVM_STATS_NAME_LEN,
+> +       .count = ARRAY_SIZE(kvm_vm_stats_desc),
+> +       .desc_offset = sizeof(struct kvm_stats_header),
+> +       .data_offset = sizeof(struct kvm_stats_header) +
+> +               sizeof(kvm_vm_stats_desc),
+> +};
+> +
+> +struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
+> +       STATS_VCPU_COMMON,
+> +       STATS_DESC_COUNTER("exit_userspace"),
+> +       STATS_DESC_COUNTER("exit_null"),
+> +       STATS_DESC_COUNTER("exit_external_request"),
+> +       STATS_DESC_COUNTER("exit_io_request"),
+> +       STATS_DESC_COUNTER("exit_external_interrupt"),
+> +       STATS_DESC_COUNTER("exit_stop_request"),
+> +       STATS_DESC_COUNTER("exit_validity"),
+> +       STATS_DESC_COUNTER("exit_instruction"),
+> +       STATS_DESC_COUNTER("exit_pei"),
+> +       STATS_DESC_COUNTER("halt_no_poll_steal"),
+> +       STATS_DESC_COUNTER("instruction_lctl"),
+> +       STATS_DESC_COUNTER("instruction_lctlg"),
+> +       STATS_DESC_COUNTER("instruction_stctl"),
+> +       STATS_DESC_COUNTER("instruction_stctg"),
+> +       STATS_DESC_COUNTER("exit_program_interruption"),
+> +       STATS_DESC_COUNTER("exit_instr_and_program"),
+> +       STATS_DESC_COUNTER("exit_operation_exception"),
+> +       STATS_DESC_COUNTER("deliver_ckc"),
+> +       STATS_DESC_COUNTER("deliver_cputm"),
+> +       STATS_DESC_COUNTER("deliver_external_call"),
+> +       STATS_DESC_COUNTER("deliver_emergency_signal"),
+> +       STATS_DESC_COUNTER("deliver_service_signal"),
+> +       STATS_DESC_COUNTER("deliver_virtio"),
+> +       STATS_DESC_COUNTER("deliver_stop_signal"),
+> +       STATS_DESC_COUNTER("deliver_prefix_signal"),
+> +       STATS_DESC_COUNTER("deliver_restart_signal"),
+> +       STATS_DESC_COUNTER("deliver_program"),
+> +       STATS_DESC_COUNTER("deliver_io"),
+> +       STATS_DESC_COUNTER("deliver_machine_check"),
+> +       STATS_DESC_COUNTER("exit_wait_state"),
+> +       STATS_DESC_COUNTER("inject_ckc"),
+> +       STATS_DESC_COUNTER("inject_cputm"),
+> +       STATS_DESC_COUNTER("inject_external_call"),
+> +       STATS_DESC_COUNTER("inject_emergency_signal"),
+> +       STATS_DESC_COUNTER("inject_mchk"),
+> +       STATS_DESC_COUNTER("inject_pfault_init"),
+> +       STATS_DESC_COUNTER("inject_program"),
+> +       STATS_DESC_COUNTER("inject_restart"),
+> +       STATS_DESC_COUNTER("inject_set_prefix"),
+> +       STATS_DESC_COUNTER("inject_stop_signal"),
+> +       STATS_DESC_COUNTER("instruction_epsw"),
+> +       STATS_DESC_COUNTER("instruction_gs"),
+> +       STATS_DESC_COUNTER("instruction_io_other"),
+> +       STATS_DESC_COUNTER("instruction_lpsw"),
+> +       STATS_DESC_COUNTER("instruction_lpswe"),
+> +       STATS_DESC_COUNTER("instruction_pfmf"),
+> +       STATS_DESC_COUNTER("instruction_ptff"),
+> +       STATS_DESC_COUNTER("instruction_sck"),
+> +       STATS_DESC_COUNTER("instruction_sckpf"),
+> +       STATS_DESC_COUNTER("instruction_stidp"),
+> +       STATS_DESC_COUNTER("instruction_spx"),
+> +       STATS_DESC_COUNTER("instruction_stpx"),
+> +       STATS_DESC_COUNTER("instruction_stap"),
+> +       STATS_DESC_COUNTER("instruction_iske"),
+> +       STATS_DESC_COUNTER("instruction_ri"),
+> +       STATS_DESC_COUNTER("instruction_rrbe"),
+> +       STATS_DESC_COUNTER("instruction_sske"),
+> +       STATS_DESC_COUNTER("instruction_ipte_interlock"),
+> +       STATS_DESC_COUNTER("instruction_stsi"),
+> +       STATS_DESC_COUNTER("instruction_stfl"),
+> +       STATS_DESC_COUNTER("instruction_tb"),
+> +       STATS_DESC_COUNTER("instruction_tpi"),
+> +       STATS_DESC_COUNTER("instruction_tprot"),
+> +       STATS_DESC_COUNTER("instruction_tsch"),
+> +       STATS_DESC_COUNTER("instruction_sie"),
+> +       STATS_DESC_COUNTER("instruction_essa"),
+> +       STATS_DESC_COUNTER("instruction_sthyi"),
+> +       STATS_DESC_COUNTER("instruction_sigp_sense"),
+> +       STATS_DESC_COUNTER("instruction_sigp_sense_running"),
+> +       STATS_DESC_COUNTER("instruction_sigp_external_call"),
+> +       STATS_DESC_COUNTER("instruction_sigp_emergency"),
+> +       STATS_DESC_COUNTER("instruction_sigp_cond_emergency"),
+> +       STATS_DESC_COUNTER("instruction_sigp_start"),
+> +       STATS_DESC_COUNTER("instruction_sigp_stop"),
+> +       STATS_DESC_COUNTER("instruction_sigp_stop_store_status"),
+> +       STATS_DESC_COUNTER("instruction_sigp_store_status"),
+> +       STATS_DESC_COUNTER("instruction_sigp_store_adtl_status"),
+> +       STATS_DESC_COUNTER("instruction_sigp_arch"),
+> +       STATS_DESC_COUNTER("instruction_sigp_prefix"),
+> +       STATS_DESC_COUNTER("instruction_sigp_restart"),
+> +       STATS_DESC_COUNTER("instruction_sigp_init_cpu_reset"),
+> +       STATS_DESC_COUNTER("instruction_sigp_cpu_reset"),
+> +       STATS_DESC_COUNTER("instruction_sigp_unknown"),
+> +       STATS_DESC_COUNTER("diagnose_10"),
+> +       STATS_DESC_COUNTER("diagnose_44"),
+> +       STATS_DESC_COUNTER("diagnose_9c"),
+> +       STATS_DESC_COUNTER("diagnose_9c_ignored"),
+> +       STATS_DESC_COUNTER("diagnose_258"),
+> +       STATS_DESC_COUNTER("diagnose_308"),
+> +       STATS_DESC_COUNTER("diagnose_500"),
+> +       STATS_DESC_COUNTER("diagnose_other"),
+> +       STATS_DESC_COUNTER("pfault_sync"),
+> +};
+> +
+> +struct _kvm_stats_header kvm_vcpu_stats_header = {
+> +       .name_size = KVM_STATS_NAME_LEN,
+> +       .count = ARRAY_SIZE(kvm_vcpu_stats_desc),
+> +       .desc_offset = sizeof(struct kvm_stats_header),
+> +       .data_offset = sizeof(struct kvm_stats_header) +
+> +               sizeof(kvm_vcpu_stats_desc),
+> +};
+> +
+>  struct kvm_stats_debugfs_item debugfs_entries[] = {
+>         VCPU_STAT("userspace_handled", exit_userspace),
+>         VCPU_STAT("exit_null", exit_null),
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index e1207fd8b40d..2b12b54f98da 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -217,6 +217,63 @@ EXPORT_SYMBOL_GPL(host_xss);
+>  u64 __read_mostly supported_xss;
+>  EXPORT_SYMBOL_GPL(supported_xss);
+>
+> +struct _kvm_stats_desc kvm_vm_stats_desc[] = {
+> +       STATS_VM_COMMON,
+> +       STATS_DESC_COUNTER("mmu_shadow_zapped"),
+> +       STATS_DESC_COUNTER("mmu_pte_write"),
+> +       STATS_DESC_COUNTER("mmu_pde_zapped"),
+> +       STATS_DESC_COUNTER("mmu_flooded"),
+> +       STATS_DESC_COUNTER("mmu_recycled"),
+> +       STATS_DESC_COUNTER("mmu_cache_miss"),
+> +       STATS_DESC_ICOUNTER("mmu_unsync"),
+> +       STATS_DESC_ICOUNTER("largepages"),
+> +       STATS_DESC_ICOUNTER("nx_largepages_splits"),
+> +       STATS_DESC_ICOUNTER("max_mmu_page_hash_collisions"),
+> +};
+> +
+> +struct _kvm_stats_header kvm_vm_stats_header = {
+> +       .name_size = KVM_STATS_NAME_LEN,
+> +       .count = ARRAY_SIZE(kvm_vm_stats_desc),
+> +       .desc_offset = sizeof(struct kvm_stats_header),
+> +       .data_offset = sizeof(struct kvm_stats_header) +
+> +               sizeof(kvm_vm_stats_desc),
+> +};
+> +
+> +struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
+> +       STATS_VCPU_COMMON,
+> +       STATS_DESC_COUNTER("pf_fixed"),
+> +       STATS_DESC_COUNTER("pf_guest"),
+> +       STATS_DESC_COUNTER("tlb_flush"),
+> +       STATS_DESC_COUNTER("invlpg"),
+> +       STATS_DESC_COUNTER("exits"),
+> +       STATS_DESC_COUNTER("io_exits"),
+> +       STATS_DESC_COUNTER("mmio_exits"),
+> +       STATS_DESC_COUNTER("signal_exits"),
+> +       STATS_DESC_COUNTER("irq_window_exits"),
+> +       STATS_DESC_COUNTER("nmi_window_exits"),
+> +       STATS_DESC_COUNTER("l1d_flush"),
+> +       STATS_DESC_COUNTER("halt_exits"),
+> +       STATS_DESC_COUNTER("request_irq_exits"),
+> +       STATS_DESC_COUNTER("irq_exits"),
+> +       STATS_DESC_COUNTER("host_state_reload"),
+> +       STATS_DESC_COUNTER("fpu_reload"),
+> +       STATS_DESC_COUNTER("insn_emulation"),
+> +       STATS_DESC_COUNTER("insn_emulation_fail"),
+> +       STATS_DESC_COUNTER("hypercalls"),
+> +       STATS_DESC_COUNTER("irq_injections"),
+> +       STATS_DESC_COUNTER("nmi_injections"),
+> +       STATS_DESC_COUNTER("req_event"),
+> +       STATS_DESC_COUNTER("nested_run"),
+> +};
+> +
+> +struct _kvm_stats_header kvm_vcpu_stats_header = {
+> +       .name_size = KVM_STATS_NAME_LEN,
+> +       .count = sizeof(kvm_vcpu_stats_desc),
+> +       .desc_offset = sizeof(struct kvm_stats_header),
+> +       .data_offset = sizeof(struct kvm_stats_header) +
+> +               sizeof(kvm_vcpu_stats_desc),
+> +};
+> +
+>  struct kvm_stats_debugfs_item debugfs_entries[] = {
+>         VCPU_STAT("pf_fixed", pf_fixed),
+>         VCPU_STAT("pf_guest", pf_guest),
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 9286516094e3..cad163bd9332 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1201,12 +1201,25 @@ struct kvm_stats_debugfs_item {
+>         int mode;
+>  };
+>
+> +struct _kvm_stats_header {
+> +       __u32 name_size;
+> +       __u32 count;
+> +       __u32 desc_offset;
+> +       __u32 data_offset;
+> +};
+> +
+> +#define KVM_STATS_NAME_LEN     32
+> +struct _kvm_stats_desc {
+> +       struct kvm_stats_desc desc;
+> +       char name[KVM_STATS_NAME_LEN];
+> +};
+> +
+>  #define KVM_DBGFS_GET_MODE(dbgfs_item)                                         \
+>         ((dbgfs_item)->mode ? (dbgfs_item)->mode : 0644)
+>
+> -#define VM_STAT(n, x, ...)                                                     \
+> +#define VM_STAT(n, x, ...)                                                    \
+>         { n, offsetof(struct kvm, stat.x), KVM_STAT_VM, ## __VA_ARGS__ }
+> -#define VCPU_STAT(n, x, ...)                                                   \
+> +#define VCPU_STAT(n, x, ...)                                                  \
+>         { n, offsetof(struct kvm_vcpu, stat.x), KVM_STAT_VCPU, ## __VA_ARGS__ }
+>  #define VM_STAT_COM(n, x, ...)                                                        \
+>         { n, offsetof(struct kvm, stat.common.x), KVM_STAT_VM, ## __VA_ARGS__ }
+> @@ -1214,8 +1227,118 @@ struct kvm_stats_debugfs_item {
+>         { n, offsetof(struct kvm_vcpu, stat.common.x),                         \
+>           KVM_STAT_VCPU, ## __VA_ARGS__ }
+>
+> +#define STATS_DESC(name, type, unit, scale, exponent)                         \
+> +       {                                                                      \
+> +               {type | unit | scale, exponent, 1}, name,                      \
+> +       }
+> +#define STATS_DESC_CUMULATIVE(name, unit, scale, exponent)                    \
+> +       STATS_DESC(name, KVM_STATS_TYPE_CUMULATIVE, unit, scale, exponent)
+> +#define STATS_DESC_INSTANT(name, unit, scale, exponent)                               \
+> +       STATS_DESC(name, KVM_STATS_TYPE_INSTANT, unit, scale, exponent)
+> +
+> +// Cumulative counter
+Will use C style comments for all the changes in this patch.
+> +#define STATS_DESC_COUNTER(name)                                              \
+> +       STATS_DESC_CUMULATIVE(name, KVM_STATS_UNIT_NONE,                       \
+> +               KVM_STATS_SCALE_POW10, 0)
+> +// Instantaneous counter
+> +#define STATS_DESC_ICOUNTER(name)                                             \
+> +       STATS_DESC_INSTANT(name, KVM_STATS_UNIT_NONE,                          \
+> +               KVM_STATS_SCALE_POW10, 0)
+> +
+> +// Cumulative clock cycles
+> +#define STATS_DESC_CYCLE(name)                                                \
+> +       STATS_DESC_CUMULATIVE(name, KVM_STATS_UNIT_CYCLES,                     \
+> +               KVM_STATS_SCALE_POW10, 0)
+> +// Instantaneous clock cycles
+> +#define STATS_DESC_ICYCLE(name)                                                       \
+> +       STATS_DESC_INSTANT(name, KVM_STATS_UNIT_CYCLES,                        \
+> +               KVM_STATS_SCALE_POW10, 0)
+> +
+> +// Cumulative memory size in Byte
+> +#define STATS_DESC_SIZE_BYTE(name)                                            \
+> +       STATS_DESC_CUMULATIVE(name, KVM_STATS_UNIT_BYTES,                      \
+> +               KVM_STATS_SCALE_POW2, 0)
+> +// Cumulative memory size in KiByte
+> +#define STATS_DESC_SIZE_KBYTE(name)                                           \
+> +       STATS_DESC_CUMULATIVE(name, KVM_STATS_UNIT_BYTES,                      \
+> +               KVM_STATS_SCALE_POW2, 10)
+> +// Cumulative memory size in MiByte
+> +#define STATS_DESC_SIZE_MBYTE(name)                                           \
+> +       STATS_DESC_CUMULATIVE(name, KVM_STATS_UNIT_BYTES,                      \
+> +               KVM_STATS_SCALE_POW2, 20)
+> +// Cumulative memory size in GiByte
+> +#define STATS_DESC_SIZE_GBYTE(name)                                           \
+> +       STATS_DESC_CUMULATIVE(name, KVM_STATS_UNIT_BYTES,                      \
+> +               KVM_STATS_SCALE_POW2, 30)
+> +
+> +// Instantaneous memory size in Byte
+> +#define STATS_DESC_ISIZE_BYTE(name)                                           \
+> +       STATS_DESC_INSTANT(name, KVM_STATS_UNIT_BYTES,                         \
+> +               KVM_STATS_SCALE_POW2, 0)
+> +// Instantaneous memory size in KiByte
+> +#define STATS_DESC_ISIZE_KBYTE(name)                                          \
+> +       STATS_DESC_INSTANT(name, KVM_STATS_UNIT_BYTES,                         \
+> +               KVM_STATS_SCALE_POW2, 10)
+> +// Instantaneous memory size in MiByte
+> +#define STATS_DESC_ISIZE_MBYTE(name)                                          \
+> +       STATS_DESC_INSTANT(name, KVM_STATS_UNIT_BYTES,                         \
+> +               KVM_STATS_SCALE_POW2, 20)
+> +// Instantaneous memory size in GiByte
+> +#define STATS_DESC_ISIZE_GBYTE(name)                                          \
+> +       STATS_DESC_INSTANT(name, KVM_STATS_UNIT_BYTES,                         \
+> +               KVM_STATS_SCALE_POW2, 30)
+> +
+> +// Cumulative time in second
+> +#define STATS_DESC_TIME_SEC(name)                                             \
+> +       STATS_DESC_CUMULATIVE(name, KVM_STATS_UNIT_SECONDS,                    \
+> +               KVM_STATS_SCALE_POW10, 0)
+> +// Cumulative time in millisecond
+> +#define STATS_DESC_TIME_MSEC(name)                                            \
+> +       STATS_DESC_CUMULATIVE(name, KVM_STATS_UNIT_SECONDS,                    \
+> +               KVM_STATS_SCALE_POW10, -3)
+> +// Cumulative time in microsecond
+> +#define STATS_DESC_TIME_USEC(name)                                            \
+> +       STATS_DESC_CUMULATIVE(name, KVM_STATS_UNIT_SECONDS,                    \
+> +               KVM_STATS_SCALE_POW10, -6)
+> +// Cumulative time in nanosecond
+> +#define STATS_DESC_TIME_NSEC(name)                                            \
+> +       STATS_DESC_CUMULATIVE(name, KVM_STATS_UNIT_SECONDS,                    \
+> +               KVM_STATS_SCALE_POW10, -9)
+> +
+> +// Instantaneous time in second
+> +#define STATS_DESC_ITIME_SEC(name)                                            \
+> +       STATS_DESC_INSTANT(name, KVM_STATS_UNIT_SECONDS,                       \
+> +               KVM_STATS_SCALE_POW10, 0)
+> +// Instantaneous time in millisecond
+> +#define STATS_DESC_ITIME_MSEC(name)                                           \
+> +       STATS_DESC_INSTANT(name, KVM_STATS_UNIT_SECONDS,                       \
+> +               KVM_STATS_SCALE_POW10, -3)
+> +// Instantaneous time in microsecond
+> +#define STATS_DESC_ITIME_USEC(name)                                           \
+> +       STATS_DESC_INSTANT(name, KVM_STATS_UNIT_SECONDS,                       \
+> +               KVM_STATS_SCALE_POW10, -6)
+> +// Instantaneous time in nanosecond
+> +#define STATS_DESC_ITIME_NSEC(name)                                           \
+> +       STATS_DESC_INSTANT(name, KVM_STATS_UNIT_SECONDS,                       \
+> +               KVM_STATS_SCALE_POW10, -9)
+> +
+> +#define STATS_VM_COMMON                                                               \
+> +       STATS_DESC_COUNTER("remote_tlb_flush")
+> +
+> +#define STATS_VCPU_COMMON                                                     \
+> +       STATS_DESC_COUNTER("halt_successful_poll"),                            \
+> +       STATS_DESC_COUNTER("halt_attempted_poll"),                             \
+> +       STATS_DESC_COUNTER("halt_poll_invalid"),                               \
+> +       STATS_DESC_COUNTER("halt_wakeup"),                                     \
+> +       STATS_DESC_TIME_NSEC("halt_poll_success_ns"),                          \
+> +       STATS_DESC_TIME_NSEC("halt_poll_fail_ns")
+> +
+>  extern struct kvm_stats_debugfs_item debugfs_entries[];
+>  extern struct dentry *kvm_debugfs_dir;
+> +extern struct _kvm_stats_header kvm_vm_stats_header;
+> +extern struct _kvm_stats_header kvm_vcpu_stats_header;
+> +extern struct _kvm_stats_desc kvm_vm_stats_desc[];
+> +extern struct _kvm_stats_desc kvm_vcpu_stats_desc[];
+>
+>  #if defined(CONFIG_MMU_NOTIFIER) && defined(KVM_ARCH_WANT_MMU_NOTIFIER)
+>  static inline int mmu_notifier_retry(struct kvm *kvm, unsigned long mmu_seq)
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 7dc1c217704f..ca8a91421bae 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1082,6 +1082,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_SGX_ATTRIBUTE 196
+>  #define KVM_CAP_VM_COPY_ENC_CONTEXT_FROM 197
+>  #define KVM_CAP_EXIT_HYPERCALL 198
+> +#define KVM_CAP_STATS_BINARY_FD 199
+>
+>  #ifdef KVM_CAP_IRQ_ROUTING
+>
+> @@ -1898,4 +1899,53 @@ struct kvm_dirty_gfn {
+>  #define KVM_BUS_LOCK_DETECTION_OFF             (1 << 0)
+>  #define KVM_BUS_LOCK_DETECTION_EXIT            (1 << 1)
+>
+> +#define KVM_STATS_ID_MAXLEN            64
+> +
+> +struct kvm_stats_header {
+> +       char id[KVM_STATS_ID_MAXLEN];
+> +       __u32 name_size;
+> +       __u32 count;
+> +       __u32 desc_offset;
+> +       __u32 data_offset;
+> +};
+> +
+> +#define KVM_STATS_TYPE_SHIFT           0
+> +#define KVM_STATS_TYPE_MASK            (0xF << KVM_STATS_TYPE_SHIFT)
+> +#define KVM_STATS_TYPE_CUMULATIVE      (0x0 << KVM_STATS_TYPE_SHIFT)
+> +#define KVM_STATS_TYPE_INSTANT         (0x1 << KVM_STATS_TYPE_SHIFT)
+> +#define KVM_STATS_TYPE_MAX             KVM_STATS_TYPE_INSTANT
+> +
+> +#define KVM_STATS_UNIT_SHIFT           4
+> +#define KVM_STATS_UNIT_MASK            (0xF << KVM_STATS_UNIT_SHIFT)
+> +#define KVM_STATS_UNIT_NONE            (0x0 << KVM_STATS_UNIT_SHIFT)
+> +#define KVM_STATS_UNIT_BYTES           (0x1 << KVM_STATS_UNIT_SHIFT)
+> +#define KVM_STATS_UNIT_SECONDS         (0x2 << KVM_STATS_UNIT_SHIFT)
+> +#define KVM_STATS_UNIT_CYCLES          (0x3 << KVM_STATS_UNIT_SHIFT)
+> +#define KVM_STATS_UNIT_MAX             KVM_STATS_UNIT_CYCLES
+> +
+> +#define KVM_STATS_SCALE_SHIFT          8
+> +#define KVM_STATS_SCALE_MASK           (0xF << KVM_STATS_SCALE_SHIFT)
+> +#define KVM_STATS_SCALE_POW10          (0x0 << KVM_STATS_SCALE_SHIFT)
+> +#define KVM_STATS_SCALE_POW2           (0x1 << KVM_STATS_SCALE_SHIFT)
+> +#define KVM_STATS_SCALE_MAX            KVM_STATS_SCALE_POW2
+> +
+> +struct kvm_stats_desc {
+> +       __u32 flags;
+> +       __s16 exponent;
+> +       __u16 size;
+> +       __u32 unused1;
+> +       __u32 unused2;
+> +       char name[0];
+> +};
+> +
+> +struct kvm_vm_stats_data {
+> +       unsigned long value[0];
+> +};
+> +
+> +struct kvm_vcpu_stats_data {
+> +       __u64 value[0];
+> +};
+> +
+> +#define KVM_STATS_GETFD  _IOR(KVMIO,  0xcc, struct kvm_stats_header)
+> +
+>  #endif /* __LINUX_KVM_H */
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index cdf53fb75ca1..445df8883d2b 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -3458,6 +3458,115 @@ static int kvm_vcpu_ioctl_set_sigmask(struct kvm_vcpu *vcpu, sigset_t *sigset)
+>         return 0;
+>  }
+>
+> +static ssize_t kvm_vcpu_stats_read(struct file *file, char __user *user_buffer,
+> +                             size_t size, loff_t *offset)
+> +{
+> +       char id[KVM_STATS_ID_MAXLEN];
+> +       struct kvm_vcpu *vcpu = file->private_data;
+> +       ssize_t copylen, len, remain = size;
+> +       size_t size_header, size_desc, size_stats;
+> +       loff_t pos = *offset;
+> +       char __user *dest = user_buffer;
+> +       void *src;
+> +
+> +       snprintf(id, sizeof(id), "kvm-%d/vcpu-%d",
+> +                       task_pid_nr(current), vcpu->vcpu_id);
+> +       size_header = sizeof(kvm_vcpu_stats_header);
+> +       size_desc =
+> +               kvm_vcpu_stats_header.count * sizeof(struct _kvm_stats_desc);
+> +       size_stats = sizeof(vcpu->stat);
+> +
+> +       len = sizeof(id) + size_header + size_desc + size_stats - pos;
+> +       len = min(len, remain);
+> +       if (len <= 0)
+> +               return 0;
+> +       remain = len;
+> +
+> +       // Copy kvm vcpu stats header id string
+> +       copylen = sizeof(id) - pos;
+> +       copylen = min(copylen, remain);
+> +       if (copylen > 0) {
+> +               src = (void *)id + pos;
+> +               if (copy_to_user(dest, src, copylen))
+> +                       return -EFAULT;
+> +               remain -= copylen;
+> +               pos += copylen;
+> +               dest += copylen;
+> +       }
+> +       // Copy kvm vcpu stats header
+> +       copylen = sizeof(id) + size_header - pos;
+> +       copylen = min(copylen, remain);
+> +       if (copylen > 0) {
+> +               src = (void *)&kvm_vcpu_stats_header;
+> +               src += pos - sizeof(id);
+> +               if (copy_to_user(dest, src, copylen))
+> +                       return -EFAULT;
+> +               remain -= copylen;
+> +               pos += copylen;
+> +               dest += copylen;
+> +       }
+> +       // Copy kvm vcpu stats descriptors
+> +       copylen = kvm_vcpu_stats_header.desc_offset + size_desc - pos;
+> +       copylen = min(copylen, remain);
+> +       if (copylen > 0) {
+> +               src = (void *)&kvm_vcpu_stats_desc;
+> +               src += pos - kvm_vcpu_stats_header.desc_offset;
+> +               if (copy_to_user(dest, src, copylen))
+> +                       return -EFAULT;
+> +               remain -= copylen;
+> +               pos += copylen;
+> +               dest += copylen;
+> +       }
+> +       // Copy kvm vcpu stats values
+> +       copylen = kvm_vcpu_stats_header.data_offset + size_stats - pos;
+> +       copylen = min(copylen, remain);
+> +       if (copylen > 0) {
+> +               src = (void *)&vcpu->stat;
+> +               src += pos - kvm_vcpu_stats_header.data_offset;
+> +               if (copy_to_user(dest, src, copylen))
+> +                       return -EFAULT;
+> +               remain -= copylen;
+> +               pos += copylen;
+> +               dest += copylen;
+> +       }
+> +
+> +       *offset = pos;
+> +       return len;
+> +}
+> +
+> +static struct file_operations kvm_vcpu_stats_fops = {
+> +       .read = kvm_vcpu_stats_read,
+> +       .llseek = noop_llseek,
+> +};
+> +
+> +static int kvm_vcpu_ioctl_get_statsfd(struct kvm_vcpu *vcpu)
+> +{
+> +       int error, fd;
+> +       struct file *file;
+> +       char name[15 + ITOA_MAX_LEN + 1];
+> +
+> +       snprintf(name, sizeof(name), "kvm-vcpu-stats:%d", vcpu->vcpu_id);
+> +
+> +       error = get_unused_fd_flags(O_CLOEXEC);
+> +       if (error < 0)
+> +               return error;
+> +       fd = error;
+> +
+> +       file = anon_inode_getfile(name, &kvm_vcpu_stats_fops, vcpu, O_RDONLY);
+> +       if (IS_ERR(file)) {
+> +               error = PTR_ERR(file);
+> +               goto err_put_unused_fd;
+> +       }
+> +       file->f_mode |= FMODE_PREAD;
+> +       fd_install(fd, file);
+> +
+> +       return fd;
+> +
+> +err_put_unused_fd:
+> +       put_unused_fd(fd);
+> +       return error;
+> +}
+> +
+>  static long kvm_vcpu_ioctl(struct file *filp,
+>                            unsigned int ioctl, unsigned long arg)
+>  {
+> @@ -3655,6 +3764,10 @@ static long kvm_vcpu_ioctl(struct file *filp,
+>                 r = kvm_arch_vcpu_ioctl_set_fpu(vcpu, fpu);
+>                 break;
+>         }
+> +       case KVM_STATS_GETFD: {
+> +               r = kvm_vcpu_ioctl_get_statsfd(vcpu);
+> +               break;
+> +       }
+>         default:
+>                 r = kvm_arch_vcpu_ioctl(filp, ioctl, arg);
+>         }
+> @@ -3913,6 +4026,8 @@ static long kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+>  #else
+>                 return 0;
+>  #endif
+> +       case KVM_CAP_STATS_BINARY_FD:
+> +               return 1;
+>         default:
+>                 break;
+>         }
+> @@ -4016,6 +4131,111 @@ static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
+>         }
+>  }
+>
+> +static ssize_t kvm_vm_stats_read(struct file *file, char __user *user_buffer,
+> +                             size_t size, loff_t *offset)
+> +{
+> +       char id[KVM_STATS_ID_MAXLEN];
+> +       struct kvm *kvm = file->private_data;
+> +       ssize_t copylen, len, remain = size;
+> +       size_t size_header, size_desc, size_stats;
+> +       loff_t pos = *offset;
+> +       char __user *dest = user_buffer;
+> +       void *src;
+> +
+> +       snprintf(id, sizeof(id), "kvm-%d", task_pid_nr(current));
+> +       size_header = sizeof(kvm_vm_stats_header);
+> +       size_desc = kvm_vm_stats_header.count * sizeof(struct _kvm_stats_desc);
+> +       size_stats = sizeof(kvm->stat);
+> +
+> +       len = sizeof(id) + size_header + size_desc + size_stats - pos;
+> +       len = min(len, remain);
+> +       if (len <= 0)
+> +               return 0;
+> +       remain = len;
+> +
+> +       // Copy kvm vm stats header id string
+> +       copylen = sizeof(id) - pos;
+> +       copylen = min(copylen, remain);
+> +       if (copylen > 0) {
+> +               src = (void *)id + pos;
+> +               if (copy_to_user(dest, src, copylen))
+> +                       return -EFAULT;
+> +               remain -= copylen;
+> +               pos += copylen;
+> +               dest += copylen;
+> +       }
+> +       // Copy kvm vm stats header
+> +       copylen = sizeof(id) + size_header - pos;
+> +       copylen = min(copylen, remain);
+> +       if (copylen > 0) {
+> +               src = (void *)&kvm_vm_stats_header;
+> +               src += pos - sizeof(id);
+> +               if (copy_to_user(dest, src, copylen))
+> +                       return -EFAULT;
+> +               remain -= copylen;
+> +               pos += copylen;
+> +               dest += copylen;
+> +       }
+> +       // Copy kvm vm stats descriptors
+> +       copylen = kvm_vm_stats_header.desc_offset + size_desc - pos;
+> +       copylen = min(copylen, remain);
+> +       if (copylen > 0) {
+> +               src = (void *)&kvm_vm_stats_desc;
+> +               src += pos - kvm_vm_stats_header.desc_offset;
+> +               if (copy_to_user(dest, src, copylen))
+> +                       return -EFAULT;
+> +               remain -= copylen;
+> +               pos += copylen;
+> +               dest += copylen;
+> +       }
+> +       // Copy kvm vm stats values
+> +       copylen = kvm_vm_stats_header.data_offset + size_stats - pos;
+> +       copylen = min(copylen, remain);
+> +       if (copylen > 0) {
+> +               src = (void *)&kvm->stat;
+> +               src += pos - kvm_vm_stats_header.data_offset;
+> +               if (copy_to_user(dest, src, copylen))
+> +                       return -EFAULT;
+> +               remain -= copylen;
+> +               pos += copylen;
+> +               dest += copylen;
+> +       }
+> +
+> +       *offset = pos;
+> +       return len;
+> +}
+> +
+> +static struct file_operations kvm_vm_stats_fops = {
+> +       .read = kvm_vm_stats_read,
+> +       .llseek = noop_llseek,
+> +};
+> +
+> +static int kvm_vm_ioctl_get_statsfd(struct kvm *kvm)
+> +{
+> +       int error, fd;
+> +       struct file *file;
+> +
+> +       error = get_unused_fd_flags(O_CLOEXEC);
+> +       if (error < 0)
+> +               return error;
+> +       fd = error;
+> +
+> +       file = anon_inode_getfile("kvm-vm-stats",
+> +                       &kvm_vm_stats_fops, kvm, O_RDONLY);
+> +       if (IS_ERR(file)) {
+> +               error = PTR_ERR(file);
+> +               goto err_put_unused_fd;
+> +       }
+> +       file->f_mode |= FMODE_PREAD;
+> +       fd_install(fd, file);
+> +
+> +       return fd;
+> +
+> +err_put_unused_fd:
+> +       put_unused_fd(fd);
+> +       return error;
+> +}
+> +
+>  static long kvm_vm_ioctl(struct file *filp,
+>                            unsigned int ioctl, unsigned long arg)
+>  {
+> @@ -4198,6 +4418,9 @@ static long kvm_vm_ioctl(struct file *filp,
+>         case KVM_RESET_DIRTY_RINGS:
+>                 r = kvm_vm_ioctl_reset_dirty_pages(kvm);
+>                 break;
+> +       case KVM_STATS_GETFD:
+> +               r = kvm_vm_ioctl_get_statsfd(kvm);
+> +               break;
+>         default:
+>                 r = kvm_arch_vm_ioctl(filp, ioctl, arg);
+>         }
+> --
+> 2.31.1.498.g6c1eba8ee3d-goog
+>
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
