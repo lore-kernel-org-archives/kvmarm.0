@@ -2,60 +2,84 @@ Return-Path: <SRS0=f3Zk=JZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7560EC43461
-	for <kvmarm@archiver.kernel.org>; Wed, 28 Apr 2021 14:43:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C9BAC433ED
+	for <kvmarm@archiver.kernel.org>; Wed, 28 Apr 2021 15:26:43 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D2D6F6142A
-	for <kvmarm@archiver.kernel.org>; Wed, 28 Apr 2021 14:43:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2D6F6142A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 8557761440
+	for <kvmarm@archiver.kernel.org>; Wed, 28 Apr 2021 15:26:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8557761440
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 287884B243;
-	Wed, 28 Apr 2021 10:43:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E55084B226;
+	Wed, 28 Apr 2021 11:26:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 1v4cf4meuafU; Wed, 28 Apr 2021 10:43:47 -0400 (EDT)
+	with ESMTP id dx4lhHdhHSuw; Wed, 28 Apr 2021 11:26:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CB0944B266;
-	Wed, 28 Apr 2021 10:43:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CF0214B260;
+	Wed, 28 Apr 2021 11:26:38 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 431CD4B25D
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Apr 2021 10:43:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7654A4B260
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Apr 2021 11:26:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Vo4nDmC3CiYT for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Apr 2021 10:43:45 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DBA9C4B243
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Apr 2021 10:43:44 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7247EED1;
- Wed, 28 Apr 2021 07:43:44 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CF0D03F694;
- Wed, 28 Apr 2021 07:43:43 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH v2] configure: arm: Replace --vmm with
- --target
-To: Andrew Jones <drjones@redhat.com>
-References: <20210427163437.243839-1-alexandru.elisei@arm.com>
- <20210427171011.ymu7j5sen76c4xb3@gator.home>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <c10442e1-f7e1-e777-c33e-d103276febf8@arm.com>
-Date: Wed, 28 Apr 2021 15:44:18 +0100
+ with ESMTP id cr5ygLfesfan for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Apr 2021 11:26:36 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6246F4B226
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Apr 2021 11:26:36 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1619623596;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=N9sLSkMd2PrkFOc/KnB2Eh0J9f5STmd+QbevjYr4WCA=;
+ b=JHBsTR+o0959iqy4+4PoTGEetS6yzX43fFszB4wbbXidP3gmTlbLZoesYtRayrkf9PRuB2
+ ZhOhRBi04nWe6vWUoXUw76+TcPFzI5qaHhNt+Dagg5760VTI71Ai7bbQNSG5eQ/AyykXOx
+ NDg6aB2X0UUbJspFS767OVX9faCSREg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-140-3DP7XKC2MKKxA7cDD_b_jQ-1; Wed, 28 Apr 2021 11:26:32 -0400
+X-MC-Unique: 3DP7XKC2MKKxA7cDD_b_jQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BD33880ED8D;
+ Wed, 28 Apr 2021 15:26:30 +0000 (UTC)
+Received: from [10.36.113.191] (ovpn-113-191.ams2.redhat.com [10.36.113.191])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BC4E91007610;
+ Wed, 28 Apr 2021 15:26:28 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v1 1/4] arm64: split its-trigger test into
+ KVM and TCG variants
+To: Marc Zyngier <maz@kernel.org>, Alexandru Elisei <alexandru.elisei@arm.com>
+References: <20210428101844.22656-1-alex.bennee@linaro.org>
+ <20210428101844.22656-2-alex.bennee@linaro.org>
+ <eaed3c63988513fe2849c2d6f22937af@kernel.org> <87fszasjdg.fsf@linaro.org>
+ <996210ae-9c63-54ff-1a65-6dbd63da74d2@arm.com> <87k0omo4rr.wl-maz@kernel.org>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <5c446e6e-fb21-3a47-587b-6ad5e6baf096@redhat.com>
+Date: Wed, 28 Apr 2021 17:26:26 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.0
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-In-Reply-To: <20210427171011.ymu7j5sen76c4xb3@gator.home>
+In-Reply-To: <87k0omo4rr.wl-maz@kernel.org>
 Content-Language: en-US
-Cc: pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Cc: kvm@vger.kernel.org, shashi.mallela@linaro.org, qemu-arm@nongnu.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -72,108 +96,42 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Drew,
+Hi,
 
-On 4/27/21 6:10 PM, Andrew Jones wrote:
-> On Tue, Apr 27, 2021 at 05:34:37PM +0100, Alexandru Elisei wrote:
->> The --vmm configure option was added to distinguish between the two virtual
->> machine managers that kvm-unit-tests supports, qemu or kvmtool. There are
->> plans to make kvm-unit-tests work as an EFI app, which will require changes
->> to the way tests are compiled. Instead of adding a new configure option
->> specifically for EFI and have it coexist with --vmm, or overloading the
->> semantics of the existing --vmm option, let's replace --vmm with the more
->> generic name --target.
+On 4/28/21 4:36 PM, Marc Zyngier wrote:
+> On Wed, 28 Apr 2021 15:00:15 +0100,
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 >>
->> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
->> ---
->> Changes in v2:
->>
->> * Removed the RFC tag and cover letter.
->> * Removed --vmm entirely.
->>
->>  configure | 19 ++++++++++---------
->>  1 file changed, 10 insertions(+), 9 deletions(-)
->>
->> diff --git a/configure b/configure
->> index 01a0b262a9f2..08c6afdf952c 100755
->> --- a/configure
->> +++ b/configure
->> @@ -21,7 +21,7 @@ pretty_print_stacks=yes
->>  environ_default=yes
->>  u32_long=
->>  wa_divide=
->> -vmm="qemu"
->> +target="qemu"
->>  errata_force=0
->>  erratatxt="$srcdir/errata.txt"
->>  host_key_document=
->> @@ -35,8 +35,8 @@ usage() {
->>  	Options include:
->>  	    --arch=ARCH            architecture to compile for ($arch)
->>  	    --processor=PROCESSOR  processor to compile for ($arch)
->> -	    --vmm=VMM              virtual machine monitor to compile for (qemu
->> -	                           or kvmtool, default is qemu) (arm/arm64 only)
->> +	    --target=TARGET        target platform that the tests will be running on (qemu or
->> +	                           kvmtool, default is qemu) (arm/arm64 only)
->>  	    --cross-prefix=PREFIX  cross compiler prefix
->>  	    --cc=CC		   c compiler to use ($cc)
->>  	    --ld=LD		   ld linker to use ($ld)
->> @@ -58,7 +58,7 @@ usage() {
->>  	    --earlycon=EARLYCON
->>  	                           Specify the UART name, type and address (optional, arm and
->>  	                           arm64 only). The specified address will overwrite the UART
->> -	                           address set by the --vmm option. EARLYCON can be one of
->> +	                           address set by the --target option. EARLYCON can be one of
->>  	                           (case sensitive):
->>  	               uart[8250],mmio,ADDR
->>  	                           Specify an 8250 compatible UART at address ADDR. Supported
->> @@ -88,8 +88,8 @@ while [[ "$1" = -* ]]; do
->>          --processor)
->>  	    processor="$arg"
->>  	    ;;
->> -	--vmm)
->> -	    vmm="$arg"
->> +	--target)
->> +	    target="$arg"
->>  	    ;;
->>  	--cross-prefix)
->>  	    cross_prefix="$arg"
->> @@ -177,13 +177,13 @@ if [ "$arch" = "i386" ] || [ "$arch" = "x86_64" ]; then
->>      testdir=x86
->>  elif [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
->>      testdir=arm
->> -    if [ "$vmm" = "qemu" ]; then
->> +    if [ "$target" = "qemu" ]; then
->>          arm_uart_early_addr=0x09000000
->> -    elif [ "$vmm" = "kvmtool" ]; then
->> +    elif [ "$target" = "kvmtool" ]; then
->>          arm_uart_early_addr=0x3f8
->>          errata_force=1
->>      else
->> -        echo '--vmm must be one of "qemu" or "kvmtool"!'
->> +        echo '--target must be one of "qemu" or "kvmtool"!'
->>          usage
->>      fi
->>  
->> @@ -317,6 +317,7 @@ U32_LONG_FMT=$u32_long
->>  WA_DIVIDE=$wa_divide
->>  GENPROTIMG=${GENPROTIMG-genprotimg}
->>  HOST_KEY_DOCUMENT=$host_key_document
->> +TARGET=$target
-> We should only emit this TARGET=qemu to the config.mak when we're
-> arm/arm64, since that's what the help text says. Also, because the help
-> text says that the --target option is only for arm/arm64, then configure
-> should error out if it's used with another architecture. The nice thing
-> about this rename is that we can get that right this time. We didn't error
-> out with --vmm, but we should have. Erroring out on an unsupported
-> feature allows us to add support for it later without the users having
-> to guess if it'll work or not.
+>> I interpret that as that an INVALL guarantees that a change is
+>> visible, but it the change can become visible even without the
+>> INVALL.
+> 
+> Yes. Expecting the LPI to be delivered or not in the absence of an
+> invalidate when its configuration has been altered is wrong. The
+> architecture doesn't guarantee anything of the sort.
+> 
+>> The test relies on the fact that changes to the LPI tables are not
+>> visible *under KVM* until the INVALL command, but that's not
+>> necessarily the case on real hardware. To match the spec, I think
+>> the test "dev2/eventid=20 still does not trigger any LPI" should be
+>> removed and the stats reset should take place before the
+>> configuration for LPI 8195 is set to the default.
 
-You're right, I'll fix it for v3.
+Yes I do agree with Alexandru and Marc after another reading of the
+spec. I initially thought the INVALL was the gate keeper for the new
+config but that sounds wrong. This test shall be removed then.
 
-Thanks,
+Eric
+> 
+> If that's what the test expects (I haven't tried to investigate), it
+> should be dropped completely, rather than trying to sidestep it for
+> TCG.
+> 
+> Thanks,
+> 
+> 	M.
+> 
 
-Alex
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
