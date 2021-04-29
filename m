@@ -7,73 +7,58 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10044C433B4
-	for <kvmarm@archiver.kernel.org>; Thu, 29 Apr 2021 09:11:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22F0DC433ED
+	for <kvmarm@archiver.kernel.org>; Thu, 29 Apr 2021 10:32:07 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3A2E161073
-	for <kvmarm@archiver.kernel.org>; Thu, 29 Apr 2021 09:11:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A2E161073
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 65D8361457
+	for <kvmarm@archiver.kernel.org>; Thu, 29 Apr 2021 10:32:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65D8361457
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8636D4B334;
-	Thu, 29 Apr 2021 05:11:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B8EC24B329;
+	Thu, 29 Apr 2021 06:32:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id kJQGqIg+yH5V; Thu, 29 Apr 2021 05:11:51 -0400 (EDT)
+	with ESMTP id PyIKcpBEJZ0p; Thu, 29 Apr 2021 06:32:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B4B64B335;
-	Thu, 29 Apr 2021 05:11:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D7DD4B33D;
+	Thu, 29 Apr 2021 06:32:04 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3FD644B2C7
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Apr 2021 20:48:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 32F764B325
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Apr 2021 06:32:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4y+6c+aB26AU for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Apr 2021 20:48:36 -0400 (EDT)
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 83EB14B2C6
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Apr 2021 20:48:36 -0400 (EDT)
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.58])
- by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4FVxcN65dqzlVyx;
- Thu, 29 Apr 2021 08:45:24 +0800 (CST)
-Received: from [10.174.177.244] (10.174.177.244) by
- DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
- 14.3.498.0; Thu, 29 Apr 2021 08:48:27 +0800
-Subject: Re: arm32: panic in move_freepages (Was [PATCH v2 0/4] arm64: drop
- pfn_valid_within() and simplify pfn_valid())
-To: Mike Rapoport <rppt@kernel.org>
-References: <9aa68d26-d736-3b75-4828-f148964eb7f0@huawei.com>
- <YIEl8aKr8Ly0Zd3O@kernel.org>
- <33fa74c2-f32d-f224-eb30-acdb717179ff@huawei.com>
- <2a1592ad-bc9d-4664-fd19-f7448a37edc0@huawei.com>
- <YIUYG8N9T3/C/tSG@kernel.org>
- <52f7d03b-7219-46bc-c62d-b976bc31ebd5@huawei.com>
- <YIZNq5HMfJ1rWytv@kernel.org>
- <2d879629-3059-fd42-428f-4b7c2a73d698@huawei.com>
- <YIet5X7lgygD9rpZ@kernel.org>
- <259d14df-a713-72e7-4ccb-c06a8ee31e13@huawei.com>
- <YIj5zcbHBHt7CC8B@kernel.org>
-From: Kefeng Wang <wangkefeng.wang@huawei.com>
-Message-ID: <6ad2956c-70ae-c423-ed7d-88e94c88060f@huawei.com>
-Date: Thu, 29 Apr 2021 08:48:26 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ with ESMTP id VP4KMUNhKrD5 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 29 Apr 2021 06:32:01 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C3FF64B2FD
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Apr 2021 06:32:01 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BA2911FB;
+ Thu, 29 Apr 2021 03:31:59 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 67D8F3F70D;
+ Thu, 29 Apr 2021 03:31:58 -0700 (PDT)
+Subject: Re: [PATCH] KVM: arm64: Skip CMOs when updating a PTE pointing to
+ non-memory
+To: Jean-Philippe Brucker <jean-philippe@linaro.org>
+References: <20210426103605.616908-1-maz@kernel.org>
+ <e6d955f1-f2a4-9505-19ab-5a770f821386@arm.com> <YIgsbp/hRxM9U+ZN@myrica>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <35d5f174-3814-a019-a6e3-14cffad69763@arm.com>
+Date: Thu, 29 Apr 2021 11:32:33 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.0
 MIME-Version: 1.0
-In-Reply-To: <YIj5zcbHBHt7CC8B@kernel.org>
+In-Reply-To: <YIgsbp/hRxM9U+ZN@myrica>
 Content-Language: en-US
-X-Originating-IP: [10.174.177.244]
-X-CFilter-Loop: Reflected
-X-Mailman-Approved-At: Thu, 29 Apr 2021 05:11:50 -0400
-Cc: David Hildenbrand <david@redhat.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Anshuman Khandual <anshuman.khandual@arm.com>, linux-kernel@vger.kernel.org,
- Mike Rapoport <rppt@linux.ibm.com>, linux-mm@kvack.org,
- kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
- Andrew Morton <akpm@linux-foundation.org>, Will
- Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Krishna Reddy <vdumpa@nvidia.com>, Sumit Gupta <sumitg@nvidia.com>,
+ kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -85,35 +70,59 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Ck9uIDIwMjEvNC8yOCAxMzo1OSwgTWlrZSBSYXBvcG9ydCB3cm90ZToKPiBPbiBUdWUsIEFwciAy
-NywgMjAyMSBhdCAwNzowODo1OVBNICswODAwLCBLZWZlbmcgV2FuZyB3cm90ZToKPj4gT24gMjAy
-MS80LzI3IDE0OjIzLCBNaWtlIFJhcG9wb3J0IHdyb3RlOgo+Pj4gT24gTW9uLCBBcHIgMjYsIDIw
-MjEgYXQgMTE6MjY6MzhQTSArMDgwMCwgS2VmZW5nIFdhbmcgd3JvdGU6Cj4+Pj4gT24gMjAyMS80
-LzI2IDEzOjIwLCBNaWtlIFJhcG9wb3J0IHdyb3RlOgo+Pj4+PiBPbiBTdW4sIEFwciAyNSwgMjAy
-MSBhdCAwMzo1MTo1NlBNICswODAwLCBLZWZlbmcgV2FuZyB3cm90ZToKPj4+Pj4+IE9uIDIwMjEv
-NC8yNSAxNToxOSwgTWlrZSBSYXBvcG9ydCB3cm90ZToKPj4+Pj4+Cj4+Pj4+PiAgICAgICAgT24g
-RnJpLCBBcHIgMjMsIDIwMjEgYXQgMDQ6MTE6MTZQTSArMDgwMCwgS2VmZW5nIFdhbmcgd3JvdGU6
-Cj4+Pj4+Pgo+Pj4+Pj4gICAgICAgICAgICBJIHRlc3RlZCB0aGlzIHBhdGNoc2V0KHBsdXMgYXJt
-MzIgY2hhbmdlLCBsaWtlIGFybTY0IGRvZXMpCj4+Pj4+PiAgICAgICAgICAgIGJhc2VkIG9uIGx0
-cyA1LjEw77yMYWRkIHNvbWUgZGVidWcgbG9nLCB0aGUgdXNlZnVsIGluZm8gc2hvd3MKPj4+Pj4+
-ICAgICAgICAgICAgYmVsb3csIGlmIHdlIGVuYWJsZSBIT0xFU19JTl9aT05FLCBubyBwYW5pYywg
-YW55IGlkZWEsCj4+Pj4+PiAgICAgICAgICAgIHRoYW5rcy4KPj4+Pj4+Cj4+Pj4+PiAgICAgICAg
-QXJlIHRoZXJlIGFueSBjaGFuZ2VzIG9uIHRvcCBvZiA1LjEwIGV4Y2VwdCBmb3IgcGZuX3ZhbGlk
-KCkgcGF0Y2g/Cj4+Pj4+PiAgICAgICAgRG8geW91IHNlZSB0aGlzIHBhbmljIG9uIDUuMTAgd2l0
-aG91dCB0aGUgY2hhbmdlcz8KPj4+Pj4+Cj4+Pj4+PiBZZXMsIHRoZXJlIGFyZSBzb21lIEJTUCBz
-dXBwb3J0IGZvciBhcm0gYm9hcmQgYmFzZWQgb24gNS4xMCwKPj4+IElzIGl0IHBvc3NpYmxlIHRv
-IHRlc3QgNS4xMj8KPiBEbyB5b3UgdXNlIFNQQVJTTUVNPyBJZiB5ZXMsIHdoYXQgaXMgeW91ciBz
-ZWN0aW9uIHNpemU/Cj4gV2hhdCBpcyB0aGUgdmFsdWUgaWYgQ09ORklHX0ZPUkNFX01BWF9aT05F
-T1JERVIgaW4geW91ciBjb25maWd1cmF0aW9uPwoKWWVzLAoKQ09ORklHX1NQQVJTRU1FTT15CgpD
-T05GSUdfU1BBUlNFTUVNX1NUQVRJQz15CgpDT05GSUdfRk9SQ0VfTUFYX1pPTkVPUkRFUiA9IDEx
-CgpDT05GSUdfUEFHRV9PRkZTRVQ9MHhDMDAwMDAwMApDT05GSUdfSEFWRV9BUkNIX1BGTl9WQUxJ
-RD15CkNPTkZJR19ISUdITUVNPXkKI2RlZmluZSBTRUNUSU9OX1NJWkVfQklUUyAgICAyNgojZGVm
-aW5lIE1BWF9QSFlTQUREUl9CSVRTICAgIDMyCiNkZWZpbmUgTUFYX1BIWVNNRU1fQklUUyAgICAg
-MzIKCgo+Cl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2
-bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xp
-c3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+Hi Jean,
+
+On 4/27/21 4:23 PM, Jean-Philippe Brucker wrote:
+> On Tue, Apr 27, 2021 at 03:52:46PM +0100, Alexandru Elisei wrote:
+>> The comment [1] suggested that the panic is triggered during page aging.
+> I think only with an out-of-tree patch applied
+> https://jpbrucker.net/git/linux/commit/?h=sva/2021-03-01&id=d32d8baaf293aaefef8a1c9b8a4508ab2ec46c61
+> which probably is not going upstream.
+
+Thanks for that, that explains why I wasn't able to trigger the notification.
+
+I did a grep for all the places where mmu_notifier_change_pte() and
+set_pte_at_notify() are used in the kernel, and from what I can tell they are only
+called for a new pte which has a struct page. From my investigation, the notifiers
+are called from ksm (which deals with physical memory), swap migration (so still
+pages in memory) and on copy-on-write.
+
+On Linux v5.12, I tried to trigger the copy-on-write notification by forking
+kvmtool right after the BAR region is mapped and then reading from the userspace
+BAR address, but the new pte (for which the notifier is called) is valid.
+
+I also looked at what x86 does, but I couldn't find where cache maintenance is
+performed (wouldn't surprise me if it's not necessary at all).
+
+So I guess my question is what kind of pfns the MMU notifiers for the secondary
+MMUs are required to handle. If the requirement is that they should handle both
+device and struct page backed pfns, then the patch looks correct to me
+(user_mem_abort() also uses kvm_is_device_pfn() to decide if dcache maintenance is
+needed).
+
+Thanks,
+
+Alex
+
+> Thanks,
+> Jean
+>
+>> vfio_pci_mmap() sets the VM_PFNMAP for the VMA and I see in the Documentation that
+>> pages with VM_PFNMAP are added to the unevictable LRU list, doesn't that mean it's
+>> not subject the page aging? I feel like there's something I'm missing.
+>>
+>> [1]
+>> https://lore.kernel.org/kvm/BY5PR12MB37642B9AC7E5D907F5A664F6B3459@BY5PR12MB3764.namprd12.prod.outlook.com/
+>>
+>> Thanks,
+>>
+>> Alex
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
