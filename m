@@ -2,89 +2,82 @@ Return-Path: <SRS0=jtxo=J2=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 952A7C43460
-	for <kvmarm@archiver.kernel.org>; Thu, 29 Apr 2021 17:52:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C397C43460
+	for <kvmarm@archiver.kernel.org>; Thu, 29 Apr 2021 18:28:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DBDC06141E
-	for <kvmarm@archiver.kernel.org>; Thu, 29 Apr 2021 17:52:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBDC06141E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 15714613ED
+	for <kvmarm@archiver.kernel.org>; Thu, 29 Apr 2021 18:28:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15714613ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 15EA94B393;
-	Thu, 29 Apr 2021 13:52:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C4364B399;
+	Thu, 29 Apr 2021 14:28:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id v1uRiKUYnc0F; Thu, 29 Apr 2021 13:52:08 -0400 (EDT)
+	with ESMTP id WyIACOEV5Gtp; Thu, 29 Apr 2021 14:28:49 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 045E94B394;
-	Thu, 29 Apr 2021 13:52:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 671B64B389;
+	Thu, 29 Apr 2021 14:28:49 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EBA914B38C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Apr 2021 13:52:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 993934B33E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Apr 2021 14:28:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mRvt8KCgWrCJ for <kvmarm@lists.cs.columbia.edu>;
- Thu, 29 Apr 2021 13:52:04 -0400 (EDT)
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com
- [209.85.214.174])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C53264B389
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Apr 2021 13:52:04 -0400 (EDT)
-Received: by mail-pl1-f174.google.com with SMTP id v13so21578318ple.9
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Apr 2021 10:52:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=Iqvx6xUJ3HpBD776B4jOHX3DLMKME1UEEEadpoQT2gQ=;
- b=jGzEnHyVLypFuPSu8rwkpX2gw75JhanOw6rujoZojvWajm23gVjBoBRyEMs0GNr7Tf
- EcOQCFEQRHs5l1om6BhrQUyLwY6d/qnjVcbqFQzCVec6NMixGQPl8Q+im8HFnw5KqADL
- JpWeBCVxB5lAcDQqFhjm349oNMLodbTI3QJ4mQZUVyJR/oCpKPzdrJZOalg8HVJ5q2dO
- Q7sUVbWw8XJXF+BygD9tCvtlWqOFa+c8QhNMwhXQq1VYCsdktnz9IZwujP0y2UHT9gqv
- /SlKRcfLpR5Z1xWPo4ys9565wgBOfp16ixNMnx517kk3b1R6bU8QT7cdkCCJv9OfyEOv
- puHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=Iqvx6xUJ3HpBD776B4jOHX3DLMKME1UEEEadpoQT2gQ=;
- b=eODS9WKShfZaifj+uCSgMhv4+bFGoUs3e5EEzoxuOtbe82RfA0iBQEdrWFpYQ0LVwB
- ISchE8f0OySGbV5bxErWjfonyMAgy5KPgRDT0MzJP0JPO1eOfyuhsMGaBdAOPXwGAqC/
- DGvL0ALTa8o6xBfyxPI9h402R6pUA3IDhNYKDyYslmh6fgBiq8iA9Fyw9KjUG6v/sVDF
- Ceojq7SxQ0mxZIu2BPnyY99fbIBqLicB6gA5+UiwMroMBWiUtalvYqFrhiuOk5hYtHUt
- lyphBWClKdUyN1Z0SyO7hVlmA6mgXrQJbK6VZsceLGuAP1pYZudOIAu4VsilWH9Fs6TZ
- qYIg==
-X-Gm-Message-State: AOAM532M1C2/S1XUP/B6Lz9tdDGGi0d4p+nGOei0XLqffS9qdA/Uohgy
- WJhL6pABwin2FPfDX5rWo86OfA==
-X-Google-Smtp-Source: ABdhPJzso9M0RRFDzJYpF5zFVqb7Ha24skEaZX2/YLwsOZbDSGiaKX23vzenBQY+6pH5STksUnpOgw==
-X-Received: by 2002:a17:90a:602:: with SMTP id
- j2mr1024998pjj.211.1619718723372; 
- Thu, 29 Apr 2021 10:52:03 -0700 (PDT)
-Received: from google.com (150.12.83.34.bc.googleusercontent.com.
- [34.83.12.150])
- by smtp.gmail.com with ESMTPSA id x13sm526220pgf.13.2021.04.29.10.52.02
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 29 Apr 2021 10:52:02 -0700 (PDT)
-Date: Thu, 29 Apr 2021 10:51:59 -0700
-From: Ricardo Koller <ricarkol@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 1/3] KVM: selftests: Add exception handling support for
- aarch64
-Message-ID: <YIryP84dAc0XHJk2@google.com>
-References: <20210423040351.1132218-1-ricarkol@google.com>
- <20210423040351.1132218-2-ricarkol@google.com>
- <87sg3hnzrj.wl-maz@kernel.org>
+ with ESMTP id IDdhu1mLWGyb for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 29 Apr 2021 14:28:47 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A41284B32A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Apr 2021 14:28:47 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1619720927;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ahhdjeTzVRBlGxvftGs550exL2vN9CqbDTNttH8KlQg=;
+ b=VBA3mzvs/a2K6hRg9GNLH5TMUmV1ZqvodPxFAiwttBBNsLZgOXHNnn2bBLV63TRTA71MAo
+ Rgpks0gyIzcFk2GpGOFRtj0ddxVdEbUnuKTr9Ock3gXMW1mw4GU/Gej2QM7oAi8oAnH36t
+ r2k4sstUQEvNfmwFNd875fZ+JYH+q+o=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-270-vDUQF24aPjCkdRuuxwsczA-1; Thu, 29 Apr 2021 14:28:43 -0400
+X-MC-Unique: vDUQF24aPjCkdRuuxwsczA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C7D1D1922966;
+ Thu, 29 Apr 2021 18:28:41 +0000 (UTC)
+Received: from redhat.com (ovpn-113-225.phx2.redhat.com [10.3.113.225])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E40B75D6DC;
+ Thu, 29 Apr 2021 18:28:40 +0000 (UTC)
+Date: Thu, 29 Apr 2021 12:28:40 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Shanker Donthineni <sdonthineni@nvidia.com>
+Subject: Re: [RFC 1/2] vfio/pci: keep the prefetchable attribute of a BAR
+ region in VMA
+Message-ID: <20210429122840.4f98f78e@redhat.com>
+In-Reply-To: <20210429162906.32742-2-sdonthineni@nvidia.com>
+References: <20210429162906.32742-1-sdonthineni@nvidia.com>
+ <20210429162906.32742-2-sdonthineni@nvidia.com>
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <87sg3hnzrj.wl-maz@kernel.org>
-Cc: kvm@vger.kernel.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ linux-kernel@vger.kernel.org, Vikram Sethi <vsethi@nvidia.com>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Jason Sequeira <jsequeira@nvidia.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -101,72 +94,58 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Apr 23, 2021 at 09:58:24AM +0100, Marc Zyngier wrote:
-> Hi Ricardo,
+On Thu, 29 Apr 2021 11:29:05 -0500
+Shanker Donthineni <sdonthineni@nvidia.com> wrote:
+
+> For pass-through device assignment, the ARM64 KVM hypervisor retrieves
+> the memory region properties physical address, size, and whether a
+> region backed with struct page or not from VMA. The prefetchable
+> attribute of a BAR region isn't visible to KVM to make an optimal
+> decision for stage2 attributes.
 > 
-> Thanks for starting this.
+> This patch updates vma->vm_page_prot and maps with write-combine
+> attribute if the associated BAR is prefetchable. For ARM64
+> pgprot_writecombine() is mapped to memory-type MT_NORMAL_NC which
+> has no side effects on reads and multiple writes can be combined.
 > 
-> On Fri, 23 Apr 2021 05:03:49 +0100,
-> Ricardo Koller <ricarkol@google.com> wrote:
-> > +.pushsection ".entry.text", "ax"
-> > +.balign 0x800
-> > +.global vectors
-> > +vectors:
-> > +.popsection
-> > +
-> > +/*
-> > + * Build an exception handler for vector and append a jump to it into
-> > + * vectors (while making sure that it's 0x80 aligned).
-> > + */
-> > +.macro HANDLER, el, label, vector
-> > +handler\()\vector:
-> > +	save_registers \el
-> > +	mov	x0, sp
-> > +	mov	x1, \vector
-> > +	bl	route_exception
-> > +	restore_registers \el
-> > +
-> > +.pushsection ".entry.text", "ax"
-> > +.balign 0x80
-> > +	b	handler\()\vector
-> > +.popsection
-> > +.endm
+> Signed-off-by: Shanker Donthineni <sdonthineni@nvidia.com>
+> ---
+>  drivers/vfio/pci/vfio_pci.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
 > 
-> That's an interesting construct, wildly different from what we are
-> using elsewhere in the kernel, but hey, I like change ;-). It'd be
-> good to add a comment to spell out that anything that emits into
-> .entry.text between the declaration of 'vectors' and the end of this
-> file will break everything.
-> 
-> > +
-> > +.global ex_handler_code
-> > +ex_handler_code:
-> > +	HANDLER	1, sync, 0			// Synchronous EL1t
-> > +	HANDLER	1, irq, 1			// IRQ EL1t
-> > +	HANDLER	1, fiq, 2			// FIQ EL1t
-> > +	HANDLER	1, error, 3			// Error EL1t
-> 
-> Can any of these actually happen? As far as I can see, the whole
-> selftest environment seems to be designed around EL1h.
->
+> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+> index 5023e23db3bc..1b734fe1dd51 100644
+> --- a/drivers/vfio/pci/vfio_pci.c
+> +++ b/drivers/vfio/pci/vfio_pci.c
+> @@ -1703,7 +1703,11 @@ static int vfio_pci_mmap(void *device_data, struct vm_area_struct *vma)
+>  	}
+>  
+>  	vma->vm_private_data = vdev;
+> -	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
+> +	if (IS_ENABLED(CONFIG_ARM64) &&
+> +	    (pci_resource_flags(pdev, index) & IORESOURCE_PREFETCH))
+> +		vma->vm_page_prot = pgprot_writecombine(vma->vm_page_prot);
+> +	else
+> +		vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
 
-They can happen. KVM defaults to use EL1h:
+If this were a valid thing to do, it should be done for all
+architectures, not just ARM64.  However, a prefetchable range only
+necessarily allows merged writes, which seems like a subset of the
+semantics implied by a WC attribute, therefore this doesn't seem
+universally valid.
 
-	#define VCPU_RESET_PSTATE_EL1   (PSR_MODE_EL1h | PSR_A_BIT | PSR_I_BIT | \
+I'm also a bit confused by your problem statement that indicates that
+without WC you're seeing unaligned accesses, does this suggest that
+your driver is actually relying on WC semantics to perform merging to
+achieve alignment?  That seems rather like a driver bug, I'd expect UC
+vs WC is largely a difference in performance, not a means to enforce
+proper driver access patterns.  Per the PCI spec, the bridge itself can
+merge writes to prefetchable areas, presumably regardless of this
+processor attribute, perhaps that's the feature your driver is relying
+on that might be missing here.  Thanks,
 
-but then a guest can set the SPSel to 0:
+Alex
 
-	asm volatile("msr spsel, #0");
-
-and this happens:
-
-	  Unexpected exception guest (vector:0x0, ec:0x25)
-
-I think it should still be a valid situation: some test might want to
-try it.
-
-Thanks,
-Ricardo
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
