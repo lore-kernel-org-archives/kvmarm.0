@@ -2,82 +2,83 @@ Return-Path: <SRS0=jtxo=J2=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C397C43460
-	for <kvmarm@archiver.kernel.org>; Thu, 29 Apr 2021 18:28:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD07DC433B4
+	for <kvmarm@archiver.kernel.org>; Thu, 29 Apr 2021 19:47:13 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 15714613ED
-	for <kvmarm@archiver.kernel.org>; Thu, 29 Apr 2021 18:28:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15714613ED
+	by mail.kernel.org (Postfix) with ESMTP id 387A8613C1
+	for <kvmarm@archiver.kernel.org>; Thu, 29 Apr 2021 19:47:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 387A8613C1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C4364B399;
-	Thu, 29 Apr 2021 14:28:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A34734B390;
+	Thu, 29 Apr 2021 15:47:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id WyIACOEV5Gtp; Thu, 29 Apr 2021 14:28:49 -0400 (EDT)
+	with ESMTP id nlt7qWw9yGCj; Thu, 29 Apr 2021 15:47:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 671B64B389;
-	Thu, 29 Apr 2021 14:28:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 793FE4B321;
+	Thu, 29 Apr 2021 15:47:11 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 993934B33E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Apr 2021 14:28:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 76CED4B2BE
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Apr 2021 15:47:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IDdhu1mLWGyb for <kvmarm@lists.cs.columbia.edu>;
- Thu, 29 Apr 2021 14:28:47 -0400 (EDT)
+ with ESMTP id fRKvVuapqXla for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 29 Apr 2021 15:47:09 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A41284B32A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Apr 2021 14:28:47 -0400 (EDT)
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 887A64B2AB
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Apr 2021 15:47:09 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1619720927;
+ s=mimecast20190719; t=1619725629;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ahhdjeTzVRBlGxvftGs550exL2vN9CqbDTNttH8KlQg=;
- b=VBA3mzvs/a2K6hRg9GNLH5TMUmV1ZqvodPxFAiwttBBNsLZgOXHNnn2bBLV63TRTA71MAo
- Rgpks0gyIzcFk2GpGOFRtj0ddxVdEbUnuKTr9Ock3gXMW1mw4GU/Gej2QM7oAi8oAnH36t
- r2k4sstUQEvNfmwFNd875fZ+JYH+q+o=
+ bh=+M4to1dcOs700isxx4oGCjHBz32mVchtGZDofF69pWA=;
+ b=OVpFVCfri1gk3LLJ2mNIW7M5jv/n5AM+DXBF5DO3457+spy4TNXT4vdC3tG0eExinkCamx
+ 9knIKR64U7TKa24djGNkD+GW8r/+i1aJRsy0ueea6/+P7oSDTfemMW5TJ5cjkwSO+9b//e
+ oO2weDWiAmWWSNGP/Yubs1HbFJIA0VY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-270-vDUQF24aPjCkdRuuxwsczA-1; Thu, 29 Apr 2021 14:28:43 -0400
-X-MC-Unique: vDUQF24aPjCkdRuuxwsczA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-79-KamNEiW9NsGsTkhGWHaQ0w-1; Thu, 29 Apr 2021 15:47:02 -0400
+X-MC-Unique: KamNEiW9NsGsTkhGWHaQ0w-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C7D1D1922966;
- Thu, 29 Apr 2021 18:28:41 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E7048189C6;
+ Thu, 29 Apr 2021 19:47:00 +0000 (UTC)
 Received: from redhat.com (ovpn-113-225.phx2.redhat.com [10.3.113.225])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E40B75D6DC;
- Thu, 29 Apr 2021 18:28:40 +0000 (UTC)
-Date: Thu, 29 Apr 2021 12:28:40 -0600
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C2AFF69513;
+ Thu, 29 Apr 2021 19:46:59 +0000 (UTC)
+Date: Thu, 29 Apr 2021 13:46:59 -0600
 From: Alex Williamson <alex.williamson@redhat.com>
-To: Shanker Donthineni <sdonthineni@nvidia.com>
+To: Shanker R Donthineni <sdonthineni@nvidia.com>
 Subject: Re: [RFC 1/2] vfio/pci: keep the prefetchable attribute of a BAR
  region in VMA
-Message-ID: <20210429122840.4f98f78e@redhat.com>
-In-Reply-To: <20210429162906.32742-2-sdonthineni@nvidia.com>
+Message-ID: <20210429134659.321a5c3c@redhat.com>
+In-Reply-To: <470360a7-0242-9ae5-816f-13608f957bf6@nvidia.com>
 References: <20210429162906.32742-1-sdonthineni@nvidia.com>
  <20210429162906.32742-2-sdonthineni@nvidia.com>
+ <20210429122840.4f98f78e@redhat.com>
+ <470360a7-0242-9ae5-816f-13608f957bf6@nvidia.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- linux-kernel@vger.kernel.org, Vikram Sethi <vsethi@nvidia.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Jason Sequeira <jsequeira@nvidia.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+ linux-kernel@vger.kernel.org, Vikram Sethi <vsethi@nvidia.com>, Catalin
+ Marinas <catalin.marinas@arm.com>, Jason Sequeira <jsequeira@nvidia.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -89,64 +90,63 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 29 Apr 2021 11:29:05 -0500
-Shanker Donthineni <sdonthineni@nvidia.com> wrote:
-
-> For pass-through device assignment, the ARM64 KVM hypervisor retrieves
-> the memory region properties physical address, size, and whether a
-> region backed with struct page or not from VMA. The prefetchable
-> attribute of a BAR region isn't visible to KVM to make an optimal
-> decision for stage2 attributes.
-> 
-> This patch updates vma->vm_page_prot and maps with write-combine
-> attribute if the associated BAR is prefetchable. For ARM64
-> pgprot_writecombine() is mapped to memory-type MT_NORMAL_NC which
-> has no side effects on reads and multiple writes can be combined.
-> 
-> Signed-off-by: Shanker Donthineni <sdonthineni@nvidia.com>
-> ---
->  drivers/vfio/pci/vfio_pci.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-> index 5023e23db3bc..1b734fe1dd51 100644
-> --- a/drivers/vfio/pci/vfio_pci.c
-> +++ b/drivers/vfio/pci/vfio_pci.c
-> @@ -1703,7 +1703,11 @@ static int vfio_pci_mmap(void *device_data, struct vm_area_struct *vma)
->  	}
->  
->  	vma->vm_private_data = vdev;
-> -	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
-> +	if (IS_ENABLED(CONFIG_ARM64) &&
-> +	    (pci_resource_flags(pdev, index) & IORESOURCE_PREFETCH))
-> +		vma->vm_page_prot = pgprot_writecombine(vma->vm_page_prot);
-> +	else
-> +		vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
-
-If this were a valid thing to do, it should be done for all
-architectures, not just ARM64.  However, a prefetchable range only
-necessarily allows merged writes, which seems like a subset of the
-semantics implied by a WC attribute, therefore this doesn't seem
-universally valid.
-
-I'm also a bit confused by your problem statement that indicates that
-without WC you're seeing unaligned accesses, does this suggest that
-your driver is actually relying on WC semantics to perform merging to
-achieve alignment?  That seems rather like a driver bug, I'd expect UC
-vs WC is largely a difference in performance, not a means to enforce
-proper driver access patterns.  Per the PCI spec, the bridge itself can
-merge writes to prefetchable areas, presumably regardless of this
-processor attribute, perhaps that's the feature your driver is relying
-on that might be missing here.  Thanks,
-
-Alex
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gVGh1LCAyOSBBcHIgMjAyMSAxNDoxNDo1MCAtMDUwMApTaGFua2VyIFIgRG9udGhpbmVuaSA8
+c2RvbnRoaW5lbmlAbnZpZGlhLmNvbT4gd3JvdGU6Cgo+IFRoYW5rcyBBbGV4IGZvciBxdWljayBy
+ZXBseS4KPiAKPiBPbiA0LzI5LzIxIDE6MjggUE0sIEFsZXggV2lsbGlhbXNvbiB3cm90ZToKPiA+
+IElmIHRoaXMgd2VyZSBhIHZhbGlkIHRoaW5nIHRvIGRvLCBpdCBzaG91bGQgYmUgZG9uZSBmb3Ig
+YWxsCj4gPiBhcmNoaXRlY3R1cmVzLCBub3QganVzdCBBUk02NC4gIEhvd2V2ZXIsIGEgcHJlZmV0
+Y2hhYmxlIHJhbmdlIG9ubHkKPiA+IG5lY2Vzc2FyaWx5IGFsbG93cyBtZXJnZWQgd3JpdGVzLCB3
+aGljaCBzZWVtcyBsaWtlIGEgc3Vic2V0IG9mIHRoZQo+ID4gc2VtYW50aWNzIGltcGxpZWQgYnkg
+YSBXQyBhdHRyaWJ1dGUsIHRoZXJlZm9yZSB0aGlzIGRvZXNuJ3Qgc2VlbQo+ID4gdW5pdmVyc2Fs
+bHkgdmFsaWQuCj4gPgo+ID4gSSdtIGFsc28gYSBiaXQgY29uZnVzZWQgYnkgeW91ciBwcm9ibGVt
+IHN0YXRlbWVudCB0aGF0IGluZGljYXRlcyB0aGF0Cj4gPiB3aXRob3V0IFdDIHlvdSdyZSBzZWVp
+bmcgdW5hbGlnbmVkIGFjY2Vzc2VzLCBkb2VzIHRoaXMgc3VnZ2VzdCB0aGF0Cj4gPiB5b3VyIGRy
+aXZlciBpcyBhY3R1YWxseSByZWx5aW5nIG9uIFdDIHNlbWFudGljcyB0byBwZXJmb3JtIG1lcmdp
+bmcgdG8KPiA+IGFjaGlldmUgYWxpZ25tZW50PyAgVGhhdCBzZWVtcyByYXRoZXIgbGlrZSBhIGRy
+aXZlciBidWcsIEknZCBleHBlY3QgVUMKPiA+IHZzIFdDIGlzIGxhcmdlbHkgYSBkaWZmZXJlbmNl
+IGluIHBlcmZvcm1hbmNlLCBub3QgYSBtZWFucyB0byBlbmZvcmNlCj4gPiBwcm9wZXIgZHJpdmVy
+IGFjY2VzcyBwYXR0ZXJucy4gIFBlciB0aGUgUENJIHNwZWMsIHRoZSBicmlkZ2UgaXRzZWxmIGNh
+bgo+ID4gbWVyZ2Ugd3JpdGVzIHRvIHByZWZldGNoYWJsZSBhcmVhcywgcHJlc3VtYWJseSByZWdh
+cmRsZXNzIG9mIHRoaXMKPiA+IHByb2Nlc3NvciBhdHRyaWJ1dGUsIHBlcmhhcHMgdGhhdCdzIHRo
+ZSBmZWF0dXJlIHlvdXIgZHJpdmVyIGlzIHJlbHlpbmcKPiA+IG9uIHRoYXQgbWlnaHQgYmUgbWlz
+c2luZyBoZXJlLiAgVGhhbmtzLCAgCj4gVGhlIGRyaXZlciB1c2VzIFdDIHNlbWFudGljcywgSXQn
+cyBtYXBwaW5nIFBDSSBwcmVmZXRjaGFibGUgQkFSUwo+IHVzaW5nIGlvcmVtYXBfd2MoKS7CoCBX
+ZSBkb24ndCBzZWUgYW55IGlzc3VlIGZvciB4ODYgYXJjaGl0ZWN0dXJlLAo+IGRyaXZlciB3b3Jr
+cyBmaW5lIGluIHRoZSBob3N0IGFuZCBndWVzdCBrZXJuZWwuIFRoZSBzYW1lIGRyaXZlciB3b3Jr
+cwo+IG9uIEFSTTY0IGtlcm5lbCBidXQgY3Jhc2hlcyBpbnNpZGUgVk0uIEdQVSBkcml2ZXIgdXNl
+cyB0aGUKPiBhcmNoaXRlY3R1cmUgYWdub3N0aWMgZnVuY3Rpb24gaW9yZW1hcF93YygpIGxpa2Ug
+b3RoZXIgZHJpdmVycy4gVGhpcwo+IGxpbWl0YXRpb24gYXBwbGllcyB0byBhbGwgdGhlIGRyaXZl
+cnMgaWYgdGhleSB1c2UgV0MgbWVtb3J5IGFuZAo+IGZvbGxvdyBBUk02NCBOT1JNQUwtTkMgYWNj
+ZXNzIHJ1bGVzLgoKeDg2IEtWTSB3b3JrcyBmb3Igb3RoZXIgcmVhc29ucywgS1ZNIHdpbGwgdHJ1
+c3QgdGhlIHZDUFUgYXR0cmlidXRlcyBmb3IKdGhlIG1lbW9yeSByYW5nZSByYXRoZXIgdGhhbiBy
+ZWx5aW5nIG9ubHkgb24gdGhlIGhvc3QgbWFwcGluZy4KCj4gT24gQVJNNjQsIGlvcmVtYXBfd2Mo
+KSBpcyBtYXBwZWQgdG8gbm9uLWNhY2hlYWJsZSBtZW1vcnktdHlwZSwgbm8KPiBzaWRlIGVmZmVj
+dHMgb24gcmVhZHMgYW5kIHVuYWxpZ25lZCBhY2Nlc3NlcyBhcmUgYWxsb3dlZCBhcyBwZXIKPiBB
+Uk0tQVJNIGFyY2hpdGVjdHVyZS4gVGhlIGRyaXZlciBiZWhhdmlvciBpcyBkaWZmZXJlbnQgaW4g
+aG9zdCB2cwo+IGd1ZXN0IG9uIEFSTTY0LsKgCgpQZXIgdGhlIFBDSSBzcGVjLCBwcmVmZXRjaGFi
+bGUgbWVtb3J5IG9ubHkgbmVjZXNzYXJpbHkgYWxsb3dzIHRoZSBicmlkZ2UKdG8gbWVyZ2Ugd3Jp
+dGVzLiAgSSBiZWxpZXZlIHRoaXMgaXMgb25seSBhIHN1YnNldCBvZiB3aGF0IFdDIG1hcHBpbmdz
+CmFsbG93LCB0aGVyZWZvcmUgSSBleHBlY3QgdGhpcyBpcyBpbmNvbXBhdGlibGUgd2l0aCBkcml2
+ZXJzIHRoYXQgZG8gbm90CnVzZSBXQyBtYXBwaW5ncy4KIAo+IEFSTSBDUFUgZ2VuZXJhdGluZyBh
+bGlnbm1lbnQgZmF1bHRzIGJlZm9yZSB0cmFuc2FjdGlvbiByZWFjaGVzIHRoZQo+IFBDSS1SQy9z
+d2l0Y2gvZW5kLXBvaW50LWRldmljZS4KCklmIGFuIGFsaWdubWVudCBmYXVsdCBpcyBmaXhlZCBi
+eSBjb25maWd1cmluZyBhIFdDIG1hcHBpbmcsIGRvZXNuJ3QKdGhhdCBzdWdnZXN0IHRoYXQgdGhl
+IGRyaXZlciBwZXJmb3JtZWQgYW4gdW5hbGlnbmVkIGFjY2VzcyBpdHNlbGYgYW5kCmlzIHJlbHlp
+bmcgb24gd3JpdGUgY29tYmluaW5nIGJ5IHRoZSBwcm9jZXNzb3IgdG8gY29ycmVjdCB0aGF0IGVy
+cm9yPwpUaGF0J3Mgd3JvbmcuICBGaXggdGhlIGRyaXZlciBvciBwbGVhc2Ugb2ZmZXIgYW5vdGhl
+ciBleHBsYW5hdGlvbiBvZgpob3cgdGhlIFdDIG1hcHBpbmcgcmVzb2x2ZXMgdGhpcy4gIEkgc3Vz
+cGVjdCB5b3UgY291bGQgZW5hYmxlIHRyYWNpbmcKaW4gUUVNVSwgZGlzYWJsZSBNTUlPIG1tYXBz
+IG9uIHRoZSB2ZmlvLXBjaSBkZXZpY2UgYW5kIGZpbmQgdGhlIGludmFsaWQKYWNjZXNzLgoKPiBX
+ZSd2ZSB0d28gY29uY2VybnMgaGVyZToKPiDCoMKgIC0gUGVyZm9ybWFuY2UgaW1wYWN0cyBmb3Ig
+cGFzcy10aHJvdWdoIGRldmljZXMuCj4gwqDCoCAtIFRoZSBkZWZpbml0aW9uIG9mIGlvcmVtYXBf
+d2MoKSBmdW5jdGlvbiBkb2Vzbid0IG1hdGNoIHRoZSBob3N0Cj4ga2VybmVsIG9uIEFSTTY0CgpQ
+ZXJmb3JtYW5jZSBJIGNhbiB1bmRlcnN0YW5kLCBidXQgSSB0aGluayB5b3UncmUgYWxzbyB1c2lu
+ZyBpdCB0byBtYXNrCmEgZHJpdmVyIGJ1ZyB3aGljaCBzaG91bGQgYmUgcmVzb2x2ZWQgZmlyc3Qu
+ICBUaGFua3MsCgpBbGV4CgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUK
+aHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
