@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C07ADC433ED
-	for <kvmarm@archiver.kernel.org>; Fri, 30 Apr 2021 23:24:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03F9EC433ED
+	for <kvmarm@archiver.kernel.org>; Fri, 30 Apr 2021 23:24:31 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6ABB761420
-	for <kvmarm@archiver.kernel.org>; Fri, 30 Apr 2021 23:24:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6ABB761420
+	by mail.kernel.org (Postfix) with ESMTP id 9DB596141E
+	for <kvmarm@archiver.kernel.org>; Fri, 30 Apr 2021 23:24:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DB596141E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D4694B499;
-	Fri, 30 Apr 2021 19:24:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5139F4B45B;
+	Fri, 30 Apr 2021 19:24:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ha+5Q8Nap59e; Fri, 30 Apr 2021 19:24:23 -0400 (EDT)
+	with ESMTP id QblNijQ8G50w; Fri, 30 Apr 2021 19:24:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DC11D4B480;
-	Fri, 30 Apr 2021 19:24:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 075184B47F;
+	Fri, 30 Apr 2021 19:24:29 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C96364B4B3
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Apr 2021 19:24:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F2F844B458
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Apr 2021 19:24:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CP6ANTXSQ64a for <kvmarm@lists.cs.columbia.edu>;
- Fri, 30 Apr 2021 19:24:19 -0400 (EDT)
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com
- [209.85.215.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 531724B4A5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Apr 2021 19:24:19 -0400 (EDT)
-Received: by mail-pg1-f201.google.com with SMTP id
- w5-20020a63a7450000b029020ee691d6a0so7365910pgo.13
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Apr 2021 16:24:19 -0700 (PDT)
+ with ESMTP id 54hJfLcxIa-h for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 30 Apr 2021 19:24:27 -0400 (EDT)
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com
+ [209.85.215.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 674314B4BB
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Apr 2021 19:24:23 -0400 (EDT)
+Received: by mail-pg1-f202.google.com with SMTP id
+ l35-20020a635b630000b029020f1edbc5dfso5182056pgm.22
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Apr 2021 16:24:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=CHatLD5Tl1lQJpmZw15smommPJOJbCh71D4e3ytfPPM=;
- b=LsaA1Zdru8LDIWkutXfR0M+1JQaI6nR3ERROJfusNV8jG9Jdnuyh6QBsHP66RxdymB
- 2fDPdGwnAqkjHj8Q+auocilZp6lr226veLKd1NUGvM7JRaDxxhJLNE9gcPcv36I3Ir8S
- 36b75n62rb+3mUfcsQJB2vpqocaWuXYG5JRr++evzEGUZ8lPCFkQRm0VGr/KHl0rjtFU
- SlWMNCfLIvVebiGreX1jVxCTrUTjruWxrq35v8huRCwmrOvhvwe5wU4+a5Hw5Nct8fXn
- KZHSNPO5GR9wAQ7geHhpeC5uVeVph03jNvLBGHGG9FL4hoizQh9McpNpsSmSpc7q5+Mh
- yj+g==
+ :cc; bh=ZyjdoDvj+0d1MrdvPreqK5eup22FMf+XNotdYUvQgRI=;
+ b=mVFEcJIz8TqMr35h+/Q4+Dav2KYnjMb7ka5/Gc219hGHhFNsWibr/XuA/YPgX+YHCA
+ NeqV+TgK7Yo40Do4rWs0FSy/f7DQXYjOid3a1piWerc8fAYFMONv/Xny8SzTye5CFkdu
+ 8UO6h2hEwmqxxb/nMC1eCrRL0GCG7JLy8rL2TxB6lsJcFj+nEOnkJ7oqynUSoat7ZCAj
+ axu0v6pjMoecsg8X9qkeuwsozgIWn4HN2ajHRbMCEll5feWXxuNRWaVkgdp/OnOWR817
+ nwjerzB/XdDGaABVwh7/aFrycJgqzKOIITDywOnNcXrzrlOM/7SnoNQIubrddxI85XBo
+ HOmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=CHatLD5Tl1lQJpmZw15smommPJOJbCh71D4e3ytfPPM=;
- b=IeNzCrI6Vyojziaovuv926DdhzQsbg5mSDXBWEVe9O4/IRyATciPhtX5X41NVcTPtg
- /AYMpjFohzpFR7wFvAOhub/qmleeJHMzE7jNuLhWr9afWxNdCq4x3xCtluVFbFJkv4k2
- hRtvdKBEv5F+6qmYBMc/HiicHW+I60UTN5MXShS2vkEvwJcjslEZTgFY4gc6Z/A63dYU
- RURjEUacOw7AlGKjy8a1Sr1BnNGV142d1qhDw16iNap0ERDKADyhOIUXmjHI+oP4BnQi
- 03np9AY+OSRGu5sA2ZsRUssutXFXyJuM/JQWuT09fg8jxq7B1cT5v6Qzq2ZAHdao6dnU
- TOYQ==
-X-Gm-Message-State: AOAM533TsiA0uFLRHUH8PYxALdSa85bcNWLinz0zMjV5Q2iCvQBzVBQ9
- D4C2zD9ecBsdj96YNwDI0hLE6vBq3yfKHg==
-X-Google-Smtp-Source: ABdhPJwfRBRfmVe1PvF+YWxvfmPKVAdRl4oeIaz0SUG/en2i/NpSYWQ93G2BtLw4SZ4+7TioAUGyhdCZvWeGrg==
+ bh=ZyjdoDvj+0d1MrdvPreqK5eup22FMf+XNotdYUvQgRI=;
+ b=O2s0BzAQupGRdUWRkOCJ/IdgMKhoxWAFwY6IPldaFO64L+bSMEnFcmJR7Qgz1cpqOj
+ OCH/zaMfykUlGELlCzenKReIUbI9RPqXlzqizqTxssK4ur32LQg721lEBgtjmMMeCo6C
+ rqie36hlXsuNMvX2oVL0sttlMs9Djkx+/N7bN/Ae0tYlCieBccky0SGXDRRwDjjZZ3CF
+ XMXikNrEqAovMvVOpnF+dvnYJQmW5s0VxPt9+vvenMcAJj/mRwjEwKcYQSllF+/Lb8tQ
+ m3m8X75NttYC/b+9xNw++8eDHudXemMTQcHSVRHA4d8yHR6mRG30w0h7nJLlDudYwmVu
+ R6Fg==
+X-Gm-Message-State: AOAM533XhG15W4s+VinvXj0yLz1YzKvgxWMsiC/8WRTgNNOSxKpH4PPY
+ LhUoqDbSPpi52CZplurnHn/1I4PdaKUW6w==
+X-Google-Smtp-Source: ABdhPJw/WgOmany3vFjVOVJu6fs2Y1+1Pd0XL579JpPqAIrVqPNcaxkdQAkHOnqSS0bi/PanAPM14cJfMb63Xw==
 X-Received: from ricarkol2.c.googlers.com
  ([fda3:e722:ac3:10:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:aa7:908c:0:b029:250:b584:a406 with SMTP
- id i12-20020aa7908c0000b0290250b584a406mr7014636pfa.44.1619825058460; Fri, 30
- Apr 2021 16:24:18 -0700 (PDT)
-Date: Fri, 30 Apr 2021 16:24:07 -0700
+ (user=ricarkol job=sendgmr) by 2002:a05:6a00:853:b029:27b:7bf6:f322 with SMTP
+ id q19-20020a056a000853b029027b7bf6f322mr7086773pfk.7.1619825052185; Fri, 30
+ Apr 2021 16:24:12 -0700 (PDT)
+Date: Fri, 30 Apr 2021 16:24:03 -0700
 In-Reply-To: <20210430232408.2707420-1-ricarkol@google.com>
-Message-Id: <20210430232408.2707420-6-ricarkol@google.com>
+Message-Id: <20210430232408.2707420-2-ricarkol@google.com>
 Mime-Version: 1.0
 References: <20210430232408.2707420-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.31.1.527.g47e6f16901-goog
-Subject: [PATCH v2 5/5] KVM: selftests: Add aarch64/debug-exceptions test
+Subject: [PATCH v2 1/5] KVM: selftests: Rename vm_handle_exception
 From: Ricardo Koller <ricarkol@google.com>
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 Cc: maz@kernel.org, pbonzini@redhat.com
@@ -96,315 +96,103 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Covers fundamental tests for debug exceptions. The guest installs and
-handle its debug exceptions itself, without KVM_SET_GUEST_DEBUG.
+Rename the vm_handle_exception function to a name that indicates more
+clearly that it installs something: vm_install_vector_handler.
 
+Suggested-by: Marc Zyngier <maz@kernel.org>
+Suggested-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/aarch64/debug-exceptions.c  | 244 ++++++++++++++++++
- .../selftests/kvm/include/aarch64/processor.h |  14 +-
- 4 files changed, 254 insertions(+), 6 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+ tools/testing/selftests/kvm/include/x86_64/processor.h    | 2 +-
+ tools/testing/selftests/kvm/lib/x86_64/processor.c        | 4 ++--
+ tools/testing/selftests/kvm/x86_64/kvm_pv_test.c          | 2 +-
+ .../selftests/kvm/x86_64/userspace_msr_exit_test.c        | 8 ++++----
+ tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c       | 2 +-
+ 5 files changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index e65d5572aefc..f09ed908422b 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -1,4 +1,5 @@
- # SPDX-License-Identifier: GPL-2.0-only
-+/aarch64/debug-exceptions
- /aarch64/get-reg-list
- /aarch64/get-reg-list-sve
- /aarch64/vgic_init
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 618c5903f478..2f92442c0cc9 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -73,6 +73,7 @@ TEST_GEN_PROGS_x86_64 += memslot_modification_stress_test
- TEST_GEN_PROGS_x86_64 += set_memory_region_test
- TEST_GEN_PROGS_x86_64 += steal_time
+diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+index 0b30b4e15c38..12889d3e8948 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/processor.h
++++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+@@ -391,7 +391,7 @@ struct ex_regs {
  
-+TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
- TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
- TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list-sve
- TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
-diff --git a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-new file mode 100644
-index 000000000000..87352ee09211
---- /dev/null
-+++ b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-@@ -0,0 +1,244 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <test_util.h>
-+#include <kvm_util.h>
-+#include <processor.h>
-+
-+#define VCPU_ID 0
-+
-+#define MDSCR_KDE	(1 << 13)
-+#define MDSCR_MDE	(1 << 15)
-+#define MDSCR_SS	(1 << 0)
-+
-+#define DBGBCR_LEN8	(0xff << 5)
-+#define DBGBCR_EXEC	(0x0 << 3)
-+#define DBGBCR_EL1	(0x1 << 1)
-+#define DBGBCR_E	(0x1 << 0)
-+
-+#define DBGWCR_LEN8	(0xff << 5)
-+#define DBGWCR_RD	(0x1 << 3)
-+#define DBGWCR_WR	(0x2 << 3)
-+#define DBGWCR_EL1	(0x1 << 1)
-+#define DBGWCR_E	(0x1 << 0)
-+
-+extern unsigned char sw_bp, hw_bp, bp_svc, bp_brk, hw_wp, ss_start;
-+static volatile uint64_t sw_bp_addr, hw_bp_addr;
-+static volatile uint64_t wp_addr, wp_data_addr;
-+static volatile uint64_t svc_addr;
-+static volatile uint64_t ss_addr[4], ss_idx;
-+#define  PC(v)  ((uint64_t)&(v))
-+
-+static void reset_debug_state(void)
-+{
-+	asm volatile("msr daifset, #8");
-+
-+	write_sysreg(osdlr_el1, 0);
-+	write_sysreg(oslar_el1, 0);
-+	asm volatile("isb" : : : "memory");
-+
-+	write_sysreg(mdscr_el1, 0);
-+	/* This test only uses the first bp and wp slot. */
-+	write_sysreg(dbgbvr0_el1, 0);
-+	write_sysreg(dbgbcr0_el1, 0);
-+	write_sysreg(dbgwcr0_el1, 0);
-+	write_sysreg(dbgwvr0_el1, 0);
-+	asm volatile("isb" : : : "memory");
-+}
-+
-+static void install_wp(uint64_t addr)
-+{
-+	uint32_t wcr;
-+	uint32_t mdscr;
-+
-+	wcr = DBGWCR_LEN8 | DBGWCR_RD | DBGWCR_WR | DBGWCR_EL1 | DBGWCR_E;
-+	write_sysreg(dbgwcr0_el1, wcr);
-+	write_sysreg(dbgwvr0_el1, addr);
-+	asm volatile("isb" : : : "memory");
-+
-+	asm volatile("msr daifclr, #8");
-+
-+	mdscr = read_sysreg(mdscr_el1) | MDSCR_KDE | MDSCR_MDE;
-+	write_sysreg(mdscr_el1, mdscr);
-+}
-+
-+static void install_hw_bp(uint64_t addr)
-+{
-+	uint32_t bcr;
-+	uint32_t mdscr;
-+
-+	bcr = DBGBCR_LEN8 | DBGBCR_EXEC | DBGBCR_EL1 | DBGBCR_E;
-+	write_sysreg(dbgbcr0_el1, bcr);
-+	write_sysreg(dbgbvr0_el1, addr);
-+	asm volatile("isb" : : : "memory");
-+
-+	asm volatile("msr daifclr, #8");
-+
-+	mdscr = read_sysreg(mdscr_el1) | MDSCR_KDE | MDSCR_MDE;
-+	write_sysreg(mdscr_el1, mdscr);
-+}
-+
-+static void install_ss(void)
-+{
-+	uint32_t mdscr;
-+
-+	asm volatile("msr daifclr, #8");
-+
-+	mdscr = read_sysreg(mdscr_el1) | MDSCR_KDE | MDSCR_SS;
-+	write_sysreg(mdscr_el1, mdscr);
-+}
-+
-+static volatile char write_data;
-+
-+static void guest_code(void)
-+{
-+	GUEST_SYNC(0);
-+
-+	/* Software-breakpoint */
-+	asm volatile("sw_bp: brk #0");
-+	GUEST_ASSERT_EQ(sw_bp_addr, PC(sw_bp));
-+
-+	GUEST_SYNC(1);
-+
-+	/* Hardware-breakpoint */
-+	reset_debug_state();
-+	install_hw_bp(PC(hw_bp));
-+	asm volatile("hw_bp: nop");
-+	GUEST_ASSERT_EQ(hw_bp_addr, PC(hw_bp));
-+
-+	GUEST_SYNC(2);
-+
-+	/* Hardware-breakpoint + svc */
-+	reset_debug_state();
-+	install_hw_bp(PC(bp_svc));
-+	asm volatile("bp_svc: svc #0");
-+	GUEST_ASSERT_EQ(hw_bp_addr, PC(bp_svc));
-+	GUEST_ASSERT_EQ(svc_addr, PC(bp_svc) + 4);
-+
-+	GUEST_SYNC(3);
-+
-+	/* Hardware-breakpoint + software-breakpoint */
-+	reset_debug_state();
-+	install_hw_bp(PC(bp_brk));
-+	asm volatile("bp_brk: brk #0");
-+	GUEST_ASSERT_EQ(sw_bp_addr, PC(bp_brk));
-+	GUEST_ASSERT_EQ(hw_bp_addr, PC(bp_brk));
-+
-+	GUEST_SYNC(4);
-+
-+	/* Watchpoint */
-+	reset_debug_state();
-+	install_wp(PC(write_data));
-+	write_data = 'x';
-+	GUEST_ASSERT_EQ(write_data, 'x');
-+	GUEST_ASSERT_EQ(wp_data_addr, PC(write_data));
-+
-+	GUEST_SYNC(5);
-+
-+	/* Single-step */
-+	reset_debug_state();
-+	install_ss();
-+	ss_idx = 0;
-+	asm volatile("ss_start:\n"
-+		     "mrs x0, esr_el1\n"
-+		     "add x0, x0, #1\n"
-+		     "msr daifset, #8\n"
-+		     : : : "x0");
-+	GUEST_ASSERT_EQ(ss_addr[0], PC(ss_start));
-+	GUEST_ASSERT_EQ(ss_addr[1], PC(ss_start) + 4);
-+	GUEST_ASSERT_EQ(ss_addr[2], PC(ss_start) + 8);
-+
-+	GUEST_DONE();
-+}
-+
-+static void guest_sw_bp_handler(struct ex_regs *regs)
-+{
-+	sw_bp_addr = regs->pc;
-+	regs->pc += 4;
-+}
-+
-+static void guest_hw_bp_handler(struct ex_regs *regs)
-+{
-+	hw_bp_addr = regs->pc;
-+	regs->pstate |= SPSR_D;
-+}
-+
-+static void guest_wp_handler(struct ex_regs *regs)
-+{
-+	wp_data_addr = read_sysreg(far_el1);
-+	wp_addr = regs->pc;
-+	regs->pstate |= SPSR_D;
-+}
-+
-+static void guest_ss_handler(struct ex_regs *regs)
-+{
-+	GUEST_ASSERT_1(ss_idx < 4, ss_idx);
-+	ss_addr[ss_idx++] = regs->pc;
-+	regs->pstate |= SPSR_SS;
-+}
-+
-+static void guest_svc_handler(struct ex_regs *regs)
-+{
-+	svc_addr = regs->pc;
-+}
-+
-+static int debug_version(struct kvm_vm *vm)
-+{
-+	uint64_t id_aa64dfr0;
-+
-+	get_reg(vm, VCPU_ID, ARM64_SYS_REG(ID_AA64DFR0_EL1), &id_aa64dfr0);
-+	return id_aa64dfr0 & 0xf;
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	struct kvm_vm *vm;
-+	struct ucall uc;
-+	int stage;
-+
-+	vm = vm_create_default(VCPU_ID, 0, guest_code);
-+	ucall_init(vm, NULL);
-+
-+	vm_init_descriptor_tables(vm);
-+	vcpu_init_descriptor_tables(vm, VCPU_ID);
-+
-+	if (debug_version(vm) < 6) {
-+		print_skip("Armv8 debug architecture not supported.");
-+		kvm_vm_free(vm);
-+		exit(KSFT_SKIP);
-+	}
-+
-+	vm_install_exception_handler(vm, VECTOR_SYNC_CURRENT,
-+				ESR_EC_BRK_INS, guest_sw_bp_handler);
-+	vm_install_exception_handler(vm, VECTOR_SYNC_CURRENT,
-+				ESR_EC_HW_BP_CURRENT, guest_hw_bp_handler);
-+	vm_install_exception_handler(vm, VECTOR_SYNC_CURRENT,
-+				ESR_EC_WP_CURRENT, guest_wp_handler);
-+	vm_install_exception_handler(vm, VECTOR_SYNC_CURRENT,
-+				ESR_EC_SSTEP_CURRENT, guest_ss_handler);
-+	vm_install_exception_handler(vm, VECTOR_SYNC_CURRENT,
-+				ESR_EC_SVC64, guest_svc_handler);
-+
-+	for (stage = 0; stage < 7; stage++) {
-+		vcpu_run(vm, VCPU_ID);
-+
-+		switch (get_ucall(vm, VCPU_ID, &uc)) {
-+		case UCALL_SYNC:
-+			TEST_ASSERT(uc.args[1] == stage,
-+				"Stage %d: Unexpected sync ucall, got %lx",
-+				stage, (ulong)uc.args[1]);
-+			break;
-+		case UCALL_ABORT:
-+			TEST_FAIL("%s at %s:%ld\n\tvalues: %#lx, %#lx",
-+				(const char *)uc.args[0],
-+				__FILE__, uc.args[1], uc.args[2], uc.args[3]);
-+			break;
-+		case UCALL_DONE:
-+			goto done;
-+		default:
-+			TEST_FAIL("Unknown ucall %lu", uc.cmd);
-+		}
-+	}
-+
-+done:
-+	kvm_vm_free(vm);
-+	return 0;
-+}
-diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-index 40aae31b4afc..a3ebef8e88c7 100644
---- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-+++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-@@ -14,12 +14,14 @@
- #define ARM64_CORE_REG(x) (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
- 			   KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(x))
- 
--#define CPACR_EL1	3, 0,  1, 0, 2
--#define TCR_EL1		3, 0,  2, 0, 2
--#define MAIR_EL1	3, 0, 10, 2, 0
--#define TTBR0_EL1	3, 0,  2, 0, 0
--#define SCTLR_EL1	3, 0,  1, 0, 0
--#define VBAR_EL1	3, 0, 12, 0, 0
-+#define CPACR_EL1               3, 0,  1, 0, 2
-+#define TCR_EL1                 3, 0,  2, 0, 2
-+#define MAIR_EL1                3, 0, 10, 2, 0
-+#define TTBR0_EL1               3, 0,  2, 0, 0
-+#define SCTLR_EL1               3, 0,  1, 0, 0
-+#define VBAR_EL1                3, 0, 12, 0, 0
-+
-+#define ID_AA64DFR0_EL1         3, 0,  0, 5, 0
+ void vm_init_descriptor_tables(struct kvm_vm *vm);
+ void vcpu_init_descriptor_tables(struct kvm_vm *vm, uint32_t vcpuid);
+-void vm_handle_exception(struct kvm_vm *vm, int vector,
++void vm_install_vector_handler(struct kvm_vm *vm, int vector,
+ 			void (*handler)(struct ex_regs *));
  
  /*
-  * Default MAIR
+diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+index a8906e60a108..e156061263a6 100644
+--- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
++++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+@@ -1250,8 +1250,8 @@ void vcpu_init_descriptor_tables(struct kvm_vm *vm, uint32_t vcpuid)
+ 	*(vm_vaddr_t *)addr_gva2hva(vm, (vm_vaddr_t)(&exception_handlers)) = vm->handlers;
+ }
+ 
+-void vm_handle_exception(struct kvm_vm *vm, int vector,
+-			 void (*handler)(struct ex_regs *))
++void vm_install_vector_handler(struct kvm_vm *vm, int vector,
++			       void (*handler)(struct ex_regs *))
+ {
+ 	vm_vaddr_t *handlers = (vm_vaddr_t *)addr_gva2hva(vm, vm->handlers);
+ 
+diff --git a/tools/testing/selftests/kvm/x86_64/kvm_pv_test.c b/tools/testing/selftests/kvm/x86_64/kvm_pv_test.c
+index 732b244d6956..5ae5f748723a 100644
+--- a/tools/testing/selftests/kvm/x86_64/kvm_pv_test.c
++++ b/tools/testing/selftests/kvm/x86_64/kvm_pv_test.c
+@@ -227,7 +227,7 @@ int main(void)
+ 
+ 	vm_init_descriptor_tables(vm);
+ 	vcpu_init_descriptor_tables(vm, VCPU_ID);
+-	vm_handle_exception(vm, GP_VECTOR, guest_gp_handler);
++	vm_install_vector_handler(vm, GP_VECTOR, guest_gp_handler);
+ 
+ 	enter_guest(vm);
+ 	kvm_vm_free(vm);
+diff --git a/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c b/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c
+index 72c0d0797522..20c373e2d329 100644
+--- a/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c
++++ b/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c
+@@ -574,7 +574,7 @@ static void test_msr_filter_allow(void) {
+ 	vm_init_descriptor_tables(vm);
+ 	vcpu_init_descriptor_tables(vm, VCPU_ID);
+ 
+-	vm_handle_exception(vm, GP_VECTOR, guest_gp_handler);
++	vm_install_vector_handler(vm, GP_VECTOR, guest_gp_handler);
+ 
+ 	/* Process guest code userspace exits. */
+ 	run_guest_then_process_rdmsr(vm, MSR_IA32_XSS);
+@@ -588,12 +588,12 @@ static void test_msr_filter_allow(void) {
+ 	run_guest_then_process_wrmsr(vm, MSR_NON_EXISTENT);
+ 	run_guest_then_process_rdmsr(vm, MSR_NON_EXISTENT);
+ 
+-	vm_handle_exception(vm, UD_VECTOR, guest_ud_handler);
++	vm_install_vector_handler(vm, UD_VECTOR, guest_ud_handler);
+ 	run_guest(vm);
+-	vm_handle_exception(vm, UD_VECTOR, NULL);
++	vm_install_vector_handler(vm, UD_VECTOR, NULL);
+ 
+ 	if (process_ucall(vm) != UCALL_DONE) {
+-		vm_handle_exception(vm, GP_VECTOR, guest_fep_gp_handler);
++		vm_install_vector_handler(vm, GP_VECTOR, guest_fep_gp_handler);
+ 
+ 		/* Process emulated rdmsr and wrmsr instructions. */
+ 		run_guest_then_process_rdmsr(vm, MSR_IA32_XSS);
+diff --git a/tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c b/tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c
+index 2f964cdc273c..ded70ff465d5 100644
+--- a/tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c
++++ b/tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c
+@@ -462,7 +462,7 @@ int main(int argc, char *argv[])
+ 
+ 	vm_init_descriptor_tables(vm);
+ 	vcpu_init_descriptor_tables(vm, HALTER_VCPU_ID);
+-	vm_handle_exception(vm, IPI_VECTOR, guest_ipi_handler);
++	vm_install_vector_handler(vm, IPI_VECTOR, guest_ipi_handler);
+ 
+ 	virt_pg_map(vm, APIC_DEFAULT_GPA, APIC_DEFAULT_GPA, 0);
+ 
 -- 
 2.31.1.527.g47e6f16901-goog
 
