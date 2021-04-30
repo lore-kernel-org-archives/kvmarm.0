@@ -2,83 +2,97 @@ Return-Path: <SRS0=QphI=J3=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8971C433ED
-	for <kvmarm@archiver.kernel.org>; Fri, 30 Apr 2021 15:31:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55309C43462
+	for <kvmarm@archiver.kernel.org>; Fri, 30 Apr 2021 15:35:16 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 32FE76144D
-	for <kvmarm@archiver.kernel.org>; Fri, 30 Apr 2021 15:31:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32FE76144D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 91B1661459
+	for <kvmarm@archiver.kernel.org>; Fri, 30 Apr 2021 15:35:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91B1661459
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A34164B44C;
-	Fri, 30 Apr 2021 11:31:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 10E8C4B39F;
+	Fri, 30 Apr 2021 11:35:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id j+Z0eMBVWLGZ; Fri, 30 Apr 2021 11:31:09 -0400 (EDT)
+	with ESMTP id fd1NxytKW98N; Fri, 30 Apr 2021 11:35:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 712984B44A;
-	Fri, 30 Apr 2021 11:31:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 110444B3AC;
+	Fri, 30 Apr 2021 11:35:14 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BAB714B441
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Apr 2021 11:31:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E0344B39F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Apr 2021 11:35:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TBbqhLl5HSRW for <kvmarm@lists.cs.columbia.edu>;
- Fri, 30 Apr 2021 11:31:07 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 915584B0B9
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Apr 2021 11:31:07 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 0053B61352;
- Fri, 30 Apr 2021 15:31:05 +0000 (UTC)
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
- (envelope-from <maz@kernel.org>)
- id 1lcV6c-00ADmW-Sk; Fri, 30 Apr 2021 16:31:02 +0100
-Date: Fri, 30 Apr 2021 16:31:02 +0100
-Message-ID: <878s4zokll.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Shanker R Donthineni <sdonthineni@nvidia.com>
-Subject: Re: [RFC 1/2] vfio/pci: keep the prefetchable attribute of a BAR
- region in VMA
-In-Reply-To: <1edb2c4e-23f0-5730-245b-fc6d289951e1@nvidia.com>
-References: <20210429162906.32742-1-sdonthineni@nvidia.com>
- <20210429162906.32742-2-sdonthineni@nvidia.com>
- <20210429122840.4f98f78e@redhat.com>
- <470360a7-0242-9ae5-816f-13608f957bf6@nvidia.com>
- <20210429134659.321a5c3c@redhat.com>
- <e3d7fda8-5263-211c-3686-f699765ab715@nvidia.com>
- <87czucngdc.wl-maz@kernel.org>
- <1edb2c4e-23f0-5730-245b-fc6d289951e1@nvidia.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: sdonthineni@nvidia.com, alex.williamson@redhat.com,
- will@kernel.org, catalin.marinas@arm.com, christoffer.dall@arm.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org, vsethi@nvidia.com,
- jsequeira@nvidia.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- linux-kernel@vger.kernel.org, Vikram Sethi <vsethi@nvidia.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Jason Sequeira <jsequeira@nvidia.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+ with ESMTP id 1xQZ4ni0fpny for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 30 Apr 2021 11:35:11 -0400 (EDT)
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com
+ [209.85.208.174])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C14844B39D
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Apr 2021 11:35:11 -0400 (EDT)
+Received: by mail-lj1-f174.google.com with SMTP id s9so23396682ljj.6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Apr 2021 08:35:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=Zw/V8/6W4skoSH0mSs8cW3qf3BAXRpq8TIlzvcUbh9Y=;
+ b=KB8gW36y7USDPOimeqhXInwA40Pnt1d90bk9cbUzrAJc2frJTwsE8DUmYpsixNTY5D
+ 0VEStw8wvZ8I0IlKf2CJfoljSzTfYWIayX3SvyxM1bomk9H/siwFiNjIEIKFbzohtdgO
+ w6vFYnxfHEF3wCnVt6V3YoSITDNsGsa10Pis/sjL+FQpIE58o9XbL+C2P81CYaPhq8Qt
+ qj8CGwVy7J+1cUwf/CXA01U/5rkNLcbVSAinzGvr1lHAjjXEfQK4i5hKVhhHHO2QhunW
+ aiKrl9b+u8yIOotQlVcCRKukY18jn7e3TOfbROxw1rCaup7aO+V4Nvp132xeshzjhRwg
+ DFLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=Zw/V8/6W4skoSH0mSs8cW3qf3BAXRpq8TIlzvcUbh9Y=;
+ b=ZKlki1lTy6cM/0JRCMaMckS/U7deOmQ5R+dsT0t7pFa1ElPiE5ksp4eouwteovyBAg
+ n3EKNpNzps5XCXkIA9BdeDawDb13cMKGn6/0z8GtCogpQoI1gkc+ModN1KWbEwj9cr1m
+ uBkMHldtadiLEC5UVYmdAa4EXE2/+Ed1GH6ozwBD6ysVH9pfrXetXVT6OMpgt49jJRGc
+ IQAlVII/9wcCRL5/l65Xa+/ghhmNjFxDju452MT5gYiihknugIMGgQq9xZOon176YVJU
+ NGPzeC/QzHy6Ggg6Fk2XEPzQeF2rIzKI5NGBkkEk9GikLmpjjX4mww+OkFvyIZT2MrmS
+ W5TQ==
+X-Gm-Message-State: AOAM533JRDESgjHS+bBPwhMeabgzFkm16/rEK3gk03QF9ZW35JLhj/Yv
+ UIYDCULUhQuhZSKM6+UoKxk7fa3ceMOydlFnrqb9WQ==
+X-Google-Smtp-Source: ABdhPJx/QRgwRdWJdR4aTn2uakfmtAz6C7OxdhfGIo2oiu582wd/0wprc5qi+RX6OipU6nb2KN0bPjeYB4Dj/CDoOuM=
+X-Received: by 2002:a2e:9a0a:: with SMTP id o10mr4294282lji.216.1619796910218; 
+ Fri, 30 Apr 2021 08:35:10 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210429203740.1935629-1-jingzhangos@google.com>
+ <20210429203740.1935629-2-jingzhangos@google.com>
+ <87bl9wnfgo.wl-maz@kernel.org>
+In-Reply-To: <87bl9wnfgo.wl-maz@kernel.org>
+From: Jing Zhang <jingzhangos@google.com>
+Date: Fri, 30 Apr 2021 10:34:58 -0500
+Message-ID: <CAAdAUtiMV_cVXPKBBEymNub8qYq-whLdihKG0si4_ALxK=yv6g@mail.gmail.com>
+Subject: Re: [PATCH v4 1/4] KVM: stats: Separate common stats from
+ architecture specific ones
+To: Marc Zyngier <maz@kernel.org>
+Cc: KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
+ Paul Mackerras <paulus@ozlabs.org>,
+ Linuxkselftest <linux-kselftest@vger.kernel.org>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, Will Deacon <will@kernel.org>,
+ KVMARM <kvmarm@lists.cs.columbia.edu>,
+ Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+ LinuxS390 <linux-s390@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
+ Oliver Upton <oupton@google.com>, Huacai Chen <chenhuacai@kernel.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ David Rientjes <rientjes@google.com>, KVMPPC <kvm-ppc@vger.kernel.org>,
+ Jim Mattson <jmattson@google.com>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ Sean Christopherson <seanjc@google.com>, Cornelia Huck <cohuck@redhat.com>,
+ Peter Shier <pshier@google.com>, LinuxMIPS <linux-mips@vger.kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,49 +104,55 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gRnJpLCAzMCBBcHIgMjAyMSAxNTo1ODoxNCArMDEwMCwKU2hhbmtlciBSIERvbnRoaW5lbmkg
-PHNkb250aGluZW5pQG52aWRpYS5jb20+IHdyb3RlOgo+IAo+IEhpIE1hcmMsCj4gCj4gT24gNC8z
-MC8yMSA2OjQ3IEFNLCBNYXJjIFp5bmdpZXIgd3JvdGU6Cj4gPgo+ID4+Pj4gV2UndmUgdHdvIGNv
-bmNlcm5zIGhlcmU6Cj4gPj4+PiAgICAtIFBlcmZvcm1hbmNlIGltcGFjdHMgZm9yIHBhc3MtdGhy
-b3VnaCBkZXZpY2VzLgo+ID4+Pj4gICAgLSBUaGUgZGVmaW5pdGlvbiBvZiBpb3JlbWFwX3djKCkg
-ZnVuY3Rpb24gZG9lc24ndCBtYXRjaCB0aGUgaG9zdAo+ID4+Pj4ga2VybmVsIG9uIEFSTTY0Cj4g
-Pj4+IFBlcmZvcm1hbmNlIEkgY2FuIHVuZGVyc3RhbmQsIGJ1dCBJIHRoaW5rIHlvdSdyZSBhbHNv
-IHVzaW5nIGl0IHRvIG1hc2sKPiA+Pj4gYSBkcml2ZXIgYnVnIHdoaWNoIHNob3VsZCBiZSByZXNv
-bHZlZCBmaXJzdC4gIFRoYW5rCj4gPj4gV2XigJl2ZSBhbHJlYWR5IGluc3RydW1lbnRlZCB0aGUg
-ZHJpdmVyIGNvZGUgYW5kIGZvdW5kIHRoZSBjb2RlIHBhdGgKPiA+PiBmb3IgdGhlIHVuYWxpZ25l
-ZCBhY2Nlc3Nlcy4gV2XigJlsbCBmaXggdGhpcyBpc3N1ZSBpZiBpdOKAmXMgbm90Cj4gPj4gZm9s
-bG93aW5nIFdDIHNlbWFudGljcy4KPiA+Pgo+ID4+IEZpeGluZyB0aGUgcGVyZm9ybWFuY2UgY29u
-Y2VybiB3aWxsIGJlIHVuZGVyIEtWTSBzdGFnZS0yIHBhZ2UtdGFibGUKPiA+PiBjb250cm9sLiBX
-ZSdyZSBsb29raW5nIGZvciBhIGd1aWRhbmNlL3NvbHV0aW9uIGZvciB1cGRhdGluZyBzdGFnZS0y
-Cj4gPj4gUFRFIGJhc2VkIG9uIFBDSS1CQVIgYXR0cmlidXRlLgo+ID4gQmVmb3JlIHdlIHN0YXJ0
-IGRpc2N1c3NpbmcgdGhlICpob3cqLCBJJ2QgbGlrZSB0byBjbGVhcmx5IHVuZGVyc3RhbmQKPiA+
-IHdoYXQgKmFybTY0KiBtZW1vcnkgYXR0cmlidXRlcyB5b3UgYXJlIHJlbHlpbmcgb24uIFdlIGFs
-cmVhZHkgaGF2ZQo+ID4gZXN0YWJsaXNoZWQgdGhhdCB0aGUgdW5hbGlnbmVkIGFjY2VzcyB3YXMg
-YSBidWcsIHdoaWNoIHdhcyB0aGUgYmlnZ2VzdAo+ID4gYXJndW1lbnQgaW4gZmF2b3VyIG9mIE5P
-Uk1BTF9OQy4gV2hhdCBhcmUgdGhlIG90aGVyIHJlcXVpcmVtZW50cz8KPiBTb3JyeSwgbXkgZWFy
-bGllciByZXNwb25zZSB3YXMgbm90IGNvbXBsZXRlLi4uCj4gCj4gQVJNdjggYXJjaGl0ZWN0dXJl
-IGhhcyB0d28gZmVhdHVyZXMgR2F0aGVyaW5nIGFuZCBSZW9yZGVyCj4gdHJhbnNhY3Rpb25zLCB2
-ZXJ5IGltcG9ydGFudCBmcm9tIGEgcGVyZm9ybWFuY2UgcG9pbnQgb2Ygdmlldy4gU21hbGwKPiBp
-bmxpbmUgcGFja2V0cyBmb3IgTklDIGNhcmRzIGFuZCBhY2Nlc3NlcyB0byBHUFUncyBmcmFtZSBi
-dWZmZXIgYXJlCj4gQ1BVLWJvdW5kIG9wZXJhdGlvbnMuIFdlIHdhbnQgdG8gdGFrZSBhZHZhbnRh
-Z2VzIG9mIEdSRSBmZWF0dXJlcyB0bwo+IGFjaGlldmUgaGlnaGVyIHBlcmZvcm1hbmNlLgo+IAo+
-IEJvdGggdGhlc2UgZmVhdHVyZXMgYXJlIGRpc2FibGVkIGZvciBwcmVmZXRjaGFibGUgQkFScyBp
-biBWTSBiZWNhdXNlCj4gbWVtb3J5LXR5cGUgTVRfREVWSUNFX25HblJFIGVuZm9yY2VkIGluIHN0
-YWdlLTIuCgpSaWdodCwgc28gTm9ybWFsX05DIGlzIGEgcmVkIGhlcnJpbmcsIGFuZCBpdCBpcyBE
-ZXZpY2VfR1JFIHRoYXQgeW91CnJlYWxseSBhcmUgYWZ0ZXIsIHJpZ2h0PwoKTm93LCBJJ20gbm90
-IGNvbnZpbmNlZCB0aGF0IHdlIGNhbiBkbyB0aGF0IGRpcmVjdGx5IGZyb20gdmZpbyBpbiBhCmRl
-dmljZS1hZ25vc3RpYyBtYW5uZXIuIEl0IGlzIHVzZXJzcGFjZSB0aGF0IHBsYWNlcyB0aGUgZGV2
-aWNlIGluIHRoZQpndWVzdCdzIG1lbW9yeSwgYW5kIEkgaGF2ZSB0aGUgdWdseSBmZWVsaW5nIHRo
-YXQgdXNlcnNwYWNlIG5lZWRzIHRvIGJlCmluIGNvbnRyb2wgb2YgbWVtb3J5IGF0dHJpYnV0ZXMu
-CgpPdGhlcndpc2UsIHdlIGNoYW5nZSB0aGUgYmVoYXZpb3VyIGZvciBhbGwgZXhpc3RpbmcgZGV2
-aWNlcyB0aGF0IGhhdmUKcHJlZmV0Y2hhYmxlIEJBUnMsIGFuZCBJIGRvbid0IHRoaW5rIHRoYXQn
-cyBhbiBhY2NlcHRhYmxlIG1vdmUKKHVzZXJzcGFjZSBBQkkgY2hhbmdlKS4KCglNLgoKLS0gCldp
-dGhvdXQgZGV2aWF0aW9uIGZyb20gdGhlIG5vcm0sIHByb2dyZXNzIGlzIG5vdCBwb3NzaWJsZS4K
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1h
-aWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3Mu
-Y29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+Hi Marc,
+
+On Fri, Apr 30, 2021 at 7:07 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> On Thu, 29 Apr 2021 21:37:37 +0100,
+> Jing Zhang <jingzhangos@google.com> wrote:
+>
+> > +struct kvm_vm_stat_common {
+> > +     ulong remote_tlb_flush;
+> > +};
+> > +
+> > +struct kvm_vcpu_stat_common {
+> > +     u64 halt_successful_poll;
+> > +     u64 halt_attempted_poll;
+> > +     u64 halt_poll_invalid;
+> > +     u64 halt_wakeup;
+> > +     u64 halt_poll_success_ns;
+> > +     u64 halt_poll_fail_ns;
+> > +};
+>
+> Why can't we make everything a u64? Is there anything that really
+> needs to be a ulong? On most architectures, they are the same anyway,
+> so we might as well bite the bullet.
+That's a question I have asked myself many times. It is a little bit annoying
+to handle different types for VM and VCPU stats.
+This divergence was from the  commit 8a7e75d47b681933, which says
+"However vm statistics
+ could potentially be updated by multiple vcpus from that vm at a time.
+ To avoid the overhead of atomics make all vm statistics ulong such that
+ they are 64-bit on 64-bit systems where they can be atomically incremented
+ and are 32-bit on 32-bit systems which may not be able to atomically
+ increment 64-bit numbers."
+
+I would be very happy if there is a lock-free way to use u64 for VM stats.
+Please let me know if anyone has any idea about this.
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
+
+Thanks,
+Jing
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
