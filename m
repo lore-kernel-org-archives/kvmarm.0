@@ -6,54 +6,54 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9D58C433B4
-	for <kvmarm@archiver.kernel.org>; Mon,  3 May 2021 09:50:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B0AEC43460
+	for <kvmarm@archiver.kernel.org>; Mon,  3 May 2021 10:17:33 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1BBEF60FE9
-	for <kvmarm@archiver.kernel.org>; Mon,  3 May 2021 09:50:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BBEF60FE9
+	by mail.kernel.org (Postfix) with ESMTP id AE9FD61153
+	for <kvmarm@archiver.kernel.org>; Mon,  3 May 2021 10:17:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE9FD61153
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A38B94B42C;
-	Mon,  3 May 2021 05:50:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C8CE4B441;
+	Mon,  3 May 2021 06:17:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id BVcxcxO6+SHO; Mon,  3 May 2021 05:50:48 -0400 (EDT)
+	with ESMTP id cqsgGz2TpnN7; Mon,  3 May 2021 06:17:30 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 736084B431;
-	Mon,  3 May 2021 05:50:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 779604B431;
+	Mon,  3 May 2021 06:17:30 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 43B134B428
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 May 2021 05:50:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A0794B431
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 May 2021 06:17:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9bpFGth+PQ+B for <kvmarm@lists.cs.columbia.edu>;
- Mon,  3 May 2021 05:50:46 -0400 (EDT)
+ with ESMTP id iv9zR64C1oUb for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  3 May 2021 06:17:28 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 046564B41A
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 May 2021 05:50:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 29FC24B343
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 May 2021 06:17:28 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id F0DC860FE9;
- Mon,  3 May 2021 09:50:44 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 2C3DB610E6;
+ Mon,  3 May 2021 10:17:27 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1ldVDu-00AWmd-Pq; Mon, 03 May 2021 10:50:42 +0100
-Date: Mon, 03 May 2021 10:50:41 +0100
-Message-ID: <87czu8uowe.wl-maz@kernel.org>
+ id 1ldVdk-00AX3n-VA; Mon, 03 May 2021 11:17:25 +0100
+Date: Mon, 03 May 2021 11:17:23 +0100
+Message-ID: <87bl9sunnw.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Shanker R Donthineni <sdonthineni@nvidia.com>
+To: Vikram Sethi <vsethi@nvidia.com>
 Subject: Re: [RFC 1/2] vfio/pci: keep the prefetchable attribute of a BAR
  region in VMA
-In-Reply-To: <49e26646-9f05-ccb8-f5c1-73a92ab79972@nvidia.com>
+In-Reply-To: <BL0PR12MB25329EF5DFA7BBAA732064A7BD5C9@BL0PR12MB2532.namprd12.prod.outlook.com>
 References: <20210429162906.32742-1-sdonthineni@nvidia.com>
  <20210429162906.32742-2-sdonthineni@nvidia.com>
  <20210429122840.4f98f78e@redhat.com>
@@ -65,13 +65,13 @@ References: <20210429162906.32742-1-sdonthineni@nvidia.com>
  <878s4zokll.wl-maz@kernel.org>
  <BL0PR12MB2532CC436EBF626966B15994BD5E9@BL0PR12MB2532.namprd12.prod.outlook.com>
  <87eeeqvm1d.wl-maz@kernel.org>
- <49e26646-9f05-ccb8-f5c1-73a92ab79972@nvidia.com>
+ <BL0PR12MB25329EF5DFA7BBAA732064A7BD5C9@BL0PR12MB2532.namprd12.prod.outlook.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: sdonthineni@nvidia.com, vsethi@nvidia.com,
+X-SA-Exim-Rcpt-To: vsethi@nvidia.com, sdonthineni@nvidia.com,
  alex.williamson@redhat.com, will@kernel.org, catalin.marinas@arm.com,
  christoffer.dall@arm.com, linux-arm-kernel@lists.infradead.org,
  kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
@@ -79,10 +79,11 @@ X-SA-Exim-Rcpt-To: sdonthineni@nvidia.com, vsethi@nvidia.com,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
  Catalin Marinas <catalin.marinas@arm.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- Vikram Sethi <vsethi@nvidia.com>, Alex Williamson <alex.williamson@redhat.com>,
+ Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
  Jason Sequeira <jsequeira@nvidia.com>, Will Deacon <will@kernel.org>,
  "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
  "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
@@ -102,63 +103,88 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sat, 01 May 2021 12:36:11 +0100,
-Shanker R Donthineni <sdonthineni@nvidia.com> wrote:
+Hi Vikram,
+
+On Sun, 02 May 2021 18:56:31 +0100,
+Vikram Sethi <vsethi@nvidia.com> wrote:
 > 
-> Hi Marc,
+> Hi Marc, 
 > 
-> On 5/1/21 4:30 AM, Marc Zyngier wrote:
-> >> I think Device GRE has some practical problems.
-> >> 1. A lot of userspace code which is used to getting write combined
-> >> mappings to GPU memory from kernel drivers does memcpy/memset on it
-> >> which can insert ldp/stp which can crash on Device Memory Type. From
-> >> a quick search I didn't find a memcpy_io or memset_io in
-> >> glibc. Perhaps there are some other functions available, but a lot
-> >> of userspace applications that work on x86 and ARM baremetal won't
-> >> work on ARM VMs without such changes. Changes to all of userspace
-> >> may not always be practical, specially if linking to binaries
-> > This seems to go against what Alex was hinting at earlier, which is
-> > that unaligned accesses were not expected on prefetchable regions, and
-> > Shanker latter confirming that it was an actual bug. Where do we stand
-> > here?
-> >
-> We agreed to call it a driver bug if it's not following Linux
-> write-combining API ioremap_wc() semantics. So far I didn't find
-> whether unaligned accesses allowed or not for WC regions explicitly
-> in Linux documentation.
-
-And that's exactly the kind of problem I want clarification on before
-we add *anything* to KVM. Proper, unambiguous definition of what WC is
-on the CPU side, and how it maps onto PCI. Without such a definition,
-we're just driving blind.
-
-> Page faults due to driver unaligned accesses
-> in kernel space will be under driver control, we'll fix it.
+> > From: Marc Zyngier <maz@kernel.org>
+> > Hi Vikram,
+> > 
+>  
+> > The problem I see is that we have VM and userspace being written in terms
+> > of Write-Combine, which is:
+> > 
+> > - loosely defined even on x86
+> > 
+> > - subject to interpretations in the way it maps to PCI
+> > 
+> > - has no direct equivalent in the ARMv8 collection of memory
+> >   attributes (and Normal_NC comes with speculation capabilities which
+> >   strikes me as extremely undesirable on arbitrary devices)
 > 
-> Driver uses the architecture agnostic functions that are available
-> in the Linux kernel and expecting the same behavior in VM vs
-> Baremetal. We would like to keep the driver implementation is
-> architecture-independent as much as possible and support VM
-> unaware. For ARM64, VM's ioremap_wc() definition doesn't match
-> baremetal.
+> If speculation with Normal NC to prefetchable BARs in devices was a
+> problem, those devices would already be broken in baremetal with
+> ioremap_wc on arm64, and we would need quirks there to not do Normal
+> NC for them but Device GRE, and if such a quirk was needed on
+> baremetal, it could be picked up by vfio/KVM as well. But we haven't
+> seen any broken devices doing wc on baremetal on ARM64, have we?
 
-You are mixing two things: what Linux/arm64 gives to kernel drivers,
-and what KVM, as an implementation of the ARMv8 architecture, gives to
-virtual machines. There is zero reason for the two to match if there
-is no definition of what we need to provide.
+The lack of evidence does not equate to a proof, and your devices not
+misbehaving doesn't mean it is the right thing, specially when we have
+such a wide range of CPU and interconnect implementation. Which is why
+I really want an answer at the architecture level. Not a "it works for
+me" type of answer.
 
-> We don't have any control over the userspace
-> applications/drivers/libraries as Vikram saying. Another example GCC
-> memset() function uses 'DC ZVA' which triggers an alignment fault if
-> the actual memory type is device_xxx.
+Furthermore, as I replied to Shanker in a separate email, what
+Linux/arm64 does is pretty much irrelevant. KVM/arm64 implements the
+ARMv8 architecture, and it is at that level that we need to solve the
+problem.
 
-Again, you're talking about an application, and I'm talking about how
-to map a nebulous concept that originated on a foreign architecture
-onto something that is entirely different. So please drop the "that's
-how my SW works", and instead give me a good definition of what WC
-means in architectural terms.
+If, by enumerating the properties of Prefetchable, you can show that
+they are a strict superset of Normal_NC, I'm on board. I haven't seen
+such an enumeration so far.
 
-Thanks
+> I know we have tested NICs write combining on arm64 in baremetal, as
+> well as GPU and NVMe CMB without issues.
+> 
+> Further, I don't see why speculation to non cacheble would be an
+> issue if prefetch without side effects is allowed by the device,
+> which is what a prefetchable BAR is.
+> If it is an issue for a device I would consider that a bug already needing a quirk in
+> Baremetal/host kernel already. 
+> From PCI spec " A prefetchable address range may have write side effects, 
+> but it may not have read side effects."
+
+Right, so we have made a small step in the direction of mapping
+"prefetchable" onto "Normal_NC", thanks for that. What about all the
+other properties (unaligned accesses, ordering, gathering)?
+
+> > How do we translate this into something consistent? I'd like to see an actual
+> > description of what we *really* expect from WC on prefetchable PCI regions,
+> > turn that into a documented definition agreed across architectures, and then
+> > we can look at implementing it with one memory type or another on arm64.
+> > 
+> > Because once we expose that memory type at S2 for KVM guests, it
+> > becomes ABI and there is no turning back. So I want to get it right once and
+> > for all.
+> > 
+> I agree that we need a precise definition for the Linux ioremap_wc
+> API wrt what drivers (kernel and userspace) can expect and whether
+> memset/memcpy is expected to work or not and whether aligned
+> accesses are a requirement.
+> To the extent ABI is set, I would think that the ABI is also already
+> set in the host kernel for arm64 WC = Normal NC, so why should that
+> not also be the ABI for same driver in VMs.
+
+KVM is an implementation of the ARM architecture, and doesn't really
+care about what WC is. If we come to the conclusion that Normal_NC is
+the natural match for Prefetchable attributes, than we're good and we
+can have Normal_NC being set by userspace, or even VFIO. But I don't
+want to set it only because "it works when bare-metal Linux uses it".
+Remember KVM doesn't only run Linux as guests.
 
 	M.
 
