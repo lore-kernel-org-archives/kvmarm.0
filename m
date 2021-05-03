@@ -2,73 +2,49 @@ Return-Path: <SRS0=w4A1=J6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7752EC433B4
-	for <kvmarm@archiver.kernel.org>; Mon,  3 May 2021 14:44:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09E6BC433ED
+	for <kvmarm@archiver.kernel.org>; Mon,  3 May 2021 16:22:00 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id AAAC9611C2
-	for <kvmarm@archiver.kernel.org>; Mon,  3 May 2021 14:44:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAAC9611C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 82CC561166
+	for <kvmarm@archiver.kernel.org>; Mon,  3 May 2021 16:21:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82CC561166
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xs4all.nl
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DA6D54B3D6;
-	Mon,  3 May 2021 10:44:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E072D4B3E8;
+	Mon,  3 May 2021 12:21:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id WFcdsfLb2BCn; Mon,  3 May 2021 10:44:41 -0400 (EDT)
+	with ESMTP id 0Y1pC4agKQTO; Mon,  3 May 2021 12:21:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A9FD74B271;
-	Mon,  3 May 2021 10:44:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CD934B415;
+	Mon,  3 May 2021 12:21:56 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A8A94B271
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 May 2021 10:44:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 09AC14B24A
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 May 2021 09:35:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cTLeJ+NUTB0l for <kvmarm@lists.cs.columbia.edu>;
- Mon,  3 May 2021 10:44:39 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DC8F4B25E
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 May 2021 10:44:39 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1620053079;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=bl56Zu7+zy9TZvZXab3dG9cf65Q5oyc9UzIYD23qD4o=;
- b=D2fF/HEL+1ciYXkZ2MJ6BsOMG3EPFK0N0qDpEhwk7oFCOp5ojLWognEzpYMRkDbXagtws3
- Q4UnHsNpXdd98K5SZVex2kucRdz/vsfgIWpipquinR9PqkUhUEK4zyJxrv6pie6gHeusN0
- 5U0jH9bTVL/fA+j8WUaMcKnWc92Q3MA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-316-5OtKC6mePom9ceq1518erg-1; Mon, 03 May 2021 10:44:35 -0400
-X-MC-Unique: 5OtKC6mePom9ceq1518erg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9A85E100A24D;
- Mon,  3 May 2021 14:44:33 +0000 (UTC)
-Received: from x1.home.shazbot.org (ovpn-113-225.phx2.redhat.com
- [10.3.113.225])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C8BF95C1D0;
- Mon,  3 May 2021 14:44:32 +0000 (UTC)
-Date: Mon, 3 May 2021 08:44:32 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Vikram Sethi <vsethi@nvidia.com>
+ with ESMTP id 8i2WietCRpTn for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  3 May 2021 09:35:28 -0400 (EDT)
+Received: from sibelius.xs4all.nl (sibelius.xs4all.nl [83.163.83.176])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 886A54B249
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 May 2021 09:35:28 -0400 (EDT)
+Received: from localhost (bloch.sibelius.xs4all.nl [local])
+ by bloch.sibelius.xs4all.nl (OpenSMTPD) with ESMTPA id 06eed435;
+ Mon, 3 May 2021 15:35:25 +0200 (CEST)
+Date: Mon, 3 May 2021 15:35:25 +0200 (CEST)
+From: Mark Kettenis <mark.kettenis@xs4all.nl>
+To: Marc Zyngier <maz@kernel.org>
+In-Reply-To: <87bl9sunnw.wl-maz@kernel.org> (message from Marc Zyngier on Mon, 
+ 03 May 2021 11:17:23 +0100)
 Subject: Re: [RFC 1/2] vfio/pci: keep the prefetchable attribute of a BAR
  region in VMA
-Message-ID: <20210503084432.75e0126d@x1.home.shazbot.org>
-In-Reply-To: <BL0PR12MB253296086906C4A850EC68E6BD5B9@BL0PR12MB2532.namprd12.prod.outlook.com>
 References: <20210429162906.32742-1-sdonthineni@nvidia.com>
  <20210429162906.32742-2-sdonthineni@nvidia.com>
  <20210429122840.4f98f78e@redhat.com>
@@ -82,19 +58,12 @@ References: <20210429162906.32742-1-sdonthineni@nvidia.com>
  <87eeeqvm1d.wl-maz@kernel.org>
  <BL0PR12MB25329EF5DFA7BBAA732064A7BD5C9@BL0PR12MB2532.namprd12.prod.outlook.com>
  <87bl9sunnw.wl-maz@kernel.org>
- <c1bd514a531988c9@bloch.sibelius.xs4all.nl>
- <BL0PR12MB253296086906C4A850EC68E6BD5B9@BL0PR12MB2532.namprd12.prod.outlook.com>
-Organization: Red Hat
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Marc Zyngier <maz@kernel.org>,
- Shanker Donthineni <sdonthineni@nvidia.com>,
- "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
- Jason Sequeira <jsequeira@nvidia.com>, "will@kernel.org" <will@kernel.org>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
- Mark Kettenis <mark.kettenis@xs4all.nl>
+Message-ID: <c1bd514a531988c9@bloch.sibelius.xs4all.nl>
+X-Mailman-Approved-At: Mon, 03 May 2021 12:21:55 -0400
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, catalin.marinas@arm.com,
+ sdonthineni@nvidia.com, vsethi@nvidia.com, alex.williamson@redhat.com,
+ jsequeira@nvidia.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -106,61 +75,159 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gTW9uLCAzIE1heSAyMDIxIDEzOjU5OjQzICswMDAwClZpa3JhbSBTZXRoaSA8dnNldGhpQG52
-aWRpYS5jb20+IHdyb3RlOgoKPiA+IEZyb206IE1hcmsgS2V0dGVuaXMgPG1hcmsua2V0dGVuaXNA
-eHM0YWxsLm5sPiAgCj4gPiA+IEZyb206IE1hcmMgWnluZ2llciA8bWF6QGtlcm5lbC5vcmc+ICAK
-PiAKPiBzbmlwCj4gPiA+IElmLCBieSBlbnVtZXJhdGluZyB0aGUgcHJvcGVydGllcyBvZiBQcmVm
-ZXRjaGFibGUsIHlvdSBjYW4gc2hvdyB0aGF0Cj4gPiA+IHRoZXkgYXJlIGEgc3RyaWN0IHN1cGVy
-c2V0IG9mIE5vcm1hbF9OQywgSSdtIG9uIGJvYXJkLiBJIGhhdmVuJ3Qgc2Vlbgo+ID4gPiBzdWNo
-IGFuIGVudW1lcmF0aW9uIHNvIGZhci4KPiA+ID4gIAo+IHNuaXAKPiA+ID4gUmlnaHQsIHNvIHdl
-IGhhdmUgbWFkZSBhIHNtYWxsIHN0ZXAgaW4gdGhlIGRpcmVjdGlvbiBvZiBtYXBwaW5nCj4gPiA+
-ICJwcmVmZXRjaGFibGUiIG9udG8gIk5vcm1hbF9OQyIsIHRoYW5rcyBmb3IgdGhhdC4gV2hhdCBh
-Ym91dCBhbGwgdGhlCj4gPiA+IG90aGVyIHByb3BlcnRpZXMgKHVuYWxpZ25lZCBhY2Nlc3Nlcywg
-b3JkZXJpbmcsIGdhdGhlcmluZyk/ICAKPiA+ICAgCj4gUmVnYXJkaW5nIGdhdGhlcmluZy93cml0
-ZSBjb21iaW5pbmcsIHRoYXQgaXMgYWxzbyBhbGxvd2VkIHRvIHByZWZldGNoYWJsZSBwZXIgUENJ
-IHNwZWMKCkFzIG90aGVycyBoYXZlIHN0YXRlZCwgZ2F0aGVyL3dyaXRlIGNvbWJpbmluZyBpdHNl
-bGYgaXMgbm90IHdlbGwKZGVmaW5lZC4KCj4gRnJvbSAxLjMuMi4yIG9mIDUvMCBiYXNlIHNwZWM6
-Cj4gQSBQQ0kgRXhwcmVzcyBFbmRwb2ludCByZXF1ZXN0aW5nIG1lbW9yeSByZXNvdXJjZXMgdGhy
-b3VnaCBhIEJBUiBtdXN0IHNldCB0aGUgQkFSJ3MgUHJlZmV0Y2hhYmxlIGJpdCB1bmxlc3MKPiB0
-aGUgcmFuZ2UgY29udGFpbnMgbG9jYXRpb25zIHdpdGggcmVhZCBzaWRlLWVmZmVjdHMgb3IgbG9j
-YXRpb25zIGluIHdoaWNoIHRoZSBGdW5jdGlvbiBkb2VzIG5vdCB0b2xlcmF0ZSB3cml0ZQo+IG1l
-cmdpbmcuCgoid3JpdGUgbWVyZ2luZyIgIFRoaXMgaXMgYSB2ZXJ5IHNwZWNpZmljIHRoaW5nLCBw
-ZXIgUENJIDMuMCwgMy4yLjY6CgogIEJ5dGUgTWVyZ2luZyDigJMgb2NjdXJzIHdoZW4gYSBzZXF1
-ZW5jZSBvZiBpbmRpdmlkdWFsIG1lbW9yeSB3cml0ZXMKICAoYnl0ZXMgb3Igd29yZHMpIGFyZSBt
-ZXJnZWQgaW50byBhIHNpbmdsZSBEV09SRC4KClRoZSBzZW1hbnRpY3Mgc3VnZ2VzdCBxdWFkd29y
-ZCBzdXBwb3J0IGluIGFkZGl0aW9uIHRvIGR3b3JkLCBidXQgZG9uJ3QKcmVxdWlyZSBpdC4gIFdy
-aXRlcyB0byBieXRlcyB3aXRoaW4gYSBkd29yZCBjYW4gYmUgbWVyZ2VkLCBidXQKZHVwbGljYXRl
-IHdyaXRlcyBjYW5ub3QuCgpJdCBzZWVtcyBsaWtlIGFuIGV4dHJlbWVseSBsaWJlcmFsIGFwcGxp
-Y2F0aW9uIHRvIHN1Z2dlc3QgdGhhdCB0aGlzIG9uZQp3cml0ZSBzZW1hbnRpYyBlbmNvbXBhc3Nl
-cyBmdWxsIHdyaXRlIGNvbWJpbmluZyBzZW1hbnRpY3MsIHdoaWNoIGl0c2VsZgppcyBub3QgY2xl
-YXJseSBkZWZpbmVkLgoKPiBGdXJ0aGVyIDcuNS4xLjIuMSBzYXlzICIgQSBGdW5jdGlvbiBpcyBw
-ZXJtaXR0ZWQKPiB0byBtYXJrIGEgcmFuZ2UgYXMgcHJlZmV0Y2hhYmxlIGlmIHRoZXJlIGFyZSBu
-byBzaWRlIGVmZmVjdHMgb24gcmVhZHMsIHRoZSBGdW5jdGlvbiByZXR1cm5zIGFsbCBieXRlcyBv
-biByZWFkcyByZWdhcmRsZXNzIG9mCj4gdGhlIGJ5dGUgZW5hYmxlcywgYW5kIGhvc3QgYnJpZGdl
-cyBjYW4gbWVyZ2UgcHJvY2Vzc29yIHdyaXRlcyBpbnRvIHRoaXMgcmFuZ2UxMzkgd2l0aG91dCBj
-YXVzaW5nIGVycm9ycyIKPiAKPiBUaGUgInJlZ2FyZGxlc3Mgb2YgYnl0ZSBlbmFibGVzIiBzdWdn
-ZXN0cyB0byBtZSB0aGF0IHVuYWxpZ25lZCBpcyBPSywgYXMgb25seSAKPiBjZXJ0YWluIGJ5dGUg
-ZW5hYmxlcyBtYXkgYmUgc2V0LCB3aGF0IGRvIHlvdSB0aGluaz8KPiAKPiBTbyB0byBtZSBwcmVm
-ZXRjaGFibGUgaW4gUENJZSBzcGVjIGFsbG93cyBmb3Igd3JpdGUgY29tYmluaW5nLCByZWFkIHdp
-dGhvdXQKCklyb25pY2FsbHkgaGVyZSwgdGhlIGFib3ZlIFBDSSBzcGVjIHNlY3Rpb24gZGVmaW5p
-bmcgd3JpdGUgbWVyZ2luZyBoYXMKc2VwYXJhdGUgc2VjdGlvbnMgZm9yICJjb21iaW5pbmciLCAi
-bWVyZ2luZyIsIGFuZCAiY29sbGFwc2luZyIuICBPbmx5Cm1lcmdpbmcgaXMgaW5kaWNhdGVkIGFz
-IGEgcmVxdWlyZW1lbnQgZm9yIHByZWZldGNoYWJsZSByZXNvdXJjZXMuCgo+IHNpZGVlZmZlY3Qg
-KHByZWZldGNoL3NwZWN1bGF0aXZlIGFzIGxvbmcgYXMgdW5jYWNoZWQpLCBhbmQgdW5hbGlnbmVk
-LiBSZWdhcmRpbmcKPiBvcmRlcmluZyBJIGRpZG4ndCBmaW5kIGEgc3RhdGVtZW50IG9uZSB3YXkg
-b3Igb3RoZXIgaW4gUENJZSBwcmVmZXRjaGFibGUgZGVmaW5pdGlvbiwgYnV0Cj4gSSB0aGluayB0
-aGF0IGdvZXMgYmV5b25kIHdoYXQgUENJZSBzYXlzIG9yIGRvZXNuJ3Qgc2F5IGFueXdheSBzaW5j
-ZSByZW9yZGVyaW5nIGNhbiAKPiBhbHNvIGhhcHBlbiBpbiB0aGUgQ1BVLCBhbmQgc2luY2UgZHJp
-dmVyIG11c3QgYmUgYXdhcmUgb2YgY29ycmVjdG5lc3MgaXNzdWVzIGluIGl0cyAKPiBwcm9kdWNl
-ci9jb25zdW1lciBtb2RlbHMgaXQgd2lsbCBuZWVkIHRoZSByaWdodCBiYXJyaWVycyB3aGVyZSB0
-aGV5IGFyZSByZXF1aXJlZCAKPiBmb3IgY29ycmVjdG5lc3MgYW55d2F5IChyZXF1aXJlZCBmb3Ig
-dGhlIGRyaXZlci91c2Vyc3BhY2UgdG8gd29yayBvbiBob3N0IHcvIGlvcmVtYXBfd2MpLgoKQSBs
-b3Qgb2YgaGFuZCB3YXZpbmcgaGVyZSwgaW1vLiAgVGhhbmtzLAoKQWxleAoKX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdApr
-dm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1
-L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+> Date: Mon, 03 May 2021 11:17:23 +0100
+> From: Marc Zyngier <maz@kernel.org>
+> 
+> Hi Vikram,
+> 
+> On Sun, 02 May 2021 18:56:31 +0100,
+> Vikram Sethi <vsethi@nvidia.com> wrote:
+> > 
+> > Hi Marc, 
+> > 
+> > > From: Marc Zyngier <maz@kernel.org>
+> > > Hi Vikram,
+> > > 
+> >  
+> > > The problem I see is that we have VM and userspace being written in terms
+> > > of Write-Combine, which is:
+> > > 
+> > > - loosely defined even on x86
+> > > 
+> > > - subject to interpretations in the way it maps to PCI
+> > > 
+> > > - has no direct equivalent in the ARMv8 collection of memory
+> > >   attributes (and Normal_NC comes with speculation capabilities which
+> > >   strikes me as extremely undesirable on arbitrary devices)
+> > 
+> > If speculation with Normal NC to prefetchable BARs in devices was a
+> > problem, those devices would already be broken in baremetal with
+> > ioremap_wc on arm64, and we would need quirks there to not do Normal
+> > NC for them but Device GRE, and if such a quirk was needed on
+> > baremetal, it could be picked up by vfio/KVM as well. But we haven't
+> > seen any broken devices doing wc on baremetal on ARM64, have we?
+
+I think the SC2A11 SoC used in the Socionext developerbox counts as
+"broken":
+
+https://www.96boards.org/documentation/enterprise/developerbox/support/known-issues.html
+
+I'm not sure my understanding of the issue is 100% correct, but I
+believe the firmware workaround described there uses the stage 2
+translation tables to map "Normal NC" onto "Device nGRE" or something
+even more restricted.  Now this hardware may be classified as simply
+broken.  However...
+
+On hardware based on the NXP LX2160A SoC we're seeing some weird
+behaviour when using "Normal NC" mappings with an AMD GPU that
+disappear by using "Device nGnRnE" mappings on OpenBSD.  No such issue
+was observed with hardware based on an Ampere eMAG SoC.  I don't fully
+understand this issue yet, and it may very well be a bug in OpenBSD
+code, but it does show there are potential pitfalls with using "Normal
+NC" for mapping prefetchable BARs of PCIe devices.
+
+> The lack of evidence does not equate to a proof, and your devices not
+> misbehaving doesn't mean it is the right thing, specially when we have
+> such a wide range of CPU and interconnect implementation. Which is why
+> I really want an answer at the architecture level. Not a "it works for
+> me" type of answer.
+> 
+> Furthermore, as I replied to Shanker in a separate email, what
+> Linux/arm64 does is pretty much irrelevant. KVM/arm64 implements the
+> ARMv8 architecture, and it is at that level that we need to solve the
+> problem.
+> 
+> If, by enumerating the properties of Prefetchable, you can show that
+> they are a strict superset of Normal_NC, I'm on board. I haven't seen
+> such an enumeration so far.
+> 
+> > I know we have tested NICs write combining on arm64 in baremetal, as
+> > well as GPU and NVMe CMB without issues.
+> > 
+> > Further, I don't see why speculation to non cacheble would be an
+> > issue if prefetch without side effects is allowed by the device,
+> > which is what a prefetchable BAR is.
+> > If it is an issue for a device I would consider that a bug already needing a quirk in
+> > Baremetal/host kernel already. 
+> > From PCI spec " A prefetchable address range may have write side effects, 
+> > but it may not have read side effects."
+> 
+> Right, so we have made a small step in the direction of mapping
+> "prefetchable" onto "Normal_NC", thanks for that. What about all the
+> other properties (unaligned accesses, ordering, gathering)?
+
+On x86 WC:
+
+1. Is not cached (but stores are buffered).
+
+2. Allows unaligned access just like normal memory.
+
+3. Allows speculative reads.
+
+4. Has weaker ordering than normal memory; [lsm]fence instructions are
+   needed to guarantee a particular ordering of writes with respect to
+   other writes and reads.
+
+5. Stores are buffered.  This buffer isn't snooped so it has to be
+   flushed before changes are globally visible.  The [sm]fence
+   instructions flush the store buffer.
+
+6. The store buffer may combine multiple writes into a single write.
+
+Now whether the fact the unaligned access is allowed is really part of
+the semantics of WC mappings is debatable as x86 always allows
+unaligned access, even for areas mapped with ioremap().
+
+However, this is where userland comes in.  The userland graphics stack
+does assume that graphics memory mapped throug a prefetchable PCIe BAR
+allows unaligned access if the architecture allows unaligned access
+for cacheable memory.  On arm64 this means that such memory needs to
+be "Normal NC".  And since kernel drivers tend to map such memory
+using ioremap_wc() that pretty much implies ioremap_wc() shoul use
+"Normal NC" as well isn't it?
+
+> > > How do we translate this into something consistent? I'd like to
+> > > see an actual description of what we *really* expect from WC on
+> > > prefetchable PCI regions, turn that into a documented definition
+> > > agreed across architectures, and then we can look at
+> > > implementing it with one memory type or another on arm64.
+> > > 
+> > > Because once we expose that memory type at S2 for KVM guests, it
+> > > becomes ABI and there is no turning back. So I want to get it
+> > > right once and for all.
+> > > 
+> > I agree that we need a precise definition for the Linux ioremap_wc
+> > API wrt what drivers (kernel and userspace) can expect and whether
+> > memset/memcpy is expected to work or not and whether aligned
+> > accesses are a requirement.
+> > To the extent ABI is set, I would think that the ABI is also already
+> > set in the host kernel for arm64 WC = Normal NC, so why should that
+> > not also be the ABI for same driver in VMs.
+> 
+> KVM is an implementation of the ARM architecture, and doesn't really
+> care about what WC is. If we come to the conclusion that Normal_NC is
+> the natural match for Prefetchable attributes, than we're good and we
+> can have Normal_NC being set by userspace, or even VFIO. But I don't
+> want to set it only because "it works when bare-metal Linux uses it".
+> Remember KVM doesn't only run Linux as guests.
+> 
+> 	M.
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
+> 
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+> 
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
