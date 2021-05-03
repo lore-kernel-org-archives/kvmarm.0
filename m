@@ -1,90 +1,162 @@
-Return-Path: <SRS0=w4A1=J6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=Rb5J=J7=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACA8CC433ED
-	for <kvmarm@archiver.kernel.org>; Mon,  3 May 2021 19:12:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4828CC433B4
+	for <kvmarm@archiver.kernel.org>; Tue,  4 May 2021 07:40:31 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 01CB1613B3
-	for <kvmarm@archiver.kernel.org>; Mon,  3 May 2021 19:12:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01CB1613B3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 9D9FA611C0
+	for <kvmarm@archiver.kernel.org>; Tue,  4 May 2021 07:40:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D9FA611C0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 651E14B2CE;
-	Mon,  3 May 2021 15:12:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DEDEB4B2E3;
+	Tue,  4 May 2021 03:40:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, body has been altered) header.i=@nvidia.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id RzmhLMu9Cd01; Mon,  3 May 2021 15:12:29 -0400 (EDT)
+	with ESMTP id ymayDJl00wNj; Tue,  4 May 2021 03:40:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E86F4B3BA;
-	Mon,  3 May 2021 15:12:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7430C4B2EC;
+	Tue,  4 May 2021 03:40:28 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C70424B2CE
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 May 2021 15:12:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 949454B33E
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 May 2021 18:04:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xLoA1Xoqao9I for <kvmarm@lists.cs.columbia.edu>;
- Mon,  3 May 2021 15:12:27 -0400 (EDT)
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com
- [209.85.210.176])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D3B044B26E
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 May 2021 15:12:26 -0400 (EDT)
-Received: by mail-pf1-f176.google.com with SMTP id v191so4904195pfc.8
- for <kvmarm@lists.cs.columbia.edu>; Mon, 03 May 2021 12:12:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=XKi3U2gpfz3uX4wXT24CVtxs1ii7WbM0YcGifTXiXkI=;
- b=fNkLN384T3cZjNWaF9XNG+jqfmkYbgPdBsX+p7hkZjupq4JUVVFCa2J2QIo2aXUtCE
- HF1CI4wBqXzmM+Wy/BIXUrZehsSvA679/oNDPFh5hs4xiVUJkW1wKC9xQmmeM5DDT9gd
- WAPJwDOU+KlT1KMoACZmOhiGxFLqsB6/NPcivAqA1tCE19zkpXhRQTTxhOwAIcJQJmgs
- WLY6I3RlcEp68YO92IlwGdFyJsDYZTubhFVpmCz0UZABGRJT1zgqbLf2Wm6dDaPCBWqf
- 2/bIUt1eq5hVmrwZCBoXyfLnbgyTkY7tXs7wldVdIP1Js8owf4hoh5+J3t9I91OPboEy
- x2XA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=XKi3U2gpfz3uX4wXT24CVtxs1ii7WbM0YcGifTXiXkI=;
- b=MuiYV+O2pOOMAwiz0eoQ+SRLebsjsw8z52rbEgjPdnmdpooika0d84SHxuMZ9AU3G3
- Nyra9crtr531ungiGf0K1zL3FrCnVMyf2hConUOxlFNq+HkOgjsSBk3LIccNPxIstwxc
- HBy3a2GOOoI/DpykDtdW5wokjGbpNnLx5XE9BxgtfwKnhzN/6HIF7fH7jMTYrjRLhX0n
- r1wrbnyO4k6Ur/d2HhO7Ghug75t8gXLZ3GwRt4DCxegNSKB6ZeWSuryJskE6WtIe7X2m
- fvklDqII9IHKTx1b5zyXEwmSpTRx6RnU6i48bvUxKcN2KKisLbZIdeqVoNk7NMs1M4ys
- 99mg==
-X-Gm-Message-State: AOAM530voVb2gantvUpBgeJAorPcvkaxN/aKDMbQeWzKZnOxW77f8frD
- K//ZaJCzqfRKyRmk2RmfTHAiIg==
-X-Google-Smtp-Source: ABdhPJwLtGkf1sYhRpG+GEGl6Xag+K3pOtbTpduaWvvATxT4ZV7df+Q6j4DwDb2bSjCBxlCHy1rAxQ==
-X-Received: by 2002:a63:a47:: with SMTP id z7mr19441799pgk.350.1620069145612; 
- Mon, 03 May 2021 12:12:25 -0700 (PDT)
-Received: from google.com (150.12.83.34.bc.googleusercontent.com.
- [34.83.12.150])
- by smtp.gmail.com with ESMTPSA id e23sm378553pgg.76.2021.05.03.12.12.24
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 03 May 2021 12:12:24 -0700 (PDT)
-Date: Mon, 3 May 2021 12:12:21 -0700
-From: Ricardo Koller <ricarkol@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v2 4/5] KVM: selftests: Add exception handling support
- for aarch64
-Message-ID: <YJBLFVoRmsehRJ1N@google.com>
-References: <20210430232408.2707420-1-ricarkol@google.com>
- <20210430232408.2707420-5-ricarkol@google.com>
- <87a6pcumyg.wl-maz@kernel.org>
+ with ESMTP id ykQUIcP8WVfz for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  3 May 2021 18:04:01 -0400 (EDT)
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com
+ (mail-dm6nam10on2051.outbound.protection.outlook.com [40.107.93.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 151344B2A0
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 May 2021 18:04:01 -0400 (EDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FGNlpdNn5NvO/tckxnl+MfRnmqFkRtgb8yP0X1z6jTeAVZ6uCFq5SUi/ygtQrW072HbZVAMhAjBz2gC0HccLxy8sn0fQ77vmL5mkypeBMm8okLu4w6RiCMlfurjIDQU4ZQ4XzFE8+dQd4CeH1C3SAiXt0yNbxQJ7KneMgGUm+uBEPKP6I9mJdbKXeDajECtYuDJhrcrOg6mvN3eV0iL+hFoTn5Tr6illpfG79EWyj48a/nkJxXG3bMM/tmvP/7mFt+ICFCXzDNmbVmfGSLvbECLxnb5MWm69ThIO2aWHIUXc6Lq6DhsPmH8i2Wyi+SXgEjA6BA2CgnZZhbWPuVwNpw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6zieIDeVeywsW59op/yz6AwWPSaaZTevG73UMdx3SlM=;
+ b=dUyRER8kgHAVyx+TzPdaoICvHYYPQAqEoQ0Ol4J7ZRZ8UxeIrq/0r6jTZXhdqguLW0qfyVEHV2TsKteoT+IkSoVAbHeypUoPltvbXH2PmVOlpYxHmlOAqFuUzUU2a5OIvfurtIs5Z8ayjAoOTnY3Xa/ALuidwdZSCKH9ijovEnz4jyzUzwJoeAvf+JQTKgNm+3Zs1Wgw/foekxtbpod8TjlNc6XdXlK4sz5WDPJazwmSRHayL+3sDtapcv7aU+6ZgJes3VgHZUZKfUVG5l2Wy7bZRPWhUQu/r8ouHRakyHI0YUeAuu3HZjq8MCmyBq5VUGphVZafwf1Fu8Zuq8rlrw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6zieIDeVeywsW59op/yz6AwWPSaaZTevG73UMdx3SlM=;
+ b=eCeWsCJdqa1f5QoXez0eHgiUX3slFccuhrAYgG9qYUgJ76zGS6d6lO9KVmBU9NXAusPHlaRTZFfsjSYg1/RwzhFEDoqzT4U6tfWPYTlR1v1j632lRwc4v4i9fRTjNj7d9ratz9wzJOpVp5/ht4a75Ts7euJefcJq+NDOakci7NRG4j+Kj6a/NpNFBIhlBIMVZ6tXKoFU+gFSRUXiCvfRlOWEuXWws4nQJEd1n8iXsbT2gHwGcTj+7H7HwJBJn2WTR7YhLlnkeAlCtDiudry5JywtHY87VfhczbDu/CXi6AvGXfdFaM7IaQ+igXRibICM9hHt7/cFrHMLP/lEx6r+Pw==
+Received: from BL0PR12MB2532.namprd12.prod.outlook.com (2603:10b6:207:4a::20)
+ by MN2PR12MB3805.namprd12.prod.outlook.com (2603:10b6:208:15a::28)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4087.35; Mon, 3 May
+ 2021 22:03:59 +0000
+Received: from BL0PR12MB2532.namprd12.prod.outlook.com
+ ([fe80::5105:e8df:9631:bf0f]) by BL0PR12MB2532.namprd12.prod.outlook.com
+ ([fe80::5105:e8df:9631:bf0f%5]) with mapi id 15.20.4087.044; Mon, 3 May 2021
+ 22:03:59 +0000
+From: Vikram Sethi <vsethi@nvidia.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Subject: RE: [RFC 1/2] vfio/pci: keep the prefetchable attribute of a BAR
+ region in VMA
+Thread-Topic: [RFC 1/2] vfio/pci: keep the prefetchable attribute of a BAR
+ region in VMA
+Thread-Index: AQHXPRTigOHff2apwEeawQns3nBPOqrL0MoAgAAM5gCAAAj7gIABBh4AgAAGT4CAADU7AIAACSoAgAABt+CAASvZAIACHFDwgAEVfYCAADdZj4AAAavQgAARoACAAHZfsA==
+Date: Mon, 3 May 2021 22:03:59 +0000
+Message-ID: <BL0PR12MB2532BEAE226E7D68A8A2F97EBD5B9@BL0PR12MB2532.namprd12.prod.outlook.com>
+References: <20210429162906.32742-1-sdonthineni@nvidia.com>
+ <20210429162906.32742-2-sdonthineni@nvidia.com>
+ <20210429122840.4f98f78e@redhat.com>
+ <470360a7-0242-9ae5-816f-13608f957bf6@nvidia.com>
+ <20210429134659.321a5c3c@redhat.com>
+ <e3d7fda8-5263-211c-3686-f699765ab715@nvidia.com>
+ <87czucngdc.wl-maz@kernel.org>
+ <1edb2c4e-23f0-5730-245b-fc6d289951e1@nvidia.com>
+ <878s4zokll.wl-maz@kernel.org>
+ <BL0PR12MB2532CC436EBF626966B15994BD5E9@BL0PR12MB2532.namprd12.prod.outlook.com>
+ <87eeeqvm1d.wl-maz@kernel.org>
+ <BL0PR12MB25329EF5DFA7BBAA732064A7BD5C9@BL0PR12MB2532.namprd12.prod.outlook.com>
+ <87bl9sunnw.wl-maz@kernel.org>	<c1bd514a531988c9@bloch.sibelius.xs4all.nl>
+ <BL0PR12MB253296086906C4A850EC68E6BD5B9@BL0PR12MB2532.namprd12.prod.outlook.com>
+ <20210503084432.75e0126d@x1.home.shazbot.org>
+In-Reply-To: <20210503084432.75e0126d@x1.home.shazbot.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
+x-originating-ip: [12.97.180.36]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: d8968630-f469-4875-7e02-08d90e7f5aa4
+x-ms-traffictypediagnostic: MN2PR12MB3805:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <MN2PR12MB3805BCD5452CD57B4C557456BD5B9@MN2PR12MB3805.namprd12.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: PXG4Q6vtO5in72BBxk0LpIeUIH/7ACiqpocnPJtzSgMkh67LDegl6x2YIvhsXUX1T6o5LrVAK8z1CrlVAR1qL8wI1iXRKYU9aY78dbRgBiv29282syRiTqlvO8KGDI+LHJqSXekCBYIJAQjEqsIuCewrVZbr0Ns0q7d4dpX2HcqkdHgr1JTlbl1U5tvfJmXQ1ikLHC3LRkXdv0zWly9++0cuLOWTpIhWVTbWzphptlA4tQ6RUFDS2Jdz/N5cXTEof/MBTCTHSjWVw6JBqp/8mA0NHeL1ypGULAZkDOHzzfEe00F2wSwTFb5nc9qw/F5A/u+Ht4skqHvze6bf4IP1iekR4b1OEgSzerdV2O/rx01hDuw8fZIqtAeR4BGAPVLzxEXd4ngC70d8RZMP+P/SPq45etkqibUDOPW2brGEMB/O9KK2iNPTLrYN6/XIiGdl3ykxjE0bOwE05EeE/yimm+yTTS3wFMPQKtOIfPESdMBM+OR+Wdtpqn9+8poRKSjU+iFacH4l3wGt1Rg+maQtQajDAWgwTuqEx7vgRllyG6Eo/WHyswIjjRFGica01Fba1zO9r9VPV0n4Qb6Paw5V24PFZJBPF7youkmJPEwM2Jo=
+x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:BL0PR12MB2532.namprd12.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(366004)(376002)(396003)(136003)(39860400002)(346002)(52536014)(9686003)(55016002)(83380400001)(316002)(33656002)(2906002)(8936002)(6916009)(66556008)(66946007)(4326008)(8676002)(66446008)(76116006)(64756008)(66476007)(7416002)(5660300002)(6506007)(186003)(122000001)(71200400001)(7696005)(478600001)(86362001)(54906003)(107886003)(26005)(38100700002);
+ DIR:OUT; SFP:1101; 
+x-ms-exchange-antispam-messagedata: =?utf-8?B?TEx5dmw4WmE0dVlQNFhkQVdKRVg0VDN4NE53M1owWGhoamcwQ3RvZkdEMlRY?=
+ =?utf-8?B?bXBDSXFJWmFrOGpFYmpadHZaNGZKYzhkc0pUU3RsZUVQdlZ3V2Z2VFJ0bjM5?=
+ =?utf-8?B?ZEpad1lSaEo3U3c0UVhQdlJnNFpTRWpXQUFSSGhMcC9KM2FiY3hRNWxpWmJH?=
+ =?utf-8?B?a2hTY1IrcjgxcGcxalVpaTl2NlE2UnM4VFFIQytXMDVua21lWDhIY0FJaGpR?=
+ =?utf-8?B?ZjZzSU5weVRQZmhha21HVWlXbkJnS2hiOWo1UFJybENYakc4bThCSFE5Nmg2?=
+ =?utf-8?B?L2lMY095VndubUJaanV5YmZFdHFQcFNoNndmODBBQnArZ1hsaGovbXFWS2kw?=
+ =?utf-8?B?OFUrZWdBd20rRE1NYWFlUFpUYmFEWnJJQUFvTU1sL1MxcTZDajVKeXNGajN4?=
+ =?utf-8?B?aG16STAvNHJrUmtTR3pVSUd3dWp6UnBad2R2NHVxSUI1SGdKdjNBZzM4d1RL?=
+ =?utf-8?B?Nm9PUThPUWJ1UmpmQ2ZrTjRiQWlsVHNWWm0xM3lBZjFDVDIvdng1N3RXOGIy?=
+ =?utf-8?B?cytRZ1F3WFJqZkx1dmJKc2syNW5UTGxxSEgyem84ZFpJN1Y2RDFjbzVZRlho?=
+ =?utf-8?B?VHpFbEMrVUhPdHJrWDNuUS9GeGk1OHgrYlJ0QjRqMEp0Y3FpWUF0dlRQRE9H?=
+ =?utf-8?B?d1FJdFgvczZKWkg2enFBWVZUdXU3SmR6dU43eG1RUVlBVjg0YXJhMXNiM0lX?=
+ =?utf-8?B?cUN3dDlNRjVpMlI2MzFWeW5SN2Q0V25vTVJBQUhnZ1RXRmtIdGFGUE9scUY5?=
+ =?utf-8?B?NHRQOXVGZ2FWRE0zdFFCZmpseE9WTE5jbG9xNTBmUEZLVU9NQjQyQ2J1alhy?=
+ =?utf-8?B?L290VGJjNnNWN1RvYXBMaXBIYit2d21LQUREZkoyZkxwb2hyWFJxVUd5OVVB?=
+ =?utf-8?B?VE1pSFM2enZ3S2J0aU9hZHhmaHdudXRHRkRoYklJTU1VR2FyRS81b1FVM1Ja?=
+ =?utf-8?B?MWhPcXQwR0xsRDNEU2xIZURsMmd4ancyT3V1eDRPbXphQ3Bxd3R5V1JqMUxj?=
+ =?utf-8?B?akg0MEJJeTF2MWJGc3VMdlBNYjZ4bmpXTDhEZUhXSUF6eXc1VEYwQWo1VHNY?=
+ =?utf-8?B?dWNhTWIxMXB0Ty84alJQS215ei9xVWVmSG5FZ3hvTVJIV0JCNms3SkVsclZp?=
+ =?utf-8?B?UkxrSXF2U1hMd2Y5TWVaVnFCdFh1M3BRQXptMnRnTTFETzdOM0VMTXpwQXlj?=
+ =?utf-8?B?ZFhIaUxObDJwZmsvdVhPaUlGeW4yWXBBVytxMFRWNXQvWTFJSkpFY1JoVGRI?=
+ =?utf-8?B?OWRoYmUzTS8xazYxYzZXdUlBaHRkTWtQQi9TOVpaeks4RkhQQVpUcG1Ic0VX?=
+ =?utf-8?B?T2dMVUpmbURYazhnSld4TUlNTDNXcnZsbDJwVjBxdTdRaElIL1MzbHRMRkZq?=
+ =?utf-8?B?QWcvWEw3UW1mclp5aEkxTmIwc3gvNDZyK29ub05hNEFtNnExL1RMalpNMGp2?=
+ =?utf-8?B?Vndad1kzSDlqQU9CQzVNdGlHZlVUemNqVXlOZE11RlVzb082d2JQaHBPYlFw?=
+ =?utf-8?B?cTRObWZUZWRGczM0d3Z4U2laenhXTDA2ZFo4ektYRTNGSG50d1ltbWZGR3VO?=
+ =?utf-8?B?S3hVRXJaZnRDVHkyVEJwTzB2YkdONUE4RzdyZlpXNittUzZ2Ui9TeVBMNVJN?=
+ =?utf-8?B?ais0Y2hpakt2VjRuZTExeUY3d2wzMTQ4MmZyNnNUMlIrZTdabzZBRU43YjZr?=
+ =?utf-8?B?OFU5eGxvNG5ncENDTWJLUVp1RjFVV0JVWkJUeC9QM2FDUlBRdzJVV00rZk15?=
+ =?utf-8?Q?twUy8aj6blA0f322g4UZBVxPCzikJCR7c8H8joe?=
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <87a6pcumyg.wl-maz@kernel.org>
-Cc: kvm@vger.kernel.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB2532.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d8968630-f469-4875-7e02-08d90e7f5aa4
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 May 2021 22:03:59.2351 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: xz9sRVwE6woAO2juBYfgO2e5T13k2r4w3YZ8t9NuP3zbHdz/xbF5bumBWdDLvUlMqBbLXpDdiLfjkq6tZQl35Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB3805
+X-Mailman-Approved-At: Tue, 04 May 2021 03:40:28 -0400
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Marc Zyngier <maz@kernel.org>,
+ Shanker Donthineni <sdonthineni@nvidia.com>,
+ "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+ Jason Sequeira <jsequeira@nvidia.com>, "will@kernel.org" <will@kernel.org>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+ "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+ Mark Kettenis <mark.kettenis@xs4all.nl>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -96,465 +168,73 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, May 03, 2021 at 11:32:39AM +0100, Marc Zyngier wrote:
-> On Sat, 01 May 2021 00:24:06 +0100,
-> Ricardo Koller <ricarkol@google.com> wrote:
-> > 
-> > Add the infrastructure needed to enable exception handling in aarch64
-> > selftests. The exception handling defaults to an unhandled-exception
-> > handler which aborts the test, just like x86. These handlers can be
-> > overridden by calling vm_install_vector_handler(vector) or
-> > vm_install_exception_handler(vector, ec). The unhandled exception
-> > reporting from the guest is done using the ucall type introduced in a
-> > previous commit, UCALL_UNHANDLED.
-> > 
-> > The exception handling code is heavily inspired on kvm-unit-tests.
-> > 
-> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> > ---
-> >  tools/testing/selftests/kvm/Makefile          |   2 +-
-> >  .../selftests/kvm/include/aarch64/processor.h |  78 +++++++++++
-> >  .../selftests/kvm/lib/aarch64/handlers.S      | 130 ++++++++++++++++++
-> >  .../selftests/kvm/lib/aarch64/processor.c     | 124 +++++++++++++++++
-> >  4 files changed, 333 insertions(+), 1 deletion(-)
-> >  create mode 100644 tools/testing/selftests/kvm/lib/aarch64/handlers.S
-> > 
-> > diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> > index 4e548d7ab0ab..618c5903f478 100644
-> > --- a/tools/testing/selftests/kvm/Makefile
-> > +++ b/tools/testing/selftests/kvm/Makefile
-> > @@ -35,7 +35,7 @@ endif
-> >  
-> >  LIBKVM = lib/assert.c lib/elf.c lib/io.c lib/kvm_util.c lib/sparsebit.c lib/test_util.c lib/guest_modes.c lib/perf_test_util.c
-> >  LIBKVM_x86_64 = lib/x86_64/processor.c lib/x86_64/vmx.c lib/x86_64/svm.c lib/x86_64/ucall.c lib/x86_64/handlers.S
-> > -LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c
-> > +LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c lib/aarch64/handlers.S
-> >  LIBKVM_s390x = lib/s390x/processor.c lib/s390x/ucall.c lib/s390x/diag318_test_handler.c
-> >  
-> >  TEST_GEN_PROGS_x86_64 = x86_64/cr4_cpuid_sync_test
-> > diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-> > index b7fa0c8551db..40aae31b4afc 100644
-> > --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-> > +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-> > @@ -8,6 +8,7 @@
-> >  #define SELFTEST_KVM_PROCESSOR_H
-> >  
-> >  #include "kvm_util.h"
-> > +#include <linux/stringify.h>
-> >  
-> >  
-> >  #define ARM64_CORE_REG(x) (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
-> > @@ -18,6 +19,7 @@
-> >  #define MAIR_EL1	3, 0, 10, 2, 0
-> >  #define TTBR0_EL1	3, 0,  2, 0, 0
-> >  #define SCTLR_EL1	3, 0,  1, 0, 0
-> > +#define VBAR_EL1	3, 0, 12, 0, 0
-> >  
-> >  /*
-> >   * Default MAIR
-> > @@ -56,4 +58,80 @@ void aarch64_vcpu_setup(struct kvm_vm *vm, int vcpuid, struct kvm_vcpu_init *ini
-> >  void aarch64_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpuid,
-> >  			      struct kvm_vcpu_init *init, void *guest_code);
-> >  
-> > +struct ex_regs {
-> > +	u64 regs[31];
-> > +	u64 sp;
-> > +	u64 pc;
-> > +	u64 pstate;
-> > +};
-> > +
-> > +#define VECTOR_NUM	16
-> > +
-> > +enum {
-> > +	VECTOR_SYNC_CURRENT_SP0,
-> > +	VECTOR_IRQ_CURRENT_SP0,
-> > +	VECTOR_FIQ_CURRENT_SP0,
-> > +	VECTOR_ERROR_CURRENT_SP0,
-> > +
-> > +	VECTOR_SYNC_CURRENT,
-> > +	VECTOR_IRQ_CURRENT,
-> > +	VECTOR_FIQ_CURRENT,
-> > +	VECTOR_ERROR_CURRENT,
-> > +
-> > +	VECTOR_SYNC_LOWER_64,
-> > +	VECTOR_IRQ_LOWER_64,
-> > +	VECTOR_FIQ_LOWER_64,
-> > +	VECTOR_ERROR_LOWER_64,
-> > +
-> > +	VECTOR_SYNC_LOWER_32,
-> > +	VECTOR_IRQ_LOWER_32,
-> > +	VECTOR_FIQ_LOWER_32,
-> > +	VECTOR_ERROR_LOWER_32,
-> > +};
-> > +
-> > +#define VECTOR_IS_SYNC(v) ((v) == VECTOR_SYNC_CURRENT_SP0 || \
-> > +			   (v) == VECTOR_SYNC_CURRENT     || \
-> > +			   (v) == VECTOR_SYNC_LOWER_64    || \
-> > +			   (v) == VECTOR_SYNC_LOWER_32)
-> > +
-> > +/* Some common EC (Exception classes) */
-> > +#define ESR_EC_ILLEGAL_INS	0x0e
-> > +#define ESR_EC_SVC64		0x15
-> > +#define ESR_EC_IABORT_CURRENT	0x21
-> > +#define ESR_EC_DABORT_CURRENT	0x25
-> > +#define ESR_EC_SERROR		0x2f
-> > +#define ESR_EC_HW_BP_CURRENT	0x31
-> > +#define ESR_EC_SSTEP_CURRENT	0x33
-> > +#define ESR_EC_WP_CURRENT	0x35
-> > +#define ESR_EC_BRK_INS		0x3C
-> > +
-> > +#define ESR_EC_NUM		64
-> > +
-> > +#define ESR_EC_SHIFT		26
-> > +#define ESR_EC_MASK		(ESR_EC_NUM - 1)
-> > +
-> > +void vm_init_descriptor_tables(struct kvm_vm *vm);
-> > +void vcpu_init_descriptor_tables(struct kvm_vm *vm, uint32_t vcpuid);
-> > +
-> > +typedef void(*handler_fn)(struct ex_regs *);
-> > +void vm_install_exception_handler(struct kvm_vm *vm,
-> > +		int vector, int ec, handler_fn handler);
-> > +void vm_install_vector_handler(struct kvm_vm *vm,
-> > +		int vector, handler_fn handler);
-> > +
-> > +#define SPSR_D          (1 << 9)
-> > +#define SPSR_SS         (1 << 21)
-> > +
-> > +#define write_sysreg(reg, val)						  \
-> > +({									  \
-> > +	u64 __val = (u64)(val);						  \
-> > +	asm volatile("msr " __stringify(reg) ", %x0" : : "rZ" (__val));	  \
-> > +})
-> > +
-> > +#define read_sysreg(reg)						  \
-> > +({	u64 val;							  \
-> > +	asm volatile("mrs %0, "__stringify(reg) : "=r"(val) : : "memory");\
-> > +	val;								  \
-> > +})
-> > +
-> >  #endif /* SELFTEST_KVM_PROCESSOR_H */
-> > diff --git a/tools/testing/selftests/kvm/lib/aarch64/handlers.S b/tools/testing/selftests/kvm/lib/aarch64/handlers.S
-> > new file mode 100644
-> > index 000000000000..8a560021892b
-> > --- /dev/null
-> > +++ b/tools/testing/selftests/kvm/lib/aarch64/handlers.S
-> > @@ -0,0 +1,130 @@
-> > +/* SPDX-License-Identifier: GPL-2.0 */
-> > +.macro save_registers, vector
-> > +	add	sp, sp, #-16 * 17
-> > +
-> > +	stp	x0, x1, [sp, #16 * 0]
-> > +	stp	x2, x3, [sp, #16 * 1]
-> > +	stp	x4, x5, [sp, #16 * 2]
-> > +	stp	x6, x7, [sp, #16 * 3]
-> > +	stp	x8, x9, [sp, #16 * 4]
-> > +	stp	x10, x11, [sp, #16 * 5]
-> > +	stp	x12, x13, [sp, #16 * 6]
-> > +	stp	x14, x15, [sp, #16 * 7]
-> > +	stp	x16, x17, [sp, #16 * 8]
-> > +	stp	x18, x19, [sp, #16 * 9]
-> > +	stp	x20, x21, [sp, #16 * 10]
-> > +	stp	x22, x23, [sp, #16 * 11]
-> > +	stp	x24, x25, [sp, #16 * 12]
-> > +	stp	x26, x27, [sp, #16 * 13]
-> > +	stp	x28, x29, [sp, #16 * 14]
-> > +
-> > +	.if \vector >= 8
-> > +	mrs	x1, sp_el0
-> 
-> I'm still a bit perplexed by this. SP_EL0 is never changed, since you
-> always run in handler mode. Therefore, saving/restoring it is only
-> overhead. If an exception handler wants to introspect it, it is
-> already available in the relevant system register.
-> 
-> Or did you have something else in mind for it?
-> 
-
-Not really. The reason for saving sp_el0 in there was just for
-consistency, so that handlers for both el0 and el1 exceptions could get
-the sp at regs->sp.
-
-Restoring sp_el0 might be too much. So, what do you think of this v3: we
-keep the saving of sp_el0 into regs->sp (to keep things the same between
-el0 and el1) and delete the restoring of sp_el0?
-
-Thanks,
-Ricardo
-
-> > +	.else
-> > +	/*
-> > +	 * This stores sp_el1 into ex_regs.sp so exception handlers can
-> > +	 * "look" at it. It will _not_ be used to restore the sp_el1 on
-> > +	 * return from the exception so handlers can not update it.
-> > +	 */
-> > +	mov	x1, sp
-> > +	.endif
-> > +	stp	x30, x1, [sp, #16 * 15] /* x30, SP */
-> > +
-> > +	mrs	x1, elr_el1
-> > +	mrs	x2, spsr_el1
-> > +	stp	x1, x2, [sp, #16 * 16] /* PC, PSTATE */
-> > +.endm
-> > +
-> > +.macro restore_registers, vector
-> > +	ldp	x1, x2, [sp, #16 * 16] /* PC, PSTATE */
-> > +	msr	elr_el1, x1
-> > +	msr	spsr_el1, x2
-> > +
-> > +	ldp	x30, x1, [sp, #16 * 15] /* x30, SP */
-> > +	.if \vector >= 8
-> > +	msr	sp_el0, x1
-> > +	.endif
-> > +
-> > +	ldp	x28, x29, [sp, #16 * 14]
-> > +	ldp	x26, x27, [sp, #16 * 13]
-> > +	ldp	x24, x25, [sp, #16 * 12]
-> > +	ldp	x22, x23, [sp, #16 * 11]
-> > +	ldp	x20, x21, [sp, #16 * 10]
-> > +	ldp	x18, x19, [sp, #16 * 9]
-> > +	ldp	x16, x17, [sp, #16 * 8]
-> > +	ldp	x14, x15, [sp, #16 * 7]
-> > +	ldp	x12, x13, [sp, #16 * 6]
-> > +	ldp	x10, x11, [sp, #16 * 5]
-> > +	ldp	x8, x9, [sp, #16 * 4]
-> > +	ldp	x6, x7, [sp, #16 * 3]
-> > +	ldp	x4, x5, [sp, #16 * 2]
-> > +	ldp	x2, x3, [sp, #16 * 1]
-> > +	ldp	x0, x1, [sp, #16 * 0]
-> > +
-> > +	add	sp, sp, #16 * 17
-> > +
-> > +	eret
-> > +.endm
-> > +
-> > +.pushsection ".entry.text", "ax"
-> > +.balign 0x800
-> > +.global vectors
-> > +vectors:
-> > +.popsection
-> > +
-> > +.set	vector, 0
-> > +
-> > +/*
-> > + * Build an exception handler for vector and append a jump to it into
-> > + * vectors (while making sure that it's 0x80 aligned).
-> > + */
-> > +.macro HANDLER, label
-> > +handler_\()\label:
-> > +	save_registers vector
-> > +	mov	x0, sp
-> > +	mov	x1, #vector
-> > +	bl	route_exception
-> > +	restore_registers vector
-> > +
-> > +.pushsection ".entry.text", "ax"
-> > +.balign 0x80
-> > +	b	handler_\()\label
-> > +.popsection
-> > +
-> > +.set	vector, vector + 1
-> > +.endm
-> > +
-> > +.macro HANDLER_INVALID
-> > +.pushsection ".entry.text", "ax"
-> > +.balign 0x80
-> > +/* This will abort so no need to save and restore registers. */
-> > +	mov	x0, #vector
-> > +	b	kvm_exit_unexpected_vector
-> > +.popsection
-> > +
-> > +.set	vector, vector + 1
-> > +.endm
-> > +
-> > +/*
-> > + * Caution: be sure to not add anything between the declaration of vectors
-> > + * above and these macro calls that will build the vectors table below it.
-> > + */
-> > +	HANDLER_INVALID                         // Synchronous EL1t
-> > +	HANDLER_INVALID                         // IRQ EL1t
-> > +	HANDLER_INVALID                         // FIQ EL1t
-> > +	HANDLER_INVALID                         // Error EL1t
-> > +
-> > +	HANDLER	el1h_sync                       // Synchronous EL1h
-> > +	HANDLER	el1h_irq                        // IRQ EL1h
-> > +	HANDLER el1h_fiq                        // FIQ EL1h
-> > +	HANDLER	el1h_error                      // Error EL1h
-> > +
-> > +	HANDLER	el0_sync_64                     // Synchronous 64-bit EL0
-> > +	HANDLER	el0_irq_64                      // IRQ 64-bit EL0
-> > +	HANDLER	el0_fiq_64                      // FIQ 64-bit EL0
-> > +	HANDLER	el0_error_64                    // Error 64-bit EL0
-> > +
-> > +	HANDLER	el0_sync_32                     // Synchronous 32-bit EL0
-> > +	HANDLER	el0_irq_32                      // IRQ 32-bit EL0
-> > +	HANDLER	el0_fiq_32                      // FIQ 32-bit EL0
-> > +	HANDLER	el0_error_32                    // Error 32-bit EL0
-> > diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-> > index cee92d477dc0..25be71ec88be 100644
-> > --- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
-> > +++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-> > @@ -6,6 +6,7 @@
-> >   */
-> >  
-> >  #include <linux/compiler.h>
-> > +#include <assert.h>
-> >  
-> >  #include "kvm_util.h"
-> >  #include "../kvm_util_internal.h"
-> > @@ -14,6 +15,8 @@
-> >  #define KVM_GUEST_PAGE_TABLE_MIN_PADDR		0x180000
-> >  #define DEFAULT_ARM64_GUEST_STACK_VADDR_MIN	0xac0000
-> >  
-> > +vm_vaddr_t exception_handlers;
-> > +
-> >  static uint64_t page_align(struct kvm_vm *vm, uint64_t v)
-> >  {
-> >  	return (v + vm->page_size) & ~(vm->page_size - 1);
-> > @@ -334,6 +337,127 @@ void vcpu_args_set(struct kvm_vm *vm, uint32_t vcpuid, unsigned int num, ...)
-> >  	va_end(ap);
-> >  }
-> >  
-> > +void kvm_exit_unexpected_vector(int vector)
-> > +{
-> > +	ucall(UCALL_UNHANDLED, 3, vector, 0, false /* !valid_ec */);
-> > +}
-> > +
-> > +void kvm_exit_unexpected_exception(int vector, uint64_t ec)
-> > +{
-> > +	ucall(UCALL_UNHANDLED, 3, vector, ec, true /* valid_ec */);
-> > +}
-> > +
-> >  void assert_on_unhandled_exception(struct kvm_vm *vm, uint32_t vcpuid)
-> >  {
-> > +	struct ucall uc;
-> > +
-> > +	if (get_ucall(vm, vcpuid, &uc) != UCALL_UNHANDLED)
-> > +		return;
-> > +
-> > +	if (uc.args[2]) /* valid_ec */ {
-> > +		assert(VECTOR_IS_SYNC(uc.args[0]));
-> > +		TEST_ASSERT(false,
-> > +			"Unexpected exception (vector:0x%lx, ec:0x%lx)",
-> > +			uc.args[0], uc.args[1]);
-> > +	} else {
-> > +		assert(!VECTOR_IS_SYNC(uc.args[0]));
-> > +		TEST_ASSERT(false,
-> > +			"Unexpected exception (vector:0x%lx)",
-> > +			uc.args[0]);
-> > +	}
-> > +}
-> > +
-> > +/*
-> > + * This exception handling code was heavily inspired on kvm-unit-tests. There
-> > + * is a set of default vector handlers stored in vector_handlers. These default
-> > + * vector handlers call user-installed handlers stored in exception_handlers.
-> > + * Synchronous handlers are indexed by (vector, ec), and irq handlers by
-> > + * (vector, ec=0).
-> > + */
-> > +
-> > +typedef void(*vector_fn)(struct ex_regs *, int vector);
-> > +
-> > +struct handlers {
-> > +	vector_fn vector_handlers[VECTOR_NUM];
-> > +	handler_fn exception_handlers[VECTOR_NUM][ESR_EC_NUM];
-> > +};
-> > +
-> > +void vcpu_init_descriptor_tables(struct kvm_vm *vm, uint32_t vcpuid)
-> > +{
-> > +	extern char vectors;
-> > +
-> > +	set_reg(vm, vcpuid, ARM64_SYS_REG(VBAR_EL1), (uint64_t)&vectors);
-> > +}
-> > +
-> > +void default_sync_handler(struct ex_regs *regs, int vector)
-> > +{
-> > +	struct handlers *handlers = (struct handlers *)exception_handlers;
-> > +	uint64_t esr = read_sysreg(esr_el1);
-> > +	uint64_t ec = (esr >> ESR_EC_SHIFT) & ESR_EC_MASK;
-> > +
-> > +	GUEST_ASSERT(VECTOR_IS_SYNC(vector));
-> > +
-> > +	if (handlers && handlers->exception_handlers[vector][ec])
-> > +		handlers->exception_handlers[vector][ec](regs);
-> > +	else
-> > +		kvm_exit_unexpected_exception(vector, ec);
-> > +}
-> > +
-> > +void default_irq_handler(struct ex_regs *regs, int vector)
-> > +{
-> > +	struct handlers *handlers = (struct handlers *)exception_handlers;
-> > +
-> > +	GUEST_ASSERT(!VECTOR_IS_SYNC(vector));
-> > +
-> > +	if (handlers && handlers->exception_handlers[vector][0])
-> > +		handlers->exception_handlers[vector][0](regs);
-> > +	else
-> > +		kvm_exit_unexpected_vector(vector);
-> > +}
-> > +
-> > +void route_exception(struct ex_regs *regs, int vector)
-> > +{
-> > +	struct handlers *handlers = (struct handlers *)exception_handlers;
-> > +
-> > +	if (handlers && handlers->vector_handlers[vector])
-> > +		handlers->vector_handlers[vector](regs, vector);
-> > +	else
-> > +		kvm_exit_unexpected_vector(vector);
-> > +}
-> > +
-> > +void vm_init_descriptor_tables(struct kvm_vm *vm)
-> > +{
-> > +	struct handlers *handlers;
-> > +
-> > +	vm->handlers = vm_vaddr_alloc(vm, sizeof(struct handlers),
-> > +			vm->page_size, 0, 0);
-> > +
-> > +	handlers = (struct handlers *)addr_gva2hva(vm, vm->handlers);
-> > +	handlers->vector_handlers[VECTOR_SYNC_CURRENT] = default_sync_handler;
-> > +	handlers->vector_handlers[VECTOR_IRQ_CURRENT] = default_irq_handler;
-> > +	handlers->vector_handlers[VECTOR_SYNC_LOWER_64] = default_sync_handler;
-> > +	handlers->vector_handlers[VECTOR_IRQ_LOWER_64] = default_irq_handler;
-> 
-> How about FIQ, Error? Although they are unlikely, they are valid
-> exceptions.
-> 
-> > +
-> > +	*(vm_vaddr_t *)addr_gva2hva(vm, (vm_vaddr_t)(&exception_handlers)) = vm->handlers;
-> > +}
-> > +
-> > +void vm_install_exception_handler(struct kvm_vm *vm, int vector, int ec,
-> > +			 void (*handler)(struct ex_regs *))
-> > +{
-> > +	struct handlers *handlers = (struct handlers *)addr_gva2hva(vm, vm->handlers);
-> > +
-> > +	assert(VECTOR_IS_SYNC(vector));
-> > +	assert(vector < VECTOR_NUM);
-> > +	assert(ec < ESR_EC_NUM);
-> > +	handlers->exception_handlers[vector][ec] = handler;
-> > +}
-> > +
-> > +void vm_install_vector_handler(struct kvm_vm *vm, int vector,
-> > +			 void (*handler)(struct ex_regs *))
-> > +{
-> > +	struct handlers *handlers = (struct handlers *)addr_gva2hva(vm, vm->handlers);
-> > +
-> > +	assert(!VECTOR_IS_SYNC(vector));
-> > +	assert(vector < VECTOR_NUM);
-> > +	handlers->exception_handlers[vector][0] = handler;
-> >  }
-> 
-> Thanks,
-> 
-> 	M.
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgQWxleCwNCj4gRnJvbTogQWxleCBXaWxsaWFtc29uIDxhbGV4LndpbGxpYW1zb25AcmVkaGF0
+LmNvbT4NCj4gT24gTW9uLCAzIE1heSAyMDIxIDEzOjU5OjQzICswMDAwDQo+IFZpa3JhbSBTZXRo
+aSA8dnNldGhpQG52aWRpYS5jb20+IHdyb3RlOg0KPiA+ID4gRnJvbTogTWFyayBLZXR0ZW5pcyA8
+bWFyay5rZXR0ZW5pc0B4czRhbGwubmw+DQo+ID4gPiA+IEZyb206IE1hcmMgWnluZ2llciA8bWF6
+QGtlcm5lbC5vcmc+DQo+ID4NCj4gPiBzbmlwDQo+ID4gPiA+IElmLCBieSBlbnVtZXJhdGluZyB0
+aGUgcHJvcGVydGllcyBvZiBQcmVmZXRjaGFibGUsIHlvdSBjYW4gc2hvdw0KPiA+ID4gPiB0aGF0
+IHRoZXkgYXJlIGEgc3RyaWN0IHN1cGVyc2V0IG9mIE5vcm1hbF9OQywgSSdtIG9uIGJvYXJkLiBJ
+DQo+ID4gPiA+IGhhdmVuJ3Qgc2VlbiBzdWNoIGFuIGVudW1lcmF0aW9uIHNvIGZhci4NCj4gPiA+
+ID4NCj4gPiBzbmlwDQo+ID4gPiA+IFJpZ2h0LCBzbyB3ZSBoYXZlIG1hZGUgYSBzbWFsbCBzdGVw
+IGluIHRoZSBkaXJlY3Rpb24gb2YgbWFwcGluZw0KPiA+ID4gPiAicHJlZmV0Y2hhYmxlIiBvbnRv
+ICJOb3JtYWxfTkMiLCB0aGFua3MgZm9yIHRoYXQuIFdoYXQgYWJvdXQgYWxsDQo+ID4gPiA+IHRo
+ZSBvdGhlciBwcm9wZXJ0aWVzICh1bmFsaWduZWQgYWNjZXNzZXMsIG9yZGVyaW5nLCBnYXRoZXJp
+bmcpPw0KPiA+ID4NCj4gPiBSZWdhcmRpbmcgZ2F0aGVyaW5nL3dyaXRlIGNvbWJpbmluZywgdGhh
+dCBpcyBhbHNvIGFsbG93ZWQgdG8NCj4gPiBwcmVmZXRjaGFibGUgcGVyIFBDSSBzcGVjDQo+IA0K
+PiBBcyBvdGhlcnMgaGF2ZSBzdGF0ZWQsIGdhdGhlci93cml0ZSBjb21iaW5pbmcgaXRzZWxmIGlz
+IG5vdCB3ZWxsIGRlZmluZWQuDQo+IA0KPiA+IEZyb20gMS4zLjIuMiBvZiA1LzAgYmFzZSBzcGVj
+Og0KPiA+IEEgUENJIEV4cHJlc3MgRW5kcG9pbnQgcmVxdWVzdGluZyBtZW1vcnkgcmVzb3VyY2Vz
+IHRocm91Z2ggYSBCQVIgbXVzdA0KPiA+IHNldCB0aGUgQkFSJ3MgUHJlZmV0Y2hhYmxlIGJpdCB1
+bmxlc3MgdGhlIHJhbmdlIGNvbnRhaW5zIGxvY2F0aW9ucw0KPiA+IHdpdGggcmVhZCBzaWRlLWVm
+ZmVjdHMgb3IgbG9jYXRpb25zIGluIHdoaWNoIHRoZSBGdW5jdGlvbiBkb2VzIG5vdCB0b2xlcmF0
+ZQ0KPiB3cml0ZSBtZXJnaW5nLg0KPiANCj4gIndyaXRlIG1lcmdpbmciICBUaGlzIGlzIGEgdmVy
+eSBzcGVjaWZpYyB0aGluZywgcGVyIFBDSSAzLjAsIDMuMi42Og0KPiANCj4gICBCeXRlIE1lcmdp
+bmcg4oCTIG9jY3VycyB3aGVuIGEgc2VxdWVuY2Ugb2YgaW5kaXZpZHVhbCBtZW1vcnkgd3JpdGVz
+DQo+ICAgKGJ5dGVzIG9yIHdvcmRzKSBhcmUgbWVyZ2VkIGludG8gYSBzaW5nbGUgRFdPUkQuDQo+
+IA0KPiBUaGUgc2VtYW50aWNzIHN1Z2dlc3QgcXVhZHdvcmQgc3VwcG9ydCBpbiBhZGRpdGlvbiB0
+byBkd29yZCwgYnV0IGRvbid0DQo+IHJlcXVpcmUgaXQuICBXcml0ZXMgdG8gYnl0ZXMgd2l0aGlu
+IGEgZHdvcmQgY2FuIGJlIG1lcmdlZCwgYnV0IGR1cGxpY2F0ZQ0KPiB3cml0ZXMgY2Fubm90Lg0K
+PiANCj4gSXQgc2VlbXMgbGlrZSBhbiBleHRyZW1lbHkgbGliZXJhbCBhcHBsaWNhdGlvbiB0byBz
+dWdnZXN0IHRoYXQgdGhpcyBvbmUgd3JpdGUNCj4gc2VtYW50aWMgZW5jb21wYXNzZXMgZnVsbCB3
+cml0ZSBjb21iaW5pbmcgc2VtYW50aWNzLCB3aGljaCBpdHNlbGYgaXMgbm90DQo+IGNsZWFybHkg
+ZGVmaW5lZC4NCj4NClRhbGtpbmcgdG8gb3VyIFBDSWUgU0lHIHJlcHJlc2VudGF0aXZlLCBQQ0ll
+IHN3aXRjaGVzIGFyZSBub3QgYWxsb3dlZCBkbyBhbnkgb2YgdGhlIGJ5dGUNCk1lcmdpbmcvY29t
+YmluaW5nIGV0YyBhcyBkZWZpbmVkIGluIHRoZSBQQ0kgc3BlYywgYW5kIHBlciBhIHJhdGhlciBw
+b29ybHkNCndvcmRlZCBJbXBsZW1lbnRhdGlvbiBub3RlIGluIHRoZSBzcGVjIHNheXMgdGhhdCBu
+byBrbm93biBQQ0llIEhvc3QgQnJpZGRnZXMvUm9vdCANCnBvcnRzIGRvIGl0IGVpdGhlci4gDQpT
+byBmb3IgUENJZSB3ZSBkb24ndCB0aGluayBiZWxpZXZlIHRoZXJlIGlzIGFueSBieXRlIG1lcmdp
+bmcgdGhhdCBoYXBwZW5zIGluIHRoZSBQQ0llDQpmYWJyaWMgc28gaXQncyByZWFsbHkgYSBtYXR0
+ZXIgb2Ygd2hhdCBoYXBwZW5zIGluIHRoZSBDUFUgY29yZSBhbmQgaW50ZXJjb25uZWN0DQpiZWZv
+cmUgaXQgZ2V0cyB0byB0aGUgUENJZSBoaWVyYXJjaHkuDQoNClN0ZXBwaW5nIGJhY2sgZnJvbSB0
+aGlzIHBhdGNoc2V0LCBkbyB5b3UgYWdyZWUgdGhhdCBpdCBpcyBkZXNpcmFibGUgdG8gc3VwcG9y
+dA0KV3JpdGUgY29tYmluaW5nIGFzIHVuZGVyc3Rvb2QgYnkgaW9yZW1hcF93YyB0byB3b3JrIGlu
+IGFsbCBJU0EgZ3Vlc3RzIGluY2x1ZGluZw0KQVJNdjg/DQoNCllvdSBub3RlIHRoYXQgeDg2IHZp
+cnR1YWxpemF0aW9uIGRvZXNuJ3QgaGF2ZSB0aGlzIGlzc3VlLCBidXQgS1ZNLUFSTSBkb2VzDQpi
+ZWNhdXNlIEtWTSBtYXBzIGFsbCBkZXZpY2UgQkFScyBhcyBEZXZpY2UgTWVtb3J5IHR5cGUgbkdu
+UkUgd2hpY2ggDQpkb2Vzbid0IGFsbG93IGlvcmVtYXBfd2MgZnJvbSB3aXRoaW4gdGhlIGd1ZXN0
+IHRvIGdldCB0aGUgYWN0dWFsIHNlbWFudGljcyBkZXNpcmVkLg0KDQpNYXJjIGFuZCBvdGhlcnMg
+aGF2ZSBzdWdnZXN0ZWQgdGhhdCB1c2Vyc3BhY2Ugc2hvdWxkIHByb3ZpZGUgdGhlIGhpbnRzLiBC
+dXQgdGhlDQpxdWVzdGlvbiBpcyBob3cgd291bGQgcWVtdSB2ZmlvIGRvIHRoaXMgZWl0aGVyPyBX
+ZSB3b3VsZCBiZSBzdHVjayBpbiB0aGUgc2FtZQ0KYXJndW1lbnRzIGFzIGhlcmUsIGFzIHRvIHdo
+YXQgaXMgdGhlIGNvcnJlY3Qgd2F5IHRvIGRldGVybWluZSB0aGUgZGVzaXJlZCBhdHRyaWJ1dGVz
+DQpmb3IgYSBnaXZlbiBCQVIgc3VjaCB0aGF0IGV2ZW50dWFsbHkgd2hlbiBhIGRyaXZlciBpbiB0
+aGUgZ3Vlc3QgYXNrcyBmb3INCmlvcmVtYXBfd2MgaXQgYWN0dWFsbHkgaGFzIGEgY2hhbmNlIG9m
+IHdvcmtpbmcgaW4gdGhlIGd1ZXN0LCBpbiBhbGwgSVNBcy4gDQpEbyB5b3UgaGF2ZSBhbnkgc3Vn
+Z2VzdGlvbnMgb24gaG93IHRvIG1ha2UgcHJvZ3Jlc3MgaGVyZT8NCkEgZGV2aWNlIHNwZWNpZmlj
+IGxpc3Qgb2Ygd2hpY2ggQkFScyBhcmUgT0sgdG8gYWxsb3cgaW9yZW1hcF93YyBmb3Igc2VlbXMg
+dGVycmlibGUNCmFuZCBJJ20gbm90IHN1cmUgaWYgYSBjb21tYW5kbGluZSBxZW11IG9wdGlvbiBp
+cyBhbnkgYmV0dGVyLiBJcyB0aGUgdXNlciBvZiBkZXZpY2UgDQphc3NpZ25tZW50L3N5c2FkbWlu
+IHN1cHBvc2VkIHRvIGtub3cgd2hpY2ggQkFSIG9mIHdoaWNoIGRldmljZSBpcyBPSyB0byBhbGxv
+dyANCmlvcmVtYXBfd2MgZm9yPw0KDQpXaWxsL0NhdGFsaW4sIHBlcmhhcHMgeW91IGNvdWxkIGV4
+cGxhaW4geW91ciB0aG91Z2h0IHByb2Nlc3Mgb24gd2h5IHlvdSBjaG9zZQ0KTm9ybWFsIE5DIGZv
+ciBpb3JlbWFwX3djIG9uIHRoZSBhcm12OCBsaW51eCBwb3J0IGluc3RlYWQgb2YgRGV2aWNlIEdS
+RSBvciBvdGhlcg0KRGV2aWNlIEd4eC4gDQoNCg0KVGhhbmtzLA0KVmlrcmFtDQpfX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0
+Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5l
+ZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
