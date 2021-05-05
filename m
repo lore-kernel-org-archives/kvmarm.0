@@ -2,70 +2,76 @@ Return-Path: <SRS0=ArdN=KA=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28295C433B4
-	for <kvmarm@archiver.kernel.org>; Wed,  5 May 2021 16:35:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ABB4C43461
+	for <kvmarm@archiver.kernel.org>; Wed,  5 May 2021 16:47:02 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 772046188B
-	for <kvmarm@archiver.kernel.org>; Wed,  5 May 2021 16:35:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 772046188B
+	by mail.kernel.org (Postfix) with ESMTP id 84B9B6141B
+	for <kvmarm@archiver.kernel.org>; Wed,  5 May 2021 16:47:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84B9B6141B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E850F4B420;
-	Wed,  5 May 2021 12:35:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 216CF4B409;
+	Wed,  5 May 2021 12:47:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id E-ozkMY6dh44; Wed,  5 May 2021 12:35:09 -0400 (EDT)
+	with ESMTP id dqVzObbYA0IH; Wed,  5 May 2021 12:46:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 242A34B322;
-	Wed,  5 May 2021 12:35:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B52E4B410;
+	Wed,  5 May 2021 12:46:58 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E24A24B289
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 May 2021 12:35:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4603A4B410
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 May 2021 12:46:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MWeupWYReiTx for <kvmarm@lists.cs.columbia.edu>;
- Wed,  5 May 2021 12:35:06 -0400 (EDT)
+ with ESMTP id e-RSl2wfgjWG for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  5 May 2021 12:46:56 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 921854B23A
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 May 2021 12:35:06 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 65CAD6190A;
- Wed,  5 May 2021 16:35:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1620232505;
- bh=XUjM3uzOEodAd8GDaJ/3gful5wE9ZKQwbXWbEv/ZHZ0=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=P44MEyT7BdQQKisV/A8INp4AyD4Ii/f18R52Cj6ewBywb4mndqsq2fBYvez951o5a
- VrttSeEq4nsrZFie/1yUYAyjDGqh/+kWAZdtGu0zmJd6mz0urrR6a+wdPcvFxIHR5X
- KTZyWzlERzXcrOVZyPHs1+6RzWvIaOtQcwGUpG0TQcNZW0unAKV58ES3UQyl6Qw6jz
- IxpVlFUyp8j94V5Td95yfS92fndATrkIKOinJdMoAwnQXrRBB0rHS99HYNKntHPGbH
- FSnY6NCHGyO/Kqz8MMcwXRNzfNSFhY34vV7Rm7sHoEvwZ+Ut/2p5kaiTzBN88KjWGi
- /8iFUDNT65Sww==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.11 036/104] KVM: arm64: Use BUG and BUG_ON in nVHE
- hyp
-Date: Wed,  5 May 2021 12:33:05 -0400
-Message-Id: <20210505163413.3461611-36-sashal@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210505163413.3461611-1-sashal@kernel.org>
-References: <20210505163413.3461611-1-sashal@kernel.org>
-MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Cc: Sasha Levin <sashal@kernel.org>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F0E834B409
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 May 2021 12:46:55 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id E59C461402;
+ Wed,  5 May 2021 16:46:54 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1leKfk-00B35v-PD; Wed, 05 May 2021 17:46:52 +0100
+Date: Wed, 05 May 2021 17:46:51 +0100
+Message-ID: <875yzxnn5w.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v2 03/11] KVM: arm64: Make kvm_skip_instr() and co private
+ to HYP
+In-Reply-To: <cef3517b-e66d-4d26-68a9-2d5fb433377c@huawei.com>
+References: <20201102164045.264512-1-maz@kernel.org>
+ <20201102164045.264512-4-maz@kernel.org>
+ <cef3517b-e66d-4d26-68a9-2d5fb433377c@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com,
+ will@kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com,
+ suzuki.poulose@arm.com, ascull@google.com, mark.rutland@arm.com,
+ qperret@google.com, dbrazdil@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, kernel-team@android.com, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -82,79 +88,100 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Andrew Scull <ascull@google.com>
+Hi Zenghui,
 
-[ Upstream commit f79e616f27ab6cd74deb0995a8eead3d1c9d65af ]
+On Wed, 05 May 2021 15:23:02 +0100,
+Zenghui Yu <yuzenghui@huawei.com> wrote:
+> 
+> Hi Marc,
+> 
+> On 2020/11/3 0:40, Marc Zyngier wrote:
+> > In an effort to remove the vcpu PC manipulations from EL1 on nVHE
+> > systems, move kvm_skip_instr() to be HYP-specific. EL1's intent
+> > to increment PC post emulation is now signalled via a flag in the
+> > vcpu structure.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> 
+> [...]
+> 
+> > @@ -133,6 +134,8 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+> >  	__load_guest_stage2(vcpu->arch.hw_mmu);
+> >  	__activate_traps(vcpu);
+> >  +	__adjust_pc(vcpu);
+> 
+> If the INCREMENT_PC flag was set (e.g., for WFx emulation) while we're
+> handling PSCI CPU_ON call targetting this VCPU, the *target_pc* (aka
+> entry point address, normally provided by the primary VCPU) will be
+> unexpectedly incremented here. That's pretty bad, I think.
 
-hyp_panic() reports the address of the panic by using ELR_EL2, but this
-isn't a useful address when hyp_panic() is called directly. Replace such
-direct calls with BUG() and BUG_ON() which use BRK to trigger an
-exception that then goes to hyp_panic() with the correct address. Also
-remove the hyp_panic() declaration from the header file to avoid
-accidental misuse.
+How can you online a CPU using PSCI if that CPU is currently spinning
+on a WFI? Or is that we have transitioned via userspace to perform the
+vcpu reset? I can imagine it happening in that case.
 
-Signed-off-by: Andrew Scull <ascull@google.com>
-Acked-by: Will Deacon <will@kernel.org>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20210318143311.839894-5-ascull@google.com
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- arch/arm64/include/asm/kvm_hyp.h   | 1 -
- arch/arm64/kvm/hyp/nvhe/hyp-main.c | 2 +-
- arch/arm64/kvm/hyp/nvhe/hyp-smp.c  | 6 ++----
- 3 files changed, 3 insertions(+), 6 deletions(-)
+> This was noticed with a latest guest kernel, at least with commit
+> dccc9da22ded ("arm64: Improve parking of stopped CPUs"), which put the
+> stopped VCPUs in the WFx loop. The guest kernel shouted at me that
+> 
+> 	"CPU: CPUs started in inconsistent modes"
 
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index 32ae676236b6..fe5fc814f228 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -100,7 +100,6 @@ u64 __guest_enter(struct kvm_vcpu *vcpu);
+Ah, the perks of running guests with "quiet"... Well caught.
+
+> *after* rebooting. The problem is that the secondary entry point was
+> corrupted by KVM as explained above. All of the secondary processors
+> started from set_cpu_boot_mode_flag(), with w0=0. Oh well...
+> 
+> I write the below diff and guess it will help. But I have to look at all
+> other places where we adjust PC directly to make a right fix. Please let
+> me know what do you think.
+> 
+> 
+> Thanks,
+> Zenghui
+> 
+> ---->8----
+> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> index 956cdc240148..ed647eb387c3 100644
+> --- a/arch/arm64/kvm/reset.c
+> +++ b/arch/arm64/kvm/reset.c
+> @@ -265,7 +265,12 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+>  		if (vcpu->arch.reset_state.be)
+>  			kvm_vcpu_set_be(vcpu);
+> 
+> +		/*
+> +		 * Don't bother with the KVM_ARM64_INCREMENT_PC flag while
+> +		 * using this version of __adjust_pc().
+> +		 */
+>  		*vcpu_pc(vcpu) = target_pc;
+> +		vcpu->arch.flags &= ~KVM_ARM64_INCREMENT_PC;
+
+I think you need to make it a lot stronger: any PC-altering flag will
+do the wrong thing here. I'd go and clear all the exception bits:
+
+Thanks,
+
+	M.
+
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index 956cdc240148..54913612d602 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -265,6 +265,12 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+ 		if (vcpu->arch.reset_state.be)
+ 			kvm_vcpu_set_be(vcpu);
  
- bool kvm_host_psci_handler(struct kvm_cpu_context *host_ctxt);
++		/*
++		 * We're reseting the CPU, make sure there is no
++		 * pending exception or other PC-altering event.
++		 */
++		vcpu->arch.flags &= ~(KVM_ARM64_PENDING_EXCEPTION |
++				      KVM_ARM64_EXCEPT_MASK);
+ 		*vcpu_pc(vcpu) = target_pc;
+ 		vcpu_set_reg(vcpu, 0, vcpu->arch.reset_state.r0);
  
--void __noreturn hyp_panic(void);
- #ifdef __KVM_NVHE_HYPERVISOR__
- void __noreturn __hyp_do_panic(struct kvm_cpu_context *host_ctxt, u64 spsr,
- 			       u64 elr, u64 par);
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 1b8ef37bf805..2630d3bbae62 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -181,6 +181,6 @@ void handle_trap(struct kvm_cpu_context *host_ctxt)
- 		handle_host_smc(host_ctxt);
- 		break;
- 	default:
--		hyp_panic();
-+		BUG();
- 	}
- }
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-smp.c b/arch/arm64/kvm/hyp/nvhe/hyp-smp.c
-index 2997aa156d8e..4495aed04240 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-smp.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-smp.c
-@@ -18,8 +18,7 @@ u64 __ro_after_init hyp_cpu_logical_map[NR_CPUS] = { [0 ... NR_CPUS-1] = INVALID
- 
- u64 cpu_logical_map(unsigned int cpu)
- {
--	if (cpu >= ARRAY_SIZE(hyp_cpu_logical_map))
--		hyp_panic();
-+	BUG_ON(cpu >= ARRAY_SIZE(hyp_cpu_logical_map));
- 
- 	return hyp_cpu_logical_map[cpu];
- }
-@@ -30,8 +29,7 @@ unsigned long __hyp_per_cpu_offset(unsigned int cpu)
- 	unsigned long this_cpu_base;
- 	unsigned long elf_base;
- 
--	if (cpu >= ARRAY_SIZE(kvm_arm_hyp_percpu_base))
--		hyp_panic();
-+	BUG_ON(cpu >= ARRAY_SIZE(kvm_arm_hyp_percpu_base));
- 
- 	cpu_base_array = (unsigned long *)hyp_symbol_addr(kvm_arm_hyp_percpu_base);
- 	this_cpu_base = kern_hyp_va(cpu_base_array[cpu]);
+
 -- 
-2.30.2
-
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
