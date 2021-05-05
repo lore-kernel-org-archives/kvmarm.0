@@ -2,69 +2,81 @@ Return-Path: <SRS0=ArdN=KA=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACF0DC43460
-	for <kvmarm@archiver.kernel.org>; Wed,  5 May 2021 18:02:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11C7EC43460
+	for <kvmarm@archiver.kernel.org>; Wed,  5 May 2021 18:03:20 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 07E8F613AA
-	for <kvmarm@archiver.kernel.org>; Wed,  5 May 2021 18:02:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07E8F613AA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 8B3B1613BC
+	for <kvmarm@archiver.kernel.org>; Wed,  5 May 2021 18:03:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B3B1613BC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 833364B504;
-	Wed,  5 May 2021 14:02:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1EFCB4B249;
+	Wed,  5 May 2021 14:03:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9YazY6PzOMru; Wed,  5 May 2021 14:02:39 -0400 (EDT)
+	with ESMTP id knB16jdYqoVO; Wed,  5 May 2021 14:03:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B63F4B50A;
-	Wed,  5 May 2021 14:02:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D57B4B37B;
+	Wed,  5 May 2021 14:03:17 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E722F4B510
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 May 2021 14:02:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AAF0C4B31F
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 May 2021 14:03:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bfCvyx-mejYr for <kvmarm@lists.cs.columbia.edu>;
- Wed,  5 May 2021 14:02:36 -0400 (EDT)
+ with ESMTP id K5v8Q79NRXvf for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  5 May 2021 14:03:15 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CB9D54B508
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 May 2021 14:02:36 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id BB46861176;
- Wed,  5 May 2021 18:02:33 +0000 (UTC)
-Date: Wed, 5 May 2021 19:02:31 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Will Deacon <will@kernel.org>
-Subject: Re: [RFC 1/2] vfio/pci: keep the prefetchable attribute of a BAR
- region in VMA
-Message-ID: <20210505180228.GA3874@arm.com>
-References: <878s4zokll.wl-maz@kernel.org>
- <BL0PR12MB2532CC436EBF626966B15994BD5E9@BL0PR12MB2532.namprd12.prod.outlook.com>
- <87eeeqvm1d.wl-maz@kernel.org>
- <BL0PR12MB25329EF5DFA7BBAA732064A7BD5C9@BL0PR12MB2532.namprd12.prod.outlook.com>
- <87bl9sunnw.wl-maz@kernel.org>
- <c1bd514a531988c9@bloch.sibelius.xs4all.nl>
- <BL0PR12MB253296086906C4A850EC68E6BD5B9@BL0PR12MB2532.namprd12.prod.outlook.com>
- <20210503084432.75e0126d@x1.home.shazbot.org>
- <BL0PR12MB2532BEAE226E7D68A8A2F97EBD5B9@BL0PR12MB2532.namprd12.prod.outlook.com>
- <20210504083005.GA12290@willie-the-truck>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210504083005.GA12290@willie-the-truck>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Marc Zyngier <maz@kernel.org>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Vikram Sethi <vsethi@nvidia.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Jason Sequeira <jsequeira@nvidia.com>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
- Mark Kettenis <mark.kettenis@xs4all.nl>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 725174B20B
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 May 2021 14:03:15 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id CDDCA61057;
+ Wed,  5 May 2021 18:03:12 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
+ (envelope-from <maz@kernel.org>)
+ id 1leLra-00B5q6-Nc; Wed, 05 May 2021 19:03:10 +0100
+Date: Wed, 05 May 2021 19:03:09 +0100
+Message-ID: <871ralnjmq.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH 15/56] KVM: arm64: Add build rules for separate VHE/nVHE
+ object files
+In-Reply-To: <2ff3a1cb-a310-7963-4171-bd1e7d08e39b@redhat.com>
+References: <20200805175700.62775-1-maz@kernel.org>
+ <20200805175700.62775-16-maz@kernel.org>
+ <2ff3a1cb-a310-7963-4171-bd1e7d08e39b@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: eric.auger@redhat.com, pbonzini@redhat.com, graf@amazon.com,
+ alexandru.elisei@arm.com, ascull@google.com, catalin.marinas@arm.com,
+ christoffer.dall@arm.com, dbrazdil@google.com, gshan@redhat.com,
+ james.morse@arm.com, mark.rutland@arm.com, richard.peng@oppo.com,
+ qperret@google.com, will@kernel.org, julien.thierry.kdev@gmail.com,
+ suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Peng Hao <richard.peng@oppo.com>, kernel-team@android.com,
+ Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
+ Alexander Graf <graf@amazon.com>, kvm@vger.kernel.org,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -81,28 +93,106 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, May 04, 2021 at 09:30:05AM +0100, Will Deacon wrote:
-> On Mon, May 03, 2021 at 10:03:59PM +0000, Vikram Sethi wrote:
-> > Will/Catalin, perhaps you could explain your thought process on why you chose
-> > Normal NC for ioremap_wc on the armv8 linux port instead of Device GRE or other
-> > Device Gxx. 
+Hi Eric,
+
+On Tue, 04 May 2021 15:47:36 +0100,
+Auger Eric <eric.auger@redhat.com> wrote:
 > 
-> I think a combination of: compatibility with 32-bit Arm, the need to
-> support unaligned accesses and the potential for higher performance.
+> Hi David, Marc,
+> 
+> On 8/5/20 7:56 PM, Marc Zyngier wrote:
+> > From: David Brazdil <dbrazdil@google.com>
+> > 
+> > Add new folders arch/arm64/kvm/hyp/{vhe,nvhe} and Makefiles for building code
+> > that runs in EL2 under VHE/nVHE KVM, repsectivelly. Add an include folder for
+> > hyp-specific header files which will include code common to VHE/nVHE.
+> > 
+> > Build nVHE code with -D__KVM_NVHE_HYPERVISOR__, VHE code with
+> > -D__KVM_VHE_HYPERVISOR__.
+> > 
+> > Under nVHE compile each source file into a `.hyp.tmp.o` object first, then
+> > prefix all its symbols with "__kvm_nvhe_" using `objcopy` and produce
+> > a `.hyp.o`. Suffixes were chosen so that it would be possible for VHE and nVHE
+> > to share some source files, but compiled with different CFLAGS.
+> > 
+> > The nVHE ELF symbol prefix is added to kallsyms.c as ignored. EL2-only symbols
+> > will never appear in EL1 stack traces.
+> > 
+> > Due to symbol prefixing, add a section in image-vars.h for aliases of symbols
+> > that are defined in nVHE EL2 and accessed by kernel in EL1 or vice versa.
+> > 
+> > Signed-off-by: David Brazdil <dbrazdil@google.com>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > Link: https://lore.kernel.org/r/20200625131420.71444-4-dbrazdil@google.com
+> > ---
+> >  arch/arm64/kernel/image-vars.h   | 14 +++++++++++++
+> >  arch/arm64/kvm/hyp/Makefile      | 10 +++++++---
+> >  arch/arm64/kvm/hyp/nvhe/Makefile | 34 ++++++++++++++++++++++++++++++++
+> >  arch/arm64/kvm/hyp/vhe/Makefile  | 17 ++++++++++++++++
+> >  scripts/kallsyms.c               |  1 +
+> >  5 files changed, 73 insertions(+), 3 deletions(-)
+> >  create mode 100644 arch/arm64/kvm/hyp/nvhe/Makefile
+> >  create mode 100644 arch/arm64/kvm/hyp/vhe/Makefile
 
-IIRC the _wc suffix also matches the pgprot_writecombine() used by some
-drivers to map a video framebuffer into user space. Accesses to the
-framebuffer are not guaranteed to be aligned (memset/memcpy don't ensure
-alignment on arm64 and the user doesn't have a memset_io or memcpy_toio).
+[...]
 
-> Furthermore, ioremap() already gives you a Device memory type, and we're
-> tight on MAIR space.
+> > diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
+> > index 6dc3078649fa..0096cd965332 100644
+> > --- a/scripts/kallsyms.c
+> > +++ b/scripts/kallsyms.c
+> > @@ -109,6 +109,7 @@ static bool is_ignored_symbol(const char *name, char type)
+> >  		".LASANPC",		/* s390 kasan local symbols */
+> >  		"__crc_",		/* modversions */
+> >  		"__efistub_",		/* arm64 EFI stub namespace */
+> > +		"__kvm_nvhe_",		/* arm64 non-VHE KVM namespace */
+> The addition of this line seems to have introduced errors on the
+> 'vmlinux symtab matches kallsyms' perf test (perf test -v 1) which fails
+> on aarch64 for all __kvm_nvhe_ prefixed symbols, like
+> 
+> ERR : <addr> : __kvm_nvhe___invalid not on kallsyms
+> ERR : <addr> : __kvm_nvhe___do_hyp_init not on kallsyms
+> ERR : <addr> : __kvm_nvhe___kvm_handle_stub_hvc not on kallsyms
+> ERR : <addr> : __kvm_nvhe_reset not on kallsyms
+> ../..
+> 
+> I understand we willingly hided those symbols from /proc/kallsyms. Do
+> you confirm the right fix is to upgrade the perf test suite accordingly?
 
-We have MT_DEVICE_GRE currently reserved though no in-kernel user, we
-might as well remove it.
+Hmmm. This test always fail here, no matter whether I have this line
+or not:
+
+<quote>
+maz@big-leg-emma:~$ sudo perf_5.10 test -v 1
+ 1: vmlinux symtab matches kallsyms                                 :
+--- start ---
+test child forked, pid 664
+/proc/{kallsyms,modules} inconsistency while looking for "[bpf]" module!
+/proc/{kallsyms,modules} inconsistency while looking for "[bpf]" module!
+/proc/{kallsyms,modules} inconsistency while looking for "[bpf]" module!
+/proc/{kallsyms,modules} inconsistency while looking for "[bpf]" module!
+/proc/{kallsyms,modules} inconsistency while looking for "[bpf]" module!
+/proc/{kallsyms,modules} inconsistency while looking for "[bpf]" module!
+/proc/{kallsyms,modules} inconsistency while looking for "[bpf]" module!
+/proc/{kallsyms,modules} inconsistency while looking for "[bpf]" module!
+/proc/{kallsyms,modules} inconsistency while looking for "[bpf]" module!
+/proc/{kallsyms,modules} inconsistency while looking for "[bpf]" module!
+Looking at the vmlinux_path (8 entries long)
+symsrc__init: cannot get elf header.
+symsrc__init: cannot get elf header.
+Couldn't find a vmlinux that matches the kernel running on this machine, skipping test
+test child finished with -2
+---- end ----
+vmlinux symtab matches kallsyms: Skip
+</quote>
+
+Rookie question: How do you provide a kernel to the test framework?
+
+Thanks,
+
+	M.
 
 -- 
-Catalin
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
