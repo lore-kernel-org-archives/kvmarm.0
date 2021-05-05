@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D38ACC433ED
-	for <kvmarm@archiver.kernel.org>; Wed,  5 May 2021 16:32:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28295C433B4
+	for <kvmarm@archiver.kernel.org>; Wed,  5 May 2021 16:35:12 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 367EB61426
-	for <kvmarm@archiver.kernel.org>; Wed,  5 May 2021 16:32:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 367EB61426
+	by mail.kernel.org (Postfix) with ESMTP id 772046188B
+	for <kvmarm@archiver.kernel.org>; Wed,  5 May 2021 16:35:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 772046188B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C848C4B42F;
-	Wed,  5 May 2021 12:32:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E850F4B420;
+	Wed,  5 May 2021 12:35:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id mb22ii6nrkEw; Wed,  5 May 2021 12:32:23 -0400 (EDT)
+	with ESMTP id E-ozkMY6dh44; Wed,  5 May 2021 12:35:09 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A914F4B410;
-	Wed,  5 May 2021 12:32:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 242A34B322;
+	Wed,  5 May 2021 12:35:09 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6951D4B3B4
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 May 2021 12:32:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E24A24B289
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 May 2021 12:35:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qBJyWT8ImKHJ for <kvmarm@lists.cs.columbia.edu>;
- Wed,  5 May 2021 12:32:21 -0400 (EDT)
+ with ESMTP id MWeupWYReiTx for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  5 May 2021 12:35:06 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4C4594B289
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 May 2021 12:32:21 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id AF40C613C4;
- Wed,  5 May 2021 16:32:17 +0000 (UTC)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 921854B23A
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 May 2021 12:35:06 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 65CAD6190A;
+ Wed,  5 May 2021 16:35:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1620232338;
- bh=HIoIwvjaeDzR6jcuBupmH52Whq50YqGDyJRDvBh+h0M=;
+ s=k20201202; t=1620232505;
+ bh=XUjM3uzOEodAd8GDaJ/3gful5wE9ZKQwbXWbEv/ZHZ0=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=BQiR8F7sb7bo6tfP8+DvhnK5w16CedUIAgicj2wJrNtkvDfyQWOmuzbWgBVUuW3sU
- Ag5a5xrMweFM45uacUlljuvafKfjEcBsXrUJLXygjbbBo6L+SvitEaoGGXZd0jZ+rr
- Gbm7J+hF/ZfORq4NX3KZMWH8asMVaRlF0U0lELKa1pl9+bl84B8zNSLGVAC+HfyiCB
- Iv1uYKdTGzGi/AB6DgYIki/LMS5P+pyxo9WQBDZQs5fAxf8ugXuX+hykM2+xsk28nG
- Wma1YTuMPqpEtwkrl3eI+C+E36z+/nbyKg1PJYoaZOIWrLWAsNc+gdgE2D5tqknwnP
- WCy/vCOcUM3NA==
+ b=P44MEyT7BdQQKisV/A8INp4AyD4Ii/f18R52Cj6ewBywb4mndqsq2fBYvez951o5a
+ VrttSeEq4nsrZFie/1yUYAyjDGqh/+kWAZdtGu0zmJd6mz0urrR6a+wdPcvFxIHR5X
+ KTZyWzlERzXcrOVZyPHs1+6RzWvIaOtQcwGUpG0TQcNZW0unAKV58ES3UQyl6Qw6jz
+ IxpVlFUyp8j94V5Td95yfS92fndATrkIKOinJdMoAwnQXrRBB0rHS99HYNKntHPGbH
+ FSnY6NCHGyO/Kqz8MMcwXRNzfNSFhY34vV7Rm7sHoEvwZ+Ut/2p5kaiTzBN88KjWGi
+ /8iFUDNT65Sww==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.12 039/116] KVM: arm64: Use BUG and BUG_ON in nVHE
+Subject: [PATCH AUTOSEL 5.11 036/104] KVM: arm64: Use BUG and BUG_ON in nVHE
  hyp
-Date: Wed,  5 May 2021 12:30:07 -0400
-Message-Id: <20210505163125.3460440-39-sashal@kernel.org>
+Date: Wed,  5 May 2021 12:33:05 -0400
+Message-Id: <20210505163413.3461611-36-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210505163125.3460440-1-sashal@kernel.org>
-References: <20210505163125.3460440-1-sashal@kernel.org>
+In-Reply-To: <20210505163413.3461611-1-sashal@kernel.org>
+References: <20210505163413.3461611-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -117,10 +117,10 @@ index 32ae676236b6..fe5fc814f228 100644
  void __noreturn __hyp_do_panic(struct kvm_cpu_context *host_ctxt, u64 spsr,
  			       u64 elr, u64 par);
 diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 936328207bde..821a69601dd9 100644
+index 1b8ef37bf805..2630d3bbae62 100644
 --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
 +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -178,6 +178,6 @@ void handle_trap(struct kvm_cpu_context *host_ctxt)
+@@ -181,6 +181,6 @@ void handle_trap(struct kvm_cpu_context *host_ctxt)
  		handle_host_smc(host_ctxt);
  		break;
  	default:
@@ -129,7 +129,7 @@ index 936328207bde..821a69601dd9 100644
  	}
  }
 diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-smp.c b/arch/arm64/kvm/hyp/nvhe/hyp-smp.c
-index 879559057dee..9f54833af400 100644
+index 2997aa156d8e..4495aed04240 100644
 --- a/arch/arm64/kvm/hyp/nvhe/hyp-smp.c
 +++ b/arch/arm64/kvm/hyp/nvhe/hyp-smp.c
 @@ -18,8 +18,7 @@ u64 __ro_after_init hyp_cpu_logical_map[NR_CPUS] = { [0 ... NR_CPUS-1] = INVALID
@@ -150,7 +150,7 @@ index 879559057dee..9f54833af400 100644
 -		hyp_panic();
 +	BUG_ON(cpu >= ARRAY_SIZE(kvm_arm_hyp_percpu_base));
  
- 	cpu_base_array = (unsigned long *)&kvm_arm_hyp_percpu_base;
+ 	cpu_base_array = (unsigned long *)hyp_symbol_addr(kvm_arm_hyp_percpu_base);
  	this_cpu_base = kern_hyp_va(cpu_base_array[cpu]);
 -- 
 2.30.2
