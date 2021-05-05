@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81909C433B4
-	for <kvmarm@archiver.kernel.org>; Wed,  5 May 2021 16:49:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40E3EC4363C
+	for <kvmarm@archiver.kernel.org>; Wed,  5 May 2021 16:49:49 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C7D03613BE
-	for <kvmarm@archiver.kernel.org>; Wed,  5 May 2021 16:49:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7D03613BE
+	by mail.kernel.org (Postfix) with ESMTP id B988261439
+	for <kvmarm@archiver.kernel.org>; Wed,  5 May 2021 16:49:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B988261439
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D8434B410;
-	Wed,  5 May 2021 12:49:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 52EF54B362;
+	Wed,  5 May 2021 12:49:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id rAS6slF1zzRy; Wed,  5 May 2021 12:48:58 -0400 (EDT)
+	with ESMTP id rfJZuXtZDit9; Wed,  5 May 2021 12:49:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 001AB4B381;
-	Wed,  5 May 2021 12:48:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3BD294B381;
+	Wed,  5 May 2021 12:49:47 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 24F354B381
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 May 2021 12:48:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F08064B381
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 May 2021 12:49:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mSX7oQyKjrH2 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  5 May 2021 12:48:56 -0400 (EDT)
+ with ESMTP id 8LQmwCsnj8Sj for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  5 May 2021 12:49:44 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1E86C4B362
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 May 2021 12:48:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D678F4B362
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 May 2021 12:49:44 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id E679D610FB;
- Wed,  5 May 2021 16:48:54 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id E926B61157;
+ Wed,  5 May 2021 16:49:43 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94)
  (envelope-from <maz@kernel.org>)
- id 1leKhg-00B3AR-80; Wed, 05 May 2021 17:48:52 +0100
-Date: Wed, 05 May 2021 17:48:51 +0100
-Message-ID: <874kfhnn2k.wl-maz@kernel.org>
+ id 1leKiT-00B3BN-RZ; Wed, 05 May 2021 17:49:41 +0100
+Date: Wed, 05 May 2021 17:49:41 +0100
+Message-ID: <8735v1nn16.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Sasha Levin <sashal@kernel.org>
-Subject: Re: [PATCH AUTOSEL 5.11 036/104] KVM: arm64: Use BUG and BUG_ON in
+Subject: Re: [PATCH AUTOSEL 5.12 039/116] KVM: arm64: Use BUG and BUG_ON in
  nVHE hyp
-In-Reply-To: <20210505163413.3461611-36-sashal@kernel.org>
-References: <20210505163413.3461611-1-sashal@kernel.org>
- <20210505163413.3461611-36-sashal@kernel.org>
+In-Reply-To: <20210505163125.3460440-39-sashal@kernel.org>
+References: <20210505163125.3460440-1-sashal@kernel.org>
+ <20210505163125.3460440-39-sashal@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -86,9 +86,7 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Sasha,
-
-On Wed, 05 May 2021 17:33:05 +0100,
+On Wed, 05 May 2021 17:30:07 +0100,
 Sasha Levin <sashal@kernel.org> wrote:
 > 
 > From: Andrew Scull <ascull@google.com>
@@ -108,12 +106,7 @@ Sasha Levin <sashal@kernel.org> wrote:
 > Link: https://lore.kernel.org/r/20210318143311.839894-5-ascull@google.com
 > Signed-off-by: Sasha Levin <sashal@kernel.org>
 
-This has no chance of working without the patches that enable BUG()
-support at EL2, and *really* isn't stable material.
-
-Please drop this patch.
-
-Thanks,
+Same this for this patch.
 
 	M.
 
