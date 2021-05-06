@@ -2,82 +2,65 @@ Return-Path: <SRS0=4Pzf=KB=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0EB6C433B4
-	for <kvmarm@archiver.kernel.org>; Thu,  6 May 2021 07:24:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B0C6C433ED
+	for <kvmarm@archiver.kernel.org>; Thu,  6 May 2021 11:43:48 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id EA30A61164
-	for <kvmarm@archiver.kernel.org>; Thu,  6 May 2021 07:24:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA30A61164
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+	by mail.kernel.org (Postfix) with ESMTP id 3276E613D9
+	for <kvmarm@archiver.kernel.org>; Thu,  6 May 2021 11:43:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3276E613D9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 583464B4B0;
-	Thu,  6 May 2021 03:24:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D37A4B508;
+	Thu,  6 May 2021 07:43:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@infradead.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 2DBayCOAkhz7; Thu,  6 May 2021 03:24:21 -0400 (EDT)
+	with ESMTP id POvEgwHBnEDc; Thu,  6 May 2021 07:43:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 326754B4DF;
-	Thu,  6 May 2021 03:24:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 633664B514;
+	Thu,  6 May 2021 07:43:44 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 642D74B4E4
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 May 2021 03:24:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E1874B508
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 May 2021 07:43:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RJqPZM-ikV3y for <kvmarm@lists.cs.columbia.edu>;
- Thu,  6 May 2021 03:24:17 -0400 (EDT)
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 53EE64B4DF
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 May 2021 03:24:17 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
- References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
- Content-Transfer-Encoding:Content-ID:Content-Description;
- bh=mmRnwL0+7c5+Z5SO1e0LYjJ5FVGGCBEN51tuNvrP2X0=; b=dpl4IyQPo0BlhWM2jTUcSNiOM5
- /T1JxZKErUyUJ9ETGjthgTvZ6+0OE2eNrB29F18aCLTSE3AY/xVRTw0W6UErf9xzj/pLYAIKskR24
- 9gkXrFzSnnoR6b0tbjou7qUCFLHVaZaFpamiS+LSYEmXJ79F/OeUbkj/AyGD+HpBOz7desj14+edY
- lUSejZFA7BuloJKBWWjRevjeIajZvfhMZGc2TxvSzC/4NWlQelWzgRFJ0GQWskjKdESm2Q71fXyDM
- MKGsLUXv63Uiz1DdJstZdNuaRRiLTFtehgz1ms52fqVkX+gi+cE6P/G5IoCOYg3wFwXgGl1M0HtoM
- TzrY8boA==;
-Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat
- Linux)) id 1leYKz-001QP0-T6; Thu, 06 May 2021 07:22:27 +0000
-Date: Thu, 6 May 2021 08:22:21 +0100
-From: Christoph Hellwig <hch@infradead.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [RFC 1/2] vfio/pci: keep the prefetchable attribute of a BAR
- region in VMA
-Message-ID: <20210506072221.GA338890@infradead.org>
-References: <BL0PR12MB2532CC436EBF626966B15994BD5E9@BL0PR12MB2532.namprd12.prod.outlook.com>
- <87eeeqvm1d.wl-maz@kernel.org>
- <BL0PR12MB25329EF5DFA7BBAA732064A7BD5C9@BL0PR12MB2532.namprd12.prod.outlook.com>
- <87bl9sunnw.wl-maz@kernel.org>
- <c1bd514a531988c9@bloch.sibelius.xs4all.nl>
- <BL0PR12MB253296086906C4A850EC68E6BD5B9@BL0PR12MB2532.namprd12.prod.outlook.com>
- <20210503084432.75e0126d@x1.home.shazbot.org>
- <BL0PR12MB2532BEAE226E7D68A8A2F97EBD5B9@BL0PR12MB2532.namprd12.prod.outlook.com>
- <20210504083005.GA12290@willie-the-truck>
- <20210505180228.GA3874@arm.com>
+ with ESMTP id efAm79Dz0GwH for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  6 May 2021 07:43:41 -0400 (EDT)
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 97A924B503
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 May 2021 07:43:40 -0400 (EDT)
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.58])
+ by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4FbWpr1xXDzqSfJ;
+ Thu,  6 May 2021 19:40:20 +0800 (CST)
+Received: from [10.174.185.179] (10.174.185.179) by
+ DGGEMS410-HUB.china.huawei.com (10.3.19.210) with Microsoft SMTP Server id
+ 14.3.498.0; Thu, 6 May 2021 19:43:26 +0800
+Subject: Re: [PATCH v2 03/11] KVM: arm64: Make kvm_skip_instr() and co private
+ to HYP
+To: Marc Zyngier <maz@kernel.org>
+References: <20201102164045.264512-1-maz@kernel.org>
+ <20201102164045.264512-4-maz@kernel.org>
+ <cef3517b-e66d-4d26-68a9-2d5fb433377c@huawei.com>
+ <875yzxnn5w.wl-maz@kernel.org> <87zgx8mkwd.wl-maz@kernel.org>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <db784fc8-3a52-49ff-0b75-83a1bbc81d98@huawei.com>
+Date: Thu, 6 May 2021 19:43:26 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210505180228.GA3874@arm.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by
- casper.infradead.org. See http://www.infradead.org/rpr.html
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Marc Zyngier <maz@kernel.org>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Vikram Sethi <vsethi@nvidia.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Jason Sequeira <jsequeira@nvidia.com>, Will Deacon <will@kernel.org>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
- Mark Kettenis <mark.kettenis@xs4all.nl>
+In-Reply-To: <87zgx8mkwd.wl-maz@kernel.org>
+Content-Language: en-US
+X-Originating-IP: [10.174.185.179]
+X-CFilter-Loop: Reflected
+Cc: kvm@vger.kernel.org, kernel-team@android.com, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -89,20 +72,114 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, May 05, 2021 at 07:02:31PM +0100, Catalin Marinas wrote:
-> > Furthermore, ioremap() already gives you a Device memory type, and we're
-> > tight on MAIR space.
-> 
-> We have MT_DEVICE_GRE currently reserved though no in-kernel user, we
-> might as well remove it.
+On 2021/5/6 14:33, Marc Zyngier wrote:
+> On Wed, 05 May 2021 17:46:51 +0100,
+> Marc Zyngier <maz@kernel.org> wrote:
+>>
+>> Hi Zenghui,
+>>
+>> On Wed, 05 May 2021 15:23:02 +0100,
+>> Zenghui Yu <yuzenghui@huawei.com> wrote:
+>>>
+>>> Hi Marc,
+>>>
+>>> On 2020/11/3 0:40, Marc Zyngier wrote:
+>>>> In an effort to remove the vcpu PC manipulations from EL1 on nVHE
+>>>> systems, move kvm_skip_instr() to be HYP-specific. EL1's intent
+>>>> to increment PC post emulation is now signalled via a flag in the
+>>>> vcpu structure.
+>>>>
+>>>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>>>
+>>> [...]
+>>>
+>>>> @@ -133,6 +134,8 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+>>>>  	__load_guest_stage2(vcpu->arch.hw_mmu);
+>>>>  	__activate_traps(vcpu);
+>>>> +	__adjust_pc(vcpu);
+>>>
+>>> If the INCREMENT_PC flag was set (e.g., for WFx emulation) while we're
+>>> handling PSCI CPU_ON call targetting this VCPU, the *target_pc* (aka
+>>> entry point address, normally provided by the primary VCPU) will be
+>>> unexpectedly incremented here. That's pretty bad, I think.
+>>
+>> How can you online a CPU using PSCI if that CPU is currently spinning
+>> on a WFI? Or is that we have transitioned via userspace to perform the
+>> vcpu reset? I can imagine it happening in that case.
 
-Please do.  The more we can cut down on different memory types, the
-better.
+I hadn't tried to reset VCPU from userspace. That would be a much easier
+way to reproduce this problem.
+
+>>> This was noticed with a latest guest kernel, at least with commit
+>>> dccc9da22ded ("arm64: Improve parking of stopped CPUs"), which put the
+>>> stopped VCPUs in the WFx loop. The guest kernel shouted at me that
+>>>
+>>> 	"CPU: CPUs started in inconsistent modes"
+>>
+>> Ah, the perks of running guests with "quiet"... Well caught.
+>>
+>>> *after* rebooting. The problem is that the secondary entry point was
+>>> corrupted by KVM as explained above. All of the secondary processors
+>>> started from set_cpu_boot_mode_flag(), with w0=0. Oh well...
+>>>
+>>> I write the below diff and guess it will help. But I have to look at all
+>>> other places where we adjust PC directly to make a right fix. Please let
+>>> me know what do you think.
+>>>
+>>>
+>>> Thanks,
+>>> Zenghui
+>>>
+>>> ---->8----
+>>> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+>>> index 956cdc240148..ed647eb387c3 100644
+>>> --- a/arch/arm64/kvm/reset.c
+>>> +++ b/arch/arm64/kvm/reset.c
+>>> @@ -265,7 +265,12 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+>>>  		if (vcpu->arch.reset_state.be)
+>>>  			kvm_vcpu_set_be(vcpu);
+>>>
+>>> +		/*
+>>> +		 * Don't bother with the KVM_ARM64_INCREMENT_PC flag while
+>>> +		 * using this version of __adjust_pc().
+>>> +		 */
+>>>  		*vcpu_pc(vcpu) = target_pc;
+>>> +		vcpu->arch.flags &= ~KVM_ARM64_INCREMENT_PC;
+> 
+> Actually, this is far worse than it looks, and this only papers over
+> one particular symptom. We need to resolve all pending PC updates
+> *before* returning to userspace, or things like live migration can
+> observe an inconsistent state.
+
+Ah yeah, agreed.
+
+Apart from the PC manipulation, I noticed that when handling the user
+GET_VCPU_EVENTS request:
+
+|	/*
+|	 * We never return a pending ext_dabt here because we deliver it to
+|	 * the virtual CPU directly when setting the event and it's no longer
+|	 * 'pending' at this point.
+|	 */
+
+Which isn't true anymore now that we defer the exception injection right
+before the VCPU entry. The comment needs to be updated anyway whilst it
+isn't clear to me that whether we should expose the in-kernel ext_dabt
+to userspace, given that the exception state is already reflected by the
+registers and the abort can be taken in the next VCPU entry (if we can
+appropriately fix the PC updating problem).
+
+> I'll try and cook something up.
+
+Thanks.
+
+
+Zenghui
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
