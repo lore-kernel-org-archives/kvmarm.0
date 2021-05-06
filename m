@@ -3,53 +3,55 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DED3C433ED
-	for <kvmarm@archiver.kernel.org>; Thu,  6 May 2021 16:54:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C62BC433ED
+	for <kvmarm@archiver.kernel.org>; Thu,  6 May 2021 16:54:44 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B8C56611AE
-	for <kvmarm@archiver.kernel.org>; Thu,  6 May 2021 16:54:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8C56611AE
+	by mail.kernel.org (Postfix) with ESMTP id 59F7D6121F
+	for <kvmarm@archiver.kernel.org>; Thu,  6 May 2021 16:54:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59F7D6121F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F3CDA4B0B1;
-	Thu,  6 May 2021 12:54:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F19064B464;
+	Thu,  6 May 2021 12:54:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ycFVS6Y+hkf5; Thu,  6 May 2021 12:54:35 -0400 (EDT)
+	with ESMTP id UDUY21+mxwnw; Thu,  6 May 2021 12:54:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C2F824B468;
-	Thu,  6 May 2021 12:54:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E2A564B49B;
+	Thu,  6 May 2021 12:54:41 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C68C14B462
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 May 2021 12:54:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 664A64B464
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 May 2021 12:54:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id c7rjarv7DGkT for <kvmarm@lists.cs.columbia.edu>;
- Thu,  6 May 2021 12:54:32 -0400 (EDT)
+ with ESMTP id ENA2REBs6MMA for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  6 May 2021 12:54:39 -0400 (EDT)
 Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id ACCF14B0B1
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 May 2021 12:54:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 316F64B462
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 May 2021 12:54:39 -0400 (EDT)
 Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.60])
- by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4FbfjV3ckdzqSVg;
- Fri,  7 May 2021 00:51:10 +0800 (CST)
+ by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4FbfkT4f4Vz1BHvj;
+ Fri,  7 May 2021 00:52:01 +0800 (CST)
 Received: from A2006125610.china.huawei.com (10.47.85.115) by
  DGGEMS410-HUB.china.huawei.com (10.3.19.210) with Microsoft SMTP Server id
- 14.3.498.0; Fri, 7 May 2021 00:54:16 +0800
+ 14.3.498.0; Fri, 7 May 2021 00:54:27 +0800
 From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 To: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.cs.columbia.edu>,
  <linux-kernel@vger.kernel.org>
-Subject: [RFC PATCH 0/3] kvm/arm: New VMID allocator based on asid(2nd
- approach) 
-Date: Thu, 6 May 2021 17:52:29 +0100
-Message-ID: <20210506165232.1969-1-shameerali.kolothum.thodi@huawei.com>
+Subject: [RFC PATCH 1/3] arch/arm64: Introduce a capability to tell whether
+ 16-bit VMID is available
+Date: Thu, 6 May 2021 17:52:30 +0100
+Message-ID: <20210506165232.1969-2-shameerali.kolothum.thodi@huawei.com>
 X-Mailer: git-send-email 2.12.0.windows.1
+In-Reply-To: <20210506165232.1969-1-shameerali.kolothum.thodi@huawei.com>
+References: <20210506165232.1969-1-shameerali.kolothum.thodi@huawei.com>
 MIME-Version: 1.0
 X-Originating-IP: [10.47.85.115]
 X-CFilter-Loop: Reflected
@@ -71,71 +73,76 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This is based on a suggestion from Will [0] to try out the asid
-based kvm vmid solution as a separate VMID allocator instead of
-the shared lib approach attempted in v4[1].
+From: Julien Grall <julien.grall@arm.com>
 
-The idea is to compare both the approaches and see whether the
-shared lib solution with callbacks make sense or not. 
+At the moment, the function kvm_get_vmid_bits() is looking up for the
+sanitized value of ID_AA64MMFR1_EL1 and extract the information
+regarding the number of VMID bits supported.
 
-Though we are not yet using the pinned vmids yet, patch #2 has
-code for pinned vmid support. This is just to help the comparison.
+This is fine as the function is mainly used during VMID roll-over. New
+use in a follow-up patch will require the function to be called a every
+context switch so we want the function to be more efficient.
 
-Test Setup/Results
-----------------
-The measurement was made with maxcpus set to 8 and with the
-number of VMID limited to 4-bit. The test involves running
-concurrently 40 guests with 2 vCPUs. Each guest will then
-execute hackbench 5 times before exiting.
+A new capability is introduced to tell whether 16-bit VMID is
+available.
 
-The performance difference between the current algo and the
-new one are(avg. of 10 runs):
-    - 1.9% less entry/exit from the guest
-    - 0.5% faster
-This is more or less comparable to v4 numbers.
+Signed-off-by: Julien Grall <julien.grall@arm.com>
+Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+---
+ arch/arm64/include/asm/cpucaps.h | 3 ++-
+ arch/arm64/include/asm/kvm_mmu.h | 4 +---
+ arch/arm64/kernel/cpufeature.c   | 9 +++++++++
+ 3 files changed, 12 insertions(+), 4 deletions(-)
 
-For the complete series, please see,
-https://github.com/hisilicon/kernel-dev/tree/private-v5.12-rc7-vmid-2nd-rfc
-
-and for the shared asid lib v4 solution,
-https://github.com/hisilicon/kernel-dev/tree/private-v5.12-rc7-asid-v4
-
-As you can see there are of course code duplication with this
-approach but may be this one is more easy to maintain considering
-the complexity involved.
-
-Please take a look and let me know your feedback.
-
-Thanks,
-Shameer
-
-
-[0] https://lore.kernel.org/lkml/20210422160846.GB2214@willie-the-truck/
-[1] https://lore.kernel.org/lkml/20210414112312.13704-1-shameerali.kolothum.thodi@huawei.com/
-
-Julien Grall (2):
-  arch/arm64: Introduce a capability to tell whether 16-bit VMID is
-    available
-  kvm/arm: Align the VMID allocation with the arm64 ASID one
-
-Shameer Kolothum (1):
-  kvm/arm: Introduce a new vmid allocator for KVM
-
- arch/arm64/include/asm/cpucaps.h   |   3 +-
- arch/arm64/include/asm/kvm_asm.h   |   4 +-
- arch/arm64/include/asm/kvm_host.h  |  11 +-
- arch/arm64/include/asm/kvm_mmu.h   |   7 +-
- arch/arm64/kernel/cpufeature.c     |   9 +
- arch/arm64/kvm/Makefile            |   2 +-
- arch/arm64/kvm/arm.c               | 115 ++++--------
- arch/arm64/kvm/hyp/nvhe/hyp-main.c |   6 +-
- arch/arm64/kvm/hyp/nvhe/tlb.c      |  10 +-
- arch/arm64/kvm/hyp/vhe/tlb.c       |  10 +-
- arch/arm64/kvm/mmu.c               |   1 -
- arch/arm64/kvm/vmid.c              | 285 +++++++++++++++++++++++++++++
- 12 files changed, 354 insertions(+), 109 deletions(-)
- create mode 100644 arch/arm64/kvm/vmid.c
-
+diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
+index c40f2490cd7b..acb92da5c254 100644
+--- a/arch/arm64/include/asm/cpucaps.h
++++ b/arch/arm64/include/asm/cpucaps.h
+@@ -67,7 +67,8 @@
+ #define ARM64_HAS_LDAPR				59
+ #define ARM64_KVM_PROTECTED_MODE		60
+ #define ARM64_WORKAROUND_NVIDIA_CARMEL_CNP	61
++#define ARM64_HAS_16BIT_VMID			62
+ 
+-#define ARM64_NCAPS				62
++#define ARM64_NCAPS				63
+ 
+ #endif /* __ASM_CPUCAPS_H */
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 90873851f677..c3080966ef83 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -213,9 +213,7 @@ void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled);
+ 
+ static inline unsigned int kvm_get_vmid_bits(void)
+ {
+-	int reg = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
+-
+-	return get_vmid_bits(reg);
++	return cpus_have_const_cap(ARM64_HAS_16BIT_VMID) ? 16 : 8;
+ }
+ 
+ /*
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index e5281e1c8f1d..ff956fb2f712 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -2203,6 +2203,15 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.matches = has_cpuid_feature,
+ 		.min_field_value = 1,
+ 	},
++	{
++		.capability = ARM64_HAS_16BIT_VMID,
++		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
++		.sys_reg = SYS_ID_AA64MMFR1_EL1,
++		.field_pos = ID_AA64MMFR1_VMIDBITS_SHIFT,
++		.sign = FTR_UNSIGNED,
++		.min_field_value = ID_AA64MMFR1_VMIDBITS_16,
++		.matches = has_cpuid_feature,
++	},
+ 	{},
+ };
+ 
 -- 
 2.17.1
 
