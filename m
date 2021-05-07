@@ -7,66 +7,67 @@ X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BE5EC433ED
-	for <kvmarm@archiver.kernel.org>; Fri,  7 May 2021 06:41:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D280AC433ED
+	for <kvmarm@archiver.kernel.org>; Fri,  7 May 2021 06:41:09 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B3B6F613C8
-	for <kvmarm@archiver.kernel.org>; Fri,  7 May 2021 06:41:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3B6F613C8
+	by mail.kernel.org (Postfix) with ESMTP id 6745B613EA
+	for <kvmarm@archiver.kernel.org>; Fri,  7 May 2021 06:41:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6745B613EA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EDFC4B314;
-	Fri,  7 May 2021 02:41:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 081464B2C4;
+	Fri,  7 May 2021 02:41:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id YfcC3HZk0Z6R; Fri,  7 May 2021 02:41:03 -0400 (EDT)
+	with ESMTP id OgZZc5P4vqzp; Fri,  7 May 2021 02:41:07 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9AC024B54C;
-	Fri,  7 May 2021 02:41:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BBDD94B41E;
+	Fri,  7 May 2021 02:41:07 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A13D44B47E
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 May 2021 02:41:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 951834B2C4
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 May 2021 02:41:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XyOJmVBGABpy for <kvmarm@lists.cs.columbia.edu>;
- Fri,  7 May 2021 02:41:00 -0400 (EDT)
+ with ESMTP id IZxiZHzDH429 for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  7 May 2021 02:41:05 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CD9614B2FA
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 May 2021 02:41:00 -0400 (EDT)
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 97BB84B449
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 May 2021 02:41:05 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1620369660;
+ s=mimecast20190719; t=1620369665;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=M8lFeeN8be7qhuOQQpXtHcaLdac3IpsizI/USRchIjU=;
- b=SRLL8xXb9na4hLcwmpXb6Cn5y1P0R+MLljmEJpGDfzFc1WuQeK8TyIMyVzJClq/pjrdGPo
- 7A5vsDfgZ1hPttPhA/qaLXncy/adIAF7CCV38iXo3npo85AwE21g7c2unjbekmgmCjqvQf
- 8gAb+8hmqq/QdIDnZrWW6ko/EZk+5n0=
+ bh=+/kypSFyh68OU3NA0OrwsIJ3llWio/dSx/GY0edISXo=;
+ b=WITDsbr5Ge8nO6Wt/V6u/6FW9cbZxrqnmnp0/+VnD13F3LYHjvYFjEIuN87ntM0ZD7jNge
+ t71WXi3LTI+GXJ9UBwhDKGizO0MpmMtCysclr6fQaAkE+pqWwAmVusOXEWgkUz98p+V4tB
+ ftZ0YN14+F1KXcfxuESE04jky5XTMak=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-482-L3HFR7wINaeUNi4LrcfFOg-1; Fri, 07 May 2021 02:40:59 -0400
-X-MC-Unique: L3HFR7wINaeUNi4LrcfFOg-1
+ us-mta-513-KIpUE33aO7-J4lw9kAVjnw-1; Fri, 07 May 2021 02:41:03 -0400
+X-MC-Unique: KIpUE33aO7-J4lw9kAVjnw-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C139C80059E;
- Fri,  7 May 2021 06:40:57 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C0666802938;
+ Fri,  7 May 2021 06:41:01 +0000 (UTC)
 Received: from gshan.redhat.com (vpn2-54-42.bne.redhat.com [10.64.54.42])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9EC065C276;
- Fri,  7 May 2021 06:40:54 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5D3765C276;
+ Fri,  7 May 2021 06:40:58 +0000 (UTC)
 From: Gavin Shan <gshan@redhat.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v3 01/15] KVM: async_pf: Move struct kvm_async_pf around
-Date: Fri,  7 May 2021 16:40:39 +0800
-Message-Id: <20210507084053.44407-2-gshan@redhat.com>
+Subject: [PATCH v3 02/15] KVM: async_pf: Add helper function to check
+ completion queue
+Date: Fri,  7 May 2021 16:40:40 +0800
+Message-Id: <20210507084053.44407-3-gshan@redhat.com>
 In-Reply-To: <20210507084053.44407-1-gshan@redhat.com>
 References: <20210507084053.44407-1-gshan@redhat.com>
 MIME-Version: 1.0
@@ -84,60 +85,136 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-VGhpcyBtb3ZlcyB0aGUgZGVmaW5pdGlvbnMgb2YgInN0cnVjdCBrdm1fYXN5bmNfcGYiIGFuZCB0
-aGUgcmVsYXRlZApmdW5jdGlvbnMgYWZ0ZXIgInN0cnVjdCBrdm1fdmNwdSIgc28gdGhhdCBuZXds
-eSBhZGRlZCBpbmxpbmUgZnVuY3Rpb25zCmluIHRoZSBzdWJzZXF1ZW50IHBhdGNoZXMgY2FuIGRl
-cmVmZXJlbmNlICJzdHJ1Y3Qga3ZtX3ZjcHUiIHByb3Blcmx5LgpPdGhlcndpc2UsIHRoZSB1bmV4
-cGVjdGVkIGJ1aWxkIGVycm9yIHdpbGwgYmUgcmFpc2VkOgoKICAgZXJyb3I6IGRlcmVmZXJlbmNp
-bmcgcG9pbnRlciB0byBpbmNvbXBsZXRlIHR5cGUg4oCYc3RydWN0IGt2bV92Y3B14oCZCiAgIHJl
-dHVybiAhbGlzdF9lbXB0eV9jYXJlZnVsKCZ2Y3B1LT5hc3luY19wZi5kb25lKTsKICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICBefgoKU29tZSBjbGVhbnVwcyBhcmUgYWxzbyBhcHBs
-aWVkIHNpbmNlIHdlJ3JlIGhlcmU6CgogICAqIFRoZSBzZXBhdG9yIGJldHdlZW4gdHlwZSBhbmQg
-ZmllbGQgaXMgcmVwbGFjZWQgYnkgdGFiIGZvciAic3RydWN0CiAgICAga3ZtX2FzeW5jX3BmIi4K
-CiAgICogQWRkZWQgc3R1YiBrdm1fY2hlY2tfYXN5bmNfcGZfY29tcGxldGlvbigpIHdoZW4gQ09O
-RklHX0tWTV9BU1lNQ19QRgogICAgIGlzIGRpc2FibGVkLgoKU2lnbmVkLW9mZi1ieTogR2F2aW4g
-U2hhbiA8Z3NoYW5AcmVkaGF0LmNvbT4KLS0tCiBpbmNsdWRlL2xpbnV4L2t2bV9ob3N0LmggfCA0
-NCArKysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0tLS0tLS0tCiAxIGZpbGUgY2hhbmdl
-ZCwgMjMgaW5zZXJ0aW9ucygrKSwgMjEgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvaW5jbHVk
-ZS9saW51eC9rdm1faG9zdC5oIGIvaW5jbHVkZS9saW51eC9rdm1faG9zdC5oCmluZGV4IDg4OTVi
-OTViNmEyMi4uZDU0YWRiYTZlYmY3IDEwMDY0NAotLS0gYS9pbmNsdWRlL2xpbnV4L2t2bV9ob3N0
-LmgKKysrIGIvaW5jbHVkZS9saW51eC9rdm1faG9zdC5oCkBAIC0xOTcsMjcgKzE5Nyw2IEBAIGlu
-dCBrdm1faW9fYnVzX3VucmVnaXN0ZXJfZGV2KHN0cnVjdCBrdm0gKmt2bSwgZW51bSBrdm1fYnVz
-IGJ1c19pZHgsCiBzdHJ1Y3Qga3ZtX2lvX2RldmljZSAqa3ZtX2lvX2J1c19nZXRfZGV2KHN0cnVj
-dCBrdm0gKmt2bSwgZW51bSBrdm1fYnVzIGJ1c19pZHgsCiAJCQkJCSBncGFfdCBhZGRyKTsKIAot
-I2lmZGVmIENPTkZJR19LVk1fQVNZTkNfUEYKLXN0cnVjdCBrdm1fYXN5bmNfcGYgewotCXN0cnVj
-dCB3b3JrX3N0cnVjdCB3b3JrOwotCXN0cnVjdCBsaXN0X2hlYWQgbGluazsKLQlzdHJ1Y3QgbGlz
-dF9oZWFkIHF1ZXVlOwotCXN0cnVjdCBrdm1fdmNwdSAqdmNwdTsKLQlzdHJ1Y3QgbW1fc3RydWN0
-ICptbTsKLQlncGFfdCBjcjJfb3JfZ3BhOwotCXVuc2lnbmVkIGxvbmcgYWRkcjsKLQlzdHJ1Y3Qg
-a3ZtX2FyY2hfYXN5bmNfcGYgYXJjaDsKLQlib29sICAgd2FrZXVwX2FsbDsKLQlib29sIG5vdHBy
-ZXNlbnRfaW5qZWN0ZWQ7Ci19OwotCi12b2lkIGt2bV9jbGVhcl9hc3luY19wZl9jb21wbGV0aW9u
-X3F1ZXVlKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSk7Ci12b2lkIGt2bV9jaGVja19hc3luY19wZl9j
-b21wbGV0aW9uKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSk7Ci1ib29sIGt2bV9zZXR1cF9hc3luY19w
-ZihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIGdwYV90IGNyMl9vcl9ncGEsCi0JCQl1bnNpZ25lZCBs
-b25nIGh2YSwgc3RydWN0IGt2bV9hcmNoX2FzeW5jX3BmICphcmNoKTsKLWludCBrdm1fYXN5bmNf
-cGZfd2FrZXVwX2FsbChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpOwotI2VuZGlmCi0KICNpZmRlZiBL
-Vk1fQVJDSF9XQU5UX01NVV9OT1RJRklFUgogc3RydWN0IGt2bV9nZm5fcmFuZ2UgewogCXN0cnVj
-dCBrdm1fbWVtb3J5X3Nsb3QgKnNsb3Q7CkBAIC0zMzgsNiArMzE3LDI5IEBAIHN0cnVjdCBrdm1f
-dmNwdSB7CiAJc3RydWN0IGt2bV9kaXJ0eV9yaW5nIGRpcnR5X3Jpbmc7CiB9OwogCisjaWZkZWYg
-Q09ORklHX0tWTV9BU1lOQ19QRgorc3RydWN0IGt2bV9hc3luY19wZiB7CisJc3RydWN0IHdvcmtf
-c3RydWN0CQl3b3JrOworCXN0cnVjdCBsaXN0X2hlYWQJCWxpbms7CisJc3RydWN0IGxpc3RfaGVh
-ZAkJcXVldWU7CisJc3RydWN0IGt2bV92Y3B1CQkJKnZjcHU7CisJc3RydWN0IG1tX3N0cnVjdAkJ
-Km1tOworCWdwYV90CQkJCWNyMl9vcl9ncGE7CisJdW5zaWduZWQgbG9uZwkJCWFkZHI7CisJc3Ry
-dWN0IGt2bV9hcmNoX2FzeW5jX3BmCWFyY2g7CisJYm9vbAkJCQl3YWtldXBfYWxsOworCWJvb2wJ
-CQkJbm90cHJlc2VudF9pbmplY3RlZDsKK307CisKK3ZvaWQga3ZtX2NsZWFyX2FzeW5jX3BmX2Nv
-bXBsZXRpb25fcXVldWUoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KTsKK3ZvaWQga3ZtX2NoZWNrX2Fz
-eW5jX3BmX2NvbXBsZXRpb24oc3RydWN0IGt2bV92Y3B1ICp2Y3B1KTsKK2Jvb2wga3ZtX3NldHVw
-X2FzeW5jX3BmKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgZ3BhX3QgY3IyX29yX2dwYSwKKwkJCXVu
-c2lnbmVkIGxvbmcgaHZhLCBzdHJ1Y3Qga3ZtX2FyY2hfYXN5bmNfcGYgKmFyY2gpOworaW50IGt2
-bV9hc3luY19wZl93YWtldXBfYWxsKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSk7CisjZWxzZQorc3Rh
-dGljIGlubGluZSB2b2lkIGt2bV9jaGVja19hc3luY19wZl9jb21wbGV0aW9uKHN0cnVjdCBrdm1f
-dmNwdSAqdmNwdSkgeyB9CisjZW5kaWYKKwogc3RhdGljIGlubGluZSBpbnQga3ZtX3ZjcHVfZXhp
-dGluZ19ndWVzdF9tb2RlKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKIHsKIAkvKgotLSAKMi4yMy4w
-CgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0g
-bWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5j
-cy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+This adds inline function kvm_check_async_pf_completion_queue() to
+check if there are pending completion in the queue. The empty stub
+is also added on !CONFIG_KVM_ASYNC_PF so that the caller needn't
+consider if CONFIG_KVM_ASYNC_PF is enabled.
+
+All checks on the completion queue is done by the newly added inline
+function since list_empty() and list_empty_careful() are interchangeable.
+
+Signed-off-by: Gavin Shan <gshan@redhat.com>
+---
+ arch/x86/kvm/x86.c       |  2 +-
+ include/linux/kvm_host.h | 10 ++++++++++
+ virt/kvm/async_pf.c      | 10 +++++-----
+ virt/kvm/kvm_main.c      |  4 +---
+ 4 files changed, 17 insertions(+), 9 deletions(-)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index cebdaa1e3cf5..300661dc6ca4 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -11075,7 +11075,7 @@ static inline bool kvm_guest_apic_has_interrupt(struct kvm_vcpu *vcpu)
+ 
+ static inline bool kvm_vcpu_has_events(struct kvm_vcpu *vcpu)
+ {
+-	if (!list_empty_careful(&vcpu->async_pf.done))
++	if (kvm_check_async_pf_completion_queue(vcpu))
+ 		return true;
+ 
+ 	if (kvm_apic_has_events(vcpu))
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index d54adba6ebf7..00811de013d0 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -331,12 +331,22 @@ struct kvm_async_pf {
+ 	bool				notpresent_injected;
+ };
+ 
++static inline bool kvm_check_async_pf_completion_queue(struct kvm_vcpu *vcpu)
++{
++	return !list_empty_careful(&vcpu->async_pf.done);
++}
++
+ void kvm_clear_async_pf_completion_queue(struct kvm_vcpu *vcpu);
+ void kvm_check_async_pf_completion(struct kvm_vcpu *vcpu);
+ bool kvm_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+ 			unsigned long hva, struct kvm_arch_async_pf *arch);
+ int kvm_async_pf_wakeup_all(struct kvm_vcpu *vcpu);
+ #else
++static inline bool kvm_check_async_pf_completion_queue(struct kvm_vcpu *vcpu)
++{
++	return false;
++}
++
+ static inline void kvm_check_async_pf_completion(struct kvm_vcpu *vcpu) { }
+ #endif
+ 
+diff --git a/virt/kvm/async_pf.c b/virt/kvm/async_pf.c
+index dd777688d14a..d145a61a046a 100644
+--- a/virt/kvm/async_pf.c
++++ b/virt/kvm/async_pf.c
+@@ -70,7 +70,7 @@ static void async_pf_execute(struct work_struct *work)
+ 		kvm_arch_async_page_present(vcpu, apf);
+ 
+ 	spin_lock(&vcpu->async_pf.lock);
+-	first = list_empty(&vcpu->async_pf.done);
++	first = !kvm_check_async_pf_completion_queue(vcpu);
+ 	list_add_tail(&apf->link, &vcpu->async_pf.done);
+ 	apf->vcpu = NULL;
+ 	spin_unlock(&vcpu->async_pf.lock);
+@@ -122,7 +122,7 @@ void kvm_clear_async_pf_completion_queue(struct kvm_vcpu *vcpu)
+ 		spin_lock(&vcpu->async_pf.lock);
+ 	}
+ 
+-	while (!list_empty(&vcpu->async_pf.done)) {
++	while (kvm_check_async_pf_completion_queue(vcpu)) {
+ 		struct kvm_async_pf *work =
+ 			list_first_entry(&vcpu->async_pf.done,
+ 					 typeof(*work), link);
+@@ -138,7 +138,7 @@ void kvm_check_async_pf_completion(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_async_pf *work;
+ 
+-	while (!list_empty_careful(&vcpu->async_pf.done) &&
++	while (kvm_check_async_pf_completion_queue(vcpu) &&
+ 	      kvm_arch_can_dequeue_async_page_present(vcpu)) {
+ 		spin_lock(&vcpu->async_pf.lock);
+ 		work = list_first_entry(&vcpu->async_pf.done, typeof(*work),
+@@ -205,7 +205,7 @@ int kvm_async_pf_wakeup_all(struct kvm_vcpu *vcpu)
+ 	struct kvm_async_pf *work;
+ 	bool first;
+ 
+-	if (!list_empty_careful(&vcpu->async_pf.done))
++	if (kvm_check_async_pf_completion_queue(vcpu))
+ 		return 0;
+ 
+ 	work = kmem_cache_zalloc(async_pf_cache, GFP_ATOMIC);
+@@ -216,7 +216,7 @@ int kvm_async_pf_wakeup_all(struct kvm_vcpu *vcpu)
+ 	INIT_LIST_HEAD(&work->queue); /* for list_del to work */
+ 
+ 	spin_lock(&vcpu->async_pf.lock);
+-	first = list_empty(&vcpu->async_pf.done);
++	first = !kvm_check_async_pf_completion_queue(vcpu);
+ 	list_add_tail(&work->link, &vcpu->async_pf.done);
+ 	spin_unlock(&vcpu->async_pf.lock);
+ 
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 2799c6660cce..d3a473f9811f 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -3129,10 +3129,8 @@ static bool vcpu_dy_runnable(struct kvm_vcpu *vcpu)
+ 	if (kvm_arch_dy_runnable(vcpu))
+ 		return true;
+ 
+-#ifdef CONFIG_KVM_ASYNC_PF
+-	if (!list_empty_careful(&vcpu->async_pf.done))
++	if (kvm_check_async_pf_completion_queue(vcpu))
+ 		return true;
+-#endif
+ 
+ 	return false;
+ }
+-- 
+2.23.0
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
