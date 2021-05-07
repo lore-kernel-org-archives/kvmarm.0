@@ -4,69 +4,69 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E435CC433B4
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E903AC43461
 	for <kvmarm@archiver.kernel.org>; Fri,  7 May 2021 06:32:08 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6A5B5613EA
+	by mail.kernel.org (Postfix) with ESMTP id 88D3E61154
 	for <kvmarm@archiver.kernel.org>; Fri,  7 May 2021 06:32:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A5B5613EA
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88D3E61154
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D6BD4B560;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 27B884B352;
 	Fri,  7 May 2021 02:32:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Y3a6voOsoNWb; Fri,  7 May 2021 02:32:05 -0400 (EDT)
+	with ESMTP id PO7velbfcQxD; Fri,  7 May 2021 02:32:07 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8AA7D4B56B;
-	Fri,  7 May 2021 02:32:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AEB8D4B58A;
+	Fri,  7 May 2021 02:32:06 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C17BB4B226
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 May 2021 02:32:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 16DB94B226
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 May 2021 02:32:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id R30ldWw1Qr-F for <kvmarm@lists.cs.columbia.edu>;
- Fri,  7 May 2021 02:32:02 -0400 (EDT)
+ with ESMTP id OdaIrU+YvWjn for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  7 May 2021 02:32:05 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D7D074B47E
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 May 2021 02:32:02 -0400 (EDT)
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DD4F4B47E
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 May 2021 02:32:05 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1620369122;
+ s=mimecast20190719; t=1620369125;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=iEhGG0hnD1JDiId4QQ1JcUjDqHGQb063cTr4+JPyYkw=;
- b=SDevcuVoof98Dhyk1rhW+/Rw7SUHrrF9zq3trWG1b0OmjSFI4Ya60P+7OSh52Z309sxiDp
- O/idiJlyGc+/95rgDTX93/V+lakcyLEN8+o3D0NguDe5gRZk0iY2YEnnr0dRtqRx+orXps
- B0O/IjHIcJesWl5ThNt7pQ9TG8Ddnr8=
+ bh=ldlsga8V9dOzPgtPoG7CPrhnt51NwBQ9YbIGxIArL70=;
+ b=am+LOOusTJIkuFQskb5XsK4XiP5VwRnYWaX5OIdARvqajgTOJt35/2FJ0+FA4+BcKg53vF
+ 8y5vw0ZQUanvaoIZSAZ+Mj2mewRB6Qe1WYMyN7RmBxiqdyHxQHiRALdBn1IxpR1G4E2cq5
+ 0PzNJS62OlrRtsMICuRwtkDLeSYTdzg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-400-FH-UJpiWNkKO64_Kj5iR5Q-1; Fri, 07 May 2021 02:31:59 -0400
-X-MC-Unique: FH-UJpiWNkKO64_Kj5iR5Q-1
+ us-mta-7-Qv_UIs2_O7m3exIR1sjsbA-1; Fri, 07 May 2021 02:32:03 -0400
+X-MC-Unique: Qv_UIs2_O7m3exIR1sjsbA-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1134E1006C81;
- Fri,  7 May 2021 06:31:58 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B3EDF803622;
+ Fri,  7 May 2021 06:32:01 +0000 (UTC)
 Received: from gshan.redhat.com (vpn2-54-42.bne.redhat.com [10.64.54.42])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 908D25D9CA;
- Fri,  7 May 2021 06:31:55 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9C19A5D9CA;
+ Fri,  7 May 2021 06:31:58 +0000 (UTC)
 From: Gavin Shan <gshan@redhat.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v3 07/21] KVM: arm64: Support SDEI_EVENT_UNREGISTER hypercall
-Date: Fri,  7 May 2021 16:31:10 +0800
-Message-Id: <20210507083124.43347-8-gshan@redhat.com>
+Subject: [PATCH v3 08/21] KVM: arm64: Support SDEI_EVENT_STATUS hypercall
+Date: Fri,  7 May 2021 16:31:11 +0800
+Message-Id: <20210507083124.43347-9-gshan@redhat.com>
 In-Reply-To: <20210507083124.43347-1-gshan@redhat.com>
 References: <20210507083124.43347-1-gshan@redhat.com>
 MIME-Version: 1.0
@@ -89,26 +89,24 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This supports SDEI_EVENT_UNREGISTER hypercall. It's used by the
-guest to unregister SDEI event. The SDEI event won't be raised to
-the guest or specific vCPU after it's unregistered successfully.
-It's notable the SDEI event is disabled automatically on the guest
-or specific vCPU once it's unregistered successfully.
+This supports SDEI_EVENT_STATUS hypercall. It's used by the guest
+to retrieve a bitmap to indicate the SDEI event states, including
+registration, enablement and delivery state.
 
 Signed-off-by: Gavin Shan <gshan@redhat.com>
 ---
- arch/arm64/kvm/sdei.c | 61 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 61 insertions(+)
+ arch/arm64/kvm/sdei.c | 50 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 50 insertions(+)
 
 diff --git a/arch/arm64/kvm/sdei.c b/arch/arm64/kvm/sdei.c
-index b4162efda470..a3ba69dc91cb 100644
+index a3ba69dc91cb..b95b8c4455e1 100644
 --- a/arch/arm64/kvm/sdei.c
 +++ b/arch/arm64/kvm/sdei.c
-@@ -308,6 +308,65 @@ static unsigned long kvm_sdei_hypercall_context(struct kvm_vcpu *vcpu)
+@@ -367,6 +367,54 @@ static unsigned long kvm_sdei_hypercall_unregister(struct kvm_vcpu *vcpu)
  	return ret;
  }
  
-+static unsigned long kvm_sdei_hypercall_unregister(struct kvm_vcpu *vcpu)
++static unsigned long kvm_sdei_hypercall_status(struct kvm_vcpu *vcpu)
 +{
 +	struct kvm *kvm = vcpu->kvm;
 +	struct kvm_sdei_kvm *ksdei = kvm->arch.sdei;
@@ -130,36 +128,25 @@ index b4162efda470..a3ba69dc91cb 100644
 +		goto out;
 +	}
 +
-+	/* Check if the KVM event exists */
++	/*
++	 * Check if the KVM event exists. None of the flags
++	 * will be set if it doesn't exist.
++	 */
 +	spin_lock(&ksdei->lock);
 +	kske = kvm_sdei_find_kvm_event(kvm, event_num);
 +	if (!kske) {
-+		ret = SDEI_INVALID_PARAMETERS;
++		ret = 0;
 +		goto unlock;
 +	}
 +
-+	/* Check if there is pending events */
-+	if (kske->state.refcount) {
-+		ret = SDEI_PENDING;
-+		goto unlock;
-+	}
-+
-+	/* Check if it has been registered */
-+	kse = kske->kse;
 +	index = (kse->state.type == SDEI_EVENT_TYPE_PRIVATE) ?
 +		vcpu->vcpu_idx : 0;
-+	if (!kvm_sdei_is_registered(kske, index)) {
-+		ret = SDEI_DENIED;
-+		goto unlock;
-+	}
-+
-+	/* The event is disabled when it's unregistered */
-+	kvm_sdei_clear_enabled(kske, index);
-+	kvm_sdei_clear_registered(kske, index);
-+	if (kvm_sdei_empty_registered(kske)) {
-+		list_del(&kske->link);
-+		kfree(kske);
-+	}
++	if (kvm_sdei_is_registered(kske, index))
++		ret |= (1UL << SDEI_EVENT_STATUS_REGISTERED);
++	if (kvm_sdei_is_enabled(kske, index))
++		ret |= (1UL << SDEI_EVENT_STATUS_ENABLED);
++	if (kske->state.refcount)
++		ret |= (1UL << SDEI_EVENT_STATUS_RUNNING);
 +
 +unlock:
 +	spin_unlock(&ksdei->lock);
@@ -170,15 +157,15 @@ index b4162efda470..a3ba69dc91cb 100644
  int kvm_sdei_hypercall(struct kvm_vcpu *vcpu)
  {
  	u32 func = smccc_get_function(vcpu);
-@@ -333,6 +392,8 @@ int kvm_sdei_hypercall(struct kvm_vcpu *vcpu)
- 	case SDEI_1_0_FN_SDEI_EVENT_COMPLETE:
- 	case SDEI_1_0_FN_SDEI_EVENT_COMPLETE_AND_RESUME:
- 	case SDEI_1_0_FN_SDEI_EVENT_UNREGISTER:
-+		ret = kvm_sdei_hypercall_unregister(vcpu);
-+		break;
+@@ -395,6 +443,8 @@ int kvm_sdei_hypercall(struct kvm_vcpu *vcpu)
+ 		ret = kvm_sdei_hypercall_unregister(vcpu);
+ 		break;
  	case SDEI_1_0_FN_SDEI_EVENT_STATUS:
++		ret = kvm_sdei_hypercall_status(vcpu);
++		break;
  	case SDEI_1_0_FN_SDEI_EVENT_GET_INFO:
  	case SDEI_1_0_FN_SDEI_EVENT_ROUTING_SET:
+ 	case SDEI_1_0_FN_SDEI_PE_MASK:
 -- 
 2.23.0
 
