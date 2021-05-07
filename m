@@ -2,73 +2,81 @@ Return-Path: <SRS0=bjrO=KC=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29148C433B4
-	for <kvmarm@archiver.kernel.org>; Fri,  7 May 2021 14:32:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02E38C433B4
+	for <kvmarm@archiver.kernel.org>; Fri,  7 May 2021 17:36:34 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6A3A7610F7
-	for <kvmarm@archiver.kernel.org>; Fri,  7 May 2021 14:32:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A3A7610F7
+	by mail.kernel.org (Postfix) with ESMTP id 311AC6145E
+	for <kvmarm@archiver.kernel.org>; Fri,  7 May 2021 17:36:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 311AC6145E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E25084B56B;
-	Fri,  7 May 2021 10:32:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 581B34B472;
+	Fri,  7 May 2021 13:36:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id cZB7DqDlUZFN; Fri,  7 May 2021 10:32:03 -0400 (EDT)
+	with ESMTP id TGxunBpo2MfQ; Fri,  7 May 2021 13:36:30 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A05AB4B519;
-	Fri,  7 May 2021 10:32:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D8DFD4B4C4;
+	Fri,  7 May 2021 13:36:30 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A9914B519
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 May 2021 10:32:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 178F74B472
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 May 2021 13:36:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5XYBJoq4FVOM for <kvmarm@lists.cs.columbia.edu>;
- Fri,  7 May 2021 10:32:00 -0400 (EDT)
+ with ESMTP id NGAvZDYVjDA0 for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  7 May 2021 13:36:28 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6E9314B518
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 May 2021 10:32:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6A4044B3F1
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 May 2021 13:36:28 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 271726101A;
- Fri,  7 May 2021 14:31:59 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id CFD91613ED;
+ Fri,  7 May 2021 17:36:26 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1lf1WG-00BTpD-Pj; Fri, 07 May 2021 15:31:57 +0100
-Date: Fri, 07 May 2021 15:31:56 +0100
-Message-ID: <877dkapqcj.wl-maz@kernel.org>
+ id 1lf4Ol-00BVKa-Qd; Fri, 07 May 2021 18:36:23 +0100
+Date: Fri, 07 May 2021 18:36:23 +0100
+Message-ID: <874kfepht4.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Ricardo Koller <ricarkol@google.com>
-Subject: Re: [PATCH v2 4/5] KVM: selftests: Add exception handling support for
- aarch64
-In-Reply-To: <YJBLFVoRmsehRJ1N@google.com>
-References: <20210430232408.2707420-1-ricarkol@google.com>
- <20210430232408.2707420-5-ricarkol@google.com>
- <87a6pcumyg.wl-maz@kernel.org> <YJBLFVoRmsehRJ1N@google.com>
+To: Zhu Lingshan <lingshan.zhu@intel.com>,
+ Shaokun Zhang <zhangshaokun@hisilicon.com>
+Subject: Re: Question on guest enable msi fail when using GICv4/4.1
+In-Reply-To: <878s4qq00u.wl-maz@kernel.org>
+References: <3a2c66d6-6ca0-8478-d24b-61e8e3241b20@hisilicon.com>
+ <87k0oaq5jf.wl-maz@kernel.org>
+ <cf870bcf-1173-a70b-2b55-4209abcbcbc3@hisilicon.com>
+ <878s4qq00u.wl-maz@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: ricarkol@google.com, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, drjones@redhat.com,
- alexandru.elisei@arm.com, eric.auger@redhat.com
+X-SA-Exim-Rcpt-To: lingshan.zhu@intel.com, zhangshaokun@hisilicon.com,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ kvm@vger.kernel.org, linux-pci@vger.kernel.org, alex.williamson@redhat.com,
+ cohuck@redhat.com, tangnianyao@huawei.com, bhelgaas@google.com,
+ eric.auger@redhat.com, jasowang@redhat.com, mst@redhat.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ linux-pci@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Bjorn Helgaas <bhelgaas@google.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -85,51 +93,114 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 03 May 2021 20:12:21 +0100,
-Ricardo Koller <ricarkol@google.com> wrote:
+On Fri, 07 May 2021 12:02:57 +0100,
+Marc Zyngier <maz@kernel.org> wrote:
 > 
-> On Mon, May 03, 2021 at 11:32:39AM +0100, Marc Zyngier wrote:
-> > On Sat, 01 May 2021 00:24:06 +0100,
-> > Ricardo Koller <ricarkol@google.com> wrote:
-
-[...]
-
-> > > +	.if \vector >= 8
-> > > +	mrs	x1, sp_el0
+> On Fri, 07 May 2021 10:58:23 +0100,
+> Shaokun Zhang <zhangshaokun@hisilicon.com> wrote:
 > > 
-> > I'm still a bit perplexed by this. SP_EL0 is never changed, since you
-> > always run in handler mode. Therefore, saving/restoring it is only
-> > overhead. If an exception handler wants to introspect it, it is
-> > already available in the relevant system register.
+> > Hi Marc,
 > > 
-> > Or did you have something else in mind for it?
+> > Thanks for your quick reply.
 > > 
+> > On 2021/5/7 17:03, Marc Zyngier wrote:
+> > > On Fri, 07 May 2021 06:57:04 +0100,
+> > > Shaokun Zhang <zhangshaokun@hisilicon.com> wrote:
+> > >>
+> > >> [This letter comes from Nianyao Tang]
+> > >>
+> > >> Hi,
+> > >>
+> > >> Using GICv4/4.1 and msi capability, guest vf driver requires 3
+> > >> vectors and enable msi, will lead to guest stuck.
+> > > 
+> > > Stuck how?
+> > 
+> > Guest serial does not response anymore and guest network shutdown.
+> > 
+> > > 
+> > >> Qemu gets number of interrupts from Multiple Message Capable field
+> > >> set by guest. This field is aligned to a power of 2(if a function
+> > >> requires 3 vectors, it initializes it to 2).
+> > > 
+> > > So I guess this is a MultiMSI device with 4 vectors, right?
+> > > 
+> > 
+> > Yes, it can support maximum of 32 msi interrupts, and vf driver only use 3 msi.
+> > 
+> > >> However, guest driver just sends 3 mapi-cmd to vits and 3 ite
+> > >> entries is recorded in host.  Vfio initializes msi interrupts using
+> > >> the number of interrupts 4 provide by qemu.  When it comes to the
+> > >> 4th msi without ite in vits, in irq_bypass_register_producer,
+> > >> producer and consumer will __connect fail, due to find_ite fail, and
+> > >> do not resume guest.
+> > > 
+> > > Let me rephrase this to check that I understand it:
+> > > - The device has 4 vectors
+> > > - The guest only create mappings for 3 of them
+> > > - VFIO calls kvm_vgic_v4_set_forwarding() for each vector
+> > > - KVM doesn't have a mapping for the 4th vector and returns an error
+> > > - VFIO disable this 4th vector
+> > > 
+> > > Is that correct? If yes, I don't understand why that impacts the guest
+> > > at all. From what I can see, vfio_msi_set_vector_signal() just prints
+> > > a message on the console and carries on.
+> > > 
+> > 
+> > function calls:
+> > --> vfio_msi_set_vector_signal
+> >    --> irq_bypass_register_producer
+> >       -->__connect
+> > 
+> > in __connect, add_producer finally calls kvm_vgic_v4_set_forwarding
+> > and fails to get the 4th mapping. When add_producer fail, it does
+> > not call cons->start, calls kvm_arch_irq_bypass_start and then
+> > kvm_arm_resume_guest.
 > 
-> Not really. The reason for saving sp_el0 in there was just for
-> consistency, so that handlers for both el0 and el1 exceptions could
-> get the sp at regs->sp.
+> [+Eric, who wrote the irq_bypass infrastructure.]
+> 
+> Ah, so the guest is actually paused, not in a livelock situation
+> (which is how I interpreted "stuck").
+> 
+> I think we should handle this case gracefully, as there should be no
+> expectation that the guest will be using this interrupt. Given that
+> VFIO seems to be pretty unfazed when a producer fails, I'm temped to
+> do the same thing and restart the guest.
+> 
+> Also, __disconnect doesn't care about errors, so why should __connect
+> have this odd behaviour?
+> 
+> Can you please try this? It is completely untested (and I think the
+> del_consumer call is odd, which is why I've also dropped it).
+> 
+> Eric, what do you think?
 
-We already have sp_el0 consistency by virtue of having it stored in in
-a sysreg.
+Adding Zhu, Jason, MST to the party. It all seems to be caused by this
+commit:
 
-> Restoring sp_el0 might be too much. So, what do you think of this
-> v3: we keep the saving of sp_el0 into regs->sp (to keep things the
-> same between el0 and el1) and delete the restoring of sp_el0?
+commit a979a6aa009f3c99689432e0cdb5402a4463fb88
+Author: Zhu Lingshan <lingshan.zhu@intel.com>
+Date:   Fri Jul 31 14:55:33 2020 +0800
 
-To me, the whole purpose of saving some some context is to allow the
-exception handling code to run C code and introspect the interrupted
-state. But saving things that are not affected by the context change
-seems a bit pointless.
+    irqbypass: do not start cons/prod when failed connect
+    
+    If failed to connect, there is no need to start consumer nor
+    producer.
+    
+    Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+    Suggested-by: Jason Wang <jasowang@redhat.com>
+    Link: https://lore.kernel.org/r/20200731065533.4144-7-lingshan.zhu@intel.com
+    Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 
-One thing I'd like to see though is to save sp_el1 as it was at the
-point of the exception (because that is meaningful to get the
-exception context -- think of an unaligned EL1 stack for example),
-which means correcting the value that gets saved.
 
-So I would suggest to *only* save sp_el1, to always save it
-(irrespective of the exception coming from EL0 or EL1), and to save a
-retro-corrected value so that the handler can directly know where the
-previous stack pointer was.
+Zhu, I'd really like to understand why you think it is OK not to
+restart consumer and producers when a connection has failed to be
+established between the two?
+
+In the case of KVM/arm64, this results in the guest being forever
+suspended and never resumed. That's obviously not an acceptable
+regression, as there is a number of benign reasons for a connect to
+fail.
 
 Thanks,
 
