@@ -2,63 +2,81 @@ Return-Path: <SRS0=z9tc=KD=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A01DC433B4
-	for <kvmarm@archiver.kernel.org>; Sat,  8 May 2021 07:22:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF4AFC433B4
+	for <kvmarm@archiver.kernel.org>; Sat,  8 May 2021 09:15:45 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C404C61466
-	for <kvmarm@archiver.kernel.org>; Sat,  8 May 2021 07:22:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C404C61466
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linuxfoundation.org
+	by mail.kernel.org (Postfix) with ESMTP id 10AA861377
+	for <kvmarm@archiver.kernel.org>; Sat,  8 May 2021 09:15:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10AA861377
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 40A344B825;
-	Sat,  8 May 2021 03:22:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9343B4B128;
+	Sat,  8 May 2021 05:15:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linuxfoundation.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ku+eQgwU54O1; Sat,  8 May 2021 03:22:38 -0400 (EDT)
+	with ESMTP id Hs2sE2ydJAIH; Sat,  8 May 2021 05:15:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 296BC4B7DE;
-	Sat,  8 May 2021 03:22:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 77C0F4B133;
+	Sat,  8 May 2021 05:15:43 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B02B34B76C
- for <kvmarm@lists.cs.columbia.edu>; Sat,  8 May 2021 03:22:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A4F64B122
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  8 May 2021 05:15:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id eZQxCpD+c6YA for <kvmarm@lists.cs.columbia.edu>;
- Sat,  8 May 2021 03:22:36 -0400 (EDT)
+ with ESMTP id Ie3st88yqhJr for <kvmarm@lists.cs.columbia.edu>;
+ Sat,  8 May 2021 05:15:41 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 71A9C4B3FD
- for <kvmarm@lists.cs.columbia.edu>; Sat,  8 May 2021 03:22:36 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 583F36145E;
- Sat,  8 May 2021 07:22:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
- s=korg; t=1620458555;
- bh=75QzCGmWcilMFGqhtLbNi4lbm90RLc6Y8MR3bsjz8IA=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=NzNgqZ1PGsNQWOtBMSrc7TB2OFZjXh0Ezp1/zJVKj9u+3OmDAA/w+jSbIVRyp8sd5
- 1iyX9tOY7ZjW/jlvEhfQKvgcMWTEjouzxmq/liD4gbqjTrGog1gREUhIKwUGEVPii1
- z+sbXfG6rY+Q4wY+5fnzC19xZK+ZGQSqv/9yYGsM=
-Date: Sat, 8 May 2021 09:22:32 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Zhu Lingshan <lingshan.zhu@intel.com>
-Subject: Re: [PATCH] Revert "irqbypass: do not start cons/prod when failed
- connect"
-Message-ID: <YJY8OOGMNEp97ej9@kroah.com>
-References: <20210508071152.722425-1-lingshan.zhu@intel.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210508071152.722425-1-lingshan.zhu@intel.com>
-Cc: kvm@vger.kernel.org, mst@redhat.com, maz@kernel.org, jasowang@redhat.com,
- cohuck@redhat.com, stable@vger.kernel.org, alex.williamson@redhat.com,
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1B6724B10B
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  8 May 2021 05:15:41 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id D14EE6135D;
+ Sat,  8 May 2021 09:15:39 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1lfJ3h-0005Lz-HK; Sat, 08 May 2021 10:15:37 +0100
+Date: Sat, 08 May 2021 10:15:36 +0100
+Message-ID: <874kfdvb5z.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Jason Wang <jasowang@redhat.com>
+Subject: Re: Question on guest enable msi fail when using GICv4/4.1
+In-Reply-To: <373c70d3-eda3-8e84-d138-2f90d4e55217@redhat.com>
+References: <3a2c66d6-6ca0-8478-d24b-61e8e3241b20@hisilicon.com>
+ <87k0oaq5jf.wl-maz@kernel.org>
+ <cf870bcf-1173-a70b-2b55-4209abcbcbc3@hisilicon.com>
+ <878s4qq00u.wl-maz@kernel.org> <874kfepht4.wl-maz@kernel.org>
+ <373c70d3-eda3-8e84-d138-2f90d4e55217@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: jasowang@redhat.com, lingshan.zhu@intel.com,
+ zhangshaokun@hisilicon.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+ linux-pci@vger.kernel.org, alex.williamson@redhat.com, cohuck@redhat.com,
+ tangnianyao@huawei.com, bhelgaas@google.com, eric.auger@redhat.com,
+ mst@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ linux-pci@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
+ Shaokun Zhang <zhangshaokun@hisilicon.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Bjorn Helgaas <bhelgaas@google.com>, Zhu Lingshan <lingshan.zhu@intel.com>,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -71,33 +89,46 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sat, May 08, 2021 at 03:11:52PM +0800, Zhu Lingshan wrote:
-> This reverts commit a979a6aa009f3c99689432e0cdb5402a4463fb88.
-> 
-> The reverted commit may cause VM freeze on arm64 platform.
-> Because on arm64 platform, stop a consumer will suspend the VM,
-> the VM will freeze without a start consumer
-> 
-> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
-> ---
->  virt/lib/irqbypass.c | 16 ++++++----------
->  1 file changed, 6 insertions(+), 10 deletions(-)
-> 
-
-<formletter>
-
-This is not the correct way to submit patches for inclusion in the
-stable kernel tree.  Please read:
-    https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
-for how to do this properly.
-
-</formletter>
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gU2F0LCAwOCBNYXkgMjAyMSAwMjo1MTozOSArMDEwMCwKSmFzb24gV2FuZyA8amFzb3dhbmdA
+cmVkaGF0LmNvbT4gd3JvdGU6Cj4gCj4gCj4g5ZyoIDIwMjEvNS84IOS4iuWNiDE6MzYsIE1hcmMg
+WnluZ2llciDlhpnpgZM6CgpbLi4uXQoKPiA+IEFkZGluZyBaaHUsIEphc29uLCBNU1QgdG8gdGhl
+IHBhcnR5LiBJdCBhbGwgc2VlbXMgdG8gYmUgY2F1c2VkIGJ5IHRoaXMKPiA+IGNvbW1pdDoKPiA+
+IAo+ID4gY29tbWl0IGE5NzlhNmFhMDA5ZjNjOTk2ODk0MzJlMGNkYjU0MDJhNDQ2M2ZiODgKPiA+
+IEF1dGhvcjogWmh1IExpbmdzaGFuIDxsaW5nc2hhbi56aHVAaW50ZWwuY29tPgo+ID4gRGF0ZTog
+ICBGcmkgSnVsIDMxIDE0OjU1OjMzIDIwMjAgKzA4MDAKPiA+IAo+ID4gICAgICBpcnFieXBhc3M6
+IGRvIG5vdCBzdGFydCBjb25zL3Byb2Qgd2hlbiBmYWlsZWQgY29ubmVjdAo+ID4gICAgICAgICAg
+IElmIGZhaWxlZCB0byBjb25uZWN0LCB0aGVyZSBpcyBubyBuZWVkIHRvIHN0YXJ0IGNvbnN1bWVy
+Cj4gPiBub3IKPiA+ICAgICAgcHJvZHVjZXIuCj4gPiAgICAgICAgICAgU2lnbmVkLW9mZi1ieTog
+Wmh1IExpbmdzaGFuIDxsaW5nc2hhbi56aHVAaW50ZWwuY29tPgo+ID4gICAgICBTdWdnZXN0ZWQt
+Ynk6IEphc29uIFdhbmcgPGphc293YW5nQHJlZGhhdC5jb20+Cj4gPiAgICAgIExpbms6IGh0dHBz
+Oi8vbG9yZS5rZXJuZWwub3JnL3IvMjAyMDA3MzEwNjU1MzMuNDE0NC03LWxpbmdzaGFuLnpodUBp
+bnRlbC5jb20KPiA+ICAgICAgU2lnbmVkLW9mZi1ieTogTWljaGFlbCBTLiBUc2lya2luIDxtc3RA
+cmVkaGF0LmNvbT4KPiA+IAo+ID4gCj4gPiBaaHUsIEknZCByZWFsbHkgbGlrZSB0byB1bmRlcnN0
+YW5kIHdoeSB5b3UgdGhpbmsgaXQgaXMgT0sgbm90IHRvCj4gPiByZXN0YXJ0IGNvbnN1bWVyIGFu
+ZCBwcm9kdWNlcnMgd2hlbiBhIGNvbm5lY3Rpb24gaGFzIGZhaWxlZCB0byBiZQo+ID4gZXN0YWJs
+aXNoZWQgYmV0d2VlbiB0aGUgdHdvPwo+IAo+IAo+IE15IGJhZCwgSSBkaWRuJ3QgY2hlY2sgQVJN
+IGNvZGUgYnV0IGl0J3Mgbm90IGVhc3kgdG8gaW5mZXIgdGhhdCB0aGUKPiBjb25zLT5zdGFydC9z
+dG9wIGlzIG5vdCBhIHBlciBjb25zdW1lciBzcGVjaWZpYyBvcGVyYXRpb24gYnV0IGEgZ2xvYmFs
+Cj4gb25lIGxpa2UgVk0gaGFsdGluZy9yZXN1bWluZy4KCkkgZG9uJ3QgZGlzYWdyZWUgdGhhdCBp
+dCBpcyBhIGJpdCBvZiBhbiBvZGQgYmVoYXZpb3VyLCBhbmQgbWF5YmUgd2UKY2FuIGV2ZW50dWFs
+bHkgcmVsYXggdGhpcy4gSG93ZXZlciwgbXkgcnVsZSBvZiB0aHVtYiBmb3IgZXJyb3IKaGFuZGxp
+bmcgaXMgdG8gdHJ5IGFuZCBwdXQgdGhpbmdzIGJhY2sgaW4gdGhlIHN0YXRlIHlvdSBmb3VuZCB0
+aGVtLgoKSXQgaXMgYWxzbyB1bmZvcnR1bmF0ZSB0aGF0IHRoaXMgc2FtZSBjb21taXQgaW50cm9k
+dWNlcyBhbiBpbnRlcmVzdGluZwpidWcgYnkgdW5jb25kaXRpb25hbGx5IGNhbGxpbmcgZGVsX3By
+b2R1Y2VyKCksIGV2ZW4gaWYgdGhlCnByb2R1Y2VyL2NvbnN1bWVyIGNvbm5lY3Rpb24gaGFzIHN1
+Y2NlZWRlZC4gSSBndWVzcyBpdCBpcyBhIGdvb2QgdGhpbmcKdGhhdCBub2JvZHkgc2VlbSB0byBp
+bXBsZW1lbnQgYW55IG9mIHRoZSBwcm9kdWNlciBjYWxsYmFja3MuCgo+ID4gSW4gdGhlIGNhc2Ug
+b2YgS1ZNL2FybTY0LCB0aGlzIHJlc3VsdHMgaW4gdGhlIGd1ZXN0IGJlaW5nIGZvcmV2ZXIKPiA+
+IHN1c3BlbmRlZCBhbmQgbmV2ZXIgcmVzdW1lZC4gVGhhdCdzIG9idmlvdXNseSBub3QgYW4gYWNj
+ZXB0YWJsZQo+ID4gcmVncmVzc2lvbiwgYXMgdGhlcmUgaXMgYSBudW1iZXIgb2YgYmVuaWduIHJl
+YXNvbnMgZm9yIGEgY29ubmVjdCB0bwo+ID4gZmFpbC4KPiAKPiAKPiBMZXQncyByZXZlcnQgdGhp
+cyBjb21taXQuCgpUaGFua3MsCgoJTS4KCi0tIApXaXRob3V0IGRldmlhdGlvbiBmcm9tIHRoZSBu
+b3JtLCBwcm9ncmVzcyBpcyBub3QgcG9zc2libGUuCl9fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNz
+LmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3Rp
+bmZvL2t2bWFybQo=
