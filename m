@@ -3,84 +3,82 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92311C433B4
-	for <kvmarm@archiver.kernel.org>; Sun,  9 May 2021 17:00:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 835B3C433ED
+	for <kvmarm@archiver.kernel.org>; Sun,  9 May 2021 17:04:42 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id F0DAC613C5
-	for <kvmarm@archiver.kernel.org>; Sun,  9 May 2021 17:00:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0DAC613C5
+	by mail.kernel.org (Postfix) with ESMTP id D4FE7613B6
+	for <kvmarm@archiver.kernel.org>; Sun,  9 May 2021 17:04:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4FE7613B6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 307064B82F;
-	Sun,  9 May 2021 13:00:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F9F44B2B4;
+	Sun,  9 May 2021 13:04:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id tyZsZ6REFlzj; Sun,  9 May 2021 13:00:21 -0400 (EDT)
+	with ESMTP id qy-ecB6YD1Mq; Sun,  9 May 2021 13:04:40 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E024A4B815;
-	Sun,  9 May 2021 13:00:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DE574B815;
+	Sun,  9 May 2021 13:04:40 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A416B4B4D3
- for <kvmarm@lists.cs.columbia.edu>; Sun,  9 May 2021 13:00:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F4774B4D3
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  9 May 2021 13:04:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rIXM6eYprEmE for <kvmarm@lists.cs.columbia.edu>;
- Sun,  9 May 2021 13:00:19 -0400 (EDT)
+ with ESMTP id xM4sFo-56CG6 for <kvmarm@lists.cs.columbia.edu>;
+ Sun,  9 May 2021 13:04:38 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7EDEB4B4CB
- for <kvmarm@lists.cs.columbia.edu>; Sun,  9 May 2021 13:00:19 -0400 (EDT)
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 190924B4CB
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  9 May 2021 13:04:38 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1620579619;
+ s=mimecast20190719; t=1620579877;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=nvRrwIvL//wqR4eXLZSclNxQvYlBf9vfJ7b18pGt9jI=;
- b=Sgyi0MIBT2BFoJCrxHC47pxcwLmjaGC6d/s9SEDRmQdIx1GxJ48OHgBIlp4t9LvXNOCfeg
- RhGzv7IHD+MVwPaKMgmGdJWTrM+oJYI4wTfT4iXcKMTx+RpZg9oew4uTcqSmuO41A/KsZR
- YR78hzylNSiri/8rtOX8ecyZ5k2hulY=
+ bh=gS221mF5itctneFLHEBt6dN2sStEXBf4HlghBIHalXQ=;
+ b=QVxhoh4BCi/g0FZ8LYBFSQshkIJo+qTIylhd6aENrQootgCXqyIh+1/X0E7x8i8i5qF38R
+ QSZ/g/a7DhF/3uy2G3CLWuDx4723mIPnBaQurDpg5tS9MAnZrywbP2XfJU5EHdla/KlUG4
+ Ms29MZCb90/hV+PCH5HThFSubo69504=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-84-mo1rzEFOPWmzXXIL-DVA0w-1; Sun, 09 May 2021 13:00:14 -0400
-X-MC-Unique: mo1rzEFOPWmzXXIL-DVA0w-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-591-NKNK1PMkMt-tlAQTihZAUg-1; Sun, 09 May 2021 13:04:36 -0400
+X-MC-Unique: NKNK1PMkMt-tlAQTihZAUg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 562DE8015A8;
- Sun,  9 May 2021 17:00:13 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9A58B18397A6;
+ Sun,  9 May 2021 17:04:34 +0000 (UTC)
 Received: from [10.36.113.168] (ovpn-113-168.ams2.redhat.com [10.36.113.168])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D5E856249C;
- Sun,  9 May 2021 17:00:06 +0000 (UTC)
-Subject: Re: Question on guest enable msi fail when using GICv4/4.1
-To: Marc Zyngier <maz@kernel.org>, Shaokun Zhang <zhangshaokun@hisilicon.com>
-References: <3a2c66d6-6ca0-8478-d24b-61e8e3241b20@hisilicon.com>
- <87k0oaq5jf.wl-maz@kernel.org>
- <cf870bcf-1173-a70b-2b55-4209abcbcbc3@hisilicon.com>
- <878s4qq00u.wl-maz@kernel.org>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DAF1169FCE;
+ Sun,  9 May 2021 17:04:24 +0000 (UTC)
+Subject: Re: [PATCH] Revert "irqbypass: do not start cons/prod when failed
+ connect"
+To: Marc Zyngier <maz@kernel.org>, Zhu Lingshan <lingshan.zhu@intel.com>
+References: <20210508071152.722425-1-lingshan.zhu@intel.com>
+ <8735uxvajh.wl-maz@kernel.org>
 From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <d6481eee-4318-1a56-a5a4-daf467070d22@redhat.com>
-Date: Sun, 9 May 2021 19:00:04 +0200
+Message-ID: <65e48458-f94c-e5fd-03d5-93d6acfb356c@redhat.com>
+Date: Sun, 9 May 2021 19:04:23 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.8.0
 MIME-Version: 1.0
-In-Reply-To: <878s4qq00u.wl-maz@kernel.org>
+In-Reply-To: <8735uxvajh.wl-maz@kernel.org>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Cc: kvm@vger.kernel.org, linux-pci@vger.kernel.org,
- Cornelia Huck <cohuck@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Bjorn Helgaas <bhelgaas@google.com>, kvmarm@lists.cs.columbia.edu,
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Cc: kvm@vger.kernel.org, mst@redhat.com, jasowang@redhat.com, cohuck@redhat.com,
+ stable@vger.kernel.org, Shaokun Zhang <zhangshaokun@hisilicon.com>,
+ alex.williamson@redhat.com, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -99,140 +97,38 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Hi,
-On 5/7/21 1:02 PM, Marc Zyngier wrote:
-> On Fri, 07 May 2021 10:58:23 +0100,
-> Shaokun Zhang <zhangshaokun@hisilicon.com> wrote:
+On 5/8/21 11:29 AM, Marc Zyngier wrote:
+> On Sat, 08 May 2021 08:11:52 +0100,
+> Zhu Lingshan <lingshan.zhu@intel.com> wrote:
 >>
->> Hi Marc,
+>> This reverts commit a979a6aa009f3c99689432e0cdb5402a4463fb88.
 >>
->> Thanks for your quick reply.
->>
->> On 2021/5/7 17:03, Marc Zyngier wrote:
->>> On Fri, 07 May 2021 06:57:04 +0100,
->>> Shaokun Zhang <zhangshaokun@hisilicon.com> wrote:
->>>>
->>>> [This letter comes from Nianyao Tang]
->>>>
->>>> Hi,
->>>>
->>>> Using GICv4/4.1 and msi capability, guest vf driver requires 3
->>>> vectors and enable msi, will lead to guest stuck.
->>>
->>> Stuck how?
->>
->> Guest serial does not response anymore and guest network shutdown.
->>
->>>
->>>> Qemu gets number of interrupts from Multiple Message Capable field
->>>> set by guest. This field is aligned to a power of 2(if a function
->>>> requires 3 vectors, it initializes it to 2).
->>>
->>> So I guess this is a MultiMSI device with 4 vectors, right?
->>>
->>
->> Yes, it can support maximum of 32 msi interrupts, and vf driver only use 3 msi.
->>
->>>> However, guest driver just sends 3 mapi-cmd to vits and 3 ite
->>>> entries is recorded in host.  Vfio initializes msi interrupts using
->>>> the number of interrupts 4 provide by qemu.  When it comes to the
->>>> 4th msi without ite in vits, in irq_bypass_register_producer,
->>>> producer and consumer will __connect fail, due to find_ite fail, and
->>>> do not resume guest.
->>>
->>> Let me rephrase this to check that I understand it:
->>> - The device has 4 vectors
->>> - The guest only create mappings for 3 of them
->>> - VFIO calls kvm_vgic_v4_set_forwarding() for each vector
->>> - KVM doesn't have a mapping for the 4th vector and returns an error
->>> - VFIO disable this 4th vector
->>>
->>> Is that correct? If yes, I don't understand why that impacts the guest
->>> at all. From what I can see, vfio_msi_set_vector_signal() just prints
->>> a message on the console and carries on.
->>>
->>
->> function calls:
->> --> vfio_msi_set_vector_signal
->>    --> irq_bypass_register_producer
->>       -->__connect
->>
->> in __connect, add_producer finally calls kvm_vgic_v4_set_forwarding
->> and fails to get the 4th mapping. When add_producer fail, it does
->> not call cons->start, calls kvm_arch_irq_bypass_start and then
->> kvm_arm_resume_guest.
+>> The reverted commit may cause VM freeze on arm64 platform.
+>> Because on arm64 platform, stop a consumer will suspend the VM,
+>> the VM will freeze without a start consumer
 > 
-> [+Eric, who wrote the irq_bypass infrastructure.]
+> It also unconditionally calls del_consumer on the producer, which
+> isn't exactly expected.
 > 
-> Ah, so the guest is actually paused, not in a livelock situation
-> (which is how I interpreted "stuck").
+>>
+>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
 > 
-> I think we should handle this case gracefully, as there should be no
-> expectation that the guest will be using this interrupt. Given that
-> VFIO seems to be pretty unfazed when a producer fails, I'm temped to
-> do the same thing and restart the guest.
-> 
-> Also, __disconnect doesn't care about errors, so why should __connect
-> have this odd behaviour?
-
-_disconnect() does not care as we should always succeed tearing off
-things. del_* ops are void functions. On the opposite we can fail
-setting up the bypass.
-
-Effectively
-a979a6aa009f ("irqbypass: do not start cons/prod when failed connect")
-needs to be reverted.
-
-I agree the kerneldoc comments in linux/irqbypass.h may be improved to
-better explain the role of stop/start cbs and warn about their potential
-global impact.
-
-wrt the case above, "in __connect, add_producer finally calls
-kvm_vgic_v4_set_forwarding and fails to get the 4th mapping", shouldn't
-we succeed in that case?
+> Reported-by: Shaokun Zhang <zhangshaokun@hisilicon.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
 Thanks
 
 Eric
 
-> 
-> Can you please try this? It is completely untested (and I think the
-> del_consumer call is odd, which is why I've also dropped it).
-> 
-> Eric, what do you think?
+> Suggested-by: Marc Zyngier <maz@kernel.org>
+> Acked-by: Marc Zyngier <maz@kernel.org>
+> Fixes: a979a6aa009f ("irqbypass: do not start cons/prod when failed connect")
+> Link: https://lore.kernel.org/r/3a2c66d6-6ca0-8478-d24b-61e8e3241b20@hisilicon.com
+> Cc: stable@vger.kernel.org
 > 
 > Thanks,
 > 
 > 	M.
-> 
-> diff --git a/virt/lib/irqbypass.c b/virt/lib/irqbypass.c
-> index c9bb3957f58a..7e1865e15668 100644
-> --- a/virt/lib/irqbypass.c
-> +++ b/virt/lib/irqbypass.c
-> @@ -40,21 +40,14 @@ static int __connect(struct irq_bypass_producer *prod,
->  	if (prod->add_consumer)
->  		ret = prod->add_consumer(prod, cons);
->  
-> -	if (ret)
-> -		goto err_add_consumer;
-> -
-> -	ret = cons->add_producer(cons, prod);
-> -	if (ret)
-> -		goto err_add_producer;
-> +	if (!ret)
-> +		ret = cons->add_producer(cons, prod);
->  
->  	if (cons->start)
->  		cons->start(cons);
->  	if (prod->start)
->  		prod->start(prod);
-> -err_add_producer:
-> -	if (prod->del_consumer)
-> -		prod->del_consumer(prod, cons);
-> -err_add_consumer:
-> +
->  	return ret;
->  }
->  
 > 
 
 _______________________________________________
