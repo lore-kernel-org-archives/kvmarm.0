@@ -6,53 +6,52 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6AB4C43462
-	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 17:27:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F4E5C43461
+	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 17:28:00 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8574861574
-	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 17:27:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8574861574
+	by mail.kernel.org (Postfix) with ESMTP id D6DD0614A7
+	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 17:27:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6DD0614A7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BD484B2A0;
-	Mon, 10 May 2021 13:27:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7AB1A4B43B;
+	Mon, 10 May 2021 13:27:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id KaQ5rMPKn4wK; Mon, 10 May 2021 13:27:51 -0400 (EDT)
+	with ESMTP id ILjY4aFql8mH; Mon, 10 May 2021 13:27:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E8D4A4B816;
-	Mon, 10 May 2021 13:27:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 273134B835;
+	Mon, 10 May 2021 13:27:56 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 543264B25E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 13:27:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7781D4B825
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 13:27:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rCKzzXJCIoYU for <kvmarm@lists.cs.columbia.edu>;
- Mon, 10 May 2021 13:27:50 -0400 (EDT)
+ with ESMTP id 9mZP1pb5MuR4 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 10 May 2021 13:27:53 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6B69E4B2E6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 13:27:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 531A14B836
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 13:27:52 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 817F56146E;
- Mon, 10 May 2021 17:27:47 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 7C39C61554;
+ Mon, 10 May 2021 17:27:51 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1lg9GP-000Uqg-8a; Mon, 10 May 2021 18:00:13 +0100
+ id 1lg9Gp-000Uqg-UY; Mon, 10 May 2021 18:00:40 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v4 26/66] KVM: arm64: nv: Respect the virtual HCR_EL2.NV1 bit
- setting
-Date: Mon, 10 May 2021 17:58:40 +0100
-Message-Id: <20210510165920.1913477-27-maz@kernel.org>
+Subject: [PATCH v4 62/66] KVM: arm64: nv: Sync nested timer state with ARMv8.4
+Date: Mon, 10 May 2021 17:59:16 +0100
+Message-Id: <20210510165920.1913477-63-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210510165920.1913477-1-maz@kernel.org>
 References: <20210510165920.1913477-1-maz@kernel.org>
@@ -83,106 +82,95 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Jintack Lim <jintack@cs.columbia.edu>
+From: Christoffer Dall <christoffer.dall@arm.com>
 
-Forward ELR_EL1, SPSR_EL1 and VBAR_EL1 traps to the virtual EL2 if the
-virtual HCR_EL2.NV bit is set.
+Emulating the ARMv8.4-NV timers is a bit odd, as the timers can
+be reconfigured behind our back without the hypervisor even
+noticing. In the VHE case, that's an actual regression in the
+architecture...
 
-This is for recursive nested virtualization.
-
-Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_arm.h |  1 +
- arch/arm64/kvm/sys_regs.c        | 28 +++++++++++++++++++++++++++-
- 2 files changed, 28 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/arch_timer.c  | 37 ++++++++++++++++++++++++++++++++++++
+ arch/arm64/kvm/arm.c         |  3 +++
+ include/kvm/arm_arch_timer.h |  1 +
+ 3 files changed, 41 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index a85d7ea646cd..c2ab4e1802cf 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -14,6 +14,7 @@
- /* Hyp Configuration Register (HCR) bits */
- #define HCR_ATA		(UL(1) << 56)
- #define HCR_FWB		(UL(1) << 46)
-+#define HCR_NV1		(UL(1) << 43)
- #define HCR_NV		(UL(1) << 42)
- #define HCR_API		(UL(1) << 41)
- #define HCR_APK		(UL(1) << 40)
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 35bdfa0cb1ff..a577cdbacc17 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -292,6 +292,22 @@ static bool access_rw(struct kvm_vcpu *vcpu,
- 	return true;
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index 8a4fce4ec7d8..c0064168b38d 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -778,6 +778,43 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
+ 	set_cntvoff(0);
  }
  
-+/* This function is to support the recursive nested virtualization */
-+static bool forward_nv1_traps(struct kvm_vcpu *vcpu, struct sys_reg_params *p)
++void kvm_timer_sync_nested(struct kvm_vcpu *vcpu)
 +{
-+	return forward_traps(vcpu, HCR_NV1);
++	if (!is_hyp_ctxt(vcpu))
++		return;
++
++	/*
++	 * Guest hypervisors using ARMv8.4 enhanced nested virt support have
++	 * their EL1 timer register accesses redirected to the VNCR page.
++	 */
++	if (!vcpu_el2_e2h_is_set(vcpu)) {
++		/*
++		 * For a non-VHE guest hypervisor, we update the hardware
++		 * timer registers with the latest value written by the guest
++		 * to the VNCR page and let the hardware take care of the
++		 * rest.
++		 */
++		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTV_CTL_EL0),  SYS_CNTV_CTL);
++		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTV_CVAL_EL0), SYS_CNTV_CVAL);
++		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTP_CTL_EL0),  SYS_CNTP_CTL);
++		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTP_CVAL_EL0), SYS_CNTP_CVAL);
++	} else {
++		/*
++		 * For a VHE guest hypervisor, the emulated state (which
++		 * is stored in the VNCR page) could have been updated behind
++		 * our back, and we must reset the emulation of the timers.
++		 */
++
++		struct timer_map map;
++		get_timer_map(vcpu, &map);
++
++		soft_timer_cancel(&map.emul_vtimer->hrtimer);
++		soft_timer_cancel(&map.emul_ptimer->hrtimer);
++		timer_emulate(map.emul_vtimer);
++		timer_emulate(map.emul_ptimer);
++	}
 +}
 +
-+static bool access_vbar_el1(struct kvm_vcpu *vcpu,
-+			    struct sys_reg_params *p,
-+			    const struct sys_reg_desc *r)
-+{
-+	if (forward_nv1_traps(vcpu, p))
-+		return false;
-+
-+	return access_rw(vcpu, p, r);
-+}
-+
- static bool access_sctlr_el2(struct kvm_vcpu *vcpu,
- 			     struct sys_reg_params *p,
- 			     const struct sys_reg_desc *r)
-@@ -1606,6 +1622,7 @@ static bool access_sp_el1(struct kvm_vcpu *vcpu,
- 	return true;
- }
+ /*
+  * With a userspace irqchip we have to check if the guest de-asserted the
+  * timer and if so, unmask the timer irq signal on the host interrupt
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 2e4d74caa114..4d9b3a9e21fd 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -858,6 +858,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 		if (static_branch_unlikely(&userspace_irqchip_in_use))
+ 			kvm_timer_sync_user(vcpu);
  
++		if (enhanced_nested_virt_in_use(vcpu))
++			kvm_timer_sync_nested(vcpu);
 +
- static bool access_elr(struct kvm_vcpu *vcpu,
- 		       struct sys_reg_params *p,
- 		       const struct sys_reg_desc *r)
-@@ -1613,6 +1630,9 @@ static bool access_elr(struct kvm_vcpu *vcpu,
- 	if (el12_reg(p) && forward_nv_traps(vcpu))
- 		return false;
+ 		kvm_arch_vcpu_ctxsync_fp(vcpu);
  
-+	if (!el12_reg(p) && forward_nv1_traps(vcpu, p))
-+		return false;
-+
- 	if (p->is_write)
- 		vcpu_write_sys_reg(vcpu, p->regval, ELR_EL1);
- 	else
-@@ -1628,6 +1648,9 @@ static bool access_spsr(struct kvm_vcpu *vcpu,
- 	if (el12_reg(p) && forward_nv_traps(vcpu))
- 		return false;
- 
-+	if (!el12_reg(p) && forward_nv1_traps(vcpu, p))
-+		return false;
-+
- 	if (p->is_write)
- 		__vcpu_sys_reg(vcpu, SPSR_EL1) = p->regval;
- 	else
-@@ -1643,6 +1666,9 @@ static bool access_spsr_el2(struct kvm_vcpu *vcpu,
- 	if (el12_reg(p) && forward_nv_traps(vcpu))
- 		return false;
- 
-+	if (!el12_reg(p) && forward_nv1_traps(vcpu, p))
-+		return false;
-+
- 	if (p->is_write)
- 		vcpu_write_sys_reg(vcpu, p->regval, SPSR_EL2);
- 	else
-@@ -1851,7 +1877,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_LORC_EL1), trap_loregion },
- 	{ SYS_DESC(SYS_LORID_EL1), trap_loregion },
- 
--	{ SYS_DESC(SYS_VBAR_EL1), access_rw, reset_val, VBAR_EL1, 0 },
-+	{ SYS_DESC(SYS_VBAR_EL1), access_vbar_el1, reset_val, VBAR_EL1, 0 },
- 	{ SYS_DESC(SYS_DISR_EL1), NULL, reset_val, DISR_EL1, 0 },
- 
- 	{ SYS_DESC(SYS_ICC_IAR0_EL1), write_to_read_only },
+ 		/*
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+index 063f613fbc7e..2e20916e9025 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -68,6 +68,7 @@ int kvm_timer_hyp_init(bool);
+ int kvm_timer_enable(struct kvm_vcpu *vcpu);
+ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu);
+ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu);
++void kvm_timer_sync_nested(struct kvm_vcpu *vcpu);
+ void kvm_timer_sync_user(struct kvm_vcpu *vcpu);
+ bool kvm_timer_should_notify_user(struct kvm_vcpu *vcpu);
+ void kvm_timer_update_run(struct kvm_vcpu *vcpu);
 -- 
 2.29.2
 
