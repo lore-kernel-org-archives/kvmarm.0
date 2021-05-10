@@ -4,55 +4,54 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD8D5C433B4
-	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 17:27:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31703C43461
+	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 17:27:51 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 59C4161481
-	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 17:27:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59C4161481
+	by mail.kernel.org (Postfix) with ESMTP id C82A66147F
+	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 17:27:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C82A66147F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 084FC4B4CB;
-	Mon, 10 May 2021 13:27:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 69FCE4B5A9;
+	Mon, 10 May 2021 13:27:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id qdlDUYGUsc3b; Mon, 10 May 2021 13:27:43 -0400 (EDT)
+	with ESMTP id SXIIp62stZSR; Mon, 10 May 2021 13:27:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 859D94B48C;
-	Mon, 10 May 2021 13:27:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CAEDD4B83B;
+	Mon, 10 May 2021 13:27:47 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C26194B441
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 13:27:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A0484B25E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 13:27:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id t2Ow7cDAIlmZ for <kvmarm@lists.cs.columbia.edu>;
- Mon, 10 May 2021 13:27:40 -0400 (EDT)
+ with ESMTP id o5b8YwyxA4YL for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 10 May 2021 13:27:45 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 684BD4B48C
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 13:27:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 25AD14B2BF
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 13:27:45 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 9CE716147F;
- Mon, 10 May 2021 17:27:39 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 3BDE7614A7;
+ Mon, 10 May 2021 17:27:44 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1lg9Gj-000Uqg-LL; Mon, 10 May 2021 18:00:33 +0100
+ id 1lg9Gi-000Uqg-HO; Mon, 10 May 2021 18:00:32 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v4 53/66] KVM: arm64: nv: Add handling of ARMv8.4-TTL TLB
- invalidation
-Date: Mon, 10 May 2021 17:59:07 +0100
-Message-Id: <20210510165920.1913477-54-maz@kernel.org>
+Subject: [PATCH v4 51/66] KVM: arm64: nv: Add nested GICv3 tracepoints
+Date: Mon, 10 May 2021 17:59:05 +0100
+Message-Id: <20210510165920.1913477-52-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210510165920.1913477-1-maz@kernel.org>
 References: <20210510165920.1913477-1-maz@kernel.org>
@@ -83,210 +82,208 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Support guest-provided information information to find out about
-the range of required invalidation.
+From: Christoffer Dall <christoffer.dall@arm.com>
 
+Adding tracepoints to be able to peek into the shadow LRs used when
+running a guest guest.
+
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_nested.h |  1 +
- arch/arm64/kvm/nested.c             | 57 +++++++++++++++++++++
- arch/arm64/kvm/sys_regs.c           | 78 ++++++++++++++++++-----------
- 3 files changed, 108 insertions(+), 28 deletions(-)
+ arch/arm64/kvm/vgic/vgic-nested-trace.h | 137 ++++++++++++++++++++++++
+ arch/arm64/kvm/vgic/vgic-v3-nested.c    |  13 ++-
+ 2 files changed, 149 insertions(+), 1 deletion(-)
+ create mode 100644 arch/arm64/kvm/vgic/vgic-nested-trace.h
 
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 5fa3c634c8e1..7c47ad655e2e 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -123,6 +123,7 @@ extern bool __forward_traps(struct kvm_vcpu *vcpu, unsigned int reg,
- 			    u64 control_bit);
- extern bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit);
- extern bool forward_nv_traps(struct kvm_vcpu *vcpu);
-+unsigned int ttl_to_size(u8 ttl);
+diff --git a/arch/arm64/kvm/vgic/vgic-nested-trace.h b/arch/arm64/kvm/vgic/vgic-nested-trace.h
+new file mode 100644
+index 000000000000..f1a074c791a6
+--- /dev/null
++++ b/arch/arm64/kvm/vgic/vgic-nested-trace.h
+@@ -0,0 +1,137 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#if !defined(_TRACE_VGIC_NESTED_H) || defined(TRACE_HEADER_MULTI_READ)
++#define _TRACE_VGIC_NESTED_H
++
++#include <linux/tracepoint.h>
++
++#undef TRACE_SYSTEM
++#define TRACE_SYSTEM kvm
++
++#define SLR_ENTRY_VALS(x)							\
++	" ",									\
++	!!(__entry->lrs[x] & ICH_LR_HW),		   			\
++	!!(__entry->lrs[x] & ICH_LR_PENDING_BIT),	   			\
++	!!(__entry->lrs[x] & ICH_LR_ACTIVE_BIT),	   			\
++	__entry->lrs[x] & ICH_LR_VIRTUAL_ID_MASK,				\
++	(__entry->lrs[x] & ICH_LR_PHYS_ID_MASK) >> ICH_LR_PHYS_ID_SHIFT,	\
++	(__entry->orig_lrs[x] & ICH_LR_PHYS_ID_MASK) >> ICH_LR_PHYS_ID_SHIFT
++
++TRACE_EVENT(vgic_create_shadow_lrs,
++	TP_PROTO(struct kvm_vcpu *vcpu, int nr_lr, u64 *lrs, u64 *orig_lrs),
++	TP_ARGS(vcpu, nr_lr, lrs, orig_lrs),
++
++	TP_STRUCT__entry(
++		__field(	int,	nr_lr			)
++		__array(	u64,	lrs,		16	)
++		__array(	u64,	orig_lrs,	16	)
++	),
++
++	TP_fast_assign(
++		__entry->nr_lr		= nr_lr;
++		memcpy(__entry->lrs, lrs, 16 * sizeof(u64));
++		memcpy(__entry->orig_lrs, orig_lrs, 16 * sizeof(u64));
++	),
++
++	TP_printk("nr_lr: %d\n"
++		  "%50sLR[ 0]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[ 1]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[ 2]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[ 3]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[ 4]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[ 5]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[ 6]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[ 7]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[ 8]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[ 9]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[10]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[11]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[12]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[13]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[14]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[15]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)",
++		  __entry->nr_lr,
++		  SLR_ENTRY_VALS(0), SLR_ENTRY_VALS(1), SLR_ENTRY_VALS(2),
++		  SLR_ENTRY_VALS(3), SLR_ENTRY_VALS(4), SLR_ENTRY_VALS(5),
++		  SLR_ENTRY_VALS(6), SLR_ENTRY_VALS(7), SLR_ENTRY_VALS(8),
++		  SLR_ENTRY_VALS(9), SLR_ENTRY_VALS(10), SLR_ENTRY_VALS(11),
++		  SLR_ENTRY_VALS(12), SLR_ENTRY_VALS(13), SLR_ENTRY_VALS(14),
++		  SLR_ENTRY_VALS(15))
++);
++
++#define LR_ENTRY_VALS(x)							\
++	" ",									\
++	!!(__entry->lrs[x] & ICH_LR_HW),		   			\
++	!!(__entry->lrs[x] & ICH_LR_PENDING_BIT),	   			\
++	!!(__entry->lrs[x] & ICH_LR_ACTIVE_BIT),	   			\
++	__entry->lrs[x] & ICH_LR_VIRTUAL_ID_MASK,				\
++	(__entry->lrs[x] & ICH_LR_PHYS_ID_MASK) >> ICH_LR_PHYS_ID_SHIFT
++
++TRACE_EVENT(vgic_put_nested,
++	TP_PROTO(struct kvm_vcpu *vcpu, int nr_lr, u64 *lrs),
++	TP_ARGS(vcpu, nr_lr, lrs),
++
++	TP_STRUCT__entry(
++		__field(	int,	nr_lr			)
++		__array(	u64,	lrs,		16	)
++	),
++
++	TP_fast_assign(
++		__entry->nr_lr		= nr_lr;
++		memcpy(__entry->lrs, lrs, 16 * sizeof(u64));
++	),
++
++	TP_printk("nr_lr: %d\n"
++		  "%50sLR[ 0]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[ 1]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[ 2]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[ 3]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[ 4]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[ 5]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[ 6]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[ 7]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[ 8]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[ 9]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[10]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[11]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[12]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[13]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[14]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[15]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu",
++		  __entry->nr_lr,
++		  LR_ENTRY_VALS(0), LR_ENTRY_VALS(1), LR_ENTRY_VALS(2),
++		  LR_ENTRY_VALS(3), LR_ENTRY_VALS(4), LR_ENTRY_VALS(5),
++		  LR_ENTRY_VALS(6), LR_ENTRY_VALS(7), LR_ENTRY_VALS(8),
++		  LR_ENTRY_VALS(9), LR_ENTRY_VALS(10), LR_ENTRY_VALS(11),
++		  LR_ENTRY_VALS(12), LR_ENTRY_VALS(13), LR_ENTRY_VALS(14),
++		  LR_ENTRY_VALS(15))
++);
++
++TRACE_EVENT(vgic_nested_hw_emulate,
++	TP_PROTO(int lr, u64 lr_val, u32 l1_intid),
++	TP_ARGS(lr, lr_val, l1_intid),
++
++	TP_STRUCT__entry(
++		__field(	int,	lr		)
++		__field(	u64,	lr_val		)
++		__field(	u32,	l1_intid	)
++	),
++
++	TP_fast_assign(
++		__entry->lr		= lr;
++		__entry->lr_val		= lr_val;
++		__entry->l1_intid	= l1_intid;
++	),
++
++	TP_printk("lr: %d LR %llx L1 INTID: %u\n",
++		  __entry->lr, __entry->lr_val, __entry->l1_intid)
++);
++
++#endif /* _TRACE_VGIC_NESTED_H */
++
++#undef TRACE_INCLUDE_PATH
++#define TRACE_INCLUDE_PATH vgic/
++#undef TRACE_INCLUDE_FILE
++#define TRACE_INCLUDE_FILE vgic-nested-trace
++
++/* This part must be outside protection */
++#include <trace/define_trace.h>
+diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+index 4ba426e2324d..94b1edb67011 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
++++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+@@ -13,6 +13,9 @@
  
- struct sys_reg_params;
- struct sys_reg_desc;
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index ecbfaf3a43cf..94d3011bcdd2 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -351,6 +351,63 @@ int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
- 	return ret;
+ #include "vgic.h"
+ 
++#define CREATE_TRACE_POINTS
++#include "vgic-nested-trace.h"
++
+ static inline struct vgic_v3_cpu_if *vcpu_nested_if(struct kvm_vcpu *vcpu)
+ {
+ 	return &vcpu->arch.vgic_cpu.nested_vgic_v3;
+@@ -119,6 +122,9 @@ static void vgic_v3_create_shadow_lr(struct kvm_vcpu *vcpu)
+ 		used_lrs = i + 1;
+ 	}
+ 
++	trace_vgic_create_shadow_lrs(vcpu, kvm_vgic_global_state.nr_lr,
++				     s_cpu_if->vgic_lr, cpu_if->vgic_lr);
++
+ 	s_cpu_if->used_lrs = used_lrs;
  }
  
-+
-+unsigned int ttl_to_size(u8 ttl)
-+{
-+	int level = ttl & 3;
-+	int gran = (ttl >> 2) & 3;
-+	unsigned int max_size = 0;
-+
-+	switch (gran) {
-+	case TLBI_TTL_TG_4K:
-+		switch (level) {
-+		case 0:
-+			break;
-+		case 1:
-+			max_size = SZ_1G;
-+			break;
-+		case 2:
-+			max_size = SZ_2M;
-+			break;
-+		case 3:
-+			max_size = SZ_4K;
-+			break;
-+		}
-+		break;
-+	case TLBI_TTL_TG_16K:
-+		switch (level) {
-+		case 0:
-+		case 1:
-+			break;
-+		case 2:
-+			max_size = SZ_32M;
-+			break;
-+		case 3:
-+			max_size = SZ_16K;
-+			break;
-+		}
-+		break;
-+	case TLBI_TTL_TG_64K:
-+		switch (level) {
-+		case 0:
-+		case 1:
-+			/* No 52bit IPA support */
-+			break;
-+		case 2:
-+			max_size = SZ_512M;
-+			break;
-+		case 3:
-+			max_size = SZ_64K;
-+			break;
-+		}
-+		break;
-+	default:			/* No size information */
-+		break;
-+	}
-+
-+	return max_size;
-+}
-+
- /* Must be called with kvm->lock held */
- struct kvm_s2_mmu *lookup_s2_mmu(struct kvm *kvm, u64 vttbr, u64 hcr)
- {
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 90dace973d8f..4374962d43ff 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2616,59 +2616,81 @@ static bool handle_vmalls12e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 	return true;
- }
+@@ -163,8 +169,10 @@ void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
+ 			continue; /* oh well, the guest hyp is broken */
  
-+static unsigned long compute_tlb_inval_range(struct kvm_vcpu *vcpu,
-+					     struct kvm_s2_mmu *mmu,
-+					     u64 val)
-+{
-+	unsigned long max_size;
-+	u8 ttl = 0;
-+
-+	if (cpus_have_const_cap(ARM64_HAS_ARMv8_4_TTL)) {
-+		ttl = FIELD_GET(GENMASK_ULL(47, 44), val);
-+	}
-+
-+	max_size = ttl_to_size(ttl);
-+
-+	if (!max_size) {
-+		u64 vtcr = vcpu_read_sys_reg(vcpu, VTCR_EL2);
-+
-+		/* Compute the maximum extent of the invalidation */
-+		switch ((vtcr & VTCR_EL2_TG0_MASK)) {
-+		case VTCR_EL2_TG0_4K:
-+			max_size = SZ_1G;
-+			break;
-+		case VTCR_EL2_TG0_16K:
-+			max_size = SZ_32M;
-+			break;
-+		case VTCR_EL2_TG0_64K:
-+			/*
-+			 * No, we do not support 52bit IPA in nested yet. Once
-+			 * we do, this should be 4TB.
-+			 */
-+			/* FIXME: remove the 52bit PA support from the IDregs */
-+			max_size = SZ_512M;
-+			break;
-+		default:
-+			BUG();
+ 		lr = __gic_v3_get_lr(i);
+-		if (!(lr & ICH_LR_STATE))
++		if (!(lr & ICH_LR_STATE)) {
++			trace_vgic_nested_hw_emulate(i, lr, l1_irq);
+ 			irq->active = false;
 +		}
-+	}
-+
-+	WARN_ON(!max_size);
-+	return max_size;
-+}
-+
- static bool handle_ipas2e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 			     const struct sys_reg_desc *r)
- {
- 	u64 vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
--	u64 vtcr = vcpu_read_sys_reg(vcpu, VTCR_EL2);
- 	struct kvm_s2_mmu *mmu;
- 	u64 base_addr;
--	int max_size;
-+	unsigned long max_size;
  
+ 		vgic_put_irq(vcpu->kvm, irq);
+ 	}
+@@ -195,6 +203,9 @@ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
+ 
+ 	__vgic_v3_save_state(vcpu_shadow_if(vcpu));
+ 
++	trace_vgic_put_nested(vcpu, kvm_vgic_global_state.nr_lr,
++			      vcpu_shadow_if(vcpu)->vgic_lr);
++
  	/*
- 	 * We drop a number of things from the supplied value:
- 	 *
- 	 * - NS bit: we're non-secure only.
- 	 *
--	 * - TTL field: We already have the granule size from the
--	 *   VTCR_EL2.TG0 field, and the level is only relevant to the
--	 *   guest's S2PT.
--	 *
- 	 * - IPA[51:48]: We don't support 52bit IPA just yet...
- 	 *
- 	 * And of course, adjust the IPA to be on an actual address.
- 	 */
- 	base_addr = (p->regval & GENMASK_ULL(35, 0)) << 12;
- 
--	/* Compute the maximum extent of the invalidation */
--	switch ((vtcr & VTCR_EL2_TG0_MASK)) {
--	case VTCR_EL2_TG0_4K:
--		max_size = SZ_1G;
--		break;
--	case VTCR_EL2_TG0_16K:
--		max_size = SZ_32M;
--		break;
--	case VTCR_EL2_TG0_64K:
--		/*
--		 * No, we do not support 52bit IPA in nested yet. Once
--		 * we do, this should be 4TB.
--		 */
--		/* FIXME: remove the 52bit PA support from the IDregs */
--		max_size = SZ_512M;
--		break;
--	default:
--		BUG();
--	}
--
- 	spin_lock(&vcpu->kvm->mmu_lock);
- 
- 	mmu = lookup_s2_mmu(vcpu->kvm, vttbr, HCR_VM);
--	if (mmu)
-+	if (mmu) {
-+		max_size = compute_tlb_inval_range(vcpu, mmu, p->regval);
-+		base_addr &= ~(max_size - 1);
- 		kvm_unmap_stage2_range(mmu, base_addr, max_size);
-+	}
- 
- 	mmu = lookup_s2_mmu(vcpu->kvm, vttbr, 0);
--	if (mmu)
-+	if (mmu) {
-+		max_size = compute_tlb_inval_range(vcpu, mmu, p->regval);
-+		base_addr &= ~(max_size - 1);
- 		kvm_unmap_stage2_range(mmu, base_addr, max_size);
-+	}
- 
- 	spin_unlock(&vcpu->kvm->mmu_lock);
- 
+ 	 * Translate the shadow state HW fields back to the virtual ones
+ 	 * before copying the shadow struct back to the nested one.
 -- 
 2.29.2
 
