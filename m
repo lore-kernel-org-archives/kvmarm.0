@@ -2,58 +2,57 @@ Return-Path: <SRS0=2g2/=KF=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.2 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5850FC433ED
-	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 17:28:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E3C1C433B4
+	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 17:28:51 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 03523616EB
-	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 17:28:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03523616EB
+	by mail.kernel.org (Postfix) with ESMTP id 2CF956147F
+	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 17:28:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CF956147F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 943654B857;
-	Mon, 10 May 2021 13:28:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BC2CA4B85B;
+	Mon, 10 May 2021 13:28:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 3lRmoEkx5ECJ; Mon, 10 May 2021 13:28:47 -0400 (EDT)
+	with ESMTP id TC-aRj-WyT9x; Mon, 10 May 2021 13:28:49 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 283104B86E;
-	Mon, 10 May 2021 13:28:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B0BF4B862;
+	Mon, 10 May 2021 13:28:49 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A091E4B6F9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 13:28:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D6A654B4BA
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 13:28:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jPwNV-jQJ5Q4 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 10 May 2021 13:28:42 -0400 (EDT)
+ with ESMTP id t12JtCpyzo7V for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 10 May 2021 13:28:46 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 24BCF4B852
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 13:28:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3F8144B841
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 13:28:43 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 6F3C0614A5;
- Mon, 10 May 2021 17:28:40 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 67A6D6162A;
+ Mon, 10 May 2021 17:28:42 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1lg9GD-000Uqg-99; Mon, 10 May 2021 18:00:02 +0100
+ id 1lg9GM-000Uqg-6j; Mon, 10 May 2021 18:00:10 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v4 19/66] KVM: arm64: nv: Trap SPSR_EL1,
- ELR_EL1 and VBAR_EL1 from virtual EL2
-Date: Mon, 10 May 2021 17:58:33 +0100
-Message-Id: <20210510165920.1913477-20-maz@kernel.org>
+Subject: [PATCH v4 23/66] KVM: arm64: nv: Respect virtual CPTR_EL2.{TFP,
+ FPEN} settings
+Date: Mon, 10 May 2021 17:58:37 +0100
+Message-Id: <20210510165920.1913477-24-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210510165920.1913477-1-maz@kernel.org>
 References: <20210510165920.1913477-1-maz@kernel.org>
@@ -87,72 +86,126 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: Jintack Lim <jintack.lim@linaro.org>
 
-For the same reason we trap virtual memory register accesses at virtual
-EL2, we need to trap SPSR_EL1, ELR_EL1 and VBAR_EL1 accesses. ARM v8.3
-introduces the HCR_EL2.NV1 bit to be able to trap on those register
-accesses in EL1. Do not set this bit until the whole nesting support is
-completed.
+Forward traps due to FP/ASIMD register accesses to the virtual EL2
+if virtual CPTR_EL2.TFP is set (with HCR_EL2.E2H == 0) or
+CPTR_EL2.FPEN is configure to do so (with HCR_EL2.E2h == 1).
 
 Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+[maz: account for HCR_EL2.E2H when testing for TFP/FPEN, with
+ all the hard work actually being done by Chase Conklin]
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 29 ++++++++++++++++++++++++++++-
- 1 file changed, 28 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_emulate.h    | 26 +++++++++++++++++++++++++
+ arch/arm64/kvm/handle_exit.c            | 16 +++++++++++----
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  8 ++++++--
+ 3 files changed, 44 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 9fb1cc8bf836..dccc2d758f68 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1584,6 +1584,30 @@ static bool access_sp_el1(struct kvm_vcpu *vcpu,
- 	return true;
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index f63872db1e39..12935f6a7aa9 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -11,12 +11,14 @@
+ #ifndef __ARM64_KVM_EMULATE_H__
+ #define __ARM64_KVM_EMULATE_H__
+ 
++#include <linux/bitfield.h>
+ #include <linux/kvm_host.h>
+ 
+ #include <asm/debug-monitors.h>
+ #include <asm/esr.h>
+ #include <asm/kvm_arm.h>
+ #include <asm/kvm_hyp.h>
++#include <asm/kvm_nested.h>
+ #include <asm/ptrace.h>
+ #include <asm/cputype.h>
+ #include <asm/virt.h>
+@@ -321,6 +323,30 @@ static inline bool vcpu_mode_priv(const struct kvm_vcpu *vcpu)
+ 	return mode != PSR_MODE_EL0t;
  }
  
-+static bool access_elr(struct kvm_vcpu *vcpu,
-+		       struct sys_reg_params *p,
-+		       const struct sys_reg_desc *r)
++static inline bool guest_hyp_fpsimd_traps_enabled(const struct kvm_vcpu *vcpu)
 +{
-+	if (p->is_write)
-+		vcpu_write_sys_reg(vcpu, p->regval, ELR_EL1);
-+	else
-+		p->regval = vcpu_read_sys_reg(vcpu, ELR_EL1);
++	u64 val;
 +
-+	return true;
++	if (!nested_virt_in_use(vcpu))
++		return false;
++
++	val = vcpu_read_sys_reg(vcpu, CPTR_EL2);
++
++	if (!vcpu_el2_e2h_is_set(vcpu))
++		return (val & CPTR_EL2_TFP);
++
++	switch (FIELD_GET(CPACR_EL1_FPEN, val)) {
++	case 0b00:
++	case 0b10:
++		return true;
++	case 0b01:
++		return vcpu_el2_tge_is_set(vcpu) && !vcpu_mode_el2(vcpu);
++	case 0b11:
++	default:		/* GCC is dumb */
++		return false;
++	}
 +}
 +
-+static bool access_spsr(struct kvm_vcpu *vcpu,
-+			struct sys_reg_params *p,
-+			const struct sys_reg_desc *r)
-+{
-+	if (p->is_write)
-+		__vcpu_sys_reg(vcpu, SPSR_EL1) = p->regval;
-+	else
-+		p->regval = __vcpu_sys_reg(vcpu, SPSR_EL1);
-+
-+	return true;
-+}
-+
- static bool access_spsr_el2(struct kvm_vcpu *vcpu,
- 			    struct sys_reg_params *p,
- 			    const struct sys_reg_desc *r)
-@@ -1746,6 +1770,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	PTRAUTH_KEY(APDB),
- 	PTRAUTH_KEY(APGA),
+ static __always_inline u32 kvm_vcpu_get_esr(const struct kvm_vcpu *vcpu)
+ {
+ 	return vcpu->arch.fault.esr_el2;
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index 2f579152df0b..3380c5a91b60 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -96,11 +96,19 @@ static int handle_smc(struct kvm_vcpu *vcpu)
+ }
  
-+	{ SYS_DESC(SYS_SPSR_EL1), access_spsr},
-+	{ SYS_DESC(SYS_ELR_EL1), access_elr},
+ /*
+- * Guest access to FP/ASIMD registers are routed to this handler only
+- * when the system doesn't support FP/ASIMD.
++ * This handles the cases where the system does not support FP/ASIMD or when
++ * we are running nested virtualization and the guest hypervisor is trapping
++ * FP/ASIMD accesses by its guest guest.
++ *
++ * All other handling of guest vs. host FP/ASIMD register state is handled in
++ * fixup_guest_exit().
+  */
+-static int handle_no_fpsimd(struct kvm_vcpu *vcpu)
++static int kvm_handle_fpasimd(struct kvm_vcpu *vcpu)
+ {
++	if (guest_hyp_fpsimd_traps_enabled(vcpu))
++		return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
 +
- 	{ SYS_DESC(SYS_AFSR0_EL1), access_vm_reg, reset_unknown, AFSR0_EL1 },
- 	{ SYS_DESC(SYS_AFSR1_EL1), access_vm_reg, reset_unknown, AFSR1_EL1 },
- 	{ SYS_DESC(SYS_ESR_EL1), access_vm_reg, reset_unknown, ESR_EL1 },
-@@ -1793,7 +1820,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_LORC_EL1), trap_loregion },
- 	{ SYS_DESC(SYS_LORID_EL1), trap_loregion },
++	/* This is the case when the system doesn't support FP/ASIMD. */
+ 	kvm_inject_undefined(vcpu);
+ 	return 1;
+ }
+@@ -243,7 +251,7 @@ static exit_handle_fn arm_exit_handlers[] = {
+ 	[ESR_ELx_EC_BREAKPT_LOW]= kvm_handle_guest_debug,
+ 	[ESR_ELx_EC_BKPT32]	= kvm_handle_guest_debug,
+ 	[ESR_ELx_EC_BRK64]	= kvm_handle_guest_debug,
+-	[ESR_ELx_EC_FP_ASIMD]	= handle_no_fpsimd,
++	[ESR_ELx_EC_FP_ASIMD]	= kvm_handle_fpasimd,
+ 	[ESR_ELx_EC_PAC]	= kvm_handle_ptrauth,
+ };
  
--	{ SYS_DESC(SYS_VBAR_EL1), NULL, reset_val, VBAR_EL1, 0 },
-+	{ SYS_DESC(SYS_VBAR_EL1), access_rw, reset_val, VBAR_EL1, 0 },
- 	{ SYS_DESC(SYS_DISR_EL1), NULL, reset_val, DISR_EL1, 0 },
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index bd2a7a6ae5d7..0790eb2b7545 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -242,8 +242,12 @@ static inline bool __hyp_handle_fpsimd(struct kvm_vcpu *vcpu)
+ 	    esr_ec != ESR_ELx_EC_SVE)
+ 		return false;
  
- 	{ SYS_DESC(SYS_ICC_IAR0_EL1), write_to_read_only },
+-	/* Don't handle SVE traps for non-SVE vcpus here: */
+-	if (!sve_guest && esr_ec != ESR_ELx_EC_FP_ASIMD)
++	/*
++	 * Don't handle SVE traps for non-SVE vcpus here. This
++	 * includes NV guests for the time being.
++	 */
++	if (!sve_guest && (esr_ec != ESR_ELx_EC_FP_ASIMD ||
++			   guest_hyp_fpsimd_traps_enabled(vcpu)))
+ 		return false;
+ 
+ 	/* Valid trap.  Switch the context: */
 -- 
 2.29.2
 
