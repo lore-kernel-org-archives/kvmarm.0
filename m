@@ -6,53 +6,52 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC4E5C43470
-	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 17:28:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38273C43462
+	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 17:28:07 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 771B6614A7
-	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 17:28:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 771B6614A7
+	by mail.kernel.org (Postfix) with ESMTP id C9DC7614A7
+	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 17:28:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9DC7614A7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 13DB74B5A3;
-	Mon, 10 May 2021 13:28:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 668064B42A;
+	Mon, 10 May 2021 13:28:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id NEjyF9Ib3Uri; Mon, 10 May 2021 13:28:03 -0400 (EDT)
+	with ESMTP id TNScq6YbISFE; Mon, 10 May 2021 13:28:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 949454B5A9;
-	Mon, 10 May 2021 13:28:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id ABFA34B703;
+	Mon, 10 May 2021 13:28:03 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C5E24B839
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 13:28:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D2BA34B25E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 13:28:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1R4fvRPWBkGb for <kvmarm@lists.cs.columbia.edu>;
- Mon, 10 May 2021 13:27:58 -0400 (EDT)
+ with ESMTP id 0u4hB7V4gX+D for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 10 May 2021 13:28:01 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6FA1D4B25E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 13:27:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5EA664B4AA
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 13:28:00 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 9159661481;
- Mon, 10 May 2021 17:27:57 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 85D8A61492;
+ Mon, 10 May 2021 17:27:59 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1lg9Gk-000Uqg-9d; Mon, 10 May 2021 18:00:34 +0100
+ id 1lg9Gg-000Uqg-Mr; Mon, 10 May 2021 18:00:30 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v4 54/66] KVM: arm64: nv: Invalidate TLBs based on shadow S2
- TTL-like information
-Date: Mon, 10 May 2021 17:59:08 +0100
-Message-Id: <20210510165920.1913477-55-maz@kernel.org>
+Subject: [PATCH v4 48/66] KVM: arm64: nv: vgic: Emulate the HW bit in software
+Date: Mon, 10 May 2021 17:59:02 +0100
+Message-Id: <20210510165920.1913477-49-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210510165920.1913477-1-maz@kernel.org>
 References: <20210510165920.1913477-1-maz@kernel.org>
@@ -83,201 +82,123 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In order to be able to make S2 TLB invalidations more performant on NV,
-let's use a scheme derived from the ARMv8.4 TTL extension.
+From: Christoffer Dall <christoffer.dall@arm.com>
 
-If bits [56:55] in the descriptor are non-zero, they indicate a level
-which can be used as an invalidation range.
+Should the guest hypervisor use the HW bit in the LRs, we need to
+emulate the deactivation from the L2 guest into the L1 distributor
+emulation, which is handled by L0.
 
+It's all good fun.
+
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_nested.h |  4 ++
- arch/arm64/kvm/nested.c             | 98 +++++++++++++++++++++++++++++
- arch/arm64/kvm/sys_regs.c           | 13 ++--
- 3 files changed, 110 insertions(+), 5 deletions(-)
+ arch/arm64/include/asm/kvm_hyp.h     |  2 ++
+ arch/arm64/kvm/hyp/vgic-v3-sr.c      |  2 +-
+ arch/arm64/kvm/vgic/vgic-v3-nested.c | 32 ++++++++++++++++++++++++++++
+ arch/arm64/kvm/vgic/vgic.c           |  6 ++++--
+ include/kvm/arm_vgic.h               |  1 +
+ 5 files changed, 40 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 7c47ad655e2e..34499c496ae6 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -123,6 +123,8 @@ extern bool __forward_traps(struct kvm_vcpu *vcpu, unsigned int reg,
- 			    u64 control_bit);
- extern bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit);
- extern bool forward_nv_traps(struct kvm_vcpu *vcpu);
-+u8 get_guest_mapping_ttl(struct kvm_vcpu *vcpu, struct kvm_s2_mmu *mmu,
-+			 u64 addr);
- unsigned int ttl_to_size(u8 ttl);
+diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+index 9d60b3006efc..67c3f76ad274 100644
+--- a/arch/arm64/include/asm/kvm_hyp.h
++++ b/arch/arm64/include/asm/kvm_hyp.h
+@@ -57,6 +57,8 @@ DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
  
- struct sys_reg_params;
-@@ -131,4 +133,6 @@ struct sys_reg_desc;
- void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
- 			  const struct sys_reg_desc *r);
+ int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu);
  
-+#define KVM_NV_GUEST_MAP_SZ	GENMASK_ULL(56, 55)
++u64 __gic_v3_get_lr(unsigned int lr);
 +
- #endif /* __ARM64_KVM_NESTED_H */
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 94d3011bcdd2..d48b37f034b8 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -16,6 +16,7 @@
-  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  */
+ void __vgic_v3_save_state(struct vgic_v3_cpu_if *cpu_if);
+ void __vgic_v3_restore_state(struct vgic_v3_cpu_if *cpu_if);
+ void __vgic_v3_activate_traps(struct vgic_v3_cpu_if *cpu_if);
+diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+index 39f8f7f9227c..89b0ffa55424 100644
+--- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
++++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+@@ -18,7 +18,7 @@
+ #define vtr_to_nr_pre_bits(v)		((((u32)(v) >> 26) & 7) + 1)
+ #define vtr_to_nr_apr_regs(v)		(1 << (vtr_to_nr_pre_bits(v) - 5))
  
-+#include <linux/bitfield.h>
- #include <linux/kvm.h>
- #include <linux/kvm_host.h>
- 
-@@ -351,6 +352,29 @@ int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
- 	return ret;
- }
- 
-+static int read_host_s2_desc(phys_addr_t pa, u64 *desc, void *data)
-+{
-+	u64 *va = phys_to_virt(pa);
-+
-+	*desc = *va;
-+
-+	return 0;
-+}
-+
-+static int kvm_walk_shadow_s2(struct kvm_s2_mmu *mmu, phys_addr_t gipa,
-+			      struct kvm_s2_trans *result)
-+{
-+	struct s2_walk_info wi = { };
-+
-+	wi.read_desc = read_host_s2_desc;
-+	wi.baddr = mmu->pgd_phys;
-+
-+	vtcr_to_walk_info(mmu->arch->vtcr, &wi);
-+
-+	wi.be = IS_ENABLED(CONFIG_CPU_BIG_ENDIAN);
-+
-+	return walk_nested_s2_pgd(gipa, &wi, result);
-+}
- 
- unsigned int ttl_to_size(u8 ttl)
+-static u64 __gic_v3_get_lr(unsigned int lr)
++u64 __gic_v3_get_lr(unsigned int lr)
  {
-@@ -408,6 +432,80 @@ unsigned int ttl_to_size(u8 ttl)
- 	return max_size;
- }
- 
-+/*
-+ * Compute the equivalent of the TTL field by parsing the shadow PT.
-+ * The granule size is extracted from VTCR_EL2.TG0 while the level is
-+ * retrieved from first entry carrying the level as a tag.
-+ */
-+u8 get_guest_mapping_ttl(struct kvm_vcpu *vcpu, struct kvm_s2_mmu *mmu,
-+			 u64 addr)
-+{
-+	u64 tmp, sz = 0, vtcr = vcpu_read_sys_reg(vcpu, VTCR_EL2);
-+	struct kvm_s2_trans out;
-+	u8 ttl, level;
-+
-+	switch (vtcr & VTCR_EL2_TG0_MASK) {
-+	case VTCR_EL2_TG0_4K:
-+		ttl = (1 << 2);
-+		break;
-+	case VTCR_EL2_TG0_16K:
-+		ttl = (2 << 2);
-+		break;
-+	case VTCR_EL2_TG0_64K:
-+		ttl = (3 << 2);
-+		break;
-+	default:
-+		BUG();
-+	}
-+
-+	tmp = addr;
-+
-+again:
-+	/* Iteratively compute the block sizes for a particular granule size */
-+	switch (vtcr & VTCR_EL2_TG0_MASK) {
-+	case VTCR_EL2_TG0_4K:
-+		if	(sz < SZ_4K)	sz = SZ_4K;
-+		else if (sz < SZ_2M)	sz = SZ_2M;
-+		else if (sz < SZ_1G)	sz = SZ_1G;
-+		else			sz = 0;
-+		break;
-+	case VTCR_EL2_TG0_16K:
-+		if	(sz < SZ_16K)	sz = SZ_16K;
-+		else if (sz < SZ_32M)	sz = SZ_32M;
-+		else			sz = 0;
-+		break;
-+	case VTCR_EL2_TG0_64K:
-+		if	(sz < SZ_64K)	sz = SZ_64K;
-+		else if (sz < SZ_512M)	sz = SZ_512M;
-+		else			sz = 0;
-+		break;
-+	default:
-+		BUG();
-+	}
-+
-+	if (sz == 0)
-+		return 0;
-+
-+	tmp &= ~(sz - 1);
-+	out = (struct kvm_s2_trans) { };
-+	kvm_walk_shadow_s2(mmu, tmp, &out);
-+	level = FIELD_GET(KVM_NV_GUEST_MAP_SZ, out.upper_attr);
-+	if (!level)
-+		goto again;
-+
-+	ttl |= level;
-+
-+	/*
-+	 * We now have found some level information in the shadow S2. Check
-+	 * that the resulting range is actually including the original IPA.
-+	 */
-+	sz = ttl_to_size(ttl);
-+	if (addr < (tmp + sz))
-+		return ttl;
-+
-+	return 0;
-+}
-+
- /* Must be called with kvm->lock held */
- struct kvm_s2_mmu *lookup_s2_mmu(struct kvm *kvm, u64 vttbr, u64 hcr)
- {
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 4374962d43ff..4db1a9333afa 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2621,10 +2621,13 @@ static unsigned long compute_tlb_inval_range(struct kvm_vcpu *vcpu,
- 					     u64 val)
- {
- 	unsigned long max_size;
--	u8 ttl = 0;
-+	u8 ttl;
- 
--	if (cpus_have_const_cap(ARM64_HAS_ARMv8_4_TTL)) {
--		ttl = FIELD_GET(GENMASK_ULL(47, 44), val);
-+	ttl = FIELD_GET(GENMASK_ULL(47, 44), val);
-+
-+	if (!(cpus_have_const_cap(ARM64_HAS_ARMv8_4_TTL) && ttl)) {
-+		u64 addr = (val & GENMASK_ULL(35, 0)) << 12;
-+		ttl = get_guest_mapping_ttl(vcpu, mmu, addr);
+ 	switch (lr & 0xf) {
+ 	case 0:
+diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+index bfe0ccde514f..3ee3438b5e22 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
++++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+@@ -138,6 +138,38 @@ static void vgic_v3_fixup_shadow_lr_state(struct kvm_vcpu *vcpu)
  	}
+ }
  
- 	max_size = ttl_to_size(ttl);
-@@ -2665,6 +2668,8 @@ static bool handle_ipas2e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 	u64 base_addr;
- 	unsigned long max_size;
- 
-+	spin_lock(&vcpu->kvm->mmu_lock);
++void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
++{
++	struct vgic_v3_cpu_if *cpu_if = vcpu_nested_if(vcpu);
++	struct vgic_v3_cpu_if *s_cpu_if = vcpu_shadow_if(vcpu);
++	struct vgic_irq *irq;
++	int i;
 +
- 	/*
- 	 * We drop a number of things from the supplied value:
- 	 *
-@@ -2676,8 +2681,6 @@ static bool handle_ipas2e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 	 */
- 	base_addr = (p->regval & GENMASK_ULL(35, 0)) << 12;
++	for (i = 0; i < s_cpu_if->used_lrs; i++) {
++		u64 lr = cpu_if->vgic_lr[i];
++		int l1_irq;
++
++		if (!(lr & ICH_LR_HW) || !(lr & ICH_LR_STATE))
++			continue;
++
++		/*
++		 * If we had a HW lr programmed by the guest hypervisor, we
++		 * need to emulate the HW effect between the guest hypervisor
++		 * and the nested guest.
++		 */
++		l1_irq = (lr & ICH_LR_PHYS_ID_MASK) >> ICH_LR_PHYS_ID_SHIFT;
++		irq = vgic_get_irq(vcpu->kvm, vcpu, l1_irq);
++		if (!irq)
++			continue; /* oh well, the guest hyp is broken */
++
++		lr = __gic_v3_get_lr(i);
++		if (!(lr & ICH_LR_STATE))
++			irq->active = false;
++
++		vgic_put_irq(vcpu->kvm, irq);
++	}
++}
++
+ void vgic_v3_load_nested(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+index b06b993c4c7e..3df8d9139999 100644
+--- a/arch/arm64/kvm/vgic/vgic.c
++++ b/arch/arm64/kvm/vgic/vgic.c
+@@ -877,9 +877,11 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
+ {
+ 	int used_lrs;
  
--	spin_lock(&vcpu->kvm->mmu_lock);
--
- 	mmu = lookup_s2_mmu(vcpu->kvm, vttbr, HCR_VM);
- 	if (mmu) {
- 		max_size = compute_tlb_inval_range(vcpu, mmu, p->regval);
+-	/* If nesting, this is a load/put affair, not flush/sync. */
+-	if (vgic_state_is_nested(vcpu))
++	/* If nesting, emulate the HW effect from L0 to L1 */
++	if (vgic_state_is_nested(vcpu)) {
++		vgic_v3_sync_nested(vcpu);
+ 		return;
++	}
+ 
+ 	/* An empty ap_list_head implies used_lrs == 0 */
+ 	if (list_empty(&vcpu->arch.vgic_cpu.ap_list_head))
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 10f63112e785..26586283c8f4 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -372,6 +372,7 @@ void kvm_vgic_load(struct kvm_vcpu *vcpu);
+ void kvm_vgic_put(struct kvm_vcpu *vcpu);
+ void kvm_vgic_vmcr_sync(struct kvm_vcpu *vcpu);
+ 
++void vgic_v3_sync_nested(struct kvm_vcpu *vcpu);
+ void vgic_v3_load_nested(struct kvm_vcpu *vcpu);
+ void vgic_v3_put_nested(struct kvm_vcpu *vcpu);
+ void vgic_v3_handle_nested_maint_irq(struct kvm_vcpu *vcpu);
 -- 
 2.29.2
 
