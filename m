@@ -2,70 +2,60 @@ Return-Path: <SRS0=2g2/=KF=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62CC3C43462
-	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 13:49:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56AA6C433B4
+	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 14:54:43 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id F1FA161584
-	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 13:49:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1FA161584
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id B2D4861421
+	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 14:54:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2D4861421
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C3C74B4EF;
-	Mon, 10 May 2021 09:49:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 227364B2A3;
+	Mon, 10 May 2021 10:54:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id RDWYzaZ5+nMz; Mon, 10 May 2021 09:49:37 -0400 (EDT)
+	with ESMTP id Y8SseZ2mkknA; Mon, 10 May 2021 10:54:40 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DC6AC4B82D;
-	Mon, 10 May 2021 09:49:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E09A4B2BF;
+	Mon, 10 May 2021 10:54:40 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 542D74B4BA
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 09:49:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D24884B2A3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 10:54:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id G6JXtYovAuRt for <kvmarm@lists.cs.columbia.edu>;
- Mon, 10 May 2021 09:49:25 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7763D4B6B6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 09:49:25 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id DF97161104;
- Mon, 10 May 2021 13:49:23 +0000 (UTC)
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1lg6Hi-000Rol-7E; Mon, 10 May 2021 14:49:22 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v3 5/9] KVM: arm64: vgic: move irq->get_input_level into an
- ops structure
-Date: Mon, 10 May 2021 14:48:20 +0100
-Message-Id: <20210510134824.1910399-6-maz@kernel.org>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20210510134824.1910399-1-maz@kernel.org>
-References: <20210510134824.1910399-1-maz@kernel.org>
+ with ESMTP id iH05a4Pdx6A3 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 10 May 2021 10:54:37 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 20B1B4B2A0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 10:54:37 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7908A15BE;
+ Mon, 10 May 2021 07:54:36 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 422713F719;
+ Mon, 10 May 2021 07:54:35 -0700 (PDT)
+Subject: Re: [PATCH 1/2] KVM: arm64: Move __adjust_pc out of line
+To: Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+References: <20210510094915.1909484-1-maz@kernel.org>
+ <20210510094915.1909484-2-maz@kernel.org>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <01c646f1-e342-b9fc-39b3-e8649862b4ac@arm.com>
+Date: Mon, 10 May 2021 15:55:16 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, james.morse@arm.com, suzuki.poulose@arm.com,
- alexandru.elisei@arm.com, eric.auger@redhat.com, marcan@marcan.st,
- mark.rutland@arm.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kernel-team@android.com, Hector Martin <marcan@marcan.st>
+In-Reply-To: <20210510094915.1909484-2-maz@kernel.org>
+Content-Language: en-US
+Cc: kernel-team@android.com, stable@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -82,165 +72,157 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-We already have the option to attach a callback to an interrupt
-to retrieve its pending state. As we are planning to expand this
-facility, move this callback into its own data structure.
+Hi Marc,
 
-This will limit the size of individual interrupts as the ops
-structures can be shared across multiple interrupts.
+On 5/10/21 10:49 AM, Marc Zyngier wrote:
+> In order to make it easy to call __adjust_pc() from the EL1 code
+> (in the case of nVHE), rename it to __kvm_adjust_pc() and move
+> it out of line.
+>
+> No expected functional change.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/arch_timer.c |  8 ++++++--
- arch/arm64/kvm/vgic/vgic.c  | 14 +++++++-------
- include/kvm/arm_vgic.h      | 28 +++++++++++++++++-----------
- 3 files changed, 30 insertions(+), 20 deletions(-)
+It does look to me like they're functionally identical. Minor comments below.
 
-diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index 74e0699661e9..e2288b6bf435 100644
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -1116,6 +1116,10 @@ bool kvm_arch_timer_get_input_level(int vintid)
- 	return kvm_timer_should_fire(timer);
- }
- 
-+static struct irq_ops arch_timer_irq_ops = {
-+	.get_input_level = kvm_arch_timer_get_input_level,
-+};
-+
- int kvm_timer_enable(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
-@@ -1143,7 +1147,7 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
- 	ret = kvm_vgic_map_phys_irq(vcpu,
- 				    map.direct_vtimer->host_timer_irq,
- 				    map.direct_vtimer->irq.irq,
--				    kvm_arch_timer_get_input_level);
-+				    &arch_timer_irq_ops);
- 	if (ret)
- 		return ret;
- 
-@@ -1151,7 +1155,7 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
- 		ret = kvm_vgic_map_phys_irq(vcpu,
- 					    map.direct_ptimer->host_timer_irq,
- 					    map.direct_ptimer->irq.irq,
--					    kvm_arch_timer_get_input_level);
-+					    &arch_timer_irq_ops);
- 	}
- 
- 	if (ret)
-diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-index 15b666200f0b..111bff47e471 100644
---- a/arch/arm64/kvm/vgic/vgic.c
-+++ b/arch/arm64/kvm/vgic/vgic.c
-@@ -182,8 +182,8 @@ bool vgic_get_phys_line_level(struct vgic_irq *irq)
- 
- 	BUG_ON(!irq->hw);
- 
--	if (irq->get_input_level)
--		return irq->get_input_level(irq->intid);
-+	if (irq->ops && irq->ops->get_input_level)
-+		return irq->ops->get_input_level(irq->intid);
- 
- 	WARN_ON(irq_get_irqchip_state(irq->host_irq,
- 				      IRQCHIP_STATE_PENDING,
-@@ -480,7 +480,7 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
- /* @irq->irq_lock must be held */
- static int kvm_vgic_map_irq(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
- 			    unsigned int host_irq,
--			    bool (*get_input_level)(int vindid))
-+			    struct irq_ops *ops)
- {
- 	struct irq_desc *desc;
- 	struct irq_data *data;
-@@ -500,7 +500,7 @@ static int kvm_vgic_map_irq(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
- 	irq->hw = true;
- 	irq->host_irq = host_irq;
- 	irq->hwintid = data->hwirq;
--	irq->get_input_level = get_input_level;
-+	irq->ops = ops;
- 	return 0;
- }
- 
-@@ -509,11 +509,11 @@ static inline void kvm_vgic_unmap_irq(struct vgic_irq *irq)
- {
- 	irq->hw = false;
- 	irq->hwintid = 0;
--	irq->get_input_level = NULL;
-+	irq->ops = NULL;
- }
- 
- int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
--			  u32 vintid, bool (*get_input_level)(int vindid))
-+			  u32 vintid, struct irq_ops *ops)
- {
- 	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, vintid);
- 	unsigned long flags;
-@@ -522,7 +522,7 @@ int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
- 	BUG_ON(!irq);
- 
- 	raw_spin_lock_irqsave(&irq->irq_lock, flags);
--	ret = kvm_vgic_map_irq(vcpu, irq, host_irq, get_input_level);
-+	ret = kvm_vgic_map_irq(vcpu, irq, host_irq, ops);
- 	raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
- 	vgic_put_irq(vcpu->kvm, irq);
- 
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index e45b26e8d479..e5f06df000f2 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -92,6 +92,21 @@ enum vgic_irq_config {
- 	VGIC_CONFIG_LEVEL
- };
- 
-+/*
-+ * Per-irq ops overriding some common behavious.
-+ *
-+ * Always called in non-preemptible section and the functions can use
-+ * kvm_arm_get_running_vcpu() to get the vcpu pointer for private IRQs.
-+ */
-+struct irq_ops {
-+	/*
-+	 * Callback function pointer to in-kernel devices that can tell us the
-+	 * state of the input level of mapped level-triggered IRQ faster than
-+	 * peaking into the physical GIC.
-+	 */
-+	bool (*get_input_level)(int vintid);
-+};
-+
- struct vgic_irq {
- 	raw_spinlock_t irq_lock;	/* Protects the content of the struct */
- 	struct list_head lpi_list;	/* Used to link all LPIs together */
-@@ -129,16 +144,7 @@ struct vgic_irq {
- 	u8 group;			/* 0 == group 0, 1 == group 1 */
- 	enum vgic_irq_config config;	/* Level or edge */
- 
--	/*
--	 * Callback function pointer to in-kernel devices that can tell us the
--	 * state of the input level of mapped level-triggered IRQ faster than
--	 * peaking into the physical GIC.
--	 *
--	 * Always called in non-preemptible section and the functions can use
--	 * kvm_arm_get_running_vcpu() to get the vcpu pointer for private
--	 * IRQs.
--	 */
--	bool (*get_input_level)(int vintid);
-+	struct irq_ops *ops;
- 
- 	void *owner;			/* Opaque pointer to reserve an interrupt
- 					   for in-kernel devices. */
-@@ -355,7 +361,7 @@ void kvm_vgic_init_cpu_hardware(void);
- int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
- 			bool level, void *owner);
- int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
--			  u32 vintid, bool (*get_input_level)(int vindid));
-+			  u32 vintid, struct irq_ops *ops);
- int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int vintid);
- bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int vintid);
- 
--- 
-2.29.2
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Cc: stable@vger.kernel.org # 5.11
+> ---
+>  arch/arm64/include/asm/kvm_asm.h           |  2 ++
+>  arch/arm64/kvm/hyp/exception.c             | 18 +++++++++++++++++-
+>  arch/arm64/kvm/hyp/include/hyp/adjust_pc.h | 18 ------------------
+>  arch/arm64/kvm/hyp/nvhe/switch.c           |  2 +-
+>  arch/arm64/kvm/hyp/vhe/switch.c            |  2 +-
+>  5 files changed, 21 insertions(+), 21 deletions(-)
+>
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index cf8df032b9c3..d5b11037401d 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -201,6 +201,8 @@ extern void __kvm_timer_set_cntvoff(u64 cntvoff);
+>  
+>  extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
+>  
+> +extern void __kvm_adjust_pc(struct kvm_vcpu *vcpu);
 
+It looks pretty strange to have the file
+arch/arm64/kvm/hyp/include/hyp/adjust_pc.h, but the function __kvm_adjust_pc() in
+another header. I guess this was done because arch/arm64/kvm/arm.c will use the
+function in the next patch. I was thinking that maybe renaming
+adjust_pc.h->skip_instr.h would make more sense, what do you think? I can send a
+patch on top of this series with the rename if you prefer.
+
+> +
+>  extern u64 __vgic_v3_get_gic_config(void);
+>  extern u64 __vgic_v3_read_vmcr(void);
+>  extern void __vgic_v3_write_vmcr(u32 vmcr);
+> diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
+> index 73629094f903..0812a496725f 100644
+> --- a/arch/arm64/kvm/hyp/exception.c
+> +++ b/arch/arm64/kvm/hyp/exception.c
+> @@ -296,7 +296,7 @@ static void enter_exception32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
+>  	*vcpu_pc(vcpu) = vect_offset;
+>  }
+>  
+> -void kvm_inject_exception(struct kvm_vcpu *vcpu)
+> +static void kvm_inject_exception(struct kvm_vcpu *vcpu)
+>  {
+>  	if (vcpu_el1_is_32bit(vcpu)) {
+>  		switch (vcpu->arch.flags & KVM_ARM64_EXCEPT_MASK) {
+> @@ -329,3 +329,19 @@ void kvm_inject_exception(struct kvm_vcpu *vcpu)
+>  		}
+>  	}
+>  }
+> +
+> +/*
+> + * Adjust the guest PC on entry, depending on flags provided by EL1
+
+This is also called by the VHE code running at EL2, but the comment is reworded in
+the next patch, so it doesn't really matter, and keeping the diff a straight move
+makes it easier to read.
+
+> + * for the purpose of emulation (MMIO, sysreg) or exception injection.
+> + */
+> +void __kvm_adjust_pc(struct kvm_vcpu *vcpu)
+> +{
+> +	if (vcpu->arch.flags & KVM_ARM64_PENDING_EXCEPTION) {
+> +		kvm_inject_exception(vcpu);
+> +		vcpu->arch.flags &= ~(KVM_ARM64_PENDING_EXCEPTION |
+> +				      KVM_ARM64_EXCEPT_MASK);
+> +	} else 	if (vcpu->arch.flags & KVM_ARM64_INCREMENT_PC) {
+> +		kvm_skip_instr(vcpu);
+> +		vcpu->arch.flags &= ~KVM_ARM64_INCREMENT_PC;
+> +	}
+> +}
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h b/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
+> index 61716359035d..4fdfeabefeb4 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
+> @@ -13,8 +13,6 @@
+>  #include <asm/kvm_emulate.h>
+>  #include <asm/kvm_host.h>
+>  
+> -void kvm_inject_exception(struct kvm_vcpu *vcpu);
+> -
+>  static inline void kvm_skip_instr(struct kvm_vcpu *vcpu)
+>  {
+>  	if (vcpu_mode_is_32bit(vcpu)) {
+> @@ -43,22 +41,6 @@ static inline void __kvm_skip_instr(struct kvm_vcpu *vcpu)
+>  	write_sysreg_el2(*vcpu_pc(vcpu), SYS_ELR);
+>  }
+>  
+> -/*
+> - * Adjust the guest PC on entry, depending on flags provided by EL1
+> - * for the purpose of emulation (MMIO, sysreg) or exception injection.
+> - */
+> -static inline void __adjust_pc(struct kvm_vcpu *vcpu)
+> -{
+> -	if (vcpu->arch.flags & KVM_ARM64_PENDING_EXCEPTION) {
+> -		kvm_inject_exception(vcpu);
+> -		vcpu->arch.flags &= ~(KVM_ARM64_PENDING_EXCEPTION |
+> -				      KVM_ARM64_EXCEPT_MASK);
+> -	} else 	if (vcpu->arch.flags & KVM_ARM64_INCREMENT_PC) {
+> -		kvm_skip_instr(vcpu);
+> -		vcpu->arch.flags &= ~KVM_ARM64_INCREMENT_PC;
+> -	}
+> -}
+> -
+>  /*
+>   * Skip an instruction while host sysregs are live.
+>   * Assumes host is always 64-bit.
+> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+> index e9f6ea704d07..b8ac123c3419 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+> @@ -201,7 +201,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>  	 */
+>  	__debug_save_host_buffers_nvhe(vcpu);
+>  
+> -	__adjust_pc(vcpu);
+> +	__kvm_adjust_pc(vcpu);
+>  
+>  	/*
+>  	 * We must restore the 32-bit state before the sysregs, thanks
+> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> index 7b8f7db5c1ed..3eafed0431f5 100644
+> --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> @@ -132,7 +132,7 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+>  	__load_guest_stage2(vcpu->arch.hw_mmu);
+>  	__activate_traps(vcpu);
+>  
+> -	__adjust_pc(vcpu);
+> +	__kvm_adjust_pc(vcpu);
+
+With the function now moved to kvm_asm.h, the header include adjust_pc.h is not
+needed. Same for the nvhe version of switch.c.
+
+Thanks,
+
+Alex
+
+>  
+>  	sysreg_restore_guest_state_vhe(guest_ctxt);
+>  	__debug_switch_to_guest(vcpu);
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
