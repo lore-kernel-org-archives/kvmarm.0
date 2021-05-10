@@ -2,80 +2,79 @@ Return-Path: <SRS0=2g2/=KF=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDD74C433B4
-	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 09:59:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FD72C433B4
+	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 10:00:14 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5696B610CB
-	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 09:59:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5696B610CB
+	by mail.kernel.org (Postfix) with ESMTP id 897366120D
+	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 10:00:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 897366120D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D42114B4BA;
-	Mon, 10 May 2021 05:59:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E2B814B456;
+	Mon, 10 May 2021 06:00:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id SFY72FHbhHZx; Mon, 10 May 2021 05:59:19 -0400 (EDT)
+	with ESMTP id qRSqrpxN5a54; Mon, 10 May 2021 06:00:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6EB8F4B490;
-	Mon, 10 May 2021 05:59:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A48AC4B258;
+	Mon, 10 May 2021 06:00:11 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BB714B490
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 05:59:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CB21F4B22B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 06:00:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Krrn41PO76fP for <kvmarm@lists.cs.columbia.edu>;
- Mon, 10 May 2021 05:59:17 -0400 (EDT)
+ with ESMTP id Ox2my1p1Rzrv for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 10 May 2021 06:00:07 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E9F654B381
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 05:59:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A86724B22A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 06:00:07 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id ECFE0610CC;
- Mon, 10 May 2021 09:59:14 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id F09F961042;
+ Mon, 10 May 2021 10:00:05 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1lg2gx-000LZK-SC; Mon, 10 May 2021 10:59:12 +0100
-Date: Mon, 10 May 2021 10:59:11 +0100
-Message-ID: <87y2cmoqog.wl-maz@kernel.org>
+ id 1lg2hm-000Lan-Qh; Mon, 10 May 2021 11:00:03 +0100
+Date: Mon, 10 May 2021 11:00:02 +0100
+Message-ID: <87wns6oqn1.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Auger Eric <eric.auger@redhat.com>
-Subject: Re: Question on guest enable msi fail when using GICv4/4.1
-In-Reply-To: <69cd5989-f4cb-469c-f6a0-3362540e0271@redhat.com>
-References: <3a2c66d6-6ca0-8478-d24b-61e8e3241b20@hisilicon.com>
- <87k0oaq5jf.wl-maz@kernel.org>
- <cf870bcf-1173-a70b-2b55-4209abcbcbc3@hisilicon.com>
- <878s4qq00u.wl-maz@kernel.org>
- <d6481eee-4318-1a56-a5a4-daf467070d22@redhat.com>
- <871rafowp2.wl-maz@kernel.org>
- <69cd5989-f4cb-469c-f6a0-3362540e0271@redhat.com>
+To: "Zhu, Lingshan" <lingshan.zhu@intel.com>
+Subject: Re: [PATCH] Revert "irqbypass: do not start cons/prod when failed
+ connect"
+In-Reply-To: <feee2889-6e91-46f3-123f-826a9c4ef43c@intel.com>
+References: <20210508071152.722425-1-lingshan.zhu@intel.com>
+ <b309c02d-9570-6400-9a0c-63030aed7ff7@redhat.com>
+ <a659fc6f-2c7a-23d2-9c34-0044d5a31861@intel.com>
+ <e5d63867-7a4a-963f-9fbd-741ccd3ec360@redhat.com>
+ <b822cde1-7970-dac0-26cc-da1daa0b622f@intel.com>
+ <feee2889-6e91-46f3-123f-826a9c4ef43c@intel.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: eric.auger@redhat.com, zhangshaokun@hisilicon.com,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- kvm@vger.kernel.org, linux-pci@vger.kernel.org, alex.williamson@redhat.com,
- cohuck@redhat.com, tangnianyao@huawei.com, bhelgaas@google.com
+X-SA-Exim-Rcpt-To: lingshan.zhu@intel.com, jasowang@redhat.com, mst@redhat.com,
+ alex.williamson@redhat.com, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ cohuck@redhat.com, stable@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, linux-pci@vger.kernel.org,
- Cornelia Huck <cohuck@redhat.com>, Shaokun Zhang <zhangshaokun@hisilicon.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Bjorn Helgaas <bhelgaas@google.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, mst@redhat.com, Jason Wang <jasowang@redhat.com>,
+ cohuck@redhat.com, stable@vger.kernel.org, alex.williamson@redhat.com,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,154 +86,43 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 10 May 2021 09:29:47 +0100,
-Auger Eric <eric.auger@redhat.com> wrote:
-> 
-> Hi Marc,
-> 
-> On 5/10/21 9:49 AM, Marc Zyngier wrote:
-> > Hi Eric,
-> > 
-> > On Sun, 09 May 2021 18:00:04 +0100,
-> > Auger Eric <eric.auger@redhat.com> wrote:
-> >>
-> >> Hi,
-> >> On 5/7/21 1:02 PM, Marc Zyngier wrote:
-> >>> On Fri, 07 May 2021 10:58:23 +0100,
-> >>> Shaokun Zhang <zhangshaokun@hisilicon.com> wrote:
-> >>>>
-> >>>> Hi Marc,
-> >>>>
-> >>>> Thanks for your quick reply.
-> >>>>
-> >>>> On 2021/5/7 17:03, Marc Zyngier wrote:
-> >>>>> On Fri, 07 May 2021 06:57:04 +0100,
-> >>>>> Shaokun Zhang <zhangshaokun@hisilicon.com> wrote:
-> >>>>>>
-> >>>>>> [This letter comes from Nianyao Tang]
-> >>>>>>
-> >>>>>> Hi,
-> >>>>>>
-> >>>>>> Using GICv4/4.1 and msi capability, guest vf driver requires 3
-> >>>>>> vectors and enable msi, will lead to guest stuck.
-> >>>>>
-> >>>>> Stuck how?
-> >>>>
-> >>>> Guest serial does not response anymore and guest network shutdown.
-> >>>>
-> >>>>>
-> >>>>>> Qemu gets number of interrupts from Multiple Message Capable field
-> >>>>>> set by guest. This field is aligned to a power of 2(if a function
-> >>>>>> requires 3 vectors, it initializes it to 2).
-> >>>>>
-> >>>>> So I guess this is a MultiMSI device with 4 vectors, right?
-> >>>>>
-> >>>>
-> >>>> Yes, it can support maximum of 32 msi interrupts, and vf driver only use 3 msi.
-> >>>>
-> >>>>>> However, guest driver just sends 3 mapi-cmd to vits and 3 ite
-> >>>>>> entries is recorded in host.  Vfio initializes msi interrupts using
-> >>>>>> the number of interrupts 4 provide by qemu.  When it comes to the
-> >>>>>> 4th msi without ite in vits, in irq_bypass_register_producer,
-> >>>>>> producer and consumer will __connect fail, due to find_ite fail, and
-> >>>>>> do not resume guest.
-> >>>>>
-> >>>>> Let me rephrase this to check that I understand it:
-> >>>>> - The device has 4 vectors
-> >>>>> - The guest only create mappings for 3 of them
-> >>>>> - VFIO calls kvm_vgic_v4_set_forwarding() for each vector
-> >>>>> - KVM doesn't have a mapping for the 4th vector and returns an error
-> >>>>> - VFIO disable this 4th vector
-> >>>>>
-> >>>>> Is that correct? If yes, I don't understand why that impacts the guest
-> >>>>> at all. From what I can see, vfio_msi_set_vector_signal() just prints
-> >>>>> a message on the console and carries on.
-> >>>>>
-> >>>>
-> >>>> function calls:
-> >>>> --> vfio_msi_set_vector_signal
-> >>>>    --> irq_bypass_register_producer
-> >>>>       -->__connect
-> >>>>
-> >>>> in __connect, add_producer finally calls kvm_vgic_v4_set_forwarding
-> >>>> and fails to get the 4th mapping. When add_producer fail, it does
-> >>>> not call cons->start, calls kvm_arch_irq_bypass_start and then
-> >>>> kvm_arm_resume_guest.
-> >>>
-> >>> [+Eric, who wrote the irq_bypass infrastructure.]
-> >>>
-> >>> Ah, so the guest is actually paused, not in a livelock situation
-> >>> (which is how I interpreted "stuck").
-> >>>
-> >>> I think we should handle this case gracefully, as there should be no
-> >>> expectation that the guest will be using this interrupt. Given that
-> >>> VFIO seems to be pretty unfazed when a producer fails, I'm temped to
-> >>> do the same thing and restart the guest.
-> >>>
-> >>> Also, __disconnect doesn't care about errors, so why should __connect
-> >>> have this odd behaviour?
-> >>
-> >> _disconnect() does not care as we should always succeed tearing off
-> >> things. del_* ops are void functions. On the opposite we can fail
-> >> setting up the bypass.
-> >>
-> >> Effectively
-> >> a979a6aa009f ("irqbypass: do not start cons/prod when failed connect")
-> >> needs to be reverted.
-> >>
-> >> I agree the kerneldoc comments in linux/irqbypass.h may be improved to
-> >> better explain the role of stop/start cbs and warn about their potential
-> >> global impact.
-> > 
-> > Yup. It also begs the question of why we have producer callbacks, as
-> > nobody seems to use them.
-> 
-> At the time this was designed, I was working on VFIO platform IRQ
-> forwarding using direct EOI and they were used (and useful)
-> 
-> +	irq->producer.stop = vfio_platform_irq_bypass_stop;
-> +	irq->producer.start = vfio_platform_irq_bypass_start;
-> 
-> [PATCH v4 02/13] VFIO: platform: registration of a dummy IRQ bypass producer
-> [PATCH v4 07/13] VFIO: platform: add irq bypass producer management
-> https://lists.cs.columbia.edu/pipermail/kvmarm/2015-November/017323.html
-> 
-> basically the IRQ was disabled and re-enabled. This series has never
-> been upstreamed but that's where it originates from.
-
-Ah, I remember those. Something tells me we are eventually going to
-need something like that with pKVM (unfortunately, PCI isn't that
-popular on Android phones...).
-
-> >> wrt the case above, "in __connect, add_producer finally calls
-> >> kvm_vgic_v4_set_forwarding and fails to get the 4th mapping", shouldn't
-> >> we succeed in that case?
-> > 
-> > From a KVM perspective, we can't return a success because there is no
-> > guest LPI that matches the input signal.
-> right, sorry I had in mind the set_forwarding was partially successful
-> for 3 of 4 LPIs but it is a unitary operation.
-> > 
-> > And such failure seems to be expected by the VFIO code, which just
-> > prints a message on the console and set the producer token to NULL. So
-> > returning an error from the KVM code is useful, at least to an extent.
-> 
-> OK. So with the revert, the use case resume working, right?
-
-Yes, Shaokun confirmed he was back in business.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gTW9uLCAxMCBNYXkgMjAyMSAwOTozMjo1NCArMDEwMCwKIlpodSwgTGluZ3NoYW4iIDxsaW5n
+c2hhbi56aHVAaW50ZWwuY29tPiB3cm90ZToKPiAKPiAKPiAKPiBPbiA1LzEwLzIwMjEgMzowOSBQ
+TSwgWmh1LCBMaW5nc2hhbiB3cm90ZToKPiA+IAo+ID4gCj4gPiBPbiA1LzEwLzIwMjEgMTI6MzQg
+UE0sIEphc29uIFdhbmcgd3JvdGU6Cj4gPj4gCj4gPj4g5ZyoIDIwMjEvNS8xMCDkuIrljYgxMTow
+MCwgWmh1LCBMaW5nc2hhbiDlhpnpgZM6Cj4gPj4+IAo+ID4+PiAKPiA+Pj4gT24gNS8xMC8yMDIx
+IDEwOjQzIEFNLCBKYXNvbiBXYW5nIHdyb3RlOgo+ID4+Pj4gCj4gPj4+PiDlnKggMjAyMS81Lzgg
+5LiL5Y2IMzoxMSwgWmh1IExpbmdzaGFuIOWGmemBkzoKPiA+Pj4+PiBUaGlzIHJldmVydHMgY29t
+bWl0IGE5NzlhNmFhMDA5ZjNjOTk2ODk0MzJlMGNkYjU0MDJhNDQ2M2ZiODguCj4gPj4+Pj4gCj4g
+Pj4+Pj4gVGhlIHJldmVydGVkIGNvbW1pdCBtYXkgY2F1c2UgVk0gZnJlZXplIG9uIGFybTY0IHBs
+YXRmb3JtLgo+ID4+Pj4+IEJlY2F1c2Ugb24gYXJtNjQgcGxhdGZvcm0sIHN0b3AgYSBjb25zdW1l
+ciB3aWxsIHN1c3BlbmQgdGhlIFZNLAo+ID4+Pj4+IHRoZSBWTSB3aWxsIGZyZWV6ZSB3aXRob3V0
+IGEgc3RhcnQgY29uc3VtZXIKPiA+Pj4+PiAKPiA+Pj4+PiBTaWduZWQtb2ZmLWJ5OiBaaHUgTGlu
+Z3NoYW4gPGxpbmdzaGFuLnpodUBpbnRlbC5jb20+Cj4gPj4+PiAKPiA+Pj4+IAo+ID4+Pj4gQWNr
+ZWQtYnk6IEphc29uIFdhbmcgPGphc293YW5nQHJlZGhhdC5jb20+Cj4gPj4+PiAKPiA+Pj4+IFBs
+ZWFzZSByZXN1Ym1pdCB3aXRoIHRoZSBmb3JtYWwgcHJvY2VzcyBvZiBzdGFibGUKPiA+Pj4+IChz
+dGFibGUta2VybmVsLXJ1bGVzLnJzdCkuCj4gPj4+IHN1cmUsIEkgd2lsbCByZS1zdWJtaXQgaXQg
+dG8gc3RhYmxlIGtlcm5lbCBvbmNlIGl0IGlzIG1lcmdlZCBpbnRvCj4gPj4+IExpbnVzIHRyZWUu
+Cj4gPj4+IAo+ID4+PiBUaGFua3MKPiA+PiAKPiA+PiAKPiA+PiBJIHRoaW5rIGl0J3MgYmV0dGVy
+IHRvIHJlc3VibWl0IChvcHRpb24gMSksIHNlZSBob3cKPiA+PiBzdGFibGUta2VybmVsLXJ1bGVz
+LnJzdCBzYWlkOgo+ID4+IAo+ID4+ICIiCj4gPj4gCj4gPj4gOnJlZjpgb3B0aW9uXzFgIGlzICoq
+c3Ryb25nbHkqKiBwcmVmZXJyZWQsIGlzIHRoZSBlYXNpZXN0IGFuZCBtb3N0Cj4gPj4gY29tbW9u
+Lgo+ID4+IDpyZWY6YG9wdGlvbl8yYCBhbmQgOnJlZjpgb3B0aW9uXzNgIGFyZSBtb3JlIHVzZWZ1
+bCBpZiB0aGUgcGF0Y2gKPiA+PiBpc24ndCBkZWVtZWQKPiA+PiB3b3J0aHkgYXQgdGhlIHRpbWUg
+aXQgaXMgYXBwbGllZCB0byBhIHB1YmxpYyBnaXQgdHJlZSAoZm9yCj4gPj4gaW5zdGFuY2UsIGJl
+Y2F1c2UKPiA+PiBpdCBkZXNlcnZlcyBtb3JlIHJlZ3Jlc3Npb24gdGVzdGluZyBmaXJzdCkuCj4g
+Pj4gCj4gPj4gIiIiCj4gPj4gCj4gPj4gVGhhbmtzCj4gPiBPSywgd29ya3MgZm9yIG1lLCBJIHdp
+bGwgYWRkIGNjIHN0YWJsZSwgYW5kIHJlc3VibWl0IGl0IHNvb24KPiA+IAo+ID4gVGhhbmtzIQo+
+IEkganVzdCBzZWVNYXJjIGhhcyBhbHJlYWR5IGFkZGVkICJDYzogc3RhYmxlQHZnZXIua2VybmVs
+Lm9yZyIsIGFuZAo+IGhlIHdvdWxkIHRha2UgdGhlIHBhdGNoIGluIGhpcyB0cmVlLCBzbyBJIHRo
+aW5rIG5vIG5lZWQgdG8gcmVzZW5kLgoKVGhhdCdzIGZpbmUsIEkgY2FuIGZpeCB0aGluZ3MgdXAg
+bXlzZWxmIGFuZCBxdWV1ZSB0aGUgZml4IGZvciAtcmMyLgoKVGhhbmtzLAoKCU0uCgotLSAKV2l0
+aG91dCBkZXZpYXRpb24gZnJvbSB0aGUgbm9ybSwgcHJvZ3Jlc3MgaXMgbm90IHBvc3NpYmxlLgpf
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFp
+bGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5j
+b2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
