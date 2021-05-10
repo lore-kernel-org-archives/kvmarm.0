@@ -6,52 +6,53 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9682C43461
-	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 17:29:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9740BC433ED
+	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 17:29:08 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5F9406161C
-	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 17:29:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F9406161C
+	by mail.kernel.org (Postfix) with ESMTP id 0C4D061621
+	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 17:29:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C4D061621
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EF3394B273;
-	Mon, 10 May 2021 13:29:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 97EAB4B870;
+	Mon, 10 May 2021 13:29:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id aUqDHCkNW9jl; Mon, 10 May 2021 13:29:02 -0400 (EDT)
+	with ESMTP id zmK0Az1pVbhw; Mon, 10 May 2021 13:29:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 277894B87D;
-	Mon, 10 May 2021 13:29:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 46DC54B2CB;
+	Mon, 10 May 2021 13:29:06 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B85894B81F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 13:28:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 583DE4B53B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 13:29:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cZmS1gt0BUKN for <kvmarm@lists.cs.columbia.edu>;
- Mon, 10 May 2021 13:28:58 -0400 (EDT)
+ with ESMTP id qOYXOHQa8Dh5 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 10 May 2021 13:29:04 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AD3704B882
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 13:28:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DF4CE4B825
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 13:29:00 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id ECE5F61480;
- Mon, 10 May 2021 17:28:57 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 1092361554;
+ Mon, 10 May 2021 17:29:00 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1lg9G2-000Uqg-1X; Mon, 10 May 2021 17:59:51 +0100
+ id 1lg9G6-000Uqg-B8; Mon, 10 May 2021 17:59:56 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v4 15/66] KVM: arm64: nv: Handle HCR_EL2.E2H specially
-Date: Mon, 10 May 2021 17:58:29 +0100
-Message-Id: <20210510165920.1913477-16-maz@kernel.org>
+Subject: [PATCH v4 17/66] KVM: arm64: nv: Emulate PSTATE.M for a guest
+ hypervisor
+Date: Mon, 10 May 2021 17:58:31 +0100
+Message-Id: <20210510165920.1913477-18-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210510165920.1913477-1-maz@kernel.org>
 References: <20210510165920.1913477-1-maz@kernel.org>
@@ -82,60 +83,85 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-HCR_EL2.E2H is nasty, as a flip of this bit completely changes the way
-we deal with a lot of the state. So when the guest flips this bit
-(sysregs are live), do the put/load dance so that we have a consistent
-state.
+From: Christoffer Dall <christoffer.dall@arm.com>
 
-Yes, this is slow. Don't do it.
+We can no longer blindly copy the VCPU's PSTATE into SPSR_EL2 and return
+to the guest and vice versa when taking an exception to the hypervisor,
+because we emulate virtual EL2 in EL1 and therefore have to translate
+the mode field from EL2 to EL1 and vice versa.
 
-Suggested-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 43 +++++++++++++++++++++-
+ 1 file changed, 41 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 2c1ab8cd58b4..0d29d9d59c3f 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -187,9 +187,24 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
- 		goto memory_write;
+diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+index e3901c73893e..92715fa01e88 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
++++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+@@ -51,10 +51,32 @@ static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
+ 	ctxt_sys_reg(ctxt, SPSR_EL1)	= read_sysreg_el1(SYS_SPSR);
+ }
  
- 	if (unlikely(get_el2_mapping(reg, &el1r, &xlate))) {
-+		bool need_put_load;
++static inline u64 from_hw_pstate(const struct kvm_cpu_context *ctxt)
++{
++	u64 reg = read_sysreg_el2(SYS_SPSR);
 +
- 		if (!is_hyp_ctxt(vcpu))
- 			goto memory_write;
- 
-+		/*
-+		 * HCR_EL2.E2H is nasty: it changes the way we interpret a
-+		 * lot of the EL2 state, so treat is as a full state
-+		 * transition.
-+		 */
-+		need_put_load = ((reg == HCR_EL2) &&
-+				 vcpu_el2_e2h_is_set(vcpu) != !!(val & HCR_E2H));
++	if (__is_hyp_ctxt(ctxt)) {
++		u64 mode = reg & (PSR_MODE_MASK | PSR_MODE32_BIT);
 +
-+		if (need_put_load) {
-+			preempt_disable();
-+			kvm_arch_vcpu_put(vcpu);
++		switch (mode) {
++		case PSR_MODE_EL1t:
++			mode = PSR_MODE_EL2t;
++			break;
++		case PSR_MODE_EL1h:
++			mode = PSR_MODE_EL2h;
++			break;
 +		}
 +
- 		/*
- 		 * Always store a copy of the write to memory to avoid having
- 		 * to reverse-translate virtual EL2 system registers for a
-@@ -197,6 +212,11 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
- 		 */
- 		__vcpu_sys_reg(vcpu, reg) = val;
- 
-+		if (need_put_load) {
-+			kvm_arch_vcpu_load(vcpu, smp_processor_id());
-+			preempt_enable();
-+		}
++		return (reg & ~(PSR_MODE_MASK | PSR_MODE32_BIT)) | mode;
++	}
 +
- 		switch (reg) {
- 		case ELR_EL2:
- 			write_sysreg_el1(val, SYS_ELR);
++	return reg;
++}
++
+ static inline void __sysreg_save_el2_return_state(struct kvm_cpu_context *ctxt)
+ {
+ 	ctxt->regs.pc			= read_sysreg_el2(SYS_ELR);
+-	ctxt->regs.pstate		= read_sysreg_el2(SYS_SPSR);
++	ctxt->regs.pstate		= from_hw_pstate(ctxt);
+ 
+ 	if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN))
+ 		ctxt_sys_reg(ctxt, DISR_EL1) = read_sysreg_s(SYS_VDISR_EL2);
+@@ -131,9 +153,26 @@ static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt,
+ 	write_sysreg_el1(ctxt_sys_reg(ctxt, SPSR_EL1),	SYS_SPSR);
+ }
+ 
++/* Read the VCPU state's PSTATE, but translate (v)EL2 to EL1. */
++static inline u64 to_hw_pstate(const struct kvm_cpu_context *ctxt)
++{
++	u64 mode = ctxt->regs.pstate & (PSR_MODE_MASK | PSR_MODE32_BIT);
++
++	switch (mode) {
++	case PSR_MODE_EL2t:
++		mode = PSR_MODE_EL1t;
++		break;
++	case PSR_MODE_EL2h:
++		mode = PSR_MODE_EL1h;
++		break;
++	}
++
++	return (ctxt->regs.pstate & ~(PSR_MODE_MASK | PSR_MODE32_BIT)) | mode;
++}
++
+ static inline void __sysreg_restore_el2_return_state(struct kvm_cpu_context *ctxt)
+ {
+-	u64 pstate = ctxt->regs.pstate;
++	u64 pstate = to_hw_pstate(ctxt);
+ 	u64 mode = pstate & PSR_AA32_MODE_MASK;
+ 
+ 	/*
 -- 
 2.29.2
 
