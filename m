@@ -6,53 +6,52 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 469FFC433B4
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1D9EC43461
 	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 13:49:37 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BEFAC61584
-	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 13:49:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEFAC61584
+	by mail.kernel.org (Postfix) with ESMTP id 3094F61606
+	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 13:49:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3094F61606
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 678D04B82F;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C98AD4B5AC;
 	Mon, 10 May 2021 09:49:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id WgkHdeqOIiln; Mon, 10 May 2021 09:49:35 -0400 (EDT)
+	with ESMTP id CjTsz1Ghqldf; Mon, 10 May 2021 09:49:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A85284B847;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B11E4B856;
 	Mon, 10 May 2021 09:49:29 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F0CD4B83C
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 084C74B808
  for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 09:49:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id oOei39x4BWVI for <kvmarm@lists.cs.columbia.edu>;
- Mon, 10 May 2021 09:49:26 -0400 (EDT)
+ with ESMTP id EWqledhUspyR for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 10 May 2021 09:49:25 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 22F944B6EB
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 09:49:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B4EFD4B7B5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 09:49:25 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id E8CF86157F;
- Mon, 10 May 2021 13:49:25 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id EE16961574;
+ Mon, 10 May 2021 13:49:24 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1lg6Hk-000Rol-7i; Mon, 10 May 2021 14:49:24 +0100
+ id 1lg6Hj-000Rol-93; Mon, 10 May 2021 14:49:23 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
  kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v3 9/9] irqchip/apple-aic: Advertise some level of vGICv3
- compatibility
-Date: Mon, 10 May 2021 14:48:24 +0100
-Message-Id: <20210510134824.1910399-10-maz@kernel.org>
+Subject: [PATCH v3 7/9] KVM: arm64: timer: Refactor IRQ configuration
+Date: Mon, 10 May 2021 14:48:22 +0100
+Message-Id: <20210510134824.1910399-8-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210510134824.1910399-1-maz@kernel.org>
 References: <20210510134824.1910399-1-maz@kernel.org>
@@ -82,50 +81,104 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The CPUs in the Apple M1 SoC partially implement a virtual GICv3
-CPU interface, although one that is incapable of HW deactivation
-of interrupts.
+As we are about to add some more things to the timer IRQ
+configuration, move this code out of the main timer init code
+into its own set of functions.
 
-Advertise the support to KVM.
+No functional changes.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- drivers/irqchip/irq-apple-aic.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ arch/arm64/kvm/arch_timer.c | 61 ++++++++++++++++++++++---------------
+ 1 file changed, 37 insertions(+), 24 deletions(-)
 
-diff --git a/drivers/irqchip/irq-apple-aic.c b/drivers/irqchip/irq-apple-aic.c
-index c179e27062fd..a44370c018e2 100644
---- a/drivers/irqchip/irq-apple-aic.c
-+++ b/drivers/irqchip/irq-apple-aic.c
-@@ -50,6 +50,7 @@
- #include <linux/cpuhotplug.h>
- #include <linux/io.h>
- #include <linux/irqchip.h>
-+#include <linux/irqchip/arm-vgic-info.h>
- #include <linux/irqdomain.h>
- #include <linux/limits.h>
- #include <linux/of_address.h>
-@@ -787,6 +788,11 @@ static int aic_init_cpu(unsigned int cpu)
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index e2288b6bf435..7fa4f446456a 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -973,6 +973,39 @@ static int kvm_timer_dying_cpu(unsigned int cpu)
  	return 0;
  }
  
-+static struct gic_kvm_info vgic_info __initdata = {
-+	.type			= GIC_V3,
-+	.no_hw_deactivation	= true,
-+};
++static void kvm_irq_fixup_flags(unsigned int virq, u32 *flags)
++{
++	*flags = irq_get_trigger_type(virq);
++	if (*flags != IRQF_TRIGGER_HIGH && *flags != IRQF_TRIGGER_LOW) {
++		kvm_err("Invalid trigger for timer IRQ%d, assuming level low\n",
++			virq);
++		*flags = IRQF_TRIGGER_LOW;
++	}
++}
 +
- static int __init aic_of_ic_init(struct device_node *node, struct device_node *parent)
++static int kvm_irq_init(struct arch_timer_kvm_info *info)
++{
++	struct irq_domain *domain = NULL;
++	struct fwnode_handle *fwnode;
++	struct irq_data *data;
++
++	if (info->virtual_irq <= 0) {
++		kvm_err("kvm_arch_timer: invalid virtual timer IRQ: %d\n",
++			info->virtual_irq);
++		return -ENODEV;
++	}
++
++	host_vtimer_irq = info->virtual_irq;
++	kvm_irq_fixup_flags(host_vtimer_irq, &host_vtimer_irq_flags);
++
++	if (info->physical_irq > 0) {
++		host_ptimer_irq = info->physical_irq;
++		kvm_irq_fixup_flags(host_ptimer_irq, &host_ptimer_irq_flags);
++	}
++
++	return 0;
++}
++
+ int kvm_timer_hyp_init(bool has_gic)
  {
- 	int i;
-@@ -843,6 +849,8 @@ static int __init aic_of_ic_init(struct device_node *node, struct device_node *p
- 			  "irqchip/apple-aic/ipi:starting",
- 			  aic_init_cpu, NULL);
+ 	struct arch_timer_kvm_info *info;
+@@ -986,22 +1019,11 @@ int kvm_timer_hyp_init(bool has_gic)
+ 		return -ENODEV;
+ 	}
  
-+	vgic_set_kvm_info(&vgic_info);
-+
- 	pr_info("Initialized with %d IRQs, %d FIQs, %d vIPIs\n",
- 		irqc->nr_hw, AIC_NR_FIQ, AIC_NR_SWIPI);
+-	/* First, do the virtual EL1 timer irq */
+-
+-	if (info->virtual_irq <= 0) {
+-		kvm_err("kvm_arch_timer: invalid virtual timer IRQ: %d\n",
+-			info->virtual_irq);
+-		return -ENODEV;
+-	}
+-	host_vtimer_irq = info->virtual_irq;
++	err = kvm_irq_init(info);
++	if (err)
++		return err;
  
+-	host_vtimer_irq_flags = irq_get_trigger_type(host_vtimer_irq);
+-	if (host_vtimer_irq_flags != IRQF_TRIGGER_HIGH &&
+-	    host_vtimer_irq_flags != IRQF_TRIGGER_LOW) {
+-		kvm_err("Invalid trigger for vtimer IRQ%d, assuming level low\n",
+-			host_vtimer_irq);
+-		host_vtimer_irq_flags = IRQF_TRIGGER_LOW;
+-	}
++	/* First, do the virtual EL1 timer irq */
+ 
+ 	err = request_percpu_irq(host_vtimer_irq, kvm_arch_timer_handler,
+ 				 "kvm guest vtimer", kvm_get_running_vcpus());
+@@ -1027,15 +1049,6 @@ int kvm_timer_hyp_init(bool has_gic)
+ 	/* Now let's do the physical EL1 timer irq */
+ 
+ 	if (info->physical_irq > 0) {
+-		host_ptimer_irq = info->physical_irq;
+-		host_ptimer_irq_flags = irq_get_trigger_type(host_ptimer_irq);
+-		if (host_ptimer_irq_flags != IRQF_TRIGGER_HIGH &&
+-		    host_ptimer_irq_flags != IRQF_TRIGGER_LOW) {
+-			kvm_err("Invalid trigger for ptimer IRQ%d, assuming level low\n",
+-				host_ptimer_irq);
+-			host_ptimer_irq_flags = IRQF_TRIGGER_LOW;
+-		}
+-
+ 		err = request_percpu_irq(host_ptimer_irq, kvm_arch_timer_handler,
+ 					 "kvm guest ptimer", kvm_get_running_vcpus());
+ 		if (err) {
 -- 
 2.29.2
 
