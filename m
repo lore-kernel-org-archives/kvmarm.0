@@ -6,53 +6,52 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC069C43460
-	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 17:28:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 703E9C43461
+	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 17:28:26 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 406DA61606
-	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 17:28:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 406DA61606
+	by mail.kernel.org (Postfix) with ESMTP id D20AF61624
+	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 17:28:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D20AF61624
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C40344B835;
-	Mon, 10 May 2021 13:28:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F47F4B5A9;
+	Mon, 10 May 2021 13:28:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id LF1gA-lNQYEM; Mon, 10 May 2021 13:28:13 -0400 (EDT)
+	with ESMTP id ylYOaBg41So7; Mon, 10 May 2021 13:28:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 30FA14B82C;
-	Mon, 10 May 2021 13:28:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AC4064B852;
+	Mon, 10 May 2021 13:28:21 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CBC534B825
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 13:28:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 536B94B830
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 13:28:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jOw2Ka40VZdK for <kvmarm@lists.cs.columbia.edu>;
- Mon, 10 May 2021 13:28:09 -0400 (EDT)
+ with ESMTP id WVoh3lObak5I for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 10 May 2021 13:28:18 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1787A4B83C
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 13:28:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2A6474B845
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 13:28:17 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 0723761554;
- Mon, 10 May 2021 17:28:07 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 24A3D61469;
+ Mon, 10 May 2021 17:28:16 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1lg9Ga-000Uqg-RG; Mon, 10 May 2021 18:00:25 +0100
+ id 1lg9GX-000Uqg-65; Mon, 10 May 2021 18:00:21 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v4 40/66] KVM: arm64: nv: Trap and emulate AT instructions
- from virtual EL2
-Date: Mon, 10 May 2021 17:58:54 +0100
-Message-Id: <20210510165920.1913477-41-maz@kernel.org>
+Subject: [PATCH v4 35/66] KVM: arm64: nv: Handle shadow stage 2 page faults
+Date: Mon, 10 May 2021 17:58:49 +0100
+Message-Id: <20210510165920.1913477-36-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210510165920.1913477-1-maz@kernel.org>
 References: <20210510165920.1913477-1-maz@kernel.org>
@@ -62,12 +61,13 @@ X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org,
  kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com,
  christoffer.dall@arm.com, jintack@cs.columbia.edu, haibo.xu@linaro.org,
  james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
- kernel-team@android.com, jintack.lim@linaro.org
+ kernel-team@android.com, christoffer.dall@linaro.org, jintack.lim@linaro.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
 Cc: kernel-team@android.com, Andre Przywara <andre.przywara@arm.com>,
- Jintack Lim <jintack.lim@linaro.org>
+ Jintack Lim <jintack.lim@linaro.org>,
+ Christoffer Dall <christoffer.dall@linaro.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -84,628 +84,358 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Jintack Lim <jintack.lim@linaro.org>
+If we are faulting on a shadow stage 2 translation, we first walk the
+guest hypervisor's stage 2 page table to see if it has a mapping. If
+not, we inject a stage 2 page fault to the virtual EL2. Otherwise, we
+create a mapping in the shadow stage 2 page table.
 
-When supporting nested virtualization a guest hypervisor executing AT
-instructions must be trapped and emulated by the host hypervisor,
-because untrapped AT instructions operating on S1E1 will use the wrong
-translation regieme (the one used to emulate virtual EL2 in EL1 instead
-of virtual EL1) and AT instructions operating on S12 will not work from
-EL1.
+Note that we have to deal with two IPAs when we got a shadow stage 2
+page fault. One is the address we faulted on, and is in the L2 guest
+phys space. The other is from the guest stage-2 page table walk, and is
+in the L1 guest phys space.  To differentiate them, we rename variables
+so that fault_ipa is used for the former and ipa is used for the latter.
 
-This patch does several things.
-
-1. List and define all AT system instructions to emulate and document
-the emulation design.
-
-2. Implement AT instruction handling logic in EL2. This will be used to
-emulate AT instructions executed in the virtual EL2.
-
-AT instruction emulation works by loading the proper processor
-context, which depends on the trapped instruction and the virtual
-HCR_EL2, to the EL1 virtual memory control registers and executing AT
-instructions. Note that ctxt->hw_sys_regs is expected to have the
-proper processor context before calling the handling
-function(__kvm_at_insn) implemented in this patch.
-
-4. Emulate AT S1E[01] instructions by issuing the same instructions in
-EL2. We set the physical EL1 registers, NV and NV1 bits as described in
-the AT instruction emulation overview.
-
-5. Emulate AT A12E[01] instructions in two steps: First, do the stage-1
-translation by reusing the existing AT emulation functions.  Second, do
-the stage-2 translation by walking the guest hypervisor's stage-2 page
-table in software. Record the translation result to PAR_EL1.
-
-6. Emulate AT S1E2 instructions by issuing the corresponding S1E1
-instructions in EL2. We set the physical EL1 registers and the HCR_EL2
-register as described in the AT instruction emulation overview.
-
-7. Forward system instruction traps to the virtual EL2 if the corresponding
-virtual AT bit is set in the virtual HCR_EL2.
-
-  [ Much logic above has been reworked by Marc Zyngier ]
-
+Co-developed-by: Christoffer Dall <christoffer.dall@linaro.org>
+Co-developed-by: Jintack Lim <jintack.lim@linaro.org>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+[maz: rewrote this multiple times...]
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 ---
- arch/arm64/include/asm/kvm_arm.h |   2 +
- arch/arm64/include/asm/kvm_asm.h |   2 +
- arch/arm64/include/asm/sysreg.h  |  17 +++
- arch/arm64/kvm/Makefile          |   2 +-
- arch/arm64/kvm/at.c              | 231 +++++++++++++++++++++++++++++++
- arch/arm64/kvm/hyp/vhe/switch.c  |  13 +-
- arch/arm64/kvm/sys_regs.c        | 201 ++++++++++++++++++++++++++-
- 7 files changed, 463 insertions(+), 5 deletions(-)
- create mode 100644 arch/arm64/kvm/at.c
+ arch/arm64/include/asm/kvm_emulate.h |  6 ++
+ arch/arm64/include/asm/kvm_nested.h  | 18 ++++++
+ arch/arm64/kvm/mmu.c                 | 93 ++++++++++++++++++++++------
+ arch/arm64/kvm/nested.c              | 48 ++++++++++++++
+ 4 files changed, 147 insertions(+), 18 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index eb0d00d8a431..6a4a11fcc9df 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -14,6 +14,7 @@
- /* Hyp Configuration Register (HCR) bits */
- #define HCR_ATA		(UL(1) << 56)
- #define HCR_FWB		(UL(1) << 46)
-+#define HCR_AT		(UL(1) << 44)
- #define HCR_NV1		(UL(1) << 43)
- #define HCR_NV		(UL(1) << 42)
- #define HCR_API		(UL(1) << 41)
-@@ -110,6 +111,7 @@
- #define VTCR_EL2_TG0_16K	TCR_TG0_16K
- #define VTCR_EL2_TG0_64K	TCR_TG0_64K
- #define VTCR_EL2_SH0_MASK	TCR_SH0_MASK
-+#define VTCR_EL2_SH0_SHIFT	TCR_SH0_SHIFT
- #define VTCR_EL2_SH0_INNER	TCR_SH0_INNER
- #define VTCR_EL2_ORGN0_MASK	TCR_ORGN0_MASK
- #define VTCR_EL2_ORGN0_WBWA	TCR_ORGN0_WBWA
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index cf8df032b9c3..c61d52c51e43 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -198,6 +198,8 @@ extern void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa,
- extern void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu);
- 
- extern void __kvm_timer_set_cntvoff(u64 cntvoff);
-+extern void __kvm_at_s1e01(struct kvm_vcpu *vcpu, u32 op, u64 vaddr);
-+extern void __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr);
- 
- extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
- 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 2704738d644a..625c040e4f72 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -651,6 +651,23 @@
- 
- #define SYS_SP_EL2			sys_reg(3, 6,  4, 1, 0)
- 
-+/* AT instructions */
-+#define AT_Op0 1
-+#define AT_CRn 7
-+
-+#define OP_AT_S1E1R	sys_insn(AT_Op0, 0, AT_CRn, 8, 0)
-+#define OP_AT_S1E1W	sys_insn(AT_Op0, 0, AT_CRn, 8, 1)
-+#define OP_AT_S1E0R	sys_insn(AT_Op0, 0, AT_CRn, 8, 2)
-+#define OP_AT_S1E0W	sys_insn(AT_Op0, 0, AT_CRn, 8, 3)
-+#define OP_AT_S1E1RP	sys_insn(AT_Op0, 0, AT_CRn, 9, 0)
-+#define OP_AT_S1E1WP	sys_insn(AT_Op0, 0, AT_CRn, 9, 1)
-+#define OP_AT_S1E2R	sys_insn(AT_Op0, 4, AT_CRn, 8, 0)
-+#define OP_AT_S1E2W	sys_insn(AT_Op0, 4, AT_CRn, 8, 1)
-+#define OP_AT_S12E1R	sys_insn(AT_Op0, 4, AT_CRn, 8, 4)
-+#define OP_AT_S12E1W	sys_insn(AT_Op0, 4, AT_CRn, 8, 5)
-+#define OP_AT_S12E0R	sys_insn(AT_Op0, 4, AT_CRn, 8, 6)
-+#define OP_AT_S12E0W	sys_insn(AT_Op0, 4, AT_CRn, 8, 7)
-+
- /* Common SCTLR_ELx flags. */
- #define SCTLR_ELx_DSSBS	(BIT(44))
- #define SCTLR_ELx_ATA	(BIT(43))
-diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-index 598526c064f7..464c7ace2fb2 100644
---- a/arch/arm64/kvm/Makefile
-+++ b/arch/arm64/kvm/Makefile
-@@ -16,7 +16,7 @@ kvm-y := $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o \
- 	 inject_fault.o va_layout.o handle_exit.o \
- 	 guest.o debug.o reset.o sys_regs.o \
- 	 vgic-sys-reg-v3.o fpsimd.o pmu.o \
--	 arch_timer.o trng.o emulate-nested.o nested.o \
-+	 arch_timer.o trng.o emulate-nested.o nested.o at.o \
- 	 vgic/vgic.o vgic/vgic-init.o \
- 	 vgic/vgic-irqfd.o vgic/vgic-v2.o \
- 	 vgic/vgic-v3.o vgic/vgic-v4.o \
-diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-new file mode 100644
-index 000000000000..c345ef98ca1e
---- /dev/null
-+++ b/arch/arm64/kvm/at.c
-@@ -0,0 +1,231 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) 2017 - Linaro Ltd
-+ * Author: Jintack Lim <jintack.lim@linaro.org>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include <asm/kvm_hyp.h>
-+#include <asm/kvm_mmu.h>
-+
-+struct mmu_config {
-+	u64	ttbr0;
-+	u64	ttbr1;
-+	u64	tcr;
-+	u64	sctlr;
-+	u64	vttbr;
-+	u64	vtcr;
-+	u64	hcr;
-+};
-+
-+static void __mmu_config_save(struct mmu_config *config)
-+{
-+	config->ttbr0	= read_sysreg_el1(SYS_TTBR0);
-+	config->ttbr1	= read_sysreg_el1(SYS_TTBR1);
-+	config->tcr	= read_sysreg_el1(SYS_TCR);
-+	config->sctlr	= read_sysreg_el1(SYS_SCTLR);
-+	config->vttbr	= read_sysreg(vttbr_el2);
-+	config->vtcr	= read_sysreg(vtcr_el2);
-+	config->hcr	= read_sysreg(hcr_el2);
-+}
-+
-+static void __mmu_config_restore(struct mmu_config *config)
-+{
-+	write_sysreg_el1(config->ttbr0,	SYS_TTBR0);
-+	write_sysreg_el1(config->ttbr1,	SYS_TTBR1);
-+	write_sysreg_el1(config->tcr,	SYS_TCR);
-+	write_sysreg_el1(config->sctlr,	SYS_SCTLR);
-+	write_sysreg(config->vttbr,	vttbr_el2);
-+	write_sysreg(config->vtcr,	vtcr_el2);
-+	write_sysreg(config->hcr,	hcr_el2);
-+
-+	isb();
-+}
-+
-+void __kvm_at_s1e01(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
-+{
-+	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
-+	struct mmu_config config;
-+	struct kvm_s2_mmu *mmu;
-+
-+	spin_lock(&vcpu->kvm->mmu_lock);
-+
-+	/*
-+	 * If HCR_EL2.{E2H,TGE} == {1,1}, the MMU context is already
-+	 * the right one (as we trapped from vEL2).
-+	 */
-+	if (vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu))
-+		goto skip_mmu_switch;
-+
-+	/*
-+	 * FIXME: Obtaining the S2 MMU for a guest guest is horribly
-+	 * racy, and we may not find it (evicted by another vcpu, for
-+	 * example).
-+	 */
-+	mmu = lookup_s2_mmu(vcpu->kvm,
-+			    vcpu_read_sys_reg(vcpu, VTTBR_EL2),
-+			    vcpu_read_sys_reg(vcpu, HCR_EL2));
-+
-+	if (WARN_ON(!mmu))
-+		goto out;
-+
-+	/* We've trapped, so everything is live on the CPU. */
-+	__mmu_config_save(&config);
-+
-+	write_sysreg_el1(ctxt_sys_reg(ctxt, TTBR0_EL1),	SYS_TTBR0);
-+	write_sysreg_el1(ctxt_sys_reg(ctxt, TTBR1_EL1),	SYS_TTBR1);
-+	write_sysreg_el1(ctxt_sys_reg(ctxt, TCR_EL1),	SYS_TCR);
-+	write_sysreg_el1(ctxt_sys_reg(ctxt, SCTLR_EL1),	SYS_SCTLR);
-+	write_sysreg(kvm_get_vttbr(mmu),		vttbr_el2);
-+	/*
-+	 * REVISIT: do we need anything from the guest's VTCR_EL2? If
-+	 * looks like keeping the hosts configuration is the right
-+	 * thing to do at this stage (and we could avoid save/restore
-+	 * it. Keep the host's version for now.
-+	 */
-+	write_sysreg((config.hcr & ~HCR_TGE) | HCR_VM,	hcr_el2);
-+
-+	isb();
-+
-+skip_mmu_switch:
-+
-+	switch (op) {
-+	case OP_AT_S1E1R:
-+	case OP_AT_S1E1RP:
-+		asm volatile("at s1e1r, %0" : : "r" (vaddr));
-+		break;
-+	case OP_AT_S1E1W:
-+	case OP_AT_S1E1WP:
-+		asm volatile("at s1e1w, %0" : : "r" (vaddr));
-+		break;
-+	case OP_AT_S1E0R:
-+		asm volatile("at s1e0r, %0" : : "r" (vaddr));
-+		break;
-+	case OP_AT_S1E0W:
-+		asm volatile("at s1e0w, %0" : : "r" (vaddr));
-+		break;
-+	default:
-+		WARN_ON_ONCE(1);
-+		break;
-+	}
-+
-+	isb();
-+
-+	ctxt_sys_reg(ctxt, PAR_EL1) = read_sysreg(par_el1);
-+
-+	/*
-+	 * Failed? let's leave the building now.
-+	 *
-+	 * FIXME: how about a failed translation because the shadow S2
-+	 * wasn't populated? We may need to perform a SW PTW,
-+	 * populating our shadow S2 and retry the instruction.
-+	 */
-+	if (ctxt_sys_reg(ctxt, PAR_EL1) & 1)
-+		goto nopan;
-+
-+	/* No PAN? No problem. */
-+	if (!(*vcpu_cpsr(vcpu) & PSR_PAN_BIT))
-+		goto nopan;
-+
-+	/*
-+	 * For PAN-involved AT operations, perform the same
-+	 * translation, using EL0 this time.
-+	 */
-+	switch (op) {
-+	case OP_AT_S1E1RP:
-+		asm volatile("at s1e0r, %0" : : "r" (vaddr));
-+		break;
-+	case OP_AT_S1E1WP:
-+		asm volatile("at s1e0w, %0" : : "r" (vaddr));
-+		break;
-+	default:
-+		goto nopan;
-+	}
-+
-+	/*
-+	 * If the EL0 translation has succeeded, we need to pretend
-+	 * the AT operation has failed, as the PAN setting forbids
-+	 * such a translation.
-+	 *
-+	 * FIXME: we hardcode a Level-3 permission fault. We really
-+	 * should return the real fault level.
-+	 */
-+	if (!(read_sysreg(par_el1) & 1))
-+		ctxt_sys_reg(ctxt, PAR_EL1) = 0x1f;
-+
-+nopan:
-+	if (!(vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu)))
-+		__mmu_config_restore(&config);
-+
-+out:
-+	spin_unlock(&vcpu->kvm->mmu_lock);
-+}
-+
-+void __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
-+{
-+	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
-+	struct mmu_config config;
-+	struct kvm_s2_mmu *mmu;
-+	u64 val;
-+
-+	spin_lock(&vcpu->kvm->mmu_lock);
-+
-+	mmu = &vcpu->kvm->arch.mmu;
-+
-+	/* We've trapped, so everything is live on the CPU. */
-+	__mmu_config_save(&config);
-+
-+	if (vcpu_el2_e2h_is_set(vcpu)) {
-+		write_sysreg_el1(ctxt_sys_reg(ctxt, TTBR0_EL2),	SYS_TTBR0);
-+		write_sysreg_el1(ctxt_sys_reg(ctxt, TTBR1_EL2),	SYS_TTBR1);
-+		write_sysreg_el1(ctxt_sys_reg(ctxt, TCR_EL2),	SYS_TCR);
-+		write_sysreg_el1(ctxt_sys_reg(ctxt, SCTLR_EL2),	SYS_SCTLR);
-+
-+		val = config.hcr;
-+	} else {
-+		write_sysreg_el1(ctxt_sys_reg(ctxt, TTBR0_EL2),	SYS_TTBR0);
-+		val = translate_tcr_el2_to_tcr_el1(ctxt_sys_reg(ctxt, TCR_EL2));
-+		write_sysreg_el1(val, SYS_TCR);
-+		val = translate_sctlr_el2_to_sctlr_el1(ctxt_sys_reg(ctxt, SCTLR_EL2));
-+		write_sysreg_el1(val, SYS_SCTLR);
-+
-+		val = config.hcr | HCR_NV | HCR_NV1;
-+	}
-+
-+	write_sysreg(kvm_get_vttbr(mmu),		vttbr_el2);
-+	/* FIXME: write S2 MMU VTCR_EL2? */
-+	write_sysreg((val & ~HCR_TGE) | HCR_VM,		hcr_el2);
-+
-+	isb();
-+
-+	switch (op) {
-+	case OP_AT_S1E2R:
-+		asm volatile("at s1e1r, %0" : : "r" (vaddr));
-+		break;
-+	case OP_AT_S1E2W:
-+		asm volatile("at s1e1w, %0" : : "r" (vaddr));
-+		break;
-+	default:
-+		WARN_ON_ONCE(1);
-+		break;
-+	}
-+
-+	isb();
-+
-+	/* FIXME: handle failed translation due to shadow S2 */
-+	ctxt_sys_reg(ctxt, PAR_EL1) = read_sysreg(par_el1);
-+
-+	__mmu_config_restore(&config);
-+	spin_unlock(&vcpu->kvm->mmu_lock);
-+}
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index 79789850639b..7715b8254a76 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -43,9 +43,10 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
- 		if (!vcpu_el2_e2h_is_set(vcpu)) {
- 			/*
- 			 * For a guest hypervisor on v8.0, trap and emulate
--			 * the EL1 virtual memory control register accesses.
-+			 * the EL1 virtual memory control register accesses
-+			 * as well as the AT S1 operations.
- 			 */
--			hcr |= HCR_TVM | HCR_TRVM | HCR_NV1;
-+			hcr |= HCR_TVM | HCR_TRVM | HCR_AT | HCR_NV1;
- 		} else {
- 			/*
- 			 * For a guest hypervisor on v8.1 (VHE), allow to
-@@ -68,6 +69,14 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
- 			hcr &= ~HCR_TVM;
- 
- 			hcr |= vhcr_el2 & (HCR_TVM | HCR_TRVM);
-+
-+			/*
-+			 * If we're using the EL1 translation regime
-+			 * (TGE clear), then ensure that AT S1 ops are
-+			 * trapped too.
-+			 */
-+			if (!vcpu_el2_tge_is_set(vcpu))
-+				hcr |= HCR_AT;
- 		}
- 	}
- 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 79f6c88425de..9d9108e9fcf7 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1625,6 +1625,10 @@ static bool access_sp_el1(struct kvm_vcpu *vcpu,
- 	return true;
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 12935f6a7aa9..1fb2edc923cc 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -591,4 +591,10 @@ static __always_inline void kvm_incr_pc(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.flags |= KVM_ARM64_INCREMENT_PC;
  }
  
-+static bool forward_at_traps(struct kvm_vcpu *vcpu)
++static inline bool kvm_is_shadow_s2_fault(struct kvm_vcpu *vcpu)
 +{
-+	return forward_traps(vcpu, HCR_AT);
++	return (vcpu->arch.hw_mmu != &vcpu->kvm->arch.mmu &&
++		vcpu->arch.hw_mmu->nested_stage2_enabled);
 +}
- 
- static bool access_elr(struct kvm_vcpu *vcpu,
- 		       struct sys_reg_params *p,
-@@ -2153,12 +2157,205 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_SP_EL2), NULL, reset_unknown, SP_EL2 },
++
+ #endif /* __ARM64_KVM_EMULATE_H__ */
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index b784d7891851..4f93a5dab183 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -78,9 +78,27 @@ struct kvm_s2_trans {
+ 	u64 upper_attr;
  };
  
--#define SYS_INSN_TO_DESC(insn, access_fn, forward_fn)	\
--	{ SYS_DESC((insn)), (access_fn), NULL, 0, 0, NULL, NULL, (forward_fn) }
-+static bool handle_s1e01(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-+			 const struct sys_reg_desc *r)
++static inline phys_addr_t kvm_s2_trans_output(struct kvm_s2_trans *trans)
 +{
-+	int sys_encoding = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
-+
-+	__kvm_at_s1e01(vcpu, sys_encoding, p->regval);
-+
-+	return true;
++	return trans->output;
 +}
 +
-+static bool handle_s1e2(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-+			const struct sys_reg_desc *r)
++static inline unsigned long kvm_s2_trans_size(struct kvm_s2_trans *trans)
 +{
-+	int sys_encoding = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
-+
-+	__kvm_at_s1e2(vcpu, sys_encoding, p->regval);
-+
-+	return true;
++	return trans->block_size;
 +}
 +
-+static u64 setup_par_aborted(u32 esr)
++static inline u32 kvm_s2_trans_esr(struct kvm_s2_trans *trans)
 +{
-+	u64 par = 0;
-+
-+	/* S [9]: fault in the stage 2 translation */
-+	par |= (1 << 9);
-+	/* FST [6:1]: Fault status code  */
-+	par |= (esr << 1);
-+	/* F [0]: translation is aborted */
-+	par |= 1;
-+
-+	return par;
++	return trans->esr;
 +}
 +
-+static u64 setup_par_completed(struct kvm_vcpu *vcpu, struct kvm_s2_trans *out)
+ extern int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
+ 			      struct kvm_s2_trans *result);
+ 
++extern int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu,
++				    struct kvm_s2_trans *trans);
++extern int kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u64 esr_el2);
+ int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
+ extern bool __forward_traps(struct kvm_vcpu *vcpu, unsigned int reg,
+ 			    u64 control_bit);
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 5c1a9966ff31..6b3753460293 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -796,7 +796,7 @@ static bool fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
+ static unsigned long
+ transparent_hugepage_adjust(struct kvm_memory_slot *memslot,
+ 			    unsigned long hva, kvm_pfn_t *pfnp,
+-			    phys_addr_t *ipap)
++			    phys_addr_t *ipap, phys_addr_t *fault_ipap)
+ {
+ 	kvm_pfn_t pfn = *pfnp;
+ 
+@@ -825,6 +825,7 @@ transparent_hugepage_adjust(struct kvm_memory_slot *memslot,
+ 		 * to PG_head and switch the pfn from a tail page to the head
+ 		 * page accordingly.
+ 		 */
++		*fault_ipap &= PMD_MASK;
+ 		*ipap &= PMD_MASK;
+ 		kvm_release_pfn_clean(pfn);
+ 		pfn &= ~(PTRS_PER_PMD - 1);
+@@ -839,14 +840,16 @@ transparent_hugepage_adjust(struct kvm_memory_slot *memslot,
+ }
+ 
+ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+-			  struct kvm_memory_slot *memslot, unsigned long hva,
+-			  unsigned long fault_status)
++			  struct kvm_s2_trans *nested,
++			  struct kvm_memory_slot *memslot,
++			  unsigned long hva, unsigned long fault_status)
+ {
+ 	int ret = 0;
+-	bool write_fault, writable, force_pte = false;
++	bool write_fault, writable;
+ 	bool exec_fault;
+ 	bool device = false;
+ 	unsigned long mmu_seq;
++	phys_addr_t ipa = fault_ipa;
+ 	struct kvm *kvm = vcpu->kvm;
+ 	struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
+ 	struct vm_area_struct *vma;
+@@ -858,6 +861,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	unsigned long vma_pagesize, fault_granule;
+ 	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
+ 	struct kvm_pgtable *pgt;
++	unsigned long max_map_size = PUD_SIZE;
+ 
+ 	fault_granule = 1UL << ARM64_HW_PGTABLE_LEVEL_SHIFT(fault_level);
+ 	write_fault = kvm_is_write_fault(vcpu);
+@@ -885,7 +889,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 
+ 	if (logging_active ||
+ 	    (vma->vm_flags & VM_PFNMAP)) {
+-		force_pte = true;
++		max_map_size = vma_pagesize = PAGE_SIZE;
+ 		vma_shift = PAGE_SHIFT;
+ 	}
+ 
+@@ -905,7 +909,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 		fallthrough;
+ 	case CONT_PTE_SHIFT:
+ 		vma_shift = PAGE_SHIFT;
+-		force_pte = true;
++		max_map_size = PAGE_SIZE;
+ 		fallthrough;
+ 	case PAGE_SHIFT:
+ 		break;
+@@ -914,10 +918,25 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	}
+ 
+ 	vma_pagesize = 1UL << vma_shift;
++
++	if (kvm_is_shadow_s2_fault(vcpu)) {
++		ipa = kvm_s2_trans_output(nested);
++
++		/*
++		 * If we're about to create a shadow stage 2 entry, then we
++		 * can only create a block mapping if the guest stage 2 page
++		 * table uses at least as big a mapping.
++		 */
++		max_map_size = min(kvm_s2_trans_size(nested), max_map_size);
++	}
++
++	vma_pagesize = min(vma_pagesize, max_map_size);
++
+ 	if (vma_pagesize == PMD_SIZE || vma_pagesize == PUD_SIZE)
+ 		fault_ipa &= ~(vma_pagesize - 1);
+ 
+-	gfn = fault_ipa >> PAGE_SHIFT;
++	gfn = ipa >> PAGE_SHIFT;
++
+ 	mmap_read_unlock(current->mm);
+ 
+ 	/*
+@@ -960,7 +979,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 
+ 	if (kvm_is_device_pfn(pfn)) {
+ 		device = true;
+-		force_pte = true;
++		max_map_size = PAGE_SIZE;
+ 	} else if (logging_active && !write_fault) {
+ 		/*
+ 		 * Only actually map the page as writable if this was a write
+@@ -981,9 +1000,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	 * If we are not forced to use page mapping, check if we are
+ 	 * backed by a THP and thus use block mapping if possible.
+ 	 */
+-	if (vma_pagesize == PAGE_SIZE && !force_pte)
+-		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
+-							   &pfn, &fault_ipa);
++	if (vma_pagesize == PAGE_SIZE && max_map_size >= PMD_SIZE)
++		vma_pagesize = transparent_hugepage_adjust(memslot, hva, &pfn,
++							   &ipa, &fault_ipa);
+ 	if (writable)
+ 		prot |= KVM_PGTABLE_PROT_W;
+ 
+@@ -1059,8 +1078,10 @@ static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ {
+ 	unsigned long fault_status;
+-	phys_addr_t fault_ipa;
++	phys_addr_t fault_ipa; /* The address we faulted on */
++	phys_addr_t ipa; /* Always the IPA in the L1 guest phys space */
+ 	struct kvm_memory_slot *memslot;
++	struct kvm_s2_trans nested_trans;
+ 	unsigned long hva;
+ 	bool is_iabt, write_fault, writable;
+ 	gfn_t gfn;
+@@ -1068,7 +1089,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ 
+ 	fault_status = kvm_vcpu_trap_get_fault_type(vcpu);
+ 
+-	fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
++	ipa = fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
+ 	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
+ 
+ 	/* Synchronous External Abort? */
+@@ -1089,6 +1110,12 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ 	/* Check the stage-2 fault is trans. fault or write fault */
+ 	if (fault_status != FSC_FAULT && fault_status != FSC_PERM &&
+ 	    fault_status != FSC_ACCESS) {
++		/*
++		 * We must never see an address size fault on shadow stage 2
++		 * page table walk, because we would have injected an addr
++		 * size fault when we walked the nested s2 page and not
++		 * create the shadow entry.
++		 */
+ 		kvm_err("Unsupported FSC: EC=%#x xFSC=%#lx ESR_EL2=%#lx\n",
+ 			kvm_vcpu_trap_get_class(vcpu),
+ 			(unsigned long)kvm_vcpu_trap_get_fault(vcpu),
+@@ -1098,7 +1125,36 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ 
+ 	idx = srcu_read_lock(&vcpu->kvm->srcu);
+ 
+-	gfn = fault_ipa >> PAGE_SHIFT;
++	/*
++	 * We may have faulted on a shadow stage 2 page table if we are
++	 * running a nested guest.  In this case, we have to resolve the L2
++	 * IPA to the L1 IPA first, before knowing what kind of memory should
++	 * back the L1 IPA.
++	 *
++	 * If the shadow stage 2 page table walk faults, then we simply inject
++	 * this to the guest and carry on.
++	 */
++	if (kvm_is_shadow_s2_fault(vcpu)) {
++		u32 esr;
++
++		ret = kvm_walk_nested_s2(vcpu, fault_ipa, &nested_trans);
++		esr = kvm_s2_trans_esr(&nested_trans);
++		if (esr)
++			kvm_inject_s2_fault(vcpu, esr);
++		if (ret)
++			goto out_unlock;
++
++		ret = kvm_s2_handle_perm_fault(vcpu, &nested_trans);
++		esr = kvm_s2_trans_esr(&nested_trans);
++		if (esr)
++			kvm_inject_s2_fault(vcpu, esr);
++		if (ret)
++			goto out_unlock;
++
++		ipa = kvm_s2_trans_output(&nested_trans);
++	}
++
++	gfn = ipa >> PAGE_SHIFT;
+ 	memslot = gfn_to_memslot(vcpu->kvm, gfn);
+ 	hva = gfn_to_hva_memslot_prot(memslot, gfn, &writable);
+ 	write_fault = kvm_is_write_fault(vcpu);
+@@ -1142,13 +1198,13 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ 		 * faulting VA. This is always 12 bits, irrespective
+ 		 * of the page size.
+ 		 */
+-		fault_ipa |= kvm_vcpu_get_hfar(vcpu) & ((1 << 12) - 1);
+-		ret = io_mem_abort(vcpu, fault_ipa);
++		ipa |= kvm_vcpu_get_hfar(vcpu) & ((1 << 12) - 1);
++		ret = io_mem_abort(vcpu, ipa);
+ 		goto out_unlock;
+ 	}
+ 
+ 	/* Userspace should not be able to register out-of-bounds IPAs */
+-	VM_BUG_ON(fault_ipa >= kvm_phys_size(vcpu->kvm));
++	VM_BUG_ON(ipa >= kvm_phys_size(vcpu->kvm));
+ 
+ 	if (fault_status == FSC_ACCESS) {
+ 		handle_access_fault(vcpu, fault_ipa);
+@@ -1156,7 +1212,8 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ 		goto out_unlock;
+ 	}
+ 
+-	ret = user_mem_abort(vcpu, fault_ipa, memslot, hva, fault_status);
++	ret = user_mem_abort(vcpu, fault_ipa, &nested_trans,
++			     memslot, hva, fault_status);
+ 	if (ret == 0)
+ 		ret = 1;
+ out:
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 1067b6422cf2..57f32768d04d 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -108,6 +108,15 @@ static u32 compute_fsc(int level, u32 fsc)
+ 	return fsc | (level & 0x3);
+ }
+ 
++static int esr_s2_fault(struct kvm_vcpu *vcpu, int level, u32 fsc)
 +{
-+	u64 par, vtcr_sh0;
-+
-+	/* F [0]: Translation is completed successfully */
-+	par = 0;
-+	/* ATTR [63:56] */
-+	par |= out->upper_attr;
-+	/* PA [47:12] */
-+	par |= out->output & GENMASK_ULL(11, 0);
-+	/* RES1 [11] */
-+	par |= (1UL << 11);
-+	/* SH [8:7]: Shareability attribute */
-+	vtcr_sh0 = vcpu_read_sys_reg(vcpu, VTCR_EL2) & VTCR_EL2_SH0_MASK;
-+	par |= (vtcr_sh0 >> VTCR_EL2_SH0_SHIFT) << 7;
-+
-+	return par;
-+}
-+
-+static bool handle_s12(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-+		       const struct sys_reg_desc *r, bool write)
-+{
-+	u64 par, va;
 +	u32 esr;
-+	phys_addr_t ipa;
-+	struct kvm_s2_trans out;
-+	int ret;
 +
-+	/* Do the stage-1 translation */
-+	handle_s1e01(vcpu, p, r);
-+	par = vcpu_read_sys_reg(vcpu, PAR_EL1);
-+	if (par & 1) {
-+		/* The stage-1 translation aborted */
-+		return true;
-+	}
-+
-+	/* Do the stage-2 translation */
-+	va = p->regval;
-+	ipa = (par & GENMASK_ULL(47, 12)) | (va & GENMASK_ULL(11, 0));
-+	out.esr = 0;
-+	ret = kvm_walk_nested_s2(vcpu, ipa, &out);
-+	if (ret < 0)
-+		return false;
-+
-+	/* Check if the stage-2 PTW is aborted */
-+	if (out.esr) {
-+		esr = out.esr;
-+		goto s2_trans_abort;
-+	}
-+
-+	/* Check the access permission */
-+	if ((!write && !out.readable) || (write && !out.writable)) {
-+		esr = ESR_ELx_FSC_PERM;
-+		esr |= out.level & 0x3;
-+		goto s2_trans_abort;
-+	}
-+
-+	vcpu_write_sys_reg(vcpu, setup_par_completed(vcpu, &out), PAR_EL1);
-+	return true;
-+
-+s2_trans_abort:
-+	vcpu_write_sys_reg(vcpu, setup_par_aborted(esr), PAR_EL1);
-+	return true;
++	esr = kvm_vcpu_get_esr(vcpu) & ~ESR_ELx_FSC;
++	esr |= compute_fsc(level, fsc);
++	return esr;
 +}
 +
-+static bool handle_s12r(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-+			const struct sys_reg_desc *r)
-+{
-+	return handle_s12(vcpu, p, r, false);
-+}
-+
-+static bool handle_s12w(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-+			const struct sys_reg_desc *r)
-+{
-+	return handle_s12(vcpu, p, r, true);
-+}
-+
-+/*
-+ * AT instruction emulation
-+ *
-+ * We emulate AT instructions executed in the virtual EL2.
-+ * Basic strategy for the stage-1 translation emulation is to load proper
-+ * context, which depends on the trapped instruction and the virtual HCR_EL2,
-+ * to the EL1 virtual memory control registers and execute S1E[01] instructions
-+ * in EL2. See below for more detail.
-+ *
-+ * For the stage-2 translation, which is necessary for S12E[01] emulation,
-+ * we walk the guest hypervisor's stage-2 page table in software.
-+ *
-+ * The stage-1 translation emulations can be divided into two groups depending
-+ * on the translation regime.
-+ *
-+ * 1. EL2 AT instructions: S1E2x
-+ * +-----------------------------------------------------------------------+
-+ * |                             |         Setting for the emulation       |
-+ * | Virtual HCR_EL2.E2H on trap |-----------------------------------------+
-+ * |                             | Phys EL1 regs | Phys NV, NV1 | Phys TGE |
-+ * |-----------------------------------------------------------------------|
-+ * |             0               |     vEL2      |    (1, 1)    |    0     |
-+ * |             1               |     vEL2      |    (0, 0)    |    0     |
-+ * +-----------------------------------------------------------------------+
-+ *
-+ * We emulate the EL2 AT instructions by loading virtual EL2 context
-+ * to the EL1 virtual memory control registers and executing corresponding
-+ * EL1 AT instructions.
-+ *
-+ * We set physical NV and NV1 bits to use EL2 page table format for non-VHE
-+ * guest hypervisor (i.e. HCR_EL2.E2H == 0). As a VHE guest hypervisor uses the
-+ * EL1 page table format, we don't set those bits.
-+ *
-+ * We should clear physical TGE bit not to use the EL2 translation regime when
-+ * the host uses the VHE feature.
-+ *
-+ *
-+ * 2. EL0/EL1 AT instructions: S1E[01]x, S12E1x
-+ * +----------------------------------------------------------------------+
-+ * |   Virtual HCR_EL2 on trap  |        Setting for the emulation        |
-+ * |----------------------------------------------------------------------+
-+ * | (vE2H, vTGE) | (vNV, vNV1) | Phys EL1 regs | Phys NV, NV1 | Phys TGE |
-+ * |----------------------------------------------------------------------|
-+ * |    (0, 0)*   |   (0, 0)    |      vEL1     |    (0, 0)    |    0     |
-+ * |    (0, 0)    |   (1, 1)    |      vEL1     |    (1, 1)    |    0     |
-+ * |    (1, 1)    |   (0, 0)    |      vEL2     |    (0, 0)    |    0     |
-+ * |    (1, 1)    |   (1, 1)    |      vEL2     |    (1, 1)    |    0     |
-+ * +----------------------------------------------------------------------+
-+ *
-+ * *For (0, 0) in the 'Virtual HCR_EL2 on trap' column, it actually means
-+ *  (1, 1). Keep them (0, 0) just for the readability.
-+ *
-+ * We set physical EL1 virtual memory control registers depending on
-+ * (vE2H, vTGE) pair. When the pair is (0, 0) where AT instructions are
-+ * supposed to use EL0/EL1 translation regime, we load the EL1 registers with
-+ * the virtual EL1 registers (i.e. EL1 registers from the guest hypervisor's
-+ * point of view). When the pair is (1, 1), however, AT instructions are defined
-+ * to apply EL2 translation regime. To emulate this behavior, we load the EL1
-+ * registers with the virtual EL2 context. (i.e the shadow registers)
-+ *
-+ * We respect the virtual NV and NV1 bit for the emulation. When those bits are
-+ * set, it means that a guest hypervisor would like to use EL2 page table format
-+ * for the EL1 translation regime. We emulate this by setting the physical
-+ * NV and NV1 bits.
-+ */
-+
-+#define SYS_INSN_TO_DESC(insn, access_fn, forward_fn)			\
-+	{ SYS_DESC(OP_##insn), (access_fn), NULL, 0, 0,			\
-+	  NULL, NULL, (forward_fn) }
- static struct sys_reg_desc sys_insn_descs[] = {
- 	{ SYS_DESC(SYS_DC_ISW), access_dcsw },
-+
-+	SYS_INSN_TO_DESC(AT_S1E1R, handle_s1e01, forward_at_traps),
-+	SYS_INSN_TO_DESC(AT_S1E1W, handle_s1e01, forward_at_traps),
-+	SYS_INSN_TO_DESC(AT_S1E0R, handle_s1e01, forward_at_traps),
-+	SYS_INSN_TO_DESC(AT_S1E0W, handle_s1e01, forward_at_traps),
-+	SYS_INSN_TO_DESC(AT_S1E1RP, handle_s1e01, forward_at_traps),
-+	SYS_INSN_TO_DESC(AT_S1E1WP, handle_s1e01, forward_at_traps),
-+
- 	{ SYS_DESC(SYS_DC_CSW), access_dcsw },
- 	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
-+
-+	SYS_INSN_TO_DESC(AT_S1E2R, handle_s1e2, forward_nv_traps),
-+	SYS_INSN_TO_DESC(AT_S1E2W, handle_s1e2, forward_nv_traps),
-+	SYS_INSN_TO_DESC(AT_S12E1R, handle_s12r, forward_nv_traps),
-+	SYS_INSN_TO_DESC(AT_S12E1W, handle_s12w, forward_nv_traps),
-+	SYS_INSN_TO_DESC(AT_S12E0R, handle_s12r, forward_nv_traps),
-+	SYS_INSN_TO_DESC(AT_S12E0W, handle_s12w, forward_nv_traps),
- };
+ static int check_base_s2_limits(struct s2_walk_info *wi,
+ 				int level, int input_size, int stride)
+ {
+@@ -457,6 +466,45 @@ void kvm_vcpu_put_hw_mmu(struct kvm_vcpu *vcpu)
+ 	}
+ }
  
- static bool trap_dbgdidr(struct kvm_vcpu *vcpu,
++/*
++ * Returns non-zero if permission fault is handled by injecting it to the next
++ * level hypervisor.
++ */
++int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu, struct kvm_s2_trans *trans)
++{
++	unsigned long fault_status = kvm_vcpu_trap_get_fault_type(vcpu);
++	bool forward_fault = false;
++
++	trans->esr = 0;
++
++	if (fault_status != FSC_PERM)
++		return 0;
++
++	if (kvm_vcpu_trap_is_iabt(vcpu)) {
++		forward_fault = (trans->upper_attr & BIT(54));
++	} else {
++		bool write_fault = kvm_is_write_fault(vcpu);
++
++		forward_fault = ((write_fault && !trans->writable) ||
++				 (!write_fault && !trans->readable));
++	}
++
++	if (forward_fault) {
++		trans->esr = esr_s2_fault(vcpu, trans->level, ESR_ELx_FSC_PERM);
++		return 1;
++	}
++
++	return 0;
++}
++
++int kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u64 esr_el2)
++{
++	vcpu_write_sys_reg(vcpu, vcpu->arch.fault.far_el2, FAR_EL2);
++	vcpu_write_sys_reg(vcpu, vcpu->arch.fault.hpfar_el2, HPFAR_EL2);
++
++	return kvm_inject_nested_sync(vcpu, esr_el2);
++}
++
+ /*
+  * Inject wfx to the virtual EL2 if this is not from the virtual EL2 and
+  * the virtual HCR_EL2.TWX is set. Otherwise, let the host hypervisor
 -- 
 2.29.2
 
