@@ -6,53 +6,53 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AAFCC43460
-	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 17:27:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD8D5C433B4
+	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 17:27:45 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 098D061574
-	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 17:27:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 098D061574
+	by mail.kernel.org (Postfix) with ESMTP id 59C4161481
+	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 17:27:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59C4161481
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A69114B2BD;
-	Mon, 10 May 2021 13:27:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 084FC4B4CB;
+	Mon, 10 May 2021 13:27:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id sE4r9jT08LEN; Mon, 10 May 2021 13:27:42 -0400 (EDT)
+	with ESMTP id qdlDUYGUsc3b; Mon, 10 May 2021 13:27:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C2A44B7E8;
-	Mon, 10 May 2021 13:27:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 859D94B48C;
+	Mon, 10 May 2021 13:27:42 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E57D14B6F3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 13:27:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C26194B441
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 13:27:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Warr9SL6nW3s for <kvmarm@lists.cs.columbia.edu>;
- Mon, 10 May 2021 13:27:38 -0400 (EDT)
+ with ESMTP id t2Ow7cDAIlmZ for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 10 May 2021 13:27:40 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5F0C84B830
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 13:27:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 684BD4B48C
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 13:27:40 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 7977761492;
- Mon, 10 May 2021 17:27:37 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 9CE716147F;
+ Mon, 10 May 2021 17:27:39 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1lg9Gm-000Uqg-Ps; Mon, 10 May 2021 18:00:37 +0100
+ id 1lg9Gj-000Uqg-LL; Mon, 10 May 2021 18:00:33 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v4 57/66] KVM: arm64: nv: Add include containing the VNCR_EL2
- offsets
-Date: Mon, 10 May 2021 17:59:11 +0100
-Message-Id: <20210510165920.1913477-58-maz@kernel.org>
+Subject: [PATCH v4 53/66] KVM: arm64: nv: Add handling of ARMv8.4-TTL TLB
+ invalidation
+Date: Mon, 10 May 2021 17:59:07 +0100
+Message-Id: <20210510165920.1913477-54-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210510165920.1913477-1-maz@kernel.org>
 References: <20210510165920.1913477-1-maz@kernel.org>
@@ -83,97 +83,210 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-VNCR_EL2 points to a page containing a number of system registers
-accessed by a guest hypervisor when ARMv8.4-NV is enabled.
-
-Let's document the offsets in that page, as we are going to use
-this layout.
+Support guest-provided information information to find out about
+the range of required invalidation.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/vncr_mapping.h | 73 +++++++++++++++++++++++++++
- 1 file changed, 73 insertions(+)
- create mode 100644 arch/arm64/include/asm/vncr_mapping.h
+ arch/arm64/include/asm/kvm_nested.h |  1 +
+ arch/arm64/kvm/nested.c             | 57 +++++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c           | 78 ++++++++++++++++++-----------
+ 3 files changed, 108 insertions(+), 28 deletions(-)
 
-diff --git a/arch/arm64/include/asm/vncr_mapping.h b/arch/arm64/include/asm/vncr_mapping.h
-new file mode 100644
-index 000000000000..64c46d658fc8
---- /dev/null
-+++ b/arch/arm64/include/asm/vncr_mapping.h
-@@ -0,0 +1,73 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * System register offsets in the VNCR page
-+ * All offsets are *byte* displacements!
-+ */
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index 5fa3c634c8e1..7c47ad655e2e 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -123,6 +123,7 @@ extern bool __forward_traps(struct kvm_vcpu *vcpu, unsigned int reg,
+ 			    u64 control_bit);
+ extern bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit);
+ extern bool forward_nv_traps(struct kvm_vcpu *vcpu);
++unsigned int ttl_to_size(u8 ttl);
+ 
+ struct sys_reg_params;
+ struct sys_reg_desc;
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index ecbfaf3a43cf..94d3011bcdd2 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -351,6 +351,63 @@ int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
+ 	return ret;
+ }
+ 
 +
-+#ifndef __ARM64_VNCR_MAPPING_H__
-+#define __ARM64_VNCR_MAPPING_H__
++unsigned int ttl_to_size(u8 ttl)
++{
++	int level = ttl & 3;
++	int gran = (ttl >> 2) & 3;
++	unsigned int max_size = 0;
 +
-+#define VNCR_VTTBR_EL2          0x020
-+#define VNCR_VTCR_EL2           0x040
-+#define VNCR_VMPIDR_EL2         0x050
-+#define VNCR_CNTVOFF_EL2        0x060
-+#define VNCR_HCR_EL2            0x078
-+#define VNCR_HSTR_EL2           0x080
-+#define VNCR_VPIDR_EL2          0x088
-+#define VNCR_TPIDR_EL2          0x090
-+#define VNCR_VNCR_EL2           0x0B0
-+#define VNCR_CPACR_EL1          0x100
-+#define VNCR_CONTEXTIDR_EL1     0x108
-+#define VNCR_SCTLR_EL1          0x110
-+#define VNCR_ACTLR_EL1          0x118
-+#define VNCR_TCR_EL1            0x120
-+#define VNCR_AFSR0_EL1          0x128
-+#define VNCR_AFSR1_EL1          0x130
-+#define VNCR_ESR_EL1            0x138
-+#define VNCR_MAIR_EL1           0x140
-+#define VNCR_AMAIR_EL1          0x148
-+#define VNCR_MDSCR_EL1          0x158
-+#define VNCR_SPSR_EL1           0x160
-+#define VNCR_CNTV_CVAL_EL0      0x168
-+#define VNCR_CNTV_CTL_EL0       0x170
-+#define VNCR_CNTP_CVAL_EL0      0x178
-+#define VNCR_CNTP_CTL_EL0       0x180
-+#define VNCR_SCXTNUM_EL1        0x188
-+#define VNCR_ZCR_EL1            0x1E0
-+#define VNCR_TTBR0_EL1          0x200
-+#define VNCR_TTBR1_EL1          0x210
-+#define VNCR_FAR_EL1            0x220
-+#define VNCR_ELR_EL1            0x230
-+#define VNCR_SP_EL1             0x240
-+#define VNCR_VBAR_EL1           0x250
-+#define VNCR_ICH_LR0_EL2        0x400
-+//      VNCR_ICH_LRN_EL2(n)     VNCR_ICH_LR0_EL2+8*((n) & 7)
-+#define VNCR_ICH_AP0R0_EL2      0x480
-+//      VNCR_ICH_AP0RN_EL2(n)   VNCR_ICH_AP0R0_EL2+8*((n) & 3)
-+#define VNCR_ICH_AP1R0_EL2      0x4A0
-+//      VNCR_ICH_AP1RN_EL2(n)   VNCR_ICH_AP1R0_EL2+8*((n) & 3)
-+#define VNCR_ICH_HCR_EL2        0x4C0
-+#define VNCR_ICH_VMCR_EL2       0x4C8
-+#define VNCR_VDISR_EL2          0x500
-+#define VNCR_PMBLIMITR_EL1      0x800
-+#define VNCR_PMBPTR_EL1         0x810
-+#define VNCR_PMBSR_EL1          0x820
-+#define VNCR_PMSCR_EL1          0x828
-+#define VNCR_PMSEVFR_EL1        0x830
-+#define VNCR_PMSICR_EL1         0x838
-+#define VNCR_PMSIRR_EL1         0x840
-+#define VNCR_PMSLATFR_EL1       0x848
-+#define VNCR_TRFCR_EL1          0x880
-+#define VNCR_MPAM1_EL1          0x900
-+#define VNCR_MPAMHCR_EL2        0x930
-+#define VNCR_MPAMVPMV_EL2       0x938
-+#define VNCR_MPAMVPM0_EL2       0x940
-+#define VNCR_MPAMVPM1_EL2       0x948
-+#define VNCR_MPAMVPM2_EL2       0x950
-+#define VNCR_MPAMVPM3_EL2       0x958
-+#define VNCR_MPAMVPM4_EL2       0x960
-+#define VNCR_MPAMVPM5_EL2       0x968
-+#define VNCR_MPAMVPM6_EL2       0x970
-+#define VNCR_MPAMVPM7_EL2       0x978
++	switch (gran) {
++	case TLBI_TTL_TG_4K:
++		switch (level) {
++		case 0:
++			break;
++		case 1:
++			max_size = SZ_1G;
++			break;
++		case 2:
++			max_size = SZ_2M;
++			break;
++		case 3:
++			max_size = SZ_4K;
++			break;
++		}
++		break;
++	case TLBI_TTL_TG_16K:
++		switch (level) {
++		case 0:
++		case 1:
++			break;
++		case 2:
++			max_size = SZ_32M;
++			break;
++		case 3:
++			max_size = SZ_16K;
++			break;
++		}
++		break;
++	case TLBI_TTL_TG_64K:
++		switch (level) {
++		case 0:
++		case 1:
++			/* No 52bit IPA support */
++			break;
++		case 2:
++			max_size = SZ_512M;
++			break;
++		case 3:
++			max_size = SZ_64K;
++			break;
++		}
++		break;
++	default:			/* No size information */
++		break;
++	}
 +
-+#endif /* __ARM64_VNCR_MAPPING_H__ */
++	return max_size;
++}
++
+ /* Must be called with kvm->lock held */
+ struct kvm_s2_mmu *lookup_s2_mmu(struct kvm *kvm, u64 vttbr, u64 hcr)
+ {
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 90dace973d8f..4374962d43ff 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2616,59 +2616,81 @@ static bool handle_vmalls12e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 	return true;
+ }
+ 
++static unsigned long compute_tlb_inval_range(struct kvm_vcpu *vcpu,
++					     struct kvm_s2_mmu *mmu,
++					     u64 val)
++{
++	unsigned long max_size;
++	u8 ttl = 0;
++
++	if (cpus_have_const_cap(ARM64_HAS_ARMv8_4_TTL)) {
++		ttl = FIELD_GET(GENMASK_ULL(47, 44), val);
++	}
++
++	max_size = ttl_to_size(ttl);
++
++	if (!max_size) {
++		u64 vtcr = vcpu_read_sys_reg(vcpu, VTCR_EL2);
++
++		/* Compute the maximum extent of the invalidation */
++		switch ((vtcr & VTCR_EL2_TG0_MASK)) {
++		case VTCR_EL2_TG0_4K:
++			max_size = SZ_1G;
++			break;
++		case VTCR_EL2_TG0_16K:
++			max_size = SZ_32M;
++			break;
++		case VTCR_EL2_TG0_64K:
++			/*
++			 * No, we do not support 52bit IPA in nested yet. Once
++			 * we do, this should be 4TB.
++			 */
++			/* FIXME: remove the 52bit PA support from the IDregs */
++			max_size = SZ_512M;
++			break;
++		default:
++			BUG();
++		}
++	}
++
++	WARN_ON(!max_size);
++	return max_size;
++}
++
+ static bool handle_ipas2e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 			     const struct sys_reg_desc *r)
+ {
+ 	u64 vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
+-	u64 vtcr = vcpu_read_sys_reg(vcpu, VTCR_EL2);
+ 	struct kvm_s2_mmu *mmu;
+ 	u64 base_addr;
+-	int max_size;
++	unsigned long max_size;
+ 
+ 	/*
+ 	 * We drop a number of things from the supplied value:
+ 	 *
+ 	 * - NS bit: we're non-secure only.
+ 	 *
+-	 * - TTL field: We already have the granule size from the
+-	 *   VTCR_EL2.TG0 field, and the level is only relevant to the
+-	 *   guest's S2PT.
+-	 *
+ 	 * - IPA[51:48]: We don't support 52bit IPA just yet...
+ 	 *
+ 	 * And of course, adjust the IPA to be on an actual address.
+ 	 */
+ 	base_addr = (p->regval & GENMASK_ULL(35, 0)) << 12;
+ 
+-	/* Compute the maximum extent of the invalidation */
+-	switch ((vtcr & VTCR_EL2_TG0_MASK)) {
+-	case VTCR_EL2_TG0_4K:
+-		max_size = SZ_1G;
+-		break;
+-	case VTCR_EL2_TG0_16K:
+-		max_size = SZ_32M;
+-		break;
+-	case VTCR_EL2_TG0_64K:
+-		/*
+-		 * No, we do not support 52bit IPA in nested yet. Once
+-		 * we do, this should be 4TB.
+-		 */
+-		/* FIXME: remove the 52bit PA support from the IDregs */
+-		max_size = SZ_512M;
+-		break;
+-	default:
+-		BUG();
+-	}
+-
+ 	spin_lock(&vcpu->kvm->mmu_lock);
+ 
+ 	mmu = lookup_s2_mmu(vcpu->kvm, vttbr, HCR_VM);
+-	if (mmu)
++	if (mmu) {
++		max_size = compute_tlb_inval_range(vcpu, mmu, p->regval);
++		base_addr &= ~(max_size - 1);
+ 		kvm_unmap_stage2_range(mmu, base_addr, max_size);
++	}
+ 
+ 	mmu = lookup_s2_mmu(vcpu->kvm, vttbr, 0);
+-	if (mmu)
++	if (mmu) {
++		max_size = compute_tlb_inval_range(vcpu, mmu, p->regval);
++		base_addr &= ~(max_size - 1);
+ 		kvm_unmap_stage2_range(mmu, base_addr, max_size);
++	}
+ 
+ 	spin_unlock(&vcpu->kvm->mmu_lock);
+ 
 -- 
 2.29.2
 
