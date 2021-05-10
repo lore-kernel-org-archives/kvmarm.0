@@ -6,53 +6,52 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68155C43461
-	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 17:29:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F167DC433B4
+	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 17:29:19 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 134FF61606
-	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 17:29:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 134FF61606
+	by mail.kernel.org (Postfix) with ESMTP id 7741061622
+	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 17:29:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7741061622
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B84974B857;
-	Mon, 10 May 2021 13:29:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 136824B456;
+	Mon, 10 May 2021 13:29:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id kKT4y62ok3M7; Mon, 10 May 2021 13:29:14 -0400 (EDT)
+	with ESMTP id jE2u86xp4whf; Mon, 10 May 2021 13:29:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A99BA4B88C;
-	Mon, 10 May 2021 13:29:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C6CE44B888;
+	Mon, 10 May 2021 13:29:16 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 132C74B257
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 13:29:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 968954B875
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 13:29:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4ou3vNuSGvhC for <kvmarm@lists.cs.columbia.edu>;
- Mon, 10 May 2021 13:29:12 -0400 (EDT)
+ with ESMTP id Y7UQtdHJvjzX for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 10 May 2021 13:29:14 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 96DB64B874
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 13:29:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 52F404086A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 13:29:14 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id C391B61481;
- Mon, 10 May 2021 17:29:09 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 7BBA46147F;
+ Mon, 10 May 2021 17:29:13 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1lg9Go-000Uqg-Pj; Mon, 10 May 2021 18:00:38 +0100
+ id 1lg9Gs-000Uqg-59; Mon, 10 May 2021 18:00:42 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v4 60/66] KVM: arm64: Add ARMv8.4 Enhanced Nested Virt
- cpufeature
-Date: Mon, 10 May 2021 17:59:14 +0100
-Message-Id: <20210510165920.1913477-61-maz@kernel.org>
+Subject: [PATCH v4 65/66] KVM: arm64: nv: Fast-track 'InHost' exception returns
+Date: Mon, 10 May 2021 17:59:19 +0100
+Message-Id: <20210510165920.1913477-66-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210510165920.1913477-1-maz@kernel.org>
 References: <20210510165920.1913477-1-maz@kernel.org>
@@ -83,65 +82,148 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add the detection code for the ARMv8.4-NV feature.
+A significant part of the ARMv8.3-NV extension is to trap ERET
+instructions so that the hypervisor gets a chance to switch
+from a vEL2 L1 guest to an EL1 L2 guest.
+
+But this also has the unfortunate consequence of trapping ERET
+in unsuspecting circumstances, such as staying at vEL2 (interrupt
+handling while being in the guest hypervisor), or returning to host
+userspace in the case of a VHE guest.
+
+Although we already make some effort to handle these ERET quicker
+by not doing the put/load dance, it is still way too far down the
+line for it to be efficient enough.
+
+For these cases, it would ideal to ERET directly, no question asked.
+Of course, we can't do that. But the next best thing is to do it as
+early as possible, in fixup_guest_exit(), much as we would handle
+FPSIMD exceptions.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/cpucaps.h    |  1 +
- arch/arm64/include/asm/kvm_nested.h |  6 ++++++
- arch/arm64/kernel/cpufeature.c      | 10 ++++++++++
- 3 files changed, 17 insertions(+)
+ arch/arm64/kvm/emulate-nested.c | 26 ++--------------
+ arch/arm64/kvm/hyp/vhe/switch.c | 53 ++++++++++++++++++++++++++++++++-
+ 2 files changed, 54 insertions(+), 25 deletions(-)
 
-diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
-index 8d0cf022010f..45ff5c6aba15 100644
---- a/arch/arm64/include/asm/cpucaps.h
-+++ b/arch/arm64/include/asm/cpucaps.h
-@@ -17,6 +17,7 @@
- #define ARM64_WORKAROUND_834220			7
- #define ARM64_HAS_NO_HW_PREFETCH		8
- #define ARM64_HAS_NESTED_VIRT			9
-+#define ARM64_HAS_ENHANCED_NESTED_VIRT		10
- #define ARM64_HAS_VIRT_HOST_EXTN		11
- #define ARM64_WORKAROUND_CAVIUM_27456		12
- #define ARM64_HAS_32BIT_EL0			13
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 36f2cd2c6fdf..c3c57eaa493a 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -14,6 +14,12 @@ static inline bool nested_virt_in_use(const struct kvm_vcpu *vcpu)
- 		test_bit(KVM_ARM_VCPU_HAS_EL2, vcpu->arch.features));
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index df4661515183..43197ff4a806 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -52,8 +52,7 @@ bool forward_nv_traps(struct kvm_vcpu *vcpu)
+ 
+ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
+ {
+-	u64 spsr, elr, mode;
+-	bool direct_eret;
++	u64 spsr, elr;
+ 
+ 	/*
+ 	 * Forward this trap to the virtual EL2 if the virtual
+@@ -62,31 +61,10 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
+ 	if (forward_nv_traps(vcpu))
+ 		return;
+ 
+-	/*
+-	 * Going through the whole put/load motions is a waste of time
+-	 * if this is a VHE guest hypervisor returning to its own
+-	 * userspace, or the hypervisor performing a local exception
+-	 * return. No need to save/restore registers, no need to
+-	 * switch S2 MMU. Just do the canonical ERET.
+-	 */
+-	spsr = vcpu_read_sys_reg(vcpu, SPSR_EL2);
+-	mode = spsr & (PSR_MODE_MASK | PSR_MODE32_BIT);
+-
+-	direct_eret  = (mode == PSR_MODE_EL0t &&
+-			vcpu_el2_e2h_is_set(vcpu) &&
+-			vcpu_el2_tge_is_set(vcpu));
+-	direct_eret |= (mode == PSR_MODE_EL2h || mode == PSR_MODE_EL2t);
+-
+-	if (direct_eret) {
+-		*vcpu_pc(vcpu) = vcpu_read_sys_reg(vcpu, ELR_EL2);
+-		*vcpu_cpsr(vcpu) = spsr;
+-		trace_kvm_nested_eret(vcpu, *vcpu_pc(vcpu), spsr);
+-		return;
+-	}
+-
+ 	preempt_disable();
+ 	kvm_arch_vcpu_put(vcpu);
+ 
++	spsr = __vcpu_sys_reg(vcpu, SPSR_EL2);
+ 	elr = __vcpu_sys_reg(vcpu, ELR_EL2);
+ 
+ 	trace_kvm_nested_eret(vcpu, elr, spsr);
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index bd4ae1296de4..b3e7d996b54d 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -166,6 +166,56 @@ void deactivate_traps_vhe_put(void)
+ 	__deactivate_traps_common();
  }
  
-+static inline bool enhanced_nested_virt_in_use(const struct kvm_vcpu *vcpu)
++static bool __hyp_handle_eret(struct kvm_vcpu *vcpu)
 +{
-+	return cpus_have_final_cap(ARM64_HAS_ENHANCED_NESTED_VIRT) &&
-+		nested_virt_in_use(vcpu);
++	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
++	u64 spsr, mode;
++
++	/*
++	 * Going through the whole put/load motions is a waste of time
++	 * if this is a VHE guest hypervisor returning to its own
++	 * userspace, or the hypervisor performing a local exception
++	 * return. No need to save/restore registers, no need to
++	 * switch S2 MMU. Just do the canonical ERET. Unless the trap
++	 * has to be forwarded further down the line, of course...
++	 */
++	if (kvm_vcpu_trap_get_class(vcpu) != ESR_ELx_EC_ERET)
++		return false;
++
++	/*
++	 * Let the trap forwarding be handled by the normal exception
++	 * handling code.
++	 */
++	if (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_NV)
++		return false;
++
++	spsr = read_sysreg_el1(SYS_SPSR);
++	spsr = __fixup_spsr_el2_read(ctxt, spsr);
++	mode = spsr & (PSR_MODE_MASK | PSR_MODE32_BIT);
++
++	switch (mode) {
++	case PSR_MODE_EL0t:
++		if (!(vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu)))
++			return false;
++		break;
++	case PSR_MODE_EL2t:
++		mode = PSR_MODE_EL1t;
++		break;
++	case PSR_MODE_EL2h:
++		mode = PSR_MODE_EL1h;
++		break;
++	default:
++		return false;
++	}
++
++	spsr = (spsr & ~(PSR_MODE_MASK | PSR_MODE32_BIT)) | mode;
++
++	write_sysreg_el2(spsr, SYS_SPSR);
++	write_sysreg_el2(read_sysreg_el1(SYS_ELR), SYS_ELR);
++
++	return true;
 +}
 +
- /* Translation helpers from non-VHE EL2 to EL1 */
- static inline u64 tcr_el2_ips_to_tcr_el1_ps(u64 tcr_el2)
+ static bool fixup_guest_exit_vhe(struct kvm_vcpu *vcpu, u64 *exit_code,
+ 				 bool hyp_ctxt)
  {
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 056de86d7f6f..d26f1ff38aac 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -1890,6 +1890,16 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.field_pos = ID_AA64MMFR2_NV_SHIFT,
- 		.min_field_value = 1,
- 	},
-+	{
-+		.desc = "Enhanced Nested Virtualization Support",
-+		.capability = ARM64_HAS_ENHANCED_NESTED_VIRT,
-+		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-+		.matches = has_nested_virt_support,
-+		.sys_reg = SYS_ID_AA64MMFR2_EL1,
-+		.sign = FTR_UNSIGNED,
-+		.field_pos = ID_AA64MMFR2_NV_SHIFT,
-+		.min_field_value = 2,
-+	},
- 	{
- 		.desc = "32-bit EL0 Support",
- 		.capability = ARM64_HAS_32BIT_EL0,
+@@ -207,7 +257,8 @@ static bool fixup_guest_exit_vhe(struct kvm_vcpu *vcpu, u64 *exit_code,
+ 	fixup_guest_exit_prologue(vcpu, exit_code);
+ 
+ 	if (*exit_code == ARM_EXCEPTION_TRAP) {
+-		/* more to come here */
++		if (__hyp_handle_eret(vcpu))
++			return true;
+ 	}
+ 
+ 	return fixup_guest_exit(vcpu, exit_code);
 -- 
 2.29.2
 
