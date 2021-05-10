@@ -6,53 +6,53 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78C69C433ED
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AAFCC43460
 	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 17:27:44 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 171656157F
-	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 17:27:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 171656157F
+	by mail.kernel.org (Postfix) with ESMTP id 098D061574
+	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 17:27:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 098D061574
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B7D5F4B4AA;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A69114B2BD;
 	Mon, 10 May 2021 13:27:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Tzip+gRFAgKj; Mon, 10 May 2021 13:27:41 -0400 (EDT)
+	with ESMTP id sE4r9jT08LEN; Mon, 10 May 2021 13:27:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F74E4B71F;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C2A44B7E8;
 	Mon, 10 May 2021 13:27:41 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B13D24B2BD
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E57D14B6F3
  for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 13:27:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 59PKZOwCkSrl for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id Warr9SL6nW3s for <kvmarm@lists.cs.columbia.edu>;
  Mon, 10 May 2021 13:27:38 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 84A494B833
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 13:27:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5F0C84B830
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 13:27:38 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id B726D61469;
- Mon, 10 May 2021 17:27:35 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 7977761492;
+ Mon, 10 May 2021 17:27:37 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1lg9GS-000Uqg-Mw; Mon, 10 May 2021 18:00:17 +0100
+ id 1lg9Gm-000Uqg-Ps; Mon, 10 May 2021 18:00:37 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v4 30/66] KVM: arm64: nv: Only toggle cache for virtual EL2
- when SCTLR_EL2 changes
-Date: Mon, 10 May 2021 17:58:44 +0100
-Message-Id: <20210510165920.1913477-31-maz@kernel.org>
+Subject: [PATCH v4 57/66] KVM: arm64: nv: Add include containing the VNCR_EL2
+ offsets
+Date: Mon, 10 May 2021 17:59:11 +0100
+Message-Id: <20210510165920.1913477-58-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210510165920.1913477-1-maz@kernel.org>
 References: <20210510165920.1913477-1-maz@kernel.org>
@@ -62,13 +62,11 @@ X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org,
  kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com,
  christoffer.dall@arm.com, jintack@cs.columbia.edu, haibo.xu@linaro.org,
  james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
- kernel-team@android.com, christoffer.dall@linaro.org, jintack.lim@linaro.org
+ kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kernel-team@android.com, Andre Przywara <andre.przywara@arm.com>,
- Jintack Lim <jintack.lim@linaro.org>,
- Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kernel-team@android.com, Andre Przywara <andre.przywara@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -85,49 +83,97 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@linaro.org>
+VNCR_EL2 points to a page containing a number of system registers
+accessed by a guest hypervisor when ARMv8.4-NV is enabled.
 
-So far we were flushing almost the entire universe whenever a VM would
-load/unload the SCTLR_EL1 and the two versions of that register had
-different MMU enabled settings.  This turned out to be so slow that it
-prevented forward progress for a nested VM, because a scheduler timer
-tick interrupt would always be pending when we reached the nested VM.
+Let's document the offsets in that page, as we are going to use
+this layout.
 
-To avoid this problem, we consider the SCTLR_EL2 when evaluating if
-caches are on or off when entering virtual EL2 (because this is the
-value that we end up shadowing onto the hardware EL1 register).
-
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_mmu.h | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/vncr_mapping.h | 73 +++++++++++++++++++++++++++
+ 1 file changed, 73 insertions(+)
+ create mode 100644 arch/arm64/include/asm/vncr_mapping.h
 
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 25ed956f9af1..0be00ec66e0f 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -115,6 +115,7 @@ alternative_cb_end
- #include <asm/cache.h>
- #include <asm/cacheflush.h>
- #include <asm/mmu_context.h>
-+#include <asm/kvm_emulate.h>
- 
- void kvm_update_va_mask(struct alt_instr *alt,
- 			__le32 *origptr, __le32 *updptr, int nr_inst);
-@@ -184,7 +185,10 @@ struct kvm;
- 
- static inline bool vcpu_has_cache_enabled(struct kvm_vcpu *vcpu)
- {
--	return (vcpu_read_sys_reg(vcpu, SCTLR_EL1) & 0b101) == 0b101;
-+	if (vcpu_mode_el2(vcpu))
-+		return (__vcpu_sys_reg(vcpu, SCTLR_EL2) & 0b101) == 0b101;
-+	else
-+		return (vcpu_read_sys_reg(vcpu, SCTLR_EL1) & 0b101) == 0b101;
- }
- 
- static inline void __clean_dcache_guest_page(kvm_pfn_t pfn, unsigned long size)
+diff --git a/arch/arm64/include/asm/vncr_mapping.h b/arch/arm64/include/asm/vncr_mapping.h
+new file mode 100644
+index 000000000000..64c46d658fc8
+--- /dev/null
++++ b/arch/arm64/include/asm/vncr_mapping.h
+@@ -0,0 +1,73 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * System register offsets in the VNCR page
++ * All offsets are *byte* displacements!
++ */
++
++#ifndef __ARM64_VNCR_MAPPING_H__
++#define __ARM64_VNCR_MAPPING_H__
++
++#define VNCR_VTTBR_EL2          0x020
++#define VNCR_VTCR_EL2           0x040
++#define VNCR_VMPIDR_EL2         0x050
++#define VNCR_CNTVOFF_EL2        0x060
++#define VNCR_HCR_EL2            0x078
++#define VNCR_HSTR_EL2           0x080
++#define VNCR_VPIDR_EL2          0x088
++#define VNCR_TPIDR_EL2          0x090
++#define VNCR_VNCR_EL2           0x0B0
++#define VNCR_CPACR_EL1          0x100
++#define VNCR_CONTEXTIDR_EL1     0x108
++#define VNCR_SCTLR_EL1          0x110
++#define VNCR_ACTLR_EL1          0x118
++#define VNCR_TCR_EL1            0x120
++#define VNCR_AFSR0_EL1          0x128
++#define VNCR_AFSR1_EL1          0x130
++#define VNCR_ESR_EL1            0x138
++#define VNCR_MAIR_EL1           0x140
++#define VNCR_AMAIR_EL1          0x148
++#define VNCR_MDSCR_EL1          0x158
++#define VNCR_SPSR_EL1           0x160
++#define VNCR_CNTV_CVAL_EL0      0x168
++#define VNCR_CNTV_CTL_EL0       0x170
++#define VNCR_CNTP_CVAL_EL0      0x178
++#define VNCR_CNTP_CTL_EL0       0x180
++#define VNCR_SCXTNUM_EL1        0x188
++#define VNCR_ZCR_EL1            0x1E0
++#define VNCR_TTBR0_EL1          0x200
++#define VNCR_TTBR1_EL1          0x210
++#define VNCR_FAR_EL1            0x220
++#define VNCR_ELR_EL1            0x230
++#define VNCR_SP_EL1             0x240
++#define VNCR_VBAR_EL1           0x250
++#define VNCR_ICH_LR0_EL2        0x400
++//      VNCR_ICH_LRN_EL2(n)     VNCR_ICH_LR0_EL2+8*((n) & 7)
++#define VNCR_ICH_AP0R0_EL2      0x480
++//      VNCR_ICH_AP0RN_EL2(n)   VNCR_ICH_AP0R0_EL2+8*((n) & 3)
++#define VNCR_ICH_AP1R0_EL2      0x4A0
++//      VNCR_ICH_AP1RN_EL2(n)   VNCR_ICH_AP1R0_EL2+8*((n) & 3)
++#define VNCR_ICH_HCR_EL2        0x4C0
++#define VNCR_ICH_VMCR_EL2       0x4C8
++#define VNCR_VDISR_EL2          0x500
++#define VNCR_PMBLIMITR_EL1      0x800
++#define VNCR_PMBPTR_EL1         0x810
++#define VNCR_PMBSR_EL1          0x820
++#define VNCR_PMSCR_EL1          0x828
++#define VNCR_PMSEVFR_EL1        0x830
++#define VNCR_PMSICR_EL1         0x838
++#define VNCR_PMSIRR_EL1         0x840
++#define VNCR_PMSLATFR_EL1       0x848
++#define VNCR_TRFCR_EL1          0x880
++#define VNCR_MPAM1_EL1          0x900
++#define VNCR_MPAMHCR_EL2        0x930
++#define VNCR_MPAMVPMV_EL2       0x938
++#define VNCR_MPAMVPM0_EL2       0x940
++#define VNCR_MPAMVPM1_EL2       0x948
++#define VNCR_MPAMVPM2_EL2       0x950
++#define VNCR_MPAMVPM3_EL2       0x958
++#define VNCR_MPAMVPM4_EL2       0x960
++#define VNCR_MPAMVPM5_EL2       0x968
++#define VNCR_MPAMVPM6_EL2       0x970
++#define VNCR_MPAMVPM7_EL2       0x978
++
++#endif /* __ARM64_VNCR_MAPPING_H__ */
 -- 
 2.29.2
 
