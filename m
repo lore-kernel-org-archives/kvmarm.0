@@ -2,61 +2,56 @@ Return-Path: <SRS0=u/VZ=KG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44194C433B4
-	for <kvmarm@archiver.kernel.org>; Tue, 11 May 2021 11:13:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6559AC433B4
+	for <kvmarm@archiver.kernel.org>; Tue, 11 May 2021 15:42:43 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 83F6A61628
-	for <kvmarm@archiver.kernel.org>; Tue, 11 May 2021 11:13:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83F6A61628
+	by mail.kernel.org (Postfix) with ESMTP id A73836162B
+	for <kvmarm@archiver.kernel.org>; Tue, 11 May 2021 15:42:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A73836162B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DAF584B4F9;
-	Tue, 11 May 2021 07:13:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B4A84B4F6;
+	Tue, 11 May 2021 11:42:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id bqJ9t19DoL4a; Tue, 11 May 2021 07:13:32 -0400 (EDT)
+	with ESMTP id IIayoIT8KhCM; Tue, 11 May 2021 11:42:40 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F0844B463;
-	Tue, 11 May 2021 07:13:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 913804B4CB;
+	Tue, 11 May 2021 11:42:40 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 483F34B371
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 May 2021 07:13:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C47534B4BC
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 May 2021 11:42:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cI5ZMst4L2Sz for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 May 2021 07:13:30 -0400 (EDT)
+ with ESMTP id cLUDQE86t-K7 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 May 2021 11:42:38 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E538D4B35F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 May 2021 07:13:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 45B464B4AE
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 May 2021 11:42:38 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4A638169E;
- Tue, 11 May 2021 04:13:14 -0700 (PDT)
-Received: from C02TD0UTHF1T.local (unknown [10.57.29.91])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E11043F719;
- Tue, 11 May 2021 04:13:06 -0700 (PDT)
-Date: Tue, 11 May 2021 12:13:03 +0100
-From: Mark Rutland <mark.rutland@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v3 3/9] KVM: arm64: vgic: Be tolerant to the lack of
- maintenance interrupt
-Message-ID: <20210511111303.GE6152@C02TD0UTHF1T.local>
-References: <20210510134824.1910399-1-maz@kernel.org>
- <20210510134824.1910399-4-maz@kernel.org>
- <20210510161907.GD92897@C02TD0UTHF1T.local>
- <87sg2uo54e.wl-maz@kernel.org>
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B5AF8D6E;
+ Tue, 11 May 2021 08:42:37 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F31D13F718;
+ Tue, 11 May 2021 08:42:36 -0700 (PDT)
+To: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Andrew Jones <drjones@redhat.com>, kvm-devel <kvm@vger.kernel.org>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: [kvm-unit-tests BUG] lib/ldiv32.c breaks arm compilation
+Message-ID: <348f023d-f313-3d98-dc18-b53b6879fe45@arm.com>
+Date: Tue, 11 May 2021 16:43:16 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <87sg2uo54e.wl-maz@kernel.org>
-Cc: kvm@vger.kernel.org, kernel-team@android.com,
- Hector Martin <marcan@marcan.st>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Content-Language: en-US
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -68,62 +63,94 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, May 10, 2021 at 06:44:49PM +0100, Marc Zyngier wrote:
-> On Mon, 10 May 2021 17:19:07 +0100,
-> Mark Rutland <mark.rutland@arm.com> wrote:
-> > 
-> > On Mon, May 10, 2021 at 02:48:18PM +0100, Marc Zyngier wrote:
-> > > As it turns out, not all the interrupt controllers are able to
-> > > expose a vGIC maintenance interrupt as a distrete signal.
-> > > And to be fair, it doesn't really matter as all we require is
-> > > for *something* to kick us out of guest mode out way or another.
-> > > 
-> > > On systems that do not expose a maintenance interrupt as such,
-> > > there are two outcomes:
-> > > 
-> > > - either the virtual CPUIF does generate an interrupt, and
-> > >   by the time we are back to the host the interrupt will have long
-> > >   been disabled (as we set ICH_HCR_EL2.EN to 0 on exit). In this case,
-> > >   interrupt latency is as good as it gets.
-> > > 
-> > > - or some other event (physical timer) will take us out of the guest
-> > >   anyway, and the only drawback is a bad interrupt latency.
-> > 
-> > IIRC we won't have a a guaranteed schedular tick for NO_HZ_FULL, so in
-> > that case we'll either need to set a period software maintenance
-> > interrupt, or reject this combination at runtime (either when trying to
-> > isolate the dynticks CPUs, or when trying to create a VM).
-> 
-> That's a good point.
-> 
-> On sensible systems, the maintenance interrupt is a standard GIC PPI
-> that requires enabling, and that is all that KVM requires (the
-> maintenance interrupt is only used as an exit mechanism and will be
-> disabled before reaching the handler).
-> 
-> On the M1, owing to the lack of a per-CPU interrupt controller, there
-> is nothing to enable. The virtual CPU interface will fire at will and
-> take us out of the guest in a timely manner.
-
-Ah, so the M1 does have a maintenance interrupt, but you can't silence
-it at the irqchip level.
-
-> So maybe instead of relaxing the requirement for a maintenance
-> interrupt, we should only bypass the checks if the root interrupt
-> controller advertises that it is safe to do so, making it a
-> M1-specific hack.
-
-That certainly sounds safer than permitting running without any
-maintenance interrupt at all.
-
-Thanks,
-Mark.
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGVsbG8sCgpDb21taXQgMGIyZDNkYWZjMGQzICgibGliY2ZsYXQ6IHByb3ZpZGUgbG9uZyBkaXZp
+c2lvbiByb3V0aW5lcyIpLCB3aGljaCBhZGRlZCB0aGUKbGliL2xkaXYzMi5jIGZpbGUsIGJyZWFr
+cyBjb21waWxhdGlvbiBmb3IgdGhlIGFybSBhcmNoaXRlY3R1cmU7IGFybTY0IHNlZW1zIHRvIGJl
+CndvcmtpbmcganVzdCBmaW5lLgoKT24gQXJjaCBMaW51eDoKCiQgLi9jb25maWd1cmUgLS1hcmNo
+PWFybSAtLWNyb3NzLXByZWZpeD1hcm0tbm9uZS1lYWJpLQokIG1ha2UgY2xlYW4gJiYgbWFrZQpy
+bSAtZiBsaWIvYXJtL2FzbS1vZmZzZXRzLmggbGliL2FybS9hc20tb2Zmc2V0cy5zIFwKwqDCoMKg
+wqDCoCBsaWIvZ2VuZXJhdGVkL2FzbS1vZmZzZXRzLmgKcm0gLWYgYXJtLyoue28sZmxhdCxlbGZ9
+IGxpYi9hcm0vbGliZWFiaS5hIGxpYi9hcm0vZWFiaV9jb21wYXQubyBcCsKgwqDCoMKgwqAgYXJt
+Ly4qLmQgbGliL2FybS8uKi5kCsKgIENMRUFOIChsaWJmZHQpCnJtIC1mIGxpYi9saWJmZHQvKi5v
+IGxpYi9saWJmZHQvLiouZApybSAtZiBsaWIvbGliZmR0L2xpYmZkdC5zby4xCnJtIC1mIGxpYi9s
+aWJmZHQvbGliZmR0LmEKcm0gLWYgbGliLy4qLmQgbGliL2xpYmNmbGF0LmEgbGliL2FyZ3YubyBs
+aWIvcHJpbnRmLm8gbGliL3N0cmluZy5vIGxpYi9hYm9ydC5vCmxpYi9yZXBvcnQubyBsaWIvc3Rh
+Y2subyBsaWIvYXJtL3NwaW5sb2NrLm8gbGliL2FybS9wcm9jZXNzb3IubyBsaWIvYXJtL3N0YWNr
+Lm8KbGliL2xkaXYzMi5vIGxpYi91dGlsLm8gbGliL2dldGNoYXIubyBsaWIvYWxsb2NfcGh5cy5v
+IGxpYi9hbGxvY19wYWdlLm8KbGliL3ZtYWxsb2MubyBsaWIvYWxsb2MubyBsaWIvZGV2aWNldHJl
+ZS5vIGxpYi9wY2kubyBsaWIvcGNpLWhvc3QtZ2VuZXJpYy5vCmxpYi9wY2ktdGVzdGRldi5vIGxp
+Yi92aXJ0aW8ubyBsaWIvdmlydGlvLW1taW8ubyBsaWIvY2hyLXRlc3RkZXYubyBsaWIvYXJtL2lv
+Lm8KbGliL2FybS9zZXR1cC5vIGxpYi9hcm0vbW11Lm8gbGliL2FybS9iaXRvcHMubyBsaWIvYXJt
+L3BzY2kubyBsaWIvYXJtL3NtcC5vCmxpYi9hcm0vZGVsYXkubyBsaWIvYXJtL2dpYy5vIGxpYi9h
+cm0vZ2ljLXYyLm8gbGliL2FybS9naWMtdjMubwpbLi5dCmFybS1ub25lLWVhYmktZ2NjIC1tYXJt
+IC1tZnB1PXZmcCAtbWNwdT1jb3J0ZXgtYTE1IC1tbm8tdW5hbGlnbmVkLWFjY2Vzcwotc3RkPWdu
+dTk5IC1mZnJlZXN0YW5kaW5nIC1PMiAtSSAvaG9tZS9hbGV4L2RhdGEvcmVwb3Mva3ZtLXVuaXQt
+dGVzdHMvbGliIC1JCi9ob21lL2FsZXgvZGF0YS9yZXBvcy9rdm0tdW5pdC10ZXN0cy9saWIvbGli
+ZmR0IC1JIGxpYiAtZyAtTU1EIC1NRiBsaWIvLmxkaXYzMi5kCi1mbm8tc3RyaWN0LWFsaWFzaW5n
+IC1mbm8tY29tbW9uIC1XYWxsIC1Xd3JpdGUtc3RyaW5ncyAtV2VtcHR5LWJvZHkKLVd1bmluaXRp
+YWxpemVkIC1XaWdub3JlZC1xdWFsaWZpZXJzIC1XZXJyb3LCoCAtZm5vLW9taXQtZnJhbWUtcG9p
+bnRlcsKgCi1mbm8tc3RhY2stcHJvdGVjdG9ywqDCoMKgIC1Xbm8tZnJhbWUtYWRkcmVzcyAtRF9f
+VTMyX0xPTkdfRk1UX1/CoCAtZm5vLXBpY8KgIC1uby1waWXCoAotV2Nsb2JiZXJlZMKgIC1XdW51
+c2VkLWJ1dC1zZXQtcGFyYW1ldGVywqAgLVdtaXNzaW5nLXBhcmFtZXRlci10eXBlwqAKLVdvbGQt
+c3R5bGUtZGVjbGFyYXRpb24gLVdvdmVycmlkZS1pbml0IC1XbWlzc2luZy1wcm90b3R5cGVzIC1X
+c3RyaWN0LXByb3RvdHlwZXPCoMKgCi1jIC1vIGxpYi9sZGl2MzIubyBsaWIvbGRpdjMyLmMKbGli
+L2xkaXYzMi5jOiBJbiBmdW5jdGlvbiAnX19tb2RkaTMnOgpsaWIvbGRpdjMyLmM6NzM6MTE6IGVy
+cm9yOiAncmVtJyBtYXkgYmUgdXNlZCB1bmluaXRpYWxpemVkIGluIHRoaXMgZnVuY3Rpb24KWy1X
+ZXJyb3I9bWF5YmUtdW5pbml0aWFsaXplZF0KwqDCoCA3MyB8wqAgdWludDY0X3QgcmVtOwrCoMKg
+wqDCoMKgIHzCoMKgwqDCoMKgwqDCoMKgwqDCoCBefn4KbGliL2xkaXYzMi5jOiBJbiBmdW5jdGlv
+biAnX191bW9kZGkzJzoKbGliL2xkaXYzMi5jOjc1Ojk6IGVycm9yOiAncmVtJyBtYXkgYmUgdXNl
+ZCB1bmluaXRpYWxpemVkIGluIHRoaXMgZnVuY3Rpb24KWy1XZXJyb3I9bWF5YmUtdW5pbml0aWFs
+aXplZF0KwqDCoCA3NSB8wqAgcmV0dXJuIHJlbTsKwqDCoMKgwqDCoCB8wqDCoMKgwqDCoMKgwqDC
+oCBefn4KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZTogKioq
+IFs8YnVpbHRpbj46IGxpYi9sZGl2MzIub10gRXJyb3IgMQokIGFybS1ub25lLWVhYmktZ2NjIC0t
+dmVyc2lvbgphcm0tbm9uZS1lYWJpLWdjYyAoQXJjaCBSZXBvc2l0b3J5KSAxMC4zLjAKQ29weXJp
+Z2h0IChDKSAyMDIwIEZyZWUgU29mdHdhcmUgRm91bmRhdGlvbiwgSW5jLgpUaGlzIGlzIGZyZWUg
+c29mdHdhcmU7IHNlZSB0aGUgc291cmNlIGZvciBjb3B5aW5nIGNvbmRpdGlvbnMuwqAgVGhlcmUg
+aXMgTk8Kd2FycmFudHk7IG5vdCBldmVuIGZvciBNRVJDSEFOVEFCSUxJVFkgb3IgRklUTkVTUyBG
+T1IgQSBQQVJUSUNVTEFSIFBVUlBPU0UuCgpPbiBGZWRvcmEgMzM6CgokIC4vY29uZmlndXJlIC0t
+YXJjaD1hcm0gLS1jcm9zcy1wcmVmaXg9YXJtLWxpbnV4LWdudS0KJCBtYWtlIGNsZWFuICYmIG1h
+a2UKcm0gLWYgbGliL2FybS9hc20tb2Zmc2V0cy5oIGxpYi9hcm0vYXNtLW9mZnNldHMucyBcCsKg
+wqDCoMKgwqAgbGliL2dlbmVyYXRlZC9hc20tb2Zmc2V0cy5oCnJtIC1mIGFybS8qLntvLGZsYXQs
+ZWxmfSBsaWIvYXJtL2xpYmVhYmkuYSBsaWIvYXJtL2VhYmlfY29tcGF0Lm8gXArCoMKgwqDCoMKg
+IGFybS8uKi5kIGxpYi9hcm0vLiouZArCoCBDTEVBTiAobGliZmR0KQpybSAtZiBsaWIvbGliZmR0
+LyoubyBsaWIvbGliZmR0Ly4qLmQKcm0gLWYgbGliL2xpYmZkdC9saWJmZHQuc28uMQpybSAtZiBs
+aWIvbGliZmR0L2xpYmZkdC5hCnJtIC1mIGxpYi8uKi5kIGxpYi9saWJjZmxhdC5hIGxpYi9hcmd2
+Lm8gbGliL3ByaW50Zi5vIGxpYi9zdHJpbmcubyBsaWIvYWJvcnQubwpsaWIvcmVwb3J0Lm8gbGli
+L3N0YWNrLm8gbGliL2FybS9zcGlubG9jay5vIGxpYi9hcm0vcHJvY2Vzc29yLm8gbGliL2FybS9z
+dGFjay5vCmxpYi9sZGl2MzIubyBsaWIvdXRpbC5vIGxpYi9nZXRjaGFyLm8gbGliL2FsbG9jX3Bo
+eXMubyBsaWIvYWxsb2NfcGFnZS5vCmxpYi92bWFsbG9jLm8gbGliL2FsbG9jLm8gbGliL2Rldmlj
+ZXRyZWUubyBsaWIvcGNpLm8gbGliL3BjaS1ob3N0LWdlbmVyaWMubwpsaWIvcGNpLXRlc3RkZXYu
+byBsaWIvdmlydGlvLm8gbGliL3ZpcnRpby1tbWlvLm8gbGliL2Noci10ZXN0ZGV2Lm8gbGliL2Fy
+bS9pby5vCmxpYi9hcm0vc2V0dXAubyBsaWIvYXJtL21tdS5vIGxpYi9hcm0vYml0b3BzLm8gbGli
+L2FybS9wc2NpLm8gbGliL2FybS9zbXAubwpsaWIvYXJtL2RlbGF5Lm8gbGliL2FybS9naWMubyBs
+aWIvYXJtL2dpYy12Mi5vIGxpYi9hcm0vZ2ljLXYzLm8KWy4uXQphcm0tbGludXgtZ251LWdjYyAt
+bWFybSAtbWZwdT12ZnAgLW1jcHU9Y29ydGV4LWExNSAtbW5vLXVuYWxpZ25lZC1hY2Nlc3MKLXN0
+ZD1nbnU5OSAtZmZyZWVzdGFuZGluZyAtTzIgLUkgL2hvbWUvYWxleC9kYXRhL3JlcG9zL2t2bS11
+bml0LXRlc3RzL2xpYiAtSQovaG9tZS9hbGV4L2RhdGEvcmVwb3Mva3ZtLXVuaXQtdGVzdHMvbGli
+L2xpYmZkdCAtSSBsaWIgLWcgLU1NRCAtTUYgbGliLy5sZGl2MzIuZAotZm5vLXN0cmljdC1hbGlh
+c2luZyAtZm5vLWNvbW1vbiAtV2FsbCAtV3dyaXRlLXN0cmluZ3MgLVdlbXB0eS1ib2R5Ci1XdW5p
+bml0aWFsaXplZCAtV2lnbm9yZWQtcXVhbGlmaWVycyAtV2Vycm9ywqAgLWZuby1vbWl0LWZyYW1l
+LXBvaW50ZXLCoAotZm5vLXN0YWNrLXByb3RlY3RvcsKgwqDCoCAtV25vLWZyYW1lLWFkZHJlc3PC
+oMKgIC1mbm8tcGljwqAgLW5vLXBpZcKgIC1XY2xvYmJlcmVkwqAKLVd1bnVzZWQtYnV0LXNldC1w
+YXJhbWV0ZXLCoCAtV21pc3NpbmctcGFyYW1ldGVyLXR5cGXCoCAtV29sZC1zdHlsZS1kZWNsYXJh
+dGlvbgotV292ZXJyaWRlLWluaXQgLVdtaXNzaW5nLXByb3RvdHlwZXMgLVdzdHJpY3QtcHJvdG90
+eXBlc8KgwqAgLWMgLW8gbGliL2xkaXYzMi5vCmxpYi9sZGl2MzIuYwpsaWIvbGRpdjMyLmM6MTox
+MDogZmF0YWwgZXJyb3I6IGludHR5cGVzLmg6IE5vIHN1Y2ggZmlsZSBvciBkaXJlY3RvcnkKwqDC
+oMKgIDEgfCAjaW5jbHVkZSA8aW50dHlwZXMuaD4KwqDCoMKgwqDCoCB8wqDCoMKgwqDCoMKgwqDC
+oMKgIF5+fn5+fn5+fn5+fgpjb21waWxhdGlvbiB0ZXJtaW5hdGVkLgptYWtlOiAqKiogWzxidWls
+dGluPjogbGliL2xkaXYzMi5vXSBFcnJvciAxCiQgYXJtLWxpbnV4LWdudS1nY2MgLS12ZXJzaW9u
+CmFybS1saW51eC1nbnUtZ2NjIChHQ0MpIDEwLjIuMSAyMDIwMDgyNiAoUmVkIEhhdCBDcm9zcyAx
+MC4yLjEtMykKQ29weXJpZ2h0IChDKSAyMDIwIEZyZWUgU29mdHdhcmUgRm91bmRhdGlvbiwgSW5j
+LgpUaGlzIGlzIGZyZWUgc29mdHdhcmU7IHNlZSB0aGUgc291cmNlIGZvciBjb3B5aW5nIGNvbmRp
+dGlvbnMuwqAgVGhlcmUgaXMgTk8Kd2FycmFudHk7IG5vdCBldmVuIGZvciBNRVJDSEFOVEFCSUxJ
+VFkgb3IgRklUTkVTUyBGT1IgQSBQQVJUSUNVTEFSIFBVUlBPU0UuCgpSZXZlcnRpbmcgdGhlIGNv
+bW1pdCBtYWtlcyBhcm0gYnVpbGQgYWdhaW4uIEkgYW0gbm90IGZhbWlsaWFyIHdpdGggdG9vbGNo
+YWlucywgYW5kCnVuZm9ydHVuYXRlbHkgSSBjYW4ndCBwcm9wb3NlIGEgZml4LgoKVGhhbmtzLAoK
+QWxleAoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3Zt
+YXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlz
+dHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
