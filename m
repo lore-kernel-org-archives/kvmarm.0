@@ -1,99 +1,78 @@
-Return-Path: <SRS0=2g2/=KF=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=u/VZ=KG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5308AC43462
-	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 18:57:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5F2FC433B4
+	for <kvmarm@archiver.kernel.org>; Tue, 11 May 2021 07:45:00 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B61D7614A5
-	for <kvmarm@archiver.kernel.org>; Mon, 10 May 2021 18:57:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B61D7614A5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id D0A4261448
+	for <kvmarm@archiver.kernel.org>; Tue, 11 May 2021 07:44:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0A4261448
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D11A4B3BD;
-	Mon, 10 May 2021 14:57:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 40FDA4B495;
+	Tue, 11 May 2021 03:44:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, body has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id LtMnMAnrl2qz; Mon, 10 May 2021 14:57:49 -0400 (EDT)
+	with ESMTP id hL120Y9aX5cB; Tue, 11 May 2021 03:44:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C063E4B3C3;
-	Mon, 10 May 2021 14:57:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D590E4B49A;
+	Tue, 11 May 2021 03:44:56 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 425004B3C3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 14:57:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7CFA24B495
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 May 2021 03:44:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id l6Q2XAE4pW1C for <kvmarm@lists.cs.columbia.edu>;
- Mon, 10 May 2021 14:57:46 -0400 (EDT)
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com
- [209.85.208.182])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AE3824B3BD
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 14:57:46 -0400 (EDT)
-Received: by mail-lj1-f182.google.com with SMTP id y9so22102120ljn.6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 May 2021 11:57:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
- bh=aKEUOJuhx+R5Q4bhRWHxVLgdxk0QGSuqQVlbf8MB+7c=;
- b=JDBZzQIPoejn3/d+QtGZzD28RdIw8C64WhVvR1t8Mm8NPesB5GQbV+6X8MAPg8d2iz
- 7mjSfAUxoe5GoA1u5eFD81uYYLAp2URnyUCGrbNDYHVp38j8bGebnRhp+yuSIhca96TB
- Idw999gL4TQKkak+v8eW//N13DSw/7q+BBPaOMR33bGqZCv8T374sU+F3cL1EEa60D/a
- NLbUr3Kya2ani4/px1deJxMu9aWX7EaHN+n0Wv5F28jq3z25xhcOIgfkMVM1CulHeisB
- 6W1yTMA8cSJ+3dwvBwd7q8xAXNwv+Nbrjofd7n08PFX4O78UvKYNZsu4A6MXr68Q2VUW
- k9Cg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to;
- bh=aKEUOJuhx+R5Q4bhRWHxVLgdxk0QGSuqQVlbf8MB+7c=;
- b=BFkJ4KxwSXx//WFT2esg/TS0za7aecqdP1+Q24dkXpJjEch3LMUGeyh0dk1g0mq/as
- RuVgyZsISP95M5wXk1Pspn6h1eeBzS0BJ/mRvtr47CI7oHs77iDX4IybTZV8OJFQAPKV
- V/n3i88dsSaNFcsVTMSNaOpMv417CEYTU7P7Ji9mNg/EUlADXmkmYfdznASTwLAifNMU
- fZP768lb00dDg3/seZBIMlXZe1udNOPcFNxS8hQSsqbxCFuLvd7CU3LOLQhlqkJx3JoR
- ONC1xo7hmQbpDAp4dFMMt1959hGrfWH4rFaSxCPC2flUV0EulqQaqP4X1QU6ynl2dEWB
- 3gnw==
-X-Gm-Message-State: AOAM533nHH6iP+GBxfadCUW2IvANM7h/ofVvr+Z/jUHTYpuNnoUlJJA3
- Roe9sQ2nM0qMRFtFEFAxnNZGja2dNsI4dB+VyMH8kA==
-X-Google-Smtp-Source: ABdhPJwlSFI8JRzL4BW3Gmg9WHqzIaE0tnEyTDmQy+u1k5R9ZHhhfpXgcqsFOBszyUlQhiyVUC1Rjjrmtnj+bLyjTHs=
-X-Received: by 2002:a2e:591:: with SMTP id 139mr14109105ljf.207.1620673065009; 
- Mon, 10 May 2021 11:57:45 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210429203740.1935629-1-jingzhangos@google.com>
-In-Reply-To: <20210429203740.1935629-1-jingzhangos@google.com>
-From: Jing Zhang <jingzhangos@google.com>
-Date: Mon, 10 May 2021 13:57:33 -0500
-Message-ID: <CAAdAUtgW0vYmr5rqiMJKbZSjgEtLQqxfHd8H0fxrTbE0o4zmWw@mail.gmail.com>
-Subject: Re: [PATCH v4 0/4] KVM statistics data fd-based binary interface
-To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>, 
- LinuxMIPS <linux-mips@vger.kernel.org>, KVMPPC <kvm-ppc@vger.kernel.org>, 
- LinuxS390 <linux-s390@vger.kernel.org>, 
- Linuxkselftest <linux-kselftest@vger.kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, 
- Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
- Julien Thierry <julien.thierry.kdev@gmail.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Will Deacon <will@kernel.org>, Huacai Chen <chenhuacai@kernel.org>, 
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, 
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- Paul Mackerras <paulus@ozlabs.org>, 
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>, 
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, 
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- Sean Christopherson <seanjc@google.com>, 
- Vitaly Kuznetsov <vkuznets@redhat.com>, Jim Mattson <jmattson@google.com>, 
- Peter Shier <pshier@google.com>, Oliver Upton <oupton@google.com>, 
- David Rientjes <rientjes@google.com>,
- Emanuele Giuseppe Esposito <eesposit@redhat.com>
+ with ESMTP id lMra4e-AYLnR for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 May 2021 03:44:54 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 033844B445
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 May 2021 03:44:53 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id A4E4861026;
+ Tue, 11 May 2021 07:44:52 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1lgN4U-000cdO-F7; Tue, 11 May 2021 08:44:50 +0100
+Date: Tue, 11 May 2021 08:44:49 +0100
+Message-ID: <87o8dhogsu.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH 2/2] KVM: arm64: Commit pending PC adjustemnts before
+ returning to userspace
+In-Reply-To: <65b5cad7-13d8-13a9-9502-7c21e0b72761@arm.com>
+References: <20210510094915.1909484-1-maz@kernel.org>
+ <20210510094915.1909484-3-maz@kernel.org>
+ <7a0f43c8-cc36-810e-0b8e-ffe66672ca82@arm.com>
+ <87v97qociy.wl-maz@kernel.org>
+ <65b5cad7-13d8-13a9-9502-7c21e0b72761@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ yuzenghui@huawei.com, james.morse@arm.com, suzuki.poulose@arm.com,
+ kernel-team@android.com, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, stable@vger.kernel.org, kernel-team@android.com,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -110,95 +89,130 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Paolo,
+On Mon, 10 May 2021 16:14:37 +0100,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> Hi Marc,
+> 
+> On 5/10/21 4:04 PM, Marc Zyngier wrote:
+> > On Mon, 10 May 2021 15:55:28 +0100,
+> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> >> Hi Marc,
+> >>
+> >> On 5/10/21 10:49 AM, Marc Zyngier wrote:
+> >>> KVM currently updates PC (and the corresponding exception state)
+> >>> using a two phase approach: first by setting a set of flags,
+> >>> then by converting these flags into a state update when the vcpu
+> >>> is about to enter the guest.
+> >>>
+> >>> However, this creates a disconnect with userspace if the vcpu thread
+> >>> returns there with any exception/PC flag set. In this case, the exposed
+> >> The code seems to handle only the KVM_ARM64_PENDING_EXCEPTION
+> >> flag. Is the "PC flag" a reference to the KVM_ARM64_INCREMENT_PC
+> >> flag?
+> > No, it does handle both exception and PC increment, unless I have
+> > completely bodged something (entirely possible).
+> 
+> The message is correct, my bad.
+> 
+> >
+> >>> context is wrong, as userpsace doesn't have access to these flags
+> >> s/userpsace/userspace
+> >>
+> >>> (they aren't architectural). It also means that these flags are
+> >>> preserved across a reset, which isn't expected.
+> >>>
+> >>> To solve this problem, force an explicit synchronisation of the
+> >>> exception state on vcpu exit to userspace. As an optimisation
+> >>> for nVHE systems, only perform this when there is something pending.
+> >>>
+> >>> Reported-by: Zenghui Yu <yuzenghui@huawei.com>
+> >>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> >>> Cc: stable@vger.kernel.org # 5.11
+> >>> ---
+> >>>  arch/arm64/include/asm/kvm_asm.h   |  1 +
+> >>>  arch/arm64/kvm/arm.c               | 10 ++++++++++
+> >>>  arch/arm64/kvm/hyp/exception.c     |  4 ++--
+> >>>  arch/arm64/kvm/hyp/nvhe/hyp-main.c |  8 ++++++++
+> >>>  4 files changed, 21 insertions(+), 2 deletions(-)
+> >>>
+> >>> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> >>> index d5b11037401d..5e9b33cbac51 100644
+> >>> --- a/arch/arm64/include/asm/kvm_asm.h
+> >>> +++ b/arch/arm64/include/asm/kvm_asm.h
+> >>> @@ -63,6 +63,7 @@
+> >>>  #define __KVM_HOST_SMCCC_FUNC___pkvm_cpu_set_vector		18
+> >>>  #define __KVM_HOST_SMCCC_FUNC___pkvm_prot_finalize		19
+> >>>  #define __KVM_HOST_SMCCC_FUNC___pkvm_mark_hyp			20
+> >>> +#define __KVM_HOST_SMCCC_FUNC___kvm_adjust_pc			21
+> >>>  
+> >>>  #ifndef __ASSEMBLY__
+> >>>  
+> >>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> >>> index 1cb39c0803a4..d62a7041ebd1 100644
+> >>> --- a/arch/arm64/kvm/arm.c
+> >>> +++ b/arch/arm64/kvm/arm.c
+> >>> @@ -897,6 +897,16 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+> >>>  
+> >>>  	kvm_sigset_deactivate(vcpu);
+> >>>  
+> >>> +	/*
+> >>> +	 * In the unlikely event that we are returning to userspace
+> >>> +	 * with pending exceptions or PC adjustment, commit these
+> >> I'm going to assume "PC adjustment" means the KVM_ARM64_INCREMENT_PC
+> >> flag. Please correct me if that's not true, but if that's the case,
+> >> then the flag isn't handled below.
+> >>
+> >>> +	 * adjustments in order to give userspace a consistent view of
+> >>> +	 * the vcpu state.
+> >>> +	 */
+> >>> +	if (unlikely(vcpu->arch.flags & (KVM_ARM64_PENDING_EXCEPTION |
+> >>> +					 KVM_ARM64_EXCEPT_MASK)))
+> >> The condition seems to suggest that it is valid to set
+> >> KVM_ARM64_EXCEPT_{AA32,AA64}_* without setting
+> >> KVM_ARM64_PENDING_EXCEPTION, which looks rather odd to me.
+> >> Is that a valid use of the KVM_ARM64_EXCEPT_MASK bits? If it's not
+> >> (the existing code always sets the exception type with the
+> >> KVM_ARM64_PENDING_EXCEPTION), that I was thinking that checking only
+> >> the KVM_ARM64_PENDING_EXCEPTION flag would make the intention
+> >> clearer.
+> > No, you are missing this (subtle) comment in kvm_host.h:
+> >
+> > <quote>
+> > /*
+> >  * Overlaps with KVM_ARM64_EXCEPT_MASK on purpose so that it can't be
+> >  * set together with an exception...
+> >  */
+> > #define KVM_ARM64_INCREMENT_PC		(1 << 9) /* Increment PC */
+> > </quote>
+> >
+> > So (KVM_ARM64_PENDING_EXCEPTION | KVM_ARM64_EXCEPT_MASK) checks for
+> > *both* an exception and a PC increment.
+> 
+> Then how about explicitly checking for the
+> KVM_ARM64_PENDING_EXCEPTION and KVM_ARM64_INCREMENT_PC flags, like
+> it's done in __kvm_adjust_pc? That would certainly make the code
+> easier to understand, as it's not immediately obvious that the
+> EXCEPT mask includes the INCREMENT_PC flag.
 
-On Thu, Apr 29, 2021 at 3:37 PM Jing Zhang <jingzhangos@google.com> wrote:
->
-> This patchset provides a file descriptor for every VM and VCPU to read
-> KVM statistics data in binary format.
-> It is meant to provide a lightweight, flexible, scalable and efficient
-> lock-free solution for user space telemetry applications to pull the
-> statistics data periodically for large scale systems. The pulling
-> frequency could be as high as a few times per second.
-> In this patchset, every statistics data are treated to have some
-> attributes as below:
->   * architecture dependent or common
->   * VM statistics data or VCPU statistics data
->   * type: cumulative, instantaneous,
->   * unit: none for simple counter, nanosecond, microsecond,
->     millisecond, second, Byte, KiByte, MiByte, GiByte. Clock Cycles
-> Since no lock/synchronization is used, the consistency between all
-> the statistics data is not guaranteed. That means not all statistics
-> data are read out at the exact same time, since the statistics date
-> are still being updated by KVM subsystems while they are read out.
->
-> ---
->
-> * v3 -> v4
->   - Rebase to kvm/queue, commit 9f242010c3b4 ("KVM: avoid "deadlock"
->     between install_new_memslots and MMU notifier")
->   - Use C-stype comments in the whole patch
->   - Fix wrong count for x86 VCPU stats descriptors
->   - Fix KVM stats data size counting and validity check in selftest
->
-> * v2 -> v3
->   - Rebase to kvm/queue, commit edf408f5257b ("KVM: avoid "deadlock"
->     between install_new_memslots and MMU notifier")
->   - Resolve some nitpicks about format
->
-> * v1 -> v2
->   - Use ARRAY_SIZE to count the number of stats descriptors
->   - Fix missing `size` field initialization in macro STATS_DESC
->
-> [1] https://lore.kernel.org/kvm/20210402224359.2297157-1-jingzhangos@google.com
-> [2] https://lore.kernel.org/kvm/20210415151741.1607806-1-jingzhangos@google.com
-> [3] https://lore.kernel.org/kvm/20210423181727.596466-1-jingzhangos@google.com
->
-> ---
->
-> Jing Zhang (4):
->   KVM: stats: Separate common stats from architecture specific ones
->   KVM: stats: Add fd-based API to read binary stats data
->   KVM: stats: Add documentation for statistics data binary interface
->   KVM: selftests: Add selftest for KVM statistics data binary interface
->
->  Documentation/virt/kvm/api.rst                | 171 ++++++++
->  arch/arm64/include/asm/kvm_host.h             |   9 +-
->  arch/arm64/kvm/guest.c                        |  42 +-
->  arch/mips/include/asm/kvm_host.h              |   9 +-
->  arch/mips/kvm/mips.c                          |  67 ++-
->  arch/powerpc/include/asm/kvm_host.h           |   9 +-
->  arch/powerpc/kvm/book3s.c                     |  68 +++-
->  arch/powerpc/kvm/book3s_hv.c                  |  12 +-
->  arch/powerpc/kvm/book3s_pr.c                  |   2 +-
->  arch/powerpc/kvm/book3s_pr_papr.c             |   2 +-
->  arch/powerpc/kvm/booke.c                      |  63 ++-
->  arch/s390/include/asm/kvm_host.h              |   9 +-
->  arch/s390/kvm/kvm-s390.c                      | 133 +++++-
->  arch/x86/include/asm/kvm_host.h               |   9 +-
->  arch/x86/kvm/x86.c                            |  71 +++-
->  include/linux/kvm_host.h                      | 132 +++++-
->  include/linux/kvm_types.h                     |  12 +
->  include/uapi/linux/kvm.h                      |  50 +++
->  tools/testing/selftests/kvm/.gitignore        |   1 +
->  tools/testing/selftests/kvm/Makefile          |   3 +
->  .../testing/selftests/kvm/include/kvm_util.h  |   3 +
->  .../selftests/kvm/kvm_bin_form_stats.c        | 380 ++++++++++++++++++
->  tools/testing/selftests/kvm/lib/kvm_util.c    |  11 +
->  virt/kvm/kvm_main.c                           | 237 ++++++++++-
->  24 files changed, 1415 insertions(+), 90 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/kvm_bin_form_stats.c
->
->
-> base-commit: 9f242010c3b46e63bc62f08fff42cef992d3801b
-> --
-> 2.31.1.527.g47e6f16901-goog
->
+Fair enough. I'll fix that in v2.
 
-Do I need to send another version for this?
+Another thing I wondered about: we now rely on __kvm_adjust_pc() to be
+preemption safe. That's always the case in nVHE (we're at EL2), but
+VHE can be preempted at any point. The code we call is preemption
+safe, but it takes some effort to be convinced of it.
+
+Do you have a good suggestion on how to express this requirement?  I
+could throw a preempt_disable()/enable() at the call for the sake of
+being in the same context between VHE and nVHE, but that's not
+strictly necessary for now.
 
 Thanks,
-Jing
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
