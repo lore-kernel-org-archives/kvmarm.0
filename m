@@ -2,63 +2,60 @@ Return-Path: <SRS0=u/VZ=KG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03ECBC433ED
-	for <kvmarm@archiver.kernel.org>; Tue, 11 May 2021 16:49:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DA73C433ED
+	for <kvmarm@archiver.kernel.org>; Tue, 11 May 2021 17:02:54 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 433F661432
-	for <kvmarm@archiver.kernel.org>; Tue, 11 May 2021 16:49:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 433F661432
+	by mail.kernel.org (Postfix) with ESMTP id E099761176
+	for <kvmarm@archiver.kernel.org>; Tue, 11 May 2021 17:02:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E099761176
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C23D4B4A1;
-	Tue, 11 May 2021 12:49:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D2AE4B4BC;
+	Tue, 11 May 2021 13:02:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id NRHzzeeLRiVV; Tue, 11 May 2021 12:49:39 -0400 (EDT)
+	with ESMTP id wc5Qv6UTASg9; Tue, 11 May 2021 13:02:51 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 006E94B45E;
-	Tue, 11 May 2021 12:49:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C0BFE4B40B;
+	Tue, 11 May 2021 13:02:51 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 030B34B3FC
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 May 2021 12:49:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 557764B3BC
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 May 2021 13:02:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id R5lfrS8nG+az for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 May 2021 12:49:35 -0400 (EDT)
+ with ESMTP id ASROCSSbVoGx for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 May 2021 13:02:49 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 75B554B3AF
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 May 2021 12:49:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 904AD4A4A4
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 May 2021 13:02:49 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C2921D6E;
- Tue, 11 May 2021 09:49:34 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 336E2D6E;
+ Tue, 11 May 2021 10:02:49 -0700 (PDT)
 Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E14203F718;
- Tue, 11 May 2021 09:49:32 -0700 (PDT)
-Subject: Re: [PATCH 2/2] KVM: arm64: Commit pending PC adjustemnts before
- returning to userspace
-To: Marc Zyngier <maz@kernel.org>
-References: <20210510094915.1909484-1-maz@kernel.org>
- <20210510094915.1909484-3-maz@kernel.org>
- <7a0f43c8-cc36-810e-0b8e-ffe66672ca82@arm.com> <87v97qociy.wl-maz@kernel.org>
- <65b5cad7-13d8-13a9-9502-7c21e0b72761@arm.com> <87o8dhogsu.wl-maz@kernel.org>
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0AD113F718;
+ Tue, 11 May 2021 10:02:47 -0700 (PDT)
+Subject: Re: [kvm-unit-tests BUG] lib/ldiv32.c breaks arm compilation
+To: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Andrew Jones <drjones@redhat.com>, kvm-devel <kvm@vger.kernel.org>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+References: <348f023d-f313-3d98-dc18-b53b6879fe45@arm.com>
+ <604b1638-452f-e8e3-b674-014d634e2767@redhat.com>
 From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <8ebe6272-5053-be9f-141a-6958562178ff@arm.com>
-Date: Tue, 11 May 2021 17:50:15 +0100
+Message-ID: <05b5ce5d-4cd8-1fe3-1d2e-d34d4cf31384@arm.com>
+Date: Tue, 11 May 2021 18:03:33 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <87o8dhogsu.wl-maz@kernel.org>
+In-Reply-To: <604b1638-452f-e8e3-b674-014d634e2767@redhat.com>
 Content-Language: en-US
-Cc: kvm@vger.kernel.org, stable@vger.kernel.org, kernel-team@android.com,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -70,148 +67,145 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
-
-On 5/11/21 8:44 AM, Marc Zyngier wrote:
-> On Mon, 10 May 2021 16:14:37 +0100,
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
->> Hi Marc,
->>
->> On 5/10/21 4:04 PM, Marc Zyngier wrote:
->>> On Mon, 10 May 2021 15:55:28 +0100,
->>> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
->>>> Hi Marc,
->>>>
->>>> On 5/10/21 10:49 AM, Marc Zyngier wrote:
->>>>> KVM currently updates PC (and the corresponding exception state)
->>>>> using a two phase approach: first by setting a set of flags,
->>>>> then by converting these flags into a state update when the vcpu
->>>>> is about to enter the guest.
->>>>>
->>>>> However, this creates a disconnect with userspace if the vcpu thread
->>>>> returns there with any exception/PC flag set. In this case, the exposed
->>>> The code seems to handle only the KVM_ARM64_PENDING_EXCEPTION
->>>> flag. Is the "PC flag" a reference to the KVM_ARM64_INCREMENT_PC
->>>> flag?
->>> No, it does handle both exception and PC increment, unless I have
->>> completely bodged something (entirely possible).
->> The message is correct, my bad.
->>
->>>>> context is wrong, as userpsace doesn't have access to these flags
->>>> s/userpsace/userspace
->>>>
->>>>> (they aren't architectural). It also means that these flags are
->>>>> preserved across a reset, which isn't expected.
->>>>>
->>>>> To solve this problem, force an explicit synchronisation of the
->>>>> exception state on vcpu exit to userspace. As an optimisation
->>>>> for nVHE systems, only perform this when there is something pending.
->>>>>
->>>>> Reported-by: Zenghui Yu <yuzenghui@huawei.com>
->>>>> Signed-off-by: Marc Zyngier <maz@kernel.org>
->>>>> Cc: stable@vger.kernel.org # 5.11
->>>>> ---
->>>>>  arch/arm64/include/asm/kvm_asm.h   |  1 +
->>>>>  arch/arm64/kvm/arm.c               | 10 ++++++++++
->>>>>  arch/arm64/kvm/hyp/exception.c     |  4 ++--
->>>>>  arch/arm64/kvm/hyp/nvhe/hyp-main.c |  8 ++++++++
->>>>>  4 files changed, 21 insertions(+), 2 deletions(-)
->>>>>
->>>>> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
->>>>> index d5b11037401d..5e9b33cbac51 100644
->>>>> --- a/arch/arm64/include/asm/kvm_asm.h
->>>>> +++ b/arch/arm64/include/asm/kvm_asm.h
->>>>> @@ -63,6 +63,7 @@
->>>>>  #define __KVM_HOST_SMCCC_FUNC___pkvm_cpu_set_vector		18
->>>>>  #define __KVM_HOST_SMCCC_FUNC___pkvm_prot_finalize		19
->>>>>  #define __KVM_HOST_SMCCC_FUNC___pkvm_mark_hyp			20
->>>>> +#define __KVM_HOST_SMCCC_FUNC___kvm_adjust_pc			21
->>>>>  
->>>>>  #ifndef __ASSEMBLY__
->>>>>  
->>>>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->>>>> index 1cb39c0803a4..d62a7041ebd1 100644
->>>>> --- a/arch/arm64/kvm/arm.c
->>>>> +++ b/arch/arm64/kvm/arm.c
->>>>> @@ -897,6 +897,16 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->>>>>  
->>>>>  	kvm_sigset_deactivate(vcpu);
->>>>>  
->>>>> +	/*
->>>>> +	 * In the unlikely event that we are returning to userspace
->>>>> +	 * with pending exceptions or PC adjustment, commit these
->>>> I'm going to assume "PC adjustment" means the KVM_ARM64_INCREMENT_PC
->>>> flag. Please correct me if that's not true, but if that's the case,
->>>> then the flag isn't handled below.
->>>>
->>>>> +	 * adjustments in order to give userspace a consistent view of
->>>>> +	 * the vcpu state.
->>>>> +	 */
->>>>> +	if (unlikely(vcpu->arch.flags & (KVM_ARM64_PENDING_EXCEPTION |
->>>>> +					 KVM_ARM64_EXCEPT_MASK)))
->>>> The condition seems to suggest that it is valid to set
->>>> KVM_ARM64_EXCEPT_{AA32,AA64}_* without setting
->>>> KVM_ARM64_PENDING_EXCEPTION, which looks rather odd to me.
->>>> Is that a valid use of the KVM_ARM64_EXCEPT_MASK bits? If it's not
->>>> (the existing code always sets the exception type with the
->>>> KVM_ARM64_PENDING_EXCEPTION), that I was thinking that checking only
->>>> the KVM_ARM64_PENDING_EXCEPTION flag would make the intention
->>>> clearer.
->>> No, you are missing this (subtle) comment in kvm_host.h:
->>>
->>> <quote>
->>> /*
->>>  * Overlaps with KVM_ARM64_EXCEPT_MASK on purpose so that it can't be
->>>  * set together with an exception...
->>>  */
->>> #define KVM_ARM64_INCREMENT_PC		(1 << 9) /* Increment PC */
->>> </quote>
->>>
->>> So (KVM_ARM64_PENDING_EXCEPTION | KVM_ARM64_EXCEPT_MASK) checks for
->>> *both* an exception and a PC increment.
->> Then how about explicitly checking for the
->> KVM_ARM64_PENDING_EXCEPTION and KVM_ARM64_INCREMENT_PC flags, like
->> it's done in __kvm_adjust_pc? That would certainly make the code
->> easier to understand, as it's not immediately obvious that the
->> EXCEPT mask includes the INCREMENT_PC flag.
-> Fair enough. I'll fix that in v2.
->
-> Another thing I wondered about: we now rely on __kvm_adjust_pc() to be
-> preemption safe. That's always the case in nVHE (we're at EL2), but
-> VHE can be preempted at any point. The code we call is preemption
-> safe, but it takes some effort to be convinced of it.
->
-> Do you have a good suggestion on how to express this requirement?  I
-> could throw a preempt_disable()/enable() at the call for the sake of
-> being in the same context between VHE and nVHE, but that's not
-> strictly necessary for now.
-
-I've had another look at it, and it does look to me that __kvm_adjust_pc() is safe
-to call with preemption enabled on VHE systems. I was a bit worried when I saw
-that it touches some EL1 registers directly, but I then I realized that
-kvm_arch_vcpu_put/load() will make sure that the values of those registers are
-correct.
-
-I do agree that it's not immediately obvious that __kvm_adjust_pc() is called with
-preemption enabled. I'm a bit worried that someone will change something and make
-the function unsafe from preemption. Since the patch already touches the comment
-for __kvm_adjust_pc(), maybe mention that it can be called from contexts with
-preemption enabled and why it's safe to do it? Something along the lines of "The
-function is called with preemption enabled, and it's safe to do so because even
-though it touches the hardware EL1 registers in the VHE case, those registers are
-saved and restored by a vcpu_put/load pair. In the NVHE case, the code is running
-at EL2 and it cannot be preempted by the host". Or something else that you fancy.
-
-Thanks,
-
-Alex
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgUGFvbG8sCgpPbiA1LzExLzIxIDU6NDMgUE0sIFBhb2xvIEJvbnppbmkgd3JvdGU6Cj4gT24g
+MTEvMDUvMjEgMTc6NDMsIEFsZXhhbmRydSBFbGlzZWkgd3JvdGU6Cj4+IEhlbGxvLAo+Pgo+PiBD
+b21taXQgMGIyZDNkYWZjMGQzICgibGliY2ZsYXQ6IHByb3ZpZGUgbG9uZyBkaXZpc2lvbiByb3V0
+aW5lcyIpLCB3aGljaCBhZGRlZCB0aGUKPj4gbGliL2xkaXYzMi5jIGZpbGUsIGJyZWFrcyBjb21w
+aWxhdGlvbiBmb3IgdGhlIGFybSBhcmNoaXRlY3R1cmU7IGFybTY0IHNlZW1zIHRvIGJlCj4+IHdv
+cmtpbmcganVzdCBmaW5lLgo+Cj4gVGhlIEZlZG9yYSBvbmUgaXMgZml4ZWQgaW4gdGhlIGNvbW1p
+dCBpbW1lZGlhdGVseSBhZnRlciwgd2hpY2ggcmVwbGFjZXMKPiBpbnR0eXBlcy5oIHdpdGggc3Rk
+aW50LmguCgokIGdpdCByZW1vdGUgLXYgc2hvdyBuZXcKKiByZW1vdGUgbmV3CsKgIEZldGNoIFVS
+TDogaHR0cHM6Ly9naXRsYWIuY29tL2t2bS11bml0LXRlc3RzL2t2bS11bml0LXRlc3RzLmdpdC8K
+wqAgUHVzaMKgIFVSTDogaHR0cHM6Ly9naXRsYWIuY29tL2t2bS11bml0LXRlc3RzL2t2bS11bml0
+LXRlc3RzLmdpdC8KwqAgSEVBRCBicmFuY2g6IG1hc3RlcgrCoCBSZW1vdGUgYnJhbmNoZXM6CsKg
+wqDCoCBtYXN0ZXLCoCB0cmFja2VkCsKgwqDCoCBzdGFnaW5nIHRyYWNrZWQKwqAgTG9jYWwgYnJh
+bmNoIGNvbmZpZ3VyZWQgZm9yICdnaXQgcHVsbCc6CsKgwqDCoCBtYXN0ZXIgbWVyZ2VzIHdpdGgg
+cmVtb3RlIG1hc3RlcgrCoCBMb2NhbCByZWYgY29uZmlndXJlZCBmb3IgJ2dpdCBwdXNoJzoKwqDC
+oMKgIG1hc3RlciBwdXNoZXMgdG8gbWFzdGVyICh1cCB0byBkYXRlKQokIGdpdCBwdWxsIG5ldwpB
+bHJlYWR5IHVwIHRvIGRhdGUuCiQgZ2l0IHNob3cKY29tbWl0IDBiMmQzZGFmYzBkMzEwMjU2MzYy
+MDFkZjkyM2ZhMGRjOGQyZTM4MGUgKEhFQUQgLT4gbWFzdGVyLCBuZXcvbWFzdGVyKQpBdXRob3I6
+IFBhb2xvIEJvbnppbmkgPHBib256aW5pQHJlZGhhdC5jb20+CkRhdGU6wqDCoCBXZWQgTWF5IDUg
+MDg6MzM6MzggMjAyMSAtMDQwMAoKwqDCoMKgIGxpYmNmbGF0OiBwcm92aWRlIGxvbmcgZGl2aXNp
+b24gcm91dGluZXMKWy4uXQoKSSBndWVzcyB0aGUgcGF0Y2ggaGFzIG5vdCBiZWVuIG1lcmdlZCB5
+ZXQsIHJpZ2h0PwoKPgo+IEZvciBBcmNoIExpbnV4IEknbSBub3Qgc3VyZSB3aGF0IHRoZSBjb21w
+aWxlciBpcyBjb21wbGFpbmluZyBhYm91dCAoZXNwZWNpYWxseQo+IHNpbmNlIHRoZXJlIGFyZSBu
+byBvcHRpb25zIHN1Y2ggYXMgLWZuby1udWxsLXBvaW50ZXItY2hlY2tzKSBidXQgcGVyaGFwcyB3
+ZSBjYW4KPiBqdXN0IGluaXRpYWxpemUgcmVtIHRvIDA/wqAgQW55IGNoYW5jZSB5b3UgY2FuIGNo
+ZWNrIGlmIHRoYXQgYWZmZWN0cyB0aGUgYXNzZW1ibHkKPiBvdXRwdXQ/wqAgKEl0IHNob3VsZG4n
+dCkuCgpJIHRoaW5rIGl0J3MgYmVjYXVzZSBJJ20gdXNpbmcgdGhlICphcm0tbm9uZS1lYWJpKiB0
+b29sY2hhaW4gZm9yIGNvbXBpbGF0aW9uCmluc3RlYWQgb2YgYXJtLWxpbnV4LWdudSwgdGhhdCdz
+IHRoZSB0b29sY2hhaW4gZm9yIGNyb3NzIGNvbXBpbGluZyBhcm0gY29kZSB0aGF0CmlzIHByZXNl
+bnQgaW4gdGhlIG9mZmljaWFsIEFyY2ggTGludXggcmVwb3NpdG9yaWVzLiBJcyB0aGF0IHVuc3Vw
+cG9ydGVkPyBJIGRvbid0CnJlbWVtYmVyIGFueSBtZW50aW9uIG9mIGl0IG5vdCBiZWluZyBzdXBw
+b3J0ZWQsIGJ1dCBpdCdzIGVudGlyZWx5IHBvc3NpYmxlIHRoYXQgSQpqdXN0IGZvcmdvdC4KCldp
+dGggcmVtIGluaXRpYWxpemVkIHRvIDAgSSBnZXQgdGhpczoKCnJtLW5vbmUtZWFiaS1sZCAtbm9z
+dGRsaWIgLVR0ZXh0PTQwMDEwMDAwIC1vIGFybS9zZWxmdGVzdC5lbGYgLVQKL2hvbWUvYWxleC9k
+YXRhL3JlcG9zL2t2bS11bml0LXRlc3RzL2FybS9mbGF0LmxkcyBcCsKgwqDCoCBhcm0vc2VsZnRl
+c3QubyBhcm0vY3N0YXJ0Lm8gbGliL2xpYmNmbGF0LmEgbGliL2xpYmZkdC9saWJmZHQuYQpsaWIv
+YXJtL2xpYmVhYmkuYSBhcm0vc2VsZnRlc3QuYXV4Lm8KYXJtLW5vbmUtZWFiaS1sZDogbGliL2xp
+YmNmbGF0LmEocHJpbnRmLm8pOiBpbiBmdW5jdGlvbiBgcHJpbnRfaW50JzoKL2hvbWUvYWxleC9k
+YXRhL3JlcG9zL2t2bS11bml0LXRlc3RzL2xpYi9wcmludGYuYzo3MjogdW5kZWZpbmVkIHJlZmVy
+ZW5jZSB0bwpgX19hZWFiaV9sZGl2bW9kJwphcm0tbm9uZS1lYWJpLWxkOiAvaG9tZS9hbGV4L2Rh
+dGEvcmVwb3Mva3ZtLXVuaXQtdGVzdHMvbGliL3ByaW50Zi5jOjczOiB1bmRlZmluZWQKcmVmZXJl
+bmNlIHRvIGBfX2FlYWJpX2xkaXZtb2QnCmFybS1ub25lLWVhYmktbGQ6IGxpYi9saWJjZmxhdC5h
+KHByaW50Zi5vKTogaW4gZnVuY3Rpb24gYHByaW50X3Vuc2lnbmVkJzoKL2hvbWUvYWxleC9kYXRh
+L3JlcG9zL2t2bS11bml0LXRlc3RzL2xpYi9wcmludGYuYzoxMDI6IHVuZGVmaW5lZCByZWZlcmVu
+Y2UgdG8KYF9fYWVhYmlfdWxkaXZtb2QnCmFybS1ub25lLWVhYmktbGQ6IGxpYi9saWJjZmxhdC5h
+KGFsbG9jX3BhZ2Uubyk6IGluIGZ1bmN0aW9uIGBfcGFnZV9hbGxvY19pbml0X2FyZWEnOgovaG9t
+ZS9hbGV4L2RhdGEvcmVwb3Mva3ZtLXVuaXQtdGVzdHMvbGliL2FsbG9jX3BhZ2UuYzo0ODI6IHVu
+ZGVmaW5lZCByZWZlcmVuY2UgdG8KYF9fYWVhYmlfdWxkaXZtb2QnCm1ha2U6ICoqKiBbL2hvbWUv
+YWxleC9kYXRhL3JlcG9zL2t2bS11bml0LXRlc3RzL2FybS9NYWtlZmlsZS5jb21tb246NjU6CmFy
+bS9zZWxmdGVzdC5lbGZdIEVycm9yIDEKClRoYW5rcywKCkFsZXgKPgo+IFBhb2xvCj4KPj4gT24g
+QXJjaCBMaW51eDoKPj4KPj4gJCAuL2NvbmZpZ3VyZSAtLWFyY2g9YXJtIC0tY3Jvc3MtcHJlZml4
+PWFybS1ub25lLWVhYmktCj4+ICQgbWFrZSBjbGVhbiAmJiBtYWtlCj4+IHJtIC1mIGxpYi9hcm0v
+YXNtLW9mZnNldHMuaCBsaWIvYXJtL2FzbS1vZmZzZXRzLnMgXAo+PiDCoMKgwqDCoMKgwqAgbGli
+L2dlbmVyYXRlZC9hc20tb2Zmc2V0cy5oCj4+IHJtIC1mIGFybS8qLntvLGZsYXQsZWxmfSBsaWIv
+YXJtL2xpYmVhYmkuYSBsaWIvYXJtL2VhYmlfY29tcGF0Lm8gXAo+PiDCoMKgwqDCoMKgwqAgYXJt
+Ly4qLmQgbGliL2FybS8uKi5kCj4+IMKgwqAgQ0xFQU4gKGxpYmZkdCkKPj4gcm0gLWYgbGliL2xp
+YmZkdC8qLm8gbGliL2xpYmZkdC8uKi5kCj4+IHJtIC1mIGxpYi9saWJmZHQvbGliZmR0LnNvLjEK
+Pj4gcm0gLWYgbGliL2xpYmZkdC9saWJmZHQuYQo+PiBybSAtZiBsaWIvLiouZCBsaWIvbGliY2Zs
+YXQuYSBsaWIvYXJndi5vIGxpYi9wcmludGYubyBsaWIvc3RyaW5nLm8gbGliL2Fib3J0Lm8KPj4g
+bGliL3JlcG9ydC5vIGxpYi9zdGFjay5vIGxpYi9hcm0vc3BpbmxvY2subyBsaWIvYXJtL3Byb2Nl
+c3Nvci5vIGxpYi9hcm0vc3RhY2subwo+PiBsaWIvbGRpdjMyLm8gbGliL3V0aWwubyBsaWIvZ2V0
+Y2hhci5vIGxpYi9hbGxvY19waHlzLm8gbGliL2FsbG9jX3BhZ2Uubwo+PiBsaWIvdm1hbGxvYy5v
+IGxpYi9hbGxvYy5vIGxpYi9kZXZpY2V0cmVlLm8gbGliL3BjaS5vIGxpYi9wY2ktaG9zdC1nZW5l
+cmljLm8KPj4gbGliL3BjaS10ZXN0ZGV2Lm8gbGliL3ZpcnRpby5vIGxpYi92aXJ0aW8tbW1pby5v
+IGxpYi9jaHItdGVzdGRldi5vIGxpYi9hcm0vaW8ubwo+PiBsaWIvYXJtL3NldHVwLm8gbGliL2Fy
+bS9tbXUubyBsaWIvYXJtL2JpdG9wcy5vIGxpYi9hcm0vcHNjaS5vIGxpYi9hcm0vc21wLm8KPj4g
+bGliL2FybS9kZWxheS5vIGxpYi9hcm0vZ2ljLm8gbGliL2FybS9naWMtdjIubyBsaWIvYXJtL2dp
+Yy12My5vCj4+IFsuLl0KPj4gYXJtLW5vbmUtZWFiaS1nY2MgLW1hcm0gLW1mcHU9dmZwIC1tY3B1
+PWNvcnRleC1hMTUgLW1uby11bmFsaWduZWQtYWNjZXNzCj4+IC1zdGQ9Z251OTkgLWZmcmVlc3Rh
+bmRpbmcgLU8yIC1JIC9ob21lL2FsZXgvZGF0YS9yZXBvcy9rdm0tdW5pdC10ZXN0cy9saWIgLUkK
+Pj4gL2hvbWUvYWxleC9kYXRhL3JlcG9zL2t2bS11bml0LXRlc3RzL2xpYi9saWJmZHQgLUkgbGli
+IC1nIC1NTUQgLU1GIGxpYi8ubGRpdjMyLmQKPj4gLWZuby1zdHJpY3QtYWxpYXNpbmcgLWZuby1j
+b21tb24gLVdhbGwgLVd3cml0ZS1zdHJpbmdzIC1XZW1wdHktYm9keQo+PiAtV3VuaW5pdGlhbGl6
+ZWQgLVdpZ25vcmVkLXF1YWxpZmllcnMgLVdlcnJvcsKgIC1mbm8tb21pdC1mcmFtZS1wb2ludGVy
+Cj4+IC1mbm8tc3RhY2stcHJvdGVjdG9ywqDCoMKgIC1Xbm8tZnJhbWUtYWRkcmVzcyAtRF9fVTMy
+X0xPTkdfRk1UX1/CoCAtZm5vLXBpY8KgIC1uby1waWUKPj4gLVdjbG9iYmVyZWTCoCAtV3VudXNl
+ZC1idXQtc2V0LXBhcmFtZXRlcsKgIC1XbWlzc2luZy1wYXJhbWV0ZXItdHlwZQo+PiAtV29sZC1z
+dHlsZS1kZWNsYXJhdGlvbiAtV292ZXJyaWRlLWluaXQgLVdtaXNzaW5nLXByb3RvdHlwZXMgLVdz
+dHJpY3QtcHJvdG90eXBlcwo+PiAtYyAtbyBsaWIvbGRpdjMyLm8gbGliL2xkaXYzMi5jCj4+IGxp
+Yi9sZGl2MzIuYzogSW4gZnVuY3Rpb24gJ19fbW9kZGkzJzoKPj4gbGliL2xkaXYzMi5jOjczOjEx
+OiBlcnJvcjogJ3JlbScgbWF5IGJlIHVzZWQgdW5pbml0aWFsaXplZCBpbiB0aGlzIGZ1bmN0aW9u
+Cj4+IFstV2Vycm9yPW1heWJlLXVuaW5pdGlhbGl6ZWRdCj4+IMKgwqDCoCA3MyB8wqAgdWludDY0
+X3QgcmVtOwo+PiDCoMKgwqDCoMKgwqAgfMKgwqDCoMKgwqDCoMKgwqDCoMKgIF5+fgo+PiBsaWIv
+bGRpdjMyLmM6IEluIGZ1bmN0aW9uICdfX3Vtb2RkaTMnOgo+PiBsaWIvbGRpdjMyLmM6NzU6OTog
+ZXJyb3I6ICdyZW0nIG1heSBiZSB1c2VkIHVuaW5pdGlhbGl6ZWQgaW4gdGhpcyBmdW5jdGlvbgo+
+PiBbLVdlcnJvcj1tYXliZS11bmluaXRpYWxpemVkXQo+PiDCoMKgwqAgNzUgfMKgIHJldHVybiBy
+ZW07Cj4+IMKgwqDCoMKgwqDCoCB8wqDCoMKgwqDCoMKgwqDCoCBefn4KPj4gY2MxOiBhbGwgd2Fy
+bmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKPj4gbWFrZTogKioqIFs8YnVpbHRpbj46IGxp
+Yi9sZGl2MzIub10gRXJyb3IgMQo+PiAkIGFybS1ub25lLWVhYmktZ2NjIC0tdmVyc2lvbgo+PiBh
+cm0tbm9uZS1lYWJpLWdjYyAoQXJjaCBSZXBvc2l0b3J5KSAxMC4zLjAKPj4gQ29weXJpZ2h0IChD
+KSAyMDIwIEZyZWUgU29mdHdhcmUgRm91bmRhdGlvbiwgSW5jLgo+PiBUaGlzIGlzIGZyZWUgc29m
+dHdhcmU7IHNlZSB0aGUgc291cmNlIGZvciBjb3B5aW5nIGNvbmRpdGlvbnMuwqAgVGhlcmUgaXMg
+Tk8KPj4gd2FycmFudHk7IG5vdCBldmVuIGZvciBNRVJDSEFOVEFCSUxJVFkgb3IgRklUTkVTUyBG
+T1IgQSBQQVJUSUNVTEFSIFBVUlBPU0UuCj4+Cj4+IE9uIEZlZG9yYSAzMzoKPj4KPj4gJCAuL2Nv
+bmZpZ3VyZSAtLWFyY2g9YXJtIC0tY3Jvc3MtcHJlZml4PWFybS1saW51eC1nbnUtCj4+ICQgbWFr
+ZSBjbGVhbiAmJiBtYWtlCj4+IHJtIC1mIGxpYi9hcm0vYXNtLW9mZnNldHMuaCBsaWIvYXJtL2Fz
+bS1vZmZzZXRzLnMgXAo+PiDCoMKgwqDCoMKgwqAgbGliL2dlbmVyYXRlZC9hc20tb2Zmc2V0cy5o
+Cj4+IHJtIC1mIGFybS8qLntvLGZsYXQsZWxmfSBsaWIvYXJtL2xpYmVhYmkuYSBsaWIvYXJtL2Vh
+YmlfY29tcGF0Lm8gXAo+PiDCoMKgwqDCoMKgwqAgYXJtLy4qLmQgbGliL2FybS8uKi5kCj4+IMKg
+wqAgQ0xFQU4gKGxpYmZkdCkKPj4gcm0gLWYgbGliL2xpYmZkdC8qLm8gbGliL2xpYmZkdC8uKi5k
+Cj4+IHJtIC1mIGxpYi9saWJmZHQvbGliZmR0LnNvLjEKPj4gcm0gLWYgbGliL2xpYmZkdC9saWJm
+ZHQuYQo+PiBybSAtZiBsaWIvLiouZCBsaWIvbGliY2ZsYXQuYSBsaWIvYXJndi5vIGxpYi9wcmlu
+dGYubyBsaWIvc3RyaW5nLm8gbGliL2Fib3J0Lm8KPj4gbGliL3JlcG9ydC5vIGxpYi9zdGFjay5v
+IGxpYi9hcm0vc3BpbmxvY2subyBsaWIvYXJtL3Byb2Nlc3Nvci5vIGxpYi9hcm0vc3RhY2subwo+
+PiBsaWIvbGRpdjMyLm8gbGliL3V0aWwubyBsaWIvZ2V0Y2hhci5vIGxpYi9hbGxvY19waHlzLm8g
+bGliL2FsbG9jX3BhZ2Uubwo+PiBsaWIvdm1hbGxvYy5vIGxpYi9hbGxvYy5vIGxpYi9kZXZpY2V0
+cmVlLm8gbGliL3BjaS5vIGxpYi9wY2ktaG9zdC1nZW5lcmljLm8KPj4gbGliL3BjaS10ZXN0ZGV2
+Lm8gbGliL3ZpcnRpby5vIGxpYi92aXJ0aW8tbW1pby5vIGxpYi9jaHItdGVzdGRldi5vIGxpYi9h
+cm0vaW8ubwo+PiBsaWIvYXJtL3NldHVwLm8gbGliL2FybS9tbXUubyBsaWIvYXJtL2JpdG9wcy5v
+IGxpYi9hcm0vcHNjaS5vIGxpYi9hcm0vc21wLm8KPj4gbGliL2FybS9kZWxheS5vIGxpYi9hcm0v
+Z2ljLm8gbGliL2FybS9naWMtdjIubyBsaWIvYXJtL2dpYy12My5vCj4+IFsuLl0KPj4gYXJtLWxp
+bnV4LWdudS1nY2MgLW1hcm0gLW1mcHU9dmZwIC1tY3B1PWNvcnRleC1hMTUgLW1uby11bmFsaWdu
+ZWQtYWNjZXNzCj4+IC1zdGQ9Z251OTkgLWZmcmVlc3RhbmRpbmcgLU8yIC1JIC9ob21lL2FsZXgv
+ZGF0YS9yZXBvcy9rdm0tdW5pdC10ZXN0cy9saWIgLUkKPj4gL2hvbWUvYWxleC9kYXRhL3JlcG9z
+L2t2bS11bml0LXRlc3RzL2xpYi9saWJmZHQgLUkgbGliIC1nIC1NTUQgLU1GIGxpYi8ubGRpdjMy
+LmQKPj4gLWZuby1zdHJpY3QtYWxpYXNpbmcgLWZuby1jb21tb24gLVdhbGwgLVd3cml0ZS1zdHJp
+bmdzIC1XZW1wdHktYm9keQo+PiAtV3VuaW5pdGlhbGl6ZWQgLVdpZ25vcmVkLXF1YWxpZmllcnMg
+LVdlcnJvcsKgIC1mbm8tb21pdC1mcmFtZS1wb2ludGVyCj4+IC1mbm8tc3RhY2stcHJvdGVjdG9y
+wqDCoMKgIC1Xbm8tZnJhbWUtYWRkcmVzc8KgwqAgLWZuby1waWPCoCAtbm8tcGllwqAgLVdjbG9i
+YmVyZWQKPj4gLVd1bnVzZWQtYnV0LXNldC1wYXJhbWV0ZXLCoCAtV21pc3NpbmctcGFyYW1ldGVy
+LXR5cGXCoCAtV29sZC1zdHlsZS1kZWNsYXJhdGlvbgo+PiAtV292ZXJyaWRlLWluaXQgLVdtaXNz
+aW5nLXByb3RvdHlwZXMgLVdzdHJpY3QtcHJvdG90eXBlc8KgwqAgLWMgLW8gbGliL2xkaXYzMi5v
+Cj4+IGxpYi9sZGl2MzIuYwo+PiBsaWIvbGRpdjMyLmM6MToxMDogZmF0YWwgZXJyb3I6IGludHR5
+cGVzLmg6IE5vIHN1Y2ggZmlsZSBvciBkaXJlY3RvcnkKPj4gwqDCoMKgwqAgMSB8ICNpbmNsdWRl
+IDxpbnR0eXBlcy5oPgo+PiDCoMKgwqDCoMKgwqAgfMKgwqDCoMKgwqDCoMKgwqDCoCBefn5+fn5+
+fn5+fn4KPj4gY29tcGlsYXRpb24gdGVybWluYXRlZC4KPj4gbWFrZTogKioqIFs8YnVpbHRpbj46
+IGxpYi9sZGl2MzIub10gRXJyb3IgMQo+PiAkIGFybS1saW51eC1nbnUtZ2NjIC0tdmVyc2lvbgo+
+PiBhcm0tbGludXgtZ251LWdjYyAoR0NDKSAxMC4yLjEgMjAyMDA4MjYgKFJlZCBIYXQgQ3Jvc3Mg
+MTAuMi4xLTMpCj4+IENvcHlyaWdodCAoQykgMjAyMCBGcmVlIFNvZnR3YXJlIEZvdW5kYXRpb24s
+IEluYy4KPj4gVGhpcyBpcyBmcmVlIHNvZnR3YXJlOyBzZWUgdGhlIHNvdXJjZSBmb3IgY29weWlu
+ZyBjb25kaXRpb25zLsKgIFRoZXJlIGlzIE5PCj4+IHdhcnJhbnR5OyBub3QgZXZlbiBmb3IgTUVS
+Q0hBTlRBQklMSVRZIG9yIEZJVE5FU1MgRk9SIEEgUEFSVElDVUxBUiBQVVJQT1NFLgo+Pgo+PiBS
+ZXZlcnRpbmcgdGhlIGNvbW1pdCBtYWtlcyBhcm0gYnVpbGQgYWdhaW4uIEkgYW0gbm90IGZhbWls
+aWFyIHdpdGggdG9vbGNoYWlucywgYW5kCj4+IHVuZm9ydHVuYXRlbHkgSSBjYW4ndCBwcm9wb3Nl
+IGEgZml4Lgo+Pgo+PiBUaGFua3MsCj4+Cj4+IEFsZXgKPj4KPgpfX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBs
+aXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1h
+bi9saXN0aW5mby9rdm1hcm0K
