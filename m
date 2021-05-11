@@ -2,77 +2,86 @@ Return-Path: <SRS0=u/VZ=KG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5F2FC433B4
-	for <kvmarm@archiver.kernel.org>; Tue, 11 May 2021 07:45:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76E98C433ED
+	for <kvmarm@archiver.kernel.org>; Tue, 11 May 2021 08:04:22 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D0A4261448
-	for <kvmarm@archiver.kernel.org>; Tue, 11 May 2021 07:44:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0A4261448
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id C96E761448
+	for <kvmarm@archiver.kernel.org>; Tue, 11 May 2021 08:04:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C96E761448
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 40FDA4B495;
-	Tue, 11 May 2021 03:44:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EC3C4B495;
+	Tue, 11 May 2021 04:04:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id hL120Y9aX5cB; Tue, 11 May 2021 03:44:56 -0400 (EDT)
+	with ESMTP id U4Ntiig-mZQe; Tue, 11 May 2021 04:04:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D590E4B49A;
-	Tue, 11 May 2021 03:44:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 47A3B4B49A;
+	Tue, 11 May 2021 04:04:20 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7CFA24B495
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 May 2021 03:44:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 752284B495
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 May 2021 04:04:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lMra4e-AYLnR for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 May 2021 03:44:54 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 033844B445
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 May 2021 03:44:53 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id A4E4861026;
- Tue, 11 May 2021 07:44:52 +0000 (UTC)
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1lgN4U-000cdO-F7; Tue, 11 May 2021 08:44:50 +0100
-Date: Tue, 11 May 2021 08:44:49 +0100
-Message-ID: <87o8dhogsu.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH 2/2] KVM: arm64: Commit pending PC adjustemnts before
- returning to userspace
-In-Reply-To: <65b5cad7-13d8-13a9-9502-7c21e0b72761@arm.com>
+ with ESMTP id T8+mneZnRaY1 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 May 2021 04:04:18 -0400 (EDT)
+Received: from mail-oo1-f54.google.com (mail-oo1-f54.google.com
+ [209.85.161.54])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5E8914B434
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 May 2021 04:04:18 -0400 (EDT)
+Received: by mail-oo1-f54.google.com with SMTP id
+ v14-20020a4ae6ce0000b02901fe68cd377fso4028427oot.13
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 May 2021 01:04:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=vqWqlRo1t8unIB3Z/gPDCFXryTe+VxOxmZbywII60x4=;
+ b=RsARpI9kPbe8fGR56PQ4skYG8c9j7c835d7rOcGai/qr7PmvAFxTBwMPg0n2VNOOJ5
+ KkP+xqxkTWNxfq5af47pwFhxQ+gI535/8Hg4Py+5tIBUnpVpw+uUqHNdiGy1We0e6P7C
+ U3pDYJNh9iAbAGww3qtuHQ2C6EI76iWRqwRdduT/OiYZNMX9ZOvWrl/LOZQlW9gSIr1c
+ Lza0R/5guKEDeTbh4LO7VrsbCV1JlyXIRO9IliK93CHvkIlqHwTidtABkP6MtO1RLgI8
+ 0futdZOP85C/BHdhcmoHGmhTFD1t2/pn5mxbgN3B6aATye6KVk+2Hm+OkS0WCKlV7WAR
+ mPUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=vqWqlRo1t8unIB3Z/gPDCFXryTe+VxOxmZbywII60x4=;
+ b=iVxdT3j/Q0xB9xpx2XkZa/hN9a8dAo7eOYj/Is9IWPb9CKbIDSSUbgPwpiM0h5LF6U
+ TBKwGk74Ke+t7Pl0Y5s8L3O7o136kbKCVq8snDN/b9cmGgE1S4KgxwG+DJC9rkRC/kai
+ 1mR4BkFbMzZdx4hFuSFR/rDWU+aNTME9KKtmrKWqFuwEHbaZOw+TPfjH9oBMYlm/Mboj
+ 3aT9Ic7eQJeuefRTFdv870uR0UADAmLAt7EzmWtdnyZSJ2kAuk6/6lXMvP0rC1YsvtQu
+ R5oDgCLl1IC8VtZrflAjOUdoGaR2N94+0nzsvmincM3bKkFHXxMyLZH6FXKgQRHj615p
+ 2JBQ==
+X-Gm-Message-State: AOAM530/Lo3MZQJi1ItilTZho182Dc2KYc/6xYMRE6XXFcHc86jP0skK
+ Jl0X7r6TRO0rYkRJN2agiSzlVW00lYdGnLxxZ0ja0g==
+X-Google-Smtp-Source: ABdhPJwiG5f14ptUggSSt+hUanG2tnouIAtbpU1JD68oO5A0s7qMCGnueWGVnCFx9fN6AZ33rumu5oXEfhtT2qh7sVs=
+X-Received: by 2002:a4a:ea2b:: with SMTP id y11mr285770ood.42.1620720257457;
+ Tue, 11 May 2021 01:04:17 -0700 (PDT)
+MIME-Version: 1.0
 References: <20210510094915.1909484-1-maz@kernel.org>
  <20210510094915.1909484-3-maz@kernel.org>
- <7a0f43c8-cc36-810e-0b8e-ffe66672ca82@arm.com>
- <87v97qociy.wl-maz@kernel.org>
- <65b5cad7-13d8-13a9-9502-7c21e0b72761@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- yuzenghui@huawei.com, james.morse@arm.com, suzuki.poulose@arm.com,
- kernel-team@android.com, stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, stable@vger.kernel.org, kernel-team@android.com,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20210510094915.1909484-3-maz@kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Tue, 11 May 2021 09:03:40 +0100
+Message-ID: <CA+EHjTzcfmt4mxh05a_P+nheQ_A2FuXhpgvKXuV5__pZP0SxkA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] KVM: arm64: Commit pending PC adjustemnts before
+ returning to userspace
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, kernel-team@android.com, stable@vger.kernel.org,
+ "open list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
+ <kvmarm@lists.cs.columbia.edu>,
+ "moderated list:ARM64 PORT \(AARCH64 ARCHITECTURE\)"
+ <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -89,130 +98,36 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 10 May 2021 16:14:37 +0100,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> 
-> Hi Marc,
-> 
-> On 5/10/21 4:04 PM, Marc Zyngier wrote:
-> > On Mon, 10 May 2021 15:55:28 +0100,
-> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> >> Hi Marc,
-> >>
-> >> On 5/10/21 10:49 AM, Marc Zyngier wrote:
-> >>> KVM currently updates PC (and the corresponding exception state)
-> >>> using a two phase approach: first by setting a set of flags,
-> >>> then by converting these flags into a state update when the vcpu
-> >>> is about to enter the guest.
-> >>>
-> >>> However, this creates a disconnect with userspace if the vcpu thread
-> >>> returns there with any exception/PC flag set. In this case, the exposed
-> >> The code seems to handle only the KVM_ARM64_PENDING_EXCEPTION
-> >> flag. Is the "PC flag" a reference to the KVM_ARM64_INCREMENT_PC
-> >> flag?
-> > No, it does handle both exception and PC increment, unless I have
-> > completely bodged something (entirely possible).
-> 
-> The message is correct, my bad.
-> 
-> >
-> >>> context is wrong, as userpsace doesn't have access to these flags
-> >> s/userpsace/userspace
-> >>
-> >>> (they aren't architectural). It also means that these flags are
-> >>> preserved across a reset, which isn't expected.
-> >>>
-> >>> To solve this problem, force an explicit synchronisation of the
-> >>> exception state on vcpu exit to userspace. As an optimisation
-> >>> for nVHE systems, only perform this when there is something pending.
-> >>>
-> >>> Reported-by: Zenghui Yu <yuzenghui@huawei.com>
-> >>> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> >>> Cc: stable@vger.kernel.org # 5.11
-> >>> ---
-> >>>  arch/arm64/include/asm/kvm_asm.h   |  1 +
-> >>>  arch/arm64/kvm/arm.c               | 10 ++++++++++
-> >>>  arch/arm64/kvm/hyp/exception.c     |  4 ++--
-> >>>  arch/arm64/kvm/hyp/nvhe/hyp-main.c |  8 ++++++++
-> >>>  4 files changed, 21 insertions(+), 2 deletions(-)
-> >>>
-> >>> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> >>> index d5b11037401d..5e9b33cbac51 100644
-> >>> --- a/arch/arm64/include/asm/kvm_asm.h
-> >>> +++ b/arch/arm64/include/asm/kvm_asm.h
-> >>> @@ -63,6 +63,7 @@
-> >>>  #define __KVM_HOST_SMCCC_FUNC___pkvm_cpu_set_vector		18
-> >>>  #define __KVM_HOST_SMCCC_FUNC___pkvm_prot_finalize		19
-> >>>  #define __KVM_HOST_SMCCC_FUNC___pkvm_mark_hyp			20
-> >>> +#define __KVM_HOST_SMCCC_FUNC___kvm_adjust_pc			21
-> >>>  
-> >>>  #ifndef __ASSEMBLY__
-> >>>  
-> >>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> >>> index 1cb39c0803a4..d62a7041ebd1 100644
-> >>> --- a/arch/arm64/kvm/arm.c
-> >>> +++ b/arch/arm64/kvm/arm.c
-> >>> @@ -897,6 +897,16 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
-> >>>  
-> >>>  	kvm_sigset_deactivate(vcpu);
-> >>>  
-> >>> +	/*
-> >>> +	 * In the unlikely event that we are returning to userspace
-> >>> +	 * with pending exceptions or PC adjustment, commit these
-> >> I'm going to assume "PC adjustment" means the KVM_ARM64_INCREMENT_PC
-> >> flag. Please correct me if that's not true, but if that's the case,
-> >> then the flag isn't handled below.
-> >>
-> >>> +	 * adjustments in order to give userspace a consistent view of
-> >>> +	 * the vcpu state.
-> >>> +	 */
-> >>> +	if (unlikely(vcpu->arch.flags & (KVM_ARM64_PENDING_EXCEPTION |
-> >>> +					 KVM_ARM64_EXCEPT_MASK)))
-> >> The condition seems to suggest that it is valid to set
-> >> KVM_ARM64_EXCEPT_{AA32,AA64}_* without setting
-> >> KVM_ARM64_PENDING_EXCEPTION, which looks rather odd to me.
-> >> Is that a valid use of the KVM_ARM64_EXCEPT_MASK bits? If it's not
-> >> (the existing code always sets the exception type with the
-> >> KVM_ARM64_PENDING_EXCEPTION), that I was thinking that checking only
-> >> the KVM_ARM64_PENDING_EXCEPTION flag would make the intention
-> >> clearer.
-> > No, you are missing this (subtle) comment in kvm_host.h:
-> >
-> > <quote>
-> > /*
-> >  * Overlaps with KVM_ARM64_EXCEPT_MASK on purpose so that it can't be
-> >  * set together with an exception...
-> >  */
-> > #define KVM_ARM64_INCREMENT_PC		(1 << 9) /* Increment PC */
-> > </quote>
-> >
-> > So (KVM_ARM64_PENDING_EXCEPTION | KVM_ARM64_EXCEPT_MASK) checks for
-> > *both* an exception and a PC increment.
-> 
-> Then how about explicitly checking for the
-> KVM_ARM64_PENDING_EXCEPTION and KVM_ARM64_INCREMENT_PC flags, like
-> it's done in __kvm_adjust_pc? That would certainly make the code
-> easier to understand, as it's not immediately obvious that the
-> EXCEPT mask includes the INCREMENT_PC flag.
+Hi Marc,
 
-Fair enough. I'll fix that in v2.
+> KVM: arm64: Commit pending PC adjustemnts before returning to userspace
 
-Another thing I wondered about: we now rely on __kvm_adjust_pc() to be
-preemption safe. That's always the case in nVHE (we're at EL2), but
-VHE can be preempted at any point. The code we call is preemption
-safe, but it takes some effort to be convinced of it.
+s/adjustments/adjustments
 
-Do you have a good suggestion on how to express this requirement?  I
-could throw a preempt_disable()/enable() at the call for the sake of
-being in the same context between VHE and nVHE, but that's not
-strictly necessary for now.
+On Mon, May 10, 2021 at 10:49 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> KVM currently updates PC (and the corresponding exception state)
+> using a two phase approach: first by setting a set of flags,
+> then by converting these flags into a state update when the vcpu
+> is about to enter the guest.
+>
+> However, this creates a disconnect with userspace if the vcpu thread
+> returns there with any exception/PC flag set. In this case, the exposed
+> context is wrong, as userpsace doesn't have access to these flags
+> (they aren't architectural). It also means that these flags are
+> preserved across a reset, which isn't expected.
+>
+> To solve this problem, force an explicit synchronisation of the
+> exception state on vcpu exit to userspace. As an optimisation
+> for nVHE systems, only perform this when there is something pending.
 
-Thanks,
+I've tested this with a few nvhe and vhe tests that exercise both
+__kvm_adjust_pc call paths (__kvm_vcpu_run and
+kvm_arch_vcpu_ioctl_run), and the tests ran as expected.  I'll do the
+same for v2 when you send it out.
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Cheers,
+/fuad
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
