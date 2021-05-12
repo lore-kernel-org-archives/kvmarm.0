@@ -2,95 +2,122 @@ Return-Path: <SRS0=saMt=KH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EDBAC433ED
-	for <kvmarm@archiver.kernel.org>; Wed, 12 May 2021 07:27:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86A17C433ED
+	for <kvmarm@archiver.kernel.org>; Wed, 12 May 2021 07:34:20 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9B95A6162B
-	for <kvmarm@archiver.kernel.org>; Wed, 12 May 2021 07:27:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B95A6162B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id D798761936
+	for <kvmarm@archiver.kernel.org>; Wed, 12 May 2021 07:34:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D798761936
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B9144B83B;
-	Wed, 12 May 2021 03:27:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A57D4B75B;
+	Wed, 12 May 2021 03:34:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@ibm.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 08Wo4CSToZiJ; Wed, 12 May 2021 03:27:38 -0400 (EDT)
+	with ESMTP id ORPs4XbqEBSH; Wed, 12 May 2021 03:34:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2983C4B524;
-	Wed, 12 May 2021 03:27:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EA6164B485;
+	Wed, 12 May 2021 03:34:17 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A6B54B4BE
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 May 2021 03:27:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E89974B485
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 May 2021 03:34:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rB3TxG7eOjt3 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 12 May 2021 03:27:34 -0400 (EDT)
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com
- [209.85.216.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8EA5E4B3CC
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 May 2021 03:27:34 -0400 (EDT)
-Received: by mail-pj1-f51.google.com with SMTP id
- gc22-20020a17090b3116b02901558435aec1so2811117pjb.4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 May 2021 00:27:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=qu5bUY4P3YOXNAIJwhXnEFiIYHEf2eg3RygWqGEj1LA=;
- b=E74wQy05gd2c+w5pTTW1VdDrDy1ZB7lqhZvIjYnxeZLxevzGri8wLvK/fbNLgmiaNq
- egtUrgJI1fVuGgFvTw20d4uuRVU2tXOqWkbospX2/6i9YHxe+nVZmL47Dz4bftgIkEsr
- PIuxFA5AIxbILiBSr8shcUoorfu+HrGEdShetCl74LGXmn19hBJMdsbE1wlX7UFKjhZW
- 2CcX4pKWJ1v1X6SdR6oHRYn3K5KfBPFyUQpc75yzuZA2XEw4klLeWRlWuni8Z5z1sxLI
- ppZmdfsBUegdvY6skUqRSFHf6pAKTDp4E+xXulFgreBXJmB8Q+nnZCHL8qPm/9GdTd65
- LaxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=qu5bUY4P3YOXNAIJwhXnEFiIYHEf2eg3RygWqGEj1LA=;
- b=S/b0szSdCK53045iq2jSnnCOfsvX4tL7TU8tC4uC3TDrCtvqn9ukU6mhuXcQqGiHSm
- HuX9KXATbtT+YxOOH4ZwfkvqrKudKO/5Nan9qCk1G3jRvpXpBEIbfLfg+anWhFPjQK09
- 1XlOrrgHvsacclJJOmREA9IRTECSwvWc+eurFyDwyEKiy0i4+P3oxy9K+GrKVSicPfzr
- IyIMa9Yk+MGDmQ0K2VDwp284zJj0TeuMCBe6Z1L1+A+Fih3EDLVFJuMTGjEpmNcqFlSJ
- OW0OkRbO/rP/eVAtrrptA1oAl/OYrFaaOIrTus8OWDQ3xJp8hrZDP+B8GnIwFHfeHfhx
- dM3w==
-X-Gm-Message-State: AOAM530+L6FKzQoQLITMMGPXbDuADO55DIJOEtW4gQAedwdqTwB3kpUe
- xBfpmflXBIHFvDuVx9AM54Hd4g==
-X-Google-Smtp-Source: ABdhPJyrMbNUhsXh8VRaNt4mQLu6QuapZZPsY1KV6quO6cQVInamasmavYHYRqySZct+OfcNqJmJtw==
-X-Received: by 2002:a17:902:bd94:b029:ef:2953:918e with SMTP id
- q20-20020a170902bd94b02900ef2953918emr17979154pls.63.1620804453240; 
- Wed, 12 May 2021 00:27:33 -0700 (PDT)
-Received: from google.com (150.12.83.34.bc.googleusercontent.com.
- [34.83.12.150])
- by smtp.gmail.com with ESMTPSA id g16sm9242549pfq.157.2021.05.12.00.27.32
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 12 May 2021 00:27:32 -0700 (PDT)
-Date: Wed, 12 May 2021 00:27:29 -0700
-From: Ricardo Koller <ricarkol@google.com>
-To: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v2 4/5] KVM: selftests: Add exception handling support
- for aarch64
-Message-ID: <YJuDYZbqe8V47YCJ@google.com>
-References: <20210430232408.2707420-1-ricarkol@google.com>
- <20210430232408.2707420-5-ricarkol@google.com>
- <87a6pcumyg.wl-maz@kernel.org> <YJBLFVoRmsehRJ1N@google.com>
- <20915a2f-d07c-2e61-3cce-ff385e98e796@redhat.com>
- <YJRADhU4CcTE7bdm@google.com>
- <8a99d57b-0513-557c-79e0-98084799812f@redhat.com>
-MIME-Version: 1.0
+ with ESMTP id MjQRVcUlvFkC for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 12 May 2021 03:34:14 -0400 (EDT)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com
+ [148.163.156.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E48914B42D
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 May 2021 03:34:13 -0400 (EDT)
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id
+ 14C7XgkA116740; Wed, 12 May 2021 03:34:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=date : from : to : cc :
+ subject : message-id : references : content-type : in-reply-to :
+ mime-version; s=pp1; bh=8RxozYUmHbciTCPsdI2xx6ZwNkaTrcx5gcPNgxcEk0o=;
+ b=TpIdg57MewPAG1xmXJIUB4b4YMeBjcW7/XLoBr8wDlySdF5Gbvlnnu+pRxFVdJUExj4I
+ othCsnCAM0rVf5IRNBPRNvNHsXd/bOIB+entalPvJ/KZDKFtsfME9hEsUTtGOJlMXn9f
+ CyXuIE8x/00Vo48bPBBfKD25WhJFX9i9fgkqHWLGWTcu2lUYogQnjHwpmkbDfe4Pzmmh
+ VLW7ADm6ERGhSKoYGo9Qxt0H9D9QSl8r7S9pBTfVqfN7eZYsm6fEkvVTRV/RwFVxHFeE
+ AceoVQU/tVcf+EbqkhefksYwcvajvRsvGAOKSFNW5HuqNQaAd+Lo7EDAQkI/IXI3jz7j mQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 38ga7f8vmu-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 12 May 2021 03:34:05 -0400
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 14C7XqNE117366;
+ Wed, 12 May 2021 03:34:05 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com
+ [159.122.73.71])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 38ga7f8vky-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 12 May 2021 03:34:04 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+ by ppma02fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 14C7X9fZ001985;
+ Wed, 12 May 2021 07:34:02 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com
+ (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+ by ppma02fra.de.ibm.com with ESMTP id 38dj9893pu-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 12 May 2021 07:34:02 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
+ [9.149.105.62])
+ by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id 14C7XX2K28442910
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 12 May 2021 07:33:33 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 15AF2AE055;
+ Wed, 12 May 2021 07:34:00 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 9BC2CAE04D;
+ Wed, 12 May 2021 07:33:58 +0000 (GMT)
+Received: from linux.ibm.com (unknown [9.145.39.4])
+ by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+ Wed, 12 May 2021 07:33:58 +0000 (GMT)
+Date: Wed, 12 May 2021 10:33:56 +0300
+From: Mike Rapoport <rppt@linux.ibm.com>
+To: Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH v4 0/4] arm64: drop pfn_valid_within() and simplify
+ pfn_valid()
+Message-ID: <YJuE5O8nWNc1TGZ6@linux.ibm.com>
+References: <20210511100550.28178-1-rppt@kernel.org>
+ <CAMj1kXFHLkmgZKEb8BtgGt6GQ93Qd+yv6NtiCvtgX0ex9wSeyw@mail.gmail.com>
 Content-Disposition: inline
-In-Reply-To: <8a99d57b-0513-557c-79e0-98084799812f@redhat.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>, pbonzini@redhat.com,
- kvmarm@lists.cs.columbia.edu
+In-Reply-To: <CAMj1kXFHLkmgZKEb8BtgGt6GQ93Qd+yv6NtiCvtgX0ex9wSeyw@mail.gmail.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: xaFvPDmB3qDdufrQ1oVBdCcS20frTO-N
+X-Proofpoint-ORIG-GUID: H5s5JzP0-t3y1SHp24KJ228bqWiUmp9w
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391, 18.0.761
+ definitions=2021-05-12_03:2021-05-11,
+ 2021-05-12 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 bulkscore=0
+ malwarescore=0 mlxscore=0 clxscore=1011 suspectscore=0 mlxlogscore=999
+ impostorscore=0 lowpriorityscore=0 spamscore=0 priorityscore=1501
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2105120053
+Cc: David Hildenbrand <david@redhat.com>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Anshuman Khandual <anshuman.khandual@arm.com>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux Memory Management List <linux-mm@kvack.org>,
+ Linux ARM <linux-arm-kernel@lists.infradead.org>,
+ Marc Zyngier <maz@kernel.org>, Andrew Morton <akpm@linux-foundation.org>,
+ Will Deacon <will@kernel.org>, kvmarm <kvmarm@lists.cs.columbia.edu>,
+ Mike Rapoport <rppt@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -107,538 +134,102 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, May 07, 2021 at 04:08:07PM +0200, Auger Eric wrote:
-> Hi Ricardo,
+On Wed, May 12, 2021 at 09:00:02AM +0200, Ard Biesheuvel wrote:
+> On Tue, 11 May 2021 at 12:05, Mike Rapoport <rppt@kernel.org> wrote:
+> >
+> > From: Mike Rapoport <rppt@linux.ibm.com>
+> >
+> > Hi,
+> >
+> > These patches aim to remove CONFIG_HOLES_IN_ZONE and essentially hardwire
+> > pfn_valid_within() to 1.
+> >
+> > The idea is to mark NOMAP pages as reserved in the memory map and restore
+> > the intended semantics of pfn_valid() to designate availability of struct
+> > page for a pfn.
+> >
+> > With this the core mm will be able to cope with the fact that it cannot use
+> > NOMAP pages and the holes created by NOMAP ranges within MAX_ORDER blocks
+> > will be treated correctly even without the need for pfn_valid_within.
+> >
+> > The patches are boot tested on qemu-system-aarch64.
+> >
 > 
-> On 5/6/21 9:14 PM, Ricardo Koller wrote:
-> > On Thu, May 06, 2021 at 02:30:17PM +0200, Auger Eric wrote:
-> >> Hi Ricardo,
-> >>
-> > 
-> > Hi Eric,
-> > 
-> > Thank you very much for the test.
-> > 
-> >> On 5/3/21 9:12 PM, Ricardo Koller wrote:
-> >>> On Mon, May 03, 2021 at 11:32:39AM +0100, Marc Zyngier wrote:
-> >>>> On Sat, 01 May 2021 00:24:06 +0100,
-> >>>> Ricardo Koller <ricarkol@google.com> wrote:
-> >>>>>
-> >>>>> Add the infrastructure needed to enable exception handling in aarch64
-> >>>>> selftests. The exception handling defaults to an unhandled-exception
-> >>>>> handler which aborts the test, just like x86. These handlers can be
-> >>>>> overridden by calling vm_install_vector_handler(vector) or
-> >>>>> vm_install_exception_handler(vector, ec). The unhandled exception
-> >>>>> reporting from the guest is done using the ucall type introduced in a
-> >>>>> previous commit, UCALL_UNHANDLED.
-> >>>>>
-> >>>>> The exception handling code is heavily inspired on kvm-unit-tests.
-> >>
-> >> running the test on 5.12 I get
-> >>
+> Did you use EFI boot when testing this? The memory map is much more
+> fragmented in that case, so this would be a good data point.
 
-Hi Eric,
+Right, something like this:
 
-I'm able to reproduce the failure you are seeing on 5.6, specifically
-with kernels older than this commit:
+[    0.000000] Early memory node ranges                                         
+[    0.000000]   node   0: [mem 0x0000000040000000-0x00000000ffffbfff]          
+[    0.000000]   node   0: [mem 0x00000000ffffc000-0x00000000ffffffff]          
+[    0.000000]   node   0: [mem 0x0000000100000000-0x00000004386fffff]          
+[    0.000000]   node   0: [mem 0x0000000438700000-0x000000043899ffff]          
+[    0.000000]   node   0: [mem 0x00000004389a0000-0x00000004389bffff]          
+[    0.000000]   node   0: [mem 0x00000004389c0000-0x0000000438b5ffff]          
+[    0.000000]   node   0: [mem 0x0000000438b60000-0x000000043be3ffff]          
+[    0.000000]   node   0: [mem 0x000000043be40000-0x000000043becffff]          
+[    0.000000]   node   0: [mem 0x000000043bed0000-0x000000043bedffff]          
+[    0.000000]   node   0: [mem 0x000000043bee0000-0x000000043bffffff]          
+[    0.000000]   node   0: [mem 0x000000043c000000-0x000000043fffffff]          
 
-  4942dc6638b0 KVM: arm64: Write arch.mdcr_el2 changes since last vcpu_load on VHE
+This is a pity really, because I don't see a fundamental reason for those
+tiny holes all over the place. 
 
-but not yet on v5.12. Could you share the commit of the kernel you are
-testing, please?
+I know that EFI/ACPI mandates "IO style" memory access for those regions,
+but I fail to get why...
+ 
+> > I beleive it would be best to route these via mmotm tree.
+> >
+> > v4:
+> > * rebase on v5.13-rc1
+> >
+> > v3: Link: https://lore.kernel.org/lkml/20210422061902.21614-1-rppt@kernel.org
+> > * Fix minor issues found by Anshuman
+> > * Freshen up the declaration of pfn_valid() to make it consistent with
+> >   pfn_is_map_memory()
+> > * Add more Acked-by and Reviewed-by tags, thanks Anshuman and David
+> >
+> > v2: Link: https://lore.kernel.org/lkml/20210421065108.1987-1-rppt@kernel.org
+> > * Add check for PFN overflow in pfn_is_map_memory()
+> > * Add Acked-by and Reviewed-by tags, thanks David.
+> >
+> > v1: Link: https://lore.kernel.org/lkml/20210420090925.7457-1-rppt@kernel.org
+> > * Add comment about the semantics of pfn_valid() as Anshuman suggested
+> > * Extend comments about MEMBLOCK_NOMAP, per Anshuman
+> > * Use pfn_is_map_memory() name for the exported wrapper for
+> >   memblock_is_map_memory(). It is still local to arch/arm64 in the end
+> >   because of header dependency issues.
+> >
+> > rfc: Link: https://lore.kernel.org/lkml/20210407172607.8812-1-rppt@kernel.org
+> >
+> > Mike Rapoport (4):
+> >   include/linux/mmzone.h: add documentation for pfn_valid()
+> >   memblock: update initialization of reserved pages
+> >   arm64: decouple check whether pfn is in linear map from pfn_valid()
+> >   arm64: drop pfn_valid_within() and simplify pfn_valid()
+> >
+> >  arch/arm64/Kconfig              |  3 ---
+> >  arch/arm64/include/asm/memory.h |  2 +-
+> >  arch/arm64/include/asm/page.h   |  3 ++-
+> >  arch/arm64/kvm/mmu.c            |  2 +-
+> >  arch/arm64/mm/init.c            | 14 +++++++++++++-
+> >  arch/arm64/mm/ioremap.c         |  4 ++--
+> >  arch/arm64/mm/mmu.c             |  2 +-
+> >  include/linux/memblock.h        |  4 +++-
+> >  include/linux/mmzone.h          | 11 +++++++++++
+> >  mm/memblock.c                   | 28 ++++++++++++++++++++++++++--
+> >  10 files changed, 60 insertions(+), 13 deletions(-)
+> >
+> >
+> > base-commit: 6efb943b8616ec53a5e444193dccf1af9ad627b5
+> > --
+> > 2.28.0
+> >
 
-Thanks!
-Ricardo
-
-> >> ==== Test Assertion Failure ====
-> >>   aarch64/debug-exceptions.c:232: false
-> >>   pid=6477 tid=6477 errno=4 - Interrupted system call
-> >>      1	0x000000000040147b: main at debug-exceptions.c:230
-> >>      2	0x000003ff8aa60de3: ?? ??:0
-> >>      3	0x0000000000401517: _start at :?
-> >>   Failed guest assert: hw_bp_addr == PC(hw_bp) at
-> >> aarch64/debug-exceptions.c:105
-> >> 	values: 0, 0x401794
-> >>
-> >>
-> >> I guess it is not an expected result. Any known bug waiting on the list?
-> >>
-> > 
-> > Not expected. That should work, or at least abort early because there is
-> > no HW breakpoints support.
-> > 
-> > I'm trying to reproduce the failure; can you help me with some
-> > questions, please?
-> sure, please find the answers below.
-> > 
-> > - does your setup have support for hardware breakpoints? Can you try a
-> >   'dmesg | grep break'? I'm looking for something like 'hw-breakpoint:
-> >   found ...'. If there is no such line it's very likely that the check
-> >   for "debug_ver >= 6" is not enough and the test should check for
-> >   "num_breakpoints > 0".
-> [   25.640418] hw-breakpoint: found 6 breakpoint and 4 watchpoint registers.
-> > - does it fail consistently (every single attempt)?
-> yes it does.
-> 
-> I will try to find some time to investigate too
-> 
-> Thanks
-> 
-> Eric
-> > 
-> > Thanks!
-> > Ricardo
-> > 
-> >>
-> >> Thanks
-> >>
-> >> Eric
-> > 
-> > 
-> >>>>>
-> >>>>> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> >>>>> ---
-> >>>>>  tools/testing/selftests/kvm/Makefile          |   2 +-
-> >>>>>  .../selftests/kvm/include/aarch64/processor.h |  78 +++++++++++
-> >>>>>  .../selftests/kvm/lib/aarch64/handlers.S      | 130 ++++++++++++++++++
-> >>>>>  .../selftests/kvm/lib/aarch64/processor.c     | 124 +++++++++++++++++
-> >>>>>  4 files changed, 333 insertions(+), 1 deletion(-)
-> >>>>>  create mode 100644 tools/testing/selftests/kvm/lib/aarch64/handlers.S
-> >>>>>
-> >>>>> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> >>>>> index 4e548d7ab0ab..618c5903f478 100644
-> >>>>> --- a/tools/testing/selftests/kvm/Makefile
-> >>>>> +++ b/tools/testing/selftests/kvm/Makefile
-> >>>>> @@ -35,7 +35,7 @@ endif
-> >>>>>  
-> >>>>>  LIBKVM = lib/assert.c lib/elf.c lib/io.c lib/kvm_util.c lib/sparsebit.c lib/test_util.c lib/guest_modes.c lib/perf_test_util.c
-> >>>>>  LIBKVM_x86_64 = lib/x86_64/processor.c lib/x86_64/vmx.c lib/x86_64/svm.c lib/x86_64/ucall.c lib/x86_64/handlers.S
-> >>>>> -LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c
-> >>>>> +LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c lib/aarch64/handlers.S
-> >>>>>  LIBKVM_s390x = lib/s390x/processor.c lib/s390x/ucall.c lib/s390x/diag318_test_handler.c
-> >>>>>  
-> >>>>>  TEST_GEN_PROGS_x86_64 = x86_64/cr4_cpuid_sync_test
-> >>>>> diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-> >>>>> index b7fa0c8551db..40aae31b4afc 100644
-> >>>>> --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-> >>>>> +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-> >>>>> @@ -8,6 +8,7 @@
-> >>>>>  #define SELFTEST_KVM_PROCESSOR_H
-> >>>>>  
-> >>>>>  #include "kvm_util.h"
-> >>>>> +#include <linux/stringify.h>
-> >>>>>  
-> >>>>>  
-> >>>>>  #define ARM64_CORE_REG(x) (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
-> >>>>> @@ -18,6 +19,7 @@
-> >>>>>  #define MAIR_EL1	3, 0, 10, 2, 0
-> >>>>>  #define TTBR0_EL1	3, 0,  2, 0, 0
-> >>>>>  #define SCTLR_EL1	3, 0,  1, 0, 0
-> >>>>> +#define VBAR_EL1	3, 0, 12, 0, 0
-> >>>>>  
-> >>>>>  /*
-> >>>>>   * Default MAIR
-> >>>>> @@ -56,4 +58,80 @@ void aarch64_vcpu_setup(struct kvm_vm *vm, int vcpuid, struct kvm_vcpu_init *ini
-> >>>>>  void aarch64_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpuid,
-> >>>>>  			      struct kvm_vcpu_init *init, void *guest_code);
-> >>>>>  
-> >>>>> +struct ex_regs {
-> >>>>> +	u64 regs[31];
-> >>>>> +	u64 sp;
-> >>>>> +	u64 pc;
-> >>>>> +	u64 pstate;
-> >>>>> +};
-> >>>>> +
-> >>>>> +#define VECTOR_NUM	16
-> >>>>> +
-> >>>>> +enum {
-> >>>>> +	VECTOR_SYNC_CURRENT_SP0,
-> >>>>> +	VECTOR_IRQ_CURRENT_SP0,
-> >>>>> +	VECTOR_FIQ_CURRENT_SP0,
-> >>>>> +	VECTOR_ERROR_CURRENT_SP0,
-> >>>>> +
-> >>>>> +	VECTOR_SYNC_CURRENT,
-> >>>>> +	VECTOR_IRQ_CURRENT,
-> >>>>> +	VECTOR_FIQ_CURRENT,
-> >>>>> +	VECTOR_ERROR_CURRENT,
-> >>>>> +
-> >>>>> +	VECTOR_SYNC_LOWER_64,
-> >>>>> +	VECTOR_IRQ_LOWER_64,
-> >>>>> +	VECTOR_FIQ_LOWER_64,
-> >>>>> +	VECTOR_ERROR_LOWER_64,
-> >>>>> +
-> >>>>> +	VECTOR_SYNC_LOWER_32,
-> >>>>> +	VECTOR_IRQ_LOWER_32,
-> >>>>> +	VECTOR_FIQ_LOWER_32,
-> >>>>> +	VECTOR_ERROR_LOWER_32,
-> >>>>> +};
-> >>>>> +
-> >>>>> +#define VECTOR_IS_SYNC(v) ((v) == VECTOR_SYNC_CURRENT_SP0 || \
-> >>>>> +			   (v) == VECTOR_SYNC_CURRENT     || \
-> >>>>> +			   (v) == VECTOR_SYNC_LOWER_64    || \
-> >>>>> +			   (v) == VECTOR_SYNC_LOWER_32)
-> >>>>> +
-> >>>>> +/* Some common EC (Exception classes) */
-> >>>>> +#define ESR_EC_ILLEGAL_INS	0x0e
-> >>>>> +#define ESR_EC_SVC64		0x15
-> >>>>> +#define ESR_EC_IABORT_CURRENT	0x21
-> >>>>> +#define ESR_EC_DABORT_CURRENT	0x25
-> >>>>> +#define ESR_EC_SERROR		0x2f
-> >>>>> +#define ESR_EC_HW_BP_CURRENT	0x31
-> >>>>> +#define ESR_EC_SSTEP_CURRENT	0x33
-> >>>>> +#define ESR_EC_WP_CURRENT	0x35
-> >>>>> +#define ESR_EC_BRK_INS		0x3C
-> >>>>> +
-> >>>>> +#define ESR_EC_NUM		64
-> >>>>> +
-> >>>>> +#define ESR_EC_SHIFT		26
-> >>>>> +#define ESR_EC_MASK		(ESR_EC_NUM - 1)
-> >>>>> +
-> >>>>> +void vm_init_descriptor_tables(struct kvm_vm *vm);
-> >>>>> +void vcpu_init_descriptor_tables(struct kvm_vm *vm, uint32_t vcpuid);
-> >>>>> +
-> >>>>> +typedef void(*handler_fn)(struct ex_regs *);
-> >>>>> +void vm_install_exception_handler(struct kvm_vm *vm,
-> >>>>> +		int vector, int ec, handler_fn handler);
-> >>>>> +void vm_install_vector_handler(struct kvm_vm *vm,
-> >>>>> +		int vector, handler_fn handler);
-> >>>>> +
-> >>>>> +#define SPSR_D          (1 << 9)
-> >>>>> +#define SPSR_SS         (1 << 21)
-> >>>>> +
-> >>>>> +#define write_sysreg(reg, val)						  \
-> >>>>> +({									  \
-> >>>>> +	u64 __val = (u64)(val);						  \
-> >>>>> +	asm volatile("msr " __stringify(reg) ", %x0" : : "rZ" (__val));	  \
-> >>>>> +})
-> >>>>> +
-> >>>>> +#define read_sysreg(reg)						  \
-> >>>>> +({	u64 val;							  \
-> >>>>> +	asm volatile("mrs %0, "__stringify(reg) : "=r"(val) : : "memory");\
-> >>>>> +	val;								  \
-> >>>>> +})
-> >>>>> +
-> >>>>>  #endif /* SELFTEST_KVM_PROCESSOR_H */
-> >>>>> diff --git a/tools/testing/selftests/kvm/lib/aarch64/handlers.S b/tools/testing/selftests/kvm/lib/aarch64/handlers.S
-> >>>>> new file mode 100644
-> >>>>> index 000000000000..8a560021892b
-> >>>>> --- /dev/null
-> >>>>> +++ b/tools/testing/selftests/kvm/lib/aarch64/handlers.S
-> >>>>> @@ -0,0 +1,130 @@
-> >>>>> +/* SPDX-License-Identifier: GPL-2.0 */
-> >>>>> +.macro save_registers, vector
-> >>>>> +	add	sp, sp, #-16 * 17
-> >>>>> +
-> >>>>> +	stp	x0, x1, [sp, #16 * 0]
-> >>>>> +	stp	x2, x3, [sp, #16 * 1]
-> >>>>> +	stp	x4, x5, [sp, #16 * 2]
-> >>>>> +	stp	x6, x7, [sp, #16 * 3]
-> >>>>> +	stp	x8, x9, [sp, #16 * 4]
-> >>>>> +	stp	x10, x11, [sp, #16 * 5]
-> >>>>> +	stp	x12, x13, [sp, #16 * 6]
-> >>>>> +	stp	x14, x15, [sp, #16 * 7]
-> >>>>> +	stp	x16, x17, [sp, #16 * 8]
-> >>>>> +	stp	x18, x19, [sp, #16 * 9]
-> >>>>> +	stp	x20, x21, [sp, #16 * 10]
-> >>>>> +	stp	x22, x23, [sp, #16 * 11]
-> >>>>> +	stp	x24, x25, [sp, #16 * 12]
-> >>>>> +	stp	x26, x27, [sp, #16 * 13]
-> >>>>> +	stp	x28, x29, [sp, #16 * 14]
-> >>>>> +
-> >>>>> +	.if \vector >= 8
-> >>>>> +	mrs	x1, sp_el0
-> >>>>
-> >>>> I'm still a bit perplexed by this. SP_EL0 is never changed, since you
-> >>>> always run in handler mode. Therefore, saving/restoring it is only
-> >>>> overhead. If an exception handler wants to introspect it, it is
-> >>>> already available in the relevant system register.
-> >>>>
-> >>>> Or did you have something else in mind for it?
-> >>>>
-> >>>
-> >>> Not really. The reason for saving sp_el0 in there was just for
-> >>> consistency, so that handlers for both el0 and el1 exceptions could get
-> >>> the sp at regs->sp.
-> >>>
-> >>> Restoring sp_el0 might be too much. So, what do you think of this v3: we
-> >>> keep the saving of sp_el0 into regs->sp (to keep things the same between
-> >>> el0 and el1) and delete the restoring of sp_el0?
-> >>>
-> >>> Thanks,
-> >>> Ricardo
-> >>>
-> >>>>> +	.else
-> >>>>> +	/*
-> >>>>> +	 * This stores sp_el1 into ex_regs.sp so exception handlers can
-> >>>>> +	 * "look" at it. It will _not_ be used to restore the sp_el1 on
-> >>>>> +	 * return from the exception so handlers can not update it.
-> >>>>> +	 */
-> >>>>> +	mov	x1, sp
-> >>>>> +	.endif
-> >>>>> +	stp	x30, x1, [sp, #16 * 15] /* x30, SP */
-> >>>>> +
-> >>>>> +	mrs	x1, elr_el1
-> >>>>> +	mrs	x2, spsr_el1
-> >>>>> +	stp	x1, x2, [sp, #16 * 16] /* PC, PSTATE */
-> >>>>> +.endm
-> >>>>> +
-> >>>>> +.macro restore_registers, vector
-> >>>>> +	ldp	x1, x2, [sp, #16 * 16] /* PC, PSTATE */
-> >>>>> +	msr	elr_el1, x1
-> >>>>> +	msr	spsr_el1, x2
-> >>>>> +
-> >>>>> +	ldp	x30, x1, [sp, #16 * 15] /* x30, SP */
-> >>>>> +	.if \vector >= 8
-> >>>>> +	msr	sp_el0, x1
-> >>>>> +	.endif
-> >>>>> +
-> >>>>> +	ldp	x28, x29, [sp, #16 * 14]
-> >>>>> +	ldp	x26, x27, [sp, #16 * 13]
-> >>>>> +	ldp	x24, x25, [sp, #16 * 12]
-> >>>>> +	ldp	x22, x23, [sp, #16 * 11]
-> >>>>> +	ldp	x20, x21, [sp, #16 * 10]
-> >>>>> +	ldp	x18, x19, [sp, #16 * 9]
-> >>>>> +	ldp	x16, x17, [sp, #16 * 8]
-> >>>>> +	ldp	x14, x15, [sp, #16 * 7]
-> >>>>> +	ldp	x12, x13, [sp, #16 * 6]
-> >>>>> +	ldp	x10, x11, [sp, #16 * 5]
-> >>>>> +	ldp	x8, x9, [sp, #16 * 4]
-> >>>>> +	ldp	x6, x7, [sp, #16 * 3]
-> >>>>> +	ldp	x4, x5, [sp, #16 * 2]
-> >>>>> +	ldp	x2, x3, [sp, #16 * 1]
-> >>>>> +	ldp	x0, x1, [sp, #16 * 0]
-> >>>>> +
-> >>>>> +	add	sp, sp, #16 * 17
-> >>>>> +
-> >>>>> +	eret
-> >>>>> +.endm
-> >>>>> +
-> >>>>> +.pushsection ".entry.text", "ax"
-> >>>>> +.balign 0x800
-> >>>>> +.global vectors
-> >>>>> +vectors:
-> >>>>> +.popsection
-> >>>>> +
-> >>>>> +.set	vector, 0
-> >>>>> +
-> >>>>> +/*
-> >>>>> + * Build an exception handler for vector and append a jump to it into
-> >>>>> + * vectors (while making sure that it's 0x80 aligned).
-> >>>>> + */
-> >>>>> +.macro HANDLER, label
-> >>>>> +handler_\()\label:
-> >>>>> +	save_registers vector
-> >>>>> +	mov	x0, sp
-> >>>>> +	mov	x1, #vector
-> >>>>> +	bl	route_exception
-> >>>>> +	restore_registers vector
-> >>>>> +
-> >>>>> +.pushsection ".entry.text", "ax"
-> >>>>> +.balign 0x80
-> >>>>> +	b	handler_\()\label
-> >>>>> +.popsection
-> >>>>> +
-> >>>>> +.set	vector, vector + 1
-> >>>>> +.endm
-> >>>>> +
-> >>>>> +.macro HANDLER_INVALID
-> >>>>> +.pushsection ".entry.text", "ax"
-> >>>>> +.balign 0x80
-> >>>>> +/* This will abort so no need to save and restore registers. */
-> >>>>> +	mov	x0, #vector
-> >>>>> +	b	kvm_exit_unexpected_vector
-> >>>>> +.popsection
-> >>>>> +
-> >>>>> +.set	vector, vector + 1
-> >>>>> +.endm
-> >>>>> +
-> >>>>> +/*
-> >>>>> + * Caution: be sure to not add anything between the declaration of vectors
-> >>>>> + * above and these macro calls that will build the vectors table below it.
-> >>>>> + */
-> >>>>> +	HANDLER_INVALID                         // Synchronous EL1t
-> >>>>> +	HANDLER_INVALID                         // IRQ EL1t
-> >>>>> +	HANDLER_INVALID                         // FIQ EL1t
-> >>>>> +	HANDLER_INVALID                         // Error EL1t
-> >>>>> +
-> >>>>> +	HANDLER	el1h_sync                       // Synchronous EL1h
-> >>>>> +	HANDLER	el1h_irq                        // IRQ EL1h
-> >>>>> +	HANDLER el1h_fiq                        // FIQ EL1h
-> >>>>> +	HANDLER	el1h_error                      // Error EL1h
-> >>>>> +
-> >>>>> +	HANDLER	el0_sync_64                     // Synchronous 64-bit EL0
-> >>>>> +	HANDLER	el0_irq_64                      // IRQ 64-bit EL0
-> >>>>> +	HANDLER	el0_fiq_64                      // FIQ 64-bit EL0
-> >>>>> +	HANDLER	el0_error_64                    // Error 64-bit EL0
-> >>>>> +
-> >>>>> +	HANDLER	el0_sync_32                     // Synchronous 32-bit EL0
-> >>>>> +	HANDLER	el0_irq_32                      // IRQ 32-bit EL0
-> >>>>> +	HANDLER	el0_fiq_32                      // FIQ 32-bit EL0
-> >>>>> +	HANDLER	el0_error_32                    // Error 32-bit EL0
-> >>>>> diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-> >>>>> index cee92d477dc0..25be71ec88be 100644
-> >>>>> --- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
-> >>>>> +++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-> >>>>> @@ -6,6 +6,7 @@
-> >>>>>   */
-> >>>>>  
-> >>>>>  #include <linux/compiler.h>
-> >>>>> +#include <assert.h>
-> >>>>>  
-> >>>>>  #include "kvm_util.h"
-> >>>>>  #include "../kvm_util_internal.h"
-> >>>>> @@ -14,6 +15,8 @@
-> >>>>>  #define KVM_GUEST_PAGE_TABLE_MIN_PADDR		0x180000
-> >>>>>  #define DEFAULT_ARM64_GUEST_STACK_VADDR_MIN	0xac0000
-> >>>>>  
-> >>>>> +vm_vaddr_t exception_handlers;
-> >>>>> +
-> >>>>>  static uint64_t page_align(struct kvm_vm *vm, uint64_t v)
-> >>>>>  {
-> >>>>>  	return (v + vm->page_size) & ~(vm->page_size - 1);
-> >>>>> @@ -334,6 +337,127 @@ void vcpu_args_set(struct kvm_vm *vm, uint32_t vcpuid, unsigned int num, ...)
-> >>>>>  	va_end(ap);
-> >>>>>  }
-> >>>>>  
-> >>>>> +void kvm_exit_unexpected_vector(int vector)
-> >>>>> +{
-> >>>>> +	ucall(UCALL_UNHANDLED, 3, vector, 0, false /* !valid_ec */);
-> >>>>> +}
-> >>>>> +
-> >>>>> +void kvm_exit_unexpected_exception(int vector, uint64_t ec)
-> >>>>> +{
-> >>>>> +	ucall(UCALL_UNHANDLED, 3, vector, ec, true /* valid_ec */);
-> >>>>> +}
-> >>>>> +
-> >>>>>  void assert_on_unhandled_exception(struct kvm_vm *vm, uint32_t vcpuid)
-> >>>>>  {
-> >>>>> +	struct ucall uc;
-> >>>>> +
-> >>>>> +	if (get_ucall(vm, vcpuid, &uc) != UCALL_UNHANDLED)
-> >>>>> +		return;
-> >>>>> +
-> >>>>> +	if (uc.args[2]) /* valid_ec */ {
-> >>>>> +		assert(VECTOR_IS_SYNC(uc.args[0]));
-> >>>>> +		TEST_ASSERT(false,
-> >>>>> +			"Unexpected exception (vector:0x%lx, ec:0x%lx)",
-> >>>>> +			uc.args[0], uc.args[1]);
-> >>>>> +	} else {
-> >>>>> +		assert(!VECTOR_IS_SYNC(uc.args[0]));
-> >>>>> +		TEST_ASSERT(false,
-> >>>>> +			"Unexpected exception (vector:0x%lx)",
-> >>>>> +			uc.args[0]);
-> >>>>> +	}
-> >>>>> +}
-> >>>>> +
-> >>>>> +/*
-> >>>>> + * This exception handling code was heavily inspired on kvm-unit-tests. There
-> >>>>> + * is a set of default vector handlers stored in vector_handlers. These default
-> >>>>> + * vector handlers call user-installed handlers stored in exception_handlers.
-> >>>>> + * Synchronous handlers are indexed by (vector, ec), and irq handlers by
-> >>>>> + * (vector, ec=0).
-> >>>>> + */
-> >>>>> +
-> >>>>> +typedef void(*vector_fn)(struct ex_regs *, int vector);
-> >>>>> +
-> >>>>> +struct handlers {
-> >>>>> +	vector_fn vector_handlers[VECTOR_NUM];
-> >>>>> +	handler_fn exception_handlers[VECTOR_NUM][ESR_EC_NUM];
-> >>>>> +};
-> >>>>> +
-> >>>>> +void vcpu_init_descriptor_tables(struct kvm_vm *vm, uint32_t vcpuid)
-> >>>>> +{
-> >>>>> +	extern char vectors;
-> >>>>> +
-> >>>>> +	set_reg(vm, vcpuid, ARM64_SYS_REG(VBAR_EL1), (uint64_t)&vectors);
-> >>>>> +}
-> >>>>> +
-> >>>>> +void default_sync_handler(struct ex_regs *regs, int vector)
-> >>>>> +{
-> >>>>> +	struct handlers *handlers = (struct handlers *)exception_handlers;
-> >>>>> +	uint64_t esr = read_sysreg(esr_el1);
-> >>>>> +	uint64_t ec = (esr >> ESR_EC_SHIFT) & ESR_EC_MASK;
-> >>>>> +
-> >>>>> +	GUEST_ASSERT(VECTOR_IS_SYNC(vector));
-> >>>>> +
-> >>>>> +	if (handlers && handlers->exception_handlers[vector][ec])
-> >>>>> +		handlers->exception_handlers[vector][ec](regs);
-> >>>>> +	else
-> >>>>> +		kvm_exit_unexpected_exception(vector, ec);
-> >>>>> +}
-> >>>>> +
-> >>>>> +void default_irq_handler(struct ex_regs *regs, int vector)
-> >>>>> +{
-> >>>>> +	struct handlers *handlers = (struct handlers *)exception_handlers;
-> >>>>> +
-> >>>>> +	GUEST_ASSERT(!VECTOR_IS_SYNC(vector));
-> >>>>> +
-> >>>>> +	if (handlers && handlers->exception_handlers[vector][0])
-> >>>>> +		handlers->exception_handlers[vector][0](regs);
-> >>>>> +	else
-> >>>>> +		kvm_exit_unexpected_vector(vector);
-> >>>>> +}
-> >>>>> +
-> >>>>> +void route_exception(struct ex_regs *regs, int vector)
-> >>>>> +{
-> >>>>> +	struct handlers *handlers = (struct handlers *)exception_handlers;
-> >>>>> +
-> >>>>> +	if (handlers && handlers->vector_handlers[vector])
-> >>>>> +		handlers->vector_handlers[vector](regs, vector);
-> >>>>> +	else
-> >>>>> +		kvm_exit_unexpected_vector(vector);
-> >>>>> +}
-> >>>>> +
-> >>>>> +void vm_init_descriptor_tables(struct kvm_vm *vm)
-> >>>>> +{
-> >>>>> +	struct handlers *handlers;
-> >>>>> +
-> >>>>> +	vm->handlers = vm_vaddr_alloc(vm, sizeof(struct handlers),
-> >>>>> +			vm->page_size, 0, 0);
-> >>>>> +
-> >>>>> +	handlers = (struct handlers *)addr_gva2hva(vm, vm->handlers);
-> >>>>> +	handlers->vector_handlers[VECTOR_SYNC_CURRENT] = default_sync_handler;
-> >>>>> +	handlers->vector_handlers[VECTOR_IRQ_CURRENT] = default_irq_handler;
-> >>>>> +	handlers->vector_handlers[VECTOR_SYNC_LOWER_64] = default_sync_handler;
-> >>>>> +	handlers->vector_handlers[VECTOR_IRQ_LOWER_64] = default_irq_handler;
-> >>>>
-> >>>> How about FIQ, Error? Although they are unlikely, they are valid
-> >>>> exceptions.
-> >>>>
-> >>>>> +
-> >>>>> +	*(vm_vaddr_t *)addr_gva2hva(vm, (vm_vaddr_t)(&exception_handlers)) = vm->handlers;
-> >>>>> +}
-> >>>>> +
-> >>>>> +void vm_install_exception_handler(struct kvm_vm *vm, int vector, int ec,
-> >>>>> +			 void (*handler)(struct ex_regs *))
-> >>>>> +{
-> >>>>> +	struct handlers *handlers = (struct handlers *)addr_gva2hva(vm, vm->handlers);
-> >>>>> +
-> >>>>> +	assert(VECTOR_IS_SYNC(vector));
-> >>>>> +	assert(vector < VECTOR_NUM);
-> >>>>> +	assert(ec < ESR_EC_NUM);
-> >>>>> +	handlers->exception_handlers[vector][ec] = handler;
-> >>>>> +}
-> >>>>> +
-> >>>>> +void vm_install_vector_handler(struct kvm_vm *vm, int vector,
-> >>>>> +			 void (*handler)(struct ex_regs *))
-> >>>>> +{
-> >>>>> +	struct handlers *handlers = (struct handlers *)addr_gva2hva(vm, vm->handlers);
-> >>>>> +
-> >>>>> +	assert(!VECTOR_IS_SYNC(vector));
-> >>>>> +	assert(vector < VECTOR_NUM);
-> >>>>> +	handlers->exception_handlers[vector][0] = handler;
-> >>>>>  }
-> >>>>
-> >>>> Thanks,
-> >>>>
-> >>>> 	M.
-> >>>>
-> >>>> -- 
-> >>>> Without deviation from the norm, progress is not possible.
-> >>>
-> >>
-> > 
-> 
+-- 
+Sincerely yours,
+Mike.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
