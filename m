@@ -2,59 +2,74 @@ Return-Path: <SRS0=saMt=KH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 041AEC433B4
-	for <kvmarm@archiver.kernel.org>; Wed, 12 May 2021 16:22:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66CE4C433ED
+	for <kvmarm@archiver.kernel.org>; Wed, 12 May 2021 16:33:09 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6D43F6127A
-	for <kvmarm@archiver.kernel.org>; Wed, 12 May 2021 16:22:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D43F6127A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 9E6A66121E
+	for <kvmarm@archiver.kernel.org>; Wed, 12 May 2021 16:33:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E6A66121E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7AC414B559;
-	Wed, 12 May 2021 12:22:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 242054B519;
+	Wed, 12 May 2021 12:33:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 8sXPn1WE2Yrp; Wed, 12 May 2021 12:22:06 -0400 (EDT)
+	with ESMTP id ke-fmtYvKlY4; Wed, 12 May 2021 12:33:07 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 421494B463;
-	Wed, 12 May 2021 12:22:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 09F0D4B51D;
+	Wed, 12 May 2021 12:33:07 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3688F4B42D
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 May 2021 12:22:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B4F04B4E1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 May 2021 12:33:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hXbRFo1rK92N for <kvmarm@lists.cs.columbia.edu>;
- Wed, 12 May 2021 12:22:03 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E26004B421
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 May 2021 12:22:03 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 256DA1FB;
- Wed, 12 May 2021 09:22:03 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 594EB3F719;
- Wed, 12 May 2021 09:22:01 -0700 (PDT)
+ with ESMTP id X6lcvwqxfoPP for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 12 May 2021 12:33:05 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4CFDF4B473
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 May 2021 12:33:05 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 090DA61176;
+ Wed, 12 May 2021 16:33:04 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1lgrnB-000yJZ-OO; Wed, 12 May 2021 17:33:01 +0100
+Date: Wed, 12 May 2021 17:33:01 +0100
+Message-ID: <87im3noqte.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
 Subject: Re: [PATCH v3 0/9] KVM: arm64: Initial host support for the Apple M1
-To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
- kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <3a21048a-a084-a884-7a3d-9b283f8b15ed@arm.com>
 References: <20210510134824.1910399-1-maz@kernel.org>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <3a21048a-a084-a884-7a3d-9b283f8b15ed@arm.com>
-Date: Wed, 12 May 2021 17:22:43 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
-MIME-Version: 1.0
-In-Reply-To: <20210510134824.1910399-1-maz@kernel.org>
-Content-Language: en-US
-Cc: Hector Martin <marcan@marcan.st>, kernel-team@android.com
+ <3a21048a-a084-a884-7a3d-9b283f8b15ed@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, james.morse@arm.com, suzuki.poulose@arm.com,
+ eric.auger@redhat.com, marcan@marcan.st, mark.rutland@arm.com,
+ kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, Hector Martin <marcan@marcan.st>,
+ kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,72 +86,59 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+Hi Alex,
 
-On 5/10/21 2:48 PM, Marc Zyngier wrote:
-> This is a new version of the series previously posted at [2], reworking
-> the vGIC and timer code to cope with the M1 braindead^Wamusing nature.
->
-> Hardly any change this time around, mostly rebased on top of upstream
-> now that the dependencies have made it in.
->
-> Tested with multiple concurrent VMs running from an initramfs.
->
-> * From v2:
->   - Rebased on 5.13-rc1
->   - Fixed a couple of nits in the GIC registration code
->
-> * From v1 [1]:
->   - Rebased on Hector's v4 posting[0]
->   - Dropped a couple of patches that have been merged in the above series
->   - Fixed irq_ack callback on the timer path
->
-> [0] https://lore.kernel.org/r/20210402090542.131194-1-marcan@marcan.st
-> [1] https://lore.kernel.org/r/20210316174617.173033-1-maz@kernel.org
-> [2] https://lore.kernel.org/r/20210403112931.1043452-1-maz@kernel.org
+On Wed, 12 May 2021 17:22:43 +0100,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> Hi Marc,
+> 
+> On 5/10/21 2:48 PM, Marc Zyngier wrote:
+> > This is a new version of the series previously posted at [2], reworking
+> > the vGIC and timer code to cope with the M1 braindead^Wamusing nature.
+> >
+> > Hardly any change this time around, mostly rebased on top of upstream
+> > now that the dependencies have made it in.
+> >
+> > Tested with multiple concurrent VMs running from an initramfs.
+> >
+> > * From v2:
+> >   - Rebased on 5.13-rc1
+> >   - Fixed a couple of nits in the GIC registration code
+> >
+> > * From v1 [1]:
+> >   - Rebased on Hector's v4 posting[0]
+> >   - Dropped a couple of patches that have been merged in the above series
+> >   - Fixed irq_ack callback on the timer path
+> >
+> > [0] https://lore.kernel.org/r/20210402090542.131194-1-marcan@marcan.st
+> > [1] https://lore.kernel.org/r/20210316174617.173033-1-maz@kernel.org
+> > [2] https://lore.kernel.org/r/20210403112931.1043452-1-maz@kernel.org
+> 
+> This looks interesting and I want to take a look. For now, I can
+> only review the series, but maybe at some point I'll take the leap
+> and try to run Linux on my Macbook Air.
 
-This looks interesting and I want to take a look. For now, I can only review the
-series, but maybe at some point I'll take the leap and try to run Linux on my
-Macbook Air.
+It is a bit involved at the moment, and I haven't tried on a laptop
+(the nice thing about the Mini is that you can bury it under a pile of
+other machines and still make use of it).
 
-Can I find something resembling a specification for the Apple interrupt
-controller, or the only available documentation is in the Linux driver and patches
-on the mailing list?
+> Can I find something resembling a specification for the Apple
+> interrupt controller, or the only available documentation is in the
+> Linux driver and patches on the mailing list?
+
+The Asahi wiki has a bunch of RE goodies, but you really don't need to
+know much about the HW to follow what this series does. Actually, you
+instead need to understand what the GIC guarantees to the guest,
+because this is all about the GIC emulation on a non-GIC interrupt
+controller.
 
 Thanks,
 
-Alex
+	M.
 
->
-> Marc Zyngier (9):
->   irqchip/gic: Split vGIC probing information from the GIC code
->   KVM: arm64: Handle physical FIQ as an IRQ while running a guest
->   KVM: arm64: vgic: Be tolerant to the lack of maintenance interrupt
->   KVM: arm64: vgic: Let an interrupt controller advertise lack of HW
->     deactivation
->   KVM: arm64: vgic: move irq->get_input_level into an ops structure
->   KVM: arm64: vgic: Implement SW-driven deactivation
->   KVM: arm64: timer: Refactor IRQ configuration
->   KVM: arm64: timer: Add support for SW-based deactivation
->   irqchip/apple-aic: Advertise some level of vGICv3 compatibility
->
->  arch/arm64/kvm/arch_timer.c            | 161 +++++++++++++++++++++----
->  arch/arm64/kvm/hyp/hyp-entry.S         |   6 +-
->  arch/arm64/kvm/vgic/vgic-init.c        |  34 +++++-
->  arch/arm64/kvm/vgic/vgic-v2.c          |  19 ++-
->  arch/arm64/kvm/vgic/vgic-v3.c          |  19 ++-
->  arch/arm64/kvm/vgic/vgic.c             |  14 +--
->  drivers/irqchip/irq-apple-aic.c        |   8 ++
->  drivers/irqchip/irq-gic-common.c       |  13 --
->  drivers/irqchip/irq-gic-common.h       |   2 -
->  drivers/irqchip/irq-gic-v3.c           |   6 +-
->  drivers/irqchip/irq-gic.c              |   6 +-
->  include/kvm/arm_vgic.h                 |  41 +++++--
->  include/linux/irqchip/arm-gic-common.h |  25 +---
->  include/linux/irqchip/arm-vgic-info.h  |  43 +++++++
->  14 files changed, 291 insertions(+), 106 deletions(-)
->  create mode 100644 include/linux/irqchip/arm-vgic-info.h
->
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
