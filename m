@@ -2,64 +2,71 @@ Return-Path: <SRS0=saMt=KH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33BACC433ED
-	for <kvmarm@archiver.kernel.org>; Wed, 12 May 2021 17:45:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9F31C433ED
+	for <kvmarm@archiver.kernel.org>; Wed, 12 May 2021 18:54:07 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5FC3F61412
-	for <kvmarm@archiver.kernel.org>; Wed, 12 May 2021 17:45:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FC3F61412
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 2369F613B9
+	for <kvmarm@archiver.kernel.org>; Wed, 12 May 2021 18:54:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2369F613B9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linuxfoundation.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C06E94B347;
-	Wed, 12 May 2021 13:45:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 689C94B516;
+	Wed, 12 May 2021 14:54:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@linuxfoundation.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id HJu1QJh3t4nT; Wed, 12 May 2021 13:45:13 -0400 (EDT)
+	with ESMTP id cJYoJ-J5h+No; Wed, 12 May 2021 14:54:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5523A4B468;
-	Wed, 12 May 2021 13:45:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2BC5B4B52E;
+	Wed, 12 May 2021 14:54:05 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A65BA4B386
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 May 2021 13:45:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 129C74B516
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 May 2021 14:54:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MQYz3389ZEOr for <kvmarm@lists.cs.columbia.edu>;
- Wed, 12 May 2021 13:45:10 -0400 (EDT)
+ with ESMTP id 8xswTBQgo4ty for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 12 May 2021 14:54:01 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 192AC4B347
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 May 2021 13:45:10 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 9D1F9613DF;
- Wed, 12 May 2021 17:45:05 +0000 (UTC)
-Date: Wed, 12 May 2021 18:45:03 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Steven Price <steven.price@arm.com>
-Subject: Re: [PATCH v11 2/6] arm64: kvm: Introduce MTE VM feature
-Message-ID: <20210512174502.GC12391@arm.com>
-References: <20210416154309.22129-1-steven.price@arm.com>
- <20210416154309.22129-3-steven.price@arm.com>
- <20210428170705.GB4022@arm.com>
- <c3293d47-a5f2-ea4a-6730-f5cae26d8a7e@arm.com>
- <YJGHApOCXl811VK3@arm.com>
- <329286e8-a8f3-ea1a-1802-58813255a4a5@arm.com>
- <20210507182538.GF26528@arm.com> <20210510183506.GA10910@arm.com>
- <c891d4eb-b388-1658-8c8a-e76477062463@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AA5BB4B515
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 May 2021 14:54:01 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id B5311611BD;
+ Wed, 12 May 2021 18:53:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+ s=korg; t=1620845640;
+ bh=0v11jeez54FneOK7W+JHdJ88FtBJC12awhEy2sMyl+w=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=LQAx1WTbfrd/rYLoXyh97Re6e8HL2bqQzU+eQCqTCzTTP0Q+E0hx68NMBmgnFxyp5
+ Yd53+drZw06vxLeL8HUpQrWNg7YlzEdtRqctl8gtLwAX9uOuGSy/MWHrro4Kwk2XFw
+ 7Je5lxvRZL6MXHonw/Fvnx0+J++J4KmtdMgP2Gl8=
+Date: Wed, 12 May 2021 20:53:57 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH 5.4 000/244] 5.4.119-rc1 review
+Message-ID: <YJwkRS20XCeVcIox@kroah.com>
+References: <20210512144743.039977287@linuxfoundation.org>
+ <CA+G9fYs1AH8ZNWMJ=H4TY5C6bqp--=SZfW9P=WbB85qSBDkuXw@mail.gmail.com>
+ <b7df0d7f-e582-6a0d-2385-b9fce50f9106@arm.com>
+ <87h7j7opg2.wl-maz@kernel.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <c891d4eb-b388-1658-8c8a-e76477062463@arm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
- Marc Zyngier <maz@kernel.org>, Juan Quintela <quintela@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
- Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org,
- Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+In-Reply-To: <87h7j7opg2.wl-maz@kernel.org>
+Cc: Linux ARM <linux-arm-kernel@lists.infradead.org>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ open list <linux-kernel@vger.kernel.org>, lkft-triage@lists.linaro.org,
+ patches@kernelci.org, Linus Torvalds <torvalds@linux-foundation.org>,
+ linux-stable <stable@vger.kernel.org>, Pavel Machek <pavel@denx.de>,
+ Andrew Morton <akpm@linux-foundation.org>, Jon Hunter <jonathanh@nvidia.com>,
+ Shuah Khan <shuah@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ Guenter Roeck <linux@roeck-us.net>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,125 +78,108 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, May 12, 2021 at 04:46:48PM +0100, Steven Price wrote:
-> On 10/05/2021 19:35, Catalin Marinas wrote:
-> > On Fri, May 07, 2021 at 07:25:39PM +0100, Catalin Marinas wrote:
-> > > On Thu, May 06, 2021 at 05:15:25PM +0100, Steven Price wrote:
-> > > > On 04/05/2021 18:40, Catalin Marinas wrote:
-> > > > > On Thu, Apr 29, 2021 at 05:06:41PM +0100, Steven Price wrote:
-> > > > > > Given the changes to set_pte_at() which means that tags are restored from
-> > > > > > swap even if !PROT_MTE, the only race I can see remaining is the creation of
-> > > > > > new PROT_MTE mappings. As you mention an attempt to change mappings in the
-> > > > > > VMM memory space should involve a mmu notifier call which I think serialises
-> > > > > > this. So the remaining issue is doing this in a separate address space.
-> > > > > > 
-> > > > > > So I guess the potential problem is:
-> > > > > > 
-> > > > > >    * allocate memory MAP_SHARED but !PROT_MTE
-> > > > > >    * fork()
-> > > > > >    * VM causes a fault in parent address space
-> > > > > >    * child does a mprotect(PROT_MTE)
-> > > > > > 
-> > > > > > With the last two potentially racing. Sadly I can't see a good way of
-> > > > > > handling that.
-[...]
-> > Options:
-> > 
-> > 1. Change the mte_sync_tags() code path to set the flag after clearing
-> >     and avoid reading stale tags. We document that mprotect() on
-> >     MAP_SHARED may lead to tag loss. Maybe we can intercept this in the
-> >     arch code and return an error.
-> 
-> This is the best option I've come up with so far - but it's not a good
-> one! We can replace the set_bit() with a test_and_set_bit() to catch the
-> race after it has occurred - but I'm not sure what we can do about it
-> then (we've already wiped the data). Returning an error doesn't seem
-> particularly useful at that point, a message in dmesg is about the best
-> I can come up with.
+On Wed, May 12, 2021 at 06:02:37PM +0100, Marc Zyngier wrote:
+> On Wed, 12 May 2021 18:00:16 +0100,
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> > =
 
-What I meant about intercepting is on something like
-arch_validate_flags() to prevent VM_SHARED and VM_MTE together but only
-for mprotect(), not mmap(). However, arch_validate_flags() is currently
-called on both mmap() and mprotect() paths.
+> > Hi Naresh,
+> > =
 
-We can't do much in set_pte_at() to prevent the race with only a single
-bit.
+> > Thank you for the report!
+> > =
 
-> > 2. Figure out some other locking in the core code. However, if
-> >     mprotect() in one process can race with a handle_pte_fault() in
-> >     another, on the same shared mapping, it's not trivial.
-> >     filemap_map_pages() would take the page lock before calling
-> >     do_set_pte(), so mprotect() would need the same page lock.
-> 
-> I can't see how this is going to work without harming the performance of
-> non-MTE work. Ultimately we're trying to add some sort of locking for
-> two (mostly) unrelated processes doing page table operations, which will
-> hurt scalability.
+> > On 5/12/21 5:47 PM, Naresh Kamboju wrote:
+> > > On Wed, 12 May 2021 at 20:22, Greg Kroah-Hartman
+> > > <gregkh@linuxfoundation.org> wrote:
+> > >> This is the start of the stable review cycle for the 5.4.119 release.
+> > >> There are 244 patches in this series, all will be posted as a respon=
+se
+> > >> to this one.  If anyone has any issues with these being applied, ple=
+ase
+> > >> let me know.
+> > >>
+> > >> Responses should be made by Fri, 14 May 2021 14:47:09 +0000.
+> > >> Anything received after that time might be too late.
+> > >>
+> > >> The whole patch series can be found in one patch at:
+> > >>         https://www.kernel.org/pub/linux/kernel/v5.x/stable-review/p=
+atch-5.4.119-rc1.gz
+> > >> or in the git tree and branch at:
+> > >>         git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-s=
+table-rc.git linux-5.4.y
+> > >> and the diffstat can be found below.
+> > >>
+> > >> thanks,
+> > >>
+> > >> greg k-h
+> > > Build regression detected.
+> > >
+> > >> Alexandru Elisei <alexandru.elisei@arm.com>
+> > >>     KVM: arm64: Initialize VCPU mdcr_el2 before loading it
+> > > stable rc 5.4 arm axm55xx_defconfig builds failed due to these
+> > > warnings / errors.
+> > >   - arm (axm55xx_defconfig) with gcc-8,9 and 10 failed
+> > >
+> > > arch/arm/kvm/../../../virt/kvm/arm/arm.c: In function 'kvm_vcpu_first=
+_run_init':
+> > > arch/arm/kvm/../../../virt/kvm/arm/arm.c:582:2: error: implicit
+> > > declaration of function 'kvm_arm_vcpu_init_debug'; did you mean
+> > > 'kvm_arm_init_debug'? [-Werror=3Dimplicit-function-declaration]
+> > >   kvm_arm_vcpu_init_debug(vcpu);
+> > >   ^~~~~~~~~~~~~~~~~~~~~~~
+> > >   kvm_arm_init_debug
+> > > cc1: some warnings being treated as errors
+> > =
 
-Another option is to have an arch callback to force re-faulting on the
-pte. That means we don't populate it back after the invalidation in the
-change_protection() path. We could do this only if the new pte is tagged
-and the page doesn't have PG_mte_tagged. The faulting path takes the
-page lock IIUC.
+> > This is my fault, in Linux v5.4 KVM for arm is still around, and
+> > there's no prototype for the function when compiling for arm. I
+> > suspect that's also the case for v4.19.
+> > =
 
-Well, at least for stage 1, I haven't thought much about stage 2.
+> > I made this change to get it to build:
+> > =
 
-> > 3. Use another PG_arch_3 bit as a lock to spin on in the arch code (i.e.
-> >     set it around the other PG_arch_* bit setting).
-> 
-> This is certainly tempting, although sadly the existing
-> wait_on_page_bit() is sleeping - so this would either be a literal spin,
-> or we'd need to implement a new non-sleeping wait mechanism.
+> > $ git diff
+> > diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm=
+_host.h
+> > index dd03d5e01a94..32564b017ba0 100644
+> > --- a/arch/arm/include/asm/kvm_host.h
+> > +++ b/arch/arm/include/asm/kvm_host.h
+> > @@ -335,6 +335,7 @@ static inline void kvm_arch_sched_in(struct kvm_vcp=
+u *vcpu,
+> > int cpu) {}
+> > =A0static inline void kvm_arch_vcpu_block_finish(struct kvm_vcpu *vcpu)=
+ {}
+> > =A0
+> > =A0static inline void kvm_arm_init_debug(void) {}
+> > +static inline void kvm_arm_vcpu_init_debug(struct kvm_vcpu *vcpu) {}
+> > =A0static inline void kvm_arm_setup_debug(struct kvm_vcpu *vcpu) {}
+> > =A0static inline void kvm_arm_clear_debug(struct kvm_vcpu *vcpu) {}
+> > =A0static inline void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu) {}
+> > =
 
-Yeah, it would have to be a custom spinning mechanism, something like:
+> > which matches the stub for kvm_arm_init_debug(). I can spin a patch
+> > out of it and send it for 5.4 and 4.19. Marc, what do you think?
+> =
 
-	/* lock the page */
-	while (test_and_set_bit(PG_arch_3, &page->flags))
-		smp_cond_load_relaxed(&page->flags, !(VAL & PG_arch_3));
-	...
-	/* unlock the page */
-	clear_bit(PG_arch_3, &page->flags);
+> Ideally, we'd drop the patch in its current form from 5.4 and 4.19,
+> and send an updated patch with this hunk to fix the 32bit build.
+> =
 
-> 4. Sledgehammer locking in mte_sync_page_tags(), add a spinlock only for
-> the MTE case where we have to sync tags (see below). What the actual
-> performance impact of this is I've no idea. It could certainly be bad
-> if there are a lot of pages with MTE enabled, which sadly is exactly
-> the case if KVM is used with MTE :(
-> 
-> --->8----
-> diff --git a/arch/arm64/kernel/mte.c b/arch/arm64/kernel/mte.c
-> index 0d320c060ebe..389ad40256f6 100644
-> --- a/arch/arm64/kernel/mte.c
-> +++ b/arch/arm64/kernel/mte.c
-> @@ -25,23 +25,33 @@
->  u64 gcr_kernel_excl __ro_after_init;
->  static bool report_fault_once = true;
-> +static spinlock_t tag_sync_lock;
->  static void mte_sync_page_tags(struct page *page, pte_t *ptep, bool check_swap,
->  			       bool pte_is_tagged)
->  {
->  	pte_t old_pte = READ_ONCE(*ptep);
-> +	if (!is_swap_pte(old_pte) && !pte_is_tagged)
-> +		return;
-> +
-> +	spin_lock_irqsave(&tag_sync_lock, flags);
-> +
-> +	/* Recheck with the lock held */
-> +	if (test_bit(PG_mte_tagged, &page->flags))
-> +		goto out;
 
-Can we skip the lock if the page already has the PG_mte_tagged set?
-That's assuming that we set the flag only after clearing the tags. The
-normal case where mprotect() is called on a page already mapped with
-PROT_MTE would not be affected.
+That would be great.  Do you want to do it for this set of releases
+(i.e. today/tomorrow) or have me just drop this now and someone will
+send me an updated version later when they get a chance?
 
--- 
-Catalin
+thanks,
+
+greg k-h
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
