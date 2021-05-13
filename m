@@ -2,81 +2,101 @@ Return-Path: <SRS0=4nKG=KI=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49ABFC433ED
-	for <kvmarm@archiver.kernel.org>; Thu, 13 May 2021 06:37:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07B3FC433ED
+	for <kvmarm@archiver.kernel.org>; Thu, 13 May 2021 07:35:46 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 92AF961433
-	for <kvmarm@archiver.kernel.org>; Thu, 13 May 2021 06:37:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92AF961433
+	by mail.kernel.org (Postfix) with ESMTP id 34687613E9
+	for <kvmarm@archiver.kernel.org>; Thu, 13 May 2021 07:35:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34687613E9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ED25F4B5E1;
-	Thu, 13 May 2021 02:37:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B1694B516;
+	Thu, 13 May 2021 03:35:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id vIF99fV4W7Z8; Thu, 13 May 2021 02:37:44 -0400 (EDT)
+	with ESMTP id ANCn4tWQLK8C; Thu, 13 May 2021 03:35:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BFE1C4B703;
-	Thu, 13 May 2021 02:37:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E7F24B48F;
+	Thu, 13 May 2021 03:35:42 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E5514B5E0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 May 2021 02:37:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 69F654B48F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 May 2021 03:35:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wfGE4yIGyo7P for <kvmarm@lists.cs.columbia.edu>;
- Thu, 13 May 2021 02:37:42 -0400 (EDT)
+ with ESMTP id HGDgf3wZQWvm for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 13 May 2021 03:35:40 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 40D064B7D4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 May 2021 02:37:42 -0400 (EDT)
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9769A4B477
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 May 2021 03:35:40 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1620887861;
+ s=mimecast20190719; t=1620891340;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=o9mkTkonP9uztCISBGQUSTSH31laLWa1RLov7sxsUUU=;
- b=ekRafYStxNB+6BlKTfmYtkHTOhE4Iu58A2K582ODUirySApWn5Dt2IOepHDlfRV1vAWLGR
- GiDUgp0Joxf6wBBMi2nqj/63xk4xfgVakyIfQrFI9UAg3pl04GB4nmoKligRxdiY13b+kN
- d79Yul2i8SiaFmN7Zr28jCupk1jjSVA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-383-VoixZ2QuPGi4mitFYrQpGQ-1; Thu, 13 May 2021 02:37:38 -0400
-X-MC-Unique: VoixZ2QuPGi4mitFYrQpGQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 339B31008545;
- Thu, 13 May 2021 06:37:37 +0000 (UTC)
-Received: from [10.36.112.87] (ovpn-112-87.ams2.redhat.com [10.36.112.87])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8615D6D8C0;
- Thu, 13 May 2021 06:37:35 +0000 (UTC)
-Subject: Re: [PATCH v3 0/5] KVM: selftests: arm64 exception handling and debug
- test
-To: Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu
+ bh=zTEQQXsAJQxZUo5zOYVOBC+x54vGh0Ue0rC0kRz9wp8=;
+ b=GvSFwA75ZZAscu9I2FhpmKHWO7Pfd89FeMGYOBB44QeNYuynOIOfa678ylPJ1iwgJaz7N7
+ PBz+5apFDXmo2fqdpHQw5GMghCUCBkKsSYs55uJoKh1hVWqE7Gn1jCmxv/G0Hh1qKnwvcE
+ tke0lcaujWEFhQcUgn4juyJKl6pmi6E=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-486-H1VdOz66MtuCircf1OnlCg-1; Thu, 13 May 2021 03:35:38 -0400
+X-MC-Unique: H1VdOz66MtuCircf1OnlCg-1
+Received: by mail-ed1-f70.google.com with SMTP id
+ y17-20020a0564023591b02903886c26ada4so14206118edc.5
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 May 2021 00:35:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=zTEQQXsAJQxZUo5zOYVOBC+x54vGh0Ue0rC0kRz9wp8=;
+ b=UHZ6qG9F1+WjTf9sL5OuC8mVUt81CPtc2f4xnjmb0NyB2F8b5y/Xtc/VdcGQnVm+kF
+ UXqhvWMnk4yf/PPPHzKE4RcWHVd4t+Ri5KyDme/dXk/+xSvew/0GquxbSrGbrd/ZaAFW
+ p6EBllzPnihYZy4cVkyDxp+rnWEwLkhaQoDgC+X5CTx+TEreYU8obzl1jfw+AIGwxej2
+ grSimpMGDuQebTS1pEV45+ajBk8iLhc8KFNOWtAKge/C6OFmF/QYUy/qveKlIR3NcV+r
+ XtFsdyoI4xRr5ilXV4+i9IYGolng2kvaJuHTdcoKDL9QmM1aUKTiMImfy9G7QT7n0IFX
+ KpTQ==
+X-Gm-Message-State: AOAM533Fl+/hg705QL1uNMf4emv+ZxgHJA/bEaeuNHbmKklOk2filOgS
+ 6f6J3gSSMDxZs3NVGHJXjCKxbI+3j8CbljdL+mij/G10+w9nBQ8Vghk7lPS1GlJvq0YfC83IoWo
+ tHTHZ57E9CABLTqE9dtE4R3p3
+X-Received: by 2002:a05:6402:1547:: with SMTP id
+ p7mr48873035edx.319.1620891337823; 
+ Thu, 13 May 2021 00:35:37 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy4fQrV1jLbyyYnaAc4rghuBIVhv9b9kqKDT7Ao5odjIT9s+5ushZxRP+CITFR79rGJjFXT+w==
+X-Received: by 2002:a05:6402:1547:: with SMTP id
+ p7mr48873016edx.319.1620891337666; 
+ Thu, 13 May 2021 00:35:37 -0700 (PDT)
+Received: from gator (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
+ by smtp.gmail.com with ESMTPSA id da25sm1869559edb.38.2021.05.13.00.35.37
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 13 May 2021 00:35:37 -0700 (PDT)
+Date: Thu, 13 May 2021 09:35:30 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Ricardo Koller <ricarkol@google.com>
+Subject: Re: [PATCH v3 3/5] KVM: selftests: Move GUEST_ASSERT_EQ to utils
+ header
+Message-ID: <20210513073530.ajehgqt55o4faxul@gator>
 References: <20210513002802.3671838-1-ricarkol@google.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <aeeec52e-5a13-be39-3b9c-cf25a27b97b1@redhat.com>
-Date: Thu, 13 May 2021 08:37:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
+ <20210513002802.3671838-4-ricarkol@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20210513002802.3671838-1-ricarkol@google.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Cc: pbonzini@redhat.com, maz@kernel.org
+In-Reply-To: <20210513002802.3671838-4-ricarkol@google.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Disposition: inline
+Cc: kvm@vger.kernel.org, maz@kernel.org, pbonzini@redhat.com,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,85 +113,19 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Ricardo,
+On Wed, May 12, 2021 at 05:28:00PM -0700, Ricardo Koller wrote:
+> Move GUEST_ASSERT_EQ to a common header, kvm_util.h, for other
+> architectures and tests to use. Also modify __GUEST_ASSERT so it can be
+> reused to implement GUEST_ASSERT_EQ.
+> 
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> ---
+>  .../testing/selftests/kvm/include/kvm_util.h  | 22 ++++++++++---------
+>  .../selftests/kvm/x86_64/tsc_msrs_test.c      |  9 --------
+>  2 files changed, 12 insertions(+), 19 deletions(-)
+>
 
-On 5/13/21 2:27 AM, Ricardo Koller wrote:
-> Hi,
-> 
-> These patches add a debug exception test in aarch64 KVM selftests while
-> also adding basic exception handling support.
-> 
-> The structure of the exception handling is based on its x86 counterpart.
-> Tests use the same calls to initialize exception handling and both
-> architectures allow tests to override the handler for a particular
-> vector, or (vector, ec) for synchronous exceptions in the arm64 case.
-> 
-> The debug test is similar to x86_64/debug_regs, except that the x86 one
-> controls the debugging from outside the VM. This proposed arm64 test
-> controls and handles debug exceptions from the inside.
-> 
-> Thanks,
-> Ricardo
-> 
-> v2 -> v3:
-> 
-> Addressed comments from Andrew and Marc (thanks again). Also, many thanks for
-> the reviews and tests from Eric and Zenghui.
-You are welcome. This version does not fail anymore on Cavium Sabre so
-this looks to fix the previously reported issue.
-
-Thanks
-
-Eric
-> - add missing ISBs after writing into debug registers.
-> - not store/restore of sp_el0 on exceptions.
-> - add default handlers for Error and FIQ.
-> - change multiple TEST_ASSERT(false, ...) to TEST_FAIL.
-> - use Andrew's suggestion regarding __GUEST_ASSERT modifications
->   in order to easier implement GUEST_ASSERT_EQ (Thanks Andrew).
-> 
-> v1 -> v2:
-> 
-> Addressed comments from Andrew and Marc (thank you very much):
-> - rename vm_handle_exception in all tests.
-> - introduce UCALL_UNHANDLED in x86 first.
-> - move GUEST_ASSERT_EQ to common utils header.
-> - handle sync and other exceptions separately: use two tables (like
->   kvm-unit-tests).
-> - add two separate functions for installing sync versus other exceptions
-> - changes in handlers.S: use the same layout as user_pt_regs, treat the
->   EL1t vectors as invalid, refactor the vector table creation to not use
->   manual numbering, add comments, remove LR from the stored registers.
-> - changes in debug-exceptions.c: remove unused headers, use the common
->   GUEST_ASSERT_EQ, use vcpu_run instead of _vcpu_run.
-> - changes in processor.h: write_sysreg with support for xzr, replace EL1
->   with current in macro names, define ESR_EC_MASK as ESR_EC_NUM-1.
-> 
-> Ricardo Koller (5):
->   KVM: selftests: Rename vm_handle_exception
->   KVM: selftests: Introduce UCALL_UNHANDLED for unhandled vector
->     reporting
->   KVM: selftests: Move GUEST_ASSERT_EQ to utils header
->   KVM: selftests: Add exception handling support for aarch64
->   KVM: selftests: Add aarch64/debug-exceptions test
-> 
->  tools/testing/selftests/kvm/.gitignore        |   1 +
->  tools/testing/selftests/kvm/Makefile          |   3 +-
->  .../selftests/kvm/aarch64/debug-exceptions.c  | 250 ++++++++++++++++++
->  .../selftests/kvm/include/aarch64/processor.h |  83 +++++-
->  .../testing/selftests/kvm/include/kvm_util.h  |  23 +-
->  .../selftests/kvm/include/x86_64/processor.h  |   4 +-
->  .../selftests/kvm/lib/aarch64/handlers.S      | 124 +++++++++
->  .../selftests/kvm/lib/aarch64/processor.c     | 131 +++++++++
->  .../selftests/kvm/lib/x86_64/processor.c      |  22 +-
->  .../selftests/kvm/x86_64/kvm_pv_test.c        |   2 +-
->  .../selftests/kvm/x86_64/tsc_msrs_test.c      |   9 -
->  .../kvm/x86_64/userspace_msr_exit_test.c      |   8 +-
->  .../selftests/kvm/x86_64/xapic_ipi_test.c     |   2 +-
->  13 files changed, 615 insertions(+), 47 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/aarch64/debug-exceptions.c
->  create mode 100644 tools/testing/selftests/kvm/lib/aarch64/handlers.S
-> 
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 
 _______________________________________________
 kvmarm mailing list
