@@ -2,79 +2,69 @@ Return-Path: <SRS0=4nKG=KI=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 623F8C433B4
-	for <kvmarm@archiver.kernel.org>; Thu, 13 May 2021 10:55:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0CCCC43460
+	for <kvmarm@archiver.kernel.org>; Thu, 13 May 2021 10:57:48 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C0C8C61446
-	for <kvmarm@archiver.kernel.org>; Thu, 13 May 2021 10:55:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0C8C61446
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 23F3061444
+	for <kvmarm@archiver.kernel.org>; Thu, 13 May 2021 10:57:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23F3061444
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 318EB4B393;
-	Thu, 13 May 2021 06:55:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 90EAB4B8A1;
+	Thu, 13 May 2021 06:57:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 8-AcOEjpZovM; Thu, 13 May 2021 06:55:15 -0400 (EDT)
+	with ESMTP id nlvuqueBR5kq; Thu, 13 May 2021 06:57:46 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AFFB74B863;
-	Thu, 13 May 2021 06:55:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 443184B89B;
+	Thu, 13 May 2021 06:57:46 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 10F8E4B480
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 May 2021 06:55:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E06964B85D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 May 2021 06:57:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rKPNvvs2MAP8 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 13 May 2021 06:55:12 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8F04A4B393
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 May 2021 06:55:12 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id E8EE56144B;
- Thu, 13 May 2021 10:55:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1620903311;
- bh=+pWwtblnPpVpGB/q2c4WYbGx3gEXQhVW/vwXOmX5ACg=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=XW+hQBNXiueUibidwJKNIlhUVK834VZIqdCAgkXR0BLOpwFDtpJVH8Rn8QINyH2an
- ibPiJYAPq177mw0NLMakS0ccT00vy6BehhNy8JngeBM8rZ6eoL17oHM7ZzbScIFOeB
- fGWMUcd0sUgCLwhGEsBrkwxDGWlVPJPXwrBaCZVComqG2Hl2N5Bqt2xHwFP2Ob05to
- ICwWNzR78fpTudi0PSnk40FOr+k12uZKsV/2EbSMrlHWfxuirjo5YThWH6VeYL8A94
- hkT7po03BZfQb/AiKsMHUdosiqwbny0LHIBvRokF28tz1qSv5OIkmYzaJgJPmi0CU/
- EHxj555a9XjHg==
-Date: Thu, 13 May 2021 13:55:02 +0300
-From: Mike Rapoport <rppt@kernel.org>
-To: Kefeng Wang <wangkefeng.wang@huawei.com>
-Subject: Re: arm32: panic in move_freepages (Was [PATCH v2 0/4] arm64: drop
- pfn_valid_within() and simplify pfn_valid())
-Message-ID: <YJ0Fhs5krPJ0FgiV@kernel.org>
-References: <82cfbb7f-dd4f-12d8-dc76-847f06172200@huawei.com>
- <b077916e-d3f7-ec6c-8c80-b5b642ee111f@huawei.com>
- <YJUWywpGwOpM8hzo@kernel.org>
- <33c67e13-dc48-9a2f-46d8-a532e17380fb@huawei.com>
- <YJd6QXcmVl+HM4Ob@kernel.org>
- <b91cd653-842b-0e77-5c00-17a0ac9c4b50@huawei.com>
- <YJpEwF2cGjS5mKma@kernel.org>
- <c3006cd0-fff6-ab45-da83-a216d40388f2@huawei.com>
- <YJuRPVWubjQKyKBj@kernel.org>
- <f0034620-b95b-3ba5-f7a2-c8be33d842c7@huawei.com>
+ with ESMTP id cz5TnRIhScdn for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 13 May 2021 06:57:43 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4BDE74B5DE
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 May 2021 06:57:43 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D1D2F1476;
+ Thu, 13 May 2021 03:57:42 -0700 (PDT)
+Received: from [192.168.1.179] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 487D43F73B;
+ Thu, 13 May 2021 03:57:40 -0700 (PDT)
+Subject: Re: [PATCH v11 2/6] arm64: kvm: Introduce MTE VM feature
+To: Catalin Marinas <catalin.marinas@arm.com>
+References: <20210416154309.22129-1-steven.price@arm.com>
+ <20210416154309.22129-3-steven.price@arm.com> <20210428170705.GB4022@arm.com>
+ <c3293d47-a5f2-ea4a-6730-f5cae26d8a7e@arm.com> <YJGHApOCXl811VK3@arm.com>
+ <329286e8-a8f3-ea1a-1802-58813255a4a5@arm.com>
+ <20210507182538.GF26528@arm.com> <20210510183506.GA10910@arm.com>
+ <c891d4eb-b388-1658-8c8a-e76477062463@arm.com>
+ <20210512174502.GC12391@arm.com>
+From: Steven Price <steven.price@arm.com>
+Message-ID: <7c1cb7c8-6ab4-62bd-fa17-2fb7be6d7f09@arm.com>
+Date: Thu, 13 May 2021 11:57:39 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.1
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <f0034620-b95b-3ba5-f7a2-c8be33d842c7@huawei.com>
-Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org,
- Mike Rapoport <rppt@linux.ibm.com>, linux-mm@kvack.org,
- kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
- Andrew Morton <akpm@linux-foundation.org>, Will Deacon <will@kernel.org>,
- linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20210512174502.GC12391@arm.com>
+Content-Language: en-GB
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
+ Marc Zyngier <maz@kernel.org>, Juan Quintela <quintela@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
+ Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org,
+ Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,255 +81,167 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, May 13, 2021 at 11:44:00AM +0800, Kefeng Wang wrote:
-> On 2021/5/12 16:26, Mike Rapoport wrote:
-> > On Wed, May 12, 2021 at 11:08:14AM +0800, Kefeng Wang wrote:
-> > > 
-> > > On 2021/5/11 16:48, Mike Rapoport wrote:
-> > > > On Mon, May 10, 2021 at 11:10:20AM +0800, Kefeng Wang wrote:
-> > > > > 
-> > > > > > > The memory is not continuous, see MEMBLOCK:
-> > > > > > >     memory size = 0x4c0fffff reserved size = 0x027ef058
-> > > > > > >     memory.cnt  = 0xa
-> > > > > > >     memory[0x0]    [0x80a00000-0x855fffff], 0x04c00000 bytes flags: 0x0
-> > > > > > >     memory[0x1]    [0x86a00000-0x87dfffff], 0x01400000 bytes flags: 0x0
-> > > > > > >     memory[0x2]    [0x8bd00000-0x8c4fffff], 0x00800000 bytes flags: 0x0
-> > > > > > >     memory[0x3]    [0x8e300000-0x8ecfffff], 0x00a00000 bytes flags: 0x0
-> > > > > > >     memory[0x4]    [0x90d00000-0xbfffffff], 0x2f300000 bytes flags: 0x0
-> > > > > > >     memory[0x5]    [0xcc000000-0xdc9fffff], 0x10a00000 bytes flags: 0x0
-> > > > > > >     memory[0x6]    [0xde700000-0xde9fffff], 0x00300000 bytes flags: 0x0
-> > > > > > > ...
-> > > > > > > 
-> > > > > > > The pfn_range [0xde600,0xde700] => addr_range [0xde600000,0xde700000]
-> > > > > > > is not available memory, and we won't create memmap , so with or without
-> > > > > > > your patch, we can't see the range in free_memmap(), right?
-> > > > > > 
-> > > > > > This is not available memory and we won't see the reange in free_memmap(),
-> > > > > > but we still should create memmap for it and that's what my patch tried to
-> > > > > > do.
-> > > > > > 
-> > > > > > There are a lot of places in core mm that operate on pageblocks and
-> > > > > > free_unused_memmap() should make sure that any pageblock has a valid memory
-> > > > > > map.
-> > > > > > 
-> > > > > > Currently, that's not the case when SPARSEMEM=y and my patch tried to fix
-> > > > > > it.
-> > > > > > 
-> > > > > > Can you please send log with my patch applied and with the printing of
-> > > > > > ranges that are freed in free_unused_memmap() you've used in previous
-> > > > > > mails?
-> > > > 
-> > > > > with your patch[1] and debug print in free_memmap,
-> > > > > ----> free_memmap, start_pfn = 85800,  85800000 end_pfn = 86800, 86800000
-> > > > > ----> free_memmap, start_pfn = 8c800,  8c800000 end_pfn = 8e000, 8e000000
-> > > > > ----> free_memmap, start_pfn = 8f000,  8f000000 end_pfn = 90000, 90000000
-> > > > > ----> free_memmap, start_pfn = dcc00,  dcc00000 end_pfn = de400, de400000
-> > > > > ----> free_memmap, start_pfn = dec00,  dec00000 end_pfn = e0000, e0000000
-> > > > > ----> free_memmap, start_pfn = e0c00,  e0c00000 end_pfn = e4000, e4000000
-> > > > > ----> free_memmap, start_pfn = f7000,  f7000000 end_pfn = f8000, f8000000
-> > > > 
-> > > > It seems that freeing of the memory map is suboptimal still because that
-> > > > code was not designed for memory layout that has more holes than Swiss
-> > > > cheese.
-> > > > 
-> > > > Still, the range [0xde600,0xde700] is not freed and there should be struct
-> > > > pages for this range.
-> > > > 
-> > > > Can you add
-> > > > 
-> > > > 	dump_page(pfn_to_page(0xde600), "");
-> > > > 
-> > > > say, in the end of memblock_free_all()?
-> > > > 
-> > > The range [0xde600,0xde700] is not memory, so it won't create struct page
-> > > for it when sparse_init?
-> > 
-> > sparse_init() indeed does not create memory map for unpopulated memory, but
-> > it has pretty coarse granularity, i.e. 64M in your configuration. A hole
-> > should be at least 64M in order to skip allocation of the memory map for
-> > it.
-> > 
-> > For example, your memory layout has a hole of 192M at pfn 0xc0000 and this
-> > hole won't have the memory map.
-> > 
-> > However the hole 0xdca00 - 0xde70 will still have a memory map in the
-> > section  that covers 0xdc000 - 0xe0000.
-> > 
-> > I've tried outline this in a sketch below, hope it helps.
-> > 
-> > Memory:
-> >                            c0000      cc000                      dca00
-> > --------------------------+          +--------------------------+ +----+
-> >   memory bank              |<- hole ->| memory bank              | | mb |
-> > --------------------------+          +--------------------------+ +----+
-> >                                                                  de700  dea00
-> > 
-> > Memory map:
-> > 
-> > b0000    b4000            c0000      cc000   d0000    d8000    dc000
-> > +--------+--------+- ... -+          +--------+- ... -+--------+---------+
-> > | memmap | memmap | ...   |<- hole ->| memmap |  ...  | memmap | memmap  |
-> > +--------+--------+- ... -+          +--------+- ... -+--------+---------+
-> > 
-> > 
-> Thanks for the sketch, it is more clear,
+On 12/05/2021 18:45, Catalin Marinas wrote:
+> On Wed, May 12, 2021 at 04:46:48PM +0100, Steven Price wrote:
+>> On 10/05/2021 19:35, Catalin Marinas wrote:
+>>> On Fri, May 07, 2021 at 07:25:39PM +0100, Catalin Marinas wrote:
+>>>> On Thu, May 06, 2021 at 05:15:25PM +0100, Steven Price wrote:
+>>>>> On 04/05/2021 18:40, Catalin Marinas wrote:
+>>>>>> On Thu, Apr 29, 2021 at 05:06:41PM +0100, Steven Price wrote:
+>>>>>>> Given the changes to set_pte_at() which means that tags are restored from
+>>>>>>> swap even if !PROT_MTE, the only race I can see remaining is the creation of
+>>>>>>> new PROT_MTE mappings. As you mention an attempt to change mappings in the
+>>>>>>> VMM memory space should involve a mmu notifier call which I think serialises
+>>>>>>> this. So the remaining issue is doing this in a separate address space.
+>>>>>>>
+>>>>>>> So I guess the potential problem is:
+>>>>>>>
+>>>>>>>    * allocate memory MAP_SHARED but !PROT_MTE
+>>>>>>>    * fork()
+>>>>>>>    * VM causes a fault in parent address space
+>>>>>>>    * child does a mprotect(PROT_MTE)
+>>>>>>>
+>>>>>>> With the last two potentially racing. Sadly I can't see a good way of
+>>>>>>> handling that.
+> [...]
+>>> Options:
+>>>
+>>> 1. Change the mte_sync_tags() code path to set the flag after clearing
+>>>     and avoid reading stale tags. We document that mprotect() on
+>>>     MAP_SHARED may lead to tag loss. Maybe we can intercept this in the
+>>>     arch code and return an error.
+>>
+>> This is the best option I've come up with so far - but it's not a good
+>> one! We can replace the set_bit() with a test_and_set_bit() to catch the
+>> race after it has occurred - but I'm not sure what we can do about it
+>> then (we've already wiped the data). Returning an error doesn't seem
+>> particularly useful at that point, a message in dmesg is about the best
+>> I can come up with.
 > 
-> > > After apply patch[1], the dump_page log,
-> > > 
-> > > page:ef3cc000 is uninitialized and poisoned
-> > > raw: ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff
-> > > page dumped because:
-> > 
-> > This means that there is a memory map entry, and it got poisoned during the
-> > initialization and never got reinitialized to sensible values, which would
-> > be PageReserved() in this case.
-> > 
-> > I believe this was fixed by commit 0740a50b9baa ("mm/page_alloc.c: refactor
-> > initialization of struct page for holes in memory layout") in the mainline
-> > tree.
-> > 
-> > Can you backport it to your 5.10 tree and check if it helps?
-> Hi Mike, the 0740a50b9baa is already in 5.10, tags/v5.10.24~5
+> What I meant about intercepting is on something like
+> arch_validate_flags() to prevent VM_SHARED and VM_MTE together but only
+> for mprotect(), not mmap(). However, arch_validate_flags() is currently
+> called on both mmap() and mprotect() paths.
 
-Ah, you are using stable 5.10.y.
- 
-> commit 4c84191cbc3eff49568d3c5cccb628fa382cf7fb
-> Author: Mike Rapoport <rppt@kernel.org>
-> Date:   Fri Mar 12 21:07:12 2021 -0800
-> 
->     mm/page_alloc.c: refactor initialization of struct page for holes in
-> memory layout
-> 
->     commit 0740a50b9baa4472cfb12442df4b39e2712a64a4 upstream.
-> 
-> but check init_unavailable_range(), we need deal with the hole in the
-> range of one pageblock.
-> 
-> For our scene, pageblock range: 0xde600,0xde7ff, but the available pfn begin
-> with 0xde700.
-> 
-> If pfn(eg, 0xde600) is not valid, the step in init_unavailable_range is
-> pageblock_nr_pages, and ALIGN_DOWN(pfn, pageblock_nr_pages) from 0xde600
-> to 0xde700 is same, so the page range for pfn [0xde600,0xde700] won't be
-> initialized.
+I think even if we were to restrict mprotect() there would be corner
+cases around swapping in. For example if a page mapped VM_SHARED|VM_MTE
+is faulted simultaneously in both processes then we have the same situation:
 
-The pfn 0xde600 is valid in the sense that there is a memory map for that
-pfn. Yet, with ARM's custom pfn_valid() will treat it as invalid because
-there is a hole.
- 
-> After add the following patch, the oom test could passed,
- 
-> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-> index aaa1655cf682..0c7e04f86f9f 100644
-> --- a/mm/page_alloc.c
-> +++ b/mm/page_alloc.c
-> @@ -6484,13 +6484,14 @@ static u64 __meminit init_unavailable_range(unsigned
-> long spfn,
->                                             unsigned long epfn,
->                                             int zone, int node)
->  {
-> -       unsigned long pfn;
-> +       unsigned long pfn, pfn_down;
-> +       unsigned long epfn_down = ALIGN_DOWN(epfn, pageblock_nr_pages);
->         u64 pgcnt = 0;
+ * with test_and_set_bit() one process could potentially see the tags
+before they have been restored - i.e. a data leak.
+
+ * with separated test and set then one process could write to the tags
+before the second restore has completed causing a lost update.
+
+Obviously completely banning VM_SHARED|VM_MTE might work, but I don't
+think that's a good idea.
+
+> We can't do much in set_pte_at() to prevent the race with only a single
+> bit.
 > 
->         for (pfn = spfn; pfn < epfn; pfn++) {
-> -               if (!pfn_valid(ALIGN_DOWN(pfn, pageblock_nr_pages))) {
-> -                       pfn = ALIGN_DOWN(pfn, pageblock_nr_pages)
-> -                               + pageblock_nr_pages - 1;
-> +               pfn_down = ALIGN_DOWN(pfn, pageblock_nr_pages);
-> +               if (!pfn_valid(pfn_down) && pfn_down != epfn_down) {
-> +                       pfn = pfn_down + pageblock_nr_pages - 1;
->                         continue;
->                 }
->                 __init_single_page(pfn_to_page(pfn), pfn, zone, node);
-
-I'd rather prefer to keep init_unavailable_range() and the assumption that
-the memory map always covers an entire pageblock.
-
-Can you please try the below hack. Essentially, it makes arm with SPARSEMEM
-to use the generic pfn_valid() and updates the freeing of the memory map to
-have the entire pageblocks covered.
-
-If this works I'll send formal patches for those changes.
-
-
-diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
-index 24804f11302d..86ee711a3fdb 100644
---- a/arch/arm/Kconfig
-+++ b/arch/arm/Kconfig
-@@ -73,7 +73,7 @@ config ARM
- 	select HAVE_ARCH_KGDB if !CPU_ENDIAN_BE32 && MMU
- 	select HAVE_ARCH_KASAN if MMU && !XIP_KERNEL
- 	select HAVE_ARCH_MMAP_RND_BITS if MMU
--	select HAVE_ARCH_PFN_VALID
-+#	select HAVE_ARCH_PFN_VALID
- 	select HAVE_ARCH_SECCOMP
- 	select HAVE_ARCH_SECCOMP_FILTER if AEABI && !OABI_COMPAT
- 	select HAVE_ARCH_THREAD_STRUCT_WHITELIST
-diff --git a/mm/memblock.c b/mm/memblock.c
-index 504435753259..0d7bef1b49c3 100644
---- a/mm/memblock.c
-+++ b/mm/memblock.c
-@@ -1928,9 +1928,11 @@ static void __init free_unused_memmap(void)
- 	unsigned long start, end, prev_end = 0;
- 	int i;
- 
-+#ifndef CONFIG_ARM
- 	if (!IS_ENABLED(CONFIG_HAVE_ARCH_PFN_VALID) ||
- 	    IS_ENABLED(CONFIG_SPARSEMEM_VMEMMAP))
- 		return;
-+#endif
- 
- 	/*
- 	 * This relies on each bank being in address order.
-@@ -1943,14 +1945,13 @@ static void __init free_unused_memmap(void)
- 		 * due to SPARSEMEM sections which aren't present.
- 		 */
- 		start = min(start, ALIGN(prev_end, PAGES_PER_SECTION));
--#else
-+#endif
- 		/*
- 		 * Align down here since the VM subsystem insists that the
- 		 * memmap entries are valid from the bank start aligned to
- 		 * MAX_ORDER_NR_PAGES.
- 		 */
- 		start = round_down(start, MAX_ORDER_NR_PAGES);
--#endif
- 
- 		/*
- 		 * If we had a previous bank, and there is a space
- 
-
-> Before:
-> On node 0 totalpages: 311551
->   Normal zone: 1230 pages used for memmap
->   Normal zone: 0 pages reserved
->   Normal zone: 157440 pages, LIFO batch:31
->   Normal zone: 16384 pages in unavailable ranges
->   HighMem zone: 154111 pages, LIFO batch:31
->   HighMem zone: 1 pages in unavailable ranges
+>>> 2. Figure out some other locking in the core code. However, if
+>>>     mprotect() in one process can race with a handle_pte_fault() in
+>>>     another, on the same shared mapping, it's not trivial.
+>>>     filemap_map_pages() would take the page lock before calling
+>>>     do_set_pte(), so mprotect() would need the same page lock.
+>>
+>> I can't see how this is going to work without harming the performance of
+>> non-MTE work. Ultimately we're trying to add some sort of locking for
+>> two (mostly) unrelated processes doing page table operations, which will
+>> hurt scalability.
 > 
-> page:ef3cc000 is uninitialized and poisoned
-> raw: ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff
+> Another option is to have an arch callback to force re-faulting on the
+> pte. That means we don't populate it back after the invalidation in the
+> change_protection() path. We could do this only if the new pte is tagged
+> and the page doesn't have PG_mte_tagged. The faulting path takes the
+> page lock IIUC.
+
+As above - I don't think this race is just on the change_protection() path.
+
+> Well, at least for stage 1, I haven't thought much about stage 2.
 > 
-> After:
-> On node 0 totalpages: 311551
->   Normal zone: 1230 pages used for memmap
->   Normal zone: 0 pages reserved
->   Normal zone: 157440 pages, LIFO batch:31
->   Normal zone: 17152 pages in unavailable ranges
->   HighMem zone: 154111 pages, LIFO batch:31
->   HighMem zone: 513 pages in unavailable ranges
-> ...
-> page:(ptrval) refcount:1 mapcount:0 mapping:00000000 index:0x0 pfn:0xde600
-> flags: 0xdd001000(reserved)
-> raw: dd001000 ef3cc004 ef3cc004 00000000 00000000 00000000 ffffffff 00000001
+>>> 3. Use another PG_arch_3 bit as a lock to spin on in the arch code (i.e.
+>>>     set it around the other PG_arch_* bit setting).
+>>
+>> This is certainly tempting, although sadly the existing
+>> wait_on_page_bit() is sleeping - so this would either be a literal spin,
+>> or we'd need to implement a new non-sleeping wait mechanism.
+> 
+> Yeah, it would have to be a custom spinning mechanism, something like:
+> 
+> 	/* lock the page */
+> 	while (test_and_set_bit(PG_arch_3, &page->flags))
+> 		smp_cond_load_relaxed(&page->flags, !(VAL & PG_arch_3));
+> 	...
+> 	/* unlock the page */
+> 	clear_bit(PG_arch_3, &page->flags);
+
+Presumably we'd also need to ensure interrupts are disabled to ensure
+we're not pre-empted in the middle and potentially deadlock. It's
+doable, but I'd prefer not to invent a new lock type if possible.
+
+>> 4. Sledgehammer locking in mte_sync_page_tags(), add a spinlock only for
+>> the MTE case where we have to sync tags (see below). What the actual
+>> performance impact of this is I've no idea. It could certainly be bad
+>> if there are a lot of pages with MTE enabled, which sadly is exactly
+>> the case if KVM is used with MTE :(
+>>
+>> --->8----
+>> diff --git a/arch/arm64/kernel/mte.c b/arch/arm64/kernel/mte.c
+>> index 0d320c060ebe..389ad40256f6 100644
+>> --- a/arch/arm64/kernel/mte.c
+>> +++ b/arch/arm64/kernel/mte.c
+>> @@ -25,23 +25,33 @@
+>>  u64 gcr_kernel_excl __ro_after_init;
+>>  static bool report_fault_once = true;
+>> +static spinlock_t tag_sync_lock;
+>>  static void mte_sync_page_tags(struct page *page, pte_t *ptep, bool check_swap,
+>>  			       bool pte_is_tagged)
+>>  {
+>>  	pte_t old_pte = READ_ONCE(*ptep);
+>> +	if (!is_swap_pte(old_pte) && !pte_is_tagged)
+>> +		return;
+>> +
+>> +	spin_lock_irqsave(&tag_sync_lock, flags);
+>> +
+>> +	/* Recheck with the lock held */
+>> +	if (test_bit(PG_mte_tagged, &page->flags))
+>> +		goto out;
+> 
+> Can we skip the lock if the page already has the PG_mte_tagged set?
+> That's assuming that we set the flag only after clearing the tags. The
+> normal case where mprotect() is called on a page already mapped with
+> PROT_MTE would not be affected.
 > 
 
--- 
-Sincerely yours,
-Mike.
+It was missing from the diff context (sorry, should have double checked
+that), but I was keeping the check in mte_sync_tags():
+
+  void mte_sync_tags(pte_t *ptep, pte_t pte)
+  {
+	struct page *page = pte_page(pte);
+	long i, nr_pages = compound_nr(page);
+	bool check_swap = nr_pages == 1;
+	bool pte_is_tagged = pte_tagged(pte);
+	unsigned long flags;
+
+	/* Early out if there's nothing to do */
+	if (!check_swap && !pte_is_tagged)
+		return;
+
+	/* if PG_mte_tagged is set, tags have already been initialised */
+	for (i = 0; i < nr_pages; i++, page++) {
+		if (!test_bit(PG_mte_tagged, &page->flags))
+			mte_sync_page_tags(page, ptep, check_swap,
+					   pte_is_tagged);
+	}
+  }
+
+So the hit is only taken if !PG_mte_tagged - hence the "recheck" comment
+in mte_sync_page_tags() once the lock is held. I guess if I'm going this
+route it would make sense to refactor this to be a bit clearer.
+
+Steve
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
