@@ -2,73 +2,88 @@ Return-Path: <SRS0=n2ZT=KJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2370C433ED
-	for <kvmarm@archiver.kernel.org>; Fri, 14 May 2021 14:21:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8ECC1C433B4
+	for <kvmarm@archiver.kernel.org>; Fri, 14 May 2021 17:53:14 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3CD0C61221
-	for <kvmarm@archiver.kernel.org>; Fri, 14 May 2021 14:21:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CD0C61221
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id F3D8E61408
+	for <kvmarm@archiver.kernel.org>; Fri, 14 May 2021 17:53:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3D8E61408
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9EF404B88C;
-	Fri, 14 May 2021 10:21:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 716F04B9B9;
+	Fri, 14 May 2021 13:53:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id AB9S7ETr-wan; Fri, 14 May 2021 10:21:36 -0400 (EDT)
+	with ESMTP id 2uqStqrBTfEt; Fri, 14 May 2021 13:53:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5BDFB4B96F;
-	Fri, 14 May 2021 10:21:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DF4334B9BA;
+	Fri, 14 May 2021 13:53:11 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B1814B88C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 14 May 2021 10:21:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 28AC84B9B8
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 May 2021 13:53:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id coLp4exMGKgf for <kvmarm@lists.cs.columbia.edu>;
- Fri, 14 May 2021 10:21:34 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 103D04B887
- for <kvmarm@lists.cs.columbia.edu>; Fri, 14 May 2021 10:21:34 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 54B4A60FEE;
- Fri, 14 May 2021 14:21:32 +0000 (UTC)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
- TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1lhYh0-001PKV-8j; Fri, 14 May 2021 15:21:30 +0100
+ with ESMTP id mx7XxZbMvM0y for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 14 May 2021 13:53:08 -0400 (EDT)
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com
+ [209.85.210.176])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 99A0C4B9B6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 May 2021 13:53:08 -0400 (EDT)
+Received: by mail-pf1-f176.google.com with SMTP id k19so275000pfu.5
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 May 2021 10:53:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=41yO8Va57ioWWsjHATF1Of9kOAfW6M275O9j1jXypcY=;
+ b=LnAh7ahOdwDtv4sCfsgcSDdQm2mof4guWSD1Trdy806n1lKVCG++dfWP5x/mPCGBTC
+ AkrEFHI7FQ1b64lcida2nsMeU7UKYRnZ1KfC+U4uucrt0xEe3FRDIWcSjAcR8Zn8oRii
+ /Xf/7VYB98KPJzFC3h4D3Q9wqcX9mOZoqhgJRZQOTxgKCiaaLhQBM6bjWkm/sP14xLmw
+ BPbUzjIrcWFmDGVGbLYmpozQssexvn1EvjUWRJXxHys9HOfFoKvanceaWqu6VrWFKMvE
+ EF1FcxV7227J4xcLataEonm7Y3iAglhncqG0kbAw0Bb2q0kmq4Qtzf9c3uwfsU6Y6AJ8
+ vFkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=41yO8Va57ioWWsjHATF1Of9kOAfW6M275O9j1jXypcY=;
+ b=LwoD589YEk9FRCnjdvwQO6LSi8TvyYQgxuuCMIVpGxHvoqQUSYWbuzae6ULBaivvpk
+ WfasYiOcqUsKruPXHT52Ajpj74MQSNgIgDN4PhMr6k7vpfNnh8R3gPXx0nVDlnNxgJXk
+ E3qcLogsq17Jmdliz75SqjCjdrD+e+BEDhYSe8eGm4z92isGA9H8Dq2MxZoB4kJuMcWS
+ PoRMCcdA4UZXFIhvLsso2b8Ga0hWYAyiCFkuKQvmoCki4oJYMkxS5q7TKdqhcrYekUmh
+ /iVvyysPc25okRppdCCQ7EeqxL7AXq9CSHCr6xuKYQdmKHOVVBkxii+l+a6bGYHcsRAn
+ pSyQ==
+X-Gm-Message-State: AOAM533i4zdhvC/hrZV1ulCQH2kvayL1h0bcXjBvCbjSqZWUjernzZme
+ 2/orAI25y2OP0g7T/XqGMkEbnA==
+X-Google-Smtp-Source: ABdhPJw2STCFTK/SD7nGvzKA6e7dz/NC+FMWdiWQmVbDQsjLxytc0OqwdNOFHniSPGQdx5CWpeEhww==
+X-Received: by 2002:aa7:955b:0:b029:28e:a874:d0c2 with SMTP id
+ w27-20020aa7955b0000b029028ea874d0c2mr46297999pfq.66.1621014787428; 
+ Fri, 14 May 2021 10:53:07 -0700 (PDT)
+Received: from google.com (150.12.83.34.bc.googleusercontent.com.
+ [34.83.12.150])
+ by smtp.gmail.com with ESMTPSA id d3sm4673557pfn.141.2021.05.14.10.53.06
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 14 May 2021 10:53:06 -0700 (PDT)
+Date: Fri, 14 May 2021 10:53:03 -0700
+From: Ricardo Koller <ricarkol@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH] KVM: arm64: Add missing index for trapping debug registers
+Message-ID: <YJ64/5AQz0ISl0oX@google.com>
+References: <20210514014906.392401-1-ricarkol@google.com>
+ <87bl9dohgu.wl-maz@kernel.org>
 MIME-Version: 1.0
-Date: Fri, 14 May 2021 15:21:30 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH v2 2/2] KVM: arm64: Commit pending PC adjustemnts before
- returning to userspace
-In-Reply-To: <c28efbe5-a269-fbf4-2a7e-b905386457bd@arm.com>
-References: <20210514104042.1929168-1-maz@kernel.org>
- <20210514104042.1929168-3-maz@kernel.org>
- <c28efbe5-a269-fbf4-2a7e-b905386457bd@arm.com>
-User-Agent: Roundcube Webmail/1.4.11
-Message-ID: <17ecd812940d854534fe9c24e6bbd655@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- yuzenghui@huawei.com, tabba@google.com, james.morse@arm.com,
- suzuki.poulose@arm.com, kernel-team@android.com, stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, stable@vger.kernel.org, kernel-team@android.com,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <87bl9dohgu.wl-maz@kernel.org>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -80,164 +95,301 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2021-05-14 15:08, Alexandru Elisei wrote:
-> Hi Marc,
+On Fri, May 14, 2021 at 09:19:29AM +0100, Marc Zyngier wrote:
+> Hi Ricardo,
 > 
-> On 5/14/21 11:40 AM, Marc Zyngier wrote:
->> KVM currently updates PC (and the corresponding exception state)
->> using a two phase approach: first by setting a set of flags,
->> then by converting these flags into a state update when the vcpu
->> is about to enter the guest.
->> 
->> However, this creates a disconnect with userspace if the vcpu thread
->> returns there with any exception/PC flag set. In this case, the 
->> exposed
->> context is wrong, as userpsace doesn't have access to these flags
+> On Fri, 14 May 2021 02:49:06 +0100,
+> Ricardo Koller <ricarkol@google.com> wrote:
+> > 
+> > Trapping an access to debug register <n> (like bvr<n>, bcr<n>, wvr<n>,
+> > wcr<n>) results in storing and loading values from the vcpu copy at
+> > index 0 (irrespective of <n>). So, this guest test fails:
+> > 
+> >   /* traps and wrongly stores 0x123 into vcpu->bvr[0] */
+> >   write_sysreg(dbgbvr1_el1, 0x123);
+> >   /* reads 0 from the real bvr[1] without trapping */
+> >   GUEST_ASSERT(read_sysreg(dbgbvr1_el1) == 0x123); /* check fails */
 > 
-> Nitpick: s/userpsace/userspace
-
-Ah, forgot that one.
-
+> Bummer... But nice catch! I broke it in 03fdfb2690099 ("KVM: arm64:
+> Don't write junk to sysregs on reset").
 > 
->> (they aren't architectural). It also means that these flags are
->> preserved across a reset, which isn't expected.
->> 
->> To solve this problem, force an explicit synchronisation of the
->> exception state on vcpu exit to userspace. As an optimisation
->> for nVHE systems, only perform this when there is something pending.
->> 
->> Reported-by: Zenghui Yu <yuzenghui@huawei.com>
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> Cc: stable@vger.kernel.org # 5.11
->> ---
->>  arch/arm64/include/asm/kvm_asm.h   |  1 +
->>  arch/arm64/kvm/arm.c               | 10 ++++++++++
->>  arch/arm64/kvm/hyp/exception.c     |  4 ++--
->>  arch/arm64/kvm/hyp/nvhe/hyp-main.c |  8 ++++++++
->>  4 files changed, 21 insertions(+), 2 deletions(-)
->> 
->> diff --git a/arch/arm64/include/asm/kvm_asm.h 
->> b/arch/arm64/include/asm/kvm_asm.h
->> index d5b11037401d..5e9b33cbac51 100644
->> --- a/arch/arm64/include/asm/kvm_asm.h
->> +++ b/arch/arm64/include/asm/kvm_asm.h
->> @@ -63,6 +63,7 @@
->>  #define __KVM_HOST_SMCCC_FUNC___pkvm_cpu_set_vector		18
->>  #define __KVM_HOST_SMCCC_FUNC___pkvm_prot_finalize		19
->>  #define __KVM_HOST_SMCCC_FUNC___pkvm_mark_hyp			20
->> +#define __KVM_HOST_SMCCC_FUNC___kvm_adjust_pc			21
->> 
->>  #ifndef __ASSEMBLY__
->> 
->> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index 1cb39c0803a4..c4fe2b71f429 100644
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
->> @@ -897,6 +897,16 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu 
->> *vcpu)
->> 
->>  	kvm_sigset_deactivate(vcpu);
->> 
->> +	/*
->> +	 * In the unlikely event that we are returning to userspace
->> +	 * with pending exceptions or PC adjustment, commit these
->> +	 * adjustments in order to give userspace a consistent view of
->> +	 * the vcpu state.
-
-I didn't managed to commit this:
-
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index c4fe2b71f429..1126eae27400 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -901,7 +901,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
-          * In the unlikely event that we are returning to userspace
-          * with pending exceptions or PC adjustment, commit these
-          * adjustments in order to give userspace a consistent view of
--        * the vcpu state.
-+        * the vcpu state. Note that this relies on __kvm_adjust_pc()
-+        * being preempt-safe on VHE.
-          */
-         if (unlikely(vcpu->arch.flags & (KVM_ARM64_PENDING_EXCEPTION |
-                                          KVM_ARM64_INCREMENT_PC)))
-
-I promise I'll fold that in!
-
->> +	 */
->> +	if (unlikely(vcpu->arch.flags & (KVM_ARM64_PENDING_EXCEPTION |
->> +					 KVM_ARM64_INCREMENT_PC)))
->> +		kvm_call_hyp(__kvm_adjust_pc, vcpu);
->> +
->>  	vcpu_put(vcpu);
->>  	return ret;
->>  }
->> diff --git a/arch/arm64/kvm/hyp/exception.c 
->> b/arch/arm64/kvm/hyp/exception.c
->> index 0812a496725f..11541b94b328 100644
->> --- a/arch/arm64/kvm/hyp/exception.c
->> +++ b/arch/arm64/kvm/hyp/exception.c
->> @@ -331,8 +331,8 @@ static void kvm_inject_exception(struct kvm_vcpu 
->> *vcpu)
->>  }
->> 
->>  /*
->> - * Adjust the guest PC on entry, depending on flags provided by EL1
->> - * for the purpose of emulation (MMIO, sysreg) or exception 
->> injection.
->> + * Adjust the guest PC (and potentially exception state) depending on
->> + * flags provided by the emulation code.
->>   */
->>  void __kvm_adjust_pc(struct kvm_vcpu *vcpu)
->>  {
->> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c 
->> b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
->> index f36420a80474..1632f001f4ed 100644
->> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
->> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
->> @@ -28,6 +28,13 @@ static void handle___kvm_vcpu_run(struct 
->> kvm_cpu_context *host_ctxt)
->>  	cpu_reg(host_ctxt, 1) =  __kvm_vcpu_run(kern_hyp_va(vcpu));
->>  }
->> 
->> +static void handle___kvm_adjust_pc(struct kvm_cpu_context *host_ctxt)
->> +{
->> +	DECLARE_REG(struct kvm_vcpu *, vcpu, host_ctxt, 1);
->> +
->> +	__kvm_adjust_pc(kern_hyp_va(vcpu));
->> +}
->> +
->>  static void handle___kvm_flush_vm_context(struct kvm_cpu_context 
->> *host_ctxt)
->>  {
->>  	__kvm_flush_vm_context();
->> @@ -170,6 +177,7 @@ typedef void (*hcall_t)(struct kvm_cpu_context *);
->> 
->>  static const hcall_t host_hcall[] = {
->>  	HANDLE_FUNC(__kvm_vcpu_run),
->> +	HANDLE_FUNC(__kvm_adjust_pc),
->>  	HANDLE_FUNC(__kvm_flush_vm_context),
->>  	HANDLE_FUNC(__kvm_tlb_flush_vmid_ipa),
->>  	HANDLE_FUNC(__kvm_tlb_flush_vmid),
+> > Fix this by setting the register index in macro DBG_BCR_BVR_WCR_WVR_EL1
+> > to <n>.
+> >
+> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> > ---
+> >  arch/arm64/kvm/sys_regs.c | 8 ++++----
+> >  1 file changed, 4 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index 76ea2800c33e..e4ec9edd49fa 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -935,13 +935,13 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+> >  /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
+> >  #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
+> >  	{ SYS_DESC(SYS_DBGBVRn_EL1(n)),					\
+> > -	  trap_bvr, reset_bvr, 0, 0, get_bvr, set_bvr },		\
+> > +	  trap_bvr, reset_bvr, n, 0, get_bvr, set_bvr },		\
+> >  	{ SYS_DESC(SYS_DBGBCRn_EL1(n)),					\
+> > -	  trap_bcr, reset_bcr, 0, 0, get_bcr, set_bcr },		\
+> > +	  trap_bcr, reset_bcr, n, 0, get_bcr, set_bcr },		\
+> >  	{ SYS_DESC(SYS_DBGWVRn_EL1(n)),					\
+> > -	  trap_wvr, reset_wvr, 0, 0,  get_wvr, set_wvr },		\
+> > +	  trap_wvr, reset_wvr, n, 0,  get_wvr, set_wvr },		\
+> >  	{ SYS_DESC(SYS_DBGWCRn_EL1(n)),					\
+> > -	  trap_wcr, reset_wcr, 0, 0,  get_wcr, set_wcr }
+> > +	  trap_wcr, reset_wcr, n, 0,  get_wcr, set_wcr }
+> >  
+> >  #define PMU_SYS_REG(r)						\
+> >  	SYS_DESC(r), .reset = reset_unknown, .visibility = pmu_visibility
 > 
-> I'm guessing that the comment mentioned in the cover letter should be 
-> in this
-> patch, right? Or is the changelog from the cover letter stale?
+> Unfortunately, I don't think that's the right fix either, and just
+> setting it to the debug register index will do the wrong thing in
+> reset_sys_reg_descs().
 > 
-> Regardless, I trust your judgement regarding the comment and the patch
-> looks correct:
+
+I see, got it.
+
+> The reason is that the debug registers don't live in the per-vcpu
+> sysreg array, but instead in some private structure, owing to the fact
+> that we support both guest and host-side debugging. The value '0' here
+> is in indication that the shadow registers are "somewhere else".
 > 
-> Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> I think the correct fix is to use the register encoding itself, which
+> contains everything we need (for all the debug regs, the CRm field is
+> the debug register index). That's what it should have been the first
+> place.
+> 
+> Could you please give the following patch a go?
+> 
+
+I just tried it and it fixes the test described in the commit message:
+wr(bvr1),rd(bvr1).
 
 Thanks,
+Ricardo
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+> Thanks,
+> 
+> 	M.
+> 
+> From cfca75f1e2ab5dd1933de59b90f31293821fd2de Mon Sep 17 00:00:00 2001
+> From: Marc Zyngier <maz@kernel.org>
+> Date: Fri, 14 May 2021 09:05:41 +0100
+> Subject: [PATCH] KVM: arm64: Fix debug register indexing
+> 
+> Commit 03fdfb2690099 ("KVM: arm64: Don't write junk to sysregs on
+> reset") flipped the register number to 0 for all the debug registers
+> in the sysreg table, hereby indicating that these registers live
+> in a separate shadow structure.
+> 
+> However, the author of this patch failed to realise that all the
+> accessors are using that particular index instead of the register
+> encoding, resulting in all the registers hitting index 0. Not quite
+> a valid implementation of the architecture...
+> 
+> Address the issue by fixing all the accessors to use the CRm field
+> of the encoding, which contains the debug register index.
+> 
+> Fixes: 03fdfb2690099 ("KVM: arm64: Don't write junk to sysregs on reset")
+> Reported-by: Ricardo Koller <ricarkol@google.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Cc: stable@vger.kernel.org
+> ---
+>  arch/arm64/kvm/sys_regs.c | 42 +++++++++++++++++++--------------------
+>  1 file changed, 21 insertions(+), 21 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 76ea2800c33e..1a7968ad078c 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -399,14 +399,14 @@ static bool trap_bvr(struct kvm_vcpu *vcpu,
+>  		     struct sys_reg_params *p,
+>  		     const struct sys_reg_desc *rd)
+>  {
+> -	u64 *dbg_reg = &vcpu->arch.vcpu_debug_state.dbg_bvr[rd->reg];
+> +	u64 *dbg_reg = &vcpu->arch.vcpu_debug_state.dbg_bvr[rd->CRm];
+>  
+>  	if (p->is_write)
+>  		reg_to_dbg(vcpu, p, rd, dbg_reg);
+>  	else
+>  		dbg_to_reg(vcpu, p, rd, dbg_reg);
+>  
+> -	trace_trap_reg(__func__, rd->reg, p->is_write, *dbg_reg);
+> +	trace_trap_reg(__func__, rd->CRm, p->is_write, *dbg_reg);
+>  
+>  	return true;
+>  }
+> @@ -414,7 +414,7 @@ static bool trap_bvr(struct kvm_vcpu *vcpu,
+>  static int set_bvr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+>  		const struct kvm_one_reg *reg, void __user *uaddr)
+>  {
+> -	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_bvr[rd->reg];
+> +	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_bvr[rd->CRm];
+>  
+>  	if (copy_from_user(r, uaddr, KVM_REG_SIZE(reg->id)) != 0)
+>  		return -EFAULT;
+> @@ -424,7 +424,7 @@ static int set_bvr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+>  static int get_bvr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+>  	const struct kvm_one_reg *reg, void __user *uaddr)
+>  {
+> -	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_bvr[rd->reg];
+> +	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_bvr[rd->CRm];
+>  
+>  	if (copy_to_user(uaddr, r, KVM_REG_SIZE(reg->id)) != 0)
+>  		return -EFAULT;
+> @@ -434,21 +434,21 @@ static int get_bvr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+>  static void reset_bvr(struct kvm_vcpu *vcpu,
+>  		      const struct sys_reg_desc *rd)
+>  {
+> -	vcpu->arch.vcpu_debug_state.dbg_bvr[rd->reg] = rd->val;
+> +	vcpu->arch.vcpu_debug_state.dbg_bvr[rd->CRm] = rd->val;
+>  }
+>  
+>  static bool trap_bcr(struct kvm_vcpu *vcpu,
+>  		     struct sys_reg_params *p,
+>  		     const struct sys_reg_desc *rd)
+>  {
+> -	u64 *dbg_reg = &vcpu->arch.vcpu_debug_state.dbg_bcr[rd->reg];
+> +	u64 *dbg_reg = &vcpu->arch.vcpu_debug_state.dbg_bcr[rd->CRm];
+>  
+>  	if (p->is_write)
+>  		reg_to_dbg(vcpu, p, rd, dbg_reg);
+>  	else
+>  		dbg_to_reg(vcpu, p, rd, dbg_reg);
+>  
+> -	trace_trap_reg(__func__, rd->reg, p->is_write, *dbg_reg);
+> +	trace_trap_reg(__func__, rd->CRm, p->is_write, *dbg_reg);
+>  
+>  	return true;
+>  }
+> @@ -456,7 +456,7 @@ static bool trap_bcr(struct kvm_vcpu *vcpu,
+>  static int set_bcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+>  		const struct kvm_one_reg *reg, void __user *uaddr)
+>  {
+> -	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_bcr[rd->reg];
+> +	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_bcr[rd->CRm];
+>  
+>  	if (copy_from_user(r, uaddr, KVM_REG_SIZE(reg->id)) != 0)
+>  		return -EFAULT;
+> @@ -467,7 +467,7 @@ static int set_bcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+>  static int get_bcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+>  	const struct kvm_one_reg *reg, void __user *uaddr)
+>  {
+> -	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_bcr[rd->reg];
+> +	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_bcr[rd->CRm];
+>  
+>  	if (copy_to_user(uaddr, r, KVM_REG_SIZE(reg->id)) != 0)
+>  		return -EFAULT;
+> @@ -477,22 +477,22 @@ static int get_bcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+>  static void reset_bcr(struct kvm_vcpu *vcpu,
+>  		      const struct sys_reg_desc *rd)
+>  {
+> -	vcpu->arch.vcpu_debug_state.dbg_bcr[rd->reg] = rd->val;
+> +	vcpu->arch.vcpu_debug_state.dbg_bcr[rd->CRm] = rd->val;
+>  }
+>  
+>  static bool trap_wvr(struct kvm_vcpu *vcpu,
+>  		     struct sys_reg_params *p,
+>  		     const struct sys_reg_desc *rd)
+>  {
+> -	u64 *dbg_reg = &vcpu->arch.vcpu_debug_state.dbg_wvr[rd->reg];
+> +	u64 *dbg_reg = &vcpu->arch.vcpu_debug_state.dbg_wvr[rd->CRm];
+>  
+>  	if (p->is_write)
+>  		reg_to_dbg(vcpu, p, rd, dbg_reg);
+>  	else
+>  		dbg_to_reg(vcpu, p, rd, dbg_reg);
+>  
+> -	trace_trap_reg(__func__, rd->reg, p->is_write,
+> -		vcpu->arch.vcpu_debug_state.dbg_wvr[rd->reg]);
+> +	trace_trap_reg(__func__, rd->CRm, p->is_write,
+> +		vcpu->arch.vcpu_debug_state.dbg_wvr[rd->CRm]);
+>  
+>  	return true;
+>  }
+> @@ -500,7 +500,7 @@ static bool trap_wvr(struct kvm_vcpu *vcpu,
+>  static int set_wvr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+>  		const struct kvm_one_reg *reg, void __user *uaddr)
+>  {
+> -	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_wvr[rd->reg];
+> +	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_wvr[rd->CRm];
+>  
+>  	if (copy_from_user(r, uaddr, KVM_REG_SIZE(reg->id)) != 0)
+>  		return -EFAULT;
+> @@ -510,7 +510,7 @@ static int set_wvr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+>  static int get_wvr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+>  	const struct kvm_one_reg *reg, void __user *uaddr)
+>  {
+> -	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_wvr[rd->reg];
+> +	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_wvr[rd->CRm];
+>  
+>  	if (copy_to_user(uaddr, r, KVM_REG_SIZE(reg->id)) != 0)
+>  		return -EFAULT;
+> @@ -520,21 +520,21 @@ static int get_wvr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+>  static void reset_wvr(struct kvm_vcpu *vcpu,
+>  		      const struct sys_reg_desc *rd)
+>  {
+> -	vcpu->arch.vcpu_debug_state.dbg_wvr[rd->reg] = rd->val;
+> +	vcpu->arch.vcpu_debug_state.dbg_wvr[rd->CRm] = rd->val;
+>  }
+>  
+>  static bool trap_wcr(struct kvm_vcpu *vcpu,
+>  		     struct sys_reg_params *p,
+>  		     const struct sys_reg_desc *rd)
+>  {
+> -	u64 *dbg_reg = &vcpu->arch.vcpu_debug_state.dbg_wcr[rd->reg];
+> +	u64 *dbg_reg = &vcpu->arch.vcpu_debug_state.dbg_wcr[rd->CRm];
+>  
+>  	if (p->is_write)
+>  		reg_to_dbg(vcpu, p, rd, dbg_reg);
+>  	else
+>  		dbg_to_reg(vcpu, p, rd, dbg_reg);
+>  
+> -	trace_trap_reg(__func__, rd->reg, p->is_write, *dbg_reg);
+> +	trace_trap_reg(__func__, rd->CRm, p->is_write, *dbg_reg);
+>  
+>  	return true;
+>  }
+> @@ -542,7 +542,7 @@ static bool trap_wcr(struct kvm_vcpu *vcpu,
+>  static int set_wcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+>  		const struct kvm_one_reg *reg, void __user *uaddr)
+>  {
+> -	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_wcr[rd->reg];
+> +	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_wcr[rd->CRm];
+>  
+>  	if (copy_from_user(r, uaddr, KVM_REG_SIZE(reg->id)) != 0)
+>  		return -EFAULT;
+> @@ -552,7 +552,7 @@ static int set_wcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+>  static int get_wcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+>  	const struct kvm_one_reg *reg, void __user *uaddr)
+>  {
+> -	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_wcr[rd->reg];
+> +	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_wcr[rd->CRm];
+>  
+>  	if (copy_to_user(uaddr, r, KVM_REG_SIZE(reg->id)) != 0)
+>  		return -EFAULT;
+> @@ -562,7 +562,7 @@ static int get_wcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+>  static void reset_wcr(struct kvm_vcpu *vcpu,
+>  		      const struct sys_reg_desc *rd)
+>  {
+> -	vcpu->arch.vcpu_debug_state.dbg_wcr[rd->reg] = rd->val;
+> +	vcpu->arch.vcpu_debug_state.dbg_wcr[rd->CRm] = rd->val;
+>  }
+>  
+>  static void reset_amair_el1(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+> -- 
+> 2.30.2
+> 
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
