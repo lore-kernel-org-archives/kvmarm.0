@@ -2,75 +2,70 @@ Return-Path: <SRS0=n2ZT=KJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A507C433ED
-	for <kvmarm@archiver.kernel.org>; Fri, 14 May 2021 03:09:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AD99C433ED
+	for <kvmarm@archiver.kernel.org>; Fri, 14 May 2021 08:19:43 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B37B961443
-	for <kvmarm@archiver.kernel.org>; Fri, 14 May 2021 03:09:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B37B961443
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id B4AFB61457
+	for <kvmarm@archiver.kernel.org>; Fri, 14 May 2021 08:19:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4AFB61457
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 05CDA4B919;
-	Thu, 13 May 2021 23:09:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 374CC4B93D;
+	Fri, 14 May 2021 04:19:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id eILM2WwdPUAj; Thu, 13 May 2021 23:09:56 -0400 (EDT)
+	with ESMTP id hcEMQZX1jvpg; Fri, 14 May 2021 04:19:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D2BFD4B926;
-	Thu, 13 May 2021 23:09:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E0B764B952;
+	Fri, 14 May 2021 04:19:39 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B8F04B919
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 May 2021 23:09:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F1ACE4B93D
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 May 2021 04:19:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XrYV4S7lrhIC for <kvmarm@lists.cs.columbia.edu>;
- Thu, 13 May 2021 23:09:53 -0400 (EDT)
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0A42C4B915
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 May 2021 23:09:53 -0400 (EDT)
-Received: from dggems705-chm.china.huawei.com (unknown [172.30.72.60])
- by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4FhD2z1kWvz1BMP2;
- Fri, 14 May 2021 11:07:07 +0800 (CST)
-Received: from dggema765-chm.china.huawei.com (10.1.198.207) by
- dggems705-chm.china.huawei.com (10.3.19.182) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2176.2; Fri, 14 May 2021 11:09:48 +0800
-Received: from [10.174.185.210] (10.174.185.210) by
- dggema765-chm.china.huawei.com (10.1.198.207) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2176.2; Fri, 14 May 2021 11:09:47 +0800
-Subject: Re: [PATCH v15 07/12] iommu/smmuv3: Implement cache_invalidate
-To: Eric Auger <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
- <iommu@lists.linux-foundation.org>, <linux-kernel@vger.kernel.org>,
- <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>, <will@kernel.org>,
- <maz@kernel.org>, <robin.murphy@arm.com>, <joro@8bytes.org>,
- <alex.williamson@redhat.com>, <tn@semihalf.com>, <zhukeqian1@huawei.com>
-References: <20210411111228.14386-1-eric.auger@redhat.com>
- <20210411111228.14386-8-eric.auger@redhat.com>
-From: Kunkun Jiang <jiangkunkun@huawei.com>
-Message-ID: <e6483bc3-192b-9b68-b3e1-641b1bed4bf6@huawei.com>
-Date: Fri, 14 May 2021 11:09:47 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
-MIME-Version: 1.0
-In-Reply-To: <20210411111228.14386-8-eric.auger@redhat.com>
-Content-Language: en-US
-X-Originating-IP: [10.174.185.210]
-X-ClientProxiedBy: dggeme706-chm.china.huawei.com (10.1.199.102) To
- dggema765-chm.china.huawei.com (10.1.198.207)
-X-CFilter-Loop: Reflected
-Cc: jean-philippe@linaro.org, jacob.jun.pan@linux.intel.com,
- wangxingang5@huawei.com, lushenming@huawei.com, chenxiang66@hisilicon.com,
- nicoleotsuka@gmail.com, vivek.gautam@arm.com, vdumpa@nvidia.com,
- yi.l.liu@intel.com, vsethi@nvidia.com, zhangfei.gao@linaro.org
+ with ESMTP id kzalJ5Jmv9R3 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 14 May 2021 04:19:35 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5389A4B942
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 May 2021 04:19:35 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 876236145A;
+ Fri, 14 May 2021 08:19:32 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1lhT2g-001LVK-EE; Fri, 14 May 2021 09:19:30 +0100
+Date: Fri, 14 May 2021 09:19:29 +0100
+Message-ID: <87bl9dohgu.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ricardo Koller <ricarkol@google.com>
+Subject: Re: [PATCH] KVM: arm64: Add missing index for trapping debug registers
+In-Reply-To: <20210514014906.392401-1-ricarkol@google.com>
+References: <20210514014906.392401-1-ricarkol@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: ricarkol@google.com, kvmarm@lists.cs.columbia.edu,
+ james.morse@arm.com, alexandru.elisei@arm.com, drjones@redhat.com,
+ suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -82,172 +77,290 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+Hi Ricardo,
 
+On Fri, 14 May 2021 02:49:06 +0100,
+Ricardo Koller <ricarkol@google.com> wrote:
+> 
+> Trapping an access to debug register <n> (like bvr<n>, bcr<n>, wvr<n>,
+> wcr<n>) results in storing and loading values from the vcpu copy at
+> index 0 (irrespective of <n>). So, this guest test fails:
+> 
+>   /* traps and wrongly stores 0x123 into vcpu->bvr[0] */
+>   write_sysreg(dbgbvr1_el1, 0x123);
+>   /* reads 0 from the real bvr[1] without trapping */
+>   GUEST_ASSERT(read_sysreg(dbgbvr1_el1) == 0x123); /* check fails */
 
-On 2021/4/11 19:12, Eric Auger wrote:
-> Implement domain-selective, pasid selective and page-selective
-> IOTLB invalidations.
+Bummer... But nice catch! I broke it in 03fdfb2690099 ("KVM: arm64:
+Don't write junk to sysregs on reset").
+
+> Fix this by setting the register index in macro DBG_BCR_BVR_WCR_WVR_EL1
+> to <n>.
 >
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
 > ---
-> v4 -> v15:
-> - remove the redundant arm_smmu_cmdq_issue_sync(smmu)
->    in IOMMU_INV_GRANU_ADDR case (Zenghui)
-> - if RIL is not supported by the host, make sure the granule_size
->    that is passed by the userspace is supported or fix it
->    (Chenxiang)
->
-> v13 -> v14:
-> - Add domain invalidation
-> - do global inval when asid is not provided with addr
->    granularity
->
-> v7 -> v8:
-> - ASID based invalidation using iommu_inv_pasid_info
-> - check ARCHID/PASID flags in addr based invalidation
-> - use __arm_smmu_tlb_inv_context and __arm_smmu_tlb_inv_range_nosync
->
-> v6 -> v7
-> - check the uapi version
->
-> v3 -> v4:
-> - adapt to changes in the uapi
-> - add support for leaf parameter
-> - do not use arm_smmu_tlb_inv_range_nosync or arm_smmu_tlb_inv_context
->    anymore
->
-> v2 -> v3:
-> - replace __arm_smmu_tlb_sync by arm_smmu_cmdq_issue_sync
->
-> v1 -> v2:
-> - properly pass the asid
-> ---
->   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 89 +++++++++++++++++++++
->   1 file changed, 89 insertions(+)
->
-> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> index 56a301fbe75a..bfc112cc0d38 100644
-> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> @@ -2961,6 +2961,94 @@ static void arm_smmu_detach_pasid_table(struct iommu_domain *domain)
->   	mutex_unlock(&smmu_domain->init_mutex);
->   }
->   
-> +static int
-> +arm_smmu_cache_invalidate(struct iommu_domain *domain, struct device *dev,
-> +			  struct iommu_cache_invalidate_info *inv_info)
-> +{
-> +	struct arm_smmu_cmdq_ent cmd = {.opcode = CMDQ_OP_TLBI_NSNH_ALL};
-> +	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
-> +	struct arm_smmu_device *smmu = smmu_domain->smmu;
-> +
-> +	if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
-> +		return -EINVAL;
-> +
-> +	if (!smmu)
-> +		return -EINVAL;
-> +
-> +	if (inv_info->version != IOMMU_CACHE_INVALIDATE_INFO_VERSION_1)
-> +		return -EINVAL;
-> +
-> +	if (inv_info->cache & IOMMU_CACHE_INV_TYPE_PASID ||
-> +	    inv_info->cache & IOMMU_CACHE_INV_TYPE_DEV_IOTLB) {
-> +		return -ENOENT;
-> +	}
-> +
-> +	if (!(inv_info->cache & IOMMU_CACHE_INV_TYPE_IOTLB))
-> +		return -EINVAL;
-> +
-> +	/* IOTLB invalidation */
-> +
-> +	switch (inv_info->granularity) {
-> +	case IOMMU_INV_GRANU_PASID:
-> +	{
-> +		struct iommu_inv_pasid_info *info =
-> +			&inv_info->granu.pasid_info;
-> +
-> +		if (info->flags & IOMMU_INV_ADDR_FLAGS_PASID)
-> +			return -ENOENT;
-> +		if (!(info->flags & IOMMU_INV_PASID_FLAGS_ARCHID))
-> +			return -EINVAL;
-> +
-> +		__arm_smmu_tlb_inv_context(smmu_domain, info->archid);
-> +		return 0;
-> +	}
-> +	case IOMMU_INV_GRANU_ADDR:
-> +	{
-> +		struct iommu_inv_addr_info *info = &inv_info->granu.addr_info;
-> +		size_t granule_size  = info->granule_size;
-> +		size_t size = info->nb_granules * info->granule_size;
-> +		bool leaf = info->flags & IOMMU_INV_ADDR_FLAGS_LEAF;
-> +		int tg;
-> +
-> +		if (info->flags & IOMMU_INV_ADDR_FLAGS_PASID)
-> +			return -ENOENT;
-> +
-> +		if (!(info->flags & IOMMU_INV_ADDR_FLAGS_ARCHID))
-> +			break;
-> +
-> +		tg = __ffs(granule_size);
-> +		if (granule_size & ~(1 << tg))
-> +			return -EINVAL;
-This check looks like to confirm the granule_size is a power of 2.
-Does the granule_size have to be a power of 2?
-I think it should also be handled correctly, even if the granule_size is 
-not a power of 2.
-> +		/*
-> +		 * When RIL is not supported, make sure the granule size that is
-> +		 * passed is supported. In RIL mode, this is enforced in
-> +		 * __arm_smmu_tlb_inv_range()
-> +		 */
-> +		if (!(smmu->features & ARM_SMMU_FEAT_RANGE_INV) &&
-> +		    !(granule_size & smmu_domain->domain.pgsize_bitmap)) {
-> +			tg = __ffs(smmu_domain->domain.pgsize_bitmap);
-> +			granule_size = 1 << tg;
-> +			size = size >> tg;
-Why does size need to be shifted tg bits to the right?
+>  arch/arm64/kvm/sys_regs.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 76ea2800c33e..e4ec9edd49fa 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -935,13 +935,13 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>  /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
+>  #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
+>  	{ SYS_DESC(SYS_DBGBVRn_EL1(n)),					\
+> -	  trap_bvr, reset_bvr, 0, 0, get_bvr, set_bvr },		\
+> +	  trap_bvr, reset_bvr, n, 0, get_bvr, set_bvr },		\
+>  	{ SYS_DESC(SYS_DBGBCRn_EL1(n)),					\
+> -	  trap_bcr, reset_bcr, 0, 0, get_bcr, set_bcr },		\
+> +	  trap_bcr, reset_bcr, n, 0, get_bcr, set_bcr },		\
+>  	{ SYS_DESC(SYS_DBGWVRn_EL1(n)),					\
+> -	  trap_wvr, reset_wvr, 0, 0,  get_wvr, set_wvr },		\
+> +	  trap_wvr, reset_wvr, n, 0,  get_wvr, set_wvr },		\
+>  	{ SYS_DESC(SYS_DBGWCRn_EL1(n)),					\
+> -	  trap_wcr, reset_wcr, 0, 0,  get_wcr, set_wcr }
+> +	  trap_wcr, reset_wcr, n, 0,  get_wcr, set_wcr }
+>  
+>  #define PMU_SYS_REG(r)						\
+>  	SYS_DESC(r), .reset = reset_unknown, .visibility = pmu_visibility
+
+Unfortunately, I don't think that's the right fix either, and just
+setting it to the debug register index will do the wrong thing in
+reset_sys_reg_descs().
+
+The reason is that the debug registers don't live in the per-vcpu
+sysreg array, but instead in some private structure, owing to the fact
+that we support both guest and host-side debugging. The value '0' here
+is in indication that the shadow registers are "somewhere else".
+
+I think the correct fix is to use the register encoding itself, which
+contains everything we need (for all the debug regs, the CRm field is
+the debug register index). That's what it should have been the first
+place.
+
+Could you please give the following patch a go?
 
 Thanks,
-Kunkun Jiang
-> +		}
-> +
-> +		arm_smmu_tlb_inv_range_domain(info->addr, size,
-> +					      granule_size, leaf,
-> +					      info->archid, smmu_domain);
-> +		return 0;
-> +	}
-> +	case IOMMU_INV_GRANU_DOMAIN:
-> +		break;
-> +	default:
-> +		return -EINVAL;
-> +	}
-> +
-> +	/* Global S1 invalidation */
-> +	cmd.tlbi.vmid   = smmu_domain->s2_cfg.vmid;
-> +	arm_smmu_cmdq_issue_cmd(smmu, &cmd);
-> +	arm_smmu_cmdq_issue_sync(smmu);
-> +	return 0;
-> +}
-> +
->   static bool arm_smmu_dev_has_feature(struct device *dev,
->   				     enum iommu_dev_features feat)
->   {
-> @@ -3060,6 +3148,7 @@ static struct iommu_ops arm_smmu_ops = {
->   	.put_resv_regions	= generic_iommu_put_resv_regions,
->   	.attach_pasid_table	= arm_smmu_attach_pasid_table,
->   	.detach_pasid_table	= arm_smmu_detach_pasid_table,
-> +	.cache_invalidate	= arm_smmu_cache_invalidate,
->   	.dev_has_feat		= arm_smmu_dev_has_feature,
->   	.dev_feat_enabled	= arm_smmu_dev_feature_enabled,
->   	.dev_enable_feat	= arm_smmu_dev_enable_feature,
+
+	M.
+
+From cfca75f1e2ab5dd1933de59b90f31293821fd2de Mon Sep 17 00:00:00 2001
+From: Marc Zyngier <maz@kernel.org>
+Date: Fri, 14 May 2021 09:05:41 +0100
+Subject: [PATCH] KVM: arm64: Fix debug register indexing
+
+Commit 03fdfb2690099 ("KVM: arm64: Don't write junk to sysregs on
+reset") flipped the register number to 0 for all the debug registers
+in the sysreg table, hereby indicating that these registers live
+in a separate shadow structure.
+
+However, the author of this patch failed to realise that all the
+accessors are using that particular index instead of the register
+encoding, resulting in all the registers hitting index 0. Not quite
+a valid implementation of the architecture...
+
+Address the issue by fixing all the accessors to use the CRm field
+of the encoding, which contains the debug register index.
+
+Fixes: 03fdfb2690099 ("KVM: arm64: Don't write junk to sysregs on reset")
+Reported-by: Ricardo Koller <ricarkol@google.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Cc: stable@vger.kernel.org
+---
+ arch/arm64/kvm/sys_regs.c | 42 +++++++++++++++++++--------------------
+ 1 file changed, 21 insertions(+), 21 deletions(-)
+
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 76ea2800c33e..1a7968ad078c 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -399,14 +399,14 @@ static bool trap_bvr(struct kvm_vcpu *vcpu,
+ 		     struct sys_reg_params *p,
+ 		     const struct sys_reg_desc *rd)
+ {
+-	u64 *dbg_reg = &vcpu->arch.vcpu_debug_state.dbg_bvr[rd->reg];
++	u64 *dbg_reg = &vcpu->arch.vcpu_debug_state.dbg_bvr[rd->CRm];
+ 
+ 	if (p->is_write)
+ 		reg_to_dbg(vcpu, p, rd, dbg_reg);
+ 	else
+ 		dbg_to_reg(vcpu, p, rd, dbg_reg);
+ 
+-	trace_trap_reg(__func__, rd->reg, p->is_write, *dbg_reg);
++	trace_trap_reg(__func__, rd->CRm, p->is_write, *dbg_reg);
+ 
+ 	return true;
+ }
+@@ -414,7 +414,7 @@ static bool trap_bvr(struct kvm_vcpu *vcpu,
+ static int set_bvr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ 		const struct kvm_one_reg *reg, void __user *uaddr)
+ {
+-	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_bvr[rd->reg];
++	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_bvr[rd->CRm];
+ 
+ 	if (copy_from_user(r, uaddr, KVM_REG_SIZE(reg->id)) != 0)
+ 		return -EFAULT;
+@@ -424,7 +424,7 @@ static int set_bvr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ static int get_bvr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ 	const struct kvm_one_reg *reg, void __user *uaddr)
+ {
+-	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_bvr[rd->reg];
++	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_bvr[rd->CRm];
+ 
+ 	if (copy_to_user(uaddr, r, KVM_REG_SIZE(reg->id)) != 0)
+ 		return -EFAULT;
+@@ -434,21 +434,21 @@ static int get_bvr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ static void reset_bvr(struct kvm_vcpu *vcpu,
+ 		      const struct sys_reg_desc *rd)
+ {
+-	vcpu->arch.vcpu_debug_state.dbg_bvr[rd->reg] = rd->val;
++	vcpu->arch.vcpu_debug_state.dbg_bvr[rd->CRm] = rd->val;
+ }
+ 
+ static bool trap_bcr(struct kvm_vcpu *vcpu,
+ 		     struct sys_reg_params *p,
+ 		     const struct sys_reg_desc *rd)
+ {
+-	u64 *dbg_reg = &vcpu->arch.vcpu_debug_state.dbg_bcr[rd->reg];
++	u64 *dbg_reg = &vcpu->arch.vcpu_debug_state.dbg_bcr[rd->CRm];
+ 
+ 	if (p->is_write)
+ 		reg_to_dbg(vcpu, p, rd, dbg_reg);
+ 	else
+ 		dbg_to_reg(vcpu, p, rd, dbg_reg);
+ 
+-	trace_trap_reg(__func__, rd->reg, p->is_write, *dbg_reg);
++	trace_trap_reg(__func__, rd->CRm, p->is_write, *dbg_reg);
+ 
+ 	return true;
+ }
+@@ -456,7 +456,7 @@ static bool trap_bcr(struct kvm_vcpu *vcpu,
+ static int set_bcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ 		const struct kvm_one_reg *reg, void __user *uaddr)
+ {
+-	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_bcr[rd->reg];
++	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_bcr[rd->CRm];
+ 
+ 	if (copy_from_user(r, uaddr, KVM_REG_SIZE(reg->id)) != 0)
+ 		return -EFAULT;
+@@ -467,7 +467,7 @@ static int set_bcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ static int get_bcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ 	const struct kvm_one_reg *reg, void __user *uaddr)
+ {
+-	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_bcr[rd->reg];
++	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_bcr[rd->CRm];
+ 
+ 	if (copy_to_user(uaddr, r, KVM_REG_SIZE(reg->id)) != 0)
+ 		return -EFAULT;
+@@ -477,22 +477,22 @@ static int get_bcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ static void reset_bcr(struct kvm_vcpu *vcpu,
+ 		      const struct sys_reg_desc *rd)
+ {
+-	vcpu->arch.vcpu_debug_state.dbg_bcr[rd->reg] = rd->val;
++	vcpu->arch.vcpu_debug_state.dbg_bcr[rd->CRm] = rd->val;
+ }
+ 
+ static bool trap_wvr(struct kvm_vcpu *vcpu,
+ 		     struct sys_reg_params *p,
+ 		     const struct sys_reg_desc *rd)
+ {
+-	u64 *dbg_reg = &vcpu->arch.vcpu_debug_state.dbg_wvr[rd->reg];
++	u64 *dbg_reg = &vcpu->arch.vcpu_debug_state.dbg_wvr[rd->CRm];
+ 
+ 	if (p->is_write)
+ 		reg_to_dbg(vcpu, p, rd, dbg_reg);
+ 	else
+ 		dbg_to_reg(vcpu, p, rd, dbg_reg);
+ 
+-	trace_trap_reg(__func__, rd->reg, p->is_write,
+-		vcpu->arch.vcpu_debug_state.dbg_wvr[rd->reg]);
++	trace_trap_reg(__func__, rd->CRm, p->is_write,
++		vcpu->arch.vcpu_debug_state.dbg_wvr[rd->CRm]);
+ 
+ 	return true;
+ }
+@@ -500,7 +500,7 @@ static bool trap_wvr(struct kvm_vcpu *vcpu,
+ static int set_wvr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ 		const struct kvm_one_reg *reg, void __user *uaddr)
+ {
+-	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_wvr[rd->reg];
++	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_wvr[rd->CRm];
+ 
+ 	if (copy_from_user(r, uaddr, KVM_REG_SIZE(reg->id)) != 0)
+ 		return -EFAULT;
+@@ -510,7 +510,7 @@ static int set_wvr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ static int get_wvr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ 	const struct kvm_one_reg *reg, void __user *uaddr)
+ {
+-	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_wvr[rd->reg];
++	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_wvr[rd->CRm];
+ 
+ 	if (copy_to_user(uaddr, r, KVM_REG_SIZE(reg->id)) != 0)
+ 		return -EFAULT;
+@@ -520,21 +520,21 @@ static int get_wvr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ static void reset_wvr(struct kvm_vcpu *vcpu,
+ 		      const struct sys_reg_desc *rd)
+ {
+-	vcpu->arch.vcpu_debug_state.dbg_wvr[rd->reg] = rd->val;
++	vcpu->arch.vcpu_debug_state.dbg_wvr[rd->CRm] = rd->val;
+ }
+ 
+ static bool trap_wcr(struct kvm_vcpu *vcpu,
+ 		     struct sys_reg_params *p,
+ 		     const struct sys_reg_desc *rd)
+ {
+-	u64 *dbg_reg = &vcpu->arch.vcpu_debug_state.dbg_wcr[rd->reg];
++	u64 *dbg_reg = &vcpu->arch.vcpu_debug_state.dbg_wcr[rd->CRm];
+ 
+ 	if (p->is_write)
+ 		reg_to_dbg(vcpu, p, rd, dbg_reg);
+ 	else
+ 		dbg_to_reg(vcpu, p, rd, dbg_reg);
+ 
+-	trace_trap_reg(__func__, rd->reg, p->is_write, *dbg_reg);
++	trace_trap_reg(__func__, rd->CRm, p->is_write, *dbg_reg);
+ 
+ 	return true;
+ }
+@@ -542,7 +542,7 @@ static bool trap_wcr(struct kvm_vcpu *vcpu,
+ static int set_wcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ 		const struct kvm_one_reg *reg, void __user *uaddr)
+ {
+-	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_wcr[rd->reg];
++	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_wcr[rd->CRm];
+ 
+ 	if (copy_from_user(r, uaddr, KVM_REG_SIZE(reg->id)) != 0)
+ 		return -EFAULT;
+@@ -552,7 +552,7 @@ static int set_wcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ static int get_wcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ 	const struct kvm_one_reg *reg, void __user *uaddr)
+ {
+-	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_wcr[rd->reg];
++	__u64 *r = &vcpu->arch.vcpu_debug_state.dbg_wcr[rd->CRm];
+ 
+ 	if (copy_to_user(uaddr, r, KVM_REG_SIZE(reg->id)) != 0)
+ 		return -EFAULT;
+@@ -562,7 +562,7 @@ static int get_wcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ static void reset_wcr(struct kvm_vcpu *vcpu,
+ 		      const struct sys_reg_desc *rd)
+ {
+-	vcpu->arch.vcpu_debug_state.dbg_wcr[rd->reg] = rd->val;
++	vcpu->arch.vcpu_debug_state.dbg_wcr[rd->CRm] = rd->val;
+ }
+ 
+ static void reset_amair_el1(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+-- 
+2.30.2
 
 
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
