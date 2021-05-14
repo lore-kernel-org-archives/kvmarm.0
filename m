@@ -6,53 +6,52 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5342AC43461
-	for <kvmarm@archiver.kernel.org>; Fri, 14 May 2021 10:40:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54327C43462
+	for <kvmarm@archiver.kernel.org>; Fri, 14 May 2021 10:40:56 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D3FDE6145B
-	for <kvmarm@archiver.kernel.org>; Fri, 14 May 2021 10:40:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3FDE6145B
+	by mail.kernel.org (Postfix) with ESMTP id EB81B61457
+	for <kvmarm@archiver.kernel.org>; Fri, 14 May 2021 10:40:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB81B61457
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A0484B4E4;
-	Fri, 14 May 2021 06:40:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9EBB04B5E1;
+	Fri, 14 May 2021 06:40:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6aNOcFYmKOEt; Fri, 14 May 2021 06:40:53 -0400 (EDT)
+	with ESMTP id YfWQOtnAmx9J; Fri, 14 May 2021 06:40:52 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 14E3B4B970;
-	Fri, 14 May 2021 06:40:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id ED4A84B6F9;
+	Fri, 14 May 2021 06:40:50 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 990344B468
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B2D44B4E4
  for <kvmarm@lists.cs.columbia.edu>; Fri, 14 May 2021 06:40:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8kB5DNUbosQa for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id TyedFIxiOIce for <kvmarm@lists.cs.columbia.edu>;
  Fri, 14 May 2021 06:40:49 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7F1EC4B4C7
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 431574B468
  for <kvmarm@lists.cs.columbia.edu>; Fri, 14 May 2021 06:40:49 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id CF5366145A;
+ by mail.kernel.org (Postfix) with ESMTPSA id 520F261458;
  Fri, 14 May 2021 10:40:48 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1lhVFP-001N6Q-4e; Fri, 14 May 2021 11:40:47 +0100
+ id 1lhVFO-001N6Q-MS; Fri, 14 May 2021 11:40:46 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v2 2/2] KVM: arm64: Commit pending PC adjustemnts before
- returning to userspace
-Date: Fri, 14 May 2021 11:40:42 +0100
-Message-Id: <20210514104042.1929168-3-maz@kernel.org>
+Subject: [PATCH v2 1/2] KVM: arm64: Move __adjust_pc out of line
+Date: Fri, 14 May 2021 11:40:41 +0100
+Message-Id: <20210514104042.1929168-2-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210514104042.1929168-1-maz@kernel.org>
 References: <20210514104042.1929168-1-maz@kernel.org>
@@ -82,105 +81,146 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-KVM currently updates PC (and the corresponding exception state)
-using a two phase approach: first by setting a set of flags,
-then by converting these flags into a state update when the vcpu
-is about to enter the guest.
+In order to make it easy to call __adjust_pc() from the EL1 code
+(in the case of nVHE), rename it to __kvm_adjust_pc() and move
+it out of line.
 
-However, this creates a disconnect with userspace if the vcpu thread
-returns there with any exception/PC flag set. In this case, the exposed
-context is wrong, as userpsace doesn't have access to these flags
-(they aren't architectural). It also means that these flags are
-preserved across a reset, which isn't expected.
+No expected functional change.
 
-To solve this problem, force an explicit synchronisation of the
-exception state on vcpu exit to userspace. As an optimisation
-for nVHE systems, only perform this when there is something pending.
-
-Reported-by: Zenghui Yu <yuzenghui@huawei.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 Cc: stable@vger.kernel.org # 5.11
 ---
- arch/arm64/include/asm/kvm_asm.h   |  1 +
- arch/arm64/kvm/arm.c               | 10 ++++++++++
- arch/arm64/kvm/hyp/exception.c     |  4 ++--
- arch/arm64/kvm/hyp/nvhe/hyp-main.c |  8 ++++++++
- 4 files changed, 21 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/kvm_asm.h           |  2 ++
+ arch/arm64/kvm/hyp/exception.c             | 18 +++++++++++++++++-
+ arch/arm64/kvm/hyp/include/hyp/adjust_pc.h | 18 ------------------
+ arch/arm64/kvm/hyp/nvhe/switch.c           |  3 +--
+ arch/arm64/kvm/hyp/vhe/switch.c            |  3 +--
+ 5 files changed, 21 insertions(+), 23 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index d5b11037401d..5e9b33cbac51 100644
+index cf8df032b9c3..d5b11037401d 100644
 --- a/arch/arm64/include/asm/kvm_asm.h
 +++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -63,6 +63,7 @@
- #define __KVM_HOST_SMCCC_FUNC___pkvm_cpu_set_vector		18
- #define __KVM_HOST_SMCCC_FUNC___pkvm_prot_finalize		19
- #define __KVM_HOST_SMCCC_FUNC___pkvm_mark_hyp			20
-+#define __KVM_HOST_SMCCC_FUNC___kvm_adjust_pc			21
+@@ -201,6 +201,8 @@ extern void __kvm_timer_set_cntvoff(u64 cntvoff);
  
- #ifndef __ASSEMBLY__
+ extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
  
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 1cb39c0803a4..c4fe2b71f429 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -897,6 +897,16 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 
- 	kvm_sigset_deactivate(vcpu);
- 
-+	/*
-+	 * In the unlikely event that we are returning to userspace
-+	 * with pending exceptions or PC adjustment, commit these
-+	 * adjustments in order to give userspace a consistent view of
-+	 * the vcpu state.
-+	 */
-+	if (unlikely(vcpu->arch.flags & (KVM_ARM64_PENDING_EXCEPTION |
-+					 KVM_ARM64_INCREMENT_PC)))
-+		kvm_call_hyp(__kvm_adjust_pc, vcpu);
++extern void __kvm_adjust_pc(struct kvm_vcpu *vcpu);
 +
- 	vcpu_put(vcpu);
- 	return ret;
- }
+ extern u64 __vgic_v3_get_gic_config(void);
+ extern u64 __vgic_v3_read_vmcr(void);
+ extern void __vgic_v3_write_vmcr(u32 vmcr);
 diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
-index 0812a496725f..11541b94b328 100644
+index 73629094f903..0812a496725f 100644
 --- a/arch/arm64/kvm/hyp/exception.c
 +++ b/arch/arm64/kvm/hyp/exception.c
-@@ -331,8 +331,8 @@ static void kvm_inject_exception(struct kvm_vcpu *vcpu)
+@@ -296,7 +296,7 @@ static void enter_exception32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
+ 	*vcpu_pc(vcpu) = vect_offset;
  }
  
- /*
+-void kvm_inject_exception(struct kvm_vcpu *vcpu)
++static void kvm_inject_exception(struct kvm_vcpu *vcpu)
+ {
+ 	if (vcpu_el1_is_32bit(vcpu)) {
+ 		switch (vcpu->arch.flags & KVM_ARM64_EXCEPT_MASK) {
+@@ -329,3 +329,19 @@ void kvm_inject_exception(struct kvm_vcpu *vcpu)
+ 		}
+ 	}
+ }
++
++/*
++ * Adjust the guest PC on entry, depending on flags provided by EL1
++ * for the purpose of emulation (MMIO, sysreg) or exception injection.
++ */
++void __kvm_adjust_pc(struct kvm_vcpu *vcpu)
++{
++	if (vcpu->arch.flags & KVM_ARM64_PENDING_EXCEPTION) {
++		kvm_inject_exception(vcpu);
++		vcpu->arch.flags &= ~(KVM_ARM64_PENDING_EXCEPTION |
++				      KVM_ARM64_EXCEPT_MASK);
++	} else 	if (vcpu->arch.flags & KVM_ARM64_INCREMENT_PC) {
++		kvm_skip_instr(vcpu);
++		vcpu->arch.flags &= ~KVM_ARM64_INCREMENT_PC;
++	}
++}
+diff --git a/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h b/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
+index 61716359035d..4fdfeabefeb4 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
++++ b/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
+@@ -13,8 +13,6 @@
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_host.h>
+ 
+-void kvm_inject_exception(struct kvm_vcpu *vcpu);
+-
+ static inline void kvm_skip_instr(struct kvm_vcpu *vcpu)
+ {
+ 	if (vcpu_mode_is_32bit(vcpu)) {
+@@ -43,22 +41,6 @@ static inline void __kvm_skip_instr(struct kvm_vcpu *vcpu)
+ 	write_sysreg_el2(*vcpu_pc(vcpu), SYS_ELR);
+ }
+ 
+-/*
 - * Adjust the guest PC on entry, depending on flags provided by EL1
 - * for the purpose of emulation (MMIO, sysreg) or exception injection.
-+ * Adjust the guest PC (and potentially exception state) depending on
-+ * flags provided by the emulation code.
+- */
+-static inline void __adjust_pc(struct kvm_vcpu *vcpu)
+-{
+-	if (vcpu->arch.flags & KVM_ARM64_PENDING_EXCEPTION) {
+-		kvm_inject_exception(vcpu);
+-		vcpu->arch.flags &= ~(KVM_ARM64_PENDING_EXCEPTION |
+-				      KVM_ARM64_EXCEPT_MASK);
+-	} else 	if (vcpu->arch.flags & KVM_ARM64_INCREMENT_PC) {
+-		kvm_skip_instr(vcpu);
+-		vcpu->arch.flags &= ~KVM_ARM64_INCREMENT_PC;
+-	}
+-}
+-
+ /*
+  * Skip an instruction while host sysregs are live.
+  * Assumes host is always 64-bit.
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index e9f6ea704d07..f7af9688c1f7 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -4,7 +4,6 @@
+  * Author: Marc Zyngier <marc.zyngier@arm.com>
   */
- void __kvm_adjust_pc(struct kvm_vcpu *vcpu)
- {
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index f36420a80474..1632f001f4ed 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -28,6 +28,13 @@ static void handle___kvm_vcpu_run(struct kvm_cpu_context *host_ctxt)
- 	cpu_reg(host_ctxt, 1) =  __kvm_vcpu_run(kern_hyp_va(vcpu));
- }
  
-+static void handle___kvm_adjust_pc(struct kvm_cpu_context *host_ctxt)
-+{
-+	DECLARE_REG(struct kvm_vcpu *, vcpu, host_ctxt, 1);
-+
-+	__kvm_adjust_pc(kern_hyp_va(vcpu));
-+}
-+
- static void handle___kvm_flush_vm_context(struct kvm_cpu_context *host_ctxt)
- {
- 	__kvm_flush_vm_context();
-@@ -170,6 +177,7 @@ typedef void (*hcall_t)(struct kvm_cpu_context *);
+-#include <hyp/adjust_pc.h>
+ #include <hyp/switch.h>
+ #include <hyp/sysreg-sr.h>
  
- static const hcall_t host_hcall[] = {
- 	HANDLE_FUNC(__kvm_vcpu_run),
-+	HANDLE_FUNC(__kvm_adjust_pc),
- 	HANDLE_FUNC(__kvm_flush_vm_context),
- 	HANDLE_FUNC(__kvm_tlb_flush_vmid_ipa),
- 	HANDLE_FUNC(__kvm_tlb_flush_vmid),
+@@ -201,7 +200,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ 	 */
+ 	__debug_save_host_buffers_nvhe(vcpu);
+ 
+-	__adjust_pc(vcpu);
++	__kvm_adjust_pc(vcpu);
+ 
+ 	/*
+ 	 * We must restore the 32-bit state before the sysregs, thanks
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index 7b8f7db5c1ed..b3229924d243 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -4,7 +4,6 @@
+  * Author: Marc Zyngier <marc.zyngier@arm.com>
+  */
+ 
+-#include <hyp/adjust_pc.h>
+ #include <hyp/switch.h>
+ 
+ #include <linux/arm-smccc.h>
+@@ -132,7 +131,7 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+ 	__load_guest_stage2(vcpu->arch.hw_mmu);
+ 	__activate_traps(vcpu);
+ 
+-	__adjust_pc(vcpu);
++	__kvm_adjust_pc(vcpu);
+ 
+ 	sysreg_restore_guest_state_vhe(guest_ctxt);
+ 	__debug_switch_to_guest(vcpu);
 -- 
 2.29.2
 
