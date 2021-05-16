@@ -1,78 +1,83 @@
-Return-Path: <SRS0=YHuQ=KK=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=dvtL=KL=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07037C433ED
-	for <kvmarm@archiver.kernel.org>; Sat, 15 May 2021 11:36:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2493AC433B4
+	for <kvmarm@archiver.kernel.org>; Sun, 16 May 2021 09:51:09 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7C4CE61168
-	for <kvmarm@archiver.kernel.org>; Sat, 15 May 2021 11:36:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C4CE61168
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 900EC6117A
+	for <kvmarm@archiver.kernel.org>; Sun, 16 May 2021 09:51:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 900EC6117A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E6A194B343;
-	Sat, 15 May 2021 07:36:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EB5644B960;
+	Sun, 16 May 2021 05:51:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jorCrL+XkUFW; Sat, 15 May 2021 07:36:52 -0400 (EDT)
+	with ESMTP id Lfoq+K3d29zQ; Sun, 16 May 2021 05:51:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E4B1D4B438;
-	Sat, 15 May 2021 07:36:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 29F4E4B46C;
+	Sun, 16 May 2021 05:51:06 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E5D5D4B893
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 May 2021 22:18:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 65D3C4B3ED
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 16 May 2021 05:51:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Mc+QJP+aldI1 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 13 May 2021 22:18:29 -0400 (EDT)
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 101E94B8FC
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 May 2021 22:18:29 -0400 (EDT)
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
- by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4FhBvg3F1SzqV51;
- Fri, 14 May 2021 10:15:43 +0800 (CST)
-Received: from [10.174.177.243] (10.174.177.243) by
- DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
- 14.3.498.0; Fri, 14 May 2021 10:18:22 +0800
-Subject: Re: arm32: panic in move_freepages (Was [PATCH v2 0/4] arm64: drop
- pfn_valid_within() and simplify pfn_valid())
-To: Mike Rapoport <rppt@kernel.org>
-References: <82cfbb7f-dd4f-12d8-dc76-847f06172200@huawei.com>
- <b077916e-d3f7-ec6c-8c80-b5b642ee111f@huawei.com>
- <YJUWywpGwOpM8hzo@kernel.org>
- <33c67e13-dc48-9a2f-46d8-a532e17380fb@huawei.com>
- <YJd6QXcmVl+HM4Ob@kernel.org>
- <b91cd653-842b-0e77-5c00-17a0ac9c4b50@huawei.com>
- <YJpEwF2cGjS5mKma@kernel.org>
- <c3006cd0-fff6-ab45-da83-a216d40388f2@huawei.com>
- <YJuRPVWubjQKyKBj@kernel.org>
- <f0034620-b95b-3ba5-f7a2-c8be33d842c7@huawei.com>
- <YJ0Fhs5krPJ0FgiV@kernel.org>
-From: Kefeng Wang <wangkefeng.wang@huawei.com>
-Message-ID: <546307d6-790b-78d4-d832-84f143d4d40a@huawei.com>
-Date: Fri, 14 May 2021 10:18:21 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ with ESMTP id u64TOkCEGDDp for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 16 May 2021 05:51:00 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C07CC4B3BF
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 16 May 2021 05:51:00 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1621158660;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=oRO/yJaNjM6VZvBpBMjV2hPGrzuDge/66QAkCSH3I5s=;
+ b=i/fzqz5SlktnNb6/UBe6M3ZnUepgXhShAdW0mn1w6hrmSlvM4+n38EfrEpXtiu7qYZ5d18
+ ok14JJ6qCJOj23sOos4xqIGZX4+lyQNG2KgLMabTayJYOBN/lUAXZNjEhwYANQXEnuOpII
+ lkGWJwP1DFEGlSnF1MbbRTUoI3JbasM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-13-k_zAiPHOPuGDguKcyaQ_OA-1; Sun, 16 May 2021 05:50:57 -0400
+X-MC-Unique: k_zAiPHOPuGDguKcyaQ_OA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 46B99100747C;
+ Sun, 16 May 2021 09:50:56 +0000 (UTC)
+Received: from [10.36.112.87] (ovpn-112-87.ams2.redhat.com [10.36.112.87])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 75ADC6EF48;
+ Sun, 16 May 2021 09:50:54 +0000 (UTC)
+Subject: Re: [PATCH v3 3/5] KVM: selftests: Move GUEST_ASSERT_EQ to utils
+ header
+To: Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu
+References: <20210513002802.3671838-1-ricarkol@google.com>
+ <20210513002802.3671838-4-ricarkol@google.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <b8e63f39-9545-4a43-362f-75e0489ae715@redhat.com>
+Date: Sun, 16 May 2021 11:50:52 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-In-Reply-To: <YJ0Fhs5krPJ0FgiV@kernel.org>
+In-Reply-To: <20210513002802.3671838-4-ricarkol@google.com>
 Content-Language: en-US
-X-Originating-IP: [10.174.177.243]
-X-CFilter-Loop: Reflected
-X-Mailman-Approved-At: Sat, 15 May 2021 07:36:51 -0400
-Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org, Mike
- Rapoport <rppt@linux.ibm.com>, linux-mm@kvack.org, kvmarm@lists.cs.columbia.edu,
- Marc Zyngier <maz@kernel.org>, Andrew Morton <akpm@linux-foundation.org>,
- Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Cc: pbonzini@redhat.com, maz@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -84,274 +89,95 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+Hi Ricardo,
 
+On 5/13/21 2:28 AM, Ricardo Koller wrote:
+> Move GUEST_ASSERT_EQ to a common header, kvm_util.h, for other
+> architectures and tests to use. Also modify __GUEST_ASSERT so it can be
+> reused to implement GUEST_ASSERT_EQ.
+> 
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-On 2021/5/13 18:55, Mike Rapoport wrote:
-> On Thu, May 13, 2021 at 11:44:00AM +0800, Kefeng Wang wrote:
->> On 2021/5/12 16:26, Mike Rapoport wrote:
->>> On Wed, May 12, 2021 at 11:08:14AM +0800, Kefeng Wang wrote:
->>>>
->>>> On 2021/5/11 16:48, Mike Rapoport wrote:
->>>>> On Mon, May 10, 2021 at 11:10:20AM +0800, Kefeng Wang wrote:
->>>>>>
->>>>>>>> The memory is not continuous, see MEMBLOCK:
->>>>>>>>      memory size = 0x4c0fffff reserved size = 0x027ef058
->>>>>>>>      memory.cnt  = 0xa
->>>>>>>>      memory[0x0]    [0x80a00000-0x855fffff], 0x04c00000 bytes flags: 0x0
->>>>>>>>      memory[0x1]    [0x86a00000-0x87dfffff], 0x01400000 bytes flags: 0x0
->>>>>>>>      memory[0x2]    [0x8bd00000-0x8c4fffff], 0x00800000 bytes flags: 0x0
->>>>>>>>      memory[0x3]    [0x8e300000-0x8ecfffff], 0x00a00000 bytes flags: 0x0
->>>>>>>>      memory[0x4]    [0x90d00000-0xbfffffff], 0x2f300000 bytes flags: 0x0
->>>>>>>>      memory[0x5]    [0xcc000000-0xdc9fffff], 0x10a00000 bytes flags: 0x0
->>>>>>>>      memory[0x6]    [0xde700000-0xde9fffff], 0x00300000 bytes flags: 0x0
->>>>>>>> ...
->>>>>>>>
->>>>>>>> The pfn_range [0xde600,0xde700] => addr_range [0xde600000,0xde700000]
->>>>>>>> is not available memory, and we won't create memmap , so with or without
->>>>>>>> your patch, we can't see the range in free_memmap(), right?
->>>>>>>
->>>>>>> This is not available memory and we won't see the reange in free_memmap(),
->>>>>>> but we still should create memmap for it and that's what my patch tried to
->>>>>>> do.
->>>>>>>
->>>>>>> There are a lot of places in core mm that operate on pageblocks and
->>>>>>> free_unused_memmap() should make sure that any pageblock has a valid memory
->>>>>>> map.
->>>>>>>
->>>>>>> Currently, that's not the case when SPARSEMEM=y and my patch tried to fix
->>>>>>> it.
->>>>>>>
->>>>>>> Can you please send log with my patch applied and with the printing of
->>>>>>> ranges that are freed in free_unused_memmap() you've used in previous
->>>>>>> mails?
->>>>>
->>>>>> with your patch[1] and debug print in free_memmap,
->>>>>> ----> free_memmap, start_pfn = 85800,  85800000 end_pfn = 86800, 86800000
->>>>>> ----> free_memmap, start_pfn = 8c800,  8c800000 end_pfn = 8e000, 8e000000
->>>>>> ----> free_memmap, start_pfn = 8f000,  8f000000 end_pfn = 90000, 90000000
->>>>>> ----> free_memmap, start_pfn = dcc00,  dcc00000 end_pfn = de400, de400000
->>>>>> ----> free_memmap, start_pfn = dec00,  dec00000 end_pfn = e0000, e0000000
->>>>>> ----> free_memmap, start_pfn = e0c00,  e0c00000 end_pfn = e4000, e4000000
->>>>>> ----> free_memmap, start_pfn = f7000,  f7000000 end_pfn = f8000, f8000000
->>>>>
->>>>> It seems that freeing of the memory map is suboptimal still because that
->>>>> code was not designed for memory layout that has more holes than Swiss
->>>>> cheese.
->>>>>
->>>>> Still, the range [0xde600,0xde700] is not freed and there should be struct
->>>>> pages for this range.
->>>>>
->>>>> Can you add
->>>>>
->>>>> 	dump_page(pfn_to_page(0xde600), "");
->>>>>
->>>>> say, in the end of memblock_free_all()?
->>>>>
->>>> The range [0xde600,0xde700] is not memory, so it won't create struct page
->>>> for it when sparse_init?
->>>
->>> sparse_init() indeed does not create memory map for unpopulated memory, but
->>> it has pretty coarse granularity, i.e. 64M in your configuration. A hole
->>> should be at least 64M in order to skip allocation of the memory map for
->>> it.
->>>
->>> For example, your memory layout has a hole of 192M at pfn 0xc0000 and this
->>> hole won't have the memory map.
->>>
->>> However the hole 0xdca00 - 0xde70 will still have a memory map in the
->>> section  that covers 0xdc000 - 0xe0000.
->>>
->>> I've tried outline this in a sketch below, hope it helps.
->>>
->>> Memory:
->>>                             c0000      cc000                      dca00
->>> --------------------------+          +--------------------------+ +----+
->>>    memory bank              |<- hole ->| memory bank              | | mb |
->>> --------------------------+          +--------------------------+ +----+
->>>                                                                   de700  dea00
->>>
->>> Memory map:
->>>
->>> b0000    b4000            c0000      cc000   d0000    d8000    dc000
->>> +--------+--------+- ... -+          +--------+- ... -+--------+---------+
->>> | memmap | memmap | ...   |<- hole ->| memmap |  ...  | memmap | memmap  |
->>> +--------+--------+- ... -+          +--------+- ... -+--------+---------+
->>>
->>>
->> Thanks for the sketch, it is more clear,
->>
->>>> After apply patch[1], the dump_page log,
->>>>
->>>> page:ef3cc000 is uninitialized and poisoned
->>>> raw: ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff
->>>> page dumped because:
->>>
->>> This means that there is a memory map entry, and it got poisoned during the
->>> initialization and never got reinitialized to sensible values, which would
->>> be PageReserved() in this case.
->>>
->>> I believe this was fixed by commit 0740a50b9baa ("mm/page_alloc.c: refactor
->>> initialization of struct page for holes in memory layout") in the mainline
->>> tree.
->>>
->>> Can you backport it to your 5.10 tree and check if it helps?
->> Hi Mike, the 0740a50b9baa is already in 5.10, tags/v5.10.24~5
+Thanks
+
+Eric
+
+> ---
+>  .../testing/selftests/kvm/include/kvm_util.h  | 22 ++++++++++---------
+>  .../selftests/kvm/x86_64/tsc_msrs_test.c      |  9 --------
+>  2 files changed, 12 insertions(+), 19 deletions(-)
 > 
-> Ah, you are using stable 5.10.y.
->   
->> commit 4c84191cbc3eff49568d3c5cccb628fa382cf7fb
->> Author: Mike Rapoport <rppt@kernel.org>
->> Date:   Fri Mar 12 21:07:12 2021 -0800
->>
->>      mm/page_alloc.c: refactor initialization of struct page for holes in
->> memory layout
->>
->>      commit 0740a50b9baa4472cfb12442df4b39e2712a64a4 upstream.
->>
->> but check init_unavailable_range(), we need deal with the hole in the
->> range of one pageblock.
->>
->> For our scene, pageblock range: 0xde600,0xde7ff, but the available pfn begin
->> with 0xde700.
->>
->> If pfn(eg, 0xde600) is not valid, the step in init_unavailable_range is
->> pageblock_nr_pages, and ALIGN_DOWN(pfn, pageblock_nr_pages) from 0xde600
->> to 0xde700 is same, so the page range for pfn [0xde600,0xde700] won't be
->> initialized.
-> 
-> The pfn 0xde600 is valid in the sense that there is a memory map for that
-> pfn. Yet, with ARM's custom pfn_valid() will treat it as invalid because
-> there is a hole.
->   
->> After add the following patch, the oom test could passed,
->   
->> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
->> index aaa1655cf682..0c7e04f86f9f 100644
->> --- a/mm/page_alloc.c
->> +++ b/mm/page_alloc.c
->> @@ -6484,13 +6484,14 @@ static u64 __meminit init_unavailable_range(unsigned
->> long spfn,
->>                                              unsigned long epfn,
->>                                              int zone, int node)
->>   {
->> -       unsigned long pfn;
->> +       unsigned long pfn, pfn_down;
->> +       unsigned long epfn_down = ALIGN_DOWN(epfn, pageblock_nr_pages);
->>          u64 pgcnt = 0;
->>
->>          for (pfn = spfn; pfn < epfn; pfn++) {
->> -               if (!pfn_valid(ALIGN_DOWN(pfn, pageblock_nr_pages))) {
->> -                       pfn = ALIGN_DOWN(pfn, pageblock_nr_pages)
->> -                               + pageblock_nr_pages - 1;
->> +               pfn_down = ALIGN_DOWN(pfn, pageblock_nr_pages);
->> +               if (!pfn_valid(pfn_down) && pfn_down != epfn_down) {
->> +                       pfn = pfn_down + pageblock_nr_pages - 1;
->>                          continue;
->>                  }
->>                  __init_single_page(pfn_to_page(pfn), pfn, zone, node);
-> 
-> I'd rather prefer to keep init_unavailable_range() and the assumption that
-> the memory map always covers an entire pageblock.
-> 
-> Can you please try the below hack. Essentially, it makes arm with SPARSEMEM
-> to use the generic pfn_valid() and updates the freeing of the memory map to
-> have the entire pageblocks covered.
-> 
-> If this works I'll send formal patches for those changes.
-> 
-> 
-> diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
-> index 24804f11302d..86ee711a3fdb 100644
-> --- a/arch/arm/Kconfig
-> +++ b/arch/arm/Kconfig
-> @@ -73,7 +73,7 @@ config ARM
->   	select HAVE_ARCH_KGDB if !CPU_ENDIAN_BE32 && MMU
->   	select HAVE_ARCH_KASAN if MMU && !XIP_KERNEL
->   	select HAVE_ARCH_MMAP_RND_BITS if MMU
-> -	select HAVE_ARCH_PFN_VALID
-> +#	select HAVE_ARCH_PFN_VALID
->   	select HAVE_ARCH_SECCOMP
->   	select HAVE_ARCH_SECCOMP_FILTER if AEABI && !OABI_COMPAT
->   	select HAVE_ARCH_THREAD_STRUCT_WHITELIST
-> diff --git a/mm/memblock.c b/mm/memblock.c
-> index 504435753259..0d7bef1b49c3 100644
-> --- a/mm/memblock.c
-> +++ b/mm/memblock.c
-> @@ -1928,9 +1928,11 @@ static void __init free_unused_memmap(void)
->   	unsigned long start, end, prev_end = 0;
->   	int i;
->   
-> +#ifndef CONFIG_ARM
->   	if (!IS_ENABLED(CONFIG_HAVE_ARCH_PFN_VALID) ||
->   	    IS_ENABLED(CONFIG_SPARSEMEM_VMEMMAP))
->   		return;
-> +#endif
->   
->   	/*
->   	 * This relies on each bank being in address order.
-> @@ -1943,14 +1945,13 @@ static void __init free_unused_memmap(void)
->   		 * due to SPARSEMEM sections which aren't present.
->   		 */
->   		start = min(start, ALIGN(prev_end, PAGES_PER_SECTION));
-> -#else
-> +#endif
->   		/*
->   		 * Align down here since the VM subsystem insists that the
->   		 * memmap entries are valid from the bank start aligned to
->   		 * MAX_ORDER_NR_PAGES.
->   		 */
->   		start = round_down(start, MAX_ORDER_NR_PAGES);
-> -#endif
->   
->   		/*
->   		 * If we had a previous bank, and there is a space
->   
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+> index 7880929ea548..fb2b8964f2ca 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> @@ -366,26 +366,28 @@ uint64_t get_ucall(struct kvm_vm *vm, uint32_t vcpu_id, struct ucall *uc);
+>  				ucall(UCALL_SYNC, 6, "hello", stage, arg1, arg2, arg3, arg4)
+>  #define GUEST_SYNC(stage)	ucall(UCALL_SYNC, 2, "hello", stage)
+>  #define GUEST_DONE()		ucall(UCALL_DONE, 0)
+> -#define __GUEST_ASSERT(_condition, _nargs, _args...) do {	\
+> -	if (!(_condition))					\
+> -		ucall(UCALL_ABORT, 2 + _nargs,			\
+> -			"Failed guest assert: "			\
+> -			#_condition, __LINE__, _args);		\
+> +#define __GUEST_ASSERT(_condition, _condstr, _nargs, _args...) do {    \
+> +	if (!(_condition))                                              \
+> +		ucall(UCALL_ABORT, 2 + _nargs,                          \
+> +			"Failed guest assert: "                         \
+> +			_condstr, __LINE__, _args);                     \
+>  } while (0)
+>  
+>  #define GUEST_ASSERT(_condition) \
+> -	__GUEST_ASSERT((_condition), 0, 0)
+> +	__GUEST_ASSERT(_condition, #_condition, 0, 0)
+>  
+>  #define GUEST_ASSERT_1(_condition, arg1) \
+> -	__GUEST_ASSERT((_condition), 1, (arg1))
+> +	__GUEST_ASSERT(_condition, #_condition, 1, (arg1))
+>  
+>  #define GUEST_ASSERT_2(_condition, arg1, arg2) \
+> -	__GUEST_ASSERT((_condition), 2, (arg1), (arg2))
+> +	__GUEST_ASSERT(_condition, #_condition, 2, (arg1), (arg2))
+>  
+>  #define GUEST_ASSERT_3(_condition, arg1, arg2, arg3) \
+> -	__GUEST_ASSERT((_condition), 3, (arg1), (arg2), (arg3))
+> +	__GUEST_ASSERT(_condition, #_condition, 3, (arg1), (arg2), (arg3))
+>  
+>  #define GUEST_ASSERT_4(_condition, arg1, arg2, arg3, arg4) \
+> -	__GUEST_ASSERT((_condition), 4, (arg1), (arg2), (arg3), (arg4))
+> +	__GUEST_ASSERT(_condition, #_condition, 4, (arg1), (arg2), (arg3), (arg4))
+> +
+> +#define GUEST_ASSERT_EQ(a, b) __GUEST_ASSERT((a) == (b), #a " == " #b, 2, a, b)
+>  
+>  #endif /* SELFTEST_KVM_UTIL_H */
+> diff --git a/tools/testing/selftests/kvm/x86_64/tsc_msrs_test.c b/tools/testing/selftests/kvm/x86_64/tsc_msrs_test.c
+> index e357d8e222d4..5a6a662f2e59 100644
+> --- a/tools/testing/selftests/kvm/x86_64/tsc_msrs_test.c
+> +++ b/tools/testing/selftests/kvm/x86_64/tsc_msrs_test.c
+> @@ -18,15 +18,6 @@
+>  #define rounded_rdmsr(x)       ROUND(rdmsr(x))
+>  #define rounded_host_rdmsr(x)  ROUND(vcpu_get_msr(vm, 0, x))
+>  
+> -#define GUEST_ASSERT_EQ(a, b) do {				\
+> -	__typeof(a) _a = (a);					\
+> -	__typeof(b) _b = (b);					\
+> -	if (_a != _b)						\
+> -                ucall(UCALL_ABORT, 4,				\
+> -                        "Failed guest assert: "			\
+> -                        #a " == " #b, __LINE__, _a, _b);	\
+> -  } while(0)
+> -
+>  static void guest_code(void)
+>  {
+>  	u64 val = 0;
 > 
 
-Without HAVE_ARCH_PFN_VALID, init_unavailable_range will set those page
-with Reserved flag, and yes, it works for oom test.
-
-On node 0 totalpages: 311551
-   Normal zone: 1230 pages used for memmap
-   Normal zone: 0 pages reserved
-   Normal zone: 157440 pages, LIFO batch:31
-   Normal zone: 55552 pages in unavailable ranges
-   HighMem zone: 154111 pages, LIFO batch:31
-   HighMem zone: 41985 pages in unavailable ranges
-
-Thanks for your kindly guidance.
-
->> Before:
->> On node 0 totalpages: 311551
->>    Normal zone: 1230 pages used for memmap
->>    Normal zone: 0 pages reserved
->>    Normal zone: 157440 pages, LIFO batch:31
->>    Normal zone: 16384 pages in unavailable ranges
->>    HighMem zone: 154111 pages, LIFO batch:31
->>    HighMem zone: 1 pages in unavailable ranges
->>
->> page:ef3cc000 is uninitialized and poisoned
->> raw: ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff
->>
->> After:
->> On node 0 totalpages: 311551
->>    Normal zone: 1230 pages used for memmap
->>    Normal zone: 0 pages reserved
->>    Normal zone: 157440 pages, LIFO batch:31
->>    Normal zone: 17152 pages in unavailable ranges
->>    HighMem zone: 154111 pages, LIFO batch:31
->>    HighMem zone: 513 pages in unavailable ranges
->> ...
->> page:(ptrval) refcount:1 mapcount:0 mapping:00000000 index:0x0 pfn:0xde600
->> flags: 0xdd001000(reserved)
->> raw: dd001000 ef3cc004 ef3cc004 00000000 00000000 00000000 ffffffff 00000001
->>
-> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
