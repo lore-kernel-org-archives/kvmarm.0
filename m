@@ -2,61 +2,81 @@ Return-Path: <SRS0=zR8f=KM=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5CCCC433B4
-	for <kvmarm@archiver.kernel.org>; Mon, 17 May 2021 12:33:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14CF9C433B4
+	for <kvmarm@archiver.kernel.org>; Mon, 17 May 2021 14:04:17 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 89D336128A
-	for <kvmarm@archiver.kernel.org>; Mon, 17 May 2021 12:33:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89D336128A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 8905261209
+	for <kvmarm@archiver.kernel.org>; Mon, 17 May 2021 14:04:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8905261209
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C8314B557;
-	Mon, 17 May 2021 08:33:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 044D84B54D;
+	Mon, 17 May 2021 10:04:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id nUS+Za6TIt6I; Mon, 17 May 2021 08:33:48 -0400 (EDT)
+	with ESMTP id m9Tr7eMZ21Ln; Mon, 17 May 2021 10:04:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B0B664B92E;
-	Mon, 17 May 2021 08:33:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E26CC4B572;
+	Mon, 17 May 2021 10:04:10 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 24EC24B557
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 May 2021 08:33:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D1F64B4A6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 May 2021 10:04:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0fc6XwD8hHid for <kvmarm@lists.cs.columbia.edu>;
- Mon, 17 May 2021 08:33:41 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C01A4B808
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 May 2021 08:33:36 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D6FF9139F;
- Mon, 17 May 2021 05:33:35 -0700 (PDT)
-Received: from e112269-lin.arm.com (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EEB773F73B;
- Mon, 17 May 2021 05:33:32 -0700 (PDT)
-From: Steven Price <steven.price@arm.com>
-To: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>
-Subject: [PATCH v12 8/8] KVM: arm64: Document MTE capability and ioctl
-Date: Mon, 17 May 2021 13:32:39 +0100
-Message-Id: <20210517123239.8025-9-steven.price@arm.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20210517123239.8025-1-steven.price@arm.com>
+ with ESMTP id 6Sagx36OSQP5 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 17 May 2021 10:04:05 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4AE244B24E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 May 2021 10:04:05 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 4AB6561074;
+ Mon, 17 May 2021 14:04:04 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1lidqj-001ouz-3j; Mon, 17 May 2021 15:04:01 +0100
+Date: Mon, 17 May 2021 15:03:59 +0100
+Message-ID: <87cztpv4mo.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Steven Price <steven.price@arm.com>
+Subject: Re: [PATCH v12 1/8] arm64: mte: Handle race when synchronising tags
+In-Reply-To: <20210517123239.8025-2-steven.price@arm.com>
 References: <20210517123239.8025-1-steven.price@arm.com>
-MIME-Version: 1.0
+ <20210517123239.8025-2-steven.price@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: steven.price@arm.com, catalin.marinas@arm.com,
+ will@kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com,
+ suzuki.poulose@arm.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Dave.Martin@arm.com, mark.rutland@arm.com, tglx@linutronix.de,
+ qemu-devel@nongnu.org, quintela@redhat.com, dgilbert@redhat.com,
+ richard.henderson@linaro.org, peter.maydell@linaro.org, Haibo.Xu@arm.com,
+ drjones@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
- Dave Martin <Dave.Martin@arm.com>, Juan Quintela <quintela@redhat.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Juan Quintela <quintela@redhat.com>,
  Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
- Steven Price <steven.price@arm.com>, Thomas Gleixner <tglx@linutronix.de>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+ Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org,
+ Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,93 +93,104 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-A new capability (KVM_CAP_ARM_MTE) identifies that the kernel supports
-granting a guest access to the tags, and provides a mechanism for the
-VMM to enable it.
+Hi Steven,
 
-A new ioctl (KVM_ARM_MTE_COPY_TAGS) provides a simple way for a VMM to
-access the tags of a guest without having to maintain a PROT_MTE mapping
-in userspace. The above capability gates access to the ioctl.
+On Mon, 17 May 2021 13:32:32 +0100,
+Steven Price <steven.price@arm.com> wrote:
+> 
+> mte_sync_tags() used test_and_set_bit() to set the PG_mte_tagged flag
+> before restoring/zeroing the MTE tags. However if another thread were to
+> race and attempt to sync the tags on the same page before the first
+> thread had completed restoring/zeroing then it would see the flag is
+> already set and continue without waiting. This would potentially expose
+> the previous contents of the tags to user space, and cause any updates
+> that user space makes before the restoring/zeroing has completed to
+> potentially be lost.
+> 
+> Since this code is run from atomic contexts we can't just lock the page
+> during the process. Instead implement a new (global) spinlock to protect
+> the mte_sync_page_tags() function.
+> 
+> Fixes: 34bfeea4a9e9 ("arm64: mte: Clear the tags when a page is mapped in user-space with PROT_MTE")
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+> ---
+>  arch/arm64/kernel/mte.c | 21 ++++++++++++++++++---
+>  1 file changed, 18 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/kernel/mte.c b/arch/arm64/kernel/mte.c
+> index 125a10e413e9..c88e778c2fa9 100644
+> --- a/arch/arm64/kernel/mte.c
+> +++ b/arch/arm64/kernel/mte.c
+> @@ -25,6 +25,7 @@
+>  u64 gcr_kernel_excl __ro_after_init;
+>  
+>  static bool report_fault_once = true;
+> +static spinlock_t tag_sync_lock;
 
-Signed-off-by: Steven Price <steven.price@arm.com>
----
- Documentation/virt/kvm/api.rst | 53 ++++++++++++++++++++++++++++++++++
- 1 file changed, 53 insertions(+)
+What initialises this spinlock? Have you tried this with lockdep? I'd
+expect it to be defined with DEFINE_SPINLOCK(), which always does the
+right thing.
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 22d077562149..a31661b870ba 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -5034,6 +5034,40 @@ see KVM_XEN_VCPU_SET_ATTR above.
- The KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_ADJUST type may not be used
- with the KVM_XEN_VCPU_GET_ATTR ioctl.
- 
-+4.130 KVM_ARM_MTE_COPY_TAGS
-+---------------------------
-+
-+:Capability: KVM_CAP_ARM_MTE
-+:Architectures: arm64
-+:Type: vm ioctl
-+:Parameters: struct kvm_arm_copy_mte_tags
-+:Returns: 0 on success, < 0 on error
-+
-+::
-+
-+  struct kvm_arm_copy_mte_tags {
-+	__u64 guest_ipa;
-+	__u64 length;
-+	union {
-+		void __user *addr;
-+		__u64 padding;
-+	};
-+	__u64 flags;
-+	__u64 reserved[2];
-+  };
-+
-+Copies Memory Tagging Extension (MTE) tags to/from guest tag memory. The
-+``guest_ipa`` and ``length`` fields must be ``PAGE_SIZE`` aligned. The ``addr``
-+fieldmust point to a buffer which the tags will be copied to or from.
-+
-+``flags`` specifies the direction of copy, either ``KVM_ARM_TAGS_TO_GUEST`` or
-+``KVM_ARM_TAGS_FROM_GUEST``.
-+
-+The size of the buffer to store the tags is ``(length / MTE_GRANULE_SIZE)``
-+bytes (i.e. 1/16th of the corresponding size). Each byte contains a single tag
-+value. This matches the format of ``PTRACE_PEEKMTETAGS`` and
-+``PTRACE_POKEMTETAGS``.
-+
- 5. The kvm_run structure
- ========================
- 
-@@ -6362,6 +6396,25 @@ default.
- 
- See Documentation/x86/sgx/2.Kernel-internals.rst for more details.
- 
-+7.26 KVM_CAP_ARM_MTE
-+--------------------
-+
-+:Architectures: arm64
-+:Parameters: none
-+
-+This capability indicates that KVM (and the hardware) supports exposing the
-+Memory Tagging Extensions (MTE) to the guest. It must also be enabled by the
-+VMM before the guest will be granted access.
-+
-+When enabled the guest is able to access tags associated with any memory given
-+to the guest. KVM will ensure that the pages are flagged ``PG_mte_tagged`` so
-+that the tags are maintained during swap or hibernation of the host; however
-+the VMM needs to manually save/restore the tags as appropriate if the VM is
-+migrated.
-+
-+When enabled the VMM may make use of the ``KVM_ARM_MTE_COPY_TAGS`` ioctl to
-+perform a bulk copy of tags to/from the guest.
-+
- 8. Other capabilities.
- ======================
- 
+>  
+>  #ifdef CONFIG_KASAN_HW_TAGS
+>  /* Whether the MTE asynchronous mode is enabled. */
+> @@ -34,13 +35,22 @@ EXPORT_SYMBOL_GPL(mte_async_mode);
+>  
+>  static void mte_sync_page_tags(struct page *page, pte_t *ptep, bool check_swap)
+>  {
+> +	unsigned long flags;
+>  	pte_t old_pte = READ_ONCE(*ptep);
+>  
+> +	spin_lock_irqsave(&tag_sync_lock, flags);
+> +
+> +	/* Recheck with the lock held */
+> +	if (test_bit(PG_mte_tagged, &page->flags))
+> +		goto out;
+> +
+>  	if (check_swap && is_swap_pte(old_pte)) {
+>  		swp_entry_t entry = pte_to_swp_entry(old_pte);
+>  
+> -		if (!non_swap_entry(entry) && mte_restore_tags(entry, page))
+> -			return;
+> +		if (!non_swap_entry(entry) && mte_restore_tags(entry, page)) {
+> +			set_bit(PG_mte_tagged, &page->flags);
+> +			goto out;
+> +		}
+>  	}
+>  
+>  	page_kasan_tag_reset(page);
+> @@ -53,6 +63,10 @@ static void mte_sync_page_tags(struct page *page, pte_t *ptep, bool check_swap)
+>  	 */
+>  	smp_wmb();
+>  	mte_clear_page_tags(page_address(page));
+> +	set_bit(PG_mte_tagged, &page->flags);
+> +
+> +out:
+> +	spin_unlock_irqrestore(&tag_sync_lock, flags);
+>  }
+>  
+>  void mte_sync_tags(pte_t *ptep, pte_t pte)
+> @@ -60,10 +74,11 @@ void mte_sync_tags(pte_t *ptep, pte_t pte)
+>  	struct page *page = pte_page(pte);
+>  	long i, nr_pages = compound_nr(page);
+>  	bool check_swap = nr_pages == 1;
+> +	bool pte_is_tagged = pte_tagged(pte);
+>  
+>  	/* if PG_mte_tagged is set, tags have already been initialised */
+>  	for (i = 0; i < nr_pages; i++, page++) {
+> -		if (!test_and_set_bit(PG_mte_tagged, &page->flags))
+> +		if (!test_bit(PG_mte_tagged, &page->flags))
+>  			mte_sync_page_tags(page, ptep, check_swap);
+>  	}
+>  }
+
+Thanks,
+
+	M.
+
 -- 
-2.20.1
-
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
