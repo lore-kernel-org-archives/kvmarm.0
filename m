@@ -2,64 +2,55 @@ Return-Path: <SRS0=zR8f=KM=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-21.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C25DFC433ED
-	for <kvmarm@archiver.kernel.org>; Mon, 17 May 2021 14:56:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE84AC433B4
+	for <kvmarm@archiver.kernel.org>; Mon, 17 May 2021 16:05:20 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 41F9660E0C
-	for <kvmarm@archiver.kernel.org>; Mon, 17 May 2021 14:56:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41F9660E0C
+	by mail.kernel.org (Postfix) with ESMTP id 69AB061042
+	for <kvmarm@archiver.kernel.org>; Mon, 17 May 2021 16:05:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69AB061042
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C85774B16D;
-	Mon, 17 May 2021 10:56:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CB8954B44A;
+	Mon, 17 May 2021 12:05:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Riz1HjFZ73NM; Mon, 17 May 2021 10:56:43 -0400 (EDT)
+	with ESMTP id IfBNGQz8iI3e; Mon, 17 May 2021 12:05:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0CB444B25E;
-	Mon, 17 May 2021 10:56:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 772E24B3A1;
+	Mon, 17 May 2021 12:05:18 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 20F5D4B228
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 May 2021 10:56:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2FB344B22A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 May 2021 12:05:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lOPlmF5ehYhi for <kvmarm@lists.cs.columbia.edu>;
- Mon, 17 May 2021 10:56:36 -0400 (EDT)
+ with ESMTP id LFEhfpU4Vtbn for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 17 May 2021 12:05:15 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D3B384B16D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 May 2021 10:56:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 42D1A4B228
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 May 2021 12:05:15 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 19BD2106F;
- Mon, 17 May 2021 07:56:36 -0700 (PDT)
-Received: from [192.168.1.179] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 815AE3F73B;
- Mon, 17 May 2021 07:56:33 -0700 (PDT)
-Subject: Re: [PATCH v12 1/8] arm64: mte: Handle race when synchronising tags
-To: Marc Zyngier <maz@kernel.org>
-References: <20210517123239.8025-1-steven.price@arm.com>
- <20210517123239.8025-2-steven.price@arm.com> <87cztpv4mo.wl-maz@kernel.org>
-From: Steven Price <steven.price@arm.com>
-Message-ID: <37fe19b5-6494-41c5-e541-ddc873a82be0@arm.com>
-Date: Mon, 17 May 2021 15:56:28 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
-MIME-Version: 1.0
-In-Reply-To: <87cztpv4mo.wl-maz@kernel.org>
-Content-Language: en-GB
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
- Catalin Marinas <catalin.marinas@arm.com>, Juan Quintela <quintela@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
- Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org,
- Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8211E106F;
+ Mon, 17 May 2021 09:05:14 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9C2B23F73D;
+ Mon, 17 May 2021 09:05:13 -0700 (PDT)
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: maz@kernel.org, linux-arm-kernel@lists.infradead.org,
  kvmarm@lists.cs.columbia.edu
+Subject: [PATCH] KVM: arm64: Consolidate functions to skip an instruction into
+ skip_instr.h
+Date: Mon, 17 May 2021 17:05:45 +0100
+Message-Id: <20210517160545.699995-1-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.31.1
+MIME-Version: 1.0
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -76,54 +67,130 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 17/05/2021 15:03, Marc Zyngier wrote:
-> Hi Steven,
+The function prototype kvm_skip_instr32() is used only by the hyp code, so
+it makes more sense to live in the hyp specific header file adjust_pc.h.
+Since __adjust_pc() has been moved to kvm_asm.h so it can be used by the
+generic code, rename adjust_pc.h -> skip_instr.h to avoid confusion and to
+better reflect the purpose of the remaining functions.
 
-Hi Marc,
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+---
+Based on git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git
+tags/kvmarm-fixes-5.13-1
 
-> On Mon, 17 May 2021 13:32:32 +0100,
-> Steven Price <steven.price@arm.com> wrote:
->>
->> mte_sync_tags() used test_and_set_bit() to set the PG_mte_tagged flag
->> before restoring/zeroing the MTE tags. However if another thread were to
->> race and attempt to sync the tags on the same page before the first
->> thread had completed restoring/zeroing then it would see the flag is
->> already set and continue without waiting. This would potentially expose
->> the previous contents of the tags to user space, and cause any updates
->> that user space makes before the restoring/zeroing has completed to
->> potentially be lost.
->>
->> Since this code is run from atomic contexts we can't just lock the page
->> during the process. Instead implement a new (global) spinlock to protect
->> the mte_sync_page_tags() function.
->>
->> Fixes: 34bfeea4a9e9 ("arm64: mte: Clear the tags when a page is mapped in user-space with PROT_MTE")
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->> ---
->>  arch/arm64/kernel/mte.c | 21 ++++++++++++++++++---
->>  1 file changed, 18 insertions(+), 3 deletions(-)
->>
->> diff --git a/arch/arm64/kernel/mte.c b/arch/arm64/kernel/mte.c
->> index 125a10e413e9..c88e778c2fa9 100644
->> --- a/arch/arm64/kernel/mte.c
->> +++ b/arch/arm64/kernel/mte.c
->> @@ -25,6 +25,7 @@
->>  u64 gcr_kernel_excl __ro_after_init;
->>  
->>  static bool report_fault_once = true;
->> +static spinlock_t tag_sync_lock;
-> 
-> What initialises this spinlock? Have you tried this with lockdep? I'd
-> expect it to be defined with DEFINE_SPINLOCK(), which always does the
-> right thing.
+ arch/arm64/include/asm/kvm_emulate.h                        | 1 -
+ arch/arm64/kvm/hyp/aarch32.c                                | 1 +
+ arch/arm64/kvm/hyp/exception.c                              | 2 +-
+ .../arm64/kvm/hyp/include/hyp/{adjust_pc.h => skip_instr.h} | 6 ++++--
+ arch/arm64/kvm/hyp/include/hyp/switch.h                     | 2 +-
+ arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c                    | 2 +-
+ arch/arm64/kvm/hyp/vgic-v3-sr.c                             | 2 +-
+ 7 files changed, 9 insertions(+), 7 deletions(-)
+ rename arch/arm64/kvm/hyp/include/hyp/{adjust_pc.h => skip_instr.h} (90%)
 
-You of course are absolute right, and this will blow up with lockdep.
-Sorry about that. DEFINE_SPINLOCK() solves the problem.
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index f612c090f2e4..436b77e6d1e8 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -34,7 +34,6 @@ enum exception_type {
+ };
+ 
+ bool kvm_condition_valid32(const struct kvm_vcpu *vcpu);
+-void kvm_skip_instr32(struct kvm_vcpu *vcpu);
+ 
+ void kvm_inject_undefined(struct kvm_vcpu *vcpu);
+ void kvm_inject_vabt(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm64/kvm/hyp/aarch32.c b/arch/arm64/kvm/hyp/aarch32.c
+index f98cbe2626a1..65ea395d81f3 100644
+--- a/arch/arm64/kvm/hyp/aarch32.c
++++ b/arch/arm64/kvm/hyp/aarch32.c
+@@ -10,6 +10,7 @@
+  * Author: Christoffer Dall <c.dall@virtualopensystems.com>
+  */
+ 
++#include <hyp/skip_instr.h>
+ #include <linux/kvm_host.h>
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_hyp.h>
+diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
+index 11541b94b328..ac03ad63c1b4 100644
+--- a/arch/arm64/kvm/hyp/exception.c
++++ b/arch/arm64/kvm/hyp/exception.c
+@@ -10,7 +10,7 @@
+  * Author: Christoffer Dall <c.dall@virtualopensystems.com>
+  */
+ 
+-#include <hyp/adjust_pc.h>
++#include <hyp/skip_instr.h>
+ #include <linux/kvm_host.h>
+ #include <asm/kvm_emulate.h>
+ 
+diff --git a/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h b/arch/arm64/kvm/hyp/include/hyp/skip_instr.h
+similarity index 90%
+rename from arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
+rename to arch/arm64/kvm/hyp/include/hyp/skip_instr.h
+index 4fdfeabefeb4..d3ece9a90751 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
++++ b/arch/arm64/kvm/hyp/include/hyp/skip_instr.h
+@@ -7,12 +7,14 @@
+  * Author: Marc Zyngier <maz@kernel.org>
+  */
+ 
+-#ifndef __ARM64_KVM_HYP_ADJUST_PC_H__
+-#define __ARM64_KVM_HYP_ADJUST_PC_H__
++#ifndef __ARM64_KVM_HYP_SKIP_INSTR_H__
++#define __ARM64_KVM_HYP_SKIP_INSTR_H__
+ 
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_host.h>
+ 
++void kvm_skip_instr32(struct kvm_vcpu *vcpu);
++
+ static inline void kvm_skip_instr(struct kvm_vcpu *vcpu)
+ {
+ 	if (vcpu_mode_is_32bit(vcpu)) {
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index e4a2f295a394..13578c1e91a6 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -7,7 +7,7 @@
+ #ifndef __ARM64_KVM_HYP_SWITCH_H__
+ #define __ARM64_KVM_HYP_SWITCH_H__
+ 
+-#include <hyp/adjust_pc.h>
++#include <hyp/skip_instr.h>
+ 
+ #include <linux/arm-smccc.h>
+ #include <linux/kvm_host.h>
+diff --git a/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c b/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
+index 87a54375bd6e..a11790cc42b4 100644
+--- a/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
++++ b/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
+@@ -4,7 +4,7 @@
+  * Author: Marc Zyngier <marc.zyngier@arm.com>
+  */
+ 
+-#include <hyp/adjust_pc.h>
++#include <hyp/skip_instr.h>
+ 
+ #include <linux/compiler.h>
+ #include <linux/irqchip/arm-gic.h>
+diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+index 39f8f7f9227c..756cde8125ef 100644
+--- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
++++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+@@ -4,7 +4,7 @@
+  * Author: Marc Zyngier <marc.zyngier@arm.com>
+  */
+ 
+-#include <hyp/adjust_pc.h>
++#include <hyp/skip_instr.h>
+ 
+ #include <linux/compiler.h>
+ #include <linux/irqchip/arm-gic-v3.h>
+-- 
+2.31.1
 
-Thanks,
-
-Steve
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
