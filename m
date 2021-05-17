@@ -2,55 +2,82 @@ Return-Path: <SRS0=zR8f=KM=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-21.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE84AC433B4
-	for <kvmarm@archiver.kernel.org>; Mon, 17 May 2021 16:05:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F0DEC433ED
+	for <kvmarm@archiver.kernel.org>; Mon, 17 May 2021 16:14:56 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 69AB061042
-	for <kvmarm@archiver.kernel.org>; Mon, 17 May 2021 16:05:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69AB061042
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 1DDB461285
+	for <kvmarm@archiver.kernel.org>; Mon, 17 May 2021 16:14:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DDB461285
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CB8954B44A;
-	Mon, 17 May 2021 12:05:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A1E254B815;
+	Mon, 17 May 2021 12:14:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id IfBNGQz8iI3e; Mon, 17 May 2021 12:05:18 -0400 (EDT)
+	with ESMTP id pbzRdxykL3FJ; Mon, 17 May 2021 12:14:53 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 772E24B3A1;
-	Mon, 17 May 2021 12:05:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3801E4B816;
+	Mon, 17 May 2021 12:14:53 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2FB344B22A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 May 2021 12:05:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D7EFF4B813
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 May 2021 12:14:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LFEhfpU4Vtbn for <kvmarm@lists.cs.columbia.edu>;
- Mon, 17 May 2021 12:05:15 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 42D1A4B228
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 May 2021 12:05:15 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8211E106F;
- Mon, 17 May 2021 09:05:14 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9C2B23F73D;
- Mon, 17 May 2021 09:05:13 -0700 (PDT)
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: maz@kernel.org, linux-arm-kernel@lists.infradead.org,
+ with ESMTP id QYKaDmmummwd for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 17 May 2021 12:14:50 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B06054B808
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 May 2021 12:14:50 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id C97A360E0B;
+ Mon, 17 May 2021 16:14:49 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1liftH-001tNE-NC; Mon, 17 May 2021 17:14:47 +0100
+Date: Mon, 17 May 2021 17:14:46 +0100
+Message-ID: <87y2cdtk09.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Steven Price <steven.price@arm.com>
+Subject: Re: [PATCH v12 3/8] arm64: mte: Sync tags for pages where PTE is
+ untagged
+In-Reply-To: <20210517123239.8025-4-steven.price@arm.com>
+References: <20210517123239.8025-1-steven.price@arm.com>
+ <20210517123239.8025-4-steven.price@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: steven.price@arm.com, catalin.marinas@arm.com,
+ will@kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com,
+ suzuki.poulose@arm.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Dave.Martin@arm.com, mark.rutland@arm.com, tglx@linutronix.de,
+ qemu-devel@nongnu.org, quintela@redhat.com, dgilbert@redhat.com,
+ richard.henderson@linaro.org, peter.maydell@linaro.org, Haibo.Xu@arm.com,
+ drjones@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
+ Catalin Marinas <catalin.marinas@arm.com>, Juan Quintela <quintela@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
+ Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org,
+ Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
  kvmarm@lists.cs.columbia.edu
-Subject: [PATCH] KVM: arm64: Consolidate functions to skip an instruction into
- skip_instr.h
-Date: Mon, 17 May 2021 17:05:45 +0100
-Message-Id: <20210517160545.699995-1-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.31.1
-MIME-Version: 1.0
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -67,130 +94,106 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The function prototype kvm_skip_instr32() is used only by the hyp code, so
-it makes more sense to live in the hyp specific header file adjust_pc.h.
-Since __adjust_pc() has been moved to kvm_asm.h so it can be used by the
-generic code, rename adjust_pc.h -> skip_instr.h to avoid confusion and to
-better reflect the purpose of the remaining functions.
+On Mon, 17 May 2021 13:32:34 +0100,
+Steven Price <steven.price@arm.com> wrote:
+> 
+> A KVM guest could store tags in a page even if the VMM hasn't mapped
+> the page with PROT_MTE. So when restoring pages from swap we will
+> need to check to see if there are any saved tags even if !pte_tagged().
+> 
+> However don't check pages for which pte_access_permitted() returns false
+> as these will not have been swapped out.
+> 
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+>  arch/arm64/include/asm/pgtable.h |  9 +++++++--
+>  arch/arm64/kernel/mte.c          | 16 ++++++++++++++--
+>  2 files changed, 21 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
+> index 0b10204e72fc..275178a810c1 100644
+> --- a/arch/arm64/include/asm/pgtable.h
+> +++ b/arch/arm64/include/asm/pgtable.h
+> @@ -314,8 +314,13 @@ static inline void set_pte_at(struct mm_struct *mm, unsigned long addr,
+>  	if (pte_present(pte) && pte_user_exec(pte) && !pte_special(pte))
+>  		__sync_icache_dcache(pte);
+>  
+> -	if (system_supports_mte() &&
+> -	    pte_present(pte) && pte_tagged(pte) && !pte_special(pte))
+> +	/*
+> +	 * If the PTE would provide user space access to the tags associated
+> +	 * with it then ensure that the MTE tags are synchronised.  Exec-only
+> +	 * mappings don't expose tags (instruction fetches don't check tags).
 
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
-Based on git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git
-tags/kvmarm-fixes-5.13-1
+I'm not sure I understand this comment. Of course, execution doesn't
+match tags. But the memory could still have tags associated with
+it. Does this mean such a page would lose its tags is swapped out?
 
- arch/arm64/include/asm/kvm_emulate.h                        | 1 -
- arch/arm64/kvm/hyp/aarch32.c                                | 1 +
- arch/arm64/kvm/hyp/exception.c                              | 2 +-
- .../arm64/kvm/hyp/include/hyp/{adjust_pc.h => skip_instr.h} | 6 ++++--
- arch/arm64/kvm/hyp/include/hyp/switch.h                     | 2 +-
- arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c                    | 2 +-
- arch/arm64/kvm/hyp/vgic-v3-sr.c                             | 2 +-
- 7 files changed, 9 insertions(+), 7 deletions(-)
- rename arch/arm64/kvm/hyp/include/hyp/{adjust_pc.h => skip_instr.h} (90%)
+Thanks,
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index f612c090f2e4..436b77e6d1e8 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -34,7 +34,6 @@ enum exception_type {
- };
- 
- bool kvm_condition_valid32(const struct kvm_vcpu *vcpu);
--void kvm_skip_instr32(struct kvm_vcpu *vcpu);
- 
- void kvm_inject_undefined(struct kvm_vcpu *vcpu);
- void kvm_inject_vabt(struct kvm_vcpu *vcpu);
-diff --git a/arch/arm64/kvm/hyp/aarch32.c b/arch/arm64/kvm/hyp/aarch32.c
-index f98cbe2626a1..65ea395d81f3 100644
---- a/arch/arm64/kvm/hyp/aarch32.c
-+++ b/arch/arm64/kvm/hyp/aarch32.c
-@@ -10,6 +10,7 @@
-  * Author: Christoffer Dall <c.dall@virtualopensystems.com>
-  */
- 
-+#include <hyp/skip_instr.h>
- #include <linux/kvm_host.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_hyp.h>
-diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
-index 11541b94b328..ac03ad63c1b4 100644
---- a/arch/arm64/kvm/hyp/exception.c
-+++ b/arch/arm64/kvm/hyp/exception.c
-@@ -10,7 +10,7 @@
-  * Author: Christoffer Dall <c.dall@virtualopensystems.com>
-  */
- 
--#include <hyp/adjust_pc.h>
-+#include <hyp/skip_instr.h>
- #include <linux/kvm_host.h>
- #include <asm/kvm_emulate.h>
- 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h b/arch/arm64/kvm/hyp/include/hyp/skip_instr.h
-similarity index 90%
-rename from arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
-rename to arch/arm64/kvm/hyp/include/hyp/skip_instr.h
-index 4fdfeabefeb4..d3ece9a90751 100644
---- a/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/skip_instr.h
-@@ -7,12 +7,14 @@
-  * Author: Marc Zyngier <maz@kernel.org>
-  */
- 
--#ifndef __ARM64_KVM_HYP_ADJUST_PC_H__
--#define __ARM64_KVM_HYP_ADJUST_PC_H__
-+#ifndef __ARM64_KVM_HYP_SKIP_INSTR_H__
-+#define __ARM64_KVM_HYP_SKIP_INSTR_H__
- 
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_host.h>
- 
-+void kvm_skip_instr32(struct kvm_vcpu *vcpu);
-+
- static inline void kvm_skip_instr(struct kvm_vcpu *vcpu)
- {
- 	if (vcpu_mode_is_32bit(vcpu)) {
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index e4a2f295a394..13578c1e91a6 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -7,7 +7,7 @@
- #ifndef __ARM64_KVM_HYP_SWITCH_H__
- #define __ARM64_KVM_HYP_SWITCH_H__
- 
--#include <hyp/adjust_pc.h>
-+#include <hyp/skip_instr.h>
- 
- #include <linux/arm-smccc.h>
- #include <linux/kvm_host.h>
-diff --git a/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c b/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
-index 87a54375bd6e..a11790cc42b4 100644
---- a/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
-+++ b/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
-@@ -4,7 +4,7 @@
-  * Author: Marc Zyngier <marc.zyngier@arm.com>
-  */
- 
--#include <hyp/adjust_pc.h>
-+#include <hyp/skip_instr.h>
- 
- #include <linux/compiler.h>
- #include <linux/irqchip/arm-gic.h>
-diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-index 39f8f7f9227c..756cde8125ef 100644
---- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-+++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-@@ -4,7 +4,7 @@
-  * Author: Marc Zyngier <marc.zyngier@arm.com>
-  */
- 
--#include <hyp/adjust_pc.h>
-+#include <hyp/skip_instr.h>
- 
- #include <linux/compiler.h>
- #include <linux/irqchip/arm-gic-v3.h>
+	M.
+
+> +	 */
+> +	if (system_supports_mte() && pte_present(pte) &&
+> +	    pte_access_permitted(pte, false) && !pte_special(pte))
+>  		mte_sync_tags(ptep, pte);
+>  
+>  	__check_racy_pte_update(mm, ptep, pte);
+> diff --git a/arch/arm64/kernel/mte.c b/arch/arm64/kernel/mte.c
+> index c88e778c2fa9..a604818c52c1 100644
+> --- a/arch/arm64/kernel/mte.c
+> +++ b/arch/arm64/kernel/mte.c
+> @@ -33,11 +33,15 @@ DEFINE_STATIC_KEY_FALSE(mte_async_mode);
+>  EXPORT_SYMBOL_GPL(mte_async_mode);
+>  #endif
+>  
+> -static void mte_sync_page_tags(struct page *page, pte_t *ptep, bool check_swap)
+> +static void mte_sync_page_tags(struct page *page, pte_t *ptep, bool check_swap,
+> +			       bool pte_is_tagged)
+>  {
+>  	unsigned long flags;
+>  	pte_t old_pte = READ_ONCE(*ptep);
+>  
+> +	if (!is_swap_pte(old_pte) && !pte_is_tagged)
+> +		return;
+> +
+>  	spin_lock_irqsave(&tag_sync_lock, flags);
+>  
+>  	/* Recheck with the lock held */
+> @@ -53,6 +57,9 @@ static void mte_sync_page_tags(struct page *page, pte_t *ptep, bool check_swap)
+>  		}
+>  	}
+>  
+> +	if (!pte_is_tagged)
+> +		goto out;
+> +
+>  	page_kasan_tag_reset(page);
+>  	/*
+>  	 * We need smp_wmb() in between setting the flags and clearing the
+> @@ -76,10 +83,15 @@ void mte_sync_tags(pte_t *ptep, pte_t pte)
+>  	bool check_swap = nr_pages == 1;
+>  	bool pte_is_tagged = pte_tagged(pte);
+>  
+> +	/* Early out if there's nothing to do */
+> +	if (!check_swap && !pte_is_tagged)
+> +		return;
+> +
+>  	/* if PG_mte_tagged is set, tags have already been initialised */
+>  	for (i = 0; i < nr_pages; i++, page++) {
+>  		if (!test_bit(PG_mte_tagged, &page->flags))
+> -			mte_sync_page_tags(page, ptep, check_swap);
+> +			mte_sync_page_tags(page, ptep, check_swap,
+> +					   pte_is_tagged);
+>  	}
+>  }
+>  
+> -- 
+> 2.20.1
+> 
+> 
+
 -- 
-2.31.1
-
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
