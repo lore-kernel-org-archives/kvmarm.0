@@ -2,61 +2,99 @@ Return-Path: <SRS0=6U3X=KN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 508A0C433B4
-	for <kvmarm@archiver.kernel.org>; Tue, 18 May 2021 16:50:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3875C433B4
+	for <kvmarm@archiver.kernel.org>; Tue, 18 May 2021 17:25:42 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B071D61184
-	for <kvmarm@archiver.kernel.org>; Tue, 18 May 2021 16:50:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B071D61184
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 60E02611BF
+	for <kvmarm@archiver.kernel.org>; Tue, 18 May 2021 17:25:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60E02611BF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 322BD4B4D5;
-	Tue, 18 May 2021 12:50:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C65014B116;
+	Tue, 18 May 2021 13:25:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id VzgW6vq-YAzj; Tue, 18 May 2021 12:50:35 -0400 (EDT)
+	with ESMTP id Bm9GDxbxsn38; Tue, 18 May 2021 13:25:40 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 98AE74B4BB;
-	Tue, 18 May 2021 12:50:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B5CE24B440;
+	Tue, 18 May 2021 13:25:40 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2592C4B4B6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 May 2021 12:50:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B3BE24B116
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 May 2021 13:25:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZUZkgdF60AzS for <kvmarm@lists.cs.columbia.edu>;
- Tue, 18 May 2021 12:50:32 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 901F34B4B4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 May 2021 12:50:32 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0D5986D;
- Tue, 18 May 2021 09:50:32 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A0A2F3F73B;
- Tue, 18 May 2021 09:50:30 -0700 (PDT)
-Subject: Re: [PATCH v3 1/9] irqchip/gic: Split vGIC probing information from
- the GIC code
-To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
- kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-References: <20210510134824.1910399-1-maz@kernel.org>
- <20210510134824.1910399-2-maz@kernel.org>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <cca6328e-1710-a7ac-e89e-a7dabe16f81f@arm.com>
-Date: Tue, 18 May 2021 17:51:11 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+ with ESMTP id 6WITzNHFVNHA for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 18 May 2021 13:25:38 -0400 (EDT)
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com
+ [209.85.208.176])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 420414B07F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 May 2021 13:25:38 -0400 (EDT)
+Received: by mail-lj1-f176.google.com with SMTP id v6so12499716ljj.5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 May 2021 10:25:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=mSnQ4LBK1uIXV07PEAq0LLHlwweU24rztLmKUUxmtEw=;
+ b=cVzaFjUacrAERsYDIZbRfiVBm3UJe9PfiIi7VMEBI4+mneYhTfREF32Ug/H7xsKLXF
+ xipKw744Y+OPokHmPOwiIilZlVMYtdOjIl5i+xzJy7TSKI5AdyAp62xAFFvkz5aGK7IR
+ rcFwa6FW0Zd3WOBHc48RIIAD4Evo4cCVo4dzA/EBc5YwUsnO0+ec80kxrOAFwBSHfz24
+ 4e/5s/iwhO092+JJCHv/Mly7vK5p7eUvyheKOSI7fXe24zmHVEHwIeyudrmdfiXjw4AW
+ BgKIuFcumclXiaD/TAOYs9fp/I9XvbqU76xLXdbQq1MXVo7j4RToAD81UGguuU1ez9aX
+ XYDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=mSnQ4LBK1uIXV07PEAq0LLHlwweU24rztLmKUUxmtEw=;
+ b=II+vAsjxgMRwQWoI77ZQ3db/4foFS2BalRexE78KdlC1HJRn5f0H/4aU846LWXPgu+
+ 9aBbcT6mZWiGwDanMKd+e31/JKVKxKX+cCnpMyc6gQzX4yUSjONWOeSX9SsC04bdjSWN
+ tHPX3pzxIEeuCPj452D57/NjbapXCH7UB50aFs3QD4G64oa8vLyqd9Erz77xGhkeW+Ni
+ ff+zkPHiUxCLW6bRkL9OdHEuV+h0p5A9UsMONOYyPs7FmuKIR+8zlmovPDXWvSwcuU8Z
+ OmcJUXwm4X99vP6ERAQfq0BowKd28TTTEKyEhFEoTctngCXQn6jI0CApLBEfItA1S3qX
+ gUpw==
+X-Gm-Message-State: AOAM531zNWgZWI8iq9j1UgY3EmKdpf3O5mBi7OOhqvGDIrjjkhWbKegi
+ knGmQ9kJewCzVse3wnN6wG10MzZNa0mAZDcOM+/bcw==
+X-Google-Smtp-Source: ABdhPJwmvfrKFgUyKP/HRH4nFuJ9B6kEhZAEG5g+dr6hELyJdzM7GIR8aVIZG1uUChl8DfU1otU2kJaVQc2bMkV5kGM=
+X-Received: by 2002:a2e:87ce:: with SMTP id v14mr4952952ljj.28.1621358736766; 
+ Tue, 18 May 2021 10:25:36 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20210510134824.1910399-2-maz@kernel.org>
-Content-Language: en-US
-Cc: Hector Martin <marcan@marcan.st>, kernel-team@android.com
+References: <20210517145314.157626-1-jingzhangos@google.com>
+ <20210517145314.157626-2-jingzhangos@google.com>
+ <CALzav=dGT7B7FWw_d5v3QaJxgfp6TZv7E4fdchG_7LKh+C17gg@mail.gmail.com>
+ <CAAdAUtjyFhuh4iFJJOkkO20XXKqbcRO-S0ziFfUW1rHL-bkeZw@mail.gmail.com>
+ <CALzav=dHjy8wnLckxifrjVDfVNBmqHcJgeS7PK6BnAp6UCyO5A@mail.gmail.com>
+In-Reply-To: <CALzav=dHjy8wnLckxifrjVDfVNBmqHcJgeS7PK6BnAp6UCyO5A@mail.gmail.com>
+From: Jing Zhang <jingzhangos@google.com>
+Date: Tue, 18 May 2021 12:25:24 -0500
+Message-ID: <CAAdAUtiXE=CXU_LWG9SpnHsnqUBMC327jC2AvXAFX7-vwwoBog@mail.gmail.com>
+Subject: Re: [PATCH v5 1/4] KVM: stats: Separate common stats from
+ architecture specific ones
+To: David Matlack <dmatlack@google.com>
+Cc: KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
+ Paul Mackerras <paulus@ozlabs.org>,
+ Linuxkselftest <linux-kselftest@vger.kernel.org>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, Will Deacon <will@kernel.org>,
+ KVMARM <kvmarm@lists.cs.columbia.edu>,
+ Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+ LinuxS390 <linux-s390@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
+ Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>,
+ Huacai Chen <chenhuacai@kernel.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ David Rientjes <rientjes@google.com>, KVMPPC <kvm-ppc@vger.kernel.org>,
+ Jim Mattson <jmattson@google.com>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ Sean Christopherson <seanjc@google.com>, Cornelia Huck <cohuck@redhat.com>,
+ Peter Shier <pshier@google.com>, LinuxMIPS <linux-mips@vger.kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,281 +111,66 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+Hi David,
 
-On 5/10/21 2:48 PM, Marc Zyngier wrote:
-> The vGIC advertising code is unsurprisingly very much tied to
-> the GIC implementations. However, we are about to extend the
-> support to lesser implementations.
+On Tue, May 18, 2021 at 11:27 AM David Matlack <dmatlack@google.com> wrote:
 >
-> Let's dissociate the vgic registration from the GIC code and
-> move it into KVM, where it makes a bit more sense. This also
-> allows us to mark the gic_kvm_info structures as __initdata.
+> On Mon, May 17, 2021 at 5:10 PM Jing Zhang <jingzhangos@google.com> wrote:
+> <snip>
+> > Actually the definition of kvm_{vcpu,vm}_stat are arch specific. There is
+> > no real structure for arch agnostic stats. Most of the stats in common
+> > structures are arch agnostic, but not all of them.
+> > There are some benefits to put all common stats in a separate structure.
+> > e.g. if we want to add a stat in kvm_main.c, we only need to add this stat
+> > in the common structure, don't have to update all kvm_{vcpu,vm}_stat
+> > definition for all architectures.
 >
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/vgic/vgic-init.c        | 18 +++++++++--
->  drivers/irqchip/irq-gic-common.c       | 13 --------
->  drivers/irqchip/irq-gic-common.h       |  2 --
->  drivers/irqchip/irq-gic-v3.c           |  6 ++--
->  drivers/irqchip/irq-gic.c              |  6 ++--
->  include/linux/irqchip/arm-gic-common.h | 25 +---------------
->  include/linux/irqchip/arm-vgic-info.h  | 41 ++++++++++++++++++++++++++
->  7 files changed, 63 insertions(+), 48 deletions(-)
->  create mode 100644 include/linux/irqchip/arm-vgic-info.h
+> I meant rename the existing arch-specific struct kvm_{vcpu,vm}_stat to
+> kvm_{vcpu,vm}_stat_arch and rename struct kvm_{vcpu,vm}_stat_common to
+> kvm_{vcpu,vm}_stat.
 >
-> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-> index 58cbda00e56d..2fdb65529594 100644
-> --- a/arch/arm64/kvm/vgic/vgic-init.c
-> +++ b/arch/arm64/kvm/vgic/vgic-init.c
-> @@ -482,6 +482,16 @@ static irqreturn_t vgic_maintenance_handler(int irq, void *data)
->  	return IRQ_HANDLED;
->  }
->  
-> +static struct gic_kvm_info *gic_kvm_info;
-> +
-> +void __init vgic_set_kvm_info(const struct gic_kvm_info *info)
-> +{
-> +	BUG_ON(gic_kvm_info != NULL);
-> +	gic_kvm_info = kmalloc(sizeof(*info), GFP_KERNEL);
-> +	if (gic_kvm_info)
-> +		*gic_kvm_info = *info;
-> +}
-> +
->  /**
->   * kvm_vgic_init_cpu_hardware - initialize the GIC VE hardware
->   *
-> @@ -509,10 +519,8 @@ void kvm_vgic_init_cpu_hardware(void)
->   */
->  int kvm_vgic_hyp_init(void)
->  {
-> -	const struct gic_kvm_info *gic_kvm_info;
->  	int ret;
->  
-> -	gic_kvm_info = gic_get_kvm_info();
->  	if (!gic_kvm_info)
->  		return -ENODEV;
->  
-> @@ -536,10 +544,14 @@ int kvm_vgic_hyp_init(void)
->  		ret = -ENODEV;
->  	}
->  
-> +	kvm_vgic_global_state.maint_irq = gic_kvm_info->maint_irq;
-> +
-> +	kfree(gic_kvm_info);
-> +	gic_kvm_info = NULL;
-
-I double checked and gic_kvm_info is not used after this point (vgic_{v2,v3}_probe
-make copies of the various fields). And after returning an error (below) this
-function cannot be called again.
-
-> +
->  	if (ret)
->  		return ret;
->  
-> -	kvm_vgic_global_state.maint_irq = gic_kvm_info->maint_irq;
->  	ret = request_percpu_irq(kvm_vgic_global_state.maint_irq,
->  				 vgic_maintenance_handler,
->  				 "vgic", kvm_get_running_vcpus());
-> diff --git a/drivers/irqchip/irq-gic-common.c b/drivers/irqchip/irq-gic-common.c
-> index f47b41dfd023..a610821c8ff2 100644
-> --- a/drivers/irqchip/irq-gic-common.c
-> +++ b/drivers/irqchip/irq-gic-common.c
-> @@ -12,19 +12,6 @@
->  
->  static DEFINE_RAW_SPINLOCK(irq_controller_lock);
->  
-> -static const struct gic_kvm_info *gic_kvm_info;
-> -
-> -const struct gic_kvm_info *gic_get_kvm_info(void)
-> -{
-> -	return gic_kvm_info;
-> -}
-> -
-> -void gic_set_kvm_info(const struct gic_kvm_info *info)
-> -{
-> -	BUG_ON(gic_kvm_info != NULL);
-> -	gic_kvm_info = info;
-> -}
-> -
->  void gic_enable_of_quirks(const struct device_node *np,
->  			  const struct gic_quirk *quirks, void *data)
->  {
-> diff --git a/drivers/irqchip/irq-gic-common.h b/drivers/irqchip/irq-gic-common.h
-> index ccba8b0fe0f5..27e3d4ed4f32 100644
-> --- a/drivers/irqchip/irq-gic-common.h
-> +++ b/drivers/irqchip/irq-gic-common.h
-> @@ -28,6 +28,4 @@ void gic_enable_quirks(u32 iidr, const struct gic_quirk *quirks,
->  void gic_enable_of_quirks(const struct device_node *np,
->  			  const struct gic_quirk *quirks, void *data);
->  
-> -void gic_set_kvm_info(const struct gic_kvm_info *info);
-> -
->  #endif /* _IRQ_GIC_COMMON_H */
-> diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
-> index 37a23aa6de37..453fc425eede 100644
-> --- a/drivers/irqchip/irq-gic-v3.c
-> +++ b/drivers/irqchip/irq-gic-v3.c
-> @@ -103,7 +103,7 @@ EXPORT_SYMBOL(gic_nonsecure_priorities);
->  /* ppi_nmi_refs[n] == number of cpus having ppi[n + 16] set as NMI */
->  static refcount_t *ppi_nmi_refs;
->  
-> -static struct gic_kvm_info gic_v3_kvm_info;
-> +static struct gic_kvm_info gic_v3_kvm_info __initdata;
->  static DEFINE_PER_CPU(bool, has_rss);
->  
->  #define MPIDR_RS(mpidr)			(((mpidr) & 0xF0UL) >> 4)
-> @@ -1852,7 +1852,7 @@ static void __init gic_of_setup_kvm_info(struct device_node *node)
->  
->  	gic_v3_kvm_info.has_v4 = gic_data.rdists.has_vlpis;
->  	gic_v3_kvm_info.has_v4_1 = gic_data.rdists.has_rvpeid;
-> -	gic_set_kvm_info(&gic_v3_kvm_info);
-> +	vgic_set_kvm_info(&gic_v3_kvm_info);
->  }
->  
->  static int __init gic_of_init(struct device_node *node, struct device_node *parent)
-> @@ -2168,7 +2168,7 @@ static void __init gic_acpi_setup_kvm_info(void)
->  
->  	gic_v3_kvm_info.has_v4 = gic_data.rdists.has_vlpis;
->  	gic_v3_kvm_info.has_v4_1 = gic_data.rdists.has_rvpeid;
-> -	gic_set_kvm_info(&gic_v3_kvm_info);
-> +	vgic_set_kvm_info(&gic_v3_kvm_info);
->  }
->  
->  static int __init
-> diff --git a/drivers/irqchip/irq-gic.c b/drivers/irqchip/irq-gic.c
-> index b1d9c22caf2e..2de9ec8ece0c 100644
-> --- a/drivers/irqchip/irq-gic.c
-> +++ b/drivers/irqchip/irq-gic.c
-> @@ -119,7 +119,7 @@ static DEFINE_STATIC_KEY_TRUE(supports_deactivate_key);
->  
->  static struct gic_chip_data gic_data[CONFIG_ARM_GIC_MAX_NR] __read_mostly;
->  
-> -static struct gic_kvm_info gic_v2_kvm_info;
-> +static struct gic_kvm_info gic_v2_kvm_info __initdata;
->  
->  static DEFINE_PER_CPU(u32, sgi_intid);
->  
-> @@ -1451,7 +1451,7 @@ static void __init gic_of_setup_kvm_info(struct device_node *node)
->  		return;
->  
->  	if (static_branch_likely(&supports_deactivate_key))
-> -		gic_set_kvm_info(&gic_v2_kvm_info);
-> +		vgic_set_kvm_info(&gic_v2_kvm_info);
->  }
->  
->  int __init
-> @@ -1618,7 +1618,7 @@ static void __init gic_acpi_setup_kvm_info(void)
->  
->  	gic_v2_kvm_info.maint_irq = irq;
->  
-> -	gic_set_kvm_info(&gic_v2_kvm_info);
-> +	vgic_set_kvm_info(&gic_v2_kvm_info);
->  }
->  
->  static int __init gic_v2_acpi_init(union acpi_subtable_headers *header,
-> diff --git a/include/linux/irqchip/arm-gic-common.h b/include/linux/irqchip/arm-gic-common.h
-> index fa8c0455c352..1177f3a1aed5 100644
-> --- a/include/linux/irqchip/arm-gic-common.h
-> +++ b/include/linux/irqchip/arm-gic-common.h
-> @@ -7,8 +7,7 @@
->  #ifndef __LINUX_IRQCHIP_ARM_GIC_COMMON_H
->  #define __LINUX_IRQCHIP_ARM_GIC_COMMON_H
->  
-> -#include <linux/types.h>
-> -#include <linux/ioport.h>
-> +#include <linux/irqchip/arm-vgic-info.h>
->  
->  #define GICD_INT_DEF_PRI		0xa0
->  #define GICD_INT_DEF_PRI_X4		((GICD_INT_DEF_PRI << 24) |\
-> @@ -16,28 +15,6 @@
->  					(GICD_INT_DEF_PRI << 8) |\
->  					GICD_INT_DEF_PRI)
->  
-> -enum gic_type {
-> -	GIC_V2,
-> -	GIC_V3,
-> -};
-> -
-> -struct gic_kvm_info {
-> -	/* GIC type */
-> -	enum gic_type	type;
-> -	/* Virtual CPU interface */
-> -	struct resource vcpu;
-> -	/* Interrupt number */
-> -	unsigned int	maint_irq;
-> -	/* Virtual control interface */
-> -	struct resource vctrl;
-> -	/* vlpi support */
-> -	bool		has_v4;
-> -	/* rvpeid support */
-> -	bool		has_v4_1;
-> -};
-> -
-> -const struct gic_kvm_info *gic_get_kvm_info(void);
-> -
->  struct irq_domain;
->  struct fwnode_handle;
->  int gicv2m_init(struct fwnode_handle *parent_handle,
-> diff --git a/include/linux/irqchip/arm-vgic-info.h b/include/linux/irqchip/arm-vgic-info.h
-> new file mode 100644
-> index 000000000000..0319636be928
-> --- /dev/null
-> +++ b/include/linux/irqchip/arm-vgic-info.h
-> @@ -0,0 +1,41 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * include/linux/irqchip/arm-vgic-info.h
-> + *
-> + * Copyright (C) 2016 ARM Limited, All Rights Reserved.
-> + */
-> +#ifndef __ARM_VGIC_INFO_H
-> +#define __ARM_VGIC_INFO_H
-
-Totally irrelevant nitpick, but the header guards from the other files in this
-directory are like __LINUX_IRQCHIP_ARM_VGIC_INFO_H. Regardless, the patch looks
-correct to me, the functions are called at the exact moment in the boot flow, only
-where the VGIC info is saved is different:
-
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> So in  include/linux/kvm_types.h you'd have:
+>
+> struct kvm_vm_stat {
+>   ulong remote_tlb_flush;
+>   struct kvm_vm_stat_arch arch;
+> };
+>
+> struct kvm_vcpu_stat {
+>   u64 halt_successful_poll;
+>   u64 halt_attempted_poll;
+>   u64 halt_poll_invalid;
+>   u64 halt_wakeup;
+>   u64 halt_poll_success_ns;
+>   u64 halt_poll_fail_ns;
+>   struct kvm_vcpu_stat_arch arch;
+> };
+>
+> And in arch/x86/include/asm/kvm_host.h you'd have:
+>
+> struct kvm_vm_stat_arch {
+>   ulong mmu_shadow_zapped;
+>   ...
+> };
+>
+> struct kvm_vcpu_stat_arch {
+>   u64 pf_fixed;
+>   u64 pf_guest;
+>   u64 tlb_flush;
+>   ...
+> };
+>
+> You still have the same benefits of having an arch-neutral place to
+> store stats but the struct layout more closely resembles struct
+> kvm_vcpu and struct kvm.
+You are right. This is a more reasonable way to layout the structures.
+I remember that I didn't choose this way is only because that it needs
+touching every arch specific stats in all architectures (stat.name ->
+stat.arch.name) instead of only touching arch neutral stats.
+Let's see if there is any vote from others about this.
 
 Thanks,
-
-Alex
-
-> +
-> +#include <linux/types.h>
-> +#include <linux/ioport.h>
-> +
-> +enum gic_type {
-> +	/* Full GICv2 */
-> +	GIC_V2,
-> +	/* Full GICv3, optionally with v2 compat */
-> +	GIC_V3,
-> +};
-> +
-> +struct gic_kvm_info {
-> +	/* GIC type */
-> +	enum gic_type	type;
-> +	/* Virtual CPU interface */
-> +	struct resource vcpu;
-> +	/* Interrupt number */
-> +	unsigned int	maint_irq;
-> +	/* Virtual control interface */
-> +	struct resource vctrl;
-> +	/* vlpi support */
-> +	bool		has_v4;
-> +	/* rvpeid support */
-> +	bool		has_v4_1;
-> +};
-> +
-> +#ifdef CONFIG_KVM
-> +void vgic_set_kvm_info(const struct gic_kvm_info *info);
-> +#else
-> +static inline void vgic_set_kvm_info(const struct gic_kvm_info *info) {}
-> +#endif
-> +
-> +#endif
+Jing
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
