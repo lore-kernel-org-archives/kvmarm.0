@@ -2,64 +2,74 @@ Return-Path: <SRS0=M1+/=KO=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4FA2C433B4
-	for <kvmarm@archiver.kernel.org>; Wed, 19 May 2021 13:52:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0B25C433B4
+	for <kvmarm@archiver.kernel.org>; Wed, 19 May 2021 14:07:38 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5666A611AE
-	for <kvmarm@archiver.kernel.org>; Wed, 19 May 2021 13:52:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5666A611AE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 19ED161355
+	for <kvmarm@archiver.kernel.org>; Wed, 19 May 2021 14:07:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19ED161355
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C41DF4B736;
-	Wed, 19 May 2021 09:52:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 89B764B851;
+	Wed, 19 May 2021 10:07:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id o3d34JPejeUD; Wed, 19 May 2021 09:52:10 -0400 (EDT)
+	with ESMTP id JeObPo9OSI-v; Wed, 19 May 2021 10:07:36 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 030614B847;
-	Wed, 19 May 2021 09:52:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5092F4B545;
+	Wed, 19 May 2021 10:07:36 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 57F144B83B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 May 2021 09:52:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 93EE14B522
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 May 2021 10:07:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id P8pbRYGHZXAY for <kvmarm@lists.cs.columbia.edu>;
- Wed, 19 May 2021 09:52:05 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0778D4B736
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 May 2021 09:52:05 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9B5BA31B;
- Wed, 19 May 2021 06:52:04 -0700 (PDT)
-Received: from [192.168.1.179] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0C3DA3F73B;
- Wed, 19 May 2021 06:52:01 -0700 (PDT)
-Subject: Re: [PATCH v12 7/8] KVM: arm64: ioctl to fetch/store tags in a guest
-To: Marc Zyngier <maz@kernel.org>
-References: <20210517123239.8025-1-steven.price@arm.com>
- <20210517123239.8025-8-steven.price@arm.com> <87sg2ltexj.wl-maz@kernel.org>
-From: Steven Price <steven.price@arm.com>
-Message-ID: <5c0f6cd7-5f2d-de5b-f057-f3b307cb9416@arm.com>
-Date: Wed, 19 May 2021 14:51:56 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+ with ESMTP id ImIilZTEgRNU for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 19 May 2021 10:07:34 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 868224B50C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 May 2021 10:07:34 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1621433254;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=w6Ik3ix00seen7f0ACeVszG5V6/4OpjDNwj8RlI2yS0=;
+ b=Dv2nUmvndqQgBaxsv6cDRD2q2A1O4BE64d0V0Q6zK4vgxkA1OI1qaMFr5nW6Y6wA5wWYZQ
+ KNw6PN7kk9wUd4UOrgbqFE9Fzfiz1H1BppJL2/y/P5EjNMEiIZI8IuaqUjLdCwAHtmFCnM
+ 0YQl5iG+f0S0Dim+Jgm6i+Y8G67xFJo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-418-CPE_d8ZRPu6BV6ilekZGDg-1; Wed, 19 May 2021 10:07:30 -0400
+X-MC-Unique: CPE_d8ZRPu6BV6ilekZGDg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 479B0180FD68;
+ Wed, 19 May 2021 14:07:29 +0000 (UTC)
+Received: from gator.redhat.com (unknown [10.40.192.248])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 350C710013C1;
+ Wed, 19 May 2021 14:07:27 +0000 (UTC)
+From: Andrew Jones <drjones@redhat.com>
+To: kvm@vger.kernel.org,
+	kvmarm@lists.cs.columbia.edu
+Subject: [PATCH v2 0/5] KVM: arm64: selftests: Fix get-reg-list
+Date: Wed, 19 May 2021 16:07:21 +0200
+Message-Id: <20210519140726.892632-1-drjones@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87sg2ltexj.wl-maz@kernel.org>
-Content-Language: en-GB
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
- Catalin Marinas <catalin.marinas@arm.com>, Juan Quintela <quintela@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
- Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org,
- Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Cc: maz@kernel.org, pbonzini@redhat.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -76,132 +86,64 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 17/05/2021 19:04, Marc Zyngier wrote:
-> On Mon, 17 May 2021 13:32:38 +0100,
-> Steven Price <steven.price@arm.com> wrote:
->>
->> The VMM may not wish to have it's own mapping of guest memory mapped
->> with PROT_MTE because this causes problems if the VMM has tag checking
->> enabled (the guest controls the tags in physical RAM and it's unlikely
->> the tags are correct for the VMM).
->>
->> Instead add a new ioctl which allows the VMM to easily read/write the
->> tags from guest memory, allowing the VMM's mapping to be non-PROT_MTE
->> while the VMM can still read/write the tags for the purpose of
->> migration.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->>  arch/arm64/include/uapi/asm/kvm.h | 11 +++++
->>  arch/arm64/kvm/arm.c              | 69 +++++++++++++++++++++++++++++++
->>  include/uapi/linux/kvm.h          |  1 +
->>  3 files changed, 81 insertions(+)
->>
->> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
->> index 24223adae150..b3edde68bc3e 100644
->> --- a/arch/arm64/include/uapi/asm/kvm.h
->> +++ b/arch/arm64/include/uapi/asm/kvm.h
->> @@ -184,6 +184,17 @@ struct kvm_vcpu_events {
->>  	__u32 reserved[12];
->>  };
->>  
->> +struct kvm_arm_copy_mte_tags {
->> +	__u64 guest_ipa;
->> +	__u64 length;
->> +	void __user *addr;
->> +	__u64 flags;
->> +	__u64 reserved[2];
->> +};
->> +
->> +#define KVM_ARM_TAGS_TO_GUEST		0
->> +#define KVM_ARM_TAGS_FROM_GUEST		1
->> +
->>  /* If you need to interpret the index values, here is the key: */
->>  #define KVM_REG_ARM_COPROC_MASK		0x000000000FFF0000
->>  #define KVM_REG_ARM_COPROC_SHIFT	16
->> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index e89a5e275e25..4b6c83beb75d 100644
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
->> @@ -1309,6 +1309,65 @@ static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
->>  	}
->>  }
->>  
->> +static int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
->> +				      struct kvm_arm_copy_mte_tags *copy_tags)
->> +{
->> +	gpa_t guest_ipa = copy_tags->guest_ipa;
->> +	size_t length = copy_tags->length;
->> +	void __user *tags = copy_tags->addr;
->> +	gpa_t gfn;
->> +	bool write = !(copy_tags->flags & KVM_ARM_TAGS_FROM_GUEST);
->> +	int ret = 0;
->> +
->> +	if (copy_tags->reserved[0] || copy_tags->reserved[1])
->> +		return -EINVAL;
->> +
->> +	if (copy_tags->flags & ~KVM_ARM_TAGS_FROM_GUEST)
->> +		return -EINVAL;
->> +
->> +	if (length & ~PAGE_MASK || guest_ipa & ~PAGE_MASK)
->> +		return -EINVAL;
->> +
->> +	gfn = gpa_to_gfn(guest_ipa);
->> +
->> +	mutex_lock(&kvm->slots_lock);
->> +
->> +	while (length > 0) {
->> +		kvm_pfn_t pfn = gfn_to_pfn_prot(kvm, gfn, write, NULL);
->> +		void *maddr;
->> +		unsigned long num_tags = PAGE_SIZE / MTE_GRANULE_SIZE;
-> 
-> nit: this is a compile time constant, make it a #define. This will
-> avoid the confusing overloading of "num_tags" as both an input and an
-> output for the mte_copy_tags-* functions.
+v2:
+ - Removed some cruft left over from a previous more complex design of the
+   config command line parser
+ - Dropped the list printing factor out patch as it's not necessary
+ - Added a 'PASS' output for passing tests to allow testers to feel good
+ - Changed the "up to date with kernel" comment to reference 5.13.0-rc2
 
-No problem, I agree my usage of num_tags wasn't very clear.
 
->> +
->> +		if (is_error_noslot_pfn(pfn)) {
->> +			ret = -EFAULT;
->> +			goto out;
->> +		}
->> +
->> +		maddr = page_address(pfn_to_page(pfn));
->> +
->> +		if (!write) {
->> +			num_tags = mte_copy_tags_to_user(tags, maddr, num_tags);
->> +			kvm_release_pfn_clean(pfn);
->> +		} else {
->> +			num_tags = mte_copy_tags_from_user(maddr, tags,
->> +							   num_tags);
->> +			kvm_release_pfn_dirty(pfn);
->> +		}
->> +
->> +		if (num_tags != PAGE_SIZE / MTE_GRANULE_SIZE) {
->> +			ret = -EFAULT;
->> +			goto out;
->> +		}
->> +
->> +		gfn++;
->> +		tags += num_tags;
->> +		length -= PAGE_SIZE;
->> +	}
->> +
->> +out:
->> +	mutex_unlock(&kvm->slots_lock);
->> +	return ret;
->> +}
->> +
-> 
-> nit again: I'd really prefer it if you moved this to guest.c, where we
-> already have a bunch of the save/restore stuff.
+Since KVM commit 11663111cd49 ("KVM: arm64: Hide PMU registers from
+userspace when not available") the get-reg-list* tests have been
+failing with
 
-Sure - I'll move it across.
+  ...
+  ... There are 74 missing registers.
+  The following lines are missing registers:
+  ...
+
+where the 74 missing registers are all PMU registers. This isn't a
+bug in KVM that the selftest found, even though it's true that a
+KVM userspace that wasn't setting the KVM_ARM_VCPU_PMU_V3 VCPU
+flag, but still expecting the PMU registers to be in the reg-list,
+would suddenly no longer have their expectations met. In that case,
+the expectations were wrong, though, so that KVM userspace needs to
+be fixed, and so does this selftest.
+
+We could fix the test with a one-liner since we just need a
+
+  init->features[0] |= 1 << KVM_ARM_VCPU_PMU_V3;
+
+in prepare_vcpu_init(), but that's too easy, so here's a 5 patch patch
+series instead :-)  The reason for all the patches and the heavy diffstat
+is to prepare for other vcpu configuration testing, e.g. ptrauth and mte.
+With the refactoring done in this series, we should now be able to easily
+add register sublists and vcpu configs to the get-reg-list test, as the
+last patch demonstrates with the pmu fix.
 
 Thanks,
+drew
 
-Steve
+
+Andrew Jones (5):
+  KVM: arm64: selftests: get-reg-list: Introduce vcpu configs
+  KVM: arm64: selftests: get-reg-list: Prepare to run multiple configs
+    at once
+  KVM: arm64: selftests: get-reg-list: Provide config selection option
+  KVM: arm64: selftests: get-reg-list: Remove get-reg-list-sve
+  KVM: arm64: selftests: get-reg-list: Split base and pmu registers
+
+ tools/testing/selftests/kvm/.gitignore        |   1 -
+ tools/testing/selftests/kvm/Makefile          |   1 -
+ .../selftests/kvm/aarch64/get-reg-list-sve.c  |   3 -
+ .../selftests/kvm/aarch64/get-reg-list.c      | 388 ++++++++++++------
+ 4 files changed, 271 insertions(+), 122 deletions(-)
+ delete mode 100644 tools/testing/selftests/kvm/aarch64/get-reg-list-sve.c
+
+-- 
+2.30.2
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
