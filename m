@@ -2,52 +2,55 @@ Return-Path: <SRS0=M1+/=KO=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1C5CC433B4
-	for <kvmarm@archiver.kernel.org>; Wed, 19 May 2021 17:32:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3433AC433B4
+	for <kvmarm@archiver.kernel.org>; Wed, 19 May 2021 17:48:21 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 535B061355
-	for <kvmarm@archiver.kernel.org>; Wed, 19 May 2021 17:32:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 535B061355
+	by mail.kernel.org (Postfix) with ESMTP id 9CDEA61244
+	for <kvmarm@archiver.kernel.org>; Wed, 19 May 2021 17:48:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CDEA61244
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D487E4B4C3;
-	Wed, 19 May 2021 13:32:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 25DE14B883;
+	Wed, 19 May 2021 13:48:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 2JCaQlbA9cwy; Wed, 19 May 2021 13:32:36 -0400 (EDT)
+	with ESMTP id uDKv2Mm-grjv; Wed, 19 May 2021 13:48:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C3E3B4B869;
-	Wed, 19 May 2021 13:32:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B94654B850;
+	Wed, 19 May 2021 13:48:18 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B9CC34B860
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 May 2021 13:32:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E28A04B83E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 May 2021 13:48:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ejxSmTla4xnE for <kvmarm@lists.cs.columbia.edu>;
- Wed, 19 May 2021 13:32:34 -0400 (EDT)
+ with ESMTP id M+MIN+Nbl-aD for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 19 May 2021 13:48:16 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A35954B4C3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 May 2021 13:32:34 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id D6564611BF;
- Wed, 19 May 2021 17:32:30 +0000 (UTC)
-Date: Wed, 19 May 2021 18:32:28 +0100
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AA7B64B832
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 May 2021 13:48:16 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 232EC611BF;
+ Wed, 19 May 2021 17:48:11 +0000 (UTC)
+Date: Wed, 19 May 2021 18:48:08 +0100
 From: Catalin Marinas <catalin.marinas@arm.com>
 To: Steven Price <steven.price@arm.com>
-Subject: Re: [PATCH v12 1/8] arm64: mte: Handle race when synchronising tags
-Message-ID: <20210519173228.GC21619@arm.com>
+Subject: Re: [PATCH v12 3/8] arm64: mte: Sync tags for pages where PTE is
+ untagged
+Message-ID: <20210519174808.GD21619@arm.com>
 References: <20210517123239.8025-1-steven.price@arm.com>
- <20210517123239.8025-2-steven.price@arm.com>
+ <20210517123239.8025-4-steven.price@arm.com>
+ <87y2cdtk09.wl-maz@kernel.org>
+ <f3a3f560-4d2b-9cd3-bbf4-ea8135ab4d17@arm.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20210517123239.8025-2-steven.price@arm.com>
+In-Reply-To: <f3a3f560-4d2b-9cd3-bbf4-ea8135ab4d17@arm.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
  Marc Zyngier <maz@kernel.org>, Juan Quintela <quintela@redhat.com>,
@@ -71,30 +74,71 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, May 17, 2021 at 01:32:32PM +0100, Steven Price wrote:
-> mte_sync_tags() used test_and_set_bit() to set the PG_mte_tagged flag
-> before restoring/zeroing the MTE tags. However if another thread were to
-> race and attempt to sync the tags on the same page before the first
-> thread had completed restoring/zeroing then it would see the flag is
-> already set and continue without waiting. This would potentially expose
-> the previous contents of the tags to user space, and cause any updates
-> that user space makes before the restoring/zeroing has completed to
-> potentially be lost.
+On Wed, May 19, 2021 at 10:32:01AM +0100, Steven Price wrote:
+> On 17/05/2021 17:14, Marc Zyngier wrote:
+> > On Mon, 17 May 2021 13:32:34 +0100,
+> > Steven Price <steven.price@arm.com> wrote:
+> >>
+> >> A KVM guest could store tags in a page even if the VMM hasn't mapped
+> >> the page with PROT_MTE. So when restoring pages from swap we will
+> >> need to check to see if there are any saved tags even if !pte_tagged().
+> >>
+> >> However don't check pages for which pte_access_permitted() returns false
+> >> as these will not have been swapped out.
+> >>
+> >> Signed-off-by: Steven Price <steven.price@arm.com>
+> >> ---
+> >>  arch/arm64/include/asm/pgtable.h |  9 +++++++--
+> >>  arch/arm64/kernel/mte.c          | 16 ++++++++++++++--
+> >>  2 files changed, 21 insertions(+), 4 deletions(-)
+> >>
+> >> diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
+> >> index 0b10204e72fc..275178a810c1 100644
+> >> --- a/arch/arm64/include/asm/pgtable.h
+> >> +++ b/arch/arm64/include/asm/pgtable.h
+> >> @@ -314,8 +314,13 @@ static inline void set_pte_at(struct mm_struct *mm, unsigned long addr,
+> >>  	if (pte_present(pte) && pte_user_exec(pte) && !pte_special(pte))
+> >>  		__sync_icache_dcache(pte);
+> >>  
+> >> -	if (system_supports_mte() &&
+> >> -	    pte_present(pte) && pte_tagged(pte) && !pte_special(pte))
+> >> +	/*
+> >> +	 * If the PTE would provide user space access to the tags associated
+> >> +	 * with it then ensure that the MTE tags are synchronised.  Exec-only
+> >> +	 * mappings don't expose tags (instruction fetches don't check tags).
+> > 
+> > I'm not sure I understand this comment. Of course, execution doesn't
+> > match tags. But the memory could still have tags associated with
+> > it. Does this mean such a page would lose its tags is swapped out?
 > 
-> Since this code is run from atomic contexts we can't just lock the page
-> during the process. Instead implement a new (global) spinlock to protect
-> the mte_sync_page_tags() function.
+> Hmm, I probably should have reread that - the context of the comment is
+> lost.
 > 
-> Fixes: 34bfeea4a9e9 ("arm64: mte: Clear the tags when a page is mapped in user-space with PROT_MTE")
-> Signed-off-by: Steven Price <steven.price@arm.com>
+> I added the comment when changing to pte_access_permitted(), and the
+> comment on pte_access_permitted() explains a potential gotcha:
+> 
+>  * p??_access_permitted() is true for valid user mappings (PTE_USER
+>  * bit set, subject to the write permission check). For execute-only
+>  * mappings, like PROT_EXEC with EPAN (both PTE_USER and PTE_UXN bits
+>  * not set) must return false. PROT_NONE mappings do not have the
+>  * PTE_VALID bit set.
+> 
+> So execute-only mappings return false even though that is effectively a
+> type of user access. However, because MTE checks are not performed by
+> the PE for instruction fetches this doesn't matter. I'll update the
+> comment, how about:
+> 
+> /*
+>  * If the PTE would provide user space access to the tags associated
+>  * with it then ensure that the MTE tags are synchronised.  Although
+>  * pte_access_permitted() returns false for exec only mappings, they
+>  * don't expose tags (instruction fetches don't check tags).
+>  */
 
-Other than the missing spinlock initialisation, the patch looks fine to
-me.
-
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
-
-(though I'll probably queue it as a fix, waiting a couple of days for
-comments)
+This looks fine to me. We basically want to check the PTE_VALID and
+PTE_USER bits and pte_access_permitted() does this (we could come up
+with a new macro name like pte_valid_user() but since we don't care
+about execute-only, it gets unnecessarily complicated).
 
 -- 
 Catalin
