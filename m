@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ECAFC433B4
-	for <kvmarm@archiver.kernel.org>; Thu, 20 May 2021 08:58:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 961BBC43460
+	for <kvmarm@archiver.kernel.org>; Thu, 20 May 2021 08:58:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8A31861353
-	for <kvmarm@archiver.kernel.org>; Thu, 20 May 2021 08:58:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A31861353
+	by mail.kernel.org (Postfix) with ESMTP id 2FFCD61261
+	for <kvmarm@archiver.kernel.org>; Thu, 20 May 2021 08:58:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FFCD61261
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 049154B506;
-	Thu, 20 May 2021 04:58:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CA33C4B6DF;
+	Thu, 20 May 2021 04:58:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id kY8mC4OKlZnx; Thu, 20 May 2021 04:58:02 -0400 (EDT)
+	with ESMTP id 8LN4HwQxvhPf; Thu, 20 May 2021 04:58:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D4344B74E;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AAE5B4B75B;
 	Thu, 20 May 2021 04:58:02 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3AE694B83A
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 May 2021 12:57:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 928034B4BC
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 May 2021 13:02:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4p1uj6pvR6Gp for <kvmarm@lists.cs.columbia.edu>;
- Wed, 19 May 2021 12:57:57 -0400 (EDT)
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com
- [209.85.208.171])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A63C24B832
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 May 2021 12:57:57 -0400 (EDT)
-Received: by mail-lj1-f171.google.com with SMTP id w15so16429269ljo.10
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 May 2021 09:57:57 -0700 (PDT)
+ with ESMTP id eBfTTNFoIo0Y for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 19 May 2021 13:02:34 -0400 (EDT)
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com
+ [209.85.208.169])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0B6E44B83A
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 May 2021 13:02:34 -0400 (EDT)
+Received: by mail-lj1-f169.google.com with SMTP id w15so16445870ljo.10
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 May 2021 10:02:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=nXnRBFRSdAWxCxN1vjVIJlzYFA0xQryLk10gJy9ij6Q=;
- b=pS95ZLgayqQwxXeQu8ZyQ8ycWuDd16ElGeC0xgVYQUfHCnl9JqIwvNsLMVzYfpTn+u
- 4ylD5YuNNMfyuo+nPoA6mEIO3YGuJw8E4wG16u8d2PGReQu3zyMBFOG9ta3vUoParUt6
- VBwXR6Hnm+iQwRnaU0ju2zrO6HTCf5g6XRrEE6GN7GeKRDvFqs8MA2sHf3MHccHnaFE6
- ORhUxGYQAZe4Mt2I3W23avCfWFCIsSeLgpToUJu3q8FEeX7qIfxWlQVpVKoxLVNKcUB2
- Ks0pVOb7sy0MIfXP21Iz0SORueBfNACFXhk9ZAJiTR3OgxcxbO7w5lPRXdyc8yjPaELJ
- 4K6Q==
+ :cc; bh=KYEHus9mFcMQyVLotJ3OZmJHh5tJfhq+Pwdg5CqpwgU=;
+ b=MMpYsiS99gN+THuy0lPQ/HUm+reH47/1KUPbzRS6M1wIQ7IGFnidDqSnmBFOpwehxx
+ nOsLeNITKnX4u3V494si+waOCpQ6ak4IgvNZohaOBKK2vNRN9oQFpRusdLGgZAK+3pX1
+ r6p3272/NVav87LVQr3PM+USPsFBYa6Epzbx7TqQGmohhgZu3yIXSi+TKrSNGsnGbj5u
+ 1jQReEx5T5kARAdGGblKnlm6LtjQ0NdtiJRB+03xkQ/JylI3GbBUc/O1yp7EYhH1uBDR
+ Kghz3Z3pNfzQdC/oFbJKvMETH6zEH70zlVVaHs4MNH582a55c62CKnXGTYmzerq9dnxA
+ EnaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=nXnRBFRSdAWxCxN1vjVIJlzYFA0xQryLk10gJy9ij6Q=;
- b=T0PbW2ryCbHh+OghROiFDie8TAOoITG41MCXnS0n2OJ3HYAeJh55iv+m8Fayh8Hh95
- IXr94BAgN81lkhHzGr8sHvmw+QoX/2oax+BbSaYieBOwXbPDdjGrGusglSAB+H1Mj2XR
- vhbktatK1rSBFQUHRKZ+QN/lJ9e6XKYydAXPyOmkM5+GBXmU98HnE3q/qmYTsf5Dlm5n
- 2cx/0FSpP5ZOjLU6CLjksV3QKAO3Khd/CsvirdZ53G8g08Q6dbfLcYXpVZOoburrXaqX
- fnFw0kLlBZzB0kg05JDzKfug6mqfLhqhi6z8HotyVSrytQcrMi4OjcfihLAMk512dgOl
- qT5Q==
-X-Gm-Message-State: AOAM530NFxZSTbhXa5fbNOkjvuL/t/o9706KGyzLVORiZ6IenCGYB0qA
- RI9d5niOGsKgkdv21IEz1BoeHgTwpYJSe8O5mauIDw==
-X-Google-Smtp-Source: ABdhPJzI+2nDatir7SSjGH9vGdaZ94OaqoLrJ65pr7UMe9dwtydU4yzOQkWodFVnPMXpww81DjPTXpOxM5ET8qLqvAo=
-X-Received: by 2002:a2e:5d7:: with SMTP id 206mr151620ljf.448.1621443475884;
- Wed, 19 May 2021 09:57:55 -0700 (PDT)
+ bh=KYEHus9mFcMQyVLotJ3OZmJHh5tJfhq+Pwdg5CqpwgU=;
+ b=pp8o1Svf4aK4qZTwGWfi1I5MWqY2KpACoIYVS5sW9e89cltoH9g/CL1caEYQfV47TG
+ Dm0NAXshjAZoPxTNbDGHqDoNG/w06bLRaz96XjPIY+o1J6VEvtbkHTfgzJXxXfMMRtKz
+ MD546VPxoNnhl/W8yc1ztMgbnt2VztjgSFDURJJh8qCieCEMGNgrBK4vBILzJNuY9J2L
+ N+P+jgGHDcH9wQNIwCOsQN4Kl4Ujc4QvFirUVJglsj370O5JbMPJfOscza0T2DeXlbFM
+ XYOCfot2NfGkZdnJCjO8PEamGiAJi6eXyfz27O41Whg9VOsLmMvo2Ca0uaz5AmOKCNG7
+ wuPA==
+X-Gm-Message-State: AOAM5316WydQK+6o7jez40MOGeL4I1F4795STEwHBGOoSNBJfJzWt2QZ
+ cEm71eeKp7NCK4ewBy24DoXgs0TEuuMLSFyRNMWcAQ==
+X-Google-Smtp-Source: ABdhPJzkGyod4UFQTKgh6iVIzPSQBVQPqitmSo9L02VJ97UmqyTweH3QZUVF70Yb7cixe5VCZu2rOn3+5tapf4hpWdc=
+X-Received: by 2002:a2e:5c83:: with SMTP id q125mr121364ljb.447.1621443752367; 
+ Wed, 19 May 2021 10:02:32 -0700 (PDT)
 MIME-Version: 1.0
 References: <20210517145314.157626-1-jingzhangos@google.com>
  <20210517145314.157626-4-jingzhangos@google.com>
 In-Reply-To: <20210517145314.157626-4-jingzhangos@google.com>
 From: David Matlack <dmatlack@google.com>
-Date: Wed, 19 May 2021 09:57:29 -0700
-Message-ID: <CALzav=e9iLLzZyccXq6gTM0nv6n=6qEUO+VYQ-RzJ44tNK30NQ@mail.gmail.com>
+Date: Wed, 19 May 2021 10:02:06 -0700
+Message-ID: <CALzav=chQrg=8krzt_aNuUfKW39SADUr-7C=i1iJSvEU5P=P0Q@mail.gmail.com>
 Subject: Re: [PATCH v5 3/4] KVM: stats: Add documentation for statistics data
  binary interface
 To: Jing Zhang <jingzhangos@google.com>
@@ -155,11 +155,6 @@ On Mon, May 17, 2021 at 9:25 AM Jing Zhang <jingzhangos@google.com> wrote:
 > +
 > +The Header block is always at the start of the file. It is only needed to be
 > +read one time after a system boot.
-
-By system boot do you mean the host or the VM? If the host then it's
-probably just cleaner to omit that part entirely and just say "It is
-only needed to be read once.".
-
 > +It is in the form of ``struct kvm_stats_header`` as below::
 > +
 > +       #define KVM_STATS_ID_MAXLEN             64
@@ -174,9 +169,6 @@ only needed to be read once.".
 > +
 > +The ``id`` field is identification for the corresponding KVM statistics. For
 > +KVM statistics, it is in the form of "kvm-{kvm pid}", like "kvm-12345". For
-
-Should this say "For VM statistics, ..." instead?
-
 > +VCPU statistics, it is in the form of "kvm-{kvm pid}/vcpu-{vcpu id}", like
 > +"kvm-12345/vcpu-12".
 > +
@@ -192,15 +184,7 @@ Should this say "For VM statistics, ..." instead?
 > +of the file indicated by the file descriptor.
 > +
 > +The Descriptors block is only needed to be read once after a system boot. It is
-
-Ditto here about system boot.
-
 > +an array of ``struct kvm_stats_desc`` as below::
-
-Consider omitting these macros from the documentation, or moving them
-to later. Readers right here are expecting to see the struct
-kvm_stats_desc given the previous line.
-
 > +
 > +       #define KVM_STATS_TYPE_SHIFT            0
 > +       #define KVM_STATS_TYPE_MASK             (0xF << KVM_STATS_TYPE_SHIFT)
@@ -221,12 +205,6 @@ kvm_stats_desc given the previous line.
 > +       #define KVM_STATS_SCALE_POW10           (0x0 << KVM_STATS_SCALE_SHIFT)
 > +       #define KVM_STATS_SCALE_POW2            (0x1 << KVM_STATS_SCALE_SHIFT)
 > +       #define KVM_STATS_SCALE_MAX             KVM_STATS_SCALE_POW2
-
-Terminology nit: I think usually this part is called the "base". e.g.
-when you decompose a number X into N * B^E, B is the "base" and E is
-the "exponent". I see you're using "exponent" already but it might
-make sense to change "scale" to "base" throughout this series.
-
 > +
 > +       struct kvm_stats_desc {
 > +               __u32 flags;
@@ -239,21 +217,6 @@ make sense to change "scale" to "base" throughout this series.
 > +
 > +The ``flags`` field contains the type and unit of the statistics data described
 > +by this descriptor. The following flags are supported:
-
-nit: Suggest breaking this list out into separate lists so readers can
-differentiate between the type, unit, and scale. Something like:
-
-Bits 0-3 of ``flags`` encode the type:
-
-* ``KVM_STATS_TYPE_CUMULATIVE`` ...
-* ``KVM_STATS_TYPE_INSTANT`` ...
-
-Bits 4-7 of ``flags encode the unit:
-
-* ``KVM_STATS_UNIT_NONE`` ...
-...
-etc.
-
 > +  * ``KVM_STATS_TYPE_CUMULATIVE``
 > +    The statistics data is cumulative. The value of data can only be increased.
 > +    Most of the counters used in KVM are of this type.
@@ -294,21 +257,16 @@ etc.
 > +The ``exponent`` field is the scale of corresponding statistics data. It has two
 > +values as follows:
 > +  * ``KVM_STATS_SCALE_POW10``
-
-I thought the scale was encoded in ``flags`` not ``exponent``? Isn't
-the exponent the
-
 > +    The scale is based on power of 10. It is used for measurement of time and
 > +    CPU clock cycles.
 > +  * ``KVM_STATS_SCALE_POW2``
 > +    The scale is based on power of 2. It is used for measurement of memory size.
-
-It might be useful to give an example of how to use the exponent field
-in practice.
-
 > +
 > +The ``size`` field is the number of values of this statistics data. It is in the
 > +unit of ``unsigned long`` for VCPU or ``__u64`` for VM.
+
+Note it is the reverse in the implementation.
+
 > +
 > +The ``unused1`` and ``unused2`` fields are reserved for future
 > +support for other types of statistics data, like log/linear histogram.
