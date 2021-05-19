@@ -2,71 +2,75 @@ Return-Path: <SRS0=M1+/=KO=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0B25C433B4
-	for <kvmarm@archiver.kernel.org>; Wed, 19 May 2021 14:07:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54610C43460
+	for <kvmarm@archiver.kernel.org>; Wed, 19 May 2021 14:07:46 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 19ED161355
-	for <kvmarm@archiver.kernel.org>; Wed, 19 May 2021 14:07:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19ED161355
+	by mail.kernel.org (Postfix) with ESMTP id D7E346135F
+	for <kvmarm@archiver.kernel.org>; Wed, 19 May 2021 14:07:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7E346135F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 89B764B851;
-	Wed, 19 May 2021 10:07:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B4FF4B53D;
+	Wed, 19 May 2021 10:07:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JeObPo9OSI-v; Wed, 19 May 2021 10:07:36 -0400 (EDT)
+	with ESMTP id EXx3j4eRfeGs; Wed, 19 May 2021 10:07:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5092F4B545;
-	Wed, 19 May 2021 10:07:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 726814B6A8;
+	Wed, 19 May 2021 10:07:44 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 93EE14B522
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 May 2021 10:07:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 450164B522
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 May 2021 10:07:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ImIilZTEgRNU for <kvmarm@lists.cs.columbia.edu>;
- Wed, 19 May 2021 10:07:34 -0400 (EDT)
+ with ESMTP id vk3kAvFLHpNL for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 19 May 2021 10:07:42 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 868224B50C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 May 2021 10:07:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C8644B53D
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 May 2021 10:07:42 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1621433254;
+ s=mimecast20190719; t=1621433262;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding;
- bh=w6Ik3ix00seen7f0ACeVszG5V6/4OpjDNwj8RlI2yS0=;
- b=Dv2nUmvndqQgBaxsv6cDRD2q2A1O4BE64d0V0Q6zK4vgxkA1OI1qaMFr5nW6Y6wA5wWYZQ
- KNw6PN7kk9wUd4UOrgbqFE9Fzfiz1H1BppJL2/y/P5EjNMEiIZI8IuaqUjLdCwAHtmFCnM
- 0YQl5iG+f0S0Dim+Jgm6i+Y8G67xFJo=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=7GTQBNGZoTX0xb+GuNByFAV5LQVduIalFtZy8xJ1/rU=;
+ b=Ej0oHLzdIwNrGYT4e/FC9TDATB3Yel9b30zf0jELqT+X2tniPLi9ApbJSr1MijxlcRnFCn
+ 4ENJwqY+sByNLJtsj4DbhPRPjX2HFSsUaMxIHPX9v7LZt4fTe/dyO5TYepXse/MJpsHpoT
+ CNi+TW1geM2CqGznJHunHdpvqTt2Y8c=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-418-CPE_d8ZRPu6BV6ilekZGDg-1; Wed, 19 May 2021 10:07:30 -0400
-X-MC-Unique: CPE_d8ZRPu6BV6ilekZGDg-1
+ us-mta-416-VkdFJco2M3uZy_aO1_Nmdg-1; Wed, 19 May 2021 10:07:40 -0400
+X-MC-Unique: VkdFJco2M3uZy_aO1_Nmdg-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 479B0180FD68;
- Wed, 19 May 2021 14:07:29 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 75FD8101371E;
+ Wed, 19 May 2021 14:07:39 +0000 (UTC)
 Received: from gator.redhat.com (unknown [10.40.192.248])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 350C710013C1;
- Wed, 19 May 2021 14:07:27 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6B19810013C1;
+ Wed, 19 May 2021 14:07:32 +0000 (UTC)
 From: Andrew Jones <drjones@redhat.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v2 0/5] KVM: arm64: selftests: Fix get-reg-list
-Date: Wed, 19 May 2021 16:07:21 +0200
-Message-Id: <20210519140726.892632-1-drjones@redhat.com>
+Subject: [PATCH v2 2/5] KVM: arm64: selftests: get-reg-list: Prepare to run
+ multiple configs at once
+Date: Wed, 19 May 2021 16:07:23 +0200
+Message-Id: <20210519140726.892632-3-drjones@redhat.com>
+In-Reply-To: <20210519140726.892632-1-drjones@redhat.com>
+References: <20210519140726.892632-1-drjones@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Cc: maz@kernel.org, pbonzini@redhat.com
@@ -86,61 +90,133 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-v2:
- - Removed some cruft left over from a previous more complex design of the
-   config command line parser
- - Dropped the list printing factor out patch as it's not necessary
- - Added a 'PASS' output for passing tests to allow testers to feel good
- - Changed the "up to date with kernel" comment to reference 5.13.0-rc2
+We don't want to have to create a new binary for each vcpu config, so
+prepare to run the test for multiple vcpu configs in a single binary.
+We do this by factoring out the test from main() and then looping over
+configs. When given '--list' we still never print more than a single
+reg-list for a single vcpu config though, because it would be confusing
+otherwise.
 
+No functional change intended.
 
-Since KVM commit 11663111cd49 ("KVM: arm64: Hide PMU registers from
-userspace when not available") the get-reg-list* tests have been
-failing with
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+---
+ .../selftests/kvm/aarch64/get-reg-list.c      | 68 ++++++++++++++-----
+ 1 file changed, 51 insertions(+), 17 deletions(-)
 
-  ...
-  ... There are 74 missing registers.
-  The following lines are missing registers:
-  ...
-
-where the 74 missing registers are all PMU registers. This isn't a
-bug in KVM that the selftest found, even though it's true that a
-KVM userspace that wasn't setting the KVM_ARM_VCPU_PMU_V3 VCPU
-flag, but still expecting the PMU registers to be in the reg-list,
-would suddenly no longer have their expectations met. In that case,
-the expectations were wrong, though, so that KVM userspace needs to
-be fixed, and so does this selftest.
-
-We could fix the test with a one-liner since we just need a
-
-  init->features[0] |= 1 << KVM_ARM_VCPU_PMU_V3;
-
-in prepare_vcpu_init(), but that's too easy, so here's a 5 patch patch
-series instead :-)  The reason for all the patches and the heavy diffstat
-is to prepare for other vcpu configuration testing, e.g. ptrauth and mte.
-With the refactoring done in this series, we should now be able to easily
-add register sublists and vcpu configs to the get-reg-list test, as the
-last patch demonstrates with the pmu fix.
-
-Thanks,
-drew
-
-
-Andrew Jones (5):
-  KVM: arm64: selftests: get-reg-list: Introduce vcpu configs
-  KVM: arm64: selftests: get-reg-list: Prepare to run multiple configs
-    at once
-  KVM: arm64: selftests: get-reg-list: Provide config selection option
-  KVM: arm64: selftests: get-reg-list: Remove get-reg-list-sve
-  KVM: arm64: selftests: get-reg-list: Split base and pmu registers
-
- tools/testing/selftests/kvm/.gitignore        |   1 -
- tools/testing/selftests/kvm/Makefile          |   1 -
- .../selftests/kvm/aarch64/get-reg-list-sve.c  |   3 -
- .../selftests/kvm/aarch64/get-reg-list.c      | 388 ++++++++++++------
- 4 files changed, 271 insertions(+), 122 deletions(-)
- delete mode 100644 tools/testing/selftests/kvm/aarch64/get-reg-list-sve.c
-
+diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+index e5d9cb312717..06f737973511 100644
+--- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
++++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+@@ -53,8 +53,8 @@ struct vcpu_config {
+ 	struct reg_sublist sublists[];
+ };
+ 
+-static struct vcpu_config vregs_config;
+-static struct vcpu_config sve_config;
++static struct vcpu_config *vcpu_configs[];
++static int vcpu_configs_n;
+ 
+ #define for_each_sublist(c, s)							\
+ 	for ((s) = &(c)->sublists[0]; (s)->regs; ++(s))
+@@ -351,29 +351,20 @@ static void check_supported(struct vcpu_config *c)
+ 	}
+ }
+ 
+-int main(int ac, char **av)
++static bool print_list;
++static bool print_filtered;
++static bool fixup_core_regs;
++
++static void run_test(struct vcpu_config *c)
+ {
+-	struct vcpu_config *c = reg_list_sve() ? &sve_config : &vregs_config;
+ 	struct kvm_vcpu_init init = { .target = -1, };
+ 	int new_regs = 0, missing_regs = 0, i, n;
+ 	int failed_get = 0, failed_set = 0, failed_reject = 0;
+-	bool print_list = false, print_filtered = false, fixup_core_regs = false;
+ 	struct kvm_vm *vm;
+ 	struct reg_sublist *s;
+ 
+ 	check_supported(c);
+ 
+-	for (i = 1; i < ac; ++i) {
+-		if (strcmp(av[i], "--core-reg-fixup") == 0)
+-			fixup_core_regs = true;
+-		else if (strcmp(av[i], "--list") == 0)
+-			print_list = true;
+-		else if (strcmp(av[i], "--list-filtered") == 0)
+-			print_filtered = true;
+-		else
+-			TEST_FAIL("Unknown option: %s\n", av[i]);
+-	}
+-
+ 	vm = vm_create(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES, O_RDWR);
+ 	prepare_vcpu_init(c, &init);
+ 	aarch64_vcpu_add_default(vm, 0, &init, NULL);
+@@ -393,7 +384,7 @@ int main(int ac, char **av)
+ 				print_reg(c, id);
+ 		}
+ 		putchar('\n');
+-		return 0;
++		return;
+ 	}
+ 
+ 	/*
+@@ -492,6 +483,44 @@ int main(int ac, char **av)
+ 		    "%d registers failed get; %d registers failed set; %d registers failed reject",
+ 		    c->name, missing_regs, failed_get, failed_set, failed_reject);
+ 
++	pr_info("%s: PASS\n", c->name);
++	blessed_n = 0;
++	free(blessed_reg);
++	free(reg_list);
++	kvm_vm_free(vm);
++}
++
++int main(int ac, char **av)
++{
++	struct vcpu_config *c, *sel = NULL;
++	int i;
++
++	for (i = 1; i < ac; ++i) {
++		if (strcmp(av[i], "--core-reg-fixup") == 0)
++			fixup_core_regs = true;
++		else if (strcmp(av[i], "--list") == 0)
++			print_list = true;
++		else if (strcmp(av[i], "--list-filtered") == 0)
++			print_filtered = true;
++		else
++			TEST_FAIL("Unknown option: %s\n", av[i]);
++	}
++
++	if (print_list || print_filtered) {
++		/*
++		 * We only want to print the register list of a single config.
++		 * TODO: Add command line support to pick which config.
++		 */
++		sel = vcpu_configs[0];
++	}
++
++	for (i = 0; i < vcpu_configs_n; ++i) {
++		c = vcpu_configs[i];
++		if (sel && c != sel)
++			continue;
++		run_test(c);
++	}
++
+ 	return 0;
+ }
+ 
+@@ -889,3 +918,8 @@ static struct vcpu_config sve_config = {
+ 	{0},
+ 	},
+ };
++
++static struct vcpu_config *vcpu_configs[] = {
++	reg_list_sve() ? &sve_config : &vregs_config,
++};
++static int vcpu_configs_n = ARRAY_SIZE(vcpu_configs);
 -- 
 2.30.2
 
