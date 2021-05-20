@@ -2,61 +2,61 @@ Return-Path: <SRS0=DM5G=KP=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 870ABC43460
-	for <kvmarm@archiver.kernel.org>; Thu, 20 May 2021 17:45:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E74BC433ED
+	for <kvmarm@archiver.kernel.org>; Thu, 20 May 2021 17:50:50 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 023496135A
-	for <kvmarm@archiver.kernel.org>; Thu, 20 May 2021 17:45:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 023496135A
+	by mail.kernel.org (Postfix) with ESMTP id B7984613E4
+	for <kvmarm@archiver.kernel.org>; Thu, 20 May 2021 17:50:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7984613E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 76C244B52D;
-	Thu, 20 May 2021 13:45:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 214944B16F;
+	Thu, 20 May 2021 13:50:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id o5NGo8oveDp0; Thu, 20 May 2021 13:45:41 -0400 (EDT)
+	with ESMTP id zYO0lX77UPTQ; Thu, 20 May 2021 13:50:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 437C44B50E;
-	Thu, 20 May 2021 13:45:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E644B4B1F6;
+	Thu, 20 May 2021 13:50:47 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DF6464B410
- for <kvmarm@lists.cs.columbia.edu>; Thu, 20 May 2021 13:45:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 57AB24B170
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 20 May 2021 13:50:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id f8S8LFVZoQc7 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 20 May 2021 13:45:39 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 90E5C4B223
- for <kvmarm@lists.cs.columbia.edu>; Thu, 20 May 2021 13:45:39 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2AC0411B3;
- Thu, 20 May 2021 10:45:39 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CF6BF3F719;
- Thu, 20 May 2021 10:45:37 -0700 (PDT)
-Subject: Re: [PATCH v3 2/9] KVM: arm64: Handle physical FIQ as an IRQ while
- running a guest
-To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
- kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-References: <20210510134824.1910399-1-maz@kernel.org>
- <20210510134824.1910399-3-maz@kernel.org>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <2311e75e-589c-4602-e81f-c639e7a33bd9@arm.com>
-Date: Thu, 20 May 2021 18:46:23 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+ with ESMTP id W7HXZlyzIqXP for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 20 May 2021 13:50:44 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8895F4B16F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 20 May 2021 13:50:44 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id A7A56613E8;
+ Thu, 20 May 2021 17:50:40 +0000 (UTC)
+Date: Thu, 20 May 2021 18:50:38 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Steven Price <steven.price@arm.com>
+Subject: Re: [PATCH v12 4/8] arm64: kvm: Introduce MTE VM feature
+Message-ID: <20210520175037.GG12251@arm.com>
+References: <20210517123239.8025-1-steven.price@arm.com>
+ <20210517123239.8025-5-steven.price@arm.com>
+ <20210520115426.GB12251@arm.com>
+ <5f0996d6-0a6e-ebcd-afcd-8290faba6780@arm.com>
 MIME-Version: 1.0
-In-Reply-To: <20210510134824.1910399-3-maz@kernel.org>
-Content-Language: en-US
-Cc: Hector Martin <marcan@marcan.st>, kernel-team@android.com
+Content-Disposition: inline
+In-Reply-To: <5f0996d6-0a6e-ebcd-afcd-8290faba6780@arm.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
+ Marc Zyngier <maz@kernel.org>, Juan Quintela <quintela@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
+ Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org,
+ Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,75 +73,97 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+On Thu, May 20, 2021 at 04:05:46PM +0100, Steven Price wrote:
+> On 20/05/2021 12:54, Catalin Marinas wrote:
+> > On Mon, May 17, 2021 at 01:32:35PM +0100, Steven Price wrote:
+> >> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> >> index c5d1f3c87dbd..8660f6a03f51 100644
+> >> --- a/arch/arm64/kvm/mmu.c
+> >> +++ b/arch/arm64/kvm/mmu.c
+> >> @@ -822,6 +822,31 @@ transparent_hugepage_adjust(struct kvm_memory_slot *memslot,
+> >>  	return PAGE_SIZE;
+> >>  }
+> >>  
+> >> +static int sanitise_mte_tags(struct kvm *kvm, unsigned long size,
+> >> +			     kvm_pfn_t pfn)
+> >> +{
+> >> +	if (kvm_has_mte(kvm)) {
+> >> +		/*
+> >> +		 * The page will be mapped in stage 2 as Normal Cacheable, so
+> >> +		 * the VM will be able to see the page's tags and therefore
+> >> +		 * they must be initialised first. If PG_mte_tagged is set,
+> >> +		 * tags have already been initialised.
+> >> +		 */
+> >> +		unsigned long i, nr_pages = size >> PAGE_SHIFT;
+> >> +		struct page *page = pfn_to_online_page(pfn);
+> >> +
+> >> +		if (!page)
+> >> +			return -EFAULT;
+> > 
+> > IIRC we ended up with pfn_to_online_page() to reject ZONE_DEVICE pages
+> > that may be mapped into a guest and we have no idea whether they support
+> > MTE. It may be worth adding a comment, otherwise, as Marc said, the page
+> > wouldn't disappear.
+> 
+> I'll add a comment.
+> 
+> >> +
+> >> +		for (i = 0; i < nr_pages; i++, page++) {
+> >> +			if (!test_and_set_bit(PG_mte_tagged, &page->flags))
+> >> +				mte_clear_page_tags(page_address(page));
+> > 
+> > We started the page->flags thread and ended up fixing it for the host
+> > set_pte_at() as per the first patch:
+> > 
+> > https://lore.kernel.org/r/c3293d47-a5f2-ea4a-6730-f5cae26d8a7e@arm.com
+> > 
+> > Now, can we have a race between the stage 2 kvm_set_spte_gfn() and a
+> > stage 1 set_pte_at()? Only the latter takes a lock. Or between two
+> > kvm_set_spte_gfn() in different VMs? I think in the above thread we
+> > concluded that there's only a problem if the page is shared between
+> > multiple VMMs (MAP_SHARED). How realistic is this and what's the
+> > workaround?
+> > 
+> > Either way, I think it's worth adding a comment here on the race on
+> > page->flags as it looks strange that here it's just a test_and_set_bit()
+> > while set_pte_at() uses a spinlock.
+> > 
+> 
+> Very good point! I should have thought about that. I think splitting the
+> test_and_set_bit() in two (as with the cache flush) is sufficient. While
+> there technically still is a race which could lead to user space tags
+> being clobbered:
+> 
+> a) It's very odd for a VMM to be doing an mprotect() after the fact to
+> add PROT_MTE, or to be sharing the memory with another process which
+> sets PROT_MTE.
+> 
+> b) The window for the race is incredibly small and the VMM (generally)
+> needs to be robust against the guest changing tags anyway.
+> 
+> But I'll add a comment here as well:
+> 
+> 	/*
+> 	 * There is a potential race between sanitising the
+> 	 * flags here and user space using mprotect() to add
+> 	 * PROT_MTE to access the tags, however by splitting
+> 	 * the test/set the only risk is user space tags
+> 	 * being overwritten by the mte_clear_page_tags() call.
+> 	 */
 
-On 5/10/21 2:48 PM, Marc Zyngier wrote:
-> As we we now entertain the possibility of FIQ being used on the host,
-> treat the signalling of a FIQ while running a guest as an IRQ,
-> causing an exit instead of a HYP panic.
+I think (well, I haven't re-checked), an mprotect() in the VMM ends up
+calling set_pte_at_notify() which would call kvm_set_spte_gfn() and that
+will map the page in the guest. So the problem only appears between
+different VMMs sharing the same page. In principle they can be
+MAP_PRIVATE but they'd be CoW so the race wouldn't matter. So it's left
+with MAP_SHARED between multiple VMMs.
 
-I've mulling over this, and I can't find anything wrong with it. Any FIQs for
-which there is no handler registered by the interrupt controller will panic in the
-default_handle_fiq() FIQ handler, similar to the current KVM behaviour. And if
-there is a handler registered (only AIC does it for now), then a FIQ will be
-handled just like any other interrupt instead of KVM panic'ing when the host can
-handle it just fine.
+I think we should just state that this is unsafe and they can delete
+each-others tags. If we are really worried, we can export that lock you
+added in mte.c.
 
-I've briefly considered creating a new return code from __kvm_vcpu_run,
-ARM_EXCEPTION_FIQ, but I really don't see any reason for it, since it will serve
-the same purpose as ARM_EXCEPTION_IRQ, which is to resume the guest without any
-special exit handling.
-
-It makes sense to me for KVM to handle FIQs just like IRQs, now that the kernel
-treats them the same:
-
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
-Thanks,
-
-Alex
-
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/hyp/hyp-entry.S | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-> index 5f49df4ffdd8..9aa9b73475c9 100644
-> --- a/arch/arm64/kvm/hyp/hyp-entry.S
-> +++ b/arch/arm64/kvm/hyp/hyp-entry.S
-> @@ -76,6 +76,7 @@ el1_trap:
->  	b	__guest_exit
->  
->  el1_irq:
-> +el1_fiq:
->  	get_vcpu_ptr	x1, x0
->  	mov	x0, #ARM_EXCEPTION_IRQ
->  	b	__guest_exit
-> @@ -131,7 +132,6 @@ SYM_CODE_END(\label)
->  	invalid_vector	el2t_error_invalid
->  	invalid_vector	el2h_irq_invalid
->  	invalid_vector	el2h_fiq_invalid
-> -	invalid_vector	el1_fiq_invalid
->  
->  	.ltorg
->  
-> @@ -179,12 +179,12 @@ SYM_CODE_START(__kvm_hyp_vector)
->  
->  	valid_vect	el1_sync		// Synchronous 64-bit EL1
->  	valid_vect	el1_irq			// IRQ 64-bit EL1
-> -	invalid_vect	el1_fiq_invalid		// FIQ 64-bit EL1
-> +	valid_vect	el1_fiq			// FIQ 64-bit EL1
->  	valid_vect	el1_error		// Error 64-bit EL1
->  
->  	valid_vect	el1_sync		// Synchronous 32-bit EL1
->  	valid_vect	el1_irq			// IRQ 32-bit EL1
-> -	invalid_vect	el1_fiq_invalid		// FIQ 32-bit EL1
-> +	valid_vect	el1_fiq			// FIQ 32-bit EL1
->  	valid_vect	el1_error		// Error 32-bit EL1
->  SYM_CODE_END(__kvm_hyp_vector)
->  
+-- 
+Catalin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
