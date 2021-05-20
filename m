@@ -4,64 +4,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7E1FC433ED
-	for <kvmarm@archiver.kernel.org>; Thu, 20 May 2021 03:05:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 141AEC433B4
+	for <kvmarm@archiver.kernel.org>; Thu, 20 May 2021 03:41:44 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id F150E610CD
-	for <kvmarm@archiver.kernel.org>; Thu, 20 May 2021 03:05:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F150E610CD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 51E9B610A1
+	for <kvmarm@archiver.kernel.org>; Thu, 20 May 2021 03:41:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51E9B610A1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=hisilicon.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 698DC4B466;
-	Wed, 19 May 2021 23:05:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BA3454B77A;
+	Wed, 19 May 2021 23:41:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id l8QBQtPA3C7E; Wed, 19 May 2021 23:05:57 -0400 (EDT)
+	with ESMTP id 4y0fck7j0XYX; Wed, 19 May 2021 23:41:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3288D4B567;
-	Wed, 19 May 2021 23:05:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BB63D4B795;
+	Wed, 19 May 2021 23:41:41 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 534B24B4B0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 May 2021 23:05:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 928CE4B778
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 May 2021 23:41:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cv-dBSpG-bkT for <kvmarm@lists.cs.columbia.edu>;
- Wed, 19 May 2021 23:05:53 -0400 (EDT)
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 351134B466
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 May 2021 23:05:53 -0400 (EDT)
-Received: from dggems704-chm.china.huawei.com (unknown [172.30.72.58])
- by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Flvff052jzqV3M;
- Thu, 20 May 2021 11:02:18 +0800 (CST)
-Received: from dggpemm000003.china.huawei.com (7.185.36.128) by
- dggems704-chm.china.huawei.com (10.3.19.181) with Microsoft SMTP Server
+ with ESMTP id K+w9rexegQdl for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 19 May 2021 23:41:38 -0400 (EDT)
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 887BC4B776
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 May 2021 23:41:38 -0400 (EDT)
+Received: from dggems706-chm.china.huawei.com (unknown [172.30.72.60])
+ by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4FlwSl6qhBzkWQg;
+ Thu, 20 May 2021 11:38:47 +0800 (CST)
+Received: from dggpeml500023.china.huawei.com (7.185.36.114) by
+ dggems706-chm.china.huawei.com (10.3.19.183) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Thu, 20 May 2021 11:05:33 +0800
-Received: from DESKTOP-5IS4806.china.huawei.com (10.174.187.224) by
- dggpemm000003.china.huawei.com (7.185.36.128) with Microsoft SMTP Server
+ 15.1.2176.2; Thu, 20 May 2021 11:41:34 +0800
+Received: from localhost.localdomain (10.69.192.56) by
+ dggpeml500023.china.huawei.com (7.185.36.114) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Thu, 20 May 2021 11:05:32 +0800
-From: Keqian Zhu <zhukeqian1@huawei.com>
-To: <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
- <linux-doc@vger.kernel.org>, <kvm@vger.kernel.org>,
- <kvmarm@lists.cs.columbia.edu>, Paolo Bonzini <pbonzini@redhat.com>,
- "Jonathan Corbet" <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>
-Subject: [PATCH] KVM: halt polling: Make the adjustment of polling time clearer
-Date: Thu, 20 May 2021 11:05:29 +0800
-Message-ID: <20210520030529.22048-1-zhukeqian1@huawei.com>
-X-Mailer: git-send-email 2.8.4.windows.1
+ 15.1.2176.2; Thu, 20 May 2021 11:41:34 +0800
+From: Shaokun Zhang <zhangshaokun@hisilicon.com>
+To: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.cs.columbia.edu>
+Subject: [PATCH] KVM: arm64: Fix typo in a comment
+Date: Thu, 20 May 2021 11:41:29 +0800
+Message-ID: <1621482089-11182-1-git-send-email-zhangshaokun@hisilicon.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-X-Originating-IP: [10.174.187.224]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpemm000003.china.huawei.com (7.185.36.128)
+X-Originating-IP: [10.69.192.56]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpeml500023.china.huawei.com (7.185.36.114)
 X-CFilter-Loop: Reflected
-Cc: gaojinhao@huawei.com, zhang.zhanghailiang@huawei.com
+Cc: Shaokun Zhang <zhangshaokun@hisilicon.com>, Marc Zyngier <maz@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -78,85 +75,30 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-When we have "block_ns > halt_poll_ns" and "block_ns < max_halt_poll_ns",
-then "halt_poll_ns < max_halt_poll_ns" is true, so we can drop this extra
-condition.
+Fix typo 'kvm_pgtable_stage2_flush_range' -> 'kvm_pgtable_stage2_flush'
 
-We want to make sure halt_poll_ns is not zero before shrinking it. Put
-the condition in shrinking primitive can make code clearer.
-
-None functional change.
-
-Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+Cc: Quentin Perret <qperret@google.com>
+Cc: Marc Zyngier <maz@kernel.org>
+Signed-off-by: Shaokun Zhang <zhangshaokun@hisilicon.com>
 ---
- Documentation/virt/kvm/halt-polling.rst | 21 ++++++++++-----------
- virt/kvm/kvm_main.c                     | 11 ++++++-----
- 2 files changed, 16 insertions(+), 16 deletions(-)
+ arch/arm64/include/asm/kvm_pgtable.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Documentation/virt/kvm/halt-polling.rst b/Documentation/virt/kvm/halt-polling.rst
-index 4922e4a15f18..d9f699395a7f 100644
---- a/Documentation/virt/kvm/halt-polling.rst
-+++ b/Documentation/virt/kvm/halt-polling.rst
-@@ -47,17 +47,16 @@ Thus this is a per vcpu (or vcore) value.
- During polling if a wakeup source is received within the halt polling interval,
- the interval is left unchanged. In the event that a wakeup source isn't
- received during the polling interval (and thus schedule is invoked) there are
--two options, either the polling interval and total block time[0] were less than
--the global max polling interval (see module params below), or the total block
--time was greater than the global max polling interval.
--
--In the event that both the polling interval and total block time were less than
--the global max polling interval then the polling interval can be increased in
--the hope that next time during the longer polling interval the wake up source
--will be received while the host is polling and the latency benefits will be
--received. The polling interval is grown in the function grow_halt_poll_ns() and
--is multiplied by the module parameters halt_poll_ns_grow and
--halt_poll_ns_grow_start.
-+two options, either the total block time[0] were less than the global max
-+polling interval (see module params below), or the total block time was greater
-+than the global max polling interval.
-+
-+In the event that the total block time were less than the global max polling
-+interval then the polling interval can be increased in the hope that next time
-+during the longer polling interval the wake up source will be received while the
-+host is polling and the latency benefits will be received. The polling interval
-+is grown in the function grow_halt_poll_ns() and is multiplied by the module
-+parameters halt_poll_ns_grow and halt_poll_ns_grow_start.
+diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+index c3674c47d48c..25589cc71599 100644
+--- a/arch/arm64/include/asm/kvm_pgtable.h
++++ b/arch/arm64/include/asm/kvm_pgtable.h
+@@ -386,7 +386,7 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
+ bool kvm_pgtable_stage2_is_young(struct kvm_pgtable *pgt, u64 addr);
  
- In the event that the total block time was greater than the global max polling
- interval then the host will never poll for long enough (limited by the global
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 6b4feb92dc79..13a9996c4ccb 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -2906,6 +2906,9 @@ static void shrink_halt_poll_ns(struct kvm_vcpu *vcpu)
- 	unsigned int old, val, shrink;
- 
- 	old = val = vcpu->halt_poll_ns;
-+	if (!old)
-+		return;
-+
- 	shrink = READ_ONCE(halt_poll_ns_shrink);
- 	if (shrink == 0)
- 		val = 0;
-@@ -3003,12 +3006,10 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
- 			if (block_ns <= vcpu->halt_poll_ns)
- 				;
- 			/* we had a long block, shrink polling */
--			else if (vcpu->halt_poll_ns &&
--					block_ns > vcpu->kvm->max_halt_poll_ns)
-+			else if (block_ns > vcpu->kvm->max_halt_poll_ns)
- 				shrink_halt_poll_ns(vcpu);
--			/* we had a short halt and our poll time is too small */
--			else if (vcpu->halt_poll_ns < vcpu->kvm->max_halt_poll_ns &&
--					block_ns < vcpu->kvm->max_halt_poll_ns)
-+			/* we had a short block, grow polling */
-+			else if (block_ns < vcpu->kvm->max_halt_poll_ns)
- 				grow_halt_poll_ns(vcpu);
- 		} else {
- 			vcpu->halt_poll_ns = 0;
+ /**
+- * kvm_pgtable_stage2_flush_range() - Clean and invalidate data cache to Point
++ * kvm_pgtable_stage2_flush() - Clean and invalidate data cache to Point
+  * 				      of Coherency for guest stage-2 address
+  *				      range.
+  * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
 -- 
-2.19.1
+2.7.4
 
 _______________________________________________
 kvmarm mailing list
