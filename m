@@ -7,56 +7,55 @@ X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B40D7C433B4
-	for <kvmarm@archiver.kernel.org>; Thu, 20 May 2021 14:46:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF136C43460
+	for <kvmarm@archiver.kernel.org>; Thu, 20 May 2021 15:05:59 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 32DA861184
-	for <kvmarm@archiver.kernel.org>; Thu, 20 May 2021 14:46:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32DA861184
+	by mail.kernel.org (Postfix) with ESMTP id 5B0DE613D8
+	for <kvmarm@archiver.kernel.org>; Thu, 20 May 2021 15:05:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B0DE613D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A8FA14B3D8;
-	Thu, 20 May 2021 10:46:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C8CE44B4B5;
+	Thu, 20 May 2021 11:05:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id I7jSZ45U8AKc; Thu, 20 May 2021 10:46:55 -0400 (EDT)
+	with ESMTP id MmWF6pnxRzjQ; Thu, 20 May 2021 11:05:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A55A4B440;
-	Thu, 20 May 2021 10:46:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 81C7C4B443;
+	Thu, 20 May 2021 11:05:57 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 02C654B3D8
- for <kvmarm@lists.cs.columbia.edu>; Thu, 20 May 2021 10:46:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C6494B443
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 20 May 2021 11:05:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JR2QnjOKlHwF for <kvmarm@lists.cs.columbia.edu>;
- Thu, 20 May 2021 10:46:52 -0400 (EDT)
+ with ESMTP id SSEaATPnagkO for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 20 May 2021 11:05:55 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BB854B3A3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 20 May 2021 10:46:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 202D24B370
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 20 May 2021 11:05:55 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1198DED1;
- Thu, 20 May 2021 07:46:52 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B333D11B3;
+ Thu, 20 May 2021 08:05:54 -0700 (PDT)
 Received: from [192.168.1.179] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 11D393F73B;
- Thu, 20 May 2021 07:46:47 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F08993F73B;
+ Thu, 20 May 2021 08:05:51 -0700 (PDT)
 Subject: Re: [PATCH v12 4/8] arm64: kvm: Introduce MTE VM feature
-To: Marc Zyngier <maz@kernel.org>
+To: Catalin Marinas <catalin.marinas@arm.com>
 References: <20210517123239.8025-1-steven.price@arm.com>
- <20210517123239.8025-5-steven.price@arm.com> <87wnrxtikl.wl-maz@kernel.org>
- <60fc8939-36b7-35ce-837c-b69d0d40c9a4@arm.com> <875yzdvldb.wl-maz@kernel.org>
+ <20210517123239.8025-5-steven.price@arm.com> <20210520115426.GB12251@arm.com>
 From: Steven Price <steven.price@arm.com>
-Message-ID: <e44c7782-bf7a-80f5-a8ae-75bbb44649ae@arm.com>
-Date: Thu, 20 May 2021 15:46:46 +0100
+Message-ID: <5f0996d6-0a6e-ebcd-afcd-8290faba6780@arm.com>
+Date: Thu, 20 May 2021 16:05:46 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.8.1
 MIME-Version: 1.0
-In-Reply-To: <875yzdvldb.wl-maz@kernel.org>
+In-Reply-To: <20210520115426.GB12251@arm.com>
 Content-Language: en-GB
 Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
- Catalin Marinas <catalin.marinas@arm.com>, Juan Quintela <quintela@redhat.com>,
+ Marc Zyngier <maz@kernel.org>, Juan Quintela <quintela@redhat.com>,
  Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
  Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org,
  Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
@@ -77,121 +76,82 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 20/05/2021 09:51, Marc Zyngier wrote:
-> On Wed, 19 May 2021 11:48:21 +0100,
-> Steven Price <steven.price@arm.com> wrote:
->>
->> On 17/05/2021 17:45, Marc Zyngier wrote:
->>> On Mon, 17 May 2021 13:32:35 +0100,
->>> Steven Price <steven.price@arm.com> wrote:
-[...]
->>>> +		}
->>>> +	}
->>>> +
->>>> +	return 0;
->>>> +}
->>>> +
->>>>  static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->>>>  			  struct kvm_memory_slot *memslot, unsigned long hva,
->>>>  			  unsigned long fault_status)
->>>> @@ -971,8 +996,13 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->>>>  	if (writable)
->>>>  		prot |= KVM_PGTABLE_PROT_W;
->>>>  
->>>> -	if (fault_status != FSC_PERM && !device)
->>>> +	if (fault_status != FSC_PERM && !device) {
->>>> +		ret = sanitise_mte_tags(kvm, vma_pagesize, pfn);
->>>> +		if (ret)
->>>> +			goto out_unlock;
->>>> +
->>>>  		clean_dcache_guest_page(pfn, vma_pagesize);
->>>> +	}
->>>>  
->>>>  	if (exec_fault) {
->>>>  		prot |= KVM_PGTABLE_PROT_X;
->>>> @@ -1168,12 +1198,17 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
->>>>  bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
->>>>  {
->>>>  	kvm_pfn_t pfn = pte_pfn(range->pte);
->>>> +	int ret;
->>>>  
->>>>  	if (!kvm->arch.mmu.pgt)
->>>>  		return 0;
->>>>  
->>>>  	WARN_ON(range->end - range->start != 1);
->>>>  
->>>> +	ret = sanitise_mte_tags(kvm, PAGE_SIZE, pfn);
->>>> +	if (ret)
->>>> +		return ret;
->>>
->>> Notice the change in return type?
->>
->> I do now - I was tricked by the use of '0' as false. Looks like false
->> ('0') is actually the correct return here to avoid an unnecessary
->> kvm_flush_remote_tlbs().
+On 20/05/2021 12:54, Catalin Marinas wrote:
+> On Mon, May 17, 2021 at 01:32:35PM +0100, Steven Price wrote:
+>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>> index c5d1f3c87dbd..8660f6a03f51 100644
+>> --- a/arch/arm64/kvm/mmu.c
+>> +++ b/arch/arm64/kvm/mmu.c
+>> @@ -822,6 +822,31 @@ transparent_hugepage_adjust(struct kvm_memory_slot *memslot,
+>>  	return PAGE_SIZE;
+>>  }
+>>  
+>> +static int sanitise_mte_tags(struct kvm *kvm, unsigned long size,
+>> +			     kvm_pfn_t pfn)
+>> +{
+>> +	if (kvm_has_mte(kvm)) {
+>> +		/*
+>> +		 * The page will be mapped in stage 2 as Normal Cacheable, so
+>> +		 * the VM will be able to see the page's tags and therefore
+>> +		 * they must be initialised first. If PG_mte_tagged is set,
+>> +		 * tags have already been initialised.
+>> +		 */
+>> +		unsigned long i, nr_pages = size >> PAGE_SHIFT;
+>> +		struct page *page = pfn_to_online_page(pfn);
+>> +
+>> +		if (!page)
+>> +			return -EFAULT;
 > 
-> Yup. BTW, the return values have been fixed to proper boolean types in
-> the latest set of fixes.
+> IIRC we ended up with pfn_to_online_page() to reject ZONE_DEVICE pages
+> that may be mapped into a guest and we have no idea whether they support
+> MTE. It may be worth adding a comment, otherwise, as Marc said, the page
+> wouldn't disappear.
 
-Thanks for the heads up - I'll return 'false' to avoid regressing that.
+I'll add a comment.
 
->>
->>>> +
->>>>  	/*
->>>>  	 * We've moved a page around, probably through CoW, so let's treat it
->>>>  	 * just like a translation fault and clean the cache to the PoC.
->>>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->>>> index 76ea2800c33e..24a844cb79ca 100644
->>>> --- a/arch/arm64/kvm/sys_regs.c
->>>> +++ b/arch/arm64/kvm/sys_regs.c
->>>> @@ -1047,6 +1047,9 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
->>>>  		break;
->>>>  	case SYS_ID_AA64PFR1_EL1:
->>>>  		val &= ~FEATURE(ID_AA64PFR1_MTE);
->>>> +		if (kvm_has_mte(vcpu->kvm))
->>>> +			val |= FIELD_PREP(FEATURE(ID_AA64PFR1_MTE),
->>>> +					  ID_AA64PFR1_MTE);
->>>
->>> Shouldn't this be consistent with what the HW is capable of
->>> (i.e. FEAT_MTE3 if available), and extracted from the sanitised view
->>> of the feature set?
->>
->> Yes - however at the moment our sanitised view is either FEAT_MTE2 or
->> nothing:
->>
->> 	{
->> 		.desc = "Memory Tagging Extension",
->> 		.capability = ARM64_MTE,
->> 		.type = ARM64_CPUCAP_STRICT_BOOT_CPU_FEATURE,
->> 		.matches = has_cpuid_feature,
->> 		.sys_reg = SYS_ID_AA64PFR1_EL1,
->> 		.field_pos = ID_AA64PFR1_MTE_SHIFT,
->> 		.min_field_value = ID_AA64PFR1_MTE,
->> 		.sign = FTR_UNSIGNED,
->> 		.cpu_enable = cpu_enable_mte,
->> 	},
->>
->> When host support for FEAT_MTE3 is added then the KVM code will need
->> revisiting to expose that down to the guest safely (AFAICS there's
->> nothing extra to do here, but I haven't tested any of the MTE3
->> features). I don't think we want to expose newer versions to the guest
->> than the host is aware of. (Or indeed expose FEAT_MTE if the host has
->> MTE disabled because Linux requires at least FEAT_MTE2).
+>> +
+>> +		for (i = 0; i < nr_pages; i++, page++) {
+>> +			if (!test_and_set_bit(PG_mte_tagged, &page->flags))
+>> +				mte_clear_page_tags(page_address(page));
 > 
-> What I was suggesting is to have something like this:
+> We started the page->flags thread and ended up fixing it for the host
+> set_pte_at() as per the first patch:
 > 
->      pfr = read_sanitised_ftr_reg(SYS_ID_AA64PFR1_EL1);
->      mte = cpuid_feature_extract_unsigned_field(pfr, ID_AA64PFR1_MTE_SHIFT);
->      val |= FIELD_PREP(FEATURE(ID_AA64PFR1_MTE), mte);
+> https://lore.kernel.org/r/c3293d47-a5f2-ea4a-6730-f5cae26d8a7e@arm.com
 > 
-> which does the trick nicely, and doesn't expose more than the host
-> supports.
+> Now, can we have a race between the stage 2 kvm_set_spte_gfn() and a
+> stage 1 set_pte_at()? Only the latter takes a lock. Or between two
+> kvm_set_spte_gfn() in different VMs? I think in the above thread we
+> concluded that there's only a problem if the page is shared between
+> multiple VMMs (MAP_SHARED). How realistic is this and what's the
+> workaround?
+> 
+> Either way, I think it's worth adding a comment here on the race on
+> page->flags as it looks strange that here it's just a test_and_set_bit()
+> while set_pte_at() uses a spinlock.
+> 
 
-Ok, I have to admit to not fully understanding the sanitised register
-code - but wouldn't this expose higher MTE values if all CPUs support
-it, even though the host doesn't know what a hypothetical 'MTE4' adds?
-Or is there some magic in the sanitising that caps the value to what the
-host knows about?
+Very good point! I should have thought about that. I think splitting the
+test_and_set_bit() in two (as with the cache flush) is sufficient. While
+there technically still is a race which could lead to user space tags
+being clobbered:
+
+a) It's very odd for a VMM to be doing an mprotect() after the fact to
+add PROT_MTE, or to be sharing the memory with another process which
+sets PROT_MTE.
+
+b) The window for the race is incredibly small and the VMM (generally)
+needs to be robust against the guest changing tags anyway.
+
+But I'll add a comment here as well:
+
+	/*
+	 * There is a potential race between sanitising the
+	 * flags here and user space using mprotect() to add
+	 * PROT_MTE to access the tags, however by splitting
+	 * the test/set the only risk is user space tags
+	 * being overwritten by the mte_clear_page_tags() call.
+	 */
 
 Thanks,
 
