@@ -2,66 +2,83 @@ Return-Path: <SRS0=DM5G=KP=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC2A8C433B4
-	for <kvmarm@archiver.kernel.org>; Thu, 20 May 2021 10:23:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A939DC433B4
+	for <kvmarm@archiver.kernel.org>; Thu, 20 May 2021 10:24:22 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 297D56101D
-	for <kvmarm@archiver.kernel.org>; Thu, 20 May 2021 10:23:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 297D56101D
+	by mail.kernel.org (Postfix) with ESMTP id 25ED3613D4
+	for <kvmarm@archiver.kernel.org>; Thu, 20 May 2021 10:24:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25ED3613D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AC42C4B6B7;
-	Thu, 20 May 2021 06:23:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A52E4B42C;
+	Thu, 20 May 2021 06:24:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id RjxXJ0qukw3p; Thu, 20 May 2021 06:23:15 -0400 (EDT)
+	with ESMTP id LrKEGGp-e2Pj; Thu, 20 May 2021 06:24:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 13D054B5CE;
-	Thu, 20 May 2021 06:23:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E2C14B6B7;
+	Thu, 20 May 2021 06:24:20 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 070DF4B6B7
- for <kvmarm@lists.cs.columbia.edu>; Thu, 20 May 2021 06:23:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 690EE4B688
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 20 May 2021 06:24:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 96B3gjvoXe0O for <kvmarm@lists.cs.columbia.edu>;
- Thu, 20 May 2021 06:23:12 -0400 (EDT)
+ with ESMTP id ly7+14wg+qy5 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 20 May 2021 06:24:15 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D4F114B712
- for <kvmarm@lists.cs.columbia.edu>; Thu, 20 May 2021 06:23:12 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id D1B6661074;
- Thu, 20 May 2021 10:23:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1621506191;
- bh=2YKqGnbeqmRaMmYTVRZcjpfhdmGfiF6XZkVGxWDYqAI=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=WOW96q1t50EutysvjFgjjl2wPym5EePWGB7q42GlOket+E52dnr7iEr0wpmdhFhGP
- ClA1IrrAhmgJLVKjD1hecTdNj3L+OvtlAaXFJGG3gLNyh06vs6EL3NUDWNI52PpozG
- SrB46nRfG9y0ZV+J+0n0tium96nsPsstIqJk4PtLWcW5LUolDFdNjFhkcsdpGKmHxW
- nPFT8LwzI94BoJBwbVwjPET00riJAvJSAIB8tiikX9qKaY03DNej2bi77Psx+ck0cH
- /1Nyz79k7WLiiKq+2gRtVxsqBxypYBwRpl1refUGwJi3WU4WCt2y4uRV1af9gak/N8
- G+ugYXMQEucxw==
-Date: Thu, 20 May 2021 11:23:07 +0100
-From: Will Deacon <will@kernel.org>
-To: Shaokun Zhang <zhangshaokun@hisilicon.com>
-Subject: Re: [PATCH] KVM: arm64: Fix typo in a comment
-Message-ID: <20210520102307.GB10065@willie-the-truck>
-References: <1621482089-11182-1-git-send-email-zhangshaokun@hisilicon.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <1621482089-11182-1-git-send-email-zhangshaokun@hisilicon.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C8D0B4B42C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 20 May 2021 06:24:15 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 142BA61279;
+ Thu, 20 May 2021 10:24:14 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1ljfqe-002V85-2q; Thu, 20 May 2021 11:24:12 +0100
+Date: Thu, 20 May 2021 11:24:11 +0100
+Message-ID: <871ra1vh2s.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Steven Price <steven.price@arm.com>
+Subject: Re: [PATCH v12 8/8] KVM: arm64: Document MTE capability and ioctl
+In-Reply-To: <3b4cca00-e81d-322e-6f65-4d0850aac5a5@arm.com>
+References: <20210517123239.8025-1-steven.price@arm.com>
+ <20210517123239.8025-9-steven.price@arm.com>
+ <87r1i5teou.wl-maz@kernel.org>
+ <3b4cca00-e81d-322e-6f65-4d0850aac5a5@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: steven.price@arm.com, catalin.marinas@arm.com,
+ will@kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com,
+ suzuki.poulose@arm.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Dave.Martin@arm.com, mark.rutland@arm.com, tglx@linutronix.de,
+ qemu-devel@nongnu.org, quintela@redhat.com, dgilbert@redhat.com,
+ richard.henderson@linaro.org, peter.maydell@linaro.org, Haibo.Xu@arm.com,
+ drjones@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
+ Catalin Marinas <catalin.marinas@arm.com>, Juan Quintela <quintela@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
+ Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org,
+ Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -78,33 +95,129 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, May 20, 2021 at 11:41:29AM +0800, Shaokun Zhang wrote:
-> Fix typo 'kvm_pgtable_stage2_flush_range' -> 'kvm_pgtable_stage2_flush'
+On Wed, 19 May 2021 15:09:23 +0100,
+Steven Price <steven.price@arm.com> wrote:
 > 
-> Cc: Quentin Perret <qperret@google.com>
-> Cc: Marc Zyngier <maz@kernel.org>
-> Signed-off-by: Shaokun Zhang <zhangshaokun@hisilicon.com>
-> ---
->  arch/arm64/include/asm/kvm_pgtable.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> On 17/05/2021 19:09, Marc Zyngier wrote:
+> > On Mon, 17 May 2021 13:32:39 +0100,
+> > Steven Price <steven.price@arm.com> wrote:
+> >>
+> >> A new capability (KVM_CAP_ARM_MTE) identifies that the kernel supports
+> >> granting a guest access to the tags, and provides a mechanism for the
+> >> VMM to enable it.
+> >>
+> >> A new ioctl (KVM_ARM_MTE_COPY_TAGS) provides a simple way for a VMM to
+> >> access the tags of a guest without having to maintain a PROT_MTE mapping
+> >> in userspace. The above capability gates access to the ioctl.
+> >>
+> >> Signed-off-by: Steven Price <steven.price@arm.com>
+> >> ---
+> >>  Documentation/virt/kvm/api.rst | 53 ++++++++++++++++++++++++++++++++++
+> >>  1 file changed, 53 insertions(+)
+> >>
+> >> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> >> index 22d077562149..a31661b870ba 100644
+> >> --- a/Documentation/virt/kvm/api.rst
+> >> +++ b/Documentation/virt/kvm/api.rst
+> >> @@ -5034,6 +5034,40 @@ see KVM_XEN_VCPU_SET_ATTR above.
+> >>  The KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_ADJUST type may not be used
+> >>  with the KVM_XEN_VCPU_GET_ATTR ioctl.
+> >>  
+> >> +4.130 KVM_ARM_MTE_COPY_TAGS
+> >> +---------------------------
+> >> +
+> >> +:Capability: KVM_CAP_ARM_MTE
+> >> +:Architectures: arm64
+> >> +:Type: vm ioctl
+> >> +:Parameters: struct kvm_arm_copy_mte_tags
+> >> +:Returns: 0 on success, < 0 on error
+> >> +
+> >> +::
+> >> +
+> >> +  struct kvm_arm_copy_mte_tags {
+> >> +	__u64 guest_ipa;
+> >> +	__u64 length;
+> >> +	union {
+> >> +		void __user *addr;
+> >> +		__u64 padding;
+> >> +	};
+> >> +	__u64 flags;
+> >> +	__u64 reserved[2];
+> >> +  };
+> > 
+> > This doesn't exactly match the structure in the previous patch :-(.
 > 
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index c3674c47d48c..25589cc71599 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -386,7 +386,7 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
->  bool kvm_pgtable_stage2_is_young(struct kvm_pgtable *pgt, u64 addr);
->  
->  /**
-> - * kvm_pgtable_stage2_flush_range() - Clean and invalidate data cache to Point
-> + * kvm_pgtable_stage2_flush() - Clean and invalidate data cache to Point
->   * 				      of Coherency for guest stage-2 address
->   *				      range.
->   * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
+> :( I knew there was a reason I didn't include it in the documentation
+> for the first 9 versions... I'll fix this up, thanks for spotting it.
+> 
+> >> +
+> >> +Copies Memory Tagging Extension (MTE) tags to/from guest tag memory. The
+> >> +``guest_ipa`` and ``length`` fields must be ``PAGE_SIZE`` aligned. The ``addr``
+> >> +fieldmust point to a buffer which the tags will be copied to or from.
+> >> +
+> >> +``flags`` specifies the direction of copy, either ``KVM_ARM_TAGS_TO_GUEST`` or
+> >> +``KVM_ARM_TAGS_FROM_GUEST``.
+> >> +
+> >> +The size of the buffer to store the tags is ``(length / MTE_GRANULE_SIZE)``
+> > 
+> > Should we add a UAPI definition for MTE_GRANULE_SIZE?
+> 
+> I wasn't sure whether to export this or not. The ioctl is based around
+> the existing ptrace interface (PTRACE_{PEEK,POKE}MTETAGS) which doesn't
+> expose a UAPI definition. Admittedly the documentation there also just
+> says "16-byte granule" rather than MTE_GRANULE_SIZE.
+> 
+> So I'll just remove the reference to MTE_GRANULE_SIZE in the
+> documentation unless you feel that we should have a UAPI definition.
 
-Acked-by: Will Deacon <will@kernel.org>
+Dropping the mention of this symbol and replacing it by the value 16
+matches the architecture and doesn't require any extra UAPI
+definition, so let's just do that.
 
-Will
+> 
+> >> +bytes (i.e. 1/16th of the corresponding size). Each byte contains a single tag
+> >> +value. This matches the format of ``PTRACE_PEEKMTETAGS`` and
+> >> +``PTRACE_POKEMTETAGS``.
+> >> +
+> >>  5. The kvm_run structure
+> >>  ========================
+> >>  
+> >> @@ -6362,6 +6396,25 @@ default.
+> >>  
+> >>  See Documentation/x86/sgx/2.Kernel-internals.rst for more details.
+> >>  
+> >> +7.26 KVM_CAP_ARM_MTE
+> >> +--------------------
+> >> +
+> >> +:Architectures: arm64
+> >> +:Parameters: none
+> >> +
+> >> +This capability indicates that KVM (and the hardware) supports exposing the
+> >> +Memory Tagging Extensions (MTE) to the guest. It must also be enabled by the
+> >> +VMM before the guest will be granted access.
+> >> +
+> >> +When enabled the guest is able to access tags associated with any memory given
+> >> +to the guest. KVM will ensure that the pages are flagged ``PG_mte_tagged`` so
+> >> +that the tags are maintained during swap or hibernation of the host; however
+> >> +the VMM needs to manually save/restore the tags as appropriate if the VM is
+> >> +migrated.
+> >> +
+> >> +When enabled the VMM may make use of the ``KVM_ARM_MTE_COPY_TAGS`` ioctl to
+> >> +perform a bulk copy of tags to/from the guest.
+> >> +
+> > 
+> > Missing limitation to AArch64 guests.
+> 
+> As mentioned previously it's not technically limited to AArch64, but
+> I'll expand this to make it clear that MTE isn't usable from a AArch32 VCPU.
+
+I believe the architecture is quite clear that it *is* limited to
+AArch64. The clarification is welcome though.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
