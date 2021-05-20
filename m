@@ -2,99 +2,83 @@ Return-Path: <SRS0=DM5G=KP=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46A18C433ED
-	for <kvmarm@archiver.kernel.org>; Thu, 20 May 2021 08:58:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FFBEC433B4
+	for <kvmarm@archiver.kernel.org>; Thu, 20 May 2021 09:46:42 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E77E861261
-	for <kvmarm@archiver.kernel.org>; Thu, 20 May 2021 08:58:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E77E861261
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id D43FF619AC
+	for <kvmarm@archiver.kernel.org>; Thu, 20 May 2021 09:46:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D43FF619AC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CDBC4B5E1;
-	Thu, 20 May 2021 04:58:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C96D4B712;
+	Thu, 20 May 2021 05:46:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id h9EjfwRRYuUd; Thu, 20 May 2021 04:58:06 -0400 (EDT)
+	with ESMTP id 0mZ4w4sMYecq; Thu, 20 May 2021 05:46:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E5EF84B7D2;
-	Thu, 20 May 2021 04:58:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A58A54B59C;
+	Thu, 20 May 2021 05:46:39 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E718F4B84C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 May 2021 13:22:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EC294B50E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 20 May 2021 05:46:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hYuXrFSeQSZV for <kvmarm@lists.cs.columbia.edu>;
- Wed, 19 May 2021 13:22:16 -0400 (EDT)
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com
- [209.85.167.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 220CA4B84B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 May 2021 13:22:16 -0400 (EDT)
-Received: by mail-lf1-f45.google.com with SMTP id i22so20113490lfl.10
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 May 2021 10:22:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=76L6ww8XbybjMK/0TY0eGaqevPfaVzkw1PkvlOSemV0=;
- b=HL/kZWs09TYOvGWhINWpUg6FBuMTVU128n/bnrU/Q6+oL422jh55Bq2Fta5ivzFcxl
- 77HLxB/ibYsoDPpWO+XAr0hF0XS9gE3EVFf9ckwMgvaOV+CBKbX0+DqMRP0zSpDY4LNf
- 5rOYo1khmX9evl2u6ocCIOTWuKQosF14ZcNALHv5CLw0NfutyNw8WsCsOz+tmS72mZPU
- XQWo/3vjkwEFtFuI8gSoXs1lvNSvYrHYMuV4dP3kbDRfPFvcUFWBbUP0wwmhbzhd0hNa
- G8wSsR4BKPtP7u+KBMjoygyFTFp3InZY32ge7iNuwWa9ICQY3J7VZPC8K1Oj9ui3oUuT
- knFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=76L6ww8XbybjMK/0TY0eGaqevPfaVzkw1PkvlOSemV0=;
- b=fyBGfkRS5r+XoTRAvFiWGAQ8AOIA/OESSW9MSNCk5yCHWYN8erp9VPNRQGGPKNQ+Gv
- 7R5LZRCMOXIwrVBe144OTrV5RC3MlrgUnLdv2GnOEispo4Nk//20UKdIHWfKTrN4FMpB
- d1T9c1vkgJg1lpIQ0C4ROJn5ZWMBqB7y5U5CTqF87hk7fEQ82A8JCbIgvnXASkFENh6g
- 2VxmPGCOx3QSE8Y8LOzZPGh2qS6NI27DXv4gYFhp16fpM6ptRB4oonXscbJKZMUsXZYd
- EqqXoQ610M1rpLmsmsir8imi/gaxrw9Lh/ANQubOqmQ+lTLaUuhokx01H21RUXYwGT5v
- rpQg==
-X-Gm-Message-State: AOAM531+314YCJXBrIBWN5u32POrevcMSwCZPZ6F7Cc2J/4zKfUd+a38
- i5WIEelxm2tfAMthGMfSBSxJ023fAnmwny5dz+DsCQ==
-X-Google-Smtp-Source: ABdhPJwkoLojL/mrvncpRMeM/tlX+hUDPvIKxDRkU9fl17sVbhjVljh3hIhpBNaFBS+b+dPIWkcpR0i9JoTWLJIMCvk=
-X-Received: by 2002:a05:6512:22d5:: with SMTP id
- g21mr407870lfu.80.1621444934457; 
- Wed, 19 May 2021 10:22:14 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210517145314.157626-1-jingzhangos@google.com>
- <20210517145314.157626-5-jingzhangos@google.com>
-In-Reply-To: <20210517145314.157626-5-jingzhangos@google.com>
-From: David Matlack <dmatlack@google.com>
-Date: Wed, 19 May 2021 10:21:47 -0700
-Message-ID: <CALzav=cMvQ6njtjS+SEZ=tx4nV+7+v7S2i8sn0+=agdDu+OtjQ@mail.gmail.com>
-Subject: Re: [PATCH v5 4/4] KVM: selftests: Add selftest for KVM statistics
- data binary interface
-To: Jing Zhang <jingzhangos@google.com>
-X-Mailman-Approved-At: Thu, 20 May 2021 04:58:01 -0400
-Cc: KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
- Paul Mackerras <paulus@ozlabs.org>,
- Linuxkselftest <linux-kselftest@vger.kernel.org>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Will Deacon <will@kernel.org>,
- KVMARM <kvmarm@lists.cs.columbia.edu>,
- Emanuele Giuseppe Esposito <eesposit@redhat.com>,
- LinuxS390 <linux-s390@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
- Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>,
- Huacai Chen <chenhuacai@kernel.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- David Rientjes <rientjes@google.com>, KVMPPC <kvm-ppc@vger.kernel.org>,
- Jim Mattson <jmattson@google.com>,
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- Sean Christopherson <seanjc@google.com>, Cornelia Huck <cohuck@redhat.com>,
- Peter Shier <pshier@google.com>, LinuxMIPS <linux-mips@vger.kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
+ with ESMTP id caRdksObeBrh for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 20 May 2021 05:46:36 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A75F04B488
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 20 May 2021 05:46:36 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id B482F619AE;
+ Thu, 20 May 2021 09:46:34 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1ljfGC-002Tzu-KZ; Thu, 20 May 2021 10:46:32 +0100
+Date: Thu, 20 May 2021 10:46:31 +0100
+Message-ID: <874kexvitk.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Steven Price <steven.price@arm.com>
+Subject: Re: [PATCH v12 5/8] arm64: kvm: Save/restore MTE registers
+In-Reply-To: <097f5f5e-b287-3c9e-1f11-e0212601ddd2@arm.com>
+References: <20210517123239.8025-1-steven.price@arm.com>
+ <20210517123239.8025-6-steven.price@arm.com>
+ <87v97hth3i.wl-maz@kernel.org>
+ <097f5f5e-b287-3c9e-1f11-e0212601ddd2@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: steven.price@arm.com, catalin.marinas@arm.com,
+ will@kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com,
+ suzuki.poulose@arm.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Dave.Martin@arm.com, mark.rutland@arm.com, tglx@linutronix.de,
+ qemu-devel@nongnu.org, quintela@redhat.com, dgilbert@redhat.com,
+ richard.henderson@linaro.org, peter.maydell@linaro.org, Haibo.Xu@arm.com,
+ drjones@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
+ Catalin Marinas <catalin.marinas@arm.com>, Juan Quintela <quintela@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
+ Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org,
+ Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -111,488 +95,280 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, May 17, 2021 at 9:24 AM Jing Zhang <jingzhangos@google.com> wrote:
->
-> Add selftest to check KVM stats descriptors validity.
->
-> Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> ---
->  tools/testing/selftests/kvm/.gitignore        |   1 +
->  tools/testing/selftests/kvm/Makefile          |   3 +
->  .../testing/selftests/kvm/include/kvm_util.h  |   3 +
->  .../selftests/kvm/kvm_bin_form_stats.c        | 379 ++++++++++++++++++
->  tools/testing/selftests/kvm/lib/kvm_util.c    |  12 +
->  5 files changed, 398 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/kvm_bin_form_stats.c
->
-> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-> index bd83158e0e0b..35796667c944 100644
-> --- a/tools/testing/selftests/kvm/.gitignore
-> +++ b/tools/testing/selftests/kvm/.gitignore
-> @@ -43,3 +43,4 @@
->  /memslot_modification_stress_test
->  /set_memory_region_test
->  /steal_time
-> +/kvm_bin_form_stats
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index e439d027939d..2984c86c848a 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -76,6 +76,7 @@ TEST_GEN_PROGS_x86_64 += kvm_page_table_test
->  TEST_GEN_PROGS_x86_64 += memslot_modification_stress_test
->  TEST_GEN_PROGS_x86_64 += set_memory_region_test
->  TEST_GEN_PROGS_x86_64 += steal_time
-> +TEST_GEN_PROGS_x86_64 += kvm_bin_form_stats
->
->  TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
->  TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list-sve
-> @@ -87,6 +88,7 @@ TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
->  TEST_GEN_PROGS_aarch64 += kvm_page_table_test
->  TEST_GEN_PROGS_aarch64 += set_memory_region_test
->  TEST_GEN_PROGS_aarch64 += steal_time
-> +TEST_GEN_PROGS_aarch64 += kvm_bin_form_stats
->
->  TEST_GEN_PROGS_s390x = s390x/memop
->  TEST_GEN_PROGS_s390x += s390x/resets
-> @@ -96,6 +98,7 @@ TEST_GEN_PROGS_s390x += dirty_log_test
->  TEST_GEN_PROGS_s390x += kvm_create_max_vcpus
->  TEST_GEN_PROGS_s390x += kvm_page_table_test
->  TEST_GEN_PROGS_s390x += set_memory_region_test
-> +TEST_GEN_PROGS_s390x += kvm_bin_form_stats
->
->  TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(UNAME_M))
->  LIBKVM += $(LIBKVM_$(UNAME_M))
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> index a8f022794ce3..ee01a67022d9 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> @@ -387,4 +387,7 @@ uint64_t get_ucall(struct kvm_vm *vm, uint32_t vcpu_id, struct ucall *uc);
->  #define GUEST_ASSERT_4(_condition, arg1, arg2, arg3, arg4) \
->         __GUEST_ASSERT((_condition), 4, (arg1), (arg2), (arg3), (arg4))
->
-> +int vm_get_statsfd(struct kvm_vm *vm);
-> +int vcpu_get_statsfd(struct kvm_vm *vm, uint32_t vcpuid);
-> +
->  #endif /* SELFTEST_KVM_UTIL_H */
-> diff --git a/tools/testing/selftests/kvm/kvm_bin_form_stats.c b/tools/testing/selftests/kvm/kvm_bin_form_stats.c
-> new file mode 100644
-> index 000000000000..dae44397d0f4
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/kvm_bin_form_stats.c
-> @@ -0,0 +1,379 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * kvm_bin_form_stats
-> + *
-> + * Copyright (C) 2021, Google LLC.
-> + *
-> + * Test the fd-based interface for KVM statistics.
-> + */
-> +
-> +#define _GNU_SOURCE /* for program_invocation_short_name */
-> +#include <fcntl.h>
-> +#include <stdio.h>
-> +#include <stdlib.h>
-> +#include <string.h>
-> +#include <errno.h>
-> +
-> +#include "test_util.h"
-> +
-> +#include "kvm_util.h"
-> +#include "asm/kvm.h"
-> +#include "linux/kvm.h"
-> +
-> +int vm_stats_test(struct kvm_vm *vm)
-> +{
-> +       ssize_t ret;
-> +       int i, stats_fd, err = -1;
-> +       size_t size_desc, size_data = 0;
-> +       struct kvm_stats_header header;
-> +       struct kvm_stats_desc *stats_desc, *pdesc;
-> +       struct kvm_vm_stats_data *stats_data;
-> +
-> +       /* Get fd for VM stats */
-> +       stats_fd = vm_get_statsfd(vm);
-> +       if (stats_fd < 0) {
-> +               perror("Get VM stats fd");
-> +               return err;
-> +       }
-> +       /* Read kvm vm stats header */
-> +       ret = read(stats_fd, &header, sizeof(header));
-> +       if (ret != sizeof(header)) {
-> +               perror("Read VM stats header");
-> +               goto out_close_fd;
-> +       }
-> +       size_desc = sizeof(*stats_desc) + header.name_size;
-> +       /* Check id string in header, that should start with "kvm" */
-> +       if (strncmp(header.id, "kvm", 3) ||
-> +                       strlen(header.id) >= KVM_STATS_ID_MAXLEN) {
-> +               printf("Invalid KVM VM stats type!\n");
-> +               goto out_close_fd;
+On Wed, 19 May 2021 14:04:20 +0100,
+Steven Price <steven.price@arm.com> wrote:
+> 
+> On 17/05/2021 18:17, Marc Zyngier wrote:
+> > On Mon, 17 May 2021 13:32:36 +0100,
+> > Steven Price <steven.price@arm.com> wrote:
+> >>
+> >> Define the new system registers that MTE introduces and context switch
+> >> them. The MTE feature is still hidden from the ID register as it isn't
+> >> supported in a VM yet.
+> >>
+> >> Signed-off-by: Steven Price <steven.price@arm.com>
+> >> ---
+> >>  arch/arm64/include/asm/kvm_host.h          |  6 ++
+> >>  arch/arm64/include/asm/kvm_mte.h           | 66 ++++++++++++++++++++++
+> >>  arch/arm64/include/asm/sysreg.h            |  3 +-
+> >>  arch/arm64/kernel/asm-offsets.c            |  3 +
+> >>  arch/arm64/kvm/hyp/entry.S                 |  7 +++
+> >>  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 21 +++++++
+> >>  arch/arm64/kvm/sys_regs.c                  | 22 ++++++--
+> >>  7 files changed, 123 insertions(+), 5 deletions(-)
+> >>  create mode 100644 arch/arm64/include/asm/kvm_mte.h
+> >>
+> >> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> >> index afaa5333f0e4..309e36cc1b42 100644
+> >> --- a/arch/arm64/include/asm/kvm_host.h
+> >> +++ b/arch/arm64/include/asm/kvm_host.h
+> >> @@ -208,6 +208,12 @@ enum vcpu_sysreg {
+> >>  	CNTP_CVAL_EL0,
+> >>  	CNTP_CTL_EL0,
+> >>  
+> >> +	/* Memory Tagging Extension registers */
+> >> +	RGSR_EL1,	/* Random Allocation Tag Seed Register */
+> >> +	GCR_EL1,	/* Tag Control Register */
+> >> +	TFSR_EL1,	/* Tag Fault Status Register (EL1) */
+> >> +	TFSRE0_EL1,	/* Tag Fault Status Register (EL0) */
+> >> +
+> >>  	/* 32bit specific registers. Keep them at the end of the range */
+> >>  	DACR32_EL2,	/* Domain Access Control Register */
+> >>  	IFSR32_EL2,	/* Instruction Fault Status Register */
+> >> diff --git a/arch/arm64/include/asm/kvm_mte.h b/arch/arm64/include/asm/kvm_mte.h
+> >> new file mode 100644
+> >> index 000000000000..6541c7d6ce06
+> >> --- /dev/null
+> >> +++ b/arch/arm64/include/asm/kvm_mte.h
+> >> @@ -0,0 +1,66 @@
+> >> +/* SPDX-License-Identifier: GPL-2.0 */
+> >> +/*
+> >> + * Copyright (C) 2020 ARM Ltd.
+> >> + */
+> >> +#ifndef __ASM_KVM_MTE_H
+> >> +#define __ASM_KVM_MTE_H
+> >> +
+> >> +#ifdef __ASSEMBLY__
+> >> +
+> >> +#include <asm/sysreg.h>
+> >> +
+> >> +#ifdef CONFIG_ARM64_MTE
+> >> +
+> >> +.macro mte_switch_to_guest g_ctxt, h_ctxt, reg1
+> >> +alternative_if_not ARM64_MTE
+> >> +	b	.L__skip_switch\@
+> >> +alternative_else_nop_endif
+> >> +	mrs	\reg1, hcr_el2
+> >> +	and	\reg1, \reg1, #(HCR_ATA)
+> >> +	cbz	\reg1, .L__skip_switch\@
+> >> +
+> >> +	mrs_s	\reg1, SYS_RGSR_EL1
+> >> +	str	\reg1, [\h_ctxt, #CPU_RGSR_EL1]
+> >> +	mrs_s	\reg1, SYS_GCR_EL1
+> >> +	str	\reg1, [\h_ctxt, #CPU_GCR_EL1]
+> >> +
+> >> +	ldr	\reg1, [\g_ctxt, #CPU_RGSR_EL1]
+> >> +	msr_s	SYS_RGSR_EL1, \reg1
+> >> +	ldr	\reg1, [\g_ctxt, #CPU_GCR_EL1]
+> >> +	msr_s	SYS_GCR_EL1, \reg1
+> >> +
+> >> +.L__skip_switch\@:
+> >> +.endm
+> >> +
+> >> +.macro mte_switch_to_hyp g_ctxt, h_ctxt, reg1
+> >> +alternative_if_not ARM64_MTE
+> >> +	b	.L__skip_switch\@
+> >> +alternative_else_nop_endif
+> >> +	mrs	\reg1, hcr_el2
+> >> +	and	\reg1, \reg1, #(HCR_ATA)
+> >> +	cbz	\reg1, .L__skip_switch\@
+> >> +
+> >> +	mrs_s	\reg1, SYS_RGSR_EL1
+> >> +	str	\reg1, [\g_ctxt, #CPU_RGSR_EL1]
+> >> +	mrs_s	\reg1, SYS_GCR_EL1
+> >> +	str	\reg1, [\g_ctxt, #CPU_GCR_EL1]
+> >> +
+> >> +	ldr	\reg1, [\h_ctxt, #CPU_RGSR_EL1]
+> >> +	msr_s	SYS_RGSR_EL1, \reg1
+> >> +	ldr	\reg1, [\h_ctxt, #CPU_GCR_EL1]
+> >> +	msr_s	SYS_GCR_EL1, \reg1
+> > 
+> > What is the rational for not having any synchronisation here? It is
+> > quite uncommon to allocate memory at EL2, but VHE can perform all kind
+> > of tricks.
+> 
+> I don't follow. This is part of the __guest_exit path and there's an ISB
+> at the end of that - is that not sufficient? I don't see any possibility
+> for allocating memory before that. What am I missing?
 
-Is there a reason why you are not using TEST_ASSERT for these checks?
-The memory will get cleaned up when the test process exits, so there's
-no need to do the careful error handling and goto statements.
+Which ISB?  We have a few in the SError handling code, but that's
+conditioned on not having RAS. With any RAS-enabled CPU, we return to
+C code early, since we don't need any extra synchronisation (see the
+comment about the absence of ISB on this path).
 
-(This applies throughout this whole test.)
+I would really like to ensure that we return to C code in the exact
+state we left it.
 
-> +       }
-> +       /* Sanity check for other fields in header */
-> +       if (header.count == 0) {
-> +               err = 0;
-> +               goto out_close_fd;
-> +       }
-> +       /* Check overlap */
-> +       if (header.desc_offset == 0 || header.data_offset == 0 ||
-> +                       header.desc_offset < sizeof(header) ||
-> +                       header.data_offset < sizeof(header)) {
-> +               printf("Invalid offset fields in header!\n");
-> +               goto out_close_fd;
-> +       }
-> +       if (header.desc_offset < header.data_offset &&
-> +                       (header.desc_offset + size_desc * header.count >
-> +                       header.data_offset)) {
-> +               printf("VM Descriptor block is overlapped with data block!\n");
-> +               goto out_close_fd;
-> +       }
-> +
-> +       /* Allocate memory for stats descriptors */
-> +       stats_desc = calloc(header.count, size_desc);
-> +       if (!stats_desc) {
-> +               perror("Allocate memory for VM stats descriptors");
-> +               goto out_close_fd;
-> +       }
-> +       /* Read kvm vm stats descriptors */
-> +       ret = pread(stats_fd, stats_desc,
-> +                       size_desc * header.count, header.desc_offset);
-> +       if (ret != size_desc * header.count) {
-> +               perror("Read KVM VM stats descriptors");
-> +               goto out_free_desc;
-> +       }
-> +       /* Sanity check for fields in descriptors */
-> +       for (i = 0; i < header.count; ++i) {
-> +               pdesc = (void *)stats_desc + i * size_desc;
-> +               /* Check type,unit,scale boundaries */
-> +               if ((pdesc->flags & KVM_STATS_TYPE_MASK) > KVM_STATS_TYPE_MAX) {
-> +                       printf("Unknown KVM stats type!\n");
-> +                       goto out_free_desc;
-> +               }
-> +               if ((pdesc->flags & KVM_STATS_UNIT_MASK) > KVM_STATS_UNIT_MAX) {
-> +                       printf("Unknown KVM stats unit!\n");
-> +                       goto out_free_desc;
-> +               }
-> +               if ((pdesc->flags & KVM_STATS_SCALE_MASK) >
-> +                               KVM_STATS_SCALE_MAX) {
-> +                       printf("Unknown KVM stats scale!\n");
-> +                       goto out_free_desc;
-> +               }
-> +               /* Check exponent for stats unit
-> +                * Exponent for counter should be greater than or equal to 0
-> +                * Exponent for unit bytes should be greater than or equal to 0
-> +                * Exponent for unit seconds should be less than or equal to 0
-> +                * Exponent for unit clock cycles should be greater than or
-> +                * equal to 0
-> +                */
-> +               switch (pdesc->flags & KVM_STATS_UNIT_MASK) {
-> +               case KVM_STATS_UNIT_NONE:
-> +               case KVM_STATS_UNIT_BYTES:
-> +               case KVM_STATS_UNIT_CYCLES:
-> +                       if (pdesc->exponent < 0) {
-> +                               printf("Unsupported KVM stats unit!\n");
-> +                               goto out_free_desc;
-> +                       }
-> +                       break;
-> +               case KVM_STATS_UNIT_SECONDS:
-> +                       if (pdesc->exponent > 0) {
-> +                               printf("Unsupported KVM stats unit!\n");
-> +                               goto out_free_desc;
-> +                       }
-> +                       break;
-> +               }
-> +               /* Check name string */
-> +               if (strlen(pdesc->name) >= header.name_size) {
-> +                       printf("KVM stats name(%s) too long!\n", pdesc->name);
-> +                       goto out_free_desc;
-> +               }
-> +               /* Check size field, which should not be zero */
-> +               if (pdesc->size == 0) {
-> +                       printf("KVM descriptor(%s) with size of 0!\n",
-> +                                       pdesc->name);
-> +                       goto out_free_desc;
-> +               }
-> +               size_data += pdesc->size * sizeof(stats_data->value[0]);
-> +       }
-> +       /* Check overlap */
-> +       if (header.data_offset < header.desc_offset &&
-> +               header.data_offset + size_data > header.desc_offset) {
-> +               printf("Data block is overlapped with Descriptor block!\n");
-> +               goto out_free_desc;
-> +       }
-> +       /* Check validity of all stats data size */
-> +       if (size_data < header.count * sizeof(stats_data->value[0])) {
-> +               printf("Data size is not correct!\n");
-> +               goto out_free_desc;
-> +       }
-> +
-> +       /* Allocate memory for stats data */
-> +       stats_data = malloc(size_data);
-> +       if (!stats_data) {
-> +               perror("Allocate memory for VM stats data");
-> +               goto out_free_desc;
-> +       }
-> +       /* Read kvm vm stats data */
-> +       ret = pread(stats_fd, stats_data, size_data, header.data_offset);
-> +       if (ret != size_data) {
-> +               perror("Read KVM VM stats data");
-> +               goto out_free_data;
-> +       }
-> +
-> +       err = 0;
-> +out_free_data:
-> +       free(stats_data);
-> +out_free_desc:
-> +       free(stats_desc);
-> +out_close_fd:
-> +       close(stats_fd);
-> +       return err;
-> +}
-> +
-> +int vcpu_stats_test(struct kvm_vm *vm, int vcpu_id)
-> +{
-> +       ssize_t ret;
-> +       int i, stats_fd, err = -1;
-> +       size_t size_desc, size_data = 0;
-> +       struct kvm_stats_header header;
-> +       struct kvm_stats_desc *stats_desc, *pdesc;
-> +       struct kvm_vcpu_stats_data *stats_data;
-> +
-> +       /* Get fd for VCPU stats */
-> +       stats_fd = vcpu_get_statsfd(vm, vcpu_id);
-> +       if (stats_fd < 0) {
-> +               perror("Get VCPU stats fd");
-> +               return err;
-> +       }
-> +       /* Read kvm vcpu stats header */
-> +       ret = read(stats_fd, &header, sizeof(header));
-> +       if (ret != sizeof(header)) {
-> +               perror("Read VCPU stats header");
-> +               goto out_close_fd;
-> +       }
-> +       size_desc = sizeof(*stats_desc) + header.name_size;
-> +       /* Check id string in header, that should start with "kvm" */
-> +       if (strncmp(header.id, "kvm", 3) ||
-> +                       strlen(header.id) >= KVM_STATS_ID_MAXLEN) {
-> +               printf("Invalid KVM VCPU stats type!\n");
-> +               goto out_close_fd;
-> +       }
-> +       /* Sanity check for other fields in header */
-> +       if (header.count == 0) {
-> +               err = 0;
-> +               goto out_close_fd;
-> +       }
-> +       /* Check overlap */
-> +       if (header.desc_offset == 0 || header.data_offset == 0 ||
-> +                       header.desc_offset < sizeof(header) ||
-> +                       header.data_offset < sizeof(header)) {
-> +               printf("Invalid offset fields in header!\n");
-> +               goto out_close_fd;
-> +       }
-> +       if (header.desc_offset < header.data_offset &&
-> +                       (header.desc_offset + size_desc * header.count >
-> +                       header.data_offset)) {
-> +               printf("VCPU Descriptor block is overlapped with data block!\n");
-> +               goto out_close_fd;
-> +       }
-> +
-> +       /* Allocate memory for stats descriptors */
-> +       stats_desc = calloc(header.count, size_desc);
-> +       if (!stats_desc) {
-> +               perror("Allocate memory for VCPU stats descriptors");
-> +               goto out_close_fd;
-> +       }
-> +       /* Read kvm vcpu stats descriptors */
-> +       ret = pread(stats_fd, stats_desc,
-> +                       size_desc * header.count, header.desc_offset);
-> +       if (ret != size_desc * header.count) {
-> +               perror("Read KVM VCPU stats descriptors");
-> +               goto out_free_desc;
-> +       }
-> +       /* Sanity check for fields in descriptors */
-> +       for (i = 0; i < header.count; ++i) {
-> +               pdesc = (void *)stats_desc + i * size_desc;
-> +               /* Check boundaries */
-> +               if ((pdesc->flags & KVM_STATS_TYPE_MASK) > KVM_STATS_TYPE_MAX) {
-> +                       printf("Unknown KVM stats type!\n");
-> +                       goto out_free_desc;
-> +               }
-> +               if ((pdesc->flags & KVM_STATS_UNIT_MASK) > KVM_STATS_UNIT_MAX) {
-> +                       printf("Unknown KVM stats unit!\n");
-> +                       goto out_free_desc;
-> +               }
-> +               if ((pdesc->flags & KVM_STATS_SCALE_MASK) >
-> +                               KVM_STATS_SCALE_MAX) {
-> +                       printf("Unknown KVM stats scale!\n");
-> +                       goto out_free_desc;
-> +               }
-> +               /* Check exponent for stats unit
-> +                * Exponent for counter should be greater than or equal to 0
-> +                * Exponent for unit bytes should be greater than or equal to 0
-> +                * Exponent for unit seconds should be less than or equal to 0
-> +                * Exponent for unit clock cycles should be greater than or
-> +                * equal to 0
-> +                */
-> +               switch (pdesc->flags & KVM_STATS_UNIT_MASK) {
-> +               case KVM_STATS_UNIT_NONE:
-> +               case KVM_STATS_UNIT_BYTES:
-> +               case KVM_STATS_UNIT_CYCLES:
-> +                       if (pdesc->exponent < 0) {
-> +                               printf("Unsupported KVM stats unit!\n");
-> +                               goto out_free_desc;
-> +                       }
-> +                       break;
-> +               case KVM_STATS_UNIT_SECONDS:
-> +                       if (pdesc->exponent > 0) {
-> +                               printf("Unsupported KVM stats unit!\n");
-> +                               goto out_free_desc;
-> +                       }
-> +                       break;
-> +               }
-> +               /* Check name string */
-> +               if (strlen(pdesc->name) >= header.name_size) {
-> +                       printf("KVM stats name(%s) too long!\n", pdesc->name);
-> +                       goto out_free_desc;
-> +               }
-> +               /* Check size field, which should not be zero */
-> +               if (pdesc->size == 0) {
-> +                       printf("KVM descriptor(%s) with size of 0!\n",
-> +                                       pdesc->name);
-> +                       goto out_free_desc;
-> +               }
-> +               size_data += pdesc->size * sizeof(stats_data->value[0]);
-> +       }
-> +       /* Check overlap */
-> +       if (header.data_offset < header.desc_offset &&
-> +               header.data_offset + size_data > header.desc_offset) {
-> +               printf("Data block is overlapped with Descriptor block!\n");
-> +               goto out_free_desc;
-> +       }
-> +       /* Check validity of all stats data size */
-> +       if (size_data < header.count * sizeof(stats_data->value[0])) {
-> +               printf("Data size is not correct!\n");
-> +               goto out_free_desc;
-> +       }
-> +
-> +       /* Allocate memory for stats data */
-> +       stats_data = malloc(size_data);
-> +       if (!stats_data) {
-> +               perror("Allocate memory for VCPU stats data");
-> +               goto out_free_desc;
-> +       }
-> +       /* Read kvm vcpu stats data */
-> +       ret = pread(stats_fd, stats_data, size_data, header.data_offset);
-> +       if (ret != size_data) {
-> +               perror("Read KVM VCPU stats data");
-> +               goto out_free_data;
-> +       }
-> +
-> +       err = 0;
-> +out_free_data:
-> +       free(stats_data);
-> +out_free_desc:
-> +       free(stats_desc);
-> +out_close_fd:
-> +       close(stats_fd);
-> +       return err;
-> +}
-> +
-> +/*
-> + * Usage: kvm_bin_form_stats [#vm] [#vcpu]
-> + * The first parameter #vm set the number of VMs being created.
-> + * The second parameter #vcpu set the number of VCPUs being created.
-> + * By default, 1 VM and 1 VCPU for the VM would be created for testing.
-> + */
+> 
+> >> +
+> >> +.L__skip_switch\@:
+> >> +.endm
+> >> +
+> >> +#else /* CONFIG_ARM64_MTE */
+> >> +
+> >> +.macro mte_switch_to_guest g_ctxt, h_ctxt, reg1
+> >> +.endm
+> >> +
+> >> +.macro mte_switch_to_hyp g_ctxt, h_ctxt, reg1
+> >> +.endm
+> >> +
+> >> +#endif /* CONFIG_ARM64_MTE */
+> >> +#endif /* __ASSEMBLY__ */
+> >> +#endif /* __ASM_KVM_MTE_H */
+> >> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> >> index 65d15700a168..347ccac2341e 100644
+> >> --- a/arch/arm64/include/asm/sysreg.h
+> >> +++ b/arch/arm64/include/asm/sysreg.h
+> >> @@ -651,7 +651,8 @@
+> >>  
+> >>  #define INIT_SCTLR_EL2_MMU_ON						\
+> >>  	(SCTLR_ELx_M  | SCTLR_ELx_C | SCTLR_ELx_SA | SCTLR_ELx_I |	\
+> >> -	 SCTLR_ELx_IESB | SCTLR_ELx_WXN | ENDIAN_SET_EL2 | SCTLR_EL2_RES1)
+> >> +	 SCTLR_ELx_IESB | SCTLR_ELx_WXN | ENDIAN_SET_EL2 |		\
+> >> +	 SCTLR_ELx_ITFSB | SCTLR_EL2_RES1)
+> >>  
+> >>  #define INIT_SCTLR_EL2_MMU_OFF \
+> >>  	(SCTLR_EL2_RES1 | ENDIAN_SET_EL2)
+> >> diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
+> >> index 0cb34ccb6e73..6b489a8462f0 100644
+> >> --- a/arch/arm64/kernel/asm-offsets.c
+> >> +++ b/arch/arm64/kernel/asm-offsets.c
+> >> @@ -111,6 +111,9 @@ int main(void)
+> >>    DEFINE(VCPU_WORKAROUND_FLAGS,	offsetof(struct kvm_vcpu, arch.workaround_flags));
+> >>    DEFINE(VCPU_HCR_EL2,		offsetof(struct kvm_vcpu, arch.hcr_el2));
+> >>    DEFINE(CPU_USER_PT_REGS,	offsetof(struct kvm_cpu_context, regs));
+> >> +  DEFINE(CPU_RGSR_EL1,		offsetof(struct kvm_cpu_context, sys_regs[RGSR_EL1]));
+> >> +  DEFINE(CPU_GCR_EL1,		offsetof(struct kvm_cpu_context, sys_regs[GCR_EL1]));
+> >> +  DEFINE(CPU_TFSRE0_EL1,	offsetof(struct kvm_cpu_context, sys_regs[TFSRE0_EL1]));
+> > 
+> > TFSRE0_EL1 is never accessed from assembly code. Leftover from a
+> > previous version?
+> 
+> Indeed, I will drop it.
+> 
+> >>    DEFINE(CPU_APIAKEYLO_EL1,	offsetof(struct kvm_cpu_context, sys_regs[APIAKEYLO_EL1]));
+> >>    DEFINE(CPU_APIBKEYLO_EL1,	offsetof(struct kvm_cpu_context, sys_regs[APIBKEYLO_EL1]));
+> >>    DEFINE(CPU_APDAKEYLO_EL1,	offsetof(struct kvm_cpu_context, sys_regs[APDAKEYLO_EL1]));
+> >> diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+> >> index e831d3dfd50d..435346ea1504 100644
+> >> --- a/arch/arm64/kvm/hyp/entry.S
+> >> +++ b/arch/arm64/kvm/hyp/entry.S
+> >> @@ -13,6 +13,7 @@
+> >>  #include <asm/kvm_arm.h>
+> >>  #include <asm/kvm_asm.h>
+> >>  #include <asm/kvm_mmu.h>
+> >> +#include <asm/kvm_mte.h>
+> >>  #include <asm/kvm_ptrauth.h>
+> >>  
+> >>  	.text
+> >> @@ -51,6 +52,9 @@ alternative_else_nop_endif
+> >>  
+> >>  	add	x29, x0, #VCPU_CONTEXT
+> >>  
+> >> +	// mte_switch_to_guest(g_ctxt, h_ctxt, tmp1)
+> >> +	mte_switch_to_guest x29, x1, x2
+> >> +
+> >>  	// Macro ptrauth_switch_to_guest format:
+> >>  	// 	ptrauth_switch_to_guest(guest cxt, tmp1, tmp2, tmp3)
+> >>  	// The below macro to restore guest keys is not implemented in C code
+> >> @@ -142,6 +146,9 @@ SYM_INNER_LABEL(__guest_exit, SYM_L_GLOBAL)
+> >>  	// when this feature is enabled for kernel code.
+> >>  	ptrauth_switch_to_hyp x1, x2, x3, x4, x5
+> >>  
+> >> +	// mte_switch_to_hyp(g_ctxt, h_ctxt, reg1)
+> >> +	mte_switch_to_hyp x1, x2, x3
+> >> +
+> >>  	// Restore hyp's sp_el0
+> >>  	restore_sp_el0 x2, x3
+> >>  
+> >> diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> >> index cce43bfe158f..de7e14c862e6 100644
+> >> --- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> >> +++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> >> @@ -14,6 +14,7 @@
+> >>  #include <asm/kvm_asm.h>
+> >>  #include <asm/kvm_emulate.h>
+> >>  #include <asm/kvm_hyp.h>
+> >> +#include <asm/kvm_mmu.h>
+> >>  
+> >>  static inline void __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
+> >>  {
+> >> @@ -26,6 +27,16 @@ static inline void __sysreg_save_user_state(struct kvm_cpu_context *ctxt)
+> >>  	ctxt_sys_reg(ctxt, TPIDRRO_EL0)	= read_sysreg(tpidrro_el0);
+> >>  }
+> >>  
+> >> +static inline bool ctxt_has_mte(struct kvm_cpu_context *ctxt)
+> >> +{
+> >> +	struct kvm_vcpu *vcpu = ctxt->__hyp_running_vcpu;
+> >> +
+> >> +	if (!vcpu)
+> >> +		vcpu = container_of(ctxt, struct kvm_vcpu, arch.ctxt);
+> >> +
+> >> +	return kvm_has_mte(kern_hyp_va(vcpu->kvm));
+> >> +}
+> >> +
+> >>  static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
+> >>  {
+> >>  	ctxt_sys_reg(ctxt, CSSELR_EL1)	= read_sysreg(csselr_el1);
+> >> @@ -46,6 +57,11 @@ static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
+> >>  	ctxt_sys_reg(ctxt, PAR_EL1)	= read_sysreg_par();
+> >>  	ctxt_sys_reg(ctxt, TPIDR_EL1)	= read_sysreg(tpidr_el1);
+> >>  
+> >> +	if (ctxt_has_mte(ctxt)) {
+> >> +		ctxt_sys_reg(ctxt, TFSR_EL1) = read_sysreg_el1(SYS_TFSR);
+> >> +		ctxt_sys_reg(ctxt, TFSRE0_EL1) = read_sysreg_s(SYS_TFSRE0_EL1);
+> >> +	}
+> > 
+> > I remember suggesting that this is slightly heavier than necessary.
+> > 
+> > On nVHE, TFSRE0_EL1 could be moved to load/put, as we never run
+> > userspace with a vcpu loaded. The same holds of course for VHE, but we
+> > also can move TFSR_EL1 to load/put, as the host uses TFSR_EL2.
+> > 
+> > Do you see any issue with that?
+> 
+> The comment[1] I made before was:
 
-Consider setting the default to something higher so people running
-this test with default arguments get more test coverage?
+Ah, I totally missed this email (or can't remember reading it, which
+amounts to the same thing). Apologies for that.
 
-> +
-> +int main(int argc, char *argv[])
-> +{
-> +       int max_vm = 1, max_vcpu = 1, ret, i, j, err = -1;
-> +       struct kvm_vm **vms;
-> +
-> +       /* Get the number of VMs and VCPUs that would be created for testing. */
-> +       if (argc > 1) {
-> +               max_vm = strtol(argv[1], NULL, 0);
-> +               if (max_vm <= 0)
-> +                       max_vm = 1;
-> +       }
-> +       if (argc > 2) {
-> +               max_vcpu = strtol(argv[2], NULL, 0);
-> +               if (max_vcpu <= 0)
-> +                       max_vcpu = 1;
-> +       }
-> +
-> +       /* Check the extension for binary stats */
-> +       ret = kvm_check_cap(KVM_CAP_STATS_BINARY_FD);
-> +       if (ret < 0) {
-> +               printf("Binary form statistics interface is not supported!\n");
-> +               return err;
-> +       }
-> +
-> +       /* Create VMs and VCPUs */
-> +       vms = malloc(sizeof(vms[0]) * max_vm);
-> +       if (!vms) {
-> +               perror("Allocate memory for storing VM pointers");
-> +               return err;
-> +       }
-> +       for (i = 0; i < max_vm; ++i) {
-> +               vms[i] = vm_create(VM_MODE_DEFAULT,
-> +                               DEFAULT_GUEST_PHY_PAGES, O_RDWR);
-> +               for (j = 0; j < max_vcpu; ++j)
-> +                       vm_vcpu_add(vms[i], j);
-> +       }
-> +
-> +       /* Check stats read for every VM and VCPU */
-> +       for (i = 0; i < max_vm; ++i) {
-> +               if (vm_stats_test(vms[i]))
-> +                       goto out_free_vm;
-> +               for (j = 0; j < max_vcpu; ++j) {
-> +                       if (vcpu_stats_test(vms[i], j))
-> +                               goto out_free_vm;
-> +               }
-> +       }
-> +
-> +       err = 0;
-> +out_free_vm:
-> +       for (i = 0; i < max_vm; ++i)
-> +               kvm_vm_free(vms[i]);
-> +       free(vms);
-> +       return err;
-> +}
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index fc83f6c5902d..d9e0b2c8b906 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -2090,3 +2090,15 @@ unsigned int vm_calc_num_guest_pages(enum vm_guest_mode mode, size_t size)
->         n = DIV_ROUND_UP(size, vm_guest_mode_params[mode].page_size);
->         return vm_adjust_num_guest_pages(mode, n);
->  }
-> +
-> +int vm_get_statsfd(struct kvm_vm *vm)
-> +{
-> +       return ioctl(vm->fd, KVM_STATS_GETFD, NULL);
-> +}
-> +
-> +int vcpu_get_statsfd(struct kvm_vm *vm, uint32_t vcpuid)
-> +{
-> +       struct vcpu *vcpu = vcpu_find(vm, vcpuid);
-> +
-> +       return ioctl(vcpu->fd, KVM_STATS_GETFD, NULL);
-> +}
-> --
-> 2.31.1.751.gd2f1c929bd-goog
+>   For TFSR_EL1 + VHE I believe it is synchronised only on vcpu_load/put -
+>   __sysreg_save_el1_state() is called from kvm_vcpu_load_sysregs_vhe().
+> 
+>   TFSRE0_EL1 potentially could be improved. I have to admit I was unsure
+>   if it should be in __sysreg_save_user_state() instead. However AFAICT
+>   that is called at the same time as __sysreg_save_el1_state() and there's
+>   no optimisation for nVHE. And given it's an _EL1 register this seemed
+>   like the logic place.
 >
+>   Am I missing something here? Potentially there are other registers to be
+>   optimised (TPIDRRO_EL0 looks like a possiblity), but IMHO that doesn't
+>   belong in this series.
+> 
+> For VHE TFSR_EL1 is already only saved/restored on load/put
+> (__sysreg_save_el1_state() is called from kvm_vcpu_put_sysregs_vhe()).
+> 
+> TFSRE0_EL1 could be moved, but I'm not sure where it should live as I
+> mentioned above.
+
+Yeah, this looks fine, please ignore my rambling.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
