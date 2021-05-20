@@ -2,105 +2,99 @@ Return-Path: <SRS0=DM5G=KP=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AF64C43461
-	for <kvmarm@archiver.kernel.org>; Thu, 20 May 2021 04:22:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B0C1C433B4
+	for <kvmarm@archiver.kernel.org>; Thu, 20 May 2021 08:37:31 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9E55561244
-	for <kvmarm@archiver.kernel.org>; Thu, 20 May 2021 04:22:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E55561244
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 087B061184
+	for <kvmarm@archiver.kernel.org>; Thu, 20 May 2021 08:37:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 087B061184
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kroah.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F7254B77A;
-	Thu, 20 May 2021 00:22:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 75E904B721;
+	Thu, 20 May 2021 04:37:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kroah.com
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@messagingengine.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Bk03YsOhO4G1; Thu, 20 May 2021 00:21:58 -0400 (EDT)
+	with ESMTP id MrMFJFISMclJ; Thu, 20 May 2021 04:37:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F82A4B7F6;
-	Thu, 20 May 2021 00:21:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4BE8D4B5E1;
+	Thu, 20 May 2021 04:37:29 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 61EF44B7DB
- for <kvmarm@lists.cs.columbia.edu>; Thu, 20 May 2021 00:21:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 08E014B5D2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 20 May 2021 04:37:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bE-q8bH-MnH6 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 20 May 2021 00:21:56 -0400 (EDT)
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com
- [209.85.210.170])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EF1BC4B5C6
- for <kvmarm@lists.cs.columbia.edu>; Thu, 20 May 2021 00:21:55 -0400 (EDT)
-Received: by mail-pf1-f170.google.com with SMTP id g18so9761974pfr.2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 May 2021 21:21:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=DoLjvzR9Ycpjqcta0VpSiJR4Bdnq46dPXdEKwxdkZyE=;
- b=KhAuP9uJ0n9pmyTFOxYfvk0m31c9RU1ZSXij+ksAklnEMQOxYzFB8F2NghHrxa0v/q
- wL/kdDf2JVSyJJnvOnZAZnOHIQwbe3g3IwaONeGKzObQDxihAExXUsj1UNM+FeUaxaCB
- cs3C6C6BObrMp27EBsoNGKxVfSeEpoLskJddVXnFZCV4+9TX18AgZvLNSOzUDsw9nUkg
- P0OgZzuc4/aPq+MHVU37o5Rsxp6/Gh/tbpXovUKYmvQmUWUws3uSDkvk9k13v3DQr1VX
- qJrP3ehBjk3P/TTsuttFjfSyzxtdq7PiNymDcP30iofWSZVHWs4jHZoUb0uN7/oXndKL
- vkZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=DoLjvzR9Ycpjqcta0VpSiJR4Bdnq46dPXdEKwxdkZyE=;
- b=TviKSZJZQxAKaVbqo7ukt7Ti6ACj4X1/cCWOkPPQvFmCrQnHvSR4mLQp7T+kYZw25K
- POMtoerrlABCFEEoKxSi+TkfYj3UWe7tAWESmAiCFFavPW5KbN30Rj/+1IFhIPqWA2Mp
- Xf+qhb729KHQsiGW4aMFo680sx0VSrT0SJ3GC6nggPb2+ABxPAUlnfNpbs9gZoAq2UuO
- lmAA0YqJCGXqxmkYNvrUCuu5A0d0MWe4hnwY+OFnaCUpNVm3/+RfHGgfUlhrgELrGLBK
- /xftdtSobNGN8zmeIQ1uyz0QYDYhhaQcZPYUoU7GdqxshnUAPg/TAO71uGI6mgT8xzoB
- 0fqQ==
-X-Gm-Message-State: AOAM531Tp08Zm5l8ge76y/ciTxOnSq6AeAwKhKRmft7v3awW4idOb8Zs
- MywWGgUo7sFQ57qzpKF/7Q/hDQ==
-X-Google-Smtp-Source: ABdhPJyUT/W5KKf6QPkIVjnToQh3ryfQCsYn+WRFe/r3PlLYmoitMteeLZgd2ATqkGcuRlOqcbdSDw==
-X-Received: by 2002:a62:860b:0:b029:28e:d45b:4d2e with SMTP id
- x11-20020a62860b0000b029028ed45b4d2emr2616829pfd.70.1621484514603; 
- Wed, 19 May 2021 21:21:54 -0700 (PDT)
-Received: from google.com (150.12.83.34.bc.googleusercontent.com.
- [34.83.12.150])
- by smtp.gmail.com with ESMTPSA id j23sm738541pfh.179.2021.05.19.21.21.53
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 19 May 2021 21:21:53 -0700 (PDT)
-Date: Wed, 19 May 2021 21:21:50 -0700
-From: Ricardo Koller <ricarkol@google.com>
-To: Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH v5 2/4] KVM: stats: Add fd-based API to read binary stats
- data
-Message-ID: <YKXj3gHvUoLnojzB@google.com>
-References: <20210517145314.157626-1-jingzhangos@google.com>
- <20210517145314.157626-3-jingzhangos@google.com>
+ with ESMTP id kWj588glhidM for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 20 May 2021 04:37:28 -0400 (EDT)
+Received: from new4-smtp.messagingengine.com (new4-smtp.messagingengine.com
+ [66.111.4.230])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 04CC94B5D0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 20 May 2021 04:37:28 -0400 (EDT)
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.46])
+ by mailnew.nyi.internal (Postfix) with ESMTP id 2D397580725;
+ Thu, 20 May 2021 04:37:26 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+ by compute6.internal (MEProxy); Thu, 20 May 2021 04:37:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=
+ date:from:to:cc:subject:message-id:references:mime-version
+ :content-type:in-reply-to; s=fm3; bh=uN/paZHT/wy9V60QgAgEZGhZMfE
+ PAIFK3VT5m0X1P1w=; b=DyqElVP72T2h8KWo4m3edK/aFE1RVet81qHItJSF6ZY
+ W7atc0Ie/fysmc55BnsCOHQ+HAuNn7KFiXpTgGFw7mJGSm+3yO78hsmxZAGIj9tQ
+ eoMRa3RnD5YYiFCcSdKHooFbto9MI27/KqFGDoOqQ413QGXIM3suDi0ry66hqIA4
+ 6w/PlTQMjOPeTV1v7ZLP2TKRLYNJX35UHfneIyClQf4/Po/6qQU4PRQtOlvkI6DN
+ cRNKwisZ0B+h8haOu4rLWw4eYsz0sFLBGTIbjOgp0h5Y0hf1skqRw/MNQad5l9qA
+ MTdLjLAzf2Ml0rzWaYKHINcnRk4fcOf378GeSIuI+QQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+ messagingengine.com; h=cc:content-type:date:from:in-reply-to
+ :message-id:mime-version:references:subject:to:x-me-proxy
+ :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=uN/paZ
+ HT/wy9V60QgAgEZGhZMfEPAIFK3VT5m0X1P1w=; b=vmeNFnj30tGwQ4olc3Hf7G
+ aH0n45x7g4dT9U5lCFSrgfr1fnsJmzyXOBhTHEwzxbsMVx0WHyAW1QxTXtVjyqfs
+ qM9HQ+CmfgCi/CpeBl64QY+4SXVqrHqIsXA6ra0D4V9JQ3rtWf70BQVo6yi8WpyB
+ bLmmeFqrVgi1x32UVSp5YBz+fR+initDRjHJMLSJu0+oFGM/cCgvcNgvEDeRgXZe
+ AxpcK7qjDHSGhaL1XGludZb19p60Hx5jOJbDNmC7G8wwaATtwsRiUrlPkeNornps
+ uT1r41JCA/4gdtxzt5Up6X4mMe9W4Mbpc0ti4S4InCtLW3VgQXLfboM+46CXKPDA
+ ==
+X-ME-Sender: <xms:xB-mYBcX-bP9zl8pwOjgEa0faf1i9zHCeIur-PWgffpIoDvtqbpyFA>
+ <xme:xB-mYPOa9-4WHSTXwAnoMk7ooaCASkL1wO_ek7I-HZnXOZaWp27XKjr9KTYuZnBKh
+ sGsqLSxOPhk0w>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrvdejuddgtdehucetufdoteggodetrfdotf
+ fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+ uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+ cujfgurhepfffhvffukfhfgggtuggjsehttdortddttddvnecuhfhrohhmpefirhgvghcu
+ mffjuceoghhrvghgsehkrhhorghhrdgtohhmqeenucggtffrrghtthgvrhhnpeevhefgje
+ eitdfffefhvdegleeigeejgeeiffekieffjeeflefhieegtefhudejueenucfkphepkeef
+ rdekiedrjeegrdeigeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrih
+ hlfhhrohhmpehgrhgvgheskhhrohgrhhdrtghomh
+X-ME-Proxy: <xmx:xR-mYKijB76mo5krd25P4UK9_y5r6g3eryM_Yt5-un5I3JS0Fyw-vg>
+ <xmx:xR-mYK8KDZq6L6FDyYMditMPW49tYEeGn6bP8dmCCrpFZRFEf8LowQ>
+ <xmx:xR-mYNuKviavCH9znzZLAzol0taNSLruz7LKtS9o_54-AufGOW8klA>
+ <xmx:xh-mYJEWESWYFyLWwYDncUDJn5PcU4uW-GHG06OMz7LL-7grdmA-GQ>
+Received: from localhost (83-86-74-64.cable.dynamic.v4.ziggo.nl [83.86.74.64])
+ by mail.messagingengine.com (Postfix) with ESMTPA;
+ Thu, 20 May 2021 04:37:24 -0400 (EDT)
+Date: Thu, 20 May 2021 10:37:22 +0200
+From: Greg KH <greg@kroah.com>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH for-stable-5.4] KVM: arm64: Initialize VCPU mdcr_el2
+ before loading it
+Message-ID: <YKYfwqrZsAVniGsD@kroah.com>
+References: <20210517142713.400651-1-alexandru.elisei@arm.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20210517145314.157626-3-jingzhangos@google.com>
-Cc: KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
- Paul Mackerras <paulus@ozlabs.org>,
- Linuxkselftest <linux-kselftest@vger.kernel.org>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Will Deacon <will@kernel.org>,
- KVMARM <kvmarm@lists.cs.columbia.edu>,
- Emanuele Giuseppe Esposito <eesposit@redhat.com>,
- LinuxS390 <linux-s390@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
- Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>,
- Huacai Chen <chenhuacai@kernel.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- David Rientjes <rientjes@google.com>, KVMPPC <kvm-ppc@vger.kernel.org>,
- Jim Mattson <jmattson@google.com>,
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- Sean Christopherson <seanjc@google.com>, Cornelia Huck <cohuck@redhat.com>,
- Peter Shier <pshier@google.com>, LinuxMIPS <linux-mips@vger.kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
+In-Reply-To: <20210517142713.400651-1-alexandru.elisei@arm.com>
+Cc: maz@kernel.org, stable@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -117,242 +111,36 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, May 17, 2021 at 02:53:12PM +0000, Jing Zhang wrote:
-> Provides a file descriptor per VM to read VM stats info/data.
-> Provides a file descriptor per vCPU to read vCPU stats info/data.
+On Mon, May 17, 2021 at 03:27:13PM +0100, Alexandru Elisei wrote:
+> [ Upstream commit 263d6287da1433aba11c5b4046388f2cdf49675c ]
 > 
-> Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> ---
->  arch/arm64/kvm/guest.c    |  26 +++++
->  arch/mips/kvm/mips.c      |  52 +++++++++
->  arch/powerpc/kvm/book3s.c |  52 +++++++++
->  arch/powerpc/kvm/booke.c  |  45 ++++++++
->  arch/s390/kvm/kvm-s390.c  | 117 ++++++++++++++++++++
->  arch/x86/kvm/x86.c        |  53 +++++++++
->  include/linux/kvm_host.h  | 127 ++++++++++++++++++++++
->  include/uapi/linux/kvm.h  |  50 +++++++++
->  virt/kvm/kvm_main.c       | 223 ++++++++++++++++++++++++++++++++++++++
->  9 files changed, 745 insertions(+)
+> When a VCPU is created, the kvm_vcpu struct is initialized to zero in
+> kvm_vm_ioctl_create_vcpu(). On VHE systems, the first time
+> vcpu.arch.mdcr_el2 is loaded on hardware is in vcpu_load(), before it is
+> set to a sensible value in kvm_arm_setup_debug() later in the run loop. The
+> result is that KVM executes for a short time with MDCR_EL2 set to zero.
 > 
-  
-> +static ssize_t kvm_vcpu_stats_read(struct file *file, char __user *user_buffer,
-> +			      size_t size, loff_t *offset)
-> +{
-> +	char id[KVM_STATS_ID_MAXLEN];
-> +	struct kvm_vcpu *vcpu = file->private_data;
-> +	ssize_t copylen, len, remain = size;
-> +	size_t size_header, size_desc, size_stats;
-> +	loff_t pos = *offset;
-> +	char __user *dest = user_buffer;
-> +	void *src;
-
-Nit. Better to do pointer arithmetic on a "char *".  Note that gcc and
-clang will do the expected thing.
-
-> +
-> +	snprintf(id, sizeof(id), "kvm-%d/vcpu-%d",
-> +			task_pid_nr(current), vcpu->vcpu_id);
-> +	size_header = sizeof(kvm_vcpu_stats_header);
-> +	size_desc =
-> +		kvm_vcpu_stats_header.count * sizeof(struct _kvm_stats_desc);
-> +	size_stats = sizeof(vcpu->stat);
-> +
-> +	len = sizeof(id) + size_header + size_desc + size_stats - pos;
-> +	len = min(len, remain);
-> +	if (len <= 0)
-> +		return 0;
-> +	remain = len;
-
-If 'desc_offset' is not right after the header, then the 'len'
-calculation is missing the gap into account. For example, assuming there
-is a gap of 0x1000000 between the header and the descriptors:
-
-	desc_offset = sizeof(id) + size_header + 0x1000000
-
-and the user calls the ioctl with enough space for the whole file,
-including the gap:
-
-	*offset = 0
-	size = sizeof(id) + size_header + size_desc + size_stats + 0x1000000
-
-then 'remain' gets the wrong size:
-
-	remain = sizeof(id) + size_header + size_desc + size_stats
-
-and ... (more below)
-
-> +
-> +	/* Copy kvm vcpu stats header id string */
-> +	copylen = sizeof(id) - pos;
-> +	copylen = min(copylen, remain);
-> +	if (copylen > 0) {
-> +		src = (void *)id + pos;
-> +		if (copy_to_user(dest, src, copylen))
-> +			return -EFAULT;
-> +		remain -= copylen;
-> +		pos += copylen;
-> +		dest += copylen;
-> +	}
-> +	/* Copy kvm vcpu stats header */
-> +	copylen = sizeof(id) + size_header - pos;
-> +	copylen = min(copylen, remain);
-> +	if (copylen > 0) {
-> +		src = (void *)&kvm_vcpu_stats_header;
-> +		src += pos - sizeof(id);
-> +		if (copy_to_user(dest, src, copylen))
-> +			return -EFAULT;
-> +		remain -= copylen;
-> +		pos += copylen;
-> +		dest += copylen;
-> +	}
-> +	/* Copy kvm vcpu stats descriptors */
-> +	copylen = kvm_vcpu_stats_header.desc_offset + size_desc - pos;
-
-This would be the state at this point:
-
-	pos	= sizeof(id) + size_header
-	copylen	= sizeof(id) + size_header + 0x1000000 + size_desc - (sizeof(id) + size_header)
-		= 0x1000000 + size_desc
-	remain	= size_desc + size_stats
-
-> +	copylen = min(copylen, remain);
-
-	copylen = size_desc + size_stats
-
-which is not enough to copy the descriptors (and the data).
-
-> +	if (copylen > 0) {
-> +		src = (void *)&kvm_vcpu_stats_desc;
-> +		src += pos - kvm_vcpu_stats_header.desc_offset;
-
-Moreover, src also needs to take the gap into account.
-
-	src	= &kvm_vcpu_stats_desc + (sizeof(id) + size_header) - (sizeof(id) + size_header + 0x1000000)
-		= &kvm_vcpu_stats_desc - 0x1000000
-
-Otherwise, src ends up pointing at the wrong place.
-
-> +		if (copy_to_user(dest, src, copylen))
-> +			return -EFAULT;
-> +		remain -= copylen;
-> +		pos += copylen;
-> +		dest += copylen;
-> +	}
-> +	/* Copy kvm vcpu stats values */
-> +	copylen = kvm_vcpu_stats_header.data_offset + size_stats - pos;
-
-The same problem occurs here. There is a potential gap before
-data_offset that needs to be taken into account for src and len.
-
-Would it be possible to just ensure that there is no gap? maybe even
-remove data_offset and desc_offset and always place them adjacent, and
-have the descriptors right after the header.
-
-> +	copylen = min(copylen, remain);
-> +	if (copylen > 0) {
-> +		src = (void *)&vcpu->stat;
-> +		src += pos - kvm_vcpu_stats_header.data_offset;
-> +		if (copy_to_user(dest, src, copylen))
-> +			return -EFAULT;
-> +		remain -= copylen;
-> +		pos += copylen;
-> +		dest += copylen;
-> +	}
-> +
-> +	*offset = pos;
-> +	return len;
-> +}
-> +
->  
-
-
-
-> +static ssize_t kvm_vm_stats_read(struct file *file, char __user *user_buffer,
-> +			      size_t size, loff_t *offset)
-> +{
-
-Consider moving the common code between kvm_vcpu_stats_read and this one
-into some function that takes pointers to header, desc, and data. Unless
-there is something vcpu or vm specific besides that.
-
-> +	char id[KVM_STATS_ID_MAXLEN];
-> +	struct kvm *kvm = file->private_data;
-> +	ssize_t copylen, len, remain = size;
-> +	size_t size_header, size_desc, size_stats;
-> +	loff_t pos = *offset;
-> +	char __user *dest = user_buffer;
-> +	void *src;
-> +
-> +	snprintf(id, sizeof(id), "kvm-%d", task_pid_nr(current));
-> +	size_header = sizeof(kvm_vm_stats_header);
-> +	size_desc = kvm_vm_stats_header.count * sizeof(struct _kvm_stats_desc);
-> +	size_stats = sizeof(kvm->stat);
-> +
-> +	len = sizeof(id) + size_header + size_desc + size_stats - pos;
-> +	len = min(len, remain);
-> +	if (len <= 0)
-> +		return 0;
-> +	remain = len;
-> +
-> +	/* Copy kvm vm stats header id string */
-> +	copylen = sizeof(id) - pos;
-> +	copylen = min(copylen, remain);
-> +	if (copylen > 0) {
-> +		src = (void *)id + pos;
-> +		if (copy_to_user(dest, src, copylen))
-> +			return -EFAULT;
-> +		remain -= copylen;
-> +		pos += copylen;
-> +		dest += copylen;
-> +	}
-> +	/* Copy kvm vm stats header */
-> +	copylen = sizeof(id) + size_header - pos;
-> +	copylen = min(copylen, remain);
-> +	if (copylen > 0) {
-> +		src = (void *)&kvm_vm_stats_header;
-> +		src += pos - sizeof(id);
-> +		if (copy_to_user(dest, src, copylen))
-> +			return -EFAULT;
-> +		remain -= copylen;
-> +		pos += copylen;
-> +		dest += copylen;
-> +	}
-> +	/* Copy kvm vm stats descriptors */
-> +	copylen = kvm_vm_stats_header.desc_offset + size_desc - pos;
-> +	copylen = min(copylen, remain);
-> +	if (copylen > 0) {
-> +		src = (void *)&kvm_vm_stats_desc;
-> +		src += pos - kvm_vm_stats_header.desc_offset;
-> +		if (copy_to_user(dest, src, copylen))
-> +			return -EFAULT;
-> +		remain -= copylen;
-> +		pos += copylen;
-> +		dest += copylen;
-> +	}
-> +	/* Copy kvm vm stats values */
-> +	copylen = kvm_vm_stats_header.data_offset + size_stats - pos;
-> +	copylen = min(copylen, remain);
-> +	if (copylen > 0) {
-> +		src = (void *)&kvm->stat;
-> +		src += pos - kvm_vm_stats_header.data_offset;
-> +		if (copy_to_user(dest, src, copylen))
-> +			return -EFAULT;
-> +		remain -= copylen;
-> +		pos += copylen;
-> +		dest += copylen;
-> +	}
-> +
-> +	*offset = pos;
-> +	return len;
-> +}
-> +
-> -- 
-> 2.31.1.751.gd2f1c929bd-goog
+> This has several unintended consequences:
 > 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> * Setting MDCR_EL2.HPMN to 0 is constrained unpredictable according to ARM
+>   DDI 0487G.a, page D13-3820. The behavior specified by the architecture
+>   in this case is for the PE to behave as if MDCR_EL2.HPMN is set to a
+>   value less than or equal to PMCR_EL0.N, which means that an unknown
+>   number of counters are now disabled by MDCR_EL2.HPME, which is zero.
+> 
+> * The host configuration for the other debug features controlled by
+>   MDCR_EL2 is temporarily lost. This has been harmless so far, as Linux
+>   doesn't use the other fields, but that might change in the future.
+> 
+> Let's avoid both issues by initializing the VCPU's mdcr_el2 field in
+> kvm_vcpu_vcpu_first_run_init(), thus making sure that the MDCR_EL2 register
+> has a consistent value after each vcpu_load().
+> 
+> [ v5.4 backport: added stub for KVM/arm that fixes compilation errors ]
+
+Thanks for both backports, now queued up.
+
+greg k-h
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
