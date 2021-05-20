@@ -2,99 +2,83 @@ Return-Path: <SRS0=DM5G=KP=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B0C1C433B4
-	for <kvmarm@archiver.kernel.org>; Thu, 20 May 2021 08:37:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAB4EC433ED
+	for <kvmarm@archiver.kernel.org>; Thu, 20 May 2021 08:51:45 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 087B061184
-	for <kvmarm@archiver.kernel.org>; Thu, 20 May 2021 08:37:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 087B061184
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kroah.com
+	by mail.kernel.org (Postfix) with ESMTP id 3868160FE5
+	for <kvmarm@archiver.kernel.org>; Thu, 20 May 2021 08:51:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3868160FE5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 75E904B721;
-	Thu, 20 May 2021 04:37:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BC0D04B4EA;
+	Thu, 20 May 2021 04:51:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kroah.com
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@messagingengine.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id MrMFJFISMclJ; Thu, 20 May 2021 04:37:29 -0400 (EDT)
+	with ESMTP id WnBDDsQ6bAYG; Thu, 20 May 2021 04:51:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4BE8D4B5E1;
-	Thu, 20 May 2021 04:37:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 202524B557;
+	Thu, 20 May 2021 04:51:42 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 08E014B5D2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 20 May 2021 04:37:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 25AD74B42C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 20 May 2021 04:51:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kWj588glhidM for <kvmarm@lists.cs.columbia.edu>;
- Thu, 20 May 2021 04:37:28 -0400 (EDT)
-Received: from new4-smtp.messagingengine.com (new4-smtp.messagingengine.com
- [66.111.4.230])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 04CC94B5D0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 20 May 2021 04:37:28 -0400 (EDT)
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.46])
- by mailnew.nyi.internal (Postfix) with ESMTP id 2D397580725;
- Thu, 20 May 2021 04:37:26 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
- by compute6.internal (MEProxy); Thu, 20 May 2021 04:37:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=
- date:from:to:cc:subject:message-id:references:mime-version
- :content-type:in-reply-to; s=fm3; bh=uN/paZHT/wy9V60QgAgEZGhZMfE
- PAIFK3VT5m0X1P1w=; b=DyqElVP72T2h8KWo4m3edK/aFE1RVet81qHItJSF6ZY
- W7atc0Ie/fysmc55BnsCOHQ+HAuNn7KFiXpTgGFw7mJGSm+3yO78hsmxZAGIj9tQ
- eoMRa3RnD5YYiFCcSdKHooFbto9MI27/KqFGDoOqQ413QGXIM3suDi0ry66hqIA4
- 6w/PlTQMjOPeTV1v7ZLP2TKRLYNJX35UHfneIyClQf4/Po/6qQU4PRQtOlvkI6DN
- cRNKwisZ0B+h8haOu4rLWw4eYsz0sFLBGTIbjOgp0h5Y0hf1skqRw/MNQad5l9qA
- MTdLjLAzf2Ml0rzWaYKHINcnRk4fcOf378GeSIuI+QQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=cc:content-type:date:from:in-reply-to
- :message-id:mime-version:references:subject:to:x-me-proxy
- :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=uN/paZ
- HT/wy9V60QgAgEZGhZMfEPAIFK3VT5m0X1P1w=; b=vmeNFnj30tGwQ4olc3Hf7G
- aH0n45x7g4dT9U5lCFSrgfr1fnsJmzyXOBhTHEwzxbsMVx0WHyAW1QxTXtVjyqfs
- qM9HQ+CmfgCi/CpeBl64QY+4SXVqrHqIsXA6ra0D4V9JQ3rtWf70BQVo6yi8WpyB
- bLmmeFqrVgi1x32UVSp5YBz+fR+initDRjHJMLSJu0+oFGM/cCgvcNgvEDeRgXZe
- AxpcK7qjDHSGhaL1XGludZb19p60Hx5jOJbDNmC7G8wwaATtwsRiUrlPkeNornps
- uT1r41JCA/4gdtxzt5Up6X4mMe9W4Mbpc0ti4S4InCtLW3VgQXLfboM+46CXKPDA
- ==
-X-ME-Sender: <xms:xB-mYBcX-bP9zl8pwOjgEa0faf1i9zHCeIur-PWgffpIoDvtqbpyFA>
- <xme:xB-mYPOa9-4WHSTXwAnoMk7ooaCASkL1wO_ek7I-HZnXOZaWp27XKjr9KTYuZnBKh
- sGsqLSxOPhk0w>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrvdejuddgtdehucetufdoteggodetrfdotf
- fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
- uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
- cujfgurhepfffhvffukfhfgggtuggjsehttdortddttddvnecuhfhrohhmpefirhgvghcu
- mffjuceoghhrvghgsehkrhhorghhrdgtohhmqeenucggtffrrghtthgvrhhnpeevhefgje
- eitdfffefhvdegleeigeejgeeiffekieffjeeflefhieegtefhudejueenucfkphepkeef
- rdekiedrjeegrdeigeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrih
- hlfhhrohhmpehgrhgvgheskhhrohgrhhdrtghomh
-X-ME-Proxy: <xmx:xR-mYKijB76mo5krd25P4UK9_y5r6g3eryM_Yt5-un5I3JS0Fyw-vg>
- <xmx:xR-mYK8KDZq6L6FDyYMditMPW49tYEeGn6bP8dmCCrpFZRFEf8LowQ>
- <xmx:xR-mYNuKviavCH9znzZLAzol0taNSLruz7LKtS9o_54-AufGOW8klA>
- <xmx:xh-mYJEWESWYFyLWwYDncUDJn5PcU4uW-GHG06OMz7LL-7grdmA-GQ>
-Received: from localhost (83-86-74-64.cable.dynamic.v4.ziggo.nl [83.86.74.64])
- by mail.messagingengine.com (Postfix) with ESMTPA;
- Thu, 20 May 2021 04:37:24 -0400 (EDT)
-Date: Thu, 20 May 2021 10:37:22 +0200
-From: Greg KH <greg@kroah.com>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH for-stable-5.4] KVM: arm64: Initialize VCPU mdcr_el2
- before loading it
-Message-ID: <YKYfwqrZsAVniGsD@kroah.com>
-References: <20210517142713.400651-1-alexandru.elisei@arm.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210517142713.400651-1-alexandru.elisei@arm.com>
-Cc: maz@kernel.org, stable@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ with ESMTP id W5OjoWN3q6iu for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 20 May 2021 04:51:39 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8E0F54B390
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 20 May 2021 04:51:39 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id AC62D60241;
+ Thu, 20 May 2021 08:51:37 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1ljeP1-002Sgn-GH; Thu, 20 May 2021 09:51:35 +0100
+Date: Thu, 20 May 2021 09:51:28 +0100
+Message-ID: <875yzdvldb.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Steven Price <steven.price@arm.com>
+Subject: Re: [PATCH v12 4/8] arm64: kvm: Introduce MTE VM feature
+In-Reply-To: <60fc8939-36b7-35ce-837c-b69d0d40c9a4@arm.com>
+References: <20210517123239.8025-1-steven.price@arm.com>
+ <20210517123239.8025-5-steven.price@arm.com>
+ <87wnrxtikl.wl-maz@kernel.org>
+ <60fc8939-36b7-35ce-837c-b69d0d40c9a4@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: steven.price@arm.com, catalin.marinas@arm.com,
+ will@kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com,
+ suzuki.poulose@arm.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Dave.Martin@arm.com, mark.rutland@arm.com, tglx@linutronix.de,
+ qemu-devel@nongnu.org, quintela@redhat.com, dgilbert@redhat.com,
+ richard.henderson@linaro.org, peter.maydell@linaro.org, Haibo.Xu@arm.com,
+ drjones@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
+ Catalin Marinas <catalin.marinas@arm.com>, Juan Quintela <quintela@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
+ Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org,
+ Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -111,36 +95,279 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, May 17, 2021 at 03:27:13PM +0100, Alexandru Elisei wrote:
-> [ Upstream commit 263d6287da1433aba11c5b4046388f2cdf49675c ]
+On Wed, 19 May 2021 11:48:21 +0100,
+Steven Price <steven.price@arm.com> wrote:
 > 
-> When a VCPU is created, the kvm_vcpu struct is initialized to zero in
-> kvm_vm_ioctl_create_vcpu(). On VHE systems, the first time
-> vcpu.arch.mdcr_el2 is loaded on hardware is in vcpu_load(), before it is
-> set to a sensible value in kvm_arm_setup_debug() later in the run loop. The
-> result is that KVM executes for a short time with MDCR_EL2 set to zero.
+> On 17/05/2021 17:45, Marc Zyngier wrote:
+> > On Mon, 17 May 2021 13:32:35 +0100,
+> > Steven Price <steven.price@arm.com> wrote:
+> >>
+> >> Add a new VM feature 'KVM_ARM_CAP_MTE' which enables memory tagging
+> >> for a VM. This will expose the feature to the guest and automatically
+> >> tag memory pages touched by the VM as PG_mte_tagged (and clear the tag
+> >> storage) to ensure that the guest cannot see stale tags, and so that
+> >> the tags are correctly saved/restored across swap.
+> >>
+> >> Actually exposing the new capability to user space happens in a later
+> >> patch.
+> > 
+> > uber nit in $SUBJECT: "KVM: arm64:" is the preferred prefix (just like
+> > patches 7 and 8).
 > 
-> This has several unintended consequences:
+> Good spot - I obviously got carried away with the "arm64:" prefix ;)
 > 
-> * Setting MDCR_EL2.HPMN to 0 is constrained unpredictable according to ARM
->   DDI 0487G.a, page D13-3820. The behavior specified by the architecture
->   in this case is for the PE to behave as if MDCR_EL2.HPMN is set to a
->   value less than or equal to PMCR_EL0.N, which means that an unknown
->   number of counters are now disabled by MDCR_EL2.HPME, which is zero.
+> >>
+> >> Signed-off-by: Steven Price <steven.price@arm.com>
+> >> ---
+> >>  arch/arm64/include/asm/kvm_emulate.h |  3 +++
+> >>  arch/arm64/include/asm/kvm_host.h    |  3 +++
+> >>  arch/arm64/kvm/hyp/exception.c       |  3 ++-
+> >>  arch/arm64/kvm/mmu.c                 | 37 +++++++++++++++++++++++++++-
+> >>  arch/arm64/kvm/sys_regs.c            |  3 +++
+> >>  include/uapi/linux/kvm.h             |  1 +
+> >>  6 files changed, 48 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> >> index f612c090f2e4..6bf776c2399c 100644
+> >> --- a/arch/arm64/include/asm/kvm_emulate.h
+> >> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> >> @@ -84,6 +84,9 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+> >>  	if (cpus_have_const_cap(ARM64_MISMATCHED_CACHE_TYPE) ||
+> >>  	    vcpu_el1_is_32bit(vcpu))
+> >>  		vcpu->arch.hcr_el2 |= HCR_TID2;
+> >> +
+> >> +	if (kvm_has_mte(vcpu->kvm))
+> >> +		vcpu->arch.hcr_el2 |= HCR_ATA;
+> >>  }
+> >>  
+> >>  static inline unsigned long *vcpu_hcr(struct kvm_vcpu *vcpu)
+> >> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> >> index 7cd7d5c8c4bc..afaa5333f0e4 100644
+> >> --- a/arch/arm64/include/asm/kvm_host.h
+> >> +++ b/arch/arm64/include/asm/kvm_host.h
+> >> @@ -132,6 +132,8 @@ struct kvm_arch {
+> >>  
+> >>  	u8 pfr0_csv2;
+> >>  	u8 pfr0_csv3;
+> >> +	/* Memory Tagging Extension enabled for the guest */
+> >> +	bool mte_enabled;
+> >>  };
+> >>  
+> >>  struct kvm_vcpu_fault_info {
+> >> @@ -769,6 +771,7 @@ bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
+> >>  #define kvm_arm_vcpu_sve_finalized(vcpu) \
+> >>  	((vcpu)->arch.flags & KVM_ARM64_VCPU_SVE_FINALIZED)
+> >>  
+> >> +#define kvm_has_mte(kvm) (system_supports_mte() && (kvm)->arch.mte_enabled)
+> >>  #define kvm_vcpu_has_pmu(vcpu)					\
+> >>  	(test_bit(KVM_ARM_VCPU_PMU_V3, (vcpu)->arch.features))
+> >>  
+> >> diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
+> >> index 73629094f903..56426565600c 100644
+> >> --- a/arch/arm64/kvm/hyp/exception.c
+> >> +++ b/arch/arm64/kvm/hyp/exception.c
+> >> @@ -112,7 +112,8 @@ static void enter_exception64(struct kvm_vcpu *vcpu, unsigned long target_mode,
+> >>  	new |= (old & PSR_C_BIT);
+> >>  	new |= (old & PSR_V_BIT);
+> >>  
+> >> -	// TODO: TCO (if/when ARMv8.5-MemTag is exposed to guests)
+> >> +	if (kvm_has_mte(vcpu->kvm))
+> >> +		new |= PSR_TCO_BIT;
+> >>  
+> >>  	new |= (old & PSR_DIT_BIT);
+> >>  
+> >> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> >> index c5d1f3c87dbd..8660f6a03f51 100644
+> >> --- a/arch/arm64/kvm/mmu.c
+> >> +++ b/arch/arm64/kvm/mmu.c
+> >> @@ -822,6 +822,31 @@ transparent_hugepage_adjust(struct kvm_memory_slot *memslot,
+> >>  	return PAGE_SIZE;
+> >>  }
+> >>  
+> >> +static int sanitise_mte_tags(struct kvm *kvm, unsigned long size,
+> >> +			     kvm_pfn_t pfn)
+> > 
+> > Nit: please order the parameters as address, then size.
 > 
-> * The host configuration for the other debug features controlled by
->   MDCR_EL2 is temporarily lost. This has been harmless so far, as Linux
->   doesn't use the other fields, but that might change in the future.
+> Sure
 > 
-> Let's avoid both issues by initializing the VCPU's mdcr_el2 field in
-> kvm_vcpu_vcpu_first_run_init(), thus making sure that the MDCR_EL2 register
-> has a consistent value after each vcpu_load().
+> >> +{
+> >> +	if (kvm_has_mte(kvm)) {
+> >> +		/*
+> >> +		 * The page will be mapped in stage 2 as Normal Cacheable, so
+> >> +		 * the VM will be able to see the page's tags and therefore
+> >> +		 * they must be initialised first. If PG_mte_tagged is set,
+> >> +		 * tags have already been initialised.
+> >> +		 */
+> >> +		unsigned long i, nr_pages = size >> PAGE_SHIFT;
+> >> +		struct page *page = pfn_to_online_page(pfn);
+> >> +
+> >> +		if (!page)
+> >> +			return -EFAULT;
+> > 
+> > Under which circumstances can this happen? We already have done a GUP
+> > on the page, so I really can't see how the page can vanish from under
+> > our feet.
 > 
-> [ v5.4 backport: added stub for KVM/arm that fixes compilation errors ]
+> It's less about the page vanishing and more that pfn_to_online_page()
+> will reject some pages. Specifically in this case we want to reject any
+> sort of device memory (e.g. graphics card memory or other memory on the
+> end of a bus like PCIe) as it is unlikely to support MTE.
 
-Thanks for both backports, now queued up.
+OK. We really never should see this error as we check for device
+mappings right before calling this, but I guess it doesn't hurt.
 
-greg k-h
+> 
+> >> +
+> >> +		for (i = 0; i < nr_pages; i++, page++) {
+> >> +			if (!test_and_set_bit(PG_mte_tagged, &page->flags))
+> >> +				mte_clear_page_tags(page_address(page));
+> > 
+> > You seem to be doing this irrespective of the VMA being created with
+> > PROT_MTE. This is fine form a guest perspective (all its memory should
+> > be MTE capable). However, I can't see any guarantee that the VMM will
+> > actually allocate memslots with PROT_MTE.
+> > 
+> > Aren't we missing some sanity checks at memslot registration time?
+> 
+> I've taken the decision not to require that the VMM allocates with
+> PROT_MTE, there are two main reasons for this:
+> 
+>  1. The VMM generally doesn't actually want a PROT_MTE mapping as the
+> tags from the guest are almost certainly wrong for most usages (e.g.
+> device emulation). So a PROT_MTE mapping actively gets in the way of the
+> VMM using MTE for it's own purposes. However this then leads to the
+> requirement for the new ioctl in patch 7.
+> 
+>  2. Because the VMM can change the pages in a memslot at any time and
+> KVM relies on mmu notifiers to spot the change it's hard and ugly to
+> enforce that the memslot VMAs keep having the PROT_MTE flag. When I
+> tried this it meant we've discover that a page doesn't have the MTE flag
+> at fault time and have no other option that to kill the VM at that time.
+> 
+> So the model is that non-PROT_MTE memory can be supplied to the memslots
+> and KVM will automatically upgrade it to PG_mte_tagged if you supply it
+> to a VM with MTE enabled. This makes the VMM implementation easier for
+> most cases, and the new ioctl helps for migration. I think the kernel
+> code is tidier too.
+
+OK, I see your point. I guess we rely on the implicit requirement that
+all the available memory is MTE-capable, although I'm willing to bet
+that someone will eventually break this requirement.
+
+> Of course even better would be a stage 2 flag to control MTE
+> availability on a page-by-page basis, but that doesn't exist in the
+> architecture at the moment.
+
+Nah, that'd be way too good. Let's not do that.
+
+> 
+> >> +		}
+> >> +	}
+> >> +
+> >> +	return 0;
+> >> +}
+> >> +
+> >>  static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >>  			  struct kvm_memory_slot *memslot, unsigned long hva,
+> >>  			  unsigned long fault_status)
+> >> @@ -971,8 +996,13 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >>  	if (writable)
+> >>  		prot |= KVM_PGTABLE_PROT_W;
+> >>  
+> >> -	if (fault_status != FSC_PERM && !device)
+> >> +	if (fault_status != FSC_PERM && !device) {
+> >> +		ret = sanitise_mte_tags(kvm, vma_pagesize, pfn);
+> >> +		if (ret)
+> >> +			goto out_unlock;
+> >> +
+> >>  		clean_dcache_guest_page(pfn, vma_pagesize);
+> >> +	}
+> >>  
+> >>  	if (exec_fault) {
+> >>  		prot |= KVM_PGTABLE_PROT_X;
+> >> @@ -1168,12 +1198,17 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+> >>  bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+> >>  {
+> >>  	kvm_pfn_t pfn = pte_pfn(range->pte);
+> >> +	int ret;
+> >>  
+> >>  	if (!kvm->arch.mmu.pgt)
+> >>  		return 0;
+> >>  
+> >>  	WARN_ON(range->end - range->start != 1);
+> >>  
+> >> +	ret = sanitise_mte_tags(kvm, PAGE_SIZE, pfn);
+> >> +	if (ret)
+> >> +		return ret;
+> > 
+> > Notice the change in return type?
+> 
+> I do now - I was tricked by the use of '0' as false. Looks like false
+> ('0') is actually the correct return here to avoid an unnecessary
+> kvm_flush_remote_tlbs().
+
+Yup. BTW, the return values have been fixed to proper boolean types in
+the latest set of fixes.
+
+> 
+> >> +
+> >>  	/*
+> >>  	 * We've moved a page around, probably through CoW, so let's treat it
+> >>  	 * just like a translation fault and clean the cache to the PoC.
+> >> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> >> index 76ea2800c33e..24a844cb79ca 100644
+> >> --- a/arch/arm64/kvm/sys_regs.c
+> >> +++ b/arch/arm64/kvm/sys_regs.c
+> >> @@ -1047,6 +1047,9 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+> >>  		break;
+> >>  	case SYS_ID_AA64PFR1_EL1:
+> >>  		val &= ~FEATURE(ID_AA64PFR1_MTE);
+> >> +		if (kvm_has_mte(vcpu->kvm))
+> >> +			val |= FIELD_PREP(FEATURE(ID_AA64PFR1_MTE),
+> >> +					  ID_AA64PFR1_MTE);
+> > 
+> > Shouldn't this be consistent with what the HW is capable of
+> > (i.e. FEAT_MTE3 if available), and extracted from the sanitised view
+> > of the feature set?
+> 
+> Yes - however at the moment our sanitised view is either FEAT_MTE2 or
+> nothing:
+> 
+> 	{
+> 		.desc = "Memory Tagging Extension",
+> 		.capability = ARM64_MTE,
+> 		.type = ARM64_CPUCAP_STRICT_BOOT_CPU_FEATURE,
+> 		.matches = has_cpuid_feature,
+> 		.sys_reg = SYS_ID_AA64PFR1_EL1,
+> 		.field_pos = ID_AA64PFR1_MTE_SHIFT,
+> 		.min_field_value = ID_AA64PFR1_MTE,
+> 		.sign = FTR_UNSIGNED,
+> 		.cpu_enable = cpu_enable_mte,
+> 	},
+> 
+> When host support for FEAT_MTE3 is added then the KVM code will need
+> revisiting to expose that down to the guest safely (AFAICS there's
+> nothing extra to do here, but I haven't tested any of the MTE3
+> features). I don't think we want to expose newer versions to the guest
+> than the host is aware of. (Or indeed expose FEAT_MTE if the host has
+> MTE disabled because Linux requires at least FEAT_MTE2).
+
+What I was suggesting is to have something like this:
+
+     pfr = read_sanitised_ftr_reg(SYS_ID_AA64PFR1_EL1);
+     mte = cpuid_feature_extract_unsigned_field(pfr, ID_AA64PFR1_MTE_SHIFT);
+     val |= FIELD_PREP(FEATURE(ID_AA64PFR1_MTE), mte);
+
+which does the trick nicely, and doesn't expose more than the host
+supports.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
