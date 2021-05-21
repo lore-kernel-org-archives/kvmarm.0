@@ -2,75 +2,66 @@ Return-Path: <SRS0=po47=KQ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5D5FC433B4
-	for <kvmarm@archiver.kernel.org>; Fri, 21 May 2021 06:48:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1713FC433ED
+	for <kvmarm@archiver.kernel.org>; Fri, 21 May 2021 09:29:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3E7486135C
-	for <kvmarm@archiver.kernel.org>; Fri, 21 May 2021 06:48:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E7486135C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 7F861613BF
+	for <kvmarm@archiver.kernel.org>; Fri, 21 May 2021 09:29:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F861613BF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A9BD64B2B0;
-	Fri, 21 May 2021 02:48:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EB58C4B3B5;
+	Fri, 21 May 2021 05:28:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QQQA8s+UBvMQ; Fri, 21 May 2021 02:48:15 -0400 (EDT)
+	with ESMTP id N3FlmyO3Wbd7; Fri, 21 May 2021 05:28:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B4874B39B;
-	Fri, 21 May 2021 02:48:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B7744B3C5;
+	Fri, 21 May 2021 05:28:58 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DE43C4B2B0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 21 May 2021 02:48:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 269844B3C5
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 21 May 2021 05:28:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QC-xDMyEArOK for <kvmarm@lists.cs.columbia.edu>;
- Fri, 21 May 2021 02:48:11 -0400 (EDT)
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 29E384B284
- for <kvmarm@lists.cs.columbia.edu>; Fri, 21 May 2021 02:48:11 -0400 (EDT)
-Received: from dggems702-chm.china.huawei.com (unknown [172.30.72.59])
- by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4FmcXf3CB9zQm2c;
- Fri, 21 May 2021 14:44:34 +0800 (CST)
-Received: from dggema765-chm.china.huawei.com (10.1.198.207) by
- dggems702-chm.china.huawei.com (10.3.19.179) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2176.2; Fri, 21 May 2021 14:48:06 +0800
-Received: from [10.174.185.210] (10.174.185.210) by
- dggema765-chm.china.huawei.com (10.1.198.207) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2176.2; Fri, 21 May 2021 14:48:05 +0800
-Subject: Re: [PATCH v15 07/12] iommu/smmuv3: Implement cache_invalidate
-To: Eric Auger <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
- <iommu@lists.linux-foundation.org>, <linux-kernel@vger.kernel.org>,
- <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>, <will@kernel.org>,
- <maz@kernel.org>, <robin.murphy@arm.com>, <joro@8bytes.org>,
- <alex.williamson@redhat.com>, <tn@semihalf.com>, <zhukeqian1@huawei.com>
-References: <20210411111228.14386-1-eric.auger@redhat.com>
- <20210411111228.14386-8-eric.auger@redhat.com>
-From: Kunkun Jiang <jiangkunkun@huawei.com>
-Message-ID: <fa06a2bf-9e85-8f05-cf51-10f694f486ff@huawei.com>
-Date: Fri, 21 May 2021 14:48:04 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ with ESMTP id Sy3LKwJ9gcwW for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 21 May 2021 05:28:56 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 98B7A4B2E1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 21 May 2021 05:28:56 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CEF5C101E;
+ Fri, 21 May 2021 02:28:55 -0700 (PDT)
+Received: from [192.168.1.179] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 49AE43F73D;
+ Fri, 21 May 2021 02:28:53 -0700 (PDT)
+Subject: Re: [PATCH v12 4/8] arm64: kvm: Introduce MTE VM feature
+To: Catalin Marinas <catalin.marinas@arm.com>
+References: <20210517123239.8025-1-steven.price@arm.com>
+ <20210517123239.8025-5-steven.price@arm.com> <20210520115426.GB12251@arm.com>
+ <5f0996d6-0a6e-ebcd-afcd-8290faba6780@arm.com>
+ <20210520175037.GG12251@arm.com>
+From: Steven Price <steven.price@arm.com>
+Message-ID: <21629fb6-4287-88b2-2287-2a63496cff79@arm.com>
+Date: Fri, 21 May 2021 10:28:52 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.8.1
 MIME-Version: 1.0
-In-Reply-To: <20210411111228.14386-8-eric.auger@redhat.com>
-Content-Language: en-US
-X-Originating-IP: [10.174.185.210]
-X-ClientProxiedBy: dggeme708-chm.china.huawei.com (10.1.199.104) To
- dggema765-chm.china.huawei.com (10.1.198.207)
-X-CFilter-Loop: Reflected
-Cc: jean-philippe@linaro.org, jacob.jun.pan@linux.intel.com,
- wangxingang5@huawei.com, lushenming@huawei.com, chenxiang66@hisilicon.com,
- nicoleotsuka@gmail.com, vivek.gautam@arm.com, vdumpa@nvidia.com,
- yi.l.liu@intel.com, vsethi@nvidia.com, zhangfei.gao@linaro.org
+In-Reply-To: <20210520175037.GG12251@arm.com>
+Content-Language: en-GB
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
+ Marc Zyngier <maz@kernel.org>, Juan Quintela <quintela@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
+ Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org,
+ Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -82,116 +73,117 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SGkgRXJpYywKCk9uIDIwMjEvNC8xMSAxOToxMiwgRXJpYyBBdWdlciB3cm90ZToKPiBJbXBsZW1l
-bnQgZG9tYWluLXNlbGVjdGl2ZSwgcGFzaWQgc2VsZWN0aXZlIGFuZCBwYWdlLXNlbGVjdGl2ZQo+
-IElPVExCIGludmFsaWRhdGlvbnMuCj4KPiBTaWduZWQtb2ZmLWJ5OiBFcmljIEF1Z2VyIDxlcmlj
-LmF1Z2VyQHJlZGhhdC5jb20+Cj4KPiAtLS0KPiB2NCAtPiB2MTU6Cj4gLSByZW1vdmUgdGhlIHJl
-ZHVuZGFudCBhcm1fc21tdV9jbWRxX2lzc3VlX3N5bmMoc21tdSkKPiAgICBpbiBJT01NVV9JTlZf
-R1JBTlVfQUREUiBjYXNlIChaZW5naHVpKQo+IC0gaWYgUklMIGlzIG5vdCBzdXBwb3J0ZWQgYnkg
-dGhlIGhvc3QsIG1ha2Ugc3VyZSB0aGUgZ3JhbnVsZV9zaXplCj4gICAgdGhhdCBpcyBwYXNzZWQg
-YnkgdGhlIHVzZXJzcGFjZSBpcyBzdXBwb3J0ZWQgb3IgZml4IGl0Cj4gICAgKENoZW54aWFuZykK
-Pgo+IHYxMyAtPiB2MTQ6Cj4gLSBBZGQgZG9tYWluIGludmFsaWRhdGlvbgo+IC0gZG8gZ2xvYmFs
-IGludmFsIHdoZW4gYXNpZCBpcyBub3QgcHJvdmlkZWQgd2l0aCBhZGRyCj4gICAgZ3JhbnVsYXJp
-dHkKPgo+IHY3IC0+IHY4Ogo+IC0gQVNJRCBiYXNlZCBpbnZhbGlkYXRpb24gdXNpbmcgaW9tbXVf
-aW52X3Bhc2lkX2luZm8KPiAtIGNoZWNrIEFSQ0hJRC9QQVNJRCBmbGFncyBpbiBhZGRyIGJhc2Vk
-IGludmFsaWRhdGlvbgo+IC0gdXNlIF9fYXJtX3NtbXVfdGxiX2ludl9jb250ZXh0IGFuZCBfX2Fy
-bV9zbW11X3RsYl9pbnZfcmFuZ2Vfbm9zeW5jCj4KPiB2NiAtPiB2Nwo+IC0gY2hlY2sgdGhlIHVh
-cGkgdmVyc2lvbgo+Cj4gdjMgLT4gdjQ6Cj4gLSBhZGFwdCB0byBjaGFuZ2VzIGluIHRoZSB1YXBp
-Cj4gLSBhZGQgc3VwcG9ydCBmb3IgbGVhZiBwYXJhbWV0ZXIKPiAtIGRvIG5vdCB1c2UgYXJtX3Nt
-bXVfdGxiX2ludl9yYW5nZV9ub3N5bmMgb3IgYXJtX3NtbXVfdGxiX2ludl9jb250ZXh0Cj4gICAg
-YW55bW9yZQo+Cj4gdjIgLT4gdjM6Cj4gLSByZXBsYWNlIF9fYXJtX3NtbXVfdGxiX3N5bmMgYnkg
-YXJtX3NtbXVfY21kcV9pc3N1ZV9zeW5jCj4KPiB2MSAtPiB2MjoKPiAtIHByb3Blcmx5IHBhc3Mg
-dGhlIGFzaWQKPiAtLS0KPiAgIGRyaXZlcnMvaW9tbXUvYXJtL2FybS1zbW11LXYzL2FybS1zbW11
-LXYzLmMgfCA4OSArKysrKysrKysrKysrKysrKysrKysKPiAgIDEgZmlsZSBjaGFuZ2VkLCA4OSBp
-bnNlcnRpb25zKCspCj4KPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9pb21tdS9hcm0vYXJtLXNtbXUt
-djMvYXJtLXNtbXUtdjMuYyBiL2RyaXZlcnMvaW9tbXUvYXJtL2FybS1zbW11LXYzL2FybS1zbW11
-LXYzLmMKPiBpbmRleCA1NmEzMDFmYmU3NWEuLmJmYzExMmNjMGQzOCAxMDA2NDQKPiAtLS0gYS9k
-cml2ZXJzL2lvbW11L2FybS9hcm0tc21tdS12My9hcm0tc21tdS12My5jCj4gKysrIGIvZHJpdmVy
-cy9pb21tdS9hcm0vYXJtLXNtbXUtdjMvYXJtLXNtbXUtdjMuYwo+IEBAIC0yOTYxLDYgKzI5NjEs
-OTQgQEAgc3RhdGljIHZvaWQgYXJtX3NtbXVfZGV0YWNoX3Bhc2lkX3RhYmxlKHN0cnVjdCBpb21t
-dV9kb21haW4gKmRvbWFpbikKPiAgIAltdXRleF91bmxvY2soJnNtbXVfZG9tYWluLT5pbml0X211
-dGV4KTsKPiAgIH0KPiAgIAo+ICtzdGF0aWMgaW50Cj4gK2FybV9zbW11X2NhY2hlX2ludmFsaWRh
-dGUoc3RydWN0IGlvbW11X2RvbWFpbiAqZG9tYWluLCBzdHJ1Y3QgZGV2aWNlICpkZXYsCj4gKwkJ
-CSAgc3RydWN0IGlvbW11X2NhY2hlX2ludmFsaWRhdGVfaW5mbyAqaW52X2luZm8pCj4gK3sKPiAr
-CXN0cnVjdCBhcm1fc21tdV9jbWRxX2VudCBjbWQgPSB7Lm9wY29kZSA9IENNRFFfT1BfVExCSV9O
-U05IX0FMTH07Cj4gKwlzdHJ1Y3QgYXJtX3NtbXVfZG9tYWluICpzbW11X2RvbWFpbiA9IHRvX3Nt
-bXVfZG9tYWluKGRvbWFpbik7Cj4gKwlzdHJ1Y3QgYXJtX3NtbXVfZGV2aWNlICpzbW11ID0gc21t
-dV9kb21haW4tPnNtbXU7Cj4gKwo+ICsJaWYgKHNtbXVfZG9tYWluLT5zdGFnZSAhPSBBUk1fU01N
-VV9ET01BSU5fTkVTVEVEKQo+ICsJCXJldHVybiAtRUlOVkFMOwo+ICsKPiArCWlmICghc21tdSkK
-PiArCQlyZXR1cm4gLUVJTlZBTDsKPiArCj4gKwlpZiAoaW52X2luZm8tPnZlcnNpb24gIT0gSU9N
-TVVfQ0FDSEVfSU5WQUxJREFURV9JTkZPX1ZFUlNJT05fMSkKPiArCQlyZXR1cm4gLUVJTlZBTDsK
-PiArCj4gKwlpZiAoaW52X2luZm8tPmNhY2hlICYgSU9NTVVfQ0FDSEVfSU5WX1RZUEVfUEFTSUQg
-fHwKPiArCSAgICBpbnZfaW5mby0+Y2FjaGUgJiBJT01NVV9DQUNIRV9JTlZfVFlQRV9ERVZfSU9U
-TEIpIHsKPiArCQlyZXR1cm4gLUVOT0VOVDsKPiArCX0KPiArCj4gKwlpZiAoIShpbnZfaW5mby0+
-Y2FjaGUgJiBJT01NVV9DQUNIRV9JTlZfVFlQRV9JT1RMQikpCj4gKwkJcmV0dXJuIC1FSU5WQUw7
-Cj4gKwo+ICsJLyogSU9UTEIgaW52YWxpZGF0aW9uICovCj4gKwo+ICsJc3dpdGNoIChpbnZfaW5m
-by0+Z3JhbnVsYXJpdHkpIHsKPiArCWNhc2UgSU9NTVVfSU5WX0dSQU5VX1BBU0lEOgo+ICsJewo+
-ICsJCXN0cnVjdCBpb21tdV9pbnZfcGFzaWRfaW5mbyAqaW5mbyA9Cj4gKwkJCSZpbnZfaW5mby0+
-Z3JhbnUucGFzaWRfaW5mbzsKPiArCj4gKwkJaWYgKGluZm8tPmZsYWdzICYgSU9NTVVfSU5WX0FE
-RFJfRkxBR1NfUEFTSUQpCj4gKwkJCXJldHVybiAtRU5PRU5UOwo+ICsJCWlmICghKGluZm8tPmZs
-YWdzICYgSU9NTVVfSU5WX1BBU0lEX0ZMQUdTX0FSQ0hJRCkpCj4gKwkJCXJldHVybiAtRUlOVkFM
-Owo+ICsKPiArCQlfX2FybV9zbW11X3RsYl9pbnZfY29udGV4dChzbW11X2RvbWFpbiwgaW5mby0+
-YXJjaGlkKTsKPiArCQlyZXR1cm4gMDsKPiArCX0KPiArCWNhc2UgSU9NTVVfSU5WX0dSQU5VX0FE
-RFI6Cj4gKwl7Cj4gKwkJc3RydWN0IGlvbW11X2ludl9hZGRyX2luZm8gKmluZm8gPSAmaW52X2lu
-Zm8tPmdyYW51LmFkZHJfaW5mbzsKPiArCQlzaXplX3QgZ3JhbnVsZV9zaXplICA9IGluZm8tPmdy
-YW51bGVfc2l6ZTsKPiArCQlzaXplX3Qgc2l6ZSA9IGluZm8tPm5iX2dyYW51bGVzICogaW5mby0+
-Z3JhbnVsZV9zaXplOwo+ICsJCWJvb2wgbGVhZiA9IGluZm8tPmZsYWdzICYgSU9NTVVfSU5WX0FE
-RFJfRkxBR1NfTEVBRjsKPiArCQlpbnQgdGc7Cj4gKwo+ICsJCWlmIChpbmZvLT5mbGFncyAmIElP
-TU1VX0lOVl9BRERSX0ZMQUdTX1BBU0lEKQo+ICsJCQlyZXR1cm4gLUVOT0VOVDsKPiArCj4gKwkJ
-aWYgKCEoaW5mby0+ZmxhZ3MgJiBJT01NVV9JTlZfQUREUl9GTEFHU19BUkNISUQpKQo+ICsJCQli
-cmVhazsKPiArCj4gKwkJdGcgPSBfX2ZmcyhncmFudWxlX3NpemUpOwo+ICsJCWlmIChncmFudWxl
-X3NpemUgJiB+KDEgPDwgdGcpKQo+ICsJCQlyZXR1cm4gLUVJTlZBTDsKPiArCQkvKgo+ICsJCSAq
-IFdoZW4gUklMIGlzIG5vdCBzdXBwb3J0ZWQsIG1ha2Ugc3VyZSB0aGUgZ3JhbnVsZSBzaXplIHRo
-YXQgaXMKPiArCQkgKiBwYXNzZWQgaXMgc3VwcG9ydGVkLiBJbiBSSUwgbW9kZSwgdGhpcyBpcyBl
-bmZvcmNlZCBpbgo+ICsJCSAqIF9fYXJtX3NtbXVfdGxiX2ludl9yYW5nZSgpCj4gKwkJICovCj4g
-KwkJaWYgKCEoc21tdS0+ZmVhdHVyZXMgJiBBUk1fU01NVV9GRUFUX1JBTkdFX0lOVikgJiYKPiAr
-CQkgICAgIShncmFudWxlX3NpemUgJiBzbW11X2RvbWFpbi0+ZG9tYWluLnBnc2l6ZV9iaXRtYXAp
-KSB7Cj4gKwkJCXRnID0gX19mZnMoc21tdV9kb21haW4tPmRvbWFpbi5wZ3NpemVfYml0bWFwKTsK
-PiArCQkJZ3JhbnVsZV9zaXplID0gMSA8PCB0ZzsKPiArCQkJc2l6ZSA9IHNpemUgPj4gdGc7Cj4g
-KwkJfQo+ICsKPiArCQlhcm1fc21tdV90bGJfaW52X3JhbmdlX2RvbWFpbihpbmZvLT5hZGRyLCBz
-aXplLAo+ICsJCQkJCSAgICAgIGdyYW51bGVfc2l6ZSwgbGVhZiwKPiArCQkJCQkgICAgICBpbmZv
-LT5hcmNoaWQsIHNtbXVfZG9tYWluKTsKSSBlbmNvdW50ZXJlZCBzb21lIGVycm9ycyB3aGVuIEkg
-dGVzdGVkIHRoZSBTTU1VIG5lc3RlZCBtb2RlLgoKVGVzdCBzY2VuYXJpbyBkZXNjcmlwdGlvbjoK
-Z3Vlc3Qga2VybmVsOiA0S0IgdHJhbnNsYXRpb24gZ3JhbnVsZQpob3N0IGtlcm5lbDogMTZLQiB0
-cmFuc2xhdGlvbiBncmFudWxlCgplcnJvcnM6CjEuIGVuY291bnRlcmVkIGFuIGVuZGxlc3MgbG9v
-cCBpbiBfX2FybV9zbW11X3RsYl9pbnZfcmFuZ2UgYmVjYXVzZQpudW1fcGFnZXMgaXMgMAoyLiBl
-bmNvdW50ZXJlZCBDRVJST1JfSUxMIGJlY2F1c2UgdGhlIGZpZWxkcyBvZiBUTEIgaW52YWxpZGF0
-aW9uCmNvbW1hbmQgYXJlIGFzIGZvbGxvdzogVEcgPSAyLCBOVU0gPSAwLCBTQ0FMRSA9IDAsIFRU
-TCA9IDAuIFRoZQpjb21iaW5hdGlvbiBpcyBleGFjdGx5IHRoZSBraW5kIG9mIHJlc2VydmVkIGNv
-bWJpbmF0aW9uIHBvaW50ZWQKb3V0IGluIHRoZSBTTU1VdjMgc3BlYyhwYWdlIDE0My0xNDQsIHZl
-cnNpb24gRC5hKQoKQWNjb3JkaW5nIHRvIG15IGFuYWx5c2lzLCB3ZSBzaG91bGQgZG8gYSBiaXQg
-bW9yZSB2YWxpZGF0aW9uIG9uIHRoZQonc2l6ZScgYW5kICdncmFudWxlX3NpemUnIHdoZW4gU01N
-VSBzdXBwb3J0cyBSSUw6CjEuIEFsaWduICdzaXplJyB3aXRoIHRoZSBzbWFsbGVzdCBncmFudWxl
-IHNpemUgc3VwcG9ydGVkIGJ5IFNNTVUgdXB3YXJkcy4KMi4gSWYgdGhlIGdyYW51bGUgc2l6ZSBp
-c24ndCBzdXBwb3J0ZWQgYnkgU01NVSwgd2Ugc2V0IGl0IHRvIHRoZSBzbWFsbGVzdApncmFudWxl
-IHNpemUgc3VwcG9ydGVkIGJ5IFNNTVUKCkkgc2VudCB0d28gcGF0Y2hlcyB0byBmaXggdGhlbSBp
-biB0aGXCoCBfX2FybV9zbW11X3RsYl9pbnZfcmFuZ2UoKS4gWzFdCihUaGVzZSBwYXRjaGVzIG1h
-eSBiZXR0ZXIgZXhwbGFpbiB3aGF0IEkgd2FudCB0byBleHByZXNzLikKQWNjb3JkaW5nIHRvIHRo
-ZSByZXBseSwgaXQgc2VlbXMgdGhhdCBpdCBpcyBtb3JlIGFwcHJvcHJpYXRlIHRvIG1vZGlmeSBo
-ZXJlLgoKVGhhbmtzLApLdW5rdW4gSmlhbmcKClsxXSBbUkZDIFBBVENIIHYxIDAvMl0gaW9tbXUv
-YXJtLXNtbXUtdjM6IEFkZCBzb21lIHBhcmFtZXRlciBjaGVjayBpbiAKX19hcm1fc21tdV90bGJf
-aW52X3JhbmdlKCkKaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcvbGludXgtaW9tbXUvMjAyMTA1MTkw
-OTQzMDcuMzI3NS0xLWppYW5na3Vua3VuQGh1YXdlaS5jb20vCj4gKwkJcmV0dXJuIDA7Cj4gKwl9
-Cj4gKwljYXNlIElPTU1VX0lOVl9HUkFOVV9ET01BSU46Cj4gKwkJYnJlYWs7Cj4gKwlkZWZhdWx0
-Ogo+ICsJCXJldHVybiAtRUlOVkFMOwo+ICsJfQo+ICsKPiArCS8qIEdsb2JhbCBTMSBpbnZhbGlk
-YXRpb24gKi8KPiArCWNtZC50bGJpLnZtaWQgICA9IHNtbXVfZG9tYWluLT5zMl9jZmcudm1pZDsK
-PiArCWFybV9zbW11X2NtZHFfaXNzdWVfY21kKHNtbXUsICZjbWQpOwo+ICsJYXJtX3NtbXVfY21k
-cV9pc3N1ZV9zeW5jKHNtbXUpOwo+ICsJcmV0dXJuIDA7Cj4gK30KPiArCj4gICBzdGF0aWMgYm9v
-bCBhcm1fc21tdV9kZXZfaGFzX2ZlYXR1cmUoc3RydWN0IGRldmljZSAqZGV2LAo+ICAgCQkJCSAg
-ICAgZW51bSBpb21tdV9kZXZfZmVhdHVyZXMgZmVhdCkKPiAgIHsKPiBAQCAtMzA2MCw2ICszMTQ4
-LDcgQEAgc3RhdGljIHN0cnVjdCBpb21tdV9vcHMgYXJtX3NtbXVfb3BzID0gewo+ICAgCS5wdXRf
-cmVzdl9yZWdpb25zCT0gZ2VuZXJpY19pb21tdV9wdXRfcmVzdl9yZWdpb25zLAo+ICAgCS5hdHRh
-Y2hfcGFzaWRfdGFibGUJPSBhcm1fc21tdV9hdHRhY2hfcGFzaWRfdGFibGUsCj4gICAJLmRldGFj
-aF9wYXNpZF90YWJsZQk9IGFybV9zbW11X2RldGFjaF9wYXNpZF90YWJsZSwKPiArCS5jYWNoZV9p
-bnZhbGlkYXRlCT0gYXJtX3NtbXVfY2FjaGVfaW52YWxpZGF0ZSwKPiAgIAkuZGV2X2hhc19mZWF0
-CQk9IGFybV9zbW11X2Rldl9oYXNfZmVhdHVyZSwKPiAgIAkuZGV2X2ZlYXRfZW5hYmxlZAk9IGFy
-bV9zbW11X2Rldl9mZWF0dXJlX2VuYWJsZWQsCj4gICAJLmRldl9lbmFibGVfZmVhdAk9IGFybV9z
-bW11X2Rldl9lbmFibGVfZmVhdHVyZSwKCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1
-bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9r
-dm1hcm0K
+On 20/05/2021 18:50, Catalin Marinas wrote:
+> On Thu, May 20, 2021 at 04:05:46PM +0100, Steven Price wrote:
+>> On 20/05/2021 12:54, Catalin Marinas wrote:
+>>> On Mon, May 17, 2021 at 01:32:35PM +0100, Steven Price wrote:
+>>>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>>>> index c5d1f3c87dbd..8660f6a03f51 100644
+>>>> --- a/arch/arm64/kvm/mmu.c
+>>>> +++ b/arch/arm64/kvm/mmu.c
+>>>> @@ -822,6 +822,31 @@ transparent_hugepage_adjust(struct kvm_memory_slot *memslot,
+>>>>  	return PAGE_SIZE;
+>>>>  }
+>>>>  
+>>>> +static int sanitise_mte_tags(struct kvm *kvm, unsigned long size,
+>>>> +			     kvm_pfn_t pfn)
+>>>> +{
+>>>> +	if (kvm_has_mte(kvm)) {
+>>>> +		/*
+>>>> +		 * The page will be mapped in stage 2 as Normal Cacheable, so
+>>>> +		 * the VM will be able to see the page's tags and therefore
+>>>> +		 * they must be initialised first. If PG_mte_tagged is set,
+>>>> +		 * tags have already been initialised.
+>>>> +		 */
+>>>> +		unsigned long i, nr_pages = size >> PAGE_SHIFT;
+>>>> +		struct page *page = pfn_to_online_page(pfn);
+>>>> +
+>>>> +		if (!page)
+>>>> +			return -EFAULT;
+>>>
+>>> IIRC we ended up with pfn_to_online_page() to reject ZONE_DEVICE pages
+>>> that may be mapped into a guest and we have no idea whether they support
+>>> MTE. It may be worth adding a comment, otherwise, as Marc said, the page
+>>> wouldn't disappear.
+>>
+>> I'll add a comment.
+>>
+>>>> +
+>>>> +		for (i = 0; i < nr_pages; i++, page++) {
+>>>> +			if (!test_and_set_bit(PG_mte_tagged, &page->flags))
+>>>> +				mte_clear_page_tags(page_address(page));
+>>>
+>>> We started the page->flags thread and ended up fixing it for the host
+>>> set_pte_at() as per the first patch:
+>>>
+>>> https://lore.kernel.org/r/c3293d47-a5f2-ea4a-6730-f5cae26d8a7e@arm.com
+>>>
+>>> Now, can we have a race between the stage 2 kvm_set_spte_gfn() and a
+>>> stage 1 set_pte_at()? Only the latter takes a lock. Or between two
+>>> kvm_set_spte_gfn() in different VMs? I think in the above thread we
+>>> concluded that there's only a problem if the page is shared between
+>>> multiple VMMs (MAP_SHARED). How realistic is this and what's the
+>>> workaround?
+>>>
+>>> Either way, I think it's worth adding a comment here on the race on
+>>> page->flags as it looks strange that here it's just a test_and_set_bit()
+>>> while set_pte_at() uses a spinlock.
+>>>
+>>
+>> Very good point! I should have thought about that. I think splitting the
+>> test_and_set_bit() in two (as with the cache flush) is sufficient. While
+>> there technically still is a race which could lead to user space tags
+>> being clobbered:
+>>
+>> a) It's very odd for a VMM to be doing an mprotect() after the fact to
+>> add PROT_MTE, or to be sharing the memory with another process which
+>> sets PROT_MTE.
+>>
+>> b) The window for the race is incredibly small and the VMM (generally)
+>> needs to be robust against the guest changing tags anyway.
+>>
+>> But I'll add a comment here as well:
+>>
+>> 	/*
+>> 	 * There is a potential race between sanitising the
+>> 	 * flags here and user space using mprotect() to add
+>> 	 * PROT_MTE to access the tags, however by splitting
+>> 	 * the test/set the only risk is user space tags
+>> 	 * being overwritten by the mte_clear_page_tags() call.
+>> 	 */
+> 
+> I think (well, I haven't re-checked), an mprotect() in the VMM ends up
+> calling set_pte_at_notify() which would call kvm_set_spte_gfn() and that
+> will map the page in the guest. So the problem only appears between
+> different VMMs sharing the same page. In principle they can be
+> MAP_PRIVATE but they'd be CoW so the race wouldn't matter. So it's left
+> with MAP_SHARED between multiple VMMs.
+
+mprotect.c only has a call to set_pte_at() not set_pte_at_notify(). And
+AFAICT the MMU notifiers are called to invalidate only in
+change_pmd_range(). So the stage 2 mappings would be invalidated rather
+than populated. However I believe this should cause synchronisation
+because of the KVM mmu_lock. So from my reading you are right an
+mprotect() can't race.
+
+MAP_SHARED between multiple VMs is then the only potential problem.
+
+> I think we should just state that this is unsafe and they can delete
+> each-others tags. If we are really worried, we can export that lock you
+> added in mte.c.
+> 
+
+I'll just update the comment for now.
+
+Thanks,
+
+Steve
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
