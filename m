@@ -2,61 +2,102 @@ Return-Path: <SRS0=po47=KQ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11D66C4707A
-	for <kvmarm@archiver.kernel.org>; Fri, 21 May 2021 17:00:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E473C4707E
+	for <kvmarm@archiver.kernel.org>; Fri, 21 May 2021 19:04:29 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7CFD4613E9
-	for <kvmarm@archiver.kernel.org>; Fri, 21 May 2021 17:00:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CFD4613E9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 9FB91613DB
+	for <kvmarm@archiver.kernel.org>; Fri, 21 May 2021 19:04:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FB91613DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E48604B26A;
-	Fri, 21 May 2021 13:00:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A7034B381;
+	Fri, 21 May 2021 15:04:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ta1g74n7yWF9; Fri, 21 May 2021 13:00:29 -0400 (EDT)
+	with ESMTP id MoGatH2Ns6os; Fri, 21 May 2021 15:04:26 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B07DE4B1E7;
-	Fri, 21 May 2021 13:00:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E78344B32A;
+	Fri, 21 May 2021 15:04:26 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 71CFD4B1D7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 21 May 2021 13:00:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BB3B64B31A
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 21 May 2021 15:04:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fqyBDb8GdKxu for <kvmarm@lists.cs.columbia.edu>;
- Fri, 21 May 2021 13:00:27 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 245954B1C5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 21 May 2021 13:00:27 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 17F7F1424;
- Fri, 21 May 2021 10:00:26 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AC43B3F73D;
- Fri, 21 May 2021 10:00:24 -0700 (PDT)
-Subject: Re: [PATCH v3 4/9] KVM: arm64: vgic: Let an interrupt controller
- advertise lack of HW deactivation
-To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
- kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-References: <20210510134824.1910399-1-maz@kernel.org>
- <20210510134824.1910399-5-maz@kernel.org>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <417846b3-ff5e-1832-82b2-3e0064275944@arm.com>
-Date: Fri, 21 May 2021 18:01:05 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+ with ESMTP id gLFwpEfvXFGs for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 21 May 2021 15:04:24 -0400 (EDT)
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com
+ [209.85.208.170])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 840664B312
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 21 May 2021 15:04:24 -0400 (EDT)
+Received: by mail-lj1-f170.google.com with SMTP id o8so25232455ljp.0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 21 May 2021 12:04:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=4c0xpiDdquziT96yZl3BHBXwubR9WKTGBWbOrT+AaXw=;
+ b=pECMVQG59uyASUJzijmFgULjtz0WeSXtfGqwCTJG2j+ImfbbJ7Idt9TYYFm4tIh5IH
+ R9tWzg69i+hjy158g1MjSB7Mz7DEsW7oz5U8qy+v+8wWvW0wYfkBXTh5OX/GlD2LFPMi
+ C8LAEMY7I+MRLp0N9IWZ0Vp4vhgE7loV0bxxYgzxSyXWT8/fH8aU2msbrP6jIKVQO7tf
+ xM4kXdA4GPVanJXhvwhALX5tp1GxBbFsrxjmcutTR7FTNKSIP95t7AcRXZNV/25kLVNM
+ OkzP7/ynTJ2xK6k9rq0UpyN6X3sUm8d+2LuQmwcc24FjbjaIDkK4azYIJ8RtyTmDymNU
+ Ktnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=4c0xpiDdquziT96yZl3BHBXwubR9WKTGBWbOrT+AaXw=;
+ b=Hdc+3t+dpuFGEyP6mS9MtcY6x6vTKZfHO4TJzFjbSTeh2FtQLfSiPkwRX69WDQ+LoE
+ nBWCRdoTpfswxhKKV6dtC/ys+4XZClbyk7hK1ntjl34RPDI/9pU/ntVVTM1XUCbhhqKf
+ pauvMsPsVv5XDI8BvcOf6oDWLBhR2JHYpa6fuE7DfdLG/5GbsOKpwjz4olbaA1SijIQg
+ yBfCWVuyIUzI2M2bP1f6BaZaa8BjEJpa0UjOrh9Wewe6+tNRNdk1c8foziDVe9cVnFsJ
+ Y6cdkQnsFivO7+cHRFq5zutB1SHtIjH8ZjSsus6D0ASuwS8p5XXVtIwkbctAf9YchCu5
+ guhA==
+X-Gm-Message-State: AOAM5338pxyVQivlKVf0k5imP6ZUL04NulpH6chpM3Qjo5fbZrtB4dwd
+ L854vEdL8KA6FzaZmUOfcPZQU7G7LMdBQOOx+8kZZA==
+X-Google-Smtp-Source: ABdhPJwOfE4Z7GOUzAJmeJCq4dABeShpU2xSSiKXlcHwytE83fbH1JNzJEVwiDFuyyhMC72fGkxyFOTVjHXM1e9tnqs=
+X-Received: by 2002:a2e:a7c9:: with SMTP id x9mr7858164ljp.216.1621623862953; 
+ Fri, 21 May 2021 12:04:22 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20210510134824.1910399-5-maz@kernel.org>
-Content-Language: en-US
-Cc: Hector Martin <marcan@marcan.st>, kernel-team@android.com
+References: <20210517145314.157626-1-jingzhangos@google.com>
+ <20210517145314.157626-2-jingzhangos@google.com>
+ <CALzav=dGT7B7FWw_d5v3QaJxgfp6TZv7E4fdchG_7LKh+C17gg@mail.gmail.com>
+ <CAAdAUtjyFhuh4iFJJOkkO20XXKqbcRO-S0ziFfUW1rHL-bkeZw@mail.gmail.com>
+ <CALzav=dHjy8wnLckxifrjVDfVNBmqHcJgeS7PK6BnAp6UCyO5A@mail.gmail.com>
+ <CAAdAUtiXE=CXU_LWG9SpnHsnqUBMC327jC2AvXAFX7-vwwoBog@mail.gmail.com>
+ <24061be4-e1e1-e59b-d701-ea8723915e36@oracle.com>
+In-Reply-To: <24061be4-e1e1-e59b-d701-ea8723915e36@oracle.com>
+From: Jing Zhang <jingzhangos@google.com>
+Date: Fri, 21 May 2021 14:04:10 -0500
+Message-ID: <CAAdAUtjDZGcmnubDw3x7tdNG=AFdu6sOG_4Z+AM63cmhQF3B8g@mail.gmail.com>
+Subject: Re: [PATCH v5 1/4] KVM: stats: Separate common stats from
+ architecture specific ones
+To: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Cc: KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
+ Paul Mackerras <paulus@ozlabs.org>,
+ Linuxkselftest <linux-kselftest@vger.kernel.org>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, Will Deacon <will@kernel.org>,
+ KVMARM <kvmarm@lists.cs.columbia.edu>,
+ Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+ LinuxS390 <linux-s390@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
+ Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>,
+ Huacai Chen <chenhuacai@kernel.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ David Rientjes <rientjes@google.com>, KVMPPC <kvm-ppc@vger.kernel.org>,
+ David Matlack <dmatlack@google.com>, Jim Mattson <jmattson@google.com>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ Sean Christopherson <seanjc@google.com>, Cornelia Huck <cohuck@redhat.com>,
+ Peter Shier <pshier@google.com>, LinuxMIPS <linux-mips@vger.kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,100 +114,79 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
-
-On 5/10/21 2:48 PM, Marc Zyngier wrote:
-> The vGIC, as architected by ARM, allows a virtual interrupt to
-> trigger the deactivation of a physical interrupt. This allows
-> the following interrupt to be delivered without requiring an exit.
-
-If I got this right, the AIC doesn't implement/ignores the ICH_LR_EL2.HW bit. Does
-it mean that the CPU IF behaves as if HW = 0b0, meaning it asserts a maintenance
-interrupt on virtual interrupt deactivation when ICH_LR_EL2.EOI = 0b1? I assume
-that's the case, just double checking.
-
-I am wondering what would happen if we come across an interrupt controller where
-the CPU IF cannot assert a maintenance interrupt at all and we rely on the EOI bit
-to take us out of the guest to deactivate the HW interrupt. I have to say that it
-looks a bit strange to start relying on the maintenance interrupt to emulate
-interrupt deactivate for hardware interrupts, but at the same timer allowing an
-interrupt controller without a maintenance interrupt.
-
-Other than that, this idea sounds like the best thing to do considering the
-circumstances, I certainly can't think of anything better.
-
+On Tue, May 18, 2021 at 1:40 PM Krish Sadhukhan
+<krish.sadhukhan@oracle.com> wrote:
 >
-> However, some implementations have choosen not to implement this,
-> meaning that we will need some unsavoury workarounds to deal with this.
 >
-> On detecting such a case, taint the kernel and spit a nastygram.
-> We'll deal with this in later patches.
+> On 5/18/21 10:25 AM, Jing Zhang wrote:
+> > Hi David,
+> >
+> > On Tue, May 18, 2021 at 11:27 AM David Matlack <dmatlack@google.com> wrote:
+> >> On Mon, May 17, 2021 at 5:10 PM Jing Zhang <jingzhangos@google.com> wrote:
+> >> <snip>
+> >>> Actually the definition of kvm_{vcpu,vm}_stat are arch specific. There is
+> >>> no real structure for arch agnostic stats. Most of the stats in common
+> >>> structures are arch agnostic, but not all of them.
+> >>> There are some benefits to put all common stats in a separate structure.
+> >>> e.g. if we want to add a stat in kvm_main.c, we only need to add this stat
+> >>> in the common structure, don't have to update all kvm_{vcpu,vm}_stat
+> >>> definition for all architectures.
+> >> I meant rename the existing arch-specific struct kvm_{vcpu,vm}_stat to
+> >> kvm_{vcpu,vm}_stat_arch and rename struct kvm_{vcpu,vm}_stat_common to
+> >> kvm_{vcpu,vm}_stat.
+> >>
+> >> So in  include/linux/kvm_types.h you'd have:
+> >>
+> >> struct kvm_vm_stat {
+> >>    ulong remote_tlb_flush;
+> >>    struct kvm_vm_stat_arch arch;
+> >> };
+> >>
+> >> struct kvm_vcpu_stat {
+> >>    u64 halt_successful_poll;
+> >>    u64 halt_attempted_poll;
+> >>    u64 halt_poll_invalid;
+> >>    u64 halt_wakeup;
+> >>    u64 halt_poll_success_ns;
+> >>    u64 halt_poll_fail_ns;
+> >>    struct kvm_vcpu_stat_arch arch;
+> >> };
+> >>
+> >> And in arch/x86/include/asm/kvm_host.h you'd have:
+> >>
+> >> struct kvm_vm_stat_arch {
+> >>    ulong mmu_shadow_zapped;
+> >>    ...
+> >> };
+> >>
+> >> struct kvm_vcpu_stat_arch {
+> >>    u64 pf_fixed;
+> >>    u64 pf_guest;
+> >>    u64 tlb_flush;
+> >>    ...
+> >> };
+> >>
+> >> You still have the same benefits of having an arch-neutral place to
+> >> store stats but the struct layout more closely resembles struct
+> >> kvm_vcpu and struct kvm.
+> > You are right. This is a more reasonable way to layout the structures.
+> > I remember that I didn't choose this way is only because that it needs
+> > touching every arch specific stats in all architectures (stat.name ->
+> > stat.arch.name) instead of only touching arch neutral stats.
+> > Let's see if there is any vote from others about this.
 >
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/vgic/vgic-init.c       | 10 ++++++++++
->  include/kvm/arm_vgic.h                |  3 +++
->  include/linux/irqchip/arm-vgic-info.h |  2 ++
->  3 files changed, 15 insertions(+)
 >
-> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-> index 9fd23f32aa54..5b06a9970a57 100644
-> --- a/arch/arm64/kvm/vgic/vgic-init.c
-> +++ b/arch/arm64/kvm/vgic/vgic-init.c
-> @@ -524,6 +524,16 @@ int kvm_vgic_hyp_init(void)
->  	if (!gic_kvm_info)
->  		return -ENODEV;
->  
-> +	/*
-> +	 * If we get one of these oddball non-GICs, taint the kernel,
-> +	 * as we have no idea of how they *really* behave.
-> +	 */
-> +	if (gic_kvm_info->no_hw_deactivation) {
-> +		kvm_info("Non-architectural vgic, tainting kernel\n");
-> +		add_taint(TAINT_CPU_OUT_OF_SPEC, LOCKDEP_STILL_OK);
-> +		kvm_vgic_global_state.no_hw_deactivation = true;
-> +	}
-
-IMO, since this means we're going to rely even more on the maintenance interrupt
-(not just for software emulation of level sensitive interrupts), I think there
-should be some sort of dependency on having something that resembles a working
-maintenance interrupt.
+> +1
+>
+> >
+> > Thanks,
+> > Jing
+It is still not fun to change hundreds of stats update code in every
+architectures.
+Let's keep it as it is for now and see how it is going.
 
 Thanks,
-
-Alex
-
-> +
->  	switch (gic_kvm_info->type) {
->  	case GIC_V2:
->  		ret = vgic_v2_probe(gic_kvm_info);
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index ec621180ef09..e45b26e8d479 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -72,6 +72,9 @@ struct vgic_global {
->  	bool			has_gicv4;
->  	bool			has_gicv4_1;
->  
-> +	/* Pseudo GICv3 from outer space */
-> +	bool			no_hw_deactivation;
-> +
->  	/* GIC system register CPU interface */
->  	struct static_key_false gicv3_cpuif;
->  
-> diff --git a/include/linux/irqchip/arm-vgic-info.h b/include/linux/irqchip/arm-vgic-info.h
-> index 0319636be928..d39d0b591c5a 100644
-> --- a/include/linux/irqchip/arm-vgic-info.h
-> +++ b/include/linux/irqchip/arm-vgic-info.h
-> @@ -30,6 +30,8 @@ struct gic_kvm_info {
->  	bool		has_v4;
->  	/* rvpeid support */
->  	bool		has_v4_1;
-> +	/* Deactivation impared, subpar stuff */
-> +	bool		no_hw_deactivation;
->  };
->  
->  #ifdef CONFIG_KVM
+Jing
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
