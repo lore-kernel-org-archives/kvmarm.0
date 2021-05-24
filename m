@@ -2,104 +2,60 @@ Return-Path: <SRS0=3L6A=KT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EBB0C04FF3
-	for <kvmarm@archiver.kernel.org>; Mon, 24 May 2021 15:18:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2CABC2B9F7
+	for <kvmarm@archiver.kernel.org>; Mon, 24 May 2021 16:52:26 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BDAF361209
-	for <kvmarm@archiver.kernel.org>; Mon, 24 May 2021 15:18:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDAF361209
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 6FA216140A
+	for <kvmarm@archiver.kernel.org>; Mon, 24 May 2021 16:52:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FA216140A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 633884B16C;
-	Mon, 24 May 2021 11:18:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B86404B15C;
+	Mon, 24 May 2021 12:52:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id PQ15x3Trgmv9; Mon, 24 May 2021 11:18:44 -0400 (EDT)
+	with ESMTP id uoORRBO6YOOE; Mon, 24 May 2021 12:52:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8639B4B16D;
-	Mon, 24 May 2021 11:18:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FB264B14F;
+	Mon, 24 May 2021 12:52:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 510154B160
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 May 2021 11:18:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 14E7E4B124
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 May 2021 12:52:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WWTkpACQZ3W3 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 24 May 2021 11:18:41 -0400 (EDT)
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com
- [209.85.216.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 49AFF4B15F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 May 2021 11:18:39 -0400 (EDT)
-Received: by mail-pj1-f74.google.com with SMTP id
- w1-20020a17090a0281b0290156f7df20a0so13794078pja.8
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 May 2021 08:18:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=UegFRYct3sLqT7pl1JEE19wyOxnWvgvclbZj0R5joEw=;
- b=ApeANbFrUsOLWs657ASas6zyPJp3sMEzvjJ6diCCbgEJfKHg7jPnVB+X8KJ2K9wObp
- Oym8WfmPp6FmRvXl4xxMWYVtbSqL9squwfQ6HIhTGK0jnMNLfMrM8u6nt5pw9xf8yqdJ
- G5828StXxoL9CUmGGe7bZAS1YApU/djbLwlT2Eyc0UGxAtiF8ImhtB6lllo2NLlSBE2V
- JhMajTpHchhM45gpFd/nKdBAcqThdLRRkXQYbL8RZYtJx53wS90JQ/i/lZEfusGswPXm
- eVcNdKONN4zvjnR2fHra8MctvrdqUw85ivuIzEXFFbaXF85c8rkRgfxeC760gQzTbXEd
- tPFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=UegFRYct3sLqT7pl1JEE19wyOxnWvgvclbZj0R5joEw=;
- b=fMLb2q6f3aHgkfDeHXIt+BWrniSq60I1Q0SJkO5DXKxL5Vob9MAykOxPib4S5PmPI8
- dD5/PVZfBE5ZcczEO2XeESoAQhE7nUJtfWwX08DU9JmhD+Db1/kOMsr7rybKAcKn9CZp
- GgF/BanJvIghKS/KoLO9EQgqZCRZ/DlMobxviS3D12nwkPhvj8zI8rRf07cNVB//THum
- 2ED8/yCaGSk9PAYnR9uf8ZhM54mDDT8iU4tIFGotgbN570U1U9FzGbj9V5f+7TvDN0YY
- nn78GtgJ4qVQleQePMcBoDFy31deRtZiiiqP+l8Y4tgBD3YWvkROxqCWuOxechHfxqvC
- 3bDg==
-X-Gm-Message-State: AOAM531zl9hPtSQlEPn+sxkIZP8eyajmWMESejItBrPQwNBy2X0L9ReP
- eg88LNXH08xTSlIyBCVDGLocctoK8zAmIagcOw==
-X-Google-Smtp-Source: ABdhPJyU4RXPh5DqjZvaKB+BvjwGCDsf7NbHS3MikVnZnMV5T1gQ7C3fkbsfHjLDDoBtFaAUFlYadVoAgve8b/ej+w==
-X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:10:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a17:90a:ab0c:: with SMTP id
- m12mr25307556pjq.179.1621869518420; Mon, 24 May 2021 08:18:38 -0700 (PDT)
-Date: Mon, 24 May 2021 15:18:28 +0000
-In-Reply-To: <20210524151828.4113777-1-jingzhangos@google.com>
-Message-Id: <20210524151828.4113777-5-jingzhangos@google.com>
-Mime-Version: 1.0
-References: <20210524151828.4113777-1-jingzhangos@google.com>
-X-Mailer: git-send-email 2.31.1.818.g46aad6cb9e-goog
-Subject: [PATCH v6 4/4] KVM: selftests: Add selftest for KVM statistics data
- binary interface
-From: Jing Zhang <jingzhangos@google.com>
-To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>, 
- LinuxMIPS <linux-mips@vger.kernel.org>, KVMPPC <kvm-ppc@vger.kernel.org>, 
- LinuxS390 <linux-s390@vger.kernel.org>, 
- Linuxkselftest <linux-kselftest@vger.kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, 
- Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
- Julien Thierry <julien.thierry.kdev@gmail.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Will Deacon <will@kernel.org>, Huacai Chen <chenhuacai@kernel.org>, 
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, 
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- Paul Mackerras <paulus@ozlabs.org>, 
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>, 
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, 
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- Sean Christopherson <seanjc@google.com>, 
- Vitaly Kuznetsov <vkuznets@redhat.com>, Jim Mattson <jmattson@google.com>, 
- Peter Shier <pshier@google.com>, Oliver Upton <oupton@google.com>, 
- David Rientjes <rientjes@google.com>,
- Emanuele Giuseppe Esposito <eesposit@redhat.com>, 
- David Matlack <dmatlack@google.com>, Ricardo Koller <ricarkol@google.com>, 
- Krish Sadhukhan <krish.sadhukhan@oracle.com>
+ with ESMTP id VdcaCB86zX9x for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 24 May 2021 12:52:20 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A487F4B11E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 May 2021 12:52:20 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2C1D5ED1;
+ Mon, 24 May 2021 09:52:20 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C9E4D3F73B;
+ Mon, 24 May 2021 09:52:18 -0700 (PDT)
+Subject: Re: [PATCH v3 6/9] KVM: arm64: vgic: Implement SW-driven deactivation
+To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+References: <20210510134824.1910399-1-maz@kernel.org>
+ <20210510134824.1910399-7-maz@kernel.org>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <fbd86687-b0cb-9979-b0a1-7e67efdd6b0a@arm.com>
+Date: Mon, 24 May 2021 17:53:04 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
+MIME-Version: 1.0
+In-Reply-To: <20210510134824.1910399-7-maz@kernel.org>
+Content-Language: en-US
+Cc: Hector Martin <marcan@marcan.st>, kernel-team@android.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -116,314 +72,155 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add selftest to check KVM stats descriptors validity.
+Hi Marc,
 
-Reviewed-by: David Matlack <dmatlack@google.com>
-Reviewed-by: Ricardo Koller <ricarkol@google.com>
-Signed-off-by: Jing Zhang <jingzhangos@google.com>
----
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   3 +
- .../testing/selftests/kvm/include/kvm_util.h  |   3 +
- .../selftests/kvm/kvm_bin_form_stats.c        | 216 ++++++++++++++++++
- tools/testing/selftests/kvm/lib/kvm_util.c    |  12 +
- 5 files changed, 235 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/kvm_bin_form_stats.c
+Some questions regarding how this is supposed to work.
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index bd83158e0e0b..35796667c944 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -43,3 +43,4 @@
- /memslot_modification_stress_test
- /set_memory_region_test
- /steal_time
-+/kvm_bin_form_stats
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index e439d027939d..2984c86c848a 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -76,6 +76,7 @@ TEST_GEN_PROGS_x86_64 += kvm_page_table_test
- TEST_GEN_PROGS_x86_64 += memslot_modification_stress_test
- TEST_GEN_PROGS_x86_64 += set_memory_region_test
- TEST_GEN_PROGS_x86_64 += steal_time
-+TEST_GEN_PROGS_x86_64 += kvm_bin_form_stats
- 
- TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
- TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list-sve
-@@ -87,6 +88,7 @@ TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
- TEST_GEN_PROGS_aarch64 += kvm_page_table_test
- TEST_GEN_PROGS_aarch64 += set_memory_region_test
- TEST_GEN_PROGS_aarch64 += steal_time
-+TEST_GEN_PROGS_aarch64 += kvm_bin_form_stats
- 
- TEST_GEN_PROGS_s390x = s390x/memop
- TEST_GEN_PROGS_s390x += s390x/resets
-@@ -96,6 +98,7 @@ TEST_GEN_PROGS_s390x += dirty_log_test
- TEST_GEN_PROGS_s390x += kvm_create_max_vcpus
- TEST_GEN_PROGS_s390x += kvm_page_table_test
- TEST_GEN_PROGS_s390x += set_memory_region_test
-+TEST_GEN_PROGS_s390x += kvm_bin_form_stats
- 
- TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(UNAME_M))
- LIBKVM += $(LIBKVM_$(UNAME_M))
-diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index a8f022794ce3..ee01a67022d9 100644
---- a/tools/testing/selftests/kvm/include/kvm_util.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -387,4 +387,7 @@ uint64_t get_ucall(struct kvm_vm *vm, uint32_t vcpu_id, struct ucall *uc);
- #define GUEST_ASSERT_4(_condition, arg1, arg2, arg3, arg4) \
- 	__GUEST_ASSERT((_condition), 4, (arg1), (arg2), (arg3), (arg4))
- 
-+int vm_get_statsfd(struct kvm_vm *vm);
-+int vcpu_get_statsfd(struct kvm_vm *vm, uint32_t vcpuid);
-+
- #endif /* SELFTEST_KVM_UTIL_H */
-diff --git a/tools/testing/selftests/kvm/kvm_bin_form_stats.c b/tools/testing/selftests/kvm/kvm_bin_form_stats.c
-new file mode 100644
-index 000000000000..09e12c5838af
---- /dev/null
-+++ b/tools/testing/selftests/kvm/kvm_bin_form_stats.c
-@@ -0,0 +1,216 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * kvm_bin_form_stats
-+ *
-+ * Copyright (C) 2021, Google LLC.
-+ *
-+ * Test the fd-based interface for KVM statistics.
-+ */
-+
-+#define _GNU_SOURCE /* for program_invocation_short_name */
-+#include <fcntl.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <errno.h>
-+
-+#include "test_util.h"
-+
-+#include "kvm_util.h"
-+#include "asm/kvm.h"
-+#include "linux/kvm.h"
-+
-+int stats_test(int stats_fd, int size_stat)
-+{
-+	ssize_t ret;
-+	int i;
-+	size_t size_desc, size_data = 0;
-+	struct kvm_stats_header header;
-+	struct kvm_stats_desc *stats_desc, *pdesc;
-+	void *stats_data;
-+
-+	/* Read kvm stats header */
-+	ret = read(stats_fd, &header, sizeof(header));
-+	TEST_ASSERT(ret == sizeof(header), "Read stats header");
-+	size_desc = sizeof(*stats_desc) + header.name_size;
-+
-+	/* Check id string in header, that should start with "kvm" */
-+	TEST_ASSERT(!strncmp(header.id, "kvm", 3) &&
-+			strlen(header.id) < KVM_STATS_ID_MAXLEN,
-+			"Invalid KVM stats type");
-+
-+	/* Sanity check for other fields in header */
-+	if (header.count == 0)
-+		return 0;
-+	/* Check overlap */
-+	TEST_ASSERT(header.desc_offset > 0 && header.data_offset > 0
-+			&& header.desc_offset >= sizeof(header)
-+			&& header.data_offset >= sizeof(header),
-+			"Invalid offset fields in header");
-+	TEST_ASSERT(header.desc_offset > header.data_offset
-+			|| (header.desc_offset + size_desc * header.count <=
-+				header.data_offset),
-+			"Descriptor block is overlapped with data block");
-+
-+	/* Allocate memory for stats descriptors */
-+	stats_desc = calloc(header.count, size_desc);
-+	TEST_ASSERT(stats_desc, "Allocate memory for stats descriptors");
-+	/* Read kvm stats descriptors */
-+	ret = pread(stats_fd, stats_desc,
-+			size_desc * header.count, header.desc_offset);
-+	TEST_ASSERT(ret == size_desc * header.count,
-+			"Read KVM stats descriptors");
-+
-+	/* Sanity check for fields in descriptors */
-+	for (i = 0; i < header.count; ++i) {
-+		pdesc = (void *)stats_desc + i * size_desc;
-+		/* Check type,unit,base boundaries */
-+		TEST_ASSERT((pdesc->flags & KVM_STATS_TYPE_MASK)
-+				<= KVM_STATS_TYPE_MAX, "Unknown KVM stats type");
-+		TEST_ASSERT((pdesc->flags & KVM_STATS_UNIT_MASK)
-+				<= KVM_STATS_UNIT_MAX, "Unknown KVM stats unit");
-+		TEST_ASSERT((pdesc->flags & KVM_STATS_BASE_MASK)
-+				<= KVM_STATS_BASE_MAX, "Unknown KVM stats base");
-+		/* Check exponent for stats unit
-+		 * Exponent for counter should be greater than or equal to 0
-+		 * Exponent for unit bytes should be greater than or equal to 0
-+		 * Exponent for unit seconds should be less than or equal to 0
-+		 * Exponent for unit clock cycles should be greater than or
-+		 * equal to 0
-+		 */
-+		switch (pdesc->flags & KVM_STATS_UNIT_MASK) {
-+		case KVM_STATS_UNIT_NONE:
-+		case KVM_STATS_UNIT_BYTES:
-+		case KVM_STATS_UNIT_CYCLES:
-+			TEST_ASSERT(pdesc->exponent >= 0,
-+					"Unsupported KVM stats unit");
-+			break;
-+		case KVM_STATS_UNIT_SECONDS:
-+			TEST_ASSERT(pdesc->exponent <= 0,
-+					"Unsupported KVM stats unit");
-+			break;
-+		}
-+		/* Check name string */
-+		TEST_ASSERT(strlen(pdesc->name) < header.name_size,
-+				"KVM stats name(%s) too long", pdesc->name);
-+		/* Check size field, which should not be zero */
-+		TEST_ASSERT(pdesc->size, "KVM descriptor(%s) with size of 0",
-+				pdesc->name);
-+		size_data += pdesc->size * size_stat;
-+	}
-+	/* Check overlap */
-+	TEST_ASSERT(header.data_offset >= header.desc_offset
-+			|| header.data_offset + size_data <= header.desc_offset,
-+			"Data block is overlapped with Descriptor block");
-+	/* Check validity of all stats data size */
-+	TEST_ASSERT(size_data >= header.count * size_stat,
-+			"Data size is not correct");
-+
-+	/* Allocate memory for stats data */
-+	stats_data = malloc(size_data);
-+	TEST_ASSERT(stats_data, "Allocate memory for stats data");
-+	/* Read kvm stats data as a bulk */
-+	ret = pread(stats_fd, stats_data, size_data, header.data_offset);
-+	TEST_ASSERT(ret == size_data, "Read KVM stats data");
-+	/* Read kvm stats data one by one */
-+	size_data = 0;
-+	for (i = 0; i < header.count; ++i) {
-+		pdesc = (void *)stats_desc + i * size_desc;
-+		ret = pread(stats_fd, stats_data, pdesc->size * size_stat,
-+				header.data_offset + size_data);
-+		TEST_ASSERT(ret == pdesc->size * size_stat,
-+				"Read data of KVM stats: %s", pdesc->name);
-+		size_data += pdesc->size * size_stat;
-+	}
-+
-+	free(stats_data);
-+	free(stats_desc);
-+	return 0;
-+}
-+
-+
-+int vm_stats_test(struct kvm_vm *vm)
-+{
-+	int stats_fd;
-+	struct kvm_vm_stats_data *stats_data;
-+
-+	/* Get fd for VM stats */
-+	stats_fd = vm_get_statsfd(vm);
-+	TEST_ASSERT(stats_fd >= 0, "Get VM stats fd");
-+
-+	stats_test(stats_fd, sizeof(stats_data->value[0]));
-+	close(stats_fd);
-+
-+	return 0;
-+}
-+
-+int vcpu_stats_test(struct kvm_vm *vm, int vcpu_id)
-+{
-+	int stats_fd;
-+	struct kvm_vcpu_stats_data *stats_data;
-+
-+	/* Get fd for VCPU stats */
-+	stats_fd = vcpu_get_statsfd(vm, vcpu_id);
-+	TEST_ASSERT(stats_fd >= 0, "Get VCPU stats fd");
-+
-+	stats_test(stats_fd, sizeof(stats_data->value[0]));
-+	close(stats_fd);
-+
-+	return 0;
-+}
-+
-+#define DEFAULT_NUM_VM		4
-+#define DEFAULT_NUM_VCPU	4
-+
-+/*
-+ * Usage: kvm_bin_form_stats [#vm] [#vcpu]
-+ * The first parameter #vm set the number of VMs being created.
-+ * The second parameter #vcpu set the number of VCPUs being created.
-+ * By default, DEFAULT_NUM_VM VM and DEFAULT_NUM_VCPU VCPU for the VM would be
-+ * created for testing.
-+ */
-+
-+int main(int argc, char *argv[])
-+{
-+	int max_vm = DEFAULT_NUM_VM, max_vcpu = DEFAULT_NUM_VCPU, ret, i, j;
-+	struct kvm_vm **vms;
-+
-+	/* Get the number of VMs and VCPUs that would be created for testing. */
-+	if (argc > 1) {
-+		max_vm = strtol(argv[1], NULL, 0);
-+		if (max_vm <= 0)
-+			max_vm = DEFAULT_NUM_VM;
-+	}
-+	if (argc > 2) {
-+		max_vcpu = strtol(argv[2], NULL, 0);
-+		if (max_vcpu <= 0)
-+			max_vcpu = DEFAULT_NUM_VCPU;
-+	}
-+
-+	/* Check the extension for binary stats */
-+	ret = kvm_check_cap(KVM_CAP_STATS_BINARY_FD);
-+	TEST_ASSERT(ret >= 0,
-+			"Binary form statistics interface is not supported");
-+
-+	/* Create VMs and VCPUs */
-+	vms = malloc(sizeof(vms[0]) * max_vm);
-+	TEST_ASSERT(vms, "Allocate memory for storing VM pointers");
-+	for (i = 0; i < max_vm; ++i) {
-+		vms[i] = vm_create(VM_MODE_DEFAULT,
-+				DEFAULT_GUEST_PHY_PAGES, O_RDWR);
-+		for (j = 0; j < max_vcpu; ++j)
-+			vm_vcpu_add(vms[i], j);
-+	}
-+
-+	/* Check stats read for every VM and VCPU */
-+	for (i = 0; i < max_vm; ++i) {
-+		vm_stats_test(vms[i]);
-+		for (j = 0; j < max_vcpu; ++j)
-+			vcpu_stats_test(vms[i], j);
-+	}
-+
-+	for (i = 0; i < max_vm; ++i)
-+		kvm_vm_free(vms[i]);
-+	free(vms);
-+	return 0;
-+}
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index fc83f6c5902d..d9e0b2c8b906 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -2090,3 +2090,15 @@ unsigned int vm_calc_num_guest_pages(enum vm_guest_mode mode, size_t size)
- 	n = DIV_ROUND_UP(size, vm_guest_mode_params[mode].page_size);
- 	return vm_adjust_num_guest_pages(mode, n);
- }
-+
-+int vm_get_statsfd(struct kvm_vm *vm)
-+{
-+	return ioctl(vm->fd, KVM_STATS_GETFD, NULL);
-+}
-+
-+int vcpu_get_statsfd(struct kvm_vm *vm, uint32_t vcpuid)
-+{
-+	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
-+
-+	return ioctl(vcpu->fd, KVM_STATS_GETFD, NULL);
-+}
--- 
-2.31.1.818.g46aad6cb9e-goog
+On 5/10/21 2:48 PM, Marc Zyngier wrote:
+> In order to deal with these systems that do not offer HW-based
+> deactivation of interrupts, let implement a SW-based approach:
+>
+> - When the irq is queued into a LR, treat it as a pure virtual
+>   interrupt and set the EOI flag in the LR.
+>
+> - When the interrupt state is read back from the LR, force a
+>   deactivation when the state is invalid (neither active nor
+>   pending)
+>
+> Interrupts requiring such treatment get the VGIC_SW_RESAMPLE flag.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/vgic/vgic-v2.c | 19 +++++++++++++++----
+>  arch/arm64/kvm/vgic/vgic-v3.c | 19 +++++++++++++++----
+>  include/kvm/arm_vgic.h        | 10 ++++++++++
+>  3 files changed, 40 insertions(+), 8 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/vgic/vgic-v2.c b/arch/arm64/kvm/vgic/vgic-v2.c
+> index 11934c2af2f4..2c580204f1dc 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v2.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v2.c
+> @@ -108,11 +108,22 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+>  		 * If this causes us to lower the level, we have to also clear
+>  		 * the physical active state, since we will otherwise never be
+>  		 * told when the interrupt becomes asserted again.
+> +		 *
+> +		 * Another case is when the interrupt requires a helping hand
+> +		 * on deactivation (no HW deactivation, for example).
+>  		 */
+> -		if (vgic_irq_is_mapped_level(irq) && (val & GICH_LR_PENDING_BIT)) {
+> -			irq->line_level = vgic_get_phys_line_level(irq);
+> +		if (vgic_irq_is_mapped_level(irq)) {
+> +			bool resample = false;
+> +
+> +			if (val & GICH_LR_PENDING_BIT) {
+> +				irq->line_level = vgic_get_phys_line_level(irq);
+> +				resample = !irq->line_level;
+> +			} else if (vgic_irq_needs_resampling(irq) &&
+> +				   !(irq->active || irq->pending_latch)) {
 
+So this means that if the IRQ has the special flag, if it's not pending in the LR
+or at the software level, and it's not active either, then perform interrupt
+deactivation. I don't see where the state of the interrupt is checked again, am I
+correct in assuming that we rely on the CPU interface to assert the interrupt to
+the host while we run with interrupts enabled in the run loop, and the handler for
+the interrupt will mark it pending for kvm_vgic_sync_hw_state->vgic_vx_fold_lr_state?
+
+> +				resample = true;
+> +			}
+>  
+> -			if (!irq->line_level)
+> +			if (resample)
+
+This name, "resample", is confusing to me, quite possibly because I'm not familiar
+with the irqchip subsystem. It was my impression that "resample" means that at
+some point, the physical interrupt state will be checked again, yet I don't see
+that happening anywhere when VGIC_IRQ_SW_RESAMPLE is set. Am I mistaken in my
+assumptions?
+
+Thanks,
+
+Alex
+
+>  				vgic_irq_set_phys_active(irq, false);
+>  		}
+>  
+> @@ -152,7 +163,7 @@ void vgic_v2_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
+>  	if (irq->group)
+>  		val |= GICH_LR_GROUP1;
+>  
+> -	if (irq->hw) {
+> +	if (irq->hw && !vgic_irq_needs_resampling(irq)) {
+>  		val |= GICH_LR_HW;
+>  		val |= irq->hwintid << GICH_LR_PHYSID_CPUID_SHIFT;
+>  		/*
+> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+> index 41ecf219c333..66004f61cd83 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v3.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
+> @@ -101,11 +101,22 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+>  		 * If this causes us to lower the level, we have to also clear
+>  		 * the physical active state, since we will otherwise never be
+>  		 * told when the interrupt becomes asserted again.
+> +		 *
+> +		 * Another case is when the interrupt requires a helping hand
+> +		 * on deactivation (no HW deactivation, for example).
+>  		 */
+> -		if (vgic_irq_is_mapped_level(irq) && (val & ICH_LR_PENDING_BIT)) {
+> -			irq->line_level = vgic_get_phys_line_level(irq);
+> +		if (vgic_irq_is_mapped_level(irq)) {
+> +			bool resample = false;
+> +
+> +			if (val & ICH_LR_PENDING_BIT) {
+> +				irq->line_level = vgic_get_phys_line_level(irq);
+> +				resample = !irq->line_level;
+> +			} else if (vgic_irq_needs_resampling(irq) &&
+> +				   !(irq->active || irq->pending_latch)) {
+> +				resample = true;
+> +			}
+>  
+> -			if (!irq->line_level)
+> +			if (resample)
+>  				vgic_irq_set_phys_active(irq, false);
+>  		}
+>  
+> @@ -136,7 +147,7 @@ void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
+>  		}
+>  	}
+>  
+> -	if (irq->hw) {
+> +	if (irq->hw && !vgic_irq_needs_resampling(irq)) {
+>  		val |= ICH_LR_HW;
+>  		val |= ((u64)irq->hwintid) << ICH_LR_PHYS_ID_SHIFT;
+>  		/*
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index e5f06df000f2..e602d848fc1a 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -99,6 +99,11 @@ enum vgic_irq_config {
+>   * kvm_arm_get_running_vcpu() to get the vcpu pointer for private IRQs.
+>   */
+>  struct irq_ops {
+> +	/* Per interrupt flags for special-cased interrupts */
+> +	unsigned long flags;
+> +
+> +#define VGIC_IRQ_SW_RESAMPLE	BIT(0)	/* Clear the active state for resampling */
+> +
+>  	/*
+>  	 * Callback function pointer to in-kernel devices that can tell us the
+>  	 * state of the input level of mapped level-triggered IRQ faster than
+> @@ -150,6 +155,11 @@ struct vgic_irq {
+>  					   for in-kernel devices. */
+>  };
+>  
+> +static inline bool vgic_irq_needs_resampling(struct vgic_irq *irq)
+> +{
+> +	return irq->ops && (irq->ops->flags & VGIC_IRQ_SW_RESAMPLE);
+> +}
+> +
+>  struct vgic_register_region;
+>  struct vgic_its;
+>  
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
