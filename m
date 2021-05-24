@@ -3,75 +3,71 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 265CDC04FF3
-	for <kvmarm@archiver.kernel.org>; Mon, 24 May 2021 17:43:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0731DC04FF3
+	for <kvmarm@archiver.kernel.org>; Mon, 24 May 2021 17:48:21 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8D45661400
-	for <kvmarm@archiver.kernel.org>; Mon, 24 May 2021 17:43:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D45661400
+	by mail.kernel.org (Postfix) with ESMTP id 6DD9161403
+	for <kvmarm@archiver.kernel.org>; Mon, 24 May 2021 17:48:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DD9161403
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B68A4B14C;
-	Mon, 24 May 2021 13:43:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0EA4C4B156;
+	Mon, 24 May 2021 13:48:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id SNzUxszJe6-w; Mon, 24 May 2021 13:43:39 -0400 (EDT)
+	with ESMTP id sHdmeiHWeuRo; Mon, 24 May 2021 13:48:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 613ED4B10B;
-	Mon, 24 May 2021 13:43:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B1E94B14C;
+	Mon, 24 May 2021 13:48:19 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B6914B0EC
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 May 2021 13:43:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 52C894B133
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 May 2021 13:48:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rIWKfheKJsKA for <kvmarm@lists.cs.columbia.edu>;
- Mon, 24 May 2021 13:43:37 -0400 (EDT)
+ with ESMTP id VvqNVbCgneX9 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 24 May 2021 13:48:16 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 15FF74B0E5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 May 2021 13:43:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5C3784B127
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 May 2021 13:48:16 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 841AF601FC;
- Mon, 24 May 2021 17:43:34 +0000 (UTC)
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ by mail.kernel.org (Postfix) with ESMTPSA id 69481613FC;
+ Mon, 24 May 2021 17:48:15 +0000 (UTC)
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
+ TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1llEc0-003Ivb-EB; Mon, 24 May 2021 18:43:32 +0100
-Date: Mon, 24 May 2021 18:43:31 +0100
-Message-ID: <87bl90vxh8.wl-maz@kernel.org>
+ id 1llEgX-003Ixg-Iu; Mon, 24 May 2021 18:48:13 +0100
+MIME-Version: 1.0
+Date: Mon, 24 May 2021 18:48:13 +0100
 From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH v3 6/9] KVM: arm64: vgic: Implement SW-driven deactivation
-In-Reply-To: <fbd86687-b0cb-9979-b0a1-7e67efdd6b0a@arm.com>
+To: Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v3 7/9] KVM: arm64: timer: Refactor IRQ configuration
+In-Reply-To: <9f28e15b-26d0-5d3e-8f0e-8026ece536e0@huawei.com>
 References: <20210510134824.1910399-1-maz@kernel.org>
- <20210510134824.1910399-7-maz@kernel.org>
- <fbd86687-b0cb-9979-b0a1-7e67efdd6b0a@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, james.morse@arm.com, suzuki.poulose@arm.com,
- eric.auger@redhat.com, marcan@marcan.st, mark.rutland@arm.com,
- kernel-team@android.com
+ <20210510134824.1910399-8-maz@kernel.org>
+ <9f28e15b-26d0-5d3e-8f0e-8026ece536e0@huawei.com>
+User-Agent: Roundcube Webmail/1.4.11
+Message-ID: <fe39ba008d6bfad395e1b12b51f75681@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org,
+ kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, kernel-team@android.com,
+ marcan@marcan.st
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, Hector Martin <marcan@marcan.st>,
- kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Cc: Hector Martin <marcan@marcan.st>, kernel-team@android.com,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -83,106 +79,57 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 24 May 2021 17:53:04 +0100,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+On 2021-05-14 13:46, Zenghui Yu wrote:
+> On 2021/5/10 21:48, Marc Zyngier wrote:
+>> As we are about to add some more things to the timer IRQ
+>> configuration, move this code out of the main timer init code
+>> into its own set of functions.
+>> 
+>> No functional changes.
+>> 
+>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>> ---
+>>  arch/arm64/kvm/arch_timer.c | 61 
+>> ++++++++++++++++++++++---------------
+>>  1 file changed, 37 insertions(+), 24 deletions(-)
+>> 
+>> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+>> index e2288b6bf435..7fa4f446456a 100644
+>> --- a/arch/arm64/kvm/arch_timer.c
+>> +++ b/arch/arm64/kvm/arch_timer.c
+>> @@ -973,6 +973,39 @@ static int kvm_timer_dying_cpu(unsigned int cpu)
+>>  	return 0;
+>>  }
+>>  +static void kvm_irq_fixup_flags(unsigned int virq, u32 *flags)
+>> +{
+>> +	*flags = irq_get_trigger_type(virq);
+>> +	if (*flags != IRQF_TRIGGER_HIGH && *flags != IRQF_TRIGGER_LOW) {
+>> +		kvm_err("Invalid trigger for timer IRQ%d, assuming level low\n",
+>> +			virq);
+>> +		*flags = IRQF_TRIGGER_LOW;
+>> +	}
+>> +}
+>> +
+>> +static int kvm_irq_init(struct arch_timer_kvm_info *info)
+>> +{
+>> +	struct irq_domain *domain = NULL;
+>> +	struct fwnode_handle *fwnode;
+>> +	struct irq_data *data;
 > 
-> Hi Marc,
-> 
-> Some questions regarding how this is supposed to work.
-> 
-> On 5/10/21 2:48 PM, Marc Zyngier wrote:
-> > In order to deal with these systems that do not offer HW-based
-> > deactivation of interrupts, let implement a SW-based approach:
-> >
-> > - When the irq is queued into a LR, treat it as a pure virtual
-> >   interrupt and set the EOI flag in the LR.
-> >
-> > - When the interrupt state is read back from the LR, force a
-> >   deactivation when the state is invalid (neither active nor
-> >   pending)
-> >
-> > Interrupts requiring such treatment get the VGIC_SW_RESAMPLE flag.
-> >
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/vgic/vgic-v2.c | 19 +++++++++++++++----
-> >  arch/arm64/kvm/vgic/vgic-v3.c | 19 +++++++++++++++----
-> >  include/kvm/arm_vgic.h        | 10 ++++++++++
-> >  3 files changed, 40 insertions(+), 8 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/vgic/vgic-v2.c b/arch/arm64/kvm/vgic/vgic-v2.c
-> > index 11934c2af2f4..2c580204f1dc 100644
-> > --- a/arch/arm64/kvm/vgic/vgic-v2.c
-> > +++ b/arch/arm64/kvm/vgic/vgic-v2.c
-> > @@ -108,11 +108,22 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
-> >  		 * If this causes us to lower the level, we have to also clear
-> >  		 * the physical active state, since we will otherwise never be
-> >  		 * told when the interrupt becomes asserted again.
-> > +		 *
-> > +		 * Another case is when the interrupt requires a helping hand
-> > +		 * on deactivation (no HW deactivation, for example).
-> >  		 */
-> > -		if (vgic_irq_is_mapped_level(irq) && (val & GICH_LR_PENDING_BIT)) {
-> > -			irq->line_level = vgic_get_phys_line_level(irq);
-> > +		if (vgic_irq_is_mapped_level(irq)) {
-> > +			bool resample = false;
-> > +
-> > +			if (val & GICH_LR_PENDING_BIT) {
-> > +				irq->line_level = vgic_get_phys_line_level(irq);
-> > +				resample = !irq->line_level;
-> > +			} else if (vgic_irq_needs_resampling(irq) &&
-> > +				   !(irq->active || irq->pending_latch)) {
-> 
-> So this means that if the IRQ has the special flag, if it's not
-> pending in the LR or at the software level, and it's not active
-> either, then perform interrupt deactivation.
+> Shouldn't this belong to patch #8?
 
-Correct.
+Yup. Now moved.
 
-> I don't see where the state of the interrupt is checked again, am I
-> correct in assuming that we rely on the CPU interface to assert the
-> interrupt to the host while we run with interrupts enabled in the
-> run loop, and the handler for the interrupt will mark it pending for
-> kvm_vgic_sync_hw_state->vgic_vx_fold_lr_state?
+Thanks,
 
-See the vgic_get_phys_line_level() call. This is all about dealing
-with an interrupt that was made pending in the LR, that the guest
-didn't Ack, but instead decided to disable the timer.
-
-In this case, we need to clear the pending bit and deactivate the
-interrupt because nothing will perform the physical deactivation for
-us.
-
-What we add in the M1 case is that if the interrupt isn't pending
-anymore at the virtual level, we also need to deactivate it at the
-physical level, because there is no HW mechanism to enforce it.
-
-> 
-> > +				resample = true;
-> > +			}
-> >  
-> > -			if (!irq->line_level)
-> > +			if (resample)
-> 
-> This name, "resample", is confusing to me, quite possibly because
-> I'm not familiar with the irqchip subsystem. It was my impression
-> that "resample" means that at some point, the physical interrupt
-> state will be checked again, yet I don't see that happening anywhere
-> when VGIC_IRQ_SW_RESAMPLE is set. Am I mistaken in my assumptions?
-
-The resample is at the HW level. We forcefully tell the interrupt
-controller to deliver a pending interrupt (this is implemented as an
-unmask under the hood).
-
-	M.
-
+         M.
 -- 
-Without deviation from the norm, progress is not possible.
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
