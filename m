@@ -2,71 +2,62 @@ Return-Path: <SRS0=3L6A=KT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0731DC04FF3
-	for <kvmarm@archiver.kernel.org>; Mon, 24 May 2021 17:48:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9063CC04FF3
+	for <kvmarm@archiver.kernel.org>; Mon, 24 May 2021 18:11:41 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6DD9161403
-	for <kvmarm@archiver.kernel.org>; Mon, 24 May 2021 17:48:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DD9161403
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 0242861405
+	for <kvmarm@archiver.kernel.org>; Mon, 24 May 2021 18:11:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0242861405
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0EA4C4B156;
-	Mon, 24 May 2021 13:48:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 845EA4B11C;
+	Mon, 24 May 2021 14:11:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id sHdmeiHWeuRo; Mon, 24 May 2021 13:48:19 -0400 (EDT)
+	with ESMTP id 4bc96+hbBigl; Mon, 24 May 2021 14:11:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B1E94B14C;
-	Mon, 24 May 2021 13:48:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D85F4B119;
+	Mon, 24 May 2021 14:11:38 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 52C894B133
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 May 2021 13:48:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 654A74B119
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 May 2021 14:11:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VvqNVbCgneX9 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 24 May 2021 13:48:16 -0400 (EDT)
+ with ESMTP id sCb0-w14nvUC for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 24 May 2021 14:11:36 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5C3784B127
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 May 2021 13:48:16 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 69481613FC;
- Mon, 24 May 2021 17:48:15 +0000 (UTC)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
- TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1llEgX-003Ixg-Iu; Mon, 24 May 2021 18:48:13 +0100
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 06CD84B0D3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 May 2021 14:11:36 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 1DF8E61403;
+ Mon, 24 May 2021 18:11:31 +0000 (UTC)
+Date: Mon, 24 May 2021 19:11:29 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Steven Price <steven.price@arm.com>
+Subject: Re: [PATCH v12 7/8] KVM: arm64: ioctl to fetch/store tags in a guest
+Message-ID: <20210524181129.GI14645@arm.com>
+References: <20210517123239.8025-1-steven.price@arm.com>
+ <20210517123239.8025-8-steven.price@arm.com>
+ <20210520120556.GC12251@arm.com>
+ <dd5ab3a0-5a74-b145-2485-d6d871be945b@arm.com>
+ <20210520172713.GF12251@arm.com>
+ <5eec330f-63c0-2af8-70f8-ba9b643e2558@arm.com>
 MIME-Version: 1.0
-Date: Mon, 24 May 2021 18:48:13 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v3 7/9] KVM: arm64: timer: Refactor IRQ configuration
-In-Reply-To: <9f28e15b-26d0-5d3e-8f0e-8026ece536e0@huawei.com>
-References: <20210510134824.1910399-1-maz@kernel.org>
- <20210510134824.1910399-8-maz@kernel.org>
- <9f28e15b-26d0-5d3e-8f0e-8026ece536e0@huawei.com>
-User-Agent: Roundcube Webmail/1.4.11
-Message-ID: <fe39ba008d6bfad395e1b12b51f75681@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org,
- kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, kernel-team@android.com,
- marcan@marcan.st
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: Hector Martin <marcan@marcan.st>, kernel-team@android.com,
- kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+Content-Disposition: inline
+In-Reply-To: <5eec330f-63c0-2af8-70f8-ba9b643e2558@arm.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
+ Marc Zyngier <maz@kernel.org>, Juan Quintela <quintela@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
+ Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org,
+ Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
  kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -79,57 +70,150 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2021-05-14 13:46, Zenghui Yu wrote:
-> On 2021/5/10 21:48, Marc Zyngier wrote:
->> As we are about to add some more things to the timer IRQ
->> configuration, move this code out of the main timer init code
->> into its own set of functions.
->> 
->> No functional changes.
->> 
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> ---
->>  arch/arm64/kvm/arch_timer.c | 61 
->> ++++++++++++++++++++++---------------
->>  1 file changed, 37 insertions(+), 24 deletions(-)
->> 
->> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
->> index e2288b6bf435..7fa4f446456a 100644
->> --- a/arch/arm64/kvm/arch_timer.c
->> +++ b/arch/arm64/kvm/arch_timer.c
->> @@ -973,6 +973,39 @@ static int kvm_timer_dying_cpu(unsigned int cpu)
->>  	return 0;
->>  }
->>  +static void kvm_irq_fixup_flags(unsigned int virq, u32 *flags)
->> +{
->> +	*flags = irq_get_trigger_type(virq);
->> +	if (*flags != IRQF_TRIGGER_HIGH && *flags != IRQF_TRIGGER_LOW) {
->> +		kvm_err("Invalid trigger for timer IRQ%d, assuming level low\n",
->> +			virq);
->> +		*flags = IRQF_TRIGGER_LOW;
->> +	}
->> +}
->> +
->> +static int kvm_irq_init(struct arch_timer_kvm_info *info)
->> +{
->> +	struct irq_domain *domain = NULL;
->> +	struct fwnode_handle *fwnode;
->> +	struct irq_data *data;
+On Fri, May 21, 2021 at 10:42:09AM +0100, Steven Price wrote:
+> On 20/05/2021 18:27, Catalin Marinas wrote:
+> > On Thu, May 20, 2021 at 04:58:01PM +0100, Steven Price wrote:
+> >> On 20/05/2021 13:05, Catalin Marinas wrote:
+> >>> On Mon, May 17, 2021 at 01:32:38PM +0100, Steven Price wrote:
+> >>>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> >>>> index e89a5e275e25..4b6c83beb75d 100644
+> >>>> --- a/arch/arm64/kvm/arm.c
+> >>>> +++ b/arch/arm64/kvm/arm.c
+> >>>> @@ -1309,6 +1309,65 @@ static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
+> >>>>  	}
+> >>>>  }
+> >>>>  
+> >>>> +static int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+> >>>> +				      struct kvm_arm_copy_mte_tags *copy_tags)
+> >>>> +{
+> >>>> +	gpa_t guest_ipa = copy_tags->guest_ipa;
+> >>>> +	size_t length = copy_tags->length;
+> >>>> +	void __user *tags = copy_tags->addr;
+> >>>> +	gpa_t gfn;
+> >>>> +	bool write = !(copy_tags->flags & KVM_ARM_TAGS_FROM_GUEST);
+> >>>> +	int ret = 0;
+> >>>> +
+> >>>> +	if (copy_tags->reserved[0] || copy_tags->reserved[1])
+> >>>> +		return -EINVAL;
+> >>>> +
+> >>>> +	if (copy_tags->flags & ~KVM_ARM_TAGS_FROM_GUEST)
+> >>>> +		return -EINVAL;
+> >>>> +
+> >>>> +	if (length & ~PAGE_MASK || guest_ipa & ~PAGE_MASK)
+> >>>> +		return -EINVAL;
+> >>>> +
+> >>>> +	gfn = gpa_to_gfn(guest_ipa);
+> >>>> +
+> >>>> +	mutex_lock(&kvm->slots_lock);
+> >>>> +
+> >>>> +	while (length > 0) {
+> >>>> +		kvm_pfn_t pfn = gfn_to_pfn_prot(kvm, gfn, write, NULL);
+> >>>> +		void *maddr;
+> >>>> +		unsigned long num_tags = PAGE_SIZE / MTE_GRANULE_SIZE;
+> >>>> +
+> >>>> +		if (is_error_noslot_pfn(pfn)) {
+> >>>> +			ret = -EFAULT;
+> >>>> +			goto out;
+> >>>> +		}
+> >>>> +
+> >>>> +		maddr = page_address(pfn_to_page(pfn));
+> >>>> +
+> >>>> +		if (!write) {
+> >>>> +			num_tags = mte_copy_tags_to_user(tags, maddr, num_tags);
+> >>>> +			kvm_release_pfn_clean(pfn);
+> >>>
+> >>> Do we need to check if PG_mte_tagged is set? If the page was not faulted
+> >>> into the guest address space but the VMM has the page, does the
+> >>> gfn_to_pfn_prot() guarantee that a kvm_set_spte_gfn() was called? If
+> >>> not, this may read stale tags.
+> >>
+> >> Ah, I hadn't thought about that... No I don't believe gfn_to_pfn_prot()
+> >> will fault it into the guest.
+> > 
+> > It doesn't indeed. What it does is a get_user_pages() but it's not of
+> > much help since the VMM pte wouldn't be tagged (we would have solved
+> > lots of problems if we required PROT_MTE in the VMM...)
 > 
-> Shouldn't this belong to patch #8?
+> Sadly it solves some problems and creates others :(
 
-Yup. Now moved.
+I had some (random) thoughts on how to make things simpler, maybe. I
+think most of these races would have been solved if we required PROT_MTE
+in the VMM but this has an impact on the VMM if it wants to use MTE
+itself. If such requirement was in place, all KVM needed to do is check
+PG_mte_tagged.
 
-Thanks,
+So what we actually need is a set_pte_at() in the VMM to clear the tags
+and set PG_mte_tagged. Currently, we only do this if the memory type is
+tagged (PROT_MTE) but it's not strictly necessary.
 
-         M.
+As an optimisation for normal programs, we don't want to do this all the
+time but the visible behaviour wouldn't change (well, maybe for ptrace
+slightly). However, it doesn't mean we couldn't for a VMM, with an
+opt-in via prctl(). This would add a MMCF_MTE_TAG_INIT bit (couldn't
+think of a better name) to mm_context_t.flags and set_pte_at() would
+behave as if the pte was tagged without actually mapping the memory in
+user space as tagged (protection flags not changed). Pages that don't
+support tagging are still safe, just some unnecessary ignored tag
+writes. This would need to be set before the mmap() for the guest
+memory.
+
+If we want finer-grained control we'd have to store this information in
+the vma flags, in addition to VM_MTE (e.g. VM_MTE_TAG_INIT) but without
+affecting the actual memory type. The easiest would be another pte bit,
+though we are short on them. A more intrusive (not too bad) approach is
+to introduce a set_pte_at_vma() and read the flags directly in the arch
+code. In most places where set_pte_at() is called on a user mm, the vma
+is also available.
+
+Anyway, I'm not saying we go this route, just thinking out loud, get
+some opinions.
+
+> > Another thing I forgot to ask, what's guaranteeing that the page
+> > supports tags? Does this ioctl ensure that it would attempt the tag
+> > copying from some device mapping? Do we need some kvm_is_device_pfn()
+> > check? I guess ZONE_DEVICE memory we just refuse to map in an earlier
+> > patch.
+> 
+> Hmm, nothing much. While reads are now fine (the memory won't have
+> PG_mte_tagged), writes could potentially happen on ZONE_DEVICE memory.
+
+I don't think it's a problem for writes either as the host wouldn't map
+such memory as tagged. It's just that it returns zeros and writes are
+ignored, so we could instead return an error (I haven't checked your
+latest series yet).
+
+> >> 		} else {
+> >> 			num_tags = mte_copy_tags_from_user(maddr, tags,
+> >> 							MTE_GRANULES_PER_PAGE);
+> >> 			kvm_release_pfn_dirty(pfn);
+> >> 		}
+> >>
+> >> 		if (num_tags != MTE_GRANULES_PER_PAGE) {
+> >> 			ret = -EFAULT;
+> >> 			goto out;
+> >> 		}
+> >>
+> >> 		if (write)
+> >> 			test_and_set_bit(PG_mte_tagged, &page->flags);
+> > 
+> > I think a set_bit() would do, I doubt it's any more efficient. But why
+> 
+> I'd seen test_and_set_bit() used elsewhere (I forget where now) as a
+> slightly more efficient approach. It complies down to a READ_ONCE and a
+> conditional atomic, vs a single non-conditional atomic. But I don't have
+> any actual data on the performance and this isn't a hot path, so I'll
+> switch to the more obvious set_bit().
+
+Yeah, I think I've seen this as well. Anyway, it's probably lost in the
+noise of tag writing here.
+
 -- 
-Jazz is not dead. It just smells funny...
+Catalin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
