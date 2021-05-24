@@ -2,61 +2,105 @@ Return-Path: <SRS0=3L6A=KT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 930F6C04FF3
-	for <kvmarm@archiver.kernel.org>; Mon, 24 May 2021 10:55:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDF0BC04FF3
+	for <kvmarm@archiver.kernel.org>; Mon, 24 May 2021 12:15:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 14897610C7
-	for <kvmarm@archiver.kernel.org>; Mon, 24 May 2021 10:55:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14897610C7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 63C9C610C8
+	for <kvmarm@archiver.kernel.org>; Mon, 24 May 2021 12:15:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63C9C610C8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C46694B175;
-	Mon, 24 May 2021 06:45:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B2AE94B178;
+	Mon, 24 May 2021 08:15:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id wjHJdUU-Jzus; Mon, 24 May 2021 06:45:37 -0400 (EDT)
+	with ESMTP id rQFTiu860CJL; Mon, 24 May 2021 08:14:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6334C4B160;
-	Mon, 24 May 2021 06:45:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A15554B0EA;
+	Mon, 24 May 2021 08:14:59 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D43FB4B12F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 May 2021 06:45:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 901594B0EA
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 May 2021 08:14:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id s7mTghwz7btB for <kvmarm@lists.cs.columbia.edu>;
- Mon, 24 May 2021 06:45:35 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 904A64B128
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 May 2021 06:45:34 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4F6BA113E;
- Mon, 24 May 2021 03:45:34 -0700 (PDT)
-Received: from e112269-lin.arm.com (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 931563F719;
- Mon, 24 May 2021 03:45:31 -0700 (PDT)
-From: Steven Price <steven.price@arm.com>
-To: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>
-Subject: [PATCH v13 4/8] KVM: arm64: Introduce MTE VM feature
-Date: Mon, 24 May 2021 11:45:09 +0100
-Message-Id: <20210524104513.13258-5-steven.price@arm.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20210524104513.13258-1-steven.price@arm.com>
-References: <20210524104513.13258-1-steven.price@arm.com>
+ with ESMTP id XLW2pmTZOUyJ for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 24 May 2021 08:14:57 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 82DD84B0E3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 May 2021 08:14:57 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1621858497;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=6VKp1xofZhd/+4tFw02ffWXfwhEtsPe1dVI9fvTfESM=;
+ b=JiY7ZDWxMr8dtjKbS5Us40gqWc2IjcgupS8KRIayqY3FiwvefA2l7u2YVERLZSP0ri3sQq
+ Yghe/2nu0YRy2WH2H0CfaDBY3qEdy45J8RJkPbhM3GyS8FLsGBeR9BYCI6xYBJjV1sj3/R
+ DxUTGiLo1cjBMfqQ8oMfPkhphCOTlw8=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-365-qeZ-RUO2PHi9C6XyQ00oGg-1; Mon, 24 May 2021 08:14:55 -0400
+X-MC-Unique: qeZ-RUO2PHi9C6XyQ00oGg-1
+Received: by mail-ed1-f71.google.com with SMTP id
+ cn20-20020a0564020cb4b029038d0b0e183fso15502991edb.22
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 May 2021 05:14:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=6VKp1xofZhd/+4tFw02ffWXfwhEtsPe1dVI9fvTfESM=;
+ b=Fd1iU7WSpl4SM6HpSPVxAcuM3gsOjmLpz/c3Ut2UaFvxf7PYXEqa+LIR2//5qj2RaQ
+ 5mcHOj6n6OdQVUY1oRdgBsqylM4sV7uSFikMaZVftjISHX3RMNxTdlRrtMlfTsFHwmer
+ FiSLK8nVdvZp0/7vaf/5ENz0ys7gK7eJvpowJTliiheigQHh3776St+bZLSKlO8SiFb6
+ 8GvV3BsVd8jRRNYHNFwFZUJltJbRlr6+BznzCGTVEtT9utaD+yNeQeJg7hzB3LbpsBhv
+ 0CgdNOU6yKjo4C3s51imAOU6Ylzp1JC+098uUwWy9mjGb5BfcWWjDcIC3FLLN1fO9i+4
+ Lmwg==
+X-Gm-Message-State: AOAM532DTrz8Lz1j5O72JkEHOJg8/qjrJZ63QUGRniLAjtwJ3Sh0D77R
+ nTEKXUOGD02JKU7alp7/8GnhXTUP8zWVWOl/tPo6e7xqx/KOY84unt5jB9RsWnqmgc0Pr3oXKQ/
+ 9NAUwonSHVpaSluKL5Ag9ijUn
+X-Received: by 2002:a17:906:eb10:: with SMTP id
+ mb16mr23517149ejb.209.1621858494184; 
+ Mon, 24 May 2021 05:14:54 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxk+0l0weiOvjyF1AGyYnOo0VG6EnvzCZZGMcmr4Lu8V//fg+XmZ0li0ktd4Yb2OtYjlpR1Ug==
+X-Received: by 2002:a17:906:eb10:: with SMTP id
+ mb16mr23517131ejb.209.1621858494009; 
+ Mon, 24 May 2021 05:14:54 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
+ ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+ by smtp.gmail.com with ESMTPSA id v23sm9221937edx.31.2021.05.24.05.14.53
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 24 May 2021 05:14:53 -0700 (PDT)
+Subject: Re: [PATCH v2 0/5] KVM: selftests: arm64 exception handling and debug
+ test
+To: Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu
+References: <20210430232408.2707420-1-ricarkol@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <362e360d-40c3-1e50-18b0-a2f4297d3746@redhat.com>
+Date: Mon, 24 May 2021 14:14:52 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
- Dave Martin <Dave.Martin@arm.com>, Juan Quintela <quintela@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
- Steven Price <steven.price@arm.com>, Thomas Gleixner <tglx@linutronix.de>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20210430232408.2707420-1-ricarkol@google.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Cc: maz@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -68,191 +112,77 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add a new VM feature 'KVM_ARM_CAP_MTE' which enables memory tagging
-for a VM. This will expose the feature to the guest and automatically
-tag memory pages touched by the VM as PG_mte_tagged (and clear the tag
-storage) to ensure that the guest cannot see stale tags, and so that
-the tags are correctly saved/restored across swap.
+On 01/05/21 01:24, Ricardo Koller wrote:
+> Hi,
+> 
+> These patches add a debug exception test in aarch64 KVM selftests while
+> also adding basic exception handling support.
+> 
+> The structure of the exception handling is based on its x86 counterpart.
+> Tests use the same calls to initialize exception handling and both
+> architectures allow tests to override the handler for a particular
+> vector, or (vector, ec) for synchronous exceptions in the arm64 case.
+> 
+> The debug test is similar to x86_64/debug_regs, except that the x86 one
+> controls the debugging from outside the VM. This proposed arm64 test
+> controls and handles debug exceptions from the inside.
+> 
+> Thanks,
+> Ricardo
 
-Actually exposing the new capability to user space happens in a later
-patch.
+Marc, are you going to queue this in your tree?
 
-Signed-off-by: Steven Price <steven.price@arm.com>
----
- arch/arm64/include/asm/kvm_emulate.h |  3 ++
- arch/arm64/include/asm/kvm_host.h    |  3 ++
- arch/arm64/kvm/hyp/exception.c       |  3 +-
- arch/arm64/kvm/mmu.c                 | 48 +++++++++++++++++++++++++++-
- arch/arm64/kvm/sys_regs.c            |  7 ++++
- include/uapi/linux/kvm.h             |  1 +
- 6 files changed, 63 insertions(+), 2 deletions(-)
+Thanks,
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index f612c090f2e4..6bf776c2399c 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -84,6 +84,9 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
- 	if (cpus_have_const_cap(ARM64_MISMATCHED_CACHE_TYPE) ||
- 	    vcpu_el1_is_32bit(vcpu))
- 		vcpu->arch.hcr_el2 |= HCR_TID2;
-+
-+	if (kvm_has_mte(vcpu->kvm))
-+		vcpu->arch.hcr_el2 |= HCR_ATA;
- }
- 
- static inline unsigned long *vcpu_hcr(struct kvm_vcpu *vcpu)
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 7cd7d5c8c4bc..afaa5333f0e4 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -132,6 +132,8 @@ struct kvm_arch {
- 
- 	u8 pfr0_csv2;
- 	u8 pfr0_csv3;
-+	/* Memory Tagging Extension enabled for the guest */
-+	bool mte_enabled;
- };
- 
- struct kvm_vcpu_fault_info {
-@@ -769,6 +771,7 @@ bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
- #define kvm_arm_vcpu_sve_finalized(vcpu) \
- 	((vcpu)->arch.flags & KVM_ARM64_VCPU_SVE_FINALIZED)
- 
-+#define kvm_has_mte(kvm) (system_supports_mte() && (kvm)->arch.mte_enabled)
- #define kvm_vcpu_has_pmu(vcpu)					\
- 	(test_bit(KVM_ARM_VCPU_PMU_V3, (vcpu)->arch.features))
- 
-diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
-index 73629094f903..56426565600c 100644
---- a/arch/arm64/kvm/hyp/exception.c
-+++ b/arch/arm64/kvm/hyp/exception.c
-@@ -112,7 +112,8 @@ static void enter_exception64(struct kvm_vcpu *vcpu, unsigned long target_mode,
- 	new |= (old & PSR_C_BIT);
- 	new |= (old & PSR_V_BIT);
- 
--	// TODO: TCO (if/when ARMv8.5-MemTag is exposed to guests)
-+	if (kvm_has_mte(vcpu->kvm))
-+		new |= PSR_TCO_BIT;
- 
- 	new |= (old & PSR_DIT_BIT);
- 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index c5d1f3c87dbd..226035cf7d6c 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -822,6 +822,42 @@ transparent_hugepage_adjust(struct kvm_memory_slot *memslot,
- 	return PAGE_SIZE;
- }
- 
-+static int sanitise_mte_tags(struct kvm *kvm, kvm_pfn_t pfn,
-+			     unsigned long size)
-+{
-+	if (kvm_has_mte(kvm)) {
-+		/*
-+		 * The page will be mapped in stage 2 as Normal Cacheable, so
-+		 * the VM will be able to see the page's tags and therefore
-+		 * they must be initialised first. If PG_mte_tagged is set,
-+		 * tags have already been initialised.
-+		 * pfn_to_online_page() is used to reject ZONE_DEVICE pages
-+		 * that may not support tags.
-+		 */
-+		unsigned long i, nr_pages = size >> PAGE_SHIFT;
-+		struct page *page = pfn_to_online_page(pfn);
-+
-+		if (!page)
-+			return -EFAULT;
-+
-+		for (i = 0; i < nr_pages; i++, page++) {
-+			/*
-+			 * There is a potential (but very unlikely) race
-+			 * between two VMs which are sharing a physical page
-+			 * entering this at the same time. However by splitting
-+			 * the test/set the only risk is tags being overwritten
-+			 * by the mte_clear_page_tags() call.
-+			 */
-+			if (!test_bit(PG_mte_tagged, &page->flags)) {
-+				mte_clear_page_tags(page_address(page));
-+				set_bit(PG_mte_tagged, &page->flags);
-+			}
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 			  struct kvm_memory_slot *memslot, unsigned long hva,
- 			  unsigned long fault_status)
-@@ -971,8 +1007,13 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (writable)
- 		prot |= KVM_PGTABLE_PROT_W;
- 
--	if (fault_status != FSC_PERM && !device)
-+	if (fault_status != FSC_PERM && !device) {
-+		ret = sanitise_mte_tags(kvm, pfn, vma_pagesize);
-+		if (ret)
-+			goto out_unlock;
-+
- 		clean_dcache_guest_page(pfn, vma_pagesize);
-+	}
- 
- 	if (exec_fault) {
- 		prot |= KVM_PGTABLE_PROT_X;
-@@ -1168,12 +1209,17 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
- bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
- {
- 	kvm_pfn_t pfn = pte_pfn(range->pte);
-+	int ret;
- 
- 	if (!kvm->arch.mmu.pgt)
- 		return 0;
- 
- 	WARN_ON(range->end - range->start != 1);
- 
-+	ret = sanitise_mte_tags(kvm, pfn, PAGE_SIZE);
-+	if (ret)
-+		return false;
-+
- 	/*
- 	 * We've moved a page around, probably through CoW, so let's treat it
- 	 * just like a translation fault and clean the cache to the PoC.
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 76ea2800c33e..4a98902eaf1a 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1047,6 +1047,13 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
- 		break;
- 	case SYS_ID_AA64PFR1_EL1:
- 		val &= ~FEATURE(ID_AA64PFR1_MTE);
-+		if (kvm_has_mte(vcpu->kvm)) {
-+			u64 pfr, mte;
-+
-+			pfr = read_sanitised_ftr_reg(SYS_ID_AA64PFR1_EL1);
-+			mte = cpuid_feature_extract_unsigned_field(pfr, ID_AA64PFR1_MTE_SHIFT);
-+			val |= FIELD_PREP(FEATURE(ID_AA64PFR1_MTE), mte);
-+		}
- 		break;
- 	case SYS_ID_AA64ISAR1_EL1:
- 		if (!vcpu_has_ptrauth(vcpu))
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 3fd9a7e9d90c..8c95ba0fadda 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1082,6 +1082,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_SGX_ATTRIBUTE 196
- #define KVM_CAP_VM_COPY_ENC_CONTEXT_FROM 197
- #define KVM_CAP_PTP_KVM 198
-+#define KVM_CAP_ARM_MTE 199
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
--- 
-2.20.1
+Paolo
+
+> v1 -> v2:
+> 
+> Addressed comments from Andrew and Marc (thank you very much):
+> - rename vm_handle_exception in all tests.
+> - introduce UCALL_UNHANDLED in x86 first.
+> - move GUEST_ASSERT_EQ to common utils header.
+> - handle sync and other exceptions separately: use two tables (like
+>    kvm-unit-tests).
+> - add two separate functions for installing sync versus other exceptions
+> - changes in handlers.S: use the same layout as user_pt_regs, treat the
+>    EL1t vectors as invalid, refactor the vector table creation to not use
+>    manual numbering, add comments, remove LR from the stored registers.
+> - changes in debug-exceptions.c: remove unused headers, use the common
+>    GUEST_ASSERT_EQ, use vcpu_run instead of _vcpu_run.
+> - changes in processor.h: write_sysreg with support for xzr, replace EL1
+>    with current in macro names, define ESR_EC_MASK as ESR_EC_NUM-1.
+> 
+> Ricardo Koller (5):
+>    KVM: selftests: Rename vm_handle_exception
+>    KVM: selftests: Introduce UCALL_UNHANDLED for unhandled vector
+>      reporting
+>    KVM: selftests: Move GUEST_ASSERT_EQ to utils header
+>    KVM: selftests: Add exception handling support for aarch64
+>    KVM: selftests: Add aarch64/debug-exceptions test
+> 
+>   tools/testing/selftests/kvm/.gitignore        |   1 +
+>   tools/testing/selftests/kvm/Makefile          |   3 +-
+>   .../selftests/kvm/aarch64/debug-exceptions.c  | 244 ++++++++++++++++++
+>   .../selftests/kvm/include/aarch64/processor.h |  90 ++++++-
+>   .../testing/selftests/kvm/include/kvm_util.h  |  10 +
+>   .../selftests/kvm/include/x86_64/processor.h  |   4 +-
+>   .../selftests/kvm/lib/aarch64/handlers.S      | 130 ++++++++++
+>   .../selftests/kvm/lib/aarch64/processor.c     | 124 +++++++++
+>   .../selftests/kvm/lib/x86_64/processor.c      |  19 +-
+>   .../selftests/kvm/x86_64/kvm_pv_test.c        |   2 +-
+>   .../selftests/kvm/x86_64/tsc_msrs_test.c      |   9 -
+>   .../kvm/x86_64/userspace_msr_exit_test.c      |   8 +-
+>   .../selftests/kvm/x86_64/xapic_ipi_test.c     |   2 +-
+>   13 files changed, 611 insertions(+), 35 deletions(-)
+>   create mode 100644 tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+>   create mode 100644 tools/testing/selftests/kvm/lib/aarch64/handlers.S
+> 
 
 _______________________________________________
 kvmarm mailing list
