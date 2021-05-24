@@ -2,69 +2,77 @@ Return-Path: <SRS0=3L6A=KT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 477ACC04FF3
-	for <kvmarm@archiver.kernel.org>; Mon, 24 May 2021 17:08:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58313C04FF3
+	for <kvmarm@archiver.kernel.org>; Mon, 24 May 2021 17:18:09 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B59FD61411
-	for <kvmarm@archiver.kernel.org>; Mon, 24 May 2021 17:08:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B59FD61411
+	by mail.kernel.org (Postfix) with ESMTP id C0E326128D
+	for <kvmarm@archiver.kernel.org>; Mon, 24 May 2021 17:18:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0E326128D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F7CB4B139;
-	Mon, 24 May 2021 13:08:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 51E254B148;
+	Mon, 24 May 2021 13:18:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id xjuJk7GANKBC; Mon, 24 May 2021 13:08:08 -0400 (EDT)
+	with ESMTP id RGRgbqXaUusL; Mon, 24 May 2021 13:18:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 452FE4B13B;
-	Mon, 24 May 2021 13:08:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 947F94B14E;
+	Mon, 24 May 2021 13:18:06 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DC54C4B139
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 May 2021 13:08:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A15C4B147
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 May 2021 13:18:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MR5ozcmlskKq for <kvmarm@lists.cs.columbia.edu>;
- Mon, 24 May 2021 13:08:05 -0400 (EDT)
+ with ESMTP id xIw8qK6dQI4K for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 24 May 2021 13:18:04 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AEDF54B138
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 May 2021 13:08:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1B4034A483
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 May 2021 13:18:04 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 03D4B61404;
- Mon, 24 May 2021 17:08:04 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 54AD5610A6;
+ Mon, 24 May 2021 17:18:02 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=hot-poop.lan)
+ helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1llE3d-003IXQ-Us; Mon, 24 May 2021 18:08:02 +0100
+ id 1llEDI-003Ifj-8k; Mon, 24 May 2021 18:18:00 +0100
+Date: Mon, 24 May 2021 18:17:59 +0100
+Message-ID: <87cztgvyns.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v2] KVM: arm64: Prevent mixed-width VM creation
-Date: Mon, 24 May 2021 18:07:52 +0100
-Message-Id: <20210524170752.1549797-1-maz@kernel.org>
-X-Mailer: git-send-email 2.30.2
-MIME-Version: 1.0
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH v3 4/9] KVM: arm64: vgic: Let an interrupt controller
+ advertise lack of HW deactivation
+In-Reply-To: <417846b3-ff5e-1832-82b2-3e0064275944@arm.com>
+References: <20210510134824.1910399-1-maz@kernel.org>
+ <20210510134824.1910399-5-maz@kernel.org>
+ <417846b3-ff5e-1832-82b2-3e0064275944@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, mark.rutland@arm.com, james.morse@arm.com,
- suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com,
- steven.price@arm.com, stable@vger.kernel.org
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, james.morse@arm.com, suzuki.poulose@arm.com,
+ eric.auger@redhat.com, marcan@marcan.st, mark.rutland@arm.com,
+ kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kernel-team@android.com, stable@vger.kernel.org,
- Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org, Hector Martin <marcan@marcan.st>,
+ kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -81,91 +89,99 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-It looks like we have tolerated creating mixed-width VMs since...
-forever. However, that was never the intention, and we'd rather
-not have to support that pointless complexity.
+Hi Alex,
 
-Forbid such a setup by making sure all the vcpus have the same
-register width.
+On Fri, 21 May 2021 18:01:05 +0100,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> Hi Marc,
+> 
+> On 5/10/21 2:48 PM, Marc Zyngier wrote:
+> > The vGIC, as architected by ARM, allows a virtual interrupt to
+> > trigger the deactivation of a physical interrupt. This allows
+> > the following interrupt to be delivered without requiring an exit.
+> 
+> If I got this right, the AIC doesn't implement/ignores the
 
-Reported-by: Steven Price <steven.price@arm.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Cc: stable@vger.kernel.org
----
+s/AIC/M1 CPU/
 
-Notes:
-    v2: Fix missing check against ARM64_HAS_32BIT_EL1 (Mark)
+> ICH_LR_EL2.HW bit. Does it mean that the CPU IF behaves as if HW =
+> 0b0, meaning it asserts a maintenance interrupt on virtual interrupt
+> deactivation when ICH_LR_EL2.EOI = 0b1? I assume that's the case,
+> just double checking.
 
- arch/arm64/include/asm/kvm_emulate.h |  5 +++++
- arch/arm64/kvm/reset.c               | 28 ++++++++++++++++++++++++----
- 2 files changed, 29 insertions(+), 4 deletions(-)
+Yes, that's what it looks like.
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index f612c090f2e4..01b9857757f2 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -463,4 +463,9 @@ static __always_inline void kvm_incr_pc(struct kvm_vcpu *vcpu)
- 	vcpu->arch.flags |= KVM_ARM64_INCREMENT_PC;
- }
- 
-+static inline bool vcpu_has_feature(struct kvm_vcpu *vcpu, int feature)
-+{
-+	return test_bit(feature, vcpu->arch.features);
-+}
-+
- #endif /* __ARM64_KVM_EMULATE_H__ */
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index 956cdc240148..d37ebee085cf 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -166,6 +166,25 @@ static int kvm_vcpu_enable_ptrauth(struct kvm_vcpu *vcpu)
- 	return 0;
- }
- 
-+static bool vcpu_allowed_register_width(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_vcpu *tmp;
-+	bool is32bit;
-+	int i;
-+
-+	is32bit = vcpu_has_feature(vcpu, KVM_ARM_VCPU_EL1_32BIT);
-+	if (!cpus_have_const_cap(ARM64_HAS_32BIT_EL1) && is32bit)
-+		return false;
-+
-+	/* Check that the vcpus are either all 32bit or all 64bit */
-+	kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
-+		if (vcpu_has_feature(tmp, KVM_ARM_VCPU_EL1_32BIT) != is32bit)
-+			return false;
-+	}
-+
-+	return true;
-+}
-+
- /**
-  * kvm_reset_vcpu - sets core registers and sys_regs to reset value
-  * @vcpu: The VCPU pointer
-@@ -217,13 +236,14 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 		}
- 	}
- 
-+	if (!vcpu_allowed_register_width(vcpu)) {
-+		ret = -EINVAL;
-+		goto out;
-+	}
-+
- 	switch (vcpu->arch.target) {
- 	default:
- 		if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features)) {
--			if (!cpus_have_const_cap(ARM64_HAS_32BIT_EL1)) {
--				ret = -EINVAL;
--				goto out;
--			}
- 			pstate = VCPU_RESET_PSTATE_SVC;
- 		} else {
- 			pstate = VCPU_RESET_PSTATE_EL1;
+> I am wondering what would happen if we come across an interrupt
+> controller where the CPU IF cannot assert a maintenance interrupt at
+> all and we rely on the EOI bit to take us out of the guest to
+> deactivate the HW interrupt.
+
+That'd be broken, and we wouldn't be able to support such an
+implementation, at least not in configuration such as CPU isolation.
+
+> I have to say that it looks a bit strange to start relying on the
+> maintenance interrupt to emulate interrupt deactivate for hardware
+> interrupts, but at the same timer allowing an interrupt controller
+> without a maintenance interrupt.
+
+We are not allowing a vGIC without a maintenance interrupt. We are
+actively mandating it. The M1 does have a working per-CPU maintenance
+interrupt. It just isn't wired into an interrupt controller, which
+means we can't mask it. But it is otherwise perfectly functional.
+
+> Other than that, this idea sounds like the best thing to do
+> considering the circumstances, I certainly can't think of anything
+> better.
+> 
+> >
+> > However, some implementations have choosen not to implement this,
+> > meaning that we will need some unsavoury workarounds to deal with this.
+> >
+> > On detecting such a case, taint the kernel and spit a nastygram.
+> > We'll deal with this in later patches.
+> >
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/vgic/vgic-init.c       | 10 ++++++++++
+> >  include/kvm/arm_vgic.h                |  3 +++
+> >  include/linux/irqchip/arm-vgic-info.h |  2 ++
+> >  3 files changed, 15 insertions(+)
+> >
+> > diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+> > index 9fd23f32aa54..5b06a9970a57 100644
+> > --- a/arch/arm64/kvm/vgic/vgic-init.c
+> > +++ b/arch/arm64/kvm/vgic/vgic-init.c
+> > @@ -524,6 +524,16 @@ int kvm_vgic_hyp_init(void)
+> >  	if (!gic_kvm_info)
+> >  		return -ENODEV;
+> >  
+> > +	/*
+> > +	 * If we get one of these oddball non-GICs, taint the kernel,
+> > +	 * as we have no idea of how they *really* behave.
+> > +	 */
+> > +	if (gic_kvm_info->no_hw_deactivation) {
+> > +		kvm_info("Non-architectural vgic, tainting kernel\n");
+> > +		add_taint(TAINT_CPU_OUT_OF_SPEC, LOCKDEP_STILL_OK);
+> > +		kvm_vgic_global_state.no_hw_deactivation = true;
+> > +	}
+> 
+> IMO, since this means we're going to rely even more on the
+> maintenance interrupt (not just for software emulation of level
+> sensitive interrupts), I think there should be some sort of
+> dependency on having something that resembles a working maintenance
+> interrupt.
+
+But the timer interrupt is exactly a SW emulation of a level sensitive
+interrupt in this context. And the maintenance interrupt is still
+required to use the vGIC.
+
+Thanks,
+
+	M.
+
 -- 
-2.30.2
-
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
