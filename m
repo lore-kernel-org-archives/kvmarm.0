@@ -6,57 +6,56 @@ X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58313C04FF3
-	for <kvmarm@archiver.kernel.org>; Mon, 24 May 2021 17:18:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 265CDC04FF3
+	for <kvmarm@archiver.kernel.org>; Mon, 24 May 2021 17:43:43 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C0E326128D
-	for <kvmarm@archiver.kernel.org>; Mon, 24 May 2021 17:18:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0E326128D
+	by mail.kernel.org (Postfix) with ESMTP id 8D45661400
+	for <kvmarm@archiver.kernel.org>; Mon, 24 May 2021 17:43:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D45661400
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 51E254B148;
-	Mon, 24 May 2021 13:18:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B68A4B14C;
+	Mon, 24 May 2021 13:43:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id RGRgbqXaUusL; Mon, 24 May 2021 13:18:06 -0400 (EDT)
+	with ESMTP id SNzUxszJe6-w; Mon, 24 May 2021 13:43:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 947F94B14E;
-	Mon, 24 May 2021 13:18:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 613ED4B10B;
+	Mon, 24 May 2021 13:43:39 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A15C4B147
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 May 2021 13:18:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B6914B0EC
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 May 2021 13:43:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xIw8qK6dQI4K for <kvmarm@lists.cs.columbia.edu>;
- Mon, 24 May 2021 13:18:04 -0400 (EDT)
+ with ESMTP id rIWKfheKJsKA for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 24 May 2021 13:43:37 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1B4034A483
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 May 2021 13:18:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 15FF74B0E5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 May 2021 13:43:37 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 54AD5610A6;
- Mon, 24 May 2021 17:18:02 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 841AF601FC;
+ Mon, 24 May 2021 17:43:34 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1llEDI-003Ifj-8k; Mon, 24 May 2021 18:18:00 +0100
-Date: Mon, 24 May 2021 18:17:59 +0100
-Message-ID: <87cztgvyns.wl-maz@kernel.org>
+ id 1llEc0-003Ivb-EB; Mon, 24 May 2021 18:43:32 +0100
+Date: Mon, 24 May 2021 18:43:31 +0100
+Message-ID: <87bl90vxh8.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH v3 4/9] KVM: arm64: vgic: Let an interrupt controller
- advertise lack of HW deactivation
-In-Reply-To: <417846b3-ff5e-1832-82b2-3e0064275944@arm.com>
+Subject: Re: [PATCH v3 6/9] KVM: arm64: vgic: Implement SW-driven deactivation
+In-Reply-To: <fbd86687-b0cb-9979-b0a1-7e67efdd6b0a@arm.com>
 References: <20210510134824.1910399-1-maz@kernel.org>
- <20210510134824.1910399-5-maz@kernel.org>
- <417846b3-ff5e-1832-82b2-3e0064275944@arm.com>
+ <20210510134824.1910399-7-maz@kernel.org>
+ <fbd86687-b0cb-9979-b0a1-7e67efdd6b0a@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -89,94 +88,96 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Alex,
-
-On Fri, 21 May 2021 18:01:05 +0100,
+On Mon, 24 May 2021 17:53:04 +0100,
 Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
 > Hi Marc,
 > 
+> Some questions regarding how this is supposed to work.
+> 
 > On 5/10/21 2:48 PM, Marc Zyngier wrote:
-> > The vGIC, as architected by ARM, allows a virtual interrupt to
-> > trigger the deactivation of a physical interrupt. This allows
-> > the following interrupt to be delivered without requiring an exit.
-> 
-> If I got this right, the AIC doesn't implement/ignores the
-
-s/AIC/M1 CPU/
-
-> ICH_LR_EL2.HW bit. Does it mean that the CPU IF behaves as if HW =
-> 0b0, meaning it asserts a maintenance interrupt on virtual interrupt
-> deactivation when ICH_LR_EL2.EOI = 0b1? I assume that's the case,
-> just double checking.
-
-Yes, that's what it looks like.
-
-> I am wondering what would happen if we come across an interrupt
-> controller where the CPU IF cannot assert a maintenance interrupt at
-> all and we rely on the EOI bit to take us out of the guest to
-> deactivate the HW interrupt.
-
-That'd be broken, and we wouldn't be able to support such an
-implementation, at least not in configuration such as CPU isolation.
-
-> I have to say that it looks a bit strange to start relying on the
-> maintenance interrupt to emulate interrupt deactivate for hardware
-> interrupts, but at the same timer allowing an interrupt controller
-> without a maintenance interrupt.
-
-We are not allowing a vGIC without a maintenance interrupt. We are
-actively mandating it. The M1 does have a working per-CPU maintenance
-interrupt. It just isn't wired into an interrupt controller, which
-means we can't mask it. But it is otherwise perfectly functional.
-
-> Other than that, this idea sounds like the best thing to do
-> considering the circumstances, I certainly can't think of anything
-> better.
-> 
+> > In order to deal with these systems that do not offer HW-based
+> > deactivation of interrupts, let implement a SW-based approach:
 > >
-> > However, some implementations have choosen not to implement this,
-> > meaning that we will need some unsavoury workarounds to deal with this.
+> > - When the irq is queued into a LR, treat it as a pure virtual
+> >   interrupt and set the EOI flag in the LR.
 > >
-> > On detecting such a case, taint the kernel and spit a nastygram.
-> > We'll deal with this in later patches.
+> > - When the interrupt state is read back from the LR, force a
+> >   deactivation when the state is invalid (neither active nor
+> >   pending)
+> >
+> > Interrupts requiring such treatment get the VGIC_SW_RESAMPLE flag.
 > >
 > > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > > ---
-> >  arch/arm64/kvm/vgic/vgic-init.c       | 10 ++++++++++
-> >  include/kvm/arm_vgic.h                |  3 +++
-> >  include/linux/irqchip/arm-vgic-info.h |  2 ++
-> >  3 files changed, 15 insertions(+)
+> >  arch/arm64/kvm/vgic/vgic-v2.c | 19 +++++++++++++++----
+> >  arch/arm64/kvm/vgic/vgic-v3.c | 19 +++++++++++++++----
+> >  include/kvm/arm_vgic.h        | 10 ++++++++++
+> >  3 files changed, 40 insertions(+), 8 deletions(-)
 > >
-> > diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-> > index 9fd23f32aa54..5b06a9970a57 100644
-> > --- a/arch/arm64/kvm/vgic/vgic-init.c
-> > +++ b/arch/arm64/kvm/vgic/vgic-init.c
-> > @@ -524,6 +524,16 @@ int kvm_vgic_hyp_init(void)
-> >  	if (!gic_kvm_info)
-> >  		return -ENODEV;
-> >  
-> > +	/*
-> > +	 * If we get one of these oddball non-GICs, taint the kernel,
-> > +	 * as we have no idea of how they *really* behave.
-> > +	 */
-> > +	if (gic_kvm_info->no_hw_deactivation) {
-> > +		kvm_info("Non-architectural vgic, tainting kernel\n");
-> > +		add_taint(TAINT_CPU_OUT_OF_SPEC, LOCKDEP_STILL_OK);
-> > +		kvm_vgic_global_state.no_hw_deactivation = true;
-> > +	}
+> > diff --git a/arch/arm64/kvm/vgic/vgic-v2.c b/arch/arm64/kvm/vgic/vgic-v2.c
+> > index 11934c2af2f4..2c580204f1dc 100644
+> > --- a/arch/arm64/kvm/vgic/vgic-v2.c
+> > +++ b/arch/arm64/kvm/vgic/vgic-v2.c
+> > @@ -108,11 +108,22 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+> >  		 * If this causes us to lower the level, we have to also clear
+> >  		 * the physical active state, since we will otherwise never be
+> >  		 * told when the interrupt becomes asserted again.
+> > +		 *
+> > +		 * Another case is when the interrupt requires a helping hand
+> > +		 * on deactivation (no HW deactivation, for example).
+> >  		 */
+> > -		if (vgic_irq_is_mapped_level(irq) && (val & GICH_LR_PENDING_BIT)) {
+> > -			irq->line_level = vgic_get_phys_line_level(irq);
+> > +		if (vgic_irq_is_mapped_level(irq)) {
+> > +			bool resample = false;
+> > +
+> > +			if (val & GICH_LR_PENDING_BIT) {
+> > +				irq->line_level = vgic_get_phys_line_level(irq);
+> > +				resample = !irq->line_level;
+> > +			} else if (vgic_irq_needs_resampling(irq) &&
+> > +				   !(irq->active || irq->pending_latch)) {
 > 
-> IMO, since this means we're going to rely even more on the
-> maintenance interrupt (not just for software emulation of level
-> sensitive interrupts), I think there should be some sort of
-> dependency on having something that resembles a working maintenance
-> interrupt.
+> So this means that if the IRQ has the special flag, if it's not
+> pending in the LR or at the software level, and it's not active
+> either, then perform interrupt deactivation.
 
-But the timer interrupt is exactly a SW emulation of a level sensitive
-interrupt in this context. And the maintenance interrupt is still
-required to use the vGIC.
+Correct.
 
-Thanks,
+> I don't see where the state of the interrupt is checked again, am I
+> correct in assuming that we rely on the CPU interface to assert the
+> interrupt to the host while we run with interrupts enabled in the
+> run loop, and the handler for the interrupt will mark it pending for
+> kvm_vgic_sync_hw_state->vgic_vx_fold_lr_state?
+
+See the vgic_get_phys_line_level() call. This is all about dealing
+with an interrupt that was made pending in the LR, that the guest
+didn't Ack, but instead decided to disable the timer.
+
+In this case, we need to clear the pending bit and deactivate the
+interrupt because nothing will perform the physical deactivation for
+us.
+
+What we add in the M1 case is that if the interrupt isn't pending
+anymore at the virtual level, we also need to deactivate it at the
+physical level, because there is no HW mechanism to enforce it.
+
+> 
+> > +				resample = true;
+> > +			}
+> >  
+> > -			if (!irq->line_level)
+> > +			if (resample)
+> 
+> This name, "resample", is confusing to me, quite possibly because
+> I'm not familiar with the irqchip subsystem. It was my impression
+> that "resample" means that at some point, the physical interrupt
+> state will be checked again, yet I don't see that happening anywhere
+> when VGIC_IRQ_SW_RESAMPLE is set. Am I mistaken in my assumptions?
+
+The resample is at the HW level. We forcefully tell the interrupt
+controller to deliver a pending interrupt (this is implemented as an
+unmask under the hood).
 
 	M.
 
