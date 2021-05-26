@@ -2,93 +2,73 @@ Return-Path: <SRS0=AgFV=KV=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED0F0C47082
-	for <kvmarm@archiver.kernel.org>; Wed, 26 May 2021 08:32:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2B5FC47082
+	for <kvmarm@archiver.kernel.org>; Wed, 26 May 2021 08:45:05 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 63D5D61440
-	for <kvmarm@archiver.kernel.org>; Wed, 26 May 2021 08:32:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63D5D61440
+	by mail.kernel.org (Postfix) with ESMTP id 5961E613BC
+	for <kvmarm@archiver.kernel.org>; Wed, 26 May 2021 08:45:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5961E613BC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E0A854A4A3;
-	Wed, 26 May 2021 04:32:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C7E004A4A4;
+	Wed, 26 May 2021 04:45:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id q0-hg6xqjmYZ; Wed, 26 May 2021 04:32:08 -0400 (EDT)
+	with ESMTP id 8HYR+kYTYZcp; Wed, 26 May 2021 04:45:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B509C49FB0;
-	Wed, 26 May 2021 04:32:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A8AB4086C;
+	Wed, 26 May 2021 04:45:03 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D7CE549DE3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 May 2021 04:32:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 13A8D4086C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 May 2021 04:45:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 44XgqKdWDAuD for <kvmarm@lists.cs.columbia.edu>;
- Wed, 26 May 2021 04:32:05 -0400 (EDT)
+ with ESMTP id 2+12xu5HWpVj for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 26 May 2021 04:45:01 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B2DEF49D50
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 May 2021 04:32:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EB5A940825
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 May 2021 04:45:00 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id A8E6D61402;
- Wed, 26 May 2021 08:32:04 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 263BE613B5;
+ Wed, 26 May 2021 08:44:59 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1lloxO-003gbK-JB; Wed, 26 May 2021 09:32:02 +0100
-Date: Wed, 26 May 2021 09:32:01 +0100
-Message-ID: <871r9tx5dq.wl-maz@kernel.org>
+ id 1llp9t-003gjz-5k; Wed, 26 May 2021 09:44:57 +0100
+Date: Wed, 26 May 2021 09:44:56 +0100
+Message-ID: <87zgwhvq7r.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: Re: [PATCH v19 7/7] ptp: arm/arm64: Enable ptp_kvm for arm/arm64
-In-Reply-To: <CAMuHMdUBwcB-v0ugCPB3D6dbttiSbqQeHgNrr+r331ntRrfiAw@mail.gmail.com>
-References: <20210330145430.996981-1-maz@kernel.org>
- <20210330145430.996981-8-maz@kernel.org>
- <CAMuHMdWd5261ti-zKsroFLvWs0abaWa7G4DKefgPwFb3rEjnNw@mail.gmail.com>
- <6c522f8116f54fa6f23a2d217d966c5a@kernel.org>
- <CAMuHMdWzBqLVOVn_z8S2H-x-kL+DfOsM5mDb_D8OKsyRJtKpdA@mail.gmail.com>
- <8735u9x6sb.wl-maz@kernel.org>
- <CAMuHMdUBwcB-v0ugCPB3D6dbttiSbqQeHgNrr+r331ntRrfiAw@mail.gmail.com>
+To: Ricardo Koller <ricarkol@google.com>
+Subject: Re: [PATCH v2 5/5] KVM: arm64: selftests: get-reg-list: Split base
+ and pmu registers
+In-Reply-To: <YK1ZcqgyLFSDH14+@google.com>
+References: <20210519140726.892632-1-drjones@redhat.com>
+ <20210519140726.892632-6-drjones@redhat.com>
+ <YK1ZcqgyLFSDH14+@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: geert@linux-m68k.org, jianyong.wu@arm.com,
- netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
- tglx@linutronix.de, pbonzini@redhat.com, seanjc@google.com,
- richardcochran@gmail.com, Mark.Rutland@arm.com, will@kernel.org,
- suzuki.poulose@arm.com, Andre.Przywara@arm.com, steven.price@arm.com,
- lorenzo.pieralisi@arm.com, sudeep.holla@arm.com, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, Steve.Capper@arm.com, justin.he@arm.com,
- kernel-team@android.com
+X-SA-Exim-Rcpt-To: ricarkol@google.com, drjones@redhat.com, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, eric.auger@redhat.com, alexandru.elisei@arm.com,
+ pbonzini@redhat.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: KVM list <kvm@vger.kernel.org>, seanjc@google.com,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, justin.he@arm.com,
- Steven Price <steven.price@arm.com>,
- Android Kernel Team <kernel-team@android.com>,
- Andre Przywara <Andre.Przywara@arm.com>,
- Richard Cochran <richardcochran@gmail.com>, Yangbo Lu <yangbo.lu@nxp.com>,
- John Stultz <john.stultz@linaro.org>, Thomas Gleixner <tglx@linutronix.de>,
- Linux ARM <linux-arm-kernel@lists.infradead.org>,
- netdev <netdev@vger.kernel.org>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Sudeep Holla <sudeep.holla@arm.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -105,69 +85,62 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 26 May 2021 09:18:27 +0100,
-Geert Uytterhoeven <geert@linux-m68k.org> wrote:
+On Tue, 25 May 2021 21:09:22 +0100,
+Ricardo Koller <ricarkol@google.com> wrote:
 > 
-> Hi Marc,
+> On Wed, May 19, 2021 at 04:07:26PM +0200, Andrew Jones wrote:
+> > Since KVM commit 11663111cd49 ("KVM: arm64: Hide PMU registers from
+> > userspace when not available") the get-reg-list* tests have been
+> > failing with
+> > 
+> >   ...
+> >   ... There are 74 missing registers.
+> >   The following lines are missing registers:
+> >   ...
+> > 
+> > where the 74 missing registers are all PMU registers. This isn't a
+> > bug in KVM that the selftest found, even though it's true that a
+> > KVM userspace that wasn't setting the KVM_ARM_VCPU_PMU_V3 VCPU
+> > flag, but still expecting the PMU registers to be in the reg-list,
+> > would suddenly no longer have their expectations met. In that case,
+> > the expectations were wrong, though, so that KVM userspace needs to
+> > be fixed, and so does this selftest. The fix for this selftest is to
+> > pull the PMU registers out of the base register sublist into their
+> > own sublist and then create new, pmu-enabled vcpu configs which can
+> > be tested.
+> > 
+> > Signed-off-by: Andrew Jones <drjones@redhat.com>
+> > ---
+> >  .../selftests/kvm/aarch64/get-reg-list.c      | 46 +++++++++++++++----
+> >  1 file changed, 38 insertions(+), 8 deletions(-)
+> > 
+> > diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> > index dc06a28bfb74..78d8949bddbd 100644
+> > --- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> > +++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> > @@ -47,6 +47,7 @@ struct reg_sublist {
+> >  struct vcpu_config {
+> >  	const char *name;
+> >  	bool sve;
+> > +	bool pmu;
+> >  	struct reg_sublist sublists[];
+> >  };
 > 
-> On Wed, May 26, 2021 at 10:01 AM Marc Zyngier <maz@kernel.org> wrote:
-> > On Wed, 26 May 2021 08:52:42 +0100,
-> > Geert Uytterhoeven <geert@linux-m68k.org> wrote:
-> > > On Tue, May 11, 2021 at 11:13 AM Marc Zyngier <maz@kernel.org> wrote:
-> > > > On 2021-05-11 10:07, Geert Uytterhoeven wrote:
-> > > > > On Tue, Mar 30, 2021 at 4:56 PM Marc Zyngier <maz@kernel.org> wrote:
-> > > > >> From: Jianyong Wu <jianyong.wu@arm.com>
-> > > > >
-> > > > >> --- a/drivers/ptp/Kconfig
-> > > > >> +++ b/drivers/ptp/Kconfig
-> > > > >> @@ -108,7 +108,7 @@ config PTP_1588_CLOCK_PCH
-> > > > >>  config PTP_1588_CLOCK_KVM
-> > > > >>         tristate "KVM virtual PTP clock"
-> > > > >>         depends on PTP_1588_CLOCK
-> > > > >> -       depends on KVM_GUEST && X86
-> > > > >> +       depends on (KVM_GUEST && X86) || (HAVE_ARM_SMCCC_DISCOVERY &&
-> > > > >> ARM_ARCH_TIMER)
-> > > > >
-> > > > > Why does this not depend on KVM_GUEST on ARM?
-> > > > > I.e. shouldn't the dependency be:
-> > > > >
-> > > > >     KVM_GUEST && (X86 || (HAVE_ARM_SMCCC_DISCOVERY && ARM_ARCH_TIMER))
-> > > > >
-> > > > > ?
-> > > >
-> > > > arm/arm64 do not select KVM_GUEST. Any kernel can be used for a guest,
-> > > > and KVM/arm64 doesn't know about this configuration symbol.
-> > >
-> > > OK.
-> > >
-> > > Does PTP_1588_CLOCK_KVM need to default to yes?
-> > > Perhaps only on X86, to maintain the status quo?
-> >
-> > I think I don't really understand the problem you are trying to
-> > solve. Is it that 'make oldconfig' now asks you about this new driver?
-> > Why is that an issue?
-> 
-> My first "problem" was that it asked about this new driver on
-> arm/arm64, while I assumed there were some missing dependencies
-> (configuring a kernel should not ask useless questions).  That turned
-> out to be a wrong assumption, so there is no such problem here.
-> 
-> The second problem is "default y": code that is not critical should
-> not be enabled by default.  Hence my last question.
+> I think it's possible that the number of sublists keeps increasing: it
+> would be very nice/useful if KVM allowed enabling/disabling more
+> features from userspace (besides SVE, PMU etc).
 
-I think consistency between architectures is important. Certainly,
-distributions depend on that, and we otherwise end-up with distro
-kernels missing functionalities.
+[tangential semi-rant]
 
-The notion of "critical" is also pretty relative. defconfig contains a
-gazillion of things that are not critical to most people, for example,
-and yet misses a bunch of things that are needed to boot on some of my
-systems.
+While this is a very noble goal, it also doubles the validation space
+each time you add an option. Given how little testing gets done
+relative to the diversity of features and implementations, that's a
+*big* problem.
 
-That's just to say that I find it difficult to make that choice from
-the PoV of a kernel hacker. I'm personally more inclined to leave
-things enabled and let people *disable* things if they want to reduce
-the footprint of their kernel.
+I'm not against it for big ticket items that result in a substantial
+amount of state to be context-switched (SVE, NV). However, doing that
+for more discrete features would require a radical change in the way
+we develop, review and test KVM/arm64.
 
 Thanks,
 
