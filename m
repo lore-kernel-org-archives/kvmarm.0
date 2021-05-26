@@ -2,69 +2,79 @@ Return-Path: <SRS0=AgFV=KV=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C47CDC47088
-	for <kvmarm@archiver.kernel.org>; Wed, 26 May 2021 07:53:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 612B6C2B9F7
+	for <kvmarm@archiver.kernel.org>; Wed, 26 May 2021 08:01:50 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4B80961443
-	for <kvmarm@archiver.kernel.org>; Wed, 26 May 2021 07:53:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B80961443
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+	by mail.kernel.org (Postfix) with ESMTP id CC36961432
+	for <kvmarm@archiver.kernel.org>; Wed, 26 May 2021 08:01:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC36961432
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B173449E5F;
-	Wed, 26 May 2021 03:53:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 319304A4BE;
+	Wed, 26 May 2021 04:01:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id J3+4hv4zb7l3; Wed, 26 May 2021 03:52:58 -0400 (EDT)
+	with ESMTP id KsPLae959qIL; Wed, 26 May 2021 04:01:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E4FA640825;
-	Wed, 26 May 2021 03:52:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F301240877;
+	Wed, 26 May 2021 04:01:47 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4077B40825
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 May 2021 03:52:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4338E4086C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 May 2021 04:01:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3-tklRFq0Dj8 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 26 May 2021 03:52:54 -0400 (EDT)
-Received: from mail-ua1-f53.google.com (mail-ua1-f53.google.com
- [209.85.222.53])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9F17040799
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 May 2021 03:52:54 -0400 (EDT)
-Received: by mail-ua1-f53.google.com with SMTP id n61so285328uan.2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 May 2021 00:52:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=DF4Qym5vi5urmQVozT7x89feYVqRBLX860c1iUhsLiU=;
- b=Q1WwGUdprrISjJyI/0ZxolD8hFW0zZvf2x+pPl1RBVPibEdS3W1rKcQ2jxc8oLItrW
- vhzb7V7muFKROfaBbb5njFyHrZ29usblfo1SGM7fu313Kp6RaWZXBArlyQvg2BgHKKIp
- u4pwRLvJTyDlmC11a9qSx8m2hOeMyQZ2iT/KzNfOK/GMLE8Zv9cHQqfQumojg/E2cFEK
- g8j+wZPE5Md2xT/XxpOIBNZQah5t4sUOojIhPseE/UOC2x6Y9xnpzD6kFizP+NHui9bE
- fzrXS/9pTAMHWYLTV4O6kBJnUA0xU8ZWd0HQJapcXoLagBwvW7WyYhslp+nlO7vVOVEp
- 6ozA==
-X-Gm-Message-State: AOAM5302KCjo8dWZyHpa4CBDgl/Gr8nWXeWyBBs8nlkpYNa6e+EgMy4m
- FUv0LTifHpLmKL8RhLOlp5JJQcBN6rkC+F8vARY=
-X-Google-Smtp-Source: ABdhPJxZSU7OcT6+Xw6agQLX8qT6DqdHwFEcdKKd93N3mCPT/ubOM0JdG4oGvbsyUb2+YK1Dc2xb1IMQ8nAWxqjy1SU=
-X-Received: by 2002:a1f:9505:: with SMTP id x5mr26222492vkd.6.1622015574205;
- Wed, 26 May 2021 00:52:54 -0700 (PDT)
-MIME-Version: 1.0
+ with ESMTP id aM9xiohtfXJI for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 26 May 2021 04:01:46 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1EFF440808
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 May 2021 04:01:46 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 85A97613D3;
+ Wed, 26 May 2021 08:01:43 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1lloU1-003gEi-El; Wed, 26 May 2021 09:01:41 +0100
+Date: Wed, 26 May 2021 09:01:40 +0100
+Message-ID: <8735u9x6sb.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: Re: [PATCH v19 7/7] ptp: arm/arm64: Enable ptp_kvm for arm/arm64
+In-Reply-To: <CAMuHMdWzBqLVOVn_z8S2H-x-kL+DfOsM5mDb_D8OKsyRJtKpdA@mail.gmail.com>
 References: <20210330145430.996981-1-maz@kernel.org>
  <20210330145430.996981-8-maz@kernel.org>
  <CAMuHMdWd5261ti-zKsroFLvWs0abaWa7G4DKefgPwFb3rEjnNw@mail.gmail.com>
  <6c522f8116f54fa6f23a2d217d966c5a@kernel.org>
-In-Reply-To: <6c522f8116f54fa6f23a2d217d966c5a@kernel.org>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Wed, 26 May 2021 09:52:42 +0200
-Message-ID: <CAMuHMdWzBqLVOVn_z8S2H-x-kL+DfOsM5mDb_D8OKsyRJtKpdA@mail.gmail.com>
-Subject: Re: [PATCH v19 7/7] ptp: arm/arm64: Enable ptp_kvm for arm/arm64
-To: Marc Zyngier <maz@kernel.org>
+ <CAMuHMdWzBqLVOVn_z8S2H-x-kL+DfOsM5mDb_D8OKsyRJtKpdA@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: geert@linux-m68k.org, jianyong.wu@arm.com,
+ netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
+ tglx@linutronix.de, pbonzini@redhat.com, seanjc@google.com,
+ richardcochran@gmail.com, Mark.Rutland@arm.com, will@kernel.org,
+ suzuki.poulose@arm.com, Andre.Przywara@arm.com, steven.price@arm.com,
+ lorenzo.pieralisi@arm.com, sudeep.holla@arm.com, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, Steve.Capper@arm.com, justin.he@arm.com,
+ kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 Cc: KVM list <kvm@vger.kernel.org>, seanjc@google.com,
  Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
  Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, justin.he@arm.com,
@@ -93,67 +103,53 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+Hi Geert,
 
-On Tue, May 11, 2021 at 11:13 AM Marc Zyngier <maz@kernel.org> wrote:
-> On 2021-05-11 10:07, Geert Uytterhoeven wrote:
-> > On Tue, Mar 30, 2021 at 4:56 PM Marc Zyngier <maz@kernel.org> wrote:
-> >> From: Jianyong Wu <jianyong.wu@arm.com>
-> >>
-> >> Currently, there is no mechanism to keep time sync between guest and
-> >> host
-> >> in arm/arm64 virtualization environment. Time in guest will drift
-> >> compared
-> >> with host after boot up as they may both use third party time sources
-> >> to correct their time respectively. The time deviation will be in
-> >> order
-> >> of milliseconds. But in some scenarios,like in cloud environment, we
-> >> ask
-> >> for higher time precision.
-> >>
-> >> kvm ptp clock, which chooses the host clock source as a reference
-> >> clock to sync time between guest and host, has been adopted by x86
-> >> which takes the time sync order from milliseconds to nanoseconds.
-> >>
-> >> This patch enables kvm ptp clock for arm/arm64 and improves clock sync
-> >> precision
-> >> significantly.
+On Wed, 26 May 2021 08:52:42 +0100,
+Geert Uytterhoeven <geert@linux-m68k.org> wrote:
+> 
+> Hi Marc,
+> 
+> On Tue, May 11, 2021 at 11:13 AM Marc Zyngier <maz@kernel.org> wrote:
+> > On 2021-05-11 10:07, Geert Uytterhoeven wrote:
+> > > On Tue, Mar 30, 2021 at 4:56 PM Marc Zyngier <maz@kernel.org> wrote:
+> > >> From: Jianyong Wu <jianyong.wu@arm.com>
+> > >
+> > >> --- a/drivers/ptp/Kconfig
+> > >> +++ b/drivers/ptp/Kconfig
+> > >> @@ -108,7 +108,7 @@ config PTP_1588_CLOCK_PCH
+> > >>  config PTP_1588_CLOCK_KVM
+> > >>         tristate "KVM virtual PTP clock"
+> > >>         depends on PTP_1588_CLOCK
+> > >> -       depends on KVM_GUEST && X86
+> > >> +       depends on (KVM_GUEST && X86) || (HAVE_ARM_SMCCC_DISCOVERY &&
+> > >> ARM_ARCH_TIMER)
+> > >
+> > > Why does this not depend on KVM_GUEST on ARM?
+> > > I.e. shouldn't the dependency be:
+> > >
+> > >     KVM_GUEST && (X86 || (HAVE_ARM_SMCCC_DISCOVERY && ARM_ARCH_TIMER))
+> > >
+> > > ?
 > >
-> >> --- a/drivers/ptp/Kconfig
-> >> +++ b/drivers/ptp/Kconfig
-> >> @@ -108,7 +108,7 @@ config PTP_1588_CLOCK_PCH
-> >>  config PTP_1588_CLOCK_KVM
-> >>         tristate "KVM virtual PTP clock"
-> >>         depends on PTP_1588_CLOCK
-> >> -       depends on KVM_GUEST && X86
-> >> +       depends on (KVM_GUEST && X86) || (HAVE_ARM_SMCCC_DISCOVERY &&
-> >> ARM_ARCH_TIMER)
-> >
-> > Why does this not depend on KVM_GUEST on ARM?
-> > I.e. shouldn't the dependency be:
-> >
-> >     KVM_GUEST && (X86 || (HAVE_ARM_SMCCC_DISCOVERY && ARM_ARCH_TIMER))
-> >
-> > ?
->
-> arm/arm64 do not select KVM_GUEST. Any kernel can be used for a guest,
-> and KVM/arm64 doesn't know about this configuration symbol.
+> > arm/arm64 do not select KVM_GUEST. Any kernel can be used for a guest,
+> > and KVM/arm64 doesn't know about this configuration symbol.
+> 
+> OK.
+> 
+> Does PTP_1588_CLOCK_KVM need to default to yes?
+> Perhaps only on X86, to maintain the status quo?
 
-OK.
+I think I don't really understand the problem you are trying to
+solve. Is it that 'make oldconfig' now asks you about this new driver?
+Why is that an issue?
 
-Does PTP_1588_CLOCK_KVM need to default to yes?
-Perhaps only on X86, to maintain the status quo?
+Thanks,
 
-Gr{oetje,eeting}s,
-
-                        Geert
+	M.
 
 -- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
