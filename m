@@ -7,75 +7,74 @@ X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4C05C47089
-	for <kvmarm@archiver.kernel.org>; Thu, 27 May 2021 12:51:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0EA6C4708C
+	for <kvmarm@archiver.kernel.org>; Thu, 27 May 2021 12:51:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 63E206109F
-	for <kvmarm@archiver.kernel.org>; Thu, 27 May 2021 12:51:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63E206109F
+	by mail.kernel.org (Postfix) with ESMTP id 6AC23613D3
+	for <kvmarm@archiver.kernel.org>; Thu, 27 May 2021 12:51:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AC23613D3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1821A4A500;
-	Thu, 27 May 2021 08:51:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 202544A19E;
+	Thu, 27 May 2021 08:51:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id WISR-26Jloms; Thu, 27 May 2021 08:51:48 -0400 (EDT)
+	with ESMTP id 8yZNrqn23LnU; Thu, 27 May 2021 08:51:51 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D1E764A1A5;
-	Thu, 27 May 2021 08:51:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0AE154A4E1;
+	Thu, 27 May 2021 08:51:51 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E3C174AEDC
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 May 2021 08:51:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B83D1406AD
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 May 2021 08:51:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id myHlqC5EbOqa for <kvmarm@lists.cs.columbia.edu>;
- Thu, 27 May 2021 08:51:44 -0400 (EDT)
-Received: from mail-ed1-f74.google.com (mail-ed1-f74.google.com
- [209.85.208.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2BEEE49F6C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 May 2021 08:51:44 -0400 (EDT)
-Received: by mail-ed1-f74.google.com with SMTP id
- cy15-20020a0564021c8fb029038d26976787so291148edb.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 May 2021 05:51:44 -0700 (PDT)
+ with ESMTP id 3pdTUZ7tp264 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 27 May 2021 08:51:48 -0400 (EDT)
+Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com
+ [209.85.219.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AB1864079D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 May 2021 08:51:48 -0400 (EDT)
+Received: by mail-qv1-f74.google.com with SMTP id
+ b5-20020a0cc9850000b02901eece87073bso3821457qvk.21
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 May 2021 05:51:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=gi5cRmDtyloWJMITCIj/sPnhDqshqX/If7D8pZ+Fco8=;
- b=DMh/PwjeROpCuIsXL8vRKNGEi9sHS19ekOOPLJW/yYZpcAXKCDh4kFuF6iI/aU1kMl
- Gd3tI584HoLn+kctQ7quFOApvKA4kHemuJ26RXQjx3fbsek7WyRVBTy4z/hDTF8/7CEL
- zxQX0nPp35II7RVacLFWT/l/To+3fVcczDHqZzs1XFABFaNr9SgLwX30EBRUuUMGhiEz
- 5euHTt9w+mN6fCrPAsZ1YWV8quDogTUAATc6+C9p/KeVUkcsAtPRHini8QK1D0L79neA
- NUHURMi7p+5iRahsNBMDoS6FlUOqIo57NM1IYG8tkhwHWec9RAnj7z1x/hxWSkIx0PPp
- axhg==
+ :cc; bh=ehs1oQ+8oLxIXVrBNHuhZcAo+D2g9l++j8BZLV6gtTA=;
+ b=a+FtUAFPFyiW0uYlgwR0eSULr6xYa8BpYbZNF6URd1JNP9Jw9Hd23+lAYigwVkhKoW
+ lyFAkrD2tp/8dk2Rn0LshAJLDfuuF3tyfte6wErSyLZlahexM9sr15qTiMWbRy54SmxA
+ CXiqPJ+PxMN1vY+PA3Qkvfqu2y/7s+tGazebtbYsQ+NKZbUxq46OS/xDMwFrSHKhJI8N
+ Q50Hl2GkR08amV3wg4iJhrweLLG/4tHzM6TtJFHyR9LfjuSmNPtKWyKL4Ik1TCtRVESm
+ 4i4sOBb2IvH511qCVxCI/ubxHWCHIZCq9RxmfVeCzmQC4cK/P8RVV750oUvTNGoiuWHm
+ IDYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=gi5cRmDtyloWJMITCIj/sPnhDqshqX/If7D8pZ+Fco8=;
- b=UOOqyOLXIIWR002U6b1IxN7u7c2RfjHzmhdHxkNIjucLy0nYJv62cSQ90c5ikZEmZt
- IpXtPIry5UtX7y7c2j88tVCYnGbSROib6NSC7CRBuO/5q5glytfVB/w8qMYLyjiFWuGm
- r+XvK3/DC8lDmFl0sDDT8jyrA45vfknOH0YnWXSy8LXAUV7NakoqfzOb90ovFRr+4Glv
- blwS9tuYHGNvFgm6LdAJNnPy4JsZ2a6V1vMPWLh+vWJmlr6ZgbFUMmxETySrAYoZof8C
- 4LbRZE5mTaQWLCNW2rHAX8M00cPCqftocLTPxemu9plZgg+I0gv0tis7fOmjQINplc/O
- sf5Q==
-X-Gm-Message-State: AOAM530FsseEf3wPi2zJkIYxCxY1aw3pSCUVg0waeR+nS5C1yHLHjS9p
- X9qh7y7fga7urHZnGJurMJft6Eysa14D
-X-Google-Smtp-Source: ABdhPJwlv3mU0dZTO0kFr4Yy4f9wIZtT5gFLjr+4vvIMhKkBy7e5WNSw28epAMZVLsvaNdTluQlcqCDUf204
-X-Received: from r2d2-qp.c.googlers.com
- ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1652])
- (user=qperret job=sendgmr) by 2002:a17:907:770a:: with SMTP id
- kw10mr3675153ejc.213.1622119903222; Thu, 27 May 2021 05:51:43 -0700 (PDT)
-Date: Thu, 27 May 2021 12:51:30 +0000
+ bh=ehs1oQ+8oLxIXVrBNHuhZcAo+D2g9l++j8BZLV6gtTA=;
+ b=o1Qp5OB0FIfUoULJO/mufxmXnvf8rhOAtjVZj8jnHf48XP5towf9qSgCad6DW/1rr5
+ OBMqulXqtxV575L7RtswA7qX79qNnqg9nAwRYpCxcBmFIWYEZ/AFVdooknaFrLdY11zt
+ F9uUSDil/RCvq5CyO1B9s5atQoeUmoxEoLBouol/92pPvsbGIqO6JnuN8VGz1hxn0Mml
+ 6FARGI1NRJ8K0f/ggsZBkMF35zEUM4eqbBKvzxsenVl6ZgteyzKxcogDiItwDGMAvG98
+ PVX9e7TY3oPZUc3kf3OECed/3qpQhjFgGwzKG20JSeUsoOhdlJceSAicaVrnZLLAMGz6
+ 1yHw==
+X-Gm-Message-State: AOAM532g6qfZ7Wmu9ekWQz3xeH2ykuTElD+lSJ+tE+nlA7HJDZ4mmfGx
+ ehqT47IMJthTqRVU63a7LecRSkQz2kKv
+X-Google-Smtp-Source: ABdhPJyaKy4GEnKIJ/S5dR75Z6Sp8g/ueH5v6TANNcDxhzHPzuTTPn0wYyWBm/8d245iHVbNGmkmL9vYBxK9
+X-Received: from r2d2-qp.c.googlers.com ([fda3:e722:ac3:10:28:9cb1:c0a8:1652])
+ (user=qperret job=sendgmr) by 2002:a0c:9e4e:: with SMTP id
+ z14mr3459560qve.31.1622119907499; Thu, 27 May 2021 05:51:47 -0700 (PDT)
+Date: Thu, 27 May 2021 12:51:32 +0000
 In-Reply-To: <20210527125134.2116404-1-qperret@google.com>
-Message-Id: <20210527125134.2116404-4-qperret@google.com>
+Message-Id: <20210527125134.2116404-6-qperret@google.com>
 Mime-Version: 1.0
 References: <20210527125134.2116404-1-qperret@google.com>
 X-Mailer: git-send-email 2.31.1.818.g46aad6cb9e-goog
-Subject: [PATCH 3/7] KVM: arm64: Remove list_head from hyp_page
+Subject: [PATCH 5/7] KVM: arm64: Remove hyp_pool pointer from struct hyp_page
 From: Quentin Perret <qperret@google.com>
 To: maz@kernel.org, will@kernel.org, james.morse@arm.com, 
  alexandru.elisei@arm.com, catalin.marinas@arm.com, suzuki.poulose@arm.com
@@ -97,119 +96,148 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The list_head member of struct hyp_page is only needed when the page is
-attached to a free-list, which by definition implies the page is free.
-As such, nothing prevents us from using the page itself to store the
-list_head, hence reducing the size of the vmemmap.
+Each struct hyp_page currently contains a pointer to a hyp_pool struct
+where the page should be freed if its refcount reaches 0. However, this
+information can always be inferred from the context in the EL2 code, so
+drop the pointer to save a few bytes in the vmemmap.
 
 Signed-off-by: Quentin Perret <qperret@google.com>
 ---
- arch/arm64/kvm/hyp/include/nvhe/memory.h |  1 -
- arch/arm64/kvm/hyp/nvhe/page_alloc.c     | 39 ++++++++++++++++++++----
- 2 files changed, 33 insertions(+), 7 deletions(-)
+ arch/arm64/kvm/hyp/include/nvhe/gfp.h    |  4 ++--
+ arch/arm64/kvm/hyp/include/nvhe/memory.h |  2 --
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c    | 13 +++++++++++--
+ arch/arm64/kvm/hyp/nvhe/page_alloc.c     |  7 ++-----
+ arch/arm64/kvm/hyp/nvhe/setup.c          | 14 ++++++++++++--
+ 5 files changed, 27 insertions(+), 13 deletions(-)
 
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/gfp.h b/arch/arm64/kvm/hyp/include/nvhe/gfp.h
+index aada4d97de49..9ed374648364 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/gfp.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/gfp.h
+@@ -42,8 +42,8 @@ static inline void hyp_set_page_refcounted(struct hyp_page *p)
+ 
+ /* Allocation */
+ void *hyp_alloc_pages(struct hyp_pool *pool, unsigned int order);
+-void hyp_get_page(void *addr);
+-void hyp_put_page(void *addr);
++void hyp_get_page(void *addr, struct hyp_pool *pool);
++void hyp_put_page(void *addr, struct hyp_pool *pool);
+ 
+ /* Used pages cannot be freed */
+ int hyp_pool_init(struct hyp_pool *pool, u64 pfn, unsigned int nr_pages,
 diff --git a/arch/arm64/kvm/hyp/include/nvhe/memory.h b/arch/arm64/kvm/hyp/include/nvhe/memory.h
-index fd78bde939ee..7691ab495eb4 100644
+index 7691ab495eb4..991636be2f46 100644
 --- a/arch/arm64/kvm/hyp/include/nvhe/memory.h
 +++ b/arch/arm64/kvm/hyp/include/nvhe/memory.h
-@@ -12,7 +12,6 @@ struct hyp_page {
+@@ -7,11 +7,9 @@
+ 
+ #include <linux/types.h>
+ 
+-struct hyp_pool;
+ struct hyp_page {
  	unsigned int refcount;
  	unsigned int order;
- 	struct hyp_pool *pool;
--	struct list_head node;
+-	struct hyp_pool *pool;
  };
  
  extern u64 __hyp_vmemmap;
+diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+index fdd5b5702e8a..3603311eb41c 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
++++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+@@ -42,6 +42,15 @@ static void *host_s2_zalloc_page(void *pool)
+ {
+ 	return hyp_alloc_pages(pool, 0);
+ }
++static void host_s2_get_page(void *addr)
++{
++	hyp_get_page(addr, &host_s2_pool);
++}
++
++static void host_s2_put_page(void *addr)
++{
++	hyp_put_page(addr, &host_s2_pool);
++}
+ 
+ static int prepare_s2_pool(void *pgt_pool_base)
+ {
+@@ -60,8 +69,8 @@ static int prepare_s2_pool(void *pgt_pool_base)
+ 		.phys_to_virt = hyp_phys_to_virt,
+ 		.virt_to_phys = hyp_virt_to_phys,
+ 		.page_count = hyp_page_count,
+-		.get_page = hyp_get_page,
+-		.put_page = hyp_put_page,
++		.get_page = host_s2_get_page,
++		.put_page = host_s2_put_page,
+ 	};
+ 
+ 	return 0;
 diff --git a/arch/arm64/kvm/hyp/nvhe/page_alloc.c b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
-index 7ee882f36767..ce7379f1480b 100644
+index ce7379f1480b..e453108a2d95 100644
 --- a/arch/arm64/kvm/hyp/nvhe/page_alloc.c
 +++ b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
-@@ -62,6 +62,34 @@ static struct hyp_page *__find_buddy_avail(struct hyp_pool *pool,
- 
+@@ -150,20 +150,18 @@ static void __hyp_put_page(struct hyp_pool *pool, struct hyp_page *p)
+ 		__hyp_attach_page(pool, p);
  }
  
-+/*
-+ * Pages that are available for allocation are tracked in free-lists, so we use
-+ * the pages themselves to store the list nodes to avoid wasting space. As the
-+ * allocator always returns zeroed pages (which are zeroed on the hyp_put_page()
-+ * path to optimize allocation speed), we also need to clean-up the list node in
-+ * each page when we take it out of the list.
-+ */
-+static inline void page_remove_from_list(struct hyp_page *p)
-+{
-+	struct list_head *node = (struct list_head *)hyp_page_to_virt(p);
-+
-+	__list_del_entry(node);
-+	memset(node, 0, sizeof(*node));
-+}
-+
-+static inline void page_add_to_list(struct hyp_page *p, struct list_head *head)
-+{
-+	struct list_head *node = (struct list_head *)hyp_page_to_virt(p);
-+
-+	INIT_LIST_HEAD(node);
-+	list_add_tail(node, head);
-+}
-+
-+static inline struct hyp_page *node_to_page(struct list_head *node)
-+{
-+	return (struct hyp_page *)hyp_virt_to_page(node);
-+}
-+
- static void __hyp_attach_page(struct hyp_pool *pool,
- 			      struct hyp_page *p)
+-void hyp_put_page(void *addr)
++void hyp_put_page(void *addr, struct hyp_pool *pool)
  {
-@@ -83,14 +111,14 @@ static void __hyp_attach_page(struct hyp_pool *pool,
- 			break;
+ 	struct hyp_page *p = hyp_virt_to_page(addr);
+-	struct hyp_pool *pool = hyp_page_to_pool(p);
  
- 		/* Take the buddy out of its list, and coallesce with @p */
--		list_del_init(&buddy->node);
-+		page_remove_from_list(buddy);
- 		buddy->order = HYP_NO_ORDER;
- 		p = min(p, buddy);
- 	}
- 
- 	/* Mark the new head, and insert it */
- 	p->order = order;
--	list_add_tail(&p->node, &pool->free_area[order]);
-+	page_add_to_list(p, &pool->free_area[order]);
+ 	hyp_spin_lock(&pool->lock);
+ 	__hyp_put_page(pool, p);
+ 	hyp_spin_unlock(&pool->lock);
  }
  
- static struct hyp_page *__hyp_extract_page(struct hyp_pool *pool,
-@@ -99,7 +127,7 @@ static struct hyp_page *__hyp_extract_page(struct hyp_pool *pool,
+-void hyp_get_page(void *addr)
++void hyp_get_page(void *addr, struct hyp_pool *pool)
  {
- 	struct hyp_page *buddy;
+ 	struct hyp_page *p = hyp_virt_to_page(addr);
+-	struct hyp_pool *pool = hyp_page_to_pool(p);
  
--	list_del_init(&p->node);
-+	page_remove_from_list(p);
- 	while (p->order > order) {
- 		/*
- 		 * The buddy of order n - 1 currently has HYP_NO_ORDER as it
-@@ -110,7 +138,7 @@ static struct hyp_page *__hyp_extract_page(struct hyp_pool *pool,
- 		p->order--;
- 		buddy = __find_buddy_nocheck(pool, p, p->order);
- 		buddy->order = p->order;
--		list_add_tail(&buddy->node, &pool->free_area[buddy->order]);
-+		page_add_to_list(buddy, &pool->free_area[buddy->order]);
- 	}
- 
- 	return p;
-@@ -158,7 +186,7 @@ void *hyp_alloc_pages(struct hyp_pool *pool, unsigned int order)
- 	}
- 
- 	/* Extract it from the tree at the right order */
--	p = list_first_entry(&pool->free_area[i], struct hyp_page, node);
-+	p = node_to_page(pool->free_area[i].next);
- 	p = __hyp_extract_page(pool, p, order);
- 
- 	hyp_set_page_refcounted(p);
-@@ -186,7 +214,6 @@ int hyp_pool_init(struct hyp_pool *pool, u64 pfn, unsigned int nr_pages,
+ 	hyp_spin_lock(&pool->lock);
+ 	hyp_page_ref_inc(p);
+@@ -212,7 +210,6 @@ int hyp_pool_init(struct hyp_pool *pool, u64 pfn, unsigned int nr_pages,
+ 	/* Init the vmemmap portion */
+ 	p = hyp_phys_to_page(phys);
  	for (i = 0; i < nr_pages; i++) {
- 		p[i].pool = pool;
+-		p[i].pool = pool;
  		p[i].order = 0;
--		INIT_LIST_HEAD(&p[i].node);
  		hyp_set_page_refcounted(&p[i]);
  	}
+diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+index 709cb3d19eb7..bf61abd4a330 100644
+--- a/arch/arm64/kvm/hyp/nvhe/setup.c
++++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+@@ -137,6 +137,16 @@ static void *hyp_zalloc_hyp_page(void *arg)
+ 	return hyp_alloc_pages(&hpool, 0);
+ }
+ 
++static void hpool_get_page(void *addr)
++{
++	hyp_get_page(addr, &hpool);
++}
++
++static void hpool_put_page(void *addr)
++{
++	hyp_put_page(addr, &hpool);
++}
++
+ void __noreturn __pkvm_init_finalise(void)
+ {
+ 	struct kvm_host_data *host_data = this_cpu_ptr(&kvm_host_data);
+@@ -160,8 +170,8 @@ void __noreturn __pkvm_init_finalise(void)
+ 		.zalloc_page = hyp_zalloc_hyp_page,
+ 		.phys_to_virt = hyp_phys_to_virt,
+ 		.virt_to_phys = hyp_virt_to_phys,
+-		.get_page = hyp_get_page,
+-		.put_page = hyp_put_page,
++		.get_page = hpool_get_page,
++		.put_page = hpool_put_page,
+ 	};
+ 	pkvm_pgtable.mm_ops = &pkvm_pgtable_mm_ops;
  
 -- 
 2.31.1.818.g46aad6cb9e-goog
