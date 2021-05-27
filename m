@@ -2,85 +2,64 @@ Return-Path: <SRS0=LQ+R=KW=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2E66C4708B
-	for <kvmarm@archiver.kernel.org>; Thu, 27 May 2021 12:51:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B261BC4707F
+	for <kvmarm@archiver.kernel.org>; Thu, 27 May 2021 13:09:03 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A604C610A8
-	for <kvmarm@archiver.kernel.org>; Thu, 27 May 2021 12:51:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A604C610A8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 30EEC613AC
+	for <kvmarm@archiver.kernel.org>; Thu, 27 May 2021 13:09:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30EEC613AC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5858E4079D;
-	Thu, 27 May 2021 08:51:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id ABC62409DD;
+	Thu, 27 May 2021 09:09:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id EM8-d9vn0Dj4; Thu, 27 May 2021 08:51:57 -0400 (EDT)
+	with ESMTP id 3KvuCIG-mrlV; Thu, 27 May 2021 09:08:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E8B24A588;
-	Thu, 27 May 2021 08:51:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B32B249E50;
+	Thu, 27 May 2021 09:08:58 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1213E4079D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 May 2021 08:51:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 30C2740CF9
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 May 2021 09:08:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Ovjuu4Jvt13c for <kvmarm@lists.cs.columbia.edu>;
- Thu, 27 May 2021 08:51:55 -0400 (EDT)
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com
- [209.85.128.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3DB844A4E1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 May 2021 08:51:53 -0400 (EDT)
-Received: by mail-wm1-f74.google.com with SMTP id
- l185-20020a1c25c20000b029014b0624775eso1455044wml.6
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 May 2021 05:51:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=Byq3teaLV2n+YzpfRy9Lkrwtyz9tACaM8wDIjUMnhpc=;
- b=lh3itUSKrY99HR4eVX5Kbop9zhHjelSV5Tk0fWZiJ9sUfR4ERy+T5lGBjCz/duYdnl
- kGkbRalNQtA2P8Y0x9AuQts+PtFMMV4Twn9z5LBtYsCtzuOsQwApQ9msA6YyUSd0L9kr
- 9uo4im5pV2Vfxkb39c1oXswe8RHMs28B40q7MqOi3d5tWR8vdUH1kSgUwquRqY9ZHNYh
- DPiymqTjegRTcs/yRjGTDtnhWm70YHVyMrJdLewGX2zGwBjl7lV8+fHtPLOB5VBtFc23
- shccUlzY2zH/UCB6UeC1Jr/WQJf3uNRFlQ+E8cRqzchohQRyWGeILnf9albgfmXsYbY4
- 29Nw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=Byq3teaLV2n+YzpfRy9Lkrwtyz9tACaM8wDIjUMnhpc=;
- b=ISm7xIyszDVwOBVJ+/GuvQHX7teB70UKB8pUE6nCSqmoeUCAgL7UtE1vnpkqCwSJ8O
- 8zSfZR0eHDN9Rm8Cwl06gfN07qEQv5CrzIqXvZuQ32ta5szseoffLh4aTaPcyPWK6i9W
- /+Rfr+P0M2i7VF6z7MODFz1dIGBIx75lRwUm9NYnv1gRUsDjPr4WHF5SS/ecntTw0xUI
- L3kO7hHYaGvbqY0tSn3qgMkI02RPNQjz/fb0sbN2AsNdK7Ag43eq4+uOL4SZQhjZrEVk
- 02/bv1ib/8Gtd5MuHpWECaCnO/1YMmPv4tkchzfl5G8bGCpaxujMcoDHq44m0FZzlFC/
- 4RIA==
-X-Gm-Message-State: AOAM532CS5K8xYGeu4UEZ2qejCdZH0gScKjRQ/xGUe/0huomF0yvL+Ad
- mY6zOBiKbOgLayeccmpbSxzmt4uQoz10
-X-Google-Smtp-Source: ABdhPJx/lfTo0VRFwUG+jBpYqhQ9SqHdKxuCeQn/auIpBlo6JTHBRUm8dOoTIg4a0j6u0pDOtb1DO+Pb2vgH
-X-Received: from r2d2-qp.c.googlers.com
- ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1652])
- (user=qperret job=sendgmr) by 2002:a05:600c:3515:: with SMTP id
- h21mr8321374wmq.148.1622119912227; Thu, 27 May 2021 05:51:52 -0700 (PDT)
-Date: Thu, 27 May 2021 12:51:34 +0000
-In-Reply-To: <20210527125134.2116404-1-qperret@google.com>
-Message-Id: <20210527125134.2116404-8-qperret@google.com>
-Mime-Version: 1.0
-References: <20210527125134.2116404-1-qperret@google.com>
-X-Mailer: git-send-email 2.31.1.818.g46aad6cb9e-goog
-Subject: [PATCH 7/7] KVM: arm64: Use less bits for hyp_page refcount
-From: Quentin Perret <qperret@google.com>
-To: maz@kernel.org, will@kernel.org, james.morse@arm.com, 
- alexandru.elisei@arm.com, catalin.marinas@arm.com, suzuki.poulose@arm.com
-Cc: kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+ with ESMTP id mbis-+GT1nva for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 27 May 2021 09:08:55 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E092A409DD
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 May 2021 09:08:54 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 107246128B;
+ Thu, 27 May 2021 13:08:50 +0000 (UTC)
+Date: Thu, 27 May 2021 14:08:48 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Steven Price <steven.price@arm.com>
+Subject: Re: [PATCH v12 7/8] KVM: arm64: ioctl to fetch/store tags in a guest
+Message-ID: <20210527130848.GA8661@arm.com>
+References: <20210517123239.8025-1-steven.price@arm.com>
+ <20210517123239.8025-8-steven.price@arm.com>
+ <20210520120556.GC12251@arm.com>
+ <dd5ab3a0-5a74-b145-2485-d6d871be945b@arm.com>
+ <20210520172713.GF12251@arm.com>
+ <5eec330f-63c0-2af8-70f8-ba9b643e2558@arm.com>
+ <20210524181129.GI14645@arm.com>
+ <58345eca-6e5f-0faa-e47d-e9149d73f6c5@arm.com>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <58345eca-6e5f-0faa-e47d-e9149d73f6c5@arm.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
+ Marc Zyngier <maz@kernel.org>, Juan Quintela <quintela@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
+ Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org,
+ Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -97,48 +76,99 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The hyp_page refcount is currently encoded on 4 bytes even though we
-never need to count that many objects in a page. Make it 2 bytes to save
-some space in the vmemmap.
+On Thu, May 27, 2021 at 08:50:30AM +0100, Steven Price wrote:
+> On 24/05/2021 19:11, Catalin Marinas wrote:
+> > I had some (random) thoughts on how to make things simpler, maybe. I
+> > think most of these races would have been solved if we required PROT_MTE
+> > in the VMM but this has an impact on the VMM if it wants to use MTE
+> > itself. If such requirement was in place, all KVM needed to do is check
+> > PG_mte_tagged.
+> > 
+> > So what we actually need is a set_pte_at() in the VMM to clear the tags
+> > and set PG_mte_tagged. Currently, we only do this if the memory type is
+> > tagged (PROT_MTE) but it's not strictly necessary.
+> > 
+> > As an optimisation for normal programs, we don't want to do this all the
+> > time but the visible behaviour wouldn't change (well, maybe for ptrace
+> > slightly). However, it doesn't mean we couldn't for a VMM, with an
+> > opt-in via prctl(). This would add a MMCF_MTE_TAG_INIT bit (couldn't
+> > think of a better name) to mm_context_t.flags and set_pte_at() would
+> > behave as if the pte was tagged without actually mapping the memory in
+> > user space as tagged (protection flags not changed). Pages that don't
+> > support tagging are still safe, just some unnecessary ignored tag
+> > writes. This would need to be set before the mmap() for the guest
+> > memory.
+> > 
+> > If we want finer-grained control we'd have to store this information in
+> > the vma flags, in addition to VM_MTE (e.g. VM_MTE_TAG_INIT) but without
+> > affecting the actual memory type. The easiest would be another pte bit,
+> > though we are short on them. A more intrusive (not too bad) approach is
+> > to introduce a set_pte_at_vma() and read the flags directly in the arch
+> > code. In most places where set_pte_at() is called on a user mm, the vma
+> > is also available.
+> > 
+> > Anyway, I'm not saying we go this route, just thinking out loud, get
+> > some opinions.
+> 
+> Does get_user_pages() actually end up calling set_pte_at() normally?
 
-As overflows are more likely to happen as well, make sure to catch those
-with a BUG in the increment function.
+Not always, at least as how it's called from hva_to_pfn(). My reading of
+the get_user_page_fast_only() is that it doesn't touch the pte, just
+walks the page tables and pins the page. Of course, it expects a valid
+pte to have been set in the VMM already, otherwise it doesn't pin any
+page and the caller falls back to the slow path.
 
-Signed-off-by: Quentin Perret <qperret@google.com>
----
- arch/arm64/kvm/hyp/include/nvhe/gfp.h    | 2 ++
- arch/arm64/kvm/hyp/include/nvhe/memory.h | 2 +-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+The slow path, get_user_pages_unlocked(), passes FOLL_TOUCH and
+set_pte_at() will be called either in follow_pfn_pte() if it was valid
+or via faultin_page() -> handle_mm_fault().
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/gfp.h b/arch/arm64/kvm/hyp/include/nvhe/gfp.h
-index d420e5c0845f..a82f73faf41e 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/gfp.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/gfp.h
-@@ -24,6 +24,8 @@ struct hyp_pool {
- 
- static inline void hyp_page_ref_inc(struct hyp_page *p)
- {
-+	if (p->refcount == USHRT_MAX)
-+		BUG();
- 	p->refcount++;
- }
- 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/memory.h b/arch/arm64/kvm/hyp/include/nvhe/memory.h
-index 3fe34fa30ea4..592b7edb3edb 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/memory.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/memory.h
-@@ -8,7 +8,7 @@
- #include <linux/types.h>
- 
- struct hyp_page {
--	unsigned int refcount;
-+	unsigned short refcount;
- 	unsigned short order;
- };
- 
+> If not then on the normal user_mem_abort() route although we can
+> easily check VM_MTE_TAG_INIT there's no obvious place to hook in to
+> ensure that the pages actually allocated have the PG_mte_tagged flag.
+
+I don't think it helps if we checked such vma flag in user_mem_abort(),
+we'd still have the race with set_pte_at() on the page flags. What I was
+trying to avoid is touching the page flags in too many places, so
+deferring this always to set_pte_at() in the VMM.
+
+> I'm also not sure how well this would work with the MMU notifiers path
+> in KVM. With MMU notifiers (i.e. the VMM replacing a page in the
+> memslot) there's not even an obvious hook to enforce the VMA flag. So I
+> think we'd end up with something like the sanitise_mte_tags() function
+> to at least check that the PG_mte_tagged flag is set on the pages
+> (assuming that the trigger for the MMU notifier has done the
+> corresponding set_pte_at()). Admittedly this might close the current
+> race documented there.
+
+If we kept this check to the VMM set_pte_at(), I think we can ignore the
+notifiers.
+
+> It also feels wrong to me to tie this to a process with prctl(), it
+> seems much more normal to implement this as a new mprotect() flag as
+> this is really a memory property not a process property. And I think
+> we'll find some scary corner cases if we try to associate everything
+> back to a process - although I can't instantly think of anything that
+> will actually break.
+
+I agree, tying it to the process looks wrong, only that it's less
+intrusive. I don't think it would break anything, only potential
+performance regression. A process would still need to pass PROT_MTE to
+be able to get tag checking. That's basically what I had in an early MTE
+implementation with clear_user_page() always zeroing the tags.
+
+I agree with you that a vma flag would be better but it's more
+complicated without an additional pte bit. We could also miss some
+updates as mprotect() for example checks for pte_same() before calling
+set_pte_at() (it would need to check the updated vma flags).
+
+I'll review the latest series but I'm tempted to move the logic in
+santise_mte_tags() to mte.c and take the big lock in there if
+PG_mte_tagged is not already set. If we hit performance issues, we can
+optimise this later to have the page flag set already on creation (new
+PROT flag, prctl etc.).
+
 -- 
-2.31.1.818.g46aad6cb9e-goog
-
+Catalin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
