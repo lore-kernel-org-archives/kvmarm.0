@@ -2,78 +2,81 @@ Return-Path: <SRS0=K5Hb=K2=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 043E4C47082
-	for <kvmarm@archiver.kernel.org>; Mon, 31 May 2021 10:34:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F363C47080
+	for <kvmarm@archiver.kernel.org>; Mon, 31 May 2021 11:14:10 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8B4A36124B
-	for <kvmarm@archiver.kernel.org>; Mon, 31 May 2021 10:34:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B4A36124B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 6DD476135B
+	for <kvmarm@archiver.kernel.org>; Mon, 31 May 2021 11:14:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DD476135B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 36A16402DB;
-	Mon, 31 May 2021 06:34:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CA34C4018F;
+	Mon, 31 May 2021 07:14:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id neXVY-Ph6JrL; Mon, 31 May 2021 06:34:13 -0400 (EDT)
+	with ESMTP id 2yH7+CPYyzPy; Mon, 31 May 2021 07:14:07 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A4EC040825;
-	Mon, 31 May 2021 06:34:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A1AC04066E;
+	Mon, 31 May 2021 07:14:07 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5418A4075E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 May 2021 06:34:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0ED8F4018F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 May 2021 07:14:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2OEXzpb6WBoo for <kvmarm@lists.cs.columbia.edu>;
- Mon, 31 May 2021 06:34:12 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 196A3406DD
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 May 2021 06:34:12 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1622457251;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=0vWlpLeqe+h7IWNv7jE/nVWyaS5tVXhak42tjTLyHuE=;
- b=PwEJaKS9yRFGNcgmGNYR/BgK/Bfmz146ClFevM3PkNhuOvNSWmjM3h5lwILeVrddqcZsuX
- kn77O5Lvbo9sIrnrAhrze1DAvsO+ZJY73svDXX6bXDq8mRScJRkZVPDyQUHRnBEATVn7Id
- B5EKUVsppzEdvoMKNyF6zH7IrfgNjuk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-490-3qjLcSZ6NUWiwyF1jCpIrg-1; Mon, 31 May 2021 06:34:10 -0400
-X-MC-Unique: 3qjLcSZ6NUWiwyF1jCpIrg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9843A8005AD;
- Mon, 31 May 2021 10:34:09 +0000 (UTC)
-Received: from gator.redhat.com (unknown [10.40.195.13])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F28905D9CD;
- Mon, 31 May 2021 10:34:01 +0000 (UTC)
-From: Andrew Jones <drjones@redhat.com>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v3 5/5] KVM: arm64: selftests: get-reg-list: Split base and
- pmu registers
-Date: Mon, 31 May 2021 12:33:44 +0200
-Message-Id: <20210531103344.29325-6-drjones@redhat.com>
-In-Reply-To: <20210531103344.29325-1-drjones@redhat.com>
-References: <20210531103344.29325-1-drjones@redhat.com>
+ with ESMTP id iIyumPgkHasi for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 31 May 2021 07:14:04 -0400 (EDT)
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com
+ [209.85.218.54])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 970D2400D5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 May 2021 07:14:04 -0400 (EDT)
+Received: by mail-ej1-f54.google.com with SMTP id gb17so16104386ejc.8
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 May 2021 04:14:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:from:date:message-id:subject:to:cc;
+ bh=mHC6kg9c+4sLUzLIkVSoHdH42qTJPJ/8ZqONWvVOQN0=;
+ b=z5yUUnRi/TBcBsaMjZNTifZJV+AgaBYq/soAnh2Q+oWuOqvte2/H1j8bHIPvOwehUe
+ N89aOoo8EKBS9/WZJA+TQX0PKiFDQ1M7ybnP9ldNHmI0/ULlMWcCYNK9iEJoM9VshWbm
+ GqpzSW7IcyFDTz2I84DP2du0oEeVXS1/4NUFsJHIQUvf4hp/lvO4NxXL87feLUQUNPiN
+ KWev3s7XH9NfUXJp9YdTqV5VJXUz7ioI1sYZhiCi251lfqz6OO9rQqb31aWvwBWe/3M3
+ ANgwsSWIsbJQdyr1q5LyJsgd7Am1fkhoGaW3C5+JCWZoGkGOhQApT+awZh1YXHFDgNGx
+ YQlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+ bh=mHC6kg9c+4sLUzLIkVSoHdH42qTJPJ/8ZqONWvVOQN0=;
+ b=B4ZXVB4KiXeA8ss9c8o+ZIOiAC9BLDHyIcvCJSX9G6fJMawJuLRE2T0+hWV8zsK7J4
+ ipEHiXRpYbdKM+hirK0KlG8ZcKKPIHKI5JOhz1hR8Ca5EqqYEaQbYB8UZ7eXrihTE6UV
+ 5+gjClsvku4/TWUOmBsBC2R4ae7N3t+a5o4Q0jp3yyMsWy1/Lx5qZFCTgYb/1t1zgLfj
+ b+T4tv8K8f5pJOhL2MB/ds3Uz/xP7NUO0u8oJ3i1yta/lt2c7tS7CfuELo96MmvdIzgS
+ Ji5MI5zKiej07D2krERjwetG0csHimrfPFODa9qlu5+pZ7GqZLbNrQDhfkLg9eXJCAQq
+ CbCw==
+X-Gm-Message-State: AOAM533/bDTZXPn3Zxufa3NXT1l8L1WqKe/fctI1bZpcSZctveHT+FMB
+ XdpLPLX0978Kyk9j9AJ8+a4Ud+XtozEyMA4zsDtQPg==
+X-Google-Smtp-Source: ABdhPJzXk8Lt3DpQOUGgad2UrC1f81NDzrAdSNkKHcfoTv1hmTY1uZJWL0xTaw63yS+39qpClAeAWEe88VN/O4pp3F8=
+X-Received: by 2002:a17:906:8318:: with SMTP id
+ j24mr3744182ejx.375.1622459643368; 
+ Mon, 31 May 2021 04:14:03 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Cc: maz@kernel.org, pbonzini@redhat.com
+From: Naresh Kamboju <naresh.kamboju@linaro.org>
+Date: Mon, 31 May 2021 16:43:52 +0530
+Message-ID: <CA+G9fYtwjDoDr=hrSGLg4x5pv3Kq-MbCTzohy3=yLLN7P-Czqw@mail.gmail.com>
+Subject: [stable-rc] 5.12 arch/arm64/kvm/arm.c:722:8: error: use of undeclared
+ label 'out'
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Sasha Levin <sashal@kernel.org>, linux-stable <stable@vger.kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, open list <linux-kernel@vger.kernel.org>,
+ lkft-triage@lists.linaro.org, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,136 +93,46 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Since KVM commit 11663111cd49 ("KVM: arm64: Hide PMU registers from
-userspace when not available") the get-reg-list* tests have been
-failing with
+The Linux stable-rc 5.12 arm64 builds failed due to these warnings / errors.
 
-  ...
-  ... There are 74 missing registers.
-  The following lines are missing registers:
-  ...
+make --silent --keep-going --jobs=8
+O=/home/tuxbuild/.cache/tuxmake/builds/current ARCH=arm64
+CROSS_COMPILE=aarch64-linux-gnu- 'HOSTCC=sccache clang' 'CC=sccache
+clang'
+arch/arm64/kvm/arm.c:722:8: error: use of undeclared label 'out'
+                goto out;
+                     ^
+arch/arm64/kvm/arm.c:918:1: warning: unused label 'out' [-Wunused-label]
+out:
+^~~~
+1 warning and 1 error generated.
 
-where the 74 missing registers are all PMU registers. This isn't a
-bug in KVM that the selftest found, even though it's true that a
-KVM userspace that wasn't setting the KVM_ARM_VCPU_PMU_V3 VCPU
-flag, but still expecting the PMU registers to be in the reg-list,
-would suddenly no longer have their expectations met. In that case,
-the expectations were wrong, though, so that KVM userspace needs to
-be fixed, and so does this selftest. The fix for this selftest is to
-pull the PMU registers out of the base register sublist into their
-own sublist and then create new, pmu-enabled vcpu configs which can
-be tested.
+Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- .../selftests/kvm/aarch64/get-reg-list.c      | 39 +++++++++++++++----
- 1 file changed, 31 insertions(+), 8 deletions(-)
+step to reproduce:
+------------------------
 
-diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-index b46b8a1fdc0c..a16c8f05366c 100644
---- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-+++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-@@ -637,7 +637,7 @@ int main(int ac, char **av)
-  * The current blessed list was primed with the output of kernel version
-  * v4.15 with --core-reg-fixup and then later updated with new registers.
-  *
-- * The blessed list is up to date with kernel version v5.10-rc5
-+ * The blessed list is up to date with kernel version v5.13-rc3
-  */
- static __u64 base_regs[] = {
- 	KVM_REG_ARM64 | KVM_REG_SIZE_U64 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(regs.regs[0]),
-@@ -829,8 +829,6 @@ static __u64 base_regs[] = {
- 	ARM64_SYS_REG(3, 0, 5, 2, 0),	/* ESR_EL1 */
- 	ARM64_SYS_REG(3, 0, 6, 0, 0),	/* FAR_EL1 */
- 	ARM64_SYS_REG(3, 0, 7, 4, 0),	/* PAR_EL1 */
--	ARM64_SYS_REG(3, 0, 9, 14, 1),	/* PMINTENSET_EL1 */
--	ARM64_SYS_REG(3, 0, 9, 14, 2),	/* PMINTENCLR_EL1 */
- 	ARM64_SYS_REG(3, 0, 10, 2, 0),	/* MAIR_EL1 */
- 	ARM64_SYS_REG(3, 0, 10, 3, 0),	/* AMAIR_EL1 */
- 	ARM64_SYS_REG(3, 0, 12, 0, 0),	/* VBAR_EL1 */
-@@ -839,6 +837,16 @@ static __u64 base_regs[] = {
- 	ARM64_SYS_REG(3, 0, 13, 0, 4),	/* TPIDR_EL1 */
- 	ARM64_SYS_REG(3, 0, 14, 1, 0),	/* CNTKCTL_EL1 */
- 	ARM64_SYS_REG(3, 2, 0, 0, 0),	/* CSSELR_EL1 */
-+	ARM64_SYS_REG(3, 3, 13, 0, 2),	/* TPIDR_EL0 */
-+	ARM64_SYS_REG(3, 3, 13, 0, 3),	/* TPIDRRO_EL0 */
-+	ARM64_SYS_REG(3, 4, 3, 0, 0),	/* DACR32_EL2 */
-+	ARM64_SYS_REG(3, 4, 5, 0, 1),	/* IFSR32_EL2 */
-+	ARM64_SYS_REG(3, 4, 5, 3, 0),	/* FPEXC32_EL2 */
-+};
-+
-+static __u64 pmu_regs[] = {
-+	ARM64_SYS_REG(3, 0, 9, 14, 1),	/* PMINTENSET_EL1 */
-+	ARM64_SYS_REG(3, 0, 9, 14, 2),	/* PMINTENCLR_EL1 */
- 	ARM64_SYS_REG(3, 3, 9, 12, 0),	/* PMCR_EL0 */
- 	ARM64_SYS_REG(3, 3, 9, 12, 1),	/* PMCNTENSET_EL0 */
- 	ARM64_SYS_REG(3, 3, 9, 12, 2),	/* PMCNTENCLR_EL0 */
-@@ -848,8 +856,6 @@ static __u64 base_regs[] = {
- 	ARM64_SYS_REG(3, 3, 9, 13, 0),	/* PMCCNTR_EL0 */
- 	ARM64_SYS_REG(3, 3, 9, 14, 0),	/* PMUSERENR_EL0 */
- 	ARM64_SYS_REG(3, 3, 9, 14, 3),	/* PMOVSSET_EL0 */
--	ARM64_SYS_REG(3, 3, 13, 0, 2),	/* TPIDR_EL0 */
--	ARM64_SYS_REG(3, 3, 13, 0, 3),	/* TPIDRRO_EL0 */
- 	ARM64_SYS_REG(3, 3, 14, 8, 0),
- 	ARM64_SYS_REG(3, 3, 14, 8, 1),
- 	ARM64_SYS_REG(3, 3, 14, 8, 2),
-@@ -913,9 +919,6 @@ static __u64 base_regs[] = {
- 	ARM64_SYS_REG(3, 3, 14, 15, 5),
- 	ARM64_SYS_REG(3, 3, 14, 15, 6),
- 	ARM64_SYS_REG(3, 3, 14, 15, 7),	/* PMCCFILTR_EL0 */
--	ARM64_SYS_REG(3, 4, 3, 0, 0),	/* DACR32_EL2 */
--	ARM64_SYS_REG(3, 4, 5, 0, 1),	/* IFSR32_EL2 */
--	ARM64_SYS_REG(3, 4, 5, 3, 0),	/* FPEXC32_EL2 */
- };
- 
- static __u64 vregs[] = {
-@@ -1015,6 +1018,8 @@ static __u64 sve_rejects_set[] = {
- 	{ "base", .regs = base_regs, .regs_n = ARRAY_SIZE(base_regs), }
- #define VREGS_SUBLIST \
- 	{ "vregs", .regs = vregs, .regs_n = ARRAY_SIZE(vregs), }
-+#define PMU_SUBLIST \
-+	{ "pmu", .regs = pmu_regs, .regs_n = ARRAY_SIZE(pmu_regs), }
- #define SVE_SUBLIST \
- 	{ "sve", .capability = KVM_CAP_ARM_SVE, .feature = KVM_ARM_VCPU_SVE, .finalize = true, \
- 	  .regs = sve_regs, .regs_n = ARRAY_SIZE(sve_regs), \
-@@ -1027,6 +1032,14 @@ static struct vcpu_config vregs_config = {
- 	{0},
- 	},
- };
-+static struct vcpu_config vregs_pmu_config = {
-+	.sublists = {
-+	BASE_SUBLIST,
-+	VREGS_SUBLIST,
-+	PMU_SUBLIST,
-+	{0},
-+	},
-+};
- static struct vcpu_config sve_config = {
- 	.sublists = {
- 	BASE_SUBLIST,
-@@ -1034,9 +1047,19 @@ static struct vcpu_config sve_config = {
- 	{0},
- 	},
- };
-+static struct vcpu_config sve_pmu_config = {
-+	.sublists = {
-+	BASE_SUBLIST,
-+	SVE_SUBLIST,
-+	PMU_SUBLIST,
-+	{0},
-+	},
-+};
- 
- static struct vcpu_config *vcpu_configs[] = {
- 	&vregs_config,
-+	&vregs_pmu_config,
- 	&sve_config,
-+	&sve_pmu_config,
- };
- static int vcpu_configs_n = ARRAY_SIZE(vcpu_configs);
--- 
-2.31.1
+# TuxMake is a command line tool and Python library that provides
+# portable and repeatable Linux kernel builds across a variety of
+# architectures, toolchains, kernel configurations, and make targets.
+#
+# TuxMake supports the concept of runtimes.
+# See https://docs.tuxmake.org/runtimes/, for that to work it requires
+# that you install podman or docker on your system.
+#
+# To install tuxmake on your system globally:
+# sudo pip3 install -U tuxmake
+#
+# See https://docs.tuxmake.org/ for complete documentation.
 
+
+tuxmake --runtime podman --target-arch arm64 --toolchain gcc-9
+--kconfig defconfig --kconfig-add
+https://builds.tuxbuild.com/1tILLnkg7Rqf4tsdhjS3VoZDrdk/config
+
+--
+Linaro LKFT
+https://lkft.linaro.org
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
