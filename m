@@ -2,70 +2,69 @@ Return-Path: <SRS0=w8eh=K3=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C17FC47080
-	for <kvmarm@archiver.kernel.org>; Tue,  1 Jun 2021 10:40:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59119C47080
+	for <kvmarm@archiver.kernel.org>; Tue,  1 Jun 2021 11:08:00 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 11A05613A9
-	for <kvmarm@archiver.kernel.org>; Tue,  1 Jun 2021 10:40:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11A05613A9
+	by mail.kernel.org (Postfix) with ESMTP id AF496613B4
+	for <kvmarm@archiver.kernel.org>; Tue,  1 Jun 2021 11:07:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF496613B4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B61AB40212;
-	Tue,  1 Jun 2021 06:40:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EECA40762;
+	Tue,  1 Jun 2021 07:07:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id InXlL7W1VEEb; Tue,  1 Jun 2021 06:40:27 -0400 (EDT)
+	with ESMTP id xgWAAjhUuvSc; Tue,  1 Jun 2021 07:07:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 346A84A4A0;
-	Tue,  1 Jun 2021 06:40:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E42240799;
+	Tue,  1 Jun 2021 07:07:58 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F421549D50
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Jun 2021 06:40:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 53E1B4075E
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Jun 2021 07:07:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fIbFbGJyqMJt for <kvmarm@lists.cs.columbia.edu>;
- Tue,  1 Jun 2021 06:40:22 -0400 (EDT)
+ with ESMTP id i9r+zz9Is87R for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  1 Jun 2021 07:07:56 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 57F9349DE7
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Jun 2021 06:40:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5F9CF40159
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Jun 2021 07:07:56 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 88DF2613C1;
- Tue,  1 Jun 2021 10:40:17 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 67779613AD;
+ Tue,  1 Jun 2021 11:07:55 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why.lan) by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ helo=hot-poop.lan)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1lo1ol-004nNs-TW; Tue, 01 Jun 2021 11:40:16 +0100
+ id 1lo2FV-004nhn-AJ; Tue, 01 Jun 2021 12:07:53 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v4 9/9] irqchip/apple-aic: Advertise some level of vGICv3
- compatibility
-Date: Tue,  1 Jun 2021 11:40:05 +0100
-Message-Id: <20210601104005.81332-10-maz@kernel.org>
+ kvmarm@lists.cs.columbia.edu, Keqian Zhu <zhukeqian1@huawei.com>
+Subject: Re: [PATCH v5 0/2] kvm/arm64: Try stage2 block mapping for host
+ device MMIO
+Date: Tue,  1 Jun 2021 12:07:48 +0100
+Message-Id: <162254563973.3767290.8382994018229103623.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210601104005.81332-1-maz@kernel.org>
-References: <20210601104005.81332-1-maz@kernel.org>
+In-Reply-To: <20210507110322.23348-1-zhukeqian1@huawei.com>
+References: <20210507110322.23348-1-zhukeqian1@huawei.com>
 MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 62.31.163.78
 X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, james.morse@arm.com, suzuki.poulose@arm.com,
- alexandru.elisei@arm.com, eric.auger@redhat.com, marcan@marcan.st,
- mark.rutland@arm.com, yuzenghui@huawei.com, kernel-team@android.com
+ kvmarm@lists.cs.columbia.edu, zhukeqian1@huawei.com,
+ wanghaibin.wang@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kernel-team@android.com, Hector Martin <marcan@marcan.st>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -82,53 +81,30 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The CPUs in the Apple M1 SoC partially implement a virtual GICv3
-CPU interface, although one that is incapable of HW deactivation
-of interrupts, nor masking the maintenance interrupt.
+On Fri, 7 May 2021 19:03:20 +0800, Keqian Zhu wrote:
+> This rebases to newest mainline kernel.
+> 
+> Thanks,
+> Keqian
+> 
+> 
+> We have two pathes to build stage2 mapping for MMIO regions.
+> 
+> [...]
 
-Advertise the support to KVM.
+Applied to next, thanks!
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- drivers/irqchip/irq-apple-aic.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+[1/2] kvm/arm64: Remove the creation time's mapping of MMIO regions
+      commit: fd6f17bade2147b31198ad00b22d3acf5a398aec
+[2/2] kvm/arm64: Try stage2 block mapping for host device MMIO
+      commit: 2aa53d68cee6603931f73b28ef6b51ff3fde9397
 
-diff --git a/drivers/irqchip/irq-apple-aic.c b/drivers/irqchip/irq-apple-aic.c
-index c179e27062fd..b8c06bd8659e 100644
---- a/drivers/irqchip/irq-apple-aic.c
-+++ b/drivers/irqchip/irq-apple-aic.c
-@@ -50,6 +50,7 @@
- #include <linux/cpuhotplug.h>
- #include <linux/io.h>
- #include <linux/irqchip.h>
-+#include <linux/irqchip/arm-vgic-info.h>
- #include <linux/irqdomain.h>
- #include <linux/limits.h>
- #include <linux/of_address.h>
-@@ -787,6 +788,12 @@ static int aic_init_cpu(unsigned int cpu)
- 	return 0;
- }
- 
-+static struct gic_kvm_info vgic_info __initdata = {
-+	.type			= GIC_V3,
-+	.no_maint_irq_mask	= true,
-+	.no_hw_deactivation	= true,
-+};
-+
- static int __init aic_of_ic_init(struct device_node *node, struct device_node *parent)
- {
- 	int i;
-@@ -843,6 +850,8 @@ static int __init aic_of_ic_init(struct device_node *node, struct device_node *p
- 			  "irqchip/apple-aic/ipi:starting",
- 			  aic_init_cpu, NULL);
- 
-+	vgic_set_kvm_info(&vgic_info);
-+
- 	pr_info("Initialized with %d IRQs, %d FIQs, %d vIPIs\n",
- 		irqc->nr_hw, AIC_NR_FIQ, AIC_NR_SWIPI);
- 
+Cheers,
+
+	M.
 -- 
-2.30.2
+Without deviation from the norm, progress is not possible.
+
 
 _______________________________________________
 kvmarm mailing list
