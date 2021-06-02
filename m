@@ -5,88 +5,86 @@ X-Spam-Level:
 X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42736C4708F
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Jun 2021 11:08:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED51EC4708F
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Jun 2021 23:27:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BB102611CC
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Jun 2021 11:08:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB102611CC
+	by mail.kernel.org (Postfix) with ESMTP id 56358613E4
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Jun 2021 23:27:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56358613E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 43778407F4;
-	Wed,  2 Jun 2021 07:08:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C662E4A483;
+	Wed,  2 Jun 2021 19:27:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 7K+hoVrdQQWa; Wed,  2 Jun 2021 07:08:03 -0400 (EDT)
+	with ESMTP id Hf0zRWwT76PE; Wed,  2 Jun 2021 19:26:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 19CE0409DD;
-	Wed,  2 Jun 2021 07:08:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E01D49F83;
+	Wed,  2 Jun 2021 19:26:59 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F53A402DB
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Jun 2021 07:08:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4731540825
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Jun 2021 19:26:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pqflPkCyfUuB for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 Jun 2021 07:07:58 -0400 (EDT)
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com
- [209.85.221.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2AECD40162
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Jun 2021 07:07:58 -0400 (EDT)
-Received: by mail-wr1-f46.google.com with SMTP id m18so1883588wrv.2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Jun 2021 04:07:58 -0700 (PDT)
+ with ESMTP id 97fMTk5qPXcy for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Jun 2021 19:26:57 -0400 (EDT)
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com
+ [209.85.210.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0044C406AD
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Jun 2021 19:26:56 -0400 (EDT)
+Received: by mail-pf1-f172.google.com with SMTP id t28so3427632pfg.10
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Jun 2021 16:26:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=QwU7eNpnhcnSNsCtdIpNIwPgvGDGJ4+rnF5GomWdPmY=;
- b=v1ylLqjAdoNf/H7w9k6hQe7WHAc3a2ZesvC3IRvLPZ1+tQRZac+5ne5v5FaCWj+y5C
- BxBVdNM5skbbGmZhDCRSWRz3Xt0A5h6zb4DZsNKbWib3299MD2oicnmoT1z9oz0cjrJ3
- 8kR2BfFD3YvzWy5mEPYEPl1uy4R86YjGrT17a/Puup3fQvY8kdPiuiv5h2H48v/v6dA/
- 3FCz/EIjFp6BEePGVBUNTN6mngT9AhytfCRfcCjE0KXsPUsm5AoALDbB/jCiNoTbie29
- OU2SyFWidQIIf65c44G8BW8zwbZe0H26U29sc2qkBI0unDdkQd9/SpRNhyyJzVXsPmI1
- qi0g==
+ bh=qVLg4Q35iCp+LlhdPI9P9bXpg6OFtieobQceA0Gb/Xk=;
+ b=htyn0vTZfw8IfuHoWZd5HiZ+suevAlDWCSkhs+BOEVeTFRufexfOiwfuxvpNaCtwuZ
+ byqWD32hXz49RAK9QxzCF8WjQevSGmkmcx8I10QW2eyIk96oJsKZ5D7z76hRfo3wz7HI
+ 1Yo8K0oN+IJPB28T8p7kpxiDEcdwfLlP/N5xC+zMro9P9pJRH4AyRfuveOjPvdH33XGG
+ Z3FZB8AkluzJC0xivxo5TRqN9GTxqlSH6FuHnkNLIc2xFhTenZo4+dimh+OJsvJ0dm1h
+ z9XTytYXbExNzWv0Gb56M4irnma4K6JjGsy9CCnYV8FMpiEPcYfR2kMB2ObPujM1hiJc
+ D9Mw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=QwU7eNpnhcnSNsCtdIpNIwPgvGDGJ4+rnF5GomWdPmY=;
- b=OG+GPLRVxHyopdO/lMrAf8fg2ihlxaCdbTIH8qLqpyzkV0raTCnQf37CKRYC/TUQVt
- xcK88SBPgpHpNYoGNXiBmQ9N9s6VRRrojYRyj15jr76h9QOlL2OXIq/UHeT2ASIn4AYk
- h9XXsuePJSI60y5lYAkFN1UnfJ8ZwoLbUKMcbeX0LGMc4MVnzNev2hTZ9ZP0MW47Jzre
- po41UfXjhYjzf/ojzDoPhDjMVyp5mrBFZWvH83zWHPQmIqGx7Mfz4daoFpso8QENoIfx
- I37APitVFoXIQ4T4XWrH1NuX+rtzjaad09RF2VEEbxQOUJyRVuUjmSPYKsWr7cqpGk0Q
- HDGg==
-X-Gm-Message-State: AOAM5310+97cdpP3q5eJkHAG20DlGMu9lnSmz/DrBI98rXM+MGIZDWnZ
- PetCKLZsriReYDlw63FMpOGj+w==
-X-Google-Smtp-Source: ABdhPJyaYUKxfSrgwNdRYacXMtN7kPQKgVxIk8ZpqN9TTX1nHz6hbmS6x6ztsX9uQZdAVXxWRyaxEg==
-X-Received: by 2002:a5d:6082:: with SMTP id w2mr7244022wrt.209.1622632076964; 
- Wed, 02 Jun 2021 04:07:56 -0700 (PDT)
-Received: from google.com (105.168.195.35.bc.googleusercontent.com.
- [35.195.168.105])
- by smtp.gmail.com with ESMTPSA id z11sm6213182wrs.7.2021.06.02.04.07.56
+ bh=qVLg4Q35iCp+LlhdPI9P9bXpg6OFtieobQceA0Gb/Xk=;
+ b=qUilnvw/nZQf+Lle0Lza+tweEGRGgH5vG6uU2JFNdtdEV5gdlauGgtgsiT094MGG6z
+ b0kx3tFXza1JsKgLWrjkeG6itIn2DwkIO7NYzchb3YFOD3BqLD2k6miDO5CbNHWZG3Zk
+ QZ1GNAl2xVI93ZvMbCc/EyohWKwfADIp3CTS+KBZMVpmeKCELNWxA5I4euGr3YQUq939
+ KQ4EiRFPAFiv19MDB2sFxVTNwc0GX/+0JNqcxIKz0aVvbYhPy7wI72WvbsC4FopHdQdK
+ uh/VHa2PjtPS0dkw0mhTro1fAsDBalFM/bv9E0Q4xIipU3oJCauPt6NxmS8IlG7kqGv3
+ oUmg==
+X-Gm-Message-State: AOAM531OaYQMyNG9lO3zbPR7WyZ4iKZz6T+XnSd4YLrC9+wcP+LAHSJF
+ BEEXBT96jBRy+H0rwllRBKrlrA==
+X-Google-Smtp-Source: ABdhPJyFKVnJ0duxYPD4Y/Doon1B87bwqj4O5vlJHiiZBYmVCJxx+kLmIYEwIt97YKOsGmDPZN6lMA==
+X-Received: by 2002:a63:f815:: with SMTP id n21mr37018823pgh.2.1622676415852; 
+ Wed, 02 Jun 2021 16:26:55 -0700 (PDT)
+Received: from google.com (150.12.83.34.bc.googleusercontent.com.
+ [34.83.12.150])
+ by smtp.gmail.com with ESMTPSA id o10sm536969pfh.67.2021.06.02.16.26.55
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 02 Jun 2021 04:07:56 -0700 (PDT)
-Date: Wed, 2 Jun 2021 11:07:53 +0000
-From: Quentin Perret <qperret@google.com>
-To: Yanan Wang <wangyanan55@huawei.com>
-Subject: Re: [PATCH v5 6/6] KVM: arm64: Distinguish cases of memcache
- allocations completely
-Message-ID: <YLdmiTfgz1EqBsJd@google.com>
-References: <20210415115032.35760-1-wangyanan55@huawei.com>
- <20210415115032.35760-7-wangyanan55@huawei.com>
+ Wed, 02 Jun 2021 16:26:55 -0700 (PDT)
+Date: Wed, 2 Jun 2021 16:26:51 -0700
+From: Ricardo Koller <ricarkol@google.com>
+To: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH v3 5/5] KVM: arm64: selftests: get-reg-list: Split base
+ and pmu registers
+Message-ID: <YLgTu4EEnwfrtHSo@google.com>
+References: <20210531103344.29325-1-drjones@redhat.com>
+ <20210531103344.29325-6-drjones@redhat.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20210415115032.35760-7-wangyanan55@huawei.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20210531103344.29325-6-drjones@redhat.com>
+Cc: kvm@vger.kernel.org, maz@kernel.org, pbonzini@redhat.com,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -103,66 +101,140 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thursday 15 Apr 2021 at 19:50:32 (+0800), Yanan Wang wrote:
-> With a guest translation fault, the memcache pages are not needed if KVM
-> is only about to install a new leaf entry into the existing page table.
-> And with a guest permission fault, the memcache pages are also not needed
-> for a write_fault in dirty-logging time if KVM is only about to update
-> the existing leaf entry instead of collapsing a block entry into a table.
+On Mon, May 31, 2021 at 12:33:44PM +0200, Andrew Jones wrote:
+> Since KVM commit 11663111cd49 ("KVM: arm64: Hide PMU registers from
+> userspace when not available") the get-reg-list* tests have been
+> failing with
 > 
-> By comparing fault_granule and vma_pagesize, cases that require allocations
-> from memcache and cases that don't can be distinguished completely.
+>   ...
+>   ... There are 74 missing registers.
+>   The following lines are missing registers:
+>   ...
 > 
-> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
+> where the 74 missing registers are all PMU registers. This isn't a
+> bug in KVM that the selftest found, even though it's true that a
+> KVM userspace that wasn't setting the KVM_ARM_VCPU_PMU_V3 VCPU
+> flag, but still expecting the PMU registers to be in the reg-list,
+> would suddenly no longer have their expectations met. In that case,
+> the expectations were wrong, though, so that KVM userspace needs to
+> be fixed, and so does this selftest. The fix for this selftest is to
+> pull the PMU registers out of the base register sublist into their
+> own sublist and then create new, pmu-enabled vcpu configs which can
+> be tested.
+> 
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+
+Reviewed-by: Ricardo Koller <ricarkol@google.com>
+
 > ---
->  arch/arm64/kvm/mmu.c | 25 ++++++++++++-------------
->  1 file changed, 12 insertions(+), 13 deletions(-)
+>  .../selftests/kvm/aarch64/get-reg-list.c      | 39 +++++++++++++++----
+>  1 file changed, 31 insertions(+), 8 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index aa536392b308..9e35aa5d29f2 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -895,19 +895,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	gfn = fault_ipa >> PAGE_SHIFT;
->  	mmap_read_unlock(current->mm);
+> diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> index b46b8a1fdc0c..a16c8f05366c 100644
+> --- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> +++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> @@ -637,7 +637,7 @@ int main(int ac, char **av)
+>   * The current blessed list was primed with the output of kernel version
+>   * v4.15 with --core-reg-fixup and then later updated with new registers.
+>   *
+> - * The blessed list is up to date with kernel version v5.10-rc5
+> + * The blessed list is up to date with kernel version v5.13-rc3
+>   */
+>  static __u64 base_regs[] = {
+>  	KVM_REG_ARM64 | KVM_REG_SIZE_U64 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(regs.regs[0]),
+> @@ -829,8 +829,6 @@ static __u64 base_regs[] = {
+>  	ARM64_SYS_REG(3, 0, 5, 2, 0),	/* ESR_EL1 */
+>  	ARM64_SYS_REG(3, 0, 6, 0, 0),	/* FAR_EL1 */
+>  	ARM64_SYS_REG(3, 0, 7, 4, 0),	/* PAR_EL1 */
+> -	ARM64_SYS_REG(3, 0, 9, 14, 1),	/* PMINTENSET_EL1 */
+> -	ARM64_SYS_REG(3, 0, 9, 14, 2),	/* PMINTENCLR_EL1 */
+>  	ARM64_SYS_REG(3, 0, 10, 2, 0),	/* MAIR_EL1 */
+>  	ARM64_SYS_REG(3, 0, 10, 3, 0),	/* AMAIR_EL1 */
+>  	ARM64_SYS_REG(3, 0, 12, 0, 0),	/* VBAR_EL1 */
+> @@ -839,6 +837,16 @@ static __u64 base_regs[] = {
+>  	ARM64_SYS_REG(3, 0, 13, 0, 4),	/* TPIDR_EL1 */
+>  	ARM64_SYS_REG(3, 0, 14, 1, 0),	/* CNTKCTL_EL1 */
+>  	ARM64_SYS_REG(3, 2, 0, 0, 0),	/* CSSELR_EL1 */
+> +	ARM64_SYS_REG(3, 3, 13, 0, 2),	/* TPIDR_EL0 */
+> +	ARM64_SYS_REG(3, 3, 13, 0, 3),	/* TPIDRRO_EL0 */
+> +	ARM64_SYS_REG(3, 4, 3, 0, 0),	/* DACR32_EL2 */
+> +	ARM64_SYS_REG(3, 4, 5, 0, 1),	/* IFSR32_EL2 */
+> +	ARM64_SYS_REG(3, 4, 5, 3, 0),	/* FPEXC32_EL2 */
+> +};
+> +
+> +static __u64 pmu_regs[] = {
+> +	ARM64_SYS_REG(3, 0, 9, 14, 1),	/* PMINTENSET_EL1 */
+> +	ARM64_SYS_REG(3, 0, 9, 14, 2),	/* PMINTENCLR_EL1 */
+>  	ARM64_SYS_REG(3, 3, 9, 12, 0),	/* PMCR_EL0 */
+>  	ARM64_SYS_REG(3, 3, 9, 12, 1),	/* PMCNTENSET_EL0 */
+>  	ARM64_SYS_REG(3, 3, 9, 12, 2),	/* PMCNTENCLR_EL0 */
+> @@ -848,8 +856,6 @@ static __u64 base_regs[] = {
+>  	ARM64_SYS_REG(3, 3, 9, 13, 0),	/* PMCCNTR_EL0 */
+>  	ARM64_SYS_REG(3, 3, 9, 14, 0),	/* PMUSERENR_EL0 */
+>  	ARM64_SYS_REG(3, 3, 9, 14, 3),	/* PMOVSSET_EL0 */
+> -	ARM64_SYS_REG(3, 3, 13, 0, 2),	/* TPIDR_EL0 */
+> -	ARM64_SYS_REG(3, 3, 13, 0, 3),	/* TPIDRRO_EL0 */
+>  	ARM64_SYS_REG(3, 3, 14, 8, 0),
+>  	ARM64_SYS_REG(3, 3, 14, 8, 1),
+>  	ARM64_SYS_REG(3, 3, 14, 8, 2),
+> @@ -913,9 +919,6 @@ static __u64 base_regs[] = {
+>  	ARM64_SYS_REG(3, 3, 14, 15, 5),
+>  	ARM64_SYS_REG(3, 3, 14, 15, 6),
+>  	ARM64_SYS_REG(3, 3, 14, 15, 7),	/* PMCCFILTR_EL0 */
+> -	ARM64_SYS_REG(3, 4, 3, 0, 0),	/* DACR32_EL2 */
+> -	ARM64_SYS_REG(3, 4, 5, 0, 1),	/* IFSR32_EL2 */
+> -	ARM64_SYS_REG(3, 4, 5, 3, 0),	/* FPEXC32_EL2 */
+>  };
 >  
-> -	/*
-> -	 * Permission faults just need to update the existing leaf entry,
-> -	 * and so normally don't require allocations from the memcache. The
-> -	 * only exception to this is when dirty logging is enabled at runtime
-> -	 * and a write fault needs to collapse a block entry into a table.
-> -	 */
-> -	if (fault_status != FSC_PERM || (logging_active && write_fault)) {
-> -		ret = kvm_mmu_topup_memory_cache(memcache,
-> -						 kvm_mmu_cache_min_pages(kvm));
-> -		if (ret)
-> -			return ret;
-> -	}
-> -
->  	mmu_seq = vcpu->kvm->mmu_notifier_seq;
->  	/*
->  	 * Ensure the read of mmu_notifier_seq happens before we call
-> @@ -970,6 +957,18 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	else if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC))
->  		prot |= KVM_PGTABLE_PROT_X;
+>  static __u64 vregs[] = {
+> @@ -1015,6 +1018,8 @@ static __u64 sve_rejects_set[] = {
+>  	{ "base", .regs = base_regs, .regs_n = ARRAY_SIZE(base_regs), }
+>  #define VREGS_SUBLIST \
+>  	{ "vregs", .regs = vregs, .regs_n = ARRAY_SIZE(vregs), }
+> +#define PMU_SUBLIST \
+> +	{ "pmu", .regs = pmu_regs, .regs_n = ARRAY_SIZE(pmu_regs), }
+>  #define SVE_SUBLIST \
+>  	{ "sve", .capability = KVM_CAP_ARM_SVE, .feature = KVM_ARM_VCPU_SVE, .finalize = true, \
+>  	  .regs = sve_regs, .regs_n = ARRAY_SIZE(sve_regs), \
+> @@ -1027,6 +1032,14 @@ static struct vcpu_config vregs_config = {
+>  	{0},
+>  	},
+>  };
+> +static struct vcpu_config vregs_pmu_config = {
+> +	.sublists = {
+> +	BASE_SUBLIST,
+> +	VREGS_SUBLIST,
+> +	PMU_SUBLIST,
+> +	{0},
+> +	},
+> +};
+>  static struct vcpu_config sve_config = {
+>  	.sublists = {
+>  	BASE_SUBLIST,
+> @@ -1034,9 +1047,19 @@ static struct vcpu_config sve_config = {
+>  	{0},
+>  	},
+>  };
+> +static struct vcpu_config sve_pmu_config = {
+> +	.sublists = {
+> +	BASE_SUBLIST,
+> +	SVE_SUBLIST,
+> +	PMU_SUBLIST,
+> +	{0},
+> +	},
+> +};
 >  
-> +	/*
-> +	 * Allocations from the memcache are required only when granule of the
-> +	 * lookup level where the guest fault happened exceeds vma_pagesize,
-> +	 * which means new page tables will be created in the fault handlers.
-> +	 */
-> +	if (fault_granule > vma_pagesize) {
-> +		ret = kvm_mmu_topup_memory_cache(memcache,
-> +						 kvm_mmu_cache_min_pages(kvm));
-> +		if (ret)
-> +			return ret;
-> +	}
-
-You're now doing the top-up in the kvm->mmu_lock critical section. Isn't
-this more or less what we try to avoid by using a memory cache?
-
-Thanks,
-Quentin
+>  static struct vcpu_config *vcpu_configs[] = {
+>  	&vregs_config,
+> +	&vregs_pmu_config,
+>  	&sve_config,
+> +	&sve_pmu_config,
+>  };
+>  static int vcpu_configs_n = ARRAY_SIZE(vcpu_configs);
+> -- 
+> 2.31.1
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
