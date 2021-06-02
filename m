@@ -2,92 +2,91 @@ Return-Path: <SRS0=fRMP=K4=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58A9BC47083
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Jun 2021 10:50:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4387CC4708F
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Jun 2021 10:58:43 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CE3F36023F
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Jun 2021 10:50:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE3F36023F
+	by mail.kernel.org (Postfix) with ESMTP id ADAA7613AE
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Jun 2021 10:58:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADAA7613AE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4208A406E0;
-	Wed,  2 Jun 2021 06:50:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2798640152;
+	Wed,  2 Jun 2021 06:58:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id bRCUHXseJayR; Wed,  2 Jun 2021 06:50:00 -0400 (EDT)
+	with ESMTP id zrrAsMRS0rgY; Wed,  2 Jun 2021 06:58:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A8D8940877;
-	Wed,  2 Jun 2021 06:50:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 008374019D;
+	Wed,  2 Jun 2021 06:58:38 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 826DF4086A
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Jun 2021 06:49:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B1EC14019D
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Jun 2021 06:58:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lbwYIMNVNxkY for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 Jun 2021 06:49:54 -0400 (EDT)
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com
- [209.85.128.47])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BEED3406E0
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Jun 2021 06:49:54 -0400 (EDT)
-Received: by mail-wm1-f47.google.com with SMTP id
- t4-20020a1c77040000b029019d22d84ebdso3469553wmi.3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Jun 2021 03:49:54 -0700 (PDT)
+ with ESMTP id 3U2uq8E3tB0H for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Jun 2021 06:58:32 -0400 (EDT)
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com
+ [209.85.221.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9562D40152
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Jun 2021 06:58:32 -0400 (EDT)
+Received: by mail-wr1-f49.google.com with SMTP id z17so1828974wrq.7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Jun 2021 03:58:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=iBPgoenc4+VXFgVYv4Mb1skeP6ikfbF6DUFZDuY5ah0=;
- b=qMBk9o3bcP5GtSnrBEjM+uWb62KPrE2rQIg+ZFejyIJ7KDc7EuHbWv6Ier5kZTigIR
- 5mXf3/3MmGJskgrxiaqGw4px5jD+G+hWfPNKX0VB3Q90xVaVC9W2ub5I3+4rYkIr8C6L
- chxtaxQI8hnb/YGqTd3MdhmSJpqeWk8UrZcTCfv9IvFWRmdLQcBX8tWbGKN4KBvbOEJ+
- EETPihJUuo8Fv747IZjxQehWVelRce/UwRVy83oJFO+hbvPTHpQi+IVjW3yMXgmJzK+H
- F27yNQMNOwh5K9XYmMwdm2gEuDDNQoEjQcctogIZhgnGP8eVl1utqqHRhFOj1a+KnMcs
- NNSw==
+ bh=O4j3rnMAVVtQuafSexYtSyjSly5WDUnGVtpX8LTwkWk=;
+ b=d9OMAA5JQL8jC8IxP/OtQ63ClDX5Ld+AUFGF/BIOaD/SPONLkodo+0jo+RoR5mTEoG
+ PgEtpTeFjZuBJL9c8NqbqT4O2UEaEcx8ML3eRmuh0UsgOU9zhHUnaTUwSksBRv50EFc4
+ /5c1l39b3D/IhKxRwmtDrUarmu7vHmsK2uTIYSofXXK4E/7OAeHrYCBLWmlw0NiySvuD
+ 8OQG/6n06I2QQCQrFJvnYGrFmG3Xm6Oa5OvJSwdktqi9f0XB5AWk5Z8d943IYaK4XrOZ
+ NIJ+adU/E5fxPEDKhHTWUPvO89BHwHgJ1hxssujS/JX1wQNwa0PwvOnQC6krwwxh+nWU
+ q3WQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=iBPgoenc4+VXFgVYv4Mb1skeP6ikfbF6DUFZDuY5ah0=;
- b=OKPJjT5uvzxMC5ZnMf3loZvZWfPYuM9ixqAle21rTzERPIU/l9kyYcf3r323EPMImu
- GVZ3/xoI94wQGGWFgaMVL1jNtQYuRsYgivMKJbXSTKR7tEuj3SYEFIJFIYdLuVvxzp0k
- /O18AmQgC7pznLjGB1jApQFCIuZBZXhxqg9DV4VGt+qDvMC2PMS6cSQxaWN1eLxM+8HN
- G7Bjc2VOcJzyiEiFaod/iCfPt/hnarbKa2wzpmY25wE/Y9nDnJuSrg01bePoGtkAVLuf
- Q2j2wwCTKbb4Wy2TgKFGlA0VqkHNEmO/dX2ssE3RclJC0x5iAuT9NOqjqaYVFl5Ce37u
- 1rcQ==
-X-Gm-Message-State: AOAM531egivSbpBs9e4woBosSeCPB+osj6SchDApmD6hRc9/+sntLHHd
- aope5UjWMvvRIyn4UdpevKAHfg==
-X-Google-Smtp-Source: ABdhPJxJX3H2bjJ6ZWWGMvygaz55JMVzxmecp5Rkf4VcZ3RHRl9KDTV+xgJcccrQmFsHPJCg9w3A/w==
-X-Received: by 2002:a7b:cc8f:: with SMTP id p15mr4585583wma.111.1622630993639; 
- Wed, 02 Jun 2021 03:49:53 -0700 (PDT)
+ bh=O4j3rnMAVVtQuafSexYtSyjSly5WDUnGVtpX8LTwkWk=;
+ b=AHHjG1PsgWGgyU4L8QARzVfGQgyyOiTJ/WEJtQkIw8dgIfbzeerN0B7Z0K/7DfoRV3
+ OqHS3V626XqS9c7EZCeA9hl8D+YwfsTK13d4PbSjKEw2k1+f/QFfRKUiyU29TnHMv2yy
+ zcJwOAdOpohod9oQ3m77JwByXDqYGp+7x5yFNXWGTKKXaXw50tWVK0Vr4AKj0aBGv/hs
+ h/nsehCVO/qG4Mb3uYxz5Zgp7c6Zj2fA/oTDU1I8umlfUA+Ai6eKVzFIZDS7EUr3tyS2
+ N051EUhqY09yC/NOj3gXJBQwmuh6Wlqz32lquMbNptpPlI84oqRi4bimm2Nf7DHgpFAu
+ GOgQ==
+X-Gm-Message-State: AOAM532Gqi+TKsng1tL8pJMssqjYA8po3u0QfescG77f5JKfXDfg2WKm
+ q/6jfDKc8+vsWQ1sq5n1ILnguA==
+X-Google-Smtp-Source: ABdhPJxQ4Mw6GmqjL/VfVeU2WxB50DVhQpumz9XVUbL+idgnhTuIw21b4d+fUny6pxwYk9C9Mijxyw==
+X-Received: by 2002:adf:f346:: with SMTP id e6mr5572912wrp.179.1622631511395; 
+ Wed, 02 Jun 2021 03:58:31 -0700 (PDT)
 Received: from google.com (105.168.195.35.bc.googleusercontent.com.
  [35.195.168.105])
- by smtp.gmail.com with ESMTPSA id a123sm2687146wmd.2.2021.06.02.03.49.53
+ by smtp.gmail.com with ESMTPSA id p20sm2282579wmq.10.2021.06.02.03.58.30
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 02 Jun 2021 03:49:53 -0700 (PDT)
-Date: Wed, 2 Jun 2021 10:49:50 +0000
+ Wed, 02 Jun 2021 03:58:30 -0700 (PDT)
+Date: Wed, 2 Jun 2021 10:58:28 +0000
 From: Quentin Perret <qperret@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v5 2/6] KVM: arm64: Move D-cache flush to the fault
+To: Yanan Wang <wangyanan55@huawei.com>
+Subject: Re: [PATCH v5 5/6] KVM: arm64: Move I-cache flush to the fault
  handlers
-Message-ID: <YLdiTnfuhMimU4dE@google.com>
+Message-ID: <YLdkVH0G2Lq9vPc5@google.com>
 References: <20210415115032.35760-1-wangyanan55@huawei.com>
- <20210415115032.35760-3-wangyanan55@huawei.com>
- <877djc1sca.wl-maz@kernel.org>
+ <20210415115032.35760-6-wangyanan55@huawei.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <877djc1sca.wl-maz@kernel.org>
-Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+In-Reply-To: <20210415115032.35760-6-wangyanan55@huawei.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
  linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -104,43 +103,113 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wednesday 02 Jun 2021 at 11:19:49 (+0100), Marc Zyngier wrote:
-> On Thu, 15 Apr 2021 12:50:28 +0100,
-> > @@ -583,6 +589,7 @@ static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
-> >  {
-> >  	kvm_pte_t new, old = *ptep;
-> >  	u64 granule = kvm_granule_size(level), phys = data->phys;
-> > +	struct kvm_pgtable *pgt = data->mmu->pgt;
-> >  	struct kvm_pgtable_mm_ops *mm_ops = data->mm_ops;
-> >  
-> >  	if (!kvm_block_mapping_supported(addr, end, phys, level))
-> > @@ -606,6 +613,13 @@ static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
-> >  		stage2_put_pte(ptep, data->mmu, addr, level, mm_ops);
-> >  	}
-> >  
-> > +	/* Perform CMOs before installation of the guest stage-2 PTE */
-> > +	if (pgt->flags & KVM_PGTABLE_S2_GUEST) {
-> > +		if (stage2_pte_cacheable(pgt, new) && !stage2_has_fwb(pgt))
-> > +			__flush_dcache_area(mm_ops->phys_to_virt(phys),
-> > +					    granule);
-> > +	}
+On Thursday 15 Apr 2021 at 19:50:31 (+0800), Yanan Wang wrote:
+> In this patch, we move invalidation of I-cache to the fault handlers to
+
+Nit: please avoid using 'This patch' in commit messages, see
+Documentation/process/submitting-patches.rst.
+
+> avoid unnecessary I-cache maintenances. On the map path, invalidate the
+> I-cache if we are going to create an executable stage-2 mapping for guest.
+> And on the permission path, invalidate the I-cache if we are going to add
+> an executable permission to the existing guest stage-2 mapping.
 > 
-> Rather than this, why not provide new callbacks in mm_ops, even if we
-> have to provide one that is specific to guests (and let the protected
-> stuff do its own thing)?
+> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
+> ---
+>  arch/arm64/include/asm/kvm_mmu.h | 15 --------------
+>  arch/arm64/kvm/hyp/pgtable.c     | 35 +++++++++++++++++++++++++++++++-
+>  arch/arm64/kvm/mmu.c             |  9 +-------
+>  3 files changed, 35 insertions(+), 24 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index e9b163c5f023..155492fe5b15 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -187,21 +187,6 @@ static inline bool vcpu_has_cache_enabled(struct kvm_vcpu *vcpu)
+>  	return (vcpu_read_sys_reg(vcpu, SCTLR_EL1) & 0b101) == 0b101;
+>  }
+>  
+> -static inline void __invalidate_icache_guest_page(kvm_pfn_t pfn,
+> -						  unsigned long size)
+> -{
+> -	if (icache_is_aliasing()) {
+> -		/* any kind of VIPT cache */
+> -		__flush_icache_all();
+> -	} else if (is_kernel_in_hyp_mode() || !icache_is_vpipt()) {
+> -		/* PIPT or VPIPT at EL2 (see comment in __kvm_tlb_flush_vmid_ipa) */
+> -		void *va = page_address(pfn_to_page(pfn));
+> -
+> -		invalidate_icache_range((unsigned long)va,
+> -					(unsigned long)va + size);
+> -	}
+> -}
+> -
+>  void kvm_set_way_flush(struct kvm_vcpu *vcpu);
+>  void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled);
+>  
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index b480f6d1171e..9f4429d80df0 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -568,6 +568,26 @@ static bool stage2_pte_cacheable(struct kvm_pgtable *pgt, kvm_pte_t pte)
+>  	return memattr == KVM_S2_MEMATTR(pgt, NORMAL);
+>  }
+>  
+> +static bool stage2_pte_executable(kvm_pte_t pte)
+> +{
+> +	return !(pte & KVM_PTE_LEAF_ATTR_HI_S2_XN);
+> +}
+> +
+> +static void stage2_invalidate_icache(void *addr, u64 size)
+> +{
+> +	if (icache_is_aliasing()) {
+> +		/* Any kind of VIPT cache */
+> +		__flush_icache_all();
+> +	} else if (is_kernel_in_hyp_mode() || !icache_is_vpipt()) {
 
-Ack, an optional callback in the mm_ops sounds much nicer.
 
-> One thing I really dislike though is that the page-table code is
-> starting to be littered with things that are not directly related to
-> page tables. We are re-creating the user_mem_abort() mess in a
-> different place.
+> +		/*
+> +		 * See comment in __kvm_tlb_flush_vmid_ipa().
+> +		 * Invalidate PIPT, or VPIPT at EL2.
+> +		 */
+> +		invalidate_icache_range((unsigned long)addr,
+> +					(unsigned long)addr + size);
+> +	}
+> +}
+> +
+>  static void stage2_put_pte(kvm_pte_t *ptep, struct kvm_s2_mmu *mmu, u64 addr,
+>  			   u32 level, struct kvm_pgtable_mm_ops *mm_ops)
+>  {
+> @@ -618,6 +638,10 @@ static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
+>  		if (stage2_pte_cacheable(pgt, new) && !stage2_has_fwb(pgt))
+>  			__flush_dcache_area(mm_ops->phys_to_virt(phys),
+>  					    granule);
+> +
+> +		if (stage2_pte_executable(new))
+> +			stage2_invalidate_icache(mm_ops->phys_to_virt(phys),
+> +						 granule);
+>  	}
+>  
+>  	smp_store_release(ptep, new);
+> @@ -896,8 +920,17 @@ static int stage2_attr_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+>  	 * but worst-case the access flag update gets lost and will be
+>  	 * set on the next access instead.
+>  	 */
+> -	if (data->pte != pte)
+> +	if (data->pte != pte) {
+> +		/*
+> +		 * Invalidate the instruction cache before updating
+> +		 * if we are going to add the executable permission
+> +		 * for the guest stage-2 PTE.
+> +		 */
+> +		if (!stage2_pte_executable(*ptep) && stage2_pte_executable(pte))
+> +			stage2_invalidate_icache(kvm_pte_follow(pte, data->mm_ops),
+> +						 kvm_granule_size(level));
+>  		WRITE_ONCE(*ptep, pte);
+> +	}
 
-+1, we should probably keep the page-table code as close as possible
-to a standalone and architecturally-compliant library as opposed to a
-mess of unrelated logic, simply because that will lead to a cleaner and
-more maintainable design in the long run, and because that will ease the
-interoperability with EL2 in protected mode.
+As for the dcache stuff, it seems like this would be best placed in an
+optional mm_ops callback, and have the kernel implement it.
 
 Thanks,
 Quentin
