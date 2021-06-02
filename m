@@ -2,91 +2,82 @@ Return-Path: <SRS0=fRMP=K4=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E529AC47092
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Jun 2021 09:38:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9757C47092
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Jun 2021 09:44:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5D1FE613D3
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Jun 2021 09:38:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D1FE613D3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 67E4E613EA
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Jun 2021 09:44:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67E4E613EA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E23BC40FC7;
-	Wed,  2 Jun 2021 05:38:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D5F3449F8F;
+	Wed,  2 Jun 2021 05:44:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id xDpJY0OgXPIe; Wed,  2 Jun 2021 05:38:07 -0400 (EDT)
+	with ESMTP id Tky3kW9Wfs1B; Wed,  2 Jun 2021 05:43:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C948409DD;
-	Wed,  2 Jun 2021 05:38:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E429A49F92;
+	Wed,  2 Jun 2021 05:43:56 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1402E40856
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Jun 2021 05:38:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D45AA406E0
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Jun 2021 05:43:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rbNQitOZu165 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 Jun 2021 05:38:02 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0379B40839
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Jun 2021 05:38:01 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 0467E60FF2;
- Wed,  2 Jun 2021 09:38:01 +0000 (UTC)
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1loNK2-004zX9-Vi; Wed, 02 Jun 2021 10:37:59 +0100
-Date: Wed, 02 Jun 2021 10:37:58 +0100
-Message-ID: <878s3s1ua1.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Shanker R Donthineni <sdonthineni@nvidia.com>
-Subject: Re: [RFC 1/2] vfio/pci: keep the prefetchable attribute of a BAR
- region in VMA
-In-Reply-To: <273ba1c2-dfe6-7dc1-3e40-03398e82469b@nvidia.com>
-References: <878s4zokll.wl-maz@kernel.org>
- <BL0PR12MB2532CC436EBF626966B15994BD5E9@BL0PR12MB2532.namprd12.prod.outlook.com>
- <87eeeqvm1d.wl-maz@kernel.org>
- <BL0PR12MB25329EF5DFA7BBAA732064A7BD5C9@BL0PR12MB2532.namprd12.prod.outlook.com>
- <87bl9sunnw.wl-maz@kernel.org>
- <c1bd514a531988c9@bloch.sibelius.xs4all.nl>
- <BL0PR12MB253296086906C4A850EC68E6BD5B9@BL0PR12MB2532.namprd12.prod.outlook.com>
- <20210503084432.75e0126d@x1.home.shazbot.org>
- <BL0PR12MB2532BEAE226E7D68A8A2F97EBD5B9@BL0PR12MB2532.namprd12.prod.outlook.com>
- <20210504083005.GA12290@willie-the-truck>
- <20210505180228.GA3874@arm.com>
- <273ba1c2-dfe6-7dc1-3e40-03398e82469b@nvidia.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: sdonthineni@nvidia.com, catalin.marinas@arm.com,
- will@kernel.org, vsethi@nvidia.com, alex.williamson@redhat.com,
- mark.kettenis@xs4all.nl, christoffer.dall@arm.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org, jsequeira@nvidia.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- Vikram Sethi <vsethi@nvidia.com>, Alex Williamson <alex.williamson@redhat.com>,
- Jason Sequeira <jsequeira@nvidia.com>, Will Deacon <will@kernel.org>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
- Mark Kettenis <mark.kettenis@xs4all.nl>
+ with ESMTP id sxM9jo6uqWqu for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Jun 2021 05:43:53 -0400 (EDT)
+Received: from mail-ed1-f74.google.com (mail-ed1-f74.google.com
+ [209.85.208.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0C7F54066E
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Jun 2021 05:43:53 -0400 (EDT)
+Received: by mail-ed1-f74.google.com with SMTP id
+ s18-20020a0564020372b029038febc2d475so1080592edw.3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Jun 2021 02:43:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=PXs9u6dzCmMe63YEsmhUrb93h0mWmoLs1gTxAQd7MEA=;
+ b=oPgorK2YXYRV0NwbupNNErxxwaXHhcqOGNqd8VNe+P/7Nj5Uz7T7moZyrqR/KdQp5E
+ iUOHFTmYLgjY+7moRvw+AKjjV2DBSZUDC7d+1Zn2fjOJu8WVLJq6Eq0T+m9uNQZE4Qdv
+ 68oufbungBm2FDwfThF94Fvb51/PTNHpNr0PqVJDP9Fai7qCvEORLB+XK0FZ+6MpTuKx
+ w42/J0YFONYdkPPmysoMeWv9wfLLp7FgmZskg3IHlybRnVZD3yizxXzCveGebPdlVIaf
+ kDua8A5CGclwlqWaUqvjFXuwm+AlAFlwyuDMET2h9JWGKzOlnh2KLZl9vpYdpX0KKae+
+ G4XQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=PXs9u6dzCmMe63YEsmhUrb93h0mWmoLs1gTxAQd7MEA=;
+ b=C+tEbAEWjJBpKHm0pB8R6nAEFEf28gLvLRr87+dfLXjxSh7ljgTylH8Vh22cksEeds
+ wpDFR4CPVURPaXop5oQ/DVgDZ6izy78USF2er+3mUPu8+aTLU1EjgIgtj1EjI62FZMuR
+ gY8VV8oilbnQPlWjhm4MGOptty8P6bG+nM2JFbtJu8U6fbNyJ1+v0tr51oi0cZHkzUDr
+ 4VPIIvqAMEmJPryT+TDGUnsvK3klBdwDIAiLc0HqqsJRTCqk3IibD5BsNByha5B9H3ve
+ RuEHsVeEeOXekBh9TB8GizGhJiofUQIwkl3Dp/64hEiaph46NPU9hT+zWO+yodI0CEF3
+ I3HA==
+X-Gm-Message-State: AOAM530RLBhMAJVEcZSkyvu9ph3Kc11ZGd+NFkiMnGjlXeqvmrpuPCFQ
+ UQWqKOlZ5bZEvvsmq5CHVnSZXHigoind
+X-Google-Smtp-Source: ABdhPJwI732qm8er6IebqhgRNDcxCaKLRuDj57CyEYHgzxVlmlFpf/MCKV1O0VnL1RhgrhvYbef7nwiw583Q
+X-Received: from r2d2-qp.c.googlers.com
+ ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1652])
+ (user=qperret job=sendgmr) by 2002:aa7:d893:: with SMTP id
+ u19mr38230483edq.258.1622627031729; Wed, 02 Jun 2021 02:43:51 -0700 (PDT)
+Date: Wed,  2 Jun 2021 09:43:40 +0000
+Message-Id: <20210602094347.3730846-1-qperret@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.32.0.rc0.204.g9fa02ecfa5-goog
+Subject: [PATCH v2 0/7] KVM: arm64: Reduce hyp_vmemmap overhead
+From: Quentin Perret <qperret@google.com>
+To: maz@kernel.org, will@kernel.org, james.morse@arm.com, 
+ alexandru.elisei@arm.com, catalin.marinas@arm.com, suzuki.poulose@arm.com
+Cc: kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -98,63 +89,51 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SGkgU2hhbmtlciwKCk9uIFNhdCwgMDggTWF5IDIwMjEgMTc6MzM6MTEgKzAxMDAsClNoYW5rZXIg
-UiBEb250aGluZW5pIDxzZG9udGhpbmVuaUBudmlkaWEuY29tPiB3cm90ZToKPiAKPiBIaSBNYXJj
-LAo+IAo+IE9uIDUvNS8yMSAxOjAyIFBNLCBDYXRhbGluIE1hcmluYXMgd3JvdGU6Cj4gPj4+IFdp
-bGwvQ2F0YWxpbiwgcGVyaGFwcyB5b3UgY291bGQgZXhwbGFpbiB5b3VyIHRob3VnaHQgcHJvY2Vz
-cyBvbiB3aHkgeW91IGNob3NlCj4gPj4+IE5vcm1hbCBOQyBmb3IgaW9yZW1hcF93YyBvbiB0aGUg
-YXJtdjggbGludXggcG9ydCBpbnN0ZWFkIG9mIERldmljZSBHUkUgb3Igb3RoZXIKPiA+Pj4gRGV2
-aWNlIEd4eC4KPiA+PiBJIHRoaW5rIGEgY29tYmluYXRpb24gb2Y6IGNvbXBhdGliaWxpdHkgd2l0
-aCAzMi1iaXQgQXJtLCB0aGUgbmVlZCB0bwo+ID4+IHN1cHBvcnQgdW5hbGlnbmVkIGFjY2Vzc2Vz
-IGFuZCB0aGUgcG90ZW50aWFsIGZvciBoaWdoZXIgcGVyZm9ybWFuY2UuCj4gPiBJSVJDIHRoZSBf
-d2Mgc3VmZml4IGFsc28gbWF0Y2hlcyB0aGUgcGdwcm90X3dyaXRlY29tYmluZSgpIHVzZWQgYnkg
-c29tZQo+ID4gZHJpdmVycyB0byBtYXAgYSB2aWRlbyBmcmFtZWJ1ZmZlciBpbnRvIHVzZXIgc3Bh
-Y2UuIEFjY2Vzc2VzIHRvIHRoZQo+ID4gZnJhbWVidWZmZXIgYXJlIG5vdCBndWFyYW50ZWVkIHRv
-IGJlIGFsaWduZWQgKG1lbXNldC9tZW1jcHkgZG9uJ3QgZW5zdXJlCj4gPiBhbGlnbm1lbnQgb24g
-YXJtNjQgYW5kIHRoZSB1c2VyIGRvZXNuJ3QgaGF2ZSBhIG1lbXNldF9pbyBvciBtZW1jcHlfdG9p
-bykuCj4gPgo+ID4+IEZ1cnRoZXJtb3JlLCBpb3JlbWFwKCkgYWxyZWFkeSBnaXZlcyB5b3UgYSBE
-ZXZpY2UgbWVtb3J5IHR5cGUsIGFuZCB3ZSdyZQo+ID4+IHRpZ2h0IG9uIE1BSVIgc3BhY2UuCj4g
-PiBXZSBoYXZlIE1UX0RFVklDRV9HUkUgY3VycmVudGx5IHJlc2VydmVkIHRob3VnaCBubyBpbi1r
-ZXJuZWwgdXNlciwgd2UKPiA+IG1pZ2h0IGFzIHdlbGwgcmVtb3ZlIGl0Lgo+IEBNYXJjLCBDb3Vs
-ZCB5b3UgcHJvdmlkZSB5b3VyIHRob3VnaHRzL2d1aWRhbmNlIGZvciB0aGUgbmV4dCBzdGVwPyBU
-aGUKPiBwcm9wb3NhbCBvZiBnZXR0aW5nIGhpbnRzIGZvciBwcmVmZXRjaGFibGUgcmVnaW9ucyBm
-cm9tIFZGSU8vUUVNVSBpcyBub3QKPiByZWNvbW1lbmRlZCwgVGhlIG9ubHkgb3B0aW9uIGxlZnQg
-aXMgdG8gaW1wbGVtZW50IEFSTTY0IGRlcGVuZGVudCBsb2dpYwo+IGluIEtWTS4KPiAKPiBPcHRp
-b24tMTogSSB0aGluayB3ZSBjb3VsZCB0YWtlIGFkdmFudGFnZSBvZiBzdGFnZS0xLzIgY29tYmlu
-aW5nIHJ1bGVzIHRvCj4gYWxsb3cgTk9STUFMX05DIG1lbW9yeS10eXBlIGZvciBkZXZpY2UgbWVt
-b3J5IGluIFZNLiBBbHdheXMgbWFwCj4gZGV2aWNlIG1lbW9yeSBhdCBzdGFnZS0yIGFzIE5PUk1B
-TC1OQyBhbmQgdHJ1c3QgVk0ncyBzdGFnZS0xIE1ULgo+IAo+IC0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo+IFN0YWdlLTIgTVTC
-oMKgwqDCoCBTdGFnZS0xIE1UwqDCoMKgIFJlc3VsdGFudCBNVCAoY29tYmluaW5nLXJ1bGVzL0ZX
-QikKPiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0KPiBOb3JtYWwtTkPCoMKgwqDCoMKgIE5vcm1hbC1XVMKgwqDCoMKgwqDCoMKg
-wqDCoMKgIE5vcm1hbC1OQwo+IMKgwqAgLcKgwqDCoMKgwqDCoMKgwqDCoMKgIE5vcm1hbC1XQsKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIC0KPiDCoMKgIC3CoMKgwqDCoMKgwqDCoMKgwqDCoCBO
-b3JtYWwtTkPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAtCj4gwqDCoCAtwqDCoMKgwqDCoMKg
-wqDCoMKgwqAgRGV2aWNlLTxhdHRyPsKgwqDCoMKgwqDCoCBEZXZpY2UtPGF0dHI+Cj4gLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-CgpJIHRoaW5rIHRoaXMgaXMgdW53aXNlLgoKV2lsbCByZWNlbnRseSBkZWJ1Z2dlZCBhIHByZXR0
-eSBob3JyaWJsZSBzaXR1YXRpb24gd2hlbiBkb2luZyBleGFjdGx5CnRoYXQ6IHdoZW4gUzEgaXMg
-b2ZmIGFuZCBTMiBpcyBvbiwgdGhlIEktc2lkZSBpcyBhbGxvd2VkIHRvIGdlbmVyYXRlCnNwZWN1
-bGF0aXZlIGFjY2Vzc2VzIChzZWUgQVJNdjggQVJNIEcuYSBENS4yLjkgZm9yIHRoZSBkZXRhaWxz
-KS4gQW5kCnllcywgaW1wbGVtZW50YXRpb25zIGRlZmluaXRlbHkgZG8gdGhhdC4gQWRkIHNpZGUt
-ZWZmZWN0IHJlYWRzIHRvIHRoZQptaXgsIGFuZCB5b3UncmUgaW4gZm9yIGEgdHJlYXQuCgo+IFdl
-J3ZlIGJlZW4gdXNpbmcgdGhpcyBvcHRpb24gaW50ZXJuYWxseSBmb3IgdGVzdGluZyBwdXJwb3Nl
-IGFuZAo+IHZhbGlkYXRlZCB3aXRoIE5WTUUvTWVsbGFub3gvR1BVIHBhc3MtdGhyb3VnaCBkZXZp
-Y2VzIG9uCj4gTWFydmVsbC1UaHVuZGV4MiBwbGF0Zm9ybS4KClNlZSBhYm92ZS4gSXQgKndpbGwq
-IGJyZWFrIGV2ZW50dWFsbHkuCgo+IE9wdGlvbi0yOiBHZXQgcmVzb3VyY2UgcHJvcGVydGllcyBh
-c3NvY2lhdGVkIHdpdGggTU1JTyB1c2luZyBsb29rdXBfcmVzb3VyY2UoKQo+IGFuZCBtYXAgYXQg
-c3RhZ2UtMiBhcyBOb3JtYWwtTkMgaWYgSU9SRVNPVVJDRV9QUkVGRVRDSCBpcyBzZXQgaW4gZmxh
-Z3MuCgpUaGF0J3MgYSBwcmV0dHkgcm91bmRhYm91dCB3YXkgb2YgZG9pbmcgZXhhY3RseSB0aGUg
-c2FtZSB0aGluZyB5b3UKaW5pdGlhbGx5IHByb3Bvc2VkLiBBbmQgaXQgc3VmZmVycyBmcm9tIHRo
-ZSBleGFjdCBzYW1lIHByb2JsZW1zLCB3aGljaAppcyB0aGF0IHlvdSBjaGFuZ2UgdGhlIHNlbWFu
-dGljcyBvZiB0aGUgbWFwcGluZyB3aXRob3V0IGtub3dpbmcgd2hhdAp0aGUgZ3Vlc3QncyBpbnRl
-bnQgaXMuCgoJTS4KCi0tIApXaXRob3V0IGRldmlhdGlvbiBmcm9tIHRoZSBub3JtLCBwcm9ncmVz
-cyBpcyBub3QgcG9zc2libGUuCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVk
-dQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+Hi all,
+
+This is a v2 of the patch series previously posted here:
+
+  https://lore.kernel.org/r/20210527125134.2116404-1-qperret@google.com/
+
+Please refer to the cover letter of v1 for the context and motivation
+behind the series.
+
+Changes since v1:
+ - Added comment/doc in page_alloc.c explaining the locking expectations;
+ - Removed unnecessary casts in the 'page-to-list-node' helpers;
+ - A few other cosmetic changes in the allocator.
+
+Thanks,
+Quentin
+
+Quentin Perret (7):
+  KVM: arm64: Move hyp_pool locking out of refcount helpers
+  KVM: arm64: Use refcount at hyp to check page availability
+  KVM: arm64: Remove list_head from hyp_page
+  KVM: arm64: Unify MMIO and mem host stage-2 pools
+  KVM: arm64: Remove hyp_pool pointer from struct hyp_page
+  KVM: arm64: Use less bits for hyp_page order
+  KVM: arm64: Use less bits for hyp_page refcount
+
+ arch/arm64/kvm/hyp/include/nvhe/gfp.h         |  45 +------
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |   2 +-
+ arch/arm64/kvm/hyp/include/nvhe/memory.h      |   7 +-
+ arch/arm64/kvm/hyp/include/nvhe/mm.h          |  13 +-
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         |  60 +++++-----
+ arch/arm64/kvm/hyp/nvhe/page_alloc.c          | 112 +++++++++++++-----
+ arch/arm64/kvm/hyp/nvhe/setup.c               |  30 +++--
+ arch/arm64/kvm/hyp/reserved_mem.c             |   3 +-
+ 8 files changed, 145 insertions(+), 127 deletions(-)
+
+-- 
+2.32.0.rc0.204.g9fa02ecfa5-goog
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
