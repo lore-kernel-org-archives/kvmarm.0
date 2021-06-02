@@ -2,97 +2,92 @@ Return-Path: <SRS0=fRMP=K4=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D61F6C47083
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Jun 2021 09:11:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 143C0C4708F
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Jun 2021 09:23:45 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 475F16101C
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Jun 2021 09:11:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 475F16101C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 895B5613D6
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Jun 2021 09:23:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 895B5613D6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C6FC240617;
-	Wed,  2 Jun 2021 05:11:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 03F26402DB;
+	Wed,  2 Jun 2021 05:23:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id aWQjLNX2pVqj; Wed,  2 Jun 2021 05:11:19 -0400 (EDT)
+	with ESMTP id D4sUBM0cY0HY; Wed,  2 Jun 2021 05:23:40 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 28B4949F83;
-	Wed,  2 Jun 2021 05:11:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1FEC6407F1;
+	Wed,  2 Jun 2021 05:23:40 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E03649F8F
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Jun 2021 05:11:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DDA54402DB
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Jun 2021 05:23:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FJi7xE8p5-Y3 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 Jun 2021 05:11:14 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1831A49F83
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Jun 2021 05:11:14 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id AD0FB608FE;
- Wed,  2 Jun 2021 09:11:12 +0000 (UTC)
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1loMu6-004zLH-Ha; Wed, 02 Jun 2021 10:11:10 +0100
-Date: Wed, 02 Jun 2021 10:11:09 +0100
-Message-ID: <87a6o81viq.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: [RFC 1/2] vfio/pci: keep the prefetchable attribute of a BAR
- region in VMA
-In-Reply-To: <20210504120348.2eec075b@redhat.com>
-References: <20210429162906.32742-1-sdonthineni@nvidia.com>
- <20210429162906.32742-2-sdonthineni@nvidia.com>
- <20210429122840.4f98f78e@redhat.com>
- <470360a7-0242-9ae5-816f-13608f957bf6@nvidia.com>
- <20210429134659.321a5c3c@redhat.com>
- <e3d7fda8-5263-211c-3686-f699765ab715@nvidia.com>
- <87czucngdc.wl-maz@kernel.org>
- <1edb2c4e-23f0-5730-245b-fc6d289951e1@nvidia.com>
- <878s4zokll.wl-maz@kernel.org>
- <BL0PR12MB2532CC436EBF626966B15994BD5E9@BL0PR12MB2532.namprd12.prod.outlook.com>
- <87eeeqvm1d.wl-maz@kernel.org>
- <BL0PR12MB25329EF5DFA7BBAA732064A7BD5C9@BL0PR12MB2532.namprd12.prod.outlook.com>
- <87bl9sunnw.wl-maz@kernel.org>
- <c1bd514a531988c9@bloch.sibelius.xs4all.nl>
- <BL0PR12MB253296086906C4A850EC68E6BD5B9@BL0PR12MB2532.namprd12.prod.outlook.com>
- <20210503084432.75e0126d@x1.home.shazbot.org>
- <BL0PR12MB2532BEAE226E7D68A8A2F97EBD5B9@BL0PR12MB2532.namprd12.prod.outlook.com>
- <20210504120348.2eec075b@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: alex.williamson@redhat.com, vsethi@nvidia.com,
- mark.kettenis@xs4all.nl, sdonthineni@nvidia.com, will@kernel.org,
- catalin.marinas@arm.com, christoffer.dall@arm.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org, jsequeira@nvidia.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Vikram Sethi <vsethi@nvidia.com>,
- Jason Sequeira <jsequeira@nvidia.com>, "will@kernel.org" <will@kernel.org>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
- Mark Kettenis <mark.kettenis@xs4all.nl>
+ with ESMTP id bmf2xk-mds2q for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Jun 2021 05:23:37 -0400 (EDT)
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com
+ [209.85.128.54])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 90317406D3
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Jun 2021 05:23:37 -0400 (EDT)
+Received: by mail-wm1-f54.google.com with SMTP id
+ f20-20020a05600c4e94b0290181f6edda88so3322649wmq.2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Jun 2021 02:23:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=WmVa2b7NUFKbzMkhRQoxLzdNVa4IgoT+niyCi15lBaU=;
+ b=fJRU2AeKIPcQx11KLen+Ij89vZ+kwU0B8R7ieQATn/S0NLwL1fvRl5LLh3ACQr34HC
+ O/8C0RF/0XjOPLbaQwJxsyQTmFiVL+Csf6hhVR3MNdjIKQDCPOwwgZZMoGIc35TOnpPe
+ pYii0GAXsOF3dYFSG/Q0zJeCb6QtDpn02L6GGQSwx7MZ9E9s317Gsikz/vHIA3HLacl9
+ 3ZZRtTIXdgDwIgatsDJ1EBqZI7eZWxX4fgyowEP5VzxlJvcFR/j5QGj3pUgUr+hlWyY5
+ d0JiS7tPfNQp6xOkVawGkmAOHWLu632QX4JEKAoYuAX+6eVgjx1gIPD/QQsd63szgsgx
+ 218A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=WmVa2b7NUFKbzMkhRQoxLzdNVa4IgoT+niyCi15lBaU=;
+ b=iJK+5e1WvJo8CXT1+uawIm9CpGy0PNjf5mRBf4vDijIQ3hLwUduIKWQ2+bBJYlEC9h
+ 5zFik3dcqurNPJ47fenReSVX+rsOYj3SIsl3Tll71s0bZ72jzWeYKIjU3TyG4fLS/By3
+ DGg1fjnBEzJCxDnkIulh4L35cFTxMldu1MEarrkdboVJL5WucCvyPSU5gIKZHg8DQelh
+ BZuyi1/tvMmfrX1lp3zNP1m8NfDqkHwkD88+5U3/FE+7LBwGXCEIUcHi25RJdN1PQbgs
+ aAJ2B3OXksZdQpV1UPL8YNwYt0GAVmuYQgB8WX24wMJpH4z3CZ/Y//A/Xcm72A3a8VRS
+ T+PQ==
+X-Gm-Message-State: AOAM531h4otxOUSrPPkwocZSvrjq8Md0/AOU1lv0gZ1lmYtyI2KkpllY
+ CYe2CC5lj07iAhWgpEZl2iq4Dw==
+X-Google-Smtp-Source: ABdhPJxrBmcIQdy1jyLXdbeY8xm3r2YATiuKPsOu+SRZUU2eDFxWBsAmhIOgoXGcJfVGwfjPxAVmew==
+X-Received: by 2002:a1c:f016:: with SMTP id a22mr31888176wmb.65.1622625816371; 
+ Wed, 02 Jun 2021 02:23:36 -0700 (PDT)
+Received: from google.com (105.168.195.35.bc.googleusercontent.com.
+ [35.195.168.105])
+ by smtp.gmail.com with ESMTPSA id h14sm2009325wmb.1.2021.06.02.02.23.35
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 02 Jun 2021 02:23:35 -0700 (PDT)
+Date: Wed, 2 Jun 2021 09:23:33 +0000
+From: Quentin Perret <qperret@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH 3/7] KVM: arm64: Remove list_head from hyp_page
+Message-ID: <YLdOFUPjgCK33Vd5@google.com>
+References: <20210527125134.2116404-1-qperret@google.com>
+ <20210527125134.2116404-4-qperret@google.com>
+ <87k0nd1wgx.wl-maz@kernel.org> <YLZWtnGVQSguI1P6@google.com>
+ <87fsy11nz6.wl-maz@kernel.org>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <87fsy11nz6.wl-maz@kernel.org>
+Cc: kernel-team@android.com, catalin.marinas@arm.com,
+ linux-kernel@vger.kernel.org, will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -104,127 +99,51 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gVHVlLCAwNCBNYXkgMjAyMSAxOTowMzo0OCArMDEwMCwKQWxleCBXaWxsaWFtc29uIDxhbGV4
-LndpbGxpYW1zb25AcmVkaGF0LmNvbT4gd3JvdGU6Cj4gCj4gT24gTW9uLCAzIE1heSAyMDIxIDIy
-OjAzOjU5ICswMDAwCj4gVmlrcmFtIFNldGhpIDx2c2V0aGlAbnZpZGlhLmNvbT4gd3JvdGU6Cj4g
-Cj4gPiBIaSBBbGV4LAo+ID4gPiBGcm9tOiBBbGV4IFdpbGxpYW1zb24gPGFsZXgud2lsbGlhbXNv
-bkByZWRoYXQuY29tPgo+ID4gPiBPbiBNb24sIDMgTWF5IDIwMjEgMTM6NTk6NDMgKzAwMDAKPiA+
-ID4gVmlrcmFtIFNldGhpIDx2c2V0aGlAbnZpZGlhLmNvbT4gd3JvdGU6ICAKPiA+ID4gPiA+IEZy
-b206IE1hcmsgS2V0dGVuaXMgPG1hcmsua2V0dGVuaXNAeHM0YWxsLm5sPiAgCj4gPiA+ID4gPiA+
-IEZyb206IE1hcmMgWnluZ2llciA8bWF6QGtlcm5lbC5vcmc+ICAKPiA+ID4gPgo+ID4gPiA+IHNu
-aXAgIAo+ID4gPiA+ID4gPiBJZiwgYnkgZW51bWVyYXRpbmcgdGhlIHByb3BlcnRpZXMgb2YgUHJl
-ZmV0Y2hhYmxlLCB5b3UgY2FuIHNob3cKPiA+ID4gPiA+ID4gdGhhdCB0aGV5IGFyZSBhIHN0cmlj
-dCBzdXBlcnNldCBvZiBOb3JtYWxfTkMsIEknbSBvbiBib2FyZC4gSQo+ID4gPiA+ID4gPiBoYXZl
-bid0IHNlZW4gc3VjaCBhbiBlbnVtZXJhdGlvbiBzbyBmYXIuCj4gPiA+ID4gPiA+ICAKPiA+ID4g
-PiBzbmlwICAKPiA+ID4gPiA+ID4gUmlnaHQsIHNvIHdlIGhhdmUgbWFkZSBhIHNtYWxsIHN0ZXAg
-aW4gdGhlIGRpcmVjdGlvbiBvZiBtYXBwaW5nCj4gPiA+ID4gPiA+ICJwcmVmZXRjaGFibGUiIG9u
-dG8gIk5vcm1hbF9OQyIsIHRoYW5rcyBmb3IgdGhhdC4gV2hhdCBhYm91dCBhbGwKPiA+ID4gPiA+
-ID4gdGhlIG90aGVyIHByb3BlcnRpZXMgKHVuYWxpZ25lZCBhY2Nlc3Nlcywgb3JkZXJpbmcsIGdh
-dGhlcmluZyk/ICAKPiA+ID4gPiA+ICAKPiA+ID4gPiBSZWdhcmRpbmcgZ2F0aGVyaW5nL3dyaXRl
-IGNvbWJpbmluZywgdGhhdCBpcyBhbHNvIGFsbG93ZWQgdG8KPiA+ID4gPiBwcmVmZXRjaGFibGUg
-cGVyIFBDSSBzcGVjICAKPiA+ID4gCj4gPiA+IEFzIG90aGVycyBoYXZlIHN0YXRlZCwgZ2F0aGVy
-L3dyaXRlIGNvbWJpbmluZyBpdHNlbGYgaXMgbm90IHdlbGwgZGVmaW5lZC4KPiA+ID4gICAKPiA+
-ID4gPiBGcm9tIDEuMy4yLjIgb2YgNS8wIGJhc2Ugc3BlYzoKPiA+ID4gPiBBIFBDSSBFeHByZXNz
-IEVuZHBvaW50IHJlcXVlc3RpbmcgbWVtb3J5IHJlc291cmNlcyB0aHJvdWdoIGEgQkFSIG11c3QK
-PiA+ID4gPiBzZXQgdGhlIEJBUidzIFByZWZldGNoYWJsZSBiaXQgdW5sZXNzIHRoZSByYW5nZSBj
-b250YWlucyBsb2NhdGlvbnMKPiA+ID4gPiB3aXRoIHJlYWQgc2lkZS1lZmZlY3RzIG9yIGxvY2F0
-aW9ucyBpbiB3aGljaCB0aGUgRnVuY3Rpb24gZG9lcyBub3QgdG9sZXJhdGUgIAo+ID4gPiB3cml0
-ZSBtZXJnaW5nLgo+ID4gPiAKPiA+ID4gIndyaXRlIG1lcmdpbmciICBUaGlzIGlzIGEgdmVyeSBz
-cGVjaWZpYyB0aGluZywgcGVyIFBDSSAzLjAsIDMuMi42Ogo+ID4gPiAKPiA+ID4gICBCeXRlIE1l
-cmdpbmcg4oCTIG9jY3VycyB3aGVuIGEgc2VxdWVuY2Ugb2YgaW5kaXZpZHVhbCBtZW1vcnkgd3Jp
-dGVzCj4gPiA+ICAgKGJ5dGVzIG9yIHdvcmRzKSBhcmUgbWVyZ2VkIGludG8gYSBzaW5nbGUgRFdP
-UkQuCj4gPiA+IAo+ID4gPiBUaGUgc2VtYW50aWNzIHN1Z2dlc3QgcXVhZHdvcmQgc3VwcG9ydCBp
-biBhZGRpdGlvbiB0byBkd29yZCwgYnV0Cj4gPiA+IGRvbid0IHJlcXVpcmUgaXQuICBXcml0ZXMg
-dG8gYnl0ZXMgd2l0aGluIGEgZHdvcmQgY2FuIGJlIG1lcmdlZCwKPiA+ID4gYnV0IGR1cGxpY2F0
-ZSB3cml0ZXMgY2Fubm90Lgo+ID4gPiAKPiA+ID4gSXQgc2VlbXMgbGlrZSBhbiBleHRyZW1lbHkg
-bGliZXJhbCBhcHBsaWNhdGlvbiB0byBzdWdnZXN0IHRoYXQKPiA+ID4gdGhpcyBvbmUgd3JpdGUg
-c2VtYW50aWMgZW5jb21wYXNzZXMgZnVsbCB3cml0ZSBjb21iaW5pbmcKPiA+ID4gc2VtYW50aWNz
-LCB3aGljaCBpdHNlbGYgaXMgbm90IGNsZWFybHkgZGVmaW5lZC4KPiA+ID4gIAo+ID4gVGFsa2lu
-ZyB0byBvdXIgUENJZSBTSUcgcmVwcmVzZW50YXRpdmUsIFBDSWUgc3dpdGNoZXMgYXJlIG5vdAo+
-ID4gYWxsb3dlZCBkbyBhbnkgb2YgdGhlIGJ5dGUgTWVyZ2luZy9jb21iaW5pbmcgZXRjIGFzIGRl
-ZmluZWQgaW4gdGhlCj4gPiBQQ0kgc3BlYywgYW5kIHBlciBhIHJhdGhlciBwb29ybHkgd29yZGVk
-IEltcGxlbWVudGF0aW9uIG5vdGUgaW4KPiA+IHRoZSBzcGVjIHNheXMgdGhhdCBubyBrbm93biBQ
-Q0llIEhvc3QgQnJpZGRnZXMvUm9vdCBwb3J0cyBkbyBpdAo+ID4gZWl0aGVyLiAgU28gZm9yIFBD
-SWUgd2UgZG9uJ3QgdGhpbmsgYmVsaWV2ZSB0aGVyZSBpcyBhbnkgYnl0ZQo+ID4gbWVyZ2luZyB0
-aGF0IGhhcHBlbnMgaW4gdGhlIFBDSWUgZmFicmljIHNvIGl0J3MgcmVhbGx5IGEgbWF0dGVyIG9m
-Cj4gPiB3aGF0IGhhcHBlbnMgaW4gdGhlIENQVSBjb3JlIGFuZCBpbnRlcmNvbm5lY3QgYmVmb3Jl
-IGl0IGdldHMgdG8KPiA+IHRoZSBQQ0llIGhpZXJhcmNoeS4KPiAKPiBZZXMsIGJ1dCBtZXJnZWQg
-d3JpdGVzLCBubyBtYXR0ZXIgd2hlcmUgdGhleSBoYXBwZW4sIGFyZSBzdGlsbCB0aGUgb25seQo+
-IHR5cGUgb2Ygd3JpdGUgY29tYmluaW5nIHRoYXQgYSBwcmVmZXRjaGFibGUgQkFSIG9uIGFuIGVu
-ZHBvaW50IGlzCj4gcmVxdWlyZWQgdG8gc3VwcG9ydC4KPiAKPiA+IFN0ZXBwaW5nIGJhY2sgZnJv
-bSB0aGlzIHBhdGNoc2V0LCBkbyB5b3UgYWdyZWUgdGhhdCBpdCBpcwo+ID4gZGVzaXJhYmxlIHRv
-IHN1cHBvcnQgV3JpdGUgY29tYmluaW5nIGFzIHVuZGVyc3Rvb2QgYnkgaW9yZW1hcF93Ywo+ID4g
-dG8gd29yayBpbiBhbGwgSVNBIGd1ZXN0cyBpbmNsdWRpbmcgQVJNdjg/Cj4gCj4gWWVzLCBhIHVz
-ZXJzcGFjZSB2ZmlvIGRyaXZlciBzaG91bGQgYmUgYWJsZSB0byB0YWtlIGFkdmFudGFnZSBvZiB0
-aGUKPiBoYXJkd2FyZSBjYXBhYmlsaXRpZXMuICBJIHRoaW5rIHdoZXJlIHdlIGRpc2FncmVlIGlz
-IHdoZXRoZXIgaXQncwo+IHVuaXZlcnNhbGx5IHNhZmUgdG8gYXNzdW1lIHdyaXRlIGNvbWJpbmlu
-ZyBiYXNlZCBvbiB0aGUgUENJCj4gcHJlZmV0Y2hhYmxlIGNhcGFiaWxpdHkgb2YgYSBCQVIuICBJ
-ZiB0aGF0J3Mgc29tZXRoaW5nIHRoYXQgY2FuIGJlCj4gYXNzdW1lZCB1bml2ZXJzYWxseSBmb3Ig
-QVJNdjggYmFzZWQgb24gdGhlIGFyY2hpdGVjdHVyZSBzcGVjaWZpY2F0aW9uCj4gY29tcGF0aWJp
-bGl0eSB3aXRoIHRoZSBQQ0kgZGVmaW5pdGlvbiBvZiBhIHByZWZldGNoYWJsZSBCQVIsIHRoZW4g
-SQo+IHdvdWxkIGV4cGVjdCBhIGhlbHBlciBzb21ld2hlcmUgaW4gYXJjaCBjb2RlIHRoYXQgcmV0
-dXJucyB0aGUgcmlnaHQKPiBwYWdlIHByb3RlY3Rpb24gZmxhZ3MsIHNvIHRoYXQgYXJjaCBtYWlu
-dGFpbmVycyBkb24ndCBuZWVkIHRvIHNjb3VyCj4gZGV2aWNlIGRyaXZlcnMgZm9yIGFyY2hpdGVj
-dHVyZSBoYWNrcy4gIE90aGVyd2lzZSwgaXQgbmVlZHMgdG8gYmUKPiBleHBvc2VkIHRocm91Z2gg
-dGhlIHZmaW8gdUFQSSB0byBhbGxvdyB0aGUgdXNlcnNwYWNlIGRldmljZSBkcml2ZXIKPiBpdHNl
-bGYgdG8gc2VsZWN0IHRoZXNlIHNlbWFudGljcy4KPiAKPiA+IFlvdSBub3RlIHRoYXQgeDg2IHZp
-cnR1YWxpemF0aW9uIGRvZXNuJ3QgaGF2ZSB0aGlzIGlzc3VlLCBidXQKPiA+IEtWTS1BUk0gZG9l
-cyBiZWNhdXNlIEtWTSBtYXBzIGFsbCBkZXZpY2UgQkFScyBhcyBEZXZpY2UgTWVtb3J5Cj4gPiB0
-eXBlIG5HblJFIHdoaWNoIGRvZXNuJ3QgYWxsb3cgaW9yZW1hcF93YyBmcm9tIHdpdGhpbiB0aGUg
-Z3Vlc3QgdG8KPiA+IGdldCB0aGUgYWN0dWFsIHNlbWFudGljcyBkZXNpcmVkLgo+ID4gCj4gPiBN
-YXJjIGFuZCBvdGhlcnMgaGF2ZSBzdWdnZXN0ZWQgdGhhdCB1c2Vyc3BhY2Ugc2hvdWxkIHByb3Zp
-ZGUgdGhlCj4gPiBoaW50cy4gQnV0IHRoZSBxdWVzdGlvbiBpcyBob3cgd291bGQgcWVtdSB2Zmlv
-IGRvIHRoaXMgZWl0aGVyPyBXZQo+ID4gd291bGQgYmUgc3R1Y2sgaW4gdGhlIHNhbWUgYXJndW1l
-bnRzIGFzIGhlcmUsIGFzIHRvIHdoYXQgaXMgdGhlCj4gPiBjb3JyZWN0IHdheSB0byBkZXRlcm1p
-bmUgdGhlIGRlc2lyZWQgYXR0cmlidXRlcyBmb3IgYSBnaXZlbiBCQVIKPiA+IHN1Y2ggdGhhdCBl
-dmVudHVhbGx5IHdoZW4gYSBkcml2ZXIgaW4gdGhlIGd1ZXN0IGFza3MgZm9yCj4gPiBpb3JlbWFw
-X3djIGl0IGFjdHVhbGx5IGhhcyBhIGNoYW5jZSBvZiB3b3JraW5nIGluIHRoZSBndWVzdCwgaW4K
-PiA+IGFsbCBJU0FzLiAgRG8geW91IGhhdmUgYW55IHN1Z2dlc3Rpb25zIG9uIGhvdyB0byBtYWtl
-IHByb2dyZXNzCj4gPiBoZXJlPwo+IAo+IFdlIGRvIG5lZWQgc29tZSB3YXkgZm9yIHVzZXJzcGFj
-ZSBkcml2ZXJzIHRvIGFsc28gbWFrZSB1c2Ugb2YgV0MKPiBzZW1hbnRpY3MsIHRoZXJlIHdlcmUg
-c29tZSBkaXNjdXNzaW9ucyBpbiB0aGUgcGFzdCwgSSB0aGluayBvdGhlcnMgaGF2ZQo+IHJlZmVy
-ZW5jZWQgdGhlbSBhcyB3ZWxsLCBidXQgbm90aGluZyBoYXMgYmVlbiBwcm9wb3NlZCBmb3IgYSB2
-ZmlvIEFQSS4KPiAKPiBJZiB3ZSBoYWQgdGhhdCBBUEksIFFFTVUgZGVjaWRpbmcgdG8gdW5pdmVy
-c2FsbHkgZW5hYmxlIFdDIGZvciBhbGwKPiB2ZmlvIHByZWZldGNoYWJsZSBCQVJzIHNlZW1zIG9u
-bHkgbWFyZ2luYWxseSBiZXR0ZXIgdGhhbiB0aGlzIGFwcHJvYWNoLgo+IFVsdGltYXRlbHkgdGhl
-IG1hcHBpbmcgc2hvdWxkIGJlIGJhc2VkIG9uIHRoZSBndWVzdCBkcml2ZXIgc2VtYW50aWNzLAo+
-IGFuZCBpZiB5b3UgZG9uJ3QgaGF2ZSBhbnkgdmlzaWJpbGl0eSB0byB0aGF0IG9uIEtWTS9hcm0g
-bGlrZSB3ZSBoYXZlIG9uCj4gS1ZNL3g4NiwgdGhlbiBpdCBzZWVtcyBsaWtlIHRoZXJlJ3Mgbm90
-aGluZyB0byB0cmlnZ2VyIGEgdmZpbyBBUEkgaGVyZQo+IGFueXdheS4KClRoZXJlIGlzbid0IG11
-Y2ggS1ZNL2FybTY0IGNhbiBkbyBoZXJlIHVubGVzcyBpdCBpcyBiZWluZyB0b2xkIHdoYXQgdG8K
-ZG8uIFdlIGRvbid0IGhhdmUgdmlzaWJpbGl0eSBvbiB0aGUgZ3Vlc3QncyBwYWdlIHRhYmxlcyBp
-biBhIHJlbGlhYmxlCndheSwgYW5kIHRydXN0aW5nIHRoZW0gaXMgbm90IHNvbWV0aGluZyBJIHdh
-bnQgdG8gZW50ZXJ0YWluIGFueXdheS4KCj4gSWYgdGhhdCdzIHRoZSBjYXNlLCBJJ2QgcHJvYmFi
-bHkgZ28gYmFjayB0byBsZXR0aW5nIHRoZSBhcmNoL2FybTY0IGZvbGtzCj4gZGVjbGFyZSB0aGF0
-IFdDIGlzIGNvbXBhdGlibGUgd2l0aCB0aGUgZGVmaW5pdGlvbiBvZiBQQ0kgcHJlZmV0Y2hhYmxl
-Cj4gYW5kIGV4cG9ydCBzb21lIHNvcnQgb2YgcGdwcm90X3BjaV9wcmVmZXRjaGFibGUoKSBoZWxw
-ZXIgd2hlcmUgdGhlCj4gZGVmYXVsdCB3b3VsZCBiZSB0byAjZGVmaW5lIGl0IGFzIHBncHJvY19u
-b25jYWNoZWQoKSAjaWZuZGVmIGJ5IHRoZQo+IGFyY2guCj4gCj4gPiBBIGRldmljZSBzcGVjaWZp
-YyBsaXN0IG9mIHdoaWNoIEJBUnMgYXJlIE9LIHRvIGFsbG93IGlvcmVtYXBfd2MKPiA+IGZvciBz
-ZWVtcyB0ZXJyaWJsZSBhbmQgSSdtIG5vdCBzdXJlIGlmIGEgY29tbWFuZGxpbmUgcWVtdSBvcHRp
-b24KPiA+IGlzIGFueSBiZXR0ZXIuIElzIHRoZSB1c2VyIG9mIGRldmljZSBhc3NpZ25tZW50L3N5
-c2FkbWluIHN1cHBvc2VkCj4gPiB0byBrbm93IHdoaWNoIEJBUiBvZiB3aGljaCBkZXZpY2UgaXMg
-T0sgdG8gYWxsb3cgaW9yZW1hcF93YyBmb3I/Cj4gCj4gTm8sIGEgZGV2aWNlIHNwZWNpZmljIHVz
-ZXJzcGFjZSBkcml2ZXIgc2hvdWxkIGtub3cgc3VjaCBkZXZpY2UKPiBzZW1hbnRpY3MsIGJ1dCBR
-RU1VIGlzIG5vdCBzdWNoIGEgZHJpdmVyLiAgQnVyZGVuaW5nIHRoZSBoeXBlcnZpc29yCj4gdXNl
-ci9hZG1pbiBpcyBub3QgYSBnb29kIHNvbHV0aW9uIGVpdGhlci4gIEknZCBsZWFuIG9uIEtWTS9h
-cm02NCBmb2xrcwo+IHRvIGtub3cgaG93IHRoZSBndWVzdCBkcml2ZXIgc2VtYW50aWNzIGNhbiBi
-ZSBleHBvc2VkIHRvIHRoZQo+IGh5cGVydmlzb3IuICBUaGFua3MsCgpJIGRvbid0IHNlZSBhIGdv
-b2Qgd2F5IGZvciB0aGF0LCB1bmxlc3Mgd2UgbWFrZSBpdCBhIHBlci1ndWVzdCBidXktaW4Kd2hl
-cmUgYWxsIFBDSSBwcmVmZXRjaGFibGUgbWFwcGluZ3MgZ2V0IHRoZSBzYW1lIHRyZWF0bWVudC4g
-SSdtCnByZXBhcmVkIHRvIGJldCB0aGF0IHRoaXMgd2lsbCBicmVhayB3aGVuIHR3byBkZXZpY2Vz
-IHdpbGwgaGF2ZQpkaWZmZXJlbnQgcmVxdWlyZW1lbnRzLiBJdCB3b3VsZCBhbHNvIHJlcXVpcmUg
-dXNlcnNwYWNlIHRvIGJ1eSBpbnRvCnRoaXMgc2NoZW1lIHRob3VnaCwgd2hpY2ggaXMgY3JhcC4K
-CkV4cG9zaW5nIHRoZSBndWVzdCdzIHByZWZlcmVuY2Ugb24gYSBwZXItZGV2aWNlIGJhc2lzIHNl
-ZW1zIGRpZmZpY3VsdAooS1ZNIGtub3dzIG5vdGhpbmcgYWJvdXQgdGhlIFBDSSBkZXZpY2VzKSBh
-bmQgd291bGQgcmVxdWlyZSBzb21lIFBWCmludGVyZmFjZSB0aGF0IHdpbGwgcXVpY2tseSBiZWNv
-bWUgdW5tYWludGFpbmFibGUuCgoJTS4KCi0tIApXaXRob3V0IGRldmlhdGlvbiBmcm9tIHRoZSBu
-b3JtLCBwcm9ncmVzcyBpcyBub3QgcG9zc2libGUuCl9fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNz
-LmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3Rp
-bmZvL2t2bWFybQo=
+On Tuesday 01 Jun 2021 at 18:41:49 (+0100), Marc Zyngier wrote:
+> On Tue, 01 Jun 2021 16:48:06 +0100,
+> Quentin Perret <qperret@google.com> wrote:
+> > 
+> > On Tuesday 01 Jun 2021 at 15:38:22 (+0100), Marc Zyngier wrote:
+> > > On Thu, 27 May 2021 13:51:30 +0100,
+> > > Quentin Perret <qperret@google.com> wrote:
+> > > > +/*
+> > > > + * Pages that are available for allocation are tracked in free-lists, so we use
+> > > > + * the pages themselves to store the list nodes to avoid wasting space. As the
+> > > > + * allocator always returns zeroed pages (which are zeroed on the hyp_put_page()
+> > > > + * path to optimize allocation speed), we also need to clean-up the list node in
+> > > > + * each page when we take it out of the list.
+> > > > + */
+> > > > +static inline void page_remove_from_list(struct hyp_page *p)
+> > > > +{
+> > > > +	struct list_head *node = (struct list_head *)hyp_page_to_virt(p);
+> > > 
+> > > Nit: How about changing hyp_page_to_virt() so that it returns a
+> > > convenient 'void *', and get rid of the ugly casts?
+> > 
+> > It should already return void *, but I kind of liked the explicit cast
+> > here for documentation purpose. We're turning a 'random' piece of unused
+> > memory into a typed object, so that felt like a useful annotation. Happy
+> > to get rid of it though.
+> 
+> My expectations were that using hyp_page_to_virt() already serves as a
+> pretty big warning that we're doing something unusual.
+> 
+> I guess that if we want to be really careful about those, we should
+> then be consistent and make it return a uintptr_t (or unsigned long)
+> instead, actively making use of the cast, consistently, everywhere.
+
+Right, so I'd prefer keeping it void * for consistency with the EL1
+equivalent -- much of this aims to be API compatible with the Linux
+stuff. I'll get rid of the cast and post a v2 shortly.
+
+Cheers,
+Quentin
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
