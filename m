@@ -2,59 +2,74 @@ Return-Path: <SRS0=Ht+8=K5=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C4C1C47096
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Jun 2021 16:00:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32B34C47097
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Jun 2021 16:04:20 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1867C613DC
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Jun 2021 16:00:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1867C613DC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id A998A613F3
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Jun 2021 16:04:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A998A613F3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9333A4B0ED;
-	Thu,  3 Jun 2021 12:00:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A6EC4B0C6;
+	Thu,  3 Jun 2021 12:04:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 8BihUlAIT1t4; Thu,  3 Jun 2021 12:00:44 -0400 (EDT)
+	with ESMTP id 7Hyi2DXQGFR6; Thu,  3 Jun 2021 12:04:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EBC9149F92;
-	Thu,  3 Jun 2021 12:00:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 771C94B0A0;
+	Thu,  3 Jun 2021 12:04:13 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 409B549F92
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Jun 2021 12:00:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1CF124B0A0
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Jun 2021 12:04:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4Ctu7CTsZXpl for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Jun 2021 12:00:38 -0400 (EDT)
+ with ESMTP id pW5SJyVJHVFx for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Jun 2021 12:04:06 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 05D634080B
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Jun 2021 12:00:38 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 0F074613DC;
- Thu,  3 Jun 2021 16:00:33 +0000 (UTC)
-Date: Thu, 3 Jun 2021 17:00:31 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Steven Price <steven.price@arm.com>
-Subject: Re: [PATCH v13 4/8] KVM: arm64: Introduce MTE VM feature
-Message-ID: <20210603160031.GE20338@arm.com>
-References: <20210524104513.13258-1-steven.price@arm.com>
- <20210524104513.13258-5-steven.price@arm.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210524104513.13258-5-steven.price@arm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
- Marc Zyngier <maz@kernel.org>, Juan Quintela <quintela@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
- Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org,
- Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A42624080B
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Jun 2021 12:04:06 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 7B574613E4;
+ Thu,  3 Jun 2021 16:04:05 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1loppD-005I9H-Dg; Thu, 03 Jun 2021 17:04:03 +0100
+Date: Thu, 03 Jun 2021 17:03:56 +0100
+Message-ID: <87wnrbylxv.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Jinank Jain <jinankj@amazon.de>
+Subject: Re: [PATCH] KVM: arm64: Properly restore PMU state during
+ live-migration
+In-Reply-To: <20210603110554.13643-1-jinankj@amazon.de>
+References: <20210603110554.13643-1-jinankj@amazon.de>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: jinankj@amazon.de, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, graf@amazon.de,
+ james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+ catalin.marinas@arm.com, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Alexander Graf <graf@amazon.de>, Will Deacon <will@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,116 +86,214 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, May 24, 2021 at 11:45:09AM +0100, Steven Price wrote:
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index c5d1f3c87dbd..226035cf7d6c 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -822,6 +822,42 @@ transparent_hugepage_adjust(struct kvm_memory_slot *memslot,
->  	return PAGE_SIZE;
->  }
+Hi Jinank,
+
+On Thu, 03 Jun 2021 12:05:54 +0100,
+Jinank Jain <jinankj@amazon.de> wrote:
+> 
+> Currently if a guest is live-migrated while it is actively using perf
+> counters, then after live-migrate it will notice that all counters would
+> suddenly start reporting 0s. This is due to the fact we are not
+> re-creating the relevant perf events inside the kernel.
+> 
+> Usually on live-migration guest state is restored using KVM_SET_ONE_REG
+> ioctl interface, which simply restores the value of PMU registers
+> values but does not re-program the perf events so that the guest can seamlessly
+> use these counters even after live-migration like it was doing before
+> live-migration.
+> 
+> Instead there are two completely different code path between guest
+> accessing PMU registers and VMM restoring counters on
+> live-migration.
+> 
+> In case of KVM_SET_ONE_REG:
+> 
+> kvm_arm_set_reg()
+> ...... kvm_arm_sys_reg_set_reg()
+> ........... reg_from_user()
+> 
+> but in case when guest tries to access these counters:
+> 
+> handle_exit()
+> ..... kvm_handle_sys_reg()
+> ..........perform_access()
+> ...............access_pmu_evcntr()
+> ...................kvm_pmu_set_counter_value()
+> .......................kvm_pmu_create_perf_event()
+> 
+> The drawback of using the KVM_SET_ONE_REG interface is that the host pmu
+> events which were registered for the source instance and not present for
+> the destination instance.
+
+I can't parse this sentence. Do you mean "are not present"?
+
+> Thus passively restoring PMCR_EL0 using
+> KVM_SET_ONE_REG interface would not create the necessary host pmu events
+> which are crucial for seamless guest experience across live migration.
+> 
+> In ordet to fix the situation, on first vcpu load we should restore
+> PMCR_EL0 in the same exact way like the guest was trying to access
+> these counters. And then we will also recreate the relevant host pmu
+> events.
+> 
+> Signed-off-by: Jinank Jain <jinankj@amazon.de>
+> Cc: Alexander Graf (AWS) <graf@amazon.de>
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: James Morse <james.morse@arm.com>
+> Cc: Alexandru Elisei <alexandru.elisei@arm.com>
+> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  1 +
+>  arch/arm64/kvm/arm.c              |  1 +
+>  arch/arm64/kvm/pmu-emul.c         | 10 ++++++++--
+>  arch/arm64/kvm/pmu.c              | 15 +++++++++++++++
+>  include/kvm/arm_pmu.h             |  3 +++
+>  5 files changed, 28 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 7cd7d5c8c4bc..2376ad3c2fc2 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -745,6 +745,7 @@ static inline int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+>  void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr);
+>  void kvm_clr_pmu_events(u32 clr);
 >  
-> +static int sanitise_mte_tags(struct kvm *kvm, kvm_pfn_t pfn,
-> +			     unsigned long size)
-> +{
-> +	if (kvm_has_mte(kvm)) {
+> +void kvm_vcpu_pmu_restore(struct kvm_vcpu *vcpu);
+>  void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu);
+>  void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
+>  #else
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index e720148232a0..c66f6d16ec06 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -408,6 +408,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>  	if (has_vhe())
+>  		kvm_vcpu_load_sysregs_vhe(vcpu);
+>  	kvm_arch_vcpu_load_fp(vcpu);
+> +	kvm_vcpu_pmu_restore(vcpu);
 
-Nitpick (less indentation):
+If this only needs to be run once per vcpu, why not trigger it from
+kvm_arm_pmu_v3_enable(), which is also called once per vcpu?
 
-	if (!kvm_has_mte(kvm))
-		return 0;
+This can done on the back of a request, saving most of the overhead
+and not requiring any extra field. Essentially, something like the
+(untested) patch below.
 
-> +		/*
-> +		 * The page will be mapped in stage 2 as Normal Cacheable, so
-> +		 * the VM will be able to see the page's tags and therefore
-> +		 * they must be initialised first. If PG_mte_tagged is set,
-> +		 * tags have already been initialised.
-> +		 * pfn_to_online_page() is used to reject ZONE_DEVICE pages
-> +		 * that may not support tags.
-> +		 */
-> +		unsigned long i, nr_pages = size >> PAGE_SHIFT;
-> +		struct page *page = pfn_to_online_page(pfn);
-> +
-> +		if (!page)
-> +			return -EFAULT;
-> +
-> +		for (i = 0; i < nr_pages; i++, page++) {
-> +			/*
-> +			 * There is a potential (but very unlikely) race
-> +			 * between two VMs which are sharing a physical page
-> +			 * entering this at the same time. However by splitting
-> +			 * the test/set the only risk is tags being overwritten
-> +			 * by the mte_clear_page_tags() call.
-> +			 */
-
-And I think the real risk here is when the page is writable by at least
-one of the VMs sharing the page. This excludes KSM, so it only leaves
-the MAP_SHARED mappings.
-
-> +			if (!test_bit(PG_mte_tagged, &page->flags)) {
-> +				mte_clear_page_tags(page_address(page));
-> +				set_bit(PG_mte_tagged, &page->flags);
-> +			}
-> +		}
-
-If we want to cover this race (I'd say in a separate patch), we can call
-mte_sync_page_tags(page, __pte(0), false, true) directly (hopefully I
-got the arguments right). We can avoid the big lock in most cases if
-kvm_arch_prepare_memory_region() sets a VM_MTE_RESET (tag clear etc.)
-and __alloc_zeroed_user_highpage() clears the tags on allocation (as we
-do for VM_MTE but the new flag would not affect the stage 1 VMM page
-attributes).
-
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  			  struct kvm_memory_slot *memslot, unsigned long hva,
->  			  unsigned long fault_status)
-> @@ -971,8 +1007,13 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	if (writable)
->  		prot |= KVM_PGTABLE_PROT_W;
+>  	kvm_vcpu_pmu_restore_guest(vcpu);
+>  	if (kvm_arm_is_pvtime_enabled(&vcpu->arch))
+>  		kvm_make_request(KVM_REQ_RECORD_STEAL, vcpu);
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index fd167d4f4215..12a40f4b5f0d 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -574,10 +574,16 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
+>  		kvm_pmu_disable_counter_mask(vcpu, mask);
+>  	}
 >  
-> -	if (fault_status != FSC_PERM && !device)
-> +	if (fault_status != FSC_PERM && !device) {
-> +		ret = sanitise_mte_tags(kvm, pfn, vma_pagesize);
-> +		if (ret)
-> +			goto out_unlock;
+> -	if (val & ARMV8_PMU_PMCR_C)
+> +	/*
+> +	 * Cycle counter needs to reset in case of first vcpu load.
+> +	 */
+> +	if (val & ARMV8_PMU_PMCR_C || !kvm_arm_pmu_v3_restored(vcpu))
 
-Maybe it was discussed in a previous version, why do we need this in
-addition to kvm_set_spte_gfn()?
+Why? There is no architectural guarantee that a counter resets to 0
+without writing PMCR_EL0.C. And if you want the guest to continue
+counting where it left off, resetting the counter is at best
+counter-productive.
 
-> +
->  		clean_dcache_guest_page(pfn, vma_pagesize);
-> +	}
->  
->  	if (exec_fault) {
->  		prot |= KVM_PGTABLE_PROT_X;
-> @@ -1168,12 +1209,17 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
->  bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
->  {
->  	kvm_pfn_t pfn = pte_pfn(range->pte);
-> +	int ret;
->  
->  	if (!kvm->arch.mmu.pgt)
->  		return 0;
->  
->  	WARN_ON(range->end - range->start != 1);
->  
-> +	ret = sanitise_mte_tags(kvm, pfn, PAGE_SIZE);
-> +	if (ret)
-> +		return false;
-> +
->  	/*
->  	 * We've moved a page around, probably through CoW, so let's treat it
->  	 * just like a translation fault and clean the cache to the PoC.
+So I must be missing something...
 
-Otherwise the patch looks fine.
+>  		kvm_pmu_set_counter_value(vcpu, ARMV8_PMU_CYCLE_IDX, 0);
+>  
+> -	if (val & ARMV8_PMU_PMCR_P) {
+> +	/*
+> +	 * All the counters needs to reset in case of first vcpu load.
+> +	 */
+> +	if (val & ARMV8_PMU_PMCR_P || !kvm_arm_pmu_v3_restored(vcpu)) {
+
+Same thing here.
+
+>  		for_each_set_bit(i, &mask, 32)
+>  			kvm_pmu_set_counter_value(vcpu, i, 0);
+>  	}
+
+The rest of the changes should be unnecessary with the patch below.
+
+Thanks,
+
+	M.
+
+From 1be188ab71867632a8c17384be6e55f47f42aa8b Mon Sep 17 00:00:00 2001
+From: Marc Zyngier <maz@kernel.org>
+Date: Thu, 3 Jun 2021 16:50:02 +0100
+Subject: [PATCH] KVM: arm64: Restore PMU configuration on first run
+
+Restoring a guest with an active virtual PMU results in no perf
+counters being instanciated on the host side. Not quite what
+you'd expect from a restore.
+
+In order to fix this, force a writeback of PMCR_EL0 on the first
+run of a vcpu (using a new request so that it happens once the
+vcpu has been loaded). This will in turn create all the host-side
+counters that were missing.
+
+Reported-by: Jinank Jain <jinankj@amazon.de>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/include/asm/kvm_host.h | 1 +
+ arch/arm64/kvm/arm.c              | 4 ++++
+ arch/arm64/kvm/pmu-emul.c         | 3 +++
+ 3 files changed, 8 insertions(+)
+
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 7cd7d5c8c4bc..6336b4309114 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -46,6 +46,7 @@
+ #define KVM_REQ_VCPU_RESET	KVM_ARCH_REQ(2)
+ #define KVM_REQ_RECORD_STEAL	KVM_ARCH_REQ(3)
+ #define KVM_REQ_RELOAD_GICv4	KVM_ARCH_REQ(4)
++#define KVM_REQ_RELOAD_PMU	KVM_ARCH_REQ(5)
+ 
+ #define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
+ 				     KVM_DIRTY_LOG_INITIALLY_SET)
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index e720148232a0..facf4d41d32a 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -689,6 +689,10 @@ static void check_vcpu_requests(struct kvm_vcpu *vcpu)
+ 			vgic_v4_load(vcpu);
+ 			preempt_enable();
+ 		}
++
++		if (kvm_check_request(KVM_REQ_RELOAD_PMU, vcpu))
++			kvm_pmu_handle_pmcr(vcpu,
++					    __vcpu_sys_reg(vcpu, PMCR_EL0));
+ 	}
+ }
+ 
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index fd167d4f4215..a0bbb7111f57 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -850,6 +850,9 @@ int kvm_arm_pmu_v3_enable(struct kvm_vcpu *vcpu)
+ 		   return -EINVAL;
+ 	}
+ 
++	/* One-off reload of the PMU on first run */
++	kvm_make_request(KVM_REQ_RELOAD_PMU, vcpu);
++
+ 	return 0;
+ }
+ 
+-- 
+2.30.2
+
 
 -- 
-Catalin
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
