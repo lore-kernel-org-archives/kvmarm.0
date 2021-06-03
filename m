@@ -2,72 +2,98 @@ Return-Path: <SRS0=Ht+8=K5=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F221DC47096
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Jun 2021 08:39:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC292C47096
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Jun 2021 10:37:45 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4C136613DA
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Jun 2021 08:39:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C136613DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 207E06138C
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Jun 2021 10:37:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 207E06138C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nuviainc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CA5BD4A7FD;
-	Thu,  3 Jun 2021 04:39:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 90D854B0E8;
+	Thu,  3 Jun 2021 06:37:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered)
+	header.i=@nuviainc-com.20150623.gappssmtp.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pwcxrMUuP4TQ; Thu,  3 Jun 2021 04:39:20 -0400 (EDT)
+	with ESMTP id mo9k0BNaf5yn; Thu,  3 Jun 2021 06:37:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 11C2D4B0D4;
-	Thu,  3 Jun 2021 04:39:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 433EF4B0CD;
+	Thu,  3 Jun 2021 06:37:43 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A59344A4A4
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Jun 2021 04:39:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 58A3E4B089
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Jun 2021 03:07:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id t1MxVbL9+5Yj for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Jun 2021 04:39:16 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8B9004A195
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Jun 2021 04:39:16 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 4DB1E6136E;
- Thu,  3 Jun 2021 08:39:15 +0000 (UTC)
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1loisj-005D8B-7S; Thu, 03 Jun 2021 09:39:13 +0100
-Date: Thu, 03 Jun 2021 09:39:09 +0100
-Message-ID: <87zgw7z6j6.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Jamie Iles <jamie@nuviainc.com>
+ with ESMTP id YtshZLTKiuFY for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Jun 2021 03:07:25 -0400 (EDT)
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com
+ [209.85.128.47])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 63D4A4A523
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Jun 2021 03:07:25 -0400 (EDT)
+Received: by mail-wm1-f47.google.com with SMTP id m18so2742464wmq.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 03 Jun 2021 00:07:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=nuviainc-com.20150623.gappssmtp.com; s=20150623;
+ h=date:from:to:cc:subject:message-id:mail-followup-to:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=swTqT+JBPk12ncEzOYoOSk8MfnzP+PLyF+iYHFtT61c=;
+ b=fuALpjEBCmQS3d00X52WWRgr/gePIoNMXojP7jyYk+Z9NXNArq9QJV0UMq93XENuxb
+ fq3zTi+yMmLIxYtuRzzDcvMtbra02NbNl4bnKmiU582LjAX27DrulwpZOlKUCYb2BihK
+ 9QlAAfvoVfe4oQInhgY0qp8VPCUnYsYWcok8HJUpDqZVXGJOXIt/A6Lcg9Va7S7cZKMC
+ l11FW3UwfNBSfXxAa8L9EmgQ+2/AdGuBIVINOb8QSSQ1WBzEdQL9sGj5RyX6KjdLA6xk
+ 9qMpJREaHSDGdWHz2BROw4Kd+IOpfZ50XVjpLUZmP55yTQn9CbfDIAyv/DRFq9L+TP3Z
+ nP9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id
+ :mail-followup-to:references:mime-version:content-disposition
+ :in-reply-to;
+ bh=swTqT+JBPk12ncEzOYoOSk8MfnzP+PLyF+iYHFtT61c=;
+ b=pw5Q6bkh4OQP1R7qitCA/Yalk85PMjJfRbj6ZXKJT7MJwcbI2Zv8KUolvyMvHWH3aP
+ wv1EMCIr8k++/qC2ngcfZaSzCD1J88BFXA0lVxIfTUBzAHzSQXS8d94hGXn9PfoOM5ap
+ SQiDzk/yZB4Oh+d0ejNsTGaJMWln4gRBFYQUv0NgBRBJF1YipsslhIxwqhmS0wd3mK5B
+ jBi98DX7b0AvzXUXGHDh6Ab+hxUxVqWkHDpeiK7Eg2aV1UJyX1urViDRxdWeZoQjacWY
+ zZ/DO+syAZGNK/cJ92qcb0V+McZt0WseeAcrG/ey6ykIWXLSL+24Y/upK6cUeUDr84JY
+ 8Kgw==
+X-Gm-Message-State: AOAM533/lC+b15x2sCrI3odrQsya8chJBHdGz1D+fqHlfFxSf78WPKAF
+ 9fvqgCPYdMnskz02PQCl9B1FSA==
+X-Google-Smtp-Source: ABdhPJyKYnBJGEQb+Nkwb/uT2+RRLkdLFQM3//Ylsfzfcko0Ag534F59xhbPPyCcGmi7N7vecIQT8Q==
+X-Received: by 2002:a05:600c:2209:: with SMTP id
+ z9mr35507257wml.120.1622704044067; 
+ Thu, 03 Jun 2021 00:07:24 -0700 (PDT)
+Received: from localhost ([82.44.17.50])
+ by smtp.gmail.com with ESMTPSA id o9sm2186295wrw.69.2021.06.03.00.07.23
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 03 Jun 2021 00:07:23 -0700 (PDT)
+Date: Thu, 3 Jun 2021 08:07:22 +0100
+From: Jamie Iles <jamie@nuviainc.com>
+To: Marc Zyngier <maz@kernel.org>
 Subject: Re: [PATCH v4 00/66] KVM: arm64: ARMv8.3/8.4 Nested Virtualization
  support
-In-Reply-To: <YLh/qsmKDJ86n75w@hazel>
-References: <20210510165920.1913477-1-maz@kernel.org> <YLh/qsmKDJ86n75w@hazel>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: jamie@nuviainc.com, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com,
- christoffer.dall@arm.com, jintack@cs.columbia.edu, haibo.xu@linaro.org,
- james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
+Message-ID: <YLh/qsmKDJ86n75w@hazel>
+Mail-Followup-To: Marc Zyngier <maz@kernel.org>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>,
+ Jintack Lim <jintack@cs.columbia.edu>,
+ Haibo Xu <haibo.xu@linaro.org>, James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
  kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+References: <20210510165920.1913477-1-maz@kernel.org>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <20210510165920.1913477-1-maz@kernel.org>
+X-Mailman-Approved-At: Thu, 03 Jun 2021 06:37:42 -0400
 Cc: kernel-team@android.com, kvm@vger.kernel.org,
  Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
@@ -87,110 +113,44 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Jamie,
+Hi Marc,
 
-Funny, your email has a "Mail-Followup-To:" field that contains
-everyone but you... Not ideal! ;-)
-
-On Thu, 03 Jun 2021 08:07:22 +0100,
-Jamie Iles <jamie@nuviainc.com> wrote:
+On Mon, May 10, 2021 at 05:58:14PM +0100, Marc Zyngier wrote:
+> Here the bi-annual drop of the KVM/arm64 NV support code.
 > 
-> Hi Marc,
+> Not a lot has changed since [1], except for a discovery mechanism for
+> the EL2 support, some tidying up in the idreg emulation, dropping RMR
+> support, and a rebase on top of 5.13-rc1.
 > 
-> On Mon, May 10, 2021 at 05:58:14PM +0100, Marc Zyngier wrote:
-> > Here the bi-annual drop of the KVM/arm64 NV support code.
-> > 
-> > Not a lot has changed since [1], except for a discovery mechanism for
-> > the EL2 support, some tidying up in the idreg emulation, dropping RMR
-> > support, and a rebase on top of 5.13-rc1.
-> > 
-> > As usual, blame me for any bug, and nobody else.
-> > 
-> > It is still massively painful to run on the FVP, but if you have a
-> > Neoverse V1 or N2 system that is collecting dust, I have the right
-> > stuff to keep it busy!
+> As usual, blame me for any bug, and nobody else.
 > 
-> I've been testing this series on FVP and get a crash when returning from 
-> __kvm_vcpu_run_vhe because the autiasp is failing.
+> It is still massively painful to run on the FVP, but if you have a
+> Neoverse V1 or N2 system that is collecting dust, I have the right
+> stuff to keep it busy!
 
-Ah, the joy of testing with older guests. I guess i should upgrade by
-test rig and play with some newer guests at L1.
+I've been testing this series on FVP and get a crash when returning from 
+__kvm_vcpu_run_vhe because the autiasp is failing.
 
-> 
-> The problem is when the L1 boots and during EL2 setup sets hcr_el2 to 
-> HCR_HOST_NVHE_FLAGS and so enables HCR_APK|HCR_API.  Then the guest 
-> enter+exit logic in L0 starts performing the key save restore, but as we 
-> didn't go through __hyp_handle_ptrauth, we haven't saved the host keys 
-> and invoked vcpu_ptrauth_enable() so restore the host keys back to 0.
-> 
-> I wonder if the pointer auth keys should be saved+restored 
-> unconditionally for a guest when running nested rather than the lazy 
-> faulting that we have today?
+The problem is when the L1 boots and during EL2 setup sets hcr_el2 to 
+HCR_HOST_NVHE_FLAGS and so enables HCR_APK|HCR_API.  Then the guest 
+enter+exit logic in L0 starts performing the key save restore, but as we 
+didn't go through __hyp_handle_ptrauth, we haven't saved the host keys 
+and invoked vcpu_ptrauth_enable() so restore the host keys back to 0.
 
-I'd like to try and avoid that in order to keep the basic logic as
-simple as possible for the time being, and as close to the tried and
-trusted flow we have today.
+I wonder if the pointer auth keys should be saved+restored 
+unconditionally for a guest when running nested rather than the lazy 
+faulting that we have today?  Alternatively we would need to duplicate 
+the lazy logic for hcr_el2 writes.  A quick hack of saving the host keys 
+in __kvm_vcpu_run_vhe before sysreg_save_host_state_vhe is enough to 
+allow me to boot an L1 with --nested and then an L2.
 
-> Alternatively we would need to duplicate
-> the lazy logic for hcr_el2 writes.  A quick hack of saving the host keys 
-> in __kvm_vcpu_run_vhe before sysreg_save_host_state_vhe is enough to 
-> allow me to boot an L1 with --nested and then an L2.
->
-> Do we also need to filter out HCR_APK|HCR_API for hcr_el2 writes when 
-> pointer authentication hasn't been exposed to the guest?  I haven't yet 
-> tried making ptrauth visible to the L1.
-
-I think this is the real thing. We should never propagate trap bits
-for features we don't want to support in guests. The L1 kernel sets
-these bits unconditionally, despite PtrAuth never being advertised,
-which trips the host code.
-
-Could you try the untested hack below?
+Do we also need to filter out HCR_APK|HCR_API for hcr_el2 writes when 
+pointer authentication hasn't been exposed to the guest?  I haven't yet 
+tried making ptrauth visible to the L1.
 
 Thanks,
 
-	M.
-
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index ce682bcce56f..54301d5ce58c 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -82,6 +82,7 @@
- 			 HCR_BSU_IS | HCR_FB | HCR_TAC | \
- 			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR | \
- 			 HCR_FMO | HCR_IMO | HCR_PTW )
-+#define HCR_GUEST_NV_FILTER_FLAGS (HCR_ATA | HCR_API | HCR_APK | HCR_RW)
- #define HCR_VIRT_EXCP_MASK (HCR_VSE | HCR_VI | HCR_VF)
- #define HCR_HOST_NVHE_FLAGS (HCR_RW | HCR_API | HCR_APK | HCR_ATA)
- #define HCR_HOST_NVHE_PROTECTED_FLAGS (HCR_HOST_NVHE_FLAGS | HCR_TSC)
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index 67f8b7d89db6..bf39bf4ef63c 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -64,6 +64,8 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
- 			 */
- 			u64 vhcr_el2 = __vcpu_sys_reg(vcpu, HCR_EL2);
- 
-+			vhcr_el2 &= ~HCR_GUEST_NV_FILTER_FLAGS;
-+
- 			/*
- 			 * We already set TVM to handle set/way cache maint
- 			 * ops traps, this somewhat collides with the nested
-@@ -91,7 +93,10 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
- 				       SYS_VNCR_EL2);
- 		}
- 	} else if (nested_virt_in_use(vcpu)) {
--		hcr |= __vcpu_sys_reg(vcpu, HCR_EL2);
-+		u64 vhcr_el2 = __vcpu_sys_reg(vcpu, HCR_EL2);
-+
-+		vhcr_el2 &= ~HCR_GUEST_NV_FILTER_FLAGS;
-+		hcr |= vhcr_el2;
- 	}
- 
- 	___activate_traps(vcpu, hcr);
-
--- 
-Without deviation from the norm, progress is not possible.
+Jamie
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
