@@ -2,52 +2,52 @@ Return-Path: <SRS0=Ht+8=K5=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFBF1C47096
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Jun 2021 16:48:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24520C47096
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Jun 2021 16:58:53 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5DF10613F1
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Jun 2021 16:48:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DF10613F1
+	by mail.kernel.org (Postfix) with ESMTP id A3958613F4
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Jun 2021 16:58:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3958613F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 09F9949F83;
-	Thu,  3 Jun 2021 12:48:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A9D34B10F;
+	Thu,  3 Jun 2021 12:58:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id uJSnMeQWjcmH; Thu,  3 Jun 2021 12:48:14 -0400 (EDT)
+	with ESMTP id df9JTfY60sO5; Thu,  3 Jun 2021 12:58:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CDC744B10B;
-	Thu,  3 Jun 2021 12:48:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0CCFC4B10B;
+	Thu,  3 Jun 2021 12:58:50 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C64124B0C5
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Jun 2021 12:48:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C5144B0AC
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Jun 2021 12:58:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MHP5qFQ2pLty for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Jun 2021 12:48:12 -0400 (EDT)
+ with ESMTP id gs0aGTYBwnNy for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Jun 2021 12:58:47 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5922B49F83
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Jun 2021 12:48:12 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 6B2D161026;
- Thu,  3 Jun 2021 16:48:08 +0000 (UTC)
-Date: Thu, 3 Jun 2021 17:48:06 +0100
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E5DD9407ED
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Jun 2021 12:58:46 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id E671B61159;
+ Thu,  3 Jun 2021 16:58:42 +0000 (UTC)
+Date: Thu, 3 Jun 2021 17:58:40 +0100
 From: Catalin Marinas <catalin.marinas@arm.com>
 To: Steven Price <steven.price@arm.com>
-Subject: Re: [PATCH v13 5/8] KVM: arm64: Save/restore MTE registers
-Message-ID: <20210603164805.GF20338@arm.com>
+Subject: Re: [PATCH v13 6/8] KVM: arm64: Expose KVM_ARM_CAP_MTE
+Message-ID: <20210603165840.GG20338@arm.com>
 References: <20210524104513.13258-1-steven.price@arm.com>
- <20210524104513.13258-6-steven.price@arm.com>
+ <20210524104513.13258-7-steven.price@arm.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20210524104513.13258-6-steven.price@arm.com>
+In-Reply-To: <20210524104513.13258-7-steven.price@arm.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
  Marc Zyngier <maz@kernel.org>, Juan Quintela <quintela@redhat.com>,
@@ -71,41 +71,11 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, May 24, 2021 at 11:45:10AM +0100, Steven Price wrote:
-> diff --git a/arch/arm64/include/asm/kvm_mte.h b/arch/arm64/include/asm/kvm_mte.h
-> new file mode 100644
-> index 000000000000..eae4bce9e269
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/kvm_mte.h
-> @@ -0,0 +1,68 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Copyright (C) 2020 ARM Ltd.
-
-You may want to update some of the years.
-
-> + */
-> +#ifndef __ASM_KVM_MTE_H
-> +#define __ASM_KVM_MTE_H
-> +
-> +#ifdef __ASSEMBLY__
-> +
-> +#include <asm/sysreg.h>
-> +
-> +#ifdef CONFIG_ARM64_MTE
-> +
-> +.macro mte_switch_to_guest g_ctxt, h_ctxt, reg1
-> +alternative_if_not ARM64_MTE
-> +	b	.L__skip_switch\@
-> +alternative_else_nop_endif
-> +	mrs	\reg1, hcr_el2
-> +	and	\reg1, \reg1, #(HCR_ATA)
-> +	cbz	\reg1, .L__skip_switch\@
-
-Nitpick: TBZ would be shorter, though you need the bit number.
-
-The patch looks fine (as per my understanding of the KVM context
-switching code):
+On Mon, May 24, 2021 at 11:45:11AM +0100, Steven Price wrote:
+> It's now safe for the VMM to enable MTE in a guest, so expose the
+> capability to user space.
+> 
+> Signed-off-by: Steven Price <steven.price@arm.com>
 
 Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 _______________________________________________
