@@ -2,91 +2,75 @@ Return-Path: <SRS0=Ht+8=K5=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5C99C47083
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Jun 2021 00:09:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F221DC47096
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Jun 2021 08:39:23 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 39880613BF
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Jun 2021 00:09:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39880613BF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 4C136613DA
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Jun 2021 08:39:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C136613DA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A20CC4A483;
-	Wed,  2 Jun 2021 20:09:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CA5BD4A7FD;
+	Thu,  3 Jun 2021 04:39:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 3TFhWC22SA-d; Wed,  2 Jun 2021 20:09:34 -0400 (EDT)
+	with ESMTP id pwcxrMUuP4TQ; Thu,  3 Jun 2021 04:39:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 44A6640CC5;
-	Wed,  2 Jun 2021 20:09:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 11C2D4B0D4;
+	Thu,  3 Jun 2021 04:39:20 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2CC0740CC5
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Jun 2021 20:09:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A59344A4A4
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Jun 2021 04:39:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jsIVvlQBFhli for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 Jun 2021 20:09:31 -0400 (EDT)
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com
- [209.85.216.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CF2A040839
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Jun 2021 20:09:31 -0400 (EDT)
-Received: by mail-pj1-f51.google.com with SMTP id
- d5-20020a17090ab305b02901675357c371so4088458pjr.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Jun 2021 17:09:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=KgoxK5UQJ3kZ7ylqlhDO43tmp7163zUwhiNj0BfHXdQ=;
- b=NJtl5G//rP3VlOMT5/AFEAUnfv9Uyi1UWa0sdnuShpWWPYj7hThl3A0Vz8JsBQgUt7
- QsiHtcOCnjGSnwEO2LVKiD+xn95hln6GrpXiRTAZF5ThayB8rXu3IjJuIxnl9YoZR9Rz
- CvqH1ankaiVA1uYaIhJngocIc2UqqnPEBB8ehYLWItUYsv28e10FulqRAgQpuKdLfYyy
- d289zk5TmCWI7yoKek710LcDjWAgc6DBFGLAH4PrXsYRzip4oWSUogAQFP+oyN5meI0y
- NH2yho3fpT1wWHjgFAWE7abyoP8y6kCKYvXP2fbINSP8Dpd5OhLLuUKHYlcJcMQksWdJ
- s04Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=KgoxK5UQJ3kZ7ylqlhDO43tmp7163zUwhiNj0BfHXdQ=;
- b=ntE8PZ3FQyPvLaE5N0s/G5s2cPaaigddCh92b8ns6/9jTLsdRj5eBxP4QHI53U0Pxx
- PNzZTzV15hI3i8ALW5sY4UhdZrsMJ6ys0GmpA7LXRjYSnlJuvRuh574j+JLNMvUIRff4
- P3lHMC08pv3nAIPvMv0h2/ovVVc+dpPPW/82X2+geI5g+YQBb025VKfKVeYGbvioJ2M4
- HMV+SSJlzALB9oxIX6kD1PmIn32gbql1sCxqemlmA56MtdWndlYbrFzEIV8nQj5ewiSt
- 7bilvMf8ueSys3fI9iX+Gr0137mZVaJke1WVUCva0GK7ltLaWIp7dNNLVqDA7SXWMh7l
- mgjw==
-X-Gm-Message-State: AOAM532l2spdzQaDCqrZjy0ljWSByqDJSQZ7TRX6gbcXnzGUaxcgGtAY
- yxvsn7sMz3rkHT/aDlaFnDS9Zw==
-X-Google-Smtp-Source: ABdhPJzu2DlDCfQt2uy8zgwfsH5CDfV0mQIzsgP6mz5Kms+RtoW4iQr6dNVMBRs/dS7v3qmcWK1ZQw==
-X-Received: by 2002:a17:90a:8c97:: with SMTP id
- b23mr33180951pjo.74.1622678970569; 
- Wed, 02 Jun 2021 17:09:30 -0700 (PDT)
-Received: from google.com (150.12.83.34.bc.googleusercontent.com.
- [34.83.12.150])
- by smtp.gmail.com with ESMTPSA id z185sm755360pgb.4.2021.06.02.17.09.29
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 02 Jun 2021 17:09:30 -0700 (PDT)
-Date: Wed, 2 Jun 2021 17:09:26 -0700
-From: Ricardo Koller <ricarkol@google.com>
-To: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v3 4/5] KVM: arm64: selftests: get-reg-list: Remove
- get-reg-list-sve
-Message-ID: <YLgdtgfrdr9ctQFW@google.com>
-References: <20210531103344.29325-1-drjones@redhat.com>
- <20210531103344.29325-5-drjones@redhat.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210531103344.29325-5-drjones@redhat.com>
-Cc: kvm@vger.kernel.org, maz@kernel.org, pbonzini@redhat.com,
- kvmarm@lists.cs.columbia.edu
+ with ESMTP id t1MxVbL9+5Yj for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Jun 2021 04:39:16 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8B9004A195
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Jun 2021 04:39:16 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 4DB1E6136E;
+ Thu,  3 Jun 2021 08:39:15 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1loisj-005D8B-7S; Thu, 03 Jun 2021 09:39:13 +0100
+Date: Thu, 03 Jun 2021 09:39:09 +0100
+Message-ID: <87zgw7z6j6.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Jamie Iles <jamie@nuviainc.com>
+Subject: Re: [PATCH v4 00/66] KVM: arm64: ARMv8.3/8.4 Nested Virtualization
+ support
+In-Reply-To: <YLh/qsmKDJ86n75w@hazel>
+References: <20210510165920.1913477-1-maz@kernel.org> <YLh/qsmKDJ86n75w@hazel>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: jamie@nuviainc.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com,
+ christoffer.dall@arm.com, jintack@cs.columbia.edu, haibo.xu@linaro.org,
+ james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
+ kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, kvm@vger.kernel.org,
+ Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -103,128 +87,110 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, May 31, 2021 at 12:33:43PM +0200, Andrew Jones wrote:
-> Now that we can easily run the test for multiple vcpu configs, let's
-> merge get-reg-list and get-reg-list-sve into just get-reg-list. We
-> also add a final change to make it more possible to run multiple
-> tests, which is to fork the test, rather than directly run it. That
-> allows a test to fail, but subsequent tests can still run.
-> 
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
+Hi Jamie,
 
-Reviewed-by: Ricardo Koller <ricarkol@google.com>
+Funny, your email has a "Mail-Followup-To:" field that contains
+everyone but you... Not ideal! ;-)
 
-> ---
->  tools/testing/selftests/kvm/.gitignore        |  1 -
->  tools/testing/selftests/kvm/Makefile          |  1 -
->  .../selftests/kvm/aarch64/get-reg-list-sve.c  |  3 --
->  .../selftests/kvm/aarch64/get-reg-list.c      | 31 +++++++++++++------
->  4 files changed, 21 insertions(+), 15 deletions(-)
->  delete mode 100644 tools/testing/selftests/kvm/aarch64/get-reg-list-sve.c
+On Thu, 03 Jun 2021 08:07:22 +0100,
+Jamie Iles <jamie@nuviainc.com> wrote:
 > 
-> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-> index 524c857a049c..dd36575b732a 100644
-> --- a/tools/testing/selftests/kvm/.gitignore
-> +++ b/tools/testing/selftests/kvm/.gitignore
-> @@ -1,6 +1,5 @@
->  # SPDX-License-Identifier: GPL-2.0-only
->  /aarch64/get-reg-list
-> -/aarch64/get-reg-list-sve
->  /aarch64/vgic_init
->  /s390x/memop
->  /s390x/resets
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index daaee1888b12..5c8f3725a7f0 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -79,7 +79,6 @@ TEST_GEN_PROGS_x86_64 += set_memory_region_test
->  TEST_GEN_PROGS_x86_64 += steal_time
->  
->  TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
-> -TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list-sve
->  TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
->  TEST_GEN_PROGS_aarch64 += demand_paging_test
->  TEST_GEN_PROGS_aarch64 += dirty_log_test
-> diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list-sve.c b/tools/testing/selftests/kvm/aarch64/get-reg-list-sve.c
-> deleted file mode 100644
-> index efba76682b4b..000000000000
-> --- a/tools/testing/selftests/kvm/aarch64/get-reg-list-sve.c
-> +++ /dev/null
-> @@ -1,3 +0,0 @@
-> -// SPDX-License-Identifier: GPL-2.0
-> -#define REG_LIST_SVE
-> -#include "get-reg-list.c"
-> diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-> index 03e041d97a18..b46b8a1fdc0c 100644
-> --- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-> +++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-> @@ -27,16 +27,13 @@
->  #include <stdio.h>
->  #include <stdlib.h>
->  #include <string.h>
-> +#include <unistd.h>
-> +#include <sys/types.h>
-> +#include <sys/wait.h>
->  #include "kvm_util.h"
->  #include "test_util.h"
->  #include "processor.h"
->  
-> -#ifdef REG_LIST_SVE
-> -#define reg_list_sve() (true)
-> -#else
-> -#define reg_list_sve() (false)
-> -#endif
-> -
->  static struct kvm_reg_list *reg_list;
->  static __u64 *blessed_reg, blessed_n;
->  
-> @@ -588,7 +585,8 @@ static struct vcpu_config *parse_config(const char *config)
->  int main(int ac, char **av)
->  {
->  	struct vcpu_config *c, *sel = NULL;
-> -	int i;
-> +	int i, ret = 0;
-> +	pid_t pid;
->  
->  	for (i = 1; i < ac; ++i) {
->  		if (strcmp(av[i], "--core-reg-fixup") == 0)
-> @@ -617,10 +615,22 @@ int main(int ac, char **av)
->  		c = vcpu_configs[i];
->  		if (sel && c != sel)
->  			continue;
-> -		run_test(c);
-> +
-> +		pid = fork();
-> +
-> +		if (!pid) {
-> +			run_test(c);
-> +			exit(0);
-> +		} else {
-> +			int wstatus;
-> +			pid_t wpid = wait(&wstatus);
-> +			TEST_ASSERT(wpid == pid && WIFEXITED(wstatus), "wait: Unexpected return");
-> +			if (WEXITSTATUS(wstatus) && WEXITSTATUS(wstatus) != KSFT_SKIP)
-> +				ret = KSFT_FAIL;
-> +		}
->  	}
->  
-> -	return 0;
-> +	return ret;
->  }
->  
->  /*
-> @@ -1026,6 +1036,7 @@ static struct vcpu_config sve_config = {
->  };
->  
->  static struct vcpu_config *vcpu_configs[] = {
-> -	reg_list_sve() ? &sve_config : &vregs_config,
-> +	&vregs_config,
-> +	&sve_config,
->  };
->  static int vcpu_configs_n = ARRAY_SIZE(vcpu_configs);
-> -- 
-> 2.31.1
+> Hi Marc,
 > 
+> On Mon, May 10, 2021 at 05:58:14PM +0100, Marc Zyngier wrote:
+> > Here the bi-annual drop of the KVM/arm64 NV support code.
+> > 
+> > Not a lot has changed since [1], except for a discovery mechanism for
+> > the EL2 support, some tidying up in the idreg emulation, dropping RMR
+> > support, and a rebase on top of 5.13-rc1.
+> > 
+> > As usual, blame me for any bug, and nobody else.
+> > 
+> > It is still massively painful to run on the FVP, but if you have a
+> > Neoverse V1 or N2 system that is collecting dust, I have the right
+> > stuff to keep it busy!
+> 
+> I've been testing this series on FVP and get a crash when returning from 
+> __kvm_vcpu_run_vhe because the autiasp is failing.
+
+Ah, the joy of testing with older guests. I guess i should upgrade by
+test rig and play with some newer guests at L1.
+
+> 
+> The problem is when the L1 boots and during EL2 setup sets hcr_el2 to 
+> HCR_HOST_NVHE_FLAGS and so enables HCR_APK|HCR_API.  Then the guest 
+> enter+exit logic in L0 starts performing the key save restore, but as we 
+> didn't go through __hyp_handle_ptrauth, we haven't saved the host keys 
+> and invoked vcpu_ptrauth_enable() so restore the host keys back to 0.
+> 
+> I wonder if the pointer auth keys should be saved+restored 
+> unconditionally for a guest when running nested rather than the lazy 
+> faulting that we have today?
+
+I'd like to try and avoid that in order to keep the basic logic as
+simple as possible for the time being, and as close to the tried and
+trusted flow we have today.
+
+> Alternatively we would need to duplicate
+> the lazy logic for hcr_el2 writes.  A quick hack of saving the host keys 
+> in __kvm_vcpu_run_vhe before sysreg_save_host_state_vhe is enough to 
+> allow me to boot an L1 with --nested and then an L2.
+>
+> Do we also need to filter out HCR_APK|HCR_API for hcr_el2 writes when 
+> pointer authentication hasn't been exposed to the guest?  I haven't yet 
+> tried making ptrauth visible to the L1.
+
+I think this is the real thing. We should never propagate trap bits
+for features we don't want to support in guests. The L1 kernel sets
+these bits unconditionally, despite PtrAuth never being advertised,
+which trips the host code.
+
+Could you try the untested hack below?
+
+Thanks,
+
+	M.
+
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index ce682bcce56f..54301d5ce58c 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -82,6 +82,7 @@
+ 			 HCR_BSU_IS | HCR_FB | HCR_TAC | \
+ 			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR | \
+ 			 HCR_FMO | HCR_IMO | HCR_PTW )
++#define HCR_GUEST_NV_FILTER_FLAGS (HCR_ATA | HCR_API | HCR_APK | HCR_RW)
+ #define HCR_VIRT_EXCP_MASK (HCR_VSE | HCR_VI | HCR_VF)
+ #define HCR_HOST_NVHE_FLAGS (HCR_RW | HCR_API | HCR_APK | HCR_ATA)
+ #define HCR_HOST_NVHE_PROTECTED_FLAGS (HCR_HOST_NVHE_FLAGS | HCR_TSC)
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index 67f8b7d89db6..bf39bf4ef63c 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -64,6 +64,8 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+ 			 */
+ 			u64 vhcr_el2 = __vcpu_sys_reg(vcpu, HCR_EL2);
+ 
++			vhcr_el2 &= ~HCR_GUEST_NV_FILTER_FLAGS;
++
+ 			/*
+ 			 * We already set TVM to handle set/way cache maint
+ 			 * ops traps, this somewhat collides with the nested
+@@ -91,7 +93,10 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+ 				       SYS_VNCR_EL2);
+ 		}
+ 	} else if (nested_virt_in_use(vcpu)) {
+-		hcr |= __vcpu_sys_reg(vcpu, HCR_EL2);
++		u64 vhcr_el2 = __vcpu_sys_reg(vcpu, HCR_EL2);
++
++		vhcr_el2 &= ~HCR_GUEST_NV_FILTER_FLAGS;
++		hcr |= vhcr_el2;
+ 	}
+ 
+ 	___activate_traps(vcpu, hcr);
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
