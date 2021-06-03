@@ -2,66 +2,101 @@ Return-Path: <SRS0=Ht+8=K5=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00A42C47096
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Jun 2021 18:34:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97491C47098
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Jun 2021 21:14:37 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 83D6D613B8
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Jun 2021 18:34:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83D6D613B8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 17CCA61401
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Jun 2021 21:14:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17CCA61401
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F6AA4B0CB;
-	Thu,  3 Jun 2021 14:34:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 812664B0CF;
+	Thu,  3 Jun 2021 17:14:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 3IXwUGxlBNlI; Thu,  3 Jun 2021 14:34:12 -0400 (EDT)
+	with ESMTP id 9dOglac67kmP; Thu,  3 Jun 2021 17:14:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0ACF24B11C;
-	Thu,  3 Jun 2021 14:34:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 011364B0EC;
+	Thu,  3 Jun 2021 17:14:35 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1439B4B0E7
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Jun 2021 14:34:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CF60B4B0C7
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Jun 2021 17:14:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RpTfGhOegTW7 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Jun 2021 14:34:09 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7E0914B0B6
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Jun 2021 14:34:09 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 3FE1A613F3;
- Thu,  3 Jun 2021 18:34:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1622745248;
- bh=xvTd7Eh6umCswsc6DntHBSUyT9ZXtV7p9wb3U520Nms=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=YbmolTxsINqDJRKpXnKvaan3EZOi0N0pFb/5O+IK+bS73V05Bny1/Oy1f4uLzaRGN
- gX3ndoG3PLWnw5aASPq+xY02dNNUUvnFuW7rZ9i8w3qbucWQjA6SNS5uoXBEJg5g1r
- nJP6CqdgpJ8bLv2Yv9PSDZnapB/wUyMB9zZxkHOFWe/TOM5+gS+VudZqbZ/orjfy8t
- vKFkxnkTN6UvSFHdocjTCsdb+aVoAcscwyw/Dmrw9QJXxEPiBDoVpPMBEL1VABSoQL
- 2zheck0pvOUTlJH8SEiZenpBfdAOk7o0Qgi/X5/Q/dZJ7rLdHFC+GOOvKpG6EiD44C
- GS0QqYVWvXrKg==
-From: Will Deacon <will@kernel.org>
-To: kvmarm@lists.cs.columbia.edu
-Subject: [RFC PATCH 4/4] KVM: arm64: Introduce KVM_CAP_ARM_PROTECTED_VM
-Date: Thu,  3 Jun 2021 19:33:47 +0100
-Message-Id: <20210603183347.1695-5-will@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20210603183347.1695-1-will@kernel.org>
-References: <20210603183347.1695-1-will@kernel.org>
-MIME-Version: 1.0
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- linux-arm-kernel@lists.infradead.org, Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Will Deacon <will@kernel.org>
+ with ESMTP id weVVZvNb2x5d for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Jun 2021 17:14:32 -0400 (EDT)
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com
+ [209.85.216.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 33E544B0BF
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Jun 2021 17:14:32 -0400 (EDT)
+Received: by mail-pj1-f74.google.com with SMTP id
+ 15-20020a17090a0f0fb029016ad0f32fd0so3538700pjy.6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 03 Jun 2021 14:14:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=I8SaxGWcB7tE5LgATQxqpPQ7x4H4jY+lCpBauP/mtmE=;
+ b=v4NgbfeqtYok0nadkyQOQYhH0/cc3YuV8LeF1teBzQov02jDdA9IwtNsTjiXssKy9k
+ lVffn3D6dt82OhY5gs0hFB5oIwHL8xvT9H3v1bma72ihTKCZi1Zk2t2aa014cQNa5UzD
+ DbKEb//m0+o8xQowxXbRc/Ve/I2AG4LU2nQFiO1Ie2PSqxDUR3eYJihknZL3UVCMeE+w
+ YWzsehJueSvNSScWsQp724tbAJe7jBiUVpwMQkL9RIzefMXHJCgYpTAoenYocG6UZYpL
+ iN7fsnWE2kf++Rf5Nvrap7/nItDWAA00w2X2A9Emcq6xa8gVmhOHOT89tbfA/M9ij5Tz
+ eQ3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=I8SaxGWcB7tE5LgATQxqpPQ7x4H4jY+lCpBauP/mtmE=;
+ b=cIXDhcx/NzgoGX/UPaDNNfFPU+8kN1yQMAjxI3dzcpZe4CmRxeK93P8hhYqKfSV3Hb
+ vYmyh7ly5oPQPBYunVZULO6QGM4JOJK23glqKXcaPEySOPZsNR4MQLipf1enmMmaZW/s
+ YJfYLSA9gvE3zH9FoR/pEMrSARiC/bgB5HkRHJsO6F8RxGRkvcvEnvmWvQCv3isSFy+U
+ mxBnC14821xTseAdNO7j9KNPvPTOJFD1tHlXmpQluXf8qZd3SV4PgQNbYJ2Jkr00XNqv
+ PA4B2vv6ohiqkmZ2O+igtMVpzAzbKSgN9b/K/7bOd4W4+fCpb1f76b6leQPlsV21SeWQ
+ m1XQ==
+X-Gm-Message-State: AOAM53050ueLVu+Su2p1kh+wwWtD0p0vePd4iRAxtdKEUktCRcVdYdGc
+ AoElYCGBkX8o/iWFU6xaqEdvOjA6+9a0tl/1Tg==
+X-Google-Smtp-Source: ABdhPJzU0E7qL3ArY231F/yeQk8juDRb1mHPctFM8DztGr6M0q3AK+ihMrnxdraTAHhl5MR5gudSicYWtrl8rO80Sg==
+X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:10:7f:e700:c0a8:1acf])
+ (user=jingzhangos job=sendgmr) by 2002:a17:902:6bc7:b029:ee:f84f:1093 with
+ SMTP id m7-20020a1709026bc7b02900eef84f1093mr936835plt.37.1622754870972; Thu,
+ 03 Jun 2021 14:14:30 -0700 (PDT)
+Date: Thu,  3 Jun 2021 21:14:22 +0000
+Message-Id: <20210603211426.790093-1-jingzhangos@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.32.0.rc1.229.g3e70b5a671-goog
+Subject: [PATCH v7 0/4] KVM statistics data fd-based binary interface
+From: Jing Zhang <jingzhangos@google.com>
+To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>, 
+ LinuxMIPS <linux-mips@vger.kernel.org>, KVMPPC <kvm-ppc@vger.kernel.org>, 
+ LinuxS390 <linux-s390@vger.kernel.org>, 
+ Linuxkselftest <linux-kselftest@vger.kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, 
+ Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
+ Julien Thierry <julien.thierry.kdev@gmail.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Will Deacon <will@kernel.org>, Huacai Chen <chenhuacai@kernel.org>, 
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, 
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ Paul Mackerras <paulus@ozlabs.org>, 
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>, 
+ David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, 
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ Sean Christopherson <seanjc@google.com>, 
+ Vitaly Kuznetsov <vkuznets@redhat.com>, Jim Mattson <jmattson@google.com>, 
+ Peter Shier <pshier@google.com>, Oliver Upton <oupton@google.com>, 
+ David Rientjes <rientjes@google.com>,
+ Emanuele Giuseppe Esposito <eesposit@redhat.com>, 
+ David Matlack <dmatlack@google.com>, Ricardo Koller <ricarkol@google.com>, 
+ Krish Sadhukhan <krish.sadhukhan@oracle.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -78,339 +113,109 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Introduce a new VM capability, KVM_CAP_ARM_PROTECTED_VM, which can be
-used to isolate guest memory from the host. For now, the EL2 portion is
-missing, so this documents and exposes the user ABI for the host.
+This patchset provides a file descriptor for every VM and VCPU to read
+KVM statistics data in binary format.
+It is meant to provide a lightweight, flexible, scalable and efficient
+lock-free solution for user space telemetry applications to pull the
+statistics data periodically for large scale systems. The pulling
+frequency could be as high as a few times per second.
+In this patchset, every statistics data are treated to have some
+attributes as below:
+  * architecture dependent or generic
+  * VM statistics data or VCPU statistics data
+  * type: cumulative, instantaneous,
+  * unit: none for simple counter, nanosecond, microsecond,
+    millisecond, second, Byte, KiByte, MiByte, GiByte. Clock Cycles
+Since no lock/synchronization is used, the consistency between all
+the statistics data is not guaranteed. That means not all statistics
+data are read out at the exact same time, since the statistics date
+are still being updated by KVM subsystems while they are read out.
 
-Signed-off-by: Will Deacon <will@kernel.org>
 ---
- Documentation/virt/kvm/api.rst    |  69 ++++++++++++++++++++
- arch/arm64/include/asm/kvm_host.h |  10 +++
- arch/arm64/include/uapi/asm/kvm.h |   9 +++
- arch/arm64/kvm/arm.c              |  18 +++---
- arch/arm64/kvm/mmu.c              |   3 +
- arch/arm64/kvm/pkvm.c             | 104 ++++++++++++++++++++++++++++++
- include/uapi/linux/kvm.h          |   1 +
- 7 files changed, 205 insertions(+), 9 deletions(-)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 7fcb2fd38f42..dfbaf905c435 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -6362,6 +6362,75 @@ default.
- 
- See Documentation/x86/sgx/2.Kernel-internals.rst for more details.
- 
-+7.26 KVM_CAP_ARM_PROTECTED_VM
-+-----------------------------
-+
-+:Architectures: arm64
-+:Target: VM
-+:Parameters: flags is a single KVM_CAP_ARM_PROTECTED_VM_FLAGS_* value
-+
-+The presence of this capability indicates that KVM supports running in a
-+configuration where the host Linux kernel does not have access to guest memory.
-+On such a system, a small hypervisor layer at EL2 can configure the stage-2
-+page tables for both the CPU and any DMA-capable devices to protect guest
-+memory pages so that they are inaccessible to the host unless access is granted
-+explicitly by the guest.
-+
-+The 'flags' parameter is defined as follows:
-+
-+7.26.1 KVM_CAP_ARM_PROTECTED_VM_FLAGS_ENABLE
-+--------------------------------------------
-+
-+:Capability: 'flag' parameter to KVM_CAP_ARM_PROTECTED_VM
-+:Architectures: arm64
-+:Target: VM
-+:Parameters: args[0] contains memory slot ID to hold guest firmware
-+:Returns: 0 on success; negative error code on failure
-+
-+Enabling this capability causes all memory slots of the specified VM to be
-+unmapped from the host system and put into a state where they are no longer
-+configurable. The memory slot corresponding to the ID passed in args[0] is
-+populated with the guest firmware image provided by the host firmware.
-+
-+The first vCPU to enter the guest is defined to be the primary vCPU. All other
-+vCPUs belonging to the VM are secondary vCPUs.
-+
-+All vCPUs belonging to a VM with this capability enabled are initialised to a
-+pre-determined reset state irrespective of any prior configuration according to
-+the KVM_ARM_VCPU_INIT ioctl, with the following exceptions for the primary
-+vCPU:
-+
-+	===========	===========
-+	Register(s)	Reset value
-+	===========	===========
-+	X0-X14:		Preserved (see KVM_SET_ONE_REG)
-+	X15:		Boot protocol version (0)
-+	X16-X30:	Reserved (0)
-+	PC:		IPA base of firmware memory slot
-+	SP:		IPA end of firmware memory slot
-+	===========	===========
-+
-+Secondary vCPUs belonging to a VM with this capability enabled will return
-+-EPERM in response to a KVM_RUN ioctl() if the vCPU was not initialised with
-+the KVM_ARM_VCPU_POWER_OFF feature.
-+
-+There is no support for AArch32 at any exception level.
-+
-+It is an error to enable this capability on a VM after issuing a KVM_RUN
-+ioctl() on one of its vCPUs.
-+
-+7.26.2 KVM_CAP_ARM_PROTECTED_VM_FLAGS_INFO
-+------------------------------------------
-+
-+:Capability: 'flag' parameter to KVM_CAP_ARM_PROTECTED_VM
-+:Architectures: arm64
-+:Target: VM
-+:Parameters: args[0] contains pointer to 'struct kvm_protected_vm_info'
-+:Returns: 0 on success; negative error code on failure
-+
-+Populates the 'struct kvm_protected_vm_info' pointed to by args[0] with
-+information about the protected environment for the VM.
-+
- 8. Other capabilities.
- ======================
- 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 7cd7d5c8c4bc..5645af2a1431 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -100,6 +100,11 @@ struct kvm_s2_mmu {
- struct kvm_arch_memory_slot {
- };
- 
-+struct kvm_protected_vm {
-+	bool enabled;
-+	struct kvm_memory_slot *firmware_slot;
-+};
-+
- struct kvm_arch {
- 	struct kvm_s2_mmu mmu;
- 
-@@ -132,6 +137,8 @@ struct kvm_arch {
- 
- 	u8 pfr0_csv2;
- 	u8 pfr0_csv3;
-+
-+	struct kvm_protected_vm pkvm;
- };
- 
- struct kvm_vcpu_fault_info {
-@@ -763,6 +770,9 @@ void kvm_arch_free_vm(struct kvm *kvm);
- 
- int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type);
- 
-+int kvm_arm_vm_ioctl_pkvm(struct kvm *kvm, struct kvm_enable_cap *cap);
-+#define kvm_vm_is_protected(kvm) (kvm->arch.pkvm.enabled)
-+
- int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature);
- bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
- 
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 24223adae150..cdb3298ba8ae 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -402,6 +402,15 @@ struct kvm_vcpu_events {
- #define KVM_PSCI_RET_INVAL		PSCI_RET_INVALID_PARAMS
- #define KVM_PSCI_RET_DENIED		PSCI_RET_DENIED
- 
-+/* Protected KVM */
-+#define KVM_CAP_ARM_PROTECTED_VM_FLAGS_ENABLE	0
-+#define KVM_CAP_ARM_PROTECTED_VM_FLAGS_INFO	1
-+
-+struct kvm_protected_vm_info {
-+	__u64 firmware_size;
-+	__u64 __reserved[7];
-+};
-+
- #endif
- 
- #endif /* __ARM_KVM_H__ */
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 8d5e23198dfd..186a0adf6391 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -83,22 +83,19 @@ int kvm_arch_check_processor_compat(void *opaque)
- int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 			    struct kvm_enable_cap *cap)
- {
--	int r;
--
--	if (cap->flags)
--		return -EINVAL;
--
- 	switch (cap->cap) {
- 	case KVM_CAP_ARM_NISV_TO_USER:
--		r = 0;
-+		if (cap->flags)
-+			return -EINVAL;
- 		kvm->arch.return_nisv_io_abort_to_user = true;
- 		break;
-+	case KVM_CAP_ARM_PROTECTED_VM:
-+		return kvm_arm_vm_ioctl_pkvm(kvm, cap);
- 	default:
--		r = -EINVAL;
--		break;
-+		return -EINVAL;
- 	}
- 
--	return r;
-+	return 0;
- }
- 
- static int kvm_arm_default_max_vcpus(void)
-@@ -265,6 +262,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_ARM_PTRAUTH_GENERIC:
- 		r = system_has_full_ptr_auth();
- 		break;
-+	case KVM_CAP_ARM_PROTECTED_VM:
-+		r = is_protected_kvm_enabled();
-+		break;
- 	default:
- 		r = 0;
- 	}
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index c5d1f3c87dbd..e1d4a87d18e4 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1349,6 +1349,9 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 	bool writable = !(mem->flags & KVM_MEM_READONLY);
- 	int ret = 0;
- 
-+	if (kvm_vm_is_protected(kvm))
-+		return -EPERM;
-+
- 	if (change != KVM_MR_CREATE && change != KVM_MR_MOVE &&
- 			change != KVM_MR_FLAGS_ONLY)
- 		return 0;
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index 7af5d03a3941..cf624350fb27 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -50,3 +50,107 @@ static int __init pkvm_firmware_rmem_init(struct reserved_mem *rmem)
- }
- RESERVEDMEM_OF_DECLARE(pkvm_firmware, "linux,pkvm-guest-firmware-memory",
- 		       pkvm_firmware_rmem_init);
-+
-+static int pkvm_init_el2_context(struct kvm *kvm)
-+{
-+	kvm_pr_unimpl("Stage-2 protection is not yet implemented\n");
-+	return -EINVAL;
-+}
-+
-+static int pkvm_init_firmware_slot(struct kvm *kvm, u64 slotid)
-+{
-+	struct kvm_memslots *slots;
-+	struct kvm_memory_slot *slot;
-+
-+	if (slotid >= KVM_MEM_SLOTS_NUM || !pkvm_firmware_mem)
-+		return -EINVAL;
-+
-+	slots = kvm_memslots(kvm);
-+	if (!slots)
-+		return -ENOENT;
-+
-+	slot = id_to_memslot(slots, slotid);
-+	if (!slot)
-+		return -ENOENT;
-+
-+	if (slot->flags)
-+		return -EINVAL;
-+
-+	if ((slot->npages << PAGE_SHIFT) < pkvm_firmware_mem->size)
-+		return -ENOMEM;
-+
-+	kvm->arch.pkvm.firmware_slot = slot;
-+	return 0;
-+}
-+
-+static void pkvm_teardown_firmware_slot(struct kvm *kvm)
-+{
-+	kvm->arch.pkvm.firmware_slot = NULL;
-+}
-+
-+static int pkvm_enable(struct kvm *kvm, u64 slotid)
-+{
-+	int ret;
-+
-+	ret = pkvm_init_firmware_slot(kvm, slotid);
-+	if (ret)
-+		return ret;
-+
-+	ret = pkvm_init_el2_context(kvm);
-+	if (ret)
-+		pkvm_teardown_firmware_slot(kvm);
-+
-+	return ret;
-+}
-+
-+static int pkvm_vm_ioctl_enable(struct kvm *kvm, u64 slotid)
-+{
-+	int ret = 0;
-+
-+	mutex_lock(&kvm->lock);
-+	if (kvm_vm_is_protected(kvm)) {
-+		ret = -EPERM;
-+		goto out_kvm_unlock;
-+	}
-+
-+	mutex_lock(&kvm->slots_lock);
-+	ret = pkvm_enable(kvm, slotid);
-+	if (ret)
-+		goto out_slots_unlock;
-+
-+	kvm->arch.pkvm.enabled = true;
-+out_slots_unlock:
-+	mutex_unlock(&kvm->slots_lock);
-+out_kvm_unlock:
-+	mutex_unlock(&kvm->lock);
-+	return ret;
-+}
-+
-+static int pkvm_vm_ioctl_info(struct kvm *kvm,
-+			      struct kvm_protected_vm_info __user *info)
-+{
-+	struct kvm_protected_vm_info kinfo = {
-+		.firmware_size = pkvm_firmware_mem ?
-+				 pkvm_firmware_mem->size :
-+				 0,
-+	};
-+
-+	return copy_to_user(info, &kinfo, sizeof(kinfo)) ? -EFAULT : 0;
-+}
-+
-+int kvm_arm_vm_ioctl_pkvm(struct kvm *kvm, struct kvm_enable_cap *cap)
-+{
-+	if (cap->args[1] || cap->args[2] || cap->args[3])
-+		return -EINVAL;
-+
-+	switch (cap->flags) {
-+	case KVM_CAP_ARM_PROTECTED_VM_FLAGS_ENABLE:
-+		return pkvm_vm_ioctl_enable(kvm, cap->args[0]);
-+	case KVM_CAP_ARM_PROTECTED_VM_FLAGS_INFO:
-+		return pkvm_vm_ioctl_info(kvm, (void __user *)cap->args[0]);
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 3fd9a7e9d90c..58ab8508be5e 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1082,6 +1082,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_SGX_ATTRIBUTE 196
- #define KVM_CAP_VM_COPY_ENC_CONTEXT_FROM 197
- #define KVM_CAP_PTP_KVM 198
-+#define KVM_CAP_ARM_PROTECTED_VM 199
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
+* v6 -> v7
+  - Improve file descriptor allocation function by Krish suggestion
+  - Use "generic stats" instead of "common stats" as Krish suggested
+  - Addressed some other nits from Krish and David Matlack
+
+* v5 -> v6
+  - Use designated initializers for STATS_DESC
+  - Change KVM_STATS_SCALE... to KVM_STATS_BASE...
+  - Use a common function for kvm_[vm|vcpu]_stats_read
+  - Fix some documentation errors/missings
+  - Use TEST_ASSERT in selftest
+  - Use a common function for [vm|vcpu]_stats_test in selftest
+
+* v4 -> v5
+  - Rebase to kvm/queue, commit a4345a7cecfb ("Merge tag
+    'kvmarm-fixes-5.13-1'")
+  - Change maximum stats name length to 48
+  - Replace VM_STATS_COMMON/VCPU_STATS_COMMON macros with stats
+    descriptor definition macros.
+  - Fixed some errors/warnings reported by checkpatch.pl
+
+* v3 -> v4
+  - Rebase to kvm/queue, commit 9f242010c3b4 ("KVM: avoid "deadlock"
+    between install_new_memslots and MMU notifier")
+  - Use C-stype comments in the whole patch
+  - Fix wrong count for x86 VCPU stats descriptors
+  - Fix KVM stats data size counting and validity check in selftest
+
+* v2 -> v3
+  - Rebase to kvm/queue, commit edf408f5257b ("KVM: avoid "deadlock"
+    between install_new_memslots and MMU notifier")
+  - Resolve some nitpicks about format
+
+* v1 -> v2
+  - Use ARRAY_SIZE to count the number of stats descriptors
+  - Fix missing `size` field initialization in macro STATS_DESC
+
+[1] https://lore.kernel.org/kvm/20210402224359.2297157-1-jingzhangos@google.com
+[2] https://lore.kernel.org/kvm/20210415151741.1607806-1-jingzhangos@google.com
+[3] https://lore.kernel.org/kvm/20210423181727.596466-1-jingzhangos@google.com
+[4] https://lore.kernel.org/kvm/20210429203740.1935629-1-jingzhangos@google.com
+[5] https://lore.kernel.org/kvm/20210517145314.157626-1-jingzhangos@google.com
+[6] https://lore.kernel.org/kvm/20210524151828.4113777-1-jingzhangos@google.com
+
+---
+
+Jing Zhang (4):
+  KVM: stats: Separate generic stats from architecture specific ones
+  KVM: stats: Add fd-based API to read binary stats data
+  KVM: stats: Add documentation for statistics data binary interface
+  KVM: selftests: Add selftest for KVM statistics data binary interface
+
+ Documentation/virt/kvm/api.rst                | 180 +++++++++++++++
+ arch/arm64/include/asm/kvm_host.h             |   9 +-
+ arch/arm64/kvm/guest.c                        |  38 +++-
+ arch/mips/include/asm/kvm_host.h              |   9 +-
+ arch/mips/kvm/mips.c                          |  64 +++++-
+ arch/powerpc/include/asm/kvm_host.h           |   9 +-
+ arch/powerpc/kvm/book3s.c                     |  64 +++++-
+ arch/powerpc/kvm/book3s_hv.c                  |  12 +-
+ arch/powerpc/kvm/book3s_pr.c                  |   2 +-
+ arch/powerpc/kvm/book3s_pr_papr.c             |   2 +-
+ arch/powerpc/kvm/booke.c                      |  59 ++++-
+ arch/s390/include/asm/kvm_host.h              |   9 +-
+ arch/s390/kvm/kvm-s390.c                      | 129 ++++++++++-
+ arch/x86/include/asm/kvm_host.h               |   9 +-
+ arch/x86/kvm/x86.c                            |  67 +++++-
+ include/linux/kvm_host.h                      | 141 +++++++++++-
+ include/linux/kvm_types.h                     |  12 +
+ include/uapi/linux/kvm.h                      |  50 ++++
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   3 +
+ .../testing/selftests/kvm/include/kvm_util.h  |   3 +
+ .../selftests/kvm/kvm_binary_stats_test.c     | 215 ++++++++++++++++++
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  12 +
+ virt/kvm/kvm_main.c                           | 169 +++++++++++++-
+ 24 files changed, 1178 insertions(+), 90 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/kvm_binary_stats_test.c
+
+
+base-commit: a4345a7cecfb91ae78cd43d26b0c6a956420761a
 -- 
-2.32.0.rc0.204.g9fa02ecfa5-goog
+2.32.0.rc1.229.g3e70b5a671-goog
 
 _______________________________________________
 kvmarm mailing list
