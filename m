@@ -2,63 +2,83 @@ Return-Path: <SRS0=VfsR=K6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC0B1C07E94
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Jun 2021 15:34:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23001C4743C
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Jun 2021 18:18:51 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4245D61404
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Jun 2021 15:34:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4245D61404
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 8B18C6054E
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Jun 2021 18:18:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B18C6054E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BE4314B0FE;
-	Fri,  4 Jun 2021 11:34:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0CB4B405A6;
+	Fri,  4 Jun 2021 14:18:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 8a79yt7jE9os; Fri,  4 Jun 2021 11:34:52 -0400 (EDT)
+	with ESMTP id W1ZTnEsoB5e2; Fri,  4 Jun 2021 14:18:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CE8D74B0D0;
-	Fri,  4 Jun 2021 11:34:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C5A824B118;
+	Fri,  4 Jun 2021 14:18:45 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C3BF4B0C8
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jun 2021 11:34:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 92D624B118
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jun 2021 14:18:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id swoDPASkhZzD for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Jun 2021 11:34:48 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B2B784B0C3
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jun 2021 11:34:48 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id CC37361402;
- Fri,  4 Jun 2021 15:34:44 +0000 (UTC)
-Date: Fri, 4 Jun 2021 16:34:42 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Steven Price <steven.price@arm.com>
-Subject: Re: [PATCH v13 7/8] KVM: arm64: ioctl to fetch/store tags in a guest
-Message-ID: <20210604153441.GG31173@arm.com>
-References: <20210524104513.13258-1-steven.price@arm.com>
- <20210524104513.13258-8-steven.price@arm.com>
- <20210603171336.GH20338@arm.com>
- <02c7682e-5fb6-29eb-9105-02e3521756a2@arm.com>
- <20210604114233.GE31173@arm.com>
- <b3c869e3-b693-5e3f-3748-1c62b01e9b22@arm.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <b3c869e3-b693-5e3f-3748-1c62b01e9b22@arm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
- Marc Zyngier <maz@kernel.org>, Juan Quintela <quintela@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
- Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org,
- Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+ with ESMTP id il9u5ZCCZNiu for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Jun 2021 14:18:40 -0400 (EDT)
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com
+ [209.85.216.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6225E405A6
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jun 2021 14:18:40 -0400 (EDT)
+Received: by mail-pj1-f74.google.com with SMTP id
+ om12-20020a17090b3a8cb029016a4ee7d56fso5672633pjb.7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 04 Jun 2021 11:18:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=OURJ6TzGdfX+C5aElOfrvLYLXIEwqt+64W7DY078FOs=;
+ b=DoohwkvXjAFEjB702S1RR85vweNK+i/nJ9ySyGXZL7k7ooN4RLk2j6KK0JpK4KBp0W
+ BUCiT5U1dWIDDUHEwVM7l41dmz4VGvpZC68yGABSBExHHEVCcyStRIbAUKmecH0d3lw0
+ WAeJhuBJ4/auMLn3lWtehD0nD9R4kYgREzE0Un51yljJ0Kkkn40uZeXLGZHBrDMZFbku
+ B4nAxYWuyr1KCo72Kw/gia2f9dqgfXPC3SsCi2vYLkGHhOf+aK2m8i9J8dOwiGL36dXM
+ NUkgGWEj9O1cTJKdJc7xeWZ9KBsejArXk3bHK3N01RJcAJDiym53uZ99msNDGxs+7R97
+ YEMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=OURJ6TzGdfX+C5aElOfrvLYLXIEwqt+64W7DY078FOs=;
+ b=fWoJrZ74evqU+rbeTpmurxghyPTrXgYfDlkLri+3FvgqWFrMdXIsXFV5PBQJ6gicFq
+ 8h0vYVR1wkSR4P1VK0jlqNkQRO3qockHbskzEKcHrukio/EtyX7F/8Z3MohB9ztJAJ6P
+ WzCkdutDd3LIzgdoTwN/VNeIGpcBa47a1dNJv569scIQDOHBmtEuAcmAkhYoe6FiXX9W
+ I+a44z413eJrkVZEB0NMioVPVIMbktQz9lysAebM/fiXp2/p3qo7i/MDA2qXk8sVdRzL
+ LVT76s6DX4yGDpvDxIC1If3MnFdFtnZ3FKdS27qqq25rOPCzZ8JBbPzgaNCxVchQoMz8
+ YkWg==
+X-Gm-Message-State: AOAM530I0tSabcj/EaOIse1UtCT25lxRpk0SeR067/mKT2putibNn41m
+ Ig28oIg56X/OYUcvQ+jPkZRd2WAgyKM1Exc5EdjqxP5RX3e4+bh3e/V7QLgKKZBPFYIb/1LywRN
+ 126ZJKuu/bqwl/2SZcSdirNu7MqrcotRZ8lKYQfY336LONHZLepZR8ehY3c6WgUA7hlM506rKFG
+ 4=
+X-Google-Smtp-Source: ABdhPJy9PKCQtJIEuOUg8w1qPNwviZRTxC7lSkcVhvhRw5bRINA/J7AJOwPEGcjkcY9tf+d4n0aJ6rlK3EBbhQ==
+X-Received: from ricarkol2.c.googlers.com
+ ([fda3:e722:ac3:10:24:72f4:c0a8:62fe])
+ (user=ricarkol job=sendgmr) by 2002:a17:90a:c68a:: with SMTP id
+ n10mr18432159pjt.32.1622830719294; Fri, 04 Jun 2021 11:18:39 -0700 (PDT)
+Date: Fri,  4 Jun 2021 11:18:33 -0700
+Message-Id: <20210604181833.1769900-1-ricarkol@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.32.0.rc1.229.g3e70b5a671-goog
+Subject: [PATCH] KVM: selftests: Rename vm_handle_exception in evmcs test
+From: Ricardo Koller <ricarkol@google.com>
+To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: maz@kernel.org, kernel test robot <oliver.sang@intel.com>,
+ pbonzini@redhat.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -75,95 +95,40 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Jun 04, 2021 at 02:09:50PM +0100, Steven Price wrote:
-> On 04/06/2021 12:42, Catalin Marinas wrote:
-> > On Fri, Jun 04, 2021 at 12:15:56PM +0100, Steven Price wrote:
-> >> On 03/06/2021 18:13, Catalin Marinas wrote:
-> >>> On Mon, May 24, 2021 at 11:45:12AM +0100, Steven Price wrote:
-> >>>> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> >>>> index 24223adae150..b3edde68bc3e 100644
-> >>>> --- a/arch/arm64/include/uapi/asm/kvm.h
-> >>>> +++ b/arch/arm64/include/uapi/asm/kvm.h
-> >>>> @@ -184,6 +184,17 @@ struct kvm_vcpu_events {
-> >>>>  	__u32 reserved[12];
-> >>>>  };
-> >>>>  
-> >>>> +struct kvm_arm_copy_mte_tags {
-> >>>> +	__u64 guest_ipa;
-> >>>> +	__u64 length;
-> >>>> +	void __user *addr;
-> >>>> +	__u64 flags;
-> >>>> +	__u64 reserved[2];
-> >>>> +};
-> >>>> +
-> >>>> +#define KVM_ARM_TAGS_TO_GUEST		0
-> >>>> +#define KVM_ARM_TAGS_FROM_GUEST		1
-> >>>> +
-> >>>>  /* If you need to interpret the index values, here is the key: */
-> >>>>  #define KVM_REG_ARM_COPROC_MASK		0x000000000FFF0000
-> >>>>  #define KVM_REG_ARM_COPROC_SHIFT	16
-> >>>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> >>>> index e89a5e275e25..baa33359e477 100644
-> >>>> --- a/arch/arm64/kvm/arm.c
-> >>>> +++ b/arch/arm64/kvm/arm.c
-> >>>> @@ -1345,6 +1345,13 @@ long kvm_arch_vm_ioctl(struct file *filp,
-> >>>>  
-> >>>>  		return 0;
-> >>>>  	}
-> >>>> +	case KVM_ARM_MTE_COPY_TAGS: {
-> >>>> +		struct kvm_arm_copy_mte_tags copy_tags;
-> >>>> +
-> >>>> +		if (copy_from_user(&copy_tags, argp, sizeof(copy_tags)))
-> >>>> +			return -EFAULT;
-> >>>> +		return kvm_vm_ioctl_mte_copy_tags(kvm, &copy_tags);
-> >>>> +	}
-> >>>
-> >>> I wonder whether we need an update of the user structure following a
-> >>> fault, like how much was copied etc. In case of an error, some tags were
-> >>> copied and the VMM may want to skip the page before continuing. But here
-> >>> there's no such information provided.
-> >>>
-> >>> On the ptrace interface, we return 0 on the syscall if any bytes were
-> >>> copied and update iov_len to such number. Maybe you want to still return
-> >>> an error here but updating copy_tags.length would be nice (and, of
-> >>> course, a copy_to_user() back).
-> >>
-> >> Good idea - as you suggest I'll make it update length with the number of
-> >> bytes not processed. Although in general I think we're expecting the VMM
-> >> to know where the memory is so this is more of a programming error - but
-> >> could still be useful for debugging.
-> > 
-> > Or update it to the number of bytes copied to be consistent with
-> > ptrace()'s iov.len. On success, the structure is effectively left
-> > unchanged.
-> 
-> I was avoiding that because it confuses the error code when the initial
-> copy_from_user() fails. In that case the structure is clearly unchanged,
-> so you can only tell from a -EFAULT return that nothing happened. By
-> returning the number of bytes left you can return an error code along
-> with the information that the copy only half completed.
-> 
-> It also seems cleaner to leave the structure unchanged if e.g. the flags
-> or reserved fields are invalid rather than having to set length=0 to
-> signal that nothing was done.
-> 
-> Although I do feel like arguing whether to use a ptrace() interface or a
-> copy_{to,from}_user() interface is somewhat ridiculous considering
-> neither are exactly considered good.
-> 
-> Rather than changing the structure we could return either an error code
-> (if nothing was copied) or the number of bytes left. That way ioctl()==0
-> means complete success, >0 means partial success and <0 means complete
-> failure and provides a detailed error code. The ioctl() can be repeated
-> (with adjusted pointers) if it returns >0 and a detailed error is needed.
+Kernel test robot reports this:
 
-That would be more like read/write (nearly, those always return the
-amount copied). Anyway, I don't have any strong preference, I'll leave
-the details up to you as long as there is some indication of how much
-was copied or left.
+> /usr/bin/ld: tools/testing/selftests/kvm/x86_64/evmcs_test.c:157: undefined reference to `vm_handle_exception'
+> /usr/bin/ld: tools/testing/selftests/kvm/x86_64/evmcs_test.c:158: undefined reference to `vm_handle_exception'
+> collect2: error: ld returned 1 exit status
 
+Fix it by renaming vm_handle_exception to vm_install_vector_handler in
+evmcs_test.c.
+
+Fixes: a2bad6a990a4 ("KVM: selftests: Rename vm_handle_exception")
+Reported-by: kernel test robot <oliver.sang@intel.com>
+Signed-off-by: Ricardo Koller <ricarkol@google.com>
+---
+ tools/testing/selftests/kvm/x86_64/evmcs_test.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tools/testing/selftests/kvm/x86_64/evmcs_test.c b/tools/testing/selftests/kvm/x86_64/evmcs_test.c
+index 63096cea26c6..278711723f4b 100644
+--- a/tools/testing/selftests/kvm/x86_64/evmcs_test.c
++++ b/tools/testing/selftests/kvm/x86_64/evmcs_test.c
+@@ -154,8 +154,8 @@ int main(int argc, char *argv[])
+ 
+ 	vm_init_descriptor_tables(vm);
+ 	vcpu_init_descriptor_tables(vm, VCPU_ID);
+-	vm_handle_exception(vm, UD_VECTOR, guest_ud_handler);
+-	vm_handle_exception(vm, NMI_VECTOR, guest_nmi_handler);
++	vm_install_vector_handler(vm, UD_VECTOR, guest_ud_handler);
++	vm_install_vector_handler(vm, NMI_VECTOR, guest_nmi_handler);
+ 
+ 	pr_info("Running L1 which uses EVMCS to run L2\n");
+ 
 -- 
-Catalin
+2.32.0.rc1.229.g3e70b5a671-goog
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
