@@ -2,66 +2,113 @@ Return-Path: <SRS0=VfsR=K6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9A87C4708F
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Jun 2021 06:49:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9AE2C07E94
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Jun 2021 07:17:56 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3F9EA6140C
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Jun 2021 06:49:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F9EA6140C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 697D861415
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Jun 2021 07:17:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 697D861415
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AA3D34B0CF;
-	Fri,  4 Jun 2021 02:49:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F0E0E4B0C9;
+	Fri,  4 Jun 2021 03:17:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id G93luDQtexZJ; Fri,  4 Jun 2021 02:49:03 -0400 (EDT)
+	with ESMTP id o27W0+dV1TYp; Fri,  4 Jun 2021 03:17:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EE3824B0DC;
-	Fri,  4 Jun 2021 02:49:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 017214B0F4;
+	Fri,  4 Jun 2021 03:17:55 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A29984B0DC
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jun 2021 02:49:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BCE0C4B0CF
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jun 2021 03:17:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PxhI5h2YCm8J for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Jun 2021 02:48:57 -0400 (EDT)
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1D2FF4B0CF
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jun 2021 02:48:57 -0400 (EDT)
-Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.54])
- by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4FxCtp2bjyz68ZN;
- Fri,  4 Jun 2021 14:45:06 +0800 (CST)
-Received: from dggpemm500022.china.huawei.com (7.185.36.162) by
- dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Fri, 4 Jun 2021 14:48:49 +0800
-Received: from DESKTOP-7FEPK9S.china.huawei.com (10.174.185.220) by
- dggpemm500022.china.huawei.com (7.185.36.162) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Fri, 4 Jun 2021 14:48:48 +0800
-From: Shenming Lu <lushenming@huawei.com>
-To: Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
- <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.cs.columbia.edu>,
- <linux-kernel@vger.kernel.org>
-Subject: [PATCH] KVM: arm64: vgic: Communicate a change of the IRQ state via
- vgic_queue_irq_unlock
-Date: Fri, 4 Jun 2021 14:48:28 +0800
-Message-ID: <20210604064828.1497-1-lushenming@huawei.com>
-X-Mailer: git-send-email 2.27.0.windows.1
+ with ESMTP id xRf8WoSS4nSz for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Jun 2021 03:17:52 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C005E4B0AC
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jun 2021 03:17:52 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1622791072;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=oYiGBrwOVwQzTkg4cxNvQnAUyjlM8dxbSVyQ8B6K+H0=;
+ b=WKYjw6DZGss2e7ZfYX7/9cRExmJoSMrz340iRvQ4rWTeS8aMde8sFIDe5U8vxmtlB+LjK9
+ nqxo17YV3+Vi1lTQHBO9BLyKSV9aQ6f5hic5ddfyGZbSvDDFn60vq8Ut1hVfGRoJ3whaJk
+ +CnEmJ/yI+kZIe0W3Ot6DY6HAT8RMBs=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-149-DlqSMc4kOMKU_HfqLxKS2w-1; Fri, 04 Jun 2021 03:17:50 -0400
+X-MC-Unique: DlqSMc4kOMKU_HfqLxKS2w-1
+Received: by mail-ej1-f72.google.com with SMTP id
+ am5-20020a1709065685b02903eef334e563so3050233ejc.2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 04 Jun 2021 00:17:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=oYiGBrwOVwQzTkg4cxNvQnAUyjlM8dxbSVyQ8B6K+H0=;
+ b=P2Mdkwafqom3MlR358RV9MyC6ZowZjeHSTg7dNCM66JHsdHq2J7BD+H6kOs9S0rYFf
+ /2E/5TNIpGbWpAwWkSGT8gV/9xDeF8ufSqAEoOuBRc06cLXutUVdyMPOddUePVZZ0mmo
+ MPdGfTPpbOvEXss/B5Dxba3TshYjqr+YoNc0TCVlK8g3RYp/+T9a0ZQDykQUi+1YZInM
+ Oc3LlZ5WPdBewKcVYg8GYOea6pF8vQybR9kn4goW2fszZ9Cc6kjMlEqtgd4QZWKKFagG
+ WcxHF0s32U2R10ELAl3XtQOEIyOwaE8KD2ndq9OkWyduQrLFV1J+UOE9ktyDJG7qEgtp
+ iXRQ==
+X-Gm-Message-State: AOAM530eYL158D8yBbxvNc2hF2YTV3HcbkYyrIqOaWPBNGJ9qHhWGFTy
+ rmfrbmsdG+2FI0M4Blaufdqj9C7HTEwTUIyBUxdQeMrvX5i8DnABNx13ED3vz8379eD5Tq/xzMj
+ Q3LHiaEWk/hljmGdw07VX/Hf4
+X-Received: by 2002:a17:906:1982:: with SMTP id
+ g2mr2940216ejd.184.1622791069075; 
+ Fri, 04 Jun 2021 00:17:49 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzNA+cR803OKErcII3/XiBGdUlseY07tlmT5T9SKrsahaFVgc/V2SdsxWbxXtho/hDOs9RuiA==
+X-Received: by 2002:a17:906:1982:: with SMTP id
+ g2mr2940199ejd.184.1622791068902; 
+ Fri, 04 Jun 2021 00:17:48 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
+ ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+ by smtp.gmail.com with ESMTPSA id um5sm2430354ejb.109.2021.06.04.00.17.47
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 04 Jun 2021 00:17:48 -0700 (PDT)
+Subject: Re: [RFC][PATCH] kvm: add suspend pm-notifier
+To: Sergey Senozhatsky <senozhatsky@chromium.org>,
+ Peter Zijlstra <peterz@infradead.org>
+References: <20210603164315.682994-1-senozhatsky@chromium.org>
+ <YLkRB3qxjrXB99He@hirez.programming.kicks-ass.net>
+ <YLl2QeoziEVHvRAO@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1a460c63-89d6-b7ae-657b-2c4b841c9562@redhat.com>
+Date: Fri, 4 Jun 2021 09:17:46 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-X-Originating-IP: [10.174.185.220]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- dggpemm500022.china.huawei.com (7.185.36.162)
-X-CFilter-Loop: Reflected
-Cc: lushenming@huawei.com
+In-Reply-To: <YLl2QeoziEVHvRAO@google.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Cc: linux-s390@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
+ Sean Christopherson <seanjc@google.com>, Huacai Chen <chenhuacai@kernel.org>,
+ linux-kernel@vger.kernel.org, kvm-ppc@vger.kernel.org,
+ linux-mips@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, Marc Zyngier <maz@kernel.org>,
+ Suleiman Souhlal <suleiman@google.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,200 +120,31 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+On 04/06/21 02:39, Sergey Senozhatsky wrote:
+>>>   
+>>> +void kvm_arch_pm_notifier(struct kvm *kvm)
+>>> +{
+>>> +}
+>>> +
+>>>   long kvm_arch_vm_ioctl(struct file *filp,
+>>>   		       unsigned int ioctl, unsigned long arg)
+>>>   {
+>> What looks like you wants a __weak function.
+> True. Thanks for the suggestion.
+> 
+> I thought about it, but I recalled that tglx had  __strong opinions
+> on __weak functions.
+> 
 
-Some time ago, you suggested that we should communicate a change
-of the IRQ state via vgic_queue_irq_unlock [1], which needs to
-include dropping the IRQ from the VCPU's ap_list if the IRQ is
-not pending or enabled but on the ap_list. And I additionally
-add a case where the IRQ has to be migrated to another ap_list.
+Alternatively, you can add a Kconfig symbol to virt/kvm/Kconfig and 
+select it from arch/x86/kvm.
 
-(maybe you forget this...)
-Does this patch match your thought at the time?
-
-[1] https://lore.kernel.org/patchwork/patch/1371884/
-
-Signed-off-by: Shenming Lu <lushenming@huawei.com>
----
- arch/arm64/kvm/vgic/vgic.c | 116 ++++++++++++++++++++++++-------------
- 1 file changed, 75 insertions(+), 41 deletions(-)
-
-diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-index 15b666200f0b..9b88d49aa439 100644
---- a/arch/arm64/kvm/vgic/vgic.c
-+++ b/arch/arm64/kvm/vgic/vgic.c
-@@ -326,8 +326,9 @@ static bool vgic_validate_injection(struct vgic_irq *irq, bool level, void *owne
- 
- /*
-  * Check whether an IRQ needs to (and can) be queued to a VCPU's ap list.
-- * Do the queuing if necessary, taking the right locks in the right order.
-- * Returns true when the IRQ was queued, false otherwise.
-+ * Do the queuing, dropping or migrating if necessary, taking the right
-+ * locks in the right order. Returns true when the IRQ was queued, false
-+ * otherwise.
-  *
-  * Needs to be entered with the IRQ lock already held, but will return
-  * with all locks dropped.
-@@ -335,49 +336,38 @@ static bool vgic_validate_injection(struct vgic_irq *irq, bool level, void *owne
- bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
- 			   unsigned long flags)
- {
-+	struct kvm_vcpu *target_vcpu;
- 	struct kvm_vcpu *vcpu;
-+	bool ret = false;
- 
- 	lockdep_assert_held(&irq->irq_lock);
- 
- retry:
--	vcpu = vgic_target_oracle(irq);
--	if (irq->vcpu || !vcpu) {
-+	target_vcpu = vgic_target_oracle(irq);
-+	vcpu = irq->vcpu;
-+	if (target_vcpu == vcpu) {
- 		/*
--		 * If this IRQ is already on a VCPU's ap_list, then it
--		 * cannot be moved or modified and there is no more work for
-+		 * If this IRQ's state is consistent with whether on
-+		 * the right ap_lsit or not, there is no more work for
- 		 * us to do.
--		 *
--		 * Otherwise, if the irq is not pending and enabled, it does
--		 * not need to be inserted into an ap_list and there is also
--		 * no more work for us to do.
- 		 */
- 		raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
--
--		/*
--		 * We have to kick the VCPU here, because we could be
--		 * queueing an edge-triggered interrupt for which we
--		 * get no EOI maintenance interrupt. In that case,
--		 * while the IRQ is already on the VCPU's AP list, the
--		 * VCPU could have EOI'ed the original interrupt and
--		 * won't see this one until it exits for some other
--		 * reason.
--		 */
--		if (vcpu) {
--			kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
--			kvm_vcpu_kick(vcpu);
--		}
--		return false;
-+		goto out;
- 	}
- 
- 	/*
- 	 * We must unlock the irq lock to take the ap_list_lock where
--	 * we are going to insert this new pending interrupt.
-+	 * we are going to insert/drop this IRQ.
- 	 */
- 	raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
- 
- 	/* someone can do stuff here, which we re-check below */
- 
--	raw_spin_lock_irqsave(&vcpu->arch.vgic_cpu.ap_list_lock, flags);
-+	if (target_vcpu)
-+		raw_spin_lock_irqsave(&target_vcpu->arch.vgic_cpu.ap_list_lock,
-+				      flags);
-+	if (vcpu)
-+		raw_spin_lock_irqsave(&vcpu->arch.vgic_cpu.ap_list_lock, flags);
- 	raw_spin_lock(&irq->irq_lock);
- 
- 	/*
-@@ -392,30 +382,74 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
- 	 * In both cases, drop the locks and retry.
- 	 */
- 
--	if (unlikely(irq->vcpu || vcpu != vgic_target_oracle(irq))) {
-+	if (unlikely(target_vcpu != vgic_target_oracle(irq) ||
-+		     vcpu != irq->vcpu)) {
- 		raw_spin_unlock(&irq->irq_lock);
--		raw_spin_unlock_irqrestore(&vcpu->arch.vgic_cpu.ap_list_lock,
--					   flags);
-+		if (target_vcpu)
-+			raw_spin_unlock_irqrestore(&target_vcpu->arch.vgic_cpu.ap_list_lock,
-+						   flags);
-+		if (vcpu)
-+			raw_spin_unlock_irqrestore(&vcpu->arch.vgic_cpu.ap_list_lock,
-+						   flags);
- 
- 		raw_spin_lock_irqsave(&irq->irq_lock, flags);
- 		goto retry;
- 	}
- 
--	/*
--	 * Grab a reference to the irq to reflect the fact that it is
--	 * now in the ap_list.
--	 */
--	vgic_get_irq_kref(irq);
--	list_add_tail(&irq->ap_list, &vcpu->arch.vgic_cpu.ap_list_head);
--	irq->vcpu = vcpu;
-+	if (!vcpu && target_vcpu) {
-+		/*
-+		 * Insert this new pending interrupt.
-+		 * Grab a reference to the irq to reflect the fact that
-+		 * it is now in the ap_list.
-+		 */
-+		vgic_get_irq_kref(irq);
-+		list_add_tail(&irq->ap_list,
-+			      &target_vcpu->arch.vgic_cpu.ap_list_head);
-+		irq->vcpu = target_vcpu;
-+		ret = true;
-+	} else if (vcpu && !target_vcpu) {
-+		/*
-+		 * This IRQ is not pending or enabled but on the ap_list,
-+		 * drop it from the ap_list.
-+		 */
-+		list_del(&irq->ap_list);
-+		irq->vcpu = NULL;
-+		raw_spin_unlock(&irq->irq_lock);
-+		vgic_put_irq(vcpu->kvm, irq);
-+		raw_spin_unlock_irqrestore(&vcpu->arch.vgic_cpu.ap_list_lock,
-+					   flags);
-+		goto out;
-+	} else {
-+		/* This IRQ looks like it has to be migrated. */
-+		list_del(&irq->ap_list);
-+		list_add_tail(&irq->ap_list,
-+			      &target_vcpu->arch.vgic_cpu.ap_list_head);
-+		irq->vcpu = target_vcpu;
-+	}
- 
- 	raw_spin_unlock(&irq->irq_lock);
--	raw_spin_unlock_irqrestore(&vcpu->arch.vgic_cpu.ap_list_lock, flags);
-+	if (target_vcpu)
-+		raw_spin_unlock_irqrestore(&target_vcpu->arch.vgic_cpu.ap_list_lock,
-+					   flags);
-+	if (vcpu)
-+		raw_spin_unlock_irqrestore(&vcpu->arch.vgic_cpu.ap_list_lock, flags);
- 
--	kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
--	kvm_vcpu_kick(vcpu);
-+out:
-+	/*
-+	 * Even for the already queuing rightly case we have
-+	 * to kick the VCPU, because we could be queueing an
-+	 * edge-triggered interrupt for which we get no EOI
-+	 * maintenance interrupt. In that case, while the IRQ
-+	 * is already on the VCPU's AP list, the VCPU could
-+	 * have EOI'ed the original interrupt and won't see
-+	 * this one until it exits for some other reason.
-+	 */
-+	if (target_vcpu) {
-+		kvm_make_request(KVM_REQ_IRQ_PENDING, target_vcpu);
-+		kvm_vcpu_kick(target_vcpu);
-+	}
- 
--	return true;
-+	return ret;
- }
- 
- /**
--- 
-2.19.1
+Paolo
 
 _______________________________________________
 kvmarm mailing list
