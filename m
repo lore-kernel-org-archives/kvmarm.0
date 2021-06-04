@@ -2,79 +2,81 @@ Return-Path: <SRS0=VfsR=K6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98B48C07E94
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Jun 2021 08:13:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40E41C07E94
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Jun 2021 08:47:11 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C0E036140C
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Jun 2021 08:13:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0E036140C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id B565361208
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Jun 2021 08:47:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B565361208
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 38C7A4B0C3;
-	Fri,  4 Jun 2021 04:13:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E2434B0BA;
+	Fri,  4 Jun 2021 04:47:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id XODFCP8vGZfg; Fri,  4 Jun 2021 04:13:24 -0400 (EDT)
+	with ESMTP id MF9nuR1hK0AZ; Fri,  4 Jun 2021 04:47:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DCA5B4B0C7;
-	Fri,  4 Jun 2021 04:13:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 134CD4B0F6;
+	Fri,  4 Jun 2021 04:47:06 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BC8054B0C7
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jun 2021 04:13:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2BF474B0D8
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jun 2021 04:47:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JX8oIr79bvJg for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Jun 2021 04:13:19 -0400 (EDT)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D8B514B0C3
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jun 2021 04:13:18 -0400 (EDT)
-Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.53])
- by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4FxFl0079FzWrcJ;
- Fri,  4 Jun 2021 16:08:28 +0800 (CST)
-Received: from dggpeml500022.china.huawei.com (7.185.36.66) by
- dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Fri, 4 Jun 2021 16:13:13 +0800
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- dggpeml500022.china.huawei.com (7.185.36.66) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Fri, 4 Jun 2021 16:13:12 +0800
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.2176.012; Fri, 4 Jun 2021 09:13:10 +0100
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu"
- <kvmarm@lists.cs.columbia.edu>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>
-Subject: RE: [RFC PATCH 0/3] kvm/arm: New VMID allocator based on asid(2nd
- approach) 
-Thread-Topic: [RFC PATCH 0/3] kvm/arm: New VMID allocator based on asid(2nd
- approach) 
-Thread-Index: AQHXQph5pwodb0a/4kShAMz7Pnc+rqsDq0rQ
-Date: Fri, 4 Jun 2021 08:13:10 +0000
-Message-ID: <e62829990c50479292af94c4152011fc@huawei.com>
-References: <20210506165232.1969-1-shameerali.kolothum.thodi@huawei.com>
-In-Reply-To: <20210506165232.1969-1-shameerali.kolothum.thodi@huawei.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.47.88.52]
-MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
- "maz@kernel.org" <maz@kernel.org>, Linuxarm <linuxarm@huawei.com>,
- "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
- "will@kernel.org" <will@kernel.org>
+ with ESMTP id WQeqvJsgZEfW for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Jun 2021 04:47:01 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0B1324B0BA
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jun 2021 04:47:01 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id BE38F61208;
+ Fri,  4 Jun 2021 08:46:59 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1lp5Tl-005RCV-NT; Fri, 04 Jun 2021 09:46:57 +0100
+Date: Fri, 04 Jun 2021 09:46:48 +0100
+Message-ID: <87v96uyq2v.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: Re: [RFC][PATCH] kvm: add suspend pm-notifier
+In-Reply-To: <20210603164315.682994-1-senozhatsky@chromium.org>
+References: <20210603164315.682994-1-senozhatsky@chromium.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: senozhatsky@chromium.org, pbonzini@redhat.com,
+ seanjc@google.com, vkuznets@redhat.com, jmattson@google.com,
+ chenhuacai@kernel.org, paulus@ozlabs.org, borntraeger@de.ibm.com,
+ suleiman@google.com, x86@kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+ linux-mips@vger.kernel.org, kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
+ linux-s390@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: linux-s390@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
+ Sean Christopherson <seanjc@google.com>, Huacai Chen <chenhuacai@kernel.org>,
+ linux-kernel@vger.kernel.org, kvm-ppc@vger.kernel.org,
+ linux-mips@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Suleiman Souhlal <suleiman@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,96 +93,248 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
-
-> -----Original Message-----
-> From: Shameerali Kolothum Thodi
-> Sent: 06 May 2021 17:52
-> To: linux-arm-kernel@lists.infradead.org; kvmarm@lists.cs.columbia.edu;
-> linux-kernel@vger.kernel.org
-> Cc: maz@kernel.org; will@kernel.org; catalin.marinas@arm.com;
-> james.morse@arm.com; julien.thierry.kdev@gmail.com;
-> suzuki.poulose@arm.com; jean-philippe@linaro.org; Linuxarm
-> <linuxarm@huawei.com>
-> Subject: [RFC PATCH 0/3] kvm/arm: New VMID allocator based on asid(2nd
-> approach)
+On Thu, 03 Jun 2021 17:43:15 +0100,
+Sergey Senozhatsky <senozhatsky@chromium.org> wrote:
 > 
-> This is based on a suggestion from Will [0] to try out the asid
-> based kvm vmid solution as a separate VMID allocator instead of
-> the shared lib approach attempted in v4[1].
+> Add KVM suspend/hibernate PM-notifier which lets architectures
+> to implement arch-specific VM suspend code. For instance, on x86
+> this sets PVCLOCK_GUEST_STOPPED on all the VCPUs.
 > 
-> The idea is to compare both the approaches and see whether the
-> shared lib solution with callbacks make sense or not.
+> Our case is that user puts the host system into sleep multiple
+> times a day (e.g. closes the laptop's lid) so we need a reliable
+> way to suspend VMs properly.
+> 
+> Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+> ---
+>  arch/arm64/kvm/arm.c       |  4 ++++
+>  arch/mips/kvm/mips.c       |  4 ++++
+>  arch/powerpc/kvm/powerpc.c |  4 ++++
+>  arch/s390/kvm/kvm-s390.c   |  4 ++++
+>  arch/x86/kvm/x86.c         | 21 ++++++++++++++++++++
+>  include/linux/kvm_host.h   |  8 ++++++++
+>  virt/kvm/kvm_main.c        | 40 ++++++++++++++++++++++++++++++++++++++
+>  7 files changed, 85 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 1126eae27400..547dbe44d039 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1311,6 +1311,10 @@ static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
+>  	}
+>  }
+>  
+> +void kvm_arch_pm_notifier(struct kvm *kvm)
+> +{
+> +}
+> +
+>  long kvm_arch_vm_ioctl(struct file *filp,
+>  		       unsigned int ioctl, unsigned long arg)
+>  {
+> diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+> index 4d4af97dcc88..d4408acd2be6 100644
+> --- a/arch/mips/kvm/mips.c
+> +++ b/arch/mips/kvm/mips.c
+> @@ -980,6 +980,10 @@ void kvm_arch_flush_remote_tlbs_memslot(struct kvm *kvm,
+>  	kvm_flush_remote_tlbs(kvm);
+>  }
+>  
+> +void kvm_arch_pm_notifier(struct kvm *kvm)
+> +{
+> +}
+> +
+>  long kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
+>  {
+>  	long r;
+> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+> index a2a68a958fa0..96e8a7b6fcf0 100644
+> --- a/arch/powerpc/kvm/powerpc.c
+> +++ b/arch/powerpc/kvm/powerpc.c
+> @@ -2334,6 +2334,10 @@ static int kvmppc_get_cpu_char(struct kvm_ppc_cpu_char *cp)
+>  }
+>  #endif
+>  
+> +void kvm_arch_pm_notifier(struct kvm *kvm)
+> +{
+> +}
+> +
+>  long kvm_arch_vm_ioctl(struct file *filp,
+>                         unsigned int ioctl, unsigned long arg)
+>  {
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 1296fc10f80c..c5f86fc1e497 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -2367,6 +2367,10 @@ static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
+>  	return r;
+>  }
+>  
+> +void kvm_arch_pm_notifier(struct kvm *kvm)
+> +{
+> +}
+> +
+>  long kvm_arch_vm_ioctl(struct file *filp,
+>  		       unsigned int ioctl, unsigned long arg)
+>  {
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index bbc4e04e67ad..3f3d6497593f 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -5613,6 +5613,27 @@ static int kvm_vm_ioctl_set_msr_filter(struct kvm *kvm, void __user *argp)
+>  	return 0;
+>  }
+>  
+> +void kvm_arch_pm_notifier(struct kvm *kvm)
+> +{
+> +#ifdef CONFIG_PM
+> +	int c;
+> +
+> +	mutex_lock(&kvm->lock);
+> +	for (c = 0; c < kvm->created_vcpus; c++) {
+> +		struct kvm_vcpu *vcpu = kvm->vcpus[c];
+> +		int r;
+> +
+> +		if (!vcpu)
+> +			continue;
 
-A gentle ping on this. Please take a look and let me know.
+Wouldn't kvm_for_each_vcpu() avoid this kind of checks?
+
+> +		r = kvm_set_guest_paused(vcpu);
+> +		if (!r)
+> +			continue;
+> +		pr_err("Failed to suspend VCPU-%d: %d\n", vcpu->vcpu_id,  r);
+> +	}
+> +	mutex_unlock(&kvm->lock);
+> +#endif
+> +}
+> +
+>  long kvm_arch_vm_ioctl(struct file *filp,
+>  		       unsigned int ioctl, unsigned long arg)
+>  {
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 2f34487e21f2..86695320a6b7 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -37,6 +37,8 @@
+>  #include <asm/kvm_host.h>
+>  #include <linux/kvm_dirty_ring.h>
+>  
+> +#include <linux/notifier.h>
+> +
+>  #ifndef KVM_MAX_VCPU_ID
+>  #define KVM_MAX_VCPU_ID KVM_MAX_VCPUS
+>  #endif
+> @@ -579,6 +581,10 @@ struct kvm {
+>  	pid_t userspace_pid;
+>  	unsigned int max_halt_poll_ns;
+>  	u32 dirty_ring_size;
+> +
+> +#ifdef CONFIG_PM
+> +	struct notifier_block pm_notifier;
+> +#endif
+
+I'd certainly like to be able to opt out from this on architectures
+that do not implement anything useful in the PM callbacks. Please
+consider making this an independent config option that individual
+archs can buy into.
+
+>  };
+>  
+>  #define kvm_err(fmt, ...) \
+> @@ -992,6 +998,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu);
+>  void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu);
+>  void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu);
+>  
+> +void kvm_arch_pm_notifier(struct kvm *kvm);
+> +
+>  #ifdef __KVM_HAVE_ARCH_VCPU_DEBUGFS
+>  void kvm_arch_create_vcpu_debugfs(struct kvm_vcpu *vcpu, struct dentry *debugfs_dentry);
+>  #endif
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 6b4feb92dc79..86925ab7d162 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -51,6 +51,7 @@
+>  #include <linux/io.h>
+>  #include <linux/lockdep.h>
+>  #include <linux/kthread.h>
+> +#include <linux/suspend.h>
+>  
+>  #include <asm/processor.h>
+>  #include <asm/ioctl.h>
+> @@ -779,6 +780,43 @@ static int kvm_init_mmu_notifier(struct kvm *kvm)
+>  
+>  #endif /* CONFIG_MMU_NOTIFIER && KVM_ARCH_WANT_MMU_NOTIFIER */
+>  
+> +#ifdef CONFIG_PM
+> +static int kvm_pm_notifier_call(struct notifier_block *bl,
+> +				unsigned long state,
+> +				void *unused)
+> +{
+> +	struct kvm *kvm = container_of(bl, struct kvm, pm_notifier);
+> +
+> +	switch (state) {
+> +	case PM_HIBERNATION_PREPARE:
+> +	case PM_SUSPEND_PREPARE:
+> +		kvm_arch_pm_notifier(kvm);
+
+How about passing the state to the notifier callback? I'd expect it to
+be useful to do something on resume too.
+
+> +		break;
+> +	}
+> +	return NOTIFY_DONE;
+> +}
+> +
+> +static void kvm_init_pm_notifier(struct kvm *kvm)
+> +{
+> +	kvm->pm_notifier.notifier_call = kvm_pm_notifier_call;
+> +	kvm->pm_notifier.priority = INT_MAX;
+
+How is this priority determined?
+
+> +	register_pm_notifier(&kvm->pm_notifier);
+> +}
+> +
+> +static void kvm_destroy_pm_notifier(struct kvm *kvm)
+> +{
+> +	unregister_pm_notifier(&kvm->pm_notifier);
+> +}
+> +#else
+> +static void kvm_init_pm_notifier(struct kvm *kvm)
+> +{
+> +}
+> +
+> +static void kvm_destroy_pm_notifier(struct kvm *kvm)
+> +{
+> +}
+> +#endif /* CONFIG_PM */
+> +
+>  static struct kvm_memslots *kvm_alloc_memslots(void)
+>  {
+>  	int i;
+> @@ -962,6 +1000,7 @@ static struct kvm *kvm_create_vm(unsigned long type)
+>  	mutex_unlock(&kvm_lock);
+>  
+>  	preempt_notifier_inc();
+> +	kvm_init_pm_notifier(kvm);
+>  
+>  	return kvm;
+>  
+> @@ -1009,6 +1048,7 @@ static void kvm_destroy_vm(struct kvm *kvm)
+>  	int i;
+>  	struct mm_struct *mm = kvm->mm;
+>  
+> +	kvm_destroy_pm_notifier(kvm);
+>  	kvm_uevent_notify_change(KVM_EVENT_DESTROY_VM, kvm);
+>  	kvm_destroy_vm_debugfs(kvm);
+>  	kvm_arch_sync_events(kvm);
 
 Thanks,
-Shameer
 
-> Though we are not yet using the pinned vmids yet, patch #2 has
-> code for pinned vmid support. This is just to help the comparison.
-> 
-> Test Setup/Results
-> ----------------
-> The measurement was made with maxcpus set to 8 and with the
-> number of VMID limited to 4-bit. The test involves running
-> concurrently 40 guests with 2 vCPUs. Each guest will then
-> execute hackbench 5 times before exiting.
-> 
-> The performance difference between the current algo and the
-> new one are(avg. of 10 runs):
->     - 1.9% less entry/exit from the guest
->     - 0.5% faster
-> This is more or less comparable to v4 numbers.
-> 
-> For the complete series, please see,
-> https://github.com/hisilicon/kernel-dev/tree/private-v5.12-rc7-vmid-2nd-rfc
-> 
-> and for the shared asid lib v4 solution,
-> https://github.com/hisilicon/kernel-dev/tree/private-v5.12-rc7-asid-v4
-> 
-> As you can see there are of course code duplication with this
-> approach but may be this one is more easy to maintain considering
-> the complexity involved.
-> 
-> Please take a look and let me know your feedback.
-> 
-> Thanks,
-> Shameer
-> 
-> 
-> [0] https://lore.kernel.org/lkml/20210422160846.GB2214@willie-the-truck/
-> [1]
-> https://lore.kernel.org/lkml/20210414112312.13704-1-shameerali.kolothum.t
-> hodi@huawei.com/
-> 
-> Julien Grall (2):
->   arch/arm64: Introduce a capability to tell whether 16-bit VMID is
->     available
->   kvm/arm: Align the VMID allocation with the arm64 ASID one
-> 
-> Shameer Kolothum (1):
->   kvm/arm: Introduce a new vmid allocator for KVM
-> 
->  arch/arm64/include/asm/cpucaps.h   |   3 +-
->  arch/arm64/include/asm/kvm_asm.h   |   4 +-
->  arch/arm64/include/asm/kvm_host.h  |  11 +-
->  arch/arm64/include/asm/kvm_mmu.h   |   7 +-
->  arch/arm64/kernel/cpufeature.c     |   9 +
->  arch/arm64/kvm/Makefile            |   2 +-
->  arch/arm64/kvm/arm.c               | 115 ++++--------
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c |   6 +-
->  arch/arm64/kvm/hyp/nvhe/tlb.c      |  10 +-
->  arch/arm64/kvm/hyp/vhe/tlb.c       |  10 +-
->  arch/arm64/kvm/mmu.c               |   1 -
->  arch/arm64/kvm/vmid.c              | 285
-> +++++++++++++++++++++++++++++
->  12 files changed, 354 insertions(+), 109 deletions(-)
->  create mode 100644 arch/arm64/kvm/vmid.c
-> 
-> --
-> 2.17.1
+	M.
 
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
