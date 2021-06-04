@@ -4,55 +4,54 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31600C47083
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Jun 2021 14:21:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23C86C4708F
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Jun 2021 14:41:29 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9330F611CC
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Jun 2021 14:21:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9330F611CC
+	by mail.kernel.org (Postfix) with ESMTP id 8547D613FF
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Jun 2021 14:41:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8547D613FF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 260714B087;
-	Fri,  4 Jun 2021 10:21:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E1834B09F;
+	Fri,  4 Jun 2021 10:41:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id M9n2-KSl5rDg; Fri,  4 Jun 2021 10:21:52 -0400 (EDT)
+	with ESMTP id EbWCqu9tZWX3; Fri,  4 Jun 2021 10:41:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 376074B0F7;
-	Fri,  4 Jun 2021 10:21:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A6224B0B8;
+	Fri,  4 Jun 2021 10:41:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C2E034B0ED
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jun 2021 10:21:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A7D24B0B4
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jun 2021 10:41:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 985JvPufaRT9 for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Jun 2021 10:21:48 -0400 (EDT)
+ with ESMTP id K2-xN2GX51IZ for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Jun 2021 10:41:17 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1CB0E4B087
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jun 2021 10:21:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 548DA4B09F
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jun 2021 10:41:17 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A0BB72B;
- Fri,  4 Jun 2021 07:21:47 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A53472B;
+ Fri,  4 Jun 2021 07:41:16 -0700 (PDT)
 Received: from C02TD0UTHF1T.local (unknown [10.57.6.137])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6F4AF3F774;
- Fri,  4 Jun 2021 07:21:44 -0700 (PDT)
-Date: Fri, 4 Jun 2021 15:21:41 +0100
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D6DFA3F774;
+ Fri,  4 Jun 2021 07:41:12 -0700 (PDT)
+Date: Fri, 4 Jun 2021 15:41:10 +0100
 From: Mark Rutland <mark.rutland@arm.com>
 To: Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 3/4] KVM: arm64: Parse reserved-memory node for pkvm
- guest firmware region
-Message-ID: <20210604142141.GC69333@C02TD0UTHF1T.local>
+Subject: Re: [RFC PATCH 4/4] KVM: arm64: Introduce KVM_CAP_ARM_PROTECTED_VM
+Message-ID: <20210604144110.GD69333@C02TD0UTHF1T.local>
 References: <20210603183347.1695-1-will@kernel.org>
- <20210603183347.1695-4-will@kernel.org>
+ <20210603183347.1695-5-will@kernel.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20210603183347.1695-4-will@kernel.org>
+In-Reply-To: <20210603183347.1695-5-will@kernel.org>
 Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
  linux-arm-kernel@lists.infradead.org, Sean Christopherson <seanjc@google.com>,
  Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
@@ -72,102 +71,188 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Jun 03, 2021 at 07:33:46PM +0100, Will Deacon wrote:
-> Add support for a "linux,pkvm-guest-firmware-memory" reserved memory
-> region, which can be used to identify a firmware image for protected
-> VMs.
-
-The idea that the guest's FW comes from the host's FW strikes me as
-unusual; what's the rationale for this coming from the host FW? IIUC
-other confidential compute VM environments allow you to load up whatever
-virtual FW you want, but this is measured such that the virtual FW used
-can be attested.
-
-Thanks,
-Mark.
-
+On Thu, Jun 03, 2021 at 07:33:47PM +0100, Will Deacon wrote:
+> Introduce a new VM capability, KVM_CAP_ARM_PROTECTED_VM, which can be
+> used to isolate guest memory from the host. For now, the EL2 portion is
+> missing, so this documents and exposes the user ABI for the host.
 > 
 > Signed-off-by: Will Deacon <will@kernel.org>
 > ---
->  arch/arm64/kvm/Makefile |  2 +-
->  arch/arm64/kvm/pkvm.c   | 52 +++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 53 insertions(+), 1 deletion(-)
->  create mode 100644 arch/arm64/kvm/pkvm.c
+>  Documentation/virt/kvm/api.rst    |  69 ++++++++++++++++++++
+>  arch/arm64/include/asm/kvm_host.h |  10 +++
+>  arch/arm64/include/uapi/asm/kvm.h |   9 +++
+>  arch/arm64/kvm/arm.c              |  18 +++---
+>  arch/arm64/kvm/mmu.c              |   3 +
+>  arch/arm64/kvm/pkvm.c             | 104 ++++++++++++++++++++++++++++++
+>  include/uapi/linux/kvm.h          |   1 +
+>  7 files changed, 205 insertions(+), 9 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-> index 589921392cb1..61e054411831 100644
-> --- a/arch/arm64/kvm/Makefile
-> +++ b/arch/arm64/kvm/Makefile
-> @@ -14,7 +14,7 @@ kvm-y := $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o \
->  	 $(KVM)/vfio.o $(KVM)/irqchip.o \
->  	 arm.o mmu.o mmio.o psci.o perf.o hypercalls.o pvtime.o \
->  	 inject_fault.o va_layout.o handle_exit.o \
-> -	 guest.o debug.o reset.o sys_regs.o \
-> +	 guest.o debug.o pkvm.o reset.o sys_regs.o \
->  	 vgic-sys-reg-v3.o fpsimd.o pmu.o \
->  	 arch_timer.o trng.o\
->  	 vgic/vgic.o vgic/vgic-init.o \
-> diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-> new file mode 100644
-> index 000000000000..7af5d03a3941
-> --- /dev/null
-> +++ b/arch/arm64/kvm/pkvm.c
-> @@ -0,0 +1,52 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * KVM host (EL1) interface to Protected KVM (pkvm) code at EL2.
-> + *
-> + * Copyright (C) 2021 Google LLC
-> + * Author: Will Deacon <will@kernel.org>
-> + */
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 7fcb2fd38f42..dfbaf905c435 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6362,6 +6362,75 @@ default.
+>  
+>  See Documentation/x86/sgx/2.Kernel-internals.rst for more details.
+>  
+> +7.26 KVM_CAP_ARM_PROTECTED_VM
+> +-----------------------------
 > +
-> +#include <linux/kvm_host.h>
-> +#include <linux/mm.h>
-> +#include <linux/of_fdt.h>
-> +#include <linux/of_reserved_mem.h>
+> +:Architectures: arm64
+> +:Target: VM
+> +:Parameters: flags is a single KVM_CAP_ARM_PROTECTED_VM_FLAGS_* value
 > +
-> +static struct reserved_mem *pkvm_firmware_mem;
+> +The presence of this capability indicates that KVM supports running in a
+> +configuration where the host Linux kernel does not have access to guest memory.
+> +On such a system, a small hypervisor layer at EL2 can configure the stage-2
+> +page tables for both the CPU and any DMA-capable devices to protect guest
+> +memory pages so that they are inaccessible to the host unless access is granted
+> +explicitly by the guest.
 > +
-> +static int __init pkvm_firmware_rmem_err(struct reserved_mem *rmem,
-> +					 const char *reason)
-> +{
-> +	phys_addr_t end = rmem->base + rmem->size;
+> +The 'flags' parameter is defined as follows:
 > +
-> +	kvm_err("Ignoring pkvm guest firmware memory reservation [%pa - %pa]: %s\n",
-> +		&rmem->base, &end, reason);
-> +	return -EINVAL;
-> +}
+> +7.26.1 KVM_CAP_ARM_PROTECTED_VM_FLAGS_ENABLE
+> +--------------------------------------------
 > +
-> +static int __init pkvm_firmware_rmem_init(struct reserved_mem *rmem)
-> +{
-> +	unsigned long node = rmem->fdt_node;
+> +:Capability: 'flag' parameter to KVM_CAP_ARM_PROTECTED_VM
+> +:Architectures: arm64
+> +:Target: VM
+> +:Parameters: args[0] contains memory slot ID to hold guest firmware
+> +:Returns: 0 on success; negative error code on failure
 > +
-> +	if (kvm_get_mode() != KVM_MODE_PROTECTED)
-> +		return pkvm_firmware_rmem_err(rmem, "protected mode not enabled");
+> +Enabling this capability causes all memory slots of the specified VM to be
+> +unmapped from the host system and put into a state where they are no longer
+> +configurable. The memory slot corresponding to the ID passed in args[0] is
+> +populated with the guest firmware image provided by the host firmware.
+
+As on the prior patch, I don't quite follow the rationale for the guest
+fw coming from the host fw, and it seems to go against the usual design
+for VM contents, so I fear it could be a problem in future (even if not
+in android's specific model for usage).
+
+> +The first vCPU to enter the guest is defined to be the primary vCPU. All other
+> +vCPUs belonging to the VM are secondary vCPUs.
 > +
-> +	if (pkvm_firmware_mem)
-> +		return pkvm_firmware_rmem_err(rmem, "duplicate reservation");
+> +All vCPUs belonging to a VM with this capability enabled are initialised to a
+> +pre-determined reset state
+
+What is that "pre-determined reset state"? e.g. is that just what KVM
+does today, or is there something more specific (e.g. that might change
+with the "Boot protocol version" below)?
+
+> irrespective of any prior configuration according to
+> +the KVM_ARM_VCPU_INIT ioctl, with the following exceptions for the primary
+> +vCPU:
 > +
-> +	if (!of_get_flat_dt_prop(node, "no-map", NULL))
-> +		return pkvm_firmware_rmem_err(rmem, "missing \"no-map\" property");
+> +	===========	===========
+> +	Register(s)	Reset value
+> +	===========	===========
+> +	X0-X14:		Preserved (see KVM_SET_ONE_REG)
+> +	X15:		Boot protocol version (0)
+
+What's the "Boot protocol" in this context? Is that just referring to
+this handover state, or is that something more involved?
+
+> +	X16-X30:	Reserved (0)
+> +	PC:		IPA base of firmware memory slot
+> +	SP:		IPA end of firmware memory slot
+> +	===========	===========
 > +
-> +	if (of_get_flat_dt_prop(node, "reusable", NULL))
-> +		return pkvm_firmware_rmem_err(rmem, "\"reusable\" property unsupported");
+> +Secondary vCPUs belonging to a VM with this capability enabled will return
+> +-EPERM in response to a KVM_RUN ioctl() if the vCPU was not initialised with
+> +the KVM_ARM_VCPU_POWER_OFF feature.
+
+I assume this means that protected VMs always get a trusted PSCI
+implementation? It might be worth mentioning so (and worth consdiering
+if that should always have the SMCCC bits too).
+
 > +
-> +	if (!PAGE_ALIGNED(rmem->base))
-> +		return pkvm_firmware_rmem_err(rmem, "base is not page-aligned");
+> +There is no support for AArch32 at any exception level.
+
+Is this only going to run on CPUs without AArch32 EL0? ... or does this
+mean behaviour will be erratic if someone tries to run AArch32 EL0?
+
 > +
-> +	if (!PAGE_ALIGNED(rmem->size))
-> +		return pkvm_firmware_rmem_err(rmem, "size is not page-aligned");
+> +It is an error to enable this capability on a VM after issuing a KVM_RUN
+> +ioctl() on one of its vCPUs.
 > +
-> +	pkvm_firmware_mem = rmem;
-> +	return 0;
-> +}
-> +RESERVEDMEM_OF_DECLARE(pkvm_firmware, "linux,pkvm-guest-firmware-memory",
-> +		       pkvm_firmware_rmem_init);
-> -- 
-> 2.32.0.rc0.204.g9fa02ecfa5-goog
-> 
+> +7.26.2 KVM_CAP_ARM_PROTECTED_VM_FLAGS_INFO
+> +------------------------------------------
+> +
+> +:Capability: 'flag' parameter to KVM_CAP_ARM_PROTECTED_VM
+> +:Architectures: arm64
+> +:Target: VM
+> +:Parameters: args[0] contains pointer to 'struct kvm_protected_vm_info'
+> +:Returns: 0 on success; negative error code on failure
+> +
+> +Populates the 'struct kvm_protected_vm_info' pointed to by args[0] with
+> +information about the protected environment for the VM.
+> +
+>  8. Other capabilities.
+>  ======================
+>  
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 7cd7d5c8c4bc..5645af2a1431 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -100,6 +100,11 @@ struct kvm_s2_mmu {
+>  struct kvm_arch_memory_slot {
+>  };
+>  
+> +struct kvm_protected_vm {
+> +	bool enabled;
+> +	struct kvm_memory_slot *firmware_slot;
+> +};
+> +
+>  struct kvm_arch {
+>  	struct kvm_s2_mmu mmu;
+>  
+> @@ -132,6 +137,8 @@ struct kvm_arch {
+>  
+>  	u8 pfr0_csv2;
+>  	u8 pfr0_csv3;
+> +
+> +	struct kvm_protected_vm pkvm;
+>  };
+>  
+>  struct kvm_vcpu_fault_info {
+> @@ -763,6 +770,9 @@ void kvm_arch_free_vm(struct kvm *kvm);
+>  
+>  int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type);
+>  
+> +int kvm_arm_vm_ioctl_pkvm(struct kvm *kvm, struct kvm_enable_cap *cap);
+> +#define kvm_vm_is_protected(kvm) (kvm->arch.pkvm.enabled)
+> +
+>  int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature);
+>  bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
+>  
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index 24223adae150..cdb3298ba8ae 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -402,6 +402,15 @@ struct kvm_vcpu_events {
+>  #define KVM_PSCI_RET_INVAL		PSCI_RET_INVALID_PARAMS
+>  #define KVM_PSCI_RET_DENIED		PSCI_RET_DENIED
+>  
+> +/* Protected KVM */
+> +#define KVM_CAP_ARM_PROTECTED_VM_FLAGS_ENABLE	0
+> +#define KVM_CAP_ARM_PROTECTED_VM_FLAGS_INFO	1
+> +
+> +struct kvm_protected_vm_info {
+> +	__u64 firmware_size;
+> +	__u64 __reserved[7];
+> +};
+
+Do you have anything in mind for those 7 fields, or was this just a
+number that sounded big enough?
+
+I wonder if it's worth adding an size field, and having a size argument
+to the ioctl, so that you can discover the full size if we need to grow
+this, but you can always get a truncated copy if you just need the early
+fields.
+
+Thanks,
+Mark.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
