@@ -1,105 +1,67 @@
-Return-Path: <SRS0=Ht+8=K5=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=VfsR=K6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E17EC47097
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Jun 2021 21:14:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9A87C4708F
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Jun 2021 06:49:07 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0A21F613FE
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Jun 2021 21:14:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A21F613FE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 3F9EA6140C
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Jun 2021 06:49:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F9EA6140C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9868C4B108;
-	Thu,  3 Jun 2021 17:14:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AA3D34B0CF;
+	Fri,  4 Jun 2021 02:49:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ug3CcnN9TcOE; Thu,  3 Jun 2021 17:14:42 -0400 (EDT)
+	with ESMTP id G93luDQtexZJ; Fri,  4 Jun 2021 02:49:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 76FE54B104;
-	Thu,  3 Jun 2021 17:14:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EE3824B0DC;
+	Fri,  4 Jun 2021 02:49:02 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A79B4B0C5
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Jun 2021 17:14:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A29984B0DC
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jun 2021 02:49:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XjHi0vtHzCIC for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Jun 2021 17:14:36 -0400 (EDT)
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com
- [209.85.214.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 552364B0FB
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Jun 2021 17:14:35 -0400 (EDT)
-Received: by mail-pl1-f201.google.com with SMTP id
- 31-20020a1709020022b02900eeddd708c8so3207539pla.11
- for <kvmarm@lists.cs.columbia.edu>; Thu, 03 Jun 2021 14:14:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=1lS2SpS3qajiC+j6FdFB12uvO8xS9by2vqUB61u6WgE=;
- b=E8eRCJamwsjO+VS870XzYeSKudvnwtO2GM2qb3KgCypEqgcUMNGomPl6kxv03pddc7
- 1kljf0V2fajGO0UJX2qJtlaIL2UKtsI3BaFlN/oXHRCiqDopwUFCSROIs1vvtIox5KHe
- w/bXokkQQZpBJeJrQN6str+Y8xqsUn7JZUR05fOJohGuG+2VXYMDuN2t9J3YKYE7tsuz
- o3YdZCPBZyvgjYMoWJL6QzqF22f26cmDi8YSJFoSTyiZQv9+d1E/X8gCv5YN9ma/X+RQ
- q/enIoZHdbnOg19sjWrLL0gEqpJV92EuoiKwgCjAxDO+o4Ly3+H3CARfBZc40XuR9jmw
- an5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=1lS2SpS3qajiC+j6FdFB12uvO8xS9by2vqUB61u6WgE=;
- b=bgQ24dE8I/lSU5COoKNy5KT6ZmPV/vHITf1Y5BeAaO4pr2UIwp+xFaZF0ELFMkPXZD
- XB8zEw6u6w6mxzrNYTZLjvd6QvpYJ1r6+ub+jmehanC+kUpzO48cVnqgGPv3Cc4Jl/d/
- xnfgA27cxkeqKP0BkyA41b7bXdJMVCoT3b5nEV7X39TGSVHhzlz+U8/f1wwnT4mopdtw
- 2mO012lxRCqNTU2sykOeo823EfVdaiL9ASl5HqDK5oLPERogaUsaUzw8MuOLgg0gTud1
- ypoUldncINLE81eaC5OyJkA/+c5T7sPoFGKEKPkkGh1DQRz5QlAg6K7NJr70JA6UEzih
- Oygw==
-X-Gm-Message-State: AOAM532ZHkpjNXbnsf7ccNiamNGBXntsSNr0LMLd920ru9ROWE1x1FPa
- ABU5gDFKdScAmEMVVzdTWmds3Hx4w2CnifnGnQ==
-X-Google-Smtp-Source: ABdhPJxtrab3MYlX8SEl4vQHo/4Sr7+1wtQCFIu2qYMai2mgciA4NquqIsaS2PwkgjyCVgB2bFUT04/rZt6DA1UrcQ==
-X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:10:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a17:902:d217:b029:105:e265:65c7 with
- SMTP id t23-20020a170902d217b0290105e26565c7mr1086188ply.16.1622754874170;
- Thu, 03 Jun 2021 14:14:34 -0700 (PDT)
-Date: Thu,  3 Jun 2021 21:14:24 +0000
-In-Reply-To: <20210603211426.790093-1-jingzhangos@google.com>
-Message-Id: <20210603211426.790093-3-jingzhangos@google.com>
-Mime-Version: 1.0
-References: <20210603211426.790093-1-jingzhangos@google.com>
-X-Mailer: git-send-email 2.32.0.rc1.229.g3e70b5a671-goog
-Subject: [PATCH v7 2/4] KVM: stats: Add fd-based API to read binary stats data
-From: Jing Zhang <jingzhangos@google.com>
-To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>, 
- LinuxMIPS <linux-mips@vger.kernel.org>, KVMPPC <kvm-ppc@vger.kernel.org>, 
- LinuxS390 <linux-s390@vger.kernel.org>, 
- Linuxkselftest <linux-kselftest@vger.kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, 
- Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
- Julien Thierry <julien.thierry.kdev@gmail.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Will Deacon <will@kernel.org>, Huacai Chen <chenhuacai@kernel.org>, 
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, 
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- Paul Mackerras <paulus@ozlabs.org>, 
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>, 
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, 
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- Sean Christopherson <seanjc@google.com>, 
- Vitaly Kuznetsov <vkuznets@redhat.com>, Jim Mattson <jmattson@google.com>, 
- Peter Shier <pshier@google.com>, Oliver Upton <oupton@google.com>, 
- David Rientjes <rientjes@google.com>,
- Emanuele Giuseppe Esposito <eesposit@redhat.com>, 
- David Matlack <dmatlack@google.com>, Ricardo Koller <ricarkol@google.com>, 
- Krish Sadhukhan <krish.sadhukhan@oracle.com>
+ with ESMTP id PxhI5h2YCm8J for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Jun 2021 02:48:57 -0400 (EDT)
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1D2FF4B0CF
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jun 2021 02:48:57 -0400 (EDT)
+Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.54])
+ by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4FxCtp2bjyz68ZN;
+ Fri,  4 Jun 2021 14:45:06 +0800 (CST)
+Received: from dggpemm500022.china.huawei.com (7.185.36.162) by
+ dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Fri, 4 Jun 2021 14:48:49 +0800
+Received: from DESKTOP-7FEPK9S.china.huawei.com (10.174.185.220) by
+ dggpemm500022.china.huawei.com (7.185.36.162) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Fri, 4 Jun 2021 14:48:48 +0800
+From: Shenming Lu <lushenming@huawei.com>
+To: Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+ <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.cs.columbia.edu>,
+ <linux-kernel@vger.kernel.org>
+Subject: [PATCH] KVM: arm64: vgic: Communicate a change of the IRQ state via
+ vgic_queue_irq_unlock
+Date: Fri, 4 Jun 2021 14:48:28 +0800
+Message-ID: <20210604064828.1497-1-lushenming@huawei.com>
+X-Mailer: git-send-email 2.27.0.windows.1
+MIME-Version: 1.0
+X-Originating-IP: [10.174.185.220]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpemm500022.china.huawei.com (7.185.36.162)
+X-CFilter-Loop: Reflected
+Cc: lushenming@huawei.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -116,849 +78,195 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Provides a file descriptor per VM to read VM stats info/data.
-Provides a file descriptor per vCPU to read vCPU stats info/data.
+Hi Marc,
 
-Reviewed-by: David Matlack <dmatlack@google.com>
-Reviewed-by: Ricardo Koller <ricarkol@google.com>
-Signed-off-by: Jing Zhang <jingzhangos@google.com>
+Some time ago, you suggested that we should communicate a change
+of the IRQ state via vgic_queue_irq_unlock [1], which needs to
+include dropping the IRQ from the VCPU's ap_list if the IRQ is
+not pending or enabled but on the ap_list. And I additionally
+add a case where the IRQ has to be migrated to another ap_list.
+
+(maybe you forget this...)
+Does this patch match your thought at the time?
+
+[1] https://lore.kernel.org/patchwork/patch/1371884/
+
+Signed-off-by: Shenming Lu <lushenming@huawei.com>
 ---
- arch/arm64/kvm/guest.c    |  26 +++++++
- arch/mips/kvm/mips.c      |  52 +++++++++++++
- arch/powerpc/kvm/book3s.c |  52 +++++++++++++
- arch/powerpc/kvm/booke.c  |  45 +++++++++++
- arch/s390/kvm/kvm-s390.c  | 117 ++++++++++++++++++++++++++++
- arch/x86/kvm/x86.c        |  53 +++++++++++++
- include/linux/kvm_host.h  | 132 ++++++++++++++++++++++++++++++++
- include/uapi/linux/kvm.h  |  50 ++++++++++++
- virt/kvm/kvm_main.c       | 155 ++++++++++++++++++++++++++++++++++++++
- 9 files changed, 682 insertions(+)
+ arch/arm64/kvm/vgic/vgic.c | 116 ++++++++++++++++++++++++-------------
+ 1 file changed, 75 insertions(+), 41 deletions(-)
 
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 4962331d01e6..c68addd38cf8 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -28,6 +28,32 @@
+diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+index 15b666200f0b..9b88d49aa439 100644
+--- a/arch/arm64/kvm/vgic/vgic.c
++++ b/arch/arm64/kvm/vgic/vgic.c
+@@ -326,8 +326,9 @@ static bool vgic_validate_injection(struct vgic_irq *irq, bool level, void *owne
  
- #include "trace.h"
+ /*
+  * Check whether an IRQ needs to (and can) be queued to a VCPU's ap list.
+- * Do the queuing if necessary, taking the right locks in the right order.
+- * Returns true when the IRQ was queued, false otherwise.
++ * Do the queuing, dropping or migrating if necessary, taking the right
++ * locks in the right order. Returns true when the IRQ was queued, false
++ * otherwise.
+  *
+  * Needs to be entered with the IRQ lock already held, but will return
+  * with all locks dropped.
+@@ -335,49 +336,38 @@ static bool vgic_validate_injection(struct vgic_irq *irq, bool level, void *owne
+ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
+ 			   unsigned long flags)
+ {
++	struct kvm_vcpu *target_vcpu;
+ 	struct kvm_vcpu *vcpu;
++	bool ret = false;
  
-+struct _kvm_stats_desc kvm_vm_stats_desc[] = DEFINE_VM_STATS_DESC();
-+
-+struct _kvm_stats_header kvm_vm_stats_header = {
-+	.name_size = KVM_STATS_NAME_LEN,
-+	.count = ARRAY_SIZE(kvm_vm_stats_desc),
-+	.desc_offset = sizeof(struct kvm_stats_header),
-+	.data_offset = sizeof(struct kvm_stats_header) +
-+		sizeof(kvm_vm_stats_desc),
-+};
-+
-+struct _kvm_stats_desc kvm_vcpu_stats_desc[] = DEFINE_VCPU_STATS_DESC(
-+	STATS_DESC_COUNTER("hvc_exit_stat"),
-+	STATS_DESC_COUNTER("wfe_exit_stat"),
-+	STATS_DESC_COUNTER("wfi_exit_stat"),
-+	STATS_DESC_COUNTER("mmio_exit_user"),
-+	STATS_DESC_COUNTER("mmio_exit_kernel"),
-+	STATS_DESC_COUNTER("exits"));
-+
-+struct _kvm_stats_header kvm_vcpu_stats_header = {
-+	.name_size = KVM_STATS_NAME_LEN,
-+	.count = ARRAY_SIZE(kvm_vcpu_stats_desc),
-+	.desc_offset = sizeof(struct kvm_stats_header),
-+	.data_offset = sizeof(struct kvm_stats_header) +
-+		sizeof(kvm_vcpu_stats_desc),
-+};
-+
- struct kvm_stats_debugfs_item debugfs_entries[] = {
- 	VCPU_STAT_GENERIC("halt_successful_poll", halt_successful_poll),
- 	VCPU_STAT_GENERIC("halt_attempted_poll", halt_attempted_poll),
-diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-index ff205b35719b..eb8fd4a96952 100644
---- a/arch/mips/kvm/mips.c
-+++ b/arch/mips/kvm/mips.c
-@@ -38,6 +38,58 @@
- #define VECTORSPACING 0x100	/* for EI/VI mode */
- #endif
+ 	lockdep_assert_held(&irq->irq_lock);
  
-+struct _kvm_stats_desc kvm_vm_stats_desc[] = DEFINE_VM_STATS_DESC();
-+
-+struct _kvm_stats_header kvm_vm_stats_header = {
-+	.name_size = KVM_STATS_NAME_LEN,
-+	.count = ARRAY_SIZE(kvm_vm_stats_desc),
-+	.desc_offset = sizeof(struct kvm_stats_header),
-+	.data_offset = sizeof(struct kvm_stats_header) +
-+		sizeof(kvm_vm_stats_desc),
-+};
-+
-+struct _kvm_stats_desc kvm_vcpu_stats_desc[] = DEFINE_VCPU_STATS_DESC(
-+	STATS_DESC_COUNTER("wait_exits"),
-+	STATS_DESC_COUNTER("cache_exits"),
-+	STATS_DESC_COUNTER("signal_exits"),
-+	STATS_DESC_COUNTER("int_exits"),
-+	STATS_DESC_COUNTER("cop_unusable_exits"),
-+	STATS_DESC_COUNTER("tlbmod_exits"),
-+	STATS_DESC_COUNTER("tlbmiss_ld_exits"),
-+	STATS_DESC_COUNTER("tlbmiss_st_exits"),
-+	STATS_DESC_COUNTER("addrerr_st_exits"),
-+	STATS_DESC_COUNTER("addrerr_ld_exits"),
-+	STATS_DESC_COUNTER("syscall_exits"),
-+	STATS_DESC_COUNTER("resvd_inst_exits"),
-+	STATS_DESC_COUNTER("break_inst_exits"),
-+	STATS_DESC_COUNTER("trap_inst_exits"),
-+	STATS_DESC_COUNTER("msa_fpe_exits"),
-+	STATS_DESC_COUNTER("fpe_exits"),
-+	STATS_DESC_COUNTER("msa_disabled_exits"),
-+	STATS_DESC_COUNTER("flush_dcache_exits"),
-+#ifdef CONFIG_KVM_MIPS_VZ
-+	STATS_DESC_COUNTER("vz_gpsi_exits"),
-+	STATS_DESC_COUNTER("vz_gsfc_exits"),
-+	STATS_DESC_COUNTER("vz_hc_exits"),
-+	STATS_DESC_COUNTER("vz_grr_exits"),
-+	STATS_DESC_COUNTER("vz_gva_exits"),
-+	STATS_DESC_COUNTER("vz_ghfc_exits"),
-+	STATS_DESC_COUNTER("vz_gpa_exits"),
-+	STATS_DESC_COUNTER("vz_resvd_exits"),
-+#ifdef CONFIG_CPU_LOONGSON64
-+	STATS_DESC_COUNTER("vz_cpucfg_exits"),
-+#endif
-+#endif
-+	);
-+
-+struct _kvm_stats_header kvm_vcpu_stats_header = {
-+	.name_size = KVM_STATS_NAME_LEN,
-+	.count = ARRAY_SIZE(kvm_vcpu_stats_desc),
-+	.desc_offset = sizeof(struct kvm_stats_header),
-+	.data_offset = sizeof(struct kvm_stats_header) +
-+		sizeof(kvm_vcpu_stats_desc),
-+};
-+
- struct kvm_stats_debugfs_item debugfs_entries[] = {
- 	VCPU_STAT("wait", wait_exits),
- 	VCPU_STAT("cache", cache_exits),
-diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
-index 92cdb4175945..53fb1da049a7 100644
---- a/arch/powerpc/kvm/book3s.c
-+++ b/arch/powerpc/kvm/book3s.c
-@@ -38,6 +38,58 @@
+ retry:
+-	vcpu = vgic_target_oracle(irq);
+-	if (irq->vcpu || !vcpu) {
++	target_vcpu = vgic_target_oracle(irq);
++	vcpu = irq->vcpu;
++	if (target_vcpu == vcpu) {
+ 		/*
+-		 * If this IRQ is already on a VCPU's ap_list, then it
+-		 * cannot be moved or modified and there is no more work for
++		 * If this IRQ's state is consistent with whether on
++		 * the right ap_lsit or not, there is no more work for
+ 		 * us to do.
+-		 *
+-		 * Otherwise, if the irq is not pending and enabled, it does
+-		 * not need to be inserted into an ap_list and there is also
+-		 * no more work for us to do.
+ 		 */
+ 		raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
+-
+-		/*
+-		 * We have to kick the VCPU here, because we could be
+-		 * queueing an edge-triggered interrupt for which we
+-		 * get no EOI maintenance interrupt. In that case,
+-		 * while the IRQ is already on the VCPU's AP list, the
+-		 * VCPU could have EOI'ed the original interrupt and
+-		 * won't see this one until it exits for some other
+-		 * reason.
+-		 */
+-		if (vcpu) {
+-			kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
+-			kvm_vcpu_kick(vcpu);
+-		}
+-		return false;
++		goto out;
+ 	}
  
- /* #define EXIT_DEBUG */
+ 	/*
+ 	 * We must unlock the irq lock to take the ap_list_lock where
+-	 * we are going to insert this new pending interrupt.
++	 * we are going to insert/drop this IRQ.
+ 	 */
+ 	raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
  
-+struct _kvm_stats_desc kvm_vm_stats_desc[] = DEFINE_VM_STATS_DESC(
-+	STATS_DESC_ICOUNTER("num_2M_pages"),
-+	STATS_DESC_ICOUNTER("num_1G_pages"));
-+
-+struct _kvm_stats_header kvm_vm_stats_header = {
-+	.name_size = KVM_STATS_NAME_LEN,
-+	.count = ARRAY_SIZE(kvm_vm_stats_desc),
-+	.desc_offset = sizeof(struct kvm_stats_header),
-+	.data_offset = sizeof(struct kvm_stats_header) +
-+		sizeof(kvm_vm_stats_desc),
-+};
-+
-+struct _kvm_stats_desc kvm_vcpu_stats_desc[] = DEFINE_VCPU_STATS_DESC(
-+	STATS_DESC_COUNTER("sum_exits"),
-+	STATS_DESC_COUNTER("mmio_exits"),
-+	STATS_DESC_COUNTER("signal_exits"),
-+	STATS_DESC_COUNTER("light_exits"),
-+	STATS_DESC_COUNTER("itlb_real_miss_exits"),
-+	STATS_DESC_COUNTER("itlb_virt_miss_exits"),
-+	STATS_DESC_COUNTER("dtlb_real_miss_exits"),
-+	STATS_DESC_COUNTER("dtlb_virt_miss_exits"),
-+	STATS_DESC_COUNTER("syscall_exits"),
-+	STATS_DESC_COUNTER("isi_exits"),
-+	STATS_DESC_COUNTER("dsi_exits"),
-+	STATS_DESC_COUNTER("emulated_inst_exits"),
-+	STATS_DESC_COUNTER("dec_exits"),
-+	STATS_DESC_COUNTER("ext_intr_exits"),
-+	STATS_DESC_TIME_NSEC("halt_wait_ns"),
-+	STATS_DESC_COUNTER("halt_successful_wait"),
-+	STATS_DESC_COUNTER("dbell_exits"),
-+	STATS_DESC_COUNTER("gdbell_exits"),
-+	STATS_DESC_COUNTER("ld"),
-+	STATS_DESC_COUNTER("st"),
-+	STATS_DESC_COUNTER("pf_storage"),
-+	STATS_DESC_COUNTER("pf_instruc"),
-+	STATS_DESC_COUNTER("sp_storage"),
-+	STATS_DESC_COUNTER("sp_instruc"),
-+	STATS_DESC_COUNTER("queue_intr"),
-+	STATS_DESC_COUNTER("ld_slow"),
-+	STATS_DESC_COUNTER("st_slow"),
-+	STATS_DESC_COUNTER("pthru_all"),
-+	STATS_DESC_COUNTER("pthru_host"),
-+	STATS_DESC_COUNTER("pthru_bad_aff"));
-+
-+struct _kvm_stats_header kvm_vcpu_stats_header = {
-+	.name_size = KVM_STATS_NAME_LEN,
-+	.count = ARRAY_SIZE(kvm_vcpu_stats_desc),
-+	.desc_offset = sizeof(struct kvm_stats_header),
-+	.data_offset = sizeof(struct kvm_stats_header) +
-+		sizeof(kvm_vcpu_stats_desc),
-+};
-+
- struct kvm_stats_debugfs_item debugfs_entries[] = {
- 	VCPU_STAT("exits", sum_exits),
- 	VCPU_STAT("mmio", mmio_exits),
-diff --git a/arch/powerpc/kvm/booke.c b/arch/powerpc/kvm/booke.c
-index 80d3b39aa7ac..02f1e147d224 100644
---- a/arch/powerpc/kvm/booke.c
-+++ b/arch/powerpc/kvm/booke.c
-@@ -36,6 +36,51 @@
+ 	/* someone can do stuff here, which we re-check below */
  
- unsigned long kvmppc_booke_handlers;
+-	raw_spin_lock_irqsave(&vcpu->arch.vgic_cpu.ap_list_lock, flags);
++	if (target_vcpu)
++		raw_spin_lock_irqsave(&target_vcpu->arch.vgic_cpu.ap_list_lock,
++				      flags);
++	if (vcpu)
++		raw_spin_lock_irqsave(&vcpu->arch.vgic_cpu.ap_list_lock, flags);
+ 	raw_spin_lock(&irq->irq_lock);
  
-+struct _kvm_stats_desc kvm_vm_stats_desc[] = DEFINE_VM_STATS_DESC(
-+	STATS_DESC_ICOUNTER("num_2M_pages"),
-+	STATS_DESC_ICOUNTER("num_1G_pages"));
-+
-+struct _kvm_stats_header kvm_vm_stats_header = {
-+	.name_size = KVM_STATS_NAME_LEN,
-+	.count = ARRAY_SIZE(kvm_vm_stats_desc),
-+	.desc_offset = sizeof(struct kvm_stats_header),
-+	.data_offset = sizeof(struct kvm_stats_header) +
-+		sizeof(kvm_vm_stats_desc),
-+};
-+
-+struct _kvm_stats_desc kvm_vcpu_stats_desc[] = DEFINE_VCPU_STATS_DESC(
-+	STATS_DESC_COUNTER("sum_exits"),
-+	STATS_DESC_COUNTER("mmio_exits"),
-+	STATS_DESC_COUNTER("signal_exits"),
-+	STATS_DESC_COUNTER("light_exits"),
-+	STATS_DESC_COUNTER("itlb_real_miss_exits"),
-+	STATS_DESC_COUNTER("itlb_virt_miss_exits"),
-+	STATS_DESC_COUNTER("dtlb_real_miss_exits"),
-+	STATS_DESC_COUNTER("dtlb_virt_miss_exits"),
-+	STATS_DESC_COUNTER("syscall_exits"),
-+	STATS_DESC_COUNTER("isi_exits"),
-+	STATS_DESC_COUNTER("dsi_exits"),
-+	STATS_DESC_COUNTER("emulated_inst_exits"),
-+	STATS_DESC_COUNTER("dec_exits"),
-+	STATS_DESC_COUNTER("ext_intr_exits"),
-+	STATS_DESC_TIME_NSEC("halt_wait_ns"),
-+	STATS_DESC_COUNTER("halt_successful_wait"),
-+	STATS_DESC_COUNTER("dbell_exits"),
-+	STATS_DESC_COUNTER("gdbell_exits"),
-+	STATS_DESC_COUNTER("ld"),
-+	STATS_DESC_COUNTER("st"),
-+	STATS_DESC_COUNTER("pthru_all"),
-+	STATS_DESC_COUNTER("pthru_host"),
-+	STATS_DESC_COUNTER("pthru_bad_aff"));
-+
-+struct _kvm_stats_header kvm_vcpu_stats_header = {
-+	.name_size = KVM_STATS_NAME_LEN,
-+	.count = ARRAY_SIZE(kvm_vcpu_stats_desc),
-+	.desc_offset = sizeof(struct kvm_stats_header),
-+	.data_offset = sizeof(struct kvm_stats_header) +
-+		sizeof(kvm_vcpu_stats_desc),
-+};
-+
- struct kvm_stats_debugfs_item debugfs_entries[] = {
- 	VCPU_STAT("mmio", mmio_exits),
- 	VCPU_STAT("sig", signal_exits),
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index e8bc7cd06794..4e2141bee3bc 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -58,6 +58,123 @@
- #define VCPU_IRQS_MAX_BUF (sizeof(struct kvm_s390_irq) * \
- 			   (KVM_MAX_VCPUS + LOCAL_IRQS))
+ 	/*
+@@ -392,30 +382,74 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
+ 	 * In both cases, drop the locks and retry.
+ 	 */
  
-+struct _kvm_stats_desc kvm_vm_stats_desc[] = DEFINE_VM_STATS_DESC(
-+	STATS_DESC_COUNTER("inject_io"),
-+	STATS_DESC_COUNTER("inject_float_mchk"),
-+	STATS_DESC_COUNTER("inject_pfault_done"),
-+	STATS_DESC_COUNTER("inject_service_signal"),
-+	STATS_DESC_COUNTER("inject_virtio"));
-+
-+struct _kvm_stats_header kvm_vm_stats_header = {
-+	.name_size = KVM_STATS_NAME_LEN,
-+	.count = ARRAY_SIZE(kvm_vm_stats_desc),
-+	.desc_offset = sizeof(struct kvm_stats_header),
-+	.data_offset = sizeof(struct kvm_stats_header) +
-+		sizeof(kvm_vm_stats_desc),
-+};
-+
-+struct _kvm_stats_desc kvm_vcpu_stats_desc[] = DEFINE_VCPU_STATS_DESC(
-+	STATS_DESC_COUNTER("exit_userspace"),
-+	STATS_DESC_COUNTER("exit_null"),
-+	STATS_DESC_COUNTER("exit_external_request"),
-+	STATS_DESC_COUNTER("exit_io_request"),
-+	STATS_DESC_COUNTER("exit_external_interrupt"),
-+	STATS_DESC_COUNTER("exit_stop_request"),
-+	STATS_DESC_COUNTER("exit_validity"),
-+	STATS_DESC_COUNTER("exit_instruction"),
-+	STATS_DESC_COUNTER("exit_pei"),
-+	STATS_DESC_COUNTER("halt_no_poll_steal"),
-+	STATS_DESC_COUNTER("instruction_lctl"),
-+	STATS_DESC_COUNTER("instruction_lctlg"),
-+	STATS_DESC_COUNTER("instruction_stctl"),
-+	STATS_DESC_COUNTER("instruction_stctg"),
-+	STATS_DESC_COUNTER("exit_program_interruption"),
-+	STATS_DESC_COUNTER("exit_instr_and_program"),
-+	STATS_DESC_COUNTER("exit_operation_exception"),
-+	STATS_DESC_COUNTER("deliver_ckc"),
-+	STATS_DESC_COUNTER("deliver_cputm"),
-+	STATS_DESC_COUNTER("deliver_external_call"),
-+	STATS_DESC_COUNTER("deliver_emergency_signal"),
-+	STATS_DESC_COUNTER("deliver_service_signal"),
-+	STATS_DESC_COUNTER("deliver_virtio"),
-+	STATS_DESC_COUNTER("deliver_stop_signal"),
-+	STATS_DESC_COUNTER("deliver_prefix_signal"),
-+	STATS_DESC_COUNTER("deliver_restart_signal"),
-+	STATS_DESC_COUNTER("deliver_program"),
-+	STATS_DESC_COUNTER("deliver_io"),
-+	STATS_DESC_COUNTER("deliver_machine_check"),
-+	STATS_DESC_COUNTER("exit_wait_state"),
-+	STATS_DESC_COUNTER("inject_ckc"),
-+	STATS_DESC_COUNTER("inject_cputm"),
-+	STATS_DESC_COUNTER("inject_external_call"),
-+	STATS_DESC_COUNTER("inject_emergency_signal"),
-+	STATS_DESC_COUNTER("inject_mchk"),
-+	STATS_DESC_COUNTER("inject_pfault_init"),
-+	STATS_DESC_COUNTER("inject_program"),
-+	STATS_DESC_COUNTER("inject_restart"),
-+	STATS_DESC_COUNTER("inject_set_prefix"),
-+	STATS_DESC_COUNTER("inject_stop_signal"),
-+	STATS_DESC_COUNTER("instruction_epsw"),
-+	STATS_DESC_COUNTER("instruction_gs"),
-+	STATS_DESC_COUNTER("instruction_io_other"),
-+	STATS_DESC_COUNTER("instruction_lpsw"),
-+	STATS_DESC_COUNTER("instruction_lpswe"),
-+	STATS_DESC_COUNTER("instruction_pfmf"),
-+	STATS_DESC_COUNTER("instruction_ptff"),
-+	STATS_DESC_COUNTER("instruction_sck"),
-+	STATS_DESC_COUNTER("instruction_sckpf"),
-+	STATS_DESC_COUNTER("instruction_stidp"),
-+	STATS_DESC_COUNTER("instruction_spx"),
-+	STATS_DESC_COUNTER("instruction_stpx"),
-+	STATS_DESC_COUNTER("instruction_stap"),
-+	STATS_DESC_COUNTER("instruction_iske"),
-+	STATS_DESC_COUNTER("instruction_ri"),
-+	STATS_DESC_COUNTER("instruction_rrbe"),
-+	STATS_DESC_COUNTER("instruction_sske"),
-+	STATS_DESC_COUNTER("instruction_ipte_interlock"),
-+	STATS_DESC_COUNTER("instruction_stsi"),
-+	STATS_DESC_COUNTER("instruction_stfl"),
-+	STATS_DESC_COUNTER("instruction_tb"),
-+	STATS_DESC_COUNTER("instruction_tpi"),
-+	STATS_DESC_COUNTER("instruction_tprot"),
-+	STATS_DESC_COUNTER("instruction_tsch"),
-+	STATS_DESC_COUNTER("instruction_sie"),
-+	STATS_DESC_COUNTER("instruction_essa"),
-+	STATS_DESC_COUNTER("instruction_sthyi"),
-+	STATS_DESC_COUNTER("instruction_sigp_sense"),
-+	STATS_DESC_COUNTER("instruction_sigp_sense_running"),
-+	STATS_DESC_COUNTER("instruction_sigp_external_call"),
-+	STATS_DESC_COUNTER("instruction_sigp_emergency"),
-+	STATS_DESC_COUNTER("instruction_sigp_cond_emergency"),
-+	STATS_DESC_COUNTER("instruction_sigp_start"),
-+	STATS_DESC_COUNTER("instruction_sigp_stop"),
-+	STATS_DESC_COUNTER("instruction_sigp_stop_store_status"),
-+	STATS_DESC_COUNTER("instruction_sigp_store_status"),
-+	STATS_DESC_COUNTER("instruction_sigp_store_adtl_status"),
-+	STATS_DESC_COUNTER("instruction_sigp_arch"),
-+	STATS_DESC_COUNTER("instruction_sigp_prefix"),
-+	STATS_DESC_COUNTER("instruction_sigp_restart"),
-+	STATS_DESC_COUNTER("instruction_sigp_init_cpu_reset"),
-+	STATS_DESC_COUNTER("instruction_sigp_cpu_reset"),
-+	STATS_DESC_COUNTER("instruction_sigp_unknown"),
-+	STATS_DESC_COUNTER("diagnose_10"),
-+	STATS_DESC_COUNTER("diagnose_44"),
-+	STATS_DESC_COUNTER("diagnose_9c"),
-+	STATS_DESC_COUNTER("diagnose_9c_ignored"),
-+	STATS_DESC_COUNTER("diagnose_258"),
-+	STATS_DESC_COUNTER("diagnose_308"),
-+	STATS_DESC_COUNTER("diagnose_500"),
-+	STATS_DESC_COUNTER("diagnose_other"),
-+	STATS_DESC_COUNTER("pfault_sync"));
-+
-+struct _kvm_stats_header kvm_vcpu_stats_header = {
-+	.name_size = KVM_STATS_NAME_LEN,
-+	.count = ARRAY_SIZE(kvm_vcpu_stats_desc),
-+	.desc_offset = sizeof(struct kvm_stats_header),
-+	.data_offset = sizeof(struct kvm_stats_header) +
-+		sizeof(kvm_vcpu_stats_desc),
-+};
-+
- struct kvm_stats_debugfs_item debugfs_entries[] = {
- 	VCPU_STAT("userspace_handled", exit_userspace),
- 	VCPU_STAT("exit_null", exit_null),
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 96d10253218a..8e900c482626 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -214,6 +214,59 @@ EXPORT_SYMBOL_GPL(host_xss);
- u64 __read_mostly supported_xss;
- EXPORT_SYMBOL_GPL(supported_xss);
+-	if (unlikely(irq->vcpu || vcpu != vgic_target_oracle(irq))) {
++	if (unlikely(target_vcpu != vgic_target_oracle(irq) ||
++		     vcpu != irq->vcpu)) {
+ 		raw_spin_unlock(&irq->irq_lock);
+-		raw_spin_unlock_irqrestore(&vcpu->arch.vgic_cpu.ap_list_lock,
+-					   flags);
++		if (target_vcpu)
++			raw_spin_unlock_irqrestore(&target_vcpu->arch.vgic_cpu.ap_list_lock,
++						   flags);
++		if (vcpu)
++			raw_spin_unlock_irqrestore(&vcpu->arch.vgic_cpu.ap_list_lock,
++						   flags);
  
-+struct _kvm_stats_desc kvm_vm_stats_desc[] = DEFINE_VM_STATS_DESC(
-+	STATS_DESC_COUNTER("mmu_shadow_zapped"),
-+	STATS_DESC_COUNTER("mmu_pte_write"),
-+	STATS_DESC_COUNTER("mmu_pde_zapped"),
-+	STATS_DESC_COUNTER("mmu_flooded"),
-+	STATS_DESC_COUNTER("mmu_recycled"),
-+	STATS_DESC_COUNTER("mmu_cache_miss"),
-+	STATS_DESC_ICOUNTER("mmu_unsync"),
-+	STATS_DESC_ICOUNTER("largepages"),
-+	STATS_DESC_ICOUNTER("nx_largepages_splits"),
-+	STATS_DESC_ICOUNTER("max_mmu_page_hash_collisions"));
-+
-+struct _kvm_stats_header kvm_vm_stats_header = {
-+	.name_size = KVM_STATS_NAME_LEN,
-+	.count = ARRAY_SIZE(kvm_vm_stats_desc),
-+	.desc_offset = sizeof(struct kvm_stats_header),
-+	.data_offset = sizeof(struct kvm_stats_header) +
-+		sizeof(kvm_vm_stats_desc),
-+};
-+
-+struct _kvm_stats_desc kvm_vcpu_stats_desc[] = DEFINE_VCPU_STATS_DESC(
-+	STATS_DESC_COUNTER("pf_fixed"),
-+	STATS_DESC_COUNTER("pf_guest"),
-+	STATS_DESC_COUNTER("tlb_flush"),
-+	STATS_DESC_COUNTER("invlpg"),
-+	STATS_DESC_COUNTER("exits"),
-+	STATS_DESC_COUNTER("io_exits"),
-+	STATS_DESC_COUNTER("mmio_exits"),
-+	STATS_DESC_COUNTER("signal_exits"),
-+	STATS_DESC_COUNTER("irq_window_exits"),
-+	STATS_DESC_COUNTER("nmi_window_exits"),
-+	STATS_DESC_COUNTER("l1d_flush"),
-+	STATS_DESC_COUNTER("halt_exits"),
-+	STATS_DESC_COUNTER("request_irq_exits"),
-+	STATS_DESC_COUNTER("irq_exits"),
-+	STATS_DESC_COUNTER("host_state_reload"),
-+	STATS_DESC_COUNTER("fpu_reload"),
-+	STATS_DESC_COUNTER("insn_emulation"),
-+	STATS_DESC_COUNTER("insn_emulation_fail"),
-+	STATS_DESC_COUNTER("hypercalls"),
-+	STATS_DESC_COUNTER("irq_injections"),
-+	STATS_DESC_COUNTER("nmi_injections"),
-+	STATS_DESC_COUNTER("req_event"),
-+	STATS_DESC_COUNTER("nested_run"));
-+
-+struct _kvm_stats_header kvm_vcpu_stats_header = {
-+	.name_size = KVM_STATS_NAME_LEN,
-+	.count = ARRAY_SIZE(kvm_vcpu_stats_desc),
-+	.desc_offset = sizeof(struct kvm_stats_header),
-+	.data_offset = sizeof(struct kvm_stats_header) +
-+		sizeof(kvm_vcpu_stats_desc),
-+};
-+
- struct kvm_stats_debugfs_item debugfs_entries[] = {
- 	VCPU_STAT("pf_fixed", pf_fixed),
- 	VCPU_STAT("pf_guest", pf_guest),
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 1870fa928762..873e21af36be 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1240,6 +1240,19 @@ struct kvm_stats_debugfs_item {
- 	int mode;
- };
+ 		raw_spin_lock_irqsave(&irq->irq_lock, flags);
+ 		goto retry;
+ 	}
  
-+struct _kvm_stats_header {
-+	__u32 name_size;
-+	__u32 count;
-+	__u32 desc_offset;
-+	__u32 data_offset;
-+};
-+
-+#define KVM_STATS_NAME_LEN	48
-+struct _kvm_stats_desc {
-+	struct kvm_stats_desc desc;
-+	char name[KVM_STATS_NAME_LEN];
-+};
-+
- #define KVM_DBGFS_GET_MODE(dbgfs_item)                                         \
- 	((dbgfs_item)->mode ? (dbgfs_item)->mode : 0644)
- 
-@@ -1253,8 +1266,127 @@ struct kvm_stats_debugfs_item {
- 	{ n, offsetof(struct kvm_vcpu, stat.generic.x),			       \
- 	  KVM_STAT_VCPU, ## __VA_ARGS__ }
- 
-+#define STATS_DESC(stat, type, unit, scale, exp)			       \
-+	{								       \
-+		{							       \
-+			.flags = type | unit | scale,			       \
-+			.exponent = exp,				       \
-+			.size = 1					       \
-+		},							       \
-+		.name = stat,						       \
+-	/*
+-	 * Grab a reference to the irq to reflect the fact that it is
+-	 * now in the ap_list.
+-	 */
+-	vgic_get_irq_kref(irq);
+-	list_add_tail(&irq->ap_list, &vcpu->arch.vgic_cpu.ap_list_head);
+-	irq->vcpu = vcpu;
++	if (!vcpu && target_vcpu) {
++		/*
++		 * Insert this new pending interrupt.
++		 * Grab a reference to the irq to reflect the fact that
++		 * it is now in the ap_list.
++		 */
++		vgic_get_irq_kref(irq);
++		list_add_tail(&irq->ap_list,
++			      &target_vcpu->arch.vgic_cpu.ap_list_head);
++		irq->vcpu = target_vcpu;
++		ret = true;
++	} else if (vcpu && !target_vcpu) {
++		/*
++		 * This IRQ is not pending or enabled but on the ap_list,
++		 * drop it from the ap_list.
++		 */
++		list_del(&irq->ap_list);
++		irq->vcpu = NULL;
++		raw_spin_unlock(&irq->irq_lock);
++		vgic_put_irq(vcpu->kvm, irq);
++		raw_spin_unlock_irqrestore(&vcpu->arch.vgic_cpu.ap_list_lock,
++					   flags);
++		goto out;
++	} else {
++		/* This IRQ looks like it has to be migrated. */
++		list_del(&irq->ap_list);
++		list_add_tail(&irq->ap_list,
++			      &target_vcpu->arch.vgic_cpu.ap_list_head);
++		irq->vcpu = target_vcpu;
 +	}
-+#define STATS_DESC_CUMULATIVE(name, unit, scale, exponent)		       \
-+	STATS_DESC(name, KVM_STATS_TYPE_CUMULATIVE, unit, scale, exponent)
-+#define STATS_DESC_INSTANT(name, unit, scale, exponent)			       \
-+	STATS_DESC(name, KVM_STATS_TYPE_INSTANT, unit, scale, exponent)
-+
-+/* Cumulative counter */
-+#define STATS_DESC_COUNTER(name)					       \
-+	STATS_DESC_CUMULATIVE(name, KVM_STATS_UNIT_NONE,		       \
-+		KVM_STATS_BASE_POW10, 0)
-+/* Instantaneous counter */
-+#define STATS_DESC_ICOUNTER(name)					       \
-+	STATS_DESC_INSTANT(name, KVM_STATS_UNIT_NONE,			       \
-+		KVM_STATS_BASE_POW10, 0)
-+
-+/* Cumulative clock cycles */
-+#define STATS_DESC_CYCLE(name)						       \
-+	STATS_DESC_CUMULATIVE(name, KVM_STATS_UNIT_CYCLES,		       \
-+		KVM_STATS_BASE_POW10, 0)
-+/* Instantaneous clock cycles */
-+#define STATS_DESC_ICYCLE(name)						       \
-+	STATS_DESC_INSTANT(name, KVM_STATS_UNIT_CYCLES,			       \
-+		KVM_STATS_BASE_POW10, 0)
-+
-+/* Cumulative memory size in Byte */
-+#define STATS_DESC_SIZE_BYTE(name)					       \
-+	STATS_DESC_CUMULATIVE(name, KVM_STATS_UNIT_BYTES,		       \
-+		KVM_STATS_BASE_POW2, 0)
-+/* Cumulative memory size in KiByte */
-+#define STATS_DESC_SIZE_KBYTE(name)					       \
-+	STATS_DESC_CUMULATIVE(name, KVM_STATS_UNIT_BYTES,		       \
-+		KVM_STATS_BASE_POW2, 10)
-+/* Cumulative memory size in MiByte */
-+#define STATS_DESC_SIZE_MBYTE(name)					       \
-+	STATS_DESC_CUMULATIVE(name, KVM_STATS_UNIT_BYTES,		       \
-+		KVM_STATS_BASE_POW2, 20)
-+/* Cumulative memory size in GiByte */
-+#define STATS_DESC_SIZE_GBYTE(name)					       \
-+	STATS_DESC_CUMULATIVE(name, KVM_STATS_UNIT_BYTES,		       \
-+		KVM_STATS_BASE_POW2, 30)
-+
-+/* Instantaneous memory size in Byte */
-+#define STATS_DESC_ISIZE_BYTE(name)					       \
-+	STATS_DESC_INSTANT(name, KVM_STATS_UNIT_BYTES,			       \
-+		KVM_STATS_BASE_POW2, 0)
-+/* Instantaneous memory size in KiByte */
-+#define STATS_DESC_ISIZE_KBYTE(name)					       \
-+	STATS_DESC_INSTANT(name, KVM_STATS_UNIT_BYTES,			       \
-+		KVM_STATS_BASE_POW2, 10)
-+/* Instantaneous memory size in MiByte */
-+#define STATS_DESC_ISIZE_MBYTE(name)					       \
-+	STATS_DESC_INSTANT(name, KVM_STATS_UNIT_BYTES,			       \
-+		KVM_STATS_BASE_POW2, 20)
-+/* Instantaneous memory size in GiByte */
-+#define STATS_DESC_ISIZE_GBYTE(name)					       \
-+	STATS_DESC_INSTANT(name, KVM_STATS_UNIT_BYTES,			       \
-+		KVM_STATS_BASE_POW2, 30)
-+
-+/* Cumulative time in second */
-+#define STATS_DESC_TIME_SEC(name)					       \
-+	STATS_DESC_CUMULATIVE(name, KVM_STATS_UNIT_SECONDS,		       \
-+		KVM_STATS_BASE_POW10, 0)
-+/* Cumulative time in millisecond */
-+#define STATS_DESC_TIME_MSEC(name)					       \
-+	STATS_DESC_CUMULATIVE(name, KVM_STATS_UNIT_SECONDS,		       \
-+		KVM_STATS_BASE_POW10, -3)
-+/* Cumulative time in microsecond */
-+#define STATS_DESC_TIME_USEC(name)					       \
-+	STATS_DESC_CUMULATIVE(name, KVM_STATS_UNIT_SECONDS,		       \
-+		KVM_STATS_BASE_POW10, -6)
-+/* Cumulative time in nanosecond */
-+#define STATS_DESC_TIME_NSEC(name)					       \
-+	STATS_DESC_CUMULATIVE(name, KVM_STATS_UNIT_SECONDS,		       \
-+		KVM_STATS_BASE_POW10, -9)
-+
-+/* Instantaneous time in second */
-+#define STATS_DESC_ITIME_SEC(name)					       \
-+	STATS_DESC_INSTANT(name, KVM_STATS_UNIT_SECONDS,		       \
-+		KVM_STATS_BASE_POW10, 0)
-+/* Instantaneous time in millisecond */
-+#define STATS_DESC_ITIME_MSEC(name)					       \
-+	STATS_DESC_INSTANT(name, KVM_STATS_UNIT_SECONDS,		       \
-+		KVM_STATS_BASE_POW10, -3)
-+/* Instantaneous time in microsecond */
-+#define STATS_DESC_ITIME_USEC(name)					       \
-+	STATS_DESC_INSTANT(name, KVM_STATS_UNIT_SECONDS,		       \
-+		KVM_STATS_BASE_POW10, -6)
-+/* Instantaneous time in nanosecond */
-+#define STATS_DESC_ITIME_NSEC(name)					       \
-+	STATS_DESC_INSTANT(name, KVM_STATS_UNIT_SECONDS,		       \
-+		KVM_STATS_BASE_POW10, -9)
-+
-+#define DEFINE_VM_STATS_DESC(...) {					       \
-+	STATS_DESC_COUNTER("remote_tlb_flush"),				       \
-+	## __VA_ARGS__							       \
-+}
-+
-+#define DEFINE_VCPU_STATS_DESC(...) {					       \
-+	STATS_DESC_COUNTER("halt_successful_poll"),			       \
-+	STATS_DESC_COUNTER("halt_attempted_poll"),			       \
-+	STATS_DESC_COUNTER("halt_poll_invalid"),			       \
-+	STATS_DESC_COUNTER("halt_wakeup"),				       \
-+	STATS_DESC_TIME_NSEC("halt_poll_success_ns"),			       \
-+	STATS_DESC_TIME_NSEC("halt_poll_fail_ns"),			       \
-+	## __VA_ARGS__							       \
-+}
-+
- extern struct kvm_stats_debugfs_item debugfs_entries[];
- extern struct dentry *kvm_debugfs_dir;
-+extern struct _kvm_stats_header kvm_vm_stats_header;
-+extern struct _kvm_stats_header kvm_vcpu_stats_header;
-+extern struct _kvm_stats_desc kvm_vm_stats_desc[];
-+extern struct _kvm_stats_desc kvm_vcpu_stats_desc[];
  
- #if defined(CONFIG_MMU_NOTIFIER) && defined(KVM_ARCH_WANT_MMU_NOTIFIER)
- static inline int mmu_notifier_retry(struct kvm *kvm, unsigned long mmu_seq)
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 3fd9a7e9d90c..dcfa0315e3f9 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1082,6 +1082,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_SGX_ATTRIBUTE 196
- #define KVM_CAP_VM_COPY_ENC_CONTEXT_FROM 197
- #define KVM_CAP_PTP_KVM 198
-+#define KVM_CAP_STATS_BINARY_FD 199
+ 	raw_spin_unlock(&irq->irq_lock);
+-	raw_spin_unlock_irqrestore(&vcpu->arch.vgic_cpu.ap_list_lock, flags);
++	if (target_vcpu)
++		raw_spin_unlock_irqrestore(&target_vcpu->arch.vgic_cpu.ap_list_lock,
++					   flags);
++	if (vcpu)
++		raw_spin_unlock_irqrestore(&vcpu->arch.vgic_cpu.ap_list_lock, flags);
  
- #ifdef KVM_CAP_IRQ_ROUTING
+-	kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
+-	kvm_vcpu_kick(vcpu);
++out:
++	/*
++	 * Even for the already queuing rightly case we have
++	 * to kick the VCPU, because we could be queueing an
++	 * edge-triggered interrupt for which we get no EOI
++	 * maintenance interrupt. In that case, while the IRQ
++	 * is already on the VCPU's AP list, the VCPU could
++	 * have EOI'ed the original interrupt and won't see
++	 * this one until it exits for some other reason.
++	 */
++	if (target_vcpu) {
++		kvm_make_request(KVM_REQ_IRQ_PENDING, target_vcpu);
++		kvm_vcpu_kick(target_vcpu);
++	}
  
-@@ -1898,4 +1899,53 @@ struct kvm_dirty_gfn {
- #define KVM_BUS_LOCK_DETECTION_OFF             (1 << 0)
- #define KVM_BUS_LOCK_DETECTION_EXIT            (1 << 1)
- 
-+#define KVM_STATS_ID_MAXLEN		64
-+
-+struct kvm_stats_header {
-+	char id[KVM_STATS_ID_MAXLEN];
-+	__u32 name_size;
-+	__u32 count;
-+	__u32 desc_offset;
-+	__u32 data_offset;
-+};
-+
-+#define KVM_STATS_TYPE_SHIFT		0
-+#define KVM_STATS_TYPE_MASK		(0xF << KVM_STATS_TYPE_SHIFT)
-+#define KVM_STATS_TYPE_CUMULATIVE	(0x0 << KVM_STATS_TYPE_SHIFT)
-+#define KVM_STATS_TYPE_INSTANT		(0x1 << KVM_STATS_TYPE_SHIFT)
-+#define KVM_STATS_TYPE_MAX		KVM_STATS_TYPE_INSTANT
-+
-+#define KVM_STATS_UNIT_SHIFT		4
-+#define KVM_STATS_UNIT_MASK		(0xF << KVM_STATS_UNIT_SHIFT)
-+#define KVM_STATS_UNIT_NONE		(0x0 << KVM_STATS_UNIT_SHIFT)
-+#define KVM_STATS_UNIT_BYTES		(0x1 << KVM_STATS_UNIT_SHIFT)
-+#define KVM_STATS_UNIT_SECONDS		(0x2 << KVM_STATS_UNIT_SHIFT)
-+#define KVM_STATS_UNIT_CYCLES		(0x3 << KVM_STATS_UNIT_SHIFT)
-+#define KVM_STATS_UNIT_MAX		KVM_STATS_UNIT_CYCLES
-+
-+#define KVM_STATS_BASE_SHIFT		8
-+#define KVM_STATS_BASE_MASK		(0xF << KVM_STATS_BASE_SHIFT)
-+#define KVM_STATS_BASE_POW10		(0x0 << KVM_STATS_BASE_SHIFT)
-+#define KVM_STATS_BASE_POW2		(0x1 << KVM_STATS_BASE_SHIFT)
-+#define KVM_STATS_BASE_MAX		KVM_STATS_BASE_POW2
-+
-+struct kvm_stats_desc {
-+	__u32 flags;
-+	__s16 exponent;
-+	__u16 size;
-+	__u32 unused1;
-+	__u32 unused2;
-+	char name[0];
-+};
-+
-+struct kvm_vm_stats_data {
-+	unsigned long value[0];
-+};
-+
-+struct kvm_vcpu_stats_data {
-+	__u64 value[0];
-+};
-+
-+#define KVM_GET_STATS_FD  _IOR(KVMIO,  0xcc, struct kvm_stats_header)
-+
- #endif /* __LINUX_KVM_H */
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index f6ad5b080994..d84bb17bdea8 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -3409,6 +3409,115 @@ static int kvm_vcpu_ioctl_set_sigmask(struct kvm_vcpu *vcpu, sigset_t *sigset)
- 	return 0;
+-	return true;
++	return ret;
  }
  
-+static ssize_t kvm_stats_read(char *id, struct _kvm_stats_header *header,
-+		struct _kvm_stats_desc *desc, void *stats, size_t size_stats,
-+		char __user *user_buffer, size_t size, loff_t *offset)
-+{
-+	ssize_t copylen, len, remain = size;
-+	size_t size_header, size_desc;
-+	loff_t pos = *offset;
-+	char __user *dest = user_buffer;
-+	void *src;
-+
-+	size_header = sizeof(*header);
-+	size_desc = header->count * sizeof(*desc);
-+
-+	len = KVM_STATS_ID_MAXLEN + size_header + size_desc + size_stats - pos;
-+	len = min(len, remain);
-+	if (len <= 0)
-+		return 0;
-+	remain = len;
-+
-+	/* Copy kvm stats header id string */
-+	copylen = KVM_STATS_ID_MAXLEN - pos;
-+	copylen = min(copylen, remain);
-+	if (copylen > 0) {
-+		src = id + pos;
-+		if (copy_to_user(dest, src, copylen))
-+			return -EFAULT;
-+		remain -= copylen;
-+		pos += copylen;
-+		dest += copylen;
-+	}
-+	/* Copy kvm stats header */
-+	copylen = KVM_STATS_ID_MAXLEN + size_header - pos;
-+	copylen = min(copylen, remain);
-+	if (copylen > 0) {
-+		src = header + pos - KVM_STATS_ID_MAXLEN;
-+		if (copy_to_user(dest, src, copylen))
-+			return -EFAULT;
-+		remain -= copylen;
-+		pos += copylen;
-+		dest += copylen;
-+	}
-+	/* Copy kvm stats descriptors */
-+	copylen = header->desc_offset + size_desc - pos;
-+	copylen = min(copylen, remain);
-+	if (copylen > 0) {
-+		src = desc + pos - header->desc_offset;
-+		if (copy_to_user(dest, src, copylen))
-+			return -EFAULT;
-+		remain -= copylen;
-+		pos += copylen;
-+		dest += copylen;
-+	}
-+	/* Copy kvm stats values */
-+	copylen = header->data_offset + size_stats - pos;
-+	copylen = min(copylen, remain);
-+	if (copylen > 0) {
-+		src = stats + pos - header->data_offset;
-+		if (copy_to_user(dest, src, copylen))
-+			return -EFAULT;
-+		remain -= copylen;
-+		pos += copylen;
-+		dest += copylen;
-+	}
-+
-+	*offset = pos;
-+	return len;
-+}
-+
-+static ssize_t kvm_vcpu_stats_read(struct file *file, char __user *user_buffer,
-+			      size_t size, loff_t *offset)
-+{
-+	char id[KVM_STATS_ID_MAXLEN];
-+	struct kvm_vcpu *vcpu = file->private_data;
-+
-+	snprintf(id, sizeof(id), "kvm-%d/vcpu-%d",
-+			task_pid_nr(current), vcpu->vcpu_id);
-+	return kvm_stats_read(id, &kvm_vcpu_stats_header,
-+			&kvm_vcpu_stats_desc[0], &vcpu->stat,
-+			sizeof(vcpu->stat), user_buffer, size, offset);
-+}
-+
-+static const struct file_operations kvm_vcpu_stats_fops = {
-+	.read = kvm_vcpu_stats_read,
-+	.llseek = noop_llseek,
-+};
-+
-+static int kvm_vcpu_ioctl_get_stats_fd(struct kvm_vcpu *vcpu)
-+{
-+	int fd;
-+	struct file *file;
-+	char name[15 + ITOA_MAX_LEN + 1];
-+
-+	snprintf(name, sizeof(name), "kvm-vcpu-stats:%d", vcpu->vcpu_id);
-+
-+	fd = get_unused_fd_flags(O_CLOEXEC);
-+	if (fd < 0)
-+		return fd;
-+
-+	file = anon_inode_getfile(name, &kvm_vcpu_stats_fops, vcpu, O_RDONLY);
-+	if (IS_ERR(file)) {
-+		put_unused_fd(fd);
-+		return PTR_ERR(file);
-+	}
-+	file->f_mode |= FMODE_PREAD;
-+	fd_install(fd, file);
-+
-+	return fd;
-+}
-+
- static long kvm_vcpu_ioctl(struct file *filp,
- 			   unsigned int ioctl, unsigned long arg)
- {
-@@ -3606,6 +3715,10 @@ static long kvm_vcpu_ioctl(struct file *filp,
- 		r = kvm_arch_vcpu_ioctl_set_fpu(vcpu, fpu);
- 		break;
- 	}
-+	case KVM_GET_STATS_FD: {
-+		r = kvm_vcpu_ioctl_get_stats_fd(vcpu);
-+		break;
-+	}
- 	default:
- 		r = kvm_arch_vcpu_ioctl(filp, ioctl, arg);
- 	}
-@@ -3864,6 +3977,8 @@ static long kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
- #else
- 		return 0;
- #endif
-+	case KVM_CAP_STATS_BINARY_FD:
-+		return 1;
- 	default:
- 		break;
- 	}
-@@ -3967,6 +4082,43 @@ static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
- 	}
- }
- 
-+static ssize_t kvm_vm_stats_read(struct file *file, char __user *user_buffer,
-+			      size_t size, loff_t *offset)
-+{
-+	char id[KVM_STATS_ID_MAXLEN];
-+	struct kvm *kvm = file->private_data;
-+
-+	snprintf(id, sizeof(id), "kvm-%d", task_pid_nr(current));
-+	return kvm_stats_read(id, &kvm_vm_stats_header, &kvm_vm_stats_desc[0],
-+		&kvm->stat, sizeof(kvm->stat), user_buffer, size, offset);
-+}
-+
-+static const struct file_operations kvm_vm_stats_fops = {
-+	.read = kvm_vm_stats_read,
-+	.llseek = noop_llseek,
-+};
-+
-+static int kvm_vm_ioctl_get_stats_fd(struct kvm *kvm)
-+{
-+	int fd;
-+	struct file *file;
-+
-+	fd = get_unused_fd_flags(O_CLOEXEC);
-+	if (fd < 0)
-+		return fd;
-+
-+	file = anon_inode_getfile("kvm-vm-stats",
-+			&kvm_vm_stats_fops, kvm, O_RDONLY);
-+	if (IS_ERR(file)) {
-+		put_unused_fd(fd);
-+		return PTR_ERR(file);
-+	}
-+	file->f_mode |= FMODE_PREAD;
-+	fd_install(fd, file);
-+
-+	return fd;
-+}
-+
- static long kvm_vm_ioctl(struct file *filp,
- 			   unsigned int ioctl, unsigned long arg)
- {
-@@ -4149,6 +4301,9 @@ static long kvm_vm_ioctl(struct file *filp,
- 	case KVM_RESET_DIRTY_RINGS:
- 		r = kvm_vm_ioctl_reset_dirty_pages(kvm);
- 		break;
-+	case KVM_GET_STATS_FD:
-+		r = kvm_vm_ioctl_get_stats_fd(kvm);
-+		break;
- 	default:
- 		r = kvm_arch_vm_ioctl(filp, ioctl, arg);
- 	}
+ /**
 -- 
-2.32.0.rc1.229.g3e70b5a671-goog
+2.19.1
 
 _______________________________________________
 kvmarm mailing list
