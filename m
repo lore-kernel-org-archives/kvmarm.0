@@ -2,60 +2,82 @@ Return-Path: <SRS0=VfsR=K6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4A53C07E94
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Jun 2021 09:01:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8101FC07E94
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Jun 2021 10:04:09 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 53E89613C9
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Jun 2021 09:01:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53E89613C9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 0196661404
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Jun 2021 10:04:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0196661404
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C90394B0E2;
-	Fri,  4 Jun 2021 05:01:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E4E14B0A3;
+	Fri,  4 Jun 2021 06:04:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JkfnKmnhUPhh; Fri,  4 Jun 2021 05:01:38 -0400 (EDT)
+	with ESMTP id p3QJb5JWv4gE; Fri,  4 Jun 2021 06:04:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7180F4B0F4;
-	Fri,  4 Jun 2021 05:01:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BD2A44B0BF;
+	Fri,  4 Jun 2021 06:04:02 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B79C24B0E2
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jun 2021 05:01:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 785474B0BF
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jun 2021 06:04:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id t6dnHvWNCMNk for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Jun 2021 05:01:32 -0400 (EDT)
+ with ESMTP id VU46tdDJEHjP for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Jun 2021 06:03:56 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9644F4B0D6
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jun 2021 05:01:32 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 7EA186140F;
- Fri,  4 Jun 2021 09:01:28 +0000 (UTC)
-Date: Fri, 4 Jun 2021 10:01:26 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Steven Price <steven.price@arm.com>
-Subject: Re: [PATCH v13 4/8] KVM: arm64: Introduce MTE VM feature
-Message-ID: <20210604090125.GA23321@arm.com>
-References: <20210524104513.13258-1-steven.price@arm.com>
- <20210524104513.13258-5-steven.price@arm.com>
- <20210603160031.GE20338@arm.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210603160031.GE20338@arm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
- Marc Zyngier <maz@kernel.org>, Juan Quintela <quintela@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
- Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org,
- Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E2B794B0A3
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jun 2021 06:03:55 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id ABFA461369;
+ Fri,  4 Jun 2021 10:03:54 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1lp6gC-005SAa-JF; Fri, 04 Jun 2021 11:03:52 +0100
+Date: Fri, 04 Jun 2021 11:03:50 +0100
+Message-ID: <87tumeymih.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: Re: [RFC][PATCH] kvm: add suspend pm-notifier
+In-Reply-To: <YLnwXD5pPplTrmoZ@google.com>
+References: <20210603164315.682994-1-senozhatsky@chromium.org>
+ <87v96uyq2v.wl-maz@kernel.org> <YLnwXD5pPplTrmoZ@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: senozhatsky@chromium.org, pbonzini@redhat.com,
+ seanjc@google.com, vkuznets@redhat.com, jmattson@google.com,
+ chenhuacai@kernel.org, paulus@ozlabs.org, borntraeger@de.ibm.com,
+ suleiman@google.com, x86@kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+ linux-mips@vger.kernel.org, kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
+ linux-s390@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: linux-s390@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
+ Sean Christopherson <seanjc@google.com>, Huacai Chen <chenhuacai@kernel.org>,
+ linux-kernel@vger.kernel.org, kvm-ppc@vger.kernel.org,
+ linux-mips@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Suleiman Souhlal <suleiman@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -72,75 +94,117 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Jun 03, 2021 at 05:00:31PM +0100, Catalin Marinas wrote:
-> On Mon, May 24, 2021 at 11:45:09AM +0100, Steven Price wrote:
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index c5d1f3c87dbd..226035cf7d6c 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -822,6 +822,42 @@ transparent_hugepage_adjust(struct kvm_memory_slot *memslot,
-> >  	return PAGE_SIZE;
-> >  }
-> >  
-> > +static int sanitise_mte_tags(struct kvm *kvm, kvm_pfn_t pfn,
-> > +			     unsigned long size)
-> > +{
-> > +	if (kvm_has_mte(kvm)) {
-> > +		/*
-> > +		 * The page will be mapped in stage 2 as Normal Cacheable, so
-> > +		 * the VM will be able to see the page's tags and therefore
-> > +		 * they must be initialised first. If PG_mte_tagged is set,
-> > +		 * tags have already been initialised.
-> > +		 * pfn_to_online_page() is used to reject ZONE_DEVICE pages
-> > +		 * that may not support tags.
-> > +		 */
-> > +		unsigned long i, nr_pages = size >> PAGE_SHIFT;
-> > +		struct page *page = pfn_to_online_page(pfn);
-> > +
-> > +		if (!page)
-> > +			return -EFAULT;
-> > +
-> > +		for (i = 0; i < nr_pages; i++, page++) {
-> > +			/*
-> > +			 * There is a potential (but very unlikely) race
-> > +			 * between two VMs which are sharing a physical page
-> > +			 * entering this at the same time. However by splitting
-> > +			 * the test/set the only risk is tags being overwritten
-> > +			 * by the mte_clear_page_tags() call.
-> > +			 */
+On Fri, 04 Jun 2021 10:20:28 +0100,
+Sergey Senozhatsky <senozhatsky@chromium.org> wrote:
 > 
-> And I think the real risk here is when the page is writable by at least
-> one of the VMs sharing the page. This excludes KSM, so it only leaves
-> the MAP_SHARED mappings.
+> On (21/06/04 09:46), Marc Zyngier wrote:
+> [..]
+> > > +void kvm_arch_pm_notifier(struct kvm *kvm)
+> > > +{
+> > > +#ifdef CONFIG_PM
+> > > +	int c;
+> > > +
+> > > +	mutex_lock(&kvm->lock);
+> > > +	for (c = 0; c < kvm->created_vcpus; c++) {
+> > > +		struct kvm_vcpu *vcpu = kvm->vcpus[c];
+> > > +		int r;
+> > > +
+> > > +		if (!vcpu)
+> > > +			continue;
+> > 
+> > Wouldn't kvm_for_each_vcpu() avoid this kind of checks?
 > 
-> > +			if (!test_bit(PG_mte_tagged, &page->flags)) {
-> > +				mte_clear_page_tags(page_address(page));
-> > +				set_bit(PG_mte_tagged, &page->flags);
-> > +			}
-> > +		}
+> Right, that's what I do in v2, which I haven't posted yet.
 > 
-> If we want to cover this race (I'd say in a separate patch), we can call
-> mte_sync_page_tags(page, __pte(0), false, true) directly (hopefully I
-> got the arguments right). We can avoid the big lock in most cases if
-> kvm_arch_prepare_memory_region() sets a VM_MTE_RESET (tag clear etc.)
-> and __alloc_zeroed_user_highpage() clears the tags on allocation (as we
-> do for VM_MTE but the new flag would not affect the stage 1 VMM page
-> attributes).
+> [..]
+> > > +#include <linux/notifier.h>
+> > > +
+> > >  #ifndef KVM_MAX_VCPU_ID
+> > >  #define KVM_MAX_VCPU_ID KVM_MAX_VCPUS
+> > >  #endif
+> > > @@ -579,6 +581,10 @@ struct kvm {
+> > >  	pid_t userspace_pid;
+> > >  	unsigned int max_halt_poll_ns;
+> > >  	u32 dirty_ring_size;
+> > > +
+> > > +#ifdef CONFIG_PM
+> > > +	struct notifier_block pm_notifier;
+> > > +#endif
+> > 
+> > I'd certainly like to be able to opt out from this on architectures
+> > that do not implement anything useful in the PM callbacks.
+> 
+> Well on the other hand PM-callbacks are harmless on those archs, they
+> won't overload the __weak function.
 
-Another idea: if VM_SHARED is found for any vma within a region in
-kvm_arch_prepare_memory_region(), we either prevent the enabling of MTE
-for the guest or reject the memory slot if MTE was already enabled.
+I don't care much for the callbacks. But struct kvm is bloated enough,
+and I'd be happy not to have this structure embedded in it if I can
+avoid it.
 
-An alternative here would be to clear VM_MTE_ALLOWED so that any
-subsequent mprotect(PROT_MTE) in the VMM would fail in
-arch_validate_flags(). MTE would still be allowed in the guest but in
-the VMM for the guest memory regions. We can probably do this
-irrespective of VM_SHARED. Of course, the VMM can still mmap() the
-memory initially with PROT_MTE but that's not an issue IIRC, only the
-concurrent mprotect().
+> 
+> > Please consider making this an independent config option that individual
+> > archs can buy into.
+> 
+> Sure, I can take a look into this, but how is this better than __weak
+> function? (that's a real question)
+
+Weak functions are OK AFAIC. More crud in struct kvm is what I'm not
+OK with.
+
+> 
+> [..]
+> > > +#ifdef CONFIG_PM
+> > > +static int kvm_pm_notifier_call(struct notifier_block *bl,
+> > > +				unsigned long state,
+> > > +				void *unused)
+> > > +{
+> > > +	struct kvm *kvm = container_of(bl, struct kvm, pm_notifier);
+> > > +
+> > > +	switch (state) {
+> > > +	case PM_HIBERNATION_PREPARE:
+> > > +	case PM_SUSPEND_PREPARE:
+> > > +		kvm_arch_pm_notifier(kvm);
+> > 
+> > How about passing the state to the notifier callback? I'd expect it to
+> > be useful to do something on resume too.
+> 
+> For different states we can have different kvm_arch functions instead.
+> kvm_arch_pm_notifier() can be renamed to kvm_arch_suspend_notifier(),
+> so that we don't need to have `switch (state)` in every arch-code. Then
+> for resume/post resume states we can have kvm_arch_resume_notifier()
+> arch functions.
+
+I'd rather we keep an arch API that is similar to the one the rest of
+the kernel has, instead of a flurry of small helpers that need to grow
+each time someone adds a new PM state. A switch() in the arch-specific
+implementation is absolutely fine.
+
+> 
+> > > +		break;
+> > > +	}
+> > > +	return NOTIFY_DONE;
+> > > +}
+> > > +
+> > > +static void kvm_init_pm_notifier(struct kvm *kvm)
+> > > +{
+> > > +	kvm->pm_notifier.notifier_call = kvm_pm_notifier_call;
+> > > +	kvm->pm_notifier.priority = INT_MAX;
+> > 
+> > How is this priority determined?
+> 
+> Nothing magical here. I want this to be executed first, before we suspend
+> ftrace, RCU and the like. Besides KVM is usually the last one to register
+> its PM callbacks, so there can be something on the notifier list that
+> returns NOTIFY_STOP_MASK in front of KVM PM-notifier list entry.
+
+Which begs the question: should arch-specific code be able to veto
+suspend and return an error itself? Always returning NOTIFY_DONE seems
+highly optimistic.
+
+	M.
 
 -- 
-Catalin
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
