@@ -2,73 +2,75 @@ Return-Path: <SRS0=VfsR=K6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33B27C4708F
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Jun 2021 14:51:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F00F0C07E94
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Jun 2021 15:27:54 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A5D5E613F4
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Jun 2021 14:51:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5D5E613F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 6F67161402
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Jun 2021 15:27:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F67161402
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E99F54B097;
-	Fri,  4 Jun 2021 10:51:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C82A34B0FE;
+	Fri,  4 Jun 2021 11:27:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 8xz1YuD31Dob; Fri,  4 Jun 2021 10:51:45 -0400 (EDT)
+	with ESMTP id wNBOKPRdXQnF; Fri,  4 Jun 2021 11:27:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5BD4A4B0BC;
-	Fri,  4 Jun 2021 10:51:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AA8644B0FA;
+	Fri,  4 Jun 2021 11:27:48 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C84084B0BC
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jun 2021 10:51:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B567D4B0EE
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jun 2021 11:27:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id n-uC7LpEXoOx for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Jun 2021 10:51:39 -0400 (EDT)
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B36534B097
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jun 2021 10:51:38 -0400 (EDT)
-Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.53])
- by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4FxQZZ31Y7z1BHbD;
- Fri,  4 Jun 2021 22:46:46 +0800 (CST)
-Received: from dggpeml500024.china.huawei.com (7.185.36.10) by
- dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Fri, 4 Jun 2021 22:51:32 +0800
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- dggpeml500024.china.huawei.com (7.185.36.10) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Fri, 4 Jun 2021 22:51:31 +0800
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.2176.012; Fri, 4 Jun 2021 15:51:29 +0100
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: RE: [RFC PATCH 0/3] kvm/arm: New VMID allocator based on asid(2nd
+ with ESMTP id PIbcQl6Vvv5M for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Jun 2021 11:27:43 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4CB0C4B0EC
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jun 2021 11:27:43 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 1852361400;
+ Fri,  4 Jun 2021 15:27:42 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1lpBjY-005VVs-2h; Fri, 04 Jun 2021 16:27:40 +0100
+Date: Fri, 04 Jun 2021 16:27:39 +0100
+Message-ID: <87lf7ptztg.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Subject: Re: [RFC PATCH 0/3] kvm/arm: New VMID allocator based on asid(2nd
  approach) 
-Thread-Topic: [RFC PATCH 0/3] kvm/arm: New VMID allocator based on asid(2nd
- approach) 
-Thread-Index: AQHXQph5pwodb0a/4kShAMz7Pnc+rqsDq0rQgABREYCAABlY4A==
-Date: Fri, 4 Jun 2021 14:51:29 +0000
-Message-ID: <95bb84ffdb0f4db3b64b38cc3b651f90@huawei.com>
+In-Reply-To: <95bb84ffdb0f4db3b64b38cc3b651f90@huawei.com>
 References: <20210506165232.1969-1-shameerali.kolothum.thodi@huawei.com>
- <e62829990c50479292af94c4152011fc@huawei.com> <87sg1xzqea.wl-maz@kernel.org>
-In-Reply-To: <87sg1xzqea.wl-maz@kernel.org>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.47.88.52]
-MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+ <e62829990c50479292af94c4152011fc@huawei.com>
+ <87sg1xzqea.wl-maz@kernel.org>
+ <95bb84ffdb0f4db3b64b38cc3b651f90@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: shameerali.kolothum.thodi@huawei.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ linux-kernel@vger.kernel.org, will@kernel.org, catalin.marinas@arm.com,
+ james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+ jean-philippe@linaro.org, Alexandru.Elisei@arm.com, linuxarm@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
  "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
  "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
@@ -91,103 +93,109 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
-
-> -----Original Message-----
-> From: Marc Zyngier [mailto:maz@kernel.org]
-> Sent: 04 June 2021 14:55
-> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-> Cc: linux-arm-kernel@lists.infradead.org; kvmarm@lists.cs.columbia.edu;
-> linux-kernel@vger.kernel.org; will@kernel.org; catalin.marinas@arm.com;
-> james.morse@arm.com; julien.thierry.kdev@gmail.com;
-> suzuki.poulose@arm.com; jean-philippe@linaro.org; Alexandru Elisei
-> <Alexandru.Elisei@arm.com>; Linuxarm <linuxarm@huawei.com>
-> Subject: Re: [RFC PATCH 0/3] kvm/arm: New VMID allocator based on asid(2nd
-> approach)
+On Fri, 04 Jun 2021 15:51:29 +0100,
+Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
 > 
-> On Fri, 04 Jun 2021 09:13:10 +0100,
-> Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-> wrote:
-> >
-> > Hi,
-> >
-> > > -----Original Message-----
-> > > From: Shameerali Kolothum Thodi
-> > > Sent: 06 May 2021 17:52
-> > > To: linux-arm-kernel@lists.infradead.org; kvmarm@lists.cs.columbia.edu;
-> > > linux-kernel@vger.kernel.org
-> > > Cc: maz@kernel.org; will@kernel.org; catalin.marinas@arm.com;
-> > > james.morse@arm.com; julien.thierry.kdev@gmail.com;
-> > > suzuki.poulose@arm.com; jean-philippe@linaro.org; Linuxarm
-> > > <linuxarm@huawei.com>
-> > > Subject: [RFC PATCH 0/3] kvm/arm: New VMID allocator based on asid(2nd
-> > > approach)
+> Hi Marc,
+> 
+> > -----Original Message-----
+> > From: Marc Zyngier [mailto:maz@kernel.org]
+> > Sent: 04 June 2021 14:55
+> > To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> > Cc: linux-arm-kernel@lists.infradead.org; kvmarm@lists.cs.columbia.edu;
+> > linux-kernel@vger.kernel.org; will@kernel.org; catalin.marinas@arm.com;
+> > james.morse@arm.com; julien.thierry.kdev@gmail.com;
+> > suzuki.poulose@arm.com; jean-philippe@linaro.org; Alexandru Elisei
+> > <Alexandru.Elisei@arm.com>; Linuxarm <linuxarm@huawei.com>
+> > Subject: Re: [RFC PATCH 0/3] kvm/arm: New VMID allocator based on asid(2nd
+> > approach)
+> > 
+> > On Fri, 04 Jun 2021 09:13:10 +0100,
+> > Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> > wrote:
 > > >
-> > > This is based on a suggestion from Will [0] to try out the asid
-> > > based kvm vmid solution as a separate VMID allocator instead of
-> > > the shared lib approach attempted in v4[1].
+> > > Hi,
 > > >
-> > > The idea is to compare both the approaches and see whether the
-> > > shared lib solution with callbacks make sense or not.
-> >
-> > A gentle ping on this. Please take a look and let me know.
+> > > > -----Original Message-----
+> > > > From: Shameerali Kolothum Thodi
+> > > > Sent: 06 May 2021 17:52
+> > > > To: linux-arm-kernel@lists.infradead.org; kvmarm@lists.cs.columbia.edu;
+> > > > linux-kernel@vger.kernel.org
+> > > > Cc: maz@kernel.org; will@kernel.org; catalin.marinas@arm.com;
+> > > > james.morse@arm.com; julien.thierry.kdev@gmail.com;
+> > > > suzuki.poulose@arm.com; jean-philippe@linaro.org; Linuxarm
+> > > > <linuxarm@huawei.com>
+> > > > Subject: [RFC PATCH 0/3] kvm/arm: New VMID allocator based on asid(2nd
+> > > > approach)
+> > > >
+> > > > This is based on a suggestion from Will [0] to try out the asid
+> > > > based kvm vmid solution as a separate VMID allocator instead of
+> > > > the shared lib approach attempted in v4[1].
+> > > >
+> > > > The idea is to compare both the approaches and see whether the
+> > > > shared lib solution with callbacks make sense or not.
+> > >
+> > > A gentle ping on this. Please take a look and let me know.
+> > 
+> > I had a look and I don't overly dislike it. I'd like to see the code
+> > without the pinned stuff though, at least to ease the reviewing. I
+> > haven't tested it in anger, but I have pushed the rebased code at [1]
+> > as it really didn't apply to 5.13-rc4.
 > 
-> I had a look and I don't overly dislike it. I'd like to see the code
-> without the pinned stuff though, at least to ease the reviewing. I
-> haven't tested it in anger, but I have pushed the rebased code at [1]
-> as it really didn't apply to 5.13-rc4.
+> Thanks for taking a look and the rebase. I will remove the pinned stuff
+> in the next revision as that was added just to compare against the previous
+> version.
+> 
+> > 
+> > One thing I'm a bit worried about is that we so far relied on VMID 0
+> > never being allocated to a guest, which is now crucial for protected
+> > KVM. I can't really convince myself that this can never happen with
+> > this.
+> 
+> Hmm..not sure I quite follow that. As per the current logic vmid 0 is
+> reserved and is not allocated to Guest.
 
-Thanks for taking a look and the rebase. I will remove the pinned stuff
-in the next revision as that was added just to compare against the previous
-version.
+And that's the bit I'm struggling to validate here. I guess it works
+because cur_idx is set to 1 in new_vmid().
 
 > 
-> One thing I'm a bit worried about is that we so far relied on VMID 0
-> never being allocated to a guest, which is now crucial for protected
-> KVM. I can't really convince myself that this can never happen with
-> this.
-
-Hmm..not sure I quite follow that. As per the current logic vmid 0 is
-reserved and is not allocated to Guest. 
-
-> Plus, I've found this nugget:
+> > Plus, I've found this nugget:
+> > 
+> > <quote
+> > 	max_pinned_vmids = NUM_USER_VMIDS - num_possible_cpus() - 2;
+> > </quote>
+> > 
+> > What is this "- 2"? My hunch is that it should really be "- 1" as VMID
+> > 0 is reserved, and we have no equivalent of KPTI for S2.
 > 
-> <quote
-> 	max_pinned_vmids = NUM_USER_VMIDS - num_possible_cpus() - 2;
-> </quote>
+> I think this is more related to the "pinned vmid" stuff and was borrowed from
+> the asid_update_limit() fn in arch/arm64/mm/context.c. But I missed the
+> comment that explains the reason behind it. It says,
 > 
-> What is this "- 2"? My hunch is that it should really be "- 1" as VMID
-> 0 is reserved, and we have no equivalent of KPTI for S2.
+> ---x---
+> 	/*
+> 	 * There must always be an ASID available after rollover. Ensure that,
+> 	 * even if all CPUs have a reserved ASID and the maximum number of ASIDs
+> 	 * are pinned, there still is at least one empty slot in the ASID map.
+> 	 */
+> 	max_pinned_asids = num_available_asids - num_possible_cpus() - 2;
+> ---x---
+> 
+> So this is to make sure we will have at least one VMID available
+> after rollover in case we have pinned the max number of VMIDs. I
+> will include that comment to make it clear.
 
-I think this is more related to the "pinned vmid" stuff and was borrowed from
-the asid_update_limit() fn in arch/arm64/mm/context.c. But I missed the
-comment that explains the reason behind it. It says,
+That doesn't really explain the -2. Or is that that we have one for
+the extra empty slot, and one for the reserved?
 
----x---
-	/*
-	 * There must always be an ASID available after rollover. Ensure that,
-	 * even if all CPUs have a reserved ASID and the maximum number of ASIDs
-	 * are pinned, there still is at least one empty slot in the ASID map.
-	 */
-	max_pinned_asids = num_available_asids - num_possible_cpus() - 2;
----x---
-
-So this is to make sure we will have at least one VMID available after rollover
-in case we have pinned the max number of VMIDs. I will include that comment
-to make it clear.
+Jean-Philippe?
 
 Thanks,
-Shameer
 
-> 
-> 	M.
-> 
-> [1]
-> https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h
-> =kvm-arm64/mmu/vmid
-> 
-> --
-> Without deviation from the norm, progress is not possible.
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
