@@ -2,60 +2,63 @@ Return-Path: <SRS0=VfsR=K6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18E3FC07E94
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Jun 2021 14:01:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB8E0C07E94
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Jun 2021 14:06:04 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 83F0960FE7
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Jun 2021 14:01:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83F0960FE7
+	by mail.kernel.org (Postfix) with ESMTP id 6525F61405
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Jun 2021 14:06:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6525F61405
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F22714B0FB;
-	Fri,  4 Jun 2021 10:01:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D790B4B09E;
+	Fri,  4 Jun 2021 10:06:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id kIzOU57QmCAr; Fri,  4 Jun 2021 10:01:36 -0400 (EDT)
+	with ESMTP id fhogdS4e1+Qq; Fri,  4 Jun 2021 10:05:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B5854B0E9;
-	Fri,  4 Jun 2021 10:01:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 249304B0F7;
+	Fri,  4 Jun 2021 10:05:58 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B5DC4B0D8
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jun 2021 10:01:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A7AA4B0DA
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jun 2021 10:05:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WMMY-8I9HUnM for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Jun 2021 10:01:28 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DB2B54B09E
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jun 2021 10:01:28 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 706D82B;
- Fri,  4 Jun 2021 07:01:28 -0700 (PDT)
-Received: from C02TD0UTHF1T.local (unknown [10.57.6.137])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 27BBE3F774;
- Fri,  4 Jun 2021 07:01:24 -0700 (PDT)
-Date: Fri, 4 Jun 2021 15:01:17 +0100
-From: Mark Rutland <mark.rutland@arm.com>
-To: Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 1/4] KVM: arm64: Ignore 'kvm-arm.mode=protected' when
- using VHE
-Message-ID: <20210604140117.GA69333@C02TD0UTHF1T.local>
-References: <20210603183347.1695-1-will@kernel.org>
- <20210603183347.1695-2-will@kernel.org>
+ with ESMTP id t5OYzTSBaOiN for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Jun 2021 10:05:51 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0D4D64B09E
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jun 2021 10:05:51 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 148D4613FF;
+ Fri,  4 Jun 2021 14:05:46 +0000 (UTC)
+Date: Fri, 4 Jun 2021 15:05:44 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Steven Price <steven.price@arm.com>
+Subject: Re: [PATCH v13 4/8] KVM: arm64: Introduce MTE VM feature
+Message-ID: <20210604140544.GF31173@arm.com>
+References: <20210524104513.13258-1-steven.price@arm.com>
+ <20210524104513.13258-5-steven.price@arm.com>
+ <20210603160031.GE20338@arm.com>
+ <a0810f3b-4f13-e8b5-7057-a9de1201887a@arm.com>
+ <20210604113658.GD31173@arm.com>
+ <2265cbf6-d643-9122-79a8-90198ea16c64@arm.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20210603183347.1695-2-will@kernel.org>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- linux-arm-kernel@lists.infradead.org, Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <2265cbf6-d643-9122-79a8-90198ea16c64@arm.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
+ Marc Zyngier <maz@kernel.org>, Juan Quintela <quintela@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
+ Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org,
+ Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -72,84 +75,43 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Jun 03, 2021 at 07:33:44PM +0100, Will Deacon wrote:
-> Ignore 'kvm-arm.mode=protected' when using VHE so that kvm_get_mode()
-> only returns KVM_MODE_PROTECTED on systems where the feature is available.
-
-IIUC, since the introduction of the idreg-override code, and the
-mutate_to_vhe stuff, passing 'kvm-arm.mode=protected' should make the
-kernel stick to EL1, right? So this should only affect M1 (or other HW
-with a similar impediment).
-
-One minor comment below; otherwise:
-
-Acked-by: Mark Rutland <mark.rutland@arm.com>
-
+On Fri, Jun 04, 2021 at 01:51:38PM +0100, Steven Price wrote:
+> On 04/06/2021 12:36, Catalin Marinas wrote:
+> > On Fri, Jun 04, 2021 at 11:42:11AM +0100, Steven Price wrote:
+> >> On 03/06/2021 17:00, Catalin Marinas wrote:
+> >>> On Mon, May 24, 2021 at 11:45:09AM +0100, Steven Price wrote:
+> >>>> @@ -971,8 +1007,13 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >>>>  	if (writable)
+> >>>>  		prot |= KVM_PGTABLE_PROT_W;
+> >>>>  
+> >>>> -	if (fault_status != FSC_PERM && !device)
+> >>>> +	if (fault_status != FSC_PERM && !device) {
+> >>>> +		ret = sanitise_mte_tags(kvm, pfn, vma_pagesize);
+> >>>> +		if (ret)
+> >>>> +			goto out_unlock;
+> >>>
+> >>> Maybe it was discussed in a previous version, why do we need this in
+> >>> addition to kvm_set_spte_gfn()?
+> >>
+> >> kvm_set_spte_gfn() is only used for the MMU notifier path (e.g. if a
+> >> memslot is changed by the VMM). For the initial access we will normally
+> >> fault the page into stage 2 with user_mem_abort().
+> > 
+> > Right. Can we move the sanitise_mte_tags() call to
+> > kvm_pgtable_stage2_map() instead or we don't have the all the
+> > information needed?
 > 
-> Cc: David Brazdil <dbrazdil@google.com>
-> Signed-off-by: Will Deacon <will@kernel.org>
-> ---
->  Documentation/admin-guide/kernel-parameters.txt |  1 -
->  arch/arm64/kernel/cpufeature.c                  | 10 +---------
->  arch/arm64/kvm/arm.c                            |  6 +++++-
->  3 files changed, 6 insertions(+), 11 deletions(-)
-> 
-> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-> index cb89dbdedc46..e85dbdf1ee8e 100644
-> --- a/Documentation/admin-guide/kernel-parameters.txt
-> +++ b/Documentation/admin-guide/kernel-parameters.txt
-> @@ -2300,7 +2300,6 @@
->  
->  			protected: nVHE-based mode with support for guests whose
->  				   state is kept private from the host.
-> -				   Not valid if the kernel is running in EL2.
->  
->  			Defaults to VHE/nVHE based on hardware support.
->  
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index efed2830d141..dc1f2e747828 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -1773,15 +1773,7 @@ static void cpu_enable_mte(struct arm64_cpu_capabilities const *cap)
->  #ifdef CONFIG_KVM
->  static bool is_kvm_protected_mode(const struct arm64_cpu_capabilities *entry, int __unused)
->  {
-> -	if (kvm_get_mode() != KVM_MODE_PROTECTED)
-> -		return false;
-> -
-> -	if (is_kernel_in_hyp_mode()) {
-> -		pr_warn("Protected KVM not available with VHE\n");
-> -		return false;
-> -	}
-> -
-> -	return true;
-> +	return kvm_get_mode() == KVM_MODE_PROTECTED;
->  }
->  #endif /* CONFIG_KVM */
->  
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 1cb39c0803a4..8d5e23198dfd 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -2121,7 +2121,11 @@ static int __init early_kvm_mode_cfg(char *arg)
->  		return -EINVAL;
->  
->  	if (strcmp(arg, "protected") == 0) {
-> -		kvm_mode = KVM_MODE_PROTECTED;
-> +		if (!is_kernel_in_hyp_mode())
-> +			kvm_mode = KVM_MODE_PROTECTED;
-> +		else
-> +			pr_warn_once("Protected KVM not available with VHE\n");
+> I tried that before: kvm_pgtable_stage2_map() is shared with the
+> hypervisor so sadly we can't go poking around in the host as this breaks
+> on nVHE. I mentioned it in the v12 cover letter but it was in a wall of
+> text:
 
-... assuming this is only for M1, it might be better to say:
+Ah, I missed this in the cover letter (haven't read it).
 
-	Protected KVM not available on this hardware
+So, apart from the nitpick with the early return for less indentation,
+feel free to add:
 
-... since that doesn't suggest that other VHE-capable HW is also not
-PKVM-capable.
-
-Thanks,
-Mark.
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
