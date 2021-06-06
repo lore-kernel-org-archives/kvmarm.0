@@ -1,93 +1,72 @@
-Return-Path: <SRS0=TgZW=K7=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=C/bf=LA=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26E15C47082
-	for <kvmarm@archiver.kernel.org>; Sat,  5 Jun 2021 08:46:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 720DBC47096
+	for <kvmarm@archiver.kernel.org>; Sun,  6 Jun 2021 10:10:57 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9CE1E61057
-	for <kvmarm@archiver.kernel.org>; Sat,  5 Jun 2021 08:46:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CE1E61057
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
+	by mail.kernel.org (Postfix) with ESMTP id E3979613EF
+	for <kvmarm@archiver.kernel.org>; Sun,  6 Jun 2021 10:10:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3979613EF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 47ED449F5F;
-	Sat,  5 Jun 2021 04:46:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B3354A173;
+	Sun,  6 Jun 2021 06:10:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@chromium.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QVg4LJMnARKk; Sat,  5 Jun 2021 04:46:29 -0400 (EDT)
+	with ESMTP id QP80KrZoI35t; Sun,  6 Jun 2021 06:10:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 70B984A1B0;
-	Sat,  5 Jun 2021 04:46:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 19EB040870;
+	Sun,  6 Jun 2021 06:10:55 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4951A40D0A
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jun 2021 20:58:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 22B7A40839
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  6 Jun 2021 06:10:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vYEOJIZ9xW+n for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Jun 2021 20:58:18 -0400 (EDT)
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com
- [209.85.215.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1A0C749E5F
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jun 2021 20:58:18 -0400 (EDT)
-Received: by mail-pg1-f172.google.com with SMTP id i5so9212191pgm.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 04 Jun 2021 17:58:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chromium.org; s=google;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=osHu87SZoZXOMS0NS84nF9iOOHnrmeoNqfJAhUD9Nl8=;
- b=Pa2JkyxLSE1rRGXabDLfYGJX/e+p4npDVCtYeuxRukmJiFGdGIs7Vo8XKOzfnQzs/h
- pbb10ZmPwg85W0Dj/cd2W3ynNa33DRRMiaarmlMcQH7ryJSk8MkcmDQypI8DrMcWoYol
- 7goaClgk0qO6BplZ0Ao8y/pEzN0c96DZijxn0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=osHu87SZoZXOMS0NS84nF9iOOHnrmeoNqfJAhUD9Nl8=;
- b=gixMJoj/t2lIoGlsUmgzFQv/uyGo/MCqpH0U+kHX+hahQ+wL1B+5nwYJCoE9q5UXeY
- jNh8asmJb+/CcjBOYPK+jrQDsJf8XvdNtw8tRb/sGXz1zwJjvCY4hj9F0VNWtJtF4vss
- x9PoaQ+qQs8tcBSkhaIPQk9EIWLal18BKYyEYXTw0xOrLU2fEqvbOmBiXHayR7BOVNM4
- nuumKy353BeQbRQzPKtx36NCz4MKz/W0jEsyhNZhc5OltyANbfR2PMgV4v7yQwrZ1Svt
- Ni+QUV9x5qevWjAh+BxKO9/3hNZE4Q9imxkuU76hHf1G1YVUSbpVkFRFJeQSZF9Roflf
- Hjig==
-X-Gm-Message-State: AOAM530GWJoqYcRiHfE6uVW7d8sUtDKeawemKm7lCxkSY+kME6+Z65qr
- g9qjQAHrUXI2V75JM2XsDrbZeg==
-X-Google-Smtp-Source: ABdhPJy+XB9KHA35L5KIcgyH8Y+GaTXYvt2kl0/zackCdS6suLdzG8cg7LKDJkfhiNoNuu0cLhDNPw==
-X-Received: by 2002:a63:4145:: with SMTP id o66mr7648691pga.4.1622854697107;
- Fri, 04 Jun 2021 17:58:17 -0700 (PDT)
-Received: from google.com ([2409:10:2e40:5100:5981:261e:350c:bb45])
- by smtp.gmail.com with ESMTPSA id v11sm2662358pfm.143.2021.06.04.17.58.12
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 04 Jun 2021 17:58:16 -0700 (PDT)
-Date: Sat, 5 Jun 2021 09:58:10 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [RFC][PATCH] kvm: add suspend pm-notifier
-Message-ID: <YLrMIugtkxePl/UZ@google.com>
-References: <20210603164315.682994-1-senozhatsky@chromium.org>
- <87v96uyq2v.wl-maz@kernel.org> <YLnwXD5pPplTrmoZ@google.com>
- <87tumeymih.wl-maz@kernel.org>
+ with ESMTP id zDG2fETgvP8o for <kvmarm@lists.cs.columbia.edu>;
+ Sun,  6 Jun 2021 06:10:52 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C584940629
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  6 Jun 2021 06:10:52 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id AB58760FEE;
+ Sun,  6 Jun 2021 10:10:51 +0000 (UTC)
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
+ TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1lppk1-005kDE-KN; Sun, 06 Jun 2021 11:10:49 +0100
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <87tumeymih.wl-maz@kernel.org>
-X-Mailman-Approved-At: Sat, 05 Jun 2021 04:46:23 -0400
-Cc: linux-s390@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Sean Christopherson <seanjc@google.com>, Huacai Chen <chenhuacai@kernel.org>,
- linux-kernel@vger.kernel.org, kvm-ppc@vger.kernel.org,
- linux-mips@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
- Sergey Senozhatsky <senozhatsky@chromium.org>,
- Suleiman Souhlal <suleiman@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>
+Date: Sun, 06 Jun 2021 11:10:49 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: Ricardo Koller <ricarkol@google.com>
+Subject: Re: [PATCH] KVM: selftests: Rename vm_handle_exception in evmcs test
+In-Reply-To: <YLqzI9THXBX2dWDE@google.com>
+References: <20210604181833.1769900-1-ricarkol@google.com>
+ <YLqanpE8tdiNeoaN@google.com> <YLqzI9THXBX2dWDE@google.com>
+User-Agent: Roundcube Webmail/1.4.11
+Message-ID: <6d1f569a5260612eb0704e31655d168d@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: ricarkol@google.com, seanjc@google.com,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, pbonzini@redhat.com,
+ drjones@redhat.com, eric.auger@redhat.com, oliver.sang@intel.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
+ kernel test robot <oliver.sang@intel.com>, pbonzini@redhat.com,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -99,37 +78,88 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On (21/06/04 11:03), Marc Zyngier wrote:
-[..]
-> > Well on the other hand PM-callbacks are harmless on those archs, they
-> > won't overload the __weak function.
+On 2021-06-05 00:11, Ricardo Koller wrote:
+> On Fri, Jun 04, 2021 at 09:26:54PM +0000, Sean Christopherson wrote:
+>> On Fri, Jun 04, 2021, Ricardo Koller wrote:
+>> > Kernel test robot reports this:
+>> >
+>> > > /usr/bin/ld: tools/testing/selftests/kvm/x86_64/evmcs_test.c:157: undefined reference to `vm_handle_exception'
+>> > > /usr/bin/ld: tools/testing/selftests/kvm/x86_64/evmcs_test.c:158: undefined reference to `vm_handle_exception'
+>> > > collect2: error: ld returned 1 exit status
+>> >
+>> > Fix it by renaming vm_handle_exception to vm_install_vector_handler in
+>> > evmcs_test.c.
+>> >
+>> > Fixes: a2bad6a990a4 ("KVM: selftests: Rename vm_handle_exception")
+>> 
+>> Belated code review...
 > 
-> I don't care much for the callbacks. But struct kvm is bloated enough,
-> and I'd be happy not to have this structure embedded in it if I can
-> avoid it.
-
-Got it.
-
-> > > How about passing the state to the notifier callback? I'd expect it to
-> > > be useful to do something on resume too.
-> > 
-> > For different states we can have different kvm_arch functions instead.
-> > kvm_arch_pm_notifier() can be renamed to kvm_arch_suspend_notifier(),
-> > so that we don't need to have `switch (state)` in every arch-code. Then
-> > for resume/post resume states we can have kvm_arch_resume_notifier()
-> > arch functions.
+> Thanks for the review.
 > 
-> I'd rather we keep an arch API that is similar to the one the rest of
-> the kernel has, instead of a flurry of small helpers that need to grow
-> each time someone adds a new PM state. A switch() in the arch-specific
-> implementation is absolutely fine.
+>> Can we rename the helper to vm_install_exception_handler()?
+>> 
+>> In x86, "vector" is the number of the exception and "vectoring" is the 
+>> process
+>> of determining the resulting vector that gets delivered to software 
+>> (e.g. when
+>> dealing with contributory faults like #GP->#PF->#DF), but the thing 
+>> that's being
+>> handled is an exception.
+> 
+> Got it. What about this renaming:
+> 
+>   vm_handle_exception(vec) 		-> vm_install_exception_handler(vec)
+>   vm_install_exception_handler(vec, ec)	-> vm_install_sync_handler(vec, 
+> ec)
+> 
+>> 
+>> arm appears to have similar terminology.  And looking at the arm code, 
+>> it's very
+>> confusing to have a helper vm_install_vector_handler() install into
+>> exception_handlers, _not_ into vector_handlers.  Calling the 
+>> vector_handlers
+>> "default" handlers is also confusing, as "default" usually implies the 
+>> thing can
+>> be overwritten.  But in this case, the "default" handler is just 
+>> another layer
+>> in the routing.
+>> 
+>> The multiple layers of routing is also confusing and a bit hard to 
+>> wade through
+>> for the uninitiated.  The whole thing can be made more straightfoward 
+>> by doing
+>> away with the intermediate routing, whacking ~50 lines of code in the 
+>> process.
+>> E.g. (definitely not functional code):
+> 
+> I think that works and it does remove a bunch of code. Just need to 
+> play
+> with the idea and check that it can cover all cases.
+> 
+> For now, given that the build is broken, what about this series of
+> patches:
+> 
+> 1. keep this patch to fix x86 kvm selftests
+> 2. rename both arm and x86 to vm_install_exception_handler and
+> vm_install_sync_handler
+> 3. restructure the internals of exception handling in arm
+> 
+> Alternatively, I can send 1+2 together and then 3. What do you think?
 
-OK.
+This is becoming a bit messy. I'd rather drop the whole series from
+-next, and get something that doesn't break in the middle. Please
+resend the series tested on top of -rc4.
+
+Thanks,
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
