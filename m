@@ -2,73 +2,80 @@ Return-Path: <SRS0=60kf=LB=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 876E9C47094
-	for <kvmarm@archiver.kernel.org>; Mon,  7 Jun 2021 16:19:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ECBCC47094
+	for <kvmarm@archiver.kernel.org>; Mon,  7 Jun 2021 16:35:30 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id F24ED61447
-	for <kvmarm@archiver.kernel.org>; Mon,  7 Jun 2021 16:19:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F24ED61447
+	by mail.kernel.org (Postfix) with ESMTP id 221C561E61
+	for <kvmarm@archiver.kernel.org>; Mon,  7 Jun 2021 16:35:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 221C561E61
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E5F24A51D;
-	Mon,  7 Jun 2021 12:19:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A53FE4B089;
+	Mon,  7 Jun 2021 12:35:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ecVZjSpO7cEH; Mon,  7 Jun 2021 12:19:14 -0400 (EDT)
+	with ESMTP id djJPSRfwocYL; Mon,  7 Jun 2021 12:35:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0262849E93;
-	Mon,  7 Jun 2021 12:19:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0084E4AEE2;
+	Mon,  7 Jun 2021 12:35:25 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CA9F549E93
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Jun 2021 12:19:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9783F4A531
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Jun 2021 12:35:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kA61f0UE4VKv for <kvmarm@lists.cs.columbia.edu>;
- Mon,  7 Jun 2021 12:19:07 -0400 (EDT)
+ with ESMTP id dXU6jbjGaHFy for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  7 Jun 2021 12:35:19 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 778F54086D
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Jun 2021 12:19:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A8F514A523
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Jun 2021 12:35:19 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 7C5BD6141E;
- Mon,  7 Jun 2021 16:19:06 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 6D1956136D;
+ Mon,  7 Jun 2021 16:35:18 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1lqHxw-005zGP-BV; Mon, 07 Jun 2021 17:19:04 +0100
-Date: Mon, 07 Jun 2021 17:19:03 +0100
-Message-ID: <87mts1zlzc.wl-maz@kernel.org>
+ id 1lqIDc-005zvV-D8; Mon, 07 Jun 2021 17:35:16 +0100
+Date: Mon, 07 Jun 2021 17:35:15 +0100
+Message-ID: <87lf7lzl8c.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH] KVM: selftests: Rename vm_handle_exception in evmcs test
-In-Reply-To: <YL5ETJatW+BM9vKS@google.com>
-References: <20210604181833.1769900-1-ricarkol@google.com>
- <YLqanpE8tdiNeoaN@google.com> <YLqzI9THXBX2dWDE@google.com>
- <6d1f569a5260612eb0704e31655d168d@kernel.org>
- <YL5ETJatW+BM9vKS@google.com>
+To: "Jain, Jinank" <jinankj@amazon.de>
+Subject: Re: [PATCH] KVM: arm64: Properly restore PMU state during
+ live-migration
+In-Reply-To: <0a694ea93303bfa04530cd940f692244e1ccd1e7.camel@amazon.de>
+References: <20210603110554.13643-1-jinankj@amazon.de>
+ <87wnrbylxv.wl-maz@kernel.org>
+ <0a694ea93303bfa04530cd940f692244e1ccd1e7.camel@amazon.de>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: seanjc@google.com, ricarkol@google.com,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, pbonzini@redhat.com,
- drjones@redhat.com, eric.auger@redhat.com, oliver.sang@intel.com
+X-SA-Exim-Rcpt-To: jinankj@amazon.de, james.morse@arm.com,
+ kvmarm@lists.cs.columbia.edu, suzuki.poulose@arm.com,
+ linux-kernel@vger.kernel.org, catalin.marinas@arm.com,
+ linux-arm-kernel@lists.infradead.org, will@kernel.org,
+ alexandru.elisei@arm.com, graf@amazon.de
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, kernel test robot <oliver.sang@intel.com>,
- pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+Cc: "Graf \(AWS\), Alexander" <graf@amazon.de>,
+ "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "will@kernel.org" <will@kernel.org>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+ "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -85,25 +92,158 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 07 Jun 2021 17:07:40 +0100,
-Sean Christopherson <seanjc@google.com> wrote:
+On Mon, 07 Jun 2021 17:05:01 +0100,
+"Jain, Jinank" <jinankj@amazon.de> wrote:
 > 
-> On Sun, Jun 06, 2021, Marc Zyngier wrote:
-> > This is becoming a bit messy. I'd rather drop the whole series from
-> > -next, and get something that doesn't break in the middle. Please
-> > resend the series tested on top of -rc4.
+> On Thu, 2021-06-03 at 17:03 +0100, Marc Zyngier wrote:
+> >
+> > Hi Jinank,
+> > 
+> > On Thu, 03 Jun 2021 12:05:54 +0100,
+> > Jinank Jain <jinankj@amazon.de> wrote:
+> > > Currently if a guest is live-migrated while it is actively using
+> > > perf
+> > > counters, then after live-migrate it will notice that all counters
+> > > would
+> > > suddenly start reporting 0s. This is due to the fact we are not
+> > > re-creating the relevant perf events inside the kernel.
+> > > 
+> > > Usually on live-migration guest state is restored using
+> > > KVM_SET_ONE_REG
+> > > ioctl interface, which simply restores the value of PMU registers
+> > > values but does not re-program the perf events so that the guest
+> > > can seamlessly
+> > > use these counters even after live-migration like it was doing
+> > > before
+> > > live-migration.
+> > > 
+> > > Instead there are two completely different code path between guest
+> > > accessing PMU registers and VMM restoring counters on
+> > > live-migration.
+> > > 
+> > > In case of KVM_SET_ONE_REG:
+> > > 
+> > > kvm_arm_set_reg()
+> > > ...... kvm_arm_sys_reg_set_reg()
+> > > ........... reg_from_user()
+> > > 
+> > > but in case when guest tries to access these counters:
+> > > 
+> > > handle_exit()
+> > > ..... kvm_handle_sys_reg()
+> > > ..........perform_access()
+> > > ...............access_pmu_evcntr()
+> > > ...................kvm_pmu_set_counter_value()
+> > > .......................kvm_pmu_create_perf_event()
+> > > 
+> > > The drawback of using the KVM_SET_ONE_REG interface is that the
+> > > host pmu
+> > > events which were registered for the source instance and not
+> > > present for
+> > > the destination instance.
+> > 
+> > I can't parse this sentence. Do you mean "are not present"?
+> > 
+> > > Thus passively restoring PMCR_EL0 using
+> > > KVM_SET_ONE_REG interface would not create the necessary host pmu
+> > > events
+> > > which are crucial for seamless guest experience across live
+> > > migration.
+> > > 
+> > > In ordet to fix the situation, on first vcpu load we should restore
+> > > PMCR_EL0 in the same exact way like the guest was trying to access
+> > > these counters. And then we will also recreate the relevant host
+> > > pmu
+> > > events.
+> > > 
+> > > Signed-off-by: Jinank Jain <jinankj@amazon.de>
+> > > Cc: Alexander Graf (AWS) <graf@amazon.de>
+> > > Cc: Marc Zyngier <maz@kernel.org>
+> > > Cc: James Morse <james.morse@arm.com>
+> > > Cc: Alexandru Elisei <alexandru.elisei@arm.com>
+> > > Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+> > > Cc: Catalin Marinas <catalin.marinas@arm.com>
+> > > Cc: Will Deacon <will@kernel.org>
+> > > ---
+> > >  arch/arm64/include/asm/kvm_host.h |  1 +
+> > >  arch/arm64/kvm/arm.c              |  1 +
+> > >  arch/arm64/kvm/pmu-emul.c         | 10 ++++++++--
+> > >  arch/arm64/kvm/pmu.c              | 15 +++++++++++++++
+> > >  include/kvm/arm_pmu.h             |  3 +++
+> > >  5 files changed, 28 insertions(+), 2 deletions(-)
+> > > 
+> > > diff --git a/arch/arm64/include/asm/kvm_host.h
+> > > b/arch/arm64/include/asm/kvm_host.h
+> > > index 7cd7d5c8c4bc..2376ad3c2fc2 100644
+> > > --- a/arch/arm64/include/asm/kvm_host.h
+> > > +++ b/arch/arm64/include/asm/kvm_host.h
+> > > @@ -745,6 +745,7 @@ static inline int
+> > > kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+> > >  void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr);
+> > >  void kvm_clr_pmu_events(u32 clr);
+> > > 
+> > > +void kvm_vcpu_pmu_restore(struct kvm_vcpu *vcpu);
+> > >  void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu);
+> > >  void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
+> > >  #else
+> > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > > index e720148232a0..c66f6d16ec06 100644
+> > > --- a/arch/arm64/kvm/arm.c
+> > > +++ b/arch/arm64/kvm/arm.c
+> > > @@ -408,6 +408,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu,
+> > > int cpu)
+> > >       if (has_vhe())
+> > >               kvm_vcpu_load_sysregs_vhe(vcpu);
+> > >       kvm_arch_vcpu_load_fp(vcpu);
+> > > +     kvm_vcpu_pmu_restore(vcpu);
+> > 
+> > If this only needs to be run once per vcpu, why not trigger it from
+> > kvm_arm_pmu_v3_enable(), which is also called once per vcpu?
+> > 
+> > This can done on the back of a request, saving most of the overhead
+> > and not requiring any extra field. Essentially, something like the
+> > (untested) patch below.
+> > 
+> > >       kvm_vcpu_pmu_restore_guest(vcpu);
+> > >       if (kvm_arm_is_pvtime_enabled(&vcpu->arch))
+> > >               kvm_make_request(KVM_REQ_RECORD_STEAL, vcpu);
+> > > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> > > index fd167d4f4215..12a40f4b5f0d 100644
+> > > --- a/arch/arm64/kvm/pmu-emul.c
+> > > +++ b/arch/arm64/kvm/pmu-emul.c
+> > > @@ -574,10 +574,16 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu
+> > > *vcpu, u64 val)
+> > >               kvm_pmu_disable_counter_mask(vcpu, mask);
+> > >       }
+> > > 
+> > > -     if (val & ARMV8_PMU_PMCR_C)
+> > > +     /*
+> > > +      * Cycle counter needs to reset in case of first vcpu load.
+> > > +      */
+> > > +     if (val & ARMV8_PMU_PMCR_C || !kvm_arm_pmu_v3_restored(vcpu))
+> > 
+> > Why? There is no architectural guarantee that a counter resets to 0
+> > without writing PMCR_EL0.C. And if you want the guest to continue
+> > counting where it left off, resetting the counter is at best
+> > counter-productive.
 > 
-> That'd be my preference too.  I almost asked if it could be (temporarily)
-> dropped, but I assumed the hashes in -next are intended to be stable.
+> Without this we would not be resetting PMU which is required for
+> creating host perf events. With the patch that you suggested we are
+> restoring PMCR_EL0 properly but still missing recreation of host perf
+> events.
 
-I usually try and keep these commits stable.
+How? The request that gets set on the first vcpu run will call
+kvm_pmu_handle_pmcr() -> kvm_pmu_enable_counter_mask() ->
+kvm_pmu_create_perf_event(). What are we missing?
 
-But in this case, we end-up with a broken build at some point in the
-series. For such cases, I'm more than happy to drop the series and
-merge a clean version again (I keep each series on a separate branch
-for this exact purpose).
+> And without host perf events, guest would still zeros after live
+> migration. In my opinion we have two ways to fix it. We can fix it
+> inside the kernel or let userspace/VMM set those bits before
+> restarting the guest on the destination machine. What do you think?
 
-Thanks,
+I think either you're missing my point above, or I'm completely
+missing yours. And I still don't understand why you want to zero the
+counters that you have just restored. How does that help?
 
 	M.
 
