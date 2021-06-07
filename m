@@ -2,96 +2,90 @@ Return-Path: <SRS0=60kf=LB=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_ADSP_ALL,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60CDAC47095
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9060C47082
 	for <kvmarm@archiver.kernel.org>; Mon,  7 Jun 2021 17:17:18 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B2A316102A
-	for <kvmarm@archiver.kernel.org>; Mon,  7 Jun 2021 17:17:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2A316102A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amazon.de
+	by mail.kernel.org (Postfix) with ESMTP id 78C3F6105A
+	for <kvmarm@archiver.kernel.org>; Mon,  7 Jun 2021 17:17:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78C3F6105A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 21BE44A4E1;
-	Mon,  7 Jun 2021 13:17:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 271B84B0B5;
+	Mon,  7 Jun 2021 13:17:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@amazon.de
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id FB3VYn-rN2r0; Mon,  7 Jun 2021 13:17:15 -0400 (EDT)
+	with ESMTP id GkeegYBK19cu; Mon,  7 Jun 2021 13:17:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 61CD74AED4;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 80E274B089;
 	Mon,  7 Jun 2021 13:17:15 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A717B4AC78
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Jun 2021 12:05:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F8644A173
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Jun 2021 12:07:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Zy8+eZlJa5CZ for <kvmarm@lists.cs.columbia.edu>;
- Mon,  7 Jun 2021 12:05:15 -0400 (EDT)
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B60DF4A173
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Jun 2021 12:05:15 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
- t=1623081916; x=1654617916;
- h=from:to:cc:date:message-id:references:in-reply-to:
- content-id:mime-version:content-transfer-encoding:subject;
- bh=Gm+1HoiO2hCI9xcdJsrs/UAeeMTFj7ruUIE1rSGlkoE=;
- b=U8d643yMwCyxRFFlRLYP+y1IEtdosrxgHXA2EapTT5ebAB86wmO7Kal6
- zNW5LpK5UsDHNVHsewIZLWzcdTMVcA4kcsLpJvdu1ELFTL5SSDRZ+NQ1q
- h6+b0qzGXRSHzdlR8TMgSEYoEyhWE4BJvBhNvs5WKeCYIj9QaMtWXgdQe 4=;
-X-IronPort-AV: E=Sophos;i="5.83,255,1616457600"; d="scan'208";a="117098644"
-Subject: Re: [PATCH] KVM: arm64: Properly restore PMU state during
- live-migration
-Thread-Topic: [PATCH] KVM: arm64: Properly restore PMU state during
- live-migration
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO
- email-inbound-relay-1e-57e1d233.us-east-1.amazon.com) ([10.43.8.2])
- by smtp-border-fw-6002.iad6.amazon.com with ESMTP; 07 Jun 2021 16:05:08 +0000
-Received: from EX13MTAUWC001.ant.amazon.com
- (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
- by email-inbound-relay-1e-57e1d233.us-east-1.amazon.com (Postfix) with ESMTPS
- id 50255140A77; Mon,  7 Jun 2021 16:05:04 +0000 (UTC)
-Received: from EX13D20UWC002.ant.amazon.com (10.43.162.163) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1497.18; Mon, 7 Jun 2021 16:05:03 +0000
-Received: from EX13D19EUA001.ant.amazon.com (10.43.165.74) by
- EX13D20UWC002.ant.amazon.com (10.43.162.163) with Microsoft SMTP Server (TLS)
- id 15.0.1497.18; Mon, 7 Jun 2021 16:05:02 +0000
-Received: from EX13D19EUA001.ant.amazon.com ([10.43.165.74]) by
- EX13D19EUA001.ant.amazon.com ([10.43.165.74]) with mapi id 15.00.1497.018;
- Mon, 7 Jun 2021 16:05:01 +0000
-From: "Jain, Jinank" <jinankj@amazon.de>
-To: "maz@kernel.org" <maz@kernel.org>
-Thread-Index: AQHXWGiDwgcuw84aU0uAgEUSGDYWHasCc0sAgAZJnQA=
-Date: Mon, 7 Jun 2021 16:05:01 +0000
-Message-ID: <0a694ea93303bfa04530cd940f692244e1ccd1e7.camel@amazon.de>
-References: <20210603110554.13643-1-jinankj@amazon.de>
- <87wnrbylxv.wl-maz@kernel.org>
-In-Reply-To: <87wnrbylxv.wl-maz@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.43.164.49]
-Content-ID: <D764C132FF194942A2E6944525E0C0C8@amazon.com>
+ with ESMTP id 5JPaJob+jr9a for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  7 Jun 2021 12:07:46 -0400 (EDT)
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com
+ [209.85.210.177])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7E80049E5F
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Jun 2021 12:07:46 -0400 (EDT)
+Received: by mail-pf1-f177.google.com with SMTP id m7so503657pfa.10
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 07 Jun 2021 09:07:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=4pT+fPdmYDqDMFuFLXYZiJ/4/kBu8OXPCoDOzFw+hto=;
+ b=s8B6/VkuyXq4qdYRCmbgDg+SuezH6hOi58cGFA8q/J9XqHQlocG8YjLu7ejgMWS/xX
+ fed8XbG0wA0QUN4lym+108KLQDsbNs4KIbRKYo6ilZOvq0o+d6UyoR//aLXn1Hu/vlAq
+ yP1ZP+cxFayYOfDE9LeAJPdGGrWedrAAUYMHZSd48ZxJfOHA8eMFXyZJhu15By4aWLpE
+ wE70dG4QXBHkg2XblNgK4vtxL/COW5tWSLBPuBynh4Db6gExW4b3XTknI75Gwm8TIZ5b
+ 4pEaSRuON5OtGFW4NYQDPLWQvFtE4A0IvVd/m1uWCVKDTMruHgrAinkwRR9JPq0A+Iss
+ gf/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=4pT+fPdmYDqDMFuFLXYZiJ/4/kBu8OXPCoDOzFw+hto=;
+ b=Q0fMHe8kiO/T6nDSFUDWipW0ZU/32NuSqEsJzPClGibe8RmP4jxe2dHR4zgKZHfnTi
+ /L6K9mU8mPgetEiMXwGqwPH8yIyacXEl4FF6jDPKbbmwGv5vlvcnAxx1IQSaOWOxVGsc
+ 7m95dN5mLouNkMb+c7JbC20aXla/dkFi1aKDoVjwMZ+ZswkPupYPHloUZBPfeuwkY+ms
+ L4hlu4XxgRIQ4bR3mT/aILTvLR5Rhf+GXbnhlKUbMVcB5PWb2adNWHqiINK35qB/2X5Q
+ lyPwGe7DLBsqn3qqBEoJHsHgZc6StJINqOHlUYkz7CTJNTsr+oDesamYVwqeUUHfWkYA
+ UwZQ==
+X-Gm-Message-State: AOAM530oq6rCRcoPiFfKhriwzGylxXc54KBvB0KSC8zma4s10JEOurRi
+ 5BgrTNaJ+55zaK2qUXzcpvqXyg==
+X-Google-Smtp-Source: ABdhPJwlwJ6AkmZNuLpzKISd0pSadI1yVpmHR5ZCOBmzeB1TAshfbuXw/bugo1uFnF0tkAOa9I2F0g==
+X-Received: by 2002:a62:8204:0:b029:2ea:2647:bb4f with SMTP id
+ w4-20020a6282040000b02902ea2647bb4fmr17635905pfd.23.1623082065121; 
+ Mon, 07 Jun 2021 09:07:45 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com.
+ [35.247.111.240])
+ by smtp.gmail.com with ESMTPSA id g63sm8580661pfb.55.2021.06.07.09.07.44
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 07 Jun 2021 09:07:44 -0700 (PDT)
+Date: Mon, 7 Jun 2021 16:07:40 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH] KVM: selftests: Rename vm_handle_exception in evmcs test
+Message-ID: <YL5ETJatW+BM9vKS@google.com>
+References: <20210604181833.1769900-1-ricarkol@google.com>
+ <YLqanpE8tdiNeoaN@google.com> <YLqzI9THXBX2dWDE@google.com>
+ <6d1f569a5260612eb0704e31655d168d@kernel.org>
 MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <6d1f569a5260612eb0704e31655d168d@kernel.org>
 X-Mailman-Approved-At: Mon, 07 Jun 2021 13:17:14 -0400
-Cc: "Graf \(AWS\), Alexander" <graf@amazon.de>,
- "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "will@kernel.org" <will@kernel.org>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Cc: kvm@vger.kernel.org, kernel test robot <oliver.sang@intel.com>,
+ pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -108,263 +102,15 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 2021-06-03 at 17:03 +0100, Marc Zyngier wrote:
-> CAUTION: This email originated from outside of the organization. Do
-> not click links or open attachments unless you can confirm the sender
-> and know the content is safe.
-> 
-> 
-> 
-> Hi Jinank,
-> 
-> On Thu, 03 Jun 2021 12:05:54 +0100,
-> Jinank Jain <jinankj@amazon.de> wrote:
-> > Currently if a guest is live-migrated while it is actively using
-> > perf
-> > counters, then after live-migrate it will notice that all counters
-> > would
-> > suddenly start reporting 0s. This is due to the fact we are not
-> > re-creating the relevant perf events inside the kernel.
-> > 
-> > Usually on live-migration guest state is restored using
-> > KVM_SET_ONE_REG
-> > ioctl interface, which simply restores the value of PMU registers
-> > values but does not re-program the perf events so that the guest
-> > can seamlessly
-> > use these counters even after live-migration like it was doing
-> > before
-> > live-migration.
-> > 
-> > Instead there are two completely different code path between guest
-> > accessing PMU registers and VMM restoring counters on
-> > live-migration.
-> > 
-> > In case of KVM_SET_ONE_REG:
-> > 
-> > kvm_arm_set_reg()
-> > ...... kvm_arm_sys_reg_set_reg()
-> > ........... reg_from_user()
-> > 
-> > but in case when guest tries to access these counters:
-> > 
-> > handle_exit()
-> > ..... kvm_handle_sys_reg()
-> > ..........perform_access()
-> > ...............access_pmu_evcntr()
-> > ...................kvm_pmu_set_counter_value()
-> > .......................kvm_pmu_create_perf_event()
-> > 
-> > The drawback of using the KVM_SET_ONE_REG interface is that the
-> > host pmu
-> > events which were registered for the source instance and not
-> > present for
-> > the destination instance.
-> 
-> I can't parse this sentence. Do you mean "are not present"?
-> 
-> > Thus passively restoring PMCR_EL0 using
-> > KVM_SET_ONE_REG interface would not create the necessary host pmu
-> > events
-> > which are crucial for seamless guest experience across live
-> > migration.
-> > 
-> > In ordet to fix the situation, on first vcpu load we should restore
-> > PMCR_EL0 in the same exact way like the guest was trying to access
-> > these counters. And then we will also recreate the relevant host
-> > pmu
-> > events.
-> > 
-> > Signed-off-by: Jinank Jain <jinankj@amazon.de>
-> > Cc: Alexander Graf (AWS) <graf@amazon.de>
-> > Cc: Marc Zyngier <maz@kernel.org>
-> > Cc: James Morse <james.morse@arm.com>
-> > Cc: Alexandru Elisei <alexandru.elisei@arm.com>
-> > Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-> > Cc: Catalin Marinas <catalin.marinas@arm.com>
-> > Cc: Will Deacon <will@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/kvm_host.h |  1 +
-> >  arch/arm64/kvm/arm.c              |  1 +
-> >  arch/arm64/kvm/pmu-emul.c         | 10 ++++++++--
-> >  arch/arm64/kvm/pmu.c              | 15 +++++++++++++++
-> >  include/kvm/arm_pmu.h             |  3 +++
-> >  5 files changed, 28 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_host.h
-> > b/arch/arm64/include/asm/kvm_host.h
-> > index 7cd7d5c8c4bc..2376ad3c2fc2 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -745,6 +745,7 @@ static inline int
-> > kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
-> >  void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr);
-> >  void kvm_clr_pmu_events(u32 clr);
-> > 
-> > +void kvm_vcpu_pmu_restore(struct kvm_vcpu *vcpu);
-> >  void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu);
-> >  void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
-> >  #else
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index e720148232a0..c66f6d16ec06 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -408,6 +408,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu,
-> > int cpu)
-> >       if (has_vhe())
-> >               kvm_vcpu_load_sysregs_vhe(vcpu);
-> >       kvm_arch_vcpu_load_fp(vcpu);
-> > +     kvm_vcpu_pmu_restore(vcpu);
-> 
-> If this only needs to be run once per vcpu, why not trigger it from
-> kvm_arm_pmu_v3_enable(), which is also called once per vcpu?
-> 
-> This can done on the back of a request, saving most of the overhead
-> and not requiring any extra field. Essentially, something like the
-> (untested) patch below.
-> 
-> >       kvm_vcpu_pmu_restore_guest(vcpu);
-> >       if (kvm_arm_is_pvtime_enabled(&vcpu->arch))
-> >               kvm_make_request(KVM_REQ_RECORD_STEAL, vcpu);
-> > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> > index fd167d4f4215..12a40f4b5f0d 100644
-> > --- a/arch/arm64/kvm/pmu-emul.c
-> > +++ b/arch/arm64/kvm/pmu-emul.c
-> > @@ -574,10 +574,16 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu
-> > *vcpu, u64 val)
-> >               kvm_pmu_disable_counter_mask(vcpu, mask);
-> >       }
-> > 
-> > -     if (val & ARMV8_PMU_PMCR_C)
-> > +     /*
-> > +      * Cycle counter needs to reset in case of first vcpu load.
-> > +      */
-> > +     if (val & ARMV8_PMU_PMCR_C || !kvm_arm_pmu_v3_restored(vcpu))
-> 
-> Why? There is no architectural guarantee that a counter resets to 0
-> without writing PMCR_EL0.C. And if you want the guest to continue
-> counting where it left off, resetting the counter is at best
-> counter-productive.
+On Sun, Jun 06, 2021, Marc Zyngier wrote:
+> This is becoming a bit messy. I'd rather drop the whole series from
+> -next, and get something that doesn't break in the middle. Please
+> resend the series tested on top of -rc4.
 
-Without this we would not be resetting PMU which is required for
-creating host perf events. With the patch that you suggested we are
-restoring PMCR_EL0 properly but still missing recreation of host perf
-events. And without host perf events, guest would still zeros after
-live migration. In my opinion we have two ways to fix it. We can fix it
-inside the kernel or let userspace/VMM set those bits before restarting
-the guest on the destination machine. What do you think?
+That'd be my preference too.  I almost asked if it could be (temporarily)
+dropped, but I assumed the hashes in -next are intended to be stable.
 
-> 
-> So I must be missing something...
-> 
-> >               kvm_pmu_set_counter_value(vcpu, ARMV8_PMU_CYCLE_IDX,
-> > 0);
-> > 
-> > -     if (val & ARMV8_PMU_PMCR_P) {
-> > +     /*
-> > +      * All the counters needs to reset in case of first vcpu
-> > load.
-> > +      */
-> > +     if (val & ARMV8_PMU_PMCR_P || !kvm_arm_pmu_v3_restored(vcpu))
-> > {
-> 
-> Same thing here.
-> 
-> >               for_each_set_bit(i, &mask, 32)
-> >                       kvm_pmu_set_counter_value(vcpu, i, 0);
-> >       }
-> 
-> The rest of the changes should be unnecessary with the patch below.
-> 
-> Thanks,
-> 
->         M.
-> 
-> From 1be188ab71867632a8c17384be6e55f47f42aa8b Mon Sep 17 00:00:00
-> 2001
-> From: Marc Zyngier <maz@kernel.org>
-> Date: Thu, 3 Jun 2021 16:50:02 +0100
-> Subject: [PATCH] KVM: arm64: Restore PMU configuration on first run
-> 
-> Restoring a guest with an active virtual PMU results in no perf
-> counters being instanciated on the host side. Not quite what
-> you'd expect from a restore.
-> 
-> In order to fix this, force a writeback of PMCR_EL0 on the first
-> run of a vcpu (using a new request so that it happens once the
-> vcpu has been loaded). This will in turn create all the host-side
-> counters that were missing.
-> 
-> Reported-by: Jinank Jain <jinankj@amazon.de>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_host.h | 1 +
->  arch/arm64/kvm/arm.c              | 4 ++++
->  arch/arm64/kvm/pmu-emul.c         | 3 +++
->  3 files changed, 8 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h
-> b/arch/arm64/include/asm/kvm_host.h
-> index 7cd7d5c8c4bc..6336b4309114 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -46,6 +46,7 @@
->  #define KVM_REQ_VCPU_RESET     KVM_ARCH_REQ(2)
->  #define KVM_REQ_RECORD_STEAL   KVM_ARCH_REQ(3)
->  #define KVM_REQ_RELOAD_GICv4   KVM_ARCH_REQ(4)
-> +#define KVM_REQ_RELOAD_PMU     KVM_ARCH_REQ(5)
-> 
->  #define
-> KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
->                                      KVM_DIRTY_LOG_INITIALLY_SET)
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index e720148232a0..facf4d41d32a 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -689,6 +689,10 @@ static void check_vcpu_requests(struct kvm_vcpu
-> *vcpu)
->                         vgic_v4_load(vcpu);
->                         preempt_enable();
->                 }
-> +
-> +               if (kvm_check_request(KVM_REQ_RELOAD_PMU, vcpu))
-> +                       kvm_pmu_handle_pmcr(vcpu,
-> +                                           __vcpu_sys_reg(vcpu,
-> PMCR_EL0));
->         }
->  }
-> 
-> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> index fd167d4f4215..a0bbb7111f57 100644
-> --- a/arch/arm64/kvm/pmu-emul.c
-> +++ b/arch/arm64/kvm/pmu-emul.c
-> @@ -850,6 +850,9 @@ int kvm_arm_pmu_v3_enable(struct kvm_vcpu *vcpu)
->                    return -EINVAL;
->         }
-> 
-> +       /* One-off reload of the PMU on first run */
-> +       kvm_make_request(KVM_REQ_RELOAD_PMU, vcpu);
-> +
->         return 0;
->  }
-> 
-> --
-> 2.30.2
-> 
-> 
-> --
-> Without deviation from the norm, progress is not possible.
-
-
-
-Amazon Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-Sitz: Berlin
-Ust-ID: DE 289 237 879
-
-
+Thanks!
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
