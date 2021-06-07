@@ -7,47 +7,48 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55B82C47095
-	for <kvmarm@archiver.kernel.org>; Mon,  7 Jun 2021 11:08:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 903F6C47082
+	for <kvmarm@archiver.kernel.org>; Mon,  7 Jun 2021 11:08:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E70C4611C0
-	for <kvmarm@archiver.kernel.org>; Mon,  7 Jun 2021 11:08:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E70C4611C0
+	by mail.kernel.org (Postfix) with ESMTP id 2F50B6121D
+	for <kvmarm@archiver.kernel.org>; Mon,  7 Jun 2021 11:08:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F50B6121D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A65A4A523;
-	Mon,  7 Jun 2021 07:08:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CEB3F4B0AD;
+	Mon,  7 Jun 2021 07:08:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id gnR9jXQFPAfO; Mon,  7 Jun 2021 07:08:43 -0400 (EDT)
+	with ESMTP id 4nNp8lgZ0ZEa; Mon,  7 Jun 2021 07:08:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 662D44B0B3;
-	Mon,  7 Jun 2021 07:08:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 86C1E4B0C3;
+	Mon,  7 Jun 2021 07:08:44 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 440334B07F
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Jun 2021 07:08:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4DE544086C
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Jun 2021 07:08:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RH-4+z8G0Xrp for <kvmarm@lists.cs.columbia.edu>;
- Mon,  7 Jun 2021 07:08:36 -0400 (EDT)
+ with ESMTP id Mztr+hMVxroT for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  7 Jun 2021 07:08:39 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ED7B74A523
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Jun 2021 07:08:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0023D4A3A5
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Jun 2021 07:08:38 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 75CA511D4;
- Mon,  7 Jun 2021 04:08:35 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 942B6143D;
+ Mon,  7 Jun 2021 04:08:38 -0700 (PDT)
 Received: from e112269-lin.arm.com (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9B45A3F73D;
- Mon,  7 Jun 2021 04:08:32 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B2F5E3F73D;
+ Mon,  7 Jun 2021 04:08:35 -0700 (PDT)
 From: Steven Price <steven.price@arm.com>
 To: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Will Deacon <will@kernel.org>
-Subject: [PATCH v14 1/8] arm64: mte: Handle race when synchronising tags
-Date: Mon,  7 Jun 2021 12:08:09 +0100
-Message-Id: <20210607110816.25762-2-steven.price@arm.com>
+Subject: [PATCH v14 2/8] arm64: Handle MTE tags zeroing in
+ __alloc_zeroed_user_highpage()
+Date: Mon,  7 Jun 2021 12:08:10 +0100
+Message-Id: <20210607110816.25762-3-steven.price@arm.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20210607110816.25762-1-steven.price@arm.com>
 References: <20210607110816.25762-1-steven.price@arm.com>
@@ -73,83 +74,75 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-mte_sync_tags() used test_and_set_bit() to set the PG_mte_tagged flag
-before restoring/zeroing the MTE tags. However if another thread were to
-race and attempt to sync the tags on the same page before the first
-thread had completed restoring/zeroing then it would see the flag is
-already set and continue without waiting. This would potentially expose
-the previous contents of the tags to user space, and cause any updates
-that user space makes before the restoring/zeroing has completed to
-potentially be lost.
+From: Catalin Marinas <catalin.marinas@arm.com>
 
-Since this code is run from atomic contexts we can't just lock the page
-during the process. Instead implement a new (global) spinlock to protect
-the mte_sync_page_tags() function.
+Currently, on an anonymous page fault, the kernel allocates a zeroed
+page and maps it in user space. If the mapping is tagged (PROT_MTE),
+set_pte_at() additionally clears the tags under a spinlock to avoid a
+race on the page->flags. In order to optimise the lock, clear the page
+tags on allocation in __alloc_zeroed_user_highpage() if the vma flags
+have VM_MTE set.
 
-Fixes: 34bfeea4a9e9 ("arm64: mte: Clear the tags when a page is mapped in user-space with PROT_MTE")
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+Signed-off-by: Catalin Marinas <catalin.marinas@arm.com>
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
- arch/arm64/kernel/mte.c | 20 +++++++++++++++++---
- 1 file changed, 17 insertions(+), 3 deletions(-)
+ arch/arm64/include/asm/page.h |  6 ++++--
+ arch/arm64/mm/fault.c         | 21 +++++++++++++++++++++
+ 2 files changed, 25 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kernel/mte.c b/arch/arm64/kernel/mte.c
-index 125a10e413e9..a3583a7fd400 100644
---- a/arch/arm64/kernel/mte.c
-+++ b/arch/arm64/kernel/mte.c
-@@ -25,6 +25,7 @@
- u64 gcr_kernel_excl __ro_after_init;
+diff --git a/arch/arm64/include/asm/page.h b/arch/arm64/include/asm/page.h
+index 012cffc574e8..97853570d0f1 100644
+--- a/arch/arm64/include/asm/page.h
++++ b/arch/arm64/include/asm/page.h
+@@ -13,6 +13,7 @@
+ #ifndef __ASSEMBLY__
  
- static bool report_fault_once = true;
-+static DEFINE_SPINLOCK(tag_sync_lock);
+ #include <linux/personality.h> /* for READ_IMPLIES_EXEC */
++#include <linux/types.h>
+ #include <asm/pgtable-types.h>
  
- #ifdef CONFIG_KASAN_HW_TAGS
- /* Whether the MTE asynchronous mode is enabled. */
-@@ -34,13 +35,22 @@ EXPORT_SYMBOL_GPL(mte_async_mode);
+ struct page;
+@@ -28,8 +29,9 @@ void copy_user_highpage(struct page *to, struct page *from,
+ void copy_highpage(struct page *to, struct page *from);
+ #define __HAVE_ARCH_COPY_HIGHPAGE
  
- static void mte_sync_page_tags(struct page *page, pte_t *ptep, bool check_swap)
- {
-+	unsigned long flags;
- 	pte_t old_pte = READ_ONCE(*ptep);
+-#define __alloc_zeroed_user_highpage(movableflags, vma, vaddr) \
+-	alloc_page_vma(GFP_HIGHUSER | __GFP_ZERO | movableflags, vma, vaddr)
++struct page *__alloc_zeroed_user_highpage(gfp_t movableflags,
++					  struct vm_area_struct *vma,
++					  unsigned long vaddr);
+ #define __HAVE_ARCH_ALLOC_ZEROED_USER_HIGHPAGE
  
-+	spin_lock_irqsave(&tag_sync_lock, flags);
-+
-+	/* Recheck with the lock held */
-+	if (test_bit(PG_mte_tagged, &page->flags))
-+		goto out;
-+
- 	if (check_swap && is_swap_pte(old_pte)) {
- 		swp_entry_t entry = pte_to_swp_entry(old_pte);
- 
--		if (!non_swap_entry(entry) && mte_restore_tags(entry, page))
--			return;
-+		if (!non_swap_entry(entry) && mte_restore_tags(entry, page)) {
-+			set_bit(PG_mte_tagged, &page->flags);
-+			goto out;
-+		}
- 	}
- 
- 	page_kasan_tag_reset(page);
-@@ -53,6 +63,10 @@ static void mte_sync_page_tags(struct page *page, pte_t *ptep, bool check_swap)
- 	 */
- 	smp_wmb();
- 	mte_clear_page_tags(page_address(page));
-+	set_bit(PG_mte_tagged, &page->flags);
-+
-+out:
-+	spin_unlock_irqrestore(&tag_sync_lock, flags);
+ #define clear_user_page(page, vaddr, pg)	clear_page(page)
+diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
+index 871c82ab0a30..5a03428e97f3 100644
+--- a/arch/arm64/mm/fault.c
++++ b/arch/arm64/mm/fault.c
+@@ -921,3 +921,24 @@ void do_debug_exception(unsigned long addr_if_watchpoint, unsigned int esr,
+ 	debug_exception_exit(regs);
  }
- 
- void mte_sync_tags(pte_t *ptep, pte_t pte)
-@@ -63,7 +77,7 @@ void mte_sync_tags(pte_t *ptep, pte_t pte)
- 
- 	/* if PG_mte_tagged is set, tags have already been initialised */
- 	for (i = 0; i < nr_pages; i++, page++) {
--		if (!test_and_set_bit(PG_mte_tagged, &page->flags))
-+		if (!test_bit(PG_mte_tagged, &page->flags))
- 			mte_sync_page_tags(page, ptep, check_swap);
- 	}
- }
+ NOKPROBE_SYMBOL(do_debug_exception);
++
++/*
++ * Used during anonymous page fault handling.
++ */
++struct page *__alloc_zeroed_user_highpage(gfp_t movableflags,
++					  struct vm_area_struct *vma,
++					  unsigned long vaddr)
++{
++	struct page *page;
++	bool tagged = system_supports_mte() && (vma->vm_flags & VM_MTE);
++
++	page = alloc_page_vma(GFP_HIGHUSER | __GFP_ZERO | movableflags, vma,
++			      vaddr);
++	if (tagged && page) {
++		mte_clear_page_tags(page_address(page));
++		page_kasan_tag_reset(page);
++		set_bit(PG_mte_tagged, &page->flags);
++	}
++
++	return page;
++}
 -- 
 2.20.1
 
