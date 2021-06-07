@@ -6,91 +6,87 @@ X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 191E4C47082
-	for <kvmarm@archiver.kernel.org>; Mon,  7 Jun 2021 08:49:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A03D5C47082
+	for <kvmarm@archiver.kernel.org>; Mon,  7 Jun 2021 10:03:34 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 89E63611AD
-	for <kvmarm@archiver.kernel.org>; Mon,  7 Jun 2021 08:49:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89E63611AD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTP id 0968061090
+	for <kvmarm@archiver.kernel.org>; Mon,  7 Jun 2021 10:03:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0968061090
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nuviainc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E2FB4B08D;
-	Mon,  7 Jun 2021 04:49:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 76C96407F4;
+	Mon,  7 Jun 2021 06:03:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linaro.org
+	(fail, message has been altered)
+	header.i=@nuviainc-com.20150623.gappssmtp.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id iALYsDZufPJ8; Mon,  7 Jun 2021 04:49:21 -0400 (EDT)
+	with ESMTP id yrIbhx3Ja2Vg; Mon,  7 Jun 2021 06:03:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E6BC4B08A;
-	Mon,  7 Jun 2021 04:49:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DFA74B080;
+	Mon,  7 Jun 2021 06:03:28 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C4D54B08B
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Jun 2021 04:49:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A8FA4B080
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Jun 2021 05:59:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id L8v4Mka8X9kv for <kvmarm@lists.cs.columbia.edu>;
- Mon,  7 Jun 2021 04:49:16 -0400 (EDT)
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com
- [209.85.128.52])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1F0804A98B
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Jun 2021 04:49:16 -0400 (EDT)
-Received: by mail-wm1-f52.google.com with SMTP id
- b145-20020a1c80970000b029019c8c824054so12073557wmd.5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 07 Jun 2021 01:49:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ with ESMTP id PuuiLnX8t3oP for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  7 Jun 2021 05:59:47 -0400 (EDT)
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com
+ [209.85.221.43])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B53B64A524
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Jun 2021 05:59:47 -0400 (EDT)
+Received: by mail-wr1-f43.google.com with SMTP id a11so14997591wrt.13
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 07 Jun 2021 02:59:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=nuviainc-com.20150623.gappssmtp.com; s=20150623;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=R2ZopsQZZdXEYjl6azm31E2MzYfojsymg///Se/cAKM=;
- b=RxBciWEa0mOrwTDqwBl7XhVt1Z3tGfff3KVAXfjjxbhvucwuitAYpCjW2AiOfmc4hY
- MW0YwzUHKGA/WeKdlYLraPeOhx4a5uKzxp6v4lLraANt7WimKeIInnK9T/6eWrQjXCT9
- WjObcZ+HYZ3Go8GMia3x24cyu5tbYPVgn1JDv/sRYAPZlA5vtodNND9A/q6x8y8UnXk6
- SuJuhS9v8M4MwoSC+c+Tx7H+ePDwkcKPvy620Tt8pc5u8pj0IFei8NsOk08p/27eHLhl
- SoI75OyhpQKO1uzn4yXdmbM/CqtG6q0nD58HzKEwZj7xuk0c/z3vpR8i7Mvpj1PS7VyY
- r5YA==
+ bh=p4DLt66lUCYjaFVIOgZH75INGuDN8geDg/llZgnm7Ic=;
+ b=v+wDKQVWu9yMRQlxnrjcHW+YzayMQw8AKbw0Sotye6dq6Mi/XirZdCp+SVNLSNDUH6
+ KnVPIi7G03WsdOSYqvHd5Qc9rE6Ecr2yquz0U/t1CxhCeMVmY7pHgQqo5UUuKnuv66yD
+ 3IxkiD8fgYT76I/fGm3OO6dyf8hVmZ6JUEsAxDr7wQvkbldYEDC6/ZiW9h/QUlHXjuSa
+ KiSH4xUr3mQtUm9S97PATjYfHMsIZyny5eSguSytWJD1hwTV5gcNLx1Y6MeiDRiSzYLh
+ /YYeUsrPtK7KK1ZWQdQmufTNGSlm2eQtRfG/TZ0qs/majukVbye/OQcd6qlqhLBo0z3g
+ ySSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=R2ZopsQZZdXEYjl6azm31E2MzYfojsymg///Se/cAKM=;
- b=K0Qus7Wchf7vbCzCEAxgC6lbZS8g9fOpiTLEgRVqiJWe9LGBtSkvporEB6v/mom2f5
- lB6XS4u+kdsyF3C4Qis8u4HCM8DtEZUrxg8pSss7sI+keFiajU18KHTi4/N36GZavQoN
- HZxyp0VQof3Skwws1rjc5rzRBZTY/xHp3RP/lCDhtO+CSgfgqa9GRX9n/JK6bmevQT3m
- V4ZHytF+EfVF/OJW/H7wBXroiRDBUxU7/3Bwca7hQfqnqKmOuweE4VCPK0oj0udwZyYX
- 1e1RlTFgjIg38ifUrdk3HK09InqpzJQg7AgxbP4L6uit+hMRv6fqUeoA8WPtWp+IO6lV
- CO5w==
-X-Gm-Message-State: AOAM5312U8wtcu990OYAjfDR+Tf5Z9vanGDQGNwJRk9LwyoqLGUR6yG+
- ZkAsC0CgSwehZpRPNzLc1l1Zvw==
-X-Google-Smtp-Source: ABdhPJyurKzta3z2CeRnxFd2iiCVeQi8uEXKlJF0ITFMul63PvHyfT+ViQ4DZznWDHGoSIMfaenzLQ==
-X-Received: by 2002:a05:600c:21d1:: with SMTP id
- x17mr15424695wmj.167.1623055754959; 
- Mon, 07 Jun 2021 01:49:14 -0700 (PDT)
-Received: from myrica (adsl-84-226-111-173.adslplus.ch. [84.226.111.173])
- by smtp.gmail.com with ESMTPSA id o18sm5415514wrx.59.2021.06.07.01.49.14
+ bh=p4DLt66lUCYjaFVIOgZH75INGuDN8geDg/llZgnm7Ic=;
+ b=M9UdKz5e9S5XjAbLkZpjfImfooZtniU2iyKKM9BBa0xTlY10dcTLvJbk64NsJPBBgV
+ x/sfLCv/Xt3Az3wIhORT7pBHauj5+jtU6BK9IYrer3CXRpikPS+7Sl2xyLgh8uHQ7dB5
+ 3+aLRm7HqTiv8oop100sTHSeHEw5FMqf8kTjoOg38YP0+XTMQWILwX2AnKLizGx3Um4F
+ WKTrcJFREZh8mE4nKHoeXDgt5QQzNX/28OpbIAdG8IY5i4U89O4uHcL8Bs31pMugErxA
+ +QK/KoOrhjYu4pD3XK2oouGoC8S0kjgpABJC2fvuZs+vc1lr9CalCchonPrNgog9U1C6
+ VxJA==
+X-Gm-Message-State: AOAM530r5o5tLjivJw68h20JILpfujXJ8X3/X/ClVEeK1CfCZRrRGeb2
+ CsukU2nbAc67flH0gJyRejVpPA==
+X-Google-Smtp-Source: ABdhPJxqSJVg78qWie75iU0nfkVmt/mrlTFme0qOfok5xe8IqNIFyAUXePcJPqifJe8VM+aT7yJP6g==
+X-Received: by 2002:adf:fa88:: with SMTP id h8mr16381574wrr.364.1623059986701; 
+ Mon, 07 Jun 2021 02:59:46 -0700 (PDT)
+Received: from localhost ([82.44.17.50])
+ by smtp.gmail.com with ESMTPSA id 89sm16240879wri.94.2021.06.07.02.59.45
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 07 Jun 2021 01:49:14 -0700 (PDT)
-Date: Mon, 7 Jun 2021 10:48:55 +0200
-From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+ Mon, 07 Jun 2021 02:59:46 -0700 (PDT)
+Date: Mon, 7 Jun 2021 10:59:45 +0100
+From: Jamie Iles <jamie@nuviainc.com>
 To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [RFC PATCH 0/3] kvm/arm: New VMID allocator based on asid(2nd
- approach)
-Message-ID: <YL3ddwlSOsv16F1g@myrica>
-References: <20210506165232.1969-1-shameerali.kolothum.thodi@huawei.com>
- <e62829990c50479292af94c4152011fc@huawei.com>
- <87sg1xzqea.wl-maz@kernel.org>
- <95bb84ffdb0f4db3b64b38cc3b651f90@huawei.com>
- <87lf7ptztg.wl-maz@kernel.org>
+Subject: Re: [PATCH v4 00/66] KVM: arm64: ARMv8.3/8.4 Nested Virtualization
+ support
+Message-ID: <YL3uEToHum2xgyOz@hazel>
+References: <20210510165920.1913477-1-maz@kernel.org> <YLh/qsmKDJ86n75w@hazel>
+ <87zgw7z6j6.wl-maz@kernel.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <87lf7ptztg.wl-maz@kernel.org>
-Cc: "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- Linuxarm <linuxarm@huawei.com>, "will@kernel.org" <will@kernel.org>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+In-Reply-To: <87zgw7z6j6.wl-maz@kernel.org>
+X-Mailman-Approved-At: Mon, 07 Jun 2021 06:03:27 -0400
+Cc: kernel-team@android.com, kvm@vger.kernel.org,
+ Andre Przywara <andre.przywara@arm.com>, Jamie Iles <jamie@nuviainc.com>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -107,48 +103,74 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Jun 04, 2021 at 04:27:39PM +0100, Marc Zyngier wrote:
-> > > Plus, I've found this nugget:
-> > > 
-> > > <quote
-> > > 	max_pinned_vmids = NUM_USER_VMIDS - num_possible_cpus() - 2;
-> > > </quote>
-> > > 
-> > > What is this "- 2"? My hunch is that it should really be "- 1" as VMID
-> > > 0 is reserved, and we have no equivalent of KPTI for S2.
-> > 
-> > I think this is more related to the "pinned vmid" stuff and was borrowed from
-> > the asid_update_limit() fn in arch/arm64/mm/context.c. But I missed the
-> > comment that explains the reason behind it. It says,
-> > 
-> > ---x---
-> > 	/*
-> > 	 * There must always be an ASID available after rollover. Ensure that,
-> > 	 * even if all CPUs have a reserved ASID and the maximum number of ASIDs
-> > 	 * are pinned, there still is at least one empty slot in the ASID map.
-> > 	 */
-> > 	max_pinned_asids = num_available_asids - num_possible_cpus() - 2;
-> > ---x---
-> > 
-> > So this is to make sure we will have at least one VMID available
-> > after rollover in case we have pinned the max number of VMIDs. I
-> > will include that comment to make it clear.
+On Thu, Jun 03, 2021 at 09:39:09AM +0100, Marc Zyngier wrote:
+> Hi Jamie,
 > 
-> That doesn't really explain the -2. Or is that that we have one for
-> the extra empty slot, and one for the reserved?
+> Funny, your email has a "Mail-Followup-To:" field that contains
+> everyone but you... Not ideal! ;-)
+
+Oops, new mutt config, thanks.
+
+> On Thu, 03 Jun 2021 08:07:22 +0100,
+> Jamie Iles <jamie@nuviainc.com> wrote:
+> > 
+> > Hi Marc,
+> > 
+> > On Mon, May 10, 2021 at 05:58:14PM +0100, Marc Zyngier wrote:
+> > > Here the bi-annual drop of the KVM/arm64 NV support code.
+> > > 
+> > > Not a lot has changed since [1], except for a discovery mechanism for
+> > > the EL2 support, some tidying up in the idreg emulation, dropping RMR
+> > > support, and a rebase on top of 5.13-rc1.
+> > > 
+> > > As usual, blame me for any bug, and nobody else.
+> > > 
+> > > It is still massively painful to run on the FVP, but if you have a
+> > > Neoverse V1 or N2 system that is collecting dust, I have the right
+> > > stuff to keep it busy!
+> > 
+> > I've been testing this series on FVP and get a crash when returning from 
+> > __kvm_vcpu_run_vhe because the autiasp is failing.
 > 
-> Jean-Philippe?
+> Ah, the joy of testing with older guests. I guess i should upgrade by
+> test rig and play with some newer guests at L1.
+> 
+> > 
+> > The problem is when the L1 boots and during EL2 setup sets hcr_el2 to 
+> > HCR_HOST_NVHE_FLAGS and so enables HCR_APK|HCR_API.  Then the guest 
+> > enter+exit logic in L0 starts performing the key save restore, but as we 
+> > didn't go through __hyp_handle_ptrauth, we haven't saved the host keys 
+> > and invoked vcpu_ptrauth_enable() so restore the host keys back to 0.
+> > 
+> > I wonder if the pointer auth keys should be saved+restored 
+> > unconditionally for a guest when running nested rather than the lazy 
+> > faulting that we have today?
+> 
+> I'd like to try and avoid that in order to keep the basic logic as
+> simple as possible for the time being, and as close to the tried and
+> trusted flow we have today.
+> 
+> > Alternatively we would need to duplicate
+> > the lazy logic for hcr_el2 writes.  A quick hack of saving the host keys 
+> > in __kvm_vcpu_run_vhe before sysreg_save_host_state_vhe is enough to 
+> > allow me to boot an L1 with --nested and then an L2.
+> >
+> > Do we also need to filter out HCR_APK|HCR_API for hcr_el2 writes when 
+> > pointer authentication hasn't been exposed to the guest?  I haven't yet 
+> > tried making ptrauth visible to the L1.
+> 
+> I think this is the real thing. We should never propagate trap bits
+> for features we don't want to support in guests. The L1 kernel sets
+> these bits unconditionally, despite PtrAuth never being advertised,
+> which trips the host code.
+> 
+> Could you try the untested hack below?
 
-Yes, -2 is for ASID#0 and the extra empty slot. A comment higher in
-asids_update_limit() hints at that, but it could definitely be clearer
+That fixes the issue that I was seeing, lgtm.
 
-        /*
-         * Expect allocation after rollover to fail if we don't have at least
-         * one more ASID than CPUs. ASID #0 is reserved for init_mm.
-         */
+Thanks Marc!
 
-Thanks,
-Jean
+Jamie
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
