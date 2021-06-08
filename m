@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC3A2C4743D
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE571C47082
 	for <kvmarm@archiver.kernel.org>; Tue,  8 Jun 2021 14:12:15 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A24D96135A
+	by mail.kernel.org (Postfix) with ESMTP id 94CA060FE9
 	for <kvmarm@archiver.kernel.org>; Tue,  8 Jun 2021 14:12:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A24D96135A
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94CA060FE9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 567814A19A;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4875240821;
 	Tue,  8 Jun 2021 10:12:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 7yfKKbaG3ben; Tue,  8 Jun 2021 10:12:14 -0400 (EDT)
+	with ESMTP id 5PlnEsRThHJv; Tue,  8 Jun 2021 10:12:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A142407ED;
-	Tue,  8 Jun 2021 10:12:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2933F49F6C;
+	Tue,  8 Jun 2021 10:12:10 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F73D4079A
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Jun 2021 10:12:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E8FC40623
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Jun 2021 10:12:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vDeWmmkilRKa for <kvmarm@lists.cs.columbia.edu>;
- Tue,  8 Jun 2021 10:12:11 -0400 (EDT)
-Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com
- [209.85.221.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7EDAB406E0
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Jun 2021 10:12:11 -0400 (EDT)
-Received: by mail-wr1-f73.google.com with SMTP id
- t14-20020adfe44e0000b029011851efa802so9454866wrm.11
- for <kvmarm@lists.cs.columbia.edu>; Tue, 08 Jun 2021 07:12:11 -0700 (PDT)
+ with ESMTP id TmSa7urcG0dO for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  8 Jun 2021 10:12:08 -0400 (EDT)
+Received: from mail-ed1-f74.google.com (mail-ed1-f74.google.com
+ [209.85.208.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E75C4406E0
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Jun 2021 10:12:06 -0400 (EDT)
+Received: by mail-ed1-f74.google.com with SMTP id
+ s25-20020aa7c5590000b0290392e051b029so5891454edr.11
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 08 Jun 2021 07:12:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=k1l2n59g13iNu83bUTxARpOhgMKflgQ04MOsDPUh0Ic=;
- b=HKMRwVfndsrVEdmwwjp+AJfDUAU/7SHKuQu+f50Ph5TxJeikrk3f1yLdxBBbNGalK4
- 1OsQdR3D7asjd+1UcEgIGwjwfNFpdR4INjRegFwmCpjoHIFrG4VisTD9D+yw0wOrihMD
- u+jS5KLKNo5J22J7NPibJPCz8HM4C4uXx57pgOf5PT9cJ5hlU5DjgyMov1wcyirmTTfd
- DmnL7lIfo9JWERgn13Mn1FX+q3udhEE6m24+t2J5Y7wWHEcarMFKH81jyvkAkw1iirzX
- ujxnJb0sk3tt2uylf6jCDqe33eE8qI8MQtloA22FQDfL0qlJumIPI3wJ6LXAx0k2kXcR
- LVJQ==
+ :cc; bh=v43My/fh29dQ89VkLemp8JE4rmjkcJppnIwoByZrgds=;
+ b=BEcD2PghOJEFU2oMhSGxgZHmAQsOMZoS8FuEDW7kwr3rf7WZqcDNBj0yUCDuKnmRxB
+ j3MVM8q3slM0Y/Yzva3xon2zKck/Y5iyW1Y/apk76zR18o/FfmDXGyjg1uyn7pkYbDuO
+ QqWXGxMSzrN2GLJoZMdre8Ytq5aI6JYKUCofX8vhb625OmDUg5zeJ2f6jXzGKWhEyaWT
+ vRAF48B27WM0JiqifHSQnXRahuUylLR1LbCreV86TpS8sU6h8/xTlL+2xpxRe8EFWRX/
+ ZMD5NyzAaA3VNCF73eRjDwaHrR8MVzEL79Ek0bJxFvCLpoNPJDakq3EfWkU/blL4BDFZ
+ W3hQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=k1l2n59g13iNu83bUTxARpOhgMKflgQ04MOsDPUh0Ic=;
- b=VaYqVsrgbTTZumuW9tYoJFkK/mVbJP6ObXnerc9E8pXUTlSQRIG0YJsqbsNfupiptR
- UX5qUJmlfBvCI08bbNKZCiu4ZR44exCP3ggx07p5c16fx0LUY4Nnn18VI/sLnvaxizOd
- yjkBHYMXz4RzESdCMt+xrxLQYZGbhAoPewzxV9dUSUZYw7cvn3H3tCZu0op95thbU9EA
- GfPVdZ4cizl3GqWYgtWgoZfCOzCUGE2ocdpo51Zv2na6M5PAZ/4xwCDOs3dx87tnAX48
- RA32oyExVawcukCBdoA2aZr/L1VLz6BoZakg9GQ0T3fl9rE4ak/hUmGgRkBH3MMToCPj
- kDpQ==
-X-Gm-Message-State: AOAM530Ce19HTHupw/eHLbqQWhR8cga1e7gyl30NB4I/JYW6HQsHgD5Z
- UtbvGzDM/JwOBfdZqN/5ETpFxkT60Tq3AEKpZ3SDkE+sBeBXPTw7q2SiFUpC/QW9bajeRbcq2np
- lf6LgqJYh2oUcN2Cl2rty/SGUUpPaSfJ9gwzvMg7bzC+Owntes56MxduEDm2RcrDzVXM=
-X-Google-Smtp-Source: ABdhPJzXIHfxt5tac7kqNaZAg4dHpDxMG83Oc7gi7GtbAhXwc3s7cpEqjJlIIcQ1S8LZ+Ld/XnKDm6HcjA==
+ bh=v43My/fh29dQ89VkLemp8JE4rmjkcJppnIwoByZrgds=;
+ b=i2jyEgTkRiJ5fNp0NjCyPPLkTmS8Svx8XECZfkVKfJhWK5fhzh0qcsbhM6pi6umoC1
+ Mfviq5J5z+y7dwd9VNw8tVCQ0pEsegr7w1qed8KsA1cTVHzuIbWAYr4OXeXkgQNW6y17
+ 59rhQAfoiFq71IKvgYM2AeBRR8ZNZHJ49Hh63HW88J5HN5msuPrzFB7je8YqXMhYXPo1
+ kaOPEGEIZ9q3vYopz/Issd70+Qoy4MLO7ft0c6Pn2ggT6eQRPvp0UXWyc2X6vYhabCGI
+ gyeIhok5h8RvFcJNdGJ/YeN1cjuvVWN8qL/yb2DmsTBxsGkF4UWfAuqmqW6Sf0KgETF5
+ WNuw==
+X-Gm-Message-State: AOAM531efkDnJLBjjWoxddHgmhJBkIcVHyOQJ+1FO60jdMDxMGPPUdyg
+ 1LQMm0buMeG48cJXBIT3pdPApf2B1eyc+ryxjAsD9vHt2aStj7mh/bGdiMN31rpzUmkzObGqFOW
+ SyveRSApbg6Kqp8cnl2jDjlaY5zIWCGKLY6UwJWXqWWpyEmjUONf4SQhwxLHdp3m+EjU=
+X-Google-Smtp-Source: ABdhPJzHyTAOoCriJLa65Ddn1L9CwZMBcN5UfqwlNYVC38pGMtIMGkU9U+lIMCG6yJr3TTUuIsp+bFjoKA==
 X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:10:28:9cb1:c0a8:482])
- (user=tabba job=sendgmr) by 2002:a05:600c:4fd0:: with SMTP id
- o16mr4554612wmq.50.1623161530591; Tue, 08 Jun 2021 07:12:10 -0700 (PDT)
-Date: Tue,  8 Jun 2021 15:11:41 +0100
+ (user=tabba job=sendgmr) by 2002:a05:6402:188:: with SMTP id
+ r8mr25681479edv.75.1623161525939; Tue, 08 Jun 2021 07:12:05 -0700 (PDT)
+Date: Tue,  8 Jun 2021 15:11:39 +0100
 In-Reply-To: <20210608141141.997398-1-tabba@google.com>
-Message-Id: <20210608141141.997398-14-tabba@google.com>
+Message-Id: <20210608141141.997398-12-tabba@google.com>
 Mime-Version: 1.0
 References: <20210608141141.997398-1-tabba@google.com>
 X-Mailer: git-send-email 2.32.0.rc1.229.g3e70b5a671-goog
-Subject: [PATCH v1 13/13] KVM: arm64: Check vcpu features at pVM creation
+Subject: [PATCH v1 11/13] KVM: arm64: Trap access to pVM restricted features
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: kernel-team@android.com, kvm@vger.kernel.org, maz@kernel.org,
@@ -96,60 +96,179 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Check that a protected VM is not setting any of the unsupported
-features when it's created.
+Trap accesses to restricted features for VMs running in protected
+mode.
+
+Access to feature registers are emulated, and only supported
+features are exposed to protected VMs.
+
+Accesses to restricted registers as well as restricted
+instructions are trapped, and an undefined exception is injected
+into the protected guest.
+
+Only affects the functionality of protected VMs. Otherwise,
+should not affect non-protected VMs when KVM is running in
+protected mode.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/pkvm.c | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+ arch/arm64/kvm/hyp/include/hyp/switch.h |   3 +
+ arch/arm64/kvm/hyp/nvhe/switch.c        | 105 ++++++++++++++++++++----
+ 2 files changed, 94 insertions(+), 14 deletions(-)
 
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index cf624350fb27..5e58d604faec 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -88,10 +88,41 @@ static void pkvm_teardown_firmware_slot(struct kvm *kvm)
- 	kvm->arch.pkvm.firmware_slot = NULL;
- }
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index f5d3d1da0aec..d9f087ed6e02 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -33,6 +33,9 @@
+ extern struct exception_table_entry __start___kvm_ex_table;
+ extern struct exception_table_entry __stop___kvm_ex_table;
+ 
++int kvm_handle_pvm_sys64(struct kvm_vcpu *vcpu);
++int kvm_handle_pvm_restricted(struct kvm_vcpu *vcpu);
++
+ /* Check whether the FP regs were dirtied while in the host-side run loop: */
+ static inline bool update_fp_enabled(struct kvm_vcpu *vcpu)
+ {
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index 967a3ad74fbd..48d5f780fe64 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -34,12 +34,63 @@ DEFINE_PER_CPU(struct kvm_host_data, kvm_host_data);
+ DEFINE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
+ DEFINE_PER_CPU(unsigned long, kvm_hyp_vector);
  
 +/*
-+ * Check that no unsupported features are enabled for the protected VM's vcpus.
++ * Set EL2 configuration registers to trap restricted register accesses and
++ * instructions for protected VMs.
 + *
-+ * Return 0 if all features enabled for all vcpus are supported, or -EINVAL if
-+ * one or more vcpus has one or more unsupported features.
++ * Should be called right before vcpu entry to restrict its impact only to the
++ * protected guest.
 + */
-+static int pkvm_check_features(struct kvm *kvm)
++static void __activate_traps_pvm(struct kvm_vcpu *vcpu)
 +{
-+	int i;
-+	const struct kvm_vcpu *vcpu;
++	u64 mdcr;
++	u64 hcr;
++	u64 cptr;
 +
-+	kvm_for_each_vcpu(i, vcpu, kvm) {
-+		/*
-+		 * No support for:
-+		 * - AArch32 state for protected VMs
-+		 * - Performance Monitoring
-+		 * - Scalable Vectors
-+		 */
-+		if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features) ||
-+		    test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features) ||
-+		    test_bit(KVM_ARM_VCPU_SVE, vcpu->arch.features))
-+			return -EINVAL;
-+	}
++	if (!kvm_vm_is_protected(kern_hyp_va(vcpu->kvm)))
++		return;
 +
-+	return 0;
++	mdcr = read_sysreg(mdcr_el2);
++	hcr = read_sysreg(hcr_el2);
++	cptr = read_sysreg(cptr_el2);
++
++	hcr |= HCR_TID3 |			/* Feature Registers */
++	       HCR_TLOR |			/* LOR */
++	       HCR_RW |				/* AArch64 EL1 only */
++	       HCR_TERR |			/* RAS */
++	       HCR_ATA | HCR_TID5 |		/* Memory Tagging */
++	       HCR_TACR | HCR_TIDCP | HCR_TID1; /* Implementation defined */
++
++	hcr &= ~(HCR_DCT |	/* Memory Tagging */
++		 HCR_FIEN |	/* RAS */
++		 HCR_AMVOFFEN);	/* Disables AMU registers virtualization */
++
++	/* Debug and Trace */
++	mdcr |= MDCR_EL2_TDRA | MDCR_EL2_TDA | MDCR_EL2_TDE |
++		MDCR_EL2_TDOSA | MDCR_EL2_TDCC | MDCR_EL2_TTRF |
++		MDCR_EL2_TPM | MDCR_EL2_TPMCR |
++		MDCR_EL2_TPMS; /* SPE */
++
++	mdcr &= ~(MDCR_EL2_HPME | MDCR_EL2_MTPME |		/* PMU */
++		  (MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT)); /* SPE */
++
++	cptr |= CPTR_EL2_TTA |	/* Trace */
++		CPTR_EL2_TAM |	/* AMU */
++		CPTR_EL2_TZ;	/* SVE */
++
++	/*  __deactivate_traps() restores these registers. */
++	write_sysreg(mdcr, mdcr_el2);
++	write_sysreg(hcr, hcr_el2);
++	write_sysreg(cptr, cptr_el2);
 +}
 +
- static int pkvm_enable(struct kvm *kvm, u64 slotid)
+ static void __activate_traps(struct kvm_vcpu *vcpu)
  {
- 	int ret;
+ 	u64 val;
  
-+	ret = pkvm_check_features(kvm);
-+	if (ret)
-+		return ret;
+ 	___activate_traps(vcpu);
+ 	__activate_traps_common(vcpu);
++	__activate_traps_pvm(vcpu);
+ 
+ 	val = CPTR_EL2_DEFAULT;
+ 	val |= CPTR_EL2_TTA | CPTR_EL2_TAM;
+@@ -165,30 +216,56 @@ static void __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
+ 		write_sysreg(pmu->events_host, pmcntenset_el0);
+ }
+ 
++/**
++ * Handle system register accesses for protected VMs.
++ *
++ * Return 1 if handled, or 0 if not.
++ */
++static int handle_pvm_sys64(struct kvm_vcpu *vcpu)
++{
++	if (kvm_vm_is_protected(kern_hyp_va(vcpu->kvm)))
++		return kvm_handle_pvm_sys64(vcpu);
++	else
++		return 0;
++}
 +
- 	ret = pkvm_init_firmware_slot(kvm, slotid);
- 	if (ret)
- 		return ret;
++/**
++ * Handle restricted feature accesses for protected VMs.
++ *
++ * Return 1 if handled, or 0 if not.
++ */
++static int handle_pvm_restricted(struct kvm_vcpu *vcpu)
++{
++	if (kvm_vm_is_protected(kern_hyp_va(vcpu->kvm)))
++		return kvm_handle_pvm_restricted(vcpu);
++	else
++		return 0;
++}
++
+ typedef int (*exit_handle_fn)(struct kvm_vcpu *);
+ 
+ static exit_handle_fn hyp_exit_handlers[] = {
+-	[0 ... ESR_ELx_EC_MAX]		= NULL,
++	[0 ... ESR_ELx_EC_MAX]		= handle_pvm_restricted,
+ 	[ESR_ELx_EC_WFx]		= NULL,
+-	[ESR_ELx_EC_CP15_32]		= NULL,
+-	[ESR_ELx_EC_CP15_64]		= NULL,
+-	[ESR_ELx_EC_CP14_MR]		= NULL,
+-	[ESR_ELx_EC_CP14_LS]		= NULL,
+-	[ESR_ELx_EC_CP14_64]		= NULL,
++	[ESR_ELx_EC_CP15_32]		= handle_pvm_restricted,
++	[ESR_ELx_EC_CP15_64]		= handle_pvm_restricted,
++	[ESR_ELx_EC_CP14_MR]		= handle_pvm_restricted,
++	[ESR_ELx_EC_CP14_LS]		= handle_pvm_restricted,
++	[ESR_ELx_EC_CP14_64]		= handle_pvm_restricted,
+ 	[ESR_ELx_EC_HVC32]		= NULL,
+ 	[ESR_ELx_EC_SMC32]		= NULL,
+ 	[ESR_ELx_EC_HVC64]		= NULL,
+ 	[ESR_ELx_EC_SMC64]		= NULL,
+-	[ESR_ELx_EC_SYS64]		= NULL,
+-	[ESR_ELx_EC_SVE]		= NULL,
++	[ESR_ELx_EC_SYS64]		= handle_pvm_sys64,
++	[ESR_ELx_EC_SVE]		= handle_pvm_restricted,
+ 	[ESR_ELx_EC_IABT_LOW]		= NULL,
+ 	[ESR_ELx_EC_DABT_LOW]		= NULL,
+-	[ESR_ELx_EC_SOFTSTP_LOW]	= NULL,
+-	[ESR_ELx_EC_WATCHPT_LOW]	= NULL,
+-	[ESR_ELx_EC_BREAKPT_LOW]	= NULL,
+-	[ESR_ELx_EC_BKPT32]		= NULL,
+-	[ESR_ELx_EC_BRK64]		= NULL,
+-	[ESR_ELx_EC_FP_ASIMD]		= NULL,
++	[ESR_ELx_EC_SOFTSTP_LOW]	= handle_pvm_restricted,
++	[ESR_ELx_EC_WATCHPT_LOW]	= handle_pvm_restricted,
++	[ESR_ELx_EC_BREAKPT_LOW]	= handle_pvm_restricted,
++	[ESR_ELx_EC_BKPT32]		= handle_pvm_restricted,
++	[ESR_ELx_EC_BRK64]		= handle_pvm_restricted,
++	[ESR_ELx_EC_FP_ASIMD]		= handle_pvm_restricted,
+ 	[ESR_ELx_EC_PAC]		= NULL,
+ };
+ 
 -- 
 2.32.0.rc1.229.g3e70b5a671-goog
 
