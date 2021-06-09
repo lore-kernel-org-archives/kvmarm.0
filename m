@@ -2,108 +2,78 @@ Return-Path: <SRS0=1TKy=LD=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B021BC48BCF
-	for <kvmarm@archiver.kernel.org>; Wed,  9 Jun 2021 13:06:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E891CC48BCD
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Jun 2021 14:37:27 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1ADF9613B6
-	for <kvmarm@archiver.kernel.org>; Wed,  9 Jun 2021 13:06:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1ADF9613B6
+	by mail.kernel.org (Postfix) with ESMTP id 62C916139A
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Jun 2021 14:37:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62C916139A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8955340256;
-	Wed,  9 Jun 2021 09:06:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BE2B740629;
+	Wed,  9 Jun 2021 10:37:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id T8VKwNt5AI6F; Wed,  9 Jun 2021 09:06:06 -0400 (EDT)
+	with ESMTP id xSLdXaVKpkUD; Wed,  9 Jun 2021 10:37:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BB3CF40878;
-	Wed,  9 Jun 2021 09:06:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9006C4080B;
+	Wed,  9 Jun 2021 10:37:25 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D564C40256
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Jun 2021 09:06:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D3422405A6
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Jun 2021 10:37:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aApiyoH0ussl for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Jun 2021 09:06:03 -0400 (EDT)
+ with ESMTP id eW57nlujvSbr for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Jun 2021 10:37:23 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C17A401A4
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Jun 2021 09:06:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D8D404048B
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Jun 2021 10:37:23 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1623243963;
+ s=mimecast20190719; t=1623249443;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=tfZIA1RD1LZXKSjC7tQzyT3Zz4AbIitiVu33W8QcHZc=;
- b=fX7rM4TGyb/E+MVPcNfiH3vv5gEU2cdZfHDuy9zeBSVP9GgsI88zc8JMSTq8eg5F+hgvIZ
- 7iBCcwjski2L426w3STbkrbaV2CWc1EOJxjqtNTKL0M+2hQ4ICxJ+BLsq48cKpVIC0QiR7
- sAjgoweMQGPWliwB0AMr8U1/aIM6VuY=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-268-ZI4VAJkOPxSKAY-cc27cKg-1; Wed, 09 Jun 2021 09:06:00 -0400
-X-MC-Unique: ZI4VAJkOPxSKAY-cc27cKg-1
-Received: by mail-wr1-f71.google.com with SMTP id
- v15-20020a5d4a4f0000b0290118dc518878so10797477wrs.6
- for <kvmarm@lists.cs.columbia.edu>; Wed, 09 Jun 2021 06:06:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:to:cc:references:from:subject:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=tfZIA1RD1LZXKSjC7tQzyT3Zz4AbIitiVu33W8QcHZc=;
- b=bY/gh038i0EwX+VWQVQvTOYox9LxGFOgXBulqeG0plWEW2++X5RTtMuFlBZ2ZFZW2O
- KA3S9CTNBovh6M8cm7bbbhKb9q23aMFSdKYWSGGo471uK3C8zUIfxNPeXkDbIHSB8/O4
- SJjzrR7HLhXnRF5B2N/k99XICqkOAqM0Od207AMdrRYvyvZizXzpD69LhGYAr+Id3sDX
- fPDzopqWpFr+rgIbLvLuIKS6AuyT9L5SS+4GTMIvv3tjxH/h+1jr6W+hB/isP8EYig6G
- Q+rbtmR92XwJaLiHXvqp95ZitiE1zPUAtQ/SuAHmKidtOYNv6Vkn+iqPAKQKh35Ot5L6
- ge/w==
-X-Gm-Message-State: AOAM5328mAx+ecveiH6u6dq9IOgpka4hn5uLBf38WzizkFueJAkGf92s
- Aory979NyxcS5Di1KA0AQAsZcKY9x41tmzDMgpeFJSOWFw8krGwD9Gi7kbKRxTcWOsShfm2Tv3o
- d8ijaEM03i1Uzxxv+F3faGv71
-X-Received: by 2002:a05:6000:229:: with SMTP id
- l9mr21895565wrz.43.1623243959343; 
- Wed, 09 Jun 2021 06:05:59 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzNZpCmexeTYepugYVxKtIrw/V4KZhj0zKnSQiqFCM66i0gzUTV95CdITRYDyNRJ2IA3nAI+w==
-X-Received: by 2002:a05:6000:229:: with SMTP id
- l9mr21895527wrz.43.1623243959126; 
- Wed, 09 Jun 2021 06:05:59 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
- ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
- by smtp.gmail.com with ESMTPSA id z11sm22741484wrs.7.2021.06.09.06.05.57
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 09 Jun 2021 06:05:58 -0700 (PDT)
-To: Oliver Upton <oupton@google.com>, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, Maxim Levitsky <mlevitsk@redhat.com>
-References: <20210608214742.1897483-1-oupton@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 00/10] KVM: Add idempotent controls for migrating system
- counter state
-Message-ID: <63db3823-b8a3-578d-4baa-146104bb977f@redhat.com>
-Date: Wed, 9 Jun 2021 15:05:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=bvCtC8uoQFN+N2CnQbF7Wd+VOqQKX0tbrscPImqjZYg=;
+ b=I5axyqtdA4cQDPO1kFj73z0zgmvST9QA2XXRZ3od5ovav14ZhuUdkJSh8okgDVqBvbKRHc
+ PFlqdBnzbCtBKZpVuk6+t03NAMgFBKVkTz2Tfj+tZ5Y3YzYEJ6yYGaYfp0FKMESWfObPnF
+ h7rW4cdYLZcmiel97sdt60zXbprSSAg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-522-12DbjUfyNT2vsDPVFvykVA-1; Wed, 09 Jun 2021 10:37:22 -0400
+X-MC-Unique: 12DbjUfyNT2vsDPVFvykVA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0722A801B14;
+ Wed,  9 Jun 2021 14:37:21 +0000 (UTC)
+Received: from gondolin.fritz.box (ovpn-113-134.ams2.redhat.com
+ [10.36.113.134])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5C3FE19726;
+ Wed,  9 Jun 2021 14:37:15 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Andrew Jones <drjones@redhat.com>
+Subject: [kvm-unit-tests PATCH v2 0/7] unify header guards
+Date: Wed,  9 Jun 2021 16:37:05 +0200
+Message-Id: <20210609143712.60933-1-cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210608214742.1897483-1-oupton@google.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Cc: Sean Christopherson <seanjc@google.com>,
- Raghavendra Rao Anata <rananta@google.com>, Peter Shier <pshier@google.com>,
- Marc Zyngier <maz@kernel.org>, David Matlack <dmatlack@google.com>,
- Jim Mattson <jmattson@google.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Cc: Laurent Vivier <lvivier@redhat.com>, linux-s390@vger.kernel.org,
+ Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
+ David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ kvm-ppc@vger.kernel.org, Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -115,150 +85,96 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 08/06/21 23:47, Oliver Upton wrote:
-> KVM's current means of saving/restoring system counters is plagued with
-> temporal issues. At least on ARM64 and x86, we migrate the guest's
-> system counter by-value through the respective guest system register
-> values (cntvct_el0, ia32_tsc). Restoring system counters by-value is
-> brittle as the state is not idempotent: the host system counter is still
-> oscillating between the attempted save and restore. Furthermore, VMMs
-> may wish to transparently live migrate guest VMs, meaning that they
-> include the elapsed time due to live migration blackout in the guest
-> system counter view. The VMM thread could be preempted for any number of
-> reasons (scheduler, L0 hypervisor under nested) between the time that
-> it calculates the desired guest counter value and when KVM actually sets
-> this counter state.
-> 
-> Despite the value-based interface that we present to userspace, KVM
-> actually has idempotent guest controls by way of system counter offsets.
-> We can avoid all of the issues associated with a value-based interface
-> by abstracting these offset controls in new ioctls. This series
-> introduces KVM_{GET,SET}_SYSTEM_COUNTER_STATE ioctls, meant to provide
-> userspace with idempotent controls of the guest system counter.
+This is an extension of "s390x: unify header guards" to the rest
+of kvm-unit-tests. I tried to choose a pattern that minimizes the
+changes; most of them are for s390x and x86.
 
-Hi Oliver,
+v1->v2:
+- change the patterns and document them
+- change other architectures and architecture-independent code as well
 
-I wonder how this compares to the idea of initializing the TSC via a 
-synchronized (nanoseconds, TSC) pair. 
-(https://lore.kernel.org/r/20201130133559.233242-2-mlevitsk@redhat.com), 
-and whether it makes sense to apply that idea to ARM as well.  If so, it 
-certainly is a good idea to use the same capability and ioctl, even 
-though the details of the struct would be architecture-dependent.
+Cornelia Huck (7):
+  README.md: add guideline for header guards format
+  lib: unify header guards
+  asm-generic: unify header guards
+  arm: unify header guards
+  powerpc: unify header guards
+  s390x: unify header guards
+  x86: unify header guards
 
-In your patches there isn't much architecture dependency in struct 
-kvm_system_counter_state.  However,  Maxim's also added an 
-MSR_IA32_TSC_ADJUST value to the struct, thus ensuring that the host 
-could write not just an arbitrary TSC value, but also tie it to an 
-arbitrary MSR_IA32_TSC_ADJUST value.  Specifying both in the same ioctl 
-simplifies the userspace API.
+ README.md                         | 9 +++++++++
+ lib/alloc_page.h                  | 4 ++--
+ lib/arm/asm/assembler.h           | 6 +++---
+ lib/arm64/asm/assembler.h         | 6 +++---
+ lib/asm-generic/atomic.h          | 4 ++--
+ lib/asm-generic/barrier.h         | 6 +++---
+ lib/asm-generic/memory_areas.h    | 4 ++--
+ lib/asm-generic/pci-host-bridge.h | 4 ++--
+ lib/libcflat.h                    | 4 ++--
+ lib/list.h                        | 4 ++--
+ lib/pci-edu.h                     | 4 ++--
+ lib/pci-host-generic.h            | 4 ++--
+ lib/s390x/asm/arch_def.h          | 4 ++--
+ lib/s390x/asm/barrier.h           | 4 ++--
+ lib/s390x/asm/cpacf.h             | 6 +++---
+ lib/s390x/asm/facility.h          | 4 ++--
+ lib/s390x/asm/float.h             | 4 ++--
+ lib/s390x/asm/mem.h               | 4 ++--
+ lib/s390x/asm/sigp.h              | 6 +++---
+ lib/s390x/asm/spinlock.h          | 4 ++--
+ lib/s390x/asm/time.h              | 4 ++--
+ lib/s390x/asm/uv.h                | 4 ++--
+ lib/s390x/css.h                   | 4 ++--
+ lib/s390x/interrupt.h             | 4 ++--
+ lib/s390x/mmu.h                   | 4 ++--
+ lib/s390x/sclp.h                  | 6 +++---
+ lib/s390x/sie.h                   | 6 +++---
+ lib/s390x/smp.h                   | 4 ++--
+ lib/s390x/uv.h                    | 4 ++--
+ lib/s390x/vm.h                    | 6 +++---
+ lib/setjmp.h                      | 4 ++--
+ lib/string.h                      | 6 +++---
+ lib/vmalloc.h                     | 4 ++--
+ lib/x86/acpi.h                    | 4 ++--
+ lib/x86/apic-defs.h               | 6 +++---
+ lib/x86/apic.h                    | 4 ++--
+ lib/x86/asm/barrier.h             | 4 ++--
+ lib/x86/asm/debugreg.h            | 6 +++---
+ lib/x86/asm/io.h                  | 4 ++--
+ lib/x86/asm/memory_areas.h        | 4 ++--
+ lib/x86/asm/page.h                | 4 ++--
+ lib/x86/asm/pci.h                 | 4 ++--
+ lib/x86/asm/spinlock.h            | 4 ++--
+ lib/x86/asm/stack.h               | 4 ++--
+ lib/x86/atomic.h                  | 4 ++--
+ lib/x86/delay.h                   | 4 ++--
+ lib/x86/desc.h                    | 4 ++--
+ lib/x86/fault_test.h              | 4 ++--
+ lib/x86/fwcfg.h                   | 4 ++--
+ lib/x86/intel-iommu.h             | 4 ++--
+ lib/x86/isr.h                     | 4 ++--
+ lib/x86/msr.h                     | 6 +++---
+ lib/x86/processor.h               | 4 ++--
+ lib/x86/smp.h                     | 4 ++--
+ lib/x86/usermode.h                | 4 ++--
+ lib/x86/vm.h                      | 4 ++--
+ powerpc/spapr.h                   | 6 +++---
+ s390x/sthyi.h                     | 4 ++--
+ x86/hyperv.h                      | 4 ++--
+ x86/ioram.h                       | 4 ++--
+ x86/kvmclock.h                    | 4 ++--
+ x86/svm.h                         | 4 ++--
+ x86/types.h                       | 4 ++--
+ x86/vmx.h                         | 4 ++--
+ 64 files changed, 148 insertions(+), 139 deletions(-)
 
-Paolo
-
-> Patch 1 defines the ioctls, and was separated from the two provided
-> implementations for the sake of review. If it is more intuitive, this
-> patch can be squashed into the implementation commit.
-> 
-> Patch 2 realizes initial support for ARM64, migrating only the state
-> associated with the guest's virtual counter-timer. Patch 3 introduces a
-> KVM selftest to assert that userspace manipulation via the
-> aforementioned ioctls produces the expected system counter values within
-> the guest.
-> 
-> Patch 4 extends upon the ARM64 implementation by adding support for
-> physical counter-timer offsetting. This is currently backed by a
-> trap-and-emulate implementation, but can also be virtualized in hardware
-> that fully implements ARMv8.6-ECV. ECV support has been elided from this
-> series out of convenience for the author :) Patch 5 adds some test cases
-> to the newly-minted kvm selftest to validate expectations of physical
-> counter-timer emulation.
-> 
-> Patch 6 introduces yet another KVM selftest for aarch64, intended to
-> measure the effects of physical counter-timer emulation. Data for this
-> test can be found below, but basically there is some tradeoff of
-> overhead for the sake of correctness, but it isn't too bad.
-> 
-> Patches 7-8 add support for the ioctls to x86 by shoehorning the
-> controls into the pre-existing synchronization heuristics. Patch 7
-> provides necessary helper methods for the implementation to play nice
-> with those heuristics, and patch 8 actually implements the ioctls.
-> 
-> Patch 9 adds x86 test cases to the system counter KVM selftest. Lastly,
-> patch 10 documents the ioctls for both x86 and arm64.
-> 
-> All patches apply cleanly to kvm/next at the following commit:
-> 
-> a4345a7cecfb ("Merge tag 'kvmarm-fixes-5.13-1' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD")
-> 
-> Physical counter benchmark
-> --------------------------
-> 
-> The following data was collected by running 10000 iterations of the
-> benchmark test from Patch 6 on an Ampere Mt. Jade reference server, A 2S
-> machine with 2 80-core Ampere Altra SoCs. Measurements were collected
-> for both VHE and nVHE operation using the `kvm-arm.mode=` command-line
-> parameter.
-> 
-> nVHE
-> ----
-> 
-> +--------------------+--------+---------+
-> |       Metric       | Native | Trapped |
-> +--------------------+--------+---------+
-> | Average            | 54ns   | 148ns   |
-> | Standard Deviation | 124ns  | 122ns   |
-> | 95th Percentile    | 258ns  | 348ns   |
-> +--------------------+--------+---------+
-> 
-> VHE
-> ---
-> 
-> +--------------------+--------+---------+
-> |       Metric       | Native | Trapped |
-> +--------------------+--------+---------+
-> | Average            | 53ns   | 152ns   |
-> | Standard Deviation | 92ns   | 94ns    |
-> | 95th Percentile    | 204ns  | 307ns   |
-> +--------------------+--------+---------+
-> 
-> Oliver Upton (10):
->    KVM: Introduce KVM_{GET,SET}_SYSTEM_COUNTER_STATE ioctls
->    KVM: arm64: Implement initial support for KVM_CAP_SYSTEM_COUNTER_STATE
->    selftests: KVM: Introduce system_counter_state_test
->    KVM: arm64: Add userspace control of the guest's physical counter
->    selftests: KVM: Add test cases for physical counter offsetting
->    selftests: KVM: Add counter emulation benchmark
->    KVM: x86: Refactor tsc synchronization code
->    KVM: x86: Implement KVM_CAP_SYSTEM_COUNTER_STATE
->    selftests: KVM: Add support for x86 to system_counter_state_test
->    Documentation: KVM: Document KVM_{GET,SET}_SYSTEM_COUNTER_STATE ioctls
-> 
->   Documentation/virt/kvm/api.rst                |  98 +++++++
->   Documentation/virt/kvm/locking.rst            |  11 +
->   arch/arm64/include/asm/kvm_host.h             |   6 +
->   arch/arm64/include/asm/sysreg.h               |   1 +
->   arch/arm64/include/uapi/asm/kvm.h             |  17 ++
->   arch/arm64/kvm/arch_timer.c                   |  84 +++++-
->   arch/arm64/kvm/arm.c                          |  25 ++
->   arch/arm64/kvm/hyp/include/hyp/switch.h       |  31 +++
->   arch/arm64/kvm/hyp/nvhe/timer-sr.c            |  16 +-
->   arch/x86/include/asm/kvm_host.h               |   1 +
->   arch/x86/include/uapi/asm/kvm.h               |   8 +
->   arch/x86/kvm/x86.c                            | 176 +++++++++---
->   include/uapi/linux/kvm.h                      |   5 +
->   tools/testing/selftests/kvm/.gitignore        |   2 +
->   tools/testing/selftests/kvm/Makefile          |   3 +
->   .../kvm/aarch64/counter_emulation_benchmark.c | 209 ++++++++++++++
->   .../selftests/kvm/include/aarch64/processor.h |  24 ++
->   .../selftests/kvm/system_counter_state_test.c | 256 ++++++++++++++++++
->   18 files changed, 926 insertions(+), 47 deletions(-)
->   create mode 100644 tools/testing/selftests/kvm/aarch64/counter_emulation_benchmark.c
->   create mode 100644 tools/testing/selftests/kvm/system_counter_state_test.c
-> 
+-- 
+2.31.1
 
 _______________________________________________
 kvmarm mailing list
