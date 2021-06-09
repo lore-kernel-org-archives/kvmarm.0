@@ -2,84 +2,90 @@ Return-Path: <SRS0=1TKy=LD=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12825C48BCD
-	for <kvmarm@archiver.kernel.org>; Wed,  9 Jun 2021 15:51:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 368E6C48BCD
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Jun 2021 16:39:07 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7487B61278
-	for <kvmarm@archiver.kernel.org>; Wed,  9 Jun 2021 15:51:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7487B61278
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 95999610A1
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Jun 2021 16:39:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95999610A1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ED8E149E72;
-	Wed,  9 Jun 2021 11:51:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D6D7840870;
+	Wed,  9 Jun 2021 12:39:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jWjg9cGqp2Vw; Wed,  9 Jun 2021 11:51:46 -0400 (EDT)
+	with ESMTP id HTEvyiamRtr7; Wed,  9 Jun 2021 12:39:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E699B4A17F;
-	Wed,  9 Jun 2021 11:51:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C435A4066E;
+	Wed,  9 Jun 2021 12:39:04 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 099464A17F
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Jun 2021 11:51:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B0B5C405D8
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Jun 2021 12:34:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tmpao5btHqSo for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Jun 2021 11:51:45 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 33C8A49E72
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Jun 2021 11:51:45 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1623253905;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=AlPS4g9klGGODfdBQvh17uuQojemuSkP0oW9AXtfw0Y=;
- b=NLbAHwWt89Z0IUY2KczHH6fnQtvL4bhAIXpi/4YNSAORffOrjiMzjIEED9pfpaVLGHMy7G
- NuYr2ROYO0Ytho87l4MgoE24kS6zp+Etbn2QKbQPlwTo/bzYJcR7GxmNaLshPrE7sJANIN
- 3HNvcM1doSkCLMgVpsk2rNk4zYsYmBI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-330-sjedR2EdM96_rQA9BdWv9w-1; Wed, 09 Jun 2021 11:51:41 -0400
-X-MC-Unique: sjedR2EdM96_rQA9BdWv9w-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C1133801FCD;
- Wed,  9 Jun 2021 15:51:40 +0000 (UTC)
-Received: from [10.36.112.148] (ovpn-112-148.ams2.redhat.com [10.36.112.148])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5C7CA5D6AD;
- Wed,  9 Jun 2021 15:51:34 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v2 4/7] arm: unify header guards
-To: Cornelia Huck <cohuck@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Andrew Jones <drjones@redhat.com>
-References: <20210609143712.60933-1-cohuck@redhat.com>
- <20210609143712.60933-5-cohuck@redhat.com>
- <8399161a-ef26-7d4f-19fb-c54ca40fe6c3@redhat.com> <874ke711m6.fsf@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <233f8a97-146e-3a75-9447-d5155a0dd7c9@redhat.com>
-Date: Wed, 9 Jun 2021 17:51:17 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+ with ESMTP id jOolfscDCw3E for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Jun 2021 12:34:33 -0400 (EDT)
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com
+ [209.85.216.54])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 86C3A4031F
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Jun 2021 12:34:33 -0400 (EDT)
+Received: by mail-pj1-f54.google.com with SMTP id
+ mp5-20020a17090b1905b029016dd057935fso1709379pjb.5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 09 Jun 2021 09:34:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=2fp6Uuy6GSNvKepEDgRuQTao6to9O/zWUvKaMxtTuY4=;
+ b=rJAYvImo8GqMKS2I8qxEWb0cR3WmfDKnRVZfann15BrfdcD6zdhw/QtCxha2yCBB1K
+ Tw6UKVWjwwhuX+WrgIQ7xeIzzGUTB/i6Awd4KjcATD0X5NDYiSJvPTERk/sz2ohI53ey
+ A7g++W3uHNTg+RjpJzLRBNbaAdvGsNNFTpDxxu861jwv5HjOYgWGdDTIjiOOcH/t1KBt
+ Z0Hgx273qBsfsqSon4qwp3PlO/g6dvElYapSdkzlyDU0WUoaOL79zEWz4KZmzU7k7wZJ
+ DSoU7Z3L2Z15lU0+ioJ5hkCEuKofiOyyL+HcdZq+DP5AQDWMEj9lUgaRox/tBZDtjbR4
+ nMIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=2fp6Uuy6GSNvKepEDgRuQTao6to9O/zWUvKaMxtTuY4=;
+ b=LX0KTvPbn+6JATDwyJ+6rKouJk2L4Cp9cGK53lagMsMi9OEfNR6LxN8mL1Fgc8uDMy
+ fqcmwLcC67ck0OgROV0WKpvQJqkSwg8dWN5yL6qcO9gfOgCXXWfPh6NK8Aj6H7JMtcOB
+ ArIB5V4hTmPXJ5cFugDOG9RJ4VLrmfhBe0m+9lLuwYUwItAoKhQLL0tTHqmnuQCWQoQL
+ 0d8qREfSrMy/673yjbOhFmeWxvH8vwCUcMvwMWWncYFHCFFmqURlrlIfXqsaFH63qnGO
+ /LT+bNLjP/783ilIV1zKKo2n0c5NFVujXRJU19m1nOT8ns8m6dkRkioyGyQkkG+UDJwB
+ wUeQ==
+X-Gm-Message-State: AOAM531fzpGWzN9audamFuhmWMKyFAqZw8OiU8I5Usj/yX9f8zR+VllF
+ kxKqO3dN1zMlFTdsC3m29RgVEg==
+X-Google-Smtp-Source: ABdhPJxF8FSKckqpsOMeQdDomw9GOa31eWHF4SWhPDbbAhjn+xUSXWde5Q9m3XV7BCG2Toi7HDfqNg==
+X-Received: by 2002:a17:902:6b8c:b029:ea:f54f:c330 with SMTP id
+ p12-20020a1709026b8cb02900eaf54fc330mr458980plk.10.1623256472218; 
+ Wed, 09 Jun 2021 09:34:32 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com.
+ [35.185.214.157])
+ by smtp.gmail.com with ESMTPSA id f15sm316396pgg.23.2021.06.09.09.34.31
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 09 Jun 2021 09:34:31 -0700 (PDT)
+Date: Wed, 9 Jun 2021 16:34:27 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Ricardo Koller <ricarkol@google.com>
+Subject: Re: [PATCH] KVM: selftests: Rename vm_handle_exception in evmcs test
+Message-ID: <YMDtk/Xyf/7wpIxx@google.com>
+References: <20210604181833.1769900-1-ricarkol@google.com>
+ <YLqanpE8tdiNeoaN@google.com> <YL/q/IJ41gO6kTIF@google.com>
 MIME-Version: 1.0
-In-Reply-To: <874ke711m6.fsf@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Cc: linux-s390@vger.kernel.org, Janosch Frank <frankja@linux.ibm.com>,
- kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
- kvm-ppc@vger.kernel.org, Claudio Imbrenda <imbrenda@linux.ibm.com>,
+Content-Disposition: inline
+In-Reply-To: <YL/q/IJ41gO6kTIF@google.com>
+X-Mailman-Approved-At: Wed, 09 Jun 2021 12:39:03 -0400
+Cc: kvm@vger.kernel.org, maz@kernel.org,
+ kernel test robot <oliver.sang@intel.com>, pbonzini@redhat.com,
  kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -97,40 +103,28 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 09/06/2021 17:47, Cornelia Huck wrote:
-> On Wed, Jun 09 2021, Laurent Vivier <lvivier@redhat.com> wrote:
+On Tue, Jun 08, 2021, Ricardo Koller wrote:
+> On Fri, Jun 04, 2021 at 09:26:54PM +0000, Sean Christopherson wrote:
+> > The multiple layers of routing is also confusing and a bit hard to wade through
+> > for the uninitiated.  The whole thing can be made more straightfoward by doing
+> > away with the intermediate routing, whacking ~50 lines of code in the process.
+> > E.g. (definitely not functional code):
 > 
->> On 09/06/2021 16:37, Cornelia Huck wrote:
->>> The assembler.h files were the only ones not already following
->>> the convention.
->>>
->>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
->>> ---
->>>  lib/arm/asm/assembler.h   | 6 +++---
->>>  lib/arm64/asm/assembler.h | 6 +++---
->>>  2 files changed, 6 insertions(+), 6 deletions(-)
->>
->> What about lib/arm/io.h?
-> 
-> It didn't have a guard yet, so I didn't touch it.
-> 
->>
->> I think you can remove the guard from
->>
->> lib/arm/asm/memory_areas.h
->>
->> as the other files including directly a header doesn't guard it.
-> 
-> I see other architectures doing that, though. I guess it doesn't hurt,
-> but we can certainly also remove it. Other opinions?
+> This works but it would remove the ability to replace the default sync
+> handler with something else, like a handler that can cover all possible
+> ec values. In this case we would have to call
+> vm_install_exception_handler_ec 64 times.  On the other hand, the tests that
+> we are planning don't seem to need it, so I will move on with the suggestion.
 
-It doesn't hurt to remove it but I think what is important is to have the same rule
-everywhere.
+My objection to layering handlers is that it introduces ambiguity regarding
+ordering and override functionality, e.g. if a test overrides both the "default"
+handler and a specific exception handler, which handler will be invoked?  My
+expectation would be that the more specific override would win, but someone else
+might expect that overriding the default would win.
 
-Thanks,
-Laurent
-
-
+It should be relatively easy to provide helpers to override the handler for
+multiple/all exceptions if we do end up with tests that want that functionality. 
+But yeah, definitely a future problem :-)
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
