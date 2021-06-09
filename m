@@ -2,107 +2,85 @@ Return-Path: <SRS0=1TKy=LD=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99FEBC48BCD
-	for <kvmarm@archiver.kernel.org>; Wed,  9 Jun 2021 14:49:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2D74C48BCD
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Jun 2021 14:52:09 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0EA556128A
-	for <kvmarm@archiver.kernel.org>; Wed,  9 Jun 2021 14:49:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EA556128A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 17BF36128A
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Jun 2021 14:52:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17BF36128A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E98540878;
-	Wed,  9 Jun 2021 10:49:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 85D2440799;
+	Wed,  9 Jun 2021 10:52:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id UOc1XXLnu-SD; Wed,  9 Jun 2021 10:49:56 -0400 (EDT)
+	with ESMTP id Iu2EfAC0iEyV; Wed,  9 Jun 2021 10:52:07 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E7A62407B0;
-	Wed,  9 Jun 2021 10:49:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 47FA6407D1;
+	Wed,  9 Jun 2021 10:52:07 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E3D0F4075E
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Jun 2021 10:49:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 17F1440799
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Jun 2021 10:52:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id u9cFidLj8cVA for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Jun 2021 10:49:54 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FD3940291
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Jun 2021 10:49:54 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1623250194;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=kPADNTwFpZwmZXzzAXUXoQL6rJ0SbSv3Bmha0yUuchE=;
- b=c8ROV6IxsTv7KVxEsVKo9En8MdajHnC/U4NNQRcubjHkYxjIDDcjasxOuLi/AsO36TL6ZA
- et79ROIyp8v7r45ttWzFuv4/FLjQJzFBPJ/j092lq892VB9gP9pOaay3jT3GGRS/jOHdzt
- BxvVjfYsr/0NsUwSWWGwfNhIK6u79aE=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-582-4fLBNt3KP2253tkBt523Pw-1; Wed, 09 Jun 2021 10:49:53 -0400
-X-MC-Unique: 4fLBNt3KP2253tkBt523Pw-1
-Received: by mail-wm1-f70.google.com with SMTP id
- 128-20020a1c04860000b0290196f3c0a927so2706591wme.3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 09 Jun 2021 07:49:53 -0700 (PDT)
+ with ESMTP id 0MXvSnKBem+5 for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Jun 2021 10:52:04 -0400 (EDT)
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com
+ [209.85.208.177])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B8B80406DD
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Jun 2021 10:52:04 -0400 (EDT)
+Received: by mail-lj1-f177.google.com with SMTP id u18so138397lju.12
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 09 Jun 2021 07:52:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=J4uqZat43uXQvNOJTycrnSDnl08RIvJWttyNK5Ek/y8=;
+ b=CnZXh4kHjTx7xzwkiaOAmy6w5zVWdF9I7OMYc2MeamT4FBJcxWhk4ZxsvP3iAKRd0E
+ JIim2I1xEV4q0gsNORNvPQPjaCwf2dieYPoj7voiuY4/U4lF7Z88RVSwIt4TUs/6bG6h
+ 5uHWDdj1Y/Nlsi8oG6ivfWIsZEUNED8MLbfV8tM/D6Om9ZUNjkn3snaoYrJr4uIiLT5G
+ UqA37LNR0HHSABqmq/Eo7QAVW7989ErxHRajxq7SJhhjRz2a/Li+mhfj2tSaT3Xwg4/a
+ ya/gBgN+q+aVYEcz3wkNQO06NZZl8WCAvdSuRnFLdV9ZYBxuwbBro+0uEmyfD6QTVWvx
+ jgTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:organization
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=kPADNTwFpZwmZXzzAXUXoQL6rJ0SbSv3Bmha0yUuchE=;
- b=oK+UzErCniSJmChBRlaWBvb45hygvkzs2K2yxLK9HZ4c0rL1/lxSvn41pvivLGs5jo
- N4q+3Sb8JaOvnGH6PVdoINVQQz3llmytXg34XwN0qCeRmGWHXtdT8bB99JLi3YFw6XsO
- RHpGz1h3MxiA0LknTOfYwQATbmS6jd67q4bd+yIssYlxvmLmkzlcogDMyChO6b1i8vvr
- khOa23NQK2kHnUPfBmGozXcjrDx5L2hLjBrLPebNY8anu/Mnz4zb8/zETrnniiS3EAri
- diwGJD1NETYJVDph/5fl2O5CGY5lJbp1xOfORWA4QQZ6zGbGaEkLSsjvUkp8r8b6UflH
- /82w==
-X-Gm-Message-State: AOAM532ghh2sgW1AwKlcLFrMVIYhZXCjvTVJ9lheV+JZMmVmdl45FxLj
- kAlUNk/ZLbgJWYaWHyNVv03J+A50xIhxSLxx/GQdepTabN1AWyyqVtwDmT7BzzLHxOWxrEX47vi
- 9+LhD4wzN0jBOwshgt7e75Rmo
-X-Received: by 2002:a5d:530c:: with SMTP id e12mr174478wrv.165.1623250192090; 
- Wed, 09 Jun 2021 07:49:52 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzJAsLUfwPAV8SKw7A8bkaIzr0yv/5tACaMMA+I4d9ATGwios9zxjytr9KkgtaI+kSa11VRog==
-X-Received: by 2002:a5d:530c:: with SMTP id e12mr174435wrv.165.1623250191798; 
- Wed, 09 Jun 2021 07:49:51 -0700 (PDT)
-Received: from [192.168.3.132] (p5b0c611d.dip0.t-ipconnect.de. [91.12.97.29])
- by smtp.gmail.com with ESMTPSA id
- r4sm158876wre.84.2021.06.09.07.49.51
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 09 Jun 2021 07:49:51 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH v2 7/7] x86: unify header guards
-To: Cornelia Huck <cohuck@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Andrew Jones <drjones@redhat.com>
-References: <20210609143712.60933-1-cohuck@redhat.com>
- <20210609143712.60933-8-cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-Message-ID: <661ee535-bdac-aa1d-7b29-a271f698e778@redhat.com>
-Date: Wed, 9 Jun 2021 16:49:50 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=J4uqZat43uXQvNOJTycrnSDnl08RIvJWttyNK5Ek/y8=;
+ b=mqVKaKOOb5rKJz1mDeTIApglbl38rna3FOoOBaEruoWFbj0tXGPb7jX8qt9e5M3zwH
+ qvXclPV5r54D3DS5t15bXrh5fmu0aXxCJzjv0Xs40NDt1oLTEIryksMOpjq3Q1rfPvCP
+ 3e9+mOgm7ifWLcQvJlIE+IR84MRplUczNNvN1bb1bCwMKLsjvKzg3morZtR9te7OV7ya
+ JkY6P/6NDe/lm0ilt+BhEsEupC1u7aa3dENwkmZcGJ112Tzh+70U6q2MecMcSPALd5yd
+ 0GXGTKrluRDoz+LQHOCQAA0FoSVPoM6DwYDw4ABo6akRgg71Fu9ggGS63MFlEtDAJHez
+ 2TUA==
+X-Gm-Message-State: AOAM530I2e+rE8JN3krpYGTHa4o+o4jL3ccIYEfxKl5rpGxEAY7sDiku
+ IYFZjH49FN7t0S9ZBbzgJt78LRShBIlfReyOFi8UJQ==
+X-Google-Smtp-Source: ABdhPJwtEy715cts9tm9X8JTlBt0diCbht9bovQ7EqpFFv+TmmL+DAqN6jgcAGII2MOGq/hEEtGudbEoe7Zf41meHZw=
+X-Received: by 2002:a05:651c:304:: with SMTP id
+ a4mr251806ljp.331.1623250322933; 
+ Wed, 09 Jun 2021 07:52:02 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20210609143712.60933-8-cohuck@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=david@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Cc: Laurent Vivier <lvivier@redhat.com>, linux-s390@vger.kernel.org,
- Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
- kvm-ppc@vger.kernel.org, Claudio Imbrenda <imbrenda@linux.ibm.com>,
- kvmarm@lists.cs.columbia.edu
+References: <20210608214742.1897483-1-oupton@google.com>
+ <20210608214742.1897483-3-oupton@google.com>
+ <877dj3z68p.wl-maz@kernel.org>
+In-Reply-To: <877dj3z68p.wl-maz@kernel.org>
+From: Oliver Upton <oupton@google.com>
+Date: Wed, 9 Jun 2021 09:51:51 -0500
+Message-ID: <CAOQ_QsgobctkqS5SQdqGaM-vjH7685zGPdDXZpcOCS8xWJxegA@mail.gmail.com>
+Subject: Re: [PATCH 02/10] KVM: arm64: Implement initial support for
+ KVM_CAP_SYSTEM_COUNTER_STATE
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm list <kvm@vger.kernel.org>, Sean Christopherson <seanjc@google.com>,
+ Peter Shier <pshier@google.com>, Raghavendra Rao Anata <rananta@google.com>,
+ David Matlack <dmatlack@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ kvmarm@lists.cs.columbia.edu, Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -114,427 +92,149 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 09.06.21 16:37, Cornelia Huck wrote:
-> Standardize header guards to _ASMX86_HEADER_H_, _X86_HEADER_H_,
-> and X86_HEADER_H.
-> 
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
->   lib/x86/acpi.h             | 4 ++--
->   lib/x86/apic-defs.h        | 6 +++---
->   lib/x86/apic.h             | 4 ++--
->   lib/x86/asm/barrier.h      | 4 ++--
->   lib/x86/asm/debugreg.h     | 6 +++---
->   lib/x86/asm/io.h           | 4 ++--
->   lib/x86/asm/memory_areas.h | 4 ++--
->   lib/x86/asm/page.h         | 4 ++--
->   lib/x86/asm/pci.h          | 4 ++--
->   lib/x86/asm/spinlock.h     | 4 ++--
->   lib/x86/asm/stack.h        | 4 ++--
->   lib/x86/atomic.h           | 4 ++--
->   lib/x86/delay.h            | 4 ++--
->   lib/x86/desc.h             | 4 ++--
->   lib/x86/fault_test.h       | 4 ++--
->   lib/x86/fwcfg.h            | 4 ++--
->   lib/x86/intel-iommu.h      | 4 ++--
->   lib/x86/isr.h              | 4 ++--
->   lib/x86/msr.h              | 6 +++---
->   lib/x86/processor.h        | 4 ++--
->   lib/x86/smp.h              | 4 ++--
->   lib/x86/usermode.h         | 4 ++--
->   lib/x86/vm.h               | 4 ++--
->   x86/hyperv.h               | 4 ++--
->   x86/ioram.h                | 4 ++--
->   x86/kvmclock.h             | 4 ++--
->   x86/svm.h                  | 4 ++--
->   x86/types.h                | 4 ++--
->   x86/vmx.h                  | 4 ++--
->   29 files changed, 61 insertions(+), 61 deletions(-)
-> 
-> diff --git a/lib/x86/acpi.h b/lib/x86/acpi.h
-> index 08aaf57a7890..1b803740f331 100644
-> --- a/lib/x86/acpi.h
-> +++ b/lib/x86/acpi.h
-> @@ -1,5 +1,5 @@
-> -#ifndef KVM_ACPI_H
-> -#define KVM_ACPI_H 1
-> +#ifndef _X86_ACPI_H_
-> +#define _X86_ACPI_H_
->   
->   #include "libcflat.h"
->   
-> diff --git a/lib/x86/apic-defs.h b/lib/x86/apic-defs.h
-> index b2014de800a7..dabefe7879ea 100644
-> --- a/lib/x86/apic-defs.h
-> +++ b/lib/x86/apic-defs.h
-> @@ -1,5 +1,5 @@
-> -#ifndef _ASM_X86_APICDEF_H
-> -#define _ASM_X86_APICDEF_H
-> +#ifndef _X86_APIC_DEFS_H_
-> +#define _X86_APIC_DEFS_H_
->   
->   /*
->    * Abuse this header file to hold the number of max-cpus, making it available
-> @@ -144,4 +144,4 @@
->   
->   #define APIC_BASE_MSR	0x800
->   
-> -#endif /* _ASM_X86_APICDEF_H */
-> +#endif /* _X86_APIC_DEFS_H_ */
-> diff --git a/lib/x86/apic.h b/lib/x86/apic.h
-> index a7eff6354a83..c4821716b352 100644
-> --- a/lib/x86/apic.h
-> +++ b/lib/x86/apic.h
-> @@ -1,5 +1,5 @@
-> -#ifndef CFLAT_APIC_H
-> -#define CFLAT_APIC_H
-> +#ifndef _X86_APIC_H_
-> +#define _X86_APIC_H_
->   
->   #include <stdint.h>
->   #include "apic-defs.h"
-> diff --git a/lib/x86/asm/barrier.h b/lib/x86/asm/barrier.h
-> index 193fb4c2e712..66c8f56f1c9a 100644
-> --- a/lib/x86/asm/barrier.h
-> +++ b/lib/x86/asm/barrier.h
-> @@ -1,5 +1,5 @@
-> -#ifndef _ASM_X86_BARRIER_H_
-> -#define _ASM_X86_BARRIER_H_
-> +#ifndef _ASMX86_BARRIER_H_
-> +#define _ASMX86_BARRIER_H_
->   /*
->    * Copyright (C) 2016, Red Hat Inc, Alexander Gordeev <agordeev@redhat.com>
->    *
-> diff --git a/lib/x86/asm/debugreg.h b/lib/x86/asm/debugreg.h
-> index d95d080b30e3..e86f5a629480 100644
-> --- a/lib/x86/asm/debugreg.h
-> +++ b/lib/x86/asm/debugreg.h
-> @@ -1,6 +1,6 @@
->   /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-> -#ifndef _UAPI_ASM_X86_DEBUGREG_H
-> -#define _UAPI_ASM_X86_DEBUGREG_H
-> +#ifndef _ASMX86_DEBUGREG_H_
-> +#define _ASMX86_DEBUGREG_H_
->   
->   
->   /* Indicate the register numbers for a number of the specific
-> @@ -78,4 +78,4 @@
->    * HW breakpoint additions
->    */
->   
-> -#endif /* _UAPI_ASM_X86_DEBUGREG_H */
-> +#endif /* _ASMX86_DEBUGREG_H_ */
-> diff --git a/lib/x86/asm/io.h b/lib/x86/asm/io.h
-> index 35a5c7347411..88734320aa93 100644
-> --- a/lib/x86/asm/io.h
-> +++ b/lib/x86/asm/io.h
-> @@ -1,5 +1,5 @@
-> -#ifndef _ASM_X86_IO_H_
-> -#define _ASM_X86_IO_H_
-> +#ifndef _ASMX86_IO_H_
-> +#define _ASMX86_IO_H_
->   
->   #define __iomem
->   
-> diff --git a/lib/x86/asm/memory_areas.h b/lib/x86/asm/memory_areas.h
-> index e84016f8b060..bd47a89aba7d 100644
-> --- a/lib/x86/asm/memory_areas.h
-> +++ b/lib/x86/asm/memory_areas.h
-> @@ -1,5 +1,5 @@
-> -#ifndef _ASM_X86_MEMORY_AREAS_H_
-> -#define _ASM_X86_MEMORY_AREAS_H_
-> +#ifndef _ASMX86_MEMORY_AREAS_H_
-> +#define _ASMX86_MEMORY_AREAS_H_
->   
->   #define AREA_NORMAL_PFN BIT(36-12)
->   #define AREA_NORMAL_NUMBER 0
-> diff --git a/lib/x86/asm/page.h b/lib/x86/asm/page.h
-> index 2cf8881e16d2..fc1416071ec9 100644
-> --- a/lib/x86/asm/page.h
-> +++ b/lib/x86/asm/page.h
-> @@ -1,5 +1,5 @@
-> -#ifndef _ASM_X86_PAGE_H_
-> -#define _ASM_X86_PAGE_H_
-> +#ifndef _ASMX86_PAGE_H_
-> +#define _ASMX86_PAGE_H_
->   /*
->    * Copyright (C) 2016, Red Hat Inc, Alexander Gordeev <agordeev@redhat.com>
->    *
-> diff --git a/lib/x86/asm/pci.h b/lib/x86/asm/pci.h
-> index c937e5cd71e1..03e55c277f12 100644
-> --- a/lib/x86/asm/pci.h
-> +++ b/lib/x86/asm/pci.h
-> @@ -1,5 +1,5 @@
-> -#ifndef ASM_PCI_H
-> -#define ASM_PCI_H
-> +#ifndef _ASMX86_PCI_H_
-> +#define _ASMX86_PCI_H_
->   /*
->    * Copyright (C) 2013, Red Hat Inc, Michael S. Tsirkin <mst@redhat.com>
->    *
-> diff --git a/lib/x86/asm/spinlock.h b/lib/x86/asm/spinlock.h
-> index 692020c5185c..34fadf771c11 100644
-> --- a/lib/x86/asm/spinlock.h
-> +++ b/lib/x86/asm/spinlock.h
-> @@ -1,5 +1,5 @@
-> -#ifndef __ASM_SPINLOCK_H
-> -#define __ASM_SPINLOCK_H
-> +#ifndef _ASMX86_SPINLOCK_H_
-> +#define _ASMX86_SPINLOCK_H_
->   
->   #include <asm-generic/spinlock.h>
->   
-> diff --git a/lib/x86/asm/stack.h b/lib/x86/asm/stack.h
-> index b14e2c0fa012..417695373801 100644
-> --- a/lib/x86/asm/stack.h
-> +++ b/lib/x86/asm/stack.h
-> @@ -1,5 +1,5 @@
-> -#ifndef _X86ASM_STACK_H_
-> -#define _X86ASM_STACK_H_
-> +#ifndef _ASMX86_STACK_H_
-> +#define _ASMX86_STACK_H_
->   
->   #ifndef _STACK_H_
->   #error Do not directly include <asm/stack.h>. Just use <stack.h>.
-> diff --git a/lib/x86/atomic.h b/lib/x86/atomic.h
-> index c9ce489d3904..13e734bb464d 100644
-> --- a/lib/x86/atomic.h
-> +++ b/lib/x86/atomic.h
-> @@ -1,5 +1,5 @@
-> -#ifndef __ATOMIC_H
-> -#define __ATOMIC_H
-> +#ifndef _X86_ATOMIC_H_
-> +#define _X86_ATOMIC_H_
->   
->   #include "asm-generic/atomic.h"
->   
-> diff --git a/lib/x86/delay.h b/lib/x86/delay.h
-> index a51eb34485d0..26270edb2156 100644
-> --- a/lib/x86/delay.h
-> +++ b/lib/x86/delay.h
-> @@ -1,5 +1,5 @@
-> -#ifndef __X86_DELAY__
-> -#define __X86_DELAY__
-> +#ifndef _X86_DELAY_H_
-> +#define _X86_DELAY_H_
->   
->   #include "libcflat.h"
->   
-> diff --git a/lib/x86/desc.h b/lib/x86/desc.h
-> index 77b2c59d5551..a6ffb38c79a1 100644
-> --- a/lib/x86/desc.h
-> +++ b/lib/x86/desc.h
-> @@ -1,5 +1,5 @@
-> -#ifndef __IDT_TEST__
-> -#define __IDT_TEST__
-> +#ifndef _X86_DESC_H_
-> +#define _X86_DESC_H_
->   
->   #include <setjmp.h>
->   
-> diff --git a/lib/x86/fault_test.h b/lib/x86/fault_test.h
-> index dfa715ba6720..07566365d57c 100644
-> --- a/lib/x86/fault_test.h
-> +++ b/lib/x86/fault_test.h
-> @@ -1,5 +1,5 @@
-> -#ifndef __FAULT_TEST__
-> -#define __FAULT_TEST__
-> +#ifndef _X86_FAULT_TEST_H_
-> +#define _X86_FAULT_TEST_H_
->   
->   #include "x86/msr.h"
->   #include "x86/processor.h"
-> diff --git a/lib/x86/fwcfg.h b/lib/x86/fwcfg.h
-> index ac4257e5d78e..2434cf62222a 100644
-> --- a/lib/x86/fwcfg.h
-> +++ b/lib/x86/fwcfg.h
-> @@ -1,5 +1,5 @@
-> -#ifndef FWCFG_H
-> -#define FWCFG_H
-> +#ifndef _X86_FWCFG_H_
-> +#define _X86_FWCFG_H_
->   
->   #include <stdint.h>
->   #include <stdbool.h>
-> diff --git a/lib/x86/intel-iommu.h b/lib/x86/intel-iommu.h
-> index 05b9744b916b..e14f825e796d 100644
-> --- a/lib/x86/intel-iommu.h
-> +++ b/lib/x86/intel-iommu.h
-> @@ -12,8 +12,8 @@
->    * (From include/linux/intel-iommu.h)
->    */
->   
-> -#ifndef __INTEL_IOMMU_H__
-> -#define __INTEL_IOMMU_H__
-> +#ifndef _X86_INTEL_IOMMU_H_
-> +#define _X86_INTEL_IOMMU_H_
->   
->   #include "libcflat.h"
->   #include "isr.h"
-> diff --git a/lib/x86/isr.h b/lib/x86/isr.h
-> index a50929190b64..746ac7af4a90 100644
-> --- a/lib/x86/isr.h
-> +++ b/lib/x86/isr.h
-> @@ -1,5 +1,5 @@
-> -#ifndef __ISR_TEST__
-> -#define __ISR_TEST__
-> +#ifndef _X86_ISR_H_
-> +#define _X86_ISR_H_
->   
->   typedef struct {
->       ulong regs[sizeof(ulong)*2];
-> diff --git a/lib/x86/msr.h b/lib/x86/msr.h
-> index 5213bcd55836..5001b169cc48 100644
-> --- a/lib/x86/msr.h
-> +++ b/lib/x86/msr.h
-> @@ -1,5 +1,5 @@
-> -#ifndef _ASM_X86_MSR_INDEX_H
-> -#define _ASM_X86_MSR_INDEX_H
-> +#ifndef _X86_MSR_H_
-> +#define _X86_MSR_H_
->   
->   /* CPU model specific register (MSR) numbers */
->   
-> @@ -435,4 +435,4 @@
->   #define MSR_VM_IGNNE                    0xc0010115
->   #define MSR_VM_HSAVE_PA                 0xc0010117
->   
-> -#endif /* _ASM_X86_MSR_INDEX_H */
-> +#endif /* _X86_MSR_H_ */
-> diff --git a/lib/x86/processor.h b/lib/x86/processor.h
-> index abc04b08afb0..b6068f52d850 100644
-> --- a/lib/x86/processor.h
-> +++ b/lib/x86/processor.h
-> @@ -1,5 +1,5 @@
-> -#ifndef LIBCFLAT_PROCESSOR_H
-> -#define LIBCFLAT_PROCESSOR_H
-> +#ifndef _X86_PROCESSOR_H_
-> +#define _X86_PROCESSOR_H_
->   
->   #include "libcflat.h"
->   #include "desc.h"
-> diff --git a/lib/x86/smp.h b/lib/x86/smp.h
-> index 09dfa86f123b..f74845e6903c 100644
-> --- a/lib/x86/smp.h
-> +++ b/lib/x86/smp.h
-> @@ -1,5 +1,5 @@
-> -#ifndef __SMP_H
-> -#define __SMP_H
-> +#ifndef _X86_SMP_H_
-> +#define _X86_SMP_H_
->   #include <asm/spinlock.h>
->   
->   void smp_init(void);
-> diff --git a/lib/x86/usermode.h b/lib/x86/usermode.h
-> index 4e005e65f917..04e358e2a3a3 100644
-> --- a/lib/x86/usermode.h
-> +++ b/lib/x86/usermode.h
-> @@ -1,5 +1,5 @@
-> -#ifndef _USERMODE_H_
-> -#define _USERMODE_H_
-> +#ifndef _X86_USERMODE_H_
-> +#define _X86_USERMODE_H_
->   
->   #include "x86/msr.h"
->   #include "x86/processor.h"
-> diff --git a/lib/x86/vm.h b/lib/x86/vm.h
-> index 3a1432f39d2a..d9753c3d4606 100644
-> --- a/lib/x86/vm.h
-> +++ b/lib/x86/vm.h
-> @@ -1,5 +1,5 @@
-> -#ifndef VM_H
-> -#define VM_H
-> +#ifndef _X86_VM_H_
-> +#define _X86_VM_H_
->   
->   #include "processor.h"
->   #include "asm/page.h"
-> diff --git a/x86/hyperv.h b/x86/hyperv.h
-> index e135221fa28a..e3803e02f4dc 100644
-> --- a/x86/hyperv.h
-> +++ b/x86/hyperv.h
-> @@ -1,5 +1,5 @@
-> -#ifndef __HYPERV_H
-> -#define __HYPERV_H
-> +#ifndef X86_HYPERV_H
-> +#define X86_HYPERV_H
->   
->   #include "libcflat.h"
->   #include "processor.h"
-> diff --git a/x86/ioram.h b/x86/ioram.h
-> index 2938142b36d3..9c816a83eae5 100644
-> --- a/x86/ioram.h
-> +++ b/x86/ioram.h
-> @@ -1,5 +1,5 @@
-> -#ifndef __IO_RAM_H
-> -#define __IO_RAM_H
-> +#ifndef X86_IORAM_H
-> +#define X86_IORAM_H
->   
->   #define IORAM_BASE_PHYS 0xff000000UL
->   #define IORAM_LEN       0x10000UL
-> diff --git a/x86/kvmclock.h b/x86/kvmclock.h
-> index f823c6dbb65d..1a40a7c0f6bc 100644
-> --- a/x86/kvmclock.h
-> +++ b/x86/kvmclock.h
-> @@ -1,5 +1,5 @@
-> -#ifndef KVMCLOCK_H
-> -#define KVMCLOCK_H
-> +#ifndef X86_KVMCLOCK_H
-> +#define X86_KVMCLOCK_H
->   
->   #define MSR_KVM_WALL_CLOCK_NEW  0x4b564d00
->   #define MSR_KVM_SYSTEM_TIME_NEW 0x4b564d01
-> diff --git a/x86/svm.h b/x86/svm.h
-> index 593e3b0f64b1..995b0f8ccbfe 100644
-> --- a/x86/svm.h
-> +++ b/x86/svm.h
-> @@ -1,5 +1,5 @@
-> -#ifndef __SVM_H
-> -#define __SVM_H
-> +#ifndef X86_SVM_H
-> +#define X86_SVM_H
->   
->   #include "libcflat.h"
->   
-> diff --git a/x86/types.h b/x86/types.h
-> index 047556e854d6..56ce5ececdec 100644
-> --- a/x86/types.h
-> +++ b/x86/types.h
-> @@ -1,5 +1,5 @@
-> -#ifndef __TYPES_H
-> -#define __TYPES_H
-> +#ifndef X86_TYPES_H
-> +#define X86_TYPES_H
->   
->   #define DE_VECTOR 0
->   #define DB_VECTOR 1
-> diff --git a/x86/vmx.h b/x86/vmx.h
-> index 7e39b843cafb..2c534ca4b801 100644
-> --- a/x86/vmx.h
-> +++ b/x86/vmx.h
-> @@ -1,5 +1,5 @@
-> -#ifndef __VMX_H
-> -#define __VMX_H
-> +#ifndef X86_VMX_H
-> +#define X86_VMX_H
->   
->   #include "libcflat.h"
->   #include "processor.h"
-> 
+On Wed, Jun 9, 2021 at 5:23 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> Hi Oliver,
+>
+> Please Cc the KVM/arm64 reviewers (now added). Also, please consider
+> subscribing to the kvmarm mailing list so that I don't have to
+> manually approve your posts ;-).
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+/facepalm
 
--- 
+Thought I had done this already. Re-requested to join kvmarm@. Seems
+that gmail politely decided the mailing list was spam, so no
+confirmation email came through.
+
+> On Tue, 08 Jun 2021 22:47:34 +0100,
+> Oliver Upton <oupton@google.com> wrote:
+> >
+> > ARMv8 provides for a virtual counter-timer offset that is added to guest
+> > views of the virtual counter-timer (CNTVOFF_EL2). To date, KVM has not
+> > provided userspace with any perception of this, and instead affords a
+> > value-based scheme of migrating the virtual counter-timer by directly
+> > reading/writing the guest's CNTVCT_EL0. This is problematic because
+> > counters continue to elapse while the register is being written, meaning
+> > it is possible for drift to sneak in to the guest's time scale. This is
+> > exacerbated by the fact that KVM will calculate an appropriate
+> > CNTVOFF_EL2 every time the register is written, which will be broadcast
+> > to all virtual CPUs. The only possible way to avoid causing guest time
+> > to drift is to restore counter-timers by offset.
+>
+> Well, the current method has one huge advantage: time can never go
+> backward from the guest PoV if you restore what you have saved. Yes,
+> time can elapse, but you don't even need to migrate to observe that.
+>
+> >
+> > Implement initial support for KVM_{GET,SET}_SYSTEM_COUNTER_STATE ioctls
+> > to migrate the value of CNTVOFF_EL2. These ioctls yield precise control
+> > of the virtual counter-timers to userspace, allowing it to define its
+> > own heuristics for managing vCPU offsets.
+>
+> I'm not really in favour of inventing a completely new API, for
+> multiple reasons:
+>
+> - CNTVOFF is an EL2 concept. I'd rather not expose it as such as it
+>   becomes really confusing with NV (which does expose its own CNTVOFF
+>   via the ONE_REG interface)
+
+Very true. At least on x86, there's a fair bit of plumbing to handle
+the KVM-owned L0 offset reg and the guest-owned L1 offset reg.
+
+> - You seem to allow each vcpu to get its own offset. I don't think
+>   that's right. The architecture defines that all PEs have the same
+>   view of the counters, and an EL1 guest should be given that
+>   illusion.
+
+Agreed. I would have preferred a VM-wide ioctl to do this, but since
+x86 explicitly allows for drifted TSCs that can't be the case in a
+generic ioctl. I can do the same broadcasting as we do in the case of
+a VMM write to CNTVCT_EL0.
+
+> - by having a parallel save/restore interface, you make it harder to
+>   reason about what happens with concurrent calls to both interfaces
+>
+> - the userspace API is already horribly bloated, and I'm not overly
+>   keen on adding more if we can avoid it.
+
+Pssh. My ioctl numbers aren't _too_ close to the limit ;-)
+
+>
+> I'd rather you extend the current ONE_REG interface and make it modal,
+> either allowing the restore of an absolute value or an offset for
+> CNTVCT_EL0. This would also keep a consistent behaviour when restoring
+> vcpus. The same logic would apply to the physical offset.
+>
+> As for how to make it modal, we have plenty of bits left in the
+> ONE_REG encoding. Pick one, and make that a "relative" attribute. This
+> will result in some minor surgery in the get/set code paths, but at
+> least no entirely new mechanism.
+
+Yeah, it'd be good to do it w/o adding new plumbing. The only reason
+I'd considered it is because x86 might necessitate it. Not wanting to
+apply bad convention to other arches, but keeping at least a somewhat
+consistent UAPI would be nice.
+
+> One question though: how do you plan to reliably compute the offset?
+> As far as I can see, it is subject to the same issues you described
+> above (while the guest is being restored, time flies), and you have
+> the added risk of exposing a counter going backward from a guest
+> perspective.
+
+Indeed, we do have the risk of time going backwards, but I'd say that
+the VMM shares in the responsibility to provide a consistent view of
+the counter too.
+
+Here's how I envisioned it working:
+
+Record the time, cycles, and offset (T0, C0, Off0) when saving the
+counter state. Record time and cycles (T1, C1) again when trying to
+restore counter state. Compute the new offset:
+
+Off1 = Off0 - (T1-T0) * CNTFRQ - (C0 - C1).
+
+The primary concern here is idempotence. Once Off1 is calculated, it
+doesn't matter how much time elapses between the calculation and the
+call into KVM, it will always produce the intended result. If instead
+we restore the counters by-value (whilst trying to account for elapsed
+time), my impression is that we'd do the following: Record time and
+guest counter (T0, G0) when saving counter state. Record time again
+when trying to restore counter state.
+
+In userspace, compute the time elapsed and fold it into the guest counter (G1):
+
+G1 = G0 + (T1-T0) * CNTFRQ
+
+And then in the kernel:
+
+CNTVOFF = G1 - CNTPCT
+
+Any number of things can happen in between the kernel and userspace
+portions of this operation, causing some drift of the VM's counter.
+Fundamentally I suppose the issue we have is that we sample the host
+counter twice (T1, G1), when really we'd want to only do so once.
+
+So, open to any suggestions where we avoid the issue of causing the
+guest counter to drift, offsets only seemed to be the easiest thing
+given that they ought to be constant for the lifetime of a VM on a
+host and is the backing state used by hardware.
+
+--
 Thanks,
+Oliver
 
-David / dhildenb
-
+>
+> Thanks,
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
