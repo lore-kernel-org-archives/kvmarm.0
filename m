@@ -7,104 +7,99 @@ X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63850C48BD1
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Jun 2021 06:23:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6489DC47094
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Jun 2021 06:26:13 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E214D6128A
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Jun 2021 06:23:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E214D6128A
+	by mail.kernel.org (Postfix) with ESMTP id C98D8613CB
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Jun 2021 06:26:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C98D8613CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F3A9A40629;
-	Thu, 10 Jun 2021 02:23:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DCD549E8C;
+	Thu, 10 Jun 2021 02:26:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id fq5G1X5CbEPQ; Thu, 10 Jun 2021 02:23:17 -0400 (EDT)
+	with ESMTP id efPkLs50VvQm; Thu, 10 Jun 2021 02:26:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AAA8D40799;
-	Thu, 10 Jun 2021 02:23:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 31A4840878;
+	Thu, 10 Jun 2021 02:26:11 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B7A6E40629
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jun 2021 02:23:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AA34540878
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jun 2021 02:26:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ErLFk0qnX0Q5 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Jun 2021 02:23:14 -0400 (EDT)
+ with ESMTP id gogd1HNxLYj1 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Jun 2021 02:26:08 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D51F0405D8
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jun 2021 02:23:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C640540874
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jun 2021 02:26:08 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1623306194;
+ s=mimecast20190719; t=1623306360;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=y9OIQ37NN86b1J9AvzEspXWjtjFLEFdsV3WicIqcSRs=;
- b=XqCdTFXlCEVriHRkID0BZXZtRSn7odO7dehcOwhd4GxbFdzQtNyzDr8n5Yx1jtbagNPlSs
- kGZtxDUCtZuNBa3x2EXEofe6VZLIFC0JJdS5HFOBtzIaueod18WRO6BvCkXTyJAJcr8Y3X
- gBh5dk5w7Xn5Z919WOW0vCj4dwMq9oE=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-194--hT6UE-WPIOc8aC4vC2H9w-1; Thu, 10 Jun 2021 02:23:13 -0400
-X-MC-Unique: -hT6UE-WPIOc8aC4vC2H9w-1
-Received: by mail-wm1-f70.google.com with SMTP id
- j6-20020a05600c1906b029019e9c982271so3470533wmq.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 09 Jun 2021 23:23:13 -0700 (PDT)
+ bh=VGs+0yvbM3aZSFiSqmWvFiKGejTxJX5EbFXyaERoXAM=;
+ b=QGeBaRSlgfvoHJURMW7y3HJ9bj2Gr/pgz8QKBxMZGr8QJfcWTUJHw8jXj4ogMntwIvZcYL
+ X4qPYaG65S6XFzlQFT1Ycfptuylf4lPYuIL0t/JdPLwbYxI52HD25aJPZ6fH3B9gVLPbzl
+ FmGgrcWTWdlqMhiCuTh/n7ZpMUQe9DY=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-34-Zz9jhI0APbGUv6cl3XL6Iw-1; Thu, 10 Jun 2021 02:26:07 -0400
+X-MC-Unique: Zz9jhI0APbGUv6cl3XL6Iw-1
+Received: by mail-wr1-f69.google.com with SMTP id
+ l13-20020adfe9cd0000b0290119a0645c8fso407311wrn.8
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 09 Jun 2021 23:26:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=y9OIQ37NN86b1J9AvzEspXWjtjFLEFdsV3WicIqcSRs=;
- b=KWWPiUtQDTEuCcsw/xE0vJQIvmsUqrtlno8laEsYkn7cRrgPMliZKueJwhr/im+cJY
- +/+xYtLUS8o2bf2aib3/1zqUl/w6awwuSerqRdhU02JU3Y3w0yjm2RYzAxqZ1fkhGHX6
- Rdq7jO/PPKYmARlZa0h0/A+IhZQDxeJt7YVd3NFU5fBLuVjNFf6gqfsag5b2DuaM2VnF
- 8KixlIiK3ESUJGyrmlmeii3IHpSsXU5iGKmJlFW/7nqE+wvGArBJVAQy1Otse0JdNu74
- ryQpK4cmdUMbP606I3ELIAQJ/zey0PqQQaRr9KLbg4X2QIQnvMY9o5hApkXA8XA37ZIA
- 7PBg==
-X-Gm-Message-State: AOAM531cvUI8xYRETyXc1U0YOHX6otTWVGxaTwmr4wBplJ8Nto12l+SN
- Q3KbjiEIiK1/KlY+3VXgtxd+66/uZnWVbG8cErID7RBQ0b+plAiTOcc861GyNE6Y7Vl1iwa2im3
- ahPA9kniXCXNkgHFXNJzBKCb+
-X-Received: by 2002:a1c:4304:: with SMTP id q4mr12694521wma.89.1623306176584; 
- Wed, 09 Jun 2021 23:22:56 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxZTfWBq0Fv/sP2kbhWGpCObvkcy+Kk8Uv1WxLCdGVISIn/nfvKSLGOLnAS9rw4rbGo0hCx6w==
-X-Received: by 2002:a1c:4304:: with SMTP id q4mr12694493wma.89.1623306176334; 
- Wed, 09 Jun 2021 23:22:56 -0700 (PDT)
+ bh=VGs+0yvbM3aZSFiSqmWvFiKGejTxJX5EbFXyaERoXAM=;
+ b=fSFG30X/quSIVOY5g0yBan5xY8kGD9tkMxsw46OdPI2z0qOp1xAI2ESm5k0B8NZMlZ
+ r3zblBymo+mBjSTxO6ysrBJXjcNxI9UlokgD48fkYLG5ZOQ5jWfPqaiH3zCBVoN98B+W
+ qEtcqb8WJyjXVv8qGUmdVXmaKdk0g6fzOuQAZhCgoc1ArcTNcpXWJh53z8sIIMJoC9mh
+ F9IJ1HL3h2PEb4HNWYH0sr2AtpK1MOBHur9sX6a3NjtW5k01gRkICiSfbpICk8RcL4aL
+ fTd1jKLHaNpWNkd6vfy0dblMehSaqnaDJf97NnDh5cp4gcYPbXbyiRvF+CKACLO4tbUI
+ t1FA==
+X-Gm-Message-State: AOAM530bsHSEL2d4HO2OByx7XHH9iiXcX+xrAkOe0XNEf652ZopGX78d
+ 5NW7wmGgr7z3WNnS5XISEXz2S1MyWPYLpUbg91OqDwx9JBf3X+4/X6864phUY4HM5ROi2XH2sEi
+ I1YIXCgL5+Aq9jODiSjqxFpQg
+X-Received: by 2002:a05:6000:1542:: with SMTP id 2mr3538355wry.4.1623306366273; 
+ Wed, 09 Jun 2021 23:26:06 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzBGG55buqU3+VfqpCmTr0MOmTfLZq6Ft4s83qkvKAaEg+eogzlxEYnXIApfOL9adnMCh2brA==
+X-Received: by 2002:a05:6000:1542:: with SMTP id 2mr3538326wry.4.1623306366038; 
+ Wed, 09 Jun 2021 23:26:06 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
  ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
- by smtp.gmail.com with ESMTPSA id m132sm1862894wmf.10.2021.06.09.23.22.55
+ by smtp.gmail.com with ESMTPSA id k16sm1840159wmr.42.2021.06.09.23.26.04
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 09 Jun 2021 23:22:55 -0700 (PDT)
-To: Oliver Upton <oupton@google.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>
+ Wed, 09 Jun 2021 23:26:05 -0700 (PDT)
+Subject: Re: [PATCH 02/10] KVM: arm64: Implement initial support for
+ KVM_CAP_SYSTEM_COUNTER_STATE
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@google.com>
 References: <20210608214742.1897483-1-oupton@google.com>
- <63db3823-b8a3-578d-4baa-146104bb977f@redhat.com>
- <CAOQ_QsgPHAUuzeLy5sX=EhE8tKs7yEF3rxM47YeM_Pk3DUXMcg@mail.gmail.com>
- <d5a79989-6866-a405-5501-a3b1223b2ecd@redhat.com>
- <CAOQ_QsgvmmiQgV5rUBnNtoz+NfwEe2e4ebfpe8rJviR20QUjoQ@mail.gmail.com>
+ <20210608214742.1897483-3-oupton@google.com> <877dj3z68p.wl-maz@kernel.org>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 00/10] KVM: Add idempotent controls for migrating system
- counter state
-Message-ID: <7b57ce79-6a17-70ac-4639-47a0df463e49@redhat.com>
-Date: Thu, 10 Jun 2021 08:22:54 +0200
+Message-ID: <9c5f19f9-b303-573a-aa2a-cf5a91110db8@redhat.com>
+Date: Thu, 10 Jun 2021 08:26:03 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <CAOQ_QsgvmmiQgV5rUBnNtoz+NfwEe2e4ebfpe8rJviR20QUjoQ@mail.gmail.com>
+In-Reply-To: <877dj3z68p.wl-maz@kernel.org>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
-Cc: kvm list <kvm@vger.kernel.org>, Sean Christopherson <seanjc@google.com>,
- Raghavendra Rao Anata <rananta@google.com>, Peter Shier <pshier@google.com>,
- Maxim Levitsky <mlevitsk@redhat.com>, Marc Zyngier <maz@kernel.org>,
+Cc: kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
+ Peter Shier <pshier@google.com>, Raghavendra Rao Anata <rananta@google.com>,
  David Matlack <dmatlack@google.com>, kvmarm@lists.cs.columbia.edu,
  Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -123,79 +118,39 @@ Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 10/06/21 00:04, Oliver Upton wrote:
->> Your approach still needs to use the "quirky" approach to host-initiated
->> MSR_IA32_TSC_ADJUST writes, which write the MSR without affecting the
->> VMCS offset.  This is just a documentation issue.
+On 09/06/21 12:23, Marc Zyngier wrote:
+>> Implement initial support for KVM_{GET,SET}_SYSTEM_COUNTER_STATE ioctls
+>> to migrate the value of CNTVOFF_EL2. These ioctls yield precise control
+>> of the virtual counter-timers to userspace, allowing it to define its
+>> own heuristics for managing vCPU offsets.
+> I'm not really in favour of inventing a completely new API, for
+> multiple reasons:
 > 
-> My suggested ioctl for the vCPU will still exist, and it will still
-> affect the VMCS tsc offset, right? However, we need to do one of the
-> following:
+> - CNTVOFF is an EL2 concept. I'd rather not expose it as such as it
+>    becomes really confusing with NV (which does expose its own CNTVOFF
+>    via the ONE_REG interface)
 > 
-> - Stash the guest's MSR_IA32_TSC_ADJUST value in the
-> kvm_system_counter_state structure. During
-> KVM_SET_SYSTEM_COUNTER_STATE, check to see if the field is valid. If
-> so, treat it as a dumb value (i.e. show it to the guest but don't fold
-> it into the offset).
-
-Yes, it's already folded into the guestTSC-hostTSC offset that the 
-caller provides.
-
-> - Inform userspace that it must still migrate MSR_IA32_TSC_ADJUST, and
-> continue to our quirky behavior around host-initiated writes of the
-> MSR.
+> - You seem to allow each vcpu to get its own offset. I don't think
+>    that's right. The architecture defines that all PEs have the same
+>    view of the counters, and an EL1 guest should be given that
+>    illusion.
 > 
-> This is why Maxim's spin migrated a value for IA32_TSC_ADJUST, right?
+> - by having a parallel save/restore interface, you make it harder to
+>    reason about what happens with concurrent calls to both interfaces
+> 
+> - the userspace API is already horribly bloated, and I'm not overly
+>    keen on adding more if we can avoid it.
+> 
+> I'd rather you extend the current ONE_REG interface and make it modal,
+> either allowing the restore of an absolute value or an offset for
+> CNTVCT_EL0. This would also keep a consistent behaviour when restoring
+> vcpus. The same logic would apply to the physical offset.
 
-Yes, so that he could then remove (optionally) the quirk for 
-host-initiated writes to the TSC and TSC_ADJUST MSRs.
-
-> Doing so ensures we don't have any guest-observable consequences due
-> to our migration of TSC state. To me, adding the guest IA32_TSC_ADJUST
-> MSR into the new counter state structure is probably best. No strong
-> opinions in either direction on this point, though:)
-
-Either is good for me, since documentation will be very important either 
-way.  This is a complex API to use due to the possibility of skewed TSCs.
-
-Just one thing, please don't introduce a new ioctl and use 
-KVM_GET_DEVICE_ATTR/KVM_SET_DEVICE_ATTR/KVM_HAS_DEVICE_ATTR.
-
-Christian, based on what Oliver mentions here, it's probably useful for 
-s390 to have functionality to get/set kvm->arch.epoch and kvm->arch.epdx 
-in addition to the absolute TOD values that you are migrating now.
+What about using KVM_GET/SET_DEVICE_ATTR?  It makes sense that the guest 
+value for nested virt goes through ONE_REG, while the host value goes 
+through DEVICE_ATTR.
 
 Paolo
-
->> 1) In the kernel:
->>
->> * KVM_GET_CLOCK should also return kvmclock_ns - realtime_ns and
->> host_TSC.  It should set two flags in struct kvm_clock_data saying that
->> the respective fields are valid.
->>
->> * KVM_SET_CLOCK checks the flag for kvmclock_ns - realtime_ns.  If set,
->> it looks at the kvmclock_ns - realtime_ns field and disregards the
->> kvmclock_ns field.
->>
->> 2) On the source, userspace will:
->>
->> * per-VM: invoke KVM_GET_CLOCK.  Migrate kvmclock_ns - realtime_ns and
->> kvmclock_ns.  Stash host_TSC for subsequent use.
->>
->> * per-vCPU: retrieve guest_TSC - host_TSC with your new ioctl.  Sum it
->> to the stashed host_TSC value; migrate the resulting value (a guest TSC).
->>
->> 3) On the destination:
->>
->> * per-VM: Pass the migrated kvmclock_ns - realtime_ns to KVM_SET_CLOCK.
->>   Use KVM_GET_CLOCK to get a consistent pair of kvmclock_ns ("newNS"
->> below) and host TSC ("newHostTSC").  Stash them for subsequent use,
->> together with the migrated kvmclock_ns value ("sourceNS") that you
->> haven't used yet.
->>
->> * per-vCPU: using the data of the previous step, and the sourceGuestTSC
->> in the migration stream, compute sourceGuestTSC + (newNS - sourceNS) *
->> freq - newHostTSC.  This is the TSC offset to be passed to your new ioctl.
 
 _______________________________________________
 kvmarm mailing list
