@@ -7,56 +7,55 @@ X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45E7AC48BD1
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Jun 2021 15:08:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61931C47094
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Jun 2021 16:02:47 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 831BA613E3
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Jun 2021 15:08:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 831BA613E3
+	by mail.kernel.org (Postfix) with ESMTP id 9C3F06128A
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Jun 2021 16:02:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C3F06128A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=Huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EEAE04A32E;
-	Thu, 10 Jun 2021 11:08:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 08AB74A4FC;
+	Thu, 10 Jun 2021 12:02:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id kqEM6AQsqy3g; Thu, 10 Jun 2021 11:08:22 -0400 (EDT)
+	with ESMTP id Aw4cyaFqqbGY; Thu, 10 Jun 2021 12:02:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AF9A94086C;
-	Thu, 10 Jun 2021 11:08:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 980354A522;
+	Thu, 10 Jun 2021 12:02:44 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0372F40874
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jun 2021 11:08:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B9F934A500
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jun 2021 12:02:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id keW+BjY-EnhI for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Jun 2021 11:08:18 -0400 (EDT)
+ with ESMTP id JzSVYNfYOIBh for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Jun 2021 12:02:42 -0400 (EDT)
 Received: from frasgout.his.huawei.com (frasgout.his.huawei.com
  [185.176.79.56])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6CA1340839
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jun 2021 11:08:18 -0400 (EDT)
-Received: from fraeml711-chm.china.huawei.com (unknown [172.18.147.207])
- by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4G16Yn5pqWz6L6GR;
- Thu, 10 Jun 2021 22:58:53 +0800 (CST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DD5EA4A4FC
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jun 2021 12:02:41 -0400 (EDT)
+Received: from fraeml738-chm.china.huawei.com (unknown [172.18.147.201])
+ by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4G17hY43GQz6M4gy;
+ Thu, 10 Jun 2021 23:49:49 +0800 (CST)
 Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- fraeml711-chm.china.huawei.com (10.206.15.60) with Microsoft SMTP Server
+ fraeml738-chm.china.huawei.com (10.206.15.219) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Thu, 10 Jun 2021 17:08:16 +0200
+ 15.1.2176.2; Thu, 10 Jun 2021 18:02:39 +0200
 Received: from localhost (10.52.126.112) by lhreml710-chm.china.huawei.com
  (10.201.108.61) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Thu, 10 Jun
- 2021 16:08:15 +0100
-Date: Thu, 10 Jun 2021 16:08:12 +0100
+ 2021 17:02:38 +0100
+Date: Thu, 10 Jun 2021 17:02:35 +0100
 From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
 To: Jean-Philippe Brucker <jean-philippe@linaro.org>
-Subject: Re: [RFC PATCH 1/5] KVM: arm64: Replace power_off with mp_state in
- struct kvm_vcpu_arch
-Message-ID: <20210610160812.0000679b@Huawei.com>
-In-Reply-To: <20210608154805.216869-2-jean-philippe@linaro.org>
+Subject: Re: [RFC PATCH 4/5] KVM: arm64: Pass hypercalls to userspace
+Message-ID: <20210610170235.00003494@Huawei.com>
+In-Reply-To: <20210608154805.216869-5-jean-philippe@linaro.org>
 References: <20210608154805.216869-1-jean-philippe@linaro.org>
- <20210608154805.216869-2-jean-philippe@linaro.org>
+ <20210608154805.216869-5-jean-philippe@linaro.org>
 Organization: Huawei Technologies Research and Development (UK) Ltd.
 X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; i686-w64-mingw32)
 MIME-Version: 1.0
@@ -84,211 +83,213 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue,  8 Jun 2021 17:48:02 +0200
+On Tue,  8 Jun 2021 17:48:05 +0200
 Jean-Philippe Brucker <jean-philippe@linaro.org> wrote:
 
-> In order to add a new "suspend" power state, replace power_off with
-> mp_state in struct kvm_vcpu_arch. Factor the vcpu_off() function while
-> we're here.
-
-Hi Jean-Phillipe,
-
-2 changes, so if you do end up doing a v2 I'd prefer the
-factor out of kvm_arm_vcpu_power_off() + possibly introduced
-kvm_arm_vcpu_is_off() using the old boolean.
-Then the change in how you track the state will be a bit easier to
-pick out.
-
+> Let userspace request to handle all hypercalls that aren't handled by
+> KVM, by setting the KVM_CAP_ARM_HVC_TO_USER capability.
 > 
-> No functional change intended.
+> With the help of another capability, this will allow userspace to handle
+> PSCI calls.
 > 
+> Suggested-by: James Morse <james.morse@arm.com>
 > Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+
+Trivial question inline.
+
+
 > ---
->  arch/arm64/include/asm/kvm_host.h |  6 ++++--
->  arch/arm64/kvm/arm.c              | 29 +++++++++++++++--------------
->  arch/arm64/kvm/psci.c             | 19 ++++++-------------
->  3 files changed, 25 insertions(+), 29 deletions(-)
 > 
+> Notes on this implementation:
+> 
+> * A similar mechanism was proposed for SDEI some time ago [1]. This RFC
+>   generalizes the idea to all hypercalls, since that was suggested on
+>   the list [2, 3].
+> 
+> * We're reusing kvm_run.hypercall. I copied x0-x5 into
+>   kvm_run.hypercall.args[] to help userspace but I'm tempted to remove
+>   this, because:
+>   - Most user handlers will need to write results back into the
+>     registers (x0-x3 for SMCCC), so if we keep this shortcut we should
+>     go all the way and synchronize them on return to kernel.
+>   - QEMU doesn't care about this shortcut, it pulls all vcpu regs before
+>     handling the call.
+>   - SMCCC uses x0-x16 for parameters.
+>   x0 does contain the SMCCC function ID and may be useful for fast
+>   dispatch, we could keep that plus the immediate number.
+> 
+> * Should we add a flag in the kvm_run.hypercall telling whether this is
+>   HVC or SMC?  Can be added later in those bottom longmode and pad
+>   fields.
+> 
+> * On top of this we could share with userspace which HVC ranges are
+>   available and which ones are handled by KVM. That can actually be
+>   added independently, through a vCPU/VM device attribute (which doesn't
+>   consume a new ioctl):
+>   - userspace issues HAS_ATTR ioctl on the VM fd to query whether this
+>     feature is available.
+>   - userspace queries the number N of HVC ranges using one GET_ATTR.
+>   - userspace passes an array of N ranges using another GET_ATTR.
+>     The array is filled and returned by KVM.
+> 
+> * Untested for AArch32 guests.
+> 
+> [1] https://lore.kernel.org/linux-arm-kernel/20170808164616.25949-12-james.morse@arm.com/
+> [2] https://lore.kernel.org/linux-arm-kernel/bf7e83f1-c58e-8d65-edd0-d08f27b8b766@arm.com/
+> [3] https://lore.kernel.org/linux-arm-kernel/f56cf420-affc-35f0-2355-801a924b8a35@arm.com/
+> ---
+>  Documentation/virt/kvm/api.rst    | 17 +++++++++++++++--
+>  arch/arm64/include/asm/kvm_host.h |  1 +
+>  include/kvm/arm_psci.h            |  4 ++++
+>  include/uapi/linux/kvm.h          |  1 +
+>  arch/arm64/kvm/arm.c              |  5 +++++
+>  arch/arm64/kvm/hypercalls.c       | 28 +++++++++++++++++++++++++++-
+>  6 files changed, 53 insertions(+), 3 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index e4fe7fb60d5d..3d8c1661e7b2 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -5228,8 +5228,12 @@ to the byte array.
+>  			__u32 pad;
+>  		} hypercall;
+>  
+> -Unused.  This was once used for 'hypercall to userspace'.  To implement
+> -such functionality, use KVM_EXIT_IO (x86) or KVM_EXIT_MMIO (all except s390).
+> +On x86 this was once used for 'hypercall to userspace'.  To implement such
+> +functionality, use KVM_EXIT_IO (x86) or KVM_EXIT_MMIO (all except s390).
+> +
+> +On arm64 it is used for hypercalls, when the KVM_CAP_ARM_HVC_TO_USER capability
+> +is enabled. 'nr' contains the HVC or SMC immediate. 'args' contains registers
+> +x0 - x5. The other parameters are unused.
+>  
+>  .. note:: KVM_EXIT_IO is significantly faster than KVM_EXIT_MMIO.
+>  
+> @@ -6894,3 +6898,12 @@ This capability is always enabled.
+>  This capability indicates that the KVM virtual PTP service is
+>  supported in the host. A VMM can check whether the service is
+>  available to the guest on migration.
+> +
+> +8.33 KVM_CAP_ARM_HVC_TO_USER
+> +----------------------------
+> +
+> +:Architecture: arm64
+> +
+> +This capability indicates that KVM can pass unhandled hypercalls to userspace,
+> +if the VMM enables it. Hypercalls are passed with KVM_EXIT_HYPERCALL in
+> +kvm_run::hypercall.
 > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 7cd7d5c8c4bc..55a04f4d5919 100644
+> index 3ca732feb9a5..25554ce97045 100644
 > --- a/arch/arm64/include/asm/kvm_host.h
 > +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -340,8 +340,8 @@ struct kvm_vcpu_arch {
->  		u32	mdscr_el1;
->  	} guest_debug_preserved;
+> @@ -123,6 +123,7 @@ struct kvm_arch {
+>  	 * supported.
+>  	 */
+>  	bool return_nisv_io_abort_to_user;
+> +	bool hvc_to_user;
 >  
-> -	/* vcpu power-off state */
-> -	bool power_off;
-> +	/* vcpu power state (runnable, stopped, halted) */
-> +	u32 mp_state;
+>  	/*
+>  	 * VM-wide PMU filter, implemented as a bitmap and big enough for
+> diff --git a/include/kvm/arm_psci.h b/include/kvm/arm_psci.h
+> index 5b58bd2fe088..d6b71a48fbb1 100644
+> --- a/include/kvm/arm_psci.h
+> +++ b/include/kvm/arm_psci.h
+> @@ -16,6 +16,10 @@
 >  
->  	/* Don't run the guest (internal implementation need) */
->  	bool pause;
-> @@ -720,6 +720,8 @@ int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
->  			       struct kvm_device_attr *attr);
->  int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
->  			       struct kvm_device_attr *attr);
-> +void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu);
-> +bool kvm_arm_vcpu_is_off(struct kvm_vcpu *vcpu);
+>  #define KVM_ARM_PSCI_LATEST	KVM_ARM_PSCI_1_0
 >  
->  /* Guest/host FPSIMD coordination helpers */
->  int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
+> +#define KVM_PSCI_FN_LAST	KVM_PSCI_FN(3)
+> +#define PSCI_0_2_FN_LAST	PSCI_0_2_FN(0x3f)
+> +#define PSCI_0_2_FN64_LAST	PSCI_0_2_FN64(0x3f)
+
+Why 3f?  Perhaps a spec reference if appropriate.
+
+> +
+>  /*
+>   * We need the KVM pointer independently from the vcpu as we can call
+>   * this from HYP, and need to apply kern_hyp_va on it...
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 06ba64c49737..aa831986a399 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1084,6 +1084,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_VM_COPY_ENC_CONTEXT_FROM 197
+>  #define KVM_CAP_PTP_KVM 198
+>  #define KVM_CAP_ARM_MP_HALTED 199
+> +#define KVM_CAP_ARM_HVC_TO_USER 200
+>  
+>  #ifdef KVM_CAP_IRQ_ROUTING
+>  
 > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index e720148232a0..bcc24adb9c0a 100644
+> index d6ad977fea5f..074197721e97 100644
 > --- a/arch/arm64/kvm/arm.c
 > +++ b/arch/arm64/kvm/arm.c
-> @@ -435,21 +435,22 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->  	vcpu->cpu = -1;
+> @@ -93,6 +93,10 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+>  		r = 0;
+>  		kvm->arch.return_nisv_io_abort_to_user = true;
+>  		break;
+> +	case KVM_CAP_ARM_HVC_TO_USER:
+> +		r = 0;
+> +		kvm->arch.hvc_to_user = true;
+> +		break;
+>  	default:
+>  		r = -EINVAL;
+>  		break;
+> @@ -208,6 +212,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  	case KVM_CAP_VCPU_ATTRIBUTES:
+>  	case KVM_CAP_PTP_KVM:
+>  	case KVM_CAP_ARM_MP_HALTED:
+> +	case KVM_CAP_ARM_HVC_TO_USER:
+>  		r = 1;
+>  		break;
+>  	case KVM_CAP_SET_GUEST_DEBUG2:
+> diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+> index 30da78f72b3b..ccc2015eddf9 100644
+> --- a/arch/arm64/kvm/hypercalls.c
+> +++ b/arch/arm64/kvm/hypercalls.c
+> @@ -58,6 +58,28 @@ static void kvm_ptp_get_time(struct kvm_vcpu *vcpu, u64 *val)
+>  	val[3] = lower_32_bits(cycles);
 >  }
 >  
-> -static void vcpu_power_off(struct kvm_vcpu *vcpu)
-> +void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu)
->  {
-> -	vcpu->arch.power_off = true;
-> +	vcpu->arch.mp_state = KVM_MP_STATE_STOPPED;
->  	kvm_make_request(KVM_REQ_SLEEP, vcpu);
->  	kvm_vcpu_kick(vcpu);
->  }
->  
-> +bool kvm_arm_vcpu_is_off(struct kvm_vcpu *vcpu)
+> +static int kvm_hvc_user(struct kvm_vcpu *vcpu)
 > +{
-> +	return vcpu->arch.mp_state == KVM_MP_STATE_STOPPED;
+> +	int i;
+> +	struct kvm_run *run = vcpu->run;
+> +
+> +	if (!vcpu->kvm->arch.hvc_to_user) {
+> +		smccc_set_retval(vcpu, SMCCC_RET_NOT_SUPPORTED, 0, 0, 0);
+> +		return 1;
+> +	}
+> +
+> +	run->exit_reason = KVM_EXIT_HYPERCALL;
+> +	run->hypercall.nr = kvm_vcpu_hvc_get_imm(vcpu);
+> +	/* Copy the first parameters for fast access */
+> +	for (i = 0; i < 6; i++)
+> +		run->hypercall.args[i] = vcpu_get_reg(vcpu, i);
+> +	run->hypercall.ret = 0;
+> +	run->hypercall.longmode = 0;
+> +	run->hypercall.pad = 0;
+> +
+> +	return 0;
 > +}
 > +
->  int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
->  				    struct kvm_mp_state *mp_state)
+>  int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
 >  {
-> -	if (vcpu->arch.power_off)
-> -		mp_state->mp_state = KVM_MP_STATE_STOPPED;
-> -	else
-> -		mp_state->mp_state = KVM_MP_STATE_RUNNABLE;
-> -
-> +	mp_state->mp_state = vcpu->arch.mp_state;
-
-Nice to have a blank line here.
-
->  	return 0;
->  }
->  
-> @@ -460,10 +461,10 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
->  
->  	switch (mp_state->mp_state) {
->  	case KVM_MP_STATE_RUNNABLE:
-> -		vcpu->arch.power_off = false;
-> +		vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
->  		break;
->  	case KVM_MP_STATE_STOPPED:
-> -		vcpu_power_off(vcpu);
-> +		kvm_arm_vcpu_power_off(vcpu);
->  		break;
->  	default:
->  		ret = -EINVAL;
-> @@ -483,7 +484,7 @@ int kvm_arch_vcpu_runnable(struct kvm_vcpu *v)
->  {
->  	bool irq_lines = *vcpu_hcr(v) & (HCR_VI | HCR_VF);
->  	return ((irq_lines || kvm_vgic_vcpu_pending_irq(v))
-> -		&& !v->arch.power_off && !v->arch.pause);
-> +		&& !kvm_arm_vcpu_is_off(v) && !v->arch.pause);
->  }
->  
->  bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
-> @@ -643,10 +644,10 @@ static void vcpu_req_sleep(struct kvm_vcpu *vcpu)
->  	struct rcuwait *wait = kvm_arch_vcpu_get_wait(vcpu);
->  
->  	rcuwait_wait_event(wait,
-> -			   (!vcpu->arch.power_off) &&(!vcpu->arch.pause),
-> +			   !kvm_arm_vcpu_is_off(vcpu) && !vcpu->arch.pause,
->  			   TASK_INTERRUPTIBLE);
->  
-> -	if (vcpu->arch.power_off || vcpu->arch.pause) {
-> +	if (kvm_arm_vcpu_is_off(vcpu) || vcpu->arch.pause) {
->  		/* Awaken to handle a signal, request we sleep again later. */
->  		kvm_make_request(KVM_REQ_SLEEP, vcpu);
+>  	u32 func_id = smccc_get_function(vcpu);
+> @@ -139,8 +161,12 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+>  	case ARM_SMCCC_TRNG_RND32:
+>  	case ARM_SMCCC_TRNG_RND64:
+>  		return kvm_trng_call(vcpu);
+> -	default:
+> +	case KVM_PSCI_FN_BASE...KVM_PSCI_FN_LAST:
+> +	case PSCI_0_2_FN_BASE...PSCI_0_2_FN_LAST:
+> +	case PSCI_0_2_FN64_BASE...PSCI_0_2_FN64_LAST:
+>  		return kvm_psci_call(vcpu);
+> +	default:
+> +		return kvm_hvc_user(vcpu);
 >  	}
-> @@ -1087,9 +1088,9 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
->  	 * Handle the "start in power-off" case.
->  	 */
->  	if (test_bit(KVM_ARM_VCPU_POWER_OFF, vcpu->arch.features))
-> -		vcpu_power_off(vcpu);
-> +		kvm_arm_vcpu_power_off(vcpu);
->  	else
-> -		vcpu->arch.power_off = false;
-> +		vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
 >  
->  	return 0;
->  }
-> diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
-> index db4056ecccfd..24b4a2265dbd 100644
-> --- a/arch/arm64/kvm/psci.c
-> +++ b/arch/arm64/kvm/psci.c
-> @@ -52,13 +52,6 @@ static unsigned long kvm_psci_vcpu_suspend(struct kvm_vcpu *vcpu)
->  	return PSCI_RET_SUCCESS;
->  }
->  
-> -static void kvm_psci_vcpu_off(struct kvm_vcpu *vcpu)
-> -{
-> -	vcpu->arch.power_off = true;
-> -	kvm_make_request(KVM_REQ_SLEEP, vcpu);
-> -	kvm_vcpu_kick(vcpu);
-> -}
-> -
->  static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
->  {
->  	struct vcpu_reset_state *reset_state;
-> @@ -78,7 +71,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
->  	 */
->  	if (!vcpu)
->  		return PSCI_RET_INVALID_PARAMS;
-> -	if (!vcpu->arch.power_off) {
-> +	if (!kvm_arm_vcpu_is_off(vcpu)) {
->  		if (kvm_psci_version(source_vcpu, kvm) != KVM_ARM_PSCI_0_1)
->  			return PSCI_RET_ALREADY_ON;
->  		else
-> @@ -107,7 +100,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
->  	 */
->  	smp_wmb();
->  
-> -	vcpu->arch.power_off = false;
-> +	vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
->  	kvm_vcpu_wake_up(vcpu);
->  
->  	return PSCI_RET_SUCCESS;
-> @@ -142,7 +135,7 @@ static unsigned long kvm_psci_vcpu_affinity_info(struct kvm_vcpu *vcpu)
->  		mpidr = kvm_vcpu_get_mpidr_aff(tmp);
->  		if ((mpidr & target_affinity_mask) == target_affinity) {
->  			matching_cpus++;
-> -			if (!tmp->arch.power_off)
-> +			if (!kvm_arm_vcpu_is_off(tmp))
->  				return PSCI_0_2_AFFINITY_LEVEL_ON;
->  		}
->  	}
-> @@ -168,7 +161,7 @@ static void kvm_prepare_system_event(struct kvm_vcpu *vcpu, u32 type)
->  	 * re-initialized.
->  	 */
->  	kvm_for_each_vcpu(i, tmp, vcpu->kvm)
-> -		tmp->arch.power_off = true;
-> +		tmp->arch.mp_state = KVM_MP_STATE_STOPPED;
->  	kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_SLEEP);
->  
->  	memset(&vcpu->run->system_event, 0, sizeof(vcpu->run->system_event));
-> @@ -237,7 +230,7 @@ static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
->  		val = kvm_psci_vcpu_suspend(vcpu);
->  		break;
->  	case PSCI_0_2_FN_CPU_OFF:
-> -		kvm_psci_vcpu_off(vcpu);
-> +		kvm_arm_vcpu_power_off(vcpu);
->  		val = PSCI_RET_SUCCESS;
->  		break;
->  	case PSCI_0_2_FN_CPU_ON:
-> @@ -350,7 +343,7 @@ static int kvm_psci_0_1_call(struct kvm_vcpu *vcpu)
->  
->  	switch (psci_fn) {
->  	case KVM_PSCI_FN_CPU_OFF:
-> -		kvm_psci_vcpu_off(vcpu);
-> +		kvm_arm_vcpu_power_off(vcpu);
->  		val = PSCI_RET_SUCCESS;
->  		break;
->  	case KVM_PSCI_FN_CPU_ON:
+>  	smccc_set_retval(vcpu, val[0], val[1], val[2], val[3]);
 
 _______________________________________________
 kvmarm mailing list
