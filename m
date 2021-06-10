@@ -2,63 +2,72 @@ Return-Path: <SRS0=KFVQ=LE=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84A4AC48BD1
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Jun 2021 14:08:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45E7AC48BD1
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Jun 2021 15:08:25 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E923C613D9
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Jun 2021 14:08:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E923C613D9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 831BA613E3
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Jun 2021 15:08:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 831BA613E3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=Huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 711E649F92;
-	Thu, 10 Jun 2021 10:08:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EEAE04A32E;
+	Thu, 10 Jun 2021 11:08:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id AFJ-coGjsQPa; Thu, 10 Jun 2021 10:08:02 -0400 (EDT)
+	with ESMTP id kqEM6AQsqy3g; Thu, 10 Jun 2021 11:08:22 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 60ED249E8C;
-	Thu, 10 Jun 2021 10:08:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AF9A94086C;
+	Thu, 10 Jun 2021 11:08:22 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EA3F749E8C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jun 2021 10:08:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0372F40874
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jun 2021 11:08:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8Jvqsm6qSZvC for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Jun 2021 10:07:59 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 424E74080B
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jun 2021 10:07:59 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 41E97613C0;
- Thu, 10 Jun 2021 14:07:55 +0000 (UTC)
-Date: Thu, 10 Jun 2021 15:07:52 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Steven Price <steven.price@arm.com>
-Subject: Re: [PATCH v14 1/8] arm64: mte: Handle race when synchronising tags
-Message-ID: <20210610140750.GA31534@arm.com>
-References: <20210607110816.25762-1-steven.price@arm.com>
- <20210607110816.25762-2-steven.price@arm.com>
- <875yynz5wp.wl-maz@kernel.org>
- <e65943cb-9643-c973-9626-ebf56723ea14@arm.com>
- <874ke7z3ng.wl-maz@kernel.org> <20210609174117.GA18459@arm.com>
- <3e0757db-d93d-8554-4167-1c6853f3ae87@arm.com>
+ with ESMTP id keW+BjY-EnhI for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Jun 2021 11:08:18 -0400 (EDT)
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com
+ [185.176.79.56])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6CA1340839
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jun 2021 11:08:18 -0400 (EDT)
+Received: from fraeml711-chm.china.huawei.com (unknown [172.18.147.207])
+ by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4G16Yn5pqWz6L6GR;
+ Thu, 10 Jun 2021 22:58:53 +0800 (CST)
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ fraeml711-chm.china.huawei.com (10.206.15.60) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Thu, 10 Jun 2021 17:08:16 +0200
+Received: from localhost (10.52.126.112) by lhreml710-chm.china.huawei.com
+ (10.201.108.61) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Thu, 10 Jun
+ 2021 16:08:15 +0100
+Date: Thu, 10 Jun 2021 16:08:12 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: Jean-Philippe Brucker <jean-philippe@linaro.org>
+Subject: Re: [RFC PATCH 1/5] KVM: arm64: Replace power_off with mp_state in
+ struct kvm_vcpu_arch
+Message-ID: <20210610160812.0000679b@Huawei.com>
+In-Reply-To: <20210608154805.216869-2-jean-philippe@linaro.org>
+References: <20210608154805.216869-1-jean-philippe@linaro.org>
+ <20210608154805.216869-2-jean-philippe@linaro.org>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; i686-w64-mingw32)
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <3e0757db-d93d-8554-4167-1c6853f3ae87@arm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
- Marc Zyngier <maz@kernel.org>, Juan Quintela <quintela@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
- Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org,
- Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+X-Originating-IP: [10.52.126.112]
+X-ClientProxiedBy: lhreml728-chm.china.huawei.com (10.201.108.79) To
+ lhreml710-chm.china.huawei.com (10.201.108.61)
+X-CFilter-Loop: Reflected
+Cc: salil.mehta@huawei.com, lorenzo.pieralisi@arm.com, kvm@vger.kernel.org,
+ corbet@lwn.net, maz@kernel.org, linux-kernel@vger.kernel.org, will@kernel.org,
+ catalin.marinas@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -75,131 +84,212 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Jun 10, 2021 at 09:05:18AM +0100, Steven Price wrote:
-> On 09/06/2021 18:41, Catalin Marinas wrote:
-> > On Wed, Jun 09, 2021 at 12:19:31PM +0100, Marc Zyngier wrote:
-> >> On Wed, 09 Jun 2021 11:51:34 +0100,
-> >> Steven Price <steven.price@arm.com> wrote:
-> >>> On 09/06/2021 11:30, Marc Zyngier wrote:
-> >>>> On Mon, 07 Jun 2021 12:08:09 +0100,
-> >>>> Steven Price <steven.price@arm.com> wrote:
-> >>>>> diff --git a/arch/arm64/kernel/mte.c b/arch/arm64/kernel/mte.c
-> >>>>> index 125a10e413e9..a3583a7fd400 100644
-> >>>>> --- a/arch/arm64/kernel/mte.c
-> >>>>> +++ b/arch/arm64/kernel/mte.c
-> >>>>> @@ -25,6 +25,7 @@
-> >>>>>  u64 gcr_kernel_excl __ro_after_init;
-> >>>>>  
-> >>>>>  static bool report_fault_once = true;
-> >>>>> +static DEFINE_SPINLOCK(tag_sync_lock);
-> >>>>>  
-> >>>>>  #ifdef CONFIG_KASAN_HW_TAGS
-> >>>>>  /* Whether the MTE asynchronous mode is enabled. */
-> >>>>> @@ -34,13 +35,22 @@ EXPORT_SYMBOL_GPL(mte_async_mode);
-> >>>>>  
-> >>>>>  static void mte_sync_page_tags(struct page *page, pte_t *ptep, bool check_swap)
-> >>>>>  {
-> >>>>> +	unsigned long flags;
-> >>>>>  	pte_t old_pte = READ_ONCE(*ptep);
-> >>>>>  
-> >>>>> +	spin_lock_irqsave(&tag_sync_lock, flags);
-> >>>>
-> >>>> having though a bit more about this after an offline discussion with
-> >>>> Catalin: why can't this lock be made per mm? We can't really share
-> >>>> tags across processes anyway, so this is limited to threads from the
-> >>>> same process.
-> >>>
-> >>> Currently there's nothing stopping processes sharing tags (mmap(...,
-> >>> PROT_MTE, MAP_SHARED)) - I agree making use of this is tricky and it
-> >>> would have been nice if this had just been prevented from the
-> >>> beginning.
-> >>
-> >> I don't think it should be prevented. I think it should be made clear
-> >> that it is unreliable and that it will result in tag corruption.
-> >>
-> >>> Given the above, clearly the lock can't be per mm and robust.
-> >>
-> >> I don't think we need to make it robust. The architecture actively
-> >> prevents sharing if the tags are also shared, just like we can't
-> >> really expect the VMM to share tags with the guest.
-[...]
-> > So, AFAICT, MAP_SHARED between two different mms is the only problem
-> > (both for stage 1 and stage 2), hence the big lock that Steven
-> > introduced. I don't like the lock either but we couldn't come up with a
-> > better solution.
-[...]
-> > Other suggestions are welcomed, including banning MAP_SHARED with
-> > PROT_MTE.
+On Tue,  8 Jun 2021 17:48:02 +0200
+Jean-Philippe Brucker <jean-philippe@linaro.org> wrote:
+
+> In order to add a new "suspend" power state, replace power_off with
+> mp_state in struct kvm_vcpu_arch. Factor the vcpu_off() function while
+> we're here.
+
+Hi Jean-Phillipe,
+
+2 changes, so if you do end up doing a v2 I'd prefer the
+factor out of kvm_arm_vcpu_power_off() + possibly introduced
+kvm_arm_vcpu_is_off() using the old boolean.
+Then the change in how you track the state will be a bit easier to
+pick out.
+
 > 
-> The finer grained locking could also be done using a table of spin_locks
-> and hashing the struct page pointer to choose a lock. This is what
-> page_waitqueue() does - but unlike the existing mechanism we need
-> spinlocks not wait queues.
-
-That's an option indeed.
-
-> >>> I guess we could have a per-mm lock and handle the race if user space
-> >>> screws up with the outcome being lost tags (double clear).
-> >>>
-> >>> But it feels to me like it could come back to bite in the future since
-> >>> VM_SHARED|VM_MTE will almost always work and I fear someone will start
-> >>> using it since it's permitted by the kernel.
-> >>
-> >> I'm really worried that performance is going to suck even on a small
-> >> system, and this global lock will be heavily contended, even without
-> >> considering KVM.
-> > 
-> > I agree, as it currently stands, enabling MTE in the guest will always
-> > serialise user_mem_abort() through a big lock shared by all VMs.
+> No functional change intended.
 > 
-> We only serialise in the case where PG_mte_tagged isn't set. Admittedly
-> this is likely to be VM startup which I know tends to be an important
-> use case. One other option there would be to provide a mechanism to the
-> VMM to proactively clear the tags (e.g. a new VM_MTE_INIT flag which
-> causes the PG_mte_tagged bit to be set but doesn't affect user space's
-> PTEs).
+> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  6 ++++--
+>  arch/arm64/kvm/arm.c              | 29 +++++++++++++++--------------
+>  arch/arm64/kvm/psci.c             | 19 ++++++-------------
+>  3 files changed, 25 insertions(+), 29 deletions(-)
 > 
-> The problem I've got is without real hardware to benchmark on it's
-> impossible to know how big of a performance problem this is and
-> therefore which of the available options (if any) is appropriate. Some
-> like the "big hammer" of scrapping PG_mte_tagged could hit the
-> performance of non-MTE paths - but equally might not have any affect and
-> would simplify the code.
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 7cd7d5c8c4bc..55a04f4d5919 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -340,8 +340,8 @@ struct kvm_vcpu_arch {
+>  		u32	mdscr_el1;
+>  	} guest_debug_preserved;
+>  
+> -	/* vcpu power-off state */
+> -	bool power_off;
+> +	/* vcpu power state (runnable, stopped, halted) */
+> +	u32 mp_state;
+>  
+>  	/* Don't run the guest (internal implementation need) */
+>  	bool pause;
+> @@ -720,6 +720,8 @@ int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
+>  			       struct kvm_device_attr *attr);
+>  int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+>  			       struct kvm_device_attr *attr);
+> +void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu);
+> +bool kvm_arm_vcpu_is_off(struct kvm_vcpu *vcpu);
+>  
+>  /* Guest/host FPSIMD coordination helpers */
+>  int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index e720148232a0..bcc24adb9c0a 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -435,21 +435,22 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>  	vcpu->cpu = -1;
+>  }
+>  
+> -static void vcpu_power_off(struct kvm_vcpu *vcpu)
+> +void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu)
+>  {
+> -	vcpu->arch.power_off = true;
+> +	vcpu->arch.mp_state = KVM_MP_STATE_STOPPED;
+>  	kvm_make_request(KVM_REQ_SLEEP, vcpu);
+>  	kvm_vcpu_kick(vcpu);
+>  }
+>  
+> +bool kvm_arm_vcpu_is_off(struct kvm_vcpu *vcpu)
+> +{
+> +	return vcpu->arch.mp_state == KVM_MP_STATE_STOPPED;
+> +}
+> +
+>  int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
+>  				    struct kvm_mp_state *mp_state)
+>  {
+> -	if (vcpu->arch.power_off)
+> -		mp_state->mp_state = KVM_MP_STATE_STOPPED;
+> -	else
+> -		mp_state->mp_state = KVM_MP_STATE_RUNNABLE;
+> -
+> +	mp_state->mp_state = vcpu->arch.mp_state;
 
-One reason to keep PG_mte_tagged around for normal user programs,
-especially those not using MTE, is that it doesn't affect CoW. Page
-copying in two separate loops (for data and tags) does affect
-performance. Now, if there's no fork, you may not notice but in the
-Android land with zygote, I think it will be quickly observed.
+Nice to have a blank line here.
 
-For KVM, I guess we could benchmark a dummy lock array without any MTE
-hardware but I don't have a setup around where I can time multiple VMs
-starting in parallel.
+>  	return 0;
+>  }
+>  
+> @@ -460,10 +461,10 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+>  
+>  	switch (mp_state->mp_state) {
+>  	case KVM_MP_STATE_RUNNABLE:
+> -		vcpu->arch.power_off = false;
+> +		vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
+>  		break;
+>  	case KVM_MP_STATE_STOPPED:
+> -		vcpu_power_off(vcpu);
+> +		kvm_arm_vcpu_power_off(vcpu);
+>  		break;
+>  	default:
+>  		ret = -EINVAL;
+> @@ -483,7 +484,7 @@ int kvm_arch_vcpu_runnable(struct kvm_vcpu *v)
+>  {
+>  	bool irq_lines = *vcpu_hcr(v) & (HCR_VI | HCR_VF);
+>  	return ((irq_lines || kvm_vgic_vcpu_pending_irq(v))
+> -		&& !v->arch.power_off && !v->arch.pause);
+> +		&& !kvm_arm_vcpu_is_off(v) && !v->arch.pause);
+>  }
+>  
+>  bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
+> @@ -643,10 +644,10 @@ static void vcpu_req_sleep(struct kvm_vcpu *vcpu)
+>  	struct rcuwait *wait = kvm_arch_vcpu_get_wait(vcpu);
+>  
+>  	rcuwait_wait_event(wait,
+> -			   (!vcpu->arch.power_off) &&(!vcpu->arch.pause),
+> +			   !kvm_arm_vcpu_is_off(vcpu) && !vcpu->arch.pause,
+>  			   TASK_INTERRUPTIBLE);
+>  
+> -	if (vcpu->arch.power_off || vcpu->arch.pause) {
+> +	if (kvm_arm_vcpu_is_off(vcpu) || vcpu->arch.pause) {
+>  		/* Awaken to handle a signal, request we sleep again later. */
+>  		kvm_make_request(KVM_REQ_SLEEP, vcpu);
+>  	}
+> @@ -1087,9 +1088,9 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
+>  	 * Handle the "start in power-off" case.
+>  	 */
+>  	if (test_bit(KVM_ARM_VCPU_POWER_OFF, vcpu->arch.features))
+> -		vcpu_power_off(vcpu);
+> +		kvm_arm_vcpu_power_off(vcpu);
+>  	else
+> -		vcpu->arch.power_off = false;
+> +		vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
+>  
+>  	return 0;
+>  }
+> diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
+> index db4056ecccfd..24b4a2265dbd 100644
+> --- a/arch/arm64/kvm/psci.c
+> +++ b/arch/arm64/kvm/psci.c
+> @@ -52,13 +52,6 @@ static unsigned long kvm_psci_vcpu_suspend(struct kvm_vcpu *vcpu)
+>  	return PSCI_RET_SUCCESS;
+>  }
+>  
+> -static void kvm_psci_vcpu_off(struct kvm_vcpu *vcpu)
+> -{
+> -	vcpu->arch.power_off = true;
+> -	kvm_make_request(KVM_REQ_SLEEP, vcpu);
+> -	kvm_vcpu_kick(vcpu);
+> -}
+> -
+>  static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+>  {
+>  	struct vcpu_reset_state *reset_state;
+> @@ -78,7 +71,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+>  	 */
+>  	if (!vcpu)
+>  		return PSCI_RET_INVALID_PARAMS;
+> -	if (!vcpu->arch.power_off) {
+> +	if (!kvm_arm_vcpu_is_off(vcpu)) {
+>  		if (kvm_psci_version(source_vcpu, kvm) != KVM_ARM_PSCI_0_1)
+>  			return PSCI_RET_ALREADY_ON;
+>  		else
+> @@ -107,7 +100,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+>  	 */
+>  	smp_wmb();
+>  
+> -	vcpu->arch.power_off = false;
+> +	vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
+>  	kvm_vcpu_wake_up(vcpu);
+>  
+>  	return PSCI_RET_SUCCESS;
+> @@ -142,7 +135,7 @@ static unsigned long kvm_psci_vcpu_affinity_info(struct kvm_vcpu *vcpu)
+>  		mpidr = kvm_vcpu_get_mpidr_aff(tmp);
+>  		if ((mpidr & target_affinity_mask) == target_affinity) {
+>  			matching_cpus++;
+> -			if (!tmp->arch.power_off)
+> +			if (!kvm_arm_vcpu_is_off(tmp))
+>  				return PSCI_0_2_AFFINITY_LEVEL_ON;
+>  		}
+>  	}
+> @@ -168,7 +161,7 @@ static void kvm_prepare_system_event(struct kvm_vcpu *vcpu, u32 type)
+>  	 * re-initialized.
+>  	 */
+>  	kvm_for_each_vcpu(i, tmp, vcpu->kvm)
+> -		tmp->arch.power_off = true;
+> +		tmp->arch.mp_state = KVM_MP_STATE_STOPPED;
+>  	kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_SLEEP);
+>  
+>  	memset(&vcpu->run->system_event, 0, sizeof(vcpu->run->system_event));
+> @@ -237,7 +230,7 @@ static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
+>  		val = kvm_psci_vcpu_suspend(vcpu);
+>  		break;
+>  	case PSCI_0_2_FN_CPU_OFF:
+> -		kvm_psci_vcpu_off(vcpu);
+> +		kvm_arm_vcpu_power_off(vcpu);
+>  		val = PSCI_RET_SUCCESS;
+>  		break;
+>  	case PSCI_0_2_FN_CPU_ON:
+> @@ -350,7 +343,7 @@ static int kvm_psci_0_1_call(struct kvm_vcpu *vcpu)
+>  
+>  	switch (psci_fn) {
+>  	case KVM_PSCI_FN_CPU_OFF:
+> -		kvm_psci_vcpu_off(vcpu);
+> +		kvm_arm_vcpu_power_off(vcpu);
+>  		val = PSCI_RET_SUCCESS;
+>  		break;
+>  	case KVM_PSCI_FN_CPU_ON:
 
-> My belief is that this series is now at the stage where it is
-> functionally correct and it doesn't impact the performance when MTE
-> isn't in use, so no impact to existing systems or MTE-enabled systems
-> where user space/VMs are not using MTE.
-
-I agree.
-
-> We also have a number of ideas
-> to investigate if/when we see performance problems with the MTE use
-> cases. I'm not sure what else we can do until hardware for benchmarking
-> is readily available.
-
-My concern is that when we hit a bottleneck on that big lock (and I'm
-pretty sure we will), do we have a good mitigation or we should rather
-break the ABI now and disallow MAP_SHARED? The latter would need to be
-done fairly soon as a fix, backported.
-
-I think the possible workarounds are pretty good but maybe we should
-also ask user-space people how important MAP_SHARED + PROT_MTE is. If
-they don't use it, maybe we shouldn't bother with all this (well,
-assuming there's no other race between different mms that we missed).
-
--- 
-Catalin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
