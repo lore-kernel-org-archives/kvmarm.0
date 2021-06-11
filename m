@@ -7,77 +7,76 @@ X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0718EC48BDF
-	for <kvmarm@archiver.kernel.org>; Fri, 11 Jun 2021 01:10:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F0B6C48BE0
+	for <kvmarm@archiver.kernel.org>; Fri, 11 Jun 2021 01:10:36 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8112C613B3
-	for <kvmarm@archiver.kernel.org>; Fri, 11 Jun 2021 01:10:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8112C613B3
+	by mail.kernel.org (Postfix) with ESMTP id E4C6D613B3
+	for <kvmarm@archiver.kernel.org>; Fri, 11 Jun 2021 01:10:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4C6D613B3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3178A4B0BD;
-	Thu, 10 Jun 2021 21:10:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 981AB4A319;
+	Thu, 10 Jun 2021 21:10:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 8JzGrJZg5C8O; Thu, 10 Jun 2021 21:10:33 -0400 (EDT)
+	with ESMTP id LcEQj13x6oOT; Thu, 10 Jun 2021 21:10:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 927784B0AD;
-	Thu, 10 Jun 2021 21:10:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B5B0A4B0A0;
+	Thu, 10 Jun 2021 21:10:33 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C30534B09F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jun 2021 21:10:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A5244B0A1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jun 2021 21:10:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nce2pZXebhzp for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Jun 2021 21:10:30 -0400 (EDT)
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com
- [209.85.210.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6401A4B09C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jun 2021 21:10:29 -0400 (EDT)
-Received: by mail-pf1-f201.google.com with SMTP id
- q3-20020aa784230000b02902ea311f25e2so2241632pfn.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jun 2021 18:10:29 -0700 (PDT)
+ with ESMTP id l4T2-5MWQb5Q for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Jun 2021 21:10:31 -0400 (EDT)
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com
+ [209.85.214.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 053464B08B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jun 2021 21:10:31 -0400 (EDT)
+Received: by mail-pl1-f201.google.com with SMTP id
+ d18-20020a170902b712b029010f71d164c6so1920574pls.19
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jun 2021 18:10:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=TYvOocfdGGEik5oZUAe7GQBrIevpGvdRMy9WY4nI218=;
- b=nJiRvBrw35+0e+bGUhSL73s0Hx6KBViDlQOEx2lufnpIp8rb+7F4TVjxSimCI21IaT
- gf65GmCFoRjdO3sMt19FwCyYyKMze/l4ZNpy155VJMv0I3Qusn9XPVyeivmGgI8Ei5Nv
- P3QviUCZNiaiXjjZ67VtOyunCLgJsB7VO9dO5q9N32cBGYk4oqLQXMkZXGn2uGthIbLp
- XjluerlLQa9RLg9DZMkoM0JjriEkldpHGApbJefIudAby1QNU+MvVOmCTX+QbjPJTHZo
- vUrcCT9k0ED5QM9hzhCI+jNqC9iAEV5SVSdv/e8dohRd+XcUPks0yh5nqy/gY/q4/RoP
- UxHg==
+ :cc; bh=4aDyFvrxlFwPOgnkxkIlU3KeNadi1hrIbCCSRD9xSSc=;
+ b=YGy5QJg9Hws1yT/Ru5qLO1HC2J/F0QhvK4R9XpwC06AK9L4lg19fWiwepuXsuVtVgo
+ UW/xvDPVAiQC4duDkeaCNCkx0HsWVYsjYUr7wRtCUIVrJU8gyKEsNkf0BLz2XVmzdyYd
+ DxL1XbdIohcgKHLbdBX6m9Pq8KBwIFCLXI8DL+P66L4zyvsml5oJv1wWwyWs+KyieP/C
+ tLCB38gdAK4PIl2/q3S+ebNmUvwtzd5Gk6THaod+3iPu7FE8x1UlcIXePjSliI3oOJ9z
+ xB2XKiuhX6kbbImNW81Onzot1LCNQ3P5k9MO/kShNWfsRtWg2ZodEQdfWmklcKkqt354
+ SxJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=TYvOocfdGGEik5oZUAe7GQBrIevpGvdRMy9WY4nI218=;
- b=rGkNTcWUwnQzWmPGOAxfGyIHDZKBoc89eKOFuvxopAKDfS25bYx9WFM9GrQRYfFElk
- DihhZnkDFudCjx1DRuuW22/XRSNvZEdCzQSXkKvwzQCBavriqINZMJuevOBiG/7YKEUR
- 2dm39IDFIUxvpooBnuhpeADR0Oh4QZU7rzUf6a2nY0EmKy3fvgSlVyTeEUjlbEYZffxC
- yT0BMt5JhcTuRk15ZOX8lkkwADZAgzk/FZlCwyS61e7iU5fGI287K7kqilCbyO7Iavcl
- 1+S+xL9ASubuBOG20eHLmDcK3xZTCnqG4iXoLi6JytenTJoj8WQNhyijOs2pZKTytlok
- YEsQ==
-X-Gm-Message-State: AOAM532TQwbjI+cFuAXaXa5bOzgSFQy2EUGjSjfW45Uof5gOV//TfUOZ
- Z6EYYScAitqvqeSUHQK8xqZ4NUi4f0TPMg==
-X-Google-Smtp-Source: ABdhPJycRe7gKvuKJjbcx7/YnZK2hdrk+Fowwdb5tNbq0e3YWn5ixMHsFSvSFp/tERi+LURVZLTQINtmCH9KPw==
+ bh=4aDyFvrxlFwPOgnkxkIlU3KeNadi1hrIbCCSRD9xSSc=;
+ b=jKfE+ihiMIFEcTCxxLjg7fivFz8e8K7LPhj0UKHQYRZSsA+TEysWU/jXgNsydMb9Zk
+ Nyjc20+xiztB8cfRVzm/rBedRfCtyJMo61RZQQAJUN333IMVd4zf3I+gMW/QQfDuLg/Y
+ uWHpRrBd0OjfNQNmB4TG0LYprxMtvJ6noSgFZRSIwpEugsXWiKnxtxjUgAQQUxBHn0Yy
+ GJ7pSAgXvcvjlbt/7qYIxrqp7Ffh7wxqkbWJSWg4qxQHqi/4IslUtm1f/c3EPMcU8q8X
+ oudI7xVc4rAYIDsW6ed/JnRy2qGuFnaTz/SgRGNCQkmsTpapb5y6jV571OSRVuhgrNLm
+ tOUA==
+X-Gm-Message-State: AOAM530tfJWgny/ILsojKetMyc3spABzSVf1rU7gV4udo56W4T2IwQz0
+ /UjoxxjFIoSJR9f5yb2hrug9qNcpD2LK0g==
+X-Google-Smtp-Source: ABdhPJwmhURii809YCjVm28/KNSwi4P3CmWOGzFj0fBc202yAjKSbR3hkxDL3AqrZOdTdClXsq/E8FCFh6Qdlg==
 X-Received: from ricarkol2.c.googlers.com
  ([fda3:e722:ac3:10:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:a17:902:720b:b029:113:19d7:2da7 with SMTP
- id ba11-20020a170902720bb029011319d72da7mr1419291plb.55.1623373828499; Thu,
- 10 Jun 2021 18:10:28 -0700 (PDT)
-Date: Thu, 10 Jun 2021 18:10:17 -0700
+ (user=ricarkol job=sendgmr) by 2002:a17:903:1042:b029:112:6ce1:667 with SMTP
+ id f2-20020a1709031042b02901126ce10667mr1449831plc.44.1623373830056; Thu, 10
+ Jun 2021 18:10:30 -0700 (PDT)
+Date: Thu, 10 Jun 2021 18:10:18 -0700
 In-Reply-To: <20210611011020.3420067-1-ricarkol@google.com>
-Message-Id: <20210611011020.3420067-4-ricarkol@google.com>
+Message-Id: <20210611011020.3420067-5-ricarkol@google.com>
 Mime-Version: 1.0
 References: <20210611011020.3420067-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.32.0.272.g935e593368-goog
-Subject: [PATCH v4 3/6] KVM: selftests: Introduce UCALL_UNHANDLED for
- unhandled vector reporting
+Subject: [PATCH v4 4/6] KVM: selftests: Move GUEST_ASSERT_EQ to utils header
 From: Ricardo Koller <ricarkol@google.com>
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 Cc: maz@kernel.org, pbonzini@redhat.com, vkuznets@redhat.com
@@ -97,91 +96,79 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-x86, the only arch implementing exception handling, reports unhandled
-vectors using port IO at a specific port number. This replicates what
-ucall already does.
-
-Introduce a new ucall type, UCALL_UNHANDLED, for guests to report
-unhandled exceptions. Then replace the x86 unhandled vector exception
-reporting to use it instead of port IO.  This new ucall type will be
-used in the next commits by arm64 to report unhandled vectors as well.
-
-Tested: Forcing a page fault in the ./x86_64/xapic_ipi_test
-	halter_guest_code() shows this:
-
-	$ ./x86_64/xapic_ipi_test
-	...
-	  Unexpected vectored event in guest (vector:0xe)
+Move GUEST_ASSERT_EQ to a common header, kvm_util.h, for other
+architectures and tests to use. Also modify __GUEST_ASSERT so it can be
+reused to implement GUEST_ASSERT_EQ.
 
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- .../testing/selftests/kvm/include/kvm_util.h  |  1 +
- .../selftests/kvm/include/x86_64/processor.h  |  2 --
- .../selftests/kvm/lib/x86_64/processor.c      | 19 ++++++++-----------
- 3 files changed, 9 insertions(+), 13 deletions(-)
+ .../testing/selftests/kvm/include/kvm_util.h  | 22 ++++++++++---------
+ .../selftests/kvm/x86_64/tsc_msrs_test.c      |  9 --------
+ 2 files changed, 12 insertions(+), 19 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index fcd8e3855111..beb76d6deaa9 100644
+index beb76d6deaa9..ce49e22843d8 100644
 --- a/tools/testing/selftests/kvm/include/kvm_util.h
 +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -349,6 +349,7 @@ enum {
- 	UCALL_SYNC,
- 	UCALL_ABORT,
- 	UCALL_DONE,
-+	UCALL_UNHANDLED,
- };
+@@ -368,26 +368,28 @@ uint64_t get_ucall(struct kvm_vm *vm, uint32_t vcpu_id, struct ucall *uc);
+ 				ucall(UCALL_SYNC, 6, "hello", stage, arg1, arg2, arg3, arg4)
+ #define GUEST_SYNC(stage)	ucall(UCALL_SYNC, 2, "hello", stage)
+ #define GUEST_DONE()		ucall(UCALL_DONE, 0)
+-#define __GUEST_ASSERT(_condition, _nargs, _args...) do {	\
+-	if (!(_condition))					\
+-		ucall(UCALL_ABORT, 2 + _nargs,			\
+-			"Failed guest assert: "			\
+-			#_condition, __LINE__, _args);		\
++#define __GUEST_ASSERT(_condition, _condstr, _nargs, _args...) do {    \
++	if (!(_condition))                                              \
++		ucall(UCALL_ABORT, 2 + _nargs,                          \
++			"Failed guest assert: "                         \
++			_condstr, __LINE__, _args);                     \
+ } while (0)
  
- #define UCALL_MAX_ARGS 6
-diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index e9f584991332..92a62c6999bc 100644
---- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -53,8 +53,6 @@
- #define CPUID_PKU		(1ul << 3)
- #define CPUID_LA57		(1ul << 16)
+ #define GUEST_ASSERT(_condition) \
+-	__GUEST_ASSERT((_condition), 0, 0)
++	__GUEST_ASSERT(_condition, #_condition, 0, 0)
  
--#define UNEXPECTED_VECTOR_PORT 0xfff0u
--
- /* General Registers in 64-Bit Mode */
- struct gpr64_regs {
- 	u64 rax;
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index 257c5c33d04e..a217515a9bc2 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -1201,7 +1201,7 @@ static void set_idt_entry(struct kvm_vm *vm, int vector, unsigned long addr,
+ #define GUEST_ASSERT_1(_condition, arg1) \
+-	__GUEST_ASSERT((_condition), 1, (arg1))
++	__GUEST_ASSERT(_condition, #_condition, 1, (arg1))
  
- void kvm_exit_unexpected_vector(uint32_t value)
- {
--	outl(UNEXPECTED_VECTOR_PORT, value);
-+	ucall(UCALL_UNHANDLED, 1, value);
- }
+ #define GUEST_ASSERT_2(_condition, arg1, arg2) \
+-	__GUEST_ASSERT((_condition), 2, (arg1), (arg2))
++	__GUEST_ASSERT(_condition, #_condition, 2, (arg1), (arg2))
  
- void route_exception(struct ex_regs *regs)
-@@ -1254,16 +1254,13 @@ void vm_install_exception_handler(struct kvm_vm *vm, int vector,
+ #define GUEST_ASSERT_3(_condition, arg1, arg2, arg3) \
+-	__GUEST_ASSERT((_condition), 3, (arg1), (arg2), (arg3))
++	__GUEST_ASSERT(_condition, #_condition, 3, (arg1), (arg2), (arg3))
  
- void assert_on_unhandled_exception(struct kvm_vm *vm, uint32_t vcpuid)
- {
--	if (vcpu_state(vm, vcpuid)->exit_reason == KVM_EXIT_IO
--		&& vcpu_state(vm, vcpuid)->io.port == UNEXPECTED_VECTOR_PORT
--		&& vcpu_state(vm, vcpuid)->io.size == 4) {
--		/* Grab pointer to io data */
--		uint32_t *data = (void *)vcpu_state(vm, vcpuid)
--			+ vcpu_state(vm, vcpuid)->io.data_offset;
--
--		TEST_ASSERT(false,
--			    "Unexpected vectored event in guest (vector:0x%x)",
--			    *data);
-+	struct ucall uc;
+ #define GUEST_ASSERT_4(_condition, arg1, arg2, arg3, arg4) \
+-	__GUEST_ASSERT((_condition), 4, (arg1), (arg2), (arg3), (arg4))
++	__GUEST_ASSERT(_condition, #_condition, 4, (arg1), (arg2), (arg3), (arg4))
 +
-+	if (get_ucall(vm, vcpuid, &uc) == UCALL_UNHANDLED) {
-+		uint64_t vector = uc.args[0];
-+
-+		TEST_FAIL("Unexpected vectored event in guest (vector:0x%lx)",
-+			  vector);
- 	}
- }
++#define GUEST_ASSERT_EQ(a, b) __GUEST_ASSERT((a) == (b), #a " == " #b, 2, a, b)
  
+ #endif /* SELFTEST_KVM_UTIL_H */
+diff --git a/tools/testing/selftests/kvm/x86_64/tsc_msrs_test.c b/tools/testing/selftests/kvm/x86_64/tsc_msrs_test.c
+index e357d8e222d4..5a6a662f2e59 100644
+--- a/tools/testing/selftests/kvm/x86_64/tsc_msrs_test.c
++++ b/tools/testing/selftests/kvm/x86_64/tsc_msrs_test.c
+@@ -18,15 +18,6 @@
+ #define rounded_rdmsr(x)       ROUND(rdmsr(x))
+ #define rounded_host_rdmsr(x)  ROUND(vcpu_get_msr(vm, 0, x))
+ 
+-#define GUEST_ASSERT_EQ(a, b) do {				\
+-	__typeof(a) _a = (a);					\
+-	__typeof(b) _b = (b);					\
+-	if (_a != _b)						\
+-                ucall(UCALL_ABORT, 4,				\
+-                        "Failed guest assert: "			\
+-                        #a " == " #b, __LINE__, _a, _b);	\
+-  } while(0)
+-
+ static void guest_code(void)
+ {
+ 	u64 val = 0;
 -- 
 2.32.0.272.g935e593368-goog
 
