@@ -7,75 +7,77 @@ X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9BADC48BD1
-	for <kvmarm@archiver.kernel.org>; Fri, 11 Jun 2021 01:10:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0718EC48BDF
+	for <kvmarm@archiver.kernel.org>; Fri, 11 Jun 2021 01:10:35 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6D0D3613BA
-	for <kvmarm@archiver.kernel.org>; Fri, 11 Jun 2021 01:10:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D0D3613BA
+	by mail.kernel.org (Postfix) with ESMTP id 8112C613B3
+	for <kvmarm@archiver.kernel.org>; Fri, 11 Jun 2021 01:10:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8112C613B3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0DC374B087;
-	Thu, 10 Jun 2021 21:10:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3178A4B0BD;
+	Thu, 10 Jun 2021 21:10:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 51kNqQoeglwV; Thu, 10 Jun 2021 21:10:30 -0400 (EDT)
+	with ESMTP id 8JzGrJZg5C8O; Thu, 10 Jun 2021 21:10:33 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E2AA4B09F;
-	Thu, 10 Jun 2021 21:10:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 927784B0AD;
+	Thu, 10 Jun 2021 21:10:32 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 75D184B086
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jun 2021 21:10:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C30534B09F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jun 2021 21:10:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ATXgAHE6mBUD for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Jun 2021 21:10:27 -0400 (EDT)
-Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com
- [209.85.219.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 93B1A49FE6
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jun 2021 21:10:27 -0400 (EDT)
-Received: by mail-qv1-f73.google.com with SMTP id
- r8-20020a0562140c88b0290242bf8596feso1505319qvr.8
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jun 2021 18:10:27 -0700 (PDT)
+ with ESMTP id nce2pZXebhzp for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Jun 2021 21:10:30 -0400 (EDT)
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com
+ [209.85.210.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6401A4B09C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jun 2021 21:10:29 -0400 (EDT)
+Received: by mail-pf1-f201.google.com with SMTP id
+ q3-20020aa784230000b02902ea311f25e2so2241632pfn.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jun 2021 18:10:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=g2jclRA9lTw/W97XJiMf53LRm15IYPw+1SChqYyccDA=;
- b=aLM0Vaaz+cyTp51TN8IDMX95LliI5Z426gW5UybIuMeG9DDvhdCPohwjwrhyx3S8/1
- 7FG/7DB3hYJ16PkBgqsjpp07ivB3cYL24UPNZwRe0Z3Otz+ZZlym2BxyJ1yLfpaEnYET
- /GtXpFNEH1nyvf7pScc1prfSlHF04N5cTN9ojF1F2eLacZ2w/3bAIr4D/uUbCVkeEKOS
- a1DvdIk/xS0CHavMi7D8VON+bJzAAFJQWgX9DWB+FCSE4F09/NbsGNUXBHSxsCRdbt62
- Iv8E6Z0YvxCWQQTxjs/y1IHD+Bf9P1SrrZpqfba24eR9wlZAnB3z3iiFsMgeoOvkhoRM
- e+pw==
+ :cc; bh=TYvOocfdGGEik5oZUAe7GQBrIevpGvdRMy9WY4nI218=;
+ b=nJiRvBrw35+0e+bGUhSL73s0Hx6KBViDlQOEx2lufnpIp8rb+7F4TVjxSimCI21IaT
+ gf65GmCFoRjdO3sMt19FwCyYyKMze/l4ZNpy155VJMv0I3Qusn9XPVyeivmGgI8Ei5Nv
+ P3QviUCZNiaiXjjZ67VtOyunCLgJsB7VO9dO5q9N32cBGYk4oqLQXMkZXGn2uGthIbLp
+ XjluerlLQa9RLg9DZMkoM0JjriEkldpHGApbJefIudAby1QNU+MvVOmCTX+QbjPJTHZo
+ vUrcCT9k0ED5QM9hzhCI+jNqC9iAEV5SVSdv/e8dohRd+XcUPks0yh5nqy/gY/q4/RoP
+ UxHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=g2jclRA9lTw/W97XJiMf53LRm15IYPw+1SChqYyccDA=;
- b=GL2+ijTgG/2YR2MhPH6hO9GD+svaHu4WMOOyPbpCh5pOfIxk3XTscxNVdp2XjEwQij
- A9VYv6sq5/AFf3+/v5hli5pynmVgu59rNz505WMjzR7s6x6Y31SgjjJv5Kl7BIcDY7Iu
- IxYb18D3pmLCxdJdNc8jmwHnTGBCu5i4bq24NAYQnIAkNuplCXKB2HX8zZ0gHDnISIEu
- PX4RvpThIAwFr2a6zEjIS66MWS9TV9Ry5LD6kwHjAJJ0tHJ3OSOVsoR5f88p6xffFX9d
- MvyhF8Gg1DbmfX/qN1W+s4oZRQHiGSb7Com9GnMD9PMGvTLOZ6KvEifbCdN7o5IeBgog
- u+hw==
-X-Gm-Message-State: AOAM533s2vQyHna0fhRZtMGf/Hsm2ljeTU4SR22Lj+DcDtUYhWICUnRC
- 6xGRhGNZBYagFq4IQVRlxGcUEyjOY3DXBg==
-X-Google-Smtp-Source: ABdhPJwS2FaokvitUzUEJhjnFOTvGpUM0p0dmA7rKoXpD9NblRj9EjqQzR8QSlMKVNeHfOQpz47kYBdAtVFv4Q==
+ bh=TYvOocfdGGEik5oZUAe7GQBrIevpGvdRMy9WY4nI218=;
+ b=rGkNTcWUwnQzWmPGOAxfGyIHDZKBoc89eKOFuvxopAKDfS25bYx9WFM9GrQRYfFElk
+ DihhZnkDFudCjx1DRuuW22/XRSNvZEdCzQSXkKvwzQCBavriqINZMJuevOBiG/7YKEUR
+ 2dm39IDFIUxvpooBnuhpeADR0Oh4QZU7rzUf6a2nY0EmKy3fvgSlVyTeEUjlbEYZffxC
+ yT0BMt5JhcTuRk15ZOX8lkkwADZAgzk/FZlCwyS61e7iU5fGI287K7kqilCbyO7Iavcl
+ 1+S+xL9ASubuBOG20eHLmDcK3xZTCnqG4iXoLi6JytenTJoj8WQNhyijOs2pZKTytlok
+ YEsQ==
+X-Gm-Message-State: AOAM532TQwbjI+cFuAXaXa5bOzgSFQy2EUGjSjfW45Uof5gOV//TfUOZ
+ Z6EYYScAitqvqeSUHQK8xqZ4NUi4f0TPMg==
+X-Google-Smtp-Source: ABdhPJycRe7gKvuKJjbcx7/YnZK2hdrk+Fowwdb5tNbq0e3YWn5ixMHsFSvSFp/tERi+LURVZLTQINtmCH9KPw==
 X-Received: from ricarkol2.c.googlers.com
  ([fda3:e722:ac3:10:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:a0c:e047:: with SMTP id
- y7mr2400895qvk.46.1623373827053; Thu, 10 Jun 2021 18:10:27 -0700 (PDT)
-Date: Thu, 10 Jun 2021 18:10:16 -0700
+ (user=ricarkol job=sendgmr) by 2002:a17:902:720b:b029:113:19d7:2da7 with SMTP
+ id ba11-20020a170902720bb029011319d72da7mr1419291plb.55.1623373828499; Thu,
+ 10 Jun 2021 18:10:28 -0700 (PDT)
+Date: Thu, 10 Jun 2021 18:10:17 -0700
 In-Reply-To: <20210611011020.3420067-1-ricarkol@google.com>
-Message-Id: <20210611011020.3420067-3-ricarkol@google.com>
+Message-Id: <20210611011020.3420067-4-ricarkol@google.com>
 Mime-Version: 1.0
 References: <20210611011020.3420067-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.32.0.272.g935e593368-goog
-Subject: [PATCH v4 2/6] KVM: selftests: Complete x86_64/sync_regs_test ucall
+Subject: [PATCH v4 3/6] KVM: selftests: Introduce UCALL_UNHANDLED for
+ unhandled vector reporting
 From: Ricardo Koller <ricarkol@google.com>
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 Cc: maz@kernel.org, pbonzini@redhat.com, vkuznets@redhat.com
@@ -95,54 +97,91 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The guest in sync_regs_test does raw ucalls by directly accessing the
-ucall IO port. It makes these ucalls without setting %rdi to a `struct
-ucall`, which is what a ucall uses to pass messages.  The issue is that
-if the host did a get_ucall (the receiver side), it would try to access
-the `struct ucall` at %rdi=0 which would lead to an error ("No mapping
-for vm virtual address, gva: 0x0").
+x86, the only arch implementing exception handling, reports unhandled
+vectors using port IO at a specific port number. This replicates what
+ucall already does.
 
-This issue is currently benign as there is no get_ucall in
-sync_regs_test; however, that will change in the next commit as it
-changes the unhandled exception reporting mechanism to use ucalls.  In
-that case, every vcpu_run is followed by a get_ucall to check if the
-guest is trying to report an unhandled exception.
+Introduce a new ucall type, UCALL_UNHANDLED, for guests to report
+unhandled exceptions. Then replace the x86 unhandled vector exception
+reporting to use it instead of port IO.  This new ucall type will be
+used in the next commits by arm64 to report unhandled vectors as well.
 
-Fix this in advance by setting %rdi to a UCALL_NONE struct ucall for the
-sync_regs_test guest.
+Tested: Forcing a page fault in the ./x86_64/xapic_ipi_test
+	halter_guest_code() shows this:
 
-Tested with gcc-[8,9,10], and clang-[9,11].
+	$ ./x86_64/xapic_ipi_test
+	...
+	  Unexpected vectored event in guest (vector:0xe)
 
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- tools/testing/selftests/kvm/x86_64/sync_regs_test.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ .../testing/selftests/kvm/include/kvm_util.h  |  1 +
+ .../selftests/kvm/include/x86_64/processor.h  |  2 --
+ .../selftests/kvm/lib/x86_64/processor.c      | 19 ++++++++-----------
+ 3 files changed, 9 insertions(+), 13 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/x86_64/sync_regs_test.c b/tools/testing/selftests/kvm/x86_64/sync_regs_test.c
-index d672f0a473f8..fc03a150278d 100644
---- a/tools/testing/selftests/kvm/x86_64/sync_regs_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/sync_regs_test.c
-@@ -24,6 +24,10 @@
+diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+index fcd8e3855111..beb76d6deaa9 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util.h
++++ b/tools/testing/selftests/kvm/include/kvm_util.h
+@@ -349,6 +349,7 @@ enum {
+ 	UCALL_SYNC,
+ 	UCALL_ABORT,
+ 	UCALL_DONE,
++	UCALL_UNHANDLED,
+ };
  
- #define UCALL_PIO_PORT ((uint16_t)0x1000)
+ #define UCALL_MAX_ARGS 6
+diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+index e9f584991332..92a62c6999bc 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/processor.h
++++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+@@ -53,8 +53,6 @@
+ #define CPUID_PKU		(1ul << 3)
+ #define CPUID_LA57		(1ul << 16)
  
-+struct ucall uc_none = {
-+	.cmd = UCALL_NONE,
-+};
-+
- /*
-  * ucall is embedded here to protect against compiler reshuffling registers
-  * before calling a function. In this test we only need to get KVM_EXIT_IO
-@@ -34,7 +38,8 @@ void guest_code(void)
- 	asm volatile("1: in %[port], %%al\n"
- 		     "add $0x1, %%rbx\n"
- 		     "jmp 1b"
--		     : : [port] "d" (UCALL_PIO_PORT) : "rax", "rbx");
-+		     : : [port] "d" (UCALL_PIO_PORT), "D" (&uc_none)
-+		     : "rax", "rbx");
+-#define UNEXPECTED_VECTOR_PORT 0xfff0u
+-
+ /* General Registers in 64-Bit Mode */
+ struct gpr64_regs {
+ 	u64 rax;
+diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+index 257c5c33d04e..a217515a9bc2 100644
+--- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
++++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+@@ -1201,7 +1201,7 @@ static void set_idt_entry(struct kvm_vm *vm, int vector, unsigned long addr,
+ 
+ void kvm_exit_unexpected_vector(uint32_t value)
+ {
+-	outl(UNEXPECTED_VECTOR_PORT, value);
++	ucall(UCALL_UNHANDLED, 1, value);
  }
  
- static void compare_regs(struct kvm_regs *left, struct kvm_regs *right)
+ void route_exception(struct ex_regs *regs)
+@@ -1254,16 +1254,13 @@ void vm_install_exception_handler(struct kvm_vm *vm, int vector,
+ 
+ void assert_on_unhandled_exception(struct kvm_vm *vm, uint32_t vcpuid)
+ {
+-	if (vcpu_state(vm, vcpuid)->exit_reason == KVM_EXIT_IO
+-		&& vcpu_state(vm, vcpuid)->io.port == UNEXPECTED_VECTOR_PORT
+-		&& vcpu_state(vm, vcpuid)->io.size == 4) {
+-		/* Grab pointer to io data */
+-		uint32_t *data = (void *)vcpu_state(vm, vcpuid)
+-			+ vcpu_state(vm, vcpuid)->io.data_offset;
+-
+-		TEST_ASSERT(false,
+-			    "Unexpected vectored event in guest (vector:0x%x)",
+-			    *data);
++	struct ucall uc;
++
++	if (get_ucall(vm, vcpuid, &uc) == UCALL_UNHANDLED) {
++		uint64_t vector = uc.args[0];
++
++		TEST_FAIL("Unexpected vectored event in guest (vector:0x%lx)",
++			  vector);
+ 	}
+ }
+ 
 -- 
 2.32.0.272.g935e593368-goog
 
