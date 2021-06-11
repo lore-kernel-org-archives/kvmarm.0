@@ -2,83 +2,136 @@ Return-Path: <SRS0=JLBt=LF=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13862C48BE0
-	for <kvmarm@archiver.kernel.org>; Fri, 11 Jun 2021 01:10:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04D96C4743D
+	for <kvmarm@archiver.kernel.org>; Fri, 11 Jun 2021 06:58:03 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id AF749611AE
-	for <kvmarm@archiver.kernel.org>; Fri, 11 Jun 2021 01:10:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF749611AE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 5BC4361374
+	for <kvmarm@archiver.kernel.org>; Fri, 11 Jun 2021 06:58:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BC4361374
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6239249E8A;
-	Thu, 10 Jun 2021 21:10:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D0A284B0C9;
+	Fri, 11 Jun 2021 02:58:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@ibm.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 57355yNZuokV; Thu, 10 Jun 2021 21:10:38 -0400 (EDT)
+	with ESMTP id 1AxE-vdgy+NN; Fri, 11 Jun 2021 02:58:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EF5614B09B;
-	Thu, 10 Jun 2021 21:10:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AA9B24B0BA;
+	Fri, 11 Jun 2021 02:58:00 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DCB6A49FE6
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jun 2021 21:10:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 413154B0BA
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Jun 2021 02:57:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rS25wCScrqvd for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Jun 2021 21:10:35 -0400 (EDT)
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com
- [209.85.214.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B37AB4AEDC
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jun 2021 21:10:33 -0400 (EDT)
-Received: by mail-pl1-f201.google.com with SMTP id
- v10-20020a1709029a0ab0290114c0e2bac6so1946743plp.5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jun 2021 18:10:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=MC18iDqGZ/WloaqWWMMtlYyOeDHuqPeRDIwlJz+c+dw=;
- b=Nt0qqLnUP+hM9LKAfPU7eVrBMrRIVGtyVBX2R2HSrhEfx+1PdLFckwFmvIP2govW0f
- 7k8ch2UkKGoX3SOttXkvR10pKeT2Tbt08CGUfj8QFAmOQUNJft6lfklZgGeELhmDjBKR
- 18CmfKJNnRFij/+pTXvc9sQQYX28cUdQJHxhFiAZIYGBmPyTpv7dRtmIAaGHbX2Sph0l
- rnL1nEJPpYePzIZY7/G25CgBTGh4ihVVEt2oq5Smd18Un8KaKmcR/T9eGwl+vWtzkTWv
- /TNjux0NgUV0/08xjz0gmRsJHUucWq7U2QzE4DqBbAdVLFNLD7+3GsdKLsxUZ9j5l6I3
- 3q7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=MC18iDqGZ/WloaqWWMMtlYyOeDHuqPeRDIwlJz+c+dw=;
- b=ahcywKotxRpwLNaOonzCeCtaZKy6CTVmJ5inT6Rq3AUpApBdlC17aiy0kEnq6vGSJn
- HED07ebXL/L+Bn9MhMqxRFuoucYEkOnknsl/EWoWb0dqEK8r3G9B03OPLJOzEgtWkCLN
- QTqVQ98EzStkgbHQf2DIvH6fDrr4NG7Ysfp2AZLdivGhIW4EdZzfU9wUv4t05FtLJMaw
- 4TErt94QK6QdAKvzWidvcfzmCYr793ElNW329EAZWLuGYPpyk3jZFAvSFmFzaJy6EVO2
- HO1wVBOWSVNRvQlK974ZLDGPvyXAajcjJV8B+9xcvK+dhMGIqGCMGBqwgB5Wyj9HrtXz
- GKuw==
-X-Gm-Message-State: AOAM530NitwSsoz/c98tETJUAqrOnm7GEJCJZ5bDqk+gs3+rywEalix0
- x4QuFUC/jdCvHAB627u9r0TgpTGA5evtpQ==
-X-Google-Smtp-Source: ABdhPJx6Zwz+S3+eC9uBioiNugvvEkFiKtXQaunp8ZjCXHrWVo5CvzXKLcAgsnZ+t+aoFdIdDdmGE6U39+//kw==
-X-Received: from ricarkol2.c.googlers.com
- ([fda3:e722:ac3:10:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:a17:90a:1c02:: with SMTP id
- s2mr1653643pjs.172.1623373832869; Thu, 10 Jun 2021 18:10:32 -0700 (PDT)
-Date: Thu, 10 Jun 2021 18:10:20 -0700
-In-Reply-To: <20210611011020.3420067-1-ricarkol@google.com>
-Message-Id: <20210611011020.3420067-7-ricarkol@google.com>
-Mime-Version: 1.0
-References: <20210611011020.3420067-1-ricarkol@google.com>
-X-Mailer: git-send-email 2.32.0.272.g935e593368-goog
-Subject: [PATCH v4 6/6] KVM: selftests: Add aarch64/debug-exceptions test
-From: Ricardo Koller <ricarkol@google.com>
-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: maz@kernel.org, pbonzini@redhat.com, vkuznets@redhat.com
+ with ESMTP id Ga4zKdStdVBw for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 11 Jun 2021 02:57:58 -0400 (EDT)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com
+ [148.163.156.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2100A4B086
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Jun 2021 02:57:58 -0400 (EDT)
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id
+ 15B6YtBQ080598; Fri, 11 Jun 2021 02:57:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=subject : to :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=x2xZ8XW9WOlZgpL4aLbZYg/Ju2cVBYzwiLpywQISssA=;
+ b=Jao9RDxibOOCkpgwk1W1fIzhpbkPyTfHJB5ql7F0L6x0KgEKJsNocQWwtFvh3m27qYxr
+ gtdyCo/2HTMz1nCv3MgEvN728epbiu71Dv9OcZL4HMCSm5tU6vlm0emUm0TO2l2DKllO
+ 0ZKKkbV2N2IFoDLSxaYnbCe8Vl7n+4RzPBnYtdyBVEUIWzjPf0PApJJ8QPvvwXWfSmMd
+ gjG/8ectYTd2wcYUJjs2Wd9ZrIIICyfzFTdptBUoQvu4b+g6IlvkWyRT5Hk6sUPNc/no
+ h1/idS3znYORahlfyCRQf/tMpVwNtalshpNp5gvo1NaI93JFDLPLbImKuhOS5Zt9jHr3 5Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 3942ch92v4-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 11 Jun 2021 02:57:27 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15B6lIHj122714;
+ Fri, 11 Jun 2021 02:57:26 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com
+ [159.122.73.71])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 3942ch92tm-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 11 Jun 2021 02:57:26 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+ by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15B6qTPE007568;
+ Fri, 11 Jun 2021 06:57:22 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com
+ (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+ by ppma02fra.de.ibm.com with ESMTP id 392e798uvh-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 11 Jun 2021 06:57:22 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+ by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 15B6vJBO12517788
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 11 Jun 2021 06:57:19 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 3EB2E42063;
+ Fri, 11 Jun 2021 06:57:19 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id EEABD4205F;
+ Fri, 11 Jun 2021 06:57:17 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.171.35.90])
+ by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Fri, 11 Jun 2021 06:57:17 +0000 (GMT)
+Subject: Re: [PATCH v7 1/4] KVM: stats: Separate generic stats from
+ architecture specific ones
+To: Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
+ KVMARM <kvmarm@lists.cs.columbia.edu>, LinuxMIPS
+ <linux-mips@vger.kernel.org>, KVMPPC <kvm-ppc@vger.kernel.org>,
+ LinuxS390 <linux-s390@vger.kernel.org>,
+ Linuxkselftest <linux-kselftest@vger.kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+ James Morse <james.morse@arm.com>,
+ Julien Thierry <julien.thierry.kdev@gmail.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Will Deacon <will@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ Paul Mackerras <paulus@ozlabs.org>, Janosch Frank <frankja@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ Sean Christopherson <seanjc@google.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>,
+ Jim Mattson <jmattson@google.com>, Peter Shier <pshier@google.com>,
+ Oliver Upton <oupton@google.com>, David Rientjes <rientjes@google.com>,
+ Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+ David Matlack <dmatlack@google.com>, Ricardo Koller <ricarkol@google.com>,
+ Krish Sadhukhan <krish.sadhukhan@oracle.com>
+References: <20210603211426.790093-1-jingzhangos@google.com>
+ <20210603211426.790093-2-jingzhangos@google.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <03f3fa03-6f61-7864-4867-3dc332a9d6f3@de.ibm.com>
+Date: Fri, 11 Jun 2021 08:57:17 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.0
+MIME-Version: 1.0
+In-Reply-To: <20210603211426.790093-2-jingzhangos@google.com>
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: d3UCT33oCNg1P-mCe7sviD_VHD-SZPdw
+X-Proofpoint-GUID: MYLFLX6kyCj9CQSWdCtzS3DAmN7ceq-J
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391, 18.0.761
+ definitions=2021-06-11_01:2021-06-11,
+ 2021-06-11 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ phishscore=0 mlxscore=0 adultscore=0 malwarescore=0 spamscore=0
+ bulkscore=0 clxscore=1011 lowpriorityscore=0 suspectscore=0
+ impostorscore=0 mlxlogscore=999 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2104190000 definitions=main-2106110042
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,349 +143,47 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Covers fundamental tests for debug exceptions. The guest installs and
-handle its debug exceptions itself, without KVM_SET_GUEST_DEBUG.
 
-Signed-off-by: Ricardo Koller <ricarkol@google.com>
----
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/aarch64/debug-exceptions.c  | 250 ++++++++++++++++++
- .../selftests/kvm/include/aarch64/processor.h |  22 +-
- 4 files changed, 268 insertions(+), 6 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/aarch64/debug-exceptions.c
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index 524c857a049c..7e2c66155b06 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -1,4 +1,5 @@
- # SPDX-License-Identifier: GPL-2.0-only
-+/aarch64/debug-exceptions
- /aarch64/get-reg-list
- /aarch64/get-reg-list-sve
- /aarch64/vgic_init
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index a77e6063f7e9..36e4ebcc82f0 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -78,6 +78,7 @@ TEST_GEN_PROGS_x86_64 += memslot_perf_test
- TEST_GEN_PROGS_x86_64 += set_memory_region_test
- TEST_GEN_PROGS_x86_64 += steal_time
- 
-+TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
- TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
- TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list-sve
- TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
-diff --git a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-new file mode 100644
-index 000000000000..e5e6c92b60da
---- /dev/null
-+++ b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-@@ -0,0 +1,250 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <test_util.h>
-+#include <kvm_util.h>
-+#include <processor.h>
-+
-+#define VCPU_ID 0
-+
-+#define MDSCR_KDE	(1 << 13)
-+#define MDSCR_MDE	(1 << 15)
-+#define MDSCR_SS	(1 << 0)
-+
-+#define DBGBCR_LEN8	(0xff << 5)
-+#define DBGBCR_EXEC	(0x0 << 3)
-+#define DBGBCR_EL1	(0x1 << 1)
-+#define DBGBCR_E	(0x1 << 0)
-+
-+#define DBGWCR_LEN8	(0xff << 5)
-+#define DBGWCR_RD	(0x1 << 3)
-+#define DBGWCR_WR	(0x2 << 3)
-+#define DBGWCR_EL1	(0x1 << 1)
-+#define DBGWCR_E	(0x1 << 0)
-+
-+#define SPSR_D		(1 << 9)
-+#define SPSR_SS		(1 << 21)
-+
-+extern unsigned char sw_bp, hw_bp, bp_svc, bp_brk, hw_wp, ss_start;
-+static volatile uint64_t sw_bp_addr, hw_bp_addr;
-+static volatile uint64_t wp_addr, wp_data_addr;
-+static volatile uint64_t svc_addr;
-+static volatile uint64_t ss_addr[4], ss_idx;
-+#define  PC(v)  ((uint64_t)&(v))
-+
-+static void reset_debug_state(void)
-+{
-+	asm volatile("msr daifset, #8");
-+
-+	write_sysreg(osdlr_el1, 0);
-+	write_sysreg(oslar_el1, 0);
-+	isb();
-+
-+	write_sysreg(mdscr_el1, 0);
-+	/* This test only uses the first bp and wp slot. */
-+	write_sysreg(dbgbvr0_el1, 0);
-+	write_sysreg(dbgbcr0_el1, 0);
-+	write_sysreg(dbgwcr0_el1, 0);
-+	write_sysreg(dbgwvr0_el1, 0);
-+	isb();
-+}
-+
-+static void install_wp(uint64_t addr)
-+{
-+	uint32_t wcr;
-+	uint32_t mdscr;
-+
-+	wcr = DBGWCR_LEN8 | DBGWCR_RD | DBGWCR_WR | DBGWCR_EL1 | DBGWCR_E;
-+	write_sysreg(dbgwcr0_el1, wcr);
-+	write_sysreg(dbgwvr0_el1, addr);
-+	isb();
-+
-+	asm volatile("msr daifclr, #8");
-+
-+	mdscr = read_sysreg(mdscr_el1) | MDSCR_KDE | MDSCR_MDE;
-+	write_sysreg(mdscr_el1, mdscr);
-+	isb();
-+}
-+
-+static void install_hw_bp(uint64_t addr)
-+{
-+	uint32_t bcr;
-+	uint32_t mdscr;
-+
-+	bcr = DBGBCR_LEN8 | DBGBCR_EXEC | DBGBCR_EL1 | DBGBCR_E;
-+	write_sysreg(dbgbcr0_el1, bcr);
-+	write_sysreg(dbgbvr0_el1, addr);
-+	isb();
-+
-+	asm volatile("msr daifclr, #8");
-+
-+	mdscr = read_sysreg(mdscr_el1) | MDSCR_KDE | MDSCR_MDE;
-+	write_sysreg(mdscr_el1, mdscr);
-+	isb();
-+}
-+
-+static void install_ss(void)
-+{
-+	uint32_t mdscr;
-+
-+	asm volatile("msr daifclr, #8");
-+
-+	mdscr = read_sysreg(mdscr_el1) | MDSCR_KDE | MDSCR_SS;
-+	write_sysreg(mdscr_el1, mdscr);
-+	isb();
-+}
-+
-+static volatile char write_data;
-+
-+static void guest_code(void)
-+{
-+	GUEST_SYNC(0);
-+
-+	/* Software-breakpoint */
-+	asm volatile("sw_bp: brk #0");
-+	GUEST_ASSERT_EQ(sw_bp_addr, PC(sw_bp));
-+
-+	GUEST_SYNC(1);
-+
-+	/* Hardware-breakpoint */
-+	reset_debug_state();
-+	install_hw_bp(PC(hw_bp));
-+	asm volatile("hw_bp: nop");
-+	GUEST_ASSERT_EQ(hw_bp_addr, PC(hw_bp));
-+
-+	GUEST_SYNC(2);
-+
-+	/* Hardware-breakpoint + svc */
-+	reset_debug_state();
-+	install_hw_bp(PC(bp_svc));
-+	asm volatile("bp_svc: svc #0");
-+	GUEST_ASSERT_EQ(hw_bp_addr, PC(bp_svc));
-+	GUEST_ASSERT_EQ(svc_addr, PC(bp_svc) + 4);
-+
-+	GUEST_SYNC(3);
-+
-+	/* Hardware-breakpoint + software-breakpoint */
-+	reset_debug_state();
-+	install_hw_bp(PC(bp_brk));
-+	asm volatile("bp_brk: brk #0");
-+	GUEST_ASSERT_EQ(sw_bp_addr, PC(bp_brk));
-+	GUEST_ASSERT_EQ(hw_bp_addr, PC(bp_brk));
-+
-+	GUEST_SYNC(4);
-+
-+	/* Watchpoint */
-+	reset_debug_state();
-+	install_wp(PC(write_data));
-+	write_data = 'x';
-+	GUEST_ASSERT_EQ(write_data, 'x');
-+	GUEST_ASSERT_EQ(wp_data_addr, PC(write_data));
-+
-+	GUEST_SYNC(5);
-+
-+	/* Single-step */
-+	reset_debug_state();
-+	install_ss();
-+	ss_idx = 0;
-+	asm volatile("ss_start:\n"
-+		     "mrs x0, esr_el1\n"
-+		     "add x0, x0, #1\n"
-+		     "msr daifset, #8\n"
-+		     : : : "x0");
-+	GUEST_ASSERT_EQ(ss_addr[0], PC(ss_start));
-+	GUEST_ASSERT_EQ(ss_addr[1], PC(ss_start) + 4);
-+	GUEST_ASSERT_EQ(ss_addr[2], PC(ss_start) + 8);
-+
-+	GUEST_DONE();
-+}
-+
-+static void guest_sw_bp_handler(struct ex_regs *regs)
-+{
-+	sw_bp_addr = regs->pc;
-+	regs->pc += 4;
-+}
-+
-+static void guest_hw_bp_handler(struct ex_regs *regs)
-+{
-+	hw_bp_addr = regs->pc;
-+	regs->pstate |= SPSR_D;
-+}
-+
-+static void guest_wp_handler(struct ex_regs *regs)
-+{
-+	wp_data_addr = read_sysreg(far_el1);
-+	wp_addr = regs->pc;
-+	regs->pstate |= SPSR_D;
-+}
-+
-+static void guest_ss_handler(struct ex_regs *regs)
-+{
-+	GUEST_ASSERT_1(ss_idx < 4, ss_idx);
-+	ss_addr[ss_idx++] = regs->pc;
-+	regs->pstate |= SPSR_SS;
-+}
-+
-+static void guest_svc_handler(struct ex_regs *regs)
-+{
-+	svc_addr = regs->pc;
-+}
-+
-+static int debug_version(struct kvm_vm *vm)
-+{
-+	uint64_t id_aa64dfr0;
-+
-+	get_reg(vm, VCPU_ID, ARM64_SYS_REG(ID_AA64DFR0_EL1), &id_aa64dfr0);
-+	return id_aa64dfr0 & 0xf;
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	struct kvm_vm *vm;
-+	struct ucall uc;
-+	int stage;
-+
-+	vm = vm_create_default(VCPU_ID, 0, guest_code);
-+	ucall_init(vm, NULL);
-+
-+	vm_init_descriptor_tables(vm);
-+	vcpu_init_descriptor_tables(vm, VCPU_ID);
-+
-+	if (debug_version(vm) < 6) {
-+		print_skip("Armv8 debug architecture not supported.");
-+		kvm_vm_free(vm);
-+		exit(KSFT_SKIP);
-+	}
-+
-+	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
-+				ESR_EC_BRK_INS, guest_sw_bp_handler);
-+	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
-+				ESR_EC_HW_BP_CURRENT, guest_hw_bp_handler);
-+	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
-+				ESR_EC_WP_CURRENT, guest_wp_handler);
-+	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
-+				ESR_EC_SSTEP_CURRENT, guest_ss_handler);
-+	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
-+				ESR_EC_SVC64, guest_svc_handler);
-+
-+	for (stage = 0; stage < 7; stage++) {
-+		vcpu_run(vm, VCPU_ID);
-+
-+		switch (get_ucall(vm, VCPU_ID, &uc)) {
-+		case UCALL_SYNC:
-+			TEST_ASSERT(uc.args[1] == stage,
-+				"Stage %d: Unexpected sync ucall, got %lx",
-+				stage, (ulong)uc.args[1]);
-+			break;
-+		case UCALL_ABORT:
-+			TEST_FAIL("%s at %s:%ld\n\tvalues: %#lx, %#lx",
-+				(const char *)uc.args[0],
-+				__FILE__, uc.args[1], uc.args[2], uc.args[3]);
-+			break;
-+		case UCALL_DONE:
-+			goto done;
-+		default:
-+			TEST_FAIL("Unknown ucall %lu", uc.cmd);
-+		}
-+	}
-+
-+done:
-+	kvm_vm_free(vm);
-+	return 0;
-+}
-diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-index b2b3e9d626cb..27dc5c2e56b9 100644
---- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-+++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-@@ -14,12 +14,14 @@
- #define ARM64_CORE_REG(x) (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
- 			   KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(x))
- 
--#define CPACR_EL1	3, 0,  1, 0, 2
--#define TCR_EL1		3, 0,  2, 0, 2
--#define MAIR_EL1	3, 0, 10, 2, 0
--#define TTBR0_EL1	3, 0,  2, 0, 0
--#define SCTLR_EL1	3, 0,  1, 0, 0
--#define VBAR_EL1	3, 0, 12, 0, 0
-+#define CPACR_EL1               3, 0,  1, 0, 2
-+#define TCR_EL1                 3, 0,  2, 0, 2
-+#define MAIR_EL1                3, 0, 10, 2, 0
-+#define TTBR0_EL1               3, 0,  2, 0, 0
-+#define SCTLR_EL1               3, 0,  1, 0, 0
-+#define VBAR_EL1                3, 0, 12, 0, 0
-+
-+#define ID_AA64DFR0_EL1         3, 0,  0, 5, 0
- 
- /*
-  * Default MAIR
-@@ -98,6 +100,12 @@ enum {
- #define ESR_EC_SHIFT		26
- #define ESR_EC_MASK		(ESR_EC_NUM - 1)
- 
-+#define ESR_EC_SVC64		0x15
-+#define ESR_EC_HW_BP_CURRENT	0x31
-+#define ESR_EC_SSTEP_CURRENT	0x33
-+#define ESR_EC_WP_CURRENT	0x35
-+#define ESR_EC_BRK_INS		0x3c
-+
- void vm_init_descriptor_tables(struct kvm_vm *vm);
- void vcpu_init_descriptor_tables(struct kvm_vm *vm, uint32_t vcpuid);
- 
-@@ -119,4 +127,6 @@ void vm_install_sync_handler(struct kvm_vm *vm,
- 	val;								  \
- })
- 
-+#define isb()	asm volatile("isb" : : : "memory")
-+
- #endif /* SELFTEST_KVM_PROCESSOR_H */
--- 
-2.32.0.272.g935e593368-goog
+On 03.06.21 23:14, Jing Zhang wrote:
+> Put all generic statistics in a separate structure to ease
+> statistics handling for the incoming new statistics API.
+> 
+> No functional change intended.
+> 
+> Reviewed-by: David Matlack <dmatlack@google.com>
+> Reviewed-by: Ricardo Koller <ricarkol@google.com>
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+[...]
+> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+> index 8925f3969478..9b4473f76e56 100644
+> --- a/arch/s390/include/asm/kvm_host.h
+> +++ b/arch/s390/include/asm/kvm_host.h
+[...]
+> @@ -755,12 +750,12 @@ struct kvm_vcpu_arch {
+>   };
+>   
+>   struct kvm_vm_stat {
+> +	struct kvm_vm_stat_generic generic;
 
+s390 does not have remote_tlb_flush. I guess this does not hurt?
+
+>   	u64 inject_io;
+>   	u64 inject_float_mchk;
+>   	u64 inject_pfault_done;
+>   	u64 inject_service_signal;
+>   	u64 inject_virtio;
+> -	u64 remote_tlb_flush;
+>   };
+[...]
+> +struct kvm_vm_stat_generic {
+> +	ulong remote_tlb_flush;
+> +};
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
