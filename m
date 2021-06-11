@@ -2,130 +2,73 @@ Return-Path: <SRS0=JLBt=LF=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56F41C48BE5
-	for <kvmarm@archiver.kernel.org>; Fri, 11 Jun 2021 12:14:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCE34C48BD1
+	for <kvmarm@archiver.kernel.org>; Fri, 11 Jun 2021 12:28:16 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C7A67613DD
-	for <kvmarm@archiver.kernel.org>; Fri, 11 Jun 2021 12:14:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7A67613DD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 60B4C613DF
+	for <kvmarm@archiver.kernel.org>; Fri, 11 Jun 2021 12:28:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60B4C613DF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D7914B0D5;
-	Fri, 11 Jun 2021 08:14:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E0C5D4A00B;
+	Fri, 11 Jun 2021 08:28:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id yzZQ2INrwA6n; Fri, 11 Jun 2021 08:14:18 -0400 (EDT)
+	with ESMTP id SeHv1sSzXQ+Q; Fri, 11 Jun 2021 08:28:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 263514B0A0;
-	Fri, 11 Jun 2021 08:14:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BAE204A7FD;
+	Fri, 11 Jun 2021 08:28:14 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 789AF4B0A0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Jun 2021 08:14:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A69CE4A3B4
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Jun 2021 08:28:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GDikc2tVmwYA for <kvmarm@lists.cs.columbia.edu>;
- Fri, 11 Jun 2021 08:14:15 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5194E4B092
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Jun 2021 08:14:15 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1623413655;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=tshLc4zdYGgPabfNvrWwtgUPpGh1iSBRoaKHJCb/8hw=;
- b=PMI2b6zBnWHuxdj543hlg7h0EXf0fTk0tnlT6pTbIzGd0QQG09ZoMII4o0VpoVLgUFTViD
- 3MojeNqYmPqNFj8TGJvxxazwWXBzZ86l5Cwf2Q7x/2SB39QRhjJm/FleCl2NuEixi9+3NK
- sBFcpACCHILfCb2QetHonb5Dg5bJjAg=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-589-I3UP2d5IMj6ZZVR05y07Pw-1; Fri, 11 Jun 2021 08:14:13 -0400
-X-MC-Unique: I3UP2d5IMj6ZZVR05y07Pw-1
-Received: by mail-wr1-f71.google.com with SMTP id
- e11-20020a056000178bb0290119c11bd29eso2550274wrg.2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Jun 2021 05:14:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=tshLc4zdYGgPabfNvrWwtgUPpGh1iSBRoaKHJCb/8hw=;
- b=aqrZEh4zKnCJzEEh3b0TOtTy7mRlXVnFj3TUEU9tC17H6Nzx3/ttkPmtD7bihGa2hW
- Scpmcp/Bx8c9+2gYuIKcl3P2hKf0S8ymU/7PdmLQjz2o4HhlgbTbaA+iJv1vA+yozcZ3
- myVWo/bUPET5Wx1KxNYzlRD54ppR+KoLfiIdF53yESRFWJKp3MBYkz2b2gvIh/4PHVNw
- LXkXo7LLyBdksx2pa+HSxwmG+4bBFnMWWP7eWghoqJ6H4cxequP0JSITeD3moZt6CJPE
- fshmFzKlAnwNFU9blJffYzUJtbxLOq0/sUjejnlr8xVUh/Kgr+L1yFaABFvP/EdbA4T0
- x9ng==
-X-Gm-Message-State: AOAM531fW48rfbSkJHDzXHTuS9nFHszw7Q+G1QyqJ9Lz1uuS+AsBwr4O
- 4vVOqmPj1z402POyiJ1lL44HJhb3HZtcYTuRITNDUj9W/aF9aCzSZHFD+WrOqMK4OCD+rlqWjqo
- LwfSDtdEv7hyZ6ysYohfCe69n
-X-Received: by 2002:a05:600c:3650:: with SMTP id
- y16mr3677449wmq.92.1623413652697; 
- Fri, 11 Jun 2021 05:14:12 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzekCA0/z805DZlMHydl4+u+pU/IhlWHIqCvhI6IwFtHm385E+SV0tWtc3pGZK67eFkb8/Udw==
-X-Received: by 2002:a05:600c:3650:: with SMTP id
- y16mr3677424wmq.92.1623413652485; 
- Fri, 11 Jun 2021 05:14:12 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
- ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
- by smtp.gmail.com with ESMTPSA id r18sm6837910wro.62.2021.06.11.05.14.10
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 11 Jun 2021 05:14:11 -0700 (PDT)
-Subject: Re: [PATCH v7 1/4] KVM: stats: Separate generic stats from
- architecture specific ones
-To: Christian Borntraeger <borntraeger@de.ibm.com>,
- Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
- KVMARM <kvmarm@lists.cs.columbia.edu>, LinuxMIPS
- <linux-mips@vger.kernel.org>, KVMPPC <kvm-ppc@vger.kernel.org>,
- LinuxS390 <linux-s390@vger.kernel.org>,
- Linuxkselftest <linux-kselftest@vger.kernel.org>,
- Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
- Julien Thierry <julien.thierry.kdev@gmail.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Will Deacon <will@kernel.org>,
- Huacai Chen <chenhuacai@kernel.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- Paul Mackerras <paulus@ozlabs.org>, Janosch Frank <frankja@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- Sean Christopherson <seanjc@google.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>, Jim Mattson <jmattson@google.com>,
- Peter Shier <pshier@google.com>, Oliver Upton <oupton@google.com>,
- David Rientjes <rientjes@google.com>,
- Emanuele Giuseppe Esposito <eesposit@redhat.com>,
- David Matlack <dmatlack@google.com>, Ricardo Koller <ricarkol@google.com>,
- Krish Sadhukhan <krish.sadhukhan@oracle.com>
-References: <20210603211426.790093-1-jingzhangos@google.com>
- <20210603211426.790093-2-jingzhangos@google.com>
- <03f3fa03-6f61-7864-4867-3dc332a9d6f3@de.ibm.com>
- <bdd315f7-0615-af69-90c3-1e5646f3e259@redhat.com>
- <c0173386-0c37-73c0-736a-e904636b6c94@de.ibm.com>
- <c5199e63-762d-a731-7ef2-c2af3a8cb0c3@redhat.com>
- <050e9d8e-278d-278c-13f7-ea0b39d13fbe@de.ibm.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8dd7259c-d0f6-6816-178f-ab0f0b486955@redhat.com>
-Date: Fri, 11 Jun 2021 14:14:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+ with ESMTP id TzfWJ+ZoZTt7 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 11 Jun 2021 08:28:12 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B093B4A00B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Jun 2021 08:28:12 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id B2A856109E;
+ Fri, 11 Jun 2021 12:28:11 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=hot-poop.lan)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1lrgGf-006yMy-FF; Fri, 11 Jun 2021 13:28:09 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: suzuki.poulose@arm.com, james.morse@arm.com, catalin.marinas@arm.com,
+ will@kernel.org, Quentin Perret <qperret@google.com>,
+ alexandru.elisei@arm.com
+Subject: Re: [PATCH v3 0/7] KVM: arm64: Reduce hyp_vmemmap overhead
+Date: Fri, 11 Jun 2021 13:27:57 +0100
+Message-Id: <162341446985.1357134.6545944671032237373.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210608114518.748712-1-qperret@google.com>
+References: <20210608114518.748712-1-qperret@google.com>
 MIME-Version: 1.0
-In-Reply-To: <050e9d8e-278d-278c-13f7-ea0b39d13fbe@de.ibm.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, james.morse@arm.com,
+ catalin.marinas@arm.com, will@kernel.org, qperret@google.com,
+ alexandru.elisei@arm.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kernel-team@android.com,
+ linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -137,31 +80,44 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 11/06/21 14:08, Christian Borntraeger wrote:
->>
->> I always interpreted it as "number of times the KVM page table 
->> management code needed other CPUs to learn about new page tables". 
->> Whether the broadcast is done in software or hardware shouldn't 
->> matter; either way I suppose there is still some traffic on the bus 
->> involved.
+On Tue, 8 Jun 2021 11:45:11 +0000, Quentin Perret wrote:
+> This is a v3 of the patch series previously posted here:
 > 
+>   https://lore.kernel.org/r/20210602094347.3730846-1-qperret@google.com
 > 
-> My point is that KVM page table management on s390x completely 
-> piggy-backs on the qemu address space page table management from common 
-> code for the last level.
-> And due to the way we handle page tables we also do not teach "other 
-> CPUs". We always teach the whole system with things like IPTE.
+> Please refer to the cover letter of v1 for the context and motivation
+> behind the series.
+> 
+> [...]
 
-But that just means that you'll have fewer KVM-exclusive and thus nicer 
-numbers than x86 or ARM. :)  It still makes sense to count 
-gmap_flush_tlb calls.
+Applied to next, thanks!
 
-Paolo
+[1/7] KVM: arm64: Move hyp_pool locking out of refcount helpers
+      commit: 6cbf874e51b68e5b2eb0cc50be3676f5d5601dab
+[2/7] KVM: arm64: Use refcount at hyp to check page availability
+      commit: 581982decc635c93934aaeb88d62c21238c63f11
+[3/7] KVM: arm64: Remove list_head from hyp_page
+      commit: 914cde58a03cc5eef858db34687433e17d0e44be
+[4/7] KVM: arm64: Unify MMIO and mem host stage-2 pools
+      commit: 7c350ea39e53ade33ca7be00b0947f2b9f53dda0
+[5/7] KVM: arm64: Remove hyp_pool pointer from struct hyp_page
+      commit: d978b9cfe6fe8008467f8c5d51677f52e7815b39
+[6/7] KVM: arm64: Use less bits for hyp_page order
+      commit: 87ec0606733e1aa9568f54ddb41f03aa6b5687f2
+[7/7] KVM: arm64: Use less bits for hyp_page refcount
+      commit: 6929586d8eddad184f43526efe7bf0a8be4f18b2
+
+Cheers,
+
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
+
 
 _______________________________________________
 kvmarm mailing list
