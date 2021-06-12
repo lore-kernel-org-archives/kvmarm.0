@@ -1,63 +1,74 @@
-Return-Path: <SRS0=JLBt=LF=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=m071=LG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31839C48BE0
-	for <kvmarm@archiver.kernel.org>; Fri, 11 Jun 2021 16:58:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C527C48BCF
+	for <kvmarm@archiver.kernel.org>; Sat, 12 Jun 2021 11:10:53 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A4069613C3
-	for <kvmarm@archiver.kernel.org>; Fri, 11 Jun 2021 16:58:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4069613C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id AC336613B8
+	for <kvmarm@archiver.kernel.org>; Sat, 12 Jun 2021 11:10:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC336613B8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 20ED34B0CE;
-	Fri, 11 Jun 2021 12:58:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4921640CF8;
+	Sat, 12 Jun 2021 07:10:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ZNuXyIRJzfbw; Fri, 11 Jun 2021 12:58:34 -0400 (EDT)
+	with ESMTP id QyX6awWzJPki; Sat, 12 Jun 2021 07:10:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A1674B0CD;
-	Fri, 11 Jun 2021 12:58:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 38ACD407D1;
+	Sat, 12 Jun 2021 07:10:50 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 85DE44B0C5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Jun 2021 12:58:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D5BE406AD
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 12 Jun 2021 07:10:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lp5m6v0XPtul for <kvmarm@lists.cs.columbia.edu>;
- Fri, 11 Jun 2021 12:58:32 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AAE84B0BA
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Jun 2021 12:58:32 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F31CFD6E;
- Fri, 11 Jun 2021 09:58:31 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 81E6B3F719;
- Fri, 11 Jun 2021 09:58:30 -0700 (PDT)
-Subject: Re: [PATCH v4 3/9] KVM: arm64: vgic: Be tolerant to the lack of
- maintenance interrupt masking
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
- kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-References: <20210601104005.81332-1-maz@kernel.org>
- <20210601104005.81332-4-maz@kernel.org>
- <a02e67c6-fceb-ed6a-fc73-8649d8d18dd8@arm.com>
-Message-ID: <b0b941ae-cd22-4454-a987-04baf5473c5e@arm.com>
-Date: Fri, 11 Jun 2021 17:59:26 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-MIME-Version: 1.0
-In-Reply-To: <a02e67c6-fceb-ed6a-fc73-8649d8d18dd8@arm.com>
-Content-Language: en-US
-Cc: Hector Martin <marcan@marcan.st>, kernel-team@android.com
+ with ESMTP id yEOwLqoO6jlz for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 12 Jun 2021 07:10:47 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 66F304064F
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 12 Jun 2021 07:10:47 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 4BB3261376;
+ Sat, 12 Jun 2021 11:10:46 +0000 (UTC)
+Received: from [185.219.108.64] (helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1ls1XI-0079Gc-6h; Sat, 12 Jun 2021 12:10:44 +0100
+Date: Sat, 12 Jun 2021 12:10:43 +0100
+Message-ID: <87eed7tk24.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Austin Kim <austindh.kim@gmail.com>
+Subject: Re: [PATCH] KVM: arm64: vgic: declear local variable 'flags' before
+ for loop starts
+In-Reply-To: <20210612110014.GA1211@raspberrypi>
+References: <20210612110014.GA1211@raspberrypi>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: austindh.kim@gmail.com, james.morse@arm.com,
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com,
+ will@kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, austin.kim@lge.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
+ austin.kim@lge.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -74,54 +85,27 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+On Sat, 12 Jun 2021 12:00:14 +0100,
+Austin Kim <austindh.kim@gmail.com> wrote:
+> 
+> From: Austin Kim <austin.kim@lge.com>
+> 
+> Normally local variable 'flags' is defined out of for loop,
+> when 'flags' is used as the second parameter in a call to
+> spinlock_irq[save/restore] function.
+> 
+> So it had better declear local variable 'flags' ahead of for loop.
 
-On 6/11/21 5:38 PM, Alexandru Elisei wrote:
-> Hi Marc,
->
-> On 6/1/21 11:39 AM, Marc Zyngier wrote:
->> As it turns out, not all the interrupt controllers are able to
->> expose a vGIC maintenance interrupt that can be independently
->> enabled/disabled.
->>
->> And to be fair, it doesn't really matter as all we require is
->> for the interrupt to kick us out of guest mode out way or another.
->>
->> To that effect, add gic_kvm_info.no_maint_irq_mask for an interrupt
->> controller to advertise the lack of masking.
->>
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> ---
->>  arch/arm64/kvm/vgic/vgic-init.c       | 8 +++++++-
->>  include/linux/irqchip/arm-vgic-info.h | 2 ++
->>  2 files changed, 9 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
->> index 2fdb65529594..6752d084934d 100644
->> --- a/arch/arm64/kvm/vgic/vgic-init.c
->> +++ b/arch/arm64/kvm/vgic/vgic-init.c
->> @@ -519,12 +519,15 @@ void kvm_vgic_init_cpu_hardware(void)
->>   */
->>  int kvm_vgic_hyp_init(void)
->>  {
->> +	bool has_mask;
->>  	int ret;
->>  
->>  	if (!gic_kvm_info)
->>  		return -ENODEV;
->>  
->> -	if (!gic_kvm_info->maint_irq) {
->> +	has_mask = !gic_kvm_info->no_maint_irq_mask;
-> This double negative is pretty awkward, I suppose this was done to avoid changes
-> to the gic drivers, because the default value is 0 (false). Just an idea, maybe
-> renaming it to maint_irq_unmaskable would be more readable?
-
-Actually, after another look, the current name stopped looking awkward to me.
+Why better? Reducing the scope of a variable is in general good
+practice. Do you see any material advantage in moving this variable
+out of the loop? Does the compiler generate better code?
 
 Thanks,
 
-Alex
+	M.
 
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
