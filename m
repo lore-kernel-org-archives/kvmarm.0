@@ -2,70 +2,98 @@ Return-Path: <SRS0=Qgx2=LI=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3016DC48BE8
-	for <kvmarm@archiver.kernel.org>; Mon, 14 Jun 2021 08:09:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C065C48BE6
+	for <kvmarm@archiver.kernel.org>; Mon, 14 Jun 2021 08:16:45 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 91164613C5
-	for <kvmarm@archiver.kernel.org>; Mon, 14 Jun 2021 08:09:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91164613C5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 8D2E761380
+	for <kvmarm@archiver.kernel.org>; Mon, 14 Jun 2021 08:16:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D2E761380
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C31D49FE6;
-	Mon, 14 Jun 2021 04:09:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 058A349FB7;
+	Mon, 14 Jun 2021 04:16:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id gdaXp7isLEtB; Mon, 14 Jun 2021 04:09:12 -0400 (EDT)
+	with ESMTP id UX1eTUeSYmwH; Mon, 14 Jun 2021 04:16:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 12F5349E72;
-	Mon, 14 Jun 2021 04:09:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E9AE149E72;
+	Mon, 14 Jun 2021 04:16:42 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 857B6404F8
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Jun 2021 04:09:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A61C4406D3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Jun 2021 04:16:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Svei7qmW1VIn for <kvmarm@lists.cs.columbia.edu>;
- Mon, 14 Jun 2021 04:09:09 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 89B1F40212
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Jun 2021 04:09:09 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 825F26138C;
- Mon, 14 Jun 2021 08:09:08 +0000 (UTC)
-Received: from [185.219.108.64] (helo=hot-poop.lan)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1lsheX-007NgD-Go; Mon, 14 Jun 2021 09:09:01 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu
-Subject: Re: [PATCH v4 0/6] KVM: selftests: arm64 exception handling and debug
- test
-Date: Mon, 14 Jun 2021 09:08:57 +0100
-Message-Id: <162365813003.2322930.1320580916892571900.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210611011020.3420067-1-ricarkol@google.com>
-References: <20210611011020.3420067-1-ricarkol@google.com>
+ with ESMTP id dxAdjnary8ua for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 14 Jun 2021 04:16:40 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BE4C9405A9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Jun 2021 04:16:40 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1623658600;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=NWYh+JN15Re9hA/u8sox/DeHyV8EZ/VNFeCGPr+FHI0=;
+ b=TuE00gNfJRTKuF/jhXHSwoiKOFOKpqoVvrjfILVNkocf78FseCaqS0Kr2GyYbZXougvNHK
+ TLWCf+ZOB6T73GlR3EZjx/PwxH0bvpUZEUhJqQfncknOGgFhsoQ/HB+MVqFbxmmDZtgKBA
+ wzQzoMPmK7rhlIK4Z7YOJJmpV9sTw6s=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-528-WxV_fI74NOWFE8K7PbbdiA-1; Mon, 14 Jun 2021 04:16:38 -0400
+X-MC-Unique: WxV_fI74NOWFE8K7PbbdiA-1
+Received: by mail-ed1-f69.google.com with SMTP id
+ u26-20020a05640207dab02903935beb5c71so14019685edy.3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Jun 2021 01:16:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=NWYh+JN15Re9hA/u8sox/DeHyV8EZ/VNFeCGPr+FHI0=;
+ b=WtPuBIYpsOsx+t0b8rlayH6ATUWA9tx2fXqwsBujPn/3dQLbe5KRKpvXPVkymQiN4O
+ TKuDna9apOBRl/ecAaxEbOSGEzLpjYbH3MkjIDgjz9gXe7SlLFpuBz1dY1XGTsa1VYZG
+ 6ApKgJkgNnWBoTDUuD+B63Cnygm6x+4S8QoaV3tR+EFaUIwzHqF2c98xyG7Wwm3USRrZ
+ k5RLNgfDgwQv/DMgKyNHycNYLCLtbvD2T/5Y+WTiL4p1S9Zx8EPNRYJUbQBi72Pqbk/N
+ QV9ShzNevxejL+tz4H0H6mTYNA9vsyJjUUVbyruCEpu/cuAMyU/WPc+aMzaVhOzkIMBA
+ GChQ==
+X-Gm-Message-State: AOAM531ZxJzhGz/qTjtu6JKn8YbH5ypUZ0z/0aPFX0D434g0qOmNaAMe
+ fREyopsEW8ibO6PdHjorNjGl9XSiqpn9Po3I+q7Q4YTztqP0zzutTN6boY1w5t8c7+CqZJYLYzX
+ 7tln1e6M/bFLtSrLP4sly0aAy
+X-Received: by 2002:a05:6402:19b9:: with SMTP id
+ o25mr15353515edz.192.1623658597247; 
+ Mon, 14 Jun 2021 01:16:37 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx/KTRQYhU+Vh3BamwYE6Ifgg3evkGYd7DRr9k1n6WQ3groQvMruoCvWoppWBg5CVzFipDzmA==
+X-Received: by 2002:a05:6402:19b9:: with SMTP id
+ o25mr15353493edz.192.1623658597033; 
+ Mon, 14 Jun 2021 01:16:37 -0700 (PDT)
+Received: from gator.home (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
+ by smtp.gmail.com with ESMTPSA id h26sm8017727edz.76.2021.06.14.01.16.36
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 14 Jun 2021 01:16:36 -0700 (PDT)
+Date: Mon, 14 Jun 2021 10:16:35 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [kvm-unit-tests PATCH] configure: arm: Update kvmtool UART address
+Message-ID: <20210614081635.4arskb7yjcsm33mn@gator.home>
+References: <20210611152621.34242-1-alexandru.elisei@arm.com>
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: ricarkol@google.com, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, vkuznets@redhat.com, pbonzini@redhat.com,
- alexandru.elisei@arm.com, eric.auger@redhat.com, drjones@redhat.com,
- yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: pbonzini@redhat.com, vkuznets@redhat.com
+In-Reply-To: <20210611152621.34242-1-alexandru.elisei@arm.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Disposition: inline
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -82,38 +110,45 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 10 Jun 2021 18:10:14 -0700, Ricardo Koller wrote:
-> These patches add a debug exception test in aarch64 KVM selftests while
-> also adding basic exception handling support.
+On Fri, Jun 11, 2021 at 04:26:21PM +0100, Alexandru Elisei wrote:
+> kvmtool commit 45b4968e0de1 ("hw/serial: ARM/arm64: Use MMIO at higher
+> addresses") changed the UART address from 0x3f8 to 0x1000000. Update the
+> UART early address accordingly when kvm-unit-tests is configured with
+> --target=kvmtool.
 > 
-> The structure of the exception handling is based on its x86 counterpart.
-> Tests use the same calls to initialize exception handling and both
-> architectures allow tests to override the handler for a particular
-> vector, or (vector, ec) for synchronous exceptions in the arm64 case.
+> Users of older kvmtool versions can still enjoy having a working early UART
+> by configuring kvm-unit-tests with --earlycon=uart,mmio,0x3f8. Note that in
+> this case --target=kvmtool is still recommended because it enables all
+> erratas.
 > 
-> [...]
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>  configure | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/configure b/configure
+> index 4ad5a4bcd782..bd0c14edb777 100755
+> --- a/configure
+> +++ b/configure
+> @@ -189,7 +189,7 @@ elif [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
+>      if [ "$target" = "qemu" ]; then
+>          arm_uart_early_addr=0x09000000
+>      elif [ "$target" = "kvmtool" ]; then
+> -        arm_uart_early_addr=0x3f8
+> +        arm_uart_early_addr=0x1000000
+>          errata_force=1
+>      else
+>          echo "--target must be one of 'qemu' or 'kvmtool'!"
+> -- 
+> 2.32.0
+>
 
-Applied to next, thanks!
+Applied to arm/queue
 
-[1/6] KVM: selftests: Rename vm_handle_exception
-      commit: b78f4a596692f6805e796a4c13f2d921b8a95166
-[2/6] KVM: selftests: Complete x86_64/sync_regs_test ucall
-      commit: b7326c01122683b88e273a0cc826cd4c01234470
-[3/6] KVM: selftests: Introduce UCALL_UNHANDLED for unhandled vector reporting
-      commit: 75275d7fbef47805b77e8af81a4d51e2d92db70f
-[4/6] KVM: selftests: Move GUEST_ASSERT_EQ to utils header
-      commit: 67f709f52bf0b5c19f24d1234163123cbb6af545
-[5/6] KVM: selftests: Add exception handling support for aarch64
-      commit: e3db7579ef355a0b2bfef4448b84d9ac882c8f2c
-[6/6] KVM: selftests: Add aarch64/debug-exceptions test
-      commit: 4f05223acaeaabe0a1a188e25fab334735d85c5e
+https://gitlab.com/rhdrjones/kvm-unit-tests/-/commits/arm/queue
 
-Cheers,
-
-	M.
--- 
-Without deviation from the norm, progress is not possible.
-
+Thanks,
+drew 
 
 _______________________________________________
 kvmarm mailing list
