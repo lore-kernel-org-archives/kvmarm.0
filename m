@@ -2,84 +2,107 @@ Return-Path: <SRS0=Qgx2=LI=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F323C48BE8
-	for <kvmarm@archiver.kernel.org>; Mon, 14 Jun 2021 09:50:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01476C49361
+	for <kvmarm@archiver.kernel.org>; Mon, 14 Jun 2021 09:51:32 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7F74361245
-	for <kvmarm@archiver.kernel.org>; Mon, 14 Jun 2021 09:50:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F74361245
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 7DFDF61380
+	for <kvmarm@archiver.kernel.org>; Mon, 14 Jun 2021 09:51:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DFDF61380
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CE33649F5D;
-	Mon, 14 Jun 2021 05:50:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EB71C40808;
+	Mon, 14 Jun 2021 05:51:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id RP7xTpAt6IbX; Mon, 14 Jun 2021 05:50:32 -0400 (EDT)
+	with ESMTP id M3RrLCFTu8bC; Mon, 14 Jun 2021 05:51:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 098FD4083E;
-	Mon, 14 Jun 2021 05:50:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D7014083E;
+	Mon, 14 Jun 2021 05:51:28 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B01940821
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Jun 2021 05:50:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5315840821
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Jun 2021 05:51:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Xz+F+ruFBG5p for <kvmarm@lists.cs.columbia.edu>;
- Mon, 14 Jun 2021 05:50:28 -0400 (EDT)
-Received: from mail-oo1-f41.google.com (mail-oo1-f41.google.com
- [209.85.161.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0DD93405A9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Jun 2021 05:50:28 -0400 (EDT)
-Received: by mail-oo1-f41.google.com with SMTP id
- w13-20020a4ad02d0000b029024a98209c35so1672798oor.4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Jun 2021 02:50:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=3ozeCrBWe056dvCFaSIn+YQtzRjUNyCG2jQsSBdsH6g=;
- b=K2qC92mVnZ7jUjofUEv4H+1w+qvltenXJMO5pP5zAQH9F9zzM6cma5PhaHyikSIE3D
- dgQc6WK4VWss1I8rQpcUAa+kknrISK1OThLKqPD0Ynu3YYr8NHxDjWdGBi55WyPUNLif
- i3JnBKWMJgfPTrRirLFRa8yVdEoj3gif50MFdkhnQ7QcHt3pdY8TR72cKPAlAymhZAhy
- fE+SeGXJkHhWdl5z0so4A3sE6OP4b04IsNaed/cw6QlyOjQcCpURRrlseuX+X6B4TqU1
- wFpbS04rbYoW9naTxekf9c4HpCWGlieaJNAtYseO4lXhzKvQiMv8Gd3ijQNtsUu8qwFY
- 4JHw==
+ with ESMTP id PqV3TUbm9UMQ for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 14 Jun 2021 05:51:26 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5378E40808
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Jun 2021 05:51:26 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1623664286;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=yVGqXIcKrLCK11mCl5CKOO3c7mK+et1d86zdU/of4sY=;
+ b=Jb5JdD8X/xF0x/6xn+VQj7HDjgkfSpyZXv+u8LxkZZRpkqK8QiJbszXNbbqmytvJUswjQs
+ Wnh3v1wG7WdNrqW3OaEz5NFOC+Kgg9a4MAO1oogYDNpFmeHbbOrpK2aN02aRyD1pBINXUw
+ dM7asWdPEOMhXzzu0G0sEYa0G83cYJ4=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-457-mMvvA3GEMDmmfSaqyxVCOA-1; Mon, 14 Jun 2021 05:51:24 -0400
+X-MC-Unique: mMvvA3GEMDmmfSaqyxVCOA-1
+Received: by mail-ed1-f69.google.com with SMTP id
+ a16-20020aa7cf100000b0290391819a774aso18022486edy.8
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Jun 2021 02:51:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=3ozeCrBWe056dvCFaSIn+YQtzRjUNyCG2jQsSBdsH6g=;
- b=UHIWB3xPBhNihHOraFwvCpJ4pHEtOMKZybc3lrFFjzIF+wiaWnSCMkh1XvTMETwSee
- OeeSfzCSOsWrUV1fRoYk4KNpFtvR/B9+3steA8Fe9hir8/ZwrjcIkzjotawYmFMvugzC
- lDJDAft08dGREZxQe64U4KSpkND26oYriFSB0Bi2zYEagUWGLZGM13Aein/El2ceHR6I
- +NsvkPI3fNL2EySKd1pWCjNFXJQ0UFU2BaXTLhRIriaSs+bHc8NvEKauqKE6FmofY0mN
- hCx4zCg964IygzHlOoPge9wIkBbWEKGumtNrDtsZwcINJisyOWPaEpTNQ8Wp17uLZoZE
- l6pg==
-X-Gm-Message-State: AOAM533CDkX1kBO4YOAbzEuDAvVkYzvuYAfSl9Qj9VmLLdD8RVRsrHrq
- 1MS+lYuqbyvRDMWlMSfaBFtFY6hm8aWp2Vut1dYmRw==
-X-Google-Smtp-Source: ABdhPJyJwQ95jW5MLr7rUkCdRFLkVYE33n19WoUneoHj3ZP6RKTjyoGOcQr4wTLfnQTTpVHh3eZs+F2r0ncYGstNVYw=
-X-Received: by 2002:a4a:5482:: with SMTP id t124mr12435372ooa.42.1623664227170; 
- Mon, 14 Jun 2021 02:50:27 -0700 (PDT)
-MIME-Version: 1.0
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=yVGqXIcKrLCK11mCl5CKOO3c7mK+et1d86zdU/of4sY=;
+ b=SeiRuvhaqBZLx7TEeFNJpfznqOhwjfl1zLcJoJiBjVYFRrhX2KlOyrbnbeV9lGFjkF
+ g9Y78Fxz2Wv3CPc4KZobtsJi9o9A8nmoweD6z4PVi+jcgOJpU8Wt4CHOHM9hcObEyb3i
+ AKLNxa4nwZLTrznXSizEDSeOK8L7GIOxvT1siIxgn2qZXkCzjv5LvrhT5DZRQsWcxJkh
+ XqFbDFUO1fBtXhiNnerQdJmUIGk95l3qbTbDrJMrzPLlxe8i4NK8oIN/vSjSWV4BzxG1
+ tbkhrol8lWrzSmwzHGLvq6Ujet2RgTu5VOZBBMigpQTBn+l3RKtiVuwIqV9lL83j2tKn
+ 1zrA==
+X-Gm-Message-State: AOAM533kYAvrvY4zjXLuInhlmWYH5x92d2RMCx8rq2a5a39bp7uwjj01
+ 9nm3dXvUTeoH4IBYOm7BGCt2YdhxVnNZGAOBdtID6UXfyjsb2TSGaJVP4VqMcoD1fqLf+DkSV6W
+ rFnG9DHzdmhv3OXs0csJz1Egp
+X-Received: by 2002:a17:906:606:: with SMTP id
+ s6mr14277118ejb.206.1623664283795; 
+ Mon, 14 Jun 2021 02:51:23 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzUGdB6YCrtVUeX6wpPs0U6HuF+wRnjGRZ9weZzhvjGvM0kMMRuORQ5jQGRt+viUDl0Dzm5nQ==
+X-Received: by 2002:a17:906:606:: with SMTP id
+ s6mr14277110ejb.206.1623664283633; 
+ Mon, 14 Jun 2021 02:51:23 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
+ ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+ by smtp.gmail.com with ESMTPSA id y15sm8131933edd.55.2021.06.14.02.51.22
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 14 Jun 2021 02:51:22 -0700 (PDT)
+Subject: Re: [PATCH 2/4] KVM: stats: Use binary stats descriptors for debugfs
+ interface
+To: Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
+ KVMARM <kvmarm@lists.cs.columbia.edu>, LinuxMIPS
+ <linux-mips@vger.kernel.org>, KVMPPC <kvm-ppc@vger.kernel.org>,
+ LinuxS390 <linux-s390@vger.kernel.org>, Fuad Tabba <tabba@google.com>
 References: <20210614025351.365284-1-jingzhangos@google.com>
- <20210614025351.365284-2-jingzhangos@google.com>
-In-Reply-To: <20210614025351.365284-2-jingzhangos@google.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 14 Jun 2021 10:49:50 +0100
-Message-ID: <CA+EHjTybUkOVVByL5r_MwLfzc_aaPybY8AzdCLYmS8aiR-RkSA@mail.gmail.com>
-Subject: Re: [PATCH 1/4] KVM: stats: Make sure no missing or mismatched binary
- stats definition
-To: Jing Zhang <jingzhangos@google.com>
-Cc: LinuxS390 <linux-s390@vger.kernel.org>, KVM <kvm@vger.kernel.org>,
- LinuxMIPS <linux-mips@vger.kernel.org>, KVMPPC <kvm-ppc@vger.kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, KVMARM <kvmarm@lists.cs.columbia.edu>
+ <20210614025351.365284-3-jingzhangos@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1b57502b-116a-9be5-fa2f-1e8f5b5fce2d@redhat.com>
+Date: Mon, 14 Jun 2021 11:51:21 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
+MIME-Version: 1.0
+In-Reply-To: <20210614025351.365284-3-jingzhangos@google.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,71 +114,29 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Jing,
+On 14/06/21 04:53, Jing Zhang wrote:
+> +	STATS_DESC_ICOUNTER_RONLY(VM, lpages),
+> +	STATS_DESC_ICOUNTER_RONLY(VM, nx_lpage_splits),
+>  	STATS_DESC_ICOUNTER(VM, max_mmu_page_hash_collisions)
 
-On Mon, Jun 14, 2021 at 3:53 AM Jing Zhang <jingzhangos@google.com> wrote:
->
-> Add static check to make sure the number of stats descriptors equals
-> the number of stats defined in vm/vcpu stats structures.
-> Add offset field in stats descriptor to let us define stats
-> descriptors freely, don't have to be in the same order as
-> stats in vm/vcpu stats structures.
-> Also fix some missing/mismatched stats from previous patch.
->
-> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+I think we're now adding too many macros.
 
-I tested this for arm64, and it does assert if there's a mismatch. I
-couldn't find any missing statistics under any of the architectures
-either.
+max_mmu_page_hash_collisions is the only remaining instant counter that 
+is not read-only.  In fact, in the statsfs prototype we made all instant 
+counters read-only.
 
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 5e77f32abef5..692af9177c9f 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -1296,119 +1296,152 @@ struct _kvm_stats_desc {
->         { n, offsetof(struct kvm_vcpu, stat.generic.x),                        \
->           KVM_STAT_VCPU, ## __VA_ARGS__ }
->
-> -#define STATS_DESC(stat, type, unit, base, exp)                               \
-> +#define STATS_DESC_COMMON(type, unit, base, exp)                              \
-> +       .flags = type | unit | base |                                          \
-> +           BUILD_BUG_ON_ZERO(type & ~KVM_STATS_TYPE_MASK) |                   \
-> +           BUILD_BUG_ON_ZERO(unit & ~KVM_STATS_UNIT_MASK) |                   \
-> +           BUILD_BUG_ON_ZERO(base & ~KVM_STATS_BASE_MASK),                    \
-> +       .exponent = exp,                                                       \
-> +       .size = 1
-> +
+You could add a third type in addition to instant and cumulative, let's 
+call it "peak".  This essentially corresponds to the "max" aggregation 
+function in the statsfs prototype.  Then instant counters would be read 
+only, while cumulative and peak would be read-write.
 
-nit: you seem to be mixing tabs and spaces here
+Paolo
 
-> +#define VM_GENERIC_STATS_DESC(stat, type, unit, base, exp)                    \
->         {                                                                      \
->                 {                                                              \
-> -                       .flags = type | unit | base |                          \
-> -                           BUILD_BUG_ON_ZERO(type & ~KVM_STATS_TYPE_MASK) |   \
-> -                           BUILD_BUG_ON_ZERO(unit & ~KVM_STATS_UNIT_MASK) |   \
-> -                           BUILD_BUG_ON_ZERO(base & ~KVM_STATS_BASE_MASK),    \
-> -                       .exponent = exp,                                       \
-> -                       .size = 1                                              \
-> +                       STATS_DESC_COMMON(type, unit, base, exp),              \
-> +                       .offset = offsetof(struct kvm_vm_stat, generic.stat)   \
->                 },                                                             \
-> -               .name = stat,                                                  \
-> +               .name = #stat,                                                 \
->         }
-
-nit: also here, mixing of tabs and spaces
-
-Tested-by: Fuad Tabba <tabba@google.com> #arm64
-Reviewed-by: Fuad Tabba <tabba@google.com>
-
-Thanks,
-/fuad
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
