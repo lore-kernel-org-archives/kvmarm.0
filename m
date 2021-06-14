@@ -2,84 +2,100 @@ Return-Path: <SRS0=Qgx2=LI=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B8A8C48BE8
-	for <kvmarm@archiver.kernel.org>; Mon, 14 Jun 2021 02:54:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80DD4C48BE6
+	for <kvmarm@archiver.kernel.org>; Mon, 14 Jun 2021 07:40:54 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0E192613AB
-	for <kvmarm@archiver.kernel.org>; Mon, 14 Jun 2021 02:54:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E192613AB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id E39FB610A2
+	for <kvmarm@archiver.kernel.org>; Mon, 14 Jun 2021 07:40:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E39FB610A2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B603D40623;
-	Sun, 13 Jun 2021 22:54:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3429240874;
+	Mon, 14 Jun 2021 03:40:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id I4VIFRldDNBx; Sun, 13 Jun 2021 22:54:11 -0400 (EDT)
+	with ESMTP id kkHWr6HSI0hj; Mon, 14 Jun 2021 03:40:52 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B707B4A2E5;
-	Sun, 13 Jun 2021 22:54:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 159A840CF8;
+	Mon, 14 Jun 2021 03:40:52 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 47CF640630
- for <kvmarm@lists.cs.columbia.edu>; Sun, 13 Jun 2021 22:54:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5155B40856
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Jun 2021 03:40:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lD5fcUCTMSNq for <kvmarm@lists.cs.columbia.edu>;
- Sun, 13 Jun 2021 22:54:03 -0400 (EDT)
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com
- [209.85.210.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4D58740762
- for <kvmarm@lists.cs.columbia.edu>; Sun, 13 Jun 2021 22:54:03 -0400 (EDT)
-Received: by mail-pf1-f202.google.com with SMTP id
- s5-20020aa78d450000b02902ace63a7e93so7472055pfe.8
- for <kvmarm@lists.cs.columbia.edu>; Sun, 13 Jun 2021 19:54:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=G0BvcWLb4IeXiMagmDzrz7Uqmh6mNFjQeYSUfBYTeS0=;
- b=J5d2R6fWgIT7owLOkJV6VeWqsPNmA3XhITMy2ACzrDEZhT0Hlwu1Mv1CGvxmT9xZEJ
- zOh45iAE5qCbYIz/1wXZBdrottBUD7tpMTeePsXb7v9pq1MVKNz/w44zNDX5DV7GJSNw
- tUg2JDh1hnHw8Fct0UeMIcmZl+UUTt3HJqYS4yXoEOYYItYDzo+7W04DATqfZNjGj0EE
- FJ4jtuO3fwrMXv+WswutYrXdpiDAx3BQTTnr1PTdXUUB8IPOb33aV1KfvgYWQbQSHSW+
- jN4K6ERakZJxjI6TqbwlCEllee61z7OrSO6pbKuyV3wieGgx7IAhVQP6z/uCtPoNXmQE
- gfOQ==
+ with ESMTP id H+infuwGgiiK for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 14 Jun 2021 03:40:50 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E35240667
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Jun 2021 03:40:50 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1623656449;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=3vluf07n1e9CMotPaBeCeLpe5If4SME3MyJJJYYovH4=;
+ b=eSttsqFmsNX4R+j+uF51ncYMq3gFA5g8kZt5qtwtabSt/ymNeg3DsFyqq+JfDOZcQ+KfTD
+ 9gQWTtCwCBAzQ1Tmnkh7NPSNQ+4Z9zmR1IflxqE2rO48VlGvVo8KONX/4UG2GyOQcrhaTg
+ noxnv00fEVxn4SG1kQvi1IN1vqMGDTs=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-239-r_HBa_ozMyyWmbRJLtdebQ-1; Mon, 14 Jun 2021 03:40:48 -0400
+X-MC-Unique: r_HBa_ozMyyWmbRJLtdebQ-1
+Received: by mail-ej1-f72.google.com with SMTP id
+ n19-20020a1709067253b029043b446e4a03so2689522ejk.23
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Jun 2021 00:40:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=G0BvcWLb4IeXiMagmDzrz7Uqmh6mNFjQeYSUfBYTeS0=;
- b=Jf0m3H6XI8aUqVogDgNqySvlLJVGgMnE7s2eAuU/2eEbat6cLzMAjDI5pCNIappIfT
- 84TSUzzdRmz3F9v3WCRepXGwNSwRiRTVjFkvg3kECcIRaO1/DYRzDE2H4aDAVuerftVS
- fKJGBVxtpcK/LwZ9xCrKOx9i8lT9c2Kp3gh2h19nkRRpz8enABq+oGuRDGUIjdEcIeK6
- GE8VltYAMhJcx3kerjqXXYy0OCNGT3cqiITNXBHhcN/CpOoJTTc5JygukaNlBs/TIMMY
- qIQYPgv0GA05iV7OmVvdAGaFkj3h1E6VjSzkuHaTcC20dIPiOb9NTn9PePiFg4OUJtnH
- RAww==
-X-Gm-Message-State: AOAM532sudlDsEJiYCSELAVnCddQmJouzr7mU8h+fKymDspMKvc/W1aj
- 9tjFrKLLbi7PIgJqg+o3XEf2YIMfNTcjgIiE5g==
-X-Google-Smtp-Source: ABdhPJycgiFSbxMZLS8Bil1CYzhmeCE7vWg07Yh1drE2XVuoYrfaHxoRxI6LH8bCvEcGVqokSkYhAgwO3CRfAtV4/A==
-X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:10:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a63:ed4d:: with SMTP id
- m13mr15005137pgk.433.1623639242315; Sun, 13 Jun 2021 19:54:02 -0700 (PDT)
-Date: Mon, 14 Jun 2021 02:53:51 +0000
-In-Reply-To: <20210614025351.365284-1-jingzhangos@google.com>
-Message-Id: <20210614025351.365284-5-jingzhangos@google.com>
-Mime-Version: 1.0
-References: <20210614025351.365284-1-jingzhangos@google.com>
-X-Mailer: git-send-email 2.32.0.272.g935e593368-goog
-Subject: [PATCH 4/4] KVM: selftests: Update binary stats test for stats mode
-From: Jing Zhang <jingzhangos@google.com>
-To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>, 
- LinuxMIPS <linux-mips@vger.kernel.org>, KVMPPC <kvm-ppc@vger.kernel.org>, 
- LinuxS390 <linux-s390@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
- Fuad Tabba <tabba@google.com>
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=3vluf07n1e9CMotPaBeCeLpe5If4SME3MyJJJYYovH4=;
+ b=a1u5J0pDvdkMF+MtCC2ivggV3E4Sidt0JpnvyvqJS2b/I/51BGJh/XcNfcSVGp7EJy
+ 01oaVvhOYH8lApgfYNK+qUdBwkk7fDZcMNsIwY2TySCIKTagV1Mn3AHfGuOm8yrhh0Ak
+ IMxmqd+BlFAQdNKxc5VnuHspzgHgVrdVeK+POKnZaQ72LI8cB5sU4aERKfXt5K1L+Xwg
+ SnTTlDLQnynUfngfN+VYeNnOBW71Qs0wt0QTBaqrhSwo4xEYiPl5gxQ4ORwq9h/l+rOw
+ vzTiQqG3LjCCV97Tn6z/hP5NgDDSeZUpTU5vT1eblE+0oFy/99J4edIUu0SOhMJ1X9hJ
+ PgZA==
+X-Gm-Message-State: AOAM532vRYSI2nMMbuUVp2iEk8NYliGw6jEsDI4FXKpvZScn+72P5RDS
+ ty172AHox0Rtr30HvxqrR44qTpASEThuzVAVWJoxRqQzbvWr9HF0kY9jZ05VM5da76174+GHt+k
+ JxReuf8d0U2to+lpI4EVsKf3y
+X-Received: by 2002:a05:6402:4395:: with SMTP id
+ o21mr15611037edc.163.1623656447250; 
+ Mon, 14 Jun 2021 00:40:47 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyXFlZ+swOY5PozQnD2lwcOa9P4NfPBGblip0aRW2ve2FhR7KJrAMeV3SRvrOwFQafoV2qa0A==
+X-Received: by 2002:a05:6402:4395:: with SMTP id
+ o21mr15611021edc.163.1623656447053; 
+ Mon, 14 Jun 2021 00:40:47 -0700 (PDT)
+Received: from gator (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
+ by smtp.gmail.com with ESMTPSA id c19sm7910388edw.10.2021.06.14.00.40.46
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 14 Jun 2021 00:40:46 -0700 (PDT)
+Date: Mon, 14 Jun 2021 09:40:44 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Ricardo Koller <ricarkol@google.com>
+Subject: Re: [PATCH v4 0/6] KVM: selftests: arm64 exception handling and
+ debug test
+Message-ID: <20210614074044.vntupqsiuqmqobsy@gator>
+References: <20210611011020.3420067-1-ricarkol@google.com>
+MIME-Version: 1.0
+In-Reply-To: <20210611011020.3420067-1-ricarkol@google.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Disposition: inline
+Cc: kvm@vger.kernel.org, maz@kernel.org, pbonzini@redhat.com,
+ vkuznets@redhat.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -96,50 +112,100 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Update binary stats selftest to support sanity test for stats
-read/write mode and offset.
+On Thu, Jun 10, 2021 at 06:10:14PM -0700, Ricardo Koller wrote:
+> Hi,
+> 
+> These patches add a debug exception test in aarch64 KVM selftests while
+> also adding basic exception handling support.
+> 
+> The structure of the exception handling is based on its x86 counterpart.
+> Tests use the same calls to initialize exception handling and both
+> architectures allow tests to override the handler for a particular
+> vector, or (vector, ec) for synchronous exceptions in the arm64 case.
+> 
+> The debug test is similar to x86_64/debug_regs, except that the x86 one
+> controls the debugging from outside the VM. This proposed arm64 test
+> controls and handles debug exceptions from the inside.
+> 
+> Thanks,
+> Ricardo
+> 
+> v3 -> v4:
+> 
+> V3 was dropped because it was breaking x86 selftests builds (reported by
+> the kernel test robot).
+> - rename vm_handle_exception to vm_install_sync_handler instead of
+>   vm_install_vector_handlers. [Sean]
+> - use a single level of routing for exception handling. [Sean]
+> - fix issue in x86_64/sync_regs_test when switching to ucalls for unhandled
+>   exceptions reporting.
+> 
+> v2 -> v3:
+> 
+> Addressed comments from Andrew and Marc (thanks again). Also, many thanks for
+> the reviews and tests from Eric and Zenghui.
+> - add missing ISBs after writing into debug registers.
+> - not store/restore of sp_el0 on exceptions.
+> - add default handlers for Error and FIQ.
+> - change multiple TEST_ASSERT(false, ...) to TEST_FAIL.
+> - use Andrew's suggestion regarding __GUEST_ASSERT modifications
+>   in order to easier implement GUEST_ASSERT_EQ (Thanks Andrew).
+> 
+> v1 -> v2:
+> 
+> Addressed comments from Andrew and Marc (thank you very much):
+> - rename vm_handle_exception in all tests.
+> - introduce UCALL_UNHANDLED in x86 first.
+> - move GUEST_ASSERT_EQ to common utils header.
+> - handle sync and other exceptions separately: use two tables (like
+>   kvm-unit-tests).
+> - add two separate functions for installing sync versus other exceptions
+> - changes in handlers.S: use the same layout as user_pt_regs, treat the
+>   EL1t vectors as invalid, refactor the vector table creation to not use
+>   manual numbering, add comments, remove LR from the stored registers.
+> - changes in debug-exceptions.c: remove unused headers, use the common
+>   GUEST_ASSERT_EQ, use vcpu_run instead of _vcpu_run.
+> - changes in processor.h: write_sysreg with support for xzr, replace EL1
+>   with current in macro names, define ESR_EC_MASK as ESR_EC_NUM-1.
+> 
+> Ricardo Koller (6):
+>   KVM: selftests: Rename vm_handle_exception
+>   KVM: selftests: Complete x86_64/sync_regs_test ucall
+>   KVM: selftests: Introduce UCALL_UNHANDLED for unhandled vector
+>     reporting
+>   KVM: selftests: Move GUEST_ASSERT_EQ to utils header
+>   KVM: selftests: Add exception handling support for aarch64
+>   KVM: selftests: Add aarch64/debug-exceptions test
+> 
+>  tools/testing/selftests/kvm/.gitignore        |   1 +
+>  tools/testing/selftests/kvm/Makefile          |   3 +-
+>  .../selftests/kvm/aarch64/debug-exceptions.c  | 250 ++++++++++++++++++
+>  .../selftests/kvm/include/aarch64/processor.h |  83 +++++-
+>  .../testing/selftests/kvm/include/kvm_util.h  |  23 +-
+>  .../selftests/kvm/include/x86_64/processor.h  |   4 +-
+>  .../selftests/kvm/lib/aarch64/handlers.S      | 126 +++++++++
+>  .../selftests/kvm/lib/aarch64/processor.c     |  97 +++++++
+>  .../selftests/kvm/lib/x86_64/processor.c      |  23 +-
+>  .../testing/selftests/kvm/x86_64/evmcs_test.c |   4 +-
+>  .../selftests/kvm/x86_64/kvm_pv_test.c        |   2 +-
+>  .../selftests/kvm/x86_64/sync_regs_test.c     |   7 +-
+>  .../selftests/kvm/x86_64/tsc_msrs_test.c      |   9 -
+>  .../kvm/x86_64/userspace_msr_exit_test.c      |   8 +-
+>  .../selftests/kvm/x86_64/xapic_ipi_test.c     |   2 +-
+>  15 files changed, 592 insertions(+), 50 deletions(-)
+>  create mode 100644 tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+>  create mode 100644 tools/testing/selftests/kvm/lib/aarch64/handlers.S
+> 
+> -- 
+> 2.32.0.272.g935e593368-goog
+>
 
-Signed-off-by: Jing Zhang <jingzhangos@google.com>
----
- tools/testing/selftests/kvm/kvm_binary_stats_test.c | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
+For the series
 
-diff --git a/tools/testing/selftests/kvm/kvm_binary_stats_test.c b/tools/testing/selftests/kvm/kvm_binary_stats_test.c
-index d85859a6815a..2a34b5e822e8 100644
---- a/tools/testing/selftests/kvm/kvm_binary_stats_test.c
-+++ b/tools/testing/selftests/kvm/kvm_binary_stats_test.c
-@@ -77,6 +77,8 @@ static void stats_test(int stats_fd)
- 				<= KVM_STATS_UNIT_MAX, "Unknown KVM stats unit");
- 		TEST_ASSERT((pdesc->flags & KVM_STATS_BASE_MASK)
- 				<= KVM_STATS_BASE_MAX, "Unknown KVM stats base");
-+		TEST_ASSERT((pdesc->flags & KVM_STATS_MODE_MASK)
-+				<= KVM_STATS_MODE_MAX, "Unknown KVM stats mode");
- 		/* Check exponent for stats unit
- 		 * Exponent for counter should be greater than or equal to 0
- 		 * Exponent for unit bytes should be greater than or equal to 0
-@@ -106,11 +108,18 @@ static void stats_test(int stats_fd)
- 	}
- 	/* Check overlap */
- 	TEST_ASSERT(header->data_offset >= header->desc_offset
--			|| header->data_offset + size_data <= header->desc_offset,
--			"Data block is overlapped with Descriptor block");
-+		|| header->data_offset + size_data <= header->desc_offset,
-+		"Data block is overlapped with Descriptor block");
- 	/* Check validity of all stats data size */
- 	TEST_ASSERT(size_data >= header->count * sizeof(stats_data->value[0]),
- 			"Data size is not correct");
-+	/* Check stats offset */
-+	for (i = 0; i < header->count; ++i) {
-+		pdesc = (void *)stats_desc + i * size_desc;
-+		TEST_ASSERT(pdesc->offset < size_data,
-+			"Invalid offset (%u) for stats: %s",
-+			pdesc->offset, pdesc->name);
-+	}
- 
- 	/* Allocate memory for stats data */
- 	stats_data = malloc(size_data);
--- 
-2.32.0.272.g935e593368-goog
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+
+Thanks,
+drew
 
 _______________________________________________
 kvmarm mailing list
