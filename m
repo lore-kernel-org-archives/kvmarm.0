@@ -2,61 +2,84 @@ Return-Path: <SRS0=xhzu=LJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D0ABC48BDF
-	for <kvmarm@archiver.kernel.org>; Tue, 15 Jun 2021 14:25:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2E17C48BDF
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Jun 2021 14:32:56 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8708E6148E
-	for <kvmarm@archiver.kernel.org>; Tue, 15 Jun 2021 14:25:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8708E6148E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 19D1361490
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Jun 2021 14:32:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19D1361490
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1399C4B0CD;
-	Tue, 15 Jun 2021 10:25:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 64DD34B0CD;
+	Tue, 15 Jun 2021 10:32:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id L6Sdj7upzPGs; Tue, 15 Jun 2021 10:25:17 -0400 (EDT)
+	with ESMTP id aCkk--LIVPeL; Tue, 15 Jun 2021 10:32:52 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C18424B0DF;
-	Tue, 15 Jun 2021 10:25:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CEE944B0CB;
+	Tue, 15 Jun 2021 10:32:52 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FACF4B0D2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 10:25:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E38A4B0CE
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 09:34:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id eX03Sq-Ee1de for <kvmarm@lists.cs.columbia.edu>;
- Tue, 15 Jun 2021 10:25:15 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 111FD4B0CD
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 10:25:15 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4E12212FC;
- Tue, 15 Jun 2021 07:25:14 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CD51A3F719;
- Tue, 15 Jun 2021 07:25:12 -0700 (PDT)
-Subject: Re: [PATCH v4 4/9] KVM: arm64: vgic: Let an interrupt controller
- advertise lack of HW deactivation
-To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
- kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-References: <20210601104005.81332-1-maz@kernel.org>
- <20210601104005.81332-5-maz@kernel.org>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <fa1fee85-04c6-d0a8-bd93-64d2ebc32e4a@arm.com>
-Date: Tue, 15 Jun 2021 15:26:02 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+ with ESMTP id p0nsHwQfkbWT for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 15 Jun 2021 09:34:10 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6458A4B097
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 09:34:10 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id AF8716146D;
+ Tue, 15 Jun 2021 13:34:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1623764049;
+ bh=REF7Zyu6cbgt3VHjuTrKDBWw8/fKKSkHr0brWCx1WDY=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=tkUy3EPUFEC5VTgPlUyI6q6kNVNwNuv+cujwgXgPktfMgwoXCN95LVYvlr2Cxj5lz
+ l7GoBU3O5grP+tSvw2b+HZzeV4cPkqgacG9kci2/x8y4ZXP/qpEimP9hJZ0eyIvDWb
+ e5t98f1pDJrHOs1eMmm+HNMbbYx0y9UmuOFThQFo+VSYEuyk0VmOVUs27m7Z1XOQ8N
+ OzmOPwdzQMYJWZIAF/rw5OQU4jmobLkJjH62eDzX9vHVkkrAFKFk73DgtornGy6rzc
+ Q89kw18R9QHxO9McqK/4MPLseixa1r/dEtCbz2OYQIwQJI29SS6qjzYQ0ZfHpVymek
+ F4bBAvgv4qHbg==
+Date: Tue, 15 Jun 2021 16:34:05 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v9 0/5] KVM statistics data fd-based binary interface
+Message-ID: <YMisTWKdyNgPvdQV@unreal>
+References: <20210614212155.1670777-1-jingzhangos@google.com>
+ <YMg5xPbmK3myjIX8@unreal>
+ <15875c41-e1e7-3bf2-a85c-21384684d279@redhat.com>
+ <YMhcek2cIu3Oz5Ek@unreal>
+ <9df462c0-e0ea-8173-0705-369d6a81107c@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210601104005.81332-5-maz@kernel.org>
-Content-Language: en-US
-Cc: Hector Martin <marcan@marcan.st>, kernel-team@android.com
+Content-Disposition: inline
+In-Reply-To: <9df462c0-e0ea-8173-0705-369d6a81107c@redhat.com>
+X-Mailman-Approved-At: Tue, 15 Jun 2021 10:32:51 -0400
+Cc: KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
+ Paul Mackerras <paulus@ozlabs.org>,
+ Linuxkselftest <linux-kselftest@vger.kernel.org>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, Will Deacon <will@kernel.org>,
+ KVMARM <kvmarm@lists.cs.columbia.edu>,
+ Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+ LinuxS390 <linux-s390@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
+ Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ David Rientjes <rientjes@google.com>, KVMPPC <kvm-ppc@vger.kernel.org>,
+ Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+ David Matlack <dmatlack@google.com>, Jim Mattson <jmattson@google.com>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ Sean Christopherson <seanjc@google.com>, Cornelia Huck <cohuck@redhat.com>,
+ Peter Shier <pshier@google.com>, LinuxMIPS <linux-mips@vger.kernel.org>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,95 +96,40 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+On Tue, Jun 15, 2021 at 01:03:34PM +0200, Paolo Bonzini wrote:
+> On 15/06/21 09:53, Leon Romanovsky wrote:
+> > > Sorry for my naive questions, but how does telemetry get statistics
+> > > for hypervisors? Why is KVM different from hypervisors or NIC's statistics
+> > > or any other high speed devices (RDMA) that generate tons of data?
+> > 
+> > So the answer to the question "why KVM is different" is that it doesn't
+> > have any stable identification except file descriptor. While hypervisors
+> > have stable names, NICs and RDMA devices have interface indexes etc.
+> > Did I get it right?
+> 
+> Right.
+> 
+> > And this was second part of my question, the first part was my attempt to
+> > get on answer why current statistics like process info (/proc/xxx/*), NICs
+> > (netlink) and RDMA (sysfs) are not using binary format.
+> 
+> NICs are using binary format (partly in struct ethtool_stats, partly in an
+> array of u64).  For KVM we decided to put the schema and the stats in the
+> same file (though you can use pread to get only the stats) to have a single
+> interface and avoid ioctls, unlike having both ETH_GSTRINGS and ETH_GSTATS.
+> 
+> I wouldn't say processes are using any specific format.  There's a mix of
+> "one value per file" (e.g. cpuset), human-readable tabular format (e.g.
+> limits, sched), human- and machine-readable tabular format (e.g. status),
+> and files that are ASCII but not human-readable (e.g. stat).
 
-On 6/1/21 11:40 AM, Marc Zyngier wrote:
-> The vGIC, as architected by ARM, allows a virtual interrupt to
-> trigger the deactivation of a physical interrupt. This allows
-> the following interrupt to be delivered without requiring an exit.
->
-> However, some implementations have choosen not to implement this,
-> meaning that we will need some unsavoury workarounds to deal with this.
->
-> On detecting such a case, taint the kernel and spit a nastygram.
-> We'll deal with this in later patches.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/vgic/vgic-init.c       | 10 ++++++++++
->  include/kvm/arm_vgic.h                |  3 +++
->  include/linux/irqchip/arm-vgic-info.h |  2 ++
->  3 files changed, 15 insertions(+)
->
-> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-> index 6752d084934d..340c51d87677 100644
-> --- a/arch/arm64/kvm/vgic/vgic-init.c
-> +++ b/arch/arm64/kvm/vgic/vgic-init.c
-> @@ -532,6 +532,16 @@ int kvm_vgic_hyp_init(void)
->  		return -ENXIO;
->  	}
->  
-> +	/*
-> +	 * If we get one of these oddball non-GICs, taint the kernel,
-> +	 * as we have no idea of how they *really* behave.
-> +	 */
-> +	if (gic_kvm_info->no_hw_deactivation) {
-> +		kvm_info("Non-architectural vgic, tainting kernel\n");
-> +		add_taint(TAINT_CPU_OUT_OF_SPEC, LOCKDEP_STILL_OK);
+I see, your explanation to Enrico cleared the mud.
 
-I'm trying to figure out what are the effects of tainting the kernel, besides
-those nasty messages. In Documentation/admin-guide/tainted-kernels.rst, I found
-this bit:
+Thanks
 
-[..] the information is mainly of interest once someone wants to investigate some
-problem, as its real cause might be the event that got the kernel tainted. That's
-why bug reports from tainted kernels will often be ignored by developers, hence
-try to reproduce problems with an untainted kernel.
-
-The lack of HW deactivation affects only KVM, I was wondering if we could taint
-the kernel the first time a VM created. If the above doc is to go by, someone who
-is running Linux on an M1, but not using KVM, might stand a better chance to get
-support when something goes wrong in that case.
-
-What do you think?
-
-Thanks,
-
-Alex
-
-> +		kvm_vgic_global_state.no_hw_deactivation = true;
-> +	}
-> +
->  	switch (gic_kvm_info->type) {
->  	case GIC_V2:
->  		ret = vgic_v2_probe(gic_kvm_info);
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index ec621180ef09..e45b26e8d479 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -72,6 +72,9 @@ struct vgic_global {
->  	bool			has_gicv4;
->  	bool			has_gicv4_1;
->  
-> +	/* Pseudo GICv3 from outer space */
-> +	bool			no_hw_deactivation;
-> +
->  	/* GIC system register CPU interface */
->  	struct static_key_false gicv3_cpuif;
->  
-> diff --git a/include/linux/irqchip/arm-vgic-info.h b/include/linux/irqchip/arm-vgic-info.h
-> index 7c0d08ebb82c..a75b2c7de69d 100644
-> --- a/include/linux/irqchip/arm-vgic-info.h
-> +++ b/include/linux/irqchip/arm-vgic-info.h
-> @@ -32,6 +32,8 @@ struct gic_kvm_info {
->  	bool		has_v4;
->  	/* rvpeid support */
->  	bool		has_v4_1;
-> +	/* Deactivation impared, subpar stuff */
-> +	bool		no_hw_deactivation;
->  };
->  
->  #ifdef CONFIG_KVM
+> 
+> Paolo
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
