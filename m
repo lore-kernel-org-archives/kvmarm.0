@@ -2,84 +2,61 @@ Return-Path: <SRS0=xhzu=LJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2E17C48BDF
-	for <kvmarm@archiver.kernel.org>; Tue, 15 Jun 2021 14:32:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD41EC48BE5
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Jun 2021 14:44:13 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 19D1361490
-	for <kvmarm@archiver.kernel.org>; Tue, 15 Jun 2021 14:32:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19D1361490
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 397126157F
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Jun 2021 14:44:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 397126157F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 64DD34B0CD;
-	Tue, 15 Jun 2021 10:32:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B0ED4B090;
+	Tue, 15 Jun 2021 10:44:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id aCkk--LIVPeL; Tue, 15 Jun 2021 10:32:52 -0400 (EDT)
+	with ESMTP id gErBejTE2oBc; Tue, 15 Jun 2021 10:44:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CEE944B0CB;
-	Tue, 15 Jun 2021 10:32:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1714A4B0B4;
+	Tue, 15 Jun 2021 10:44:11 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E38A4B0CE
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 09:34:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BAD474B0B2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 10:44:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id p0nsHwQfkbWT for <kvmarm@lists.cs.columbia.edu>;
- Tue, 15 Jun 2021 09:34:10 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6458A4B097
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 09:34:10 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id AF8716146D;
- Tue, 15 Jun 2021 13:34:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1623764049;
- bh=REF7Zyu6cbgt3VHjuTrKDBWw8/fKKSkHr0brWCx1WDY=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=tkUy3EPUFEC5VTgPlUyI6q6kNVNwNuv+cujwgXgPktfMgwoXCN95LVYvlr2Cxj5lz
- l7GoBU3O5grP+tSvw2b+HZzeV4cPkqgacG9kci2/x8y4ZXP/qpEimP9hJZ0eyIvDWb
- e5t98f1pDJrHOs1eMmm+HNMbbYx0y9UmuOFThQFo+VSYEuyk0VmOVUs27m7Z1XOQ8N
- OzmOPwdzQMYJWZIAF/rw5OQU4jmobLkJjH62eDzX9vHVkkrAFKFk73DgtornGy6rzc
- Q89kw18R9QHxO9McqK/4MPLseixa1r/dEtCbz2OYQIwQJI29SS6qjzYQ0ZfHpVymek
- F4bBAvgv4qHbg==
-Date: Tue, 15 Jun 2021 16:34:05 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v9 0/5] KVM statistics data fd-based binary interface
-Message-ID: <YMisTWKdyNgPvdQV@unreal>
-References: <20210614212155.1670777-1-jingzhangos@google.com>
- <YMg5xPbmK3myjIX8@unreal>
- <15875c41-e1e7-3bf2-a85c-21384684d279@redhat.com>
- <YMhcek2cIu3Oz5Ek@unreal>
- <9df462c0-e0ea-8173-0705-369d6a81107c@redhat.com>
+ with ESMTP id L7bl7m4G+zfE for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 15 Jun 2021 10:44:08 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3AD724B090
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 10:44:08 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B01BC12FC;
+ Tue, 15 Jun 2021 07:44:07 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3F25F3F70D;
+ Tue, 15 Jun 2021 07:44:06 -0700 (PDT)
+Subject: Re: [PATCH v4 5/9] KVM: arm64: vgic: move irq->get_input_level into
+ an ops structure
+To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+References: <20210601104005.81332-1-maz@kernel.org>
+ <20210601104005.81332-6-maz@kernel.org>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <da762d7c-9eec-4fb8-ab6f-10bde6d777b3@arm.com>
+Date: Tue, 15 Jun 2021 15:45:03 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <9df462c0-e0ea-8173-0705-369d6a81107c@redhat.com>
-X-Mailman-Approved-At: Tue, 15 Jun 2021 10:32:51 -0400
-Cc: KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
- Paul Mackerras <paulus@ozlabs.org>,
- Linuxkselftest <linux-kselftest@vger.kernel.org>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Will Deacon <will@kernel.org>,
- KVMARM <kvmarm@lists.cs.columbia.edu>,
- Emanuele Giuseppe Esposito <eesposit@redhat.com>,
- LinuxS390 <linux-s390@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
- Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- David Rientjes <rientjes@google.com>, KVMPPC <kvm-ppc@vger.kernel.org>,
- Krish Sadhukhan <krish.sadhukhan@oracle.com>,
- David Matlack <dmatlack@google.com>, Jim Mattson <jmattson@google.com>,
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- Sean Christopherson <seanjc@google.com>, Cornelia Huck <cohuck@redhat.com>,
- Peter Shier <pshier@google.com>, LinuxMIPS <linux-mips@vger.kernel.org>,
- Vitaly Kuznetsov <vkuznets@redhat.com>
+In-Reply-To: <20210601104005.81332-6-maz@kernel.org>
+Content-Language: en-US
+Cc: Hector Martin <marcan@marcan.st>, kernel-team@android.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -96,40 +73,182 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Jun 15, 2021 at 01:03:34PM +0200, Paolo Bonzini wrote:
-> On 15/06/21 09:53, Leon Romanovsky wrote:
-> > > Sorry for my naive questions, but how does telemetry get statistics
-> > > for hypervisors? Why is KVM different from hypervisors or NIC's statistics
-> > > or any other high speed devices (RDMA) that generate tons of data?
-> > 
-> > So the answer to the question "why KVM is different" is that it doesn't
-> > have any stable identification except file descriptor. While hypervisors
-> > have stable names, NICs and RDMA devices have interface indexes etc.
-> > Did I get it right?
-> 
-> Right.
-> 
-> > And this was second part of my question, the first part was my attempt to
-> > get on answer why current statistics like process info (/proc/xxx/*), NICs
-> > (netlink) and RDMA (sysfs) are not using binary format.
-> 
-> NICs are using binary format (partly in struct ethtool_stats, partly in an
-> array of u64).  For KVM we decided to put the schema and the stats in the
-> same file (though you can use pread to get only the stats) to have a single
-> interface and avoid ioctls, unlike having both ETH_GSTRINGS and ETH_GSTATS.
-> 
-> I wouldn't say processes are using any specific format.  There's a mix of
-> "one value per file" (e.g. cpuset), human-readable tabular format (e.g.
-> limits, sched), human- and machine-readable tabular format (e.g. status),
-> and files that are ASCII but not human-readable (e.g. stat).
+Hi Marc,
 
-I see, your explanation to Enrico cleared the mud.
+On 6/1/21 11:40 AM, Marc Zyngier wrote:
+> We already have the option to attach a callback to an interrupt
+> to retrieve its pending state. As we are planning to expand this
+> facility, move this callback into its own data structure.
+>
+> This will limit the size of individual interrupts as the ops
+> structures can be shared across multiple interrupts.
 
-Thanks
+I can't figure out what you mean by that. If you are referring to struct vgic_irq,
+the change I am seeing is a pointer being replaced by another pointer, which
+shouldn't affect its size. Are you referring to something else?
 
-> 
-> Paolo
-> 
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/arch_timer.c |  8 ++++++--
+>  arch/arm64/kvm/vgic/vgic.c  | 14 +++++++-------
+>  include/kvm/arm_vgic.h      | 28 +++++++++++++++++-----------
+>  3 files changed, 30 insertions(+), 20 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> index 74e0699661e9..e2288b6bf435 100644
+> --- a/arch/arm64/kvm/arch_timer.c
+> +++ b/arch/arm64/kvm/arch_timer.c
+> @@ -1116,6 +1116,10 @@ bool kvm_arch_timer_get_input_level(int vintid)
+>  	return kvm_timer_should_fire(timer);
+>  }
+>  
+> +static struct irq_ops arch_timer_irq_ops = {
+> +	.get_input_level = kvm_arch_timer_get_input_level,
+
+Since kvm_arch_timer_get_input_level() is used only indirectly, through the
+get_input_level field of the static struct, I think we can make
+kvm_arch_timer_get_input_level() static and remove the declaration from
+include/kvm/arm_arch_timer.h.
+
+Other than that, everything else looks correct.
+
+Thanks,
+
+Alex
+
+> +};
+> +
+>  int kvm_timer_enable(struct kvm_vcpu *vcpu)
+>  {
+>  	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
+> @@ -1143,7 +1147,7 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+>  	ret = kvm_vgic_map_phys_irq(vcpu,
+>  				    map.direct_vtimer->host_timer_irq,
+>  				    map.direct_vtimer->irq.irq,
+> -				    kvm_arch_timer_get_input_level);
+> +				    &arch_timer_irq_ops);
+>  	if (ret)
+>  		return ret;
+>  
+> @@ -1151,7 +1155,7 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+>  		ret = kvm_vgic_map_phys_irq(vcpu,
+>  					    map.direct_ptimer->host_timer_irq,
+>  					    map.direct_ptimer->irq.irq,
+> -					    kvm_arch_timer_get_input_level);
+> +					    &arch_timer_irq_ops);
+>  	}
+>  
+>  	if (ret)
+> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+> index 15b666200f0b..111bff47e471 100644
+> --- a/arch/arm64/kvm/vgic/vgic.c
+> +++ b/arch/arm64/kvm/vgic/vgic.c
+> @@ -182,8 +182,8 @@ bool vgic_get_phys_line_level(struct vgic_irq *irq)
+>  
+>  	BUG_ON(!irq->hw);
+>  
+> -	if (irq->get_input_level)
+> -		return irq->get_input_level(irq->intid);
+> +	if (irq->ops && irq->ops->get_input_level)
+> +		return irq->ops->get_input_level(irq->intid);
+>  
+>  	WARN_ON(irq_get_irqchip_state(irq->host_irq,
+>  				      IRQCHIP_STATE_PENDING,
+> @@ -480,7 +480,7 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+>  /* @irq->irq_lock must be held */
+>  static int kvm_vgic_map_irq(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
+>  			    unsigned int host_irq,
+> -			    bool (*get_input_level)(int vindid))
+> +			    struct irq_ops *ops)
+>  {
+>  	struct irq_desc *desc;
+>  	struct irq_data *data;
+> @@ -500,7 +500,7 @@ static int kvm_vgic_map_irq(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
+>  	irq->hw = true;
+>  	irq->host_irq = host_irq;
+>  	irq->hwintid = data->hwirq;
+> -	irq->get_input_level = get_input_level;
+> +	irq->ops = ops;
+>  	return 0;
+>  }
+>  
+> @@ -509,11 +509,11 @@ static inline void kvm_vgic_unmap_irq(struct vgic_irq *irq)
+>  {
+>  	irq->hw = false;
+>  	irq->hwintid = 0;
+> -	irq->get_input_level = NULL;
+> +	irq->ops = NULL;
+>  }
+>  
+>  int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
+> -			  u32 vintid, bool (*get_input_level)(int vindid))
+> +			  u32 vintid, struct irq_ops *ops)
+>  {
+>  	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, vintid);
+>  	unsigned long flags;
+> @@ -522,7 +522,7 @@ int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
+>  	BUG_ON(!irq);
+>  
+>  	raw_spin_lock_irqsave(&irq->irq_lock, flags);
+> -	ret = kvm_vgic_map_irq(vcpu, irq, host_irq, get_input_level);
+> +	ret = kvm_vgic_map_irq(vcpu, irq, host_irq, ops);
+>  	raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
+>  	vgic_put_irq(vcpu->kvm, irq);
+>  
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index e45b26e8d479..e5f06df000f2 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -92,6 +92,21 @@ enum vgic_irq_config {
+>  	VGIC_CONFIG_LEVEL
+>  };
+>  
+> +/*
+> + * Per-irq ops overriding some common behavious.
+> + *
+> + * Always called in non-preemptible section and the functions can use
+> + * kvm_arm_get_running_vcpu() to get the vcpu pointer for private IRQs.
+> + */
+> +struct irq_ops {
+> +	/*
+> +	 * Callback function pointer to in-kernel devices that can tell us the
+> +	 * state of the input level of mapped level-triggered IRQ faster than
+> +	 * peaking into the physical GIC.
+> +	 */
+> +	bool (*get_input_level)(int vintid);
+> +};
+> +
+>  struct vgic_irq {
+>  	raw_spinlock_t irq_lock;	/* Protects the content of the struct */
+>  	struct list_head lpi_list;	/* Used to link all LPIs together */
+> @@ -129,16 +144,7 @@ struct vgic_irq {
+>  	u8 group;			/* 0 == group 0, 1 == group 1 */
+>  	enum vgic_irq_config config;	/* Level or edge */
+>  
+> -	/*
+> -	 * Callback function pointer to in-kernel devices that can tell us the
+> -	 * state of the input level of mapped level-triggered IRQ faster than
+> -	 * peaking into the physical GIC.
+> -	 *
+> -	 * Always called in non-preemptible section and the functions can use
+> -	 * kvm_arm_get_running_vcpu() to get the vcpu pointer for private
+> -	 * IRQs.
+> -	 */
+> -	bool (*get_input_level)(int vintid);
+> +	struct irq_ops *ops;
+>  
+>  	void *owner;			/* Opaque pointer to reserve an interrupt
+>  					   for in-kernel devices. */
+> @@ -355,7 +361,7 @@ void kvm_vgic_init_cpu_hardware(void);
+>  int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+>  			bool level, void *owner);
+>  int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
+> -			  u32 vintid, bool (*get_input_level)(int vindid));
+> +			  u32 vintid, struct irq_ops *ops);
+>  int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int vintid);
+>  bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int vintid);
+>  
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
