@@ -2,82 +2,81 @@ Return-Path: <SRS0=xhzu=LJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF5CAC49361
-	for <kvmarm@archiver.kernel.org>; Tue, 15 Jun 2021 13:40:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28BC1C48BDF
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Jun 2021 13:40:08 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 84E3961490
-	for <kvmarm@archiver.kernel.org>; Tue, 15 Jun 2021 13:40:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84E3961490
+	by mail.kernel.org (Postfix) with ESMTP id BE35C61474
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Jun 2021 13:40:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE35C61474
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A99D4B0E2;
-	Tue, 15 Jun 2021 09:40:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 698394B0F9;
+	Tue, 15 Jun 2021 09:40:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id IoHwg58DKHuh; Tue, 15 Jun 2021 09:40:01 -0400 (EDT)
+	with ESMTP id cpca79unTFa6; Tue, 15 Jun 2021 09:40:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CCA474B0F3;
-	Tue, 15 Jun 2021 09:40:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B4A04B0CD;
+	Tue, 15 Jun 2021 09:40:06 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DEC8C4B0DF
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 09:40:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B9EF4B0C7
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 09:40:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id b3dYjLGe6ns7 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 15 Jun 2021 09:39:59 -0400 (EDT)
-Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com
- [209.85.219.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 09C8B4B0DE
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 09:39:58 -0400 (EDT)
-Received: by mail-qv1-f74.google.com with SMTP id
- r8-20020a0562140c88b0290242bf8596feso10141662qvr.8
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 06:39:58 -0700 (PDT)
+ with ESMTP id xuEuPml2dgsD for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 15 Jun 2021 09:40:03 -0400 (EDT)
+Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com
+ [209.85.160.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3070B4B105
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 09:40:02 -0400 (EDT)
+Received: by mail-qt1-f201.google.com with SMTP id
+ 44-20020aed30af0000b029024e8ccfcd07so1858223qtf.11
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 06:40:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=h81F4wcCbnV7L6gI0AGyQlwCkwN2F1m7FrS2Kkl/bW8=;
- b=KTUXJgd6caBCdc+M4k4HGFeM/V9rj2lK2AeVoiizcxyvns/59VpVFyRrMdwK47pudU
- ePME/N6UtIrANu4IP2UfiGHsvuSePpcExuPVVyANG6Or2ovBR971W2CZHmEs4sBDyYIr
- O+SDbFsrytABuZd+OKh06IfCgjtsrhxVkt/GWKZlx4xRSqjxoRCC02CEAF1JI8ZhPA5g
- TKp1T8udQW110RM0+6Jam43YqjjE+snzajys3YbX4u02iJRNesDu3Xco7zFu0PZWJzXt
- 3q9NAyGTKEQRYJsvfUa+mxfEU1XycGLN9u553ojlho3khYVy0TTDR06cxatvTeiUwHQ2
- q0JA==
+ :cc; bh=jYkkrJFjFL8nIIwe4a5o69t0rRU+w71fquE5OUT3gPM=;
+ b=S5zXDLqyCAOh4VIhckQcVKGabiV7iKLjxEkEXHApGDi2GM6Ka2pBwXUT8jE+e4Ko9o
+ iVA1zjIKNpj0Cti7KzIW4mqAkwFf43GoOC4ml0RuH4hkcVwd4nNNEF0QYwkto6SiqAFC
+ g8WHINq6Lo5xa+891ZBERD6+HZ9dzpDglVURxbSebkL5HHPa2eOZK8e1ZSgpKcGuEkBh
+ CSwYSDRdpXdubJ8ce6ut4K0cS4BeSXATxKC3HRqI7Fc8Cc12YGEO8JaNV+w6gmW23UN8
+ PwIpiDt/FALvSkKlcP2endnOCEt3zsrSjWV4Sh0gOqP5KghZgEZfBQMf1DHF8D/c2csI
+ ulUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=h81F4wcCbnV7L6gI0AGyQlwCkwN2F1m7FrS2Kkl/bW8=;
- b=XMoYY4RD8fu5K+DZylBb45gadoN8CSXWGM0U9cK5XjvrKzscQcasINPRgc4K6R9dtj
- wj7yfeHUnEUrMLaNB04PzUDqiAHm3EEI2r5NLj57BL8vqLj3DbBEe6R+XEycKYeP1Kft
- fUFKz71yk9ADwom07zcRfhRlAlifQ3iyjomicByK0qAY/1r9LwH7ez6n9HGKgrN5/uLG
- rh6mKOyMXzmdm+N9c1KiZE6nDlOspyLgSiHuqx9IdPIlNA5UbFXQ0uzfPx+47tteoqtT
- 6KQmWcEMP8FzSzNsD8S1uVVcXuw8szp4y/wtb/4TrbAgGjdsdX1LWCBC7ytDLw0bQuWE
- TWJg==
-X-Gm-Message-State: AOAM531dqYHtXXJicoOwMsCkWfr5jLRAdSV/5DRt9pmhEeE6HlJBFda2
- /NRR48RNzobxmh27aQmaGp3+HCrqdICNwkAYChj0A5ZPnRwLtN5rtT3KdXsJYVfPngJsNbnnBmf
- wWVC7XTx2ONzQvwojpSS6+hq/TnVy4VaXTQz9PUZYSF/QLWKGgTX8EDrhP8k0xx6ehdk=
-X-Google-Smtp-Source: ABdhPJyvL9NdxwMQplHaSrcNX5rt5Jx6b3E469dw+hoVXJiTAStfZmmqZ9ej7kP1bosuGPyy8Y7dttitQg==
+ bh=jYkkrJFjFL8nIIwe4a5o69t0rRU+w71fquE5OUT3gPM=;
+ b=su4KrWOL+7ALx05pjvQHstV3WTsp78K0U66Se2thEREuZW66/29xOvWtubF9xj0Dsq
+ 81DZ2DL1QPjpibxWFtEjoJvKginlKfiZ/nxL3YsqCKxiEQ9OThNwcXrZi8LpikXnuXhY
+ QJjIjMYVat+E/MPG2UBfVECgd6XRHAUKmBSvuJ0fCs4kGzJFvQL4IO6gVQW5rSNRgqmp
+ QkpVL9rSjgTWTtsEsiTzzpqVrk8DO8j1ry9pKVL4Agcu8jwrxlSOS7X76l5PoAlqfPm0
+ Mg4odEAEK+1KLynq0b1sGILu7zP+IavhazwbnLXHCP6DZ5VyE1KnTwcfUxLIqEDToc0Q
+ j5jQ==
+X-Gm-Message-State: AOAM531M5KWUWSCyPjv9eNsUJxaqFfYvCPSattstQwcsjIo/Hq4ImXLw
+ W4OeDd12tCkFpyKAhI/NHs8Ow35sDnIPwKlbANUsccAvVBGHGjW06iGCwRGcC7/LM/bKtvs6p1C
+ GXbM05Q2OFjF85ZwuzO4WZGVEPyxvKghN0BUsCIOi1m2ke3aKUTArzdTIS9WCZMG5hOk=
+X-Google-Smtp-Source: ABdhPJzbO9Wa4830T3Jw0zkIaqq9QotkImxkX6j9XK6Vu74WcK/PmAExRQLUvaCI/qiWtgd5FbapWYkNPw==
 X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:482])
- (user=tabba job=sendgmr) by 2002:a0c:e902:: with SMTP id
- a2mr5350038qvo.39.1623764397471; 
- Tue, 15 Jun 2021 06:39:57 -0700 (PDT)
-Date: Tue, 15 Jun 2021 14:39:39 +0100
+ (user=tabba job=sendgmr) by 2002:ad4:4306:: with SMTP id
+ c6mr4493918qvs.37.1623764401605; 
+ Tue, 15 Jun 2021 06:40:01 -0700 (PDT)
+Date: Tue, 15 Jun 2021 14:39:41 +0100
 In-Reply-To: <20210615133950.693489-1-tabba@google.com>
-Message-Id: <20210615133950.693489-3-tabba@google.com>
+Message-Id: <20210615133950.693489-5-tabba@google.com>
 Mime-Version: 1.0
 References: <20210615133950.693489-1-tabba@google.com>
 X-Mailer: git-send-email 2.32.0.272.g935e593368-goog
-Subject: [PATCH v2 02/13] KVM: arm64: MDCR_EL2 is a 64-bit register
+Subject: [PATCH v2 04/13] KVM: arm64: Refactor sys_regs.h,c for nVHE reuse
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: kernel-team@android.com, kvm@vger.kernel.org, maz@kernel.org,
@@ -98,129 +97,145 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Fix the places in KVM that treat MDCR_EL2 as a 32-bit register.
-More recent features (e.g., FEAT_SPEv1p2) use bits above 31.
+Refactor sys_regs.h and sys_regs.c to make it easier to reuse
+common code. It will be used in nVHE in a later patch.
 
 No functional change intended.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/include/asm/kvm_arm.h   | 20 ++++++++++----------
- arch/arm64/include/asm/kvm_asm.h   |  2 +-
- arch/arm64/include/asm/kvm_host.h  |  2 +-
- arch/arm64/kvm/debug.c             |  5 +++--
- arch/arm64/kvm/hyp/nvhe/debug-sr.c |  2 +-
- arch/arm64/kvm/hyp/vhe/debug-sr.c  |  2 +-
- 6 files changed, 17 insertions(+), 16 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 30 +-----------------------------
+ arch/arm64/kvm/sys_regs.h | 35 +++++++++++++++++++++++++++++++++++
+ 2 files changed, 36 insertions(+), 29 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 692c9049befa..25d8a61888e4 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -280,18 +280,18 @@
- /* Hyp Debug Configuration Register bits */
- #define MDCR_EL2_E2TB_MASK	(UL(0x3))
- #define MDCR_EL2_E2TB_SHIFT	(UL(24))
--#define MDCR_EL2_TTRF		(1 << 19)
--#define MDCR_EL2_TPMS		(1 << 14)
-+#define MDCR_EL2_TTRF		(UL(1) << 19)
-+#define MDCR_EL2_TPMS		(UL(1) << 14)
- #define MDCR_EL2_E2PB_MASK	(UL(0x3))
- #define MDCR_EL2_E2PB_SHIFT	(UL(12))
--#define MDCR_EL2_TDRA		(1 << 11)
--#define MDCR_EL2_TDOSA		(1 << 10)
--#define MDCR_EL2_TDA		(1 << 9)
--#define MDCR_EL2_TDE		(1 << 8)
--#define MDCR_EL2_HPME		(1 << 7)
--#define MDCR_EL2_TPM		(1 << 6)
--#define MDCR_EL2_TPMCR		(1 << 5)
--#define MDCR_EL2_HPMN_MASK	(0x1F)
-+#define MDCR_EL2_TDRA		(UL(1) << 11)
-+#define MDCR_EL2_TDOSA		(UL(1) << 10)
-+#define MDCR_EL2_TDA		(UL(1) << 9)
-+#define MDCR_EL2_TDE		(UL(1) << 8)
-+#define MDCR_EL2_HPME		(UL(1) << 7)
-+#define MDCR_EL2_TPM		(UL(1) << 6)
-+#define MDCR_EL2_TPMCR		(UL(1) << 5)
-+#define MDCR_EL2_HPMN_MASK	(UL(0x1F))
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 15c247fc9f0c..826a04f27194 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -44,10 +44,6 @@
+  * 64bit interface.
+  */
  
- /* For compatibility with fault code shared with 32-bit */
- #define FSC_FAULT	ESR_ELx_FSC_FAULT
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 5e9b33cbac51..d88a5550552c 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -209,7 +209,7 @@ extern u64 __vgic_v3_read_vmcr(void);
- extern void __vgic_v3_write_vmcr(u32 vmcr);
- extern void __vgic_v3_init_lrs(void);
+-#define reg_to_encoding(x)						\
+-	sys_reg((u32)(x)->Op0, (u32)(x)->Op1,				\
+-		(u32)(x)->CRn, (u32)(x)->CRm, (u32)(x)->Op2)
+-
+ static bool read_from_write_only(struct kvm_vcpu *vcpu,
+ 				 struct sys_reg_params *params,
+ 				 const struct sys_reg_desc *r)
+@@ -1026,8 +1022,6 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
+ 	return true;
+ }
  
--extern u32 __kvm_get_mdcr_el2(void);
-+extern u64 __kvm_get_mdcr_el2(void);
+-#define FEATURE(x)	(GENMASK_ULL(x##_SHIFT + 3, x##_SHIFT))
+-
+ /* Read a sanitised cpufeature ID register by sys_reg_desc */
+ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+ 		struct sys_reg_desc const *r, bool raz)
+@@ -2082,23 +2076,6 @@ static int check_sysreg_table(const struct sys_reg_desc *table, unsigned int n,
+ 	return 0;
+ }
  
- #define __KVM_EXTABLE(from, to)						\
- 	"	.pushsection	__kvm_ex_table, \"a\"\n"		\
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 5645af2a1431..45fdd0b7063f 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -286,7 +286,7 @@ struct kvm_vcpu_arch {
- 
- 	/* HYP configuration */
- 	u64 hcr_el2;
--	u32 mdcr_el2;
-+	u64 mdcr_el2;
- 
- 	/* Exception Information */
- 	struct kvm_vcpu_fault_info fault;
-diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-index d5e79d7ee6e9..f7385bfbc9e4 100644
---- a/arch/arm64/kvm/debug.c
-+++ b/arch/arm64/kvm/debug.c
-@@ -21,7 +21,7 @@
- 				DBG_MDSCR_KDE | \
- 				DBG_MDSCR_MDE)
- 
--static DEFINE_PER_CPU(u32, mdcr_el2);
-+static DEFINE_PER_CPU(u64, mdcr_el2);
- 
- /**
-  * save/restore_guest_debug_regs
-@@ -154,7 +154,8 @@ void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu)
- 
- void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+-static int match_sys_reg(const void *key, const void *elt)
+-{
+-	const unsigned long pval = (unsigned long)key;
+-	const struct sys_reg_desc *r = elt;
+-
+-	return pval - reg_to_encoding(r);
+-}
+-
+-static const struct sys_reg_desc *find_reg(const struct sys_reg_params *params,
+-					 const struct sys_reg_desc table[],
+-					 unsigned int num)
+-{
+-	unsigned long pval = reg_to_encoding(params);
+-
+-	return bsearch((void *)pval, table, num, sizeof(table[0]), match_sys_reg);
+-}
+-
+ int kvm_handle_cp14_load_store(struct kvm_vcpu *vcpu)
  {
--	unsigned long mdscr, orig_mdcr_el2 = vcpu->arch.mdcr_el2;
-+	unsigned long mdscr;
-+	u64 orig_mdcr_el2 = vcpu->arch.mdcr_el2;
+ 	kvm_inject_undefined(vcpu);
+@@ -2341,13 +2318,8 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu)
  
- 	trace_kvm_arm_setup_debug(vcpu, vcpu->guest_debug);
+ 	trace_kvm_handle_sys_reg(esr);
  
-diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-index 7d3f25868cae..df361d839902 100644
---- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-+++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-@@ -109,7 +109,7 @@ void __debug_switch_to_host(struct kvm_vcpu *vcpu)
- 	__debug_switch_to_host_common(vcpu);
+-	params.Op0 = (esr >> 20) & 3;
+-	params.Op1 = (esr >> 14) & 0x7;
+-	params.CRn = (esr >> 10) & 0xf;
+-	params.CRm = (esr >> 1) & 0xf;
+-	params.Op2 = (esr >> 17) & 0x7;
++	params = esr_sys64_to_params(esr);
+ 	params.regval = vcpu_get_reg(vcpu, Rt);
+-	params.is_write = !(esr & 1);
+ 
+ 	ret = emulate_sys_reg(vcpu, &params);
+ 
+diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
+index 9d0621417c2a..b8e2a4dd830f 100644
+--- a/arch/arm64/kvm/sys_regs.h
++++ b/arch/arm64/kvm/sys_regs.h
+@@ -11,6 +11,12 @@
+ #ifndef __ARM64_KVM_SYS_REGS_LOCAL_H__
+ #define __ARM64_KVM_SYS_REGS_LOCAL_H__
+ 
++#include <linux/bsearch.h>
++
++#define reg_to_encoding(x)						\
++	sys_reg((u32)(x)->Op0, (u32)(x)->Op1,				\
++		(u32)(x)->CRn, (u32)(x)->CRm, (u32)(x)->Op2)
++
+ struct sys_reg_params {
+ 	u8	Op0;
+ 	u8	Op1;
+@@ -21,6 +27,14 @@ struct sys_reg_params {
+ 	bool	is_write;
+ };
+ 
++#define esr_sys64_to_params(esr)                                               \
++	((struct sys_reg_params){ .Op0 = ((esr) >> 20) & 3,                    \
++				  .Op1 = ((esr) >> 14) & 0x7,                  \
++				  .CRn = ((esr) >> 10) & 0xf,                  \
++				  .CRm = ((esr) >> 1) & 0xf,                   \
++				  .Op2 = ((esr) >> 17) & 0x7,                  \
++				  .is_write = !((esr)&1) })
++
+ struct sys_reg_desc {
+ 	/* Sysreg string for debug */
+ 	const char *name;
+@@ -152,6 +166,24 @@ static inline int cmp_sys_reg(const struct sys_reg_desc *i1,
+ 	return i1->Op2 - i2->Op2;
  }
  
--u32 __kvm_get_mdcr_el2(void)
-+u64 __kvm_get_mdcr_el2(void)
- {
- 	return read_sysreg(mdcr_el2);
- }
-diff --git a/arch/arm64/kvm/hyp/vhe/debug-sr.c b/arch/arm64/kvm/hyp/vhe/debug-sr.c
-index f1e2e5a00933..289689b2682d 100644
---- a/arch/arm64/kvm/hyp/vhe/debug-sr.c
-+++ b/arch/arm64/kvm/hyp/vhe/debug-sr.c
-@@ -20,7 +20,7 @@ void __debug_switch_to_host(struct kvm_vcpu *vcpu)
- 	__debug_switch_to_host_common(vcpu);
- }
++static inline int match_sys_reg(const void *key, const void *elt)
++{
++	const unsigned long pval = (unsigned long)key;
++	const struct sys_reg_desc *r = elt;
++
++	return pval - reg_to_encoding(r);
++}
++
++static inline const struct sys_reg_desc *
++find_reg(const struct sys_reg_params *params, const struct sys_reg_desc table[],
++	 unsigned int num)
++{
++	unsigned long pval = reg_to_encoding(params);
++
++	return __inline_bsearch((void *)pval, table, num, sizeof(table[0]),
++				match_sys_reg);
++}
++
+ const struct sys_reg_desc *find_reg_by_id(u64 id,
+ 					  struct sys_reg_params *params,
+ 					  const struct sys_reg_desc table[],
+@@ -170,4 +202,7 @@ const struct sys_reg_desc *find_reg_by_id(u64 id,
+ 	CRn(sys_reg_CRn(reg)), CRm(sys_reg_CRm(reg)),	\
+ 	Op2(sys_reg_Op2(reg))
  
--u32 __kvm_get_mdcr_el2(void)
-+u64 __kvm_get_mdcr_el2(void)
- {
- 	return read_sysreg(mdcr_el2);
- }
++/* Extract the feature specified from the feature id register. */
++#define FEATURE(x)	(GENMASK_ULL(x##_SHIFT + 3, x##_SHIFT))
++
+ #endif /* __ARM64_KVM_SYS_REGS_LOCAL_H__ */
 -- 
 2.32.0.272.g935e593368-goog
 
