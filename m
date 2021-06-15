@@ -6,58 +6,60 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DA07C48BE5
-	for <kvmarm@archiver.kernel.org>; Tue, 15 Jun 2021 09:45:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAE40C49361
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Jun 2021 09:45:26 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B2CB561446
-	for <kvmarm@archiver.kernel.org>; Tue, 15 Jun 2021 09:45:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2CB561446
+	by mail.kernel.org (Postfix) with ESMTP id 55B3E613ED
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Jun 2021 09:45:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55B3E613ED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 657864B08D;
-	Tue, 15 Jun 2021 05:45:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B1C44A3A3;
+	Tue, 15 Jun 2021 05:45:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id v6cCCsRBI+ss; Tue, 15 Jun 2021 05:45:23 -0400 (EDT)
+	with ESMTP id I1XB7CSdfKOA; Tue, 15 Jun 2021 05:45:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E11FC4B0ED;
-	Tue, 15 Jun 2021 05:45:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 210884B0F6;
+	Tue, 15 Jun 2021 05:45:22 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D35A74B08D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 01:25:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D86C04B0A1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 03:53:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id I1z4+BEEqFoF for <kvmarm@lists.cs.columbia.edu>;
- Tue, 15 Jun 2021 01:25:29 -0400 (EDT)
+ with ESMTP id cZ4c37e-VtKw for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 15 Jun 2021 03:53:35 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B206549E57
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 01:25:29 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id EC7106140C;
- Tue, 15 Jun 2021 05:25:27 +0000 (UTC)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B91224B085
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 03:53:35 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 4086B60E09;
+ Tue, 15 Jun 2021 07:53:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1623734728;
- bh=ccQSlvryxnxETl+l+tNcmXDaNhM9HlrwPO8EJMj+lco=;
+ s=k20201202; t=1623743613;
+ bh=vDFtBhlYLrwtZnXOmkUZxpC5WdGn3oEPAkfut4CQqlM=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=VqGj7By+d/l6mauCaIJU0c/KV3+rqklJy6aVtPt9CDzS7chlu0KCSgJohCt6ENRFB
- hZbqrm74sk+HbYGsLB2IFGR0HNlTtEDCiJ45q53lv3oXtKgbUi2LTn6IBkCySex0Ut
- v+lP6YYo+18NfLUwnU/avHN5VCfXxHGNOLiIYOEUwXTfMSpFZLeX2c5sZ6FUPzXloJ
- 3NKX84fPqnuujHvw9LaCnskPcKNSo1gTZ6gUirpGBA4TSmfzxMrFZtGX6C09vzgi+w
- E6/8CN+r511QtRKRmtzndwnz2BF4ZxWPZTO723jD82/gwROR8WDqwapMzkmkXos310
- A6WpBeSUo/T1g==
-Date: Tue, 15 Jun 2021 08:25:24 +0300
+ b=k5TCBQVSBuiL6rRGP41YwOT3DJImXi6Z1ty8MpV5XWkPGRguUfc9uqH2nPdbuWVKF
+ nvKqUgp1gYQEozxBTNl+B8OwZn6E0A0Azee9sgNbBFp5f2BF9MrCeazfECaTgWqA9R
+ IbVaQdoTKURDMZqti9x/Eraat8P4E50XDSuVD+MuJCPgtp9VnY24fi2kAu85igKzhD
+ 0A1BkJXNkIQZLCyCOJWVgqoq+ZvwfFA4F+e8cmCvtDh1bylcfCG/QNJysbdmDUL8NF
+ wKqmAxU0QdRufELcUgnOVFU0l12rQxTX29JTQBnJJY+L0yB5UefYMAD5OIhB88ScBU
+ CFl88in6YsOAw==
+Date: Tue, 15 Jun 2021 10:53:30 +0300
 From: Leon Romanovsky <leon@kernel.org>
-To: Jing Zhang <jingzhangos@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
 Subject: Re: [PATCH v9 0/5] KVM statistics data fd-based binary interface
-Message-ID: <YMg5xPbmK3myjIX8@unreal>
+Message-ID: <YMhcek2cIu3Oz5Ek@unreal>
 References: <20210614212155.1670777-1-jingzhangos@google.com>
+ <YMg5xPbmK3myjIX8@unreal>
+ <15875c41-e1e7-3bf2-a85c-21384684d279@redhat.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20210614212155.1670777-1-jingzhangos@google.com>
+In-Reply-To: <15875c41-e1e7-3bf2-a85c-21384684d279@redhat.com>
 X-Mailman-Approved-At: Tue, 15 Jun 2021 05:45:20 -0400
 Cc: KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
  Paul Mackerras <paulus@ozlabs.org>,
@@ -75,7 +77,7 @@ Cc: KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
  Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
  Sean Christopherson <seanjc@google.com>, Cornelia Huck <cohuck@redhat.com>,
  Peter Shier <pshier@google.com>, LinuxMIPS <linux-mips@vger.kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
+ Vitaly Kuznetsov <vkuznets@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,30 +94,40 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Jun 14, 2021 at 09:21:50PM +0000, Jing Zhang wrote:
-> This patchset provides a file descriptor for every VM and VCPU to read
-> KVM statistics data in binary format.
-> It is meant to provide a lightweight, flexible, scalable and efficient
-> lock-free solution for user space telemetry applications to pull the
-> statistics data periodically for large scale systems. The pulling
-> frequency could be as high as a few times per second.
-> In this patchset, every statistics data are treated to have some
-> attributes as below:
->   * architecture dependent or generic
->   * VM statistics data or VCPU statistics data
->   * type: cumulative, instantaneous, peak
->   * unit: none for simple counter, nanosecond, microsecond,
->     millisecond, second, Byte, KiByte, MiByte, GiByte. Clock Cycles
-> Since no lock/synchronization is used, the consistency between all
-> the statistics data is not guaranteed. That means not all statistics
-> data are read out at the exact same time, since the statistics date
-> are still being updated by KVM subsystems while they are read out.
+On Tue, Jun 15, 2021 at 09:06:43AM +0200, Paolo Bonzini wrote:
+> On 15/06/21 07:25, Leon Romanovsky wrote:
+> > Sorry for my naive questions, but how does telemetry get statistics
+> > for hypervisors? Why is KVM different from hypervisors or NIC's statistics
+> > or any other high speed devices (RDMA) that generate tons of data?
+> 
+> Right now, the only way is debugfs but it's slow, and it's disabled when
+> using lockdown mode; this series is a way to fix this.
+> 
+> I sense that there is another question in there; are you wondering if
+> another mechanism should be used, for example netlink?  The main issue there
+> is how to identify a VM, since KVM file descriptors don't have a name.
+> Using a pid works (sort of) for debugfs, but pids are not appropriate for a
+> stable API.  Using a file descriptor as in this series requires
+> collaboration from the userspace program; howver, once the file descriptor
+> has been transmitted via SCM_RIGHTS, telemetry can read it forever without
+> further IPC, and there is proper privilege separation.
 
-Sorry for my naive questions, but how does telemetry get statistics
-for hypervisors? Why is KVM different from hypervisors or NIC's statistics
-or any other high speed devices (RDMA) that generate tons of data?
+Yeah, sorry for mixing different questions into one.
+
+So the answer to the question "why KVM is different" is that it doesn't
+have any stable identification except file descriptor. While hypervisors
+have stable names, NICs and RDMA devices have interface indexes e.t.c.
+Did I get it right?
+
+And this was second part of my question, the first part was my attempt to
+get on answer why current statistics like process info (/proc/xxx/*), NICs
+(netlink) and RDMA (sysfs) are not using binary format.
 
 Thanks
+
+> 
+> Paolo
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
