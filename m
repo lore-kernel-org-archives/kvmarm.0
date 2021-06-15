@@ -7,75 +7,76 @@ X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF0F2C48BDF
-	for <kvmarm@archiver.kernel.org>; Tue, 15 Jun 2021 13:40:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 280AEC49EA2
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Jun 2021 13:40:26 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9F92961477
-	for <kvmarm@archiver.kernel.org>; Tue, 15 Jun 2021 13:40:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F92961477
+	by mail.kernel.org (Postfix) with ESMTP id E2C1461477
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Jun 2021 13:40:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2C1461477
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A3F14A195;
-	Tue, 15 Jun 2021 09:40:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8FF044B117;
+	Tue, 15 Jun 2021 09:40:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 18SbuAZd9iUB; Tue, 15 Jun 2021 09:40:23 -0400 (EDT)
+	with ESMTP id AQPNqGLSQbgJ; Tue, 15 Jun 2021 09:40:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DDBB4B0C7;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E8B64B102;
 	Tue, 15 Jun 2021 09:40:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C4054B0DF
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 991C14B0DF
  for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 09:40:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CmsXgbiE6+Z6 for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id r20PitmAjkpm for <kvmarm@lists.cs.columbia.edu>;
  Tue, 15 Jun 2021 09:40:20 -0400 (EDT)
 Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com
  [209.85.222.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BB6D34B0E7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 09:40:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C03D74B0E5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 09:40:20 -0400 (EDT)
 Received: by mail-qk1-f201.google.com with SMTP id
- t131-20020a37aa890000b02903a9f6c1e8bfso25651294qke.10
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 06:40:18 -0700 (PDT)
+ v134-20020a37618c0000b02902fa5329f2b4so7596161qkb.18
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 06:40:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=f7gIb5rbS/9fOLN8dgvWOK7JCBV5aEZAvZ9qj7H9rQE=;
- b=mW9q4ubIKavGOU+Rb7aPnr1hD4mQbtR60amfOLStgdVAzy8G1ZXV0pospZ9jvjhE3P
- ZM6K+Bt7HDuOZq4dbeMHuTGhpfLrIquFHeLX1+dz/TU+bdQm5fUvjEaPt1q4ZpQ0n2eL
- dWZOG+Jo83M+JSERsHd0PSn8UEO8MSFAZMINv8BYrbe9F6IDK1pliRtNkeN4XCAXCrrh
- J18DD94cdm+kNJoqnij5o6QkeogOmDeAqtW8+QKXyf5qo+b30+jFj1fd7WLf8MwND+AI
- L/1YACkCPbMwSz1ymkC1PVqdN9igJDxPbMsBWgYlpiDbO9cG4KFN+wEw95VoReAmUmON
- AJSw==
+ :cc; bh=MzTuqOfSLXkQXPIBooH4fP63ZLmEi4w/w9F0qFeyLuI=;
+ b=b7HMusMXDb/BxYrxekRaLBxg6+8Di6dNYMsHoZDx91Rw74oEQIqQpEq4tZYgXlM9Bq
+ vBq9n+In91lMzAjJUtBV2Qu2CPHCKbd9illCEiWAlYwAgEaftP0NYm7BNePEToWqmCCn
+ 7pVSLwwRKSPKsT64YEkG5/LzzS+jWXFoy+P6Inh6ochfcO7ZoZuX0kLF/J7TNi9BHi96
+ 5VDUuCwqtxO3gINwdOreBNN5T2Yir3rmT17+JqIg3gxAsrmpqEyfo9AT2MUfC3dBApjL
+ jYoPAG42lxBJXkEvBK8FjZwPr8Bf5LH/9q+VgPrdh0UubiS6CyOU9vemBBgXNldhL5zL
+ mWgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=f7gIb5rbS/9fOLN8dgvWOK7JCBV5aEZAvZ9qj7H9rQE=;
- b=DeBBEGQ3sAsNYQI79Pgd7y82fmodVCKHYZK7DyZGLhXl7oa4CV9rLcLgLzczH6Hiay
- LgvViRmMsn8dVNNviJ3J03Rky6iiTLTRoQ+R8V+0c3UZOZIl8ZCaAHlV8m+4SIeL6D75
- W9rkiouOifiRyivr/T5PKccJeJejbzif9sKRNu/Rixo3xvHVdcBpC0MMoKk9omp+bA3c
- jUvZkHZJ30e0wE8o8WKUFm4PycX4WeRddWbR+GK683+qCHGZYLpLaEU05KGv4Su0Px+m
- ryX21KEml/3LJqO2H2n+mlKampM/FB7bH3KW/Pi1QsLF9gf+BIp1thxkb/ipi+ZQ0RwK
- Ajcg==
-X-Gm-Message-State: AOAM533B68D+2U1y+ZsnqWt3n1FHwaKt+SBnyzd3Woa6ILe4xZVUxwKz
- ssirR9yIsjFlchX3i0tlWOYOHTY672Cj52OfLew4BtubLwEj8HoNObR8L816BKmqtDXMtHZkbyj
- I1hwHs+GWDDfqphzei4JdZsYClqziLD+SU+JqDtzSMPwvGAbH1wtXCMWmE3DU2o7l3e8=
-X-Google-Smtp-Source: ABdhPJwS1qgOTRkDm9mapt/6C5Eyu8aYkJbw3LxewWQRvCB49rvrPnzdxGSqNfaJ1zDu9GfhaXZESn9zRQ==
+ bh=MzTuqOfSLXkQXPIBooH4fP63ZLmEi4w/w9F0qFeyLuI=;
+ b=dJNs515yf7qflowUwwe1/yfkaR7PHMfLDAMT/yf4+exeg4RIGSRBbgSWCzk0J1Zzi7
+ OUQxl/7IFNezUB0ophdQIjY7NA/DkkDzvwn624oCb4gzp7NtTSZ/aaXKzvKpm/yRwaS1
+ aDhMyn3NWRFX49xnJxsBgWxy5m3maWzcmlThgQzgWp4taUfMw0DNgA3JvZ9T+tCoBOM3
+ scjNW/aw2LqicHa2wCVs+sAGAn0PmIBSVJ0TwGcc1JpmYXN/v1R/2XKp6cFdzqOSWm5y
+ OVMBjpMLh8tp4YEE2bscwvkGwf+W4GEpCKCtpyV/0dlWGxOgleYJOOageoMrkRhVrqdA
+ gYWw==
+X-Gm-Message-State: AOAM533knKzQt0+E0r9bt/V9XqhaLwPtap9Hr3jtjmS9am1AXnpYVWi9
+ GREg+1dgNp2/JB9RMnqZYTN8hpYSqyIMsze5HxtJtRWYVomqGVsg4OTwbTniGz24sl/YVb0rhLS
+ 6oueaeRLTZcAzUX0w1+pJwbciztHlRmT6pXdXjxz8JZmhFIMB1JqZy3RKyrWSEl+Rbbs=
+X-Google-Smtp-Source: ABdhPJwvkJ1Cqi1cwhQ8+25SscFqILXhxSW+c+DE3yisa7Q5WIyh+leztx9V8c334RDLLSz46bw6zNHG1g==
 X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:482])
- (user=tabba job=sendgmr) by 2002:a05:6214:c88:: with SMTP id
- r8mr4489209qvr.58.1623764418202; Tue, 15 Jun 2021 06:40:18 -0700 (PDT)
-Date: Tue, 15 Jun 2021 14:39:49 +0100
+ (user=tabba job=sendgmr) by 2002:ad4:5309:: with SMTP id
+ y9mr5312176qvr.31.1623764420268; 
+ Tue, 15 Jun 2021 06:40:20 -0700 (PDT)
+Date: Tue, 15 Jun 2021 14:39:50 +0100
 In-Reply-To: <20210615133950.693489-1-tabba@google.com>
-Message-Id: <20210615133950.693489-13-tabba@google.com>
+Message-Id: <20210615133950.693489-14-tabba@google.com>
 Mime-Version: 1.0
 References: <20210615133950.693489-1-tabba@google.com>
 X-Mailer: git-send-email 2.32.0.272.g935e593368-goog
-Subject: [PATCH v2 12/13] KVM: arm64: Handle protected guests at 32 bits
+Subject: [PATCH v2 13/13] KVM: arm64: Check vcpu features at pVM creation
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: kernel-team@android.com, kvm@vger.kernel.org, maz@kernel.org,
@@ -96,52 +97,72 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Protected KVM does not support protected AArch32 guests. However,
-it is possible for the guest to force run AArch32, potentially
-causing problems. Add an extra check so that if the hypervisor
-catches the guest doing that, it can prevent the guest from
-running again by resetting vcpu->arch.target and returning
-ARM_EXCEPTION_IL.
-
-Adapted from commit 22f553842b14 ("KVM: arm64: Handle Asymmetric
-AArch32 systems")
+Check that a protected VM enabled only supported features when
+created.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/hyp/include/hyp/switch.h | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ arch/arm64/kvm/pkvm.c | 43 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index d9f087ed6e02..672801f79579 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -447,6 +447,26 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
- 			write_sysreg_el2(read_sysreg_el2(SYS_ELR) - 4, SYS_ELR);
- 	}
+diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+index cf624350fb27..15a92f3fdd44 100644
+--- a/arch/arm64/kvm/pkvm.c
++++ b/arch/arm64/kvm/pkvm.c
+@@ -88,10 +88,53 @@ static void pkvm_teardown_firmware_slot(struct kvm *kvm)
+ 	kvm->arch.pkvm.firmware_slot = NULL;
+ }
  
++/*
++ * Check that only supported features are enabled for the protected VM's vcpus.
++ *
++ * Return 0 if all features enabled for all vcpus are supported, or -EINVAL if
++ * one or more vcpus has one or more unsupported features.
++ */
++static int pkvm_check_features(struct kvm *kvm)
++{
++	int i;
++	const struct kvm_vcpu *vcpu;
++	DECLARE_BITMAP(allowed_features, KVM_VCPU_MAX_FEATURES);
++
++	bitmap_zero(allowed_features, KVM_VCPU_MAX_FEATURES);
++
 +	/*
-+	 * Protected VMs are not allowed to run in AArch32. The check below is
-+	 * based on the one in kvm_arch_vcpu_ioctl_run().
-+	 * The ARMv8 architecture doesn't give the hypervisor a mechanism to
-+	 * prevent a guest from dropping to AArch32 EL0 if implemented by the
-+	 * CPU. If the hypervisor spots a guest in such a state ensure it is
-+	 * handled, and don't trust the host to spot or fix it.
++	 * Support for:
++	 * - CPU starting in poweroff state
++	 * - PSCI v0.2
++	 * - Pointer authentication: address or generic
++	 *
++	 * No support for remaining features, i.e.,:
++	 * - AArch32 state
++	 * - Performance Monitoring
++	 * - Scalable Vectors
 +	 */
-+	if (unlikely(is_nvhe_hyp_code() &&
-+		     kvm_vm_is_protected(kern_hyp_va(vcpu->kvm)) &&
-+		     vcpu_mode_is_32bit(vcpu))) {
-+		/*
-+		 * As we have caught the guest red-handed, decide that it isn't
-+		 * fit for purpose anymore by making the vcpu invalid.
-+		 */
-+		vcpu->arch.target = -1;
-+		*exit_code = ARM_EXCEPTION_IL;
-+		goto exit;
++	set_bit(KVM_ARM_VCPU_POWER_OFF, allowed_features);
++	set_bit(KVM_ARM_VCPU_PSCI_0_2, allowed_features);
++	set_bit(KVM_ARM_VCPU_PTRAUTH_ADDRESS, allowed_features);
++	set_bit(KVM_ARM_VCPU_PTRAUTH_GENERIC, allowed_features);
++
++	kvm_for_each_vcpu(i, vcpu, kvm) {
++		if (!bitmap_subset(vcpu->arch.features, allowed_features,
++				   KVM_VCPU_MAX_FEATURES))
++			return -EINVAL;
 +	}
 +
- 	/*
- 	 * We're using the raw exception code in order to only process
- 	 * the trap if no SError is pending. We will come back to the
++	return 0;
++}
++
+ static int pkvm_enable(struct kvm *kvm, u64 slotid)
+ {
+ 	int ret;
+ 
++	ret = pkvm_check_features(kvm);
++	if (ret)
++		return ret;
++
+ 	ret = pkvm_init_firmware_slot(kvm, slotid);
+ 	if (ret)
+ 		return ret;
 -- 
 2.32.0.272.g935e593368-goog
 
