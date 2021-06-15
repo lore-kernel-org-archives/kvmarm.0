@@ -7,75 +7,76 @@ X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84ADAC48BE5
-	for <kvmarm@archiver.kernel.org>; Tue, 15 Jun 2021 13:40:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29E55C48BDF
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Jun 2021 13:40:12 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0C93961474
-	for <kvmarm@archiver.kernel.org>; Tue, 15 Jun 2021 13:40:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C93961474
+	by mail.kernel.org (Postfix) with ESMTP id BF30F61477
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Jun 2021 13:40:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF30F61477
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AF6E74B0F0;
-	Tue, 15 Jun 2021 09:40:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F9934B110;
+	Tue, 15 Jun 2021 09:40:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id zU1Gad7fH9H1; Tue, 15 Jun 2021 09:40:07 -0400 (EDT)
+	with ESMTP id Y0GZfSWNW0yp; Tue, 15 Jun 2021 09:40:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 312174B0FA;
-	Tue, 15 Jun 2021 09:40:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 588F34B0EE;
+	Tue, 15 Jun 2021 09:40:10 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 57B484B0C7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 09:40:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A5E984B0E4
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 09:40:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sP7rk88eJVpO for <kvmarm@lists.cs.columbia.edu>;
- Tue, 15 Jun 2021 09:40:04 -0400 (EDT)
-Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com
- [209.85.219.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 58AB24B0F0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 09:40:04 -0400 (EDT)
-Received: by mail-qv1-f74.google.com with SMTP id
- g17-20020a0caad10000b029021886e075f0so30008248qvb.15
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 06:40:04 -0700 (PDT)
+ with ESMTP id RiFIRjhS1+fp for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 15 Jun 2021 09:40:07 -0400 (EDT)
+Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com
+ [209.85.219.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 606024B0F0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 09:40:06 -0400 (EDT)
+Received: by mail-qv1-f73.google.com with SMTP id
+ r8-20020a0562140c88b0290242bf8596feso10141887qvr.8
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 06:40:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=fFb5EdfjHO+ewt5HOuLeS1mR20gu2Eahh4MlZRHs87o=;
- b=uKaxyGfPO489RueaQxt7plGasBN2wxPBdDP9z18kBH5QsmXdJmOlWt8qsZ7fWyWg4Z
- Tf//G1/iiAP67NdxyLmKercnkJs0TK2St7DeUD7sP4JgqDPllgRUqSfADFSresHo9rjN
- wud6qkKNi/AzL/R29gFpKSs8mr3evLA2jhkf1U0LsfofKWt3WUTM4huvPRZKNg7JMURS
- g8WN+BbSuRdnqmj6vmI3a1aV5p7GQe3ZEnzBxVKUVIgfww3v3tYcGgraZK2GjWfl70hz
- T911O8r8pHnOkWSJPKIr2jDpYRn/XQw/O4TKpQDWBCCdG+uwAiVvLdEMYkWfKaQO5njr
- Am4Q==
+ :cc; bh=kL/kBHAQck4ApelGdSS7r2lP6eaQeDEKtmMiMUjhfo0=;
+ b=gzqPcBKLBvsLtIpEG1aUU37g0RalZyoxkyhQar78llr2oOc96Tava3TDOCiRx/YzEm
+ OAh8TvMkEWDMPRC/bmfuFicpQV2yuurSJCvzKZuu7RXLqmur44ozuMukAkMEaGUyoOEL
+ 775rpm73wH5/gfsIXgBzkK9rQqPrjXOk0GIoLBVxrqDy8OmH78CbVcj1TYfehMToBrGu
+ vORRBMciUjIHgl6+21vGLDXma9hKclutw+MqKY79hibqJ/RttXxhJoUBjCKvW5EJbMlX
+ 4TRfrtYuBACaUKlWTnWTh35wbz5CtLb6XErSBJSX45vP3N3sniIGOEHGty3ZLjb7Qaiy
+ Y1tQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=fFb5EdfjHO+ewt5HOuLeS1mR20gu2Eahh4MlZRHs87o=;
- b=QnBFQbBL6baw2eG6syQo7ZeB1r5DZESo5pmHlK1PsWc9YI/VY4YvNmtaOsdrnP5m/J
- Yg/4Qf1VdJDPQU7KzRNfxy/6VGc2aF7oonRMkC1HiKdDJdbRklXbc4EBxve0rwyREIO+
- USpsIekFTVJgeiEGhIfD3CDWLkiBbKdynpMOfuHpVVbcOGucSPosWMLMQsPAx5FbM9WI
- A3RENQQGNR0Bs9IwYi5BYe5l6RWzv+QItd20S4p1r4JthsXZd9jtDIqBLZMH79ojwuU8
- sjvVV5OQuMG/6cqap3P6+OtFnzzqAmsgwpD/QIYuj02blU3+EldgPtZ4qg7VKCnNTeXg
- kWYw==
-X-Gm-Message-State: AOAM533vHPOSov5R5CLIHDUM9K2z8N0w6ohTQOSd5TgQ3k7grq3V/u9s
- E5wszZRBe/hg5nLHqgMDmG03BKsU2Nz9Jmr7rirFu3jDw8f9IVHTtIvY4eTz7lUC3Sy6NDh88sV
- 0RzV45ud4dnFE9jwGXIii6OLiduBmdDVbY5cOc+1gYYeSsM93keK1qXLFHMJXw9/ceII=
-X-Google-Smtp-Source: ABdhPJyIzj64ZU0rwOF1Tns2cDZxg6a1VMvSmsV4v/YREuu/92HJn1cyThLZrrOSb3o9FBNoCaWcDXZWqA==
+ bh=kL/kBHAQck4ApelGdSS7r2lP6eaQeDEKtmMiMUjhfo0=;
+ b=U3BeUi+Seu/nHBfNdH1nr0imWIctiqv0scpLc1dXYq42sqDcFyhsIKvHYLSCd+tcYH
+ g4ZJ/2WrZwOVkN4GcZsxywNey8PHVw/AzLGbteY9rwcwGXYS+td0VPEJjH6RBRBqU6/Z
+ XAFf5OcOL5okq68xu8c9VjOdP9r606+JVCOLJzvg65vfDYZaHTitlWqQPLte6SOPDz4h
+ SmSjXxnh+oW4njXXTgbylcT8LKZxEMIrrxsaEnko0BOqREeaejBKB6Wu6nxMGGLVC7bo
+ g8dTDXH16xSLALGTS4meDcYaxzLcWcUyR5MqjbmAwvjDC3tl2PilOnH3Ya9Vf9XmNKV6
+ mLYQ==
+X-Gm-Message-State: AOAM5327/izR9tsvzFzw+le/P1kVSqpXZ6/j1KdMiua+Bb79Yj1sVz3d
+ 2IcngrCK/dtz72iAGPzL07fd7UyW4u5+/8lD7Y6iAtX9VWsMS3dIVtwstB44I3fR8kDic8YjPM+
+ xqqVCmRxAExIRzbsf50jkwRaAkLKaf3u/zPeoPsZlMsHtKmOuWeUStjGzkcr8av2A8YM=
+X-Google-Smtp-Source: ABdhPJzXW07KU0XghibXdRXCGLp6L5Ztu0HSUPRZ+aQpdEyoZgVmZraHgVD7kZuhI194f2WprPrdxaRdtw==
 X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:482])
- (user=tabba job=sendgmr) by 2002:a05:6214:c6b:: with SMTP id
- t11mr4873488qvj.31.1623764403740; Tue, 15 Jun 2021 06:40:03 -0700 (PDT)
-Date: Tue, 15 Jun 2021 14:39:42 +0100
+ (user=tabba job=sendgmr) by 2002:ad4:536a:: with SMTP id
+ e10mr5022177qvv.9.1623764405756; 
+ Tue, 15 Jun 2021 06:40:05 -0700 (PDT)
+Date: Tue, 15 Jun 2021 14:39:43 +0100
 In-Reply-To: <20210615133950.693489-1-tabba@google.com>
-Message-Id: <20210615133950.693489-6-tabba@google.com>
+Message-Id: <20210615133950.693489-7-tabba@google.com>
 Mime-Version: 1.0
 References: <20210615133950.693489-1-tabba@google.com>
 X-Mailer: git-send-email 2.32.0.272.g935e593368-goog
-Subject: [PATCH v2 05/13] KVM: arm64: Restore mdcr_el2 from vcpu
+Subject: [PATCH v2 06/13] KVM: arm64: Add feature register flag definitions
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: kernel-team@android.com, kvm@vger.kernel.org, maz@kernel.org,
@@ -96,33 +97,56 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On deactivating traps, restore the value of mdcr_el2 from the
-vcpu context, rather than directly reading the hardware register.
-Currently, the two values are the same, i.e., the hardware
-register and the vcpu one. A future patch will be changing the
-value of mdcr_el2 on activating traps, and this ensures that its
-value will be restored.
+Add feature register flag definitions to clarify which features
+might be supported.
 
 No functional change intended.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/switch.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm64/include/asm/sysreg.h | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index f7af9688c1f7..430b5bae8761 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -73,7 +73,7 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 65d15700a168..42bcc5102d10 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -789,6 +789,10 @@
+ #define ID_AA64PFR0_FP_SUPPORTED	0x0
+ #define ID_AA64PFR0_ASIMD_NI		0xf
+ #define ID_AA64PFR0_ASIMD_SUPPORTED	0x0
++#define ID_AA64PFR0_EL3_64BIT_ONLY	0x1
++#define ID_AA64PFR0_EL3_32BIT_64BIT	0x2
++#define ID_AA64PFR0_EL2_64BIT_ONLY	0x1
++#define ID_AA64PFR0_EL2_32BIT_64BIT	0x2
+ #define ID_AA64PFR0_EL1_64BIT_ONLY	0x1
+ #define ID_AA64PFR0_EL1_32BIT_64BIT	0x2
+ #define ID_AA64PFR0_EL0_64BIT_ONLY	0x1
+@@ -848,12 +852,16 @@
+ #define ID_AA64MMFR0_ASID_SHIFT		4
+ #define ID_AA64MMFR0_PARANGE_SHIFT	0
  
- 	___deactivate_traps(vcpu);
++#define ID_AA64MMFR0_ASID_8		0x0
++#define ID_AA64MMFR0_ASID_16		0x2
++
+ #define ID_AA64MMFR0_TGRAN4_NI		0xf
+ #define ID_AA64MMFR0_TGRAN4_SUPPORTED	0x0
+ #define ID_AA64MMFR0_TGRAN64_NI		0xf
+ #define ID_AA64MMFR0_TGRAN64_SUPPORTED	0x0
+ #define ID_AA64MMFR0_TGRAN16_NI		0x0
+ #define ID_AA64MMFR0_TGRAN16_SUPPORTED	0x1
++#define ID_AA64MMFR0_PARANGE_40		0x2
+ #define ID_AA64MMFR0_PARANGE_48		0x5
+ #define ID_AA64MMFR0_PARANGE_52		0x6
  
--	mdcr_el2 = read_sysreg(mdcr_el2);
-+	mdcr_el2 = vcpu->arch.mdcr_el2;
+@@ -901,6 +909,7 @@
+ #define ID_AA64MMFR2_CNP_SHIFT		0
  
- 	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
- 		u64 val;
+ /* id_aa64dfr0 */
++#define ID_AA64DFR0_MTPMU_SHIFT		48
+ #define ID_AA64DFR0_TRBE_SHIFT		44
+ #define ID_AA64DFR0_TRACE_FILT_SHIFT	40
+ #define ID_AA64DFR0_DOUBLELOCK_SHIFT	36
 -- 
 2.32.0.272.g935e593368-goog
 
