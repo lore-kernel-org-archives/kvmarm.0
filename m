@@ -2,125 +2,82 @@ Return-Path: <SRS0=xhzu=LJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCEFEC49EA3
-	for <kvmarm@archiver.kernel.org>; Tue, 15 Jun 2021 11:31:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC389C48BE5
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Jun 2021 13:39:59 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4662C61462
-	for <kvmarm@archiver.kernel.org>; Tue, 15 Jun 2021 11:31:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4662C61462
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 512A161483
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Jun 2021 13:39:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 512A161483
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CB0314B0E5;
-	Tue, 15 Jun 2021 07:31:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C4BE44B0FB;
+	Tue, 15 Jun 2021 09:39:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ribYBQOatMS6; Tue, 15 Jun 2021 07:31:19 -0400 (EDT)
+	with ESMTP id ITmcQceG7-6Z; Tue, 15 Jun 2021 09:39:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 85C064B0C3;
-	Tue, 15 Jun 2021 07:31:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 889B64B0E4;
+	Tue, 15 Jun 2021 09:39:57 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EC6B34B0BF
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 07:31:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 717AE4B0DE
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 09:39:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1hsdBwyOJ0xD for <kvmarm@lists.cs.columbia.edu>;
- Tue, 15 Jun 2021 07:31:16 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CFE1140821
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 07:31:16 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1623756676;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=aQ2nOAspl2AGDi9hsIXoVirS49xlNLfSm3ZVd3FKUiQ=;
- b=V82DZbveubcSsIiwIZDz6ctHABaVoWqBPZAL0FfNG1bV3tVMXdn+nK4bOIWM4cnDLQv9K6
- CDEdRKojsAN/h0R5S1GddXdv10jrXlVD4DvTCEtnXfvh5BDpuIQuAY0rw7Ce1vRz4NyVHN
- kqk0I1LCNdK1iNyzhV2Rnb7fvwNUq/g=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-136-exm-VOSKPBOVk6w333Buuw-1; Tue, 15 Jun 2021 07:31:14 -0400
-X-MC-Unique: exm-VOSKPBOVk6w333Buuw-1
-Received: by mail-ej1-f70.google.com with SMTP id
- b10-20020a170906194ab02903ea7d084cd3so4414839eje.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 04:31:14 -0700 (PDT)
+ with ESMTP id OVLPzRcCDaWg for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 15 Jun 2021 09:39:55 -0400 (EDT)
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com
+ [209.85.221.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D68124B097
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 09:39:54 -0400 (EDT)
+Received: by mail-wr1-f73.google.com with SMTP id
+ k25-20020a5d52590000b0290114dee5b660so8653784wrc.16
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 06:39:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=YqFGnAW4G80KFjLlYtbBihqs/VTfxdlv4UyDdFH0VNk=;
+ b=vW8UU2mcVqIU2mlyEisSMA6Kbql1ZGDyN4oKiLenSONa/dq2y5ObhezQJCRnWqR4AO
+ erXSeDx7mrF9iWHaFloBWd3gB1Jg7EDbnhltwV+e/cuI+nAZyTueEP+8VrykmXlgtgvr
+ hqJHvVphsBKr8tdiVgRFElzn7BTPLBPpJh6ZgIf+pQVbrMgindHsOy7UgX6M+6cLMe55
+ BiyAJNBd5HqG0NGyMs26s4ElIxBU1heAGJBYKK4CL/Xbk0f1sPw8BkIJs6i+Nkk8kBA2
+ KZpq7kpV/AsChjgK2s8H+SNgGPFGVgNycLE9SfCDkfChrjVz/FqXgG/yAGkBpwdMQgY2
+ aGSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:to:references:from:subject:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=aQ2nOAspl2AGDi9hsIXoVirS49xlNLfSm3ZVd3FKUiQ=;
- b=Fc4MxCRiYkQn2TUUmDd4Y6IbRpBeZOrNB/pan8yyjMwC6EZHpnPEtnp6SliBqk6Lfy
- ULkcAUAC/+LiB0kJ/QjlZZKtVm/UIJ8ZvRKMWzDkKlYT+6iHu4Mbd/aqrBrdsGMZVs5q
- jm/m6OnQuG3Gdvr+GEbF//OYUnasKDIWhS4Vw83vV+wz+I5MB8F0t4L2AFtPcomxY31u
- BM/0Va0EblnLPvNySYLvPpYi6Vklt0bTj/i35oRVqXCkuNS9DoYaaccV8TzhSM5Sk3XS
- HhgXFcrczssaMefcgMLF5haaw0++uuMPppXuVCu9a5jPNtq10EN7wEB0SHbMpsruG+4b
- h5ag==
-X-Gm-Message-State: AOAM531D9a8w7Cj63QKQCV6QA09+ioFfQyurdy5s2ZhmDojvaungnkcx
- JobMcGyLPA0dvZL/+xnompEAE3h3rX1KNjSdwPH/AuzGtlq0GSZ7dX+CZ6DMsfBxXVdnN9kTdX9
- iuKWJfnglaQO6g6mDmd7ofVFF
-X-Received: by 2002:a17:906:6ad0:: with SMTP id
- q16mr20563674ejs.286.1623756673695; 
- Tue, 15 Jun 2021 04:31:13 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzKlp02kMxK2rO+S69nIrAnTgSLt5X2p2XEkmw4RDKa1lrb0dqopq+Tz3VP4q2ZjtECG1DKNg==
-X-Received: by 2002:a17:906:6ad0:: with SMTP id
- q16mr20563625ejs.286.1623756673461; 
- Tue, 15 Jun 2021 04:31:13 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
- ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
- by smtp.gmail.com with ESMTPSA id u21sm7110928eja.59.2021.06.15.04.31.10
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 15 Jun 2021 04:31:12 -0700 (PDT)
-To: "Enrico Weigelt, metux IT consult" <lkml@metux.net>,
- Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
- KVMARM <kvmarm@lists.cs.columbia.edu>, LinuxMIPS
- <linux-mips@vger.kernel.org>, KVMPPC <kvm-ppc@vger.kernel.org>,
- LinuxS390 <linux-s390@vger.kernel.org>,
- Linuxkselftest <linux-kselftest@vger.kernel.org>,
- Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
- Julien Thierry <julien.thierry.kdev@gmail.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Will Deacon <will@kernel.org>,
- Huacai Chen <chenhuacai@kernel.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- Paul Mackerras <paulus@ozlabs.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>, David Hildenbrand <david@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, Claudio Imbrenda
- <imbrenda@linux.ibm.com>, Sean Christopherson <seanjc@google.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>, Jim Mattson <jmattson@google.com>,
- Peter Shier <pshier@google.com>, Oliver Upton <oupton@google.com>,
- David Rientjes <rientjes@google.com>,
- Emanuele Giuseppe Esposito <eesposit@redhat.com>,
- David Matlack <dmatlack@google.com>, Ricardo Koller <ricarkol@google.com>,
- Krish Sadhukhan <krish.sadhukhan@oracle.com>, Fuad Tabba <tabba@google.com>
-References: <20210614212155.1670777-1-jingzhangos@google.com>
- <b86aa6df-5fd7-d705-1688-4d325df6f7d9@metux.net>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v9 0/5] KVM statistics data fd-based binary interface
-Message-ID: <ad7905f9-8338-382a-b1df-9b3352bbd2f8@redhat.com>
-Date: Tue, 15 Jun 2021 13:31:10 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
-MIME-Version: 1.0
-In-Reply-To: <b86aa6df-5fd7-d705-1688-4d325df6f7d9@metux.net>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=YqFGnAW4G80KFjLlYtbBihqs/VTfxdlv4UyDdFH0VNk=;
+ b=BNb6BMFEYhQKUCAiQlU6Jwy1CrbJNJAxiZxsCx4Grg0M9Vk0WYhPfBy4uk9Zz3w3cm
+ 8mdHTFH6juoBguz9xTkeQgc0ddhq7e+qogiovSOFyR68J0ZZHNJr97ombvc/GiwKsv8m
+ eGABMGigAvTwuULJhcN4FCODNY1obM1WGPD/P26JfY084ddRHp15UrwTJirWB/wmBuwh
+ qEBycSxlewWXdNZQVjpk4N6L1QEvlygzrxhUV8Q9MLiP9zr+0bB58FEMrQml9UYa82Re
+ cxN2Jo+uK6lUZvJ8bfWiJsCjKoPwPHMxAXzLblQQIZip+o/QLcXhWlfHW3zN8oEsQfBF
+ 4oMQ==
+X-Gm-Message-State: AOAM532H05iSwuxYk+WFsxY4iJgcz1ESPqJq43moCNW2lkhRY6TjgawH
+ 2DDn7GJI2hP747vGICuvMcTPf2bbZpkXftiLC/XI7nYZOrPQoL2/3OqyH9NYdTaaaaht4sXA5jG
+ ndzA090G3AemfGsMF5eygyLlCZn9z5twS9HoFb5Ky3N/8gSFgNYikdhJPryAul9F7dz8=
+X-Google-Smtp-Source: ABdhPJzBlOmstNMiFWInb2WeX1AQwhgtoVD7ZnXYUlVqpBpHhlkPQmt7vhX1oh7GW7BAoXIVaF7wKZIaJw==
+X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:482])
+ (user=tabba job=sendgmr) by 2002:a7b:c24a:: with SMTP id
+ b10mr11308wmj.1.1623764393022; 
+ Tue, 15 Jun 2021 06:39:53 -0700 (PDT)
+Date: Tue, 15 Jun 2021 14:39:37 +0100
+Message-Id: <20210615133950.693489-1-tabba@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.32.0.272.g935e593368-goog
+Subject: [PATCH v2 00/13] KVM: arm64: Fixed features for protected VMs
+From: Fuad Tabba <tabba@google.com>
+To: kvmarm@lists.cs.columbia.edu
+Cc: kernel-team@android.com, kvm@vger.kernel.org, maz@kernel.org,
+ pbonzini@redhat.com, will@kernel.org, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -132,91 +89,129 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gMTUvMDYvMjEgMTA6MzcsIEVucmljbyBXZWlnZWx0LCBtZXR1eCBJVCBjb25zdWx0IHdyb3Rl
-Ogo+ICogd2h5IGlzIGl0IGJpbmFyeSBpbnN0ZWFkIG9mIHRleHQgPyBpcyBpdCBzbyB2ZXJ5IGhp
-Z2ggdm9sdW1lIHRoYXQKPiAgwqAgaXQgcmVhbGx5IG1hdHRlcnMgPwoKVGhlIG1haW4gcmVhc29u
-IHRvIGhhdmUgYSBiaW5hcnkgZm9ybWF0IGlzIG5vdCB0aGUgaGlnaCB2b2x1bWUgYWN0dWFsbHkg
-Cih0aG91Z2ggaXQgYWxzbyBoYXMgaXRzIHBhcnQpLiAgUmF0aGVyLCB3ZSB3b3VsZCByZWFsbHkg
-bGlrZSB0byBpbmNsdWRlIAp0aGUgc2NoZW1hIHRvIG1ha2UgdGhlIHN0YXRpc3RpY3Mgc2VsZi1k
-ZXNjcmliaW5nLiAgVGhpcyBpbmNsdWRlcyBzdHVmZiAKbGlrZSB3aGV0aGVyIHRoZSB1bml0IG9m
-IG1lYXN1cmUgb2YgYSBzdGF0aXN0aWMgaXMgY2xvY2sgY3ljbGVzLCAKbmFub3NlY29uZHMsIHBh
-Z2VzIG9yIHdoYXRub3Q7IGhhdmluZyB0aGlzIGtpbmQgb2YgaW5mb3JtYXRpb24gaW4gdGV4dCAK
-bGVhZHMgdG8gYXdrd2FyZG5lc3MgaW4gdGhlIHBhcnNlcnMuICB0cmFjZS1jbWQgaXMgYW5vdGhl
-ciBleGFtcGxlIHdoZXJlIAp0aGUgZGF0YSBjb25zaXN0cyBvZiBhIHNjaGVtYSBmb2xsb3dlZCBi
-eSBiaW5hcnkgZGF0YS4KClRleHQgZm9ybWF0IGNvdWxkIGNlcnRhaW5seSBiZSBhZGRlZCBpZiB0
-aGVyZSdzIGEgdXNlY2FzZSwgYnV0IGZvciAKZGV2ZWxvcGVyIHVzZSBkZWJ1Z2ZzIGlzIHVzdWFs
-bHkgYSBzdWl0YWJsZSByZXBsYWNlbWVudC4KCkxhc3QgeWVhciB3ZSB0cmllZCB0aGUgb3Bwb3Np
-dGUgZGlyZWN0aW9uOiB3ZSBidWlsdCBhIG9uZS12YWx1ZS1wZXItZmlsZSAKZmlsZXN5c3RlbSB3
-aXRoIGEgY29tbW9uIEFQSSB0aGF0IGFueSBzdWJzeXN0ZW0gY291bGQgdXNlIChlLmcuIApwcm92
-aWRpbmcgZXRodG9vbCBzdGF0cywgL3Byb2MvaW50ZXJydXB0cywgZXRjLiBpbiBhZGRpdGlvbiB0
-byBLVk0gCnN0YXRzKS4gIFdlIHN0YXJ0ZWQgd2l0aCB0ZXh0LCBzaW1pbGFyIHRvIHN5c2ZzLCB3
-aXRoIHRoZSBwbGFuIG9mIApleHRlbmRpbmcgaXQgdG8gYSBiaW5hcnkgZm9ybWF0IGxhdGVyLiAg
-SG93ZXZlciwgb3RoZXIgc3Vic3lzdGVtcyAKZXhwcmVzc2VkIHZlcnkgbGl0dGxlIGludGVyZXN0
-IGluIHRoaXMsIHNvIGluc3RlYWQgd2UgZGVjaWRlZCB0byBnbyB3aXRoIApzb21ldGhpbmcgdGhh
-dCBpcyBkZXNpZ25lZCBhcm91bmQgS1ZNIG5lZWRzLgoKU3RpbGwsIHRoZSBiaW5hcnkgZm9ybWF0
-IHRoYXQgS1ZNIHVzZXMgaXMgZGVzaWduZWQgbm90IHRvIGJlIApLVk0tc3BlY2lmaWMuICBJZiBv
-dGhlciBzdWJzeXN0ZW1zIHdhbnQgdG8gcHVibGlzaCBoaWdoLXZvbHVtZSwgCnNlbGYtZGVzY3Jp
-YmluZyBzdGF0aXN0aWMgaW5mb3JtYXRpb24sIHRoZXkgYXJlIHdlbGNvbWUgdG8gc2hhcmUgdGhl
-IApiaW5hcnkgZm9ybWF0IGFuZCB0aGUgY29kZS4gIFBlcmhhcHMgaXQgbWF5IG1ha2Ugc2Vuc2Ug
-aW4gc29tZSBjYXNlcyB0byAKaGF2ZSB0aGVtIGluIHN5c2ZzLCBldmVuIChlLmcuIC9zeXMva2Vy
-bmVsL3NsYWIvKi8uc3RhdHMpLiAgQXMgR3JlZyBzYWlkIApzeXNmcyBpcyBjdXJyZW50bHkgb25l
-IHZhbHVlIHBlciBmaWxlLCBidXQgcGVyaGFwcyB0aGF0IGNvdWxkIGJlIGNoYW5nZWQgCmlmIHRo
-ZSBiaW5hcnkgZm9ybWF0IGlzIGFuIGFkZGl0aW9uYWwgd2F5IHRvIGFjY2VzcyB0aGUgaW5mb3Jt
-YXRpb24gYW5kIApub3QgdGhlIG9ubHkgb25lIChub3QgdGhhdCBJJ20gcGxhbm5pbmcgdG8gZG8g
-aXQpLgoKPiAqIGhvdyB3aWxsIHBvc3NpYmxlIGZ1dHVyZSBleHRlbnNpb25zIG9mIHRoZSB0ZWxl
-bWV0cnkgcGFja2V0cyB3b3JrID8KClRoZSBmb3JtYXQgaW5jbHVkZXMgYSBzY2hlbWEsIHNvIGl0
-J3MgcG9zc2libGUgdG8gYWRkIG1vcmUgc3RhdGlzdGljcyBpbiAKdGhlIGZ1dHVyZS4gIFRoZSBl
-eGFjdCBsaXN0IG9mIHN0YXRpc3RpY3MgdmFyaWVzIHBlciBhcmNoaXRlY3R1cmUgYW5kIGlzIApu
-b3QgcGFydCBvZiB0aGUgdXNlcnNwYWNlIEFQSSAob2J2aW91cyBjYXZlYXQ6IGh0dHBzOi8veGtj
-ZC5jb20vMTE3Mi8pLgoKPiAqIGFyZW4ndCB0aGVyZSBvdGhlciBtZWFucyB0byBnZXQgdGhpcyBm
-ZCBpbnN0ZWFkIG9mIGFuIGlvY3RsKCkgb24gdGhlCj4gIMKgIFZNIGZkID8gc29tZXRoaW5nIG1v
-cmUgZnJvbSB0aGUgb3V0c2lkZSAoZWcuIHN5c2ZzL3Byb2NmcykKCk5vdCB5ZXQsIGJ1dCBpZiB0
-aGVyZSdzIGEgbmVlZCBpdCBjYW4gYmUgYWRkZWQuICBJdCdkIGJlIHBsYXVzaWJsZSB0byAKcHVi
-bGlzaCBzeXN0ZW0td2lkZSBzdGF0aXN0aWNzIHZpYSBhIGlvY3RsIG9uIC9kZXYva3ZtLCBmb3Ig
-ZXhhbXBsZS4gCldlJ2QgaGF2ZSB0byBjaGVjayBob3cgdGhpcyBjb21wYXJlcyB3aXRoIHN0dWZm
-IHRoYXQgaXMgd29ybGQtcmVhZGFibGUgCmluIHByb2NmcyBhbmQgc3lzZnMsIGJ1dCBJIGRvbid0
-IHRoaW5rIHRoZXJlIGFyZSBzZWN1cml0eSBjb25jZXJucyBpbiAKZXhwb3NpbmcgdGhhdC4KClRo
-ZXJlJ3MgYWxzbyBwaWRmZF9nZXRmZCgyKSB3aGljaCBjYW4gYmUgdXNlZCB0byBwdWxsIGEgVk0g
-ZmlsZSAKZGVzY3JpcHRvciBmcm9tIGFub3RoZXIgcnVubmluZyBwcm9jZXNzLiAgVGhhdCBjYW4g
-YmUgdXNlZCB0byBhdm9pZCB0aGUgCmlzc3VlIG9mIEtWTSBmaWxlIGRlc2NyaXB0b3JzIGJlaW5n
-IHVubmFtZWQuCgo+ICogaG93IHdpbGwgdGhhdCByZWxhdGUgdG8gb3RoZXIgaHlwZXJ2aXNvcnMg
-PwoKT3RoZXIgaHlwZXJ2aXNvcnMgZG8gbm90IHJ1biBhcyBwYXJ0IG9mIHRoZSBMaW51eCBrZXJu
-ZWwgKGF0IGxlYXN0IHRoZXkgCmFyZSBub3QgdXBzdHJlYW0pLiAgVGhlc2Ugc3RhdGlzdGljcyBv
-bmx5IGFwcGx5IHRvIExpbnV4ICpob3N0cyosIG5vdCAKZ3Vlc3RzLgoKQXMgZmFyIGFzIEkga25v
-dywgdGhlcmUgaXMgbm8gc3RhbmRhcmQgdGhhdCBYZW4gb3IgdGhlIHByb3ByaWV0YXJ5IApoeXBl
-cnZpc29ycyB1c2UgdG8gY29tbXVuaWNhdGUgdGhlaXIgdGVsZW1ldHJ5IGluZm8gdG8gbW9uaXRv
-cmluZyB0b29scywgCmFuZCBhbHNvIG5vIHN0YW5kYXJkIGJpbmFyeSBmb3JtYXQgdXNlZCBieSBl
-eHBvcnRlcnMgdG8gdGFsayB0byAKbW9uaXRvcmluZyB0b29scy4gIElmIHRoaXMgZm9ybWF0IHdp
-bGwgYmUgYWRvcHRlZCBieSBvdGhlciBoeXBlcnZpc29ycyAKb3IgYW55IHJhbmRvbSBzb2Z0d2Fy
-ZSwgSSB3aWxsIGJlIGhhcHB5LgoKPiBTb21lIG5vdGVzIGZyb20gdGhlIG9wZXJhdGluZyBwZXJz
-cGVjdGl2ZToKPiAKPiBJbiB0eXBpY2FsIGRhdGFjZW50ZXJzIHdlJ3ZlIGdvdCB2YXJpb3VzIG1v
-bml0b3JpbmcgdG9vbHMgdGhhdCBhcmUgYWJsZQo+IHRvIGNhdGNoIHVwIGxvdHMgb2YgZGF0YSBm
-cm9tIGRpZmZlcmVudCBzb3VyY2VzIChlc3BlY2lhbGx5IGZpbGVzKS4gSWYKPiBhbiBvcGVyYXRv
-ciBlLmcuIGlzIGludGVyZXN0ZWQgaW4gc29tZXRoaW5nIGluIGhhcHBlbmluZyBpbiBzb21lIGZp
-bGUKPiAoZS5nLiBpbiAvcHJvYyBvZiAvc3lzKSwgaXQncyBxdWl0ZSB0cml2aWFsIC0ganVzdCBj
-b25maWd1cmUgeWV0IGFub3RoZXIKPiBwcm9iZSAobWF5YmUgc29tZSByZWdleCBmb3IgcGFyc2lu
-ZykgYW5kIGRvbmUuIEF1dG9tYXRpY2FsbHkgZmVkIGluIGhpcwo+ICRtb25pdG9yaW5nX3NvbHV0
-aW9uIChlLmcuIG5hZ2lvcywgRUxLLCBTcGx1bmssIHdoYXRzbm90KQoKLi4uIGJ1dCBpbiBwcmFj
-dGljZSB3aGF0IHlvdSBkbyBpcyB5b3UgaGF2ZSBwcmVidWlsdCBleHBvcnRlcnMgdGhhdCAKdGFs
-a3MgdG8gJG1vbml0b3Jpbmdfc29sdXRpb24uICBNb25pdG9yaW5nIGluZGl2aWR1YWwgZmlsZXMg
-aXMgdGhlIApleGNlcHRpb24sIG5vdCB0aGUgcnVsZS4gIEJ1dCBpbmRlZWQgTGlidmlydCBhbHJl
-YWR5IGhhcyBJL08gYW5kIG5ldHdvcmsgCnN0YXRpc3RpY3MgYW5kIHRoZXJlIGlzIGFuIGV4cG9y
-dGVyIGZvciBQcm9tZXRoZXVzLCBzbyB3ZSBzaG91bGQgYWRkIApzdXBwb3J0IGZvciB0aGlzIG5l
-dyBtZXRob2QgYXMgd2VsbCB0byBib3RoIFFFTVUgKGV4cG9ydGluZyB0aGUgZmlsZSAKZGVzY3Jp
-cHRvcikgYW5kIExpYnZpcnQuCgpJIGhvcGUgdGhpcyBoZWxwcyBjbGFyaWZ5aW5nIHlvdXIgZG91
-YnRzIQoKUGFvbG8KCj4gV2l0aCB5b3VyIGFwcHJvYWNoLCBpdCdzIG5vdCB0aGF0IHNpbXBsZTog
-bm93IHRoZSBvcGVyYXRvciBuZWVkcyB0bwo+IGNyZWF0ZSAoYW5kIGRlcGxveSBhbmQgbWFuYWdl
-KSBhIHNlcGFyYXRlIGFnZW50IHRoYXQgc29tZWhvdyByZWNlaXZlcwo+IHRoYXQgZmQgZnJvbSB0
-aGUgVk1NLCByZWFkcyBhbmQgcGFyc2VzIHRoYXQgc3BlY2lmaWMgYmluYXJ5IHN0cmVhbQo+IGFu
-ZCBmaW5hbGx5IHB1c2hlcyBpdCBpbnRvIHRoZSBtb25pdG9yaW5nIGluZnJhc3RydWN0dXJlLiBP
-ciB0aGUgVk1NCj4gd3JpdGVzIGl0IGludG8gc29tZSBmaWxlLCB3aGVyZSBzb21lIG1vbml0b3Jp
-bmcgYWdlbnQgY2FuIHBpY2sgaXQgdXAuCj4gSW4gYW55IGNhc2UsIG5vdCBhY3R1YWxseSB0cml2
-aWFsIGZyb20gb3BzIHBlcnNwZWN0aXZlLgoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29s
-dW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8v
-a3ZtYXJtCg==
+Hi,
+
+Changes since v1 [0]:
+- Restrict protected VM features based on an allowed features rather than
+  rejected ones (Drew)
+- Add more background describing protected KVM to the cover letter (Alex)
+- Rebase on the latest kvmarm/next
+
+This patch series adds support for restricting CPU features for protected VMs
+in KVM (pKVM) [1].
+
+Various feature configurations are allowed in KVM/arm64. Supporting all
+these features in pKVM is difficult, as it either involves moving much of
+the handling code to EL2, which adds bloat and results in a less verifiable
+trusted code base. Or it involves leaving the code handling at EL1, which
+risks having an untrusted host kernel feeding wrong information to the EL2
+and to the protected guests.
+
+This series attempts to mitigate this by reducing the configuration space,
+providing a reduced amount of feature support at EL2 with the least amount of
+compromise of protected guests' capabilities.
+
+This is done by restricting CPU features exposed to protected guests through
+feature registers. These restrictions are enforced by trapping register
+accesses as well as instructions associated with these features, and injecting
+an undefined exception into the guest if it attempts to use a restricted
+feature.
+
+The features being restricted (only for protected VMs in protected mode) are
+the following:
+- Debug, Trace, and DoubleLock
+- Performance Monitoring (PMU)
+- Statistical Profiling (SPE)
+- Scalable Vector Extension (SVE)
+- Memory Partitioning and Monitoring (MPAM)
+- Activity Monitoring (AMU)
+- Memory Tagging (MTE)
+- Limited Ordering Regions (LOR)
+- AArch32 State
+- Generic Interrupt Controller (GIC) (depending on rVIC support)
+- Nested Virtualization (NV)
+- Reliability, Availability, and Serviceability (RAS) above V1
+- Implementation-defined Features
+
+Remaining features currently supported by KVM are allowed. If new hardware
+features become supported by KVM, they would need to be explicitly allowed
+for protected VMs.
+
+This series is based on kvmarm/next and Will's patches for an Initial pKVM user
+ABI [2]. You can find the applied series here [3].
+
+Cheers,
+/fuad
+
+[0] https://lore.kernel.org/kvmarm/20210608141141.997398-1-tabba@google.com/
+
+[1] Once complete, protected KVM adds the ability to create protected VMs.
+These protected VMs are protected from the host Linux kernel (and from other
+VMs), where the host does not have access to guest memory,even if compromised.
+Normal (nVHE) guests can still be created and run in parallel with protected
+VMs. Their functionality should not be affected.
+
+For protected VMs, the host should not even have access to a protected guest's
+state or anything that would enable it to manipulate it (e.g., vcpu register
+context and el2 system registers); only hyp would have that access. If the host
+could access that state, then it might be able to get around the protection
+provided.  Therefore, anything that is sensitive and that would require such
+access needs to happen at hyp, hence the code in nvhe running only at hyp.
+
+For more details about pKVM, please refer to Will's talk at KVM Forum 2020:
+https://mirrors.edge.kernel.org/pub/linux/kernel/people/will/slides/kvmforum-2020-edited.pdf
+https://www.youtube.com/watch?v=edqJSzsDRxk
+
+[2] https://lore.kernel.org/kvmarm/20210603183347.1695-1-will@kernel.org/
+
+[3] https://android-kvm.googlesource.com/linux/+/refs/heads/tabba/el2_fixed_feature_v2
+
+Fuad Tabba (13):
+  KVM: arm64: Remove trailing whitespace in comments
+  KVM: arm64: MDCR_EL2 is a 64-bit register
+  KVM: arm64: Fix names of config register fields
+  KVM: arm64: Refactor sys_regs.h,c for nVHE reuse
+  KVM: arm64: Restore mdcr_el2 from vcpu
+  KVM: arm64: Add feature register flag definitions
+  KVM: arm64: Add config register bit definitions
+  KVM: arm64: Guest exit handlers for nVHE hyp
+  KVM: arm64: Add trap handlers for protected VMs
+  KVM: arm64: Move sanitized copies of CPU features
+  KVM: arm64: Trap access to pVM restricted features
+  KVM: arm64: Handle protected guests at 32 bits
+  KVM: arm64: Check vcpu features at pVM creation
+
+ arch/arm64/include/asm/kvm_arm.h        |  53 ++-
+ arch/arm64/include/asm/kvm_asm.h        |   2 +-
+ arch/arm64/include/asm/kvm_host.h       |   2 +-
+ arch/arm64/include/asm/kvm_hyp.h        |   3 +
+ arch/arm64/include/asm/sysreg.h         |   9 +
+ arch/arm64/kvm/arm.c                    |   3 +
+ arch/arm64/kvm/debug.c                  |   5 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  42 +++
+ arch/arm64/kvm/hyp/nvhe/Makefile        |   2 +-
+ arch/arm64/kvm/hyp/nvhe/debug-sr.c      |   2 +-
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c   |   6 -
+ arch/arm64/kvm/hyp/nvhe/switch.c        | 125 ++++++-
+ arch/arm64/kvm/hyp/nvhe/sys_regs.c      | 477 ++++++++++++++++++++++++
+ arch/arm64/kvm/hyp/vhe/debug-sr.c       |   2 +-
+ arch/arm64/kvm/pkvm.c                   |  43 +++
+ arch/arm64/kvm/sys_regs.c               |  34 +-
+ arch/arm64/kvm/sys_regs.h               |  35 ++
+ 17 files changed, 784 insertions(+), 61 deletions(-)
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/sys_regs.c
+
+
+base-commit: bc63d9369b320fd3c85ee13a029af9dc0ddac0ea
+-- 
+2.32.0.272.g935e593368-goog
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
