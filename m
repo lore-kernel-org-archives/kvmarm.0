@@ -2,64 +2,65 @@ Return-Path: <SRS0=xhzu=LJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC5A3C48BDF
-	for <kvmarm@archiver.kernel.org>; Tue, 15 Jun 2021 09:48:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAA9EC48BE5
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Jun 2021 09:51:33 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5CBD36143E
-	for <kvmarm@archiver.kernel.org>; Tue, 15 Jun 2021 09:48:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CBD36143E
+	by mail.kernel.org (Postfix) with ESMTP id 1CCCA60FF1
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Jun 2021 09:51:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CCCA60FF1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F10374A418;
-	Tue, 15 Jun 2021 05:48:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AED644A551;
+	Tue, 15 Jun 2021 05:51:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 1pOWBMTV4BzN; Tue, 15 Jun 2021 05:48:39 -0400 (EDT)
+	with ESMTP id rE8k+s00GHMQ; Tue, 15 Jun 2021 05:51:30 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BC1744B0B1;
-	Tue, 15 Jun 2021 05:48:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 488CD4B0A3;
+	Tue, 15 Jun 2021 05:51:30 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BA10C4A418
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 05:48:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9669A4A551
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 05:51:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3ZMgy1jKt9av for <kvmarm@lists.cs.columbia.edu>;
- Tue, 15 Jun 2021 05:48:34 -0400 (EDT)
+ with ESMTP id 3uMAsIciJShQ for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 15 Jun 2021 05:51:26 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9A9174A3A3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 05:48:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0D0594A418
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 05:51:26 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 0A8906143E;
- Tue, 15 Jun 2021 09:48:32 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 16B3D6143E;
+ Tue, 15 Jun 2021 09:51:25 +0000 (UTC)
 Received: from [185.219.108.64] (helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1lt5gL-007eHZ-0u; Tue, 15 Jun 2021 10:48:29 +0100
-Date: Tue, 15 Jun 2021 10:48:28 +0100
-Message-ID: <87o8c7ihlf.wl-maz@kernel.org>
+ id 1lt5j9-007eKe-0g; Tue, 15 Jun 2021 10:51:23 +0100
+Date: Tue, 15 Jun 2021 10:51:22 +0100
+Message-ID: <87mtrrihgl.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Yanan Wang <wangyanan55@huawei.com>
-Subject: Re: [PATCH] KVM: arm64: Trival coding style fixes for all
- vgic-related files
-In-Reply-To: <20210615035019.35808-1-wangyanan55@huawei.com>
-References: <20210615035019.35808-1-wangyanan55@huawei.com>
+Subject: Re: [PATCH] KVM: arm64: Fix inconsistency from function comment of
+ __unmap_stage2_range
+In-Reply-To: <20210615090436.13916-1-wangyanan55@huawei.com>
+References: <20210615090436.13916-1-wangyanan55@huawei.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: wangyanan55@huawei.com, james.morse@arm.com,
- alexandru.elisei@arm.com, eric.auger@redhat.com, catalin.marinas@arm.com,
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com,
  will@kernel.org, linux-arm-kernel@lists.infradead.org,
  kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
  yuzenghui@huawei.com, wanghaibin.wang@huawei.com
@@ -85,25 +86,95 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 15 Jun 2021 04:50:19 +0100,
+On Tue, 15 Jun 2021 10:04:36 +0100,
 Yanan Wang <wangyanan55@huawei.com> wrote:
 > 
-> These fixes introduce no functional change but just adjustment about
-> coding style issues for ARM64 vgic code. They mainly include identation
-> fix of function parameters/arguments, identation fix of structure
-> initialization, identation fix of comment, also the deletion of some
-> superfluous space lines.
+> Commit 'b5331379bc626'
+> (KVM: arm64: Only reschedule if MMU_NOTIFIER_RANGE_BLOCKABLE is not set)
+> has converted the original function name 'unmap_stage2_range' to
+> '__unmap_stage2_range', but leaving the corresponding function comment
+> unadjusted. So fix it for code readability.
+> 
+> Incidentally, we also tewak some comment identation by using tabs instead
+> of spaces to be consistent with the other functions.
+> 
+> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
 
-Please don't. This sort of patches bring little value, and make the
-backporting of important fixes more difficult because of pointless
-context change.
+Same as the previous patch. The first hunk is OK, as it fixes an
+actual defect (wrong documentation), and adjusting the alignment is OK
+as your changing the context.
 
-Fixing these cosmetic details is fine when you are modifying the
-code. But as a standalone patch, this brings more pain than benefit.
+However, the last 3 are just noise. Please drop them.
 
 Thanks,
 
 	M.
+
+> ---
+>  arch/arm64/kvm/mmu.c | 18 +++++++++---------
+>  1 file changed, 9 insertions(+), 9 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 5742ba765ff9..80040af147a2 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -151,11 +151,11 @@ static void *kvm_host_va(phys_addr_t phys)
+>   * does.
+>   */
+>  /**
+> - * unmap_stage2_range -- Clear stage2 page table entries to unmap a range
+> - * @mmu:   The KVM stage-2 MMU pointer
+> - * @start: The intermediate physical base address of the range to unmap
+> - * @size:  The size of the area to unmap
+> - * @may_block: Whether or not we are permitted to block
+> + * __unmap_stage2_range -- Clear stage2 page table entries to unmap a range
+> + * @mmu:	The KVM stage-2 MMU pointer
+> + * @start:	The intermediate physical base address of the range to unmap
+> + * @size:	The size of the area to unmap
+> + * @may_block:	Whether or not we are permitted to block
+>   *
+>   * Clear a range of stage-2 mappings, lowering the various ref-counts.  Must
+>   * be called while holding mmu_lock (unless for freeing the stage2 pgd before
+> @@ -190,7 +190,7 @@ static void stage2_flush_memslot(struct kvm *kvm,
+>  
+>  /**
+>   * stage2_flush_vm - Invalidate cache for pages mapped in stage 2
+> - * @kvm: The struct kvm pointer
+> + * @kvm:	The struct kvm pointer
+>   *
+>   * Go through the stage 2 page tables and invalidate any cache lines
+>   * backing memory already mapped to the VM.
+> @@ -527,7 +527,7 @@ static void stage2_unmap_memslot(struct kvm *kvm,
+>  
+>  /**
+>   * stage2_unmap_vm - Unmap Stage-2 RAM mappings
+> - * @kvm: The struct kvm pointer
+> + * @kvm:	The struct kvm pointer
+>   *
+>   * Go through the memregions and unmap any regular RAM
+>   * backing memory already mapped to the VM.
+> @@ -578,7 +578,7 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
+>   * @guest_ipa:	The IPA at which to insert the mapping
+>   * @pa:		The physical address of the device
+>   * @size:	The size of the mapping
+> - * @writable:   Whether or not to create a writable mapping
+> + * @writable:	Whether or not to create a writable mapping
+>   */
+>  int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+>  			  phys_addr_t pa, unsigned long size, bool writable)
+> @@ -616,7 +616,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+>  
+>  /**
+>   * stage2_wp_range() - write protect stage2 memory region range
+> - * @mmu:        The KVM stage-2 MMU pointer
+> + * @mmu:	The KVM stage-2 MMU pointer
+>   * @addr:	Start address of range
+>   * @end:	End address of range
+>   */
+> -- 
+> 2.23.0
+> 
+> 
 
 -- 
 Without deviation from the norm, progress is not possible.
