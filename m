@@ -2,85 +2,61 @@ Return-Path: <SRS0=xhzu=LJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 280AEC49EA2
-	for <kvmarm@archiver.kernel.org>; Tue, 15 Jun 2021 13:40:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D0ABC48BDF
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Jun 2021 14:25:20 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E2C1461477
-	for <kvmarm@archiver.kernel.org>; Tue, 15 Jun 2021 13:40:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2C1461477
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 8708E6148E
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Jun 2021 14:25:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8708E6148E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8FF044B117;
-	Tue, 15 Jun 2021 09:40:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1399C4B0CD;
+	Tue, 15 Jun 2021 10:25:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id AQPNqGLSQbgJ; Tue, 15 Jun 2021 09:40:24 -0400 (EDT)
+	with ESMTP id L6Sdj7upzPGs; Tue, 15 Jun 2021 10:25:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E8B64B102;
-	Tue, 15 Jun 2021 09:40:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C18424B0DF;
+	Tue, 15 Jun 2021 10:25:17 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 991C14B0DF
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 09:40:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FACF4B0D2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 10:25:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id r20PitmAjkpm for <kvmarm@lists.cs.columbia.edu>;
- Tue, 15 Jun 2021 09:40:20 -0400 (EDT)
-Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com
- [209.85.222.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C03D74B0E5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 09:40:20 -0400 (EDT)
-Received: by mail-qk1-f201.google.com with SMTP id
- v134-20020a37618c0000b02902fa5329f2b4so7596161qkb.18
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 06:40:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=MzTuqOfSLXkQXPIBooH4fP63ZLmEi4w/w9F0qFeyLuI=;
- b=b7HMusMXDb/BxYrxekRaLBxg6+8Di6dNYMsHoZDx91Rw74oEQIqQpEq4tZYgXlM9Bq
- vBq9n+In91lMzAjJUtBV2Qu2CPHCKbd9illCEiWAlYwAgEaftP0NYm7BNePEToWqmCCn
- 7pVSLwwRKSPKsT64YEkG5/LzzS+jWXFoy+P6Inh6ochfcO7ZoZuX0kLF/J7TNi9BHi96
- 5VDUuCwqtxO3gINwdOreBNN5T2Yir3rmT17+JqIg3gxAsrmpqEyfo9AT2MUfC3dBApjL
- jYoPAG42lxBJXkEvBK8FjZwPr8Bf5LH/9q+VgPrdh0UubiS6CyOU9vemBBgXNldhL5zL
- mWgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=MzTuqOfSLXkQXPIBooH4fP63ZLmEi4w/w9F0qFeyLuI=;
- b=dJNs515yf7qflowUwwe1/yfkaR7PHMfLDAMT/yf4+exeg4RIGSRBbgSWCzk0J1Zzi7
- OUQxl/7IFNezUB0ophdQIjY7NA/DkkDzvwn624oCb4gzp7NtTSZ/aaXKzvKpm/yRwaS1
- aDhMyn3NWRFX49xnJxsBgWxy5m3maWzcmlThgQzgWp4taUfMw0DNgA3JvZ9T+tCoBOM3
- scjNW/aw2LqicHa2wCVs+sAGAn0PmIBSVJ0TwGcc1JpmYXN/v1R/2XKp6cFdzqOSWm5y
- OVMBjpMLh8tp4YEE2bscwvkGwf+W4GEpCKCtpyV/0dlWGxOgleYJOOageoMrkRhVrqdA
- gYWw==
-X-Gm-Message-State: AOAM533knKzQt0+E0r9bt/V9XqhaLwPtap9Hr3jtjmS9am1AXnpYVWi9
- GREg+1dgNp2/JB9RMnqZYTN8hpYSqyIMsze5HxtJtRWYVomqGVsg4OTwbTniGz24sl/YVb0rhLS
- 6oueaeRLTZcAzUX0w1+pJwbciztHlRmT6pXdXjxz8JZmhFIMB1JqZy3RKyrWSEl+Rbbs=
-X-Google-Smtp-Source: ABdhPJwvkJ1Cqi1cwhQ8+25SscFqILXhxSW+c+DE3yisa7Q5WIyh+leztx9V8c334RDLLSz46bw6zNHG1g==
-X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:482])
- (user=tabba job=sendgmr) by 2002:ad4:5309:: with SMTP id
- y9mr5312176qvr.31.1623764420268; 
- Tue, 15 Jun 2021 06:40:20 -0700 (PDT)
-Date: Tue, 15 Jun 2021 14:39:50 +0100
-In-Reply-To: <20210615133950.693489-1-tabba@google.com>
-Message-Id: <20210615133950.693489-14-tabba@google.com>
-Mime-Version: 1.0
-References: <20210615133950.693489-1-tabba@google.com>
-X-Mailer: git-send-email 2.32.0.272.g935e593368-goog
-Subject: [PATCH v2 13/13] KVM: arm64: Check vcpu features at pVM creation
-From: Fuad Tabba <tabba@google.com>
-To: kvmarm@lists.cs.columbia.edu
-Cc: kernel-team@android.com, kvm@vger.kernel.org, maz@kernel.org,
- pbonzini@redhat.com, will@kernel.org, linux-arm-kernel@lists.infradead.org
+ with ESMTP id eX03Sq-Ee1de for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 15 Jun 2021 10:25:15 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 111FD4B0CD
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jun 2021 10:25:15 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4E12212FC;
+ Tue, 15 Jun 2021 07:25:14 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CD51A3F719;
+ Tue, 15 Jun 2021 07:25:12 -0700 (PDT)
+Subject: Re: [PATCH v4 4/9] KVM: arm64: vgic: Let an interrupt controller
+ advertise lack of HW deactivation
+To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+References: <20210601104005.81332-1-maz@kernel.org>
+ <20210601104005.81332-5-maz@kernel.org>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <fa1fee85-04c6-d0a8-bd93-64d2ebc32e4a@arm.com>
+Date: Tue, 15 Jun 2021 15:26:02 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
+MIME-Version: 1.0
+In-Reply-To: <20210601104005.81332-5-maz@kernel.org>
+Content-Language: en-US
+Cc: Hector Martin <marcan@marcan.st>, kernel-team@android.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -97,75 +73,95 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Check that a protected VM enabled only supported features when
-created.
+Hi Marc,
 
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
- arch/arm64/kvm/pkvm.c | 43 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 43 insertions(+)
+On 6/1/21 11:40 AM, Marc Zyngier wrote:
+> The vGIC, as architected by ARM, allows a virtual interrupt to
+> trigger the deactivation of a physical interrupt. This allows
+> the following interrupt to be delivered without requiring an exit.
+>
+> However, some implementations have choosen not to implement this,
+> meaning that we will need some unsavoury workarounds to deal with this.
+>
+> On detecting such a case, taint the kernel and spit a nastygram.
+> We'll deal with this in later patches.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/vgic/vgic-init.c       | 10 ++++++++++
+>  include/kvm/arm_vgic.h                |  3 +++
+>  include/linux/irqchip/arm-vgic-info.h |  2 ++
+>  3 files changed, 15 insertions(+)
+>
+> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+> index 6752d084934d..340c51d87677 100644
+> --- a/arch/arm64/kvm/vgic/vgic-init.c
+> +++ b/arch/arm64/kvm/vgic/vgic-init.c
+> @@ -532,6 +532,16 @@ int kvm_vgic_hyp_init(void)
+>  		return -ENXIO;
+>  	}
+>  
+> +	/*
+> +	 * If we get one of these oddball non-GICs, taint the kernel,
+> +	 * as we have no idea of how they *really* behave.
+> +	 */
+> +	if (gic_kvm_info->no_hw_deactivation) {
+> +		kvm_info("Non-architectural vgic, tainting kernel\n");
+> +		add_taint(TAINT_CPU_OUT_OF_SPEC, LOCKDEP_STILL_OK);
 
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index cf624350fb27..15a92f3fdd44 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -88,10 +88,53 @@ static void pkvm_teardown_firmware_slot(struct kvm *kvm)
- 	kvm->arch.pkvm.firmware_slot = NULL;
- }
- 
-+/*
-+ * Check that only supported features are enabled for the protected VM's vcpus.
-+ *
-+ * Return 0 if all features enabled for all vcpus are supported, or -EINVAL if
-+ * one or more vcpus has one or more unsupported features.
-+ */
-+static int pkvm_check_features(struct kvm *kvm)
-+{
-+	int i;
-+	const struct kvm_vcpu *vcpu;
-+	DECLARE_BITMAP(allowed_features, KVM_VCPU_MAX_FEATURES);
-+
-+	bitmap_zero(allowed_features, KVM_VCPU_MAX_FEATURES);
-+
-+	/*
-+	 * Support for:
-+	 * - CPU starting in poweroff state
-+	 * - PSCI v0.2
-+	 * - Pointer authentication: address or generic
-+	 *
-+	 * No support for remaining features, i.e.,:
-+	 * - AArch32 state
-+	 * - Performance Monitoring
-+	 * - Scalable Vectors
-+	 */
-+	set_bit(KVM_ARM_VCPU_POWER_OFF, allowed_features);
-+	set_bit(KVM_ARM_VCPU_PSCI_0_2, allowed_features);
-+	set_bit(KVM_ARM_VCPU_PTRAUTH_ADDRESS, allowed_features);
-+	set_bit(KVM_ARM_VCPU_PTRAUTH_GENERIC, allowed_features);
-+
-+	kvm_for_each_vcpu(i, vcpu, kvm) {
-+		if (!bitmap_subset(vcpu->arch.features, allowed_features,
-+				   KVM_VCPU_MAX_FEATURES))
-+			return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
- static int pkvm_enable(struct kvm *kvm, u64 slotid)
- {
- 	int ret;
- 
-+	ret = pkvm_check_features(kvm);
-+	if (ret)
-+		return ret;
-+
- 	ret = pkvm_init_firmware_slot(kvm, slotid);
- 	if (ret)
- 		return ret;
--- 
-2.32.0.272.g935e593368-goog
+I'm trying to figure out what are the effects of tainting the kernel, besides
+those nasty messages. In Documentation/admin-guide/tainted-kernels.rst, I found
+this bit:
 
+[..] the information is mainly of interest once someone wants to investigate some
+problem, as its real cause might be the event that got the kernel tainted. That's
+why bug reports from tainted kernels will often be ignored by developers, hence
+try to reproduce problems with an untainted kernel.
+
+The lack of HW deactivation affects only KVM, I was wondering if we could taint
+the kernel the first time a VM created. If the above doc is to go by, someone who
+is running Linux on an M1, but not using KVM, might stand a better chance to get
+support when something goes wrong in that case.
+
+What do you think?
+
+Thanks,
+
+Alex
+
+> +		kvm_vgic_global_state.no_hw_deactivation = true;
+> +	}
+> +
+>  	switch (gic_kvm_info->type) {
+>  	case GIC_V2:
+>  		ret = vgic_v2_probe(gic_kvm_info);
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index ec621180ef09..e45b26e8d479 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -72,6 +72,9 @@ struct vgic_global {
+>  	bool			has_gicv4;
+>  	bool			has_gicv4_1;
+>  
+> +	/* Pseudo GICv3 from outer space */
+> +	bool			no_hw_deactivation;
+> +
+>  	/* GIC system register CPU interface */
+>  	struct static_key_false gicv3_cpuif;
+>  
+> diff --git a/include/linux/irqchip/arm-vgic-info.h b/include/linux/irqchip/arm-vgic-info.h
+> index 7c0d08ebb82c..a75b2c7de69d 100644
+> --- a/include/linux/irqchip/arm-vgic-info.h
+> +++ b/include/linux/irqchip/arm-vgic-info.h
+> @@ -32,6 +32,8 @@ struct gic_kvm_info {
+>  	bool		has_v4;
+>  	/* rvpeid support */
+>  	bool		has_v4_1;
+> +	/* Deactivation impared, subpar stuff */
+> +	bool		no_hw_deactivation;
+>  };
+>  
+>  #ifdef CONFIG_KVM
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
