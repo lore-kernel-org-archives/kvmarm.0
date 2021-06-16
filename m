@@ -6,55 +6,57 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9424C48BE5
-	for <kvmarm@archiver.kernel.org>; Wed, 16 Jun 2021 10:31:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88678C48BE5
+	for <kvmarm@archiver.kernel.org>; Wed, 16 Jun 2021 11:03:20 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 542556128B
-	for <kvmarm@archiver.kernel.org>; Wed, 16 Jun 2021 10:31:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 542556128B
+	by mail.kernel.org (Postfix) with ESMTP id 02043610A3
+	for <kvmarm@archiver.kernel.org>; Wed, 16 Jun 2021 11:03:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02043610A3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ECD9149FB7;
-	Wed, 16 Jun 2021 06:31:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7FE1B4A523;
+	Wed, 16 Jun 2021 07:03:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id sUNsgF7lCr5c; Wed, 16 Jun 2021 06:31:24 -0400 (EDT)
+	with ESMTP id TUD-WBYcT1So; Wed, 16 Jun 2021 07:03:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BC64B49DE7;
-	Wed, 16 Jun 2021 06:31:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A5854B091;
+	Wed, 16 Jun 2021 07:03:17 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BBB540874
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Jun 2021 06:31:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C0164A523
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Jun 2021 07:03:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LXIzgf1YmMxF for <kvmarm@lists.cs.columbia.edu>;
- Wed, 16 Jun 2021 06:31:22 -0400 (EDT)
+ with ESMTP id F6SyN37bncsd for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 16 Jun 2021 07:03:14 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E4CCE4029C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Jun 2021 06:31:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D59B34A4A3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Jun 2021 07:03:14 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 0194560FE6;
- Wed, 16 Jun 2021 10:31:21 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id E1F26610A3;
+ Wed, 16 Jun 2021 11:03:13 +0000 (UTC)
 Received: from [185.219.108.64] (helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1ltSpK-007v8x-Ur; Wed, 16 Jun 2021 11:31:19 +0100
-Date: Wed, 16 Jun 2021 11:31:18 +0100
-Message-ID: <87lf7am77t.wl-maz@kernel.org>
+ id 1ltTKA-007vgz-En; Wed, 16 Jun 2021 12:03:11 +0100
+Date: Wed, 16 Jun 2021 12:03:08 +0100
+Message-ID: <87k0mum5qr.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Aman Priyadarshi <apeureka@amazon.de>
 Subject: Re: KVM: arm64: pmu: Reset sample period on overflow handling
-In-Reply-To: <131663dbe335646ac952c55d6271022a42fa382f.camel@amazon.de>
+In-Reply-To: <094d40a0e7f5389ce5a13d96b96d4b7588c71d74.camel@amazon.de>
 References: <322843db2f986f418d4175ca9c10e0904aa81d7a.camel@amazon.de>
  <87lf7bhxcf.wl-maz@kernel.org>
  <131663dbe335646ac952c55d6271022a42fa382f.camel@amazon.de>
+ <87lf7am77t.wl-maz@kernel.org>
+ <094d40a0e7f5389ce5a13d96b96d4b7588c71d74.camel@amazon.de>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -65,8 +67,8 @@ X-SA-Exim-Rcpt-To: apeureka@amazon.de, kvmarm@lists.cs.columbia.edu,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: Alexander Graf <graf@amazon.com>, kvmarm@lists.cs.columbia.edu,
- Ali Saidi <alisaidi@amazon.com>
+Cc: Alexander Graf <graf@amazon.com>, kvmarm@lists.cs.columbia.edu, Ali
+ Saidi <alisaidi@amazon.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -83,72 +85,46 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Aman,
-
-On Wed, 16 Jun 2021 10:17:28 +0100,
+On Wed, 16 Jun 2021 11:52:42 +0100,
 Aman Priyadarshi <apeureka@amazon.de> wrote:
 > 
-> Hi Marc,
-> 
-> On Tue, 2021-06-15 at 18:05 +0100, Marc Zyngier wrote:
+> On Wed, 2021-06-16 at 11:31 +0100, Marc Zyngier wrote:
 > > 
-> > Can you reproduce the issue with vanilla guest kernels? It'd be
-> > interesting to understand what makes it work on the guest side. Can
-> > you please bisect it?
+> > Hi Aman,
+> > 
+> > On Wed, 16 Jun 2021 10:17:28 +0100,
+> > Aman Priyadarshi <apeureka@amazon.de> wrote:
+> > > 
+> > > Hi Marc,
+> > > 
+> > > On Tue, 2021-06-15 at 18:05 +0100, Marc Zyngier wrote:
+> > > > 
+> > > > Can you reproduce the issue with vanilla guest kernels? It'd be
+> > > > interesting to understand what makes it work on the guest side. Can
+> > > > you please bisect it?
+> > > > 
+> > > 
+> > > yes, I was able to narrow it down to the commit 0cbb058be904 ("arm64:
+> > > perf:
+> > > Disable PMU while processing counter overflows"), which fixes the
+> > > problem
+> > > on the guest side.
+> > 
+> > Which is 3cce50dfec4a5b0414c974190940f47dd32c6dee in mainline. This
+> > doesn't seem to have ever been backported before 4.18. So I don't know
+> > why your 4.15 kernel was correctly behaving, but it could be that the
+> > distro had randomly picked up the correct patch!
+> 
+> Yes. https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1836117
+
+Right. I guess that's their "value add".
+
+> > You may want to backport it to 4.14.y and let Greg know about that.
 > > 
 > 
-> yes, I was able to narrow it down to the commit 0cbb058be904 ("arm64: perf:
-> Disable PMU while processing counter overflows"), which fixes the problem
-> on the guest side.
+> Ack.
 
-Which is 3cce50dfec4a5b0414c974190940f47dd32c6dee in mainline. This
-doesn't seem to have ever been backported before 4.18. So I don't know
-why your 4.15 kernel was correctly behaving, but it could be that the
-distro had randomly picked up the correct patch!
-
-You may want to backport it to 4.14.y and let Greg know about that.
-
-> 
-> I _think_, I understand the problem now. Please correct me if I am wrong.
-> 
-> commit 30d97754b2d1 ("KVM: arm/arm64: Re-create event when setting counter
-> value") adds a new code path for perf event when counter value is set,
-> therefore kvm would generate more events than before. Without this change,
-> we have a lot less events, thus reducing the chances of guest messing
-> things up.
-
-Without this fix, we don't communicate the new guest sample period to
-the host's perf counter, and depending on what the guest wrote (and
-the previous value), it can go one way or the other.
-
-> On the other side, commit 8c3252c06516 ("KVM: arm64: pmu: Reset sample
-> period on overflow handling") resets the sample period to the max value,
-> thus reducing the number of overflow events to guest to an optimal value
-> (note, number of interrupts actually handled by guest would remain same in
-> either case). Less number of overflow interrupts to the guest, reduces the
-> chance of guest making up for any left over overflow event that it did not
-> see earlier.
-
-This fix is the natural complement of the previous one. We need to
-emulate the actual overflow, and prevent perf from doing its thing on
-the host (reloading from the previously provided value). So we reset
-the period to the value that perf did observe on taking the physical
-interrupt.
-
-Together, these two patches provide a more correct PMU emulation.
-
-The guest patch fixes prevents additional overflow being observed due
-while the guest is reprogramming its counters and observe a moving
-target. Note that the host itself needs that initial fix to correctly
-emulate the PMU! ;-)
-
-It is pretty hard to picture exactly *what* happens when you are
-missing any of these 3 patches. Both the kernel and KVM were buggy at
-some point, and you need all three patches to ensure something
-correct.
-
-Anyway, thanks for having bisected it, and worked out that this was a
-guest issue!
+Thanks,
 
 	M.
 
