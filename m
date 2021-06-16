@@ -2,69 +2,122 @@ Return-Path: <SRS0=ypkC=LK=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7BFDC49EA2
-	for <kvmarm@archiver.kernel.org>; Wed, 16 Jun 2021 15:57:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB918C48BE6
+	for <kvmarm@archiver.kernel.org>; Wed, 16 Jun 2021 16:59:26 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7DFEC61166
-	for <kvmarm@archiver.kernel.org>; Wed, 16 Jun 2021 15:57:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DFEC61166
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 6B037613B9
+	for <kvmarm@archiver.kernel.org>; Wed, 16 Jun 2021 16:59:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B037613B9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B13A4A3A3;
-	Wed, 16 Jun 2021 11:57:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DBAAF4B08E;
+	Wed, 16 Jun 2021 12:59:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Gb02FQV2h9ZV; Wed, 16 Jun 2021 11:57:54 -0400 (EDT)
+	with ESMTP id tDoOzJJikozf; Wed, 16 Jun 2021 12:59:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 89AF940808;
-	Wed, 16 Jun 2021 11:57:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 878B949F82;
+	Wed, 16 Jun 2021 12:59:24 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FE124B085
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Jun 2021 11:57:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 040A34048A
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Jun 2021 12:59:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3-Z8qartli-g for <kvmarm@lists.cs.columbia.edu>;
- Wed, 16 Jun 2021 11:57:51 -0400 (EDT)
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com
- [185.176.79.56])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C517D407ED
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Jun 2021 11:57:51 -0400 (EDT)
-Received: from fraeml744-chm.china.huawei.com (unknown [172.18.147.226])
- by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4G4qMs2RRFz6K6RH;
- Wed, 16 Jun 2021 23:48:09 +0800 (CST)
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- fraeml744-chm.china.huawei.com (10.206.15.225) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Wed, 16 Jun 2021 17:57:50 +0200
-Received: from A2006125610.china.huawei.com (10.47.83.191) by
- lhreml710-chm.china.huawei.com (10.201.108.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Wed, 16 Jun 2021 16:57:43 +0100
-From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-To: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.cs.columbia.edu>,
- <linux-kernel@vger.kernel.org>
-Subject: [PATCH v2 3/3] kvm/arm: Align the VMID allocation with the arm64 ASID
- one
-Date: Wed, 16 Jun 2021 16:56:06 +0100
-Message-ID: <20210616155606.2806-4-shameerali.kolothum.thodi@huawei.com>
-X-Mailer: git-send-email 2.12.0.windows.1
-In-Reply-To: <20210616155606.2806-1-shameerali.kolothum.thodi@huawei.com>
-References: <20210616155606.2806-1-shameerali.kolothum.thodi@huawei.com>
+ with ESMTP id 5Ne9NOmP+87C for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 16 Jun 2021 12:59:21 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D4B03402DB
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Jun 2021 12:59:21 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1623862761;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=CSaKm7Um2oPV0vgrRNxfNZveJ3Fyoig0t9ydKjDoicw=;
+ b=VEa9EgL8Gvq/Q+pi59nGrDPLgwKlEYCN8XH92OH1lcsvcJ/8JmDHGa8d2hr2yn74df7JDH
+ Wx5qsrfa7kgZKGRT7dTJCZ4sQCbrU7xFzV0qPasHeMW7ZJMMWiLIEoLOMrpQ4DuHoO21rJ
+ PlRwSgCtC8RbTHT2tsQLXeQk4GfVpuE=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-286-FYx8KM0qPXaZmGzD1lY-gQ-1; Wed, 16 Jun 2021 12:59:20 -0400
+X-MC-Unique: FYx8KM0qPXaZmGzD1lY-gQ-1
+Received: by mail-ed1-f69.google.com with SMTP id
+ dd28-20020a056402313cb029038fc9850034so29098edb.7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Jun 2021 09:59:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=CSaKm7Um2oPV0vgrRNxfNZveJ3Fyoig0t9ydKjDoicw=;
+ b=UNmNifoOr95sENqvE5ycPiBKF7fa1RY5As6h6PxPuTeipacPQQEYex57qBQ3bdZn3O
+ 76c0eLJ3aItv2V8ebV3gqdRXPNzotgAylBmKbvZkuhz9421OmhHxsdSXF9cBKboJ0JLX
+ 9xqoC3QJHYNQWmVZTtahMV4sWK0KNESPVaXak7wmdZV9LYo0uoDNYVZ5NByx4c/Vtpyv
+ zo3vLm9UrV8Raj+bik/GhGyYjF2++qKV02KJCtKzdBvxdHJWa2HY+L3K1KnlDhSKTm0Q
+ RQ2psln50oek53brKEQD/n2KvNHz44+i/sVGi9cXo4RCM83UYa5N2m8fkcWBcV1Q7wuP
+ FqjQ==
+X-Gm-Message-State: AOAM531V5i+kwWfWTovxM27VsilTpJiu84tvpgxg0eo+lppJX+kKdOWG
+ Z3Ftrl1FogHbecJfj1nu/klc9mhhp1qbl14BVL0Mny2ht/T0ehQQWpBtIrDTnIdEnMv/Qdjg9/u
+ 8RuibcQlgf3pV7f0bLiu+CYT+
+X-Received: by 2002:a17:906:5053:: with SMTP id
+ e19mr483655ejk.251.1623862759116; 
+ Wed, 16 Jun 2021 09:59:19 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw6Emn8wPqyvgKohGYGtUKYf4y4jrRKJJ2HFHwhTepqW0F8ugL/e9E7NezRGCz6vjrObsyEOg==
+X-Received: by 2002:a17:906:5053:: with SMTP id
+ e19mr483616ejk.251.1623862758801; 
+ Wed, 16 Jun 2021 09:59:18 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
+ ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+ by smtp.gmail.com with ESMTPSA id a3sm2208828edu.61.2021.06.16.09.59.16
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 16 Jun 2021 09:59:17 -0700 (PDT)
+To: Greg KH <gregkh@linuxfoundation.org>, Jing Zhang <jingzhangos@google.com>
+References: <20210614212155.1670777-1-jingzhangos@google.com>
+ <20210614212155.1670777-4-jingzhangos@google.com>
+ <YMoW7SBqO9EPgCXw@kroah.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v9 3/5] KVM: stats: Add documentation for statistics data
+ binary interface
+Message-ID: <9b9a951d-d020-5599-5c4f-e154b40522b9@redhat.com>
+Date: Wed, 16 Jun 2021 18:59:15 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-X-Originating-IP: [10.47.83.191]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- lhreml710-chm.china.huawei.com (10.201.108.61)
-X-CFilter-Loop: Reflected
-Cc: jean-philippe@linaro.org, maz@kernel.org, linuxarm@huawei.com,
- catalin.marinas@arm.com, will@kernel.org
+In-Reply-To: <YMoW7SBqO9EPgCXw@kroah.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Cc: KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
+ Paul Mackerras <paulus@ozlabs.org>,
+ Linuxkselftest <linux-kselftest@vger.kernel.org>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, Will Deacon <will@kernel.org>,
+ KVMARM <kvmarm@lists.cs.columbia.edu>,
+ Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+ LinuxS390 <linux-s390@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
+ Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ David Rientjes <rientjes@google.com>, KVMPPC <kvm-ppc@vger.kernel.org>,
+ Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+ David Matlack <dmatlack@google.com>, Jim Mattson <jmattson@google.com>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ Sean Christopherson <seanjc@google.com>, Cornelia Huck <cohuck@redhat.com>,
+ Peter Shier <pshier@google.com>, LinuxMIPS <linux-mips@vger.kernel.org>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -76,423 +129,143 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Julien Grall <julien.grall@arm.com>
+On 16/06/21 17:21, Greg KH wrote:
+> I forgot to comment on this one, sorry for the delay.
+> 
+> Why are you "inventing" your own schema format here for this?  Why not
+> use a well-known or at least well-designed/implemented one that we have
+> in userspace already?
+> 
+> There are a few that I would love to see in the kernel, varlink being
+> the best example.  We have kernel examples of this and I would consider
+> using that as a transport for sysfs-like data in the future, but never
+> got around to it.
 
-At the moment, the VMID algorithm will send an SGI to all the CPUs to
-force an exit and then broadcast a full TLB flush and I-Cache
-invalidation.
+Thanks, that's a good observation, and it's a problem that the rationale 
+and the design process didn't end up in either the documentation or the 
+commit message (only the outcome did).  In order to fix that, this is 
+going to be quite a long message.
 
-This patch use the new VMID allocator. The
-benefits are:
-    - CPUs are not forced to exit at roll-over. Instead the VMID will be
-    marked reserved and the context will be flushed at next exit. This
-    will reduce the IPIs traffic.
-    - Context invalidation is now per-CPU rather than broadcasted.
-    - Catalin has a formal model of the ASID allocator.
+Varlink comprises both a schema and an encoding, and each has its own 
+problems.  For the encoding of the data, varlink is really just using 
+JSON and it is really just the wrong tool here.  The first few problems 
+that come to mind are:
 
-With the new algo, the code is now adapted:
-    - The function __kvm_flush_vm_context() has been renamed to
-    __kvm_tlb_flush_local_all() and now only flushing the current CPU
-    context.
-    - The call to update_vmid() will be done with preemption disabled
-    as the new algo requires to store information per-CPU.
-    - The TLBs associated to EL1 will be flushed when booting a CPU to
-    deal with stale information. This was previously done on the
-    allocation of the first VMID of a new generation.
+- varlink structs are encoded as JSON dictionaries.  Therefore, every 
+time userspace reads the fields, the kernel has to include the field 
+names as JSON dictionary keys.  This means that a lot of time is spent 
+writing buffers, and on the receiving side parsing them.
 
-Signed-off-by: Julien Grall <julien.grall@arm.com>
-Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
----
- arch/arm64/include/asm/kvm_asm.h      |   4 +-
- arch/arm64/include/asm/kvm_host.h     |   6 +-
- arch/arm64/include/asm/kvm_mmu.h      |   3 +-
- arch/arm64/kvm/Makefile               |   2 +-
- arch/arm64/kvm/arm.c                  | 115 +++++++-------------------
- arch/arm64/kvm/hyp/nvhe/hyp-main.c    |   6 +-
- arch/arm64/kvm/hyp/nvhe/mem_protect.c |   3 +-
- arch/arm64/kvm/hyp/nvhe/tlb.c         |  10 +--
- arch/arm64/kvm/hyp/vhe/tlb.c          |  10 +--
- arch/arm64/kvm/mmu.c                  |   1 -
- 10 files changed, 52 insertions(+), 108 deletions(-)
+- because numeric data has to be converted to ASCII the output doesn't 
+have fixed offsets, so it is not possible to make an efficient 
+implementation of pread.
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 5e9b33cbac51..15fc0e555943 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -44,7 +44,7 @@
- 
- #define __KVM_HOST_SMCCC_FUNC___kvm_hyp_init			0
- #define __KVM_HOST_SMCCC_FUNC___kvm_vcpu_run			1
--#define __KVM_HOST_SMCCC_FUNC___kvm_flush_vm_context		2
-+#define __KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_local_all		2
- #define __KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa		3
- #define __KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid		4
- #define __KVM_HOST_SMCCC_FUNC___kvm_flush_cpu_context		5
-@@ -192,7 +192,7 @@ DECLARE_KVM_NVHE_SYM(__per_cpu_end);
- DECLARE_KVM_HYP_SYM(__bp_harden_hyp_vecs);
- #define __bp_harden_hyp_vecs	CHOOSE_HYP_SYM(__bp_harden_hyp_vecs)
- 
--extern void __kvm_flush_vm_context(void);
-+extern void __kvm_tlb_flush_local_all(void);
- extern void __kvm_flush_cpu_context(struct kvm_s2_mmu *mmu);
- extern void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa,
- 				     int level);
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 75a7e8071012..d96284da8571 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -70,9 +70,7 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
- void kvm_arm_vcpu_destroy(struct kvm_vcpu *vcpu);
- 
- struct kvm_vmid {
--	/* The VMID generation used for the virt. memory system */
--	u64    vmid_gen;
--	u32    vmid;
-+	atomic64_t id;
- };
- 
- struct kvm_s2_mmu {
-@@ -642,8 +640,6 @@ void kvm_arm_resume_guest(struct kvm *kvm);
- #define kvm_call_hyp_nvhe(f, ...) f(__VA_ARGS__)
- #endif /* __KVM_NVHE_HYPERVISOR__ */
- 
--void force_vm_exit(const cpumask_t *mask);
--
- int handle_exit(struct kvm_vcpu *vcpu, int exception_index);
- void handle_exit_early(struct kvm_vcpu *vcpu, int exception_index);
- 
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 2abdea7dcb43..00b22f50df15 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -262,7 +262,8 @@ static __always_inline u64 kvm_get_vttbr(struct kvm_s2_mmu *mmu)
- 	u64 cnp = system_supports_cnp() ? VTTBR_CNP_BIT : 0;
- 
- 	baddr = mmu->pgd_phys;
--	vmid_field = (u64)vmid->vmid << VTTBR_VMID_SHIFT;
-+	vmid_field = atomic64_read(&vmid->id) << VTTBR_VMID_SHIFT;
-+	vmid_field &= VTTBR_VMID_MASK(kvm_get_vmid_bits());
- 	return kvm_phys_to_vttbr(baddr) | vmid_field | cnp;
- }
- 
-diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-index 589921392cb1..717c4cbf557a 100644
---- a/arch/arm64/kvm/Makefile
-+++ b/arch/arm64/kvm/Makefile
-@@ -16,7 +16,7 @@ kvm-y := $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o \
- 	 inject_fault.o va_layout.o handle_exit.o \
- 	 guest.o debug.o reset.o sys_regs.o \
- 	 vgic-sys-reg-v3.o fpsimd.o pmu.o \
--	 arch_timer.o trng.o\
-+	 arch_timer.o trng.o vmid.o \
- 	 vgic/vgic.o vgic/vgic-init.o \
- 	 vgic/vgic-irqfd.o vgic/vgic-v2.o \
- 	 vgic/vgic-v3.o vgic/vgic-v4.o \
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index e720148232a0..bd258956f3c3 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -55,11 +55,6 @@ static DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_page);
- unsigned long kvm_arm_hyp_percpu_base[NR_CPUS];
- DECLARE_KVM_NVHE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
- 
--/* The VMID used in the VTTBR */
--static atomic64_t kvm_vmid_gen = ATOMIC64_INIT(1);
--static u32 kvm_next_vmid;
--static DEFINE_SPINLOCK(kvm_vmid_lock);
--
- static bool vgic_present;
- 
- static DEFINE_PER_CPU(unsigned char, kvm_arm_hardware_enabled);
-@@ -491,85 +486,13 @@ bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
- 	return vcpu_mode_priv(vcpu);
- }
- 
--/* Just ensure a guest exit from a particular CPU */
--static void exit_vm_noop(void *info)
--{
--}
--
--void force_vm_exit(const cpumask_t *mask)
--{
--	preempt_disable();
--	smp_call_function_many(mask, exit_vm_noop, NULL, true);
--	preempt_enable();
--}
--
--/**
-- * need_new_vmid_gen - check that the VMID is still valid
-- * @vmid: The VMID to check
-- *
-- * return true if there is a new generation of VMIDs being used
-- *
-- * The hardware supports a limited set of values with the value zero reserved
-- * for the host, so we check if an assigned value belongs to a previous
-- * generation, which requires us to assign a new value. If we're the first to
-- * use a VMID for the new generation, we must flush necessary caches and TLBs
-- * on all CPUs.
-- */
--static bool need_new_vmid_gen(struct kvm_vmid *vmid)
--{
--	u64 current_vmid_gen = atomic64_read(&kvm_vmid_gen);
--	smp_rmb(); /* Orders read of kvm_vmid_gen and kvm->arch.vmid */
--	return unlikely(READ_ONCE(vmid->vmid_gen) != current_vmid_gen);
--}
--
- /**
-  * update_vmid - Update the vmid with a valid VMID for the current generation
-  * @vmid: The stage-2 VMID information struct
-  */
- static void update_vmid(struct kvm_vmid *vmid)
- {
--	if (!need_new_vmid_gen(vmid))
--		return;
--
--	spin_lock(&kvm_vmid_lock);
--
--	/*
--	 * We need to re-check the vmid_gen here to ensure that if another vcpu
--	 * already allocated a valid vmid for this vm, then this vcpu should
--	 * use the same vmid.
--	 */
--	if (!need_new_vmid_gen(vmid)) {
--		spin_unlock(&kvm_vmid_lock);
--		return;
--	}
--
--	/* First user of a new VMID generation? */
--	if (unlikely(kvm_next_vmid == 0)) {
--		atomic64_inc(&kvm_vmid_gen);
--		kvm_next_vmid = 1;
--
--		/*
--		 * On SMP we know no other CPUs can use this CPU's or each
--		 * other's VMID after force_vm_exit returns since the
--		 * kvm_vmid_lock blocks them from reentry to the guest.
--		 */
--		force_vm_exit(cpu_all_mask);
--		/*
--		 * Now broadcast TLB + ICACHE invalidation over the inner
--		 * shareable domain to make sure all data structures are
--		 * clean.
--		 */
--		kvm_call_hyp(__kvm_flush_vm_context);
--	}
--
--	vmid->vmid = kvm_next_vmid;
--	kvm_next_vmid++;
--	kvm_next_vmid &= (1 << kvm_get_vmid_bits()) - 1;
--
--	smp_wmb();
--	WRITE_ONCE(vmid->vmid_gen, atomic64_read(&kvm_vmid_gen));
--
--	spin_unlock(&kvm_vmid_lock);
-+	kvm_arm_update_vmid(&vmid->id);
- }
- 
- static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
-@@ -737,8 +660,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 		 */
- 		cond_resched();
- 
--		update_vmid(&vcpu->arch.hw_mmu->vmid);
--
- 		check_vcpu_requests(vcpu);
- 
- 		/*
-@@ -748,6 +669,15 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 		 */
- 		preempt_disable();
- 
-+		/*
-+		 * The VMID allocator only tracks active VMIDs per
-+		 * physical CPU, and therefore the VMID allocated may not be
-+		 * preserved on VMID roll-over if the task was preempted,
-+		 * making a thread's VMID inactive. So we need to call
-+		 * update_vttbr in non-premptible context.
-+		 */
-+		update_vmid(&vcpu->arch.hw_mmu->vmid);
-+
- 		kvm_pmu_flush_hwstate(vcpu);
- 
- 		local_irq_disable();
-@@ -786,8 +716,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 		 */
- 		smp_store_mb(vcpu->mode, IN_GUEST_MODE);
- 
--		if (ret <= 0 || need_new_vmid_gen(&vcpu->arch.hw_mmu->vmid) ||
--		    kvm_request_pending(vcpu)) {
-+		if (ret <= 0 || kvm_request_pending(vcpu)) {
- 			vcpu->mode = OUTSIDE_GUEST_MODE;
- 			isb(); /* Ensure work in x_flush_hwstate is committed */
- 			kvm_pmu_sync_hwstate(vcpu);
-@@ -1490,6 +1419,8 @@ static void cpu_hyp_reset(void)
- {
- 	if (!is_kernel_in_hyp_mode())
- 		__hyp_reset_vectors();
-+
-+	kvm_call_hyp(__kvm_tlb_flush_local_all);
- }
- 
- /*
-@@ -1669,9 +1600,26 @@ static bool init_psci_relay(void)
- 
- static int init_common_resources(void)
- {
-+	int err;
-+
-+	/*
-+	 * Initialize the VMID allocator telling it to allocate a single
-+	 * VMID per VM.
-+	 */
-+	err = kvm_arm_vmid_alloc_init();
-+	if (err) {
-+		kvm_err("Failed to initialize VMID allocator.\n");
-+		return err;
-+	}
-+
- 	return kvm_set_ipa_limit();
- }
- 
-+static void free_common_resources(void)
-+{
-+	kvm_arm_vmid_alloc_free();
-+}
-+
- static int init_subsystems(void)
- {
- 	int err = 0;
-@@ -2079,7 +2027,7 @@ int kvm_arch_init(void *opaque)
- 
- 	err = kvm_arm_init_sve();
- 	if (err)
--		return err;
-+		goto out_err;
- 
- 	if (!in_hyp_mode) {
- 		err = init_hyp_mode();
-@@ -2120,6 +2068,7 @@ int kvm_arch_init(void *opaque)
- 	if (!in_hyp_mode)
- 		teardown_hyp_mode();
- out_err:
-+	free_common_resources();
- 	return err;
- }
- 
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 1632f001f4ed..bd86d3d4d787 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -35,9 +35,9 @@ static void handle___kvm_adjust_pc(struct kvm_cpu_context *host_ctxt)
- 	__kvm_adjust_pc(kern_hyp_va(vcpu));
- }
- 
--static void handle___kvm_flush_vm_context(struct kvm_cpu_context *host_ctxt)
-+static void handle___kvm_tlb_flush_local_all(struct kvm_cpu_context *host_ctxt)
- {
--	__kvm_flush_vm_context();
-+	__kvm_tlb_flush_local_all();
- }
- 
- static void handle___kvm_tlb_flush_vmid_ipa(struct kvm_cpu_context *host_ctxt)
-@@ -178,7 +178,7 @@ typedef void (*hcall_t)(struct kvm_cpu_context *);
- static const hcall_t host_hcall[] = {
- 	HANDLE_FUNC(__kvm_vcpu_run),
- 	HANDLE_FUNC(__kvm_adjust_pc),
--	HANDLE_FUNC(__kvm_flush_vm_context),
-+	HANDLE_FUNC(__kvm_tlb_flush_local_all),
- 	HANDLE_FUNC(__kvm_tlb_flush_vmid_ipa),
- 	HANDLE_FUNC(__kvm_tlb_flush_vmid),
- 	HANDLE_FUNC(__kvm_flush_cpu_context),
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index 4b60c0056c04..a02c4877a055 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -106,8 +106,7 @@ int kvm_host_prepare_stage2(void *mem_pgt_pool, void *dev_pgt_pool)
- 	mmu->pgd_phys = __hyp_pa(host_kvm.pgt.pgd);
- 	mmu->arch = &host_kvm.arch;
- 	mmu->pgt = &host_kvm.pgt;
--	mmu->vmid.vmid_gen = 0;
--	mmu->vmid.vmid = 0;
-+	atomic64_set(&mmu->vmid.id, 0);
- 
- 	return 0;
- }
-diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
-index 83dc3b271bc5..42df9931ed9a 100644
---- a/arch/arm64/kvm/hyp/nvhe/tlb.c
-+++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
-@@ -140,10 +140,10 @@ void __kvm_flush_cpu_context(struct kvm_s2_mmu *mmu)
- 	__tlb_switch_to_host(&cxt);
- }
- 
--void __kvm_flush_vm_context(void)
-+void __kvm_tlb_flush_local_all(void)
- {
--	dsb(ishst);
--	__tlbi(alle1is);
-+	dsb(nshst);
-+	__tlbi(alle1);
- 
- 	/*
- 	 * VIPT and PIPT caches are not affected by VMID, so no maintenance
-@@ -155,7 +155,7 @@ void __kvm_flush_vm_context(void)
- 	 *
- 	 */
- 	if (icache_is_vpipt())
--		asm volatile("ic ialluis");
-+		asm volatile("ic iallu" : : );
- 
--	dsb(ish);
-+	dsb(nsh);
- }
-diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
-index 66f17349f0c3..89f229e77b7d 100644
---- a/arch/arm64/kvm/hyp/vhe/tlb.c
-+++ b/arch/arm64/kvm/hyp/vhe/tlb.c
-@@ -142,10 +142,10 @@ void __kvm_flush_cpu_context(struct kvm_s2_mmu *mmu)
- 	__tlb_switch_to_host(&cxt);
- }
- 
--void __kvm_flush_vm_context(void)
-+void __kvm_tlb_flush_local_all(void)
- {
--	dsb(ishst);
--	__tlbi(alle1is);
-+	dsb(nshst);
-+	__tlbi(alle1);
- 
- 	/*
- 	 * VIPT and PIPT caches are not affected by VMID, so no maintenance
-@@ -157,7 +157,7 @@ void __kvm_flush_vm_context(void)
- 	 *
- 	 */
- 	if (icache_is_vpipt())
--		asm volatile("ic ialluis");
-+		asm volatile("ic iallu" : : );
- 
--	dsb(ish);
-+	dsb(nsh);
- }
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index c10207fed2f3..5c73220356e0 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -473,7 +473,6 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
- 	mmu->arch = &kvm->arch;
- 	mmu->pgt = pgt;
- 	mmu->pgd_phys = __pa(pgt->pgd);
--	mmu->vmid.vmid_gen = 0;
- 	return 0;
- 
- out_destroy_pgtable:
--- 
-2.17.1
+- even though Varlink specifies that int is "usually int64", a 
+little-known gem is that JSON behavior for numbers not representable as 
+a double (i.e. exceeding 2^53) is implementation-defined; 
+implementations can and will mess up values outside that range.  This 
+problem is not specific to this KVM stats usecase; varlink's schema 
+specification really is at odds with its encoding specification.
+
+
+For the schema, there are some specific problems with varlink, but also 
+a more generic issue.  The specific problems are:
+
+- the schema doesn't include the length of arrays.  This makes it hard 
+to compute in advance lengths and offsets of fields (even ignoring the 
+fact that data is not binary, which I'll get to later)
+
+- the schema also is not extensible with user annotations.  In our case 
+that would be mostly the unit in which the value is expressed.
+
+The main problem with the various available serialization formats is 
+that their schema languages are designed to be compiled with a code 
+generator.  Here instead the schema is transmitted from the kernel to 
+userspace.  Userspace is not really supposed to know what a value means 
+or even that if it exists.  Userspace takes care of collecting the data 
+from the kernel, but ultimately there will be a human that knows what 
+e.g. "io_exits" or "req_event" means, and they will ask for the current 
+value, or a plot over time, of a specific statistic.
+
+Now, unlike most other schema languages, varlink does not require 
+precompiling the schema in its C bindings.  However, this was mostly 
+just the authors not bothering to write a C code generator---they did 
+write one for Rust, for example.  When using the "official" varlink C 
+bindings, you hardly use the schema at all.
+
+Something similar to the above issues is quite common in other formats. 
+  For example, FlatBuffers[2]'s schema language[1] does have annotations 
+(which it calls metadata), but then we would still have to invent some 
+standard annotations and teach programs about them.  However, the deal 
+breaker is that again there is no way to transmit the schema from the 
+server to the client, and that users are supposed to precompile the 
+schema using a code generator.
+
+
+All that said, what we _could_ do is serialize the schema as JSON 
+instead of using a binary format, like so:
+
+   [{
+     "name": "exits",
+     "kind": "cumulative",
+     "count": 1
+   }, {
+     "name": "halt_poll_fail_ns",
+     "kind": "cumulative",
+     "unit": "seconds",
+     "scale": {"base": "pow2", exponent: -9},
+     "count": 1
+   }, ...]
+
+while keeping the actual statistics as an array of u64 values just like 
+in these patches.  The JSON representation of the schema would be always 
+the same, so it could be treated as fixed-size and an efficient 
+implementation of pread would be possible.  And once the schema is JSON, 
+there could be a *meta*-schema expressed using the varlink language:
+
+   # compare to struct kvm_stats_desc, included after my sig
+   # for reference
+   type StatsDescriptor {
+     name: string,
+     kind: (cumulative, instant, peak),
+     unit: ?(bytes, seconds, cycles),
+     scale: ?(base: (pow2, pow10), exponent: int),
+     count: int
+   }
+
+   type StatsSchema {
+     name: string,
+     stats: []StatsDescriptor
+   }
+
+Varlink would *not* be used in the kernel, because Varlink isreally 
+just JSON.  The above ten lines (plus comments) would be dropped in 
+Documentation/ as a .varlink file; they would be a convenient way to 
+describe (to either a human or a program) how to parse the JSON schema.
+
+There would then be another problem, namely how to include the varlink 
+schema in the generated documentation, since right now there are for 
+example no sphinx bindings for varlink.  Nevertheless, if you think it's 
+better to have the schema as JSON instead of binary, according to the 
+above varlink meta-schema, then we can look into it.
+
+Thanks,
+
+Paolo
+
+>> +	struct kvm_stats_desc {
+>> +		__u32 flags;
+>> +		__s16 exponent;
+>> +		__u16 size;
+>> +		__u32 offset;
+>> +		__u32 unused;
+>> +		char name[0];
+>> +	};
 
 _______________________________________________
 kvmarm mailing list
