@@ -7,72 +7,71 @@ X-Spam-Status: No, score=-4.2 required=3.0 tests=BAYES_00,DKIM_ADSP_ALL,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88A67C48BE5
-	for <kvmarm@archiver.kernel.org>; Wed, 16 Jun 2021 12:08:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A078DC48BE6
+	for <kvmarm@archiver.kernel.org>; Wed, 16 Jun 2021 12:08:59 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0A08861351
-	for <kvmarm@archiver.kernel.org>; Wed, 16 Jun 2021 12:08:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A08861351
+	by mail.kernel.org (Postfix) with ESMTP id 37ADB61245
+	for <kvmarm@archiver.kernel.org>; Wed, 16 Jun 2021 12:08:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37ADB61245
 Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amazon.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 63EFA4B0B1;
-	Wed, 16 Jun 2021 08:08:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BF7194B0A5;
+	Wed, 16 Jun 2021 08:08:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@amazon.de
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Y8z1BB17EhNf; Wed, 16 Jun 2021 08:08:56 -0400 (EDT)
+	with ESMTP id 3bCb2AFCUpAa; Wed, 16 Jun 2021 08:08:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F9ED4B092;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DAC74B09E;
 	Wed, 16 Jun 2021 08:08:56 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C110A4A3A3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Jun 2021 05:17:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 571D04AEDC
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Jun 2021 06:53:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dhIitfIdgN6A for <kvmarm@lists.cs.columbia.edu>;
- Wed, 16 Jun 2021 05:17:44 -0400 (EDT)
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com
- [99.78.197.218])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BD40B40895
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Jun 2021 05:17:44 -0400 (EDT)
+ with ESMTP id 4ZMDFllld2fR for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 16 Jun 2021 06:53:29 -0400 (EDT)
+Received: from smtp-fw-4101.amazon.com (smtp-fw-4101.amazon.com [72.21.198.25])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0A4694A19E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Jun 2021 06:53:29 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
- t=1623835065; x=1655371065;
- h=message-id:subject:from:to:cc:date:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=r+ZKwNeW5+Ab+uKUwYJ3MzcAyLyTzZ/8NFhKVY+sNA8=;
- b=cjfmb/Id2WBuwFzhPsQ4RBjDhjZDlufaNUxB6tOEoc5mwZ4YwD4bhvoy
- T6V7XQ2vrLd7e0yVXUiZiscF23LJ7+8MahkNmLVx3S7NlBr51hbg5KylH
- yt49QbalUIRfl8mCjfL+8wzk0Vz1JiIQ6drB+AszeBwHO7N9Z12jCq5sI k=;
-X-IronPort-AV: E=Sophos;i="5.83,277,1616457600"; 
-   d="scan'208";a="6906837"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO
- email-inbound-relay-1e-42f764a0.us-east-1.amazon.com) ([10.25.36.210])
- by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP;
- 16 Jun 2021 09:17:36 +0000
-Received: from EX13D39EUC002.ant.amazon.com
- (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
- by email-inbound-relay-1e-42f764a0.us-east-1.amazon.com (Postfix) with ESMTPS
- id C78C6A0499; Wed, 16 Jun 2021 09:17:35 +0000 (UTC)
-Received: from freeip.amazon.com (10.43.161.201) by
- EX13D39EUC002.ant.amazon.com (10.43.164.187) with Microsoft SMTP Server (TLS)
- id 15.0.1497.18; Wed, 16 Jun 2021 09:17:32 +0000
-Message-ID: <131663dbe335646ac952c55d6271022a42fa382f.camel@amazon.de>
+ t=1623840809; x=1655376809;
+ h=message-id:from:to:cc:date:in-reply-to:references:
+ mime-version:content-transfer-encoding:subject;
+ bh=pbee6tL8WFnoKVsCEcKvLOf70eO8JG4bQmkXlAHMbnQ=;
+ b=iyLBuV7MVaxBzh53rqub2si0Ol7J4SM0Mn1IARXktJWZdAffW/DIVDGt
+ +Sdhe5ddV8xk/QBhOVMAHvma9Phsr9X7jtAGKx7EUR0zuZGepnKq3FZXL
+ lL/S3oS4F1WACPIJYnzoMSKGO28U+bC4nKGiKRQ3ZlnnoF+5EH1TTpPGU Q=;
+X-IronPort-AV: E=Sophos;i="5.83,277,1616457600"; d="scan'208";a="114625335"
 Subject: Re: KVM: arm64: pmu: Reset sample period on overflow handling
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO
+ email-inbound-relay-2c-579b7f5b.us-west-2.amazon.com) ([10.43.8.6])
+ by smtp-border-fw-4101.iad4.amazon.com with ESMTP; 16 Jun 2021 10:52:50 +0000
+Received: from EX13D39EUC002.ant.amazon.com
+ (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+ by email-inbound-relay-2c-579b7f5b.us-west-2.amazon.com (Postfix) with ESMTPS
+ id 040ABA28F6; Wed, 16 Jun 2021 10:52:49 +0000 (UTC)
+Received: from freeip.amazon.com (10.43.162.228) by
+ EX13D39EUC002.ant.amazon.com (10.43.164.187) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.18; Wed, 16 Jun 2021 10:52:46 +0000
+Message-ID: <094d40a0e7f5389ce5a13d96b96d4b7588c71d74.camel@amazon.de>
 From: Aman Priyadarshi <apeureka@amazon.de>
 To: Marc Zyngier <maz@kernel.org>
-Date: Wed, 16 Jun 2021 11:17:28 +0200
-In-Reply-To: <87lf7bhxcf.wl-maz@kernel.org>
+Date: Wed, 16 Jun 2021 12:52:42 +0200
+In-Reply-To: <87lf7am77t.wl-maz@kernel.org>
 References: <322843db2f986f418d4175ca9c10e0904aa81d7a.camel@amazon.de>
  <87lf7bhxcf.wl-maz@kernel.org>
+ <131663dbe335646ac952c55d6271022a42fa382f.camel@amazon.de>
+ <87lf7am77t.wl-maz@kernel.org>
 X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
 MIME-Version: 1.0
-X-Originating-IP: [10.43.161.201]
-X-ClientProxiedBy: EX13D27UWB003.ant.amazon.com (10.43.161.195) To
+X-Originating-IP: [10.43.162.228]
+X-ClientProxiedBy: EX13D22UWB004.ant.amazon.com (10.43.161.165) To
  EX13D39EUC002.ant.amazon.com (10.43.164.187)
 X-Mailman-Approved-At: Wed, 16 Jun 2021 08:08:55 -0400
 Cc: Alexander Graf <graf@amazon.com>, kvmarm@lists.cs.columbia.edu, Ali
@@ -93,38 +92,93 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
-
-On Tue, 2021-06-15 at 18:05 +0100, Marc Zyngier wrote:
+On Wed, 2021-06-16 at 11:31 +0100, Marc Zyngier wrote:
 > 
-> Can you reproduce the issue with vanilla guest kernels? It'd be
-> interesting to understand what makes it work on the guest side. Can
-> you please bisect it?
+> Hi Aman,
+> 
+> On Wed, 16 Jun 2021 10:17:28 +0100,
+> Aman Priyadarshi <apeureka@amazon.de> wrote:
+> > 
+> > Hi Marc,
+> > 
+> > On Tue, 2021-06-15 at 18:05 +0100, Marc Zyngier wrote:
+> > > 
+> > > Can you reproduce the issue with vanilla guest kernels? It'd be
+> > > interesting to understand what makes it work on the guest side. Can
+> > > you please bisect it?
+> > > 
+> > 
+> > yes, I was able to narrow it down to the commit 0cbb058be904 ("arm64:
+> > perf:
+> > Disable PMU while processing counter overflows"), which fixes the
+> > problem
+> > on the guest side.
+> 
+> Which is 3cce50dfec4a5b0414c974190940f47dd32c6dee in mainline. This
+> doesn't seem to have ever been backported before 4.18. So I don't know
+> why your 4.15 kernel was correctly behaving, but it could be that the
+> distro had randomly picked up the correct patch!
+
+Yes. https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1836117
+
+> 
+> You may want to backport it to 4.14.y and let Greg know about that.
 > 
 
-yes, I was able to narrow it down to the commit 0cbb058be904 ("arm64: perf:
-Disable PMU while processing counter overflows"), which fixes the problem
-on the guest side.
+Ack.
 
-I _think_, I understand the problem now. Please correct me if I am wrong.
+> > 
+> > I _think_, I understand the problem now. Please correct me if I am
+> > wrong.
+> > 
+> > commit 30d97754b2d1 ("KVM: arm/arm64: Re-create event when setting
+> > counter
+> > value") adds a new code path for perf event when counter value is set,
+> > therefore kvm would generate more events than before. Without this
+> > change,
+> > we have a lot less events, thus reducing the chances of guest messing
+> > things up.
+> 
+> Without this fix, we don't communicate the new guest sample period to
+> the host's perf counter, and depending on what the guest wrote (and
+> the previous value), it can go one way or the other.
+> 
+> > On the other side, commit 8c3252c06516 ("KVM: arm64: pmu: Reset sample
+> > period on overflow handling") resets the sample period to the max
+> > value,
+> > thus reducing the number of overflow events to guest to an optimal
+> > value
+> > (note, number of interrupts actually handled by guest would remain same
+> > in
+> > either case). Less number of overflow interrupts to the guest, reduces
+> > the
+> > chance of guest making up for any left over overflow event that it did
+> > not
+> > see earlier.
+> 
+> This fix is the natural complement of the previous one. We need to
+> emulate the actual overflow, and prevent perf from doing its thing on
+> the host (reloading from the previously provided value). So we reset
+> the period to the value that perf did observe on taking the physical
+> interrupt.
+> 
+> Together, these two patches provide a more correct PMU emulation.
+> 
+> The guest patch fixes prevents additional overflow being observed due
+> while the guest is reprogramming its counters and observe a moving
+> target. Note that the host itself needs that initial fix to correctly
+> emulate the PMU! ;-)
+> 
+> It is pretty hard to picture exactly *what* happens when you are
+> missing any of these 3 patches. Both the kernel and KVM were buggy at
+> some point, and you need all three patches to ensure something
+> correct.
+> 
 
-commit 30d97754b2d1 ("KVM: arm/arm64: Re-create event when setting counter
-value") adds a new code path for perf event when counter value is set,
-therefore kvm would generate more events than before. Without this change,
-we have a lot less events, thus reducing the chances of guest messing
-things up.
+Thanks for the explanation!
 
-On the other side, commit 8c3252c06516 ("KVM: arm64: pmu: Reset sample
-period on overflow handling") resets the sample period to the max value,
-thus reducing the number of overflow events to guest to an optimal value
-(note, number of interrupts actually handled by guest would remain same in
-either case). Less number of overflow interrupts to the guest, reduces the
-chance of guest making up for any left over overflow event that it did not
-see earlier.
-
-Thanks,
+Regards,
 Aman Priyadarshi
-
 
 
 
