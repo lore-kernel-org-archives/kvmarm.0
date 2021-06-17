@@ -3,57 +3,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8B8CC49EA2
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Jun 2021 08:00:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A489C2B9F4
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Jun 2021 08:03:19 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3FBE6613C1
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Jun 2021 08:00:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FBE6613C1
+	by mail.kernel.org (Postfix) with ESMTP id E97C261078
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Jun 2021 08:03:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E97C261078
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CF6B740825;
-	Thu, 17 Jun 2021 04:00:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7574B49F83;
+	Thu, 17 Jun 2021 04:03:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id h6WSqk-TOwaF; Thu, 17 Jun 2021 04:00:18 -0400 (EDT)
+	with ESMTP id ngIpL4vlLfZK; Thu, 17 Jun 2021 04:03:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F30BB4A4A3;
-	Thu, 17 Jun 2021 04:00:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DEB94A319;
+	Thu, 17 Jun 2021 04:03:13 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AEFCE40825
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 04:00:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EE8F49F83
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 04:03:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id w-a4RQrlVWwD for <kvmarm@lists.cs.columbia.edu>;
- Thu, 17 Jun 2021 04:00:12 -0400 (EDT)
+ with ESMTP id 9AC8k-mqGz92 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 17 Jun 2021 04:03:08 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9C3D04A4A3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 04:00:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3B2C540825
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 04:03:08 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id A586A61076;
- Thu, 17 Jun 2021 08:00:11 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 40E5761078;
+ Thu, 17 Jun 2021 08:03:07 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1ltmwb-0087xa-MT; Thu, 17 Jun 2021 09:00:09 +0100
-Date: Thu, 17 Jun 2021 09:00:09 +0100
-Message-ID: <87pmwkdipi.wl-maz@kernel.org>
+ id 1ltmzR-00880N-AG; Thu, 17 Jun 2021 09:03:05 +0100
+Date: Thu, 17 Jun 2021 09:03:04 +0100
+Message-ID: <87o8c4dikn.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Yanan Wang <wangyanan55@huawei.com>
-Subject: Re: [PATCH v6 4/4] KVM: arm64: Move guest CMOs to the fault handlers
-In-Reply-To: <20210616095200.38008-5-wangyanan55@huawei.com>
+To: "wangyanan (Y)" <wangyanan55@huawei.com>
+Subject: Re: [PATCH v6 1/4] KVM: arm64: Introduce cache maintenance callbacks
+ for guest stage-2
+In-Reply-To: <8340be12-cc80-8c2a-3597-ecba05eaf35a@huawei.com>
 References: <20210616095200.38008-1-wangyanan55@huawei.com>
- <20210616095200.38008-5-wangyanan55@huawei.com>
+ <20210616095200.38008-2-wangyanan55@huawei.com>
+ <87eed2lzcc.wl-maz@kernel.org>
+ <8340be12-cc80-8c2a-3597-ecba05eaf35a@huawei.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -87,80 +90,67 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 16 Jun 2021 10:52:00 +0100,
-Yanan Wang <wangyanan55@huawei.com> wrote:
+On Thu, 17 Jun 2021 07:48:29 +0100,
+"wangyanan (Y)" <wangyanan55@huawei.com> wrote:
 > 
-> We currently uniformly permorm CMOs of D-cache and I-cache in function
-> user_mem_abort before calling the fault handlers. If we get concurrent
-> guest faults(e.g. translation faults, permission faults) or some really
-> unnecessary guest faults caused by BBM, CMOs for the first vcpu are
-> necessary while the others later are not.
+> Hi Marc,
 > 
-> By moving CMOs to the fault handlers, we can easily identify conditions
-> where they are really needed and avoid the unnecessary ones. As it's a
-> time consuming process to perform CMOs especially when flushing a block
-> range, so this solution reduces much load of kvm and improve efficiency
-> of the stage-2 page table code.
+> On 2021/6/16 21:21, Marc Zyngier wrote:
+> > Hi Yanan,
+> > 
+> > On Wed, 16 Jun 2021 10:51:57 +0100,
+> > Yanan Wang <wangyanan55@huawei.com> wrote:
+> >> To prepare for performing guest CMOs in the fault handlers in pgtable.c,
+> >> introduce two cache maintenance callbacks in struct kvm_pgtable_mm_ops.
+> >> 
+> >> The new callbacks are specific for guest stage-2, so they will only be
+> >> initialized in 'struct kvm_pgtable_mm_ops kvm_s2_mm_ops'.
+> >> 
+> >> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
+> >> ---
+> >>   arch/arm64/include/asm/kvm_pgtable.h | 7 +++++++
+> >>   1 file changed, 7 insertions(+)
+> >> 
+> >> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> >> index c3674c47d48c..302eca32e0af 100644
+> >> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> >> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> >> @@ -44,6 +44,11 @@ typedef u64 kvm_pte_t;
+> >>    *			in the current context.
+> >>    * @virt_to_phys:	Convert a virtual address mapped in the current context
+> >>    *			into a physical address.
+> >> + * @flush_dcache:	Clean data cache for a guest page address range before
+> >> + *			creating the corresponding stage-2 mapping.
+> > Please don't reintroduce the word 'flush'. We are really trying to
+> > move away from it as it doesn't describe what we want to do.
+> I agree with this. I intended to make the names short and laconic, but this
+> missed the information about the callback's actual behaviors.
+> > Here this
+> > should be 'clean_invalidate_dcache' which, despite being a mouthful,
+> > describe accurately what we expect it to do.
+> Sure, I will change the name as you suggested.
+> > The comment is also missing the invalidate part, and we shouldn't
+> > assume that this is only used for S2 mapping.
+> Ok, will refine the comment. I think something like"Clean and invalidate the
+> date cache for the specified memory address range" may be generic enough.
+> >> + * @flush_icache:	Invalidate instruction cache for a guest page address
+> >> + *			range before creating or updating the corresponding
+> >> + *			stage-2 mapping.
+> > Same thing here; this should be 'invalidate_icache', and the comment
+> > cleaned up.
+> Thanks, I will also correct this part.
 > 
-> We can imagine two specific scenarios which will gain much benefit:
-> 1) In a normal VM startup, this solution will improve the efficiency of
-> handling guest page faults incurred by vCPUs, when initially populating
-> stage-2 page tables.
-> 2) After live migration, the heavy workload will be resumed on the
-> destination VM, however all the stage-2 page tables need to be rebuilt
-> at the moment. So this solution will ease the performance drop during
-> resuming stage.
-> 
-> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
-> ---
->  arch/arm64/kvm/hyp/pgtable.c | 37 +++++++++++++++++++++++++++++-------
->  arch/arm64/kvm/mmu.c         | 21 +++++++-------------
->  2 files changed, 37 insertions(+), 21 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index d99789432b05..b7b40abe78e8 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -577,12 +577,24 @@ static void stage2_put_pte(kvm_pte_t *ptep, struct kvm_s2_mmu *mmu, u64 addr,
->  	mm_ops->put_page(ptep);
->  }
->  
-> +static bool stage2_pte_cacheable(struct kvm_pgtable *pgt, kvm_pte_t pte)
-> +{
-> +	u64 memattr = pte & KVM_PTE_LEAF_ATTR_LO_S2_MEMATTR;
-> +	return memattr == KVM_S2_MEMATTR(pgt, NORMAL);
-> +}
-> +
-> +static bool stage2_pte_executable(kvm_pte_t pte)
-> +{
-> +	return !(pte & KVM_PTE_LEAF_ATTR_HI_S2_XN);
-> +}
-> +
->  static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
->  				      kvm_pte_t *ptep,
->  				      struct stage2_map_data *data)
->  {
->  	kvm_pte_t new, old = *ptep;
->  	u64 granule = kvm_granule_size(level), phys = data->phys;
-> +	struct kvm_pgtable *pgt = data->mmu->pgt;
->  	struct kvm_pgtable_mm_ops *mm_ops = data->mm_ops;
->  
->  	if (!kvm_block_mapping_supported(addr, end, phys, level))
-> @@ -606,6 +618,13 @@ static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
->  		stage2_put_pte(ptep, data->mmu, addr, level, mm_ops);
->  	}
->  
-> +	/* Perform CMOs before installation of the guest stage-2 PTE */
-> +	if (mm_ops->flush_dcache && stage2_pte_cacheable(pgt, new))
-> +		mm_ops->flush_dcache(mm_ops->phys_to_virt(phys), granule);
-> +
-> +	if (mm_ops->flush_icache && stage2_pte_executable(new))
-> +		mm_ops->flush_icache(mm_ops->phys_to_virt(phys), granule);
-> +
+> Besides the callback names and comments, is there anything else that still
+> needs some adjustment in the other three patches? :)
 
-Can you use kvm_pte_follow(new, mm_ops) here, instead of the direct
-use of phys_to_virt()? It would at least make the two icache cases
-consistent.
+It looks pretty good so far, much nicer than the previous versions.
+
+I have a small nit on the last patch, which should be dead easy to
+address. I'm currently running a bunch of tests, hopefully nothing bad
+will come out of it.
+
+If you respin it shortly, that nothing fails, and unless someone
+shouts, I'll queue it for -next.
 
 Thanks,
 
