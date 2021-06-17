@@ -6,73 +6,73 @@ X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS,URIBL_RED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 284DDC49EA2
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Jun 2021 15:09:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FB0CC49361
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Jun 2021 15:20:46 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 904E0613EA
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Jun 2021 15:09:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 904E0613EA
+	by mail.kernel.org (Postfix) with ESMTP id C7545613F9
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Jun 2021 15:20:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7545613F9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 01F6D4B08C;
-	Thu, 17 Jun 2021 11:09:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 53FB24B097;
+	Thu, 17 Jun 2021 11:20:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JG5IQi7z4g9j; Thu, 17 Jun 2021 11:09:42 -0400 (EDT)
+	with ESMTP id DpRkjauCW0jQ; Thu, 17 Jun 2021 11:20:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BD24649F92;
-	Thu, 17 Jun 2021 11:09:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 30CF34A51D;
+	Thu, 17 Jun 2021 11:20:44 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A59A44086A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 11:09:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CE804A3B4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 11:20:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id p2NnnYpQFPX6 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 17 Jun 2021 11:09:40 -0400 (EDT)
+ with ESMTP id GZ3mSd7vnRGE for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 17 Jun 2021 11:20:41 -0400 (EDT)
 Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com
  [209.85.167.52])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9960C40821
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 11:09:40 -0400 (EDT)
-Received: by mail-lf1-f52.google.com with SMTP id p7so11039791lfg.4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 08:09:40 -0700 (PDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4EADC40874
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 11:20:41 -0400 (EDT)
+Received: by mail-lf1-f52.google.com with SMTP id f30so11197225lfj.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 08:20:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=xXZRhEcd2Cbrj/tVl2ryBxrcp7ZNIEiNaJWzDG2F5Kg=;
- b=TqWgVeNXToRFcCgGFrlG52MtXOvoEpEgH+psGbhdraIxWdvhr8qhRpfWoVKcSxORjB
- B831vy6R7RTZzs2nM/KQJ71iM9aVLCvGMf20DJUF4AiJWHbwKHIT31rxxZUeXh2p2oRt
- XL4KPiTOT9hbUZgUJfDFuKG7oGbFDKYHU8SCBYWaX0RmwnVcF135fDTnUplDx6/kg56A
- WtUBi4LRlBK+S9bbzajtt7FAUOTE3fofCi+CtbjwZsPln+zjbIngScXUpHx9H35LbAYv
- yhbCZ2245i7w4fll7tlZ0JTQLXy7oTYwQOusiRyXIwwEXch8Jc2WjtK44ttM+hrJsoLv
- Zk4w==
+ :cc; bh=5nxSzCxRIGKeYpvFJwHnokf+lsLXzTQKnVZehNuKBfY=;
+ b=v73zJk16lVzUG7QbbkRkacwK3TUPJGuBDYnlw6a7OPjaXiFoy/Tg1SF7o+pP2VkjgQ
+ GCw+WkjfIQ3l6iS90jFkDddYRWl54Fy+YMR/OLBaPnT1q7EH0oEDgCPwHFRf8oPp7gGh
+ W7Ec4TAFYCyuNTidERQalF9VJ9rhnKCIZeBncU5P/7WoHZpOenVDVwlRJezyVC2NtJ6Y
+ vboZ+Jh+7e1OhUpnKBfhBMPZL2co2cGDoDioEPRVmBRw4+jEILLh2FWrKa/OxCOxZ34S
+ /rw7UTqce3bTc65+uzu2YO9pLXUzTgYikYTMftRKjr074dSbh8dedXtXArBgTf7VXUpm
+ YOvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=xXZRhEcd2Cbrj/tVl2ryBxrcp7ZNIEiNaJWzDG2F5Kg=;
- b=i+0UmtD7R102eyaooMYP6EGGHts3tLRnDGkLutmaUSoUaWIpjMSD17ZvIusHZzZF9U
- YBA98u2lqki8+FeOgrIfJb3vrugU53hZery62Dt32u9LqKHdHU5VdLTAH4+jFtMiDEQD
- VQcpLA00gQqIpk9hu9VtXvU//iCvY0FXkWbNUsHiiPxTfo8ZYvRlN048ySHSaJ3Bcx2V
- HnO/dtIyXIwxvMS2y9iqFSUMTgQg4dKDvJYazYXWbLz3Pvi6ExYAM8OLxVSoI7EAKu+s
- j3PAwsmDG5Wq+5tJYFNBd41yhJME8Wj6MOLI1oc61IHIcC4F+++lMeZ56JQZytKH1DlH
- Vs/g==
-X-Gm-Message-State: AOAM531Th6jnuXQ3G2s7gnvfRkzCZsMfau6/gNMAGgST8P19zkNxBcQ3
- +q4PqrOa7xvE6UiHTH/Kx8UUu7Rp2TZptP+DEPJFpw==
-X-Google-Smtp-Source: ABdhPJzAyrQsMnAqbBOEYMZVZQD5qO0SZlAXpM63+DpcX+GVx2elMNK7wl3R9skQOGetSMH5r+n7sJJM07csoEf6gTw=
-X-Received: by 2002:a05:6512:33c4:: with SMTP id
- d4mr4587741lfg.536.1623942578963; 
- Thu, 17 Jun 2021 08:09:38 -0700 (PDT)
+ bh=5nxSzCxRIGKeYpvFJwHnokf+lsLXzTQKnVZehNuKBfY=;
+ b=HtDFWHZHgQnUidHpP9pYxAUmHOQS3UfTXANZEx7htAxD+QhM2qYPtkmeAAsFFw1mSi
+ kw1qOT6Fvuyw4YBPaqhMTkId56nGYoy/RPEwvSdyqgJMs5XDfbAGnV1LcdINohGYdWac
+ 8TsFF16c4ge8riNW4JyEk8IHErjY/3tVg4vFg8RtHh3CikVsngYDRpwQe+JKMaG/0aWH
+ 6eQ0uPwlFQYun0hn+uylprVm7n92Z0xarJB6Rdx/X7LRGogplBJxagiCvFNA5qF3NaFI
+ T/noh6pjjThfQw3KtCAZ55eKWao4I8ftd88LL7R3X3OgzW/1NgsRKyxUYHjEdI6LA8U6
+ tt+Q==
+X-Gm-Message-State: AOAM533LPv+QMEkmzzZ9yCr2XVgrM6fImH6ak94rAKGPeHCTnXsVBnjU
+ OcxX+Kks0HIyuAe05YBRWKRTr7uHFKtF7yA0Ia18wQ==
+X-Google-Smtp-Source: ABdhPJxKKizWi/fGNn+9wpt69Ewj2CzuOybJdiyg4e/t3EuxZUFb779j6T3WEp//mVN3Ae7BamP0hcGF5jtDYBl/+0Y=
+X-Received: by 2002:a05:6512:3ea:: with SMTP id
+ n10mr4392667lfq.178.1623943239558; 
+ Thu, 17 Jun 2021 08:20:39 -0700 (PDT)
 MIME-Version: 1.0
 References: <20210617044146.2667540-1-jingzhangos@google.com>
- <20210617044146.2667540-4-jingzhangos@google.com> <YMrjKhV8TNwmRtf6@kroah.com>
-In-Reply-To: <YMrjKhV8TNwmRtf6@kroah.com>
+ <20210617044146.2667540-4-jingzhangos@google.com> <YMrkGZzPrt0jA1iP@kroah.com>
+In-Reply-To: <YMrkGZzPrt0jA1iP@kroah.com>
 From: Jing Zhang <jingzhangos@google.com>
-Date: Thu, 17 Jun 2021 10:09:27 -0500
-Message-ID: <CAAdAUtiySqu6VKpK2LDnG5S0m9tRKjrKSu5BWoFurkhWay4yCg@mail.gmail.com>
+Date: Thu, 17 Jun 2021 10:20:27 -0500
+Message-ID: <CAAdAUtik0Yw+4=4Ld-DJSokNzvdpa-tsxkqAdBCAb-C=uS0-sA@mail.gmail.com>
 Subject: Re: [PATCH v10 3/5] KVM: stats: Add documentation for binary
  statistics interface
 To: Greg KH <gregkh@linuxfoundation.org>
@@ -111,7 +111,7 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Hi Greg,
 
-On Thu, Jun 17, 2021 at 12:52 AM Greg KH <gregkh@linuxfoundation.org> wrote:
+On Thu, Jun 17, 2021 at 12:56 AM Greg KH <gregkh@linuxfoundation.org> wrote:
 >
 > On Thu, Jun 17, 2021 at 04:41:44AM +0000, Jing Zhang wrote:
 > > +     struct kvm_stats_desc {
@@ -122,19 +122,39 @@ On Thu, Jun 17, 2021 at 12:52 AM Greg KH <gregkh@linuxfoundation.org> wrote:
 > > +             __u32 unused;
 > > +             char name[0];
 > > +     };
-> > +
-> > +The ``flags`` field contains the type and unit of the statistics data described
-> > +by this descriptor. The following flags are supported:
-> > +
-> > +Bits 0-3 of ``flags`` encode the type:
 >
 > <snip>
 >
-> As flags is a bit field, what is the endian of it?  Native or LE or BE?
-> I'm guessing "cpu native", but you should be explicit as userspace will
-> have to deal with this somehow.
-Sure, will add clarification for endianness.
+> > +The ``unused`` fields are reserved for future support for other types of
+> > +statistics data, like log/linear histogram.
 >
+> you HAVE to set unused to 0 for now, otherwise userspace does not know
+> it is unused, right?  And then, really it is "used", so why not just say
+> that now?  It's tricky, but you have to get this right now otherwise you
+> can never use it in the future.
+>
+Sure, will do that.
+> > +The ``name`` field points to the name string of the statistics data. The name
+>
+> It is not a pointer, it is the data itself.
+>
+Will fix it.
+> > +string starts at the end of ``struct kvm_stats_desc``.
+> > +The maximum length (including trailing '\0') is indicated by ``name_size``
+> > +in ``struct kvm_stats_header``.
+>
+> I thought we were replacing [0] arrays with [], are you sure you should
+> be declaring this as [0]?  Same for all structures in this document (and
+> code).
+>
+The reason to declare it as [0] is to have the flexibility to change the maximum
+length of KVM stats name. For now, the max len is  defined as 48, which can
+be read from the header. Then the userspace can get the length of descriptor by
+adding sizeof(struct_kvm_stats_desc) + 48. Whenever the max len is changed
+in KVM, the userspace would not have to update code to reflect that.
+However, if we are OK to restrict the maximum KVM stats' length to 48
+(or any other
+number), we can just declear it with [] instead of [0].
 > thanks,
 >
 > greg k-h
