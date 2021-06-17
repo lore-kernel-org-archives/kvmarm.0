@@ -4,78 +4,77 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_RED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B315FC2B9F4
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Jun 2021 14:48:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 255C0C2B9F4
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Jun 2021 14:56:31 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 354CE613EA
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Jun 2021 14:48:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 354CE613EA
+	by mail.kernel.org (Postfix) with ESMTP id 9881A613E9
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Jun 2021 14:56:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9881A613E9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A6CD74A551;
-	Thu, 17 Jun 2021 10:48:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E49774B090;
+	Thu, 17 Jun 2021 10:56:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id OuTVxRMcGUYX; Thu, 17 Jun 2021 10:48:23 -0400 (EDT)
+	with ESMTP id wva1nG33Q+7j; Thu, 17 Jun 2021 10:56:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5383B4B085;
-	Thu, 17 Jun 2021 10:48:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BA1A849E5F;
+	Thu, 17 Jun 2021 10:56:28 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8AF254A551
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 10:48:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C813940821
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 10:56:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xJtE47z7JcWE for <kvmarm@lists.cs.columbia.edu>;
- Thu, 17 Jun 2021 10:48:21 -0400 (EDT)
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com
- [209.85.167.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 29D7749E5F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 10:48:21 -0400 (EDT)
-Received: by mail-lf1-f41.google.com with SMTP id p7so10920617lfg.4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 07:48:21 -0700 (PDT)
+ with ESMTP id aMRUAqRRPGNf for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 17 Jun 2021 10:56:25 -0400 (EDT)
+Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com
+ [209.85.208.173])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 89A2D40233
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 10:56:25 -0400 (EDT)
+Received: by mail-lj1-f173.google.com with SMTP id c11so9432588ljd.6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 07:56:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=7xTcig9u+ckmAK7F7nxFSbFSF3LG6qPs6DaQp7FLrvY=;
- b=bygYJMkfBrOTcD5rgvdu2TqpUYCHPRA5N7W6suhW34MjzQ7Q41hSSaiV4p4h1kSB8B
- wtVqMlTitgQM18JdvB7h9Q+oFDUtZ5+vI4b0NNHWxiQOyhK6wSHPrWESvV/RMicAbEB2
- JONdfC82tVgGDbroHeVLo3Zu06osDZZ2CimkJypcMPXAcRddVw5QsLGliJLlP3ZRnfRW
- QBMeN4RVmbyQ6GXkM4cATYRg3sKqyvnFP/9pSO3RCyzzxmSghU06nl6L+xfZxsQeCtwA
- OxuR8KUTSn5/6zjnAcYoWUmGsLpODf/TMKL/SNbBxB4gcI/KyOtgXGVUlZqe9XP1j3C1
- Cw6Q==
+ :cc; bh=EbTYKOXEoTjmKWk+fpZnI99Si3buCUHA1ir4ZzP+nnI=;
+ b=kc50UfvlreBP4U5XFPb9bvzXsic67xc5PlptbeuPCrbP14fhRwj9rOBUGLN6p+dtZX
+ SOP1ZY5unyfg5G3JMXQ9hNEF7K9BJdNpysaExPQ4ZGnlcljp5AKYoIS2AnJWN9HA/eWW
+ lcShCvH37ITs73OSDSewiBRwVuWFOqCDZuZLvOsSFwyv8XeY/lnBVaai2CWHMzpJ0ZWY
+ Y53GpWGGPDQii1rEcnb3vD8rPnS7JYgrBF/1Tz+6xjdeaKCB2GHwPT9jPUZBQxOpU2vJ
+ uVx93iAJ9KIPSlbLvTT+iKfClmYBRlq2GejTdrownxtxHdZu6Y8+qgMycGlLKMFEmk5n
+ Fe2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=7xTcig9u+ckmAK7F7nxFSbFSF3LG6qPs6DaQp7FLrvY=;
- b=KVUFQJ+I5w4hhHWs6i90vDaXp3Upr3Cl7g+dFiOXu8FCBODsyl/FwC+tEHm/94a/fc
- RWHaX1y7SXo7+bLo4DBhWEsRvFDfN8uKQXdbufM1mFqQXx3YB9HdyKRvG5hYUvQ5lcYF
- 1tggzQxD8F8gKdH01ci+W/oXAS4hY4rTj2oivV2f3sktvSmKNcqZh0A7I4gd35xfTfNJ
- FWNRNUByAOWpQUk/fzCSUA3eWtGNa7V8OoMaYxFgxXENIgmJe8vV2qPNYWBswMHLQLUW
- tYcMb2SCF/k4Se279W4D6hJppZCt+yJ27TLgE7QV8SECsUFAbHj2xjDe+hrUPdJzl3sn
- YVGw==
-X-Gm-Message-State: AOAM530WRZPofLq7/si10Fq2bEnrKhaluICBWTZ4M+qwhc3dSToAQAvd
- TuNXXcFnxRlOUuF6AvMXl1x8anGNf0rzRSGfVD3gQw==
-X-Google-Smtp-Source: ABdhPJyAGNi+2863i+xt6PnvN+8SqM67FY0o8ilXr0tbP46MEwKu1YD9BBtN+J/dXZivkcBRgfa36w81fk2G41mFTyg=
-X-Received: by 2002:a05:6512:318d:: with SMTP id
- i13mr4438454lfe.407.1623941299197; 
- Thu, 17 Jun 2021 07:48:19 -0700 (PDT)
+ bh=EbTYKOXEoTjmKWk+fpZnI99Si3buCUHA1ir4ZzP+nnI=;
+ b=hxF+PDHqioM2/srUXf1scxx5f3LRmJtUtfGCIJ5ihXaNT7Lfwx0Ej8p2oG/0pOvqm0
+ 0uLxVMDomoO666NsJlTnfE3t1X6onljjXyj3Id17Hgu6Bt5r9yR+A/BW+t8rweqhROPE
+ fdEkus/qsNk+1Mtqf4p/CN9xb9JEtZKgRjNBtQl8144Zohz28KP/BwLjoqx2IX/kb2fT
+ IKYfy4MOUHUtp0TdqyaRK4EEdiingKZgQ0plDR4B/V2AnjzpRs/MaS+BaZe+IPB2MAKv
+ UalOmi7tRpMNX/8IekhTqEJ3FTOvxghmQkw0luh8Q4PBzuBzG8pORh+bP4KvCtQrg1JP
+ dJqQ==
+X-Gm-Message-State: AOAM533WpSNgsMI1dRydpxEFSpzxMXhWCMcnSTuucF0R5ic3q7IML09q
+ mO0MRnBgYPIOGDbW60/YLFZ1lriYAM17zb432+5whA==
+X-Google-Smtp-Source: ABdhPJyHZSoRzwk/uvauvQQuu1bVwpP27gPIjPYDoJYNtfXQcbgPRMFOMqegaGb6vFsOuSX995igEG4xKcInEvg9Wdg=
+X-Received: by 2002:a2e:9b8f:: with SMTP id z15mr4952786lji.304.1623941783847; 
+ Thu, 17 Jun 2021 07:56:23 -0700 (PDT)
 MIME-Version: 1.0
 References: <20210617044146.2667540-1-jingzhangos@google.com>
- <20210617044146.2667540-3-jingzhangos@google.com> <YMrzzYEkDQNCpnP7@kroah.com>
-In-Reply-To: <YMrzzYEkDQNCpnP7@kroah.com>
+ <20210617044146.2667540-3-jingzhangos@google.com> <YMr4rArKvj3obDEM@kroah.com>
+In-Reply-To: <YMr4rArKvj3obDEM@kroah.com>
 From: Jing Zhang <jingzhangos@google.com>
-Date: Thu, 17 Jun 2021 09:48:07 -0500
-Message-ID: <CAAdAUtibbp4y_Ju4E+EeQ6HmRsEGXycjK-Y_P78xGVySYkftSQ@mail.gmail.com>
+Date: Thu, 17 Jun 2021 09:56:12 -0500
+Message-ID: <CAAdAUtiiQ0304vWR3Zm2XUKz374W4LY3=qdrFZCsQ27VkqMn9A@mail.gmail.com>
 Subject: Re: [PATCH v10 2/5] KVM: stats: Add fd-based API to read binary stats
  data
-To: Greg KH <greg@kroah.com>
+To: Greg KH <gregkh@linuxfoundation.org>
 Cc: KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
  Paul Mackerras <paulus@ozlabs.org>,
  Linuxkselftest <linux-kselftest@vger.kernel.org>,
@@ -111,80 +110,120 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Hi Greg,
 
-On Thu, Jun 17, 2021 at 2:03 AM Greg KH <greg@kroah.com> wrote:
+On Thu, Jun 17, 2021 at 2:24 AM Greg KH <gregkh@linuxfoundation.org> wrote:
 >
 > On Thu, Jun 17, 2021 at 04:41:43AM +0000, Jing Zhang wrote:
 > > Provides a file descriptor per VM to read VM stats info/data.
 > > Provides a file descriptor per vCPU to read vCPU stats info/data.
-> >
-> > The KVM stats now is only accessible by debugfs, which has some
-> > shortcomings this change are supposed to fix:
-> > 1. Debugfs is not a stable interface for production and it is
-> >    disabled when kernel Lockdown mode is enabled.
 >
-> debugfs _could_ be a stable interface if you want it to be and make that
-> rule for your subsystem.  Disabling it for lockdown mode is a different
-> issue, and that is a system-wide-policy-decision, not a debugfs-specific
-> thing.
+> Shouldn't this be two separate patches, one for each thing as these are
+> two different features being added?
 >
-> > 2. Debugfs is organized as "one value per file", it is good for
-> >    debugging, but not supposed to be used for production.
+Actually, it is really not easy to separate this change into two patches even by
+following Paolo's suggestion. And it would be a surprise to userspace to see
+only VM stats, no VCPU stats.
+I guess it is the text that caused the confusion, I'll change the commit message
+for this.
+> Anyway, an implementation question for both of these:
 >
-> debugfs IS NOT one-value-per-file, you can do whatever you want in
-> there.  sysfs IS one-value-per-file, do not get the two confused there.
->
-> > 3. Debugfs read/clear in KVM are protected by the global kvm_lock.
->
-> That's your implementation issue, not a debugfs issue.
->
-> The only "rule" in debugfs is:
->         There are no rules.
->
-> So while your subsystem might have issues with using debugfs for
-> statistics like this, that's not debugfs's fault, that's how you want to
-> use the debugfs files for your subsystem.
->
-You are right. The issues are from how the debugfs is used in KVM stats.
-Will fix the text accordingly.
-> > Besides that, there are some other benefits with this change:
-> > 1. All KVM VM/VCPU stats can be read out in a bulk by one copy
-> >    to userspace.
-> > 2. A schema is used to describe KVM statistics. From userspace's
-> >    perspective, the KVM statistics are self-describing.
-> > 3. Fd-based solution provides the possibility that a telemetry can
-> >    read KVM stats in a less privileged situation.
->
-> "possiblity"?  Does this work or not?  Have you tested it?
->
-I should've said "We are able to read KVM stats in a less privileged process".
-> > +static ssize_t kvm_vm_stats_read(struct file *file, char __user *user_buffer,
-> > +                           size_t size, loff_t *offset)
+> > +static ssize_t kvm_stats_read(struct _kvm_stats_header *header,
+> > +             struct _kvm_stats_desc *desc, void *stats, size_t size_stats,
+> > +             char __user *user_buffer, size_t size, loff_t *offset)
 > > +{
-> > +     struct kvm *kvm = file->private_data;
+> > +     ssize_t copylen, len, remain = size;
+>
+> You are "burying" the fact that remain is initialized here, not nice, I
+> totally missed it when reading this the first time.
+>
+> This should be:
+>         ssize_t copylen;
+>         ssize_t len;
+>         ssize_t remain = size;
+> to be obvious.
+>
+> Remember you will be looking at this code for the next 20 years, make it
+> easy to read.
+>
+Nice! Will do.
+> > +     size_t size_header, size_desc;
+> > +     loff_t pos = *offset;
+> > +     char __user *dest = user_buffer;
+> > +     void *src;
 > > +
-> > +     snprintf(&kvm_vm_stats_header.id[0], sizeof(kvm_vm_stats_header.id),
-> > +                     "kvm-%d", task_pid_nr(current));
+> > +     size_header = sizeof(*header);
+> > +     size_desc = header->header.count * sizeof(*desc);
+> > +
+> > +     len = size_header + size_desc + size_stats - pos;
+> > +     len = min(len, remain);
+> > +     if (len <= 0)
+> > +             return 0;
+> > +     remain = len;
+> > +
+> > +     /* Copy kvm stats header */
+> > +     copylen = size_header - pos;
+> > +     copylen = min(copylen, remain);
+> > +     if (copylen > 0) {
+> > +             src = (void *)header + pos;
+> > +             if (copy_to_user(dest, src, copylen))
+> > +                     return -EFAULT;
+> > +             remain -= copylen;
+> > +             pos += copylen;
+> > +             dest += copylen;
+> > +     }
 >
-> Why do you write to this static variable for EVERY read?  Shouldn't you
-> just do it once at open?  How can it change?
+> I thought you said that you would not provide the header for each read,
+> if you keep reading from the fd.  It looks like you are adding it here
+> to each read, or is there some "magic" with pos happening here that I do
+> not understand?
 >
-> Wait, it's a single shared variable, what happens when multiple tasks
-> open this thing and read from it?  You race between writing to this
-> variable here and then:
+> And if there is "magic" with pos, you should document it as it's not
+> very obvious :)
 >
-> > +     return kvm_stats_read(&kvm_vm_stats_header, &kvm_vm_stats_desc[0],
-> > +             &kvm->stat, sizeof(kvm->stat), user_buffer, size, offset);
+Will do.
+> > +     /* Copy kvm stats descriptors */
+> > +     copylen = header->header.desc_offset + size_desc - pos;
+> > +     copylen = min(copylen, remain);
+> > +     if (copylen > 0) {
+> > +             src = (void *)desc + pos - header->header.desc_offset;
+> > +             if (copy_to_user(dest, src, copylen))
+> > +                     return -EFAULT;
+> > +             remain -= copylen;
+> > +             pos += copylen;
+> > +             dest += copylen;
+> > +     }
+> > +     /* Copy kvm stats values */
 >
-> Accessing it here.
+> New lines between code blocks of doing things?
 >
-> So how is this really working?
+Will add lines between code blocks.
+> And again, why copy the decriptor again?  or is it being skipped
+> somehow?  Ah, I think I see how it's being skipped, if I look really
+> closely.  But again, it's not obvious, and I could be wrong.  Please
+> document this REALLY well.
 >
-You are right. We only need to do it once at the open. Will fix it according to
-Paolo's suggestion.
+> Write code for the developer first, compiler second.  Again, you are
+> going to be maintaining it for 20+ years, think of your future self...
+>
+>
+Sure, will document it.
+> > +     copylen = header->header.data_offset + size_stats - pos;
+> > +     copylen = min(copylen, remain);
+> > +     if (copylen > 0) {
+> > +             src = stats + pos - header->header.data_offset;
+> > +             if (copy_to_user(dest, src, copylen))
+> > +                     return -EFAULT;
+> > +             remain -= copylen;
+> > +             pos += copylen;
+> > +             dest += copylen;
+> > +     }
+> > +
+> > +     *offset = pos;
+> > +     return len;
+> > +}
+>
 > thanks,
 >
 > greg k-h
-
 Thanks,
 Jing
 _______________________________________________
