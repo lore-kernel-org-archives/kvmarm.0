@@ -2,54 +2,56 @@ Return-Path: <SRS0=srdq=LL=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A01EFC2B9F4
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Jun 2021 09:43:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3D84C2B9F4
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Jun 2021 10:43:23 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1C02161209
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Jun 2021 09:43:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C02161209
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 2414B613BF
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Jun 2021 10:43:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2414B613BF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D3BC4086A;
-	Thu, 17 Jun 2021 05:43:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AB58440821;
+	Thu, 17 Jun 2021 06:43:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id OR+tUWIuK3n5; Thu, 17 Jun 2021 05:43:34 -0400 (EDT)
+	with ESMTP id gw-SqDGcL3ND; Thu, 17 Jun 2021 06:43:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E44840870;
-	Thu, 17 Jun 2021 05:43:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9358D49F8F;
+	Thu, 17 Jun 2021 06:43:21 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 216C34083E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 05:43:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 26EBA40CF8
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 06:43:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id J+Dkc8F3Yiz0 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 17 Jun 2021 05:43:30 -0400 (EDT)
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E0B1D4081C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 05:43:29 -0400 (EDT)
-Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.56])
- by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4G5H7w6kgSz6vT9;
- Thu, 17 Jun 2021 17:39:24 +0800 (CST)
-Received: from dggpemm500023.china.huawei.com (7.185.36.83) by
- dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Thu, 17 Jun 2021 17:43:25 +0800
-Received: from [10.174.187.128] (10.174.187.128) by
- dggpemm500023.china.huawei.com (7.185.36.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2176.2; Thu, 17 Jun 2021 17:43:24 +0800
+ with ESMTP id hmGY74Kj0s8N for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 17 Jun 2021 06:43:19 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D707040821
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 06:43:19 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id B7D2E60FDA;
+ Thu, 17 Jun 2021 10:43:18 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1ltpUS-0089ev-O8; Thu, 17 Jun 2021 11:43:16 +0100
+Date: Thu, 17 Jun 2021 11:43:16 +0100
+Message-ID: <87lf78db5n.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: "wangyanan (Y)" <wangyanan55@huawei.com>
 Subject: Re: [PATCH v6 1/4] KVM: arm64: Introduce cache maintenance callbacks
  for guest stage-2
-To: Marc Zyngier <maz@kernel.org>
+In-Reply-To: <0af45a89-03cd-ac0d-9fa2-7f57eb828c86@huawei.com>
 References: <20210616095200.38008-1-wangyanan55@huawei.com>
  <20210616095200.38008-2-wangyanan55@huawei.com>
  <87eed2lzcc.wl-maz@kernel.org>
@@ -57,18 +59,21 @@ References: <20210616095200.38008-1-wangyanan55@huawei.com>
  <87o8c4dikn.wl-maz@kernel.org>
  <0dced974-b507-ce48-b89d-344d41a02418@huawei.com>
  <87mtrodgn2.wl-maz@kernel.org>
-From: "wangyanan (Y)" <wangyanan55@huawei.com>
-Message-ID: <0af45a89-03cd-ac0d-9fa2-7f57eb828c86@huawei.com>
-Date: Thu, 17 Jun 2021 17:43:23 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
-MIME-Version: 1.0
-In-Reply-To: <87mtrodgn2.wl-maz@kernel.org>
-Content-Language: en-US
-X-Originating-IP: [10.174.187.128]
-X-ClientProxiedBy: dggeme712-chm.china.huawei.com (10.1.199.108) To
- dggpemm500023.china.huawei.com (7.185.36.83)
-X-CFilter-Loop: Reflected
+ <0af45a89-03cd-ac0d-9fa2-7f57eb828c86@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: wangyanan55@huawei.com, will@kernel.org, qperret@google.com,
+ alexandru.elisei@arm.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, catalin.marinas@arm.com, james.morse@arm.com,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, gshan@redhat.com,
+ wanghaibin.wang@huawei.com, zhukeqian1@huawei.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
  linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
@@ -83,99 +88,31 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+On Thu, 17 Jun 2021 10:43:23 +0100,
+"wangyanan (Y)" <wangyanan55@huawei.com> wrote:
+> 
+> Hi Marc,
+> 
+> On 2021/6/17 16:44, Marc Zyngier wrote:
+> > By the way, what the status of your selftest series that originally
+> > came with this series? Are you planning to respin it? It would be
+> > useful to have something that checks for regressions, and that series
+> > did seem to do the trick.
+> Actually they have already gone into upstream, since v5.13-rc1. :)
+> The path is tools/testing/selftests/kvm/kvm_page_table_test.c, so it
+> will be much convenient to test a 5.13 kernel, you can also have a try.
 
-On 2021/6/17 16:44, Marc Zyngier wrote:
-> On Thu, 17 Jun 2021 09:22:51 +0100,
-> "wangyanan (Y)" <wangyanan55@huawei.com> wrote:
->>
->>
->> On 2021/6/17 16:03, Marc Zyngier wrote:
->>> On Thu, 17 Jun 2021 07:48:29 +0100,
->>> "wangyanan (Y)" <wangyanan55@huawei.com> wrote:
->>>> Hi Marc,
->>>>
->>>> On 2021/6/16 21:21, Marc Zyngier wrote:
->>>>> Hi Yanan,
->>>>>
->>>>> On Wed, 16 Jun 2021 10:51:57 +0100,
->>>>> Yanan Wang <wangyanan55@huawei.com> wrote:
->>>>>> To prepare for performing guest CMOs in the fault handlers in pgtable.c,
->>>>>> introduce two cache maintenance callbacks in struct kvm_pgtable_mm_ops.
->>>>>>
->>>>>> The new callbacks are specific for guest stage-2, so they will only be
->>>>>> initialized in 'struct kvm_pgtable_mm_ops kvm_s2_mm_ops'.
->>>>>>
->>>>>> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
->>>>>> ---
->>>>>>     arch/arm64/include/asm/kvm_pgtable.h | 7 +++++++
->>>>>>     1 file changed, 7 insertions(+)
->>>>>>
->>>>>> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
->>>>>> index c3674c47d48c..302eca32e0af 100644
->>>>>> --- a/arch/arm64/include/asm/kvm_pgtable.h
->>>>>> +++ b/arch/arm64/include/asm/kvm_pgtable.h
->>>>>> @@ -44,6 +44,11 @@ typedef u64 kvm_pte_t;
->>>>>>      *			in the current context.
->>>>>>      * @virt_to_phys:	Convert a virtual address mapped in the current context
->>>>>>      *			into a physical address.
->>>>>> + * @flush_dcache:	Clean data cache for a guest page address range before
->>>>>> + *			creating the corresponding stage-2 mapping.
->>>>> Please don't reintroduce the word 'flush'. We are really trying to
->>>>> move away from it as it doesn't describe what we want to do.
->>>> I agree with this. I intended to make the names short and laconic, but this
->>>> missed the information about the callback's actual behaviors.
->>>>> Here this
->>>>> should be 'clean_invalidate_dcache' which, despite being a mouthful,
->>>>> describe accurately what we expect it to do.
->>>> Sure, I will change the name as you suggested.
->>>>> The comment is also missing the invalidate part, and we shouldn't
->>>>> assume that this is only used for S2 mapping.
->>>> Ok, will refine the comment. I think something like"Clean and invalidate the
->>>> date cache for the specified memory address range" may be generic enough.
->>>>>> + * @flush_icache:	Invalidate instruction cache for a guest page address
->>>>>> + *			range before creating or updating the corresponding
->>>>>> + *			stage-2 mapping.
->>>>> Same thing here; this should be 'invalidate_icache', and the comment
->>>>> cleaned up.
->>>> Thanks, I will also correct this part.
->>>>
->>>> Besides the callback names and comments, is there anything else that still
->>>> needs some adjustment in the other three patches? :)
->>> It looks pretty good so far, much nicer than the previous versions.
->>>
->>> I have a small nit on the last patch, which should be dead easy to
->>> address. I'm currently running a bunch of tests, hopefully nothing bad
->>> will come out of it.
->>>
->>> If you respin it shortly, that nothing fails, and unless someone
->>> shouts, I'll queue it for -next.
->> It would be nice, thanks!
->> I will address the nit and respin the series soon.
-> By the way, what the status of your selftest series that originally
-> came with this series? Are you planning to respin it? It would be
-> useful to have something that checks for regressions, and that series
-> did seem to do the trick.
-Actually they have already gone into upstream, since v5.13-rc1. :)
-The path is tools/testing/selftests/kvm/kvm_page_table_test.c, so it
-will be much convenient to test a 5.13 kernel, you can also have a try.
+Ah, I missed it! Good stuff.
 
-I am using the original test data from v3 in the cover-letter because
-I think the test results will be almost the same with a different kernel.
+	M.
 
-Thanks,
-Yanan
-.
-> Thanks,
->
-> 	M.
->
-
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
