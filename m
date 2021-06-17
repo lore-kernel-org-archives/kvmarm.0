@@ -2,78 +2,75 @@ Return-Path: <SRS0=srdq=LL=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28A5CC2B9F4
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Jun 2021 07:24:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8B8CC49EA2
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Jun 2021 08:00:23 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A13056135C
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Jun 2021 07:24:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A13056135C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linuxfoundation.org
+	by mail.kernel.org (Postfix) with ESMTP id 3FBE6613C1
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Jun 2021 08:00:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FBE6613C1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2AAB240870;
-	Thu, 17 Jun 2021 03:24:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CF6B740825;
+	Thu, 17 Jun 2021 04:00:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linuxfoundation.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Acz13U+9F-DC; Thu, 17 Jun 2021 03:24:37 -0400 (EDT)
+	with ESMTP id h6WSqk-TOwaF; Thu, 17 Jun 2021 04:00:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 51D7449DE7;
-	Thu, 17 Jun 2021 03:24:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F30BB4A4A3;
+	Thu, 17 Jun 2021 04:00:17 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E92AE40874
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 03:24:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AEFCE40825
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 04:00:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nJxE-kX20rn8 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 17 Jun 2021 03:24:32 -0400 (EDT)
+ with ESMTP id w-a4RQrlVWwD for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 17 Jun 2021 04:00:12 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9B77B40870
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 03:24:32 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id B5C0A61241;
- Thu, 17 Jun 2021 07:24:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
- s=korg; t=1623914671;
- bh=kNxTxEwPcYv3NN2DfpZ8GnBN8QRikI5mGsAdJMShdj8=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=vmjn0HbF4vDkLycAFVfFgocX33s32jQVUNaGP0J3DSVKZAgg2IaQrobYDvDawDma7
- x3ikJMr5SuhJwFPLP6HEpPDeER5nEM2UPQEAeKtSe//vF6YDonr90WBlk5yNgc90ZN
- Ffb7TLPNWmUzQseIO/Xbs7cENsIfzLUJos/2MPo0=
-Date: Thu, 17 Jun 2021 09:24:28 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH v10 2/5] KVM: stats: Add fd-based API to read binary
- stats data
-Message-ID: <YMr4rArKvj3obDEM@kroah.com>
-References: <20210617044146.2667540-1-jingzhangos@google.com>
- <20210617044146.2667540-3-jingzhangos@google.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210617044146.2667540-3-jingzhangos@google.com>
-Cc: KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
- Paul Mackerras <paulus@ozlabs.org>,
- Linuxkselftest <linux-kselftest@vger.kernel.org>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Will Deacon <will@kernel.org>,
- KVMARM <kvmarm@lists.cs.columbia.edu>,
- Emanuele Giuseppe Esposito <eesposit@redhat.com>,
- LinuxS390 <linux-s390@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
- Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- David Rientjes <rientjes@google.com>, KVMPPC <kvm-ppc@vger.kernel.org>,
- Krish Sadhukhan <krish.sadhukhan@oracle.com>,
- David Matlack <dmatlack@google.com>, Jim Mattson <jmattson@google.com>,
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- Sean Christopherson <seanjc@google.com>, Cornelia Huck <cohuck@redhat.com>,
- Peter Shier <pshier@google.com>, LinuxMIPS <linux-mips@vger.kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9C3D04A4A3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 04:00:12 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id A586A61076;
+ Thu, 17 Jun 2021 08:00:11 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1ltmwb-0087xa-MT; Thu, 17 Jun 2021 09:00:09 +0100
+Date: Thu, 17 Jun 2021 09:00:09 +0100
+Message-ID: <87pmwkdipi.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Yanan Wang <wangyanan55@huawei.com>
+Subject: Re: [PATCH v6 4/4] KVM: arm64: Move guest CMOs to the fault handlers
+In-Reply-To: <20210616095200.38008-5-wangyanan55@huawei.com>
+References: <20210616095200.38008-1-wangyanan55@huawei.com>
+ <20210616095200.38008-5-wangyanan55@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: wangyanan55@huawei.com, will@kernel.org, qperret@google.com,
+ alexandru.elisei@arm.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, catalin.marinas@arm.com, james.morse@arm.com,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, gshan@redhat.com,
+ wanghaibin.wang@huawei.com, zhukeqian1@huawei.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,109 +87,87 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Jun 17, 2021 at 04:41:43AM +0000, Jing Zhang wrote:
-> Provides a file descriptor per VM to read VM stats info/data.
-> Provides a file descriptor per vCPU to read vCPU stats info/data.
-
-Shouldn't this be two separate patches, one for each thing as these are
-two different features being added?
-
-Anyway, an implementation question for both of these:
-
-> +static ssize_t kvm_stats_read(struct _kvm_stats_header *header,
-> +		struct _kvm_stats_desc *desc, void *stats, size_t size_stats,
-> +		char __user *user_buffer, size_t size, loff_t *offset)
+On Wed, 16 Jun 2021 10:52:00 +0100,
+Yanan Wang <wangyanan55@huawei.com> wrote:
+> 
+> We currently uniformly permorm CMOs of D-cache and I-cache in function
+> user_mem_abort before calling the fault handlers. If we get concurrent
+> guest faults(e.g. translation faults, permission faults) or some really
+> unnecessary guest faults caused by BBM, CMOs for the first vcpu are
+> necessary while the others later are not.
+> 
+> By moving CMOs to the fault handlers, we can easily identify conditions
+> where they are really needed and avoid the unnecessary ones. As it's a
+> time consuming process to perform CMOs especially when flushing a block
+> range, so this solution reduces much load of kvm and improve efficiency
+> of the stage-2 page table code.
+> 
+> We can imagine two specific scenarios which will gain much benefit:
+> 1) In a normal VM startup, this solution will improve the efficiency of
+> handling guest page faults incurred by vCPUs, when initially populating
+> stage-2 page tables.
+> 2) After live migration, the heavy workload will be resumed on the
+> destination VM, however all the stage-2 page tables need to be rebuilt
+> at the moment. So this solution will ease the performance drop during
+> resuming stage.
+> 
+> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
+> ---
+>  arch/arm64/kvm/hyp/pgtable.c | 37 +++++++++++++++++++++++++++++-------
+>  arch/arm64/kvm/mmu.c         | 21 +++++++-------------
+>  2 files changed, 37 insertions(+), 21 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index d99789432b05..b7b40abe78e8 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -577,12 +577,24 @@ static void stage2_put_pte(kvm_pte_t *ptep, struct kvm_s2_mmu *mmu, u64 addr,
+>  	mm_ops->put_page(ptep);
+>  }
+>  
+> +static bool stage2_pte_cacheable(struct kvm_pgtable *pgt, kvm_pte_t pte)
 > +{
-> +	ssize_t copylen, len, remain = size;
-
-You are "burying" the fact that remain is initialized here, not nice, I
-totally missed it when reading this the first time.
-
-This should be:
-	ssize_t copylen;
-	ssize_t len;
-	ssize_t remain = size;
-to be obvious.
-
-Remember you will be looking at this code for the next 20 years, make it
-easy to read.
-
-> +	size_t size_header, size_desc;
-> +	loff_t pos = *offset;
-> +	char __user *dest = user_buffer;
-> +	void *src;
-> +
-> +	size_header = sizeof(*header);
-> +	size_desc = header->header.count * sizeof(*desc);
-> +
-> +	len = size_header + size_desc + size_stats - pos;
-> +	len = min(len, remain);
-> +	if (len <= 0)
-> +		return 0;
-> +	remain = len;
-> +
-> +	/* Copy kvm stats header */
-> +	copylen = size_header - pos;
-> +	copylen = min(copylen, remain);
-> +	if (copylen > 0) {
-> +		src = (void *)header + pos;
-> +		if (copy_to_user(dest, src, copylen))
-> +			return -EFAULT;
-> +		remain -= copylen;
-> +		pos += copylen;
-> +		dest += copylen;
-> +	}
-
-I thought you said that you would not provide the header for each read,
-if you keep reading from the fd.  It looks like you are adding it here
-to each read, or is there some "magic" with pos happening here that I do
-not understand?
-
-And if there is "magic" with pos, you should document it as it's not
-very obvious :)
-
-> +	/* Copy kvm stats descriptors */
-> +	copylen = header->header.desc_offset + size_desc - pos;
-> +	copylen = min(copylen, remain);
-> +	if (copylen > 0) {
-> +		src = (void *)desc + pos - header->header.desc_offset;
-> +		if (copy_to_user(dest, src, copylen))
-> +			return -EFAULT;
-> +		remain -= copylen;
-> +		pos += copylen;
-> +		dest += copylen;
-> +	}
-> +	/* Copy kvm stats values */
-
-New lines between code blocks of doing things?
-
-And again, why copy the decriptor again?  or is it being skipped
-somehow?  Ah, I think I see how it's being skipped, if I look really
-closely.  But again, it's not obvious, and I could be wrong.  Please
-document this REALLY well.
-
-Write code for the developer first, compiler second.  Again, you are
-going to be maintaining it for 20+ years, think of your future self...
-
-
-> +	copylen = header->header.data_offset + size_stats - pos;
-> +	copylen = min(copylen, remain);
-> +	if (copylen > 0) {
-> +		src = stats + pos - header->header.data_offset;
-> +		if (copy_to_user(dest, src, copylen))
-> +			return -EFAULT;
-> +		remain -= copylen;
-> +		pos += copylen;
-> +		dest += copylen;
-> +	}
-> +
-> +	*offset = pos;
-> +	return len;
+> +	u64 memattr = pte & KVM_PTE_LEAF_ATTR_LO_S2_MEMATTR;
+> +	return memattr == KVM_S2_MEMATTR(pgt, NORMAL);
 > +}
+> +
+> +static bool stage2_pte_executable(kvm_pte_t pte)
+> +{
+> +	return !(pte & KVM_PTE_LEAF_ATTR_HI_S2_XN);
+> +}
+> +
+>  static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
+>  				      kvm_pte_t *ptep,
+>  				      struct stage2_map_data *data)
+>  {
+>  	kvm_pte_t new, old = *ptep;
+>  	u64 granule = kvm_granule_size(level), phys = data->phys;
+> +	struct kvm_pgtable *pgt = data->mmu->pgt;
+>  	struct kvm_pgtable_mm_ops *mm_ops = data->mm_ops;
+>  
+>  	if (!kvm_block_mapping_supported(addr, end, phys, level))
+> @@ -606,6 +618,13 @@ static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
+>  		stage2_put_pte(ptep, data->mmu, addr, level, mm_ops);
+>  	}
+>  
+> +	/* Perform CMOs before installation of the guest stage-2 PTE */
+> +	if (mm_ops->flush_dcache && stage2_pte_cacheable(pgt, new))
+> +		mm_ops->flush_dcache(mm_ops->phys_to_virt(phys), granule);
+> +
+> +	if (mm_ops->flush_icache && stage2_pte_executable(new))
+> +		mm_ops->flush_icache(mm_ops->phys_to_virt(phys), granule);
+> +
 
-thanks,
+Can you use kvm_pte_follow(new, mm_ops) here, instead of the direct
+use of phys_to_virt()? It would at least make the two icache cases
+consistent.
 
-greg k-h
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
