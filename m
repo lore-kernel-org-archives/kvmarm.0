@@ -2,72 +2,115 @@ Return-Path: <SRS0=srdq=LL=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3211C2B9F4
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Jun 2021 06:48:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41DCEC2B9F4
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Jun 2021 07:03:53 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6D5CB611CA
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Jun 2021 06:48:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D5CB611CA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id B48F161369
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Jun 2021 07:03:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B48F161369
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kroah.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E2A904B080;
-	Thu, 17 Jun 2021 02:48:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3FFE24A2E5;
+	Thu, 17 Jun 2021 03:03:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kroah.com
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@messagingengine.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id utY3VEk2aEIr; Thu, 17 Jun 2021 02:48:38 -0400 (EDT)
+	with ESMTP id Bj2KGRUnxhiy; Thu, 17 Jun 2021 03:03:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CA4A34A524;
-	Thu, 17 Jun 2021 02:48:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EC5334A418;
+	Thu, 17 Jun 2021 03:03:50 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 703834A3A3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 02:48:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E87764A1A7
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 03:03:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HK5QTAg5qtSj for <kvmarm@lists.cs.columbia.edu>;
- Thu, 17 Jun 2021 02:48:36 -0400 (EDT)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E220F40895
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 02:48:35 -0400 (EDT)
-Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.57])
- by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4G5CDx0683zXgkX;
- Thu, 17 Jun 2021 14:43:29 +0800 (CST)
-Received: from dggpemm500023.china.huawei.com (7.185.36.83) by
- dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Thu, 17 Jun 2021 14:48:31 +0800
-Received: from [10.174.187.128] (10.174.187.128) by
- dggpemm500023.china.huawei.com (7.185.36.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2176.2; Thu, 17 Jun 2021 14:48:30 +0800
-Subject: Re: [PATCH v6 1/4] KVM: arm64: Introduce cache maintenance callbacks
- for guest stage-2
-To: Marc Zyngier <maz@kernel.org>
-References: <20210616095200.38008-1-wangyanan55@huawei.com>
- <20210616095200.38008-2-wangyanan55@huawei.com>
- <87eed2lzcc.wl-maz@kernel.org>
-From: "wangyanan (Y)" <wangyanan55@huawei.com>
-Message-ID: <8340be12-cc80-8c2a-3597-ecba05eaf35a@huawei.com>
-Date: Thu, 17 Jun 2021 14:48:29 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+ with ESMTP id pATWW9Yyh7pg for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 17 Jun 2021 03:03:48 -0400 (EDT)
+Received: from new4-smtp.messagingengine.com (new4-smtp.messagingengine.com
+ [66.111.4.230])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D82A24066E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 03:03:48 -0400 (EDT)
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+ by mailnew.nyi.internal (Postfix) with ESMTP id 477165804CA;
+ Thu, 17 Jun 2021 03:03:46 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+ by compute3.internal (MEProxy); Thu, 17 Jun 2021 03:03:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=
+ date:from:to:cc:subject:message-id:references:mime-version
+ :content-type:in-reply-to; s=fm1; bh=bHJT5oI183t6jXiLX3QAsM6ZuOC
+ /RnAjhVkdaNoMjms=; b=tNE1qdbTe2Iwk79XEmxLKNQf/ULyBRs71UgcvFxUPws
+ /UOhvLwidIeXxlIssIen9uT+20PVORO+X+Xftl6QQsh/Qq03jAFW6CAhEUX05vv+
+ /2ktx/H0Q80COXId5hOFulpBxdXVCx+PiQZ5+Vv1VCCat9WNJpywo/v9MOgsQQrU
+ dp/bDGiT5lMYInMG1NPsEsKJe1bc95oYES8TsfSwAGWrwVXcgS2oO1Bg5C2olSxe
+ QncDeB9Xa0Z6uv38Q30vFFnWV9ps++M7v5mRgD328yjY/YB5nPLq/vrLaf7yMPnn
+ Fz+MfbFTfpjwp9koJfvdOt+DiElCaEtiomO8I+lq6bQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+ messagingengine.com; h=cc:content-type:date:from:in-reply-to
+ :message-id:mime-version:references:subject:to:x-me-proxy
+ :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=bHJT5o
+ I183t6jXiLX3QAsM6ZuOC/RnAjhVkdaNoMjms=; b=AMnxMQ0MQLmH+F4tyjDGo5
+ tqoJYLL3+fnBDD8a3zA+iMmAOJQPH2s4vdbvcF2fntElefcnM1M1DCo1RQdwVqrr
+ noleuZOcVZpgQqJbPUy7u7Imsg3gggcEPGeC/RF0SJ0dhyiO9rEfGiiUQ7KOnJti
+ 9XWRQDLK6LBzMdHPrrpr/ek7HEfydxfWW6mi+fFvQz3hLj7KSByizRYeRJg+9ptB
+ GKE223xx1moa/6rL98j4OOOk1xByNrVnPFYsaTkDhWrag4sU3fTwxPY0IbVmeOZe
+ 6DfWnJXuyjNlqyKynjhusDUByZgytQMRAN0ZdJrej4wgj4xaptYP8vKpalfFpBuA
+ ==
+X-ME-Sender: <xms:0PPKYJb4cPZMmeNkJS6hNkBCYqaAXTY8FDRKVyAUWZfO9tFMGaxB4Q>
+ <xme:0PPKYAa4rvMOF7kvq4LAPcqOpUFWbZJkRgfeb2sfhJolxArQjeL1JixLjilzjBTbo
+ fuDVcX5epR6dA>
+X-ME-Received: <xmr:0PPKYL8WoovLaP38NszhOiKK_7Zqlk7gUkvybi-NzcLHKDu5v_tDTHlNxbbyZAoN5_el6eq44Qr1kHTADaDun43-iiwScCrJ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrfeeftddguddutdcutefuodetggdotefrod
+ ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+ necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+ enucfjughrpeffhffvuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepifhrvghg
+ ucfmjfcuoehgrhgvgheskhhrohgrhhdrtghomheqnecuggftrfgrthhtvghrnhepveeuhe
+ ejgfffgfeivddukedvkedtleelleeghfeljeeiueeggeevueduudekvdetnecuvehluhhs
+ thgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepghhrvghgsehkrhhorg
+ hhrdgtohhm
+X-ME-Proxy: <xmx:0PPKYHq1avN6BNEi8vANMkXkqGdQtWEjShfRtV0HMbZf6_OqzR_F1A>
+ <xmx:0PPKYEqlNtjyglw52nt_5dKHSTkxKGSQDE69euR7foPlqrSwmgIdMg>
+ <xmx:0PPKYNR44zTgO-kpi3UXJ09C5vcWGpVR0mD0YOBytqO5JzNHBAtFDg>
+ <xmx:0vPKYHAHy81HipZYNm0Q2g22K9_KDTebTao77ccsKsEu5mpjCw5S-Q>
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 17 Jun 2021 03:03:44 -0400 (EDT)
+Date: Thu, 17 Jun 2021 09:03:41 +0200
+From: Greg KH <greg@kroah.com>
+To: Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH v10 2/5] KVM: stats: Add fd-based API to read binary
+ stats data
+Message-ID: <YMrzzYEkDQNCpnP7@kroah.com>
+References: <20210617044146.2667540-1-jingzhangos@google.com>
+ <20210617044146.2667540-3-jingzhangos@google.com>
 MIME-Version: 1.0
-In-Reply-To: <87eed2lzcc.wl-maz@kernel.org>
-Content-Language: en-US
-X-Originating-IP: [10.174.187.128]
-X-ClientProxiedBy: dggeme711-chm.china.huawei.com (10.1.199.107) To
- dggpemm500023.china.huawei.com (7.185.36.83)
-X-CFilter-Loop: Reflected
-Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
- linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <20210617044146.2667540-3-jingzhangos@google.com>
+Cc: KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
+ Paul Mackerras <paulus@ozlabs.org>,
+ Linuxkselftest <linux-kselftest@vger.kernel.org>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, Will Deacon <will@kernel.org>,
+ KVMARM <kvmarm@lists.cs.columbia.edu>,
+ Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+ LinuxS390 <linux-s390@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
+ Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ David Rientjes <rientjes@google.com>, KVMPPC <kvm-ppc@vger.kernel.org>,
+ Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+ David Matlack <dmatlack@google.com>, Jim Mattson <jmattson@google.com>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ Sean Christopherson <seanjc@google.com>, Cornelia Huck <cohuck@redhat.com>,
+ Peter Shier <pshier@google.com>, LinuxMIPS <linux-mips@vger.kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -79,81 +122,77 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+On Thu, Jun 17, 2021 at 04:41:43AM +0000, Jing Zhang wrote:
+> Provides a file descriptor per VM to read VM stats info/data.
+> Provides a file descriptor per vCPU to read vCPU stats info/data.
+> 
+> The KVM stats now is only accessible by debugfs, which has some
+> shortcomings this change are supposed to fix:
+> 1. Debugfs is not a stable interface for production and it is
+>    disabled when kernel Lockdown mode is enabled.
 
-On 2021/6/16 21:21, Marc Zyngier wrote:
-> Hi Yanan,
->
-> On Wed, 16 Jun 2021 10:51:57 +0100,
-> Yanan Wang <wangyanan55@huawei.com> wrote:
->> To prepare for performing guest CMOs in the fault handlers in pgtable.c,
->> introduce two cache maintenance callbacks in struct kvm_pgtable_mm_ops.
->>
->> The new callbacks are specific for guest stage-2, so they will only be
->> initialized in 'struct kvm_pgtable_mm_ops kvm_s2_mm_ops'.
->>
->> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
->> ---
->>   arch/arm64/include/asm/kvm_pgtable.h | 7 +++++++
->>   1 file changed, 7 insertions(+)
->>
->> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
->> index c3674c47d48c..302eca32e0af 100644
->> --- a/arch/arm64/include/asm/kvm_pgtable.h
->> +++ b/arch/arm64/include/asm/kvm_pgtable.h
->> @@ -44,6 +44,11 @@ typedef u64 kvm_pte_t;
->>    *			in the current context.
->>    * @virt_to_phys:	Convert a virtual address mapped in the current context
->>    *			into a physical address.
->> + * @flush_dcache:	Clean data cache for a guest page address range before
->> + *			creating the corresponding stage-2 mapping.
-> Please don't reintroduce the word 'flush'. We are really trying to
-> move away from it as it doesn't describe what we want to do.
-I agree with this. I intended to make the names short and laconic, but this
-missed the information about the callback's actual behaviors.
-> Here this
-> should be 'clean_invalidate_dcache' which, despite being a mouthful,
-> describe accurately what we expect it to do.
-Sure, I will change the name as you suggested.
-> The comment is also missing the invalidate part, and we shouldn't
-> assume that this is only used for S2 mapping.
-Ok, will refine the comment. I think something like"Clean and invalidate the
-date cache for the specified memory address range" may be generic enough.
->> + * @flush_icache:	Invalidate instruction cache for a guest page address
->> + *			range before creating or updating the corresponding
->> + *			stage-2 mapping.
-> Same thing here; this should be 'invalidate_icache', and the comment
-> cleaned up.
-Thanks, I will also correct this part.
+debugfs _could_ be a stable interface if you want it to be and make that
+rule for your subsystem.  Disabling it for lockdown mode is a different
+issue, and that is a system-wide-policy-decision, not a debugfs-specific
+thing.
 
-Besides the callback names and comments, is there anything else that still
-needs some adjustment in the other three patches? :)
+> 2. Debugfs is organized as "one value per file", it is good for
+>    debugging, but not supposed to be used for production.
 
-Regards,
-Yanan
-.
->>    */
->>   struct kvm_pgtable_mm_ops {
->>   	void*		(*zalloc_page)(void *arg);
->> @@ -54,6 +59,8 @@ struct kvm_pgtable_mm_ops {
->>   	int		(*page_count)(void *addr);
->>   	void*		(*phys_to_virt)(phys_addr_t phys);
->>   	phys_addr_t	(*virt_to_phys)(void *addr);
->> +	void		(*flush_dcache)(void *addr, size_t size);
->> +	void		(*flush_icache)(void *addr, size_t size);
->>   };
->>   
->>   /**
-> Thanks,
->
-> 	M.
->
+debugfs IS NOT one-value-per-file, you can do whatever you want in
+there.  sysfs IS one-value-per-file, do not get the two confused there.
 
+> 3. Debugfs read/clear in KVM are protected by the global kvm_lock.
+
+That's your implementation issue, not a debugfs issue.
+
+The only "rule" in debugfs is:
+	There are no rules.
+
+So while your subsystem might have issues with using debugfs for
+statistics like this, that's not debugfs's fault, that's how you want to
+use the debugfs files for your subsystem.
+
+> Besides that, there are some other benefits with this change:
+> 1. All KVM VM/VCPU stats can be read out in a bulk by one copy
+>    to userspace.
+> 2. A schema is used to describe KVM statistics. From userspace's
+>    perspective, the KVM statistics are self-describing.
+> 3. Fd-based solution provides the possibility that a telemetry can
+>    read KVM stats in a less privileged situation.
+
+"possiblity"?  Does this work or not?  Have you tested it?
+
+> +static ssize_t kvm_vm_stats_read(struct file *file, char __user *user_buffer,
+> +			      size_t size, loff_t *offset)
+> +{
+> +	struct kvm *kvm = file->private_data;
+> +
+> +	snprintf(&kvm_vm_stats_header.id[0], sizeof(kvm_vm_stats_header.id),
+> +			"kvm-%d", task_pid_nr(current));
+
+Why do you write to this static variable for EVERY read?  Shouldn't you
+just do it once at open?  How can it change?
+
+Wait, it's a single shared variable, what happens when multiple tasks
+open this thing and read from it?  You race between writing to this
+variable here and then:
+
+> +	return kvm_stats_read(&kvm_vm_stats_header, &kvm_vm_stats_desc[0],
+> +		&kvm->stat, sizeof(kvm->stat), user_buffer, size, offset);
+
+Accessing it here.
+
+So how is this really working?
+
+thanks,
+
+greg k-h
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
