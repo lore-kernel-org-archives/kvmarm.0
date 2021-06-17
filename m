@@ -3,77 +3,80 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5562C49361
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Jun 2021 13:37:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33164C2B9F4
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Jun 2021 13:53:49 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 681D8613DB
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Jun 2021 13:37:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 681D8613DB
+	by mail.kernel.org (Postfix) with ESMTP id 9A551613CE
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Jun 2021 13:53:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A551613CE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 08A5E4A51D;
-	Thu, 17 Jun 2021 09:37:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 28DCE4B085;
+	Thu, 17 Jun 2021 09:53:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QCKJKj15eASW; Thu, 17 Jun 2021 09:37:31 -0400 (EDT)
+	with ESMTP id L2Xq7rSkW9GC; Thu, 17 Jun 2021 09:53:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 447114A3B4;
-	Thu, 17 Jun 2021 09:37:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id ACB254B089;
+	Thu, 17 Jun 2021 09:53:45 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DDDAE40878
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 09:37:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A1B234B085
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 09:53:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id y-6hkR0rcVIV for <kvmarm@lists.cs.columbia.edu>;
- Thu, 17 Jun 2021 09:37:28 -0400 (EDT)
+ with ESMTP id Limh6-rMDJXv for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 17 Jun 2021 09:53:43 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C91194086A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 09:37:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 221034B082
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 09:53:43 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id D3482610A3;
- Thu, 17 Jun 2021 13:37:27 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 11EFD611CE;
+ Thu, 17 Jun 2021 13:53:42 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1ltsD0-008BeV-0E; Thu, 17 Jun 2021 14:37:26 +0100
-Date: Thu, 17 Jun 2021 14:37:25 +0100
-Message-ID: <87h7hwd33e.wl-maz@kernel.org>
+ id 1ltsSi-008BoA-28; Thu, 17 Jun 2021 14:53:40 +0100
+Date: Thu, 17 Jun 2021 14:53:39 +0100
+Message-ID: <87fsxgd2cc.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v7 4/4] KVM: arm64: Move guest CMOs to the fault handlers
-In-Reply-To: <20210617132115.GA24656@willie-the-truck>
-References: <20210617105824.31752-1-wangyanan55@huawei.com>
- <20210617105824.31752-5-wangyanan55@huawei.com>
- <20210617124557.GB24457@willie-the-truck>
- <87k0msd4ue.wl-maz@kernel.org>
- <20210617132115.GA24656@willie-the-truck>
+To: Steven Price <steven.price@arm.com>
+Subject: Re: [PATCH v15 0/7] MTE support for KVM guest
+In-Reply-To: <db4cf3c1-d5eb-f8cf-23ff-d52e3b6ae9b1@arm.com>
+References: <20210614090525.4338-1-steven.price@arm.com>
+ <20210617121322.GC6314@arm.com> <87im2cd443.wl-maz@kernel.org>
+ <db4cf3c1-d5eb-f8cf-23ff-d52e3b6ae9b1@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: will@kernel.org, wangyanan55@huawei.com, qperret@google.com,
- alexandru.elisei@arm.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, catalin.marinas@arm.com, james.morse@arm.com,
- julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, gshan@redhat.com,
- wanghaibin.wang@huawei.com, zhukeqian1@huawei.com, yuzenghui@huawei.com
+X-SA-Exim-Rcpt-To: steven.price@arm.com, catalin.marinas@arm.com,
+ will@kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com,
+ suzuki.poulose@arm.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Dave.Martin@arm.com, mark.rutland@arm.com, tglx@linutronix.de,
+ qemu-devel@nongnu.org, quintela@redhat.com, dgilbert@redhat.com,
+ richard.henderson@linaro.org, peter.maydell@linaro.org, Haibo.Xu@arm.com,
+ drjones@redhat.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
+ Catalin Marinas <catalin.marinas@arm.com>, Juan Quintela <quintela@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
+ Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org,
+ Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,58 +93,79 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 17 Jun 2021 14:21:16 +0100,
-Will Deacon <will@kernel.org> wrote:
+On Thu, 17 Jun 2021 14:24:25 +0100,
+Steven Price <steven.price@arm.com> wrote:
 > 
-> On Thu, Jun 17, 2021 at 01:59:37PM +0100, Marc Zyngier wrote:
-> > On Thu, 17 Jun 2021 13:45:57 +0100,
-> > Will Deacon <will@kernel.org> wrote:
-> > > On Thu, Jun 17, 2021 at 06:58:24PM +0800, Yanan Wang wrote:
-> > > > @@ -606,6 +618,14 @@ static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
-> > > >  		stage2_put_pte(ptep, data->mmu, addr, level, mm_ops);
-> > > >  	}
-> > > >  
-> > > > +	/* Perform CMOs before installation of the guest stage-2 PTE */
-> > > > +	if (mm_ops->clean_invalidate_dcache && stage2_pte_cacheable(pgt, new))
-> > > > +		mm_ops->clean_invalidate_dcache(kvm_pte_follow(new, mm_ops),
-> > > > +						granule);
-> > > > +
-> > > > +	if (mm_ops->invalidate_icache && stage2_pte_executable(new))
-> > > > +		mm_ops->invalidate_icache(kvm_pte_follow(new, mm_ops), granule);
-> > > 
-> > > One thing I'm missing here is why we need the indirection via mm_ops. Are
-> > > there cases where we would want to pass a different function pointer for
-> > > invalidating the icache? If not, why not just call the function directly?
-> > > 
-> > > Same for the D side.
+> On 17/06/2021 14:15, Marc Zyngier wrote:
+> > On Thu, 17 Jun 2021 13:13:22 +0100,
+> > Catalin Marinas <catalin.marinas@arm.com> wrote:
+> >>
+> >> On Mon, Jun 14, 2021 at 10:05:18AM +0100, Steven Price wrote:
+> >>> I realise there are still open questions[1] around the performance of
+> >>> this series (the 'big lock', tag_sync_lock, introduced in the first
+> >>> patch). But there should be no impact on non-MTE workloads and until we
+> >>> get real MTE-enabled hardware it's hard to know whether there is a need
+> >>> for something more sophisticated or not. Peter Collingbourne's patch[3]
+> >>> to clear the tags at page allocation time should hide more of the impact
+> >>> for non-VM cases. So the remaining concern is around VM startup which
+> >>> could be effectively serialised through the lock.
+> >> [...]
+> >>> [1]: https://lore.kernel.org/r/874ke7z3ng.wl-maz%40kernel.org
+> >>
+> >> Start-up, VM resume, migration could be affected by this lock, basically
+> >> any time you fault a page into the guest. As you said, for now it should
+> >> be fine as long as the hardware doesn't support MTE or qemu doesn't
+> >> enable MTE in guests. But the problem won't go away.
 > > 
-> > If we didn't do that, we'd end-up having to track whether the guest
-> > context requires CMOs with additional flags, which is pretty ugly (see
-> > v5 of this series for reference [1]).
+> > Indeed. And I find it odd to say "it's not a problem, we don't have
+> > any HW available". By this token, why should we merge this work the
+> > first place, or any of the MTE work that has gone into the kernel over
+> > the past years?
+> > 
+> >> We have a partial solution with an array of locks to mitigate against
+> >> this but there's still the question of whether we should actually bother
+> >> for something that's unlikely to happen in practice: MAP_SHARED memory
+> >> in guests (ignoring the stage 1 case for now).
+> >>
+> >> If MAP_SHARED in guests is not a realistic use-case, we have the vma in
+> >> user_mem_abort() and if the VM_SHARED flag is set together with MTE
+> >> enabled for guests, we can reject the mapping.
+> > 
+> > That's a reasonable approach. I wonder whether we could do that right
+> > at the point where the memslot is associated with the VM, like this:
+> > 
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index a36a2e3082d8..ebd3b3224386 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -1376,6 +1376,9 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+> >  		if (!vma)
+> >  			break;
+> >  
+> > +		if (kvm_has_mte(kvm) && vma->vm_flags & VM_SHARED)
+> > +			return -EINVAL;
+> > +
+> >  		/*
+> >  		 * Take the intersection of this VMA with the memory region
+> >  		 */
+> > 
+> > which takes the problem out of the fault path altogether? We document
+> > the restriction and move on. With that, we can use a non-locking
+> > version of mte_sync_page_tags().
 > 
-> Fair enough, although the function pointers here _are_ being used as
-> flags, as they only ever have one of two possible values (NULL or
-> the CMO function), so it's a shame to bring in the indirect branch
-> as well.
+> Does this deal with the case where the VMAs are changed after the
+> memslot is created? While we can do the check here to give the VMM a
+> heads-up if it gets it wrong, I think we also need it in
+> user_mem_abort() to deal with a VMM which mmap()s over the VA of the
+> memslot. Or am I missing something?
 
-What I hope eventually is to get rid of some of the FWB tracking we
-have for the host in the protected case, and use the same abstraction.
+No, you're right. I wish the memslot API wasn't so lax... Anyway, even
+a VMA flag check in user_mem_abort() will be cheaper than this new BKL.
 
-> 
-> > It also means that we would have to drag the CM functions into the EL2
-> > object, something that we don't need with this approach.
-> 
-> I think it won't be long before we end up with CMO functions at EL2 and
-> you'd hope we'd be able to use the same code as EL1 for something like
-> that. But I also wouldn't want to put money on it...
+> But if everyone is happy with the restriction (just for KVM) of not
+> allowing MTE+VM_SHARED then that sounds like a good way forward.
 
-It we reach that stage, I'll be happy to try and move these function
-into some shared location.
-
-> Anyway, no strong opinion on this, it just jumped out when I skimmed the
-> patches.
-
-Thanks,
+Definitely works for me.
 
 	M.
 
