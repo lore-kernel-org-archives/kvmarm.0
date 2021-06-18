@@ -7,95 +7,95 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 067A6C49EA3
-	for <kvmarm@archiver.kernel.org>; Fri, 18 Jun 2021 08:27:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 982B5C49EA4
+	for <kvmarm@archiver.kernel.org>; Fri, 18 Jun 2021 08:28:55 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 872C860FF0
-	for <kvmarm@archiver.kernel.org>; Fri, 18 Jun 2021 08:27:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 872C860FF0
+	by mail.kernel.org (Postfix) with ESMTP id 1D6326121D
+	for <kvmarm@archiver.kernel.org>; Fri, 18 Jun 2021 08:28:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D6326121D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 35C874B08A;
-	Fri, 18 Jun 2021 04:27:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A9F740FC7;
+	Fri, 18 Jun 2021 04:28:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id UIwQQBxpSk4X; Fri, 18 Jun 2021 04:27:08 -0400 (EDT)
+	with ESMTP id pyggFv2dfZwl; Fri, 18 Jun 2021 04:28:53 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 349994A522;
-	Fri, 18 Jun 2021 04:27:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CC934A1A7;
+	Fri, 18 Jun 2021 04:28:53 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1804140821
- for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Jun 2021 04:27:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A65DC40870
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Jun 2021 04:28:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TNvPBuTU9F8L for <kvmarm@lists.cs.columbia.edu>;
- Fri, 18 Jun 2021 04:27:05 -0400 (EDT)
+ with ESMTP id bpmXDkdVs9ee for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 18 Jun 2021 04:28:51 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4991C407F1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Jun 2021 04:27:05 -0400 (EDT)
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 966EC407F1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Jun 2021 04:28:51 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1624004825;
+ s=mimecast20190719; t=1624004931;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=3cJFa3rkdFzYGb5rzW5d+HyixyhjbZALeUmzplacLDE=;
- b=WDUDMG+yIFy+RLOkgd3s42sCcbDRp33y9//JHRxyT5g8w0zD9A9nGKR6oWRLpUeO70Gc0m
- GqcWr6mpTPPUibiM8YW6nEtkI4qD29pX+AHt8bgKNQcL8v8bEoSbHzdtA8RSUUG4xM/xoD
- 9AcB9o7Q1x5fNhHCiW5+NPIBM8YFxWY=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-297-6efjEDwHNeCcrs_NSJpoRA-1; Fri, 18 Jun 2021 04:27:03 -0400
-X-MC-Unique: 6efjEDwHNeCcrs_NSJpoRA-1
-Received: by mail-ej1-f70.google.com with SMTP id
- jy19-20020a1709077633b02903eb7acdb38cso3596367ejc.14
- for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Jun 2021 01:27:03 -0700 (PDT)
+ bh=2dX1Z1B4jDVkxeyQIb00TBL9OAqb/e0k+UeCSPEL6lM=;
+ b=Vvn032ENBgFnkOuTzKqptjPXV0MdMk+v36tnx+ISPrpm5CIFL9fzaCutXDlSD9nwMy05AB
+ FykGmO0YnMFulOhDJkXUVF2VxipNsObl0ZtfTFD85AjGXf9Y4YxFDv67lyVuWtgxlCLIZG
+ 8gxqmezP2SKX275K8LiCYgB8n3dwEdw=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-534-K5wlZeL_NZ2osQIjIXP0jw-1; Fri, 18 Jun 2021 04:28:50 -0400
+X-MC-Unique: K5wlZeL_NZ2osQIjIXP0jw-1
+Received: by mail-ed1-f69.google.com with SMTP id
+ x12-20020a05640226ccb0290393aaa6e811so3123774edd.19
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Jun 2021 01:28:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=3cJFa3rkdFzYGb5rzW5d+HyixyhjbZALeUmzplacLDE=;
- b=rbnsAyv+8h05Pr5Ei0dtZC+raX+qutoREWoHPGQk/Ki7NRndgP604kuNsNP9gi/yuU
- o4E4q6p7x89apicA/+TEznfnqNNnjw+Qp00hdeN7Rnx8+pVl2ZMA+PJhtbD1yGHj6HQE
- GaSHwSRw+rhBEq4Ej5HmOWa7JPIan4yfIRF8pTeK8V2e4cT05CxkWPXVn7XEZuyZEPH6
- +ZF4ImgRhnVN7B4jw3cZ99TaPTVaG9HFaU6EDXRTfbN5tMOM7a5jT8V0N+ySsFv4Cihg
- AeaAA2bVtdoBko7WE4t8Xj2x3zXVulK+flsI26dDrW54jRTV/edxwn3P5qrTyRMiW7G/
- VnUg==
-X-Gm-Message-State: AOAM533gcg77UIEvE7CFA76Uowrx2r0d/jaKSW0MmbJvlvTrCBPYCkxV
- az6wOInCsxyTNed7m0A+5D3nBQcbyKC+u2jTrAxujz30Av38xpjItq0xNmbIyG7Hy16k1GMdws6
- ORbQZkR6yXrOmWfy65Ft3kdW9
-X-Received: by 2002:a05:6402:2710:: with SMTP id
- y16mr3390932edd.101.1624004822546; 
- Fri, 18 Jun 2021 01:27:02 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwGq2oipoZItfIeXLaX4qbZsbrZASIiqcoDPCV2d+cJqFo6XvKWJmN2hFBt1VaAXBJaJ52UYQ==
-X-Received: by 2002:a05:6402:2710:: with SMTP id
- y16mr3390904edd.101.1624004822357; 
- Fri, 18 Jun 2021 01:27:02 -0700 (PDT)
+ bh=2dX1Z1B4jDVkxeyQIb00TBL9OAqb/e0k+UeCSPEL6lM=;
+ b=h+YnDoA25JPSYXruif8PablnZT4Hox/lfCd6a/lnhsHExgE3rVSmbFmlYZs45U8h1c
+ BMuBTkdtw7jhBe7mIfmQnnL1jQ+slBqBBrOyqQTvf8ZRCaioVM/s/ZICawHXvwsmuUeK
+ IAJZs5mhOIfjx4NmIBzBkE11T/gAjPARsPl7X4/sAwcdIk5wMihXIdle/LRndyQGHIg4
+ esanJip49GwUY0v9VX1xSzOO/LvsT5bs0UkDCNxSMHigblFchq7rxWoa8iisa29XmIHx
+ 1KvYXNvxW1nI1jkq7SbsVzTKyWkWC7EjntbBVgayp+j5lNEErDPyR9+q3ggRPd8dpkbR
+ zL3A==
+X-Gm-Message-State: AOAM531Hxio4aCB7bf//+CFnn6nF28yLAmmzMs56D2OloCbBQkKZOowA
+ UKQ97ApFciWV3/58mxRAsZW46MdKh3BqDwujwJQwDguOda2tP76/3tw/rcoJLOyRiEGRTU9dNic
+ 2eFwWtMiX0Ff2FescrJ9dXndw
+X-Received: by 2002:a17:907:2648:: with SMTP id
+ ar8mr9824428ejc.67.1624004928740; 
+ Fri, 18 Jun 2021 01:28:48 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxxEeRkMy/icCxnO1ZwArvUqnCPkqScwHQd07KbiNxNFCpJPaEhOwv7LrjsH24qmyNHLMlMAg==
+X-Received: by 2002:a17:907:2648:: with SMTP id
+ ar8mr9824392ejc.67.1624004928541; 
+ Fri, 18 Jun 2021 01:28:48 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
  ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
- by smtp.gmail.com with ESMTPSA id m7sm709185ejo.95.2021.06.18.01.27.00
+ by smtp.gmail.com with ESMTPSA id lu21sm730110ejb.31.2021.06.18.01.28.46
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 18 Jun 2021 01:27:01 -0700 (PDT)
+ Fri, 18 Jun 2021 01:28:47 -0700 (PDT)
+Subject: Re: [PATCH v11 2/7] KVM: stats: Add fd-based API to read binary stats
+ data
 To: Greg KH <gregkh@linuxfoundation.org>, Jing Zhang <jingzhangos@google.com>
 References: <20210618044819.3690166-1-jingzhangos@google.com>
- <20210618044819.3690166-6-jingzhangos@google.com>
- <YMxE8pUrbQkwlpbD@kroah.com>
+ <20210618044819.3690166-3-jingzhangos@google.com>
+ <YMxDv5BgfdMn2Y9b@kroah.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v11 5/7] KVM: stats: Add documentation for binary
- statistics interface
-Message-ID: <0036c55a-72d6-7b5c-a6fd-3a285476e522@redhat.com>
-Date: Fri, 18 Jun 2021 10:26:59 +0200
+Message-ID: <f9919638-06e2-2c4a-a6a6-f00fca6d78f8@redhat.com>
+Date: Fri, 18 Jun 2021 10:28:46 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <YMxE8pUrbQkwlpbD@kroah.com>
+In-Reply-To: <YMxDv5BgfdMn2Y9b@kroah.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -134,34 +134,15 @@ Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 18/06/21 09:02, Greg KH wrote:
->> +	struct kvm_stats_desc {
->> +		__u32 flags;
->> +		__s16 exponent;
->> +		__u16 size;
->> +		__u32 offset;
->> +		__u32 unused;
->> +		char name[];
->> +	};
-> As I mention in another patch, this should be sucked in directly from
-> the .h file in kerneldoc format, so that everything stays in sync.  I
-> bet almost this whole file can be put into the .h file, look at how drm
-> and v4l2 does this in a way that you only have to write the above one
-> time, not try to keep it in sync in two different places.
+On 18/06/21 08:57, Greg KH wrote:
+>> + * 2. Read descriptors from its offset and discover all the stats by parsing
+>> + *    descriptors. This is a one-time work for the lifecycle of the
+>> + *    corresponding vm/vcpu stats fd.
+>> + * 3. Periodically read stats data from its offset.
+> You forgot "2.5.  rewind fd pointer position", see below...
 
-V4L's userspace-api/media/v4l is absurdly good and I'd say it's by far 
-the best documentation of any Linux subsystem, but it's all handwritten 
-just like in KVM.  In fact, grepping for kernel-doc directives in 
-Documentation/ gives no hits for the V4L uAPI documentation.
-
-DRM has great kernel documentation, but quality-wise the KVM userland 
-documentation is on a completely different level compared to DRM; just 
-compare https://www.kernel.org/doc/html/latest/virt/kvm/api.html to 
-https://www.kernel.org/doc/html/latest/gpu/drm-uapi.html.  The latter is 
-not about how to use the DRM interfaces from userspace, it's about how 
-to implement the userspace interfaces.  It is full of kernel struct 
-definitions that should have no place in a uAPI manual, and does not 
-include documentation for almost anything in include/uapi/drm/drm.h
+Or use pread (that's what the test does).  I'll do a copy-editing pass 
+and be sure to mention that as well.
 
 Paolo
 
