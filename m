@@ -1,99 +1,73 @@
-Return-Path: <SRS0=srdq=LL=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=A4hI=LM=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_RED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C675EC2B9F4
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Jun 2021 22:16:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D6FCC2B9F4
+	for <kvmarm@archiver.kernel.org>; Fri, 18 Jun 2021 01:52:50 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3F501613AA
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Jun 2021 22:16:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F501613AA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 719BC613AA
+	for <kvmarm@archiver.kernel.org>; Fri, 18 Jun 2021 01:52:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 719BC613AA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AD9B34B0BC;
-	Thu, 17 Jun 2021 18:16:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D6A704B11C;
+	Thu, 17 Jun 2021 21:52:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id S0IoP5T+QAgr; Thu, 17 Jun 2021 18:16:12 -0400 (EDT)
+	with ESMTP id F9pOyZBSQu7U; Thu, 17 Jun 2021 21:52:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9962B4B09A;
-	Thu, 17 Jun 2021 18:16:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FA214B0F6;
+	Thu, 17 Jun 2021 21:52:47 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C42C440825
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 18:16:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DA7E84B0F6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 21:52:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YnuWmSTgHOV0 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 17 Jun 2021 18:16:10 -0400 (EDT)
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com
- [209.85.167.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 80BD9407EC
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 18:16:10 -0400 (EDT)
-Received: by mail-lf1-f43.google.com with SMTP id r198so12953940lff.11
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 15:16:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Om4JuohRkmHi4PHjJKgFSJXAnZij6pa7PZ+XB/Q93x4=;
- b=OOJpmNp62ZqVr6/h+5AHW1TBMZyF0mEzGOtoq/r2otQshVmw6uWPHvvmIPVKxDZJ8S
- INOe1MRD5ArDkisHNAm/m/BeaB21SJGpgm0A0A3o4jnwtPPOT4BI93x+cGmvun04tUfc
- 9oed64L6ruhD5G0X3ATf8KfMWJvcjZqq/9ntWbomgnwy3H+yhpsCepGn6VD/wurC/N2N
- 7eTCkGorBvJvG4JgwwjnhfMl4FmZhS2UCV+rteS/vwvyVaM5uFd33dISni3uW5mwJT7O
- a4PveGpEHqaokkFSRfCPS/C0SoVok/Hk+wPlQvWnytijp/pOuCFCkw2JVIvA6GOEp8Ed
- 73Ng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Om4JuohRkmHi4PHjJKgFSJXAnZij6pa7PZ+XB/Q93x4=;
- b=H8LX53Q8yvWLTfWrBrdk/Xgohpb3Rg5c+8H+Wt726jgyQ9PR3ZnVRx8/HVwRI+mx2i
- KSOP66kjPZGWjMP0RCIM4uUVDMLTgJmqRJThR9KwnSG873X63UNMUVxE/t+Z3jYTRkSo
- eyEYkVpkl6PczDeVZt/Yx/6h79qZki5jwm/JxEzpVssm8MsPs5hPHs6Kzy0GkWLFglOp
- BgnbF75lLgX5DD2TXL5eZwgv9gjNyHhXrA35KAX0ywu18+HvUg5xKYo0gloruGSz+Zf2
- dbMs1G2sMZsAeJdlQdz8lS/c84VxkMkQniFY1Oilo/ql18Q+Mrp5+vv5NMp3b3HUdW/y
- msPg==
-X-Gm-Message-State: AOAM532HIqCY9KSJnARISknjD1S7TynTPEXux5i/5df7hOLicYNXBXF9
- 0EBGosPtYSd+vBPUaPkUGRgUaEukejjqAg5hUDvWsQ==
-X-Google-Smtp-Source: ABdhPJxohFfvIE3vimsdKuy3pBfzuaga47QP5AbxcBntiUHpDUZF67j+bYeQSRMJ5KlBsVBRHTjWoXc8V+tBTOqYm9M=
-X-Received: by 2002:a05:6512:318d:: with SMTP id
- i13mr403328lfe.407.1623968168586; 
- Thu, 17 Jun 2021 15:16:08 -0700 (PDT)
+ with ESMTP id u3583XKXu0cg for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 17 Jun 2021 21:52:43 -0400 (EDT)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9DE114B0F5
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 21:52:42 -0400 (EDT)
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.56])
+ by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4G5hd256cNzXh6G;
+ Fri, 18 Jun 2021 09:47:34 +0800 (CST)
+Received: from dggpemm500023.china.huawei.com (7.185.36.83) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Fri, 18 Jun 2021 09:52:38 +0800
+Received: from [10.174.187.128] (10.174.187.128) by
+ dggpemm500023.china.huawei.com (7.185.36.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2176.2; Fri, 18 Jun 2021 09:52:37 +0800
+Subject: Re: [PATCH v7 1/4] KVM: arm64: Introduce two cache maintenance
+ callbacks
+To: Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>
+References: <20210617105824.31752-1-wangyanan55@huawei.com>
+ <20210617105824.31752-2-wangyanan55@huawei.com>
+ <20210617123837.GA24457@willie-the-truck> <87eed0d13p.wl-maz@kernel.org>
+From: "wangyanan (Y)" <wangyanan55@huawei.com>
+Message-ID: <2c1b9376-3997-aa7b-d5f3-b04da985c260@huawei.com>
+Date: Fri, 18 Jun 2021 09:52:36 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-References: <20210617044146.2667540-1-jingzhangos@google.com>
- <20210617044146.2667540-4-jingzhangos@google.com> <YMrkGZzPrt0jA1iP@kroah.com>
- <CAAdAUtik0Yw+4=4Ld-DJSokNzvdpa-tsxkqAdBCAb-C=uS0-sA@mail.gmail.com>
-In-Reply-To: <CAAdAUtik0Yw+4=4Ld-DJSokNzvdpa-tsxkqAdBCAb-C=uS0-sA@mail.gmail.com>
-From: Jing Zhang <jingzhangos@google.com>
-Date: Thu, 17 Jun 2021 17:15:57 -0500
-Message-ID: <CAAdAUthDbVvzFMGEp5sWEZ0MrtWaJBV4F_N4ois1D+4NO3n7fg@mail.gmail.com>
-Subject: Re: [PATCH v10 3/5] KVM: stats: Add documentation for binary
- statistics interface
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
- Paul Mackerras <paulus@ozlabs.org>,
- Linuxkselftest <linux-kselftest@vger.kernel.org>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Will Deacon <will@kernel.org>,
- KVMARM <kvmarm@lists.cs.columbia.edu>,
- Emanuele Giuseppe Esposito <eesposit@redhat.com>,
- LinuxS390 <linux-s390@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
- Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- David Rientjes <rientjes@google.com>, KVMPPC <kvm-ppc@vger.kernel.org>,
- Krish Sadhukhan <krish.sadhukhan@oracle.com>,
- David Matlack <dmatlack@google.com>, Jim Mattson <jmattson@google.com>,
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- Sean Christopherson <seanjc@google.com>, Cornelia Huck <cohuck@redhat.com>,
- Peter Shier <pshier@google.com>, LinuxMIPS <linux-mips@vger.kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
+In-Reply-To: <87eed0d13p.wl-maz@kernel.org>
+Content-Language: en-US
+X-Originating-IP: [10.174.187.128]
+X-ClientProxiedBy: dggeme718-chm.china.huawei.com (10.1.199.114) To
+ dggpemm500023.china.huawei.com (7.185.36.83)
+X-CFilter-Loop: Reflected
+Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -105,71 +79,85 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Greg,
 
-On Thu, Jun 17, 2021 at 10:20 AM Jing Zhang <jingzhangos@google.com> wrote:
+
+On 2021/6/17 22:20, Marc Zyngier wrote:
+> On Thu, 17 Jun 2021 13:38:37 +0100,
+> Will Deacon <will@kernel.org> wrote:
+>> On Thu, Jun 17, 2021 at 06:58:21PM +0800, Yanan Wang wrote:
+>>> To prepare for performing CMOs for guest stage-2 in the fault handlers
+>>> in pgtable.c, here introduce two cache maintenance callbacks in struct
+>>> kvm_pgtable_mm_ops. We also adjust the comment alignment for the
+>>> existing part but make no real content change at all.
+>>>
+>>> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
+>>> ---
+>>>   arch/arm64/include/asm/kvm_pgtable.h | 42 +++++++++++++++++-----------
+>>>   1 file changed, 25 insertions(+), 17 deletions(-)
+>>>
+>>> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+>>> index c3674c47d48c..b6ce34aa44bb 100644
+>>> --- a/arch/arm64/include/asm/kvm_pgtable.h
+>>> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+>>> @@ -27,23 +27,29 @@ typedef u64 kvm_pte_t;
+>>>   
+>>>   /**
+>>>    * struct kvm_pgtable_mm_ops - Memory management callbacks.
+>>> - * @zalloc_page:	Allocate a single zeroed memory page. The @arg parameter
+>>> - *			can be used by the walker to pass a memcache. The
+>>> - *			initial refcount of the page is 1.
+>>> - * @zalloc_pages_exact:	Allocate an exact number of zeroed memory pages. The
+>>> - *			@size parameter is in bytes, and is rounded-up to the
+>>> - *			next page boundary. The resulting allocation is
+>>> - *			physically contiguous.
+>>> - * @free_pages_exact:	Free an exact number of memory pages previously
+>>> - *			allocated by zalloc_pages_exact.
+>>> - * @get_page:		Increment the refcount on a page.
+>>> - * @put_page:		Decrement the refcount on a page. When the refcount
+>>> - *			reaches 0 the page is automatically freed.
+>>> - * @page_count:		Return the refcount of a page.
+>>> - * @phys_to_virt:	Convert a physical address into a virtual address mapped
+>>> - *			in the current context.
+>>> - * @virt_to_phys:	Convert a virtual address mapped in the current context
+>>> - *			into a physical address.
+>>> + * @zalloc_page:		Allocate a single zeroed memory page.
+>>> + *				The @arg parameter can be used by the walker
+>>> + *				to pass a memcache. The initial refcount of
+>>> + *				the page is 1.
+>>> + * @zalloc_pages_exact:		Allocate an exact number of zeroed memory pages.
+>>> + *				The @size parameter is in bytes, and is rounded
+>>> + *				up to the next page boundary. The resulting
+>>> + *				allocation is physically contiguous.
+>>> + * @free_pages_exact:		Free an exact number of memory pages previously
+>>> + *				allocated by zalloc_pages_exact.
+>>> + * @get_page:			Increment the refcount on a page.
+>>> + * @put_page:			Decrement the refcount on a page. When the
+>>> + *				refcount reaches 0 the page is automatically
+>>> + *				freed.
+>>> + * @page_count:			Return the refcount of a page.
+>>> + * @phys_to_virt:		Convert a physical address into a virtual address
+>>> + *				mapped in the current context.
+>>> + * @virt_to_phys:		Convert a virtual address mapped in the current
+>>> + *				context into a physical address.
+>>> + * @clean_invalidate_dcache:	Clean and invalidate the data cache for the
+>>> + *				specified memory address range.
+>> This should probably be explicit about whether this to the PoU/PoC/PoP.
+> Indeed. I can fix that locally if there is nothing else that requires
+> adjusting.
+Will be grateful !
+
+Thanks,
+Yanan
+.
 >
-> Hi Greg,
+> 	M.
 >
-> On Thu, Jun 17, 2021 at 12:56 AM Greg KH <gregkh@linuxfoundation.org> wrote:
-> >
-> > On Thu, Jun 17, 2021 at 04:41:44AM +0000, Jing Zhang wrote:
-> > > +     struct kvm_stats_desc {
-> > > +             __u32 flags;
-> > > +             __s16 exponent;
-> > > +             __u16 size;
-> > > +             __u32 offset;
-> > > +             __u32 unused;
-> > > +             char name[0];
-> > > +     };
-> >
-> > <snip>
-> >
-> > > +The ``unused`` fields are reserved for future support for other types of
-> > > +statistics data, like log/linear histogram.
-> >
-> > you HAVE to set unused to 0 for now, otherwise userspace does not know
-> > it is unused, right?  And then, really it is "used", so why not just say
-> > that now?  It's tricky, but you have to get this right now otherwise you
-> > can never use it in the future.
-> >
-> Sure, will do that.
-> > > +The ``name`` field points to the name string of the statistics data. The name
-> >
-> > It is not a pointer, it is the data itself.
-> >
-> Will fix it.
-> > > +string starts at the end of ``struct kvm_stats_desc``.
-> > > +The maximum length (including trailing '\0') is indicated by ``name_size``
-> > > +in ``struct kvm_stats_header``.
-> >
-> > I thought we were replacing [0] arrays with [], are you sure you should
-> > be declaring this as [0]?  Same for all structures in this document (and
-> > code).
-> >
-> The reason to declare it as [0] is to have the flexibility to change the maximum
-> length of KVM stats name. For now, the max len is  defined as 48, which can
-> be read from the header. Then the userspace can get the length of descriptor by
-> adding sizeof(struct_kvm_stats_desc) + 48. Whenever the max len is changed
-> in KVM, the userspace would not have to update code to reflect that.
-> However, if we are OK to restrict the maximum KVM stats' length to 48
-> (or any other
-> number), we can just declear it with [] instead of [0].
-Please ignore my above comments.
-You are right. We can just replace all zero-length arrays [0] with a
-flexible array
-member []. Thanks.
-> > thanks,
-> >
-> > greg k-h
->
-> Thanks,
-> Jing
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
