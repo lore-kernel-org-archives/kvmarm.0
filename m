@@ -2,79 +2,110 @@ Return-Path: <SRS0=A4hI=LM=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05C6EC48BDF
-	for <kvmarm@archiver.kernel.org>; Fri, 18 Jun 2021 15:43:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD945C48BDF
+	for <kvmarm@archiver.kernel.org>; Fri, 18 Jun 2021 16:09:21 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7637761245
-	for <kvmarm@archiver.kernel.org>; Fri, 18 Jun 2021 15:43:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7637761245
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 168DF613B4
+	for <kvmarm@archiver.kernel.org>; Fri, 18 Jun 2021 16:09:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 168DF613B4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1AE33407F1;
-	Fri, 18 Jun 2021 11:43:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 84FA94B080;
+	Fri, 18 Jun 2021 12:09:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id XCQzr9GoDfvS; Fri, 18 Jun 2021 11:43:02 -0400 (EDT)
+	with ESMTP id ig5p1Dmmw2wn; Fri, 18 Jun 2021 12:09:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EEE2C4A51D;
-	Fri, 18 Jun 2021 11:43:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4DCC249DE7;
+	Fri, 18 Jun 2021 12:09:19 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E33B64A4A3
- for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Jun 2021 11:43:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C53B4A4A3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Jun 2021 11:51:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZYe-RPCazt67 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 18 Jun 2021 11:42:59 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C75FC407F1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Jun 2021 11:42:59 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id B71CF61222;
- Fri, 18 Jun 2021 15:42:58 +0000 (UTC)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
- TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1luGe0-008TnC-Er; Fri, 18 Jun 2021 16:42:57 +0100
+ with ESMTP id 8DZlL1GVQGTv for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 18 Jun 2021 11:51:36 -0400 (EDT)
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com
+ [209.85.221.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1C0C2407F1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Jun 2021 11:51:36 -0400 (EDT)
+Received: by mail-wr1-f52.google.com with SMTP id y7so11230349wrh.7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Jun 2021 08:51:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:to:cc:references:from:subject:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=CD9XnXo3UlaYFvntUj461NFpsSCX2GWDOVULfKVOTy0=;
+ b=nDc9H2/XnHo7s1BgDDoRt0U6v8ckmFqgmEWFtyKB3gfuFjOr7AP752I7pJacwMeuSn
+ U/N4IaBNR+4GN8t3kdoNdZmWixER4cTnLJyqpxg5JCe/VumjOLB4qSraPZr409ZG3PZR
+ 0iX0k4yCHpfc85SqA80AbZrqtr9qe+aEXf6xYu+YT3n3aIR7jkhsSJ2AC8Rehe6CNfJO
+ 4ON9vNCZv3TbETMSsLGAyGhRJaZRjcAMvF6iZSQhEwrh5V/96XvHkN4F7tVugqqjzx4A
+ hIB73eHqOfRDSbpcetHtIEFX+ecPZrlzSoUsDELCq6c6U7aMuqxznfJspBB+4rl5Qytn
+ Juwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:to:cc:references:from:subject:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=CD9XnXo3UlaYFvntUj461NFpsSCX2GWDOVULfKVOTy0=;
+ b=PCPAtFL4ocyVacxtEVlpQ+BUVEphq0y8QHDL9l6VnYd4LZwFjE1wmIM8+dfQcmGyHO
+ w+TDOwbbKnyZNPaDn1eNB3OZrnsZDlAZY1CPUmYYZ3Xus5kOzqlKOCgWD3t77KvncEEF
+ 7HaYOJIrDIeAz+Yh8kwZgzibrOcmfOVMvFElSnmDNMM2d7O/1bL2j3W1+BY7TwWgpKC+
+ o87kFsSnl+f+7UrMkaZWsq6VzX/+qoANm7iO8R8w6hCVIJkCCn+jOuk6eF1uOnLEGtKW
+ LaH8kPXm2AHH6+ZbzdiQ2Z5YZwp4VbnVjGkiVh882yWNjFEIrMWfD+LsjTdNdrD3O6j0
+ GtzQ==
+X-Gm-Message-State: AOAM533vqxys8BL74GzgY4/CZ7kiV2kqznp0nlGaTNOowIjsqwYh46eS
+ T1j5tKTdugKKaPAXvMYRyFw=
+X-Google-Smtp-Source: ABdhPJzkI7Io3g4FbXkpApW8iRbTya+G4og+TF5Olp6jNzTRurHJqUU5y/Ze/8I4kybjCv0/noZ/6A==
+X-Received: by 2002:adf:f20c:: with SMTP id p12mr13048124wro.257.1624031495092; 
+ Fri, 18 Jun 2021 08:51:35 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
+ ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+ by smtp.googlemail.com with ESMTPSA id b8sm11568956wmd.35.2021.06.18.08.51.33
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 18 Jun 2021 08:51:34 -0700 (PDT)
+To: Greg KH <gregkh@linuxfoundation.org>
+References: <20210618044819.3690166-1-jingzhangos@google.com>
+ <20210618044819.3690166-3-jingzhangos@google.com>
+ <YMxEqvKyGnZinMOS@kroah.com> <f2616b8e-0cf8-570f-4bd3-7ef5cbcb37b0@gnu.org>
+ <YMxYC8syYRBhbBAq@kroah.com>
+From: Paolo Bonzini <bonzini@gnu.org>
+Subject: Re: [PATCH v11 2/7] KVM: stats: Add fd-based API to read binary stats
+ data
+Message-ID: <22bb0eb6-1305-4af9-aecc-166d7e62e6c3@gnu.org>
+Date: Fri, 18 Jun 2021 17:51:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Date: Fri, 18 Jun 2021 16:42:56 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v16 1/7] arm64: mte: Handle race when synchronising tags
-In-Reply-To: <20210618144013.GE16116@arm.com>
-References: <20210618132826.54670-1-steven.price@arm.com>
- <20210618132826.54670-2-steven.price@arm.com>
- <20210618144013.GE16116@arm.com>
-User-Agent: Roundcube Webmail/1.4.11
-Message-ID: <3551d8ea9c9464e982d75acdd5f855b4@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: catalin.marinas@arm.com, steven.price@arm.com,
- will@kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com,
- suzuki.poulose@arm.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Dave.Martin@arm.com, mark.rutland@arm.com, tglx@linutronix.de,
- qemu-devel@nongnu.org, quintela@redhat.com, dgilbert@redhat.com,
- richard.henderson@linaro.org, peter.maydell@linaro.org, drjones@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
- Dave Martin <Dave.Martin@arm.com>, Juan Quintela <quintela@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
- Steven Price <steven.price@arm.com>, linux-arm-kernel@lists.infradead.org,
- Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+In-Reply-To: <YMxYC8syYRBhbBAq@kroah.com>
+Content-Language: en-US
+X-Mailman-Approved-At: Fri, 18 Jun 2021 12:09:17 -0400
+Cc: KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
+ Paul Mackerras <paulus@ozlabs.org>,
+ Linuxkselftest <linux-kselftest@vger.kernel.org>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, Will Deacon <will@kernel.org>,
+ KVMARM <kvmarm@lists.cs.columbia.edu>,
+ Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+ LinuxS390 <linux-s390@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
+ Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ David Rientjes <rientjes@google.com>, KVMPPC <kvm-ppc@vger.kernel.org>,
+ Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+ David Matlack <dmatlack@google.com>, Jim Mattson <jmattson@google.com>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ Sean Christopherson <seanjc@google.com>, Cornelia Huck <cohuck@redhat.com>,
+ Peter Shier <pshier@google.com>, LinuxMIPS <linux-mips@vger.kernel.org>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,53 +122,84 @@ Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2021-06-18 15:40, Catalin Marinas wrote:
-> On Fri, Jun 18, 2021 at 02:28:20PM +0100, Steven Price wrote:
->> mte_sync_tags() used test_and_set_bit() to set the PG_mte_tagged flag
->> before restoring/zeroing the MTE tags. However if another thread were 
->> to
->> race and attempt to sync the tags on the same page before the first
->> thread had completed restoring/zeroing then it would see the flag is
->> already set and continue without waiting. This would potentially 
->> expose
->> the previous contents of the tags to user space, and cause any updates
->> that user space makes before the restoring/zeroing has completed to
->> potentially be lost.
->> 
->> Since this code is run from atomic contexts we can't just lock the 
->> page
->> during the process. Instead implement a new (global) spinlock to 
->> protect
->> the mte_sync_page_tags() function.
->> 
->> Fixes: 34bfeea4a9e9 ("arm64: mte: Clear the tags when a page is mapped 
->> in user-space with PROT_MTE")
->> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
->> Signed-off-by: Steven Price <steven.price@arm.com>
+On 18/06/21 10:23, Greg KH wrote:
+> On Fri, Jun 18, 2021 at 10:02:57AM +0200, Paolo Bonzini wrote:
+>> On 18/06/21 09:00, Greg KH wrote:
+>>>> +struct kvm_stats_header {
+>>>> +	__u32 name_size;
+>>>> +	__u32 count;
+>>>> +	__u32 desc_offset;
+>>>> +	__u32 data_offset;
+>>>> +	char id[];
+>>>> +};
+>>>
+>>> You mentioned before that the size of this really is the size of the
+>>> structure + KVM_STATS_ID_MAXLEN, right?  Or is it - KVM_STATS_ID_MAXLEN?
+>>>
+>>> If so, why not put that value explicitly in:
+>>> 	char id[THE_REST_OF_THE_HEADER_SPACE];
+>>>
+>>> As this is not a variable header size at all, and you can not change it
+>>> going forward, so the variable length array here feels disingenuous.
+>>
+>> It can change; the header goes up to desc_offset.  Let's rename desc_offset
+>> to header_size.
 > 
-> Although I reviewed this patch, I think we should drop it from this
-> series and restart the discussion with the Chromium guys on what/if 
-> they
-> need PROT_MTE with MAP_SHARED. It currently breaks if you have two
-> PROT_MTE mappings but if they are ok with only one of the mappings 
-> being
-> PROT_MTE, I'm happy to just document it.
+> "Traditionally" the first field of a variable length structure like this
+> has the size.  So maybe this needs to be:
 > 
-> Not sure whether subsequent patches depend on it though.
+> struct kvm_stats_header {
+> 	__u32 header_size;
 
-I'd certainly like it to be independent of the KVM series, specially
-as this series is pretty explicit that this MTE lock is not required
-for KVM.
+Thinking more about it, I slightly prefer id_offset so that we can later 
+give a meaning to any bytes after kvm_stats_header and before id_offset.
 
-This will require some rework of patch #2, I believe. And while we're
-at it, a rebase on 5.13-rc4 wouldn't hurt, as both patches #3 and #5
-conflict with it...
+Adding four unused bytes (for now always zero) is also useful to future 
+proof the struct a bit, thus:
 
-Thanks,
+struct kvm_stats_header {
+	__u32 flags;
+	__u32 name_size;
+	__u32 num_desc;
+	__u32 id_offset;
+	__u32 desc_offset;
+	__u32 data_offset;
+}
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+(Indeed num_desc is better than count).
+
+> Wait, what is "name_size" here for?
+
+So that you know the full size of the descriptors is (name_size + 
+sizeof(kvm_stats_desc) + name_size) * num_desc.  That's the memory you 
+allocate and the size that you can then pass to a single pread system 
+call starting from offset desc_offset.
+
+There is certainly room for improvement in that the length of id[] and 
+name[] can be unified to name_size.
+
+>>>> +struct kvm_stats_desc {
+>>>> +	__u32 flags;
+>>>> +	__s16 exponent;
+>>>> +	__u16 size;
+>>>> +	__u32 offset;
+>>>> +	__u32 unused;
+>>>> +	char name[];
+>>>> +};
+>>>
+>>> What is the max length of name?
+>>
+>> It's name_size in the header.
+> 
+> So it's specified in the _previous_ header?  That feels wrong, shouldn't
+> this descriptor define what is in it?
+
+Compared to e.g. PCI where you can do random-access reads from memory or 
+configuration space, reading from a file has slightly different 
+tradeoffs.  So designing a file format is slightly different compared to 
+designing an in-memory format, or a wire protocol.
+
+Paolo
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
