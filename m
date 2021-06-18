@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85A2DC48BDF
-	for <kvmarm@archiver.kernel.org>; Fri, 18 Jun 2021 13:28:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5E93C48BDF
+	for <kvmarm@archiver.kernel.org>; Fri, 18 Jun 2021 13:28:48 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 12BAE613F0
-	for <kvmarm@archiver.kernel.org>; Fri, 18 Jun 2021 13:28:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12BAE613F0
+	by mail.kernel.org (Postfix) with ESMTP id 365B2613F0
+	for <kvmarm@archiver.kernel.org>; Fri, 18 Jun 2021 13:28:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 365B2613F0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A6D614B0BA;
-	Fri, 18 Jun 2021 09:28:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CEE9E4A195;
+	Fri, 18 Jun 2021 09:28:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ZgYAllsEyXZQ; Fri, 18 Jun 2021 09:28:43 -0400 (EDT)
+	with ESMTP id RJI35u6LQ1Da; Fri, 18 Jun 2021 09:28:46 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6624D4B081;
-	Fri, 18 Jun 2021 09:28:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8575D4B0A1;
+	Fri, 18 Jun 2021 09:28:46 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B06E4B0A0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Jun 2021 09:28:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 366A54B0A1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Jun 2021 09:28:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id eRyj6ISIkAVE for <kvmarm@lists.cs.columbia.edu>;
- Fri, 18 Jun 2021 09:28:41 -0400 (EDT)
+ with ESMTP id OGno+TFAxGCO for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 18 Jun 2021 09:28:44 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 31DA849E8C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Jun 2021 09:28:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EF8224A3A3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Jun 2021 09:28:43 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B5A981476;
- Fri, 18 Jun 2021 06:28:40 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9E37F1478;
+ Fri, 18 Jun 2021 06:28:43 -0700 (PDT)
 Received: from e112269-lin.arm.com (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 166E93F719;
- Fri, 18 Jun 2021 06:28:37 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F10433F719;
+ Fri, 18 Jun 2021 06:28:40 -0700 (PDT)
 From: Steven Price <steven.price@arm.com>
 To: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Will Deacon <will@kernel.org>
-Subject: [PATCH v16 1/7] arm64: mte: Handle race when synchronising tags
-Date: Fri, 18 Jun 2021 14:28:20 +0100
-Message-Id: <20210618132826.54670-2-steven.price@arm.com>
+Subject: [PATCH v16 2/7] arm64: mte: Sync tags for pages where PTE is untagged
+Date: Fri, 18 Jun 2021 14:28:21 +0100
+Message-Id: <20210618132826.54670-3-steven.price@arm.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20210618132826.54670-1-steven.price@arm.com>
 References: <20210618132826.54670-1-steven.price@arm.com>
@@ -73,83 +73,128 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-mte_sync_tags() used test_and_set_bit() to set the PG_mte_tagged flag
-before restoring/zeroing the MTE tags. However if another thread were to
-race and attempt to sync the tags on the same page before the first
-thread had completed restoring/zeroing then it would see the flag is
-already set and continue without waiting. This would potentially expose
-the previous contents of the tags to user space, and cause any updates
-that user space makes before the restoring/zeroing has completed to
-potentially be lost.
+A KVM guest could store tags in a page even if the VMM hasn't mapped
+the page with PROT_MTE. So when restoring pages from swap we will
+need to check to see if there are any saved tags even if !pte_tagged().
 
-Since this code is run from atomic contexts we can't just lock the page
-during the process. Instead implement a new (global) spinlock to protect
-the mte_sync_page_tags() function.
+However don't check pages for which pte_access_permitted() returns false
+as these will not have been swapped out.
 
-Fixes: 34bfeea4a9e9 ("arm64: mte: Clear the tags when a page is mapped in user-space with PROT_MTE")
 Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
- arch/arm64/kernel/mte.c | 20 +++++++++++++++++---
- 1 file changed, 17 insertions(+), 3 deletions(-)
+ arch/arm64/include/asm/mte.h     |  4 ++--
+ arch/arm64/include/asm/pgtable.h | 22 +++++++++++++++++++---
+ arch/arm64/kernel/mte.c          | 17 +++++++++++++----
+ 3 files changed, 34 insertions(+), 9 deletions(-)
 
+diff --git a/arch/arm64/include/asm/mte.h b/arch/arm64/include/asm/mte.h
+index bc88a1ced0d7..347ef38a35f7 100644
+--- a/arch/arm64/include/asm/mte.h
++++ b/arch/arm64/include/asm/mte.h
+@@ -37,7 +37,7 @@ void mte_free_tag_storage(char *storage);
+ /* track which pages have valid allocation tags */
+ #define PG_mte_tagged	PG_arch_2
+ 
+-void mte_sync_tags(pte_t *ptep, pte_t pte);
++void mte_sync_tags(pte_t old_pte, pte_t pte);
+ void mte_copy_page_tags(void *kto, const void *kfrom);
+ void mte_thread_init_user(void);
+ void mte_thread_switch(struct task_struct *next);
+@@ -53,7 +53,7 @@ int mte_ptrace_copy_tags(struct task_struct *child, long request,
+ /* unused if !CONFIG_ARM64_MTE, silence the compiler */
+ #define PG_mte_tagged	0
+ 
+-static inline void mte_sync_tags(pte_t *ptep, pte_t pte)
++static inline void mte_sync_tags(pte_t old_pte, pte_t pte)
+ {
+ }
+ static inline void mte_copy_page_tags(void *kto, const void *kfrom)
+diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
+index 0b10204e72fc..db5402168841 100644
+--- a/arch/arm64/include/asm/pgtable.h
++++ b/arch/arm64/include/asm/pgtable.h
+@@ -314,9 +314,25 @@ static inline void set_pte_at(struct mm_struct *mm, unsigned long addr,
+ 	if (pte_present(pte) && pte_user_exec(pte) && !pte_special(pte))
+ 		__sync_icache_dcache(pte);
+ 
+-	if (system_supports_mte() &&
+-	    pte_present(pte) && pte_tagged(pte) && !pte_special(pte))
+-		mte_sync_tags(ptep, pte);
++	/*
++	 * If the PTE would provide user space access to the tags associated
++	 * with it then ensure that the MTE tags are synchronised.  Although
++	 * pte_access_permitted() returns false for exec only mappings, they
++	 * don't expose tags (instruction fetches don't check tags).
++	 */
++	if (system_supports_mte() && pte_access_permitted(pte, false) &&
++	    !pte_special(pte)) {
++		pte_t old_pte = READ_ONCE(*ptep);
++		/*
++		 * We only need to synchronise if the new PTE has tags enabled
++		 * or if swapping in (in which case another mapping may have
++		 * set tags in the past even if this PTE isn't tagged).
++		 * (!pte_none() && !pte_present()) is an open coded version of
++		 * is_swap_pte()
++		 */
++		if (pte_tagged(pte) || (!pte_none(old_pte) && !pte_present(old_pte)))
++			mte_sync_tags(old_pte, pte);
++	}
+ 
+ 	__check_racy_pte_update(mm, ptep, pte);
+ 
 diff --git a/arch/arm64/kernel/mte.c b/arch/arm64/kernel/mte.c
-index 125a10e413e9..a3583a7fd400 100644
+index a3583a7fd400..ae0a3c68fece 100644
 --- a/arch/arm64/kernel/mte.c
 +++ b/arch/arm64/kernel/mte.c
-@@ -25,6 +25,7 @@
- u64 gcr_kernel_excl __ro_after_init;
+@@ -33,10 +33,10 @@ DEFINE_STATIC_KEY_FALSE(mte_async_mode);
+ EXPORT_SYMBOL_GPL(mte_async_mode);
+ #endif
  
- static bool report_fault_once = true;
-+static DEFINE_SPINLOCK(tag_sync_lock);
- 
- #ifdef CONFIG_KASAN_HW_TAGS
- /* Whether the MTE asynchronous mode is enabled. */
-@@ -34,13 +35,22 @@ EXPORT_SYMBOL_GPL(mte_async_mode);
- 
- static void mte_sync_page_tags(struct page *page, pte_t *ptep, bool check_swap)
+-static void mte_sync_page_tags(struct page *page, pte_t *ptep, bool check_swap)
++static void mte_sync_page_tags(struct page *page, pte_t old_pte,
++			       bool check_swap, bool pte_is_tagged)
  {
-+	unsigned long flags;
- 	pte_t old_pte = READ_ONCE(*ptep);
+ 	unsigned long flags;
+-	pte_t old_pte = READ_ONCE(*ptep);
  
-+	spin_lock_irqsave(&tag_sync_lock, flags);
-+
-+	/* Recheck with the lock held */
-+	if (test_bit(PG_mte_tagged, &page->flags))
-+		goto out;
-+
- 	if (check_swap && is_swap_pte(old_pte)) {
- 		swp_entry_t entry = pte_to_swp_entry(old_pte);
+ 	spin_lock_irqsave(&tag_sync_lock, flags);
  
--		if (!non_swap_entry(entry) && mte_restore_tags(entry, page))
--			return;
-+		if (!non_swap_entry(entry) && mte_restore_tags(entry, page)) {
-+			set_bit(PG_mte_tagged, &page->flags);
-+			goto out;
-+		}
+@@ -53,6 +53,9 @@ static void mte_sync_page_tags(struct page *page, pte_t *ptep, bool check_swap)
+ 		}
  	}
  
- 	page_kasan_tag_reset(page);
-@@ -53,6 +63,10 @@ static void mte_sync_page_tags(struct page *page, pte_t *ptep, bool check_swap)
- 	 */
- 	smp_wmb();
- 	mte_clear_page_tags(page_address(page));
-+	set_bit(PG_mte_tagged, &page->flags);
++	if (!pte_is_tagged)
++		goto out;
 +
-+out:
-+	spin_unlock_irqrestore(&tag_sync_lock, flags);
+ 	page_kasan_tag_reset(page);
+ 	/*
+ 	 * We need smp_wmb() in between setting the flags and clearing the
+@@ -69,16 +72,22 @@ static void mte_sync_page_tags(struct page *page, pte_t *ptep, bool check_swap)
+ 	spin_unlock_irqrestore(&tag_sync_lock, flags);
  }
  
- void mte_sync_tags(pte_t *ptep, pte_t pte)
-@@ -63,7 +77,7 @@ void mte_sync_tags(pte_t *ptep, pte_t pte)
+-void mte_sync_tags(pte_t *ptep, pte_t pte)
++void mte_sync_tags(pte_t old_pte, pte_t pte)
+ {
+ 	struct page *page = pte_page(pte);
+ 	long i, nr_pages = compound_nr(page);
+ 	bool check_swap = nr_pages == 1;
++	bool pte_is_tagged = pte_tagged(pte);
++
++	/* Early out if there's nothing to do */
++	if (!check_swap && !pte_is_tagged)
++		return;
  
  	/* if PG_mte_tagged is set, tags have already been initialised */
  	for (i = 0; i < nr_pages; i++, page++) {
--		if (!test_and_set_bit(PG_mte_tagged, &page->flags))
-+		if (!test_bit(PG_mte_tagged, &page->flags))
- 			mte_sync_page_tags(page, ptep, check_swap);
+ 		if (!test_bit(PG_mte_tagged, &page->flags))
+-			mte_sync_page_tags(page, ptep, check_swap);
++			mte_sync_page_tags(page, old_pte, check_swap,
++					   pte_is_tagged);
  	}
  }
+ 
 -- 
 2.20.1
 
