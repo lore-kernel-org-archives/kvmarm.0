@@ -2,72 +2,102 @@ Return-Path: <SRS0=A4hI=LM=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D6FCC2B9F4
-	for <kvmarm@archiver.kernel.org>; Fri, 18 Jun 2021 01:52:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6470EC49EA5
+	for <kvmarm@archiver.kernel.org>; Fri, 18 Jun 2021 04:48:28 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 719BC613AA
-	for <kvmarm@archiver.kernel.org>; Fri, 18 Jun 2021 01:52:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 719BC613AA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id D42E561209
+	for <kvmarm@archiver.kernel.org>; Fri, 18 Jun 2021 04:48:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D42E561209
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D6A704B11C;
-	Thu, 17 Jun 2021 21:52:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 27F1940808;
+	Fri, 18 Jun 2021 00:48:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id F9pOyZBSQu7U; Thu, 17 Jun 2021 21:52:47 -0400 (EDT)
+	with ESMTP id QP8OIKU0cCoz; Fri, 18 Jun 2021 00:48:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FA214B0F6;
-	Thu, 17 Jun 2021 21:52:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E0BEE40870;
+	Fri, 18 Jun 2021 00:48:25 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DA7E84B0F6
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 21:52:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DE44040463
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Jun 2021 00:48:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id u3583XKXu0cg for <kvmarm@lists.cs.columbia.edu>;
- Thu, 17 Jun 2021 21:52:43 -0400 (EDT)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9DE114B0F5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 21:52:42 -0400 (EDT)
-Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.56])
- by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4G5hd256cNzXh6G;
- Fri, 18 Jun 2021 09:47:34 +0800 (CST)
-Received: from dggpemm500023.china.huawei.com (7.185.36.83) by
- dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Fri, 18 Jun 2021 09:52:38 +0800
-Received: from [10.174.187.128] (10.174.187.128) by
- dggpemm500023.china.huawei.com (7.185.36.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2176.2; Fri, 18 Jun 2021 09:52:37 +0800
-Subject: Re: [PATCH v7 1/4] KVM: arm64: Introduce two cache maintenance
- callbacks
-To: Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>
-References: <20210617105824.31752-1-wangyanan55@huawei.com>
- <20210617105824.31752-2-wangyanan55@huawei.com>
- <20210617123837.GA24457@willie-the-truck> <87eed0d13p.wl-maz@kernel.org>
-From: "wangyanan (Y)" <wangyanan55@huawei.com>
-Message-ID: <2c1b9376-3997-aa7b-d5f3-b04da985c260@huawei.com>
-Date: Fri, 18 Jun 2021 09:52:36 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
-MIME-Version: 1.0
-In-Reply-To: <87eed0d13p.wl-maz@kernel.org>
-Content-Language: en-US
-X-Originating-IP: [10.174.187.128]
-X-ClientProxiedBy: dggeme718-chm.china.huawei.com (10.1.199.114) To
- dggpemm500023.china.huawei.com (7.185.36.83)
-X-CFilter-Loop: Reflected
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ with ESMTP id F2C5GOqQJYPJ for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 18 Jun 2021 00:48:23 -0400 (EDT)
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com
+ [209.85.210.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6AEF9402C0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Jun 2021 00:48:23 -0400 (EDT)
+Received: by mail-pf1-f202.google.com with SMTP id
+ p42-20020a056a000a2ab02902f33d81f23fso5052600pfh.9
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jun 2021 21:48:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=aX5vzwr4uX568u1A1NtAetcO8H5b06l0VkOaAxAnVkA=;
+ b=tGukxaCQCc4unz3T4o+1k0603INSgUYlITVDfwwxW++mV230YThTVX3uCxQj4LPeyV
+ 3tm06/AS0y5aN6UK0EwyOKWiRohe3ONlbCdGuGqjcnREBxpAyAv8DP0+F+cY7XOqaHw1
+ 7k42a9bIJ1Fee1o5+wigkWZooFIb0jYeG+XGss6wAugAWZPyeo+HUsDOauBm1Il8f4P+
+ FUNhuo9ZSeAvtjf3L27zPcNWsbbSlPmt9h1IwZZLoRPjynf6iBgu9eEBGxffroGj9/RG
+ XBHxo7/gRpWxb9UUjGtV/B2xSoT61OqmSFGwBrpukiIJqlz67koILyqmP2Y/FucTrV86
+ 8J6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=aX5vzwr4uX568u1A1NtAetcO8H5b06l0VkOaAxAnVkA=;
+ b=tomztdFnIuGLvJVFvXGh305UWcVGXnc2PYKVLVFhKLQTQ7oEsAtngr5tgkLdQ/q1ix
+ R0bk7clp/ylAuiB9ZbXBpTVGhhu8FKIbnTzjESxcHkPaN5CSggBra+UmrJaUEs/NFnEW
+ qFchUphrDAw8CBLA6iZZT893ymH86h+t9gYxjDXrnWzl/Wd/+bEZD+PQrL9sfT6uTDCw
+ CQjMBinpzzPSNczTtsLSl0rsDuxg0KSCZ0mEgLs+lvDCJ7Z787Kb+C+4xnSDfC2RGtKB
+ Xlmt6iG/vOaTmeDtsaDF18UYiq0lNf9eYU0/mS5dfsbpwLbGBpkpT7KiJjcOD894C0o+
+ suoQ==
+X-Gm-Message-State: AOAM531qwNq7FBUlJ/72oyIuBK1RNUhVdn8BXPGqnntqh4TTetPuzRIe
+ c6W4CfJkSTG7LMmf83UgvjCRwPjsqD8WpSJwtQ==
+X-Google-Smtp-Source: ABdhPJxEgFkmUsrAiGXTKrRezE/MFsoflpuzIyEmccg4HBROR6o6jTNfQuRly6Y0jXP9sNzdKcJFCvKFqlwREyAfag==
+X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:10:7f:e700:c0a8:1acf])
+ (user=jingzhangos job=sendgmr) by 2002:a17:903:31c9:b029:ed:6f56:9d1e with
+ SMTP id v9-20020a17090331c9b02900ed6f569d1emr2993605ple.46.1623991702352;
+ Thu, 17 Jun 2021 21:48:22 -0700 (PDT)
+Date: Fri, 18 Jun 2021 04:48:12 +0000
+Message-Id: <20210618044819.3690166-1-jingzhangos@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.32.0.288.g62a8d224e6-goog
+Subject: [PATCH v11 0/7] KVM statistics data fd-based binary interface
+From: Jing Zhang <jingzhangos@google.com>
+To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>, 
+ LinuxMIPS <linux-mips@vger.kernel.org>, KVMPPC <kvm-ppc@vger.kernel.org>, 
+ LinuxS390 <linux-s390@vger.kernel.org>, 
+ Linuxkselftest <linux-kselftest@vger.kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, 
+ Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
+ Julien Thierry <julien.thierry.kdev@gmail.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Will Deacon <will@kernel.org>, Huacai Chen <chenhuacai@kernel.org>, 
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, 
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ Paul Mackerras <paulus@ozlabs.org>, 
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>, 
+ David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, 
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ Sean Christopherson <seanjc@google.com>, 
+ Vitaly Kuznetsov <vkuznets@redhat.com>, Jim Mattson <jmattson@google.com>, 
+ Peter Shier <pshier@google.com>, Oliver Upton <oupton@google.com>, 
+ David Rientjes <rientjes@google.com>,
+ Emanuele Giuseppe Esposito <eesposit@redhat.com>, 
+ David Matlack <dmatlack@google.com>, Ricardo Koller <ricarkol@google.com>, 
+ Krish Sadhukhan <krish.sadhukhan@oracle.com>, Fuad Tabba <tabba@google.com>, 
+ Greg KH <gregkh@linuxfoundation.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -79,84 +109,164 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+This patchset provides a file descriptor for every VM and VCPU to read
+KVM statistics data in binary format.
+It is meant to provide a lightweight, flexible, scalable and efficient
+lock-free solution for user space telemetry applications to pull the
+statistics data periodically for large scale systems. The pulling
+frequency could be as high as a few times per second.
+In this patchset, every statistics data are treated to have some
+attributes as below:
+  * architecture dependent or generic
+  * VM statistics data or VCPU statistics data
+  * type: cumulative, instantaneous, peak
+  * unit: none for simple counter, nanosecond, microsecond,
+    millisecond, second, Byte, KiByte, MiByte, GiByte, Clock Cycles
+Since no lock/synchronization is used, the consistency between all
+the statistics data is not guaranteed. That means not all statistics
+data are read out at the exact same time, since the statistics data
+are still being updated by KVM subsystems while they are read out.
+
+---
+
+* v10 -> v11
+  - Rebase to kvm/queue, commit f1b832550832
+    (KVM: x86/mmu: Fix TDP MMU page table level)
+  - Separate binary stats implementation commit
+  - Use flexible length array member field in API structure instead of
+    zero-length array member field
+  - Move major binary stats reading function in a separate source file
+  - Move stats id string into vm/vcpu structures
+  - Add some detailed comments and update commit messages
+  - Addressed some other review comments from Greg K.H. and Paolo.
+
+* v9 -> v10
+  - Relocate vcpu stat in vcpu's slab's usercopy region
+  - Fix test issue for capability checking
+  - Update commit message to explain why/how we need to add this new
+    API for KVM statistics
+
+* v8 -> v9
+  - Rebase to commit 8331a2bc0898
+    (KVM: X86: Introduce KVM_HC_MAP_GPA_RANGE hypercall)
+  - Reduce code duplication between binary and debugfs interface
+  - Add field "offset" in stats descriptor to let us define stats
+    descriptors in any order (not necessary in the order of stats
+    defined in vm/vcpu stats structures)
+  - Add static check to make sure the number of stats descriptors
+    is the same as the number of stats defined in vm/vcpu stats
+    structures
+  - Fix missing/mismatched stats descriptor definition caused by
+    rebase
+
+* v7 -> v8
+  - Rebase to kvm/queue, commit c1dc20e254b4 ("KVM: switch per-VM
+  stats to u64")
+  - Revise code to reflect the per-VM stats type from ulong to u64
+  - Addressed some other nits
+
+* v6 -> v7
+  - Improve file descriptor allocation function by Krish suggestion
+  - Use "generic stats" instead of "common stats" as Krish suggested
+  - Addressed some other nits from Krish and David Matlack
+
+* v5 -> v6
+  - Use designated initializers for STATS_DESC
+  - Change KVM_STATS_SCALE... to KVM_STATS_BASE...
+  - Use a common function for kvm_[vm|vcpu]_stats_read
+  - Fix some documentation errors/missings
+  - Use TEST_ASSERT in selftest
+  - Use a common function for [vm|vcpu]_stats_test in selftest
+
+* v4 -> v5
+  - Rebase to kvm/queue, commit a4345a7cecfb ("Merge tag
+    'kvmarm-fixes-5.13-1'")
+  - Change maximum stats name length to 48
+  - Replace VM_STATS_COMMON/VCPU_STATS_COMMON macros with stats
+    descriptor definition macros.
+  - Fixed some errors/warnings reported by checkpatch.pl
+
+* v3 -> v4
+  - Rebase to kvm/queue, commit 9f242010c3b4 ("KVM: avoid "deadlock"
+    between install_new_memslots and MMU notifier")
+  - Use C-stype comments in the whole patch
+  - Fix wrong count for x86 VCPU stats descriptors
+  - Fix KVM stats data size counting and validity check in selftest
+
+* v2 -> v3
+  - Rebase to kvm/queue, commit edf408f5257b ("KVM: avoid "deadlock"
+    between install_new_memslots and MMU notifier")
+  - Resolve some nitpicks about format
+
+* v1 -> v2
+  - Use ARRAY_SIZE to count the number of stats descriptors
+  - Fix missing `size` field initialization in macro STATS_DESC
+
+[1] https://lore.kernel.org/kvm/20210402224359.2297157-1-jingzhangos@google.com
+[2] https://lore.kernel.org/kvm/20210415151741.1607806-1-jingzhangos@google.com
+[3] https://lore.kernel.org/kvm/20210423181727.596466-1-jingzhangos@google.com
+[4] https://lore.kernel.org/kvm/20210429203740.1935629-1-jingzhangos@google.com
+[5] https://lore.kernel.org/kvm/20210517145314.157626-1-jingzhangos@google.com
+[6] https://lore.kernel.org/kvm/20210524151828.4113777-1-jingzhangos@google.com
+[7] https://lore.kernel.org/kvm/20210603211426.790093-1-jingzhangos@google.com
+[8] https://lore.kernel.org/kvm/20210611124624.1404010-1-jingzhangos@google.com
+[9] https://lore.kernel.org/kvm/20210614212155.1670777-1-jingzhangos@google.com
+[10] https://lore.kernel.org/kvm/20210617044146.2667540-1-jingzhangos@google.com
+
+---
+
+Jing Zhang (7):
+  KVM: stats: Separate generic stats from architecture specific ones
+  KVM: stats: Add fd-based API to read binary stats data
+  KVM: stats: Support binary stats retrieval for a VM
+  KVM: stats: Support binary stats retrieval for a VCPU
+  KVM: stats: Add documentation for binary statistics interface
+  KVM: selftests: Add selftest for KVM statistics data binary interface
+  KVM: stats: Remove code duplication for binary and debugfs stats
+
+ Documentation/virt/kvm/api.rst                | 176 +++++++++++++-
+ arch/arm64/include/asm/kvm_host.h             |   9 +-
+ arch/arm64/kvm/Makefile                       |   2 +-
+ arch/arm64/kvm/guest.c                        |  46 ++--
+ arch/mips/include/asm/kvm_host.h              |   9 +-
+ arch/mips/kvm/Makefile                        |   2 +-
+ arch/mips/kvm/mips.c                          |  88 ++++---
+ arch/powerpc/include/asm/kvm_host.h           |   9 +-
+ arch/powerpc/kvm/Makefile                     |   2 +-
+ arch/powerpc/kvm/book3s.c                     |  89 ++++---
+ arch/powerpc/kvm/book3s_hv.c                  |  12 +-
+ arch/powerpc/kvm/book3s_pr.c                  |   2 +-
+ arch/powerpc/kvm/book3s_pr_papr.c             |   2 +-
+ arch/powerpc/kvm/booke.c                      |  74 ++++--
+ arch/s390/include/asm/kvm_host.h              |   9 +-
+ arch/s390/kvm/Makefile                        |   3 +-
+ arch/s390/kvm/kvm-s390.c                      | 230 ++++++++++--------
+ arch/x86/include/asm/kvm_host.h               |   9 +-
+ arch/x86/kvm/Makefile                         |   2 +-
+ arch/x86/kvm/x86.c                            | 107 ++++----
+ include/linux/kvm_host.h                      | 182 ++++++++++++--
+ include/linux/kvm_types.h                     |  12 +
+ include/uapi/linux/kvm.h                      |  44 ++++
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   3 +
+ .../testing/selftests/kvm/include/kvm_util.h  |   3 +
+ .../selftests/kvm/kvm_binary_stats_test.c     | 225 +++++++++++++++++
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  12 +
+ virt/kvm/binary_stats.c                       | 130 ++++++++++
+ virt/kvm/kvm_main.c                           | 218 ++++++++++++++---
+ 30 files changed, 1355 insertions(+), 357 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/kvm_binary_stats_test.c
+ create mode 100644 virt/kvm/binary_stats.c
 
 
-On 2021/6/17 22:20, Marc Zyngier wrote:
-> On Thu, 17 Jun 2021 13:38:37 +0100,
-> Will Deacon <will@kernel.org> wrote:
->> On Thu, Jun 17, 2021 at 06:58:21PM +0800, Yanan Wang wrote:
->>> To prepare for performing CMOs for guest stage-2 in the fault handlers
->>> in pgtable.c, here introduce two cache maintenance callbacks in struct
->>> kvm_pgtable_mm_ops. We also adjust the comment alignment for the
->>> existing part but make no real content change at all.
->>>
->>> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
->>> ---
->>>   arch/arm64/include/asm/kvm_pgtable.h | 42 +++++++++++++++++-----------
->>>   1 file changed, 25 insertions(+), 17 deletions(-)
->>>
->>> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
->>> index c3674c47d48c..b6ce34aa44bb 100644
->>> --- a/arch/arm64/include/asm/kvm_pgtable.h
->>> +++ b/arch/arm64/include/asm/kvm_pgtable.h
->>> @@ -27,23 +27,29 @@ typedef u64 kvm_pte_t;
->>>   
->>>   /**
->>>    * struct kvm_pgtable_mm_ops - Memory management callbacks.
->>> - * @zalloc_page:	Allocate a single zeroed memory page. The @arg parameter
->>> - *			can be used by the walker to pass a memcache. The
->>> - *			initial refcount of the page is 1.
->>> - * @zalloc_pages_exact:	Allocate an exact number of zeroed memory pages. The
->>> - *			@size parameter is in bytes, and is rounded-up to the
->>> - *			next page boundary. The resulting allocation is
->>> - *			physically contiguous.
->>> - * @free_pages_exact:	Free an exact number of memory pages previously
->>> - *			allocated by zalloc_pages_exact.
->>> - * @get_page:		Increment the refcount on a page.
->>> - * @put_page:		Decrement the refcount on a page. When the refcount
->>> - *			reaches 0 the page is automatically freed.
->>> - * @page_count:		Return the refcount of a page.
->>> - * @phys_to_virt:	Convert a physical address into a virtual address mapped
->>> - *			in the current context.
->>> - * @virt_to_phys:	Convert a virtual address mapped in the current context
->>> - *			into a physical address.
->>> + * @zalloc_page:		Allocate a single zeroed memory page.
->>> + *				The @arg parameter can be used by the walker
->>> + *				to pass a memcache. The initial refcount of
->>> + *				the page is 1.
->>> + * @zalloc_pages_exact:		Allocate an exact number of zeroed memory pages.
->>> + *				The @size parameter is in bytes, and is rounded
->>> + *				up to the next page boundary. The resulting
->>> + *				allocation is physically contiguous.
->>> + * @free_pages_exact:		Free an exact number of memory pages previously
->>> + *				allocated by zalloc_pages_exact.
->>> + * @get_page:			Increment the refcount on a page.
->>> + * @put_page:			Decrement the refcount on a page. When the
->>> + *				refcount reaches 0 the page is automatically
->>> + *				freed.
->>> + * @page_count:			Return the refcount of a page.
->>> + * @phys_to_virt:		Convert a physical address into a virtual address
->>> + *				mapped in the current context.
->>> + * @virt_to_phys:		Convert a virtual address mapped in the current
->>> + *				context into a physical address.
->>> + * @clean_invalidate_dcache:	Clean and invalidate the data cache for the
->>> + *				specified memory address range.
->> This should probably be explicit about whether this to the PoU/PoC/PoP.
-> Indeed. I can fix that locally if there is nothing else that requires
-> adjusting.
-Will be grateful !
-
-Thanks,
-Yanan
-.
->
-> 	M.
->
+base-commit: f1b8325508327a302f1d5cd8a4bf51e2c9c72fa9
+-- 
+2.32.0.288.g62a8d224e6-goog
 
 _______________________________________________
 kvmarm mailing list
