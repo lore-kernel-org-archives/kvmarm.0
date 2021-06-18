@@ -7,75 +7,80 @@ X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89B06C49361
-	for <kvmarm@archiver.kernel.org>; Fri, 18 Jun 2021 08:50:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79C55C48BE8
+	for <kvmarm@archiver.kernel.org>; Fri, 18 Jun 2021 08:59:50 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 11A2F613CB
-	for <kvmarm@archiver.kernel.org>; Fri, 18 Jun 2021 08:50:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11A2F613CB
+	by mail.kernel.org (Postfix) with ESMTP id EB4BB613D1
+	for <kvmarm@archiver.kernel.org>; Fri, 18 Jun 2021 08:59:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB4BB613D1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D27549FB7;
-	Fri, 18 Jun 2021 04:50:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 70E634A5A0;
+	Fri, 18 Jun 2021 04:59:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id tAVS7XF9ZyLN; Fri, 18 Jun 2021 04:50:46 -0400 (EDT)
+	with ESMTP id 8SxH03OUvATJ; Fri, 18 Jun 2021 04:59:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AA3E4A1A7;
-	Fri, 18 Jun 2021 04:50:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A8A74A4A3;
+	Fri, 18 Jun 2021 04:59:48 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3333940FC7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Jun 2021 04:50:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F74340FC7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Jun 2021 04:59:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6k14ZVnCxtGY for <kvmarm@lists.cs.columbia.edu>;
- Fri, 18 Jun 2021 04:50:44 -0400 (EDT)
-Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com
- [209.85.167.174])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0329E4081C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Jun 2021 04:50:43 -0400 (EDT)
-Received: by mail-oi1-f174.google.com with SMTP id w127so9779854oig.12
- for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Jun 2021 01:50:43 -0700 (PDT)
+ with ESMTP id aMQokLA26lQg for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 18 Jun 2021 04:59:45 -0400 (EDT)
+Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com
+ [209.85.210.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D7D8B40825
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Jun 2021 04:59:45 -0400 (EDT)
+Received: by mail-ot1-f53.google.com with SMTP id
+ i12-20020a05683033ecb02903346fa0f74dso8996643otu.10
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Jun 2021 01:59:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=jdFKobz0v5eVip0thXQlonp2mF35EnH4oN1hYfZc5Y8=;
- b=eaI1qif8hWH4BDUPA4zAfU/JyLPIPsuOqFjMGM8Bena5fakXJe42h1NsUQcLTvKdJ1
- LOcf3Qw8GQpYgpe1f/t5BZwAua9NJK/G8Q5YA0x3gEUix6SK0puD0UuAtx+522RhyFpH
- v4eUaoWuflGssbIsWGhZ4Q0auBg7DdWZVHDrnnwfk2+9LefFaGFSuIuQ9zld9KS8IFv6
- Sd0rdtaCXNVsby6BzdgBjLciQorxLwS2MxQSfyQVweBhblWYkBi4L+gKasclg9l19zHq
- 1GMpCGCj40H2EsIOBz8dw37C0Qe0+/jP52+2bQikzN3ft8mTNr0GKkink3eqiPd9DNE/
- sy/g==
+ :cc; bh=kxWq/w4pUVc8HOlAC++EsNgPCdWz4WRSzn6eNlOcpd8=;
+ b=bhaMQb0WGrbDqa+aKHcQIksSIM+zTHdcqFfPBr5BV5rr/Wi8UST4PtBaFBBmWA70/c
+ JeE4Hu4BbtwFqF0c80sjfACvvB1nesUeK9TieyU/oqhdgOex7UgfdkqRux0UxZ5/TcHT
+ DLHvuKVExIhZtgV1fPhYLr/Md+zpFpFjNVpAPjGlXCP+m9MsUwKdcLN7akLZFoz7RcTk
+ 238s+sJ/BuekxpTMYI4dcJE/HjWwxIUM3JYIJt/VdYH2Zb8cmBY3gzekVcESfoAgP54o
+ bIIHlFX/dEToFLWW+5NXkS2fXPFEuRa4egZ9ULCaZiOK2z8px8znd93Nlh17ZN0KkdrP
+ Dwpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=jdFKobz0v5eVip0thXQlonp2mF35EnH4oN1hYfZc5Y8=;
- b=HLTGAbz4mJXP2qPvPvOEAjVOz29l4nx2XTlhY2/mt9qR/cBKWuas15K3wbUdjNdt1E
- XinCfqUc1Ba5FRnOf8/H52LAiwmC8p4zPPu2JFc6kwJOjBIWcDVjC5vVs10tzlEbj1KB
- 1vxSktC+rgvniPEXhLsUTmqBCHyanZCqaIoTEcKcLde79uGe0gwnDV45pwsqHiS1Va6Z
- 4DyTLe9TxHvpaFiytL7gOa328Sjn0uExa7sj2tB+6Ljqjcef1a8HtsCxUb5RmAeHPRK5
- byfx6JaMMwvGz/Xe10g3ZwpX7dfErVjVV6FUj51WxfeLIAZuZ8Yi7z5+iCD5whGI0XrF
- iS+w==
-X-Gm-Message-State: AOAM532oY2UAIdMNg5rr5EpvDRqZj62yc5VNIpzYpKE9t+UxZLvAoMy9
- bxtNuk9o2PISCG5Fbeuuac05d/RMIksKUCVbqiGw7A==
-X-Google-Smtp-Source: ABdhPJypyxrsFJT695FL1xens+cccnkIs+C967czc330C77nK9BPZwBZ32eYzwZk3n/kX5cAq1Thkw1gKRvl10izUa0=
-X-Received: by 2002:aca:de07:: with SMTP id v7mr13635036oig.8.1624006243106;
- Fri, 18 Jun 2021 01:50:43 -0700 (PDT)
+ bh=kxWq/w4pUVc8HOlAC++EsNgPCdWz4WRSzn6eNlOcpd8=;
+ b=dO701+lIbC4ZDkNnGB6stF7z02hNdTlIJo2KjhINkD9IB5FA7TGIj2mg78jVdmT3BW
+ orogY4dMoENzrf97+N5kYXfYxEcpRDRcfxChB94OvRVGiZaMELKNpBpv4CeK3RaSGdTy
+ zkS3Eanu1N8hWaff+BnpIZvScSTKZX5FQMt4oq32/LWo61hTsu1/Zc0eQkphxm5zan3c
+ m0s9UMUNR6dywsLUyKRYzeJkapkA+5TdM9Pg7EO7mnjXuXkwDPFwZ8603GyCm08j5MrO
+ 6s+QrsTHn54fKTP8mSIPy1qpXBmT+oACKDIW1FDuhmLcQU0ezsDQPbw2IOdGRZCfZTOx
+ v8+g==
+X-Gm-Message-State: AOAM5315rYNcoco3i2X/41rZTHb2WG4cx1J/g57d693EfVTcaHa4gXU8
+ RYGXeiE/t82ZS/1GddJChDqkGBRxBw55/6kwYhaRwA==
+X-Google-Smtp-Source: ABdhPJwzc7DiWjyKPp58Q0od7P57f5+tDcapLIkUHFsPNVK62ZAuAwBi+XcIKklM8bb9dajJNv9sTtXhTaAbgYqG490=
+X-Received: by 2002:a05:6830:1598:: with SMTP id
+ i24mr8497546otr.52.1624006785056; 
+ Fri, 18 Jun 2021 01:59:45 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210616095200.38008-1-wangyanan55@huawei.com>
- <20210616095200.38008-2-wangyanan55@huawei.com>
-In-Reply-To: <20210616095200.38008-2-wangyanan55@huawei.com>
+References: <20210617105824.31752-1-wangyanan55@huawei.com>
+ <20210617105824.31752-2-wangyanan55@huawei.com>
+ <20210617123837.GA24457@willie-the-truck>
+ <87eed0d13p.wl-maz@kernel.org>
+ <2c1b9376-3997-aa7b-d5f3-b04da985c260@huawei.com>
+In-Reply-To: <2c1b9376-3997-aa7b-d5f3-b04da985c260@huawei.com>
 From: Fuad Tabba <tabba@google.com>
-Date: Fri, 18 Jun 2021 09:50:06 +0100
-Message-ID: <CA+EHjTyVnHkk5rYb=W6msqoT5E_bVTBdhLtpeRR_b2wsib4Vgw@mail.gmail.com>
-Subject: Re: [PATCH v6 1/4] KVM: arm64: Introduce cache maintenance callbacks
- for guest stage-2
-To: Yanan Wang <wangyanan55@huawei.com>
+Date: Fri, 18 Jun 2021 09:59:09 +0100
+Message-ID: <CA+EHjTyW+LP=UmwDP+egbPzpz2vxFpbOMgXi=dOt15j8wfLxWg@mail.gmail.com>
+Subject: Re: [PATCH v7 1/4] KVM: arm64: Introduce two cache maintenance
+ callbacks
+To: "wangyanan (Y)" <wangyanan55@huawei.com>
 Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
  linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
  Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
@@ -96,69 +101,97 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Yanan,
+Hi,
 
-On Wed, Jun 16, 2021 at 10:52 AM Yanan Wang <wangyanan55@huawei.com> wrote:
+On Fri, Jun 18, 2021 at 2:52 AM wangyanan (Y) <wangyanan55@huawei.com> wrote:
 >
-> To prepare for performing guest CMOs in the fault handlers in pgtable.c,
-> introduce two cache maintenance callbacks in struct kvm_pgtable_mm_ops.
 >
-> The new callbacks are specific for guest stage-2, so they will only be
-> initialized in 'struct kvm_pgtable_mm_ops kvm_s2_mm_ops'.
 >
-> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
-> ---
->  arch/arm64/include/asm/kvm_pgtable.h | 7 +++++++
->  1 file changed, 7 insertions(+)
->
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index c3674c47d48c..302eca32e0af 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -44,6 +44,11 @@ typedef u64 kvm_pte_t;
->   *                     in the current context.
->   * @virt_to_phys:      Convert a virtual address mapped in the current context
->   *                     into a physical address.
-> + * @flush_dcache:      Clean data cache for a guest page address range before
-> + *                     creating the corresponding stage-2 mapping.
-> + * @flush_icache:      Invalidate instruction cache for a guest page address
-> + *                     range before creating or updating the corresponding
-> + *                     stage-2 mapping.
->   */
->  struct kvm_pgtable_mm_ops {
->         void*           (*zalloc_page)(void *arg);
-> @@ -54,6 +59,8 @@ struct kvm_pgtable_mm_ops {
->         int             (*page_count)(void *addr);
->         void*           (*phys_to_virt)(phys_addr_t phys);
->         phys_addr_t     (*virt_to_phys)(void *addr);
-> +       void            (*flush_dcache)(void *addr, size_t size);
-> +       void            (*flush_icache)(void *addr, size_t size);
->  };
->
+> On 2021/6/17 22:20, Marc Zyngier wrote:
+> > On Thu, 17 Jun 2021 13:38:37 +0100,
+> > Will Deacon <will@kernel.org> wrote:
+> >> On Thu, Jun 17, 2021 at 06:58:21PM +0800, Yanan Wang wrote:
+> >>> To prepare for performing CMOs for guest stage-2 in the fault handlers
+> >>> in pgtable.c, here introduce two cache maintenance callbacks in struct
+> >>> kvm_pgtable_mm_ops. We also adjust the comment alignment for the
+> >>> existing part but make no real content change at all.
+> >>>
+> >>> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
+> >>> ---
+> >>>   arch/arm64/include/asm/kvm_pgtable.h | 42 +++++++++++++++++-----------
+> >>>   1 file changed, 25 insertions(+), 17 deletions(-)
+> >>>
+> >>> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> >>> index c3674c47d48c..b6ce34aa44bb 100644
+> >>> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> >>> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> >>> @@ -27,23 +27,29 @@ typedef u64 kvm_pte_t;
+> >>>
+> >>>   /**
+> >>>    * struct kvm_pgtable_mm_ops - Memory management callbacks.
+> >>> - * @zalloc_page:   Allocate a single zeroed memory page. The @arg parameter
+> >>> - *                 can be used by the walker to pass a memcache. The
+> >>> - *                 initial refcount of the page is 1.
+> >>> - * @zalloc_pages_exact:    Allocate an exact number of zeroed memory pages. The
+> >>> - *                 @size parameter is in bytes, and is rounded-up to the
+> >>> - *                 next page boundary. The resulting allocation is
+> >>> - *                 physically contiguous.
+> >>> - * @free_pages_exact:      Free an exact number of memory pages previously
+> >>> - *                 allocated by zalloc_pages_exact.
+> >>> - * @get_page:              Increment the refcount on a page.
+> >>> - * @put_page:              Decrement the refcount on a page. When the refcount
+> >>> - *                 reaches 0 the page is automatically freed.
+> >>> - * @page_count:            Return the refcount of a page.
+> >>> - * @phys_to_virt:  Convert a physical address into a virtual address mapped
+> >>> - *                 in the current context.
+> >>> - * @virt_to_phys:  Convert a virtual address mapped in the current context
+> >>> - *                 into a physical address.
+> >>> + * @zalloc_page:           Allocate a single zeroed memory page.
+> >>> + *                         The @arg parameter can be used by the walker
+> >>> + *                         to pass a memcache. The initial refcount of
+> >>> + *                         the page is 1.
+> >>> + * @zalloc_pages_exact:            Allocate an exact number of zeroed memory pages.
+> >>> + *                         The @size parameter is in bytes, and is rounded
+> >>> + *                         up to the next page boundary. The resulting
+> >>> + *                         allocation is physically contiguous.
+> >>> + * @free_pages_exact:              Free an exact number of memory pages previously
+> >>> + *                         allocated by zalloc_pages_exact.
+> >>> + * @get_page:                      Increment the refcount on a page.
+> >>> + * @put_page:                      Decrement the refcount on a page. When the
+> >>> + *                         refcount reaches 0 the page is automatically
+> >>> + *                         freed.
+> >>> + * @page_count:                    Return the refcount of a page.
+> >>> + * @phys_to_virt:          Convert a physical address into a virtual address
+> >>> + *                         mapped in the current context.
+> >>> + * @virt_to_phys:          Convert a virtual address mapped in the current
+> >>> + *                         context into a physical address.
+> >>> + * @clean_invalidate_dcache:       Clean and invalidate the data cache for the
+> >>> + *                         specified memory address range.
+> >> This should probably be explicit about whether this to the PoU/PoC/PoP.
+> > Indeed. I can fix that locally if there is nothing else that requires
+> > adjusting.
+> Will be grateful !
 
-Just to add to Marc's comment on naming, flush_dcache is in this case
-a clean and invalidate: I see that in patch 4 it eventually does a
-civac. So, yes, although it is a mouthful, I think it should be
-dcache_clean_inval and not just dcache_clean. An alternative, if it's
-acceptable by Marc and the others, is to name the parameters dcmo/icmo
-or something like that, where the nature of the maintenance operation
-is not necessarily tied to the name.
-
-For reference, this is the patch Marc mentioned, where we're trying to
-fix the naming to make it consistent with Arm terminology (Arm doesn't
-define what a flush is):
+Sorry, I missed the v7 update. One comment here is that the naming
+used in the patch series I mentioned shortens invalidate to inval (if
+you want it to be less of a mouthful):
 https://lore.kernel.org/linux-arm-kernel/20210524083001.2586635-19-tabba@google.com/
 
 Otherwise:
 Reviewed-by: Fuad Tabba <tabba@google.com>
 
-Cheers,
+Thanks!
 /fuad
 
 
->  /**
-> --
-> 2.23.0
+
+>
+> Thanks,
+> Yanan
+> .
+> >
+> >       M.
+> >
 >
 > _______________________________________________
 > kvmarm mailing list
