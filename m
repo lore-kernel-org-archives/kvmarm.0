@@ -2,59 +2,76 @@ Return-Path: <SRS0=A4hI=LM=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF539C48BDF
-	for <kvmarm@archiver.kernel.org>; Fri, 18 Jun 2021 11:16:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C54B2C48BDF
+	for <kvmarm@archiver.kernel.org>; Fri, 18 Jun 2021 11:30:43 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0350061248
-	for <kvmarm@archiver.kernel.org>; Fri, 18 Jun 2021 11:16:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0350061248
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 3F61561351
+	for <kvmarm@archiver.kernel.org>; Fri, 18 Jun 2021 11:30:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F61561351
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 875AE4A5A0;
-	Fri, 18 Jun 2021 07:16:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D62F140D0A;
+	Fri, 18 Jun 2021 07:30:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id PrWwgqh8S9T6; Fri, 18 Jun 2021 07:16:07 -0400 (EDT)
+	with ESMTP id IySIY+CjNU69; Fri, 18 Jun 2021 07:30:40 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 664DC40808;
-	Fri, 18 Jun 2021 07:16:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 84CE240FC7;
+	Fri, 18 Jun 2021 07:30:40 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EEE7440808
- for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Jun 2021 07:16:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 07B3640825
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Jun 2021 07:30:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NByvo0OiBrMF for <kvmarm@lists.cs.columbia.edu>;
- Fri, 18 Jun 2021 07:16:04 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D9CF9407F1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Jun 2021 07:16:04 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4B33413A1;
- Fri, 18 Jun 2021 04:16:04 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A85D63F719;
- Fri, 18 Jun 2021 04:16:03 -0700 (PDT)
-Subject: Re: [PATCH] KVM: arm64: Don't zero the cycle count register when
- PMCR_EL0.P is set
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: maz@kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu
-References: <20210618105139.83795-1-alexandru.elisei@arm.com>
-Message-ID: <583c1ece-75f1-bfa6-0166-aca741f43b51@arm.com>
-Date: Fri, 18 Jun 2021 12:16:56 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-MIME-Version: 1.0
-In-Reply-To: <20210618105139.83795-1-alexandru.elisei@arm.com>
-Content-Language: en-US
+ with ESMTP id 3JpSxFKau+qt for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 18 Jun 2021 07:30:39 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0D6A14048B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Jun 2021 07:30:39 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 14CD36128C;
+ Fri, 18 Jun 2021 11:30:38 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1luChn-008QUl-W0; Fri, 18 Jun 2021 12:30:36 +0100
+Date: Fri, 18 Jun 2021 12:30:35 +0100
+Message-ID: <87czsjcsv8.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Yanan Wang <wangyanan55@huawei.com>
+Subject: Re: [PATCH v7 3/4] KVM: arm64: Tweak parameters of guest cache
+ maintenance functions
+In-Reply-To: <20210617105824.31752-4-wangyanan55@huawei.com>
+References: <20210617105824.31752-1-wangyanan55@huawei.com>
+ <20210617105824.31752-4-wangyanan55@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: wangyanan55@huawei.com, will@kernel.org, qperret@google.com,
+ alexandru.elisei@arm.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, catalin.marinas@arm.com, james.morse@arm.com,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, gshan@redhat.com,
+ wanghaibin.wang@huawei.com, zhukeqian1@huawei.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,42 +88,39 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Argh, forgot to CC Eric.
-
-On 6/18/21 11:51 AM, Alexandru Elisei wrote:
-> According to ARM DDI 0487G.a, page D13-3895, setting the PMCR_EL0.P bit to
-> 1 has the following effect:
->
-> "Reset all event counters accessible in the current Exception level, not
-> including PMCCNTR_EL0, to zero."
->
-> Similar behaviour is described for AArch32 on page G8-7022. Make it so.
->
-> Fixes: c01d6a18023b ("KVM: arm64: pmu: Only handle supported event counters")
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+On Thu, 17 Jun 2021 11:58:23 +0100,
+Yanan Wang <wangyanan55@huawei.com> wrote:
+> 
+> Adjust the parameter "kvm_pfn_t pfn" of __clean_dcache_guest_page
+> and __invalidate_icache_guest_page to "void *va", which paves the
+> way for converting these two guest CMO functions into callbacks in
+> structure kvm_pgtable_mm_ops. No functional change.
+> 
+> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
 > ---
-> Found by code inspection.
+>  arch/arm64/include/asm/kvm_mmu.h |  9 ++-------
+>  arch/arm64/kvm/mmu.c             | 28 +++++++++++++++-------------
+>  2 files changed, 17 insertions(+), 20 deletions(-)
 >
-> Entertained the idea of restricting the number of bits in
-> for_each_set_bit() to 31 since Linux (and the architecture, to some degree)
-> treats the cycle count register as the 32nd event counter. Settled on this
-> approach because I think it's clearer.
->
->  arch/arm64/kvm/pmu-emul.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> index fd167d4f4215..ecc0d19c8cc1 100644
-> --- a/arch/arm64/kvm/pmu-emul.c
-> +++ b/arch/arm64/kvm/pmu-emul.c
-> @@ -578,6 +578,7 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
->  		kvm_pmu_set_counter_value(vcpu, ARMV8_PMU_CYCLE_IDX, 0);
->  
->  	if (val & ARMV8_PMU_PMCR_P) {
-> +		mask &= ~BIT(ARMV8_PMU_CYCLE_IDX);
->  		for_each_set_bit(i, &mask, 32)
->  			kvm_pmu_set_counter_value(vcpu, i, 0);
->  	}
+
+[...]
+
+> @@ -1219,7 +1221,7 @@ bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+>  	 * We've moved a page around, probably through CoW, so let's treat it
+>  	 * just like a translation fault and clean the cache to the PoC.
+>  	 */
+> -	clean_dcache_guest_page(pfn, PAGE_SIZE);
+> +	clean_dcache_guest_page(page_address(pfn_to_page(pfn), PAGE_SIZE);
+
+This obviously doesn't compile. I have fixed it locally, but in the
+future please make sure that patch series can be bisected correctly.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
