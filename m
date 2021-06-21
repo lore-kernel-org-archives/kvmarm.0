@@ -2,106 +2,103 @@ Return-Path: <SRS0=rYk4=LP=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0A1DC4743C
-	for <kvmarm@archiver.kernel.org>; Mon, 21 Jun 2021 12:44:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 720E6C48BC2
+	for <kvmarm@archiver.kernel.org>; Mon, 21 Jun 2021 15:23:57 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6AD9C61026
-	for <kvmarm@archiver.kernel.org>; Mon, 21 Jun 2021 12:44:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AD9C61026
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id E2F7E6115A
+	for <kvmarm@archiver.kernel.org>; Mon, 21 Jun 2021 15:23:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2F7E6115A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kroah.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CA7174079A;
-	Mon, 21 Jun 2021 08:44:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6ED1440569;
+	Mon, 21 Jun 2021 11:23:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@kroah.com
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@messagingengine.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 3wbmSpYujA5l; Mon, 21 Jun 2021 08:44:40 -0400 (EDT)
+	with ESMTP id 7PlwntRh8Qec; Mon, 21 Jun 2021 11:23:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A385B40463;
-	Mon, 21 Jun 2021 08:44:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F3C54057F;
+	Mon, 21 Jun 2021 11:23:55 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AB3E8402BD
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Jun 2021 08:44:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 961F540569
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Jun 2021 11:23:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jIJ4GrRLtf1g for <kvmarm@lists.cs.columbia.edu>;
- Mon, 21 Jun 2021 08:44:38 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7504B40256
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Jun 2021 08:44:38 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1624279478;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=xY6nAdAkng/ghHrBQBfm1ZmFUpZlorDdA2kwXRZ+7xU=;
- b=IeJddnMBNzRxZYjoe8AYD16RoMkHPxOOZjzkELNuF5g1EOK8lQSpm44BC6cfjprN4SxDzU
- SefAExNb9XCdWGTfrOBjLck3bM8ni2OrYCX75znUwJrPK0njt6ReISxwaUqq/wHT4aFV79
- 906UwvAWHE4Udo6BJa7wt0b5/0LNA74=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-307-r6twNxJLNteyBToP3MBQPw-1; Mon, 21 Jun 2021 08:44:37 -0400
-X-MC-Unique: r6twNxJLNteyBToP3MBQPw-1
-Received: by mail-wr1-f69.google.com with SMTP id
- u16-20020a5d51500000b029011a6a17cf62so8035163wrt.13
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Jun 2021 05:44:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:reply-to:subject:to:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-transfer-encoding
- :content-language;
- bh=xY6nAdAkng/ghHrBQBfm1ZmFUpZlorDdA2kwXRZ+7xU=;
- b=kgAaQ7oOXbA78xVdikFhpOXJlO15QT1FnYMyTVyI9KAnEFOX6XGuUkwem/1sT00vvD
- ooxs77vKNE7bfL69oF7eaxNg23Lrrfu/eARjkchXcWday0UT7gPB/EbYh+RBycg6tTqV
- WHrJsyBbDOYaFAqFRw/cQEgYgj1Pp3seiQKQxne//JPjztr5e9ZAo1hH8KpgeuLMks1R
- QydoslFN8OVEvWDTe6gGQcRQCeEeOj31BRyImGd9AmZTfmRJcUEpBw2R4w73Pp6Mdomu
- 08MXGYWKzaeE6KLZ/2PKYElozpJw/UUTuEQBnnU/6EDAR+zRHGA7LzC2rBPz/nwEWTiU
- 3uNQ==
-X-Gm-Message-State: AOAM533qIkA+sxbBcMiYsdOmt98qjH/Gw8AkfsFnR70EfDQ1gweijJS7
- vGsVjg2HN9mb8ptOjQ0dRC9SyQqeGAfhd1Nxk1W5JcDjsCjcfYQe8CuIhfmJ0lD6VEhwFNu7eap
- c6cntKyxEElj8jfDQe9yt5QZs8mr1aM1fWYlOyw/gd9nIbQp/b6QaUR0Tb4aPPCeXojXa2f3wsF
- xKNek=
-X-Received: by 2002:a5d:47af:: with SMTP id 15mr27383128wrb.289.1624279475199; 
- Mon, 21 Jun 2021 05:44:35 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyiQHL5PA0rXiLB9N/4Ymzd355PSqLCUCP+mLc4znMmOdX5sFeuYsZH8JOoThSHcMZrCXCncg==
-X-Received: by 2002:a5d:47af:: with SMTP id 15mr27383108wrb.289.1624279475043; 
- Mon, 21 Jun 2021 05:44:35 -0700 (PDT)
-Received: from [192.168.43.95] ([37.173.110.237])
- by smtp.gmail.com with ESMTPSA id r1sm716931wmn.10.2021.06.21.05.44.34
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 21 Jun 2021 05:44:34 -0700 (PDT)
-Subject: Re: [PATCH] KVM: arm/arm64: Fix KVM_VGIC_V3_ADDR_TYPE_REDIST read
-To: eric.auger.pro@gmail.com, stable@vger.kernel.org, maz@kernel.org,
- linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-References: <20210621121839.792649-1-eric.auger@redhat.com>
-From: Eric Auger <eric.auger@redhat.com>
-Message-ID: <495e1326-14aa-7d7e-abf4-1054978c8de2@redhat.com>
-Date: Mon, 21 Jun 2021 14:44:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+ with ESMTP id XfZ2RMi-2t6f for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 21 Jun 2021 11:23:53 -0400 (EDT)
+Received: from new1-smtp.messagingengine.com (new1-smtp.messagingengine.com
+ [66.111.4.221])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8562340233
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Jun 2021 11:23:53 -0400 (EDT)
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+ by mailnew.nyi.internal (Postfix) with ESMTP id 0233B58085E;
+ Mon, 21 Jun 2021 11:23:51 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+ by compute4.internal (MEProxy); Mon, 21 Jun 2021 11:23:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=
+ date:from:to:cc:subject:message-id:references:mime-version
+ :content-type:in-reply-to; s=fm1; bh=9K3u2Ll8ef7lXqXfO5YF59Gk1Vi
+ Je+PDxvFbDXwXxtQ=; b=yebfp9yeoY21SFGD5LE170uZbwnlZJ0dji95uyz2NKp
+ jpHtDrBfRsOtkHAlHXYiT2QCfacEl3geh0kqZOXs8Vrf7tjqUvI6OxpSHgZXfuTF
+ PdR2Q+JGQ9QdOtzy3THAiEEXcpSuoaZGopZ4yQTdNEr9lyDNPmt9zfRrgbApb5hg
+ A3oaWGfHKH81sUD0lNrn8yy2xvhaywvqKtDmdqEL87yIs2vnwHZoOqT+wn5/Xz1r
+ 6oQkQNs4+x7M2yNYPIYU2rm2inEP7qd7AHlzjA1v6nlbLzntpTFcUUOZn1d291hE
+ dG0hh/H8DypJ+iPn8cr7Tngqzsq8d601BzbVCho3FQA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+ messagingengine.com; h=cc:content-type:date:from:in-reply-to
+ :message-id:mime-version:references:subject:to:x-me-proxy
+ :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=9K3u2L
+ l8ef7lXqXfO5YF59Gk1ViJe+PDxvFbDXwXxtQ=; b=dFfApVLdvFrcIX7MX9a4VW
+ ldDHW8yNGPjzdXBqtJTuAYXPI2tDjF1IoM7qNk2EOJy0NfoIhSA42pzIsW+2F61/
+ EWgqV5q4FTIF0YIgMJw3J+KwV5RR/xE7rQ44n6ERaeb6amFVpPkbOfc8IxK35NyF
+ 5KVSaZPlG4tiFBL5RE1y+tl8OlHyD4J8mFVgdQ/3zLj7ejQbU/Gb9h1ZepIn/Agb
+ KQ+pkVVj2/0UwNTV6TOK0T+0FqNbVCYSremmO+gHko7oY/TmfTvGPLOAt2KLmW3R
+ GzWV3cSFZ0FMefHa7y9r5OcqxKYYZuH0gXuUAJWQ2FGawG6QAqO5AOhe9GTUgEXw
+ ==
+X-ME-Sender: <xms:Bq_QYOpP6Z7kLX35bmHnoKYpsF2Tc25pDxVa-CJocLWOFFhFaHuTDw>
+ <xme:Bq_QYMpe0SaZL9vx2mqhg7SCdIo2C6YB05ekoJmyfBPpfu6ISM8HDEy8RCP1OUpQ1
+ 1_3-0D_Qh0Dhw>
+X-ME-Received: <xmr:Bq_QYDMw5yd8o5K0T9guxB-V1L2VZhZ2QLXMTwmCr-uZfVJEaFY_2HKC7lr9NXxpFjZZkMvK8hMgBHkOdDJeYMp5bLVDF6Zl>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrfeefledgkeelucetufdoteggodetrfdotf
+ fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+ uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+ cujfgurhepfffhvffukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefirhgvghcu
+ mffjuceoghhrvghgsehkrhhorghhrdgtohhmqeenucggtffrrghtthgvrhhnpeeuleeltd
+ ehkeeltefhleduuddvhfffuedvffduveegheekgeeiffevheegfeetgfenucffohhmrghi
+ nhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
+ hmrghilhhfrhhomhepghhrvghgsehkrhhorghhrdgtohhm
+X-ME-Proxy: <xmx:Bq_QYN7DpKCpDeoTuc9ll7qeNlLgZaZq2zu8f9mO2P73xNnan_6X_w>
+ <xmx:Bq_QYN6dDL_YUMzZYs1vCjgcpSFBbUgfM4OxWjj0ktDPI_gb7naR5g>
+ <xmx:Bq_QYNhHwzvF75IckUaN0aBH6Edt8nr67ldslzF9DVxGvirwxvU7Jg>
+ <xmx:Bq_QYKxjbvQts28nBm8P8cWOenVy56YZxj4UM5oRGlVV23ek2UQClQ>
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 21 Jun 2021 11:23:50 -0400 (EDT)
+Date: Mon, 21 Jun 2021 17:23:47 +0200
+From: Greg KH <greg@kroah.com>
+To: Eric Auger <eric.auger@redhat.com>
+Subject: Re: [PATCH for-stable-5.4] KVM: arm/arm64: Fix
+ KVM_VGIC_V3_ADDR_TYPE_REDIST read
+Message-ID: <YNCvA4qDuc2Tlmi0@kroah.com>
+References: <20210621124232.793383-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210621121839.792649-1-eric.auger@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
+Content-Disposition: inline
+In-Reply-To: <20210621124232.793383-1-eric.auger@redhat.com>
+Cc: maz@kernel.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org, eric.auger.pro@gmail.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
-Reply-To: eric.auger@redhat.com
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -115,51 +112,34 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
-
-On 6/21/21 2:18 PM, Eric Auger wrote:
+On Mon, Jun 21, 2021 at 02:42:32PM +0200, Eric Auger wrote:
 > When reading the base address of the a REDIST region
 > through KVM_VGIC_V3_ADDR_TYPE_REDIST we expect the
 > redistributor region list to be populated with a single
 > element.
->
+> 
 > However list_first_entry() expects the list to be non empty.
 > Instead we should use list_first_entry_or_null which effectively
 > returns NULL if the list is empty.
->
+> 
 > Fixes: dbd9733ab674 ("KVM: arm/arm64: Replace the single rdist region by a list")
-> Cc: <Stable@vger.kernel.org> # v4.19
+> Cc: <Stable@vger.kernel.org> # v5.4
 > Signed-off-by: Eric Auger <eric.auger@redhat.com>
 > Reported-by: Gavin Shan <gshan@redhat.com>
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > Link: https://lore.kernel.org/r/20210412150034.29185-1-eric.auger@redhat.com
-
-so I have resent with the [PATCH for-stable-4.19] prefix.
-Please ignore that patch and sorry for the mess.
-
-Thanks
-
-Eric
 > ---
 >  virt/kvm/arm/vgic/vgic-kvm-device.c | 4 ++--
 >  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
-> index 6ada2432e37c..71d92096776e 100644
-> --- a/virt/kvm/arm/vgic/vgic-kvm-device.c
-> +++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
-> @@ -95,8 +95,8 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
->  			r = vgic_v3_set_redist_base(kvm, 0, *addr, 0);
->  			goto out;
->  		}
-> -		rdreg = list_first_entry(&vgic->rd_regions,
-> -					 struct vgic_redist_region, list);
-> +		rdreg = list_first_entry_or_null(&vgic->rd_regions,
-> +						 struct vgic_redist_region, list);
->  		if (!rdreg)
->  			addr_ptr = &undef_value;
->  		else
 
+Both now queued up, thanks.
+
+Next time, give us a hint as to what the upstream commit id is, so that
+we do not have to dig it up ourselves :)
+
+thanks,
+
+greg k-h
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
