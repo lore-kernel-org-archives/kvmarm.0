@@ -2,60 +2,60 @@ Return-Path: <SRS0=VGwd=LQ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80EBDC2B9F4
-	for <kvmarm@archiver.kernel.org>; Tue, 22 Jun 2021 16:19:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99E3EC2B9F4
+	for <kvmarm@archiver.kernel.org>; Tue, 22 Jun 2021 16:27:04 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DBE6261289
-	for <kvmarm@archiver.kernel.org>; Tue, 22 Jun 2021 16:19:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBE6261289
+	by mail.kernel.org (Postfix) with ESMTP id 11C096113D
+	for <kvmarm@archiver.kernel.org>; Tue, 22 Jun 2021 16:27:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11C096113D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 737554A003;
-	Tue, 22 Jun 2021 12:19:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F74849FB7;
+	Tue, 22 Jun 2021 12:27:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id a-Au0p-uAsWb; Tue, 22 Jun 2021 12:19:21 -0400 (EDT)
+	with ESMTP id 1b6k0CCXyvfg; Tue, 22 Jun 2021 12:27:01 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3818A407D1;
-	Tue, 22 Jun 2021 12:19:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 265734064F;
+	Tue, 22 Jun 2021 12:27:01 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9AD334086F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Jun 2021 12:19:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A7E1A40573
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Jun 2021 12:26:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yn5OVaMBm6l4 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 22 Jun 2021 12:19:19 -0400 (EDT)
+ with ESMTP id qwGHMHCBVy0M for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 22 Jun 2021 12:26:58 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6C0DC4064F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Jun 2021 12:19:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6916B40291
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Jun 2021 12:26:58 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 6EC7E60FEE;
- Tue, 22 Jun 2021 16:19:18 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 6BE3D60FE7;
+ Tue, 22 Jun 2021 16:26:57 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1lvj7M-009DG1-BW; Tue, 22 Jun 2021 17:19:16 +0100
-Date: Tue, 22 Jun 2021 17:19:15 +0100
-Message-ID: <87wnqlc1oc.wl-maz@kernel.org>
+ id 1lvjEl-009DKK-9D; Tue, 22 Jun 2021 17:26:55 +0100
+Date: Tue, 22 Jun 2021 17:26:54 +0100
+Message-ID: <87v965c1bl.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH v4 4/9] KVM: arm64: vgic: Let an interrupt controller
- advertise lack of HW deactivation
-In-Reply-To: <fa1fee85-04c6-d0a8-bd93-64d2ebc32e4a@arm.com>
+Subject: Re: [PATCH v4 0/9] KVM: arm64: Initial host support for the Apple M1
+In-Reply-To: <df8163a0-3c2e-afc5-2f98-e804934c864c@arm.com>
 References: <20210601104005.81332-1-maz@kernel.org>
- <20210601104005.81332-5-maz@kernel.org>
- <fa1fee85-04c6-d0a8-bd93-64d2ebc32e4a@arm.com>
+ <9bc0923c-5c3b-eeac-86ee-c3234c486955@arm.com>
+ <871r8tdhjq.wl-maz@kernel.org>
+ <df8163a0-3c2e-afc5-2f98-e804934c864c@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -83,89 +83,88 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 15 Jun 2021 15:26:02 +0100,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> 
-> Hi Marc,
-> 
-> On 6/1/21 11:40 AM, Marc Zyngier wrote:
-> > The vGIC, as architected by ARM, allows a virtual interrupt to
-> > trigger the deactivation of a physical interrupt. This allows
-> > the following interrupt to be delivered without requiring an exit.
-> >
-> > However, some implementations have choosen not to implement this,
-> > meaning that we will need some unsavoury workarounds to deal with this.
-> >
-> > On detecting such a case, taint the kernel and spit a nastygram.
-> > We'll deal with this in later patches.
-> >
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/vgic/vgic-init.c       | 10 ++++++++++
-> >  include/kvm/arm_vgic.h                |  3 +++
-> >  include/linux/irqchip/arm-vgic-info.h |  2 ++
-> >  3 files changed, 15 insertions(+)
-> >
-> > diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-> > index 6752d084934d..340c51d87677 100644
-> > --- a/arch/arm64/kvm/vgic/vgic-init.c
-> > +++ b/arch/arm64/kvm/vgic/vgic-init.c
-> > @@ -532,6 +532,16 @@ int kvm_vgic_hyp_init(void)
-> >  		return -ENXIO;
-> >  	}
-> >  
-> > +	/*
-> > +	 * If we get one of these oddball non-GICs, taint the kernel,
-> > +	 * as we have no idea of how they *really* behave.
-> > +	 */
-> > +	if (gic_kvm_info->no_hw_deactivation) {
-> > +		kvm_info("Non-architectural vgic, tainting kernel\n");
-> > +		add_taint(TAINT_CPU_OUT_OF_SPEC, LOCKDEP_STILL_OK);
-> 
-> I'm trying to figure out what are the effects of tainting the
-> kernel, besides those nasty messages. In
-> Documentation/admin-guide/tainted-kernels.rst, I found this bit:
-> 
-> [..] the information is mainly of interest once someone wants to
-> investigate some problem, as its real cause might be the event that
-> got the kernel tainted. That's why bug reports from tainted kernels
-> will often be ignored by developers, hence try to reproduce problems
-> with an untainted kernel.
-> 
-> The lack of HW deactivation affects only KVM, I was wondering if we
-> could taint the kernel the first time a VM created. If the above doc
-> is to go by, someone who is running Linux on an M1, but not using
-> KVM, might stand a better chance to get support when something goes
-> wrong in that case.
-
-Unfortunately, by the time we're here, we have already committed to
-using stuff that isn't architectural.
-
-For example, this CPU doesn't advertise a virtual GICv3 CPU interface
-(because it isn't possible to do so independently of the full-fat
-one). And right from the beginning, before any VM is present, we are
-going to access ICH_VTR_EL2, because we really need it as part of
-initialising KVM.
-
-> What do you think?
-
-I think that if people are bothered by this tainting, they can disable
-KVM altogether. And to be fair, we should taint the kernel right when
-the first CPU boots, because it isn't implementing the ARM
-architecture as defined by the spec.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gVHVlLCAyMiBKdW4gMjAyMSAxNzowMzoyMiArMDEwMCwKQWxleGFuZHJ1IEVsaXNlaSA8YWxl
+eGFuZHJ1LmVsaXNlaUBhcm0uY29tPiB3cm90ZToKPiAKPiBIaSBNYXJjLAo+IAo+IE9uIDYvMjIv
+MjEgNDo1MSBQTSwgTWFyYyBaeW5naWVyIHdyb3RlOgo+ID4gSGkgQWxleCwKPiA+Cj4gPiBPbiBU
+dWUsIDIyIEp1biAyMDIxIDE2OjM5OjExICswMTAwLAo+ID4gQWxleGFuZHJ1IEVsaXNlaSA8YWxl
+eGFuZHJ1LmVsaXNlaUBhcm0uY29tPiB3cm90ZToKPiA+PiBIaSBNYXJjLAo+ID4+Cj4gPj4gT24g
+Ni8xLzIxIDExOjM5IEFNLCBNYXJjIFp5bmdpZXIgd3JvdGU6Cj4gPj4+IFRoaXMgaXMgYSBuZXcg
+dmVyc2lvbiBvZiB0aGUgc2VyaWVzIHByZXZpb3VzbHkgcG9zdGVkIGF0IFszXSwgcmV3b3JraW5n
+Cj4gPj4+IHRoZSB2R0lDIGFuZCB0aW1lciBjb2RlIHRvIGNvcGUgd2l0aCB0aGUgTTEgYnJhaW5k
+ZWFkXldhbXVzaW5nIG5hdHVyZS4KPiA+Pj4KPiA+Pj4gSGFyZGx5IGFueSBjaGFuZ2UgdGhpcyB0
+aW1lIGFyb3VuZCwgbW9zdGx5IHJlYmFzZWQgb24gdG9wIG9mIHVwc3RyZWFtCj4gPj4+IG5vdyB0
+aGF0IHRoZSBkZXBlbmRlbmNpZXMgaGF2ZSBtYWRlIGl0IGluLgo+ID4+Pgo+ID4+PiBUZXN0ZWQg
+d2l0aCBtdWx0aXBsZSBjb25jdXJyZW50IFZNcyBydW5uaW5nIGZyb20gYW4gaW5pdHJhbWZzLgo+
+ID4+Pgo+ID4+PiBVbnRpbCBzb21lb25lIHNob3V0cyBsb3VkbHkgbm93LCBJJ2xsIHRha2UgdGhp
+cyBpbnRvIDUuMTQgKGFuZCBpbgo+ID4+PiAtbmV4dCBmcm9tIHRvbW9ycm93KS4KPiA+PiBJIGFt
+IG5vdCBmYW1pbGlhciB3aXRoIGlycWRvbWFpbnMgb3Igd2l0aCB0aGUgaXJxY2hpcAo+ID4+IGlu
+ZnJhc3RydWN0dXJlLCBzbyBJIGNhbid0IHJlYWxseSBjb21tZW50IG9uIHBhdGNoICM4Lgo+ID4+
+Cj4gPj4gSSB0cmllZCB0ZXN0aW5nIHRoaXMgd2l0aCBhIEdJQ3YzIGJ5IG1vZGlmeWluZyB0aGUg
+ZHJpdmVyIHRvIHNldAo+ID4+IG5vX2h3X2RlYWN0aXZhdGlvbiBhbmQgbm9fbWFpbnRfaXJxX21h
+c2s6Cj4gPj4KPiA+PiBkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rdm0vdmdpYy92Z2ljLWluaXQu
+YyBiL2FyY2gvYXJtNjQva3ZtL3ZnaWMvdmdpYy1pbml0LmMKPiA+PiBpbmRleCAzNDBjNTFkODc2
+NzcuLmQwYzZmODA4ZDdmNCAxMDA2NDQKPiA+PiAtLS0gYS9hcmNoL2FybTY0L2t2bS92Z2ljL3Zn
+aWMtaW5pdC5jCj4gPj4gKysrIGIvYXJjaC9hcm02NC9rdm0vdmdpYy92Z2ljLWluaXQuYwo+ID4+
+IEBAIC01NjUsOCArNTY1LDEwIEBAIGludCBrdm1fdmdpY19oeXBfaW5pdCh2b2lkKQo+ID4+IMKg
+wqDCoMKgwqDCoMKgIGlmIChyZXQpCj4gPj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+IHJldHVybiByZXQ7Cj4gPj4gwqAKPiA+PiArwqDCoMKgwqDCoMKgIC8qCj4gPj4gwqDCoMKgwqDC
+oMKgwqAgaWYgKCFoYXNfbWFzaykKPiA+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAg
+cmV0dXJuIDA7Cj4gPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgKi8KPiA+PiDCoAo+
+ID4+IMKgwqDCoMKgwqDCoMKgIHJldCA9IHJlcXVlc3RfcGVyY3B1X2lycShrdm1fdmdpY19nbG9i
+YWxfc3RhdGUubWFpbnRfaXJxLAo+ID4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgdmdpY19tYWludGVuYW5jZV9oYW5kbGVy
+LAo+ID4+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2lycWNoaXAvaXJxLWdpYy12My5jIGIvZHJpdmVy
+cy9pcnFjaGlwL2lycS1naWMtdjMuYwo+ID4+IGluZGV4IDQ1M2ZjNDI1ZWVkZS4uOWNlNGRlZTIw
+NjU1IDEwMDY0NAo+ID4+IC0tLSBhL2RyaXZlcnMvaXJxY2hpcC9pcnEtZ2ljLXYzLmMKPiA+PiAr
+KysgYi9kcml2ZXJzL2lycWNoaXAvaXJxLWdpYy12My5jCj4gPj4gQEAgLTE4NTAsNiArMTg1MCwx
+MiBAQCBzdGF0aWMgdm9pZCBfX2luaXQgZ2ljX29mX3NldHVwX2t2bV9pbmZvKHN0cnVjdCBkZXZp
+Y2Vfbm9kZQo+ID4+ICpub2RlKQo+ID4+IMKgwqDCoMKgwqDCoMKgIGlmICghcmV0KQo+ID4+IMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBnaWNfdjNfa3ZtX2luZm8udmNwdSA9IHI7Cj4g
+Pj4gwqAKPiA+PiArwqDCoMKgwqDCoMKgIGdpY192M19rdm1faW5mby5ub19od19kZWFjdGl2YXRp
+b24gPSB0cnVlOwo+ID4gQmxpbmsuLi4KPiA+Cj4gPj4gK8KgwqDCoMKgwqDCoCBnaWNfdjNfa3Zt
+X2luZm8ubm9fbWFpbnRfaXJxX21hc2sgPSB0cnVlOwo+ID4+ICsKPiA+PiArwqDCoMKgwqDCoMKg
+IHZnaWNfc2V0X2t2bV9pbmZvKCZnaWNfdjNfa3ZtX2luZm8pOwo+ID4+ICvCoMKgwqDCoMKgwqAg
+cmV0dXJuOwo+ID4+ICsKPiA+PiDCoMKgwqDCoMKgwqDCoCBnaWNfdjNfa3ZtX2luZm8uaGFzX3Y0
+ID0gZ2ljX2RhdGEucmRpc3RzLmhhc192bHBpczsKPiA+PiDCoMKgwqDCoMKgwqDCoCBnaWNfdjNf
+a3ZtX2luZm8uaGFzX3Y0XzEgPSBnaWNfZGF0YS5yZGlzdHMuaGFzX3J2cGVpZDsKPiA+PiDCoMKg
+wqDCoMKgwqDCoCB2Z2ljX3NldF9rdm1faW5mbygmZ2ljX3YzX2t2bV9pbmZvKTsKPiA+Pgo+ID4+
+IEtlcHQgdGhlIG1haW50ZW5hbmNlIGlycSBJRCBzbyB0aGUgSVJRIGdldHMgZW5hYmxlZCBhdCB0
+aGUKPiA+PiBSZWRpc3RyaWJ1dG9yIGxldmVsLiBJIGRvbid0IGtub3cgaWYgSSBtYW5hZ2VkIHRv
+IGJyZWFrIHNvbWV0aGluZwo+ID4+IHdpdGggdGhvc2UgY2hhbmdlcywgYnV0IHdoZW4gdGVzdGlu
+ZyBvbiB0aGUgbW9kZWwgYW5kIG9uIGEgcm9ja3BybzY0Cj4gPj4gKHdpdGggdGhlIHBhdGNoZXMg
+Y2hlcnJ5LXBpY2tlZCBvbiB0b3Agb2YgdjUuMTMtcmM3KSBJIGtlcHQgc2VlaW5nCj4gPj4gcmN1
+IHN0YWxscy4gSSBhc3N1bWUgSSBkaWQgc29tZXRoaW5nIHdyb25nLgo+ID4gSWYgeW91IGRvIHRo
+YXQsIHRoZSBpbnRlcnJ1cHRzIHRoYXQgYXJlIGZvcndhcmRlZCB0byB0aGUgZ3Vlc3QKPiA+ICh0
+aW1lcnMpIHdpbGwgbmV2ZXIgYmUgZGVhY3RpdmF0ZWQsIGFuZCB3aWxsIGJlIGxlZnQgZGFuZ2xp
+bmcgYWZ0ZXIKPiA+IHRoZSBmaXJzdCBpbmplY3Rpb24uIFRoaXMgaXMgYm91bmQgdG8gY3JlYXRl
+IGhhdm9jLCBhcyB3ZSB3aWxsIHRoZW4KPiA+IHVzZSBtYXNrL3VubWFzayB0byBjb250cm9sIHRo
+ZSB0aW1lciBkZWxpdmVyeSAocmVtZW1iZXIgdGhhdCB0aGUKPiA+IEFjdGl2ZSBzdGF0ZSBpcyBq
+dXN0IGFub3RoZXIgZm9ybSBvZiBhdXRvLW1hc2tpbmcgb24gdG9wIG9mIHRoZQo+ID4gc3RhbmRh
+cmQgZW5hYmxlIGJpdCkKPiA+Cj4gPiBPbiB0aGUgY29udHJhcnksIHRoZSBBSUMgb25seSBoYXMg
+YSBzaW5nbGUgYml0IHRvIGNvbnRyb2wgdGhlIHRpbWVyCj4gPiAodXNlZCBhcyBhIG1hc2spLCB3
+aGljaCBpcyB3aGF0IHRoZSBpcnFkb21haW4gc3R1ZmYgaW1wbGVtZW50cyB0bwo+ID4gbWltaWMg
+dGhlIGFjdGl2ZSBzdGF0ZS4KPiAKPiBTbyB0aGVzZSBwYXRjaGVzIHdvcmsgKipvbmx5Kiogd2l0
+aCB0aGUgQUlDLCBub3Qgd2l0aCBhIHN0YW5kYXJkCj4gR0lDdjMgd2l0aG91dCB0aGUgSFcgYml0
+IGluIHRoZSBMUiByZWdpc3RlcnMgYW5kIHdpdGggYW4gdW5tYXNrYWJsZQo+IG1haW50ZW5hbmNl
+IElSUT8gQmVjYXVzZSBmcm9tIHRoZSBjb21taXQgbWVzc2FnZSBmcm9tICM4IEkgZ290IHRoZQo+
+IGltcHJlc3Npb24gdGhhdCB0aGUgcHVycG9zZSBvZiB0aGUgY2hhbmdlIGlzIHRvIG1ha2UgdGlt
+ZXJzIHdvcmsgb24KPiBhIHN0YW5kYXJkIEdJQ3YzLCBzYW5zIHRob3NlIHJlcXVpcmVkIGFyY2hp
+dGVjdHVyYWwgZmVhdHVyZXMuCgpJIGRvbid0IHVuZGVyc3RhbmQgd2hhdCB5b3UgbWVhbi4KClRo
+ZSBIVyBiaXQgaW4gdGhlIExSIGFuZCBkZWFjdGl2YXRpb24gKmFyZSogcmVxdWlyZWQsIG5vbi1u
+ZWdvdGlhYmxlCnBhcnRzIG9mIHRoZSBHSUN2MyBhcmNoaXRlY3R1cmUuIEFwcGxlIGRpZCBub3Qg
+aW1wbGVtZW50IGl0IGlzIGEKY29uc2VxdWVuY2Ugb2YgdGhlIEFJQyBub3QgaGF2aW5nIGFuIGFj
+dGl2ZSBzdGF0ZSB0aGF0IHRoZSBndWVzdCBjYW4KbWFuaXB1bGF0ZSBpbmRlcGVuZGVudGx5IG9m
+IHRoZSBob3N0LgoKRWl0aGVyIHlvdSBoYXZlIGJvdGggSFcgYml0IGFuZCBhY3RpdmUgc3RhdGUs
+IGFuZCBib3RoIHdvcmsgdG9nZXRoZXIKKG5vcm1hbCBHSUN2MyksIG9yIHlvdSBoYXZlIG5vbmUg
+b2YgdGhhdCBhbmQgd2UgcmVseSBvbiB0aGUKbWFpbnRlbmFuY2UgaW50ZXJydXB0IHRvIGV4aXQg
+YW5kIGZpeCB0aGUgbWVzcyAoQXBwbGUgY3JhcCkuIFlvdQpjYW5ub3QgaGF2ZSBhbiBpbnRlcm1l
+ZGlhdGUgc3RhdGUgYmV0d2VlbiB0aGUgdHdvLgoKVGhhbmtzLAoKCU0uCgotLSAKV2l0aG91dCBk
+ZXZpYXRpb24gZnJvbSB0aGUgbm9ybSwgcHJvZ3Jlc3MgaXMgbm90IHBvc3NpYmxlLgpfX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBs
+aXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJp
+YS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
