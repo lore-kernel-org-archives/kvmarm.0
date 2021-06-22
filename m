@@ -7,73 +7,67 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F36D4C49EA2
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0223BC49EA4
 	for <kvmarm@archiver.kernel.org>; Tue, 22 Jun 2021 15:20:51 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 876F0613BD
+	by mail.kernel.org (Postfix) with ESMTP id 71C11613B4
 	for <kvmarm@archiver.kernel.org>; Tue, 22 Jun 2021 15:20:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 876F0613BD
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71C11613B4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1897C4A4CD;
-	Tue, 22 Jun 2021 11:20:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D14F6407ED;
+	Tue, 22 Jun 2021 11:20:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id bKK+nSWlRyts; Tue, 22 Jun 2021 11:20:50 -0400 (EDT)
+	with ESMTP id g15bXfdfXFMU; Tue, 22 Jun 2021 11:20:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 79DF44A19A;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 602674A173;
 	Tue, 22 Jun 2021 11:20:47 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B31C7402DB
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Jun 2021 05:43:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CA6D3405A6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Jun 2021 05:38:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 05gtY0R5fL2t for <kvmarm@lists.cs.columbia.edu>;
- Tue, 22 Jun 2021 05:43:25 -0400 (EDT)
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 511ED40617
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Jun 2021 05:43:25 -0400 (EDT)
-IronPort-SDR: s0x0vBZ/MJJcJzp6lncpbYvY0CUkSdXj6L8fJh3qb9NI20lxiw6iW27wsb5pEvywZfTpRorOdr
- 4aCwuvufbUIg==
-X-IronPort-AV: E=McAfee;i="6200,9189,10022"; a="194330922"
-X-IronPort-AV: E=Sophos;i="5.83,291,1616482800"; d="scan'208";a="194330922"
+ with ESMTP id xWmLIgvdGypK for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 22 Jun 2021 05:38:49 -0400 (EDT)
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 50F8B40573
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Jun 2021 05:38:49 -0400 (EDT)
+IronPort-SDR: PUoDmaAr4yAM7BSh/6fRWB/jxMQVkZQbQ3ymN35HBvwUekdlO2L9gr/2aEzH7z3tBMsN0wjwRF
+ QCD8dWU8y0jA==
+X-IronPort-AV: E=McAfee;i="6200,9189,10022"; a="187402088"
+X-IronPort-AV: E=Sophos;i="5.83,291,1616482800"; d="scan'208";a="187402088"
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
- by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 22 Jun 2021 02:43:23 -0700
-IronPort-SDR: YT0UXablTbHFjVGOUphLdQZI3IoiFPL8yBc2UqJr8G7mpfASBqseVxlrWsQj5BcIMDyWLT+dx2
- b78pMKFrVOjA==
-X-IronPort-AV: E=Sophos;i="5.83,291,1616482800"; d="scan'208";a="641600114"
+ by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 22 Jun 2021 02:38:40 -0700
+IronPort-SDR: YjghSkQQhfpqXchU5FmETDRBEKjg++NYbLVqNiZ3bX2P3p3aIdtsxEvlzAZ3khA29zw8feGTq5
+ hSRTxjz0q+eg==
+X-IronPort-AV: E=Sophos;i="5.83,291,1616482800"; d="scan'208";a="641599201"
 Received: from vmm_a4_icx.sh.intel.com (HELO localhost.localdomain)
  ([10.239.53.245])
  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 22 Jun 2021 02:43:17 -0700
+ 22 Jun 2021 02:38:37 -0700
 From: Zhu Lingshan <lingshan.zhu@intel.com>
-To: peterz@infradead.org,
-	pbonzini@redhat.com
+To: lingshan.zhu@live.com
 Subject: [PATCH V7 01/18] perf/core: Use static_call to optimize
  perf_guest_info_callbacks
-Date: Tue, 22 Jun 2021 17:42:49 +0800
-Message-Id: <20210622094306.8336-2-lingshan.zhu@intel.com>
+Date: Tue, 22 Jun 2021 17:38:06 +0800
+Message-Id: <20210622093823.8215-2-lingshan.zhu@intel.com>
 X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210622094306.8336-1-lingshan.zhu@intel.com>
-References: <20210622094306.8336-1-lingshan.zhu@intel.com>
+In-Reply-To: <20210622093823.8215-1-lingshan.zhu@intel.com>
+References: <20210622093823.8215-1-lingshan.zhu@intel.com>
 MIME-Version: 1.0
 X-Mailman-Approved-At: Tue, 22 Jun 2021 11:20:46 -0400
-Cc: wanpengli@tencent.com, Like Xu <like.xu@linux.intel.com>,
- eranian@google.com, weijiang.yang@intel.com, Guo Ren <guoren@kernel.org>,
- linux-riscv@lists.infradead.org, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, kan.liang@linux.intel.com, ak@linux.intel.com,
- kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>, joro@8bytes.org,
- x86@kernel.org, linux-csky@vger.kernel.org, wei.w.wang@intel.com,
- xen-devel@lists.xenproject.org, liuxiangdong5@huawei.com, bp@alien8.de,
- Paul Walmsley <paul.walmsley@sifive.com>,
- Boris Ostrovsky <boris.ostrovsky@oracle.com>,
- Zhu Lingshan <lingshan.zhu@intel.com>, linux-arm-kernel@lists.infradead.org,
- jmattson@google.com, like.xu.linux@gmail.com, Nick Hu <nickhu@andestech.com>,
- seanjc@google.com, linux-kernel@vger.kernel.org, vkuznets@redhat.com
+Cc: Zhu Lingshan <lingshan.zhu@intel.com>, Like Xu <like.xu@linux.intel.com>,
+ Nick Hu <nickhu@andestech.com>, Peter Zijlstra <peterz@infradead.org>,
+ Marc Zyngier <maz@kernel.org>, linux-csky@vger.kernel.org,
+ linux-riscv@lists.infradead.org, Guo Ren <guoren@kernel.org>,
+ Paul Walmsley <paul.walmsley@sifive.com>, xen-devel@lists.xenproject.org,
+ Boris Ostrovsky <boris.ostrovsky@oracle.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
