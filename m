@@ -2,86 +2,61 @@ Return-Path: <SRS0=VGwd=LQ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1B6AC48BE5
-	for <kvmarm@archiver.kernel.org>; Tue, 22 Jun 2021 08:57:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78DF1C2B9F4
+	for <kvmarm@archiver.kernel.org>; Tue, 22 Jun 2021 09:41:50 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0D9B36137D
-	for <kvmarm@archiver.kernel.org>; Tue, 22 Jun 2021 08:57:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D9B36137D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id F1FB361353
+	for <kvmarm@archiver.kernel.org>; Tue, 22 Jun 2021 09:41:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1FB361353
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E8574066E;
-	Tue, 22 Jun 2021 04:57:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 73A0340617;
+	Tue, 22 Jun 2021 05:41:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id tLdhT2PQyr11; Tue, 22 Jun 2021 04:57:02 -0400 (EDT)
+	with ESMTP id Q9UmJ6ZUPWFd; Tue, 22 Jun 2021 05:41:46 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A87F406DD;
-	Tue, 22 Jun 2021 04:57:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EF22E40642;
+	Tue, 22 Jun 2021 05:41:46 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A5FB4064F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Jun 2021 04:57:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1300E40617
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Jun 2021 05:41:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mp+WqJId-64x for <kvmarm@lists.cs.columbia.edu>;
- Tue, 22 Jun 2021 04:56:59 -0400 (EDT)
-Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com
- [209.85.167.176])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D995840642
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Jun 2021 04:56:59 -0400 (EDT)
-Received: by mail-oi1-f176.google.com with SMTP id s17so174738oij.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Jun 2021 01:56:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=gsnx3WWXGHiAO3TPKJpzIec1T+lt/uyQth3YVlL9pnc=;
- b=rVxG5kaR90ysvW7okvOvabn5lo+ydrxWE4ngLY16gB2qCaPmwTFGDpC/HrF4kLM7Dh
- bmY6PONRopxgaQqJRL8C2B6E6T/6y3QFUi/LNCbq1ZzOp+diERhvt4+bpHMkBCnO0scx
- DXifc9h3lxHiRPbdXOMAzd4bH7KEK2MlM8v/Yd030HIeiNZLuWwbecnSMJiQky1G6Hxp
- sXckYlybo1FVWHHRUsfV4IkBLZh9reVDIGFOp4yR29oG8VOylYV7WmQmcitA1S+SIZE4
- 4lZGrcqBU1UQzS9KNoPlW9Z0A2EAej47g0WSs0eME0KQTZMH6T3hP9m4TU2Pmul6yHsG
- rUyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=gsnx3WWXGHiAO3TPKJpzIec1T+lt/uyQth3YVlL9pnc=;
- b=poArwzEZqGXSxrm7zyNErptkTKkfQaR9S6RK8OoQiNsKjP5UmwnBmPKr5QNG48ozUe
- f7B+/31qKHOQ16rj/ZJcmYjFRbqnq1s4v47SJKjDZB9liZRtRYa6TGn+467QrYHKlJ1H
- ftT2hYVy6dIUmPIoulkWb/Qw+cPNJknLmAdWRgeUnBIqS7JHPYOOO+3S4x2FuktLu7L9
- oEbrQrheTuB/tAUSGXuORD++kgEjLtLuSiBoe82Qtsw9JmDIF7L3ckadai2EVRat5Y2O
- A4S4YYHkwq/nhzpR2rwxZEKZtNuQ5EEuC0NiJmpw19WER7MMmQ0BItn2vnfFnsEw17ef
- eSBQ==
-X-Gm-Message-State: AOAM533FpXmJXPliLyooxCFVdUu9vXryTuFAb6KiWyCPs4zjSIofdgHG
- WmzrOFj2aH5dDUmrhdcsRf2rcfWB+65Gv2IBMRXIWA==
-X-Google-Smtp-Source: ABdhPJzNy4tmmTU4hyu2JtcL2mUCBLsLb91CbtjqvgbJMOuxDhSiRtfNgTHpct2a5+XVH5QglaC1zgDWvalpN5+uc3c=
-X-Received: by 2002:aca:b38a:: with SMTP id c132mr2304058oif.90.1624352218925; 
- Tue, 22 Jun 2021 01:56:58 -0700 (PDT)
+ with ESMTP id LqWTgNbjoWUs for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 22 Jun 2021 05:41:43 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 10EFA402DB
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Jun 2021 05:41:43 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7E07D1063;
+ Tue, 22 Jun 2021 02:41:42 -0700 (PDT)
+Received: from slackpad.fritz.box (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F32EF3F718;
+ Tue, 22 Jun 2021 02:41:41 -0700 (PDT)
+Date: Tue, 22 Jun 2021 10:41:24 +0100
+From: Andre Przywara <andre.przywara@arm.com>
+To: =?UTF-8?B?6IOk5qGmIOmZiA==?= <yinhua_chen@outlook.com>
+Subject: Re: KVM/ARM64: Booting KVM on FVP/fastmodels
+Message-ID: <20210622104124.2b1a4820@slackpad.fritz.box>
+In-Reply-To: <OSZP286MB11361A5F1B4D592F54930F6F81099@OSZP286MB1136.JPNP286.PROD.OUTLOOK.COM>
+References: <OSYPR01MB54317CECC49E872ACFD9D84B817E9@OSYPR01MB5431.jpnprd01.prod.outlook.com>
+ <0bbea123-7bea-3a2e-70ae-30f43df3000e@arm.com>
+ <OS0PR01MB54283E4CF20EF0D2E423E366814E9@OS0PR01MB5428.jpnprd01.prod.outlook.com>
+ <20210414095028.0bb75aaa@slackpad.fritz.box>
+ <OSZP286MB11361A5F1B4D592F54930F6F81099@OSZP286MB1136.JPNP286.PROD.OUTLOOK.COM>
+Organization: Arm Ltd.
+X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
 MIME-Version: 1.0
-References: <20210621111716.37157-1-steven.price@arm.com>
- <20210621111716.37157-6-steven.price@arm.com>
-In-Reply-To: <20210621111716.37157-6-steven.price@arm.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Tue, 22 Jun 2021 09:56:22 +0100
-Message-ID: <CA+EHjTx7_atkNMqrUkHr0mM2xDbzBafip3s0JhGrGzsX9N08XQ@mail.gmail.com>
-Subject: Re: [PATCH v17 5/6] KVM: arm64: ioctl to fetch/store tags in a guest
-To: Steven Price <steven.price@arm.com>
-Cc: Juan Quintela <quintela@redhat.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
- Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
- Dave Martin <Dave.Martin@arm.com>, linux-kernel@vger.kernel.org
+Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,233 +68,124 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
-
-
-On Mon, Jun 21, 2021 at 12:18 PM Steven Price <steven.price@arm.com> wrote:
->
-> The VMM may not wish to have it's own mapping of guest memory mapped
-> with PROT_MTE because this causes problems if the VMM has tag checking
-> enabled (the guest controls the tags in physical RAM and it's unlikely
-> the tags are correct for the VMM).
->
-> Instead add a new ioctl which allows the VMM to easily read/write the
-> tags from guest memory, allowing the VMM's mapping to be non-PROT_MTE
-> while the VMM can still read/write the tags for the purpose of
-> migration.
->
-> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
->  arch/arm64/include/asm/kvm_host.h |  3 ++
->  arch/arm64/include/asm/mte-def.h  |  1 +
->  arch/arm64/include/uapi/asm/kvm.h | 11 +++++
->  arch/arm64/kvm/arm.c              |  7 +++
->  arch/arm64/kvm/guest.c            | 82 +++++++++++++++++++++++++++++++
->  include/uapi/linux/kvm.h          |  1 +
->  6 files changed, 105 insertions(+)
->
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 309e36cc1b42..6a2ac4636d42 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -729,6 +729,9 @@ int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
->  int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
->                                struct kvm_device_attr *attr);
->
-> +long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
-> +                               struct kvm_arm_copy_mte_tags *copy_tags);
-> +
->  /* Guest/host FPSIMD coordination helpers */
->  int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
->  void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu);
-> diff --git a/arch/arm64/include/asm/mte-def.h b/arch/arm64/include/asm/mte-def.h
-> index cf241b0f0a42..626d359b396e 100644
-> --- a/arch/arm64/include/asm/mte-def.h
-> +++ b/arch/arm64/include/asm/mte-def.h
-> @@ -7,6 +7,7 @@
->
->  #define MTE_GRANULE_SIZE       UL(16)
->  #define MTE_GRANULE_MASK       (~(MTE_GRANULE_SIZE - 1))
-> +#define MTE_GRANULES_PER_PAGE  (PAGE_SIZE / MTE_GRANULE_SIZE)
->  #define MTE_TAG_SHIFT          56
->  #define MTE_TAG_SIZE           4
->  #define MTE_TAG_MASK           GENMASK((MTE_TAG_SHIFT + (MTE_TAG_SIZE - 1)), MTE_TAG_SHIFT)
-> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> index 24223adae150..b3edde68bc3e 100644
-> --- a/arch/arm64/include/uapi/asm/kvm.h
-> +++ b/arch/arm64/include/uapi/asm/kvm.h
-> @@ -184,6 +184,17 @@ struct kvm_vcpu_events {
->         __u32 reserved[12];
->  };
->
-> +struct kvm_arm_copy_mte_tags {
-> +       __u64 guest_ipa;
-> +       __u64 length;
-> +       void __user *addr;
-> +       __u64 flags;
-> +       __u64 reserved[2];
-> +};
-> +
-> +#define KVM_ARM_TAGS_TO_GUEST          0
-> +#define KVM_ARM_TAGS_FROM_GUEST                1
-> +
->  /* If you need to interpret the index values, here is the key: */
->  #define KVM_REG_ARM_COPROC_MASK                0x000000000FFF0000
->  #define KVM_REG_ARM_COPROC_SHIFT       16
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 28ce26a68f09..511f3716fe33 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -1359,6 +1359,13 @@ long kvm_arch_vm_ioctl(struct file *filp,
->
->                 return 0;
->         }
-> +       case KVM_ARM_MTE_COPY_TAGS: {
-> +               struct kvm_arm_copy_mte_tags copy_tags;
-> +
-> +               if (copy_from_user(&copy_tags, argp, sizeof(copy_tags)))
-> +                       return -EFAULT;
-> +               return kvm_vm_ioctl_mte_copy_tags(kvm, &copy_tags);
-> +       }
->         default:
->                 return -EINVAL;
->         }
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index 5cb4a1cd5603..4ddb20017b2f 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-> @@ -995,3 +995,85 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
->
->         return ret;
->  }
-> +
-> +long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
-> +                               struct kvm_arm_copy_mte_tags *copy_tags)
-> +{
-> +       gpa_t guest_ipa = copy_tags->guest_ipa;
-> +       size_t length = copy_tags->length;
-> +       void __user *tags = copy_tags->addr;
-> +       gpa_t gfn;
-> +       bool write = !(copy_tags->flags & KVM_ARM_TAGS_FROM_GUEST);
-> +       int ret = 0;
-> +
-> +       if (!kvm_has_mte(kvm))
-> +               return -EINVAL;
-> +
-> +       if (copy_tags->reserved[0] || copy_tags->reserved[1])
-> +               return -EINVAL;
-> +
-> +       if (copy_tags->flags & ~KVM_ARM_TAGS_FROM_GUEST)
-> +               return -EINVAL;
-> +
-> +       if (length & ~PAGE_MASK || guest_ipa & ~PAGE_MASK)
-> +               return -EINVAL;
-> +
-> +       gfn = gpa_to_gfn(guest_ipa);
-> +
-> +       mutex_lock(&kvm->slots_lock);
-> +
-> +       while (length > 0) {
-> +               kvm_pfn_t pfn = gfn_to_pfn_prot(kvm, gfn, write, NULL);
-> +               void *maddr;
-> +               unsigned long num_tags;
-> +               struct page *page;
-> +
-> +               if (is_error_noslot_pfn(pfn)) {
-> +                       ret = -EFAULT;
-> +                       goto out;
-> +               }
-> +
-> +               page = pfn_to_online_page(pfn);
-> +               if (!page) {
-> +                       /* Reject ZONE_DEVICE memory */
-> +                       ret = -EFAULT;
-> +                       goto out;
-> +               }
-> +               maddr = page_address(page);
-> +
-> +               if (!write) {
-> +                       if (test_bit(PG_mte_tagged, &page->flags))
-> +                               num_tags = mte_copy_tags_to_user(tags, maddr,
-> +                                                       MTE_GRANULES_PER_PAGE);
-> +                       else
-> +                               /* No tags in memory, so write zeros */
-> +                               num_tags = MTE_GRANULES_PER_PAGE -
-> +                                       clear_user(tags, MTE_GRANULES_PER_PAGE);
-> +                       kvm_release_pfn_clean(pfn);
-> +               } else {
-> +                       num_tags = mte_copy_tags_from_user(maddr, tags,
-> +                                                       MTE_GRANULES_PER_PAGE);
-> +                       kvm_release_pfn_dirty(pfn);
-> +               }
-> +
-> +               if (num_tags != MTE_GRANULES_PER_PAGE) {
-> +                       ret = -EFAULT;
-> +                       goto out;
-> +               }
-> +
-> +               /* Set the flag after checking the write completed fully */
-> +               if (write)
-> +                       set_bit(PG_mte_tagged, &page->flags);
-> +
-> +               gfn++;
-> +               tags += num_tags;
-> +               length -= PAGE_SIZE;
-> +       }
-> +
-> +out:
-> +       mutex_unlock(&kvm->slots_lock);
-> +       /* If some data has been copied report the number of bytes copied */
-> +       if (length != copy_tags->length)
-> +               return copy_tags->length - length;
-
-I'm not sure if this is actually an issue, but a couple of comments on
-the return value if there is an error after a partial copy has been
-done. If mte_copy_tags_to_user or mte_copy_tags_from_user don't return
-MTE_GRANULES_PER_PAGE, then the check for num_tags would fail, but
-some of the tags would have been copied, which wouldn't be reflected
-in length. That said, on a write the tagged bit wouldn't be set, and
-on read then the return value would be conservative, but not
-incorrect.
-
-That said, even though it is described that way in the documentation
-(rather deep in the description though), it might be confusing to
-return a non-negative value on an error. The other kvm ioctl I could
-find that does something similar, KVM_S390_GET_IRQ_STATE, seems to
-always return a -ERROR on error, rather than the number of bytes
-copied.
-
-Cheers,
-/fuad
-
-> +       return ret;
-> +}
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index d4da58ddcad7..da1edd2b4046 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1429,6 +1429,7 @@ struct kvm_s390_ucas_mapping {
->  /* Available with KVM_CAP_PMU_EVENT_FILTER */
->  #define KVM_SET_PMU_EVENT_FILTER  _IOW(KVMIO,  0xb2, struct kvm_pmu_event_filter)
->  #define KVM_PPC_SVM_OFF                  _IO(KVMIO,  0xb3)
-> +#define KVM_ARM_MTE_COPY_TAGS    _IOR(KVMIO,  0xb4, struct kvm_arm_copy_mte_tags)
->
->  /* ioctl for vm fd */
->  #define KVM_CREATE_DEVICE        _IOWR(KVMIO,  0xe0, struct kvm_create_device)
-> --
-> 2.20.1
->
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gVHVlLCAyMiBKdW4gMjAyMSAwMjozMzo0NCArMDAwMArog6TmoaYg6ZmIIDx5aW5odWFfY2hl
+bkBvdXRsb29rLmNvbT4gd3JvdGU6CgpIaSwKCj4gSSBmb2xsb3cgdGhlIGRvY3VtZW50IGh0dHBz
+Oi8vZ2l0LmxpbmFyby5vcmcvbGFuZGluZy10ZWFtcy93b3JraW5nL2FybS9hcm0tcmVmZXJlbmNl
+LXBsYXRmb3Jtcy5naXQvYWJvdXQvZG9jcy9iYXNlZnZwL3VzZXItZ3VpZGUucnN0LAoKc29ycnkg
+Zm9yIHRoYXQgOy0pCgo+IGFuZCBJIGJ1aWxkIGEgTGludXgtb24tRlZQIGVudmlyb25tZW50IHN1
+Y2Nlc3NmdWxseS4gSG93ZXZlciwgSSBzdGlsbCBjYW5ub3QgYm9vdCBLVk0sIHRoZSBkZXRhaWxz
+IGFyZSBhcyBmb2xsb3dzOgo+IDEuSSBtYWtlIHN1cmUgdGhhdCB0d28gY29uZmlndXJhdGlvbiBm
+aWxlcyBlbmFibGUgS1ZNIChJIGd1ZXNzIHRoZXNlIGFyZSB0aGUgcmlnaHQgY29uZmlndXJhdGlv
+biBmaWxlcyksIHRoZXkgYXJlCj4gbGF5ZXJzL21ldGEtYXJtL21ldGEtYXJtLWJzcC9yZWNpcGVz
+LWtlcm5lbC9saW51eC9maWxlcy90YzAvZGVmY29uZmlnOkNPTkZJR19LVk09eQo+IGJ1aWxkLXBv
+a3kvdG1wLXBva3kvd29yay1zaGFyZWQvZnZwLWJhc2Uva2VybmVsLXNvdXJjZS9hcmNoL2FybTY0
+L2NvbmZpZ3MvZGVmY29uZmlnOkNPTkZJR19LVk09eQoKPiAyLkkgZm9sbG93IHRoZSBkb2N1bWVu
+dCBodHRwczovL2dpdC5saW5hcm8ub3JnL2xhbmRpbmctdGVhbXMvd29ya2luZy9hcm0vYXJtLXJl
+ZmVyZW5jZS1wbGF0Zm9ybXMuZ2l0L2Fib3V0L2RvY3MvYmFzZWZ2cC91c2VyLWd1aWRlLnJzdC4g
+QWZ0ZXIgYnVpbGRpbmcgdGhlIHdob2xlIHNvZnR3YXJlIHN0YWNrLCBJIHRyeSBzZXZlcmFsIGNv
+bW1hbmRzIGJ1dCB0aGUgcmVzdWx0cyBzaG93IHRoYXQgS1ZNIGRvZXMgbm90IHdvcmsuCgpIYXZl
+IHlvdSB0cmllZCBhY3R1YWxseSBydW5uaW5nIGEgZ3Vlc3Q/IFVzaW5nIGt2bXRvb2wsIGZvciBp
+bnN0YW5jZT8Ka3ZtdG9vbCBjYW4gYmUgc3RhdGljYWxseSBsaW5rZWQsIHNvIHlvdSBlbmQgdXAg
+d2l0aCBhIHNpbmdsZQpleGVjdXRhYmxlIGZpbGUsIGVhc3kgdG8gY29weSBpbnRvIHdoYXRldmVy
+IHVzZXJsYW5kIHlvdSB1c2UuCklmIHlvdSBjbG9uZSBpdCBmcm9tCmdpdDovL2dpdC5rZXJuZWwu
+b3JnL3B1Yi9zY20vbGludXgva2VybmVsL2dpdC93aWxsL2t2bXRvb2wuZ2l0CmFuZCBkbyAibWFr
+ZSBsa3ZtLXN0YXRpYyIgb24gYW55IGFybTY0IHN5c3RlbSwgeW91IGNhbiBjb3B5IHRoZQpyZXN1
+bHRpbmcgYmluYXJ5ICJsa3ZtLXN0YXRpYyIgaW50byB5b3VyIHJvb3RmcywgYW5kIHRoZW4gcnVu
+IGl0IG9uIHRoZQptb2RlbDoKIyBsa3ZtLXN0YXRpYyBydW4gLWsgPHNvbWVfa2VybmVsX2ltYWdl
+PgpZb3UgbWlnaHQgbmVlZCB0byBjcmVhdGUgdGhlIGRldmljZSBmaWxlIGZpcnN0IChzZWUgYmVs
+b3cpLgoKPiBUaGUgc2NyZWVuc2hvdHMgYXJlIHNob3duIGFzIGZvbGxvd3NbY29tbWFuZHNdSSB0
+cnkgdGhyZWUgY29tbWFuZHMsCj4gImt2bS1vayIKClRoaXMgZG9lcyBub3QgZG8gbXVjaCBvbiBB
+Uk0vYXJtNjQsIGl0IGp1c3QgbWVyZWx5IGNoZWNrcyBmb3IgdGhlCmV4aXN0ZW5jZSBvZiAvZGV2
+L2t2bS4gRGVwZW5kaW5nIG9uIHlvdXIgdXNlcmxhbmQsIG5vYm9keSBtaWdodCBoYXZlCmNyZWF0
+ZWQgdGhhdCAtIGJ1dCBzdGlsbCBLVk0gbWlnaHQgYmUgY29uZmlndXJlZCBmaW5lLgpBIHNpbXBs
+ZSAibWtub2QgL2Rldi9rdm0gYyAxMCAyMzIiIGZpeGVzIHRoYXQsIGJ1dCB0aGUgdGVzdCBwYXNz
+aW5nIG5vdwpkb2Vzbid0IG1lYW4gbXVjaCAoYXMgaXMganVzdCBjaGVja3MgZm9yIHRoZSBleGlz
+dGVuY2Ugb2YgdGhpcyBmaWxlLApub3QgYWN0dWFsIEtWTSBmdW5jdGlvbmFsaXR5KS4KCj4gImRt
+ZXNnIHwgZ3JlcCBLVk0iCgpQbGVhc2UgYWx3YXlzIHVzZSAiZ3JlcCAtaSIgd2hlbiBncmVwJ2lu
+ZyBpbiBkbWVzZywgY2FwaXRhbGlzYXRpb24gb2YKdGhvc2UgbmFtZXMgbWF5IHZhcnkuIE9uIG15
+IGtlcm5lbCB0aGVyZSBpcyBpbmRlZWQgbm90IGEgc2luZ2xlIGhpdCBmb3IKIktWTSIsIGJ1dCBz
+ZXZlcmFsIGZvciAia3ZtIi4KS2VlcCBpbiBtaW5kIHRoYXQgdGhpcyBpcyBub3QgYSBidWxsZXQt
+cHJvb2YgbWV0aG9kOiB0aGUgYm9vdCBtZXNzYWdlcwpmcm9tIEtWTSBtaWdodCBoYXZlIGJlZW4g
+Zmx1c2hlZCBmcm9tIHRoZSBkbWVzZyBidWZmZXIgYWxyZWFkeSAtIG9uIG9uZQpvZiBteSBzeXN0
+ZW1zIHJ1bm5pbmcgZm9yIHNvbWUgd2Vla3Mgd2l0aCBzb21lIGRlYnVnIG1lc3NhZ2VzIHRoZXkK
+Y2VydGFpbmx5IGFyZS4KQnV0IHJpZ2h0IGFmdGVyIGJvb3QgdGhlcmUgaXMgYSBoaWdoIGNoYW5j
+ZSBvZiBzdWNjZXNzLCB0aG91Z2gsIGFuZAppdCdzIHRoZSBlYXNpZXN0IGNoZWNrIGZvciBLVk0u
+Cgo+ICJncmVwIC1FIC1vICd2bXh8c3ZtJyAvcHJvYy9jcHVpbmZvIgoKVGhpcyBpcyB4ODYgc3Bl
+Y2lmaWMgYW5kIGRvZXMgbm90IHdvcmsgYXQgYWxsIG9uIEFSTS9hcm02NC4KVGhlcmUgaXMgbm90
+IG11Y2ggdG8gbGVhcm4gYWJvdXQgS1ZNIGluIGNwdWluZm8gb24gYXJtNjQuCgo+IEkgZ3Vlc3Mg
+bWF5YmUgdGhlIHJlYXNvbiBpcyB0aGF0IEZWUCBjb25maWd1cmF0aW9uIHVzZXMgYSBLVk0tdW5z
+dXBwb3J0IENQVSwgYnV0IEkgZG8gbm90IGtub3cgdGhlIHJpZ2h0IGNvbmZpZ3VyYXRpb24sIGFu
+ZCB0aGUgRlZQIGRvY3VtZW50cyBkbyBub3QgbWVudGlvbiBhbnl0aGluZyBhYm91dCBLVk0uCgpJ
+IGRvdWJ0IHRoYXQsIHRoZSBub3JtYWwgbW9kZWxzIHNob3VsZCBhbGwgY29tZSB3aXRoIEVMMiBl
+bmFibGVkLiBUaGUKUmV2QyBtb2RlbCBkZWZpbml0ZWx5IHdvcmtzLgoKQ2hlZXJzLApBbmRyZQoK
+PiBBbmQgdGhpcyBpcyB0aGUgRlZQIGJvb3RpbmcgY29tbWFuZCBpbiB0aGUgc2NyaXB0czoKPiAK
+PiA9PT0KPiAKPiAvRlZQX0Jhc2VfUmV2Qy0yeEFFTXY4QQo+IAo+ICAtQyBwY3RsLnN0YXJ0dXA9
+MC4wLjAuMAo+IAo+ICAtQyBicC5zZWN1cmVfbWVtb3J5PTAKPiAKPiAgLUMgY2x1c3RlcjAuTlVN
+X0NPUkVTPTEKPiAKPiAgLUMgY2x1c3RlcjEuTlVNX0NPUkVTPTEKPiAKPiAgLUMgY2FjaGVfc3Rh
+dGVfbW9kZWxsZWQ9MAo+IAo+ICAtQyBicC5wbDAxMV91YXJ0MC51bnRpbWVkX2ZpZm9zPTEKPiAK
+PiAgLUMgYnAucGwwMTFfdWFydDAudW5idWZmZXJlZF9vdXRwdXQ9MQo+IAo+ICAtQyBicC5wbDAx
+MV91YXJ0MC5vdXRfZmlsZT11YXJ0MC0xNjI0MzI4OTMyMjc0NDM5NDk3LmxvZwo+IAo+ICAtQyBi
+cC5wbDAxMV91YXJ0MS5vdXRfZmlsZT11YXJ0MS0xNjI0MzI4OTMyMjc0NDM5NDk3LmxvZwo+IAo+
+ICAtQyBicC5zZWN1cmVmbGFzaGxvYWRlci5mbmFtZT08d29ya3NwYWNlPi9idWlsZC1wb2t5L3Rt
+cC1wb2t5L2RlcGxveS9pbWFnZXMvZnZwLWJhc2UvYmwxLWZ2cC5iaW4KPiAKPiAgLUMgYnAuZmxh
+c2hsb2FkZXIwLmZuYW1lPTx3b3Jrc3BhY2U+L2J1aWxkLXBva3kvdG1wLXBva3kvZGVwbG95L2lt
+YWdlcy9mdnAtYmFzZS9maXAtZnZwLmJpbgo+IAo+ICAtQyBicC5ob3N0YnJpZGdlLmludGVyZmFj
+ZU5hbWU9dGFwMAo+IAo+ICAtQyBicC5zbXNjXzkxYzExMS5lbmFibGVkPTEKPiAKPiAgLS1kYXRh
+IGNsdXN0ZXIwLmNwdTA9PHdvcmtzcGFjZT4vYnVpbGQtcG9reS90bXAtcG9reS9kZXBsb3kvaW1h
+Z2VzL2Z2cC1iYXNlL0ltYWdlQDB4ODAwODAwMDAKPiAKPiAgLS1kYXRhIGNsdXN0ZXIwLmNwdTA9
+PHdvcmtzcGFjZT4vYnVpbGQtcG9reS90bXAtcG9reS9kZXBsb3kvaW1hZ2VzL2Z2cC1iYXNlL2Z2
+cC1iYXNlLWdpY3YzLXBzY2ktY3VzdG9tLmR0YkAweDgzMDAwMDAwCj4gCj4gIC1DIGJwLnZlX3N5
+c3JlZ3MubW1iU2l0ZURlZmF1bHQ9MAo+IAo+ICAtQyBicC52ZV9zeXNyZWdzLmV4aXRfb25fc2h1
+dGRvd249MQo+IAo+ICAtQyBicC52aXJ0aW9ibG9ja2RldmljZS5pbWFnZV9wYXRoPTx3b3Jrc3Bh
+Y2U+L2J1aWxkLXBva3kvdG1wLXBva3kvZGVwbG95L2ltYWdlcy9mdnAtYmFzZS9jb3JlLWltYWdl
+LW1pbmltYWwtZnZwLWJhc2UuZGlzay5pbWcKPiAKPiA9PT0KPiAKPiAKPiAKPiBJZiB5b3UgY2Fu
+IHByb3ZpZGUgYW55IGtpbmQgb2YgaGVscCwgSSBhcHByZWNpYXRlIGl0IHZlcnkgbXVjaC4KPiAK
+PiBfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwo+IEZyb206IEFuZHJlIFByenl3YXJh
+IDxhbmRyZS5wcnp5d2FyYUBhcm0uY29tPgo+IFNlbnQ6IFdlZG5lc2RheSwgQXByaWwgMTQsIDIw
+MjEgMTY6NTAKPiBUbzog6IOk5qGmIOmZiCA8eWluaHVhX2NoZW5Ab3V0bG9vay5jb20+Cj4gQ2M6
+IGt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUgPGt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5l
+ZHU+Cj4gU3ViamVjdDogUmU6IEtWTS9BUk02NDogQm9vdGluZyBLVk0gb24gRlZQL2Zhc3Rtb2Rl
+bHMKPiAKPiBPbiBXZWQsIDE0IEFwciAyMDIxIDAyOjM3OjA3ICswMDAwCj4g6IOk5qGmIOmZiCA8
+eWluaHVhX2NoZW5Ab3V0bG9vay5jb20+IHdyb3RlOgo+IAo+ID4gSGksIEFuZHJlCj4gPgo+ID4g
+RG8geW91IG1lYW4gdGhhdCBpZiBJIGJvb3QgTGludXggb24gRlZQLCB0aGVuIEkgY2FuIHJ1biBL
+Vk0gb24gRlZQPyBTaW5jZSBLVk0gaXMganVzdCBhIG1vZHVsZSBpbiBMaW51eD8gIAo+IAo+IFdl
+bGwsIG9uIEFSTSBpdCdzIG5vdCBhIGtlcm5lbCBtb2R1bGUsIGJ1dCBidWlsdC1pbiB0byB0aGUg
+a2VybmVsCj4gaW1hZ2UsIGJ1dCB5ZXM6IFlvdSBjYW4gcnVuIGFueSBub3JtYWwgS1ZNIGVuYWJs
+ZWQga2VybmVsIG9uCj4gaXQuIFNvIGp1c3QgdXNlIHRoZSBzYW1lIHJlY2lwZSB5b3Ugd291bGQg
+dXNlIG9uIGFueSBvdGhlciBzeXN0ZW0gdG8KPiBydW4gS1ZNIGd1ZXN0cy4KPiAKPiBDaGVlcnMs
+Cj4gQW5kcmUKPiAKPiA+IF9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCj4gPiBGcm9t
+OiBBbmRyw6kgUHJ6eXdhcmEgPGFuZHJlLnByenl3YXJhQGFybS5jb20+Cj4gPiBTZW50OiBUdWVz
+ZGF5LCBNYXJjaCAzMCwgMjAyMSAxODoyMgo+ID4gVG86IHlpbmh1YV9jaGVuQG91dGxvb2suY29t
+IDx5aW5odWFfY2hlbkBvdXRsb29rLmNvbT47IGt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUg
+PGt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHU+Cj4gPiBTdWJqZWN0OiBSZTogS1ZNL0FSTTY0
+OiBCb290aW5nIEtWTSBvbiBGVlAvZmFzdG1vZGVscwo+ID4KPiA+IE9uIDI5LzAzLzIwMjEgMTM6
+MTMsIHlpbmh1YV9jaGVuQG91dGxvb2suY29tIHdyb3RlOgo+ID4KPiA+IEhpLAo+ID4gIAo+ID4g
+PiBJIHdhbnQgdG8gYm9vdCBLVk0gb24gc2ltdWxhdG9ycy4KPiA+ID4KPiA+ID4gSSBkb24ndCB3
+YW50IHRvIHVzZSBRRU1VIHNpbmNlIHNvbWUgZmVhdHVyZXMgYXJlIG9ubHkgc3VwcG9ydGVkIG9u
+Cj4gPiA+IEZWUC9mYXN0bW9kZWxzIG5vdy4KPiA+ID4KPiA+ID4gSG93ZXZlciwgSSBjYW5ub3Qg
+ZmluZCBkb2N1bWVudHMvYmxvZ3Mvd2lraSBhYm91dCBib290aW5nIEtWTSBvbgo+ID4gPiBGVlAv
+ZmFzdG1vZGVscy4KPiA+ID4KPiA+ID4gRG9lcyBLVk0gc3VwcG9ydCBydW5uaW5nIG9uIEZWUD8g
+IAo+ID4KPiA+IFRoZSBGVlAgZW11bGF0ZXMgdGhlIGZ1bGwgYXJjaGl0ZWN0dXJlLCBpbmNsdWRp
+bmcgYWxsIGV4Y2VwdGlvbiBsZXZlbHMKPiA+IChzbyBhbHNvIEVMMiksIGFuZCB0aGUgdmlydHVh
+bGl6YXRpb24gc3VwcG9ydCBvZiB0aGUgR0lDIGFuZCB0aGUgR2VuZXJpYwo+ID4gVGltZXIuCj4g
+PiBTbyB5ZXMsIHRoZSBtb2RlbHMgZnVsbHkgc3VwcG9ydCBLVk0gKG9yIGFueSBvdGhlciBoeXBl
+cnZpc29yLCBmb3IgdGhhdAo+ID4gbWF0dGVyKSwgYW5kIGFyZSBpbiBmYWN0IG9mdGVuIHVzZWQg
+Zm9yIGRldmVsb3BpbmcgS1ZNIHN1cHBvcnQgb2YgbmV3Cj4gPiBoYXJkd2FyZSBmZWF0dXJlcy4K
+PiA+Cj4gPiBTbyB3aGF0IGFyZSB0aGUgcHJvYmxlbXMgdGhhdCB5b3UgYXJlIGZhY2luZz8gSnVz
+dCBydW5uaW5nIGEga2VybmVsIGxpa2UKPiA+IHlvdSB3b3VsZCBub3JtYWxseSBkbyBvbiB0aGUg
+bW9kZWwgc2hvdWxkIHdvcmsgb3V0IG9mIHRoZSBib3guCj4gPiBJZiB5b3UgZGVzY3JpYmUgeW91
+ciBzZXR1cCBhbmQgdGhlIGVycm9yIG1lc3NhZ2VzLCB3ZSBjYW4gcHJvYmFibHkgaGVscAo+ID4g
+eW91IGJldHRlci4KPiA+Cj4gPiBDaGVlcnMsCj4gPiBBbmRyZQo+ID4gIAo+ID4gPgo+ID4gPiBB
+cHByZWNpYXRlIGZvciB5b3VyIGhlbHAhCj4gPiA+Cj4gPiA+IFNpbmNlcmVseSwKPiA+ID4gWWlu
+aHVhCj4gPiA+Cj4gPiA+IF9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fCj4gPiA+IGt2bWFybSBtYWlsaW5nIGxpc3QKPiA+ID4ga3ZtYXJtQGxpc3RzLmNzLmNv
+bHVtYmlhLmVkdQo+ID4gPiBodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xp
+c3RpbmZvL2t2bWFybQo+ID4gPiAgCj4gPiAgCj4gCgpfX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5j
+cy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0
+aW5mby9rdm1hcm0K
