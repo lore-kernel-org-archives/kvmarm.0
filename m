@@ -1,103 +1,99 @@
-Return-Path: <SRS0=rYk4=LP=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=VGwd=LQ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92F6DC4743C
-	for <kvmarm@archiver.kernel.org>; Mon, 21 Jun 2021 23:39:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFE30C48BE5
+	for <kvmarm@archiver.kernel.org>; Tue, 22 Jun 2021 07:07:41 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0C83B611BD
-	for <kvmarm@archiver.kernel.org>; Mon, 21 Jun 2021 23:39:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C83B611BD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 46E656128C
+	for <kvmarm@archiver.kernel.org>; Tue, 22 Jun 2021 07:07:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46E656128C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C35F4057F;
-	Mon, 21 Jun 2021 19:39:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B8AD4407B0;
+	Tue, 22 Jun 2021 03:07:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id yDkbEj6t4LUK; Mon, 21 Jun 2021 19:39:04 -0400 (EDT)
+	with ESMTP id 0bnGE0fj2JBd; Tue, 22 Jun 2021 03:07:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8504D401A4;
-	Mon, 21 Jun 2021 19:39:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F3174079A;
+	Tue, 22 Jun 2021 03:07:39 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D1973401A4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Jun 2021 19:39:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 07EAB406DD
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Jun 2021 03:07:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dTmbmrLfEoNt for <kvmarm@lists.cs.columbia.edu>;
- Mon, 21 Jun 2021 19:39:01 -0400 (EDT)
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com
- [209.85.167.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 971F240191
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Jun 2021 19:39:01 -0400 (EDT)
-Received: by mail-lf1-f51.google.com with SMTP id a11so19870984lfg.11
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Jun 2021 16:39:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=LKCX3YjuqUNoE4+roGGfm8o2np78e+Xfu61B4cA+uJI=;
- b=QFcnGtA3VrPeLLWUQicj9F1i0h1b/5RybgGRdCxbzFL8QhdCFvqX8VwhHYX5q3Pqkr
- 5doeAmEDeGxRt76VeDSVeTUadqoTA9u5/6KTlXOqcOXjJSNpNfPijSSqRT/k13mRT82w
- BkMfCbkNJslkTjpro+DkmBk3PjS4Hn6PXERxRUa93acO7MAGSIQkTHpMNoCVbbitEC/G
- 3z40+VkdiWaBHfrDy1AVZ8PQ02ycaq32fh4zmxddeYVhD6TbyPzafSla/8UwQq8SJUic
- P+LJtxgksTY14V5S67BoAcB1O0z9RiIOsr1CYCnuSPJgiazaQKBcf7ytjA/ktHEpP3jT
- SeQA==
+ with ESMTP id BNeYy6ZNjJBI for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 22 Jun 2021 03:07:38 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 165ED402C0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Jun 2021 03:07:38 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1624345657;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=BpxLvUdEN4UOwGk1JTOpTM4c5SQrD6XCtpiY9c/D+sc=;
+ b=EIYBMf+rG8kVVz4uIswDKQsu9Ix+kOXBbqGDNutUMqr35oa+dslmrOyCwnGh7ZrXLCwYYV
+ Tbx4vpOf1TKXFJvMfqLRD44jKCLkOeQTPGcuzQk+hnKezJwSaSFm1GPXkDcax/ZLVQ9Hn5
+ BVf/Um45QSJ2WqBQQNkVKrTGi3GjdHI=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-49-d-7eJTf0NMCXbAgVZv4tFg-1; Tue, 22 Jun 2021 03:07:36 -0400
+X-MC-Unique: d-7eJTf0NMCXbAgVZv4tFg-1
+Received: by mail-ed1-f70.google.com with SMTP id
+ t11-20020a056402524bb029038ffacf1cafso8976601edd.5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Jun 2021 00:07:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=LKCX3YjuqUNoE4+roGGfm8o2np78e+Xfu61B4cA+uJI=;
- b=M4GKB7jCwQEmvumzp/W+9KlTRyVQbgtmzWLj87o8Ml2y/ArqV/H5N52uHBPgk4aQjy
- bnbRvN8mpiES0xE278AcbWJI2Vny6+Ycq5HGaLIwW9aHBLgc5T5HIwmQKWJf4PvULUC+
- idDWRQAtVFKtox++lQ3YJtWNkoQnr+wuzepdXB8r8AeB+GCWTcT12eUPuBUrBaqySy4Z
- QGcv5cwdiYnTBYU3VyP2EyakaKy7K3TYNYGeg2PQ21keVdav8naVuZKw5+AFQ+P/t4vh
- TWQ2PLfNG++O5IFU/VtyV44EbqaLZk5k8qTAsHw2Y3PVQsbXHmfWK/Eftiqm2oJXb0Sb
- zP0Q==
-X-Gm-Message-State: AOAM530bf36oVGb8lSbTLVw5kguiZ0pefeDGOXDqZuSv+nQKnP3UTFFf
- 6KpI4IRSb9lv7GK9G1ReR5GjEOpFZmsOw5X35zhaOw==
-X-Google-Smtp-Source: ABdhPJyDQGI0gLkASAQSuSpsPjVvNlP9W768H8z16TiAXAgKg2wBct7k8/lWvgPo4urmgneuo0U07ygTChCL7ubyJYY=
-X-Received: by 2002:a05:6512:33c4:: with SMTP id
- d4mr592219lfg.536.1624318739777; 
- Mon, 21 Jun 2021 16:38:59 -0700 (PDT)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=BpxLvUdEN4UOwGk1JTOpTM4c5SQrD6XCtpiY9c/D+sc=;
+ b=mG+r7wy35OzvdeliA/A34L/HTnYoT76I4jybqsXt580kkkoELgKo68RsgYyQt8/KQt
+ twPAorUZIbo2ts5gfHI6uKQnTAPe5ft3tzXovePsuMxGmtZxEmaSFAFxsEn0RVGXgVYJ
+ YhDFMsB17R2DuHMw92KSgFBkDYuWK2/24YtNC3VbnVgekpFzHjbayZebPaYzZEuwFkoG
+ k1lFgud6M1Ee0YlSRqho/ne5/XdngoEtqFOsI1rz5BSWCEgsNfYOoKgIKrJlXcHqp+NW
+ YS2qCbe8/mXz33gTQqXTGlr+/SYBNS07PWeTJQK9ZiKEtQ3ZLt4JWUmjWnG9sO2M4oH1
+ WePg==
+X-Gm-Message-State: AOAM5321g2SderQmkYKWxut0uB1dq+zKI52/rBmF8YTi6VPzF/Oy3TWV
+ vj3LoyTouolONs/Qdj/jEeBd7RiW8ifONTqPHVPja58mhbq2vgEP/Uh9DDOW8wb3NUC6eMcGBhV
+ 1jZk9jzIO7g3sp0CGFdMKO+tM
+X-Received: by 2002:a17:906:670c:: with SMTP id
+ a12mr2323242ejp.249.1624345655076; 
+ Tue, 22 Jun 2021 00:07:35 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyIRL7kFdSnYi6ayAi9cWByQS1oJPIkRm7y2jVnBDl937Rh9GVFkpzhNuSsQPogXJRPDSPj+A==
+X-Received: by 2002:a17:906:670c:: with SMTP id
+ a12mr2323214ejp.249.1624345654861; 
+ Tue, 22 Jun 2021 00:07:34 -0700 (PDT)
+Received: from gator (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
+ by smtp.gmail.com with ESMTPSA id h20sm5416875ejl.7.2021.06.22.00.07.34
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 22 Jun 2021 00:07:34 -0700 (PDT)
+Date: Tue, 22 Jun 2021 09:07:32 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Subject: Re: [PATCH v3 0/5] KVM: arm64: selftests: Fix get-reg-list
+Message-ID: <20210622070732.zod7gaqhqo344vg6@gator>
+References: <20210531103344.29325-1-drjones@redhat.com>
 MIME-Version: 1.0
-References: <20210618222709.1858088-1-jingzhangos@google.com>
- <20210618222709.1858088-3-jingzhangos@google.com>
- <0cde024e-a234-9a10-5157-d17ba423939e@redhat.com>
- <CAAdAUtiL6DwJDWLLmUqct6B6n7Zaa2DyPhpwKZKb=cpRH+8+vQ@mail.gmail.com>
- <aa1d0bd9-55cf-161a-5af9-f5abde807353@redhat.com>
- <CAAdAUti1MreOnAXtA+jBEaq+AixmqvBEByi9G4EgDpfu63spHA@mail.gmail.com>
- <c639c557-0e16-6938-2da5-46400ee2dd14@redhat.com>
-In-Reply-To: <c639c557-0e16-6938-2da5-46400ee2dd14@redhat.com>
-From: Jing Zhang <jingzhangos@google.com>
-Date: Mon, 21 Jun 2021 18:38:49 -0500
-Message-ID: <CAAdAUtgXAedsXf_1Mjp+mBNkZkHg9feirMpUYQFrYhQ=8vVFcg@mail.gmail.com>
-Subject: Re: [PATCH v12 2/7] KVM: stats: Add fd-based API to read binary stats
- data
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
- Paul Mackerras <paulus@ozlabs.org>,
- Linuxkselftest <linux-kselftest@vger.kernel.org>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Will Deacon <will@kernel.org>,
- KVMARM <kvmarm@lists.cs.columbia.edu>,
- Emanuele Giuseppe Esposito <eesposit@redhat.com>,
- LinuxS390 <linux-s390@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
- Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- David Rientjes <rientjes@google.com>, KVMPPC <kvm-ppc@vger.kernel.org>,
- Krish Sadhukhan <krish.sadhukhan@oracle.com>,
- David Matlack <dmatlack@google.com>, Jim Mattson <jmattson@google.com>,
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- Sean Christopherson <seanjc@google.com>, Cornelia Huck <cohuck@redhat.com>,
- Peter Shier <pshier@google.com>, LinuxMIPS <linux-mips@vger.kernel.org>,
- Greg KH <gregkh@linuxfoundation.org>, Vitaly Kuznetsov <vkuznets@redhat.com>
+In-Reply-To: <20210531103344.29325-1-drjones@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Disposition: inline
+Cc: maz@kernel.org, pbonzini@redhat.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -114,26 +110,91 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Jun 21, 2021 at 6:35 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Mon, May 31, 2021 at 12:33:39PM +0200, Andrew Jones wrote:
+> v3:
+>  - Took Ricardo's suggestions in order to avoid needing to update
+>    prepare_vcpu_init, finalize_vcpu, and check_supported when adding
+>    new register sublists by better associating the sublists with their
+>    vcpu feature bits and caps [Ricardo]
+>  - We now dynamically generate the vcpu config name by creating them
+>    from its sublist names [drew]
+> 
+> v2:
+>  - Removed some cruft left over from a previous more complex design of the
+>    config command line parser
+>  - Dropped the list printing factor out patch as it's not necessary
+>  - Added a 'PASS' output for passing tests to allow testers to feel good
+>  - Changed the "up to date with kernel" comment to reference 5.13.0-rc2
+> 
+> 
+> Since KVM commit 11663111cd49 ("KVM: arm64: Hide PMU registers from
+> userspace when not available") the get-reg-list* tests have been
+> failing with
+> 
+>   ...
+>   ... There are 74 missing registers.
+>   The following lines are missing registers:
+>   ...
+> 
+> where the 74 missing registers are all PMU registers. This isn't a
+> bug in KVM that the selftest found, even though it's true that a
+> KVM userspace that wasn't setting the KVM_ARM_VCPU_PMU_V3 VCPU
+> flag, but still expecting the PMU registers to be in the reg-list,
+> would suddenly no longer have their expectations met. In that case,
+> the expectations were wrong, though, so that KVM userspace needs to
+> be fixed, and so does this selftest.
+> 
+> We could fix the test with a one-liner since we just need a
+> 
+>   init->features[0] |= 1 << KVM_ARM_VCPU_PMU_V3;
+> 
+> in prepare_vcpu_init(), but that's too easy, so here's a 5 patch patch
+> series instead :-)  The reason for all the patches and the heavy diffstat
+> is to prepare for other vcpu configuration testing, e.g. ptrauth and mte.
+> With the refactoring done in this series, we should now be able to easily
+> add register sublists and vcpu configs to the get-reg-list test, as the
+> last patch demonstrates with the pmu fix.
+> 
+> Thanks,
+> drew
+> 
+> 
+> Andrew Jones (5):
+>   KVM: arm64: selftests: get-reg-list: Introduce vcpu configs
+>   KVM: arm64: selftests: get-reg-list: Prepare to run multiple configs
+>     at once
+>   KVM: arm64: selftests: get-reg-list: Provide config selection option
+>   KVM: arm64: selftests: get-reg-list: Remove get-reg-list-sve
+>   KVM: arm64: selftests: get-reg-list: Split base and pmu registers
+> 
+>  tools/testing/selftests/kvm/.gitignore        |   1 -
+>  tools/testing/selftests/kvm/Makefile          |   1 -
+>  .../selftests/kvm/aarch64/get-reg-list-sve.c  |   3 -
+>  .../selftests/kvm/aarch64/get-reg-list.c      | 439 +++++++++++++-----
+>  4 files changed, 321 insertions(+), 123 deletions(-)
+>  delete mode 100644 tools/testing/selftests/kvm/aarch64/get-reg-list-sve.c
+> 
+> -- 
+> 2.31.1
 >
-> On 22/06/21 00:58, Jing Zhang wrote:
-> >> Pass it as an argument?
-> > The num_desc can only be initialized in the same file that defines the
-> > descriptor array.
-> > Looks like we have to have a global variable to save that. The
-> > solution would be similar
-> > to have a statically defined header for each arch.
-> > So, keep the header structure for each arch?
->
-> Oh, sorry.  I missed that there's only one call to kvm_stats_read and
-> it's in common code.  The remaining comments are small enough that I can
-> apply them myself.  Thanks!
->
-> Paolo
->
-Cool! Thanks, Paolo.
 
-Jing
+Gentle ping.
+
+I'm not sure if I'm pinging Marc or Paolo though. MAINTAINERS shows Paolo
+as all kvm selftests, but I think Marc has started picking up the AArch64
+specific kvm selftests.
+
+Marc, if you've decided to maintain AArch64 kvm selftests, would you be
+opposed to adding
+
+  F: tools/testing/selftests/kvm/*/aarch64/
+  F: tools/testing/selftests/kvm/aarch64/
+
+to "KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)"?
+
+Thanks,
+drew
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
