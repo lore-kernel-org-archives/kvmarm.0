@@ -2,58 +2,60 @@ Return-Path: <SRS0=VGwd=LQ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C98EC2B9F4
-	for <kvmarm@archiver.kernel.org>; Tue, 22 Jun 2021 15:51:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1E54C2B9F4
+	for <kvmarm@archiver.kernel.org>; Tue, 22 Jun 2021 15:55:37 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C554B61075
-	for <kvmarm@archiver.kernel.org>; Tue, 22 Jun 2021 15:51:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C554B61075
+	by mail.kernel.org (Postfix) with ESMTP id 2EBFA6113E
+	for <kvmarm@archiver.kernel.org>; Tue, 22 Jun 2021 15:55:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EBFA6113E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5041D4A17F;
-	Tue, 22 Jun 2021 11:51:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C50E54081C;
+	Tue, 22 Jun 2021 11:55:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 5vrMlPIzVcDa; Tue, 22 Jun 2021 11:51:14 -0400 (EDT)
+	with ESMTP id Itq9CeqGhrzb; Tue, 22 Jun 2021 11:55:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2EEBD40870;
-	Tue, 22 Jun 2021 11:51:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CC186409DD;
+	Tue, 22 Jun 2021 11:55:35 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E5424080B
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Jun 2021 11:51:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3660F4080B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Jun 2021 11:55:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cqCwvriIdY01 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 22 Jun 2021 11:51:11 -0400 (EDT)
+ with ESMTP id qCKqSp-IwUl4 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 22 Jun 2021 11:55:33 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3B5EA404F8
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Jun 2021 11:51:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D850F404F8
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Jun 2021 11:55:32 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 29C9560233;
- Tue, 22 Jun 2021 15:51:10 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id E23F261040;
+ Tue, 22 Jun 2021 15:55:31 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1lvig6-009Cui-3O; Tue, 22 Jun 2021 16:51:06 +0100
-Date: Tue, 22 Jun 2021 16:51:05 +0100
-Message-ID: <871r8tdhjq.wl-maz@kernel.org>
+ id 1lvikK-009Cz7-01; Tue, 22 Jun 2021 16:55:28 +0100
+Date: Tue, 22 Jun 2021 16:55:27 +0100
+Message-ID: <87zgvhc2s0.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH v4 0/9] KVM: arm64: Initial host support for the Apple M1
-In-Reply-To: <9bc0923c-5c3b-eeac-86ee-c3234c486955@arm.com>
+Subject: Re: [PATCH v4 5/9] KVM: arm64: vgic: move irq->get_input_level into
+ an ops structure
+In-Reply-To: <da762d7c-9eec-4fb8-ab6f-10bde6d777b3@arm.com>
 References: <20210601104005.81332-1-maz@kernel.org>
- <9bc0923c-5c3b-eeac-86ee-c3234c486955@arm.com>
+ <20210601104005.81332-6-maz@kernel.org>
+ <da762d7c-9eec-4fb8-ab6f-10bde6d777b3@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -81,67 +83,67 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SGkgQWxleCwKCk9uIFR1ZSwgMjIgSnVuIDIwMjEgMTY6Mzk6MTEgKzAxMDAsCkFsZXhhbmRydSBF
-bGlzZWkgPGFsZXhhbmRydS5lbGlzZWlAYXJtLmNvbT4gd3JvdGU6Cj4gCj4gSGkgTWFyYywKPiAK
-PiBPbiA2LzEvMjEgMTE6MzkgQU0sIE1hcmMgWnluZ2llciB3cm90ZToKPiA+IFRoaXMgaXMgYSBu
-ZXcgdmVyc2lvbiBvZiB0aGUgc2VyaWVzIHByZXZpb3VzbHkgcG9zdGVkIGF0IFszXSwgcmV3b3Jr
-aW5nCj4gPiB0aGUgdkdJQyBhbmQgdGltZXIgY29kZSB0byBjb3BlIHdpdGggdGhlIE0xIGJyYWlu
-ZGVhZF5XYW11c2luZyBuYXR1cmUuCj4gPgo+ID4gSGFyZGx5IGFueSBjaGFuZ2UgdGhpcyB0aW1l
-IGFyb3VuZCwgbW9zdGx5IHJlYmFzZWQgb24gdG9wIG9mIHVwc3RyZWFtCj4gPiBub3cgdGhhdCB0
-aGUgZGVwZW5kZW5jaWVzIGhhdmUgbWFkZSBpdCBpbi4KPiA+Cj4gPiBUZXN0ZWQgd2l0aCBtdWx0
-aXBsZSBjb25jdXJyZW50IFZNcyBydW5uaW5nIGZyb20gYW4gaW5pdHJhbWZzLgo+ID4KPiA+IFVu
-dGlsIHNvbWVvbmUgc2hvdXRzIGxvdWRseSBub3csIEknbGwgdGFrZSB0aGlzIGludG8gNS4xNCAo
-YW5kIGluCj4gPiAtbmV4dCBmcm9tIHRvbW9ycm93KS4KPiAKPiBJIGFtIG5vdCBmYW1pbGlhciB3
-aXRoIGlycWRvbWFpbnMgb3Igd2l0aCB0aGUgaXJxY2hpcAo+IGluZnJhc3RydWN0dXJlLCBzbyBJ
-IGNhbid0IHJlYWxseSBjb21tZW50IG9uIHBhdGNoICM4Lgo+IAo+IEkgdHJpZWQgdGVzdGluZyB0
-aGlzIHdpdGggYSBHSUN2MyBieSBtb2RpZnlpbmcgdGhlIGRyaXZlciB0byBzZXQKPiBub19od19k
-ZWFjdGl2YXRpb24gYW5kIG5vX21haW50X2lycV9tYXNrOgo+IAo+IGRpZmYgLS1naXQgYS9hcmNo
-L2FybTY0L2t2bS92Z2ljL3ZnaWMtaW5pdC5jIGIvYXJjaC9hcm02NC9rdm0vdmdpYy92Z2ljLWlu
-aXQuYwo+IGluZGV4IDM0MGM1MWQ4NzY3Ny4uZDBjNmY4MDhkN2Y0IDEwMDY0NAo+IC0tLSBhL2Fy
-Y2gvYXJtNjQva3ZtL3ZnaWMvdmdpYy1pbml0LmMKPiArKysgYi9hcmNoL2FybTY0L2t2bS92Z2lj
-L3ZnaWMtaW5pdC5jCj4gQEAgLTU2NSw4ICs1NjUsMTAgQEAgaW50IGt2bV92Z2ljX2h5cF9pbml0
-KHZvaWQpCj4gwqDCoMKgwqDCoMKgwqAgaWYgKHJldCkKPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqAgcmV0dXJuIHJldDsKPiDCoAo+ICvCoMKgwqDCoMKgwqAgLyoKPiDCoMKgwqDCoMKg
-wqDCoCBpZiAoIWhhc19tYXNrKQo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCByZXR1
-cm4gMDsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAqLwo+IMKgCj4gwqDCoMKgwqDC
-oMKgwqAgcmV0ID0gcmVxdWVzdF9wZXJjcHVfaXJxKGt2bV92Z2ljX2dsb2JhbF9zdGF0ZS5tYWlu
-dF9pcnEsCj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoCB2Z2ljX21haW50ZW5hbmNlX2hhbmRsZXIsCj4gZGlmZiAtLWdpdCBh
-L2RyaXZlcnMvaXJxY2hpcC9pcnEtZ2ljLXYzLmMgYi9kcml2ZXJzL2lycWNoaXAvaXJxLWdpYy12
-My5jCj4gaW5kZXggNDUzZmM0MjVlZWRlLi45Y2U0ZGVlMjA2NTUgMTAwNjQ0Cj4gLS0tIGEvZHJp
-dmVycy9pcnFjaGlwL2lycS1naWMtdjMuYwo+ICsrKyBiL2RyaXZlcnMvaXJxY2hpcC9pcnEtZ2lj
-LXYzLmMKPiBAQCAtMTg1MCw2ICsxODUwLDEyIEBAIHN0YXRpYyB2b2lkIF9faW5pdCBnaWNfb2Zf
-c2V0dXBfa3ZtX2luZm8oc3RydWN0IGRldmljZV9ub2RlCj4gKm5vZGUpCj4gwqDCoMKgwqDCoMKg
-wqAgaWYgKCFyZXQpCj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGdpY192M19rdm1f
-aW5mby52Y3B1ID0gcjsKPiDCoAo+ICvCoMKgwqDCoMKgwqAgZ2ljX3YzX2t2bV9pbmZvLm5vX2h3
-X2RlYWN0aXZhdGlvbiA9IHRydWU7CgpCbGluay4uLgoKPiArwqDCoMKgwqDCoMKgIGdpY192M19r
-dm1faW5mby5ub19tYWludF9pcnFfbWFzayA9IHRydWU7Cj4gKwo+ICvCoMKgwqDCoMKgwqAgdmdp
-Y19zZXRfa3ZtX2luZm8oJmdpY192M19rdm1faW5mbyk7Cj4gK8KgwqDCoMKgwqDCoCByZXR1cm47
-Cj4gKwo+IMKgwqDCoMKgwqDCoMKgIGdpY192M19rdm1faW5mby5oYXNfdjQgPSBnaWNfZGF0YS5y
-ZGlzdHMuaGFzX3ZscGlzOwo+IMKgwqDCoMKgwqDCoMKgIGdpY192M19rdm1faW5mby5oYXNfdjRf
-MSA9IGdpY19kYXRhLnJkaXN0cy5oYXNfcnZwZWlkOwo+IMKgwqDCoMKgwqDCoMKgIHZnaWNfc2V0
-X2t2bV9pbmZvKCZnaWNfdjNfa3ZtX2luZm8pOwo+IAo+IEtlcHQgdGhlIG1haW50ZW5hbmNlIGly
-cSBJRCBzbyB0aGUgSVJRIGdldHMgZW5hYmxlZCBhdCB0aGUKPiBSZWRpc3RyaWJ1dG9yIGxldmVs
-LiBJIGRvbid0IGtub3cgaWYgSSBtYW5hZ2VkIHRvIGJyZWFrIHNvbWV0aGluZwo+IHdpdGggdGhv
-c2UgY2hhbmdlcywgYnV0IHdoZW4gdGVzdGluZyBvbiB0aGUgbW9kZWwgYW5kIG9uIGEgcm9ja3By
-bzY0Cj4gKHdpdGggdGhlIHBhdGNoZXMgY2hlcnJ5LXBpY2tlZCBvbiB0b3Agb2YgdjUuMTMtcmM3
-KSBJIGtlcHQgc2VlaW5nCj4gcmN1IHN0YWxscy4gSSBhc3N1bWUgSSBkaWQgc29tZXRoaW5nIHdy
-b25nLgoKSWYgeW91IGRvIHRoYXQsIHRoZSBpbnRlcnJ1cHRzIHRoYXQgYXJlIGZvcndhcmRlZCB0
-byB0aGUgZ3Vlc3QKKHRpbWVycykgd2lsbCBuZXZlciBiZSBkZWFjdGl2YXRlZCwgYW5kIHdpbGwg
-YmUgbGVmdCBkYW5nbGluZyBhZnRlcgp0aGUgZmlyc3QgaW5qZWN0aW9uLiBUaGlzIGlzIGJvdW5k
-IHRvIGNyZWF0ZSBoYXZvYywgYXMgd2Ugd2lsbCB0aGVuCnVzZSBtYXNrL3VubWFzayB0byBjb250
-cm9sIHRoZSB0aW1lciBkZWxpdmVyeSAocmVtZW1iZXIgdGhhdCB0aGUKQWN0aXZlIHN0YXRlIGlz
-IGp1c3QgYW5vdGhlciBmb3JtIG9mIGF1dG8tbWFza2luZyBvbiB0b3Agb2YgdGhlCnN0YW5kYXJk
-IGVuYWJsZSBiaXQpCgpPbiB0aGUgY29udHJhcnksIHRoZSBBSUMgb25seSBoYXMgYSBzaW5nbGUg
-Yml0IHRvIGNvbnRyb2wgdGhlIHRpbWVyCih1c2VkIGFzIGEgbWFzayksIHdoaWNoIGlzIHdoYXQg
-dGhlIGlycWRvbWFpbiBzdHVmZiBpbXBsZW1lbnRzIHRvCm1pbWljIHRoZSBhY3RpdmUgc3RhdGUu
-CgpUaGFua3MsCgoJTS4KCi0tIApXaXRob3V0IGRldmlhdGlvbiBmcm9tIHRoZSBub3JtLCBwcm9n
-cmVzcyBpcyBub3QgcG9zc2libGUuCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlh
-LmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFy
-bQo=
+On Tue, 15 Jun 2021 15:45:03 +0100,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> Hi Marc,
+> 
+> On 6/1/21 11:40 AM, Marc Zyngier wrote:
+> > We already have the option to attach a callback to an interrupt
+> > to retrieve its pending state. As we are planning to expand this
+> > facility, move this callback into its own data structure.
+> >
+> > This will limit the size of individual interrupts as the ops
+> > structures can be shared across multiple interrupts.
+> 
+> I can't figure out what you mean by that. If you are referring to
+> struct vgic_irq, the change I am seeing is a pointer being replaced
+> by another pointer, which shouldn't affect its size. Are you
+> referring to something else?
+
+Eventually, we have more than just a pointer (we also get flags in the
+same structure), so this saves some space.
+
+> 
+> >
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/arch_timer.c |  8 ++++++--
+> >  arch/arm64/kvm/vgic/vgic.c  | 14 +++++++-------
+> >  include/kvm/arm_vgic.h      | 28 +++++++++++++++++-----------
+> >  3 files changed, 30 insertions(+), 20 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> > index 74e0699661e9..e2288b6bf435 100644
+> > --- a/arch/arm64/kvm/arch_timer.c
+> > +++ b/arch/arm64/kvm/arch_timer.c
+> > @@ -1116,6 +1116,10 @@ bool kvm_arch_timer_get_input_level(int vintid)
+> >  	return kvm_timer_should_fire(timer);
+> >  }
+> >  
+> > +static struct irq_ops arch_timer_irq_ops = {
+> > +	.get_input_level = kvm_arch_timer_get_input_level,
+> 
+> Since kvm_arch_timer_get_input_level() is used only indirectly, through the
+> get_input_level field of the static struct, I think we can make
+> kvm_arch_timer_get_input_level() static and remove the declaration from
+> include/kvm/arm_arch_timer.h.
+
+Ah, good point. I'll stash a patch on top of the existing series (I'm
+trying not to change what is currently queued in -next).
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
