@@ -4,57 +4,57 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E498C2B9F4
-	for <kvmarm@archiver.kernel.org>; Tue, 22 Jun 2021 10:25:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6705FC2B9F4
+	for <kvmarm@archiver.kernel.org>; Tue, 22 Jun 2021 10:35:15 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 09FEE613B2
-	for <kvmarm@archiver.kernel.org>; Tue, 22 Jun 2021 10:25:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09FEE613B2
+	by mail.kernel.org (Postfix) with ESMTP id DE58E613C5
+	for <kvmarm@archiver.kernel.org>; Tue, 22 Jun 2021 10:35:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE58E613C5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E70740870;
-	Tue, 22 Jun 2021 06:25:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B7B3407B0;
+	Tue, 22 Jun 2021 06:35:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id YqvpZSyIN0JT; Tue, 22 Jun 2021 06:25:33 -0400 (EDT)
+	with ESMTP id 5qq-FGHNMJBm; Tue, 22 Jun 2021 06:35:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E8728407F4;
-	Tue, 22 Jun 2021 06:25:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 476364029C;
+	Tue, 22 Jun 2021 06:35:12 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 72956407E7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Jun 2021 06:25:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 795EF407B0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Jun 2021 06:35:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id e2Tr9JI-XVbE for <kvmarm@lists.cs.columbia.edu>;
- Tue, 22 Jun 2021 06:25:31 -0400 (EDT)
+ with ESMTP id ksWBI9u8jJTY for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 22 Jun 2021 06:35:09 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 172A6407D1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Jun 2021 06:25:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 36BBD40256
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Jun 2021 06:35:09 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id D02FB613AD;
- Tue, 22 Jun 2021 10:25:29 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 4096C613BE;
+ Tue, 22 Jun 2021 10:35:08 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1lvdax-0094U6-Pc; Tue, 22 Jun 2021 11:25:27 +0100
-Date: Tue, 22 Jun 2021 11:25:27 +0100
-Message-ID: <875yy6ci20.wl-maz@kernel.org>
+ id 1lvdkI-0094e6-Dg; Tue, 22 Jun 2021 11:35:06 +0100
+Date: Tue, 22 Jun 2021 11:35:06 +0100
+Message-ID: <874kdqchlx.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH v17 5/6] KVM: arm64: ioctl to fetch/store tags in a guest
-In-Reply-To: <CA+EHjTx7_atkNMqrUkHr0mM2xDbzBafip3s0JhGrGzsX9N08XQ@mail.gmail.com>
+Subject: Re: [PATCH v17 6/6] KVM: arm64: Document MTE capability and ioctl
+In-Reply-To: <CA+EHjTwww=QFq30bi8n2t2fkfr1B_0v0KSZ75dK+ZJDUU3f5xQ@mail.gmail.com>
 References: <20210621111716.37157-1-steven.price@arm.com>
- <20210621111716.37157-6-steven.price@arm.com>
- <CA+EHjTx7_atkNMqrUkHr0mM2xDbzBafip3s0JhGrGzsX9N08XQ@mail.gmail.com>
+ <20210621111716.37157-7-steven.price@arm.com>
+ <CA+EHjTwww=QFq30bi8n2t2fkfr1B_0v0KSZ75dK+ZJDUU3f5xQ@mail.gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -91,9 +91,7 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Fuad,
-
-On Tue, 22 Jun 2021 09:56:22 +0100,
+On Tue, 22 Jun 2021 10:42:42 +0100,
 Fuad Tabba <tabba@google.com> wrote:
 > 
 > Hi,
@@ -101,206 +99,103 @@ Fuad Tabba <tabba@google.com> wrote:
 > 
 > On Mon, Jun 21, 2021 at 12:18 PM Steven Price <steven.price@arm.com> wrote:
 > >
-> > The VMM may not wish to have it's own mapping of guest memory mapped
-> > with PROT_MTE because this causes problems if the VMM has tag checking
-> > enabled (the guest controls the tags in physical RAM and it's unlikely
-> > the tags are correct for the VMM).
+> > A new capability (KVM_CAP_ARM_MTE) identifies that the kernel supports
+> > granting a guest access to the tags, and provides a mechanism for the
+> > VMM to enable it.
 > >
-> > Instead add a new ioctl which allows the VMM to easily read/write the
-> > tags from guest memory, allowing the VMM's mapping to be non-PROT_MTE
-> > while the VMM can still read/write the tags for the purpose of
-> > migration.
+> > A new ioctl (KVM_ARM_MTE_COPY_TAGS) provides a simple way for a VMM to
+> > access the tags of a guest without having to maintain a PROT_MTE mapping
+> > in userspace. The above capability gates access to the ioctl.
 > >
 > > Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 > > Signed-off-by: Steven Price <steven.price@arm.com>
 > > ---
-> >  arch/arm64/include/asm/kvm_host.h |  3 ++
-> >  arch/arm64/include/asm/mte-def.h  |  1 +
-> >  arch/arm64/include/uapi/asm/kvm.h | 11 +++++
-> >  arch/arm64/kvm/arm.c              |  7 +++
-> >  arch/arm64/kvm/guest.c            | 82 +++++++++++++++++++++++++++++++
-> >  include/uapi/linux/kvm.h          |  1 +
-> >  6 files changed, 105 insertions(+)
+> >  Documentation/virt/kvm/api.rst | 61 ++++++++++++++++++++++++++++++++++
+> >  1 file changed, 61 insertions(+)
 > >
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index 309e36cc1b42..6a2ac4636d42 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -729,6 +729,9 @@ int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
-> >  int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
-> >                                struct kvm_device_attr *attr);
+> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> > index 7fcb2fd38f42..97661a97943f 100644
+> > --- a/Documentation/virt/kvm/api.rst
+> > +++ b/Documentation/virt/kvm/api.rst
+> > @@ -5034,6 +5034,43 @@ see KVM_XEN_VCPU_SET_ATTR above.
+> >  The KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_ADJUST type may not be used
+> >  with the KVM_XEN_VCPU_GET_ATTR ioctl.
 > >
-> > +long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
-> > +                               struct kvm_arm_copy_mte_tags *copy_tags);
+> > +4.130 KVM_ARM_MTE_COPY_TAGS
+> > +---------------------------
 > > +
-> >  /* Guest/host FPSIMD coordination helpers */
-> >  int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
-> >  void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu);
-> > diff --git a/arch/arm64/include/asm/mte-def.h b/arch/arm64/include/asm/mte-def.h
-> > index cf241b0f0a42..626d359b396e 100644
-> > --- a/arch/arm64/include/asm/mte-def.h
-> > +++ b/arch/arm64/include/asm/mte-def.h
-> > @@ -7,6 +7,7 @@
-> >
-> >  #define MTE_GRANULE_SIZE       UL(16)
-> >  #define MTE_GRANULE_MASK       (~(MTE_GRANULE_SIZE - 1))
-> > +#define MTE_GRANULES_PER_PAGE  (PAGE_SIZE / MTE_GRANULE_SIZE)
-> >  #define MTE_TAG_SHIFT          56
-> >  #define MTE_TAG_SIZE           4
-> >  #define MTE_TAG_MASK           GENMASK((MTE_TAG_SHIFT + (MTE_TAG_SIZE - 1)), MTE_TAG_SHIFT)
-> > diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> > index 24223adae150..b3edde68bc3e 100644
-> > --- a/arch/arm64/include/uapi/asm/kvm.h
-> > +++ b/arch/arm64/include/uapi/asm/kvm.h
-> > @@ -184,6 +184,17 @@ struct kvm_vcpu_events {
-> >         __u32 reserved[12];
-> >  };
-> >
-> > +struct kvm_arm_copy_mte_tags {
+> > +:Capability: KVM_CAP_ARM_MTE
+> > +:Architectures: arm64
+> > +:Type: vm ioctl
+> > +:Parameters: struct kvm_arm_copy_mte_tags
+> > +:Returns: number of bytes copied, < 0 on error (-EINVAL for incorrect
+> > +          arguments, -EFAULT if memory cannot be accessed).
+> > +
+> > +::
+> > +
+> > +  struct kvm_arm_copy_mte_tags {
 > > +       __u64 guest_ipa;
 > > +       __u64 length;
 > > +       void __user *addr;
 > > +       __u64 flags;
 > > +       __u64 reserved[2];
-> > +};
+> > +  };
 > > +
-> > +#define KVM_ARM_TAGS_TO_GUEST          0
-> > +#define KVM_ARM_TAGS_FROM_GUEST                1
+> > +Copies Memory Tagging Extension (MTE) tags to/from guest tag memory. The
+> > +``guest_ipa`` and ``length`` fields must be ``PAGE_SIZE`` aligned. The ``addr``
+> > +field must point to a buffer which the tags will be copied to or from.
 > > +
-> >  /* If you need to interpret the index values, here is the key: */
-> >  #define KVM_REG_ARM_COPROC_MASK                0x000000000FFF0000
-> >  #define KVM_REG_ARM_COPROC_SHIFT       16
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index 28ce26a68f09..511f3716fe33 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -1359,6 +1359,13 @@ long kvm_arch_vm_ioctl(struct file *filp,
+> > +``flags`` specifies the direction of copy, either ``KVM_ARM_TAGS_TO_GUEST`` or
+> > +``KVM_ARM_TAGS_FROM_GUEST``.
+> > +
+> > +The size of the buffer to store the tags is ``(length / 16)`` bytes
+> > +(granules in MTE are 16 bytes long). Each byte contains a single tag
+> > +value. This matches the format of ``PTRACE_PEEKMTETAGS`` and
+> > +``PTRACE_POKEMTETAGS``.
+> > +
+> > +If an error occurs before any data is copied then a negative error code is
+> > +returned. If some tags have been copied before an error occurs then the number
+> > +of bytes successfully copied is returned. If the call completes successfully
+> > +then ``length`` is returned.
+> > +
+> >  5. The kvm_run structure
+> >  ========================
 > >
-> >                 return 0;
-> >         }
-> > +       case KVM_ARM_MTE_COPY_TAGS: {
-> > +               struct kvm_arm_copy_mte_tags copy_tags;
-> > +
-> > +               if (copy_from_user(&copy_tags, argp, sizeof(copy_tags)))
-> > +                       return -EFAULT;
-> > +               return kvm_vm_ioctl_mte_copy_tags(kvm, &copy_tags);
-> > +       }
-> >         default:
-> >                 return -EINVAL;
-> >         }
-> > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> > index 5cb4a1cd5603..4ddb20017b2f 100644
-> > --- a/arch/arm64/kvm/guest.c
-> > +++ b/arch/arm64/kvm/guest.c
-> > @@ -995,3 +995,85 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+> > @@ -6362,6 +6399,30 @@ default.
 > >
-> >         return ret;
-> >  }
+> >  See Documentation/x86/sgx/2.Kernel-internals.rst for more details.
+> >
+> > +7.26 KVM_CAP_ARM_MTE
+> > +--------------------
 > > +
-> > +long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
-> > +                               struct kvm_arm_copy_mte_tags *copy_tags)
-> > +{
-> > +       gpa_t guest_ipa = copy_tags->guest_ipa;
-> > +       size_t length = copy_tags->length;
-> > +       void __user *tags = copy_tags->addr;
-> > +       gpa_t gfn;
-> > +       bool write = !(copy_tags->flags & KVM_ARM_TAGS_FROM_GUEST);
-> > +       int ret = 0;
+> > +:Architectures: arm64
+> > +:Parameters: none
 > > +
-> > +       if (!kvm_has_mte(kvm))
-> > +               return -EINVAL;
-> > +
-> > +       if (copy_tags->reserved[0] || copy_tags->reserved[1])
-> > +               return -EINVAL;
-> > +
-> > +       if (copy_tags->flags & ~KVM_ARM_TAGS_FROM_GUEST)
-> > +               return -EINVAL;
-> > +
-> > +       if (length & ~PAGE_MASK || guest_ipa & ~PAGE_MASK)
-> > +               return -EINVAL;
-> > +
-> > +       gfn = gpa_to_gfn(guest_ipa);
-> > +
-> > +       mutex_lock(&kvm->slots_lock);
-> > +
-> > +       while (length > 0) {
-> > +               kvm_pfn_t pfn = gfn_to_pfn_prot(kvm, gfn, write, NULL);
-> > +               void *maddr;
-> > +               unsigned long num_tags;
-> > +               struct page *page;
-> > +
-> > +               if (is_error_noslot_pfn(pfn)) {
-> > +                       ret = -EFAULT;
-> > +                       goto out;
-> > +               }
-> > +
-> > +               page = pfn_to_online_page(pfn);
-> > +               if (!page) {
-> > +                       /* Reject ZONE_DEVICE memory */
-> > +                       ret = -EFAULT;
-> > +                       goto out;
-> > +               }
-> > +               maddr = page_address(page);
-> > +
-> > +               if (!write) {
-> > +                       if (test_bit(PG_mte_tagged, &page->flags))
-> > +                               num_tags = mte_copy_tags_to_user(tags, maddr,
-> > +                                                       MTE_GRANULES_PER_PAGE);
-> > +                       else
-> > +                               /* No tags in memory, so write zeros */
-> > +                               num_tags = MTE_GRANULES_PER_PAGE -
-> > +                                       clear_user(tags, MTE_GRANULES_PER_PAGE);
-> > +                       kvm_release_pfn_clean(pfn);
-> > +               } else {
-> > +                       num_tags = mte_copy_tags_from_user(maddr, tags,
-> > +                                                       MTE_GRANULES_PER_PAGE);
-> > +                       kvm_release_pfn_dirty(pfn);
-> > +               }
-> > +
-> > +               if (num_tags != MTE_GRANULES_PER_PAGE) {
-> > +                       ret = -EFAULT;
-> > +                       goto out;
-> > +               }
-> > +
-> > +               /* Set the flag after checking the write completed fully */
-> > +               if (write)
-> > +                       set_bit(PG_mte_tagged, &page->flags);
-> > +
-> > +               gfn++;
-> > +               tags += num_tags;
-> > +               length -= PAGE_SIZE;
-> > +       }
-> > +
-> > +out:
-> > +       mutex_unlock(&kvm->slots_lock);
-> > +       /* If some data has been copied report the number of bytes copied */
-> > +       if (length != copy_tags->length)
-> > +               return copy_tags->length - length;
+> > +This capability indicates that KVM (and the hardware) supports exposing the
+> > +Memory Tagging Extensions (MTE) to the guest. It must also be enabled by the
+> > +VMM before creating any VCPUs to allow the guest access. Note that MTE is only
+> > +available to a guest running in AArch64 mode and enabling this capability will
+> > +cause attempts to create AArch32 VCPUs to fail.
 > 
-> I'm not sure if this is actually an issue, but a couple of comments on
-> the return value if there is an error after a partial copy has been
-> done. If mte_copy_tags_to_user or mte_copy_tags_from_user don't return
-> MTE_GRANULES_PER_PAGE, then the check for num_tags would fail, but
-> some of the tags would have been copied, which wouldn't be reflected
-> in length. That said, on a write the tagged bit wouldn't be set, and
-> on read then the return value would be conservative, but not
-> incorrect.
->
-> That said, even though it is described that way in the documentation
-> (rather deep in the description though), it might be confusing to
-> return a non-negative value on an error. The other kvm ioctl I could
-> find that does something similar, KVM_S390_GET_IRQ_STATE, seems to
-> always return a -ERROR on error, rather than the number of bytes
-> copied.
+> I was wondering if there might be an issue with AArch32 at EL0 and
+> MTE, because I think that even if AArch64 at EL1 is disallowed, the
 
-My mental analogy for this ioctl is the read()/write() syscalls, which
-return the number of bytes that have been transferred in either
-direction.
+Did you mean AArch32 here?
 
-I agree that there are some corner cases (a tag copy that fails
-because of a faulty page adjacent to a valid page will still report
-some degree of success), but it is also important to report what has
-actually been done in either direction.
+> guest can still run AArch32 at EL0.
+
+I don't get your question:
+
+- If the guest is AArch32 at EL1, there is not MTE whatsoever (where
+  would you place the tag?)
+
+- If the guest is AArch64, it can have MTE enabled or not,
+  irrespective of the EL. If this guest decides to run an AArch32 EL0,
+  the architecture rules still apply, and it cannot expose MTE to its
+  own 32bit userspace. Nothing that KVM needs to do about this.
+
+What KVM enforces is that at the point where the guest is in charge,
+we have a consistent architectural behaviour.
 
 Thanks,
 
