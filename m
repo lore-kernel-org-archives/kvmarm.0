@@ -2,115 +2,79 @@ Return-Path: <SRS0=0p1Y=LS=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5534C48BDF
-	for <kvmarm@archiver.kernel.org>; Thu, 24 Jun 2021 12:41:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69A70C49EAB
+	for <kvmarm@archiver.kernel.org>; Thu, 24 Jun 2021 13:35:41 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 21C6561410
-	for <kvmarm@archiver.kernel.org>; Thu, 24 Jun 2021 12:41:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21C6561410
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id DFABB613ED
+	for <kvmarm@archiver.kernel.org>; Thu, 24 Jun 2021 13:35:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFABB613ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9400B4B195;
-	Thu, 24 Jun 2021 08:41:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 64EB14B1E1;
+	Thu, 24 Jun 2021 09:35:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id eS1sxjdhb+sf; Thu, 24 Jun 2021 08:41:29 -0400 (EDT)
+	with ESMTP id hzZmDt+FmKzR; Thu, 24 Jun 2021 09:35:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C20B40463;
-	Thu, 24 Jun 2021 08:41:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CE1174B1D5;
+	Thu, 24 Jun 2021 09:35:38 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C57374B18A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jun 2021 08:41:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ECC004B1D1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jun 2021 09:35:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aHYqKAobx4dN for <kvmarm@lists.cs.columbia.edu>;
- Thu, 24 Jun 2021 08:41:26 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C21B04B178
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jun 2021 08:41:26 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1624538486;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Ao/aik86DETd7ceeMOwWvzTcaJv+rZayOURU+D31sn8=;
- b=GjvelJK9NqzwPH+wQt4p2rrMHQ+NmPcPSNVXrH2f0EGBGBkRWu28p8uhXdnkGg+jIxxi35
- K18CZYpwAQXIXJe/qoc0AAtBS6Xqn7n7gbbZtzOsuIr22LchymDudqsIDKQkzI+6dF6VBX
- PM/RTYHUvoAjjDy3wrUPGHfG0iT5m+I=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-573-bukRmWk3NpSAWOXdDyYgHg-1; Thu, 24 Jun 2021 08:41:25 -0400
-X-MC-Unique: bukRmWk3NpSAWOXdDyYgHg-1
-Received: by mail-wr1-f72.google.com with SMTP id
- k3-20020a5d62830000b029011a69a4d069so2150551wru.21
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jun 2021 05:41:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Ao/aik86DETd7ceeMOwWvzTcaJv+rZayOURU+D31sn8=;
- b=sZO59N3T3dpH+dHLIr5sJwZ21BGia9mtfgOAZ3vkGS6UnWpRve0hOCqT8XyclSncaT
- vNxir1LDMPMnNJxlWRbUTk2sW6NU0UVPY6sdoRr/sPqGrirx6mYEdPpTCMEzqaUbI/NB
- 9EOX7rzVkTj1RKtwr7MaTGea+Cgc6wJCC7+k+by5ze+csE4pSK0QKLfzfkOy1qQcsbok
- S7+e32P5eaB7xV2IrC2VyMXnH/LeaoBD+8AJrUDF2DqgC9VaEnVCytoARr8qySkBLmtP
- NdEWQeqKPr/Y00aqvJ/NwWlS3eV0sNijqiG/Uy0Vg0M8kiGNHdbs7aOeN+rKSCZ5Sd5w
- reIA==
-X-Gm-Message-State: AOAM531cy9x0RigibYLD1dsmnOy0AhUtb1VanXFavBhG6zoBp86jGiQe
- 0Ma4ZieJUbIfouEws19bZSptFNeveDCqH0WYNamgXUcI+vlTUZFqzrgmSNzEucn0SuYgsUsdkux
- tPpeDoBXEZnGcko5/kdZBiIVZ
-X-Received: by 2002:adf:f88e:: with SMTP id u14mr4211994wrp.391.1624538484145; 
- Thu, 24 Jun 2021 05:41:24 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxX2C4aDAGP4h4xfzWoN2DoJE9Xd7OTVDMCCB2JExPqVzxr2MgGsOeSZupCF70+GqEZaJi1OA==
-X-Received: by 2002:adf:f88e:: with SMTP id u14mr4211952wrp.391.1624538483934; 
- Thu, 24 Jun 2021 05:41:23 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
- ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
- by smtp.gmail.com with ESMTPSA id 22sm2818691wmi.4.2021.06.24.05.41.22
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 24 Jun 2021 05:41:23 -0700 (PDT)
-Subject: Re: [PATCH 0/6] KVM: Remove uses of struct page from x86 and arm64 MMU
-To: Nicholas Piggin <npiggin@gmail.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Huacai Chen <chenhuacai@kernel.org>, Marc Zyngier <maz@kernel.org>,
- Paul Mackerras <paulus@ozlabs.org>, David Stevens <stevensd@chromium.org>,
- Zhenyu Wang <zhenyuw@linux.intel.com>, Zhi Wang <zhi.a.wang@intel.com>
-References: <20210624035749.4054934-1-stevensd@google.com>
- <1624530624.8jff1f4u11.astroid@bobo.none>
- <1624534759.nj0ylor2eh.astroid@bobo.none>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0d3a699a-15eb-9f1b-0735-79d14736f38c@redhat.com>
-Date: Thu, 24 Jun 2021 14:41:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
-MIME-Version: 1.0
-In-Reply-To: <1624534759.nj0ylor2eh.astroid@bobo.none>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- David Stevens <stevensd@google.com>, intel-gfx@lists.freedesktop.org,
- linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
- dri-devel@lists.freedesktop.org, kvmarm@lists.cs.columbia.edu,
- Will Deacon <will@kernel.org>, kvm-ppc@vger.kernel.org,
- Sean Christopherson <seanjc@google.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>, linux-mips@vger.kernel.org,
- intel-gvt-dev@lists.freedesktop.org, Joerg Roedel <joro@8bytes.org>,
- linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>
+ with ESMTP id mQwOwQAULRPA for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 24 Jun 2021 09:35:36 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 42FF54B1AE
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jun 2021 09:35:36 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 12AF061002;
+ Thu, 24 Jun 2021 13:35:35 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1lwPW0-009bmk-MA; Thu, 24 Jun 2021 14:35:32 +0100
+Date: Thu, 24 Jun 2021 14:35:32 +0100
+Message-ID: <87k0mjidwb.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Steven Price <steven.price@arm.com>
+Subject: Re: [PATCH v17 5/6] KVM: arm64: ioctl to fetch/store tags in a guest
+In-Reply-To: <20210621111716.37157-6-steven.price@arm.com>
+References: <20210621111716.37157-1-steven.price@arm.com>
+ <20210621111716.37157-6-steven.price@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: steven.price@arm.com, catalin.marinas@arm.com,
+ will@kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com,
+ suzuki.poulose@arm.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Dave.Martin@arm.com, mark.rutland@arm.com, tglx@linutronix.de,
+ qemu-devel@nongnu.org, quintela@redhat.com, dgilbert@redhat.com,
+ richard.henderson@linaro.org, peter.maydell@linaro.org, drjones@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
+ Catalin Marinas <catalin.marinas@arm.com>, Juan Quintela <quintela@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
+ Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org,
+ Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -122,108 +86,247 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 24/06/21 13:42, Nicholas Piggin wrote:
-> Excerpts from Nicholas Piggin's message of June 24, 2021 8:34 pm:
->> Excerpts from David Stevens's message of June 24, 2021 1:57 pm:
->>> KVM supports mapping VM_IO and VM_PFNMAP memory into the guest by using
->>> follow_pte in gfn_to_pfn. However, the resolved pfns may not have
->>> assoicated struct pages, so they should not be passed to pfn_to_page.
->>> This series removes such calls from the x86 and arm64 secondary MMU. To
->>> do this, this series modifies gfn_to_pfn to return a struct page in
->>> addition to a pfn, if the hva was resolved by gup. This allows the
->>> caller to call put_page only when necessated by gup.
->>>
->>> This series provides a helper function that unwraps the new return type
->>> of gfn_to_pfn to provide behavior identical to the old behavior. As I
->>> have no hardware to test powerpc/mips changes, the function is used
->>> there for minimally invasive changes. Additionally, as gfn_to_page and
->>> gfn_to_pfn_cache are not integrated with mmu notifier, they cannot be
->>> easily changed over to only use pfns.
->>>
->>> This addresses CVE-2021-22543 on x86 and arm64.
->>
->> Does this fix the problem? (untested I don't have a POC setup at hand,
->> but at least in concept)
+Hi Steven,
+
+On Mon, 21 Jun 2021 12:17:15 +0100,
+Steven Price <steven.price@arm.com> wrote:
 > 
-> This one actually compiles at least. Unfortunately I don't have much
-> time in the near future to test, and I only just found out about this
-> CVE a few hours ago.
-
-And it also works (the reproducer gets an infinite stream of userspace 
-exits and especially does not crash).  We can still go for David's 
-solution later since MMU notifiers are able to deal with this pages, but 
-it's a very nice patch for stable kernels.
-
-If you provide a Signed-off-by, I can integrate it.
-
-Paolo
-
+> The VMM may not wish to have it's own mapping of guest memory mapped
+> with PROT_MTE because this causes problems if the VMM has tag checking
+> enabled (the guest controls the tags in physical RAM and it's unlikely
+> the tags are correct for the VMM).
+> 
+> Instead add a new ioctl which allows the VMM to easily read/write the
+> tags from guest memory, allowing the VMM's mapping to be non-PROT_MTE
+> while the VMM can still read/write the tags for the purpose of
+> migration.
+> 
+> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+> Signed-off-by: Steven Price <steven.price@arm.com>
 > ---
+>  arch/arm64/include/asm/kvm_host.h |  3 ++
+>  arch/arm64/include/asm/mte-def.h  |  1 +
+>  arch/arm64/include/uapi/asm/kvm.h | 11 +++++
+>  arch/arm64/kvm/arm.c              |  7 +++
+>  arch/arm64/kvm/guest.c            | 82 +++++++++++++++++++++++++++++++
+>  include/uapi/linux/kvm.h          |  1 +
+>  6 files changed, 105 insertions(+)
 > 
-> 
-> It's possible to create a region which maps valid but non-refcounted
-> pages (e.g., tail pages of non-compound higher order allocations). These
-> host pages can then be returned by gfn_to_page, gfn_to_pfn, etc., family
-> of APIs, which take a reference to the page, which takes it from 0 to 1.
-> When the reference is dropped, this will free the page incorrectly.
-> 
-> Fix this by only taking a reference on the page if it was non-zero,
-> which indicates it is participating in normal refcounting (and can be
-> released with put_page).
-> 
-> ---
->   virt/kvm/kvm_main.c | 19 +++++++++++++++++--
->   1 file changed, 17 insertions(+), 2 deletions(-)
-> 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 6a6bc7af0e28..46fb042837d2 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -2055,6 +2055,13 @@ static bool vma_is_valid(struct vm_area_struct *vma, bool write_fault)
->   	return true;
->   }
->   
-> +static int kvm_try_get_pfn(kvm_pfn_t pfn)
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 309e36cc1b42..6a2ac4636d42 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -729,6 +729,9 @@ int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
+>  int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+>  			       struct kvm_device_attr *attr);
+>  
+> +long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+> +				struct kvm_arm_copy_mte_tags *copy_tags);
+> +
+>  /* Guest/host FPSIMD coordination helpers */
+>  int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
+>  void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu);
+> diff --git a/arch/arm64/include/asm/mte-def.h b/arch/arm64/include/asm/mte-def.h
+> index cf241b0f0a42..626d359b396e 100644
+> --- a/arch/arm64/include/asm/mte-def.h
+> +++ b/arch/arm64/include/asm/mte-def.h
+> @@ -7,6 +7,7 @@
+>  
+>  #define MTE_GRANULE_SIZE	UL(16)
+>  #define MTE_GRANULE_MASK	(~(MTE_GRANULE_SIZE - 1))
+> +#define MTE_GRANULES_PER_PAGE	(PAGE_SIZE / MTE_GRANULE_SIZE)
+>  #define MTE_TAG_SHIFT		56
+>  #define MTE_TAG_SIZE		4
+>  #define MTE_TAG_MASK		GENMASK((MTE_TAG_SHIFT + (MTE_TAG_SIZE - 1)), MTE_TAG_SHIFT)
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index 24223adae150..b3edde68bc3e 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -184,6 +184,17 @@ struct kvm_vcpu_events {
+>  	__u32 reserved[12];
+>  };
+>  
+> +struct kvm_arm_copy_mte_tags {
+> +	__u64 guest_ipa;
+> +	__u64 length;
+> +	void __user *addr;
+> +	__u64 flags;
+> +	__u64 reserved[2];
+> +};
+> +
+> +#define KVM_ARM_TAGS_TO_GUEST		0
+> +#define KVM_ARM_TAGS_FROM_GUEST		1
+> +
+>  /* If you need to interpret the index values, here is the key: */
+>  #define KVM_REG_ARM_COPROC_MASK		0x000000000FFF0000
+>  #define KVM_REG_ARM_COPROC_SHIFT	16
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 28ce26a68f09..511f3716fe33 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1359,6 +1359,13 @@ long kvm_arch_vm_ioctl(struct file *filp,
+>  
+>  		return 0;
+>  	}
+> +	case KVM_ARM_MTE_COPY_TAGS: {
+> +		struct kvm_arm_copy_mte_tags copy_tags;
+> +
+> +		if (copy_from_user(&copy_tags, argp, sizeof(copy_tags)))
+> +			return -EFAULT;
+> +		return kvm_vm_ioctl_mte_copy_tags(kvm, &copy_tags);
+> +	}
+>  	default:
+>  		return -EINVAL;
+>  	}
+> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> index 5cb4a1cd5603..4ddb20017b2f 100644
+> --- a/arch/arm64/kvm/guest.c
+> +++ b/arch/arm64/kvm/guest.c
+> @@ -995,3 +995,85 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+>  
+>  	return ret;
+>  }
+> +
+> +long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+> +				struct kvm_arm_copy_mte_tags *copy_tags)
 > +{
-> +	if (kvm_is_reserved_pfn(pfn))
-> +		return 1;
-> +	return get_page_unless_zero(pfn_to_page(pfn));
-> +}
+> +	gpa_t guest_ipa = copy_tags->guest_ipa;
+> +	size_t length = copy_tags->length;
+> +	void __user *tags = copy_tags->addr;
+> +	gpa_t gfn;
+> +	bool write = !(copy_tags->flags & KVM_ARM_TAGS_FROM_GUEST);
+> +	int ret = 0;
 > +
->   static int hva_to_pfn_remapped(struct vm_area_struct *vma,
->   			       unsigned long addr, bool *async,
->   			       bool write_fault, bool *writable,
-> @@ -2104,13 +2111,21 @@ static int hva_to_pfn_remapped(struct vm_area_struct *vma,
->   	 * Whoever called remap_pfn_range is also going to call e.g.
->   	 * unmap_mapping_range before the underlying pages are freed,
->   	 * causing a call to our MMU notifier.
-> +	 *
-> +	 * Certain IO or PFNMAP mappings can be backed with valid
-> +	 * struct pages, but be allocated without refcounting e.g.,
-> +	 * tail pages of non-compound higher order allocations, which
-> +	 * would then underflow the refcount when the caller does the
-> +	 * required put_page. Don't allow those pages here.
->   	 */
-> -	kvm_get_pfn(pfn);
-> +	if (!kvm_try_get_pfn(pfn))
-> +		r = -EFAULT;
->   
->   out:
->   	pte_unmap_unlock(ptep, ptl);
->   	*p_pfn = pfn;
-> -	return 0;
+> +	if (!kvm_has_mte(kvm))
+> +		return -EINVAL;
 > +
-> +	return r;
->   }
->   
->   /*
-> 
+> +	if (copy_tags->reserved[0] || copy_tags->reserved[1])
+> +		return -EINVAL;
+> +
+> +	if (copy_tags->flags & ~KVM_ARM_TAGS_FROM_GUEST)
+> +		return -EINVAL;
+> +
+> +	if (length & ~PAGE_MASK || guest_ipa & ~PAGE_MASK)
+> +		return -EINVAL;
+> +
+> +	gfn = gpa_to_gfn(guest_ipa);
+> +
+> +	mutex_lock(&kvm->slots_lock);
+> +
+> +	while (length > 0) {
+> +		kvm_pfn_t pfn = gfn_to_pfn_prot(kvm, gfn, write, NULL);
+> +		void *maddr;
+> +		unsigned long num_tags;
+> +		struct page *page;
+> +
+> +		if (is_error_noslot_pfn(pfn)) {
+> +			ret = -EFAULT;
+> +			goto out;
+> +		}
+> +
+> +		page = pfn_to_online_page(pfn);
+> +		if (!page) {
+> +			/* Reject ZONE_DEVICE memory */
+> +			ret = -EFAULT;
+> +			goto out;
+> +		}
+> +		maddr = page_address(page);
+> +
+> +		if (!write) {
+> +			if (test_bit(PG_mte_tagged, &page->flags))
+> +				num_tags = mte_copy_tags_to_user(tags, maddr,
+> +							MTE_GRANULES_PER_PAGE);
+> +			else
+> +				/* No tags in memory, so write zeros */
+> +				num_tags = MTE_GRANULES_PER_PAGE -
+> +					clear_user(tags, MTE_GRANULES_PER_PAGE);
+> +			kvm_release_pfn_clean(pfn);
+> +		} else {
+> +			num_tags = mte_copy_tags_from_user(maddr, tags,
+> +							MTE_GRANULES_PER_PAGE);
+> +			kvm_release_pfn_dirty(pfn);
+> +		}
+> +
+> +		if (num_tags != MTE_GRANULES_PER_PAGE) {
+> +			ret = -EFAULT;
+> +			goto out;
+> +		}
+> +
+> +		/* Set the flag after checking the write completed fully */
+> +		if (write)
+> +			set_bit(PG_mte_tagged, &page->flags);
 
+This ended up catching my eye as I was merging some other patches.
+
+This set_bit() occurs *after* the page has been released, meaning it
+could have been evicted and reused in the interval. I plan to fix it
+as below. Please let me know if that works for you.
+
+Thanks,
+
+	M.
+
+From a78d3206378a7101659fbc2a4bf01cb9376c4793 Mon Sep 17 00:00:00 2001
+From: Marc Zyngier <maz@kernel.org>
+Date: Thu, 24 Jun 2021 14:21:05 +0100
+Subject: [PATCH] KVM: arm64: Set the MTE tag bit before releasing the page
+
+Setting a page flag without holding a reference to the page
+is living dangerously. In the tag-writing path, we drop the
+reference to the page by calling kvm_release_pfn_dirty(),
+and only then set the PG_mte_tagged bit.
+
+It would be safer to do it the other way round.
+
+Fixes: f0376edb1ddca ("KVM: arm64: Add ioctl to fetch/store tags in a guest")
+Cc: Steven Price <steven.price@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/guest.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index 4ddb20017b2f..60815ae477cf 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -1053,6 +1053,14 @@ long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+ 		} else {
+ 			num_tags = mte_copy_tags_from_user(maddr, tags,
+ 							MTE_GRANULES_PER_PAGE);
++
++			/*
++			 * Set the flag after checking the write
++			 * completed fully
++			 */
++			if (num_tags == MTE_GRANULES_PER_PAGE)
++				set_bit(PG_mte_tagged, &page->flags);
++
+ 			kvm_release_pfn_dirty(pfn);
+ 		}
+ 
+@@ -1061,10 +1069,6 @@ long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+ 			goto out;
+ 		}
+ 
+-		/* Set the flag after checking the write completed fully */
+-		if (write)
+-			set_bit(PG_mte_tagged, &page->flags);
+-
+ 		gfn++;
+ 		tags += num_tags;
+ 		length -= PAGE_SIZE;
+-- 
+2.30.2
+
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
