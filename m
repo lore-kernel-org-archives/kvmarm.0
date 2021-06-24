@@ -7,83 +7,86 @@ X-Spam-Status: No, score=-0.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D791C49EA6
-	for <kvmarm@archiver.kernel.org>; Thu, 24 Jun 2021 14:03:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46EA8C49EA5
+	for <kvmarm@archiver.kernel.org>; Thu, 24 Jun 2021 14:03:58 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 82E56613FB
-	for <kvmarm@archiver.kernel.org>; Thu, 24 Jun 2021 14:03:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82E56613FB
+	by mail.kernel.org (Postfix) with ESMTP id CF742613FB
+	for <kvmarm@archiver.kernel.org>; Thu, 24 Jun 2021 14:03:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF742613FB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 059994B12E;
-	Thu, 24 Jun 2021 10:03:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D0774B1D5;
+	Thu, 24 Jun 2021 10:03:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Ne4MMrwJ2GEu; Thu, 24 Jun 2021 10:03:55 -0400 (EDT)
+	with ESMTP id Wt3b8WKmBxH9; Thu, 24 Jun 2021 10:03:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F1C24B18A;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 242324B198;
 	Thu, 24 Jun 2021 10:03:55 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 64F064B183
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jun 2021 04:58:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3BA0F4B265
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jun 2021 05:58:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id COd1QEta6U8q for <kvmarm@lists.cs.columbia.edu>;
- Thu, 24 Jun 2021 04:58:07 -0400 (EDT)
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com
- [209.85.210.180])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2FCC44B176
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jun 2021 04:58:07 -0400 (EDT)
-Received: by mail-pf1-f180.google.com with SMTP id q192so4592606pfc.7
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jun 2021 01:58:07 -0700 (PDT)
+ with ESMTP id 4lq1RTBe01OV for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 24 Jun 2021 05:58:04 -0400 (EDT)
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com
+ [209.85.210.182])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 385684B264
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jun 2021 05:58:04 -0400 (EDT)
+Received: by mail-pf1-f182.google.com with SMTP id t32so4723994pfg.2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jun 2021 02:58:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=date:from:subject:to:cc:references:in-reply-to:mime-version
  :message-id:content-transfer-encoding;
- bh=tKGKGI76BKfQVO8CY1clLxpyySv3vaB3aNh7NWcPhFU=;
- b=hr3gPiWSs1kzsoT0RN4D0/9u1oAQb1rzWVWLp59xVCkmpZThGbP8ZZHdbz3ZoRByYE
- Q+bBx6g9vlzubm3xmDqrFRZB2+oF9y38fRVeD/lgeXJbzeuitriXAAYQ0N8Gc/HydmS9
- h/5/U9gCncS2FPi6hlzNOXRrtw9yomYF3Wegfa7y5BMTxxqMjVRS/4Rtc+vsfYrwyiXs
- LyEAUsbj+aFGjgwEVS9b0hjW6sOv/s+/X+xMkec2Brf1nwlIC4mUivbzM9KBmc/1CmOo
- TCEnNnCh1Rmp7Wm6gBzXbz6S+8yTRr+T+rSaRDpuwEYfFxSOn4uIuwntNiH62vmZwJdo
- +iuw==
+ bh=2/FXkDvvz78LZzi8vEuw9P0gxvIPqn8+9Qh994D56qo=;
+ b=EhX2h/EGnTWqdqRQbpZlpJcgT0oJJ6o7Nef8q7EtPvI99smF5fr4TIG1Xp5CmTthMl
+ XHQzIJWggbxJUXpq8OIPTnYOso57K6OBKZR9lvcFT5+8SBJA9849ahv3W1ndrCYtoccT
+ yygIYTNJlnGOy5EhAkMecjcGkX/PpQmk6jKwKuAM0vg6/CjPiKQtp4B/woWoN5Oxyu7M
+ ua8ZUETzbjTOqOpCOLZ+ZXZ4cbXcI88NdWfpPkU+Dnz/3z1CLTZvVnhoG0DpsDAi9bV1
+ nK9pW2bxw2DMCvsnbAXlJB/lKwAPvP15NgJgI5cnQ6vQYvzhGuulMUnoZMx6s+4VaanO
+ Eqdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
  :mime-version:message-id:content-transfer-encoding;
- bh=tKGKGI76BKfQVO8CY1clLxpyySv3vaB3aNh7NWcPhFU=;
- b=W9AoFW07jQo5iUdluN3rfoJgNjQmEXw13IS0M+EvNnls9CEz8j8vOpOPjSfo8Ji4ZI
- +QLZDDl7VWbLWAjR5s2IHE1BjUOx6+UZwt5rE/Pq+mnPreQ3pviJh4Ihx4PdXwWlhJHz
- LArbt49t4wBQ825yL9cElDjTyGChCFsMToscKgKG9EGCbLmvlwsE9IJ13al8mN9kfqow
- 6NKCqQK5TRgwA6a3fu7+5Ni4khaP6r4WttUhAlNgjIsnu/mQRbxOcLnAGwdfgYo2Fqzq
- e+czmfJzvAXUQJcgVujp2cI+HBv2HJdWPLO/ibmmjoWYfoX92mwtBE6Qp23bhJgreEzj
- Xwyw==
-X-Gm-Message-State: AOAM533Qkto/OwnC4p5pze6ylSixJ4KKRGs7Gvc1NsXPdvxTcWhiN4ad
- 6ao7afTl/rHnA+RBbFLWL6Y=
-X-Google-Smtp-Source: ABdhPJw6tjizzTpMBwm3ffTzeTydtLNTRDVWzEX8o5A/u6n7JmgIJ0z9ctLYNOtrV24IDSrsfT+37Q==
-X-Received: by 2002:a63:4e4c:: with SMTP id o12mr3895360pgl.95.1624525086186; 
- Thu, 24 Jun 2021 01:58:06 -0700 (PDT)
+ bh=2/FXkDvvz78LZzi8vEuw9P0gxvIPqn8+9Qh994D56qo=;
+ b=DxevGnUzUMzcORd/Rzo0c3QUa3FXMoHBdZT+ms17CUBC02AB9HSPmUyBIsDaCyLEtk
+ OIXBdeHMZRjtNOLEPDig1cNwtUoWe4keUvJ+nMUIQ8IHAs1z2HOEg7PWL4o052qY8uiP
+ GbMB/GjdPqOHavA0Uvk9tgQSyk9/jhrRSw/tCxheNXLzDiBV12utcnB7aMIcwY+AOwMa
+ hmiADL5EY+kd/A13Z9Ndc+YBgtrsqt6dCjb3wQeIriFb9N/zLzTyo1o7NrrlBKxvVIiZ
+ 2+uqblzuwbf4+cwrA0B35dV7LkAhnAumCnRl+Shz/13uZ60txzLdG4++iGxiA4RBHeZx
+ rCeA==
+X-Gm-Message-State: AOAM530vStrgg/GHaKZ+3T+aiVYMaVmQq5pt+E+AWbJ5+bjpm+DlC+08
+ Qg9YBasrTCsBGLeIJkeogiM=
+X-Google-Smtp-Source: ABdhPJzzKwhLHCAEARj7N7XbHWSLsSDNrl/BU7M36fXftqZpKf9BHg/7Rmx6MuG9ZeVpPhgC2xWSpQ==
+X-Received: by 2002:a62:1857:0:b029:302:fb56:df52 with SMTP id
+ 84-20020a6218570000b0290302fb56df52mr4317733pfy.3.1624528683047; 
+ Thu, 24 Jun 2021 02:58:03 -0700 (PDT)
 Received: from localhost (60-242-147-73.tpgi.com.au. [60.242.147.73])
- by smtp.gmail.com with ESMTPSA id u12sm2003479pjc.0.2021.06.24.01.58.05
+ by smtp.gmail.com with ESMTPSA id y20sm2759510pfb.207.2021.06.24.02.58.01
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 24 Jun 2021 01:58:05 -0700 (PDT)
-Date: Thu, 24 Jun 2021 18:58:00 +1000
+ Thu, 24 Jun 2021 02:58:02 -0700 (PDT)
+Date: Thu, 24 Jun 2021 19:57:57 +1000
 From: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH 3/6] KVM: x86/mmu: avoid struct page in MMU
+Subject: Re: [PATCH 2/6] KVM: mmu: also return page from gfn_to_pfn
 To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, Huacai Chen
  <chenhuacai@kernel.org>, Marc Zyngier <maz@kernel.org>, Paul Mackerras
  <paulus@ozlabs.org>, Paolo Bonzini <pbonzini@redhat.com>, David Stevens
  <stevensd@chromium.org>, Zhenyu Wang <zhenyuw@linux.intel.com>, Zhi Wang
  <zhi.a.wang@intel.com>
 References: <20210624035749.4054934-1-stevensd@google.com>
- <20210624035749.4054934-4-stevensd@google.com>
-In-Reply-To: <20210624035749.4054934-4-stevensd@google.com>
+ <20210624035749.4054934-3-stevensd@google.com>
+ <1624524331.zsin3qejl9.astroid@bobo.none>
+ <201b68a7-10ea-d656-0c1e-5511b1f22674@redhat.com>
+In-Reply-To: <201b68a7-10ea-d656-0c1e-5511b1f22674@redhat.com>
 MIME-Version: 1.0
-Message-Id: <1624524744.2sr7o7ix86.astroid@bobo.none>
+Message-Id: <1624528342.s2ezcyp90x.astroid@bobo.none>
 X-Mailman-Approved-At: Thu, 24 Jun 2021 10:03:53 -0400
 Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
  intel-gfx@lists.freedesktop.org, linuxppc-dev@lists.ozlabs.org,
@@ -109,22 +112,28 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Excerpts from David Stevens's message of June 24, 2021 1:57 pm:
-> From: David Stevens <stevensd@chromium.org>
->  out_unlock:
->  	if (is_tdp_mmu_root(vcpu->kvm, vcpu->arch.mmu->root_hpa))
->  		read_unlock(&vcpu->kvm->mmu_lock);
->  	else
->  		write_unlock(&vcpu->kvm->mmu_lock);
-> -	kvm_release_pfn_clean(pfn);
-> +	if (pfnpg.page)
-> +		put_page(pfnpg.page);
->  	return r;
->  }
+Excerpts from Paolo Bonzini's message of June 24, 2021 7:42 pm:
+> On 24/06/21 10:52, Nicholas Piggin wrote:
+>>> For now, wrap all calls to gfn_to_pfn functions in the new helper
+>>> function. Callers which don't need the page struct will be updated in
+>>> follow-up patches.
+>> Hmm. You mean callers that do need the page will be updated? Normally
+>> if there will be leftover users that don't need the struct page then
+>> you would go the other way and keep the old call the same, and add a new
+>> one (gfn_to_pfn_page) just for those that need it.
+> 
+> Needing kvm_pfn_page_unwrap is a sign that something might be buggy, so 
+> it's a good idea to move the short name to the common case and the ugly 
+> kvm_pfn_page_unwrap(gfn_to_pfn(...)) for the weird one.  In fact I'm not 
+> sure there should be any kvm_pfn_page_unwrap in the end.
 
-How about
+If all callers were updated that is one thing, but from the changelog
+it sounds like that would not happen and there would be some gfn_to_pfn
+users left over.
 
-  kvm_release_pfn_page_clean(pfnpg);
+But yes in the end you would either need to make gfn_to_pfn never return
+a page found via follow_pte, or change all callers to the new way. If 
+the plan is for the latter then I guess that's fine.
 
 Thanks,
 Nick
