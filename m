@@ -7,110 +7,108 @@ X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D44FC49EA5
-	for <kvmarm@archiver.kernel.org>; Thu, 24 Jun 2021 06:57:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29A71C48BDF
+	for <kvmarm@archiver.kernel.org>; Thu, 24 Jun 2021 07:31:21 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E5DA1613CC
-	for <kvmarm@archiver.kernel.org>; Thu, 24 Jun 2021 06:57:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5DA1613CC
+	by mail.kernel.org (Postfix) with ESMTP id A211E613E7
+	for <kvmarm@archiver.kernel.org>; Thu, 24 Jun 2021 07:31:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A211E613E7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 679D34B0CD;
-	Thu, 24 Jun 2021 02:57:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 18CC64B1BF;
+	Thu, 24 Jun 2021 03:31:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id fH976fqJteBZ; Thu, 24 Jun 2021 02:57:45 -0400 (EDT)
+	with ESMTP id WIlUPmJkl+Nn; Thu, 24 Jun 2021 03:31:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3AF414B13A;
-	Thu, 24 Jun 2021 02:57:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0DCA84B1AC;
+	Thu, 24 Jun 2021 03:31:19 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EDF14B11A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jun 2021 02:57:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8227E4B1AC
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jun 2021 03:31:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hrQ9sJBPxq4E for <kvmarm@lists.cs.columbia.edu>;
- Thu, 24 Jun 2021 02:57:43 -0400 (EDT)
+ with ESMTP id Kt3XJ1Tuj6BD for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 24 Jun 2021 03:31:16 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 56A074B0CD
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jun 2021 02:57:43 -0400 (EDT)
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 95D134B128
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jun 2021 03:31:16 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1624517863;
+ s=mimecast20190719; t=1624519876;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=igFDOV6BxGJ7IfsozRxLlI1SBnI7ilQNQtLZk9DKzFQ=;
- b=NfMKvr8Ax1E1LpAoe9jSBidAQj+ol3buwQmpYHGZG+kDQY+eCVgPPndbFH8AmRYtuUGdd6
- 73Dbvk1gl3N6WMgE0j2Ge8KPXEThGtYmYzN2ufR5BXrPwwfcYj9hfimVKweuRvymgVyEEw
- vdbW6duZZOGeWQm/vjJkitKFrUcOawo=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-559-DYSdtq6CN7ynbywlIVezOg-1; Thu, 24 Jun 2021 02:57:41 -0400
-X-MC-Unique: DYSdtq6CN7ynbywlIVezOg-1
-Received: by mail-wr1-f71.google.com with SMTP id
- l6-20020a0560000226b029011a80413b4fso1813631wrz.23
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Jun 2021 23:57:41 -0700 (PDT)
+ bh=1ummzXLEBVOW6zJVjd9RvyjdRwJ4z9g5ls7IEU8SqM4=;
+ b=Y9EN46vlYv8dx7xo7zo/N+e35jQUwxm54WbN9oZLJcohYJhlj7Q1ZduFrIayWMoLH36Nfe
+ Wy5E1JNH8nsLqI8kl6vAKJt8wDohtFajnpjH1JDCrZZVTRblOiNC5l/OsFBu8N8+fqfOKi
+ o4CxUIcp2TEPRJNbIXsOftpxLma+YCw=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-540-V84fkIrYNvuFJlMVVDsYVg-1; Thu, 24 Jun 2021 03:31:15 -0400
+X-MC-Unique: V84fkIrYNvuFJlMVVDsYVg-1
+Received: by mail-wr1-f70.google.com with SMTP id
+ c15-20020a056000184fb0290124a352153cso1180604wri.9
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jun 2021 00:31:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=igFDOV6BxGJ7IfsozRxLlI1SBnI7ilQNQtLZk9DKzFQ=;
- b=PzY6IqqydYbxqX959iVA6JS0KmVK8knqoU4licvJ3/rX1MEuMDA+s/EZOPxDQROWoi
- fjfnWMrnSvYsUyLpySf4P25Ung/SVPRlPa4piLIub4tSqJzORq//0pyWpM0A5vkee8fE
- eaEBDddHsMFOsxBcZnG+eeO84hSy9JmDOU6DUXHRqKxVd2PRgMS2NCFHrK+OY/yz+ZYJ
- VyGFMf37wOE0Ey4STWwn0zrBWJpDldqsxCli6PgySB5sMVYBnL7KEZfYI6YjwIYcf5N4
- iVShFz2pt0aKBKa3XbMciBMV3lfLDosPqsepKQuG8wk7bCGgkLbuj6TjtoAsBtgH8WRZ
- LNIA==
-X-Gm-Message-State: AOAM531hwUqbOMAUMhTymluZNZhL7oArJNEibfMGKJQekar3PxELVouf
- em8FFfb5Elp7un0ttSsPniKwY9uUdPRizx63/V8Y6o8pzKVFgeJFIADuQ3JTOtF9JawMuUFxnvq
- XIZaPLEsDAzfVW9Vmyf12qdov
-X-Received: by 2002:a05:6000:1889:: with SMTP id
- a9mr85624wri.141.1624517860519; 
- Wed, 23 Jun 2021 23:57:40 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzdqChWxI2TqFhdGI9pdTdW0OY2cpxOML9ILwZzD3plJUW6I8N3vbOFGhbVC127GRhm0xAu2w==
-X-Received: by 2002:a05:6000:1889:: with SMTP id
- a9mr85587wri.141.1624517860347; 
- Wed, 23 Jun 2021 23:57:40 -0700 (PDT)
+ bh=1ummzXLEBVOW6zJVjd9RvyjdRwJ4z9g5ls7IEU8SqM4=;
+ b=Gie0BR0DfInCElcXm8PLKIRA08ExbOrL7tnOM5GrwVVMgw/oAOtWGHM3tke1cYenHy
+ uK2M+n4bJJiH+2TOYMMiz8gHxLkg2VGPS+v1BjuLyxHW3xpUO8C/pH4HtZP5qnPV0cPw
+ +u4GTdDiG/Jj3cGOoNKnj6G30frS8r1WtsUARtYwtXoJUHZHY+wQfpXUpTDUj4lW20u4
+ mYOhdH5PF8ccrJsBOWVI/XnrswiV5A48+LoyFDDqliWya/jX2MLtPt6jClXpYIJ4K2ak
+ y+z6/CM/XGPYxzt3CVXPVR74shdum30XBpGsnKPWX6ggC3gQXzEKYF0dQa8JpF//S/aV
+ 54yw==
+X-Gm-Message-State: AOAM5300i5CnE13hMU+9e9LoquFCR/yZ1YPnuJbOOfiuCcTay30cWTEH
+ e4H+lc4D4MVDA3AR5j0GF7CSL6qa+bSEi6xuvYQZyMUrdycCG/IMvaRld392UdN6fZ3lKtbL2XX
+ DAEnRZ2UWMKoXTL4JA9UJEa+q
+X-Received: by 2002:adf:f88e:: with SMTP id u14mr2674315wrp.391.1624519873912; 
+ Thu, 24 Jun 2021 00:31:13 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwmU2A8muf7XixWmRWMn8O50eJCa1GKEjZYZIlN1VsKBfgiuuBfyX9v0BcxFt1KFEfxAoHypw==
+X-Received: by 2002:adf:f88e:: with SMTP id u14mr2674272wrp.391.1624519873717; 
+ Thu, 24 Jun 2021 00:31:13 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
  ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
- by smtp.gmail.com with ESMTPSA id o26sm1900491wmr.29.2021.06.23.23.57.38
+ by smtp.gmail.com with ESMTPSA id f19sm2269746wre.48.2021.06.24.00.31.12
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 23 Jun 2021 23:57:39 -0700 (PDT)
-Subject: Re: [PATCH 0/6] KVM: Remove uses of struct page from x86 and arm64 MMU
+ Thu, 24 Jun 2021 00:31:13 -0700 (PDT)
+Subject: Re: [PATCH 3/6] KVM: x86/mmu: avoid struct page in MMU
 To: David Stevens <stevensd@chromium.org>, Marc Zyngier <maz@kernel.org>,
  Huacai Chen <chenhuacai@kernel.org>,
  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
  Paul Mackerras <paulus@ozlabs.org>, Zhenyu Wang <zhenyuw@linux.intel.com>,
  Zhi Wang <zhi.a.wang@intel.com>
 References: <20210624035749.4054934-1-stevensd@google.com>
+ <20210624035749.4054934-4-stevensd@google.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <20baae77-785c-5d46-e00c-41d86c2fbc56@redhat.com>
-Date: Thu, 24 Jun 2021 08:57:37 +0200
+Message-ID: <49504c79-2cd4-1707-a0a5-79b679a4b214@redhat.com>
+Date: Thu, 24 Jun 2021 09:31:11 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <20210624035749.4054934-1-stevensd@google.com>
+In-Reply-To: <20210624035749.4054934-4-stevensd@google.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
-Cc: David Stevens <stevensd@google.com>, intel-gvt-dev@lists.freedesktop.org,
- Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- Will Deacon <will@kernel.org>, Sean Christopherson <seanjc@google.com>,
- Joerg Roedel <joro@8bytes.org>, linuxppc-dev@lists.ozlabs.org,
- linux-kernel@vger.kernel.org, kvm-ppc@vger.kernel.org,
- linux-mips@vger.kernel.org, dri-devel@lists.freedesktop.org,
- intel-gfx@lists.freedesktop.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- Jim Mattson <jmattson@google.com>
+Cc: intel-gvt-dev@lists.freedesktop.org, Wanpeng Li <wanpengli@tencent.com>,
+ kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ Sean Christopherson <seanjc@google.com>, Joerg Roedel <joro@8bytes.org>,
+ linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+ kvm-ppc@vger.kernel.org, linux-mips@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+ Vitaly Kuznetsov <vkuznets@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -128,30 +126,17 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On 24/06/21 05:57, David Stevens wrote:
-> KVM supports mapping VM_IO and VM_PFNMAP memory into the guest by using
-> follow_pte in gfn_to_pfn. However, the resolved pfns may not have
-> assoicated struct pages, so they should not be passed to pfn_to_page.
-> This series removes such calls from the x86 and arm64 secondary MMU. To
-> do this, this series modifies gfn_to_pfn to return a struct page in
-> addition to a pfn, if the hva was resolved by gup. This allows the
-> caller to call put_page only when necessated by gup.
-> 
-> This series provides a helper function that unwraps the new return type
-> of gfn_to_pfn to provide behavior identical to the old behavior. As I
-> have no hardware to test powerpc/mips changes, the function is used
-> there for minimally invasive changes. Additionally, as gfn_to_page and
-> gfn_to_pfn_cache are not integrated with mmu notifier, they cannot be
-> easily changed over to only use pfns.
-> 
-> This addresses CVE-2021-22543 on x86 and arm64.
+>   static int __direct_map(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+> -			int map_writable, int max_level, kvm_pfn_t pfn,
+> +			int map_writable, int max_level,
+> +			const struct kvm_pfn_page *pfnpg,
+>   			bool prefault, bool is_tdp)
+>   {
+>   	bool nx_huge_page_workaround_enabled = is_nx_huge_pa
 
-Thank you very much for this.  I agree that it makes sense to have a 
-minimal change; I had similar changes almost ready, but was stuck with 
-deadlocks in the gfn_to_pfn_cache case.  In retrospect I should have 
-posted something similar to your patches.
-
-I have started reviewing the patches, and they look good.  I will try to 
-include them in 5.13.
+So the main difference with my tentative patches is that here I was 
+passing the struct by value.  I'll try to clean this up for 5.15, but 
+for now it's all good like this.  Thanks again!
 
 Paolo
 
