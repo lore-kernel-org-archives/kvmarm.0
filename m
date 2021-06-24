@@ -2,99 +2,95 @@ Return-Path: <SRS0=0p1Y=LS=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E092C49EA7
-	for <kvmarm@archiver.kernel.org>; Thu, 24 Jun 2021 14:03:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73841C49EAB
+	for <kvmarm@archiver.kernel.org>; Thu, 24 Jun 2021 14:03:59 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 142866140A
-	for <kvmarm@archiver.kernel.org>; Thu, 24 Jun 2021 14:03:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 142866140A
+	by mail.kernel.org (Postfix) with ESMTP id 265E5613F6
+	for <kvmarm@archiver.kernel.org>; Thu, 24 Jun 2021 14:03:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 265E5613F6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A3DC04B1D4;
-	Thu, 24 Jun 2021 10:03:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CD0B54B183;
+	Thu, 24 Jun 2021 10:03:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 8hH9mEt6xKYJ; Thu, 24 Jun 2021 10:03:56 -0400 (EDT)
+	with ESMTP id TBkqgmGMIipY; Thu, 24 Jun 2021 10:03:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 403A14B154;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5EBA04B15A;
 	Thu, 24 Jun 2021 10:03:55 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C3EEA4B26E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jun 2021 06:17:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D3DD64B176
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jun 2021 06:34:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FdxqEcpWByKH for <kvmarm@lists.cs.columbia.edu>;
- Thu, 24 Jun 2021 06:17:49 -0400 (EDT)
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com
- [209.85.216.47])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6F02C4B26D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jun 2021 06:17:49 -0400 (EDT)
-Received: by mail-pj1-f47.google.com with SMTP id
- bb10-20020a17090b008ab029016eef083425so5582874pjb.5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jun 2021 03:17:49 -0700 (PDT)
+ with ESMTP id j8ElyTFSHj-j for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 24 Jun 2021 06:34:32 -0400 (EDT)
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com
+ [209.85.216.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BF4724B183
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jun 2021 06:34:32 -0400 (EDT)
+Received: by mail-pj1-f52.google.com with SMTP id g4so3242170pjk.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jun 2021 03:34:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=date:from:subject:to:cc:references:in-reply-to:mime-version
  :message-id:content-transfer-encoding;
- bh=ufPcep0sp8fFam4s8EQWkn+673yXecgGkFHNTHQONWw=;
- b=sFF5ZYvJivSW9geCDpAWHQIXJqy0TaWKJDeCWyf+SN8sC0zvAWOqxE0kDzVGrlqH0T
- tmnXDqy/vMEUI/QT1fg3tuAhH6y/WaFDv0bhKrmNY65hIUEPGulyXJKnytExJVEwigXZ
- EEgjb92CecGE/1ZNSefvvxGTeh5Bu3j4pd19HStH0J6gJv+4gmTPMVXvpU/FEf57f6Z1
- yZZLHMoK9YK0EH+XiEgmNblrEYdl95qc0I5aDyKhqYAvytW6+/07zmQXw9lEc1D57uv2
- sPH/vR/v0oM7LuQHI7hajV/RDoziumHUY8ZgFdgAAJLR7DiFovRTgo8M2LsLunQ7LnIe
- UNoA==
+ bh=ISlLS/Bnqpf/oAWEGOJgKBZ0Rb18u3bU0Ep0kv2LMg0=;
+ b=ItVpaR72A3eWg+6QNdd9RNw76aFcKOXvgi86A4U+ygjRobuSVtqGLn83lJQMbfCPA4
+ LQIa3P9bWqZxWn65q97p0mTXZfMJxza4XBkddIpoDzA0Y1gz2b4OTCDChEW1fNnXNMtx
+ Fd/HR/h+M9YqDeioWNf5AArKjGRkQ+rrWucptSeSf/UUf6QUwL4Nowo/4rEimVbdxS4Q
+ CrrkCNn+4rsxvoMWh2fX66Avx4PzjnR2opDju0qKu/sbanWcGLqwESvvdl5Yw6PwyCya
+ zQM4h5g6tjIbnWhNNgTE1fjofoOSBjtXdTRyzTMD0NSsHlc5YkGJ7hehN9KlI5q5bxjS
+ Pecg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
  :mime-version:message-id:content-transfer-encoding;
- bh=ufPcep0sp8fFam4s8EQWkn+673yXecgGkFHNTHQONWw=;
- b=fildmnEdS+NTjspY11XTgi+gVlpnZ9fDE93U21hCCCiviGoKOBQP1tCtlcDmY+cz6l
- amQ5Atsbn/iAH9t5E5Ss6Tn/8JjM/sara0HLl73YeB9eMj6bjonyTwWykrTPZ/OHBVlB
- YNlsWcL4ajYp9OA7r+YmFFe22APzC9EsmaFKDUnoeqP3ohmAaawiQ0m8NYt7UNJsvtr8
- 29tmjQmvRkXrHtoD/yAofBhJPumKOTky5AdRmJmwzBW9d8ms7dsptfy7SBFiC2/1H6Sj
- v/bcuFP5bzVtfWwMTexvYM9pL9EQ8E/46+xwc+V2hk01a1ur+yZSD452Y8aJUx5eIS1b
- 2iaw==
-X-Gm-Message-State: AOAM531W9/ejJubYNM1JTGOv5W9quEr6NLG2ND9AYLTQsuhxY9sd7p9B
- jZnHTHq3/UYn0Cfx9sMKI6c=
-X-Google-Smtp-Source: ABdhPJzBDdHKwzOfU1IGTH+/PPCRK2jVsTxYoY95EuRzqDADJIdiFOBloV8Ki52/MFkR99nX/DL1Xg==
-X-Received: by 2002:a17:90a:7401:: with SMTP id
- a1mr14554343pjg.57.1624529868549; 
- Thu, 24 Jun 2021 03:17:48 -0700 (PDT)
+ bh=ISlLS/Bnqpf/oAWEGOJgKBZ0Rb18u3bU0Ep0kv2LMg0=;
+ b=gLSjEEBDZa24jYqMPq5JiKhlrBUtXGJ7Cj2Mqnp4C8QkbIfU1ZvRNHMQE0/wCh9/6X
+ OvI2fyYEbmoCwW/qS+K7r5cVZ+RsC1cz3cDlUTT5HbiJJR21w7M20RBlZz1Mf/rsm1j1
+ Et9tO97XdJSTcMML7WaloxSQ5zsk+Mhq8CgcpyiREMwpZklDxu2FyC65e0A2HOrsP3gz
+ 9WCZUsJxCrU8CEYWpoVQGV4TDnnDKk6/p5uy1+kgPdKz9Dg4oQQAV7RsLgzqcfrb6SmN
+ 5EcNBOnp9RSVWAOLEGYnOJMsrTtcx6k6IDGyTlgv5ApwHKGCHI8k8WwdmxXXDS53q9cw
+ uIrQ==
+X-Gm-Message-State: AOAM530hLzw84oE/2JaI1rRQDzuBC9DP9t52sanJPNhMZGqDmDNbrxAN
+ waSZGIpT3Xw27nxxOwKrbWk=
+X-Google-Smtp-Source: ABdhPJy6kajrzF0OadUDC6nHAS6U7gmSDYSh4DBdORcOqITOBjGnDhRDrYwGVGZv+udz0pGSetXg8w==
+X-Received: by 2002:a17:90b:4ac6:: with SMTP id
+ mh6mr15043416pjb.210.1624530871905; 
+ Thu, 24 Jun 2021 03:34:31 -0700 (PDT)
 Received: from localhost (60-242-147-73.tpgi.com.au. [60.242.147.73])
- by smtp.gmail.com with ESMTPSA id o20sm2094410pjq.57.2021.06.24.03.17.47
+ by smtp.gmail.com with ESMTPSA id k63sm7664839pjh.13.2021.06.24.03.34.30
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 24 Jun 2021 03:17:48 -0700 (PDT)
-Date: Thu, 24 Jun 2021 20:17:42 +1000
+ Thu, 24 Jun 2021 03:34:31 -0700 (PDT)
+Date: Thu, 24 Jun 2021 20:34:25 +1000
 From: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH 2/6] KVM: mmu: also return page from gfn_to_pfn
+Subject: Re: [PATCH 0/6] KVM: Remove uses of struct page from x86 and arm64 MMU
 To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, Huacai Chen
  <chenhuacai@kernel.org>, Marc Zyngier <maz@kernel.org>, Paul Mackerras
  <paulus@ozlabs.org>, Paolo Bonzini <pbonzini@redhat.com>, David Stevens
  <stevensd@chromium.org>, Zhenyu Wang <zhenyuw@linux.intel.com>, Zhi Wang
  <zhi.a.wang@intel.com>
 References: <20210624035749.4054934-1-stevensd@google.com>
- <20210624035749.4054934-3-stevensd@google.com>
- <1624524331.zsin3qejl9.astroid@bobo.none>
- <201b68a7-10ea-d656-0c1e-5511b1f22674@redhat.com>
- <1624528342.s2ezcyp90x.astroid@bobo.none>
-In-Reply-To: <1624528342.s2ezcyp90x.astroid@bobo.none>
+In-Reply-To: <20210624035749.4054934-1-stevensd@google.com>
 MIME-Version: 1.0
-Message-Id: <1624529635.75a1ann91v.astroid@bobo.none>
+Message-Id: <1624530624.8jff1f4u11.astroid@bobo.none>
 X-Mailman-Approved-At: Thu, 24 Jun 2021 10:03:53 -0400
 Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- intel-gfx@lists.freedesktop.org, linuxppc-dev@lists.ozlabs.org,
- linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
- kvmarm@lists.cs.columbia.edu, Will Deacon <will@kernel.org>,
- kvm-ppc@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
+ David Stevens <stevensd@google.com>, intel-gfx@lists.freedesktop.org,
+ linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, kvmarm@lists.cs.columbia.edu,
+ Will Deacon <will@kernel.org>, kvm-ppc@vger.kernel.org,
+ Sean Christopherson <seanjc@google.com>,
  Vitaly Kuznetsov <vkuznets@redhat.com>, linux-mips@vger.kernel.org,
  intel-gvt-dev@lists.freedesktop.org, Joerg Roedel <joro@8bytes.org>,
  linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>
@@ -114,41 +110,80 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Excerpts from Nicholas Piggin's message of June 24, 2021 7:57 pm:
-> Excerpts from Paolo Bonzini's message of June 24, 2021 7:42 pm:
->> On 24/06/21 10:52, Nicholas Piggin wrote:
->>>> For now, wrap all calls to gfn_to_pfn functions in the new helper
->>>> function. Callers which don't need the page struct will be updated in
->>>> follow-up patches.
->>> Hmm. You mean callers that do need the page will be updated? Normally
->>> if there will be leftover users that don't need the struct page then
->>> you would go the other way and keep the old call the same, and add a new
->>> one (gfn_to_pfn_page) just for those that need it.
->> 
->> Needing kvm_pfn_page_unwrap is a sign that something might be buggy, so 
->> it's a good idea to move the short name to the common case and the ugly 
->> kvm_pfn_page_unwrap(gfn_to_pfn(...)) for the weird one.  In fact I'm not 
->> sure there should be any kvm_pfn_page_unwrap in the end.
+Excerpts from David Stevens's message of June 24, 2021 1:57 pm:
+> KVM supports mapping VM_IO and VM_PFNMAP memory into the guest by using
+> follow_pte in gfn_to_pfn. However, the resolved pfns may not have
+> assoicated struct pages, so they should not be passed to pfn_to_page.
+> This series removes such calls from the x86 and arm64 secondary MMU. To
+> do this, this series modifies gfn_to_pfn to return a struct page in
+> addition to a pfn, if the hva was resolved by gup. This allows the
+> caller to call put_page only when necessated by gup.
 > 
-> If all callers were updated that is one thing, but from the changelog
-> it sounds like that would not happen and there would be some gfn_to_pfn
-> users left over.
+> This series provides a helper function that unwraps the new return type
+> of gfn_to_pfn to provide behavior identical to the old behavior. As I
+> have no hardware to test powerpc/mips changes, the function is used
+> there for minimally invasive changes. Additionally, as gfn_to_page and
+> gfn_to_pfn_cache are not integrated with mmu notifier, they cannot be
+> easily changed over to only use pfns.
 > 
-> But yes in the end you would either need to make gfn_to_pfn never return
-> a page found via follow_pte, or change all callers to the new way. If 
-> the plan is for the latter then I guess that's fine.
+> This addresses CVE-2021-22543 on x86 and arm64.
 
-Actually in that case anyway I don't see the need -- the existence of
-gfn_to_pfn is enough to know it might be buggy. It can just as easily
-be grepped for as kvm_pfn_page_unwrap. And are gfn_to_page cases also
-vulernable to the same issue?
+Does this fix the problem? (untested I don't have a POC setup at hand,
+but at least in concept)
 
-So I think it could be marked deprecated or something if not everything 
-will be converted in the one series, and don't need to touch all that 
-arch code with this patch.
+I have no problem with improving the API and probably in the direction 
+of your series is good. But there seems to be a lot of unfixed arch code 
+and broken APIs remaining left to do after your series too. This might 
+be most suitable to backport and as a base for your series that can take
+more time to convert to new APIs.
 
 Thanks,
 Nick
+
+---
+
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 6a6bc7af0e28..e208c279d903 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -2104,13 +2104,21 @@ static int hva_to_pfn_remapped(struct vm_area_struct *vma,
+ 	 * Whoever called remap_pfn_range is also going to call e.g.
+ 	 * unmap_mapping_range before the underlying pages are freed,
+ 	 * causing a call to our MMU notifier.
++	 *
++	 * Certain IO or PFNMAP mappings can be backed with valid
++	 * struct pages, but be allocated without refcounting e.g.,
++	 * tail pages of non-compound higher order allocations, which
++	 * would then underflow the refcount when the caller does the
++	 * required put_page. Don't allow those pages here.
+ 	 */ 
+-	kvm_get_pfn(pfn);
++	if (!kvm_try_get_pfn(pfn))
++		r = -EFAULT;
+ 
+ out:
+ 	pte_unmap_unlock(ptep, ptl);
+ 	*p_pfn = pfn;
+-	return 0;
++
++	return r;
+ }
+ 
+ /*
+@@ -2487,6 +2495,13 @@ void kvm_set_pfn_accessed(kvm_pfn_t pfn)
+ }
+ EXPORT_SYMBOL_GPL(kvm_set_pfn_accessed);
+ 
++static int kvm_try_get_pfn(kvm_pfn_t pfn)
++{
++	if (kvm_is_reserved_pfn(pfn))
++		return 1;
++	return get_page_unless_zero(pfn_to_page(pfn));
++}
++
+ void kvm_get_pfn(kvm_pfn_t pfn)
+ {
+ 	if (!kvm_is_reserved_pfn(pfn))
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
