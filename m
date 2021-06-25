@@ -1,104 +1,133 @@
-Return-Path: <SRS0=0p1Y=LS=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=mXZs=LT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A625FC49EA5
-	for <kvmarm@archiver.kernel.org>; Thu, 24 Jun 2021 16:02:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 867BBC2B9F4
+	for <kvmarm@archiver.kernel.org>; Fri, 25 Jun 2021 07:44:53 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 22B70613EB
-	for <kvmarm@archiver.kernel.org>; Thu, 24 Jun 2021 16:02:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22B70613EB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id F02DD613C0
+	for <kvmarm@archiver.kernel.org>; Fri, 25 Jun 2021 07:44:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F02DD613C0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E6A84B19A;
-	Thu, 24 Jun 2021 12:02:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7AB2C4B191;
+	Fri, 25 Jun 2021 03:44:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@ibm.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jTrEgjzAHNki; Thu, 24 Jun 2021 12:02:34 -0400 (EDT)
+	with ESMTP id 2QSmkUxUP5c9; Fri, 25 Jun 2021 03:44:51 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 895034B176;
-	Thu, 24 Jun 2021 12:02:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 19D954B199;
+	Fri, 25 Jun 2021 03:44:51 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D6314B0F9
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jun 2021 11:36:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B91914B196
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Jun 2021 03:44:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id A3cL628caiCa for <kvmarm@lists.cs.columbia.edu>;
- Thu, 24 Jun 2021 11:36:46 -0400 (EDT)
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com
- [209.85.214.179])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EA2E84B0F7
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jun 2021 11:36:45 -0400 (EDT)
-Received: by mail-pl1-f179.google.com with SMTP id f10so3171270plg.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jun 2021 08:36:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=oSmcLkLaYmb30K4x2o5V0PgF5sReFf2n8jT9UaERRsg=;
- b=bSQo4DhU2KuL3CjUZN64j4WcwdggQch/R7XnEdix2NVuOf40qPGfYHBno8Xm619GAr
- wg2kvoNy4VPNerE1UJQqTO/mn+wSl2WW8B9f7dL8xOzOgdg74JEfehGKdbWSQ0+1rr/t
- 2LEY4HKbsscIOGINiR9uO5OVpBxOglyxXqSvwqqzzZpKt1BhIehu/QDEuFSbgcAbmd1A
- 2Vn5BfcWryEpw7ny/6e9BAwB13V5uLq3/TeIlPL3nNBaDSZ9vfocg3yuStOuQjDnW2a3
- vbLINUOPqFtht9Zb0kQj2xFTxtidhP/wmPjkGUm290ZvEfhGiSSc1t+MN7azCayA+NIy
- PYiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=oSmcLkLaYmb30K4x2o5V0PgF5sReFf2n8jT9UaERRsg=;
- b=WsiRWTSN+28FO6ZCplr4fgffTPHn3J1Z5BJ4cINZ0yS/JmEhmkcnF7XG9zMgCprdEX
- /9Qj6mxZi31uLaeids40nMH0mUlsxuQdXF7xLrSPCAlP0Dpj1sYHYCv7L2nVMyx1jNMA
- ePl7r8JafJx4uYPv6PgyjfoFzNMy6wHRuTHLsdIYTWsQs5jzmrKPAjn1YFhZFXvojYrD
- 15thS6iX5lRyZ4/9oEp+Glodw4zNas6eJ63foLoWjAa59/YUVXrJpg8SbZN4HMu77Lw3
- AVKln/sIvQbQ1m0Wln8bXF9fvpGAmQpiEXbHVW9KOGi8zlBvX7q5jatNFtajkQGXu+Rn
- j4hQ==
-X-Gm-Message-State: AOAM533VSVHlC+gJP3qjFF6lsmLrOSwinecB53UNzk8WfMZOfp2uKOwa
- Mz1rpvnSRF2U7Op5oQc2H4GWhA==
-X-Google-Smtp-Source: ABdhPJxfmbtVti63yi0rwniZ/V3vp7ddChowhbbwk916pZwapRYWPu+wwBqr+2N8fYjWJaOb0U93+Q==
-X-Received: by 2002:a17:90a:8542:: with SMTP id
- a2mr14115924pjw.185.1624549004763; 
- Thu, 24 Jun 2021 08:36:44 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com.
- [35.185.214.157])
- by smtp.gmail.com with ESMTPSA id p1sm3132065pfp.137.2021.06.24.08.36.43
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 24 Jun 2021 08:36:44 -0700 (PDT)
-Date: Thu, 24 Jun 2021 15:36:40 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 1/6] KVM: x86/mmu: release audited pfns
-Message-ID: <YNSmiOsmJin4UPcG@google.com>
-References: <20210624035749.4054934-1-stevensd@google.com>
- <20210624035749.4054934-2-stevensd@google.com>
- <1624524156.04etgk7zmz.astroid@bobo.none>
- <4816287a-b9a9-d3f4-f844-06922d696e06@redhat.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <4816287a-b9a9-d3f4-f844-06922d696e06@redhat.com>
-X-Mailman-Approved-At: Thu, 24 Jun 2021 12:02:33 -0400
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-mips@vger.kernel.org,
- Paul Mackerras <paulus@ozlabs.org>, Zhenyu Wang <zhenyuw@linux.intel.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
- Huacai Chen <chenhuacai@kernel.org>,
+ with ESMTP id tE0RFrt5nmoo for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 25 Jun 2021 03:44:49 -0400 (EDT)
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com
+ [148.163.158.5])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 83FF04B191
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Jun 2021 03:44:49 -0400 (EDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id
+ 15P7YTqX061945; Fri, 25 Jun 2021 03:44:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=1RqvYvHqS+g8GAhL7EUAfBHKQHRxaUMGXuw/IwCXA00=;
+ b=Nmb11u4f/JhMKk+ivMs7oA1Ku85DovZ4LdaLOgwfNrDLH0a/wz5mI0aLrLO3Altwv4N4
+ LMTZyz/WDveZjxrU5tD5PPo68pDirAd4Gfrex52xiqR0TujC5LdTRYi0ri1ge/eDHmSN
+ JQJ8rK/jOMjr3THp/ok9RkvIdn/4KtjecaWiJfeTOER6nglHE+EZicixc1c1BnhsB+1Y
+ g5DWwvan20xvxygDIi3MEZQ7H/GwZDVcHzVEGz2iIjsiJgKnoZ7U+TUpyPDhD5O2Zekw
+ xJiAEI7Z0lyxcZgGi3MCDrgB0acHr+cDdUAyjJoQ4I+2kOZz0Z9ex/2nv4xilwCqOw4H ZA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 39d8cn51sy-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 25 Jun 2021 03:44:39 -0400
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15P7YRo0061765;
+ Fri, 25 Jun 2021 03:44:38 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com
+ [169.51.49.102])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 39d8cn51s5-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 25 Jun 2021 03:44:38 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+ by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15P7g5SF017198;
+ Fri, 25 Jun 2021 07:44:36 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com
+ (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+ by ppma06ams.nl.ibm.com with ESMTP id 3997uhaw6x-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 25 Jun 2021 07:44:35 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
+ [9.149.105.62])
+ by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id 15P7h6UA14352728
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 25 Jun 2021 07:43:06 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 6193DAE056;
+ Fri, 25 Jun 2021 07:44:33 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 9D274AE051;
+ Fri, 25 Jun 2021 07:44:31 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.171.31.44])
+ by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Fri, 25 Jun 2021 07:44:31 +0000 (GMT)
+Subject: Re: [PATCH 0/6] KVM: Remove uses of struct page from x86 and arm64 MMU
+To: Nicholas Piggin <npiggin@gmail.com>,
  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Zhi Wang <zhi.a.wang@intel.com>, intel-gfx@lists.freedesktop.org,
- kvm-ppc@vger.kernel.org, Nicholas Piggin <npiggin@gmail.com>,
- intel-gvt-dev@lists.freedesktop.org, linux-arm-kernel@lists.infradead.org,
- Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org,
- David Stevens <stevensd@chromium.org>, Vitaly Kuznetsov <vkuznets@redhat.com>,
- linuxppc-dev@lists.ozlabs.org
+ Huacai Chen <chenhuacai@kernel.org>, Marc Zyngier <maz@kernel.org>,
+ Paul Mackerras <paulus@ozlabs.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ David Stevens <stevensd@chromium.org>, Zhenyu Wang
+ <zhenyuw@linux.intel.com>, Zhi Wang <zhi.a.wang@intel.com>
+References: <20210624035749.4054934-1-stevensd@google.com>
+ <1624530624.8jff1f4u11.astroid@bobo.none>
+ <1624534759.nj0ylor2eh.astroid@bobo.none>
+ <0d3a699a-15eb-9f1b-0735-79d14736f38c@redhat.com>
+ <1624539354.6zggpdrdbw.astroid@bobo.none>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <19c4e392-fbab-ee2c-7039-c88d1ae5775d@de.ibm.com>
+Date: Fri, 25 Jun 2021 09:44:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
+MIME-Version: 1.0
+In-Reply-To: <1624539354.6zggpdrdbw.astroid@bobo.none>
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Xd2p2n2e6jxdPlNvwSbyIgmg3LPAQMfs
+X-Proofpoint-ORIG-GUID: 6q0X_bUItmYJaGkAxPmmRfj9zzu6NsL2
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391, 18.0.790
+ definitions=2021-06-25_02:2021-06-24,
+ 2021-06-25 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 suspectscore=0
+ malwarescore=0 lowpriorityscore=0 adultscore=0 mlxlogscore=999
+ impostorscore=0 bulkscore=0 priorityscore=1501 clxscore=1011 mlxscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2106250043
+Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+ David Stevens <stevensd@google.com>, intel-gfx@lists.freedesktop.org,
+ linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, kvmarm@lists.cs.columbia.edu,
+ Will Deacon <will@kernel.org>, kvm-ppc@vger.kernel.org,
+ Sean Christopherson <seanjc@google.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>, linux-mips@vger.kernel.org,
+ intel-gvt-dev@lists.freedesktop.org, Joerg Roedel <joro@8bytes.org>,
+ linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -110,23 +139,124 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Jun 24, 2021, Paolo Bonzini wrote:
-> On 24/06/21 10:43, Nicholas Piggin wrote:
-> > Excerpts from David Stevens's message of June 24, 2021 1:57 pm:
-> > > From: David Stevens <stevensd@chromium.org>
-> > 
-> > Changelog? This looks like a bug, should it have a Fixes: tag?
-> 
-> Probably has been there forever... The best way to fix the bug would be to
-> nuke mmu_audit.c, which I've threatened to do many times but never followed
-> up on.
 
-Yar.  It has only survived because it hasn't required any maintenance.
+
+On 24.06.21 14:57, Nicholas Piggin wrote:
+> Excerpts from Paolo Bonzini's message of June 24, 2021 10:41 pm:
+>> On 24/06/21 13:42, Nicholas Piggin wrote:
+>>> Excerpts from Nicholas Piggin's message of June 24, 2021 8:34 pm:
+>>>> Excerpts from David Stevens's message of June 24, 2021 1:57 pm:
+>>>>> KVM supports mapping VM_IO and VM_PFNMAP memory into the guest by using
+>>>>> follow_pte in gfn_to_pfn. However, the resolved pfns may not have
+>>>>> assoicated struct pages, so they should not be passed to pfn_to_page.
+>>>>> This series removes such calls from the x86 and arm64 secondary MMU. To
+>>>>> do this, this series modifies gfn_to_pfn to return a struct page in
+>>>>> addition to a pfn, if the hva was resolved by gup. This allows the
+>>>>> caller to call put_page only when necessated by gup.
+>>>>>
+>>>>> This series provides a helper function that unwraps the new return type
+>>>>> of gfn_to_pfn to provide behavior identical to the old behavior. As I
+>>>>> have no hardware to test powerpc/mips changes, the function is used
+>>>>> there for minimally invasive changes. Additionally, as gfn_to_page and
+>>>>> gfn_to_pfn_cache are not integrated with mmu notifier, they cannot be
+>>>>> easily changed over to only use pfns.
+>>>>>
+>>>>> This addresses CVE-2021-22543 on x86 and arm64.
+>>>>
+>>>> Does this fix the problem? (untested I don't have a POC setup at hand,
+>>>> but at least in concept)
+>>>
+>>> This one actually compiles at least. Unfortunately I don't have much
+>>> time in the near future to test, and I only just found out about this
+>>> CVE a few hours ago.
+>>
+>> And it also works (the reproducer gets an infinite stream of userspace
+>> exits and especially does not crash).  We can still go for David's
+>> solution later since MMU notifiers are able to deal with this pages, but
+>> it's a very nice patch for stable kernels.
+> 
+> Oh nice, thanks for testing. How's this?
+> 
+> Thanks,
+> Nick
+> 
+> ---
+> 
+> KVM: Fix page ref underflow for regions with valid but non-refcounted pages
+> 
+> It's possible to create a region which maps valid but non-refcounted
+> pages (e.g., tail pages of non-compound higher order allocations). These
+> host pages can then be returned by gfn_to_page, gfn_to_pfn, etc., family
+> of APIs, which take a reference to the page, which takes it from 0 to 1.
+> When the reference is dropped, this will free the page incorrectly.
+> 
+> Fix this by only taking a reference on the page if it was non-zero,
+> which indicates it is participating in normal refcounting (and can be
+> released with put_page).
+> 
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> ---
+>   virt/kvm/kvm_main.c | 19 +++++++++++++++++--
+>   1 file changed, 17 insertions(+), 2 deletions(-)
+> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 6a6bc7af0e28..46fb042837d2 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -2055,6 +2055,13 @@ static bool vma_is_valid(struct vm_area_struct *vma, bool write_fault)
+>   	return true;
+>   }
+>   
+> +static int kvm_try_get_pfn(kvm_pfn_t pfn)
+> +{
+> +	if (kvm_is_reserved_pfn(pfn))
+> +		return 1;
+> +	return get_page_unless_zero(pfn_to_page(pfn));
+> +}
+> +
+>   static int hva_to_pfn_remapped(struct vm_area_struct *vma,
+>   			       unsigned long addr, bool *async,
+>   			       bool write_fault, bool *writable,
+> @@ -2104,13 +2111,21 @@ static int hva_to_pfn_remapped(struct vm_area_struct *vma,
+>   	 * Whoever called remap_pfn_range is also going to call e.g.
+>   	 * unmap_mapping_range before the underlying pages are freed,
+>   	 * causing a call to our MMU notifier.
+> +	 *
+> +	 * Certain IO or PFNMAP mappings can be backed with valid
+> +	 * struct pages, but be allocated without refcounting e.g.,
+> +	 * tail pages of non-compound higher order allocations, which
+> +	 * would then underflow the refcount when the caller does the
+> +	 * required put_page. Don't allow those pages here.
+>   	 */
+> -	kvm_get_pfn(pfn);
+> +	if (!kvm_try_get_pfn(pfn))
+> +		r = -EFAULT;
+>   
+
+Right. That should also take care of s390 (pin_guest_page in vsie.c
+which calls gfn_to_page).
+FWIW, the current API is really hard to follow as it does not tell
+which functions take a reference and which dont.
+
+Anyway, this patch (with cc stable?)
+
+Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+
+>   out:
+>   	pte_unmap_unlock(ptep, ptl);
+>   	*p_pfn = pfn;
+> -	return 0;
+> +
+> +	return r;
+>   }
+>   
+>   /*
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
