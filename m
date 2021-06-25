@@ -2,97 +2,72 @@ Return-Path: <SRS0=mXZs=LT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-22.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
+	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60C44C2B9F4
-	for <kvmarm@archiver.kernel.org>; Fri, 25 Jun 2021 10:11:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0184C2B9F4
+	for <kvmarm@archiver.kernel.org>; Fri, 25 Jun 2021 13:44:38 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 12CAD61428
-	for <kvmarm@archiver.kernel.org>; Fri, 25 Jun 2021 10:11:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12CAD61428
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
+	by mail.kernel.org (Postfix) with ESMTP id 1530F617ED
+	for <kvmarm@archiver.kernel.org>; Fri, 25 Jun 2021 13:44:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1530F617ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 20A304B10B;
-	Fri, 25 Jun 2021 06:11:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A7144B103;
+	Fri, 25 Jun 2021 09:44:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@chromium.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id azDuPu773vyA; Fri, 25 Jun 2021 06:11:56 -0400 (EDT)
+	with ESMTP id UQdmOldPmP7W; Fri, 25 Jun 2021 09:44:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9EF434B1B3;
-	Fri, 25 Jun 2021 06:11:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 83E314B15B;
+	Fri, 25 Jun 2021 09:44:34 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 69CEA4B162
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Jun 2021 03:37:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 173E94B159
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Jun 2021 09:44:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8WWWqVAd0b9G for <kvmarm@lists.cs.columbia.edu>;
- Fri, 25 Jun 2021 03:37:51 -0400 (EDT)
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com
- [209.85.216.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 369C64B14F
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Jun 2021 03:37:51 -0400 (EDT)
-Received: by mail-pj1-f50.google.com with SMTP id k5so4990287pjj.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Jun 2021 00:37:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chromium.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=16WTMv4TM6XRqCXu1WqfhwXLGUuF1I5eSAZgF8nuzNU=;
- b=j1IBKqLi1jF1pVyyqujoaaEyDD956vhQFsW4IqQOy9pFHxew6pDCRuHqUYQPzXhgIV
- rZzKBOewFTMPizmmlwFMEzkUu3wwxGe2e89oLtXslKb8oDVXALVjACeulmB5NJhacKR6
- l2tBxaC35ppPnNjz4UkRwFuKRG263fy/OfW/I=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=16WTMv4TM6XRqCXu1WqfhwXLGUuF1I5eSAZgF8nuzNU=;
- b=g2hz0G3QnP+f4ii4xWlEIwY3Y5j7Q4Tgr+oxDJo3M82ubeKy4O9k/qQWXFGQQ9DQhQ
- sJ4qxluWFU1uJ1y/RU8dOYppOtMYuovFqmg/QWfmGciQ48pF8qRA9Hmdp8iGZ7Dd3VKf
- w5XNPAcYMY49iLx81FeI31O5olLoCRREAmDVz+yM0XffakOkj+52DCBHNvqkdwVgQ1sh
- z8dz0Np/48+slYB0CR8/LMesc34CN7YXkUMehKmUdMRRGj4mHpguQNyAxt9PNquvUQTz
- Qs+FcevXKKnsU3t6Gb6zUOYcOibTtXuwTW+ZilnJX2lPTQ7g8kZJDd/vq169K5BgC7Mb
- LjnQ==
-X-Gm-Message-State: AOAM5320snjTkDjwUZRczskCe2Zf5PMzCDevxdVZj58r0VBClc5qCsoE
- YGNJt8oJ3JEuH/piRI2BCbwUGQ==
-X-Google-Smtp-Source: ABdhPJyNGzGIGPRke+4sy9vknoJlahbCbtDrQ1Pof1+x3qW6lrR+9qBg5laf4ZCLScq2FNWqiUDGlQ==
-X-Received: by 2002:a17:90b:b18:: with SMTP id
- bf24mr9795691pjb.220.1624606670432; 
- Fri, 25 Jun 2021 00:37:50 -0700 (PDT)
-Received: from localhost ([2401:fa00:8f:203:1492:9d4f:19fa:df61])
- by smtp.gmail.com with UTF8SMTPSA id j10sm4395324pjb.36.2021.06.25.00.37.45
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 25 Jun 2021 00:37:50 -0700 (PDT)
-From: David Stevens <stevensd@chromium.org>
-X-Google-Original-From: David Stevens <stevensd@google.com>
-To: Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Paul Mackerras <paulus@ozlabs.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Nick Piggin <npiggin@gmail.com>
-Subject: [PATCH v2 5/5] KVM: mmu: remove over-aggressive warnings
-Date: Fri, 25 Jun 2021 16:36:16 +0900
-Message-Id: <20210625073616.2184426-6-stevensd@google.com>
-X-Mailer: git-send-email 2.32.0.93.g670b81a890-goog
-In-Reply-To: <20210625073616.2184426-1-stevensd@google.com>
-References: <20210625073616.2184426-1-stevensd@google.com>
+ with ESMTP id 73EqPyqWkyzK for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 25 Jun 2021 09:44:31 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E34F24B137
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Jun 2021 09:44:30 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id B0882617ED;
+ Fri, 25 Jun 2021 13:44:29 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1lwm8B-009pWm-KJ; Fri, 25 Jun 2021 14:44:27 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: [GIT PULL] KVM/arm64 updates for 5.14
+Date: Fri, 25 Jun 2021 14:43:57 +0100
+Message-Id: <20210625134357.12804-1-maz@kernel.org>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-X-Mailman-Approved-At: Fri, 25 Jun 2021 06:11:50 -0400
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-mips@vger.kernel.org,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- Joerg Roedel <joro@8bytes.org>, Zhi Wang <zhi.a.wang@intel.com>,
- intel-gfx@lists.freedesktop.org, kvm-ppc@vger.kernel.org,
- Zhenyu Wang <zhenyuw@linux.intel.com>, intel-gvt-dev@lists.freedesktop.org,
- linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
- Sean Christopherson <seanjc@google.com>, linux-kernel@vger.kernel.org,
- David Stevens <stevensd@chromium.org>, Vitaly Kuznetsov <vkuznets@redhat.com>,
- linuxppc-dev@lists.ozlabs.org
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com,
+ drjones@redhat.com, ardb@kernel.org, catalin.marinas@arm.com, tabba@google.com,
+ jinankj@amazon.de, zhukeqian1@huawei.com, mark.rutland@arm.com,
+ qperret@google.com, ricarkol@google.com, steven.price@arm.com, will@kernel.org,
+ wangyanan55@huawei.com, james.morse@arm.com, suzuki.poulose@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvmarm@lists.cs.columbia.edu, kernel-team@android.com, kvm@vger.kernel.org,
+ Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
+ Steven Price <steven.price@arm.com>, linux-arm-kernel@lists.infradead.org,
+ Jinank Jain <jinankj@amazon.de>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -109,51 +84,236 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: David Stevens <stevensd@chromium.org>
+Hi Paolo,
 
-Remove two warnings that require ref counts for pages to be non-zero, as
-mapped pfns from follow_pfn may not have an initialized ref count.
+Here's the 5.14 pull request for 5.14. This round, plenty of changes
+in the mm department (MTE, CMOs, device mappings, host S2), but also
+a lot of work in the selftest infrastructure. On top of that, a few
+PMU fixes, and the ability to run guests on the M1...
 
-Signed-off-by: David Stevens <stevensd@chromium.org>
----
- arch/x86/kvm/mmu/mmu.c | 7 -------
- virt/kvm/kvm_main.c    | 2 +-
- 2 files changed, 1 insertion(+), 8 deletions(-)
+Note that we carry a branch (arm64/for-next/caches) shared with the
+arm64 tree in order to avoid ugly conflicts. You will still get a few
+minor ones with the PPC tree, but the resolution is obvious.
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index dd5cb6e33591..0c47245594c6 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -607,13 +607,6 @@ static int mmu_spte_clear_track_bits(u64 *sptep)
- 
- 	pfn = spte_to_pfn(old_spte);
- 
--	/*
--	 * KVM does not hold the refcount of the page used by
--	 * kvm mmu, before reclaiming the page, we should
--	 * unmap it from mmu first.
--	 */
--	WARN_ON(!kvm_is_reserved_pfn(pfn) && !page_count(pfn_to_page(pfn)));
--
- 	if (is_accessed_spte(old_spte))
- 		kvm_set_pfn_accessed(pfn);
- 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 1de8702845ac..ce7126bab4b0 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -168,7 +168,7 @@ bool kvm_is_zone_device_pfn(kvm_pfn_t pfn)
- 	 * the device has been pinned, e.g. by get_user_pages().  WARN if the
- 	 * page_count() is zero to help detect bad usage of this helper.
- 	 */
--	if (!pfn_valid(pfn) || WARN_ON_ONCE(!page_count(pfn_to_page(pfn))))
-+	if (!pfn_valid(pfn) || !page_count(pfn_to_page(pfn)))
- 		return false;
- 
- 	return is_zone_device_page(pfn_to_page(pfn));
--- 
-2.32.0.93.g670b81a890-goog
+Oh, and each merge commit has a full description of what they contain.
+Hopefully we won't get yelled at this time.
 
+Please pull,
+
+	M.
+
+The following changes since commit 8124c8a6b35386f73523d27eacb71b5364a68c4c:
+
+  Linux 5.13-rc4 (2021-05-30 11:58:25 -1000)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-5.14
+
+for you to fetch changes up to 188982cda00ebfe28b50c2905d9bbaa2e9a001b9:
+
+  Merge branch kvm-arm64/mmu/mte into kvmarm-master/next (2021-06-25 14:25:56 +0100)
+
+----------------------------------------------------------------
+KVM/arm64 updates for v5.14.
+
+- Add MTE support in guests, complete with tag save/restore interface
+- Reduce the impact of CMOs by moving them in the page-table code
+- Allow device block mappings at stage-2
+- Reduce the footprint of the vmemmap in protected mode
+- Support the vGIC on dumb systems such as the Apple M1
+- Add selftest infrastructure to support multiple configuration
+  and apply that to PMU/non-PMU setups
+- Add selftests for the debug architecture
+- The usual crop of PMU fixes
+
+----------------------------------------------------------------
+Alexandru Elisei (1):
+      KVM: arm64: Don't zero the cycle count register when PMCR_EL0.P is set
+
+Andrew Jones (5):
+      KVM: arm64: selftests: get-reg-list: Introduce vcpu configs
+      KVM: arm64: selftests: get-reg-list: Prepare to run multiple configs at once
+      KVM: arm64: selftests: get-reg-list: Provide config selection option
+      KVM: arm64: selftests: get-reg-list: Remove get-reg-list-sve
+      KVM: arm64: selftests: get-reg-list: Split base and pmu registers
+
+Fuad Tabba (16):
+      arm64: Apply errata to swsusp_arch_suspend_exit
+      arm64: Do not enable uaccess for flush_icache_range
+      arm64: Do not enable uaccess for invalidate_icache_range
+      arm64: Downgrade flush_icache_range to invalidate
+      arm64: assembler: remove user_alt
+      arm64: Move documentation of dcache_by_line_op
+      arm64: Fix comments to refer to correct function __flush_icache_range
+      arm64: __inval_dcache_area to take end parameter instead of size
+      arm64: dcache_by_line_op to take end parameter instead of size
+      arm64: __flush_dcache_area to take end parameter instead of size
+      arm64: __clean_dcache_area_poc to take end parameter instead of size
+      arm64: __clean_dcache_area_pop to take end parameter instead of size
+      arm64: __clean_dcache_area_pou to take end parameter instead of size
+      arm64: sync_icache_aliases to take end parameter instead of size
+      arm64: Fix cache maintenance function comments
+      arm64: Rename arm64-internal cache maintenance functions
+
+Keqian Zhu (2):
+      KVM: arm64: Remove the creation time's mapping of MMIO regions
+      KVM: arm64: Try stage2 block mapping for host device MMIO
+
+Marc Zyngier (22):
+      irqchip/gic: Split vGIC probing information from the GIC code
+      KVM: arm64: Handle physical FIQ as an IRQ while running a guest
+      KVM: arm64: vgic: Be tolerant to the lack of maintenance interrupt masking
+      KVM: arm64: vgic: Let an interrupt controller advertise lack of HW deactivation
+      KVM: arm64: vgic: move irq->get_input_level into an ops structure
+      KVM: arm64: vgic: Implement SW-driven deactivation
+      KVM: arm64: timer: Refactor IRQ configuration
+      KVM: arm64: timer: Add support for SW-based deactivation
+      irqchip/apple-aic: Advertise some level of vGICv3 compatibility
+      Merge branch kvm-arm64/m1 into kvmarm-master/next
+      Merge branch kvm-arm64/mmu/MMIO-block-mapping into kvmarm-master/next
+      Merge branch kvm-arm64/mmu/reduce-vmemmap-overhead into kvmarm-master/next
+      Merge branch kvm-arm64/selftest/debug into kvmarm-master/next
+      Merge branch kvm-arm64/mmu/stage2-cmos into kvmarm-master/next
+      KVM: arm64: Restore PMU configuration on first run
+      Merge branch kvm-arm64/pmu-fixes into kvmarm-master/next
+      Merge branch arm64/for-next/caches into kvmarm-master/next
+      KVM: arm64: Update MAINTAINERS to include selftests
+      Merge branch kvm-arm64/selftest/sysreg-list-fix into kvmarm-master/next
+      Merge branch kvm-arm64/mmu/mte into kvmarm-master/next
+      KVM: arm64: Set the MTE tag bit before releasing the page
+      Merge branch kvm-arm64/mmu/mte into kvmarm-master/next
+
+Mark Rutland (2):
+      arm64: assembler: replace `kaddr` with `addr`
+      arm64: assembler: add conditional cache fixups
+
+Quentin Perret (7):
+      KVM: arm64: Move hyp_pool locking out of refcount helpers
+      KVM: arm64: Use refcount at hyp to check page availability
+      KVM: arm64: Remove list_head from hyp_page
+      KVM: arm64: Unify MMIO and mem host stage-2 pools
+      KVM: arm64: Remove hyp_pool pointer from struct hyp_page
+      KVM: arm64: Use less bits for hyp_page order
+      KVM: arm64: Use less bits for hyp_page refcount
+
+Ricardo Koller (6):
+      KVM: selftests: Rename vm_handle_exception
+      KVM: selftests: Complete x86_64/sync_regs_test ucall
+      KVM: selftests: Introduce UCALL_UNHANDLED for unhandled vector reporting
+      KVM: selftests: Move GUEST_ASSERT_EQ to utils header
+      KVM: selftests: Add exception handling support for aarch64
+      KVM: selftests: Add aarch64/debug-exceptions test
+
+Steven Price (6):
+      arm64: mte: Sync tags for pages where PTE is untagged
+      KVM: arm64: Introduce MTE VM feature
+      KVM: arm64: Save/restore MTE registers
+      KVM: arm64: Expose KVM_ARM_CAP_MTE
+      KVM: arm64: Add ioctl to fetch/store tags in a guest
+      KVM: arm64: Document MTE capability and ioctl
+
+Yanan Wang (4):
+      KVM: arm64: Introduce two cache maintenance callbacks
+      KVM: arm64: Introduce mm_ops member for structure stage2_attr_data
+      KVM: arm64: Tweak parameters of guest cache maintenance functions
+      KVM: arm64: Move guest CMOs to the fault handlers
+
+ Documentation/virt/kvm/api.rst                     |  61 +++
+ MAINTAINERS                                        |   2 +
+ arch/arm64/include/asm/alternative-macros.h        |   5 -
+ arch/arm64/include/asm/arch_gicv3.h                |   3 +-
+ arch/arm64/include/asm/assembler.h                 |  80 ++--
+ arch/arm64/include/asm/cacheflush.h                |  71 ++--
+ arch/arm64/include/asm/efi.h                       |   2 +-
+ arch/arm64/include/asm/kvm_arm.h                   |   3 +-
+ arch/arm64/include/asm/kvm_emulate.h               |   3 +
+ arch/arm64/include/asm/kvm_host.h                  |  14 +
+ arch/arm64/include/asm/kvm_mmu.h                   |  17 +-
+ arch/arm64/include/asm/kvm_mte.h                   |  66 ++++
+ arch/arm64/include/asm/kvm_pgtable.h               |  42 +-
+ arch/arm64/include/asm/mte-def.h                   |   1 +
+ arch/arm64/include/asm/mte.h                       |   4 +-
+ arch/arm64/include/asm/pgtable.h                   |  22 +-
+ arch/arm64/include/asm/sysreg.h                    |   3 +-
+ arch/arm64/include/uapi/asm/kvm.h                  |  11 +
+ arch/arm64/kernel/alternative.c                    |   2 +-
+ arch/arm64/kernel/asm-offsets.c                    |   2 +
+ arch/arm64/kernel/efi-entry.S                      |   9 +-
+ arch/arm64/kernel/head.S                           |  13 +-
+ arch/arm64/kernel/hibernate-asm.S                  |   7 +-
+ arch/arm64/kernel/hibernate.c                      |  20 +-
+ arch/arm64/kernel/idreg-override.c                 |   3 +-
+ arch/arm64/kernel/image-vars.h                     |   2 +-
+ arch/arm64/kernel/insn.c                           |   2 +-
+ arch/arm64/kernel/kaslr.c                          |  12 +-
+ arch/arm64/kernel/machine_kexec.c                  |  30 +-
+ arch/arm64/kernel/mte.c                            |  18 +-
+ arch/arm64/kernel/probes/uprobes.c                 |   2 +-
+ arch/arm64/kernel/smp.c                            |   8 +-
+ arch/arm64/kernel/smp_spin_table.c                 |   7 +-
+ arch/arm64/kernel/sys_compat.c                     |   2 +-
+ arch/arm64/kvm/arch_timer.c                        | 162 ++++++--
+ arch/arm64/kvm/arm.c                               |  22 +-
+ arch/arm64/kvm/guest.c                             |  86 ++++
+ arch/arm64/kvm/hyp/entry.S                         |   7 +
+ arch/arm64/kvm/hyp/exception.c                     |   3 +-
+ arch/arm64/kvm/hyp/hyp-entry.S                     |   6 +-
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h         |  21 +
+ arch/arm64/kvm/hyp/include/nvhe/gfp.h              |  45 +--
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h      |   2 +-
+ arch/arm64/kvm/hyp/include/nvhe/memory.h           |   7 +-
+ arch/arm64/kvm/hyp/include/nvhe/mm.h               |  13 +-
+ arch/arm64/kvm/hyp/nvhe/cache.S                    |   4 +-
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c              |  60 +--
+ arch/arm64/kvm/hyp/nvhe/page_alloc.c               | 112 ++++--
+ arch/arm64/kvm/hyp/nvhe/setup.c                    |  33 +-
+ arch/arm64/kvm/hyp/nvhe/tlb.c                      |   2 +-
+ arch/arm64/kvm/hyp/pgtable.c                       |  61 ++-
+ arch/arm64/kvm/hyp/reserved_mem.c                  |   3 +-
+ arch/arm64/kvm/mmu.c                               | 196 ++++++---
+ arch/arm64/kvm/pmu-emul.c                          |   4 +
+ arch/arm64/kvm/reset.c                             |   4 +
+ arch/arm64/kvm/sys_regs.c                          |  32 +-
+ arch/arm64/kvm/vgic/vgic-init.c                    |  36 +-
+ arch/arm64/kvm/vgic/vgic-v2.c                      |  19 +-
+ arch/arm64/kvm/vgic/vgic-v3.c                      |  19 +-
+ arch/arm64/kvm/vgic/vgic.c                         |  14 +-
+ arch/arm64/lib/uaccess_flushcache.c                |   4 +-
+ arch/arm64/mm/cache.S                              | 158 ++++----
+ arch/arm64/mm/flush.c                              |  29 +-
+ drivers/irqchip/irq-apple-aic.c                    |   9 +
+ drivers/irqchip/irq-gic-common.c                   |  13 -
+ drivers/irqchip/irq-gic-common.h                   |   2 -
+ drivers/irqchip/irq-gic-v3.c                       |   6 +-
+ drivers/irqchip/irq-gic.c                          |   6 +-
+ include/kvm/arm_vgic.h                             |  41 +-
+ include/linux/irqchip/arm-gic-common.h             |  25 +-
+ include/linux/irqchip/arm-vgic-info.h              |  45 +++
+ include/uapi/linux/kvm.h                           |   2 +
+ tools/testing/selftests/kvm/.gitignore             |   2 +-
+ tools/testing/selftests/kvm/Makefile               |   4 +-
+ .../selftests/kvm/aarch64/debug-exceptions.c       | 250 ++++++++++++
+ .../selftests/kvm/aarch64/get-reg-list-sve.c       |   3 -
+ tools/testing/selftests/kvm/aarch64/get-reg-list.c | 439 +++++++++++++++------
+ .../selftests/kvm/include/aarch64/processor.h      |  83 +++-
+ tools/testing/selftests/kvm/include/kvm_util.h     |  23 +-
+ .../selftests/kvm/include/x86_64/processor.h       |   4 +-
+ tools/testing/selftests/kvm/lib/aarch64/handlers.S | 126 ++++++
+ .../testing/selftests/kvm/lib/aarch64/processor.c  |  97 +++++
+ tools/testing/selftests/kvm/lib/x86_64/processor.c |  23 +-
+ tools/testing/selftests/kvm/x86_64/evmcs_test.c    |   4 +-
+ tools/testing/selftests/kvm/x86_64/kvm_pv_test.c   |   2 +-
+ .../testing/selftests/kvm/x86_64/sync_regs_test.c  |   7 +-
+ tools/testing/selftests/kvm/x86_64/tsc_msrs_test.c |   9 -
+ .../selftests/kvm/x86_64/userspace_msr_exit_test.c |   8 +-
+ .../testing/selftests/kvm/x86_64/xapic_ipi_test.c  |   2 +-
+ 89 files changed, 2208 insertions(+), 740 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kvm_mte.h
+ create mode 100644 include/linux/irqchip/arm-vgic-info.h
+ create mode 100644 tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+ delete mode 100644 tools/testing/selftests/kvm/aarch64/get-reg-list-sve.c
+ create mode 100644 tools/testing/selftests/kvm/lib/aarch64/handlers.S
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
