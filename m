@@ -2,65 +2,82 @@ Return-Path: <SRS0=4KxT=LZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50494C11F64
-	for <kvmarm@archiver.kernel.org>; Thu,  1 Jul 2021 14:08:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68410C11F64
+	for <kvmarm@archiver.kernel.org>; Thu,  1 Jul 2021 14:32:36 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C74FD60C3F
-	for <kvmarm@archiver.kernel.org>; Thu,  1 Jul 2021 14:08:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C74FD60C3F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id D4DBF6140B
+	for <kvmarm@archiver.kernel.org>; Thu,  1 Jul 2021 14:32:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4DBF6140B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 68FE4407F1;
-	Thu,  1 Jul 2021 10:08:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 503474B089;
+	Thu,  1 Jul 2021 10:32:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id XtnqQX1Kg8ZF; Thu,  1 Jul 2021 10:08:32 -0400 (EDT)
+	with ESMTP id rZM5HHZK1Gs1; Thu,  1 Jul 2021 10:32:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A90C4A4A0;
-	Thu,  1 Jul 2021 10:08:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 54DE540CC5;
+	Thu,  1 Jul 2021 10:32:34 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C3DB54086A
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Jul 2021 10:08:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C8CF240CC5
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Jul 2021 10:32:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id l6ghndO3y+s0 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  1 Jul 2021 10:08:29 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 86CAA407F1
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Jul 2021 10:08:29 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 77D0760C3F;
- Thu,  1 Jul 2021 14:08:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1625148507;
- bh=W2O2HBHukE33uMewYGpE7LxhKSgNZJIn7NkYzwJ7ikg=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=MO+grJJKr0XxaJkjyEfZ/BDWdVlpLG5EBsSlytYRjEe5fVdBr6Z772606mcaxTMVB
- PP6y28MY9woGBGGurYkrHvwwsvYW3YkddFhYqMTkeBafQALsNQF19sC70RLDtKWMGS
- 6hXXO1WsQ3RGLa5kj3R6quVptIEj+o+4PQucqepNgrK1bLn+GqlrB3jUO5VCQUJBWu
- ybhKh7wk0N/udlR1YAO0TM25NPa2SXNnKfh/X3W9lh6SSAsyC6XYfl1NmW7gDjOT5l
- TyGYzCFOVQmR+WWfvU8Ob9JzR9EbdXsaU+wB3Nbt4rHi1DbLr0acfRuk8gGMnLG4nn
- 4aWzq0PJFyj7g==
-Date: Thu, 1 Jul 2021 15:08:22 +0100
-From: Will Deacon <will@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH v2 09/13] KVM: arm64: Add trap handlers for protected VMs
-Message-ID: <20210701140821.GI9757@willie-the-truck>
-References: <20210615133950.693489-1-tabba@google.com>
- <20210615133950.693489-10-tabba@google.com>
+ with ESMTP id NoKKO9s9NX9F for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  1 Jul 2021 10:32:31 -0400 (EDT)
+Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com
+ [209.85.210.44])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DFB034080B
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Jul 2021 10:32:31 -0400 (EDT)
+Received: by mail-ot1-f44.google.com with SMTP id
+ n99-20020a9d206c0000b029045d4f996e62so6712598ota.4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 01 Jul 2021 07:32:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=GTWJSM0xuYeJ1qxgbQHiMwUUzauF3cOKfHO15I4MhOw=;
+ b=EygC7C1OvqQkptipYOSfVSwUc6YZNt5+lNvyBzvRWkOWnirOZ5wZ5dEsoamkLJSrj5
+ /9B6RCY00Jxl7hENRq7PzVM0E7y+LFl/Zq9En80e2xztq0ZfSTeBnb2rLBJ0B7btNNvu
+ VmYVBwzU4mhxmPmzpctJscT43Ul9Jn2DCd5DgNc3sB3joylfXFKMVIz5uHQzyQXU7iZV
+ AvsFjjNLNPQWuSh2bM7QffkAjjXVhneH9SBuMvihGyPgnRcaQqd9047WD3+O7z9yiXXX
+ N35Cvz55rAMmglMiCW5pr9ff+HoAErFWVkAA+hb05qKN9wEBJSrop38E/WXO+MK+WD+z
+ AXdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=GTWJSM0xuYeJ1qxgbQHiMwUUzauF3cOKfHO15I4MhOw=;
+ b=uMnDNW5FReia5s7+dKUsYPxLf7lw0vctJTl4DnOaDslOW+D6TRvfYV4PqTki6nSrcw
+ kiBHQSQT9IFYdJyi/r75AoaZQ9DOdP9GFw7hn5NUv4G8FfpcjbKmtIpa8aXVjadmZhBM
+ HCjN++POl5paTF0aPqT1bbwaiHxafeo5/qBf4e4yBD50iL7C/F3qbk8nOBYEtSTGE93u
+ xwEuly7BXiJsovWAu0YScJyr5yoW045iAnXcMoUXxsvuisdg/m9I5zGyHdzHb8jyWmIt
+ IK6+71duYxEuB0oLTg6TRBrg5NEDbpJMXDYechakG0LCz5xrwVI3R8/oFG5IxIEQMpk7
+ VDbw==
+X-Gm-Message-State: AOAM531yvRlIoSxhzBhh903a2ClgngvDWnZz12osd3mwR2uIs7Kf5FyC
+ ahtzFTiHRxt8YYr1F6phpzfaFfl6wnzsnY1cU6DhNQ==
+X-Google-Smtp-Source: ABdhPJzW0WFDucrNK/jthp+c5o1CjayKDRPKm1VqM1CogtX3ulAO6RQp4oH+Gl/UqH7nsn/hycliW0RuWuVZ1PFLkpU=
+X-Received: by 2002:a05:6830:18da:: with SMTP id
+ v26mr262263ote.144.1625149951088; 
+ Thu, 01 Jul 2021 07:32:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210615133950.693489-10-tabba@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20210615133950.693489-1-tabba@google.com>
+ <20210615133950.693489-7-tabba@google.com>
+ <20210701132244.GF9757@willie-the-truck>
+In-Reply-To: <20210701132244.GF9757@willie-the-truck>
+From: Fuad Tabba <tabba@google.com>
+Date: Thu, 1 Jul 2021 15:31:54 +0100
+Message-ID: <CA+EHjTwcJaQtgJK8Wiqj1W+oyNU8oycGdR0Kk-+5BJbyj5oEPQ@mail.gmail.com>
+Subject: Re: [PATCH v2 06/13] KVM: arm64: Add feature register flag definitions
+To: Will Deacon <will@kernel.org>
 Cc: kernel-team@android.com, kvm@vger.kernel.org, maz@kernel.org,
  pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
@@ -80,129 +97,50 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Jun 15, 2021 at 02:39:46PM +0100, Fuad Tabba wrote:
-> Add trap handlers for protected VMs. These are mainly for Sys64
-> and debug traps.
+Hi Will,
 
-I think one big thing missing from this patch is some rationale around
-which features are advertised and which are not. Further, when traps
-are enabled later on, there doesn't seem to be one place which drives the
-logic, so it's quite hard to reason about.
+On Thu, Jul 1, 2021 at 2:22 PM Will Deacon <will@kernel.org> wrote:
+>
+> On Tue, Jun 15, 2021 at 02:39:43PM +0100, Fuad Tabba wrote:
+> > Add feature register flag definitions to clarify which features
+> > might be supported.
+> >
+> > No functional change intended.
+> >
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > ---
+> >  arch/arm64/include/asm/sysreg.h | 9 +++++++++
+> >  1 file changed, 9 insertions(+)
+> >
+> > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> > index 65d15700a168..42bcc5102d10 100644
+> > --- a/arch/arm64/include/asm/sysreg.h
+> > +++ b/arch/arm64/include/asm/sysreg.h
+> > @@ -789,6 +789,10 @@
+> >  #define ID_AA64PFR0_FP_SUPPORTED     0x0
+> >  #define ID_AA64PFR0_ASIMD_NI         0xf
+> >  #define ID_AA64PFR0_ASIMD_SUPPORTED  0x0
+> > +#define ID_AA64PFR0_EL3_64BIT_ONLY   0x1
+> > +#define ID_AA64PFR0_EL3_32BIT_64BIT  0x2
+> > +#define ID_AA64PFR0_EL2_64BIT_ONLY   0x1
+> > +#define ID_AA64PFR0_EL2_32BIT_64BIT  0x2
+> >  #define ID_AA64PFR0_EL1_64BIT_ONLY   0x1
+> >  #define ID_AA64PFR0_EL1_32BIT_64BIT  0x2
+> >  #define ID_AA64PFR0_EL0_64BIT_ONLY   0x1
+>
+> Maybe just consolidate all of these into two definitions:
+>
+>   #define ID_AA64PFR0_ELx_64BIT_ONLY   0x1
+>   #define ID_AA64PFR0_ELx_32BIT_64BIT  0x2
 
-So I think we need both some documentation to describe the architectural
-environment provided to protected VMs, but also a way to couple the logic
-which says "We hide this feature from the ID registers because of foo"
-with the logic that says "And here is the control bit to trap this feature".
+Will do.
 
-Otherwise, it's very hard to ensure that this is (and remains) consistent.
-It would also make it easier to review :)
+Cheers,
+/fuad
 
-> No functional change intended as these are not hooked in yet.
-> 
-> Signed-off-by: Fuad Tabba <tabba@google.com>
-> ---
->  arch/arm64/include/asm/kvm_hyp.h   |   3 +
->  arch/arm64/kvm/arm.c               |   3 +
->  arch/arm64/kvm/hyp/nvhe/Makefile   |   2 +-
->  arch/arm64/kvm/hyp/nvhe/sys_regs.c | 475 +++++++++++++++++++++++++++++
->  4 files changed, 482 insertions(+), 1 deletion(-)
->  create mode 100644 arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> 
-> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-> index 9d60b3006efc..7e81e42107e1 100644
-> --- a/arch/arm64/include/asm/kvm_hyp.h
-> +++ b/arch/arm64/include/asm/kvm_hyp.h
-> @@ -115,7 +115,10 @@ int __pkvm_init(phys_addr_t phys, unsigned long size, unsigned long nr_cpus,
->  void __noreturn __host_enter(struct kvm_cpu_context *host_ctxt);
->  #endif
->  
-> +extern u64 kvm_nvhe_sym(id_aa64pfr0_el1_sys_val);
-> +extern u64 kvm_nvhe_sym(id_aa64pfr1_el1_sys_val);
->  extern u64 kvm_nvhe_sym(id_aa64mmfr0_el1_sys_val);
->  extern u64 kvm_nvhe_sym(id_aa64mmfr1_el1_sys_val);
-> +extern u64 kvm_nvhe_sym(id_aa64mmfr2_el1_sys_val);
->  
->  #endif /* __ARM64_KVM_HYP_H__ */
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index d71da6089822..363493395eba 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -1751,8 +1751,11 @@ static int kvm_hyp_init_protection(u32 hyp_va_bits)
->  	void *addr = phys_to_virt(hyp_mem_base);
->  	int ret;
->  
-> +	kvm_nvhe_sym(id_aa64pfr0_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
-> +	kvm_nvhe_sym(id_aa64pfr1_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64PFR1_EL1);
->  	kvm_nvhe_sym(id_aa64mmfr0_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
->  	kvm_nvhe_sym(id_aa64mmfr1_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
-> +	kvm_nvhe_sym(id_aa64mmfr2_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64MMFR2_EL1);
->  
->  	ret = create_hyp_mappings(addr, addr + hyp_mem_size, PAGE_HYP);
->  	if (ret)
-> diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-> index 5df6193fc430..a23f417a0c20 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/Makefile
-> +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-> @@ -14,7 +14,7 @@ lib-objs := $(addprefix ../../../lib/, $(lib-objs))
->  
->  obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o \
->  	 hyp-main.o hyp-smp.o psci-relay.o early_alloc.o stub.o page_alloc.o \
-> -	 cache.o setup.o mm.o mem_protect.o
-> +	 cache.o setup.o mm.o mem_protect.o sys_regs.o
->  obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
->  	 ../fpsimd.o ../hyp-entry.o ../exception.o ../pgtable.o
->  obj-y += $(lib-objs)
-> diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> new file mode 100644
-> index 000000000000..ab09ccc64fea
-> --- /dev/null
-> +++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> @@ -0,0 +1,475 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (C) 2021 Google LLC
-> + * Author: Fuad Tabba <tabba@google.com>
-> + */
-> +
-> +#include <linux/kvm_host.h>
-> +
-> +#include <asm/kvm_asm.h>
-> +#include <asm/kvm_emulate.h>
-> +#include <asm/kvm_mmu.h>
-> +
-> +#include <hyp/adjust_pc.h>
-> +
-> +#include "../../sys_regs.h"
-> +
-> +/*
-> + * Copies of the host's CPU features registers holding sanitized values.
-> + */
-> +u64 id_aa64pfr0_el1_sys_val;
-> +u64 id_aa64pfr1_el1_sys_val;
-> +u64 id_aa64mmfr2_el1_sys_val;
-> +
-> +/*
-> + * Inject an undefined exception to the guest.
-> + */
-> +static void inject_undef(struct kvm_vcpu *vcpu)
-> +{
-> +	u32 esr = (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT);
-> +
-> +	vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA64_EL1 |
-> +			     KVM_ARM64_EXCEPT_AA64_ELx_SYNC |
-> +			     KVM_ARM64_PENDING_EXCEPTION);
-
-Has vcpu_cpsr(vcpu) been populated as part of the trap? I couldn't spot
-that, but __kvm_adjust_pc(vcpu) goes and reads that information.
-
-> +	__kvm_adjust_pc(vcpu);
-> +
-> +	write_sysreg_el1(esr, SYS_ESR);
-> +	write_sysreg_el1(read_sysreg_el2(SYS_ELR), SYS_ELR);
-> +	write_sysreg_el2(*vcpu_pc(vcpu), SYS_ELR);
-> +	write_sysreg_el2(*vcpu_cpsr(vcpu), SYS_SPSR);
-
-Will
+> ?
+>
+> Will
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
