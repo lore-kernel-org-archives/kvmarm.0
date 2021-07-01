@@ -2,84 +2,85 @@ Return-Path: <SRS0=4KxT=LZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E31DC11F64
-	for <kvmarm@archiver.kernel.org>; Thu,  1 Jul 2021 14:59:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68BEFC11F6B
+	for <kvmarm@archiver.kernel.org>; Thu,  1 Jul 2021 15:41:14 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id EA2656128C
-	for <kvmarm@archiver.kernel.org>; Thu,  1 Jul 2021 14:59:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA2656128C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id DCD076141D
+	for <kvmarm@archiver.kernel.org>; Thu,  1 Jul 2021 15:41:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCD076141D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=suse.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 687444A4C0;
-	Thu,  1 Jul 2021 10:59:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DF0C4ACC9;
+	Thu,  1 Jul 2021 11:41:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@suse.com
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@suse.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id hqTmxcN7DaJZ; Thu,  1 Jul 2021 10:59:34 -0400 (EDT)
+	with ESMTP id YlC9V51uDvIG; Thu,  1 Jul 2021 11:41:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D4DB4A551;
-	Thu,  1 Jul 2021 10:59:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E9844B080;
+	Thu,  1 Jul 2021 11:41:12 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8210B4A4C0
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Jul 2021 10:59:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 36C984A95C
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Jul 2021 11:41:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id J8m4+xwsib+Q for <kvmarm@lists.cs.columbia.edu>;
- Thu,  1 Jul 2021 10:59:32 -0400 (EDT)
-Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com
- [209.85.167.171])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 76BD340874
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Jul 2021 10:59:32 -0400 (EDT)
-Received: by mail-oi1-f171.google.com with SMTP id w127so7545021oig.12
- for <kvmarm@lists.cs.columbia.edu>; Thu, 01 Jul 2021 07:59:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=ltmhFCjb1WelitfArWc9DX2nLRCgQFqidnyjLJbZMyU=;
- b=EkW9I5Hw9T7Mg3qzdaW7TNoGNc0FAw7z/Tz693senj6TSQVMaoO9C5+G8no3WO5QUQ
- L/3hqNEzTF6sgam0DWFKbhtrIjPGIDPyk/Raok4vgFbuOJr495w7U4MLaEwOmLFmIQFV
- ii7a5JdB0xwrhdXAC1RLPkqwhUOEina074K8j/o9J3k3aExEf6ttdrH/Pns2+zVcPSc/
- /pm9JxrevtuwcYWahKFxt7SLlH9PGvUHVy7NDOOw5PozStUs3Zjan5fhTN4Hj4cxZYm5
- 0YZvxxFfmx3gQbeMrI5zR85IiPb87texys/4CID3lZIyineyDFZrp9QI9zdgTp90wU+6
- dCkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=ltmhFCjb1WelitfArWc9DX2nLRCgQFqidnyjLJbZMyU=;
- b=Kc1UtBcU0SxG0W8xFa1tvyTZx/E/cdYXRxIjtXMx6vh6OWK4n65KNH/TfEjQlyDwz0
- nfgc4m++Z90pnyNtcFa/VNsqWtCJnAydaVAkRXY7OnDSx+tDQwdFu2BDon9Xxg3/7D5Y
- 3o/AhYenvi+oVN+4Wrt/YSIh0tZzY4i1yJnJduDy/dIUaQCQbU7VSwJB1olE0B6yMjTf
- 7wqhG2XwPuKPTVq9gGE8eT0+SGmTMy3u8LzV+GeCogDtXMpGhDVMjkRR2PZjrXpbLeyp
- 8OxIjtoUcki6//5k4v7R6qcIN3YOwwBoiCNhb95QwO6BW+1VtgG2x5FfRXX6apVSWSbe
- tpcw==
-X-Gm-Message-State: AOAM532KTtI9GaoYZmFhQhRBpU+98h2yzvxGNCZqVXuQ6Uq0uXg9TFry
- fsJpSd0zhbr521vAC/PxlkAWDw2zOSvXOPJlc/KAOg==
-X-Google-Smtp-Source: ABdhPJz7kZwgKADNdRptSCOhsnXccXkQQ52LRN1EzbPnXhsc9AMzr4LE8wtsRq7OyE83M21OVEMR1Sch+UK6Br6X3iE=
-X-Received: by 2002:a05:6808:158b:: with SMTP id
- t11mr1261355oiw.8.1625151571717; 
- Thu, 01 Jul 2021 07:59:31 -0700 (PDT)
+ with ESMTP id vV9+PEYuq0Iw for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  1 Jul 2021 11:41:10 -0400 (EDT)
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 16D304A7FD
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Jul 2021 11:41:10 -0400 (EDT)
+Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
+ (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by smtp-out1.suse.de (Postfix) with ESMTPS id A491022891;
+ Thu,  1 Jul 2021 15:41:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+ t=1625154068; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+ mime-version:mime-version: content-transfer-encoding:content-transfer-encoding;
+ bh=upovNwSZjv8f/iecsKALo/k8SCqL9R0LoxKlal4MHxw=;
+ b=b4fYRKsHielTGsj+p0iJjnZfPn8+LTBhqB6ZyhTEUT9lDbF2wSVPpn6+4aTMKANIhTHdkw
+ VgRt3j0/5duL08x9ABYMvZv+/vYaznkIaqmekSXYgQUAC+25fSOuVe1nsIuJwvXQ4zTv5z
+ 8mX/m1WcA9MsMHqfBDrh25S2ifLzPi8=
+Received: from imap3-int (imap-alt.suse-dmz.suse.de [192.168.254.47])
+ by imap.suse.de (Postfix) with ESMTP id 1D66011CD5;
+ Thu,  1 Jul 2021 15:41:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+ t=1625154068; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+ mime-version:mime-version: content-transfer-encoding:content-transfer-encoding;
+ bh=upovNwSZjv8f/iecsKALo/k8SCqL9R0LoxKlal4MHxw=;
+ b=b4fYRKsHielTGsj+p0iJjnZfPn8+LTBhqB6ZyhTEUT9lDbF2wSVPpn6+4aTMKANIhTHdkw
+ VgRt3j0/5duL08x9ABYMvZv+/vYaznkIaqmekSXYgQUAC+25fSOuVe1nsIuJwvXQ4zTv5z
+ 8mX/m1WcA9MsMHqfBDrh25S2ifLzPi8=
+Received: from director2.suse.de ([192.168.254.72]) by imap3-int with ESMTPSA
+ id lUxpBRTi3WAOFwAALh3uQQ
+ (envelope-from <jgross@suse.com>); Thu, 01 Jul 2021 15:41:08 +0000
+From: Juergen Gross <jgross@suse.com>
+To: linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: [PATCH 0/6] x86/kvm: add boot parameters for max vcpu configs
+Date: Thu,  1 Jul 2021 17:40:59 +0200
+Message-Id: <20210701154105.23215-1-jgross@suse.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-References: <20210615133950.693489-1-tabba@google.com>
- <20210615133950.693489-9-tabba@google.com>
- <20210701134823.GH9757@willie-the-truck>
-In-Reply-To: <20210701134823.GH9757@willie-the-truck>
-From: Fuad Tabba <tabba@google.com>
-Date: Thu, 1 Jul 2021 15:58:55 +0100
-Message-ID: <CA+EHjTzsx1jR9JWhN5iKENSi8ry-0-byF1wN_bTBmm3+qn6MdA@mail.gmail.com>
-Subject: Re: [PATCH v2 08/13] KVM: arm64: Guest exit handlers for nVHE hyp
-To: Will Deacon <will@kernel.org>
-Cc: kernel-team@android.com, kvm@vger.kernel.org, maz@kernel.org,
- pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Cc: Juergen Gross <jgross@suse.com>, Marc Zyngier <maz@kernel.org>,
+ Wanpeng Li <wanpengli@tencent.com>, Will Deacon <will@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Sean Christopherson <seanjc@google.com>,
+ Joerg Roedel <joro@8bytes.org>, kvmarm@lists.cs.columbia.edu,
+ Catalin Marinas <catalin.marinas@arm.com>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -96,59 +97,47 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Will,
+In order to be able to have a single kernel for supporting even huge
+numbers of vcpus per guest some arrays should be sized dynamically.
 
-On Thu, Jul 1, 2021 at 2:48 PM Will Deacon <will@kernel.org> wrote:
->
-> On Tue, Jun 15, 2021 at 02:39:45PM +0100, Fuad Tabba wrote:
-> > Add an array of pointers to handlers for various trap reasons in
-> > nVHE code.
-> >
-> > The current code selects how to fixup a guest on exit based on a
-> > series of if/else statements. Future patches will also require
-> > different handling for guest exists. Create an array of handlers
-> > to consolidate them.
-> >
-> > No functional change intended as the array isn't populated yet.
-> >
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > ---
-> >  arch/arm64/kvm/hyp/include/hyp/switch.h | 19 ++++++++++++++
-> >  arch/arm64/kvm/hyp/nvhe/switch.c        | 35 +++++++++++++++++++++++++
-> >  2 files changed, 54 insertions(+)
-> >
-> > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > index e4a2f295a394..f5d3d1da0aec 100644
-> > --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > @@ -405,6 +405,18 @@ static inline bool __hyp_handle_ptrauth(struct kvm_vcpu *vcpu)
-> >       return true;
-> >  }
-> >
-> > +typedef int (*exit_handle_fn)(struct kvm_vcpu *);
-> > +
-> > +exit_handle_fn kvm_get_nvhe_exit_handler(struct kvm_vcpu *vcpu);
-> > +
-> > +static exit_handle_fn kvm_get_hyp_exit_handler(struct kvm_vcpu *vcpu)
-> > +{
-> > +     if (is_nvhe_hyp_code())
-> > +             return kvm_get_nvhe_exit_handler(vcpu);
-> > +     else
-> > +             return NULL;
-> > +}
->
-> nit: might be a bit tidier with a ternary if (?:).
+The easiest way to do that is to add boot parameters for the maximum
+number of vcpus and the highest supported vcpu-id overwriting the
+normal default.
 
-Sure thing.
+This patch series is doing that for x86. The same scheme can be easily
+adapted to other architectures, but I don't want to do that in the
+first iteration.
 
-Thanks,
-/fuad
+In the long term I'd suggest to have a per-guest setting of the two
+parameters allowing to spare some memory for smaller guests. OTOH this
+would require new ioctl()s and respective qemu modifications, so I let
+those away for now.
 
-> But either way:
->
-> Acked-by: Will Deacon <will@kernel.org>
->
-> Will
+I've tested the series not to break normal guest operation and the new
+parameters to be effective on x86. For Arm64 I did a compile test only.
+
+Juergen Gross (6):
+  x86/kvm: fix vcpu-id indexed array sizes
+  x86/kvm: remove non-x86 stuff from arch/x86/kvm/ioapic.h
+  x86/kvm: add boot parameter for maximum vcpu-id
+  x86/kvm: introduce per cpu vcpu masks
+  kvm: allocate vcpu pointer array separately
+  x86/kvm: add boot parameter for setting max number of vcpus per guest
+
+ .../admin-guide/kernel-parameters.txt         | 18 +++++++
+ arch/arm64/kvm/arm.c                          | 28 +++++++++--
+ arch/x86/include/asm/kvm_host.h               | 22 ++++++---
+ arch/x86/kvm/hyperv.c                         | 25 +++++++---
+ arch/x86/kvm/ioapic.c                         | 14 +++++-
+ arch/x86/kvm/ioapic.h                         |  8 +--
+ arch/x86/kvm/irq_comm.c                       |  9 +++-
+ arch/x86/kvm/x86.c                            | 49 ++++++++++++++++++-
+ include/linux/kvm_host.h                      | 17 ++++++-
+ 9 files changed, 160 insertions(+), 30 deletions(-)
+
+-- 
+2.26.2
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
