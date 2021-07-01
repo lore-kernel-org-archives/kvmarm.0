@@ -1,187 +1,85 @@
-Return-Path: <SRS0=+T1+=LX=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=4KxT=LZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E7BCC11F66
-	for <kvmarm@archiver.kernel.org>; Tue, 29 Jun 2021 14:41:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84592C11F67
+	for <kvmarm@archiver.kernel.org>; Thu,  1 Jul 2021 09:45:42 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8BB3B61DC0
-	for <kvmarm@archiver.kernel.org>; Tue, 29 Jun 2021 14:41:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BB3B61DC0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	by mail.kernel.org (Postfix) with ESMTP id EE85961481
+	for <kvmarm@archiver.kernel.org>; Thu,  1 Jul 2021 09:45:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE85961481
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F2E5849FB7;
-	Tue, 29 Jun 2021 10:40:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E8B94B07F;
+	Thu,  1 Jul 2021 05:45:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@oracle.com
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@oracle.onmicrosoft.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 52TxGqemZM+H; Tue, 29 Jun 2021 10:40:58 -0400 (EDT)
+	with ESMTP id wjhNX5uGd1PT; Thu,  1 Jul 2021 05:45:40 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BD7ED4A173;
-	Tue, 29 Jun 2021 10:40:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B6F54A95C;
+	Thu,  1 Jul 2021 05:45:40 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4649449FB7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jun 2021 10:40:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BA58E4A95C
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Jul 2021 05:45:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RO8-ccsDPe8U for <kvmarm@lists.cs.columbia.edu>;
- Tue, 29 Jun 2021 10:40:56 -0400 (EDT)
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com
- [205.220.177.32])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 286D349F5F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jun 2021 10:40:56 -0400 (EDT)
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
- by mx0b-00069f02.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id
- 15TEWtv1014729; Tue, 29 Jun 2021 14:40:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=subject : to : cc :
- references : from : message-id : date : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2020-01-29;
- bh=bp+5wxKczOG8YNm+/XuQ79AzA/wuAaIPIVU7TGMY83w=;
- b=hmi3cq1DlLS/7abo7pTmbMhCGgH9k1G4FLyN/84ToEhTUpWQVG7jxn2bpyddWDuNga3R
- HIEcd6E/mSQIxbsHK3T/2KZcKWiicRlL9tk8J3S8O+RSiUnbEEPZmODndtUXy0yitZgr
- QNqbcXlT4RJyn6Z+Pv+lMZXA1kaJ2h19jZ+1L+7jdaEqMIcCD2ybOsix8j9uywpNUxq2
- osAU4IvQets78i9+VNpWpTHy7hPk8Be2uWHR8/GTSkIZKEqEhddB5VxxSCMiHznBZ/qz
- vxUsA1jdjBuyWoNCR/BIW1i1Qg9Rz58DQT+adrHlSivhQrrfixZ+OSHC4Pqzflwjmu7e zA== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
- by mx0b-00069f02.pphosted.com with ESMTP id 39f174kybe-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 29 Jun 2021 14:40:52 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
- by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 15TEUCr6083377;
- Tue, 29 Jun 2021 14:40:51 GMT
-Received: from nam10-mw2-obe.outbound.protection.outlook.com
- (mail-mw2nam10lp2109.outbound.protection.outlook.com [104.47.55.109])
- by userp3020.oracle.com with ESMTP id 39ee0v00cw-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 29 Jun 2021 14:40:51 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BHRlETFHbUAK1TkiCxJDQwjY1Q+4LA9cR2zW4y5P8iMPC6E2KXitU4putU3u4TX6Kf0gC4dVpVWzshqqlOx+6Cx04sYR3WGJ3Vd5PndaaSEZQTz/df6V5/hF1E3EY7wU39x5A9F/plpmRpgxwIVc0XKOh0ym1nHBJkjx9vJB9Eup0bAc22s1nAjXKu1fxJib4oITc52O+foM01BekX0dL1TaHljZ3d34zJLkPzKihkiUP6wlDPpRm5g3bLZRG46a/rpqzO5CxbrOCa4OnG8t+9Y15Suoju1Kn3GIHqIvwfK0nSaXIZOy8/cq33fldM6fJzh8Wiko76RnXfhpj/vCdg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bp+5wxKczOG8YNm+/XuQ79AzA/wuAaIPIVU7TGMY83w=;
- b=nUoqzwg0Utn+MtOYG30rf2SwEB8NK9y3ziFTP56CrWTwuAmW6SCHwwRQefteGGKe68aP2FFKRIwIcS9lU77tV6z3kpUuL5bN0IuyjpnwUHUm7bFi1GbusFfie6PZTJyPYZPFSDYkm11u/0v6pzfsNRhaRhr2px+XbDPRgHwSWSzsDQsv8jpHi1kgLx+6k5D0hBr+9870VwtHx1tSIv0ulhgBRXU7x5YaiE7dOQQqXpN5SE/odyzBCdZDV7QyrQm5cczJocvYY962ztbWD020YhCIEUHCNYopAURzF3Ev1t4Cc6kJSraQ88qOKirobXrtUdQ3H+RykV4MLB8Du+QyMg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bp+5wxKczOG8YNm+/XuQ79AzA/wuAaIPIVU7TGMY83w=;
- b=SUPjeMvn0X55MjbqRdSbgxqLQYxXEVyHlq4om9E36wrxzqi0PZBWTL0IbVh8Jwj6u+lMkeq3uL18Iqhf5viL2P+mfEBhrS42zHvKmAW3jjgI+e6Iqa1HEg8aioLbbRBCHVkRDB6VcQdHKU/X+R8z51sqBmzu/A4CDYjzf9/95Ss=
-Authentication-Results: oracle.com; dkim=none (message not signed)
- header.d=none;oracle.com; dmarc=none action=none header.from=oracle.com;
-Received: from CH2PR10MB4391.namprd10.prod.outlook.com (2603:10b6:610:7d::11)
- by CH2PR10MB4248.namprd10.prod.outlook.com (2603:10b6:610:7e::18)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4264.18; Tue, 29 Jun
- 2021 14:40:48 +0000
-Received: from CH2PR10MB4391.namprd10.prod.outlook.com
- ([fe80::9490:e23f:3d15:9cd6]) by CH2PR10MB4391.namprd10.prod.outlook.com
- ([fe80::9490:e23f:3d15:9cd6%9]) with mapi id 15.20.4264.027; Tue, 29 Jun 2021
- 14:40:48 +0000
-Subject: Re: [PATCH] KVM: arm64: Disabling disabled PMU counters wastes a lot
- of time
-To: Marc Zyngier <maz@kernel.org>
-References: <20210628161925.401343-1-alexandre.chartre@oracle.com>
- <878s2tavks.wl-maz@kernel.org>
- <e3843c2c-e20a-ef58-c795-1ba8f1d91ff6@oracle.com>
- <877dicbx61.wl-maz@kernel.org>
- <abcbd6db-da75-a6ad-01f3-7c614172ebd4@oracle.com>
- <62e6fa4693c87e7233642e7192344562@kernel.org>
-From: Alexandre Chartre <alexandre.chartre@oracle.com>
-Message-ID: <fdf22426-b5e1-d71e-4d4d-3a698f714902@oracle.com>
-Date: Tue, 29 Jun 2021 16:40:42 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.0
-In-Reply-To: <62e6fa4693c87e7233642e7192344562@kernel.org>
-Content-Language: en-US
-X-Originating-IP: [2.7.202.103]
-X-ClientProxiedBy: LNXP265CA0080.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:76::20) To CH2PR10MB4391.namprd10.prod.outlook.com
- (2603:10b6:610:7d::11)
+ with ESMTP id TR5-9MVY32NQ for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  1 Jul 2021 05:45:37 -0400 (EDT)
+Received: from mail-oi1-f180.google.com (mail-oi1-f180.google.com
+ [209.85.167.180])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 62A23406D3
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Jul 2021 05:45:37 -0400 (EDT)
+Received: by mail-oi1-f180.google.com with SMTP id t80so6607622oie.8
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 01 Jul 2021 02:45:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=S4TJbDbmRHYbelCTMQc9PtwVVnooXUeP5A1QqT0HJx0=;
+ b=Ms8bX1TZnLJgR7ZZZdcU7eQCDD2YpR2IrQ7nLRai3kq/EG1QO7IHtO0zKLcFgGRdcH
+ sAfej2gsPnsh9TCVPiI54d3E3impx+tYVwGgX+MbZUamZGi9RqYFd1zj7TngbaEZ0Py3
+ oH2IYHYhMRKnn4OOTcUCkPN6JZWxMhP64Uwn/gFM/dUCdhynk8dyXxT8GPb2dJoTOh4w
+ dIMv4adoo9oIoEXEUZMMbJVwBZ+n9aPoZq6mtQmFkdNBA8k6uMClQ2fGjPn7B8wb+9CP
+ BU36vtyu/X4N6ZYreyhw9TycxVNDWWwDoWMzndGQX1UjkiUPPp/abrybA+fXfrL6o63I
+ ZTIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=S4TJbDbmRHYbelCTMQc9PtwVVnooXUeP5A1QqT0HJx0=;
+ b=XvDDhJ5dvdyF2RwoQux/09ODkXcqRV0nzsxo9MR8T8eTUtqW/6BrUgUT26Us2jokg8
+ TwnBvOs9HQHfAjsMH2ZoK2RNq2GEz0uPVMjlGAAxE56UmoY3dZSLx3akGrge5O3vqSFF
+ j9Tsxj1sxJUFpZQflLbtRt0ApJLuCvBRFIUZPa0QYkBai6BrN/dJfViPxlw4z2uv9ijG
+ zcvuVMokW4wilDLYInDOM88XSA++A5MEvloZdKvc4skxHoJwOpTDzNaBixyqPV0r+1Ca
+ W/04zG02IQYQEmRmNQTupHeEE/zJW6qIJ/ZVYxPeT5op/9WCKq2kNeQjiecyKGDwv6vR
+ e+Vg==
+X-Gm-Message-State: AOAM531e/6YDxXXazJDesIRBV7Wc8yMTyRzBD7lqO7XUHiWcaxTust1c
+ BL6pcXUwkFNpoVKxRus4G+qFnAY4fcsMhF6zHBMzyA==
+X-Google-Smtp-Source: ABdhPJyoiG7rNKpy1FkxlCFar9u5j2o+S5C1PZiAfvWpayLt/f0mt4lQcp5C2OOHDao6REjtiRNHHYdv74ArtXSsLK4=
+X-Received: by 2002:a05:6808:158b:: with SMTP id
+ t11mr128947oiw.8.1625132735641; 
+ Thu, 01 Jul 2021 02:45:35 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost.localdomain (2.7.202.103) by
- LNXP265CA0080.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:76::20) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4264.19 via Frontend Transport; Tue, 29 Jun 2021 14:40:47 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 993c7b6c-4693-4a60-5c7d-08d93b0be2e5
-X-MS-TrafficTypeDiagnostic: CH2PR10MB4248:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <CH2PR10MB42489D491844A9707CFB1ED79A029@CH2PR10MB4248.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:389;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: CRlVi/NlqViujV1RBXBzCWMub1Tpy2+X+S8NRYNRYdV3v/1GXAONx87JYUAl1yB3+NYRKcC5SJgQpFJKVN2qjl5XJjiJnqn7tXj96zrLgYSXMa/C+ZS3SKaHma7E9pUCRJwHO/Nffz5pz33S9AQ/ZZvWPbQeV73HeWfyV4hooBre9Dkxh4N+Q1LygHyLqbNwy8kPDJTICMl0hdikQ4+aoWPOWZPzvDxnVvXpprMlExo4hTjJ5m/H0tJAtkcYfz9+2gXqdiv2Rpz2+oEj/xwHH8L99JD1hiKq6aJFJ2gzmJzxrtUhPJS84pOisBvfaYONxxUG7qCa8eOLQJfKAUZRVTKrApa1wYHMj18KWRqo+5VC5+MrfHB1y343hbaXWWpveMRpWpvjXCqCFRYX76XNlK2TqTXLWIszrJOEDSquAAGfYh3E63c0XUqbFuUn+jLvaPpqA4F15oxLbNduH8EWjv7rphvL4G+P2kdJctL7cV0bMYi/3mZmYSE/0Z+y1qVm5GmlwdS26FyCWvD4ZYbkWEmZVJDWX4br4lAb8ONlaQTmv2kOw32KTwQHb+L8nFYiYAhmmIRMXAPWxr1jmHh3ccdpafRnLYs2o1Bx8peIK1IuHen3Y2EZuWXSTJxANfX5hXfkfhY1DSJ6hbJwT2dx3ADUBygYZ6gpO4MVqSIK0GiZ9ShRFLjr4evZTtH6XJOBLXd33xftL8242nk8zHFDOQlXPLDZNWeIpKAdZUyBGjk=
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:CH2PR10MB4391.namprd10.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(39860400002)(346002)(396003)(376002)(136003)(366004)(316002)(66946007)(31696002)(66556008)(66476007)(4744005)(31686004)(186003)(86362001)(16526019)(26005)(107886003)(6506007)(8676002)(53546011)(5660300002)(4326008)(38100700002)(8936002)(6666004)(956004)(2616005)(2906002)(36756003)(6486002)(6512007)(83380400001)(478600001)(44832011)(6916009)(43740500002)(45980500001);
- DIR:OUT; SFP:1101; 
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dVEwTnhVUVBJTG9UVlBUb2l5cWpyYWJTQ0pDQm8ybGU2TVhjK2JpZzNLb1Fu?=
- =?utf-8?B?aGNCeTlLMnNQdUlXNm5uRkVyRjlMSERYOVdCODQ1bEZjdFZxQnJSaVg5bDlC?=
- =?utf-8?B?a0x4U0pIOHpKK3d3RUpDZmZLSm51ekN1SmgvZnU3VFExS2NXaC9uQks2eEM3?=
- =?utf-8?B?R2xaWUdxUEFUNFlML1NBZlMyb0oreGt2enRhRDVMS0pTbjczTUwwZnpaMkhH?=
- =?utf-8?B?c1YyQWlxZVRMY2J6SURmY01WZklhakZ4eHZFUHppVUkyd3REVFJoRG4rcklu?=
- =?utf-8?B?dmQ5MHlsd3RnbUdzbVZReG05Rkhpa1o0aXhWU0N0RXFzN3hlQ2FaNTlOUFFZ?=
- =?utf-8?B?ZndxaVdRS3Z4YlJHWWhhSkV5cm9pdmNiUlpUcTZ4aUdxU2IyWGd6V05ac0ZF?=
- =?utf-8?B?aVN2WnhINEIyUXgrblRRVnFHRUFRcHBoRGd3dGpHaitYenNwUVRCM0RpMTFR?=
- =?utf-8?B?cDZvWkNEWHNueEdFQXJhR1FxSHFicGZncG13RURmb0MyQmNoR2NjRldJVy9s?=
- =?utf-8?B?TWxpRnc2RjloRktwOThrZS9TSEwwcytXeVBmaG1LL2Mvcm93bUdSYmNLQllB?=
- =?utf-8?B?WGpJMXVxZEFFOTBnOWRuS3pPY0JUTVRzY2lPUmk3LzU3VHQ0djkveStVbm5Z?=
- =?utf-8?B?OXlQaWZTT1g0UFJsYkRHR3hxK2pqN2lkVEI4U3pwa3R2R0M3c2tCMkV6MjVO?=
- =?utf-8?B?WGZVa1hEM0xGVWpCZmk3c2lwOVNtaHBsdTdaTnpxU05zdGdVSG5NckptdGF4?=
- =?utf-8?B?V1Q2VC82R2pxRnRzS1NkY3pQVHB2ZEx5UnlRclZXQTVBZTQ0MVQ2d0ROcVpi?=
- =?utf-8?B?MXVMM3ozUm1veE45R2RGeVZDM2FsQkllWUV4QWpYN3VpaU05US9SdENTQk1K?=
- =?utf-8?B?LzJiaUNDUzdRbFJwRzBoSGZTb0thK3Y5RnFMUFF6M3BKOVFmMkQybjNwU09q?=
- =?utf-8?B?YTVXSWdLMHA4WXhBQnJUd0FEc1F2eHZNT2RsKzlTUlpSNlQ5U3lEcHhEamNN?=
- =?utf-8?B?NlAzMUdOM2dSTUxYOEJtTEloT3NLQUxLMVMzdi9wSTU1R3Y5RWxqRlg4ZlIz?=
- =?utf-8?B?RURXaHBvS09MRk12cEo5RnEvQWFqT2FxUTFQZ1NZQ0R3SkRGQjVKcUVJQWVL?=
- =?utf-8?B?ZDl5dS8xUXN5emc3NXNnTXhLTmYzR3BjOU5ya0k2WWtiZUwyRWJpYnN6WmFs?=
- =?utf-8?B?a05vaXFFenNOdGpCWDc5TEpkamp5YVh0UXNGa29UcmdwenRoVnJERDRWMXZZ?=
- =?utf-8?B?cDJ3dk05VWZGdmZHdVk1djd0WWZ4eUFpeDNBSUNhRXNRdkl1N0xLM1JPMVhF?=
- =?utf-8?B?QXNsUy9UdFNMWlU0RnlCNUtLV3JCNWxDbFBjMWhUVXJJeURiRWw4ZWoydmVH?=
- =?utf-8?B?dDA5QmpJSGRPM3lFZUdra0VqRzZ5ZWdvRmpoTEVnd1FteGJuSVRnZThKUFRT?=
- =?utf-8?B?SzNxa2U3SHdSY3JIWlg5T094K2ZySTB0VjBCRXJESnNTOVgvSUEwcGx1SWl5?=
- =?utf-8?B?WjV1cnZRQUh6VU9IS1NXOE9NNWI1em5GKzg5NXVaSTJGbFdYTU1oZjQ1VWk0?=
- =?utf-8?B?S2JuOGpNVW9lSFNaT1dlSU52Nkt2WkduK09sRkJoTEFvWjlWay9SMzhBVDhU?=
- =?utf-8?B?Zk1QWXJ5TTdDNnA1cmtyOXR3WVFGWVRVeHdkZnZCT2dScmM2S1VBeG9aZnl1?=
- =?utf-8?B?RFZlMHBROHFWejVHTEVnR2dTZHIvSWhDZEVDTTBnNUcxZklIVnFCM0xlUWFv?=
- =?utf-8?Q?a/wl441MCXqD/gkiWmGlJTH5qrdQOOCPpFzZJeE?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 993c7b6c-4693-4a60-5c7d-08d93b0be2e5
-X-MS-Exchange-CrossTenant-AuthSource: CH2PR10MB4391.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jun 2021 14:40:48.7933 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: NBBJV8QIkikbStvHWn2sww7eLlM8EubTD9sQZSVfy6wV+eQTirULxXw7gmRbRy2dfrA6EbhUXE87j9+0L1ca3rmYOeuxpCFHTkSBBFSguNw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR10MB4248
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=10029
- signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0
- bulkscore=0 spamscore=0
- suspectscore=0 mlxscore=0 mlxlogscore=999 adultscore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104190000
- definitions=main-2106290097
-X-Proofpoint-GUID: ntndlR86xuczC74X13zNDtuG8kPHFt7l
-X-Proofpoint-ORIG-GUID: ntndlR86xuczC74X13zNDtuG8kPHFt7l
-Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, konrad.wilk@oracle.com,
+References: <20210608154805.216869-1-jean-philippe@linaro.org>
+ <20210608154805.216869-2-jean-philippe@linaro.org>
+In-Reply-To: <20210608154805.216869-2-jean-philippe@linaro.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Thu, 1 Jul 2021 10:44:59 +0100
+Message-ID: <CA+EHjTws5L8Nti_Pr7TYtECZXGbgOHiNQsoc5ez1Ncf7yaCQaw@mail.gmail.com>
+Subject: Re: [RFC PATCH 1/5] KVM: arm64: Replace power_off with mp_state in
+ struct kvm_vcpu_arch
+To: Jean-Philippe Brucker <jean-philippe@linaro.org>
+Cc: salil.mehta@huawei.com, lorenzo.pieralisi@arm.com, kvm@vger.kernel.org,
+ corbet@lwn.net, maz@kernel.org, jonathan.cameron@huawei.com,
+ linux-kernel@vger.kernel.org, catalin.marinas@arm.com, pbonzini@redhat.com,
  will@kernel.org, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -195,43 +93,222 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+Hi Jean-Philippe,
 
-On 6/29/21 4:25 PM, Marc Zyngier wrote:
-> On 2021-06-29 15:17, Alexandre Chartre wrote:
->> On 6/29/21 3:47 PM, Marc Zyngier wrote:
->>> On Tue, 29 Jun 2021 14:16:55 +0100,
->>> Alexandre Chartre <alexandre.chartre@oracle.com> wrote:
->>>>
->>>>
->>>> Hi Marc,
->>>>
->>>> On 6/29/21 11:06 AM, Marc Zyngier wrote:
->>>>> Hi Alexandre,
->>>
->>> [...]
->>>
->>> If you are cleaning up the read-side of sysregs, access_pminten() and
->>> access_pmovs() could have some of your attention too.
->>>
->>
->> Ok, so for now, I will just resubmit the initial patch with the commit
->> comment fixes. Then, look at all the mask cleanup on top of Alexandru
->> changes and prepare another patch.
-> 
-> Please send this as a series rather than individual patches. I'm only
-> queuing critical fixes at the moment (this is the merge window).
-> If you post the series after -rc1, I'll queue it and let it simmer
-> in -next.
-> 
+On Tue, Jun 8, 2021 at 4:54 PM Jean-Philippe Brucker
+<jean-philippe@linaro.org> wrote:
+>
+> In order to add a new "suspend" power state, replace power_off with
+> mp_state in struct kvm_vcpu_arch. Factor the vcpu_off() function while
+> we're here.
+>
+> No functional change intended.
+>
+> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  6 ++++--
+>  arch/arm64/kvm/arm.c              | 29 +++++++++++++++--------------
+>  arch/arm64/kvm/psci.c             | 19 ++++++-------------
+>  3 files changed, 25 insertions(+), 29 deletions(-)
+>
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 7cd7d5c8c4bc..55a04f4d5919 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -340,8 +340,8 @@ struct kvm_vcpu_arch {
+>                 u32     mdscr_el1;
+>         } guest_debug_preserved;
+>
+> -       /* vcpu power-off state */
+> -       bool power_off;
+> +       /* vcpu power state (runnable, stopped, halted) */
 
-Ok, I will prepare a series and send it after rc1.
+Should the comment be, for clarity, something along the lines of
+KVM_MP_STATE_(STOPPED, RUNNABLE, HALTED), or maybe "a valid struct
+kvm_mp_state", if you think other states might be added in the future?
 
-alex.
+Thanks,
+/fuad
+
+
+> +       u32 mp_state;
+>
+>         /* Don't run the guest (internal implementation need) */
+>         bool pause;
+> @@ -720,6 +720,8 @@ int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
+>                                struct kvm_device_attr *attr);
+>  int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+>                                struct kvm_device_attr *attr);
+> +void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu);
+> +bool kvm_arm_vcpu_is_off(struct kvm_vcpu *vcpu);
+>
+>  /* Guest/host FPSIMD coordination helpers */
+>  int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index e720148232a0..bcc24adb9c0a 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -435,21 +435,22 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>         vcpu->cpu = -1;
+>  }
+>
+> -static void vcpu_power_off(struct kvm_vcpu *vcpu)
+> +void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu)
+>  {
+> -       vcpu->arch.power_off = true;
+> +       vcpu->arch.mp_state = KVM_MP_STATE_STOPPED;
+>         kvm_make_request(KVM_REQ_SLEEP, vcpu);
+>         kvm_vcpu_kick(vcpu);
+>  }
+>
+> +bool kvm_arm_vcpu_is_off(struct kvm_vcpu *vcpu)
+> +{
+> +       return vcpu->arch.mp_state == KVM_MP_STATE_STOPPED;
+> +}
+> +
+>  int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
+>                                     struct kvm_mp_state *mp_state)
+>  {
+> -       if (vcpu->arch.power_off)
+> -               mp_state->mp_state = KVM_MP_STATE_STOPPED;
+> -       else
+> -               mp_state->mp_state = KVM_MP_STATE_RUNNABLE;
+> -
+> +       mp_state->mp_state = vcpu->arch.mp_state;
+>         return 0;
+>  }
+>
+> @@ -460,10 +461,10 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+>
+>         switch (mp_state->mp_state) {
+>         case KVM_MP_STATE_RUNNABLE:
+> -               vcpu->arch.power_off = false;
+> +               vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
+>                 break;
+>         case KVM_MP_STATE_STOPPED:
+> -               vcpu_power_off(vcpu);
+> +               kvm_arm_vcpu_power_off(vcpu);
+>                 break;
+>         default:
+>                 ret = -EINVAL;
+> @@ -483,7 +484,7 @@ int kvm_arch_vcpu_runnable(struct kvm_vcpu *v)
+>  {
+>         bool irq_lines = *vcpu_hcr(v) & (HCR_VI | HCR_VF);
+>         return ((irq_lines || kvm_vgic_vcpu_pending_irq(v))
+> -               && !v->arch.power_off && !v->arch.pause);
+> +               && !kvm_arm_vcpu_is_off(v) && !v->arch.pause);
+>  }
+>
+>  bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
+> @@ -643,10 +644,10 @@ static void vcpu_req_sleep(struct kvm_vcpu *vcpu)
+>         struct rcuwait *wait = kvm_arch_vcpu_get_wait(vcpu);
+>
+>         rcuwait_wait_event(wait,
+> -                          (!vcpu->arch.power_off) &&(!vcpu->arch.pause),
+> +                          !kvm_arm_vcpu_is_off(vcpu) && !vcpu->arch.pause,
+>                            TASK_INTERRUPTIBLE);
+>
+> -       if (vcpu->arch.power_off || vcpu->arch.pause) {
+> +       if (kvm_arm_vcpu_is_off(vcpu) || vcpu->arch.pause) {
+>                 /* Awaken to handle a signal, request we sleep again later. */
+>                 kvm_make_request(KVM_REQ_SLEEP, vcpu);
+>         }
+> @@ -1087,9 +1088,9 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
+>          * Handle the "start in power-off" case.
+>          */
+>         if (test_bit(KVM_ARM_VCPU_POWER_OFF, vcpu->arch.features))
+> -               vcpu_power_off(vcpu);
+> +               kvm_arm_vcpu_power_off(vcpu);
+>         else
+> -               vcpu->arch.power_off = false;
+> +               vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
+>
+>         return 0;
+>  }
+> diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
+> index db4056ecccfd..24b4a2265dbd 100644
+> --- a/arch/arm64/kvm/psci.c
+> +++ b/arch/arm64/kvm/psci.c
+> @@ -52,13 +52,6 @@ static unsigned long kvm_psci_vcpu_suspend(struct kvm_vcpu *vcpu)
+>         return PSCI_RET_SUCCESS;
+>  }
+>
+> -static void kvm_psci_vcpu_off(struct kvm_vcpu *vcpu)
+> -{
+> -       vcpu->arch.power_off = true;
+> -       kvm_make_request(KVM_REQ_SLEEP, vcpu);
+> -       kvm_vcpu_kick(vcpu);
+> -}
+> -
+>  static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+>  {
+>         struct vcpu_reset_state *reset_state;
+> @@ -78,7 +71,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+>          */
+>         if (!vcpu)
+>                 return PSCI_RET_INVALID_PARAMS;
+> -       if (!vcpu->arch.power_off) {
+> +       if (!kvm_arm_vcpu_is_off(vcpu)) {
+>                 if (kvm_psci_version(source_vcpu, kvm) != KVM_ARM_PSCI_0_1)
+>                         return PSCI_RET_ALREADY_ON;
+>                 else
+> @@ -107,7 +100,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+>          */
+>         smp_wmb();
+>
+> -       vcpu->arch.power_off = false;
+> +       vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
+>         kvm_vcpu_wake_up(vcpu);
+>
+>         return PSCI_RET_SUCCESS;
+> @@ -142,7 +135,7 @@ static unsigned long kvm_psci_vcpu_affinity_info(struct kvm_vcpu *vcpu)
+>                 mpidr = kvm_vcpu_get_mpidr_aff(tmp);
+>                 if ((mpidr & target_affinity_mask) == target_affinity) {
+>                         matching_cpus++;
+> -                       if (!tmp->arch.power_off)
+> +                       if (!kvm_arm_vcpu_is_off(tmp))
+>                                 return PSCI_0_2_AFFINITY_LEVEL_ON;
+>                 }
+>         }
+> @@ -168,7 +161,7 @@ static void kvm_prepare_system_event(struct kvm_vcpu *vcpu, u32 type)
+>          * re-initialized.
+>          */
+>         kvm_for_each_vcpu(i, tmp, vcpu->kvm)
+> -               tmp->arch.power_off = true;
+> +               tmp->arch.mp_state = KVM_MP_STATE_STOPPED;
+>         kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_SLEEP);
+>
+>         memset(&vcpu->run->system_event, 0, sizeof(vcpu->run->system_event));
+> @@ -237,7 +230,7 @@ static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
+>                 val = kvm_psci_vcpu_suspend(vcpu);
+>                 break;
+>         case PSCI_0_2_FN_CPU_OFF:
+> -               kvm_psci_vcpu_off(vcpu);
+> +               kvm_arm_vcpu_power_off(vcpu);
+>                 val = PSCI_RET_SUCCESS;
+>                 break;
+>         case PSCI_0_2_FN_CPU_ON:
+> @@ -350,7 +343,7 @@ static int kvm_psci_0_1_call(struct kvm_vcpu *vcpu)
+>
+>         switch (psci_fn) {
+>         case KVM_PSCI_FN_CPU_OFF:
+> -               kvm_psci_vcpu_off(vcpu);
+> +               kvm_arm_vcpu_power_off(vcpu);
+>                 val = PSCI_RET_SUCCESS;
+>                 break;
+>         case KVM_PSCI_FN_CPU_ON:
+> --
+> 2.31.1
+>
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
