@@ -2,75 +2,75 @@ Return-Path: <SRS0=R38U=L2=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F915C11F68
-	for <kvmarm@archiver.kernel.org>; Fri,  2 Jul 2021 16:42:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7D67C11F68
+	for <kvmarm@archiver.kernel.org>; Fri,  2 Jul 2021 16:57:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9124661429
-	for <kvmarm@archiver.kernel.org>; Fri,  2 Jul 2021 16:42:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9124661429
+	by mail.kernel.org (Postfix) with ESMTP id 47F2061420
+	for <kvmarm@archiver.kernel.org>; Fri,  2 Jul 2021 16:57:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47F2061420
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=perches.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E67D40CF9;
-	Fri,  2 Jul 2021 12:42:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B982F4B08E;
+	Fri,  2 Jul 2021 12:57:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id wQbrpS7K3jYV; Fri,  2 Jul 2021 12:42:38 -0400 (EDT)
+	with ESMTP id VPDyIQJD7vgu; Fri,  2 Jul 2021 12:57:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A6F64A4A0;
-	Fri,  2 Jul 2021 12:42:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B12924081C;
+	Fri,  2 Jul 2021 12:57:04 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E89649D50
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Jul 2021 12:42:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 358214081C
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Jul 2021 12:57:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OfhT-WoLlVPj for <kvmarm@lists.cs.columbia.edu>;
- Fri,  2 Jul 2021 12:42:35 -0400 (EDT)
-Received: from smtprelay.hostedemail.com (smtprelay0098.hostedemail.com
- [216.40.44.98])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7C5624A4A0
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Jul 2021 12:42:35 -0400 (EDT)
-Received: from omf19.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
- by smtprelay04.hostedemail.com (Postfix) with ESMTP id C507B180A9C91;
- Fri,  2 Jul 2021 16:42:34 +0000 (UTC)
+ with ESMTP id QcV+N1AzUX+s for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  2 Jul 2021 12:57:02 -0400 (EDT)
+Received: from smtprelay.hostedemail.com (smtprelay0248.hostedemail.com
+ [216.40.44.248])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2DC0E4066E
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Jul 2021 12:57:02 -0400 (EDT)
+Received: from omf04.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
+ by smtprelay03.hostedemail.com (Postfix) with ESMTP id 1BBDF837F27E;
+ Fri,  2 Jul 2021 16:57:01 +0000 (UTC)
 Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by
- omf19.hostedemail.com (Postfix) with ESMTPA id 10EBB20D764; 
- Fri,  2 Jul 2021 16:42:26 +0000 (UTC)
-Message-ID: <34a668a0606092990326207d2acc5441592756d6.camel@perches.com>
+ omf04.hostedemail.com (Postfix) with ESMTPA id D6515D1517; 
+ Fri,  2 Jul 2021 16:56:52 +0000 (UTC)
+Message-ID: <7a2ef915bd08a1c0277b9633e20905c0ca62c568.camel@perches.com>
 Subject: Re: [PATCH V7 01/18] perf/core: Use static_call to optimize
  perf_guest_info_callbacks
 From: Joe Perches <joe@perches.com>
-To: Peter Zijlstra <peterz@infradead.org>
-Date: Fri, 02 Jul 2021 09:42:25 -0700
-In-Reply-To: <YN88rE+cxb7HrEtI@hirez.programming.kicks-ass.net>
+To: Mark Rutland <mark.rutland@arm.com>
+Date: Fri, 02 Jul 2021 09:56:51 -0700
+In-Reply-To: <20210702163836.GB94260@C02TD0UTHF1T.local>
 References: <20210622094306.8336-1-lingshan.zhu@intel.com>
  <20210622094306.8336-2-lingshan.zhu@intel.com>
  <YN722HIrzc6Z2+oD@hirez.programming.kicks-ass.net>
  <7379289718c6826dd1affec5824b749be2aee0a4.camel@perches.com>
- <YN88rE+cxb7HrEtI@hirez.programming.kicks-ass.net>
+ <20210702163836.GB94260@C02TD0UTHF1T.local>
 User-Agent: Evolution 3.40.0-1 
 MIME-Version: 1.0
-X-Stat-Signature: ycuw4tc4dkddxofnskkdygh116nc5379
-X-Rspamd-Server: rspamout04
-X-Rspamd-Queue-Id: 10EBB20D764
+X-Rspamd-Server: rspamout01
+X-Rspamd-Queue-Id: D6515D1517
+X-Stat-Signature: yfcchsbgyrrjqd9annscud3jta5gtkxi
 X-Session-Marker: 6A6F6540706572636865732E636F6D
-X-Session-ID: U2FsdGVkX18HOccKXnefKVhqRarv+ICfPC7oSScH3Ls=
-X-HE-Tag: 1625244146-824246
-Cc: wanpengli@tencent.com, Like Xu <like.xu@linux.intel.com>,
- eranian@google.com, weijiang.yang@intel.com, Guo Ren <guoren@kernel.org>,
+X-Session-ID: U2FsdGVkX1/FrPSf3Ewjv8gI9yMKoa9Lq2JHlpGAS2Q=
+X-HE-Tag: 1625245012-826405
+Cc: wanpengli@tencent.com, kvm@vger.kernel.org,
+ Peter Zijlstra <peterz@infradead.org>, eranian@google.com,
+ weijiang.yang@intel.com, Guo Ren <guoren@kernel.org>,
  linux-riscv@lists.infradead.org, Will Deacon <will@kernel.org>,
  kvmarm@lists.cs.columbia.edu, kan.liang@linux.intel.com, ak@linux.intel.com,
- kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>, joro@8bytes.org,
- x86@kernel.org, linux-csky@vger.kernel.org, wei.w.wang@intel.com,
- xen-devel@lists.xenproject.org, liuxiangdong5@huawei.com, bp@alien8.de,
- Paul Walmsley <paul.walmsley@sifive.com>,
+ Like Xu <like.xu@linux.intel.com>, Marc Zyngier <maz@kernel.org>,
+ joro@8bytes.org, x86@kernel.org, linux-csky@vger.kernel.org,
+ wei.w.wang@intel.com, xen-devel@lists.xenproject.org, liuxiangdong5@huawei.com,
+ bp@alien8.de, Paul Walmsley <paul.walmsley@sifive.com>,
  Boris Ostrovsky <boris.ostrovsky@oracle.com>, vkuznets@redhat.com,
  linux-arm-kernel@lists.infradead.org, jmattson@google.com,
  like.xu.linux@gmail.com, Nick Hu <nickhu@andestech.com>, seanjc@google.com,
@@ -92,12 +92,11 @@ Content-Transfer-Encoding: quoted-printable
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 2021-07-02 at 18:19 +0200, Peter Zijlstra wrote:
+On Fri, 2021-07-02 at 17:38 +0100, Mark Rutland wrote:
 > On Fri, Jul 02, 2021 at 09:00:22AM -0700, Joe Perches wrote:
 > > On Fri, 2021-07-02 at 13:22 +0200, Peter Zijlstra wrote:
 > > > On Tue, Jun 22, 2021 at 05:42:49PM +0800, Zhu Lingshan wrote:
-> > > > diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
-> > []
+[]
 > > > > +	if (perf_guest_cbs && perf_guest_cbs->handle_intel_pt_intr)
 > > > > +		static_call_update(x86_guest_handle_intel_pt_intr,
 > > > > +				   perf_guest_cbs->handle_intel_pt_intr);
@@ -108,52 +107,110 @@ On Fri, 2021-07-02 at 18:19 +0200, Peter Zijlstra wrote:
 > > =
 
 > > That's just your personal preference.
+> > =
+
+> > The coding-style document doesn't require that.
+> > =
+
+> > It just says single statement.  It's not the number of
+> > vertical lines or characters required for the statement.
+> > =
+
+> > ----------------------------------
+> > =
+
+> > Do not unnecessarily use braces where a single statement will do.
+> > =
+
+> > .. code-block:: c
+> > =
+
+> > 	if (condition)
+> > 		action();
+> > =
+
+> > and
+> > =
+
+> > .. code-block:: none
+> > =
+
+> > 	if (condition)
+> > 		do_this();
+> > 	else
+> > 		do_that();
+> > =
+
+> > This does not apply if only one branch of a conditional statement is a =
+single
+> > statement; in the latter case use braces in both branches:
 > =
 
-> As a maintainer, those carry weight, also that's tip rules:
+> Immediately after this, we say:
 > =
 
-> =A0=A0https://lore.kernel.org/lkml/20181107171149.165693799@linutronix.de/
+> > Also, use braces when a loop contains more than a single simple stateme=
+nt:
+> > =
 
-Right, definitely so.
+> > .. code-block:: c
+> > =
 
-But merely referencing 'coding style' is ambiguous at best.
+> > =A0=A0=A0=A0=A0=A0=A0=A0while (condition) {
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0if (test)
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0do_something();
+> > =A0=A0=A0=A0=A0=A0=A0=A0}
+> > =
 
-btw:
+> =
 
-ASCII commonly refers to '{' and '}', the curly brackets, to be braces
-and '[' and ']', the square brackets, to be brackets.
+> ... and while that says "a loop", the principle is obviously supposed to
+> apply to conditionals too; structurally they're no different. We should
+> just fix the documentation to say "a loop or conditional", or something
+> to that effect.
 
-It might be clearer to use that terminology.
+<shrug>  Maybe.
 
-belts and braces, etc...
+I think there are _way_ too many existing obvious uses where the
+statement that follows a conditional is multi-line.
+
+	if (foo)
+		printk(fmt,
+		       args...);
+
+where the braces wouldn't add anything other than more vertical space.
+
+I don't much care one way or another other than Peter's somewhat ambiguous
+use of the phrase "coding style".
+
+checkpatch doesn't emit a message either way.
+-----------------------------------------
+$ cat t_multiline.c
+// SPDX-License-Identifier: GPL-2.0-only
+
+void foo(void)
+{
+	if (foo) {
+		pr_info(fmt,
+			args);
+	}
+
+	if (foo)
+		pr_info(fmt,
+			args);
+
+	if (foo)
+		pr_info(fmt, args);
+}
+
+$ ./scripts/checkpatch.pl -f --strict t_multiline.c
+total: 0 errors, 0 warnings, 0 checks, 16 lines checked
+
+t_multiline.c has no obvious style problems and is ready for submission.
+-----------------------------------------
 
 cheers, Joe
-
-----------------
-
-+Bracket rules
-+^^^^^^^^^^^^^
-+
-+Brackets should be omitted only if the statement which follows 'if', 'for',
-+'while' etc. is truly a single line::
-+
-+	if (foo)
-+		do_something();
-+
-+The following is not considered to be a single line statement even
-+though C does not require brackets::
-+
-+	for (i =3D 0; i < end; i++)
-+		if (foo[i])
-+			do_something(foo[i]);
-+
-+Adding brackets around the outer loop enhances the reading flow::
-+
-+	for (i =3D 0; i < end; i++) {
-+		if (foo[i])
-+			do_something(foo[i]);
-+	}
 
 
 _______________________________________________
