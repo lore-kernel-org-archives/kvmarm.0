@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DEA5C11F84
-	for <kvmarm@archiver.kernel.org>; Sun,  4 Jul 2021 23:06:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F015C07E9D
+	for <kvmarm@archiver.kernel.org>; Sun,  4 Jul 2021 23:07:47 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E0D7E6195C
-	for <kvmarm@archiver.kernel.org>; Sun,  4 Jul 2021 23:05:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0D7E6195C
+	by mail.kernel.org (Postfix) with ESMTP id E771261452
+	for <kvmarm@archiver.kernel.org>; Sun,  4 Jul 2021 23:07:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E771261452
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B0534A126;
-	Sun,  4 Jul 2021 19:05:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 707C740569;
+	Sun,  4 Jul 2021 19:07:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id tkoclO1tbljw; Sun,  4 Jul 2021 19:05:58 -0400 (EDT)
+	with ESMTP id YywCW5mDf5qH; Sun,  4 Jul 2021 19:07:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 095DC40CF8;
-	Sun,  4 Jul 2021 19:05:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 518DB4081C;
+	Sun,  4 Jul 2021 19:07:45 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D0C6407EF
- for <kvmarm@lists.cs.columbia.edu>; Sun,  4 Jul 2021 19:05:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8655F406D3
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  4 Jul 2021 19:07:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QbXUWpZ1MtGg for <kvmarm@lists.cs.columbia.edu>;
- Sun,  4 Jul 2021 19:05:54 -0400 (EDT)
+ with ESMTP id pLSz1u6MJZf1 for <kvmarm@lists.cs.columbia.edu>;
+ Sun,  4 Jul 2021 19:07:43 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 79D5E406D3
- for <kvmarm@lists.cs.columbia.edu>; Sun,  4 Jul 2021 19:05:54 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 9312C613E5;
- Sun,  4 Jul 2021 23:05:52 +0000 (UTC)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 648E240569
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  4 Jul 2021 19:07:43 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 9BA5561416;
+ Sun,  4 Jul 2021 23:07:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1625439953;
- bh=k4A9U8XSbpXM50WX2bk9eqfV52wvOpVIiCKt8c8gujg=;
+ s=k20201202; t=1625440062;
+ bh=n0UOv8XGqRxE8ABKttXEeMPtQWNfPtRpL6ZYJXVh0uQ=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=cl1I3TZ+YCF35Hj97tff50OR/Mk/k0GPy7geJPMbSRSbDkhSz27sXrsjKV+KIHIjn
- XWf1455SC5Wy16O395mmQfArVKQ6y3kd5WIrhPgCHa1+zml2pMtIVvhXpQoKrKSpYK
- J4MZgZBLBjWaOlTvOhf/XliSYkmtjgpH7jRoHNz7FAWaDzl8N+ekkhi7LAy2ypArtT
- 0wIcQG3qvs9Hsbj8Q7UVBLH4z9QBgVQE2r4gnr0XvHbo+XNE7LdKO+82bGKOcvZv8Q
- Nh8osPu9xEWL/9IBf3lbcFCSryeMBxYgL8GQ15DnTAuwhTZmCok/JMrk5KBkCVAPbF
- 84xu36m3Nejfw==
+ b=aQHnYPSicyQc6W2yZkUGPX0VqnB/OuxQQKLmwH8neQmUYwY6+q5Ak/OxxPnsWN6Bg
+ Lu2hbjpTz5D6smrXWtQu202NBQO6hdHmiuKVZ+lgdpfHCHPGMmgflSRpGFmCVSPKVk
+ 4uAbmCG0pCYgOobeAXJT39Yg9v2aFxUygrkT8qyuoUOx6HhhMMR4U0u7xc8/xLZrpE
+ 8lC7JFGv23WlDNc6FO5hd6vTanNQ6HrQzv2/Fino167jRHY9Eio6woH50PM+bT4N4o
+ ZOFIN5R8Uo7dg/54tmKI+KgLC9QGWpYVeBAsiuc8MeFBuDgQHxm0+Ny+WMcbEN6rdJ
+ nTr8R40+fnb7A==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.13 68/85] KVM: arm64: Restore PMU configuration on
+Subject: [PATCH AUTOSEL 5.12 64/80] KVM: arm64: Restore PMU configuration on
  first run
-Date: Sun,  4 Jul 2021 19:04:03 -0400
-Message-Id: <20210704230420.1488358-68-sashal@kernel.org>
+Date: Sun,  4 Jul 2021 19:06:00 -0400
+Message-Id: <20210704230616.1489200-64-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210704230420.1488358-1-sashal@kernel.org>
-References: <20210704230420.1488358-1-sashal@kernel.org>
+In-Reply-To: <20210704230616.1489200-1-sashal@kernel.org>
+References: <20210704230616.1489200-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -108,7 +108,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  3 files changed, 8 insertions(+)
 
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 7cd7d5c8c4bc..6336b4309114 100644
+index 858c2fcfc043..4e4356add46e 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
 @@ -46,6 +46,7 @@
@@ -120,10 +120,10 @@ index 7cd7d5c8c4bc..6336b4309114 100644
  #define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
  				     KVM_DIRTY_LOG_INITIALLY_SET)
 diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index e720148232a0..facf4d41d32a 100644
+index 7730b81aad6d..8455c5c30116 100644
 --- a/arch/arm64/kvm/arm.c
 +++ b/arch/arm64/kvm/arm.c
-@@ -689,6 +689,10 @@ static void check_vcpu_requests(struct kvm_vcpu *vcpu)
+@@ -684,6 +684,10 @@ static void check_vcpu_requests(struct kvm_vcpu *vcpu)
  			vgic_v4_load(vcpu);
  			preempt_enable();
  		}
@@ -135,7 +135,7 @@ index e720148232a0..facf4d41d32a 100644
  }
  
 diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index fd167d4f4215..a0bbb7111f57 100644
+index e32c6e139a09..e9699d10d2bd 100644
 --- a/arch/arm64/kvm/pmu-emul.c
 +++ b/arch/arm64/kvm/pmu-emul.c
 @@ -850,6 +850,9 @@ int kvm_arm_pmu_v3_enable(struct kvm_vcpu *vcpu)
