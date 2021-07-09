@@ -1,105 +1,89 @@
-Return-Path: <SRS0=6kC2=MA=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=w/1t=MB=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B886C07E99
-	for <kvmarm@archiver.kernel.org>; Thu,  8 Jul 2021 17:16:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81955C07E99
+	for <kvmarm@archiver.kernel.org>; Fri,  9 Jul 2021 09:25:46 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 83FE8616EA
-	for <kvmarm@archiver.kernel.org>; Thu,  8 Jul 2021 17:16:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83FE8616EA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id E5734613DC
+	for <kvmarm@archiver.kernel.org>; Fri,  9 Jul 2021 09:25:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5734613DC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 01E464B0C1;
-	Thu,  8 Jul 2021 13:16:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 546194A483;
+	Fri,  9 Jul 2021 05:25:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@chromium.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id OmBOnpPQTGN8; Thu,  8 Jul 2021 13:16:23 -0400 (EDT)
+	with ESMTP id LHgPpWoUduB2; Fri,  9 Jul 2021 05:25:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E5B504B0C5;
-	Thu,  8 Jul 2021 13:16:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C2E84A17F;
+	Fri,  9 Jul 2021 05:25:44 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B61BB4B0C1
- for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Jul 2021 13:16:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B17240870
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Jul 2021 00:37:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QNNS9FBEEDh4 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  8 Jul 2021 13:16:21 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D9B194A4E5
- for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Jul 2021 13:16:21 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1625764581;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=+NjBGd/4T9twKgX/ZHNdm+93Uf3nnJPB993PVyrBW5E=;
- b=GleDX/IDgJAdw7BZlXSOaZG0vbxfpWGFnSY0NrJUjqwGM79IwzCyjEvOCYhIMAjDe3yXl+
- K/Aws7Kd3vKyLJ7XjYTMjVFFS7gHanKyULk0FVClavW3WtOb1dN3AH2o45N2A8xC2igb+k
- Ow6EgbrnFd92O/HoDd5ly7r83a2gawg=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-565-tBt0iF9gNGODgSvvJ-Jd8A-1; Thu, 08 Jul 2021 13:16:20 -0400
-X-MC-Unique: tBt0iF9gNGODgSvvJ-Jd8A-1
-Received: by mail-ed1-f71.google.com with SMTP id
- i19-20020a05640200d3b02903948b71f25cso3676142edu.4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 08 Jul 2021 10:16:20 -0700 (PDT)
+ with ESMTP id yYmDEJeduzXC for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  9 Jul 2021 00:37:34 -0400 (EDT)
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com
+ [209.85.214.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 59BA440808
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Jul 2021 00:37:34 -0400 (EDT)
+Received: by mail-pl1-f172.google.com with SMTP id x16so3493811plg.3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 08 Jul 2021 21:37:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chromium.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=H/LklQaJdTOXWeUT+mprxaDKrVkD8A9UO7oJUzmViNQ=;
+ b=BG8tocLa4Fc6GVIjbj/83MmQ562w43ne1yivFCQz30vkd1c2tWv5D71ctj9JMn0a/s
+ 3wZbh/hEhgz+vSrVvnrhuxUH9Rizx7klC2gPGSSX658M5KU/uGIgxQsLZ4tLgMU56Apd
+ b3soeKez7tuOdGuGTWH0hrCgVZXgsByXKESZM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=+NjBGd/4T9twKgX/ZHNdm+93Uf3nnJPB993PVyrBW5E=;
- b=s7zeIZngnPWjKqgmQyGeSGl3oCrcwtKYWr+lwy8clMr7VpW4/uF9r6gwKQgQK+sZ0E
- iLF2ozlbGWZuVZ5I9REkFM7Po5sHD9CxpfzjJdKgbv0RZqq8r6fwtLxH3BBfW5Opxebj
- hQMEft8HeuxlJ5M8aLVKYLHFwPBNnSuOmbOs9x8+4p5amZ0Xc7+nyljvCRwgSC/MU6T3
- 2+GAl49SEM9UbLUyRfEg8jnelqGSS1CJX6zgaJW9kCcF+X5bWAQfOFcHNVJlHy9GWZO6
- TvohFgT5sQgr0Ks7zQCoKk2q6kmfQQFZA3AMTg6hLwl+zpV1Q+7yX9/IaWjEO9svvgyp
- Km5g==
-X-Gm-Message-State: AOAM531vG6J/oHFvAqISdyCqp+HO5AkU0fxvkE2i87azolZKqHLPVVRJ
- s6uRKCEGzAjHNL8frzB9XimPIv7ebzcraFKCsppCltPDHcRbW7qrWQnT+gP29LPg5LdwbbB9cP1
- 7m+wAiCtJPOwWgKRIrFdBIxRT
-X-Received: by 2002:a05:6402:419:: with SMTP id
- q25mr40332859edv.331.1625764579275; 
- Thu, 08 Jul 2021 10:16:19 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzQVvnmaFFbGkreLluH7iRVwQq7iwQchIQvrtFvvU2a0y+JUwjav42PUgwI1804W02tpXYMtA==
-X-Received: by 2002:a05:6402:419:: with SMTP id
- q25mr40332821edv.331.1625764578995; 
- Thu, 08 Jul 2021 10:16:18 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
- ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
- by smtp.gmail.com with ESMTPSA id e24sm1138632ejx.100.2021.07.08.10.16.17
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 08 Jul 2021 10:16:18 -0700 (PDT)
-Subject: Re: [PATCH] KVM: selftests: Address extra memslot parameters in
- vm_vaddr_alloc
-To: Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org
-References: <20210702201042.4036162-1-ricarkol@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <eebf14e1-cd5c-a55d-cd68-620df1c9bcf0@redhat.com>
-Date: Thu, 8 Jul 2021 19:16:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+ bh=H/LklQaJdTOXWeUT+mprxaDKrVkD8A9UO7oJUzmViNQ=;
+ b=tjP64mEXu61oS2otobt+0GMRbtVUtEjEx1WApN8ikGwDmVQ9nujzUnfDl5fW/JDzpD
+ AC2+JSgt3cNqz1Yr4zEq/N8zlVq6UJ3SutYgeksurPq/zT9C0PCTu704fX5wQupqT4vN
+ z/fxI87+D3SEyKi8re+iYmsOKvcfpt9idbRfHkeWv95k+UyehiDXzBFdpGB68+8j30CX
+ K1C9tj7BjE4x88JQNLZwOvw2wpzCR0Hxo+GUB50Jza2+Vg1SFSpSf98Nv0gnlYrvi20t
+ L91Eep2im7X+PietCLEVmeG1W/dyocBaVavs8RNXPFa0PjfyWhFcjk0x4xisiwVW56eS
+ R2qQ==
+X-Gm-Message-State: AOAM530FYevpLMBq8hOWSycGfA158nIjI3eBa5lmo571+wyetDW+POXk
+ sFpXF5YwR0+ObNjAv2YwrCWdfg==
+X-Google-Smtp-Source: ABdhPJwQ4+9mQudHLFskGBug4FzGh1FHXv+U9yzd3L1gcLu6YE9FOXHurMSqd0ktQwQkYJA/TWJ0/Q==
+X-Received: by 2002:a17:90a:ff0d:: with SMTP id
+ ce13mr2922178pjb.157.1625805453217; 
+ Thu, 08 Jul 2021 21:37:33 -0700 (PDT)
+Received: from senozhatsky.flets-east.jp
+ ([2409:10:2e40:5100:a30d:fc4:7834:ee08])
+ by smtp.gmail.com with ESMTPSA id y4sm4420760pfa.14.2021.07.08.21.37.30
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 08 Jul 2021 21:37:32 -0700 (PDT)
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Marc Zyngier <maz@kernel.org>,
+	Will Deacon <will@kernel.org>
+Subject: [PATCHv2 0/4] arm64:kvm: teach guest sched that VCPUs can be preempted
+Date: Fri,  9 Jul 2021 13:37:09 +0900
+Message-Id: <20210709043713.887098-1-senozhatsky@chromium.org>
+X-Mailer: git-send-email 2.32.0.93.g670b81a890-goog
 MIME-Version: 1.0
-In-Reply-To: <20210702201042.4036162-1-ricarkol@google.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Cc: seanjc@google.com, kvmarm@lists.cs.columbia.edu, maz@kernel.org
+X-Mailman-Approved-At: Fri, 09 Jul 2021 05:25:42 -0400
+Cc: Joel Fernandes <joelaf@google.com>, linux-kernel@vger.kernel.org,
+ virtualization@lists.linux-foundation.org,
+ Sergey Senozhatsky <senozhatsky@chromium.org>,
+ Suleiman Souhlal <suleiman@google.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -111,44 +95,46 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 02/07/21 22:10, Ricardo Koller wrote:
-> Commit a75a895e6457 ("KVM: selftests: Unconditionally use memslot 0 for
-> vaddr allocations") removed the memslot parameters from vm_vaddr_alloc.
-> It addressed all callers except one under lib/aarch64/, due to a race
-> with commit e3db7579ef35 ("KVM: selftests: Add exception handling
-> support for aarch64")
-> 
-> Fix the vm_vaddr_alloc call in lib/aarch64/processor.c.
-> 
-> Reported-by: Zenghui Yu <yuzenghui@huawei.com>
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> ---
->   tools/testing/selftests/kvm/lib/aarch64/processor.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-> index 9f49f6caafe5..632b74d6b3ca 100644
-> --- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-> @@ -401,7 +401,7 @@ void route_exception(struct ex_regs *regs, int vector)
->   void vm_init_descriptor_tables(struct kvm_vm *vm)
->   {
->   	vm->handlers = vm_vaddr_alloc(vm, sizeof(struct handlers),
-> -			vm->page_size, 0, 0);
-> +			vm->page_size);
->   
->   	*(vm_vaddr_t *)addr_gva2hva(vm, (vm_vaddr_t)(&exception_handlers)) = vm->handlers;
->   }
-> 
+Hello,
 
-Queued, thanks.
+This patch set adds a simple vcpu_is_preempted() implementation so
+that scheduler can make better decisions when it search for the idle
+(v)CPU.
 
-Paolo
+For sched benchmarks please refer to [0].
+
+[0] https://github.com/sergey-senozhatsky/arm64-vcpu_is_preempted
+
+v2:
+- 5.13 rebase (static calls, etc)
+- simplified and reworked some bits
+
+Sergey Senozhatsky (4):
+  arm64: smccc: Add SMCCC pv-vcpu-state function call IDs
+  arm64: add guest pvstate support
+  arm64: do not use dummy vcpu_is_preempted()
+  arm64: add host pv-vcpu-state support
+
+ arch/arm64/include/asm/kvm_host.h | 23 ++++++++
+ arch/arm64/include/asm/paravirt.h | 19 +++++++
+ arch/arm64/include/asm/spinlock.h | 18 +++---
+ arch/arm64/kernel/paravirt.c      | 94 +++++++++++++++++++++++++++++++
+ arch/arm64/kernel/smp.c           |  4 ++
+ arch/arm64/kvm/Makefile           |  3 +-
+ arch/arm64/kvm/arm.c              |  3 +
+ arch/arm64/kvm/hypercalls.c       | 11 ++++
+ arch/arm64/kvm/pv-vcpu-state.c    | 64 +++++++++++++++++++++
+ include/linux/arm-smccc.h         | 18 ++++++
+ 10 files changed, 248 insertions(+), 9 deletions(-)
+ create mode 100644 arch/arm64/kvm/pv-vcpu-state.c
+
+-- 
+2.32.0.93.g670b81a890-goog
 
 _______________________________________________
 kvmarm mailing list
