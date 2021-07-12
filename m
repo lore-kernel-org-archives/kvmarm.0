@@ -2,61 +2,175 @@ Return-Path: <SRS0=bTo6=ME=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-21.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3057CC07E99
-	for <kvmarm@archiver.kernel.org>; Mon, 12 Jul 2021 16:52:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E863C07E9C
+	for <kvmarm@archiver.kernel.org>; Mon, 12 Jul 2021 17:04:09 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C012660FF3
-	for <kvmarm@archiver.kernel.org>; Mon, 12 Jul 2021 16:52:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C012660FF3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id D2F8D611CB
+	for <kvmarm@archiver.kernel.org>; Mon, 12 Jul 2021 17:04:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2F8D611CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 73889406E0;
-	Mon, 12 Jul 2021 12:52:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 50348406E0;
+	Mon, 12 Jul 2021 13:04:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@oracle.com
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@oracle.onmicrosoft.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id vnz+7poS6BJN; Mon, 12 Jul 2021 12:52:55 -0400 (EDT)
+	with ESMTP id 4GfzLmzLvyrF; Mon, 12 Jul 2021 13:04:07 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D0C8240821;
-	Mon, 12 Jul 2021 12:52:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1909B40856;
+	Mon, 12 Jul 2021 13:04:07 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 81DE9406E0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Jul 2021 12:52:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CB9D34075E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Jul 2021 13:04:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id o3rYYuAEJd5s for <kvmarm@lists.cs.columbia.edu>;
- Mon, 12 Jul 2021 12:52:52 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BF44D404F8
- for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Jul 2021 12:52:52 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5ADA031B;
- Mon, 12 Jul 2021 09:52:52 -0700 (PDT)
-Received: from slackpad.fritz.box (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4066F3F694;
- Mon, 12 Jul 2021 09:52:50 -0700 (PDT)
-Date: Mon, 12 Jul 2021 17:52:19 +0100
-From: Andre Przywara <andre.przywara@arm.com>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [kvm-unit-tests RFC PATCH 3/5] run_tests.sh: Add kvmtool support
-Message-ID: <20210712175219.132e22cc@slackpad.fritz.box>
-In-Reply-To: <20210702163122.96110-4-alexandru.elisei@arm.com>
-References: <20210702163122.96110-1-alexandru.elisei@arm.com>
- <20210702163122.96110-4-alexandru.elisei@arm.com>
-Organization: Arm Ltd.
-X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
+ with ESMTP id xF6xLda3b7dd for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 12 Jul 2021 13:04:04 -0400 (EDT)
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com
+ [205.220.177.32])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 992DD406E0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Jul 2021 13:04:04 -0400 (EDT)
+Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
+ by mx0b-00069f02.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id
+ 16CGvCGP017159; Mon, 12 Jul 2021 17:04:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : cc :
+ subject : date : message-id : content-transfer-encoding : content-type :
+ mime-version; s=corp-2020-01-29;
+ bh=NPhc5mxfcQOV73V7MTFx8KERIgZs/BG2uCuksy4GbNA=;
+ b=HKJQeUxMVqW4Lj1RVReMuLuTp6BkgYx+zlh0ahT7qqyvAuZTM4+E3cm+CPSs5za0ml0G
+ DGtAfym3Sc5l4TImovztcjvAije6N99QJHEIj3h6Z7eGp1fKOO8ctVswtWI8RHHk4k4V
+ MVRtZzx8oJdHn5w0rLC6ZOeqq9KpAQqol0TJhGZhbiOhrkXXhRVt+PS5JPTCY3cqxxxL
+ K6dOix3xkwNKanF4Yz1RfA3nQ1xtSd4R2jVj83rNmZt3l/tnX+OWKbMPBmGYkepuL7Ek
+ Nh/mKdz1uirim5o7SSaCF/2llYv/tvOUkNByXLTnhB3v92zxb1EzL21HYrLD3IGKP9TN lA== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by mx0b-00069f02.pphosted.com with ESMTP id 39rnxdgmuc-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 12 Jul 2021 17:04:00 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 16CGt3sd186637;
+ Mon, 12 Jul 2021 17:04:00 GMT
+Received: from nam02-bn1-obe.outbound.protection.outlook.com
+ (mail-bn1nam07lp2048.outbound.protection.outlook.com [104.47.51.48])
+ by aserp3030.oracle.com with ESMTP id 39qycs8t9v-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 12 Jul 2021 17:03:59 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=g1cmI4yQrCrijNI1Of9Oh9EqHSbXVzSAslfBszvDGAkC3aba6S7Se7v5ATSnNyVK+vK7Yc/9s/Dv+7ZOLKXhpvXps6M+EnyH68urjbZrMIHck9AyKd7LHm8uZBtrLwOTTrLYdsKe0sA4t2B/w6zBkVNmXq5HCHw5zsUGHASY3a7bTkL9YtiqlPN79qSZntyL7A7mZFN9x37tygRd5fGlh5rNaG87yB+K+SKTApb1Jbx5BUqT33ByI+smFX52s0DISiayAzJvkS4SRjodw9Tl/izUohFVNDewqDTzqigr0GbzjyQBpSWCJoyIpy0L+GJadJ6X0s7xzUoHVXtodTZadg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NPhc5mxfcQOV73V7MTFx8KERIgZs/BG2uCuksy4GbNA=;
+ b=bOKMgARQD9RI9hO2r750sS+39CWAn7Ky/y+hymEQCUdTXtazS1e/1639v0kqSJ7WaqUXTOp8SBFkV0f7DWdUWbIR1rTg1uzmM5y2ed7TCEaCBrQdpRFvMCENoMXX5ZaAMmKnOD3lb3kXJ62bdy/FMmusi3eVByqxrDAyVE3RWfd2IW/7rYxNgJBjydda4mY59xU/luRaNNr9l8Mipni5eP+uMj/E8VGqlnegAMj0s8tcRL4nKruvwpXlG4y0th7ouWqTtwUQ7A4lC+DgyBkGWFGbIxHRB1YTf2V7maDUEvDLAE+13bj3jCUVyYpKnpKlsEvHkzNv0JxKfoFdShpvkQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NPhc5mxfcQOV73V7MTFx8KERIgZs/BG2uCuksy4GbNA=;
+ b=n4UXhEoKJj8TMNwHiQO/yaDoX2HRwl6WoCk9E3EcJF/HKU4utvvlMwOGyg6UWl0gMwtVAwIv/tUjcWKawaHOjNt8l5HeGtAv3YaT8Ql4ushEiUVpVjBI88Zje4Pw7BoLJptIGFxsIO/ma948vYZzaaKJSRR0LSBhZYBcebOAQwk=
+Authentication-Results: kernel.org; dkim=none (message not signed)
+ header.d=none;kernel.org; dmarc=none action=none header.from=oracle.com;
+Received: from CH2PR10MB4391.namprd10.prod.outlook.com (2603:10b6:610:7d::11)
+ by CH0PR10MB5115.namprd10.prod.outlook.com (2603:10b6:610:c4::16)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.23; Mon, 12 Jul
+ 2021 17:03:57 +0000
+Received: from CH2PR10MB4391.namprd10.prod.outlook.com
+ ([fe80::b895:ab48:fa35:3f15]) by CH2PR10MB4391.namprd10.prod.outlook.com
+ ([fe80::b895:ab48:fa35:3f15%4]) with mapi id 15.20.4308.026; Mon, 12 Jul 2021
+ 17:03:57 +0000
+From: Alexandre Chartre <alexandre.chartre@oracle.com>
+To: maz@kernel.org, will@kernel.org, catalin.marinas@arm.com,
+ alexandru.elisei@arm.com, james.morse@arm.com, suzuki.poulose@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org
+Subject: [PATCH v3] KVM: arm64: Disabling disabled PMU counters wastes a lot
+ of time
+Date: Mon, 12 Jul 2021 19:03:45 +0200
+Message-Id: <20210712170345.660272-1-alexandre.chartre@oracle.com>
+X-Mailer: git-send-email 2.27.0
+X-ClientProxiedBy: LO4P123CA0139.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:193::18) To CH2PR10MB4391.namprd10.prod.outlook.com
+ (2603:10b6:610:7d::11)
 MIME-Version: 1.0
-Cc: lvivier@redhat.com, linux-s390@vger.kernel.org, frankja@linux.ibm.com,
- kvm@vger.kernel.org, david@redhat.com, maz@kernel.org, cohuck@redhat.com,
- thuth@redhat.com, kvm-ppc@vger.kernel.org, vivek.gautam@arm.com,
- pbonzini@redhat.com, imbrenda@linux.ibm.com, kvmarm@lists.cs.columbia.edu
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from localhost.nl.oracle.com
+ (2a01:cb15:8010:b100:76dc:8169:72eb:62ac) by
+ LO4P123CA0139.GBRP123.PROD.OUTLOOK.COM (2603:10a6:600:193::18) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4308.21 via Frontend Transport; Mon, 12 Jul 2021 17:03:56 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 1a3d0b1b-cb1b-4d88-8665-08d94557098e
+X-MS-TrafficTypeDiagnostic: CH0PR10MB5115:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <CH0PR10MB51154ABFC8E30F67F11D960B9A159@CH0PR10MB5115.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:53;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 9781wdqfdVOtlx/R/TuhVB/o7OmjmaiSNoGuUC88vg5WA2plaz9lAUjtThqwyp6yHkvMH4JpT6pu4+vpU/A2fRKiL0DqixiB6v91fWXvOtrQYyKTisZfOsN6YeRDTNkI3oCz2gnjpfx05wb147fzS2UQD9bhWZE16hXfZ9a8eKvZzxt87nC1yCLsMyQHDF5SZFp9HCBfVTRskHoS6/o0MnAAzTqOe/aPv+oNCXYSLGKGpy4hLak4Isvdtroz0TWuF3EnwMyPnfnhlEbXEVwYuRhoDUVtrajPYvfw+/h65KkGli0d9moif+MkK0NwFsSHALzIMEzbZnQhAcFitzwD589GHYZhvRc+JYc0Qvg/xdKpelXHu+LNMXvBE5QVe8kICLInp07dmawn7gMuUxBYgH5sIM7SI2wUqNZ9MJRmMY9IqPte7a/6D0LSmzX1WY0nHs0LjEH/VdX9eD8Es2tiyMrpFLiBlutcA6iYMJXcZPQHx0oRQ4c5jLKMbNUzfBPQfBJWZiAYqMUVZYE7l3EOY2DL9NoQ1gN58Z4TfKLJXRG6uYlBIBAC2K6HOTaReGwbE8cbvCpmBBneWn12+2B4sEhQtwUqeOyOAeepqn/z+EhFd7pVybQGL2W7ZMR6mr9A81CQN6YvqkepnxbNDVHs6lXoKZnkT0+x5UXqyejFy3bl1j/ApE0aF0OK4Zd2smLf4jEqD0iNV48w7KvO0r1hXN39MCEgAe/Oh9gHQGg+XFA=
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:CH2PR10MB4391.namprd10.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(346002)(396003)(376002)(39860400002)(366004)(136003)(83380400001)(66946007)(66476007)(6666004)(38100700002)(5660300002)(7696005)(52116002)(316002)(66556008)(36756003)(2906002)(966005)(4326008)(8676002)(107886003)(86362001)(6486002)(478600001)(8936002)(1076003)(186003)(2616005)(44832011);
+ DIR:OUT; SFP:1101; 
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?YLuTpFPb+s4qhhHtEXlLdhigm2jZYGHENPQ3bVqwQoNy6kwCie9oGVYNRX/t?=
+ =?us-ascii?Q?wxI/0oeTVzyd01Jv8ZODi8/0KHyjmFh4VxSWbQvTSLYuwf+siy29OE+3JJ+4?=
+ =?us-ascii?Q?B+MTThQ6y7HfCMqGh2eQ5fNC67zTZP8+S3fd9jowLjNRY+Xrff5e+/oLvexq?=
+ =?us-ascii?Q?PpD7dXxPiwFLPV3rFyAzC2sOzJkAXVvDIhgTr0+MMNVc2aeh+qwJZNXXajBy?=
+ =?us-ascii?Q?+TiXxrwUsmcGT5Cx+KECWv5ULGl/Y9VO4aBgk9wq19MX7MpSKMOSVkFicT+q?=
+ =?us-ascii?Q?BaolD/meiHC7yHZ+kGFqonW8amonUnP8qIGVUw7U75SbvshW3nQhXIPlbp9S?=
+ =?us-ascii?Q?q5mN0Ns6ZOQQq+EEFzp/ofU4avINj0H8bI5TNXp8UxtPHZfY7ObsuyDdxOYn?=
+ =?us-ascii?Q?5+pvQU0YpS/a/trFaS8mc3JxROkYUJtsMYENNwXiDQnorn6kfFppH7av5IHk?=
+ =?us-ascii?Q?GU/JfUEAoU+1cUKWMNds1K+eCj03PPmNc8oB84soKE/Q74N40saS/Pjsr4Vj?=
+ =?us-ascii?Q?3VfkP4CeoBnchZ8OAFliKNWix6kakM70kZI9pPYFz3Elnb9yVEjXwAWbq4Ta?=
+ =?us-ascii?Q?Gata7O0nPNCnlGC9otVNZYgzgjFDtioBJH0S+bWZonBBVAZKfAruI15kEhfk?=
+ =?us-ascii?Q?AfcB5mR+TUoNnTw/9T5RHp5vtAIs7xC1v2WQvQwvGEXffw3oy28APK+etmB4?=
+ =?us-ascii?Q?ir/P/74iV39P8L3IRc2JATEchCCnIArZjKYwa51wjSAOwyR5A3753ZX1X0tX?=
+ =?us-ascii?Q?pbFgQduqXRdGx/x/wfjO1QDVraoGemDENSQ545QA/xrGKx+iMHbkjKvRffEN?=
+ =?us-ascii?Q?4865obB1SkeFv78NpI++GW1HO3ycromKsiF/S0I1X1V/KPy+1lamSyF4/Lks?=
+ =?us-ascii?Q?cyBj05Fh7Nzc8mv6JZ4qXx21VddiVavUDHaoEgkl3U/Xy6SfMC5bFa0ZxIvW?=
+ =?us-ascii?Q?VsPEEp8XsViYKJubqPTpiYMvIs7ydndVGltQ4dtwjm7CidMeTheJoEIBsPwQ?=
+ =?us-ascii?Q?rGvuZiahiZSh2VjG7OnTKQVG+5Tnbx+SQ6bAO2UJgrqwzkxPsCrCvqyCwJLi?=
+ =?us-ascii?Q?fSPq5S0k/YNBca4QOiR1OCEkfp4O2KEuEUm8OsMA/VC3aBmjMK83HPyvENAe?=
+ =?us-ascii?Q?jyHZeR8JuYR5epEG6Mj1fr8rezMaOD/jUVpcXoUDzTvlz3VpUUnwxir+95uO?=
+ =?us-ascii?Q?i0O+5rsu9k0ghFn++rhVQ27/1IUR4UI9gypafe0zB4CBvl+SCwVcrjDqkths?=
+ =?us-ascii?Q?C1dqFZQEDNRBzNE7mpiH9RLOFwv/Jfecwad8JRRsFHsqL/lntXDT3JMHx8qR?=
+ =?us-ascii?Q?0+FFD82qH7bicgL29Bw1pUAAHI40uLv9nnhqGw+6oVet2J5J/PZEx0LL9nzp?=
+ =?us-ascii?Q?zWVxYh7TgaE+M16fmADnh9e4XtXO?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1a3d0b1b-cb1b-4d88-8665-08d94557098e
+X-MS-Exchange-CrossTenant-AuthSource: CH2PR10MB4391.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jul 2021 17:03:57.5756 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: T/iUc80gS264ZKYxdoe+clzEbwdWMBWC9tsVd+em86s+D1vMqEBvoOVpo8c0r5wPeydQs//GoVPN895eWbR43dpB60K3w8j/HT4WARNJhMo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR10MB5115
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=10043
+ signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
+ mlxlogscore=999
+ adultscore=0 malwarescore=0 bulkscore=0 mlxscore=0 suspectscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2107120126
+X-Proofpoint-GUID: rXapSZxtehFgI2QrA8YksA1mUmorCkT2
+X-Proofpoint-ORIG-GUID: rXapSZxtehFgI2QrA8YksA1mUmorCkT2
+Cc: konrad.wilk@oracle.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,441 +187,77 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri,  2 Jul 2021 17:31:20 +0100
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+In a KVM guest on arm64, performance counters interrupts have an
+unnecessary overhead which slows down execution when using the "perf
+record" command and limits the "perf record" sampling period.
 
-Hi Alex,
+The problem is that when a guest VM disables counters by clearing the
+PMCR_EL0.E bit (bit 0), KVM will disable all counters defined in
+PMCR_EL0 even if they are not enabled in PMCNTENSET_EL0.
 
-> Modify run_tests.sh to use kvmtool instead of qemu to run tests when
-> kvm-unit-tests has been configured with --target=kvmtool.
-> 
-> Example invocation:
-> 
-> $ ./configure --target=kvmtool
-> $ make clean && make
-> $ ./run_scripts.sh
-> 
-> A custom location for the kvmtool binary can be set using the environment
-> variable KVMTOOL:
-> 
-> $ KVMTOOL=/path/to/kvmtool/binary ./run_scripts.sh
-> 
-> Standalone test support is absent, but will be added in subsequent patches.
+KVM disables a counter by calling into the perf framework, in particular
+by calling perf_event_create_kernel_counter() which is a time consuming
+operation. So, for example, with a Neoverse N1 CPU core which has 6 event
+counters and one cycle counter, KVM will always disable all 7 counters
+even if only one is enabled.
 
-So I skimmed over this, and it's at least better than what I had tried
-a few years back ;-)
-And while there might be other ways to sort out command line
-differences between the two, this fixup_kvmtool_opts() looks like a
-clever solution to the problem.
+This typically happens when using the "perf record" command in a guest
+VM: perf will disable all event counters with PMCNTENTSET_EL0 and only
+uses the cycle counter. And when using the "perf record" -F option with
+a high profiling frequency, the overhead of KVM disabling all counters
+instead of one on every counter interrupt becomes very noticeable.
 
-The only problem with this patch is that it's rather big, I wonder if
-this could be split up? For instance move any QEMU specific
-functionality into separate functions first (like run_test_qemu()),
-also use 'if [ "$TARGET" = "qemu" ]' in this first (or second?) patch.
-Then later on just add the kvmtool specifics.
+The problem is fixed by having KVM disable only counters which are
+enabled in PMCNTENSET_EL0. If a counter is not enabled in PMCNTENSET_EL0
+then KVM will not enable it when setting PMCR_EL0.E and it will remain
+disabled as long as it is not enabled in PMCNTENSET_EL0. So there is
+effectively no need to disable a counter when clearing PMCR_EL0.E if it
+is not enabled PMCNTENSET_EL0.
 
-Cheers,
-Andre
+Signed-off-by: Alexandre Chartre <alexandre.chartre@oracle.com>
+---
+The patch is based on https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/pmu/reset-values
+v2 - fix commit messages and rebase on kvm-arm64/pmu/reset-values
+v3 - add missing ~ (stupid me)
 
-> 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
->  scripts/arch-run.bash   |  48 ++++++++++++++++--
->  scripts/runtime.bash    |  94 ++++++++++++++++++++++++++++------
->  scripts/mkstandalone.sh |   5 ++
->  arm/run                 | 110 ++++++++++++++++++++++++----------------
->  run_tests.sh            |  11 +++-
->  5 files changed, 204 insertions(+), 64 deletions(-)
-> 
-> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-> index 8ceed53ed7f8..b916b0e79aca 100644
-> --- a/scripts/arch-run.bash
-> +++ b/scripts/arch-run.bash
-> @@ -69,16 +69,39 @@ run_qemu ()
->  	return $ret
->  }
->  
-> +run_kvmtool()
-> +{
-> +	local stdout errors ret sig
-> +
-> +	# kvmtool doesn't allow an initrd argument with --firmware, but configure
-> +	# sets CONFIG_ERRATA_FORCE in lib/config.h for the kvmtool target.
-> +
-> +	# stdout to {stdout}, stderr to $errors and stderr
-> +	exec {stdout}>&1
-> +	errors=$("${@}" </dev/null 2> >(tee /dev/stderr) > /dev/fd/$stdout)
-> +	ret=$?
-> +	exec {stdout}>&-
-> +
-> +	# ret=0 success, everything else is failure.
-> +	return $ret
-> +}
-> +
->  run_test_status ()
->  {
-> -	local stdout ret
-> +	local stdout ret exit_status
->  
->  	exec {stdout}>&1
-> -	lines=$(run_qemu "$@" > >(tee /dev/fd/$stdout))
-> +	if [ "$TARGET" = "kvmtool" ]; then
-> +		lines=$(run_kvmtool "$@" > >(tee /dev/fd/$stdout))
-> +		exit_status=0
-> +	else
-> +		lines=$(run_qemu "$@" > >(tee /dev/fd/$stdout))
-> +		exit_status=1
-> +	fi
->  	ret=$?
->  	exec {stdout}>&-
->  
-> -	if [ $ret -eq 1 ]; then
-> +	if [ $ret -eq $exit_status ]; then
->  		testret=$(grep '^EXIT: ' <<<"$lines" | sed 's/.*STATUS=\([0-9][0-9]*\).*/\1/')
->  		if [ "$testret" ]; then
->  			if [ $testret -eq 1 ]; then
-> @@ -193,6 +216,25 @@ search_qemu_binary ()
->  	export PATH=$save_path
->  }
->  
-> +search_kvmtool_binary ()
-> +{
-> +	local lkvm kvmtool
-> +
-> +	for lkvm in ${KVMTOOL:-lkvm vm lkvm-static}; do
-> +		if $lkvm --help 2>/dev/null | grep -q 'The most commonly used'; then
-> +			kvmtool="$lkvm"
-> +			break
-> +		fi
-> +	done
-> +
-> +	if [ -z "$kvmtool" ]; then
-> +		echo "A kvmtool binary was not found." >&2
-> +		echo "You can set a custom location by using the KVMTOOL=<path> environment variable." >&2
-> +		return 2
-> +	fi
-> +	command -v $kvmtool
-> +}
-> +
->  initrd_create ()
->  {
->  	if [ "$ENVIRON_DEFAULT" = "yes" ]; then
-> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-> index 132389c7dd59..23b238a6ab6f 100644
-> --- a/scripts/runtime.bash
-> +++ b/scripts/runtime.bash
-> @@ -12,14 +12,19 @@ extract_summary()
->      tail -3 | grep '^SUMMARY: ' | sed 's/^SUMMARY: /(/;s/'"$cr"'\{0,1\}$/)/'
->  }
->  
-> -# We assume that QEMU is going to work if it tried to load the kernel
-> +# We assume that QEMU/kvmtool is going to work if it tried to load the kernel
->  premature_failure()
->  {
->      local log="$(eval $(get_cmdline _NO_FILE_4Uhere_) 2>&1)"
->  
-> -    echo "$log" | grep "_NO_FILE_4Uhere_" |
-> -        grep -q -e "could not \(load\|open\) kernel" -e "error loading" &&
-> -        return 1
-> +    if [ "$TARGET" = "kvmtool" ]; then
-> +        echo "$log" | grep "Fatal: unable to load firmware image _NO_FILE_4Uhere_" &&
-> +            return 1
-> +    else
-> +        echo "$log" | grep "_NO_FILE_4Uhere_" |
-> +            grep -q -e "could not \(load\|open\) kernel" -e "error loading" &&
-> +            return 1
-> +    fi
->  
->      RUNTIME_log_stderr <<< "$log"
->  
-> @@ -30,7 +35,14 @@ premature_failure()
->  get_cmdline()
->  {
->      local kernel=$1
-> -    echo "TESTNAME=$testname TIMEOUT=$timeout ACCEL=$accel $RUNTIME_arch_run $kernel -smp $smp $opts"
-> +    local smp_param
-> +
-> +    if [ "$TARGET" = "kvmtool" ]; then
-> +        smp_param="--cpus $smp"
-> +    else
-> +        smp_param="-smp $smp"
-> +    fi
-> +    echo "TESTNAME=$testname TIMEOUT=$timeout ACCEL=$accel $RUNTIME_arch_run $kernel $smp_param $opts"
->  }
->  
->  skip_nodefault()
-> @@ -70,6 +82,35 @@ function find_word()
->      grep -Fq " $1 " <<< " $2 "
->  }
->  
-> +fixup_kvmtool_opts()
-> +{
-> +    local opts=$1
-> +    local groups=$2
-> +    local gic
-> +    local gic_version
-> +
-> +    if find_word "pmu" $groups; then
-> +        opts+=" --pmu"
-> +    fi
-> +
-> +    if find_word "its" $groups; then
-> +        gic_version=3
-> +        gic="gicv3-its"
-> +    elif [[ "$opts" =~ -machine\ *gic-version=(2|3) ]]; then
-> +        gic_version="${BASH_REMATCH[1]}"
-> +        gic="gicv$gic_version"
-> +    fi
-> +
-> +    if [ -n "$gic" ]; then
-> +        opts=${opts/-machine gic-version=$gic_version/}
-> +        opts+=" --irqchip=$gic"
-> +    fi
-> +
-> +    opts=${opts/-append/--params}
-> +
-> +    echo "$opts"
-> +}
-> +
->  function run()
->  {
->      local testname="$1"
-> @@ -105,7 +146,12 @@ function run()
->          return 2
->      fi
->  
-> -    if [ -n "$accel" ] && [ -n "$ACCEL" ] && [ "$accel" != "$ACCEL" ]; then
-> +    if [ "$TARGET" = "kvmtool" ]; then
-> +        if [ -n "$accel" ] && [ "$accel" != "kvm" ]; then
-> +            print_result "SKIP" $testname "" "$accel not supported by kvmtool"
-> +            return 2
-> +        fi
-> +    elif [ -n "$accel" ] && [ -n "$ACCEL" ] && [ "$accel" != "$ACCEL" ]; then
->          print_result "SKIP" $testname "" "$accel only, but ACCEL=$ACCEL"
->          return 2
->      elif [ -n "$ACCEL" ]; then
-> @@ -126,6 +172,10 @@ function run()
->          done
->      fi
->  
-> +    if [ "$TARGET" = "kvmtool" ]; then
-> +        opts=$(fixup_kvmtool_opts "$opts" "$groups")
-> +    fi
-> +
->      last_line=$(premature_failure > >(tail -1)) && {
->          print_result "SKIP" $testname "" "$last_line"
->          return 77
-> @@ -165,13 +215,25 @@ function run()
->  #
->  # Probe for MAX_SMP, in case it's less than the number of host cpus.
->  #
-> -# This probing currently only works for ARM, as x86 bails on another
-> -# error first. Also, this probing isn't necessary for any ARM hosts
-> -# running kernels later than v4.3, i.e. those including ef748917b52
-> -# "arm/arm64: KVM: Remove 'config KVM_ARM_MAX_VCPUS'". So, at some
-> -# point when maintaining the while loop gets too tiresome, we can
-> -# just remove it...
-> -while $RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP \
-> -		|& grep -qi 'exceeds max CPUs'; do
-> -	MAX_SMP=$((MAX_SMP >> 1))
-> -done
-> +# This probing currently only works for ARM, as x86 bails on another error
-> +# first. Also, this probing isn't necessary for any ARM hosts running kernels
-> +# later than v4.3, i.e. those including ef748917b52 "arm/arm64: KVM: Remove
-> +# 'config KVM_ARM_MAX_VCPUS'". So, at some point when maintaining the while loop
-> +# gets too tiresome, we can just remove it...
-> +#
-> +# We don't need this check for kvmtool, as kvmtool will automatically limit the
-> +# number of VCPUs to what the host supports instead of exiting with an error.
-> +# kvmtool prints a message when that happens, but it's harmless and the chance
-> +# of running a kernel so old that the number of VCPUs is smaller than the number
-> +# of physical CPUs is vanishingly small.
-> +#
-> +# For qemu this check is still needed. For qemu-system-aarch64 version 6.0.0,
-> +# using TCG, the maximum number of VCPUs that mach-virt supports is 8. If a test
-> +# is running on a recent x86 machine, there's a fairly good chance that more
-> +# than 8 logical CPUs are available.
-> +if [ "$TARGET" = "qemu" ]; then
-> +    while $RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP \
-> +            |& grep -qi 'exceeds max CPUs'; do
-> +        MAX_SMP=$((MAX_SMP >> 1))
-> +    done
-> +fi
-> diff --git a/scripts/mkstandalone.sh b/scripts/mkstandalone.sh
-> index cefdec30cb33..16f461c06842 100755
-> --- a/scripts/mkstandalone.sh
-> +++ b/scripts/mkstandalone.sh
-> @@ -95,6 +95,11 @@ function mkstandalone()
->  	echo Written $standalone.
->  }
->  
-> +if [ "$TARGET" = "kvmtool" ]; then
-> +	echo "Standalone tests not supported with kvmtool"
-> +	exit 2
-> +fi
-> +
->  if [ "$ENVIRON_DEFAULT" = "yes" ] && [ "$ERRATATXT" ] && [ ! -f "$ERRATATXT" ]; then
->  	echo "$ERRATATXT not found. (ERRATATXT=$ERRATATXT)" >&2
->  	exit 2
-> diff --git a/arm/run b/arm/run
-> index a390ca5ae0ba..cc5890e7fec4 100755
-> --- a/arm/run
-> +++ b/arm/run
-> @@ -8,59 +8,81 @@ if [ -z "$STANDALONE" ]; then
->  	source config.mak
->  	source scripts/arch-run.bash
->  fi
-> -processor="$PROCESSOR"
->  
-> -ACCEL=$(get_qemu_accelerator) ||
-> -	exit $?
-> +run_test_qemu()
-> +{
-> +    processor="$PROCESSOR"
->  
-> -qemu=$(search_qemu_binary) ||
-> -	exit $?
-> +    ACCEL=$(get_qemu_accelerator) ||
-> +        exit $?
->  
-> -if ! $qemu -machine '?' 2>&1 | grep 'ARM Virtual Machine' > /dev/null; then
-> -	echo "$qemu doesn't support mach-virt ('-machine virt'). Exiting."
-> -	exit 2
-> -fi
-> +    qemu=$(search_qemu_binary) ||
-> +        exit $?
->  
-> -M='-machine virt'
-> +    if ! $qemu -machine '?' 2>&1 | grep 'ARM Virtual Machine' > /dev/null; then
-> +        echo "$qemu doesn't support mach-virt ('-machine virt'). Exiting."
-> +        exit 2
-> +    fi
->  
-> -if [ "$ACCEL" = "kvm" ]; then
-> -	if $qemu $M,\? 2>&1 | grep gic-version > /dev/null; then
-> -		M+=',gic-version=host'
-> -	fi
-> -	if [ "$HOST" = "aarch64" ] || [ "$HOST" = "arm" ]; then
-> -		processor="host"
-> -		if [ "$ARCH" = "arm" ] && [ "$HOST" = "aarch64" ]; then
-> -			processor+=",aarch64=off"
-> -		fi
-> -	fi
-> -fi
-> +    M='-machine virt'
->  
-> -if [ "$ARCH" = "arm" ]; then
-> -	M+=",highmem=off"
-> -fi
-> +    if [ "$ACCEL" = "kvm" ]; then
-> +        if $qemu $M,\? 2>&1 | grep gic-version > /dev/null; then
-> +            M+=',gic-version=host'
-> +        fi
-> +        if [ "$HOST" = "aarch64" ] || [ "$HOST" = "arm" ]; then
-> +            processor="host"
-> +            if [ "$ARCH" = "arm" ] && [ "$HOST" = "aarch64" ]; then
-> +                processor+=",aarch64=off"
-> +            fi
-> +        fi
-> +    fi
->  
-> -if ! $qemu $M -device '?' 2>&1 | grep virtconsole > /dev/null; then
-> -	echo "$qemu doesn't support virtio-console for chr-testdev. Exiting."
-> -	exit 2
-> -fi
-> +    if [ "$ARCH" = "arm" ]; then
-> +        M+=",highmem=off"
-> +    fi
->  
-> -if $qemu $M -chardev testdev,id=id -initrd . 2>&1 \
-> -		| grep backend > /dev/null; then
-> -	echo "$qemu doesn't support chr-testdev. Exiting."
-> -	exit 2
-> -fi
-> +    if ! $qemu $M -device '?' 2>&1 | grep virtconsole > /dev/null; then
-> +        echo "$qemu doesn't support virtio-console for chr-testdev. Exiting."
-> +        exit 2
-> +    fi
->  
-> -chr_testdev='-device virtio-serial-device'
-> -chr_testdev+=' -device virtconsole,chardev=ctd -chardev testdev,id=ctd'
-> +    if $qemu $M -chardev testdev,id=id -initrd . 2>&1 \
-> +            | grep backend > /dev/null; then
-> +        echo "$qemu doesn't support chr-testdev. Exiting."
-> +        exit 2
-> +    fi
->  
-> -pci_testdev=
-> -if $qemu $M -device '?' 2>&1 | grep pci-testdev > /dev/null; then
-> -	pci_testdev="-device pci-testdev"
-> -fi
-> +    chr_testdev='-device virtio-serial-device'
-> +    chr_testdev+=' -device virtconsole,chardev=ctd -chardev testdev,id=ctd'
-> +
-> +    pci_testdev=
-> +    if $qemu $M -device '?' 2>&1 | grep pci-testdev > /dev/null; then
-> +        pci_testdev="-device pci-testdev"
-> +    fi
-> +
-> +    M+=",accel=$ACCEL"
-> +    command="$qemu -nodefaults $M -cpu $processor $chr_testdev $pci_testdev"
-> +    command+=" -display none -serial stdio -kernel"
-> +    command="$(migration_cmd) $(timeout_cmd) $command"
-> +
-> +    run_qemu $command "$@"
-> +}
-> +
-> +run_test_kvmtool()
-> +{
-> +    kvmtool=$(search_kvmtool_binary) ||
-> +        exit $?
->  
-> -M+=",accel=$ACCEL"
-> -command="$qemu -nodefaults $M -cpu $processor $chr_testdev $pci_testdev"
-> -command+=" -display none -serial stdio -kernel"
-> -command="$(migration_cmd) $(timeout_cmd) $command"
-> +    local command="$(timeout_cmd) $kvmtool run --firmware "
-> +    run_test_status $command "$@"
-> +}
->  
-> -run_qemu $command "$@"
-> +case "$TARGET" in
-> +    "qemu")
-> +        run_test_qemu "$@"
-> +        ;;
-> +    "kvmtool")
-> +        run_test_kvmtool "$@"
-> +        ;;
-> +esac
-> diff --git a/run_tests.sh b/run_tests.sh
-> index 65108e73a2c0..b010ee3ab348 100755
-> --- a/run_tests.sh
-> +++ b/run_tests.sh
-> @@ -26,7 +26,9 @@ Usage: $0 [-h] [-v] [-a] [-g group] [-j NUM-TASKS] [-t]
->      -t, --tap13     Output test results in TAP format
->  
->  Set the environment variable QEMU=/path/to/qemu-system-ARCH to
-> -specify the appropriate qemu binary for ARCH-run.
-> +specify the appropriate qemu binary for ARCH-run. For arm/arm64, kvmtool
-> +is also supported and the environment variable KVMTOOL=/path/to/kvmtool
-> +can be used to specify a custom location for the kvmtool binary.
->  
->  EOF
->  }
-> @@ -41,6 +43,13 @@ if [ $? -ne 4 ]; then
->      exit 1
->  fi
->  
-> +if [ "$TARGET" = "kvmtool" ]; then
-> +    if [ -n "$ACCEL" ] && [ "$ACCEL" != "kvm" ]; then
-> +        echo "kvmtool supports only the kvm accelerator"
-> +        exit 1
-> +    fi
-> +fi
-> +
->  only_tests=""
->  args=`getopt -u -o ag:htj:v -l all,group:,help,tap13,parallel:,verbose -- $*`
->  [ $? -ne 0 ] && exit 2;
+ arch/arm64/kvm/pmu-emul.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index fae4e95b586c..c64e35534694 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -563,21 +563,23 @@ void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val)
+  */
+ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
+ {
+-	unsigned long mask = kvm_pmu_valid_counter_mask(vcpu);
++	unsigned long mask;
+ 	int i;
+ 
+ 	if (val & ARMV8_PMU_PMCR_E) {
+ 		kvm_pmu_enable_counter_mask(vcpu,
+ 		       __vcpu_sys_reg(vcpu, PMCNTENSET_EL0));
+ 	} else {
+-		kvm_pmu_disable_counter_mask(vcpu, mask);
++		kvm_pmu_disable_counter_mask(vcpu,
++		       __vcpu_sys_reg(vcpu, PMCNTENSET_EL0));
+ 	}
+ 
+ 	if (val & ARMV8_PMU_PMCR_C)
+ 		kvm_pmu_set_counter_value(vcpu, ARMV8_PMU_CYCLE_IDX, 0);
+ 
+ 	if (val & ARMV8_PMU_PMCR_P) {
+-		mask &= ~BIT(ARMV8_PMU_CYCLE_IDX);
++		mask = kvm_pmu_valid_counter_mask(vcpu)
++			& ~BIT(ARMV8_PMU_CYCLE_IDX);
+ 		for_each_set_bit(i, &mask, 32)
+ 			kvm_pmu_set_counter_value(vcpu, i, 0);
+ 	}
+
+base-commit: 83f870a663592797c576846db3611e0a1664eda2
+-- 
+2.27.0
 
 _______________________________________________
 kvmarm mailing list
