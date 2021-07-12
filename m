@@ -6,62 +6,72 @@ X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13975C07E9C
-	for <kvmarm@archiver.kernel.org>; Mon, 12 Jul 2021 14:16:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A31B8C07E99
+	for <kvmarm@archiver.kernel.org>; Mon, 12 Jul 2021 14:22:47 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7902561154
-	for <kvmarm@archiver.kernel.org>; Mon, 12 Jul 2021 14:16:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7902561154
+	by mail.kernel.org (Postfix) with ESMTP id 1EFB6610E6
+	for <kvmarm@archiver.kernel.org>; Mon, 12 Jul 2021 14:22:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EFB6610E6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 068994086F;
-	Mon, 12 Jul 2021 10:16:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A19CD4048A;
+	Mon, 12 Jul 2021 10:22:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id i-ZXsHr1SpIj; Mon, 12 Jul 2021 10:16:16 -0400 (EDT)
+	with ESMTP id t0EDqumLjNIt; Mon, 12 Jul 2021 10:22:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BB73D40856;
-	Mon, 12 Jul 2021 10:16:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A4C640617;
+	Mon, 12 Jul 2021 10:22:45 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 18AC040821
- for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Jul 2021 10:16:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2EB034048A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Jul 2021 10:22:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qxSKBRSSU1m5 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 12 Jul 2021 10:16:15 -0400 (EDT)
+ with ESMTP id PXdtTM4poHdR for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 12 Jul 2021 10:22:43 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E40E6407ED
- for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Jul 2021 10:16:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3701240212
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Jul 2021 10:22:43 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id C1603610CB;
- Mon, 12 Jul 2021 14:16:13 +0000 (UTC)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
- TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94.2)
+ by mail.kernel.org (Postfix) with ESMTPSA id 3C51F61026;
+ Mon, 12 Jul 2021 14:22:42 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1m2wjD-00Cqee-Qq; Mon, 12 Jul 2021 15:16:11 +0100
-MIME-Version: 1.0
-Date: Mon, 12 Jul 2021 15:16:11 +0100
+ id 1m2wpU-00CqmO-6C; Mon, 12 Jul 2021 15:22:40 +0100
+Date: Mon, 12 Jul 2021 15:22:40 +0100
+Message-ID: <878s2b393j.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: John Gong <johngong0791@163.com>
-Subject: Re: [PATCH] KVM/ARM: vgic: Delete the redundant lines of code
-In-Reply-To: <20210712124933.1153992-1-johngong0791@163.com>
-References: <20210712124933.1153992-1-johngong0791@163.com>
-User-Agent: Roundcube Webmail/1.4.11
-Message-ID: <a97545a9e80c6799507a9f9d93817625@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: johngong0791@163.com, kvmarm@lists.cs.columbia.edu
+To: Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: Re: [PATCHv2 1/4] arm64: smccc: Add SMCCC pv-vcpu-state function call
+ IDs
+In-Reply-To: <20210709043713.887098-2-senozhatsky@chromium.org>
+References: <20210709043713.887098-1-senozhatsky@chromium.org>
+ <20210709043713.887098-2-senozhatsky@chromium.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: senozhatsky@chromium.org, will@kernel.org,
+ suleiman@google.com, joelaf@google.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+ virtualization@lists.linux-foundation.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvmarm@lists.cs.columbia.edu
+Cc: Joel Fernandes <joelaf@google.com>, linux-kernel@vger.kernel.org,
+ virtualization@lists.linux-foundation.org,
+ Suleiman Souhlal <suleiman@google.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,41 +83,62 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2021-07-12 13:49, John Gong wrote:
-> delete redundant lines of code
+On Fri, 09 Jul 2021 05:37:10 +0100,
+Sergey Senozhatsky <senozhatsky@chromium.org> wrote:
 > 
-> Signed-off-by: John Gong <johngong0791@163.com>
+> Add the definitions of the SMCCC functions that will be
+> used to paravirt VCPU state configuration.
+> 
+> Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
 > ---
->  arch/arm64/kvm/vgic/vgic-mmio.c | 2 --
->  1 file changed, 2 deletions(-)
+>  include/linux/arm-smccc.h | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
 > 
-> diff --git a/arch/arm64/kvm/vgic/vgic-mmio.c 
-> b/arch/arm64/kvm/vgic/vgic-mmio.c
-> index 48c6067fc5ec..19cf661c451e 100644
-> --- a/arch/arm64/kvm/vgic/vgic-mmio.c
-> +++ b/arch/arm64/kvm/vgic/vgic-mmio.c
-> @@ -1004,8 +1004,6 @@ static int dispatch_mmio_read(struct kvm_vcpu
-> *vcpu, struct kvm_io_device *dev,
-> 
->  	switch (iodev->iodev_type) {
->  	case IODEV_CPUIF:
-> -		data = region->read(vcpu, addr, len);
-> -		break;
->  	case IODEV_DIST:
->  		data = region->read(vcpu, addr, len);
->  		break;
+> diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
+> index 7d1cabe15262..dbf0d658e54a 100644
+> --- a/include/linux/arm-smccc.h
+> +++ b/include/linux/arm-smccc.h
+> @@ -177,6 +177,24 @@
+>  			   ARM_SMCCC_OWNER_STANDARD,		\
+>  			   0x53)
+>  
+> +#define ARM_SMCCC_HV_PV_VCPU_STATE_FEATURES			\
+> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
+> +			   ARM_SMCCC_SMC_64,			\
+> +			   ARM_SMCCC_OWNER_STANDARD_HYP,	\
+> +			   0x60)
+> +
+> +#define ARM_SMCCC_HV_PV_VCPU_STATE_INIT			\
+> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
+> +			   ARM_SMCCC_SMC_64,			\
+> +			   ARM_SMCCC_OWNER_STANDARD_HYP,	\
+> +			   0x61)
+> +
+> +#define ARM_SMCCC_HV_PV_VCPU_STATE_RELEASE			\
+> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
+> +			   ARM_SMCCC_SMC_64,			\
+> +			   ARM_SMCCC_OWNER_STANDARD_HYP,	\
+> +			   0x62)
+> +
 
-I'm not overly keen on this. Why isn't the write path treated the same 
-way?
+This is definitely the *wrong* namespace for this. The "STANDARD_HYP"
+space is owned by ARM for hypercalls that are implementable by any
+hypervisors, and for which there is an ARM-owned specification.
 
-         M.
+Unless you plan to get this adopted as an ARM spec (pretty doubtful),
+this should go instead in the KVM-specific space, which currently has
+a single user (the PTP stuff), although I plan to add a couple more
+shortly.
+
+	M.
+
 -- 
-Jazz is not dead. It just smells funny...
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
