@@ -7,89 +7,87 @@ X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03D09C07E99
-	for <kvmarm@archiver.kernel.org>; Mon, 12 Jul 2021 16:36:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27AB0C11F66
+	for <kvmarm@archiver.kernel.org>; Mon, 12 Jul 2021 16:37:53 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 759B161221
-	for <kvmarm@archiver.kernel.org>; Mon, 12 Jul 2021 16:36:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 759B161221
+	by mail.kernel.org (Postfix) with ESMTP id 8A7E161221
+	for <kvmarm@archiver.kernel.org>; Mon, 12 Jul 2021 16:37:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A7E161221
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E5A2F40870;
-	Mon, 12 Jul 2021 12:36:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 189F040CF8;
+	Mon, 12 Jul 2021 12:37:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pCN6VUVtawwv; Mon, 12 Jul 2021 12:36:54 -0400 (EDT)
+	with ESMTP id SRCphGY0OhnN; Mon, 12 Jul 2021 12:37:51 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C81F64083E;
-	Mon, 12 Jul 2021 12:36:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0748340839;
+	Mon, 12 Jul 2021 12:37:51 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 864D240821
- for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Jul 2021 12:36:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AB7274048B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Jul 2021 12:37:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jZKphhJpNCkb for <kvmarm@lists.cs.columbia.edu>;
- Mon, 12 Jul 2021 12:36:52 -0400 (EDT)
+ with ESMTP id tmsHiqf14FP9 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 12 Jul 2021 12:37:48 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 867C1407F4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Jul 2021 12:36:52 -0400 (EDT)
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CCBC840489
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Jul 2021 12:37:48 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1626107812;
+ s=mimecast20190719; t=1626107868;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=MtrPeL1MW5g9H7qmJOUpT+3Y4CWR41HGQODgw/zxeBs=;
- b=gRVYqrRYr/O0Xs8gh7WUoBjPIfvrJs0fyabPdf3ks++Wj1nPANLMChPL0eQLhAdeHU/p10
- o9qmLGAZ7xRxCPopJ5w+vk9E4gG4ZGU9LnWPoIVd2DyIF1r6SABVO7mMO5FH2k0nyfx3Hp
- DFqvO9n0FGFo/dEunRiIGMEOcwHlKYc=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-371-Sxoj3lI7Oxqb1UaqPt_kjw-1; Mon, 12 Jul 2021 12:36:50 -0400
-X-MC-Unique: Sxoj3lI7Oxqb1UaqPt_kjw-1
-Received: by mail-io1-f72.google.com with SMTP id
- i13-20020a5d88cd0000b02904e5ab8bdc6cso12196633iol.22
- for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Jul 2021 09:36:50 -0700 (PDT)
+ bh=DmsrfUJqVuzKIhoeVB1ab8GPQvYJh20rCkMxoqwgccc=;
+ b=iLcJaA84nFVoUH12X/mg1M6/IB6BEiXGRP/w/SUBVbTkpxA1Bor1X9vtVmqhoZHD5q7y3g
+ DnKzkMIY+aeqW8xkd8KdGpqgJD/NqLLkoseE88HuP12mqCAhv/ZPdCPC9VswQ8nYFCAUI4
+ 9YbKCKZ36D/zW3dwNOMitmWpJaLc2II=
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
+ [209.85.166.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-400-i9ZC5zFRNWiiSYqGqUlUQA-1; Mon, 12 Jul 2021 12:37:47 -0400
+X-MC-Unique: i9ZC5zFRNWiiSYqGqUlUQA-1
+Received: by mail-il1-f200.google.com with SMTP id
+ s12-20020a056e02216cb02901f9cee02769so5764430ilv.11
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Jul 2021 09:37:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=MtrPeL1MW5g9H7qmJOUpT+3Y4CWR41HGQODgw/zxeBs=;
- b=NsjAk37woh3htfa2Lg4etsnsO/deGCAls6uRTGN+5SUB6X+iYc6JFyy6E/1tg5DCzi
- UGIfgEuCfwH0RrRxXuSDubRKPrzR2XOhhrQL/tWfRDPi1pqaQoPEoIhu607pU3pxsBfg
- al9aU3f2oRzrlCHILo5N1LydG2o92tRcyKY6Nm7qd4j8MOQSZrXZkAOUcNVLnGVF8R5O
- MOBgTNhQFf8CH1dcFjxXG4oY74MQQwg7rRh5jbN1Qh9ynIt0G84FkxhXO7B8yn8MHKDv
- rWcPdfg6W+FI6OUPpOjSDr+JsnX+sRlCZGMZ0LnuqDyVOvjqVBLE5G6WaGZy8F2duxuE
- dalQ==
-X-Gm-Message-State: AOAM531CfrjKpTSKWQSke2ZNZtuYP65OJLbB6c9OGICCtAGTiA/mBvJK
- j6ItSMaGNEnqcoyJJccBMrtWM+ZexYkm5EhfbfzW7DBB7K2xwyxiDXmzhfnpvFDpb9srXJrMwJn
- z6gBrz0OJ5I766otG2tt1C+D2
-X-Received: by 2002:a05:6638:3594:: with SMTP id
- v20mr44398399jal.25.1626107810377; 
- Mon, 12 Jul 2021 09:36:50 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwfZs7GgsE/lzYFDtyQMKvJJdBgqUsxHSeDXSOj4Dft5q8ck5jfD4jmnOq1o4WYVKlXhNT6cA==
-X-Received: by 2002:a05:6638:3594:: with SMTP id
- v20mr44398375jal.25.1626107810195; 
- Mon, 12 Jul 2021 09:36:50 -0700 (PDT)
+ bh=DmsrfUJqVuzKIhoeVB1ab8GPQvYJh20rCkMxoqwgccc=;
+ b=e1Vm0upYurpAfx596b9yEPfF57GbimH7TP0zaU8HUdI4n2KpEW1NBWJD3U3BpYeDtF
+ QsAujsLPS1NmD+c9CVAfnDGX9t+INKui1Nfse2+s/rU+XjvIvM/YPXj6+KFu1xwNz6kf
+ I8jsXex0Py6cX0t4irnS1ROKp2N/Hn55Nd+DFb2G7vUXTnsFiGpfiLSCLOk33tWZCGbZ
+ VRWgwEzl9Ble7T0xI5Rf73PWoW/mgrxzeN3ih3bV88HOs3CZj/DtyhpoQdvr8mZM91r3
+ DlNw+8woktGW+XTxbSZYeqCDRWq8r0EDt4P0cFcwnb1BqJFvaou0tbV0VgQkmrznpT9a
+ vbMg==
+X-Gm-Message-State: AOAM532R15KigqM9DwWJvxNEzN5XsBnJfWvI7VaCLXWs29J8b422NOhd
+ eaWbQrO/afp7uJdZ58/A83O2FHM4mBmVstsvEKdjcBg+DidpvPVLXdJWZxqkMPYA6OLqNeXloic
+ TtEFYEoU7DZrzYxOiM8RjbxzU
+X-Received: by 2002:a92:7a12:: with SMTP id v18mr11239779ilc.27.1626107866875; 
+ Mon, 12 Jul 2021 09:37:46 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzVBVoWaMr/V5Gyw1JMvoSpF+iBmSnxs3Lb0dTzJIaWKLxJccOVfvstXhDuQpUmyCOaoGc3Jw==
+X-Received: by 2002:a92:7a12:: with SMTP id v18mr11239751ilc.27.1626107866573; 
+ Mon, 12 Jul 2021 09:37:46 -0700 (PDT)
 Received: from gator ([140.82.166.162])
- by smtp.gmail.com with ESMTPSA id m24sm8288360ion.3.2021.07.12.09.36.49
+ by smtp.gmail.com with ESMTPSA id y13sm7797842ioa.51.2021.07.12.09.37.45
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 12 Jul 2021 09:36:49 -0700 (PDT)
-Date: Mon, 12 Jul 2021 18:36:47 +0200
+ Mon, 12 Jul 2021 09:37:46 -0700 (PDT)
+Date: Mon, 12 Jul 2021 18:37:44 +0200
 From: Andrew Jones <drjones@redhat.com>
 To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [kvm-unit-tests RFC PATCH 1/5] lib: arm: Print test exit status
- on exit if chr-testdev is not available
-Message-ID: <20210712163647.oxntpjapur4z23sl@gator>
+Subject: Re: [kvm-unit-tests RFC PATCH 2/5] scripts: Rename run_qemu_status
+ -> run_test_status
+Message-ID: <20210712163744.5qj3jddg4j6abuq4@gator>
 References: <20210702163122.96110-1-alexandru.elisei@arm.com>
- <20210702163122.96110-2-alexandru.elisei@arm.com>
+ <20210702163122.96110-3-alexandru.elisei@arm.com>
 MIME-Version: 1.0
-In-Reply-To: <20210702163122.96110-2-alexandru.elisei@arm.com>
+In-Reply-To: <20210702163122.96110-3-alexandru.elisei@arm.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -116,73 +114,55 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Jul 02, 2021 at 05:31:18PM +0100, Alexandru Elisei wrote:
-> The arm64 tests can be run under kvmtool, which doesn't emulate a
-> chr-testdev device. In preparation for adding run script support for
-> kvmtool, print the test exit status so the scripts can pick it up and
-> correctly mark the test as pass or fail.
+On Fri, Jul 02, 2021 at 05:31:19PM +0100, Alexandru Elisei wrote:
+> kvm-unit-tests will get support for running tests automatically under
+> kvmtool, rename the function to make it more generic.
 > 
 > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 > ---
->  lib/chr-testdev.h |  1 +
->  lib/arm/io.c      | 10 +++++++++-
->  lib/chr-testdev.c |  5 +++++
->  3 files changed, 15 insertions(+), 1 deletion(-)
+>  scripts/arch-run.bash | 2 +-
+>  powerpc/run           | 2 +-
+>  s390x/run             | 2 +-
+>  3 files changed, 3 insertions(+), 3 deletions(-)
 > 
-> diff --git a/lib/chr-testdev.h b/lib/chr-testdev.h
-> index ffd9a851aa9b..09b4b424670e 100644
-> --- a/lib/chr-testdev.h
-> +++ b/lib/chr-testdev.h
-> @@ -11,4 +11,5 @@
->   */
->  extern void chr_testdev_init(void);
->  extern void chr_testdev_exit(int code);
-> +extern bool chr_testdev_available(void);
->  #endif
-> diff --git a/lib/arm/io.c b/lib/arm/io.c
-> index 343e10822263..9e62b571a91b 100644
-> --- a/lib/arm/io.c
-> +++ b/lib/arm/io.c
-> @@ -125,7 +125,15 @@ extern void halt(int code);
->  
->  void exit(int code)
->  {
-> -	chr_testdev_exit(code);
-> +	if (chr_testdev_available()) {
-> +		chr_testdev_exit(code);
-
-chr_testdev_exit() already has a 'if !vcon goto out' in it, so you can
-just call it unconditionally. No need for chr_testdev_available().
-
-> +	} else {
-> +		/*
-> +		 * Print the test return code in the format used by chr-testdev
-> +		 * so the runner script can parse it.
-> +		 */
-> +		printf("\nEXIT: STATUS=%d\n", ((code) << 1) | 1);
-> +	}
->  	psci_system_off();
->  	halt(code);
->  	__builtin_unreachable();
-> diff --git a/lib/chr-testdev.c b/lib/chr-testdev.c
-> index b3c641a833fe..301e73a6c064 100644
-> --- a/lib/chr-testdev.c
-> +++ b/lib/chr-testdev.c
-> @@ -68,3 +68,8 @@ void chr_testdev_init(void)
->  	in_vq = vqs[0];
->  	out_vq = vqs[1];
+> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
+> index 5997e384019b..8ceed53ed7f8 100644
+> --- a/scripts/arch-run.bash
+> +++ b/scripts/arch-run.bash
+> @@ -69,7 +69,7 @@ run_qemu ()
+>  	return $ret
 >  }
-> +
-> +bool chr_testdev_available(void)
-> +{
-> +	return vcon != NULL;
-> +}
+>  
+> -run_qemu_status ()
+> +run_test_status ()
+>  {
+>  	local stdout ret
+>  
+> diff --git a/powerpc/run b/powerpc/run
+> index 597ab96ed8a8..312576006504 100755
+> --- a/powerpc/run
+> +++ b/powerpc/run
+> @@ -31,4 +31,4 @@ command="$(migration_cmd) $(timeout_cmd) $command"
+>  # to fixup the fixup below by parsing the true exit code from the output.
+>  # The second fixup is also a FIXME, because once we add chr-testdev
+>  # support for powerpc, we won't need the second fixup.
+> -run_qemu_status $command "$@"
+> +run_test_status $command "$@"
+> diff --git a/s390x/run b/s390x/run
+> index c615caa1b772..5a4bb3bda805 100755
+> --- a/s390x/run
+> +++ b/s390x/run
+> @@ -28,4 +28,4 @@ command+=" -kernel"
+>  command="$(timeout_cmd) $command"
+>  
+>  # We return the exit code via stdout, not via the QEMU return code
+> -run_qemu_status $command "$@"
+> +run_test_status $command "$@"
 > -- 
 > 2.32.0
 >
 
-Thanks,
-drew 
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 
 _______________________________________________
 kvmarm mailing list
