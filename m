@@ -2,78 +2,102 @@ Return-Path: <SRS0=yjsw=MF=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-18.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D2BEC07E95
-	for <kvmarm@archiver.kernel.org>; Tue, 13 Jul 2021 20:37:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72C28C07E95
+	for <kvmarm@archiver.kernel.org>; Tue, 13 Jul 2021 20:48:05 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B008A61175
-	for <kvmarm@archiver.kernel.org>; Tue, 13 Jul 2021 20:37:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B008A61175
+	by mail.kernel.org (Postfix) with ESMTP id E0A4C61369
+	for <kvmarm@archiver.kernel.org>; Tue, 13 Jul 2021 20:48:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0A4C61369
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 508E64A1A7;
-	Tue, 13 Jul 2021 16:37:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 69EC94A173;
+	Tue, 13 Jul 2021 16:48:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id MKmquusywr1f; Tue, 13 Jul 2021 16:37:53 -0400 (EDT)
+	with ESMTP id CJC1MSmxNwcv; Tue, 13 Jul 2021 16:48:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C1E34A551;
-	Tue, 13 Jul 2021 16:37:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C8C24A524;
+	Tue, 13 Jul 2021 16:48:03 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B20BB4A1A7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Jul 2021 16:37:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C7DF4A4BE
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Jul 2021 16:48:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Npg1VCo-4dEK for <kvmarm@lists.cs.columbia.edu>;
- Tue, 13 Jul 2021 16:37:50 -0400 (EDT)
+ with ESMTP id kzPq+m1ujGaZ for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 13 Jul 2021 16:48:01 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B731E4B080
- for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Jul 2021 16:37:50 -0400 (EDT)
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7906449F5F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Jul 2021 16:48:01 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1626208670;
+ s=mimecast20190719; t=1626209281;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=+3BE+KBwmpKZs3HfTywA3YepA+ZFEmEvW/zZIsH9yzY=;
- b=RSiTasrrkkcUCvGQfgbwbkzahvoA27ma8ujhBPbhvefVc50fb5TSxjRywZo8/wuWdAAbgo
- EMVcVIHTEy+SYfDGSZKJiBpxShpc/MZdEaLj/YR6tfUGsD220o1Mgke55PzpllSzD7janV
- 1AQE7Z90ELfUoPmhfCUm8h3ISS/nVLk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-269-OxfjYbIcPK2i_muuum3CcA-1; Tue, 13 Jul 2021 16:37:47 -0400
-X-MC-Unique: OxfjYbIcPK2i_muuum3CcA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0CB3E804145;
- Tue, 13 Jul 2021 20:37:46 +0000 (UTC)
-Received: from gator.redhat.com (unknown [10.22.8.235])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1A4581002D71;
- Tue, 13 Jul 2021 20:37:44 +0000 (UTC)
+ bh=edgULd724qxW2wczl2lL2drDkUNp/TtLehg+wvSDn60=;
+ b=Km7/Ni0OrKc8z1HJ+HXACh6hets7CcM3aLdqYvksZebOJunQC2RQ2q9j0j8bRXTGzyI+uA
+ 5pa+fuv+ua2BvfoNCDiHk687jWw2A4GbXRw8VhqoJYPV27Oq3HEGiDIGRnPm+3Y1mypVQy
+ rn3IAMb6YVFGhI5ngX4DVJJJzaVxLx8=
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
+ [209.85.166.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-462--YDt2YGGPgOXKGLSjncdbg-1; Tue, 13 Jul 2021 16:47:57 -0400
+X-MC-Unique: -YDt2YGGPgOXKGLSjncdbg-1
+Received: by mail-il1-f198.google.com with SMTP id
+ i11-20020a056e02004bb029020269661e11so14310076ilr.13
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Jul 2021 13:47:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=edgULd724qxW2wczl2lL2drDkUNp/TtLehg+wvSDn60=;
+ b=PX6UHdd7wbFvVXe9Mp6cvPfqMiQgZOjhzHIdE09jYWggy58MOq7Zdnrw3m0U9vaqUm
+ jZ5P12GMfiiH58XtmPmJSu+d3EmTbuNSUHWOWZXMa50QQka6XvcgkCb+7UtJdu74fiY2
+ dwZ8ce2Aqp1/b6I0/2MGIvaQ/akoe9xa1J9CJM+YIUq6TMVOm7k1uWre1OY30vZW9Bql
+ wCqWS+d32L418/4EefcN9GThQkDxYKfK8wgRLTFnn6bRi4PKu8rrjyGGBkmSM/CZN/ar
+ 62Cm5y1JzY39g4H6SPoEmpDGViF6DQ5rwnQ4oBH/SK9byeobhMsxOh22bhIv/9BKXZS8
+ vtLw==
+X-Gm-Message-State: AOAM530ZVUZCNCYis85RetdKxKlWDUXDK1HVaHbMVkNGpdgKzTIBsiD7
+ okDtTs3aJl2QH5vmGqGx6nwscj0Y9po17Sv5ksL7N6pGhWgMUil+r1l5kvQl6VOUqZmSYAUxqpq
+ zBzcCWPdKW3XZ9GeU7ydpN5cl
+X-Received: by 2002:a92:db4e:: with SMTP id w14mr4382864ilq.188.1626209277264; 
+ Tue, 13 Jul 2021 13:47:57 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxlRTk8ZYwTep6uQ3YEemMecev8TKW7q7hnLoZpmdpPTnuZHGlGP2olwGFrF73D7gKpIhoktA==
+X-Received: by 2002:a92:db4e:: with SMTP id w14mr4382859ilq.188.1626209277118; 
+ Tue, 13 Jul 2021 13:47:57 -0700 (PDT)
+Received: from gator ([140.82.166.162])
+ by smtp.gmail.com with ESMTPSA id s6sm22547ilv.76.2021.07.13.13.47.56
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 13 Jul 2021 13:47:56 -0700 (PDT)
+Date: Tue, 13 Jul 2021 22:47:54 +0200
 From: Andrew Jones <drjones@redhat.com>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 2/2] KVM: arm64: selftests: get-reg-list: actually enable pmu
- regs in pmu sublist
-Date: Tue, 13 Jul 2021 22:37:42 +0200
-Message-Id: <20210713203742.29680-3-drjones@redhat.com>
-In-Reply-To: <20210713203742.29680-1-drjones@redhat.com>
-References: <20210713203742.29680-1-drjones@redhat.com>
+To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [kvm-unit-tests PATCH v2 2/4] scripts/arch-run: don't use
+ deprecated server/nowait options
+Message-ID: <20210713204754.xg3eawok4m6q7ulk@gator>
+References: <20210525172628.2088-1-alex.bennee@linaro.org>
+ <20210525172628.2088-3-alex.bennee@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Cc: maz@kernel.org, pbonzini@redhat.com
+In-Reply-To: <20210525172628.2088-3-alex.bennee@linaro.org>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Disposition: inline
+Cc: kvm@vger.kernel.org, maz@kernel.org, shashi.mallela@linaro.org,
+ qemu-arm@nongnu.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -85,40 +109,70 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-We reworked get-reg-list to make it easier to enable optional register
-sublists by parametrizing their vcpu feature flags as well as making
-other generalizations. That was all to make sure we enable the PMU
-registers when we want to test them. Somehow we forgot to actually
-include the PMU feature flag in the PMU sublist description though!
-Do that now.
+On Tue, May 25, 2021 at 06:26:26PM +0100, Alex Benn=E9e wrote:
+> The very fact that QEMU drops the deprecation warning while running is
+> enough to confuse the its-migration test into failing. The boolean
+> options server and wait have accepted the long form options for a long
+> time.
+> =
 
-Fixes: 313673bad871 ("KVM: arm64: selftests: get-reg-list: Split base and pmu registers")
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- tools/testing/selftests/kvm/aarch64/get-reg-list.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
+> Cc: Shashi Mallela <shashi.mallela@linaro.org>
+> ---
+>  scripts/arch-run.bash | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> =
 
-diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-index a16c8f05366c..cc898181faab 100644
---- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-+++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-@@ -1019,7 +1019,8 @@ static __u64 sve_rejects_set[] = {
- #define VREGS_SUBLIST \
- 	{ "vregs", .regs = vregs, .regs_n = ARRAY_SIZE(vregs), }
- #define PMU_SUBLIST \
--	{ "pmu", .regs = pmu_regs, .regs_n = ARRAY_SIZE(pmu_regs), }
-+	{ "pmu", .capability = KVM_CAP_ARM_PMU_V3, .feature = KVM_ARM_VCPU_PMU_V3, \
-+	  .regs = pmu_regs, .regs_n = ARRAY_SIZE(pmu_regs), }
- #define SVE_SUBLIST \
- 	{ "sve", .capability = KVM_CAP_ARM_SVE, .feature = KVM_ARM_VCPU_SVE, .finalize = true, \
- 	  .regs = sve_regs, .regs_n = ARRAY_SIZE(sve_regs), \
--- 
-2.31.1
+> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
+> index 5997e38..70693f2 100644
+> --- a/scripts/arch-run.bash
+> +++ b/scripts/arch-run.bash
+> @@ -122,14 +122,14 @@ run_migration ()
+>  	trap 'kill 0; exit 2' INT TERM
+>  	trap 'rm -f ${migout1} ${migsock} ${qmp1} ${qmp2} ${fifo}' RETURN EXIT
+>  =
+
+> -	eval "$@" -chardev socket,id=3Dmon1,path=3D${qmp1},server,nowait \
+> +	eval "$@" -chardev socket,id=3Dmon1,path=3D${qmp1},server=3Don,wait=3Do=
+ff \
+>  		-mon chardev=3Dmon1,mode=3Dcontrol | tee ${migout1} &
+>  =
+
+>  	# We have to use cat to open the named FIFO, because named FIFO's, unli=
+ke
+>  	# pipes, will block on open() until the other end is also opened, and t=
+hat
+>  	# totally breaks QEMU...
+>  	mkfifo ${fifo}
+> -	eval "$@" -chardev socket,id=3Dmon2,path=3D${qmp2},server,nowait \
+> +	eval "$@" -chardev socket,id=3Dmon2,path=3D${qmp2},server=3Don,wait=3Do=
+ff \
+>  		-mon chardev=3Dmon2,mode=3Dcontrol -incoming unix:${migsock} < <(cat $=
+{fifo}) &
+>  	incoming_pid=3D`jobs -l %+ | awk '{print$2}'`
+>  =
+
+> -- =
+
+> 2.20.1
+> =
+
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+Applied to misc/queue
+
+https://gitlab.com/rhdrjones/kvm-unit-tests/-/commits/misc/queue
+
+Thanks,
+drew
 
 _______________________________________________
 kvmarm mailing list
