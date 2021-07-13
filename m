@@ -2,71 +2,77 @@ Return-Path: <SRS0=yjsw=MF=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 935A7C07E95
-	for <kvmarm@archiver.kernel.org>; Tue, 13 Jul 2021 16:00:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 928B0C07E95
+	for <kvmarm@archiver.kernel.org>; Tue, 13 Jul 2021 16:15:55 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 05A5B61158
-	for <kvmarm@archiver.kernel.org>; Tue, 13 Jul 2021 16:00:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05A5B61158
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 0701461175
+	for <kvmarm@archiver.kernel.org>; Tue, 13 Jul 2021 16:15:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0701461175
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 880F24AED4;
-	Tue, 13 Jul 2021 12:00:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 674384A19F;
+	Tue, 13 Jul 2021 12:15:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@armlinux.org.uk
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 0WmsAVktZXzq; Tue, 13 Jul 2021 12:00:04 -0400 (EDT)
+	with ESMTP id UK4k4-liTiRE; Tue, 13 Jul 2021 12:15:52 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 25F494B08D;
-	Tue, 13 Jul 2021 12:00:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4482E4A19E;
+	Tue, 13 Jul 2021 12:15:52 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 465CC49F5F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Jul 2021 12:00:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B652D4A00B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Jul 2021 12:15:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xQznPXGzLbiW for <kvmarm@lists.cs.columbia.edu>;
- Tue, 13 Jul 2021 12:00:02 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3B4294A7FD
- for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Jul 2021 12:00:02 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 4B294610A6;
- Tue, 13 Jul 2021 16:00:01 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1m3KpD-00D7CY-6B; Tue, 13 Jul 2021 16:59:59 +0100
-Date: Tue, 13 Jul 2021 16:59:58 +0100
-Message-ID: <87mtqq6w75.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+ with ESMTP id Ga9TdouyUGgc for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 13 Jul 2021 12:15:49 -0400 (EDT)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 57D8D40799
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Jul 2021 12:15:49 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+ MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+ Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+ Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+ List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+ bh=LQoPboS23ZJWmSVy61Mm/NOINFZejZIfzYMHAqlDOS0=; b=w/jsQrSI7bJ1ZrydFotmRErPM
+ drc4eD9/xShHE8IkaqogtxmHN5jecAuKJe1hm1GnJxVZI+Khij+VACmFAts2xIJmVbR3YB7dWeQtB
+ rAVxHNnrVUqg8xcQbgoZtOWF2WuPgAMssSGfm1kTR6/ZCoOvD1TPh0lXcVW9wQN4saPSvme4wD6c4
+ IWhlSFvcCRZabQU6yLCEsX3+oSmROYeyyGEvCiZ6o+Sn1TclIMwaEC7OBz/LvArxRyJq2JjtkKXYG
+ 6ogFP2ohLPG23VtH/DfY1wn4GMrcPdgCqLuri45n/qazASEiOX9EifgyxP5LWYTsAcCqYMf1+wUo7
+ tz0a/f/FQ==;
+Received: from shell.armlinux.org.uk
+ ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46060)
+ by pandora.armlinux.org.uk with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
+ (envelope-from <linux@armlinux.org.uk>)
+ id 1m3L4T-0006Iy-PN; Tue, 13 Jul 2021 17:15:45 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.92)
+ (envelope-from <linux@shell.armlinux.org.uk>)
+ id 1m3L4S-0000SA-Fi; Tue, 13 Jul 2021 17:15:44 +0100
+Date: Tue, 13 Jul 2021 17:15:44 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Marc Zyngier <maz@kernel.org>
 Subject: Re: [PATCH 1/3] KVM: arm64: Narrow PMU sysreg reset values to
  architectural requirements
-In-Reply-To: <20210713143949.GJ22278@shell.armlinux.org.uk>
+Message-ID: <20210713161544.GL22278@shell.armlinux.org.uk>
 References: <20210713135900.1473057-1-maz@kernel.org>
  <20210713135900.1473057-2-maz@kernel.org>
  <20210713143949.GJ22278@shell.armlinux.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: linux@armlinux.org.uk, linux-arm-kernel@lists.infradead.org,
- kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com,
- suzuki.poulose@arm.com, alexandru.elisei@arm.com, alexandre.chartre@oracle.com,
- robin.murphy@arm.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+ <87mtqq6w75.wl-maz@kernel.org>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <87mtqq6w75.wl-maz@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Cc: kernel-team@android.com, kvm@vger.kernel.org,
  Robin Murphy <robin.murphy@arm.com>, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
@@ -86,51 +92,55 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 13 Jul 2021 15:39:49 +0100,
-"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+On Tue, Jul 13, 2021 at 04:59:58PM +0100, Marc Zyngier wrote:
+> On Tue, 13 Jul 2021 15:39:49 +0100,
+> "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+> > 
+> > On Tue, Jul 13, 2021 at 02:58:58PM +0100, Marc Zyngier wrote:
+> > > +static void reset_pmu_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+> > > +{
+> > > +	u64 n, mask;
+> > > +
+> > > +	/* No PMU available, any PMU reg may UNDEF... */
+> > > +	if (!kvm_arm_support_pmu_v3())
+> > > +		return;
+> > > +
+> > > +	n = read_sysreg(pmcr_el0) >> ARMV8_PMU_PMCR_N_SHIFT;
+> > > +	n &= ARMV8_PMU_PMCR_N_MASK;
+> > > +
+> > > +	reset_unknown(vcpu, r);
+> > > +
+> > > +	mask = BIT(ARMV8_PMU_CYCLE_IDX);
+> > > +	if (n)
+> > > +		mask |= GENMASK(n - 1, 0);
+> > > +
+> > > +	__vcpu_sys_reg(vcpu, r->reg) &= mask;
+> > 
+> > Would this read more logically to structure it as:
+> > 
+> > 	mask = BIT(ARMV8_PMU_CYCLE_IDX);
+> > 
+> > 	n = read_sysreg(pmcr_el0) >> ARMV8_PMU_PMCR_N_SHIFT;
+> > 	n &= ARMV8_PMU_PMCR_N_MASK;
+> > 	if (n)
+> > 		mask |= GENMASK(n - 1, 0);
+> > 
+> > 	reset_unknown(vcpu, r);
+> > 	__vcpu_sys_reg(vcpu, r->reg) &= mask;
+> > 
+> > ?
 > 
-> On Tue, Jul 13, 2021 at 02:58:58PM +0100, Marc Zyngier wrote:
-> > +static void reset_pmu_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
-> > +{
-> > +	u64 n, mask;
-> > +
-> > +	/* No PMU available, any PMU reg may UNDEF... */
-> > +	if (!kvm_arm_support_pmu_v3())
-> > +		return;
-> > +
-> > +	n = read_sysreg(pmcr_el0) >> ARMV8_PMU_PMCR_N_SHIFT;
-> > +	n &= ARMV8_PMU_PMCR_N_MASK;
-> > +
-> > +	reset_unknown(vcpu, r);
-> > +
-> > +	mask = BIT(ARMV8_PMU_CYCLE_IDX);
-> > +	if (n)
-> > +		mask |= GENMASK(n - 1, 0);
-> > +
-> > +	__vcpu_sys_reg(vcpu, r->reg) &= mask;
-> 
-> Would this read more logically to structure it as:
-> 
-> 	mask = BIT(ARMV8_PMU_CYCLE_IDX);
-> 
-> 	n = read_sysreg(pmcr_el0) >> ARMV8_PMU_PMCR_N_SHIFT;
-> 	n &= ARMV8_PMU_PMCR_N_MASK;
-> 	if (n)
-> 		mask |= GENMASK(n - 1, 0);
-> 
-> 	reset_unknown(vcpu, r);
-> 	__vcpu_sys_reg(vcpu, r->reg) &= mask;
-> 
-> ?
+> Yup, that's nicer. Amended locally.
 
-Yup, that's nicer. Amended locally.
+Thanks Marc.
 
-Thanks,
+For the whole series:
 
-	M.
+Acked-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
 -- 
-Without deviation from the norm, progress is not possible.
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 40Mbps down 10Mbps up. Decent connectivity at last!
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
