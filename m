@@ -2,60 +2,73 @@ Return-Path: <SRS0=yjsw=MF=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.6 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D918C07E95
-	for <kvmarm@archiver.kernel.org>; Tue, 13 Jul 2021 16:18:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BE24C11F68
+	for <kvmarm@archiver.kernel.org>; Tue, 13 Jul 2021 20:37:51 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id EACE661175
-	for <kvmarm@archiver.kernel.org>; Tue, 13 Jul 2021 16:18:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EACE661175
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 8C14361351
+	for <kvmarm@archiver.kernel.org>; Tue, 13 Jul 2021 20:37:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C14361351
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FF534A19A;
-	Tue, 13 Jul 2021 12:18:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 05B304AC80;
+	Tue, 13 Jul 2021 16:37:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id lN5hEaWK17Oq; Tue, 13 Jul 2021 12:18:45 -0400 (EDT)
+	with ESMTP id KxIvv0XJbXMv; Tue, 13 Jul 2021 16:37:49 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AB3E14A19E;
-	Tue, 13 Jul 2021 12:18:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0CA824A531;
+	Tue, 13 Jul 2021 16:37:49 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 14DDA40821
- for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Jul 2021 12:18:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D9FEC4A524
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Jul 2021 16:37:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fuUWI+gwkK+U for <kvmarm@lists.cs.columbia.edu>;
- Tue, 13 Jul 2021 12:18:40 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D1E24083E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Jul 2021 12:18:40 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2CD206D;
- Tue, 13 Jul 2021 09:18:40 -0700 (PDT)
-Received: from [192.168.1.179] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C11E03F7D8;
- Tue, 13 Jul 2021 09:18:38 -0700 (PDT)
-Subject: Re: [PATCH] KVM: arm64: Fix detection of shared VMAs on guest fault
-To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
-References: <20210713114804.594993-1-maz@kernel.org>
-From: Steven Price <steven.price@arm.com>
-Message-ID: <017a25b0-d706-df97-dbba-80d5b21d1779@arm.com>
-Date: Tue, 13 Jul 2021 17:18:33 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+ with ESMTP id qinqjqQoMDuj for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 13 Jul 2021 16:37:46 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CF1344A1A7
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Jul 2021 16:37:46 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1626208666;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=StjhJZ4vCHXZICLvMdmlRWHHb1Np0k3u9iVCo+f4OO0=;
+ b=iXDCW1Oa06FU5xg2PcydsaiF6Eq5Ljz4qBy7ZG7TlERcVKCHpMpADv9vtIV3ZhScaM04UD
+ C+FQUtbXnGp2GvCQyQFOA6s2xRVjTO2bX36UOAmMHbbYjT2ZJRuRf+sM0KEjoGlONR6LyR
+ 6jiZg2NatY57yeDTgFzFBh9uFML8y7s=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-515-witzaIkJOcyklM0hiWrgrg-1; Tue, 13 Jul 2021 16:37:45 -0400
+X-MC-Unique: witzaIkJOcyklM0hiWrgrg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EB9D919200C0;
+ Tue, 13 Jul 2021 20:37:43 +0000 (UTC)
+Received: from gator.redhat.com (unknown [10.22.8.235])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1CF4510016F8;
+ Tue, 13 Jul 2021 20:37:43 +0000 (UTC)
+From: Andrew Jones <drjones@redhat.com>
+To: kvm@vger.kernel.org,
+	kvmarm@lists.cs.columbia.edu
+Subject: [PATCH 0/2] KVM: selftests: a couple fixes
+Date: Tue, 13 Jul 2021 22:37:40 +0200
+Message-Id: <20210713203742.29680-1-drjones@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210713114804.594993-1-maz@kernel.org>
-Content-Language: en-GB
-Cc: kernel-team@android.com, kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Cc: maz@kernel.org, pbonzini@redhat.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -72,46 +85,21 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 13/07/2021 12:48, Marc Zyngier wrote:
-> When merging the KVM MTE support, the blob that was interposed between
-> the chair and the keyboard experienced a neuronal accident (also known
-> as a brain fart), turning a check for VM_SHARED into VM_PFNMAP as it
-> was reshuffling some of the code.
-> 
-> The blob having now come back to its senses, let's restore the
-> initial check that the original author got right the first place.
-> 
-> Fixes: ea7fc1bb1cd1 ("KVM: arm64: Introduce MTE VM feature")
-> Cc: Steven Price <steven.price@arm.com>
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+The first removes a compiler warning. The second does what a 6 patch
+patch series wanted to do, but apparently got too distracted with
+the preparation refactoring to actually do...
 
-Reviewed-by: Steven Price <steven.price@arm.com>
+Andrew Jones (2):
+  KVM: selftests: change pthread_yield to sched_yield
+  KVM: arm64: selftests: get-reg-list: actually enable pmu regs in pmu
+    sublist
 
-Somehow this blob missed it too while reviewing the changes you'd made.
+ tools/testing/selftests/kvm/aarch64/get-reg-list.c | 3 ++-
+ tools/testing/selftests/kvm/steal_time.c           | 2 +-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
-Thanks,
-
-Steve
-
-> ---
->  arch/arm64/kvm/mmu.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 3155c9e778f0..0625bf2353c2 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -947,7 +947,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  		vma_shift = get_vma_page_shift(vma, hva);
->  	}
->  
-> -	shared = (vma->vm_flags & VM_PFNMAP);
-> +	shared = (vma->vm_flags & VM_SHARED);
->  
->  	switch (vma_shift) {
->  #ifndef __PAGETABLE_PMD_FOLDED
-> 
+-- 
+2.31.1
 
 _______________________________________________
 kvmarm mailing list
