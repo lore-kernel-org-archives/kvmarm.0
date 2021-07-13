@@ -2,70 +2,77 @@ Return-Path: <SRS0=yjsw=MF=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3949C07E95
-	for <kvmarm@archiver.kernel.org>; Tue, 13 Jul 2021 13:59:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBFBBC07E96
+	for <kvmarm@archiver.kernel.org>; Tue, 13 Jul 2021 14:40:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 91A336127C
-	for <kvmarm@archiver.kernel.org>; Tue, 13 Jul 2021 13:59:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91A336127C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 6CC4761288
+	for <kvmarm@archiver.kernel.org>; Tue, 13 Jul 2021 14:40:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CC4761288
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 37CE44A4E1;
-	Tue, 13 Jul 2021 09:59:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D379F4A551;
+	Tue, 13 Jul 2021 10:40:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@armlinux.org.uk
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id MV8aAR7YXghf; Tue, 13 Jul 2021 09:59:13 -0400 (EDT)
+	with ESMTP id 5SerJ5z1q0sF; Tue, 13 Jul 2021 10:39:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F40124B081;
-	Tue, 13 Jul 2021 09:59:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C80FA4A4E1;
+	Tue, 13 Jul 2021 10:39:59 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 46FEB4A4FC
- for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Jul 2021 09:59:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 291DE4A4E1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Jul 2021 10:39:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WlcMUqeWNOWe for <kvmarm@lists.cs.columbia.edu>;
- Tue, 13 Jul 2021 09:59:08 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EEB6E4A19B
- for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Jul 2021 09:59:07 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 393206128B;
- Tue, 13 Jul 2021 13:59:07 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1m3IwD-00D5p8-LF; Tue, 13 Jul 2021 14:59:05 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 3/3] KVM: arm64: Disabling disabled PMU counters wastes a lot
- of time
-Date: Tue, 13 Jul 2021 14:59:00 +0100
-Message-Id: <20210713135900.1473057-4-maz@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210713135900.1473057-1-maz@kernel.org>
+ with ESMTP id R947cieO6t42 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 13 Jul 2021 10:39:56 -0400 (EDT)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8CA764A4A4
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Jul 2021 10:39:56 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+ MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+ Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+ Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+ List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+ bh=SJJMrxtMNFqRvemONP1f4NnQi5qafts1cHoez9F3skE=; b=gl70oHKF6x5JHToNhVhDWqKOL
+ JPTvLKHhNDqsg5zHBfI7iMMI17d3Z5JZA4HtyKekNYDXXXnYdfZI9QM3hKg9lyHSYz2eR1j7teD+D
+ stciPEAXNl1laacDnsuHrcuym53mrrwHFvM42qvEh+zwSNVKI5g3tkaLXq+xhxR+0+Zp6nk08EO2x
+ VMvDpW3eDqlraIQUBNqpcfo4KYWqZYXyycg7Pzlx+Z+9KOJbbSyvGPMIAq65AsuhRJiHodJKSpBV7
+ wvfmX4+NHUbtchvCyy13+nNhl61XEaftoRi/3S2fmGEoX4jcSXOLt8KSOkr/zCZeT8SzmKJ0p3Iaf
+ Gq9U1G/9A==;
+Received: from shell.armlinux.org.uk
+ ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46056)
+ by pandora.armlinux.org.uk with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
+ (envelope-from <linux@armlinux.org.uk>)
+ id 1m3JZg-0006DA-4G; Tue, 13 Jul 2021 15:39:52 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.92)
+ (envelope-from <linux@shell.armlinux.org.uk>)
+ id 1m3JZd-0000OC-Uk; Tue, 13 Jul 2021 15:39:49 +0100
+Date: Tue, 13 Jul 2021 15:39:49 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH 1/3] KVM: arm64: Narrow PMU sysreg reset values to
+ architectural requirements
+Message-ID: <20210713143949.GJ22278@shell.armlinux.org.uk>
 References: <20210713135900.1473057-1-maz@kernel.org>
+ <20210713135900.1473057-2-maz@kernel.org>
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, james.morse@arm.com, suzuki.poulose@arm.com,
- alexandru.elisei@arm.com, alexandre.chartre@oracle.com, robin.murphy@arm.com,
- kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kernel-team@android.com, Robin Murphy <robin.murphy@arm.com>
+Content-Disposition: inline
+In-Reply-To: <20210713135900.1473057-2-maz@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: kernel-team@android.com, kvm@vger.kernel.org,
+ Robin Murphy <robin.murphy@arm.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -82,74 +89,45 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Alexandre Chartre <alexandre.chartre@oracle.com>
+On Tue, Jul 13, 2021 at 02:58:58PM +0100, Marc Zyngier wrote:
+> +static void reset_pmu_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+> +{
+> +	u64 n, mask;
+> +
+> +	/* No PMU available, any PMU reg may UNDEF... */
+> +	if (!kvm_arm_support_pmu_v3())
+> +		return;
+> +
+> +	n = read_sysreg(pmcr_el0) >> ARMV8_PMU_PMCR_N_SHIFT;
+> +	n &= ARMV8_PMU_PMCR_N_MASK;
+> +
+> +	reset_unknown(vcpu, r);
+> +
+> +	mask = BIT(ARMV8_PMU_CYCLE_IDX);
+> +	if (n)
+> +		mask |= GENMASK(n - 1, 0);
+> +
+> +	__vcpu_sys_reg(vcpu, r->reg) &= mask;
 
-In a KVM guest on arm64, performance counters interrupts have an
-unnecessary overhead which slows down execution when using the "perf
-record" command and limits the "perf record" sampling period.
+Would this read more logically to structure it as:
 
-The problem is that when a guest VM disables counters by clearing the
-PMCR_EL0.E bit (bit 0), KVM will disable all counters defined in
-PMCR_EL0 even if they are not enabled in PMCNTENSET_EL0.
+	mask = BIT(ARMV8_PMU_CYCLE_IDX);
 
-KVM disables a counter by calling into the perf framework, in particular
-by calling perf_event_create_kernel_counter() which is a time consuming
-operation. So, for example, with a Neoverse N1 CPU core which has 6 event
-counters and one cycle counter, KVM will always disable all 7 counters
-even if only one is enabled.
+	n = read_sysreg(pmcr_el0) >> ARMV8_PMU_PMCR_N_SHIFT;
+	n &= ARMV8_PMU_PMCR_N_MASK;
+	if (n)
+		mask |= GENMASK(n - 1, 0);
 
-This typically happens when using the "perf record" command in a guest
-VM: perf will disable all event counters with PMCNTENTSET_EL0 and only
-uses the cycle counter. And when using the "perf record" -F option with
-a high profiling frequency, the overhead of KVM disabling all counters
-instead of one on every counter interrupt becomes very noticeable.
+	reset_unknown(vcpu, r);
+	__vcpu_sys_reg(vcpu, r->reg) &= mask;
 
-The problem is fixed by having KVM disable only counters which are
-enabled in PMCNTENSET_EL0. If a counter is not enabled in PMCNTENSET_EL0
-then KVM will not enable it when setting PMCR_EL0.E and it will remain
-disabled as long as it is not enabled in PMCNTENSET_EL0. So there is
-effectively no need to disable a counter when clearing PMCR_EL0.E if it
-is not enabled PMCNTENSET_EL0.
+?
 
-Signed-off-by: Alexandre Chartre <alexandre.chartre@oracle.com>
-[maz: moved 'mask' close to the actual user, simplifying the patch]
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20210712170345.660272-1-alexandre.chartre@oracle.com
----
- arch/arm64/kvm/pmu-emul.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Thanks.
 
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index fae4e95b586c..dc65b58dc68f 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -563,20 +563,21 @@ void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val)
-  */
- void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
- {
--	unsigned long mask = kvm_pmu_valid_counter_mask(vcpu);
- 	int i;
- 
- 	if (val & ARMV8_PMU_PMCR_E) {
- 		kvm_pmu_enable_counter_mask(vcpu,
- 		       __vcpu_sys_reg(vcpu, PMCNTENSET_EL0));
- 	} else {
--		kvm_pmu_disable_counter_mask(vcpu, mask);
-+		kvm_pmu_disable_counter_mask(vcpu,
-+		       __vcpu_sys_reg(vcpu, PMCNTENSET_EL0));
- 	}
- 
- 	if (val & ARMV8_PMU_PMCR_C)
- 		kvm_pmu_set_counter_value(vcpu, ARMV8_PMU_CYCLE_IDX, 0);
- 
- 	if (val & ARMV8_PMU_PMCR_P) {
-+		unsigned long mask = kvm_pmu_valid_counter_mask(vcpu);
- 		mask &= ~BIT(ARMV8_PMU_CYCLE_IDX);
- 		for_each_set_bit(i, &mask, 32)
- 			kvm_pmu_set_counter_value(vcpu, i, 0);
 -- 
-2.30.2
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 40Mbps down 10Mbps up. Decent connectivity at last!
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
