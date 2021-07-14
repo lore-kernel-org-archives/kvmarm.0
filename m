@@ -2,58 +2,70 @@ Return-Path: <SRS0=5+eb=MG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2C00C07E9A
-	for <kvmarm@archiver.kernel.org>; Wed, 14 Jul 2021 09:55:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5C66C07E9A
+	for <kvmarm@archiver.kernel.org>; Wed, 14 Jul 2021 10:24:00 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A7E0A61358
-	for <kvmarm@archiver.kernel.org>; Wed, 14 Jul 2021 09:55:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7E0A61358
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 57E21613AA
+	for <kvmarm@archiver.kernel.org>; Wed, 14 Jul 2021 10:24:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57E21613AA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B7AF4B080;
-	Wed, 14 Jul 2021 05:55:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DFC8C4B087;
+	Wed, 14 Jul 2021 06:23:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6qVTsO+QhQ0I; Wed, 14 Jul 2021 05:55:18 -0400 (EDT)
+	with ESMTP id sghqchwo1Mm0; Wed, 14 Jul 2021 06:23:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 025B04B09A;
-	Wed, 14 Jul 2021 05:55:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B43F64A7FD;
+	Wed, 14 Jul 2021 06:23:58 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 498014B08A
- for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Jul 2021 05:55:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 513D24A195
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Jul 2021 06:23:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vxCI1mE5SxUG for <kvmarm@lists.cs.columbia.edu>;
- Wed, 14 Jul 2021 05:55:14 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AA034B082
- for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Jul 2021 05:55:14 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0A1001396;
- Wed, 14 Jul 2021 02:55:14 -0700 (PDT)
-Received: from monolith.cable.virginm.net (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CAB173F774;
- Wed, 14 Jul 2021 02:55:12 -0700 (PDT)
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: maz@kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 5/5] KVM: arm64: nVHE: Remove unneeded isb() when modifying
- PMSCR_EL1
-Date: Wed, 14 Jul 2021 10:56:01 +0100
-Message-Id: <20210714095601.184854-6-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20210714095601.184854-1-alexandru.elisei@arm.com>
+ with ESMTP id MUpvuN8BJkCk for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 14 Jul 2021 06:23:57 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0109349F83
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Jul 2021 06:23:56 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 6BE3361362;
+ Wed, 14 Jul 2021 10:23:54 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1m3c3U-00DGUt-J0; Wed, 14 Jul 2021 11:23:52 +0100
+Date: Wed, 14 Jul 2021 11:23:52 +0100
+Message-ID: <87k0lt6vnr.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH 3/5] KVM: arm64: Rename __vcpu_sys_reg -> vcpu_sys_reg
+In-Reply-To: <20210714095601.184854-4-alexandru.elisei@arm.com>
 References: <20210714095601.184854-1-alexandru.elisei@arm.com>
-MIME-Version: 1.0
-Cc: Will Deacon <will@kernel.org>
+ <20210714095601.184854-4-alexandru.elisei@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ james.morse@arm.com, suzuki.poulose@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -70,37 +82,45 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-According to ARM DDI 0487G.a, page D9-2930, profiling is disabled when
-the PE is executing at a higher exception level than the profiling
-buffer owning exception level. This is also confirmed by the pseudocode
-for the StatisticalProfilingEnabled() function.
+Hi Alex,
 
-During the world switch and before activating guest traps, KVM executes
-at EL2 with the buffer owning exception level being EL1 (MDCR_EL2.E2PB =
-0b11). As a result, profiling is already disabled when draining the
-buffer, making the isb() after the write to PMSCR_EL1 unnecessary.
+On Wed, 14 Jul 2021 10:55:59 +0100,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> There are two macros to access a specific system register from a known
+> kvm_cpu_context: __ctxt_sys_reg(), which returns a pointer to the register,
+> and ctxt_sys_reg(), which deferences the pointer returned by
+> __ctxt_sys_reg().
+> 
+> __vcpu_sys_reg() serves a similar purpose, with the difference being that
+> it takes a struct kvm_vcpu as a parameter. __vcpu_sys_reg(), although it
+> looks like __ctxt_sys_reg(), it dereferences the pointer to the register,
+> like ctxt_sys_reg() does, and indeed it is defined as an abstraction over
+> ctxt_sys_reg().
+> 
+> Let's remove this naming inconsistency by renaming __vcpu_sys_reg() to
+> vcpu_sys_reg(), to make it clear it behaves like ctxt_sys_reg(), and not
+> like __ctxt_sys_reg().
 
-CC: Will Deacon <will@kernel.org>
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
- arch/arm64/kvm/hyp/nvhe/debug-sr.c | 1 -
- 1 file changed, 1 deletion(-)
+I can't say I'm keen on this change.
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-index 7d3f25868cae..fdf0e0ba17e9 100644
---- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-+++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-@@ -33,7 +33,6 @@ static void __debug_save_spe(u64 *pmscr_el1)
- 	/* Yes; save the control register and disable data generation */
- 	*pmscr_el1 = read_sysreg_s(SYS_PMSCR_EL1);
- 	write_sysreg_s(0, SYS_PMSCR_EL1);
--	isb();
- 
- 	/* Now drain all buffered data to memory */
- 	psb_csync();
+The leading underscores really are there to outline that *this is
+dangerous*, as you really need to know which context you are in.
+Dropping the leading '__' may give the false impression that this is
+safe, and not actually a primitive that requires careful thinking
+before use.
+
+ctxt_sys_reg() is, on the other hand, clearly something that acts
+solely on memory because it takes a context structure, and not a
+vcpu. At least that's what the 'ctxt' prefix is supposed to convey
+(not very successfully, apparently).
+
+Thanks,
+
+	M.
+
 -- 
-2.32.0
-
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
