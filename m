@@ -7,54 +7,53 @@ X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A703AC07E9A
-	for <kvmarm@archiver.kernel.org>; Wed, 14 Jul 2021 15:47:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83E62C07E9A
+	for <kvmarm@archiver.kernel.org>; Wed, 14 Jul 2021 16:11:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1AB416128D
-	for <kvmarm@archiver.kernel.org>; Wed, 14 Jul 2021 15:47:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AB416128D
+	by mail.kernel.org (Postfix) with ESMTP id F3053613C0
+	for <kvmarm@archiver.kernel.org>; Wed, 14 Jul 2021 16:11:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3053613C0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7CFE04A1AF;
-	Wed, 14 Jul 2021 11:47:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5CA924B08C;
+	Wed, 14 Jul 2021 12:11:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id zLDY2CGdb-yA; Wed, 14 Jul 2021 11:47:13 -0400 (EDT)
+	with ESMTP id Y1EoAw8f5WpT; Wed, 14 Jul 2021 12:11:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 35D9B40821;
-	Wed, 14 Jul 2021 11:47:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 09C754A4FC;
+	Wed, 14 Jul 2021 12:11:04 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3515B402BD
- for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Jul 2021 11:47:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C8484A4FC
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Jul 2021 12:11:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dRCNCYBtR8Y7 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 14 Jul 2021 11:47:10 -0400 (EDT)
+ with ESMTP id UeK0NcDqmxS2 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 14 Jul 2021 12:11:01 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9675C40152
- for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Jul 2021 11:47:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 334144A19F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Jul 2021 12:11:01 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D548131B;
- Wed, 14 Jul 2021 08:47:09 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9B666D6E;
+ Wed, 14 Jul 2021 09:11:00 -0700 (PDT)
 Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BDFB03F7D8;
- Wed, 14 Jul 2021 08:47:06 -0700 (PDT)
-Subject: Re: [PATCH 1/3] KVM: arm64: Narrow PMU sysreg reset values to
- architectural requirements
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 206BC3F7D8;
+ Wed, 14 Jul 2021 09:10:57 -0700 (PDT)
+Subject: Re: [PATCH 2/3] KVM: arm64: Drop unnecessary masking of PMU registers
 To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
  kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 References: <20210713135900.1473057-1-maz@kernel.org>
- <20210713135900.1473057-2-maz@kernel.org>
+ <20210713135900.1473057-3-maz@kernel.org>
 From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <ae510501-0410-47b1-77f3-cb83d3b1fa9e@arm.com>
-Date: Wed, 14 Jul 2021 16:48:07 +0100
+Message-ID: <e67684f9-e5df-072c-b6ac-f5adecfeb260@arm.com>
+Date: Wed, 14 Jul 2021 17:12:03 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <20210713135900.1473057-2-maz@kernel.org>
+In-Reply-To: <20210713135900.1473057-3-maz@kernel.org>
 Content-Language: en-US
 Cc: kernel-team@android.com, Robin Murphy <robin.murphy@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -76,124 +75,79 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 Hi Marc,
 
 On 7/13/21 2:58 PM, Marc Zyngier wrote:
-> A number of the PMU sysregs expose reset values that are not in
-> compliant with the architecture (set bits in the RES0 ranges,
-> for example).
+> We always sanitise our PMU sysreg on the write side, so there
+> is no need to do it on the read side as well.
 >
-> This in turn has the effect that we need to pointlessly mask
-> some register when using them.
->
-> Let's start by making sure we don't have illegal values in the
-> shadow registers at reset time. This affects all the registers
-> that dedicate one bit per counter, the counters themselves,
-> PMEVTYPERn_EL0 and PMSELR_EL0.
->
-> Reported-by: Alexandre Chartre <alexandre.chartre@oracle.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/sys_regs.c | 46 ++++++++++++++++++++++++++++++++++++---
->  1 file changed, 43 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index f6f126eb6ac1..95ccb8f45409 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -603,6 +603,44 @@ static unsigned int pmu_visibility(const struct kvm_vcpu *vcpu,
->  	return REG_HIDDEN;
->  }
->  
-> +static void reset_pmu_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
-> +{
-> +	u64 n, mask;
-> +
-> +	/* No PMU available, any PMU reg may UNDEF... */
-> +	if (!kvm_arm_support_pmu_v3())
-> +		return;
-> +
-> +	n = read_sysreg(pmcr_el0) >> ARMV8_PMU_PMCR_N_SHIFT;
+> Drop the unnecessary masking.
 
-Isn't this going to cause a lot of unnecessary traps with NV? Is that going to be
-a problem? Because at the moment I can't think of an elegant way to avoid it,
-other than special casing PMCR_EL0 in kvm_reset_sys_regs() and using here
-__vcpu_sys_reg(vcpu, PMCR_EL0). Or, even better, using
-kvm_pmu_valid_counter_mask(vcpu), since this is identical to what that function does.
+Checked for all the remaining uses of kvm_pmu_valid_counter_mask in sys_regs.c and
+in pmu-emul.c, and nothing stands out:
 
-> +	n &= ARMV8_PMU_PMCR_N_MASK;
-> +
-> +	reset_unknown(vcpu, r);
-> +
-> +	mask = BIT(ARMV8_PMU_CYCLE_IDX);
-
-PMSWINC_EL0 has bit 31 RES0. Other than that, looked at all the PMU registers and
-everything looks correct to me.
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
 Thanks,
 
 Alex
 
-> +	if (n)
-> +		mask |= GENMASK(n - 1, 0);
-> +
-> +	__vcpu_sys_reg(vcpu, r->reg) &= mask;
-> +}
-> +
-> +static void reset_pmevcntr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
-> +{
-> +	reset_unknown(vcpu, r);
-> +	__vcpu_sys_reg(vcpu, r->reg) &= GENMASK(31, 0);
-> +}
-> +
-> +static void reset_pmevtyper(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
-> +{
-> +	reset_unknown(vcpu, r);
-> +	__vcpu_sys_reg(vcpu, r->reg) &= ARMV8_PMU_EVTYPE_MASK;
-> +}
-> +
-> +static void reset_pmselr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
-> +{
-> +	reset_unknown(vcpu, r);
-> +	__vcpu_sys_reg(vcpu, r->reg) &= ARMV8_PMU_COUNTER_MASK;
-> +}
-> +
->  static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
->  {
->  	u64 pmcr, val;
-> @@ -944,16 +982,18 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->  	  trap_wcr, reset_wcr, 0, 0,  get_wcr, set_wcr }
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/pmu-emul.c | 3 +--
+>  arch/arm64/kvm/sys_regs.c | 6 +++---
+>  2 files changed, 4 insertions(+), 5 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index f33825c995cb..fae4e95b586c 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -373,7 +373,6 @@ static u64 kvm_pmu_overflow_status(struct kvm_vcpu *vcpu)
+>  		reg = __vcpu_sys_reg(vcpu, PMOVSSET_EL0);
+>  		reg &= __vcpu_sys_reg(vcpu, PMCNTENSET_EL0);
+>  		reg &= __vcpu_sys_reg(vcpu, PMINTENSET_EL1);
+> -		reg &= kvm_pmu_valid_counter_mask(vcpu);
+>  	}
 >  
->  #define PMU_SYS_REG(r)						\
-> -	SYS_DESC(r), .reset = reset_unknown, .visibility = pmu_visibility
-> +	SYS_DESC(r), .reset = reset_pmu_reg, .visibility = pmu_visibility
+>  	return reg;
+> @@ -569,7 +568,7 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
 >  
->  /* Macro to expand the PMEVCNTRn_EL0 register */
->  #define PMU_PMEVCNTR_EL0(n)						\
->  	{ PMU_SYS_REG(SYS_PMEVCNTRn_EL0(n)),				\
-> +	  .reset = reset_pmevcntr,					\
->  	  .access = access_pmu_evcntr, .reg = (PMEVCNTR0_EL0 + n), }
+>  	if (val & ARMV8_PMU_PMCR_E) {
+>  		kvm_pmu_enable_counter_mask(vcpu,
+> -		       __vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & mask);
+> +		       __vcpu_sys_reg(vcpu, PMCNTENSET_EL0));
+>  	} else {
+>  		kvm_pmu_disable_counter_mask(vcpu, mask);
+>  	}
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 95ccb8f45409..7ead93a8d67f 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -883,7 +883,7 @@ static bool access_pmcnten(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>  			kvm_pmu_disable_counter_mask(vcpu, val);
+>  		}
+>  	} else {
+> -		p->regval = __vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & mask;
+> +		p->regval = __vcpu_sys_reg(vcpu, PMCNTENSET_EL0);
+>  	}
 >  
->  /* Macro to expand the PMEVTYPERn_EL0 register */
->  #define PMU_PMEVTYPER_EL0(n)						\
->  	{ PMU_SYS_REG(SYS_PMEVTYPERn_EL0(n)),				\
-> +	  .reset = reset_pmevtyper,					\
->  	  .access = access_pmu_evtyper, .reg = (PMEVTYPER0_EL0 + n), }
+>  	return true;
+> @@ -907,7 +907,7 @@ static bool access_pminten(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>  			/* accessing PMINTENCLR_EL1 */
+>  			__vcpu_sys_reg(vcpu, PMINTENSET_EL1) &= ~val;
+>  	} else {
+> -		p->regval = __vcpu_sys_reg(vcpu, PMINTENSET_EL1) & mask;
+> +		p->regval = __vcpu_sys_reg(vcpu, PMINTENSET_EL1);
+>  	}
 >  
->  static bool undef_access(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> @@ -1595,13 +1635,13 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	{ PMU_SYS_REG(SYS_PMSWINC_EL0),
->  	  .access = access_pmswinc, .reg = PMSWINC_EL0 },
->  	{ PMU_SYS_REG(SYS_PMSELR_EL0),
-> -	  .access = access_pmselr, .reg = PMSELR_EL0 },
-> +	  .access = access_pmselr, .reset = reset_pmselr, .reg = PMSELR_EL0 },
->  	{ PMU_SYS_REG(SYS_PMCEID0_EL0),
->  	  .access = access_pmceid, .reset = NULL },
->  	{ PMU_SYS_REG(SYS_PMCEID1_EL0),
->  	  .access = access_pmceid, .reset = NULL },
->  	{ PMU_SYS_REG(SYS_PMCCNTR_EL0),
-> -	  .access = access_pmu_evcntr, .reg = PMCCNTR_EL0 },
-> +	  .access = access_pmu_evcntr, .reset = reset_unknown, .reg = PMCCNTR_EL0 },
->  	{ PMU_SYS_REG(SYS_PMXEVTYPER_EL0),
->  	  .access = access_pmu_evtyper, .reset = NULL },
->  	{ PMU_SYS_REG(SYS_PMXEVCNTR_EL0),
+>  	return true;
+> @@ -929,7 +929,7 @@ static bool access_pmovs(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>  			/* accessing PMOVSCLR_EL0 */
+>  			__vcpu_sys_reg(vcpu, PMOVSSET_EL0) &= ~(p->regval & mask);
+>  	} else {
+> -		p->regval = __vcpu_sys_reg(vcpu, PMOVSSET_EL0) & mask;
+> +		p->regval = __vcpu_sys_reg(vcpu, PMOVSSET_EL0);
+>  	}
+>  
+>  	return true;
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
