@@ -2,76 +2,73 @@ Return-Path: <SRS0=OVIf=MH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AB94C07E96
-	for <kvmarm@archiver.kernel.org>; Thu, 15 Jul 2021 12:25:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C41DC1B08C
+	for <kvmarm@archiver.kernel.org>; Thu, 15 Jul 2021 16:32:23 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 807D6611AB
-	for <kvmarm@archiver.kernel.org>; Thu, 15 Jul 2021 12:25:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 807D6611AB
+	by mail.kernel.org (Postfix) with ESMTP id 0354F613FA
+	for <kvmarm@archiver.kernel.org>; Thu, 15 Jul 2021 16:32:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0354F613FA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ED5B34B093;
-	Thu, 15 Jul 2021 08:25:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 87F7E4B097;
+	Thu, 15 Jul 2021 12:32:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id SMd9CotsvGn8; Thu, 15 Jul 2021 08:25:18 -0400 (EDT)
+	with ESMTP id MrqK3LE4xv4X; Thu, 15 Jul 2021 12:32:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C72344A3A3;
-	Thu, 15 Jul 2021 08:25:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 817EB4B08B;
+	Thu, 15 Jul 2021 12:32:21 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8AD544A19E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Jul 2021 08:25:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C1374B092
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Jul 2021 12:32:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id H9hejupxiF3b for <kvmarm@lists.cs.columbia.edu>;
- Thu, 15 Jul 2021 08:25:15 -0400 (EDT)
+ with ESMTP id etl1X36mbUoY for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 15 Jul 2021 12:32:19 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 57ED340CC5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Jul 2021 08:25:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 146A94B08B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Jul 2021 12:32:19 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 66E5F611AB;
- Thu, 15 Jul 2021 12:25:14 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by mail.kernel.org (Postfix) with ESMTPSA id 08904613F8;
+ Thu, 15 Jul 2021 16:32:17 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1m40QS-00DWYJ-Ae; Thu, 15 Jul 2021 13:25:12 +0100
-Date: Thu, 15 Jul 2021 13:25:11 +0100
-Message-ID: <87lf67kbmg.wl-maz@kernel.org>
+ id 1m44HX-00DYjr-EX; Thu, 15 Jul 2021 17:32:15 +0100
 From: Marc Zyngier <maz@kernel.org>
-To: Robin Murphy <robin.murphy@arm.com>
-Subject: Re: [PATCH 1/3] KVM: arm64: Narrow PMU sysreg reset values to
- architectural requirements
-In-Reply-To: <daf4c8a9-8873-276d-ff15-b2812ed7f1e1@arm.com>
-References: <20210713135900.1473057-1-maz@kernel.org>
- <20210713135900.1473057-2-maz@kernel.org>
- <ae510501-0410-47b1-77f3-cb83d3b1fa9e@arm.com>
- <87mtqnkf1w.wl-maz@kernel.org>
- <daf4c8a9-8873-276d-ff15-b2812ed7f1e1@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 02/16] KVM: arm64: Don't issue CMOs when the physical address
+ is invalid
+Date: Thu, 15 Jul 2021 17:31:45 +0100
+Message-Id: <20210715163159.1480168-3-maz@kernel.org>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210715163159.1480168-1-maz@kernel.org>
+References: <20210715163159.1480168-1-maz@kernel.org>
+MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: robin.murphy@arm.com, alexandru.elisei@arm.com,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, james.morse@arm.com, suzuki.poulose@arm.com,
- alexandre.chartre@oracle.com, kernel-team@android.com
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, will@kernel.org, qperret@google.com,
+ dbrazdil@google.com, vatsa@codeaurora.org, sdonthineni@nvidia.com,
+ james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
+ kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Cc: kernel-team@android.com, Srivatsa Vaddagiri <vatsa@codeaurora.org>,
+ Shanker R Donthineni <sdonthineni@nvidia.com>, will@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -88,86 +85,44 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 15 Jul 2021 12:51:49 +0100,
-Robin Murphy <robin.murphy@arm.com> wrote:
-> 
-> On 2021-07-15 12:11, Marc Zyngier wrote:
-> > Hi Alex,
-> > 
-> > On Wed, 14 Jul 2021 16:48:07 +0100,
-> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> >> 
-> >> Hi Marc,
-> >> 
-> >> On 7/13/21 2:58 PM, Marc Zyngier wrote:
-> >>> A number of the PMU sysregs expose reset values that are not in
-> >>> compliant with the architecture (set bits in the RES0 ranges,
-> >>> for example).
-> >>> 
-> >>> This in turn has the effect that we need to pointlessly mask
-> >>> some register when using them.
-> >>> 
-> >>> Let's start by making sure we don't have illegal values in the
-> >>> shadow registers at reset time. This affects all the registers
-> >>> that dedicate one bit per counter, the counters themselves,
-> >>> PMEVTYPERn_EL0 and PMSELR_EL0.
-> >>> 
-> >>> Reported-by: Alexandre Chartre <alexandre.chartre@oracle.com>
-> >>> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> >>> ---
-> >>>   arch/arm64/kvm/sys_regs.c | 46 ++++++++++++++++++++++++++++++++++++---
-> >>>   1 file changed, 43 insertions(+), 3 deletions(-)
-> >>> 
-> >>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> >>> index f6f126eb6ac1..95ccb8f45409 100644
-> >>> --- a/arch/arm64/kvm/sys_regs.c
-> >>> +++ b/arch/arm64/kvm/sys_regs.c
-> >>> @@ -603,6 +603,44 @@ static unsigned int pmu_visibility(const struct kvm_vcpu *vcpu,
-> >>>   	return REG_HIDDEN;
-> >>>   }
-> >>>   +static void reset_pmu_reg(struct kvm_vcpu *vcpu, const struct
-> >>> sys_reg_desc *r)
-> >>> +{
-> >>> +	u64 n, mask;
-> >>> +
-> >>> +	/* No PMU available, any PMU reg may UNDEF... */
-> >>> +	if (!kvm_arm_support_pmu_v3())
-> >>> +		return;
-> >>> +
-> >>> +	n = read_sysreg(pmcr_el0) >> ARMV8_PMU_PMCR_N_SHIFT;
-> >> 
-> >> Isn't this going to cause a lot of unnecessary traps with NV? Is
-> >> that going to be a problem?
-> > 
-> > We'll get a new traps at L2 VM creation if we expose a PMU to the L1
-> > guest, and if L2 gets one too. I don't think that's a real problem, as
-> > the performance of an L2 PMU is bound to be hilarious, and if we are
-> > really worried about that, we can always cache it locally. Which is
-> > likely the best thing to do if you think of big-little.
-> > 
-> > Let's not think of big-little.
-> > 
-> > Another thing is that we could perfectly ignore the number of counter
-> > on the host and always expose the architectural maximum, given that
-> > the PMU is completely emulated. With that, no trap.
-> 
-> Although that would deliberately exacerbate the existing problem of
-> guest counters mysteriously under-reporting due to the host event
-> getting multiplexed, thus arguably make the L2 PMU even less useful.
+Make sure we don't issue CMOs when mapping something that
+is not a memory address in the S2 page tables.
 
-Oh, absolutely. But the current implementation of the PMU emulation
-would be pretty terrible on NV anyway.
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/hyp/pgtable.c | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
 
-> But then trying to analyse application performance under NV at all
-> seems to stand a high chance of being akin to shovelling fog, so...
-
-Indeed. Not to mention that there is no (publicly available) HW to
-measure performance on anyway...
-
-	M.
-
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index 05321f4165e3..a5874ebd0354 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -619,12 +619,16 @@ static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
+ 	}
+ 
+ 	/* Perform CMOs before installation of the guest stage-2 PTE */
+-	if (mm_ops->dcache_clean_inval_poc && stage2_pte_cacheable(pgt, new))
+-		mm_ops->dcache_clean_inval_poc(kvm_pte_follow(new, mm_ops),
+-						granule);
+-
+-	if (mm_ops->icache_inval_pou && stage2_pte_executable(new))
+-		mm_ops->icache_inval_pou(kvm_pte_follow(new, mm_ops), granule);
++	if (kvm_phys_is_valid(phys)) {
++		if (mm_ops->dcache_clean_inval_poc &&
++		    stage2_pte_cacheable(pgt, new))
++			mm_ops->dcache_clean_inval_poc(kvm_pte_follow(new,
++								      mm_ops),
++						       granule);
++		if (mm_ops->icache_inval_pou && stage2_pte_executable(new))
++			mm_ops->icache_inval_pou(kvm_pte_follow(new, mm_ops),
++						 granule);
++	}
+ 
+ 	smp_store_release(ptep, new);
+ 	if (stage2_pte_is_counted(new))
 -- 
-Without deviation from the norm, progress is not possible.
+2.30.2
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
