@@ -4,54 +4,55 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1409C47E4B
-	for <kvmarm@archiver.kernel.org>; Thu, 15 Jul 2021 16:54:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13C9EC07E96
+	for <kvmarm@archiver.kernel.org>; Thu, 15 Jul 2021 16:54:11 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 864A6613FC
-	for <kvmarm@archiver.kernel.org>; Thu, 15 Jul 2021 16:54:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 864A6613FC
+	by mail.kernel.org (Postfix) with ESMTP id A36E4613F9
+	for <kvmarm@archiver.kernel.org>; Thu, 15 Jul 2021 16:54:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A36E4613F9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B5534B091;
-	Thu, 15 Jul 2021 12:54:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 55C824B0C2;
+	Thu, 15 Jul 2021 12:54:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id BeRpvjtSDJYa; Thu, 15 Jul 2021 12:54:07 -0400 (EDT)
+	with ESMTP id RadzEWmsXZPc; Thu, 15 Jul 2021 12:54:09 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 210184B09A;
-	Thu, 15 Jul 2021 12:54:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 42AF54B098;
+	Thu, 15 Jul 2021 12:54:09 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A73054B098
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Jul 2021 12:54:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D0BA4B08A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Jul 2021 12:54:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fo2DVPOLzOJN for <kvmarm@lists.cs.columbia.edu>;
- Thu, 15 Jul 2021 12:54:04 -0400 (EDT)
+ with ESMTP id kFT-gpxvWJVC for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 15 Jul 2021 12:54:07 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B13A64B090
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Jul 2021 12:54:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0B5CB4B090
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Jul 2021 12:54:07 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 104B6613F9;
- Thu, 15 Jul 2021 16:54:04 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 4B8456128D;
+ Thu, 15 Jul 2021 16:54:06 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1m44Hb-00DYjr-Pg; Thu, 15 Jul 2021 17:32:19 +0100
+ id 1m44Ha-00DYjr-Ou; Thu, 15 Jul 2021 17:32:18 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 15/16] arm64: Add a helper to retrieve the PTE of a fixmap
-Date: Thu, 15 Jul 2021 17:31:58 +0100
-Message-Id: <20210715163159.1480168-16-maz@kernel.org>
+Subject: [PATCH 12/16] mm/ioremap: Add arch-specific callbacks on
+ ioremap/iounmap calls
+Date: Thu, 15 Jul 2021 17:31:55 +0100
+Message-Id: <20210715163159.1480168-13-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210715163159.1480168-1-maz@kernel.org>
 References: <20210715163159.1480168-1-maz@kernel.org>
@@ -84,55 +85,90 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In order to transfer the early mapping state into KVM's MMIO
-guard infrastucture, provide a small helper that will retrieve
-the associated PTE.
+Add a pair of hooks (ioremap_page_range_hook/iounmap_page_range_hook)
+that can be implemented by an architecture.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/fixmap.h |  2 ++
- arch/arm64/mm/mmu.c             | 15 +++++++++++++++
- 2 files changed, 17 insertions(+)
+ include/linux/io.h |  3 +++
+ mm/ioremap.c       | 13 ++++++++++++-
+ mm/vmalloc.c       |  8 ++++++++
+ 3 files changed, 23 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/fixmap.h b/arch/arm64/include/asm/fixmap.h
-index 4335800201c9..1aae625b944f 100644
---- a/arch/arm64/include/asm/fixmap.h
-+++ b/arch/arm64/include/asm/fixmap.h
-@@ -105,6 +105,8 @@ void __init early_fixmap_init(void);
+diff --git a/include/linux/io.h b/include/linux/io.h
+index 9595151d800d..0ffc265f114c 100644
+--- a/include/linux/io.h
++++ b/include/linux/io.h
+@@ -21,6 +21,9 @@ void __ioread32_copy(void *to, const void __iomem *from, size_t count);
+ void __iowrite64_copy(void __iomem *to, const void *from, size_t count);
  
- extern void __set_fixmap(enum fixed_addresses idx, phys_addr_t phys, pgprot_t prot);
+ #ifdef CONFIG_MMU
++void ioremap_page_range_hook(unsigned long addr, unsigned long end,
++			     phys_addr_t phys_addr, pgprot_t prot);
++void iounmap_page_range_hook(phys_addr_t phys_addr, size_t size);
+ int ioremap_page_range(unsigned long addr, unsigned long end,
+ 		       phys_addr_t phys_addr, pgprot_t prot);
+ #else
+diff --git a/mm/ioremap.c b/mm/ioremap.c
+index 8ee0136f8cb0..bd77a86088f2 100644
+--- a/mm/ioremap.c
++++ b/mm/ioremap.c
+@@ -28,10 +28,21 @@ early_param("nohugeiomap", set_nohugeiomap);
+ static const unsigned int iomap_max_page_shift = PAGE_SHIFT;
+ #endif	/* CONFIG_HAVE_ARCH_HUGE_VMAP */
  
-+extern pte_t *__get_fixmap_pte(enum fixed_addresses idx);
-+
- #include <asm-generic/fixmap.h>
- 
- #endif /* !__ASSEMBLY__ */
-diff --git a/arch/arm64/mm/mmu.c b/arch/arm64/mm/mmu.c
-index d74586508448..f1b7abd04025 100644
---- a/arch/arm64/mm/mmu.c
-+++ b/arch/arm64/mm/mmu.c
-@@ -1286,6 +1286,21 @@ void __set_fixmap(enum fixed_addresses idx,
- 	}
- }
- 
-+pte_t *__get_fixmap_pte(enum fixed_addresses idx)
++void __weak ioremap_page_range_hook(unsigned long addr, unsigned long end,
++				    phys_addr_t phys_addr, pgprot_t prot)
 +{
-+	unsigned long 	addr = __fix_to_virt(idx);
-+	pte_t *ptep;
-+
-+	BUG_ON(idx <= FIX_HOLE || idx >= __end_of_fixed_addresses);
-+
-+	ptep = fixmap_pte(addr);
-+
-+	if (!pte_valid(*ptep))
-+		return NULL;
-+
-+	return ptep;
 +}
 +
- void *__init fixmap_remap_fdt(phys_addr_t dt_phys, int *size, pgprot_t prot)
+ int ioremap_page_range(unsigned long addr,
+ 		       unsigned long end, phys_addr_t phys_addr, pgprot_t prot)
  {
- 	const u64 dt_virt_base = __fix_to_virt(FIX_FDT);
+-	return vmap_range(addr, end, phys_addr, prot, iomap_max_page_shift);
++	int ret;
++
++	ret = vmap_range(addr, end, phys_addr, prot, iomap_max_page_shift);
++	if (!ret)
++		ioremap_page_range_hook(addr, end, phys_addr, prot);
++
++	return ret;
+ }
+ 
+ #ifdef CONFIG_GENERIC_IOREMAP
+diff --git a/mm/vmalloc.c b/mm/vmalloc.c
+index d5cd52805149..af18a6141093 100644
+--- a/mm/vmalloc.c
++++ b/mm/vmalloc.c
+@@ -38,6 +38,7 @@
+ #include <linux/pgtable.h>
+ #include <linux/uaccess.h>
+ #include <linux/hugetlb.h>
++#include <linux/io.h>
+ #include <asm/tlbflush.h>
+ #include <asm/shmparam.h>
+ 
+@@ -2551,6 +2552,10 @@ static void vm_remove_mappings(struct vm_struct *area, int deallocate_pages)
+ 	set_area_direct_map(area, set_direct_map_default_noflush);
+ }
+ 
++void __weak iounmap_page_range_hook(phys_addr_t phys_addr, size_t size)
++{
++}
++
+ static void __vunmap(const void *addr, int deallocate_pages)
+ {
+ 	struct vm_struct *area;
+@@ -2574,6 +2579,9 @@ static void __vunmap(const void *addr, int deallocate_pages)
+ 
+ 	kasan_poison_vmalloc(area->addr, get_vm_area_size(area));
+ 
++	if (area->flags & VM_IOREMAP)
++		iounmap_page_range_hook(area->phys_addr, get_vm_area_size(area));
++
+ 	vm_remove_mappings(area, deallocate_pages);
+ 
+ 	if (deallocate_pages) {
 -- 
 2.30.2
 
