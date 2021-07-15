@@ -2,57 +2,62 @@ Return-Path: <SRS0=OVIf=MH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66BCAC07E96
-	for <kvmarm@archiver.kernel.org>; Thu, 15 Jul 2021 09:29:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8F22C07E96
+	for <kvmarm@archiver.kernel.org>; Thu, 15 Jul 2021 09:30:36 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D9962613BF
-	for <kvmarm@archiver.kernel.org>; Thu, 15 Jul 2021 09:29:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9962613BF
+	by mail.kernel.org (Postfix) with ESMTP id 388A6613B5
+	for <kvmarm@archiver.kernel.org>; Thu, 15 Jul 2021 09:30:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 388A6613B5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 57D644B0A5;
-	Thu, 15 Jul 2021 05:29:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A7A9F4A418;
+	Thu, 15 Jul 2021 05:30:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 5tRZ0ZyNxhtz; Thu, 15 Jul 2021 05:28:59 -0400 (EDT)
+	with ESMTP id R0qHaixvtoBL; Thu, 15 Jul 2021 05:30:30 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A0E04B0A1;
-	Thu, 15 Jul 2021 05:28:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6EC674B0AC;
+	Thu, 15 Jul 2021 05:30:30 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B3344B092
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Jul 2021 05:28:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E8454B0A0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Jul 2021 05:30:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id p7s+rXgan7Ci for <kvmarm@lists.cs.columbia.edu>;
- Thu, 15 Jul 2021 05:28:56 -0400 (EDT)
+ with ESMTP id LU75w+CwhiX6 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 15 Jul 2021 05:30:27 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4BF644B0A0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Jul 2021 05:28:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C01004B092
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Jul 2021 05:30:27 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 53A646D;
- Thu, 15 Jul 2021 02:28:55 -0700 (PDT)
-Received: from [10.57.36.240] (unknown [10.57.36.240])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9CB9D3F774;
- Thu, 15 Jul 2021 02:28:54 -0700 (PDT)
-Subject: Re: Any way to disable KVM VHE extension?
-To: Qu Wenruo <wqu@suse.com>, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, Linux ARM <linux-arm-kernel@lists.infradead.org>
-References: <37f873cf-1b39-ea7f-a5e7-6feb0200dd4c@suse.com>
-From: Robin Murphy <robin.murphy@arm.com>
-Message-ID: <e17449e7-b91d-d288-ff1c-e9451f9d1973@arm.com>
-Date: Thu, 15 Jul 2021 10:28:49 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 60D1E6D;
+ Thu, 15 Jul 2021 02:30:27 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 53E593F774;
+ Thu, 15 Jul 2021 02:30:26 -0700 (PDT)
+Subject: Re: [PATCH 5/5] KVM: arm64: nVHE: Remove unneeded isb() when
+ modifying PMSCR_EL1
+To: Will Deacon <will@kernel.org>
+References: <20210714095601.184854-1-alexandru.elisei@arm.com>
+ <20210714095601.184854-6-alexandru.elisei@arm.com>
+ <20210714182036.GA32475@willie-the-truck>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <17eead71-5db4-403c-eff0-e45d9b9f7a31@arm.com>
+Date: Thu, 15 Jul 2021 10:31:29 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <37f873cf-1b39-ea7f-a5e7-6feb0200dd4c@suse.com>
-Content-Language: en-GB
+In-Reply-To: <20210714182036.GA32475@willie-the-truck>
+Content-Language: en-US
+Cc: maz@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -64,48 +69,66 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gMjAyMS0wNy0xNSAwOTo1NSwgUXUgV2VucnVvIHdyb3RlOgo+IEhpLAo+IAo+IFJlY2VudGx5
-IEknbSBwbGF5aW5nIGFyb3VuZCB0aGUgTnZpZGlhIFhhdmllciBBR1ggYm9hcmQsIHdoaWNoIGhh
-cyBWSEUgCj4gZXh0ZW5zaW9uIHN1cHBvcnQuCj4gCj4gSW4gdGhlb3J5LCBjb25zaWRlcmluZyB0
-aGUgQ1BVIGFuZCBtZW1vcnksIGl0IHNob3VsZCBiZSBwcmV0dHkgcG93ZXJmdWwgCj4gY29tcGFy
-ZWQgdG8gYm9hcmRzIGxpa2UgUlBJIENNNC4KPiAKPiBCdXQgdG8gbXkgc3VycHJpc2UsIEtWTSBy
-dW5zIHByZXR0eSBwb29yIG9uIFhhdmllci4KPiAKPiBKdXN0IGJvb3RpbmcgdGhlIGVkazIgZmly
-bXdhcmUgY291bGQgdGFrZSBvdmVyIDEwcywgYW5kIDIwcyB0byBmdWxseSAKPiBib290IHRoZSBr
-ZXJuZWwuCj4gRXZlbiBteSBWTSBvbiBSUEkgQ000IGhhcyB3YXkgZmFzdGVyIGJvb3QgdGltZSwg
-ZXZlbiBqdXN0IHJ1bm5pbmcgb24gCj4gUENJRTIuMCB4MSBsYW5lIE5WTUUsIGFuZCBqdXN0IDQg
-Mi4xR2h6IEE3MiBjb3JlLgo+IAo+IFRoaXMgaXMgZGVmaW5pdGVseSBvdXQgb2YgbXkgZXhwZWN0
-YXRpb24sIEkgZG91YmxlIGNoZWNrZWQgdG8gYmUgc3VyZSAKPiB0aGF0IGl0J3MgcnVubmluZyBp
-biBLVk0gbW9kZS4KPiAKPiBCdXQgZnVydGhlciBkaWdnaW5nIHNob3dzIHRoYXQsIHNpbmNlIFhh
-dmllciBBR1ggQ1BVIHN1cHBvcnRzIFZIRSwga3ZtIAo+IGlzIHJ1bm5pbmcgaW4gVkhFIG1vZGUg
-b3RoZXIgdGhhbiBIWVAgbW9kZSBvbiBDTTQuCj4gCj4gSXMgdGhlcmUgYW55d2F5IHRvIG1hbnVh
-bGx5IGRpc2FibGUgVkhFIG1vZGUgdG8gdGVzdCB0aGUgbW9yZSBjb21tb24gSFlQIAo+IG1vZGUg
-b24gWGF2aWVyPwoKQWNjb3JkaW5nIHRvIGtlcm5lbC1wYXJhbWV0ZXJzLnR4dCwgImt2bS1hcm0u
-bW9kZT1udmhlIiAob3IgaXRzIApsb3ctbGV2ZWwgZXF1aXZhbGVudCAiaWRfYWE2NG1tZnIxLnZo
-PTAiKSBvbiB0aGUgY29tbWFuZCBsaW5lIHNob3VsZCBkbyAKdGhhdC4KCkhvd2V2ZXIgSSdkIGlt
-YWdpbmUgdGhlIGRpc2NyZXBhbmN5IGlzIGxpa2VseSB0byBiZSBzb21ldGhpbmcgbW9yZSAKZnVu
-ZGFtZW50YWwgdG8gdGhlIHdpbGRseSBkaWZmZXJlbnQgbWljcm9hcmNoaXRlY3R1cmVzLiBUaGVy
-ZSdzIApjZXJ0YWlubHkgbm8gaGFybSBpbiBnaXZpbmcgbm9uLVZIRSBhIGdvIGZvciBjb21wYXJp
-c29uLCBidXQgSSB3b3VsZG4ndCAKYmUgc3VycHJpc2VkIGlmIGl0IHR1cm5zIG91dCBldmVuIHNs
-b3dlci4uLgoKUm9iaW4uCgo+IEJUVywgdGhpcyBpcyB0aGUgZG1lc2cgcmVsYXRlZCB0byBLVk0g
-b24gWGF2aWVyLCBydW5uaW5nIHY1LjEzIHVwc3RyZWFtIAo+IGtlcm5lbCwgd2l0aCA2NEsgcGFn
-ZSBzaXplOgo+IFvCoMKgwqAgMC44NTIzNTddIGt2bSBbMV06IElQQSBTaXplIExpbWl0OiA0MCBi
-aXRzCj4gW8KgwqDCoCAwLjg1NzM3OF0ga3ZtIFsxXTogdmdpYyBpbnRlcnJ1cHQgSVJROQo+IFvC
-oMKgwqAgMC44NjIxMjJdIGt2bTogcG11IGV2ZW50IGNyZWF0aW9uIGZhaWxlZCAtMgo+IFvCoMKg
-wqAgMC44NjY3MzRdIGt2bSBbMV06IFZIRSBtb2RlIGluaXRpYWxpemVkIHN1Y2Nlc3NmdWxseQo+
-IAo+IFdoaWxlIG9uIENNNCwgdGhlIGhvc3QgcnVucyB2NS4xMi4xMCB1cHN0cmVhbSBrZXJuZWwg
-KHdpdGggZG93bnN0cmVhbSAKPiBkdGIpLCB3aXRoIDRLIHBhZ2Ugc2l6ZToKPiBbwqDCoMKgIDEu
-Mjc2ODE4XSBrdm0gWzFdOiBJUEEgU2l6ZSBMaW1pdDogNDQgYml0cwo+IFvCoMKgwqAgMS4yNzg0
-MjVdIGt2bSBbMV06IHZnaWMgaW50ZXJydXB0IElSUTkKPiBbwqDCoMKgIDEuMjc4NjIwXSBrdm0g
-WzFdOiBIeXAgbW9kZSBpbml0aWFsaXplZCBzdWNjZXNzZnVsbHkKPiAKPiBDb3VsZCBpdCBiZSB0
-aGUgUEFHRSBzaXplIGNhdXNpbmcgcHJvYmxlbT8KPiAKPiBUaGFua3MsCj4gUXUKPiAKPiAKPiBf
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwo+IGxpbnV4LWFy
-bS1rZXJuZWwgbWFpbGluZyBsaXN0Cj4gbGludXgtYXJtLWtlcm5lbEBsaXN0cy5pbmZyYWRlYWQu
-b3JnCj4gaHR0cDovL2xpc3RzLmluZnJhZGVhZC5vcmcvbWFpbG1hbi9saXN0aW5mby9saW51eC1h
-cm0ta2VybmVsCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-Cmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczov
-L2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+Hi Will,
+
+On 7/14/21 7:20 PM, Will Deacon wrote:
+> On Wed, Jul 14, 2021 at 10:56:01AM +0100, Alexandru Elisei wrote:
+>> According to ARM DDI 0487G.a, page D9-2930, profiling is disabled when
+>> the PE is executing at a higher exception level than the profiling
+>> buffer owning exception level. This is also confirmed by the pseudocode
+>> for the StatisticalProfilingEnabled() function.
+>>
+>> During the world switch and before activating guest traps, KVM executes
+>> at EL2 with the buffer owning exception level being EL1 (MDCR_EL2.E2PB =
+>> 0b11). As a result, profiling is already disabled when draining the
+>> buffer, making the isb() after the write to PMSCR_EL1 unnecessary.
+>>
+>> CC: Will Deacon <will@kernel.org>
+>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>> ---
+>>  arch/arm64/kvm/hyp/nvhe/debug-sr.c | 1 -
+>>  1 file changed, 1 deletion(-)
+>>
+>> diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+>> index 7d3f25868cae..fdf0e0ba17e9 100644
+>> --- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+>> +++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+>> @@ -33,7 +33,6 @@ static void __debug_save_spe(u64 *pmscr_el1)
+>>  	/* Yes; save the control register and disable data generation */
+>>  	*pmscr_el1 = read_sysreg_s(SYS_PMSCR_EL1);
+>>  	write_sysreg_s(0, SYS_PMSCR_EL1);
+>> -	isb();
+> Hmm, but we still need an ISB somewhere between clearing pmscr_el1 and
+> mdcr_el2.e2pb, right? Where does that occur?
+
+Yes, we do need an ISB to make sure we don't start profiling using the EL2&0
+translation regime, but with a buffer pointer programmed by the host at EL1 which
+is most likely not even mapped at EL2.
+
+When I wrote the patch, I reasoned that the ISB in
+__sysreg_restore_state_nvhe->__sysreg_restore_el1_state and the isb from
+__load_stage2 will make sure that PMSCR_EL1 is cleared before the change to the
+buffer owning regime.
+
+As I was double checking that just now, I realized that *both* ISBs are executed
+only if the system has ARM64_WORKAROUND_SPECULATIVE_AT. No ISB gets executed when
+the workaround is not needed. We could make the ISB here depend on the system not
+having the workaround, but it looks to me like there's little to be gained from
+that (just one less ISB when the workaround is applied), at the expense of making
+the code even more difficult to reason about.
+
+My preference would be to drop this patch.
+
+Thanks,
+
+Alex
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
