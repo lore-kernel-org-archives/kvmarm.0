@@ -3,56 +3,55 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UPPERCASE_50_75,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E8B0C47E4B
-	for <kvmarm@archiver.kernel.org>; Thu, 15 Jul 2021 16:32:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7950C47E4F
+	for <kvmarm@archiver.kernel.org>; Thu, 15 Jul 2021 16:32:29 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 51810613F0
-	for <kvmarm@archiver.kernel.org>; Thu, 15 Jul 2021 16:32:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51810613F0
+	by mail.kernel.org (Postfix) with ESMTP id 74AC6613F7
+	for <kvmarm@archiver.kernel.org>; Thu, 15 Jul 2021 16:32:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74AC6613F7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 041BD4B0B1;
-	Thu, 15 Jul 2021 12:32:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 27C4E4B0C5;
+	Thu, 15 Jul 2021 12:32:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Xc0l-tJk62NR; Thu, 15 Jul 2021 12:32:26 -0400 (EDT)
+	with ESMTP id Qt7+lFhVM1KF; Thu, 15 Jul 2021 12:32:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 08C024B0CB;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 233C04B0CE;
 	Thu, 15 Jul 2021 12:32:22 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 05B924B09E
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 18A304B08B
  for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Jul 2021 12:32:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UdHcB2At-zyU for <kvmarm@lists.cs.columbia.edu>;
- Thu, 15 Jul 2021 12:32:19 -0400 (EDT)
+ with ESMTP id 9OP7nywHioPE for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 15 Jul 2021 12:32:20 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 11F1A4B089
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DC1CC4B099
  for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Jul 2021 12:32:19 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 5323B613D3;
- Thu, 15 Jul 2021 16:32:17 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id B693D613FB;
+ Thu, 15 Jul 2021 16:32:18 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1m44HX-00DYjr-OF; Thu, 15 Jul 2021 17:32:15 +0100
+ id 1m44HZ-00DYjr-3w; Thu, 15 Jul 2021 17:32:17 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 03/16] KVM: arm64: Turn kvm_pgtable_stage2_set_owner into
- kvm_pgtable_stage2_annotate
-Date: Thu, 15 Jul 2021 17:31:46 +0100
-Message-Id: <20210715163159.1480168-4-maz@kernel.org>
+Subject: [PATCH 07/16] KVM: arm64: Wire MMIO guard hypercalls
+Date: Thu, 15 Jul 2021 17:31:50 +0100
+Message-Id: <20210715163159.1480168-8-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210715163159.1480168-1-maz@kernel.org>
 References: <20210715163159.1480168-1-maz@kernel.org>
@@ -85,159 +84,103 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-kvm_pgtable_stage2_set_owner() could be generalised into a way
-to store up to 63 bits in the page tables, as long as we don't
-set bit 0.
-
-Let's just do that.
+Plumb in the hypercall interface to allow a guest to discover,
+enroll, map and unmap MMIO regions.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_pgtable.h  | 12 +++++++-----
- arch/arm64/kvm/hyp/nvhe/mem_protect.c | 14 ++++++++++++--
- arch/arm64/kvm/hyp/pgtable.c          | 20 ++++++--------------
- 3 files changed, 25 insertions(+), 21 deletions(-)
+ arch/arm64/kvm/hypercalls.c | 20 ++++++++++++++++++++
+ include/linux/arm-smccc.h   | 28 ++++++++++++++++++++++++++++
+ 2 files changed, 48 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index f004c0115d89..9579e8c2793b 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -274,14 +274,16 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 			   void *mc);
+diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+index 30da78f72b3b..a3deeb907fdd 100644
+--- a/arch/arm64/kvm/hypercalls.c
++++ b/arch/arm64/kvm/hypercalls.c
+@@ -5,6 +5,7 @@
+ #include <linux/kvm_host.h>
  
- /**
-- * kvm_pgtable_stage2_set_owner() - Unmap and annotate pages in the IPA space to
-- *				    track ownership.
-+ * kvm_pgtable_stage2_annotate() - Unmap and annotate pages in the IPA space
-+ *				   to track ownership (and more).
-  * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
-  * @addr:	Base intermediate physical address to annotate.
-  * @size:	Size of the annotated range.
-  * @mc:		Cache of pre-allocated and zeroed memory from which to allocate
-  *		page-table pages.
-- * @owner_id:	Unique identifier for the owner of the page.
-+ * @annotation:	A 63 bit value that will be stored in the page tables.
-+ *		@annotation[0] must be 0, and @annotation[63:1] is stored
-+ *		in the page tables. @annotation as a whole must not be 0.
-  *
-  * By default, all page-tables are owned by identifier 0. This function can be
-  * used to mark portions of the IPA space as owned by other entities. When a
-@@ -290,8 +292,8 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
-  *
-  * Return: 0 on success, negative error code on failure.
-  */
--int kvm_pgtable_stage2_set_owner(struct kvm_pgtable *pgt, u64 addr, u64 size,
--				 void *mc, u8 owner_id);
-+int kvm_pgtable_stage2_annotate(struct kvm_pgtable *pgt, u64 addr, u64 size,
-+				void *mc, kvm_pte_t annotation);
+ #include <asm/kvm_emulate.h>
++#include <asm/kvm_mmu.h>
  
- /**
-  * kvm_pgtable_stage2_unmap() - Remove a mapping from a guest stage-2 page-table.
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index d938ce95d3bd..ffe482c3b818 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -245,6 +245,15 @@ static int host_stage2_idmap(u64 addr)
- 	return ret;
- }
+ #include <kvm/arm_hypercalls.h>
+ #include <kvm/arm_psci.h>
+@@ -129,10 +130,29 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+ 	case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
+ 		val[0] = BIT(ARM_SMCCC_KVM_FUNC_FEATURES);
+ 		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_PTP);
++		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_MMIO_GUARD_INFO);
++		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_MMIO_GUARD_ENROLL);
++		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_MMIO_GUARD_MAP);
++		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_MMIO_GUARD_UNMAP);
+ 		break;
+ 	case ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID:
+ 		kvm_ptp_get_time(vcpu, val);
+ 		break;
++	case ARM_SMCCC_VENDOR_HYP_KVM_MMIO_GUARD_INFO_FUNC_ID:
++		val[0] = PAGE_SIZE;
++		break;
++	case ARM_SMCCC_VENDOR_HYP_KVM_MMIO_GUARD_ENROLL_FUNC_ID:
++		set_bit(KVM_ARCH_FLAG_MMIO_GUARD, &vcpu->kvm->arch.flags);
++		val[0] = SMCCC_RET_SUCCESS;
++		break;
++	case ARM_SMCCC_VENDOR_HYP_KVM_MMIO_GUARD_MAP_FUNC_ID:
++		if (kvm_install_ioguard_page(vcpu, vcpu_get_reg(vcpu, 1)))
++			val[0] = SMCCC_RET_SUCCESS;
++		break;
++	case ARM_SMCCC_VENDOR_HYP_KVM_MMIO_GUARD_UNMAP_FUNC_ID:
++		if (kvm_remove_ioguard_page(vcpu, vcpu_get_reg(vcpu, 1)))
++			val[0] = SMCCC_RET_SUCCESS;
++		break;
+ 	case ARM_SMCCC_TRNG_VERSION:
+ 	case ARM_SMCCC_TRNG_FEATURES:
+ 	case ARM_SMCCC_TRNG_GET_UUID:
+diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
+index 7d1cabe15262..4aab2078d8d3 100644
+--- a/include/linux/arm-smccc.h
++++ b/include/linux/arm-smccc.h
+@@ -107,6 +107,10 @@
+ /* KVM "vendor specific" services */
+ #define ARM_SMCCC_KVM_FUNC_FEATURES		0
+ #define ARM_SMCCC_KVM_FUNC_PTP			1
++#define ARM_SMCCC_KVM_FUNC_MMIO_GUARD_INFO	2
++#define ARM_SMCCC_KVM_FUNC_MMIO_GUARD_ENROLL	3
++#define ARM_SMCCC_KVM_FUNC_MMIO_GUARD_MAP	4
++#define ARM_SMCCC_KVM_FUNC_MMIO_GUARD_UNMAP	5
+ #define ARM_SMCCC_KVM_FUNC_FEATURES_2		127
+ #define ARM_SMCCC_KVM_NUM_FUNCS			128
  
-+#define KVM_INVALID_PTE_OWNER_MASK	GENMASK(63, 56)
-+#define KVM_MAX_OWNER_ID		1
+@@ -133,6 +137,30 @@
+ #define KVM_PTP_VIRT_COUNTER			0
+ #define KVM_PTP_PHYS_COUNTER			1
+ 
++#define ARM_SMCCC_VENDOR_HYP_KVM_MMIO_GUARD_INFO_FUNC_ID		\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
++			   ARM_SMCCC_SMC_64,				\
++			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
++			   ARM_SMCCC_KVM_FUNC_MMIO_GUARD_INFO)
 +
-+static kvm_pte_t kvm_init_invalid_leaf_owner(u8 owner_id)
-+{
-+	BUG_ON(owner_id > KVM_MAX_OWNER_ID);
-+	return FIELD_PREP(KVM_INVALID_PTE_OWNER_MASK, owner_id);
-+}
++#define ARM_SMCCC_VENDOR_HYP_KVM_MMIO_GUARD_ENROLL_FUNC_ID		\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
++			   ARM_SMCCC_SMC_64,				\
++			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
++			   ARM_SMCCC_KVM_FUNC_MMIO_GUARD_ENROLL)
 +
- int __pkvm_mark_hyp(phys_addr_t start, phys_addr_t end)
- {
- 	int ret;
-@@ -257,8 +266,9 @@ int __pkvm_mark_hyp(phys_addr_t start, phys_addr_t end)
- 		return -EINVAL;
- 
- 	hyp_spin_lock(&host_kvm.lock);
--	ret = kvm_pgtable_stage2_set_owner(&host_kvm.pgt, start, end - start,
--					   &host_s2_pool, pkvm_hyp_id);
-+	ret = kvm_pgtable_stage2_annotate(&host_kvm.pgt, start, end - start,
-+					  &host_s2_pool,
-+					  kvm_init_invalid_leaf_owner(pkvm_hyp_id));
- 	hyp_spin_unlock(&host_kvm.lock);
- 
- 	return ret != -EAGAIN ? ret : 0;
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index a5874ebd0354..a065f6d960af 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -50,9 +50,6 @@
- 
- #define KVM_PTE_LEAF_ATTR_S2_IGNORED	GENMASK(58, 55)
- 
--#define KVM_INVALID_PTE_OWNER_MASK	GENMASK(63, 56)
--#define KVM_MAX_OWNER_ID		1
--
- struct kvm_pgtable_walk_data {
- 	struct kvm_pgtable		*pgt;
- 	struct kvm_pgtable_walker	*walker;
-@@ -206,11 +203,6 @@ static kvm_pte_t kvm_init_valid_leaf_pte(u64 pa, kvm_pte_t attr, u32 level)
- 	return pte;
- }
- 
--static kvm_pte_t kvm_init_invalid_leaf_owner(u8 owner_id)
--{
--	return FIELD_PREP(KVM_INVALID_PTE_OWNER_MASK, owner_id);
--}
--
- static int kvm_pgtable_visitor_cb(struct kvm_pgtable_walk_data *data, u64 addr,
- 				  u32 level, kvm_pte_t *ptep,
- 				  enum kvm_pgtable_walk_flags flag)
-@@ -466,7 +458,7 @@ void kvm_pgtable_hyp_destroy(struct kvm_pgtable *pgt)
- struct stage2_map_data {
- 	u64				phys;
- 	kvm_pte_t			attr;
--	u8				owner_id;
-+	u64				annotation;
- 
- 	kvm_pte_t			*anchor;
- 	kvm_pte_t			*childp;
-@@ -603,7 +595,7 @@ static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
- 	if (kvm_phys_is_valid(phys))
- 		new = kvm_init_valid_leaf_pte(phys, data->attr, level);
- 	else
--		new = kvm_init_invalid_leaf_owner(data->owner_id);
-+		new = data->annotation;
- 
- 	if (stage2_pte_is_counted(old)) {
- 		/*
-@@ -796,8 +788,8 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 	return ret;
- }
- 
--int kvm_pgtable_stage2_set_owner(struct kvm_pgtable *pgt, u64 addr, u64 size,
--				 void *mc, u8 owner_id)
-+int kvm_pgtable_stage2_annotate(struct kvm_pgtable *pgt, u64 addr, u64 size,
-+				void *mc, kvm_pte_t annotation)
- {
- 	int ret;
- 	struct stage2_map_data map_data = {
-@@ -805,7 +797,7 @@ int kvm_pgtable_stage2_set_owner(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 		.mmu		= pgt->mmu,
- 		.memcache	= mc,
- 		.mm_ops		= pgt->mm_ops,
--		.owner_id	= owner_id,
-+		.annotation	= annotation,
- 	};
- 	struct kvm_pgtable_walker walker = {
- 		.cb		= stage2_map_walker,
-@@ -815,7 +807,7 @@ int kvm_pgtable_stage2_set_owner(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 		.arg		= &map_data,
- 	};
- 
--	if (owner_id > KVM_MAX_OWNER_ID)
-+	if (!annotation || (annotation & PTE_VALID))
- 		return -EINVAL;
- 
- 	ret = kvm_pgtable_walk(pgt, addr, size, &walker);
++#define ARM_SMCCC_VENDOR_HYP_KVM_MMIO_GUARD_MAP_FUNC_ID			\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
++			   ARM_SMCCC_SMC_64,				\
++			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
++			   ARM_SMCCC_KVM_FUNC_MMIO_GUARD_MAP)
++
++#define ARM_SMCCC_VENDOR_HYP_KVM_MMIO_GUARD_UNMAP_FUNC_ID		\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
++			   ARM_SMCCC_SMC_64,				\
++			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
++			   ARM_SMCCC_KVM_FUNC_MMIO_GUARD_UNMAP)
++
+ /* Paravirtualised time calls (defined by ARM DEN0057A) */
+ #define ARM_SMCCC_HV_PV_TIME_FEATURES				\
+ 	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
 -- 
 2.30.2
 
