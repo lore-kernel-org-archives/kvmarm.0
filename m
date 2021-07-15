@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37A28C07E96
-	for <kvmarm@archiver.kernel.org>; Thu, 15 Jul 2021 16:32:33 +0000 (UTC)
-Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E2BCB613F8
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DD86C47E48
 	for <kvmarm@archiver.kernel.org>; Thu, 15 Jul 2021 16:32:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2BCB613F8
+Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
+	by mail.kernel.org (Postfix) with ESMTP id 0FC66613F8
+	for <kvmarm@archiver.kernel.org>; Thu, 15 Jul 2021 16:32:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FC66613F8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 95B9A4B0A5;
-	Thu, 15 Jul 2021 12:32:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BAC054B09F;
+	Thu, 15 Jul 2021 12:32:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ZumGw2CJLaEq; Thu, 15 Jul 2021 12:32:31 -0400 (EDT)
+	with ESMTP id baECkvaDZAN4; Thu, 15 Jul 2021 12:32:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 745444B0DF;
-	Thu, 15 Jul 2021 12:32:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4852A4B0D5;
+	Thu, 15 Jul 2021 12:32:24 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E2E314B09C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Jul 2021 12:32:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 365D84B08D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Jul 2021 12:32:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yJ0goA++Ez1o for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id oHEAIEvTNPRp for <kvmarm@lists.cs.columbia.edu>;
  Thu, 15 Jul 2021 12:32:20 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DAC9F4B098
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CEB604B097
  for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Jul 2021 12:32:19 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 1208E613FD;
- Thu, 15 Jul 2021 16:32:19 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 5B6E8613FC;
+ Thu, 15 Jul 2021 16:32:18 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1m44HZ-00DYjr-Ei; Thu, 15 Jul 2021 17:32:17 +0100
+ id 1m44HY-00DYjr-P8; Thu, 15 Jul 2021 17:32:16 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 08/16] KVM: arm64: Add tracepoint for failed MMIO guard check
-Date: Thu, 15 Jul 2021 17:31:51 +0100
-Message-Id: <20210715163159.1480168-9-maz@kernel.org>
+Subject: [PATCH 06/16] KVM: arm64: Force a full unmap on vpcu reinit
+Date: Thu, 15 Jul 2021 17:31:49 +0100
+Message-Id: <20210715163159.1480168-7-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210715163159.1480168-1-maz@kernel.org>
 References: <20210715163159.1480168-1-maz@kernel.org>
@@ -84,59 +84,42 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In order to make debugging easier, expose a new trace point
-that triggers when a MMIO check fails.
+As we now keep information in the S2PT, we must be careful not
+to keep it across a VM reboot, which could otherwise lead to
+interesting problems.
+
+Make sure that the S2 is completely discarded on reset of
+a vcpu, and remove the flag that enforces the MMIO check.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/mmu.c       |  4 +++-
- arch/arm64/kvm/trace_arm.h | 17 +++++++++++++++++
- 2 files changed, 20 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/arm.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 638827c8842b..c2a23457552b 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1229,8 +1229,10 @@ bool kvm_check_ioguard_page(struct kvm_vcpu *vcpu, gpa_t ipa)
- 	ret = __check_ioguard_page(vcpu, ipa & PAGE_MASK);
- 	spin_unlock(&vcpu->kvm->mmu_lock);
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 97ab1512c44f..b0d2225190d2 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1096,12 +1096,18 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
+ 	 * ensuring that the data side is always coherent. We still
+ 	 * need to invalidate the I-cache though, as FWB does *not*
+ 	 * imply CTR_EL0.DIC.
++	 *
++	 * If the MMIO guard was enabled, we pay the price of a full
++	 * unmap to get back to a sane state (and clear the flag).
+ 	 */
+ 	if (vcpu->arch.has_run_once) {
+-		if (!cpus_have_final_cap(ARM64_HAS_STAGE2_FWB))
++		if (!cpus_have_final_cap(ARM64_HAS_STAGE2_FWB) ||
++		    test_bit(KVM_ARCH_FLAG_MMIO_GUARD, &vcpu->kvm->arch.flags))
+ 			stage2_unmap_vm(vcpu->kvm);
+ 		else
+ 			icache_inval_all_pou();
++
++		clear_bit(KVM_ARCH_FLAG_MMIO_GUARD, &vcpu->kvm->arch.flags);
+ 	}
  
--	if (!ret)
-+	if (!ret) {
-+		trace_kvm_failed_mmio_check(*vcpu_pc(vcpu), ipa);
- 		kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
-+	}
- 
- 	return ret;
- }
-diff --git a/arch/arm64/kvm/trace_arm.h b/arch/arm64/kvm/trace_arm.h
-index 33e4e7dd2719..e40cfeb251ad 100644
---- a/arch/arm64/kvm/trace_arm.h
-+++ b/arch/arm64/kvm/trace_arm.h
-@@ -89,6 +89,23 @@ TRACE_EVENT(kvm_access_fault,
- 	TP_printk("IPA: %lx", __entry->ipa)
- );
- 
-+TRACE_EVENT(kvm_failed_mmio_check,
-+	TP_PROTO(unsigned long vcpu_pc, unsigned long ipa),
-+	TP_ARGS(vcpu_pc, ipa),
-+
-+	TP_STRUCT__entry(
-+		__field(	unsigned long,	vcpu_pc		)
-+		__field(	unsigned long,	ipa		)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->vcpu_pc	= vcpu_pc;
-+		__entry->ipa		= ipa;
-+	),
-+
-+	TP_printk("PC: %lx IPA: %lx", __entry->vcpu_pc, __entry->ipa)
-+);
-+
- TRACE_EVENT(kvm_irq_line,
- 	TP_PROTO(unsigned int type, int vcpu_idx, int irq_num, int level),
- 	TP_ARGS(type, vcpu_idx, irq_num, level),
+ 	vcpu_reset_hcr(vcpu);
 -- 
 2.30.2
 
