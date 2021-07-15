@@ -2,59 +2,144 @@ Return-Path: <SRS0=OVIf=MH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED08CC07E96
-	for <kvmarm@archiver.kernel.org>; Thu, 15 Jul 2021 10:07:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25E06C07E96
+	for <kvmarm@archiver.kernel.org>; Thu, 15 Jul 2021 10:39:02 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 60F6B61178
-	for <kvmarm@archiver.kernel.org>; Thu, 15 Jul 2021 10:07:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60F6B61178
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 8F518613BF
+	for <kvmarm@archiver.kernel.org>; Thu, 15 Jul 2021 10:39:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F518613BF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=suse.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E20EC40068;
-	Thu, 15 Jul 2021 06:07:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 113464A5A0;
+	Thu, 15 Jul 2021 06:39:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@suse.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id DsEsvxvvrjTk; Thu, 15 Jul 2021 06:07:08 -0400 (EDT)
+	with ESMTP id LP5CSXOefkv2; Thu, 15 Jul 2021 06:38:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9AEBE4A19F;
-	Thu, 15 Jul 2021 06:07:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9AB1D4B09E;
+	Thu, 15 Jul 2021 06:38:58 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F6E04B081
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Jul 2021 06:07:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EF1594A1AF
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Jul 2021 04:55:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IyN++5K8aFzK for <kvmarm@lists.cs.columbia.edu>;
- Thu, 15 Jul 2021 06:07:06 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3CC3649FB0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Jul 2021 06:07:06 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C29E531B;
- Thu, 15 Jul 2021 03:07:05 -0700 (PDT)
-Received: from C02TD0UTHF1T.local (unknown [10.57.0.163])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5EF843F694;
- Thu, 15 Jul 2021 03:07:04 -0700 (PDT)
-Date: Thu, 15 Jul 2021 11:06:54 +0100
-From: Mark Rutland <mark.rutland@arm.com>
-To: Robin Murphy <robin.murphy@arm.com>
-Subject: Re: Any way to disable KVM VHE extension?
-Message-ID: <20210715100643.GA53188@C02TD0UTHF1T.local>
-References: <37f873cf-1b39-ea7f-a5e7-6feb0200dd4c@suse.com>
- <e17449e7-b91d-d288-ff1c-e9451f9d1973@arm.com>
- <0e992d47-1f17-d49f-8341-670770ac49ef@suse.com>
- <6331dfe5-a028-4a71-6cc1-479003a58f47@arm.com>
+ with ESMTP id I1oI1hqUOsQd for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 15 Jul 2021 04:55:39 -0400 (EDT)
+Received: from de-smtp-delivery-102.mimecast.com
+ (de-smtp-delivery-102.mimecast.com [194.104.111.102])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B29FC4A19F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Jul 2021 04:55:39 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com;
+ s=mimecast20200619; t=1626339338;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=68NKbrwr4xIWVH0gzIYYeJI4VzOA2QcK1vwRRSxDToI=;
+ b=GYonlwAM9n2QYnkS9IPpuAK8H+Tu2k2qeDHeyVEVa+WKQGNkWk3iYP4J2+aIailqjqrZw+
+ 7c/QbS3cEiQZqIOJ0piF8CSes7yAUggTIKIPv38o9a7FHXhP5eWMxF19AWygTHEdWpHqJg
+ 7R8PCVspMulClX5eAlzoo4W2DtLPzvQ=
+Received: from EUR01-DB5-obe.outbound.protection.outlook.com
+ (mail-db5eur01lp2054.outbound.protection.outlook.com [104.47.2.54]) (Using
+ TLS) by relay.mimecast.com with ESMTP id
+ de-mta-40-3OjsqvlIMbakg-sYGd4hsg-1; Thu, 15 Jul 2021 10:55:37 +0200
+X-MC-Unique: 3OjsqvlIMbakg-sYGd4hsg-1
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=A9HmjEFwuqCVEBRJAlRHZz3N7eQpMMa6hjVz2LtXVxlNLbljO6VnTorfinVbUpwtqaQ/gz5fxEAw4XS3OBFNV7ffwv4s0/w4bcUiAfhvn/56UjCH7vwaKW0+v6MHFoJuQg9x/7yCj3afAS1hhtrKC9/pSy7omq+p23lSkjQjumV/OADLILD+Zu5OSWo0jBdfhmDkTcf+lxeHaiksLPgv/in8eaqwCgwM+gvLhHk/i6WIPaHIdTlYGYJI0iGGc9ymklCBwFrYmKJE23537jrZbawVyldNPuDKa1Ty9nXsejT+/JEQHd33AjRyO+MTAMNVnshw8UBWqZM5ZXsbdrL51w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7fXW5dI0LhZ7Hx1THd5HjUdc0P3eCVsHtCBbnB5zas8=;
+ b=ZufkQ3Jgw7KpbfvZ3W2Ip9Gd/JJcDL3KN20S4inwmpSRhrbPVNL3fIZt4GoxbzckzFALmJUQN+9LDElHZU/UoROeOFuQCoyysIvtxNaNaxavS9L8FUTCbRjRoyX137hSNY+hzjuJmm7X/3HAQGtQgNsVL6Owu83THj64A3oHKnNJtSudTGnRoGfXyJSZ3504lhypGcOk0z6JDPpxTLYwHMThIwc51pGpyaWWpN9Y30R1OVRh8l4h868M7wRNOPnl3dyscu3R0aw7jUBGcGGo0M6sUGrrBHvOFnz1XvpsMy8mAbtKvmhd8i3v9IwrAvNpwaashZXas2bXl357u3GnPA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
+ dkim=pass header.d=suse.com; arc=none
+Authentication-Results: lists.infradead.org; dkim=none (message not signed)
+ header.d=none;lists.infradead.org; dmarc=none action=none
+ header.from=suse.com;
+Received: from AM7PR04MB6821.eurprd04.prod.outlook.com (2603:10a6:20b:105::22)
+ by AM5PR0402MB2897.eurprd04.prod.outlook.com (2603:10a6:203:95::13)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.21; Thu, 15 Jul
+ 2021 08:55:35 +0000
+Received: from AM7PR04MB6821.eurprd04.prod.outlook.com
+ ([fe80::816b:1f6a:c279:1b65]) by AM7PR04MB6821.eurprd04.prod.outlook.com
+ ([fe80::816b:1f6a:c279:1b65%3]) with mapi id 15.20.4308.027; Thu, 15 Jul 2021
+ 08:55:35 +0000
+To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+ Linux ARM <linux-arm-kernel@lists.infradead.org>
+From: Qu Wenruo <wqu@suse.com>
+Subject: Any way to disable KVM VHE extension?
+Message-ID: <37f873cf-1b39-ea7f-a5e7-6feb0200dd4c@suse.com>
+Date: Thu, 15 Jul 2021 16:55:27 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
+Content-Language: en-US
+X-ClientProxiedBy: BYAPR02CA0036.namprd02.prod.outlook.com
+ (2603:10b6:a02:ee::49) To AM7PR04MB6821.eurprd04.prod.outlook.com
+ (2603:10a6:20b:105::22)
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <6331dfe5-a028-4a71-6cc1-479003a58f47@arm.com>
-Cc: Linux ARM <linux-arm-kernel@lists.infradead.org>,
- kvmarm@lists.cs.columbia.edu, Qu Wenruo <wqu@suse.com>, kvm@vger.kernel.org
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [0.0.0.0] (149.28.201.231) by
+ BYAPR02CA0036.namprd02.prod.outlook.com (2603:10b6:a02:ee::49) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4331.21 via Frontend Transport; Thu, 15 Jul 2021 08:55:34 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: f6c44baf-0b54-48fd-c544-08d9476e4f98
+X-MS-TrafficTypeDiagnostic: AM5PR0402MB2897:
+X-Microsoft-Antispam-PRVS: <AM5PR0402MB2897485823B3EC5151D5D833D6129@AM5PR0402MB2897.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: udYQc2Q3jFiIZUIIAS1T87nZu6OfwhnlMjM/0f47wXyQSdAy3MyzpKcCCfWq56/HkIF2h78kKRR4c0rlNwJvNmJN7FTAP3fexrZv/1kYw3dYPpZ9TqOTl3s4xNcPdSS+5LBWrZqNpYqvgLV2ooQHjjy2CuDZqRTD1hz7VDnIfGxyMUqr7iEoafLGH14JfbCJafNIsTJmUJ3KDrdsxuxW89ueWOnDYISobWzDwu2tY1OGmvnl76Y63mwFixUVJApUutp0NmiYNjMvZGPbyfVzBEC2NLh0KMnYPkgxpnkLQ4tJCOli4zeFk4SnU0vlLwG1bosZsvQZCLQW5Zqi1ZUDlV5mKxovArxUe2a90JF90AQ6U6jAs5fdMt06/vcYeaRVEp0PdlufkkLpZA5Ac8Cwibug3GK0xn3Rv2/wkbAEqmIt+mv9JkBjp7WI9KhqJ40InlxmB/Do+T+Pu0Xq192+eaSn3LeM29wlnJIDkfSh6TM0XHnRL0+kKPCQCwAO//P2L89Ew2yRsgFmDV4iJk/Ve5MmNvEium1Mn4WlcLmWq8xixqfyVkGXALK8hm+dL/EFBqniz/QthK2Wmht3Xs0wwTIZIUqPEMKkd/IZeg6hbaERJYy46RvyqjAGqoiUQQHDSJqveIDXFCO2VPAkBlrUGIxxfY/Sh6rzanjBeJI3RA+q0FhGL9xTupejaIfCWBGb5FwpirLpikzq7ioeeenrkqgKvThdH2MO2kp5qVYT5KZuYeBc6ZvRFb50/FTTqmWMSSXBPfzO1QnrVvXOgDE7dA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR04MB6821.eurprd04.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(346002)(136003)(396003)(376002)(366004)(39850400004)(83380400001)(31696002)(2906002)(26005)(86362001)(66476007)(478600001)(316002)(66556008)(186003)(5660300002)(8676002)(36756003)(31686004)(6486002)(66946007)(6706004)(8936002)(16576012)(6916009)(2616005)(38100700002)(956004)(6666004)(43043002)(78286007)(43740500002)(45980500001);
+ DIR:OUT; SFP:1101; 
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?f8/xWioPmKANPOyG3lJSIlrUI+ZH5/1ZiTO//RdSgt50SA7TLhgUehHQf6Nh?=
+ =?us-ascii?Q?k8ynXcCZh7c4/mLnkagk3G1lSwHEQEEeEoEDKp7pOt0wfZ3G6664yuHD78Cb?=
+ =?us-ascii?Q?DV4q7Z3aRrG/7TFMfGBqergBSFct2JojGp/Dh8rtH/2E7M0A/DBsmvKur9XC?=
+ =?us-ascii?Q?C/B8lEr8m8fS7u51DLEAULv1utILqJLqlY5IRYljCNadmZMcRpvJIyMnsNw3?=
+ =?us-ascii?Q?lkR1plsfHoM8HfPd7z+yYKFQ4a4VQunjENQZfgLb+voA0vH5b0TWmWJCkXXZ?=
+ =?us-ascii?Q?LhSIAYPv4Ph/NvKXIedFy/ZZZceHlvrZfOITahe87snQdTtbvJaSp5R5BRkk?=
+ =?us-ascii?Q?dFqa0v7XvWkD0NiFLMKtQ8tbqcCWijvZEGqS3ObJqI4hck7rcuqYNVYMX9LC?=
+ =?us-ascii?Q?KcxIHfscKpISVQaBXLq8B3GSckDwTu5yEL3pi8TTPH0FaF6AHOZu7+sFQ0I2?=
+ =?us-ascii?Q?gatIVNa3yIRl+OBi01Ije+YITByKhFtUx+/VIeGUKUPtSgQR40ROoziPLUPA?=
+ =?us-ascii?Q?L2hG/HrFrg8FMIXBZmWnEsRLp5yMnQuwmtuxQ3XZC+hORUFWPrMEdYu+nLPL?=
+ =?us-ascii?Q?SAnEBI9dw+HF4cm/DRwd6q3RXe3ExmSr5KfTZpl98ICc+Ieo/8xuKky2zocF?=
+ =?us-ascii?Q?g4PJLynsz82gYcBcV62b77cd97cB8dm8fOtS3GMONxwxsxcgNFdNTy6cPtn/?=
+ =?us-ascii?Q?h2w0L451YI80QFFJPyg2XH6WNuHK9Li744ktVmY9SPkDf3gShaYN81KHXUPv?=
+ =?us-ascii?Q?rKJsEiS3gPSuvLvVCTdSs0J+RRYiEF3+S0kRCRna4cFTr0JOOOmpNlwEn+B5?=
+ =?us-ascii?Q?hg/Y/Pp6iGASlzz7RncN77TnMKDC8qpo3qW+StPqFp0Q9WAWtWebDYrOHCFM?=
+ =?us-ascii?Q?YJQSA9DDt3UFM6yjEHeIpYJL36bNruis1MHNyQLoE38c9hFNCxzIYR8Arxgq?=
+ =?us-ascii?Q?38iVVL92VT8VPRvQjo8kHBSXPILdaLO6DvSh6dV1Z34gXifFVbyDtEGiy/7t?=
+ =?us-ascii?Q?SDhiNbMt9fOaCtzOQ79aOH2B1BPUaLqmqd80cik0WTjoGUyYTD9xwR6QwQMj?=
+ =?us-ascii?Q?GT1G1KWvLPbMETp6w1ardJ0eJoXoCDefx59Kbfc/05uMkpeRsWwAM2zFwjjX?=
+ =?us-ascii?Q?pUJyEsuEv6WaloFMT47O08u0omlOWIgke8RSdaLH6KAVMJoiIbtbBZkJmytp?=
+ =?us-ascii?Q?cdNkmCmCz+HJf4ZOsCWYR/I7NaFdgpsIQpH8XR0vpKJrIry8rcsei9J6YL4I?=
+ =?us-ascii?Q?/meq0wSn1NHyU6TnQUO7z38sJ4gJ5hOveapOSNDcgBlX94msj4cE5/YDAcTN?=
+ =?us-ascii?Q?EHfU1q10eChEvr1EZqOpqtzN?=
+X-OriginatorOrg: suse.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f6c44baf-0b54-48fd-c544-08d9476e4f98
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR04MB6821.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jul 2021 08:55:35.8386 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: LhrfzEerTxdl9UhW19mdanqoOZoa9olitrgzKVtdkKE0pyzZcmdWq+iSIXzqau4F
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM5PR0402MB2897
+X-Mailman-Approved-At: Thu, 15 Jul 2021 06:38:57 -0400
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -66,64 +151,54 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gVGh1LCBKdWwgMTUsIDIwMjEgYXQgMTE6MDA6NDJBTSArMDEwMCwgUm9iaW4gTXVycGh5IHdy
-b3RlOgo+IE9uIDIwMjEtMDctMTUgMTA6NDQsIFF1IFdlbnJ1byB3cm90ZToKPiA+IAo+ID4gCj4g
-PiBPbiAyMDIxLzcvMTUg5LiL5Y2INToyOCwgUm9iaW4gTXVycGh5IHdyb3RlOgo+ID4gPiBPbiAy
-MDIxLTA3LTE1IDA5OjU1LCBRdSBXZW5ydW8gd3JvdGU6Cj4gPiA+ID4gSGksCj4gPiA+ID4gCj4g
-PiA+ID4gUmVjZW50bHkgSSdtIHBsYXlpbmcgYXJvdW5kIHRoZSBOdmlkaWEgWGF2aWVyIEFHWCBi
-b2FyZCwgd2hpY2gKPiA+ID4gPiBoYXMgVkhFIGV4dGVuc2lvbiBzdXBwb3J0Lgo+ID4gPiA+IAo+
-ID4gPiA+IEluIHRoZW9yeSwgY29uc2lkZXJpbmcgdGhlIENQVSBhbmQgbWVtb3J5LCBpdCBzaG91
-bGQgYmUgcHJldHR5Cj4gPiA+ID4gcG93ZXJmdWwgY29tcGFyZWQgdG8gYm9hcmRzIGxpa2UgUlBJ
-IENNNC4KPiA+ID4gPiAKPiA+ID4gPiBCdXQgdG8gbXkgc3VycHJpc2UsIEtWTSBydW5zIHByZXR0
-eSBwb29yIG9uIFhhdmllci4KPiA+ID4gPiAKPiA+ID4gPiBKdXN0IGJvb3RpbmcgdGhlIGVkazIg
-ZmlybXdhcmUgY291bGQgdGFrZSBvdmVyIDEwcywgYW5kIDIwcyB0bwo+ID4gPiA+IGZ1bGx5IGJv
-b3QgdGhlIGtlcm5lbC4KPiA+ID4gPiBFdmVuIG15IFZNIG9uIFJQSSBDTTQgaGFzIHdheSBmYXN0
-ZXIgYm9vdCB0aW1lLCBldmVuIGp1c3QKPiA+ID4gPiBydW5uaW5nIG9uIFBDSUUyLjAgeDEgbGFu
-ZSBOVk1FLCBhbmQganVzdCA0IDIuMUdoeiBBNzIgY29yZS4KPiA+ID4gPiAKPiA+ID4gPiBUaGlz
-IGlzIGRlZmluaXRlbHkgb3V0IG9mIG15IGV4cGVjdGF0aW9uLCBJIGRvdWJsZSBjaGVja2VkIHRv
-IGJlCj4gPiA+ID4gc3VyZSB0aGF0IGl0J3MgcnVubmluZyBpbiBLVk0gbW9kZS4KPiA+ID4gPiAK
-PiA+ID4gPiBCdXQgZnVydGhlciBkaWdnaW5nIHNob3dzIHRoYXQsIHNpbmNlIFhhdmllciBBR1gg
-Q1BVIHN1cHBvcnRzCj4gPiA+ID4gVkhFLCBrdm0gaXMgcnVubmluZyBpbiBWSEUgbW9kZSBvdGhl
-ciB0aGFuIEhZUCBtb2RlIG9uIENNNC4KPiA+ID4gPiAKPiA+ID4gPiBJcyB0aGVyZSBhbnl3YXkg
-dG8gbWFudWFsbHkgZGlzYWJsZSBWSEUgbW9kZSB0byB0ZXN0IHRoZSBtb3JlCj4gPiA+ID4gY29t
-bW9uIEhZUCBtb2RlIG9uIFhhdmllcj8KPiA+ID4gCj4gPiA+IEFjY29yZGluZyB0byBrZXJuZWwt
-cGFyYW1ldGVycy50eHQsICJrdm0tYXJtLm1vZGU9bnZoZSIgKG9yIGl0cwo+ID4gPiBsb3ctbGV2
-ZWwgZXF1aXZhbGVudCAiaWRfYWE2NG1tZnIxLnZoPTAiKSBvbiB0aGUgY29tbWFuZCBsaW5lIHNo
-b3VsZAo+ID4gPiBkbyB0aGF0Lgo+ID4gCj4gPiBUaGFua3MgZm9yIHRoaXMgb25lLCBJIHN0dXBp
-ZGx5IG9ubHkgc2VhcmNoZWQgbW9kaW5mbyBvZiBrdm0sIGFuZCBkaWRuJ3QKPiA+IGV2ZW4gYm90
-aGVyIHRvIHNlYXJjaCBhcmNoL2FybTY0L2t2bS4uLgo+ID4gCj4gPiA+IAo+ID4gPiBIb3dldmVy
-IEknZCBpbWFnaW5lIHRoZSBkaXNjcmVwYW5jeSBpcyBsaWtlbHkgdG8gYmUgc29tZXRoaW5nIG1v
-cmUKPiA+ID4gZnVuZGFtZW50YWwgdG8gdGhlIHdpbGRseSBkaWZmZXJlbnQgbWljcm9hcmNoaXRl
-Y3R1cmVzLiBUaGVyZSdzCj4gPiA+IGNlcnRhaW5seSBubyBoYXJtIGluIGdpdmluZyBub24tVkhF
-IGEgZ28gZm9yIGNvbXBhcmlzb24sIGJ1dCBJCj4gPiA+IHdvdWxkbid0IGJlIHN1cnByaXNlZCBp
-ZiBpdCB0dXJucyBvdXQgZXZlbiBzbG93ZXIuLi4KPiA+IAo+ID4gWW91J3JlIHRvdGFsbHkgcmln
-aHQsIHdpdGggbnZoZSBtb2RlLCBpdCdzIHN0aWxsIHRoZSBzYW1lIHNsb3cgc3BlZWQuCj4gPiAK
-PiA+IEJUVywgd2hhdCBkaWQgeW91IG1lYW4gYnkgdGhlICJ3aWxkbHkgZGlmZmVyZW50IG1pY3Jv
-YXJjaCI/Cj4gPiBJcyBBUk12OC4yIGFyY2ggdGhhdCBkaWZmZXJlbnQgZnJvbSBBUk12OCBvZiBS
-UEk0Pwo+IAo+IEkgZG9uJ3QgbWVhbiBBcm12OC54IGFyY2hpdGVjdHVyYWwgZmVhdHVyZXMsIEkg
-bWVhbiB0aGUgYWN0dWFsCj4gaW1wbGVtZW50YXRpb24gb2YgTlZJRElBJ3MgQ2FybWVsIGNvcmUg
-aXMgdmVyeSwgdmVyeSBkaWZmZXJlbnQgZnJvbQo+IENvcnRleC1BNzIgb3IgaW5kZWVkIG91ciBu
-ZXdlciB2OC4yIENvcnRleC1BIGRlc2lnbnMuCj4gCj4gPiBBbmQgYW55IGV4dHJhIG1ldGhvZHMg
-SSBjb3VsZCB0cnkgdG8gZXhwbG9yZSB0aGUgcmVhc29uIG9mIHRoZSBzbG93bmVzcz8KPiAKPiBJ
-IGd1ZXNzIHRoZSBmaXJzdCBjaGVjayB3b3VsZCBiZSB3aGV0aGVyIHlvdSdyZSB0cmFwcGluZyBh
-bmQgZXhpdGluZyB0aGUgVk0KPiBzaWduaWZpY2FudGx5IG1vcmUuIEkgYmVsaWV2ZSB0aGVyZSBh
-cmUgc3RhdHMgc29tZXdoZXJlLCBidXQgSSBkb24ndCBrbm93Cj4gZXhhY3RseSB3aGVyZSwgc29y
-cnkgLSBJIGtub3cgdmVyeSBsaXR0bGUgYWJvdXQgYWN0dWFsbHkgKnVzaW5nKiBLVk0gOikKPiAK
-PiBJZiBpdCdzIG5vdCB0aGF0LCB0aGVuIGl0IG1pZ2h0IGp1c3QgYmUgdGhhdCBFREsyIGlzIGRv
-aW5nIGEgbG90IG9mIGNhY2hlCj4gbWFpbnRlbmFuY2Ugb3Igc3lzdGVtIHJlZ2lzdGVyIG1vZGlm
-aWNhdGlvbiBvciBzb21lIG90aGVyIG9wZXJhdGlvbiB0aGF0Cj4gaGFwcGVucyB0byBiZSBzbG93
-ZXIgb24gQ2FybWVsIGNvbXBhcmVkIHRvIENvcnRleC1BNzIuCgpJdCB3b3VsZCBhbHNvIGJlIHdv
-cnRoY2hlY2tpbmcgdGhhIHRoZSBDUFVzIGFyZSBydW5uaW5nIGF0IHRoZSBzcGVlZCB5b3UKZXhw
-ZWN0LCBpbiBlLmcuIGNhc2UgdGhlIGxhY2sgb2YgYSBEVkZTIGRyaXZlciBtZWFucyB0aGV5J3Jl
-IHJ1bm5pbmcKc2xvdywgYW5kIHRoaXMganVzdCBoYXBwZW5zIHRvIGJlIG1vcmUgbm90aWNlYWJs
-ZSBpbiBhIFZNLgoKWW91IGNhbiBlc3RpbWF0ZSB0aGF0IGJ5IHVzaW5nIGBwZXJmIHN0YXRgIG9u
-IHRoZSBob3N0IG9uIGEgYnVzeSBsb29wLAphbmQgbG9va2luZyB3aGF0IHRoZSBjcHUtY3ljbGVz
-IGNvdW50IGltcGxpZXMuCgpUaGFua3MsCk1hcmsuCl9fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNz
-LmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3Rp
-bmZvL2t2bWFybQo=
+Hi,
+
+Recently I'm playing around the Nvidia Xavier AGX board, which has VHE 
+extension support.
+
+In theory, considering the CPU and memory, it should be pretty powerful 
+compared to boards like RPI CM4.
+
+But to my surprise, KVM runs pretty poor on Xavier.
+
+Just booting the edk2 firmware could take over 10s, and 20s to fully 
+boot the kernel.
+Even my VM on RPI CM4 has way faster boot time, even just running on 
+PCIE2.0 x1 lane NVME, and just 4 2.1Ghz A72 core.
+
+This is definitely out of my expectation, I double checked to be sure 
+that it's running in KVM mode.
+
+But further digging shows that, since Xavier AGX CPU supports VHE, kvm 
+is running in VHE mode other than HYP mode on CM4.
+
+Is there anyway to manually disable VHE mode to test the more common HYP 
+mode on Xavier?
+
+BTW, this is the dmesg related to KVM on Xavier, running v5.13 upstream 
+kernel, with 64K page size:
+[    0.852357] kvm [1]: IPA Size Limit: 40 bits
+[    0.857378] kvm [1]: vgic interrupt IRQ9
+[    0.862122] kvm: pmu event creation failed -2
+[    0.866734] kvm [1]: VHE mode initialized successfully
+
+While on CM4, the host runs v5.12.10 upstream kernel (with downstream 
+dtb), with 4K page size:
+[    1.276818] kvm [1]: IPA Size Limit: 44 bits
+[    1.278425] kvm [1]: vgic interrupt IRQ9
+[    1.278620] kvm [1]: Hyp mode initialized successfully
+
+Could it be the PAGE size causing problem?
+
+Thanks,
+Qu
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
