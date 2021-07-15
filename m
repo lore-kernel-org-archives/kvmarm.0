@@ -2,72 +2,75 @@ Return-Path: <SRS0=OVIf=MH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BBBEC07E96
-	for <kvmarm@archiver.kernel.org>; Thu, 15 Jul 2021 10:50:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1861C07E96
+	for <kvmarm@archiver.kernel.org>; Thu, 15 Jul 2021 11:11:16 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id EE70B61380
-	for <kvmarm@archiver.kernel.org>; Thu, 15 Jul 2021 10:50:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE70B61380
+	by mail.kernel.org (Postfix) with ESMTP id 64451613BA
+	for <kvmarm@archiver.kernel.org>; Thu, 15 Jul 2021 11:11:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64451613BA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 80AE94A5A0;
-	Thu, 15 Jul 2021 06:50:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EA4CC4A1A7;
+	Thu, 15 Jul 2021 07:11:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id fVgkv+xCwsdT; Thu, 15 Jul 2021 06:50:10 -0400 (EDT)
+	with ESMTP id CF33zzlT4xPV; Thu, 15 Jul 2021 07:11:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7299E4A4FC;
-	Thu, 15 Jul 2021 06:50:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BB5EC4A4E1;
+	Thu, 15 Jul 2021 07:11:14 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B385B4A4FC
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Jul 2021 06:50:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 099424A1A7
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Jul 2021 07:11:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PRXp5LTtB3Jy for <kvmarm@lists.cs.columbia.edu>;
- Thu, 15 Jul 2021 06:50:07 -0400 (EDT)
+ with ESMTP id QpMdOU6lPvNS for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 15 Jul 2021 07:11:13 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6EE164A19E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Jul 2021 06:50:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D07D149F8F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Jul 2021 07:11:12 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 84B0961002;
- Thu, 15 Jul 2021 10:50:06 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 46DC4613BF;
+ Thu, 15 Jul 2021 11:11:10 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1m3ywO-00DVgb-FB; Thu, 15 Jul 2021 11:50:04 +0100
-Date: Thu, 15 Jul 2021 11:49:54 +0100
-Message-ID: <87o8b3kg19.wl-maz@kernel.org>
+ id 1m3zGm-00DVt9-46; Thu, 15 Jul 2021 12:11:08 +0100
+Date: Thu, 15 Jul 2021 12:11:07 +0100
+Message-ID: <87mtqnkf1w.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Qu Wenruo <wqu@suse.com>
-Subject: Re: Any way to disable KVM VHE extension?
-In-Reply-To: <0e992d47-1f17-d49f-8341-670770ac49ef@suse.com>
-References: <37f873cf-1b39-ea7f-a5e7-6feb0200dd4c@suse.com>
- <e17449e7-b91d-d288-ff1c-e9451f9d1973@arm.com>
- <0e992d47-1f17-d49f-8341-670770ac49ef@suse.com>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH 1/3] KVM: arm64: Narrow PMU sysreg reset values to
+ architectural requirements
+In-Reply-To: <ae510501-0410-47b1-77f3-cb83d3b1fa9e@arm.com>
+References: <20210713135900.1473057-1-maz@kernel.org>
+ <20210713135900.1473057-2-maz@kernel.org>
+ <ae510501-0410-47b1-77f3-cb83d3b1fa9e@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: wqu@suse.com, robin.murphy@arm.com,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, james.morse@arm.com, suzuki.poulose@arm.com,
+ alexandre.chartre@oracle.com, robin.murphy@arm.com, kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: Linux ARM <linux-arm-kernel@lists.infradead.org>,
+Cc: kvm@vger.kernel.org, kernel-team@android.com,
  Robin Murphy <robin.murphy@arm.com>, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -79,60 +82,100 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gVGh1LCAxNSBKdWwgMjAyMSAxMDo0NDozMiArMDEwMCwKUXUgV2VucnVvIDx3cXVAc3VzZS5j
-b20+IHdyb3RlOgo+IAo+IAo+IAo+IE9uIDIwMjEvNy8xNSDkuIvljYg1OjI4LCBSb2JpbiBNdXJw
-aHkgd3JvdGU6Cj4gPiBPbiAyMDIxLTA3LTE1IDA5OjU1LCBRdSBXZW5ydW8gd3JvdGU6Cj4gPj4g
-SGksCj4gPj4gCj4gPj4gUmVjZW50bHkgSSdtIHBsYXlpbmcgYXJvdW5kIHRoZSBOdmlkaWEgWGF2
-aWVyIEFHWCBib2FyZCwgd2hpY2ggaGFzCj4gPj4gVkhFIGV4dGVuc2lvbiBzdXBwb3J0Lgo+ID4+
-IAo+ID4+IEluIHRoZW9yeSwgY29uc2lkZXJpbmcgdGhlIENQVSBhbmQgbWVtb3J5LCBpdCBzaG91
-bGQgYmUgcHJldHR5Cj4gPj4gcG93ZXJmdWwgY29tcGFyZWQgdG8gYm9hcmRzIGxpa2UgUlBJIENN
-NC4KPiA+PiAKPiA+PiBCdXQgdG8gbXkgc3VycHJpc2UsIEtWTSBydW5zIHByZXR0eSBwb29yIG9u
-IFhhdmllci4KPiA+PiAKPiA+PiBKdXN0IGJvb3RpbmcgdGhlIGVkazIgZmlybXdhcmUgY291bGQg
-dGFrZSBvdmVyIDEwcywgYW5kIDIwcyB0bwo+ID4+IGZ1bGx5IGJvb3QgdGhlIGtlcm5lbC4KPiA+
-PiBFdmVuIG15IFZNIG9uIFJQSSBDTTQgaGFzIHdheSBmYXN0ZXIgYm9vdCB0aW1lLCBldmVuIGp1
-c3QgcnVubmluZwo+ID4+IG9uIFBDSUUyLjAgeDEgbGFuZSBOVk1FLCBhbmQganVzdCA0IDIuMUdo
-eiBBNzIgY29yZS4KPiA+PiAKPiA+PiBUaGlzIGlzIGRlZmluaXRlbHkgb3V0IG9mIG15IGV4cGVj
-dGF0aW9uLCBJIGRvdWJsZSBjaGVja2VkIHRvIGJlCj4gPj4gc3VyZSB0aGF0IGl0J3MgcnVubmlu
-ZyBpbiBLVk0gbW9kZS4KPiA+PiAKPiA+PiBCdXQgZnVydGhlciBkaWdnaW5nIHNob3dzIHRoYXQs
-IHNpbmNlIFhhdmllciBBR1ggQ1BVIHN1cHBvcnRzIFZIRSwKPiA+PiBrdm0gaXMgcnVubmluZyBp
-biBWSEUgbW9kZSBvdGhlciB0aGFuIEhZUCBtb2RlIG9uIENNNC4KPiA+PiAKPiA+PiBJcyB0aGVy
-ZSBhbnl3YXkgdG8gbWFudWFsbHkgZGlzYWJsZSBWSEUgbW9kZSB0byB0ZXN0IHRoZSBtb3JlCj4g
-Pj4gY29tbW9uIEhZUCBtb2RlIG9uIFhhdmllcj8KPiA+IAo+ID4gQWNjb3JkaW5nIHRvIGtlcm5l
-bC1wYXJhbWV0ZXJzLnR4dCwgImt2bS1hcm0ubW9kZT1udmhlIiAob3IgaXRzCj4gPiBsb3ctbGV2
-ZWwgZXF1aXZhbGVudCAiaWRfYWE2NG1tZnIxLnZoPTAiKSBvbiB0aGUgY29tbWFuZCBsaW5lIHNo
-b3VsZAo+ID4gZG8gdGhhdC4KPiAKPiBUaGFua3MgZm9yIHRoaXMgb25lLCBJIHN0dXBpZGx5IG9u
-bHkgc2VhcmNoZWQgbW9kaW5mbyBvZiBrdm0sIGFuZAo+IGRpZG4ndCBldmVuIGJvdGhlciB0byBz
-ZWFyY2ggYXJjaC9hcm02NC9rdm0uLi4KPiAKPiA+IAo+ID4gSG93ZXZlciBJJ2QgaW1hZ2luZSB0
-aGUgZGlzY3JlcGFuY3kgaXMgbGlrZWx5IHRvIGJlIHNvbWV0aGluZyBtb3JlCj4gPiBmdW5kYW1l
-bnRhbCB0byB0aGUgd2lsZGx5IGRpZmZlcmVudCBtaWNyb2FyY2hpdGVjdHVyZXMuIFRoZXJlJ3MK
-PiA+IGNlcnRhaW5seSBubyBoYXJtIGluIGdpdmluZyBub24tVkhFIGEgZ28gZm9yIGNvbXBhcmlz
-b24sIGJ1dCBJCj4gPiB3b3VsZG4ndCBiZSBzdXJwcmlzZWQgaWYgaXQgdHVybnMgb3V0IGV2ZW4g
-c2xvd2VyLi4uCj4gCj4gWW91J3JlIHRvdGFsbHkgcmlnaHQsIHdpdGggbnZoZSBtb2RlLCBpdCdz
-IHN0aWxsIHRoZSBzYW1lIHNsb3cgc3BlZWQuCgpNeSBleHBlcmllbmNlIHdpdGggRGVudmVyIChO
-dmlkaWEncyBwcmV2aW91cyBjb3JlKSBpcyB0aGF0IGl0IGlzCmhvcnJpYmx5IHNsb3cgd2hlbiBy
-dW5uaW5nIEtWTS4gSSBndWVzcyB0aGF0IHRoZSBKSVQtbGlrZSBtaWNyb2FyY2gKZmFyZXMgcG9v
-cmx5IHdpdGggZXhjZXB0aW9ucyBhbmQgc2F2ZS1yZXN0b3JlIG9wZXJhdGlvbnMuCgo+IEJUVywg
-d2hhdCBkaWQgeW91IG1lYW4gYnkgdGhlICJ3aWxkbHkgZGlmZmVyZW50IG1pY3JvYXJjaCI/Cj4g
-SXMgQVJNdjguMiBhcmNoIHRoYXQgZGlmZmVyZW50IGZyb20gQVJNdjggb2YgUlBJND8KPiAKPiBB
-bmQgYW55IGV4dHJhIG1ldGhvZHMgSSBjb3VsZCB0cnkgdG8gZXhwbG9yZSB0aGUgcmVhc29uIG9m
-IHRoZSBzbG93bmVzcz8KPiAKPiBBdCBsZWFzdCBSUEkgQ000IGlzIGJleW9uZCBteSBleHBlY3Rh
-dGlvbiBhbmQgaXMgd29ya2luZyBwcmV0dHkgZmluZS4KPiAKPiBUaGFua3MsCj4gUXUKPiAKPiA+
-IAo+ID4gUm9iaW4uCj4gPiAKPiA+PiBCVFcsIHRoaXMgaXMgdGhlIGRtZXNnIHJlbGF0ZWQgdG8g
-S1ZNIG9uIFhhdmllciwgcnVubmluZyB2NS4xMwo+ID4+IHVwc3RyZWFtIGtlcm5lbCwgd2l0aCA2
-NEsgcGFnZSBzaXplOgo+ID4+IFvCoMKgwqAgMC44NTIzNTddIGt2bSBbMV06IElQQSBTaXplIExp
-bWl0OiA0MCBiaXRzCj4gPj4gW8KgwqDCoCAwLjg1NzM3OF0ga3ZtIFsxXTogdmdpYyBpbnRlcnJ1
-cHQgSVJROQo+ID4+IFvCoMKgwqAgMC44NjIxMjJdIGt2bTogcG11IGV2ZW50IGNyZWF0aW9uIGZh
-aWxlZCAtMgoKQW5kIHRoaXMgaXNuJ3QgZ29pbmcgdG8gaGVscCBmaW5kaW5nIG91dCB0aGUgYm90
-dGxlbmVjaywgYXMgdGhlIGtlcm5lbApkb2Vzbid0IGZpbmQgYSBQTVUuIE9uIERlbnZlciwgb25j
-ZSB0aGUgUE1VIGlzIGVuYWJsZWQsIHByb2ZpbGluZwphbnl0aGluZyBtYWtlcyB0aGUgd2hvbGUg
-dGhpbmcgZXZlbiBzbG93ZXIuIEF0IHdoaWNoIHBvaW50LCBJIGp1c3QKcGFya2VkIHRoZSBib2Fy
-ZCBhbmQgZm9yZ290IGFib3V0IGl0LgoKVGhhbmtzLAoKCU0uCgotLSAKV2l0aG91dCBkZXZpYXRp
-b24gZnJvbSB0aGUgbm9ybSwgcHJvZ3Jlc3MgaXMgbm90IHBvc3NpYmxlLgpfX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2
-bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUv
-bWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+Hi Alex,
+
+On Wed, 14 Jul 2021 16:48:07 +0100,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> Hi Marc,
+> 
+> On 7/13/21 2:58 PM, Marc Zyngier wrote:
+> > A number of the PMU sysregs expose reset values that are not in
+> > compliant with the architecture (set bits in the RES0 ranges,
+> > for example).
+> >
+> > This in turn has the effect that we need to pointlessly mask
+> > some register when using them.
+> >
+> > Let's start by making sure we don't have illegal values in the
+> > shadow registers at reset time. This affects all the registers
+> > that dedicate one bit per counter, the counters themselves,
+> > PMEVTYPERn_EL0 and PMSELR_EL0.
+> >
+> > Reported-by: Alexandre Chartre <alexandre.chartre@oracle.com>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/sys_regs.c | 46 ++++++++++++++++++++++++++++++++++++---
+> >  1 file changed, 43 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index f6f126eb6ac1..95ccb8f45409 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -603,6 +603,44 @@ static unsigned int pmu_visibility(const struct kvm_vcpu *vcpu,
+> >  	return REG_HIDDEN;
+> >  }
+> >  
+> > +static void reset_pmu_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+> > +{
+> > +	u64 n, mask;
+> > +
+> > +	/* No PMU available, any PMU reg may UNDEF... */
+> > +	if (!kvm_arm_support_pmu_v3())
+> > +		return;
+> > +
+> > +	n = read_sysreg(pmcr_el0) >> ARMV8_PMU_PMCR_N_SHIFT;
+> 
+> Isn't this going to cause a lot of unnecessary traps with NV? Is
+> that going to be a problem?
+
+We'll get a new traps at L2 VM creation if we expose a PMU to the L1
+guest, and if L2 gets one too. I don't think that's a real problem, as
+the performance of an L2 PMU is bound to be hilarious, and if we are
+really worried about that, we can always cache it locally. Which is
+likely the best thing to do if you think of big-little.
+
+Let's not think of big-little.
+
+Another thing is that we could perfectly ignore the number of counter
+on the host and always expose the architectural maximum, given that
+the PMU is completely emulated. With that, no trap.
+
+> Because at the moment I can't think of an elegant way to avoid it,
+> other than special casing PMCR_EL0 in kvm_reset_sys_regs() and using
+> here __vcpu_sys_reg(vcpu, PMCR_EL0). Or, even better, using
+> kvm_pmu_valid_counter_mask(vcpu), since this is identical to what
+> that function does.
+
+I looked into that and bailed out, as it creates interesting ordering
+problems...
+
+> 
+> > +	n &= ARMV8_PMU_PMCR_N_MASK;
+> > +
+> > +	reset_unknown(vcpu, r);
+> > +
+> > +	mask = BIT(ARMV8_PMU_CYCLE_IDX);
+> 
+> PMSWINC_EL0 has bit 31 RES0. Other than that, looked at all the PMU
+> registers and everything looks correct to me.
+
+PMSWINC_EL0 is a RAZ/WO register, which really shouldn't have a shadow
+counterpart (the storage is completely unused). Let me get rid on this
+sucker in v2.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
