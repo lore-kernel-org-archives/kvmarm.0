@@ -2,90 +2,83 @@ Return-Path: <SRS0=FmU0=ML=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7753CC07E95
-	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 18:02:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAA33C07E95
+	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 18:50:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E2CDF61006
-	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 18:02:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2CDF61006
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTP id 3A4F56108B
+	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 18:50:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A4F56108B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5322F4B0CB;
-	Mon, 19 Jul 2021 14:02:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D0EB4B0D7;
+	Mon, 19 Jul 2021 14:50:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linaro.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id suNj1Z1AZPSj; Mon, 19 Jul 2021 14:02:34 -0400 (EDT)
+	with ESMTP id 257LkT+cUjBl; Mon, 19 Jul 2021 14:50:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 267B64A4A0;
-	Mon, 19 Jul 2021 14:02:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CB2804B0B5;
+	Mon, 19 Jul 2021 14:50:03 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 47A6A4A2E5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 14:02:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A0894B0BB
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 14:50:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GlfNuns5hY77 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 19 Jul 2021 14:02:31 -0400 (EDT)
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com
- [209.85.208.48])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 154F349E50
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 14:02:31 -0400 (EDT)
-Received: by mail-ed1-f48.google.com with SMTP id ca14so25226872edb.2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 11:02:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=iwY647XqSBr0nhop6u+nJOZDJO2ojgmzAbMlPyzAP2A=;
- b=de4dSCIFeNoXczBGIJKhs+9cQ67ihAH384iDNj7/ghw8A521i45BAOlb9Wj5VrML2B
- ts5bNRNWddT+aI1DLJIMor+SL4/f3zNwEtrLVZsD2tjcjsRkzEr1TRxdDN0DwJUJ6pq2
- vSViocJn6F9z759rRSS8/3I8kikyFNECOd2Jum/ADid6KfFaxXYT7kzrn3v/uD/drMMG
- QmB7VB6/FnvNvlUQU1yQ7RgVec5cXCMQW4i7ue70iiKVBvUrwW3xqoF7vRTo45xa+TQV
- ER89LXFuY7yD0DDbzZMfbrV5Of00o5bIHTQbJFYMZNcVBnBX+yL0g9CKq1SafiocuodB
- XvpA==
+ with ESMTP id dX+Z-u-L5rxz for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 19 Jul 2021 14:50:01 -0400 (EDT)
+Received: from mail-io1-f74.google.com (mail-io1-f74.google.com
+ [209.85.166.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0E88A4086D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 14:50:01 -0400 (EDT)
+Received: by mail-io1-f74.google.com with SMTP id
+ s203-20020a6b2cd40000b0290528db19d5b3so11949075ios.5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 11:50:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=TW3Lwfo6iV3YWWKfTQZnRqKolgBnoTBJnEoEOlUBBIU=;
+ b=Ka7NIFYp8eL6xwNwJff+OsKuklDUlOD9dQVG8L4hhr8zIJMW0+qvq3OmyK3dBb39aM
+ dVauf6jg209m/BQbQ6WkBJl/Hi6q/5zWGvlKuZw1OhXPVhqAFOnnBf+ntdqe2DLKCRDb
+ SI9Kk4VLposrYS16Prq2KpqODez2UdyxnMY6SyXquz0GumkWt1cSa2TmBAGvCPZExGf6
+ 0IhUVBp5oReWE9HG9T4D8o6rEkh0BmrtjlmhVaHK+1KMWwnGRh7ERe5wbCCmI2aigQRd
+ iS4kdmz3knct394pqegei0v3g0IySWFV+Qai5NY/SheK2Fj1Fq8vI5+bGXjvuJdjFEeN
+ mtUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=iwY647XqSBr0nhop6u+nJOZDJO2ojgmzAbMlPyzAP2A=;
- b=UZrxsyLh66lugMgmLS60/aE52d+IJR6nPwj3f9Wew9iUzJoXw7HMLD+4pbJLln0fwb
- c3iDWML5f8VDN/s5+LridxYhb0f/n3RZgzzqrrWocqhTU3k7FEUl3IsNwzPnuHM+0czx
- Aeo77v1/togko5VVxs67e3Aoc0sg/4DwiJ5UcEWTsYo5Kq0bhnr2jJs4/ONqOiY1/Jd5
- 8XbF1tP8xgRtkf93WlFlsDtPg5of5tCa4AmRvgVFF2C+ACz/w8FFBmnBiM7mtOxgYVfL
- paubS8zoLW2JSxJ3BgchPDrGtjVe5YLC4eoO47wfdpZ8K0HDdzuFkWIy0/cSgOr1EZL/
- iHgw==
-X-Gm-Message-State: AOAM533LqYkYCPfHHIoQYtG8lYE27WDy0yoAuJvs/tSemySPS7L78wU0
- kiKf3Bwogdg/7kfAr0dEHgN6eg==
-X-Google-Smtp-Source: ABdhPJyQlO0WF1yuY/72pvxqzE/S/j0RUDWpsZG3FB/CGPHlXlZjXIrduqfJdRb/baD0ksNgkAUGWw==
-X-Received: by 2002:a05:6402:1592:: with SMTP id
- c18mr35924631edv.243.1626717749925; 
- Mon, 19 Jul 2021 11:02:29 -0700 (PDT)
-Received: from myrica (adsl-84-226-111-173.adslplus.ch. [84.226.111.173])
- by smtp.gmail.com with ESMTPSA id n14sm8178314edo.23.2021.07.19.11.02.28
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 19 Jul 2021 11:02:29 -0700 (PDT)
-Date: Mon, 19 Jul 2021 20:02:06 +0200
-From: Jean-Philippe Brucker <jean-philippe@linaro.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [RFC PATCH 0/5] KVM: arm64: Pass PSCI to userspace
-Message-ID: <YPW+Hv3r586zKxpY@myrica>
-References: <20210608154805.216869-1-jean-philippe@linaro.org>
- <c29ff5c8-9c94-6a6c-6142-3bed440676bf@arm.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <c29ff5c8-9c94-6a6c-6142-3bed440676bf@arm.com>
-Cc: salil.mehta@huawei.com, lorenzo.pieralisi@arm.com, kvm@vger.kernel.org,
- corbet@lwn.net, maz@kernel.org, linux-kernel@vger.kernel.org,
- jonathan.cameron@huawei.com, catalin.marinas@arm.com, pbonzini@redhat.com,
- will@kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=TW3Lwfo6iV3YWWKfTQZnRqKolgBnoTBJnEoEOlUBBIU=;
+ b=gpNiwBg51tob7XWviJZjcwVpJ19OEKWlz6yE6Hf6ikz1YAgKhoLLuG7NZLglOjKaYh
+ 5hBwS768cNBeq7CB5U+eaPgniA9nECBkRu1k8b/YrDh1+23r8dyu24sQ9IlhImpQFD1N
+ gnO43mtf0+0izvS0jgdWF+B3rFyaNg0iUhUR+J4qs6Eiq8gWaySftGLx4wWgKryjT2YN
+ 08bNcBDSeOZifsB/M0Y9wrSHkPP1U25UGIoUqXpJoZ+eQ9cDS19dFfIfEyc4tzZ7Htpo
+ BDAmbnICC2mimm3uuXNafYPmK3+yxHA77yycJaj8iYsQVMZuDvpinGDBhJ9iqFe9uS0C
+ pB7w==
+X-Gm-Message-State: AOAM533j/qWPh/vYNEKsuICvNxaxcIPMDZwmyJuVRZP1zXtvQey8UCLB
+ 9qeC8tbeJ+ZhBCzuQakj6l7H4xV2tqw=
+X-Google-Smtp-Source: ABdhPJxAZWRt/inMp7xN5+GhnqHLkGfanEok2D7yX9AeIFdWV2Eh47/OPmYvAnECuaXJ0ytjYuFl7s1PqIk=
+X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
+ (user=oupton job=sendgmr) by 2002:a05:6602:2099:: with SMTP id
+ a25mr1891457ioa.143.1626720600237; Mon, 19 Jul 2021 11:50:00 -0700 (PDT)
+Date: Mon, 19 Jul 2021 18:49:37 +0000
+Message-Id: <20210719184949.1385910-1-oupton@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.32.0.402.g57bb445576-goog
+Subject: [PATCH v3 00/12] KVM: Add idempotent controls for migrating system
+ counter state
+From: Oliver Upton <oupton@google.com>
+To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <maz@kernel.org>, Raghavendra Rao Anata <rananta@google.com>,
+ Peter Shier <pshier@google.com>, Sean Christopherson <seanjc@google.com>,
+ David Matlack <dmatlack@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -102,83 +95,168 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Alex,
+KVM's current means of saving/restoring system counters is plagued with
+temporal issues. At least on ARM64 and x86, we migrate the guest's
+system counter by-value through the respective guest system register
+values (cntvct_el0, ia32_tsc). Restoring system counters by-value is
+brittle as the state is not idempotent: the host system counter is still
+oscillating between the attempted save and restore. Furthermore, VMMs
+may wish to transparently live migrate guest VMs, meaning that they
+include the elapsed time due to live migration blackout in the guest
+system counter view. The VMM thread could be preempted for any number of
+reasons (scheduler, L0 hypervisor under nested) between the time that
+it calculates the desired guest counter value and when KVM actually sets
+this counter state.
 
-I'm not planning to resend this work at the moment, because it looks like
-vcpu hot-add will go a different way so I don't have a user. But I'll
-probably address the feedback so far and park it on some branch, in case
-anyone else needs it.
+Despite the value-based interface that we present to userspace, KVM
+actually has idempotent guest controls by way of system counter offsets.
+We can avoid all of the issues associated with a value-based interface
+by abstracting these offset controls in new ioctls. This series
+introduces new vCPU device attributes to provide userspace access to the
+vCPU's system counter offset.
 
-On Mon, Jul 19, 2021 at 04:29:18PM +0100, Alexandru Elisei wrote:
-> 1. Why forwarding PSCI calls to userspace depend on enabling forwarding for other
-> HVC calls? As I understand from the patches, those handle distinct function IDs.
+Patch 1 adopts Paolo's suggestion, augmenting the KVM_{GET,SET}_CLOCK
+ioctls to provide userspace with a (host_tsc, realtime) instant. This is
+essential for a VMM to perform precise migration of the guest's system
+counters.
 
-The HVC cap from patch 4 enables returning from the VCPU_RUN ioctl with
-KVM_EXIT_HYPERCALL, for any HVC not handled by KVM. This one should
-definitely be improved, either by letting userspace choose the ranges of
-HVC it wants, or at least by reporting ranges reserved by KVM to
-userspace.
+Patches 2-3 add support for x86 by shoehorning the new controls into the
+pre-existing synchronization heuristics.
 
-The PSCI cap from patch 5 disables the in-kernel PSCI implementation. As a
-result those HVCs are forwarded to userspace.
+Patches 4-5 implement a test for the new additions to
+KVM_{GET,SET}_CLOCK.
 
-It was suggested that other users will want to handle HVC calls (SDEI for
-example [1]), hence splitting into two capabilities rather than just the
-PSCI cap. In v5.14 x86 added KVM_CAP_EXIT_HYPERCALL [2], which lets
-userspace receive specific hypercalls. We could reuse that and have PSCI
-be one bit of that capability's parameter.
+Patches 6-7 implement at test for the tsc offset attribute introduced in
+patch 3.
 
-[1] https://lore.kernel.org/linux-arm-kernel/20170808164616.25949-12-james.morse@arm.com/
-[2] https://lore.kernel.org/kvm/90778988e1ee01926ff9cac447aacb745f954c8c.1623174621.git.ashish.kalra@amd.com/
+Patch 8 adds a device attribute for the arm64 virtual counter-timer
+offset.
 
-> 2. HVC call forwarding to userspace also forwards PSCI functions which are defined
-> in ARM DEN 0022D, but not (yet) implemented by KVM. What happens if KVM's PSCI
-> implementation gets support for one of those functions? How does userspace know
-> that now it also needs to enable PSCI call forwarding to be able to handle that
-> function?
+Patch 9 extends the test from patch 7 to cover the arm64 virtual
+counter-timer offset.
 
-We forward the whole PSCI function range, so it's either KVM or userspace.
-If KVM manages PSCI and the guest calls an unimplemented function, that
-returns directly to the guest without going to userspace.
+Patch 10 adds a device attribute for the arm64 physical counter-timer
+offset. Currently, this is implemented as a synthetic register, forcing
+the guest to trap to the host and emulating the offset in the fast exit
+path. Later down the line we will have hardware with FEAT_ECV, which
+allows the hypervisor to perform physical counter-timer offsetting in
+hardware (CNTPOFF_EL2).
 
-The concern is valid for any other range, though. If userspace enables the
-HVC cap it receives function calls that at some point KVM might need to
-handle itself. So we need some negotiation between user and KVM about the
-specific HVC ranges that userspace can and will handle.
+Patch 11 extends the test from patch 7 to cover the arm64 physical
+counter-timer offset.
 
-> It looks to me like the boundary between the functions that are forwarded when HVC
-> call forwarding is enabled and the functions that are forwarded when PSCI call
-> forwarding is enabled is based on what Linux v5.13 handles. Have you considered
-> choosing this boundary based on something less arbitrary, like the function types
-> specified in ARM DEN 0028C, table 2-1?
+Patch 12 introduces a benchmark to measure the overhead of emulation in
+patch 10.
 
-For PSCI I've used the range 0-0x1f as the boundary, which is reserved for
-PSCI by SMCCC (table 6-4 in that document).
+Physical counter benchmark
+--------------------------
 
-> 
-> In my opinion, setting the MP state to HALTED looks like a sensible approach to
-> implementing PSCI_SUSPEND. I'll take a closer look at the patches after I get a
-> better understanding about what is going on.
-> 
-> On 6/8/21 4:48 PM, Jean-Philippe Brucker wrote:
-> > Allow userspace to request handling PSCI calls from guests. Our goal is
-> > to enable a vCPU hot-add solution for Arm where the VMM presents
-> > possible resources to the guest at boot, and controls which vCPUs can be
-> > brought up by allowing or denying PSCI CPU_ON calls. Passing HVC and
-> > PSCI to userspace has been discussed on the list in the context of vCPU
-> > hot-add [1,2] but it can also be useful for implementing other SMCCC and
-> > vendor hypercalls [3,4,5].
-> >
-> > Patches 1-3 allow userspace to request WFI to be executed in KVM. That
-> 
-> I don't understand this. KVM, in kvm_vcpu_block(), does not execute an WFI.
-> PSCI_SUSPEND is documented as being indistinguishable from an WFI from the guest's
-> point of view, but it's implementation is not architecturally defined.
+The following data was collected by running 10000 iterations of the
+benchmark test from Patch 6 on an Ampere Mt. Jade reference server, A 2S
+machine with 2 80-core Ampere Altra SoCs. Measurements were collected
+for both VHE and nVHE operation using the `kvm-arm.mode=` command-line
+parameter.
 
-Yes that was an oversimplification on my part
+nVHE
+----
 
-Thanks,
-Jean
++--------------------+--------+---------+
+|       Metric       | Native | Trapped |
++--------------------+--------+---------+
+| Average            | 54ns   | 148ns   |
+| Standard Deviation | 124ns  | 122ns   |
+| 95th Percentile    | 258ns  | 348ns   |
++--------------------+--------+---------+
+
+VHE
+---
+
++--------------------+--------+---------+
+|       Metric       | Native | Trapped |
++--------------------+--------+---------+
+| Average            | 53ns   | 152ns   |
+| Standard Deviation | 92ns   | 94ns    |
+| 95th Percentile    | 204ns  | 307ns   |
++--------------------+--------+---------+
+
+This series applies cleanly to the following commit:
+
+1889228d80fe ("KVM: selftests: smm_test: Test SMM enter from L2")
+
+v1 -> v2:
+  - Reimplemented as vCPU device attributes instead of a distinct ioctl.
+  - Added the (realtime, host_tsc) instant support to KVM_{GET,SET}_CLOCK
+  - Changed the arm64 implementation to broadcast counter
+    offset values to all vCPUs in a guest. This upholds the
+    architectural expectations of a consistent counter-timer across CPUs.
+  - Fixed a bug with traps in VHE mode. We now configure traps on every
+    transition into a guest to handle differing VMs (trapped, emulated).
+
+v2 -> v3:
+  - Added documentation for additions to KVM_{GET,SET}_CLOCK
+  - Added documentation for all new vCPU attributes
+  - Added documentation for suggested algorithm to migrate a guest's
+    TSC(s)
+  - Bug fixes throughout series
+  - Rename KVM_CLOCK_REAL_TIME -> KVM_CLOCK_REALTIME
+
+v1: https://lore.kernel.org/kvm/20210608214742.1897483-1-oupton@google.com/
+v2: https://lore.kernel.org/r/20210716212629.2232756-1-oupton@google.com
+
+Oliver Upton (12):
+  KVM: x86: Report host tsc and realtime values in KVM_GET_CLOCK
+  KVM: x86: Refactor tsc synchronization code
+  KVM: x86: Expose TSC offset controls to userspace
+  tools: arch: x86: pull in pvclock headers
+  selftests: KVM: Add test for KVM_{GET,SET}_CLOCK
+  selftests: KVM: Add helpers for vCPU device attributes
+  selftests: KVM: Introduce system counter offset test
+  KVM: arm64: Allow userspace to configure a vCPU's virtual offset
+  selftests: KVM: Add support for aarch64 to system_counter_offset_test
+  KVM: arm64: Provide userspace access to the physical counter offset
+  selftests: KVM: Test physical counter offsetting
+  selftests: KVM: Add counter emulation benchmark
+
+ Documentation/virt/kvm/api.rst                |  42 +-
+ Documentation/virt/kvm/devices/vcpu.rst       | 101 +++++
+ Documentation/virt/kvm/locking.rst            |  11 +
+ arch/arm64/include/asm/kvm_host.h             |   1 +
+ arch/arm64/include/asm/kvm_hyp.h              |   2 -
+ arch/arm64/include/asm/sysreg.h               |   1 +
+ arch/arm64/include/uapi/asm/kvm.h             |   2 +
+ arch/arm64/kvm/arch_timer.c                   | 118 ++++-
+ arch/arm64/kvm/arm.c                          |   4 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h       |  23 +
+ arch/arm64/kvm/hyp/include/hyp/timer-sr.h     |  26 ++
+ arch/arm64/kvm/hyp/nvhe/switch.c              |   2 -
+ arch/arm64/kvm/hyp/nvhe/timer-sr.c            |  21 +-
+ arch/arm64/kvm/hyp/vhe/timer-sr.c             |  27 ++
+ arch/x86/include/asm/kvm_host.h               |   4 +
+ arch/x86/include/uapi/asm/kvm.h               |   4 +
+ arch/x86/kvm/x86.c                            | 422 ++++++++++++++----
+ include/kvm/arm_arch_timer.h                  |   2 -
+ include/uapi/linux/kvm.h                      |   7 +-
+ tools/arch/x86/include/asm/pvclock-abi.h      |  48 ++
+ tools/arch/x86/include/asm/pvclock.h          | 103 +++++
+ tools/testing/selftests/kvm/.gitignore        |   3 +
+ tools/testing/selftests/kvm/Makefile          |   4 +
+ .../kvm/aarch64/counter_emulation_benchmark.c | 215 +++++++++
+ .../selftests/kvm/include/aarch64/processor.h |  24 +
+ .../testing/selftests/kvm/include/kvm_util.h  |  11 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  38 ++
+ .../kvm/system_counter_offset_test.c          | 206 +++++++++
+ .../selftests/kvm/x86_64/kvm_clock_test.c     | 210 +++++++++
+ 29 files changed, 1549 insertions(+), 133 deletions(-)
+ create mode 100644 arch/arm64/kvm/hyp/include/hyp/timer-sr.h
+ create mode 100644 tools/arch/x86/include/asm/pvclock-abi.h
+ create mode 100644 tools/arch/x86/include/asm/pvclock.h
+ create mode 100644 tools/testing/selftests/kvm/aarch64/counter_emulation_benchmark.c
+ create mode 100644 tools/testing/selftests/kvm/system_counter_offset_test.c
+ create mode 100644 tools/testing/selftests/kvm/x86_64/kvm_clock_test.c
+
+-- 
+2.32.0.402.g57bb445576-goog
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
