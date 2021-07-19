@@ -2,106 +2,77 @@ Return-Path: <SRS0=FmU0=ML=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91EF4C12002
-	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 06:31:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACAD4C636C9
+	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 09:32:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 350D261165
-	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 06:31:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 350D261165
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 2F87E61164
+	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 09:32:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F87E61164
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DCC634B087;
-	Mon, 19 Jul 2021 02:31:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A81D4A1A7;
+	Mon, 19 Jul 2021 05:32:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9-VMOKzacx4G; Mon, 19 Jul 2021 02:31:53 -0400 (EDT)
+	with ESMTP id hBl6me8FP6q3; Mon, 19 Jul 2021 05:32:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EA6CD4A500;
-	Mon, 19 Jul 2021 02:31:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7172E4A319;
+	Mon, 19 Jul 2021 05:32:03 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DACC740856
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 02:31:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CA9C849F6C
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 05:32:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KWL+GcHUWZbo for <kvmarm@lists.cs.columbia.edu>;
- Mon, 19 Jul 2021 02:31:52 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 100BE4A3A5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 02:31:52 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1626676311;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=5iBFyoa3ekzBjt+3mHKhKLuzk3TVXqOUxd9HJiVKOWA=;
- b=VyL8LrzoP8cupK4fD6/DLdTVXUk17NBDDFrnzUmb2HxDjCS6D2Uo5Opm5URyEc1KvkaDnS
- 7tcSEyzDLnlPIIJzmG0aBmPAfyOZhCnUOBj3KvIocQYqFTYnrp4sLB6uswXMIWSRKcuRRG
- X2zulMuBCpdNCSbkiihBCU1PytfkmRE=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-459-FtN3UmEgPYSalBd_e5_uAg-1; Mon, 19 Jul 2021 02:31:48 -0400
-X-MC-Unique: FtN3UmEgPYSalBd_e5_uAg-1
-Received: by mail-ej1-f72.google.com with SMTP id
- jx16-20020a1709077610b02904e0a2912b46so4866553ejc.7
- for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Jul 2021 23:31:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=5iBFyoa3ekzBjt+3mHKhKLuzk3TVXqOUxd9HJiVKOWA=;
- b=XOqsvBZ85teA+r/vljly0G/tdKAvqwGt8+BxFB1FHmrRJNFDSZaN8uS1+Peg8x0KYA
- D65bc0VIC0Jn0rNfX1CsF9btfn4MVeHSLR6/O3o34lPyvSkYbErgjfVIjqkGSxp+p+5p
- 5GBFi0j5CqrCMhzVBsDpbBWnVwKa2Z8gf+wvl9KXbqgYAhKSLze4h/lew/wQ8ra9/78W
- Fupi4kE4FR1+Tet/B0nLqUUa1lKu12jQJ6Ev36V5H9U9M4b/WzIv9PbJ9gZFdO/Mir21
- H/DLXzKd4lqt+kGjR9SbzWuqqfQK6U7pV+lb4u1QE5juLkVjnD1+7/gbB5jyPt+edp6H
- 3LUw==
-X-Gm-Message-State: AOAM532ikwRUpy44kpOGlExMIGmtmNh/QliwY7U1EHyknnWsZETtjNs0
- 6mAsRCGAyBPwiHOQ2ZsMPpxRszrYkN2Tswp2edYQ8RSoeCz8NdbvkHQZqN0ZZqA2pX+C0md5ZRx
- WAWgfBFXmefXalU09cEJa8L40
-X-Received: by 2002:a17:906:660f:: with SMTP id
- b15mr26130818ejp.443.1626676307274; 
- Sun, 18 Jul 2021 23:31:47 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxwKAXQ0jz8kg1aBiPUIh7/qkMfflW9/UFkvvWaaFSOpzP+F0zQJJOF6m/qps2butenIEa5BQ==
-X-Received: by 2002:a17:906:660f:: with SMTP id
- b15mr26130798ejp.443.1626676307142; 
- Sun, 18 Jul 2021 23:31:47 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:63a7:c72e:ea0e:6045?
- ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
- by smtp.gmail.com with ESMTPSA id f24sm4761419edv.93.2021.07.18.23.31.46
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 18 Jul 2021 23:31:46 -0700 (PDT)
-Subject: Re: [PATCH 5/5] KVM: Get rid of kvm_get_pfn()
-To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
- kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-mm@kvack.org
+ with ESMTP id ZPh08DEAmVfA for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 19 Jul 2021 05:32:00 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D3F5149E57
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 05:32:00 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id BF7AC6115B;
+ Mon, 19 Jul 2021 09:31:59 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1m5Pcz-00EAx7-Pg; Mon, 19 Jul 2021 10:31:57 +0100
+Date: Mon, 19 Jul 2021 10:31:51 +0100
+Message-ID: <87o8ayk5tk.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 1/5] KVM: arm64: Walk userspace page tables to compute the
+ THP mapping size
+In-Reply-To: <c04fc75d-0f2a-3a3f-f698-eaf5e2aa00bd@redhat.com>
 References: <20210717095541.1486210-1-maz@kernel.org>
- <20210717095541.1486210-6-maz@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ef15f26a-4701-9d8c-b856-e7bb717a69f9@redhat.com>
-Date: Mon, 19 Jul 2021 08:31:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-MIME-Version: 1.0
-In-Reply-To: <20210717095541.1486210-6-maz@kernel.org>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Cc: kernel-team@android.com, Sean Christopherson <seanjc@google.com>,
- Matthew Wilcox <willy@infradead.org>, Will Deacon <will@kernel.org>
+ <20210717095541.1486210-2-maz@kernel.org>
+ <c04fc75d-0f2a-3a3f-f698-eaf5e2aa00bd@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, linux-arm-kernel@lists.infradead.org,
+ kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-mm@kvack.org,
+ seanjc@google.com, willy@infradead.org, will@kernel.org, qperret@google.com,
+ james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
+ kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, kvm@vger.kernel.org,
+ Sean Christopherson <seanjc@google.com>, Matthew Wilcox <willy@infradead.org>,
+ linux-mm@kvack.org, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -113,63 +84,52 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 17/07/21 11:55, Marc Zyngier wrote:
-> Nobody is using kvm_get_pfn() anymore. Get rid of it.
+On Mon, 19 Jul 2021 07:31:30 +0100,
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->   include/linux/kvm_host.h | 1 -
->   virt/kvm/kvm_main.c      | 9 +--------
->   2 files changed, 1 insertion(+), 9 deletions(-)
+> On 17/07/21 11:55, Marc Zyngier wrote:
+> > We currently rely on the kvm_is_transparent_hugepage() helper to
+> > discover whether a given page has the potential to be mapped as
+> > a block mapping.
+> > 
+> > However, this API doesn't really give un everything we want:
+> > - we don't get the size: this is not crucial today as we only
+> >    support PMD-sized THPs, but we'd like to have larger sizes
+> >    in the future
+> > - we're the only user left of the API, and there is a will
+> >    to remove it altogether
+> > 
+> > To address the above, implement a simple walker using the existing
+> > page table infrastructure, and plumb it into transparent_hugepage_adjust().
+> > No new page sizes are supported in the process.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > 
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index ae7735b490b4..9818d271c2a1 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -824,7 +824,6 @@ void kvm_release_pfn_clean(kvm_pfn_t pfn);
->   void kvm_release_pfn_dirty(kvm_pfn_t pfn);
->   void kvm_set_pfn_dirty(kvm_pfn_t pfn);
->   void kvm_set_pfn_accessed(kvm_pfn_t pfn);
-> -void kvm_get_pfn(kvm_pfn_t pfn);
->   
->   void kvm_release_pfn(kvm_pfn_t pfn, bool dirty, struct gfn_to_pfn_cache *cache);
->   int kvm_read_guest_page(struct kvm *kvm, gfn_t gfn, void *data, int offset,
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 2e410a8a6a67..0284418c4400 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -2215,7 +2215,7 @@ static int hva_to_pfn_remapped(struct vm_area_struct *vma,
->   	 * Get a reference here because callers of *hva_to_pfn* and
->   	 * *gfn_to_pfn* ultimately call kvm_release_pfn_clean on the
->   	 * returned pfn.  This is only needed if the VMA has VM_MIXEDMAP
-> -	 * set, but the kvm_get_pfn/kvm_release_pfn_clean pair will
-> +	 * set, but the kvm_try_get_pfn/kvm_release_pfn_clean pair will
->   	 * simply do nothing for reserved pfns.
->   	 *
->   	 * Whoever called remap_pfn_range is also going to call e.g.
-> @@ -2612,13 +2612,6 @@ void kvm_set_pfn_accessed(kvm_pfn_t pfn)
->   }
->   EXPORT_SYMBOL_GPL(kvm_set_pfn_accessed);
->   
-> -void kvm_get_pfn(kvm_pfn_t pfn)
-> -{
-> -	if (!kvm_is_reserved_pfn(pfn))
-> -		get_page(pfn_to_page(pfn));
-> -}
-> -EXPORT_SYMBOL_GPL(kvm_get_pfn);
-> -
->   static int next_segment(unsigned long len, int offset)
->   {
->   	if (len > PAGE_SIZE - offset)
-> 
+> If it's okay for you to reuse the KVM page walker that's fine of
+> course, but the arch/x86/mm functions lookup_address_in_{mm,pgd} are
+> mostly machine-independent and it may make sense to move them to mm/.
+>
+> That would also allow reusing the x86 function host_pfn_mapping_level.
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+That could work to some extent, but the way the x86 code equates level
+to mapping size is a bit at odds with the multiple page sizes that
+arm64 deals with.
 
+We're also trying to move away from the whole P*D abstraction, because
+this isn't something we want to deal with in the self-contained EL2
+object.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
