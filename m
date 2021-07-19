@@ -2,73 +2,90 @@ Return-Path: <SRS0=FmU0=ML=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.9 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FSL_HELO_FAKE,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A678C6377E
-	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 16:56:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFC34C07E95
+	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 17:18:12 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7590660E0C
-	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 16:56:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7590660E0C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 33E1661019
+	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 17:18:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33E1661019
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F0E3B4B088;
-	Mon, 19 Jul 2021 12:56:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A25DD4B0BB;
+	Mon, 19 Jul 2021 13:18:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id J4yfJwPiodXP; Mon, 19 Jul 2021 12:56:44 -0400 (EDT)
+	with ESMTP id aTz5N3PYqJNN; Mon, 19 Jul 2021 13:18:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C32A54B08D;
-	Mon, 19 Jul 2021 12:56:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8EB0C4A4E5;
+	Mon, 19 Jul 2021 13:18:10 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C31124B088
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 12:56:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 239E64A1A7
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 13:18:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id posCqjx8d9Kp for <kvmarm@lists.cs.columbia.edu>;
- Mon, 19 Jul 2021 12:56:42 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9305E4A193
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 12:56:42 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 6FD8A60FE9;
- Mon, 19 Jul 2021 16:56:41 +0000 (UTC)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
- TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1m5WZL-00EIvl-Ek; Mon, 19 Jul 2021 17:56:39 +0100
+ with ESMTP id s4v6xqdOjlFJ for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 19 Jul 2021 13:18:08 -0400 (EDT)
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com
+ [209.85.221.46])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1C00140FC7
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 13:18:08 -0400 (EDT)
+Received: by mail-wr1-f46.google.com with SMTP id a13so22939017wrf.10
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 10:18:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=/Xmu5FPqUyjX/AwFlDabtmrvnaqYTVi+iQ6O/Qt9w3U=;
+ b=GcCvN0tvN5Qo1sPuEvd5e8Kiu9SppusmgEE+8feDajKDgBnTsTuQobZHqBMkPe4+XY
+ yDuvGw8+USSyAwlYdV40GobxMRoS7Pazgu1thJ3JvazliW/fsy13HMsBFQPYjLdIdFfy
+ yFL2gx3s6YHADMMGEc+dX1e6tegPCpIYQXsCEPbjVpdY0UTwHVXQhxr19NtHh4hPTAZ1
+ UWcn7ZRvOVjzdiESzn8l/UhXaBilVgTKvPTIbHN1YVHSYdgQK0MJXV2KjODEbabseXLi
+ 4exz6XdzSK+5EwLOoofh8rWI2oDPAHZjmXO5UHi3Ckw+K10jfY0Qpm8zbUq2xNHwZzt7
+ WgxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=/Xmu5FPqUyjX/AwFlDabtmrvnaqYTVi+iQ6O/Qt9w3U=;
+ b=SlkZufadpS8PiufPEv7lo7WqZ7lk+eLckuFtb8+IaalwiXIAC7x1XdaP9EK0YYwuW0
+ Dq39d28qZyEExzMbvO4bmKV7Rs5tkN5TEdzcxzztrsKRizbErC6OzgC4LKIYHRYL6ggq
+ ewGVBHaNfEYpKUVhzqQ7gpuZyiMyLs3F/YfhEOGkw1NMzXz9zMNP9sGrrYlEzI9KYzN2
+ 33c4DMItHEg6qViINeQ/DSq/0z0BeW25mCXTN/TtFHWzUa6LQMW6t378bM5G7oBiWHYh
+ w2MtINZbPRHHpLwXEUUPUQjmbMqXgTZuLNyfOgmB4hCWu7ivoMAj68hRDnBf3XwJdQTm
+ Pl6w==
+X-Gm-Message-State: AOAM530Qmd26BQnFzVRSyFYasXKEqI1PLv/FxoJ6fIw7Q1FlMXN3CF3D
+ gzuxouz1NqBbUF0do2T5YTKh7A==
+X-Google-Smtp-Source: ABdhPJxB1LiYaftghh0ifR2L76/445eAkiioG51gjnaxWSKBrKU6oQPzKqFBlbAnW5eZ1f2hyOGEvA==
+X-Received: by 2002:adf:9084:: with SMTP id i4mr31273012wri.23.1626715086799; 
+ Mon, 19 Jul 2021 10:18:06 -0700 (PDT)
+Received: from google.com ([2a00:79e0:d:210:83e0:11ac:c870:2b97])
+ by smtp.gmail.com with ESMTPSA id r18sm21209280wrt.96.2021.07.19.10.18.05
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 19 Jul 2021 10:18:06 -0700 (PDT)
+Date: Mon, 19 Jul 2021 18:18:02 +0100
+From: Quentin Perret <qperret@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH 02/16] KVM: arm64: Don't issue CMOs when the physical
+ address is invalid
+Message-ID: <YPWzykpDMOhT2yh8@google.com>
+References: <20210715163159.1480168-1-maz@kernel.org>
+ <20210715163159.1480168-3-maz@kernel.org>
 MIME-Version: 1.0
-Date: Mon, 19 Jul 2021 17:56:39 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH v2 4/4] KVM: arm64: Remove PMSWINC_EL0 shadow register
-In-Reply-To: <c1a63908-b55c-bdf8-b8ba-5a43f2e99e1f@arm.com>
-References: <20210719123902.1493805-1-maz@kernel.org>
- <20210719123902.1493805-5-maz@kernel.org>
- <c1a63908-b55c-bdf8-b8ba-5a43f2e99e1f@arm.com>
-User-Agent: Roundcube Webmail/1.4.11
-Message-ID: <f2b655d0977cde5483716f58ba2ab739@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, james.morse@arm.com, suzuki.poulose@arm.com,
- alexandre.chartre@oracle.com, robin.murphy@arm.com, drjones@redhat.com,
- linux@arm.linux.org.uk, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, kernel-team@android.com,
- Russell King <linux@arm.linux.org.uk>, Robin Murphy <robin.murphy@arm.com>,
+Content-Disposition: inline
+In-Reply-To: <20210715163159.1480168-3-maz@kernel.org>
+Cc: kernel-team@android.com, kvm@vger.kernel.org,
+ Srivatsa Vaddagiri <vatsa@codeaurora.org>, linux-kernel@vger.kernel.org,
+ Shanker R Donthineni <sdonthineni@nvidia.com>, will@kernel.org,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -81,115 +98,61 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Alex,
-
-On 2021-07-19 17:35, Alexandru Elisei wrote:
-> Hi Marc,
+On Thursday 15 Jul 2021 at 17:31:45 (+0100), Marc Zyngier wrote:
+> Make sure we don't issue CMOs when mapping something that
+> is not a memory address in the S2 page tables.
 > 
-> On 7/19/21 1:39 PM, Marc Zyngier wrote:
->> We keep an entry for the PMSWINC_EL0 register in the vcpu structure,
->> while *never* writing anything there outside of reset.
->> 
->> Given that the register is defined as write-only, that we always
->> trap when this register is accessed, there is little point in saving
->> anything anyway.
->> 
->> Get rid of the entry, and save a mighty 8 bytes per vcpu structure.
->> 
->> We still need to keep it exposed to userspace in order to preserve
->> backward compatibility with previously saved VMs. Since userspace
->> cannot expect any effect of writing to PMSWINC_EL0, treat the
->> register as RAZ/WI for the purpose of userspace access.
->> 
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> ---
->>  arch/arm64/include/asm/kvm_host.h |  1 -
->>  arch/arm64/kvm/sys_regs.c         | 21 ++++++++++++++++++++-
->>  2 files changed, 20 insertions(+), 2 deletions(-)
->> 
->> diff --git a/arch/arm64/include/asm/kvm_host.h 
->> b/arch/arm64/include/asm/kvm_host.h
->> index 41911585ae0c..afc169630884 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -185,7 +185,6 @@ enum vcpu_sysreg {
->>  	PMCNTENSET_EL0,	/* Count Enable Set Register */
->>  	PMINTENSET_EL1,	/* Interrupt Enable Set Register */
->>  	PMOVSSET_EL0,	/* Overflow Flag Status Set Register */
->> -	PMSWINC_EL0,	/* Software Increment Register */
->>  	PMUSERENR_EL0,	/* User Enable Register */
->> 
->>  	/* Pointer Authentication Registers in a strict increasing order. */
->> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->> index f22139658e48..a1f5101f49a3 100644
->> --- a/arch/arm64/kvm/sys_regs.c
->> +++ b/arch/arm64/kvm/sys_regs.c
->> @@ -1286,6 +1286,20 @@ static int set_raz_id_reg(struct kvm_vcpu 
->> *vcpu, const struct sys_reg_desc *rd,
->>  	return __set_id_reg(vcpu, rd, uaddr, true);
->>  }
->> 
->> +static int set_wi_reg(struct kvm_vcpu *vcpu, const struct 
->> sys_reg_desc *rd,
->> +		      const struct kvm_one_reg *reg, void __user *uaddr)
->> +{
->> +	int err;
->> +	u64 val;
->> +
->> +	/* Perform the access even if we are going to ignore the value */
->> +	err = reg_from_user(&val, uaddr, sys_reg_to_index(rd));
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/hyp/pgtable.c | 16 ++++++++++------
+>  1 file changed, 10 insertions(+), 6 deletions(-)
 > 
-> I don't understand why the read still happens if the value is ignored.
-> Just so KVM
-> preserves the previous behaviour and tells userspace there was an 
-> error?
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index 05321f4165e3..a5874ebd0354 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -619,12 +619,16 @@ static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
+>  	}
+>  
+>  	/* Perform CMOs before installation of the guest stage-2 PTE */
+> -	if (mm_ops->dcache_clean_inval_poc && stage2_pte_cacheable(pgt, new))
+> -		mm_ops->dcache_clean_inval_poc(kvm_pte_follow(new, mm_ops),
+> -						granule);
+> -
+> -	if (mm_ops->icache_inval_pou && stage2_pte_executable(new))
+> -		mm_ops->icache_inval_pou(kvm_pte_follow(new, mm_ops), granule);
+> +	if (kvm_phys_is_valid(phys)) {
+> +		if (mm_ops->dcache_clean_inval_poc &&
+> +		    stage2_pte_cacheable(pgt, new))
+> +			mm_ops->dcache_clean_inval_poc(kvm_pte_follow(new,
+> +								      mm_ops),
+> +						       granule);
+> +		if (mm_ops->icache_inval_pou && stage2_pte_executable(new))
+> +			mm_ops->icache_inval_pou(kvm_pte_follow(new, mm_ops),
+> +						 granule);
+> +	}
 
-If userspace has given us a duff pointer, it needs to know about it.
+Hrmpf so this makes me realize we have a problem here, not really caused
+by your patch though.
 
->> +	if (err)
->> +		return err;
->> +
->> +	return 0;
->> +}
->> +
->>  static bool access_ctr(struct kvm_vcpu *vcpu, struct sys_reg_params 
->> *p,
->>  		       const struct sys_reg_desc *r)
->>  {
->> @@ -1629,8 +1643,13 @@ static const struct sys_reg_desc 
->> sys_reg_descs[] = {
->>  	  .access = access_pmcnten, .reg = PMCNTENSET_EL0 },
->>  	{ PMU_SYS_REG(SYS_PMOVSCLR_EL0),
->>  	  .access = access_pmovs, .reg = PMOVSSET_EL0 },
->> +	/*
->> +	 * PM_SWINC_EL0 is exposed to userspace as RAZ/WI, as it was
->> +	 * previously (and pointlessly) advertised in the past...
->> +	 */
->>  	{ PMU_SYS_REG(SYS_PMSWINC_EL0),
->> -	  .access = access_pmswinc, .reg = PMSWINC_EL0 },
->> +	  .get_user = get_raz_id_reg, .set_user = set_wi_reg,
-> 
-> In my opinion, the call chain to return 0 looks pretty confusing to me, 
-> as the
-> functions seemed made for ID register accesses, and the leaf function,
-> read_id_reg(), tries to match this register with a list of ID
-> registers. Since we
-> have already added a new function just for PMSWINC_EL0, I was
-> wondering if adding
-> another function, something like get_raz_reg(), would make more sense.
+Specifically, calling kvm_pgtable_stage2_set_owner() can lead to
+overriding valid mappings with invalid mappings, which is effectively an
+unmap operation. In this case we should issue CMOs when unmapping a
+cacheable page to ensure it is clean to the PoC, like the
+kvm_pgtable_stage2_unmap() does.
 
-In that case, I'd rather just kill get_raz_id_reg() and replace it with
-this get_raz_reg(). If we trat something as RAZ, who cares whether it is
-an idreg or not?
+Note that you patch is already an improvement over the current state of
+things, because calling stage2_pte_cacheable(pgt, new),
+kvm_pte_follow(new, mm_ops) and friends is bogus when 'new' is invalid
+...
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+Thanks,
+Quentin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
