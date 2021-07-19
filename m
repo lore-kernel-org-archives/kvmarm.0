@@ -2,87 +2,75 @@ Return-Path: <SRS0=FmU0=ML=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4966FC07E9D
-	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 10:48:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B1C3C07E9B
+	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 12:14:57 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 001D261006
-	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 10:48:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 001D261006
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 7D7E46112D
+	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 12:14:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D7E46112D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A70054A00B;
-	Mon, 19 Jul 2021 06:48:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1013F4A193;
+	Mon, 19 Jul 2021 08:14:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id HKk-HWPlhxm2; Mon, 19 Jul 2021 06:48:17 -0400 (EDT)
+	with ESMTP id ti8-m+xhHLOs; Mon, 19 Jul 2021 08:14:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8020B4B0BB;
-	Mon, 19 Jul 2021 06:48:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A65E4A1A7;
+	Mon, 19 Jul 2021 08:14:55 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EB50049F92
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 06:48:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 60B5B4A193
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 08:14:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NBuM7cYxTQ9b for <kvmarm@lists.cs.columbia.edu>;
- Mon, 19 Jul 2021 06:48:15 -0400 (EDT)
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com
- [209.85.128.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BC0044B0DD
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 06:48:13 -0400 (EDT)
-Received: by mail-wm1-f74.google.com with SMTP id
- g13-20020a05600c4ecdb0290242a8f4cf9cso1437618wmq.5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 03:48:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=xCrkHvgx5Vjp7sEk2L8Nl84wrwMoF/axMUKdY9pah24=;
- b=pDxR+oOIO361IE8JTpjXvK01glJPoXIl5CKZaNz+ZEfkmqJ2xvk3unbPd+7kb+OWda
- trEZrnZ3NzpP8uHCTZzYftalFdx/5wIdaoBQhrxNPVxgdiIghwpg+2wP8M3OPqfirjTd
- xnwKYQbjP84kmxrLM9ZxQ2L+sfZUek62Dy3owBDZGm0aQ2qax8dWHJG04y1UCCQkOeuM
- PcvsBY4gP2Eu0tIv5EGGfrTI+RlXVojwsHLkOMz6yutWmR06OxR8yq1klADXa4P0bQwV
- ool2uXbjJpW+F45cx8urCBsHAnKEob82EgvPFM7Eq5WwW85p/LaSm12Ccfkyebt5WyL7
- ovvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=xCrkHvgx5Vjp7sEk2L8Nl84wrwMoF/axMUKdY9pah24=;
- b=FxsHmI3+r0+DpZbb5fdiXPXyMvEUYn56JdsjGmiNFNsN8UiYzKw5Hev261p0UyC5Lh
- CcpJRRvX+OKiIz6GmjXNz7O+nH7x/FBTRfwfZcaZDNFhVZ37QsL6kurUMGVv7oiLWn1g
- C0+SQUNBWA/JlPvZoV4Ll8+IZrYyQwPtEbN7rsZA4Xy5Sx3946SUZZr+Icq01WagtHH5
- PtPbSOwwGeyDuAHZJ2qYIrfPoLyH5BncKxtBdL0QHrE6/dAbHWQ8XZqgALIPWVxzCECx
- E4pxFKDpyWdM4Qz64r0skGVQtd9qLg/P7XZrChCZTA09rW9UQ4wrSwF9ZjceTHedHtBk
- tfdQ==
-X-Gm-Message-State: AOAM532WImJ0kDWgsjWqsFCWklpoz7LkpwL+s4nIeL72QX5MCO5AU243
- yMHezaIE6RK2Pq3CU9vf1Gfyw24XOLUI
-X-Google-Smtp-Source: ABdhPJyIruRnm597DeIoz+H4lQk2XaV0lp7fhRFMVmFaiZHZyDX1vs7MSEJSK9DYDl49AjGViAobxaMPEAN7
-X-Received: from luke.lon.corp.google.com
- ([2a00:79e0:d:210:1a96:a43f:6c2e:bb5a])
- (user=qperret job=sendgmr) by 2002:a1c:4c18:: with SMTP id
- z24mr32007850wmf.168.1626691692999; Mon, 19 Jul 2021 03:48:12 -0700 (PDT)
-Date: Mon, 19 Jul 2021 11:47:35 +0100
-In-Reply-To: <20210719104735.3681732-1-qperret@google.com>
-Message-Id: <20210719104735.3681732-15-qperret@google.com>
-Mime-Version: 1.0
+ with ESMTP id R6EJL7Q1mUcP for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 19 Jul 2021 08:14:52 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 627C34A126
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 08:14:52 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 2AE0E60200;
+ Mon, 19 Jul 2021 12:14:51 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1m5SAb-00EChJ-A3; Mon, 19 Jul 2021 13:14:49 +0100
+Date: Mon, 19 Jul 2021 13:14:48 +0100
+Message-ID: <87lf62jy9z.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Quentin Perret <qperret@google.com>
+Subject: Re: [PATCH 03/14] KVM: arm64: Continue stage-2 map when re-creating
+ mappings
+In-Reply-To: <20210719104735.3681732-4-qperret@google.com>
 References: <20210719104735.3681732-1-qperret@google.com>
-X-Mailer: git-send-email 2.32.0.402.g57bb445576-goog
-Subject: [PATCH 14/14] KVM: arm64: Prevent late calls to
- __pkvm_create_private_mapping()
-From: Quentin Perret <qperret@google.com>
-To: maz@kernel.org, james.morse@arm.com, alexandru.elisei@arm.com, 
- suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org
-Cc: qwandor@google.com, linux-kernel@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- kernel-team@android.com
+ <20210719104735.3681732-4-qperret@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: qperret@google.com, james.morse@arm.com,
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com,
+ will@kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, ardb@kernel.org,
+ qwandor@google.com, tabba@google.com, dbrazdil@google.com,
+ kernel-team@android.com, wangyanan55@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, qwandor@google.com, will@kernel.org,
+ catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -99,37 +87,44 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-__pkvm_create_private_mapping() allows the host kernel to create
-arbitrary mappings the hypervisor's "private" range. However, this is
-only needed early on, and there should be no good reason for the host
-to need this past the point where the pkvm static is set. Make sure to
-stub the hypercall past this point to ensure it can't be used by a
-malicious host.
+On Mon, 19 Jul 2021 11:47:24 +0100,
+Quentin Perret <qperret@google.com> wrote:
+> 
+> The stage-2 map walkers currently return -EAGAIN when re-creating
+> identical mappings or only changing access permissions. This allows to
+> optimize mapping pages for concurrent (v)CPUs faulting on the same
+> page.
+> 
+> While this works as expected when touching one page-table leaf at a
+> time, this can lead to difficult situations when mapping larger ranges.
+> Indeed, a large map operation can fail in the middle if an existing
+> mapping is found in the range, even if it has compatible attributes,
+> hence leaving only half of the range mapped.
 
-Signed-off-by: Quentin Perret <qperret@google.com>
----
- arch/arm64/kvm/hyp/nvhe/hyp-main.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+I'm curious of when this can happen. We normally map a single leaf at
+a time, and we don't have a way to map multiple leaves at once: we
+either use the VMA base size or try to upgrade it to a THP, but the
+result is always a single leaf entry. What changed?
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index f05ecbd382d0..e1d12f8122a7 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -154,7 +154,10 @@ static void handle___pkvm_create_private_mapping(struct kvm_cpu_context *host_ct
- 	DECLARE_REG(size_t, size, host_ctxt, 2);
- 	DECLARE_REG(enum kvm_pgtable_prot, prot, host_ctxt, 3);
- 
--	cpu_reg(host_ctxt, 1) = __pkvm_create_private_mapping(phys, size, prot);
-+	if (static_branch_unlikely(&kvm_protected_mode_initialized))
-+		cpu_reg(host_ctxt, 1) = -EPERM;
-+	else
-+		cpu_reg(host_ctxt, 1) = __pkvm_create_private_mapping(phys, size, prot);
- }
- 
- static void handle___pkvm_prot_finalize(struct kvm_cpu_context *host_ctxt)
+> To avoid having to deal with such failures in the caller, don't
+> interrupt the map operation when hitting existing PTEs, but make sure to
+> still return -EAGAIN so that user_mem_abort() can mark the page dirty
+> when needed.
+
+I don't follow you here: if you return -EAGAIN for a writable mapping,
+we don't account for the page to be dirty on the assumption that
+nothing has been mapped. But if there is a way to map more than a
+single entry and to get -EAGAIN at the same time, then we're bound to
+lose data on page eviction.
+
+Can you shed some light on this?
+
+Thanks,
+
+	M.
+
 -- 
-2.32.0.402.g57bb445576-goog
-
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
