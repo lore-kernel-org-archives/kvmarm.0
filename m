@@ -2,91 +2,62 @@ Return-Path: <SRS0=FmU0=ML=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.9 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FSL_HELO_FAKE,
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A999C07E9D
-	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 15:49:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DD0EC12002
+	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 15:54:11 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1C46C613EE
-	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 15:49:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C46C613EE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id E1E94613F2
+	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 15:54:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1E94613F2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CD744A4CD;
-	Mon, 19 Jul 2021 11:49:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5CD0D4A1B0;
+	Mon, 19 Jul 2021 11:54:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id TwuouOUgccEk; Mon, 19 Jul 2021 11:49:22 -0400 (EDT)
+	with ESMTP id 7-zRNuthxpLg; Mon, 19 Jul 2021 11:54:08 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 29ED44A1B0;
-	Mon, 19 Jul 2021 11:49:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D27F14A126;
+	Mon, 19 Jul 2021 11:54:08 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BD86C49F83
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 11:49:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F341B49F8F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 11:54:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0Xz2A5fRbgqD for <kvmarm@lists.cs.columbia.edu>;
- Mon, 19 Jul 2021 11:49:18 -0400 (EDT)
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com
- [209.85.128.42])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B3F77407F1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 11:49:18 -0400 (EDT)
-Received: by mail-wm1-f42.google.com with SMTP id l6so10677117wmq.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 08:49:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=TYKhoQ4D1GCm29JiD2RjfrhT+yoW6UPyXSGkVZ42b6I=;
- b=uYuNRRxW+EPIeyO7iax10Ap5SnaGkarH0XjF+pn7i9S2Xrez/GV4hy7DCvhI3Yjq97
- 8EnuPTHZ9GXuYlwvXpUCCyeGmFLL8sL2UxWwGZjkNDfYu/2ec+jIHyFHTzRNebVmCPkw
- EPH0baTnGDORwc8Vw1hJfWcUJyQH+HtZYOw+srOdNxlXQ1wfXMrBdiPX//LvMBLpgtEw
- DlsUsVyPFsRty91xi0mXPNN12VOe4mhTxhWk61Nztz7ziNy4LNYVuAzytEx7w4KXifkv
- o1Mjl4onQclhs5kfeTxw9VwQ2jueeFOPvztWQZqfLirSqG3y4m/+Ty6lgxZCa7hgA7+y
- 5H8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=TYKhoQ4D1GCm29JiD2RjfrhT+yoW6UPyXSGkVZ42b6I=;
- b=c9EKsmNKj2RBJQz52h8JTltTahMuN+8jlrlvyPwftuLn4vE81KS96yanVOpykgBD49
- J36gGM6oMRsU6LXrGk1SK+KhiEeAFVc4fRVeWg0KVboroeBKFe5453vfBMhx1bw4Z+Lw
- Osr3HUJxLWgqE8Z40NKWzY5fVl7SV244TPyDG0QRoWeYsH4IJGD7rzPyLVeb0T+r09j4
- 3OxgFZ6RlXdUs5/fAcDi10BXeWvhbazHzymcnW/DOa9bdbrvqkGLePpbbxCZ4a+t7DjO
- LOodav2vliIGlfe5K0R3IDcDpo8goiJ9nazj5fHTKDRC96ymOMWlINMTPO/dv+XmKvLD
- hvUQ==
-X-Gm-Message-State: AOAM5303ZwvZQUf5nEVCu6YOQwmfkt6jEuydl60PFwyvgv2/ktsKj4Vl
- VFNoJ0GkYIVtFDompk8gznUReA==
-X-Google-Smtp-Source: ABdhPJzwc5K0Nq5j0YELVgRA0pGjHkbEaPDd08UzQoIgVN/asWvPgdSwtBg10yjoywRQagh17pm6Vg==
-X-Received: by 2002:a7b:c385:: with SMTP id s5mr26298245wmj.43.1626709757475; 
- Mon, 19 Jul 2021 08:49:17 -0700 (PDT)
-Received: from google.com ([2a00:79e0:d:210:83e0:11ac:c870:2b97])
- by smtp.gmail.com with ESMTPSA id u2sm1588050wmm.37.2021.07.19.08.49.16
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 19 Jul 2021 08:49:16 -0700 (PDT)
-Date: Mon, 19 Jul 2021 16:49:13 +0100
-From: Quentin Perret <qperret@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 08/14] KVM: arm64: Add support for tagging shared pages
- in page-table
-Message-ID: <YPWe+W3QmeYHqre/@google.com>
-References: <20210719104735.3681732-1-qperret@google.com>
- <20210719104735.3681732-9-qperret@google.com>
- <87fswajre1.wl-maz@kernel.org>
+ with ESMTP id j109Jo36vE82 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 19 Jul 2021 11:54:06 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A887140895
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 11:54:06 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2F1551FB;
+ Mon, 19 Jul 2021 08:54:06 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A29CE3F73D;
+ Mon, 19 Jul 2021 08:54:03 -0700 (PDT)
+Subject: Re: [PATCH v2 1/4] KVM: arm64: Narrow PMU sysreg reset values to
+ architectural requirements
+To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+References: <20210719123902.1493805-1-maz@kernel.org>
+ <20210719123902.1493805-2-maz@kernel.org>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <171cca9d-2a6e-248c-8502-feba8ebbe55e@arm.com>
+Date: Mon, 19 Jul 2021 16:55:06 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <87fswajre1.wl-maz@kernel.org>
-Cc: kernel-team@android.com, qwandor@google.com, will@kernel.org,
- catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20210719123902.1493805-2-maz@kernel.org>
+Content-Language: en-US
+Cc: kernel-team@android.com, Russell King <rmk+kernel@armlinux.org.uk>,
+ Russell King <linux@arm.linux.org.uk>, Robin Murphy <robin.murphy@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -103,126 +74,118 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Monday 19 Jul 2021 at 15:43:34 (+0100), Marc Zyngier wrote:
-> On Mon, 19 Jul 2021 11:47:29 +0100,
-> Quentin Perret <qperret@google.com> wrote:
-> > 
-> > The hypervisor will soon be in charge of tracking ownership of all
-> > memory pages in the system. The current page-tracking infrastructure at
-> > EL2 only allows binary states: a page is either owned or not by an
-> > entity. But a number of use-cases will require more complex states for
-> > pages that are shared between two entities (host, hypervisor, or guests).
-> > 
-> > In preparation for supporting these use-cases, introduce in the KVM
-> > page-table library some infrastructure allowing to tag shared pages
-> > using ignored bits (a.k.a. software bits) in PTEs.
-> > 
-> > Signed-off-by: Quentin Perret <qperret@google.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_pgtable.h |  5 +++++
-> >  arch/arm64/kvm/hyp/pgtable.c         | 25 +++++++++++++++++++++++++
-> >  2 files changed, 30 insertions(+)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> > index dd72653314c7..f6d3d5c8910d 100644
-> > --- a/arch/arm64/include/asm/kvm_pgtable.h
-> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> > @@ -81,6 +81,8 @@ enum kvm_pgtable_stage2_flags {
-> >   * @KVM_PGTABLE_PROT_W:		Write permission.
-> >   * @KVM_PGTABLE_PROT_R:		Read permission.
-> >   * @KVM_PGTABLE_PROT_DEVICE:	Device attributes.
-> > + * @KVM_PGTABLE_STATE_SHARED:	Page shared with another entity.
-> > + * @KVM_PGTABLE_STATE_BORROWED:	Page borrowed from another entity.
-> >   */
-> >  enum kvm_pgtable_prot {
-> >  	KVM_PGTABLE_PROT_X			= BIT(0),
-> > @@ -88,6 +90,9 @@ enum kvm_pgtable_prot {
-> >  	KVM_PGTABLE_PROT_R			= BIT(2),
-> >  
-> >  	KVM_PGTABLE_PROT_DEVICE			= BIT(3),
-> > +
-> > +	KVM_PGTABLE_STATE_SHARED		= BIT(4),
-> > +	KVM_PGTABLE_STATE_BORROWED		= BIT(5),
-> 
-> I'd rather have some indirection here, as we have other potential
-> users for the SW bits outside of pKVM (see the NV series, which uses
-> some of these SW bits as the backend for TTL-based TLB invalidation).
-> 
-> Can we instead only describe the SW bit states in this enum, and let
-> the users map the semantic they require onto that state? See [1] for
-> what I carry in the NV branch.
+Hi Marc,
 
-Works for me -- I just wanted to make sure we don't have users in
-different places that use the same bits without knowing, but no strong
-opinions, so happy to change.
+On 7/19/21 1:38 PM, Marc Zyngier wrote:
+> A number of the PMU sysregs expose reset values that are not
+> compliant with the architecture (set bits in the RES0 ranges,
+> for example).
+>
+> This in turn has the effect that we need to pointlessly mask
+> some register fields when using them.
+>
+> Let's start by making sure we don't have illegal values in the
+> shadow registers at reset time. This affects all the registers
+> that dedicate one bit per counter, the counters themselves,
+> PMEVTYPERn_EL0 and PMSELR_EL0.
+>
+> Reported-by: Alexandre Chartre <alexandre.chartre@oracle.com>
+> Reviewed-by: Alexandre Chartre <alexandre.chartre@oracle.com>
+> Acked-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 43 ++++++++++++++++++++++++++++++++++++---
+>  1 file changed, 40 insertions(+), 3 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index f6f126eb6ac1..96bdfa0e68b2 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -603,6 +603,41 @@ static unsigned int pmu_visibility(const struct kvm_vcpu *vcpu,
+>  	return REG_HIDDEN;
+>  }
+>  
+> +static void reset_pmu_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+> +{
+> +	u64 n, mask = BIT(ARMV8_PMU_CYCLE_IDX);
+> +
+> +	/* No PMU available, any PMU reg may UNDEF... */
+> +	if (!kvm_arm_support_pmu_v3())
+> +		return;
+> +
+> +	n = read_sysreg(pmcr_el0) >> ARMV8_PMU_PMCR_N_SHIFT;
+> +	n &= ARMV8_PMU_PMCR_N_MASK;
+> +	if (n)
+> +		mask |= GENMASK(n - 1, 0);
 
-> >  };
-> >  
-> >  #define KVM_PGTABLE_PROT_RW	(KVM_PGTABLE_PROT_R | KVM_PGTABLE_PROT_W)
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > index 5bdbe7a31551..51598b79dafc 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -211,6 +211,29 @@ static kvm_pte_t kvm_init_invalid_leaf_owner(u8 owner_id)
-> >  	return FIELD_PREP(KVM_INVALID_PTE_OWNER_MASK, owner_id);
-> >  }
-> >  
-> > +static kvm_pte_t pte_ignored_bit_prot(enum kvm_pgtable_prot prot)
-> 
-> Can we call these sw rather than ignored?
+Hm... seems to be missing the cycle counter.
 
-Sure.
+Thanks,
 
-> > +{
-> > +	kvm_pte_t ignored_bits = 0;
-> > +
-> > +	/*
-> > +	 * Ignored bits 0 and 1 are reserved to track the memory ownership
-> > +	 * state of each page:
-> > +	 *   00: The page is owned solely by the page-table owner.
-> > +	 *   01: The page is owned by the page-table owner, but is shared
-> > +	 *       with another entity.
-> > +	 *   10: The page is shared with, but not owned by the page-table owner.
-> > +	 *   11: Reserved for future use (lending).
-> > +	 */
-> > +	if (prot & KVM_PGTABLE_STATE_SHARED) {
-> > +		if (prot & KVM_PGTABLE_STATE_BORROWED)
-> > +			ignored_bits |= BIT(1);
-> > +		else
-> > +			ignored_bits |= BIT(0);
-> > +	}
-> > +
-> > +	return FIELD_PREP(KVM_PTE_LEAF_ATTR_IGNORED, ignored_bits);
-> > +}
-> > +
-> >  static int kvm_pgtable_visitor_cb(struct kvm_pgtable_walk_data *data, u64 addr,
-> >  				  u32 level, kvm_pte_t *ptep,
-> >  				  enum kvm_pgtable_walk_flags flag)
-> > @@ -357,6 +380,7 @@ static int hyp_set_prot_attr(enum kvm_pgtable_prot prot, kvm_pte_t *ptep)
-> >  	attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S1_AP, ap);
-> >  	attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S1_SH, sh);
-> >  	attr |= KVM_PTE_LEAF_ATTR_LO_S1_AF;
-> > +	attr |= pte_ignored_bit_prot(prot);
-> >  	*ptep = attr;
-> >  
-> >  	return 0;
-> > @@ -558,6 +582,7 @@ static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot p
-> >  
-> >  	attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S2_SH, sh);
-> >  	attr |= KVM_PTE_LEAF_ATTR_LO_S2_AF;
-> > +	attr |= pte_ignored_bit_prot(prot);
-> >  	*ptep = attr;
-> >  
-> >  	return 0;
-> 
-> How about kvm_pgtable_stage2_relax_perms()?
+Alex
 
-It should leave SW bits untouched, and it really felt like a path were
-we want to change permissions and nothing else. What did you have in
-mind?
-
-Cheers,
-Quentin
+> +
+> +	reset_unknown(vcpu, r);
+> +	__vcpu_sys_reg(vcpu, r->reg) &= mask;
+> +}
+> +
+> +static void reset_pmevcntr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+> +{
+> +	reset_unknown(vcpu, r);
+> +	__vcpu_sys_reg(vcpu, r->reg) &= GENMASK(31, 0);
+> +}
+> +
+> +static void reset_pmevtyper(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+> +{
+> +	reset_unknown(vcpu, r);
+> +	__vcpu_sys_reg(vcpu, r->reg) &= ARMV8_PMU_EVTYPE_MASK;
+> +}
+> +
+> +static void reset_pmselr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+> +{
+> +	reset_unknown(vcpu, r);
+> +	__vcpu_sys_reg(vcpu, r->reg) &= ARMV8_PMU_COUNTER_MASK;
+> +}
+> +
+>  static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+>  {
+>  	u64 pmcr, val;
+> @@ -944,16 +979,18 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>  	  trap_wcr, reset_wcr, 0, 0,  get_wcr, set_wcr }
+>  
+>  #define PMU_SYS_REG(r)						\
+> -	SYS_DESC(r), .reset = reset_unknown, .visibility = pmu_visibility
+> +	SYS_DESC(r), .reset = reset_pmu_reg, .visibility = pmu_visibility
+>  
+>  /* Macro to expand the PMEVCNTRn_EL0 register */
+>  #define PMU_PMEVCNTR_EL0(n)						\
+>  	{ PMU_SYS_REG(SYS_PMEVCNTRn_EL0(n)),				\
+> +	  .reset = reset_pmevcntr,					\
+>  	  .access = access_pmu_evcntr, .reg = (PMEVCNTR0_EL0 + n), }
+>  
+>  /* Macro to expand the PMEVTYPERn_EL0 register */
+>  #define PMU_PMEVTYPER_EL0(n)						\
+>  	{ PMU_SYS_REG(SYS_PMEVTYPERn_EL0(n)),				\
+> +	  .reset = reset_pmevtyper,					\
+>  	  .access = access_pmu_evtyper, .reg = (PMEVTYPER0_EL0 + n), }
+>  
+>  static bool undef_access(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+> @@ -1595,13 +1632,13 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	{ PMU_SYS_REG(SYS_PMSWINC_EL0),
+>  	  .access = access_pmswinc, .reg = PMSWINC_EL0 },
+>  	{ PMU_SYS_REG(SYS_PMSELR_EL0),
+> -	  .access = access_pmselr, .reg = PMSELR_EL0 },
+> +	  .access = access_pmselr, .reset = reset_pmselr, .reg = PMSELR_EL0 },
+>  	{ PMU_SYS_REG(SYS_PMCEID0_EL0),
+>  	  .access = access_pmceid, .reset = NULL },
+>  	{ PMU_SYS_REG(SYS_PMCEID1_EL0),
+>  	  .access = access_pmceid, .reset = NULL },
+>  	{ PMU_SYS_REG(SYS_PMCCNTR_EL0),
+> -	  .access = access_pmu_evcntr, .reg = PMCCNTR_EL0 },
+> +	  .access = access_pmu_evcntr, .reset = reset_unknown, .reg = PMCCNTR_EL0 },
+>  	{ PMU_SYS_REG(SYS_PMXEVTYPER_EL0),
+>  	  .access = access_pmu_evtyper, .reset = NULL },
+>  	{ PMU_SYS_REG(SYS_PMXEVCNTR_EL0),
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
