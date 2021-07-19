@@ -2,81 +2,80 @@ Return-Path: <SRS0=FmU0=ML=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A84FC07E9D
-	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 10:47:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18E60C07E9D
+	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 10:47:57 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C416460FF4
-	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 10:47:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C416460FF4
+	by mail.kernel.org (Postfix) with ESMTP id B0DDF61026
+	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 10:47:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0DDF61026
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7626649FB7;
-	Mon, 19 Jul 2021 06:47:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 590A74A5A0;
+	Mon, 19 Jul 2021 06:47:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id aTpYkTzQlIam; Mon, 19 Jul 2021 06:47:53 -0400 (EDT)
+	with ESMTP id HhjILDF39fWV; Mon, 19 Jul 2021 06:47:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 280914B081;
-	Mon, 19 Jul 2021 06:47:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 574AD4B088;
+	Mon, 19 Jul 2021 06:47:55 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AE35D4AC78
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 06:47:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 033234A3A3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 06:47:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IyxQ4jNHnQFB for <kvmarm@lists.cs.columbia.edu>;
- Mon, 19 Jul 2021 06:47:50 -0400 (EDT)
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com
- [209.85.222.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D6BCB4A4C0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 06:47:50 -0400 (EDT)
-Received: by mail-qk1-f202.google.com with SMTP id
- t144-20020a3746960000b02903ad9c5e94baso14261799qka.16
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 03:47:50 -0700 (PDT)
+ with ESMTP id DbpkNuOgFMfg for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 19 Jul 2021 06:47:53 -0400 (EDT)
+Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com
+ [209.85.219.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 176884A4C0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 06:47:53 -0400 (EDT)
+Received: by mail-qv1-f74.google.com with SMTP id
+ eo14-20020ad4594e0000b02902fc3fd31414so11331016qvb.16
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 03:47:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=hF3abQWZBVX3OcEZC1+muydZc+hxmzmuOXsHVIQGXQY=;
- b=bKDVheVY1IoxMnY0wSKdcwzVYL3+9RUBExVTBuQLvOyjLLO3PPt0/L9UEBmEHL+1Dx
- 4GCQT5nMdj7k5BCms5Cp4cMXS2yqRf69jgSSFeaoSz1jZ8avNGOl6b181XVKQ4cCFaUh
- 2EXb6bfTh+tcgwI2a383qfuwgtr2+1sZO2XBFsp8DH6NTZhuD0ICB8n4FNcbW7Hlzrda
- YHTa8rkvihWr9onnhlMHiBLIYzudPGEcwL/Mb87H+EpZpOzDbgM0KKrePPGhBHLoHkMU
- i2BYhTw5ZbitjRvVXlW5OqXmbQ5tYM1XNWQVTNkVnIgSDNNNia7XPNcXQe/0SlM0ppTf
- GepA==
+ :cc; bh=9b2DYjQT7/g/R4ArAtIC/jYlBeWl0FTuTlWq0insfwk=;
+ b=PqGcmBO2wTNT/PQffInicuYzE+ddpQibVhLtljlpqJEXnf4+QFhSeP67SvzmIU5KQS
+ 9Y8K7fKXU8Yc2JMPC9ZkvCioxx6Ssjg4gKGnar073enL+Qbu9mfXxey6Dr18AIdn2GyM
+ Xcnr9YSul/mEPJCH8qfFwsaTQpnmJsqjqkfMVu5HSANq7OT62XP9gVzuUPOKP0g0bz56
+ VQvMF7nmoLyBRZ7zawRL2TtSoSiM5+3X3gxQFB8vZtyLtEjeCydgiiPljiynVaYzAwX/
+ lEJosv5Ud8X0u1ZfKviLaU84GaSDjbTS3GbiU1t4IlJ14sXx5GQjYGyJZQu2fpJGo0wu
+ QkQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=hF3abQWZBVX3OcEZC1+muydZc+hxmzmuOXsHVIQGXQY=;
- b=KfqepijM5okmWypJ2zy0gCbf/xBnbOEw1TXAPmN1bAsnXYcX1nugYztaLwhIBm7Bn4
- iU2DaLsmHdm/dQRYqhlwus6+pmSllsKreQgLmQfA6aTj1IVn4elDEXBGe6Iu2mt16sSb
- 7lPpo5XPDLOCQslRRsKdDB29XdrrIULLzB0JaWCXv7qfeOxERU4hacZQ7dEyJwas/RJ6
- hfgq4jVVVSNc4R+qww/Kr9Nr/00WHExtmNOCm1WrqMo2zXhyltireatKDLKU9XQASPyG
- lsFfRIHBDmj0j49x/1G70fvrlEbtJlXFBrTa+E3Lox8Cm/uh7uMvXt6EBFW3SDQ/7kyE
- XvoQ==
-X-Gm-Message-State: AOAM532qx+C9OvuTPHjCDrR4gSo2W0Udhy66+DyTh8YQorkjoBm+W8qn
- 39bgaOKjxHWxctkUC52kcjWo/LC3kk2m
-X-Google-Smtp-Source: ABdhPJywsBug5lNdL9XgQmCske7yV74xcWDxC3HLTB31TuI7A3Ec/12WOGGcTHohteYdwrcfEA0JudPZ10me
+ bh=9b2DYjQT7/g/R4ArAtIC/jYlBeWl0FTuTlWq0insfwk=;
+ b=OW1KNpL2eHf/hXMfGKwQyrsQmZlKoRLaaYCYUPvWRhMefovxwDWgcXYKSkEyklbh+X
+ LnLGmFMubFrDX4lOOwBpc+w87K0nBWsnTrwfBbkfyBe8ECfcbUpzq1dWyw9VeNmis4JH
+ v7Rwglz5m3h/xbFqkTfS54m3mO9jc8c3v+7JtJRVzQ8R5+8ZDrDOqK9E+JOBDmMoJNJ4
+ oIQyXzb8As4yItQtjqCoDeD2Ub+jHi7A5Yi2FzJvKCkifTYZTDriTw1fK16dDAguLQsn
+ p+V2hZdYmV0kBQpFIETbWKfDYPpAdXVjp4wQ53K572B66HQzrnqewFlr6M1XlMkQCS7s
+ lzEA==
+X-Gm-Message-State: AOAM533IOlR1TTYNzigMXdWu8r9grihtEke0Gqenn2AB4ymyOhSPWdWP
+ Hzvc3T5+ma7NMJe0IEw+GPmbKiDx01FL
+X-Google-Smtp-Source: ABdhPJxrGQcU/bELmtAI4DiOZarAZdNIyxfly8cWQksXRDD7AQeTy6wEy0Y1zFBuD/hd8VGZA2WdmEFZdPU1
 X-Received: from luke.lon.corp.google.com
  ([2a00:79e0:d:210:1a96:a43f:6c2e:bb5a])
- (user=qperret job=sendgmr) by 2002:a05:6214:1021:: with SMTP id
- k1mr24356756qvr.4.1626691670169; Mon, 19 Jul 2021 03:47:50 -0700 (PDT)
-Date: Mon, 19 Jul 2021 11:47:25 +0100
+ (user=qperret job=sendgmr) by 2002:a0c:ca0f:: with SMTP id
+ c15mr24195317qvk.58.1626691672637; Mon, 19 Jul 2021 03:47:52 -0700 (PDT)
+Date: Mon, 19 Jul 2021 11:47:26 +0100
 In-Reply-To: <20210719104735.3681732-1-qperret@google.com>
-Message-Id: <20210719104735.3681732-5-qperret@google.com>
+Message-Id: <20210719104735.3681732-6-qperret@google.com>
 Mime-Version: 1.0
 References: <20210719104735.3681732-1-qperret@google.com>
 X-Mailer: git-send-email 2.32.0.402.g57bb445576-goog
-Subject: [PATCH 04/14] KVM: arm64: Rename KVM_PTE_LEAF_ATTR_S2_IGNORED
+Subject: [PATCH 05/14] KVM: arm64: Don't overwrite ignored bits with owner id
 From: Quentin Perret <qperret@google.com>
 To: maz@kernel.org, james.morse@arm.com, alexandru.elisei@arm.com, 
  suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org
@@ -99,37 +98,29 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The ignored bits for both stage-1 and stage-2 page and block
-descriptors are in [55:58], so rename KVM_PTE_LEAF_ATTR_S2_IGNORED to
-make it applicable to both.
+The nVHE protected mode uses invalid mappings in the host stage-2
+page-table to track the owner of each page in the system. In order to
+allow the usage of ignored bits (a.k.a. software bits) in these
+mappings, move the owner encoding away from the top bits.
 
 Signed-off-by: Quentin Perret <qperret@google.com>
 ---
- arch/arm64/kvm/hyp/pgtable.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/hyp/pgtable.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index bb73c5331b7c..a60653cbd8e5 100644
+index a60653cbd8e5..a0ac8c2bc174 100644
 --- a/arch/arm64/kvm/hyp/pgtable.c
 +++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -40,6 +40,8 @@
- 
- #define KVM_PTE_LEAF_ATTR_HI		GENMASK(63, 51)
- 
-+#define KVM_PTE_LEAF_ATTR_IGNORED	GENMASK(58, 55)
-+
- #define KVM_PTE_LEAF_ATTR_HI_S1_XN	BIT(54)
- 
- #define KVM_PTE_LEAF_ATTR_HI_S2_XN	BIT(54)
-@@ -48,8 +50,6 @@
+@@ -50,7 +50,7 @@
  					 KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W | \
  					 KVM_PTE_LEAF_ATTR_HI_S2_XN)
  
--#define KVM_PTE_LEAF_ATTR_S2_IGNORED	GENMASK(58, 55)
--
- #define KVM_INVALID_PTE_OWNER_MASK	GENMASK(63, 56)
+-#define KVM_INVALID_PTE_OWNER_MASK	GENMASK(63, 56)
++#define KVM_INVALID_PTE_OWNER_MASK	GENMASK(9, 2)
  #define KVM_MAX_OWNER_ID		1
  
+ struct kvm_pgtable_walk_data {
 -- 
 2.32.0.402.g57bb445576-goog
 
