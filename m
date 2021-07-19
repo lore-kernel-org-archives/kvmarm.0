@@ -2,59 +2,59 @@ Return-Path: <SRS0=FmU0=ML=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29315C07E9B
-	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 14:43:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36929C636C9
+	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 15:01:53 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9CE666112D
-	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 14:43:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CE666112D
+	by mail.kernel.org (Postfix) with ESMTP id B133D6120D
+	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 15:01:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B133D6120D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A9274A4A0;
-	Mon, 19 Jul 2021 10:43:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 39B0949D50;
+	Mon, 19 Jul 2021 11:01:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 56tvCO5FSIjL; Mon, 19 Jul 2021 10:43:40 -0400 (EDT)
+	with ESMTP id sVzeJns+ZfOB; Mon, 19 Jul 2021 11:01:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 63B5F4A3A3;
-	Mon, 19 Jul 2021 10:43:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 04B8F4A2E5;
+	Mon, 19 Jul 2021 11:01:47 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DD2B84A2E5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 10:43:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BBCF040CF9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 11:01:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id c5hZWoyesbvt for <kvmarm@lists.cs.columbia.edu>;
- Mon, 19 Jul 2021 10:43:37 -0400 (EDT)
+ with ESMTP id SVAQTwezlXBm for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 19 Jul 2021 11:01:44 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 85E86406DD
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 10:43:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 69158407EC
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 11:01:44 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 8948661003;
- Mon, 19 Jul 2021 14:43:36 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 6F9ED61181;
+ Mon, 19 Jul 2021 15:01:43 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1m5UUY-00EEFY-MJ; Mon, 19 Jul 2021 15:43:34 +0100
-Date: Mon, 19 Jul 2021 15:43:34 +0100
-Message-ID: <87fswajre1.wl-maz@kernel.org>
+ id 1m5Um5-00EEYM-CC; Mon, 19 Jul 2021 16:01:41 +0100
+Date: Mon, 19 Jul 2021 16:01:40 +0100
+Message-ID: <87eebujqjv.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Quentin Perret <qperret@google.com>
-Subject: Re: [PATCH 08/14] KVM: arm64: Add support for tagging shared pages in
- page-table
-In-Reply-To: <20210719104735.3681732-9-qperret@google.com>
+Subject: Re: [PATCH 09/14] KVM: arm64: Mark host bss and rodata section as
+ shared
+In-Reply-To: <20210719104735.3681732-10-qperret@google.com>
 References: <20210719104735.3681732-1-qperret@google.com>
- <20210719104735.3681732-9-qperret@google.com>
+ <20210719104735.3681732-10-qperret@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -88,118 +88,164 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 19 Jul 2021 11:47:29 +0100,
+On Mon, 19 Jul 2021 11:47:30 +0100,
 Quentin Perret <qperret@google.com> wrote:
 > 
-> The hypervisor will soon be in charge of tracking ownership of all
-> memory pages in the system. The current page-tracking infrastructure at
-> EL2 only allows binary states: a page is either owned or not by an
-> entity. But a number of use-cases will require more complex states for
-> pages that are shared between two entities (host, hypervisor, or guests).
+> As the hypervisor maps the host's .bss and .rodata sections in its
+> stage-1, make sure to tag them as shared in hyp and host page-tables.
 > 
-> In preparation for supporting these use-cases, introduce in the KVM
-> page-table library some infrastructure allowing to tag shared pages
-> using ignored bits (a.k.a. software bits) in PTEs.
+> But since the hypervisor relies on the presence of these mappings, we
+> cannot let the host in complete control of the memory regions -- it
+> must not unshare or donate them to another entity for example. To
+> prevent this, let's transfer the ownership of those ranges to the
+> hypervisor itself, and share the page back with the host.
 > 
 > Signed-off-by: Quentin Perret <qperret@google.com>
 > ---
->  arch/arm64/include/asm/kvm_pgtable.h |  5 +++++
->  arch/arm64/kvm/hyp/pgtable.c         | 25 +++++++++++++++++++++++++
->  2 files changed, 30 insertions(+)
+>  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  1 +
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c         |  7 ++-
+>  arch/arm64/kvm/hyp/nvhe/setup.c               | 52 ++++++++++++++++---
+>  3 files changed, 51 insertions(+), 9 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index dd72653314c7..f6d3d5c8910d 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -81,6 +81,8 @@ enum kvm_pgtable_stage2_flags {
->   * @KVM_PGTABLE_PROT_W:		Write permission.
->   * @KVM_PGTABLE_PROT_R:		Read permission.
->   * @KVM_PGTABLE_PROT_DEVICE:	Device attributes.
-> + * @KVM_PGTABLE_STATE_SHARED:	Page shared with another entity.
-> + * @KVM_PGTABLE_STATE_BORROWED:	Page borrowed from another entity.
->   */
->  enum kvm_pgtable_prot {
->  	KVM_PGTABLE_PROT_X			= BIT(0),
-> @@ -88,6 +90,9 @@ enum kvm_pgtable_prot {
->  	KVM_PGTABLE_PROT_R			= BIT(2),
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> index 9c227d87c36d..b39047463075 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> @@ -23,6 +23,7 @@ extern struct host_kvm host_kvm;
+>  int __pkvm_prot_finalize(void);
+>  int __pkvm_mark_hyp(phys_addr_t start, phys_addr_t end);
 >  
->  	KVM_PGTABLE_PROT_DEVICE			= BIT(3),
-> +
-> +	KVM_PGTABLE_STATE_SHARED		= BIT(4),
-> +	KVM_PGTABLE_STATE_BORROWED		= BIT(5),
-
-I'd rather have some indirection here, as we have other potential
-users for the SW bits outside of pKVM (see the NV series, which uses
-some of these SW bits as the backend for TTL-based TLB invalidation).
-
-Can we instead only describe the SW bit states in this enum, and let
-the users map the semantic they require onto that state? See [1] for
-what I carry in the NV branch.
-
->  };
+> +int host_stage2_idmap_locked(u64 start, u64 end, enum kvm_pgtable_prot prot);
+>  int kvm_host_prepare_stage2(void *pgt_pool_base);
+>  void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt);
 >  
->  #define KVM_PGTABLE_PROT_RW	(KVM_PGTABLE_PROT_R | KVM_PGTABLE_PROT_W)
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index 5bdbe7a31551..51598b79dafc 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -211,6 +211,29 @@ static kvm_pte_t kvm_init_invalid_leaf_owner(u8 owner_id)
->  	return FIELD_PREP(KVM_INVALID_PTE_OWNER_MASK, owner_id);
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> index cdace80d3e28..6f28edf58407 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> @@ -235,6 +235,11 @@ static bool host_stage2_want_pte_cb(u64 addr, u64 end, enum kvm_pgtable_prot pro
+>  		return prot != KVM_PGTABLE_PROT_RW;
 >  }
 >  
-> +static kvm_pte_t pte_ignored_bit_prot(enum kvm_pgtable_prot prot)
-
-Can we call these sw rather than ignored?
-
+> +int host_stage2_idmap_locked(u64 start, u64 end, enum kvm_pgtable_prot prot)
 > +{
-> +	kvm_pte_t ignored_bits = 0;
-> +
-> +	/*
-> +	 * Ignored bits 0 and 1 are reserved to track the memory ownership
-> +	 * state of each page:
-> +	 *   00: The page is owned solely by the page-table owner.
-> +	 *   01: The page is owned by the page-table owner, but is shared
-> +	 *       with another entity.
-> +	 *   10: The page is shared with, but not owned by the page-table owner.
-> +	 *   11: Reserved for future use (lending).
-> +	 */
-> +	if (prot & KVM_PGTABLE_STATE_SHARED) {
-> +		if (prot & KVM_PGTABLE_STATE_BORROWED)
-> +			ignored_bits |= BIT(1);
-> +		else
-> +			ignored_bits |= BIT(0);
-> +	}
-> +
-> +	return FIELD_PREP(KVM_PTE_LEAF_ATTR_IGNORED, ignored_bits);
+> +	return host_stage2_try(__host_stage2_idmap, start, end, prot);
 > +}
 > +
->  static int kvm_pgtable_visitor_cb(struct kvm_pgtable_walk_data *data, u64 addr,
->  				  u32 level, kvm_pte_t *ptep,
->  				  enum kvm_pgtable_walk_flags flag)
-> @@ -357,6 +380,7 @@ static int hyp_set_prot_attr(enum kvm_pgtable_prot prot, kvm_pte_t *ptep)
->  	attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S1_AP, ap);
->  	attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S1_SH, sh);
->  	attr |= KVM_PTE_LEAF_ATTR_LO_S1_AF;
-> +	attr |= pte_ignored_bit_prot(prot);
->  	*ptep = attr;
+>  static int host_stage2_idmap(u64 addr)
+>  {
+>  	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_RW;
+> @@ -250,7 +255,7 @@ static int host_stage2_idmap(u64 addr)
+>  	if (ret)
+>  		goto unlock;
 >  
+> -	ret = host_stage2_try(__host_stage2_idmap, range.start, range.end, prot);
+> +	ret = host_stage2_idmap_locked(range.start, range.end, prot);
+>  unlock:
+>  	hyp_spin_unlock(&host_kvm.lock);
+>  
+> diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+> index 0b574d106519..74dce83a6fad 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/setup.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+> @@ -83,10 +83,6 @@ static int recreate_hyp_mappings(phys_addr_t phys, unsigned long size,
+>  	if (ret)
+>  		return ret;
+>  
+> -	ret = pkvm_create_mappings(__start_rodata, __end_rodata, PAGE_HYP_RO);
+> -	if (ret)
+> -		return ret;
+> -
+>  	ret = pkvm_create_mappings(__hyp_rodata_start, __hyp_rodata_end, PAGE_HYP_RO);
+>  	if (ret)
+>  		return ret;
+> @@ -95,10 +91,6 @@ static int recreate_hyp_mappings(phys_addr_t phys, unsigned long size,
+>  	if (ret)
+>  		return ret;
+>  
+> -	ret = pkvm_create_mappings(__hyp_bss_end, __bss_stop, PAGE_HYP_RO);
+> -	if (ret)
+> -		return ret;
+> -
+>  	ret = pkvm_create_mappings(virt, virt + size, PAGE_HYP);
+>  	if (ret)
+>  		return ret;
+> @@ -117,6 +109,25 @@ static int recreate_hyp_mappings(phys_addr_t phys, unsigned long size,
+>  			return ret;
+>  	}
+>  
+> +	/*
+> +	 * Map the host's .bss and .rodata sections RO in the hypervisor, but
+> +	 * transfer the ownerhsip from the host to the hypervisor itself to
+> +	 * make sure it can't be donated or shared with another entity.
+> +	 *
+> +	 * The ownership transtion requires matching changes in the host
+> +	 * stage-2. This will done later (see finalize_mappings()) once the
+> +	 * hyp_vmemmap is addressable.
+> +	 */
+> +	ret = pkvm_create_mappings(__start_rodata, __end_rodata,
+> +				   PAGE_HYP_RO | KVM_PGTABLE_STATE_SHARED);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = pkvm_create_mappings(__hyp_bss_end, __bss_stop,
+> +				   PAGE_HYP_RO | KVM_PGTABLE_STATE_SHARED);
+> +	if (ret)
+> +		return ret;
+> +
 >  	return 0;
-> @@ -558,6 +582,7 @@ static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot p
+>  }
 >  
->  	attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S2_SH, sh);
->  	attr |= KVM_PTE_LEAF_ATTR_LO_S2_AF;
-> +	attr |= pte_ignored_bit_prot(prot);
->  	*ptep = attr;
+> @@ -148,6 +159,27 @@ static void hpool_put_page(void *addr)
+>  	hyp_put_page(&hpool, addr);
+>  }
 >  
->  	return 0;
+> +static int finalize_mappings(void)
+> +{
+> +	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_RWX;
+> +	int ret;
+> +
+> +	/*
+> +	 * The host's .bss and .rodata sections are now conceptually owned by
+> +	 * the hypervisor, so mark them as 'borrowed' in the host stage-2. We
+> +	 * can safely use host_stage2_idmap_locked() at this point since the
+> +	 * host stage-2 has not been enabled yet.
+> +	 */
+> +	prot |= KVM_PGTABLE_STATE_SHARED | KVM_PGTABLE_STATE_BORROWED;
+> +	ret = host_stage2_idmap_locked(__hyp_pa(__start_rodata),
+> +				       __hyp_pa(__end_rodata), prot);
 
-How about kvm_pgtable_stage2_relax_perms()?
+Do we really want to map the rodata section as RWX?
+
+> +	if (ret)
+> +		return ret;
+> +
+> +	return host_stage2_idmap_locked(__hyp_pa(__hyp_bss_end),
+> +					__hyp_pa(__bss_stop), prot);
+
+If the 'locked' state implies SHARED+BORROWED, maybe consider moving
+the ORRing of the prot into host_stage2_idmap_locked()?
+
+> +}
+> +
+>  void __noreturn __pkvm_init_finalise(void)
+>  {
+>  	struct kvm_host_data *host_data = this_cpu_ptr(&kvm_host_data);
+> @@ -167,6 +199,10 @@ void __noreturn __pkvm_init_finalise(void)
+>  	if (ret)
+>  		goto out;
+>  
+> +	ret = finalize_mappings();
+> +	if (ret)
+> +		goto out;
+> +
+>  	pkvm_pgtable_mm_ops = (struct kvm_pgtable_mm_ops) {
+>  		.zalloc_page = hyp_zalloc_hyp_page,
+>  		.phys_to_virt = hyp_phys_to_virt,
 
 Thanks,
 
 	M.
-
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/commit/?h=kvm-arm64/nv-5.13&id=5dea6d82de76cfcda59818ec2532fc34c615db39
 
 -- 
 Without deviation from the norm, progress is not possible.
