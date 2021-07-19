@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 418D5C07E9B
-	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 16:04:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3806FC07E95
+	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 16:04:12 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E6DBE6147D
-	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 16:04:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6DBE6147D
+	by mail.kernel.org (Postfix) with ESMTP id DF3E66146D
+	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 16:04:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF3E66146D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BAF44A1AF;
-	Mon, 19 Jul 2021 12:04:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 93B354AED4;
+	Mon, 19 Jul 2021 12:04:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ZofGZOSeZubU; Mon, 19 Jul 2021 12:04:07 -0400 (EDT)
+	with ESMTP id 4LoT7my1txM2; Mon, 19 Jul 2021 12:04:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D41F4B0DB;
-	Mon, 19 Jul 2021 12:04:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 98DD64A00B;
+	Mon, 19 Jul 2021 12:04:10 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1044440667
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 12:04:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AA74C49F5F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 12:04:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5oiemeghF-Ob for <kvmarm@lists.cs.columbia.edu>;
- Mon, 19 Jul 2021 12:04:05 -0400 (EDT)
-Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com
- [209.85.219.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E77EF4B0B1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 12:04:04 -0400 (EDT)
-Received: by mail-qv1-f73.google.com with SMTP id
- kj25-20020a0562145299b02902fbda5d4988so12161955qvb.11
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 09:04:04 -0700 (PDT)
+ with ESMTP id YoypQAxWzLwU for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 19 Jul 2021 12:04:08 -0400 (EDT)
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com
+ [209.85.128.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BA7C64A5A0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 12:04:07 -0400 (EDT)
+Received: by mail-wm1-f74.google.com with SMTP id
+ z127-20020a1c7e850000b02901e46e4d52c0so4131849wmc.6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 09:04:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=V9acI6EDUhR6tDfpqD9I6jrvJeuKAdMZUkQ+s858Nww=;
- b=BTpC1hwjiWVrUEkLbLdoxGFsQTsMQ7ua3qjmKq/cWq8pEdtqNoaW1vlJJr/8xIcdGW
- 51tQOla73fd6ozBrfWwYvU0fK7r4h2tePvxtQPbPru4f1iWcoMPyT//2OXb5xJXcrfqE
- 1SP8DZ1RGUOTDRVjV41OZd4ZWeitV/jtLi0aD5igfY9HwuF9Gqr3/G94dawfUHvXF+n4
- +Ne/qeTtowBLUGLppz/g3dF6GlHFHI7UvavDhFMcsQe9k+B0+rgDuHt/y6XME9JECePm
- 9dPiB/I11y4V43mNctHB9+dR85b5cj49lv/wMFuuZcrYFhRc5D99vGZDsiqenb7SYaUf
- M+cQ==
+ :cc; bh=vw+9k8TKpKtQTjxQwt2hnUGZ2NjHx/OJWiEJkCkz1N4=;
+ b=sLPNtiMKmja20KaICWALYJ4ofuflIkIOE7nOQiX2tSdy3n44fa65SqsexcWWzl79/k
+ Z7NBRtSnzz84wnQ6qLdJBL9GKE6UqQRfIh9ZD/Zoc8s71akMHsfvR8BYC9nCYfsXApFF
+ MIS5H9GeVm2hzhNrZefd/v7Iq5w9JKQ+ZNYm981SW4oHqDsDNDynCD92CM8+0qbF0RdZ
+ 6XxEFgfBgwlbMM19NhgJBIln16v5px7eZiRLqfqSDmJiQl05wtPSSWN7FF6W6wdd5xTW
+ PJBOFw3SNSRE5rRfXYRnucerBoTwqihx1C3ukxGoX4Azbb2q1755m61BUT1R25v9ql7K
+ 3rpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=V9acI6EDUhR6tDfpqD9I6jrvJeuKAdMZUkQ+s858Nww=;
- b=kDPlYNQrrrKwdcN1OnFVITcfMUmvOReR931z1y55+AXMAuliD5wANvChzS0gax/4Bg
- 1WMUCXHJdmudmj4e8y7f+cjFxCkQGmDFtmjYNSMVYsN2sm2cFB/ztAnUBsxKB6G0lX5C
- KRyobY49RqGQMcVssxMRTt+Ue/agYSESfiBiMfL0dYbRv1hiRHTSOYdGKz8IfdZ0p3J9
- haDvafFGsQUVLPQ5wve+Qpuav3p9FSs3u9bEDwcOta0q8yaKJ/4SRMNkL9po8HwgygG8
- yKVaPOqSKK5BiOzXcFxhBsRoW5Jfuxzb9JlMkUrSSWCubDFrNh51kQwGD61kYNK3LiXI
- ULfQ==
-X-Gm-Message-State: AOAM533e9jO+biXJTSQ/pUGWtkKPBVGWt04BC4DyWwynSoMHG6KR53On
- RkDWy3wdImwXTvEz1hSpmcQ5ghHUXLoBCOCnPzhpVCs2AdC5mz18KP0O5xpWgYlWZoTr6TL9k9U
- lwEpIIK0Q2uWUgSPv2kXvEqz0Xn0G4oNkfQ5T8w5KkgozmeJ90uoyxIP5V/GPhiuLVx0=
-X-Google-Smtp-Source: ABdhPJyyKsZdgx86oOpgbZLiHegl5Y1zod3kRSEavOWe7KLm5NM5K6J05rrWMdpFS4IHz+JdQ3I7DZHEMg==
+ bh=vw+9k8TKpKtQTjxQwt2hnUGZ2NjHx/OJWiEJkCkz1N4=;
+ b=NUhPD90Vt3HQl3bHCEnLO4D0wqLtoAHKxlU2OePILQwIPJi+B6szCfjIz57y2nBFKc
+ LtVLYkv0I//dGRD3MFl1GK3oRL3eUKQfpmiciy4ebApVJDpn9B/0YJS7gRwvxLLS1+no
+ rTRnarA/IttU4vdux/LMB3muhuzpnLlgmoYFWwX4f3Xv17pq+xxtQqk7dvuHMF/2Ts4f
+ 6iB+ZlOc6VhR5Kn8H+to2UCPIc3Af8tF3GRbO3SB9aeOslHUyz9Ov/C4LLo5xG8QUmbf
+ LSM+gI4FeZriFR6C41KE4sL9qwdS7nrWXgvHUVZB8MwwklpvCpP1FVBWkTelvt2PcAao
+ kZ/Q==
+X-Gm-Message-State: AOAM532my7KNYPGpeMp9g1wbR747y3Ld90YHAZ4kWUUN3mlZHnl2SpJB
+ 6AT/4ZYnf0JPlQ9ftqtp4Kb4wNfmrssBaMixyD8sHeWAwZKBiNd77lXcMKdpolyb49JHsuwd6Bo
+ N2li1mIF8IPZmGObn3gkM+5q1P2Non8LFqDeAjoRJ5e+n1ASs0lZ2mRdWY/Q5sFPtP4Y=
+X-Google-Smtp-Source: ABdhPJwqgGr1dc9ElvS+DtbtyF4398Jwb9HePJzbzjhsmwOOPQEhoV8D79HvGRx3Y9ug0QbreOeQr0qtmQ==
 X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:482])
- (user=tabba job=sendgmr) by 2002:a0c:a321:: with SMTP id
- u30mr25473018qvu.57.1626710644424; 
- Mon, 19 Jul 2021 09:04:04 -0700 (PDT)
-Date: Mon, 19 Jul 2021 17:03:39 +0100
+ (user=tabba job=sendgmr) by 2002:adf:ea0f:: with SMTP id
+ q15mr30547671wrm.145.1626710646765; 
+ Mon, 19 Jul 2021 09:04:06 -0700 (PDT)
+Date: Mon, 19 Jul 2021 17:03:40 +0100
 In-Reply-To: <20210719160346.609914-1-tabba@google.com>
-Message-Id: <20210719160346.609914-9-tabba@google.com>
+Message-Id: <20210719160346.609914-10-tabba@google.com>
 Mime-Version: 1.0
 References: <20210719160346.609914-1-tabba@google.com>
 X-Mailer: git-send-email 2.32.0.402.g57bb445576-goog
-Subject: [PATCH v3 08/15] KVM: arm64: Add feature register flag definitions
+Subject: [PATCH v3 09/15] KVM: arm64: Add config register bit definitions
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: kernel-team@android.com, kvm@vger.kernel.org, maz@kernel.org,
@@ -97,121 +97,78 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add feature register flag definitions to clarify which features
-might be supported.
-
-Consolidate the various ID_AA64PFR0_ELx flags for all ELs.
+Add hardware configuration register bit definitions for HCR_EL2
+and MDCR_EL2. Future patches toggle these hyp configuration
+register bits to trap on certain accesses.
 
 No functional change intended.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/include/asm/cpufeature.h |  4 ++--
- arch/arm64/include/asm/sysreg.h     | 12 ++++++++----
- arch/arm64/kernel/cpufeature.c      |  8 ++++----
- 3 files changed, 14 insertions(+), 10 deletions(-)
+ arch/arm64/include/asm/kvm_arm.h | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
-diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-index 9bb9d11750d7..b7d9bb17908d 100644
---- a/arch/arm64/include/asm/cpufeature.h
-+++ b/arch/arm64/include/asm/cpufeature.h
-@@ -602,14 +602,14 @@ static inline bool id_aa64pfr0_32bit_el1(u64 pfr0)
- {
- 	u32 val = cpuid_feature_extract_unsigned_field(pfr0, ID_AA64PFR0_EL1_SHIFT);
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index a928b2dc0b0f..327120c0089f 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -12,8 +12,13 @@
+ #include <asm/types.h>
  
--	return val == ID_AA64PFR0_EL1_32BIT_64BIT;
-+	return val == ID_AA64PFR0_ELx_32BIT_64BIT;
- }
- 
- static inline bool id_aa64pfr0_32bit_el0(u64 pfr0)
- {
- 	u32 val = cpuid_feature_extract_unsigned_field(pfr0, ID_AA64PFR0_EL0_SHIFT);
- 
--	return val == ID_AA64PFR0_EL0_32BIT_64BIT;
-+	return val == ID_AA64PFR0_ELx_32BIT_64BIT;
- }
- 
- static inline bool id_aa64pfr0_sve(u64 pfr0)
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 326f49e7bd42..0b773037251c 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -784,14 +784,13 @@
- #define ID_AA64PFR0_AMU			0x1
- #define ID_AA64PFR0_SVE			0x1
- #define ID_AA64PFR0_RAS_V1		0x1
-+#define ID_AA64PFR0_RAS_ANY		0xf
- #define ID_AA64PFR0_FP_NI		0xf
- #define ID_AA64PFR0_FP_SUPPORTED	0x0
- #define ID_AA64PFR0_ASIMD_NI		0xf
- #define ID_AA64PFR0_ASIMD_SUPPORTED	0x0
--#define ID_AA64PFR0_EL1_64BIT_ONLY	0x1
--#define ID_AA64PFR0_EL1_32BIT_64BIT	0x2
--#define ID_AA64PFR0_EL0_64BIT_ONLY	0x1
--#define ID_AA64PFR0_EL0_32BIT_64BIT	0x2
-+#define ID_AA64PFR0_ELx_64BIT_ONLY	0x1
-+#define ID_AA64PFR0_ELx_32BIT_64BIT	0x2
- 
- /* id_aa64pfr1 */
- #define ID_AA64PFR1_MPAMFRAC_SHIFT	16
-@@ -847,12 +846,16 @@
- #define ID_AA64MMFR0_ASID_SHIFT		4
- #define ID_AA64MMFR0_PARANGE_SHIFT	0
- 
-+#define ID_AA64MMFR0_ASID_8		0x0
-+#define ID_AA64MMFR0_ASID_16		0x2
+ /* Hyp Configuration Register (HCR) bits */
 +
- #define ID_AA64MMFR0_TGRAN4_NI		0xf
- #define ID_AA64MMFR0_TGRAN4_SUPPORTED	0x0
- #define ID_AA64MMFR0_TGRAN64_NI		0xf
- #define ID_AA64MMFR0_TGRAN64_SUPPORTED	0x0
- #define ID_AA64MMFR0_TGRAN16_NI		0x0
- #define ID_AA64MMFR0_TGRAN16_SUPPORTED	0x1
-+#define ID_AA64MMFR0_PARANGE_40		0x2
- #define ID_AA64MMFR0_PARANGE_48		0x5
- #define ID_AA64MMFR0_PARANGE_52		0x6
++#define HCR_TID5	(UL(1) << 58)
++#define HCR_DCT		(UL(1) << 57)
+ #define HCR_ATA_SHIFT	56
+ #define HCR_ATA		(UL(1) << HCR_ATA_SHIFT)
++#define HCR_AMVOFFEN	(UL(1) << 51)
++#define HCR_FIEN	(UL(1) << 47)
+ #define HCR_FWB		(UL(1) << 46)
+ #define HCR_API		(UL(1) << 41)
+ #define HCR_APK		(UL(1) << 40)
+@@ -56,6 +61,7 @@
+ #define HCR_PTW		(UL(1) << 2)
+ #define HCR_SWIO	(UL(1) << 1)
+ #define HCR_VM		(UL(1) << 0)
++#define HCR_RES0	((UL(1) << 48) | (UL(1) << 39))
  
-@@ -900,6 +903,7 @@
- #define ID_AA64MMFR2_CNP_SHIFT		0
+ /*
+  * The bits we set in HCR:
+@@ -277,11 +283,21 @@
+ #define CPTR_EL2_TZ	(1 << 8)
+ #define CPTR_NVHE_EL2_RES1	0x000032ff /* known RES1 bits in CPTR_EL2 (nVHE) */
+ #define CPTR_EL2_DEFAULT	CPTR_NVHE_EL2_RES1
++#define CPTR_NVHE_EL2_RES0	(GENMASK(63, 32) |	\
++				 GENMASK(29, 21) |	\
++				 GENMASK(19, 14) |	\
++				 BIT(11))
  
- /* id_aa64dfr0 */
-+#define ID_AA64DFR0_MTPMU_SHIFT		48
- #define ID_AA64DFR0_TRBE_SHIFT		44
- #define ID_AA64DFR0_TRACE_FILT_SHIFT	40
- #define ID_AA64DFR0_DOUBLELOCK_SHIFT	36
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 0ead8bfedf20..5b59fe5e26e4 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -239,8 +239,8 @@ static const struct arm64_ftr_bits ftr_id_aa64pfr0[] = {
- 	S_ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_FP_SHIFT, 4, ID_AA64PFR0_FP_NI),
- 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL3_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL2_SHIFT, 4, 0),
--	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_SHIFT, 4, ID_AA64PFR0_EL1_64BIT_ONLY),
--	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL0_SHIFT, 4, ID_AA64PFR0_EL0_64BIT_ONLY),
-+	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_SHIFT, 4, ID_AA64PFR0_ELx_64BIT_ONLY),
-+	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL0_SHIFT, 4, ID_AA64PFR0_ELx_64BIT_ONLY),
- 	ARM64_FTR_END,
- };
+ /* Hyp Debug Configuration Register bits */
+ #define MDCR_EL2_E2TB_MASK	(UL(0x3))
+ #define MDCR_EL2_E2TB_SHIFT	(UL(24))
++#define MDCR_EL2_HPMFZS		(UL(1) << 36)
++#define MDCR_EL2_HPMFZO		(UL(1) << 29)
++#define MDCR_EL2_MTPME		(UL(1) << 28)
++#define MDCR_EL2_TDCC		(UL(1) << 27)
++#define MDCR_EL2_HCCD		(UL(1) << 23)
+ #define MDCR_EL2_TTRF		(UL(1) << 19)
++#define MDCR_EL2_HPMD		(UL(1) << 17)
+ #define MDCR_EL2_TPMS		(UL(1) << 14)
+ #define MDCR_EL2_E2PB_MASK	(UL(0x3))
+ #define MDCR_EL2_E2PB_SHIFT	(UL(12))
+@@ -293,6 +309,12 @@
+ #define MDCR_EL2_TPM		(UL(1) << 6)
+ #define MDCR_EL2_TPMCR		(UL(1) << 5)
+ #define MDCR_EL2_HPMN_MASK	(UL(0x1F))
++#define MDCR_EL2_RES0		(GENMASK(63, 37) |	\
++				 GENMASK(35, 30) |	\
++				 GENMASK(25, 24) |	\
++				 GENMASK(22, 20) |	\
++				 BIT(18) |		\
++				 GENMASK(16, 15))
  
-@@ -1956,7 +1956,7 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.sys_reg = SYS_ID_AA64PFR0_EL1,
- 		.sign = FTR_UNSIGNED,
- 		.field_pos = ID_AA64PFR0_EL0_SHIFT,
--		.min_field_value = ID_AA64PFR0_EL0_32BIT_64BIT,
-+		.min_field_value = ID_AA64PFR0_ELx_32BIT_64BIT,
- 	},
- #ifdef CONFIG_KVM
- 	{
-@@ -1967,7 +1967,7 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.sys_reg = SYS_ID_AA64PFR0_EL1,
- 		.sign = FTR_UNSIGNED,
- 		.field_pos = ID_AA64PFR0_EL1_SHIFT,
--		.min_field_value = ID_AA64PFR0_EL1_32BIT_64BIT,
-+		.min_field_value = ID_AA64PFR0_ELx_32BIT_64BIT,
- 	},
- 	{
- 		.desc = "Protected KVM",
+ /* For compatibility with fault code shared with 32-bit */
+ #define FSC_FAULT	ESR_ELx_FSC_FAULT
 -- 
 2.32.0.402.g57bb445576-goog
 
