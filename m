@@ -7,77 +7,76 @@ X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB6C5C07E95
-	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 16:04:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 418D5C07E9B
+	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 16:04:09 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5F88C6147E
-	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 16:04:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F88C6147E
+	by mail.kernel.org (Postfix) with ESMTP id E6DBE6147D
+	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 16:04:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6DBE6147D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F12940667;
-	Mon, 19 Jul 2021 12:04:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BAF44A1AF;
+	Mon, 19 Jul 2021 12:04:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ZKyulDolZRzw; Mon, 19 Jul 2021 12:04:06 -0400 (EDT)
+	with ESMTP id ZofGZOSeZubU; Mon, 19 Jul 2021 12:04:07 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E3A04B0C5;
-	Mon, 19 Jul 2021 12:04:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D41F4B0DB;
+	Mon, 19 Jul 2021 12:04:07 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E4434A5A0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 12:04:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1044440667
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 12:04:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UrbDImb8RKUP for <kvmarm@lists.cs.columbia.edu>;
- Mon, 19 Jul 2021 12:04:03 -0400 (EDT)
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com
- [209.85.128.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 53AD64B0D8
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 12:04:03 -0400 (EDT)
-Received: by mail-wm1-f74.google.com with SMTP id
- i7-20020a05600c3547b0290229a389ceb2so4105772wmq.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 09:04:03 -0700 (PDT)
+ with ESMTP id 5oiemeghF-Ob for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 19 Jul 2021 12:04:05 -0400 (EDT)
+Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com
+ [209.85.219.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E77EF4B0B1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 12:04:04 -0400 (EDT)
+Received: by mail-qv1-f73.google.com with SMTP id
+ kj25-20020a0562145299b02902fbda5d4988so12161955qvb.11
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 09:04:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=U8tD0ZWRxueOiZnXn8UX8nsv6z5g8QfT23T+iieg6fI=;
- b=ea29I0iVbjUEGeftel12Gbq366g83QtA8E8r2Uz+6IHkJ5UWd79gUIX3JA3bLyJe2D
- QopBkuDzcKVtOEKFgcYrOrqaG1U79giGVajM4WVon/jAnyPxWl7lSRLHkf5bUKq7hgqI
- qYrGlejOsSSAggxfvj3GQmg9m+MadgXLM2jZmKxePlf5wMrQg7oXbwV1tsjyrjq2MRA6
- FvMoXKvos5kv9fcrVWa87rlDj4y5EvS+eYCN+qe3HXSpqhRo9Kq1RukOmpGNRgkw1sAf
- vmRE9+AgJ5UoMmzOf5n3YI7T6NGPJw9OgUFVbWdHiFjEvWuFY/8WIPBGjuVN8OxaTsLr
- z+AA==
+ :cc; bh=V9acI6EDUhR6tDfpqD9I6jrvJeuKAdMZUkQ+s858Nww=;
+ b=BTpC1hwjiWVrUEkLbLdoxGFsQTsMQ7ua3qjmKq/cWq8pEdtqNoaW1vlJJr/8xIcdGW
+ 51tQOla73fd6ozBrfWwYvU0fK7r4h2tePvxtQPbPru4f1iWcoMPyT//2OXb5xJXcrfqE
+ 1SP8DZ1RGUOTDRVjV41OZd4ZWeitV/jtLi0aD5igfY9HwuF9Gqr3/G94dawfUHvXF+n4
+ +Ne/qeTtowBLUGLppz/g3dF6GlHFHI7UvavDhFMcsQe9k+B0+rgDuHt/y6XME9JECePm
+ 9dPiB/I11y4V43mNctHB9+dR85b5cj49lv/wMFuuZcrYFhRc5D99vGZDsiqenb7SYaUf
+ M+cQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=U8tD0ZWRxueOiZnXn8UX8nsv6z5g8QfT23T+iieg6fI=;
- b=k2gfXMZ4x4Rs4D37rqyHa4EaB3N28yuM9YpnmMlKflqsvkybJspF9GnTCXyQu3ebl5
- ItDtz54hxvdc3uvx46mhmcIX4ygkrdN+uz747s0e0ZsYEHt1ZeFbP9LUreg66rG5QP0z
- 9gveXHU062X3J1mzRyrrSkXgmIwZkzBFZnsWwmVmpd2zRcE+TCaOnlBLT7KIxJddd964
- JlPuP7B6NNHM77V/QfrP5uo0h32PYv4kUNFYjG907YT1Fjov+QL0nGcyVjtKtfgjb8fo
- M3A7adkTUl4mvgYbhIufWJ21ukz3mqTc1DwvaubyB8UzTV+zIQCg1W5kPggfG3HiV8c6
- gyJA==
-X-Gm-Message-State: AOAM533RZatWkcD69rVK/leMB98OZsoIKFNbkUyRNPjmW5Ym4Q0yV4p2
- ZOmTsoyIi5gEt0tSs2grglgst2/UtG6zsT99PqIwwIPJvHSnHDqRH0s+AUo02tJBq9wsV9Se7TH
- jc5Fs5r+mEcjj1v8UCkiB8GTryQjL3WRlVvNl6Q9cFJJclw/CUfKfMvux7jX17ekXR9U=
-X-Google-Smtp-Source: ABdhPJyZIExAAOBCez1kX40oKv+JGxZhb6d/02I7dL1PYFLCOK6saRJUulsso2zHWmJh0mrJepqqSzq7lA==
+ bh=V9acI6EDUhR6tDfpqD9I6jrvJeuKAdMZUkQ+s858Nww=;
+ b=kDPlYNQrrrKwdcN1OnFVITcfMUmvOReR931z1y55+AXMAuliD5wANvChzS0gax/4Bg
+ 1WMUCXHJdmudmj4e8y7f+cjFxCkQGmDFtmjYNSMVYsN2sm2cFB/ztAnUBsxKB6G0lX5C
+ KRyobY49RqGQMcVssxMRTt+Ue/agYSESfiBiMfL0dYbRv1hiRHTSOYdGKz8IfdZ0p3J9
+ haDvafFGsQUVLPQ5wve+Qpuav3p9FSs3u9bEDwcOta0q8yaKJ/4SRMNkL9po8HwgygG8
+ yKVaPOqSKK5BiOzXcFxhBsRoW5Jfuxzb9JlMkUrSSWCubDFrNh51kQwGD61kYNK3LiXI
+ ULfQ==
+X-Gm-Message-State: AOAM533e9jO+biXJTSQ/pUGWtkKPBVGWt04BC4DyWwynSoMHG6KR53On
+ RkDWy3wdImwXTvEz1hSpmcQ5ghHUXLoBCOCnPzhpVCs2AdC5mz18KP0O5xpWgYlWZoTr6TL9k9U
+ lwEpIIK0Q2uWUgSPv2kXvEqz0Xn0G4oNkfQ5T8w5KkgozmeJ90uoyxIP5V/GPhiuLVx0=
+X-Google-Smtp-Source: ABdhPJyyKsZdgx86oOpgbZLiHegl5Y1zod3kRSEavOWe7KLm5NM5K6J05rrWMdpFS4IHz+JdQ3I7DZHEMg==
 X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:482])
- (user=tabba job=sendgmr) by 2002:a5d:4ccb:: with SMTP id
- c11mr30162930wrt.331.1626710642525; 
- Mon, 19 Jul 2021 09:04:02 -0700 (PDT)
-Date: Mon, 19 Jul 2021 17:03:38 +0100
+ (user=tabba job=sendgmr) by 2002:a0c:a321:: with SMTP id
+ u30mr25473018qvu.57.1626710644424; 
+ Mon, 19 Jul 2021 09:04:04 -0700 (PDT)
+Date: Mon, 19 Jul 2021 17:03:39 +0100
 In-Reply-To: <20210719160346.609914-1-tabba@google.com>
-Message-Id: <20210719160346.609914-8-tabba@google.com>
+Message-Id: <20210719160346.609914-9-tabba@google.com>
 Mime-Version: 1.0
 References: <20210719160346.609914-1-tabba@google.com>
 X-Mailer: git-send-email 2.32.0.402.g57bb445576-goog
-Subject: [PATCH v3 07/15] KVM: arm64: Track value of cptr_el2 in struct
- kvm_vcpu_arch
+Subject: [PATCH v3 08/15] KVM: arm64: Add feature register flag definitions
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: kernel-team@android.com, kvm@vger.kernel.org, maz@kernel.org,
@@ -98,60 +97,121 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Track the baseline guest value for cptr_el2 in struct
-kvm_vcpu_arch, similar to the other registers that control traps.
-Use this value when setting cptr_el2 for the guest.
+Add feature register flag definitions to clarify which features
+might be supported.
 
-Currently this value is unchanged (CPTR_EL2_DEFAULT), but future
-patches will set trapping bits based on features supported for
-the guest.
+Consolidate the various ID_AA64PFR0_ELx flags for all ELs.
 
 No functional change intended.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/include/asm/kvm_host.h | 1 +
- arch/arm64/kvm/arm.c              | 1 +
- arch/arm64/kvm/hyp/nvhe/switch.c  | 2 +-
- 3 files changed, 3 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/cpufeature.h |  4 ++--
+ arch/arm64/include/asm/sysreg.h     | 12 ++++++++----
+ arch/arm64/kernel/cpufeature.c      |  8 ++++----
+ 3 files changed, 14 insertions(+), 10 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 76462c6a91ee..ac67d5699c68 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -290,6 +290,7 @@ struct kvm_vcpu_arch {
- 	/* Values of trap registers for the guest. */
- 	u64 hcr_el2;
- 	u64 mdcr_el2;
-+	u64 cptr_el2;
+diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+index 9bb9d11750d7..b7d9bb17908d 100644
+--- a/arch/arm64/include/asm/cpufeature.h
++++ b/arch/arm64/include/asm/cpufeature.h
+@@ -602,14 +602,14 @@ static inline bool id_aa64pfr0_32bit_el1(u64 pfr0)
+ {
+ 	u32 val = cpuid_feature_extract_unsigned_field(pfr0, ID_AA64PFR0_EL1_SHIFT);
  
- 	/* Values of trap registers for the host before guest entry. */
- 	u64 mdcr_el2_host;
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index e9a2b8f27792..14b12f2c08c0 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1104,6 +1104,7 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
- 	}
+-	return val == ID_AA64PFR0_EL1_32BIT_64BIT;
++	return val == ID_AA64PFR0_ELx_32BIT_64BIT;
+ }
  
- 	vcpu_reset_hcr(vcpu);
-+	vcpu->arch.cptr_el2 = CPTR_EL2_DEFAULT;
+ static inline bool id_aa64pfr0_32bit_el0(u64 pfr0)
+ {
+ 	u32 val = cpuid_feature_extract_unsigned_field(pfr0, ID_AA64PFR0_EL0_SHIFT);
  
- 	/*
- 	 * Handle the "start in power-off" case.
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index 1778593a08a9..86f3d6482935 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -41,7 +41,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
- 	___activate_traps(vcpu);
- 	__activate_traps_common(vcpu);
+-	return val == ID_AA64PFR0_EL0_32BIT_64BIT;
++	return val == ID_AA64PFR0_ELx_32BIT_64BIT;
+ }
  
--	val = CPTR_EL2_DEFAULT;
-+	val = vcpu->arch.cptr_el2;
- 	val |= CPTR_EL2_TTA | CPTR_EL2_TAM;
- 	if (!update_fp_enabled(vcpu)) {
- 		val |= CPTR_EL2_TFP | CPTR_EL2_TZ;
+ static inline bool id_aa64pfr0_sve(u64 pfr0)
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 326f49e7bd42..0b773037251c 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -784,14 +784,13 @@
+ #define ID_AA64PFR0_AMU			0x1
+ #define ID_AA64PFR0_SVE			0x1
+ #define ID_AA64PFR0_RAS_V1		0x1
++#define ID_AA64PFR0_RAS_ANY		0xf
+ #define ID_AA64PFR0_FP_NI		0xf
+ #define ID_AA64PFR0_FP_SUPPORTED	0x0
+ #define ID_AA64PFR0_ASIMD_NI		0xf
+ #define ID_AA64PFR0_ASIMD_SUPPORTED	0x0
+-#define ID_AA64PFR0_EL1_64BIT_ONLY	0x1
+-#define ID_AA64PFR0_EL1_32BIT_64BIT	0x2
+-#define ID_AA64PFR0_EL0_64BIT_ONLY	0x1
+-#define ID_AA64PFR0_EL0_32BIT_64BIT	0x2
++#define ID_AA64PFR0_ELx_64BIT_ONLY	0x1
++#define ID_AA64PFR0_ELx_32BIT_64BIT	0x2
+ 
+ /* id_aa64pfr1 */
+ #define ID_AA64PFR1_MPAMFRAC_SHIFT	16
+@@ -847,12 +846,16 @@
+ #define ID_AA64MMFR0_ASID_SHIFT		4
+ #define ID_AA64MMFR0_PARANGE_SHIFT	0
+ 
++#define ID_AA64MMFR0_ASID_8		0x0
++#define ID_AA64MMFR0_ASID_16		0x2
++
+ #define ID_AA64MMFR0_TGRAN4_NI		0xf
+ #define ID_AA64MMFR0_TGRAN4_SUPPORTED	0x0
+ #define ID_AA64MMFR0_TGRAN64_NI		0xf
+ #define ID_AA64MMFR0_TGRAN64_SUPPORTED	0x0
+ #define ID_AA64MMFR0_TGRAN16_NI		0x0
+ #define ID_AA64MMFR0_TGRAN16_SUPPORTED	0x1
++#define ID_AA64MMFR0_PARANGE_40		0x2
+ #define ID_AA64MMFR0_PARANGE_48		0x5
+ #define ID_AA64MMFR0_PARANGE_52		0x6
+ 
+@@ -900,6 +903,7 @@
+ #define ID_AA64MMFR2_CNP_SHIFT		0
+ 
+ /* id_aa64dfr0 */
++#define ID_AA64DFR0_MTPMU_SHIFT		48
+ #define ID_AA64DFR0_TRBE_SHIFT		44
+ #define ID_AA64DFR0_TRACE_FILT_SHIFT	40
+ #define ID_AA64DFR0_DOUBLELOCK_SHIFT	36
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 0ead8bfedf20..5b59fe5e26e4 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -239,8 +239,8 @@ static const struct arm64_ftr_bits ftr_id_aa64pfr0[] = {
+ 	S_ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_FP_SHIFT, 4, ID_AA64PFR0_FP_NI),
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL3_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL2_SHIFT, 4, 0),
+-	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_SHIFT, 4, ID_AA64PFR0_EL1_64BIT_ONLY),
+-	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL0_SHIFT, 4, ID_AA64PFR0_EL0_64BIT_ONLY),
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_SHIFT, 4, ID_AA64PFR0_ELx_64BIT_ONLY),
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL0_SHIFT, 4, ID_AA64PFR0_ELx_64BIT_ONLY),
+ 	ARM64_FTR_END,
+ };
+ 
+@@ -1956,7 +1956,7 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.sys_reg = SYS_ID_AA64PFR0_EL1,
+ 		.sign = FTR_UNSIGNED,
+ 		.field_pos = ID_AA64PFR0_EL0_SHIFT,
+-		.min_field_value = ID_AA64PFR0_EL0_32BIT_64BIT,
++		.min_field_value = ID_AA64PFR0_ELx_32BIT_64BIT,
+ 	},
+ #ifdef CONFIG_KVM
+ 	{
+@@ -1967,7 +1967,7 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.sys_reg = SYS_ID_AA64PFR0_EL1,
+ 		.sign = FTR_UNSIGNED,
+ 		.field_pos = ID_AA64PFR0_EL1_SHIFT,
+-		.min_field_value = ID_AA64PFR0_EL1_32BIT_64BIT,
++		.min_field_value = ID_AA64PFR0_ELx_32BIT_64BIT,
+ 	},
+ 	{
+ 		.desc = "Protected KVM",
 -- 
 2.32.0.402.g57bb445576-goog
 
