@@ -2,91 +2,90 @@ Return-Path: <SRS0=FmU0=ML=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.9 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FSL_HELO_FAKE,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFC34C07E95
-	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 17:18:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7753CC07E95
+	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 18:02:36 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 33E1661019
-	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 17:18:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33E1661019
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id E2CDF61006
+	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 18:02:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2CDF61006
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A25DD4B0BB;
-	Mon, 19 Jul 2021 13:18:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5322F4B0CB;
+	Mon, 19 Jul 2021 14:02:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id aTz5N3PYqJNN; Mon, 19 Jul 2021 13:18:10 -0400 (EDT)
+	with ESMTP id suNj1Z1AZPSj; Mon, 19 Jul 2021 14:02:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8EB0C4A4E5;
-	Mon, 19 Jul 2021 13:18:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 267B64A4A0;
+	Mon, 19 Jul 2021 14:02:34 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 239E64A1A7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 13:18:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 47A6A4A2E5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 14:02:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id s4v6xqdOjlFJ for <kvmarm@lists.cs.columbia.edu>;
- Mon, 19 Jul 2021 13:18:08 -0400 (EDT)
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com
- [209.85.221.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1C00140FC7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 13:18:08 -0400 (EDT)
-Received: by mail-wr1-f46.google.com with SMTP id a13so22939017wrf.10
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 10:18:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ with ESMTP id GlfNuns5hY77 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 19 Jul 2021 14:02:31 -0400 (EDT)
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com
+ [209.85.208.48])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 154F349E50
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 14:02:31 -0400 (EDT)
+Received: by mail-ed1-f48.google.com with SMTP id ca14so25226872edb.2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 11:02:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=/Xmu5FPqUyjX/AwFlDabtmrvnaqYTVi+iQ6O/Qt9w3U=;
- b=GcCvN0tvN5Qo1sPuEvd5e8Kiu9SppusmgEE+8feDajKDgBnTsTuQobZHqBMkPe4+XY
- yDuvGw8+USSyAwlYdV40GobxMRoS7Pazgu1thJ3JvazliW/fsy13HMsBFQPYjLdIdFfy
- yFL2gx3s6YHADMMGEc+dX1e6tegPCpIYQXsCEPbjVpdY0UTwHVXQhxr19NtHh4hPTAZ1
- UWcn7ZRvOVjzdiESzn8l/UhXaBilVgTKvPTIbHN1YVHSYdgQK0MJXV2KjODEbabseXLi
- 4exz6XdzSK+5EwLOoofh8rWI2oDPAHZjmXO5UHi3Ckw+K10jfY0Qpm8zbUq2xNHwZzt7
- WgxA==
+ bh=iwY647XqSBr0nhop6u+nJOZDJO2ojgmzAbMlPyzAP2A=;
+ b=de4dSCIFeNoXczBGIJKhs+9cQ67ihAH384iDNj7/ghw8A521i45BAOlb9Wj5VrML2B
+ ts5bNRNWddT+aI1DLJIMor+SL4/f3zNwEtrLVZsD2tjcjsRkzEr1TRxdDN0DwJUJ6pq2
+ vSViocJn6F9z759rRSS8/3I8kikyFNECOd2Jum/ADid6KfFaxXYT7kzrn3v/uD/drMMG
+ QmB7VB6/FnvNvlUQU1yQ7RgVec5cXCMQW4i7ue70iiKVBvUrwW3xqoF7vRTo45xa+TQV
+ ER89LXFuY7yD0DDbzZMfbrV5Of00o5bIHTQbJFYMZNcVBnBX+yL0g9CKq1SafiocuodB
+ XvpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=/Xmu5FPqUyjX/AwFlDabtmrvnaqYTVi+iQ6O/Qt9w3U=;
- b=SlkZufadpS8PiufPEv7lo7WqZ7lk+eLckuFtb8+IaalwiXIAC7x1XdaP9EK0YYwuW0
- Dq39d28qZyEExzMbvO4bmKV7Rs5tkN5TEdzcxzztrsKRizbErC6OzgC4LKIYHRYL6ggq
- ewGVBHaNfEYpKUVhzqQ7gpuZyiMyLs3F/YfhEOGkw1NMzXz9zMNP9sGrrYlEzI9KYzN2
- 33c4DMItHEg6qViINeQ/DSq/0z0BeW25mCXTN/TtFHWzUa6LQMW6t378bM5G7oBiWHYh
- w2MtINZbPRHHpLwXEUUPUQjmbMqXgTZuLNyfOgmB4hCWu7ivoMAj68hRDnBf3XwJdQTm
- Pl6w==
-X-Gm-Message-State: AOAM530Qmd26BQnFzVRSyFYasXKEqI1PLv/FxoJ6fIw7Q1FlMXN3CF3D
- gzuxouz1NqBbUF0do2T5YTKh7A==
-X-Google-Smtp-Source: ABdhPJxB1LiYaftghh0ifR2L76/445eAkiioG51gjnaxWSKBrKU6oQPzKqFBlbAnW5eZ1f2hyOGEvA==
-X-Received: by 2002:adf:9084:: with SMTP id i4mr31273012wri.23.1626715086799; 
- Mon, 19 Jul 2021 10:18:06 -0700 (PDT)
-Received: from google.com ([2a00:79e0:d:210:83e0:11ac:c870:2b97])
- by smtp.gmail.com with ESMTPSA id r18sm21209280wrt.96.2021.07.19.10.18.05
+ bh=iwY647XqSBr0nhop6u+nJOZDJO2ojgmzAbMlPyzAP2A=;
+ b=UZrxsyLh66lugMgmLS60/aE52d+IJR6nPwj3f9Wew9iUzJoXw7HMLD+4pbJLln0fwb
+ c3iDWML5f8VDN/s5+LridxYhb0f/n3RZgzzqrrWocqhTU3k7FEUl3IsNwzPnuHM+0czx
+ Aeo77v1/togko5VVxs67e3Aoc0sg/4DwiJ5UcEWTsYo5Kq0bhnr2jJs4/ONqOiY1/Jd5
+ 8XbF1tP8xgRtkf93WlFlsDtPg5of5tCa4AmRvgVFF2C+ACz/w8FFBmnBiM7mtOxgYVfL
+ paubS8zoLW2JSxJ3BgchPDrGtjVe5YLC4eoO47wfdpZ8K0HDdzuFkWIy0/cSgOr1EZL/
+ iHgw==
+X-Gm-Message-State: AOAM533LqYkYCPfHHIoQYtG8lYE27WDy0yoAuJvs/tSemySPS7L78wU0
+ kiKf3Bwogdg/7kfAr0dEHgN6eg==
+X-Google-Smtp-Source: ABdhPJyQlO0WF1yuY/72pvxqzE/S/j0RUDWpsZG3FB/CGPHlXlZjXIrduqfJdRb/baD0ksNgkAUGWw==
+X-Received: by 2002:a05:6402:1592:: with SMTP id
+ c18mr35924631edv.243.1626717749925; 
+ Mon, 19 Jul 2021 11:02:29 -0700 (PDT)
+Received: from myrica (adsl-84-226-111-173.adslplus.ch. [84.226.111.173])
+ by smtp.gmail.com with ESMTPSA id n14sm8178314edo.23.2021.07.19.11.02.28
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 19 Jul 2021 10:18:06 -0700 (PDT)
-Date: Mon, 19 Jul 2021 18:18:02 +0100
-From: Quentin Perret <qperret@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 02/16] KVM: arm64: Don't issue CMOs when the physical
- address is invalid
-Message-ID: <YPWzykpDMOhT2yh8@google.com>
-References: <20210715163159.1480168-1-maz@kernel.org>
- <20210715163159.1480168-3-maz@kernel.org>
+ Mon, 19 Jul 2021 11:02:29 -0700 (PDT)
+Date: Mon, 19 Jul 2021 20:02:06 +0200
+From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [RFC PATCH 0/5] KVM: arm64: Pass PSCI to userspace
+Message-ID: <YPW+Hv3r586zKxpY@myrica>
+References: <20210608154805.216869-1-jean-philippe@linaro.org>
+ <c29ff5c8-9c94-6a6c-6142-3bed440676bf@arm.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20210715163159.1480168-3-maz@kernel.org>
-Cc: kernel-team@android.com, kvm@vger.kernel.org,
- Srivatsa Vaddagiri <vatsa@codeaurora.org>, linux-kernel@vger.kernel.org,
- Shanker R Donthineni <sdonthineni@nvidia.com>, will@kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <c29ff5c8-9c94-6a6c-6142-3bed440676bf@arm.com>
+Cc: salil.mehta@huawei.com, lorenzo.pieralisi@arm.com, kvm@vger.kernel.org,
+ corbet@lwn.net, maz@kernel.org, linux-kernel@vger.kernel.org,
+ jonathan.cameron@huawei.com, catalin.marinas@arm.com, pbonzini@redhat.com,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -103,56 +102,83 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thursday 15 Jul 2021 at 17:31:45 (+0100), Marc Zyngier wrote:
-> Make sure we don't issue CMOs when mapping something that
-> is not a memory address in the S2 page tables.
+Hi Alex,
+
+I'm not planning to resend this work at the moment, because it looks like
+vcpu hot-add will go a different way so I don't have a user. But I'll
+probably address the feedback so far and park it on some branch, in case
+anyone else needs it.
+
+On Mon, Jul 19, 2021 at 04:29:18PM +0100, Alexandru Elisei wrote:
+> 1. Why forwarding PSCI calls to userspace depend on enabling forwarding for other
+> HVC calls? As I understand from the patches, those handle distinct function IDs.
+
+The HVC cap from patch 4 enables returning from the VCPU_RUN ioctl with
+KVM_EXIT_HYPERCALL, for any HVC not handled by KVM. This one should
+definitely be improved, either by letting userspace choose the ranges of
+HVC it wants, or at least by reporting ranges reserved by KVM to
+userspace.
+
+The PSCI cap from patch 5 disables the in-kernel PSCI implementation. As a
+result those HVCs are forwarded to userspace.
+
+It was suggested that other users will want to handle HVC calls (SDEI for
+example [1]), hence splitting into two capabilities rather than just the
+PSCI cap. In v5.14 x86 added KVM_CAP_EXIT_HYPERCALL [2], which lets
+userspace receive specific hypercalls. We could reuse that and have PSCI
+be one bit of that capability's parameter.
+
+[1] https://lore.kernel.org/linux-arm-kernel/20170808164616.25949-12-james.morse@arm.com/
+[2] https://lore.kernel.org/kvm/90778988e1ee01926ff9cac447aacb745f954c8c.1623174621.git.ashish.kalra@amd.com/
+
+> 2. HVC call forwarding to userspace also forwards PSCI functions which are defined
+> in ARM DEN 0022D, but not (yet) implemented by KVM. What happens if KVM's PSCI
+> implementation gets support for one of those functions? How does userspace know
+> that now it also needs to enable PSCI call forwarding to be able to handle that
+> function?
+
+We forward the whole PSCI function range, so it's either KVM or userspace.
+If KVM manages PSCI and the guest calls an unimplemented function, that
+returns directly to the guest without going to userspace.
+
+The concern is valid for any other range, though. If userspace enables the
+HVC cap it receives function calls that at some point KVM might need to
+handle itself. So we need some negotiation between user and KVM about the
+specific HVC ranges that userspace can and will handle.
+
+> It looks to me like the boundary between the functions that are forwarded when HVC
+> call forwarding is enabled and the functions that are forwarded when PSCI call
+> forwarding is enabled is based on what Linux v5.13 handles. Have you considered
+> choosing this boundary based on something less arbitrary, like the function types
+> specified in ARM DEN 0028C, table 2-1?
+
+For PSCI I've used the range 0-0x1f as the boundary, which is reserved for
+PSCI by SMCCC (table 6-4 in that document).
+
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/hyp/pgtable.c | 16 ++++++++++------
->  1 file changed, 10 insertions(+), 6 deletions(-)
+> In my opinion, setting the MP state to HALTED looks like a sensible approach to
+> implementing PSCI_SUSPEND. I'll take a closer look at the patches after I get a
+> better understanding about what is going on.
 > 
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index 05321f4165e3..a5874ebd0354 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -619,12 +619,16 @@ static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
->  	}
->  
->  	/* Perform CMOs before installation of the guest stage-2 PTE */
-> -	if (mm_ops->dcache_clean_inval_poc && stage2_pte_cacheable(pgt, new))
-> -		mm_ops->dcache_clean_inval_poc(kvm_pte_follow(new, mm_ops),
-> -						granule);
-> -
-> -	if (mm_ops->icache_inval_pou && stage2_pte_executable(new))
-> -		mm_ops->icache_inval_pou(kvm_pte_follow(new, mm_ops), granule);
-> +	if (kvm_phys_is_valid(phys)) {
-> +		if (mm_ops->dcache_clean_inval_poc &&
-> +		    stage2_pte_cacheable(pgt, new))
-> +			mm_ops->dcache_clean_inval_poc(kvm_pte_follow(new,
-> +								      mm_ops),
-> +						       granule);
-> +		if (mm_ops->icache_inval_pou && stage2_pte_executable(new))
-> +			mm_ops->icache_inval_pou(kvm_pte_follow(new, mm_ops),
-> +						 granule);
-> +	}
+> On 6/8/21 4:48 PM, Jean-Philippe Brucker wrote:
+> > Allow userspace to request handling PSCI calls from guests. Our goal is
+> > to enable a vCPU hot-add solution for Arm where the VMM presents
+> > possible resources to the guest at boot, and controls which vCPUs can be
+> > brought up by allowing or denying PSCI CPU_ON calls. Passing HVC and
+> > PSCI to userspace has been discussed on the list in the context of vCPU
+> > hot-add [1,2] but it can also be useful for implementing other SMCCC and
+> > vendor hypercalls [3,4,5].
+> >
+> > Patches 1-3 allow userspace to request WFI to be executed in KVM. That
+> 
+> I don't understand this. KVM, in kvm_vcpu_block(), does not execute an WFI.
+> PSCI_SUSPEND is documented as being indistinguishable from an WFI from the guest's
+> point of view, but it's implementation is not architecturally defined.
 
-Hrmpf so this makes me realize we have a problem here, not really caused
-by your patch though.
-
-Specifically, calling kvm_pgtable_stage2_set_owner() can lead to
-overriding valid mappings with invalid mappings, which is effectively an
-unmap operation. In this case we should issue CMOs when unmapping a
-cacheable page to ensure it is clean to the PoC, like the
-kvm_pgtable_stage2_unmap() does.
-
-Note that you patch is already an improvement over the current state of
-things, because calling stage2_pte_cacheable(pgt, new),
-kvm_pte_follow(new, mm_ops) and friends is bogus when 'new' is invalid
-...
+Yes that was an oversimplification on my part
 
 Thanks,
-Quentin
+Jean
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
