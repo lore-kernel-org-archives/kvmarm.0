@@ -2,75 +2,89 @@ Return-Path: <SRS0=FmU0=ML=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-6.9 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A54DBC07E95
-	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 15:56:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 570E6C07E9B
+	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 15:57:07 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 13FC560FDA
-	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 15:56:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13FC560FDA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id C2C7B61279
+	for <kvmarm@archiver.kernel.org>; Mon, 19 Jul 2021 15:57:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2C7B61279
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A11E4A126;
-	Mon, 19 Jul 2021 11:56:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5EE0240895;
+	Mon, 19 Jul 2021 11:57:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id V-jrQbOgK44i; Mon, 19 Jul 2021 11:56:40 -0400 (EDT)
+	with ESMTP id zx5qoCR0ULT6; Mon, 19 Jul 2021 11:57:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3107C49F8F;
-	Mon, 19 Jul 2021 11:56:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5706049F8F;
+	Mon, 19 Jul 2021 11:57:05 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 47A0249F8F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 11:56:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ABC0949F8F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 11:57:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7TAU+nVkwMAB for <kvmarm@lists.cs.columbia.edu>;
- Mon, 19 Jul 2021 11:56:37 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4EB6540895
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 11:56:37 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 033F6601FD;
- Mon, 19 Jul 2021 15:56:36 +0000 (UTC)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa (TLS1.2) tls
- TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1m5VdC-00EGXH-BP; Mon, 19 Jul 2021 16:56:34 +0100
+ with ESMTP id ubhBf-3d6Cpq for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 19 Jul 2021 11:57:02 -0400 (EDT)
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com
+ [209.85.221.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A8E1D40895
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 11:57:02 -0400 (EDT)
+Received: by mail-wr1-f53.google.com with SMTP id g16so22665832wrw.5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Jul 2021 08:57:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=lqk2jkzthWLyzhPPwl9UElGn40y2Dt6x0oKXE1RM9g8=;
+ b=jI3en6+L35OGQjtiyLEBUmVWVLufhxwq/1aOfwuDJV44bcq1jbW0DRpXwwWlYvSdMk
+ e4Xm3XmGv35SIVRFvfDV0Fdm1m0G59WRs/JZYelzbtxZfeEOv0+E2rKlGbQ1frzNzc76
+ fXzvmTXp+dnZBCwUIz5YNwPAkhnsQdXVRzQKoZsBp43fwvrYi9RgXPvTk1n7ltpWSPVQ
+ IZp88OIXUDGh7cL1PTzzyxgcCC1TNFv7J2WYENBPUFn78VP+iJbtcr9SZZkNqNjdndnk
+ FQG0OmlrWdFs0XoRXmu2H2p3Dl+9wpibmflX0a+iE/KQ2XvTufMt3nNZvVUNv9GRNHov
+ 34sw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=lqk2jkzthWLyzhPPwl9UElGn40y2Dt6x0oKXE1RM9g8=;
+ b=Mftjol5YO/Vph3myEdKIA5cmB5G+Y69qBXmOfylSpnfk7yVJF0Ixod7QPVfY4DYkzr
+ hWOu91+NSEVFFcxaSrvgOfrD3EmUMQ26HjqbN5d0pJHabLhbtq5ZvkpR0fivXPYm8DAb
+ yoJjbAV7atBc0zHwaVxNqnlzIgYivy6XmGkJ+WDxHPHqUKqvhG1IDpCh7Y92CDe2Hwgk
+ uRM3L1ULgjDfLlpS7EkQ97WECcsbY5anlVb6mdw/x9CsVgbc+SAOE+Gxhw/4QlI2AuS8
+ QYYLu3liu3spvOBB5TS+IdQpB6ck9gCpkwYgc0BD0+MpUKGIFqBTXuqVvKTohaWSzdwD
+ 1ruw==
+X-Gm-Message-State: AOAM532gU75ixFoirRPkvfO4A9kwyfEQLwaX4IlSAPx2tLpMjB+d85Yh
+ By5KhRzM+J2oZaSNWdENtxBagA==
+X-Google-Smtp-Source: ABdhPJxpNsB2RMnrXBTt9Gp1trnlhrfx+X5PhpEBH6aIheVp4g43w00+TxDIiSELO95IVAOEFTQhhA==
+X-Received: by 2002:adf:a41e:: with SMTP id d30mr30429082wra.10.1626710221588; 
+ Mon, 19 Jul 2021 08:57:01 -0700 (PDT)
+Received: from google.com ([2a00:79e0:d:210:83e0:11ac:c870:2b97])
+ by smtp.gmail.com with ESMTPSA id w16sm6652930wru.58.2021.07.19.08.57.00
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 19 Jul 2021 08:57:01 -0700 (PDT)
+Date: Mon, 19 Jul 2021 16:56:57 +0100
+From: Quentin Perret <qperret@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH 09/14] KVM: arm64: Mark host bss and rodata section as
+ shared
+Message-ID: <YPWgyS7i2sMtiX8S@google.com>
+References: <20210719104735.3681732-1-qperret@google.com>
+ <20210719104735.3681732-10-qperret@google.com>
+ <87eebujqjv.wl-maz@kernel.org>
 MIME-Version: 1.0
-Date: Mon, 19 Jul 2021 16:56:34 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH v2 1/4] KVM: arm64: Narrow PMU sysreg reset values to
- architectural requirements
-In-Reply-To: <171cca9d-2a6e-248c-8502-feba8ebbe55e@arm.com>
-References: <20210719123902.1493805-1-maz@kernel.org>
- <20210719123902.1493805-2-maz@kernel.org>
- <171cca9d-2a6e-248c-8502-feba8ebbe55e@arm.com>
-User-Agent: Roundcube Webmail/1.4.11
-Message-ID: <171834f3198b898d5c2aefa0270b65f2@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, james.morse@arm.com, suzuki.poulose@arm.com,
- alexandre.chartre@oracle.com, robin.murphy@arm.com, drjones@redhat.com,
- linux@arm.linux.org.uk, kernel-team@android.com, rmk+kernel@armlinux.org.uk
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, kernel-team@android.com,
- Russell King <rmk+kernel@armlinux.org.uk>,
- Russell King <linux@arm.linux.org.uk>, Robin Murphy <robin.murphy@arm.com>,
+Content-Disposition: inline
+In-Reply-To: <87eebujqjv.wl-maz@kernel.org>
+Cc: kernel-team@android.com, qwandor@google.com, will@kernel.org,
+ catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -83,66 +97,71 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2021-07-19 16:55, Alexandru Elisei wrote:
-> Hi Marc,
+On Monday 19 Jul 2021 at 16:01:40 (+0100), Marc Zyngier wrote:
+> On Mon, 19 Jul 2021 11:47:30 +0100,
+> Quentin Perret <qperret@google.com> wrote:
+> > +static int finalize_mappings(void)
+> > +{
+> > +	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_RWX;
+> > +	int ret;
+> > +
+> > +	/*
+> > +	 * The host's .bss and .rodata sections are now conceptually owned by
+> > +	 * the hypervisor, so mark them as 'borrowed' in the host stage-2. We
+> > +	 * can safely use host_stage2_idmap_locked() at this point since the
+> > +	 * host stage-2 has not been enabled yet.
+> > +	 */
+> > +	prot |= KVM_PGTABLE_STATE_SHARED | KVM_PGTABLE_STATE_BORROWED;
+> > +	ret = host_stage2_idmap_locked(__hyp_pa(__start_rodata),
+> > +				       __hyp_pa(__end_rodata), prot);
 > 
-> On 7/19/21 1:38 PM, Marc Zyngier wrote:
->> A number of the PMU sysregs expose reset values that are not
->> compliant with the architecture (set bits in the RES0 ranges,
->> for example).
->> 
->> This in turn has the effect that we need to pointlessly mask
->> some register fields when using them.
->> 
->> Let's start by making sure we don't have illegal values in the
->> shadow registers at reset time. This affects all the registers
->> that dedicate one bit per counter, the counters themselves,
->> PMEVTYPERn_EL0 and PMSELR_EL0.
->> 
->> Reported-by: Alexandre Chartre <alexandre.chartre@oracle.com>
->> Reviewed-by: Alexandre Chartre <alexandre.chartre@oracle.com>
->> Acked-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> ---
->>  arch/arm64/kvm/sys_regs.c | 43 
->> ++++++++++++++++++++++++++++++++++++---
->>  1 file changed, 40 insertions(+), 3 deletions(-)
->> 
->> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->> index f6f126eb6ac1..96bdfa0e68b2 100644
->> --- a/arch/arm64/kvm/sys_regs.c
->> +++ b/arch/arm64/kvm/sys_regs.c
->> @@ -603,6 +603,41 @@ static unsigned int pmu_visibility(const struct 
->> kvm_vcpu *vcpu,
->>  	return REG_HIDDEN;
->>  }
->> 
->> +static void reset_pmu_reg(struct kvm_vcpu *vcpu, const struct 
->> sys_reg_desc *r)
->> +{
->> +	u64 n, mask = BIT(ARMV8_PMU_CYCLE_IDX);
->> +
->> +	/* No PMU available, any PMU reg may UNDEF... */
->> +	if (!kvm_arm_support_pmu_v3())
->> +		return;
->> +
->> +	n = read_sysreg(pmcr_el0) >> ARMV8_PMU_PMCR_N_SHIFT;
->> +	n &= ARMV8_PMU_PMCR_N_MASK;
->> +	if (n)
->> +		mask |= GENMASK(n - 1, 0);
+> Do we really want to map the rodata section as RWX?
+
+I know, feels odd, but for now I think so. The host is obviously
+welcome to restrict things in its stage-1, but for stage-2, this is
+just 'memory' so far, the host is allowed to patch it if it wants too.
+
+Eventually, yes, I think we should make it RO in the host stage-2, but
+maybe that's for another series?
+
+> > +	if (ret)
+> > +		return ret;
+> > +
+> > +	return host_stage2_idmap_locked(__hyp_pa(__hyp_bss_end),
+> > +					__hyp_pa(__bss_stop), prot);
 > 
-> Hm... seems to be missing the cycle counter.
+> If the 'locked' state implies SHARED+BORROWED, maybe consider moving
+> the ORRing of the prot into host_stage2_idmap_locked()?
 
-Check the declaration for 'mask'... :-)
+Ah no, sorry for the confusion, but 'locked' means that we already hold
+the pgtable lock. That is not actually true here, but this is a special
+case as only the current CPU can be messing with it at this point in
+time so taking the lock would just be wasted cycles.
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+> > +}
+> > +
+> >  void __noreturn __pkvm_init_finalise(void)
+> >  {
+> >  	struct kvm_host_data *host_data = this_cpu_ptr(&kvm_host_data);
+> > @@ -167,6 +199,10 @@ void __noreturn __pkvm_init_finalise(void)
+> >  	if (ret)
+> >  		goto out;
+> >  
+> > +	ret = finalize_mappings();
+> > +	if (ret)
+> > +		goto out;
+> > +
+> >  	pkvm_pgtable_mm_ops = (struct kvm_pgtable_mm_ops) {
+> >  		.zalloc_page = hyp_zalloc_hyp_page,
+> >  		.phys_to_virt = hyp_phys_to_virt,
+
+Thanks,
+Quentin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
