@@ -2,91 +2,93 @@ Return-Path: <SRS0=KNUW=MM=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FSL_HELO_FAKE,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96F0AC07E9B
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Jul 2021 11:36:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3F9DC07E95
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Jul 2021 11:48:18 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 09B5C6113A
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Jul 2021 11:36:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09B5C6113A
+	by mail.kernel.org (Postfix) with ESMTP id 4BA456113C
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Jul 2021 11:48:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BA456113C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 73B3B4B0BF;
-	Tue, 20 Jul 2021 07:36:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D1C794B0EF;
+	Tue, 20 Jul 2021 07:48:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Rn-VCrs2NEVJ; Tue, 20 Jul 2021 07:36:28 -0400 (EDT)
+	with ESMTP id yHT4uiFBlBCz; Tue, 20 Jul 2021 07:48:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4AB454B0CC;
-	Tue, 20 Jul 2021 07:36:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D6FA4B0CA;
+	Tue, 20 Jul 2021 07:48:16 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F07D4B0C0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jul 2021 07:36:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 67D864B0A3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jul 2021 07:48:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZRIJwBNCXyBn for <kvmarm@lists.cs.columbia.edu>;
- Tue, 20 Jul 2021 07:36:26 -0400 (EDT)
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com
- [209.85.221.47])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 812914B0BF
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jul 2021 07:36:26 -0400 (EDT)
-Received: by mail-wr1-f47.google.com with SMTP id m2so25665857wrq.2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jul 2021 04:36:26 -0700 (PDT)
+ with ESMTP id kyGZ-6QZXn4H for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 20 Jul 2021 07:48:14 -0400 (EDT)
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com
+ [209.85.128.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 25EDD4B098
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jul 2021 07:48:14 -0400 (EDT)
+Received: by mail-wm1-f50.google.com with SMTP id
+ f10-20020a05600c4e8ab029023e8d74d693so1860023wmq.3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jul 2021 04:48:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=d5WGGczUDQ+z5x6mRYmC5MZD9AX2DybKW9Ucl1ZZ5x4=;
- b=GGHkZUBInNS2eawKVqyh2dZiBgqBA0ZAt6XqWzq6FhWyVhlXFPbnrSHWOAFPS8Z9ZR
- dVibOwR1wemIROQr4YCp1xwVf64z1Rg6WMpiGmIbfEBFWPrx7MmRdjb8gV3/SgBP2ZFz
- a9equnKu6rHXrtF1/q3vcbOQPyLeVxfwNuL+UDob2YQyCPEw22TnPSzcp86A1o8wmep8
- 1ovlB+LtfWokYN7bMc5KLPeyi/66y6j4HTX1EvxJshk2q4Z+Mrbh6HeBmZDHYOODRsRw
- ktVTLWOHs/HMh+a+mLrAgjBio5S/1PCoIAKLdzp+GyxBK5Ra+Tjpp58IHq5VCMfwp/Vd
- YXZw==
+ bh=hPwJ/dW4a4srx9+XIlue+N7D+kVuX+NIds9OwYkD43Q=;
+ b=mBdzbgaenC7gw/D5SPsG8J5mVx29jdxJjOG69xzNWqWQ59jZH8+dwFjiHFAC4y7J6b
+ O8HDkokQ0DBw6OgdxtF03SO9ByK3Ouv6ElQjH4LR226D4AEqlFJVzfeLLHbffjt5AIGX
+ 8JI9avw34kLztnnCLckx+KEbJbM7VhaNE+D8KGBzvIH8FQGDZ+MVSKf/bkbauI7/Eosq
+ L1LKGhI/I9tTP50jA3h2kMY2OL7HstTogPdeCWqd5accPN1r48o7/uCw6U3XhokT3/lm
+ Ct4lKUir7xGXoqJMWipfrEtVVSZ48Xwqj2FdZpFO5gCElxAAtMpJEKkLfCoh50XrzH28
+ +XJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=d5WGGczUDQ+z5x6mRYmC5MZD9AX2DybKW9Ucl1ZZ5x4=;
- b=CRFUz8Yk5+5rRDiVC0b6A1mFY/7iimRcdvqMNQPORQ6Ye+0iyISlNaXDz3qFUX3lQf
- WwIhMW/MGFgwmONdYRDCae64iDxasQwcz7vzqpT6Ea3lEvLKzejsQwAY8EhrSF0DnyBR
- XH1Sp0z+c5tcfaUUUU9ZRR12tP9+PEWMmwBxggnvrDbN/Cxk+se42XBtJqczaTb2AlwJ
- 4NGoj2d7XXq00m5HsR+t7f72oKievaVeMmNq+4GCuDGf58+R7vqpSugPJY2kZIdH5/a5
- 6Ga/BqzfqFPH5u0Lc141HYyP9p/bUF2jIK/3thPziKLtxiJ7gk8Q4Zv+pMr6VvpT/OHv
- aQJw==
-X-Gm-Message-State: AOAM530AcKnSJ4P1Mvxb0FtFLndXxoVlIYBfiDfffATCM6ffTMn/3KsS
- EFlTXACBLiDNP1PIcV2uJa7o2A==
-X-Google-Smtp-Source: ABdhPJxWCOn5XF/Z6Scsndh/Ax3SBXXxu2JEXA+6Z/V9aXahHy5B6KiYzK39pJgPk6HYOKcI6cp8rA==
-X-Received: by 2002:a5d:6589:: with SMTP id q9mr2297646wru.284.1626780985461; 
- Tue, 20 Jul 2021 04:36:25 -0700 (PDT)
+ bh=hPwJ/dW4a4srx9+XIlue+N7D+kVuX+NIds9OwYkD43Q=;
+ b=VDhQ5/mHto7JW/RkDg+ptDTHRVz5vH/0i8EC4T2Us3udC8s6fWKKx3OTrBmVPgjzo2
+ e1lvMR6WJVeNzQQtwl2eC3z+NerMCWcdOdylu7QSji2Me918NzCk8pRdj7oxwWxFWPkK
+ FN15QxitP/9n/XFi0xr+4/N8YH+RD6ett7kx0tZgu0NWBEgY7qnpX+CA1fGlwpasCssE
+ PIHTE9JalSx35Q/NaJKEsKC7F+6kY/M8/R85NLQbzQJre67M1cYgzkILHjZa0nE3HcmN
+ 3vcW9n/B1lV3YiyBp/1NiGaHhr4+yZwLePFVJfZssxDNGReE3F/8NGYF34ySwmwDWhnP
+ MmeQ==
+X-Gm-Message-State: AOAM53238gEnOgBlvTtjNGF6N+e6Vqba6+nDKK6/vGloZhkQR6KsM+iI
+ wgipYZS3IHUlPwYpVpasgHVAdw==
+X-Google-Smtp-Source: ABdhPJx/vBaJQh6J/RNVt3vHGViwFJuVjJNenDo+nnp215LT08auAySOacQLtTrv1SeKkE+/sTjUtg==
+X-Received: by 2002:a05:600c:4841:: with SMTP id
+ j1mr31229342wmo.88.1626781692919; 
+ Tue, 20 Jul 2021 04:48:12 -0700 (PDT)
 Received: from google.com ([2a00:79e0:d:210:83e0:11ac:c870:2b97])
- by smtp.gmail.com with ESMTPSA id d9sm23135294wrx.76.2021.07.20.04.36.24
+ by smtp.gmail.com with ESMTPSA id d8sm24217158wrv.20.2021.07.20.04.48.11
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 20 Jul 2021 04:36:25 -0700 (PDT)
-Date: Tue, 20 Jul 2021 12:36:21 +0100
+ Tue, 20 Jul 2021 04:48:12 -0700 (PDT)
+Date: Tue, 20 Jul 2021 12:48:08 +0100
 From: Quentin Perret <qperret@google.com>
 To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 03/16] KVM: arm64: Turn kvm_pgtable_stage2_set_owner into
- kvm_pgtable_stage2_annotate
-Message-ID: <YPa1NfbEDY3kVHzr@google.com>
-References: <20210715163159.1480168-1-maz@kernel.org>
- <20210715163159.1480168-4-maz@kernel.org>
- <YPag0YQHB0nph5ji@google.com> <871r7t9tgi.wl-maz@kernel.org>
- <YPanmXfdr9rqnICK@google.com> <87zguh8c4l.wl-maz@kernel.org>
+Subject: Re: [PATCH 08/14] KVM: arm64: Add support for tagging shared pages
+ in page-table
+Message-ID: <YPa3+NHt08zz5a1C@google.com>
+References: <20210719104735.3681732-1-qperret@google.com>
+ <20210719104735.3681732-9-qperret@google.com>
+ <87fswajre1.wl-maz@kernel.org> <YPWe+W3QmeYHqre/@google.com>
+ <8735s99ttg.wl-maz@kernel.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <87zguh8c4l.wl-maz@kernel.org>
-Cc: kernel-team@android.com, kvm@vger.kernel.org,
- Srivatsa Vaddagiri <vatsa@codeaurora.org>, linux-kernel@vger.kernel.org,
- Shanker R Donthineni <sdonthineni@nvidia.com>, will@kernel.org,
+In-Reply-To: <8735s99ttg.wl-maz@kernel.org>
+Cc: kernel-team@android.com, qwandor@google.com, will@kernel.org,
+ catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -104,50 +106,148 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tuesday 20 Jul 2021 at 12:20:58 (+0100), Marc Zyngier wrote:
-> On Tue, 20 Jul 2021 11:38:17 +0100,
+On Tuesday 20 Jul 2021 at 11:13:31 (+0100), Marc Zyngier wrote:
+> On Mon, 19 Jul 2021 16:49:13 +0100,
 > Quentin Perret <qperret@google.com> wrote:
 > > 
-> > On Tuesday 20 Jul 2021 at 11:21:17 (+0100), Marc Zyngier wrote:
-> > > On Tue, 20 Jul 2021 11:09:21 +0100,
+> > On Monday 19 Jul 2021 at 15:43:34 (+0100), Marc Zyngier wrote:
+> > > On Mon, 19 Jul 2021 11:47:29 +0100,
 > > > Quentin Perret <qperret@google.com> wrote:
 > > > > 
-> > > > On Thursday 15 Jul 2021 at 17:31:46 (+0100), Marc Zyngier wrote:
-> > > > > @@ -815,7 +807,7 @@ int kvm_pgtable_stage2_set_owner(struct kvm_pgtable *pgt, u64 addr, u64 size,
-> > > > >  		.arg		= &map_data,
-> > > > >  	};
-> > > > >  
-> > > > > -	if (owner_id > KVM_MAX_OWNER_ID)
-> > > > > +	if (!annotation || (annotation & PTE_VALID))
-> > > > >  		return -EINVAL;
+> > > > The hypervisor will soon be in charge of tracking ownership of all
+> > > > memory pages in the system. The current page-tracking infrastructure at
+> > > > EL2 only allows binary states: a page is either owned or not by an
+> > > > entity. But a number of use-cases will require more complex states for
+> > > > pages that are shared between two entities (host, hypervisor, or guests).
 > > > > 
-> > > > Why do you consider annotation==0 invalid? The assumption so far has
-> > > > been that the owner_id for the host is 0, so annotating a range with 0s
-> > > > should be a valid operation -- this will be required when e.g.
-> > > > transferring ownership of a page back to the host.
+> > > > In preparation for supporting these use-cases, introduce in the KVM
+> > > > page-table library some infrastructure allowing to tag shared pages
+> > > > using ignored bits (a.k.a. software bits) in PTEs.
+> > > > 
+> > > > Signed-off-by: Quentin Perret <qperret@google.com>
+> > > > ---
+> > > >  arch/arm64/include/asm/kvm_pgtable.h |  5 +++++
+> > > >  arch/arm64/kvm/hyp/pgtable.c         | 25 +++++++++++++++++++++++++
+> > > >  2 files changed, 30 insertions(+)
+> > > > 
+> > > > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> > > > index dd72653314c7..f6d3d5c8910d 100644
+> > > > --- a/arch/arm64/include/asm/kvm_pgtable.h
+> > > > +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> > > > @@ -81,6 +81,8 @@ enum kvm_pgtable_stage2_flags {
+> > > >   * @KVM_PGTABLE_PROT_W:		Write permission.
+> > > >   * @KVM_PGTABLE_PROT_R:		Read permission.
+> > > >   * @KVM_PGTABLE_PROT_DEVICE:	Device attributes.
+> > > > + * @KVM_PGTABLE_STATE_SHARED:	Page shared with another entity.
+> > > > + * @KVM_PGTABLE_STATE_BORROWED:	Page borrowed from another entity.
+> > > >   */
+> > > >  enum kvm_pgtable_prot {
+> > > >  	KVM_PGTABLE_PROT_X			= BIT(0),
+> > > > @@ -88,6 +90,9 @@ enum kvm_pgtable_prot {
+> > > >  	KVM_PGTABLE_PROT_R			= BIT(2),
+> > > >  
+> > > >  	KVM_PGTABLE_PROT_DEVICE			= BIT(3),
+> > > > +
+> > > > +	KVM_PGTABLE_STATE_SHARED		= BIT(4),
+> > > > +	KVM_PGTABLE_STATE_BORROWED		= BIT(5),
 > > > 
-> > > How do you then distinguish it from an empty entry that doesn't map to
-> > > anything at all?
+> > > I'd rather have some indirection here, as we have other potential
+> > > users for the SW bits outside of pKVM (see the NV series, which uses
+> > > some of these SW bits as the backend for TTL-based TLB invalidation).
+> > > 
+> > > Can we instead only describe the SW bit states in this enum, and let
+> > > the users map the semantic they require onto that state? See [1] for
+> > > what I carry in the NV branch.
 > > 
-> > You don't, but that's beauty of it :)
+> > Works for me -- I just wanted to make sure we don't have users in
+> > different places that use the same bits without knowing, but no strong
+> > opinions, so happy to change.
 > > 
-> > The host starts with a PGD full of zeroes, which in terms of ownership
-> > means that it owns the entire (I)PA space. And it loses ownership of a
-> > page only when we explicitly annotate it with an owner id != 0.
+> > > >  };
+> > > >  
+> > > >  #define KVM_PGTABLE_PROT_RW	(KVM_PGTABLE_PROT_R | KVM_PGTABLE_PROT_W)
+> > > > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> > > > index 5bdbe7a31551..51598b79dafc 100644
+> > > > --- a/arch/arm64/kvm/hyp/pgtable.c
+> > > > +++ b/arch/arm64/kvm/hyp/pgtable.c
+> > > > @@ -211,6 +211,29 @@ static kvm_pte_t kvm_init_invalid_leaf_owner(u8 owner_id)
+> > > >  	return FIELD_PREP(KVM_INVALID_PTE_OWNER_MASK, owner_id);
+> > > >  }
+> > > >  
+> > > > +static kvm_pte_t pte_ignored_bit_prot(enum kvm_pgtable_prot prot)
+> > > 
+> > > Can we call these sw rather than ignored?
+> > 
+> > Sure.
+> > 
+> > > > +{
+> > > > +	kvm_pte_t ignored_bits = 0;
+> > > > +
+> > > > +	/*
+> > > > +	 * Ignored bits 0 and 1 are reserved to track the memory ownership
+> > > > +	 * state of each page:
+> > > > +	 *   00: The page is owned solely by the page-table owner.
+> > > > +	 *   01: The page is owned by the page-table owner, but is shared
+> > > > +	 *       with another entity.
+> > > > +	 *   10: The page is shared with, but not owned by the page-table owner.
+> > > > +	 *   11: Reserved for future use (lending).
+> > > > +	 */
+> > > > +	if (prot & KVM_PGTABLE_STATE_SHARED) {
+> > > > +		if (prot & KVM_PGTABLE_STATE_BORROWED)
+> > > > +			ignored_bits |= BIT(1);
+> > > > +		else
+> > > > +			ignored_bits |= BIT(0);
+> > > > +	}
+> > > > +
+> > > > +	return FIELD_PREP(KVM_PTE_LEAF_ATTR_IGNORED, ignored_bits);
+> > > > +}
+> > > > +
+> > > >  static int kvm_pgtable_visitor_cb(struct kvm_pgtable_walk_data *data, u64 addr,
+> > > >  				  u32 level, kvm_pte_t *ptep,
+> > > >  				  enum kvm_pgtable_walk_flags flag)
+> > > > @@ -357,6 +380,7 @@ static int hyp_set_prot_attr(enum kvm_pgtable_prot prot, kvm_pte_t *ptep)
+> > > >  	attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S1_AP, ap);
+> > > >  	attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S1_SH, sh);
+> > > >  	attr |= KVM_PTE_LEAF_ATTR_LO_S1_AF;
+> > > > +	attr |= pte_ignored_bit_prot(prot);
+> > > >  	*ptep = attr;
+> > > >  
+> > > >  	return 0;
+> > > > @@ -558,6 +582,7 @@ static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot p
+> > > >  
+> > > >  	attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S2_SH, sh);
+> > > >  	attr |= KVM_PTE_LEAF_ATTR_LO_S2_AF;
+> > > > +	attr |= pte_ignored_bit_prot(prot);
+> > > >  	*ptep = attr;
+> > > >  
+> > > >  	return 0;
+> > > 
+> > > How about kvm_pgtable_stage2_relax_perms()?
+> > 
+> > It should leave SW bits untouched, and it really felt like a path were
+> > we want to change permissions and nothing else. What did you have in
+> > mind?
 > 
-> Right. But this scheme doesn't apply to the guests, does it?
+> It isn't clear to me that it would not (cannot?) be used to change
+> other bits, given that it takes an arbitrary 'prot' set.
 
-Right, the meaning of a NULL PTE in guests will clearly be something
-different, but I guess the interpretation of what invalid mappings mean
-is up to the caller.
+Sure, though it already ignores KVM_PGTABLE_PROT_DEVICE.
 
-> Don't we
-> need something that is non-null to preserve the table refcounting?
+I guess the thing I find hard to reason about is that
+kvm_pgtable_stage2_relax_perms() is 'additive'. E.g. it can make a
+mapping RW if it was RO, but not the other way around. With the current
+patch-set it wasn't really clear how that should translate to
+KVM_PGTABLE_STATE_SHARED and such.
 
-Sure, but do we care? If the table entry gets zeroed we're then
-basically using an 'invalid block' mapping to annotate the entire block
-range with '0', whatever that means. For guests it won't mean much, but
-for the host that would mean sole ownership of the entire range.
+> If there is
+> such an intended restriction, we definitely should document it.
+
+Ack, that's definitely missing. And in fact I should probably make
+kvm_pgtable_stage2_relax_perms() return -EINVAL if we're passing prot
+values it can't handle.
+
+Cheers,
+Quentin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
