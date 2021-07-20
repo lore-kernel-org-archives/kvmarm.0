@@ -2,62 +2,59 @@ Return-Path: <SRS0=KNUW=MM=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5FC1C07E9B
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Jul 2021 13:14:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 371DEC07E95
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Jul 2021 13:16:08 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3558561165
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Jul 2021 13:14:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3558561165
+	by mail.kernel.org (Postfix) with ESMTP id B513461164
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Jul 2021 13:16:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B513461164
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9DEE54B0B3;
-	Tue, 20 Jul 2021 09:14:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 568104B090;
+	Tue, 20 Jul 2021 09:16:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id r91fWFchxB1H; Tue, 20 Jul 2021 09:14:10 -0400 (EDT)
+	with ESMTP id JnuSPzefdD1X; Tue, 20 Jul 2021 09:16:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 890F34B090;
-	Tue, 20 Jul 2021 09:14:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D79214A7FD;
+	Tue, 20 Jul 2021 09:16:02 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C2A444B090
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jul 2021 09:14:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C666E4A7FD
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jul 2021 09:16:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6qfRWpu-Oy+t for <kvmarm@lists.cs.columbia.edu>;
- Tue, 20 Jul 2021 09:14:03 -0400 (EDT)
+ with ESMTP id EKyrXeNJea3z for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 20 Jul 2021 09:16:00 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 983194B08E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jul 2021 09:14:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E5D464A51D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jul 2021 09:15:59 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 5969A610CC;
- Tue, 20 Jul 2021 13:14:02 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id EFFE4610D2;
+ Tue, 20 Jul 2021 13:15:58 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1m5pZQ-00EVoq-8p; Tue, 20 Jul 2021 14:14:00 +0100
-Date: Tue, 20 Jul 2021 14:13:59 +0100
-Message-ID: <87y2a186w8.wl-maz@kernel.org>
+ id 1m5pbI-00EVqR-FY; Tue, 20 Jul 2021 14:15:57 +0100
+Date: Tue, 20 Jul 2021 14:15:56 +0100
+Message-ID: <87wnpl86sz.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Quentin Perret <qperret@google.com>
-Subject: Re: [PATCH 03/16] KVM: arm64: Turn kvm_pgtable_stage2_set_owner into
- kvm_pgtable_stage2_annotate
-In-Reply-To: <YPa1NfbEDY3kVHzr@google.com>
+Subject: Re: [PATCH 04/16] KVM: arm64: Add MMIO checking infrastructure
+In-Reply-To: <YPav0Hye5Dat/yoL@google.com>
 References: <20210715163159.1480168-1-maz@kernel.org>
- <20210715163159.1480168-4-maz@kernel.org>
- <YPag0YQHB0nph5ji@google.com> <871r7t9tgi.wl-maz@kernel.org>
- <YPanmXfdr9rqnICK@google.com> <87zguh8c4l.wl-maz@kernel.org>
- <YPa1NfbEDY3kVHzr@google.com>
+ <20210715163159.1480168-5-maz@kernel.org>
+ <YPav0Hye5Dat/yoL@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -91,60 +88,51 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 20 Jul 2021 12:36:21 +0100,
+On Tue, 20 Jul 2021 12:13:20 +0100,
 Quentin Perret <qperret@google.com> wrote:
 > 
-> On Tuesday 20 Jul 2021 at 12:20:58 (+0100), Marc Zyngier wrote:
-> > On Tue, 20 Jul 2021 11:38:17 +0100,
-> > Quentin Perret <qperret@google.com> wrote:
-> > > 
-> > > On Tuesday 20 Jul 2021 at 11:21:17 (+0100), Marc Zyngier wrote:
-> > > > On Tue, 20 Jul 2021 11:09:21 +0100,
-> > > > Quentin Perret <qperret@google.com> wrote:
-> > > > > 
-> > > > > On Thursday 15 Jul 2021 at 17:31:46 (+0100), Marc Zyngier wrote:
-> > > > > > @@ -815,7 +807,7 @@ int kvm_pgtable_stage2_set_owner(struct kvm_pgtable *pgt, u64 addr, u64 size,
-> > > > > >  		.arg		= &map_data,
-> > > > > >  	};
-> > > > > >  
-> > > > > > -	if (owner_id > KVM_MAX_OWNER_ID)
-> > > > > > +	if (!annotation || (annotation & PTE_VALID))
-> > > > > >  		return -EINVAL;
-> > > > > 
-> > > > > Why do you consider annotation==0 invalid? The assumption so far has
-> > > > > been that the owner_id for the host is 0, so annotating a range with 0s
-> > > > > should be a valid operation -- this will be required when e.g.
-> > > > > transferring ownership of a page back to the host.
-> > > > 
-> > > > How do you then distinguish it from an empty entry that doesn't map to
-> > > > anything at all?
-> > > 
-> > > You don't, but that's beauty of it :)
-> > > 
-> > > The host starts with a PGD full of zeroes, which in terms of ownership
-> > > means that it owns the entire (I)PA space. And it loses ownership of a
-> > > page only when we explicitly annotate it with an owner id != 0.
-> > 
-> > Right. But this scheme doesn't apply to the guests, does it?
+> On Thursday 15 Jul 2021 at 17:31:47 (+0100), Marc Zyngier wrote:
+> > +struct s2_walk_data {
+> > +	kvm_pte_t	pteval;
+> > +	u32		level;
+> > +};
+> > +
+> > +static int s2_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+> > +		     enum kvm_pgtable_walk_flags flag, void * const arg)
+> > +{
+> > +	struct s2_walk_data *data = arg;
+> > +
+> > +	data->level = level;
+> > +	data->pteval = *ptep;
+> > +	return 0;
+> > +}
+> > +
+> > +/* Assumes mmu_lock taken */
+> > +static bool __check_ioguard_page(struct kvm_vcpu *vcpu, gpa_t ipa)
+> > +{
+> > +	struct s2_walk_data data;
+> > +	struct kvm_pgtable_walker walker = {
+> > +		.cb             = s2_walker,
+> > +		.flags          = KVM_PGTABLE_WALK_LEAF,
+> > +		.arg            = &data,
+> > +	};
+> > +
+> > +	kvm_pgtable_walk(vcpu->arch.hw_mmu->pgt, ALIGN_DOWN(ipa, PAGE_SIZE),
+> > +			 PAGE_SIZE, &walker);
+> > +
+> > +	/* Must be a PAGE_SIZE mapping with our annotation */
+> > +	return (BIT(ARM64_HW_PGTABLE_LEVEL_SHIFT(data.level)) == PAGE_SIZE &&
+> > +		data.pteval == MMIO_NOTE);
 > 
-> Right, the meaning of a NULL PTE in guests will clearly be something
-> different, but I guess the interpretation of what invalid mappings mean
-> is up to the caller.
+> Nit: you could do this check in the walker directly and check the return
+> value of kvm_pgtable_walk() instead. That would allow to get rid of
+> struct s2_walk_data.
 > 
-> > Don't we
-> > need something that is non-null to preserve the table refcounting?
-> 
-> Sure, but do we care? If the table entry gets zeroed we're then
-> basically using an 'invalid block' mapping to annotate the entire block
-> range with '0', whatever that means. For guests it won't mean much, but
-> for the host that would mean sole ownership of the entire range.
+> Also, though the compiler might be able to optimize, maybe simplify the
+> level check to level == (KVM_PGTABLE_MAX_LEVELS - 1)?
 
-I see. You let the refcount drop to 0, unmap the table and let
-transfer the 0 annotation one level up, covering the whole block.
-
-I guess I'll revert back to allowing 0, but I'd like to make sure we
-don't do that for guests unless we actually tear down the address
-space (checking for KVM_PGTABLE_S2_IDMAP should work).
+Yup, all good points. I guess I could do the same in my other series
+that parses the userspace PT to extract the level.
 
 Thanks,
 
