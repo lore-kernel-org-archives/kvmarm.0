@@ -2,76 +2,76 @@ Return-Path: <SRS0=KNUW=MM=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A3A8C07E95
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Jul 2021 08:04:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32F69C07E95
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Jul 2021 08:26:19 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D27DA61107
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Jul 2021 08:04:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D27DA61107
+	by mail.kernel.org (Postfix) with ESMTP id 9D0FB611F2
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Jul 2021 08:26:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D0FB611F2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E9BC4A3A3;
-	Tue, 20 Jul 2021 04:04:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 250AD4A4E5;
+	Tue, 20 Jul 2021 04:26:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 8BuDYQKDE6w1; Tue, 20 Jul 2021 04:04:44 -0400 (EDT)
+	with ESMTP id BgqK+2SFrrOr; Tue, 20 Jul 2021 04:26:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C42FB4B0CB;
-	Tue, 20 Jul 2021 04:04:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D6AE94B0CC;
+	Tue, 20 Jul 2021 04:26:16 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E767A4B0BF
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jul 2021 04:04:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A43D4A4E5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jul 2021 04:26:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tMFDI3b4ULGA for <kvmarm@lists.cs.columbia.edu>;
- Tue, 20 Jul 2021 04:04:37 -0400 (EDT)
+ with ESMTP id QwNGMGb4sdrZ for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 20 Jul 2021 04:26:14 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 287C14A3A3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jul 2021 04:04:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5158E4B0CA
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jul 2021 04:26:14 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id D4752610F7;
- Tue, 20 Jul 2021 08:04:35 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 57EC46101B;
+ Tue, 20 Jul 2021 08:26:13 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1m5kjx-00ESnt-U3; Tue, 20 Jul 2021 09:04:34 +0100
-Date: Tue, 20 Jul 2021 09:04:33 +0100
-Message-ID: <877dhl9zse.wl-maz@kernel.org>
+ id 1m5l4t-00ET2Y-Cp; Tue, 20 Jul 2021 09:26:11 +0100
+Date: Tue, 20 Jul 2021 09:26:10 +0100
+Message-ID: <875yx59ysd.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Quentin Perret <qperret@google.com>
-Subject: Re: [PATCH 02/16] KVM: arm64: Don't issue CMOs when the physical
- address is invalid
-In-Reply-To: <YPWzykpDMOhT2yh8@google.com>
-References: <20210715163159.1480168-1-maz@kernel.org>
- <20210715163159.1480168-3-maz@kernel.org>
- <YPWzykpDMOhT2yh8@google.com>
+Subject: Re: [PATCH 03/14] KVM: arm64: Continue stage-2 map when re-creating
+ mappings
+In-Reply-To: <YPV+2jQ/Q/ie14Fn@google.com>
+References: <20210719104735.3681732-1-qperret@google.com>
+ <20210719104735.3681732-4-qperret@google.com>
+ <87lf62jy9z.wl-maz@kernel.org> <YPV+2jQ/Q/ie14Fn@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: qperret@google.com, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, will@kernel.org, dbrazdil@google.com,
- vatsa@codeaurora.org, sdonthineni@nvidia.com, james.morse@arm.com,
- suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
+X-SA-Exim-Rcpt-To: qperret@google.com, james.morse@arm.com,
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com,
+ will@kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, ardb@kernel.org,
+ qwandor@google.com, tabba@google.com, dbrazdil@google.com,
+ kernel-team@android.com, wangyanan55@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kernel-team@android.com, kvm@vger.kernel.org,
- Srivatsa Vaddagiri <vatsa@codeaurora.org>, linux-kernel@vger.kernel.org,
- Shanker R Donthineni <sdonthineni@nvidia.com>, will@kernel.org,
+Cc: kernel-team@android.com, qwandor@google.com, will@kernel.org,
+ catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -89,65 +89,92 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 19 Jul 2021 18:18:02 +0100,
+On Mon, 19 Jul 2021 14:32:10 +0100,
 Quentin Perret <qperret@google.com> wrote:
 > 
-> On Thursday 15 Jul 2021 at 17:31:45 (+0100), Marc Zyngier wrote:
-> > Make sure we don't issue CMOs when mapping something that
-> > is not a memory address in the S2 page tables.
+> On Monday 19 Jul 2021 at 13:14:48 (+0100), Marc Zyngier wrote:
+> > On Mon, 19 Jul 2021 11:47:24 +0100,
+> > Quentin Perret <qperret@google.com> wrote:
+> > > 
+> > > The stage-2 map walkers currently return -EAGAIN when re-creating
+> > > identical mappings or only changing access permissions. This allows to
+> > > optimize mapping pages for concurrent (v)CPUs faulting on the same
+> > > page.
+> > > 
+> > > While this works as expected when touching one page-table leaf at a
+> > > time, this can lead to difficult situations when mapping larger ranges.
+> > > Indeed, a large map operation can fail in the middle if an existing
+> > > mapping is found in the range, even if it has compatible attributes,
+> > > hence leaving only half of the range mapped.
 > > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/hyp/pgtable.c | 16 ++++++++++------
-> >  1 file changed, 10 insertions(+), 6 deletions(-)
+> > I'm curious of when this can happen. We normally map a single leaf at
+> > a time, and we don't have a way to map multiple leaves at once: we
+> > either use the VMA base size or try to upgrade it to a THP, but the
+> > result is always a single leaf entry. What changed?
+> 
+> Nothing _yet_ :-)
+> 
+> The 'share' hypercall introduced near the end of the series allows to
+> share multiple physically contiguous pages in one go -- this is mostly
+> to allow sharing data-structures that are larger than a page.
+> 
+> So if one of the pages happens to be already mapped by the time the
+> hypercall is issued, mapping the range with the right SW bits becomes
+> difficult as kvm_pgtable_stage2_map() will fail halfway through, which
+> is tricky to handle.
+> 
+> This patch shouldn't change anything for existing users that only map
+> things that are nicely aligned at block/page granularity, but should
+> make the life of new users easier, so that seemed like a win.
+
+Right, but this is on a different path, right? Guests can never fault
+multiple mappings at once, and it takes you a host hypercall to
+perform this "multiple leaves at once".
+
+Is there any way we can restrict this to the hypercall? Or even
+better, keep the hypercall as a "one page at a time" thing? I can't
+imagine it being performance critical (it is a once-off, and only used
+over a rather small region of memory). Then, the called doesn't have
+to worry about the page already being mapped or not. This would also
+match the behaviour of what I do on the MMIO side.
+
+Or do you anticipate much gain from this being able to use block
+mappings?
+
+> 
+> > > To avoid having to deal with such failures in the caller, don't
+> > > interrupt the map operation when hitting existing PTEs, but make sure to
+> > > still return -EAGAIN so that user_mem_abort() can mark the page dirty
+> > > when needed.
 > > 
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > index 05321f4165e3..a5874ebd0354 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -619,12 +619,16 @@ static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
-> >  	}
-> >  
-> >  	/* Perform CMOs before installation of the guest stage-2 PTE */
-> > -	if (mm_ops->dcache_clean_inval_poc && stage2_pte_cacheable(pgt, new))
-> > -		mm_ops->dcache_clean_inval_poc(kvm_pte_follow(new, mm_ops),
-> > -						granule);
-> > -
-> > -	if (mm_ops->icache_inval_pou && stage2_pte_executable(new))
-> > -		mm_ops->icache_inval_pou(kvm_pte_follow(new, mm_ops), granule);
-> > +	if (kvm_phys_is_valid(phys)) {
-> > +		if (mm_ops->dcache_clean_inval_poc &&
-> > +		    stage2_pte_cacheable(pgt, new))
-> > +			mm_ops->dcache_clean_inval_poc(kvm_pte_follow(new,
-> > +								      mm_ops),
-> > +						       granule);
-> > +		if (mm_ops->icache_inval_pou && stage2_pte_executable(new))
-> > +			mm_ops->icache_inval_pou(kvm_pte_follow(new, mm_ops),
-> > +						 granule);
-> > +	}
+> > I don't follow you here: if you return -EAGAIN for a writable mapping,
+> > we don't account for the page to be dirty on the assumption that
+> > nothing has been mapped. But if there is a way to map more than a
+> > single entry and to get -EAGAIN at the same time, then we're bound to
+> > lose data on page eviction.
+> > 
+> > Can you shed some light on this?
 > 
-> Hrmpf so this makes me realize we have a problem here, not really caused
-> by your patch though.
+> Sure. For guests, hitting the -EAGAIN case means we've lost the race
+> with another vCPU that faulted the same page. In this case the other
+> vCPU either mapped the page RO, which means that our vCPU will then get
+> a permission fault next time we run it which will lead to the page being
+> marked dirty, or the other vCPU mapped the page RW in which case it
+> already marked the page dirty for us and we can safely re-enter the
+> guest without doing anything else.
 > 
-> Specifically, calling kvm_pgtable_stage2_set_owner() can lead to
-> overriding valid mappings with invalid mappings, which is effectively an
-> unmap operation. In this case we should issue CMOs when unmapping a
-> cacheable page to ensure it is clean to the PoC, like the
-> kvm_pgtable_stage2_unmap() does.
+> So what I meant by "still return -EAGAIN so that user_mem_abort() can
+> mark the page dirty when needed" is "make sure to mark the page dirty
+> only when necessary: if winning the race and marking the page RW, or
+> in the permission fault path". That is, by keeping the -EAGAIN I want to
+> make sure we don't mark the page dirty twice. (This might fine, but this
+> would be new behaviour, and it was not clear that would scale well to
+> many vCPUs faulting the same page).
+> 
+> I see how this wording can be highly confusing though, I'll and re-word
+> for the next version.
 
-You only need that if you to have a non-cacheable mapping to the same
-page. Otherwise, you will be fine.
-
-For pages that are moved from host-EL1 to EL2, we're good (I don't
-think we ever have a non-cachable mapping at EL2). However, once we
-start moving pages to guests, we'll need something.
-
-> Note that you patch is already an improvement over the current state of
-> things, because calling stage2_pte_cacheable(pgt, new),
-> kvm_pte_follow(new, mm_ops) and friends is bogus when 'new' is invalid
-
-Yeah, I had it mentally earmarked as a potential stable candidate. We
-may have to do a bit better in the light of the above though.
+I indeed found it pretty confusing. A reword would be much appreciated.
 
 Thanks,
 
