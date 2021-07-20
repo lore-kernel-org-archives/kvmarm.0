@@ -2,84 +2,91 @@ Return-Path: <SRS0=KNUW=MM=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29B68C636C8
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Jul 2021 14:03:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A4C0C07E9B
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Jul 2021 14:06:55 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9D7746113C
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Jul 2021 14:03:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D7746113C
+	by mail.kernel.org (Postfix) with ESMTP id 0B0A66113A
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Jul 2021 14:06:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B0A66113A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A4034B0DB;
-	Tue, 20 Jul 2021 10:03:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8EDB64A19F;
+	Tue, 20 Jul 2021 10:06:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id IpI6PY2MxYDd; Tue, 20 Jul 2021 10:03:51 -0400 (EDT)
+	with ESMTP id 0t1Iu7GrgH+T; Tue, 20 Jul 2021 10:06:53 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E20464A534;
-	Tue, 20 Jul 2021 10:03:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7ABFE4B0BE;
+	Tue, 20 Jul 2021 10:06:53 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EE9814A126
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jul 2021 10:03:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C1C44B0B3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jul 2021 10:06:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2Eq6TgYvRaR4 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 20 Jul 2021 10:03:49 -0400 (EDT)
-Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com
- [209.85.167.176])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CC0594A023
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jul 2021 10:03:49 -0400 (EDT)
-Received: by mail-oi1-f176.google.com with SMTP id a132so13771262oib.6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jul 2021 07:03:49 -0700 (PDT)
+ with ESMTP id JjOIor6-xrBv for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 20 Jul 2021 10:06:51 -0400 (EDT)
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com
+ [209.85.221.48])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1E9AD4A19F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jul 2021 10:06:51 -0400 (EDT)
+Received: by mail-wr1-f48.google.com with SMTP id f9so26136326wrq.11
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jul 2021 07:06:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=3pAi2IUwv7EdpJAk0boQH8aQmdEiZAI8a1a0cHarpI4=;
- b=tOwo8JvOI333zTSShr7G1VQA9f36JvMMNfNy1R4+AFu6wyd+zUTDRc3727tpBO3PTO
- CollJtLxZ1ie8UmiMdFJ2EwmFnHL7LVTZ1MwOUnb0/9VJ40wFwvdA4u4VoYw3xKLcRq+
- j3BiNhWmklGXaozYmLVL87ARe8dSQ+G0O6BuuPS+1jkZHknx87nIzCb0U5wh5fb1Pj9k
- z6Rj9DPISr0X2Wc9vqLTM4EmCRb4uz0xKXGaqCwwLg5xN811WE56OjyoHuKePwn7UC+F
- 9sCfaWQsLxa5QsFKDhwvoDHoKWtadr3X89+6EWT/j+Lj1Dmv0luQacJyQiqYXxY2Nf23
- FpJw==
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=4Y7wO3FmEg9E/e/M3ZFiJFbsJXbUsTlhUr/Aisk4F7w=;
+ b=lu1K4wCxmYTUEOAY0h4I+WRyY+GjDf9LqwrVn+apJAj+WQ78hw81zzGUFuz1g6DyzD
+ 3qjJUaBpmVOpkjVoLyrsJ2/Kc4LH4ZGWlBAJBu8wuvbeO9zuoda9yFQQPBdkmxhJI57J
+ 9VQmX8jPbHoZj/VB7XrOzE3R+N9O+zOSAI7IxpF0zzQLSaRhHjq8GzHtSuJWqOGYohS5
+ iImsZnRyOb/OjnPNtGHUwhR/fTpzZYbAWb8D6BlLVXBC2tA6VvwBF6tRNsDr7dRJvWtC
+ LPJTPTIGzM5jGa8K4Ylulif0sIoiFM/LeO/syFCA9ksIL6oJCzEirXmlegbA9itahNlu
+ HDMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=3pAi2IUwv7EdpJAk0boQH8aQmdEiZAI8a1a0cHarpI4=;
- b=JVKvatVVtStVE1czcmVGKGTyZi4UX3Ffd7vYLVZICp8u5t+LyV49pF95z75ovGvfkI
- Wr+tT4zXDwMk5oYlLD/gDCtR/B1Baedqf63Bv9t32ibOQi0hTBl4IvqCrvWErZGK+ClK
- e45Nn5t83psa9g9Kx4iS9RpY+XHc++8EBq0ZImDLVl0Uruo6v3GmwWEYSiwf1p1Lb5JX
- bq7nqoeV2UJo8JIIVpexLrAdknnfIwV5rMtGXHtHrUPMxeDBJJbfZND4Sa22Ibs7+8sA
- t225LbpCFe/AHzDrui1dcBat5DDRYz2hvP/3PuuvsKsuP7x1VE3YhfBYWivzfzX4SH1b
- g6kw==
-X-Gm-Message-State: AOAM530peRaEjsrm8hQ0GArriCmt9eYEj9A6XnZA+bT2S5+q6UfLIqvq
- wyK5Jbuc2YvoqRmBxb7eMwWVxDWBpWQ0TNqcdWKqJg==
-X-Google-Smtp-Source: ABdhPJy67+4yt2CQ9gqDe2NPUt44b6Ljx8YHSPr8w0AM4pzGQ7GWeDm6CdAiYnsIJo8vfqE2nz3OKjDc0mNnw3K+NQk=
-X-Received: by 2002:a05:6808:5a:: with SMTP id
- v26mr12146167oic.90.1626789829100; 
- Tue, 20 Jul 2021 07:03:49 -0700 (PDT)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=4Y7wO3FmEg9E/e/M3ZFiJFbsJXbUsTlhUr/Aisk4F7w=;
+ b=NDa32lGKvE5+YzvcBTxccRaGAlkP9g7nPLBqYUxpEqrUY/vFsyOxwMM+53lQhlVr6P
+ X1KCybpLRqLknWeHzrFqGMyqLC83+saKeo81mA6gln62P2sk1XxVuiqcU7cMz6chK5Wv
+ Gi2X4oUrReZLgXiah1/vCMvXhTJhsViCiL+O7lcJAPfn5r6USp9H5YNUI71xJzAfrC6M
+ H2tgUjF7z7dEYU9MlP8isZKzmU5TuGMB538gdCbKcOzj5jjU2zhuOwQmYJBrXefS4jNh
+ gQWs3LcSSQh9fgKK8E/vusK0atSGtY44O/BlTP1PUoogG4Svbduo8DPKnKXgV49UHpSo
+ ktug==
+X-Gm-Message-State: AOAM531u0X6OGanPC5qG9W/gzIQcjgUT7rDbUR/hnWa8vZbl3cYKkV9W
+ xD8LBg2PWz1NDyR99Mqd9hWgvQ==
+X-Google-Smtp-Source: ABdhPJxjEWqFqQoktHsVZL6arngMcaaXABAJUgOrUrQFloZHgHwZpBl3SXOVE0HVVWN1F/G91ZiY9Q==
+X-Received: by 2002:a05:6000:154c:: with SMTP id
+ 12mr36606989wry.393.1626790009958; 
+ Tue, 20 Jul 2021 07:06:49 -0700 (PDT)
+Received: from google.com ([2a00:79e0:d:210:ffa2:b757:e72a:11dd])
+ by smtp.gmail.com with ESMTPSA id d8sm24562783wrv.20.2021.07.20.07.06.48
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 20 Jul 2021 07:06:49 -0700 (PDT)
+Date: Tue, 20 Jul 2021 15:06:46 +0100
+From: Quentin Perret <qperret@google.com>
+To: Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH 08/14] KVM: arm64: Add support for tagging shared pages
+ in page-table
+Message-ID: <YPbYdtRx6dMH52oO@google.com>
+References: <20210719104735.3681732-1-qperret@google.com>
+ <20210719104735.3681732-9-qperret@google.com>
+ <CA+EHjTwmmV6EooG+Ykbso3G6nkjq=sbRzXH3vetazzPF5mO02g@mail.gmail.com>
 MIME-Version: 1.0
-References: <20210719160346.609914-1-tabba@google.com>
- <20210719160346.609914-6-tabba@google.com>
- <20210720133810.7q4k2yde57okgvmm@gator>
-In-Reply-To: <20210720133810.7q4k2yde57okgvmm@gator>
-From: Fuad Tabba <tabba@google.com>
-Date: Tue, 20 Jul 2021 15:03:12 +0100
-Message-ID: <CA+EHjTzW=GnG_zE=eregR7+WTLD-ASzajrMkinUMX=+Lfq3RcA@mail.gmail.com>
-Subject: Re: [PATCH v3 05/15] KVM: arm64: Refactor sys_regs.h, c for nVHE reuse
-To: Andrew Jones <drjones@redhat.com>
-Cc: kernel-team@android.com, kvm@vger.kernel.org, maz@kernel.org,
- pbonzini@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTwmmV6EooG+Ykbso3G6nkjq=sbRzXH3vetazzPF5mO02g@mail.gmail.com>
+Cc: kernel-team@android.com, qwandor@google.com, maz@kernel.org,
+ linux-kernel@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -96,182 +103,47 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
+On Tuesday 20 Jul 2021 at 14:48:09 (+0100), Fuad Tabba wrote:
+> This might tie in to Marc's comments for using enums, but
+> consolidating the translation between prot and ignored/software bits
+> in one place would be good: thinking about patch 10 as well, where you
+> get the prot from the ignored bits. Even though you have documented
+> it, I'm finding the part where a field can be borrowed and shared as
+> opposed to being only shared not very intuitive, and I need to reread
+> the comment here to remember the difference while going through the
+> code.
+> 
+> You also mention lending as potentially reserved for the future, but I
+> think that lending is the other side of borrowing (depends on who's
+> doing the giving/taking). I wonder if in this case it would be clearer
+> to describe it in terms of whether it's exclusively owned vs owned but
+> shared (for the owner), and just shared for the sharer...
 
-On Tue, Jul 20, 2021 at 2:38 PM Andrew Jones <drjones@redhat.com> wrote:
->
-> On Mon, Jul 19, 2021 at 05:03:36PM +0100, Fuad Tabba wrote:
-> > Refactor sys_regs.h and sys_regs.c to make it easier to reuse
-> > common code. It will be used in nVHE in a later patch.
-> >
-> > Note that the refactored code uses __inline_bsearch for find_reg
-> > instead of bsearch to avoid copying the bsearch code for nVHE.
-> >
-> > No functional change intended.
-> >
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > ---
-> >  arch/arm64/include/asm/sysreg.h |  3 +++
-> >  arch/arm64/kvm/sys_regs.c       | 30 +-----------------------------
-> >  arch/arm64/kvm/sys_regs.h       | 31 +++++++++++++++++++++++++++++++
-> >  3 files changed, 35 insertions(+), 29 deletions(-)
-> >
-> > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> > index 7b9c3acba684..326f49e7bd42 100644
-> > --- a/arch/arm64/include/asm/sysreg.h
-> > +++ b/arch/arm64/include/asm/sysreg.h
-> > @@ -1153,6 +1153,9 @@
-> >  #define ICH_VTR_A3V_SHIFT    21
-> >  #define ICH_VTR_A3V_MASK     (1 << ICH_VTR_A3V_SHIFT)
-> >
-> > +/* Extract the feature specified from the feature id register. */
-> > +#define FEATURE(x)   (GENMASK_ULL(x##_SHIFT + 3, x##_SHIFT))
->
-> I think the comment would be better as
->
->  Create a mask for the feature bits of the specified feature.
+Argh so I actually found the encoding pretty neat :/
+The idea is the following:
 
-I agree. I'll use this instead.
+  - an entity that has a page mapped as SHARED in its PT means it
+    doesn't have exclusive access to the page;
 
-> And, I think a more specific name than FEATURE would be better. Maybe
-> FEATURE_MASK or even ARM64_FEATURE_MASK ?
+  - an entity that has a page mapped as BORROWED in its PT means it has
+    access to a page it doesn't own;
 
-I think so too. ARM64_FEATURE_MASK is more descriptive than just FEATURE.
+From that we can build the states we need:
+
+  - when an entity shares a page with another, the original owner gets a
+    SHARED mapping, and the recipient a SHARED+BORROWED mapping.
+
+  - and in the future when/if we implement lending (which means an
+    entity gives exclusive access to a page to another entity, but
+    retains ownership) we can map the page in the recipient as
+    'BORROWED' only, but not 'SHARED'. And the original owner will have
+    an invalid mapping with a new state 'LENT', which is encoded with
+    both SW bits set.
+
+How does that sound? Did you have something else in mind?
 
 Thanks,
-/fuad
-
-> > +
-> >  #ifdef __ASSEMBLY__
-> >
-> >       .irp    num,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index 80a6e41cadad..1a939c464858 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -44,10 +44,6 @@
-> >   * 64bit interface.
-> >   */
-> >
-> > -#define reg_to_encoding(x)                                           \
-> > -     sys_reg((u32)(x)->Op0, (u32)(x)->Op1,                           \
-> > -             (u32)(x)->CRn, (u32)(x)->CRm, (u32)(x)->Op2)
-> > -
-> >  static bool read_from_write_only(struct kvm_vcpu *vcpu,
-> >                                struct sys_reg_params *params,
-> >                                const struct sys_reg_desc *r)
-> > @@ -1026,8 +1022,6 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
-> >       return true;
-> >  }
-> >
-> > -#define FEATURE(x)   (GENMASK_ULL(x##_SHIFT + 3, x##_SHIFT))
-> > -
-> >  /* Read a sanitised cpufeature ID register by sys_reg_desc */
-> >  static u64 read_id_reg(const struct kvm_vcpu *vcpu,
-> >               struct sys_reg_desc const *r, bool raz)
-> > @@ -2106,23 +2100,6 @@ static int check_sysreg_table(const struct sys_reg_desc *table, unsigned int n,
-> >       return 0;
-> >  }
-> >
-> > -static int match_sys_reg(const void *key, const void *elt)
-> > -{
-> > -     const unsigned long pval = (unsigned long)key;
-> > -     const struct sys_reg_desc *r = elt;
-> > -
-> > -     return pval - reg_to_encoding(r);
-> > -}
-> > -
-> > -static const struct sys_reg_desc *find_reg(const struct sys_reg_params *params,
-> > -                                      const struct sys_reg_desc table[],
-> > -                                      unsigned int num)
-> > -{
-> > -     unsigned long pval = reg_to_encoding(params);
-> > -
-> > -     return bsearch((void *)pval, table, num, sizeof(table[0]), match_sys_reg);
-> > -}
-> > -
-> >  int kvm_handle_cp14_load_store(struct kvm_vcpu *vcpu)
-> >  {
-> >       kvm_inject_undefined(vcpu);
-> > @@ -2365,13 +2342,8 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu)
-> >
-> >       trace_kvm_handle_sys_reg(esr);
-> >
-> > -     params.Op0 = (esr >> 20) & 3;
-> > -     params.Op1 = (esr >> 14) & 0x7;
-> > -     params.CRn = (esr >> 10) & 0xf;
-> > -     params.CRm = (esr >> 1) & 0xf;
-> > -     params.Op2 = (esr >> 17) & 0x7;
-> > +     params = esr_sys64_to_params(esr);
-> >       params.regval = vcpu_get_reg(vcpu, Rt);
-> > -     params.is_write = !(esr & 1);
-> >
-> >       ret = emulate_sys_reg(vcpu, &params);
-> >
-> > diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-> > index 9d0621417c2a..cc0cc95a0280 100644
-> > --- a/arch/arm64/kvm/sys_regs.h
-> > +++ b/arch/arm64/kvm/sys_regs.h
-> > @@ -11,6 +11,12 @@
-> >  #ifndef __ARM64_KVM_SYS_REGS_LOCAL_H__
-> >  #define __ARM64_KVM_SYS_REGS_LOCAL_H__
-> >
-> > +#include <linux/bsearch.h>
-> > +
-> > +#define reg_to_encoding(x)                                           \
-> > +     sys_reg((u32)(x)->Op0, (u32)(x)->Op1,                           \
-> > +             (u32)(x)->CRn, (u32)(x)->CRm, (u32)(x)->Op2)
-> > +
-> >  struct sys_reg_params {
-> >       u8      Op0;
-> >       u8      Op1;
-> > @@ -21,6 +27,14 @@ struct sys_reg_params {
-> >       bool    is_write;
-> >  };
-> >
-> > +#define esr_sys64_to_params(esr)                                               \
-> > +     ((struct sys_reg_params){ .Op0 = ((esr) >> 20) & 3,                    \
-> > +                               .Op1 = ((esr) >> 14) & 0x7,                  \
-> > +                               .CRn = ((esr) >> 10) & 0xf,                  \
-> > +                               .CRm = ((esr) >> 1) & 0xf,                   \
-> > +                               .Op2 = ((esr) >> 17) & 0x7,                  \
-> > +                               .is_write = !((esr) & 1) })
-> > +
-> >  struct sys_reg_desc {
-> >       /* Sysreg string for debug */
-> >       const char *name;
-> > @@ -152,6 +166,23 @@ static inline int cmp_sys_reg(const struct sys_reg_desc *i1,
-> >       return i1->Op2 - i2->Op2;
-> >  }
-> >
-> > +static inline int match_sys_reg(const void *key, const void *elt)
-> > +{
-> > +     const unsigned long pval = (unsigned long)key;
-> > +     const struct sys_reg_desc *r = elt;
-> > +
-> > +     return pval - reg_to_encoding(r);
-> > +}
-> > +
-> > +static inline const struct sys_reg_desc *
-> > +find_reg(const struct sys_reg_params *params, const struct sys_reg_desc table[],
-> > +      unsigned int num)
-> > +{
-> > +     unsigned long pval = reg_to_encoding(params);
-> > +
-> > +     return __inline_bsearch((void *)pval, table, num, sizeof(table[0]), match_sys_reg);
-> > +}
-> > +
-> >  const struct sys_reg_desc *find_reg_by_id(u64 id,
-> >                                         struct sys_reg_params *params,
-> >                                         const struct sys_reg_desc table[],
-> > --
-> > 2.32.0.402.g57bb445576-goog
-> >
->
-> Otherwise
->
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
->
+Quentin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
