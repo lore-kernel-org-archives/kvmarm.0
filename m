@@ -2,87 +2,74 @@ Return-Path: <SRS0=KNUW=MM=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FSL_HELO_FAKE,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36681C07E95
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Jul 2021 11:16:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB98EC07E95
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Jul 2021 11:21:07 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id AF45461165
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Jul 2021 11:16:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF45461165
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 402A261165
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Jul 2021 11:21:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 402A261165
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C6344A531;
-	Tue, 20 Jul 2021 07:16:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CC49A4A531;
+	Tue, 20 Jul 2021 07:21:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 4dhEzS3-MZtU; Tue, 20 Jul 2021 07:16:24 -0400 (EDT)
+	with ESMTP id DmYH+T3Ypb5L; Tue, 20 Jul 2021 07:21:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F8134A95C;
-	Tue, 20 Jul 2021 07:16:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 422534B0BF;
+	Tue, 20 Jul 2021 07:21:05 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 58FED4A193
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jul 2021 07:16:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E1B394A193
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jul 2021 07:21:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QiI6Zy5QQgJ1 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 20 Jul 2021 07:16:22 -0400 (EDT)
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com
- [209.85.221.42])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4AC0440808
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jul 2021 07:16:22 -0400 (EDT)
-Received: by mail-wr1-f42.google.com with SMTP id l7so25561691wrv.7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jul 2021 04:16:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=lpz51H3kvzr0DXJiE5RSxJNphxVtTP/JsLlCDtT69nE=;
- b=qIC8S+W4YEqX+/j1F2FfOOKMPB60fsBSS7jpd0cT0fUpSNivYVwV9Lc7AMV3WoXmMw
- v9CgSh/vI2qWbAPurBZw5TN+KhWhe340MqIv4ApDr2YkuHg+Csl3bWm9i8QeClaaikDF
- uMaiwpDXgtAjXyOpfnmR2iYIblGFLYIY3j+yTDSwccOVQiIL8S3kXlqDClfWK41H+kgw
- kmra3575DBZwkejSgK4e4RWzFoz1f0sOdv7uO07ytjh1dww1naA5hdZhhZFRFHVDi3Yj
- hQdxBPLQFqiPS5CCQ0OE+yh0ewTntdOyy+voxTzTeMDdMan7IlXYk0lQLYB1dMXeHg6A
- /60Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=lpz51H3kvzr0DXJiE5RSxJNphxVtTP/JsLlCDtT69nE=;
- b=qH9L5V6J7uup0596RzOS7kHHT5Urt0EDn/ZYQCRQfPemLWDLWTe+v9OE1UEF2/jvgW
- r9iMUC3rYp+Ncvnv+BKtQNq/KL6ZutDlDKZ6NdWVWTw40HPJmvcOvJjcVvFu0nsmXfsK
- X3RscXawwAn8/nWlTEXmWddlxde4lXS8uYOBzsAdp6ULwYvXB76ZcDKiEeozyIW0gFoB
- qvEQ7TiiBN1A4M1idPlUi8icgYq29ttJAf3Dqpa1IIFms/lz8HsMRGso5z55W5oYOuBR
- n4haezGd9ge2Yat4z7skNdeI2qfB3ICSZ6rmsKw9RG8INWzQVlb/4WekKE+wmuP6AKL1
- stqQ==
-X-Gm-Message-State: AOAM533MEJixE9b90YNi4bVROHDUCfFHuCOkFr9UTriPPw7j/VboVEsD
- XDwPDutBlDLiJb0pNHYiLn/vYA==
-X-Google-Smtp-Source: ABdhPJzyDbPtX+5Q7MPnRmTCUDtOQw0hbyz28e4E5BQ9dsfjysvHdxUpebOfYRKz9mVC05s+yeb7VQ==
-X-Received: by 2002:a05:6000:102:: with SMTP id
- o2mr35120793wrx.299.1626779781184; 
- Tue, 20 Jul 2021 04:16:21 -0700 (PDT)
-Received: from google.com ([2a00:79e0:d:210:83e0:11ac:c870:2b97])
- by smtp.gmail.com with ESMTPSA id a8sm23462978wrt.61.2021.07.20.04.16.20
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 20 Jul 2021 04:16:20 -0700 (PDT)
-Date: Tue, 20 Jul 2021 12:16:17 +0100
-From: Quentin Perret <qperret@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 15/16] arm64: Add a helper to retrieve the PTE of a fixmap
-Message-ID: <YPawgYJYfD+EfXBW@google.com>
+ with ESMTP id qg+SO1isgbqi for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 20 Jul 2021 07:21:02 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EDCD54A126
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jul 2021 07:21:01 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id CE68B6113A;
+ Tue, 20 Jul 2021 11:21:00 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1m5no2-00EUqR-Qa; Tue, 20 Jul 2021 12:20:58 +0100
+Date: Tue, 20 Jul 2021 12:20:58 +0100
+Message-ID: <87zguh8c4l.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Quentin Perret <qperret@google.com>
+Subject: Re: [PATCH 03/16] KVM: arm64: Turn kvm_pgtable_stage2_set_owner into
+ kvm_pgtable_stage2_annotate
+In-Reply-To: <YPanmXfdr9rqnICK@google.com>
 References: <20210715163159.1480168-1-maz@kernel.org>
- <20210715163159.1480168-16-maz@kernel.org>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210715163159.1480168-16-maz@kernel.org>
+ <20210715163159.1480168-4-maz@kernel.org>
+ <YPag0YQHB0nph5ji@google.com> <871r7t9tgi.wl-maz@kernel.org>
+ <YPanmXfdr9rqnICK@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: qperret@google.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, will@kernel.org, dbrazdil@google.com,
+ vatsa@codeaurora.org, sdonthineni@nvidia.com, james.morse@arm.com,
+ suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 Cc: kernel-team@android.com, kvm@vger.kernel.org,
  Srivatsa Vaddagiri <vatsa@codeaurora.org>, linux-kernel@vger.kernel.org,
  Shanker R Donthineni <sdonthineni@nvidia.com>, will@kernel.org,
@@ -103,62 +90,45 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thursday 15 Jul 2021 at 17:31:58 (+0100), Marc Zyngier wrote:
-> In order to transfer the early mapping state into KVM's MMIO
-> guard infrastucture, provide a small helper that will retrieve
-> the associated PTE.
+On Tue, 20 Jul 2021 11:38:17 +0100,
+Quentin Perret <qperret@google.com> wrote:
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/fixmap.h |  2 ++
->  arch/arm64/mm/mmu.c             | 15 +++++++++++++++
->  2 files changed, 17 insertions(+)
+> On Tuesday 20 Jul 2021 at 11:21:17 (+0100), Marc Zyngier wrote:
+> > On Tue, 20 Jul 2021 11:09:21 +0100,
+> > Quentin Perret <qperret@google.com> wrote:
+> > > 
+> > > On Thursday 15 Jul 2021 at 17:31:46 (+0100), Marc Zyngier wrote:
+> > > > @@ -815,7 +807,7 @@ int kvm_pgtable_stage2_set_owner(struct kvm_pgtable *pgt, u64 addr, u64 size,
+> > > >  		.arg		= &map_data,
+> > > >  	};
+> > > >  
+> > > > -	if (owner_id > KVM_MAX_OWNER_ID)
+> > > > +	if (!annotation || (annotation & PTE_VALID))
+> > > >  		return -EINVAL;
+> > > 
+> > > Why do you consider annotation==0 invalid? The assumption so far has
+> > > been that the owner_id for the host is 0, so annotating a range with 0s
+> > > should be a valid operation -- this will be required when e.g.
+> > > transferring ownership of a page back to the host.
+> > 
+> > How do you then distinguish it from an empty entry that doesn't map to
+> > anything at all?
 > 
-> diff --git a/arch/arm64/include/asm/fixmap.h b/arch/arm64/include/asm/fixmap.h
-> index 4335800201c9..1aae625b944f 100644
-> --- a/arch/arm64/include/asm/fixmap.h
-> +++ b/arch/arm64/include/asm/fixmap.h
-> @@ -105,6 +105,8 @@ void __init early_fixmap_init(void);
->  
->  extern void __set_fixmap(enum fixed_addresses idx, phys_addr_t phys, pgprot_t prot);
->  
-> +extern pte_t *__get_fixmap_pte(enum fixed_addresses idx);
-> +
->  #include <asm-generic/fixmap.h>
->  
->  #endif /* !__ASSEMBLY__ */
-> diff --git a/arch/arm64/mm/mmu.c b/arch/arm64/mm/mmu.c
-> index d74586508448..f1b7abd04025 100644
-> --- a/arch/arm64/mm/mmu.c
-> +++ b/arch/arm64/mm/mmu.c
-> @@ -1286,6 +1286,21 @@ void __set_fixmap(enum fixed_addresses idx,
->  	}
->  }
->  
-> +pte_t *__get_fixmap_pte(enum fixed_addresses idx)
-> +{
-> +	unsigned long 	addr = __fix_to_virt(idx);
+> You don't, but that's beauty of it :)
+> 
+> The host starts with a PGD full of zeroes, which in terms of ownership
+> means that it owns the entire (I)PA space. And it loses ownership of a
+> page only when we explicitly annotate it with an owner id != 0.
 
-Nit: odd spacing here.
+Right. But this scheme doesn't apply to the guests, does it? Don't we
+need something that is non-null to preserve the table refcounting?
 
-> +	pte_t *ptep;
-> +
-> +	BUG_ON(idx <= FIX_HOLE || idx >= __end_of_fixed_addresses);
-> +
-> +	ptep = fixmap_pte(addr);
-> +
-> +	if (!pte_valid(*ptep))
-> +		return NULL;
-> +
-> +	return ptep;
-> +}
-> +
->  void *__init fixmap_remap_fdt(phys_addr_t dt_phys, int *size, pgprot_t prot)
->  {
->  	const u64 dt_virt_base = __fix_to_virt(FIX_FDT);
-> -- 
-> 2.30.2
-> 
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
