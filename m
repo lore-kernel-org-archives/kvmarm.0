@@ -2,91 +2,78 @@ Return-Path: <SRS0=KNUW=MM=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3BC9C07E9B
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Jul 2021 11:57:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5FC1C07E9B
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Jul 2021 13:14:16 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3D20761164
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Jul 2021 11:57:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D20761164
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 3558561165
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Jul 2021 13:14:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3558561165
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B02214B0CA;
-	Tue, 20 Jul 2021 07:57:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9DEE54B0B3;
+	Tue, 20 Jul 2021 09:14:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id WG7ThJDVrogq; Tue, 20 Jul 2021 07:56:59 -0400 (EDT)
+	with ESMTP id r91fWFchxB1H; Tue, 20 Jul 2021 09:14:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A5BBE4B098;
-	Tue, 20 Jul 2021 07:56:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 890F34B090;
+	Tue, 20 Jul 2021 09:14:10 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AEDED4B08E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jul 2021 07:56:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C2A444B090
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jul 2021 09:14:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uBIr1HpSShG4 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 20 Jul 2021 07:56:57 -0400 (EDT)
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com
- [209.85.128.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A77294A32E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jul 2021 07:56:57 -0400 (EDT)
-Received: by mail-wm1-f45.google.com with SMTP id
- a23-20020a05600c2257b0290236ec98bebaso1888269wmm.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jul 2021 04:56:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=WheQ7fUX5EA867I+bv9cFye5SAD4lIhGyGX5hYkcj+M=;
- b=vhIcOCOvy5Rai9IUroGOqHvmtz2lTrczf34W0vWXkqQkyInbPoQYwfN0oToFxuLqji
- ir9eSpzqiHc4OYCUazxINKpDTodBu3AhlbpSxd7yywx03U7AmZ2V27Tz9BMu5d6Y4dqQ
- 4nQTxB8Ji3Ng/pegFcNH2Lwx7Evla81MoA0JPk4OFxMNXo6T6zsBd9rZy2w3QhMQq/Rb
- /SEWgi8DzAYYNDXHhXGjJimRiuoL0wwvbGpG7AYgfjYuKeoSm2a9B6gvWOpYVLFIxC02
- SocqIuB4fm7W3uVn4Leh6atXqmdtuTkkskx06YtjEMbA/2vDqNc3uNraOjezdjS8A6iz
- V5Pw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=WheQ7fUX5EA867I+bv9cFye5SAD4lIhGyGX5hYkcj+M=;
- b=qN6STcT2XmsgMSN8uILrW60OL9nlaPV06bO2OB07yCJqjtSYWF3NNb/F11ivGf7Pw5
- 2mJ3xDTLtzw29d6eM3D/x4qLd86yZnBpJx2YfU+FvVbtAQekZLnPXinwxvCcipVmhrUz
- n4mHepUlIroiBTH9LxZhij/8KLpAEOMTjUQgApB+yozMrwKgs0ZkqpPp2uxcotmGWplc
- Ly3dqq2QXJ6tDHDxUEi/RxqCYquiYI230b/zFGxMt4/57AuqIM5h3hmzHdvaBN3m+jmV
- Pv/DUdYsQBCgNNLVzwLrKMa02EGvfo5mshIwgpp2xIgoxRBMGi0qLFu9mdCfn6HYegtg
- hAZw==
-X-Gm-Message-State: AOAM530M9feUw6wT6pSyqOW5uXcoyRXfT9TCQ5zugvrSz9RVhKdYZo/V
- DBe5GD3w941LLOgs47OQSbJxew==
-X-Google-Smtp-Source: ABdhPJwJrV/b4HrNOBTUVc50mwLqlvQcj8GwTPDgrlDwpIuPjeOwLY1hcD8a9O+QoPfgfmLgXfG+yQ==
-X-Received: by 2002:a1c:1f47:: with SMTP id f68mr31394200wmf.58.1626782216570; 
- Tue, 20 Jul 2021 04:56:56 -0700 (PDT)
-Received: from google.com ([2a00:79e0:d:210:83e0:11ac:c870:2b97])
- by smtp.gmail.com with ESMTPSA id j12sm23997076wrq.83.2021.07.20.04.56.55
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 20 Jul 2021 04:56:55 -0700 (PDT)
-Date: Tue, 20 Jul 2021 12:56:52 +0100
-From: Quentin Perret <qperret@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 03/14] KVM: arm64: Continue stage-2 map when re-creating
- mappings
-Message-ID: <YPa6BGuUFjw8do+o@google.com>
-References: <20210719104735.3681732-1-qperret@google.com>
- <20210719104735.3681732-4-qperret@google.com>
- <87lf62jy9z.wl-maz@kernel.org> <YPV+2jQ/Q/ie14Fn@google.com>
- <875yx59ysd.wl-maz@kernel.org>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <875yx59ysd.wl-maz@kernel.org>
-Cc: kernel-team@android.com, qwandor@google.com, will@kernel.org,
- catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
+ with ESMTP id 6qfRWpu-Oy+t for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 20 Jul 2021 09:14:03 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 983194B08E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jul 2021 09:14:03 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 5969A610CC;
+ Tue, 20 Jul 2021 13:14:02 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1m5pZQ-00EVoq-8p; Tue, 20 Jul 2021 14:14:00 +0100
+Date: Tue, 20 Jul 2021 14:13:59 +0100
+Message-ID: <87y2a186w8.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Quentin Perret <qperret@google.com>
+Subject: Re: [PATCH 03/16] KVM: arm64: Turn kvm_pgtable_stage2_set_owner into
+ kvm_pgtable_stage2_annotate
+In-Reply-To: <YPa1NfbEDY3kVHzr@google.com>
+References: <20210715163159.1480168-1-maz@kernel.org>
+ <20210715163159.1480168-4-maz@kernel.org>
+ <YPag0YQHB0nph5ji@google.com> <871r7t9tgi.wl-maz@kernel.org>
+ <YPanmXfdr9rqnICK@google.com> <87zguh8c4l.wl-maz@kernel.org>
+ <YPa1NfbEDY3kVHzr@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: qperret@google.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, will@kernel.org, dbrazdil@google.com,
+ vatsa@codeaurora.org, sdonthineni@nvidia.com, james.morse@arm.com,
+ suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, kvm@vger.kernel.org,
+ Srivatsa Vaddagiri <vatsa@codeaurora.org>, linux-kernel@vger.kernel.org,
+ Shanker R Donthineni <sdonthineni@nvidia.com>, will@kernel.org,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -104,33 +91,67 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tuesday 20 Jul 2021 at 09:26:10 (+0100), Marc Zyngier wrote:
-> Right, but this is on a different path, right? Guests can never fault
-> multiple mappings at once, and it takes you a host hypercall to
-> perform this "multiple leaves at once".
-
-Right.
-
-> Is there any way we can restrict this to the hypercall? Or even
-> better, keep the hypercall as a "one page at a time" thing? I can't
-> imagine it being performance critical (it is a once-off, and only used
-> over a rather small region of memory). Then, the called doesn't have
-> to worry about the page already being mapped or not. This would also
-> match the behaviour of what I do on the MMIO side.
+On Tue, 20 Jul 2021 12:36:21 +0100,
+Quentin Perret <qperret@google.com> wrote:
 > 
-> Or do you anticipate much gain from this being able to use block
-> mappings?
+> On Tuesday 20 Jul 2021 at 12:20:58 (+0100), Marc Zyngier wrote:
+> > On Tue, 20 Jul 2021 11:38:17 +0100,
+> > Quentin Perret <qperret@google.com> wrote:
+> > > 
+> > > On Tuesday 20 Jul 2021 at 11:21:17 (+0100), Marc Zyngier wrote:
+> > > > On Tue, 20 Jul 2021 11:09:21 +0100,
+> > > > Quentin Perret <qperret@google.com> wrote:
+> > > > > 
+> > > > > On Thursday 15 Jul 2021 at 17:31:46 (+0100), Marc Zyngier wrote:
+> > > > > > @@ -815,7 +807,7 @@ int kvm_pgtable_stage2_set_owner(struct kvm_pgtable *pgt, u64 addr, u64 size,
+> > > > > >  		.arg		= &map_data,
+> > > > > >  	};
+> > > > > >  
+> > > > > > -	if (owner_id > KVM_MAX_OWNER_ID)
+> > > > > > +	if (!annotation || (annotation & PTE_VALID))
+> > > > > >  		return -EINVAL;
+> > > > > 
+> > > > > Why do you consider annotation==0 invalid? The assumption so far has
+> > > > > been that the owner_id for the host is 0, so annotating a range with 0s
+> > > > > should be a valid operation -- this will be required when e.g.
+> > > > > transferring ownership of a page back to the host.
+> > > > 
+> > > > How do you then distinguish it from an empty entry that doesn't map to
+> > > > anything at all?
+> > > 
+> > > You don't, but that's beauty of it :)
+> > > 
+> > > The host starts with a PGD full of zeroes, which in terms of ownership
+> > > means that it owns the entire (I)PA space. And it loses ownership of a
+> > > page only when we explicitly annotate it with an owner id != 0.
+> > 
+> > Right. But this scheme doesn't apply to the guests, does it?
+> 
+> Right, the meaning of a NULL PTE in guests will clearly be something
+> different, but I guess the interpretation of what invalid mappings mean
+> is up to the caller.
+> 
+> > Don't we
+> > need something that is non-null to preserve the table refcounting?
+> 
+> Sure, but do we care? If the table entry gets zeroed we're then
+> basically using an 'invalid block' mapping to annotate the entire block
+> range with '0', whatever that means. For guests it won't mean much, but
+> for the host that would mean sole ownership of the entire range.
 
-Not really no, especially given that mappings of shared pages will be
-forced to page granularity thanks to the other patch we discussed in
-this series. I was just hoping to reduce the overhead a bit by reducing
-the number of hypercalls. But as you said, this probably doesn't matter
-all that much, so happy to rework that. I'll look into making the hcall
-use one page at a time, and hopefully that'll simplify a few other
-things in the check_host_share_hyp() path near the end of this series.
+I see. You let the refcount drop to 0, unmap the table and let
+transfer the 0 annotation one level up, covering the whole block.
+
+I guess I'll revert back to allowing 0, but I'd like to make sure we
+don't do that for guests unless we actually tear down the address
+space (checking for KVM_PGTABLE_S2_IDMAP should work).
 
 Thanks,
-Quentin
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
