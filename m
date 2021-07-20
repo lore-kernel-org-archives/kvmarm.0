@@ -2,89 +2,62 @@ Return-Path: <SRS0=KNUW=MM=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8378C07E95
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Jul 2021 15:49:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C79A3C07E95
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Jul 2021 16:43:39 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 57944610D2
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Jul 2021 15:49:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57944610D2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 19B7D610C7
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Jul 2021 16:43:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19B7D610C7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C37D24B086;
-	Tue, 20 Jul 2021 11:49:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 98D1D4A00B;
+	Tue, 20 Jul 2021 12:43:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jtJA-V04oFT1; Tue, 20 Jul 2021 11:49:52 -0400 (EDT)
+	with ESMTP id y5VuKB6bhZyi; Tue, 20 Jul 2021 12:43:37 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 96A304B08A;
-	Tue, 20 Jul 2021 11:49:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 386794A193;
+	Tue, 20 Jul 2021 12:43:37 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DC70749F83
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jul 2021 11:49:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E45214A00B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jul 2021 12:43:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Rol-SVrBHLU9 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 20 Jul 2021 11:49:50 -0400 (EDT)
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com
- [209.85.221.48])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7E30E49F6C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jul 2021 11:49:50 -0400 (EDT)
-Received: by mail-wr1-f48.google.com with SMTP id k4so26517976wrc.8
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jul 2021 08:49:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=eXamM+sMZZfyW2rB3syre/v13RlKOutdbrix8Hieb/Q=;
- b=KXp0zKrUI/OXoRw6lXxx2SFUUXaOZwzGxopbvF0uAfHTw7ZmIku2LexAmSY8NEHCGQ
- K5WN0Y8Jo3COz5c3QitqdFAQNczB2y0+XoewDy5ZSAI5R78/TdP4nbqPKFtoTSTfunVl
- bYN8+t4/ZagWjaeYdraSMxMDpI8Hog34PDuKoXSZx9FX+J+2o6wqUoAD9MttLM/PKiro
- OCwm/Cvoam/U9zF03GieeDkrvVkMT0/cqwSXZxbvvcGAbOXoUBAlCKlMWMmqAj7lHMtD
- X5g2NJEkHfXzydWS8RU//uFnq6ZimmZw6TPCCxXOqcqeMnwLuORTvkgHMukdmC1e5bTB
- emKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=eXamM+sMZZfyW2rB3syre/v13RlKOutdbrix8Hieb/Q=;
- b=od5LBow1aL0ejuke2E3gWy2EZt+hn9dQecVG6TaE6J/Ipx+3qFIq1mLCI8psAmEg6p
- GSRwuVSfF5TXzJx5+8lfqi86GLZsD9092H48oaU/LPK1gLyL0Vjv+/u1ZSjveWRaqebo
- i2pF6WUdiydF3XbhwPZEFKzmaWzEszWjcT3OlkSbRwgbDj1xA3KofpBsTw3p3wC5bVSb
- qcXdUY/CVbP4OMmpXO0drFqam+1iO5bhoxFkqRxs3gpLhUqm9H1CAvlor303K+8cSaRE
- AjeQu91VXhkKNLqNWOcvkeOKYuNX6HpMVOgl5lI9ZnuYa/mu57XoVCe5GNMIzokN/2Fd
- TwqQ==
-X-Gm-Message-State: AOAM5326fP2k1VzE0Dg0PuVOrvAssiwuq/lzmKBQS/5Dj60YjJWe9iOx
- 50ceDdhY1q75giFg8hR0OJa2tw==
-X-Google-Smtp-Source: ABdhPJyzRWkzFreaGWXMPsTfkWs7PmiScWdF0pFWpbrQIca+q2nIlIPzY5Ms7/DYn3Ihu8xo8lE/SQ==
-X-Received: by 2002:adf:efc6:: with SMTP id i6mr36363480wrp.213.1626796189365; 
- Tue, 20 Jul 2021 08:49:49 -0700 (PDT)
-Received: from google.com ([2a00:79e0:d:210:ffa2:b757:e72a:11dd])
- by smtp.gmail.com with ESMTPSA id c2sm23910164wrs.60.2021.07.20.08.49.48
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 20 Jul 2021 08:49:48 -0700 (PDT)
-Date: Tue, 20 Jul 2021 16:49:45 +0100
-From: Quentin Perret <qperret@google.com>
+ with ESMTP id E662FnDx9Ofv for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 20 Jul 2021 12:43:35 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8530040FC7
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jul 2021 12:43:35 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A154C31B;
+ Tue, 20 Jul 2021 09:43:34 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DA2B33F694;
+ Tue, 20 Jul 2021 09:43:32 -0700 (PDT)
+Subject: Re: [PATCH v2 4/4] KVM: arm64: Remove PMSWINC_EL0 shadow register
 To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 04/16] KVM: arm64: Add MMIO checking infrastructure
-Message-ID: <YPbwmVk1YD9+y7tr@google.com>
-References: <20210715163159.1480168-1-maz@kernel.org>
- <20210715163159.1480168-5-maz@kernel.org>
- <YPav0Hye5Dat/yoL@google.com> <87wnpl86sz.wl-maz@kernel.org>
+References: <20210719123902.1493805-1-maz@kernel.org>
+ <20210719123902.1493805-5-maz@kernel.org>
+ <c1a63908-b55c-bdf8-b8ba-5a43f2e99e1f@arm.com>
+ <f2b655d0977cde5483716f58ba2ab739@kernel.org>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <9ad0f6a5-fcd0-0179-efa7-7b35ed36e2ff@arm.com>
+Date: Tue, 20 Jul 2021 17:44:32 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <87wnpl86sz.wl-maz@kernel.org>
-Cc: kernel-team@android.com, kvm@vger.kernel.org,
- Srivatsa Vaddagiri <vatsa@codeaurora.org>, linux-kernel@vger.kernel.org,
- Shanker R Donthineni <sdonthineni@nvidia.com>, will@kernel.org,
+In-Reply-To: <f2b655d0977cde5483716f58ba2ab739@kernel.org>
+Content-Language: en-US
+Cc: kvm@vger.kernel.org, kernel-team@android.com,
+ Russell King <linux@arm.linux.org.uk>, Robin Murphy <robin.murphy@arm.com>,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -97,126 +70,94 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tuesday 20 Jul 2021 at 14:15:56 (+0100), Marc Zyngier wrote:
-> On Tue, 20 Jul 2021 12:13:20 +0100,
-> Quentin Perret <qperret@google.com> wrote:
-> > 
-> > On Thursday 15 Jul 2021 at 17:31:47 (+0100), Marc Zyngier wrote:
-> > > +struct s2_walk_data {
-> > > +	kvm_pte_t	pteval;
-> > > +	u32		level;
-> > > +};
-> > > +
-> > > +static int s2_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
-> > > +		     enum kvm_pgtable_walk_flags flag, void * const arg)
-> > > +{
-> > > +	struct s2_walk_data *data = arg;
-> > > +
-> > > +	data->level = level;
-> > > +	data->pteval = *ptep;
-> > > +	return 0;
-> > > +}
-> > > +
-> > > +/* Assumes mmu_lock taken */
-> > > +static bool __check_ioguard_page(struct kvm_vcpu *vcpu, gpa_t ipa)
-> > > +{
-> > > +	struct s2_walk_data data;
-> > > +	struct kvm_pgtable_walker walker = {
-> > > +		.cb             = s2_walker,
-> > > +		.flags          = KVM_PGTABLE_WALK_LEAF,
-> > > +		.arg            = &data,
-> > > +	};
-> > > +
-> > > +	kvm_pgtable_walk(vcpu->arch.hw_mmu->pgt, ALIGN_DOWN(ipa, PAGE_SIZE),
-> > > +			 PAGE_SIZE, &walker);
-> > > +
-> > > +	/* Must be a PAGE_SIZE mapping with our annotation */
-> > > +	return (BIT(ARM64_HW_PGTABLE_LEVEL_SHIFT(data.level)) == PAGE_SIZE &&
-> > > +		data.pteval == MMIO_NOTE);
-> > 
-> > Nit: you could do this check in the walker directly and check the return
-> > value of kvm_pgtable_walk() instead. That would allow to get rid of
-> > struct s2_walk_data.
-> > 
-> > Also, though the compiler might be able to optimize, maybe simplify the
-> > level check to level == (KVM_PGTABLE_MAX_LEVELS - 1)?
-> 
-> Yup, all good points. I guess I could do the same in my other series
-> that parses the userspace PT to extract the level.
-
-Well, actually, let me take that back. I think something like you have
-would be useful, but in pgtable.c directly and re-usable for stage-1 and
-stage-2 walks. Maybe something like the below (totally untested)?
-
-I could use such a walker in several places as well in the memory
-ownership series:
-
- - following the idea of [1], I could remove the
-   kvm_pgtable_stage2_find_range() function entirely;
-
- - [2] defines 2 custom walkers that do nothing but walk host stage-2
-   and hyp stage-1 page-tables to check permissions and such --  they
-   could be removed/re-implemented easily as well.
-
-And you seem to need something similar here, so clearly there is a need.
-WDYT?
-
-Thanks,
-Quentin
-
-[1] https://lore.kernel.org/kvmarm/20210719104735.3681732-3-qperret@google.com/
-[2] https://lore.kernel.org/kvmarm/20210719104735.3681732-14-qperret@google.com/
-
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index e0ae57dca827..bd6d26f27e1a 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -357,6 +357,38 @@ int kvm_pgtable_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
-        return _kvm_pgtable_walk(&walk_data);
- }
-
-+struct get_leaf_data {
-+       kvm_pte_t *ptep;
-+       u32 *level;
-+};
-+
-+static int get_leaf_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
-+                          enum kvm_pgtable_walk_flags flag, void * const arg)
-+{
-+       struct get_leaf_data *data = arg;
-+
-+       *(data->ptep) = *ptep;
-+       *(data->level) = level;
-+
-+       return 0;
-+}
-+
-+int kvm_pgtable_get_leaf(struct kvm_pgtable *pgt, u64 addr, kvm_pte_t *ptep,
-+                        u32 *level)
-+{
-+       struct get_leaf_data data = {
-+               .ptep = ptep,
-+               .level = level,
-+       };
-+       struct kvm_pgtable_walker __get_leaf_walker = {
-+               .cb             = get_leaf_walker,
-+               .flags          = KVM_PGTABLE_WALK_LEAF,
-+               .arg            = &data,
-+       };
-+
-+       return kvm_pgtable_walk(pgt, addr, PAGE_SIZE, &__get_leaf_walker);
-+}
-+
- struct hyp_map_data {
-        u64                             phys;
-        kvm_pte_t                       attr;
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgTWFyYywKCk9uIDcvMTkvMjEgNTo1NiBQTSwgTWFyYyBaeW5naWVyIHdyb3RlOgo+IEhpIEFs
+ZXgsCj4KPiBPbiAyMDIxLTA3LTE5IDE3OjM1LCBBbGV4YW5kcnUgRWxpc2VpIHdyb3RlOgo+PiBI
+aSBNYXJjLAo+Pgo+PiBPbiA3LzE5LzIxIDE6MzkgUE0sIE1hcmMgWnluZ2llciB3cm90ZToKPj4+
+IFdlIGtlZXAgYW4gZW50cnkgZm9yIHRoZSBQTVNXSU5DX0VMMCByZWdpc3RlciBpbiB0aGUgdmNw
+dSBzdHJ1Y3R1cmUsCj4+PiB3aGlsZSAqbmV2ZXIqIHdyaXRpbmcgYW55dGhpbmcgdGhlcmUgb3V0
+c2lkZSBvZiByZXNldC4KPj4+Cj4+PiBHaXZlbiB0aGF0IHRoZSByZWdpc3RlciBpcyBkZWZpbmVk
+IGFzIHdyaXRlLW9ubHksIHRoYXQgd2UgYWx3YXlzCj4+PiB0cmFwIHdoZW4gdGhpcyByZWdpc3Rl
+ciBpcyBhY2Nlc3NlZCwgdGhlcmUgaXMgbGl0dGxlIHBvaW50IGluIHNhdmluZwo+Pj4gYW55dGhp
+bmcgYW55d2F5Lgo+Pj4KPj4+IEdldCByaWQgb2YgdGhlIGVudHJ5LCBhbmQgc2F2ZSBhIG1pZ2h0
+eSA4IGJ5dGVzIHBlciB2Y3B1IHN0cnVjdHVyZS4KPj4+Cj4+PiBXZSBzdGlsbCBuZWVkIHRvIGtl
+ZXAgaXQgZXhwb3NlZCB0byB1c2Vyc3BhY2UgaW4gb3JkZXIgdG8gcHJlc2VydmUKPj4+IGJhY2t3
+YXJkIGNvbXBhdGliaWxpdHkgd2l0aCBwcmV2aW91c2x5IHNhdmVkIFZNcy4gU2luY2UgdXNlcnNw
+YWNlCj4+PiBjYW5ub3QgZXhwZWN0IGFueSBlZmZlY3Qgb2Ygd3JpdGluZyB0byBQTVNXSU5DX0VM
+MCwgdHJlYXQgdGhlCj4+PiByZWdpc3RlciBhcyBSQVovV0kgZm9yIHRoZSBwdXJwb3NlIG9mIHVz
+ZXJzcGFjZSBhY2Nlc3MuCj4+Pgo+Pj4gU2lnbmVkLW9mZi1ieTogTWFyYyBaeW5naWVyIDxtYXpA
+a2VybmVsLm9yZz4KPj4+IC0tLQo+Pj4gwqBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0
+LmggfMKgIDEgLQo+Pj4gwqBhcmNoL2FybTY0L2t2bS9zeXNfcmVncy5jwqDCoMKgwqDCoMKgwqDC
+oCB8IDIxICsrKysrKysrKysrKysrKysrKysrLQo+Pj4gwqAyIGZpbGVzIGNoYW5nZWQsIDIwIGlu
+c2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pCj4+Pgo+Pj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJt
+NjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaAo+Pj4gYi9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2
+bV9ob3N0LmgKPj4+IGluZGV4IDQxOTExNTg1YWUwYy4uYWZjMTY5NjMwODg0IDEwMDY0NAo+Pj4g
+LS0tIGEvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faG9zdC5oCj4+PiArKysgYi9hcmNoL2Fy
+bTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmgKPj4+IEBAIC0xODUsNyArMTg1LDYgQEAgZW51bSB2
+Y3B1X3N5c3JlZyB7Cj4+PiDCoMKgwqDCoCBQTUNOVEVOU0VUX0VMMCzCoMKgwqAgLyogQ291bnQg
+RW5hYmxlIFNldCBSZWdpc3RlciAqLwo+Pj4gwqDCoMKgwqAgUE1JTlRFTlNFVF9FTDEswqDCoMKg
+IC8qIEludGVycnVwdCBFbmFibGUgU2V0IFJlZ2lzdGVyICovCj4+PiDCoMKgwqDCoCBQTU9WU1NF
+VF9FTDAswqDCoMKgIC8qIE92ZXJmbG93IEZsYWcgU3RhdHVzIFNldCBSZWdpc3RlciAqLwo+Pj4g
+LcKgwqDCoCBQTVNXSU5DX0VMMCzCoMKgwqAgLyogU29mdHdhcmUgSW5jcmVtZW50IFJlZ2lzdGVy
+ICovCj4+PiDCoMKgwqDCoCBQTVVTRVJFTlJfRUwwLMKgwqDCoCAvKiBVc2VyIEVuYWJsZSBSZWdp
+c3RlciAqLwo+Pj4KPj4+IMKgwqDCoMKgIC8qIFBvaW50ZXIgQXV0aGVudGljYXRpb24gUmVnaXN0
+ZXJzIGluIGEgc3RyaWN0IGluY3JlYXNpbmcgb3JkZXIuICovCj4+PiBkaWZmIC0tZ2l0IGEvYXJj
+aC9hcm02NC9rdm0vc3lzX3JlZ3MuYyBiL2FyY2gvYXJtNjQva3ZtL3N5c19yZWdzLmMKPj4+IGlu
+ZGV4IGYyMjEzOTY1OGU0OC4uYTFmNTEwMWY0OWEzIDEwMDY0NAo+Pj4gLS0tIGEvYXJjaC9hcm02
+NC9rdm0vc3lzX3JlZ3MuYwo+Pj4gKysrIGIvYXJjaC9hcm02NC9rdm0vc3lzX3JlZ3MuYwo+Pj4g
+QEAgLTEyODYsNiArMTI4NiwyMCBAQCBzdGF0aWMgaW50IHNldF9yYXpfaWRfcmVnKHN0cnVjdCBr
+dm1fdmNwdSAqdmNwdSwgY29uc3QKPj4+IHN0cnVjdCBzeXNfcmVnX2Rlc2MgKnJkLAo+Pj4gwqDC
+oMKgwqAgcmV0dXJuIF9fc2V0X2lkX3JlZyh2Y3B1LCByZCwgdWFkZHIsIHRydWUpOwo+Pj4gwqB9
+Cj4+Pgo+Pj4gK3N0YXRpYyBpbnQgc2V0X3dpX3JlZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIGNv
+bnN0IHN0cnVjdCBzeXNfcmVnX2Rlc2MgKnJkLAo+Pj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgIGNvbnN0IHN0cnVjdCBrdm1fb25lX3JlZyAqcmVnLCB2b2lkIF9fdXNlciAqdWFkZHIpCj4+
+PiArewo+Pj4gK8KgwqDCoCBpbnQgZXJyOwo+Pj4gK8KgwqDCoCB1NjQgdmFsOwo+Pj4gKwo+Pj4g
+K8KgwqDCoCAvKiBQZXJmb3JtIHRoZSBhY2Nlc3MgZXZlbiBpZiB3ZSBhcmUgZ29pbmcgdG8gaWdu
+b3JlIHRoZSB2YWx1ZSAqLwo+Pj4gK8KgwqDCoCBlcnIgPSByZWdfZnJvbV91c2VyKCZ2YWwsIHVh
+ZGRyLCBzeXNfcmVnX3RvX2luZGV4KHJkKSk7Cj4+Cj4+IEkgZG9uJ3QgdW5kZXJzdGFuZCB3aHkg
+dGhlIHJlYWQgc3RpbGwgaGFwcGVucyBpZiB0aGUgdmFsdWUgaXMgaWdub3JlZC4KPj4gSnVzdCBz
+byBLVk0KPj4gcHJlc2VydmVzIHRoZSBwcmV2aW91cyBiZWhhdmlvdXIgYW5kIHRlbGxzIHVzZXJz
+cGFjZSB0aGVyZSB3YXMgYW4gZXJyb3I/Cj4KPiBJZiB1c2Vyc3BhY2UgaGFzIGdpdmVuIHVzIGEg
+ZHVmZiBwb2ludGVyLCBpdCBuZWVkcyB0byBrbm93IGFib3V0IGl0LgoKTWFrZXMgc2Vuc2UsIHRo
+YW5rcy4KCj4KPj4+ICvCoMKgwqAgaWYgKGVycikKPj4+ICvCoMKgwqDCoMKgwqDCoCByZXR1cm4g
+ZXJyOwo+Pj4gKwo+Pj4gK8KgwqDCoCByZXR1cm4gMDsKPj4+ICt9Cj4+PiArCj4+PiDCoHN0YXRp
+YyBib29sIGFjY2Vzc19jdHIoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBzdHJ1Y3Qgc3lzX3JlZ19w
+YXJhbXMgKnAsCj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgY29uc3Qgc3RydWN0
+IHN5c19yZWdfZGVzYyAqcikKPj4+IMKgewo+Pj4gQEAgLTE2MjksOCArMTY0MywxMyBAQCBzdGF0
+aWMgY29uc3Qgc3RydWN0IHN5c19yZWdfZGVzYyBzeXNfcmVnX2Rlc2NzW10gPSB7Cj4+PiDCoMKg
+wqDCoMKgwqAgLmFjY2VzcyA9IGFjY2Vzc19wbWNudGVuLCAucmVnID0gUE1DTlRFTlNFVF9FTDAg
+fSwKPj4+IMKgwqDCoMKgIHsgUE1VX1NZU19SRUcoU1lTX1BNT1ZTQ0xSX0VMMCksCj4+PiDCoMKg
+wqDCoMKgwqAgLmFjY2VzcyA9IGFjY2Vzc19wbW92cywgLnJlZyA9IFBNT1ZTU0VUX0VMMCB9LAo+
+Pj4gK8KgwqDCoCAvKgo+Pj4gK8KgwqDCoMKgICogUE1fU1dJTkNfRUwwIGlzIGV4cG9zZWQgdG8g
+dXNlcnNwYWNlIGFzIFJBWi9XSSwgYXMgaXQgd2FzCj4+PiArwqDCoMKgwqAgKiBwcmV2aW91c2x5
+IChhbmQgcG9pbnRsZXNzbHkpIGFkdmVydGlzZWQgaW4gdGhlIHBhc3QuLi4KPj4+ICvCoMKgwqDC
+oCAqLwo+Pj4gwqDCoMKgwqAgeyBQTVVfU1lTX1JFRyhTWVNfUE1TV0lOQ19FTDApLAo+Pj4gLcKg
+wqDCoMKgwqAgLmFjY2VzcyA9IGFjY2Vzc19wbXN3aW5jLCAucmVnID0gUE1TV0lOQ19FTDAgfSwK
+Pj4+ICvCoMKgwqDCoMKgIC5nZXRfdXNlciA9IGdldF9yYXpfaWRfcmVnLCAuc2V0X3VzZXIgPSBz
+ZXRfd2lfcmVnLAo+Pgo+PiBJbiBteSBvcGluaW9uLCB0aGUgY2FsbCBjaGFpbiB0byByZXR1cm4g
+MCBsb29rcyBwcmV0dHkgY29uZnVzaW5nIHRvIG1lLCBhcyB0aGUKPj4gZnVuY3Rpb25zIHNlZW1l
+ZCBtYWRlIGZvciBJRCByZWdpc3RlciBhY2Nlc3NlcywgYW5kIHRoZSBsZWFmIGZ1bmN0aW9uLAo+
+PiByZWFkX2lkX3JlZygpLCB0cmllcyB0byBtYXRjaCB0aGlzIHJlZ2lzdGVyIHdpdGggYSBsaXN0
+IG9mIElECj4+IHJlZ2lzdGVycy4gU2luY2Ugd2UKPj4gaGF2ZSBhbHJlYWR5IGFkZGVkIGEgbmV3
+IGZ1bmN0aW9uIGp1c3QgZm9yIFBNU1dJTkNfRUwwLCBJIHdhcwo+PiB3b25kZXJpbmcgaWYgYWRk
+aW5nCj4+IGFub3RoZXIgZnVuY3Rpb24sIHNvbWV0aGluZyBsaWtlIGdldF9yYXpfcmVnKCksIHdv
+dWxkIG1ha2UgbW9yZSBzZW5zZS4KPgo+IEluIHRoYXQgY2FzZSwgSSdkIHJhdGhlciBqdXN0IGtp
+bGwgZ2V0X3Jhel9pZF9yZWcoKSBhbmQgcmVwbGFjZSBpdCB3aXRoCj4gdGhpcyBnZXRfcmF6X3Jl
+ZygpLiBJZiB3ZSB0cmF0IHNvbWV0aGluZyBhcyBSQVosIHdobyBjYXJlcyB3aGV0aGVyIGl0IGlz
+Cj4gYW4gaWRyZWcgb3Igbm90PwoKSSBhZ3JlZSwgdGhlIEFybSBBUk0gZG9lc24ndCBtYWtlIHRo
+ZSBkaXN0aW5jdGlvbiBiZXR3ZWVuIElEIHJlZ2lzdGVycyBhbmQgb3RoZXIKc3lzdGVtIHJlZ2lz
+dGVycyBpbiB0aGUgZGVmaW5pdGlvbiBvZiBSQVosIEkgZG9uJ3QgdGhpbmsgS1ZNIHNob3VsZCBl
+aXRoZXIuIEFuZAp0aGUgd2F5IHJlYWRfaWRfcmVnKCkgaXMgd3JpdHRlbiBhbGxvd3MgcmV0dXJu
+aW5nIGEgdmFsdWUgZGlmZmVyZW50IHRoYW4gMCBldmVuIGlmCnJheiBpcyB0cnVlLCB3aGljaCBp
+biBteSBvcGluaW9uIGNvdWxkIG9ubHkgaGFwcGVuIGJlY2F1c2Ugb2YgYSBidWcgaW4gS1ZNLgoK
+SSBjYW4gaGF2ZSBhIGdvIGF0IHdyaXRpbmcgdGhlIHBhdGNoKGVzKSBvbiB0b3Agb2YgdGhpcyBz
+ZXJpZXMsIGlmIHlvdSB3YW50LiBBdAp0aGUgbW9tZW50IEknbSByZXdyaXRpbmcgdGhlIEtWTSBT
+UEUgc2VyaWVzLCBzbyBpdCB3aWxsIGJlIGEgZmV3IHdlZWtzIHVudGlsIEkgZ2V0CmFyb3VuZCB0
+byBkb2luZyBpdCB0aG91Z2guCgpUaGFua3MsCgpBbGV4CgpfX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0
+cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9s
+aXN0aW5mby9rdm1hcm0K
