@@ -2,86 +2,84 @@ Return-Path: <SRS0=81/H=MN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D87FC07E9B
-	for <kvmarm@archiver.kernel.org>; Wed, 21 Jul 2021 07:35:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8C7BC636CE
+	for <kvmarm@archiver.kernel.org>; Wed, 21 Jul 2021 07:38:03 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8DED96113C
-	for <kvmarm@archiver.kernel.org>; Wed, 21 Jul 2021 07:35:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DED96113C
+	by mail.kernel.org (Postfix) with ESMTP id 210166120C
+	for <kvmarm@archiver.kernel.org>; Wed, 21 Jul 2021 07:38:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 210166120C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F39204B126;
-	Wed, 21 Jul 2021 03:35:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 899544B0ED;
+	Wed, 21 Jul 2021 03:38:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 0x2tpEqf8dyG; Wed, 21 Jul 2021 03:35:06 -0400 (EDT)
+	with ESMTP id 5-SSQMXYJNcV; Wed, 21 Jul 2021 03:38:01 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CDB964B116;
-	Wed, 21 Jul 2021 03:35:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E12E4B118;
+	Wed, 21 Jul 2021 03:38:01 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 022D34B101
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Jul 2021 03:35:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CF2674B0E6
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Jul 2021 03:37:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4mi0MwPrc3Tl for <kvmarm@lists.cs.columbia.edu>;
- Wed, 21 Jul 2021 03:35:03 -0400 (EDT)
-Received: from mail-ot1-f48.google.com (mail-ot1-f48.google.com
- [209.85.210.48])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C44C240CF8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Jul 2021 03:35:03 -0400 (EDT)
-Received: by mail-ot1-f48.google.com with SMTP id
- f12-20020a056830204cb029048bcf4c6bd9so1250612otp.8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Jul 2021 00:35:03 -0700 (PDT)
+ with ESMTP id g6s2ynAWG1Yr for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 21 Jul 2021 03:37:58 -0400 (EDT)
+Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com
+ [209.85.210.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 810BA4B0DD
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Jul 2021 03:37:58 -0400 (EDT)
+Received: by mail-ot1-f51.google.com with SMTP id
+ t4-20020a05683014c4b02904cd671b911bso1291238otq.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Jul 2021 00:37:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=8+C3yWM1Aq25AnToXYe0OxrL1vCuAWOUW+a14IQfShM=;
- b=vtaMs7dhTXsjys2mWi5QB8shnliH3LrkB6s1LGUXdyJanimPJRQ7SUjC2I/vqoWGxY
- k3hviiV60qay40DJOSTvONJWAx1+PKwC0nu+4ZtW6HdXRuNwvO9S+1I39Qj8gQzE6zuV
- gLJk5Tic/HuzwEa1ubkMIUQbEjzfZ7tmpxdwFF4d8tzcMd1JVE7BQGvIdIeDsU37/ami
- IVklHeTuWAMtlrhMuic3GFQOWBFipA+CJt38rkdbMAR/Ls955ATKzwoU+dpMyed22fA1
- y9ltCCmdh96NJRIpZlLXDrqVg0gP5ycxewWFVVblNPyYrPYJZ4F/rqky9ww5tsY3Agti
- YaPw==
+ :cc; bh=sbDE9nuiwcCGzXXq+7fSJ8S51kGTOjsBAbq4AfxevII=;
+ b=jGy1guoPkgxKAm1XQU1WLRIEQZY1AD4aitTaSIidCU3rRsvKa7nxuBID74o4MsS/bj
+ 4qXadR3io6HZi6HOnEdXWMjqn8bNkMukr9HhK5Zf9izRcFc+1b4yPdGDsHGvxaqAoLhR
+ xibE1txj9oMAoU+2XyKy0BCoNvYyFfxbU3oh1bNDNJkIFiL0VxTxbMyipjkZSbIZg6fB
+ Fukma3U+Q6MCJLGluVxLjsadF5PTSATyatjQ9hAZJMnzdT4ioLG+cAIEJrJ8RL1LcQ9c
+ 3Ka8kBButPskeIKyCsjo5hwsp1IQ9b9QPTGzOfWMqInEh4NTWwvm69W+Rj/wQHgJAl1g
+ 4+IQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=8+C3yWM1Aq25AnToXYe0OxrL1vCuAWOUW+a14IQfShM=;
- b=gdWRGzQeLF3HHFxY9EM6RvvtisKoPp8iHjGl+B+lx1AAQqSkQ2KarLdNp5KGTii1gC
- fs8iJlUFAYG0df2HolOR83xRbhrjsKWPPj0i1heS1f5z5R74mSp1Y7JhoMZ2zr3pCl2s
- QkiSbNEgqItmn64qqsXCAbZwityPfU4mysKoQ99/3g0FFrHtBx0wVgV2cDJMnjqgPqc8
- lj+LEmhzlzyBvhAV3yvCmih/s9dFPC3NE5NlLdyAm8RWzU4dvaqNZJOLkcqVl+Hy7QPc
- iAJVVph0WimwYYzmpPhrzAH8BAyRjC/xiyRD6dIV4rP98rX9SQBt6V2+AHwuRDzRIT0T
- kZVQ==
-X-Gm-Message-State: AOAM533GXHWSLoDGgRLGqaDq1zuWoflA8CQv56io2LQWAA3fqtkjeQMb
- vB2E6Kxdgj6scy4IS4Hf/Y/JmWYZm7SPi3U71VYCFA==
-X-Google-Smtp-Source: ABdhPJxWS4P3/legZ/TlwXxppTSSemQXnWnvlkkGMpTD3obhtSOJNiFjn6I7+UP0SEsIAcukDCsLe6vdUfva3QrxYkQ=
-X-Received: by 2002:a05:6830:1455:: with SMTP id
- w21mr25226545otp.365.1626852902894; 
- Wed, 21 Jul 2021 00:35:02 -0700 (PDT)
+ bh=sbDE9nuiwcCGzXXq+7fSJ8S51kGTOjsBAbq4AfxevII=;
+ b=Umrj3E7UQtrOVTOtugao1ItbMtvOihL34RBQvJpr2rdOPbZBKmrBf93lnCSYnsWfT/
+ cbBxIrxIIXHD+c3abKgxI/cCZvLCzSg/ZMfD9YMEhhLnt9WT80vwYIj5yWhrBBBqF28P
+ cbMS2SNMRsoD1Bp4OVCKI0MDK+mrcLf48BABhuqZm2BlFxmVQj2y+SZ//kc+ciONE5EZ
+ bon6O1b9x8jA/so+3tJ6RbC55qqceUW0HnFs9ufhbxB1bqQ+AMm21x+3PG8j1ObjrYYO
+ w04pQudd5IPNc8cSQ341uocII9K2M22U6aXhgLZEkNLRG0LRNvHcIJn9XTnoZ0JfxRJn
+ CxUw==
+X-Gm-Message-State: AOAM530J3hd46WjN4Qmjb/7kUGs+qmVCni6AgKm1H5we3nd52YngRY/x
+ lI0n0aVB9Jn+UB5/tgczYIU1JLFdbUjr4OSNPqqn8g==
+X-Google-Smtp-Source: ABdhPJzn9ZlAdVQ5+LOgkbShWo2nP3Ij7fKtXuiBI/ClZYD4r7erA2kfADFFHYYk/rf89JGWCw3PtbSRc5H7QH0EHpg=
+X-Received: by 2002:a9d:4b02:: with SMTP id q2mr14416397otf.52.1626853077570; 
+ Wed, 21 Jul 2021 00:37:57 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210719104735.3681732-1-qperret@google.com>
- <20210719104735.3681732-9-qperret@google.com>
- <CA+EHjTwmmV6EooG+Ykbso3G6nkjq=sbRzXH3vetazzPF5mO02g@mail.gmail.com>
- <YPbYdtRx6dMH52oO@google.com>
-In-Reply-To: <YPbYdtRx6dMH52oO@google.com>
+References: <20210719160346.609914-1-tabba@google.com>
+ <20210719160346.609914-7-tabba@google.com>
+ <20210720145258.axhqog3abdvtpqhw@gator>
+In-Reply-To: <20210720145258.axhqog3abdvtpqhw@gator>
 From: Fuad Tabba <tabba@google.com>
-Date: Wed, 21 Jul 2021 08:34:26 +0100
-Message-ID: <CA+EHjTw4ZKCGUWz99c-Ui_e5yGWS2eh_f-85RaZpFeZKgy8D9Q@mail.gmail.com>
-Subject: Re: [PATCH 08/14] KVM: arm64: Add support for tagging shared pages in
- page-table
-To: Quentin Perret <qperret@google.com>
-Cc: kernel-team@android.com, qwandor@google.com, maz@kernel.org,
- linux-kernel@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Date: Wed, 21 Jul 2021 08:37:21 +0100
+Message-ID: <CA+EHjTweLPu+DQ8hR9kEW0LrawtaoAoXR_+HmSEZpP-XOEm2qg@mail.gmail.com>
+Subject: Re: [PATCH v3 06/15] KVM: arm64: Restore mdcr_el2 from vcpu
+To: Andrew Jones <drjones@redhat.com>
+Cc: kernel-team@android.com, kvm@vger.kernel.org, maz@kernel.org,
+ pbonzini@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -98,90 +96,177 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Quentin,
+Hi Drew,
 
-
-On Tue, Jul 20, 2021 at 3:06 PM Quentin Perret <qperret@google.com> wrote:
+On Tue, Jul 20, 2021 at 3:53 PM Andrew Jones <drjones@redhat.com> wrote:
 >
-> On Tuesday 20 Jul 2021 at 14:48:09 (+0100), Fuad Tabba wrote:
-> > This might tie in to Marc's comments for using enums, but
-> > consolidating the translation between prot and ignored/software bits
-> > in one place would be good: thinking about patch 10 as well, where you
-> > get the prot from the ignored bits. Even though you have documented
-> > it, I'm finding the part where a field can be borrowed and shared as
-> > opposed to being only shared not very intuitive, and I need to reread
-> > the comment here to remember the difference while going through the
-> > code.
+> On Mon, Jul 19, 2021 at 05:03:37PM +0100, Fuad Tabba wrote:
+> > On deactivating traps, restore the value of mdcr_el2 from the
+> > newly created and preserved host value vcpu context, rather than
+> > directly reading the hardware register.
 > >
-> > You also mention lending as potentially reserved for the future, but I
-> > think that lending is the other side of borrowing (depends on who's
-> > doing the giving/taking). I wonder if in this case it would be clearer
-> > to describe it in terms of whether it's exclusively owned vs owned but
-> > shared (for the owner), and just shared for the sharer...
+> > Up until and including this patch the two values are the same,
+> > i.e., the hardware register and the vcpu one. A future patch will
+> > be changing the value of mdcr_el2 on activating traps, and this
+> > ensures that its value will be restored.
+> >
+> > No functional change intended.
 >
-> Argh so I actually found the encoding pretty neat :/
-> The idea is the following:
->
->   - an entity that has a page mapped as SHARED in its PT means it
->     doesn't have exclusive access to the page;
->
->   - an entity that has a page mapped as BORROWED in its PT means it has
->     access to a page it doesn't own;
->
-> From that we can build the states we need:
->
->   - when an entity shares a page with another, the original owner gets a
->     SHARED mapping, and the recipient a SHARED+BORROWED mapping.
->
->   - and in the future when/if we implement lending (which means an
->     entity gives exclusive access to a page to another entity, but
->     retains ownership) we can map the page in the recipient as
->     'BORROWED' only, but not 'SHARED'. And the original owner will have
->     an invalid mapping with a new state 'LENT', which is encoded with
->     both SW bits set.
->
-> How does that sound? Did you have something else in mind?
+> I'm probably missing something, but I can't convince myself that the host
+> will end up with the same mdcr_el2 value after deactivating traps after
+> this patch as before. We clearly now restore whatever we had when
+> activating traps (presumably whatever we configured at init_el2_state
+> time), but is that equivalent to what we had before with the masking and
+> ORing that this patch drops?
 
-The encoding is very neat by the way :D
-
-I see where you're going with the lent state now, and I understand the
-states as well as the possible transitions now that you've explained
-it.
-
-It's the terminology that confused me a bit (especially when you
-mention lending, which seemed to imply is something distinct from
-borrowing as opposed to just the other side of it). What for me would
-help is to document this, and the possible combinations/legal states.
-kvm_pgtable.h describes the prots a bit, but maybe you could expand
-that similar to what you've done in this email:
-
-@KVM_PGTABLE_STATE_BORROWED: Page borrowed from another entity: has
-access to the page but no ownership
-
-Not sure if defining aliases for all legal combinations would also
-help or add to the confusion, thinking out loud, something along the
-lines of cache state taxonomy (e.g., Sweazy and Smith fig 3 [1]). You
-have that in the borrowed (as opposed to owned), and shared (as
-opposed to exclusive). So aliases to build on these:
-
-#define KVM_PGTABLE_STATE_BORROWED_SHARED (KVM_PGTABLE_STATE_SHARED |
-KVM_PGTABLE_STATE_BORROWED)
-#define KVM_PGTABLE_STATE_BORROWED_EXCLUSIVE (KVM_PGTABLE_STATE_BORROWED)
-#define KVM_PGTABLE_STATE_OWNED_SHARED (KVM_PGTABLE_STATE_SHARED)
-#define KVM_PGTABLE_STATE_OWNED_EXCLUSIVE (0ULL)
-
-You have thought about this way more than I have. But I think that
-having clear documentation, ideally in the code itself via
-helpers/enums/aliases could help people like me who come to the code
-later not shoot themselves in the foot.
+You're right. I thought that these were actually being initialized to
+the same values, but having a closer look at the code the mdcr values
+are not the same as pre-patch. I will fix this.
 
 Thanks!
 /fuad
 
-[1] https://www.cs.auckland.ac.nz/compsci703s1c/archive/2008/resources/Sweazey.pdf
-
 > Thanks,
-> Quentin
+> drew
+>
+> >
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h       |  5 ++++-
+> >  arch/arm64/include/asm/kvm_hyp.h        |  2 +-
+> >  arch/arm64/kvm/hyp/include/hyp/switch.h |  6 +++++-
+> >  arch/arm64/kvm/hyp/nvhe/switch.c        | 11 ++---------
+> >  arch/arm64/kvm/hyp/vhe/switch.c         | 12 ++----------
+> >  arch/arm64/kvm/hyp/vhe/sysreg-sr.c      |  2 +-
+> >  6 files changed, 15 insertions(+), 23 deletions(-)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 4d2d974c1522..76462c6a91ee 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -287,10 +287,13 @@ struct kvm_vcpu_arch {
+> >       /* Stage 2 paging state used by the hardware on next switch */
+> >       struct kvm_s2_mmu *hw_mmu;
+> >
+> > -     /* HYP configuration */
+> > +     /* Values of trap registers for the guest. */
+> >       u64 hcr_el2;
+> >       u64 mdcr_el2;
+> >
+> > +     /* Values of trap registers for the host before guest entry. */
+> > +     u64 mdcr_el2_host;
+> > +
+> >       /* Exception Information */
+> >       struct kvm_vcpu_fault_info fault;
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+> > index 9d60b3006efc..657d0c94cf82 100644
+> > --- a/arch/arm64/include/asm/kvm_hyp.h
+> > +++ b/arch/arm64/include/asm/kvm_hyp.h
+> > @@ -95,7 +95,7 @@ void __sve_restore_state(void *sve_pffr, u32 *fpsr);
+> >
+> >  #ifndef __KVM_NVHE_HYPERVISOR__
+> >  void activate_traps_vhe_load(struct kvm_vcpu *vcpu);
+> > -void deactivate_traps_vhe_put(void);
+> > +void deactivate_traps_vhe_put(struct kvm_vcpu *vcpu);
+> >  #endif
+> >
+> >  u64 __guest_enter(struct kvm_vcpu *vcpu);
+> > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > index e4a2f295a394..a0e78a6027be 100644
+> > --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > @@ -92,11 +92,15 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
+> >               write_sysreg(0, pmselr_el0);
+> >               write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
+> >       }
+> > +
+> > +     vcpu->arch.mdcr_el2_host = read_sysreg(mdcr_el2);
+> >       write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
+> >  }
+> >
+> > -static inline void __deactivate_traps_common(void)
+> > +static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
+> >  {
+> > +     write_sysreg(vcpu->arch.mdcr_el2_host, mdcr_el2);
+> > +
+> >       write_sysreg(0, hstr_el2);
+> >       if (kvm_arm_support_pmu_v3())
+> >               write_sysreg(0, pmuserenr_el0);
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+> > index f7af9688c1f7..1778593a08a9 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/switch.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+> > @@ -69,12 +69,10 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+> >  static void __deactivate_traps(struct kvm_vcpu *vcpu)
+> >  {
+> >       extern char __kvm_hyp_host_vector[];
+> > -     u64 mdcr_el2, cptr;
+> > +     u64 cptr;
+> >
+> >       ___deactivate_traps(vcpu);
+> >
+> > -     mdcr_el2 = read_sysreg(mdcr_el2);
+> > -
+> >       if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
+> >               u64 val;
+> >
+> > @@ -92,13 +90,8 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
+> >               isb();
+> >       }
+> >
+> > -     __deactivate_traps_common();
+> > -
+> > -     mdcr_el2 &= MDCR_EL2_HPMN_MASK;
+> > -     mdcr_el2 |= MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT;
+> > -     mdcr_el2 |= MDCR_EL2_E2TB_MASK << MDCR_EL2_E2TB_SHIFT;
+> > +     __deactivate_traps_common(vcpu);
+> >
+> > -     write_sysreg(mdcr_el2, mdcr_el2);
+> >       write_sysreg(this_cpu_ptr(&kvm_init_params)->hcr_el2, hcr_el2);
+> >
+> >       cptr = CPTR_EL2_DEFAULT;
+> > diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> > index b3229924d243..0d0c9550fb08 100644
+> > --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> > @@ -91,17 +91,9 @@ void activate_traps_vhe_load(struct kvm_vcpu *vcpu)
+> >       __activate_traps_common(vcpu);
+> >  }
+> >
+> > -void deactivate_traps_vhe_put(void)
+> > +void deactivate_traps_vhe_put(struct kvm_vcpu *vcpu)
+> >  {
+> > -     u64 mdcr_el2 = read_sysreg(mdcr_el2);
+> > -
+> > -     mdcr_el2 &= MDCR_EL2_HPMN_MASK |
+> > -                 MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT |
+> > -                 MDCR_EL2_TPMS;
+> > -
+> > -     write_sysreg(mdcr_el2, mdcr_el2);
+> > -
+> > -     __deactivate_traps_common();
+> > +     __deactivate_traps_common(vcpu);
+> >  }
+> >
+> >  /* Switch to the guest for VHE systems running in EL2 */
+> > diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+> > index 2a0b8c88d74f..007a12dd4351 100644
+> > --- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+> > +++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+> > @@ -101,7 +101,7 @@ void kvm_vcpu_put_sysregs_vhe(struct kvm_vcpu *vcpu)
+> >       struct kvm_cpu_context *host_ctxt;
+> >
+> >       host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+> > -     deactivate_traps_vhe_put();
+> > +     deactivate_traps_vhe_put(vcpu);
+> >
+> >       __sysreg_save_el1_state(guest_ctxt);
+> >       __sysreg_save_user_state(guest_ctxt);
+> > --
+> > 2.32.0.402.g57bb445576-goog
+> >
+>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
