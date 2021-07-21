@@ -2,83 +2,74 @@ Return-Path: <SRS0=81/H=MN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA788C12002
-	for <kvmarm@archiver.kernel.org>; Wed, 21 Jul 2021 08:54:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6CF0C07E9B
+	for <kvmarm@archiver.kernel.org>; Wed, 21 Jul 2021 09:11:09 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 31DA66120A
-	for <kvmarm@archiver.kernel.org>; Wed, 21 Jul 2021 08:54:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31DA66120A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 2CBB26120A
+	for <kvmarm@archiver.kernel.org>; Wed, 21 Jul 2021 09:11:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CBB26120A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AE6204B146;
-	Wed, 21 Jul 2021 04:54:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C0ECC4B13B;
+	Wed, 21 Jul 2021 05:11:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ETbMfuF1sCXl; Wed, 21 Jul 2021 04:54:07 -0400 (EDT)
+	with ESMTP id fMY2w-7MnwJK; Wed, 21 Jul 2021 05:11:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7368E4B137;
-	Wed, 21 Jul 2021 04:54:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9326C4B121;
+	Wed, 21 Jul 2021 05:11:05 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 497B34B11F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Jul 2021 04:54:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 401EA4B110
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Jul 2021 05:11:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1jFCbBlRs1ya for <kvmarm@lists.cs.columbia.edu>;
- Wed, 21 Jul 2021 04:54:03 -0400 (EDT)
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com
- [185.176.79.56])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4B29F4B0FB
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Jul 2021 04:54:03 -0400 (EDT)
-Received: from fraeml744-chm.china.huawei.com (unknown [172.18.147.201])
- by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4GV8Kd3ykkz6G982;
- Wed, 21 Jul 2021 16:45:09 +0800 (CST)
-Received: from lhreml720-chm.china.huawei.com (10.201.108.71) by
- fraeml744-chm.china.huawei.com (10.206.15.225) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Wed, 21 Jul 2021 10:54:00 +0200
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- lhreml720-chm.china.huawei.com (10.201.108.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Wed, 21 Jul 2021 09:54:00 +0100
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.2176.012; Wed, 21 Jul 2021 09:54:00 +0100
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: Jean-Philippe Brucker <jean-philippe@linaro.org>
-Subject: RE: [RFC PATCH 4/5] iommu/arm-smmu-v3: Use pinned VMID for NESTED
- stage with BTM
-Thread-Topic: [RFC PATCH 4/5] iommu/arm-smmu-v3: Use pinned VMID for NESTED
- stage with BTM
-Thread-Index: AQHXERlrJofV4Zjw70Ci8icDpSKnl6tN8a9g
-Date: Wed, 21 Jul 2021 08:54:00 +0000
-Message-ID: <903a06a9db8c45fe88158e1c35f38c25@huawei.com>
-References: <20210222155338.26132-1-shameerali.kolothum.thodi@huawei.com>
- <20210222155338.26132-5-shameerali.kolothum.thodi@huawei.com>
- <YEEUocRn3IfIDpLj@myrica>
-In-Reply-To: <YEEUocRn3IfIDpLj@myrica>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.47.86.152]
-MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-Cc: "maz@kernel.org" <maz@kernel.org>, Linuxarm <linuxarm@huawei.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "linuxarm@openeuler.org" <linuxarm@openeuler.org>,
- "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
- "Zengtao \(B\)" <prime.zeng@hisilicon.com>,
- Jonathan Cameron <jonathan.cameron@huawei.com>,
- "zhangfei.gao@linaro.org" <zhangfei.gao@linaro.org>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+ with ESMTP id o9sufotDVLsn for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 21 Jul 2021 05:11:03 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2725A4B0FB
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Jul 2021 05:11:03 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 31F3960FE9;
+ Wed, 21 Jul 2021 09:11:02 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1m68Fo-00EfUP-5u; Wed, 21 Jul 2021 10:11:00 +0100
+Date: Wed, 21 Jul 2021 10:10:59 +0100
+Message-ID: <87fsw82frw.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: Re: [PATCHv2 4/4] arm64: add host pv-vcpu-state support
+In-Reply-To: <YPd1Q1ppmKng67tk@google.com>
+References: <20210709043713.887098-1-senozhatsky@chromium.org>
+ <20210709043713.887098-5-senozhatsky@chromium.org>
+ <874kcz33g5.wl-maz@kernel.org> <YPd1Q1ppmKng67tk@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: senozhatsky@chromium.org, will@kernel.org,
+ suleiman@google.com, joelaf@google.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+ virtualization@lists.linux-foundation.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Joel Fernandes <joelaf@google.com>, linux-kernel@vger.kernel.org,
+ virtualization@lists.linux-foundation.org,
+ Suleiman Souhlal <suleiman@google.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -95,85 +86,67 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Jean,
-
-> -----Original Message-----
-> From: Jean-Philippe Brucker [mailto:jean-philippe@linaro.org]
-> Sent: 04 March 2021 17:11
-> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-> Cc: linux-arm-kernel@lists.infradead.org; iommu@lists.linux-foundation.org;
-> kvmarm@lists.cs.columbia.edu; maz@kernel.org;
-> alex.williamson@redhat.com; eric.auger@redhat.com;
-> zhangfei.gao@linaro.org; Jonathan Cameron
-> <jonathan.cameron@huawei.com>; Zengtao (B) <prime.zeng@hisilicon.com>;
-> linuxarm@openeuler.org
-> Subject: Re: [RFC PATCH 4/5] iommu/arm-smmu-v3: Use pinned VMID for
-> NESTED stage with BTM
-
-[...]
-
-> >
-> >  	kfree(smmu_domain);
-> > @@ -3199,6 +3230,17 @@ static int arm_smmu_attach_pasid_table(struct
-> iommu_domain *domain,
-> >  				!(smmu->features & ARM_SMMU_FEAT_2_LVL_CDTAB))
-> >  			goto out;
-> >
-> > +		if (smmu->features & ARM_SMMU_FEAT_BTM) {
-> > +			ret = arm_smmu_pinned_vmid_get(smmu_domain);
-> > +			if (ret < 0)
-> > +				goto out;
-> > +
-> > +			if (smmu_domain->s2_cfg.vmid)
-> > +				arm_smmu_bitmap_free(smmu->vmid_map,
-> smmu_domain->s2_cfg.vmid);
-> > +
-> > +			smmu_domain->s2_cfg.vmid = (u16)ret;
+On Wed, 21 Jul 2021 02:15:47 +0100,
+Sergey Senozhatsky <senozhatsky@chromium.org> wrote:
 > 
-> That will require a TLB invalidation on the old VMID, once the STE is
-> rewritten.
+> On (21/07/12 17:24), Marc Zyngier wrote:
+> > >  
+> > >  void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+> > >  {
+> > > +	kvm_update_vcpu_preempted(vcpu, true);
+> > 
+> > This doesn't look right. With this, you are now telling the guest that
+> > a vcpu that is blocked on WFI is preempted. This really isn't the
+> > case, as it has voluntarily entered a low-power mode while waiting for
+> > an interrupt. Indeed, the vcpu isn't running. A physical CPU wouldn't
+> > be running either.
 > 
-> More generally I think this pinned VMID set conflicts with that of
-> stage-2-only domains (which is the default state until a guest attaches a
-> PASID table). Say you have one guest using DOMAIN_NESTED without PASID
-> table, just DMA to IPA using VMID 0x8000. Now another guest attaches a
-> PASID table and obtains the same VMID from KVM. The stage-2 translation
-> might use TLB entries from the other guest, no?  They'll both create
-> stage-2 TLB entries with {StreamWorld=NS-EL1, VMID=0x8000}
+> I suppose you are talking about kvm_vcpu_block().
 
-Now that we are trying to align the KVM VMID allocation algorithm similar to
-that of the ASID allocator [1], I attempted to use that for the SMMU pinned 
-VMID allocation. But the issue you have mentioned above is still valid. 
+kvm_vcpu_block() is how things are implemented. WFI is the instruction
+I'm concerned about.
 
-And as a solution what I have tried now is follow what pinned ASID is doing 
-in SVA,
- -Use xarray for private VMIDs
- -Get pinned VMID from KVM for DOMAIN_NESTED with PASID table
- -If the new pinned VMID is in use by private, then update the private
-  VMID(VMID update to a live STE).
+> Well, it checks kvm_vcpu_check_block() but then it simply schedule()
+> out the vcpu process, which does look like "the vcpu is
+> preempted". Once we sched_in() that vcpu process again we mark it as
+> non-preempted, even though it remains in kvm wfx handler. Why isn't
+> it right?
 
-This seems to work, but still need to run more tests with this though.  
+Because the vcpu hasn't been "preempted". It has *voluntarily* gone
+into a low-power mode, and how KVM implements this "low-power mode" is
+none of the guest's business. This is exactly the same behaviour that
+you will have on bare metal. From a Linux guest perspective, the vcpu
+is *idle*, not doing anything, and only waiting for an interrupt to
+start executing again.
 
-> It's tempting to allocate all VMIDs through KVM instead, but that will
-> force a dependency on KVM to use VFIO_TYPE1_NESTING_IOMMU and might
-> break
-> existing users of that extension (though I'm not sure there are any).
-> Instead we might need to restrict the SMMU VMID bitmap to match the
-> private VMID set in KVM.
+This is a fundamentally different concept from preempting a vcpu
+because its time-slice is up. In this second case, you can indeed
+mitigate things by exposing steal time and preemption status as you
+break the illusion of a machine that is completely controlled by the
+guest.
 
-Another solution I have in mind is, make the new KVM VMID allocator common
-between SMMUv3 and KVM. This will help to avoid all the private and shared
-VMID splitting, also no need for live updates to STE VMID. One possible drawback
-is less number of available KVM VMIDs but with 16 bit VMID space I am not sure
-how much that is a concern.
+If the "reched on interrupt delivery while blocked on WFI" is too slow
+for you, then *that* is the thing that needs addressing. Feeding extra
+state to the guest doesn't help.
 
-Please let me know your thoughts.
+> Another call path is iret:
+> 
+> <iret>
+> __schedule()
+>  context_switch()
+>   prepare_task_switch()
+>    fire_sched_in_preempt_notifiers()
+>     kvm_sched_out()
+>      kvm_arch_vcpu_put()
+
+I'm not sure how a x86 concept is relevant here.
 
 Thanks,
-Shameer
 
-[1]. https://lore.kernel.org/kvmarm/20210616155606.2806-1-shameerali.kolothum.thodi@huawei.com/
+	M.
 
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
