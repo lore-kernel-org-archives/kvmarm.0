@@ -2,104 +2,90 @@ Return-Path: <SRS0=81/H=MN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.9 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F702C636CE
-	for <kvmarm@archiver.kernel.org>; Wed, 21 Jul 2021 12:20:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1746CC636C9
+	for <kvmarm@archiver.kernel.org>; Wed, 21 Jul 2021 13:35:41 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 97F906121F
-	for <kvmarm@archiver.kernel.org>; Wed, 21 Jul 2021 12:20:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97F906121F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTP id 7B50961241
+	for <kvmarm@archiver.kernel.org>; Wed, 21 Jul 2021 13:35:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B50961241
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B4954B108;
-	Wed, 21 Jul 2021 08:20:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id ED1D84B110;
+	Wed, 21 Jul 2021 09:35:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@gmail.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6K6zCYY89GGK; Wed, 21 Jul 2021 08:20:11 -0400 (EDT)
+	with ESMTP id tNKS947EZY5e; Wed, 21 Jul 2021 09:35:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 55EAE4B147;
-	Wed, 21 Jul 2021 08:20:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BF4184B0E9;
+	Wed, 21 Jul 2021 09:35:38 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D8B94B100
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Jul 2021 07:57:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D8B74B0E9
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Jul 2021 09:35:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aGF7DSrACo4B for <kvmarm@lists.cs.columbia.edu>;
- Wed, 21 Jul 2021 07:57:14 -0400 (EDT)
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com
- [209.85.215.178])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 599F74B0FF
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Jul 2021 07:57:14 -0400 (EDT)
-Received: by mail-pg1-f178.google.com with SMTP id i16so1623918pgi.9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Jul 2021 04:57:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=to:cc:references:from:subject:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=1aayxhP7LR5pbpYNWPExB3m6iym6gHf5XQMlRKlxp94=;
- b=Gb3sYMtxc/kWDCMnCmYUN5o70Tvt9W/hvjABaQVw6GepiW6AF7jJcANbzNBRV1gq0H
- KVgsqId2MY+RXzDpDGY6dPw0M9zOWZUAQNGPy7PM2rys/HzrGgdYJ1JWxUE1QI9btZVV
- O6Nge5AQbsqTmzXcQomJIje10kgbOVDLOw6CAEgavNSXA2gO45gvZInn+kY7JYMZv+qO
- 7oKYPWFeZHS6IplBXQIb7MGoEHkzU7p7v5SEAUS6Qb0XpyY5ciKG5wbqqw5mBV2thXmN
- kc5wkdciG83RddYCL0ig7AXvXY6vLlAn6fNTtakKWWWjb2B/kLBoNRRLEWJHhmSw7M5h
- laRg==
+ with ESMTP id Ff7BOz-lUmU0 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 21 Jul 2021 09:35:35 -0400 (EDT)
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com
+ [209.85.128.47])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C59454A483
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Jul 2021 09:35:35 -0400 (EDT)
+Received: by mail-wm1-f47.google.com with SMTP id f190so1338261wmf.4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Jul 2021 06:35:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=THtvL95+Wdg5XKa0Q6wjHIENl0Y9TZHt3CwdcuBkgF8=;
+ b=dYzzqSbTcHoAKX52adHhFah33UAvJMaxB1AIimYVp8/ShQNJyvzpQuyW4v9H9wQS7C
+ 9oUflpJc11rRJeujwNJ/0OaIN7oOBEwVF7hMZpgJorzEtN81xw7UznEeWpFXOCMU+9Yf
+ vvlCvBwEaXtKD+Mit2oA1qgc2x2cQOCvdQD8ad6Jmyx3IV+U1K1ht0zp7+FRoLComa9z
+ 7nyg//dnCxl4r1LGd2OmqdUp+AIhctUAyBKbvsw/8+fgpsxlsGVuOTjFWbitTHU3+qua
+ iXTTZxxsP4ssGpvdcORzQIsJquYp1mYs6zK7WvpK/a82z1I5x6mBKwGwDf4o5qiqrpRR
+ CN8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:to:cc:references:from:subject:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=1aayxhP7LR5pbpYNWPExB3m6iym6gHf5XQMlRKlxp94=;
- b=ofY78W1gejSJrSE1N9COG/HXMw6HrRgWRXO9PHcKAsx2sd3LZ8TLlgaNxjfSVvUwac
- xNQynS4c5xVaL7TwDWjKMDmPHWZKo40caELvHZjnbumMAUluTAhEY6zdT40byUen6NZn
- VyCRzWwdPQ9lphOj4ZyT3KeU0xK7SCcL4xtT5hGiXctyrdh3ACuxkpOJtYtF06EK/tDI
- njdiiSNJE21c+mv2Tph6M05UVsgBe6wUPzE2yrhXf5CxvIFBqfS8EslBhebcA/cf7nn+
- K2PyKEnCy9aNxU5FcYfBNObLSLCKvIDQdJLRKcNKEUcir0MSwnmIhqvBulXwSK7Qj4qN
- QPUw==
-X-Gm-Message-State: AOAM5327BWgp5DDOO9TKVsjzZbmitCZEZ7kU/c8YJMTxLHbMaXOrkIKO
- XSP4JmiwXgUpCul/AoFqtdA=
-X-Google-Smtp-Source: ABdhPJx8Jc6D+8J2xe+jplPG6WjflufBXyqLNydLZmg9K2ukmxfm1tClEJcFPfqxf5GDpWMtdTO8gQ==
-X-Received: by 2002:a63:a01:: with SMTP id 1mr35267098pgk.360.1626868633306;
- Wed, 21 Jul 2021 04:57:13 -0700 (PDT)
-Received: from Likes-MacBook-Pro.local ([103.7.29.32])
- by smtp.gmail.com with ESMTPSA id j12sm25930570pfj.208.2021.07.21.04.57.06
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 21 Jul 2021 04:57:12 -0700 (PDT)
-To: Zhu Lingshan <lingshan.zhu@intel.com>
-References: <20210716085325.10300-1-lingshan.zhu@intel.com>
- <20210716085325.10300-2-lingshan.zhu@intel.com>
-From: Like Xu <like.xu.linux@gmail.com>
-Subject: Re: [PATCH V8 01/18] perf/core: Use static_call to optimize
- perf_guest_info_callbacks
-Message-ID: <fd117e37-8063-63a4-43cd-7cb555e5bab5@gmail.com>
-Date: Wed, 21 Jul 2021 19:57:01 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.12.0
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=THtvL95+Wdg5XKa0Q6wjHIENl0Y9TZHt3CwdcuBkgF8=;
+ b=Rp9p0tw8D9vr5jYO4pEhqUuesQQvJwIKOKNlWrA98MX+nzNiEBdEqzb1gu3pZpehzN
+ +rDIQ4Nq1B97IV7Gl+KpMUqWUy06+N6t+P5Ior7nPclkJrMPQc38z5ct1Swcm5BHl/Wm
+ +ndICox+bm/bmjtuQUf9BAvF12Ah5oVTemG2aRSD3KNPkMnoXtAr6++sczP3L7al73xf
+ 2VikgLmn/tB3CJC1bWoPeAm2NtjNZjxM95IFUg9TXfghjknzUEHs3rhq+pozft49QvHY
+ YEc82wI+Fgj3RxxYdrO9gcpcL1aVZ4p0K43lUlGqMmViEZcukIiEk5714gRWY9JyCjGG
+ rfrg==
+X-Gm-Message-State: AOAM532PvsI3hy94/4uSLpfN9D+3gtPL2uawrcJIQowRfKxHgquXp4lR
+ Jks3fPtfGExfMKClD6eiJMjHyg==
+X-Google-Smtp-Source: ABdhPJyciOXfOFa9KQ+iYzD+QsJY74g96fGc86hUOZHCThYzhTYjYByChhSiI5DH0qDjIx7s8PRrdA==
+X-Received: by 2002:a1c:1bc3:: with SMTP id b186mr4197684wmb.27.1626874534544; 
+ Wed, 21 Jul 2021 06:35:34 -0700 (PDT)
+Received: from google.com ([2a00:79e0:d:210:efb1:2fcc:e84:52ad])
+ by smtp.gmail.com with ESMTPSA id e11sm33189602wrt.0.2021.07.21.06.35.33
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 21 Jul 2021 06:35:34 -0700 (PDT)
+Date: Wed, 21 Jul 2021 14:35:30 +0100
+From: Quentin Perret <qperret@google.com>
+To: Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH 13/14] KVM: arm64: Restrict hyp stage-1 manipulation in
+ protected mode
+Message-ID: <YPgion9+okAtvkr4@google.com>
+References: <20210719104735.3681732-1-qperret@google.com>
+ <20210719104735.3681732-14-qperret@google.com>
+ <CA+EHjTzpoX+rLQHwUbR3BVY_XJEWERiG4AGk7SW6GDtDFC_cuQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20210716085325.10300-2-lingshan.zhu@intel.com>
-Content-Language: en-US
-X-Mailman-Approved-At: Wed, 21 Jul 2021 08:20:04 -0400
-Cc: wanpengli@tencent.com, Like Xu <like.xu@linux.intel.com>,
- Peter Zijlstra <peterz@infradead.org>, eranian@google.com,
- Guo Ren <guoren@kernel.org>, linux-riscv@lists.infradead.org,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- kan.liang@linux.intel.com, ak@linux.intel.com, kvm@vger.kernel.org,
- Marc Zyngier <maz@kernel.org>, joro@8bytes.org, x86@kernel.org,
- linux-csky@vger.kernel.org, wei.w.wang@intel.com,
- linux-arm-kernel@lists.infradead.org, xen-devel@lists.xenproject.org,
- liuxiangdong5@huawei.com, bp@alien8.de,
- Paul Walmsley <paul.walmsley@sifive.com>,
- Boris Ostrovsky <boris.ostrovsky@oracle.com>, boris.ostrvsky@oracle.com,
- jmattson@google.com, Nick Hu <nickhu@andestech.com>, seanjc@google.com,
- linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
- vkuznets@redhat.com
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTzpoX+rLQHwUbR3BVY_XJEWERiG4AGk7SW6GDtDFC_cuQ@mail.gmail.com>
+Cc: kernel-team@android.com, qwandor@google.com, maz@kernel.org,
+ linux-kernel@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -111,23 +97,151 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gMTYvNy8yMDIxIDQ6NTMgcG0sIFpodSBMaW5nc2hhbiB3cm90ZToKPiArCX0gZWxzZSBpZiAo
-eGVucG11X2RhdGEtPnBtdS5yLnJlZ3MuY3BsICYgMykKCkxpbmdzaGFuLCBzZXJpb3VzIGZvciB0
-aGlzIHZlcnNpb24gPwoKYXJjaC94ODYveGVuL3BtdS5jOjQzODo5OiBlcnJvcjogZXhwZWN0ZWQg
-aWRlbnRpZmllciBvciDigJgo4oCZIGJlZm9yZSDigJhyZXR1cm7igJkKICAgNDM4IHwgICAgICAg
-ICByZXR1cm4gc3RhdGU7CiAgICAgICB8ICAgICAgICAgXn5+fn5+CmFyY2gveDg2L3hlbi9wbXUu
-Yzo0Mzk6MTogZXJyb3I6IGV4cGVjdGVkIGlkZW50aWZpZXIgb3Ig4oCYKOKAmSBiZWZvcmUg4oCY
-feKAmSB0b2tlbgogICA0MzkgfCB9CiAgICAgICB8IF4KYXJjaC94ODYveGVuL3BtdS5jOiBJbiBm
-dW5jdGlvbiDigJh4ZW5fZ3Vlc3Rfc3RhdGXigJk6CmFyY2gveDg2L3hlbi9wbXUuYzo0MzY6OTog
-ZXJyb3I6IGNvbnRyb2wgcmVhY2hlcyBlbmQgb2Ygbm9uLXZvaWQgCmZ1bmN0aW9uIFstV2Vycm9y
-PXJldHVybi10eXBlXQogICA0MzYgfCAgICAgICAgIH0KICAgICAgIHwgICAgICAgICBeCmNjMTog
-c29tZSB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwoKPiArCQkJc3RhdGUgfD0gUEVS
-Rl9HVUVTVF9VU0VSOwo+ICAgCX0KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEu
-ZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJt
-Cg==
+Hi Fuad,
+
+On Wednesday 21 Jul 2021 at 11:45:53 (+0100), Fuad Tabba wrote:
+> > +static int hyp_range_is_shared_walker(u64 addr, u64 end, u32 level,
+> > +                                     kvm_pte_t *ptep,
+> > +                                     enum kvm_pgtable_walk_flags flag,
+> > +                                     void * const arg)
+> > +{
+> > +       enum kvm_pgtable_prot prot;
+> > +       kvm_pte_t pte = *ptep;
+> > +
+> > +       if (!kvm_pte_valid(pte))
+> > +               return -EPERM;
+> > +
+> > +       prot = kvm_pgtable_hyp_pte_prot(pte);
+> > +       if (!prot)
+> > +               return -EPERM;
+> nit: is this check necessary?
+
+I guess not, the next one should do, I'll remove :)
+
+> > +       /* Check that the page has been shared with the hypervisor before */
+> > +       if (prot != (PAGE_HYP | KVM_PGTABLE_STATE_SHARED | KVM_PGTABLE_STATE_BORROWED))
+> > +               return -EPERM;
+> > +
+> > +       return 0;
+> > +}
+> > +
+> > +static int hyp_range_is_shared(phys_addr_t start, phys_addr_t end)
+> > +{
+> > +       struct kvm_pgtable_walker walker = {
+> > +               .cb = hyp_range_is_shared_walker,
+> > +               .flags = KVM_PGTABLE_WALK_LEAF,
+> > +       };
+> > +
+> > +       return kvm_pgtable_walk(&pkvm_pgtable, (u64)__hyp_va(start),
+> > +                               end - start, &walker);
+> > +}
+> > +
+> > +static int check_host_share_hyp_walker(u64 addr, u64 end, u32 level,
+> 
+> nit: It seems the convention is usually addr,size or start,end. Here
+> you're using addr,end.
+
+Well for some reason all the walkers in pgtable.c follow the addr,end
+convention, so I followed that. But in fact, as per [1] I might actually
+get rid of this walker in v2, so hopefully that'll make the issue go
+away.
+
+[1] https://lore.kernel.org/kvmarm/YPbwmVk1YD9+y7tr@google.com/
+
+> > +                                      kvm_pte_t *ptep,
+> > +                                      enum kvm_pgtable_walk_flags flag,
+> > +                                      void * const arg)
+> > +{
+> > +       enum kvm_pgtable_prot prot;
+> > +       kvm_pte_t pte = *ptep;
+> > +
+> > +       /* If invalid, only allow to share pristine pages */
+> > +       if (!kvm_pte_valid(pte))
+> > +               return pte ? -EPERM : 0;
+> > +
+> > +       prot = kvm_pgtable_stage2_pte_prot(pte);
+> > +       if (!prot)
+> > +               return -EPERM;
+> > +
+> > +       /* Cannot share a page that is not owned */
+> > +       if (prot & KVM_PGTABLE_STATE_BORROWED)
+> > +               return -EPERM;
+> > +
+> > +       /* Cannot share a page with restricted access */
+> > +       if ((prot & KVM_PGTABLE_PROT_RWX) ^ KVM_PGTABLE_PROT_RWX)
+> nit: isn't this clearer as
+> 
+> if ((prot & KVM_PGTABLE_PROT_RWX) != KVM_PGTABLE_PROT_RWX)
+
+I guess it would be, I'll fix it up.
+
+> > +               return -EPERM;
+> > +
+> > +       /* Allow double-sharing (requires cross-checking the hyp stage-1) */
+> > +       if (prot & KVM_PGTABLE_STATE_SHARED)
+> > +               return hyp_range_is_shared(addr, addr + 1);
+> 
+> Why addr+1, rather than end?
+
+Because 'end' here is the 'end' that was passed to kvm_pgtable_walk()
+IIRC. What I want to do here is check if the page I'm currently visiting
+is already shared and if so, that it is shared with the hypervisor. But
+it's possible that only one page in the range of pages passed to
+__pkvm_host_share_hyp is already shared, so I need to check them one by
+one.
+
+Anyways, as per the discussion with Marc on [2], I'll probably switch to
+only accept sharing one page at a time, so all these issues should just
+go away as well!
+
+[2] https://lore.kernel.org/kvmarm/YPa6BGuUFjw8do+o@google.com/
+
+> > +
+> > +       return 0;
+> > +}
+> > +
+> > +static int check_host_share_hyp(phys_addr_t start, phys_addr_t end)
+> > +{
+> > +       struct kvm_pgtable_walker walker = {
+> > +               .cb = check_host_share_hyp_walker,
+> > +               .flags = KVM_PGTABLE_WALK_LEAF,
+> > +       };
+> > +
+> > +       return kvm_pgtable_walk(&host_kvm.pgt, start, end - start, &walker);
+> > +}
+> > +
+> > +int __pkvm_host_share_hyp(phys_addr_t start, phys_addr_t end)
+> > +{
+> > +       enum kvm_pgtable_prot prot;
+> > +       int ret;
+> > +
+> > +       if (!range_is_memory(start, end))
+> > +               return -EINVAL;
+> > +
+> > +       hyp_spin_lock(&host_kvm.lock);
+> > +       hyp_spin_lock(&pkvm_pgd_lock);
+> > +
+> > +       ret = check_host_share_hyp(start, end);
+> > +       if (ret)
+> > +               goto unlock;
+> > +
+> > +       prot = KVM_PGTABLE_PROT_RWX | KVM_PGTABLE_STATE_SHARED;
+> > +       ret = host_stage2_idmap_locked(start, end, prot);
+> 
+> Just for me to understand this better. The id mapping here, which
+> wasn't taking place before this patch, is for tracking, right?
+
+Yes, exactly, I want to make sure to mark the page as shared (and
+borrowed) in the relevant page-tables to not forget about it :)
+
+Cheers,
+Quentin
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
