@@ -2,102 +2,69 @@ Return-Path: <SRS0=81/H=MN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD1E1C12002
-	for <kvmarm@archiver.kernel.org>; Wed, 21 Jul 2021 16:26:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BA08C636C9
+	for <kvmarm@archiver.kernel.org>; Wed, 21 Jul 2021 16:31:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4F62761242
-	for <kvmarm@archiver.kernel.org>; Wed, 21 Jul 2021 16:26:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F62761242
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 8409E61246
+	for <kvmarm@archiver.kernel.org>; Wed, 21 Jul 2021 16:31:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8409E61246
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BE4E14B100;
-	Wed, 21 Jul 2021 12:26:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 16C264B116;
+	Wed, 21 Jul 2021 12:31:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id qMjMYXLvv9SS; Wed, 21 Jul 2021 12:26:52 -0400 (EDT)
+	with ESMTP id vzNyGIsKUMIj; Wed, 21 Jul 2021 12:31:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 914E04B115;
-	Wed, 21 Jul 2021 12:26:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 829AC4B114;
+	Wed, 21 Jul 2021 12:31:48 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C2B854B100
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Jul 2021 12:26:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 144754B10E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Jul 2021 12:31:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id R+jZR+6OwbIu for <kvmarm@lists.cs.columbia.edu>;
- Wed, 21 Jul 2021 12:26:50 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B00094086F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Jul 2021 12:26:50 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1626884810;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=m+x1aVmvJEpbSpTNhe+gSPdN5GMbbTZag6bLJsVFPDU=;
- b=iKhz1ocfWiID1lGL82qLvbKTY6rDNO4EZ5esICYOx6HgdgVVn790sOduhYWCYDZnAk+Xxx
- hiNQNR2SVfBAl1wxH+UWOoSiX95pCOIxoy9rLlufNs2YC8BDacCE0eIg6b9P5w7hA8C8+e
- 3dbe4fUD+cz5hzFhI+eSAr4gtEH+kQA=
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
- [209.85.166.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-294-Hw8DzDMRPfS9d1SkOs-2lw-1; Wed, 21 Jul 2021 12:26:49 -0400
-X-MC-Unique: Hw8DzDMRPfS9d1SkOs-2lw-1
-Received: by mail-io1-f71.google.com with SMTP id
- p7-20020a6b63070000b029050017e563a6so1955574iog.4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Jul 2021 09:26:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=m+x1aVmvJEpbSpTNhe+gSPdN5GMbbTZag6bLJsVFPDU=;
- b=LnawvxeI8XZhuWy2oq+kRYdk6LFovumXXh95/2gBrr6bQMAN2uHLnXN2mFXz+s5RoF
- 4pKwpeOu7GeenCPTLFGarVj2nwDQgVyOWltOKHWDw+vkZP2l1cfr2+aOJZGR434F8CgU
- b5od2f+PLMex1j3ZOCQJC8q3FVzW2HOUYYEXlPo1vPISEHC2QuXOFXeNg2MGqAZhMaNE
- ULvwveLiBZNc6mmVOps0aUnFA2N24IcX9q8CRlhr5j1q8JgXzkQNSgfRWdXYaMHM0YtP
- pHTQVdkSQfAr+OE2/x/LgX5SxGs8yNEzJgnQM36GhGLtLF5NJxJpdIRbBgN82iYB5mbQ
- ZWag==
-X-Gm-Message-State: AOAM533O8vchkQTjPpK6ujbJAyPjTGg3h4yv95p7xQB3XlRkdg3DFude
- LXsnfn2csCTPafhaM07PHXJmgINuBfbbMZfo9tSwVoQ+XZ15/BIFAzEzd92UlgsKkFgEEbJq1M2
- B7LcCOb2HC6DUMR7R72cbze9p
-X-Received: by 2002:a6b:fe03:: with SMTP id x3mr7853643ioh.120.1626884808828; 
- Wed, 21 Jul 2021 09:26:48 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxwgzuS9Yi4VtCvnXQZWmI5CguoZwANnXgiGFfIgiUSl1f7p3if1KjZl/ILBiSx0bJnXvz5BQ==
-X-Received: by 2002:a6b:fe03:: with SMTP id x3mr7853623ioh.120.1626884808633; 
- Wed, 21 Jul 2021 09:26:48 -0700 (PDT)
-Received: from gator ([140.82.166.162])
- by smtp.gmail.com with ESMTPSA id m1sm14838987iok.33.2021.07.21.09.26.47
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 21 Jul 2021 09:26:48 -0700 (PDT)
-Date: Wed, 21 Jul 2021 18:26:45 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Oliver Upton <oupton@google.com>
-Subject: Re: [PATCH v3 09/12] selftests: KVM: Add support for aarch64 to
- system_counter_offset_test
-Message-ID: <20210721162645.5frobtrhtniyanng@gator>
-References: <20210719184949.1385910-1-oupton@google.com>
- <20210719184949.1385910-10-oupton@google.com>
+ with ESMTP id vqLF7w-xJvML for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 21 Jul 2021 12:31:45 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BC7164B0C5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Jul 2021 12:31:45 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 94EDF60FF3;
+ Wed, 21 Jul 2021 16:31:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1626885104;
+ bh=b+eyZKwXabnVt+UjMV9OoFipdi6nkiIvKOjz34qdmyU=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=Q/Kp5r04BDGIq0tKftkH8+P/tDazAi/vkiZ2bx3TbNLkTUpGZ5KqFK6XlqETvPGWs
+ tECA1E08WuXB81889LUTDQAPms55KzycEkQi3Eiz6UsRKYAYF6eaO9+7d+QXM9v4ge
+ yeFk1WMgoR/sKFTjLAq56pZ48rr823kk70dDlUfCnIYBMV1Q5snj42ZeIRsyYV6Dxw
+ f45/atVNb/rrxq0QpBqxh+7FzLsE5zq14324k7tKcq2NjGZbE4gQIOZjFP6841Pnih
+ 7mQBBxS1XMuXc4BAh+t6nxG8cPh9v7Uz2CcXsVu8WYRj7RMu2feJqqJWYvA2Hid+mK
+ b42QWSiMRdL9Q==
+Date: Wed, 21 Jul 2021 17:31:39 +0100
+From: Will Deacon <will@kernel.org>
+To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Subject: Re: [PATCH v2 3/3] kvm/arm: Align the VMID allocation with the arm64
+ ASID one
+Message-ID: <20210721163138.GD11003@willie-the-truck>
+References: <20210616155606.2806-1-shameerali.kolothum.thodi@huawei.com>
+ <20210616155606.2806-4-shameerali.kolothum.thodi@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20210719184949.1385910-10-oupton@google.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Disposition: inline
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Raghavendra Rao Anata <rananta@google.com>, Peter Shier <pshier@google.com>,
- Sean Christopherson <seanjc@google.com>, David Matlack <dmatlack@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>
+In-Reply-To: <20210616155606.2806-4-shameerali.kolothum.thodi@huawei.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: jean-philippe@linaro.org, maz@kernel.org, linux-kernel@vger.kernel.org,
+ linuxarm@huawei.com, catalin.marinas@arm.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -114,128 +81,123 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Jul 19, 2021 at 06:49:46PM +0000, Oliver Upton wrote:
-> KVM/arm64 now allows userspace to adjust the guest virtual counter-timer
-> via a vCPU device attribute. Test that changes to the virtual
-> counter-timer offset result in the correct view being presented to the
-> guest.
+[+Quentin]
+
+On Wed, Jun 16, 2021 at 04:56:06PM +0100, Shameer Kolothum wrote:
+> From: Julien Grall <julien.grall@arm.com>
 > 
-> Signed-off-by: Oliver Upton <oupton@google.com>
+> At the moment, the VMID algorithm will send an SGI to all the CPUs to
+> force an exit and then broadcast a full TLB flush and I-Cache
+> invalidation.
+> 
+> This patch use the new VMID allocator. The
+> benefits are:
+>     - CPUs are not forced to exit at roll-over. Instead the VMID will be
+>     marked reserved and the context will be flushed at next exit. This
+>     will reduce the IPIs traffic.
+>     - Context invalidation is now per-CPU rather than broadcasted.
+>     - Catalin has a formal model of the ASID allocator.
+> 
+> With the new algo, the code is now adapted:
+>     - The function __kvm_flush_vm_context() has been renamed to
+>     __kvm_tlb_flush_local_all() and now only flushing the current CPU
+>     context.
+>     - The call to update_vmid() will be done with preemption disabled
+>     as the new algo requires to store information per-CPU.
+>     - The TLBs associated to EL1 will be flushed when booting a CPU to
+>     deal with stale information. This was previously done on the
+>     allocation of the first VMID of a new generation.
+> 
+> Signed-off-by: Julien Grall <julien.grall@arm.com>
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 > ---
->  tools/testing/selftests/kvm/Makefile          |  1 +
->  .../selftests/kvm/include/aarch64/processor.h | 12 +++++
->  .../kvm/system_counter_offset_test.c          | 54 ++++++++++++++++++-
->  3 files changed, 66 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index 7bf2e5fb1d5a..d89908108c97 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -96,6 +96,7 @@ TEST_GEN_PROGS_aarch64 += kvm_page_table_test
->  TEST_GEN_PROGS_aarch64 += set_memory_region_test
->  TEST_GEN_PROGS_aarch64 += steal_time
->  TEST_GEN_PROGS_aarch64 += kvm_binary_stats_test
-> +TEST_GEN_PROGS_aarch64 += system_counter_offset_test
+>  arch/arm64/include/asm/kvm_asm.h      |   4 +-
+>  arch/arm64/include/asm/kvm_host.h     |   6 +-
+>  arch/arm64/include/asm/kvm_mmu.h      |   3 +-
+>  arch/arm64/kvm/Makefile               |   2 +-
+>  arch/arm64/kvm/arm.c                  | 115 +++++++-------------------
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c    |   6 +-
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c |   3 +-
+>  arch/arm64/kvm/hyp/nvhe/tlb.c         |  10 +--
+>  arch/arm64/kvm/hyp/vhe/tlb.c          |  10 +--
+>  arch/arm64/kvm/mmu.c                  |   1 -
+>  10 files changed, 52 insertions(+), 108 deletions(-)
+
+[...]
+
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 75a7e8071012..d96284da8571 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -70,9 +70,7 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
+>  void kvm_arm_vcpu_destroy(struct kvm_vcpu *vcpu);
 >  
->  TEST_GEN_PROGS_s390x = s390x/memop
->  TEST_GEN_PROGS_s390x += s390x/resets
-> diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-> index 27dc5c2e56b9..3168cdbae6ee 100644
-> --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-> +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-> @@ -129,4 +129,16 @@ void vm_install_sync_handler(struct kvm_vm *vm,
->  
->  #define isb()	asm volatile("isb" : : : "memory")
->  
-> +static inline uint64_t read_cntvct_ordered(void)
-> +{
-> +	uint64_t r;
-> +
-> +	__asm__ __volatile__("isb\n\t"
-> +			     "mrs %0, cntvct_el0\n\t"
-> +			     "isb\n\t"
-> +			     : "=r"(r));
-> +
-> +	return r;
-> +}
-> +
->  #endif /* SELFTEST_KVM_PROCESSOR_H */
-> diff --git a/tools/testing/selftests/kvm/system_counter_offset_test.c b/tools/testing/selftests/kvm/system_counter_offset_test.c
-> index 7e9015770759..88ad997f5b69 100644
-> --- a/tools/testing/selftests/kvm/system_counter_offset_test.c
-> +++ b/tools/testing/selftests/kvm/system_counter_offset_test.c
-> @@ -53,7 +53,59 @@ static uint64_t host_read_guest_system_counter(struct test_case *test)
->  	return rdtsc() + test->tsc_offset;
+>  struct kvm_vmid {
+> -	/* The VMID generation used for the virt. memory system */
+> -	u64    vmid_gen;
+> -	u32    vmid;
+> +	atomic64_t id;
+
+Maybe a typedef would be better if this is the only member of the structure?
+
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> index 4b60c0056c04..a02c4877a055 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> @@ -106,8 +106,7 @@ int kvm_host_prepare_stage2(void *mem_pgt_pool, void *dev_pgt_pool)
+>  	mmu->pgd_phys = __hyp_pa(host_kvm.pgt.pgd);
+>  	mmu->arch = &host_kvm.arch;
+>  	mmu->pgt = &host_kvm.pgt;
+> -	mmu->vmid.vmid_gen = 0;
+> -	mmu->vmid.vmid = 0;
+> +	atomic64_set(&mmu->vmid.id, 0);
+
+I think this is the first atomic64 use in the EL2 object, which may pull in
+some fatal KCSAN instrumentation. Quentin, have you run into this before?
+
+Might be simple just to zero-initialise mmu for now, if it isn't already.
+
+> diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
+> index 83dc3b271bc5..42df9931ed9a 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/tlb.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
+> @@ -140,10 +140,10 @@ void __kvm_flush_cpu_context(struct kvm_s2_mmu *mmu)
+>  	__tlb_switch_to_host(&cxt);
 >  }
 >  
-> -#else /* __x86_64__ */
-> +#elif __aarch64__ /* __x86_64__ */
-> +
-> +enum arch_counter {
-> +	VIRTUAL,
-> +};
-> +
-> +struct test_case {
-> +	enum arch_counter counter;
-> +	uint64_t offset;
-> +};
-> +
-> +static struct test_case test_cases[] = {
-> +	{ .counter = VIRTUAL, .offset = 0 },
-> +	{ .counter = VIRTUAL, .offset = 180 * NSEC_PER_SEC },
-> +	{ .counter = VIRTUAL, .offset = -180 * NSEC_PER_SEC },
-> +};
-> +
-> +static void check_preconditions(struct kvm_vm *vm)
-> +{
-> +	if (!_vcpu_has_device_attr(vm, VCPU_ID, KVM_ARM_VCPU_TIMER_CTRL,
-> +				   KVM_ARM_VCPU_TIMER_OFFSET_VTIMER))
-> +		return;
-> +
-> +	print_skip("KVM_ARM_VCPU_TIMER_OFFSET_VTIMER not supported; skipping test");
-> +	exit(KSFT_SKIP);
-> +}
-> +
-> +static void setup_system_counter(struct kvm_vm *vm, struct test_case *test)
-> +{
-> +	vcpu_access_device_attr(vm, VCPU_ID, KVM_ARM_VCPU_TIMER_CTRL,
-> +				KVM_ARM_VCPU_TIMER_OFFSET_VTIMER, &test->offset,
-> +				true);
-> +}
-> +
-> +static uint64_t guest_read_system_counter(struct test_case *test)
-> +{
-> +	switch (test->counter) {
-> +	case VIRTUAL:
-> +		return read_cntvct_ordered();
-> +	default:
-> +		GUEST_ASSERT(0);
-> +	}
-> +
-> +	/* unreachable */
-> +	return 0;
-> +}
-> +
-> +static uint64_t host_read_guest_system_counter(struct test_case *test)
-> +{
-> +	return read_cntvct_ordered() - test->offset;
-> +}
-> +
-> +#else /* __aarch64__ */
+> -void __kvm_flush_vm_context(void)
+> +void __kvm_tlb_flush_local_all(void)
+>  {
+> -	dsb(ishst);
+> -	__tlbi(alle1is);
+> +	dsb(nshst);
+> +	__tlbi(alle1);
 >  
->  #error test not implemented for this architecture!
+>  	/*
+>  	 * VIPT and PIPT caches are not affected by VMID, so no maintenance
+> @@ -155,7 +155,7 @@ void __kvm_flush_vm_context(void)
+>  	 *
+>  	 */
+>  	if (icache_is_vpipt())
+> -		asm volatile("ic ialluis");
+> +		asm volatile("ic iallu" : : );
 >  
-> -- 
-> 2.32.0.402.g57bb445576-goog
-> 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
->
+> -	dsb(ish);
+> +	dsb(nsh);
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+Hmm, I'm wondering whether having this local stuff really makes sense for
+VMIDs. For ASIDs, where rollover can be frequent and TLBI could result in
+IPI on 32-bit, the local option was important, but here rollover is less
+frequent, DVM is relied upon to work and the cost of a hypercall is
+significant with nVHE.
 
+So I do think you could simplify patch 2 slightly to drop the
+flush_pending and just issue inner-shareable invalidation on rollover.
+With that, it might also make it straightforward to clear active_asids
+when scheduling out a vCPU, which would solve the other problem I mentioned
+about unnecessarily reserving a bunch of the VMID space.
+
+Will
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
