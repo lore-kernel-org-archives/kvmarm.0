@@ -1,64 +1,87 @@
-Return-Path: <SRS0=KNUW=MM=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=81/H=MN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24B6DC07E9B
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Jul 2021 17:22:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D87FC07E9B
+	for <kvmarm@archiver.kernel.org>; Wed, 21 Jul 2021 07:35:09 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A88EA610D2
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Jul 2021 17:22:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A88EA610D2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 8DED96113C
+	for <kvmarm@archiver.kernel.org>; Wed, 21 Jul 2021 07:35:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DED96113C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EE78F4B0AD;
-	Tue, 20 Jul 2021 13:22:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F39204B126;
+	Wed, 21 Jul 2021 03:35:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6bIGK0xLqzhE; Tue, 20 Jul 2021 13:22:03 -0400 (EDT)
+	with ESMTP id 0x2tpEqf8dyG; Wed, 21 Jul 2021 03:35:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F2614B0BB;
-	Tue, 20 Jul 2021 13:22:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CDB964B116;
+	Wed, 21 Jul 2021 03:35:06 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 63F854B0B3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jul 2021 13:22:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 022D34B101
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Jul 2021 03:35:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id E8feXpzzQzWq for <kvmarm@lists.cs.columbia.edu>;
- Tue, 20 Jul 2021 13:22:01 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1185E4B0AD
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Jul 2021 13:22:01 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A04A031B;
- Tue, 20 Jul 2021 10:22:00 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 92F443F73D;
- Tue, 20 Jul 2021 10:21:58 -0700 (PDT)
-Subject: Re: [PATCH 1/5] KVM: arm64: Walk userspace page tables to compute the
- THP mapping size
-To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
- kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-mm@kvack.org
-References: <20210717095541.1486210-1-maz@kernel.org>
- <20210717095541.1486210-2-maz@kernel.org>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <f09c297b-21dd-a6fa-6e72-49587ba80fe5@arm.com>
-Date: Tue, 20 Jul 2021 18:23:02 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+ with ESMTP id 4mi0MwPrc3Tl for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 21 Jul 2021 03:35:03 -0400 (EDT)
+Received: from mail-ot1-f48.google.com (mail-ot1-f48.google.com
+ [209.85.210.48])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C44C240CF8
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Jul 2021 03:35:03 -0400 (EDT)
+Received: by mail-ot1-f48.google.com with SMTP id
+ f12-20020a056830204cb029048bcf4c6bd9so1250612otp.8
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Jul 2021 00:35:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=8+C3yWM1Aq25AnToXYe0OxrL1vCuAWOUW+a14IQfShM=;
+ b=vtaMs7dhTXsjys2mWi5QB8shnliH3LrkB6s1LGUXdyJanimPJRQ7SUjC2I/vqoWGxY
+ k3hviiV60qay40DJOSTvONJWAx1+PKwC0nu+4ZtW6HdXRuNwvO9S+1I39Qj8gQzE6zuV
+ gLJk5Tic/HuzwEa1ubkMIUQbEjzfZ7tmpxdwFF4d8tzcMd1JVE7BQGvIdIeDsU37/ami
+ IVklHeTuWAMtlrhMuic3GFQOWBFipA+CJt38rkdbMAR/Ls955ATKzwoU+dpMyed22fA1
+ y9ltCCmdh96NJRIpZlLXDrqVg0gP5ycxewWFVVblNPyYrPYJZ4F/rqky9ww5tsY3Agti
+ YaPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=8+C3yWM1Aq25AnToXYe0OxrL1vCuAWOUW+a14IQfShM=;
+ b=gdWRGzQeLF3HHFxY9EM6RvvtisKoPp8iHjGl+B+lx1AAQqSkQ2KarLdNp5KGTii1gC
+ fs8iJlUFAYG0df2HolOR83xRbhrjsKWPPj0i1heS1f5z5R74mSp1Y7JhoMZ2zr3pCl2s
+ QkiSbNEgqItmn64qqsXCAbZwityPfU4mysKoQ99/3g0FFrHtBx0wVgV2cDJMnjqgPqc8
+ lj+LEmhzlzyBvhAV3yvCmih/s9dFPC3NE5NlLdyAm8RWzU4dvaqNZJOLkcqVl+Hy7QPc
+ iAJVVph0WimwYYzmpPhrzAH8BAyRjC/xiyRD6dIV4rP98rX9SQBt6V2+AHwuRDzRIT0T
+ kZVQ==
+X-Gm-Message-State: AOAM533GXHWSLoDGgRLGqaDq1zuWoflA8CQv56io2LQWAA3fqtkjeQMb
+ vB2E6Kxdgj6scy4IS4Hf/Y/JmWYZm7SPi3U71VYCFA==
+X-Google-Smtp-Source: ABdhPJxWS4P3/legZ/TlwXxppTSSemQXnWnvlkkGMpTD3obhtSOJNiFjn6I7+UP0SEsIAcukDCsLe6vdUfva3QrxYkQ=
+X-Received: by 2002:a05:6830:1455:: with SMTP id
+ w21mr25226545otp.365.1626852902894; 
+ Wed, 21 Jul 2021 00:35:02 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20210717095541.1486210-2-maz@kernel.org>
-Content-Language: en-US
-Cc: kernel-team@android.com, Sean Christopherson <seanjc@google.com>,
- Matthew Wilcox <willy@infradead.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Will Deacon <will@kernel.org>
+References: <20210719104735.3681732-1-qperret@google.com>
+ <20210719104735.3681732-9-qperret@google.com>
+ <CA+EHjTwmmV6EooG+Ykbso3G6nkjq=sbRzXH3vetazzPF5mO02g@mail.gmail.com>
+ <YPbYdtRx6dMH52oO@google.com>
+In-Reply-To: <YPbYdtRx6dMH52oO@google.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Wed, 21 Jul 2021 08:34:26 +0100
+Message-ID: <CA+EHjTw4ZKCGUWz99c-Ui_e5yGWS2eh_f-85RaZpFeZKgy8D9Q@mail.gmail.com>
+Subject: Re: [PATCH 08/14] KVM: arm64: Add support for tagging shared pages in
+ page-table
+To: Quentin Perret <qperret@google.com>
+Cc: kernel-team@android.com, qwandor@google.com, maz@kernel.org,
+ linux-kernel@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -75,124 +98,90 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+Hi Quentin,
 
-I just can't figure out why having the mmap lock is not needed to walk the
-userspace page tables. Any hints? Or am I not seeing where it's taken?
 
-On 7/17/21 10:55 AM, Marc Zyngier wrote:
-> We currently rely on the kvm_is_transparent_hugepage() helper to
-> discover whether a given page has the potential to be mapped as
-> a block mapping.
+On Tue, Jul 20, 2021 at 3:06 PM Quentin Perret <qperret@google.com> wrote:
 >
-> However, this API doesn't really give un everything we want:
-> - we don't get the size: this is not crucial today as we only
->   support PMD-sized THPs, but we'd like to have larger sizes
->   in the future
-> - we're the only user left of the API, and there is a will
->   to remove it altogether
+> On Tuesday 20 Jul 2021 at 14:48:09 (+0100), Fuad Tabba wrote:
+> > This might tie in to Marc's comments for using enums, but
+> > consolidating the translation between prot and ignored/software bits
+> > in one place would be good: thinking about patch 10 as well, where you
+> > get the prot from the ignored bits. Even though you have documented
+> > it, I'm finding the part where a field can be borrowed and shared as
+> > opposed to being only shared not very intuitive, and I need to reread
+> > the comment here to remember the difference while going through the
+> > code.
+> >
+> > You also mention lending as potentially reserved for the future, but I
+> > think that lending is the other side of borrowing (depends on who's
+> > doing the giving/taking). I wonder if in this case it would be clearer
+> > to describe it in terms of whether it's exclusively owned vs owned but
+> > shared (for the owner), and just shared for the sharer...
 >
-> To address the above, implement a simple walker using the existing
-> page table infrastructure, and plumb it into transparent_hugepage_adjust().
-> No new page sizes are supported in the process.
+> Argh so I actually found the encoding pretty neat :/
+> The idea is the following:
 >
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/mmu.c | 46 ++++++++++++++++++++++++++++++++++++++++----
->  1 file changed, 42 insertions(+), 4 deletions(-)
+>   - an entity that has a page mapped as SHARED in its PT means it
+>     doesn't have exclusive access to the page;
 >
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 3155c9e778f0..db6314b93e99 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -433,6 +433,44 @@ int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
->  	return 0;
->  }
->  
-> +static struct kvm_pgtable_mm_ops kvm_user_mm_ops = {
-> +	/* We shouldn't need any other callback to walk the PT */
-> +	.phys_to_virt		= kvm_host_va,
-> +};
-> +
-> +struct user_walk_data {
-> +	u32	level;
-> +};
-> +
-> +static int user_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
-> +		       enum kvm_pgtable_walk_flags flag, void * const arg)
-> +{
-> +	struct user_walk_data *data = arg;
-> +
-> +	data->level = level;
-> +	return 0;
-> +}
-> +
-> +static int get_user_mapping_size(struct kvm *kvm, u64 addr)
-> +{
-> +	struct user_walk_data data;
-> +	struct kvm_pgtable pgt = {
-> +		.pgd		= (kvm_pte_t *)kvm->mm->pgd,
-> +		.ia_bits	= VA_BITS,
-> +		.start_level	= 4 - CONFIG_PGTABLE_LEVELS,
-> +		.mm_ops		= &kvm_user_mm_ops,
-> +	};
-> +	struct kvm_pgtable_walker walker = {
-> +		.cb		= user_walker,
-> +		.flags		= KVM_PGTABLE_WALK_LEAF,
-> +		.arg		= &data,
-> +	};
-> +
-> +	kvm_pgtable_walk(&pgt, ALIGN_DOWN(addr, PAGE_SIZE), PAGE_SIZE, &walker);
+>   - an entity that has a page mapped as BORROWED in its PT means it has
+>     access to a page it doesn't own;
+>
+> From that we can build the states we need:
+>
+>   - when an entity shares a page with another, the original owner gets a
+>     SHARED mapping, and the recipient a SHARED+BORROWED mapping.
+>
+>   - and in the future when/if we implement lending (which means an
+>     entity gives exclusive access to a page to another entity, but
+>     retains ownership) we can map the page in the recipient as
+>     'BORROWED' only, but not 'SHARED'. And the original owner will have
+>     an invalid mapping with a new state 'LENT', which is encoded with
+>     both SW bits set.
+>
+> How does that sound? Did you have something else in mind?
 
-I take it that it is guaranteed that kvm_pgtable_walk() will never fail? For
-example, I can see it failing if someone messes with KVM_PGTABLE_MAX_LEVELS. To be
-honest, I would rather have a check here instead of potentially feeding a bogus
-value to ARM64_HW_PGTABLE_LEVEL_SHIFT. It could be a VM_WARN_ON, so there's no
-runtime overhead unless CONFIG_DEBUG_VM.
+The encoding is very neat by the way :D
 
-The patch looks good to me so far, but I want to give it another look (or two)
-after I figure out why the mmap semaphone is not needed.
+I see where you're going with the lent state now, and I understand the
+states as well as the possible transitions now that you've explained
+it.
 
-Thanks,
+It's the terminology that confused me a bit (especially when you
+mention lending, which seemed to imply is something distinct from
+borrowing as opposed to just the other side of it). What for me would
+help is to document this, and the possible combinations/legal states.
+kvm_pgtable.h describes the prots a bit, but maybe you could expand
+that similar to what you've done in this email:
 
-Alex
+@KVM_PGTABLE_STATE_BORROWED: Page borrowed from another entity: has
+access to the page but no ownership
 
-> +
-> +	return BIT(ARM64_HW_PGTABLE_LEVEL_SHIFT(data.level));
-> +}
-> +
->  static struct kvm_pgtable_mm_ops kvm_s2_mm_ops = {
->  	.zalloc_page		= stage2_memcache_zalloc_page,
->  	.zalloc_pages_exact	= kvm_host_zalloc_pages_exact,
-> @@ -780,7 +818,7 @@ static bool fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
->   * Returns the size of the mapping.
->   */
->  static unsigned long
-> -transparent_hugepage_adjust(struct kvm_memory_slot *memslot,
-> +transparent_hugepage_adjust(struct kvm *kvm, struct kvm_memory_slot *memslot,
->  			    unsigned long hva, kvm_pfn_t *pfnp,
->  			    phys_addr_t *ipap)
->  {
-> @@ -791,8 +829,8 @@ transparent_hugepage_adjust(struct kvm_memory_slot *memslot,
->  	 * sure that the HVA and IPA are sufficiently aligned and that the
->  	 * block map is contained within the memslot.
->  	 */
-> -	if (kvm_is_transparent_hugepage(pfn) &&
-> -	    fault_supports_stage2_huge_mapping(memslot, hva, PMD_SIZE)) {
-> +	if (fault_supports_stage2_huge_mapping(memslot, hva, PMD_SIZE) &&
-> +	    get_user_mapping_size(kvm, hva) >= PMD_SIZE) {
->  		/*
->  		 * The address we faulted on is backed by a transparent huge
->  		 * page.  However, because we map the compound huge page and
-> @@ -1051,7 +1089,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	 * backed by a THP and thus use block mapping if possible.
->  	 */
->  	if (vma_pagesize == PAGE_SIZE && !(force_pte || device))
-> -		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
-> +		vma_pagesize = transparent_hugepage_adjust(kvm, memslot, hva,
->  							   &pfn, &fault_ipa);
->  
->  	if (fault_status != FSC_PERM && !device && kvm_has_mte(kvm)) {
+Not sure if defining aliases for all legal combinations would also
+help or add to the confusion, thinking out loud, something along the
+lines of cache state taxonomy (e.g., Sweazy and Smith fig 3 [1]). You
+have that in the borrowed (as opposed to owned), and shared (as
+opposed to exclusive). So aliases to build on these:
+
+#define KVM_PGTABLE_STATE_BORROWED_SHARED (KVM_PGTABLE_STATE_SHARED |
+KVM_PGTABLE_STATE_BORROWED)
+#define KVM_PGTABLE_STATE_BORROWED_EXCLUSIVE (KVM_PGTABLE_STATE_BORROWED)
+#define KVM_PGTABLE_STATE_OWNED_SHARED (KVM_PGTABLE_STATE_SHARED)
+#define KVM_PGTABLE_STATE_OWNED_EXCLUSIVE (0ULL)
+
+You have thought about this way more than I have. But I think that
+having clear documentation, ideally in the code itself via
+helpers/enums/aliases could help people like me who come to the code
+later not shoot themselves in the foot.
+
+Thanks!
+/fuad
+
+[1] https://www.cs.auckland.ac.nz/compsci703s1c/archive/2008/resources/Sweazey.pdf
+
+> Thanks,
+> Quentin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
