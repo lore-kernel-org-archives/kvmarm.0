@@ -2,101 +2,92 @@ Return-Path: <SRS0=81/H=MN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78C88C12002
-	for <kvmarm@archiver.kernel.org>; Wed, 21 Jul 2021 16:46:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49BF3C636C9
+	for <kvmarm@archiver.kernel.org>; Wed, 21 Jul 2021 17:47:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id F265361244
-	for <kvmarm@archiver.kernel.org>; Wed, 21 Jul 2021 16:46:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F265361244
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id AE92F6128E
+	for <kvmarm@archiver.kernel.org>; Wed, 21 Jul 2021 17:47:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE92F6128E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 840CD4B0FB;
-	Wed, 21 Jul 2021 12:46:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 291F44B117;
+	Wed, 21 Jul 2021 13:47:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id RkzhP+Sfz8WJ; Wed, 21 Jul 2021 12:46:46 -0400 (EDT)
+	with ESMTP id iu8o4s7zEGqH; Wed, 21 Jul 2021 13:46:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5CB744B091;
-	Wed, 21 Jul 2021 12:46:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0CDF74B10D;
+	Wed, 21 Jul 2021 13:46:59 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A0F04B091
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Jul 2021 12:46:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AC6014B109
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Jul 2021 13:46:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2nYyPRyGNGr4 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 21 Jul 2021 12:46:41 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E24C24A003
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Jul 2021 12:46:41 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1626886001;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=SdDUG3Tlr7StcVQDE/T+VireBjyknjYEkozWsd7mGNo=;
- b=hKFrsC4EEkIstb8QmkUGGFW5qCpEIhAdaBb6qlvZdFqZTtTDxW73XlfIXjOaqierTQXTxg
- gqIYT7CWNzNW7//x3QwuUdLjd/ZI3B8By8L2CVrxgv7HeMg68wRSstgBOGTINaw0Ig8V6Z
- eDKfpYMTuvyXAsUBUmtt6mgKP4+z1l8=
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
- [209.85.166.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-184-zMtLy_vcOiCLk0LstvKcRw-1; Wed, 21 Jul 2021 12:46:40 -0400
-X-MC-Unique: zMtLy_vcOiCLk0LstvKcRw-1
-Received: by mail-io1-f69.google.com with SMTP id
- i13-20020a5d88cd0000b02904e5ab8bdc6cso1943266iol.22
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Jul 2021 09:46:40 -0700 (PDT)
+ with ESMTP id rPR63Lq2wTOi for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 21 Jul 2021 13:46:56 -0400 (EDT)
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com
+ [209.85.218.42])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8EB2E4B0F7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Jul 2021 13:46:56 -0400 (EDT)
+Received: by mail-ej1-f42.google.com with SMTP id hc15so4489633ejc.4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Jul 2021 10:46:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=AxTvururg15eAgQqT/Vw3IaCmq/AtpICOLNE7tzoQWM=;
+ b=s0WASEAsAruBpiL/ESXJp2VeA5h+VTH0uEnk+LjAD3MHgy72GUAmI0zBPcvrD8s0SA
+ BWd9ei0B8Hv1rK7VYNbIu6CBlaBhnbfO64qTWXLIdQniLZyup1q2j9Bl5Ub6BeGijcX8
+ o2GowuJAhyePRBqL1PylmSGGCsNgtoGiloJFlPnxkrNT2U81r5Mxayn2fG2GDKvW/6Wr
+ JHGyMNfwDGxoCXuUwC54Cph9OIE9di/Zn5VNuNjuxY1xSE8IY6oZOFZOwV1+s5UgN5EL
+ WdegzQ2TXCJbEAUWTyI+Nys4iqZoAnBRb0CZnuj1SZTVekfvqquMS7B2ygo0sDqp4kYi
+ SlKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=SdDUG3Tlr7StcVQDE/T+VireBjyknjYEkozWsd7mGNo=;
- b=QNvzp47RdFTjy9BiVDx8llCTwO0JXTJ5CzXhnt/3pXMTJcn7/qliSPBZjAFb5mGF53
- CND5/nhQkgeE+JeKTEPnRW+5301K+REPokSRyWnekx8ALAIjaU2exQoXmzCBVUqohIe9
- uAlEus/+62pVH4oIxDq9ZJURRLsg4YQolzZeIcNFq1LqBibD+9etIHZOIvdOzc+Gyy8b
- 3lHnDTsv7d1lYlBob2g5+BlfO3OeVsUPkXaHEidr2H+6lOH80fwN7NzEGBVnxXSQD1FL
- e2P4Da7W8m11/XaubTwmFJSQpBqzMraDyEOCetZHe1wTqklSDOdXZeWFkf/TIo7R8lFj
- NV4Q==
-X-Gm-Message-State: AOAM530TM+7931SjrST1QbTHtoF5JxG09NqrTc3AXsVaAL+qGnrfeqgJ
- mspuGU8H0vfcfOrcDxGqZ/NPrq0sTSamiD0ZYS9swgnDowPhumW4KVHQNDhOP5v1wcu5Oujs5ub
- SkGY/S/J0QNs+U1ZBm1kvyb+H
-X-Received: by 2002:a92:d58f:: with SMTP id a15mr8037172iln.18.1626885999247; 
- Wed, 21 Jul 2021 09:46:39 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwhXSZhbJ3Y7T2Mveqj1UY3BfD2Zr2HtG+rzw/5HH87b6MDaadStM2r2qKfE3lFkz+licmK8w==
-X-Received: by 2002:a92:d58f:: with SMTP id a15mr8037150iln.18.1626885999068; 
- Wed, 21 Jul 2021 09:46:39 -0700 (PDT)
-Received: from gator ([140.82.166.162])
- by smtp.gmail.com with ESMTPSA id y198sm14555037iof.25.2021.07.21.09.46.38
+ bh=AxTvururg15eAgQqT/Vw3IaCmq/AtpICOLNE7tzoQWM=;
+ b=gUM47mSvqYBRcyIYbWVAMfZWMCyoo9Uzoy9+hW1RBp8k+vlpcsvbtpQqNMPFMnwlCW
+ aYV6zx5teJ4WkcvCbfd9wa40zOhk7eJC5D1ZyAkC8JC1LEOzhFYB2ax6nBvBkYZ8spe3
+ QwxmAslld3Cw9aNeMW2zPPRaeWtIviyfsBRKHxwfdXppepJX8Af3tno04dXUWT9saeGf
+ U5+KQ5t+gw3OgdulSagElDbJbeYjelNmDhUjdHwfL35RigZrcpmP6Yn8YUAD4GMpN/AZ
+ WlU5YWqC2ZKnx3OZ+cZoDG8C/cbLHzTM5/f4X6Y0j2MzdaHuzn93t48Uw+fl9eiygBEn
+ ibMw==
+X-Gm-Message-State: AOAM533PW8H0z+lb4xpZQ5ylBqVRKYhXVoNq7mMjcUroBecJ21yBm55L
+ bBDJlVcpEly/FNEBTkYEnP9Z/g==
+X-Google-Smtp-Source: ABdhPJy4TQnKuFecqxFoIlEfztLPuXcjzFwaiFkqmvuxoQO+VS6qVLl59Uri6H53MV/Z29iViIl6mw==
+X-Received: by 2002:a17:907:170c:: with SMTP id
+ le12mr41029420ejc.288.1626889615495; 
+ Wed, 21 Jul 2021 10:46:55 -0700 (PDT)
+Received: from myrica (adsl-84-226-111-173.adslplus.ch. [84.226.111.173])
+ by smtp.gmail.com with ESMTPSA id qo6sm8570087ejb.122.2021.07.21.10.46.54
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 21 Jul 2021 09:46:38 -0700 (PDT)
-Date: Wed, 21 Jul 2021 18:46:36 +0200
-From: Andrew Jones <drjones@redhat.com>
+ Wed, 21 Jul 2021 10:46:55 -0700 (PDT)
+Date: Wed, 21 Jul 2021 19:46:34 +0200
+From: Jean-Philippe Brucker <jean-philippe@linaro.org>
 To: Oliver Upton <oupton@google.com>
-Subject: Re: [PATCH v3 11/12] selftests: KVM: Test physical counter offsetting
-Message-ID: <20210721164636.yzzhguwzjrtj3ty6@gator>
-References: <20210719184949.1385910-1-oupton@google.com>
- <20210719184949.1385910-12-oupton@google.com>
+Subject: Re: [RFC PATCH 0/5] KVM: arm64: Pass PSCI to userspace
+Message-ID: <YPhdehJ2m/EEGkdT@myrica>
+References: <20210608154805.216869-1-jean-philippe@linaro.org>
+ <c29ff5c8-9c94-6a6c-6142-3bed440676bf@arm.com>
+ <YPW+Hv3r586zKxpY@myrica>
+ <CAOQ_QsjyP0PMGOorTss2Fpn011mHPwVqQ72x26Gs2L0bg2amsQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20210719184949.1385910-12-oupton@google.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Disposition: inline
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Raghavendra Rao Anata <rananta@google.com>, Peter Shier <pshier@google.com>,
- Sean Christopherson <seanjc@google.com>, David Matlack <dmatlack@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>
+In-Reply-To: <CAOQ_QsjyP0PMGOorTss2Fpn011mHPwVqQ72x26Gs2L0bg2amsQ@mail.gmail.com>
+Cc: salil.mehta@huawei.com, lorenzo.pieralisi@arm.com, catalin.marinas@arm.com,
+ kvm@vger.kernel.org, corbet@lwn.net, maz@kernel.org,
+ linux-kernel@vger.kernel.org, will@kernel.org, jonathan.cameron@huawei.com,
+ pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -113,116 +104,49 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Jul 19, 2021 at 06:49:48PM +0000, Oliver Upton wrote:
-> Test that userpace adjustment of the guest physical counter-timer
-> results in the correct view of within the guest.
+On Mon, Jul 19, 2021 at 12:37:52PM -0700, Oliver Upton wrote:
+> On Mon, Jul 19, 2021 at 11:02 AM Jean-Philippe Brucker
+> <jean-philippe@linaro.org> wrote:
+> > We forward the whole PSCI function range, so it's either KVM or userspace.
+> > If KVM manages PSCI and the guest calls an unimplemented function, that
+> > returns directly to the guest without going to userspace.
+> >
+> > The concern is valid for any other range, though. If userspace enables the
+> > HVC cap it receives function calls that at some point KVM might need to
+> > handle itself. So we need some negotiation between user and KVM about the
+> > specific HVC ranges that userspace can and will handle.
 > 
-> Signed-off-by: Oliver Upton <oupton@google.com>
-> ---
->  .../selftests/kvm/include/aarch64/processor.h | 12 ++++++++
->  .../kvm/system_counter_offset_test.c          | 29 ++++++++++++++++---
->  2 files changed, 37 insertions(+), 4 deletions(-)
+> Are we going to use KVM_CAPs for every interesting HVC range that
+> userspace may want to trap? I wonder if a more generic interface for
+> hypercall filtering would have merit to handle the aforementioned
+> cases, and whatever else a VMM will want to intercept down the line.
 > 
-> diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-> index 3168cdbae6ee..7f53d90e9512 100644
-> --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-> +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-> @@ -141,4 +141,16 @@ static inline uint64_t read_cntvct_ordered(void)
->  	return r;
->  }
->  
-> +static inline uint64_t read_cntpct_ordered(void)
-> +{
-> +	uint64_t r;
-> +
-> +	__asm__ __volatile__("isb\n\t"
-> +			     "mrs %0, cntpct_el0\n\t"
-> +			     "isb\n\t"
-> +			     : "=r"(r));
-> +
-> +	return r;
-> +}
-> +
->  #endif /* SELFTEST_KVM_PROCESSOR_H */
-> diff --git a/tools/testing/selftests/kvm/system_counter_offset_test.c b/tools/testing/selftests/kvm/system_counter_offset_test.c
-> index 88ad997f5b69..3eed9dcb7693 100644
-> --- a/tools/testing/selftests/kvm/system_counter_offset_test.c
-> +++ b/tools/testing/selftests/kvm/system_counter_offset_test.c
-> @@ -57,6 +57,7 @@ static uint64_t host_read_guest_system_counter(struct test_case *test)
->  
->  enum arch_counter {
->  	VIRTUAL,
-> +	PHYSICAL,
->  };
->  
->  struct test_case {
-> @@ -68,23 +69,41 @@ static struct test_case test_cases[] = {
->  	{ .counter = VIRTUAL, .offset = 0 },
->  	{ .counter = VIRTUAL, .offset = 180 * NSEC_PER_SEC },
->  	{ .counter = VIRTUAL, .offset = -180 * NSEC_PER_SEC },
-> +	{ .counter = PHYSICAL, .offset = 0 },
-> +	{ .counter = PHYSICAL, .offset = 180 * NSEC_PER_SEC },
-> +	{ .counter = PHYSICAL, .offset = -180 * NSEC_PER_SEC },
->  };
->  
->  static void check_preconditions(struct kvm_vm *vm)
->  {
->  	if (!_vcpu_has_device_attr(vm, VCPU_ID, KVM_ARM_VCPU_TIMER_CTRL,
-> -				   KVM_ARM_VCPU_TIMER_OFFSET_VTIMER))
-> +				   KVM_ARM_VCPU_TIMER_OFFSET_VTIMER) &&
-> +	    !_vcpu_has_device_attr(vm, VCPU_ID, KVM_ARM_VCPU_TIMER_CTRL,
-> +				   KVM_ARM_VCPU_TIMER_OFFSET_PTIMER))
->  		return;
->  
-> -	print_skip("KVM_ARM_VCPU_TIMER_OFFSET_VTIMER not supported; skipping test");
-> +	print_skip("KVM_ARM_VCPU_TIMER_OFFSET_{VTIMER,PTIMER} not supported; skipping test");
->  	exit(KSFT_SKIP);
->  }
->  
->  static void setup_system_counter(struct kvm_vm *vm, struct test_case *test)
->  {
-> +	u64 attr = 0;
-> +
-> +	switch (test->counter) {
-> +	case VIRTUAL:
-> +		attr = KVM_ARM_VCPU_TIMER_OFFSET_VTIMER;
-> +		break;
-> +	case PHYSICAL:
-> +		attr = KVM_ARM_VCPU_TIMER_OFFSET_PTIMER;
-> +		break;
-> +	default:
-> +		TEST_ASSERT(false, "unrecognized counter index %u",
-> +			    test->counter);
-> +	}
-> +
->  	vcpu_access_device_attr(vm, VCPU_ID, KVM_ARM_VCPU_TIMER_CTRL,
-> -				KVM_ARM_VCPU_TIMER_OFFSET_VTIMER, &test->offset,
-> -				true);
-> +				attr, &test->offset, true);
->  }
->  
->  static uint64_t guest_read_system_counter(struct test_case *test)
-> @@ -92,6 +111,8 @@ static uint64_t guest_read_system_counter(struct test_case *test)
->  	switch (test->counter) {
->  	case VIRTUAL:
->  		return read_cntvct_ordered();
-> +	case PHYSICAL:
-> +		return read_cntpct_ordered();
->  	default:
->  		GUEST_ASSERT(0);
->  	}
-> -- 
-> 2.32.0.402.g57bb445576-goog
-> 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
->
+> For example, x86 has the concept of 'MSR filtering', wherein userspace
+> can specify a set of registers that it wants to intercept. Doing
+> something similar for HVCs would avoid the need for a kernel change
+> each time a VMM wishes to intercept a new hypercall.
 
- 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+Yes we could introduce a VM device group for this:
+* User reads attribute KVM_ARM_VM_HVC_NR_SLOTS, which defines the number
+  of available HVC ranges.
+* User writes attribute KVM_ARM_VM_HVC_SET_RANGE with one range
+  struct kvm_arm_hvc_range {
+          __u32 slot;
+  #define KVM_ARM_HVC_USER (1 << 0) /* Enable range. 0 disables it */
+          __u16 flags;
+	  __u16 imm;
+          __u32 fn_start;
+          __u32 fn_end;
+  };
+* KVM forwards any HVC within this range to userspace.
+* If one of the ranges is PSCI functions, disable KVM PSCI.
 
+Since it's more work for KVM to keep track of ranges, I didn't include it
+in the RFC, and I'm going to leave it to the next person dealing with this
+stuff :)
+
+Thanks,
+Jean
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
