@@ -2,77 +2,71 @@ Return-Path: <SRS0=81/H=MN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 823C6C07E9B
-	for <kvmarm@archiver.kernel.org>; Wed, 21 Jul 2021 09:31:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2619C07E9B
+	for <kvmarm@archiver.kernel.org>; Wed, 21 Jul 2021 09:53:45 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id F116161181
-	for <kvmarm@archiver.kernel.org>; Wed, 21 Jul 2021 09:31:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F116161181
+	by mail.kernel.org (Postfix) with ESMTP id 5ED7060FDA
+	for <kvmarm@archiver.kernel.org>; Wed, 21 Jul 2021 09:53:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5ED7060FDA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F0DC4B086;
-	Wed, 21 Jul 2021 05:31:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EF7B04B107;
+	Wed, 21 Jul 2021 05:53:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id znQX6YY5iBBz; Wed, 21 Jul 2021 05:31:06 -0400 (EDT)
+	with ESMTP id OYjZsP4aUdAf; Wed, 21 Jul 2021 05:53:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 72C4D4B091;
-	Wed, 21 Jul 2021 05:31:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 45AA04B108;
+	Wed, 21 Jul 2021 05:53:43 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 00A2D4B081
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Jul 2021 05:31:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DEA444B103
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Jul 2021 05:53:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UIEu5ez8AS6E for <kvmarm@lists.cs.columbia.edu>;
- Wed, 21 Jul 2021 05:31:03 -0400 (EDT)
+ with ESMTP id snqs3owooYvP for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 21 Jul 2021 05:53:41 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A0E894A5A0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Jul 2021 05:31:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F21164B107
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Jul 2021 05:53:40 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 1D422611CE;
- Wed, 21 Jul 2021 09:31:01 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 03EEC60FDA;
+ Wed, 21 Jul 2021 09:53:40 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1m68Z9-00Eflq-2f; Wed, 21 Jul 2021 10:30:59 +0100
-Date: Wed, 21 Jul 2021 10:30:58 +0100
-Message-ID: <87eebs2eul.wl-maz@kernel.org>
+ id 1m68v3-00Efzw-VK; Wed, 21 Jul 2021 10:53:38 +0100
+Date: Wed, 21 Jul 2021 10:53:37 +0100
+Message-ID: <87czrc2dsu.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH v2 4/4] KVM: arm64: Remove PMSWINC_EL0 shadow register
-In-Reply-To: <9ad0f6a5-fcd0-0179-efa7-7b35ed36e2ff@arm.com>
-References: <20210719123902.1493805-1-maz@kernel.org>
- <20210719123902.1493805-5-maz@kernel.org>
- <c1a63908-b55c-bdf8-b8ba-5a43f2e99e1f@arm.com>
- <f2b655d0977cde5483716f58ba2ab739@kernel.org>
- <9ad0f6a5-fcd0-0179-efa7-7b35ed36e2ff@arm.com>
+To: Jianyong Wu <jianyong.wu@arm.com>
+Subject: Re: [PATCH] doc/arm: take care restore order of GICR_* in ITS restore
+In-Reply-To: <20210721092019.144088-1-jianyong.wu@arm.com>
+References: <20210721092019.144088-1-jianyong.wu@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, james.morse@arm.com, suzuki.poulose@arm.com,
- alexandre.chartre@oracle.com, robin.murphy@arm.com, drjones@redhat.com,
- linux@arm.linux.org.uk, kernel-team@android.com
+X-SA-Exim-Rcpt-To: jianyong.wu@arm.com, james.morse@arm.com,
+ andre.przywara@arm.com, lushenming@huawei.com, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, justin.he@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, kernel-team@android.com,
- Russell King <linux@arm.linux.org.uk>, Robin Murphy <robin.murphy@arm.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: justin.he@arm.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+ andre.przywara@arm.com, linux-kernel@vger.kernel.org, lushenming@huawei.com,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -84,103 +78,46 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gVHVlLCAyMCBKdWwgMjAyMSAxNzo0NDozMiArMDEwMCwKQWxleGFuZHJ1IEVsaXNlaSA8YWxl
-eGFuZHJ1LmVsaXNlaUBhcm0uY29tPiB3cm90ZToKPiAKPiBIaSBNYXJjLAo+IAo+IE9uIDcvMTkv
-MjEgNTo1NiBQTSwgTWFyYyBaeW5naWVyIHdyb3RlOgo+ID4gSGkgQWxleCwKPiA+Cj4gPiBPbiAy
-MDIxLTA3LTE5IDE3OjM1LCBBbGV4YW5kcnUgRWxpc2VpIHdyb3RlOgo+ID4+IEhpIE1hcmMsCj4g
-Pj4KPiA+PiBPbiA3LzE5LzIxIDE6MzkgUE0sIE1hcmMgWnluZ2llciB3cm90ZToKPiA+Pj4gV2Ug
-a2VlcCBhbiBlbnRyeSBmb3IgdGhlIFBNU1dJTkNfRUwwIHJlZ2lzdGVyIGluIHRoZSB2Y3B1IHN0
-cnVjdHVyZSwKPiA+Pj4gd2hpbGUgKm5ldmVyKiB3cml0aW5nIGFueXRoaW5nIHRoZXJlIG91dHNp
-ZGUgb2YgcmVzZXQuCj4gPj4+Cj4gPj4+IEdpdmVuIHRoYXQgdGhlIHJlZ2lzdGVyIGlzIGRlZmlu
-ZWQgYXMgd3JpdGUtb25seSwgdGhhdCB3ZSBhbHdheXMKPiA+Pj4gdHJhcCB3aGVuIHRoaXMgcmVn
-aXN0ZXIgaXMgYWNjZXNzZWQsIHRoZXJlIGlzIGxpdHRsZSBwb2ludCBpbiBzYXZpbmcKPiA+Pj4g
-YW55dGhpbmcgYW55d2F5Lgo+ID4+Pgo+ID4+PiBHZXQgcmlkIG9mIHRoZSBlbnRyeSwgYW5kIHNh
-dmUgYSBtaWdodHkgOCBieXRlcyBwZXIgdmNwdSBzdHJ1Y3R1cmUuCj4gPj4+Cj4gPj4+IFdlIHN0
-aWxsIG5lZWQgdG8ga2VlcCBpdCBleHBvc2VkIHRvIHVzZXJzcGFjZSBpbiBvcmRlciB0byBwcmVz
-ZXJ2ZQo+ID4+PiBiYWNrd2FyZCBjb21wYXRpYmlsaXR5IHdpdGggcHJldmlvdXNseSBzYXZlZCBW
-TXMuIFNpbmNlIHVzZXJzcGFjZQo+ID4+PiBjYW5ub3QgZXhwZWN0IGFueSBlZmZlY3Qgb2Ygd3Jp
-dGluZyB0byBQTVNXSU5DX0VMMCwgdHJlYXQgdGhlCj4gPj4+IHJlZ2lzdGVyIGFzIFJBWi9XSSBm
-b3IgdGhlIHB1cnBvc2Ugb2YgdXNlcnNwYWNlIGFjY2Vzcy4KPiA+Pj4KPiA+Pj4gU2lnbmVkLW9m
-Zi1ieTogTWFyYyBaeW5naWVyIDxtYXpAa2VybmVsLm9yZz4KPiA+Pj4gLS0tCj4gPj4+IMKgYXJj
-aC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faG9zdC5oIHzCoCAxIC0KPiA+Pj4gwqBhcmNoL2FybTY0
-L2t2bS9zeXNfcmVncy5jwqDCoMKgwqDCoMKgwqDCoCB8IDIxICsrKysrKysrKysrKysrKysrKysr
-LQo+ID4+PiDCoDIgZmlsZXMgY2hhbmdlZCwgMjAgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMo
-LSkKPiA+Pj4KPiA+Pj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hv
-c3QuaAo+ID4+PiBiL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaAo+ID4+PiBpbmRl
-eCA0MTkxMTU4NWFlMGMuLmFmYzE2OTYzMDg4NCAxMDA2NDQKPiA+Pj4gLS0tIGEvYXJjaC9hcm02
-NC9pbmNsdWRlL2FzbS9rdm1faG9zdC5oCj4gPj4+ICsrKyBiL2FyY2gvYXJtNjQvaW5jbHVkZS9h
-c20va3ZtX2hvc3QuaAo+ID4+PiBAQCAtMTg1LDcgKzE4NSw2IEBAIGVudW0gdmNwdV9zeXNyZWcg
-ewo+ID4+PiDCoMKgwqDCoCBQTUNOVEVOU0VUX0VMMCzCoMKgwqAgLyogQ291bnQgRW5hYmxlIFNl
-dCBSZWdpc3RlciAqLwo+ID4+PiDCoMKgwqDCoCBQTUlOVEVOU0VUX0VMMSzCoMKgwqAgLyogSW50
-ZXJydXB0IEVuYWJsZSBTZXQgUmVnaXN0ZXIgKi8KPiA+Pj4gwqDCoMKgwqAgUE1PVlNTRVRfRUww
-LMKgwqDCoCAvKiBPdmVyZmxvdyBGbGFnIFN0YXR1cyBTZXQgUmVnaXN0ZXIgKi8KPiA+Pj4gLcKg
-wqDCoCBQTVNXSU5DX0VMMCzCoMKgwqAgLyogU29mdHdhcmUgSW5jcmVtZW50IFJlZ2lzdGVyICov
-Cj4gPj4+IMKgwqDCoMKgIFBNVVNFUkVOUl9FTDAswqDCoMKgIC8qIFVzZXIgRW5hYmxlIFJlZ2lz
-dGVyICovCj4gPj4+Cj4gPj4+IMKgwqDCoMKgIC8qIFBvaW50ZXIgQXV0aGVudGljYXRpb24gUmVn
-aXN0ZXJzIGluIGEgc3RyaWN0IGluY3JlYXNpbmcgb3JkZXIuICovCj4gPj4+IGRpZmYgLS1naXQg
-YS9hcmNoL2FybTY0L2t2bS9zeXNfcmVncy5jIGIvYXJjaC9hcm02NC9rdm0vc3lzX3JlZ3MuYwo+
-ID4+PiBpbmRleCBmMjIxMzk2NThlNDguLmExZjUxMDFmNDlhMyAxMDA2NDQKPiA+Pj4gLS0tIGEv
-YXJjaC9hcm02NC9rdm0vc3lzX3JlZ3MuYwo+ID4+PiArKysgYi9hcmNoL2FybTY0L2t2bS9zeXNf
-cmVncy5jCj4gPj4+IEBAIC0xMjg2LDYgKzEyODYsMjAgQEAgc3RhdGljIGludCBzZXRfcmF6X2lk
-X3JlZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIGNvbnN0Cj4gPj4+IHN0cnVjdCBzeXNfcmVnX2Rl
-c2MgKnJkLAo+ID4+PiDCoMKgwqDCoCByZXR1cm4gX19zZXRfaWRfcmVnKHZjcHUsIHJkLCB1YWRk
-ciwgdHJ1ZSk7Cj4gPj4+IMKgfQo+ID4+Pgo+ID4+PiArc3RhdGljIGludCBzZXRfd2lfcmVnKHN0
-cnVjdCBrdm1fdmNwdSAqdmNwdSwgY29uc3Qgc3RydWN0IHN5c19yZWdfZGVzYyAqcmQsCj4gPj4+
-ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBjb25zdCBzdHJ1Y3Qga3ZtX29uZV9yZWcgKnJl
-Zywgdm9pZCBfX3VzZXIgKnVhZGRyKQo+ID4+PiArewo+ID4+PiArwqDCoMKgIGludCBlcnI7Cj4g
-Pj4+ICvCoMKgwqAgdTY0IHZhbDsKPiA+Pj4gKwo+ID4+PiArwqDCoMKgIC8qIFBlcmZvcm0gdGhl
-IGFjY2VzcyBldmVuIGlmIHdlIGFyZSBnb2luZyB0byBpZ25vcmUgdGhlIHZhbHVlICovCj4gPj4+
-ICvCoMKgwqAgZXJyID0gcmVnX2Zyb21fdXNlcigmdmFsLCB1YWRkciwgc3lzX3JlZ190b19pbmRl
-eChyZCkpOwo+ID4+Cj4gPj4gSSBkb24ndCB1bmRlcnN0YW5kIHdoeSB0aGUgcmVhZCBzdGlsbCBo
-YXBwZW5zIGlmIHRoZSB2YWx1ZSBpcyBpZ25vcmVkLgo+ID4+IEp1c3Qgc28gS1ZNCj4gPj4gcHJl
-c2VydmVzIHRoZSBwcmV2aW91cyBiZWhhdmlvdXIgYW5kIHRlbGxzIHVzZXJzcGFjZSB0aGVyZSB3
-YXMgYW4gZXJyb3I/Cj4gPgo+ID4gSWYgdXNlcnNwYWNlIGhhcyBnaXZlbiB1cyBhIGR1ZmYgcG9p
-bnRlciwgaXQgbmVlZHMgdG8ga25vdyBhYm91dCBpdC4KPiAKPiBNYWtlcyBzZW5zZSwgdGhhbmtz
-Lgo+IAo+ID4KPiA+Pj4gK8KgwqDCoCBpZiAoZXJyKQo+ID4+PiArwqDCoMKgwqDCoMKgwqAgcmV0
-dXJuIGVycjsKPiA+Pj4gKwo+ID4+PiArwqDCoMKgIHJldHVybiAwOwo+ID4+PiArfQo+ID4+PiAr
-Cj4gPj4+IMKgc3RhdGljIGJvb2wgYWNjZXNzX2N0cihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHN0
-cnVjdCBzeXNfcmVnX3BhcmFtcyAqcCwKPiA+Pj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgIGNvbnN0IHN0cnVjdCBzeXNfcmVnX2Rlc2MgKnIpCj4gPj4+IMKgewo+ID4+PiBAQCAtMTYy
-OSw4ICsxNjQzLDEzIEBAIHN0YXRpYyBjb25zdCBzdHJ1Y3Qgc3lzX3JlZ19kZXNjIHN5c19yZWdf
-ZGVzY3NbXSA9IHsKPiA+Pj4gwqDCoMKgwqDCoMKgIC5hY2Nlc3MgPSBhY2Nlc3NfcG1jbnRlbiwg
-LnJlZyA9IFBNQ05URU5TRVRfRUwwIH0sCj4gPj4+IMKgwqDCoMKgIHsgUE1VX1NZU19SRUcoU1lT
-X1BNT1ZTQ0xSX0VMMCksCj4gPj4+IMKgwqDCoMKgwqDCoCAuYWNjZXNzID0gYWNjZXNzX3Btb3Zz
-LCAucmVnID0gUE1PVlNTRVRfRUwwIH0sCj4gPj4+ICvCoMKgwqAgLyoKPiA+Pj4gK8KgwqDCoMKg
-ICogUE1fU1dJTkNfRUwwIGlzIGV4cG9zZWQgdG8gdXNlcnNwYWNlIGFzIFJBWi9XSSwgYXMgaXQg
-d2FzCj4gPj4+ICvCoMKgwqDCoCAqIHByZXZpb3VzbHkgKGFuZCBwb2ludGxlc3NseSkgYWR2ZXJ0
-aXNlZCBpbiB0aGUgcGFzdC4uLgo+ID4+PiArwqDCoMKgwqAgKi8KPiA+Pj4gwqDCoMKgwqAgeyBQ
-TVVfU1lTX1JFRyhTWVNfUE1TV0lOQ19FTDApLAo+ID4+PiAtwqDCoMKgwqDCoCAuYWNjZXNzID0g
-YWNjZXNzX3Btc3dpbmMsIC5yZWcgPSBQTVNXSU5DX0VMMCB9LAo+ID4+PiArwqDCoMKgwqDCoCAu
-Z2V0X3VzZXIgPSBnZXRfcmF6X2lkX3JlZywgLnNldF91c2VyID0gc2V0X3dpX3JlZywKPiA+Pgo+
-ID4+IEluIG15IG9waW5pb24sIHRoZSBjYWxsIGNoYWluIHRvIHJldHVybiAwIGxvb2tzIHByZXR0
-eSBjb25mdXNpbmcgdG8gbWUsIGFzIHRoZQo+ID4+IGZ1bmN0aW9ucyBzZWVtZWQgbWFkZSBmb3Ig
-SUQgcmVnaXN0ZXIgYWNjZXNzZXMsIGFuZCB0aGUgbGVhZiBmdW5jdGlvbiwKPiA+PiByZWFkX2lk
-X3JlZygpLCB0cmllcyB0byBtYXRjaCB0aGlzIHJlZ2lzdGVyIHdpdGggYSBsaXN0IG9mIElECj4g
-Pj4gcmVnaXN0ZXJzLiBTaW5jZSB3ZQo+ID4+IGhhdmUgYWxyZWFkeSBhZGRlZCBhIG5ldyBmdW5j
-dGlvbiBqdXN0IGZvciBQTVNXSU5DX0VMMCwgSSB3YXMKPiA+PiB3b25kZXJpbmcgaWYgYWRkaW5n
-Cj4gPj4gYW5vdGhlciBmdW5jdGlvbiwgc29tZXRoaW5nIGxpa2UgZ2V0X3Jhel9yZWcoKSwgd291
-bGQgbWFrZSBtb3JlIHNlbnNlLgo+ID4KPiA+IEluIHRoYXQgY2FzZSwgSSdkIHJhdGhlciBqdXN0
-IGtpbGwgZ2V0X3Jhel9pZF9yZWcoKSBhbmQgcmVwbGFjZSBpdCB3aXRoCj4gPiB0aGlzIGdldF9y
-YXpfcmVnKCkuIElmIHdlIHRyYXQgc29tZXRoaW5nIGFzIFJBWiwgd2hvIGNhcmVzIHdoZXRoZXIg
-aXQgaXMKPiA+IGFuIGlkcmVnIG9yIG5vdD8KPiAKPiBJIGFncmVlLCB0aGUgQXJtIEFSTSBkb2Vz
-bid0IG1ha2UgdGhlIGRpc3RpbmN0aW9uIGJldHdlZW4gSUQKPiByZWdpc3RlcnMgYW5kIG90aGVy
-IHN5c3RlbSByZWdpc3RlcnMgaW4gdGhlIGRlZmluaXRpb24gb2YgUkFaLCBJCj4gZG9uJ3QgdGhp
-bmsgS1ZNIHNob3VsZCBlaXRoZXIuIEFuZCB0aGUgd2F5IHJlYWRfaWRfcmVnKCkgaXMgd3JpdHRl
-bgo+IGFsbG93cyByZXR1cm5pbmcgYSB2YWx1ZSBkaWZmZXJlbnQgdGhhbiAwIGV2ZW4gaWYgcmF6
-IGlzIHRydWUsIHdoaWNoCj4gaW4gbXkgb3BpbmlvbiBjb3VsZCBvbmx5IGhhcHBlbiBiZWNhdXNl
-IG9mIGEgYnVnIGluIEtWTS4KPiAKPiBJIGNhbiBoYXZlIGEgZ28gYXQgd3JpdGluZyB0aGUgcGF0
-Y2goZXMpIG9uIHRvcCBvZiB0aGlzIHNlcmllcywgaWYKPiB5b3Ugd2FudC4gQXQgdGhlIG1vbWVu
-dCBJJ20gcmV3cml0aW5nIHRoZSBLVk0gU1BFIHNlcmllcywgc28gaXQgd2lsbAo+IGJlIGEgZmV3
-IHdlZWtzIHVudGlsIEkgZ2V0IGFyb3VuZCB0byBkb2luZyBpdCB0aG91Z2guCgpXZSBjYW4gZG8g
-dGhhdCBhdCBhbnkgdGltZSwgaXQgaXMganVzdCBhIGNsZWFudXAgd2l0aG91dCBhbnkgZ3Vlc3Qg
-b3IKdXNlcnNwYWNlIHZpc2libGUgZWZmZWN0LiBJZiBhIGdldCBhIHNwYXJlIGhvdXIsIEknbGwg
-aGF2ZSBhCmxvb2suIE90aGVyd2lzZSwgdGhpcyBjYW4gd2FpdCBhIGJpdC4KClRoYW5rcywKCglN
-LgoKLS0gCldpdGhvdXQgZGV2aWF0aW9uIGZyb20gdGhlIG5vcm0sIHByb2dyZXNzIGlzIG5vdCBw
-b3NzaWJsZS4KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18K
-a3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8v
-bGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+On Wed, 21 Jul 2021 10:20:19 +0100,
+Jianyong Wu <jianyong.wu@arm.com> wrote:
+> 
+> When restore GIC/ITS, GICR_CTLR must be restored after GICR_PROPBASER
+> and GICR_PENDBASER. That is important, as both of GICR_PROPBASER and
+> GICR_PENDBASER will fail to be loaded when lpi has enabled yet in
+> GICR_CTLR. Keep the restore order above will avoid that issue.
+> Shout it out at the doc is very helpful that may avoid lots of debug work.
+
+But that's something that is already mandated by the architecture,
+isn't it? See "5.1 LPIs" in the architecture spec:
+
+<quote>
+
+If GICR_PROPBASER is updated when GICR_CTLR.EnableLPIs == 1, the
+effects are UNPREDICTABLE.
+
+[...]
+
+If GICR_PENDBASER is updated when GICR_CTLR.EnableLPIs == 1, the
+effects are UNPREDICTABLE.
+
+</quote>
+
+The point of this documentation is to make it explicit what is *not*
+covered by the architecture. Anything that is in the architecture
+still applies, and shouldn't be overlooked.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
