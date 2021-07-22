@@ -2,85 +2,97 @@ Return-Path: <SRS0=vB6B=MO=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A5AEC63797
-	for <kvmarm@archiver.kernel.org>; Thu, 22 Jul 2021 15:42:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61D49C6377D
+	for <kvmarm@archiver.kernel.org>; Thu, 22 Jul 2021 16:46:23 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id EEF5F6120C
-	for <kvmarm@archiver.kernel.org>; Thu, 22 Jul 2021 15:42:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEF5F6120C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id D26DE61D3F
+	for <kvmarm@archiver.kernel.org>; Thu, 22 Jul 2021 16:46:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D26DE61D3F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E0B24A3B4;
-	Thu, 22 Jul 2021 11:42:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 252BA49F82;
+	Thu, 22 Jul 2021 12:46:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ans10XZVTiJD; Thu, 22 Jul 2021 11:42:42 -0400 (EDT)
+	with ESMTP id kQeO+7sIYJ5i; Thu, 22 Jul 2021 12:46:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 50DD94081C;
-	Thu, 22 Jul 2021 11:42:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DBEAD4A023;
+	Thu, 22 Jul 2021 12:46:20 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B1D1E406D3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Jul 2021 11:42:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EC69A49FE6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Jul 2021 12:46:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 61hdvhU6FPug for <kvmarm@lists.cs.columbia.edu>;
- Thu, 22 Jul 2021 11:42:40 -0400 (EDT)
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com
- [209.85.167.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4E519402DB
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Jul 2021 11:42:40 -0400 (EDT)
-Received: by mail-lf1-f45.google.com with SMTP id 8so9150792lfp.9
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Jul 2021 08:42:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=ANvQO69/axclvlEpOBS3JYuVDXJ+POO8G/3hSlcgFno=;
- b=ZCQIvI4CvSnxNpx6lz8iiRE9/A0ehdWfvnifDXdKU5GRMYs5au4LS8oXXzExqmnzdQ
- 0VZJJ98I26UL9irET8phzbbWjxkz/itByeXcfPUhxKCjq8BgQeTmDXpvZrGcnQyi0iLn
- 0m7HVs1Zn7d67nQGFkRmeMRmdwDc6/1WOf7TEJ8ruDEYQSCKBw/G/wfyoD1D8CoUnmOX
- VOiYiEEiNrYjmlOFG/eqPWN0sFMS0iXgSWR0nuDZCoO5e51tK5FP1Awpu/kuPcGhYrIK
- 5Kr/JF9Xfaq8ogw8guhDye8k/+O7l+GQUyJfHR1sSImISI0OBsmA+7I0/DTPOOrXlPgQ
- G6EA==
+ with ESMTP id WoMWcD43v3Pc for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 22 Jul 2021 12:46:18 -0400 (EDT)
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com
+ [209.85.208.41])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B146949F82
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Jul 2021 12:46:18 -0400 (EDT)
+Received: by mail-ed1-f41.google.com with SMTP id h2so7608787edt.3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Jul 2021 09:46:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=W7EgR/KjyQstNuhpRlaCK/6CxtUIzCbapIFC82TrdSA=;
+ b=xP8oApi+Bdr+OensXaaKE8LA+9sbUQwMXVBw6NjjQbKxXo1Yohg9cn+RrKIRtbfgco
+ pkj5t/6ULCwiUcS4Bi9LAu9WRF5s7zBflC8bvLdkV+ATbo7uY7MK56xy2X6j3zy7MSZ4
+ 4xWw+tyqbU1iK8wcAXJwkrEWYAx8c23VGAtbXj4tsJ3jO7HPd1palC4627CYvJQKmyHI
+ O66+K1ghpMK6vk3B6BpzCszBTf+HJTtXD8fFqb3sXRyURY5/8Np1zO/irLBFJddYJ9I6
+ A9K9wCCJL3kBQ/tkTBN4WMGtc/MTaTyCUOMwZVaBNiNbSSfsbCf/USj1EkIh6nghbah7
+ 81yA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=ANvQO69/axclvlEpOBS3JYuVDXJ+POO8G/3hSlcgFno=;
- b=dincwr8PnORWkUlGaELZ7AKxJZPm41H4iyK14OCquBEaveebLSVYCQY46+vq4yBrGX
- IpdMmEGi6LzOjTR/D7kzos72IDxCbgNSScsHq75CTixzfx/jpmwOdF25BFx/pyV4OO14
- NsoSqKRh6NeKzQCvPDCTSA8nANvQY3QiM9e8gRpjipdoNej7o2YVGhc0ufhfxlsm/TP/
- HwJUA7qZ52yHGM8I8+1ynnRzZCs+sfZX7jSvYCLOou0Wv+LPrM2htYdDFVmqmUVHb7Vc
- gR0+rysxvUnQec4P0i+xp8puVYDvo3kipfRsaHonLGvoyJGeQAiwvK3lGZF/XDropVla
- PQVQ==
-X-Gm-Message-State: AOAM5312AgNEMrwImOPmMVwqg2x20ZHI2GI8IYFfNsNmbpb10T7Sdod2
- Qa2EN6LJxViRumb1dkIEjV/EBqqxU6dqEdyO31Z0qA==
-X-Google-Smtp-Source: ABdhPJzic6y0tc96cyVlm1JL6/pJubrETKp8vY7wnwkX0MfRUL8ys308oj6FoydX4iDwhZmV4nZUXQ2juj4W/TRGsAY=
-X-Received: by 2002:ac2:555b:: with SMTP id l27mr86978lfk.57.1626968558415;
- Thu, 22 Jul 2021 08:42:38 -0700 (PDT)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=W7EgR/KjyQstNuhpRlaCK/6CxtUIzCbapIFC82TrdSA=;
+ b=hdCFUWpQQZXGikJWMeQhReZ938tOTmXCaFYvvLUmq4hX5kBRIIMHg98E9gktpzm5iJ
+ dNP4qisqLWLA/8hV19dE9NjABd369BJWwhahfTqIzmw53LQ7JrlA0uTdcKbXUELIMw12
+ LAR8igJpG4SU1y4tBj8xGkVn/Gex5vpwfl/QILpk+2+u3clRuNklEvBIi0OPj8F+SAZy
+ KWIoARRkXPTz91+CF9YNzh68Vspz/23aGw004mZxMLVtnJ8vuvvTZxPuMSH9Vah6h3iC
+ 3Sol1eG1BKJBn+rkt0G2i6ln17Ya/NAa5SNABVQpH4LZzof4yhc8gpR9k0EoSdluujue
+ Hlvw==
+X-Gm-Message-State: AOAM533Pk4IWDLYAfE/iJK/oD69FDw+DlpeZcwcyqXeCRocUDmCOILRB
+ eKGRJ0JAQjEOJuXYU85RSRdSWA==
+X-Google-Smtp-Source: ABdhPJyaZqihTJvxMXbAmM8mW5XOhXvQdit5VNpHrh7U2L33+s17D1jweU/bvZeP06sbOOH1H+7sFw==
+X-Received: by 2002:a05:6402:168f:: with SMTP id
+ a15mr638501edv.3.1626972377612; 
+ Thu, 22 Jul 2021 09:46:17 -0700 (PDT)
+Received: from myrica (adsl-84-226-111-173.adslplus.ch. [84.226.111.173])
+ by smtp.gmail.com with ESMTPSA id j1sm12673521edl.80.2021.07.22.09.46.16
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 22 Jul 2021 09:46:17 -0700 (PDT)
+Date: Thu, 22 Jul 2021 18:45:55 +0200
+From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Subject: Re: [RFC PATCH 4/5] iommu/arm-smmu-v3: Use pinned VMID for NESTED
+ stage with BTM
+Message-ID: <YPmgw5fQ59rCw2I6@myrica>
+References: <20210222155338.26132-1-shameerali.kolothum.thodi@huawei.com>
+ <20210222155338.26132-5-shameerali.kolothum.thodi@huawei.com>
+ <YEEUocRn3IfIDpLj@myrica>
+ <903a06a9db8c45fe88158e1c35f38c25@huawei.com>
 MIME-Version: 1.0
-References: <20210716212629.2232756-1-oupton@google.com>
- <20210721152808.lsnphkl3urz6bu3v@gator>
-In-Reply-To: <20210721152808.lsnphkl3urz6bu3v@gator>
-From: Oliver Upton <oupton@google.com>
-Date: Thu, 22 Jul 2021 08:42:27 -0700
-Message-ID: <CAOQ_Qshr__rtVSk-QUbDxJpjhUW=OAf2=hpAK=ZOEA_NCFpZoQ@mail.gmail.com>
-Subject: Re: [PATCH v2 00/12] KVM: Add idempotent controls for migrating
- system counter state
-To: Andrew Jones <drjones@redhat.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Raghavendra Rao Anata <rananta@google.com>, Peter Shier <pshier@google.com>,
- Sean Christopherson <seanjc@google.com>, David Matlack <dmatlack@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>
+Content-Disposition: inline
+In-Reply-To: <903a06a9db8c45fe88158e1c35f38c25@huawei.com>
+Cc: "maz@kernel.org" <maz@kernel.org>, Linuxarm <linuxarm@huawei.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "linuxarm@openeuler.org" <linuxarm@openeuler.org>,
+ "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+ "Zengtao \(B\)" <prime.zeng@hisilicon.com>,
+ Jonathan Cameron <jonathan.cameron@huawei.com>,
+ "zhangfei.gao@linaro.org" <zhangfei.gao@linaro.org>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+ "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -97,119 +109,69 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Jul 21, 2021 at 8:28 AM Andrew Jones <drjones@redhat.com> wrote:
+Hi Shameer,
+
+On Wed, Jul 21, 2021 at 08:54:00AM +0000, Shameerali Kolothum Thodi wrote:
+> > More generally I think this pinned VMID set conflicts with that of
+> > stage-2-only domains (which is the default state until a guest attaches a
+> > PASID table). Say you have one guest using DOMAIN_NESTED without PASID
+> > table, just DMA to IPA using VMID 0x8000. Now another guest attaches a
+> > PASID table and obtains the same VMID from KVM. The stage-2 translation
+> > might use TLB entries from the other guest, no?  They'll both create
+> > stage-2 TLB entries with {StreamWorld=NS-EL1, VMID=0x8000}
+> 
+> Now that we are trying to align the KVM VMID allocation algorithm similar to
+> that of the ASID allocator [1], I attempted to use that for the SMMU pinned 
+> VMID allocation. But the issue you have mentioned above is still valid. 
+> 
+> And as a solution what I have tried now is follow what pinned ASID is doing 
+> in SVA,
+>  -Use xarray for private VMIDs
+>  -Get pinned VMID from KVM for DOMAIN_NESTED with PASID table
+>  -If the new pinned VMID is in use by private, then update the private
+>   VMID(VMID update to a live STE).
+> 
+> This seems to work, but still need to run more tests with this though.  
 >
-> On Fri, Jul 16, 2021 at 09:26:17PM +0000, Oliver Upton wrote:
-> > KVM's current means of saving/restoring system counters is plagued with
-> > temporal issues. At least on ARM64 and x86, we migrate the guest's
-> > system counter by-value through the respective guest system register
-> > values (cntvct_el0, ia32_tsc). Restoring system counters by-value is
-> > brittle as the state is not idempotent: the host system counter is still
-> > oscillating between the attempted save and restore. Furthermore, VMMs
-> > may wish to transparently live migrate guest VMs, meaning that they
-> > include the elapsed time due to live migration blackout in the guest
-> > system counter view. The VMM thread could be preempted for any number of
-> > reasons (scheduler, L0 hypervisor under nested) between the time that
-> > it calculates the desired guest counter value and when KVM actually sets
-> > this counter state.
-> >
-> > Despite the value-based interface that we present to userspace, KVM
-> > actually has idempotent guest controls by way of system counter offsets.
-> > We can avoid all of the issues associated with a value-based interface
-> > by abstracting these offset controls in new ioctls. This series
-> > introduces new vCPU device attributes to provide userspace access to the
-> > vCPU's system counter offset.
-> >
-> > Patch 1 adopts Paolo's suggestion, augmenting the KVM_{GET,SET}_CLOCK
-> > ioctls to provide userspace with a (host_tsc, realtime) instant. This is
-> > essential for a VMM to perform precise migration of the guest's system
-> > counters.
-> >
-> > Patches 2-3 add support for x86 by shoehorning the new controls into the
-> > pre-existing synchronization heuristics.
-> >
-> > Patches 4-5 implement a test for the new additions to
-> > KVM_{GET,SET}_CLOCK.
-> >
-> > Patches 6-7 implement at test for the tsc offset attribute introduced in
-> > patch 3.
-> >
-> > Patch 8 adds a device attribute for the arm64 virtual counter-timer
-> > offset.
-> >
-> > Patch 9 extends the test from patch 7 to cover the arm64 virtual
-> > counter-timer offset.
-> >
-> > Patch 10 adds a device attribute for the arm64 physical counter-timer
-> > offset. Currently, this is implemented as a synthetic register, forcing
-> > the guest to trap to the host and emulating the offset in the fast exit
-> > path. Later down the line we will have hardware with FEAT_ECV, which
-> > allows the hypervisor to perform physical counter-timer offsetting in
-> > hardware (CNTPOFF_EL2).
-> >
-> > Patch 11 extends the test from patch 7 to cover the arm64 physical
-> > counter-timer offset.
-> >
-> > Patch 12 introduces a benchmark to measure the overhead of emulation in
-> > patch 10.
-> >
-> > Physical counter benchmark
-> > --------------------------
-> >
-> > The following data was collected by running 10000 iterations of the
-> > benchmark test from Patch 6 on an Ampere Mt. Jade reference server, A 2S
-> > machine with 2 80-core Ampere Altra SoCs. Measurements were collected
-> > for both VHE and nVHE operation using the `kvm-arm.mode=` command-line
-> > parameter.
-> >
-> > nVHE
-> > ----
-> >
-> > +--------------------+--------+---------+
-> > |       Metric       | Native | Trapped |
-> > +--------------------+--------+---------+
-> > | Average            | 54ns   | 148ns   |
-> > | Standard Deviation | 124ns  | 122ns   |
-> > | 95th Percentile    | 258ns  | 348ns   |
-> > +--------------------+--------+---------+
-> >
-> > VHE
-> > ---
-> >
-> > +--------------------+--------+---------+
-> > |       Metric       | Native | Trapped |
-> > +--------------------+--------+---------+
-> > | Average            | 53ns   | 152ns   |
-> > | Standard Deviation | 92ns   | 94ns    |
-> > | 95th Percentile    | 204ns  | 307ns   |
-> > +--------------------+--------+---------+
-> >
-> > This series applies cleanly to the following commit:
-> >
-> > 1889228d80fe ("KVM: selftests: smm_test: Test SMM enter from L2")
-> >
-> > v1 -> v2:
-> >   - Reimplemented as vCPU device attributes instead of a distinct ioctl.
-> >   - Added the (realtime, host_tsc) instant support to
-> >     KVM_{GET,SET}_CLOCK
-> >   - Changed the arm64 implementation to broadcast counter offset values
-> >     to all vCPUs in a guest. This upholds the architectural expectations
-> >     of a consistent counter-timer across CPUs.
-> >   - Fixed a bug with traps in VHE mode. We now configure traps on every
-> >     transition into a guest to handle differing VMs (trapped, emulated).
-> >
->
-> Oops, I see there's a v3 of this series. I'll switch to reviewing that. I
-> think my comments / r-b's apply to that version as well though.
+> > It's tempting to allocate all VMIDs through KVM instead, but that will
+> > force a dependency on KVM to use VFIO_TYPE1_NESTING_IOMMU and might
+> > break
+> > existing users of that extension (though I'm not sure there are any).
+> > Instead we might need to restrict the SMMU VMID bitmap to match the
+> > private VMID set in KVM.
+> 
+> Another solution I have in mind is, make the new KVM VMID allocator common
+> between SMMUv3 and KVM. This will help to avoid all the private and shared
+> VMID splitting, also no need for live updates to STE VMID. One possible drawback
+> is less number of available KVM VMIDs but with 16 bit VMID space I am not sure
+> how much that is a concern.
 
-Hey Drew,
+Yes I think that works too. In practice there shouldn't be many VMIDs on
+the SMMU side, the feature's only enabled when a user wants to assign
+devices with nesting translation (unlike ASIDs where each device in the
+system gets a private ASID by default).
 
-Thanks for the review. I'll address your comments from both v2 and v3
-in the next series.
+Note that you still need to pin all VMIDs used by the SMMU, otherwise
+you'll have to update the STE after rollover.
 
---
+The problem we have with VFIO_TYPE1_NESTING_IOMMU might be solved by the
+upcoming deprecation of VFIO_*_IOMMU [2]. We need a specific sequence from
+userspace:
+1. Attach VFIO group to KVM (KVM_DEV_VFIO_GROUP_ADD)
+2. Create nesting IOMMU domain and attach the group to it
+   (VFIO_GROUP_SET_CONTAINER, VFIO_SET_IOMMU becomes
+    IOMMU_IOASID_ALLOC, VFIO_DEVICE_ATTACH_IOASID)
+Currently QEMU does 2 then 1, which would cause the SMMU to allocate a
+separate VMID. If we wanted to extend VFIO_TYPE1_NESTING_IOMMU with PASID
+tables we'd need to mandate 1-2 and may break existing users. In the new
+design we can require from the start that creating a nesting IOMMU
+container through /dev/iommu *must* come with a KVM context, that way
+we're sure to reuse the existing VMID.
+
 Thanks,
-Oliver
+Jean
+
+[2] https://lore.kernel.org/linux-iommu/BN9PR11MB5433B1E4AE5B0480369F97178C189@BN9PR11MB5433.namprd11.prod.outlook.com/
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
