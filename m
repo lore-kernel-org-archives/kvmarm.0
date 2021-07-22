@@ -2,70 +2,77 @@ Return-Path: <SRS0=vB6B=MO=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4E0AC6377D
-	for <kvmarm@archiver.kernel.org>; Thu, 22 Jul 2021 15:22:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11FF1C63793
+	for <kvmarm@archiver.kernel.org>; Thu, 22 Jul 2021 15:30:39 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3EB8A60FDA
-	for <kvmarm@archiver.kernel.org>; Thu, 22 Jul 2021 15:22:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EB8A60FDA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 79C426135B
+	for <kvmarm@archiver.kernel.org>; Thu, 22 Jul 2021 15:30:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79C426135B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B132E402DB;
-	Thu, 22 Jul 2021 11:22:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 14A2B4A003;
+	Thu, 22 Jul 2021 11:30:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id sxKhAKzYgdf7; Thu, 22 Jul 2021 11:22:33 -0400 (EDT)
+	with ESMTP id YtW44fGxTVER; Thu, 22 Jul 2021 11:30:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EF1C74029F;
-	Thu, 22 Jul 2021 11:22:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D58D849E57;
+	Thu, 22 Jul 2021 11:30:35 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 08D8F4029F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Jul 2021 11:22:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F66949E57
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Jul 2021 11:30:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rpaA+h4ZHfUI for <kvmarm@lists.cs.columbia.edu>;
- Thu, 22 Jul 2021 11:22:29 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C10DE4029C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Jul 2021 11:22:29 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BCA88106F;
- Thu, 22 Jul 2021 08:22:28 -0700 (PDT)
-Received: from [10.57.7.91] (unknown [10.57.7.91])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6E3563F694;
- Thu, 22 Jul 2021 08:22:27 -0700 (PDT)
-Subject: Re: [PATCH v2 3/3] kvm/arm: Align the VMID allocation with the arm64
- ASID one
-To: Will Deacon <will@kernel.org>,
- Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-References: <20210616155606.2806-1-shameerali.kolothum.thodi@huawei.com>
- <20210616155606.2806-4-shameerali.kolothum.thodi@huawei.com>
- <20210721163138.GD11003@willie-the-truck>
- <f7d708704fb84380af85298a98f7a48c@huawei.com>
- <20210722095010.GA12012@willie-the-truck>
-From: Vladimir Murzin <vladimir.murzin@arm.com>
-Message-ID: <43b32e77-52b1-8524-63a1-c99578c2dd1d@arm.com>
-Date: Thu, 22 Jul 2021 16:22:26 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20210722095010.GA12012@willie-the-truck>
-Content-Language: en-US
-Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
- "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
- Linuxarm <linuxarm@huawei.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "maz@kernel.org" <maz@kernel.org>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+ with ESMTP id uspx1baOD7fG for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 22 Jul 2021 11:30:33 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 26B4A40629
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Jul 2021 11:30:33 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 316C360BD3;
+ Thu, 22 Jul 2021 15:30:32 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1m6aec-000IEl-22; Thu, 22 Jul 2021 16:30:30 +0100
+Date: Thu, 22 Jul 2021 16:30:29 +0100
+Message-ID: <87y29y1i3u.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH 00/16] KVM: arm64: MMIO guard PV services
+In-Reply-To: <20210722132515.y66qi23r6ty3anax@gator>
+References: <20210715163159.1480168-1-maz@kernel.org>
+ <20210721214243.dy6d644yznuopuqx@gator>
+ <874kcm3byd.wl-maz@kernel.org>
+ <20210722132515.y66qi23r6ty3anax@gator>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: drjones@redhat.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel-team@android.com, vatsa@codeaurora.org,
+ sdonthineni@nvidia.com, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, will@kernel.org,
+ Srivatsa Vaddagiri <vatsa@codeaurora.org>, linux-kernel@vger.kernel.org,
+ Shanker R Donthineni <sdonthineni@nvidia.com>, kernel-team@android.com,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -82,17 +89,92 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 7/22/21 10:50 AM, Will Deacon wrote:
-> As an aside: I'm more and more inclined to rip out the CnP stuff given
-> that it doesn't appear to being any benefits, but does have some clear
-> downsides. Perhaps something for next week.
+On Thu, 22 Jul 2021 14:25:15 +0100,
+Andrew Jones <drjones@redhat.com> wrote:
+> 
+> On Thu, Jul 22, 2021 at 11:00:26AM +0100, Marc Zyngier wrote:
+> > On Wed, 21 Jul 2021 22:42:43 +0100,
+> > Andrew Jones <drjones@redhat.com> wrote:
+> > > 
+> > > On Thu, Jul 15, 2021 at 05:31:43PM +0100, Marc Zyngier wrote:
+> > > > KVM/arm64 currently considers that any memory access outside of a
+> > > > memslot is a MMIO access. This so far has served us very well, but
+> > > > obviously relies on the guest trusting the host, and especially
+> > > > userspace to do the right thing.
+> > > > 
+> > > > As we keep on hacking away at pKVM, it becomes obvious that this trust
+> > > > model is not really fit for a confidential computing environment, and
+> > > > that the guest would require some guarantees that emulation only
+> > > > occurs on portions of the address space that have clearly been
+> > > > identified for this purpose.
+> > > 
+> > > This trust model is hard for me to reason about. userspace is trusted to
+> > > control the life cycle of the VM, to prepare the memslots for the VM,
+> > > and [presumably] identify what MMIO ranges are valid, yet it's not
+> > > trusted to handle invalid MMIO accesses. I'd like to learn more about
+> > > this model and the userspace involved.
+> > 
+> > Imagine the following scenario:
+> > 
+> > On top of the normal memory described as memslots (which pKVM will
+> > ensure that userspace cannot access),
+> 
+> Ah, I didn't know that part.
 
-Can you please clarify what do you mean by "it doesn't appear to being any
-benefits"? IIRC, Cortex-A65 implements CnP hint and I've heard that some
-payloads seen improvement...
+Yeah, that's the crucial bit. By default, pKVM guests do not share any
+memory with anyone, so the memslots are made inaccessible from both
+the VMM and the host kernel. The guest has to explicitly change the
+state of the memory it wants to share back with the host for things
+like IO.
 
-Cheers
-Vladimir 
+> 
+> > a malicious userspace describes
+> > to the guest another memory region in a firmware table and does not
+> > back it with a memslot.
+> > 
+> > The hypervisor cannot validate this firmware description (imagine
+> > doing ACPI and DT parsing at EL2...), so the guest starts using this
+> > "memory" for something, and data slowly trickles all the way to EL0.
+> > Not what you wanted.
+> 
+> Yes, I see that now, in light of the above.
+> 
+> > 
+> > To ensure that this doesn't happen, we reverse the problem: userspace
+> > (and ultimately the EL1 kernel) doesn't get involved on a translation
+> > fault outside of a memslot *unless* the guest has explicitly asked for
+> > that page to be handled as a MMIO. With that, we have a full
+> > description of the IPA space contained in the S2 page tables:
+> > 
+> > - memory described via a memslot,
+> > - directly mapped device (GICv2, for exmaple),
+> > - MMIO exposed for emulation
+> > 
+> > and anything else is an invalid access that results in an abort.
+> > 
+> > Does this make sense to you?
+> 
+> Now I understand better, but if we're worried about malicious userspaces,
+> then how do we protect the guest from "bad" MMIO devices that have been
+> described to it? The guest can request access to those using this new
+> mechanism.
+
+We don't try to do anything about a malicious IO device. Any IO should
+be considered as malicious, and you don't want to give it anything in
+clear-text if it is supposed to be secret.
+
+Eventually, you'd probably want directly assigned devices that can
+attest to the guest that they are what they pretend to be, but that's
+a long way away. For now, we only want to enable virtio with a reduced
+level of trust (bounce buffering via shared pages for DMA, and reduced
+MMIO exposure).
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
