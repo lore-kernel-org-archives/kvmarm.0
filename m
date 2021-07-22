@@ -2,81 +2,59 @@ Return-Path: <SRS0=vB6B=MO=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ED31C6377D
-	for <kvmarm@archiver.kernel.org>; Thu, 22 Jul 2021 09:12:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9B8EC63799
+	for <kvmarm@archiver.kernel.org>; Thu, 22 Jul 2021 09:50:21 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B52F6610F7
-	for <kvmarm@archiver.kernel.org>; Thu, 22 Jul 2021 09:12:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B52F6610F7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 4CE1A61287
+	for <kvmarm@archiver.kernel.org>; Thu, 22 Jul 2021 09:50:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CE1A61287
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 23D4E4B0D5;
-	Thu, 22 Jul 2021 05:12:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D272D4A195;
+	Thu, 22 Jul 2021 05:50:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id l6pN+ThDtcj1; Thu, 22 Jul 2021 05:12:08 -0400 (EDT)
+	with ESMTP id kDHIn-VBDw3i; Thu, 22 Jul 2021 05:50:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 385D84B0B1;
-	Thu, 22 Jul 2021 05:12:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C180C4A1B0;
+	Thu, 22 Jul 2021 05:50:19 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 13E6D4B0B1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Jul 2021 05:12:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D8274A1B0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Jul 2021 05:50:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vnbGYSJPQ3QW for <kvmarm@lists.cs.columbia.edu>;
- Thu, 22 Jul 2021 05:12:02 -0400 (EDT)
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com
- [209.85.221.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B94754A4CD
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Jul 2021 05:12:02 -0400 (EDT)
-Received: by mail-wr1-f46.google.com with SMTP id m2so5142762wrq.2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Jul 2021 02:12:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=NaNS9AMgRmwWpk7IwOuTN+Dqg/nfKEvds147rH9Tsw4=;
- b=ecOgwWM0pxO8mzTAh4/Y9NmnUmrXKIT5LaCzZ6YB70MqSZc0e2QHL4FSMP/Cs70w71
- Ur5QgKQQr5sD1sSbh/MO/Y1K1b3JmBpFyxtSX8JKjxNlzPtdQUIQFCtpPh4MgPMaNI9J
- 6U6SnNmQQ2n+xayFQbhYElJ3CYfYnE2pkowTi2ZIsJM7lyiug/9KoE7fly4mp3uddkFW
- GNC496bmEs61CWvpFoFpFZmXdcQMUMP9MqRZYnmhYUG+IWztvLd2Kn3z01attIDw7zl1
- A6jjXrbGH/PXNwY93OuFBHFGKmxWI5l+QIRigCPrc5YLVDdDFo0ziiuYJa7DFXmruZx4
- BEYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=NaNS9AMgRmwWpk7IwOuTN+Dqg/nfKEvds147rH9Tsw4=;
- b=p6j8DuWmxPQYWgMjGRaeRBTDDP8hXkXs7eKWwO5S6t2Xm2b9v0OKPjQb39n/NXaG1Y
- 0iTj5aq9I1ul2ev+38aGLaNiV0ip8kILYJf9sTXHOL67izvAQ1Eydcn9W6jRlIvKyPxD
- E49p5PPX13C5hilEOensD2Nbrs4g5dFPsxSeB8ejbaAuVrghO9CnfvDVh864gv2E89or
- vW95VWAm5fVusvq7Tr0CPudxQzzAYpe1lzCpzXxKhK8R2SEkc5Jw3VXKeefAfjmVxbgZ
- HNIUr3dzcECoxyl9/gdk5U+gRprt5vQgsgYEZiJu4RoGYwZxT8y82KFIUno9x9BTT4ng
- 3m9Q==
-X-Gm-Message-State: AOAM533B5TW+oTeyklIx5kYOa/9osMmcs0jEfbSbmfyq2y4qgWTg7d3U
- EHorR/1tNnbahJniJ6JzfoVjzw==
-X-Google-Smtp-Source: ABdhPJyLWiHBnDA36VBmChvvNm3hWvX+VZpa3Rz7wOqMiZ8+/dewGGLnMKuFbyZcmEza8fsTByf6lg==
-X-Received: by 2002:a5d:568a:: with SMTP id f10mr28245004wrv.293.1626945121506; 
- Thu, 22 Jul 2021 02:12:01 -0700 (PDT)
-Received: from google.com ([2a00:79e0:d:210:efb1:2fcc:e84:52ad])
- by smtp.gmail.com with ESMTPSA id f26sm24174882wmc.29.2021.07.22.02.12.01
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 22 Jul 2021 02:12:01 -0700 (PDT)
-Date: Thu, 22 Jul 2021 10:11:58 +0100
-From: Quentin Perret <qperret@google.com>
+ with ESMTP id mhL2CcqiWEOz for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 22 Jul 2021 05:50:17 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 59FF84A195
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Jul 2021 05:50:17 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 3B7FB60725;
+ Thu, 22 Jul 2021 09:50:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1626947416;
+ bh=1fTJzkwRBBXvLw3M2jo2NjL1Gq2JwYZPXQMQ+PsKlKU=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=dSihkVRV1wezfnc8Z4ZiE7ndBzY/FfUy7o6c23SS0bLn5V7c+2QCW9tuk3p6ZmfEf
+ lPBGNoiVcmQYKpjqWF+x/tqps0JMdtOSbHzB1griSKgXbNg8uEJgfuuJxGG9y/Dv8N
+ PIJr10rsZMwLAdTgp3nY3u1A/u6FNKG/IckpsjdVAg8PnkRFKToryQ7Lw0zVtMV0rv
+ 8aKKlbyQ7JItbrbEn7RTuZf0ZpJ7IvODALCZiao/X3xTQf50nIsXw1Lwe8J2IyPITj
+ 42fXMSDwLqZ61wc2xtDFxT9raPBi4CHfP3ZA/eFvqmxQQoRPs7SpcArbVr/u7NSVLg
+ ppSo48UESDOgQ==
+Date: Thu, 22 Jul 2021 10:50:10 +0100
+From: Will Deacon <will@kernel.org>
 To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
 Subject: Re: [PATCH v2 3/3] kvm/arm: Align the VMID allocation with the arm64
  ASID one
-Message-ID: <YPk2XqrOeP6dEtPL@google.com>
+Message-ID: <20210722095010.GA12012@willie-the-truck>
 References: <20210616155606.2806-1-shameerali.kolothum.thodi@huawei.com>
  <20210616155606.2806-4-shameerali.kolothum.thodi@huawei.com>
  <20210721163138.GD11003@willie-the-truck>
@@ -84,11 +62,12 @@ References: <20210616155606.2806-1-shameerali.kolothum.thodi@huawei.com>
 MIME-Version: 1.0
 Content-Disposition: inline
 In-Reply-To: <f7d708704fb84380af85298a98f7a48c@huawei.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
- "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+ "maz@kernel.org" <maz@kernel.org>,
  "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- Linuxarm <linuxarm@huawei.com>, "maz@kernel.org" <maz@kernel.org>,
- Will Deacon <will@kernel.org>,
+ Linuxarm <linuxarm@huawei.com>,
+ "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
  "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
  "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -107,37 +86,72 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thursday 22 Jul 2021 at 06:45:14 (+0000), Shameerali Kolothum Thodi wrote:
-> > From: Will Deacon [mailto:will@kernel.org]
-> > > diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > > index 4b60c0056c04..a02c4877a055 100644
-> > > --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > > +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > > @@ -106,8 +106,7 @@ int kvm_host_prepare_stage2(void *mem_pgt_pool,
-> > void *dev_pgt_pool)
-> > >  	mmu->pgd_phys = __hyp_pa(host_kvm.pgt.pgd);
-> > >  	mmu->arch = &host_kvm.arch;
-> > >  	mmu->pgt = &host_kvm.pgt;
-> > > -	mmu->vmid.vmid_gen = 0;
-> > > -	mmu->vmid.vmid = 0;
-> > > +	atomic64_set(&mmu->vmid.id, 0);
+On Thu, Jul 22, 2021 at 06:45:14AM +0000, Shameerali Kolothum Thodi wrote:
+> > > diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c
+> > b/arch/arm64/kvm/hyp/nvhe/tlb.c
+> > > index 83dc3b271bc5..42df9931ed9a 100644
+> > > --- a/arch/arm64/kvm/hyp/nvhe/tlb.c
+> > > +++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
+> > > @@ -140,10 +140,10 @@ void __kvm_flush_cpu_context(struct
+> > kvm_s2_mmu *mmu)
+> > >  	__tlb_switch_to_host(&cxt);
+> > >  }
+> > >
+> > > -void __kvm_flush_vm_context(void)
+> > > +void __kvm_tlb_flush_local_all(void)
+> > >  {
+> > > -	dsb(ishst);
+> > > -	__tlbi(alle1is);
+> > > +	dsb(nshst);
+> > > +	__tlbi(alle1);
+> > >
+> > >  	/*
+> > >  	 * VIPT and PIPT caches are not affected by VMID, so no maintenance
+> > > @@ -155,7 +155,7 @@ void __kvm_flush_vm_context(void)
+> > >  	 *
+> > >  	 */
+> > >  	if (icache_is_vpipt())
+> > > -		asm volatile("ic ialluis");
+> > > +		asm volatile("ic iallu" : : );
+> > >
+> > > -	dsb(ish);
+> > > +	dsb(nsh);
 > > 
-> > I think this is the first atomic64 use in the EL2 object, which may pull in
-> > some fatal KCSAN instrumentation. Quentin, have you run into this before?
+> > Hmm, I'm wondering whether having this local stuff really makes sense for
+> > VMIDs. For ASIDs, where rollover can be frequent and TLBI could result in
+> > IPI on 32-bit, the local option was important, but here rollover is less
+> > frequent, DVM is relied upon to work and the cost of a hypercall is
+> > significant with nVHE.
 > > 
-> > Might be simple just to zero-initialise mmu for now, if it isn't already.
+> > So I do think you could simplify patch 2 slightly to drop the
+> > flush_pending and just issue inner-shareable invalidation on rollover.
+> > With that, it might also make it straightforward to clear active_asids
+> > when scheduling out a vCPU, which would solve the other problem I
+> > mentioned
+> > about unnecessarily reserving a bunch of the VMID space.
 > 
-> I will check that.
+> Ok. I will try out the above suggestion. Hope it will be acceptable for 8 bit 
+> VMID systems as well as there is a higher chance for rollover especially
+> when we introduce pinned VMIDs(I am not sure such platforms care about
+> Pinned VMID or not. If not, we could limit Pinned VMIDs to 16 bit systems).
 
-Yes I think what saves us here is that, AFAICT. arm64 doesn't support
-KCSAN yet. But the day it does, this should fail to link (hopefully)
-because of out-of-line calls into e.g. __kasan_check_write().
+So I woke up at 3am in a cold sweat after dreaming about this code.
 
-So yes, a simple zeroing here is probably preferable.
+I think my suggestion above still stands for the VMID allocator, but
+interestingly, it would _not_ be valid for the ASID allocator because there
+the ASID is part of the active context and so, during the window where the
+active_asid is out of sync with the TTBR, receiving a broadcast TLBI from a
+concurrent rollover wouldn't be enough to knock out the old ASID from the
+TLB despite it subsequently being made available for reallocation. So the
+local TLB invalidation is not just a performance hint as I said; it's crucial
+to the way the thing works (and this is also why the CnP code has to switch
+to the reserved TTBR0).
 
-Thanks,
-Quentin
+As an aside: I'm more and more inclined to rip out the CnP stuff given
+that it doesn't appear to being any benefits, but does have some clear
+downsides. Perhaps something for next week.
+
+Will
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
