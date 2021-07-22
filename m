@@ -2,77 +2,77 @@ Return-Path: <SRS0=vB6B=MO=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E31CC6377D
-	for <kvmarm@archiver.kernel.org>; Thu, 22 Jul 2021 06:45:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CC95C6377D
+	for <kvmarm@archiver.kernel.org>; Thu, 22 Jul 2021 08:11:11 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id ACAC061287
-	for <kvmarm@archiver.kernel.org>; Thu, 22 Jul 2021 06:45:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACAC061287
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id E17CC61283
+	for <kvmarm@archiver.kernel.org>; Thu, 22 Jul 2021 08:11:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E17CC61283
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 390754B0BE;
-	Thu, 22 Jul 2021 02:45:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 650654A500;
+	Thu, 22 Jul 2021 04:11:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Tc4f7E+vgVbU; Thu, 22 Jul 2021 02:45:24 -0400 (EDT)
+	with ESMTP id XaWOis-xqMot; Thu, 22 Jul 2021 04:11:09 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D85694B0E9;
-	Thu, 22 Jul 2021 02:45:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 14C6D4A522;
+	Thu, 22 Jul 2021 04:11:09 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E02514B0B1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Jul 2021 02:45:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 95BFB4A3A5
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Jul 2021 04:11:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id L9YYNYmpZktc for <kvmarm@lists.cs.columbia.edu>;
- Thu, 22 Jul 2021 02:45:22 -0400 (EDT)
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7D1A14A51D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Jul 2021 02:45:21 -0400 (EDT)
-Received: from dggems704-chm.china.huawei.com (unknown [172.30.72.60])
- by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4GVjWW3rB9zPy7X;
- Thu, 22 Jul 2021 14:40:39 +0800 (CST)
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- dggems704-chm.china.huawei.com (10.3.19.181) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Thu, 22 Jul 2021 14:45:16 +0800
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.2176.012; Thu, 22 Jul 2021 07:45:14 +0100
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: Will Deacon <will@kernel.org>
-Subject: RE: [PATCH v2 3/3] kvm/arm: Align the VMID allocation with the arm64
- ASID one
-Thread-Topic: [PATCH v2 3/3] kvm/arm: Align the VMID allocation with the arm64
- ASID one
-Thread-Index: AQHXYshdKTToNwJp/0KRL8OlJabnS6tNxW6AgAD8jbA=
-Date: Thu, 22 Jul 2021 06:45:14 +0000
-Message-ID: <f7d708704fb84380af85298a98f7a48c@huawei.com>
-References: <20210616155606.2806-1-shameerali.kolothum.thodi@huawei.com>
- <20210616155606.2806-4-shameerali.kolothum.thodi@huawei.com>
- <20210721163138.GD11003@willie-the-truck>
-In-Reply-To: <20210721163138.GD11003@willie-the-truck>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.47.80.98]
-MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
- "maz@kernel.org" <maz@kernel.org>,
+ with ESMTP id G83v+IGH5lIr for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 22 Jul 2021 04:11:06 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8A3CD4A4CD
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Jul 2021 04:11:06 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id C61F4610CC;
+ Thu, 22 Jul 2021 08:11:04 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1m6TnK-000DuT-J5; Thu, 22 Jul 2021 09:11:02 +0100
+Date: Thu, 22 Jul 2021 09:11:02 +0100
+Message-ID: <875yx23h0p.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Jianyong Wu <Jianyong.Wu@arm.com>
+Subject: Re: [PATCH] doc/arm: take care restore order of GICR_* in ITS restore
+In-Reply-To: <AM9PR08MB727690189F03ED71450B8EB3F4E49@AM9PR08MB7276.eurprd08.prod.outlook.com>
+References: <20210721092019.144088-1-jianyong.wu@arm.com>
+ <87czrc2dsu.wl-maz@kernel.org>
+ <AM9PR08MB727690189F03ED71450B8EB3F4E49@AM9PR08MB7276.eurprd08.prod.outlook.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: Jianyong.Wu@arm.com, James.Morse@arm.com,
+ Andre.Przywara@arm.com, lushenming@huawei.com, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Justin.He@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Justin He <Justin.He@arm.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+ Andre Przywara <Andre.Przywara@arm.com>,
  "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- Linuxarm <linuxarm@huawei.com>,
- "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+ "lushenming@huawei.com" <lushenming@huawei.com>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -89,157 +89,100 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+On Thu, 22 Jul 2021 03:49:52 +0100,
+Jianyong Wu <Jianyong.Wu@arm.com> wrote:
+> 
+> Hello Marc,
+> 
+> > -----Original Message-----
+> > From: Marc Zyngier <maz@kernel.org>
+> > Sent: Wednesday, July 21, 2021 5:54 PM
+> > To: Jianyong Wu <Jianyong.Wu@arm.com>
+> > Cc: James Morse <James.Morse@arm.com>; Andre Przywara
+> > <Andre.Przywara@arm.com>; lushenming@huawei.com;
+> > kvm@vger.kernel.org; kvmarm@lists.cs.columbia.edu; linux-
+> > doc@vger.kernel.org; linux-kernel@vger.kernel.org; Justin He
+> > <Justin.He@arm.com>
+> > Subject: Re: [PATCH] doc/arm: take care restore order of GICR_* in ITS
+> > restore
+> >
+> > On Wed, 21 Jul 2021 10:20:19 +0100,
+> > Jianyong Wu <jianyong.wu@arm.com> wrote:
+> > >
+> > > When restore GIC/ITS, GICR_CTLR must be restored after GICR_PROPBASER
+> > > and GICR_PENDBASER. That is important, as both of GICR_PROPBASER and
+> > > GICR_PENDBASER will fail to be loaded when lpi has enabled yet in
+> > > GICR_CTLR. Keep the restore order above will avoid that issue.
+> > > Shout it out at the doc is very helpful that may avoid lots of debug work.
+> >
+> > But that's something that is already mandated by the architecture, isn't it?
+> > See "5.1 LPIs" in the architecture spec:
+> >
+> > <quote>
+> >
+> > If GICR_PROPBASER is updated when GICR_CTLR.EnableLPIs == 1, the effects
+> > are UNPREDICTABLE.
+> >
+> > [...]
+> >
+> > If GICR_PENDBASER is updated when GICR_CTLR.EnableLPIs == 1, the effects
+> > are UNPREDICTABLE.
+> >
+> 
+> I think this "UNPREDICTABLE" related with the "physical machine". Am
+> I right?
 
+No, you are unfortunately wrong. The architecture applies to *any*
+implementation, and makes no distinction between a HW implementation
+of a SW version. This is why we call it an architecture, and not an
+implementation.
 
-> -----Original Message-----
-> From: Will Deacon [mailto:will@kernel.org]
-> Sent: 21 July 2021 17:32
-> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-> Cc: linux-arm-kernel@lists.infradead.org; kvmarm@lists.cs.columbia.edu;
-> linux-kernel@vger.kernel.org; maz@kernel.org; catalin.marinas@arm.com;
-> james.morse@arm.com; julien.thierry.kdev@gmail.com;
-> suzuki.poulose@arm.com; jean-philippe@linaro.org;
-> Alexandru.Elisei@arm.com; Linuxarm <linuxarm@huawei.com>;
-> qperret@google.com
-> Subject: Re: [PATCH v2 3/3] kvm/arm: Align the VMID allocation with the
-> arm64 ASID one
-> 
-> [+Quentin]
-> 
-> On Wed, Jun 16, 2021 at 04:56:06PM +0100, Shameer Kolothum wrote:
-> > From: Julien Grall <julien.grall@arm.com>
-> >
-> > At the moment, the VMID algorithm will send an SGI to all the CPUs to
-> > force an exit and then broadcast a full TLB flush and I-Cache
-> > invalidation.
-> >
-> > This patch use the new VMID allocator. The
-> > benefits are:
-> >     - CPUs are not forced to exit at roll-over. Instead the VMID will be
-> >     marked reserved and the context will be flushed at next exit. This
-> >     will reduce the IPIs traffic.
-> >     - Context invalidation is now per-CPU rather than broadcasted.
-> >     - Catalin has a formal model of the ASID allocator.
-> >
-> > With the new algo, the code is now adapted:
-> >     - The function __kvm_flush_vm_context() has been renamed to
-> >     __kvm_tlb_flush_local_all() and now only flushing the current CPU
-> >     context.
-> >     - The call to update_vmid() will be done with preemption disabled
-> >     as the new algo requires to store information per-CPU.
-> >     - The TLBs associated to EL1 will be flushed when booting a CPU to
-> >     deal with stale information. This was previously done on the
-> >     allocation of the first VMID of a new generation.
-> >
-> > Signed-off-by: Julien Grall <julien.grall@arm.com>
-> > Signed-off-by: Shameer Kolothum
-> <shameerali.kolothum.thodi@huawei.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_asm.h      |   4 +-
-> >  arch/arm64/include/asm/kvm_host.h     |   6 +-
-> >  arch/arm64/include/asm/kvm_mmu.h      |   3 +-
-> >  arch/arm64/kvm/Makefile               |   2 +-
-> >  arch/arm64/kvm/arm.c                  | 115 +++++++-------------------
-> >  arch/arm64/kvm/hyp/nvhe/hyp-main.c    |   6 +-
-> >  arch/arm64/kvm/hyp/nvhe/mem_protect.c |   3 +-
-> >  arch/arm64/kvm/hyp/nvhe/tlb.c         |  10 +--
-> >  arch/arm64/kvm/hyp/vhe/tlb.c          |  10 +--
-> >  arch/arm64/kvm/mmu.c                  |   1 -
-> >  10 files changed, 52 insertions(+), 108 deletions(-)
-> 
-> [...]
-> 
-> > diff --git a/arch/arm64/include/asm/kvm_host.h
-> b/arch/arm64/include/asm/kvm_host.h
-> > index 75a7e8071012..d96284da8571 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -70,9 +70,7 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
-> >  void kvm_arm_vcpu_destroy(struct kvm_vcpu *vcpu);
-> >
-> >  struct kvm_vmid {
-> > -	/* The VMID generation used for the virt. memory system */
-> > -	u64    vmid_gen;
-> > -	u32    vmid;
-> > +	atomic64_t id;
-> 
-> Maybe a typedef would be better if this is the only member of the structure?
+> In virtualization environment, kernel gives the definite answer that
+> we should not enable GICR_CTLR.EnableLPIs before restoring
+> GICR_PROPBASER(GICR_PENDBASER either) when restore GIC ITS in VMM,
+> see [1]. Thus, should we consider the virtualization environment as
+> a special case?
 
-Ok.
+Absolutely not.  If you start special casing things, then we end-up
+having stupidly designed SW that tries to do stupid things based on
+the supposed properties of an implementation.
 
-> 
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > index 4b60c0056c04..a02c4877a055 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > @@ -106,8 +106,7 @@ int kvm_host_prepare_stage2(void *mem_pgt_pool,
-> void *dev_pgt_pool)
-> >  	mmu->pgd_phys = __hyp_pa(host_kvm.pgt.pgd);
-> >  	mmu->arch = &host_kvm.arch;
-> >  	mmu->pgt = &host_kvm.pgt;
-> > -	mmu->vmid.vmid_gen = 0;
-> > -	mmu->vmid.vmid = 0;
-> > +	atomic64_set(&mmu->vmid.id, 0);
-> 
-> I think this is the first atomic64 use in the EL2 object, which may pull in
-> some fatal KCSAN instrumentation. Quentin, have you run into this before?
-> 
-> Might be simple just to zero-initialise mmu for now, if it isn't already.
+We follow the architecture, all the architecture, nothing but the
+architecture. The architecture is the only barrier between insanity
+and pure madness! ;-)
 
-I will check that.
+>
+> [1] linux/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> static void vgic_mmio_write_propbase(struct kvm_vcpu *vcpu,
+>                                      gpa_t addr, unsigned int len,
+>                                      unsigned long val)
+> {
+>         struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+>         struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+>         u64 old_propbaser, propbaser;
+> 
+>         /* Storing a value with LPIs already enabled is undefined */
+>         if (vgic_cpu->lpis_enabled)
+>            return;
+> ...
+> }
 
-> 
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c
-> b/arch/arm64/kvm/hyp/nvhe/tlb.c
-> > index 83dc3b271bc5..42df9931ed9a 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/tlb.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
-> > @@ -140,10 +140,10 @@ void __kvm_flush_cpu_context(struct
-> kvm_s2_mmu *mmu)
-> >  	__tlb_switch_to_host(&cxt);
-> >  }
-> >
-> > -void __kvm_flush_vm_context(void)
-> > +void __kvm_tlb_flush_local_all(void)
-> >  {
-> > -	dsb(ishst);
-> > -	__tlbi(alle1is);
-> > +	dsb(nshst);
-> > +	__tlbi(alle1);
-> >
-> >  	/*
-> >  	 * VIPT and PIPT caches are not affected by VMID, so no maintenance
-> > @@ -155,7 +155,7 @@ void __kvm_flush_vm_context(void)
-> >  	 *
-> >  	 */
-> >  	if (icache_is_vpipt())
-> > -		asm volatile("ic ialluis");
-> > +		asm volatile("ic iallu" : : );
-> >
-> > -	dsb(ish);
-> > +	dsb(nsh);
-> 
-> Hmm, I'm wondering whether having this local stuff really makes sense for
-> VMIDs. For ASIDs, where rollover can be frequent and TLBI could result in
-> IPI on 32-bit, the local option was important, but here rollover is less
-> frequent, DVM is relied upon to work and the cost of a hypercall is
-> significant with nVHE.
-> 
-> So I do think you could simplify patch 2 slightly to drop the
-> flush_pending and just issue inner-shareable invalidation on rollover.
-> With that, it might also make it straightforward to clear active_asids
-> when scheduling out a vCPU, which would solve the other problem I
-> mentioned
-> about unnecessarily reserving a bunch of the VMID space.
+Do you see how the kernel does exactly what the architecture says we
+can do? Ignoring the write is a perfectly valid implementation of
+UNPREDICTABLE.
 
-Ok. I will try out the above suggestion. Hope it will be acceptable for 8 bit 
-VMID systems as well as there is a higher chance for rollover especially
-when we introduce pinned VMIDs(I am not sure such platforms care about
-Pinned VMID or not. If not, we could limit Pinned VMIDs to 16 bit systems).
+So what we do is completely in line with the architecture. As such, no
+need to document it any further, everything is already where it should
+be. If someone tries to write code dealing with the GIC without
+understanding the architecture, no amount of additional documentation
+will help.
 
 Thanks,
-Shameer
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
