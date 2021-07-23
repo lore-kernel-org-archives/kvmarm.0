@@ -2,91 +2,74 @@ Return-Path: <SRS0=3CJn=MP=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E48CEC43214
-	for <kvmarm@archiver.kernel.org>; Fri, 23 Jul 2021 10:16:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA4C7C4338F
+	for <kvmarm@archiver.kernel.org>; Fri, 23 Jul 2021 13:30:20 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5F17960F02
-	for <kvmarm@archiver.kernel.org>; Fri, 23 Jul 2021 10:16:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 5F17960F02
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 5CFE560EFD
+	for <kvmarm@archiver.kernel.org>; Fri, 23 Jul 2021 13:30:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 5CFE560EFD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CC9654B17D;
-	Fri, 23 Jul 2021 06:16:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D40444B11A;
+	Fri, 23 Jul 2021 09:30:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id UpVgJJtYctrb; Fri, 23 Jul 2021 06:16:57 -0400 (EDT)
+	with ESMTP id KFuI-S0uhtUD; Fri, 23 Jul 2021 09:30:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CAD944B180;
-	Fri, 23 Jul 2021 06:16:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 99E564B139;
+	Fri, 23 Jul 2021 09:30:18 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F1BFB4B180
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Jul 2021 06:16:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CF2A4B11A
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Jul 2021 09:30:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aa8h9W8yZoyp for <kvmarm@lists.cs.columbia.edu>;
- Fri, 23 Jul 2021 06:16:53 -0400 (EDT)
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com
- [209.85.128.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3FD6E4B17D
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Jul 2021 06:16:53 -0400 (EDT)
-Received: by mail-wm1-f43.google.com with SMTP id
- x14-20020a7bc20e0000b0290249f2904453so3931669wmi.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Jul 2021 03:16:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=QO4j2IzOM4wXld1oT8EabRjAV6YqFAKfUcj8YzHBVaI=;
- b=p4cx62NpsnLzf2m+W/3JJq7BI22oWbvFv0i1JckRLSteAer4gZOuRH15gI/fN+lg9w
- siVxMEdqDosI3aqGGl9F6jnZHnetBuNBnSOem3WOdiUGAbldFFYf8ZssKFnvBDLp0RmS
- 3gn6RnAHQRVq8oJ/fgyOTBg0dO5t/3UaGWuOhKn1C9AVTXq6HOqPeiYtXBBZhgMuXzv1
- mZ++vZrTNqqnqGbbaJTUK5ct3SLLBA3pCzneAjbKfInzuveVP9XdaZMHWxkKSeNCS3rp
- FLE94xYozdI0j4m4CdozhSUBM55Yt7y2y2xXVT+7nPx6aMKsta55M6MB6/snld9AMeTX
- 5mtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=QO4j2IzOM4wXld1oT8EabRjAV6YqFAKfUcj8YzHBVaI=;
- b=LaJwWLBIDyfIvBl4WnESUasXAUnOnFlXSgKmuocbZAC/No6m5jC4p+A0pPc2HW8ki3
- g1X/mt0nx8qBZTFKWHQuMLCn74Opej985CyyB/OK9LxOMfRqv85zr5+H6L8QqgahWljW
- glUlDSBydp2fGYjQ7uHIpKNFl3TejNnUxSa86mZXcW0AzrIXQIbBcSByNkQt0HUlQI73
- CaTtfS24owWwbk+LWw22W+zuCpOqvS6EKyZaiqJr9bYLauWTHwvBwA1qnen2V8GJzzGU
- ZdtMLicaxQk6m8ayA2BLQNmk/5ihuEls6QL3wsHqlDPlbNkHSmUrYA5PSVaPnIu/YQ9D
- 4mrQ==
-X-Gm-Message-State: AOAM533GOpJ/JwBBvmeOmntZfjHAWRSVXWhuWHWZB0e7HLvoLccIX/TR
- /z7JGF7ad2U6Fxjc2ZrEl3XUCg==
-X-Google-Smtp-Source: ABdhPJwcozbpoFVBs05Zwspcd461WuCRshxtkqBNwhnzq02piQroC4Xf8Z0bCbz4m8KGE6IV7yRefw==
-X-Received: by 2002:a1c:7410:: with SMTP id p16mr12979418wmc.6.1627035412079; 
- Fri, 23 Jul 2021 03:16:52 -0700 (PDT)
-Received: from google.com ([2a00:79e0:d:210:a74:efb2:dddd:7915])
- by smtp.gmail.com with ESMTPSA id f7sm32325442wru.11.2021.07.23.03.16.51
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 23 Jul 2021 03:16:51 -0700 (PDT)
-Date: Fri, 23 Jul 2021 11:16:45 +0100
-From: Quentin Perret <qperret@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 04/16] KVM: arm64: Add MMIO checking infrastructure
-Message-ID: <YPqXDeRMZOX8bmNh@google.com>
-References: <20210715163159.1480168-1-maz@kernel.org>
- <20210715163159.1480168-5-maz@kernel.org>
- <YPav0Hye5Dat/yoL@google.com> <87wnpl86sz.wl-maz@kernel.org>
- <YPbwmVk1YD9+y7tr@google.com> <87wnpi1ayc.wl-maz@kernel.org>
+ with ESMTP id sSjCLSvF1UfE for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 23 Jul 2021 09:30:16 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 29A3F4B117
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Jul 2021 09:30:16 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 3A3D360EB4;
+ Fri, 23 Jul 2021 13:30:15 +0000 (UTC)
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1m6vFl-000UyF-5x; Fri, 23 Jul 2021 14:30:13 +0100
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <87wnpi1ayc.wl-maz@kernel.org>
-Cc: kernel-team@android.com, kvm@vger.kernel.org,
+Date: Fri, 23 Jul 2021 14:30:13 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH 10/16] KVM: arm64: Add some documentation for the MMIO
+ guard feature
+In-Reply-To: <20210721211743.hb2cxghhwl2y22yh@gator>
+References: <20210715163159.1480168-1-maz@kernel.org>
+ <20210715163159.1480168-11-maz@kernel.org>
+ <20210721211743.hb2cxghhwl2y22yh@gator>
+User-Agent: Roundcube Webmail/1.4.11
+Message-ID: <60d8e9e95ee4640cf3b457c53cb4cc7a@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: drjones@redhat.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel-team@android.com, vatsa@codeaurora.org,
+ sdonthineni@nvidia.com, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, will@kernel.org,
  Srivatsa Vaddagiri <vatsa@codeaurora.org>, linux-kernel@vger.kernel.org,
- Shanker R Donthineni <sdonthineni@nvidia.com>, will@kernel.org,
+ Shanker R Donthineni <sdonthineni@nvidia.com>, kernel-team@android.com,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -99,22 +82,160 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thursday 22 Jul 2021 at 19:04:59 (+0100), Marc Zyngier wrote:
-> So FWIW, I've now pushed out an updated series for the THP changes[1],
-> and you will find a similar patch at the base of the branch. Please
-> have a look and let me know what you think!
+On 2021-07-21 22:17, Andrew Jones wrote:
+> On Thu, Jul 15, 2021 at 05:31:53PM +0100, Marc Zyngier wrote:
+>> Document the hypercalls user for the MMIO guard infrastructure.
+>> 
+>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>> ---
+>>  Documentation/virt/kvm/arm/index.rst      |  1 +
+>>  Documentation/virt/kvm/arm/mmio-guard.rst | 73 
+>> +++++++++++++++++++++++
+>>  2 files changed, 74 insertions(+)
+>>  create mode 100644 Documentation/virt/kvm/arm/mmio-guard.rst
+>> 
+>> diff --git a/Documentation/virt/kvm/arm/index.rst 
+>> b/Documentation/virt/kvm/arm/index.rst
+>> index 78a9b670aafe..e77a0ee2e2d4 100644
+>> --- a/Documentation/virt/kvm/arm/index.rst
+>> +++ b/Documentation/virt/kvm/arm/index.rst
+>> @@ -11,3 +11,4 @@ ARM
+>>     psci
+>>     pvtime
+>>     ptp_kvm
+>> +   mmio-guard
+>> diff --git a/Documentation/virt/kvm/arm/mmio-guard.rst 
+>> b/Documentation/virt/kvm/arm/mmio-guard.rst
+>> new file mode 100644
+>> index 000000000000..a5563a3e12cc
+>> --- /dev/null
+>> +++ b/Documentation/virt/kvm/arm/mmio-guard.rst
+>> @@ -0,0 +1,73 @@
+>> +.. SPDX-License-Identifier: GPL-2.0
+>> +
+>> +==============
+>> +KVM MMIO guard
+>> +==============
+>> +
+>> +KVM implements device emulation by handling translation faults to any
+>> +IPA range that is not contained a memory slot. Such translation fault
+>                                   ^ in                ^ a
+> 
+>> +is in most cases passed on to userspace (or in rare cases to the host
+>> +kernel) with the address, size and possibly data of the access for
+>> +emulation.
+>> +
+>> +Should the guest exit with an address that is not one that 
+>> corresponds
+>> +to an emulatable device, userspace may take measures that are not the
+>> +most graceful as far as the guest is concerned (such as terminating 
+>> it
+>> +or delivering a fatal exception).
+>> +
+>> +There is also an element of trust: by forwarding the request to
+>> +userspace, the kernel asumes that the guest trusts userspace to do 
+>> the
+> 
+> assumes
+> 
+>> +right thing.
+>> +
+>> +The KVM MMIO guard offers a way to mitigate this last point: a guest
+>> +can request that only certainly regions of the IPA space are valid as
+> 
+> certain
 
-I Like the look of it! I'll pull this patch in my series and rebase on
-top -- that should introduce three new users or so, and allow a few nice
-cleanups.
+Thanks, all corrections applied.
 
-Thanks!
-Quentin
+> 
+>> +MMIO. Only these regions will be handled as an MMIO, and any other
+>> +will result in an exception being delivered to the guest.
+>> +
+>> +This relies on a set of hypercalls defined in the KVM-specific range,
+>> +using the HVC64 calling convention.
+>> +
+>> +* ARM_SMCCC_KVM_FUNC_MMIO_GUARD_INFO
+>> +
+>> +    ==============    ========    ================================
+>> +    Function ID:      (uint32)    0xC6000002
+>> +    Arguments:        none
+>> +    Return Values:    (int64)     NOT_SUPPORTED(-1) on error, or
+>> +                      (uint64)    Protection Granule (PG) size in
+>> +		                  bytes (r0)
+>> +    ==============    ========    ================================
+>> +
+>> +* ARM_SMCCC_KVM_FUNC_MMIO_GUARD_ENROLL
+>> +
+>> +    ==============    ========    ==============================
+>> +    Function ID:      (uint32)    0xC6000003
+>> +    Arguments:        none
+>> +    Return Values:    (int64)     NOT_SUPPORTED(-1) on error, or
+>> +                                  RET_SUCCESS(0) (r0)
+>> +    ==============    ========    ==============================
+>> +
+>> +* ARM_SMCCC_KVM_FUNC_MMIO_GUARD_MAP
+>> +
+>> +    ==============    ========    
+>> ======================================
+>> +    Function ID:      (uint32)    0xC6000004
+>> +    Arguments:        (uint64)    The base of the PG-sized IPA range
+>> +                                  that is allowed to be accessed as
+>> +				  MMIO. Must aligned to the PG size (r1)
+> 
+> align
+
+Hmmm. Ugly mix of tab and spaces. I have no idea what the norm
+is here, so I'll just put spaces. I'm sure someone will let me
+know if I'm wrong! ;-)
+
+> 
+>> +                      (uint64)    Index in the MAIR_EL1 register
+>> +		                  providing the memory attribute that
+>> +				  is used by the guest (r2)
+>> +    Return Values:    (int64)     NOT_SUPPORTED(-1) on error, or
+>> +                                  RET_SUCCESS(0) (r0)
+>> +    ==============    ========    
+>> ======================================
+>> +
+>> +* ARM_SMCCC_KVM_FUNC_MMIO_GUARD_UNMAP
+>> +
+>> +    ==============    ========    
+>> ======================================
+>> +    Function ID:      (uint32)    0xC6000004
+> 
+> copy+paste error, should be 0xC6000005
+
+Gah, well cpotted.
+
+> 
+>> +    Arguments:        (uint64)    The base of the PG-sized IPA range
+>> +                                  that is forbidden to be accessed as
+> 
+> is now forbidden
+> 
+> or
+> 
+> was allowed
+> 
+> or just drop that part of the sentence because its covered by the "and
+> have been previously mapped" part. Something like
+> 
+> PG-sized IPA range aligned to the PG size which has been previously 
+> mapped
+> (r1)
+
+Picked the latter.
+
+Thanks again,
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
