@@ -2,86 +2,75 @@ Return-Path: <SRS0=fiTO=MS=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39152C432BE
-	for <kvmarm@archiver.kernel.org>; Mon, 26 Jul 2021 09:29:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A716CC4338F
+	for <kvmarm@archiver.kernel.org>; Mon, 26 Jul 2021 10:35:18 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DCFA260F02
-	for <kvmarm@archiver.kernel.org>; Mon, 26 Jul 2021 09:29:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org DCFA260F02
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 11D5360F56
+	for <kvmarm@archiver.kernel.org>; Mon, 26 Jul 2021 10:35:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 11D5360F56
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 911B34ACC9;
-	Mon, 26 Jul 2021 05:29:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7086949F8F;
+	Mon, 26 Jul 2021 06:35:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id CzwybLUU82e7; Mon, 26 Jul 2021 05:29:50 -0400 (EDT)
+	with ESMTP id Xs9zA788FUwp; Mon, 26 Jul 2021 06:35:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E8464A319;
-	Mon, 26 Jul 2021 05:29:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 233654A126;
+	Mon, 26 Jul 2021 06:35:16 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EB25406E0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Jul 2021 05:29:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 31FF349F8F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Jul 2021 06:35:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Dh8vW0u+yMW2 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 26 Jul 2021 05:29:47 -0400 (EDT)
-Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com
- [209.85.219.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 41F144B096
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Jul 2021 05:29:47 -0400 (EDT)
-Received: by mail-qv1-f73.google.com with SMTP id
- js9-20020a0562142aa9b0290310fecb5f78so7951020qvb.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Jul 2021 02:29:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=4KB8zz71n+ckn7q+A5npd/SGGm4PNZq4hk1c6+NwEJY=;
- b=kkbETL0dMsBo3aqN8t9V/kIx0Ztkf3eaIwZl0PzH5SGS9l2R07gZCo3SrYhlVi0Aq8
- DYE6R8DSj9iT04q9VHzh6K+4SpsFIWhZ21iXDGINKGvc1prCFhcttOusRwxU37nyzoBJ
- cGXebYm+WF+eQ3xmw+KAK1J3BjSZ3bPpSTpuIEjXY099wkk5S/7jGm6iLAJW4Ee1idbp
- 5Skr4vyXufnVr58Rb40+iWEREgGtIjuPt7Gzvmz14VSeW3GBhdK8I9sPFbIysDe099cl
- VJTQxXrn2ZOjquQC+U5SzPZy1y6uov5YuZ6+JVs5ya29jcZkLE3TflfMn+pwghu4p+ZT
- uC9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=4KB8zz71n+ckn7q+A5npd/SGGm4PNZq4hk1c6+NwEJY=;
- b=i4RP5BFKDsjpDJrPkhXOnjR6FqA3c4w6xkA9kSeQ9qPk0z0bUl/MaoURGesTbX8Atk
- w1ugESrsrQhKu7sJm9IHecnaiNs3xWNj2o+vaNumCLn0Bj3ngthgeEkvavpvYavMxuTQ
- 7bsBjtnrfOxsn91zbIuIWn8qLMHiy3p3g06gfgb/7MmlCWhXafQ6bg4fCBDCPaWQEZb4
- 6/Nwl7lQpXZIlD+tZ8hQuTS1w8qSPCJQFkpoqkV9Z3mbrHSGUeDvWuD2OmzcK6igIj5d
- FaPGJ2MkAmjbp+ZFgvVqRklzjU3PSkePKu04ICDbDJtvGYjSl/sNHgYPDh7C+pe1/xoO
- NGvw==
-X-Gm-Message-State: AOAM530nAhvkuk5Bv4TsbYRWjheG7cfJyn8iSdtbH1ZGyhOIiZoxi/Yo
- nBL2U7loTBrg6uQh2H3Zsr54kjheIlB+
-X-Google-Smtp-Source: ABdhPJw4rV2DFKIOrC4bodeI8pRwP94WRLnn2cUKstVXAH0e5UMS4sxvzAPdNEu8x+a/0hc9RNwJfIDJlSr6
-X-Received: from luke.lon.corp.google.com
- ([2a00:79e0:d:210:23a0:2f14:433:e6cb])
- (user=qperret job=sendgmr) by 2002:a05:6214:2482:: with SMTP id
- gi2mr13928371qvb.51.1627291786850; Mon, 26 Jul 2021 02:29:46 -0700 (PDT)
-Date: Mon, 26 Jul 2021 10:29:05 +0100
-In-Reply-To: <20210726092905.2198501-1-qperret@google.com>
-Message-Id: <20210726092905.2198501-17-qperret@google.com>
-Mime-Version: 1.0
+ with ESMTP id 3qXd0yCspFeF for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 26 Jul 2021 06:35:14 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D366040856
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Jul 2021 06:35:13 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id AED8860F22;
+ Mon, 26 Jul 2021 10:35:12 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1m7xx0-0010R4-OE; Mon, 26 Jul 2021 11:35:10 +0100
+Date: Mon, 26 Jul 2021 11:35:10 +0100
+Message-ID: <87pmv5e529.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Quentin Perret <qperret@google.com>
+Subject: Re: [PATCH v2 04/16] KVM: arm64: Optimize host memory aborts
+In-Reply-To: <20210726092905.2198501-5-qperret@google.com>
 References: <20210726092905.2198501-1-qperret@google.com>
-X-Mailer: git-send-email 2.32.0.432.gabb21c7263-goog
-Subject: [PATCH v2 16/16] KVM: arm64: Make __pkvm_create_mappings static
-From: Quentin Perret <qperret@google.com>
-To: maz@kernel.org, james.morse@arm.com, alexandru.elisei@arm.com, 
- suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org
-Cc: qwandor@google.com, linux-kernel@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ <20210726092905.2198501-5-qperret@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: qperret@google.com, james.morse@arm.com,
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com,
+ will@kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, ardb@kernel.org,
+ qwandor@google.com, tabba@google.com, dbrazdil@google.com,
  kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, qwandor@google.com, will@kernel.org,
+ catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -98,46 +87,176 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The __pkvm_create_mappings() function is no longer used outside of
-nvhe/mm.c, make it static.
+On Mon, 26 Jul 2021 10:28:53 +0100,
+Quentin Perret <qperret@google.com> wrote:
+> 
+> The kvm_pgtable_stage2_find_range() function is used in the host memory
+> abort path to try and look for the largest block mapping that can be
+> used to map the faulting address. In order to do so, the function
+> currently walks the stage-2 page-table and looks for existing
+> incompatible mappings within the range of the largest possible block.
+> If incompatible mappings are found, it tries the same procedure again,
+> but using a smaller block range, and repeats until a matching range is
+> found (potentially up to page granularity). While this approach has
+> benefits (mostly in the fact that it proactively coalesces host stage-2
+> mappings), it can be slow if the ranges are fragmented, and it isn't
+> optimized to deal with CPUs faulting on the same IPA as all of them will
+> do all the work every time.
+> 
+> To avoid these issues, remove kvm_pgtable_stage2_find_range(), and walk
+> the page-table only once in the host_mem_abort() path to find the
+> closest leaf to the input address. With this, use the corresponding
+> range if it is invalid and not owned by another entity. If a valid leaf
+> is found, return -EAGAIN similar to what is done in the
+> kvm_pgtable_stage2_map() path to optimize concurrent faults.
+> 
+> Signed-off-by: Quentin Perret <qperret@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_pgtable.h  | 30 -----------
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c | 39 +++++++++++++-
+>  arch/arm64/kvm/hyp/pgtable.c          | 74 ---------------------------
+>  3 files changed, 38 insertions(+), 105 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index 5a7a13bbd4a1..cec76a49f521 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -141,16 +141,6 @@ enum kvm_pgtable_prot {
+>  #define PAGE_HYP_RO		(KVM_PGTABLE_PROT_R)
+>  #define PAGE_HYP_DEVICE		(PAGE_HYP | KVM_PGTABLE_PROT_DEVICE)
+>  
+> -/**
+> - * struct kvm_mem_range - Range of Intermediate Physical Addresses
+> - * @start:	Start of the range.
+> - * @end:	End of the range.
+> - */
+> -struct kvm_mem_range {
+> -	u64 start;
+> -	u64 end;
+> -};
+> -
+>  /**
+>   * enum kvm_pgtable_walk_flags - Flags to control a depth-first page-table walk.
+>   * @KVM_PGTABLE_WALK_LEAF:		Visit leaf entries, including invalid
+> @@ -477,24 +467,4 @@ int kvm_pgtable_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
+>   */
+>  int kvm_pgtable_get_leaf(struct kvm_pgtable *pgt, u64 addr,
+>  			 kvm_pte_t *ptep, u32 *level);
+> -
+> -/**
+> - * kvm_pgtable_stage2_find_range() - Find a range of Intermediate Physical
+> - *				     Addresses with compatible permission
+> - *				     attributes.
+> - * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
+> - * @addr:	Address that must be covered by the range.
+> - * @prot:	Protection attributes that the range must be compatible with.
+> - * @range:	Range structure used to limit the search space at call time and
+> - *		that will hold the result.
+> - *
+> - * The offset of @addr within a page is ignored. An IPA is compatible with @prot
+> - * iff its corresponding stage-2 page-table entry has default ownership and, if
+> - * valid, is mapped with protection attributes identical to @prot.
+> - *
+> - * Return: 0 on success, negative error code on failure.
+> - */
+> -int kvm_pgtable_stage2_find_range(struct kvm_pgtable *pgt, u64 addr,
+> -				  enum kvm_pgtable_prot prot,
+> -				  struct kvm_mem_range *range);
+>  #endif	/* __ARM64_KVM_PGTABLE_H__ */
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> index 871149246f5f..01700a908bb7 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> @@ -159,6 +159,11 @@ static int host_stage2_unmap_dev_all(void)
+>  	return kvm_pgtable_stage2_unmap(pgt, addr, BIT(pgt->ia_bits) - addr);
+>  }
+>  
+> +struct kvm_mem_range {
+> +	u64 start;
+> +	u64 end;
+> +};
+> +
+>  static bool find_mem_range(phys_addr_t addr, struct kvm_mem_range *range)
+>  {
+>  	int cur, left = 0, right = hyp_memblock_nr;
+> @@ -227,6 +232,38 @@ static inline int __host_stage2_idmap(u64 start, u64 end,
+>  		__ret;							\
+>  	 })
+>
+> +static int host_stage2_find_range(u64 addr, struct kvm_mem_range *range)
 
-Signed-off-by: Quentin Perret <qperret@google.com>
----
- arch/arm64/kvm/hyp/include/nvhe/mm.h | 2 --
- arch/arm64/kvm/hyp/nvhe/mm.c         | 4 ++--
- 2 files changed, 2 insertions(+), 4 deletions(-)
+nit: I find 'find_range' a bit odd. We already have found a
+range. We're just trying to narrow it down to something that fits in a
+single block mapping. How about 'host_stage2_adjust_range'?
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/mm.h b/arch/arm64/kvm/hyp/include/nvhe/mm.h
-index c76d7136ed9b..c9a8f535212e 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/mm.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/mm.h
-@@ -24,8 +24,6 @@ int hyp_back_vmemmap(phys_addr_t phys, unsigned long size, phys_addr_t back);
- int pkvm_cpu_set_vector(enum arm64_hyp_spectre_vector slot);
- int pkvm_create_mappings(void *from, void *to, enum kvm_pgtable_prot prot);
- int pkvm_create_mappings_locked(void *from, void *to, enum kvm_pgtable_prot prot);
--int __pkvm_create_mappings(unsigned long start, unsigned long size,
--			   unsigned long phys, enum kvm_pgtable_prot prot);
- unsigned long __pkvm_create_private_mapping(phys_addr_t phys, size_t size,
- 					    enum kvm_pgtable_prot prot);
- 
-diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
-index 256cbe5c0dca..80303041f72f 100644
---- a/arch/arm64/kvm/hyp/nvhe/mm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mm.c
-@@ -23,8 +23,8 @@ u64 __io_map_base;
- struct memblock_region hyp_memory[HYP_MEMBLOCK_REGIONS];
- unsigned int hyp_memblock_nr;
- 
--int __pkvm_create_mappings(unsigned long start, unsigned long size,
--			  unsigned long phys, enum kvm_pgtable_prot prot)
-+static int __pkvm_create_mappings(unsigned long start, unsigned long size,
-+				  unsigned long phys, enum kvm_pgtable_prot prot)
- {
- 	int err;
- 
+> +{
+> +	u64 granule, start, end;
+> +	kvm_pte_t pte;
+> +	u32 level;
+> +	int ret;
+> +
+> +	ret = kvm_pgtable_get_leaf(&host_kvm.pgt, addr, &pte, &level);
+> +	if (ret)
+> +		return ret;
+> +
+> +	if (kvm_pte_valid(pte))
+> +		return -EAGAIN;
+> +
+> +	if (pte)
+> +		return -EPERM;
+> +
+> +	do {
+> +		granule = kvm_granule_size(level);
+> +		start = ALIGN_DOWN(addr, granule);
+> +		end = start + granule;
+> +		level++;
+> +	} while ((level < KVM_PGTABLE_MAX_LEVELS) &&
+> +			(!kvm_level_supports_block_mapping(level) ||
+> +			 start < range->start || range->end < end));
+> +
+
+This expression does my head in. You are trying to find the largest
+block mapping that entirely fits in range, right? Can we just express
+that directly (with a global negation for the purpose of the loop)?
+
+	do {
+		[...]
+	} while (level < KVM_PGTABLE_MAX_LEVELS &&
+		 !(kvm_level_supports_block_mapping(level) &&
+		   start >= range->start &&
+		   end <= range->end));
+
+I personally find this much more readable, because it expresses the
+condition we are looking for rather than a lot of conditions forcing
+us to continue.
+
+You could also use a kvm_mem_range for the iteration, and add a helper
+that checks for the inclusion.
+
+> +	range->start = start;
+> +	range->end = end;
+> +
+> +	return 0;
+> +}
+> +
+>  static int host_stage2_idmap(u64 addr)
+>  {
+>  	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R | KVM_PGTABLE_PROT_W;
+> @@ -238,7 +275,7 @@ static int host_stage2_idmap(u64 addr)
+>  		prot |= KVM_PGTABLE_PROT_X;
+>  
+>  	hyp_spin_lock(&host_kvm.lock);
+> -	ret = kvm_pgtable_stage2_find_range(&host_kvm.pgt, addr, prot, &range);
+> +	ret = host_stage2_find_range(addr, &range);
+>  	if (ret)
+>  		goto unlock;
+
+Thanks,
+
+	M.
+
 -- 
-2.32.0.432.gabb21c7263-goog
-
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
