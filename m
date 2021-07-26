@@ -4,56 +4,57 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A716CC4338F
-	for <kvmarm@archiver.kernel.org>; Mon, 26 Jul 2021 10:35:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94B11C4338F
+	for <kvmarm@archiver.kernel.org>; Mon, 26 Jul 2021 11:27:22 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 11D5360F56
-	for <kvmarm@archiver.kernel.org>; Mon, 26 Jul 2021 10:35:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 11D5360F56
+	by mail.kernel.org (Postfix) with ESMTP id 0E86160F0F
+	for <kvmarm@archiver.kernel.org>; Mon, 26 Jul 2021 11:27:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 0E86160F0F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7086949F8F;
-	Mon, 26 Jul 2021 06:35:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AE9C407D1;
+	Mon, 26 Jul 2021 07:27:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Xs9zA788FUwp; Mon, 26 Jul 2021 06:35:16 -0400 (EDT)
+	with ESMTP id m9yzMeewQLhY; Mon, 26 Jul 2021 07:27:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 233654A126;
-	Mon, 26 Jul 2021 06:35:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E5EEC49E5F;
+	Mon, 26 Jul 2021 07:27:19 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 31FF349F8F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Jul 2021 06:35:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 07A3049F5D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Jul 2021 07:27:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3qXd0yCspFeF for <kvmarm@lists.cs.columbia.edu>;
- Mon, 26 Jul 2021 06:35:14 -0400 (EDT)
+ with ESMTP id VsbXQLxSQ3+t for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 26 Jul 2021 07:27:16 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D366040856
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Jul 2021 06:35:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9062F4086C
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Jul 2021 07:27:16 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id AED8860F22;
- Mon, 26 Jul 2021 10:35:12 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 4332860EB2;
+ Mon, 26 Jul 2021 11:27:15 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1m7xx0-0010R4-OE; Mon, 26 Jul 2021 11:35:10 +0100
-Date: Mon, 26 Jul 2021 11:35:10 +0100
-Message-ID: <87pmv5e529.wl-maz@kernel.org>
+ id 1m7ylN-00118f-91; Mon, 26 Jul 2021 12:27:13 +0100
+Date: Mon, 26 Jul 2021 12:27:12 +0100
+Message-ID: <87o8ape2nj.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Quentin Perret <qperret@google.com>
-Subject: Re: [PATCH v2 04/16] KVM: arm64: Optimize host memory aborts
-In-Reply-To: <20210726092905.2198501-5-qperret@google.com>
+Subject: Re: [PATCH v2 15/16] KVM: arm64: Restrict EL2 stage-1 changes in
+ protected mode
+In-Reply-To: <20210726092905.2198501-16-qperret@google.com>
 References: <20210726092905.2198501-1-qperret@google.com>
- <20210726092905.2198501-5-qperret@google.com>
+ <20210726092905.2198501-16-qperret@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -87,169 +88,248 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 26 Jul 2021 10:28:53 +0100,
+On Mon, 26 Jul 2021 10:29:04 +0100,
 Quentin Perret <qperret@google.com> wrote:
 > 
-> The kvm_pgtable_stage2_find_range() function is used in the host memory
-> abort path to try and look for the largest block mapping that can be
-> used to map the faulting address. In order to do so, the function
-> currently walks the stage-2 page-table and looks for existing
-> incompatible mappings within the range of the largest possible block.
-> If incompatible mappings are found, it tries the same procedure again,
-> but using a smaller block range, and repeats until a matching range is
-> found (potentially up to page granularity). While this approach has
-> benefits (mostly in the fact that it proactively coalesces host stage-2
-> mappings), it can be slow if the ranges are fragmented, and it isn't
-> optimized to deal with CPUs faulting on the same IPA as all of them will
-> do all the work every time.
+> The host kernel is currently able to change EL2 stage-1 mappings without
+> restrictions thanks to the __pkvm_create_mappings() hypercall. But in a
+> world where the host is no longer part of the TCB, this clearly poses a
+> problem.
 > 
-> To avoid these issues, remove kvm_pgtable_stage2_find_range(), and walk
-> the page-table only once in the host_mem_abort() path to find the
-> closest leaf to the input address. With this, use the corresponding
-> range if it is invalid and not owned by another entity. If a valid leaf
-> is found, return -EAGAIN similar to what is done in the
-> kvm_pgtable_stage2_map() path to optimize concurrent faults.
+> To fix this, introduce a new hypercall to allow the host to share a
+> physical memory page with the hypervisor, and remove the
+> __pkvm_create_mappings() variant. The new hypercall implements
+> ownership and permission checks before allowing the sharing operation,
+> and it annotates the shared page in the hypervisor stage-1 and host
+> stage-2 page-tables.
 > 
 > Signed-off-by: Quentin Perret <qperret@google.com>
 > ---
->  arch/arm64/include/asm/kvm_pgtable.h  | 30 -----------
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c | 39 +++++++++++++-
->  arch/arm64/kvm/hyp/pgtable.c          | 74 ---------------------------
->  3 files changed, 38 insertions(+), 105 deletions(-)
+>  arch/arm64/include/asm/kvm_asm.h              |  2 +-
+>  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  1 +
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c            | 11 +--
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 90 +++++++++++++++++++
+>  arch/arm64/kvm/mmu.c                          | 28 +++++-
+>  5 files changed, 120 insertions(+), 12 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index 5a7a13bbd4a1..cec76a49f521 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -141,16 +141,6 @@ enum kvm_pgtable_prot {
->  #define PAGE_HYP_RO		(KVM_PGTABLE_PROT_R)
->  #define PAGE_HYP_DEVICE		(PAGE_HYP | KVM_PGTABLE_PROT_DEVICE)
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index 9f0bf2109be7..78db818ae2c9 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -59,7 +59,7 @@
+>  #define __KVM_HOST_SMCCC_FUNC___vgic_v3_save_aprs		13
+>  #define __KVM_HOST_SMCCC_FUNC___vgic_v3_restore_aprs		14
+>  #define __KVM_HOST_SMCCC_FUNC___pkvm_init			15
+> -#define __KVM_HOST_SMCCC_FUNC___pkvm_create_mappings		16
+> +#define __KVM_HOST_SMCCC_FUNC___pkvm_host_share_hyp		16
+>  #define __KVM_HOST_SMCCC_FUNC___pkvm_create_private_mapping	17
+>  #define __KVM_HOST_SMCCC_FUNC___pkvm_cpu_set_vector		18
+>  #define __KVM_HOST_SMCCC_FUNC___pkvm_prot_finalize		19
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> index 8e5725d032b2..1b8e59a9d065 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> @@ -49,6 +49,7 @@ extern struct host_kvm host_kvm;
 >  
-> -/**
-> - * struct kvm_mem_range - Range of Intermediate Physical Addresses
-> - * @start:	Start of the range.
-> - * @end:	End of the range.
-> - */
-> -struct kvm_mem_range {
-> -	u64 start;
-> -	u64 end;
-> -};
-> -
->  /**
->   * enum kvm_pgtable_walk_flags - Flags to control a depth-first page-table walk.
->   * @KVM_PGTABLE_WALK_LEAF:		Visit leaf entries, including invalid
-> @@ -477,24 +467,4 @@ int kvm_pgtable_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
->   */
->  int kvm_pgtable_get_leaf(struct kvm_pgtable *pgt, u64 addr,
->  			 kvm_pte_t *ptep, u32 *level);
-> -
-> -/**
-> - * kvm_pgtable_stage2_find_range() - Find a range of Intermediate Physical
-> - *				     Addresses with compatible permission
-> - *				     attributes.
-> - * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
-> - * @addr:	Address that must be covered by the range.
-> - * @prot:	Protection attributes that the range must be compatible with.
-> - * @range:	Range structure used to limit the search space at call time and
-> - *		that will hold the result.
-> - *
-> - * The offset of @addr within a page is ignored. An IPA is compatible with @prot
-> - * iff its corresponding stage-2 page-table entry has default ownership and, if
-> - * valid, is mapped with protection attributes identical to @prot.
-> - *
-> - * Return: 0 on success, negative error code on failure.
-> - */
-> -int kvm_pgtable_stage2_find_range(struct kvm_pgtable *pgt, u64 addr,
-> -				  enum kvm_pgtable_prot prot,
-> -				  struct kvm_mem_range *range);
->  #endif	/* __ARM64_KVM_PGTABLE_H__ */
-> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> index 871149246f5f..01700a908bb7 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> @@ -159,6 +159,11 @@ static int host_stage2_unmap_dev_all(void)
->  	return kvm_pgtable_stage2_unmap(pgt, addr, BIT(pgt->ia_bits) - addr);
+>  int __pkvm_prot_finalize(void);
+>  int __pkvm_mark_hyp(phys_addr_t start, phys_addr_t end);
+> +int __pkvm_host_share_hyp(u64 pfn);
+>  
+>  int host_stage2_idmap_locked(u64 start, u64 end, enum kvm_pgtable_prot prot);
+>  int kvm_host_prepare_stage2(void *pgt_pool_base);
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> index 1632f001f4ed..dd155646ec86 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> @@ -140,14 +140,11 @@ static void handle___pkvm_cpu_set_vector(struct kvm_cpu_context *host_ctxt)
+>  	cpu_reg(host_ctxt, 1) = pkvm_cpu_set_vector(slot);
 >  }
 >  
-> +struct kvm_mem_range {
-> +	u64 start;
-> +	u64 end;
-> +};
-> +
->  static bool find_mem_range(phys_addr_t addr, struct kvm_mem_range *range)
+> -static void handle___pkvm_create_mappings(struct kvm_cpu_context *host_ctxt)
+> +static void handle___pkvm_host_share_hyp(struct kvm_cpu_context *host_ctxt)
 >  {
->  	int cur, left = 0, right = hyp_memblock_nr;
-> @@ -227,6 +232,38 @@ static inline int __host_stage2_idmap(u64 start, u64 end,
->  		__ret;							\
->  	 })
->
-> +static int host_stage2_find_range(u64 addr, struct kvm_mem_range *range)
-
-nit: I find 'find_range' a bit odd. We already have found a
-range. We're just trying to narrow it down to something that fits in a
-single block mapping. How about 'host_stage2_adjust_range'?
-
+> -	DECLARE_REG(unsigned long, start, host_ctxt, 1);
+> -	DECLARE_REG(unsigned long, size, host_ctxt, 2);
+> -	DECLARE_REG(unsigned long, phys, host_ctxt, 3);
+> -	DECLARE_REG(enum kvm_pgtable_prot, prot, host_ctxt, 4);
+> +	DECLARE_REG(u64, pfn, host_ctxt, 1);
+>  
+> -	cpu_reg(host_ctxt, 1) = __pkvm_create_mappings(start, size, phys, prot);
+> +	cpu_reg(host_ctxt, 1) = __pkvm_host_share_hyp(pfn);
+>  }
+>  
+>  static void handle___pkvm_create_private_mapping(struct kvm_cpu_context *host_ctxt)
+> @@ -193,7 +190,7 @@ static const hcall_t host_hcall[] = {
+>  	HANDLE_FUNC(__vgic_v3_restore_aprs),
+>  	HANDLE_FUNC(__pkvm_init),
+>  	HANDLE_FUNC(__pkvm_cpu_set_vector),
+> -	HANDLE_FUNC(__pkvm_create_mappings),
+> +	HANDLE_FUNC(__pkvm_host_share_hyp),
+>  	HANDLE_FUNC(__pkvm_create_private_mapping),
+>  	HANDLE_FUNC(__pkvm_prot_finalize),
+>  	HANDLE_FUNC(__pkvm_mark_hyp),
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> index 223c541a7051..75273166d2c5 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> @@ -315,6 +315,96 @@ static int host_stage2_idmap(u64 addr)
+>  	return ret;
+>  }
+>  
+> +static inline bool check_prot(enum kvm_pgtable_prot prot,
+> +			      enum kvm_pgtable_prot required,
+> +			      enum kvm_pgtable_prot denied)
 > +{
-> +	u64 granule, start, end;
+> +	return (prot & (required | denied)) == required;
+> +}
+> +
+> +int __pkvm_host_share_hyp(u64 pfn)
+> +{
+> +	phys_addr_t addr = hyp_pfn_to_phys(pfn);
+> +	enum kvm_pgtable_prot prot, cur;
+> +	void * virt = __hyp_va(addr);
+> +	enum pkvm_page_state state;
 > +	kvm_pte_t pte;
 > +	u32 level;
 > +	int ret;
 > +
+> +	if (!range_is_memory(addr, addr + PAGE_SIZE))
+> +		return -EINVAL;
+> +
+> +	hyp_spin_lock(&host_kvm.lock);
+> +	hyp_spin_lock(&pkvm_pgd_lock);
+> +
 > +	ret = kvm_pgtable_get_leaf(&host_kvm.pgt, addr, &pte, &level);
 > +	if (ret)
-> +		return ret;
+> +		goto unlock;
+> +	if (!pte)
+> +		goto map_shared;
 > +
-> +	if (kvm_pte_valid(pte))
-> +		return -EAGAIN;
+> +	/*
+> +	 * Check attributes in the host stage-2 PTE. We need the page to be:
+> +	 *  - mapped RWX as we're sharing memory;
+> +	 *  - not borrowed, as that implies absence of ownership.
+> +	 * Otherwise, we can't let it got through
+> +	 */
+> +	cur = kvm_pgtable_stage2_pte_prot(pte);
+> +	prot = pkvm_mkstate(0, PKVM_PAGE_SHARED_BORROWED);
+> +	if (!check_prot(cur, KVM_PGTABLE_PROT_RWX, prot)) {
+> +		ret = -EPERM;
+> +		goto unlock;
+> +	}
 > +
-> +	if (pte)
-> +		return -EPERM;
+> +	state = pkvm_getstate(cur);
+> +	if (state == PKVM_PAGE_OWNED)
+> +		goto map_shared;
 > +
-> +	do {
-> +		granule = kvm_granule_size(level);
-> +		start = ALIGN_DOWN(addr, granule);
-> +		end = start + granule;
-> +		level++;
-> +	} while ((level < KVM_PGTABLE_MAX_LEVELS) &&
-> +			(!kvm_level_supports_block_mapping(level) ||
-> +			 start < range->start || range->end < end));
+> +	/*
+> +	 * Tolerate double-sharing the same page, but this requires
+> +	 * cross-checking the hypervisor stage-1.
+> +	 */
+> +	if (state != PKVM_PAGE_SHARED_OWNED) {
+> +		ret = -EPERM;
+> +		goto unlock;
+> +	}
 > +
+> +	ret = kvm_pgtable_get_leaf(&pkvm_pgtable, (u64)virt, &pte, &level);
+> +	if (ret)
+> +		goto unlock;
+> +
+> +	/*
+> +	 * If the page has been shared with the hypervisor, it must be
+> +	 * SHARED_BORROWED already.
+> +	 */
+> +	cur = kvm_pgtable_hyp_pte_prot(pte);
+> +	prot = pkvm_mkstate(PAGE_HYP, PKVM_PAGE_SHARED_BORROWED);
+> +	if (!check_prot(cur, prot, ~prot))
+> +		ret = EPERM;
+> +	goto unlock;
+> +
+> +map_shared:
+> +	/*
+> +	 * If the page is not yet shared, adjust mappings in both page-tables
+> +	 * while both locks are held.
+> +	 */
+> +	prot = pkvm_mkstate(PAGE_HYP, PKVM_PAGE_SHARED_BORROWED);
+> +	ret = pkvm_create_mappings_locked(virt, virt + PAGE_SIZE, prot);
+> +	if (ret)
+> +		goto unlock;
+> +
+> +	prot = pkvm_mkstate(KVM_PGTABLE_PROT_RWX, PKVM_PAGE_SHARED_OWNED);
+> +	ret = host_stage2_idmap_locked(addr, addr + PAGE_SIZE, prot);
+> +	BUG_ON(ret);
 
-This expression does my head in. You are trying to find the largest
-block mapping that entirely fits in range, right? Can we just express
-that directly (with a global negation for the purpose of the loop)?
+Why the different treatment here? If we couldn't map the page in EL2
+Stage-1, surely that's also a big problem, isn't it?
 
-	do {
-		[...]
-	} while (level < KVM_PGTABLE_MAX_LEVELS &&
-		 !(kvm_level_supports_block_mapping(level) &&
-		   start >= range->start &&
-		   end <= range->end));
+> +
+> +unlock:
+> +	hyp_spin_unlock(&pkvm_pgd_lock);
+> +	hyp_spin_unlock(&host_kvm.lock);
+> +
+> +	return ret;
+> +}
+> +
+>  int __pkvm_mark_hyp(phys_addr_t start, phys_addr_t end)
+>  {
+>  	int ret;
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 0625bf2353c2..cbab146cda6a 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -259,10 +259,8 @@ static int __create_hyp_mappings(unsigned long start, unsigned long size,
+>  {
+>  	int err;
+>  
+> -	if (!kvm_host_owns_hyp_mappings()) {
+> -		return kvm_call_hyp_nvhe(__pkvm_create_mappings,
+> -					 start, size, phys, prot);
+> -	}
+> +	if (WARN_ON(!kvm_host_owns_hyp_mappings()))
+> +		return -EINVAL;
 
-I personally find this much more readable, because it expresses the
-condition we are looking for rather than a lot of conditions forcing
-us to continue.
+How comes that this doesn't generate a warning on a GICv2 system when
+we try and map the CPU interface via create_hyp_io_mappings()?
 
-You could also use a kvm_mem_range for the iteration, and add a helper
-that checks for the inclusion.
-
-> +	range->start = start;
-> +	range->end = end;
+>  
+>  	mutex_lock(&kvm_hyp_pgd_mutex);
+>  	err = kvm_pgtable_hyp_map(hyp_pgtable, start, size, phys, prot);
+> @@ -282,6 +280,21 @@ static phys_addr_t kvm_kaddr_to_phys(void *kaddr)
+>  	}
+>  }
+>  
+> +static int pkvm_share_hyp(phys_addr_t start, phys_addr_t end)
+> +{
+> +	phys_addr_t addr;
+> +	int ret;
+> +
+> +	for (addr = ALIGN_DOWN(start, PAGE_SIZE); addr < end; addr += PAGE_SIZE) {
+> +		ret = kvm_call_hyp_nvhe(__pkvm_host_share_hyp,
+> +					__phys_to_pfn(addr));
+> +		if (ret)
+> +			return ret;
+> +	}
 > +
 > +	return 0;
 > +}
 > +
->  static int host_stage2_idmap(u64 addr)
->  {
->  	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R | KVM_PGTABLE_PROT_W;
-> @@ -238,7 +275,7 @@ static int host_stage2_idmap(u64 addr)
->  		prot |= KVM_PGTABLE_PROT_X;
+>  /**
+>   * create_hyp_mappings - duplicate a kernel virtual address range in Hyp mode
+>   * @from:	The virtual kernel start address of the range
+> @@ -302,6 +315,13 @@ int create_hyp_mappings(void *from, void *to, enum kvm_pgtable_prot prot)
+>  	if (is_kernel_in_hyp_mode())
+>  		return 0;
 >  
->  	hyp_spin_lock(&host_kvm.lock);
-> -	ret = kvm_pgtable_stage2_find_range(&host_kvm.pgt, addr, prot, &range);
-> +	ret = host_stage2_find_range(addr, &range);
->  	if (ret)
->  		goto unlock;
+> +	if (!kvm_host_owns_hyp_mappings()) {
+> +		if (WARN_ON(prot != PAGE_HYP))
+> +			return -EPERM;
+> +		return pkvm_share_hyp(kvm_kaddr_to_phys(from),
+> +				      kvm_kaddr_to_phys(to));
+> +	}
+> +
+>  	start = start & PAGE_MASK;
+>  	end = PAGE_ALIGN(end);
+>  
 
 Thanks,
 
