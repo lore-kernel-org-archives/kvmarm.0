@@ -2,91 +2,86 @@ Return-Path: <SRS0=phmX=MT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C66BC4338F
-	for <kvmarm@archiver.kernel.org>; Tue, 27 Jul 2021 10:29:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D42CC4338F
+	for <kvmarm@archiver.kernel.org>; Tue, 27 Jul 2021 10:33:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9FF2461880
-	for <kvmarm@archiver.kernel.org>; Tue, 27 Jul 2021 10:29:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 9FF2461880
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id EF49160F46
+	for <kvmarm@archiver.kernel.org>; Tue, 27 Jul 2021 10:33:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org EF49160F46
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E907A4A195;
-	Tue, 27 Jul 2021 06:29:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6977D4A531;
+	Tue, 27 Jul 2021 06:33:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id VjkTD82A-0+C; Tue, 27 Jul 2021 06:29:55 -0400 (EDT)
+	with ESMTP id 9m69xGBblnGH; Tue, 27 Jul 2021 06:32:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E22E24A1A5;
-	Tue, 27 Jul 2021 06:29:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 58DB74A193;
+	Tue, 27 Jul 2021 06:32:59 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B0D24A023
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Jul 2021 06:29:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E1BEA49F6C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Jul 2021 06:32:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dQ7nx08zVT2X for <kvmarm@lists.cs.columbia.edu>;
- Tue, 27 Jul 2021 06:29:53 -0400 (EDT)
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com
- [209.85.221.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3BCAB49F6C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Jul 2021 06:29:53 -0400 (EDT)
-Received: by mail-wr1-f51.google.com with SMTP id p5so9473574wro.7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Jul 2021 03:29:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=sEVmfuf6SAseKM7IhWi4Jb0Zlgwxa7yzUBD2vot0gXo=;
- b=jbMwd6Vf/veIiSMmFyck6MkZinWyb8unn2adULZu5hHXgBtUJvqcr7kHGRoDFsLTVF
- Ht499ehIBB/nonP+vrMAjoWud6FMfahyup+Xc0MfU/qds5iHMcnX9oDDtGxhXfsmw2jQ
- bOA+6T18uhuWrPr7HOF9DqvemNutUfebyAiFbMmlsk90+4cfzU35BkGVuzCOjlJzHABS
- Cpt4iwJFPDMjI6lmrKwLeQlrPdYPUWBMpzRnzxhv7u586fgB5yOFDr74Z++FKEHYj7hv
- vjMZy3Xh3I1JPjwJNfnFXsagRYMzf2VQSW6ySqNJ1lvGEY6NX0bBn2Dlb5HaqspF7peF
- dfMA==
+ with ESMTP id vP1kFUPNzIQ7 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 27 Jul 2021 06:32:56 -0400 (EDT)
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com
+ [209.85.208.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AE00F49E8C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Jul 2021 06:32:56 -0400 (EDT)
+Received: by mail-ed1-f51.google.com with SMTP id z26so14727639edr.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Jul 2021 03:32:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=jnFmiiCARwRXURV87SUoI4OAHXmTW3lr0hJaEC8D8Qo=;
+ b=t5/8OCiV65LjtymFAaIrJfaSLZnhAwBIp4orIX/0Z1v2iy1a6amOxkKFI69uy0S14q
+ VzeM8IvLh4y36jG3aVxfAZs0TMweAVVWwlFoLTPJPmIkwmD3FBxA03ABTrmZUU1gM1fR
+ fZ1Viz0+VHQT6fnAzY6kr2TTNtJ3FoWLklbrOd3X5kSn49K/+E3EgRLkwos/ewcrJhA+
+ KQkiS+2K+2ALVEnQe+9ARSCiIAbjCKtg41e6Wjz1AKmDvAy/ZhssNgyfC2HSpxX5OdeY
+ gNoOyPnc8tm9+4qU59BAE2P8vp0JjeVpjLEMIYbhJZ6XYS5Cn8jghBtzA5TArnoUCGRQ
+ DlpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=sEVmfuf6SAseKM7IhWi4Jb0Zlgwxa7yzUBD2vot0gXo=;
- b=WLHe96BYlltJ8e1e68H+SeBNouErDwa4Ev5MVgiv48zl0x1aqEIOX5jDq+7sCWQTjD
- o37R6TRZRwV3s/6t9WSbR1a1viHSNq3u+XxlbFv5WY1wvSnkrgYgX/zR4yjt8zA25x25
- qCBqC7yhPHcbIe6I7dsysBrql4xWfdoOqNMXGZISrkuyMfK5bUbbGRUOUp6YIYkFyahx
- MZGUkBM+NRfjb9QzaSJWsjL/1EpPgBVhFhTgvBl0DtYVJ9GA6FmIfGkCEFBxgKdnTNDI
- X2FS7OOaTgTuHFbCu6N5JuSTNFCKMbylqgSbr13YgUJauQz5ez4JUP2Nv2fPbC6WYA/4
- ZpNA==
-X-Gm-Message-State: AOAM532V8+oLeuzhprcFk0cec9BFEqXBs0VvbUmUHI7ZSHg++zFMClhN
- e8/sWexfM0yv3R9qUBSCb6J2ag==
-X-Google-Smtp-Source: ABdhPJyl4ddC3yvRFr3OUCBwgPccE+P0sn15kKofTfKQowfSw6BB1YRonRXV/ZY3mD3e5qu7Ph1vew==
-X-Received: by 2002:adf:f64b:: with SMTP id x11mr14340461wrp.155.1627381791958; 
- Tue, 27 Jul 2021 03:29:51 -0700 (PDT)
-Received: from google.com ([2a00:79e0:d:210:c468:e033:fa2b:3a6])
- by smtp.gmail.com with ESMTPSA id w18sm2928774wrg.68.2021.07.27.03.29.51
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=jnFmiiCARwRXURV87SUoI4OAHXmTW3lr0hJaEC8D8Qo=;
+ b=m1KfnC0ySooHg7vAAu6fMtb7JPAyKgn/9XcCr9L7ItYXuYVeMUngwUOF7Ym8qEnW5w
+ za2H6cySH61cS/Xv/+JPxgVF3si8jZsvT3DZypyEsgM5m8q0twVkptU7Jn4NQ8ehn7o3
+ ONi9s5RPp2do7T6bNzOcmsQkInRFIXpikxrbaaW/3+3ZblkOw/SqJWv1D1WdyiMeBCBi
+ Cd/t5CNHzjcnmQFbPmgn2TrfMTmFxQ4aJo4H0AD6P6gs64DoYZF4cfIZPo9RaYKQ7GfB
+ F/spx4A9mSlRUmr4w/UuUp3gf6J9iWf/CCxjNyg/qEuzWsKXo/98IoChsh6qBoIUGkTK
+ RiOg==
+X-Gm-Message-State: AOAM530URyX0JgxKgHNgHKkb+XlobKyRs+GnoyTl/8k76s56H++hRUZV
+ u8jBOaCDX9DtN3RbhnSJSho=
+X-Google-Smtp-Source: ABdhPJwVzbWCsmg6tp3vU13MkpOZeZpi6hJPrU/wtF3E5a4blQzAdpGohkBz9ys4/iB3AFYxRb59+A==
+X-Received: by 2002:a05:6402:3489:: with SMTP id
+ v9mr27339068edc.124.1627381975605; 
+ Tue, 27 Jul 2021 03:32:55 -0700 (PDT)
+Received: from avogadro.. (93-33-132-114.ip44.fastwebnet.it. [93.33.132.114])
+ by smtp.gmail.com with ESMTPSA id
+ la23sm742030ejc.63.2021.07.27.03.32.53
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 27 Jul 2021 03:29:51 -0700 (PDT)
-Date: Tue, 27 Jul 2021 11:29:48 +0100
-From: Quentin Perret <qperret@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v2 1/6] KVM: arm64: Introduce helper to retrieve a PTE
- and its level
-Message-ID: <YP/gHGfhXgBBe7iD@google.com>
-References: <20210726153552.1535838-1-maz@kernel.org>
- <20210726153552.1535838-2-maz@kernel.org>
+ Tue, 27 Jul 2021 03:32:54 -0700 (PDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Subject: [PATCH] KVM: ARM: count remote TLB flushes
+Date: Tue, 27 Jul 2021 12:32:51 +0200
+Message-Id: <20210727103251.16561-1-pbonzini@redhat.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210726153552.1535838-2-maz@kernel.org>
-Cc: kernel-team@android.com, kvm@vger.kernel.org,
- Sean Christopherson <seanjc@google.com>, Matthew Wilcox <willy@infradead.org>,
- linux-mm@kvack.org, Paolo Bonzini <pbonzini@redhat.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Cc: maz@kernel.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -103,14 +98,31 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Monday 26 Jul 2021 at 16:35:47 (+0100), Marc Zyngier wrote:
-> It is becoming a common need to fetch the PTE for a given address
-> together with its level. Add such a helper.
+KVM/ARM has an architecture-specific implementation of
+kvm_flush_remote_tlbs; however, unlike the generic one,
+it does not count the flushes in kvm->stat.remote_tlb_flush,
+so that it inexorably remained stuck to zero.
 
-Reviewed-by: Quentin Perret <qperret@google.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/arm64/kvm/mmu.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Thanks,
-Quentin
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index c10207fed2f3..6cf16b43bfcc 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -81,6 +81,7 @@ static bool memslot_is_logging(struct kvm_memory_slot *memslot)
+ void kvm_flush_remote_tlbs(struct kvm *kvm)
+ {
+ 	kvm_call_hyp(__kvm_tlb_flush_vmid, &kvm->arch.mmu);
++	++kvm->stat.generic.remote_tlb_flush;
+ }
+ 
+ static bool kvm_is_device_pfn(unsigned long pfn)
+-- 
+2.31.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
