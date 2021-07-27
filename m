@@ -2,86 +2,63 @@ Return-Path: <SRS0=phmX=MT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D42CC4338F
-	for <kvmarm@archiver.kernel.org>; Tue, 27 Jul 2021 10:33:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 102F4C432BE
+	for <kvmarm@archiver.kernel.org>; Tue, 27 Jul 2021 15:24:35 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id EF49160F46
-	for <kvmarm@archiver.kernel.org>; Tue, 27 Jul 2021 10:33:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org EF49160F46
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 6285661B42
+	for <kvmarm@archiver.kernel.org>; Tue, 27 Jul 2021 15:24:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 6285661B42
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6977D4A531;
-	Tue, 27 Jul 2021 06:33:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D4AEA49DE7;
+	Tue, 27 Jul 2021 11:24:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9m69xGBblnGH; Tue, 27 Jul 2021 06:32:59 -0400 (EDT)
+	with ESMTP id G7pvnCOyaelH; Tue, 27 Jul 2021 11:24:32 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 58DB74A193;
-	Tue, 27 Jul 2021 06:32:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A2B484A534;
+	Tue, 27 Jul 2021 11:24:32 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E1BEA49F6C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Jul 2021 06:32:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A5DB540CF8
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Jul 2021 11:24:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vP1kFUPNzIQ7 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 27 Jul 2021 06:32:56 -0400 (EDT)
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com
- [209.85.208.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AE00F49E8C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Jul 2021 06:32:56 -0400 (EDT)
-Received: by mail-ed1-f51.google.com with SMTP id z26so14727639edr.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Jul 2021 03:32:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=jnFmiiCARwRXURV87SUoI4OAHXmTW3lr0hJaEC8D8Qo=;
- b=t5/8OCiV65LjtymFAaIrJfaSLZnhAwBIp4orIX/0Z1v2iy1a6amOxkKFI69uy0S14q
- VzeM8IvLh4y36jG3aVxfAZs0TMweAVVWwlFoLTPJPmIkwmD3FBxA03ABTrmZUU1gM1fR
- fZ1Viz0+VHQT6fnAzY6kr2TTNtJ3FoWLklbrOd3X5kSn49K/+E3EgRLkwos/ewcrJhA+
- KQkiS+2K+2ALVEnQe+9ARSCiIAbjCKtg41e6Wjz1AKmDvAy/ZhssNgyfC2HSpxX5OdeY
- gNoOyPnc8tm9+4qU59BAE2P8vp0JjeVpjLEMIYbhJZ6XYS5Cn8jghBtzA5TArnoUCGRQ
- DlpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=jnFmiiCARwRXURV87SUoI4OAHXmTW3lr0hJaEC8D8Qo=;
- b=m1KfnC0ySooHg7vAAu6fMtb7JPAyKgn/9XcCr9L7ItYXuYVeMUngwUOF7Ym8qEnW5w
- za2H6cySH61cS/Xv/+JPxgVF3si8jZsvT3DZypyEsgM5m8q0twVkptU7Jn4NQ8ehn7o3
- ONi9s5RPp2do7T6bNzOcmsQkInRFIXpikxrbaaW/3+3ZblkOw/SqJWv1D1WdyiMeBCBi
- Cd/t5CNHzjcnmQFbPmgn2TrfMTmFxQ4aJo4H0AD6P6gs64DoYZF4cfIZPo9RaYKQ7GfB
- F/spx4A9mSlRUmr4w/UuUp3gf6J9iWf/CCxjNyg/qEuzWsKXo/98IoChsh6qBoIUGkTK
- RiOg==
-X-Gm-Message-State: AOAM530URyX0JgxKgHNgHKkb+XlobKyRs+GnoyTl/8k76s56H++hRUZV
- u8jBOaCDX9DtN3RbhnSJSho=
-X-Google-Smtp-Source: ABdhPJwVzbWCsmg6tp3vU13MkpOZeZpi6hJPrU/wtF3E5a4blQzAdpGohkBz9ys4/iB3AFYxRb59+A==
-X-Received: by 2002:a05:6402:3489:: with SMTP id
- v9mr27339068edc.124.1627381975605; 
- Tue, 27 Jul 2021 03:32:55 -0700 (PDT)
-Received: from avogadro.. (93-33-132-114.ip44.fastwebnet.it. [93.33.132.114])
- by smtp.gmail.com with ESMTPSA id
- la23sm742030ejc.63.2021.07.27.03.32.53
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 27 Jul 2021 03:32:54 -0700 (PDT)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: [PATCH] KVM: ARM: count remote TLB flushes
-Date: Tue, 27 Jul 2021 12:32:51 +0200
-Message-Id: <20210727103251.16561-1-pbonzini@redhat.com>
-X-Mailer: git-send-email 2.31.1
+ with ESMTP id EjWkqiCb1Ny5 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 27 Jul 2021 11:24:30 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 324A54086F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Jul 2021 11:24:30 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8DAF131B;
+ Tue, 27 Jul 2021 08:24:29 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 782673F66F;
+ Tue, 27 Jul 2021 08:24:27 -0700 (PDT)
+Subject: Re: [PATCH v2 1/6] KVM: arm64: Introduce helper to retrieve a PTE and
+ its level
+To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-mm@kvack.org
+References: <20210726153552.1535838-1-maz@kernel.org>
+ <20210726153552.1535838-2-maz@kernel.org>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <11d5e176-ac47-e215-b82a-b8f074220bd6@arm.com>
+Date: Tue, 27 Jul 2021 16:25:34 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-Cc: maz@kernel.org, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20210726153552.1535838-2-maz@kernel.org>
+Content-Language: en-US
+Cc: kernel-team@android.com, Sean Christopherson <seanjc@google.com>,
+ Matthew Wilcox <willy@infradead.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ Will Deacon <will@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -98,31 +75,115 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-KVM/ARM has an architecture-specific implementation of
-kvm_flush_remote_tlbs; however, unlike the generic one,
-it does not count the flushes in kvm->stat.remote_tlb_flush,
-so that it inexorably remained stuck to zero.
+Hi Marc,
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/arm64/kvm/mmu.c | 1 +
- 1 file changed, 1 insertion(+)
+On 7/26/21 4:35 PM, Marc Zyngier wrote:
+> It is becoming a common need to fetch the PTE for a given address
+> together with its level. Add such a helper.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_pgtable.h | 19 ++++++++++++++
+>  arch/arm64/kvm/hyp/pgtable.c         | 39 ++++++++++++++++++++++++++++
+>  2 files changed, 58 insertions(+)
+>
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index f004c0115d89..082b9d65f40b 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -432,6 +432,25 @@ int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size);
+>  int kvm_pgtable_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
+>  		     struct kvm_pgtable_walker *walker);
+>  
+> +/**
+> + * kvm_pgtable_get_leaf() - Walk a page-table and retrieve the leaf entry
+> + *			    with its level.
+> + * @pgt:	Page-table structure initialised by kvm_pgtable_*_init().
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index c10207fed2f3..6cf16b43bfcc 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -81,6 +81,7 @@ static bool memslot_is_logging(struct kvm_memory_slot *memslot)
- void kvm_flush_remote_tlbs(struct kvm *kvm)
- {
- 	kvm_call_hyp(__kvm_tlb_flush_vmid, &kvm->arch.mmu);
-+	++kvm->stat.generic.remote_tlb_flush;
- }
- 
- static bool kvm_is_device_pfn(unsigned long pfn)
--- 
-2.31.1
+Yet in the next patch you use a struct kvm_pgtable_pgt not initialized by any of
+the kvm_pgtable_*_init() functions. It doesn't hurt correctness, but it might
+confuse potential users of this function.
 
+> + * @addr:	Input address for the start of the walk.
+> + * @ptep:	Pointer to storage for the retrieved PTE.
+> + * @level:	Pointer to storage for the level of the retrieved PTE.
+> + *
+> + * The offset of @addr within a page is ignored.
+> + *
+> + * The walker will walk the page-table entries corresponding to the input
+> + * address specified, retrieving the leaf corresponding to this address.
+> + * Invalid entries are treated as leaf entries.
+> + *
+> + * Return: 0 on success, negative error code on failure.
+> + */
+> +int kvm_pgtable_get_leaf(struct kvm_pgtable *pgt, u64 addr,
+> +			 kvm_pte_t *ptep, u32 *level);
+> +
+>  /**
+>   * kvm_pgtable_stage2_find_range() - Find a range of Intermediate Physical
+>   *				     Addresses with compatible permission
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index 05321f4165e3..78f36bd5df6c 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -326,6 +326,45 @@ int kvm_pgtable_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
+>  	return _kvm_pgtable_walk(&walk_data);
+>  }
+>  
+> +struct leaf_walk_data {
+> +	kvm_pte_t	pte;
+> +	u32		level;
+> +};
+> +
+> +static int leaf_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+> +		       enum kvm_pgtable_walk_flags flag, void * const arg)
+> +{
+> +	struct leaf_walk_data *data = arg;
+> +
+> +	data->pte   = *ptep;
+> +	data->level = level;
+> +
+> +	return 0;
+> +}
+> +
+> +int kvm_pgtable_get_leaf(struct kvm_pgtable *pgt, u64 addr,
+> +			 kvm_pte_t *ptep, u32 *level)
+> +{
+> +	struct leaf_walk_data data;
+> +	struct kvm_pgtable_walker walker = {
+> +		.cb	= leaf_walker,
+> +		.flags	= KVM_PGTABLE_WALK_LEAF,
+> +		.arg	= &data,
+> +	};
+> +	int ret;
+> +
+> +	ret = kvm_pgtable_walk(pgt, ALIGN_DOWN(addr, PAGE_SIZE),
+> +			       PAGE_SIZE, &walker);
+
+kvm_pgtable_walk() already aligns addr down to PAGE_SIZE, I don't think that's
+needed here. But not harmful either.
+
+Otherwise, the patch looks good to me:
+
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+Thanks,
+
+Alex
+
+> +	if (!ret) {
+> +		if (ptep)
+> +			*ptep  = data.pte;
+> +		if (level)
+> +			*level = data.level;
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+>  struct hyp_map_data {
+>  	u64				phys;
+>  	kvm_pte_t			attr;
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
