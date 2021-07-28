@@ -2,91 +2,78 @@ Return-Path: <SRS0=xfyP=MU=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF9DFC4320A
-	for <kvmarm@archiver.kernel.org>; Wed, 28 Jul 2021 12:15:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 124DAC4338F
+	for <kvmarm@archiver.kernel.org>; Wed, 28 Jul 2021 12:17:14 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2540F60EB9
-	for <kvmarm@archiver.kernel.org>; Wed, 28 Jul 2021 12:15:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 2540F60EB9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 7C72A60FC2
+	for <kvmarm@archiver.kernel.org>; Wed, 28 Jul 2021 12:17:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 7C72A60FC2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B30E4B086;
-	Wed, 28 Jul 2021 08:15:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D85854A195;
+	Wed, 28 Jul 2021 08:17:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id kT0k2x1SqTT7; Wed, 28 Jul 2021 08:15:02 -0400 (EDT)
+	with ESMTP id amM3dVrXQ37v; Wed, 28 Jul 2021 08:17:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C0D64B089;
-	Wed, 28 Jul 2021 08:15:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B44684B089;
+	Wed, 28 Jul 2021 08:17:11 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2EE314A2E5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jul 2021 08:15:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 54AC74AEDC
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jul 2021 08:17:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NiOWnFvs4gw8 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Jul 2021 08:15:00 -0400 (EDT)
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com
- [209.85.128.53])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F31834A195
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jul 2021 08:14:59 -0400 (EDT)
-Received: by mail-wm1-f53.google.com with SMTP id
- f14-20020a05600c154eb02902519e4abe10so4131209wmg.4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jul 2021 05:14:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=mYbbIZoMD/b/Fq8e37HailMl4O7MY4m6Mt2gCBpEuDQ=;
- b=fqTrQ4uuHUeFCXJuKjWrrRZAjUSahCTgoWavfLLB4lOMC3ZYN+qMijBsymlR1rNoOv
- TZENLRhzK4CaipcXK90ge4PAAy3XlMGEgLugd/1FTgGlOw6NaMgGePd5Qq1wb60j8pOC
- V6T6u5XHmCmvkGD7Yu1lE/8Du+eMRUZUJNr84DGYfrJM5gBPbCL0lf5PgJJ3gU29r2Hn
- MApOPtQ30W4H8J/wz8oBgYYzwxVUYeroWafjX0hvAUzv7cxlXyTNPNpQ0SCBMhhX059q
- ahNwTVnKTF2LsmLZh5a2sEQOjMwzLrRA1gNMstiSvYy/TIEcVzg7CYhY0Rks1j+Zj41+
- stiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=mYbbIZoMD/b/Fq8e37HailMl4O7MY4m6Mt2gCBpEuDQ=;
- b=gE/ou8wLPtSfdyeYgjOOeTE+dSR1syiHr7XwT8Za6wMZZdcyQXHRrL3gSv3C2LBbp4
- 1D5kDCByjP1kXFSvFgJySrHYGzIQJbDuM1EgfLx8sR/F4YsDkhqRjulR2kQU5bVHOvzJ
- fSzYtNNK7+2eZccpkqVz0OfiAPvZlFTW6ZX/S3eA1/RaWr6OXDh4/vP6dFDYllTbu3Ng
- 5u2ASAQsSOppYmNBmdwYTsUDsYqfSEGhF0X8vok7IRDIbdCS1gSmoKLYqiDI84HoqJ8m
- a/BJZLRIdCrdJRjWZej7Cxe6dmPdw77gKBOjwuX9xH5jYLwFYWldXyHN8syAbzX/cflt
- sEsw==
-X-Gm-Message-State: AOAM532euGkA2NevBW5dN0W4sjVM2/Xenc0NMSeolXJ/95z+eB3/x6RU
- 65n4htDi45seCTkIPEBIX6vVSw==
-X-Google-Smtp-Source: ABdhPJzgNbqRIxzd4hehDTC+KCWYXXRYwck4YjYrAzMJP5c35Whvluz0sZ3AKraerAUjQbY5ud0c6g==
-X-Received: by 2002:a7b:c5c7:: with SMTP id n7mr23388587wmk.5.1627474498601;
- Wed, 28 Jul 2021 05:14:58 -0700 (PDT)
-Received: from google.com ([2a00:79e0:d:210:ff6f:6a8e:935d:3f53])
- by smtp.gmail.com with ESMTPSA id w5sm1534611wro.45.2021.07.28.05.14.58
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 28 Jul 2021 05:14:58 -0700 (PDT)
-Date: Wed, 28 Jul 2021 13:14:54 +0100
-From: Quentin Perret <qperret@google.com>
-To: maz@kernel.org, james.morse@arm.com, alexandru.elisei@arm.com,
- suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org
-Subject: Re: [PATCH v2 12/16] KVM: arm64: Mark host bss and rodata section as
- shared
-Message-ID: <YQFKPoUUjJyceVjR@google.com>
-References: <20210726092905.2198501-1-qperret@google.com>
- <20210726092905.2198501-13-qperret@google.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210726092905.2198501-13-qperret@google.com>
-Cc: qwandor@google.com, linux-kernel@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- kernel-team@android.com
+ with ESMTP id tAUInoEiNX0B for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Jul 2021 08:17:09 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F23804A195
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jul 2021 08:17:08 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id E5AE560F46;
+ Wed, 28 Jul 2021 12:17:07 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1m8iUj-001Wc7-UM; Wed, 28 Jul 2021 13:17:06 +0100
+Date: Wed, 28 Jul 2021 13:17:05 +0100
+Message-ID: <87sfzyd45a.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH v2 1/6] KVM: arm64: Introduce helper to retrieve a PTE and
+ its level
+In-Reply-To: <11d5e176-ac47-e215-b82a-b8f074220bd6@arm.com>
+References: <20210726153552.1535838-1-maz@kernel.org>
+ <20210726153552.1535838-2-maz@kernel.org>
+ <11d5e176-ac47-e215-b82a-b8f074220bd6@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-mm@kvack.org, seanjc@google.com,
+ willy@infradead.org, pbonzini@redhat.com, will@kernel.org, qperret@google.com,
+ james.morse@arm.com, suzuki.poulose@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, kvm@vger.kernel.org,
+ Sean Christopherson <seanjc@google.com>, Matthew Wilcox <willy@infradead.org>,
+ linux-mm@kvack.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -103,58 +90,117 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Monday 26 Jul 2021 at 10:29:01 (+0100), Quentin Perret wrote:
-> +static int finalize_mappings(void)
-> +{
-> +	enum kvm_pgtable_prot prot;
-> +	int ret;
-> +
-> +	/*
-> +	 * The host's .bss and .rodata sections are now conceptually owned by
-> +	 * the hypervisor, so mark them as 'borrowed' in the host stage-2. We
-> +	 * can safely use host_stage2_idmap_locked() at this point since the
-> +	 * host stage-2 has not been enabled yet.
-> +	 */
-> +	prot = pkvm_mkstate(KVM_PGTABLE_PROT_RWX, PKVM_PAGE_SHARED_BORROWED);
-> +	ret = host_stage2_idmap_locked(__hyp_pa(__start_rodata),
-> +				       __hyp_pa(__end_rodata), prot);
-> +	if (ret)
-> +		return ret;
-> +
-> +	return host_stage2_idmap_locked(__hyp_pa(__hyp_bss_end),
-> +					__hyp_pa(__bss_stop), prot);
-> +}
-> +
->  void __noreturn __pkvm_init_finalise(void)
->  {
->  	struct kvm_host_data *host_data = this_cpu_ptr(&kvm_host_data);
-> @@ -167,6 +199,10 @@ void __noreturn __pkvm_init_finalise(void)
->  	if (ret)
->  		goto out;
->  
-> +	ret = finalize_mappings();
-> +	if (ret)
-> +		goto out;
+Hi Alex,
 
-While working on v3 of this series it occurred to me that we can
-actually do vastly better than this. Specifically, the annotation of
-shared pages currently happens in two places (recreate_hyp_mappings()
-and finalize_mappings()) with nothing to guarantee they are in sync. At
-the same time, the annotation of pages owned by the hypervisor is left
-to the host itself using the __pkvm_mark_hyp hypercall. But clearly, by
-the point we arrive to finalize_mappings() above, all the information I
-need is already stored in the hyp pgtable. That is, it should be fairly
-easy to walk the hyp stage-1, and for each valid mapping create a
-matching annotation in the host stage-2 to mark the page shared or owned
-by the hypervisor.
+On Tue, 27 Jul 2021 16:25:34 +0100,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> Hi Marc,
+> 
+> On 7/26/21 4:35 PM, Marc Zyngier wrote:
+> > It is becoming a common need to fetch the PTE for a given address
+> > together with its level. Add such a helper.
+> >
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/kvm_pgtable.h | 19 ++++++++++++++
+> >  arch/arm64/kvm/hyp/pgtable.c         | 39 ++++++++++++++++++++++++++++
+> >  2 files changed, 58 insertions(+)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> > index f004c0115d89..082b9d65f40b 100644
+> > --- a/arch/arm64/include/asm/kvm_pgtable.h
+> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> > @@ -432,6 +432,25 @@ int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size);
+> >  int kvm_pgtable_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
+> >  		     struct kvm_pgtable_walker *walker);
+> >  
+> > +/**
+> > + * kvm_pgtable_get_leaf() - Walk a page-table and retrieve the leaf entry
+> > + *			    with its level.
+> > + * @pgt:	Page-table structure initialised by kvm_pgtable_*_init().
+> 
+> Yet in the next patch you use a struct kvm_pgtable_pgt not
+> initialized by any of the kvm_pgtable_*_init() functions. It doesn't
+> hurt correctness, but it might confuse potential users of this
+> function.
 
-I'll have a go at implementing this in v3, which would guarantee
-consistency across page-tables once the hypervisor is initialized, and
-also allow to get rid of __pkvm_mark_hyp entirely. But if anybody thinks
-this is a bad idea in the meantime, please shout!
+Fair enough. I'll add something like "[...] or any similar initialisation".
 
-Thanks,
-Quentin
+> 
+> > + * @addr:	Input address for the start of the walk.
+> > + * @ptep:	Pointer to storage for the retrieved PTE.
+> > + * @level:	Pointer to storage for the level of the retrieved PTE.
+> > + *
+> > + * The offset of @addr within a page is ignored.
+> > + *
+> > + * The walker will walk the page-table entries corresponding to the input
+> > + * address specified, retrieving the leaf corresponding to this address.
+> > + * Invalid entries are treated as leaf entries.
+> > + *
+> > + * Return: 0 on success, negative error code on failure.
+> > + */
+> > +int kvm_pgtable_get_leaf(struct kvm_pgtable *pgt, u64 addr,
+> > +			 kvm_pte_t *ptep, u32 *level);
+> > +
+> >  /**
+> >   * kvm_pgtable_stage2_find_range() - Find a range of Intermediate Physical
+> >   *				     Addresses with compatible permission
+> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> > index 05321f4165e3..78f36bd5df6c 100644
+> > --- a/arch/arm64/kvm/hyp/pgtable.c
+> > +++ b/arch/arm64/kvm/hyp/pgtable.c
+> > @@ -326,6 +326,45 @@ int kvm_pgtable_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
+> >  	return _kvm_pgtable_walk(&walk_data);
+> >  }
+> >  
+> > +struct leaf_walk_data {
+> > +	kvm_pte_t	pte;
+> > +	u32		level;
+> > +};
+> > +
+> > +static int leaf_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+> > +		       enum kvm_pgtable_walk_flags flag, void * const arg)
+> > +{
+> > +	struct leaf_walk_data *data = arg;
+> > +
+> > +	data->pte   = *ptep;
+> > +	data->level = level;
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +int kvm_pgtable_get_leaf(struct kvm_pgtable *pgt, u64 addr,
+> > +			 kvm_pte_t *ptep, u32 *level)
+> > +{
+> > +	struct leaf_walk_data data;
+> > +	struct kvm_pgtable_walker walker = {
+> > +		.cb	= leaf_walker,
+> > +		.flags	= KVM_PGTABLE_WALK_LEAF,
+> > +		.arg	= &data,
+> > +	};
+> > +	int ret;
+> > +
+> > +	ret = kvm_pgtable_walk(pgt, ALIGN_DOWN(addr, PAGE_SIZE),
+> > +			       PAGE_SIZE, &walker);
+> 
+> kvm_pgtable_walk() already aligns addr down to PAGE_SIZE, I don't
+> think that's needed here. But not harmful either.
+
+It is more that if you don't align it down, the size becomes awkward
+to express. Masking is both cheap and readable.
+
+> 
+> Otherwise, the patch looks good to me:
+> 
+> Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+Thanks!
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
