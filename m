@@ -1,67 +1,74 @@
-Return-Path: <SRS0=phmX=MT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=xfyP=MU=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A688C4338F
-	for <kvmarm@archiver.kernel.org>; Tue, 27 Jul 2021 18:12:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A28DC4338F
+	for <kvmarm@archiver.kernel.org>; Wed, 28 Jul 2021 09:41:10 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2CC4560F59
-	for <kvmarm@archiver.kernel.org>; Tue, 27 Jul 2021 18:12:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 2CC4560F59
+	by mail.kernel.org (Postfix) with ESMTP id BA75060FC0
+	for <kvmarm@archiver.kernel.org>; Wed, 28 Jul 2021 09:41:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org BA75060FC0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D55FA4AEDC;
-	Tue, 27 Jul 2021 14:12:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E16A4A98B;
+	Wed, 28 Jul 2021 05:41:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 8IW34pBueUDm; Tue, 27 Jul 2021 14:12:11 -0400 (EDT)
+	with ESMTP id 3KJuGmXfskCA; Wed, 28 Jul 2021 05:41:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C793E4AEE2;
-	Tue, 27 Jul 2021 14:12:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C403640CF9;
+	Wed, 28 Jul 2021 05:41:06 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AC83A4AED4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Jul 2021 14:12:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 944174A98B
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jul 2021 05:41:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5LMbbFhteRNE for <kvmarm@lists.cs.columbia.edu>;
- Tue, 27 Jul 2021 14:12:09 -0400 (EDT)
+ with ESMTP id m15zylCCtomu for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Jul 2021 05:41:04 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C1F744A534
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Jul 2021 14:12:09 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id DD3946056B;
- Tue, 27 Jul 2021 18:12:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1627409529;
- bh=fUgkuFB9VQtgL1VRh8fF7edi9U2ibRcCUZV2oZL57h8=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=cpxx1nirtagKB64kip87dBNB4SjfC/kG0WM5+aseu385nTOwDTylRCPPxcHHEKwf4
- S/qfl0CnSLCp9sK+uhtUVArERHSiTR7kkyPKN3sq91+Zg5hJSy5mlTys4lOcf64vbg
- Uzt9HkAx8h1hcXSUxH2ZVPiwZInxVvvWK6Yd2+f2RvEJSo7d4I04xtqexTPdTbtzSq
- 6pPq1ijZab66hHRoS6BHWS/xdQG0UfWek6Cq3yLNt+lx7b1GmqOeo3uT4+9QhCTbuj
- obYyb3hXWK+0f4QnJlejAIT2PVix0kDbobIpTmsJqi74OX4pei/3hFhpxQmVgnTisi
- P/T7JGHLrHYog==
-Date: Tue, 27 Jul 2021 19:12:04 +0100
-From: Will Deacon <will@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 12/16] mm/ioremap: Add arch-specific callbacks on
- ioremap/iounmap calls
-Message-ID: <20210727181203.GG19173@willie-the-truck>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6B05440CF9
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jul 2021 05:41:04 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 50B6260F9C;
+ Wed, 28 Jul 2021 09:41:03 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1m8g3h-001Uxw-D0; Wed, 28 Jul 2021 10:41:01 +0100
+Date: Wed, 28 Jul 2021 10:41:00 +0100
+Message-ID: <875ywuepxv.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 01/16] KVM: arm64: Generalise VM features into a set of
+ flags
+In-Reply-To: <20210727181026.GA19173@willie-the-truck>
 References: <20210715163159.1480168-1-maz@kernel.org>
- <20210715163159.1480168-13-maz@kernel.org>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210715163159.1480168-13-maz@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+ <20210715163159.1480168-2-maz@kernel.org>
+ <20210727181026.GA19173@willie-the-truck>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: will@kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, qperret@google.com, dbrazdil@google.com,
+ vatsa@codeaurora.org, sdonthineni@nvidia.com, james.morse@arm.com,
+ suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 Cc: kvm@vger.kernel.org, kernel-team@android.com,
  Srivatsa Vaddagiri <vatsa@codeaurora.org>, linux-kernel@vger.kernel.org,
  Shanker R Donthineni <sdonthineni@nvidia.com>, kvmarm@lists.cs.columbia.edu,
@@ -82,42 +89,78 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Jul 15, 2021 at 05:31:55PM +0100, Marc Zyngier wrote:
-> Add a pair of hooks (ioremap_page_range_hook/iounmap_page_range_hook)
-> that can be implemented by an architecture.
+On Tue, 27 Jul 2021 19:10:27 +0100,
+Will Deacon <will@kernel.org> wrote:
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  include/linux/io.h |  3 +++
->  mm/ioremap.c       | 13 ++++++++++++-
->  mm/vmalloc.c       |  8 ++++++++
->  3 files changed, 23 insertions(+), 1 deletion(-)
+> On Thu, Jul 15, 2021 at 05:31:44PM +0100, Marc Zyngier wrote:
+> > We currently deal with a set of booleans for VM features,
+> > while they could be better represented as set of flags
+> > contained in an unsigned long, similarily to what we are
+> > doing on the CPU side.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h | 12 +++++++-----
+> >  arch/arm64/kvm/arm.c              |  5 +++--
+> >  arch/arm64/kvm/mmio.c             |  3 ++-
+> >  3 files changed, 12 insertions(+), 8 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 41911585ae0c..4add6c27251f 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -122,7 +122,10 @@ struct kvm_arch {
+> >  	 * should) opt in to this feature if KVM_CAP_ARM_NISV_TO_USER is
+> >  	 * supported.
+> >  	 */
+> > -	bool return_nisv_io_abort_to_user;
+> > +#define KVM_ARCH_FLAG_RETURN_NISV_IO_ABORT_TO_USER	0
+> > +	/* Memory Tagging Extension enabled for the guest */
+> > +#define KVM_ARCH_FLAG_MTE_ENABLED			1
+> > +	unsigned long flags;
 > 
-> diff --git a/include/linux/io.h b/include/linux/io.h
-> index 9595151d800d..0ffc265f114c 100644
-> --- a/include/linux/io.h
-> +++ b/include/linux/io.h
-> @@ -21,6 +21,9 @@ void __ioread32_copy(void *to, const void __iomem *from, size_t count);
->  void __iowrite64_copy(void __iomem *to, const void *from, size_t count);
->  
->  #ifdef CONFIG_MMU
-> +void ioremap_page_range_hook(unsigned long addr, unsigned long end,
-> +			     phys_addr_t phys_addr, pgprot_t prot);
-> +void iounmap_page_range_hook(phys_addr_t phys_addr, size_t size);
->  int ioremap_page_range(unsigned long addr, unsigned long end,
->  		       phys_addr_t phys_addr, pgprot_t prot);
->  #else
+> One downside of packing all these together is that updating 'flags' now
+> requires an atomic rmw sequence (i.e. set_bit()). Then again, that's
+> probably for the best anyway given that kvm_vm_ioctl_enable_cap() looks
+> like it doesn't hold any locks.
 
-Can we avoid these hooks by instead not registering the regions proactively
-in the guest and moving that logic to a fault handler which runs off the
-back of the injected data abort? From there, we could check if the faulting
-IPA is a memory address and register it as MMIO if not.
+That, and these operations are supposed to be extremely rare anyway.
 
-Dunno, you've spent more time than me thinking about this, but just
-wondering if you'd had a crack at doing it that way, as it _seems_ simpler
-to my naive brain.
+> 
+> >  	/*
+> >  	 * VM-wide PMU filter, implemented as a bitmap and big enough for
+> > @@ -133,9 +136,6 @@ struct kvm_arch {
+> >  
+> >  	u8 pfr0_csv2;
+> >  	u8 pfr0_csv3;
+> > -
+> > -	/* Memory Tagging Extension enabled for the guest */
+> > -	bool mte_enabled;
+> >  };
+> >  
+> >  struct kvm_vcpu_fault_info {
+> > @@ -777,7 +777,9 @@ bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
+> >  #define kvm_arm_vcpu_sve_finalized(vcpu) \
+> >  	((vcpu)->arch.flags & KVM_ARM64_VCPU_SVE_FINALIZED)
+> >  
+> > -#define kvm_has_mte(kvm) (system_supports_mte() && (kvm)->arch.mte_enabled)
+> > +#define kvm_has_mte(kvm)					\
+> > +	(system_supports_mte() &&				\
+> > +	 test_bit(KVM_ARCH_FLAG_MTE_ENABLED, &(kvm)->arch.flags))
+> 
+> Not an issue with this patch, but I just noticed that the
+> system_supports_mte() check is redundant here as we only allow the flag to
+> be set if that's already the case.
 
-Will
+It allows us to save a memory access if system_supports_mte() is false
+(it is eventually implemented as a static key). On the other hand,
+there is so much inlining due to it being a non-final cap that we
+probably lose on that too...
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
