@@ -4,58 +4,57 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59CBAC4338F
-	for <kvmarm@archiver.kernel.org>; Wed, 28 Jul 2021 09:46:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A7E8C4338F
+	for <kvmarm@archiver.kernel.org>; Wed, 28 Jul 2021 09:57:39 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C1E7F60F9C
-	for <kvmarm@archiver.kernel.org>; Wed, 28 Jul 2021 09:46:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org C1E7F60F9C
+	by mail.kernel.org (Postfix) with ESMTP id BC3D660F9D
+	for <kvmarm@archiver.kernel.org>; Wed, 28 Jul 2021 09:57:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org BC3D660F9D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4BD9C4B0B1;
-	Wed, 28 Jul 2021 05:46:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 493714066E;
+	Wed, 28 Jul 2021 05:57:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id aLHikkdLsisv; Wed, 28 Jul 2021 05:46:05 -0400 (EDT)
+	with ESMTP id BMZbaMN8tW1v; Wed, 28 Jul 2021 05:57:36 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4134849F8F;
-	Wed, 28 Jul 2021 05:46:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E0A1D4029F;
+	Wed, 28 Jul 2021 05:57:36 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E8F0F49F8F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jul 2021 05:46:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C7A64B086
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jul 2021 05:57:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kYAd83PAsSi5 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Jul 2021 05:46:03 -0400 (EDT)
+ with ESMTP id SPYeylcT7HEI for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Jul 2021 05:57:34 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EFE7B40CC5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jul 2021 05:46:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3E17B4A95C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jul 2021 05:57:34 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 04C9D600D4;
- Wed, 28 Jul 2021 09:46:01 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 4623360E78;
+ Wed, 28 Jul 2021 09:57:33 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1m8g8V-001V1V-Sj; Wed, 28 Jul 2021 10:46:00 +0100
-Date: Wed, 28 Jul 2021 10:45:59 +0100
-Message-ID: <874kceeppk.wl-maz@kernel.org>
+ id 1m8gJf-001V9M-4p; Wed, 28 Jul 2021 10:57:31 +0100
+Date: Wed, 28 Jul 2021 10:57:30 +0100
+Message-ID: <8735ryep6d.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 02/16] KVM: arm64: Don't issue CMOs when the physical
- address is invalid
-In-Reply-To: <20210727181044.GB19173@willie-the-truck>
+Subject: Re: [PATCH 04/16] KVM: arm64: Add MMIO checking infrastructure
+In-Reply-To: <20210727181107.GC19173@willie-the-truck>
 References: <20210715163159.1480168-1-maz@kernel.org>
- <20210715163159.1480168-3-maz@kernel.org>
- <20210727181044.GB19173@willie-the-truck>
+ <20210715163159.1480168-5-maz@kernel.org>
+ <20210727181107.GC19173@willie-the-truck>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -89,50 +88,113 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 27 Jul 2021 19:10:45 +0100,
+On Tue, 27 Jul 2021 19:11:08 +0100,
 Will Deacon <will@kernel.org> wrote:
 > 
-> On Thu, Jul 15, 2021 at 05:31:45PM +0100, Marc Zyngier wrote:
-> > Make sure we don't issue CMOs when mapping something that
-> > is not a memory address in the S2 page tables.
+> On Thu, Jul 15, 2021 at 05:31:47PM +0100, Marc Zyngier wrote:
+> > Introduce the infrastructure required to identify an IPA region
+> > that is expected to be used as an MMIO window.
+> > 
+> > This include mapping, unmapping and checking the regions. Nothing
+> > calls into it yet, so no expected functional change.
 > > 
 > > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > > ---
-> >  arch/arm64/kvm/hyp/pgtable.c | 16 ++++++++++------
-> >  1 file changed, 10 insertions(+), 6 deletions(-)
+> >  arch/arm64/include/asm/kvm_host.h |   2 +
+> >  arch/arm64/include/asm/kvm_mmu.h  |   5 ++
+> >  arch/arm64/kvm/mmu.c              | 115 ++++++++++++++++++++++++++++++
+> >  3 files changed, 122 insertions(+)
 > > 
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > index 05321f4165e3..a5874ebd0354 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -619,12 +619,16 @@ static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
-> >  	}
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 4add6c27251f..914c1b7bb3ad 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -125,6 +125,8 @@ struct kvm_arch {
+> >  #define KVM_ARCH_FLAG_RETURN_NISV_IO_ABORT_TO_USER	0
+> >  	/* Memory Tagging Extension enabled for the guest */
+> >  #define KVM_ARCH_FLAG_MTE_ENABLED			1
+> > +	/* Gues has bought into the MMIO guard extension */
+> > +#define KVM_ARCH_FLAG_MMIO_GUARD			2
+> >  	unsigned long flags;
 > >  
-> >  	/* Perform CMOs before installation of the guest stage-2 PTE */
-> > -	if (mm_ops->dcache_clean_inval_poc && stage2_pte_cacheable(pgt, new))
-> > -		mm_ops->dcache_clean_inval_poc(kvm_pte_follow(new, mm_ops),
-> > -						granule);
-> > -
-> > -	if (mm_ops->icache_inval_pou && stage2_pte_executable(new))
-> > -		mm_ops->icache_inval_pou(kvm_pte_follow(new, mm_ops), granule);
-> > +	if (kvm_phys_is_valid(phys)) {
-> > +		if (mm_ops->dcache_clean_inval_poc &&
-> > +		    stage2_pte_cacheable(pgt, new))
-> > +			mm_ops->dcache_clean_inval_poc(kvm_pte_follow(new,
-> > +								      mm_ops),
-> > +						       granule);
-> > +		if (mm_ops->icache_inval_pou && stage2_pte_executable(new))
-> > +			mm_ops->icache_inval_pou(kvm_pte_follow(new, mm_ops),
-> > +						 granule);
-> > +	}
+> >  	/*
+> > diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> > index b52c5c4b9a3d..f6b8fc1671b3 100644
+> > --- a/arch/arm64/include/asm/kvm_mmu.h
+> > +++ b/arch/arm64/include/asm/kvm_mmu.h
+> > @@ -170,6 +170,11 @@ phys_addr_t kvm_mmu_get_httbr(void);
+> >  phys_addr_t kvm_get_idmap_vector(void);
+> >  int kvm_mmu_init(u32 *hyp_va_bits);
+> >  
+> > +/* MMIO guard */
+> > +bool kvm_install_ioguard_page(struct kvm_vcpu *vcpu, gpa_t ipa);
+> > +bool kvm_remove_ioguard_page(struct kvm_vcpu *vcpu, gpa_t ipa);
+> > +bool kvm_check_ioguard_page(struct kvm_vcpu *vcpu, gpa_t ipa);
+> > +
+> >  static inline void *__kvm_vector_slot2addr(void *base,
+> >  					   enum arm64_hyp_spectre_vector slot)
+> >  {
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index 3155c9e778f0..638827c8842b 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -1120,6 +1120,121 @@ static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+> >  		kvm_set_pfn_accessed(pte_pfn(pte));
+> >  }
+> >  
+> > +#define MMIO_NOTE	('M' << 24 | 'M' << 16 | 'I' << 8 | '0')
 > 
-> Given that this check corresponds to checking the validity of 'new', I
-> wonder whether we'd be better off pushing the validity checks down into
-> stage2_pte_{cacheable,executable}()?
-> 
-> I.e. have stage2_pte_cacheable() return false if !kvm_pte_valid()
+> Although this made me smile, maybe we should carve up the bit space a bit
+> more carefully ;) Also, you know somebody clever will "fix" that typo to
+> 'O'!
 
-That would work just as well. I'll update the patch.
+They'll get to keep the pieces when the whole thing breaks!
+
+More seriously, happy to have a more elaborate allocation scheme. For
+the purpose of this series, it really doesn't matter.
+
+> Quentin, as the other user of this stuff at the moment, how do you see the
+> annotation space being allocated? Feels like we should have some 'type'
+> bits which decide how to parse the rest of the entry.
+> 
+> > +
+> > +bool kvm_install_ioguard_page(struct kvm_vcpu *vcpu, gpa_t ipa)
+> > +{
+> > +	struct kvm_mmu_memory_cache *memcache;
+> > +	struct kvm_memory_slot *memslot;
+> > +	int ret, idx;
+> > +
+> > +	if (!test_bit(KVM_ARCH_FLAG_MMIO_GUARD, &vcpu->kvm->arch.flags))
+> > +		return false;
+> > +
+> > +	/* Must be page-aligned */
+> > +	if (ipa & ~PAGE_MASK)
+> > +		return false;
+> > +
+> > +	/*
+> > +	 * The page cannot be in a memslot. At some point, this will
+> > +	 * have to deal with device mappings though.
+> > +	 */
+> > +	idx = srcu_read_lock(&vcpu->kvm->srcu);
+> > +	memslot = gfn_to_memslot(vcpu->kvm, ipa >> PAGE_SHIFT);
+> > +	srcu_read_unlock(&vcpu->kvm->srcu, idx);
+> 
+> What does this memslot check achieve? A new memslot could be added after
+> you've checked, no?
+
+If you start allowing S2 annotations to coexist with potential memory
+mappings, you're in for trouble. The faulting logic will happily
+overwrite the annotation, and that's probably not what you want.
+
+As for new (or moving) memslots, I guess they should be checked
+against existing annotations.
+
+> 
+> > +/* Assumes mmu_lock taken */
+> 
+> You can use a lockdep assertion for that!
+
+Sure.
 
 Thanks,
 
