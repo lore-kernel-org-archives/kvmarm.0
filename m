@@ -6,55 +6,56 @@ X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC04BC4338F
-	for <kvmarm@archiver.kernel.org>; Wed, 28 Jul 2021 10:47:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD5A4C4338F
+	for <kvmarm@archiver.kernel.org>; Wed, 28 Jul 2021 11:02:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3372460F41
-	for <kvmarm@archiver.kernel.org>; Wed, 28 Jul 2021 10:47:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 3372460F41
+	by mail.kernel.org (Postfix) with ESMTP id 22FE060FEB
+	for <kvmarm@archiver.kernel.org>; Wed, 28 Jul 2021 11:02:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 22FE060FEB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B83944A195;
-	Wed, 28 Jul 2021 06:47:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CF6E4B099;
+	Wed, 28 Jul 2021 07:02:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id a2gDqK+8lPCw; Wed, 28 Jul 2021 06:47:25 -0400 (EDT)
+	with ESMTP id yvGMrLsyzmOk; Wed, 28 Jul 2021 07:01:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 687DE4AEDC;
-	Wed, 28 Jul 2021 06:47:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6EF194A524;
+	Wed, 28 Jul 2021 07:01:59 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 058EC4A195
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jul 2021 06:47:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CF19A4A319
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jul 2021 07:01:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ghWic7zEFD0S for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Jul 2021 06:47:23 -0400 (EDT)
+ with ESMTP id cNuYOisJhNIa for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Jul 2021 07:01:56 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BF89D49E93
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jul 2021 06:47:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A8B614A195
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jul 2021 07:01:56 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id C6B0760F9B;
- Wed, 28 Jul 2021 10:47:22 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id AEBEA60F46;
+ Wed, 28 Jul 2021 11:01:55 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1m8h5t-001Vli-5g; Wed, 28 Jul 2021 11:47:21 +0100
-Date: Wed, 28 Jul 2021 11:47:20 +0100
-Message-ID: <87v94ud8av.wl-maz@kernel.org>
+ id 1m8hJx-001Vuk-R3; Wed, 28 Jul 2021 12:01:53 +0100
+Date: Wed, 28 Jul 2021 12:01:53 +0100
+Message-ID: <87tuked7mm.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 07/16] KVM: arm64: Wire MMIO guard hypercalls
-In-Reply-To: <20210727181145.GF19173@willie-the-truck>
+Subject: Re: [PATCH 12/16] mm/ioremap: Add arch-specific callbacks on
+ ioremap/iounmap calls
+In-Reply-To: <20210727181203.GG19173@willie-the-truck>
 References: <20210715163159.1480168-1-maz@kernel.org>
- <20210715163159.1480168-8-maz@kernel.org>
- <20210727181145.GF19173@willie-the-truck>
+ <20210715163159.1480168-13-maz@kernel.org>
+ <20210727181203.GG19173@willie-the-truck>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -88,80 +89,59 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 27 Jul 2021 19:11:46 +0100,
+On Tue, 27 Jul 2021 19:12:04 +0100,
 Will Deacon <will@kernel.org> wrote:
 > 
-> On Thu, Jul 15, 2021 at 05:31:50PM +0100, Marc Zyngier wrote:
-> > Plumb in the hypercall interface to allow a guest to discover,
-> > enroll, map and unmap MMIO regions.
+> On Thu, Jul 15, 2021 at 05:31:55PM +0100, Marc Zyngier wrote:
+> > Add a pair of hooks (ioremap_page_range_hook/iounmap_page_range_hook)
+> > that can be implemented by an architecture.
 > > 
 > > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > > ---
-> >  arch/arm64/kvm/hypercalls.c | 20 ++++++++++++++++++++
-> >  include/linux/arm-smccc.h   | 28 ++++++++++++++++++++++++++++
-> >  2 files changed, 48 insertions(+)
+> >  include/linux/io.h |  3 +++
+> >  mm/ioremap.c       | 13 ++++++++++++-
+> >  mm/vmalloc.c       |  8 ++++++++
+> >  3 files changed, 23 insertions(+), 1 deletion(-)
 > > 
-> > diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-> > index 30da78f72b3b..a3deeb907fdd 100644
-> > --- a/arch/arm64/kvm/hypercalls.c
-> > +++ b/arch/arm64/kvm/hypercalls.c
-> > @@ -5,6 +5,7 @@
-> >  #include <linux/kvm_host.h>
+> > diff --git a/include/linux/io.h b/include/linux/io.h
+> > index 9595151d800d..0ffc265f114c 100644
+> > --- a/include/linux/io.h
+> > +++ b/include/linux/io.h
+> > @@ -21,6 +21,9 @@ void __ioread32_copy(void *to, const void __iomem *from, size_t count);
+> >  void __iowrite64_copy(void __iomem *to, const void *from, size_t count);
 > >  
-> >  #include <asm/kvm_emulate.h>
-> > +#include <asm/kvm_mmu.h>
-> >  
-> >  #include <kvm/arm_hypercalls.h>
-> >  #include <kvm/arm_psci.h>
-> > @@ -129,10 +130,29 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
-> >  	case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
-> >  		val[0] = BIT(ARM_SMCCC_KVM_FUNC_FEATURES);
-> >  		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_PTP);
-> > +		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_MMIO_GUARD_INFO);
-> > +		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_MMIO_GUARD_ENROLL);
-> > +		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_MMIO_GUARD_MAP);
-> > +		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_MMIO_GUARD_UNMAP);
-> >  		break;
-> >  	case ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID:
-> >  		kvm_ptp_get_time(vcpu, val);
-> >  		break;
-> > +	case ARM_SMCCC_VENDOR_HYP_KVM_MMIO_GUARD_INFO_FUNC_ID:
-> > +		val[0] = PAGE_SIZE;
-> > +		break;
+> >  #ifdef CONFIG_MMU
+> > +void ioremap_page_range_hook(unsigned long addr, unsigned long end,
+> > +			     phys_addr_t phys_addr, pgprot_t prot);
+> > +void iounmap_page_range_hook(phys_addr_t phys_addr, size_t size);
+> >  int ioremap_page_range(unsigned long addr, unsigned long end,
+> >  		       phys_addr_t phys_addr, pgprot_t prot);
+> >  #else
 > 
-> I get the nagging feeling that querying the stage-2 page-size outside of
-> MMIO guard is going to be useful once we start looking at memory sharing,
-> so perhaps rename this to something more generic?
-
-At this stage, why not follow the architecture and simply expose it as
-ID_AA64MMFR0_EL1.TGran{4,64,16}_2? That's exactly what it is for, and
-we already check for this in KVM itself.
-
+> Can we avoid these hooks by instead not registering the regions proactively
+> in the guest and moving that logic to a fault handler which runs off the
+> back of the injected data abort? From there, we could check if the faulting
+> IPA is a memory address and register it as MMIO if not.
 > 
-> > +	case ARM_SMCCC_VENDOR_HYP_KVM_MMIO_GUARD_ENROLL_FUNC_ID:
-> > +		set_bit(KVM_ARCH_FLAG_MMIO_GUARD, &vcpu->kvm->arch.flags);
-> > +		val[0] = SMCCC_RET_SUCCESS;
-> > +		break;
-> > +	case ARM_SMCCC_VENDOR_HYP_KVM_MMIO_GUARD_MAP_FUNC_ID:
-> > +		if (kvm_install_ioguard_page(vcpu, vcpu_get_reg(vcpu, 1)))
-> > +			val[0] = SMCCC_RET_SUCCESS;
-> > +		break;
-> > +	case ARM_SMCCC_VENDOR_HYP_KVM_MMIO_GUARD_UNMAP_FUNC_ID:
-> > +		if (kvm_remove_ioguard_page(vcpu, vcpu_get_reg(vcpu, 1)))
-> > +			val[0] = SMCCC_RET_SUCCESS;
-> > +		break;
-> 
-> I think there's a slight discrepancy between MAP and UNMAP here in that
-> calling UNMAP on something that hasn't been mapped will fail, whereas
-> calling MAP on something that's already been mapped will succeed. I think
-> that might mean you can't reason about the final state of the page if two
-> vCPUs race to call these functions in some cases (and both succeed).
+> Dunno, you've spent more time than me thinking about this, but just
+> wondering if you'd had a crack at doing it that way, as it _seems_ simpler
+> to my naive brain.
 
-I'm not sure that's the expected behaviour for ioremap(), for example
-(you can ioremap two portions of the same page successfully).
+I thought about it, but couldn't work out whether it was always
+possible for the guest to handle these faults (first access in an
+interrupt context, for example?).
 
-I guess MAP could return something indicating that the page is already
-mapped, but I wouldn't want to return a hard failure in this case.
+Also, this changes the semantics of the protection this is supposed to
+offer: any access out of the RAM space will generate an abort, and the
+fault handler will grant MMIO forwarding for this page. Stray accesses
+that would normally be properly handled as fatal would now succeed and
+be forwarded to userspace, even if there was no emulated devices
+there.
+
+For this to work, we'd need to work out whether there is any existing
+device mapping that actually points to this page. And whether it
+actually is supposed to be forwarded to userspace. Do we have a rmap
+for device mappings?
 
 	M.
 
