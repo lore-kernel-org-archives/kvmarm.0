@@ -4,58 +4,58 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A28DC4338F
-	for <kvmarm@archiver.kernel.org>; Wed, 28 Jul 2021 09:41:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59CBAC4338F
+	for <kvmarm@archiver.kernel.org>; Wed, 28 Jul 2021 09:46:07 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BA75060FC0
-	for <kvmarm@archiver.kernel.org>; Wed, 28 Jul 2021 09:41:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org BA75060FC0
+	by mail.kernel.org (Postfix) with ESMTP id C1E7F60F9C
+	for <kvmarm@archiver.kernel.org>; Wed, 28 Jul 2021 09:46:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org C1E7F60F9C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E16A4A98B;
-	Wed, 28 Jul 2021 05:41:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4BD9C4B0B1;
+	Wed, 28 Jul 2021 05:46:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 3KJuGmXfskCA; Wed, 28 Jul 2021 05:41:06 -0400 (EDT)
+	with ESMTP id aLHikkdLsisv; Wed, 28 Jul 2021 05:46:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C403640CF9;
-	Wed, 28 Jul 2021 05:41:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4134849F8F;
+	Wed, 28 Jul 2021 05:46:05 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 944174A98B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jul 2021 05:41:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E8F0F49F8F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jul 2021 05:46:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id m15zylCCtomu for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Jul 2021 05:41:04 -0400 (EDT)
+ with ESMTP id kYAd83PAsSi5 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Jul 2021 05:46:03 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6B05440CF9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jul 2021 05:41:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EFE7B40CC5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jul 2021 05:46:02 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 50B6260F9C;
- Wed, 28 Jul 2021 09:41:03 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 04C9D600D4;
+ Wed, 28 Jul 2021 09:46:01 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1m8g3h-001Uxw-D0; Wed, 28 Jul 2021 10:41:01 +0100
-Date: Wed, 28 Jul 2021 10:41:00 +0100
-Message-ID: <875ywuepxv.wl-maz@kernel.org>
+ id 1m8g8V-001V1V-Sj; Wed, 28 Jul 2021 10:46:00 +0100
+Date: Wed, 28 Jul 2021 10:45:59 +0100
+Message-ID: <874kceeppk.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 01/16] KVM: arm64: Generalise VM features into a set of
- flags
-In-Reply-To: <20210727181026.GA19173@willie-the-truck>
+Subject: Re: [PATCH 02/16] KVM: arm64: Don't issue CMOs when the physical
+ address is invalid
+In-Reply-To: <20210727181044.GB19173@willie-the-truck>
 References: <20210715163159.1480168-1-maz@kernel.org>
- <20210715163159.1480168-2-maz@kernel.org>
- <20210727181026.GA19173@willie-the-truck>
+ <20210715163159.1480168-3-maz@kernel.org>
+ <20210727181044.GB19173@willie-the-truck>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -89,73 +89,52 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 27 Jul 2021 19:10:27 +0100,
+On Tue, 27 Jul 2021 19:10:45 +0100,
 Will Deacon <will@kernel.org> wrote:
 > 
-> On Thu, Jul 15, 2021 at 05:31:44PM +0100, Marc Zyngier wrote:
-> > We currently deal with a set of booleans for VM features,
-> > while they could be better represented as set of flags
-> > contained in an unsigned long, similarily to what we are
-> > doing on the CPU side.
+> On Thu, Jul 15, 2021 at 05:31:45PM +0100, Marc Zyngier wrote:
+> > Make sure we don't issue CMOs when mapping something that
+> > is not a memory address in the S2 page tables.
 > > 
 > > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > > ---
-> >  arch/arm64/include/asm/kvm_host.h | 12 +++++++-----
-> >  arch/arm64/kvm/arm.c              |  5 +++--
-> >  arch/arm64/kvm/mmio.c             |  3 ++-
-> >  3 files changed, 12 insertions(+), 8 deletions(-)
+> >  arch/arm64/kvm/hyp/pgtable.c | 16 ++++++++++------
+> >  1 file changed, 10 insertions(+), 6 deletions(-)
 > > 
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index 41911585ae0c..4add6c27251f 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -122,7 +122,10 @@ struct kvm_arch {
-> >  	 * should) opt in to this feature if KVM_CAP_ARM_NISV_TO_USER is
-> >  	 * supported.
-> >  	 */
-> > -	bool return_nisv_io_abort_to_user;
-> > +#define KVM_ARCH_FLAG_RETURN_NISV_IO_ABORT_TO_USER	0
-> > +	/* Memory Tagging Extension enabled for the guest */
-> > +#define KVM_ARCH_FLAG_MTE_ENABLED			1
-> > +	unsigned long flags;
-> 
-> One downside of packing all these together is that updating 'flags' now
-> requires an atomic rmw sequence (i.e. set_bit()). Then again, that's
-> probably for the best anyway given that kvm_vm_ioctl_enable_cap() looks
-> like it doesn't hold any locks.
-
-That, and these operations are supposed to be extremely rare anyway.
-
-> 
-> >  	/*
-> >  	 * VM-wide PMU filter, implemented as a bitmap and big enough for
-> > @@ -133,9 +136,6 @@ struct kvm_arch {
+> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> > index 05321f4165e3..a5874ebd0354 100644
+> > --- a/arch/arm64/kvm/hyp/pgtable.c
+> > +++ b/arch/arm64/kvm/hyp/pgtable.c
+> > @@ -619,12 +619,16 @@ static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
+> >  	}
 > >  
-> >  	u8 pfr0_csv2;
-> >  	u8 pfr0_csv3;
+> >  	/* Perform CMOs before installation of the guest stage-2 PTE */
+> > -	if (mm_ops->dcache_clean_inval_poc && stage2_pte_cacheable(pgt, new))
+> > -		mm_ops->dcache_clean_inval_poc(kvm_pte_follow(new, mm_ops),
+> > -						granule);
 > > -
-> > -	/* Memory Tagging Extension enabled for the guest */
-> > -	bool mte_enabled;
-> >  };
-> >  
-> >  struct kvm_vcpu_fault_info {
-> > @@ -777,7 +777,9 @@ bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
-> >  #define kvm_arm_vcpu_sve_finalized(vcpu) \
-> >  	((vcpu)->arch.flags & KVM_ARM64_VCPU_SVE_FINALIZED)
-> >  
-> > -#define kvm_has_mte(kvm) (system_supports_mte() && (kvm)->arch.mte_enabled)
-> > +#define kvm_has_mte(kvm)					\
-> > +	(system_supports_mte() &&				\
-> > +	 test_bit(KVM_ARCH_FLAG_MTE_ENABLED, &(kvm)->arch.flags))
+> > -	if (mm_ops->icache_inval_pou && stage2_pte_executable(new))
+> > -		mm_ops->icache_inval_pou(kvm_pte_follow(new, mm_ops), granule);
+> > +	if (kvm_phys_is_valid(phys)) {
+> > +		if (mm_ops->dcache_clean_inval_poc &&
+> > +		    stage2_pte_cacheable(pgt, new))
+> > +			mm_ops->dcache_clean_inval_poc(kvm_pte_follow(new,
+> > +								      mm_ops),
+> > +						       granule);
+> > +		if (mm_ops->icache_inval_pou && stage2_pte_executable(new))
+> > +			mm_ops->icache_inval_pou(kvm_pte_follow(new, mm_ops),
+> > +						 granule);
+> > +	}
 > 
-> Not an issue with this patch, but I just noticed that the
-> system_supports_mte() check is redundant here as we only allow the flag to
-> be set if that's already the case.
+> Given that this check corresponds to checking the validity of 'new', I
+> wonder whether we'd be better off pushing the validity checks down into
+> stage2_pte_{cacheable,executable}()?
+> 
+> I.e. have stage2_pte_cacheable() return false if !kvm_pte_valid()
 
-It allows us to save a memory access if system_supports_mte() is false
-(it is eventually implemented as a static key). On the other hand,
-there is so much inlining due to it being a non-final cap that we
-probably lose on that too...
+That would work just as well. I'll update the patch.
+
+Thanks,
 
 	M.
 
