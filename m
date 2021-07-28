@@ -2,63 +2,63 @@ Return-Path: <SRS0=xfyP=MU=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.5 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79C1BC4338F
-	for <kvmarm@archiver.kernel.org>; Wed, 28 Jul 2021 14:51:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 175B3C4338F
+	for <kvmarm@archiver.kernel.org>; Wed, 28 Jul 2021 15:25:31 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CE0B260FE7
-	for <kvmarm@archiver.kernel.org>; Wed, 28 Jul 2021 14:51:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org CE0B260FE7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 7C1F260F91
+	for <kvmarm@archiver.kernel.org>; Wed, 28 Jul 2021 15:25:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 7C1F260F91
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cdjrlc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 418B849F8F;
-	Wed, 28 Jul 2021 10:51:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E71CC4ACC9;
+	Wed, 28 Jul 2021 11:25:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 5RmEEM3LLQ71; Wed, 28 Jul 2021 10:51:06 -0400 (EDT)
+	with ESMTP id 3O-CpKwp8c8K; Wed, 28 Jul 2021 11:25:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1EC034A7FD;
-	Wed, 28 Jul 2021 10:51:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7DF5E4AED4;
+	Wed, 28 Jul 2021 11:25:21 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 67B3D4A483
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jul 2021 10:51:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 56C0D49FE6
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jul 2021 09:06:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lWoOM5TJmPOe for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Jul 2021 10:51:04 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0993340463
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jul 2021 10:51:04 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 86FDB1042;
- Wed, 28 Jul 2021 07:51:03 -0700 (PDT)
-Received: from [192.168.1.179] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8FDC63F70D;
- Wed, 28 Jul 2021 07:51:01 -0700 (PDT)
-Subject: Re: [PATCH 01/16] KVM: arm64: Generalise VM features into a set of
- flags
-To: Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>
-References: <20210715163159.1480168-1-maz@kernel.org>
- <20210715163159.1480168-2-maz@kernel.org>
- <20210727181026.GA19173@willie-the-truck> <875ywuepxv.wl-maz@kernel.org>
-From: Steven Price <steven.price@arm.com>
-Message-ID: <716fffdb-580a-bc70-478a-a54912a77c82@arm.com>
-Date: Wed, 28 Jul 2021 15:51:00 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+ with ESMTP id pTbWHC8U8mys for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Jul 2021 09:06:37 -0400 (EDT)
+Received: from smtpbg604.qq.com (smtpbg604.qq.com [59.36.128.82])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BBB1940870
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jul 2021 09:06:36 -0400 (EDT)
+X-QQ-mid: bizesmtp40t1627477586t4r18s2j
+Received: from ficus.lan (unknown [171.223.99.141])
+ by esmtp6.qq.com (ESMTP) with 
+ id ; Wed, 28 Jul 2021 21:06:24 +0800 (CST)
+X-QQ-SSF: 01000000002000B0C000B00A0000000
+X-QQ-FEAT: 5gms5Di3ODhwcUaoG5y/inyFUTUQBomNyL29HOE+eLy3B7jVXWO0qnWknMCqS
+ 4EUzJ1s5k48LQGmjdCtJtRVrtVGrdVJMGodSu1RhfXpRANy7M2HNEbQ4jBbTUQbxrSHYKWZ
+ Ef7BSVcL+XJ6DYqoo6ve8NxCaOqG3DOZpuPSe4iQ4wnhcjXox0xP4k9W1rdx1VBwaabWW25
+ BIyQLdhcPLtq7f6hOq87jovC/3zZNYy7xYEthpLUOUvvvVuqK5GF2U9j9cvfK0/lc11hZhM
+ 4gv0by9DALqMd2QWqoOGZpDBL/YgWtJLrc62mJUbtkkIjFip2R0iyRCQs=
+X-QQ-GoodBg: 0
+From: Jason Wang <wangborong@cdjrlc.com>
+To: maz@kernel.org
+Subject: [PATCH] KVM: arm64: fix comment typo
+Date: Wed, 28 Jul 2021 21:06:23 +0800
+Message-Id: <20210728130623.12017-1-wangborong@cdjrlc.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-In-Reply-To: <875ywuepxv.wl-maz@kernel.org>
-Content-Language: en-GB
-Cc: kvm@vger.kernel.org, kernel-team@android.com,
- Srivatsa Vaddagiri <vatsa@codeaurora.org>, linux-kernel@vger.kernel.org,
- Shanker R Donthineni <sdonthineni@nvidia.com>, kvmarm@lists.cs.columbia.edu,
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:cdjrlc.com:qybgspam:qybgspam4
+X-Mailman-Approved-At: Wed, 28 Jul 2021 11:25:20 -0400
+Cc: will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
+ Jason Wang <wangborong@cdjrlc.com>, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -76,91 +76,38 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 28/07/2021 10:41, Marc Zyngier wrote:
-> On Tue, 27 Jul 2021 19:10:27 +0100,
-> Will Deacon <will@kernel.org> wrote:
->>
->> On Thu, Jul 15, 2021 at 05:31:44PM +0100, Marc Zyngier wrote:
->>> We currently deal with a set of booleans for VM features,
->>> while they could be better represented as set of flags
->>> contained in an unsigned long, similarily to what we are
->>> doing on the CPU side.
->>>
->>> Signed-off-by: Marc Zyngier <maz@kernel.org>
->>> ---
->>>  arch/arm64/include/asm/kvm_host.h | 12 +++++++-----
->>>  arch/arm64/kvm/arm.c              |  5 +++--
->>>  arch/arm64/kvm/mmio.c             |  3 ++-
->>>  3 files changed, 12 insertions(+), 8 deletions(-)
->>>
->>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->>> index 41911585ae0c..4add6c27251f 100644
->>> --- a/arch/arm64/include/asm/kvm_host.h
->>> +++ b/arch/arm64/include/asm/kvm_host.h
->>> @@ -122,7 +122,10 @@ struct kvm_arch {
->>>  	 * should) opt in to this feature if KVM_CAP_ARM_NISV_TO_USER is
->>>  	 * supported.
->>>  	 */
->>> -	bool return_nisv_io_abort_to_user;
->>> +#define KVM_ARCH_FLAG_RETURN_NISV_IO_ABORT_TO_USER	0
->>> +	/* Memory Tagging Extension enabled for the guest */
->>> +#define KVM_ARCH_FLAG_MTE_ENABLED			1
->>> +	unsigned long flags;
->>
->> One downside of packing all these together is that updating 'flags' now
->> requires an atomic rmw sequence (i.e. set_bit()). Then again, that's
->> probably for the best anyway given that kvm_vm_ioctl_enable_cap() looks
->> like it doesn't hold any locks.
-> 
-> That, and these operations are supposed to be extremely rare anyway.
-> 
->>
->>>  	/*
->>>  	 * VM-wide PMU filter, implemented as a bitmap and big enough for
->>> @@ -133,9 +136,6 @@ struct kvm_arch {
->>>  
->>>  	u8 pfr0_csv2;
->>>  	u8 pfr0_csv3;
->>> -
->>> -	/* Memory Tagging Extension enabled for the guest */
->>> -	bool mte_enabled;
->>>  };
->>>  
->>>  struct kvm_vcpu_fault_info {
->>> @@ -777,7 +777,9 @@ bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
->>>  #define kvm_arm_vcpu_sve_finalized(vcpu) \
->>>  	((vcpu)->arch.flags & KVM_ARM64_VCPU_SVE_FINALIZED)
->>>  
->>> -#define kvm_has_mte(kvm) (system_supports_mte() && (kvm)->arch.mte_enabled)
->>> +#define kvm_has_mte(kvm)					\
->>> +	(system_supports_mte() &&				\
->>> +	 test_bit(KVM_ARCH_FLAG_MTE_ENABLED, &(kvm)->arch.flags))
->>
->> Not an issue with this patch, but I just noticed that the
->> system_supports_mte() check is redundant here as we only allow the flag to
->> be set if that's already the case.
-> 
-> It allows us to save a memory access if system_supports_mte() is false
-> (it is eventually implemented as a static key). On the other hand,
-> there is so much inlining due to it being a non-final cap that we
-> probably lose on that too...
+Remove the repeated word 'the' from two comments.
 
-My original logic was that system_supports_mte() checks
-IS_ENABLED(CONFIG_ARM64_MTE) - so this enables the code guarded with
-kvm_has_mte() to be compiled out if CONFIG_ARM64_MTE is disabled.
+Signed-off-by: Jason Wang <wangborong@cdjrlc.com>
+---
+ arch/arm64/kvm/vgic/vgic-mmio-v2.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Indeed it turns at we currently rely on this (with CONFIG_ARM64_MTE
-disabled):
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v2.c b/arch/arm64/kvm/vgic/vgic-mmio-v2.c
+index a016f07adc28..5f9014ae595b 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio-v2.c
++++ b/arch/arm64/kvm/vgic/vgic-mmio-v2.c
+@@ -282,7 +282,7 @@ static unsigned long vgic_mmio_read_vcpuif(struct kvm_vcpu *vcpu,
+ 	case GIC_CPU_PRIMASK:
+ 		/*
+ 		 * Our KVM_DEV_TYPE_ARM_VGIC_V2 device ABI exports the
+-		 * the PMR field as GICH_VMCR.VMPriMask rather than
++		 * PMR field as GICH_VMCR.VMPriMask rather than
+ 		 * GICC_PMR.Priority, so we expose the upper five bits of
+ 		 * priority mask to userspace using the lower bits in the
+ 		 * unsigned long.
+@@ -329,7 +329,7 @@ static void vgic_mmio_write_vcpuif(struct kvm_vcpu *vcpu,
+ 	case GIC_CPU_PRIMASK:
+ 		/*
+ 		 * Our KVM_DEV_TYPE_ARM_VGIC_V2 device ABI exports the
+-		 * the PMR field as GICH_VMCR.VMPriMask rather than
++		 * PMR field as GICH_VMCR.VMPriMask rather than
+ 		 * GICC_PMR.Priority, so we expose the upper five bits of
+ 		 * priority mask to userspace using the lower bits in the
+ 		 * unsigned long.
+-- 
+2.32.0
 
-aarch64-linux-gnu-ld: arch/arm64/kvm/mmu.o: in function `sanitise_mte_tags':
-/home/stepri01/work/linux/arch/arm64/kvm/mmu.c:887: undefined reference to `mte_clear_page_tags'
-aarch64-linux-gnu-ld: arch/arm64/kvm/guest.o: in function `kvm_vm_ioctl_mte_copy_tags':
-/home/stepri01/work/linux/arch/arm64/kvm/guest.c:1066: undefined reference to `mte_copy_tags_to_user'
-aarch64-linux-gnu-ld: /home/stepri01/work/linux/arch/arm64/kvm/guest.c:1074: undefined reference to `mte_copy_tags_from_user'
-
-Obviously we could pull just the IS_ENABLED() into kvm_has_mte() instead.
-
-Steve
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
