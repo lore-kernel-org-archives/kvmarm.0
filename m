@@ -6,55 +6,55 @@ X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EC07C4338F
-	for <kvmarm@archiver.kernel.org>; Wed, 28 Jul 2021 10:38:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC04BC4338F
+	for <kvmarm@archiver.kernel.org>; Wed, 28 Jul 2021 10:47:28 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E225D60C3F
-	for <kvmarm@archiver.kernel.org>; Wed, 28 Jul 2021 10:38:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org E225D60C3F
+	by mail.kernel.org (Postfix) with ESMTP id 3372460F41
+	for <kvmarm@archiver.kernel.org>; Wed, 28 Jul 2021 10:47:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 3372460F41
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7084A4B09C;
-	Wed, 28 Jul 2021 06:38:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B83944A195;
+	Wed, 28 Jul 2021 06:47:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id vNECS-TBynQu; Wed, 28 Jul 2021 06:38:41 -0400 (EDT)
+	with ESMTP id a2gDqK+8lPCw; Wed, 28 Jul 2021 06:47:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D5FA4B093;
-	Wed, 28 Jul 2021 06:38:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 687DE4AEDC;
+	Wed, 28 Jul 2021 06:47:25 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 049084A534
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jul 2021 06:38:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 058EC4A195
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jul 2021 06:47:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id De0NpiPPwxV1 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Jul 2021 06:38:39 -0400 (EDT)
+ with ESMTP id ghWic7zEFD0S for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Jul 2021 06:47:23 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D020C407A0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jul 2021 06:38:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BF89D49E93
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Jul 2021 06:47:23 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id D598C60F9B;
- Wed, 28 Jul 2021 10:38:37 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id C6B0760F9B;
+ Wed, 28 Jul 2021 10:47:22 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1m8gxP-001VeA-OZ; Wed, 28 Jul 2021 11:38:35 +0100
-Date: Wed, 28 Jul 2021 11:38:35 +0100
-Message-ID: <87wnpad8pg.wl-maz@kernel.org>
+ id 1m8h5t-001Vli-5g; Wed, 28 Jul 2021 11:47:21 +0100
+Date: Wed, 28 Jul 2021 11:47:20 +0100
+Message-ID: <87v94ud8av.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 06/16] KVM: arm64: Force a full unmap on vpcu reinit
-In-Reply-To: <20210727181132.GE19173@willie-the-truck>
+Subject: Re: [PATCH 07/16] KVM: arm64: Wire MMIO guard hypercalls
+In-Reply-To: <20210727181145.GF19173@willie-the-truck>
 References: <20210715163159.1480168-1-maz@kernel.org>
- <20210715163159.1480168-7-maz@kernel.org>
- <20210727181132.GE19173@willie-the-truck>
+ <20210715163159.1480168-8-maz@kernel.org>
+ <20210727181145.GF19173@willie-the-truck>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -88,57 +88,80 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 27 Jul 2021 19:11:33 +0100,
+On Tue, 27 Jul 2021 19:11:46 +0100,
 Will Deacon <will@kernel.org> wrote:
 > 
-> On Thu, Jul 15, 2021 at 05:31:49PM +0100, Marc Zyngier wrote:
-> > As we now keep information in the S2PT, we must be careful not
-> > to keep it across a VM reboot, which could otherwise lead to
-> > interesting problems.
-> > 
-> > Make sure that the S2 is completely discarded on reset of
-> > a vcpu, and remove the flag that enforces the MMIO check.
+> On Thu, Jul 15, 2021 at 05:31:50PM +0100, Marc Zyngier wrote:
+> > Plumb in the hypercall interface to allow a guest to discover,
+> > enroll, map and unmap MMIO regions.
 > > 
 > > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > > ---
-> >  arch/arm64/kvm/arm.c | 8 +++++++-
-> >  1 file changed, 7 insertions(+), 1 deletion(-)
+> >  arch/arm64/kvm/hypercalls.c | 20 ++++++++++++++++++++
+> >  include/linux/arm-smccc.h   | 28 ++++++++++++++++++++++++++++
+> >  2 files changed, 48 insertions(+)
 > > 
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index 97ab1512c44f..b0d2225190d2 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -1096,12 +1096,18 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
-> >  	 * ensuring that the data side is always coherent. We still
-> >  	 * need to invalidate the I-cache though, as FWB does *not*
-> >  	 * imply CTR_EL0.DIC.
-> > +	 *
-> > +	 * If the MMIO guard was enabled, we pay the price of a full
-> > +	 * unmap to get back to a sane state (and clear the flag).
-> >  	 */
-> >  	if (vcpu->arch.has_run_once) {
-> > -		if (!cpus_have_final_cap(ARM64_HAS_STAGE2_FWB))
-> > +		if (!cpus_have_final_cap(ARM64_HAS_STAGE2_FWB) ||
-> > +		    test_bit(KVM_ARCH_FLAG_MMIO_GUARD, &vcpu->kvm->arch.flags))
-> >  			stage2_unmap_vm(vcpu->kvm);
-> >  		else
-> >  			icache_inval_all_pou();
-> > +
-> > +		clear_bit(KVM_ARCH_FLAG_MMIO_GUARD, &vcpu->kvm->arch.flags);
+> > diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+> > index 30da78f72b3b..a3deeb907fdd 100644
+> > --- a/arch/arm64/kvm/hypercalls.c
+> > +++ b/arch/arm64/kvm/hypercalls.c
+> > @@ -5,6 +5,7 @@
+> >  #include <linux/kvm_host.h>
+> >  
+> >  #include <asm/kvm_emulate.h>
+> > +#include <asm/kvm_mmu.h>
+> >  
+> >  #include <kvm/arm_hypercalls.h>
+> >  #include <kvm/arm_psci.h>
+> > @@ -129,10 +130,29 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+> >  	case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
+> >  		val[0] = BIT(ARM_SMCCC_KVM_FUNC_FEATURES);
+> >  		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_PTP);
+> > +		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_MMIO_GUARD_INFO);
+> > +		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_MMIO_GUARD_ENROLL);
+> > +		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_MMIO_GUARD_MAP);
+> > +		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_MMIO_GUARD_UNMAP);
+> >  		break;
+> >  	case ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID:
+> >  		kvm_ptp_get_time(vcpu, val);
+> >  		break;
+> > +	case ARM_SMCCC_VENDOR_HYP_KVM_MMIO_GUARD_INFO_FUNC_ID:
+> > +		val[0] = PAGE_SIZE;
+> > +		break;
 > 
-> What prevents this racing with another vCPU trying to set the bit?
+> I get the nagging feeling that querying the stage-2 page-size outside of
+> MMIO guard is going to be useful once we start looking at memory sharing,
+> so perhaps rename this to something more generic?
 
-Not much. We could take the kvm lock on both ends to serialize it, but
-that's pretty ugly. And should we care? What is the semantic of
-resetting a vcpu while another is still running?
+At this stage, why not follow the architecture and simply expose it as
+ID_AA64MMFR0_EL1.TGran{4,64,16}_2? That's exactly what it is for, and
+we already check for this in KVM itself.
 
-If we want to support this sort of behaviour, then our tracking is
-totally bogus, because it is VM-wide. And you don't even have to play
-with that bit from another vcpu: all the information is lost at the
-point where we unmap the S2 PTs.
+> 
+> > +	case ARM_SMCCC_VENDOR_HYP_KVM_MMIO_GUARD_ENROLL_FUNC_ID:
+> > +		set_bit(KVM_ARCH_FLAG_MMIO_GUARD, &vcpu->kvm->arch.flags);
+> > +		val[0] = SMCCC_RET_SUCCESS;
+> > +		break;
+> > +	case ARM_SMCCC_VENDOR_HYP_KVM_MMIO_GUARD_MAP_FUNC_ID:
+> > +		if (kvm_install_ioguard_page(vcpu, vcpu_get_reg(vcpu, 1)))
+> > +			val[0] = SMCCC_RET_SUCCESS;
+> > +		break;
+> > +	case ARM_SMCCC_VENDOR_HYP_KVM_MMIO_GUARD_UNMAP_FUNC_ID:
+> > +		if (kvm_remove_ioguard_page(vcpu, vcpu_get_reg(vcpu, 1)))
+> > +			val[0] = SMCCC_RET_SUCCESS;
+> > +		break;
+> 
+> I think there's a slight discrepancy between MAP and UNMAP here in that
+> calling UNMAP on something that hasn't been mapped will fail, whereas
+> calling MAP on something that's already been mapped will succeed. I think
+> that might mean you can't reason about the final state of the page if two
+> vCPUs race to call these functions in some cases (and both succeed).
 
-Maybe an alternative is to move this to the halt/reboot PSCI handlers,
-making it clearer what we expect?
+I'm not sure that's the expected behaviour for ioremap(), for example
+(you can ioremap two portions of the same page successfully).
+
+I guess MAP could return something indicating that the page is already
+mapped, but I wouldn't want to return a hard failure in this case.
 
 	M.
 
