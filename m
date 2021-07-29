@@ -7,76 +7,75 @@ X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1584C4320A
-	for <kvmarm@archiver.kernel.org>; Thu, 29 Jul 2021 13:28:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C683DC4320E
+	for <kvmarm@archiver.kernel.org>; Thu, 29 Jul 2021 13:28:57 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 63EAA60F48
-	for <kvmarm@archiver.kernel.org>; Thu, 29 Jul 2021 13:28:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 63EAA60F48
+	by mail.kernel.org (Postfix) with ESMTP id 7778161052
+	for <kvmarm@archiver.kernel.org>; Thu, 29 Jul 2021 13:28:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 7778161052
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 19DE34B10D;
-	Thu, 29 Jul 2021 09:28:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F25C40D0A;
+	Thu, 29 Jul 2021 09:28:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id awwjn+gjiMN1; Thu, 29 Jul 2021 09:28:54 -0400 (EDT)
+	with ESMTP id U0ovw2+fScHu; Thu, 29 Jul 2021 09:28:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0CDF84A5A0;
-	Thu, 29 Jul 2021 09:28:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A7654B085;
+	Thu, 29 Jul 2021 09:28:56 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 63BA94B0D0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 09:28:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C1C34B0DD
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 09:28:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UURdqRJX4lM9 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 29 Jul 2021 09:28:51 -0400 (EDT)
-Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com
- [209.85.221.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7450A40D0A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 09:28:51 -0400 (EDT)
-Received: by mail-wr1-f73.google.com with SMTP id
- o11-20020a5d474b0000b02901533f8ed22cso2234817wrs.22
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 06:28:51 -0700 (PDT)
+ with ESMTP id Vt-GCzdRN7C9 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 29 Jul 2021 09:28:53 -0400 (EDT)
+Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com
+ [209.85.219.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 369B14B0DF
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 09:28:53 -0400 (EDT)
+Received: by mail-qv1-f73.google.com with SMTP id
+ r14-20020a0c8d0e0000b02902e82df307f0so3933326qvb.4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 06:28:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=H72uhE5VGkDx1jb1MVcWxLaZfSQPWlRzbrWGol5Bg8o=;
- b=HTncpCcFrfYqsq+B0XVUZSJV3OsWsCbXAq0Nsc6wlmDYOhwALGBrA3jJ41pZG0qqMI
- BUp7QdvrQdj2zE8BkjdDej0plVEuMnXHWUQxTorC7+RLWrL1Cl5SNZOzSPQYcIPsiBfy
- PrIxNokt9gtSQCGyTC4CeE1TIB4Vpi45IPhQSXcZ31S+u0qfhpB+xXZJnFGTLgqBW/FK
- 8j7S1I+GtzmzNFPDXkOtQ4OpR5EBk196h65xM3EPu3FNApwn8htU1h7pYOsraR/C0MHV
- Et3C8vRAcLob23EWSpeVAA0PxgEvB3ZxKyeGA3rhHcr1KBj7OXeo6C86lTupLKh5WO3I
- vGjQ==
+ :cc; bh=AlIcs6je/4eH5g1VpJMJ6MIaoeGclfxxvTq2IG6FTnE=;
+ b=PojaLSp2J3h7SGHoj/wg3sKvQEJru11qmRDv6TPyUDNP0v2sIgCgjnQcQBfVvjJIBd
+ yvSNbLe1o+nRvt4gE0x+yU5fyEqbr0b5rs+ag4a5W3POPPbpSKs5xgMCz0wnKXhZeNQJ
+ Jz8fp9z+v6v263KlELujgmCZkDPY4LwdYCPTuK3m51ARcYRoysYF4I+3aFi/t2XpYMF3
+ LZR4+yesCGdVYduYfwUa+43g/OSLzHdoLEJ6HOnuqE+eHQa2gYpDnE7HKgtttm2Q3g6D
+ wMuKjYgK7mmdnQTrjI/+6Qfcz2yvwA+zA0dgaLkl/O6s+UYLBYYi6gfD4pqB6YDAw10Q
+ LWgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=H72uhE5VGkDx1jb1MVcWxLaZfSQPWlRzbrWGol5Bg8o=;
- b=KLvRci13YDG9Z3RlStyNOjF2xlYRVKrUHdbm9HGX36tcBvpA5jiJkX2RtgrT0Le21n
- fjWQU64DFoWgIbgsJPn6IkSrEX1A61cHeyh/wK9Dc5fBhIbit8bHqPtfmmrECE/hQ4XI
- v/xF5KnK2NVvbMSYhjtVCn23kyVLbPACacIBDeg5zgS4Odl73nOjQzOapuYxlyIG4MvM
- kIkQ+4gXFUxzHSZOXML+b8vVkW2gVIEdwdv4RgaEDYy02QfBZ6VJ2oKj9KT9MKegTHSK
- wuDcRHKuouVqt57gwmxzfq7HriILiT5r/OxBZHRoDL0CZKa/s4vNDkTx/I4G/RvvL4/a
- +BLw==
-X-Gm-Message-State: AOAM532QspIKFa4wiNgoeuyV8DrczYxm6fF6ch1GHAksJ5/bwIPwHBUY
- sf/UrjWuMu16LfppEClK0EOS7xgCQexk
-X-Google-Smtp-Source: ABdhPJzn1rlmoNXXKLmPJSHjhbkDAjV7ZnprHUg6PgSi5S1PmeBEhPufv9qLwdFykhgetYoUfULvmrtzd+sc
+ bh=AlIcs6je/4eH5g1VpJMJ6MIaoeGclfxxvTq2IG6FTnE=;
+ b=GSsEHFuLtMoJ2jmYFKyvAHZBcs9RIa6AY5P8CwrHIwyrLYVGMKMLmDh9Afy/CiHyQ2
+ Hw1asmS7oEXF0oJjDXF/nMVBJa2441L/PYQW/CcnNvt3FX+lSsSJ6ZlBAdhAmqNegu/f
+ wzYyLDxDRxJUlCAaj56lPCkvjyDLBNxVTXG5u0YKBt8i+Rm8zQSrS68J+jUzd0XOiPgZ
+ g2g8eyWUaFWD8HtFniYokFLBzj7ULnljAwZNN4OVDia7KyFXiH/cJe4iIuAs+riUWeg3
+ w1pYHbNyKt9LLQEU3FMn0PEiR8NDjE1po7b733TrVoZ432NCttPrUOlbqsUj+2rsjoTD
+ ZKvQ==
+X-Gm-Message-State: AOAM531QVX4DtqOCn0JfYrvkegjoUT4uhvqsh1k4k1MwRggJb5jrgcc8
+ QWmrLqbmVgolbg+Hd6YxjntTeHGsHVSg
+X-Google-Smtp-Source: ABdhPJwjclaLvF9NNfuY6mTQNdmoAJ3rTkidxuL1gXdxsvT/IfAhg+ijqY4w89EJuF24aa4xY4D+MGf/w1eo
 X-Received: from luke.lon.corp.google.com
  ([2a00:79e0:d:210:293a:bc89:7514:5218])
- (user=qperret job=sendgmr) by 2002:a1c:a78a:: with SMTP id
- q132mr4804653wme.76.1627565330622; Thu, 29 Jul 2021 06:28:50 -0700 (PDT)
-Date: Thu, 29 Jul 2021 14:28:09 +0100
+ (user=qperret job=sendgmr) by 2002:a05:6214:20c8:: with SMTP id
+ 8mr1933136qve.4.1627565332854; Thu, 29 Jul 2021 06:28:52 -0700 (PDT)
+Date: Thu, 29 Jul 2021 14:28:10 +0100
 In-Reply-To: <20210729132818.4091769-1-qperret@google.com>
-Message-Id: <20210729132818.4091769-13-qperret@google.com>
+Message-Id: <20210729132818.4091769-14-qperret@google.com>
 Mime-Version: 1.0
 References: <20210729132818.4091769-1-qperret@google.com>
 X-Mailer: git-send-email 2.32.0.432.gabb21c7263-goog
-Subject: [PATCH v3 12/21] KVM: arm64: Add helpers to tag shared pages in SW
- bits
+Subject: [PATCH v3 13/21] KVM: arm64: Expose host stage-2 manipulation helpers
 From: Quentin Perret <qperret@google.com>
 To: maz@kernel.org, james.morse@arm.com, alexandru.elisei@arm.com, 
  suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org
@@ -99,54 +98,64 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-We will soon start annotating shared pages in page-tables in nVHE
-protected mode. Define all the states in which a page can be (owned,
-shared and owned, shared and borrowed), and provide helpers allowing to
-convert this into SW bits annotations using the matching prot
-attributes.
+We will need to manipulate the host stage-2 page-table from outside
+mem_protect.c soon. Introduce two functions allowing this, and make
+them usable to users of mem_protect.h.
 
 Signed-off-by: Quentin Perret <qperret@google.com>
 ---
- arch/arm64/kvm/hyp/include/nvhe/mem_protect.h | 26 +++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  2 ++
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 17 ++++++++++++++++-
+ 2 files changed, 18 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-index 9c227d87c36d..ae355bfd8c01 100644
+index ae355bfd8c01..47c2a0c51612 100644
 --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
 +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-@@ -12,6 +12,32 @@
- #include <asm/virt.h>
- #include <nvhe/spinlock.h>
+@@ -49,6 +49,8 @@ extern struct host_kvm host_kvm;
+ int __pkvm_prot_finalize(void);
+ int __pkvm_mark_hyp(phys_addr_t start, phys_addr_t end);
  
-+/*
-+ * SW bits 0-1 are reserved to track the memory ownership state of each page:
-+ *   00: The page is owned solely by the page-table owner.
-+ *   01: The page is owned by the page-table owner, but is shared
-+ *       with another entity.
-+ *   10: The page is shared with, but not owned by the page-table owner.
-+ *   11: Reserved for future use (lending).
-+ */
-+enum pkvm_page_state {
-+	PKVM_PAGE_OWNED			= 0ULL,
-+	PKVM_PAGE_SHARED_OWNED		= KVM_PGTABLE_PROT_SW0,
-+	PKVM_PAGE_SHARED_BORROWED	= KVM_PGTABLE_PROT_SW1,
-+};
-+
-+#define PKVM_PAGE_STATE_PROT_MASK	(KVM_PGTABLE_PROT_SW0 | KVM_PGTABLE_PROT_SW1)
-+static inline enum kvm_pgtable_prot pkvm_mkstate(enum kvm_pgtable_prot prot,
-+						 enum pkvm_page_state state)
++int host_stage2_idmap_locked(u64 start, u64 end, enum kvm_pgtable_prot prot);
++int host_stage2_set_owner_locked(u64 start, u64 end, u8 owner_id);
+ int kvm_host_prepare_stage2(void *pgt_pool_base);
+ void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt);
+ 
+diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+index 70c57d2c3024..a7f6134789e0 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
++++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+@@ -272,6 +272,21 @@ static int host_stage2_adjust_range(u64 addr, struct kvm_mem_range *range)
+ 	return 0;
+ }
+ 
++int host_stage2_idmap_locked(u64 start, u64 end, enum kvm_pgtable_prot prot)
 +{
-+	return (prot & ~PKVM_PAGE_STATE_PROT_MASK) | state;
++	hyp_assert_lock_held(&host_kvm.lock);
++
++	return host_stage2_try(__host_stage2_idmap, start, end, prot);
 +}
 +
-+static inline enum pkvm_page_state pkvm_getstate(enum kvm_pgtable_prot prot)
++int host_stage2_set_owner_locked(u64 start, u64 end, u8 owner_id)
 +{
-+	return prot & PKVM_PAGE_STATE_PROT_MASK;
++	hyp_assert_lock_held(&host_kvm.lock);
++
++	return host_stage2_try(kvm_pgtable_stage2_set_owner, &host_kvm.pgt,
++			       start, end - start, &host_s2_pool, owner_id);
 +}
 +
- struct host_kvm {
- 	struct kvm_arch arch;
- 	struct kvm_pgtable pgt;
+ static bool host_stage2_force_pte_cb(u64 addr, u64 end, enum kvm_pgtable_prot prot)
+ {
+ 	/*
+@@ -309,7 +324,7 @@ static int host_stage2_idmap(u64 addr)
+ 	if (ret)
+ 		goto unlock;
+ 
+-	ret = host_stage2_try(__host_stage2_idmap, range.start, range.end, prot);
++	ret = host_stage2_idmap_locked(range.start, range.end, prot);
+ unlock:
+ 	hyp_spin_unlock(&host_kvm.lock);
+ 
 -- 
 2.32.0.432.gabb21c7263-goog
 
