@@ -8,75 +8,75 @@ X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21650C4338F
-	for <kvmarm@archiver.kernel.org>; Thu, 29 Jul 2021 17:33:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25040C4320A
+	for <kvmarm@archiver.kernel.org>; Thu, 29 Jul 2021 17:33:22 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C8C2E60F48
-	for <kvmarm@archiver.kernel.org>; Thu, 29 Jul 2021 17:33:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org C8C2E60F48
+	by mail.kernel.org (Postfix) with ESMTP id BBBA060F42
+	for <kvmarm@archiver.kernel.org>; Thu, 29 Jul 2021 17:33:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org BBBA060F42
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7DDE94B101;
-	Thu, 29 Jul 2021 13:33:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E41E4B09B;
+	Thu, 29 Jul 2021 13:33:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id DVH+MyKenCow; Thu, 29 Jul 2021 13:33:19 -0400 (EDT)
+	with ESMTP id KH1L1UITlUe9; Thu, 29 Jul 2021 13:33:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ABFD84B11F;
-	Thu, 29 Jul 2021 13:33:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C7EE84B102;
+	Thu, 29 Jul 2021 13:33:18 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 78E664B10F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 13:33:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A4E34B104
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 13:33:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id n7FOFhB4b3uz for <kvmarm@lists.cs.columbia.edu>;
- Thu, 29 Jul 2021 13:33:15 -0400 (EDT)
-Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com
- [209.85.219.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6C7794B0F7
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 13:33:13 -0400 (EDT)
-Received: by mail-qv1-f74.google.com with SMTP id
- r14-20020a0c8d0e0000b02902e82df307f0so4302964qvb.4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 10:33:13 -0700 (PDT)
+ with ESMTP id 2EwwEAqz+VxU for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 29 Jul 2021 13:33:16 -0400 (EDT)
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com
+ [209.85.219.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6F2DC4B125
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 13:33:14 -0400 (EDT)
+Received: by mail-yb1-f202.google.com with SMTP id
+ j21-20020a25d2150000b029057ac4b4e78fso7446141ybg.4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 10:33:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=tWp4QqVMPEQEhDxfNdWfM4hSXZXvk7lxfQAckJjLAqA=;
- b=BfRwJ0QWyzCLQRDRmQyJEtUje8JBbrz83rAucF5ipfus6AeWvzpnDjCnWn70+9KgiI
- yZhuYBnczFa2hUQAYmcWeLwcwjbbyhP/AHnczh8DeS7tVlNWKHx5WgFsghbm0gfF0jts
- p4D80XWLp5DrD+8YI8Bv3Jkqj30WmCgIcuTVo3n2YbVrUzVVT4pwkQ5GkY9/D5QBVc9Z
- dnEnzNYzCNkgUqPp4ztl9Gy8McDpJj9oApriBT8ka/5VCKDXQ3kt1ETJMP7UhKnDo/we
- BC7jj6qgA2ZilNiHkMX2tU5Sb1rRvQUKX+eXS5zTgnGI/aJSMZAvKnEsh4fWjrR1q0Qg
- i/hQ==
+ :cc; bh=e1bCoHWm27rhJDUQhB5Prsjt54mG72fssvd6s+HeReo=;
+ b=ZYiQMy2QUUUiYdFMlBX6Pio4UgtsJ6xu6RFaU5UKRLsd+S4bwQCbYC9LfKHzKWSxW6
+ 4QnHktxEnw+3/J9aFrixPIfJN4WycWEUj+JII3KiMhLRvr4z4Fg5dIolfj3uQ7VKe5WK
+ /6eqJ4+rkbHJv9YYPKpVPZyDw7gaVf0JegyCyksSUBjesTLciv70VjSUpoFicizqsL89
+ c3sAi8hrRA357ijTB+Gi0iX2qqsO5Q1QY8oJbBR12aVTOv3xtAUEOyYpiEYIVyrfP6UC
+ BOo1yFrczuUwSGm/H/nVsVPbM5So8b0SPhEg0X8pNGyh1oImXyn2x0d/Njg8Mb9l0mb+
+ puHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=tWp4QqVMPEQEhDxfNdWfM4hSXZXvk7lxfQAckJjLAqA=;
- b=i80+TlWiLimuF/a3JEd6+SJH56/jlXCa+NL5FUOPv8obJ3vyRoG7Kgbro0mUxZF4ua
- 5GulyDZLrpXJGIRLYv/IwXrmlfNgZ+Sd/Bm8NaRhiudDiLC+4yOagK2+F143jPcjANqu
- gyOqxdFQ7pSt4QSwH718UQwtDl7WRa0+0GbPdLEwMC1waSawnCrniJMa1RYFdmzjyH4Y
- P4+fZrCMS5hOCoYGq49z8KgFpd7tKTocf63DSKk/MdNIw1MGViW6atJe1aew8xkbojIE
- TDEz1QxZ3+1Z5+/M9shRbwxDJSWYEWGxJel+WAXOwRI93xo+8lk4k7GXDHwY2/ByvKWj
- /mJg==
-X-Gm-Message-State: AOAM533VAmQ7RvZKN/+6RXKuETcllTlTFbk2/pI+wbsO8LqnJTDY+0Ua
- pdrYqmrcv25jQXN2r+Wg8zfKBuIlV+0=
-X-Google-Smtp-Source: ABdhPJxCE/6cxmHAmOJ15Lxiq41dl28sqCTb6rChEr3qenRhc+JvYfDFTpk5+e6maSQNBVbFIuPvL2wVyws=
+ bh=e1bCoHWm27rhJDUQhB5Prsjt54mG72fssvd6s+HeReo=;
+ b=kJLLcSUI8l6o0N2xcIbqkSfawTnG/1p4YVBGNndFzpRvTwppS4Yq3jHv1VPgxgA0py
+ mM3pVThq9AuBSEiqj54n0Rfa+E+ccVRgIRGySiC7g/WTeN7VACosqmV+kOAkJpWm3Y9u
+ mIYl0Hx+QMbYIx49nXsFH57sNXlLwIlPusIW6HuSYfcGtSAbsxp9FQOkgL3PnPyI+9K4
+ nJKTV6ZRZOtwd1qUQixnxVTFcxrKXWQRVgaYf2I1XQiJ7wdFyao+7Z5/7ZQLdHu907si
+ pEj6L2F1WS0R207/bdyKaw8FTTIaV00HvryeZIqnNUth6OsGWVd5Ck+elr1bAVS1tfF4
+ SFsQ==
+X-Gm-Message-State: AOAM531Hjr+WdfoHEEir1/ev27gyrnmoRFrvQxEtQgI15vF9qnzcYwTe
+ 7fxnnuDBvKn/QtS6BapilSomgDhpdfc=
+X-Google-Smtp-Source: ABdhPJxlvLpmRwOOOs661OCWJ/9eeDqMd8dMMjoVPFyQlHQ5eZC2j+Bab+BXWQYlGr8hDaoDXKOjKn9LTOM=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a05:6214:a63:: with SMTP id
- ef3mr6461527qvb.15.1627579993003; Thu, 29 Jul 2021 10:33:13 -0700 (PDT)
-Date: Thu, 29 Jul 2021 17:32:56 +0000
+ (user=oupton job=sendgmr) by 2002:a05:6902:703:: with SMTP id
+ k3mr8030922ybt.47.1627579994021; Thu, 29 Jul 2021 10:33:14 -0700 (PDT)
+Date: Thu, 29 Jul 2021 17:32:57 +0000
 In-Reply-To: <20210729173300.181775-1-oupton@google.com>
-Message-Id: <20210729173300.181775-10-oupton@google.com>
+Message-Id: <20210729173300.181775-11-oupton@google.com>
 Mime-Version: 1.0
 References: <20210729173300.181775-1-oupton@google.com>
 X-Mailer: git-send-email 2.32.0.432.gabb21c7263-goog
-Subject: [PATCH v5 09/13] KVM: arm64: Allow userspace to configure a vCPU's
- virtual offset
+Subject: [PATCH v5 10/13] selftests: KVM: Add support for aarch64 to
+ system_counter_offset_test
 From: Oliver Upton <oupton@google.com>
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 Cc: Marc Zyngier <maz@kernel.org>, Raghavendra Rao Anata <rananta@google.com>,
@@ -99,165 +99,116 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add a new vCPU attribute that allows userspace to directly manipulate
-the virtual counter-timer offset. Exposing such an interface allows for
-the precise migration of guest virtual counter-timers, as it is an
-indepotent interface.
-
-Uphold the existing behavior of writes to CNTVOFF_EL2 for this new
-interface, wherein a write to a single vCPU is broadcasted to all vCPUs
-within a VM.
+KVM/arm64 now allows userspace to adjust the guest virtual counter-timer
+via a vCPU device attribute. Test that changes to the virtual
+counter-timer offset result in the correct view being presented to the
+guest.
 
 Reviewed-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- Documentation/virt/kvm/devices/vcpu.rst | 22 ++++++++
- arch/arm64/include/uapi/asm/kvm.h       |  1 +
- arch/arm64/kvm/arch_timer.c             | 68 ++++++++++++++++++++++++-
- 3 files changed, 89 insertions(+), 2 deletions(-)
+ tools/testing/selftests/kvm/Makefile          |  1 +
+ .../selftests/kvm/include/aarch64/processor.h | 12 +++++
+ .../kvm/system_counter_offset_test.c          | 54 ++++++++++++++++++-
+ 3 files changed, 66 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
-index 0f46f2588905..ecbab7adc602 100644
---- a/Documentation/virt/kvm/devices/vcpu.rst
-+++ b/Documentation/virt/kvm/devices/vcpu.rst
-@@ -139,6 +139,28 @@ configured values on other VCPUs.  Userspace should configure the interrupt
- numbers on at least one VCPU after creating all VCPUs and before running any
- VCPUs.
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index 9f7060c02668..fab42e7c23ee 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -98,6 +98,7 @@ TEST_GEN_PROGS_aarch64 += kvm_page_table_test
+ TEST_GEN_PROGS_aarch64 += set_memory_region_test
+ TEST_GEN_PROGS_aarch64 += steal_time
+ TEST_GEN_PROGS_aarch64 += kvm_binary_stats_test
++TEST_GEN_PROGS_aarch64 += system_counter_offset_test
  
-+2.2. ATTRIBUTE: KVM_ARM_VCPU_TIMER_OFFSET_VTIMER
-+------------------------------------------------
-+
-+:Parameters: Pointer to a 64-bit unsigned counter-timer offset.
-+
-+Returns:
-+
-+	 ======= ======================================
-+	 -EFAULT Error reading/writing the provided
-+	 	 parameter address
-+	 -ENXIO  Attribute not supported
-+	 ======= ======================================
-+
-+Specifies the guest's virtual counter-timer offset from the host's
-+virtual counter. The guest's virtual counter is then derived by
-+the following equation:
-+
-+  guest_cntvct = host_cntvct - KVM_ARM_VCPU_TIMER_OFFSET_VTIMER
-+
-+KVM does not allow the use of varying offset values for different vCPUs;
-+the last written offset value will be broadcasted to all vCPUs in a VM.
-+
- 3. GROUP: KVM_ARM_VCPU_PVTIME_CTRL
- ==================================
+ TEST_GEN_PROGS_s390x = s390x/memop
+ TEST_GEN_PROGS_s390x += s390x/resets
+diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
+index 27dc5c2e56b9..3168cdbae6ee 100644
+--- a/tools/testing/selftests/kvm/include/aarch64/processor.h
++++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+@@ -129,4 +129,16 @@ void vm_install_sync_handler(struct kvm_vm *vm,
  
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index b3edde68bc3e..008d0518d2b1 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -365,6 +365,7 @@ struct kvm_arm_copy_mte_tags {
- #define KVM_ARM_VCPU_TIMER_CTRL		1
- #define   KVM_ARM_VCPU_TIMER_IRQ_VTIMER		0
- #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
-+#define   KVM_ARM_VCPU_TIMER_OFFSET_VTIMER	2
- #define KVM_ARM_VCPU_PVTIME_CTRL	2
- #define   KVM_ARM_VCPU_PVTIME_IPA	0
+ #define isb()	asm volatile("isb" : : : "memory")
  
-diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index 3df67c127489..d2b1b13af658 100644
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -1305,7 +1305,7 @@ static void set_timer_irqs(struct kvm *kvm, int vtimer_irq, int ptimer_irq)
- 	}
- }
- 
--int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-+int kvm_arm_timer_set_attr_irq(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
- {
- 	int __user *uaddr = (int __user *)(long)attr->addr;
- 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
-@@ -1338,7 +1338,39 @@ int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
- 	return 0;
- }
- 
--int kvm_arm_timer_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-+int kvm_arm_timer_set_attr_offset(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
++static inline uint64_t read_cntvct_ordered(void)
 +{
-+	u64 __user *uaddr = (u64 __user *)(long)attr->addr;
-+	u64 offset;
++	uint64_t r;
 +
-+	if (get_user(offset, uaddr))
-+		return -EFAULT;
++	__asm__ __volatile__("isb\n\t"
++			     "mrs %0, cntvct_el0\n\t"
++			     "isb\n\t"
++			     : "=r"(r));
 +
-+	switch (attr->attr) {
-+	case KVM_ARM_VCPU_TIMER_OFFSET_VTIMER:
-+		update_vtimer_cntvoff(vcpu, offset);
-+		break;
++	return r;
++}
++
+ #endif /* SELFTEST_KVM_PROCESSOR_H */
+diff --git a/tools/testing/selftests/kvm/system_counter_offset_test.c b/tools/testing/selftests/kvm/system_counter_offset_test.c
+index b337bbbfa41f..25806cdd31ef 100644
+--- a/tools/testing/selftests/kvm/system_counter_offset_test.c
++++ b/tools/testing/selftests/kvm/system_counter_offset_test.c
+@@ -53,7 +53,59 @@ static uint64_t host_read_guest_system_counter(struct test_case *test)
+ 	return rdtsc() + test->tsc_offset;
+ }
+ 
+-#else /* __x86_64__ */
++#elif __aarch64__ /* __x86_64__ */
++
++enum arch_counter {
++	VIRTUAL,
++};
++
++struct test_case {
++	enum arch_counter counter;
++	uint64_t offset;
++};
++
++static struct test_case test_cases[] = {
++	{ .counter = VIRTUAL, .offset = 0 },
++	{ .counter = VIRTUAL, .offset = 180 * NSEC_PER_SEC },
++	{ .counter = VIRTUAL, .offset = -180 * NSEC_PER_SEC },
++};
++
++static void check_preconditions(struct kvm_vm *vm)
++{
++	if (!_vcpu_has_device_attr(vm, VCPU_ID, KVM_ARM_VCPU_TIMER_CTRL,
++				   KVM_ARM_VCPU_TIMER_OFFSET_VTIMER))
++		return;
++
++	print_skip("KVM_ARM_VCPU_TIMER_OFFSET_VTIMER not supported; skipping test");
++	exit(KSFT_SKIP);
++}
++
++static void setup_system_counter(struct kvm_vm *vm, struct test_case *test)
++{
++	vcpu_access_device_attr(vm, VCPU_ID, KVM_ARM_VCPU_TIMER_CTRL,
++				KVM_ARM_VCPU_TIMER_OFFSET_VTIMER, &test->offset,
++				true);
++}
++
++static uint64_t guest_read_system_counter(struct test_case *test)
++{
++	switch (test->counter) {
++	case VIRTUAL:
++		return read_cntvct_ordered();
 +	default:
-+		return -ENXIO;
++		GUEST_ASSERT(0);
 +	}
 +
++	/* unreachable */
 +	return 0;
 +}
 +
-+int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
++static uint64_t host_read_guest_system_counter(struct test_case *test)
 +{
-+	switch (attr->attr) {
-+	case KVM_ARM_VCPU_TIMER_IRQ_VTIMER:
-+	case KVM_ARM_VCPU_TIMER_IRQ_PTIMER:
-+		return kvm_arm_timer_set_attr_irq(vcpu, attr);
-+	case KVM_ARM_VCPU_TIMER_OFFSET_VTIMER:
-+		return kvm_arm_timer_set_attr_offset(vcpu, attr);
-+	}
-+
-+	return -ENXIO;
++	return read_cntvct_ordered() - test->offset;
 +}
 +
-+int kvm_arm_timer_get_attr_irq(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
- {
- 	int __user *uaddr = (int __user *)(long)attr->addr;
- 	struct arch_timer_context *timer;
-@@ -1359,11 +1391,43 @@ int kvm_arm_timer_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
- 	return put_user(irq, uaddr);
- }
++#else /* __aarch64__ */
  
-+int kvm_arm_timer_get_attr_offset(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-+{
-+	u64 __user *uaddr = (u64 __user *)(long)attr->addr;
-+	struct arch_timer_context *timer;
-+	u64 offset;
-+
-+	switch (attr->attr) {
-+	case KVM_ARM_VCPU_TIMER_OFFSET_VTIMER:
-+		timer = vcpu_vtimer(vcpu);
-+		break;
-+	default:
-+		return -ENXIO;
-+	}
-+
-+	offset = timer_get_offset(timer);
-+	return put_user(offset, uaddr);
-+}
-+
-+int kvm_arm_timer_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-+{
-+	switch (attr->attr) {
-+	case KVM_ARM_VCPU_TIMER_IRQ_VTIMER:
-+	case KVM_ARM_VCPU_TIMER_IRQ_PTIMER:
-+		return kvm_arm_timer_get_attr_irq(vcpu, attr);
-+	case KVM_ARM_VCPU_TIMER_OFFSET_VTIMER:
-+		return kvm_arm_timer_get_attr_offset(vcpu, attr);
-+	}
-+
-+	return -ENXIO;
-+}
-+
- int kvm_arm_timer_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
- {
- 	switch (attr->attr) {
- 	case KVM_ARM_VCPU_TIMER_IRQ_VTIMER:
- 	case KVM_ARM_VCPU_TIMER_IRQ_PTIMER:
-+	case KVM_ARM_VCPU_TIMER_OFFSET_VTIMER:
- 		return 0;
- 	}
+ #error test not implemented for this architecture!
  
 -- 
 2.32.0.432.gabb21c7263-goog
