@@ -2,77 +2,81 @@ Return-Path: <SRS0=9/XU=MV=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05460C4338F
-	for <kvmarm@archiver.kernel.org>; Thu, 29 Jul 2021 13:28:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E56AC432BE
+	for <kvmarm@archiver.kernel.org>; Thu, 29 Jul 2021 13:28:31 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 780F360F42
-	for <kvmarm@archiver.kernel.org>; Thu, 29 Jul 2021 13:28:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 780F360F42
+	by mail.kernel.org (Postfix) with ESMTP id 1DD0360F23
+	for <kvmarm@archiver.kernel.org>; Thu, 29 Jul 2021 13:28:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 1DD0360F23
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D8BC24B0CE;
-	Thu, 29 Jul 2021 09:28:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B55414B0C5;
+	Thu, 29 Jul 2021 09:28:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jD-L+3ieOVf2; Thu, 29 Jul 2021 09:28:27 -0400 (EDT)
+	with ESMTP id H+Rgmqo96Omt; Thu, 29 Jul 2021 09:28:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8AE624B0BA;
-	Thu, 29 Jul 2021 09:28:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A6BC54B0D0;
+	Thu, 29 Jul 2021 09:28:29 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 585724B0A0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 09:28:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 689C14B0A0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 09:28:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id S6zIxEsQV0pP for <kvmarm@lists.cs.columbia.edu>;
- Thu, 29 Jul 2021 09:28:22 -0400 (EDT)
-Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com
- [209.85.219.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D3AE240256
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 09:28:22 -0400 (EDT)
-Received: by mail-qv1-f74.google.com with SMTP id
- o32-20020a0c85a30000b0290328f91ede2bso3944484qva.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 06:28:22 -0700 (PDT)
+ with ESMTP id NLkEYLgt4LdS for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 29 Jul 2021 09:28:25 -0400 (EDT)
+Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com
+ [209.85.160.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EB5114B0B5
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 09:28:24 -0400 (EDT)
+Received: by mail-qt1-f202.google.com with SMTP id
+ l12-20020a05622a050cb029025ca4fbcc12so2729993qtx.18
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 06:28:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:message-id:mime-version:subject:from:to:cc;
- bh=uCsDvrfcUF+1HjCy/5u0lXgukkeSpeNSQPNFAPtE5Og=;
- b=TwUGuSD9qt0RaCZOS9MqYshAwbluPWeQnV47t4m6fl1LT4Bu8aMFJPgR4wel2mQ/0d
- VMq3hAK+GBdhK0pDqqszgH6EjWtt0g+gsttm5me4V/4bLlmdJtY8xDdSkXQhD2+kh7En
- APBRNllYpK/w+G4htTFazfyOkcJT2CNzdRflI8pGflgUvStmidwaEZJ1ISLDNIz8XHkE
- I8TAGDAGu8wQRDYBI3LsbMZm8DvGc5Yhi05TnDxDgHirqn7QwkGG9pUJKe1iAk3KJ5ST
- nrE4ll47uKL1HWghtXbFmGP9rQo/7u9BGNvZD5e4hpV4BN1enHUmTMlPD1rE19y/oH2I
- Rzug==
+ h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+ :cc; bh=crBqYydgsM0lLmpXbxrQzqnfwJboPEMWJ5uFG+CB388=;
+ b=JOIVCVkTKSE7PwC39f/uN10vnOvi7Vzp2RTafhg3kyIB15DlDdxcNRRjKoM75ogyTS
+ sjmXizIUunrQ4Q2yIkfgmJDrNF8nuB33MW7tB7YPCbcNhgcnStKG61TKLA9OHyXOwzKH
+ i7uDNzA+PPHFpfTHJs2M5QoYOwbb6NUXBh++UvXlYe3cdezMzPl1EZ3sOx0jBVOxIit7
+ DsJ4Rk2OJv96rif4hnZqeL50UBKsRJGWc8A2EaMc0YZVDJkZTXTjcJfL1x72E+Z4uyBi
+ PGyvbycBPgY92pQ84g5f29LjEY96+E8Pod3jV3Xa3E41vkI8XuIPX9jDrr0GlJ2pzzRS
+ RQTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
- bh=uCsDvrfcUF+1HjCy/5u0lXgukkeSpeNSQPNFAPtE5Og=;
- b=s+a/Z7tUXbhMvII15yZ0YsnybGEMvRse/uaY9B/H0jegB7/ORuLxcmST+My7Y8fgiB
- aqb68hm2dD9cpbQPu25mTmUm+RQtFqa1kf/1hhtaPSJb5LCv36sKYwcF2dJQ1AfMRX0+
- WBgESBS45pvPXMhmK2Xzavn0gK0ItN1pTtNjENqgIpMiEP/zVWvv1obwqqOquPNEfrwu
- wBvyiUrjA2uaBTd6WruneXISNVtL8aIWh2jD8ZjOEpE6X9PDnSVwVtIVVbev1lAGZYV6
- vFgLzWcKCyH6ImNf4TWgvHFQ3gLDGDMxpKvLRBFVRLXZjdqHzbNRXkFRRj26uu4nAiyR
- 5fdA==
-X-Gm-Message-State: AOAM531kxlrS1V4qDsuyNREobY/crB4bzVVLz9BjMap2fquHyy4FhmXd
- mR7NkYOHf4biHnKUMvOZoCOry69vDUEV
-X-Google-Smtp-Source: ABdhPJwFLu6UzIEWRzj8e8yAxcsgzIxAgdeYD1x+wnn2xqD3UBVZS+HjIyhzCZDdD20gs2aUkHHEOqy6y/hY
+ h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+ :references:subject:from:to:cc;
+ bh=crBqYydgsM0lLmpXbxrQzqnfwJboPEMWJ5uFG+CB388=;
+ b=TP7mEC7RuYqRnAD/6gESZ+8yxaFvoGuWnB1LG4oqc7zE/KCxoIZ/Kpoh/B9Qj0hg4e
+ Z9GhyWTyq361jl7gjbJPvM+DQo/s/ZPJZK4wV2VM/o6vxkYSWWqZyPTjtVkC6VyZdS5V
+ rDQx+zhi0JGt0fR4G93OWGKSDsRbI0epaDcnNcw1OsNodLPaf3sBQsWv++YdhEY8lMhZ
+ RjIZXtCNr0Gwr1uAj1NQduQpcbcRbRscO3z3uF3DBMnCUIg9eTSM5lWd63k4+kAcpiAw
+ NR9rmWjQLvEga6LTcl8aEsSDsnrNAVoDRqkhGv4gFuKRej9zJZ3uwPLFJrbhwlopY26M
+ NRrg==
+X-Gm-Message-State: AOAM5337dI4olgxnwG0ZUXXCmY1eZ6RRsuwhrizVdqHju7I3v7L35/fG
+ 6OzZbJFaxbCnCxtC4vA5nvL2Tm6OMm+o
+X-Google-Smtp-Source: ABdhPJxHRTBRw3rhOotBjYPWwjVk04U8m2F1PsiYgMcXVSq1/9Rd7rzCjHaUtz4DsAzceZrGz5P9KOU1HQzs
 X-Received: from luke.lon.corp.google.com
  ([2a00:79e0:d:210:293a:bc89:7514:5218])
- (user=qperret job=sendgmr) by 2002:a05:6214:27e7:: with SMTP id
- jt7mr5278007qvb.28.1627565302295; Thu, 29 Jul 2021 06:28:22 -0700 (PDT)
-Date: Thu, 29 Jul 2021 14:27:57 +0100
-Message-Id: <20210729132818.4091769-1-qperret@google.com>
+ (user=qperret job=sendgmr) by 2002:a05:6214:1021:: with SMTP id
+ k1mr5318862qvr.4.1627565304476; Thu, 29 Jul 2021 06:28:24 -0700 (PDT)
+Date: Thu, 29 Jul 2021 14:27:58 +0100
+In-Reply-To: <20210729132818.4091769-1-qperret@google.com>
+Message-Id: <20210729132818.4091769-2-qperret@google.com>
 Mime-Version: 1.0
+References: <20210729132818.4091769-1-qperret@google.com>
 X-Mailer: git-send-email 2.32.0.432.gabb21c7263-goog
-Subject: [PATCH v3 00/21] Track shared pages at EL2 in protected mode
+Subject: [PATCH v3 01/21] KVM: arm64: Add hyp_spin_is_locked() for basic
+ locking assertions at EL2
 From: Quentin Perret <qperret@google.com>
 To: maz@kernel.org, james.morse@arm.com, alexandru.elisei@arm.com, 
  suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org
@@ -95,97 +99,42 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi all,
+From: Will Deacon <will@kernel.org>
 
-This is v3 of the patch series previously posted here:
+Introduce hyp_spin_is_locked() so that functions can easily assert that
+a given lock is held (albeit possibly by another CPU!) without having to
+drag full lockdep support up to EL2.
 
-https://lore.kernel.org/kvmarm/20210726092905.2198501-1-qperret@google.com/
+Signed-off-by: Will Deacon <will@kernel.org>
+Signed-off-by: Quentin Perret <qperret@google.com>
+---
+ arch/arm64/kvm/hyp/include/nvhe/spinlock.h | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-This series aims to improve how the nVHE hypervisor tracks ownership of
-memory pages when running in protected mode ("kvm-arm.mode=protected" on
-the kernel command line).
-
-The main issue with the existing ownership tracking code is that it is
-completely binary: a page is either owned by an entity (e.g. the host)
-or not. However, we'll need something smarter to track shared pages, as
-is needed for virtio, or even just host/hypervisor communications.
-
-This series introduces a few changes to the kvm page-table library to
-allow annotating shared pages in ignored bits (a.k.a. software bits) of
-leaf entries, and makes use of that infrastructure to track all pages
-that are shared between the host and the hypervisor. We will obviously
-want to apply the same treatment to guest stage-2 page-tables, but that
-is not really possible to do until EL2 manages them directly, so I'll
-keep that for another series.
-
-The series is based on the kvmarm/fixes branch, and has been tested on
-AML-S905X-CC (Le Potato) and using various Qemu configurations.
-
-Changes since v2:
- - Renamed and refactored the find_range() path for host memory aborts;
- - Added hyp_assert_lock_held() using Will's hyp_spin_is_locked()
-   helper, and sprinkled a few of them throughout the series;
- - Changed how host stage-2 mappings are adjusted after __pkvm_init() by
-   walking the hyp stage-1 instead of relying on the host calling
-   __pkvm_mark_hyp.
-
-Changes since v1:
- - Changed the 'share' hypercall to accept a single page at a time;
- - Dropped the patch allowing to continue stage-2 map when hitting the
-   EAGAIN case;
- - Dropped some of the custom pgtable walkers and used Marc's get_leaf()
-   patch instead;
- - Changed pgtable API to manipulate SW bits directly rather than
-   specifying shared pages;
- - Added comments and documentations all over;
- - Cleanups and small refactoring.
-
-Thanks,
-Quentin
-
-Marc Zyngier (1):
-  KVM: arm64: Introduce helper to retrieve a PTE and its level
-
-Quentin Perret (19):
-  KVM: arm64: Introduce hyp_assert_lock_held()
-  KVM: arm64: Provide the host_stage2_try() helper macro
-  KVM: arm64: Expose page-table helpers
-  KVM: arm64: Optimize host memory aborts
-  KVM: arm64: Rename KVM_PTE_LEAF_ATTR_S2_IGNORED
-  KVM: arm64: Don't overwrite software bits with owner id
-  KVM: arm64: Tolerate re-creating hyp mappings to set software bits
-  KVM: arm64: Enable forcing page-level stage-2 mappings
-  KVM: arm64: Allow populating software bits
-  KVM: arm64: Add helpers to tag shared pages in SW bits
-  KVM: arm64: Expose host stage-2 manipulation helpers
-  KVM: arm64: Expose pkvm_hyp_id
-  KVM: arm64: Introduce addr_is_memory()
-  KVM: arm64: Enable retrieving protections attributes of PTEs
-  KVM: arm64: Mark host bss and rodata section as shared
-  KVM: arm64: Remove __pkvm_mark_hyp
-  KVM: arm64: Refactor protected nVHE stage-1 locking
-  KVM: arm64: Restrict EL2 stage-1 changes in protected mode
-  KVM: arm64: Make __pkvm_create_mappings static
-
-Will Deacon (1):
-  KVM: arm64: Add hyp_spin_is_locked() for basic locking assertions at
-    EL2
-
- arch/arm64/include/asm/kvm_asm.h              |   5 +-
- arch/arm64/include/asm/kvm_pgtable.h          | 166 ++++++++----
- arch/arm64/kvm/Kconfig                        |   9 +
- arch/arm64/kvm/arm.c                          |  46 ----
- arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  33 ++-
- arch/arm64/kvm/hyp/include/nvhe/mm.h          |   3 +-
- arch/arm64/kvm/hyp/include/nvhe/spinlock.h    |  25 ++
- arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  20 +-
- arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 221 ++++++++++++++--
- arch/arm64/kvm/hyp/nvhe/mm.c                  |  22 +-
- arch/arm64/kvm/hyp/nvhe/setup.c               |  82 +++++-
- arch/arm64/kvm/hyp/pgtable.c                  | 247 +++++++++---------
- arch/arm64/kvm/mmu.c                          |  28 +-
- 13 files changed, 625 insertions(+), 282 deletions(-)
-
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/spinlock.h b/arch/arm64/kvm/hyp/include/nvhe/spinlock.h
+index 76b537f8d1c6..04f65b655fcf 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/spinlock.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/spinlock.h
+@@ -15,6 +15,7 @@
+ 
+ #include <asm/alternative.h>
+ #include <asm/lse.h>
++#include <asm/rwonce.h>
+ 
+ typedef union hyp_spinlock {
+ 	u32	__val;
+@@ -89,4 +90,11 @@ static inline void hyp_spin_unlock(hyp_spinlock_t *lock)
+ 	: "memory");
+ }
+ 
++static inline bool hyp_spin_is_locked(hyp_spinlock_t *lock)
++{
++	hyp_spinlock_t lockval = READ_ONCE(*lock);
++
++	return lockval.owner != lockval.next;
++}
++
+ #endif /* __ARM64_KVM_NVHE_SPINLOCK_H__ */
 -- 
 2.32.0.432.gabb21c7263-goog
 
