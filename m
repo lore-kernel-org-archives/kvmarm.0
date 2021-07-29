@@ -2,89 +2,92 @@ Return-Path: <SRS0=9/XU=MV=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9F97C432BE
-	for <kvmarm@archiver.kernel.org>; Thu, 29 Jul 2021 20:24:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE697C4338F
+	for <kvmarm@archiver.kernel.org>; Thu, 29 Jul 2021 20:29:51 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 497D160F4A
-	for <kvmarm@archiver.kernel.org>; Thu, 29 Jul 2021 20:24:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 497D160F4A
+	by mail.kernel.org (Postfix) with ESMTP id 14D1860F4A
+	for <kvmarm@archiver.kernel.org>; Thu, 29 Jul 2021 20:29:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 14D1860F4A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CE85C4B0C6;
-	Thu, 29 Jul 2021 16:24:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 713D24B0D3;
+	Thu, 29 Jul 2021 16:29:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Fv3kDVzpCFjo; Thu, 29 Jul 2021 16:24:07 -0400 (EDT)
+	with ESMTP id iKdas9pat4J5; Thu, 29 Jul 2021 16:29:49 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AA5824B0CA;
-	Thu, 29 Jul 2021 16:24:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 689C64B09B;
+	Thu, 29 Jul 2021 16:29:49 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B23F4B0C2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 16:24:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 873C14B0C5
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 14:15:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gNS5rfFZeZRf for <kvmarm@lists.cs.columbia.edu>;
- Thu, 29 Jul 2021 16:24:05 -0400 (EDT)
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com
- [209.85.167.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 63ED14A4A3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 16:24:05 -0400 (EDT)
-Received: by mail-lf1-f51.google.com with SMTP id r26so13318341lfp.5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 13:24:05 -0700 (PDT)
+ with ESMTP id e8la-b3pK6AT for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 29 Jul 2021 14:15:33 -0400 (EDT)
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com
+ [209.85.216.44])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2A2324B0B2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 14:15:33 -0400 (EDT)
+Received: by mail-pj1-f44.google.com with SMTP id
+ ds11-20020a17090b08cbb0290172f971883bso16999288pjb.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 11:15:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Gj7yCj3TgjmiQPtQl0jHjvThrzk1CYgb/iJobvGGefk=;
- b=tl09esBor3zjI+pKbOaNgY4vHM/cu59XWi6upaP0j5ZXoIJjMeDMjLYtUFUsLyn+iW
- xo6xMo/kZo6MvUbXVq76eALXaBvUOZuBqlFleNDkQojj1DTWOmrC+aM1kCGXye8VKf1V
- wv5J3wu2RvdOaHyo1pFpCK9ko2I2tywWIMm0rCQ7J+cZ3Y5oZUSlXXhMXGc2XIr7/aU5
- QVP8igM173wDGREtV03oDcqNYlUSnhMYfx4/tjWFc2pj3LxwDw8Zq7wrvTwvpJRi1WSE
- qRY+A8YZFNHyax+N2dPeGqxEchGSO2B8vG23E2kN0nYBnY/q/TEi1FkqHdqRXowpjLkx
- m0nA==
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=1VgSvIUg18Pmu6bXQr/jLLZHZW93wmUUl7jcbNMrRlE=;
+ b=c7Xg5u/SFv0fecvDSkWBz6Or6adxwzBui7Dq/4a59U/xMEjg8w8P/kAEQXWhvAovjQ
+ mih0wxsqaaPUB38HpOf6y50jYJ1C6e8XQM9falOaY4Fd0q17yJ/nhIkfIDEuzVcsxbRz
+ kvROAVdZuCjR8xG4APDxgAbdiPartFPWfak43cWy4fPI+1UJB5FUXt+eLbQsvvXBFlfp
+ B4KDcEVK3fIjhSOHocLlUFwNxs/i6Dp7v1xyvKf9Drcyw2B00s539e59q+vyeXJnKl6W
+ O1sHXA7YJOKy+Vsb8WiCC5HtnjMZRby+Aq/UMM4dG8IMO5uDH8jNlPd1eWPoHzr0e+QL
+ ppyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Gj7yCj3TgjmiQPtQl0jHjvThrzk1CYgb/iJobvGGefk=;
- b=gBpw2uFKleUkeD/080adMi23hRF4AHrm7C/Nd9/voLPEqf89stOyny0k7oPywYJBs7
- Mj+AP/+w5tjd6mf4yApGlxCoT/BtDSPrD+TxiDCbpR/knypfj+cIB0zLhF1fL0G/v/T+
- OJ/gI6u5+RpHVS1P0ZF4HMnfvZVkxNf4Pdk/63RxZsCcI2iYAc4feDoFTqkSDD7a21VZ
- y7t3qy/WW3Sc7mWVwTU9gk1JHRaUMACSz1DTp+6GJZjiJUagkh5rqQc8AyGhoZA0PkzQ
- bogHn/5W7wdbSZ8jBUOaHcBRbYe4Mrso55EtffGryHfDwCdjWJp1/WyPgxB0UBGqAZF6
- wzVw==
-X-Gm-Message-State: AOAM531UBmXI/DLxCQ+OnBytCzCDsUjO6angfaXpNP4u/RW+RxEEnPvA
- IyYI3qhmBJYHkpRDvI2akL6lWQ5cZxeMo+h/gurNcg==
-X-Google-Smtp-Source: ABdhPJzPxiDGiDFKysX5izFriQkSlWyo919HiI1mAjdl/EIF2YA5xH+2Ix5p0VGNtGuJGYezdz59xwCBRVN47iNQNuc=
-X-Received: by 2002:a05:6512:3237:: with SMTP id
- f23mr4870368lfe.524.1627590243514; 
- Thu, 29 Jul 2021 13:24:03 -0700 (PDT)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=1VgSvIUg18Pmu6bXQr/jLLZHZW93wmUUl7jcbNMrRlE=;
+ b=s/uwhBDzhHzTI+gMRVVfRZIMNcezjfIECUDzZqUtx/tKCz47ybv65M9Dle5zMKoISO
+ DD1trBLB+SHf1RxWQsbiMGEZLMJc4dZo10fzbubzefekxrwbZ7vO627+2NgOv20Lc/P6
+ 4380YqfvrNXM7QPiezf5pC73DhCoNU4lbwkecZdhsvlJ6+Vs4nhJxS2qVbQ7UMlhFOCc
+ 6WjXc4QyQ8cqmePACLdG5Xfnm5G5GSWuV/hkM+dA0UnDfuY0q5corP71MZY5rn6sfyoD
+ dmR9qYbO4d0Z20gdAK2yItCWHdc4+OB9y5F39jiewkaMx7x4Gf/gIEk6+dw+ew4Heb42
+ UNiw==
+X-Gm-Message-State: AOAM533XiMa5ayEwB2uLEzUSCbnyC2Yf+CQJdwJCzgnLB8II2aoYhqUJ
+ +B+8Sl6uhasB94j2PVhrtVxRrQ==
+X-Google-Smtp-Source: ABdhPJxeL54Xfvacu7ArTo3B5iH93qHeEnG4cdgRdD0aAvS5WWEXUwctrS4C2oSGWKL/TIsmgOIT0A==
+X-Received: by 2002:a17:902:c402:b029:12b:5175:1ddd with SMTP id
+ k2-20020a170902c402b029012b51751dddmr5870494plk.67.1627582531986; 
+ Thu, 29 Jul 2021 11:15:31 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com.
+ [35.185.214.157])
+ by smtp.gmail.com with ESMTPSA id i8sm4638520pfk.18.2021.07.29.11.15.31
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 29 Jul 2021 11:15:31 -0700 (PDT)
+Date: Thu, 29 Jul 2021 18:15:27 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Ricardo Koller <ricarkol@google.com>
+Subject: Re: [PATCH v4 3/6] KVM: selftests: Introduce UCALL_UNHANDLED for
+ unhandled vector reporting
+Message-ID: <YQLwP9T4hevAqa7w@google.com>
+References: <20210611011020.3420067-1-ricarkol@google.com>
+ <20210611011020.3420067-4-ricarkol@google.com>
 MIME-Version: 1.0
-References: <20210729195632.489978-1-oupton@google.com>
- <20210729195632.489978-2-oupton@google.com>
- <CAAdAUtge_wRL-Ri-TngototL5jixSfDyJm7nTaYBXJqXU0jfmw@mail.gmail.com>
-In-Reply-To: <CAAdAUtge_wRL-Ri-TngototL5jixSfDyJm7nTaYBXJqXU0jfmw@mail.gmail.com>
-From: Oliver Upton <oupton@google.com>
-Date: Thu, 29 Jul 2021 13:23:52 -0700
-Message-ID: <CAOQ_QshrXJx42AS4Efu3gSZj1fnGgJ9FMFCydtdZ9h3Zj8cy=A@mail.gmail.com>
-Subject: Re: [PATCH 1/3] KVM: arm64: Record number of signal exits as a vCPU
- stat
-To: Jing Zhang <jingzhangos@google.com>
-Cc: Shakeel Butt <shakeelb@google.com>, KVM <kvm@vger.kernel.org>,
- Peter Zijlstra <peterz@infradead.org>, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
- Guangyu Shi <guangyus@google.com>, Will Deacon <will@kernel.org>,
- Andy Lutomirski <luto@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
- KVM ARM <kvmarm@lists.cs.columbia.edu>, linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <20210611011020.3420067-4-ricarkol@google.com>
+X-Mailman-Approved-At: Thu, 29 Jul 2021 16:29:47 -0400
+Cc: kvm@vger.kernel.org, maz@kernel.org, pbonzini@redhat.com,
+ vkuznets@redhat.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -101,71 +104,54 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Jul 29, 2021 at 1:07 PM Jing Zhang <jingzhangos@google.com> wrote:
->
-> On Thu, Jul 29, 2021 at 12:56 PM Oliver Upton <oupton@google.com> wrote:
-> >
-> > Most other architectures that implement KVM record a statistic
-> > indicating the number of times a vCPU has exited due to a pending
-> > signal. Add support for that stat to arm64.
-> >
-> > Cc: Jing Zhang <jingzhangos@google.com>
-> > Signed-off-by: Oliver Upton <oupton@google.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_host.h | 1 +
-> >  arch/arm64/kvm/arm.c              | 1 +
-> >  arch/arm64/kvm/guest.c            | 3 ++-
-> >  3 files changed, 4 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index 41911585ae0c..70e129f2b574 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -576,6 +576,7 @@ struct kvm_vcpu_stat {
-> >         u64 wfi_exit_stat;
-> >         u64 mmio_exit_user;
-> >         u64 mmio_exit_kernel;
-> > +       u64 signal_exits;
-> >         u64 exits;
-> >  };
-> >
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index e9a2b8f27792..60d0a546d7fd 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -783,6 +783,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
-> >                 if (signal_pending(current)) {
-> >                         ret = -EINTR;
-> >                         run->exit_reason = KVM_EXIT_INTR;
-> > +                       ++vcpu->stat.signal_exits;
-> >                 }
-> >
-> >                 /*
-> > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> > index 1dfb83578277..50fc16ad872f 100644
-> > --- a/arch/arm64/kvm/guest.c
-> > +++ b/arch/arm64/kvm/guest.c
-> > @@ -50,7 +50,8 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
-> >         STATS_DESC_COUNTER(VCPU, wfi_exit_stat),
-> >         STATS_DESC_COUNTER(VCPU, mmio_exit_user),
-> >         STATS_DESC_COUNTER(VCPU, mmio_exit_kernel),
-> > -       STATS_DESC_COUNTER(VCPU, exits)
-> > +       STATS_DESC_COUNTER(VCPU, exits),
-> > +       STATS_DESC_COUNTER(VCPU, signal_exits),
-> How about put signal_exits before exits as the same order in
-> kvm_vcpu_stat just for readability?
+On Thu, Jun 10, 2021, Ricardo Koller wrote:
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+> index fcd8e3855111..beb76d6deaa9 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> @@ -349,6 +349,7 @@ enum {
+>  	UCALL_SYNC,
+>  	UCALL_ABORT,
+>  	UCALL_DONE,
+> +	UCALL_UNHANDLED,
+>  };
 
-Definitely.
+...
 
-> >  };
-> >  static_assert(ARRAY_SIZE(kvm_vcpu_stats_desc) ==
-> >                 sizeof(struct kvm_vcpu_stat) / sizeof(u64));
-> > --
-> > 2.32.0.554.ge1b32706d8-goog
-> >
-> Reviewed-by: Jing Zhang <jingzhangos@google.com>
+> @@ -1254,16 +1254,13 @@ void vm_install_exception_handler(struct kvm_vm *vm, int vector,
+>  
+>  void assert_on_unhandled_exception(struct kvm_vm *vm, uint32_t vcpuid)
+>  {
+> -	if (vcpu_state(vm, vcpuid)->exit_reason == KVM_EXIT_IO
+> -		&& vcpu_state(vm, vcpuid)->io.port == UNEXPECTED_VECTOR_PORT
+> -		&& vcpu_state(vm, vcpuid)->io.size == 4) {
+> -		/* Grab pointer to io data */
+> -		uint32_t *data = (void *)vcpu_state(vm, vcpuid)
+> -			+ vcpu_state(vm, vcpuid)->io.data_offset;
+> -
+> -		TEST_ASSERT(false,
+> -			    "Unexpected vectored event in guest (vector:0x%x)",
+> -			    *data);
+> +	struct ucall uc;
+> +
+> +	if (get_ucall(vm, vcpuid, &uc) == UCALL_UNHANDLED) {
 
-Thanks Jing!
+UCALL_UNHANDLED is a bit of an odd name.  Without the surrounding context, I would
+have no idea that it's referring to an unhandled event, e.g. my gut reaction would
+be that it means the ucall itself was unhandled.  Maybe UCALL_UNHANDLED_EVENT?
+It's rather long, but I don't think that will be problematic for any of the code.
+
+
+> +		uint64_t vector = uc.args[0];
+> +
+> +		TEST_FAIL("Unexpected vectored event in guest (vector:0x%lx)",
+> +			  vector);
+>  	}
+>  }
+>  
+> -- 
+> 2.32.0.272.g935e593368-goog
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
