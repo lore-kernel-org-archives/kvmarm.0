@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DC0BC43214
-	for <kvmarm@archiver.kernel.org>; Thu, 29 Jul 2021 22:09:32 +0000 (UTC)
-Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CAD6E60F5C
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 952D4C4320E
 	for <kvmarm@archiver.kernel.org>; Thu, 29 Jul 2021 22:09:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org CAD6E60F5C
+Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
+	by mail.kernel.org (Postfix) with ESMTP id 328B660F4B
+	for <kvmarm@archiver.kernel.org>; Thu, 29 Jul 2021 22:09:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 328B660F4B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F8D44B0E7;
-	Thu, 29 Jul 2021 18:09:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C62C14B0B9;
+	Thu, 29 Jul 2021 18:09:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id mu0KVPkDYNPy; Thu, 29 Jul 2021 18:09:30 -0400 (EDT)
+	with ESMTP id 6fTDZfYc-TSv; Thu, 29 Jul 2021 18:09:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D53ED4B0E0;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AEF454B0DA;
 	Thu, 29 Jul 2021 18:09:29 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E4A114B0D2
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F7BD4B0D3
  for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 18:09:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5xkTgN2c+8UT for <kvmarm@lists.cs.columbia.edu>;
- Thu, 29 Jul 2021 18:09:28 -0400 (EDT)
-Received: from mail-io1-f74.google.com (mail-io1-f74.google.com
- [209.85.166.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1557C4B0D5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 18:09:28 -0400 (EDT)
-Received: by mail-io1-f74.google.com with SMTP id
- k20-20020a6b6f140000b029053817be16cdso4653540ioc.3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 15:09:28 -0700 (PDT)
+ with ESMTP id S9my36gpvQZ6 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 29 Jul 2021 18:09:27 -0400 (EDT)
+Received: from mail-oi1-f201.google.com (mail-oi1-f201.google.com
+ [209.85.167.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 30FCD4B0D2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 18:09:27 -0400 (EDT)
+Received: by mail-oi1-f201.google.com with SMTP id
+ m20-20020a0568080f14b029025a3cb2429bso3631653oiw.20
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 15:09:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=OUDEC1vqPr7sdUdf2B7zr2nu10+QX6s5o8FUl8jn128=;
- b=afE61tmFlcKYV3syP0+ocrz06Dzk453aCfpsM5SdLvc9pXlbGValTdHId9+zvt7H+M
- wYkB0MblDqvsjNJQs3xi0hlRFhf5T2vW5CS2ZIv7ezpfpvzRtWEk9hygtiKge9mN1F9U
- WnKUVDYfMwPaMVDB778tT5OjBgssPZfqJsShDS+S+hY3M/4XbAe07rjzHqhnrsB3QOlh
- oDO1n0Hr+y+GJtvHFGUarcecAb9fZi4NVCmTTOKOsxmhlfSrIW1+GQ/kW8St9S68/pH6
- ZZ3P18M07QIcvNF07ClKQqYPgHfSkbBLFtoN8V027CGEypWH8yATHh6g3uqpDKBhxT3p
- U58w==
+ :cc; bh=quVRBmXT16c8/+OvPaemt4sih+vYkJfmbVpHJfXSYSE=;
+ b=ugW9I6GN7pWL34ADNzvmolXeBcl8BcWkp42bUMTI1HufksQY7hkq6QIre1ssegbcDK
+ 1HingL2dULatPpmnK4uTzlDTe5eHq4aIvslbmDd+0FZDk9o/YhXmqlRUHTKClJqtjIRx
+ lO9lAb7lc0X/0//6WYsoJanHg5bq1N/NKju+D9SXdR0TnkG7bI2ZtwBRiaEWf6bOkRAb
+ 98/5vkebBq7V5Nz4THlbYao4dA+pzlZ/gHl/QwtbvjtosU+04rXIX/8S9Log9/7k7tkG
+ h+Dzno/lXwqxLsTSydVwT48EpccvW4FnKhbvPPd1heziD9Z5v6dkZjVLzssvROFfgMNZ
+ 1Y1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=OUDEC1vqPr7sdUdf2B7zr2nu10+QX6s5o8FUl8jn128=;
- b=O8MlUBtPs8Qs8ZCUg0gGDH84TJvvlvqWty6bFivRalkMcoRUL+lCPgZ48C7m+8Zard
- JbaqZufdENY8Vrg/9nTiv0QGYAISFWhU/S1DNe7LtiCunrFWEQTYnUrtzPx8vetl1WIK
- 9H6N/9cxaiNTZ8DenzlaJdAMq3ncENdo1DHSVve4Fqlg6SinQSAnMsOFGpodmGbu/qip
- vJptp5j6eMAlSYr3N5p3nFtRMO7uf8/0h94UjvRa9kTADuPBtzkRYJmaH8QpNE+Twuux
- a61yhbUosvVnuOHnG6NuW+4XuFQGXQYFK1ezTivshLpCI3VCyyidqKUhLDQeEKHUC6Av
- LV+w==
-X-Gm-Message-State: AOAM530g6jYJkTqyqLC+zPwBT8xfscfKOwhkVtvCTztQcmoxbWMViwwc
- RMw5/ZnT5ZBkv7DIa1tN1jsPcmzkR83uOkRynGERu40hGd3YagpHzM1EWwAv0bWqHNKWsre9xfh
- 12+/GRGwnV7Ka13CluPEBCcplkt2d8p3qeGRFUH0NRmPFd3tK9cEjvem37fEhpYkN+jLGsA==
-X-Google-Smtp-Source: ABdhPJynKEKZCh3Kk0HnLCvNi7Sc5MHDpzqm8Ql84cT0T630dSbB3HhwdbM09/xE2CFjkssQ6KG4bWN3Y/U=
+ bh=quVRBmXT16c8/+OvPaemt4sih+vYkJfmbVpHJfXSYSE=;
+ b=JvW6kNOGDhUU7miWT2OYNHyAjutxlFffRZwaezBe9O5GuUFbhsnzL+H3BvZO9Tvl0A
+ foG6RskuKGwZo7KR61HkcLlvBeTm5sIt6fglmwIjSSvzoWiuhcyxqE+BHEoRx/Sd+ohW
+ WM8JIKoSm7p5ynAROaoZHzijdo0nXcx6Mg8WumW/zZEWIqO/kU4/6EFfgAQezcU/DlVy
+ aN+htfDF4jUJNOyywaKroEfjmHe2VcoKQgLvlqMCuo20EZLsYF5zLIzNV+c6hz0D7gMm
+ 6FrQAwWHCpGrTgu8nr+PgimcAXmdNIHb7N39MVn9fpelOEj4AC4DKVXFHrET+3mrHncw
+ MvLA==
+X-Gm-Message-State: AOAM532AnR1OmqRcmy7xo/0HZ9/+Yr99wf7z7eJXvk8k19kHccF02+9k
+ +jPnGwBV3rP2FtFjqLxa/iCSFa3iBLczMQ4sWB2hF1gbZ4454cxSY/u+7hkRF1AEzOoyEE54YyL
+ m7f/ypE7pBCoaqPGZfR9nC50PgMfEkxhqt47oK6exbAe52dFoMNphco+8xXd2klM+Q96WWw==
+X-Google-Smtp-Source: ABdhPJzcet3LHyvZdP4E+QC8YrDCMndlQCo3ftaMJDpvwe0sicb30CgU1kH3S2MUtZSb4XXEKENrpPs4SFs=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a02:b058:: with SMTP id
- q24mr117122jah.88.1627596567382; 
- Thu, 29 Jul 2021 15:09:27 -0700 (PDT)
-Date: Thu, 29 Jul 2021 22:09:15 +0000
+ (user=oupton job=sendgmr) by 2002:aca:bf84:: with SMTP id
+ p126mr4508603oif.154.1627596566328; 
+ Thu, 29 Jul 2021 15:09:26 -0700 (PDT)
+Date: Thu, 29 Jul 2021 22:09:14 +0000
 In-Reply-To: <20210729220916.1672875-1-oupton@google.com>
-Message-Id: <20210729220916.1672875-3-oupton@google.com>
+Message-Id: <20210729220916.1672875-2-oupton@google.com>
 Mime-Version: 1.0
 References: <20210729220916.1672875-1-oupton@google.com>
 X-Mailer: git-send-email 2.32.0.554.ge1b32706d8-goog
-Subject: [PATCH v2 2/3] entry: KVM: Allow use of generic KVM entry w/o full
- generic support
+Subject: [PATCH v2 1/3] KVM: arm64: Record number of signal exits as a vCPU
+ stat
 From: Oliver Upton <oupton@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: Shakeel Butt <shakeelb@google.com>, kvm@vger.kernel.org,
@@ -103,36 +103,54 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Some architectures (e.g. arm64) have yet to adopt the generic entry
-infrastructure. Despite that, it would be nice to use some common
-plumbing for guest entry/exit handling. For example, KVM/arm64 currently
-does not handle TIF_NOTIFY_PENDING correctly.
+Most other architectures that implement KVM record a statistic
+indicating the number of times a vCPU has exited due to a pending
+signal. Add support for that stat to arm64.
 
-Allow use of only the generic KVM entry code by tightening up the
-include list. No functional change intended.
-
+Reviewed-by: Jing Zhang <jingzhangos@google.com>
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- include/linux/entry-kvm.h | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_host.h | 1 +
+ arch/arm64/kvm/arm.c              | 1 +
+ arch/arm64/kvm/guest.c            | 1 +
+ 3 files changed, 3 insertions(+)
 
-diff --git a/include/linux/entry-kvm.h b/include/linux/entry-kvm.h
-index 136b8d97d8c0..0d7865a0731c 100644
---- a/include/linux/entry-kvm.h
-+++ b/include/linux/entry-kvm.h
-@@ -2,7 +2,11 @@
- #ifndef __LINUX_ENTRYKVM_H
- #define __LINUX_ENTRYKVM_H
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 41911585ae0c..70e129f2b574 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -576,6 +576,7 @@ struct kvm_vcpu_stat {
+ 	u64 wfi_exit_stat;
+ 	u64 mmio_exit_user;
+ 	u64 mmio_exit_kernel;
++	u64 signal_exits;
+ 	u64 exits;
+ };
  
--#include <linux/entry-common.h>
-+#include <linux/static_call_types.h>
-+#include <linux/tracehook.h>
-+#include <linux/syscalls.h>
-+#include <linux/seccomp.h>
-+#include <linux/sched.h>
- #include <linux/tick.h>
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index e9a2b8f27792..60d0a546d7fd 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -783,6 +783,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 		if (signal_pending(current)) {
+ 			ret = -EINTR;
+ 			run->exit_reason = KVM_EXIT_INTR;
++			++vcpu->stat.signal_exits;
+ 		}
  
- /* Transfer to guest mode work */
+ 		/*
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index 1dfb83578277..853d1e8d2e73 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -50,6 +50,7 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
+ 	STATS_DESC_COUNTER(VCPU, wfi_exit_stat),
+ 	STATS_DESC_COUNTER(VCPU, mmio_exit_user),
+ 	STATS_DESC_COUNTER(VCPU, mmio_exit_kernel),
++	STATS_DESC_COUNTER(VCPU, signal_exits),
+ 	STATS_DESC_COUNTER(VCPU, exits)
+ };
+ static_assert(ARRAY_SIZE(kvm_vcpu_stats_desc) ==
 -- 
 2.32.0.554.ge1b32706d8-goog
 
