@@ -2,68 +2,83 @@ Return-Path: <SRS0=9/XU=MV=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1F22C4338F
-	for <kvmarm@archiver.kernel.org>; Thu, 29 Jul 2021 10:44:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05460C4338F
+	for <kvmarm@archiver.kernel.org>; Thu, 29 Jul 2021 13:28:30 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6120D60EC0
-	for <kvmarm@archiver.kernel.org>; Thu, 29 Jul 2021 10:44:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 6120D60EC0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 780F360F42
+	for <kvmarm@archiver.kernel.org>; Thu, 29 Jul 2021 13:28:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 780F360F42
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 14A764A4A0;
-	Thu, 29 Jul 2021 06:44:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D8BC24B0CE;
+	Thu, 29 Jul 2021 09:28:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 1kfyMr4ekI+o; Thu, 29 Jul 2021 06:44:14 -0400 (EDT)
+	with ESMTP id jD-L+3ieOVf2; Thu, 29 Jul 2021 09:28:27 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ECEF44A7FD;
-	Thu, 29 Jul 2021 06:44:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8AE624B0BA;
+	Thu, 29 Jul 2021 09:28:27 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EE21249FB0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 06:44:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 585724B0A0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 09:28:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qUFZGeEb+Dh6 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 29 Jul 2021 06:44:12 -0400 (EDT)
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com
- [185.176.79.56])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1372149F5D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 06:44:12 -0400 (EDT)
-Received: from fraeml707-chm.china.huawei.com (unknown [172.18.147.206])
- by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Gb6NZ3C6lz6FG8P;
- Thu, 29 Jul 2021 18:34:54 +0800 (CST)
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- fraeml707-chm.china.huawei.com (10.206.15.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Thu, 29 Jul 2021 12:44:11 +0200
-Received: from A2006125610.china.huawei.com (10.47.90.183) by
- lhreml710-chm.china.huawei.com (10.201.108.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Thu, 29 Jul 2021 11:44:04 +0100
-From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-To: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.cs.columbia.edu>,
- <linux-kernel@vger.kernel.org>
-Subject: [PATCH v3 4/4] KVM: arm64: Clear active_vmids on vCPU schedule out
-Date: Thu, 29 Jul 2021 11:40:09 +0100
-Message-ID: <20210729104009.382-5-shameerali.kolothum.thodi@huawei.com>
-X-Mailer: git-send-email 2.12.0.windows.1
-In-Reply-To: <20210729104009.382-1-shameerali.kolothum.thodi@huawei.com>
-References: <20210729104009.382-1-shameerali.kolothum.thodi@huawei.com>
-MIME-Version: 1.0
-X-Originating-IP: [10.47.90.183]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- lhreml710-chm.china.huawei.com (10.201.108.61)
-X-CFilter-Loop: Reflected
-Cc: jean-philippe@linaro.org, maz@kernel.org, linuxarm@huawei.com,
- catalin.marinas@arm.com, will@kernel.org
+ with ESMTP id S6zIxEsQV0pP for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 29 Jul 2021 09:28:22 -0400 (EDT)
+Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com
+ [209.85.219.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D3AE240256
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 09:28:22 -0400 (EDT)
+Received: by mail-qv1-f74.google.com with SMTP id
+ o32-20020a0c85a30000b0290328f91ede2bso3944484qva.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 06:28:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=uCsDvrfcUF+1HjCy/5u0lXgukkeSpeNSQPNFAPtE5Og=;
+ b=TwUGuSD9qt0RaCZOS9MqYshAwbluPWeQnV47t4m6fl1LT4Bu8aMFJPgR4wel2mQ/0d
+ VMq3hAK+GBdhK0pDqqszgH6EjWtt0g+gsttm5me4V/4bLlmdJtY8xDdSkXQhD2+kh7En
+ APBRNllYpK/w+G4htTFazfyOkcJT2CNzdRflI8pGflgUvStmidwaEZJ1ISLDNIz8XHkE
+ I8TAGDAGu8wQRDYBI3LsbMZm8DvGc5Yhi05TnDxDgHirqn7QwkGG9pUJKe1iAk3KJ5ST
+ nrE4ll47uKL1HWghtXbFmGP9rQo/7u9BGNvZD5e4hpV4BN1enHUmTMlPD1rE19y/oH2I
+ Rzug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=uCsDvrfcUF+1HjCy/5u0lXgukkeSpeNSQPNFAPtE5Og=;
+ b=s+a/Z7tUXbhMvII15yZ0YsnybGEMvRse/uaY9B/H0jegB7/ORuLxcmST+My7Y8fgiB
+ aqb68hm2dD9cpbQPu25mTmUm+RQtFqa1kf/1hhtaPSJb5LCv36sKYwcF2dJQ1AfMRX0+
+ WBgESBS45pvPXMhmK2Xzavn0gK0ItN1pTtNjENqgIpMiEP/zVWvv1obwqqOquPNEfrwu
+ wBvyiUrjA2uaBTd6WruneXISNVtL8aIWh2jD8ZjOEpE6X9PDnSVwVtIVVbev1lAGZYV6
+ vFgLzWcKCyH6ImNf4TWgvHFQ3gLDGDMxpKvLRBFVRLXZjdqHzbNRXkFRRj26uu4nAiyR
+ 5fdA==
+X-Gm-Message-State: AOAM531kxlrS1V4qDsuyNREobY/crB4bzVVLz9BjMap2fquHyy4FhmXd
+ mR7NkYOHf4biHnKUMvOZoCOry69vDUEV
+X-Google-Smtp-Source: ABdhPJwFLu6UzIEWRzj8e8yAxcsgzIxAgdeYD1x+wnn2xqD3UBVZS+HjIyhzCZDdD20gs2aUkHHEOqy6y/hY
+X-Received: from luke.lon.corp.google.com
+ ([2a00:79e0:d:210:293a:bc89:7514:5218])
+ (user=qperret job=sendgmr) by 2002:a05:6214:27e7:: with SMTP id
+ jt7mr5278007qvb.28.1627565302295; Thu, 29 Jul 2021 06:28:22 -0700 (PDT)
+Date: Thu, 29 Jul 2021 14:27:57 +0100
+Message-Id: <20210729132818.4091769-1-qperret@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.32.0.432.gabb21c7263-goog
+Subject: [PATCH v3 00/21] Track shared pages at EL2 in protected mode
+From: Quentin Perret <qperret@google.com>
+To: maz@kernel.org, james.morse@arm.com, alexandru.elisei@arm.com, 
+ suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org
+Cc: qwandor@google.com, linux-kernel@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ kernel-team@android.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -75,45 +90,106 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-TGlrZSBBU0lEIGFsbG9jYXRvciwgd2UgY29weSB0aGUgYWN0aXZlX3ZtaWRzIGludG8gdGhlCnJl
-c2VydmVkX3ZtaWRzIG9uIGEgcm9sbG92ZXIuIEJ1dCBpdCdzIHVubGlrZWx5IHRoYXQKZXZlcnkg
-Q1BVIHdpbGwgaGF2ZSBhwqB2Q1BVIGFzIGN1cnJlbnQgdGFzayBhbmQgd2UgbWF5CmVuZCB1cCB1
-bm5lY2Vzc2FyaWx5wqByZXNlcnZpbmcgdGhlIFZNSUQgc3BhY2UuCgpIZW5jZSwgY2xlYXIgYWN0
-aXZlX3ZtaWRzIHdoZW4gc2NoZWR1bGluZyBvdXQgYSB2Q1BVLgoKU3VnZ2VzdGVkLWJ5OiBXaWxs
-IERlYWNvbiA8d2lsbEBrZXJuZWwub3JnPgpTaWduZWQtb2ZmLWJ5OiBTaGFtZWVyIEtvbG90aHVt
-IDxzaGFtZWVyYWxpLmtvbG90aHVtLnRob2RpQGh1YXdlaS5jb20+Ci0tLQogYXJjaC9hcm02NC9p
-bmNsdWRlL2FzbS9rdm1faG9zdC5oIHwgMSArCiBhcmNoL2FybTY0L2t2bS9hcm0uYyAgICAgICAg
-ICAgICAgfCAxICsKIGFyY2gvYXJtNjQva3ZtL3ZtaWQuYyAgICAgICAgICAgICB8IDYgKysrKysr
-CiAzIGZpbGVzIGNoYW5nZWQsIDggaW5zZXJ0aW9ucygrKQoKZGlmZiAtLWdpdCBhL2FyY2gvYXJt
-NjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaCBiL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hv
-c3QuaAppbmRleCBiYjk5M2JjZTEzNjMuLmQ5MzE0MWNiOGQxNiAxMDA2NDQKLS0tIGEvYXJjaC9h
-cm02NC9pbmNsdWRlL2FzbS9rdm1faG9zdC5oCisrKyBiL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20v
-a3ZtX2hvc3QuaApAQCAtNjg3LDYgKzY4Nyw3IEBAIGV4dGVybiB1bnNpZ25lZCBpbnQga3ZtX2Fy
-bV92bWlkX2JpdHM7CiBpbnQga3ZtX2FybV92bWlkX2FsbG9jX2luaXQodm9pZCk7CiB2b2lkIGt2
-bV9hcm1fdm1pZF9hbGxvY19mcmVlKHZvaWQpOwogdm9pZCBrdm1fYXJtX3ZtaWRfdXBkYXRlKHN0
-cnVjdCBrdm1fdm1pZCAqa3ZtX3ZtaWQpOwordm9pZCBrdm1fYXJtX3ZtaWRfY2xlYXJfYWN0aXZl
-KHZvaWQpOwogCiBzdGF0aWMgaW5saW5lIHZvaWQga3ZtX2FybV9wdnRpbWVfdmNwdV9pbml0KHN0
-cnVjdCBrdm1fdmNwdV9hcmNoICp2Y3B1X2FyY2gpCiB7CmRpZmYgLS1naXQgYS9hcmNoL2FybTY0
-L2t2bS9hcm0uYyBiL2FyY2gvYXJtNjQva3ZtL2FybS5jCmluZGV4IDA3N2U1NWE1MTFhOS4uYjEz
-NGExYjg5Yzg0IDEwMDY0NAotLS0gYS9hcmNoL2FybTY0L2t2bS9hcm0uYworKysgYi9hcmNoL2Fy
-bTY0L2t2bS9hcm0uYwpAQCAtNDM1LDYgKzQzNSw3IEBAIHZvaWQga3ZtX2FyY2hfdmNwdV9wdXQo
-c3RydWN0IGt2bV92Y3B1ICp2Y3B1KQogCWt2bV90aW1lcl92Y3B1X3B1dCh2Y3B1KTsKIAlrdm1f
-dmdpY19wdXQodmNwdSk7CiAJa3ZtX3ZjcHVfcG11X3Jlc3RvcmVfaG9zdCh2Y3B1KTsKKwlrdm1f
-YXJtX3ZtaWRfY2xlYXJfYWN0aXZlKCk7CiAKIAl2Y3B1LT5jcHUgPSAtMTsKIH0KZGlmZiAtLWdp
-dCBhL2FyY2gvYXJtNjQva3ZtL3ZtaWQuYyBiL2FyY2gvYXJtNjQva3ZtL3ZtaWQuYwppbmRleCA1
-NTg0ZTg0YWVkOTUuLjVmZDUxZjU0NDVjMSAxMDA2NDQKLS0tIGEvYXJjaC9hcm02NC9rdm0vdm1p
-ZC5jCisrKyBiL2FyY2gvYXJtNjQva3ZtL3ZtaWQuYwpAQCAtMTE2LDYgKzExNiwxMiBAQCBzdGF0
-aWMgdTY0IG5ld192bWlkKHN0cnVjdCBrdm1fdm1pZCAqa3ZtX3ZtaWQpCiAJcmV0dXJuIGlkeDJ2
-bWlkKHZtaWQpIHwgZ2VuZXJhdGlvbjsKIH0KIAorLyogQ2FsbCB3aXRoIHByZWVtcHRpb24gZGlz
-YWJsZWQgKi8KK3ZvaWQga3ZtX2FybV92bWlkX2NsZWFyX2FjdGl2ZSh2b2lkKQoreworCWF0b21p
-YzY0X3NldCh0aGlzX2NwdV9wdHIoJmFjdGl2ZV92bWlkcyksIDApOworfQorCiB2b2lkIGt2bV9h
-cm1fdm1pZF91cGRhdGUoc3RydWN0IGt2bV92bWlkICprdm1fdm1pZCkKIHsKIAl1bnNpZ25lZCBs
-b25nIGZsYWdzOwotLSAKMi4xNy4xCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJp
-YS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1h
-cm0K
+Hi all,
+
+This is v3 of the patch series previously posted here:
+
+https://lore.kernel.org/kvmarm/20210726092905.2198501-1-qperret@google.com/
+
+This series aims to improve how the nVHE hypervisor tracks ownership of
+memory pages when running in protected mode ("kvm-arm.mode=protected" on
+the kernel command line).
+
+The main issue with the existing ownership tracking code is that it is
+completely binary: a page is either owned by an entity (e.g. the host)
+or not. However, we'll need something smarter to track shared pages, as
+is needed for virtio, or even just host/hypervisor communications.
+
+This series introduces a few changes to the kvm page-table library to
+allow annotating shared pages in ignored bits (a.k.a. software bits) of
+leaf entries, and makes use of that infrastructure to track all pages
+that are shared between the host and the hypervisor. We will obviously
+want to apply the same treatment to guest stage-2 page-tables, but that
+is not really possible to do until EL2 manages them directly, so I'll
+keep that for another series.
+
+The series is based on the kvmarm/fixes branch, and has been tested on
+AML-S905X-CC (Le Potato) and using various Qemu configurations.
+
+Changes since v2:
+ - Renamed and refactored the find_range() path for host memory aborts;
+ - Added hyp_assert_lock_held() using Will's hyp_spin_is_locked()
+   helper, and sprinkled a few of them throughout the series;
+ - Changed how host stage-2 mappings are adjusted after __pkvm_init() by
+   walking the hyp stage-1 instead of relying on the host calling
+   __pkvm_mark_hyp.
+
+Changes since v1:
+ - Changed the 'share' hypercall to accept a single page at a time;
+ - Dropped the patch allowing to continue stage-2 map when hitting the
+   EAGAIN case;
+ - Dropped some of the custom pgtable walkers and used Marc's get_leaf()
+   patch instead;
+ - Changed pgtable API to manipulate SW bits directly rather than
+   specifying shared pages;
+ - Added comments and documentations all over;
+ - Cleanups and small refactoring.
+
+Thanks,
+Quentin
+
+Marc Zyngier (1):
+  KVM: arm64: Introduce helper to retrieve a PTE and its level
+
+Quentin Perret (19):
+  KVM: arm64: Introduce hyp_assert_lock_held()
+  KVM: arm64: Provide the host_stage2_try() helper macro
+  KVM: arm64: Expose page-table helpers
+  KVM: arm64: Optimize host memory aborts
+  KVM: arm64: Rename KVM_PTE_LEAF_ATTR_S2_IGNORED
+  KVM: arm64: Don't overwrite software bits with owner id
+  KVM: arm64: Tolerate re-creating hyp mappings to set software bits
+  KVM: arm64: Enable forcing page-level stage-2 mappings
+  KVM: arm64: Allow populating software bits
+  KVM: arm64: Add helpers to tag shared pages in SW bits
+  KVM: arm64: Expose host stage-2 manipulation helpers
+  KVM: arm64: Expose pkvm_hyp_id
+  KVM: arm64: Introduce addr_is_memory()
+  KVM: arm64: Enable retrieving protections attributes of PTEs
+  KVM: arm64: Mark host bss and rodata section as shared
+  KVM: arm64: Remove __pkvm_mark_hyp
+  KVM: arm64: Refactor protected nVHE stage-1 locking
+  KVM: arm64: Restrict EL2 stage-1 changes in protected mode
+  KVM: arm64: Make __pkvm_create_mappings static
+
+Will Deacon (1):
+  KVM: arm64: Add hyp_spin_is_locked() for basic locking assertions at
+    EL2
+
+ arch/arm64/include/asm/kvm_asm.h              |   5 +-
+ arch/arm64/include/asm/kvm_pgtable.h          | 166 ++++++++----
+ arch/arm64/kvm/Kconfig                        |   9 +
+ arch/arm64/kvm/arm.c                          |  46 ----
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  33 ++-
+ arch/arm64/kvm/hyp/include/nvhe/mm.h          |   3 +-
+ arch/arm64/kvm/hyp/include/nvhe/spinlock.h    |  25 ++
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  20 +-
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 221 ++++++++++++++--
+ arch/arm64/kvm/hyp/nvhe/mm.c                  |  22 +-
+ arch/arm64/kvm/hyp/nvhe/setup.c               |  82 +++++-
+ arch/arm64/kvm/hyp/pgtable.c                  | 247 +++++++++---------
+ arch/arm64/kvm/mmu.c                          |  28 +-
+ 13 files changed, 625 insertions(+), 282 deletions(-)
+
+-- 
+2.32.0.432.gabb21c7263-goog
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
