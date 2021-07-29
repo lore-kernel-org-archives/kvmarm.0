@@ -2,89 +2,84 @@ Return-Path: <SRS0=9/XU=MV=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FSL_HELO_FAKE,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D338C4320E
-	for <kvmarm@archiver.kernel.org>; Thu, 29 Jul 2021 17:00:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D35E2C43214
+	for <kvmarm@archiver.kernel.org>; Thu, 29 Jul 2021 17:33:09 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id AD86E60F22
-	for <kvmarm@archiver.kernel.org>; Thu, 29 Jul 2021 17:00:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org AD86E60F22
+	by mail.kernel.org (Postfix) with ESMTP id 5125A60720
+	for <kvmarm@archiver.kernel.org>; Thu, 29 Jul 2021 17:33:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 5125A60720
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B2984B0CD;
-	Thu, 29 Jul 2021 13:00:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CD3114031F;
+	Thu, 29 Jul 2021 13:33:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id js27YacXp15t; Thu, 29 Jul 2021 13:00:30 -0400 (EDT)
+	with ESMTP id Mo8Kps3xdMeD; Thu, 29 Jul 2021 13:33:07 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F00249D50;
-	Thu, 29 Jul 2021 13:00:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 89A4F4B0D6;
+	Thu, 29 Jul 2021 13:33:07 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D20B40870
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 13:00:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D64B84A4A0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 13:33:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8qyquWFTPqny for <kvmarm@lists.cs.columbia.edu>;
- Thu, 29 Jul 2021 13:00:28 -0400 (EDT)
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com
- [209.85.221.53])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3A4244081C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 13:00:28 -0400 (EDT)
-Received: by mail-wr1-f53.google.com with SMTP id g15so7792608wrd.3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 10:00:28 -0700 (PDT)
+ with ESMTP id ORxzIzaelp0q for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 29 Jul 2021 13:33:04 -0400 (EDT)
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com
+ [209.85.219.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5FFD34031F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 13:33:04 -0400 (EDT)
+Received: by mail-yb1-f201.google.com with SMTP id
+ f3-20020a25cf030000b029055a2303fc2dso7448038ybg.11
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 10:33:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=rFgImdL4oRnQoKBA5pI3AwMwu/TF6E4dvPNBUaLQNFQ=;
- b=Ym5Ufkl/exEhxT3LXpkyNJPvberJTQmdCqua9HnSvE4M1l834pSV3ErwW2z0EyYWzN
- 25tlJDAdf4Z8milEdWy0tk01sdQ6hArqX5HIewWnMc4zSAriwLR/66Pb62qomNeOfoZ9
- uHH4jP7oMOLk7iBAtSooAcqjMGyBacUbzwf2prksRZN34Etp9YS6CxBG1OmhWxdt5iwv
- Cz0hTGe2SZ6LQAjhb/19b6Onsoqj3n+calSmMc1PqDOdl6S5v2E+DIvW1JqZultHFGaZ
- e0HJto+/7kXHwepNw+rHHp76Vd4deu1YTEZU2A+fO6L5MjxxixVrUs1tBlqHMKsC19AF
- Ywgw==
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=0HZDrxCyGrVeJfmBDe1FADDB470ehjEc3z36rEakmo0=;
+ b=Ql5V/6VPZs1NFnchmPCaB7Pl8D3FXX4cYIs50TNcfN/dopVTCpqcumZmmwJu/65ibf
+ VgAuX9RURwOE2Rxuj3H1iXUMfKCfdnzqx2IcladIP2jbyOR9xA81Gg0SZqV1OEe/bwy8
+ foFShfZAwjf2mks4LjUn2DLmeB8avJH00oFogsmcNl12fFUXTM6r3fJ+UhfJh7/qQumV
+ F8FKdV6sYB4UeGleDOt+1B0jFEEUZp7gFaB1UOc5/RPcfFoWk78ofcWbDzve1kkB+8/f
+ Aztbhi2mXAfsimusz6vHCbLtPV1970+RrPQc3Jzqpg2z9PIgvES3YMnMN4iExWhurh3y
+ raMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=rFgImdL4oRnQoKBA5pI3AwMwu/TF6E4dvPNBUaLQNFQ=;
- b=GYmBWB/1Z12hKT6rdcJebb8juv9MfgSsXELKnnGiEYgz7Vtla68CyGJe/AH0JP01UJ
- Ta52vObKMaT323itPWuCtGqgrOSKUYGF8vKAKo9r412LeyVrtM6tOTYXtGtPL4vfiTCC
- I1w+04xUmpwRcNKxzVmJGc/Wy5dp/cT/x0WW640a8KlKQyU9PdVf75sm6Kv7sgfIhM8N
- i3T1XNSnlmyNn4mg9X+frXa3fOpB+CXo8D5P5yyEuDDecZdH5E2qHsJswMqy+JHvQ35d
- ebia3MDDU4VrALJcZ9BviFjjPCNrAo8TazRLBilR5/Lbzn7I7KM7YAmnv4AFWOqrxYM6
- CJfw==
-X-Gm-Message-State: AOAM531BAOiff2chS21R7uFOr5FM5hqm168ISZJJFG9M4pVzZWsQBzHx
- qigzy1Ldfe/rvbIdDoukJ/4ikQ==
-X-Google-Smtp-Source: ABdhPJyFz2hml+WnVbZ7VNzv3kjo6OC8XSEJ53KL7oluYjYUSeypg9pkHqCQ9bSEkCwBjaOkz9WNEQ==
-X-Received: by 2002:a5d:53ca:: with SMTP id a10mr4243003wrw.197.1627578027075; 
- Thu, 29 Jul 2021 10:00:27 -0700 (PDT)
-Received: from google.com ([2a00:79e0:d:210:293a:bc89:7514:5218])
- by smtp.gmail.com with ESMTPSA id q22sm3841194wmc.16.2021.07.29.10.00.26
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 29 Jul 2021 10:00:26 -0700 (PDT)
-Date: Thu, 29 Jul 2021 18:00:23 +0100
-From: Quentin Perret <qperret@google.com>
-To: David Brazdil <dbrazdil@google.com>
-Subject: Re: [PATCH 2/2] KVM: arm64: Minor optimization of range_is_memory
-Message-ID: <YQLep2cwhyzWu2cL@google.com>
-References: <20210728153232.1018911-1-dbrazdil@google.com>
- <20210728153232.1018911-3-dbrazdil@google.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210728153232.1018911-3-dbrazdil@google.com>
-Cc: Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
- linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=0HZDrxCyGrVeJfmBDe1FADDB470ehjEc3z36rEakmo0=;
+ b=UvZ9OYjK4ewMDK8EZqW9on1roDywctrBbvtu90KwK7ijwvRPkeMHh2jbQC2XspNqUT
+ lAZYGHQi4b7oVGQU6wn2i3SectKkJHYWDmvT1Kk0TvwLjREFO343+GNeLdFbewJqo83q
+ ieZqWfsy+pNPB6C4Cc11ULZeeR1zg9LFuknGKt47/uGB2qAQuWOeUx201dCRNfjXt0m2
+ r4cKdgbRuuQXTSepWtlBXf8WWyLl7ZIJA7g91QiVuQFDOCysy2JPjJfjMmixfeesTfj5
+ ZX9HiyCu+EG+kzOMSWSXlhZrZfRCI9wSVgdgxAhyjI7sDm8jaJBtitWURhL0c/BeVxZs
+ F2CQ==
+X-Gm-Message-State: AOAM533EUoEBZi+zlUQiKllbjHWrsYtacHFbZUwBQ3PBjCxtdLJY28qI
+ FOWMvLIEAzmsmQt8YbQFGn6hnOkEgEo=
+X-Google-Smtp-Source: ABdhPJyqW/q033Ixa/GLVUb+Qi/lDm85QUALhkNdG4gii6eXKLltiGURavEzTkrVKxZqr5OF8qhTX0p3L8U=
+X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
+ (user=oupton job=sendgmr) by 2002:a25:374d:: with SMTP id
+ e74mr8052534yba.130.1627579983748; 
+ Thu, 29 Jul 2021 10:33:03 -0700 (PDT)
+Date: Thu, 29 Jul 2021 17:32:47 +0000
+Message-Id: <20210729173300.181775-1-oupton@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.32.0.432.gabb21c7263-goog
+Subject: [PATCH v5 00/13] KVM: Add idempotent controls for migrating system
+ counter state
+From: Oliver Upton <oupton@google.com>
+To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <maz@kernel.org>, Raghavendra Rao Anata <rananta@google.com>,
+ Peter Shier <pshier@google.com>, Sean Christopherson <seanjc@google.com>,
+ David Matlack <dmatlack@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -101,59 +96,188 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wednesday 28 Jul 2021 at 15:32:32 (+0000), David Brazdil wrote:
-> Currently range_is_memory finds the corresponding struct memblock_region
-> for both the lower and upper bounds of the given address range with two
-> rounds of binary search, and then checks that the two memblocks are the
-> same. Simplify this by only doing binary search on the lower bound and
-> then checking that the upper bound is in the same memblock.
-> 
-> Signed-off-by: David Brazdil <dbrazdil@google.com>
-> ---
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> index a6ce991b1467..37d73af69634 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> @@ -189,13 +189,18 @@ static bool find_mem_range(phys_addr_t addr, struct kvm_mem_range *range)
->  	return false;
->  }
->  
-> +static bool is_in_mem_range(phys_addr_t addr, struct kvm_mem_range *range)
-> +{
+KVM's current means of saving/restoring system counters is plagued with
+temporal issues. At least on ARM64 and x86, we migrate the guest's
+system counter by-value through the respective guest system register
+values (cntvct_el0, ia32_tsc). Restoring system counters by-value is
+brittle as the state is not idempotent: the host system counter is still
+oscillating between the attempted save and restore. Furthermore, VMMs
+may wish to transparently live migrate guest VMs, meaning that they
+include the elapsed time due to live migration blackout in the guest
+system counter view. The VMM thread could be preempted for any number of
+reasons (scheduler, L0 hypervisor under nested) between the time that
+it calculates the desired guest counter value and when KVM actually sets
+this counter state.
 
-Nit: addr@ could be u64 for consistency -- struct kvm_mem_range holds
-IPAs in general.
+Despite the value-based interface that we present to userspace, KVM
+actually has idempotent guest controls by way of system counter offsets.
+We can avoid all of the issues associated with a value-based interface
+by abstracting these offset controls in new ioctls. This series
+introduces new vCPU device attributes to provide userspace access to the
+vCPU's system counter offset.
 
-> +	return range->start <= addr && addr < range->end;
-> +}
-> +
->  static bool range_is_memory(u64 start, u64 end)
->  {
-> -	struct kvm_mem_range r1, r2;
-> +	struct kvm_mem_range r;
->  
-> -	if (!find_mem_range(start, &r1) || !find_mem_range(end - 1, &r2))
-> +	if (!find_mem_range(start, &r))
->  		return false;
-> -	if (r1.start != r2.start)
-> +	if (!is_in_mem_range(end - 1, &r))
->  		return false;
->  
->  	return true;
+Patch 1 adopts Paolo's suggestion, augmenting the KVM_{GET,SET}_CLOCK
+ioctls to provide userspace with a (host_tsc, realtime) instant. This is
+essential for a VMM to perform precise migration of the guest's system
+counters.
 
-Nit: maybe drop the second if and simplify to:
+Patches 2-3 add support for x86 by shoehorning the new controls into the
+pre-existing synchronization heuristics.
 
-	return is_in_mem_range(end - 1, &r);
+Patches 4-5 implement a test for the new additions to
+KVM_{GET,SET}_CLOCK.
 
-With that:
+Patch 6 fixes some assertions in the kvm device attribute helpers.
 
-Reviewed-by: Quentin Perret <qperret@google.com>
+Patches 7-8 implement at test for the tsc offset attribute introduced in
+patch 3.
 
-Thanks,
-Quentin
+Patch 9 adds a device attribute for the arm64 virtual counter-timer
+offset.
+
+Patch 10 extends the test from patch 8 to cover the arm64 virtual
+counter-timer offset.
+
+Patch 11 adds a device attribute for the arm64 physical counter-timer
+offset. Currently, this is implemented as a synthetic register, forcing
+the guest to trap to the host and emulating the offset in the fast exit
+path. Later down the line we will have hardware with FEAT_ECV, which
+allows the hypervisor to perform physical counter-timer offsetting in
+hardware (CNTPOFF_EL2).
+
+Patch 12 extends the test from patch 8 to cover the arm64 physical
+counter-timer offset.
+
+Patch 13 introduces a benchmark to measure the overhead of emulation in
+patch 11.
+
+This series was tested on both an Ampere Mt. Jade and Haswell systems.
+
+Physical counter benchmark
+--------------------------
+
+The following data was collected by running 10000 iterations of the
+benchmark test from Patch 6 on an Ampere Mt. Jade reference server, A 2S
+machine with 2 80-core Ampere Altra SoCs. Measurements were collected
+for both VHE and nVHE operation using the `kvm-arm.mode=` command-line
+parameter.
+
+nVHE
+----
+
++--------------------+--------+---------+
+|       Metric       | Native | Trapped |
++--------------------+--------+---------+
+| Average            | 54ns   | 148ns   |
+| Standard Deviation | 124ns  | 122ns   |
+| 95th Percentile    | 258ns  | 348ns   |
++--------------------+--------+---------+
+
+VHE
+---
+
++--------------------+--------+---------+
+|       Metric       | Native | Trapped |
++--------------------+--------+---------+
+| Average            | 53ns   | 152ns   |
+| Standard Deviation | 92ns   | 94ns    |
+| 95th Percentile    | 204ns  | 307ns   |
++--------------------+--------+---------+
+
+This series applies cleanly to kvm/queue at the following commit:
+
+8ad5e63649ff ("KVM: Don't take mmu_lock for range invalidation unless necessary")
+
+v1 -> v2:
+  - Reimplemented as vCPU device attributes instead of a distinct ioctl.
+  - Added the (realtime, host_tsc) instant support to KVM_{GET,SET}_CLOCK
+  - Changed the arm64 implementation to broadcast counter
+    offset values to all vCPUs in a guest. This upholds the
+    architectural expectations of a consistent counter-timer across CPUs.
+  - Fixed a bug with traps in VHE mode. We now configure traps on every
+    transition into a guest to handle differing VMs (trapped, emulated).
+
+v2 -> v3:
+  - Added documentation for additions to KVM_{GET,SET}_CLOCK
+  - Added documentation for all new vCPU attributes
+  - Added documentation for suggested algorithm to migrate a guest's
+    TSC(s)
+  - Bug fixes throughout series
+  - Rename KVM_CLOCK_REAL_TIME -> KVM_CLOCK_REALTIME
+
+v3 -> v4:
+  - Added patch to address incorrect device helper assertions (Drew)
+  - Carried Drew's r-b tags where appropriate
+  - x86 selftest cleanup
+  - Removed stale kvm_timer_init_vhe() function
+  - Removed unnecessary GUEST_DONE() from selftests
+
+v4 -> v5:
+  - Fix typo in TSC migration algorithm
+  - Carry more of Drew's r-b tags
+  - clean up run loop logic in counter emulation benchmark (missed from
+    Drew's comments on v3)
+
+v1: https://lore.kernel.org/kvm/20210608214742.1897483-1-oupton@google.com/
+v2: https://lore.kernel.org/r/20210716212629.2232756-1-oupton@google.com
+v3: https://lore.kernel.org/r/20210719184949.1385910-1-oupton@google.com
+v4: https://lore.kernel.org/r/20210729001012.70394-1-oupton@google.com
+
+Oliver Upton (13):
+  KVM: x86: Report host tsc and realtime values in KVM_GET_CLOCK
+  KVM: x86: Refactor tsc synchronization code
+  KVM: x86: Expose TSC offset controls to userspace
+  tools: arch: x86: pull in pvclock headers
+  selftests: KVM: Add test for KVM_{GET,SET}_CLOCK
+  selftests: KVM: Fix kvm device helper ioctl assertions
+  selftests: KVM: Add helpers for vCPU device attributes
+  selftests: KVM: Introduce system counter offset test
+  KVM: arm64: Allow userspace to configure a vCPU's virtual offset
+  selftests: KVM: Add support for aarch64 to system_counter_offset_test
+  KVM: arm64: Provide userspace access to the physical counter offset
+  selftests: KVM: Test physical counter offsetting
+  selftests: KVM: Add counter emulation benchmark
+
+ Documentation/virt/kvm/api.rst                |  42 +-
+ Documentation/virt/kvm/devices/vcpu.rst       | 101 +++++
+ Documentation/virt/kvm/locking.rst            |  11 +
+ arch/arm64/include/asm/kvm_host.h             |   1 +
+ arch/arm64/include/asm/kvm_hyp.h              |   2 -
+ arch/arm64/include/asm/sysreg.h               |   1 +
+ arch/arm64/include/uapi/asm/kvm.h             |   2 +
+ arch/arm64/kvm/arch_timer.c                   | 140 ++++--
+ arch/arm64/kvm/arm.c                          |   4 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h       |  23 +
+ arch/arm64/kvm/hyp/include/hyp/timer-sr.h     |  26 ++
+ arch/arm64/kvm/hyp/nvhe/switch.c              |   2 -
+ arch/arm64/kvm/hyp/nvhe/timer-sr.c            |  21 +-
+ arch/arm64/kvm/hyp/vhe/timer-sr.c             |  27 ++
+ arch/x86/include/asm/kvm_host.h               |   4 +
+ arch/x86/include/uapi/asm/kvm.h               |   4 +
+ arch/x86/kvm/x86.c                            | 422 ++++++++++++++----
+ include/kvm/arm_arch_timer.h                  |   2 -
+ include/uapi/linux/kvm.h                      |   7 +-
+ tools/arch/x86/include/asm/pvclock-abi.h      |  48 ++
+ tools/arch/x86/include/asm/pvclock.h          | 103 +++++
+ tools/testing/selftests/kvm/.gitignore        |   3 +
+ tools/testing/selftests/kvm/Makefile          |   4 +
+ .../kvm/aarch64/counter_emulation_benchmark.c | 207 +++++++++
+ .../selftests/kvm/include/aarch64/processor.h |  24 +
+ .../testing/selftests/kvm/include/kvm_util.h  |  11 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  44 +-
+ .../kvm/system_counter_offset_test.c          | 205 +++++++++
+ .../selftests/kvm/x86_64/kvm_clock_test.c     | 204 +++++++++
+ 29 files changed, 1537 insertions(+), 158 deletions(-)
+ create mode 100644 arch/arm64/kvm/hyp/include/hyp/timer-sr.h
+ create mode 100644 tools/arch/x86/include/asm/pvclock-abi.h
+ create mode 100644 tools/arch/x86/include/asm/pvclock.h
+ create mode 100644 tools/testing/selftests/kvm/aarch64/counter_emulation_benchmark.c
+ create mode 100644 tools/testing/selftests/kvm/system_counter_offset_test.c
+ create mode 100644 tools/testing/selftests/kvm/x86_64/kvm_clock_test.c
+
+-- 
+2.32.0.432.gabb21c7263-goog
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
