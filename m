@@ -2,102 +2,56 @@ Return-Path: <SRS0=9/XU=MV=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C430AC432BE
-	for <kvmarm@archiver.kernel.org>; Thu, 29 Jul 2021 16:33:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED1D2C4338F
+	for <kvmarm@archiver.kernel.org>; Thu, 29 Jul 2021 16:42:25 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3D5DE60F43
-	for <kvmarm@archiver.kernel.org>; Thu, 29 Jul 2021 16:33:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 3D5DE60F43
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 6B6BF60F23
+	for <kvmarm@archiver.kernel.org>; Thu, 29 Jul 2021 16:42:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 6B6BF60F23
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A4A414B0DF;
-	Thu, 29 Jul 2021 12:33:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E40AD4B0E4;
+	Thu, 29 Jul 2021 12:42:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 5MhkvFutIuMN; Thu, 29 Jul 2021 12:33:52 -0400 (EDT)
+	with ESMTP id yO1vDatQoTyQ; Thu, 29 Jul 2021 12:42:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C1204B0E4;
-	Thu, 29 Jul 2021 12:33:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CA1284B0E9;
+	Thu, 29 Jul 2021 12:42:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BA2C54B0DD
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 12:33:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 663FF4B0E4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 12:42:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id A09D1do+XM9C for <kvmarm@lists.cs.columbia.edu>;
- Thu, 29 Jul 2021 12:33:49 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D7E8A4B0D8
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 12:33:49 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1627576429;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=FjcH7sCGB66RKzqPeaDWjgM8tAnh9bdebcMjCL2pj+c=;
- b=AZMgn07nZDnWk6ZmC6UevS+2QDxOnllRT7nBFZ+Vy0zxVauxY0qwb2CoQM+QD/p0kGYU1t
- YYEGPi9+AQT3dvmsMreQmUkKOPv9tmyM4r9F3vI5+GVLvUSb0RWDLp4Z2ftx62SmB96f0r
- gmeAiRZdY5RlLL0PLHg5nkUrjL4cisM=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-412-GtzZSG1AOr6a71MlM4hlug-1; Thu, 29 Jul 2021 12:33:48 -0400
-X-MC-Unique: GtzZSG1AOr6a71MlM4hlug-1
-Received: by mail-il1-f197.google.com with SMTP id
- x16-20020a9206100000b02902166568c213so3524152ilg.22
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 09:33:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=FjcH7sCGB66RKzqPeaDWjgM8tAnh9bdebcMjCL2pj+c=;
- b=SSt2vZCewyZuptYoUX/MLpZc4DQu9hpS+w7ZCQfadYvJYSrZgP1oQ5yKWPn5DpcHWn
- Sflp2FnIBBAnr5KXfXqoY6kpy1/Wi1ZTUGawqD9hQ8D1c0VX1GoesoMQgx8ow9slZ0mR
- 2Nlqy0k0aP1jxy1XhymQVxUzKYWNUsoNZUryee9PpMHEEECYUIvfIUk1cfxfzBMi/9e7
- pg0gvyt0hhR3s7s0h8PuWJEkenMN2rKPW2OOf3m6b372VxPpyoyPAS4qjXrUqV9eblp2
- vb7JH8HhGQ5/66WQ9/TAWnt4ppf/L8NNxiT1L2aOi7ueazj9uB6wVtFWhqS//zQFHDHP
- tJlw==
-X-Gm-Message-State: AOAM532qO3sLifVIFrh5JBP7IpHzMbL5iQ7z6SMiraZQy3yQY/mzNagn
- 28Ez89d8mvF6tSHnf5LsPUlG+jNqVfXOU6c5Yiq2dBBIPScmkmk4pCm/Xch7lrNIh5YXN9g44NQ
- To/b5podzfhwNf/9NEtqZmKuN
-X-Received: by 2002:a02:8241:: with SMTP id q1mr5172583jag.134.1627576427833; 
- Thu, 29 Jul 2021 09:33:47 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw4d115XMfSVHnaViBRH7zqO/+JS3UA9k8rGTp/h+c0mtFXHxXJNO0ZZi3gMSV04nJNqZsx0Q==
-X-Received: by 2002:a02:8241:: with SMTP id q1mr5172569jag.134.1627576427690; 
- Thu, 29 Jul 2021 09:33:47 -0700 (PDT)
-Received: from gator ([140.82.166.162])
- by smtp.gmail.com with ESMTPSA id f16sm2147192ilc.53.2021.07.29.09.33.46
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 29 Jul 2021 09:33:47 -0700 (PDT)
-Date: Thu, 29 Jul 2021 18:33:44 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Oliver Upton <oupton@google.com>
-Subject: Re: [PATCH v4 11/13] KVM: arm64: Provide userspace access to the
- physical counter offset
-Message-ID: <20210729163344.bojsdqw4z6pjdg3g@gator>
-References: <20210729001012.70394-1-oupton@google.com>
- <20210729001012.70394-12-oupton@google.com>
+ with ESMTP id h0ebtMNNKNlj for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 29 Jul 2021 12:42:21 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 480DB4B0DF
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 12:42:21 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 4CADD60EBD;
+ Thu, 29 Jul 2021 16:42:18 +0000 (UTC)
+Date: Thu, 29 Jul 2021 17:42:15 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH] KVM: arm64: Unregister HYP sections from kmemleak in
+ protected mode
+Message-ID: <20210729164214.GB31848@arm.com>
+References: <20210729135016.3037277-1-maz@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20210729001012.70394-12-oupton@google.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Disposition: inline
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Raghavendra Rao Anata <rananta@google.com>, Peter Shier <pshier@google.com>,
- Sean Christopherson <seanjc@google.com>, David Matlack <dmatlack@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>
+In-Reply-To: <20210729135016.3037277-1-maz@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: kernel-team@android.com, kvm@vger.kernel.org, stable@vger.kernel.org,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -114,55 +68,66 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Jul 29, 2021 at 12:10:10AM +0000, Oliver Upton wrote:
-> Presently, KVM provides no facilities for correctly migrating a guest
-> that depends on the physical counter-timer. While most guests (barring
-> NV, of course) should not depend on the physical counter-timer, an
-> operator may still wish to provide a consistent view of the physical
-> counter-timer across migrations.
+On Thu, Jul 29, 2021 at 02:50:16PM +0100, Marc Zyngier wrote:
+> Booting a KVM host in protected mode with kmemleak quickly results
+> in a pretty bad crash, as kmemleak doesn't know that the HYP sections
+> have been taken away.
 > 
-> Provide userspace with a new vCPU attribute to modify the guest physical
-> counter-timer offset. Since the base architecture doesn't provide a
-> physical counter-timer offset register, emulate the correct behavior by
-> trapping accesses to the physical counter-timer whenever the offset
-> value is non-zero.
+> Make the unregistration from kmemleak part of marking the sections
+> as HYP-private. The rest of the HYP-specific data is obtained via
+> the page allocator, which is not subjected to kmemleak.
 > 
-> Uphold the same behavior as CNTVOFF_EL2 and broadcast the physical
-> offset to all vCPUs whenever written. This guarantees that the
-> counter-timer we provide the guest remains architectural, wherein all
-> views of the counter-timer are consistent across vCPUs. Reconfigure
-> timer traps for VHE on every guest entry, as different VMs will now have
-> different traps enabled. Enable physical counter traps for nVHE whenever
-> the offset is nonzero (we already trap physical timer registers in
-> nVHE).
-> 
-> FEAT_ECV provides a guest physical counter-timer offset register
-> (CNTPOFF_EL2), but ECV-enabled hardware is nonexistent at the time of
-> writing so support for it was elided for the sake of the author :)
-> 
-> Cc: Andrew Jones <drjones@redhat.com>
-> Signed-off-by: Oliver Upton <oupton@google.com>
+> Fixes: 90134ac9cabb ("KVM: arm64: Protect the .hyp sections from the host")
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Cc: Quentin Perret <qperret@google.com>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: stable@vger.kernel.org # 5.13
 > ---
->  Documentation/virt/kvm/devices/vcpu.rst   | 22 +++++++
->  arch/arm64/include/asm/kvm_host.h         |  1 +
->  arch/arm64/include/asm/kvm_hyp.h          |  2 -
->  arch/arm64/include/asm/sysreg.h           |  1 +
->  arch/arm64/include/uapi/asm/kvm.h         |  1 +
->  arch/arm64/kvm/arch_timer.c               | 72 ++++++++++++++---------
->  arch/arm64/kvm/arm.c                      |  4 +-
->  arch/arm64/kvm/hyp/include/hyp/switch.h   | 23 ++++++++
->  arch/arm64/kvm/hyp/include/hyp/timer-sr.h | 26 ++++++++
->  arch/arm64/kvm/hyp/nvhe/switch.c          |  2 -
->  arch/arm64/kvm/hyp/nvhe/timer-sr.c        | 21 +++----
->  arch/arm64/kvm/hyp/vhe/timer-sr.c         | 27 +++++++++
->  include/kvm/arm_arch_timer.h              |  2 -
->  13 files changed, 158 insertions(+), 46 deletions(-)
->  create mode 100644 arch/arm64/kvm/hyp/include/hyp/timer-sr.h
->
+>  arch/arm64/kvm/arm.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index e9a2b8f27792..23f12e602878 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -15,6 +15,7 @@
+>  #include <linux/fs.h>
+>  #include <linux/mman.h>
+>  #include <linux/sched.h>
+> +#include <linux/kmemleak.h>
+>  #include <linux/kvm.h>
+>  #include <linux/kvm_irqfd.h>
+>  #include <linux/irqbypass.h>
+> @@ -1960,8 +1961,12 @@ static inline int pkvm_mark_hyp(phys_addr_t start, phys_addr_t end)
+>  }
+>  
+>  #define pkvm_mark_hyp_section(__section)		\
+> +({							\
+> +	u64 sz = __section##_end - __section##_start;	\
+> +	kmemleak_free_part(__section##_start, sz);	\
+>  	pkvm_mark_hyp(__pa_symbol(__section##_start),	\
+> -			__pa_symbol(__section##_end))
+> +		      __pa_symbol(__section##_end));	\
+> +})
 
- 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+Using kmemleak_free_part() is fine in principle as this is not a slab
+object. However, the above would call the function even for ranges that
+are not tracked at all by kmemleak (text, idmap). Luckily Kmemleak won't
+complain, unless you #define DEBUG in the file (initially I tried to
+warn all the time but I couldn't fix all the callbacks).
 
+If it was just the BSS, I would move the kmemleak_free_part() call to
+finalize_hyp_mode() but there's the __hyp_rodata section as well.
+
+I think we have some inconsistency with .hyp.rodata which falls under
+_sdata.._edata while the kernel's own .rodata goes immediately after
+_etext. Should we move __hyp_rodata outside _sdata.._edata as well? It
+would benefit from the RO NX marking (probably more useful without the
+protected mode). If this works, we'd only need to call kmemleak once for
+the BSS.
+
+-- 
+Catalin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
