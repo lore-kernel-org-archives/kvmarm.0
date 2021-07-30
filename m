@@ -1,91 +1,92 @@
-Return-Path: <SRS0=9/XU=MV=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=HDjL=MW=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EED2EC4320A
-	for <kvmarm@archiver.kernel.org>; Thu, 29 Jul 2021 22:09:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50C69C432BE
+	for <kvmarm@archiver.kernel.org>; Fri, 30 Jul 2021 01:11:02 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8695960EB5
-	for <kvmarm@archiver.kernel.org>; Thu, 29 Jul 2021 22:09:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 8695960EB5
+	by mail.kernel.org (Postfix) with ESMTP id B5DC960F00
+	for <kvmarm@archiver.kernel.org>; Fri, 30 Jul 2021 01:11:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org B5DC960F00
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 253F94B0E2;
-	Thu, 29 Jul 2021 18:09:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2EE294A319;
+	Thu, 29 Jul 2021 21:11:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id e++MNUFC+n0P; Thu, 29 Jul 2021 18:09:31 -0400 (EDT)
+	with ESMTP id Qo2Ov4V-C8Ca; Thu, 29 Jul 2021 21:11:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EF8EE4B0F7;
-	Thu, 29 Jul 2021 18:09:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 20BDD4A483;
+	Thu, 29 Jul 2021 21:11:00 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8480C4025B
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 18:09:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 840054A19E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 21:10:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IAjU6+N6JQ-4 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 29 Jul 2021 18:09:29 -0400 (EDT)
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com
- [209.85.219.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 159C04B0D2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 18:09:29 -0400 (EDT)
-Received: by mail-yb1-f202.google.com with SMTP id
- j9-20020a2581490000b02905897d81c63fso2617118ybm.8
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 15:09:29 -0700 (PDT)
+ with ESMTP id 3sLG7yqbptgy for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 29 Jul 2021 21:10:58 -0400 (EDT)
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com
+ [209.85.214.176])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4F28A4A00B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 21:10:58 -0400 (EDT)
+Received: by mail-pl1-f176.google.com with SMTP id t21so9023238plr.13
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Jul 2021 18:10:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=Ol+FzPmhNMEWcf/ywMIJRhViVzXRwXAQpsvgYkKHWL8=;
- b=rMkpaQypttkvOTlv0Yu0PJmHWsRFvCYfneyQu7XZAtrdjGpFfNfWqGn18dsvnXx69o
- PZKA+4rEXvIPkfayg+sTbiz/r2c2jFqjggsWxPnHu2UvNAE/TxUYORkliLZz8+Unip/t
- 8u26bRuYDYcAGouDHhdj3sGiQeLcyUoht6c3vAIWVzH75s2ci3VOmqFxR/seNYXNYlu8
- /AUeM/FGUiGx2BfOL8T7HKYlAbBrzpWfI02ULYgSN6TnmoTbeZ41S7ebJMuFU2smbXuw
- xnez5Awds1TMNx/arUH4gXwb9PyM5txGUSIjEvN0bYU7LVM0JasjEqcZuf3NxC0uOWP+
- uZnQ==
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=DsDa8w/t7/VXcjTtjhlMutUZ69+V3sKaHAYWUrxvP2w=;
+ b=s5WKvm12hxduXD4KaBZVdGFu1auOXhmp85lyVaoRSW/i40OfXQUyx5b0TBXC+zeqll
+ Nqfev9udZ9s3S7qMBcWcr4MMCRGeZh7r31GXm49jNsKlnzuv8dtSyh4y4mskTCDsA9S3
+ QU3STRyPmpSeRi0qUf64zUJkaUCQxX49L97ZND7xLa0yvKCfzJcEn0y+z0uRBCjegntd
+ 3ruUl7q66HZI3OLUvqEVPYCCdO4btGXwjs9Rmh2qCQ/vw2CedidiUv8BpS9RHY0MGdMN
+ tWRDfn/+oTzIOLFWjJRyiAhPh5NxaQXFiY8x/1ykirixoItlLiu0KTqzifk1So2yfQmX
+ kymg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=Ol+FzPmhNMEWcf/ywMIJRhViVzXRwXAQpsvgYkKHWL8=;
- b=Nb844j9c1Zhults21bkhSdvQYvi8J+TwY9Yrfh+Q61EZn0cprRyTLpEDIcvw+C90ra
- LZHNAbBH9FGRgYJjQW0uBAkBMvssJTJ3u+RF4MhrSCv3LqgvA4DtBuBc27qNdIhnWrST
- esqyCpXxCbiaHZ96T+c0ju3M53FR4j/376iYMEREaOvGdK83f5vDLjRaI9wWUad2y/S1
- SeH2LIvvXGeuB/eh4S7mpFuM8VF8usnq0cUF4kZRX/H3VDfvMTrWUC/4FyUV+CSm9Ib1
- w7by24fUwlsumE8SV+cPC9sv2cQY6FIDs8sijaNDDMJhNXQxensUW0vq6A07bKoXf5Nd
- Bbcw==
-X-Gm-Message-State: AOAM532Tnhy7FBRIwylJXOtazv/3O3SMVMP+wN0MP1C6KZNHGbKl9xWJ
- Cb3d+fdUZHp9pHhxUbpvheX32e0r4BU+QRdnIhdQ3V7BvF7Pu4cBfvZEm3oIH1q/7rIny+s8/6S
- RJ9z0PDyxaU43ADGrT4vzj3dFq9e2R+5uZPUw00LMoZY7NwNFm/8bK0gCxhRjWHzSwUMobQ==
-X-Google-Smtp-Source: ABdhPJzutKBCdlIcisOY4xmX+bS3I+7VYGny6icfY80fNWnWdBzJeRY3xCP1/YQ+2mjVREH1XV6dtDLEzkk=
-X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a25:e64a:: with SMTP id
- d71mr9565726ybh.142.1627596568495; 
- Thu, 29 Jul 2021 15:09:28 -0700 (PDT)
-Date: Thu, 29 Jul 2021 22:09:16 +0000
-In-Reply-To: <20210729220916.1672875-1-oupton@google.com>
-Message-Id: <20210729220916.1672875-4-oupton@google.com>
-Mime-Version: 1.0
-References: <20210729220916.1672875-1-oupton@google.com>
-X-Mailer: git-send-email 2.32.0.554.ge1b32706d8-goog
-Subject: [PATCH v2 3/3] KVM: arm64: Use generic KVM xfer to guest work function
-From: Oliver Upton <oupton@google.com>
-To: kvmarm@lists.cs.columbia.edu
-Cc: Shakeel Butt <shakeelb@google.com>, kvm@vger.kernel.org,
- Peter Zijlstra <peterz@infradead.org>, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
- Guangyu Shi <guangyus@google.com>, Will Deacon <will@kernel.org>,
- Andy Lutomirski <luto@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
- linux-arm-kernel@lists.infradead.org
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=DsDa8w/t7/VXcjTtjhlMutUZ69+V3sKaHAYWUrxvP2w=;
+ b=gaLK4f459ivc75EDYYAgoGdvQRQ+3LLA3aniztbk4vEV4MAyxgkmPPhriLNP4DYCrI
+ yEFUG4sTla+MHry8cjUlKFVCP/YPxem1RPoR/v4M7ChqQYYZs+B0GcQxUIcivhE6iEcr
+ 8dewvR6pul/M+ppU1UuBJ0yh6tWs7CJKYcboJ3GdEAmZsgMfXytjY0CttMhB40svpBcM
+ PW7ZlxgAO3VCh7NB2y0js3eBm+Quf1bQ1wSWFbv2Qxw6JedefiPwe484zq7G6+CRetAc
+ m2+Iv85qfOv1pK2kxwZyASMO0dS0SnXeeL/3QSm5iK+lDIjBghxjilT9M9PE02zNVNKy
+ uJPQ==
+X-Gm-Message-State: AOAM5314gHINs0erFRgZSER8jtWjreG5OTW/zL3TVpywdjEeUxMwg/rB
+ 8NV1OHIkc8KTxup4oqO6U3XVxw==
+X-Google-Smtp-Source: ABdhPJykHjxFNng8e9pwGpUCl99/cU52oDpwBq5WiOXs/vFkGzZfPrkKkwfN3K7VYIuO2swkU374ZQ==
+X-Received: by 2002:aa7:88d4:0:b029:329:be20:a5c with SMTP id
+ k20-20020aa788d40000b0290329be200a5cmr7927892pff.61.1627607456971; 
+ Thu, 29 Jul 2021 18:10:56 -0700 (PDT)
+Received: from google.com (150.12.83.34.bc.googleusercontent.com.
+ [34.83.12.150])
+ by smtp.gmail.com with ESMTPSA id h192sm59949pfe.1.2021.07.29.18.10.56
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 29 Jul 2021 18:10:56 -0700 (PDT)
+Date: Thu, 29 Jul 2021 18:10:53 -0700
+From: Ricardo Koller <ricarkol@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH v4 3/6] KVM: selftests: Introduce UCALL_UNHANDLED for
+ unhandled vector reporting
+Message-ID: <YQNRnbuucxcYJT2F@google.com>
+References: <20210611011020.3420067-1-ricarkol@google.com>
+ <20210611011020.3420067-4-ricarkol@google.com>
+ <YQLwP9T4hevAqa7w@google.com>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <YQLwP9T4hevAqa7w@google.com>
+Cc: kvm@vger.kernel.org, maz@kernel.org, pbonzini@redhat.com,
+ vkuznets@redhat.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -102,99 +103,60 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Clean up handling of checks for pending work by switching to the generic
-infrastructure to do so.
+On Thu, Jul 29, 2021 at 06:15:27PM +0000, Sean Christopherson wrote:
+> On Thu, Jun 10, 2021, Ricardo Koller wrote:
+> > diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+> > index fcd8e3855111..beb76d6deaa9 100644
+> > --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> > +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> > @@ -349,6 +349,7 @@ enum {
+> >  	UCALL_SYNC,
+> >  	UCALL_ABORT,
+> >  	UCALL_DONE,
+> > +	UCALL_UNHANDLED,
+> >  };
+> 
+> ...
+> 
+> > @@ -1254,16 +1254,13 @@ void vm_install_exception_handler(struct kvm_vm *vm, int vector,
+> >  
+> >  void assert_on_unhandled_exception(struct kvm_vm *vm, uint32_t vcpuid)
+> >  {
+> > -	if (vcpu_state(vm, vcpuid)->exit_reason == KVM_EXIT_IO
+> > -		&& vcpu_state(vm, vcpuid)->io.port == UNEXPECTED_VECTOR_PORT
+> > -		&& vcpu_state(vm, vcpuid)->io.size == 4) {
+> > -		/* Grab pointer to io data */
+> > -		uint32_t *data = (void *)vcpu_state(vm, vcpuid)
+> > -			+ vcpu_state(vm, vcpuid)->io.data_offset;
+> > -
+> > -		TEST_ASSERT(false,
+> > -			    "Unexpected vectored event in guest (vector:0x%x)",
+> > -			    *data);
+> > +	struct ucall uc;
+> > +
+> > +	if (get_ucall(vm, vcpuid, &uc) == UCALL_UNHANDLED) {
+> 
+> UCALL_UNHANDLED is a bit of an odd name.  Without the surrounding context, I would
+> have no idea that it's referring to an unhandled event, e.g. my gut reaction would
+> be that it means the ucall itself was unhandled. Maybe UCALL_UNHANDLED_EVENT?
 
-We pick up handling for TIF_NOTIFY_RESUME from this switch, meaning that
-task work will be correctly handled.
+I see. I can send a new patch (this was commited as 75275d7fbe) with a
+new name. The only name I can think of that's more descriptive would be
+UCALL_UNHANDLED_EXCEPTION, but that's even longer.
 
-Signed-off-by: Oliver Upton <oupton@google.com>
----
- arch/arm64/kvm/Kconfig |  1 +
- arch/arm64/kvm/arm.c   | 27 ++++++++++++++-------------
- 2 files changed, 15 insertions(+), 13 deletions(-)
-
-diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index a4eba0908bfa..8bc1fac5fa26 100644
---- a/arch/arm64/kvm/Kconfig
-+++ b/arch/arm64/kvm/Kconfig
-@@ -26,6 +26,7 @@ menuconfig KVM
- 	select HAVE_KVM_ARCH_TLB_FLUSH_ALL
- 	select KVM_MMIO
- 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
-+	select KVM_XFER_TO_GUEST_WORK
- 	select SRCU
- 	select KVM_VFIO
- 	select HAVE_KVM_EVENTFD
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 60d0a546d7fd..9762e2129813 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -6,6 +6,7 @@
- 
- #include <linux/bug.h>
- #include <linux/cpu_pm.h>
-+#include <linux/entry-kvm.h>
- #include <linux/errno.h>
- #include <linux/err.h>
- #include <linux/kvm_host.h>
-@@ -714,6 +715,13 @@ static bool vcpu_mode_is_bad_32bit(struct kvm_vcpu *vcpu)
- 		static_branch_unlikely(&arm64_mismatched_32bit_el0);
- }
- 
-+static bool kvm_vcpu_exit_request(struct kvm_vcpu *vcpu)
-+{
-+	return kvm_request_pending(vcpu) ||
-+			need_new_vmid_gen(&vcpu->arch.hw_mmu->vmid) ||
-+			xfer_to_guest_mode_work_pending();
-+}
-+
- /**
-  * kvm_arch_vcpu_ioctl_run - the main VCPU run function to execute guest code
-  * @vcpu:	The VCPU pointer
-@@ -757,7 +765,11 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 		/*
- 		 * Check conditions before entering the guest
- 		 */
--		cond_resched();
-+		if (__xfer_to_guest_mode_work_pending()) {
-+			ret = xfer_to_guest_mode_handle_work(vcpu);
-+			if (!ret)
-+				ret = 1;
-+		}
- 
- 		update_vmid(&vcpu->arch.hw_mmu->vmid);
- 
-@@ -776,16 +788,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 
- 		kvm_vgic_flush_hwstate(vcpu);
- 
--		/*
--		 * Exit if we have a signal pending so that we can deliver the
--		 * signal to user space.
--		 */
--		if (signal_pending(current)) {
--			ret = -EINTR;
--			run->exit_reason = KVM_EXIT_INTR;
--			++vcpu->stat.signal_exits;
--		}
--
- 		/*
- 		 * If we're using a userspace irqchip, then check if we need
- 		 * to tell a userspace irqchip about timer or PMU level
-@@ -809,8 +811,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 		 */
- 		smp_store_mb(vcpu->mode, IN_GUEST_MODE);
- 
--		if (ret <= 0 || need_new_vmid_gen(&vcpu->arch.hw_mmu->vmid) ||
--		    kvm_request_pending(vcpu)) {
-+		if (ret <= 0 || kvm_vcpu_exit_request(vcpu)) {
- 			vcpu->mode = OUTSIDE_GUEST_MODE;
- 			isb(); /* Ensure work in x_flush_hwstate is committed */
- 			kvm_pmu_sync_hwstate(vcpu);
--- 
-2.32.0.554.ge1b32706d8-goog
-
+> It's rather long, but I don't think that will be problematic for any of the code.
+> 
+> 
+> > +		uint64_t vector = uc.args[0];
+> > +
+> > +		TEST_FAIL("Unexpected vectored event in guest (vector:0x%lx)",
+> > +			  vector);
+> >  	}
+> >  }
+> >  
+> > -- 
+> > 2.32.0.272.g935e593368-goog
+> > 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
