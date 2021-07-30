@@ -1,87 +1,93 @@
-Return-Path: <SRS0=HDjL=MW=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=pkzt=MX=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+X-Spam-Status: No, score=-0.6 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C468C432BE
-	for <kvmarm@archiver.kernel.org>; Fri, 30 Jul 2021 18:25:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C1EEC4338F
+	for <kvmarm@archiver.kernel.org>; Sat, 31 Jul 2021 09:33:56 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C333960F9B
-	for <kvmarm@archiver.kernel.org>; Fri, 30 Jul 2021 18:25:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org C333960F9B
+	by mail.kernel.org (Postfix) with ESMTP id 750C661040
+	for <kvmarm@archiver.kernel.org>; Sat, 31 Jul 2021 09:33:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 750C661040
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B58D4B0EC;
-	Fri, 30 Jul 2021 14:25:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E393F4A19F;
+	Sat, 31 Jul 2021 05:33:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id PYG27Xw8lIGs; Fri, 30 Jul 2021 14:25:01 -0400 (EDT)
+	with ESMTP id jWUnIDyeV-zQ; Sat, 31 Jul 2021 05:33:52 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A0B264B0D4;
-	Fri, 30 Jul 2021 14:25:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D6C2C4AED4;
+	Sat, 31 Jul 2021 05:33:52 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D857E4B0B4
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jul 2021 14:24:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F9554B08C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jul 2021 12:24:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EG91TxtnEHUM for <kvmarm@lists.cs.columbia.edu>;
- Fri, 30 Jul 2021 14:24:58 -0400 (EDT)
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com
- [209.85.208.171])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 60EE44A49C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jul 2021 14:24:58 -0400 (EDT)
-Received: by mail-lj1-f171.google.com with SMTP id n6so13579327ljp.9
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jul 2021 11:24:58 -0700 (PDT)
+ with ESMTP id o5FCcfSIQXUi for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 30 Jul 2021 12:24:06 -0400 (EDT)
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com
+ [209.85.214.170])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4E4FD4A19E
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jul 2021 12:24:06 -0400 (EDT)
+Received: by mail-pl1-f170.google.com with SMTP id i10so11694084pla.3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jul 2021 09:24:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=rqMYq2CWXiNrNOrfwEzFO/KTNa6FWzj2w0cC6kBlhtc=;
- b=VPhZ21dZARDbHcMs08hZe0sJhMKOZMXsX2u8qhO8X6scpIJjrtbj4VWZHqI/4GigEj
- 1qCt/sKqN3deIP+2fzjE3nzzmsNkXbLWrrBiEDQbv/9qhkfbnK4MP+3rujkEHb43uefs
- Klk8/GZ07sxxhBQe4K96vYdQIMlQZKjelr+UfdlhMywAp5dQb+bkzptisPTZc55NTOrX
- vA2XEY9DS0n9G+3pBSEnCw7PHygN2LSM3y5Qs9Ck3BdGZnZsAXOML62gO/2iAY5L5gJJ
- upjTgnsf4tdR0tbZqgggxPVSsL4qpHlHttYumbNL9TmR6gqv4tNidTszuHH8uh7caf+B
- cD5Q==
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=9Dt7BPkqKJMerMDAUFj+9/P/yGyah1WPEScK3C0WzA4=;
+ b=dB/7UCE7sp7q+bEm8dm5tdQNQGCMHmj7u+PrWEFahjhHDjJaNkqQkVeqD0H+Ls4llN
+ C5sWP5NLwCkAZuvoYJCHubExu9LiCnALoCfusst8K06XqgFScxO7tlHOeFx+K1qS2MTw
+ LMMfvx36FQU7t0ov0W6nl2B5AXFx3BcPlVItSW5YC4cWzaa/gl0XttSRyqP2oRaqjCAi
+ zf8nLFILyqe51JcEL8GR42b/BAGQYqld4sO66AS6HhwyVENHdL8XW/C/H/xzlhMQcED5
+ I43rIH/KK3LNK+yLFyD/40DB2bdvHosUf0Kwky1pBu3Chq+GSZxvyR9JeklPGv5evsDs
+ eB+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=rqMYq2CWXiNrNOrfwEzFO/KTNa6FWzj2w0cC6kBlhtc=;
- b=V+Ftqy0MV/MMu3IsO4m2q5nISFLuWk0oUT+5xBkOWbG36wfULP5SfroYzMpCjMCXqw
- KP/QsdIHU0wIk2fFfe+EfyhECyKDEhEpmsgG5TeB/b7YxtaPNDUw4rxMaG/UkfOnne8R
- DONkTyLrxsZA88E7Pip22rTaCac7krUr6MLjQHGyJhHXqnvu49+xIacvu4GmHCRbGWZ2
- e0KPJCl2J6ZhMw93OwP4gXkiGIwwfDxkjklgogofYkvMcI50WJ8tHR5J/5md0qD33zwL
- 2NthzQKqNjpslxNbh6ov7kzORuYFzmEvqX5egyYVSsycOcaOIZUwclUJJBeZ7CLKbg94
- nQGg==
-X-Gm-Message-State: AOAM531ZNPp0XyquDkCfDCAI+4vDA4Z1gYOHcpqUHzl2Z8Ms8HVRRlr0
- KC4tmbRe7jR8TFcPM0En5v0wW5wF6cQ9UufpzWv9hQ==
-X-Google-Smtp-Source: ABdhPJzdtPl6p6Ma5FhWcVM12t2+r5Hw1Cc+5/G0Nha/v+f1rF5QoRu64gmbzCNjcgoiXH4m7bT9LOCk65t0MJXdddw=
-X-Received: by 2002:a2e:535c:: with SMTP id t28mr2435423ljd.129.1627669496637; 
- Fri, 30 Jul 2021 11:24:56 -0700 (PDT)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=9Dt7BPkqKJMerMDAUFj+9/P/yGyah1WPEScK3C0WzA4=;
+ b=Wtp6BJVXmeW8l6V5CkBTxpIaxI380vfzWxnL/jacXqqN+s2jNvFTsw8U2z4jy9exyT
+ l6vYRGyqv1BFNpw/EO/6JKDe1NslbesxpwNQCQtvQpUxfeRkT4F6kfVX1un3JPOZfStl
+ RosB0QJfOwyQxgODQs33i4c5n1ZCbJSRGWEvYG364pbHbd5NQZK2JbYPYNhKGihNWvQQ
+ rpzs7LyxU30N8WNFLl9PUktBouGyRBhVJARRa2S+HJfteIFevjPxQzlgMrrzyk7T59WX
+ ahFwhNaJp8oIkfwtW8vY2CxTycFaZe0mMFqXGAEkl1cq4OPThP/Iy9PIG/qD6T/N5HIo
+ KYLg==
+X-Gm-Message-State: AOAM530LOyo1O4Q3JdyQ1g6Yfpcnqfiox78NCEq61wbKOcBvF8ddHBAd
+ 3mqTMq4zmXKXCv/G40CstvRqug==
+X-Google-Smtp-Source: ABdhPJxTmfhIfPyjKz/UdLpI661R9AEt1hom4/brpTzb/gdG6WfcxlblSRvTcb3ctkd6UWtkgCV2vg==
+X-Received: by 2002:a05:6a00:1508:b029:332:3aab:d842 with SMTP id
+ q8-20020a056a001508b02903323aabd842mr3547511pfu.59.1627662245035; 
+ Fri, 30 Jul 2021 09:24:05 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com.
+ [35.185.214.157])
+ by smtp.gmail.com with ESMTPSA id i8sm3063415pfk.18.2021.07.30.09.24.04
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 30 Jul 2021 09:24:04 -0700 (PDT)
+Date: Fri, 30 Jul 2021 16:24:00 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Ricardo Koller <ricarkol@google.com>
+Subject: Re: [PATCH v4 3/6] KVM: selftests: Introduce UCALL_UNHANDLED for
+ unhandled vector reporting
+Message-ID: <YQQnoDq7d4KU4bAV@google.com>
+References: <20210611011020.3420067-1-ricarkol@google.com>
+ <20210611011020.3420067-4-ricarkol@google.com>
+ <YQLwP9T4hevAqa7w@google.com> <YQNRnbuucxcYJT2F@google.com>
 MIME-Version: 1.0
-References: <20210729173300.181775-1-oupton@google.com>
- <20210729173300.181775-2-oupton@google.com>
- <YQQ7fuOhSoJVfkYn@google.com>
-In-Reply-To: <YQQ7fuOhSoJVfkYn@google.com>
-From: Oliver Upton <oupton@google.com>
-Date: Fri, 30 Jul 2021 11:24:45 -0700
-Message-ID: <CAOQ_QsgVqS_PuJo8F10Gg5Xw+tKt+5gDx+kJf1j3CiPO4MAOqg@mail.gmail.com>
-Subject: Re: [PATCH v5 01/13] KVM: x86: Report host tsc and realtime values in
- KVM_GET_CLOCK
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, Raghavendra Rao Anata <rananta@google.com>,
- David Matlack <dmatlack@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- Jim Mattson <jmattson@google.com>
+Content-Disposition: inline
+In-Reply-To: <YQNRnbuucxcYJT2F@google.com>
+X-Mailman-Approved-At: Sat, 31 Jul 2021 05:33:51 -0400
+Cc: kvm@vger.kernel.org, maz@kernel.org, pbonzini@redhat.com,
+ vkuznets@redhat.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -98,330 +104,28 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Jul 30, 2021 at 10:48 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Thu, Jul 29, 2021, Oliver Upton wrote:
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 916c976e99ab..e052c7afaac4 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -2782,17 +2782,24 @@ static void kvm_gen_update_masterclock(struct kvm *kvm)
-> >  #endif
-> >  }
-> >
-> > -u64 get_kvmclock_ns(struct kvm *kvm)
-> > +/*
-> > + * Returns true if realtime and TSC values were written back to the caller.
-> > + * Returns false if a clock triplet cannot be obtained, such as if the host's
-> > + * realtime clock is not based on the TSC.
-> > + */
-> > +static bool get_kvmclock_and_realtime(struct kvm *kvm, u64 *kvmclock_ns,
-> > +                                   u64 *realtime_ns, u64 *tsc)
-> >  {
-> >       struct kvm_arch *ka = &kvm->arch;
-> >       struct pvclock_vcpu_time_info hv_clock;
-> >       unsigned long flags;
-> > -     u64 ret;
-> > +     bool ret = false;
-> >
-> >       spin_lock_irqsave(&ka->pvclock_gtod_sync_lock, flags);
-> >       if (!ka->use_master_clock) {
-> >               spin_unlock_irqrestore(&ka->pvclock_gtod_sync_lock, flags);
-> > -             return get_kvmclock_base_ns() + ka->kvmclock_offset;
-> > +             *kvmclock_ns = get_kvmclock_base_ns() + ka->kvmclock_offset;
-> > +             return false;
-> >       }
-> >
-> >       hv_clock.tsc_timestamp = ka->master_cycle_now;
-> > @@ -2803,18 +2810,36 @@ u64 get_kvmclock_ns(struct kvm *kvm)
-> >       get_cpu();
-> >
-> >       if (__this_cpu_read(cpu_tsc_khz)) {
-> > +             struct timespec64 ts;
-> > +             u64 tsc_val;
-> > +
-> >               kvm_get_time_scale(NSEC_PER_SEC, __this_cpu_read(cpu_tsc_khz) * 1000LL,
-> >                                  &hv_clock.tsc_shift,
-> >                                  &hv_clock.tsc_to_system_mul);
-> > -             ret = __pvclock_read_cycles(&hv_clock, rdtsc());
-> > +
-> > +             if (kvm_get_walltime_and_clockread(&ts, &tsc_val)) {
-> > +                     *realtime_ns = ts.tv_nsec + NSEC_PER_SEC * ts.tv_sec;
-> > +                     *tsc = tsc_val;
-> > +                     ret = true;
-> > +             }
-> > +
-> > +             *kvmclock_ns = __pvclock_read_cycles(&hv_clock, tsc_val);
->
-> This is buggy, as tsc_val is not initialized if kvm_get_walltime_and_clockread()
-> returns false.  This also straight up fails to compile on 32-bit kernels because
-> kvm_get_walltime_and_clockread() is wrapped with CONFIG_X86_64.
+On Thu, Jul 29, 2021, Ricardo Koller wrote:
+> On Thu, Jul 29, 2021 at 06:15:27PM +0000, Sean Christopherson wrote:
+> > On Thu, Jun 10, 2021, Ricardo Koller wrote:
+> > > +	struct ucall uc;
+> > > +
+> > > +	if (get_ucall(vm, vcpuid, &uc) == UCALL_UNHANDLED) {
+> > 
+> > UCALL_UNHANDLED is a bit of an odd name.  Without the surrounding context, I would
+> > have no idea that it's referring to an unhandled event, e.g. my gut reaction would
+> > be that it means the ucall itself was unhandled. Maybe UCALL_UNHANDLED_EVENT?
+> 
+> I see. I can send a new patch (this was commited as 75275d7fbe) with a
+> new name.
 
-Pssh... works on my machine ;-)
+Eh, no need to post another patch.  If it can be fixed up in tree, great, if not,
+no big deal.
 
->
-> A gross way to resolve both issues would be (see below regarding 'data'):
->
->         if (__this_cpu_read(cpu_tsc_khz)) {
-> #ifdef CONFIG_X86_64
->                 struct timespec64 ts;
->
->                 if (kvm_get_walltime_and_clockread(&ts, &data->host_tsc)) {
->                         data->realtime = ts.tv_nsec + NSEC_PER_SEC * ts.tv_sec;
->                         data->flags |= KVM_CLOCK_REALTIME | KVM_CLOCK_HOST_TSC;
->                 } else
-> #endif
->                 data->host_tsc = rdtsc();
->
->                 kvm_get_time_scale(NSEC_PER_SEC, __this_cpu_read(cpu_tsc_khz) * 1000LL,
->                                    &hv_clock.tsc_shift,
->                                    &hv_clock.tsc_to_system_mul);
->
->                 data->clock = __pvclock_read_cycles(&hv_clock, data->host_tsc);
->         } else {
->                 data->clock = get_kvmclock_base_ns() + ka->kvmclock_offset;
->         }
->
+> The only name I can think of that's more descriptive would be
+> UCALL_UNHANDLED_EXCEPTION, but that's even longer.
 
-I'll mull on this if there's any cleaner way to fix it, but thanks for
-the suggested fix! I missed the x86_64 ifdefs first time around.
-
-> >       } else
->
-> Not your code, but this needs braces.
-
-Ack.
-
->
-> > -             ret = get_kvmclock_base_ns() + ka->kvmclock_offset;
-> > +             *kvmclock_ns = get_kvmclock_base_ns() + ka->kvmclock_offset;
-> >
-> >       put_cpu();
-> >
-> >       return ret;
-> >  }
->
-> ...
->
-> > @@ -5820,6 +5845,68 @@ int kvm_arch_pm_notifier(struct kvm *kvm, unsigned long state)
-> >  }
-> >  #endif /* CONFIG_HAVE_KVM_PM_NOTIFIER */
-> >
-> > +static int kvm_vm_ioctl_get_clock(struct kvm *kvm,
-> > +                               void __user *argp)
-> > +{
-> > +     struct kvm_clock_data data;
-> > +
-> > +     memset(&data, 0, sizeof(data));
-> > +
-> > +     if (get_kvmclock_and_realtime(kvm, &data.clock, &data.realtime,
-> > +                                   &data.host_tsc))
-> > +             data.flags |= KVM_CLOCK_REALTIME | KVM_CLOCK_HOST_TSC;
-> > +
-> > +     if (kvm->arch.use_master_clock)
-> > +             data.flags |= KVM_CLOCK_TSC_STABLE;
->
-> I know nothing about the actual behavior, but this appears to have a potential
-> race (though it came from the existing code).  get_kvmclock_and_realtime() checks
-> arch.use_master_clock under pvclock_gtod_sync_lock, but this does not.  Even if
-> that's functionally ok, it's a needless complication.
->
-> Fixing that weirdness would also provide an opportunity to clean up the API,
-> e.g. the boolean return is not exactly straightforward.  The simplest approach
-> would be to take "struct kvm_clock_data *data" in get_kvmclock_and_realtime()
-> instead of multiple params.  Then that helper can set the flags accordingly, thus
-> avoiding the question of whether or not there's a race and eliminating the boolean
-> return.  E.g.
-
-Yeah, agreed. I think it may be best to separate fixing the mess from
-the new API here.
-
->
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index e052c7afaac4..872a53a7c467 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -2782,25 +2782,20 @@ static void kvm_gen_update_masterclock(struct kvm *kvm)
->  #endif
->  }
->
-> -/*
-> - * Returns true if realtime and TSC values were written back to the caller.
-> - * Returns false if a clock triplet cannot be obtained, such as if the host's
-> - * realtime clock is not based on the TSC.
-> - */
-> -static bool get_kvmclock_and_realtime(struct kvm *kvm, u64 *kvmclock_ns,
-> -                                     u64 *realtime_ns, u64 *tsc)
-> +static void get_kvmclock_and_realtime(struct kvm *kvm,
-> +                                     struct kvm_clock_data *data)
->  {
->         struct kvm_arch *ka = &kvm->arch;
->         struct pvclock_vcpu_time_info hv_clock;
->         unsigned long flags;
-> -       bool ret = false;
->
->         spin_lock_irqsave(&ka->pvclock_gtod_sync_lock, flags);
->         if (!ka->use_master_clock) {
->                 spin_unlock_irqrestore(&ka->pvclock_gtod_sync_lock, flags);
-> -               *kvmclock_ns = get_kvmclock_base_ns() + ka->kvmclock_offset;
-> -               return false;
-> +               data->clock = get_kvmclock_base_ns() + ka->kvmclock_offset;
-> +               return;
->         }
-> +       data->flags |= KVM_CLOCK_TSC_STABLE;
->
->         hv_clock.tsc_timestamp = ka->master_cycle_now;
->         hv_clock.system_time = ka->master_kernel_ns + ka->kvmclock_offset;
-> @@ -2810,34 +2805,40 @@ static bool get_kvmclock_and_realtime(struct kvm *kvm, u64 *kvmclock_ns,
->         get_cpu();
->
->         if (__this_cpu_read(cpu_tsc_khz)) {
-> +#ifdef CONFIG_X86_64
->                 struct timespec64 ts;
-> -               u64 tsc_val;
-> +
-> +               if (kvm_get_walltime_and_clockread(&ts, &data->host_tsc)) {
-> +                       data->realtime = ts.tv_nsec + NSEC_PER_SEC * ts.tv_sec;
-> +                       data->flags |= KVM_CLOCK_REALTIME | KVM_CLOCK_HOST_TSC;
-> +               } else
-> +#endif
-> +               data->host_tsc = rdtsc();
->
->                 kvm_get_time_scale(NSEC_PER_SEC, __this_cpu_read(cpu_tsc_khz) * 1000LL,
->                                    &hv_clock.tsc_shift,
->                                    &hv_clock.tsc_to_system_mul);
->
-> -               if (kvm_get_walltime_and_clockread(&ts, &tsc_val)) {
-> -                       *realtime_ns = ts.tv_nsec + NSEC_PER_SEC * ts.tv_sec;
-> -                       *tsc = tsc_val;
-> -                       ret = true;
-> -               }
-> -
-> -               *kvmclock_ns = __pvclock_read_cycles(&hv_clock, tsc_val);
-> -       } else
-> -               *kvmclock_ns = get_kvmclock_base_ns() + ka->kvmclock_offset;
-> +               data->clock = __pvclock_read_cycles(&hv_clock, data->host_tsc);
-> +       } else {
-> +               data->clock = get_kvmclock_base_ns() + ka->kvmclock_offset;
-> +       }
->
->         put_cpu();
-> -
-> -       return ret;
->  }
->
->  u64 get_kvmclock_ns(struct kvm *kvm)
->  {
-> -       u64 kvmclock_ns, realtime_ns, tsc;
-> +       struct kvm_clock_data data;
->
-> -       get_kvmclock_and_realtime(kvm, &kvmclock_ns, &realtime_ns, &tsc);
-> -       return kvmclock_ns;
-> +       /*
-> +        * Zero flags as it's accessed RMW, leave everything else uninitialized
-> +        * as clock is always written and no other fields are consumed.
-> +        */
-> +       data.flags = 0;
-> +
-> +       get_kvmclock_and_realtime(kvm, &data);
-> +       return data.clock;
->  }
->
->  static void kvm_setup_pvclock_page(struct kvm_vcpu *v,
-> @@ -5852,12 +5853,7 @@ static int kvm_vm_ioctl_get_clock(struct kvm *kvm,
->
->         memset(&data, 0, sizeof(data));
->
-> -       if (get_kvmclock_and_realtime(kvm, &data.clock, &data.realtime,
-> -                                     &data.host_tsc))
-> -               data.flags |= KVM_CLOCK_REALTIME | KVM_CLOCK_HOST_TSC;
-> -
-> -       if (kvm->arch.use_master_clock)
-> -               data.flags |= KVM_CLOCK_TSC_STABLE;
-> +       get_kvmclock_and_realtime(kvm, &data);
->
->         if (copy_to_user(argp, &data, sizeof(data)))
->                 return -EFAULT;
->
-> > +
-> > +     if (copy_to_user(argp, &data, sizeof(data)))
-> > +             return -EFAULT;
-> > +
-> > +     return 0;
-> > +}
-> > +
-> > +static int kvm_vm_ioctl_set_clock(struct kvm *kvm,
-> > +                               void __user *argp)
-> > +{
-> > +     struct kvm_arch *ka = &kvm->arch;
-> > +     struct kvm_clock_data data;
-> > +     u64 now_raw_ns;
-> > +
-> > +     if (copy_from_user(&data, argp, sizeof(data)))
-> > +             return -EFAULT;
-> > +
-> > +     if (data.flags & ~KVM_CLOCK_REALTIME)
-> > +             return -EINVAL;
->
-> Huh, this an odd ABI, the output of KVM_GET_CLOCK isn't legal input to KVM_SET_CLOCK.
-> The existing code has the same behavior, so apparently it's ok, just odd.
-
-Quite the head scratcher to me as well /shrug
-
-> > +
-> > +     /*
-> > +      * TODO: userspace has to take care of races with VCPU_RUN, so
-> > +      * kvm_gen_update_masterclock() can be cut down to locked
-> > +      * pvclock_update_vm_gtod_copy().
-> > +      */
-> > +     kvm_gen_update_masterclock(kvm);
-> > +
-> > +     spin_lock_irq(&ka->pvclock_gtod_sync_lock);
-> > +     if (data.flags & KVM_CLOCK_REALTIME) {
-> > +             u64 now_real_ns = ktime_get_real_ns();
-> > +
-> > +             /*
-> > +              * Avoid stepping the kvmclock backwards.
-> > +              */
-> > +             if (now_real_ns > data.realtime)
-> > +                     data.clock += now_real_ns - data.realtime;
-> > +     }
-> > +
-> > +     if (ka->use_master_clock)
-> > +             now_raw_ns = ka->master_kernel_ns;
-> > +     else
-> > +             now_raw_ns = get_kvmclock_base_ns();
-> > +     ka->kvmclock_offset = data.clock - now_raw_ns;
-> > +     spin_unlock_irq(&ka->pvclock_gtod_sync_lock);
-> > +
-> > +     kvm_make_all_cpus_request(kvm, KVM_REQ_CLOCK_UPDATE);
-> > +     return 0;
-> > +}
-> > +
-> >  long kvm_arch_vm_ioctl(struct file *filp,
-> >                      unsigned int ioctl, unsigned long arg)
-> >  {
-> > @@ -6064,57 +6151,11 @@ long kvm_arch_vm_ioctl(struct file *filp,
-> >       }
-> >  #endif
-> >       case KVM_SET_CLOCK: {
->
-> The curly braces can be dropped, both here and in KVM_GET_CLOCK.
-
-Ack.
-
-> >       }
-> >       case KVM_GET_CLOCK: {
->
-> ...
->
-> >       }
-
-As always, thanks for the careful review Sean!
-
---
-Best,
-Oliver
+Unfortunately, EXCEPTION is incorrect as x86 will route unexpected IRQs through
+this as well.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
