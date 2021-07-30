@@ -2,81 +2,75 @@ Return-Path: <SRS0=HDjL=MW=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 995B4C4320A
-	for <kvmarm@archiver.kernel.org>; Fri, 30 Jul 2021 15:22:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ACBEC4338F
+	for <kvmarm@archiver.kernel.org>; Fri, 30 Jul 2021 16:18:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1C56E61059
-	for <kvmarm@archiver.kernel.org>; Fri, 30 Jul 2021 15:22:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 1C56E61059
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 758F060F3A
+	for <kvmarm@archiver.kernel.org>; Fri, 30 Jul 2021 16:18:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 758F060F3A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B8EB4B0C9;
-	Fri, 30 Jul 2021 11:22:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E67F44A524;
+	Fri, 30 Jul 2021 12:18:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id MX63yujUh0n8; Fri, 30 Jul 2021 11:22:17 -0400 (EDT)
+	with ESMTP id dgyiDC0wHfRE; Fri, 30 Jul 2021 12:18:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 73FAA4B0A3;
-	Fri, 30 Jul 2021 11:22:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A436B4B0C6;
+	Fri, 30 Jul 2021 12:18:03 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EAC644B0A3
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jul 2021 11:22:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1289D406E7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jul 2021 12:18:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mZsZDRc6cr+m for <kvmarm@lists.cs.columbia.edu>;
- Fri, 30 Jul 2021 11:22:14 -0400 (EDT)
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com
- [209.85.167.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 84B2D4B09A
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jul 2021 11:22:14 -0400 (EDT)
-Received: by mail-lf1-f43.google.com with SMTP id p38so3679920lfa.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jul 2021 08:22:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=/1o7+QKd97cIwS/kb/Ro1mV06vaGWcTs0D3fJHtTeso=;
- b=nVqXEBrlXTGcTUwaUH5Wm8FEDfko7xv0Xdqrq5ntdbi6gth09eo2rp2GDwyHrYvBtt
- qcCaJ8HQgf4tyQdQ6aro6IyWLEpR5ja2MABBOxIHdNHEOIYAAx4P6J0nwbLx1/VjwT3z
- MnxgpQjuj/UbcnSfMYqagxbISEsp7GkQYhqGVNHjVMqv0GR0qtz9XXiVfUvngr69Llko
- Zlutqz6DBFg76VF5mD1QAh2yDxoxr7I/kjDc3v6eRfwv/YBPGLIJ1G6ckwEqO9WL8UT4
- LTjGh2P4o7HCw6SZOwcuTIAbcdkvvScewj+4RG5cfRjkKrck+bbowZ88vu01qTxghj3R
- HVcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=/1o7+QKd97cIwS/kb/Ro1mV06vaGWcTs0D3fJHtTeso=;
- b=FQfbvs5X4BzAeYxE9+T8SjQ5JJsR2pjNjvOwiuKWjCzYe08YO6keSb4TejO1oK8/80
- AsOr8fAsi+g6vdGIAcSjcE2mTuk/8ZIc1eQcq9DdU2uPRm6PWt/O6Hur2PNOW3cPjDMv
- fGI2q1bsk9MEUMlSgW4oVlXwiFxpGD5E+1ChjOwoWMHemI2Zjdha1D6jd7ANITztUsRK
- 3vgx4wkOLMn+BX5lCFv8JbqVmFSHQ4bB3CKPOI9npwqSsJcyqffXW2bqYoZxyRocSosw
- T1+6tskD4TqlVEI9d/9NIOlmKKIj5IbEQvRi8E/DgNf5MGxfLp5O5r0t5vQkpSKi/ctq
- eWuQ==
-X-Gm-Message-State: AOAM533lD+MYCDA2+i3mgF4yeErrwuZQUVdNI2Xu9/UWJVdTs5LRgIa6
- DNHRdOf+3Y8pii5O9aZN9LFbwdL5mb3eky0Pg83ftw==
-X-Google-Smtp-Source: ABdhPJy3MzOJEL7JUXn3pv247OvpOyrn4DFM65cNNeDejFTsyvt+MsdJW5ifOeeaLmsG2MxQDXZ+nQuM/comVP/br64=
-X-Received: by 2002:a05:6512:3d26:: with SMTP id
- d38mr2131778lfv.411.1627658532665; 
- Fri, 30 Jul 2021 08:22:12 -0700 (PDT)
-MIME-Version: 1.0
+ with ESMTP id kJsuP2x9vSBd for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 30 Jul 2021 12:18:01 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C49AC4A524
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Jul 2021 12:18:01 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 8B7FD60EE2;
+ Fri, 30 Jul 2021 16:18:00 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1m9VCw-0022rE-EI; Fri, 30 Jul 2021 17:17:58 +0100
+Date: Fri, 30 Jul 2021 17:17:57 +0100
+Message-ID: <87wnp722tm.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oupton@google.com>
+Subject: Re: [PATCH v5 11/13] KVM: arm64: Provide userspace access to the
+ physical counter offset
+In-Reply-To: <CAOQ_QsgCrEWQqakicR3Peu_c8oCMeq8Cok+CK8vJVURUwAdG0A@mail.gmail.com>
 References: <20210729173300.181775-1-oupton@google.com>
  <20210729173300.181775-12-oupton@google.com>
  <875yws2h5w.wl-maz@kernel.org>
-In-Reply-To: <875yws2h5w.wl-maz@kernel.org>
-From: Oliver Upton <oupton@google.com>
-Date: Fri, 30 Jul 2021 08:22:01 -0700
-Message-ID: <CAOQ_QsgCrEWQqakicR3Peu_c8oCMeq8Cok+CK8vJVURUwAdG0A@mail.gmail.com>
-Subject: Re: [PATCH v5 11/13] KVM: arm64: Provide userspace access to the
- physical counter offset
-To: Marc Zyngier <maz@kernel.org>
+ <CAOQ_QsgCrEWQqakicR3Peu_c8oCMeq8Cok+CK8vJVURUwAdG0A@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@google.com, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, seanjc@google.com,
+ pshier@google.com, jmattson@google.com, dmatlack@google.com,
+ ricarkol@google.com, jingzhangos@google.com, rananta@google.com,
+ james.morse@arm.com, Alexandru.Elisei@arm.com, suzuki.poulose@arm.com,
+ linux-arm-kernel@lists.infradead.org, drjones@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 Cc: kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
  Peter Shier <pshier@google.com>, Raghavendra Rao Anata <rananta@google.com>,
  David Matlack <dmatlack@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
@@ -98,102 +92,83 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Jul 30, 2021 at 4:08 AM Marc Zyngier <maz@kernel.org> wrote:
-> > FEAT_ECV provides a guest physical counter-timer offset register
-> > (CNTPOFF_EL2), but ECV-enabled hardware is nonexistent at the time of
-> > writing so support for it was elided for the sake of the author :)
->
-> You seem to have done most the work for that, and there are SW models
-> out there that implement ECV. If anything, the ECV support should come
-> first, and its emulation only as a poor man's workaround.
->
-> It is also good to show silicon vendors that they suck at providing
-> useful features, and pointing them to the code that would use these
-> features *is* an incentive.
-
-Lol, then so be it. I'll add ECV support to this series. What can I
-test with, though? I don't recall QEMU supporting ECV last I checked..
-
-> I really dislike the fallback to !vhe here. I'd rather you
-> special-case the emulated ptimer in the VHE case:
->
->         if (has_vhe()) {
->                 map->direct_vtimer = vcpu_vtimer(vcpu);
->                 if (!timer_get_offset(vcpu_ptimer(vcpu)))
->                         map->direct_ptimer = vcpu_ptimer(vcpu);
->                         map->emul_ptimer = NULL;
->                 } else {
->                         map->direct_ptimer = NULL;
->                         map->emul_ptimer = vcpu_ptimer(vcpu);
->                 }
->         } else {
-
-Ack.
-
-> and you can drop the timer_emulation_required() helper which doesn't
-> serve any purpose.
-
-Especially if I add ECV to this series, I'd prefer to carry it than
-open-code the check for CNTPOFF && !ECV in get_timer_map(). Do you
-concur? I can tighten it to ptimer_emulation_required() and avoid
-taking an arch_timer context if you prefer.
-
-> > +static inline bool __hyp_handle_counter(struct kvm_vcpu *vcpu)
-> > +{
-> > +     u32 sysreg = esr_sys64_to_sysreg(kvm_vcpu_get_esr(vcpu));
-> > +     int rt = kvm_vcpu_sys_get_rt(vcpu);
-> > +     u64 rv;
-> > +
-> > +     if (sysreg != SYS_CNTPCT_EL0)
->
-> That's feels really optimistic. You don't check for the exception
-> class, and pray that the bits will align? ;-)
-
-Doh! Missed the EC check.
-
-> Please don't add more small includes like this. It makes things hard
-> to read and hides bugs
-
-Ack.
-
-> the counter read can (and will) be speculated,
-> so you definitely need an ISB before the access. Please also look at
-> __arch_counter_get_cntpct() and arch_counter_enforce_ordering().
-
-Wouldn't it be up to the guest to decide if it wants the counter to be
-speculated or not? I debated this a bit myself in the implementation,
-as we would trap both ordered and un-ordered reads. Well, no way to
-detect it :)
-
+On Fri, 30 Jul 2021 16:22:01 +0100,
+Oliver Upton <oupton@google.com> wrote:
+> 
+> On Fri, Jul 30, 2021 at 4:08 AM Marc Zyngier <maz@kernel.org> wrote:
+> > > FEAT_ECV provides a guest physical counter-timer offset register
+> > > (CNTPOFF_EL2), but ECV-enabled hardware is nonexistent at the time of
+> > > writing so support for it was elided for the sake of the author :)
 > >
-> > -/*
-> > - * Should only be called on non-VHE systems.
-> > - * VHE systems use EL2 timers and configure EL1 timers in kvm_timer_init_vhe().
-> > - */
+> > You seem to have done most the work for that, and there are SW models
+> > out there that implement ECV. If anything, the ECV support should come
+> > first, and its emulation only as a poor man's workaround.
+> >
+> > It is also good to show silicon vendors that they suck at providing
+> > useful features, and pointing them to the code that would use these
+> > features *is* an incentive.
+> 
+> Lol, then so be it. I'll add ECV support to this series. What can I
+> test with, though? I don't recall QEMU supporting ECV last I checked..
+
+You want the ARM FVP model, or maybe even the Foundation model. It has
+support all the way to ARMv8.7 apparently. I personally use the FVP,
+get in touch offline and I'll help you with the setup.
+
+In general, I tend to trust the ARM models a lot more than QEMU for
+the quality of the emulation. You can tune it in some bizarre way
+(the cache modelling is terrifying), and it will definitely do all
+kind of crazy reordering and speculation.
+
 >
-> This comment still applies. this function *is* nVHE specific.
->
+> > I really dislike the fallback to !vhe here. I'd rather you
+> > special-case the emulated ptimer in the VHE case:
+> >
+> >         if (has_vhe()) {
+> >                 map->direct_vtimer = vcpu_vtimer(vcpu);
+> >                 if (!timer_get_offset(vcpu_ptimer(vcpu)))
+> >                         map->direct_ptimer = vcpu_ptimer(vcpu);
+> >                         map->emul_ptimer = NULL;
+> >                 } else {
+> >                         map->direct_ptimer = NULL;
+> >                         map->emul_ptimer = vcpu_ptimer(vcpu);
+> >                 }
+> >         } else {
+> 
+> Ack.
+> 
+> > and you can drop the timer_emulation_required() helper which doesn't
+> > serve any purpose.
+> 
+> Especially if I add ECV to this series, I'd prefer to carry it than
+> open-code the check for CNTPOFF && !ECV in get_timer_map(). Do you
+> concur? I can tighten it to ptimer_emulation_required() and avoid
+> taking an arch_timer context if you prefer.
 
-Ack.
+Sure, whatever you prefer. I'm not set on one way or another, but in
+the above case, it was clearly easier to get rid of the helper.
 
->
-> You now pay the price of reprogramming CNTHCTL_EL2 on every entry for
-> VHE, and that's not right. On VHE, it should be enough to perform the
-> programming on vcpu_load() only.
->
+> > the counter read can (and will) be speculated,
+> > so you definitely need an ISB before the access. Please also look at
+> > __arch_counter_get_cntpct() and arch_counter_enforce_ordering().
+> 
+> Wouldn't it be up to the guest to decide if it wants the counter to be
+> speculated or not? I debated this a bit myself in the implementation,
+> as we would trap both ordered and un-ordered reads. Well, no way to
+> detect it :)
 
-True. I'll rework the programming in the next series.
+There has been a trap, so that already was a context synchronisation
+event. but it would be pretty common for the counter to be speculated
+way early, when entering EL2. That's not the end of the world, but
+that's not an accurate emulation. You'd want it to be as close as
+possible to the reentry point into the guest.
 
-> Overall, this patch needs a bit of splitting up (userspace interface,
-> HV rework), re-optimise VHE, and it *definitely* wants the ECV support
-> for the physical timer.
->
+Thanks,
 
-Sure thing, thanks for the review Marc!
+	M.
 
---
-Best,
-Oliver
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
