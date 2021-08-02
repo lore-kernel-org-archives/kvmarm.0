@@ -2,84 +2,74 @@ Return-Path: <SRS0=xqRQ=MZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B272C4338F
-	for <kvmarm@archiver.kernel.org>; Mon,  2 Aug 2021 11:14:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3C32C4338F
+	for <kvmarm@archiver.kernel.org>; Mon,  2 Aug 2021 12:36:20 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id F09FC60FC2
-	for <kvmarm@archiver.kernel.org>; Mon,  2 Aug 2021 11:14:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org F09FC60FC2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 343DE610CC
+	for <kvmarm@archiver.kernel.org>; Mon,  2 Aug 2021 12:36:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 343DE610CC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E3B64A531;
-	Mon,  2 Aug 2021 07:14:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 938354A19A;
+	Mon,  2 Aug 2021 08:36:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Bq5dmny6JcJQ; Mon,  2 Aug 2021 07:14:00 -0400 (EDT)
+	with ESMTP id LzPkG+Nh76R3; Mon,  2 Aug 2021 08:36:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 54D354A7FD;
-	Mon,  2 Aug 2021 07:14:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 910494A4A4;
+	Mon,  2 Aug 2021 08:36:17 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CC41A4A531
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Aug 2021 07:13:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 63EBE4099E
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Aug 2021 08:36:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KSqtVYSFBPBm for <kvmarm@lists.cs.columbia.edu>;
- Mon,  2 Aug 2021 07:13:57 -0400 (EDT)
-Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com
- [209.85.210.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BB9C24A19E
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Aug 2021 07:13:57 -0400 (EDT)
-Received: by mail-ot1-f50.google.com with SMTP id
- x15-20020a05683000cfb02904d1f8b9db81so5570802oto.12
- for <kvmarm@lists.cs.columbia.edu>; Mon, 02 Aug 2021 04:13:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=0CfDLtrkCkMzvLd35FEs6eMwBrh1e58lQcLyXALKvq0=;
- b=AybFJOtKRe0q6jJhqwD86EFrT14YFKKUCn0/lX25FdoRhTsyaZ6uPTsCg/y0ubJqCO
- z/Ap1RHVChJarWRV1k+rH/fX/V4fmA4obJqont8F6g1d3ckqT7Vwpdll97eRr8n54TVe
- no5UyzPnO+eGTcIgU4Py4/s+xQKjE1Y4DsVo7wfz3fKgAXXo9aGFCsDxRxOd8pCms28s
- eYg6g1qgj6fIIXsNYwhK+FKg/U0izdC0WLdlaY0+aFI2rEx+U7B4xOIQpkJjyXQjIEfl
- fEK3BsXeSe3kbUyaTWSsnt8Y94PtzisV7qFyHIjbUX4l7SGMM3rbjKz7LifoSAUA0FrV
- EKwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=0CfDLtrkCkMzvLd35FEs6eMwBrh1e58lQcLyXALKvq0=;
- b=EctoOth1wCrgA33vg6ZJNcJZhjO3mbrOgy/4jHMy+PcJOauSccxK8ztrUrgGoWXgeQ
- AU7F1ndrRIT2BB4JoWU6krWIOwhq71+d/ouWnv8vwyYdb4N9QShKeN6a5wrRrJ4GhUfj
- 66gyye+TTcLtFW3YCwbbiQ7d02FQr5DYZHhW+JXVsgVSr8UWmYxnGO/ZrUnk4lgUBgT1
- zGp/X2wqFciOg2HlP8ylGOor0uKdFyL/jurRjqQDIuyHJkdQ3aZkh0juNhFlfcXthpd8
- 57isPNsk4fd1MOBKLJL9LqoDcFb/0iCGVPc09a2gF/0xnqBc2GrndBNbK+tNMcdyH35w
- NtZQ==
-X-Gm-Message-State: AOAM532umiROFHqaFA9SC4BLa+41vcRzbunxSZdvrb/hGe9Gf13JdKVk
- eVRWtwRcNDzB0SqJ+pNaOeJlVE6I049ADPdmywl90Q==
-X-Google-Smtp-Source: ABdhPJxRpcv8YUt/d5raKHTBgJ8s47A7Jkisqse/dDL12s34vizVFXgZbUpeOvNeTac/Ai7ulOfMTQki8uGGCwIVlzk=
-X-Received: by 2002:a9d:4b02:: with SMTP id q2mr11320334otf.52.1627902836962; 
- Mon, 02 Aug 2021 04:13:56 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210729132818.4091769-1-qperret@google.com>
- <20210729132818.4091769-14-qperret@google.com>
-In-Reply-To: <20210729132818.4091769-14-qperret@google.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 2 Aug 2021 13:13:20 +0200
-Message-ID: <CA+EHjTxTaPc=bt_kyXf0TE85v5eyHnq0o3KQ3Pd6+kOwmm5oMw@mail.gmail.com>
-Subject: Re: [PATCH v3 13/21] KVM: arm64: Expose host stage-2 manipulation
- helpers
-To: Quentin Perret <qperret@google.com>
-Cc: kernel-team@android.com, qwandor@google.com, maz@kernel.org,
- linux-kernel@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+ with ESMTP id pzKaTRXVhv-t for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  2 Aug 2021 08:36:15 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 382A940667
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Aug 2021 08:36:15 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 1FD7460551;
+ Mon,  2 Aug 2021 12:36:14 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mAXAy-002RiU-6o; Mon, 02 Aug 2021 13:36:12 +0100
+Date: Mon, 02 Aug 2021 13:36:11 +0100
+Message-ID: <87o8ag10sk.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH] KVM: arm64: Unregister HYP sections from kmemleak in
+ protected mode
+In-Reply-To: <20210729164214.GB31848@arm.com>
+References: <20210729135016.3037277-1-maz@kernel.org>
+ <20210729164214.GB31848@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: catalin.marinas@arm.com, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, will@kernel.org,
+ james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
+ kernel-team@android.com, qperret@google.com, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, kvm@vger.kernel.org, stable@vger.kernel.org,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -96,81 +86,79 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Quentin,
+On Thu, 29 Jul 2021 17:42:15 +0100,
+Catalin Marinas <catalin.marinas@arm.com> wrote:
+> 
+> On Thu, Jul 29, 2021 at 02:50:16PM +0100, Marc Zyngier wrote:
+> > Booting a KVM host in protected mode with kmemleak quickly results
+> > in a pretty bad crash, as kmemleak doesn't know that the HYP sections
+> > have been taken away.
+> > 
+> > Make the unregistration from kmemleak part of marking the sections
+> > as HYP-private. The rest of the HYP-specific data is obtained via
+> > the page allocator, which is not subjected to kmemleak.
+> > 
+> > Fixes: 90134ac9cabb ("KVM: arm64: Protect the .hyp sections from the host")
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > Cc: Quentin Perret <qperret@google.com>
+> > Cc: Catalin Marinas <catalin.marinas@arm.com>
+> > Cc: stable@vger.kernel.org # 5.13
+> > ---
+> >  arch/arm64/kvm/arm.c | 7 ++++++-
+> >  1 file changed, 6 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index e9a2b8f27792..23f12e602878 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -15,6 +15,7 @@
+> >  #include <linux/fs.h>
+> >  #include <linux/mman.h>
+> >  #include <linux/sched.h>
+> > +#include <linux/kmemleak.h>
+> >  #include <linux/kvm.h>
+> >  #include <linux/kvm_irqfd.h>
+> >  #include <linux/irqbypass.h>
+> > @@ -1960,8 +1961,12 @@ static inline int pkvm_mark_hyp(phys_addr_t start, phys_addr_t end)
+> >  }
+> >  
+> >  #define pkvm_mark_hyp_section(__section)		\
+> > +({							\
+> > +	u64 sz = __section##_end - __section##_start;	\
+> > +	kmemleak_free_part(__section##_start, sz);	\
+> >  	pkvm_mark_hyp(__pa_symbol(__section##_start),	\
+> > -			__pa_symbol(__section##_end))
+> > +		      __pa_symbol(__section##_end));	\
+> > +})
+> 
+> Using kmemleak_free_part() is fine in principle as this is not a slab
+> object. However, the above would call the function even for ranges that
+> are not tracked at all by kmemleak (text, idmap). Luckily Kmemleak won't
+> complain, unless you #define DEBUG in the file (initially I tried to
+> warn all the time but I couldn't fix all the callbacks).
 
-On Thu, Jul 29, 2021 at 3:28 PM Quentin Perret <qperret@google.com> wrote:
->
-> We will need to manipulate the host stage-2 page-table from outside
-> mem_protect.c soon. Introduce two functions allowing this, and make
-> them usable to users of mem_protect.h.
->
-> Signed-off-by: Quentin Perret <qperret@google.com>
-> ---
->  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  2 ++
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 17 ++++++++++++++++-
->  2 files changed, 18 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> index ae355bfd8c01..47c2a0c51612 100644
-> --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> @@ -49,6 +49,8 @@ extern struct host_kvm host_kvm;
->  int __pkvm_prot_finalize(void);
->  int __pkvm_mark_hyp(phys_addr_t start, phys_addr_t end);
->
-> +int host_stage2_idmap_locked(u64 start, u64 end, enum kvm_pgtable_prot prot);
-> +int host_stage2_set_owner_locked(u64 start, u64 end, u8 owner_id);
->  int kvm_host_prepare_stage2(void *pgt_pool_base);
->  void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt);
->
-> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> index 70c57d2c3024..a7f6134789e0 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> @@ -272,6 +272,21 @@ static int host_stage2_adjust_range(u64 addr, struct kvm_mem_range *range)
->         return 0;
->  }
->
-> +int host_stage2_idmap_locked(u64 start, u64 end, enum kvm_pgtable_prot prot)
-> +{
-> +       hyp_assert_lock_held(&host_kvm.lock);
-> +
-> +       return host_stage2_try(__host_stage2_idmap, start, end, prot);
-> +}
-> +
-> +int host_stage2_set_owner_locked(u64 start, u64 end, u8 owner_id)
-> +{
-> +       hyp_assert_lock_held(&host_kvm.lock);
-> +
-> +       return host_stage2_try(kvm_pgtable_stage2_set_owner, &host_kvm.pgt,
-> +                              start, end - start, &host_s2_pool, owner_id);
-> +}
+Yeah, I had a look last week, and this fires everywhere (KVM only adds
+a drop in an ocean of warnings).
 
-This is a potential issue elsewhere as well, but all functions in
-kvm_pgtable.h, including kvm_pgtable_stage2_set_owner, specify an
-address range via address and size. The two you have introduced here
-take a start and an end. I'm not sure if making these two consistent
-with the ones in kvm_pgtable.h would be good, or would just complicate
-things in other places.
+> If it was just the BSS, I would move the kmemleak_free_part() call to
+> finalize_hyp_mode() but there's the __hyp_rodata section as well.
+> 
+> I think we have some inconsistency with .hyp.rodata which falls under
+> _sdata.._edata while the kernel's own .rodata goes immediately after
+> _etext. Should we move __hyp_rodata outside _sdata.._edata as well? It
+> would benefit from the RO NX marking (probably more useful without the
+> protected mode). If this works, we'd only need to call kmemleak once for
+> the BSS.
+
+That's a good idea, and pretty easy to implement. I'll post a respin
+shortly.
 
 Thanks,
-/fuad
 
->  static bool host_stage2_force_pte_cb(u64 addr, u64 end, enum kvm_pgtable_prot prot)
->  {
->         /*
-> @@ -309,7 +324,7 @@ static int host_stage2_idmap(u64 addr)
->         if (ret)
->                 goto unlock;
->
-> -       ret = host_stage2_try(__host_stage2_idmap, range.start, range.end, prot);
-> +       ret = host_stage2_idmap_locked(range.start, range.end, prot);
->  unlock:
->         hyp_spin_unlock(&host_kvm.lock);
->
-> --
-> 2.32.0.432.gabb21c7263-goog
->
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
