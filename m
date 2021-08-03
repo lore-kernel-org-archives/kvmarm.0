@@ -2,77 +2,72 @@ Return-Path: <SRS0=p2dm=M2=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7351CC4338F
-	for <kvmarm@archiver.kernel.org>; Tue,  3 Aug 2021 15:56:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AEF6C432BE
+	for <kvmarm@archiver.kernel.org>; Tue,  3 Aug 2021 18:05:47 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C536D60FA0
-	for <kvmarm@archiver.kernel.org>; Tue,  3 Aug 2021 15:56:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org C536D60FA0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 9D46961040
+	for <kvmarm@archiver.kernel.org>; Tue,  3 Aug 2021 18:05:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 9D46961040
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4DDA34A1A7;
-	Tue,  3 Aug 2021 11:56:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 20AA7407E7;
+	Tue,  3 Aug 2021 14:05:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id z+oDndQJO-qQ; Tue,  3 Aug 2021 11:56:20 -0400 (EDT)
+	with ESMTP id F3bBh-WdGpif; Tue,  3 Aug 2021 14:05:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F38FF49F8F;
-	Tue,  3 Aug 2021 11:56:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 856F74A193;
+	Tue,  3 Aug 2021 14:05:42 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F16174064F
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Aug 2021 11:56:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C48CB40C88
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Aug 2021 14:05:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WOKqaz39Is4u for <kvmarm@lists.cs.columbia.edu>;
- Tue,  3 Aug 2021 11:56:16 -0400 (EDT)
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3FC2E40463
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Aug 2021 11:56:16 -0400 (EDT)
-Received: from dggems703-chm.china.huawei.com (unknown [172.30.72.60])
- by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4GfKCL1Y7lzmmZs;
- Tue,  3 Aug 2021 23:53:02 +0800 (CST)
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- dggems703-chm.china.huawei.com (10.3.19.180) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Tue, 3 Aug 2021 23:56:10 +0800
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.2176.012; Tue, 3 Aug 2021 16:56:09 +0100
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: Will Deacon <will@kernel.org>
-Subject: RE: [PATCH v3 4/4] KVM: arm64: Clear active_vmids on vCPU schedule out
-Thread-Topic: [PATCH v3 4/4] KVM: arm64: Clear active_vmids on vCPU schedule
- out
-Thread-Index: AQHXhGar1JrryboKrU+7h+yU/0K2/6thny2AgAAaZCCAACXigIAAEl3Q
-Date: Tue, 3 Aug 2021 15:56:08 +0000
-Message-ID: <58bf7a27a4c440c685c6b1e7c9325441@huawei.com>
-References: <20210729104009.382-1-shameerali.kolothum.thodi@huawei.com>
- <20210729104009.382-5-shameerali.kolothum.thodi@huawei.com>
- <20210803114034.GB30853@willie-the-truck>
- <ee2863107d614ef8a36006b5aa912eca@huawei.com>
- <20210803153036.GA31125@willie-the-truck>
-In-Reply-To: <20210803153036.GA31125@willie-the-truck>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.47.86.18]
+ with ESMTP id eVM92Ah1o0mh for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  3 Aug 2021 14:05:40 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 83417407E7
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Aug 2021 14:05:40 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 2E36260F48;
+ Tue,  3 Aug 2021 18:05:34 +0000 (UTC)
+Date: Tue, 3 Aug 2021 19:05:26 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Mike Rapoport <rppt@kernel.org>
+Subject: Re: [PATCH v3] memblock: make memblock_find_in_range method private
+Message-ID: <20210803180526.GD5786@arm.com>
+References: <20210803064218.6611-1-rppt@kernel.org>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
- "maz@kernel.org" <maz@kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- Linuxarm <linuxarm@huawei.com>,
- "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <20210803064218.6611-1-rppt@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: Peter Zijlstra <peterz@infradead.org>,
+ Dave Hansen <dave.hansen@linux.intel.com>, linux-mips@vger.kernel.org,
+ linux-mm@kvack.org, Will Deacon <will@kernel.org>,
+ "H. Peter Anvin" <hpa@zytor.com>, linux-riscv@lists.infradead.org,
+ Frank Rowand <frowand.list@gmail.com>, kvmarm@lists.cs.columbia.edu,
+ linux-s390@vger.kernel.org, linux-acpi@vger.kernel.org,
+ Marc Zyngier <maz@kernel.org>, x86@kernel.org,
+ Russell King <linux@armlinux.org.uk>, Mike Rapoport <rppt@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, Ingo Molnar <mingo@redhat.com>,
+ Len Brown <lenb@kernel.org>, devicetree@vger.kernel.org,
+ Albert Ou <aou@eecs.berkeley.edu>, Vasily Gorbik <gor@linux.ibm.com>,
+ Heiko Carstens <hca@linux.ibm.com>, Rob Herring <robh+dt@kernel.org>,
+ Borislav Petkov <bp@alien8.de>, Andy Lutomirski <luto@kernel.org>,
+ Paul Walmsley <paul.walmsley@sifive.com>,
+ "Kirill A. Shutemov" <kirill@shutemov.name>,
+ Thomas Gleixner <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rjw@rjwysocki.net>, linux-kernel@vger.kernel.org,
+ Palmer Dabbelt <palmer@dabbelt.com>, Andrew Morton <akpm@linux-foundation.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -89,103 +84,74 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+On Tue, Aug 03, 2021 at 09:42:18AM +0300, Mike Rapoport wrote:
+> diff --git a/arch/arm64/mm/init.c b/arch/arm64/mm/init.c
+> index 8490ed2917ff..0bffd2d1854f 100644
+> --- a/arch/arm64/mm/init.c
+> +++ b/arch/arm64/mm/init.c
+> @@ -74,6 +74,7 @@ phys_addr_t arm64_dma_phys_limit __ro_after_init;
+>  static void __init reserve_crashkernel(void)
+>  {
+>  	unsigned long long crash_base, crash_size;
+> +	unsigned long long crash_max = arm64_dma_phys_limit;
+>  	int ret;
+>  
+>  	ret = parse_crashkernel(boot_command_line, memblock_phys_mem_size(),
+> @@ -84,33 +85,18 @@ static void __init reserve_crashkernel(void)
+>  
+>  	crash_size = PAGE_ALIGN(crash_size);
+>  
+> -	if (crash_base == 0) {
+> -		/* Current arm64 boot protocol requires 2MB alignment */
+> -		crash_base = memblock_find_in_range(0, arm64_dma_phys_limit,
+> -				crash_size, SZ_2M);
+> -		if (crash_base == 0) {
+> -			pr_warn("cannot allocate crashkernel (size:0x%llx)\n",
+> -				crash_size);
+> -			return;
+> -		}
+> -	} else {
+> -		/* User specifies base address explicitly. */
+> -		if (!memblock_is_region_memory(crash_base, crash_size)) {
+> -			pr_warn("cannot reserve crashkernel: region is not memory\n");
+> -			return;
+> -		}
+> +	/* User specifies base address explicitly. */
+> +	if (crash_base)
+> +		crash_max = crash_base + crash_size;
+>  
+> -		if (memblock_is_region_reserved(crash_base, crash_size)) {
+> -			pr_warn("cannot reserve crashkernel: region overlaps reserved memory\n");
+> -			return;
+> -		}
+> -
+> -		if (!IS_ALIGNED(crash_base, SZ_2M)) {
+> -			pr_warn("cannot reserve crashkernel: base address is not 2MB aligned\n");
+> -			return;
+> -		}
+> +	/* Current arm64 boot protocol requires 2MB alignment */
+> +	crash_base = memblock_phys_alloc_range(crash_size, SZ_2M,
+> +					       crash_base, crash_max);
+> +	if (!crash_base) {
+> +		pr_warn("cannot allocate crashkernel (size:0x%llx)\n",
+> +			crash_size);
+> +		return;
+>  	}
+> -	memblock_reserve(crash_base, crash_size);
 
+We'll miss a bit on debug information provided to the user in case of a
+wrong crash_base/size option on the command line. Not sure we care much,
+though the alignment would probably be useful (maybe we document it
+somewhere).
 
-> -----Original Message-----
-> From: Will Deacon [mailto:will@kernel.org]
-> Sent: 03 August 2021 16:31
-> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-> Cc: linux-arm-kernel@lists.infradead.org; kvmarm@lists.cs.columbia.edu;
-> linux-kernel@vger.kernel.org; maz@kernel.org; catalin.marinas@arm.com;
-> james.morse@arm.com; julien.thierry.kdev@gmail.com;
-> suzuki.poulose@arm.com; jean-philippe@linaro.org;
-> Alexandru.Elisei@arm.com; qperret@google.com; Linuxarm
-> <linuxarm@huawei.com>
-> Subject: Re: [PATCH v3 4/4] KVM: arm64: Clear active_vmids on vCPU
-> schedule out
-> 
-> On Tue, Aug 03, 2021 at 12:55:25PM +0000, Shameerali Kolothum Thodi
-> wrote:
-> > > > diff --git a/arch/arm64/kvm/vmid.c b/arch/arm64/kvm/vmid.c
-> > > > index 5584e84aed95..5fd51f5445c1 100644
-> > > > --- a/arch/arm64/kvm/vmid.c
-> > > > +++ b/arch/arm64/kvm/vmid.c
-> > > > @@ -116,6 +116,12 @@ static u64 new_vmid(struct kvm_vmid
-> > > *kvm_vmid)
-> > > >  	return idx2vmid(vmid) | generation;
-> > > >  }
-> > > >
-> > > > +/* Call with preemption disabled */
-> > > > +void kvm_arm_vmid_clear_active(void)
-> > > > +{
-> > > > +	atomic64_set(this_cpu_ptr(&active_vmids), 0);
-> > > > +}
-> > >
-> > > I think this is very broken, as it will force everybody to take the
-> > > slow-path when they see an active_vmid of 0.
-> >
-> > Yes. I have seen that happening in my test setup.
-> 
-> Why didn't you say so?!
+What I haven't checked is whether memblock_phys_alloc_range() aims to
+get a 2MB aligned end (size) as well. If crash_size is not 2MB aligned,
+crash_max wouldn't be either and the above could fail. We only care
+about the crash_base to be aligned but the memblock_phys_alloc_range()
+doc says that both the start and size would be aligned to this.
 
-Sorry. I thought of getting some performance numbers with and
-without this patch and measure the impact. But didn't quite get time
-to finish it yet.
- 
-> 
-> > > It also doesn't solve the issue I mentioned before, as an active_vmid of 0
-> > > means that the reserved vmid is preserved.
-> > >
-> > > Needs more thought...
-> >
-> > How about we clear all the active_vmids in kvm_arch_free_vm() if it
-> > matches the kvm_vmid->id ? But we may have to hold the lock
-> > there
-> 
-> I think we have to be really careful not to run into the "suspended
-> animation" problem described in ae120d9edfe9 ("ARM: 7767/1: let the ASID
-> allocator handle suspended animation") if we go down this road.
-
-
-Ok. I will go through that.
- 
-> Maybe something along the lines of:
-> 
-> ROLLOVER
-> 
->   * Take lock
->   * Inc generation
->     => This will force everybody down the slow path
->   * Record active VMIDs
->   * Broadcast TLBI
->     => Only active VMIDs can be dirty
->     => Reserve active VMIDs and mark as allocated
-> 
-> VCPU SCHED IN
-> 
->   * Set active VMID
->   * Check generation
->   * If mismatch then:
->         * Take lock
->         * Try to match a reserved VMID
->         * If no reserved VMID, allocate new
-> 
-> VCPU SCHED OUT
-> 
->   * Clear active VMID
-> 
-> but I'm not daft enough to think I got it right first time. I think it
-> needs both implementing *and* modelling in TLA+ before we merge it!
-> 
-
-Ok. I need some time to digest the above first :).
-
-On another note, how serious do you think is the problem of extra
-reservation of the VMID space? Just wondering if we can skip this
-patch for now or not..
-
-Thanks,
-Shameer
+-- 
+Catalin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
