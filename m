@@ -8,81 +8,82 @@ X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C19D0C4338F
-	for <kvmarm@archiver.kernel.org>; Tue,  3 Aug 2021 10:23:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D47E2C4338F
+	for <kvmarm@archiver.kernel.org>; Tue,  3 Aug 2021 10:24:22 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 36F6460F58
-	for <kvmarm@archiver.kernel.org>; Tue,  3 Aug 2021 10:23:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 36F6460F58
+	by mail.kernel.org (Postfix) with ESMTP id 62DD960F58
+	for <kvmarm@archiver.kernel.org>; Tue,  3 Aug 2021 10:24:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 62DD960F58
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B3B39406AD;
-	Tue,  3 Aug 2021 06:23:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 044DA40799;
+	Tue,  3 Aug 2021 06:24:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id zOzzgk08FtVA; Tue,  3 Aug 2021 06:23:54 -0400 (EDT)
+	with ESMTP id rLDy4r+INt9C; Tue,  3 Aug 2021 06:24:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 91B70407F1;
-	Tue,  3 Aug 2021 06:23:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C0162406AD;
+	Tue,  3 Aug 2021 06:24:20 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 59359406AD
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Aug 2021 06:23:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C6E624064F
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Aug 2021 06:24:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JeX8DCizX-7w for <kvmarm@lists.cs.columbia.edu>;
- Tue,  3 Aug 2021 06:23:52 -0400 (EDT)
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com
- [209.85.221.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3A01E40629
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Aug 2021 06:23:52 -0400 (EDT)
-Received: by mail-wr1-f51.google.com with SMTP id h13so11268451wrp.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 03 Aug 2021 03:23:52 -0700 (PDT)
+ with ESMTP id 0RoNfujwOcUB for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  3 Aug 2021 06:24:18 -0400 (EDT)
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com
+ [209.85.221.46])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 827AC40629
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Aug 2021 06:24:18 -0400 (EDT)
+Received: by mail-wr1-f46.google.com with SMTP id z4so24768868wrv.11
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 03 Aug 2021 03:24:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=4nP9D6D93L6qc5wew7Nn46YCj/dOgm/CGIsmnHV7G9M=;
- b=Ho4RQEFtqmvBySDaWHiw1aTqR3SvwRCIavU7WYhFyFZhuNLD+JoxHFCrzhAGnlwv45
- nGcmz5APzAtb38Smfo7PXQOSiH9KG+hvvvDyezbbCsXufg9MGoEC2R5Hdso09fGEMt6q
- SvkrB1zNZe8acO7dxYIUmRnRXfp6O3KpfKQrqXJdOX8R+4/+K1zFHXDlzjLJ/HOYxZtH
- FYAc+DfRi8FWVr0tTLlKp54se6JvxmOaP/V4ia6YKhaHu5fhhzBDNVmUGB2ktw/ZXwSx
- R1cpS1W9iOhYU6OAgDBOYDoRukjsvsNjbWcfyU9AmBb67uctkwKkttxb7JCAhkUatIxC
- Yv+A==
+ bh=d6Nsv/xNSHs2Om+wxrSlYuqNQWvEFvnUhoy5ThkMx0Q=;
+ b=FP0D12uUpP5OBvBJhAyl2dhq/xIpjHa4hZWkq4WRNfgxNtiPI5C6WPYX+SGVeC3ukl
+ ZWEGnBrN5n6lwuVMkQyX0O7o8hsbO7aJ8dYH1ye3Tpp7c4cGB/2sVFrXYy12qm5rGvds
+ hkTc+cakkXC9bcPjo4laVstTV0GDVZrfNNWrsIMRP+Tau4jPgy2iP2jvKkZiDWjfFrFy
+ cP6Sozo7M0T5i08TOHBQfZd/TJI5Es/WHVej0aFyjpVZQZC9d2Fe7bnTPaB8Gy3tB//n
+ ETrsOto9MjuxzgoSsMaWII+VfYTMe60WGl3u0yO5efg66bp2CHBuitvheec6vOCRi9JF
+ UI9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=4nP9D6D93L6qc5wew7Nn46YCj/dOgm/CGIsmnHV7G9M=;
- b=aQZWeH3guN1nlGcop8tOPK7HDTx8RE4ps5SesBjL7DZbZ2ddRbVDSGkdMGOjYd86dv
- uFQxfnd9swbmR1VFjmLB2UsIuFT+NQVkVaqCJSUbtWY6QDtIJZgjzn7zX17ogfgX+Cuc
- po1gs2Ja0qbHG9jOvcDtmt4+D0ejq8nyZzdqC8eQQO8yGj5yPSSn0H4YZoyWifbtOzt4
- jbogX32ad4GsM1fkXh22GrRznLTFaeqQ8BNe4eIx1CohmvsQqNtLEJOCKrQfxO63jpfc
- EDZE/GEpAsUO3OH8gGvNdHx/ZXuRQEDQSZDhQwhj/Z54AcZgKaLCtMiddqjas7LIlibK
- LHpw==
-X-Gm-Message-State: AOAM533kONonQ8WwqeOiTL+zvqRbtouchqfhEoUbCMGC88qqaoTF+UeL
- AggR9RJ/JFPLKAI93nrjBjWWug==
-X-Google-Smtp-Source: ABdhPJw6dFoHt9c3udAF7oPNiz9FzEP1I0FGJKO5RGfwj7M7cAIND+fyusk+0UJkJ+0JmosBwI1pOw==
-X-Received: by 2002:adf:fd90:: with SMTP id d16mr23463332wrr.105.1627986231087; 
- Tue, 03 Aug 2021 03:23:51 -0700 (PDT)
+ bh=d6Nsv/xNSHs2Om+wxrSlYuqNQWvEFvnUhoy5ThkMx0Q=;
+ b=BeakNtRn+CJw/m8h6o6J9frmt6QYsWlGz+lsPhxMYeh/S62ep/YJM1pIx2fO6aXGqF
+ 1L69DGbD+8e8vxwN16LrnIj7nUObGPDKsrbdzSdf9itfB9twSyhOUDRSxcdkCZ+kDNRG
+ erIDm7uy2hbleLVqKYZsCFqgL02YRYjx6sqzGf6suBYWi6WsL60DYlf0aoZpfhuc39xi
+ jnbbmDgxF310pR/bjJyuxhduxdK3jkoXnDnNkxtSGBwgxaIQCQ30KtLM9lyMsQm1TACd
+ 2cSbWLQx1c7OOYjCMnvck0AopebFET18tOOtzLofr4nZrXY0OnRJ9I0cMWOJNnbFBbrZ
+ xz2A==
+X-Gm-Message-State: AOAM5322BhXxT5CMVCIqVv5gsV2lKrnBnHhYCNIrxgtVGff31g2GIeoZ
+ iyVwiQDLOONAVa3wpOoGbh7XsA==
+X-Google-Smtp-Source: ABdhPJwblvZME7yKQlNor7Ndnl8b41R6jAh8T6Km7UHNqfvDgBQx1oplfzKTG7fCFMoS/YBxs1eocA==
+X-Received: by 2002:adf:f2cd:: with SMTP id d13mr22244889wrp.315.1627986257474; 
+ Tue, 03 Aug 2021 03:24:17 -0700 (PDT)
 Received: from google.com ([2a00:79e0:d:210:754:7d1b:7303:129a])
- by smtp.gmail.com with ESMTPSA id n5sm12842687wme.47.2021.08.03.03.23.50
+ by smtp.gmail.com with ESMTPSA id v15sm2179876wmj.39.2021.08.03.03.24.16
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 Aug 2021 03:23:50 -0700 (PDT)
-Date: Tue, 3 Aug 2021 11:23:47 +0100
+ Tue, 03 Aug 2021 03:24:17 -0700 (PDT)
+Date: Tue, 3 Aug 2021 11:24:14 +0100
 From: Quentin Perret <qperret@google.com>
 To: Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH v3 15/21] KVM: arm64: Introduce addr_is_memory()
-Message-ID: <YQkZMyyqgqb8+Uqq@google.com>
+Subject: Re: [PATCH v3 16/21] KVM: arm64: Enable retrieving protections
+ attributes of PTEs
+Message-ID: <YQkZTnVLwVYDFvoA@google.com>
 References: <20210729132818.4091769-1-qperret@google.com>
- <20210729132818.4091769-16-qperret@google.com>
- <CA+EHjTxrdA3wVsBe7zwvvGUGgoWuaGwuWCBL0k2+FcAdTGB=Qw@mail.gmail.com>
+ <20210729132818.4091769-17-qperret@google.com>
+ <CA+EHjTwL+grX__03SfeDdxeppjSovEZhKRvqjmA_4kSBwsjswg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <CA+EHjTxrdA3wVsBe7zwvvGUGgoWuaGwuWCBL0k2+FcAdTGB=Qw@mail.gmail.com>
+In-Reply-To: <CA+EHjTwL+grX__03SfeDdxeppjSovEZhKRvqjmA_4kSBwsjswg@mail.gmail.com>
 Cc: kernel-team@android.com, qwandor@google.com, maz@kernel.org,
  linux-kernel@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
@@ -102,48 +103,79 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Monday 02 Aug 2021 at 16:52:31 (+0200), Fuad Tabba wrote:
-> Hi Quentin.
+On Monday 02 Aug 2021 at 16:52:49 (+0200), Fuad Tabba wrote:
+> Hi Quentin,
 > 
-> On Thu, Jul 29, 2021 at 3:28 PM Quentin Perret <qperret@google.com> wrote:
+> On Thu, Jul 29, 2021 at 3:29 PM Quentin Perret <qperret@google.com> wrote:
 > >
-> > Introduce a helper usable in nVHE protected mode to check whether a
-> > physical address is in a RAM region or not.
+> > Introduce helper functions in the KVM stage-2 and stage-1 page-table
+> > manipulation library allowing to retrieve the enum kvm_pgtable_prot of a
+> > PTE. This will be useful to implement custom walkers outside of
+> > pgtable.c.
 > >
 > > Signed-off-by: Quentin Perret <qperret@google.com>
 > > ---
-> >  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h | 1 +
-> >  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 7 +++++++
-> >  2 files changed, 8 insertions(+)
+> >  arch/arm64/include/asm/kvm_pgtable.h | 20 +++++++++++++++
+> >  arch/arm64/kvm/hyp/pgtable.c         | 37 ++++++++++++++++++++++++++++
+> >  2 files changed, 57 insertions(+)
 > >
-> > diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> > index cc86598654b9..5968fbbb3514 100644
-> > --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> > +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> > @@ -51,6 +51,7 @@ extern const u8 pkvm_hyp_id;
-> >  int __pkvm_prot_finalize(void);
-> >  int __pkvm_mark_hyp(phys_addr_t start, phys_addr_t end);
+> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> > index d5ca9b6ce241..7ff9f52239ba 100644
+> > --- a/arch/arm64/include/asm/kvm_pgtable.h
+> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> > @@ -505,4 +505,24 @@ int kvm_pgtable_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
+> >   */
+> >  int kvm_pgtable_get_leaf(struct kvm_pgtable *pgt, u64 addr,
+> >                          kvm_pte_t *ptep, u32 *level);
+> > +
+> > +/**
+> > + * kvm_pgtable_stage2_pte_prot() - Retrieve the protection attributes of a
+> > + *                                stage-2 Page-Table Entry.
+> > + * @pte:       Page-table entry
+> > + *
+> > + * Return: protection attributes of the page-table entry in the enum
+> > + *        kvm_pgtable_prot format.
+> > + */
+> > +enum kvm_pgtable_prot kvm_pgtable_stage2_pte_prot(kvm_pte_t pte);
+> > +
+> > +/**
+> > + * kvm_pgtable_hyp_pte_prot() - Retrieve the protection attributes of a stage-1
+> > + *                             Page-Table Entry.
+> > + * @pte:       Page-table entry
+> > + *
+> > + * Return: protection attributes of the page-table entry in the enum
+> > + *        kvm_pgtable_prot format.
+> > + */
+> > +enum kvm_pgtable_prot kvm_pgtable_hyp_pte_prot(kvm_pte_t pte);
+> >  #endif /* __ARM64_KVM_PGTABLE_H__ */
+> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> > index 1915489bb127..a6eda8f23cb6 100644
+> > --- a/arch/arm64/kvm/hyp/pgtable.c
+> > +++ b/arch/arm64/kvm/hyp/pgtable.c
+> > @@ -363,6 +363,26 @@ static int hyp_set_prot_attr(enum kvm_pgtable_prot prot, kvm_pte_t *ptep)
+> >         return 0;
+> >  }
 > >
-> > +bool addr_is_memory(phys_addr_t phys);
+> > +enum kvm_pgtable_prot kvm_pgtable_hyp_pte_prot(kvm_pte_t pte)
+> > +{
+> > +       enum kvm_pgtable_prot prot = pte & KVM_PTE_LEAF_ATTR_HI_SW;
+> > +       u32 ap;
+> > +
+> > +       if (!kvm_pte_valid(pte))
+> > +               return prot;
+> > +
+> > +       if (!(pte & KVM_PTE_LEAF_ATTR_HI_S1_XN))
+> > +               prot |= KVM_PGTABLE_PROT_X;
+> > +
+> > +       ap = FIELD_GET(KVM_PTE_LEAF_ATTR_LO_S1_AP, pte);
+> > +       if (ap == KVM_PTE_LEAF_ATTR_LO_S1_AP_RO)
+> > +               prot |= KVM_PGTABLE_PROT_R;
+> > +       else if (ap == KVM_PTE_LEAF_ATTR_LO_S1_AP_RW)
+> > +               prot |= KVM_PGTABLE_PROT_R | KVM_PGTABLE_PROT_W;
 > 
-> I'm just wondering about the naming of the function. I understand what
-> you're trying to achieve with it, but an address without a unit that
-> conveys size or type seems to be missing something. Would
+> nit: why not use the freshly minted KVM_PGTABLE_PROT_RW?
 
-Well it does have a type no? I was hopping this would make it clear what
-it actually does.
-
-> memregion_addr_is_memory or something like that be a better
-> description, since it is what find_mem_range finds?
-
-I think the callers shouldn't need to care about the implementation
-details though. This just replies to the question 'is this physical
-address in RAM range or not?'. And I could actually imagine that we
-would change the implementation some day to avoid the binary search, but
-the users probably don't need to care.
-
-Thanks,
-Quentin
+No good reason, I'll fix that up, thanks!
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
