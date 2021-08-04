@@ -1,82 +1,87 @@
-Return-Path: <SRS0=p2dm=M2=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=rr56=M3=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19D25C4338F
-	for <kvmarm@archiver.kernel.org>; Tue,  3 Aug 2021 21:18:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FA57C432BE
+	for <kvmarm@archiver.kernel.org>; Wed,  4 Aug 2021 06:59:55 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8A72860F45
-	for <kvmarm@archiver.kernel.org>; Tue,  3 Aug 2021 21:18:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 8A72860F45
+	by mail.kernel.org (Postfix) with ESMTP id CB36E60C41
+	for <kvmarm@archiver.kernel.org>; Wed,  4 Aug 2021 06:59:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org CB36E60C41
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 05D66407ED;
-	Tue,  3 Aug 2021 17:18:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4319A4A195;
+	Wed,  4 Aug 2021 02:59:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id usMq9WuaVko9; Tue,  3 Aug 2021 17:18:32 -0400 (EDT)
+	with ESMTP id N5onrKdgCGid; Wed,  4 Aug 2021 02:59:53 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D9B724066E;
-	Tue,  3 Aug 2021 17:18:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 44EBC40825;
+	Wed,  4 Aug 2021 02:59:53 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EB4864066E
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Aug 2021 17:18:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E6A740825
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Aug 2021 02:59:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aKaze-voKKPE for <kvmarm@lists.cs.columbia.edu>;
- Tue,  3 Aug 2021 17:18:29 -0400 (EDT)
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com
- [209.85.167.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B423040630
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Aug 2021 17:18:29 -0400 (EDT)
-Received: by mail-lf1-f45.google.com with SMTP id c16so891159lfc.2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 03 Aug 2021 14:18:29 -0700 (PDT)
+ with ESMTP id WDFSnL2et0hC for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  4 Aug 2021 02:59:50 -0400 (EDT)
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com
+ [209.85.167.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5771F407F1
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Aug 2021 02:59:50 -0400 (EDT)
+Received: by mail-lf1-f49.google.com with SMTP id h2so2773676lfu.4
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 03 Aug 2021 23:59:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Ta6l2xXWDT9u5jccv96eXJ1qjXmVTPggm0wilGcpdVs=;
- b=BdE9W00YEuXqcEPUPfUmVzyU+jcHWH+410m74a1ncOOtdr5zirV7UEplYvEhtLPMre
- WaJruCdCQxginzPDCczLWu89yDppye3VsjFTRRvJx0YL9OFa5tRmy2fIQWJ12YlcZfY1
- kTufqa+cc2M7lKqhQemENjDHf1CRXAyT9ZktXCzVoIaVNxD0D6KRIOYOCg1zIh1b4Jwp
- 2R3NiFWyLNR200i/dmGmjfDVaVGGG2CBL5Dh7GGv1K/XTgQCvRBZ/38jnpkv0bTShWe6
- UR72L1IOHGOyCrNc7ttsTvZYbgs4gvGld1YdPhKmDauqAZ/glfLv0vhV5gYwXRnmBPjC
- 8s3Q==
+ :cc; bh=FyMnszXXyHK4JDa0x/iclyGuG1G0X7e/HsoyPTG9034=;
+ b=O4ScIbiiu9dQgWr9MYBsJ7D7L5y53rgIr6rBY0Al0x6bLaD/QC54vpgVaAnYS29zlG
+ wkTjmNUfxliTIQ0aQU0OZEKx3pSAgIwaYbrBd1b1EdRvMIRH/oScbeKx6KYqu9swRn2z
+ AZxgEa8Lx7vQXXGr8x6tIAiHo+Z7DH/t638EfZLab02YuiXMkqPWdCqWjfTQi3GF7qc2
+ 2aPloOXQpeBfUEMuah/ScHkmRqOGL7yVTNpRmH80JSlRIDGcHGk3W53rikKcZOO4W5AF
+ BrdYfrxYYa6MBdMuPOubwecXugERvoLpUwVVLNrk/9pAsbsWG8GIQ1HzzXBMUjA62zoJ
+ RdMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=Ta6l2xXWDT9u5jccv96eXJ1qjXmVTPggm0wilGcpdVs=;
- b=mFAVbKQnF7G5KN5ixW6Tk4AStG7WMc+buh17a5QSMK/kgWzJ3t9cCWWyQ2x3Tw2zMp
- 2RoXyJ2t8JgQOQRl8bkzxEVEKXfETmK+V8ZLbngf2ekEz1hNaJtWdsSxBijP4YRhmrHy
- SeEKEjMBgMKjSqzKlby57rPJCm3tcCy0OVFXZIcuf5fsaO6Ik95yD5J5VfC2qteskiHX
- jdHEOM06WsorTyGIjtHv8NC4S/wt7fXf3e5nmtIE/BBna+EZhBI4gSjO/sqbTiXK6I18
- BT/VuOxLfpVKwYGpZq62gB/bj8pOMIcbviTF3DKU5LDfjh1W/I22mZZufXWAYvkrU6cH
- mtQg==
-X-Gm-Message-State: AOAM5318ASnyDakKaqMOEOlDhTSjJ+GDri20ApE3wZSUtlU60HLZ6fmn
- PdcotVtfUCfV3zcNWY5UGg3p7eLBBGYMxEESypJCcA==
-X-Google-Smtp-Source: ABdhPJxHnayzG6ipEbIowb4o96jcK4d1APZCmmGvNA676lxtxxTmkXjlKp38rlwEV12gMG1y7qkziiPC0bhMql6xLi8=
-X-Received: by 2002:ac2:57cd:: with SMTP id k13mr147309lfo.117.1628025508018; 
- Tue, 03 Aug 2021 14:18:28 -0700 (PDT)
+ bh=FyMnszXXyHK4JDa0x/iclyGuG1G0X7e/HsoyPTG9034=;
+ b=kUvraHDxkSh1USQBajqEYGwLLGPyeg09aqlEiOov2bkxHYeaXf7wAOPNAVErVUK+74
+ XgnOj0San5/uUmLsFTvqb1a8K2H3htrPG9jxueQYy8ar9Y7nmz7U1g2QQ5NAh8ivNBiH
+ CUeizsugsjd86VuLJpgqLsmmPVxn6KKn/vy89IJXRq7p3Pl9AeLCS9EnHd4L1s93hN26
+ FY5FESqOlWFmrqw5kX/Kv4uAEVX+GFSLwTUUbNRdpauACI/2MyVeDLnYfeXufS3VK+CQ
+ WJggwSytbG9cNnBTVzshUE5mvltVdM6ZTtMEGnJ+4S7WCf7lCHkbcyhtl/H+CbdHHtFe
+ aKUg==
+X-Gm-Message-State: AOAM5338sPrFING1IqMNiL0NGkjBgUcGmTTsqJKzF0EqKPyg+zSQ3jZg
+ nXIgqOrnpBFrhXsNdjH5n/QhBO3Fzjpqw43+AglNhw==
+X-Google-Smtp-Source: ABdhPJw2rUXELmIWFkaMKtzqgTKfHrd105kgYzO8xlzBjLxsLAtt/jBBP3NH6qpDRWX+ZhCBAP9JdOZwYa8M2d7kCpc=
+X-Received: by 2002:a05:6512:314a:: with SMTP id
+ s10mr1127161lfi.57.1628060388794; 
+ Tue, 03 Aug 2021 23:59:48 -0700 (PDT)
 MIME-Version: 1.0
 References: <20210729173300.181775-1-oupton@google.com>
- <20210729173300.181775-3-oupton@google.com>
- <YQRAGSJ1PxwXA2m/@google.com>
-In-Reply-To: <YQRAGSJ1PxwXA2m/@google.com>
+ <20210729173300.181775-12-oupton@google.com>
+ <875yws2h5w.wl-maz@kernel.org>
+ <CAOQ_QsgCrEWQqakicR3Peu_c8oCMeq8Cok+CK8vJVURUwAdG0A@mail.gmail.com>
+ <87wnp722tm.wl-maz@kernel.org>
+ <CAOQ_QsiwuancUsFEVr3TBeP6yLZMfAqNRv3ww2H+hcUGfxs9LA@mail.gmail.com>
+In-Reply-To: <CAOQ_QsiwuancUsFEVr3TBeP6yLZMfAqNRv3ww2H+hcUGfxs9LA@mail.gmail.com>
 From: Oliver Upton <oupton@google.com>
-Date: Tue, 3 Aug 2021 14:18:17 -0700
-Message-ID: <CAOQ_Qsiko1U4ZQPuSkxQtzxZ_PVvW7JCMoBvY06uMoNrVSjj+g@mail.gmail.com>
-Subject: Re: [PATCH v5 02/13] KVM: x86: Refactor tsc synchronization code
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+Date: Tue, 3 Aug 2021 23:59:37 -0700
+Message-ID: <CAOQ_QsiChO1mGGOFL96d35bbLaUBXyYf9cZw1h-Cf3G4P=1YXg@mail.gmail.com>
+Subject: Re: [PATCH v5 11/13] KVM: arm64: Provide userspace access to the
+ physical counter offset
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
  Peter Shier <pshier@google.com>, Raghavendra Rao Anata <rananta@google.com>,
  David Matlack <dmatlack@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
@@ -97,104 +102,29 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Jul 30, 2021 at 11:08 AM Sean Christopherson <seanjc@google.com> wrote:
+Hi Marc,
+
+On Fri, Jul 30, 2021 at 9:48 AM Oliver Upton <oupton@google.com> wrote:
 >
-> On Thu, Jul 29, 2021, Oliver Upton wrote:
-> > Refactor kvm_synchronize_tsc to make a new function that allows callers
-> > to specify TSC parameters (offset, value, nanoseconds, etc.) explicitly
-> > for the sake of participating in TSC synchronization.
+> On Fri, Jul 30, 2021 at 9:18 AM Marc Zyngier <maz@kernel.org> wrote:
+> > You want the ARM FVP model, or maybe even the Foundation model. It has
+> > support all the way to ARMv8.7 apparently. I personally use the FVP,
+> > get in touch offline and I'll help you with the setup.
 > >
-> > This changes the locking semantics around TSC writes.
+> > In general, I tend to trust the ARM models a lot more than QEMU for
+> > the quality of the emulation. You can tune it in some bizarre way
+> > (the cache modelling is terrifying), and it will definitely do all
+> > kind of crazy reordering and speculation.
 >
-> "refactor" and "changes the locking semantics" are somewhat contradictory.  The
-> correct way to do this is to first change the locking semantics, then extract the
-> helper you want.  That makes review and archaeology easier, and isolates the
-> locking change in case it isn't so safe after all.
-
-Indeed, it was mere laziness doing so :)
-
-> > Writes to the TSC will now take the pvclock gtod lock while holding the tsc
-> > write lock, whereas before these locks were disjoint.
-> >
-> > Reviewed-by: David Matlack <dmatlack@google.com>
-> > Signed-off-by: Oliver Upton <oupton@google.com>
-> > ---
-> > +/*
-> > + * Infers attempts to synchronize the guest's tsc from host writes. Sets the
-> > + * offset for the vcpu and tracks the TSC matching generation that the vcpu
-> > + * participates in.
-> > + *
-> > + * Must hold kvm->arch.tsc_write_lock to call this function.
->
-> Drop this blurb, lockdep assertions exist for a reason :-)
+> Awesome, thanks. I'll give this a try.
 >
 
-Ack.
-
-> > + */
-> > +static void __kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 offset, u64 tsc,
-> > +                               u64 ns, bool matched)
-> > +{
-> > +     struct kvm *kvm = vcpu->kvm;
-> > +     bool already_matched;
->
-> Eww, not your code, but "matched" and "already_matched" are not helpful names,
-> e.g. they don't provide a clue as to _what_ matched, and thus don't explain why
-> there are two separate variables.  And I would expect an "already" variant to
-> come in from the caller, not the other way 'round.
->
->   matched         => freq_matched
->   already_matched => gen_matched
-
-Yeah, everything this series touches is a bit messy. I greedily
-avoided the pile of cleanups that are needed, but alas...
-
-> > +     spin_lock_irqsave(&kvm->arch.pvclock_gtod_sync_lock, flags);
->
-> I believe this can be spin_lock(), since AFAICT the caller _must_ disable IRQs
-> when taking tsc_write_lock, i.e. we know IRQs are disabled at this point.
-
-Definitely.
-
-
->
-> > +     if (!matched) {
-> > +             /*
-> > +              * We split periods of matched TSC writes into generations.
-> > +              * For each generation, we track the original measured
-> > +              * nanosecond time, offset, and write, so if TSCs are in
-> > +              * sync, we can match exact offset, and if not, we can match
-> > +              * exact software computation in compute_guest_tsc()
-> > +              *
-> > +              * These values are tracked in kvm->arch.cur_xxx variables.
-> > +              */
-> > +             kvm->arch.nr_vcpus_matched_tsc = 0;
-> > +             kvm->arch.cur_tsc_generation++;
-> > +             kvm->arch.cur_tsc_nsec = ns;
-> > +             kvm->arch.cur_tsc_write = tsc;
-> > +             kvm->arch.cur_tsc_offset = offset;
->
-> IMO, adjusting kvm->arch.cur_tsc_* belongs outside of pvclock_gtod_sync_lock.
-> Based on the existing code, it is protected by tsc_write_lock.  I don't care
-> about the extra work while holding pvclock_gtod_sync_lock, but it's very confusing
-> to see code that reads variables outside of a lock, then take a lock and write
-> those same variables without first rechecking.
->
-> > +             matched = false;
->
-> What's the point of clearing "matched"?  It's already false...
-
-None, besides just yanking the old chunk of code :)
-
->
-> > +     } else if (!already_matched) {
-> > +             kvm->arch.nr_vcpus_matched_tsc++;
-> > +     }
-> > +
-> > +     kvm_track_tsc_matching(vcpu);
-> > +     spin_unlock_irqrestore(&kvm->arch.pvclock_gtod_sync_lock, flags);
-> > +}
-> > +
+I have another spin of this series ready to kick out the door that
+implements ECV support but ran into some issues testing it... Seems
+that the ARM Foundation model only implements ECV=0x01, when we need
+ECV=0x02 for CNTPOFF_EL2 to be valid. Any thoughts, or shall I just
+send out the series and stare at it long enough to make sure the ECV
+parts look right ;-)
 
 --
 Thanks,
