@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC135C432BE
-	for <kvmarm@archiver.kernel.org>; Wed,  4 Aug 2021 08:59:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07142C4338F
+	for <kvmarm@archiver.kernel.org>; Wed,  4 Aug 2021 08:59:03 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8326260FC4
-	for <kvmarm@archiver.kernel.org>; Wed,  4 Aug 2021 08:59:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 8326260FC4
+	by mail.kernel.org (Postfix) with ESMTP id AEFB160F6F
+	for <kvmarm@archiver.kernel.org>; Wed,  4 Aug 2021 08:59:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org AEFB160F6F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 36D954A7FD;
-	Wed,  4 Aug 2021 04:59:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 641D64B09A;
+	Wed,  4 Aug 2021 04:59:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id n3qQltXW7Gbe; Wed,  4 Aug 2021 04:59:00 -0400 (EDT)
+	with ESMTP id XCtia5Omtwo5; Wed,  4 Aug 2021 04:59:01 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DF984B0AC;
-	Wed,  4 Aug 2021 04:58:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5FC654B08A;
+	Wed,  4 Aug 2021 04:59:00 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AC17B40C88
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Aug 2021 04:58:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 14FA14A483
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Aug 2021 04:58:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MecODjaQL2Qs for <kvmarm@lists.cs.columbia.edu>;
- Wed,  4 Aug 2021 04:58:54 -0400 (EDT)
-Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com
- [209.85.219.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D32044B096
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Aug 2021 04:58:52 -0400 (EDT)
-Received: by mail-qv1-f73.google.com with SMTP id
- y10-20020a0cd98a0000b029032ca50bbea1so1286721qvj.12
- for <kvmarm@lists.cs.columbia.edu>; Wed, 04 Aug 2021 01:58:52 -0700 (PDT)
+ with ESMTP id mDwKb4Ule-Mg for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  4 Aug 2021 04:58:58 -0400 (EDT)
+Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com
+ [209.85.160.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 027884A7FD
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Aug 2021 04:58:55 -0400 (EDT)
+Received: by mail-qt1-f202.google.com with SMTP id
+ e16-20020ac867100000b0290257b7db4a28so747730qtp.9
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 04 Aug 2021 01:58:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=h8C+AkSSxjD2I6RXdGSsBwEWeDSTzFjVwyFJmn30s0c=;
- b=vdFpyj+9XNPjdYnHOx6TwDyWXfkwfTUZA5Sw6ri/Z+MfoVjX9B5ei1iIA6qchNTckg
- Js4/woRxok9rGl937dT5UR6w8jykMhwsS++V75ZeD8wlloCL6wCsYKsehUNaIOE43JeR
- Z2I0iFTOk5qzEKQKx3u2dbLLBMotmDxqqKCR94OqjLYyygFGecaxna6m9TnnTENZ1dlO
- BcCV64E3066DzzNmcmkPW3oPneJUjkCGeWxgt3hXPaU/8EVSRFSD6lZNyz1DT33Lkoi7
- qZmZBVlnNgK5BwZRYc/LHdxEGICI0QBX432vw8WwyIBzzYfANL3FddNoQdY4qIW6LGFV
- epqw==
+ :cc; bh=xEsi9T4OqglNe742KkivPaDxPwp3ZoFaFAtWROXbBVo=;
+ b=ChSZQBwkJB66ulFJ3pUxF49mjFQq4MBi3vZvx3rv+9LE+Wi7bTs1eRJQzexlr+JRSY
+ n8GGWqtHE6Gj0UzXp8u7OVcee5UjmtXgNekWCLLa5kYlfHloNwdxCdc+Ct0rKHZ9H5MS
+ Lkfrmt/805DmNFA9xjBhD6iryqm8HFC8yEIAfGsd6QT62XFkkQdbUnqv+KeQRQQcaoKc
+ ooADx9GQgfZmou14MKEHG/t4rhEESUtzhs6w4fmnvAlQZTc1x6TOFShLv0Ltd4CyQ4mp
+ W5tQu0tDthrEE4M9igHoxYjuLR+gA4eHJ/5/Iob0qnQunOUx/bJFNJrWm1phkPrntUr2
+ kgbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=h8C+AkSSxjD2I6RXdGSsBwEWeDSTzFjVwyFJmn30s0c=;
- b=TRhAl74pvM0lOsWmVfCFnGGOU79k/Xp+wvYknz5bRK23XeBcm6EXmrr8a6oil2s+Qg
- rAHbdJxXoHE/SsPGugXdMMQU14VxslsmtuseehiI9aiDcbNlOHKuCGFNSwIbXeN3ljmN
- pawGErD1zHcmshq8DL4Ug/uSZKlzmq0Rj0rbGe6YW4s5VLvrhnK80LwmC86AqktrRD09
- KRw4IMx7WT0G35HPvbpTsY9HYLQlEji+R9oB7YKegl160JfNwkoEc20alimx0n7wlzGp
- iCTSDpZU/5vrl9DyF1Ujj6lXEExRZLysv/MVD8yPeE8upDWS/lxjj9tPYcg+WSpOd9d8
- 3jGQ==
-X-Gm-Message-State: AOAM531cHoOQGKmsI01BQKhCRXmcaxEETDYnHrpIgXCe2gKjTb9qXkIY
- 0hEUT27u2s18r1Z6rXLx9S+GstDcM/4=
-X-Google-Smtp-Source: ABdhPJx+GeA32n6jMUHsP7WogSpQpinH4eyTOFkLIo8qvlVC8zogWUDIRuiTAtVqSj3R5xgXeAPAlnAcOpw=
+ bh=xEsi9T4OqglNe742KkivPaDxPwp3ZoFaFAtWROXbBVo=;
+ b=pX5xgtEt3SmOz3FxsJkGXE24nPLOYhOdqNjRhIoErdkT+tWLnuT7oYv9aauLaQTUaH
+ di7TVos7ywQwjMr931gOp5su4/3JL6Q61+0+LpXlDzaWOdnbQ99uDFLqj/N+YqLe5YHv
+ qgDyn/GAB8WU0UpBDSmy/xvLZ48RsynkSqphO2PIXN05BTcoeTMS+2veRiCaM1gNKq3i
+ RdkDgd1OzJO2FtKfSWW2kq2dDZBQzkUfZUj/L8km3nnoBKMGrKFz/ZLVp1vFt+Ge5/h1
+ z/4XxdWPaaswt13qNmDrrogUc1qqxWo6MLKZ2XEOwlukTs5pBqbWV4M3JhFZAMAQKFK+
+ u5Fg==
+X-Gm-Message-State: AOAM530jkpyEQieMlceWCmxPWVTwoXhOSlBGikRVphi9yUMRq+klfJGy
+ a+QiF6yUh0cS5RAtwvaFEQW5Dn2PtTw=
+X-Google-Smtp-Source: ABdhPJw4uOQBnarbZ8Pq5S9gvLmcNwTMIjaIMpvh+qw/OSoRZsXJkePXii8fJVoN7ZA8FRpp8uLdyyoJ81g=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a05:6214:134c:: with SMTP id
- b12mr24474131qvw.39.1628067532459; Wed, 04 Aug 2021 01:58:52 -0700 (PDT)
-Date: Wed,  4 Aug 2021 08:58:14 +0000
+ (user=oupton job=sendgmr) by 2002:a05:6214:104b:: with SMTP id
+ l11mr25726502qvr.40.1628067534598; Wed, 04 Aug 2021 01:58:54 -0700 (PDT)
+Date: Wed,  4 Aug 2021 08:58:16 +0000
 In-Reply-To: <20210804085819.846610-1-oupton@google.com>
-Message-Id: <20210804085819.846610-17-oupton@google.com>
+Message-Id: <20210804085819.846610-19-oupton@google.com>
 Mime-Version: 1.0
 References: <20210804085819.846610-1-oupton@google.com>
 X-Mailer: git-send-email 2.32.0.605.g8dce9f2422-goog
-Subject: [PATCH v6 16/21] arm64: cpufeature: Enumerate support for Enhanced
- Counter Virtualization
+Subject: [PATCH v6 18/21] KVM: arm64: Configure timer traps in vcpu_load() for
+ VHE
 From: Oliver Upton <oupton@google.com>
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
@@ -99,62 +99,85 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Introduce a new cpucap to indicate if the system supports full enhanced
-counter virtualization (i.e. ID_AA64MMFR0_EL1.ECV==0x2).
+In preparation for emulated physical counter-timer offsetting, configure
+traps on every vcpu_load() for VHE systems. As before, these trap
+settings do not affect host userspace, and are only active for the
+guest.
 
+Suggested-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- arch/arm64/include/asm/sysreg.h |  2 ++
- arch/arm64/kernel/cpufeature.c  | 10 ++++++++++
- arch/arm64/tools/cpucaps        |  1 +
- 3 files changed, 13 insertions(+)
+ arch/arm64/kvm/arch_timer.c  | 10 +++++++---
+ arch/arm64/kvm/arm.c         |  4 +---
+ include/kvm/arm_arch_timer.h |  2 --
+ 3 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 7b9c3acba684..4dfc44066dfb 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -847,6 +847,8 @@
- #define ID_AA64MMFR0_ASID_SHIFT		4
- #define ID_AA64MMFR0_PARANGE_SHIFT	0
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index f15058612994..9ead94aa867d 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -51,6 +51,7 @@ static void kvm_arm_timer_write(struct kvm_vcpu *vcpu,
+ static u64 kvm_arm_timer_read(struct kvm_vcpu *vcpu,
+ 			      struct arch_timer_context *timer,
+ 			      enum kvm_arch_timer_regs treg);
++static void kvm_timer_enable_traps_vhe(void);
  
-+#define ID_AA64MMFR0_ECV_VIRT		0x1
-+#define ID_AA64MMFR0_ECV_PHYS		0x2
- #define ID_AA64MMFR0_TGRAN4_NI		0xf
- #define ID_AA64MMFR0_TGRAN4_SUPPORTED	0x0
- #define ID_AA64MMFR0_TGRAN64_NI		0xf
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 0ead8bfedf20..94c349e179d3 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -2301,6 +2301,16 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.matches = has_cpuid_feature,
- 		.min_field_value = 1,
- 	},
-+	{
-+		.desc = "Enhanced Counter Virtualization (Physical)",
-+		.capability = ARM64_ECV,
-+		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-+		.sys_reg = SYS_ID_AA64MMFR0_EL1,
-+		.sign = FTR_UNSIGNED,
-+		.field_pos = ID_AA64MMFR0_ECV_SHIFT,
-+		.matches = has_cpuid_feature,
-+		.min_field_value = ID_AA64MMFR0_ECV_PHYS,
-+	},
- 	{},
- };
+ u32 timer_get_ctl(struct arch_timer_context *ctxt)
+ {
+@@ -668,6 +669,9 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
  
-diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-index 49305c2e6dfd..d819ea614da5 100644
---- a/arch/arm64/tools/cpucaps
-+++ b/arch/arm64/tools/cpucaps
-@@ -3,6 +3,7 @@
- # Internal CPU capabilities constants, keep this list sorted
+ 	if (map.emul_ptimer)
+ 		timer_emulate(map.emul_ptimer);
++
++	if (has_vhe())
++		kvm_timer_enable_traps_vhe();
+ }
  
- BTI
-+ECV
- # Unreliable: use system_supports_32bit_el0() instead.
- HAS_32BIT_EL0_DO_NOT_USE
- HAS_32BIT_EL1
+ bool kvm_timer_should_notify_user(struct kvm_vcpu *vcpu)
+@@ -1383,12 +1387,12 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+ }
+ 
+ /*
+- * On VHE system, we only need to configure the EL2 timer trap register once,
+- * not for every world switch.
++ * On VHE system, we only need to configure the EL2 timer trap register on
++ * vcpu_load(), but not every world switch into the guest.
+  * The host kernel runs at EL2 with HCR_EL2.TGE == 1,
+  * and this makes those bits have no effect for the host kernel execution.
+  */
+-void kvm_timer_init_vhe(void)
++static void kvm_timer_enable_traps_vhe(void)
+ {
+ 	/* When HCR_EL2.E2H ==1, EL1PCEN and EL1PCTEN are shifted by 10 */
+ 	u32 cnthctl_shift = 10;
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index e9a2b8f27792..47ea1e1ba80b 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1558,9 +1558,7 @@ static void cpu_hyp_reinit(void)
+ 
+ 	cpu_hyp_reset();
+ 
+-	if (is_kernel_in_hyp_mode())
+-		kvm_timer_init_vhe();
+-	else
++	if (!is_kernel_in_hyp_mode())
+ 		cpu_init_hyp_mode();
+ 
+ 	cpu_set_hyp_vector();
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+index 615f9314f6a5..254653b42da0 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -87,8 +87,6 @@ u64 kvm_phys_timer_read(void);
+ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu);
+ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu);
+ 
+-void kvm_timer_init_vhe(void);
+-
+ bool kvm_arch_timer_get_input_level(int vintid);
+ 
+ #define vcpu_timer(v)	(&(v)->arch.timer_cpu)
 -- 
 2.32.0.605.g8dce9f2422-goog
 
