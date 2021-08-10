@@ -2,87 +2,85 @@ Return-Path: <SRS0=u6p1=NB=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93A8FC4338F
-	for <kvmarm@archiver.kernel.org>; Tue, 10 Aug 2021 17:55:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25EA6C4338F
+	for <kvmarm@archiver.kernel.org>; Tue, 10 Aug 2021 18:55:55 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0CE0160E52
-	for <kvmarm@archiver.kernel.org>; Tue, 10 Aug 2021 17:55:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 0CE0160E52
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 9688460F25
+	for <kvmarm@archiver.kernel.org>; Tue, 10 Aug 2021 18:55:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 9688460F25
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5374B4A4A0;
-	Tue, 10 Aug 2021 13:55:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1FE864A193;
+	Tue, 10 Aug 2021 14:55:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id AxCRtSTM+lzv; Tue, 10 Aug 2021 13:55:29 -0400 (EDT)
+	with ESMTP id xJ8RYrzcz5mV; Tue, 10 Aug 2021 14:55:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D4EC4A19A;
-	Tue, 10 Aug 2021 13:55:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A7094A319;
+	Tue, 10 Aug 2021 14:55:50 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C457A4A126
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Aug 2021 13:55:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2EC5749FB0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Aug 2021 14:55:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fU7M3WEM553r for <kvmarm@lists.cs.columbia.edu>;
- Tue, 10 Aug 2021 13:55:26 -0400 (EDT)
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com
- [209.85.167.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EB84149FB7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Aug 2021 13:55:25 -0400 (EDT)
-Received: by mail-lf1-f41.google.com with SMTP id d4so14298655lfk.9
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Aug 2021 10:55:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=iEmSbOy5gEtZzr1voPCTuXFrPIAMZbkD8pCZpWeVtew=;
- b=pE1Vwu3WAFXlpfiYmyVud3KTAAkqwR0aoyJFJhn55Rn9Ah+yguSJbURcSbIBZZxgIC
- 6Dy2Aglorr7uJj0k3LWLGQ8Fhb6Ig5GgqzPQa61z/hTtTcxGYTawGmqo/l89JkNIzCt8
- NBoc+Z6e0SaaurZbdvDNvRlMwXDXLjlL2jSOGA5BbYworu6qX5petwpM93U/aUnRoorR
- PS+3Zk2Un14Em4VlPrCSXQkqnyOGmUZowVlUtMAFN+6JyvJC8E864rMLZ4vZHgg3lmdR
- S6DSp76JMKdciITmJ3h/8heVPr301FSX56WoVCwrmLCS51pitR0DTsAUbuI+vWfep/2C
- 7kJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=iEmSbOy5gEtZzr1voPCTuXFrPIAMZbkD8pCZpWeVtew=;
- b=sIX1SddB6pFWv40dTPw9voRkr+yY8FbFvXtsjasWrfQlS98QJT0d7Ug+bh/TtMqAg6
- TdJFxJujJDCPG+FQM4n7GVo1A7NAPPpdiFo+gRZ0y0j+Ij6KlpxPu3ulEMQqSPLdlIOz
- q+zz09fDR+cYLKbN0CCawHR9SJKsZb2FR/tIdFjoGcA8TAo5U7DZMKKgyshhXjRp07iU
- Nz7LNhHpFcSYHBIbmjTlvkgadp1D+rs47fKSF7hW9+FDt1YqHG+8fg+GXVG1Ce+D+sQB
- GdH1ne+DT4+x58LeJgD7MOmBPppZqTZutcp70C52s8bXseqTRv77MLP+LcVVJFdXJx6e
- lidQ==
-X-Gm-Message-State: AOAM533I8cM+k8iQQs0aOeffhn2KKn0F9QE6RHzp2bS22urnkIq9ijkC
- 1+z/D7kZIpYdPQzsJ/JWKOkF1Oa2CkmsW7v3jH07og==
-X-Google-Smtp-Source: ABdhPJyXzHSEh5+Ab5c9zDAO2aMUX/LNEpn69aBlDibzm9WbQqysnahPY6RsVLwPDEroJ/8vlooWR7BycfWpA0qb/aE=
-X-Received: by 2002:ac2:429a:: with SMTP id m26mr22709610lfh.80.1628618124180; 
- Tue, 10 Aug 2021 10:55:24 -0700 (PDT)
+ with ESMTP id Zi9HmWH+n6ff for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 10 Aug 2021 14:55:47 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BBD5E49FA6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Aug 2021 14:55:47 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id A3CE160EC0;
+ Tue, 10 Aug 2021 18:55:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1628621746;
+ bh=F5kTOFRnzjAJrBKXolCjL+dzW0Enob7L6Qo6a9N/FIw=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=mnF0CNC25E4oa/W7CwgBWzcyamvcXR62RJwDP1+hoIvOaCnu6u6aaG77F5mBgJCO6
+ 4/bGSTge8ClhoeunKJAzJ948hRgjQhIptS3R43yp9ARM8MtNPwXNGLvI8CiIj/L11a
+ aS+QzDaj3VIGg6EaJg5/UnzPR69tHjLIu96HzU6VtDhhLT47ayOMpo93dX53xzQyCA
+ 0uiuaEGSP5AXuhVpYg5Gv491i3avovaTEBaFIzzGVCIjksQJmFkaS+f4ZtRb2qSNYM
+ 6NrahHn7t/d0xhmc6bQ/nDGDJevaDydcqBRpnmxTlLIiwMsiULeezD+vRbWUP3bIvk
+ 61vSADYEw+Xnw==
+Date: Tue, 10 Aug 2021 21:55:32 +0300
+From: Mike Rapoport <rppt@kernel.org>
+To: Guenter Roeck <linux@roeck-us.net>
+Subject: Re: [PATCH v3] memblock: make memblock_find_in_range method private
+Message-ID: <YRLLpImNhZaLzs3z@kernel.org>
+References: <20210803064218.6611-1-rppt@kernel.org>
+ <20210809190641.GA1176508@roeck-us.net>
 MIME-Version: 1.0
-References: <20210804085819.846610-1-oupton@google.com>
- <20210804085819.846610-18-oupton@google.com>
- <87a6lpbmbb.wl-maz@kernel.org>
-In-Reply-To: <87a6lpbmbb.wl-maz@kernel.org>
-From: Oliver Upton <oupton@google.com>
-Date: Tue, 10 Aug 2021 10:55:12 -0700
-Message-ID: <CAOQ_Qsjn4UK81qBj-uPzoejNc4GAnZXPi=mvcoVi15N0_kayAw@mail.gmail.com>
-Subject: Re: [PATCH v6 17/21] KVM: arm64: Allow userspace to configure a
- guest's counter-timer offset
-To: Marc Zyngier <maz@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org,
- Will Deacon <will@kernel.org>, Sean Christopherson <seanjc@google.com>,
- Peter Shier <pshier@google.com>, Raghavendra Rao Anata <rananta@google.com>,
- David Matlack <dmatlack@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- Jim Mattson <jmattson@google.com>
+Content-Disposition: inline
+In-Reply-To: <20210809190641.GA1176508@roeck-us.net>
+Cc: Peter Zijlstra <peterz@infradead.org>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Dave Hansen <dave.hansen@linux.intel.com>, linux-kernel@vger.kernel.org,
+ linux-mm@kvack.org, "H. Peter Anvin" <hpa@zytor.com>,
+ linux-riscv@lists.infradead.org, Frank Rowand <frowand.list@gmail.com>,
+ kvmarm@lists.cs.columbia.edu, linux-s390@vger.kernel.org,
+ Vasily Gorbik <gor@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, Marc Zyngier <maz@kernel.org>,
+ x86@kernel.org, Russell King <linux@armlinux.org.uk>,
+ Mike Rapoport <rppt@linux.ibm.com>, linux-acpi@vger.kernel.org,
+ Ingo Molnar <mingo@redhat.com>, Len Brown <lenb@kernel.org>,
+ devicetree@vger.kernel.org, Albert Ou <aou@eecs.berkeley.edu>,
+ Will Deacon <will@kernel.org>, Heiko Carstens <hca@linux.ibm.com>,
+ Rob Herring <robh+dt@kernel.org>, Borislav Petkov <bp@alien8.de>,
+ Andy Lutomirski <luto@kernel.org>, Paul Walmsley <paul.walmsley@sifive.com>,
+ "Kirill A. Shutemov" <kirill@shutemov.name>,
+ Thomas Gleixner <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rjw@rjwysocki.net>, linux-mips@vger.kernel.org,
+ Palmer Dabbelt <palmer@dabbelt.com>, Andrew Morton <akpm@linux-foundation.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -99,474 +97,148 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Aug 10, 2021 at 3:56 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> On Wed, 04 Aug 2021 09:58:15 +0100,
-> Oliver Upton <oupton@google.com> wrote:
-> >
-> > Presently, KVM provides no facilities for correctly migrating a guest
-> > that depends on the physical counter-timer. Whie most guests (barring
->
-> nit: While
+On Mon, Aug 09, 2021 at 12:06:41PM -0700, Guenter Roeck wrote:
+> On Tue, Aug 03, 2021 at 09:42:18AM +0300, Mike Rapoport wrote:
+> > From: Mike Rapoport <rppt@linux.ibm.com>
+> > 
+> > There are a lot of uses of memblock_find_in_range() along with
+> > memblock_reserve() from the times memblock allocation APIs did not exist.
+> > 
+> > memblock_find_in_range() is the very core of memblock allocations, so any
+> > future changes to its internal behaviour would mandate updates of all the
+> > users outside memblock.
+> > 
+> > Replace the calls to memblock_find_in_range() with an equivalent calls to
+> > memblock_phys_alloc() and memblock_phys_alloc_range() and make
+> > memblock_find_in_range() private method of memblock.
+> > 
+> > This simplifies the callers, ensures that (unlikely) errors in
+> > memblock_reserve() are handled and improves maintainability of
+> > memblock_find_in_range().
+> > 
+> > Signed-off-by: Mike Rapoport <rppt@linux.ibm.com>
+> 
+> I see a number of crashes in next-20210806 when booting x86 images from efi.
+> 
+> [    0.000000] efi: EFI v2.70 by EDK II
+> [    0.000000] efi: SMBIOS=0x1fbcc000 ACPI=0x1fbfa000 ACPI 2.0=0x1fbfa014 MEMATTR=0x1f25f018
+> [    0.000000] SMBIOS 2.8 present.
+> [    0.000000] DMI: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
+> [    0.000000] last_pfn = 0x1ff50 max_arch_pfn = 0x400000000
+> [    0.000000] x86/PAT: Configuration [0-7]: WB  WC  UC- UC  WB  WP  UC- WT
+> [    0.000000] Kernel panic - not syncing: alloc_low_pages: can not alloc memory
+> [    0.000000] CPU: 0 PID: 0 Comm: swapper Not tainted 5.14.0-rc4-next-20210806 #1
+> [    0.000000] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
+> [    0.000000] Call Trace:
+> [    0.000000]  ? dump_stack_lvl+0x57/0x7d
+> [    0.000000]  ? panic+0xfc/0x2c6
+> [    0.000000]  ? alloc_low_pages+0x117/0x156
+> [    0.000000]  ? phys_pmd_init+0x234/0x342
+> [    0.000000]  ? phys_pud_init+0x171/0x337
+> [    0.000000]  ? __kernel_physical_mapping_init+0xec/0x276
+> [    0.000000]  ? init_memory_mapping+0x1ea/0x2aa
+> [    0.000000]  ? init_range_memory_mapping+0xdf/0x12e
+> [    0.000000]  ? init_mem_mapping+0x1e9/0x26f
+> [    0.000000]  ? setup_arch+0x5ff/0xb6d
+> [    0.000000]  ? start_kernel+0x71/0x6b4
+> [    0.000000]  ? secondary_startup_64_no_verify+0xc2/0xcb
+> 
+> Bisect points to this patch. Reverting it fixes the problem. Key seems to
+> be the amount of memory configured in qemu; the problem is not seen if
+> there is 1G or more of memory, but it is seen with all test boots with
+> 512M or 256M of memory. It is also seen with almost all 32-bit efi boots.
+> 
+> The problem is not seen when booting without efi.
 
-Ack.
+It looks like this change uncovered a problem in
+x86::memory_map_top_down(). 
 
->
-> > NV, of course) should not depend on the physical counter-timer, an
-> > operator may wish to provide a consistent view of the physical
-> > counter-timer across migrations.
-> >
-> > Provide userspace with a new vCPU attribute to modify the guest
-> > counter-timer offset. Unlike KVM_REG_ARM_TIMER_OFFSET, this attribute is
-> > hidden from the guest's architectural state. The value offsets *both*
-> > the virtual and physical counter-timer views for the guest. Only support
-> > this attribute on ECV systems as ECV is required for hardware offsetting
-> > of the physical counter-timer.
-> >
-> > Signed-off-by: Oliver Upton <oupton@google.com>
-> > ---
-> >  Documentation/virt/kvm/devices/vcpu.rst |  28 ++++++
-> >  arch/arm64/include/asm/kvm_asm.h        |   2 +
-> >  arch/arm64/include/asm/sysreg.h         |   2 +
-> >  arch/arm64/include/uapi/asm/kvm.h       |   1 +
-> >  arch/arm64/kvm/arch_timer.c             | 122 +++++++++++++++++++++++-
-> >  arch/arm64/kvm/hyp/nvhe/hyp-main.c      |   6 ++
-> >  arch/arm64/kvm/hyp/nvhe/timer-sr.c      |   5 +
-> >  arch/arm64/kvm/hyp/vhe/timer-sr.c       |   5 +
-> >  include/clocksource/arm_arch_timer.h    |   1 +
-> >  9 files changed, 169 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
-> > index 3b399d727c11..3ba35b9d9d03 100644
-> > --- a/Documentation/virt/kvm/devices/vcpu.rst
-> > +++ b/Documentation/virt/kvm/devices/vcpu.rst
-> > @@ -139,6 +139,34 @@ configured values on other VCPUs.  Userspace should configure the interrupt
-> >  numbers on at least one VCPU after creating all VCPUs and before running any
-> >  VCPUs.
-> >
-> > +2.2. ATTRIBUTE: KVM_ARM_VCPU_TIMER_OFFSET
-> > +-----------------------------------------
-> > +
-> > +:Parameters: in kvm_device_attr.addr the address for the timer offset is a
-> > +             pointer to a __u64
-> > +
-> > +Returns:
-> > +
-> > +      ======= ==================================
-> > +      -EFAULT Error reading/writing the provided
-> > +              parameter address
-> > +      -ENXIO  Timer offsetting not implemented
-> > +      ======= ==================================
-> > +
-> > +Specifies the guest's counter-timer offset from the host's virtual counter.
-> > +The guest's physical counter value is then derived by the following
-> > +equation:
-> > +
-> > +  guest_cntpct = host_cntvct - KVM_ARM_VCPU_TIMER_OFFSET
-> > +
-> > +The guest's virtual counter value is derived by the following equation:
-> > +
-> > +  guest_cntvct = host_cntvct - KVM_REG_ARM_TIMER_OFFSET
-> > +                     - KVM_ARM_VCPU_TIMER_OFFSET
-> > +
-> > +KVM does not allow the use of varying offset values for different vCPUs;
-> > +the last written offset value will be broadcasted to all vCPUs in a VM.
-> > +
-> >  3. GROUP: KVM_ARM_VCPU_PVTIME_CTRL
-> >  ==================================
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> > index 9f0bf2109be7..ab1c8fdb0177 100644
-> > --- a/arch/arm64/include/asm/kvm_asm.h
-> > +++ b/arch/arm64/include/asm/kvm_asm.h
-> > @@ -65,6 +65,7 @@
-> >  #define __KVM_HOST_SMCCC_FUNC___pkvm_prot_finalize           19
-> >  #define __KVM_HOST_SMCCC_FUNC___pkvm_mark_hyp                        20
-> >  #define __KVM_HOST_SMCCC_FUNC___kvm_adjust_pc                        21
-> > +#define __KVM_HOST_SMCCC_FUNC___kvm_timer_set_cntpoff                22
-> >
-> >  #ifndef __ASSEMBLY__
-> >
-> > @@ -200,6 +201,7 @@ extern void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa,
-> >  extern void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu);
-> >
-> >  extern void __kvm_timer_set_cntvoff(u64 cntvoff);
-> > +extern void __kvm_timer_set_cntpoff(u64 cntpoff);
-> >
-> >  extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
-> >
-> > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> > index 4dfc44066dfb..c34672aa65b9 100644
-> > --- a/arch/arm64/include/asm/sysreg.h
-> > +++ b/arch/arm64/include/asm/sysreg.h
-> > @@ -586,6 +586,8 @@
-> >  #define SYS_ICH_LR14_EL2             __SYS__LR8_EL2(6)
-> >  #define SYS_ICH_LR15_EL2             __SYS__LR8_EL2(7)
-> >
-> > +#define SYS_CNTPOFF_EL2                      sys_reg(3, 4, 14, 0, 6)
-> > +
-> >  /* VHE encodings for architectural EL0/1 system registers */
-> >  #define SYS_SCTLR_EL12                       sys_reg(3, 5, 1, 0, 0)
-> >  #define SYS_CPACR_EL12                       sys_reg(3, 5, 1, 0, 2)
-> > diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> > index 949a31bc10f0..15150f8224a1 100644
-> > --- a/arch/arm64/include/uapi/asm/kvm.h
-> > +++ b/arch/arm64/include/uapi/asm/kvm.h
-> > @@ -366,6 +366,7 @@ struct kvm_arm_copy_mte_tags {
-> >  #define KVM_ARM_VCPU_TIMER_CTRL              1
-> >  #define   KVM_ARM_VCPU_TIMER_IRQ_VTIMER              0
-> >  #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER              1
-> > +#define   KVM_ARM_VCPU_TIMER_OFFSET          2
-> >  #define KVM_ARM_VCPU_PVTIME_CTRL     2
-> >  #define   KVM_ARM_VCPU_PVTIME_IPA    0
-> >
-> > diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> > index a8815b09da3e..f15058612994 100644
-> > --- a/arch/arm64/kvm/arch_timer.c
-> > +++ b/arch/arm64/kvm/arch_timer.c
-> > @@ -85,11 +85,15 @@ u64 timer_get_cval(struct arch_timer_context *ctxt)
-> >  static u64 timer_get_offset(struct arch_timer_context *ctxt)
-> >  {
-> >       struct kvm_vcpu *vcpu = ctxt->vcpu;
-> > +     struct arch_timer_cpu *timer = vcpu_timer(vcpu);
->
-> Unused variable?
+The allocation in alloc_low_pages() is limited by min_pfn_mapped and
+max_pfn_mapped. The min_pfn_mapped is updated at every iteration of the
+loop in memory_map_top_down, but there is another loop in
+init_range_memory_mapping() that maps several regions below the current
+min_pfn_mapped without updating this variable.
 
-Yep!
+The memory layout in qemu with 256M of RAM and EFI enabled, causes
+exhaustion of the memory limited by min_pfn_mapped and max_pfn_mapped
+before min_pfn_mapped is updated.
 
-> >
-> >       switch(arch_timer_ctx_index(ctxt)) {
-> >       case TIMER_VTIMER:
-> > +     case TIMER_PTIMER:
-> >               return ctxt->host_offset;
-> >       default:
-> > +             WARN_ONCE(1, "unrecognized timer %ld\n",
-> > +                       arch_timer_ctx_index(ctxt));
-> >               return 0;
-> >       }
-> >  }
-> > @@ -144,6 +148,7 @@ static void timer_set_offset(struct arch_timer_context *ctxt, u64 offset)
-> >
-> >       switch(arch_timer_ctx_index(ctxt)) {
-> >       case TIMER_VTIMER:
-> > +     case TIMER_PTIMER:
-> >               ctxt->host_offset = offset;
-> >               break;
-> >       default:
-> > @@ -572,6 +577,11 @@ static void set_cntvoff(u64 cntvoff)
-> >       kvm_call_hyp(__kvm_timer_set_cntvoff, cntvoff);
-> >  }
-> >
-> > +static void set_cntpoff(u64 cntpoff)
-> > +{
-> > +     kvm_call_hyp(__kvm_timer_set_cntpoff, cntpoff);
-> > +}
-> > +
-> >  static inline void set_timer_irq_phys_active(struct arch_timer_context *ctx, bool active)
-> >  {
-> >       int r;
-> > @@ -647,6 +657,8 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
-> >       }
-> >
-> >       set_cntvoff(timer_get_offset(map.direct_vtimer));
-> > +     if (cpus_have_const_cap(ARM64_ECV))
->
-> This really should be a final cap instead (same for all the other use
-> cases).
+Before this commit there was unconditional "reservation" of 2M in the end
+of the memory that moved the initial min_pfn_mapped below the memory
+reserved by EFI. The addition of check for xen_domain() removed this
+reservation for !XEN and made alloc_low_pages() use the range already busy
+with EFI data.
 
-Ack.
+The patch below moves the update of min_pfn_mapped near the update of
+max_pfn_mapped so that every time a new range is mapped both limits will be
+updated accordingly.
 
-> > +             set_cntpoff(timer_get_offset(vcpu_ptimer(vcpu)));
->
-> However, tripping to EL2 for each offset on nVHE may prove to be an
-> unnecessary overhead. Not a problem for now anyway.
->
-> >
-> >       kvm_timer_unblocking(vcpu);
-> >
-> > @@ -814,6 +826,22 @@ static void update_vtimer_cntvoff(struct kvm_vcpu *vcpu, u64 cntvoff)
-> >       mutex_unlock(&kvm->lock);
-> >  }
-> >
-> > +static void update_ptimer_cntpoff(struct kvm_vcpu *vcpu, u64 cntpoff)
-> > +{
-> > +     struct kvm *kvm = vcpu->kvm;
-> > +     u64 cntvoff;
-> > +
-> > +     mutex_lock(&kvm->lock);
-> > +
-> > +     /* adjustments to the physical offset also affect vtimer */
-> > +     cntvoff = timer_get_offset(vcpu_vtimer(vcpu));
-> > +     cntvoff += cntpoff - timer_get_offset(vcpu_ptimer(vcpu));
-> > +
-> > +     update_timer_offset(vcpu, TIMER_PTIMER, cntpoff, false);
-> > +     update_timer_offset(vcpu, TIMER_VTIMER, cntvoff, false);
-> > +     mutex_unlock(&kvm->lock);
-> > +}
-> > +
-> >  void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
-> >  {
-> >       struct arch_timer_cpu *timer = vcpu_timer(vcpu);
-> > @@ -932,6 +960,29 @@ u64 kvm_arm_timer_get_reg(struct kvm_vcpu *vcpu, u64 regid)
-> >       return (u64)-1;
-> >  }
-> >
-> > +/**
-> > + * kvm_arm_timer_read_offset - returns the guest value of CNTVOFF_EL2.
-> > + * @vcpu: the vcpu pointer
-> > + *
-> > + * Computes the guest value of CNTVOFF_EL2 by subtracting the physical
-> > + * counter offset. Note that KVM defines CNTVOFF_EL2 as the offset from the
-> > + * guest's physical counter-timer, not the host's.
-> > + *
-> > + * Returns: the guest value for CNTVOFF_EL2
-> > + */
-> > +static u64 kvm_arm_timer_read_offset(struct kvm_vcpu *vcpu)
-> > +{
-> > +     struct kvm *kvm = vcpu->kvm;
-> > +     u64 offset;
-> > +
-> > +     mutex_lock(&kvm->lock);
-> > +     offset = timer_get_offset(vcpu_vtimer(vcpu)) -
-> > +                     timer_get_offset(vcpu_ptimer(vcpu));
->
-> nit: please keep this on a single line.
->
-> > +     mutex_unlock(&kvm->lock);
-> > +
-> > +     return offset;
-> > +}
-> > +
-> >  static u64 kvm_arm_timer_read(struct kvm_vcpu *vcpu,
-> >                             struct arch_timer_context *timer,
-> >                             enum kvm_arch_timer_regs treg)
-> > @@ -957,7 +1008,7 @@ static u64 kvm_arm_timer_read(struct kvm_vcpu *vcpu,
-> >               break;
-> >
-> >       case TIMER_REG_OFFSET:
-> > -             val = timer_get_offset(timer);
-> > +             val = kvm_arm_timer_read_offset(vcpu);
-> >               break;
-> >
-> >       default:
-> > @@ -1350,6 +1401,9 @@ void kvm_timer_init_vhe(void)
-> >       val = read_sysreg(cnthctl_el2);
-> >       val |= (CNTHCTL_EL1PCEN << cnthctl_shift);
-> >       val |= (CNTHCTL_EL1PCTEN << cnthctl_shift);
-> > +
-> > +     if (cpus_have_const_cap(ARM64_ECV))
-> > +             val |= CNTHCTL_ECV;
->
-> I cannot immediately see where you are doing the equivalent enablement
-> of ECV on the nVHE path. Obviously, it has to be done eagerly from
-> EL2, together with the rest of the EL1 timer setup. Something like:
+diff --git a/arch/x86/mm/init.c b/arch/x86/mm/init.c
+index 1152a29ce109..be279f6e5a0a 100644
+--- a/arch/x86/mm/init.c
++++ b/arch/x86/mm/init.c
+@@ -1,3 +1,4 @@
++#define DEBUG
+ #include <linux/gfp.h>
+ #include <linux/initrd.h>
+ #include <linux/ioport.h>
+@@ -485,6 +486,7 @@ static void add_pfn_range_mapped(unsigned long start_pfn, unsigned long end_pfn)
+ 	nr_pfn_mapped = clean_sort_range(pfn_mapped, E820_MAX_ENTRIES);
+ 
+ 	max_pfn_mapped = max(max_pfn_mapped, end_pfn);
++	min_pfn_mapped = min(min_pfn_mapped, start_pfn);
+ 
+ 	if (start_pfn < (1UL<<(32-PAGE_SHIFT)))
+ 		max_low_pfn_mapped = max(max_low_pfn_mapped,
+@@ -643,7 +645,6 @@ static void __init memory_map_top_down(unsigned long map_start,
+ 		mapped_ram_size += init_range_memory_mapping(start,
+ 							last_start);
+ 		last_start = start;
+-		min_pfn_mapped = last_start >> PAGE_SHIFT;
+ 		if (mapped_ram_size >= step_size)
+ 			step_size = get_new_step_size(step_size);
+ 	}
+ 
 
-Yep, I had caught this when I was actually able to run the Base FVP. I
-have a fix (same as yours, basically) but held back until you reviewed
-to avoid storming your inbox :)
+> Guenter
+> 
+> ---
+> Bisect log:
+> 
+> # bad: [da454ebf578f6c542ba9f5b3ddb98db3ede109c1] Add linux-next specific files for 20210809
+> # good: [36a21d51725af2ce0700c6ebcb6b9594aac658a6] Linux 5.14-rc5
+> git bisect start 'HEAD' 'v5.14-rc5'
+> # good: [d22fda64bea5f33000e31e5b7e4ba876bca37436] Merge remote-tracking branch 'crypto/master'
+> git bisect good d22fda64bea5f33000e31e5b7e4ba876bca37436
+> # good: [b084da3a98fad27a39ed5ca64106b86df0417851] Merge remote-tracking branch 'irqchip/irq/irqchip-next'
+> git bisect good b084da3a98fad27a39ed5ca64106b86df0417851
+> # good: [a5383d1f57190a33c6afc25c62b9907d84ba2bc6] Merge remote-tracking branch 'staging/staging-next'
+> git bisect good a5383d1f57190a33c6afc25c62b9907d84ba2bc6
+> # good: [a439da3e6abeb054f4e6b0d37814e762b7340196] Merge remote-tracking branch 'seccomp/for-next/seccomp'
+> git bisect good a439da3e6abeb054f4e6b0d37814e762b7340196
+> # bad: [9801f3c0890c7b992b45a5c2afcb16c5cdc8388e] mm/idle_page_tracking: Make PG_idle reusable
+> git bisect bad 9801f3c0890c7b992b45a5c2afcb16c5cdc8388e
+> # good: [b4f7f4a9b542836683308d48ffdd18471c6f3e76] lazy-tlb-allow-lazy-tlb-mm-refcounting-to-be-configurable-fix
+> git bisect good b4f7f4a9b542836683308d48ffdd18471c6f3e76
+> # good: [e30842a48c36f094271eea0984bb861b49c49c87] mm/vmscan: add 'else' to remove check_pending label
+> git bisect good e30842a48c36f094271eea0984bb861b49c49c87
+> # bad: [65300b20a21214fb2043419d4e5da1d9947c6e15] mm/madvise: add MADV_WILLNEED to process_madvise()
+> git bisect bad 65300b20a21214fb2043419d4e5da1d9947c6e15
+> # bad: [7348da7a8c244d1a755bc5838b04cb9b1b6ee06c] memblock: make memblock_find_in_range method private
+> git bisect bad 7348da7a8c244d1a755bc5838b04cb9b1b6ee06c
+> # good: [98f8c467fe2ba8e553b450b2a3294d69f1f2027f] mm-mempolicy-convert-from-atomic_t-to-refcount_t-on-mempolicy-refcnt-fix
+> git bisect good 98f8c467fe2ba8e553b450b2a3294d69f1f2027f
+> # good: [760ded422ebe4f8899905b752d8378c44f2a78f3] mm/memplicy: add page allocation function for MPOL_PREFERRED_MANY policy
+> git bisect good 760ded422ebe4f8899905b752d8378c44f2a78f3
+> # good: [fbfa0492d9639b67119d3d94b7a6a3f85e064260] mm/mempolicy: advertise new MPOL_PREFERRED_MANY
+> git bisect good fbfa0492d9639b67119d3d94b7a6a3f85e064260
+> # good: [ff6d5759a871883aeea38309fb16d91666179328] mm/mempolicy: unify the create() func for bind/interleave/prefer-many policies
+> git bisect good ff6d5759a871883aeea38309fb16d91666179328
+> # first bad commit: [7348da7a8c244d1a755bc5838b04cb9b1b6ee06c] memblock: make memblock_find_in_range method private
 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/timer-sr.c b/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-> index 9072e71693ba..999931fe55d2 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-> @@ -26,6 +26,8 @@ void __timer_disable_traps(struct kvm_vcpu *vcpu)
->         /* Allow physical timer/counter access for the host */
->         val = read_sysreg(cnthctl_el2);
->         val |= CNTHCTL_EL1PCTEN | CNTHCTL_EL1PCEN;
-> +       if (cpus_have_final_cap(ARM64_ECV))
-> +               val |= CNTHCTL_ECV;
->         write_sysreg(val, cnthctl_el2);
->  }
->
-> @@ -42,6 +44,8 @@ void __timer_enable_traps(struct kvm_vcpu *vcpu)
->          * Physical counter access is allowed
->          */
->         val = read_sysreg(cnthctl_el2);
-> +       if (cpus_have_final_cap(ARM64_ECV))
-> +               val &= ~CNTHCTL_ECV;
->         val &= ~CNTHCTL_EL1PCEN;
->         val |= CNTHCTL_EL1PCTEN;
->         write_sysreg(val, cnthctl_el2);
->
-> This will ensure that only the guest sees the physical offset.
->
-> >       write_sysreg(val, cnthctl_el2);
-> >  }
-> >
-> > @@ -1364,7 +1418,8 @@ static void set_timer_irqs(struct kvm *kvm, int vtimer_irq, int ptimer_irq)
-> >       }
-> >  }
-> >
-> > -int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-> > +static int kvm_arm_timer_set_attr_irq(struct kvm_vcpu *vcpu,
-> > +                                   struct kvm_device_attr *attr)
-> >  {
-> >       int __user *uaddr = (int __user *)(long)attr->addr;
-> >       struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
-> > @@ -1397,7 +1452,37 @@ int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-> >       return 0;
-> >  }
-> >
-> > -int kvm_arm_timer_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-> > +static int kvm_arm_timer_set_attr_offset(struct kvm_vcpu *vcpu,
-> > +                                      struct kvm_device_attr *attr)
-> > +{
-> > +     u64 __user *uaddr = (u64 __user *)(long)attr->addr;
-> > +     u64 offset;
-> > +
-> > +     if (!cpus_have_const_cap(ARM64_ECV))
-> > +             return -ENXIO;
-> > +
-> > +     if (get_user(offset, uaddr))
-> > +             return -EFAULT;
-> > +
-> > +     update_ptimer_cntpoff(vcpu, offset);
-> > +     return 0;
-> > +}
-> > +
-> > +int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-> > +{
-> > +     switch (attr->attr) {
-> > +     case KVM_ARM_VCPU_TIMER_IRQ_VTIMER:
-> > +     case KVM_ARM_VCPU_TIMER_IRQ_PTIMER:
-> > +             return kvm_arm_timer_set_attr_irq(vcpu, attr);
-> > +     case KVM_ARM_VCPU_TIMER_OFFSET:
-> > +             return kvm_arm_timer_set_attr_offset(vcpu, attr);
-> > +     default:
-> > +             return -ENXIO;
-> > +     }
-> > +}
-> > +
-> > +static int kvm_arm_timer_get_attr_irq(struct kvm_vcpu *vcpu,
-> > +                                   struct kvm_device_attr *attr)
-> >  {
-> >       int __user *uaddr = (int __user *)(long)attr->addr;
-> >       struct arch_timer_context *timer;
-> > @@ -1418,12 +1503,43 @@ int kvm_arm_timer_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-> >       return put_user(irq, uaddr);
-> >  }
-> >
-> > +static int kvm_arm_timer_get_attr_offset(struct kvm_vcpu *vcpu,
-> > +                                      struct kvm_device_attr *attr)
-> > +{
-> > +     u64 __user *uaddr = (u64 __user *)(long)attr->addr;
-> > +     u64 offset;
-> > +
-> > +     if (!cpus_have_const_cap(ARM64_ECV))
-> > +             return -ENXIO;
-> > +
-> > +     offset = timer_get_offset(vcpu_ptimer(vcpu));
-> > +     return put_user(offset, uaddr);
-> > +}
-> > +
-> > +int kvm_arm_timer_get_attr(struct kvm_vcpu *vcpu,
-> > +                        struct kvm_device_attr *attr)
-> > +{
-> > +     switch (attr->attr) {
-> > +     case KVM_ARM_VCPU_TIMER_IRQ_VTIMER:
-> > +     case KVM_ARM_VCPU_TIMER_IRQ_PTIMER:
-> > +             return kvm_arm_timer_get_attr_irq(vcpu, attr);
-> > +     case KVM_ARM_VCPU_TIMER_OFFSET:
-> > +             return kvm_arm_timer_get_attr_offset(vcpu, attr);
-> > +     default:
-> > +             return -ENXIO;
-> > +     }
-> > +}
-> > +
-> >  int kvm_arm_timer_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-> >  {
-> >       switch (attr->attr) {
-> >       case KVM_ARM_VCPU_TIMER_IRQ_VTIMER:
-> >       case KVM_ARM_VCPU_TIMER_IRQ_PTIMER:
-> >               return 0;
-> > +     case KVM_ARM_VCPU_TIMER_OFFSET:
-> > +             if (cpus_have_const_cap(ARM64_ECV))
-> > +                     return 0;
-> > +             break;
-> >       }
-> >
-> >       return -ENXIO;
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > index 1632f001f4ed..cfa923df3af6 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > @@ -68,6 +68,11 @@ static void handle___kvm_timer_set_cntvoff(struct kvm_cpu_context *host_ctxt)
-> >       __kvm_timer_set_cntvoff(cpu_reg(host_ctxt, 1));
-> >  }
-> >
-> > +static void handle___kvm_timer_set_cntpoff(struct kvm_cpu_context *host_ctxt)
-> > +{
-> > +     __kvm_timer_set_cntpoff(cpu_reg(host_ctxt, 1));
-> > +}
-> > +
-> >  static void handle___kvm_enable_ssbs(struct kvm_cpu_context *host_ctxt)
-> >  {
-> >       u64 tmp;
-> > @@ -197,6 +202,7 @@ static const hcall_t host_hcall[] = {
-> >       HANDLE_FUNC(__pkvm_create_private_mapping),
-> >       HANDLE_FUNC(__pkvm_prot_finalize),
-> >       HANDLE_FUNC(__pkvm_mark_hyp),
-> > +     HANDLE_FUNC(__kvm_timer_set_cntpoff),
-> >  };
-> >
-> >  static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/timer-sr.c b/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-> > index 9072e71693ba..5b8b4cd02506 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-> > @@ -15,6 +15,11 @@ void __kvm_timer_set_cntvoff(u64 cntvoff)
-> >       write_sysreg(cntvoff, cntvoff_el2);
-> >  }
-> >
-> > +void __kvm_timer_set_cntpoff(u64 cntpoff)
-> > +{
-> > +     write_sysreg_s(cntpoff, SYS_CNTPOFF_EL2);
-> > +}
-> > +
-> >  /*
-> >   * Should only be called on non-VHE systems.
-> >   * VHE systems use EL2 timers and configure EL1 timers in kvm_timer_init_vhe().
-> > diff --git a/arch/arm64/kvm/hyp/vhe/timer-sr.c b/arch/arm64/kvm/hyp/vhe/timer-sr.c
-> > index 4cda674a8be6..231e16a071a5 100644
-> > --- a/arch/arm64/kvm/hyp/vhe/timer-sr.c
-> > +++ b/arch/arm64/kvm/hyp/vhe/timer-sr.c
-> > @@ -10,3 +10,8 @@ void __kvm_timer_set_cntvoff(u64 cntvoff)
-> >  {
-> >       write_sysreg(cntvoff, cntvoff_el2);
-> >  }
-> > +
-> > +void __kvm_timer_set_cntpoff(u64 cntpoff)
-> > +{
-> > +     write_sysreg_s(cntpoff, SYS_CNTPOFF_EL2);
-> > +}
-> > diff --git a/include/clocksource/arm_arch_timer.h b/include/clocksource/arm_arch_timer.h
-> > index 73c7139c866f..7252ffa3d675 100644
-> > --- a/include/clocksource/arm_arch_timer.h
-> > +++ b/include/clocksource/arm_arch_timer.h
-> > @@ -21,6 +21,7 @@
-> >  #define CNTHCTL_EVNTEN                       (1 << 2)
-> >  #define CNTHCTL_EVNTDIR                      (1 << 3)
-> >  #define CNTHCTL_EVNTI                        (0xF << 4)
-> > +#define CNTHCTL_ECV                  (1 << 12)
-> >
-> >  enum arch_timer_reg {
-> >       ARCH_TIMER_REG_CTRL,
->
-> You also want to document that SCR_EL3.ECVEn has to be set to 1 for
-> this to work (see Documentation/arm64/booting.txt). And if it isn't,
-> the firmware better handle the CNTPOFF_EL2 traps correctly...
-
-I'll grab the popcorn now ;-) Adding docs for this, good idea.
-
-> What firmware did you use for this? I think we need to update the boot
-> wrapper, but that's something that can be done in parallel.
-
-I had actually just done a direct boot from ARM-TF -> Linux, nothing
-else in between.
-
---
-Thanks,
-Oliver
+-- 
+Sincerely yours,
+Mike.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
