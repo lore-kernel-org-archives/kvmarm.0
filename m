@@ -2,63 +2,65 @@ Return-Path: <SRS0=u6p1=NB=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F35AC4338F
-	for <kvmarm@archiver.kernel.org>; Tue, 10 Aug 2021 13:21:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A05FC4338F
+	for <kvmarm@archiver.kernel.org>; Tue, 10 Aug 2021 13:28:40 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B327361008
-	for <kvmarm@archiver.kernel.org>; Tue, 10 Aug 2021 13:21:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org B327361008
+	by mail.kernel.org (Postfix) with ESMTP id C08C761019
+	for <kvmarm@archiver.kernel.org>; Tue, 10 Aug 2021 13:28:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org C08C761019
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 370CC4A483;
-	Tue, 10 Aug 2021 09:21:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C92B40877;
+	Tue, 10 Aug 2021 09:28:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ONY8D4ker6EW; Tue, 10 Aug 2021 09:21:33 -0400 (EDT)
+	with ESMTP id kt2x6IKZdQkJ; Tue, 10 Aug 2021 09:28:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CCFB54A3A3;
-	Tue, 10 Aug 2021 09:21:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CC5ED4A500;
+	Tue, 10 Aug 2021 09:28:34 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 03D474A3A3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Aug 2021 09:21:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 98B1F4A4A3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Aug 2021 09:28:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id h6vIpnCpy0Ot for <kvmarm@lists.cs.columbia.edu>;
- Tue, 10 Aug 2021 09:21:31 -0400 (EDT)
+ with ESMTP id JkyhNwZUqfkE for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 10 Aug 2021 09:28:29 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2002C4A19F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Aug 2021 09:21:31 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 57CE260F38;
- Tue, 10 Aug 2021 13:21:28 +0000 (UTC)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1ACA040877
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Aug 2021 09:28:29 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 1A9D361008;
+ Tue, 10 Aug 2021 13:28:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1628601690;
- bh=jqyHZ175J/Gvvs023uqRUmo52RsbbfMGvn++lpbF66s=;
+ s=k20201202; t=1628602108;
+ bh=e0EorNutTQj/n4ko+JR91efDJm3tMXggkYYS1yjdf0Q=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=I+a4GHR4h1dHtT1sJaTfvsu8J2/xAVbb8xQvxOWtAZkgpn26IlUZ/GFV/gaQYEbGV
- lPxKHhT2GkVeHO6Xwvno6jh1lBza6SRE8pvMIqH/Rh3wl/+LCzNUK1nQLQxcfO7Bba
- OId6prpx1+pskLJVHqM3W0VaZjMdN8WDujnwOd3kKK1QTuEpqYAuV6pbX9s1+MQicX
- 6re4qQcHFaRDpWO4wq6WRcP7bMmn/hi7L5k3sc+yZ107nm1nFUWIC4C12AEM3i4um6
- q3JD/05M7BgrMyMwt5l72dUcXFqH1rrruzEzn0A08IFety7rDlp8ODT2jTXG7z6MLr
- PoAnqpxa3E6pw==
-Date: Tue, 10 Aug 2021 14:21:24 +0100
+ b=E6WB1QQ7XiHvWBiNtDH6+7DcZgoNBxNsm6lrgGZ/aLMRXYuRGbJYkidf9j1k9Ho3I
+ mpBFx1HGFMHmO3la9vyyPST7cXNeaObCjivL+gznRERT387++Y2bbjSiqtSvHtJ6ye
+ ydccEBAUkzBOvX8ovvS1488xK7xQFzAA4096btKPCUCzGzw77OkmgrFDuxmFH8U7AI
+ zs2utfs2nRra4mfky6HDQKrHGMF9ZCWhv4827ypiNTxa7s91lg2nCCtOT6DRLJHTVd
+ bo+y2JhhKHrAXxP8OWKFajdyXoG2Zg7T9eXFXPGpNd5juKEJcPIjIqeeckXvYHpN3N
+ ILOxjZEU++M/w==
+Date: Tue, 10 Aug 2021 14:28:22 +0100
 From: Will Deacon <will@kernel.org>
 To: Anshuman Khandual <anshuman.khandual@arm.com>
-Subject: Re: [PATCH 2/5] KVM: arm64: Drop init_common_resources()
-Message-ID: <20210810132123.GB2946@willie-the-truck>
+Subject: Re: [PATCH 3/5] KVM: arm64: Drop check_kvm_target_cpu() based percpu
+ probe
+Message-ID: <20210810132822.GC2946@willie-the-truck>
 References: <1628578961-29097-1-git-send-email-anshuman.khandual@arm.com>
- <1628578961-29097-3-git-send-email-anshuman.khandual@arm.com>
+ <1628578961-29097-4-git-send-email-anshuman.khandual@arm.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <1628578961-29097-3-git-send-email-anshuman.khandual@arm.com>
+In-Reply-To: <1628578961-29097-4-git-send-email-anshuman.khandual@arm.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Cc: Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
  Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu,
@@ -79,43 +81,73 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Aug 10, 2021 at 12:32:38PM +0530, Anshuman Khandual wrote:
-> Could do without this additional indirection via init_common_resources() by
-> just calling kvm_set_ipa_limit() directly instead. This change saves memory
-> and cycles.
-
-Does it? Really?
-
-Will
-
+On Tue, Aug 10, 2021 at 12:32:39PM +0530, Anshuman Khandual wrote:
+> kvm_target_cpu() never returns a negative error code, so check_kvm_target()
+> would never have 'ret' filled with a negative error code. Hence the percpu
+> probe via check_kvm_target_cpu() does not make sense as its never going to
+> find an unsupported CPU, forcing kvm_arch_init() to exit early. Hence lets
+> just drop this percpu probe (and also check_kvm_target_cpu()) altogether.
+> 
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: James Morse <james.morse@arm.com>
+> Cc: Alexandru Elisei <alexandru.elisei@arm.com>
+> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will@kernel.org>
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: kvmarm@lists.cs.columbia.edu
+> Cc: linux-kernel@vger.kernel.org
+> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+> ---
+>  arch/arm64/kvm/arm.c | 14 --------------
+>  1 file changed, 14 deletions(-)
+> 
 > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index e9a2b8f27792..19560e457c11 100644
+> index 19560e457c11..16f93678c17e 100644
 > --- a/arch/arm64/kvm/arm.c
 > +++ b/arch/arm64/kvm/arm.c
-> @@ -1696,11 +1696,6 @@ static bool init_psci_relay(void)
->  	return true;
+> @@ -2010,11 +2010,6 @@ static int finalize_hyp_mode(void)
+>  	return 0;
 >  }
 >  
-> -static int init_common_resources(void)
+> -static void check_kvm_target_cpu(void *ret)
 > -{
-> -	return kvm_set_ipa_limit();
+> -	*(int *)ret = kvm_target_cpu();
 > -}
 > -
->  static int init_subsystems(void)
+>  struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr)
 >  {
->  	int err = 0;
-> @@ -2102,7 +2097,7 @@ int kvm_arch_init(void *opaque)
->  		}
->  	}
+>  	struct kvm_vcpu *vcpu;
+> @@ -2074,7 +2069,6 @@ void kvm_arch_irq_bypass_start(struct irq_bypass_consumer *cons)
+>  int kvm_arch_init(void *opaque)
+>  {
+>  	int err;
+> -	int ret, cpu;
+>  	bool in_hyp_mode;
 >  
-> -	err = init_common_resources();
-> +	err = kvm_set_ipa_limit();
->  	if (err)
->  		return err;
+>  	if (!is_hyp_mode_available()) {
+> @@ -2089,14 +2083,6 @@ int kvm_arch_init(void *opaque)
+>  		kvm_info("Guests without required CPU erratum workarounds can deadlock system!\n" \
+>  			 "Only trusted guests should be used on this system.\n");
 >  
-> -- 
-> 2.20.1
-> 
+> -	for_each_online_cpu(cpu) {
+> -		smp_call_function_single(cpu, check_kvm_target_cpu, &ret, 1);
+> -		if (ret < 0) {
+> -			kvm_err("Error, CPU %d not supported!\n", cpu);
+> -			return -ENODEV;
+> -		}
+> -	}
+
+Looks like kvm_target_cpu() *could* return an error at one time of day (at
+least on 32-bit), but agreed that this checking is no longer needed:
+
+Acked-by: Will Deacon <will@kernel.org>
+
+Perhaps it's worth making the return type of kvm_target_cpu() a u32 to
+make it a bit more explicit that you shouldn't be returning an error code
+there?
+
+Will
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
