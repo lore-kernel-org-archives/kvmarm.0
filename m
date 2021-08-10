@@ -2,83 +2,58 @@ Return-Path: <SRS0=u6p1=NB=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9588C4338F
-	for <kvmarm@archiver.kernel.org>; Tue, 10 Aug 2021 04:57:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85634C4338F
+	for <kvmarm@archiver.kernel.org>; Tue, 10 Aug 2021 05:06:13 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 59BA06101E
-	for <kvmarm@archiver.kernel.org>; Tue, 10 Aug 2021 04:57:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 59BA06101E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id EEFF660F38
+	for <kvmarm@archiver.kernel.org>; Tue, 10 Aug 2021 05:06:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org EEFF660F38
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C8C19406E0;
-	Tue, 10 Aug 2021 00:57:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6AC6B4A5A0;
+	Tue, 10 Aug 2021 01:06:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Q+qmATb3k17o; Tue, 10 Aug 2021 00:57:53 -0400 (EDT)
+	with ESMTP id 5AgfWDjxJLAH; Tue, 10 Aug 2021 01:06:08 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D60AC4A173;
-	Tue, 10 Aug 2021 00:57:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F40914B08D;
+	Tue, 10 Aug 2021 01:06:07 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 049614056A
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Aug 2021 00:57:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A087B4A7FD
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Aug 2021 01:06:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xf9qNr8eGOJU for <kvmarm@lists.cs.columbia.edu>;
- Tue, 10 Aug 2021 00:57:50 -0400 (EDT)
-Received: from mail-oo1-f46.google.com (mail-oo1-f46.google.com
- [209.85.161.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2327D401A4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Aug 2021 00:57:50 -0400 (EDT)
-Received: by mail-oo1-f46.google.com with SMTP id
- y23-20020a4a62570000b029028727ffa408so3039662oog.5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 09 Aug 2021 21:57:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=ZzIb/ALC5uOWJQxpcPBbJjvGksioyH36daLuKghiHvM=;
- b=c0FITYn9LmtYp+Fa/PwYe1ydEJp02qgTJpSn/ArFf4psnFIQSeDxgGESgqIMKZLiVA
- KbqzDsuBk5Lk5hZ6D42YbUGBACnkoRC0fGQN4WN3UIbKx55/7Wbata/iDz6KgHxThZ9L
- ZoMhypSwa+pPwMKe2XmVnwTAJMkahr20XIavtGV1bJ4nyz7RVEpW7SgUwQ3aZGdwl+Rc
- iTKWtyKpXFJ3FdIElreai6cs2X0ZPNbiztQJ758+JBNvddgqUCBC8xTutHChnGiD+/Oy
- jdsJyX+abDiPYFRzvDcc/XIWuumQTCc0amugFHMQBwjU3sThHWVPOBLAGsT2Sjs5FG7q
- jweg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=ZzIb/ALC5uOWJQxpcPBbJjvGksioyH36daLuKghiHvM=;
- b=JA6ki4aMEgCgYu0U2iQ1rk2b+KC61s5Pus6zoqXf/7aluHBF5pdelpf7BFTSalBTSZ
- ARMngEWe+m2Xz8vzOhrlHG4w7y+Aat21ywZHdUeKl8rS9+NHtCXEZ9aXCLDSdfwIxitU
- LznSeYX9x+tD/hWnw2gUpv2RDy9VahINuXhRwLMRljNAN4sogUV6YFy0M5qSjbV9YZ0q
- NnO12cKF4HBTXqc29ftw7zFxAc0sCNd9h4BfxSgN2zX0Yu/Y0Xng7EKJzFdw1G0fG8wp
- YIum8HWMxj8p28noO2f1DnfzndzhNHJuLIwGu/CXIPJzmyMTfidWIj6yjtJ+ITzE79oQ
- 8AYw==
-X-Gm-Message-State: AOAM533f4aL1o6KYwFtgJOMgnkQUNTbSVb0JMrjbCEGztTgIP+XZF7ct
- nEX7PKAFyXC9DhsEa7U1dKMwbYGlX7Lvz7uQzhN+rQ==
-X-Google-Smtp-Source: ABdhPJwB2hq8/JcoLsWH5ScDehx0CJBEyn2OBkWhzQB2UgK0UtrlGIYvud3gzCmKUmah6AUNeEJfaFCoQh5ryEa9cdw=
-X-Received: by 2002:a4a:4c55:: with SMTP id a82mr17509260oob.66.1628571469459; 
- Mon, 09 Aug 2021 21:57:49 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210809152448.1810400-1-qperret@google.com>
- <20210809152448.1810400-15-qperret@google.com>
-In-Reply-To: <20210809152448.1810400-15-qperret@google.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Tue, 10 Aug 2021 06:57:13 +0200
-Message-ID: <CA+EHjTyxW_X-xjn7opfrLFWXupfjMzCZFVBYZjgpaqLbxbjDVQ@mail.gmail.com>
-Subject: Re: [PATCH v4 14/21] KVM: arm64: Expose pkvm_hyp_id
-To: Quentin Perret <qperret@google.com>
-Cc: kernel-team@android.com, qwandor@google.com, maz@kernel.org,
- linux-kernel@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+ with ESMTP id fRGOHJn2139P for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 10 Aug 2021 01:06:02 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E8114A5A0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Aug 2021 01:06:02 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 698FC6D;
+ Mon,  9 Aug 2021 22:06:00 -0700 (PDT)
+Received: from p8cg001049571a15.arm.com (unknown [10.163.67.89])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 06A653F40C;
+ Mon,  9 Aug 2021 22:05:56 -0700 (PDT)
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+To: linux-arm-kernel@lists.infradead.org
+Subject: [PATCH] arm64/perf: Replace '0xf' instances with
+ ID_AA64DFR0_PMUVER_IMP_DEF
+Date: Tue, 10 Aug 2021 10:36:38 +0530
+Message-Id: <1628571998-13634-1-git-send-email-anshuman.khandual@arm.com>
+X-Mailer: git-send-email 2.7.4
+Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
+ Peter Zijlstra <peterz@infradead.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+ linux-perf-users@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,59 +65,108 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Quentin,
+ID_AA64DFR0_PMUVER_IMP_DEF which indicate implementation defined PMU, never
+actually gets used although there are '0xf' instances scattered all around.
+Just do the macro replacement to improve readability.
 
-On Mon, Aug 9, 2021 at 5:25 PM Quentin Perret <qperret@google.com> wrote:
->
-> Allow references to the hypervisor's owner id from outside
-> mem_protect.c.
->
-> Signed-off-by: Quentin Perret <qperret@google.com>
-> ---
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will@kernel.org>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: linux-perf-users@vger.kernel.org
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: kvmarm@lists.cs.columbia.edu
+Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+---
+This applies on v5.14-rc5
 
-Reviewed-by: Fuad Tabba <tabba@google.com>
+ arch/arm64/include/asm/cpufeature.h | 2 +-
+ arch/arm64/kernel/perf_event.c      | 2 +-
+ arch/arm64/kvm/perf.c               | 2 +-
+ arch/arm64/kvm/pmu-emul.c           | 6 +++---
+ 4 files changed, 6 insertions(+), 6 deletions(-)
 
-Thanks,
-/fuad
+diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+index 9bb9d11750d7..54474e76ad86 100644
+--- a/arch/arm64/include/asm/cpufeature.h
++++ b/arch/arm64/include/asm/cpufeature.h
+@@ -552,7 +552,7 @@ cpuid_feature_cap_perfmon_field(u64 features, int field, u64 cap)
+ 	u64 mask = GENMASK_ULL(field + 3, field);
+ 
+ 	/* Treat IMPLEMENTATION DEFINED functionality as unimplemented */
+-	if (val == 0xf)
++	if (val == ID_AA64DFR0_PMUVER_IMP_DEF)
+ 		val = 0;
+ 
+ 	if (val > cap) {
+diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
+index d07788dad388..b4044469527e 100644
+--- a/arch/arm64/kernel/perf_event.c
++++ b/arch/arm64/kernel/perf_event.c
+@@ -1055,7 +1055,7 @@ static void __armv8pmu_probe_pmu(void *info)
+ 	dfr0 = read_sysreg(id_aa64dfr0_el1);
+ 	pmuver = cpuid_feature_extract_unsigned_field(dfr0,
+ 			ID_AA64DFR0_PMUVER_SHIFT);
+-	if (pmuver == 0xf || pmuver == 0)
++	if (pmuver == ID_AA64DFR0_PMUVER_IMP_DEF || pmuver == 0)
+ 		return;
+ 
+ 	cpu_pmu->pmuver = pmuver;
+diff --git a/arch/arm64/kvm/perf.c b/arch/arm64/kvm/perf.c
+index 151c31fb9860..f9bb3b14130e 100644
+--- a/arch/arm64/kvm/perf.c
++++ b/arch/arm64/kvm/perf.c
+@@ -50,7 +50,7 @@ static struct perf_guest_info_callbacks kvm_guest_cbs = {
+ 
+ int kvm_perf_init(void)
+ {
+-	if (kvm_pmu_probe_pmuver() != 0xf && !is_protected_kvm_enabled())
++	if (kvm_pmu_probe_pmuver() != ID_AA64DFR0_PMUVER_IMP_DEF && !is_protected_kvm_enabled())
+ 		static_branch_enable(&kvm_arm_pmu_available);
+ 
+ 	return perf_register_guest_info_callbacks(&kvm_guest_cbs);
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index f33825c995cb..60f89bdbeebb 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -745,7 +745,7 @@ int kvm_pmu_probe_pmuver(void)
+ 	struct perf_event_attr attr = { };
+ 	struct perf_event *event;
+ 	struct arm_pmu *pmu;
+-	int pmuver = 0xf;
++	int pmuver = ID_AA64DFR0_PMUVER_IMP_DEF;
+ 
+ 	/*
+ 	 * Create a dummy event that only counts user cycles. As we'll never
+@@ -770,7 +770,7 @@ int kvm_pmu_probe_pmuver(void)
+ 	if (IS_ERR(event)) {
+ 		pr_err_once("kvm: pmu event creation failed %ld\n",
+ 			    PTR_ERR(event));
+-		return 0xf;
++		return ID_AA64DFR0_PMUVER_IMP_DEF;
+ 	}
+ 
+ 	if (event->pmu) {
+@@ -923,7 +923,7 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ 	if (!vcpu->kvm->arch.pmuver)
+ 		vcpu->kvm->arch.pmuver = kvm_pmu_probe_pmuver();
+ 
+-	if (vcpu->kvm->arch.pmuver == 0xf)
++	if (vcpu->kvm->arch.pmuver == ID_AA64DFR0_PMUVER_IMP_DEF)
+ 		return -ENODEV;
+ 
+ 	switch (attr->attr) {
+-- 
+2.20.1
 
->  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h | 2 ++
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 2 +-
->  2 files changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> index 0849ee8fa260..23316a021880 100644
-> --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> @@ -46,6 +46,8 @@ struct host_kvm {
->  };
->  extern struct host_kvm host_kvm;
->
-> +extern const u8 pkvm_hyp_id;
-> +
->  int __pkvm_prot_finalize(void);
->  int __pkvm_mark_hyp(phys_addr_t start, phys_addr_t end);
->
-> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> index f95a5a4aa09c..ee255171945c 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> @@ -31,7 +31,7 @@ static struct hyp_pool host_s2_pool;
->  u64 id_aa64mmfr0_el1_sys_val;
->  u64 id_aa64mmfr1_el1_sys_val;
->
-> -static const u8 pkvm_hyp_id = 1;
-> +const u8 pkvm_hyp_id = 1;
->
->  static void *host_s2_zalloc_pages_exact(size_t size)
->  {
-> --
-> 2.32.0.605.g8dce9f2422-goog
->
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
