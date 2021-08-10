@@ -2,57 +2,80 @@ Return-Path: <SRS0=u6p1=NB=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59A3BC4338F
-	for <kvmarm@archiver.kernel.org>; Tue, 10 Aug 2021 07:02:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73740C4338F
+	for <kvmarm@archiver.kernel.org>; Tue, 10 Aug 2021 09:36:02 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DD77661051
-	for <kvmarm@archiver.kernel.org>; Tue, 10 Aug 2021 07:02:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org DD77661051
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id C408761019
+	for <kvmarm@archiver.kernel.org>; Tue, 10 Aug 2021 09:36:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org C408761019
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E0224B0BB;
-	Tue, 10 Aug 2021 03:02:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 415344B08F;
+	Tue, 10 Aug 2021 05:36:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id OXK8DBJ+4fg2; Tue, 10 Aug 2021 03:02:29 -0400 (EDT)
+	with ESMTP id JQdyKN5gHlMn; Tue, 10 Aug 2021 05:35:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D86C54B0EF;
-	Tue, 10 Aug 2021 03:02:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0EF2D4B08B;
+	Tue, 10 Aug 2021 05:35:56 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 306DF4B098
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Aug 2021 03:02:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B94A4B087
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Aug 2021 05:35:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8wJ745vqpkJX for <kvmarm@lists.cs.columbia.edu>;
- Tue, 10 Aug 2021 03:02:24 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C63CB4B0E4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Aug 2021 03:02:23 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7A78BD6E;
- Tue, 10 Aug 2021 00:02:23 -0700 (PDT)
-Received: from p8cg001049571a15.arm.com (unknown [10.163.67.89])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id EB8463F718;
- Tue, 10 Aug 2021 00:02:19 -0700 (PDT)
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-To: linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 5/5] KVM: arm64: Define KVM_PHYS_SHIFT_MIN
-Date: Tue, 10 Aug 2021 12:32:41 +0530
-Message-Id: <1628578961-29097-6-git-send-email-anshuman.khandual@arm.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1628578961-29097-1-git-send-email-anshuman.khandual@arm.com>
-References: <1628578961-29097-1-git-send-email-anshuman.khandual@arm.com>
-Cc: Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
- Anshuman Khandual <anshuman.khandual@arm.com>, linux-kernel@vger.kernel.org,
- Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu
+ with ESMTP id cNCUMQ4pbvRi for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 10 Aug 2021 05:35:54 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 50AAA4A98B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Aug 2021 05:35:54 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 2D5EA6101E;
+ Tue, 10 Aug 2021 09:35:53 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mDOAp-0041Qv-6G; Tue, 10 Aug 2021 10:35:51 +0100
+Date: Tue, 10 Aug 2021 10:35:50 +0100
+Message-ID: <87czqlbq15.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oupton@google.com>
+Subject: Re: [PATCH v6 13/21] KVM: arm64: Allow userspace to configure a
+ vCPU's virtual offset
+In-Reply-To: <20210804085819.846610-14-oupton@google.com>
+References: <20210804085819.846610-1-oupton@google.com>
+ <20210804085819.846610-14-oupton@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@google.com, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, seanjc@google.com,
+ pshier@google.com, jmattson@google.com, dmatlack@google.com,
+ ricarkol@google.com, jingzhangos@google.com, rananta@google.com,
+ james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+ linux-arm-kernel@lists.infradead.org, drjones@redhat.com, will@kernel.org,
+ catalin.marinas@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org,
+ Will Deacon <will@kernel.org>, Sean Christopherson <seanjc@google.com>,
+ Peter Shier <pshier@google.com>, Raghavendra Rao Anata <rananta@google.com>,
+ David Matlack <dmatlack@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -64,60 +87,79 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Drop the hard coded value for the minimum IPA range i.e 32 bit. Instead
-define a macro KVM_PHYS_SHIFT_MIN which improves the code readability.
+On Wed, 04 Aug 2021 09:58:11 +0100,
+Oliver Upton <oupton@google.com> wrote:
+> 
+> Allow userspace to access the guest's virtual counter-timer offset
+> through the ONE_REG interface. The value read or written is defined to
+> be an offset from the guest's physical counter-timer. Add some
+> documentation to clarify how a VMM should use this and the existing
+> CNTVCT_EL0.
+> 
+> Signed-off-by: Oliver Upton <oupton@google.com>
+> ---
+>  Documentation/virt/kvm/api.rst    | 10 ++++++++++
+>  arch/arm64/include/uapi/asm/kvm.h |  1 +
+>  arch/arm64/kvm/arch_timer.c       | 11 +++++++++++
+>  arch/arm64/kvm/guest.c            |  6 +++++-
+>  include/kvm/arm_arch_timer.h      |  1 +
+>  5 files changed, 28 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 8d4a3471ad9e..28a65dc89985 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -2487,6 +2487,16 @@ arm64 system registers have the following id bit patterns::
+>       derived from the register encoding for CNTV_CVAL_EL0.  As this is
+>       API, it must remain this way.
+>  
+> +.. warning::
+> +
+> +     The value of KVM_REG_ARM_TIMER_OFFSET is defined as an offset from
+> +     the guest's view of the physical counter-timer.
+> +
+> +     Userspace should use either KVM_REG_ARM_TIMER_OFFSET or
+> +     KVM_REG_ARM_TIMER_CVAL to pause and resume a guest's virtual
 
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: James Morse <james.morse@arm.com>
-Cc: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org
-Cc: kvmarm@lists.cs.columbia.edu
-Cc: linux-kernel@vger.kernel.org
-Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
----
- arch/arm64/include/asm/kvm_mmu.h | 3 ++-
- arch/arm64/kvm/reset.c           | 2 +-
- 2 files changed, 3 insertions(+), 2 deletions(-)
+You probably mean KVM_REG_ARM_TIMER_CNT here, despite the broken
+encoding.
 
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index b52c5c4b9a3d..716f999818d9 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -141,7 +141,8 @@ static __always_inline unsigned long __kern_hyp_va(unsigned long v)
-  * We currently support using a VM-specified IPA size. For backward
-  * compatibility, the default IPA size is fixed to 40bits.
-  */
--#define KVM_PHYS_SHIFT	(40)
-+#define KVM_PHYS_SHIFT		(40)
-+#define KVM_PHYS_SHIFT_MIN	(32)
- 
- #define kvm_phys_shift(kvm)		VTCR_EL2_IPA(kvm->arch.vtcr)
- #define kvm_phys_size(kvm)		(_AC(1, ULL) << kvm_phys_shift(kvm))
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index cba7872d69a8..8dc8b4b9de37 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -369,7 +369,7 @@ int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type)
- 	phys_shift = KVM_VM_TYPE_ARM_IPA_SIZE(type);
- 	if (phys_shift) {
- 		if (phys_shift > kvm_ipa_limit ||
--		    phys_shift < 32)
-+		    phys_shift < KVM_PHYS_SHIFT_MIN)
- 			return -EINVAL;
- 	} else {
- 		phys_shift = KVM_PHYS_SHIFT;
+> +     counter-timer. Mixed use of these registers could result in an
+> +     unpredictable guest counter value.
+> +
+>  arm64 firmware pseudo-registers have the following bit pattern::
+>  
+>    0x6030 0000 0014 <regno:16>
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index b3edde68bc3e..949a31bc10f0 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -255,6 +255,7 @@ struct kvm_arm_copy_mte_tags {
+>  #define KVM_REG_ARM_TIMER_CTL		ARM64_SYS_REG(3, 3, 14, 3, 1)
+>  #define KVM_REG_ARM_TIMER_CVAL		ARM64_SYS_REG(3, 3, 14, 0, 2)
+>  #define KVM_REG_ARM_TIMER_CNT		ARM64_SYS_REG(3, 3, 14, 3, 2)
+> +#define KVM_REG_ARM_TIMER_OFFSET	ARM64_SYS_REG(3, 4, 14, 0, 3)
+
+I don't think we can use the encoding for CNTPOFF_EL2 here, as it will
+eventually clash with a NV guest using the same feature for its own
+purpose. We don't want this offset to overlap with any of the existing
+features.
+
+I actually liked your previous proposal of controlling the physical
+offset via a device property, as it clearly indicated that you were
+dealing with non-architectural state.
+
+Thanks,
+
+	M.
+
 -- 
-2.20.1
-
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
