@@ -2,74 +2,81 @@ Return-Path: <SRS0=u6p1=NB=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D032C4338F
-	for <kvmarm@archiver.kernel.org>; Tue, 10 Aug 2021 09:38:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B81FC432BE
+	for <kvmarm@archiver.kernel.org>; Tue, 10 Aug 2021 09:44:21 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B1A7661076
-	for <kvmarm@archiver.kernel.org>; Tue, 10 Aug 2021 09:38:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org B1A7661076
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id AEDA1610CB
+	for <kvmarm@archiver.kernel.org>; Tue, 10 Aug 2021 09:44:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org AEDA1610CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4203A49DE3;
-	Tue, 10 Aug 2021 05:38:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D50D4B092;
+	Tue, 10 Aug 2021 05:44:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id LzbCfJAHSBmp; Tue, 10 Aug 2021 05:38:15 -0400 (EDT)
+	with ESMTP id 1raole8zWpx6; Tue, 10 Aug 2021 05:44:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5BA674ACC9;
-	Tue, 10 Aug 2021 05:38:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 268E04AC80;
+	Tue, 10 Aug 2021 05:44:16 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BB8CB4A531
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Aug 2021 05:38:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6AFBF4A4A4
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Aug 2021 05:44:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id birs6FXBBYhI for <kvmarm@lists.cs.columbia.edu>;
- Tue, 10 Aug 2021 05:38:13 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8FF6D49DE3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Aug 2021 05:38:13 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 9818561078;
- Tue, 10 Aug 2021 09:38:12 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1mDOD4-0041Tz-KE; Tue, 10 Aug 2021 10:38:10 +0100
-Date: Tue, 10 Aug 2021 10:38:10 +0100
-Message-ID: <87bl65bpx9.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oupton@google.com>
-Subject: Re: [PATCH v6 16/21] arm64: cpufeature: Enumerate support for
- Enhanced Counter Virtualization
-In-Reply-To: <20210804085819.846610-17-oupton@google.com>
+ with ESMTP id ogV+xtBfvLkb for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 10 Aug 2021 05:44:14 -0400 (EDT)
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com
+ [209.85.208.178])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 300074A4A0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Aug 2021 05:44:14 -0400 (EDT)
+Received: by mail-lj1-f178.google.com with SMTP id u13so28095222lje.5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Aug 2021 02:44:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=yE5wXZDXK6p9cpZ2q0EZSEm3h7xR70bZBY+/kdRRL0c=;
+ b=CRO03wZGW9IhDXyoC7tHi98Ja0XupCcBdJAnNO0LJgz5Hr/4tX8bE7lC8sh5nXSMz4
+ r+qJDvdQOTJPMcSkKA/yt+ECcOjls9JMmmNgIfvfEbnxM4o2xQzyJUelT1TmznCjSYzs
+ gGwHdKzl9m+H/hhxsyxOSa4DDTSAnlGCJsGkgMFlMB2hC8pZZEjX6C4Yphf8RjExvNff
+ 1rulAz0nxCsvsAdwaL/xE/pIPBdDLbeRyJC0Qubdu7z/oe4INRDK8fgSAu4JgknRPv96
+ xtaOetA4RrzmQ4YJ6NLsjhuKMtZjvZybtrccCQH9GJrw+fTpwpiAfP/232Tf44PidSLD
+ Lefg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=yE5wXZDXK6p9cpZ2q0EZSEm3h7xR70bZBY+/kdRRL0c=;
+ b=iKk4w+bN+xevzOAPzFL3STQhDcXyikz5mVPdQUPXZFYSLxetr75aD92jYCe+7BFGaY
+ zL+sQHFFUf9WLAnRpK8ZVuisPeYkK/w7grMCEFprIpIE9SsUL5371N4z7fsZAwMrxmXi
+ iKABuxZ+b0aJVvT4GAn1FBakHHEggkf4Y/rFgYaBs3qT39lhyT83MYsMKmAqtlXoisDW
+ GpWIzTh2aQ0t08mvKtp18/C4z2p7hZnBw4jXoPJ+sD4PWjs0Iho3g2yDI3KOg5zsBzSG
+ y3XT+N4N32J60Yu3tKErZX0fVQJ2K18iBPoxJ99KtPog5JV/lvaZ1HseAfMivav2bnNp
+ 7+dw==
+X-Gm-Message-State: AOAM533dL/yDYu+iEvhvByIBEzWiE9MO4om80v52f7Z0Hq1PqqyrynXy
+ yic123lPIbAFYZ5lQhVWpVVxVN/sOppYEmohSHpcMA==
+X-Google-Smtp-Source: ABdhPJxUnypR2IsyYSmdqkzIj2TFW6CoDKEXzQYFw/rzkhRclEucBFJqITY4bz5cpiueE/RXRyoyQxJgKvpb1EKKg+k=
+X-Received: by 2002:a2e:89c4:: with SMTP id c4mr18569718ljk.275.1628588652559; 
+ Tue, 10 Aug 2021 02:44:12 -0700 (PDT)
+MIME-Version: 1.0
 References: <20210804085819.846610-1-oupton@google.com>
- <20210804085819.846610-17-oupton@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oupton@google.com, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, seanjc@google.com,
- pshier@google.com, jmattson@google.com, dmatlack@google.com,
- ricarkol@google.com, jingzhangos@google.com, rananta@google.com,
- james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com,
- linux-arm-kernel@lists.infradead.org, drjones@redhat.com, will@kernel.org,
- catalin.marinas@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+ <20210804085819.846610-14-oupton@google.com>
+ <87czqlbq15.wl-maz@kernel.org>
+In-Reply-To: <87czqlbq15.wl-maz@kernel.org>
+From: Oliver Upton <oupton@google.com>
+Date: Tue, 10 Aug 2021 02:44:01 -0700
+Message-ID: <CAOQ_Qsjiyp_HQLhgFfF-o7T=Qpe+djL9KCFjAU2xmj8OXhAf4w@mail.gmail.com>
+Subject: Re: [PATCH v6 13/21] KVM: arm64: Allow userspace to configure a
+ vCPU's virtual offset
+To: Marc Zyngier <maz@kernel.org>
 Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org,
  Will Deacon <will@kernel.org>, Sean Christopherson <seanjc@google.com>,
  Peter Shier <pshier@google.com>, Raghavendra Rao Anata <rananta@google.com>,
@@ -92,75 +99,82 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 04 Aug 2021 09:58:14 +0100,
-Oliver Upton <oupton@google.com> wrote:
-> 
-> Introduce a new cpucap to indicate if the system supports full enhanced
-> counter virtualization (i.e. ID_AA64MMFR0_EL1.ECV==0x2).
-> 
-> Signed-off-by: Oliver Upton <oupton@google.com>
-> ---
->  arch/arm64/include/asm/sysreg.h |  2 ++
->  arch/arm64/kernel/cpufeature.c  | 10 ++++++++++
->  arch/arm64/tools/cpucaps        |  1 +
->  3 files changed, 13 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index 7b9c3acba684..4dfc44066dfb 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -847,6 +847,8 @@
->  #define ID_AA64MMFR0_ASID_SHIFT		4
->  #define ID_AA64MMFR0_PARANGE_SHIFT	0
->  
-> +#define ID_AA64MMFR0_ECV_VIRT		0x1
-> +#define ID_AA64MMFR0_ECV_PHYS		0x2
->  #define ID_AA64MMFR0_TGRAN4_NI		0xf
->  #define ID_AA64MMFR0_TGRAN4_SUPPORTED	0x0
->  #define ID_AA64MMFR0_TGRAN64_NI		0xf
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index 0ead8bfedf20..94c349e179d3 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -2301,6 +2301,16 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
->  		.matches = has_cpuid_feature,
->  		.min_field_value = 1,
->  	},
-> +	{
-> +		.desc = "Enhanced Counter Virtualization (Physical)",
-> +		.capability = ARM64_ECV,
-> +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-> +		.sys_reg = SYS_ID_AA64MMFR0_EL1,
-> +		.sign = FTR_UNSIGNED,
-> +		.field_pos = ID_AA64MMFR0_ECV_SHIFT,
-> +		.matches = has_cpuid_feature,
-> +		.min_field_value = ID_AA64MMFR0_ECV_PHYS,
-> +	},
->  	{},
->  };
->  
-> diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-> index 49305c2e6dfd..d819ea614da5 100644
-> --- a/arch/arm64/tools/cpucaps
-> +++ b/arch/arm64/tools/cpucaps
-> @@ -3,6 +3,7 @@
->  # Internal CPU capabilities constants, keep this list sorted
->  
->  BTI
-> +ECV
->  # Unreliable: use system_supports_32bit_el0() instead.
->  HAS_32BIT_EL0_DO_NOT_USE
->  HAS_32BIT_EL1
+On Tue, Aug 10, 2021 at 2:35 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> On Wed, 04 Aug 2021 09:58:11 +0100,
+> Oliver Upton <oupton@google.com> wrote:
+> >
+> > Allow userspace to access the guest's virtual counter-timer offset
+> > through the ONE_REG interface. The value read or written is defined to
+> > be an offset from the guest's physical counter-timer. Add some
+> > documentation to clarify how a VMM should use this and the existing
+> > CNTVCT_EL0.
+> >
+> > Signed-off-by: Oliver Upton <oupton@google.com>
+> > ---
+> >  Documentation/virt/kvm/api.rst    | 10 ++++++++++
+> >  arch/arm64/include/uapi/asm/kvm.h |  1 +
+> >  arch/arm64/kvm/arch_timer.c       | 11 +++++++++++
+> >  arch/arm64/kvm/guest.c            |  6 +++++-
+> >  include/kvm/arm_arch_timer.h      |  1 +
+> >  5 files changed, 28 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> > index 8d4a3471ad9e..28a65dc89985 100644
+> > --- a/Documentation/virt/kvm/api.rst
+> > +++ b/Documentation/virt/kvm/api.rst
+> > @@ -2487,6 +2487,16 @@ arm64 system registers have the following id bit patterns::
+> >       derived from the register encoding for CNTV_CVAL_EL0.  As this is
+> >       API, it must remain this way.
+> >
+> > +.. warning::
+> > +
+> > +     The value of KVM_REG_ARM_TIMER_OFFSET is defined as an offset from
+> > +     the guest's view of the physical counter-timer.
+> > +
+> > +     Userspace should use either KVM_REG_ARM_TIMER_OFFSET or
+> > +     KVM_REG_ARM_TIMER_CVAL to pause and resume a guest's virtual
+>
+> You probably mean KVM_REG_ARM_TIMER_CNT here, despite the broken
+> encoding.
 
-As discussed in another context, we probably want both ECV and ECV2 to
-distinguish the two feature sets that ECV has so far.
+Indeed I do!
 
+>
+> > +     counter-timer. Mixed use of these registers could result in an
+> > +     unpredictable guest counter value.
+> > +
+> >  arm64 firmware pseudo-registers have the following bit pattern::
+> >
+> >    0x6030 0000 0014 <regno:16>
+> > diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> > index b3edde68bc3e..949a31bc10f0 100644
+> > --- a/arch/arm64/include/uapi/asm/kvm.h
+> > +++ b/arch/arm64/include/uapi/asm/kvm.h
+> > @@ -255,6 +255,7 @@ struct kvm_arm_copy_mte_tags {
+> >  #define KVM_REG_ARM_TIMER_CTL                ARM64_SYS_REG(3, 3, 14, 3, 1)
+> >  #define KVM_REG_ARM_TIMER_CVAL               ARM64_SYS_REG(3, 3, 14, 0, 2)
+> >  #define KVM_REG_ARM_TIMER_CNT                ARM64_SYS_REG(3, 3, 14, 3, 2)
+> > +#define KVM_REG_ARM_TIMER_OFFSET     ARM64_SYS_REG(3, 4, 14, 0, 3)
+>
+> I don't think we can use the encoding for CNTPOFF_EL2 here, as it will
+> eventually clash with a NV guest using the same feature for its own
+> purpose. We don't want this offset to overlap with any of the existing
+> features.
+>
+> I actually liked your previous proposal of controlling the physical
+> offset via a device property, as it clearly indicated that you were
+> dealing with non-architectural state.
+
+That's actually exactly what I did here :) That said, the macro name
+is horribly obfuscated from CNTVOFF_EL2. I did this for the sake of
+symmetry with other virtual counter-timer registers above, though this
+may warrant special casing given the fact that we have a similarly
+named device attribute to handle the physical offset.
+
+--
 Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Oliver
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
