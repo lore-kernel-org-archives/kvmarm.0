@@ -2,82 +2,74 @@ Return-Path: <SRS0=13S2=NC=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66F4FC4338F
-	for <kvmarm@archiver.kernel.org>; Wed, 11 Aug 2021 09:01:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01607C4338F
+	for <kvmarm@archiver.kernel.org>; Wed, 11 Aug 2021 09:36:53 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D608960FE6
-	for <kvmarm@archiver.kernel.org>; Wed, 11 Aug 2021 09:01:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org D608960FE6
+	by mail.kernel.org (Postfix) with ESMTP id 702E860F22
+	for <kvmarm@archiver.kernel.org>; Wed, 11 Aug 2021 09:36:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 702E860F22
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5EB6E4080B;
-	Wed, 11 Aug 2021 05:01:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F0D19405D8;
+	Wed, 11 Aug 2021 05:36:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id L3Xgc-5JH5gn; Wed, 11 Aug 2021 05:01:37 -0400 (EDT)
+	with ESMTP id 8+Xt0F13W2Nq; Wed, 11 Aug 2021 05:36:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A8E9E4086C;
-	Wed, 11 Aug 2021 05:01:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9287E49F83;
+	Wed, 11 Aug 2021 05:36:47 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B61DB40808
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Aug 2021 05:01:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CCD4449E5F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Aug 2021 05:36:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lhKR+qACiBRE for <kvmarm@lists.cs.columbia.edu>;
- Wed, 11 Aug 2021 05:01:35 -0400 (EDT)
+ with ESMTP id 28LpWDc1AJ4z for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 11 Aug 2021 05:36:41 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9ED8E407F4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Aug 2021 05:01:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 56E28405D8
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Aug 2021 05:36:41 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 9DE7060FE6;
- Wed, 11 Aug 2021 09:01:34 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 43B8E60F11;
+ Wed, 11 Aug 2021 09:36:40 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mDk7A-004H2h-Iv; Wed, 11 Aug 2021 10:01:32 +0100
-Date: Wed, 11 Aug 2021 10:01:32 +0100
-Message-ID: <87wnos9wyb.wl-maz@kernel.org>
+ id 1mDkf8-004HVI-5u; Wed, 11 Aug 2021 10:36:38 +0100
+Date: Wed, 11 Aug 2021 10:36:37 +0100
+Message-ID: <87v94c9vbu.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oupton@google.com>
-Subject: Re: [PATCH v6 17/21] KVM: arm64: Allow userspace to configure a
- guest's counter-timer offset
-In-Reply-To: <CAOQ_Qsjn4UK81qBj-uPzoejNc4GAnZXPi=mvcoVi15N0_kayAw@mail.gmail.com>
-References: <20210804085819.846610-1-oupton@google.com>
- <20210804085819.846610-18-oupton@google.com>
- <87a6lpbmbb.wl-maz@kernel.org>
- <CAOQ_Qsjn4UK81qBj-uPzoejNc4GAnZXPi=mvcoVi15N0_kayAw@mail.gmail.com>
+To: Anshuman Khandual <anshuman.khandual@arm.com>
+Subject: Re: [PATCH] KVM: arm64: Restrict IPA size to maximum 48 bits on 4K
+ and 16K page size
+In-Reply-To: <1628657549-27584-1-git-send-email-anshuman.khandual@arm.com>
+References: <1628657549-27584-1-git-send-email-anshuman.khandual@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oupton@google.com, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, seanjc@google.com,
- pshier@google.com, jmattson@google.com, dmatlack@google.com,
- ricarkol@google.com, jingzhangos@google.com, rananta@google.com,
- james.morse@arm.com, Alexandru.Elisei@arm.com, suzuki.poulose@arm.com,
- linux-arm-kernel@lists.infradead.org, drjones@redhat.com, will@kernel.org,
- catalin.marinas@arm.com
+X-SA-Exim-Rcpt-To: anshuman.khandual@arm.com,
+ linux-arm-kernel@lists.infradead.org, mark.rutland@arm.com,
+ james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+ catalin.marinas@arm.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org,
- Will Deacon <will@kernel.org>, Sean Christopherson <seanjc@google.com>,
- Peter Shier <pshier@google.com>, Raghavendra Rao Anata <rananta@google.com>,
- David Matlack <dmatlack@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- Jim Mattson <jmattson@google.com>
+Cc: Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
+ linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -94,51 +86,67 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 10 Aug 2021 18:55:12 +0100,
-Oliver Upton <oupton@google.com> wrote:
+On Wed, 11 Aug 2021 05:52:29 +0100,
+Anshuman Khandual <anshuman.khandual@arm.com> wrote:
 > 
-> On Tue, Aug 10, 2021 at 3:56 AM Marc Zyngier <maz@kernel.org> wrote:
-> >
-> > On Wed, 04 Aug 2021 09:58:15 +0100,
-> > Oliver Upton <oupton@google.com> wrote:
+> Even though ID_AA64MMFR0.PARANGE reports 52 bit PA size support, it cannot
+> be enabled as guest IPA size on 4K or 16K page size configurations. Hence
+> kvm_ipa_limit must be restricted to 48 bits. This change achieves required
+> IPA capping.
+> 
+> Before the commit c9b69a0cf0b4 ("KVM: arm64: Don't constrain maximum IPA
+> size based on host configuration"), the problem here would have been just
+> latent via PHYS_MASK_SHIFT (which earlier in turn capped kvm_ipa_limit),
+> which remains capped at 48 bits on 4K and 16K configs.
+> 
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: James Morse <james.morse@arm.com>
+> Cc: Alexandru Elisei <alexandru.elisei@arm.com>
+> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will@kernel.org>
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: kvmarm@lists.cs.columbia.edu
+> Cc: linux-kernel@vger.kernel.org
+> Fixes: c9b69a0cf0b4 ("KVM: arm64: Don't constrain maximum IPA size based on host configuration")
+> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+> ---
+> This applies on v5.14-rc5
+> 
+>  arch/arm64/kvm/reset.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> index 20588220fe66..e66974c4b9d3 100644
+> --- a/arch/arm64/kvm/reset.c
+> +++ b/arch/arm64/kvm/reset.c
+> @@ -337,6 +337,15 @@ int kvm_set_ipa_limit(void)
+>  		return -EINVAL;
+>  	}
+>  
+> +	/*
+> +	 * IPA size beyond 48 bits could not be supported
+> +	 * on either 4K or 16K page size. Hence let's cap
+> +	 * it to 48 bits, in case it's reported as larger
+> +	 * on the system.
+> +	 */
+> +	if (!IS_ENABLED(CONFIG_ARM64_64K_PAGES))
 
-[...]
+As per our earlier discussion, please use (PAGE_SIZE != SZ_64K)
+instead. This is in keeping with the rest of the file.
 
-> > > diff --git a/include/clocksource/arm_arch_timer.h b/include/clocksource/arm_arch_timer.h
-> > > index 73c7139c866f..7252ffa3d675 100644
-> > > --- a/include/clocksource/arm_arch_timer.h
-> > > +++ b/include/clocksource/arm_arch_timer.h
-> > > @@ -21,6 +21,7 @@
-> > >  #define CNTHCTL_EVNTEN                       (1 << 2)
-> > >  #define CNTHCTL_EVNTDIR                      (1 << 3)
-> > >  #define CNTHCTL_EVNTI                        (0xF << 4)
-> > > +#define CNTHCTL_ECV                  (1 << 12)
-> > >
-> > >  enum arch_timer_reg {
-> > >       ARCH_TIMER_REG_CTRL,
-> >
-> > You also want to document that SCR_EL3.ECVEn has to be set to 1 for
-> > this to work (see Documentation/arm64/booting.txt). And if it isn't,
-> > the firmware better handle the CNTPOFF_EL2 traps correctly...
-> 
-> I'll grab the popcorn now ;-) Adding docs for this, good idea.
-> 
-> > What firmware did you use for this? I think we need to update the boot
-> > wrapper, but that's something that can be done in parallel.
-> 
-> I had actually just done a direct boot from ARM-TF -> Linux, nothing
-> else in between.
+> +		parange = min(parange, (unsigned int)ID_AA64MMFR0_PARANGE_48);
+> +
 
-Ah, right. I tend to use the boot-wrapper[1] to build a single binary
-that contains the 'boot loader', DT and kernel. Using ATF is probably
-more representative of the final thing, but the boot-wrapper is dead
-easy to hack on...
+Also, please move it next to the point where we assign parange.
+
+>  	kvm_ipa_limit = id_aa64mmfr0_parange_to_phys_shift(parange);
+>  	kvm_info("IPA Size Limit: %d bits%s\n", kvm_ipa_limit,
+>  		 ((kvm_ipa_limit < KVM_PHYS_SHIFT) ?
 
 Thanks,
 
 	M.
-
-[1] git://git.kernel.org/pub/scm/linux/kernel/git/mark/boot-wrapper-aarch64.git
 
 -- 
 Without deviation from the norm, progress is not possible.
