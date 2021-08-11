@@ -2,74 +2,67 @@ Return-Path: <SRS0=13S2=NC=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0993C4338F
-	for <kvmarm@archiver.kernel.org>; Wed, 11 Aug 2021 09:56:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5A6BC432BE
+	for <kvmarm@archiver.kernel.org>; Wed, 11 Aug 2021 10:12:44 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 11D8B60527
-	for <kvmarm@archiver.kernel.org>; Wed, 11 Aug 2021 09:56:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 11D8B60527
+	by mail.kernel.org (Postfix) with ESMTP id 3FC00601FD
+	for <kvmarm@archiver.kernel.org>; Wed, 11 Aug 2021 10:12:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 3FC00601FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9217849FA6;
-	Wed, 11 Aug 2021 05:56:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BF01F49F83;
+	Wed, 11 Aug 2021 06:12:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id sAAf4F+6KLss; Wed, 11 Aug 2021 05:56:12 -0400 (EDT)
+	with ESMTP id CY96NM1pvqvL; Wed, 11 Aug 2021 06:12:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A7A049F83;
-	Wed, 11 Aug 2021 05:56:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 08CBB49F5D;
+	Wed, 11 Aug 2021 06:12:38 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4177349F83
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Aug 2021 05:56:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0648649F5D
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Aug 2021 06:12:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UgLcwH2jVBV8 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 11 Aug 2021 05:56:07 -0400 (EDT)
+ with ESMTP id byT2eWLTRMtu for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 11 Aug 2021 06:12:31 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3847249F6C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Aug 2021 05:56:07 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 3486B60200;
- Wed, 11 Aug 2021 09:56:06 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1mDkxw-004HmC-0l; Wed, 11 Aug 2021 10:56:04 +0100
-Date: Wed, 11 Aug 2021 10:56:03 +0100
-Message-ID: <87tujw9ufg.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7EE17407ED
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Aug 2021 06:12:31 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 3C4E0604AC;
+ Wed, 11 Aug 2021 10:12:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1628676750;
+ bh=k5j7pTJV1G1/uJTXFNYwXDPkN3zQameqJbn3FuQ+zfA=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=TOy5TVoWXDc9sN+JOLfAdHzSnl8kfTevmJIH9ykKKMFBnvnUccg/KhZ1g3/rBa+Sm
+ tmujjPQovKdYIZcSEZ45m1SjqWX8l7fu7wZgc5GiyQjvQe+CSQSBhdjrTaxyc/g600
+ uI7iz6P47c39LvkTj7w83jbEa/eJ2Kp75peghBgSilGZ8ro4EkfQpqswsgH4sN5vKW
+ ug65vqnjPwwXNGhCg0cPlIKE6uKFrtyJgN5eShR57+iQW++NpL5ZCfYahPQb0VZWmZ
+ vcYFyK6c6zkQ81NZ24yys7HSZcIZO40nqlQsW16z8+W8IZGz11ijstAUaAdwyN89GB
+ iHIDebm/1RodQ==
+Date: Wed, 11 Aug 2021 11:12:25 +0100
+From: Will Deacon <will@kernel.org>
 To: Anshuman Khandual <anshuman.khandual@arm.com>
-Subject: Re: [PATCH V2] KVM: arm64: perf: Replace '0xf' instances with
- ID_AA64DFR0_PMUVER_IMP_DEF
-In-Reply-To: <1628652427-24695-1-git-send-email-anshuman.khandual@arm.com>
-References: <1628652427-24695-1-git-send-email-anshuman.khandual@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: anshuman.khandual@arm.com,
- linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, will@kernel.org,
- mark.rutland@arm.com, peterz@infradead.org, linux-perf-users@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: Peter Zijlstra <peterz@infradead.org>,
- Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
- linux-perf-users@vger.kernel.org, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH] arm64/mm: Define ID_AA64MMFR0_TGRAN_2_SHIFT
+Message-ID: <20210811101225.GC4426@willie-the-truck>
+References: <1628569782-30213-1-git-send-email-anshuman.khandual@arm.com>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <1628569782-30213-1-git-send-email-anshuman.khandual@arm.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ Marc Zyngier <maz@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -86,34 +79,28 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 11 Aug 2021 04:27:06 +0100,
-Anshuman Khandual <anshuman.khandual@arm.com> wrote:
-> 
-> ID_AA64DFR0_PMUVER_IMP_DEF which indicate implementation defined PMU, never
-> actually gets used although there are '0xf' instances scattered all around.
-> Just do the macro replacement to improve readability.
+On Tue, Aug 10, 2021 at 09:59:42AM +0530, Anshuman Khandual wrote:
+> Streamline the Stage-2 TGRAN value extraction from ID_AA64MMFR0 register by
+> adding a page size agnostic ID_AA64MMFR0_TGRAN_2_SHIFT. This is similar to
+> the existing Stage-1 TGRAN shift i.e ID_AA64MMFR0_TGRAN_SHIFT.
 > 
 > Cc: Catalin Marinas <catalin.marinas@arm.com>
 > Cc: Will Deacon <will@kernel.org>
-> Cc: Mark Rutland <mark.rutland@arm.com>
-> Cc: Peter Zijlstra <peterz@infradead.org>
 > Cc: Marc Zyngier <maz@kernel.org>
-> Cc: linux-perf-users@vger.kernel.org
 > Cc: linux-arm-kernel@lists.infradead.org
 > Cc: kvmarm@lists.cs.columbia.edu
 > Cc: linux-kernel@vger.kernel.org
 > Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+> ---
+> This applies on v5.14-rc5.
+> 
+>  arch/arm64/include/asm/sysreg.h |  3 +++
+>  arch/arm64/kvm/reset.c          | 17 ++---------------
+>  2 files changed, 5 insertions(+), 15 deletions(-)
 
-For some reason I don't understand, b4 doesn't want to cherry-pick
-this patch from the list. I've applied it manually to
-kvm-arm64/misc-5.15.
+Acked-by: Will Deacon <will@kernel.org>
 
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Will
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
