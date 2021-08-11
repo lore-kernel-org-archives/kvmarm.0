@@ -2,71 +2,82 @@ Return-Path: <SRS0=13S2=NC=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A1ACC4338F
-	for <kvmarm@archiver.kernel.org>; Wed, 11 Aug 2021 15:02:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C51DC432BE
+	for <kvmarm@archiver.kernel.org>; Wed, 11 Aug 2021 15:22:55 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7A07860FC0
-	for <kvmarm@archiver.kernel.org>; Wed, 11 Aug 2021 15:02:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 7A07860FC0
+	by mail.kernel.org (Postfix) with ESMTP id 8A98260F11
+	for <kvmarm@archiver.kernel.org>; Wed, 11 Aug 2021 15:22:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 8A98260F11
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 06EDE40256;
-	Wed, 11 Aug 2021 11:02:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 16F8B40808;
+	Wed, 11 Aug 2021 11:22:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JapOXD6kfnmH; Wed, 11 Aug 2021 11:02:52 -0400 (EDT)
+	with ESMTP id 3Qg3L+g4jFLC; Wed, 11 Aug 2021 11:22:49 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D94434086A;
-	Wed, 11 Aug 2021 11:02:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 518C7407F4;
+	Wed, 11 Aug 2021 11:22:49 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9477940874
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Aug 2021 11:02:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 24809407F4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Aug 2021 11:22:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7hCwPZztu+BQ for <kvmarm@lists.cs.columbia.edu>;
- Wed, 11 Aug 2021 11:02:50 -0400 (EDT)
+ with ESMTP id zUJ5pev85DRZ for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 11 Aug 2021 11:22:46 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9C8FF407EF
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Aug 2021 11:02:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C651D407EF
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Aug 2021 11:22:46 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 857E760F55;
- Wed, 11 Aug 2021 15:02:49 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
+ by mail.kernel.org (Postfix) with ESMTPSA id C145560F11;
+ Wed, 11 Aug 2021 15:22:45 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mDpkl-004MSu-GS; Wed, 11 Aug 2021 16:02:47 +0100
+ id 1mDq43-004Mfn-Kz; Wed, 11 Aug 2021 16:22:43 +0100
+Date: Wed, 11 Aug 2021 16:22:43 +0100
+Message-ID: <87h7fw9fb0.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: linux-arm-kernel@lists.infradead.org,
- Anshuman Khandual <anshuman.khandual@arm.com>
-Subject: Re: [PATCH V2] KVM: arm64: Restrict IPA size to maximum 48 bits on 4K
- and 16K page size
-Date: Wed, 11 Aug 2021 16:02:44 +0100
-Message-Id: <162869415426.2969316.15859233360100994637.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <1628680275-16578-1-git-send-email-anshuman.khandual@arm.com>
-References: <1628680275-16578-1-git-send-email-anshuman.khandual@arm.com>
-MIME-Version: 1.0
+To: Oliver Upton <oupton@google.com>
+Subject: Re: [PATCH v6 13/21] KVM: arm64: Allow userspace to configure a
+ vCPU's virtual offset
+In-Reply-To: <CAOQ_Qsjiyp_HQLhgFfF-o7T=Qpe+djL9KCFjAU2xmj8OXhAf4w@mail.gmail.com>
+References: <20210804085819.846610-1-oupton@google.com>
+ <20210804085819.846610-14-oupton@google.com>
+ <87czqlbq15.wl-maz@kernel.org>
+ <CAOQ_Qsjiyp_HQLhgFfF-o7T=Qpe+djL9KCFjAU2xmj8OXhAf4w@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org,
- anshuman.khandual@arm.com, catalin.marinas@arm.com, alexandru.elisei@arm.com,
- james.morse@arm.com, kvmarm@lists.cs.columbia.edu,
- linux-kernel@vger.kernel.org, suzuki.poulose@arm.com, will@kernel.org
+X-SA-Exim-Rcpt-To: oupton@google.com, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, seanjc@google.com,
+ pshier@google.com, jmattson@google.com, dmatlack@google.com,
+ ricarkol@google.com, jingzhangos@google.com, rananta@google.com,
+ james.morse@arm.com, Alexandru.Elisei@arm.com, suzuki.poulose@arm.com,
+ linux-arm-kernel@lists.infradead.org, drjones@redhat.com, will@kernel.org,
+ catalin.marinas@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org,
+ Will Deacon <will@kernel.org>, Sean Christopherson <seanjc@google.com>,
+ Peter Shier <pshier@google.com>, Raghavendra Rao Anata <rananta@google.com>,
+ David Matlack <dmatlack@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -83,29 +94,97 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 11 Aug 2021 16:41:15 +0530, Anshuman Khandual wrote:
-> Even though ID_AA64MMFR0.PARANGE reports 52 bit PA size support, it cannot
-> be enabled as guest IPA size on 4K or 16K page size configurations. Hence
-> kvm_ipa_limit must be restricted to 48 bits. This change achieves required
-> IPA capping.
+On Tue, 10 Aug 2021 10:44:01 +0100,
+Oliver Upton <oupton@google.com> wrote:
 > 
-> Before the commit c9b69a0cf0b4 ("KVM: arm64: Don't constrain maximum IPA
-> size based on host configuration"), the problem here would have been just
-> latent via PHYS_MASK_SHIFT (which earlier in turn capped kvm_ipa_limit),
-> which remains capped at 48 bits on 4K and 16K configs.
+> On Tue, Aug 10, 2021 at 2:35 AM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > On Wed, 04 Aug 2021 09:58:11 +0100,
+> > Oliver Upton <oupton@google.com> wrote:
+> > >
+> > > Allow userspace to access the guest's virtual counter-timer offset
+> > > through the ONE_REG interface. The value read or written is defined to
+> > > be an offset from the guest's physical counter-timer. Add some
+> > > documentation to clarify how a VMM should use this and the existing
+> > > CNTVCT_EL0.
+> > >
+> > > Signed-off-by: Oliver Upton <oupton@google.com>
+> > > ---
+> > >  Documentation/virt/kvm/api.rst    | 10 ++++++++++
+> > >  arch/arm64/include/uapi/asm/kvm.h |  1 +
+> > >  arch/arm64/kvm/arch_timer.c       | 11 +++++++++++
+> > >  arch/arm64/kvm/guest.c            |  6 +++++-
+> > >  include/kvm/arm_arch_timer.h      |  1 +
+> > >  5 files changed, 28 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> > > index 8d4a3471ad9e..28a65dc89985 100644
+> > > --- a/Documentation/virt/kvm/api.rst
+> > > +++ b/Documentation/virt/kvm/api.rst
+> > > @@ -2487,6 +2487,16 @@ arm64 system registers have the following id bit patterns::
+> > >       derived from the register encoding for CNTV_CVAL_EL0.  As this is
+> > >       API, it must remain this way.
+> > >
+> > > +.. warning::
+> > > +
+> > > +     The value of KVM_REG_ARM_TIMER_OFFSET is defined as an offset from
+> > > +     the guest's view of the physical counter-timer.
+> > > +
+> > > +     Userspace should use either KVM_REG_ARM_TIMER_OFFSET or
+> > > +     KVM_REG_ARM_TIMER_CVAL to pause and resume a guest's virtual
+> >
+> > You probably mean KVM_REG_ARM_TIMER_CNT here, despite the broken
+> > encoding.
+> 
+> Indeed I do!
+> 
+> >
+> > > +     counter-timer. Mixed use of these registers could result in an
+> > > +     unpredictable guest counter value.
+> > > +
+> > >  arm64 firmware pseudo-registers have the following bit pattern::
+> > >
+> > >    0x6030 0000 0014 <regno:16>
+> > > diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> > > index b3edde68bc3e..949a31bc10f0 100644
+> > > --- a/arch/arm64/include/uapi/asm/kvm.h
+> > > +++ b/arch/arm64/include/uapi/asm/kvm.h
+> > > @@ -255,6 +255,7 @@ struct kvm_arm_copy_mte_tags {
+> > >  #define KVM_REG_ARM_TIMER_CTL                ARM64_SYS_REG(3, 3, 14, 3, 1)
+> > >  #define KVM_REG_ARM_TIMER_CVAL               ARM64_SYS_REG(3, 3, 14, 0, 2)
+> > >  #define KVM_REG_ARM_TIMER_CNT                ARM64_SYS_REG(3, 3, 14, 3, 2)
+> > > +#define KVM_REG_ARM_TIMER_OFFSET     ARM64_SYS_REG(3, 4, 14, 0, 3)
+> >
+> > I don't think we can use the encoding for CNTPOFF_EL2 here, as it will
+> > eventually clash with a NV guest using the same feature for its own
+> > purpose. We don't want this offset to overlap with any of the existing
+> > features.
+> >
+> > I actually liked your previous proposal of controlling the physical
+> > offset via a device property, as it clearly indicated that you were
+> > dealing with non-architectural state.
+> 
+> That's actually exactly what I did here :) That said, the macro name
+> is horribly obfuscated from CNTVOFF_EL2. I did this for the sake of
+> symmetry with other virtual counter-timer registers above, though this
+> may warrant special casing given the fact that we have a similarly
+> named device attribute to handle the physical offset.
 
-Applied to next, thanks!
+Gah, you are of course right. Ignore my rambling. The name is fine (or
+at least in keeping with existing quality level of the making).
 
-[1/1] KVM: arm64: Restrict IPA size to maximum 48 bits on 4K and 16K page size
-      commit: 5e5df9571c319fb107d7a523cc96fcc99961ee70
+For the physical offset, something along the lines of
+KVM_ARM_VCPU_TIMER_PHYS_OFFSET is probably right (but feel free to be
+creative, I'm terrible at this stuff [1]).
 
-Cheers,
+Thanks,
 
 	M.
+
+[1] https://twitter.com/codinghorror/status/506010907021828096?lang=en
+
 -- 
 Without deviation from the norm, progress is not possible.
-
-
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
