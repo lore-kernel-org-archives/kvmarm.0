@@ -7,60 +7,59 @@ X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD4A1C4338F
-	for <kvmarm@archiver.kernel.org>; Thu, 12 Aug 2021 09:53:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CD05C4338F
+	for <kvmarm@archiver.kernel.org>; Thu, 12 Aug 2021 09:57:58 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 422C560FBF
-	for <kvmarm@archiver.kernel.org>; Thu, 12 Aug 2021 09:53:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 422C560FBF
+	by mail.kernel.org (Postfix) with ESMTP id C652460F57
+	for <kvmarm@archiver.kernel.org>; Thu, 12 Aug 2021 09:57:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org C652460F57
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C067F407EC;
-	Thu, 12 Aug 2021 05:53:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 53EA0407EF;
+	Thu, 12 Aug 2021 05:57:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id mrT-84NCsQsM; Thu, 12 Aug 2021 05:53:48 -0400 (EDT)
+	with ESMTP id suospwceeCQl; Thu, 12 Aug 2021 05:57:53 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CDF7E407F4;
-	Thu, 12 Aug 2021 05:53:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 62AFA49F8F;
+	Thu, 12 Aug 2021 05:57:53 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B56B4407F4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Aug 2021 05:53:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EF4094086A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Aug 2021 05:57:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KoJjSfP8dr8B for <kvmarm@lists.cs.columbia.edu>;
- Thu, 12 Aug 2021 05:53:46 -0400 (EDT)
+ with ESMTP id 4vtmPZGO3vNZ for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 12 Aug 2021 05:57:52 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A7D4A407EC
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Aug 2021 05:53:46 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 7F3D160EB9;
- Thu, 12 Aug 2021 09:53:42 +0000 (UTC)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EF260407EF
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Aug 2021 05:57:51 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 9ED9960F57;
+ Thu, 12 Aug 2021 09:57:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1628762024;
- bh=8XFM14K7kKN0l/+uki0YeLpUShrJFjJTlweUW//YX9Q=;
+ s=k20201202; t=1628762269;
+ bh=HxmpIxZ8vP71X/haLXmLN6MBqTPWJ4X2U98Wz3faOco=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=k9TYlALwCXVzH3+KaEt2QnWfDx4lBTVGzLXbtIhA9S+5ZdGElwQ5jOltSn7jpFSb6
- hYUsaGUJqWi1fuCHorBIET+c+9zW/5BzQyTBERYgeLuLdPlHzMFvq/lRukJcjudWih
- 4MStLVfi4KVHLkpaUpYDrBrYIVh9odqyFPDMhqK/DOLEkezOj8FF3Ijh/8COy4vkEu
- ipfEwesSN+Cq5avEt1xO1p+wf8Nl9ommH1u9J7Y3/UwWSed6x6FpeKoUJNksKf+O1p
- f8o1Ax0tEAbj2K3fyUqK5DTW739ptxn9uTnaFn7KGVd4hi1JMAxnFyUUBwDBw0nk7A
- Xcn4KTfWoyI2w==
-Date: Thu, 12 Aug 2021 10:53:39 +0100
+ b=qi3GtSC95NtI+T6MxxcNybLmWFslRHvRU4ZDmPgyAoXbqx4EgyXqEnLVndjdRYaUe
+ /Wgt8tZ9n4FTy+sfler2nLtrTLmuML0Uoj/RttYKi+nE9x8SQJepidfJYmEemGOfgP
+ UGRkBZqW/HX9AsEjDgBGf7hq1/A7IJsqTRL03YUn/hMtiY7hwctM+HqysiEQXlfqBJ
+ ZHCWU+Qo1HSJE/NFdGC1ZsUTImBJZp7yHuEziSB43FNJN0XHeBIigL2okY/EjPR9ok
+ sL1F0NCCNRHHUEcQ7PQ4eXre5RZGobzyfcWG5dsVno/9VK3AMkNHeTLHg4PxMHD8l1
+ izwVzHr89iTrg==
+Date: Thu, 12 Aug 2021 10:57:44 +0100
 From: Will Deacon <will@kernel.org>
 To: Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH v3 13/15] KVM: arm64: Trap access to pVM restricted
- features
-Message-ID: <20210812095338.GK5912@willie-the-truck>
+Subject: Re: [PATCH v3 14/15] KVM: arm64: Handle protected guests at 32 bits
+Message-ID: <20210812095743.GL5912@willie-the-truck>
 References: <20210719160346.609914-1-tabba@google.com>
- <20210719160346.609914-14-tabba@google.com>
+ <20210719160346.609914-15-tabba@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20210719160346.609914-14-tabba@google.com>
+In-Reply-To: <20210719160346.609914-15-tabba@google.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Cc: kernel-team@android.com, kvm@vger.kernel.org, maz@kernel.org,
  pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu,
@@ -81,71 +80,65 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Jul 19, 2021 at 05:03:44PM +0100, Fuad Tabba wrote:
-> Trap accesses to restricted features for VMs running in protected
-> mode.
+On Mon, Jul 19, 2021 at 05:03:45PM +0100, Fuad Tabba wrote:
+> Protected KVM does not support protected AArch32 guests. However,
+> it is possible for the guest to force run AArch32, potentially
+> causing problems. Add an extra check so that if the hypervisor
+> catches the guest doing that, it can prevent the guest from
+> running again by resetting vcpu->arch.target and returning
+> ARM_EXCEPTION_IL.
 > 
-> Access to feature registers are emulated, and only supported
-> features are exposed to protected VMs.
-> 
-> Accesses to restricted registers as well as restricted
-> instructions are trapped, and an undefined exception is injected
-> into the protected guests, i.e., with EC = 0x0 (unknown reason).
-> This EC is the one used, according to the Arm Architecture
-> Reference Manual, for unallocated or undefined system registers
-> or instructions.
-> 
-> Only affects the functionality of protected VMs. Otherwise,
-> should not affect non-protected VMs when KVM is running in
-> protected mode.
+> Adapted from commit 22f553842b14 ("KVM: arm64: Handle Asymmetric
+> AArch32 systems")
 > 
 > Signed-off-by: Fuad Tabba <tabba@google.com>
 > ---
->  arch/arm64/kvm/hyp/include/hyp/switch.h |  3 ++
->  arch/arm64/kvm/hyp/nvhe/switch.c        | 52 ++++++++++++++++++-------
->  2 files changed, 41 insertions(+), 14 deletions(-)
+>  arch/arm64/kvm/hyp/include/hyp/switch.h | 24 ++++++++++++++++++++++++
+>  1 file changed, 24 insertions(+)
 > 
 > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index 5a2b89b96c67..8431f1514280 100644
+> index 8431f1514280..f09343e15a80 100644
 > --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
 > +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -33,6 +33,9 @@
->  extern struct exception_table_entry __start___kvm_ex_table;
->  extern struct exception_table_entry __stop___kvm_ex_table;
+> @@ -23,6 +23,7 @@
+>  #include <asm/kprobes.h>
+>  #include <asm/kvm_asm.h>
+>  #include <asm/kvm_emulate.h>
+> +#include <asm/kvm_fixed_config.h>
+>  #include <asm/kvm_hyp.h>
+>  #include <asm/kvm_mmu.h>
+>  #include <asm/fpsimd.h>
+> @@ -477,6 +478,29 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  			write_sysreg_el2(read_sysreg_el2(SYS_ELR) - 4, SYS_ELR);
+>  	}
 >  
-> +int kvm_handle_pvm_sys64(struct kvm_vcpu *vcpu);
-> +int kvm_handle_pvm_restricted(struct kvm_vcpu *vcpu);
-> +
->  /* Check whether the FP regs were dirtied while in the host-side run loop: */
->  static inline bool update_fp_enabled(struct kvm_vcpu *vcpu)
->  {
-> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-> index 36da423006bd..99bbbba90094 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-> @@ -158,30 +158,54 @@ static void __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
->  		write_sysreg(pmu->events_host, pmcntenset_el0);
->  }
->  
-> +/**
-> + * Handle system register accesses for protected VMs.
-> + *
-> + * Return 1 if handled, or 0 if not.
-> + */
-> +static int handle_pvm_sys64(struct kvm_vcpu *vcpu)
-> +{
-> +	return kvm_vm_is_protected(kern_hyp_va(vcpu->kvm)) ?
-> +			     kvm_handle_pvm_sys64(vcpu) :
-> +			     0;
-> +}
+> +	/*
+> +	 * Protected VMs might not be allowed to run in AArch32. The check below
+> +	 * is based on the one in kvm_arch_vcpu_ioctl_run().
+> +	 * The ARMv8 architecture doesn't give the hypervisor a mechanism to
+> +	 * prevent a guest from dropping to AArch32 EL0 if implemented by the
+> +	 * CPU. If the hypervisor spots a guest in such a state ensure it is
+> +	 * handled, and don't trust the host to spot or fix it.
+> +	 */
+> +	if (unlikely(is_nvhe_hyp_code() &&
+> +		     kvm_vm_is_protected(kern_hyp_va(vcpu->kvm)) &&
+> +		     FIELD_GET(FEATURE(ID_AA64PFR0_EL0),
+> +			       PVM_ID_AA64PFR0_ALLOW) <
+> +			     ID_AA64PFR0_ELx_32BIT_64BIT &&
+> +		     vcpu_mode_is_32bit(vcpu))) {
+> +		/*
+> +		 * As we have caught the guest red-handed, decide that it isn't
+> +		 * fit for purpose anymore by making the vcpu invalid.
+> +		 */
+> +		vcpu->arch.target = -1;
+> +		*exit_code = ARM_EXCEPTION_IL;
+> +		goto exit;
+> +	}
 
-Why don't we move the kvm_vm_is_protected() check into
-kvm_get_hyp_exit_handler() so we can avoid adding it to each handler
-instead?
-
-Either way:
-
-Acked-by: Will Deacon <will@kernel.org>
+Would this be better off inside the nvhe-specific run loop? Seems like we
+could elide fixup_guest_exit() altogether if we've detect that we're in
+AArch32 state when we shouldn't be and it would keep the code off the shared
+path.
 
 Will
 _______________________________________________
