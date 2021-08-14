@@ -1,89 +1,72 @@
-Return-Path: <SRS0=HTLS=NE=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=nCrY=NF=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3066C4338F
-	for <kvmarm@archiver.kernel.org>; Fri, 13 Aug 2021 17:46:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7F00C4338F
+	for <kvmarm@archiver.kernel.org>; Sat, 14 Aug 2021 09:10:21 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2FA0F6103A
-	for <kvmarm@archiver.kernel.org>; Fri, 13 Aug 2021 17:46:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 2FA0F6103A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 5EDF660F00
+	for <kvmarm@archiver.kernel.org>; Sat, 14 Aug 2021 09:10:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 5EDF660F00
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 938734A319;
-	Fri, 13 Aug 2021 13:46:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BC7C84A3A3;
+	Sat, 14 Aug 2021 05:10:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id vtoF4qOS5H2G; Fri, 13 Aug 2021 13:46:25 -0400 (EDT)
+	with ESMTP id LuBanio+L+B5; Sat, 14 Aug 2021 05:10:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A12244B0BA;
-	Fri, 13 Aug 2021 13:46:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CDE104A4A3;
+	Sat, 14 Aug 2021 05:10:16 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 27B064A319
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Aug 2021 13:46:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 07E474A126
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 14 Aug 2021 05:10:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id InyvwSOo0VHe for <kvmarm@lists.cs.columbia.edu>;
- Fri, 13 Aug 2021 13:46:23 -0400 (EDT)
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com
- [209.85.208.176])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0B0844086D
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Aug 2021 13:46:23 -0400 (EDT)
-Received: by mail-lj1-f176.google.com with SMTP id h11so16673923ljo.12
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Aug 2021 10:46:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=f8Holqm94msH8zwwttqnwNNIb5GP1G9/99qvE2v+dcU=;
- b=FPBviLCHTYpGAqgTfZCCThlPsy3SvDQxjuebC13p0iXhj0OeNzcrk8YOeVtI5XtpMF
- Uz75WPbJwSvlgpLB3W9qk6PHRin4VdhT9qA8BJG5ghCMldOJLsqDkm82fAq0EG8X/9BU
- 8X0Jhf6XqawQsbRgFF6RRyadIjhI2BKj4pTGDmuYTJyYsiQMyLxObkqnuD976ng/AB8v
- NgMtefW1nPUJFOW/t+mhBlXgdY58Unh1X9nWpqYWjWqlYtWMHQ7OFlwxbWE6Xg1lIYrk
- MK78YUyYD35s7G1H9/bmzRptli+3Oa4ZmwL653IleMYkjHZaiwFDmBcZfA+TZ/gXbrXs
- WVhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=f8Holqm94msH8zwwttqnwNNIb5GP1G9/99qvE2v+dcU=;
- b=Ojfru4IJxLIDPZLRtHyJ7Ix9e8ob+JpFofIDBY4wiwBtbILl0dC2EeF27mF9H0mqnv
- 51c+HWk/jM7ZS/tx8vdso00PCJIwztJxfHYWwgiSKjvbHPlccyGRrb2l478QwV0YCopH
- 0dIvW39q/rBjCtReQFzAJxHMC/+s0GicC/fVwjsQnAGqhizzHo94Ko0HsNkHv5I46+oj
- kBAFbB1R2Gv+QMEds/bwOKQe5W0e57AIDyXHyiAX6at8u7zn94bST33/kzKAoPd4KW7E
- L8CewqzrvwNFZznEFnAcH9DRUdEXSMSo78Y4LQTkZggzD4LCjtr9wCLFttbTzkcvGowj
- UC1A==
-X-Gm-Message-State: AOAM533Jn1Us9ujUvbEHWbCsJj9uZ1Enuypce4HIqWrWnYExdu7eNjOL
- QI1hJudByE02wj6Fk29uxNtefWzhiOzRvb3fNYg8CA==
-X-Google-Smtp-Source: ABdhPJx8HrYl3U2RpJvJAW94Qnm4I1248XWC/aFD75EZtnwMe+a7ZCPJypazWWRAKqrHLiT2BB63moMkioDJPlkcPDc=
-X-Received: by 2002:a2e:a5c1:: with SMTP id n1mr2653235ljp.65.1628876781486;
- Fri, 13 Aug 2021 10:46:21 -0700 (PDT)
+ with ESMTP id lkJAgeYq6Wua for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 14 Aug 2021 05:10:12 -0400 (EDT)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C567F4AC78
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 14 Aug 2021 05:10:11 -0400 (EDT)
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.57])
+ by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Gmvg417C3zb1TY;
+ Sat, 14 Aug 2021 17:06:24 +0800 (CST)
+Received: from dggema764-chm.china.huawei.com (10.1.198.206) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2176.2; Sat, 14 Aug 2021 17:10:05 +0800
+Received: from [10.174.185.179] (10.174.185.179) by
+ dggema764-chm.china.huawei.com (10.1.198.206) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2176.2; Sat, 14 Aug 2021 17:10:03 +0800
+Subject: Re: [PATCH 04/10] KVM: arm64: selftests: Add basic support for
+ arch_timers
+To: Raghavendra Rao Ananta <rananta@google.com>
+References: <20210813211211.2983293-1-rananta@google.com>
+ <20210813211211.2983293-5-rananta@google.com>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <35c06dff-36cf-3836-e469-bedcf3c04a4d@huawei.com>
+Date: Sat, 14 Aug 2021 17:10:02 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-References: <20210804085819.846610-1-oupton@google.com>
- <20210804085819.846610-2-oupton@google.com>
- <78eeaf83-2bfa-8452-1301-a607fba7fa0c@redhat.com>
- <CAOQ_QsiwzKpaXUadGR6cWC2k0pg1P4QgkAxNdo0gpVAP1P3hSQ@mail.gmail.com>
- <0b415872-7a67-d38b-ae01-62c38b365be0@redhat.com>
-In-Reply-To: <0b415872-7a67-d38b-ae01-62c38b365be0@redhat.com>
-From: Oliver Upton <oupton@google.com>
-Date: Fri, 13 Aug 2021 10:46:10 -0700
-Message-ID: <CAOQ_Qsjs7MOeh8ZGx3_CdgpedFwb9pYG_tQ4insdPwaqhAY=6g@mail.gmail.com>
-Subject: Re: [PATCH v6 01/21] KVM: x86: Fix potential race in KVM_GET_CLOCK
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org,
- Will Deacon <will@kernel.org>, Sean Christopherson <seanjc@google.com>,
- Raghavendra Rao Anata <rananta@google.com>, Peter Shier <pshier@google.com>,
- Marc Zyngier <maz@kernel.org>, David Matlack <dmatlack@google.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- Jim Mattson <jmattson@google.com>
+In-Reply-To: <20210813211211.2983293-5-rananta@google.com>
+Content-Language: en-US
+X-Originating-IP: [10.174.185.179]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggema764-chm.china.huawei.com (10.1.198.206)
+X-CFilter-Loop: Reflected
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -95,37 +78,107 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Aug 13, 2021 at 3:44 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 13/08/21 12:39, Oliver Upton wrote:
-> > Might it make sense to fix this issue under the existing locking
-> > scheme, then shift to what you're proposing? I say that, but the
-> > locking change in 03/21 would most certainly have a short lifetime
-> > until this patch supersedes it.
->
-> Yes, definitely.  The seqcount change would definitely go in much later.
->   Extracting KVM_{GET,SET}_CLOCK to separate function would also be a
-> patch of its own.  Give me a few more days of frantic KVM Forum
-> preparation. :)
+On 2021/8/14 5:12, Raghavendra Rao Ananta wrote:
+> Add a minimalistic library support to access the virtual timers,
+> that can be used for simple timing functionalities, such as
+> introducing delays in the guest.
+> 
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> ---
+>  .../kvm/include/aarch64/arch_timer.h          | 138 ++++++++++++++++++
+>  1 file changed, 138 insertions(+)
+>  create mode 100644 tools/testing/selftests/kvm/include/aarch64/arch_timer.h
+> 
+> diff --git a/tools/testing/selftests/kvm/include/aarch64/arch_timer.h b/tools/testing/selftests/kvm/include/aarch64/arch_timer.h
+> new file mode 100644
+> index 000000000000..e6144ab95348
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/include/aarch64/arch_timer.h
+> @@ -0,0 +1,138 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * ARM Generic Interrupt Controller (GIC) specific defines
 
-Sounds good :-) I'm probably going to send this out once more, in
-three separate series:
+This isn't GIC specific, but arch timer.
 
-- x86 (no changes, just rebasing)
-- arm64 (address some comments, bugs)
-- selftests (no changes)
+> + */
+> +
+> +#ifndef SELFTEST_KVM_ARCH_TIMER_H
+> +#define SELFTEST_KVM_ARCH_TIMER_H
+> +
+> +#include <linux/sizes.h>
 
---
+Do we really need it?
+
+> +
+> +#include "processor.h"
+> +
+> +enum arch_timer {
+> +	VIRTUAL,
+> +	PHYSICAL,
+> +};
+> +
+> +#define CTL_ENABLE	(1 << 0)
+> +#define CTL_ISTATUS	(1 << 2)
+> +#define CTL_IMASK	(1 << 1)
+
+nitpick: Move CTL_IMASK before CTL_ISTATUS ?
+
+> +
+> +#define msec_to_cycles(msec)	\
+> +	(timer_get_cntfrq() * (uint64_t)(msec) / 1000)
+> +
+> +#define usec_to_cycles(usec)	\
+> +	(timer_get_cntfrq() * (uint64_t)(usec) / 1000000)
+> +
+> +#define cycles_to_usec(cycles) \
+> +	((uint64_t)(cycles) * 1000000 / timer_get_cntfrq())
+> +
+> +static inline uint32_t timer_get_cntfrq(void)
+> +{
+> +	return read_sysreg(cntfrq_el0);
+> +}
+> +
+> +static inline uint64_t timer_get_cntct(enum arch_timer timer)
+> +{
+> +	isb();
+> +
+> +	switch (timer) {
+> +	case VIRTUAL:
+> +		return read_sysreg(cntvct_el0);
+> +	case PHYSICAL:
+> +		return read_sysreg(cntpct_el0);
+> +	default:
+> +		GUEST_ASSERT_1(0, timer);
+> +	}
+> +
+> +	/* We should not reach here */
+> +	return 0;
+> +}
+> +
+> +static inline void timer_set_cval(enum arch_timer timer, uint64_t cval)
+> +{
+> +	switch (timer) {
+> +	case VIRTUAL:
+> +		return write_sysreg(cntv_cval_el0, cval);
+> +	case PHYSICAL:
+> +		return write_sysreg(cntp_cval_el0, cval);
+> +	default:
+> +		GUEST_ASSERT_1(0, timer);
+> +	}
+> +
+> +	isb();
+
+ISB should be performed before 'return'. And the same for
+timer_set_{tval,ctl}.
+
 Thanks,
-Oliver
-
-> Paolo
->
+Zenghui
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
