@@ -7,66 +7,67 @@ X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57BAFC4338F
-	for <kvmarm@archiver.kernel.org>; Sun, 15 Aug 2021 00:15:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78E53C4338F
+	for <kvmarm@archiver.kernel.org>; Sun, 15 Aug 2021 00:15:22 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0796160F51
-	for <kvmarm@archiver.kernel.org>; Sun, 15 Aug 2021 00:15:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 0796160F51
+	by mail.kernel.org (Postfix) with ESMTP id 28673604DC
+	for <kvmarm@archiver.kernel.org>; Sun, 15 Aug 2021 00:15:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 28673604DC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A7DD640825;
-	Sat, 14 Aug 2021 20:15:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D334A4A32E;
+	Sat, 14 Aug 2021 20:15:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id zf9ROnZ90Fyd; Sat, 14 Aug 2021 20:15:11 -0400 (EDT)
+	with ESMTP id O7di0fWopPml; Sat, 14 Aug 2021 20:15:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D29F94B086;
-	Sat, 14 Aug 2021 20:15:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 020154B0B4;
+	Sat, 14 Aug 2021 20:15:18 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D4C54B0B5
- for <kvmarm@lists.cs.columbia.edu>; Sat, 14 Aug 2021 20:15:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BBE24B086
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 14 Aug 2021 20:15:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MBQfi6NfX46R for <kvmarm@lists.cs.columbia.edu>;
- Sat, 14 Aug 2021 20:15:08 -0400 (EDT)
+ with ESMTP id Hpx+-oveJliI for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 14 Aug 2021 20:15:15 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 922F04B0D2
- for <kvmarm@lists.cs.columbia.edu>; Sat, 14 Aug 2021 20:15:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D7854B0C0
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 14 Aug 2021 20:15:14 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1628986506;
+ s=mimecast20190719; t=1628986514;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=qv6I3logkEqrFKBHAcTSKZ8CXuHzBhGguNUvVqUgdvc=;
- b=DnfVIoDscgVZjE1AvZltH4+NaEtSN/v37wH22YLuCy8w83BqWZ6U6V4VxioSVXZ4SVgE15
- 6jPwksxR1wZ84NH0chyc+fUSP5jrmnDrnwwfnlZHbQKX5OTxm/AgWY5IzxtkLb5mebOp8u
- k6IGau+yYEMBH6Pe5LscgO92oGYqmJQ=
+ bh=DElgAKnXxGi8roylqPYAKEl/MuVnVKXjV89e67/IzUs=;
+ b=CMBNbzrSvgbFLHgHqQta1SlwRmrjfrMclAJC6NOmdy8qi792ILmhVlR/fQwmY9KKH90Hmy
+ q7yHWl6sG7YMPqM1PyqQW0CPzLIh83/nSnOEbL0UIy3tRuFgnXaCWZqNSNiW3eFBRo5RMY
+ 85xxZoLPVVQrGCtIBwfUzemMFADcpnQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-362-v2DHF4anNjSj-4gai3M0qA-1; Sat, 14 Aug 2021 20:15:05 -0400
-X-MC-Unique: v2DHF4anNjSj-4gai3M0qA-1
+ us-mta-122-u7EXkTDYPOCrt3foqR6R_Q-1; Sat, 14 Aug 2021 20:15:12 -0400
+X-MC-Unique: u7EXkTDYPOCrt3foqR6R_Q-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C6952801B3D;
- Sun, 15 Aug 2021 00:15:03 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7452C801B3D;
+ Sun, 15 Aug 2021 00:15:11 +0000 (UTC)
 Received: from gshan.redhat.com (vpn2-54-103.bne.redhat.com [10.64.54.103])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7FA5710016FF;
- Sun, 15 Aug 2021 00:15:00 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5B44B1036D2E;
+ Sun, 15 Aug 2021 00:15:08 +0000 (UTC)
 From: Gavin Shan <gshan@redhat.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v4 10/21] KVM: arm64: Support SDEI_EVENT_ROUTING_SET hypercall
-Date: Sun, 15 Aug 2021 08:13:41 +0800
-Message-Id: <20210815001352.81927-11-gshan@redhat.com>
+Subject: [PATCH v4 12/21] KVM: arm64: Support SDEI_{PRIVATE,
+ SHARED}_RESET hypercall
+Date: Sun, 15 Aug 2021 08:13:43 +0800
+Message-Id: <20210815001352.81927-13-gshan@redhat.com>
 In-Reply-To: <20210815001352.81927-1-gshan@redhat.com>
 References: <20210815001352.81927-1-gshan@redhat.com>
 MIME-Version: 1.0
@@ -89,35 +90,31 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This supports SDEI_EVENT_ROUTING_SET hypercall. It's used by the
-guest to set route mode and affinity for the registered KVM event.
-It's only valid for the shared events. It's not allowed to do so
-when the corresponding event has been raised to the guest.
+This supports SDEI_{PRIVATE, SHARED}_RESET. They are used by the
+guest to purge the private or shared SDEI events, which are registered
+previously.
 
 Signed-off-by: Gavin Shan <gshan@redhat.com>
 ---
- arch/arm64/kvm/sdei.c | 64 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 64 insertions(+)
+ arch/arm64/kvm/sdei.c | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
 diff --git a/arch/arm64/kvm/sdei.c b/arch/arm64/kvm/sdei.c
-index 5dfa74b093f1..458695c2394f 100644
+index 3fb33258b494..62efee2b67b8 100644
 --- a/arch/arm64/kvm/sdei.c
 +++ b/arch/arm64/kvm/sdei.c
-@@ -489,6 +489,68 @@ static unsigned long kvm_sdei_hypercall_info(struct kvm_vcpu *vcpu)
+@@ -582,6 +582,29 @@ static unsigned long kvm_sdei_hypercall_mask(struct kvm_vcpu *vcpu,
  	return ret;
  }
  
-+static unsigned long kvm_sdei_hypercall_route(struct kvm_vcpu *vcpu)
++static unsigned long kvm_sdei_hypercall_reset(struct kvm_vcpu *vcpu,
++					      bool private)
 +{
 +	struct kvm *kvm = vcpu->kvm;
 +	struct kvm_sdei_kvm *ksdei = kvm->arch.sdei;
 +	struct kvm_sdei_vcpu *vsdei = vcpu->arch.sdei;
-+	struct kvm_sdei_event *kse = NULL;
-+	struct kvm_sdei_kvm_event *kske = NULL;
-+	unsigned long event_num = smccc_get_arg1(vcpu);
-+	unsigned long route_mode = smccc_get_arg2(vcpu);
-+	unsigned long route_affinity = smccc_get_arg3(vcpu);
-+	int index = 0;
++	unsigned int mask = private ? (1 << SDEI_EVENT_TYPE_PRIVATE) :
++				      (1 << SDEI_EVENT_TYPE_SHARED);
 +	unsigned long ret = SDEI_SUCCESS;
 +
 +	/* Sanity check */
@@ -126,44 +123,8 @@ index 5dfa74b093f1..458695c2394f 100644
 +		goto out;
 +	}
 +
-+	if (!kvm_sdei_is_valid_event_num(event_num)) {
-+		ret = SDEI_INVALID_PARAMETERS;
-+		goto out;
-+	}
-+
-+	if (!(route_mode == SDEI_EVENT_REGISTER_RM_ANY ||
-+	      route_mode == SDEI_EVENT_REGISTER_RM_PE)) {
-+		ret = SDEI_INVALID_PARAMETERS;
-+		goto out;
-+	}
-+
-+	/* Check if the KVM event has been registered */
 +	spin_lock(&ksdei->lock);
-+	kske = kvm_sdei_find_kvm_event(kvm, event_num);
-+	if (!kske) {
-+		ret = SDEI_INVALID_PARAMETERS;
-+		goto unlock;
-+	}
-+
-+	/* Validate KVM event state */
-+	kse = kske->kse;
-+	if (kse->state.type != SDEI_EVENT_TYPE_SHARED) {
-+		ret = SDEI_INVALID_PARAMETERS;
-+		goto unlock;
-+	}
-+
-+	if (!kvm_sdei_is_registered(kske, index) ||
-+	    kvm_sdei_is_enabled(kske, index)     ||
-+	    kske->state.refcount) {
-+		ret = SDEI_DENIED;
-+		goto unlock;
-+	}
-+
-+	/* Update state */
-+	kske->state.route_mode     = route_mode;
-+	kske->state.route_affinity = route_affinity;
-+
-+unlock:
++	kvm_sdei_remove_kvm_events(kvm, mask, false);
 +	spin_unlock(&ksdei->lock);
 +out:
 +	return ret;
@@ -172,15 +133,21 @@ index 5dfa74b093f1..458695c2394f 100644
  int kvm_sdei_hypercall(struct kvm_vcpu *vcpu)
  {
  	u32 func = smccc_get_function(vcpu);
-@@ -523,6 +585,8 @@ int kvm_sdei_hypercall(struct kvm_vcpu *vcpu)
- 		ret = kvm_sdei_hypercall_info(vcpu);
+@@ -626,8 +649,14 @@ int kvm_sdei_hypercall(struct kvm_vcpu *vcpu)
  		break;
- 	case SDEI_1_0_FN_SDEI_EVENT_ROUTING_SET:
-+		ret = kvm_sdei_hypercall_route(vcpu);
-+		break;
- 	case SDEI_1_0_FN_SDEI_PE_MASK:
- 	case SDEI_1_0_FN_SDEI_PE_UNMASK:
  	case SDEI_1_0_FN_SDEI_INTERRUPT_BIND:
+ 	case SDEI_1_0_FN_SDEI_INTERRUPT_RELEASE:
++		ret = SDEI_NOT_SUPPORTED;
++		break;
+ 	case SDEI_1_0_FN_SDEI_PRIVATE_RESET:
++		ret = kvm_sdei_hypercall_reset(vcpu, true);
++		break;
+ 	case SDEI_1_0_FN_SDEI_SHARED_RESET:
++		ret = kvm_sdei_hypercall_reset(vcpu, false);
++		break;
+ 	default:
+ 		ret = SDEI_NOT_SUPPORTED;
+ 	}
 -- 
 2.23.0
 
