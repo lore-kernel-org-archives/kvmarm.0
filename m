@@ -3,69 +3,72 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A63C5C4338F
-	for <kvmarm@archiver.kernel.org>; Sun, 15 Aug 2021 01:01:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EDE5C4338F
+	for <kvmarm@archiver.kernel.org>; Sun, 15 Aug 2021 01:01:37 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1BD7760EE5
-	for <kvmarm@archiver.kernel.org>; Sun, 15 Aug 2021 01:01:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 1BD7760EE5
+	by mail.kernel.org (Postfix) with ESMTP id D207760F39
+	for <kvmarm@archiver.kernel.org>; Sun, 15 Aug 2021 01:01:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org D207760F39
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7FF9849FE6;
-	Sat, 14 Aug 2021 21:01:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 859CA49E8C;
+	Sat, 14 Aug 2021 21:01:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id gzjjnyb4pvY3; Sat, 14 Aug 2021 21:01:16 -0400 (EDT)
+	with ESMTP id VHrcfSYiLchH; Sat, 14 Aug 2021 21:01:32 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 711994A3A3;
-	Sat, 14 Aug 2021 21:01:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9DA8E49FE6;
+	Sat, 14 Aug 2021 21:01:32 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 907A749E93
- for <kvmarm@lists.cs.columbia.edu>; Sat, 14 Aug 2021 21:01:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F7C34AED4
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 14 Aug 2021 21:01:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HywyeelRI9ML for <kvmarm@lists.cs.columbia.edu>;
- Sat, 14 Aug 2021 21:01:11 -0400 (EDT)
+ with ESMTP id sE0ppQEPD373 for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 14 Aug 2021 21:01:30 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BF8D149E8C
- for <kvmarm@lists.cs.columbia.edu>; Sat, 14 Aug 2021 21:01:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A6414A500
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 14 Aug 2021 21:01:30 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1628989271;
+ s=mimecast20190719; t=1628989290;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=iJJZNDyKl4Ek6TjG1w1P59gYwAvAe47Ps70LACizZ7I=;
- b=DONqYEF4AZtX/hnak/6cDEamtuY3iemzeodmVPnfn65oWfqPW9voNvDt8mLfTy2oV7HvlO
- uLxOpi12NIC1JOwvfalAsbFphlY7D58cFBBIfOrQVX4Mfchy/vNL45JXd90OZ0t9NFCsDX
- E/gVcaQrVWyTfXsFCUUVtNFajqp8yLI=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=wWP6RGsbS05Ong3eKswiduOpUs/hgQz8GgliHnHRYWU=;
+ b=SRfaEMuD7ZUhDFwK1ZqY3QArxnCK9WZAt1/PU9zGDHVAJVsBNHv43QQyWwX+7CQspF2cgy
+ ECgzGwALtlArkjNE0NIfijxrm1ZWVyKrcql424MrJOGT5lETXK0iqL3XekEMlZTc4vW0Ru
+ IVsc9Z1fOTIaTwrot/ppr9k1I2sWtfA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-559-V6GEry83PhaLAdvP2bA0UQ-1; Sat, 14 Aug 2021 21:01:08 -0400
-X-MC-Unique: V6GEry83PhaLAdvP2bA0UQ-1
+ us-mta-315-DdB0egO7MQa688jEAG9r8w-1; Sat, 14 Aug 2021 21:01:28 -0400
+X-MC-Unique: DdB0egO7MQa688jEAG9r8w-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2ABE21082927;
- Sun, 15 Aug 2021 01:01:06 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 34434801B3D;
+ Sun, 15 Aug 2021 01:01:27 +0000 (UTC)
 Received: from gshan.redhat.com (vpn2-54-103.bne.redhat.com [10.64.54.103])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3E9856091B;
- Sun, 15 Aug 2021 01:00:51 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EE3606A05F;
+ Sun, 15 Aug 2021 01:01:06 +0000 (UTC)
 From: Gavin Shan <gshan@redhat.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v4 00/15] Support Asynchronous Page Fault
-Date: Sun, 15 Aug 2021 08:59:32 +0800
-Message-Id: <20210815005947.83699-1-gshan@redhat.com>
+Subject: [PATCH v4 01/15] KVM: async_pf: Move struct kvm_async_pf around
+Date: Sun, 15 Aug 2021 08:59:33 +0800
+Message-Id: <20210815005947.83699-2-gshan@redhat.com>
+In-Reply-To: <20210815005947.83699-1-gshan@redhat.com>
+References: <20210815005947.83699-1-gshan@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Cc: kvm@vger.kernel.org, maz@kernel.org, linux-kernel@vger.kernel.org,
@@ -82,214 +85,61 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-There are two stages of page fault. The guest kernel is responsible for
-handling stage-1 page fault, while the host kernel is to take care of the
-stage-2 page fault. When the guest is trapped to host because of stage-2
-page fault, the guest is suspended until the requested memory (page) is
-populated. Sometimes, the cost to populate the requested page isn't cheap
-and can take hundreds of milliseconds in extreme cases. Similarly, the
-guest has to wait until the requested memory is ready in the scenario of
-post-copy live migration.
-
-This series introduces the feature (Asynchronous Page Fault) to improve
-situation, so that the guest needn't have to wait in the scenarios. With
-it, the overall performance is improved on the guest. This series depends
-on the feature "SDEI virtualization" and QEMU changes. All code changes
-can be found from github:
-
- https://github.com/gwshan/linux ("kvm/arm64_sdei") # SDEI virtualization
- https://github.com/gwshan/linux ("kvm/arm64_apf")  # This series + "sdei"
- https://github.com/gwshan/qemu  ("kvm/arm64_apf")  # QEMU code changes
-
-About the design, the details can be found from last patch. Generally,
-it's driven by two notifications: page-not-present and page-ready. They
-are delivered from the host to guest via SDEI event and PPI separately.
-In the mean while, each notification is always associated with a token,
-used to identify the notification. The token is passed by the shared
-memory between host/guest. Besides, the SMCCC and ioctl interface are
-mitigated by VMM and guest to configure, enable, disable, even migrate
-the functionality.
-
-When the guest is trapped to host because of stage-2 page fault, a
-page-not-present notification is raised by the host, and sent to the
-guest through dedicated SDEI event (0x40400001) if the requested page
-can't be populated immediately. In the mean while, a (background) worker
-is also started to populate the requested page. On receiving the SDEI
-event, the guest marks the current running process with special flag
-(TIF_ASYNC_PF) and associates it with a pre-allocated waitqueue. At
-same time, a (reschedule) IPI is sent to current CPU. After the SDEI
-event is acknowledged by the guest, the (reschedule) IPI is delivered
-and it causes context switch from that process tagged with TIF_ASYNC_PF
-to another process.
-
-Later on, a page-ready notification is sent to guest after the requested
-page is populated by the (background) worker. On receiving the interrupt,
-the guest uses the associated token to locate the process, which was
-previously suspended because of page-not-present. The flag (TIF_ASYNC_PF)
-is cleared for the suspended process and it's waken up.
-
-The series is organized as below:
-
-   PATCH[01-04] makes the GFN hash table management generic so that it
-                can be shared by x86/arm64.
-   PATCH[05-06] preparatory work to support asynchronous page fault.
-   PATCH[07-08] support asynchronous page fault.
-   PATCH[09-11] support ioctl and SMCCC interfaces for the functionality.
-   PATHC[12-14] supoort asynchronous page fault for guest
-   PATCH[15]    adds document to explain the design and internals
-
-Testing
-=======
-
-The tests are taken using program "testsuite", which is written by myself.
-The program basically does two things: (a) Starts a thread to allocate
-all the available memory, write to them by the specified times. (b) The
-parallel thread is started to do calculation while the memory is written
-for the specified times. 
-
-Besides, there are two testing scenarios: (a) the QEMU process is put into
-cgroup where the memory is limited. With this, we should have asynchronous
-page fault activities. The total used time for "testsuite" to finish is
-measured. The calculation capacity is also measured if the corresponding
-thread is started. (b) To measure the total used time and calculation
-capacity in scenario of migrating the workload.
-
-(a) Running "testsuite" with (cgroup) memory limitation to QEMU process.
-    When the calculation thread isn't started, the consumed time is
-    slightly increased because of overhead introduced by asynchronous
-    page fault. The total used time drops by ~40% when the calculation
-    thread is started. It means the parallelism is greatly improved
-    by the asynchronous page fault.
-
-  vCPU: 1  Memory: 1024MB   cgroupv2.limit: 512MB
-  Command: testsuite test async_pf -l 1 [-t] -q
-
-  Time-     Calculation-   Time+     Calculation+    Output
-  --------------------------------------------------------------------
-  14.592s                  15.010s                   +2.8%
-  15.726s                  15.185s                   +3.4%
-  15.742s                  15.192s                   +3.4%
-  15.827s                  15.270s                   +3.5%
-  15.831s                  15.291s                   +3.4%
-  27.880s   2108m          16.539s    1104m          -40.6%  -47.6%
-  27.972s   2111m          16.588s    1110m          -40.6%  -47.4%
-  28.020s   2114m          16.656s    1117m          -40.5%  -47.1%
-  28.227s   2135m          16.722s    1105m          -40.7%  -48.2%
-  28.918s   2194m          16.767s    1113m          -42.0%  -49.2%
-
-  Asynchronous page faults:  55000
-
-(b) Migrating the workload ("testsuite"). The total used time is dropped
-    a bit since the migration is completed in very short period (~1.5s).
-    There are not too much asynchronous page fault activies during the
-    migration. It's overall beneficial to migration performance if guest
-    experices high work load. However, the used time is increased by ~14%
-    because of the overhead introduced by asynchronous page fault when
-    guest doesn't have high work load.
-
-  vCPU: 1  Memory: 1024MB   cgroupv2.limit: unlimited
-  Command: testsuite test async_pf -l 50 [-t] -q
-
-  Time-     Calculation-   Time+     Calculation+    Output
-  --------------------------------------------------------------------
-  11.132s                  12.655s                   +13.6%
-  11.135s                  12.707s                   +14.1%
-  11.143s                  12.728s                   +14.2%
-  11.167s                  12.746s                   +14.1%
-  11.172s                  12.821s                   +14.7%
-  27.308s   2252m          25.827s   2131m           -5.4%
-  27.440s   2275m          26.517s   2333m           -3.3%
-  28.069s   2364m          26.520s   2356m           -5.5%
-  28.777s   2427m          26.726s   2383m           -7.1%
-  28.915s   2452m          27.632s   2508m           -4.4%
-
-  migrate.total_time:       ~1.6s
-  Asynchronous page faults: ~100 times
-
-Changelog
-=========
-v4:
-   * Rebase to v5.14.rc5 and retest                               (Gavin)
-v3:
-   * Rebase to v5.13.rc1                                          (Gavin)
-   * Drop patches from Will to detected SMCCC KVM service         (Gavin)
-   * Retest and recapture the benchmarks                          (Gavin)
-v2:
-   * Rebase to v5.11.rc6                                          (Gavin)
-   * Split the patches                                            (James)
-   * Allocate "struct kvm_arch_async_control" dymaicall and use
-     it to check if the feature has been enabled. The kernel
-     option (CONFIG_KVM_ASYNC_PF) isn't used.                     (James)
-   * Add document to explain the design                           (James)
-   * Make GFN hash table management generic                       (James)
-   * Add ioctl commands to support migration                      (Gavin)
-
-Gavin Shan (15):
-  KVM: async_pf: Move struct kvm_async_pf around
-  KVM: async_pf: Add helper function to check completion queue
-  KVM: async_pf: Make GFN slot management generic
-  KVM: x86: Use generic async PF slot management
-  KVM: arm64: Export kvm_handle_user_mem_abort()
-  KVM: arm64: Add paravirtualization header files
-  KVM: arm64: Support page-not-present notification
-  KVM: arm64: Support page-ready notification
-  KVM: arm64: Support async PF hypercalls
-  KVM: arm64: Support async PF ioctl commands
-  KVM: arm64: Export async PF capability
-  arm64: Detect async PF para-virtualization feature
-  arm64: Reschedule process on aync PF
-  arm64: Enable async PF
-  KVM: arm64: Add async PF document
-
- Documentation/virt/kvm/arm/apf.rst     | 143 +++++++
- Documentation/virt/kvm/arm/index.rst   |   1 +
- arch/arm64/Kconfig                     |  11 +
- arch/arm64/include/asm/esr.h           |   6 +
- arch/arm64/include/asm/kvm_emulate.h   |  27 +-
- arch/arm64/include/asm/kvm_host.h      |  85 ++++
- arch/arm64/include/asm/kvm_para.h      |  37 ++
- arch/arm64/include/asm/processor.h     |   1 +
- arch/arm64/include/asm/thread_info.h   |   4 +-
- arch/arm64/include/uapi/asm/Kbuild     |   2 -
- arch/arm64/include/uapi/asm/kvm.h      |  19 +
- arch/arm64/include/uapi/asm/kvm_para.h |  23 ++
- arch/arm64/include/uapi/asm/kvm_sdei.h |   1 +
- arch/arm64/kernel/Makefile             |   1 +
- arch/arm64/kernel/kvm.c                | 452 +++++++++++++++++++++
- arch/arm64/kernel/signal.c             |  17 +
- arch/arm64/kvm/Kconfig                 |   2 +
- arch/arm64/kvm/Makefile                |   1 +
- arch/arm64/kvm/arm.c                   |  37 +-
- arch/arm64/kvm/async_pf.c              | 533 +++++++++++++++++++++++++
- arch/arm64/kvm/hypercalls.c            |   5 +
- arch/arm64/kvm/mmu.c                   |  76 +++-
- arch/arm64/kvm/sdei.c                  |   5 +
- arch/x86/include/asm/kvm_host.h        |   2 -
- arch/x86/kvm/Kconfig                   |   1 +
- arch/x86/kvm/mmu/mmu.c                 |   2 +-
- arch/x86/kvm/x86.c                     |  88 +---
- include/linux/arm-smccc.h              |  15 +
- include/linux/kvm_host.h               |  72 +++-
- include/uapi/linux/kvm.h               |   3 +
- virt/kvm/Kconfig                       |   3 +
- virt/kvm/async_pf.c                    |  95 ++++-
- virt/kvm/kvm_main.c                    |   4 +-
- 33 files changed, 1621 insertions(+), 153 deletions(-)
- create mode 100644 Documentation/virt/kvm/arm/apf.rst
- create mode 100644 arch/arm64/include/asm/kvm_para.h
- create mode 100644 arch/arm64/include/uapi/asm/kvm_para.h
- create mode 100644 arch/arm64/kernel/kvm.c
- create mode 100644 arch/arm64/kvm/async_pf.c
-
--- 
-2.23.0
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+VGhpcyBtb3ZlcyB0aGUgZGVmaW5pdGlvbiBvZiAic3RydWN0IGt2bV9hc3luY19wZiIgYW5kIHRo
+ZSByZWxhdGVkCmZ1bmN0aW9ucyBhZnRlciAic3RydWN0IGt2bV92Y3B1IiBzbyB0aGF0IG5ld2x5
+IGFkZGVkIGlubGluZSBmdW5jdGlvbnMKaW4gdGhlIHN1YnNlcXVlbnQgcGF0Y2hlcyBjYW4gZGVy
+ZWZlcmVuY2UgInN0cnVjdCBrdm1fdmNwdSIgcHJvcGVybHkuCk90aGVyd2lzZSwgdGhlIHVuZXhw
+ZWN0ZWQgYnVpbGQgZXJyb3Igd2lsbCBiZSByYWlzZWQ6CgogICBlcnJvcjogZGVyZWZlcmVuY2lu
+ZyBwb2ludGVyIHRvIGluY29tcGxldGUgdHlwZSDigJhzdHJ1Y3Qga3ZtX3ZjcHXigJkKICAgcmV0
+dXJuICFsaXN0X2VtcHR5X2NhcmVmdWwoJnZjcHUtPmFzeW5jX3BmLmRvbmUpOwogICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIF5+ClNpbmNlIHdlJ3JlIGhlcmUsIHRoZSBzZXBhdG9y
+IGJldHdlZW4gdHlwZSBhbmQgZmllbGQgaW4gInN0cnVjdCBrdm1fdmNwdSIKaXMgcmVwbGFjZWQg
+YnkgdGFiLiBUaGUgZW1wdHkgc3R1YiBrdm1fY2hlY2tfYXN5bmNfcGZfY29tcGxldGlvbigpIGlz
+IGFsc28KYWRkZWQgb24gIUNPTkZJR19LVk1fQVNZTkNfUEYsIHdoaWNoIGlzIG5lZWRlZCBieSBz
+dWJzZXF1ZW50IHBhdGNoZXMgdG8Kc3VwcG9ydCBhc3luY2hyb25vdXMgcGFnZSBmYXVsdCBvbiBB
+Uk02NC4KClNpZ25lZC1vZmYtYnk6IEdhdmluIFNoYW4gPGdzaGFuQHJlZGhhdC5jb20+Ci0tLQog
+aW5jbHVkZS9saW51eC9rdm1faG9zdC5oIHwgNDQgKysrKysrKysrKysrKysrKysrKysrLS0tLS0t
+LS0tLS0tLS0tLS0tLQogMSBmaWxlIGNoYW5nZWQsIDIzIGluc2VydGlvbnMoKyksIDIxIGRlbGV0
+aW9ucygtKQoKZGlmZiAtLWdpdCBhL2luY2x1ZGUvbGludXgva3ZtX2hvc3QuaCBiL2luY2x1ZGUv
+bGludXgva3ZtX2hvc3QuaAppbmRleCBhZTc3MzViNDkwYjQuLjg1YjYxYTQ1NmYxYyAxMDA2NDQK
+LS0tIGEvaW5jbHVkZS9saW51eC9rdm1faG9zdC5oCisrKyBiL2luY2x1ZGUvbGludXgva3ZtX2hv
+c3QuaApAQCAtMTk5LDI3ICsxOTksNiBAQCBpbnQga3ZtX2lvX2J1c191bnJlZ2lzdGVyX2Rldihz
+dHJ1Y3Qga3ZtICprdm0sIGVudW0ga3ZtX2J1cyBidXNfaWR4LAogc3RydWN0IGt2bV9pb19kZXZp
+Y2UgKmt2bV9pb19idXNfZ2V0X2RldihzdHJ1Y3Qga3ZtICprdm0sIGVudW0ga3ZtX2J1cyBidXNf
+aWR4LAogCQkJCQkgZ3BhX3QgYWRkcik7CiAKLSNpZmRlZiBDT05GSUdfS1ZNX0FTWU5DX1BGCi1z
+dHJ1Y3Qga3ZtX2FzeW5jX3BmIHsKLQlzdHJ1Y3Qgd29ya19zdHJ1Y3Qgd29yazsKLQlzdHJ1Y3Qg
+bGlzdF9oZWFkIGxpbms7Ci0Jc3RydWN0IGxpc3RfaGVhZCBxdWV1ZTsKLQlzdHJ1Y3Qga3ZtX3Zj
+cHUgKnZjcHU7Ci0Jc3RydWN0IG1tX3N0cnVjdCAqbW07Ci0JZ3BhX3QgY3IyX29yX2dwYTsKLQl1
+bnNpZ25lZCBsb25nIGFkZHI7Ci0Jc3RydWN0IGt2bV9hcmNoX2FzeW5jX3BmIGFyY2g7Ci0JYm9v
+bCAgIHdha2V1cF9hbGw7Ci0JYm9vbCBub3RwcmVzZW50X2luamVjdGVkOwotfTsKLQotdm9pZCBr
+dm1fY2xlYXJfYXN5bmNfcGZfY29tcGxldGlvbl9xdWV1ZShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUp
+Owotdm9pZCBrdm1fY2hlY2tfYXN5bmNfcGZfY29tcGxldGlvbihzdHJ1Y3Qga3ZtX3ZjcHUgKnZj
+cHUpOwotYm9vbCBrdm1fc2V0dXBfYXN5bmNfcGYoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBncGFf
+dCBjcjJfb3JfZ3BhLAotCQkJdW5zaWduZWQgbG9uZyBodmEsIHN0cnVjdCBrdm1fYXJjaF9hc3lu
+Y19wZiAqYXJjaCk7Ci1pbnQga3ZtX2FzeW5jX3BmX3dha2V1cF9hbGwoc3RydWN0IGt2bV92Y3B1
+ICp2Y3B1KTsKLSNlbmRpZgotCiAjaWZkZWYgS1ZNX0FSQ0hfV0FOVF9NTVVfTk9USUZJRVIKIHN0
+cnVjdCBrdm1fZ2ZuX3JhbmdlIHsKIAlzdHJ1Y3Qga3ZtX21lbW9yeV9zbG90ICpzbG90OwpAQCAt
+MzQ2LDYgKzMyNSwyOSBAQCBzdHJ1Y3Qga3ZtX3ZjcHUgewogCXN0cnVjdCBrdm1fZGlydHlfcmlu
+ZyBkaXJ0eV9yaW5nOwogfTsKIAorI2lmZGVmIENPTkZJR19LVk1fQVNZTkNfUEYKK3N0cnVjdCBr
+dm1fYXN5bmNfcGYgeworCXN0cnVjdCB3b3JrX3N0cnVjdAkJd29yazsKKwlzdHJ1Y3QgbGlzdF9o
+ZWFkCQlsaW5rOworCXN0cnVjdCBsaXN0X2hlYWQJCXF1ZXVlOworCXN0cnVjdCBrdm1fdmNwdQkJ
+CSp2Y3B1OworCXN0cnVjdCBtbV9zdHJ1Y3QJCSptbTsKKwlncGFfdAkJCQljcjJfb3JfZ3BhOwor
+CXVuc2lnbmVkIGxvbmcJCQlhZGRyOworCXN0cnVjdCBrdm1fYXJjaF9hc3luY19wZglhcmNoOwor
+CWJvb2wJCQkJd2FrZXVwX2FsbDsKKwlib29sCQkJCW5vdHByZXNlbnRfaW5qZWN0ZWQ7Cit9Owor
+Cit2b2lkIGt2bV9jbGVhcl9hc3luY19wZl9jb21wbGV0aW9uX3F1ZXVlKHN0cnVjdCBrdm1fdmNw
+dSAqdmNwdSk7Cit2b2lkIGt2bV9jaGVja19hc3luY19wZl9jb21wbGV0aW9uKHN0cnVjdCBrdm1f
+dmNwdSAqdmNwdSk7Citib29sIGt2bV9zZXR1cF9hc3luY19wZihzdHJ1Y3Qga3ZtX3ZjcHUgKnZj
+cHUsIGdwYV90IGNyMl9vcl9ncGEsCisJCQl1bnNpZ25lZCBsb25nIGh2YSwgc3RydWN0IGt2bV9h
+cmNoX2FzeW5jX3BmICphcmNoKTsKK2ludCBrdm1fYXN5bmNfcGZfd2FrZXVwX2FsbChzdHJ1Y3Qg
+a3ZtX3ZjcHUgKnZjcHUpOworI2Vsc2UKK3N0YXRpYyBpbmxpbmUgdm9pZCBrdm1fY2hlY2tfYXN5
+bmNfcGZfY29tcGxldGlvbihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpIHsgfQorI2VuZGlmCisKIC8q
+IG11c3QgYmUgY2FsbGVkIHdpdGggaXJxcyBkaXNhYmxlZCAqLwogc3RhdGljIF9fYWx3YXlzX2lu
+bGluZSB2b2lkIGd1ZXN0X2VudGVyX2lycW9mZih2b2lkKQogewotLSAKMi4yMy4wCgpfX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBs
+aXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJp
+YS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
