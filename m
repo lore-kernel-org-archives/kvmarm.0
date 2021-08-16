@@ -5,77 +5,78 @@ X-Spam-Level:
 X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65370C432BE
-	for <kvmarm@archiver.kernel.org>; Mon, 16 Aug 2021 00:13:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34F77C4338F
+	for <kvmarm@archiver.kernel.org>; Mon, 16 Aug 2021 00:13:18 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 144156138F
-	for <kvmarm@archiver.kernel.org>; Mon, 16 Aug 2021 00:13:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 144156138F
+	by mail.kernel.org (Postfix) with ESMTP id D6A206137D
+	for <kvmarm@archiver.kernel.org>; Mon, 16 Aug 2021 00:13:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org D6A206137D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BD55A4B11B;
-	Sun, 15 Aug 2021 20:13:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 88CD84B0B6;
+	Sun, 15 Aug 2021 20:13:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id L4anVOLVq5Yw; Sun, 15 Aug 2021 20:13:09 -0400 (EDT)
+	with ESMTP id kEk0pjb0FohS; Sun, 15 Aug 2021 20:13:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CD9B54B143;
-	Sun, 15 Aug 2021 20:13:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E50254B148;
+	Sun, 15 Aug 2021 20:13:06 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 884194B126
- for <kvmarm@lists.cs.columbia.edu>; Sun, 15 Aug 2021 20:12:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9379E4B108
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 15 Aug 2021 20:13:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nyGyol-Y0DSj for <kvmarm@lists.cs.columbia.edu>;
- Sun, 15 Aug 2021 20:12:57 -0400 (EDT)
-Received: from mail-io1-f74.google.com (mail-io1-f74.google.com
- [209.85.166.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 860314B111
- for <kvmarm@lists.cs.columbia.edu>; Sun, 15 Aug 2021 20:12:57 -0400 (EDT)
-Received: by mail-io1-f74.google.com with SMTP id
- c22-20020a5d9a960000b029059c9e04cd63so8221990iom.23
- for <kvmarm@lists.cs.columbia.edu>; Sun, 15 Aug 2021 17:12:57 -0700 (PDT)
+ with ESMTP id IWab91cFZ7s4 for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 15 Aug 2021 20:13:04 -0400 (EDT)
+Received: from mail-il1-f201.google.com (mail-il1-f201.google.com
+ [209.85.166.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AAA564B126
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 15 Aug 2021 20:12:58 -0400 (EDT)
+Received: by mail-il1-f201.google.com with SMTP id
+ n4-20020a056e021ba400b0022481cdc803so575737ili.15
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 15 Aug 2021 17:12:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=ayfGWlWzmNUKw7VcWz1FuZK9fj+r+Odsg+LA8h7I9IM=;
- b=H1Ss/u73mhOjmo3QAikiF0SVH3FuV1G7ER2IFRS2+hNWogGbSAg/f9+5PUpp7w7CLi
- vXqB5WbthilHYgWeujWkAR+R14+OqGlMcZcycPXLDetxHxZdu2OPhvQAvB8syORoEEdI
- KZZIRIvcAKMTq0brsm2n06okhIb9WhgF5tsXbgbRZZml7WFhx0PLkuwIvCQ9DbcVBkxs
- dJ+wsaWT77cGgD2ORbvCS+tqEZsU6gNnVdndbda5unv5q5LzAATWwzQ5YD3VHRHr7MUc
- WZVWJlPIXMYxK3lCpE8jbm9mZNC/s/omZlW+VAzdAwtA2SwIRV/XczVF77V/t8bKz82Y
- moEw==
+ :cc; bh=LDn71X/mteHSm80S6t26TyxwkEj27LrlTf7lB/WnK0E=;
+ b=tFGja0lkfeepK+FkjFeq/aVGW+mKNcPoNNlqpTMnu0V3vovCmctbotfMUDQjFSAcD4
+ 6HOZbhkVK/AJkuPU4vE4cvo6B1mF3aDEYLG107YqyjKseSoClfb8cG4UAZjnRyke0Ce+
+ WkIpMN+ybYGn2RRLaX7uoEOw+pTWEzeY7aTzSFVuig04pceKNl0TVXOGaDRVgK2a8Vhr
+ 2DXYsb5DVrL2L3qN297jolFCHfD3H6kPSjk+gIA/ush9nBL2y5iojzV6Yx6PC74aeADD
+ Cak/sRa9pm9NFS5qTT+cpb8hE/wID6LMeB6ol1Ypc7u2S47YZbKgp0UUN7W+RYGywGaI
+ mVRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=ayfGWlWzmNUKw7VcWz1FuZK9fj+r+Odsg+LA8h7I9IM=;
- b=JJR6OoxosHWtxqg3rdKzI8goKNnIDabM3K0LmpyJRwXewtYIA9CrSOtTcQ1yQ9i0mY
- g+uwmz/W5WL1wtmhZ2qvtcEgx/EYyaq6zak0BwUtESstpgHQFY0kYy4NBaKF0synBRbt
- 3qGhymR0wvP66iTTuvlBP50jUWMCMM9dG5bfim8Tkiq884RjztekBDSvpwInfuclpA+a
- Ea4OWxUCBO7+Re8ANfu+Nnk2+3b/ROShR/bJETGm/rhUCk4Iol4aTzyuHnxGvJ7ttqLI
- P2kQhoAWuoPAHvouCwcDbal+RY6S6OCP7F7x4Tp6FKMZ3Kji1Wsw/EnZSq99zeDz5PEx
- 7SIg==
-X-Gm-Message-State: AOAM532ehmO6Q4EKlRBabHcUBhiUsY6BpYxnZ2uY+mtc+IuumJM0PBjJ
- IzmPrLqZf00fgmcJeTEodeRhCf46i4s=
-X-Google-Smtp-Source: ABdhPJyAbRyP/VkOYLoYhUyYnwxM8RMKT3VkkLEHBZsdHF2Ww/2WTFNj/xZRn2KQkue9PJGC7sBkkcdRKf0=
+ bh=LDn71X/mteHSm80S6t26TyxwkEj27LrlTf7lB/WnK0E=;
+ b=P5VaghtC/TSnZDJkFcnETXEnPXnPvpfDWVQlf4hUEIrKoivMJ5aHAPSExpEPCvFII4
+ YFTTtmRkg1i1ZEBAKmXDkvkKjEYnzDY3pKuY2vuYCH7iLOvb+TpPHYBECL2bw/7GWRqx
+ Jv+yFG3g17cV7KRJVfzFYSLPVDU/N7ZRJqryqsm9FzI0jaIPR0L7NEZHpdDAG3hRXGcO
+ cxIFEL7NBnuOY26oHbI8Wy6jzVCZG41VJT+r/MXOi1kQc7ONZgXRSVNTVeaSonIfbK4E
+ 7/49Bq8UQxkRl++WYgLw2bnwivMTk9wYYlQVPya5rGKa2Ph36KYyd2g66cKiy2G7KGuM
+ AFMg==
+X-Gm-Message-State: AOAM531F0hwEWzhz8QyPu4cjV1ZZ7ukQxrof48ILOf82wzaCV9CWnAd5
+ dE4bkzm8kCMTpbIJw/JqumUIUKZ65Bg=
+X-Google-Smtp-Source: ABdhPJxBGSNKp7nAwuyx4V4ZkrlD3NGCg0jwXeIu/+7/9/7758jjyZKMe4CTsweb4Xrvpxd+DmoDyTn6Lyo=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a05:6e02:17cf:: with SMTP id
- z15mr6809959ilu.103.1629072777088; Sun, 15 Aug 2021 17:12:57 -0700 (PDT)
-Date: Mon, 16 Aug 2021 00:12:42 +0000
+ (user=oupton job=sendgmr) by 2002:a6b:fb07:: with SMTP id
+ h7mr3843368iog.201.1629072778180; 
+ Sun, 15 Aug 2021 17:12:58 -0700 (PDT)
+Date: Mon, 16 Aug 2021 00:12:43 +0000
 In-Reply-To: <20210816001246.3067312-1-oupton@google.com>
-Message-Id: <20210816001246.3067312-6-oupton@google.com>
+Message-Id: <20210816001246.3067312-7-oupton@google.com>
 Mime-Version: 1.0
 References: <20210816001246.3067312-1-oupton@google.com>
 X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
-Subject: [PATCH v7 5/9] selftests: KVM: Introduce system counter offset test
+Subject: [PATCH v7 6/9] selftests: KVM: Add helper to check for register
+ presence
 From: Oliver Upton <oupton@google.com>
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
@@ -99,178 +100,60 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Introduce a KVM selftest to verify that userspace manipulation of the
-TSC (via the new vCPU attribute) results in the correct behavior within
-the guest.
+The KVM_GET_REG_LIST vCPU ioctl returns a list of supported registers
+for a given vCPU. Add a helper to check if a register exists in the list
+of supported registers.
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Oliver Upton <oupton@google.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 ---
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../kvm/system_counter_offset_test.c          | 132 ++++++++++++++++++
- 3 files changed, 134 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/system_counter_offset_test.c
+ .../testing/selftests/kvm/include/kvm_util.h  |  2 ++
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 19 +++++++++++++++++++
+ 2 files changed, 21 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index 06268d6b9aca..9a73befbd8d6 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -51,3 +51,4 @@
- /set_memory_region_test
- /steal_time
- /kvm_binary_stats_test
-+/system_counter_offset_test
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 3b09133e84a4..2cb0a375c7db 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -84,6 +84,7 @@ TEST_GEN_PROGS_x86_64 += memslot_perf_test
- TEST_GEN_PROGS_x86_64 += set_memory_region_test
- TEST_GEN_PROGS_x86_64 += steal_time
- TEST_GEN_PROGS_x86_64 += kvm_binary_stats_test
-+TEST_GEN_PROGS_x86_64 += system_counter_offset_test
+diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+index 1b3ef5757819..077082dd2ca7 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util.h
++++ b/tools/testing/selftests/kvm/include/kvm_util.h
+@@ -215,6 +215,8 @@ void vcpu_fpu_get(struct kvm_vm *vm, uint32_t vcpuid,
+ 		  struct kvm_fpu *fpu);
+ void vcpu_fpu_set(struct kvm_vm *vm, uint32_t vcpuid,
+ 		  struct kvm_fpu *fpu);
++
++bool vcpu_has_reg(struct kvm_vm *vm, uint32_t vcpuid, uint64_t reg_id);
+ void vcpu_get_reg(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_one_reg *reg);
+ void vcpu_set_reg(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_one_reg *reg);
+ #ifdef __KVM_HAVE_VCPU_EVENTS
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index 0fe66ca6139a..a5801d4ed37d 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -1823,6 +1823,25 @@ void vcpu_fpu_set(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_fpu *fpu)
+ 		    ret, errno, strerror(errno));
+ }
  
- TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
- TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
-diff --git a/tools/testing/selftests/kvm/system_counter_offset_test.c b/tools/testing/selftests/kvm/system_counter_offset_test.c
-new file mode 100644
-index 000000000000..b337bbbfa41f
---- /dev/null
-+++ b/tools/testing/selftests/kvm/system_counter_offset_test.c
-@@ -0,0 +1,132 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) 2021, Google LLC.
-+ *
-+ * Tests for adjusting the system counter from userspace
-+ */
-+#include <asm/kvm_para.h>
-+#include <stdint.h>
-+#include <string.h>
-+#include <sys/stat.h>
-+#include <time.h>
-+
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "processor.h"
-+
-+#define VCPU_ID 0
-+
-+#ifdef __x86_64__
-+
-+struct test_case {
-+	uint64_t tsc_offset;
-+};
-+
-+static struct test_case test_cases[] = {
-+	{ 0 },
-+	{ 180 * NSEC_PER_SEC },
-+	{ -180 * NSEC_PER_SEC },
-+};
-+
-+static void check_preconditions(struct kvm_vm *vm)
++bool vcpu_has_reg(struct kvm_vm *vm, uint32_t vcpuid, uint64_t reg_id)
 +{
-+	if (!_vcpu_has_device_attr(vm, VCPU_ID, KVM_VCPU_TSC_CTRL, KVM_VCPU_TSC_OFFSET))
-+		return;
++	struct kvm_reg_list *list;
++	bool ret = false;
++	uint64_t i;
 +
-+	print_skip("KVM_VCPU_TSC_OFFSET not supported; skipping test");
-+	exit(KSFT_SKIP);
-+}
++	list = vcpu_get_reg_list(vm, vcpuid);
 +
-+static void setup_system_counter(struct kvm_vm *vm, struct test_case *test)
-+{
-+	vcpu_access_device_attr(vm, VCPU_ID, KVM_VCPU_TSC_CTRL,
-+				KVM_VCPU_TSC_OFFSET, &test->tsc_offset, true);
-+}
-+
-+static uint64_t guest_read_system_counter(struct test_case *test)
-+{
-+	return rdtsc();
-+}
-+
-+static uint64_t host_read_guest_system_counter(struct test_case *test)
-+{
-+	return rdtsc() + test->tsc_offset;
-+}
-+
-+#else /* __x86_64__ */
-+
-+#error test not implemented for this architecture!
-+
-+#endif
-+
-+#define GUEST_SYNC_CLOCK(__stage, __val)			\
-+		GUEST_SYNC_ARGS(__stage, __val, 0, 0, 0)
-+
-+static void guest_main(void)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(test_cases); i++) {
-+		struct test_case *test = &test_cases[i];
-+
-+		GUEST_SYNC_CLOCK(i, guest_read_system_counter(test));
-+	}
-+}
-+
-+static void handle_sync(struct ucall *uc, uint64_t start, uint64_t end)
-+{
-+	uint64_t obs = uc->args[2];
-+
-+	TEST_ASSERT(start <= obs && obs <= end,
-+		    "unexpected system counter value: %"PRIu64" expected range: [%"PRIu64", %"PRIu64"]",
-+		    obs, start, end);
-+
-+	pr_info("system counter value: %"PRIu64" expected range [%"PRIu64", %"PRIu64"]\n",
-+		obs, start, end);
-+}
-+
-+static void handle_abort(struct ucall *uc)
-+{
-+	TEST_FAIL("%s at %s:%ld", (const char *)uc->args[0],
-+		  __FILE__, uc->args[1]);
-+}
-+
-+static void enter_guest(struct kvm_vm *vm)
-+{
-+	uint64_t start, end;
-+	struct ucall uc;
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(test_cases); i++) {
-+		struct test_case *test = &test_cases[i];
-+
-+		setup_system_counter(vm, test);
-+		start = host_read_guest_system_counter(test);
-+		vcpu_run(vm, VCPU_ID);
-+		end = host_read_guest_system_counter(test);
-+
-+		switch (get_ucall(vm, VCPU_ID, &uc)) {
-+		case UCALL_SYNC:
-+			handle_sync(&uc, start, end);
++	for (i = 0; i < list->n; i++) {
++		if (list->reg[i] == reg_id) {
++			ret = true;
 +			break;
-+		case UCALL_ABORT:
-+			handle_abort(&uc);
-+			return;
-+		default:
-+			TEST_ASSERT(0, "unhandled ucall %ld\n",
-+				    get_ucall(vm, VCPU_ID, &uc));
 +		}
 +	}
++
++	free(list);
++	return ret;
 +}
 +
-+int main(void)
-+{
-+	struct kvm_vm *vm;
-+
-+	vm = vm_create_default(VCPU_ID, 0, guest_main);
-+	check_preconditions(vm);
-+	ucall_init(vm, NULL);
-+
-+	enter_guest(vm);
-+	kvm_vm_free(vm);
-+}
+ void vcpu_get_reg(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_one_reg *reg)
+ {
+ 	int ret;
 -- 
 2.33.0.rc1.237.g0d66db33f3-goog
 
