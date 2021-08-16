@@ -2,85 +2,85 @@ Return-Path: <SRS0=9WlX=NH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53C4CC4338F
-	for <kvmarm@archiver.kernel.org>; Mon, 16 Aug 2021 12:26:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 467F6C432BE
+	for <kvmarm@archiver.kernel.org>; Mon, 16 Aug 2021 14:40:42 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C663663254
-	for <kvmarm@archiver.kernel.org>; Mon, 16 Aug 2021 12:26:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org C663663254
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 9E02561038
+	for <kvmarm@archiver.kernel.org>; Mon, 16 Aug 2021 14:40:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 9E02561038
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6406D4B0BB;
-	Mon, 16 Aug 2021 08:26:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 10C864B0C2;
+	Mon, 16 Aug 2021 10:40:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id F4rE1zuNa44e; Mon, 16 Aug 2021 08:26:43 -0400 (EDT)
+	with ESMTP id IDQd7jMIzEto; Mon, 16 Aug 2021 10:40:36 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B08074B0D0;
-	Mon, 16 Aug 2021 08:26:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6ECDA4A4A3;
+	Mon, 16 Aug 2021 10:40:36 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D27C74B0AD
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Aug 2021 08:26:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 71A164A1A5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Aug 2021 10:40:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3xcMGDi6Ubdt for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Aug 2021 08:26:38 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DC3314B0AC
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Aug 2021 08:26:37 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id E14C661C19;
- Mon, 16 Aug 2021 12:26:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1629116796;
- bh=oKGepH+V+CuRpZMZ1SznskgkAaw7iXR+hlH95oGa2O8=;
- h=From:To:Cc:Subject:Date:From;
- b=RilaEPxyYfwaa78F2JInfDC366AkDMXVuYmme2b614jAkTLbko12psRUTDlW2ps7s
- 8ZcKxbQjkgJUPFCRnkxEG6a/9T9bKWwRvL+JIi2IdWYERfb+mwAEthxwWbjeVRpCGy
- nDwgxxWC933fwe+2cVj0YDuOGC+Vi3gVxta8vs5IK5Q4DGC3JgAiOnepvSF/AKv9n7
- oDHfe74RCLgHJ2q5iF+vjJVEIvSetNADYJrWFYyf+M2RXFUMrtW/hb0kgCvsdAGPio
- 9bs5z+bUf/sljHxaa0YUN2HaKLSUkexZvF9UvdmznPF4oaKNE6qMPLM6Xp10UuTS92
- lYRzzL2c745pg==
-From: Mike Rapoport <rppt@kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>
-Subject: [PATCH v5] memblock: make memblock_find_in_range method private
-Date: Mon, 16 Aug 2021 15:26:22 +0300
-Message-Id: <20210816122622.30279-1-rppt@kernel.org>
-X-Mailer: git-send-email 2.28.0
+ with ESMTP id 1173tEES5yfB for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 Aug 2021 10:40:30 -0400 (EDT)
+Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com
+ [209.85.210.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AA05A49FE6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Aug 2021 10:40:30 -0400 (EDT)
+Received: by mail-ot1-f52.google.com with SMTP id
+ m7-20020a9d4c87000000b0051875f56b95so4138956otf.6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Aug 2021 07:40:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=QBcYcSqcdNcpIp2giaoF7M3Ly7AuyhnDB1Pw04D25Rw=;
+ b=siFKAANECq1GHq97zm8ie+x5ZoX9TiIe0DwDt8e13HMWjP5FL4PZy0cmvRmfzUquzT
+ FiRKccOuLrUW9mnW3oeVB6XsI4tfBVnLgnkDttv0hbnS4zxEGEfeY5lsdzL+0co1ClCy
+ 7iTH/3WunTo0TGoWeU0nusm6fUrawR1Me9Q8256fD4arYNTV0l3ayp+50pAMQZYg0moo
+ n8SDVz+vCTrOXTZC0rc+ezn5AtCek2jQ6+LKoef/yLTMlyVTCaffHQ+B3UQBYJ0W0lGe
+ ePibt3zHC040cjcGv7DFFEYpXpO2pi5eI+OSDz1D2vg7/grezP0MO/pwoPp3FCqp9VL9
+ Jyyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=QBcYcSqcdNcpIp2giaoF7M3Ly7AuyhnDB1Pw04D25Rw=;
+ b=E4cq796IsuhRmJYDDQK9dA29qzwCF7+1YypT7/EsIoZqcywb90OQw9VAQjWKq8ffyv
+ Lb+TVaepbktKDXJSIw2H32WwB4sSLU3BUDm7R8G74SeA6TQsNbPKiR9ivR3N8Hkb2A1V
+ /WahlhDJF/hypgzTj24n8x5D4spdMDI9WBLO0O0mSdhnzod7m+X1anmy9KJNFJh12AlR
+ JxVG+unipg0aioJCcRVzys4NdduJAKxHjvM3JadlZfwzBcYoUo+R7voj9bAWsut6pTL3
+ rC9aUg8N87dZFDb5O6+SphKqzMMSlD0u9hrf6Ac8GZhLnLiLjJpxfcT+ap7ZQqLyP4Ux
+ ZGpQ==
+X-Gm-Message-State: AOAM533P8cYSqBqPoHkSn776HMMc7y1wZDJDzklqqDUT/vSMl0UqeIdz
+ 1wSDFKZI7TVDdpFm+FV15Ubmmi5t9F4B113PO049RQ==
+X-Google-Smtp-Source: ABdhPJy3Bum9MoBdjM5b7boLFdDpAOrm0jAW07RQsLLqy/vUEekhINyh4Wf0Iw9N6Q9OYiuqLOz2svi1UDj3ATf5xBE=
+X-Received: by 2002:a05:6830:1095:: with SMTP id
+ y21mr12303246oto.144.1629124829634; 
+ Mon, 16 Aug 2021 07:40:29 -0700 (PDT)
 MIME-Version: 1.0
-Cc: "Kirill A . Shutemov" <kirill.shtuemov@linux.intel.com>,
- "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>,
- Peter Zijlstra <peterz@infradead.org>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Dave Hansen <dave.hansen@linux.intel.com>, linux-mips@vger.kernel.org,
- linux-mm@kvack.org, Will Deacon <will@kernel.org>,
- "H. Peter Anvin" <hpa@zytor.com>, Nick Kossifidis <mick@ics.forth.gr>,
- linux-riscv@lists.infradead.org, Frank Rowand <frowand.list@gmail.com>,
- kvmarm@lists.cs.columbia.edu, linux-s390@vger.kernel.org,
- linux-acpi@vger.kernel.org, Marc Zyngier <maz@kernel.org>, x86@kernel.org,
- Russell King <linux@armlinux.org.uk>, Mike Rapoport <rppt@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, Ingo Molnar <mingo@redhat.com>,
- Guenter Roeck <linux@roeck-us.net>, Len Brown <lenb@kernel.org>,
- devicetree@vger.kernel.org, Albert Ou <aou@eecs.berkeley.edu>,
- Vasily Gorbik <gor@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>,
- Russell King <rmk+kernel@armlinux.org.uk>, Rob Herring <robh+dt@kernel.org>,
- Borislav Petkov <bp@alien8.de>, Andy Lutomirski <luto@kernel.org>,
- Paul Walmsley <paul.walmsley@sifive.com>,
- "Kirill A. Shutemov" <kirill@shutemov.name>,
- Thomas Gleixner <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org,
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rjw@rjwysocki.net>, linux-kernel@vger.kernel.org,
- Palmer Dabbelt <palmer@dabbelt.com>, Mike Rapoport <rppt@kernel.org>
+References: <20210719160346.609914-1-tabba@google.com>
+ <20210719160346.609914-12-tabba@google.com>
+ <20210812094554.GH5912@willie-the-truck>
+In-Reply-To: <20210812094554.GH5912@willie-the-truck>
+From: Fuad Tabba <tabba@google.com>
+Date: Mon, 16 Aug 2021 16:39:53 +0200
+Message-ID: <CA+EHjTz2warTOJLYfdOMjybg65WiUZ+v9UT7rvSPDEMR35Gy8Q@mail.gmail.com>
+Subject: Re: [PATCH v3 11/15] KVM: arm64: Add trap handlers for protected VMs
+To: Will Deacon <will@kernel.org>
+Cc: kernel-team@android.com, kvm@vger.kernel.org, maz@kernel.org,
+ pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -97,548 +97,514 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Mike Rapoport <rppt@linux.ibm.com>
+Hi Will,
 
-There are a lot of uses of memblock_find_in_range() along with
-memblock_reserve() from the times memblock allocation APIs did not exist.
+On Thu, Aug 12, 2021 at 11:46 AM Will Deacon <will@kernel.org> wrote:
+>
+> On Mon, Jul 19, 2021 at 05:03:42PM +0100, Fuad Tabba wrote:
+> > Add trap handlers for protected VMs. These are mainly for Sys64
+> > and debug traps.
+> >
+> > No functional change intended as these are not hooked in yet to
+> > the guest exit handlers introduced earlier. So even when trapping
+> > is triggered, the exit handlers would let the host handle it, as
+> > before.
+> >
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_fixed_config.h | 178 +++++++++
+> >  arch/arm64/include/asm/kvm_host.h         |   2 +
+> >  arch/arm64/include/asm/kvm_hyp.h          |   3 +
+> >  arch/arm64/kvm/Makefile                   |   2 +-
+> >  arch/arm64/kvm/arm.c                      |  11 +
+> >  arch/arm64/kvm/hyp/nvhe/Makefile          |   2 +-
+> >  arch/arm64/kvm/hyp/nvhe/sys_regs.c        | 443 ++++++++++++++++++++++
+> >  arch/arm64/kvm/pkvm.c                     | 183 +++++++++
+> >  8 files changed, 822 insertions(+), 2 deletions(-)
+> >  create mode 100644 arch/arm64/include/asm/kvm_fixed_config.h
+> >  create mode 100644 arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> >  create mode 100644 arch/arm64/kvm/pkvm.c
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_fixed_config.h b/arch/arm64/include/asm/kvm_fixed_config.h
+> > new file mode 100644
+> > index 000000000000..b39a5de2c4b9
+> > --- /dev/null
+> > +++ b/arch/arm64/include/asm/kvm_fixed_config.h
+> > @@ -0,0 +1,178 @@
+> > +/* SPDX-License-Identifier: GPL-2.0-only */
+> > +/*
+> > + * Copyright (C) 2021 Google LLC
+> > + * Author: Fuad Tabba <tabba@google.com>
+> > + */
+> > +
+> > +#ifndef __ARM64_KVM_FIXED_CONFIG_H__
+> > +#define __ARM64_KVM_FIXED_CONFIG_H__
+> > +
+> > +#include <asm/sysreg.h>
+> > +
+> > +/*
+> > + * This file contains definitions for features to be allowed or restricted for
+> > + * guest virtual machines as a baseline, depending on what mode KVM is running
+> > + * in and on the type of guest is running.
+>
+> s/is running/that is running/
 
-memblock_find_in_range() is the very core of memblock allocations, so any
-future changes to its internal behaviour would mandate updates of all the
-users outside memblock.
+Ack.
 
-Replace the calls to memblock_find_in_range() with an equivalent calls to
-memblock_phys_alloc() and memblock_phys_alloc_range() and make
-memblock_find_in_range() private method of memblock.
+> > + *
+> > + * The features are represented as the highest allowed value for a feature in
+> > + * the feature id registers. If the field is set to all ones (i.e., 0b1111),
+> > + * then it's only restricted by what the system allows. If the feature is set to
+> > + * another value, then that value would be the maximum value allowed and
+> > + * supported in pKVM, even if the system supports a higher value.
+>
+> Given that some fields are signed whereas others are unsigned, I think the
+> wording could be a bit tighter here when it refers to "maximum".
+>
+> > + *
+> > + * Some features are forced to a certain value, in which case a SET bitmap is
+> > + * used to force these values.
+> > + */
+> > +
+> > +
+> > +/*
+> > + * Allowed features for protected guests (Protected KVM)
+> > + *
+> > + * The approach taken here is to allow features that are:
+> > + * - needed by common Linux distributions (e.g., flooating point)
+>
+> s/flooating/floating
+Ack.
 
-This simplifies the callers, ensures that (unlikely) errors in
-memblock_reserve() are handled and improves maintainability of
-memblock_find_in_range().
+> > + * - are trivial, e.g., supporting the feature doesn't introduce or require the
+> > + * tracking of additional state
+> ... in KVM.
 
-Signed-off-by: Mike Rapoport <rppt@linux.ibm.com>
-Acked-by: Kirill A. Shutemov <kirill.shtuemov@linux.intel.com>
-Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>	# ACPI
-Acked-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-Acked-by: Nick Kossifidis <mick@ics.forth.gr>			# riscv
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>		# arm64
----
-v5:
-* restore the original behaviour on x86 with addition of more elaborate
-  comment; I will address the issue in memory_map_top_down() in a separate
-  series.
+Ack.
 
-v4: https://lore.kernel.org/lkml/20210812065907.20046-1-rppt@kernel.org
-* Add patch that prevents the crashes reported by Guenter Roeck on x86/i386
-  on QEMU with 256M or 512M of memory and EFI boot enabled.
-* Add Acked-by and Reviewed-by, thanks everybidy!
+> > + * - not trapable
+>
+> s/not trapable/cannot be trapped/
+Ack
 
-v3: https://lore.kernel.org/lkml/20210803064218.6611-1-rppt@kernel.org
-* simplify check for exact crash kerenl allocation on arm, per Rob
-* make crash_max unsigned long long on arm64, per Rob
+> > + */
+> > +
+> > +/*
+> > + * - Floating-point and Advanced SIMD:
+> > + *   Don't require much support other than maintaining the context, which KVM
+> > + *   already has.
+>
+> I'd rework this sentence. We have to support fpsimd because Linux guests
+> rely on it.
 
-v2: https://lore.kernel.org/lkml/20210802063737.22733-1-rppt@kernel.org
-* don't change error message in arm::reserve_crashkernel(), per Russell
+Ack
 
-v1: https://lore.kernel.org/lkml/20210730104039.7047-1-rppt@kernel.org
+> > + * - AArch64 guests only (no support for AArch32 guests):
+> > + *   Simplify support in case of asymmetric AArch32 systems.
+>
+> I don't think asymmetric systems come into this really; AArch32 on its
+> own adds lots of complexity in trap handling, emulation, condition codes
+> etc. Restricting guests to AArch64 means we don't have to worry about the
+> AArch32 exception model or emulation of 32-bit instructions.
+
+Ack
+
+> > + * - RAS (v1)
+> > + *   v1 doesn't require much additional support, but later versions do.
+>
+> Be more specific?
+
+Ack
+
+> > + * - Data Independent Timing
+> > + *   Trivial
+> > + * Remaining features are not supported either because they require too much
+> > + * support from KVM, or risk leaking guest data.
+>
+> I think we should drop this sentence -- it makes it sounds like we can't
+> be arsed :)
+
+Ack.
+
+> > + */
+> > +#define PVM_ID_AA64PFR0_ALLOW (\
+> > +     FEATURE(ID_AA64PFR0_FP) | \
+> > +     FIELD_PREP(FEATURE(ID_AA64PFR0_EL0), ID_AA64PFR0_ELx_64BIT_ONLY) | \
+> > +     FIELD_PREP(FEATURE(ID_AA64PFR0_EL1), ID_AA64PFR0_ELx_64BIT_ONLY) | \
+> > +     FIELD_PREP(FEATURE(ID_AA64PFR0_EL2), ID_AA64PFR0_ELx_64BIT_ONLY) | \
+> > +     FIELD_PREP(FEATURE(ID_AA64PFR0_EL3), ID_AA64PFR0_ELx_64BIT_ONLY) | \
+> > +     FIELD_PREP(FEATURE(ID_AA64PFR0_RAS), ID_AA64PFR0_RAS_V1) | \
+>
+> I think having the FIELD_PREP entries in the ALLOW mask is quite confusing
+> here -- naively you would expect to be able to bitwise-and the host register
+> value with the ALLOW mask and get the sanitised version back, but with these
+> here you have to go field-by-field to compute the common value.
+>
+> So perhaps move those into a PVM_ID_AA64PFR0_RESTRICT mask or something?
+> Then pvm_access_id_aa64pfr0() will become a little easier to read, I think.
+
+I agree. I've reworked it, and it simplifies the code and makes it
+easier to read.
+
+> > +     FEATURE(ID_AA64PFR0_ASIMD) | \
+> > +     FEATURE(ID_AA64PFR0_DIT) \
+> > +     )
+> > +
+> > +/*
+> > + * - Branch Target Identification
+> > + * - Speculative Store Bypassing
+> > + *   These features are trivial to support
+> > + */
+> > +#define PVM_ID_AA64PFR1_ALLOW (\
+> > +     FEATURE(ID_AA64PFR1_BT) | \
+> > +     FEATURE(ID_AA64PFR1_SSBS) \
+> > +     )
+> > +
+> > +/*
+> > + * No support for Scalable Vectors:
+> > + *   Requires additional support from KVM
+>
+> Perhaps expand on "support" here? E.g. "context-switching and trapping
+> support at EL2".
+
+Ack.
+
+> > + */
+> > +#define PVM_ID_AA64ZFR0_ALLOW (0ULL)
+> > +
+> > +/*
+> > + * No support for debug, including breakpoints, and watchpoints:
+> > + *   Reduce complexity and avoid exposing/leaking guest data
+> > + *
+> > + * NOTE: The Arm architecture mandates support for at least the Armv8 debug
+> > + * architecture, which would include at least 2 hardware breakpoints and
+> > + * watchpoints. Providing that support to protected guests adds considerable
+> > + * state and complexity, and risks leaking guest data. Therefore, the reserved
+> > + * value of 0 is used for debug-related fields.
+> > + */
+>
+> I think the complexity of the debug architecture is a good reason to avoid
+> exposing it here, but I don't understand how providing breakpoints or
+> watchpoints to a guest could risk leaking guest data. What is the specific
+> threat here?
+
+I mixed up the various debug and trace features here. Will fix the comment.
+
+> > +#define PVM_ID_AA64DFR0_ALLOW (0ULL)
+> > +
+> > +/*
+> > + * These features are chosen because they are supported by KVM and to limit the
+> > + * confiruation state space and make it more deterministic.
+>
+> s/confiruation/configuration/
+>
+> However, I don't agree that this provides determinism since we're not
+> forcing any particular values, but rather filtering the values from the
+> host.
+
+Ack
+
+> > + * - 40-bit IPA
+>
+> This seems more about not supporting KVM_CAP_ARM_VM_IPA_SIZE for now.
+>
+> > + * - 16-bit ASID
+> > + * - Mixed-endian
+> > + * - Distinction between Secure and Non-secure Memory
+> > + * - Mixed-endian at EL0 only
+> > + * - Non-context synchronizing exception entry and exit
+>
+> These all seem to fall into the "cannot trap" category, so we just advertise
+> whatever we've got.
+
+Ack.
 
 
- arch/arm/kernel/setup.c           | 20 +++++---------
- arch/arm64/kvm/hyp/reserved_mem.c |  9 +++----
- arch/arm64/mm/init.c              | 36 ++++++++-----------------
- arch/mips/kernel/setup.c          | 14 +++++-----
- arch/riscv/mm/init.c              | 44 ++++++++++---------------------
- arch/s390/kernel/setup.c          | 10 ++++---
- arch/x86/kernel/aperture_64.c     |  5 ++--
- arch/x86/mm/init.c                | 23 ++++++++++------
- arch/x86/mm/numa.c                |  5 ++--
- arch/x86/mm/numa_emulation.c      |  5 ++--
- arch/x86/realmode/init.c          |  2 +-
- drivers/acpi/tables.c             |  5 ++--
- drivers/base/arch_numa.c          |  5 +---
- drivers/of/of_reserved_mem.c      | 12 ++++++---
- include/linux/memblock.h          |  2 --
- mm/memblock.c                     |  2 +-
- 16 files changed, 81 insertions(+), 118 deletions(-)
+>
+> > + */
+> > +#define PVM_ID_AA64MMFR0_ALLOW (\
+> > +     FIELD_PREP(FEATURE(ID_AA64MMFR0_PARANGE), ID_AA64MMFR0_PARANGE_40) | \
+> > +     FIELD_PREP(FEATURE(ID_AA64MMFR0_ASID), ID_AA64MMFR0_ASID_16) | \
+> > +     FEATURE(ID_AA64MMFR0_BIGENDEL) | \
+> > +     FEATURE(ID_AA64MMFR0_SNSMEM) | \
+> > +     FEATURE(ID_AA64MMFR0_BIGENDEL0) | \
+> > +     FEATURE(ID_AA64MMFR0_EXS) \
+> > +     )
+> > +
+> > +/*
+> > + * - 64KB granule not supported
+> > + */
+> > +#define PVM_ID_AA64MMFR0_SET (\
+> > +     FIELD_PREP(FEATURE(ID_AA64MMFR0_TGRAN64), ID_AA64MMFR0_TGRAN64_NI) \
+> > +     )
+>
+> Why not, and can we actually prevent the guest from doing that?
 
-diff --git a/arch/arm/kernel/setup.c b/arch/arm/kernel/setup.c
-index f97eb2371672..284a80c0b6e1 100644
---- a/arch/arm/kernel/setup.c
-+++ b/arch/arm/kernel/setup.c
-@@ -1012,31 +1012,25 @@ static void __init reserve_crashkernel(void)
- 		unsigned long long lowmem_max = __pa(high_memory - 1) + 1;
- 		if (crash_max > lowmem_max)
- 			crash_max = lowmem_max;
--		crash_base = memblock_find_in_range(CRASH_ALIGN, crash_max,
--						    crash_size, CRASH_ALIGN);
-+
-+		crash_base = memblock_phys_alloc_range(crash_size, CRASH_ALIGN,
-+						       CRASH_ALIGN, crash_max);
- 		if (!crash_base) {
- 			pr_err("crashkernel reservation failed - No suitable area found.\n");
- 			return;
- 		}
- 	} else {
-+		unsigned long long crash_max = crash_base + crash_size;
- 		unsigned long long start;
- 
--		start = memblock_find_in_range(crash_base,
--					       crash_base + crash_size,
--					       crash_size, SECTION_SIZE);
--		if (start != crash_base) {
-+		start = memblock_phys_alloc_range(crash_size, SECTION_SIZE,
-+						  crash_base, crash_max);
-+		if (!start) {
- 			pr_err("crashkernel reservation failed - memory is in use.\n");
- 			return;
- 		}
- 	}
- 
--	ret = memblock_reserve(crash_base, crash_size);
--	if (ret < 0) {
--		pr_warn("crashkernel reservation failed - memory is in use (0x%lx)\n",
--			(unsigned long)crash_base);
--		return;
--	}
--
- 	pr_info("Reserving %ldMB of memory at %ldMB for crashkernel (System RAM: %ldMB)\n",
- 		(unsigned long)(crash_size >> 20),
- 		(unsigned long)(crash_base >> 20),
-diff --git a/arch/arm64/kvm/hyp/reserved_mem.c b/arch/arm64/kvm/hyp/reserved_mem.c
-index d654921dd09b..578670e3f608 100644
---- a/arch/arm64/kvm/hyp/reserved_mem.c
-+++ b/arch/arm64/kvm/hyp/reserved_mem.c
-@@ -92,12 +92,10 @@ void __init kvm_hyp_reserve(void)
- 	 * this is unmapped from the host stage-2, and fallback to PAGE_SIZE.
- 	 */
- 	hyp_mem_size = hyp_mem_pages << PAGE_SHIFT;
--	hyp_mem_base = memblock_find_in_range(0, memblock_end_of_DRAM(),
--					      ALIGN(hyp_mem_size, PMD_SIZE),
--					      PMD_SIZE);
-+	hyp_mem_base = memblock_phys_alloc(ALIGN(hyp_mem_size, PMD_SIZE),
-+					   PMD_SIZE);
- 	if (!hyp_mem_base)
--		hyp_mem_base = memblock_find_in_range(0, memblock_end_of_DRAM(),
--						      hyp_mem_size, PAGE_SIZE);
-+		hyp_mem_base = memblock_phys_alloc(hyp_mem_size, PAGE_SIZE);
- 	else
- 		hyp_mem_size = ALIGN(hyp_mem_size, PMD_SIZE);
- 
-@@ -105,7 +103,6 @@ void __init kvm_hyp_reserve(void)
- 		kvm_err("Failed to reserve hyp memory\n");
- 		return;
- 	}
--	memblock_reserve(hyp_mem_base, hyp_mem_size);
- 
- 	kvm_info("Reserved %lld MiB at 0x%llx\n", hyp_mem_size >> 20,
- 		 hyp_mem_base);
-diff --git a/arch/arm64/mm/init.c b/arch/arm64/mm/init.c
-index 8490ed2917ff..0bffd2d1854f 100644
---- a/arch/arm64/mm/init.c
-+++ b/arch/arm64/mm/init.c
-@@ -74,6 +74,7 @@ phys_addr_t arm64_dma_phys_limit __ro_after_init;
- static void __init reserve_crashkernel(void)
- {
- 	unsigned long long crash_base, crash_size;
-+	unsigned long long crash_max = arm64_dma_phys_limit;
- 	int ret;
- 
- 	ret = parse_crashkernel(boot_command_line, memblock_phys_mem_size(),
-@@ -84,33 +85,18 @@ static void __init reserve_crashkernel(void)
- 
- 	crash_size = PAGE_ALIGN(crash_size);
- 
--	if (crash_base == 0) {
--		/* Current arm64 boot protocol requires 2MB alignment */
--		crash_base = memblock_find_in_range(0, arm64_dma_phys_limit,
--				crash_size, SZ_2M);
--		if (crash_base == 0) {
--			pr_warn("cannot allocate crashkernel (size:0x%llx)\n",
--				crash_size);
--			return;
--		}
--	} else {
--		/* User specifies base address explicitly. */
--		if (!memblock_is_region_memory(crash_base, crash_size)) {
--			pr_warn("cannot reserve crashkernel: region is not memory\n");
--			return;
--		}
-+	/* User specifies base address explicitly. */
-+	if (crash_base)
-+		crash_max = crash_base + crash_size;
- 
--		if (memblock_is_region_reserved(crash_base, crash_size)) {
--			pr_warn("cannot reserve crashkernel: region overlaps reserved memory\n");
--			return;
--		}
--
--		if (!IS_ALIGNED(crash_base, SZ_2M)) {
--			pr_warn("cannot reserve crashkernel: base address is not 2MB aligned\n");
--			return;
--		}
-+	/* Current arm64 boot protocol requires 2MB alignment */
-+	crash_base = memblock_phys_alloc_range(crash_size, SZ_2M,
-+					       crash_base, crash_max);
-+	if (!crash_base) {
-+		pr_warn("cannot allocate crashkernel (size:0x%llx)\n",
-+			crash_size);
-+		return;
- 	}
--	memblock_reserve(crash_base, crash_size);
- 
- 	pr_info("crashkernel reserved: 0x%016llx - 0x%016llx (%lld MB)\n",
- 		crash_base, crash_base + crash_size, crash_size >> 20);
-diff --git a/arch/mips/kernel/setup.c b/arch/mips/kernel/setup.c
-index 23a140327a0b..f979adfd4fc2 100644
---- a/arch/mips/kernel/setup.c
-+++ b/arch/mips/kernel/setup.c
-@@ -452,8 +452,9 @@ static void __init mips_parse_crashkernel(void)
- 		return;
- 
- 	if (crash_base <= 0) {
--		crash_base = memblock_find_in_range(CRASH_ALIGN, CRASH_ADDR_MAX,
--							crash_size, CRASH_ALIGN);
-+		crash_base = memblock_phys_alloc_range(crash_size, CRASH_ALIGN,
-+						       CRASH_ALIGN,
-+						       CRASH_ADDR_MAX);
- 		if (!crash_base) {
- 			pr_warn("crashkernel reservation failed - No suitable area found.\n");
- 			return;
-@@ -461,8 +462,9 @@ static void __init mips_parse_crashkernel(void)
- 	} else {
- 		unsigned long long start;
- 
--		start = memblock_find_in_range(crash_base, crash_base + crash_size,
--						crash_size, 1);
-+		start = memblock_phys_alloc_range(crash_size, 1,
-+						  crash_base,
-+						  crash_base + crash_size);
- 		if (start != crash_base) {
- 			pr_warn("Invalid memory region reserved for crash kernel\n");
- 			return;
-@@ -656,10 +658,6 @@ static void __init arch_mem_init(char **cmdline_p)
- 	mips_reserve_vmcore();
- 
- 	mips_parse_crashkernel();
--#ifdef CONFIG_KEXEC
--	if (crashk_res.start != crashk_res.end)
--		memblock_reserve(crashk_res.start, resource_size(&crashk_res));
--#endif
- 	device_tree_init();
- 
- 	/*
-diff --git a/arch/riscv/mm/init.c b/arch/riscv/mm/init.c
-index a14bf3910eec..88649337c568 100644
---- a/arch/riscv/mm/init.c
-+++ b/arch/riscv/mm/init.c
-@@ -812,38 +812,22 @@ static void __init reserve_crashkernel(void)
- 
- 	crash_size = PAGE_ALIGN(crash_size);
- 
--	if (crash_base == 0) {
--		/*
--		 * Current riscv boot protocol requires 2MB alignment for
--		 * RV64 and 4MB alignment for RV32 (hugepage size)
--		 */
--		crash_base = memblock_find_in_range(search_start, search_end,
--						    crash_size, PMD_SIZE);
--
--		if (crash_base == 0) {
--			pr_warn("crashkernel: couldn't allocate %lldKB\n",
--				crash_size >> 10);
--			return;
--		}
--	} else {
--		/* User specifies base address explicitly. */
--		if (!memblock_is_region_memory(crash_base, crash_size)) {
--			pr_warn("crashkernel: requested region is not memory\n");
--			return;
--		}
--
--		if (memblock_is_region_reserved(crash_base, crash_size)) {
--			pr_warn("crashkernel: requested region is reserved\n");
--			return;
--		}
--
-+	if (crash_base) {
-+		search_start = crash_base;
-+		search_end = crash_base + crash_size;
-+	}
- 
--		if (!IS_ALIGNED(crash_base, PMD_SIZE)) {
--			pr_warn("crashkernel: requested region is misaligned\n");
--			return;
--		}
-+	/*
-+	 * Current riscv boot protocol requires 2MB alignment for
-+	 * RV64 and 4MB alignment for RV32 (hugepage size)
-+	 */
-+	crash_base = memblock_phys_alloc_range(crash_size, PMD_SIZE,
-+					       search_start, search_end);
-+	if (crash_base == 0) {
-+		pr_warn("crashkernel: couldn't allocate %lldKB\n",
-+			crash_size >> 10);
-+		return;
- 	}
--	memblock_reserve(crash_base, crash_size);
- 
- 	pr_info("crashkernel: reserved 0x%016llx - 0x%016llx (%lld MB)\n",
- 		crash_base, crash_base + crash_size, crash_size >> 20);
-diff --git a/arch/s390/kernel/setup.c b/arch/s390/kernel/setup.c
-index ff0f9e838916..3d9efee0f43c 100644
---- a/arch/s390/kernel/setup.c
-+++ b/arch/s390/kernel/setup.c
-@@ -626,8 +626,9 @@ static void __init reserve_crashkernel(void)
- 			return;
- 		}
- 		low = crash_base ?: low;
--		crash_base = memblock_find_in_range(low, high, crash_size,
--						    KEXEC_CRASH_MEM_ALIGN);
-+		crash_base = memblock_phys_alloc_range(crash_size,
-+						       KEXEC_CRASH_MEM_ALIGN,
-+						       low, high);
- 	}
- 
- 	if (!crash_base) {
-@@ -636,14 +637,15 @@ static void __init reserve_crashkernel(void)
- 		return;
- 	}
- 
--	if (register_memory_notifier(&kdump_mem_nb))
-+	if (register_memory_notifier(&kdump_mem_nb)) {
-+		memblock_free(crash_base, crash_size);
- 		return;
-+	}
- 
- 	if (!OLDMEM_BASE && MACHINE_IS_VM)
- 		diag10_range(PFN_DOWN(crash_base), PFN_DOWN(crash_size));
- 	crashk_res.start = crash_base;
- 	crashk_res.end = crash_base + crash_size - 1;
--	memblock_remove(crash_base, crash_size);
- 	pr_info("Reserving %lluMB of memory at %lluMB "
- 		"for crashkernel (System RAM: %luMB)\n",
- 		crash_size >> 20, crash_base >> 20,
-diff --git a/arch/x86/kernel/aperture_64.c b/arch/x86/kernel/aperture_64.c
-index 294ed4392a0e..10562885f5fc 100644
---- a/arch/x86/kernel/aperture_64.c
-+++ b/arch/x86/kernel/aperture_64.c
-@@ -109,14 +109,13 @@ static u32 __init allocate_aperture(void)
- 	 * memory. Unfortunately we cannot move it up because that would
- 	 * make the IOMMU useless.
- 	 */
--	addr = memblock_find_in_range(GART_MIN_ADDR, GART_MAX_ADDR,
--				      aper_size, aper_size);
-+	addr = memblock_phys_alloc_range(aper_size, aper_size,
-+					 GART_MIN_ADDR, GART_MAX_ADDR);
- 	if (!addr) {
- 		pr_err("Cannot allocate aperture memory hole [mem %#010lx-%#010lx] (%uKB)\n",
- 		       addr, addr + aper_size - 1, aper_size >> 10);
- 		return 0;
- 	}
--	memblock_reserve(addr, aper_size);
- 	pr_info("Mapping aperture over RAM [mem %#010lx-%#010lx] (%uKB)\n",
- 		addr, addr + aper_size - 1, aper_size >> 10);
- 	register_nosave_region(addr >> PAGE_SHIFT,
-diff --git a/arch/x86/mm/init.c b/arch/x86/mm/init.c
-index 75ef19aa8903..23a14d82e783 100644
---- a/arch/x86/mm/init.c
-+++ b/arch/x86/mm/init.c
-@@ -127,14 +127,12 @@ __ref void *alloc_low_pages(unsigned int num)
- 		unsigned long ret = 0;
- 
- 		if (min_pfn_mapped < max_pfn_mapped) {
--			ret = memblock_find_in_range(
-+			ret = memblock_phys_alloc_range(
-+					PAGE_SIZE * num, PAGE_SIZE,
- 					min_pfn_mapped << PAGE_SHIFT,
--					max_pfn_mapped << PAGE_SHIFT,
--					PAGE_SIZE * num , PAGE_SIZE);
-+					max_pfn_mapped << PAGE_SHIFT);
- 		}
--		if (ret)
--			memblock_reserve(ret, PAGE_SIZE * num);
--		else if (can_use_brk_pgt)
-+		if (!ret && can_use_brk_pgt)
- 			ret = __pa(extend_brk(PAGE_SIZE * num, PAGE_SIZE));
- 
- 		if (!ret)
-@@ -610,8 +608,17 @@ static void __init memory_map_top_down(unsigned long map_start,
- 	unsigned long addr;
- 	unsigned long mapped_ram_size = 0;
- 
--	/* xen has big range in reserved near end of ram, skip it at first.*/
--	addr = memblock_find_in_range(map_start, map_end, PMD_SIZE, PMD_SIZE);
-+	/*
-+	 * Systems that have many reserved areas near top of the memory,
-+	 * e.g. QEMU with less than 1G RAM and EFI enabled, or Xen, will
-+	 * require lots of 4K mappings which may exhaust pgt_buf.
-+	 * Start with top-most PMD_SIZE range aligned at PMD_SIZE to ensure
-+	 * there is enough mapped memory that can be allocated from
-+	 * memblock.
-+	 */
-+	addr = memblock_phys_alloc_range(PMD_SIZE, PMD_SIZE, map_start,
-+					 map_end);
-+	memblock_free(addr, PMD_SIZE);
- 	real_end = addr + PMD_SIZE;
- 
- 	/* step_size need to be small so pgt_buf from BRK could cover it */
-diff --git a/arch/x86/mm/numa.c b/arch/x86/mm/numa.c
-index e94da744386f..a1b5c71099e6 100644
---- a/arch/x86/mm/numa.c
-+++ b/arch/x86/mm/numa.c
-@@ -376,15 +376,14 @@ static int __init numa_alloc_distance(void)
- 	cnt++;
- 	size = cnt * cnt * sizeof(numa_distance[0]);
- 
--	phys = memblock_find_in_range(0, PFN_PHYS(max_pfn_mapped),
--				      size, PAGE_SIZE);
-+	phys = memblock_phys_alloc_range(size, PAGE_SIZE, 0,
-+					 PFN_PHYS(max_pfn_mapped));
- 	if (!phys) {
- 		pr_warn("Warning: can't allocate distance table!\n");
- 		/* don't retry until explicitly reset */
- 		numa_distance = (void *)1LU;
- 		return -ENOMEM;
- 	}
--	memblock_reserve(phys, size);
- 
- 	numa_distance = __va(phys);
- 	numa_distance_cnt = cnt;
-diff --git a/arch/x86/mm/numa_emulation.c b/arch/x86/mm/numa_emulation.c
-index 87d77cc52f86..737491b13728 100644
---- a/arch/x86/mm/numa_emulation.c
-+++ b/arch/x86/mm/numa_emulation.c
-@@ -447,13 +447,12 @@ void __init numa_emulation(struct numa_meminfo *numa_meminfo, int numa_dist_cnt)
- 	if (numa_dist_cnt) {
- 		u64 phys;
- 
--		phys = memblock_find_in_range(0, PFN_PHYS(max_pfn_mapped),
--					      phys_size, PAGE_SIZE);
-+		phys = memblock_phys_alloc_range(phys_size, PAGE_SIZE, 0,
-+						 PFN_PHYS(max_pfn_mapped));
- 		if (!phys) {
- 			pr_warn("NUMA: Warning: can't allocate copy of distance table, disabling emulation\n");
- 			goto no_emu;
- 		}
--		memblock_reserve(phys, phys_size);
- 		phys_dist = __va(phys);
- 
- 		for (i = 0; i < numa_dist_cnt; i++)
-diff --git a/arch/x86/realmode/init.c b/arch/x86/realmode/init.c
-index 6534c92d0f83..31b5856010cb 100644
---- a/arch/x86/realmode/init.c
-+++ b/arch/x86/realmode/init.c
-@@ -28,7 +28,7 @@ void __init reserve_real_mode(void)
- 	WARN_ON(slab_is_available());
- 
- 	/* Has to be under 1M so we can execute real-mode AP code. */
--	mem = memblock_find_in_range(0, 1<<20, size, PAGE_SIZE);
-+	mem = memblock_phys_alloc_range(size, PAGE_SIZE, 0, 1<<20);
- 	if (!mem)
- 		pr_info("No sub-1M memory is available for the trampoline\n");
- 	else
-diff --git a/drivers/acpi/tables.c b/drivers/acpi/tables.c
-index a37a1532a575..f9383736fa0f 100644
---- a/drivers/acpi/tables.c
-+++ b/drivers/acpi/tables.c
-@@ -583,8 +583,8 @@ void __init acpi_table_upgrade(void)
- 	}
- 
- 	acpi_tables_addr =
--		memblock_find_in_range(0, ACPI_TABLE_UPGRADE_MAX_PHYS,
--				       all_tables_size, PAGE_SIZE);
-+		memblock_phys_alloc_range(all_tables_size, PAGE_SIZE,
-+					  0, ACPI_TABLE_UPGRADE_MAX_PHYS);
- 	if (!acpi_tables_addr) {
- 		WARN_ON(1);
- 		return;
-@@ -599,7 +599,6 @@ void __init acpi_table_upgrade(void)
- 	 * Both memblock_reserve and e820__range_add (via arch_reserve_mem_area)
- 	 * works fine.
- 	 */
--	memblock_reserve(acpi_tables_addr, all_tables_size);
- 	arch_reserve_mem_area(acpi_tables_addr, all_tables_size);
- 
- 	/*
-diff --git a/drivers/base/arch_numa.c b/drivers/base/arch_numa.c
-index 4cc4e117727d..46c503486e96 100644
---- a/drivers/base/arch_numa.c
-+++ b/drivers/base/arch_numa.c
-@@ -279,13 +279,10 @@ static int __init numa_alloc_distance(void)
- 	int i, j;
- 
- 	size = nr_node_ids * nr_node_ids * sizeof(numa_distance[0]);
--	phys = memblock_find_in_range(0, PFN_PHYS(max_pfn),
--				      size, PAGE_SIZE);
-+	phys = memblock_phys_alloc_range(size, PAGE_SIZE, 0, PFN_PHYS(max_pfn));
- 	if (WARN_ON(!phys))
- 		return -ENOMEM;
- 
--	memblock_reserve(phys, size);
--
- 	numa_distance = __va(phys);
- 	numa_distance_cnt = nr_node_ids;
- 
-diff --git a/drivers/of/of_reserved_mem.c b/drivers/of/of_reserved_mem.c
-index fd3964d24224..59c1390cdf42 100644
---- a/drivers/of/of_reserved_mem.c
-+++ b/drivers/of/of_reserved_mem.c
-@@ -33,18 +33,22 @@ static int __init early_init_dt_alloc_reserved_memory_arch(phys_addr_t size,
- 	phys_addr_t *res_base)
- {
- 	phys_addr_t base;
-+	int err = 0;
- 
- 	end = !end ? MEMBLOCK_ALLOC_ANYWHERE : end;
- 	align = !align ? SMP_CACHE_BYTES : align;
--	base = memblock_find_in_range(start, end, size, align);
-+	base = memblock_phys_alloc_range(size, align, start, end);
- 	if (!base)
- 		return -ENOMEM;
- 
- 	*res_base = base;
--	if (nomap)
--		return memblock_mark_nomap(base, size);
-+	if (nomap) {
-+		err = memblock_mark_nomap(base, size);
-+		if (err)
-+			memblock_free(base, size);
-+	}
- 
--	return memblock_reserve(base, size);
-+	return err;
- }
- 
- /*
-diff --git a/include/linux/memblock.h b/include/linux/memblock.h
-index 4a53c3ca86bd..b066024c62e3 100644
---- a/include/linux/memblock.h
-+++ b/include/linux/memblock.h
-@@ -99,8 +99,6 @@ void memblock_discard(void);
- static inline void memblock_discard(void) {}
- #endif
- 
--phys_addr_t memblock_find_in_range(phys_addr_t start, phys_addr_t end,
--				   phys_addr_t size, phys_addr_t align);
- void memblock_allow_resize(void);
- int memblock_add_node(phys_addr_t base, phys_addr_t size, int nid);
- int memblock_add(phys_addr_t base, phys_addr_t size);
-diff --git a/mm/memblock.c b/mm/memblock.c
-index de7b553baa50..28a813d9e955 100644
---- a/mm/memblock.c
-+++ b/mm/memblock.c
-@@ -315,7 +315,7 @@ static phys_addr_t __init_memblock memblock_find_in_range_node(phys_addr_t size,
-  * Return:
-  * Found address on success, 0 on failure.
-  */
--phys_addr_t __init_memblock memblock_find_in_range(phys_addr_t start,
-+static phys_addr_t __init_memblock memblock_find_in_range(phys_addr_t start,
- 					phys_addr_t end, phys_addr_t size,
- 					phys_addr_t align)
- {
+We cannot prevent the guest from doing it. Initial reasoning was that
+there isn't a clear use case for it, but since we cannot prevent the
+guest from doing that, I'll unhide it.
 
-base-commit: ff1176468d368232b684f75e82563369208bc371
--- 
-2.28.0
+> > +/*
+> > + * These features are chosen because they are supported by KVM and to limit the
+> > + * confiruation state space and make it more deterministic.
+>
+> It's that typo again ;) But my comment from before still applies -- I don't
+> think an ALLOW mask adds hugely to the determinism.
 
+Ack
+
+> > + * - Hardware translation table updates to Access flag and Dirty state
+> > + * - Number of VMID bits from CPU
+> > + * - Hierarchical Permission Disables
+> > + * - Privileged Access Never
+> > + * - SError interrupt exceptions from speculative reads
+> > + * - Enhanced Translation Synchronization
+>
+> As before, I think this is a mixture of "trivial" and "cannot trap"
+> features.
+
+Ack
+
+> > + */
+> > +#define PVM_ID_AA64MMFR1_ALLOW (\
+> > +     FEATURE(ID_AA64MMFR1_HADBS) | \
+> > +     FEATURE(ID_AA64MMFR1_VMIDBITS) | \
+> > +     FEATURE(ID_AA64MMFR1_HPD) | \
+> > +     FEATURE(ID_AA64MMFR1_PAN) | \
+> > +     FEATURE(ID_AA64MMFR1_SPECSEI) | \
+> > +     FEATURE(ID_AA64MMFR1_ETS) \
+> > +     )
+> > +
+> > +/*
+> > + * These features are chosen because they are supported by KVM and to limit the
+> > + * confiruation state space and make it more deterministic.
+>
+> <same comment>
+
+Ack
+> > + * - Common not Private translations
+> > + * - User Access Override
+> > + * - IESB bit in the SCTLR_ELx registers
+> > + * - Unaligned single-copy atomicity and atomic functions
+> > + * - ESR_ELx.EC value on an exception by read access to feature ID space
+> > + * - TTL field in address operations.
+> > + * - Break-before-make sequences when changing translation block size
+> > + * - E0PDx mechanism
+> > + */
+> > +#define PVM_ID_AA64MMFR2_ALLOW (\
+> > +     FEATURE(ID_AA64MMFR2_CNP) | \
+> > +     FEATURE(ID_AA64MMFR2_UAO) | \
+> > +     FEATURE(ID_AA64MMFR2_IESB) | \
+> > +     FEATURE(ID_AA64MMFR2_AT) | \
+> > +     FEATURE(ID_AA64MMFR2_IDS) | \
+> > +     FEATURE(ID_AA64MMFR2_TTL) | \
+> > +     FEATURE(ID_AA64MMFR2_BBM) | \
+> > +     FEATURE(ID_AA64MMFR2_E0PD) \
+> > +     )
+> > +
+> > +/*
+> > + * Allow all features in this register because they are trivial to support, or
+> > + * are already supported by KVM:
+> > + * - LS64
+> > + * - XS
+> > + * - I8MM
+> > + * - DGB
+> > + * - BF16
+> > + * - SPECRES
+> > + * - SB
+> > + * - FRINTTS
+> > + * - PAuth
+> > + * - FPAC
+> > + * - LRCPC
+> > + * - FCMA
+> > + * - JSCVT
+> > + * - DPB
+> > + */
+> > +#define PVM_ID_AA64ISAR1_ALLOW (~0ULL)
+> > +
+> > +#endif /* __ARM64_KVM_FIXED_CONFIG_H__ */
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index ac67d5699c68..e1ceadd69575 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -780,6 +780,8 @@ static inline bool kvm_vm_is_protected(struct kvm *kvm)
+> >       return false;
+> >  }
+> >
+> > +void kvm_init_protected_traps(struct kvm_vcpu *vcpu);
+> > +
+> >  int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature);
+> >  bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+> > index 657d0c94cf82..3f4866322f85 100644
+> > --- a/arch/arm64/include/asm/kvm_hyp.h
+> > +++ b/arch/arm64/include/asm/kvm_hyp.h
+> > @@ -115,7 +115,10 @@ int __pkvm_init(phys_addr_t phys, unsigned long size, unsigned long nr_cpus,
+> >  void __noreturn __host_enter(struct kvm_cpu_context *host_ctxt);
+> >  #endif
+> >
+> > +extern u64 kvm_nvhe_sym(id_aa64pfr0_el1_sys_val);
+> > +extern u64 kvm_nvhe_sym(id_aa64pfr1_el1_sys_val);
+> >  extern u64 kvm_nvhe_sym(id_aa64mmfr0_el1_sys_val);
+> >  extern u64 kvm_nvhe_sym(id_aa64mmfr1_el1_sys_val);
+> > +extern u64 kvm_nvhe_sym(id_aa64mmfr2_el1_sys_val);
+> >
+> >  #endif /* __ARM64_KVM_HYP_H__ */
+> > diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> > index 989bb5dad2c8..0be63f5c495f 100644
+> > --- a/arch/arm64/kvm/Makefile
+> > +++ b/arch/arm64/kvm/Makefile
+> > @@ -14,7 +14,7 @@ kvm-y := $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o \
+> >        $(KVM)/vfio.o $(KVM)/irqchip.o $(KVM)/binary_stats.o \
+> >        arm.o mmu.o mmio.o psci.o perf.o hypercalls.o pvtime.o \
+> >        inject_fault.o va_layout.o handle_exit.o \
+> > -      guest.o debug.o reset.o sys_regs.o \
+> > +      guest.o debug.o pkvm.o reset.o sys_regs.o \
+> >        vgic-sys-reg-v3.o fpsimd.o pmu.o \
+> >        arch_timer.o trng.o\
+> >        vgic/vgic.o vgic/vgic-init.o \
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 14b12f2c08c0..3f28549aff0d 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -618,6 +618,14 @@ static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
+> >
+> >       ret = kvm_arm_pmu_v3_enable(vcpu);
+> >
+> > +     /*
+> > +      * Initialize traps for protected VMs.
+> > +      * NOTE: Move  trap initialization to EL2 once the code is in place for
+> > +      * maintaining protected VM state at EL2 instead of the host.
+> > +      */
+> > +     if (kvm_vm_is_protected(kvm))
+> > +             kvm_init_protected_traps(vcpu);
+> > +
+> >       return ret;
+> >  }
+> >
+> > @@ -1781,8 +1789,11 @@ static int kvm_hyp_init_protection(u32 hyp_va_bits)
+> >       void *addr = phys_to_virt(hyp_mem_base);
+> >       int ret;
+> >
+> > +     kvm_nvhe_sym(id_aa64pfr0_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
+> > +     kvm_nvhe_sym(id_aa64pfr1_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64PFR1_EL1);
+> >       kvm_nvhe_sym(id_aa64mmfr0_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
+> >       kvm_nvhe_sym(id_aa64mmfr1_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
+> > +     kvm_nvhe_sym(id_aa64mmfr2_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64MMFR2_EL1);
+> >
+> >       ret = create_hyp_mappings(addr, addr + hyp_mem_size, PAGE_HYP);
+> >       if (ret)
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+> > index 5df6193fc430..a23f417a0c20 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/Makefile
+> > +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+> > @@ -14,7 +14,7 @@ lib-objs := $(addprefix ../../../lib/, $(lib-objs))
+> >
+> >  obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o \
+> >        hyp-main.o hyp-smp.o psci-relay.o early_alloc.o stub.o page_alloc.o \
+> > -      cache.o setup.o mm.o mem_protect.o
+> > +      cache.o setup.o mm.o mem_protect.o sys_regs.o
+> >  obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
+> >        ../fpsimd.o ../hyp-entry.o ../exception.o ../pgtable.o
+> >  obj-y += $(lib-objs)
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> > new file mode 100644
+> > index 000000000000..6c7230aa70e9
+> > --- /dev/null
+> > +++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> > @@ -0,0 +1,443 @@
+> > +// SPDX-License-Identifier: GPL-2.0-only
+> > +/*
+> > + * Copyright (C) 2021 Google LLC
+> > + * Author: Fuad Tabba <tabba@google.com>
+> > + */
+> > +
+> > +#include <linux/kvm_host.h>
+> > +
+> > +#include <asm/kvm_asm.h>
+> > +#include <asm/kvm_emulate.h>
+> > +#include <asm/kvm_fixed_config.h>
+> > +#include <asm/kvm_mmu.h>
+> > +
+> > +#include <hyp/adjust_pc.h>
+> > +
+> > +#include "../../sys_regs.h"
+> > +
+> > +/*
+> > + * Copies of the host's CPU features registers holding sanitized values.
+> > + */
+> > +u64 id_aa64pfr0_el1_sys_val;
+> > +u64 id_aa64pfr1_el1_sys_val;
+> > +u64 id_aa64mmfr2_el1_sys_val;
+> > +
+> > +/*
+> > + * Inject an unknown/undefined exception to the guest.
+> > + */
+> > +static void inject_undef(struct kvm_vcpu *vcpu)
+> > +{
+> > +     u32 esr = (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT);
+> > +
+> > +     vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA64_EL1 |
+> > +                          KVM_ARM64_EXCEPT_AA64_ELx_SYNC |
+> > +                          KVM_ARM64_PENDING_EXCEPTION);
+> > +
+> > +     __kvm_adjust_pc(vcpu);
+> > +
+> > +     write_sysreg_el1(esr, SYS_ESR);
+> > +     write_sysreg_el1(read_sysreg_el2(SYS_ELR), SYS_ELR);
+> > +}
+> > +
+> > +/*
+> > + * Accessor for undefined accesses.
+> > + */
+> > +static bool undef_access(struct kvm_vcpu *vcpu,
+> > +                      struct sys_reg_params *p,
+> > +                      const struct sys_reg_desc *r)
+> > +{
+> > +     inject_undef(vcpu);
+> > +     return false;
+> > +}
+> > +
+> > +/*
+> > + * Accessors for feature registers.
+> > + *
+> > + * If access is allowed, set the regval to the protected VM's view of the
+> > + * register and return true.
+> > + * Otherwise, inject an undefined exception and return false.
+> > + */
+> > +
+> > +/*
+> > + * Returns the minimum feature supported and allowed.
+> > + */
+> > +static u64 get_min_feature(u64 feature, u64 allowed_features,
+> > +                        u64 supported_features)
+"> > +{
+> > +     const u64 allowed_feature = FIELD_GET(feature, allowed_features);
+> > +     const u64 supported_feature = FIELD_GET(feature, supported_features);
+> > +
+> > +     return min(allowed_feature, supported_feature);
+>
+> Careful here: this is an unsigned comparison, yet some fields are signed.
+> cpufeature.c uses the S_ARM64_FTR_BITS and ARM64_FTR_BITS to declare signed
+> and unsigned fields respectively.
+
+I completely missed that! It's described in "D13.1.3 Principles of the
+ID scheme for fields in ID registers" or the Arm Architecture
+Reference Manual. Fortunately, all of the features I'm working with
+are unsigned. However, I will fix it in v4 to ensure that should we
+add a signed feature we can clearly see that it needs to be handled
+differently.
+
+Thanks!
+
+/fuad
+
+> Will
+>
+> --
+> To unsubscribe from this group and stop receiving emails from it, send an email to kernel-team+unsubscribe@android.com.
+>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
