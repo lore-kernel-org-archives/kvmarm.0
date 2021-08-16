@@ -2,102 +2,85 @@ Return-Path: <SRS0=9WlX=NH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF84FC4338F
-	for <kvmarm@archiver.kernel.org>; Mon, 16 Aug 2021 21:30:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16B74C4338F
+	for <kvmarm@archiver.kernel.org>; Mon, 16 Aug 2021 21:30:46 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8258760F39
-	for <kvmarm@archiver.kernel.org>; Mon, 16 Aug 2021 21:30:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 8258760F39
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 9547C60E97
+	for <kvmarm@archiver.kernel.org>; Mon, 16 Aug 2021 21:30:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 9547C60E97
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 290484B0F3;
-	Mon, 16 Aug 2021 17:30:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 399F54B0E0;
+	Mon, 16 Aug 2021 17:30:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id DtUTAeByjny6; Mon, 16 Aug 2021 17:30:38 -0400 (EDT)
+	with ESMTP id 9l3bXOyzgiiJ; Mon, 16 Aug 2021 17:30:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BFD64B107;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 34E3A4B112;
 	Mon, 16 Aug 2021 17:30:37 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 46A184B10E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Aug 2021 13:05:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 427384B091
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Aug 2021 16:01:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qJU-IOrwvePM for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Aug 2021 13:05:34 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BB5194B10C
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Aug 2021 13:05:34 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1629133534;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=HQ8qwEo7/BHEwLXydRRYV4MKMc9Jy/YbNuBdHYVdLgs=;
- b=ARK3NrOMdDqlc8qh4wckKJT8UUQRuoYky8wYJlGLAhFtAYYatMByBZQA4KhxT9os0yGLMJ
- g5A9+sxpKFWCZVt2OECgcppupuZe13nI/R2ST/+V0pbMVQ4Z/okxDeK/41K2Eaz4AIdiSB
- nII/yM3XN34NGIJD+MawBCYNMpjt0rE=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-63-cMsaVFu3N2KEn72RxpwJbw-1; Mon, 16 Aug 2021 13:05:30 -0400
-X-MC-Unique: cMsaVFu3N2KEn72RxpwJbw-1
-Received: by mail-wr1-f69.google.com with SMTP id
- d12-20020a056000186cb02901548bff164dso5691560wri.18
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Aug 2021 10:05:30 -0700 (PDT)
+ with ESMTP id ciZ3yJVSiR+e for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 Aug 2021 16:01:13 -0400 (EDT)
+Received: from mail-vs1-f46.google.com (mail-vs1-f46.google.com
+ [209.85.217.46])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2BD844B08A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Aug 2021 16:01:13 -0400 (EDT)
+Received: by mail-vs1-f46.google.com with SMTP id f13so3343879vsl.13
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Aug 2021 13:01:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=/KwqlZeT6sdGRreX5g/ke/YMCXwSEo7rp8jOlCMxsII=;
+ b=mwdSDvWVIjvElZeYJ1YVAkD625BhTxrGwgCGPtGfzVVFj5UFz7ScpbHXnydzovM1vP
+ BJ+axQl4nEU4wZJrpsSc5OkDPMXIS8f797JO2zCwFnhDH9rVz/PbVoqPggcufln3CPRo
+ uC5KIxcBFNbdxVURt2NmdkT+8YaMmGaT1s4I39BmyKCOvPZmCL7iHW1BSbHcb6cnbtUD
+ 42SM2ypUxKkEl7j/69NEOpyMr624OI4qWWlIjMlJ9yutTN/YO5MG4s+CXb80XJUSIpTE
+ 2X6qTZIRp1c7Ldk40dyAbgFKkfI3y9YCVF3knkWftif0DugP9qDBWnSAABR+lZaKLCQE
+ +rYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
- :message-id:mime-version;
- bh=HQ8qwEo7/BHEwLXydRRYV4MKMc9Jy/YbNuBdHYVdLgs=;
- b=pYinA4meE8s7K+jt1G85lGfffsS+jVAzTNkxmMvtfE7iAYfkZfvRvBJo6+G56PWoFm
- q6mKBL5+NoAvtlMBEPNsgNW/yrFGCVhaRBFq/vQVDkjc0x2IHfwpMV54j5STyKn/r5Mg
- DX0AQZoAEv+fL4zvxs9KazmwqKt1aIol56NWoAn4WWMq6RGGI0bTT9upyKvXnVbxD4cS
- cXgs3FPMzA2PcvYxF/UTDTTR5bU86l24wL8vgp1Uguv4f9n2A76Ibji9tWXQNmZkbp3O
- ds3Pk14d0+uB2gC/yiYOxxoaAomqhVNQ8CYkMWEn4XBn7UvW1mqQ+kNKalXejIBUfWBa
- nysw==
-X-Gm-Message-State: AOAM530TmZRFN8IUZ8W1XkqVYOuJzl5bMTROLg0Fx25xxjtHBAyZRfru
- /8cLhzS3zT3GsvidglPr5iAsgj7rSJwtmc3O//WNzGvTpMdf+OzN6yrfQ1tA0zRL3HUztb3k3s2
- AlBVt2mptgSxintuSLCBgxXVZmO1BWnP2JpGKxuHDgsLfyChj5eVqYdBcL5tVONgLiK/W2KKTl9
- o6
-X-Received: by 2002:a05:600c:225a:: with SMTP id
- a26mr78237wmm.189.1629133529567; 
- Mon, 16 Aug 2021 10:05:29 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw34GAALgBxekvDOnFTY7wx4WMOSCEVhPYBNFGVb9uHsEl01xXrlJ4AzpWnlJlIEHYJx2wLGg==
-X-Received: by 2002:a05:600c:225a:: with SMTP id
- a26mr78190wmm.189.1629133529189; 
- Mon, 16 Aug 2021 10:05:29 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
- by smtp.gmail.com with ESMTPSA id f17sm88645wmq.17.2021.08.16.10.05.27
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 16 Aug 2021 10:05:28 -0700 (PDT)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v4 14/15] arm64: Enable async PF
-In-Reply-To: <20210815005947.83699-15-gshan@redhat.com>
-References: <20210815005947.83699-1-gshan@redhat.com>
- <20210815005947.83699-15-gshan@redhat.com>
-Date: Mon, 16 Aug 2021 19:05:27 +0200
-Message-ID: <878s11miaw.fsf@vitty.brq.redhat.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=/KwqlZeT6sdGRreX5g/ke/YMCXwSEo7rp8jOlCMxsII=;
+ b=gPCPpUzXVTJnPiqAtFvZViZejr5y5ejsSINUqkMU2GuA3HmANo2/fomvJADbBHfUin
+ XBs/RBEHdhhCYssCqE0aaWdX136hFoB5D6u88Dc2id3tGYLu4cS8jN22vjcf3nd0jDeG
+ S3HmEmYscEgQtMj5jRIYItA8hRWozNYB2TWKIRYIYew/iSzWo0+kffbzGRn22bfZYWnQ
+ 1p70G+xsXU//Lvhe/8RokF8r8lK2EV46mkWTpOYVCMwzhpsxkIurcMU2+Pk6GKV/M15+
+ BGix6GSaURoTWzw3xt6LeFIMZRwTYC6pr1fgMDK7zpLCtYi5rWcfgfX2tSKyPdU3YlzO
+ /1Pw==
+X-Gm-Message-State: AOAM532bp3O8X4PJ8cJCMz9Ef33KTUhd3abOnzdNo//bXzvC7T3Rhs+A
+ 9NYYfyZqfSRKi74QVu+erjk2/UROcmMyaDmcnsxGdA==
+X-Google-Smtp-Source: ABdhPJynTv01BWxGnAkTuRLxJ40jk1zjrNBPt6FCIz1AgO0PbibFSIyewQo/9Ua+dYvwQmQ2ZPLZIIOLv9nOWuE2siM=
+X-Received: by 2002:a67:ec88:: with SMTP id h8mr8108vsp.47.1629144072541; Mon,
+ 16 Aug 2021 13:01:12 -0700 (PDT)
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=vkuznets@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+References: <20210813211211.2983293-1-rananta@google.com>
+ <20210813211211.2983293-5-rananta@google.com>
+ <35c06dff-36cf-3836-e469-bedcf3c04a4d@huawei.com>
+In-Reply-To: <35c06dff-36cf-3836-e469-bedcf3c04a4d@huawei.com>
+From: Raghavendra Rao Ananta <rananta@google.com>
+Date: Mon, 16 Aug 2021 13:01:01 -0700
+Message-ID: <CAJHc60x2XdRKywRytMG-B95ZYd5fdrybau0mXp1UrHngyWiuDA@mail.gmail.com>
+Subject: Re: [PATCH 04/10] KVM: arm64: selftests: Add basic support for
+ arch_timers
+To: Zenghui Yu <yuzenghui@huawei.com>
 X-Mailman-Approved-At: Mon, 16 Aug 2021 17:30:36 -0400
-Cc: kvm@vger.kernel.org, maz@kernel.org, linux-kernel@vger.kernel.org,
- shan.gavin@gmail.com, Jonathan.Cameron@huawei.com, pbonzini@redhat.com,
- will@kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -114,539 +97,127 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Gavin Shan <gshan@redhat.com> writes:
+Hi Zenghui,
 
-> This enables asynchronous page fault from guest side. The design
-> is highlighted as below:
+On Sat, Aug 14, 2021 at 2:10 AM Zenghui Yu <yuzenghui@huawei.com> wrote:
 >
->    * The per-vCPU shared memory region, which is represented by
->      "struct kvm_vcpu_pv_apf_data", is allocated. The reason and
->      token associated with the received notifications of asynchronous
->      page fault are delivered through it.
+> On 2021/8/14 5:12, Raghavendra Rao Ananta wrote:
+> > Add a minimalistic library support to access the virtual timers,
+> > that can be used for simple timing functionalities, such as
+> > introducing delays in the guest.
+> >
+> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > ---
+> >  .../kvm/include/aarch64/arch_timer.h          | 138 ++++++++++++++++++
+> >  1 file changed, 138 insertions(+)
+> >  create mode 100644 tools/testing/selftests/kvm/include/aarch64/arch_timer.h
+> >
+> > diff --git a/tools/testing/selftests/kvm/include/aarch64/arch_timer.h b/tools/testing/selftests/kvm/include/aarch64/arch_timer.h
+> > new file mode 100644
+> > index 000000000000..e6144ab95348
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/kvm/include/aarch64/arch_timer.h
+> > @@ -0,0 +1,138 @@
+> > +/* SPDX-License-Identifier: GPL-2.0 */
+> > +/*
+> > + * ARM Generic Interrupt Controller (GIC) specific defines
 >
->    * A per-vCPU table, which is represented by "struct kvm_apf_table",
->      is allocated. The process, on which the page-not-present notification
->      is received, is added into the table so that it can reschedule
->      itself on switching from kernel to user mode. Afterwards, the
->      process, identified by token, is removed from the table and put
->      into runnable state when page-ready notification is received.
+> This isn't GIC specific, but arch timer.
+
+You are right. That's my bad.
 >
->    * During CPU hotplug, the (private) SDEI event is expected to be
->      enabled or disabled on the affected CPU by SDEI client driver.
->      The (PPI) interrupt is enabled or disabled on the affected CPU
->      by ourself. When the system is going to reboot, the SDEI event
->      is disabled and unregistered and the (PPI) interrupt is disabled.
 >
->    * The SDEI event and (PPI) interrupt number are retrieved from host
->      through SMCCC interface. Besides, the version of the asynchronous
->      page fault is validated when the feature is enabled on the guest.
+> > + */
+> > +
+> > +#ifndef SELFTEST_KVM_ARCH_TIMER_H
+> > +#define SELFTEST_KVM_ARCH_TIMER_H
+> > +
+> > +#include <linux/sizes.h>
 >
->    * The feature is disabled on guest when boot parameter "no-kvmapf"
->      is specified.
+> Do we really need it?
 
-Documentation/admin-guide/kernel-parameters.txt states this one is
-x86-only:
 
-        no-kvmapf       [X86,KVM] Disable paravirtualized asynchronous page
-                        fault handling.
-
-makes sense to update in this patch I believe.
-
+I must have left it from some code re-org. We don't need it anymore.
+Will remove.
 >
-> Signed-off-by: Gavin Shan <gshan@redhat.com>
-> ---
->  arch/arm64/kernel/Makefile |   1 +
->  arch/arm64/kernel/kvm.c    | 452 +++++++++++++++++++++++++++++++++++++
->  2 files changed, 453 insertions(+)
->  create mode 100644 arch/arm64/kernel/kvm.c
 >
-> diff --git a/arch/arm64/kernel/Makefile b/arch/arm64/kernel/Makefile
-> index 3f1490bfb938..f0c1a6a7eaa7 100644
-> --- a/arch/arm64/kernel/Makefile
-> +++ b/arch/arm64/kernel/Makefile
-> @@ -59,6 +59,7 @@ obj-$(CONFIG_ACPI)			+= acpi.o
->  obj-$(CONFIG_ACPI_NUMA)			+= acpi_numa.o
->  obj-$(CONFIG_ARM64_ACPI_PARKING_PROTOCOL)	+= acpi_parking_protocol.o
->  obj-$(CONFIG_PARAVIRT)			+= paravirt.o
-> +obj-$(CONFIG_KVM_GUEST)			+= kvm.o
->  obj-$(CONFIG_RANDOMIZE_BASE)		+= kaslr.o
->  obj-$(CONFIG_HIBERNATION)		+= hibernate.o hibernate-asm.o
->  obj-$(CONFIG_KEXEC_CORE)		+= machine_kexec.o relocate_kernel.o	\
-> diff --git a/arch/arm64/kernel/kvm.c b/arch/arm64/kernel/kvm.c
-> new file mode 100644
-> index 000000000000..effe8dc7e921
-> --- /dev/null
-> +++ b/arch/arm64/kernel/kvm.c
-> @@ -0,0 +1,452 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Asynchronous page fault support.
-> + *
-> + * Copyright (C) 2021 Red Hat, Inc.
-> + *
-> + * Author(s): Gavin Shan <gshan@redhat.com>
-> + */
-> +
-> +#include <linux/kernel.h>
-> +#include <linux/spinlock.h>
-> +#include <linux/slab.h>
-> +#include <linux/interrupt.h>
-> +#include <linux/irq.h>
-> +#include <linux/of.h>
-> +#include <linux/of_fdt.h>
-> +#include <linux/arm-smccc.h>
-> +#include <linux/kvm_para.h>
-> +#include <linux/arm_sdei.h>
-> +#include <linux/acpi.h>
-> +#include <linux/cpuhotplug.h>
-> +#include <linux/reboot.h>
-> +
-> +struct kvm_apf_task {
-> +	unsigned int		token;
-> +	struct task_struct	*task;
-> +	struct swait_queue_head	wq;
-> +};
-> +
-> +struct kvm_apf_table {
-> +	raw_spinlock_t		lock;
-> +	unsigned int		count;
-> +	struct kvm_apf_task	tasks[0];
-> +};
-> +
-> +static bool async_pf_available = true;
-> +static DEFINE_PER_CPU_DECRYPTED(struct kvm_vcpu_pv_apf_data, apf_data) __aligned(64);
-> +static struct kvm_apf_table __percpu *apf_tables;
-> +static unsigned int apf_tasks;
-> +static unsigned int apf_sdei_num;
-> +static unsigned int apf_ppi_num;
-> +static int apf_irq;
-> +
-> +static bool kvm_async_pf_add_task(struct task_struct *task,
-> +				  unsigned int token)
-> +{
-> +	struct kvm_apf_table *table = this_cpu_ptr(apf_tables);
-> +	unsigned int i, index = apf_tasks;
-> +	bool ret = false;
-> +
-> +	raw_spin_lock(&table->lock);
-> +
-> +	if (WARN_ON(table->count >= apf_tasks))
-> +		goto unlock;
-> +
-> +	for (i = 0; i < apf_tasks; i++) {
-> +		if (!table->tasks[i].task) {
-> +			if (index == apf_tasks) {
-> +				ret = true;
-> +				index = i;
-> +			}
-> +		} else if (table->tasks[i].task == task) {
-> +			WARN_ON(table->tasks[i].token != token);
-> +			ret = false;
-> +			break;
-> +		}
-> +	}
-> +
-> +	if (!ret)
-> +		goto unlock;
-> +
-> +	task->thread.data = &table->tasks[index].wq;
-> +	set_tsk_thread_flag(task, TIF_ASYNC_PF);
-> +
-> +	table->count++;
-> +	table->tasks[index].task = task;
-> +	table->tasks[index].token = token;
-> +
-> +unlock:
-> +	raw_spin_unlock(&table->lock);
-> +	return ret;
-> +}
-> +
-> +static inline void kvm_async_pf_remove_one_task(struct kvm_apf_table *table,
-> +						unsigned int index)
-> +{
-> +	clear_tsk_thread_flag(table->tasks[index].task, TIF_ASYNC_PF);
-> +	WRITE_ONCE(table->tasks[index].task->thread.data, NULL);
-> +
-> +	table->count--;
-> +	table->tasks[index].task = NULL;
-> +	table->tasks[index].token = 0;
-> +
-> +	swake_up_one(&table->tasks[index].wq);
-> +}
-> +
-> +static bool kvm_async_pf_remove_task(unsigned int token)
-> +{
-> +	struct kvm_apf_table *table = this_cpu_ptr(apf_tables);
-> +	unsigned int i;
-> +	bool ret = (token == UINT_MAX);
-> +
-> +	raw_spin_lock(&table->lock);
-> +
-> +	for (i = 0; i < apf_tasks; i++) {
-> +		if (!table->tasks[i].task)
-> +			continue;
-> +
-> +		/* Wakeup all */
-> +		if (token == UINT_MAX) {
-> +			kvm_async_pf_remove_one_task(table, i);
-> +			continue;
-> +		}
-> +
-> +		if (table->tasks[i].token == token) {
-> +			kvm_async_pf_remove_one_task(table, i);
-> +			ret = true;
-> +			break;
-> +		}
-> +	}
-> +
-> +	raw_spin_unlock(&table->lock);
-> +
-> +	return ret;
-> +}
-> +
-> +static int kvm_async_pf_sdei_handler(unsigned int event,
-> +				     struct pt_regs *regs,
-> +				     void *arg)
-> +{
-> +	unsigned int reason = __this_cpu_read(apf_data.reason);
-> +	unsigned int token = __this_cpu_read(apf_data.token);
-> +	bool ret;
-> +
-> +	if (reason != KVM_PV_REASON_PAGE_NOT_PRESENT) {
-> +		pr_warn("%s: Bogus notification (%d, 0x%08x)\n",
-> +			__func__, reason, token);
-> +		return -EINVAL;
-> +	}
-> +
-> +	ret = kvm_async_pf_add_task(current, token);
-> +	__this_cpu_write(apf_data.token, 0);
-> +	__this_cpu_write(apf_data.reason, 0);
-> +
-> +	if (!ret)
-> +		return -ENOSPC;
-> +
-> +	smp_send_reschedule(smp_processor_id());
-> +
-> +	return 0;
-> +}
-> +
-> +static irqreturn_t kvm_async_pf_irq_handler(int irq, void *dev_id)
-> +{
-> +	unsigned int reason = __this_cpu_read(apf_data.reason);
-> +	unsigned int token = __this_cpu_read(apf_data.token);
-> +	struct arm_smccc_res res;
-> +
-> +	if (reason != KVM_PV_REASON_PAGE_READY) {
-> +		pr_warn("%s: Bogus interrupt %d (%d, 0x%08x)\n",
-> +			__func__, irq, reason, token);
-
-Spurrious interrupt or bogus APF reason set? Could be both I belive.
-
-> +		return IRQ_HANDLED;
-> +	}
-> +
-> +	kvm_async_pf_remove_task(token);
-> +
-> +	__this_cpu_write(apf_data.token, 0);
-> +	__this_cpu_write(apf_data.reason, 0);
-> +	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_ASYNC_PF_FUNC_ID,
-> +			     ARM_SMCCC_KVM_FUNC_ASYNC_PF_IRQ_ACK, &res);
-> +
-> +	return IRQ_HANDLED;
-> +}
-> +
-> +static int __init kvm_async_pf_available(char *arg)
-> +{
-> +	async_pf_available = false;
-> +
-> +	return 0;
-> +}
-> +early_param("no-kvmapf", kvm_async_pf_available);
-> +
-> +static void kvm_async_pf_disable(void)
-> +{
-> +	struct arm_smccc_res res;
-> +	u32 enabled = __this_cpu_read(apf_data.enabled);
-> +
-> +	if (!enabled)
-> +		return;
-> +
-> +	/* Disable the functionality */
-> +	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_ASYNC_PF_FUNC_ID,
-> +			     ARM_SMCCC_KVM_FUNC_ASYNC_PF_ENABLE,
-> +			     0, 0, &res);
-> +	if (res.a0 != SMCCC_RET_SUCCESS) {
-> +		pr_warn("%s: Error %ld to disable on CPU%d\n",
-> +			__func__, res.a0, smp_processor_id());
-> +		return;
-> +	}
-> +
-> +	__this_cpu_write(apf_data.enabled, 0);
-> +
-> +	pr_info("Async PF disabled on CPU%d\n", smp_processor_id());
-
-Nitpicking: x86 uses 
-
-"setup async PF for cpu %d\n" and
-"disable async PF for cpu %d\n"
-
-which are not ideal maybe but in any case it would probably make sense
-to be consistent across arches.
+> > +
+> > +#include "processor.h"
+> > +
+> > +enum arch_timer {
+> > +     VIRTUAL,
+> > +     PHYSICAL,
+> > +};
+> > +
+> > +#define CTL_ENABLE   (1 << 0)
+> > +#define CTL_ISTATUS  (1 << 2)
+> > +#define CTL_IMASK    (1 << 1)
+>
+> nitpick: Move CTL_IMASK before CTL_ISTATUS ?
 
 
-> +}
-> +
-> +static void kvm_async_pf_enable(void)
-> +{
-> +	struct arm_smccc_res res;
-> +	u32 enabled = __this_cpu_read(apf_data.enabled);
-> +	u64 val = virt_to_phys(this_cpu_ptr(&apf_data));
-> +
-> +	if (enabled)
-> +		return;
-> +
-> +	val |= KVM_ASYNC_PF_ENABLED;
-> +	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_ASYNC_PF_FUNC_ID,
-> +			     ARM_SMCCC_KVM_FUNC_ASYNC_PF_ENABLE,
-> +			     (u32)val, (u32)(val >> 32), &res);
-> +	if (res.a0 != SMCCC_RET_SUCCESS) {
-> +		pr_warn("%s: Error %ld to enable CPU%d\n",
-> +			__func__, res.a0, smp_processor_id());
-> +		return;
-> +	}
-> +
-> +	__this_cpu_write(apf_data.enabled, 1);
-> +
-> +	pr_info("Async PF enabled on CPU%d\n", smp_processor_id());
-> +}
-> +
-> +static void kvm_async_pf_cpu_disable(void *info)
-> +{
-> +	disable_percpu_irq(apf_irq);
-> +	kvm_async_pf_disable();
-> +}
-> +
-> +static void kvm_async_pf_cpu_enable(void *info)
-> +{
-> +	enable_percpu_irq(apf_irq, IRQ_TYPE_LEVEL_HIGH);
-> +	kvm_async_pf_enable();
-> +}
-> +
-> +static int kvm_async_pf_cpu_reboot_notify(struct notifier_block *nb,
-> +					  unsigned long code,
-> +					  void *unused)
-> +{
-> +	if (code == SYS_RESTART) {
-> +		sdei_event_disable(apf_sdei_num);
-> +		sdei_event_unregister(apf_sdei_num);
-> +
-> +		on_each_cpu(kvm_async_pf_cpu_disable, NULL, 1);
-> +	}
-> +
-> +	return NOTIFY_DONE;
-> +}
-> +
-> +static struct notifier_block kvm_async_pf_cpu_reboot_nb = {
-> +	.notifier_call = kvm_async_pf_cpu_reboot_notify,
-> +};
-> +
-> +static int kvm_async_pf_cpu_online(unsigned int cpu)
-> +{
-> +	kvm_async_pf_cpu_enable(NULL);
-> +
-> +	return 0;
-> +}
-> +
-> +static int kvm_async_pf_cpu_offline(unsigned int cpu)
-> +{
-> +	kvm_async_pf_cpu_disable(NULL);
-> +
-> +	return 0;
-> +}
-> +
-> +static int __init kvm_async_pf_check_version(void)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	/*
-> +	 * Check the version and v1.0.0 or higher version is required
-> +	 * to support the functionality.
-> +	 */
-> +	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_ASYNC_PF_FUNC_ID,
-> +			     ARM_SMCCC_KVM_FUNC_ASYNC_PF_VERSION, &res);
-> +	if (res.a0 != SMCCC_RET_SUCCESS) {
-> +		pr_warn("%s: Error %ld to get version\n",
-> +			__func__, res.a0);
-> +		return -EPERM;
-> +	}
-> +
-> +	if ((res.a1 & 0xFFFFFFFFFF000000) ||
-> +	    ((res.a1 & 0xFF0000) >> 16) < 0x1) {
-> +		pr_warn("%s: Invalid version (0x%016lx)\n",
-> +			__func__, res.a1);
-> +		return -EINVAL;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int __init kvm_async_pf_info(void)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	/* Retrieve number of tokens */
-> +	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_ASYNC_PF_FUNC_ID,
-> +			     ARM_SMCCC_KVM_FUNC_ASYNC_PF_SLOTS, &res);
-> +	if (res.a0 != SMCCC_RET_SUCCESS) {
-> +		pr_warn("%s: Error %ld to get token number\n",
-> +			__func__, res.a0);
-> +		return -EPERM;
-> +	}
-> +
-> +	apf_tasks = res.a1 * 2;
-> +
-> +	/* Retrieve SDEI event number */
-> +	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_ASYNC_PF_FUNC_ID,
-> +			     ARM_SMCCC_KVM_FUNC_ASYNC_PF_SDEI, &res);
-> +	if (res.a0 != SMCCC_RET_SUCCESS) {
-> +		pr_warn("%s: Error %ld to get SDEI event number\n",
-> +			__func__, res.a0);
-> +		return -EPERM;
-> +	}
-> +
-> +	apf_sdei_num = res.a1;
-> +
-> +	/* Retrieve (PPI) interrupt number */
-> +	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_ASYNC_PF_FUNC_ID,
-> +			     ARM_SMCCC_KVM_FUNC_ASYNC_PF_IRQ, &res);
-> +	if (res.a0 != SMCCC_RET_SUCCESS) {
-> +		pr_warn("%s: Error %ld to get IRQ\n",
-> +			__func__, res.a0);
-> +		return -EPERM;
-> +	}
-> +
-> +	apf_ppi_num = res.a1;
-> +
-> +	return 0;
-> +}
-> +
-> +static int __init kvm_async_pf_init(void)
-> +{
-> +	struct kvm_apf_table *table;
-> +	size_t size;
-> +	int cpu, i, ret;
-> +
-> +	if (!kvm_para_has_feature(KVM_FEATURE_ASYNC_PF) ||
-> +	    !async_pf_available)
-> +		return -EPERM;
-> +
-> +	ret = kvm_async_pf_check_version();
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = kvm_async_pf_info();
-> +	if (ret)
-> +		return ret;
-> +
-> +	/* Allocate and initialize the sleeper table */
-> +	size = sizeof(struct kvm_apf_table) +
-> +	       apf_tasks * sizeof(struct kvm_apf_task);
-> +	apf_tables = __alloc_percpu(size, 0);
-> +	if (!apf_tables) {
-> +		pr_warn("%s: Unable to alloc async PF table\n",
-> +			__func__);
-> +		return -ENOMEM;
-> +	}
-> +
-> +	for_each_possible_cpu(cpu) {
-> +		table = per_cpu_ptr(apf_tables, cpu);
-> +		raw_spin_lock_init(&table->lock);
-> +		for (i = 0; i < apf_tasks; i++)
-> +			init_swait_queue_head(&table->tasks[i].wq);
-> +	}
-> +
-> +	/*
-> +	 * Initialize SDEI event for page-not-present notification.
-> +	 * The SDEI event number should have been retrieved from
-> +	 * the host.
-> +	 */
-> +	ret = sdei_event_register(apf_sdei_num,
-> +				  kvm_async_pf_sdei_handler, NULL);
-> +	if (ret) {
-> +		pr_warn("%s: Error %d to register SDEI event\n",
-> +			__func__, ret);
-> +		ret = -EIO;
-> +		goto release_tables;
-> +	}
-> +
-> +	ret = sdei_event_enable(apf_sdei_num);
-> +	if (ret) {
-> +		pr_warn("%s: Error %d to enable SDEI event\n",
-> +			__func__, ret);
-> +		goto unregister_event;
-> +	}
-> +
-> +	/*
-> +	 * Initialize interrupt for page-ready notification. The
-> +	 * interrupt number and its properties should have been
-> +	 * retrieved from the ACPI:APFT table.
-> +	 */
-> +	apf_irq = acpi_register_gsi(NULL, apf_ppi_num,
-> +				    ACPI_LEVEL_SENSITIVE, ACPI_ACTIVE_HIGH);
-> +	if (apf_irq <= 0) {
-> +		ret = -EIO;
-> +		pr_warn("%s: Error %d to register IRQ\n",
-> +			__func__, apf_irq);
-> +		goto disable_event;
-> +	}
-> +
-> +	ret = request_percpu_irq(apf_irq, kvm_async_pf_irq_handler,
-> +				 "Asynchronous Page Fault", &apf_data);
-> +	if (ret) {
-> +		pr_warn("%s: Error %d to request IRQ\n",
-> +			__func__, ret);
-> +		goto unregister_irq;
-> +	}
-> +
-> +	register_reboot_notifier(&kvm_async_pf_cpu_reboot_nb);
-> +	ret = cpuhp_setup_state_nocalls(CPUHP_AP_ONLINE_DYN,
-> +			"arm/kvm:online", kvm_async_pf_cpu_online,
-> +			kvm_async_pf_cpu_offline);
-> +	if (ret < 0) {
-> +		pr_warn("%s: Error %d to install cpu hotplug callbacks\n",
-> +			__func__, ret);
-> +		goto release_irq;
-> +	}
-> +
-> +	/* Enable async PF on the online CPUs */
-> +	on_each_cpu(kvm_async_pf_cpu_enable, NULL, 1);
-> +
-> +	return 0;
-> +
-> +release_irq:
-> +	free_percpu_irq(apf_irq, &apf_data);
-> +unregister_irq:
-> +	acpi_unregister_gsi(apf_ppi_num);
-> +disable_event:
-> +	sdei_event_disable(apf_sdei_num);
-> +unregister_event:
-> +	sdei_event_unregister(apf_sdei_num);
-> +release_tables:
-> +	free_percpu(apf_tables);
-> +
-> +	return ret;
-> +}
-> +
-> +static int __init kvm_guest_init(void)
-> +{
-> +	return kvm_async_pf_init();
-> +}
-> +
-> +fs_initcall(kvm_guest_init);
+Sure, that's cleaner!
+>
+>
+> > +
+> > +#define msec_to_cycles(msec) \
+> > +     (timer_get_cntfrq() * (uint64_t)(msec) / 1000)
+> > +
+> > +#define usec_to_cycles(usec) \
+> > +     (timer_get_cntfrq() * (uint64_t)(usec) / 1000000)
+> > +
+> > +#define cycles_to_usec(cycles) \
+> > +     ((uint64_t)(cycles) * 1000000 / timer_get_cntfrq())
+> > +
+> > +static inline uint32_t timer_get_cntfrq(void)
+> > +{
+> > +     return read_sysreg(cntfrq_el0);
+> > +}
+> > +
+> > +static inline uint64_t timer_get_cntct(enum arch_timer timer)
+> > +{
+> > +     isb();
+> > +
+> > +     switch (timer) {
+> > +     case VIRTUAL:
+> > +             return read_sysreg(cntvct_el0);
+> > +     case PHYSICAL:
+> > +             return read_sysreg(cntpct_el0);
+> > +     default:
+> > +             GUEST_ASSERT_1(0, timer);
+> > +     }
+> > +
+> > +     /* We should not reach here */
+> > +     return 0;
+> > +}
+> > +
+> > +static inline void timer_set_cval(enum arch_timer timer, uint64_t cval)
+> > +{
+> > +     switch (timer) {
+> > +     case VIRTUAL:
+> > +             return write_sysreg(cntv_cval_el0, cval);
+> > +     case PHYSICAL:
+> > +             return write_sysreg(cntp_cval_el0, cval);
+> > +     default:
+> > +             GUEST_ASSERT_1(0, timer);
+> > +     }
+> > +
+> > +     isb();
+>
+> ISB should be performed before 'return'. And the same for
+> timer_set_{tval,ctl}.
 
--- 
-Vitaly
 
+Seems like a copy-paste error on my side. The timer_set_*() functions
+shouldn't even have a 'return'. Thanks for catching this! Will fix it.
+>
+>
+> Thanks,
+> Zenghui
+
+
+Regards,
+Raghavendra
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
