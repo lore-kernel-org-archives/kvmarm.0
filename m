@@ -2,79 +2,79 @@ Return-Path: <SRS0=mpH5=NJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	HTML_MESSAGE,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23BB0C4338F
-	for <kvmarm@archiver.kernel.org>; Wed, 18 Aug 2021 18:21:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E213EC4338F
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Aug 2021 18:21:17 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8600960187
-	for <kvmarm@archiver.kernel.org>; Wed, 18 Aug 2021 18:21:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 8600960187
+	by mail.kernel.org (Postfix) with ESMTP id 86FFE60C40
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Aug 2021 18:21:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 86FFE60C40
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0EC554B0D0;
-	Wed, 18 Aug 2021 14:21:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2BDF04B0AD;
+	Wed, 18 Aug 2021 14:21:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id lr6i9WNWuUH9; Wed, 18 Aug 2021 14:21:09 -0400 (EDT)
+	with ESMTP id Q+RVIJuO838s; Wed, 18 Aug 2021 14:21:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 115174B0B3;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E2C74B0C7;
 	Wed, 18 Aug 2021 14:21:09 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5042E4B1B9
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Aug 2021 09:06:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 071184B191
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Aug 2021 09:53:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ubozN+EatQKV for <kvmarm@lists.cs.columbia.edu>;
- Tue, 17 Aug 2021 09:06:44 -0400 (EDT)
-Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com
- [209.85.221.169])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CE4FE4B1B6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Aug 2021 09:06:44 -0400 (EDT)
-Received: by mail-vk1-f169.google.com with SMTP id j196so3423374vkj.2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Aug 2021 06:06:44 -0700 (PDT)
+ with ESMTP id 74RdSV0HUx9d for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 17 Aug 2021 09:53:23 -0400 (EDT)
+Received: from mail-vs1-f42.google.com (mail-vs1-f42.google.com
+ [209.85.217.42])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E4B454B116
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Aug 2021 09:53:23 -0400 (EDT)
+Received: by mail-vs1-f42.google.com with SMTP id s19so5658501vsl.11
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Aug 2021 06:53:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=745PA0ZZ7OzUNLEhPL+IlI/BkoDSTjzvZeg48uD4JuY=;
- b=iVGh25w/k1FK9GhtXmwM+KO0ASfGHg1oe/CFf00QPoqZZ+D7Ix/R5L9ptwTiX7pM5I
- DQZJkQDTzFoSsQdOmcAjZsiLam5EP50tuOpGNEj8LfR3DxercJwFB+9fHzgExAg0SDQv
- tnOEfHVHzMtZeRMuMnp8UQuwwPH2msamcXHwhvR+mgZaE0nn/1S3pwGD18WLBD1hjG+0
- 20xlUl+gDnTYUybv4qy7KCWkLot+VRnfWMBo8ppu6p/9PukK2+L225m7xgQZBtGZpN8E
- bKLWRaICEwMvkPQVgheqshrY8q6IahpJeRwXLWGSqbDPjDVfi4Z7l0RyMSu9n5tlSdRf
- ww0A==
+ :cc; bh=hzLGfWfkXgbeysswBtPu+BnIgfNwuL+OvyU10ntiiGk=;
+ b=wDOUy6bkGiMewAacYWtRCV4fUIotnVXoXVvNtkpN/9oZCEfs7Qqs3qzwjNk7rSuga2
+ Ea+EhuQ0zBq5mkHoeponqUgnGwK/XrLS2zpl4DxylWycdVX1rkvz+Z61ljbpepl4q+yg
+ gZ2Jxk0bMlilHxM84Mj9cQK1vXrytbNIwkGKiQHjKOVTLyKv/30hdkNaNu9+IxjwR8jO
+ RkdhOoHf83HVJC5OeMI9/gGPRkVNplKAaNp7SwSt9AtIb2eVH4SiuJtNtYMYui0nCGGX
+ vLBBjZFlbvi/ocexXQUXnCuATDJFFFYn629sH91hyASsMMqOMX24GaIwVkvqpWzGjSA/
+ IR6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=745PA0ZZ7OzUNLEhPL+IlI/BkoDSTjzvZeg48uD4JuY=;
- b=Y+tEbrAEscSgmvKYzzb60KV56S+xbnfuG7m5TmBb1lyT2+Bq8I3PmONLvCGXYPtJUk
- dnbQG55VpWX3A2t6rvim2QC9+XmvDavQEAhy/Lst0aTE8cuuO3kcBJKEeVcmpkpryHkc
- HFIY647/vLwHzQhORZBz6ntS3BONqrsw11la6OTspu0vxdJaZ6M2dtK8qNhZ7dGMrgAz
- gKfGMGHYRbMUpqZeyThlZDMBYBDIWqdlDWRpqofsdvduiEZxHfFVJlUNSHpf91PfSd+k
- RFD0rLk8Nhs0g6nzwKuroFRuRlwSh6b1EkKwpSzVOiVRRtPzBZnWa30pAYsGBdlX/dX0
- J3fA==
-X-Gm-Message-State: AOAM532b7bCe29+zMGYnSPY6TOmTYKcovjNYBYyqNz48LOpcF1C0kQf3
- af2JH9zfhIgz+wM2TPbgwICZlBNteX63NQfA6bdcpA==
-X-Google-Smtp-Source: ABdhPJxgFxIGOrHHNxJmG8sJsBiqUe3my7E9+QbhnZGL+8yHBT6snx1ff2yxzyts352+2QHr+/SL84/H+SRKVG7yED4=
-X-Received: by 2002:a1f:3808:: with SMTP id f8mr2318802vka.2.1629205604191;
- Tue, 17 Aug 2021 06:06:44 -0700 (PDT)
+ bh=hzLGfWfkXgbeysswBtPu+BnIgfNwuL+OvyU10ntiiGk=;
+ b=AvcmUgPtlNwJwxXCahWnfyT1A8+699QPaeMokvqvW7HHoYQ5DABrlRi/lbyq7ySjbq
+ TmHs/7O0J0WPewGtFH1PYLkZJ3YGYLPCZNAd5pqVMgQuV2E+0dlPIn35I7ILgfiLdFlt
+ DuB6Dj3fut36/0IRjSYUVrfGknAVcp20ISbygbm5uE0mWZP9AfB2TFJ08QE+N8Xi9P03
+ AXMufgO+xssDstYrHT26XKTXUMkP8XkmMjVsGbS+p8o8v1kI/znS04ngiJiyIRvdHyIJ
+ jFhj70K+dXwSUcCordbrsY+Ocv3zICoTIxt1uBjcdhhOHG/2LB/2WZjGKi8gKhpy4uTt
+ vYxQ==
+X-Gm-Message-State: AOAM530RYUPYysDkyM32CdFYQQF8qV1hG+nOKoRx2HzN76t4oKqtA8z8
+ j9ya4Rvl57ECWs2i/4PpWa2CvMGUqN8XjKvyK6XlbQ==
+X-Google-Smtp-Source: ABdhPJxJmYW88Ev1ks/v9+BGAp05ASceu2cDL3gJmffO4wJWaGzGP8q2pDY2O4Csdw373h0sW7M8fDiO3qm0JSuaM2k=
+X-Received: by 2002:a67:bb15:: with SMTP id m21mr2888819vsn.26.1629208403329; 
+ Tue, 17 Aug 2021 06:53:23 -0700 (PDT)
 MIME-Version: 1.0
 References: <20210809152448.1810400-1-qperret@google.com>
- <20210809152448.1810400-4-qperret@google.com>
-In-Reply-To: <20210809152448.1810400-4-qperret@google.com>
+ <20210809152448.1810400-5-qperret@google.com>
+In-Reply-To: <20210809152448.1810400-5-qperret@google.com>
 From: Andrew Walbran <qwandor@google.com>
-Date: Tue, 17 Aug 2021 14:06:32 +0100
-Message-ID: <CA+_y_2EFZjEQEvX-ipy7Z40jDaeD8hd7YnxswkgGCp8VM4eHGw@mail.gmail.com>
-Subject: Re: [PATCH v4 03/21] KVM: arm64: Provide the host_stage2_try() helper
- macro
+Date: Tue, 17 Aug 2021 14:53:11 +0100
+Message-ID: <CA+_y_2EsStP+zNOfykjrmJBx6a1pxaewC2X9TnXnj3kNpixsWg@mail.gmail.com>
+Subject: Re: [PATCH v4 04/21] KVM: arm64: Introduce helper to retrieve a PTE
+ and its level
 To: Quentin Perret <qperret@google.com>
 X-Mailman-Approved-At: Wed, 18 Aug 2021 14:21:08 -0400
 Cc: Android Kernel Team <kernel-team@android.com>,
@@ -92,218 +92,118 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============6031177081538323196=="
+Content-Type: multipart/mixed; boundary="===============0687541595073452442=="
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
---===============6031177081538323196==
+--===============0687541595073452442==
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000005331c405c9c0fd55"
+	boundary="0000000000002ae81b05c9c1a4a9"
 
---0000000000005331c405c9c0fd55
-Content-Type: multipart/alternative; boundary="0000000000004e3fad05c9c0fd01"
-
---0000000000004e3fad05c9c0fd01
+--0000000000002ae81b05c9c1a4a9
 Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 9 Aug 2021 at 16:24, Quentin Perret <qperret@google.com> wrote:
-
-> We currently unmap all MMIO mappings from the host stage-2 to recycle
-> the pages whenever we run out. In order to make this pattern easy to
-> re-use from other places, factor the logic out into a dedicated macro.
-> While at it, apply the macro for the kvm_pgtable_stage2_set_owner()
-> calls. They're currently only called early on and are guaranteed to
-> succeed, but making them robust to the -ENOMEM case doesn't hurt and
-> will avoid painful debugging sessions later on.
+On Mon, 9 Aug 2021 at 16:25, Quentin Perret <qperret@google.com> wrote:
 >
-> Reviewed-by: Fuad Tabba <tabba@google.com>
+> From: Marc Zyngier <maz@kernel.org>
+>
+> It is becoming a common need to fetch the PTE for a given address
+> together with its level. Add such a helper.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 > Signed-off-by: Quentin Perret <qperret@google.com>
 > ---
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c | 40 +++++++++++++++------------
->  1 file changed, 22 insertions(+), 18 deletions(-)
+>  arch/arm64/include/asm/kvm_pgtable.h | 19 ++++++++++++++
+>  arch/arm64/kvm/hyp/pgtable.c         | 39 ++++++++++++++++++++++++++++
+>  2 files changed, 58 insertions(+)
 >
-> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> index d938ce95d3bd..74280a753efb 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> @@ -208,6 +208,25 @@ static inline int __host_stage2_idmap(u64 start, u64
-> end,
->                                       prot, &host_s2_pool);
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index f004c0115d89..082b9d65f40b 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -432,6 +432,25 @@ int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size);
+>  int kvm_pgtable_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
+>                      struct kvm_pgtable_walker *walker);
+>
+> +/**
+> + * kvm_pgtable_get_leaf() - Walk a page-table and retrieve the leaf entry
+> + *                         with its level.
+> + * @pgt:       Page-table structure initialised by kvm_pgtable_*_init().
+> + * @addr:      Input address for the start of the walk.
+> + * @ptep:      Pointer to storage for the retrieved PTE.
+> + * @level:     Pointer to storage for the level of the retrieved PTE.
+> + *
+> + * The offset of @addr within a page is ignored.
+> + *
+> + * The walker will walk the page-table entries corresponding to the input
+> + * address specified, retrieving the leaf corresponding to this address.
+> + * Invalid entries are treated as leaf entries.
+> + *
+> + * Return: 0 on success, negative error code on failure.
+> + */
+> +int kvm_pgtable_get_leaf(struct kvm_pgtable *pgt, u64 addr,
+> +                        kvm_pte_t *ptep, u32 *level);
+> +
+>  /**
+>   * kvm_pgtable_stage2_find_range() - Find a range of Intermediate Physical
+>   *                                  Addresses with compatible permission
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index 05321f4165e3..78f36bd5df6c 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -326,6 +326,45 @@ int kvm_pgtable_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
+>         return _kvm_pgtable_walk(&walk_data);
 >  }
 >
-> +/*
-> + * The pool has been provided with enough pages to cover all of memory
-> with
-> + * page granularity, but it is difficult to know how much of the MMIO
-> range
-> + * we will need to cover upfront, so we may need to 'recycle' the pages
-> if we
-> + * run out.
-> + */
-> +#define host_stage2_try(fn, ...)                                       \
-> +       ({                                                              \
-> +               int __ret;                                              \
-> +               hyp_assert_lock_held(&host_kvm.lock);                   \
-> +               __ret = fn(__VA_ARGS__);                                \
-> +               if (__ret == -ENOMEM) {                                 \
-> +                       __ret = host_stage2_unmap_dev_all();            \
-> +                       if (!__ret)                                     \
-> +                               __ret = fn(__VA_ARGS__);                \
-> +               }                                                       \
-> +               __ret;                                                  \
-> +        })
+> +struct leaf_walk_data {
+> +       kvm_pte_t       pte;
+> +       u32             level;
+> +};
 > +
->  static int host_stage2_idmap(u64 addr)
->  {
->         enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R |
-> KVM_PGTABLE_PROT_W;
-> @@ -223,22 +242,7 @@ static int host_stage2_idmap(u64 addr)
->         if (ret)
->                 goto unlock;
->
-> -       ret = __host_stage2_idmap(range.start, range.end, prot);
-> -       if (ret != -ENOMEM)
-> -               goto unlock;
-> -
-> -       /*
-> -        * The pool has been provided with enough pages to cover all of
-> memory
-> -        * with page granularity, but it is difficult to know how much of
-> the
-> -        * MMIO range we will need to cover upfront, so we may need to
-> 'recycle'
-> -        * the pages if we run out.
-> -        */
-> -       ret = host_stage2_unmap_dev_all();
-> -       if (ret)
-> -               goto unlock;
-> -
-> -       ret = __host_stage2_idmap(range.start, range.end, prot);
-> -
-> +       ret = host_stage2_try(__host_stage2_idmap, range.start, range.end,
-> prot);
->  unlock:
->         hyp_spin_unlock(&host_kvm.lock);
->
-> @@ -257,8 +261,8 @@ int __pkvm_mark_hyp(phys_addr_t start, phys_addr_t end)
->                 return -EINVAL;
->
->         hyp_spin_lock(&host_kvm.lock);
-> -       ret = kvm_pgtable_stage2_set_owner(&host_kvm.pgt, start, end -
-> start,
-> -                                          &host_s2_pool, pkvm_hyp_id);
-> +       ret = host_stage2_try(kvm_pgtable_stage2_set_owner, &host_kvm.pgt,
-> +                             start, end - start, &host_s2_pool,
-> pkvm_hyp_id);
->         hyp_spin_unlock(&host_kvm.lock);
->
->         return ret != -EAGAIN ? ret : 0;
+> +static int leaf_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+> +                      enum kvm_pgtable_walk_flags flag, void * const arg)
+> +{
+> +       struct leaf_walk_data *data = arg;
+> +
+> +       data->pte   = *ptep;
+> +       data->level = level;
+> +
+> +       return 0;
+> +}
+> +
+> +int kvm_pgtable_get_leaf(struct kvm_pgtable *pgt, u64 addr,
+> +                        kvm_pte_t *ptep, u32 *level)
+> +{
+> +       struct leaf_walk_data data;
+> +       struct kvm_pgtable_walker walker = {
+> +               .cb     = leaf_walker,
+> +               .flags  = KVM_PGTABLE_WALK_LEAF,
+> +               .arg    = &data,
+> +       };
+> +       int ret;
+> +
+> +       ret = kvm_pgtable_walk(pgt, ALIGN_DOWN(addr, PAGE_SIZE),
+> +                              PAGE_SIZE, &walker);
+> +       if (!ret) {
+> +               if (ptep)
+> +                       *ptep  = data.pte;
+> +               if (level)
+> +                       *level = data.level;
+> +       }
+> +
+> +       return ret;
+> +}
+> +
+>  struct hyp_map_data {
+>         u64                             phys;
+>         kvm_pte_t                       attr;
 > --
 > 2.32.0.605.g8dce9f2422-goog
 >
->
+
 Reviewed-by: Andrew Walbran <qwandor@google.com>
 
---0000000000004e3fad05c9c0fd01
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: base64
-
-PGRpdiBkaXI9Imx0ciI+PGRpdiBkaXI9Imx0ciI+PC9kaXY+PGRpdiBjbGFzcz0iZ21haWxfcXVv
-dGUiPjxkaXYgZGlyPSJsdHIiIGNsYXNzPSJnbWFpbF9hdHRyIj5PbiBNb24sIDkgQXVnIDIwMjEg
-YXQgMTY6MjQsIFF1ZW50aW4gUGVycmV0ICZsdDs8YSBocmVmPSJtYWlsdG86cXBlcnJldEBnb29n
-bGUuY29tIj5xcGVycmV0QGdvb2dsZS5jb208L2E+Jmd0OyB3cm90ZTo8YnI+PC9kaXY+PGJsb2Nr
-cXVvdGUgY2xhc3M9ImdtYWlsX3F1b3RlIiBzdHlsZT0ibWFyZ2luOjBweCAwcHggMHB4IDAuOGV4
-O2JvcmRlci1sZWZ0OjFweCBzb2xpZCByZ2IoMjA0LDIwNCwyMDQpO3BhZGRpbmctbGVmdDoxZXgi
-PldlIGN1cnJlbnRseSB1bm1hcCBhbGwgTU1JTyBtYXBwaW5ncyBmcm9tIHRoZSBob3N0IHN0YWdl
-LTIgdG8gcmVjeWNsZTxicj4NCnRoZSBwYWdlcyB3aGVuZXZlciB3ZSBydW4gb3V0LiBJbiBvcmRl
-ciB0byBtYWtlIHRoaXMgcGF0dGVybiBlYXN5IHRvPGJyPg0KcmUtdXNlIGZyb20gb3RoZXIgcGxh
-Y2VzLCBmYWN0b3IgdGhlIGxvZ2ljIG91dCBpbnRvIGEgZGVkaWNhdGVkIG1hY3JvLjxicj4NCldo
-aWxlIGF0IGl0LCBhcHBseSB0aGUgbWFjcm8gZm9yIHRoZSBrdm1fcGd0YWJsZV9zdGFnZTJfc2V0
-X293bmVyKCk8YnI+DQpjYWxscy4gVGhleSYjMzk7cmUgY3VycmVudGx5IG9ubHkgY2FsbGVkIGVh
-cmx5IG9uIGFuZCBhcmUgZ3VhcmFudGVlZCB0bzxicj4NCnN1Y2NlZWQsIGJ1dCBtYWtpbmcgdGhl
-bSByb2J1c3QgdG8gdGhlIC1FTk9NRU0gY2FzZSBkb2VzbiYjMzk7dCBodXJ0IGFuZDxicj4NCndp
-bGwgYXZvaWQgcGFpbmZ1bCBkZWJ1Z2dpbmcgc2Vzc2lvbnMgbGF0ZXIgb24uPGJyPg0KPGJyPg0K
-UmV2aWV3ZWQtYnk6IEZ1YWQgVGFiYmEgJmx0OzxhIGhyZWY9Im1haWx0bzp0YWJiYUBnb29nbGUu
-Y29tIiB0YXJnZXQ9Il9ibGFuayI+dGFiYmFAZ29vZ2xlLmNvbTwvYT4mZ3Q7PGJyPg0KU2lnbmVk
-LW9mZi1ieTogUXVlbnRpbiBQZXJyZXQgJmx0OzxhIGhyZWY9Im1haWx0bzpxcGVycmV0QGdvb2ds
-ZS5jb20iIHRhcmdldD0iX2JsYW5rIj5xcGVycmV0QGdvb2dsZS5jb208L2E+Jmd0Ozxicj4NCi0t
-LTxicj4NCsKgYXJjaC9hcm02NC9rdm0vaHlwL252aGUvbWVtX3Byb3RlY3QuYyB8IDQwICsrKysr
-KysrKysrKysrKy0tLS0tLS0tLS0tLTxicj4NCsKgMSBmaWxlIGNoYW5nZWQsIDIyIGluc2VydGlv
-bnMoKyksIDE4IGRlbGV0aW9ucygtKTxicj4NCjxicj4NCmRpZmYgLS1naXQgYS9hcmNoL2FybTY0
-L2t2bS9oeXAvbnZoZS9tZW1fcHJvdGVjdC5jIGIvYXJjaC9hcm02NC9rdm0vaHlwL252aGUvbWVt
-X3Byb3RlY3QuYzxicj4NCmluZGV4IGQ5MzhjZTk1ZDNiZC4uNzQyODBhNzUzZWZiIDEwMDY0NDxi
-cj4NCi0tLSBhL2FyY2gvYXJtNjQva3ZtL2h5cC9udmhlL21lbV9wcm90ZWN0LmM8YnI+DQorKysg
-Yi9hcmNoL2FybTY0L2t2bS9oeXAvbnZoZS9tZW1fcHJvdGVjdC5jPGJyPg0KQEAgLTIwOCw2ICsy
-MDgsMjUgQEAgc3RhdGljIGlubGluZSBpbnQgX19ob3N0X3N0YWdlMl9pZG1hcCh1NjQgc3RhcnQs
-IHU2NCBlbmQsPGJyPg0KwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgcHJvdCwgJmFtcDtob3N0X3MyX3Bvb2wpOzxicj4NCsKgfTxicj4NCjxi
-cj4NCisvKjxicj4NCisgKiBUaGUgcG9vbCBoYXMgYmVlbiBwcm92aWRlZCB3aXRoIGVub3VnaCBw
-YWdlcyB0byBjb3ZlciBhbGwgb2YgbWVtb3J5IHdpdGg8YnI+DQorICogcGFnZSBncmFudWxhcml0
-eSwgYnV0IGl0IGlzIGRpZmZpY3VsdCB0byBrbm93IGhvdyBtdWNoIG9mIHRoZSBNTUlPIHJhbmdl
-PGJyPg0KKyAqIHdlIHdpbGwgbmVlZCB0byBjb3ZlciB1cGZyb250LCBzbyB3ZSBtYXkgbmVlZCB0
-byAmIzM5O3JlY3ljbGUmIzM5OyB0aGUgcGFnZXMgaWYgd2U8YnI+DQorICogcnVuIG91dC48YnI+
-DQorICovPGJyPg0KKyNkZWZpbmUgaG9zdF9zdGFnZTJfdHJ5KGZuLCAuLi4pwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqBcPGJyPg0KK8Kg
-IMKgIMKgIMKgKHvCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCBcPGJyPg0KK8Kg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgaW50IF9fcmV0O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIFw8YnI+DQorwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqBoeXBfYXNzZXJ0X2xvY2tfaGVsZCgmYW1wO2hvc3Rfa3ZtLmxvY2sp
-O8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgXDxicj4NCivCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoF9fcmV0ID0gZm4oX19WQV9BUkdTX18pO8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIFw8YnI+DQorwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqBpZiAoX19y
-ZXQgPT0gLUVOT01FTSkge8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgXDxicj4NCivCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoF9fcmV0
-ID0gaG9zdF9zdGFnZTJfdW5tYXBfZGV2X2FsbCgpO8KgIMKgIMKgIMKgIMKgIMKgIFw8YnI+DQor
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqBpZiAoIV9fcmV0KcKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgXDxicj4NCivCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoF9fcmV0ID0gZm4oX19W
-QV9BUkdTX18pO8KgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIFw8YnI+DQorwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqB9wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqBcPGJyPg0KK8KgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgX19yZXQ7wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgXDxicj4NCivCoCDCoCDCoCDCoCB9KTxi
-cj4NCis8YnI+DQrCoHN0YXRpYyBpbnQgaG9zdF9zdGFnZTJfaWRtYXAodTY0IGFkZHIpPGJyPg0K
-wqB7PGJyPg0KwqAgwqAgwqAgwqAgZW51bSBrdm1fcGd0YWJsZV9wcm90IHByb3QgPSBLVk1fUEdU
-QUJMRV9QUk9UX1IgfCBLVk1fUEdUQUJMRV9QUk9UX1c7PGJyPg0KQEAgLTIyMywyMiArMjQyLDcg
-QEAgc3RhdGljIGludCBob3N0X3N0YWdlMl9pZG1hcCh1NjQgYWRkcik8YnI+DQrCoCDCoCDCoCDC
-oCBpZiAocmV0KTxicj4NCsKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIGdvdG8gdW5sb2NrOzxicj4N
-Cjxicj4NCi3CoCDCoCDCoCDCoHJldCA9IF9faG9zdF9zdGFnZTJfaWRtYXAocmFuZ2Uuc3RhcnQs
-IHJhbmdlLmVuZCwgcHJvdCk7PGJyPg0KLcKgIMKgIMKgIMKgaWYgKHJldCAhPSAtRU5PTUVNKTxi
-cj4NCi3CoCDCoCDCoCDCoCDCoCDCoCDCoCDCoGdvdG8gdW5sb2NrOzxicj4NCi08YnI+DQotwqAg
-wqAgwqAgwqAvKjxicj4NCi3CoCDCoCDCoCDCoCAqIFRoZSBwb29sIGhhcyBiZWVuIHByb3ZpZGVk
-IHdpdGggZW5vdWdoIHBhZ2VzIHRvIGNvdmVyIGFsbCBvZiBtZW1vcnk8YnI+DQotwqAgwqAgwqAg
-wqAgKiB3aXRoIHBhZ2UgZ3JhbnVsYXJpdHksIGJ1dCBpdCBpcyBkaWZmaWN1bHQgdG8ga25vdyBo
-b3cgbXVjaCBvZiB0aGU8YnI+DQotwqAgwqAgwqAgwqAgKiBNTUlPIHJhbmdlIHdlIHdpbGwgbmVl
-ZCB0byBjb3ZlciB1cGZyb250LCBzbyB3ZSBtYXkgbmVlZCB0byAmIzM5O3JlY3ljbGUmIzM5Ozxi
-cj4NCi3CoCDCoCDCoCDCoCAqIHRoZSBwYWdlcyBpZiB3ZSBydW4gb3V0Ljxicj4NCi3CoCDCoCDC
-oCDCoCAqLzxicj4NCi3CoCDCoCDCoCDCoHJldCA9IGhvc3Rfc3RhZ2UyX3VubWFwX2Rldl9hbGwo
-KTs8YnI+DQotwqAgwqAgwqAgwqBpZiAocmV0KTxicj4NCi3CoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oGdvdG8gdW5sb2NrOzxicj4NCi08YnI+DQotwqAgwqAgwqAgwqByZXQgPSBfX2hvc3Rfc3RhZ2Uy
-X2lkbWFwKHJhbmdlLnN0YXJ0LCByYW5nZS5lbmQsIHByb3QpOzxicj4NCi08YnI+DQorwqAgwqAg
-wqAgwqByZXQgPSBob3N0X3N0YWdlMl90cnkoX19ob3N0X3N0YWdlMl9pZG1hcCwgcmFuZ2Uuc3Rh
-cnQsIHJhbmdlLmVuZCwgcHJvdCk7PGJyPg0KwqB1bmxvY2s6PGJyPg0KwqAgwqAgwqAgwqAgaHlw
-X3NwaW5fdW5sb2NrKCZhbXA7aG9zdF9rdm0ubG9jayk7PGJyPg0KPGJyPg0KQEAgLTI1Nyw4ICsy
-NjEsOCBAQCBpbnQgX19wa3ZtX21hcmtfaHlwKHBoeXNfYWRkcl90IHN0YXJ0LCBwaHlzX2FkZHJf
-dCBlbmQpPGJyPg0KwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgcmV0dXJuIC1FSU5WQUw7PGJyPg0K
-PGJyPg0KwqAgwqAgwqAgwqAgaHlwX3NwaW5fbG9jaygmYW1wO2hvc3Rfa3ZtLmxvY2spOzxicj4N
-Ci3CoCDCoCDCoCDCoHJldCA9IGt2bV9wZ3RhYmxlX3N0YWdlMl9zZXRfb3duZXIoJmFtcDtob3N0
-X2t2bS5wZ3QsIHN0YXJ0LCBlbmQgLSBzdGFydCw8YnI+DQotwqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgJmFtcDtob3N0X3MyX3Bv
-b2wsIHBrdm1faHlwX2lkKTs8YnI+DQorwqAgwqAgwqAgwqByZXQgPSBob3N0X3N0YWdlMl90cnko
-a3ZtX3BndGFibGVfc3RhZ2UyX3NldF9vd25lciwgJmFtcDtob3N0X2t2bS5wZ3QsPGJyPg0KK8Kg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgc3RhcnQsIGVuZCAtIHN0
-YXJ0LCAmYW1wO2hvc3RfczJfcG9vbCwgcGt2bV9oeXBfaWQpOzxicj4NCsKgIMKgIMKgIMKgIGh5
-cF9zcGluX3VubG9jaygmYW1wO2hvc3Rfa3ZtLmxvY2spOzxicj4NCjxicj4NCsKgIMKgIMKgIMKg
-IHJldHVybiByZXQgIT0gLUVBR0FJTiA/IHJldCA6IDA7PGJyPg0KLS0gPGJyPg0KMi4zMi4wLjYw
-NS5nOGRjZTlmMjQyMi1nb29nPGJyPg0KPGJyPjwvYmxvY2txdW90ZT48ZGl2Pjxicj48L2Rpdj48
-ZGl2PlJldmlld2VkLWJ5OiBBbmRyZXcgV2FsYnJhbiAmbHQ7PGEgaHJlZj0ibWFpbHRvOnF3YW5k
-b3JAZ29vZ2xlLmNvbSI+cXdhbmRvckBnb29nbGUuY29tPC9hPiZndDvCoDwvZGl2PjwvZGl2Pjwv
-ZGl2Pg0K
---0000000000004e3fad05c9c0fd01--
-
---0000000000005331c405c9c0fd55
+--0000000000002ae81b05c9c1a4a9
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -370,19 +270,19 @@ sIJJDk19oBSQvbt138wyZBe6UYYgQhQ3ZvU/9vTXB9geysqPfJbr27MYJ0ZFrCDlQdW49MksZ1x6
 P/Sxi49Xlra8e/bCTotvMPt76LN69+0lcZzcc/oNJJttsCLBqBZ7ABTSiTQaLp4UwTgTYMg7eBqD
 oJF2uULm2EfP8cT7HzGCAmowggJmAgEBMGgwVDELMAkGA1UEBhMCQkUxGTAXBgNVBAoTEEdsb2Jh
 bFNpZ24gbnYtc2ExKjAoBgNVBAMTIUdsb2JhbFNpZ24gQXRsYXMgUjMgU01JTUUgQ0EgMjAyMAIQ
-AdV711V3BM5Q4YSSMDl1STANBglghkgBZQMEAgEFAKCB1DAvBgkqhkiG9w0BCQQxIgQgd2mBPeWi
-i2avxLSEJch6xY2st54lmTHgqo08pgHcgGwwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkq
-hkiG9w0BCQUxDxcNMjEwODE3MTMwNjQ0WjBpBgkqhkiG9w0BCQ8xXDBaMAsGCWCGSAFlAwQBKjAL
+AdV711V3BM5Q4YSSMDl1STANBglghkgBZQMEAgEFAKCB1DAvBgkqhkiG9w0BCQQxIgQgRSTyEkut
+N4kTEeAqJ8YqqIMxFBiaIpIxisez+VBDwXUwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkq
+hkiG9w0BCQUxDxcNMjEwODE3MTM1MzIzWjBpBgkqhkiG9w0BCQ8xXDBaMAsGCWCGSAFlAwQBKjAL
 BglghkgBZQMEARYwCwYJYIZIAWUDBAECMAoGCCqGSIb3DQMHMAsGCSqGSIb3DQEBCjALBgkqhkiG
-9w0BAQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEBAQUABIIBAGXChOQlMaEL+DXneyC3WV07GVJp
-t3IaHmop7KzPMnNl16y+5STt/wy4QLTmGmPe626zbl31HkKOtkII8cQ4Q4ezCHjzBlaLa3+yjow4
-aJPXp2/ZRvG7hHzlQTlYGilvH0DY9C5fh0BiCht6pGxlpXmMi6BdKxsQDjr0L7lQZHInRJG0k/Fv
-9ipx/5LzlqnuhRYGd7W8pHDUYY90C6BPZZVQhGdmDrUTQHgrww/iHbn/3+Bx0pcKFDmgl/PRlTdB
-R31QRuqcslmEvK3Wmwpev306u1TbVXBg2BUIGi2zBfzBvqI7u3sw185YXeuSgMUlJNk0yRQ9SP07
-IVFJrB/nLz8=
---0000000000005331c405c9c0fd55--
+9w0BAQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEBAQUABIIBAHuYbpEtRWazYW0f6ODhCeBBRHjC
+ZMA9Tbk/qqN6dDGEatfOhKgSCBNk8cm2UnN1Aavmb6HIWHmHOD4sSAoI5I2x/MebusI3QS+8xmjC
+EROIrToBqqsr6gZ6s/WQagEx0jmzQdr0eTUYzfSxCTtQSVkk5Gcwig1NDZ02fPXOnaLsBCjmHo8Z
+d8lc6kvFL4NtvurqGU+Q5cPlbDdiNSTfnHb+fKu5AsxsoLncItIycQ4fR4D6FUvEggCU6saW24Nk
+VmO1DlZODrN6OzLsEVVlHSnbA2f5nNz5LAGxbHVy5qTVRwy4IC3IEiWc60PJXnj+ztmwmACYAOIe
+LrwAbJ4Droo=
+--0000000000002ae81b05c9c1a4a9--
 
---===============6031177081538323196==
+--===============0687541595073452442==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -393,4 +293,4 @@ kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 
---===============6031177081538323196==--
+--===============0687541595073452442==--
