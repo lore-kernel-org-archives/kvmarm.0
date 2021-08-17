@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00348C4338F
-	for <kvmarm@archiver.kernel.org>; Tue, 17 Aug 2021 17:12:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44F46C4338F
+	for <kvmarm@archiver.kernel.org>; Tue, 17 Aug 2021 18:06:00 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3CA9A60FDA
-	for <kvmarm@archiver.kernel.org>; Tue, 17 Aug 2021 17:12:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 3CA9A60FDA
+	by mail.kernel.org (Postfix) with ESMTP id A57BB60EFE
+	for <kvmarm@archiver.kernel.org>; Tue, 17 Aug 2021 18:05:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org A57BB60EFE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AA0934B102;
-	Tue, 17 Aug 2021 13:12:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1CF624B183;
+	Tue, 17 Aug 2021 14:05:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ffDaFWeBuaVO; Tue, 17 Aug 2021 13:12:23 -0400 (EDT)
+	with ESMTP id N4B3XozLN1Bj; Tue, 17 Aug 2021 14:05:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 29ABD4B17B;
-	Tue, 17 Aug 2021 13:12:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B30E4B17A;
+	Tue, 17 Aug 2021 14:05:54 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 57E3C4B17D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Aug 2021 13:12:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C9424B174
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Aug 2021 14:05:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DL1PGuuLKFLq for <kvmarm@lists.cs.columbia.edu>;
- Tue, 17 Aug 2021 13:12:17 -0400 (EDT)
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 710A04B173
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Aug 2021 13:12:17 -0400 (EDT)
-X-IronPort-AV: E=McAfee;i="6200,9189,10079"; a="203302126"
+ with ESMTP id k8D4tEUxe6B6 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 17 Aug 2021 14:05:48 -0400 (EDT)
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3C2234B143
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Aug 2021 14:05:48 -0400 (EDT)
+X-IronPort-AV: E=McAfee;i="6200,9189,10079"; a="301742455"
 X-IronPort-AV: E=Sophos;i="5.84,329,1620716400"; 
- d="gz'50?scan'50,208,50";a="203302126"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
- by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 17 Aug 2021 10:12:15 -0700
+ d="gz'50?scan'50,208,50";a="301742455"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+ by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 17 Aug 2021 11:05:45 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.84,329,1620716400"; 
- d="gz'50?scan'50,208,50";a="680437189"
+ d="gz'50?scan'50,208,50";a="520584648"
 Received: from lkp-server01.sh.intel.com (HELO d053b881505b) ([10.239.97.150])
- by fmsmga005.fm.intel.com with ESMTP; 17 Aug 2021 10:12:11 -0700
+ by FMSMGA003.fm.intel.com with ESMTP; 17 Aug 2021 11:05:41 -0700
 Received: from kbuild by d053b881505b with local (Exim 4.92)
  (envelope-from <lkp@intel.com>)
- id 1mG2dG-000S2E-QK; Tue, 17 Aug 2021 17:12:10 +0000
-Date: Wed, 18 Aug 2021 01:11:48 +0800
+ id 1mG3T2-000S5s-JV; Tue, 17 Aug 2021 18:05:40 +0000
+Date: Wed, 18 Aug 2021 02:04:51 +0800
 From: kernel test robot <lkp@intel.com>
 To: Fuad Tabba <tabba@google.com>, kvmarm@lists.cs.columbia.edu
-Subject: Re: [PATCH v4 11/15] KVM: arm64: Guest exit handlers for nVHE hyp
-Message-ID: <202108180107.MtLzV2Ut-lkp@intel.com>
-References: <20210817081134.2918285-12-tabba@google.com>
+Subject: Re: [PATCH v4 12/15] KVM: arm64: Add trap handlers for protected VMs
+Message-ID: <202108180135.eSuSFnIj-lkp@intel.com>
+References: <20210817081134.2918285-13-tabba@google.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="Q68bSM7Ycu6FN28Q"
+Content-Type: multipart/mixed; boundary="7JfCtLOvnd9MIVvH"
 Content-Disposition: inline
-In-Reply-To: <20210817081134.2918285-12-tabba@google.com>
+In-Reply-To: <20210817081134.2918285-13-tabba@google.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Cc: kbuild-all@lists.01.org, will@kernel.org,
  clang-built-linux@googlegroups.com, maz@kernel.org, pbonzini@redhat.com
@@ -78,7 +78,7 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 
---Q68bSM7Ycu6FN28Q
+--7JfCtLOvnd9MIVvH
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
@@ -97,10 +97,10 @@ reproduce (this is a W=1 build):
         chmod +x ~/bin/make.cross
         # install arm64 cross compiling tool for clang build
         # apt-get install binutils-aarch64-linux-gnu
-        # https://github.com/0day-ci/linux/commit/d20adc963041fb77c56e8da7935236d73b738e63
+        # https://github.com/0day-ci/linux/commit/58bc1e79b35b3353db259b152a450671bc0822b2
         git remote add linux-review https://github.com/0day-ci/linux
         git fetch --no-tags linux-review Fuad-Tabba/KVM-arm64-Fixed-features-for-protected-VMs/20210817-161500
-        git checkout d20adc963041fb77c56e8da7935236d73b738e63
+        git checkout 58bc1e79b35b3353db259b152a450671bc0822b2
         # save the attached .config to linux build tree
         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross ARCH=arm64 
 
@@ -109,148 +109,79 @@ Reported-by: kernel test robot <lkp@intel.com>
 
 All warnings (new ones prefixed by >>):
 
->> arch/arm64/kvm/hyp/nvhe/switch.c:163:22: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
-           [ESR_ELx_EC_WFx]                = NULL,
-                                             ^~~~
-   include/linux/stddef.h:8:14: note: expanded from macro 'NULL'
-   #define NULL ((void *)0)
-                ^~~~~~~~~~~
-   arch/arm64/kvm/hyp/nvhe/switch.c:162:28: note: previous initialization is here
-           [0 ... ESR_ELx_EC_MAX]          = NULL,
-                                             ^~~~
-   include/linux/stddef.h:8:14: note: expanded from macro 'NULL'
-   #define NULL ((void *)0)
-                ^~~~~~~~~~~
-   arch/arm64/kvm/hyp/nvhe/switch.c:164:26: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
-           [ESR_ELx_EC_CP15_32]            = NULL,
-                                             ^~~~
-   include/linux/stddef.h:8:14: note: expanded from macro 'NULL'
-   #define NULL ((void *)0)
-                ^~~~~~~~~~~
-   arch/arm64/kvm/hyp/nvhe/switch.c:162:28: note: previous initialization is here
-           [0 ... ESR_ELx_EC_MAX]          = NULL,
-                                             ^~~~
-   include/linux/stddef.h:8:14: note: expanded from macro 'NULL'
-   #define NULL ((void *)0)
-                ^~~~~~~~~~~
-   arch/arm64/kvm/hyp/nvhe/switch.c:165:26: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
-           [ESR_ELx_EC_CP15_64]            = NULL,
-                                             ^~~~
-   include/linux/stddef.h:8:14: note: expanded from macro 'NULL'
-   #define NULL ((void *)0)
-                ^~~~~~~~~~~
-   arch/arm64/kvm/hyp/nvhe/switch.c:162:28: note: previous initialization is here
-           [0 ... ESR_ELx_EC_MAX]          = NULL,
-                                             ^~~~
-   include/linux/stddef.h:8:14: note: expanded from macro 'NULL'
-   #define NULL ((void *)0)
-                ^~~~~~~~~~~
-   arch/arm64/kvm/hyp/nvhe/switch.c:166:26: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
-           [ESR_ELx_EC_CP14_MR]            = NULL,
-                                             ^~~~
-   include/linux/stddef.h:8:14: note: expanded from macro 'NULL'
-   #define NULL ((void *)0)
-                ^~~~~~~~~~~
-   arch/arm64/kvm/hyp/nvhe/switch.c:162:28: note: previous initialization is here
-           [0 ... ESR_ELx_EC_MAX]          = NULL,
-                                             ^~~~
-   include/linux/stddef.h:8:14: note: expanded from macro 'NULL'
-   #define NULL ((void *)0)
-                ^~~~~~~~~~~
-   arch/arm64/kvm/hyp/nvhe/switch.c:167:26: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
-           [ESR_ELx_EC_CP14_LS]            = NULL,
-                                             ^~~~
-   include/linux/stddef.h:8:14: note: expanded from macro 'NULL'
-   #define NULL ((void *)0)
-                ^~~~~~~~~~~
-   arch/arm64/kvm/hyp/nvhe/switch.c:162:28: note: previous initialization is here
-           [0 ... ESR_ELx_EC_MAX]          = NULL,
-                                             ^~~~
-   include/linux/stddef.h:8:14: note: expanded from macro 'NULL'
-   #define NULL ((void *)0)
-                ^~~~~~~~~~~
-   arch/arm64/kvm/hyp/nvhe/switch.c:168:26: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
-           [ESR_ELx_EC_CP14_64]            = NULL,
-                                             ^~~~
-   include/linux/stddef.h:8:14: note: expanded from macro 'NULL'
-   #define NULL ((void *)0)
-                ^~~~~~~~~~~
-   arch/arm64/kvm/hyp/nvhe/switch.c:162:28: note: previous initialization is here
-           [0 ... ESR_ELx_EC_MAX]          = NULL,
-                                             ^~~~
-   include/linux/stddef.h:8:14: note: expanded from macro 'NULL'
-   #define NULL ((void *)0)
-                ^~~~~~~~~~~
-   arch/arm64/kvm/hyp/nvhe/switch.c:169:24: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
-           [ESR_ELx_EC_HVC32]              = NULL,
-                                             ^~~~
-   include/linux/stddef.h:8:14: note: expanded from macro 'NULL'
-   #define NULL ((void *)0)
-                ^~~~~~~~~~~
-   arch/arm64/kvm/hyp/nvhe/switch.c:162:28: note: previous initialization is here
-           [0 ... ESR_ELx_EC_MAX]          = NULL,
-                                             ^~~~
-   include/linux/stddef.h:8:14: note: expanded from macro 'NULL'
-   #define NULL ((void *)0)
-                ^~~~~~~~~~~
-   arch/arm64/kvm/hyp/nvhe/switch.c:170:24: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
-           [ESR_ELx_EC_SMC32]              = NULL,
-                                             ^~~~
-   include/linux/stddef.h:8:14: note: expanded from macro 'NULL'
-   #define NULL ((void *)0)
-                ^~~~~~~~~~~
-   arch/arm64/kvm/hyp/nvhe/switch.c:162:28: note: previous initialization is here
-           [0 ... ESR_ELx_EC_MAX]          = NULL,
-                                             ^~~~
-   include/linux/stddef.h:8:14: note: expanded from macro 'NULL'
-   #define NULL ((void *)0)
-                ^~~~~~~~~~~
-   arch/arm64/kvm/hyp/nvhe/switch.c:171:24: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
-           [ESR_ELx_EC_HVC64]              = NULL,
-                                             ^~~~
-   include/linux/stddef.h:8:14: note: expanded from macro 'NULL'
-   #define NULL ((void *)0)
+>> arch/arm64/kvm/hyp/nvhe/sys_regs.c:390:5: warning: no previous prototype for function 'kvm_handle_pvm_sys64' [-Wmissing-prototypes]
+   int kvm_handle_pvm_sys64(struct kvm_vcpu *vcpu)
+       ^
+   arch/arm64/kvm/hyp/nvhe/sys_regs.c:390:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+   int kvm_handle_pvm_sys64(struct kvm_vcpu *vcpu)
+   ^
+   static 
+>> arch/arm64/kvm/hyp/nvhe/sys_regs.c:426:5: warning: no previous prototype for function 'kvm_handle_pvm_restricted' [-Wmissing-prototypes]
+   int kvm_handle_pvm_restricted(struct kvm_vcpu *vcpu)
+       ^
+   arch/arm64/kvm/hyp/nvhe/sys_regs.c:426:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+   int kvm_handle_pvm_restricted(struct kvm_vcpu *vcpu)
+   ^
+   static 
+   2 warnings generated.
 
 
-vim +163 arch/arm64/kvm/hyp/nvhe/switch.c
+vim +/kvm_handle_pvm_sys64 +390 arch/arm64/kvm/hyp/nvhe/sys_regs.c
 
-   160	
-   161	static exit_handle_fn hyp_exit_handlers[] = {
-   162		[0 ... ESR_ELx_EC_MAX]		= NULL,
- > 163		[ESR_ELx_EC_WFx]		= NULL,
-   164		[ESR_ELx_EC_CP15_32]		= NULL,
-   165		[ESR_ELx_EC_CP15_64]		= NULL,
-   166		[ESR_ELx_EC_CP14_MR]		= NULL,
-   167		[ESR_ELx_EC_CP14_LS]		= NULL,
-   168		[ESR_ELx_EC_CP14_64]		= NULL,
-   169		[ESR_ELx_EC_HVC32]		= NULL,
-   170		[ESR_ELx_EC_SMC32]		= NULL,
-   171		[ESR_ELx_EC_HVC64]		= NULL,
-   172		[ESR_ELx_EC_SMC64]		= NULL,
-   173		[ESR_ELx_EC_SYS64]		= NULL,
-   174		[ESR_ELx_EC_SVE]		= NULL,
-   175		[ESR_ELx_EC_IABT_LOW]		= NULL,
-   176		[ESR_ELx_EC_DABT_LOW]		= NULL,
-   177		[ESR_ELx_EC_SOFTSTP_LOW]	= NULL,
-   178		[ESR_ELx_EC_WATCHPT_LOW]	= NULL,
-   179		[ESR_ELx_EC_BREAKPT_LOW]	= NULL,
-   180		[ESR_ELx_EC_BKPT32]		= NULL,
-   181		[ESR_ELx_EC_BRK64]		= NULL,
-   182		[ESR_ELx_EC_FP_ASIMD]		= NULL,
-   183		[ESR_ELx_EC_PAC]		= NULL,
-   184	};
-   185	
+   384	
+   385	/*
+   386	 * Handler for protected VM MSR, MRS or System instruction execution in AArch64.
+   387	 *
+   388	 * Return 1 if handled, or 0 if not.
+   389	 */
+ > 390	int kvm_handle_pvm_sys64(struct kvm_vcpu *vcpu)
+   391	{
+   392		const struct sys_reg_desc *r;
+   393		struct sys_reg_params params;
+   394		unsigned long esr = kvm_vcpu_get_esr(vcpu);
+   395		int Rt = kvm_vcpu_sys_get_rt(vcpu);
+   396	
+   397		params = esr_sys64_to_params(esr);
+   398		params.regval = vcpu_get_reg(vcpu, Rt);
+   399	
+   400		r = find_reg(&params, pvm_sys_reg_descs, ARRAY_SIZE(pvm_sys_reg_descs));
+   401	
+   402		/* Undefined access (RESTRICTED). */
+   403		if (r == NULL) {
+   404			inject_undef(vcpu);
+   405			return 1;
+   406		}
+   407	
+   408		/* Handled by the host (HOST_HANDLED) */
+   409		if (r->access == NULL)
+   410			return 0;
+   411	
+   412		/* Handled by hyp: skip instruction if instructed to do so. */
+   413		if (r->access(vcpu, &params, r))
+   414			__kvm_skip_instr(vcpu);
+   415	
+   416		vcpu_set_reg(vcpu, Rt, params.regval);
+   417		return 1;
+   418	}
+   419	
+   420	/*
+   421	 * Handler for protected VM restricted exceptions.
+   422	 *
+   423	 * Inject an undefined exception into the guest and return 1 to indicate that
+   424	 * it was handled.
+   425	 */
+ > 426	int kvm_handle_pvm_restricted(struct kvm_vcpu *vcpu)
 
 ---
 0-DAY CI Kernel Test Service, Intel Corporation
 https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
 
---Q68bSM7Ycu6FN28Q
+--7JfCtLOvnd9MIVvH
 Content-Type: application/gzip
 Content-Disposition: attachment; filename=".config.gz"
 Content-Transfer-Encoding: base64
 
-H4sICOrbG2EAAy5jb25maWcAnDzJduO2svt8hU5nc98iHU0e+t3jBUiCFCKSoAFSgzc8ii13
+H4sICDrwG2EAAy5jb25maWcAnDzJduO2svt8hU5nc98iHU0e+t3jBUiCFCKSoAFSgzc8ii13
 /OKhryx30n//qgAOAAnKzk1yOi1UASgUCjWhwJ9/+nlE3o4vT7vjw+3u8fHH6Ov+eX/YHfd3
 o/uHx/2/RwEfpTwf0YDlnwE5fnh++/vX3eHpfD46+zyZfx7/cridj5b7w/P+ceS/PN8/fH2D
 /g8vzz/9/JPP05BFpe+XKyok42mZ001+9en2cff8dfR9f3gFvBGO8nk8+tfXh+P//vor/Pn0
@@ -926,7 +857,7 @@ WSS3RXvS2wW+4XaPBebsOumjIoSp0rK/A4ihdSs1dIkBCkPlv0uzxjOpkGKm7XKrpEuQGgGs
 GT3zwdmmxl+9TkuaANSolxIOAWq06zbHF0BLsa2Q9Q20JWFK9TL7azWzlC81HJzSyBaGDY9M
 dHQIKRjQQCRPcnfNahDJt03tK4f3koE/0c225LIv1OJXTFqUqmVohZZz3nj+Hz48QbE/TwIA
 
---Q68bSM7Ycu6FN28Q
+--7JfCtLOvnd9MIVvH
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -937,4 +868,4 @@ kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 
---Q68bSM7Ycu6FN28Q--
+--7JfCtLOvnd9MIVvH--
