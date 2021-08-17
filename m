@@ -2,81 +2,81 @@ Return-Path: <SRS0=6VsV=NI=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFB3DC4338F
-	for <kvmarm@archiver.kernel.org>; Tue, 17 Aug 2021 08:12:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3053DC4320A
+	for <kvmarm@archiver.kernel.org>; Tue, 17 Aug 2021 08:12:09 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A582B60F5E
-	for <kvmarm@archiver.kernel.org>; Tue, 17 Aug 2021 08:12:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org A582B60F5E
+	by mail.kernel.org (Postfix) with ESMTP id DB9B461008
+	for <kvmarm@archiver.kernel.org>; Tue, 17 Aug 2021 08:12:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org DB9B461008
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 594864B158;
-	Tue, 17 Aug 2021 04:12:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E64C4B148;
+	Tue, 17 Aug 2021 04:12:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 58n142rSQJKT; Tue, 17 Aug 2021 04:12:00 -0400 (EDT)
+	with ESMTP id YyKNBr5gQsOW; Tue, 17 Aug 2021 04:12:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C026E4B170;
-	Tue, 17 Aug 2021 04:11:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E45464B160;
+	Tue, 17 Aug 2021 04:11:54 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BC9FF4B152
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Aug 2021 04:11:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F5B84B149
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Aug 2021 04:11:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id D9B6YyC8f5Qy for <kvmarm@lists.cs.columbia.edu>;
- Tue, 17 Aug 2021 04:11:50 -0400 (EDT)
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com
- [209.85.221.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 28B6D4B155
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Aug 2021 04:11:48 -0400 (EDT)
-Received: by mail-wr1-f74.google.com with SMTP id
- t15-20020a5d42cf000000b001565f9c9ee8so4130664wrr.2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Aug 2021 01:11:48 -0700 (PDT)
+ with ESMTP id OsoXDKpP+0NM for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 17 Aug 2021 04:11:51 -0400 (EDT)
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com
+ [209.85.222.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6C1364B13F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Aug 2021 04:11:51 -0400 (EDT)
+Received: by mail-qk1-f202.google.com with SMTP id
+ d20-20020a05620a1414b02903d24f3e6540so1632544qkj.7
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Aug 2021 01:11:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=5N9sL5FNi9qrbBCH60+h/5aGjehNQlmcB8JtRn+LK/Y=;
- b=Y9gCxjQgu8WBnIwLq0UnpoEyfcwWFnZk9EOwZk5QUmzoT9Svlr1th34g/QjJoDB+ab
- zZpl5TBx3FL7mnwXSLgADzhf+2CGRAZKZPKiRZG8VEUibVmKP6KFg43r/Zuk9kLL9/b8
- 7HgYGzFNzdIWRuNIiIEYlCrw/dyiXXnwehzp+vdn8LEVLVirVyBVfp6PWmmHWXvpzbIk
- 5qhABEIRo/VBXLlpfwYDVise2mty3JtejTP/fFRusuZFO+fWkOh+g0d9z64EQvhG/bOn
- LnGLykAU1b2fZ75hPyAVrZwKB3SovLgzHvEaY0MjwGovwohFLcZHWhiOd53DkJ6y7GaK
- 0gcg==
+ :cc; bh=aHCf3CwNNBrmIRx2wJpLYl7QdQEwhZAoOTdqtlemKNA=;
+ b=nmj5YInKovfYpQ7u2gu+Y7J66loXt+NDQNemJ7HGUcKXj0fC7wwCSMymCEi4G21L3p
+ IArJSFzNsytGyM9Aj+pPYXesA9Vm/c7zfGQmeaSoLhwVGjTFnvS9R+lIcvVEM8C1k/YR
+ vWzurZ7ebNzykXtZc9niVn9GYk9PSDHnApssgQ253v3a0E1TACnW+kba/jsCf/OUQST1
+ lRY+I29CFT8E6+v1g/A8yjDZEgGVBkXRxQmXua664ZpNGjHjWAh/aYXWpdE3sTpV5KSC
+ 4F2hbJOwiqlbmgpuhHpxBsZ8LyTztDaiQNI7jgWINBi0Cz59uNMk+MX/4294lx7erU0g
+ aByA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=5N9sL5FNi9qrbBCH60+h/5aGjehNQlmcB8JtRn+LK/Y=;
- b=oXTOLVQIpBueaI+UhV8cxAohFnHz+LML3vYGxD0819+ChciBKvGhOr1rbSJ7IXeDNr
- 0ixWsWkQJ3hLVbmuPFf4b4l7je9rnb3PwrS32zd63TApc/LHUH+rm79HFlxdJ5gYZ93s
- pQffPPI8j20JCFL8FQxv4TnwMqRRjNBpumaZkIb538Fi7i75pMV6JKHK/FIUf0nzHvTK
- f5pnrzlzYw/xkKEdC+/772Vq5I5p2IxvAObkMyMWfBjnafpKo2SvMVLPhREqGe+EVGw8
- p0VzrHJ6qN2tdfmAOhKBezoOS5YlYV0Xz9wqNsW5F6jrW+inZ0W1fTwB0JHCaCabRHJb
- ES0Q==
-X-Gm-Message-State: AOAM532Uk7VwVvbAqC7mWmVZGeWniJKmJRxd9QoOYofY2wfJgywzPROn
- b3j2pMUXuAptjRgM7n/9yKI1hOJkXDLv3iZJpkOx5fOA4NeqYL/TTk3yavcpcDrvkMJgwW6l1O5
- u//LupgedEYSe8bGrQpXZ5Ck5UhdXiTvwh/rSp1Dg7Db7vUyzKPLytN6RcYaT/uYFlyw=
-X-Google-Smtp-Source: ABdhPJzt7u4Sk+ACYI0cSDXGAWDWaXIZ7nNJ6bvJ191RPxt+qLvQzW+ZQUSMtv7dbzAVAyk+72BhiULwOQ==
+ bh=aHCf3CwNNBrmIRx2wJpLYl7QdQEwhZAoOTdqtlemKNA=;
+ b=N3LICuNO7KJEne0OcROWPuOHk6N+WFK0hJPK8M4ZhmpPCFX+3uz2nSv3ylE+WQE+2E
+ xje/ot3AEu7hEomy9qKHEHwj3Jt6mWyAAFZ1IFPnjSfJeBB9E/Z3WGPS61CzV1cSUDSR
+ 3TvRChP12nDPpyrWZ161/w6hoIzcpRVDHrTY5PakSGtuXJjo4mVmzaLYCN1cOqOrjjt/
+ ep42/s1BmWAq17jU/lDuXvnF29h6CN4jhOJLbG7lJobpBkRKzdslss50XtEtlxod8ylw
+ 6JDKw3grbaBo9tWZaCvOyr/T3GpDDq2f0XwU4LcuBj+loGcJxcRe6I/4OX0EfNZ8VDsB
+ ryaA==
+X-Gm-Message-State: AOAM530FYlZliAyuwXP2xeCPThymYVxNhzqNaC9hc5ro0NdfMsDY/UpQ
+ Z8r+XPH7RPPpCGcAFCTXvtSRZypypiBRvUaRWef0kMyyHhORjtAUtS4uMqtiiZPEtMAdMEqhusR
+ bAFvfi5/lO4DkSWxLvN11d79TsRieJ1+GWOAvCTZUdmdVWIlWV8oJBduAP5FRIcqpr2s=
+X-Google-Smtp-Source: ABdhPJwo9+n3O7kUXlMfd9UmZiDXQnjQGGvtzSb/qI8QL6++MTL6aNWs0u51HkTG4jUJ6+mkEPCkxCl2mw==
 X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:482])
- (user=tabba job=sendgmr) by 2002:a05:600c:5116:: with SMTP id
- o22mr227600wms.0.1629187906624; Tue, 17 Aug 2021 01:11:46 -0700 (PDT)
-Date: Tue, 17 Aug 2021 09:11:24 +0100
+ (user=tabba job=sendgmr) by 2002:a05:6214:1933:: with SMTP id
+ es19mr2165343qvb.42.1629187910879; Tue, 17 Aug 2021 01:11:50 -0700 (PDT)
+Date: Tue, 17 Aug 2021 09:11:26 +0100
 In-Reply-To: <20210817081134.2918285-1-tabba@google.com>
-Message-Id: <20210817081134.2918285-6-tabba@google.com>
+Message-Id: <20210817081134.2918285-8-tabba@google.com>
 Mime-Version: 1.0
 References: <20210817081134.2918285-1-tabba@google.com>
 X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
-Subject: [PATCH v4 05/15] KVM: arm64: Refactor sys_regs.h,c for nVHE reuse
+Subject: [PATCH v4 07/15] KVM: arm64: Keep mdcr_el2's value as set by
+ __init_el2_debug
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: kernel-team@android.com, kvm@vger.kernel.org, maz@kernel.org,
@@ -97,213 +97,50 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Refactor sys_regs.h and sys_regs.c to make it easier to reuse
-common code. It will be used in nVHE in a later patch.
+__init_el2_debug configures mdcr_el2 at initialization based on,
+among other things, available hardware support. Trap deactivation
+doesn't check that, so keep the initial value.
 
-Note that the refactored code uses __inline_bsearch for find_reg
-instead of bsearch to avoid copying the bsearch code for nVHE.
+No functional change intended. However, the value of mdcr_el2
+might be different after deactivating traps than it was before
+this patch.
 
-No functional change intended.
-
-Acked-by: Will Deacon <will@kernel.org>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/include/asm/sysreg.h |  5 +++
- arch/arm64/kvm/sys_regs.c       | 60 +++++++++------------------------
- arch/arm64/kvm/sys_regs.h       | 31 +++++++++++++++++
- 3 files changed, 52 insertions(+), 44 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/switch.c | 4 ----
+ arch/arm64/kvm/hyp/vhe/switch.c  | 4 ----
+ 2 files changed, 8 deletions(-)
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 7b9c3acba684..53a93a9c5253 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -1153,6 +1153,11 @@
- #define ICH_VTR_A3V_SHIFT	21
- #define ICH_VTR_A3V_MASK	(1 << ICH_VTR_A3V_SHIFT)
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index 2ea764a48958..1778593a08a9 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -90,10 +90,6 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
+ 		isb();
+ 	}
  
-+#define ARM64_FEATURE_FIELD_BITS	4
-+
-+/* Create a mask for the feature bits of the specified feature. */
-+#define ARM64_FEATURE_MASK(x)	(GENMASK_ULL(x##_SHIFT + ARM64_FEATURE_FIELD_BITS - 1, x##_SHIFT))
-+
- #ifdef __ASSEMBLY__
+-	vcpu->arch.mdcr_el2_host &= MDCR_EL2_HPMN_MASK |
+-				    MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT |
+-				    MDCR_EL2_E2TB_MASK << MDCR_EL2_E2TB_SHIFT;
+-
+ 	__deactivate_traps_common(vcpu);
  
- 	.irp	num,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 80a6e41cadad..b6a2f8e890db 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -44,10 +44,6 @@
-  * 64bit interface.
-  */
+ 	write_sysreg(this_cpu_ptr(&kvm_init_params)->hcr_el2, hcr_el2);
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index ec158fa41ae6..0d0c9550fb08 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -93,10 +93,6 @@ void activate_traps_vhe_load(struct kvm_vcpu *vcpu)
  
--#define reg_to_encoding(x)						\
--	sys_reg((u32)(x)->Op0, (u32)(x)->Op1,				\
--		(u32)(x)->CRn, (u32)(x)->CRm, (u32)(x)->Op2)
--
- static bool read_from_write_only(struct kvm_vcpu *vcpu,
- 				 struct sys_reg_params *params,
- 				 const struct sys_reg_desc *r)
-@@ -1026,8 +1022,6 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
- 	return true;
- }
- 
--#define FEATURE(x)	(GENMASK_ULL(x##_SHIFT + 3, x##_SHIFT))
--
- /* Read a sanitised cpufeature ID register by sys_reg_desc */
- static u64 read_id_reg(const struct kvm_vcpu *vcpu,
- 		struct sys_reg_desc const *r, bool raz)
-@@ -1038,40 +1032,40 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
- 	switch (id) {
- 	case SYS_ID_AA64PFR0_EL1:
- 		if (!vcpu_has_sve(vcpu))
--			val &= ~FEATURE(ID_AA64PFR0_SVE);
--		val &= ~FEATURE(ID_AA64PFR0_AMU);
--		val &= ~FEATURE(ID_AA64PFR0_CSV2);
--		val |= FIELD_PREP(FEATURE(ID_AA64PFR0_CSV2), (u64)vcpu->kvm->arch.pfr0_csv2);
--		val &= ~FEATURE(ID_AA64PFR0_CSV3);
--		val |= FIELD_PREP(FEATURE(ID_AA64PFR0_CSV3), (u64)vcpu->kvm->arch.pfr0_csv3);
-+			val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_SVE);
-+		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_AMU);
-+		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_CSV2);
-+		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_CSV2), (u64)vcpu->kvm->arch.pfr0_csv2);
-+		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_CSV3);
-+		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_CSV3), (u64)vcpu->kvm->arch.pfr0_csv3);
- 		break;
- 	case SYS_ID_AA64PFR1_EL1:
--		val &= ~FEATURE(ID_AA64PFR1_MTE);
-+		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_MTE);
- 		if (kvm_has_mte(vcpu->kvm)) {
- 			u64 pfr, mte;
- 
- 			pfr = read_sanitised_ftr_reg(SYS_ID_AA64PFR1_EL1);
- 			mte = cpuid_feature_extract_unsigned_field(pfr, ID_AA64PFR1_MTE_SHIFT);
--			val |= FIELD_PREP(FEATURE(ID_AA64PFR1_MTE), mte);
-+			val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR1_MTE), mte);
- 		}
- 		break;
- 	case SYS_ID_AA64ISAR1_EL1:
- 		if (!vcpu_has_ptrauth(vcpu))
--			val &= ~(FEATURE(ID_AA64ISAR1_APA) |
--				 FEATURE(ID_AA64ISAR1_API) |
--				 FEATURE(ID_AA64ISAR1_GPA) |
--				 FEATURE(ID_AA64ISAR1_GPI));
-+			val &= ~(ARM64_FEATURE_MASK(ID_AA64ISAR1_APA) |
-+				 ARM64_FEATURE_MASK(ID_AA64ISAR1_API) |
-+				 ARM64_FEATURE_MASK(ID_AA64ISAR1_GPA) |
-+				 ARM64_FEATURE_MASK(ID_AA64ISAR1_GPI));
- 		break;
- 	case SYS_ID_AA64DFR0_EL1:
- 		/* Limit debug to ARMv8.0 */
--		val &= ~FEATURE(ID_AA64DFR0_DEBUGVER);
--		val |= FIELD_PREP(FEATURE(ID_AA64DFR0_DEBUGVER), 6);
-+		val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_DEBUGVER);
-+		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_DEBUGVER), 6);
- 		/* Limit guests to PMUv3 for ARMv8.4 */
- 		val = cpuid_feature_cap_perfmon_field(val,
- 						      ID_AA64DFR0_PMUVER_SHIFT,
- 						      kvm_vcpu_has_pmu(vcpu) ? ID_AA64DFR0_PMUVER_8_4 : 0);
- 		/* Hide SPE from guests */
--		val &= ~FEATURE(ID_AA64DFR0_PMSVER);
-+		val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_PMSVER);
- 		break;
- 	case SYS_ID_DFR0_EL1:
- 		/* Limit guests to PMUv3 for ARMv8.4 */
-@@ -2106,23 +2100,6 @@ static int check_sysreg_table(const struct sys_reg_desc *table, unsigned int n,
- 	return 0;
- }
- 
--static int match_sys_reg(const void *key, const void *elt)
--{
--	const unsigned long pval = (unsigned long)key;
--	const struct sys_reg_desc *r = elt;
--
--	return pval - reg_to_encoding(r);
--}
--
--static const struct sys_reg_desc *find_reg(const struct sys_reg_params *params,
--					 const struct sys_reg_desc table[],
--					 unsigned int num)
--{
--	unsigned long pval = reg_to_encoding(params);
--
--	return bsearch((void *)pval, table, num, sizeof(table[0]), match_sys_reg);
--}
--
- int kvm_handle_cp14_load_store(struct kvm_vcpu *vcpu)
+ void deactivate_traps_vhe_put(struct kvm_vcpu *vcpu)
  {
- 	kvm_inject_undefined(vcpu);
-@@ -2365,13 +2342,8 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu)
- 
- 	trace_kvm_handle_sys_reg(esr);
- 
--	params.Op0 = (esr >> 20) & 3;
--	params.Op1 = (esr >> 14) & 0x7;
--	params.CRn = (esr >> 10) & 0xf;
--	params.CRm = (esr >> 1) & 0xf;
--	params.Op2 = (esr >> 17) & 0x7;
-+	params = esr_sys64_to_params(esr);
- 	params.regval = vcpu_get_reg(vcpu, Rt);
--	params.is_write = !(esr & 1);
- 
- 	ret = emulate_sys_reg(vcpu, &params);
- 
-diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-index 9d0621417c2a..cc0cc95a0280 100644
---- a/arch/arm64/kvm/sys_regs.h
-+++ b/arch/arm64/kvm/sys_regs.h
-@@ -11,6 +11,12 @@
- #ifndef __ARM64_KVM_SYS_REGS_LOCAL_H__
- #define __ARM64_KVM_SYS_REGS_LOCAL_H__
- 
-+#include <linux/bsearch.h>
-+
-+#define reg_to_encoding(x)						\
-+	sys_reg((u32)(x)->Op0, (u32)(x)->Op1,				\
-+		(u32)(x)->CRn, (u32)(x)->CRm, (u32)(x)->Op2)
-+
- struct sys_reg_params {
- 	u8	Op0;
- 	u8	Op1;
-@@ -21,6 +27,14 @@ struct sys_reg_params {
- 	bool	is_write;
- };
- 
-+#define esr_sys64_to_params(esr)                                               \
-+	((struct sys_reg_params){ .Op0 = ((esr) >> 20) & 3,                    \
-+				  .Op1 = ((esr) >> 14) & 0x7,                  \
-+				  .CRn = ((esr) >> 10) & 0xf,                  \
-+				  .CRm = ((esr) >> 1) & 0xf,                   \
-+				  .Op2 = ((esr) >> 17) & 0x7,                  \
-+				  .is_write = !((esr) & 1) })
-+
- struct sys_reg_desc {
- 	/* Sysreg string for debug */
- 	const char *name;
-@@ -152,6 +166,23 @@ static inline int cmp_sys_reg(const struct sys_reg_desc *i1,
- 	return i1->Op2 - i2->Op2;
+-	vcpu->arch.mdcr_el2_host &= MDCR_EL2_HPMN_MASK |
+-				    MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT |
+-				    MDCR_EL2_TPMS;
+-
+ 	__deactivate_traps_common(vcpu);
  }
  
-+static inline int match_sys_reg(const void *key, const void *elt)
-+{
-+	const unsigned long pval = (unsigned long)key;
-+	const struct sys_reg_desc *r = elt;
-+
-+	return pval - reg_to_encoding(r);
-+}
-+
-+static inline const struct sys_reg_desc *
-+find_reg(const struct sys_reg_params *params, const struct sys_reg_desc table[],
-+	 unsigned int num)
-+{
-+	unsigned long pval = reg_to_encoding(params);
-+
-+	return __inline_bsearch((void *)pval, table, num, sizeof(table[0]), match_sys_reg);
-+}
-+
- const struct sys_reg_desc *find_reg_by_id(u64 id,
- 					  struct sys_reg_params *params,
- 					  const struct sys_reg_desc table[],
 -- 
 2.33.0.rc1.237.g0d66db33f3-goog
 
