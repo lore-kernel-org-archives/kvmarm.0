@@ -8,75 +8,76 @@ X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D43FAC4338F
-	for <kvmarm@archiver.kernel.org>; Tue, 17 Aug 2021 08:12:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2372CC4320A
+	for <kvmarm@archiver.kernel.org>; Tue, 17 Aug 2021 08:12:23 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8A0CC60F58
-	for <kvmarm@archiver.kernel.org>; Tue, 17 Aug 2021 08:12:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 8A0CC60F58
+	by mail.kernel.org (Postfix) with ESMTP id CCC1D60F58
+	for <kvmarm@archiver.kernel.org>; Tue, 17 Aug 2021 08:12:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org CCC1D60F58
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C6A74B154;
-	Tue, 17 Aug 2021 04:12:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 80E3D4B173;
+	Tue, 17 Aug 2021 04:12:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id OtdUHbfSrLNb; Tue, 17 Aug 2021 04:12:18 -0400 (EDT)
+	with ESMTP id ithqHzzC3kgu; Tue, 17 Aug 2021 04:12:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 528724B173;
-	Tue, 17 Aug 2021 04:12:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 68C4C4B198;
+	Tue, 17 Aug 2021 04:12:12 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2EC964B173
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 62E3C4B160
  for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Aug 2021 04:12:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id p+lX1C0XZ3b9 for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id uR9lnLDDjwCR for <kvmarm@lists.cs.columbia.edu>;
  Tue, 17 Aug 2021 04:12:09 -0400 (EDT)
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com
- [209.85.128.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D08B64B165
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Aug 2021 04:11:56 -0400 (EDT)
-Received: by mail-wm1-f73.google.com with SMTP id
- u14-20020a7bcb0e0000b0290248831d46e4so606328wmj.6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Aug 2021 01:11:56 -0700 (PDT)
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com
+ [209.85.221.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 92C624B14D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Aug 2021 04:12:00 -0400 (EDT)
+Received: by mail-wr1-f74.google.com with SMTP id
+ p4-20020a5d59a4000000b00156992180dbso3978115wrr.10
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Aug 2021 01:12:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=8n83SYPJFagVj2+maLVaB3cngisvORRV9MwxIVnJLmI=;
- b=QK/oT43c/HyLP/flGctPFGgv7ERt829+s64w8tFk/HXu62cv5ewT8zROH3wOTe2tvj
- /aS4rS4XvL+VdJ9fohamgn6Nyg59PZxWDrodzia7PUArQfMO26PTAh+H6xoSWEEE3mr9
- dDmCJJ0j+3nII+H807f9g0TIew5R2UMyYDEfLyjS2RBXhILL7blWPMY7mBzm07CD2FZV
- R8adqZDTDufewJarzOCN7pgqdsv7Vx+iayW4OdoLDVJoz3VzmOcOn+/+N4eEAJqA5HBX
- c3eEB1npKGLlrrR/cCsOka1MAFIAwLC4Wyfv2oF357gfPE6pnUPWzc5uT0kVfitF8n0b
- Bl7w==
+ :cc; bh=wCAlPucxwkxQDsZjrMwYYiCi5QbYeNWxBim5zrWnq2Y=;
+ b=Aakqhp0ujPFBkz2t9XKF2sWAACl4G7B5hxJDrt2uXINVbL4SDQRXJFOegBUQ1cWZ/J
+ 0jUUeLw9Od7HUTBaHF2bEbcWHbDSiLs7WOuMmHvkgQ9aKAKEc1Se9jaIc0RdmvVOh0fO
+ 2EN/wB6tJc5Zuqxbzk63h/bmcGOdULfseyFm4sZABt1qcXnPvBSlGoCTvs5yVR6Y8Yo1
+ YMuBWKj78N9MEBXEHK0yav34qJ6J/ferOrSpzyXe15duHhdaVH3IinJtQB7TmOXkIdhf
+ EGOlFmuP1fTlBQFW97lGVUPjXY5ipiWvG/UMC6271totgCudngPKM0tiXwaU5gQ9KdQm
+ 5UzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=8n83SYPJFagVj2+maLVaB3cngisvORRV9MwxIVnJLmI=;
- b=HdPeagRlqqPiCmNK29RBMG4ig7xaJk4LgpQthlIQs2eKVNSKfdmf2/EMJJHZYQilBU
- XuY86HF2IJVHxLT2Zuan/T/P7OdTqxZ++jP18KZeAv2pQNtcaynB5dZGGJrvpjliFGRW
- vnQi8WmTAuDIXK4rOZKQzZcrfikwaxL/L8uuFdMC35EYVvjdcEpsyJFH6g5Qc7NGQboU
- 6R6e9dnKS+sIOicgzY4WIkaOT3vhi2WdGb0XLchI0mOElJQDHFr3sOby8p/CpdOMH3fb
- BfQWla90COaRcexBZi+Du6Z/Lbg+ifHDI1/u98ZKdQemA/ZGTBSRUBY4HeFlUvRY0yqf
- nPIQ==
-X-Gm-Message-State: AOAM531ktAO2f41rDB+ARBpCAZTo2iWR+6QYO4uYe20WfHwRDr9E/xZL
- NZe6lTT6dhn+geKzuYgq1znzbSmTalxByfXeXqa0jDId/yu94aFDnR1cWTKJrK+umLD/6NzmtNs
- +G2HcKhmYPk7Ipj1Lzk/02j/Xqa/P7wds6yLyA6Mn9nFwXEvTpqVWf1gukOo4fexzdXI=
-X-Google-Smtp-Source: ABdhPJyTMMnMvo44W4iioAshOfXYGiB/EBOESDhi7wJydM3Tnpejk+WoPKZaFjTVp97hac/tbSdCEeXM2g==
+ bh=wCAlPucxwkxQDsZjrMwYYiCi5QbYeNWxBim5zrWnq2Y=;
+ b=KBenN3PKiW8DwOLkZhmYI2Qr+FClswOa/4IkFpLQT9hW16V8qxksUmklLJnuwbmu3E
+ NRBUB7xizhcmaO5bRXJ24kPfnZrehc4MrspSS32dcIskCy9S8QRTe1IZYZRwF1EICezY
+ 2n2YLNQL6vnuzAac3re5tXSnDpN1mkIpTMaIS8d+iHzUzW9Mq1fM0ezjD8vyOLMMSP7V
+ iXsU/ngtGPdAnmM/4dmbD5LB8/ocepem7oqZfJFRbWvgaWJCYInwrdxqoH94VAgE4UkY
+ HKD0ErItswEAuaerI+f4SRjhayHo12RjNDhNOtfioCI3eTTloglWDiOJB2i2BFVdxx1y
+ YamQ==
+X-Gm-Message-State: AOAM532xZMYfeUCGQrtHNiq2bNezqdsFHhz4BZ/JcTAY5kJJcUXhpSV3
+ ah+2lw8M7q0ZgdWoal3nLj1VA0OCdnEuEWUnFNEaWZZ7WFlP7ItwmdibX8IvSDzIzX/ZYtZqe44
+ +Vfvb4/86hk5bW6S8EHIlvHOGGIu71xVG+001nyCEnzHKVG9hraLr9zRRP3mP1x1pmBA=
+X-Google-Smtp-Source: ABdhPJyYTcbz4UVboGo7zKDmnSidrFF2RAjsx5lYf6M4UE4X0H/bCAlk0j+kiCGYLkR2pXqzSg2USK4ZwA==
 X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:482])
- (user=tabba job=sendgmr) by 2002:a05:600c:5116:: with SMTP id
- o22mr227673wms.0.1629187915361; Tue, 17 Aug 2021 01:11:55 -0700 (PDT)
-Date: Tue, 17 Aug 2021 09:11:28 +0100
+ (user=tabba job=sendgmr) by 2002:a1c:c914:: with SMTP id
+ f20mr2057147wmb.140.1629187919570; 
+ Tue, 17 Aug 2021 01:11:59 -0700 (PDT)
+Date: Tue, 17 Aug 2021 09:11:30 +0100
 In-Reply-To: <20210817081134.2918285-1-tabba@google.com>
-Message-Id: <20210817081134.2918285-10-tabba@google.com>
+Message-Id: <20210817081134.2918285-12-tabba@google.com>
 Mime-Version: 1.0
 References: <20210817081134.2918285-1-tabba@google.com>
 X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
-Subject: [PATCH v4 09/15] KVM: arm64: Add feature register flag definitions
+Subject: [PATCH v4 11/15] KVM: arm64: Guest exit handlers for nVHE hyp
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: kernel-team@android.com, kvm@vger.kernel.org, maz@kernel.org,
@@ -97,121 +98,128 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add feature register flag definitions to clarify which features
-might be supported.
+Add an array of pointers to handlers for various trap reasons in
+nVHE code.
 
-Consolidate the various ID_AA64PFR0_ELx flags for all ELs.
+The current code selects how to fixup a guest on exit based on a
+series of if/else statements. Future patches will also require
+different handling for guest exists. Create an array of handlers
+to consolidate them.
 
-No functional change intended.
+No functional change intended as the array isn't populated yet.
 
+Acked-by: Will Deacon <will@kernel.org>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/include/asm/cpufeature.h |  4 ++--
- arch/arm64/include/asm/sysreg.h     | 12 ++++++++----
- arch/arm64/kernel/cpufeature.c      |  8 ++++----
- 3 files changed, 14 insertions(+), 10 deletions(-)
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 43 +++++++++++++++++++++++++
+ arch/arm64/kvm/hyp/nvhe/switch.c        | 33 +++++++++++++++++++
+ 2 files changed, 76 insertions(+)
 
-diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-index 9bb9d11750d7..b7d9bb17908d 100644
---- a/arch/arm64/include/asm/cpufeature.h
-+++ b/arch/arm64/include/asm/cpufeature.h
-@@ -602,14 +602,14 @@ static inline bool id_aa64pfr0_32bit_el1(u64 pfr0)
- {
- 	u32 val = cpuid_feature_extract_unsigned_field(pfr0, ID_AA64PFR0_EL1_SHIFT);
- 
--	return val == ID_AA64PFR0_EL1_32BIT_64BIT;
-+	return val == ID_AA64PFR0_ELx_32BIT_64BIT;
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index a0e78a6027be..5a2b89b96c67 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -409,6 +409,46 @@ static inline bool __hyp_handle_ptrauth(struct kvm_vcpu *vcpu)
+ 	return true;
  }
  
- static inline bool id_aa64pfr0_32bit_el0(u64 pfr0)
- {
- 	u32 val = cpuid_feature_extract_unsigned_field(pfr0, ID_AA64PFR0_EL0_SHIFT);
- 
--	return val == ID_AA64PFR0_EL0_32BIT_64BIT;
-+	return val == ID_AA64PFR0_ELx_32BIT_64BIT;
- }
- 
- static inline bool id_aa64pfr0_sve(u64 pfr0)
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 53a93a9c5253..f84a00f5874d 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -784,14 +784,13 @@
- #define ID_AA64PFR0_AMU			0x1
- #define ID_AA64PFR0_SVE			0x1
- #define ID_AA64PFR0_RAS_V1		0x1
-+#define ID_AA64PFR0_RAS_V1P1		0x2
- #define ID_AA64PFR0_FP_NI		0xf
- #define ID_AA64PFR0_FP_SUPPORTED	0x0
- #define ID_AA64PFR0_ASIMD_NI		0xf
- #define ID_AA64PFR0_ASIMD_SUPPORTED	0x0
--#define ID_AA64PFR0_EL1_64BIT_ONLY	0x1
--#define ID_AA64PFR0_EL1_32BIT_64BIT	0x2
--#define ID_AA64PFR0_EL0_64BIT_ONLY	0x1
--#define ID_AA64PFR0_EL0_32BIT_64BIT	0x2
-+#define ID_AA64PFR0_ELx_64BIT_ONLY	0x1
-+#define ID_AA64PFR0_ELx_32BIT_64BIT	0x2
- 
- /* id_aa64pfr1 */
- #define ID_AA64PFR1_MPAMFRAC_SHIFT	16
-@@ -847,12 +846,16 @@
- #define ID_AA64MMFR0_ASID_SHIFT		4
- #define ID_AA64MMFR0_PARANGE_SHIFT	0
- 
-+#define ID_AA64MMFR0_ASID_8		0x0
-+#define ID_AA64MMFR0_ASID_16		0x2
++typedef int (*exit_handle_fn)(struct kvm_vcpu *);
 +
- #define ID_AA64MMFR0_TGRAN4_NI		0xf
- #define ID_AA64MMFR0_TGRAN4_SUPPORTED	0x0
- #define ID_AA64MMFR0_TGRAN64_NI		0xf
- #define ID_AA64MMFR0_TGRAN64_SUPPORTED	0x0
- #define ID_AA64MMFR0_TGRAN16_NI		0x0
- #define ID_AA64MMFR0_TGRAN16_SUPPORTED	0x1
-+#define ID_AA64MMFR0_PARANGE_40		0x2
- #define ID_AA64MMFR0_PARANGE_48		0x5
- #define ID_AA64MMFR0_PARANGE_52		0x6
++exit_handle_fn kvm_get_nvhe_exit_handler(struct kvm_vcpu *vcpu);
++
++static exit_handle_fn kvm_get_hyp_exit_handler(struct kvm_vcpu *vcpu)
++{
++	return is_nvhe_hyp_code() ? kvm_get_nvhe_exit_handler(vcpu) : NULL;
++}
++
++/*
++ * Allow the hypervisor to handle the exit with an exit handler if it has one.
++ *
++ * Returns true if the hypervisor handled the exit, and control should go back
++ * to the guest, or false if it hasn't.
++ */
++static bool kvm_hyp_handle_exit(struct kvm_vcpu *vcpu)
++{
++	bool is_handled = false;
++	exit_handle_fn exit_handler = kvm_get_hyp_exit_handler(vcpu);
++
++	if (exit_handler) {
++		/*
++		 * There's limited vcpu context here since it's not synced yet.
++		 * Ensure that relevant vcpu context that might be used by the
++		 * exit_handler is in sync before it's called and if handled.
++		 */
++		*vcpu_pc(vcpu) = read_sysreg_el2(SYS_ELR);
++		*vcpu_cpsr(vcpu) = read_sysreg_el2(SYS_SPSR);
++
++		is_handled = exit_handler(vcpu);
++
++		if (is_handled) {
++			write_sysreg_el2(*vcpu_pc(vcpu), SYS_ELR);
++			write_sysreg_el2(*vcpu_cpsr(vcpu), SYS_SPSR);
++		}
++	}
++
++	return is_handled;
++}
++
+ /*
+  * Return true when we were able to fixup the guest exit and should return to
+  * the guest, false when we should restore the host state and return to the
+@@ -496,6 +536,9 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 			goto guest;
+ 	}
  
-@@ -900,6 +903,7 @@
- #define ID_AA64MMFR2_CNP_SHIFT		0
++	/* Check if there's an exit handler and allow it to handle the exit. */
++	if (kvm_hyp_handle_exit(vcpu))
++		goto guest;
+ exit:
+ 	/* Return to the host kernel and handle the exit */
+ 	return false;
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index 86f3d6482935..b7f25307a7b9 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -158,6 +158,39 @@ static void __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
+ 		write_sysreg(pmu->events_host, pmcntenset_el0);
+ }
  
- /* id_aa64dfr0 */
-+#define ID_AA64DFR0_MTPMU_SHIFT		48
- #define ID_AA64DFR0_TRBE_SHIFT		44
- #define ID_AA64DFR0_TRACE_FILT_SHIFT	40
- #define ID_AA64DFR0_DOUBLELOCK_SHIFT	36
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 0ead8bfedf20..5b59fe5e26e4 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -239,8 +239,8 @@ static const struct arm64_ftr_bits ftr_id_aa64pfr0[] = {
- 	S_ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_FP_SHIFT, 4, ID_AA64PFR0_FP_NI),
- 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL3_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL2_SHIFT, 4, 0),
--	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_SHIFT, 4, ID_AA64PFR0_EL1_64BIT_ONLY),
--	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL0_SHIFT, 4, ID_AA64PFR0_EL0_64BIT_ONLY),
-+	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_SHIFT, 4, ID_AA64PFR0_ELx_64BIT_ONLY),
-+	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL0_SHIFT, 4, ID_AA64PFR0_ELx_64BIT_ONLY),
- 	ARM64_FTR_END,
- };
- 
-@@ -1956,7 +1956,7 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.sys_reg = SYS_ID_AA64PFR0_EL1,
- 		.sign = FTR_UNSIGNED,
- 		.field_pos = ID_AA64PFR0_EL0_SHIFT,
--		.min_field_value = ID_AA64PFR0_EL0_32BIT_64BIT,
-+		.min_field_value = ID_AA64PFR0_ELx_32BIT_64BIT,
- 	},
- #ifdef CONFIG_KVM
- 	{
-@@ -1967,7 +1967,7 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.sys_reg = SYS_ID_AA64PFR0_EL1,
- 		.sign = FTR_UNSIGNED,
- 		.field_pos = ID_AA64PFR0_EL1_SHIFT,
--		.min_field_value = ID_AA64PFR0_EL1_32BIT_64BIT,
-+		.min_field_value = ID_AA64PFR0_ELx_32BIT_64BIT,
- 	},
- 	{
- 		.desc = "Protected KVM",
++static exit_handle_fn hyp_exit_handlers[] = {
++	[0 ... ESR_ELx_EC_MAX]		= NULL,
++	[ESR_ELx_EC_WFx]		= NULL,
++	[ESR_ELx_EC_CP15_32]		= NULL,
++	[ESR_ELx_EC_CP15_64]		= NULL,
++	[ESR_ELx_EC_CP14_MR]		= NULL,
++	[ESR_ELx_EC_CP14_LS]		= NULL,
++	[ESR_ELx_EC_CP14_64]		= NULL,
++	[ESR_ELx_EC_HVC32]		= NULL,
++	[ESR_ELx_EC_SMC32]		= NULL,
++	[ESR_ELx_EC_HVC64]		= NULL,
++	[ESR_ELx_EC_SMC64]		= NULL,
++	[ESR_ELx_EC_SYS64]		= NULL,
++	[ESR_ELx_EC_SVE]		= NULL,
++	[ESR_ELx_EC_IABT_LOW]		= NULL,
++	[ESR_ELx_EC_DABT_LOW]		= NULL,
++	[ESR_ELx_EC_SOFTSTP_LOW]	= NULL,
++	[ESR_ELx_EC_WATCHPT_LOW]	= NULL,
++	[ESR_ELx_EC_BREAKPT_LOW]	= NULL,
++	[ESR_ELx_EC_BKPT32]		= NULL,
++	[ESR_ELx_EC_BRK64]		= NULL,
++	[ESR_ELx_EC_FP_ASIMD]		= NULL,
++	[ESR_ELx_EC_PAC]		= NULL,
++};
++
++exit_handle_fn kvm_get_nvhe_exit_handler(struct kvm_vcpu *vcpu)
++{
++	u32 esr = kvm_vcpu_get_esr(vcpu);
++	u8 esr_ec = ESR_ELx_EC(esr);
++
++	return hyp_exit_handlers[esr_ec];
++}
++
+ /* Switch to the guest for legacy non-VHE systems */
+ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ {
 -- 
 2.33.0.rc1.237.g0d66db33f3-goog
 
