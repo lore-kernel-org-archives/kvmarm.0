@@ -1,84 +1,85 @@
-Return-Path: <SRS0=9WlX=NH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=6VsV=NI=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65122C4320A
-	for <kvmarm@archiver.kernel.org>; Mon, 16 Aug 2021 21:30:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44512C4338F
+	for <kvmarm@archiver.kernel.org>; Tue, 17 Aug 2021 00:27:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1101C60E97
-	for <kvmarm@archiver.kernel.org>; Mon, 16 Aug 2021 21:30:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 1101C60E97
+	by mail.kernel.org (Postfix) with ESMTP id B1E2D60F58
+	for <kvmarm@archiver.kernel.org>; Tue, 17 Aug 2021 00:27:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org B1E2D60F58
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B6C5C4B0F7;
-	Mon, 16 Aug 2021 17:30:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 232BB4B0BC;
+	Mon, 16 Aug 2021 20:27:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id J1gGfwF8ocja; Mon, 16 Aug 2021 17:30:44 -0400 (EDT)
+	with ESMTP id GO8tDtCcqa60; Mon, 16 Aug 2021 20:26:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 49EB04B116;
-	Mon, 16 Aug 2021 17:30:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 350274B0E5;
+	Mon, 16 Aug 2021 20:26:56 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D7BAD4B0B9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Aug 2021 16:56:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 740AB4B0BC
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Aug 2021 20:26:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IfGW7fcMYo6p for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Aug 2021 16:56:28 -0400 (EDT)
-Received: from mail-vk1-f174.google.com (mail-vk1-f174.google.com
- [209.85.221.174])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C62094B0B4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Aug 2021 16:56:28 -0400 (EDT)
-Received: by mail-vk1-f174.google.com with SMTP id d30so4625539vkl.12
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Aug 2021 13:56:28 -0700 (PDT)
+ with ESMTP id NJT-Y6hHWuTJ for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 Aug 2021 20:26:54 -0400 (EDT)
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com
+ [209.85.214.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2DACB4B0EC
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Aug 2021 20:26:54 -0400 (EDT)
+Received: by mail-pl1-f201.google.com with SMTP id
+ p7-20020a170902b087b029012c2879a885so11891894plr.6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Aug 2021 17:26:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=PAjqAgz4SbwhR4C2g99BnpgC4FJpr+PKslvtcBCtV7g=;
- b=Z0LdAVsVOA5UHNfiWH6pgQcaDfOI9yO7Prph0FcJkli65iCPGkn28i57u0iz4+rr/k
- 7vexRoGXmoPITr+5iwD1J66G3TX2bPkT/CXwyeVpXNo7GjzQ7AhRHto17gppMPSKbsWK
- RuJRGjnJZUEvu08KT6euDd9I6tm7GraORU6AK3mdU3PHuwzqhr90lo9viERzvg1NotTN
- SQEOnKw/W7fs/3/6pADSnP1TY1XrkH/jkzfAZhWNNJ5qAQpDVTkOjbT7l7Uy0t3/vrRN
- MMadQi9Wh82FRxI2kmi5Jl9OwXaKDExXlsgp1jDNN4pukiE+JblEQPerb0tNc5/nkAmI
- uLlA==
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=GmFYFWgSJqnYvi5uzE7wopljyXsB3O7OfGsKWKCJGuY=;
+ b=b4f1FMtWLjJ9VYPvJ9oT6EDEBvLQnL/BGyFRDQvrfDTfhb/IPPcBSbd2AzesdLwfxg
+ bxUJuh3+aPqAi8foBEiinZTVoFhUv176g47LSxpy9liUchTLJS9ngNH4whJOedOlHVTZ
+ 8Uvq00WwgvyiWrrWjeESLEcjTBevgNer8H7o2acqcvKM7ZHizu6tzw2EuOC/4HvamaRq
+ 0f6W98eLb2ofHtM1vizH8yxC7vt5oLiyCDEWUFE6qi0w5T+G9fyc5IDG7DwL3kw/rCKM
+ zmrv739kbhLM5gPECbcHsF2HwQp0SgyKQwe/guyHZBFK0EAKNWGHtZZDTsOvlDPAA8Cx
+ iYBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=PAjqAgz4SbwhR4C2g99BnpgC4FJpr+PKslvtcBCtV7g=;
- b=RUHuFXwW7mqZfjeGLT9mbNbIex+Kv0NzVLNgTpd/FD5uWg11bUgWp8xvsNN9djAcos
- XL87I4fHfmoeRUCHHHd1sXeZOKvosY2DTjzqdc//elUSheyGFfRoiS64pkh71PCJ8zrA
- MNOvS+up4bKpYCAojDTLNVQAABUGteT0KJ5mHhvwOMxMjNr5cWuhuSQJ1ySGIQJiA50w
- yI1n6dsTYhC+7ait3GHxUZQyDMyBBlUCLOUhccd/h+UKHthvvNUVK9vXbJlmb0xCF2Xz
- X8KdZHZvWhZKAohiCDc2rZS4y+5KmxoEE2Z0iEU+RXV8rjUQpgrGcXyIVayn1fUGbZ1h
- B8DA==
-X-Gm-Message-State: AOAM531bZG/hc3/ZOBVxIThXr741ywywP20ZGNy9+KrRMeWlAPCibPSG
- pMAZFBdLJyfYiagU8ixoYuxgVs6auCgRor25geTeyg==
-X-Google-Smtp-Source: ABdhPJwFYs1vFOV9d+q8kCyHbjok7b0AZnXTp2WBYai2NMcFXOwpP6G4PDTDMv1OQqhNCSOcya9L68gfllHl5OFFeZI=
-X-Received: by 2002:a1f:bfc4:: with SMTP id p187mr407300vkf.17.1629147388071; 
- Mon, 16 Aug 2021 13:56:28 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210813211211.2983293-1-rananta@google.com>
- <20210816121548.y5w624yhrql2trzt@gator.home>
-In-Reply-To: <20210816121548.y5w624yhrql2trzt@gator.home>
-From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Mon, 16 Aug 2021 13:56:17 -0700
-Message-ID: <CAJHc60yqNcpmDCmSehVb6uDeu+FF--aPhwJ9ZBTAcJCPBVR=1Q@mail.gmail.com>
-Subject: Re: [PATCH 00/10] KVM: arm64: selftests: Introduce arch_timer selftest
-To: Andrew Jones <drjones@redhat.com>
-X-Mailman-Approved-At: Mon, 16 Aug 2021 17:30:36 -0400
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- kvmarm@lists.cs.columbia.edu
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=GmFYFWgSJqnYvi5uzE7wopljyXsB3O7OfGsKWKCJGuY=;
+ b=ZtPPR2rRr5StwWNX1GKKrFZRiTtGkG/J3lU/b/Yi/pwVM3mU+873iMRiL4B09tWZRE
+ YBXUMu3EDIncX534F+mcxeTZu/wyJfZoJVyS114miIXQF0zVqyDo8ZUqEoJDJZyRIL5B
+ qY1ffrsDdDYIVsUOmBxgWSu6+R204UpW7VXc1F+mn31KFS7bsgKkZAq5odR6lO2cAOWp
+ stUfyfMLdDD5vSBQfG7xflbnsBjTMdeb8ydfPHBngF5Y6onJG1gmxrb5DQ1wv5cVdMbD
+ AuMJOGBE3MgHhZQdv4d0dMV3o/vO4PO3+K6RUL0limWWJjjKlG36lqIiWMLg3XrNwBn/
+ NqIQ==
+X-Gm-Message-State: AOAM5305xpEhl+zg1lLSbcojnXmtfi2GLPuYmRqb+pzEQzDpm/G4d7WN
+ OUVjRNLIiix/9MGTK7jGSTZRfOXXikD9grHHAw==
+X-Google-Smtp-Source: ABdhPJyFaF0EVkxwXDmU6xb8bee1RXFu3kmq7woIq1DfWxoQUoXXuCJt0ujRSFs/vD/RyaMoFKYq5CC/RLU8ApIr4Q==
+X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
+ (user=jingzhangos job=sendgmr) by
+ 2002:a17:902:cec3:b0:12d:92c4:1ea6 with
+ SMTP id d3-20020a170902cec300b0012d92c41ea6mr563343plg.36.1629160013007; Mon,
+ 16 Aug 2021 17:26:53 -0700 (PDT)
+Date: Tue, 17 Aug 2021 00:26:39 +0000
+Message-Id: <20210817002639.3856694-1-jingzhangos@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
+Subject: [PATCH] KVM: stats: Add VM stat for remote tlb flush requests
+From: Jing Zhang <jingzhangos@google.com>
+To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>, 
+ Paolo Bonzini <pbonzini@redhat.com>, David Matlack <dmatlack@google.com>, 
+ Peter Shier <pshier@google.com>, Oliver Upton <oupton@google.com>,
+ Marc Zyngier <maz@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -95,76 +96,74 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Aug 16, 2021 at 5:15 AM Andrew Jones <drjones@redhat.com> wrote:
->
-> On Fri, Aug 13, 2021 at 09:12:01PM +0000, Raghavendra Rao Ananta wrote:
-> > Hello,
-> >
-> > The patch series adds a KVM selftest to validate the behavior of
-> > ARM's generic timer (patch-10). The test programs the timer IRQs
-> > periodically, and for each interrupt, it validates the behaviour
-> > against the architecture specifications. The test further provides
-> > a command-line interface to configure the number of vCPUs, the
-> > period of the timer, and the number of iterations that the test
-> > has to run for.
-> >
-> > Since the test heavily depends on interrupts, the patch series also
-> > adds a basic support for ARM Generic Interrupt Controller v3 (GICv3)
-> > to the KVM's aarch64 selftest framework (patch-9).
-> >
-> > Furthermore, additional processor utilities such as accessing the MMIO
-> > (via readl/writel), read/write to assembler unsupported registers,
-> > basic delay generation, enable/disable local IRQs, spinlock support,
-> > and so on, are also introduced that the test/GICv3 takes advantage of.
-> > These are presented in patches 1 through 8.
-> >
-> > The patch series, specifically the library support, is derived from the
-> > kvm-unit-tests and the kernel itself.
-> >
->
-> Hi Raghavendra,
->
-> I appreciate the new support being added to aarch64 kselftests in order to
-> support new tests. I'm curious as to why the kvm-unit-tests timer test
-> wasn't extended instead, though. Also, I'm curious if you've seen any
-> room for improvements to the kvm-unit-tests code and, if so, if you plan
-> to submit patches for those improvements.
+Add a new stat that counts the number of times a remote TLB flush is
+requested, regardless of whether it kicks vCPUs out of guest mode. This
+allows us to look at how often flushes are initiated.
 
+Original-by: David Matlack <dmatlack@google.com>
+Signed-off-by: Jing Zhang <jingzhangos@google.com>
+---
+ arch/arm64/kvm/mmu.c      | 1 +
+ include/linux/kvm_host.h  | 3 ++-
+ include/linux/kvm_types.h | 1 +
+ virt/kvm/kvm_main.c       | 1 +
+ 4 files changed, 5 insertions(+), 1 deletion(-)
 
-Hi  Andrew,
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 0625bf2353c2..f5bb235bbb59 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -80,6 +80,7 @@ static bool memslot_is_logging(struct kvm_memory_slot *memslot)
+  */
+ void kvm_flush_remote_tlbs(struct kvm *kvm)
+ {
++	++kvm->stat.generic.remote_tlb_flush_requests;
+ 	kvm_call_hyp(__kvm_tlb_flush_vmid, &kvm->arch.mmu);
+ }
+ 
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index d447b21cdd73..27cb69e564cb 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1444,7 +1444,8 @@ struct _kvm_stats_desc {
+ 		KVM_STATS_BASE_POW10, -9, sz)
+ 
+ #define KVM_GENERIC_VM_STATS()						       \
+-	STATS_DESC_COUNTER(VM_GENERIC, remote_tlb_flush)
++	STATS_DESC_COUNTER(VM_GENERIC, remote_tlb_flush),		       \
++	STATS_DESC_COUNTER(VM_GENERIC, remote_tlb_flush_requests)
+ 
+ #define KVM_GENERIC_VCPU_STATS()					       \
+ 	STATS_DESC_COUNTER(VCPU_GENERIC, halt_successful_poll),		       \
+diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
+index de7fb5f364d8..2237abb93ccd 100644
+--- a/include/linux/kvm_types.h
++++ b/include/linux/kvm_types.h
+@@ -80,6 +80,7 @@ struct kvm_mmu_memory_cache {
+ 
+ struct kvm_vm_stat_generic {
+ 	u64 remote_tlb_flush;
++	u64 remote_tlb_flush_requests;
+ };
+ 
+ struct kvm_vcpu_stat_generic {
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 3e67c93ca403..26b77ab98a04 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -318,6 +318,7 @@ void kvm_flush_remote_tlbs(struct kvm *kvm)
+ 	 */
+ 	long dirty_count = smp_load_acquire(&kvm->tlbs_dirty);
+ 
++	++kvm->stat.generic.remote_tlb_flush_requests;
+ 	/*
+ 	 * We want to publish modifications to the page tables before reading
+ 	 * mode. Pairs with a memory barrier in arch-specific code.
 
-Interesting question! It's more about ease and flexibility in
-controlling the guest via the VMM-
-Since arch_timer's interface is mostly per-CPU, we'd like to extend
-this test case to be
-more stressful, such as migrating the vCPUs across pCPUs rapidly, or
-even affining
-a large number of vCPUs to a single pCPU, and so on.
+base-commit: a3e0b8bd99ab098514bde2434301fa6fde040da2
+-- 
+2.33.0.rc1.237.g0d66db33f3-goog
 
-On the other hand, since the patch series brings-in a lot of aarch64
-goodies with it,
-such as interrupt support, it might encourage others to add more arch
-specific tests
-easily :) For example, we also plan to add tests that verifies KVM
-interface for interrupts,
-for which the GIC support in the series would come handy.
-
-I'm still gaining understanding of kvm-unit-tests. However, I'm
-curious to know your thoughts as
-well in-support of kvm-unit-tests.
-
-Unfortunately, I don't have any immediate plans to submit patches on
-arch_timer for
-kvm-unit-tests.
-
-Thanks,
-Raghavendra
-
->
->
-> Thanks,
-> drew
->
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
