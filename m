@@ -7,75 +7,76 @@ X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB2AAC432BE
-	for <kvmarm@archiver.kernel.org>; Tue, 17 Aug 2021 08:12:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AB21C4320A
+	for <kvmarm@archiver.kernel.org>; Tue, 17 Aug 2021 08:12:27 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8D06160F58
+	by mail.kernel.org (Postfix) with ESMTP id F205460F58
 	for <kvmarm@archiver.kernel.org>; Tue, 17 Aug 2021 08:12:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 8D06160F58
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org F205460F58
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 39ED84B145;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9EA554B16F;
 	Tue, 17 Aug 2021 04:12:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id O7dqRO0bHDBN; Tue, 17 Aug 2021 04:12:22 -0400 (EDT)
+	with ESMTP id IAFmpL5E7bFZ; Tue, 17 Aug 2021 04:12:22 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 87D494B19A;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 99F294B19D;
 	Tue, 17 Aug 2021 04:12:12 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 00C6A4B181
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 153734B156
  for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Aug 2021 04:12:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FzBLh6zDAr92 for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id xZ3g6TIoKcWh for <kvmarm@lists.cs.columbia.edu>;
  Tue, 17 Aug 2021 04:12:10 -0400 (EDT)
-Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com
- [209.85.219.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3DBBE4B156
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Aug 2021 04:12:04 -0400 (EDT)
-Received: by mail-qv1-f73.google.com with SMTP id
- s4-20020ad44b24000000b0035c77ac6861so11630292qvw.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Aug 2021 01:12:04 -0700 (PDT)
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com
+ [209.85.221.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D0F3C4B15A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Aug 2021 04:12:06 -0400 (EDT)
+Received: by mail-wr1-f73.google.com with SMTP id
+ z10-20020a5d440a0000b0290154e0f00348so6308745wrq.4
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Aug 2021 01:12:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=CiI5OAhgkZ42MHJT2zFxCH5sP5MyitED8/DF2mknSW8=;
- b=N2qruQnB57J1upAsUBNREhuAR3StiZe2QzZ5sJCUFNr7a3zSqoFVSMrJWMj6bHPTUK
- sVdDMSI+dJ/2JRgJ8G7NYagBFHT+BsSJASB/c9Y9FZjN/j1EhQL8ZYFI4QrA0gDqs0jC
- 2elLEehk23jjYdR5Hx9ZvwyBJA3KuoaOl8qY7/L784YKX0c0FHWN+05BCelz8E5rfgYS
- 9OXpPNBscLSGqXjwGNMw8ANyt8vZVJGLDn81YtH5QtnkigIIlnlB/oZD6JA5no2Yliw9
- UaUriYgFKVvMl273Yj5Z1x3GVVDTMO/Ctqzlkz4vX+gat3oxvr4o7/kY7fAK+aF7UkLF
- u4mQ==
+ :cc; bh=RY75TCp6EAmYPGA4I7+3iKQeuuwEdqY335GXVfnDS7k=;
+ b=JYCa6cCgNtWF/sF0Bltf5bVCZmJFXv4748Iy5bRGGb+tbvHOCstp6BQWGgNwnjAz++
+ ykeIvouot4Gx+7bHS4lR/vf4n38EIQV5c0vwbqfIxMWQ0Duh2plc+Z1hOYwMDf/PE7ii
+ vrpDAnMRve8T7iTnx6xxkIr8J6d4/pGuQTJBcGtf72MnjQEoMT5z3cZE0IFKB4vIYZ8N
+ Qyi+s2nQAKNGBdoqQCdd1Xj7jHpqX8ASK00m5yoxaaItWnRhIdmYBTuHaw8wSd2taDTR
+ qMDZNZI/1U33C12jgjXOkicmnbPFKTwXX6/BXOCPPyKK1haKx+ejllyelOjzD62GHB4r
+ Khbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=CiI5OAhgkZ42MHJT2zFxCH5sP5MyitED8/DF2mknSW8=;
- b=Cl5zdFxV5K1FnU8OolE0IJyQgcvr3ZXQfq2dg7BzYfmKGIrJe0hmjaQb3WLlkg4qS6
- N6Nn9LH1z8FC4rQb1+aOBW6kWzszE2xd+E2jKmGcKP9I2No48c9+AI64D/PqwRcjhP6f
- +I8Nclq9DF+6GPJFqkAXlh4UglZZNZuIJBQED0DbmwfUoHZz8H3dMEHqH0snlBDHd3dA
- jTtflR/Tv7cMONJB0C48fkolExO12vHVhYQyACOMC7PVrQuAlusa0rvrvhcjYQqHtKNV
- WCpMHM/cA0rk+BQMT+7mM9sgvkvbxZitJj8JF8RIFxe5SaOSZ3YAWvEC2w9Xxdta13Vn
- Xy6w==
-X-Gm-Message-State: AOAM531jh78lFjZkI8KwNbE4hUQLRUudKzKW2+rcVWHg/2pJO6rnMtoA
- Xzgg2L8KQYQNgKMbTSp0yqimaL5apNtWA5p9IYMF96AjNd17tzhl6zamAtxOnOp/sAOdo8Vg2Su
- 97zxLsCoVWI8bk1gFcAbvUf+6BJ/9fbxDINT4bO8qfgozy7X0aXRxejMXEE7fjVVSW2A=
-X-Google-Smtp-Source: ABdhPJx3EYuucuTVJB6wfR0mR5/W7Jcy3V7XAywnfoLLIN/YNpK/SPf6PSNDn9Ub/h9uKoQlJkPSo44QGg==
+ bh=RY75TCp6EAmYPGA4I7+3iKQeuuwEdqY335GXVfnDS7k=;
+ b=REiak6REsKIzUwLXzT6e/rXlrbXXWi/PDm/aBWVkS2VrVFvlFQntaRkQbcCac/CAP9
+ VJf4O7O9GKnMF+0yV4hRGvbN6kEvKFpXYa8vjdxqe9+YtW1PwlAWIwPvX0kZ06Vom1wv
+ 5ifzgCvqki44gWUB90+B2B/QyTm6IfdVN6juHK7iELkAfaLgU9TEdXnUumkZTvdigkt8
+ yl+ycKo98Gskggd4ld1Hg0F9gT9WRZQSvDUl30ijQj6vr2HEca9QS5tR3yKbt6YZ8qY5
+ xEhHenR6NAL/hds3pw4hQxBuE9jjx6d9XQh2TtljSTUiu2U3R8qQoDrldx4sxoD3T0CO
+ b+Nw==
+X-Gm-Message-State: AOAM530IyI+LWCk3B9QbDPHzJrVaemlRv9LBtDGEf5Sf1Bo2ZbS0Dszr
+ zl7xGoiKWAcQ1wWvMb/82efWyQ1ZKuJ7dyzP/mkH7N7VfdxoyUSslLjIZbHCzo490aBNdy2FRbn
+ /mPuCtTFlXFyGij7huvhjbed5739iwd9/tWdF6GemJ8nL6Mdc3Wdkgoix9WscmXZ0sgs=
+X-Google-Smtp-Source: ABdhPJy/OtVFqjYy4H9XKyK309GPg+Qg6SCvxgN3Qdf+Y2tTkAyZkPf+vBPU02aV6SLjKwZnco28Op+O2Q==
 X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:482])
- (user=tabba job=sendgmr) by 2002:a05:6214:10c4:: with SMTP id
- r4mr2134781qvs.58.1629187923801; Tue, 17 Aug 2021 01:12:03 -0700 (PDT)
-Date: Tue, 17 Aug 2021 09:11:32 +0100
+ (user=tabba job=sendgmr) by 2002:a1c:32c1:: with SMTP id
+ y184mr2010593wmy.70.1629187925926; 
+ Tue, 17 Aug 2021 01:12:05 -0700 (PDT)
+Date: Tue, 17 Aug 2021 09:11:33 +0100
 In-Reply-To: <20210817081134.2918285-1-tabba@google.com>
-Message-Id: <20210817081134.2918285-14-tabba@google.com>
+Message-Id: <20210817081134.2918285-15-tabba@google.com>
 Mime-Version: 1.0
 References: <20210817081134.2918285-1-tabba@google.com>
 X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
-Subject: [PATCH v4 13/15] KVM: arm64: Move sanitized copies of CPU features
+Subject: [PATCH v4 14/15] KVM: arm64: Trap access to pVM restricted features
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: kernel-team@android.com, kvm@vger.kernel.org, maz@kernel.org,
@@ -96,49 +97,103 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Move the sanitized copies of the CPU feature registers to the
-recently created sys_regs.c. This consolidates all copies in a
-more relevant file.
+Trap accesses to restricted features for VMs running in protected
+mode.
 
-No functional change intended.
+Access to feature registers are emulated, and only supported
+features are exposed to protected VMs.
+
+Accesses to restricted registers as well as restricted
+instructions are trapped, and an undefined exception is injected
+into the protected guests, i.e., with EC = 0x0 (unknown reason).
+This EC is the one used, according to the Arm Architecture
+Reference Manual, for unallocated or undefined system registers
+or instructions.
+
+Only affects the functionality of protected VMs. Otherwise,
+should not affect non-protected VMs when KVM is running in
+protected mode.
 
 Acked-by: Will Deacon <will@kernel.org>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/mem_protect.c | 6 ------
- arch/arm64/kvm/hyp/nvhe/sys_regs.c    | 2 ++
- 2 files changed, 2 insertions(+), 6 deletions(-)
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  3 +++
+ arch/arm64/kvm/hyp/nvhe/switch.c        | 34 ++++++++++++++-----------
+ 2 files changed, 22 insertions(+), 15 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index d938ce95d3bd..925c7db7fa34 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -25,12 +25,6 @@ struct host_kvm host_kvm;
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 5a2b89b96c67..8431f1514280 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -33,6 +33,9 @@
+ extern struct exception_table_entry __start___kvm_ex_table;
+ extern struct exception_table_entry __stop___kvm_ex_table;
  
- static struct hyp_pool host_s2_pool;
++int kvm_handle_pvm_sys64(struct kvm_vcpu *vcpu);
++int kvm_handle_pvm_restricted(struct kvm_vcpu *vcpu);
++
+ /* Check whether the FP regs were dirtied while in the host-side run loop: */
+ static inline bool update_fp_enabled(struct kvm_vcpu *vcpu)
+ {
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index b7f25307a7b9..398e62098898 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -159,27 +159,27 @@ static void __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
+ }
  
--/*
-- * Copies of the host's CPU features registers holding sanitized values.
-- */
--u64 id_aa64mmfr0_el1_sys_val;
--u64 id_aa64mmfr1_el1_sys_val;
--
- static const u8 pkvm_hyp_id = 1;
+ static exit_handle_fn hyp_exit_handlers[] = {
+-	[0 ... ESR_ELx_EC_MAX]		= NULL,
++	[0 ... ESR_ELx_EC_MAX]		= kvm_handle_pvm_restricted,
+ 	[ESR_ELx_EC_WFx]		= NULL,
+-	[ESR_ELx_EC_CP15_32]		= NULL,
+-	[ESR_ELx_EC_CP15_64]		= NULL,
+-	[ESR_ELx_EC_CP14_MR]		= NULL,
+-	[ESR_ELx_EC_CP14_LS]		= NULL,
+-	[ESR_ELx_EC_CP14_64]		= NULL,
++	[ESR_ELx_EC_CP15_32]		= kvm_handle_pvm_restricted,
++	[ESR_ELx_EC_CP15_64]		= kvm_handle_pvm_restricted,
++	[ESR_ELx_EC_CP14_MR]		= kvm_handle_pvm_restricted,
++	[ESR_ELx_EC_CP14_LS]		= kvm_handle_pvm_restricted,
++	[ESR_ELx_EC_CP14_64]		= kvm_handle_pvm_restricted,
+ 	[ESR_ELx_EC_HVC32]		= NULL,
+ 	[ESR_ELx_EC_SMC32]		= NULL,
+ 	[ESR_ELx_EC_HVC64]		= NULL,
+ 	[ESR_ELx_EC_SMC64]		= NULL,
+-	[ESR_ELx_EC_SYS64]		= NULL,
+-	[ESR_ELx_EC_SVE]		= NULL,
++	[ESR_ELx_EC_SYS64]		= kvm_handle_pvm_sys64,
++	[ESR_ELx_EC_SVE]		= kvm_handle_pvm_restricted,
+ 	[ESR_ELx_EC_IABT_LOW]		= NULL,
+ 	[ESR_ELx_EC_DABT_LOW]		= NULL,
+-	[ESR_ELx_EC_SOFTSTP_LOW]	= NULL,
+-	[ESR_ELx_EC_WATCHPT_LOW]	= NULL,
+-	[ESR_ELx_EC_BREAKPT_LOW]	= NULL,
+-	[ESR_ELx_EC_BKPT32]		= NULL,
+-	[ESR_ELx_EC_BRK64]		= NULL,
+-	[ESR_ELx_EC_FP_ASIMD]		= NULL,
++	[ESR_ELx_EC_SOFTSTP_LOW]	= kvm_handle_pvm_restricted,
++	[ESR_ELx_EC_WATCHPT_LOW]	= kvm_handle_pvm_restricted,
++	[ESR_ELx_EC_BREAKPT_LOW]	= kvm_handle_pvm_restricted,
++	[ESR_ELx_EC_BKPT32]		= kvm_handle_pvm_restricted,
++	[ESR_ELx_EC_BRK64]		= kvm_handle_pvm_restricted,
++	[ESR_ELx_EC_FP_ASIMD]		= kvm_handle_pvm_restricted,
+ 	[ESR_ELx_EC_PAC]		= NULL,
+ };
  
- static void *host_s2_zalloc_pages_exact(size_t size)
-diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-index cd126d45cbcc..d641bae0467d 100644
---- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-+++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-@@ -20,6 +20,8 @@
-  */
- u64 id_aa64pfr0_el1_sys_val;
- u64 id_aa64pfr1_el1_sys_val;
-+u64 id_aa64mmfr0_el1_sys_val;
-+u64 id_aa64mmfr1_el1_sys_val;
- u64 id_aa64mmfr2_el1_sys_val;
+@@ -188,7 +188,11 @@ exit_handle_fn kvm_get_nvhe_exit_handler(struct kvm_vcpu *vcpu)
+ 	u32 esr = kvm_vcpu_get_esr(vcpu);
+ 	u8 esr_ec = ESR_ELx_EC(esr);
  
- /*
+-	return hyp_exit_handlers[esr_ec];
++	/* For now, only protected VMs have exit handlers. */
++	if (unlikely(kvm_vm_is_protected(kern_hyp_va(vcpu->kvm))))
++		return hyp_exit_handlers[esr_ec];
++	else
++		return NULL;
+ }
+ 
+ /* Switch to the guest for legacy non-VHE systems */
 -- 
 2.33.0.rc1.237.g0d66db33f3-goog
 
