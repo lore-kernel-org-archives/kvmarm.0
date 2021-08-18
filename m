@@ -6,55 +6,55 @@ X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45E9FC4338F
-	for <kvmarm@archiver.kernel.org>; Wed, 18 Aug 2021 10:06:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD68CC4338F
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Aug 2021 10:38:14 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 982956108F
-	for <kvmarm@archiver.kernel.org>; Wed, 18 Aug 2021 10:06:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 982956108F
+	by mail.kernel.org (Postfix) with ESMTP id 3774A6103A
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Aug 2021 10:38:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 3774A6103A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D8F324086F;
-	Wed, 18 Aug 2021 06:06:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B7DBC4A198;
+	Wed, 18 Aug 2021 06:38:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id PmRW+IYQB8iA; Wed, 18 Aug 2021 06:06:35 -0400 (EDT)
+	with ESMTP id 71S9ngVlATFk; Wed, 18 Aug 2021 06:38:08 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 69E054AEE2;
-	Wed, 18 Aug 2021 06:06:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 92CBE4A1FA;
+	Wed, 18 Aug 2021 06:38:08 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CDC2A4B08B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Aug 2021 06:06:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B78A14A193
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Aug 2021 06:38:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JxgnIoKZvh-F for <kvmarm@lists.cs.columbia.edu>;
- Wed, 18 Aug 2021 06:06:32 -0400 (EDT)
+ with ESMTP id I4sIhVoVegEX for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 18 Aug 2021 06:38:05 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9C15F4AEE2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Aug 2021 06:06:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 76BA64A173
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Aug 2021 06:38:05 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 6E7EA60524;
- Wed, 18 Aug 2021 10:06:31 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 6C8D76108E;
+ Wed, 18 Aug 2021 10:38:04 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mGISr-005iqf-IV; Wed, 18 Aug 2021 11:06:29 +0100
-Date: Wed, 18 Aug 2021 11:06:28 +0100
-Message-ID: <87sfz7rrrv.wl-maz@kernel.org>
+ id 1mGIxO-005jGE-Hj; Wed, 18 Aug 2021 11:38:02 +0100
+Date: Wed, 18 Aug 2021 11:38:02 +0100
+Message-ID: <87r1errqb9.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oupton@google.com>
-Subject: Re: [PATCH 1/4] KVM: arm64: Fix read-side race on updates to vcpu
- reset state
-In-Reply-To: <20210818085047.1005285-2-oupton@google.com>
+Subject: Re: [PATCH 2/4] KVM: arm64: Handle PSCI resets before userspace
+ touches vCPU state
+In-Reply-To: <20210818085047.1005285-3-oupton@google.com>
 References: <20210818085047.1005285-1-oupton@google.com>
- <20210818085047.1005285-2-oupton@google.com>
+ <20210818085047.1005285-3-oupton@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -85,77 +85,69 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 18 Aug 2021 09:50:44 +0100,
+On Wed, 18 Aug 2021 09:50:45 +0100,
 Oliver Upton <oupton@google.com> wrote:
 > 
-> KVM correctly serializes writes to a vCPU's reset state, however since
-> we do not take the KVM lock on the read side it is entirely possible to
-> read state from two different reset requests.
+> The CPU_ON PSCI call takes a payload that KVM uses to configure a
+> destination vCPU to run. This payload is non-architectural state and not
+> exposed through any existing UAPI. Effectively, we have a race between
+> CPU_ON and userspace saving/restoring a guest: if the target vCPU isn't
+> ran again before the VMM saves its state, the requested PC and context
+> ID are lost. When restored, the target vCPU will be runnable and start
+> executing at its old PC.
 > 
-> Cure the race for now by taking the KVM lock when reading the
-> reset_state structure.
-> 
+> We can avoid this race by making sure the reset payload is serviced
+> before userspace can access a vCPU's state. This is, of course, a hairy
+> ugly hack. A benefit of such a hack, though, is that we've managed to
+> massage the reset state into the architected state, thereby making it
+> migratable without forcing userspace to play our game with a UAPI
+> addition.
+
+I don't think it is that bad. In a way, it is similar to the "resync
+pending exception state" dance that we do on vcpu exit to userspace.
+One thing to note is that it only works because this is done from the
+vcpu thread itself.
+
+>
 > Fixes: 358b28f09f0a ("arm/arm64: KVM: Allow a VCPU to fully reset itself")
 > Signed-off-by: Oliver Upton <oupton@google.com>
 > ---
->  arch/arm64/kvm/reset.c | 16 ++++++++++------
->  1 file changed, 10 insertions(+), 6 deletions(-)
+> I really hate this, but my imagination is failing me on any other way to
+> cure the race without cluing in userspace. Any ideas?
 > 
-> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> index 18ffc6ad67b8..3507e64ff8ad 100644
-> --- a/arch/arm64/kvm/reset.c
-> +++ b/arch/arm64/kvm/reset.c
-> @@ -210,10 +210,16 @@ static bool vcpu_allowed_register_width(struct kvm_vcpu *vcpu)
->   */
->  int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
->  {
-> +	struct vcpu_reset_state reset_state;
->  	int ret;
->  	bool loaded;
->  	u32 pstate;
+>  arch/arm64/kvm/arm.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 0de4b41c3706..6b124c29c663 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1216,6 +1216,15 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>  		if (copy_from_user(&reg, argp, sizeof(reg)))
+>  			break;
 >  
-> +	mutex_lock(&vcpu->kvm->lock);
-> +	memcpy(&reset_state, &vcpu->arch.reset_state, sizeof(reset_state));
+> +		/*
+> +		 * ugly hack. We could owe a reset due to PSCI and not yet
+> +		 * serviced it. Prevent userspace from reading/writing state
+> +		 * that will be clobbered by the eventual handling of the reset
+> +		 * bit.
 
-nit: "reset_state = vcpu->arch.reset_state;" should do the trick.
+This reads a bit odd. You are taking care of two potential issues in
+one go here:
+- userspace writes won't be overwritten by a pending reset as they
+will take place after said reset
+- userspace reads will reflect the state of the freshly reset CPU
+instead of some stale state
 
-> +	vcpu->arch.reset_state.reset = false;
-
-We should probably need to upgrade this to a WRITE_ONCE() to match the
-PSCI side.
-
-> +	mutex_unlock(&vcpu->kvm->lock);
+> +		 */
+> +		if (kvm_check_request(KVM_REQ_VCPU_RESET, vcpu))
+> +			kvm_reset_vcpu(vcpu);
 > +
->  	/* Reset PMU outside of the non-preemptible section */
->  	kvm_pmu_vcpu_reset(vcpu);
->  
-> @@ -276,8 +282,8 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
->  	 * Additional reset state handling that PSCI may have imposed on us.
->  	 * Must be done after all the sys_reg reset.
->  	 */
-> -	if (vcpu->arch.reset_state.reset) {
-> -		unsigned long target_pc = vcpu->arch.reset_state.pc;
-> +	if (reset_state.reset) {
-> +		unsigned long target_pc = reset_state.pc;
->  
->  		/* Gracefully handle Thumb2 entry point */
->  		if (vcpu_mode_is_32bit(vcpu) && (target_pc & 1)) {
-> @@ -286,13 +292,11 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
->  		}
->  
->  		/* Propagate caller endianness */
-> -		if (vcpu->arch.reset_state.be)
-> +		if (reset_state.be)
->  			kvm_vcpu_set_be(vcpu);
->  
->  		*vcpu_pc(vcpu) = target_pc;
-> -		vcpu_set_reg(vcpu, 0, vcpu->arch.reset_state.r0);
-> -
-> -		vcpu->arch.reset_state.reset = false;
-> +		vcpu_set_reg(vcpu, 0, reset_state.r0);
->  	}
->  
->  	/* Reset timer */
+>  		if (ioctl == KVM_SET_ONE_REG)
+>  			r = kvm_arm_set_reg(vcpu, &reg);
+>  		else
+
+Otherwise, well spotted.
 
 Thanks,
 
