@@ -4,56 +4,56 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8D5DC4338F
-	for <kvmarm@archiver.kernel.org>; Wed, 18 Aug 2021 14:42:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17321C432BE
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Aug 2021 15:16:16 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 50081610CF
-	for <kvmarm@archiver.kernel.org>; Wed, 18 Aug 2021 14:42:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 50081610CF
+	by mail.kernel.org (Postfix) with ESMTP id 7E5DE6104F
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Aug 2021 15:16:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 7E5DE6104F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E85E54A523;
-	Wed, 18 Aug 2021 10:42:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B8D740617;
+	Wed, 18 Aug 2021 11:16:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6+gq4rYUdwhY; Wed, 18 Aug 2021 10:42:28 -0400 (EDT)
+	with ESMTP id GspcoVleVidr; Wed, 18 Aug 2021 11:16:09 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C5D934B0C2;
-	Wed, 18 Aug 2021 10:42:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EB79B4A1A5;
+	Wed, 18 Aug 2021 11:16:09 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 296134A524
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Aug 2021 10:42:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 206774B0E1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Aug 2021 11:16:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Hf81rUqEUSHb for <kvmarm@lists.cs.columbia.edu>;
- Wed, 18 Aug 2021 10:42:27 -0400 (EDT)
+ with ESMTP id 39jdTn6rzZ90 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 18 Aug 2021 11:16:08 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D111B4A523
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Aug 2021 10:42:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E10B04A1B0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Aug 2021 11:16:07 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 085CB6108D;
- Wed, 18 Aug 2021 14:42:26 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id E8BE961042;
+ Wed, 18 Aug 2021 15:16:06 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mGMlr-005mN8-Hi; Wed, 18 Aug 2021 15:42:23 +0100
-Date: Wed, 18 Aug 2021 15:42:23 +0100
-Message-ID: <87im02stkg.wl-maz@kernel.org>
+ id 1mGNIS-005mkS-Rq; Wed, 18 Aug 2021 16:16:05 +0100
+Date: Wed, 18 Aug 2021 16:16:04 +0100
+Message-ID: <87h7fmss0b.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH v4 06/15] KVM: arm64: Restore mdcr_el2 from vcpu
-In-Reply-To: <20210817081134.2918285-7-tabba@google.com>
+Subject: Re: [PATCH v4 10/15] KVM: arm64: Add config register bit definitions
+In-Reply-To: <20210817081134.2918285-11-tabba@google.com>
 References: <20210817081134.2918285-1-tabba@google.com>
- <20210817081134.2918285-7-tabba@google.com>
+ <20210817081134.2918285-11-tabba@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -87,123 +87,86 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 17 Aug 2021 09:11:25 +0100,
+On Tue, 17 Aug 2021 09:11:29 +0100,
 Fuad Tabba <tabba@google.com> wrote:
 > 
-> On deactivating traps, restore the value of mdcr_el2 from the
-> newly created and preserved host value vcpu context, rather than
-> directly reading the hardware register.
-> 
-> Up until and including this patch the two values are the same,
-> i.e., the hardware register and the vcpu one. A future patch will
-> be changing the value of mdcr_el2 on activating traps, and this
-> ensures that its value will be restored.
+> Add hardware configuration register bit definitions for HCR_EL2
+> and MDCR_EL2. Future patches toggle these hyp configuration
+> register bits to trap on certain accesses.
 > 
 > No functional change intended.
 > 
+> Acked-by: Will Deacon <will@kernel.org>
 > Signed-off-by: Fuad Tabba <tabba@google.com>
 > ---
->  arch/arm64/include/asm/kvm_host.h       |  5 ++++-
->  arch/arm64/include/asm/kvm_hyp.h        |  2 +-
->  arch/arm64/kvm/hyp/include/hyp/switch.h |  6 +++++-
->  arch/arm64/kvm/hyp/nvhe/switch.c        | 13 +++++--------
->  arch/arm64/kvm/hyp/vhe/switch.c         | 14 +++++---------
->  arch/arm64/kvm/hyp/vhe/sysreg-sr.c      |  2 +-
->  6 files changed, 21 insertions(+), 21 deletions(-)
+>  arch/arm64/include/asm/kvm_arm.h | 22 ++++++++++++++++++++++
+>  1 file changed, 22 insertions(+)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 4d2d974c1522..76462c6a91ee 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -287,10 +287,13 @@ struct kvm_vcpu_arch {
->  	/* Stage 2 paging state used by the hardware on next switch */
->  	struct kvm_s2_mmu *hw_mmu;
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index a928b2dc0b0f..327120c0089f 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -12,8 +12,13 @@
+>  #include <asm/types.h>
 >  
-> -	/* HYP configuration */
-> +	/* Values of trap registers for the guest. */
->  	u64 hcr_el2;
->  	u64 mdcr_el2;
->  
-> +	/* Values of trap registers for the host before guest entry. */
-> +	u64 mdcr_el2_host;
-
-This probably should then eventually replace the per-CPU copy of
-mdcr_el2 that lives in debug.c, shouldn't it?
-
+>  /* Hyp Configuration Register (HCR) bits */
 > +
->  	/* Exception Information */
->  	struct kvm_vcpu_fault_info fault;
+> +#define HCR_TID5	(UL(1) << 58)
+> +#define HCR_DCT		(UL(1) << 57)
+>  #define HCR_ATA_SHIFT	56
+>  #define HCR_ATA		(UL(1) << HCR_ATA_SHIFT)
+> +#define HCR_AMVOFFEN	(UL(1) << 51)
+> +#define HCR_FIEN	(UL(1) << 47)
+>  #define HCR_FWB		(UL(1) << 46)
+>  #define HCR_API		(UL(1) << 41)
+>  #define HCR_APK		(UL(1) << 40)
+> @@ -56,6 +61,7 @@
+>  #define HCR_PTW		(UL(1) << 2)
+>  #define HCR_SWIO	(UL(1) << 1)
+>  #define HCR_VM		(UL(1) << 0)
+> +#define HCR_RES0	((UL(1) << 48) | (UL(1) << 39))
 >  
-> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-> index 9d60b3006efc..657d0c94cf82 100644
-> --- a/arch/arm64/include/asm/kvm_hyp.h
-> +++ b/arch/arm64/include/asm/kvm_hyp.h
-> @@ -95,7 +95,7 @@ void __sve_restore_state(void *sve_pffr, u32 *fpsr);
+>  /*
+>   * The bits we set in HCR:
+> @@ -277,11 +283,21 @@
+>  #define CPTR_EL2_TZ	(1 << 8)
+>  #define CPTR_NVHE_EL2_RES1	0x000032ff /* known RES1 bits in CPTR_EL2 (nVHE) */
+>  #define CPTR_EL2_DEFAULT	CPTR_NVHE_EL2_RES1
+> +#define CPTR_NVHE_EL2_RES0	(GENMASK(63, 32) |	\
+> +				 GENMASK(29, 21) |	\
+> +				 GENMASK(19, 14) |	\
+> +				 BIT(11))
 >  
->  #ifndef __KVM_NVHE_HYPERVISOR__
->  void activate_traps_vhe_load(struct kvm_vcpu *vcpu);
-> -void deactivate_traps_vhe_put(void);
-> +void deactivate_traps_vhe_put(struct kvm_vcpu *vcpu);
->  #endif
->  
->  u64 __guest_enter(struct kvm_vcpu *vcpu);
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index e4a2f295a394..a0e78a6027be 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -92,11 +92,15 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
->  		write_sysreg(0, pmselr_el0);
->  		write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
->  	}
-> +
-> +	vcpu->arch.mdcr_el2_host = read_sysreg(mdcr_el2);
->  	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
->  }
->  
-> -static inline void __deactivate_traps_common(void)
-> +static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
->  {
-> +	write_sysreg(vcpu->arch.mdcr_el2_host, mdcr_el2);
-> +
->  	write_sysreg(0, hstr_el2);
->  	if (kvm_arm_support_pmu_v3())
->  		write_sysreg(0, pmuserenr_el0);
-> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-> index f7af9688c1f7..2ea764a48958 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-> @@ -69,12 +69,10 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
->  static void __deactivate_traps(struct kvm_vcpu *vcpu)
->  {
->  	extern char __kvm_hyp_host_vector[];
-> -	u64 mdcr_el2, cptr;
-> +	u64 cptr;
->  
->  	___deactivate_traps(vcpu);
->  
-> -	mdcr_el2 = read_sysreg(mdcr_el2);
-> -
->  	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
->  		u64 val;
->  
-> @@ -92,13 +90,12 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
->  		isb();
->  	}
->  
-> -	__deactivate_traps_common();
-> +	vcpu->arch.mdcr_el2_host &= MDCR_EL2_HPMN_MASK |
-> +				    MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT |
-> +				    MDCR_EL2_E2TB_MASK << MDCR_EL2_E2TB_SHIFT;
->  
-> -	mdcr_el2 &= MDCR_EL2_HPMN_MASK;
-> -	mdcr_el2 |= MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT;
-> -	mdcr_el2 |= MDCR_EL2_E2TB_MASK << MDCR_EL2_E2TB_SHIFT;
-> +	__deactivate_traps_common(vcpu);
->  
-> -	write_sysreg(mdcr_el2, mdcr_el2);
+>  /* Hyp Debug Configuration Register bits */
+>  #define MDCR_EL2_E2TB_MASK	(UL(0x3))
+>  #define MDCR_EL2_E2TB_SHIFT	(UL(24))
+> +#define MDCR_EL2_HPMFZS		(UL(1) << 36)
+> +#define MDCR_EL2_HPMFZO		(UL(1) << 29)
+> +#define MDCR_EL2_MTPME		(UL(1) << 28)
+> +#define MDCR_EL2_TDCC		(UL(1) << 27)
+> +#define MDCR_EL2_HCCD		(UL(1) << 23)
 
-FWIW, I found this whole sequence massively confusing, and it is only
-when I came to patch #7 that the various pieces did come together.
+Nit: If you're aiming for completeness, you're missing MDCR_EL2.HLP
+(bit 26).
+
+>  #define MDCR_EL2_TTRF		(UL(1) << 19)
+> +#define MDCR_EL2_HPMD		(UL(1) << 17)
+>  #define MDCR_EL2_TPMS		(UL(1) << 14)
+>  #define MDCR_EL2_E2PB_MASK	(UL(0x3))
+>  #define MDCR_EL2_E2PB_SHIFT	(UL(12))
+> @@ -293,6 +309,12 @@
+>  #define MDCR_EL2_TPM		(UL(1) << 6)
+>  #define MDCR_EL2_TPMCR		(UL(1) << 5)
+>  #define MDCR_EL2_HPMN_MASK	(UL(0x1F))
+> +#define MDCR_EL2_RES0		(GENMASK(63, 37) |	\
+> +				 GENMASK(35, 30) |	\
+> +				 GENMASK(25, 24) |	\
+> +				 GENMASK(22, 20) |	\
+> +				 BIT(18) |		\
+> +				 GENMASK(16, 15))
+>  
+>  /* For compatibility with fault code shared with 32-bit */
+>  #define FSC_FAULT	ESR_ELx_FSC_FAULT
 
 Thanks,
 
