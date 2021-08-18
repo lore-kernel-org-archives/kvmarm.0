@@ -2,81 +2,86 @@ Return-Path: <SRS0=mpH5=NJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A033FC4338F
-	for <kvmarm@archiver.kernel.org>; Wed, 18 Aug 2021 19:59:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95311C4338F
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Aug 2021 20:00:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2FA18610FE
-	for <kvmarm@archiver.kernel.org>; Wed, 18 Aug 2021 19:59:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 2FA18610FE
+	by mail.kernel.org (Postfix) with ESMTP id 344CD610FE
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Aug 2021 20:00:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 344CD610FE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C75FC4B08D;
-	Wed, 18 Aug 2021 15:59:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DD6C64A1AF;
+	Wed, 18 Aug 2021 16:00:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id bbAtJaxfyFD5; Wed, 18 Aug 2021 15:59:52 -0400 (EDT)
+	with ESMTP id 7z19wFY6c9oV; Wed, 18 Aug 2021 15:59:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D5AF74B0E7;
-	Wed, 18 Aug 2021 15:59:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E7C34B0F0;
+	Wed, 18 Aug 2021 15:59:49 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 114EE49E57
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Aug 2021 14:42:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4941B400D5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Aug 2021 14:43:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LlQK1uxWPQAu for <kvmarm@lists.cs.columbia.edu>;
- Wed, 18 Aug 2021 14:42:14 -0400 (EDT)
-Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com
- [209.85.222.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6B9AE4099E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Aug 2021 14:42:14 -0400 (EDT)
-Received: by mail-ua1-f50.google.com with SMTP id b7so1391692uav.11
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Aug 2021 11:42:14 -0700 (PDT)
+ with ESMTP id 7D2ztX7LmZoW for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 18 Aug 2021 14:43:20 -0400 (EDT)
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com
+ [209.85.210.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4256440162
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Aug 2021 14:43:20 -0400 (EDT)
+Received: by mail-pf1-f201.google.com with SMTP id
+ o3-20020a625a030000b02903c9ba4d8a70so1780767pfb.12
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Aug 2021 11:43:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=+Ng1WTSvGZfgMb8v7uO3fX7kJHxGGsPeDrhYAtssMjo=;
- b=FCFhANXc7mQxpbwR01iX9xsG9YdDJu18csNeMdwwPRJp97wQ6bgZ1hEDmtGaKl84QQ
- mDbY0oWVa8Yl2hsjUhrY1hCsRnaWkSKfKh8mOem0jit7Go1mhRS5NUTKKBfaXGG3QQUY
- Cwf35BzM6HewqEh6yuZ9FvxFvFFt9JpDQn63SRNdO4hjVWh/+LlLXVeCF2Pr1HvRJf/X
- i67jgtF/qnCz2MH5focYtOQovIVaPOB2WGpGxkSe4BkQ3wZ+VIVM8aod8yxBzDuQJXOq
- zw28BweF2reGP8BOMWpPEzSLMRgKB7ZEus/26gI6pJwqpugS6Ibfj1KEwsZYYHEuSN1g
- 7low==
+ h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+ :cc; bh=sybk7YcBeZufJ2AiOux9y0QLju0ZjmiMoQ+rDeqF05I=;
+ b=KyWRMVB2YjHXSj3SrlXBQ1vUcQjS4upaB1ecKlUekeQMP3aw4uhnG6uXijlPT/31ui
+ Z28ax39JzZAx1Z7J8FJei5MIVv98GH6r7vIQCEG3PfaFCvB4WEuqVRxab5ga+fSTQmeY
+ j5QUx4OUcKTj4AdUaQMpWPvrugwRMTrM64LTE1De5ouxE5IHLW5fPrrULhaBEHdcoHGo
+ hmbDITScovX72Zyu4nY8lVbvpgAGK8k1T0EtpyvDMXvLOlNKXz+0BX/BgPjyaT1zNHnT
+ rqsSfheHhwSn27ZcOd/7GIFehJ32fm81DLLxjUIGrGL2qdhydKSCw30/2SGJncJylHge
+ 2juw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=+Ng1WTSvGZfgMb8v7uO3fX7kJHxGGsPeDrhYAtssMjo=;
- b=gtsvbpMIx7seMnKJZe3xnMSNIOzpe08s5F89nCLeR4khc0ApZ8YTJtyoDBo+1iV6qj
- 7v4BfjKE2GK6IvXuyMrrdrqbZ/lyiQhL8hXvpZU6O9eojPxTwLbKq2wnew0BdnIU/Fzy
- 20w77seoN5MEGlwpjpKTt/Y2HACgAR2LWYHhK8001R60Jmcwf+8vyVixLnSyzoJ++QT1
- iaPzpbaryBRMSKKcvUW8mighydeOtegMUbjwJNH3Sf4+yR+WXH1mDawagHhhDWVHT7lW
- a4c7N7E1l0ZDIrVuy8HtA5Cp39Ok75z02CUWGC3c+Qs8czF+6AMmmQGONdeRr2etTHjp
- 0i1A==
-X-Gm-Message-State: AOAM531RMFYoXCbNBI8MVng9jbKnjDaMRPGVnU6/vjAegEUYMnBiYMe7
- 0SyyfGV4mRgHjrKSb+ZC20iItkf4GDxpWptC3r4Smg==
-X-Google-Smtp-Source: ABdhPJxD2TsqeJAu62OQI9GJbfnHm0E/nNI7HgtCLesglhFdiEu2JJtzEl0++gNNcsrTStCnIgoDo+CKE1MjNFtghVw=
-X-Received: by 2002:ab0:3a8f:: with SMTP id r15mr8202775uaw.13.1629312133633; 
- Wed, 18 Aug 2021 11:42:13 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210818184057.515187-1-rananta@google.com>
-In-Reply-To: <20210818184057.515187-1-rananta@google.com>
+ h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+ :references:subject:from:to:cc;
+ bh=sybk7YcBeZufJ2AiOux9y0QLju0ZjmiMoQ+rDeqF05I=;
+ b=U1KG2rSFJG0X3mcyzaSaGXdC50uAOcJgB5dY3u9T3W9mshsXHbfz39UcIfnkOMOfg0
+ TZLYnykL9JANIYuZCNs2Ojz0xt/Mc4Bh/lzgyOnBmcpIXZkovvPiugoGGb0ZQr6O8zmm
+ rw167eqO+buYsl9/P1Zgms0A6ybXITRraPSRQ7A4DxNjNJsY9bCS2LbHxDVDKZvbLYYy
+ GK9ZHavrdB7AKHLrMKEkGJCk39s4GFFkbwmql/0/Z+cougnz4tvtBiXAWGna8eLlK4nj
+ dd5YIarBbLVwtE9IeqHS91HBjrHP91M71uvN/OHM3U1Lh1zT+2vTup8LGAKlPZdVMsi1
+ ddAw==
+X-Gm-Message-State: AOAM532/Va1ynAN+LKir96wTN4JG0SUmxEoZzUXoYr90LszhTyTdRNHU
+ Ku/5PHZbHZRuiuzc3fi8EecMKzZsYip2
+X-Google-Smtp-Source: ABdhPJwpulpudlfIiB7CO8SfhZeZ9mfxxExEhDLOhAm5IzLeR7emCgSi+C7ROeGvaAWlJ6EMz8iciBV4Xt6V
+X-Received: from rananta-virt.c.googlers.com
+ ([fda3:e722:ac3:cc00:7f:e700:c0a8:1bcc])
+ (user=rananta job=sendgmr) by 2002:a17:90b:396:: with SMTP id
+ ga22mr92005pjb.0.1629312198788; Wed, 18 Aug 2021 11:43:18 -0700 (PDT)
+Date: Wed, 18 Aug 2021 18:43:02 +0000
+In-Reply-To: <20210818184311.517295-1-rananta@google.com>
+Message-Id: <20210818184311.517295-2-rananta@google.com>
+Mime-Version: 1.0
+References: <20210818184311.517295-1-rananta@google.com>
+X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
+Subject: [PATCH v2 01/10] KVM: arm64: selftests: Add MMIO readl/writel support
 From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Wed, 18 Aug 2021 11:42:03 -0700
-Message-ID: <CAJHc60z9AQ1huwan_WE5etEV0BAq_ZtNea+0u1AqgGHdAFmKQw@mail.gmail.com>
-Subject: Re: KVM: arm64: vgic: Resample HW pending state on deactivation
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>
 X-Mailman-Approved-At: Wed, 18 Aug 2021 15:59:47 -0400
 Cc: kvm@vger.kernel.org, Peter Shier <pshier@google.com>,
- kvmarm@lists.cs.columbia.edu
+ Raghavendra Rao Anata <rananta@google.com>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,156 +98,75 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Please ignore this. Sent by accident.
+Define the readl() and writel() functions for the guests to
+access (4-byte) the MMIO region.
 
-Regards,
-Raghavendra
+The routines, and their dependents, are inspired from the kernel's
+arch/arm64/include/asm/io.h and arch/arm64/include/asm/barrier.h.
 
-On Wed, Aug 18, 2021 at 11:41 AM Raghavendra Rao Ananta
-<rananta@google.com> wrote:
->
-> From: Marc Zyngier <maz@kernel.org>
->
-> When a mapped level interrupt (a timer, for example) is deactivated
-> by the guest, the corresponding host interrupt is equally deactivated.
-> However, the fate of the pending state still needs to be dealt
-> with in SW.
->
-> This is specially true when the interrupt was in the active+pending
-> state in the virtual distributor at the point where the guest
-> was entered. On exit, the pending state is potentially stale
-> (the guest may have put the interrupt in a non-pending state).
->
-> If we don't do anything, the interrupt will be spuriously injected
-> in the guest. Although this shouldn't have any ill effect (spurious
-> interrupts are always possible), we can improve the emulation by
-> detecting the deactivation-while-pending case and resample the
-> interrupt.
->
-> Reported-by: Raghavendra Rao Ananta <rananta@google.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/vgic/vgic-v2.c | 25 ++++++++++++++++++-------
->  arch/arm64/kvm/vgic/vgic-v3.c | 25 ++++++++++++++++++-------
->  2 files changed, 36 insertions(+), 14 deletions(-)
->
-> diff --git a/arch/arm64/kvm/vgic/vgic-v2.c b/arch/arm64/kvm/vgic/vgic-v2.c
-> index 2c580204f1dc9..3e52ea86a87ff 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v2.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v2.c
-> @@ -60,6 +60,7 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
->                 u32 val = cpuif->vgic_lr[lr];
->                 u32 cpuid, intid = val & GICH_LR_VIRTUALID;
->                 struct vgic_irq *irq;
-> +               bool deactivated;
->
->                 /* Extract the source vCPU id from the LR */
->                 cpuid = val & GICH_LR_PHYSID_CPUID;
-> @@ -75,7 +76,8 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
->
->                 raw_spin_lock(&irq->irq_lock);
->
-> -               /* Always preserve the active bit */
-> +               /* Always preserve the active bit, note deactivation */
-> +               deactivated = irq->active && !(val & GICH_LR_ACTIVE_BIT);
->                 irq->active = !!(val & GICH_LR_ACTIVE_BIT);
->
->                 if (irq->active && vgic_irq_is_sgi(intid))
-> @@ -105,6 +107,12 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
->                  * device state could have changed or we simply need to
->                  * process the still pending interrupt later.
->                  *
-> +                * We could also have entered the guest with the interrupt
-> +                * active+pending. On the next exit, we need to re-evaluate
-> +                * the pending state, as it could otherwise result in a
-> +                * spurious interrupt by injecting a now potentially stale
-> +                * pending state.
-> +                *
->                  * If this causes us to lower the level, we have to also clear
->                  * the physical active state, since we will otherwise never be
->                  * told when the interrupt becomes asserted again.
-> @@ -115,12 +123,15 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
->                 if (vgic_irq_is_mapped_level(irq)) {
->                         bool resample = false;
->
-> -                       if (val & GICH_LR_PENDING_BIT) {
-> -                               irq->line_level = vgic_get_phys_line_level(irq);
-> -                               resample = !irq->line_level;
-> -                       } else if (vgic_irq_needs_resampling(irq) &&
-> -                                  !(irq->active || irq->pending_latch)) {
-> -                               resample = true;
-> +                       if (unlikely(vgic_irq_needs_resampling(irq))) {
-> +                               if (!(irq->active || irq->pending_latch))
-> +                                       resample = true;
-> +                       } else {
-> +                               if ((val & GICH_LR_PENDING_BIT) ||
-> +                                   (deactivated && irq->line_level)) {
-> +                                       irq->line_level = vgic_get_phys_line_level(irq);
-> +                                       resample = !irq->line_level;
-> +                               }
->                         }
->
->                         if (resample)
-> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-> index 66004f61cd83d..74f9aefffd5e0 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v3.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
-> @@ -46,6 +46,7 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
->                 u32 intid, cpuid;
->                 struct vgic_irq *irq;
->                 bool is_v2_sgi = false;
-> +               bool deactivated;
->
->                 cpuid = val & GICH_LR_PHYSID_CPUID;
->                 cpuid >>= GICH_LR_PHYSID_CPUID_SHIFT;
-> @@ -68,7 +69,8 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
->
->                 raw_spin_lock(&irq->irq_lock);
->
-> -               /* Always preserve the active bit */
-> +               /* Always preserve the active bit, note deactivation */
-> +               deactivated = irq->active && !(val & ICH_LR_ACTIVE_BIT);
->                 irq->active = !!(val & ICH_LR_ACTIVE_BIT);
->
->                 if (irq->active && is_v2_sgi)
-> @@ -98,6 +100,12 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
->                  * device state could have changed or we simply need to
->                  * process the still pending interrupt later.
->                  *
-> +                * We could also have entered the guest with the interrupt
-> +                * active+pending. On the next exit, we need to re-evaluate
-> +                * the pending state, as it could otherwise result in a
-> +                * spurious interrupt by injecting a now potentially stale
-> +                * pending state.
-> +                *
->                  * If this causes us to lower the level, we have to also clear
->                  * the physical active state, since we will otherwise never be
->                  * told when the interrupt becomes asserted again.
-> @@ -108,12 +116,15 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
->                 if (vgic_irq_is_mapped_level(irq)) {
->                         bool resample = false;
->
-> -                       if (val & ICH_LR_PENDING_BIT) {
-> -                               irq->line_level = vgic_get_phys_line_level(irq);
-> -                               resample = !irq->line_level;
-> -                       } else if (vgic_irq_needs_resampling(irq) &&
-> -                                  !(irq->active || irq->pending_latch)) {
-> -                               resample = true;
-> +                       if (unlikely(vgic_irq_needs_resampling(irq))) {
-> +                               if (!(irq->active || irq->pending_latch))
-> +                                       resample = true;
-> +                       } else {
-> +                               if ((val & ICH_LR_PENDING_BIT) ||
-> +                                   (deactivated && irq->line_level)) {
-> +                                       irq->line_level = vgic_get_phys_line_level(irq);
-> +                                       resample = !irq->line_level;
-> +                               }
->                         }
->
->                         if (resample)
-> --
-> cgit 1.2.3-1.el7
->
+Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+---
+ .../selftests/kvm/include/aarch64/processor.h | 45 ++++++++++++++++++-
+ 1 file changed, 44 insertions(+), 1 deletion(-)
+
+diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
+index 27dc5c2e56b9..14f68bf55036 100644
+--- a/tools/testing/selftests/kvm/include/aarch64/processor.h
++++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+@@ -127,6 +127,49 @@ void vm_install_sync_handler(struct kvm_vm *vm,
+ 	val;								  \
+ })
+ 
+-#define isb()	asm volatile("isb" : : : "memory")
++#define isb()		asm volatile("isb" : : : "memory")
++#define dsb(opt)	asm volatile("dsb " #opt : : : "memory")
++#define dmb(opt)	asm volatile("dmb " #opt : : : "memory")
++
++#define dma_wmb()	dmb(oshst)
++#define __iowmb()	dma_wmb()
++
++#define dma_rmb()	dmb(oshld)
++
++#define __iormb(v)							\
++({									\
++	unsigned long tmp;						\
++									\
++	dma_rmb();							\
++									\
++	/*								\
++	 * Courtesy of arch/arm64/include/asm/io.h:			\
++	 * Create a dummy control dependency from the IO read to any	\
++	 * later instructions. This ensures that a subsequent call	\
++	 * to udelay() will be ordered due to the ISB in __delay().	\
++	 */								\
++	asm volatile("eor	%0, %1, %1\n"				\
++		     "cbnz	%0, ."					\
++		     : "=r" (tmp) : "r" ((unsigned long)(v))		\
++		     : "memory");					\
++})
++
++static __always_inline void __raw_writel(u32 val, volatile void *addr)
++{
++	asm volatile("str %w0, [%1]" : : "rZ" (val), "r" (addr));
++}
++
++static __always_inline u32 __raw_readl(const volatile void *addr)
++{
++	u32 val;
++	asm volatile("ldr %w0, [%1]" : "=r" (val) : "r" (addr));
++	return val;
++}
++
++#define writel_relaxed(v,c)	((void)__raw_writel((__force u32)cpu_to_le32(v),(c)))
++#define readl_relaxed(c)	({ u32 __r = le32_to_cpu((__force __le32)__raw_readl(c)); __r; })
++
++#define writel(v,c)		({ __iowmb(); writel_relaxed((v),(c));})
++#define readl(c)		({ u32 __v = readl_relaxed(c); __iormb(__v); __v; })
+ 
+ #endif /* SELFTEST_KVM_PROCESSOR_H */
+-- 
+2.33.0.rc1.237.g0d66db33f3-goog
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
