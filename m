@@ -2,59 +2,57 @@ Return-Path: <SRS0=mpH5=NJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFD6EC4338F
-	for <kvmarm@archiver.kernel.org>; Wed, 18 Aug 2021 11:13:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F72EC4338F
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Aug 2021 11:33:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6C51E6108F
-	for <kvmarm@archiver.kernel.org>; Wed, 18 Aug 2021 11:13:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 6C51E6108F
+	by mail.kernel.org (Postfix) with ESMTP id F0196610A3
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Aug 2021 11:33:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org F0196610A3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E817A4B086;
-	Wed, 18 Aug 2021 07:13:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A03F4B0BC;
+	Wed, 18 Aug 2021 07:33:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ZW43L8JiuvZW; Wed, 18 Aug 2021 07:12:59 -0400 (EDT)
+	with ESMTP id Ek-gOdpQoUUD; Wed, 18 Aug 2021 07:33:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 319F14B097;
-	Wed, 18 Aug 2021 07:12:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B0814B0B4;
+	Wed, 18 Aug 2021 07:33:00 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BBCF04B086
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Aug 2021 07:12:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DE5264B091
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Aug 2021 07:32:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ToQpmcrUlfEE for <kvmarm@lists.cs.columbia.edu>;
- Wed, 18 Aug 2021 07:12:56 -0400 (EDT)
+ with ESMTP id rGi1AiaOKOqR for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 18 Aug 2021 07:32:57 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 92CC94A2E5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Aug 2021 07:12:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AA8A64A98B
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Aug 2021 07:32:57 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 6ADD06108F;
- Wed, 18 Aug 2021 11:12:55 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id AAA96610C7;
+ Wed, 18 Aug 2021 11:32:56 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mGJV6-005jgS-V1; Wed, 18 Aug 2021 12:12:53 +0100
-Date: Wed, 18 Aug 2021 12:12:52 +0100
-Message-ID: <87pmubrop7.wl-maz@kernel.org>
+ id 1mGJoV-005jtQ-0f; Wed, 18 Aug 2021 12:32:55 +0100
+Date: Wed, 18 Aug 2021 12:32:54 +0100
+Message-ID: <87mtpfrnrt.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oupton@google.com>
-Subject: Re: [PATCH 3/4] KVM: arm64: Enforce reserved bits for PSCI target
- affinities
-In-Reply-To: <20210818085047.1005285-4-oupton@google.com>
+Subject: Re: [PATCH 0/4] KVM: arm64: Fix some races in CPU_ON PSCI call
+In-Reply-To: <20210818085047.1005285-1-oupton@google.com>
 References: <20210818085047.1005285-1-oupton@google.com>
- <20210818085047.1005285-4-oupton@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -63,7 +61,7 @@ X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: oupton@google.com, kvm@vger.kernel.org,
  kvmarm@lists.cs.columbia.edu, pshier@google.com, ricarkol@google.com,
  jingzhangos@google.com, rananta@google.com, james.morse@arm.com,
- alexandru.elisei@arm.com, suzuki.poulose@arm.com
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com, drjones@redhat.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
@@ -85,94 +83,84 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 18 Aug 2021 09:50:46 +0100,
+[+ Andrew for the selftest part.]
+
+Hi Oliver,
+
+On Wed, 18 Aug 2021 09:50:43 +0100,
 Oliver Upton <oupton@google.com> wrote:
 > 
-> Some calls in PSCI take a target affinity argument, defined to be
-> bit-compatible with the affinity fields in MPIDR_EL1. All other bits in
-> the parameter are reserved and must be 0.
-
-For future reference, it may be worth quoting the spec (ARM DEN 0022D,
-5.1.4 "CPU_ON").
-
-> Return INVALID_PARAMETERS if the guest incorrectly sets a reserved
-> bit.
+> The CPU_ON PSCI call requires careful coordination between vCPUs in KVM,
+> as it allows callers to send a payload (pc, context id) to another vCPU
+> to start execution. There are a couple of races in the handling of
+> CPU_ON:
 > 
-> Signed-off-by: Oliver Upton <oupton@google.com>
-> ---
->  arch/arm64/kvm/psci.c | 20 +++++++++++++++++---
->  1 file changed, 17 insertions(+), 3 deletions(-)
+>  - KVM uses the kvm->lock to serialize the write-side of a vCPU's reset
+>    state. However, kvm_vcpu_reset() doesn't take the lock on the
+>    read-size, meaning the vCPU could be reset with interleaved state
+>    from two separate CPU_ON calls.
 > 
-> diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
-> index db4056ecccfd..bb76be01abd2 100644
-> --- a/arch/arm64/kvm/psci.c
-> +++ b/arch/arm64/kvm/psci.c
-> @@ -59,6 +59,17 @@ static void kvm_psci_vcpu_off(struct kvm_vcpu *vcpu)
->  	kvm_vcpu_kick(vcpu);
->  }
->  
-> +static inline bool kvm_psci_valid_affinity(struct kvm_vcpu *vcpu,
-> +					   unsigned long affinity)
-> +{
-> +	unsigned long mask = MPIDR_HWID_BITMASK;
-> +
-> +	if (vcpu_mode_is_32bit(vcpu))
-> +		mask &= ~((u32) 0);
+>  - If a targeted vCPU never enters the guest again (say, the VMM was
+>    getting ready to migrate), then the reset payload is never actually
+>    folded in to the vCPU's registers. Despite this, the calling vCPU has
+>    already made the target runnable. Migrating the target vCPU at this
+>    time will result in execution from its old PC, not execution coming
+>    out of the reset state at the requested address.
+> 
+> Patch 1 addresses the read-side race in KVM's CPU_ON implementation.
+> 
+> Patch 2 fixes the KVM/VMM race by resetting a vCPU (if requested)
+> whenever the VMM tries to read out its registers. Gross, but it avoids
+> exposing the vcpu_reset_state structure through some other UAPI. That is
+> undesirable, as we really are only trying to paper over the
+> implementation details of PSCI in KVM.
+> 
+> Patch 3 is unrelated, and is based on my own reading of the PSCI
+> specification. In short, if you invoke PSCI_ON from AArch64, then you
+> must set the Aff3 bits. This is impossible if you use the 32 bit
+> function, since the arguments are only 32 bits. Just return
+> INVALID_PARAMS to the guest in this case.
 
-I don't think we need this anymore since 5.7:
+Overall, this looks pretty good, and I only have a few nits on the
+first three patches. I'll let Andrew comment on the selftest, which
+looks OK to me at least on the surface.
 
-- fdc9999e20cd ("KVM: arm64: PSCI: Forbid 64bit functions for 32bit
-  guests") guarantees that the guest can't trick KVM into using the
-  SMC64 functions.
+> 
+> This series cleanly applies to kvm-arm/next at the following commit:
+> 
+> ae280335cdb5 ("Merge branch kvm-arm64/mmu/el2-tracking into kvmarm-master/next")
+>
 
-- with 2890ac993daa ("KVM: arm64: PSCI: Narrow input registers when
-  using 32bit functions"), the registers are always narrowed down to
-  32bit
-
-Put the two together, and you can't have a 32bit guest issuing a PSCI
-operation with crap in the upper 32bits.
-
-> +
-> +	return !(affinity & ~mask);
-
-So the whole helper can now be rewritten as
-
-	return !(affinity & ~MPIDR_HWID_BITMASK);
-
-> +}
-> +
->  static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
->  {
->  	struct vcpu_reset_state *reset_state;
-> @@ -66,9 +77,9 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
->  	struct kvm_vcpu *vcpu = NULL;
->  	unsigned long cpu_id;
->  
-> -	cpu_id = smccc_get_arg1(source_vcpu) & MPIDR_HWID_BITMASK;
-> -	if (vcpu_mode_is_32bit(source_vcpu))
-> -		cpu_id &= ~((u32) 0);
-> +	cpu_id = smccc_get_arg1(source_vcpu);
-> +	if (!kvm_psci_valid_affinity(source_vcpu, cpu_id))
-> +		return PSCI_RET_INVALID_PARAMS;
->  
->  	vcpu = kvm_mpidr_to_vcpu(kvm, cpu_id);
->  
-> @@ -126,6 +137,9 @@ static unsigned long kvm_psci_vcpu_affinity_info(struct kvm_vcpu *vcpu)
->  	target_affinity = smccc_get_arg1(vcpu);
->  	lowest_affinity_level = smccc_get_arg2(vcpu);
->  
-> +	if (!kvm_psci_valid_affinity(vcpu, target_affinity))
-> +		return PSCI_RET_INVALID_PARAMS;
-> +
->  	/* Determine target affinity mask */
->  	target_affinity_mask = psci_affinity_mask(lowest_affinity_level);
->  	if (!target_affinity_mask)
-
-Otherwise, looks good to me.
+Another nit: In the future, please consider basing your series on a
+stable tag (such as v5.14-rc4), as kvmarm/next is a bit of a moving
+target (the individual commits are stable, but the merge commits
+aren't). Basing something off -next should be reserved for the cases
+where you are fixing something that is only broken there.
 
 Thanks,
 
 	M.
+
+> The series was tested with the included KVM selftest on an Ampere Mt.
+> Jade system. Broken behavior was verified using the same test on
+> kvm-arm/next, sans this series.
+> 
+> Oliver Upton (4):
+>   KVM: arm64: Fix read-side race on updates to vcpu reset state
+>   KVM: arm64: Handle PSCI resets before userspace touches vCPU state
+>   KVM: arm64: Enforce reserved bits for PSCI target affinities
+>   selftests: KVM: Introduce psci_cpu_on_test
+> 
+>  arch/arm64/kvm/arm.c                          |   9 ++
+>  arch/arm64/kvm/psci.c                         |  20 ++-
+>  arch/arm64/kvm/reset.c                        |  16 ++-
+>  tools/testing/selftests/kvm/.gitignore        |   1 +
+>  tools/testing/selftests/kvm/Makefile          |   1 +
+>  .../selftests/kvm/aarch64/psci_cpu_on_test.c  | 121 ++++++++++++++++++
+>  .../selftests/kvm/include/aarch64/processor.h |   3 +
+>  7 files changed, 162 insertions(+), 9 deletions(-)
+>  create mode 100644 tools/testing/selftests/kvm/aarch64/psci_cpu_on_test.c
+> 
 
 -- 
 Without deviation from the norm, progress is not possible.
