@@ -2,101 +2,75 @@ Return-Path: <SRS0=mpH5=NJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97EDEC4338F
-	for <kvmarm@archiver.kernel.org>; Wed, 18 Aug 2021 14:42:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8D5DC4338F
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Aug 2021 14:42:34 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 07974610CF
-	for <kvmarm@archiver.kernel.org>; Wed, 18 Aug 2021 14:42:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 07974610CF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 50081610CF
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Aug 2021 14:42:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 50081610CF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 74B354A523;
-	Wed, 18 Aug 2021 10:42:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E85E54A523;
+	Wed, 18 Aug 2021 10:42:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id XWjveilVq+Lc; Wed, 18 Aug 2021 10:42:16 -0400 (EDT)
+	with ESMTP id 6+gq4rYUdwhY; Wed, 18 Aug 2021 10:42:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9ABAE4A524;
-	Wed, 18 Aug 2021 10:42:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C5D934B0C2;
+	Wed, 18 Aug 2021 10:42:28 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B3B84A524
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Aug 2021 10:42:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 296134A524
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Aug 2021 10:42:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Dn9f5nVKRPc2 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 18 Aug 2021 10:42:14 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F7DD4A523
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Aug 2021 10:42:14 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1629297734;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=oHOC6qM8SYsxg5GXK1RakJzITqPj1QkZBCg9QMQDUco=;
- b=ExDE5HSdvxpSgkFmK6WH6dgfpnc2brl5eRmmiNZF5QGM/c5EjvNxZjtNMezcaJ/wZGZqLc
- M9iTIwhWyheo7SrpIaMTA9SLidqUMUMqWt2kU61SdP5UlKxTcaemXRAEcX4pygs44kk6+X
- ozKoGfxOzcYAutmYPgq7UaxhtttvhiQ=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-75-1hnvb22VMTCxJQPBB6sklw-1; Wed, 18 Aug 2021 10:42:10 -0400
-X-MC-Unique: 1hnvb22VMTCxJQPBB6sklw-1
-Received: by mail-ed1-f72.google.com with SMTP id
- di3-20020a056402318300b003bebf0828a2so1163790edb.8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Aug 2021 07:42:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=oHOC6qM8SYsxg5GXK1RakJzITqPj1QkZBCg9QMQDUco=;
- b=T7hViRZG9Nt95VWKCysamQ4SyprJrM/Rxanh6OBozHn4Z5zdEfQ25GPCIAR4jvNLFa
- PVwbS0rXVt5fCeoDOaIcfnrDI5NzrsPKraX/SAu6K5vVpOKft/Cd6HPhDK3tRi8ru9Of
- gPHv7zwbq+nWZRywevl8r3B2rDzeV3Cw+d6P0ZWQvaXnSjum/dBVcTUHwSJbeEwBqdSM
- BIg9csij2v80Lgr1UJnwCBkK5DZgudHHFTVDSc/TCEZq7a147aozmNs7AwTns3yojmID
- kcqFAwxKDcdHBlk9gWRqwXLPDrnZwALZFueDR5iuRi8XlM9tHs6j/z/R41WAz+UMksr0
- 5J/Q==
-X-Gm-Message-State: AOAM5311EYg43FQjj90l7UPWy7OxHvNk8JOLKw1MwPb6xsKjc7mxIf21
- +PuxvCrqLg8xZVKvEt/ATAPadsvaBFM3tDFZ5AyJn9LDHz10MsZ0ozvltK46draYM6a5kc9rqdX
- JIXJGL7mF6Xk1bw7hrKNPvB7/
-X-Received: by 2002:a17:906:769a:: with SMTP id
- o26mr10260118ejm.18.1629297729773; 
- Wed, 18 Aug 2021 07:42:09 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzsUMjWsJZkdAO5Ia6PsQSh8NFeDEF2eu0vMI7nX2SYA8sWVGkvZya4kW3CwJkzpaxp1jcgJQ==
-X-Received: by 2002:a17:906:769a:: with SMTP id
- o26mr10260095ejm.18.1629297729568; 
- Wed, 18 Aug 2021 07:42:09 -0700 (PDT)
-Received: from gator.home (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
- by smtp.gmail.com with ESMTPSA id a2sm112760edm.72.2021.08.18.07.42.08
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 18 Aug 2021 07:42:09 -0700 (PDT)
-Date: Wed, 18 Aug 2021 16:42:07 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Oliver Upton <oupton@google.com>
-Subject: Re: [PATCH 4/4] selftests: KVM: Introduce psci_cpu_on_test
-Message-ID: <20210818144207.o7ycdaiy5iyap63k@gator.home>
-References: <20210818085047.1005285-1-oupton@google.com>
- <20210818085047.1005285-5-oupton@google.com>
-MIME-Version: 1.0
-In-Reply-To: <20210818085047.1005285-5-oupton@google.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Disposition: inline
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, Raghavendra Rao Anata <rananta@google.com>,
- kvmarm@lists.cs.columbia.edu
+ with ESMTP id Hf81rUqEUSHb for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 18 Aug 2021 10:42:27 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D111B4A523
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Aug 2021 10:42:26 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 085CB6108D;
+ Wed, 18 Aug 2021 14:42:26 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mGMlr-005mN8-Hi; Wed, 18 Aug 2021 15:42:23 +0100
+Date: Wed, 18 Aug 2021 15:42:23 +0100
+Message-ID: <87im02stkg.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH v4 06/15] KVM: arm64: Restore mdcr_el2 from vcpu
+In-Reply-To: <20210817081134.2918285-7-tabba@google.com>
+References: <20210817081134.2918285-1-tabba@google.com>
+ <20210817081134.2918285-7-tabba@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.cs.columbia.edu,
+ will@kernel.org, james.morse@arm.com, alexandru.elisei@arm.com,
+ suzuki.poulose@arm.com, mark.rutland@arm.com, christoffer.dall@arm.com,
+ pbonzini@redhat.com, drjones@redhat.com, oupton@google.com, qperret@google.com,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, kvm@vger.kernel.org, pbonzini@redhat.com,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -113,27 +87,130 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Aug 18, 2021 at 08:50:47AM +0000, Oliver Upton wrote:
-> Introduce a test for aarch64 that ensures CPU resets induced by PSCI are
-> reflected in the target vCPU's state, even if the target is never run
-> again. This is a regression test for a race between vCPU migration and
-> PSCI.
+On Tue, 17 Aug 2021 09:11:25 +0100,
+Fuad Tabba <tabba@google.com> wrote:
 > 
-> Signed-off-by: Oliver Upton <oupton@google.com>
+> On deactivating traps, restore the value of mdcr_el2 from the
+> newly created and preserved host value vcpu context, rather than
+> directly reading the hardware register.
+> 
+> Up until and including this patch the two values are the same,
+> i.e., the hardware register and the vcpu one. A future patch will
+> be changing the value of mdcr_el2 on activating traps, and this
+> ensures that its value will be restored.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Fuad Tabba <tabba@google.com>
 > ---
->  tools/testing/selftests/kvm/.gitignore        |   1 +
->  tools/testing/selftests/kvm/Makefile          |   1 +
->  .../selftests/kvm/aarch64/psci_cpu_on_test.c  | 121 ++++++++++++++++++
->  .../selftests/kvm/include/aarch64/processor.h |   3 +
->  4 files changed, 126 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/aarch64/psci_cpu_on_test.c
->
+>  arch/arm64/include/asm/kvm_host.h       |  5 ++++-
+>  arch/arm64/include/asm/kvm_hyp.h        |  2 +-
+>  arch/arm64/kvm/hyp/include/hyp/switch.h |  6 +++++-
+>  arch/arm64/kvm/hyp/nvhe/switch.c        | 13 +++++--------
+>  arch/arm64/kvm/hyp/vhe/switch.c         | 14 +++++---------
+>  arch/arm64/kvm/hyp/vhe/sysreg-sr.c      |  2 +-
+>  6 files changed, 21 insertions(+), 21 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 4d2d974c1522..76462c6a91ee 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -287,10 +287,13 @@ struct kvm_vcpu_arch {
+>  	/* Stage 2 paging state used by the hardware on next switch */
+>  	struct kvm_s2_mmu *hw_mmu;
+>  
+> -	/* HYP configuration */
+> +	/* Values of trap registers for the guest. */
+>  	u64 hcr_el2;
+>  	u64 mdcr_el2;
+>  
+> +	/* Values of trap registers for the host before guest entry. */
+> +	u64 mdcr_el2_host;
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+This probably should then eventually replace the per-CPU copy of
+mdcr_el2 that lives in debug.c, shouldn't it?
+
+> +
+>  	/* Exception Information */
+>  	struct kvm_vcpu_fault_info fault;
+>  
+> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+> index 9d60b3006efc..657d0c94cf82 100644
+> --- a/arch/arm64/include/asm/kvm_hyp.h
+> +++ b/arch/arm64/include/asm/kvm_hyp.h
+> @@ -95,7 +95,7 @@ void __sve_restore_state(void *sve_pffr, u32 *fpsr);
+>  
+>  #ifndef __KVM_NVHE_HYPERVISOR__
+>  void activate_traps_vhe_load(struct kvm_vcpu *vcpu);
+> -void deactivate_traps_vhe_put(void);
+> +void deactivate_traps_vhe_put(struct kvm_vcpu *vcpu);
+>  #endif
+>  
+>  u64 __guest_enter(struct kvm_vcpu *vcpu);
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index e4a2f295a394..a0e78a6027be 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -92,11 +92,15 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
+>  		write_sysreg(0, pmselr_el0);
+>  		write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
+>  	}
+> +
+> +	vcpu->arch.mdcr_el2_host = read_sysreg(mdcr_el2);
+>  	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
+>  }
+>  
+> -static inline void __deactivate_traps_common(void)
+> +static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
+>  {
+> +	write_sysreg(vcpu->arch.mdcr_el2_host, mdcr_el2);
+> +
+>  	write_sysreg(0, hstr_el2);
+>  	if (kvm_arm_support_pmu_v3())
+>  		write_sysreg(0, pmuserenr_el0);
+> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+> index f7af9688c1f7..2ea764a48958 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+> @@ -69,12 +69,10 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+>  static void __deactivate_traps(struct kvm_vcpu *vcpu)
+>  {
+>  	extern char __kvm_hyp_host_vector[];
+> -	u64 mdcr_el2, cptr;
+> +	u64 cptr;
+>  
+>  	___deactivate_traps(vcpu);
+>  
+> -	mdcr_el2 = read_sysreg(mdcr_el2);
+> -
+>  	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
+>  		u64 val;
+>  
+> @@ -92,13 +90,12 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
+>  		isb();
+>  	}
+>  
+> -	__deactivate_traps_common();
+> +	vcpu->arch.mdcr_el2_host &= MDCR_EL2_HPMN_MASK |
+> +				    MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT |
+> +				    MDCR_EL2_E2TB_MASK << MDCR_EL2_E2TB_SHIFT;
+>  
+> -	mdcr_el2 &= MDCR_EL2_HPMN_MASK;
+> -	mdcr_el2 |= MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT;
+> -	mdcr_el2 |= MDCR_EL2_E2TB_MASK << MDCR_EL2_E2TB_SHIFT;
+> +	__deactivate_traps_common(vcpu);
+>  
+> -	write_sysreg(mdcr_el2, mdcr_el2);
+
+FWIW, I found this whole sequence massively confusing, and it is only
+when I came to patch #7 that the various pieces did come together.
 
 Thanks,
-drew
 
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
