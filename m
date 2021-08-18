@@ -2,67 +2,73 @@ Return-Path: <SRS0=mpH5=NJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7821EC4338F
-	for <kvmarm@archiver.kernel.org>; Wed, 18 Aug 2021 09:11:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45E9FC4338F
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Aug 2021 10:06:41 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D73DB60187
-	for <kvmarm@archiver.kernel.org>; Wed, 18 Aug 2021 09:11:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org D73DB60187
+	by mail.kernel.org (Postfix) with ESMTP id 982956108F
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Aug 2021 10:06:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 982956108F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 773C54B0B7;
-	Wed, 18 Aug 2021 05:11:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D8F324086F;
+	Wed, 18 Aug 2021 06:06:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id zcTnRg1Z3ZLX; Wed, 18 Aug 2021 05:11:10 -0400 (EDT)
+	with ESMTP id PmRW+IYQB8iA; Wed, 18 Aug 2021 06:06:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6EEE34B0BF;
-	Wed, 18 Aug 2021 05:11:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 69E054AEE2;
+	Wed, 18 Aug 2021 06:06:35 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EC2194B0B7
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Aug 2021 05:11:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CDC2A4B08B
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Aug 2021 06:06:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id eTJ176gW66gK for <kvmarm@lists.cs.columbia.edu>;
- Wed, 18 Aug 2021 05:10:48 -0400 (EDT)
+ with ESMTP id JxgnIoKZvh-F for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 18 Aug 2021 06:06:32 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3F5544A4A4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Aug 2021 05:10:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9C15F4AEE2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Aug 2021 06:06:32 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 470D26103A;
- Wed, 18 Aug 2021 09:10:47 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
+ by mail.kernel.org (Postfix) with ESMTPSA id 6E7EA60524;
+ Wed, 18 Aug 2021 10:06:31 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mGHav-005i8N-8F; Wed, 18 Aug 2021 10:10:45 +0100
+ id 1mGISr-005iqf-IV; Wed, 18 Aug 2021 11:06:29 +0100
+Date: Wed, 18 Aug 2021 11:06:28 +0100
+Message-ID: <87sfz7rrrv.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Will Deacon <will@kernel.org>
-Subject: Re: [PATCH] KVM: arm64: Make hyp_panic() more robust when protected
- mode is enabled
-Date: Wed, 18 Aug 2021 10:10:40 +0100
-Message-Id: <162927783509.2863.13074937375734887703.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210813130336.8139-1-will@kernel.org>
-References: <20210813130336.8139-1-will@kernel.org>
-MIME-Version: 1.0
+To: Oliver Upton <oupton@google.com>
+Subject: Re: [PATCH 1/4] KVM: arm64: Fix read-side race on updates to vcpu
+ reset state
+In-Reply-To: <20210818085047.1005285-2-oupton@google.com>
+References: <20210818085047.1005285-1-oupton@google.com>
+ <20210818085047.1005285-2-oupton@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: will@kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Rcpt-To: oupton@google.com, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, pshier@google.com, ricarkol@google.com,
+ jingzhangos@google.com, rananta@google.com, james.morse@arm.com,
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Peter Shier <pshier@google.com>,
+ Raghavendra Rao Anata <rananta@google.com>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -79,29 +85,84 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 13 Aug 2021 14:03:36 +0100, Will Deacon wrote:
-> When protected mode is enabled, the host is unable to access most parts
-> of the EL2 hypervisor image, including 'hyp_physvirt_offset' and the
-> contents of the hypervisor's '.rodata.str' section. Unfortunately,
-> nvhe_hyp_panic_handler() tries to read from both of these locations when
-> handling a BUG() triggered at EL2; the former for converting the ELR to
-> a physical address and the latter for displaying the name of the source
-> file where the BUG() occurred.
+On Wed, 18 Aug 2021 09:50:44 +0100,
+Oliver Upton <oupton@google.com> wrote:
 > 
-> [...]
+> KVM correctly serializes writes to a vCPU's reset state, however since
+> we do not take the KVM lock on the read side it is entirely possible to
+> read state from two different reset requests.
+> 
+> Cure the race for now by taking the KVM lock when reading the
+> reset_state structure.
+> 
+> Fixes: 358b28f09f0a ("arm/arm64: KVM: Allow a VCPU to fully reset itself")
+> Signed-off-by: Oliver Upton <oupton@google.com>
+> ---
+>  arch/arm64/kvm/reset.c | 16 ++++++++++------
+>  1 file changed, 10 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> index 18ffc6ad67b8..3507e64ff8ad 100644
+> --- a/arch/arm64/kvm/reset.c
+> +++ b/arch/arm64/kvm/reset.c
+> @@ -210,10 +210,16 @@ static bool vcpu_allowed_register_width(struct kvm_vcpu *vcpu)
+>   */
+>  int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+>  {
+> +	struct vcpu_reset_state reset_state;
+>  	int ret;
+>  	bool loaded;
+>  	u32 pstate;
+>  
+> +	mutex_lock(&vcpu->kvm->lock);
+> +	memcpy(&reset_state, &vcpu->arch.reset_state, sizeof(reset_state));
 
-Applied to kvm-arm64/mmu/el2-tracking, thanks!
+nit: "reset_state = vcpu->arch.reset_state;" should do the trick.
 
-[1/1] KVM: arm64: Make hyp_panic() more robust when protected mode is enabled
-      commit: ccac96977243d7916053550f62e6489760ad0adc
+> +	vcpu->arch.reset_state.reset = false;
 
-Cheers,
+We should probably need to upgrade this to a WRITE_ONCE() to match the
+PSCI side.
+
+> +	mutex_unlock(&vcpu->kvm->lock);
+> +
+>  	/* Reset PMU outside of the non-preemptible section */
+>  	kvm_pmu_vcpu_reset(vcpu);
+>  
+> @@ -276,8 +282,8 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+>  	 * Additional reset state handling that PSCI may have imposed on us.
+>  	 * Must be done after all the sys_reg reset.
+>  	 */
+> -	if (vcpu->arch.reset_state.reset) {
+> -		unsigned long target_pc = vcpu->arch.reset_state.pc;
+> +	if (reset_state.reset) {
+> +		unsigned long target_pc = reset_state.pc;
+>  
+>  		/* Gracefully handle Thumb2 entry point */
+>  		if (vcpu_mode_is_32bit(vcpu) && (target_pc & 1)) {
+> @@ -286,13 +292,11 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+>  		}
+>  
+>  		/* Propagate caller endianness */
+> -		if (vcpu->arch.reset_state.be)
+> +		if (reset_state.be)
+>  			kvm_vcpu_set_be(vcpu);
+>  
+>  		*vcpu_pc(vcpu) = target_pc;
+> -		vcpu_set_reg(vcpu, 0, vcpu->arch.reset_state.r0);
+> -
+> -		vcpu->arch.reset_state.reset = false;
+> +		vcpu_set_reg(vcpu, 0, reset_state.r0);
+>  	}
+>  
+>  	/* Reset timer */
+
+Thanks,
 
 	M.
+
 -- 
 Without deviation from the norm, progress is not possible.
-
-
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
