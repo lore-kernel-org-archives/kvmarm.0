@@ -2,73 +2,69 @@ Return-Path: <SRS0=mpH5=NJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF8BDC4338F
-	for <kvmarm@archiver.kernel.org>; Wed, 18 Aug 2021 16:52:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9709EC4338F
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Aug 2021 18:14:48 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 346C4610F9
-	for <kvmarm@archiver.kernel.org>; Wed, 18 Aug 2021 16:52:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 346C4610F9
+	by mail.kernel.org (Postfix) with ESMTP id 1080861100
+	for <kvmarm@archiver.kernel.org>; Wed, 18 Aug 2021 18:14:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 1080861100
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B4ED84A1AF;
-	Wed, 18 Aug 2021 12:52:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 83D2A4A49C;
+	Wed, 18 Aug 2021 14:14:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id sE0aGPcSkI1r; Wed, 18 Aug 2021 12:52:21 -0400 (EDT)
+	with ESMTP id csCtPKDdOynK; Wed, 18 Aug 2021 14:14:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A2B74B0CD;
-	Wed, 18 Aug 2021 12:52:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 416A24ACC9;
+	Wed, 18 Aug 2021 14:14:42 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2CF4F4B0CB
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Aug 2021 12:52:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 349914A4A3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Aug 2021 14:14:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 79O9Clwhy4-5 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 18 Aug 2021 12:52:19 -0400 (EDT)
+ with ESMTP id YDJZCZ2-JwEr for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 18 Aug 2021 14:14:39 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2D2CC4B098
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Aug 2021 12:52:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5BC5C4A49C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Aug 2021 14:14:39 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 63D69610E8;
- Wed, 18 Aug 2021 16:52:17 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by mail.kernel.org (Postfix) with ESMTPSA id 2E17860E09;
+ Wed, 18 Aug 2021 18:14:38 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mGOnX-005npK-AX; Wed, 18 Aug 2021 17:52:15 +0100
-Date: Wed, 18 Aug 2021 17:52:14 +0100
-Message-ID: <87eeaqsnk1.wl-maz@kernel.org>
+ id 1mGQ5E-005oZa-4d; Wed, 18 Aug 2021 19:14:36 +0100
 From: Marc Zyngier <maz@kernel.org>
-To: Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH] KVM: stats: Add VM stat for remote tlb flush requests
-In-Reply-To: <CAAdAUtjFdEX73fTDu-+gGfPR=KqvvSzVRZ=vVGJe=8=iAJOv1A@mail.gmail.com>
-References: <20210817002639.3856694-1-jingzhangos@google.com>
- <87v943rx32.wl-maz@kernel.org>
- <CAAdAUtjFdEX73fTDu-+gGfPR=KqvvSzVRZ=vVGJe=8=iAJOv1A@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org
+Subject: [PATCH] KVM: arm64: vgic: Resample HW pending state on deactivation
+Date: Wed, 18 Aug 2021 19:14:32 +0100
+Message-Id: <20210818181432.432256-1-maz@kernel.org>
+X-Mailer: git-send-email 2.30.2
+MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, dmatlack@google.com,
- pshier@google.com, oupton@google.com
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com,
+ suzuki.poulose@arm.com, alexandru.elisei@arm.com, andre.przywara@arm.com,
+ eric.auger@redhat.com, oupton@google.com, ricarkol@google.com,
+ kernel-team@android.com, rananta@google.com, stable@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: KVM <kvm@vger.kernel.org>, Peter Shier <pshier@google.com>,
- David Matlack <dmatlack@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- KVMARM <kvmarm@lists.cs.columbia.edu>
+Cc: kernel-team@android.com, Andre Przywara <andre.przywara@arm.com>,
+ stable@vger.kernel.org, Raghavendra Rao Ananta <rananta@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -85,65 +81,148 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 18 Aug 2021 17:15:36 +0100,
-Jing Zhang <jingzhangos@google.com> wrote:
-> 
-> Hi Marc,
-> 
-> On Wed, Aug 18, 2021 at 1:11 AM Marc Zyngier <maz@kernel.org> wrote:
-> >
-> > On Tue, 17 Aug 2021 01:26:39 +0100,
-> > Jing Zhang <jingzhangos@google.com> wrote:
-> > >
-> > > Add a new stat that counts the number of times a remote TLB flush is
-> > > requested, regardless of whether it kicks vCPUs out of guest mode. This
-> > > allows us to look at how often flushes are initiated.
-> >
-> > nit: this is a very x86-centric view of things. On arm64, TLB
-> > invalidation is broadcast in HW, and does not interrupt the guest
-> > execution.
-> >
-> Understood. Thanks.
-> > >
-> > > Original-by: David Matlack <dmatlack@google.com>
-> > > Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> > > ---
-> > >  arch/arm64/kvm/mmu.c      | 1 +
-> > >  include/linux/kvm_host.h  | 3 ++-
-> > >  include/linux/kvm_types.h | 1 +
-> > >  virt/kvm/kvm_main.c       | 1 +
-> > >  4 files changed, 5 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > > index 0625bf2353c2..f5bb235bbb59 100644
-> > > --- a/arch/arm64/kvm/mmu.c
-> > > +++ b/arch/arm64/kvm/mmu.c
-> > > @@ -80,6 +80,7 @@ static bool memslot_is_logging(struct kvm_memory_slot *memslot)
-> > >   */
-> > >  void kvm_flush_remote_tlbs(struct kvm *kvm)
-> > >  {
-> > > +     ++kvm->stat.generic.remote_tlb_flush_requests;
-> > >       kvm_call_hyp(__kvm_tlb_flush_vmid, &kvm->arch.mmu);
-> > >  }
-> >
-> > We already have this queued for 5.15 [1].
-> I guess you mean the change for "remote_tlb_flush" has been queued,
-> not "remote_tlb_flush_requests"?
+When a mapped level interrupt (a timer, for example) is deactivated
+by the guest, the corresponding host interrupt is equally deactivated.
+However, the fate of the pending state still needs to be dealt
+with in SW.
 
-Yes, this is what I meant, as I only quoted the bit that was redundant.
+This is specially true when the interrupt was in the active+pending
+state in the virtual distributor at the point where the guest
+was entered. On exit, the pending state is potentially stale
+(the guest may have put the interrupt in a non-pending state).
 
-> These two counters would have the same value for arm64, but not for
-> others (at least x86).
+If we don't do anything, the interrupt will be spuriously injected
+in the guest. Although this shouldn't have any ill effect (spurious
+interrupts are always possible), we can improve the emulation by
+detecting the deactivation-while-pending case and resample the
+interrupt.
 
-Sure. It is just that this patch does two things at once, but doesn't
-advertise it.
+Fixes: e40cc57bac79 ("KVM: arm/arm64: vgic: Support level-triggered mapped interrupts")
+Reported-by: Raghavendra Rao Ananta <rananta@google.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Cc: stable@vger.kernel.org
+---
+ arch/arm64/kvm/vgic/vgic-v2.c | 25 ++++++++++++++++++-------
+ arch/arm64/kvm/vgic/vgic-v3.c | 25 ++++++++++++++++++-------
+ 2 files changed, 36 insertions(+), 14 deletions(-)
 
-Thanks,
-
-	M.
-
+diff --git a/arch/arm64/kvm/vgic/vgic-v2.c b/arch/arm64/kvm/vgic/vgic-v2.c
+index 2c580204f1dc..3e52ea86a87f 100644
+--- a/arch/arm64/kvm/vgic/vgic-v2.c
++++ b/arch/arm64/kvm/vgic/vgic-v2.c
+@@ -60,6 +60,7 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+ 		u32 val = cpuif->vgic_lr[lr];
+ 		u32 cpuid, intid = val & GICH_LR_VIRTUALID;
+ 		struct vgic_irq *irq;
++		bool deactivated;
+ 
+ 		/* Extract the source vCPU id from the LR */
+ 		cpuid = val & GICH_LR_PHYSID_CPUID;
+@@ -75,7 +76,8 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+ 
+ 		raw_spin_lock(&irq->irq_lock);
+ 
+-		/* Always preserve the active bit */
++		/* Always preserve the active bit, note deactivation */
++		deactivated = irq->active && !(val & GICH_LR_ACTIVE_BIT);
+ 		irq->active = !!(val & GICH_LR_ACTIVE_BIT);
+ 
+ 		if (irq->active && vgic_irq_is_sgi(intid))
+@@ -105,6 +107,12 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+ 		 * device state could have changed or we simply need to
+ 		 * process the still pending interrupt later.
+ 		 *
++		 * We could also have entered the guest with the interrupt
++		 * active+pending. On the next exit, we need to re-evaluate
++		 * the pending state, as it could otherwise result in a
++		 * spurious interrupt by injecting a now potentially stale
++		 * pending state.
++		 *
+ 		 * If this causes us to lower the level, we have to also clear
+ 		 * the physical active state, since we will otherwise never be
+ 		 * told when the interrupt becomes asserted again.
+@@ -115,12 +123,15 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+ 		if (vgic_irq_is_mapped_level(irq)) {
+ 			bool resample = false;
+ 
+-			if (val & GICH_LR_PENDING_BIT) {
+-				irq->line_level = vgic_get_phys_line_level(irq);
+-				resample = !irq->line_level;
+-			} else if (vgic_irq_needs_resampling(irq) &&
+-				   !(irq->active || irq->pending_latch)) {
+-				resample = true;
++			if (unlikely(vgic_irq_needs_resampling(irq))) {
++				if (!(irq->active || irq->pending_latch))
++					resample = true;
++			} else {
++				if ((val & GICH_LR_PENDING_BIT) ||
++				    (deactivated && irq->line_level)) {
++					irq->line_level = vgic_get_phys_line_level(irq);
++					resample = !irq->line_level;
++				}
+ 			}
+ 
+ 			if (resample)
+diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+index 66004f61cd83..74f9aefffd5e 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-v3.c
+@@ -46,6 +46,7 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+ 		u32 intid, cpuid;
+ 		struct vgic_irq *irq;
+ 		bool is_v2_sgi = false;
++		bool deactivated;
+ 
+ 		cpuid = val & GICH_LR_PHYSID_CPUID;
+ 		cpuid >>= GICH_LR_PHYSID_CPUID_SHIFT;
+@@ -68,7 +69,8 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+ 
+ 		raw_spin_lock(&irq->irq_lock);
+ 
+-		/* Always preserve the active bit */
++		/* Always preserve the active bit, note deactivation */
++		deactivated = irq->active && !(val & ICH_LR_ACTIVE_BIT);
+ 		irq->active = !!(val & ICH_LR_ACTIVE_BIT);
+ 
+ 		if (irq->active && is_v2_sgi)
+@@ -98,6 +100,12 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+ 		 * device state could have changed or we simply need to
+ 		 * process the still pending interrupt later.
+ 		 *
++		 * We could also have entered the guest with the interrupt
++		 * active+pending. On the next exit, we need to re-evaluate
++		 * the pending state, as it could otherwise result in a
++		 * spurious interrupt by injecting a now potentially stale
++		 * pending state.
++		 *
+ 		 * If this causes us to lower the level, we have to also clear
+ 		 * the physical active state, since we will otherwise never be
+ 		 * told when the interrupt becomes asserted again.
+@@ -108,12 +116,15 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+ 		if (vgic_irq_is_mapped_level(irq)) {
+ 			bool resample = false;
+ 
+-			if (val & ICH_LR_PENDING_BIT) {
+-				irq->line_level = vgic_get_phys_line_level(irq);
+-				resample = !irq->line_level;
+-			} else if (vgic_irq_needs_resampling(irq) &&
+-				   !(irq->active || irq->pending_latch)) {
+-				resample = true;
++			if (unlikely(vgic_irq_needs_resampling(irq))) {
++				if (!(irq->active || irq->pending_latch))
++					resample = true;
++			} else {
++				if ((val & ICH_LR_PENDING_BIT) ||
++				    (deactivated && irq->line_level)) {
++					irq->line_level = vgic_get_phys_line_level(irq);
++					resample = !irq->line_level;
++				}
+ 			}
+ 
+ 			if (resample)
 -- 
-Without deviation from the norm, progress is not possible.
+2.30.2
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
