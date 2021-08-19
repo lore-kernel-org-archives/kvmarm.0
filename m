@@ -2,69 +2,79 @@ Return-Path: <SRS0=/4wP=NK=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEDC6C4338F
-	for <kvmarm@archiver.kernel.org>; Thu, 19 Aug 2021 08:19:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C548DC4320A
+	for <kvmarm@archiver.kernel.org>; Thu, 19 Aug 2021 09:11:21 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 22A246113B
-	for <kvmarm@archiver.kernel.org>; Thu, 19 Aug 2021 08:19:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 22A246113B
+	by mail.kernel.org (Postfix) with ESMTP id 385DC61131
+	for <kvmarm@archiver.kernel.org>; Thu, 19 Aug 2021 09:11:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 385DC61131
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B66B44B10E;
-	Thu, 19 Aug 2021 04:19:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 99FBF4B0BF;
+	Thu, 19 Aug 2021 05:11:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id E8d1U-yYtADx; Thu, 19 Aug 2021 04:18:58 -0400 (EDT)
+	with ESMTP id Ybe-yW-FH4Zf; Thu, 19 Aug 2021 05:11:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 51DDA4B10F;
-	Thu, 19 Aug 2021 04:18:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C07D4B0D0;
+	Thu, 19 Aug 2021 05:11:15 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E6EB4B10D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Aug 2021 04:18:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B71284B0BF
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Aug 2021 05:11:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VwJX2rHwsPpy for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 Aug 2021 04:18:56 -0400 (EDT)
+ with ESMTP id BfKKoevqWtaO for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 Aug 2021 05:11:13 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 11C764B10C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Aug 2021 04:18:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 70A0E4B0BE
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Aug 2021 05:11:13 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 177B061139;
- Thu, 19 Aug 2021 08:18:55 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
+ by mail.kernel.org (Postfix) with ESMTPSA id AA2D06108B;
+ Thu, 19 Aug 2021 09:11:11 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mGdGG-005vQx-SX; Thu, 19 Aug 2021 09:18:53 +0100
+ id 1mGe4r-005vyM-No; Thu, 19 Aug 2021 10:11:09 +0100
+Date: Thu, 19 Aug 2021 10:11:09 +0100
+Message-ID: <874kblsssy.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- Oliver Upton <oupton@google.com>
-Subject: Re: [PATCH v2 0/4] KVM: arm64: Fix some races in CPU_ON PSCI call
-Date: Thu, 19 Aug 2021 09:18:49 +0100
-Message-Id: <162936111407.541676.11774865845630227247.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210818202133.1106786-1-oupton@google.com>
-References: <20210818202133.1106786-1-oupton@google.com>
-MIME-Version: 1.0
+To: Oliver Upton <oupton@google.com>, 	Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH v7 3/7] KVM: arm64: Allow userspace to configure a vCPU's
+ virtual offset
+In-Reply-To: <20210816001217.3063400-4-oupton@google.com>
+References: <20210816001217.3063400-1-oupton@google.com>
+ <20210816001217.3063400-4-oupton@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- oupton@google.com, suzuki.poulose@arm.com, james.morse@arm.com,
- ricarkol@google.com, alexandru.elisei@arm.com, drjones@redhat.com,
- jingzhangos@google.com, rananta@google.com, pshier@google.com
+X-SA-Exim-Rcpt-To: oupton@google.com, drjones@redhat.com, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, seanjc@google.com,
+ pshier@google.com, jmattson@google.com, dmatlack@google.com,
+ ricarkol@google.com, jingzhangos@google.com, rananta@google.com,
+ james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+ linux-arm-kernel@lists.infradead.org, will@kernel.org, catalin.marinas@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: Peter Shier <pshier@google.com>, Raghavendra Rao Anata <rananta@google.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org,
+ Will Deacon <will@kernel.org>, Sean Christopherson <seanjc@google.com>,
+ Peter Shier <pshier@google.com>, Raghavendra Rao Anata <rananta@google.com>,
+ David Matlack <dmatlack@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -81,37 +91,71 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 18 Aug 2021 20:21:29 +0000, Oliver Upton wrote:
-> The CPU_ON PSCI call requires careful coordination between vCPUs in KVM,
-> as it allows callers to send a payload (pc, context id) to another vCPU
-> to start execution. There are a couple of races in the handling of
-> CPU_ON:
+On Mon, 16 Aug 2021 01:12:13 +0100,
+Oliver Upton <oupton@google.com> wrote:
 > 
->  - KVM uses the kvm->lock to serialize the write-side of a vCPU's reset
->    state. However, kvm_vcpu_reset() doesn't take the lock on the
->    read-size, meaning the vCPU could be reset with interleaved state
->    from two separate CPU_ON calls.
+> Allow userspace to access the guest's virtual counter-timer offset
+> through the ONE_REG interface. The value read or written is defined to
+> be an offset from the guest's physical counter-timer. Add some
+> documentation to clarify how a VMM should use this and the existing
+> CNTVCT_EL0.
 > 
-> [...]
+> Signed-off-by: Oliver Upton <oupton@google.com>
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  Documentation/virt/kvm/api.rst    | 10 ++++++++++
+>  arch/arm64/include/uapi/asm/kvm.h |  1 +
+>  arch/arm64/kvm/arch_timer.c       | 23 +++++++++++++++++++++++
+>  arch/arm64/kvm/guest.c            |  6 +++++-
+>  include/kvm/arm_arch_timer.h      |  1 +
+>  5 files changed, 40 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index dae68e68ca23..adb04046a752 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -2463,6 +2463,16 @@ arm64 system registers have the following id bit patterns::
+>       derived from the register encoding for CNTV_CVAL_EL0.  As this is
+>       API, it must remain this way.
+>  
+> +.. warning::
+> +
+> +     The value of KVM_REG_ARM_TIMER_OFFSET is defined as an offset from
+> +     the guest's view of the physical counter-timer.
+> +
+> +     Userspace should use either KVM_REG_ARM_TIMER_OFFSET or
+> +     KVM_REG_ARM_TIMER_CNT to pause and resume a guest's virtual
+> +     counter-timer. Mixed use of these registers could result in an
+> +     unpredictable guest counter value.
+> +
+>  arm64 firmware pseudo-registers have the following bit pattern::
+>  
+>    0x6030 0000 0014 <regno:16>
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index b3edde68bc3e..949a31bc10f0 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -255,6 +255,7 @@ struct kvm_arm_copy_mte_tags {
+>  #define KVM_REG_ARM_TIMER_CTL		ARM64_SYS_REG(3, 3, 14, 3, 1)
+>  #define KVM_REG_ARM_TIMER_CVAL		ARM64_SYS_REG(3, 3, 14, 0, 2)
+>  #define KVM_REG_ARM_TIMER_CNT		ARM64_SYS_REG(3, 3, 14, 3, 2)
+> +#define KVM_REG_ARM_TIMER_OFFSET	ARM64_SYS_REG(3, 4, 14, 0, 3)
+>
 
-Applied to next, thanks!
+Andrew, does this warrant an update to the selftest that checks for
+sysreg visibility?
 
-[1/4] KVM: arm64: Fix read-side race on updates to vcpu reset state
-      commit: 6654f9dfcb88fea3b9affc180dc3c04333d0f306
-[2/4] KVM: arm64: Handle PSCI resets before userspace touches vCPU state
-      commit: 6826c6849b46aaa91300201213701eb861af4ba0
-[3/4] KVM: arm64: Enforce reserved bits for PSCI target affinities
-      commit: e10ecb4d6c0761ca545b3946df1707a41f9f845e
-[4/4] selftests: KVM: Introduce psci_cpu_on_test
-      commit: cb97cf95c44021278b7637731bc0928026bc29ab
+I am also wondering how a VMM such as QEMU is going to deal with the
+above restriction, given the way it blindly saves/restores all the
+registers that KVM exposes, hence hitting that mixed-use that the
+documentation warns about...
 
-Cheers,
+Thanks,
 
 	M.
+
 -- 
 Without deviation from the norm, progress is not possible.
-
-
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
