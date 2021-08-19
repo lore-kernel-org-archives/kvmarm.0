@@ -2,69 +2,84 @@ Return-Path: <SRS0=/4wP=NK=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFB87C4338F
-	for <kvmarm@archiver.kernel.org>; Thu, 19 Aug 2021 18:03:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3D55C4338F
+	for <kvmarm@archiver.kernel.org>; Thu, 19 Aug 2021 18:43:57 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 27D45610A0
-	for <kvmarm@archiver.kernel.org>; Thu, 19 Aug 2021 18:03:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 27D45610A0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 64E4A610A5
+	for <kvmarm@archiver.kernel.org>; Thu, 19 Aug 2021 18:43:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 64E4A610A5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ADE8A407A0;
-	Thu, 19 Aug 2021 14:03:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D3E9A4A5A0;
+	Thu, 19 Aug 2021 14:43:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id HXhTLVhWFu4Z; Thu, 19 Aug 2021 14:03:18 -0400 (EDT)
+	with ESMTP id RO18Y32Rltfq; Thu, 19 Aug 2021 14:43:53 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F296D4B0BE;
-	Thu, 19 Aug 2021 14:03:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F0F3F4B0BD;
+	Thu, 19 Aug 2021 14:43:52 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 748A14B0BE
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Aug 2021 14:03:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 533394ACC9
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Aug 2021 14:43:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sLXJblqej4sR for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 Aug 2021 14:03:15 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0EA8040870
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Aug 2021 14:03:15 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ with ESMTP id Z6VS-0tAVymP for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 Aug 2021 14:43:50 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 466224A5A0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Aug 2021 14:43:50 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1629398630;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=H/wl8m/9lH1CHxbJFAhOGRrmreud5t/3OP9MGx3avmE=;
+ b=JTIhHJIB6ybC8A2SMKvNyxorFaMaY2Dr9j0/cGbjWafDOP2r+oxhAmJrpMblbfGg63jyV8
+ QohTNIxudTWdeW0XYs4COQlrh1Wiy6w8rGvX8rR1OQV3F0AyLRvTn00ilT2GDmXj0ZFHr2
+ i81DZYwsybSm/OzBtueB3JADLXEkFjA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-563-aKQUDwrROzmaDp7OcHlfzA-1; Thu, 19 Aug 2021 14:43:46 -0400
+X-MC-Unique: aKQUDwrROzmaDp7OcHlfzA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 283066109F;
- Thu, 19 Aug 2021 18:03:13 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1mGmNj-006293-CQ; Thu, 19 Aug 2021 19:03:11 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org
-Subject: [PATCH v2] KVM: arm64: vgic: Resample HW pending state on deactivation
-Date: Thu, 19 Aug 2021 19:03:05 +0100
-Message-Id: <20210819180305.1670525-1-maz@kernel.org>
-X-Mailer: git-send-email 2.30.2
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 58EA1107ACF5;
+ Thu, 19 Aug 2021 18:43:44 +0000 (UTC)
+Received: from fuller.cnet (ovpn-112-6.gru2.redhat.com [10.97.112.6])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C1C3F188E4;
+ Thu, 19 Aug 2021 18:43:43 +0000 (UTC)
+Received: by fuller.cnet (Postfix, from userid 1000)
+ id 054DB434F000; Thu, 19 Aug 2021 15:24:22 -0300 (-03)
+Date: Thu, 19 Aug 2021 15:24:22 -0300
+From: Marcelo Tosatti <mtosatti@redhat.com>
+To: Oliver Upton <oupton@google.com>
+Subject: Re: [PATCH v7 1/6] KVM: x86: Fix potential race in KVM_GET_CLOCK
+Message-ID: <20210819182422.GA25923@fuller.cnet>
+References: <20210816001130.3059564-1-oupton@google.com>
+ <20210816001130.3059564-2-oupton@google.com>
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com,
- suzuki.poulose@arm.com, alexandru.elisei@arm.com, andre.przywara@arm.com,
- eric.auger@redhat.com, oupton@google.com, ricarkol@google.com,
- kernel-team@android.com, rananta@google.com, stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kernel-team@android.com, Andre Przywara <andre.przywara@arm.com>,
- stable@vger.kernel.org, Raghavendra Rao Ananta <rananta@google.com>
+Content-Disposition: inline
+In-Reply-To: <20210816001130.3059564-2-oupton@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org,
+ Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+ Raghavendra Rao Anata <rananta@google.com>, Peter Shier <pshier@google.com>,
+ Sean Christopherson <seanjc@google.com>, David Matlack <dmatlack@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -81,228 +96,20 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-When a mapped level interrupt (a timer, for example) is deactivated
-by the guest, the corresponding host interrupt is equally deactivated.
-However, the fate of the pending state still needs to be dealt
-with in SW.
+On Mon, Aug 16, 2021 at 12:11:25AM +0000, Oliver Upton wrote:
+> Sean noticed that KVM_GET_CLOCK was checking kvm_arch.use_master_clock
+> outside of the pvclock sync lock. This is problematic, as the clock
+> value written to the user may or may not actually correspond to a stable
+> TSC.
+> 
+> Fix the race by populating the entire kvm_clock_data structure behind
+> the pvclock_gtod_sync_lock.
 
-This is specially true when the interrupt was in the active+pending
-state in the virtual distributor at the point where the guest
-was entered. On exit, the pending state is potentially stale
-(the guest may have put the interrupt in a non-pending state).
+Oliver, 
 
-If we don't do anything, the interrupt will be spuriously injected
-in the guest. Although this shouldn't have any ill effect (spurious
-interrupts are always possible), we can improve the emulation by
-detecting the deactivation-while-pending case and resample the
-interrupt.
+Can you please describe the race in more detail?
 
-While we're at it, move the logic into a common helper that can
-be shared between the two GIC implementations.
-
-Fixes: e40cc57bac79 ("KVM: arm/arm64: vgic: Support level-triggered mapped interrupts")
-Reported-by: Raghavendra Rao Ananta <rananta@google.com>
-Tested-by: Raghavendra Rao Ananta <rananta@google.com>
-Reviewed-by: Oliver Upton <oupton@google.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Cc: stable@vger.kernel.org
----
-
-Notes:
-    * From v1:
-      - Moved the resampling into a separate helper, and pointed both
-        GIC implementations to it.
-      - Collected TB, RB, with thanks.
-
- arch/arm64/kvm/vgic/vgic-v2.c | 36 +++++----------------------------
- arch/arm64/kvm/vgic/vgic-v3.c | 36 +++++----------------------------
- arch/arm64/kvm/vgic/vgic.c    | 38 +++++++++++++++++++++++++++++++++++
- arch/arm64/kvm/vgic/vgic.h    |  2 ++
- 4 files changed, 50 insertions(+), 62 deletions(-)
-
-diff --git a/arch/arm64/kvm/vgic/vgic-v2.c b/arch/arm64/kvm/vgic/vgic-v2.c
-index 2c580204f1dc..95a18cec14a3 100644
---- a/arch/arm64/kvm/vgic/vgic-v2.c
-+++ b/arch/arm64/kvm/vgic/vgic-v2.c
-@@ -60,6 +60,7 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
- 		u32 val = cpuif->vgic_lr[lr];
- 		u32 cpuid, intid = val & GICH_LR_VIRTUALID;
- 		struct vgic_irq *irq;
-+		bool deactivated;
- 
- 		/* Extract the source vCPU id from the LR */
- 		cpuid = val & GICH_LR_PHYSID_CPUID;
-@@ -75,7 +76,8 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
- 
- 		raw_spin_lock(&irq->irq_lock);
- 
--		/* Always preserve the active bit */
-+		/* Always preserve the active bit, note deactivation */
-+		deactivated = irq->active && !(val & GICH_LR_ACTIVE_BIT);
- 		irq->active = !!(val & GICH_LR_ACTIVE_BIT);
- 
- 		if (irq->active && vgic_irq_is_sgi(intid))
-@@ -96,36 +98,8 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
- 		if (irq->config == VGIC_CONFIG_LEVEL && !(val & GICH_LR_STATE))
- 			irq->pending_latch = false;
- 
--		/*
--		 * Level-triggered mapped IRQs are special because we only
--		 * observe rising edges as input to the VGIC.
--		 *
--		 * If the guest never acked the interrupt we have to sample
--		 * the physical line and set the line level, because the
--		 * device state could have changed or we simply need to
--		 * process the still pending interrupt later.
--		 *
--		 * If this causes us to lower the level, we have to also clear
--		 * the physical active state, since we will otherwise never be
--		 * told when the interrupt becomes asserted again.
--		 *
--		 * Another case is when the interrupt requires a helping hand
--		 * on deactivation (no HW deactivation, for example).
--		 */
--		if (vgic_irq_is_mapped_level(irq)) {
--			bool resample = false;
--
--			if (val & GICH_LR_PENDING_BIT) {
--				irq->line_level = vgic_get_phys_line_level(irq);
--				resample = !irq->line_level;
--			} else if (vgic_irq_needs_resampling(irq) &&
--				   !(irq->active || irq->pending_latch)) {
--				resample = true;
--			}
--
--			if (resample)
--				vgic_irq_set_phys_active(irq, false);
--		}
-+		/* Handle resampling for mapped interrupts if required */
-+		vgic_irq_handle_resampling(irq, deactivated, val & GICH_LR_PENDING_BIT);
- 
- 		raw_spin_unlock(&irq->irq_lock);
- 		vgic_put_irq(vcpu->kvm, irq);
-diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-index 66004f61cd83..21a6207fb2ee 100644
---- a/arch/arm64/kvm/vgic/vgic-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3.c
-@@ -46,6 +46,7 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
- 		u32 intid, cpuid;
- 		struct vgic_irq *irq;
- 		bool is_v2_sgi = false;
-+		bool deactivated;
- 
- 		cpuid = val & GICH_LR_PHYSID_CPUID;
- 		cpuid >>= GICH_LR_PHYSID_CPUID_SHIFT;
-@@ -68,7 +69,8 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
- 
- 		raw_spin_lock(&irq->irq_lock);
- 
--		/* Always preserve the active bit */
-+		/* Always preserve the active bit, note deactivation */
-+		deactivated = irq->active && !(val & ICH_LR_ACTIVE_BIT);
- 		irq->active = !!(val & ICH_LR_ACTIVE_BIT);
- 
- 		if (irq->active && is_v2_sgi)
-@@ -89,36 +91,8 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
- 		if (irq->config == VGIC_CONFIG_LEVEL && !(val & ICH_LR_STATE))
- 			irq->pending_latch = false;
- 
--		/*
--		 * Level-triggered mapped IRQs are special because we only
--		 * observe rising edges as input to the VGIC.
--		 *
--		 * If the guest never acked the interrupt we have to sample
--		 * the physical line and set the line level, because the
--		 * device state could have changed or we simply need to
--		 * process the still pending interrupt later.
--		 *
--		 * If this causes us to lower the level, we have to also clear
--		 * the physical active state, since we will otherwise never be
--		 * told when the interrupt becomes asserted again.
--		 *
--		 * Another case is when the interrupt requires a helping hand
--		 * on deactivation (no HW deactivation, for example).
--		 */
--		if (vgic_irq_is_mapped_level(irq)) {
--			bool resample = false;
--
--			if (val & ICH_LR_PENDING_BIT) {
--				irq->line_level = vgic_get_phys_line_level(irq);
--				resample = !irq->line_level;
--			} else if (vgic_irq_needs_resampling(irq) &&
--				   !(irq->active || irq->pending_latch)) {
--				resample = true;
--			}
--
--			if (resample)
--				vgic_irq_set_phys_active(irq, false);
--		}
-+		/* Handle resampling for mapped interrupts if required */
-+		vgic_irq_handle_resampling(irq, deactivated, val & ICH_LR_PENDING_BIT);
- 
- 		raw_spin_unlock(&irq->irq_lock);
- 		vgic_put_irq(vcpu->kvm, irq);
-diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-index 111bff47e471..42a6ac78fe95 100644
---- a/arch/arm64/kvm/vgic/vgic.c
-+++ b/arch/arm64/kvm/vgic/vgic.c
-@@ -1022,3 +1022,41 @@ bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int vintid)
- 
- 	return map_is_active;
- }
-+
-+/*
-+ * Level-triggered mapped IRQs are special because we only observe rising
-+ * edges as input to the VGIC.
-+ *
-+ * If the guest never acked the interrupt we have to sample the physical
-+ * line and set the line level, because the device state could have changed
-+ * or we simply need to process the still pending interrupt later.
-+ *
-+ * We could also have entered the guest with the interrupt active+pending.
-+ * On the next exit, we need to re-evaluate the pending state, as it could
-+ * otherwise result in a spurious interrupt by injecting a now potentially
-+ * stale pending state.
-+ *
-+ * If this causes us to lower the level, we have to also clear the physical
-+ * active state, since we will otherwise never be told when the interrupt
-+ * becomes asserted again.
-+ *
-+ * Another case is when the interrupt requires a helping hand on
-+ * deactivation (no HW deactivation, for example).
-+ */
-+void vgic_irq_handle_resampling(struct vgic_irq *irq,
-+				bool lr_deactivated, bool lr_pending)
-+{
-+	if (vgic_irq_is_mapped_level(irq)) {
-+		bool resample = false;
-+
-+		if (unlikely(vgic_irq_needs_resampling(irq))) {
-+			resample = !(irq->active || irq->pending_latch);
-+		} else if (lr_pending || (lr_deactivated && irq->line_level)) {
-+			irq->line_level = vgic_get_phys_line_level(irq);
-+			resample = !irq->line_level;
-+		}
-+
-+		if (resample)
-+			vgic_irq_set_phys_active(irq, false);
-+	}
-+}
-diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-index dc1f3d1657ee..14a9218641f5 100644
---- a/arch/arm64/kvm/vgic/vgic.h
-+++ b/arch/arm64/kvm/vgic/vgic.h
-@@ -169,6 +169,8 @@ void vgic_irq_set_phys_active(struct vgic_irq *irq, bool active);
- bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
- 			   unsigned long flags);
- void vgic_kick_vcpus(struct kvm *kvm);
-+void vgic_irq_handle_resampling(struct vgic_irq *irq,
-+				bool lr_deactivated, bool lr_pending);
- 
- int vgic_check_ioaddr(struct kvm *kvm, phys_addr_t *ioaddr,
- 		      phys_addr_t addr, phys_addr_t alignment);
--- 
-2.30.2
+Is it about host TSC going unstable VS parallel KVM_GET_CLOCK ? 
 
 _______________________________________________
 kvmarm mailing list
