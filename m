@@ -2,70 +2,76 @@ Return-Path: <SRS0=/4wP=NK=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7754C4338F
-	for <kvmarm@archiver.kernel.org>; Thu, 19 Aug 2021 10:47:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C472CC4338F
+	for <kvmarm@archiver.kernel.org>; Thu, 19 Aug 2021 14:36:10 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 456B561155
-	for <kvmarm@archiver.kernel.org>; Thu, 19 Aug 2021 10:47:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 456B561155
+	by mail.kernel.org (Postfix) with ESMTP id 37458610A7
+	for <kvmarm@archiver.kernel.org>; Thu, 19 Aug 2021 14:36:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 37458610A7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D5E314B0EE;
-	Thu, 19 Aug 2021 06:47:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B755F4A534;
+	Thu, 19 Aug 2021 10:36:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 62HJRl5y4TcB; Thu, 19 Aug 2021 06:47:36 -0400 (EDT)
+	with ESMTP id t99SirErmOHe; Thu, 19 Aug 2021 10:36:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C61D4B0ED;
-	Thu, 19 Aug 2021 06:47:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D00534B0C1;
+	Thu, 19 Aug 2021 10:36:04 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F10E84B0ED
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Aug 2021 06:47:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2611C4A534
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Aug 2021 10:36:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VUJscebH-u-1 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 Aug 2021 06:47:34 -0400 (EDT)
+ with ESMTP id MJatTxHSqYpH for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 Aug 2021 10:36:00 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E39214ACC9
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Aug 2021 06:47:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 520054A4A3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Aug 2021 10:36:00 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 2194461154;
- Thu, 19 Aug 2021 10:47:32 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
+ by mail.kernel.org (Postfix) with ESMTPSA id 8DDF26103A;
+ Thu, 19 Aug 2021 14:35:58 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mGfa6-005x1C-0z; Thu, 19 Aug 2021 11:47:30 +0100
+ id 1mGj9A-005zY7-JG; Thu, 19 Aug 2021 15:35:56 +0100
+Date: Thu, 19 Aug 2021 15:35:56 +0100
+Message-ID: <87zgtdqz77.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: kvm@vger.kernel.org, Ricardo Koller <ricarkol@google.com>,
- kvmarm@lists.cs.columbia.edu
-Subject: Re: [PATCH] KVM: arm64: vgic: drop WARN from vgic_get_irq
-Date: Thu, 19 Aug 2021 11:47:24 +0100
-Message-Id: <162937003857.598624.13282260461070232329.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210818213205.598471-1-ricarkol@google.com>
-References: <20210818213205.598471-1-ricarkol@google.com>
-MIME-Version: 1.0
+To: Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH v4 11/15] KVM: arm64: Guest exit handlers for nVHE hyp
+In-Reply-To: <87fsv6snup.wl-maz@kernel.org>
+References: <20210817081134.2918285-1-tabba@google.com>
+ <20210817081134.2918285-12-tabba@google.com>
+ <87fsv6snup.wl-maz@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, ricarkol@google.com,
- kvmarm@lists.cs.columbia.edu, jingzhangos@google.com, pshier@google.com,
- oupton@google.com, james.morse@arm.com, rananta@google.com,
- suzuki.poulose@arm.com, catalin.marinas@arm.com, drjones@redhat.com,
- reijiw@google.com, alexandru.elisei@arm.com
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.cs.columbia.edu,
+ will@kernel.org, james.morse@arm.com, alexandru.elisei@arm.com,
+ suzuki.poulose@arm.com, mark.rutland@arm.com, christoffer.dall@arm.com,
+ pbonzini@redhat.com, drjones@redhat.com, oupton@google.com, qperret@google.com,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: catalin.marinas@arm.com, pshier@google.com, rananta@google.com
+Cc: kernel-team@android.com, kvm@vger.kernel.org, pbonzini@redhat.com,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -82,26 +88,125 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 18 Aug 2021 14:32:05 -0700, Ricardo Koller wrote:
-> vgic_get_irq(intid) is used all over the vgic code in order to get a
-> reference to a struct irq. It warns whenever intid is not a valid number
-> (like when it's a reserved IRQ number). The issue is that this warning
-> can be triggered from userspace (e.g., KVM_IRQ_LINE for intid 1020).
+Hi Fuad,
+
+On Wed, 18 Aug 2021 17:45:50 +0100,
+Marc Zyngier <maz@kernel.org> wrote:
 > 
-> Drop the WARN call from vgic_get_irq.
+> On Tue, 17 Aug 2021 09:11:30 +0100,
+> Fuad Tabba <tabba@google.com> wrote:
+> > 
+> > Add an array of pointers to handlers for various trap reasons in
+> > nVHE code.
+> > 
+> > The current code selects how to fixup a guest on exit based on a
+> > series of if/else statements. Future patches will also require
+> > different handling for guest exists. Create an array of handlers
+> > to consolidate them.
+> > 
+> > No functional change intended as the array isn't populated yet.
+> > 
+> > Acked-by: Will Deacon <will@kernel.org>
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > ---
+> >  arch/arm64/kvm/hyp/include/hyp/switch.h | 43 +++++++++++++++++++++++++
+> >  arch/arm64/kvm/hyp/nvhe/switch.c        | 33 +++++++++++++++++++
+> >  2 files changed, 76 insertions(+)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > index a0e78a6027be..5a2b89b96c67 100644
+> > --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > @@ -409,6 +409,46 @@ static inline bool __hyp_handle_ptrauth(struct kvm_vcpu *vcpu)
+> >  	return true;
+> >  }
+> >  
+> > +typedef int (*exit_handle_fn)(struct kvm_vcpu *);
+> 
+> This returns an int...
+> 
+> > +
+> > +exit_handle_fn kvm_get_nvhe_exit_handler(struct kvm_vcpu *vcpu);
+> > +
+> > +static exit_handle_fn kvm_get_hyp_exit_handler(struct kvm_vcpu *vcpu)
+> > +{
+> > +	return is_nvhe_hyp_code() ? kvm_get_nvhe_exit_handler(vcpu) : NULL;
+> > +}
+> > +
+> > +/*
+> > + * Allow the hypervisor to handle the exit with an exit handler if it has one.
+> > + *
+> > + * Returns true if the hypervisor handled the exit, and control should go back
+> > + * to the guest, or false if it hasn't.
+> > + */
+> > +static bool kvm_hyp_handle_exit(struct kvm_vcpu *vcpu)
+> > +{
+> > +	bool is_handled = false;
+> 
+> ... which you then implicitly cast as a bool.
+> 
+> > +	exit_handle_fn exit_handler = kvm_get_hyp_exit_handler(vcpu);
+> > +
+> > +	if (exit_handler) {
+> > +		/*
+> > +		 * There's limited vcpu context here since it's not synced yet.
+> > +		 * Ensure that relevant vcpu context that might be used by the
+> > +		 * exit_handler is in sync before it's called and if handled.
+> > +		 */
+> > +		*vcpu_pc(vcpu) = read_sysreg_el2(SYS_ELR);
+> > +		*vcpu_cpsr(vcpu) = read_sysreg_el2(SYS_SPSR);
+> > +
+> > +		is_handled = exit_handler(vcpu);
+> 
+> What does 'is_handled' mean here? By definition, any trap *must* be
+> handled, one way or another. By the look of it, what you really mean
+> is something like "I have updated the vcpu state and you'd better
+> reload it". Is that what it means?
+> 
+> > +
+> > +		if (is_handled) {
+> > +			write_sysreg_el2(*vcpu_pc(vcpu), SYS_ELR);
+> > +			write_sysreg_el2(*vcpu_cpsr(vcpu), SYS_SPSR);
+> > +		}
+> > +	}
+> > +
+> > +	return is_handled;
+> > +}
+> 
+> All these functions really should be marked inline. Have you checked
+> how this expands on VHE? I think some compilers could be pretty
+> unhappy about the undefined symbol in kvm_get_hyp_exit_handler().
+> 
+> It is also unfortunate that we get a bunch of tests for various
+> flavours of traps (FP, PAuth, page faults...), only to hit yet another
+> decoding tree. Is there a way we could use this infrastructure for
+> everything?
 
-Applied to next, thanks!
+I realised that I wasn't very forthcoming here. I've decided to put
+the code where my mouth is and pushed out a branch [1] with your first
+10 patches, followed by my own take on this particular problem. It
+compiles, and even managed to boot a Debian guest on a nVHE box.
 
-[1/1] KVM: arm64: vgic: drop WARN from vgic_get_irq
-      commit: b9a51949cebcd57bfb9385d9da62ace52564898c
+As you can see, most of the early exit handling is now moved to
+specific handlers, unifying the handling. For the protected mode, you
+can provide your own handler array (just hack
+kvm_get_exit_handler_array() to return something else), which will do
+the right thing as long as you call into the existing handlers first.
 
-Cheers,
+When it comes to the ELR/SPSR handling, it is better left to the
+individual handlers (which we already do in some cases, see how we
+skip instructions, for example).
+
+Please let me know what you think.
+
+Thanks,
 
 	M.
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/pkvm-fixed-features
+
 -- 
 Without deviation from the norm, progress is not possible.
-
-
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
