@@ -2,85 +2,69 @@ Return-Path: <SRS0=/4wP=NK=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E967BC4338F
-	for <kvmarm@archiver.kernel.org>; Thu, 19 Aug 2021 08:16:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEDC6C4338F
+	for <kvmarm@archiver.kernel.org>; Thu, 19 Aug 2021 08:19:03 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5A0556112E
-	for <kvmarm@archiver.kernel.org>; Thu, 19 Aug 2021 08:16:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 5A0556112E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 22A246113B
+	for <kvmarm@archiver.kernel.org>; Thu, 19 Aug 2021 08:19:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 22A246113B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D564B4B10B;
-	Thu, 19 Aug 2021 04:16:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B66B44B10E;
+	Thu, 19 Aug 2021 04:19:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id USoIIizxN1yH; Thu, 19 Aug 2021 04:16:34 -0400 (EDT)
+	with ESMTP id E8d1U-yYtADx; Thu, 19 Aug 2021 04:18:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E02FE4B10E;
-	Thu, 19 Aug 2021 04:16:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 51DDA4B10F;
+	Thu, 19 Aug 2021 04:18:58 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C59F74B10C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Aug 2021 04:16:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E6EB4B10D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Aug 2021 04:18:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Oez1VtKgBHvb for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 Aug 2021 04:16:32 -0400 (EDT)
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com
- [209.85.167.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 769354B10B
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Aug 2021 04:16:32 -0400 (EDT)
-Received: by mail-lf1-f49.google.com with SMTP id y34so10999121lfa.8
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Aug 2021 01:16:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=yIjfNruIRqoaZMP1dFgzuYg2bekGFWIjBtMbeKsjOv4=;
- b=Uh1Rb4Tubmyt9cse91ISt5kDTlQA5cOUNtpTo3ndsgr8Ck+k+NFexFFUz7dyuM2H3t
- m3kAPtmzO3DBlZuQbQOS1BGJjUv9r6yFgy0WnVgPSxucBCkqke5QvTkuTCy+8oy0eOTb
- JkmkswyVt1D3ZoaYkI5dov/HLiOeTx2Mr0bQ2TJFhtusQPTrCpPomFM4IItSUMn8JFmy
- Q9HWWiKPZA6ri/QVNnb34rhV/YDwcBDhhZlbiewsQu0Tsb8x3P4CosXJJGeXo3yOBl4Y
- D8HnhI1tOhAnkfLZwT3K4kw7633qGlsmUBv1GFT8pq0ffBfsjvKvZ0yKkegYDWU7Uxxr
- 5cGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=yIjfNruIRqoaZMP1dFgzuYg2bekGFWIjBtMbeKsjOv4=;
- b=caIKGmr689Be1Hw/B5Z0kQC036RSyBIM8l2cwfRPv7DD48L5S6RsqLpHy0hGo9Pttr
- Ys4inqkHenpmpwvk+3jEjG6c3e/6jh22f/fFs3aB26baDgjiDURb5M662CO+5PLHDFMF
- pjwzXoCFs0o3kwEplHmFkMrEuPUM5MCV32DwtWiLYuN2xcKRsx1vIR7OCXY6HGTYmY9H
- 4BUCVjRRBnjnNn2fCajEC4DqUuoxO9qKW1BFc3L2gpo1mhI2QuV+f/Mb/7imfmmkwNX6
- 9pHb3mo2Bi2NcuUNP3qciQXtWyNXKUK6QszhNmSpvDvkJ2j/Vj2Bfb3kaxJ8A/mw/nbn
- oAiw==
-X-Gm-Message-State: AOAM5334r2myjsVH3aosdRBRFarlb0pAKHHF+Ujf3yqyNpozmn6GqPxl
- fez+KwfK5dz9FkUlw8zZhWyGiMZ9VWtT0DAQodJSqA==
-X-Google-Smtp-Source: ABdhPJwrWW9U4piKXkDbBKX+qAG8nI3LRbhJGUFw/CctYUBkZ/9YzEYznpDVd1/rjsXd1dFJ2yjXMXs2F+/onMOvPlM=
-X-Received: by 2002:a05:6512:4025:: with SMTP id
- br37mr9473510lfb.23.1629360990837; 
- Thu, 19 Aug 2021 01:16:30 -0700 (PDT)
+ with ESMTP id VwJX2rHwsPpy for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 Aug 2021 04:18:56 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 11C764B10C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Aug 2021 04:18:56 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 177B061139;
+ Thu, 19 Aug 2021 08:18:55 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mGdGG-005vQx-SX; Thu, 19 Aug 2021 09:18:53 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+ Oliver Upton <oupton@google.com>
+Subject: Re: [PATCH v2 0/4] KVM: arm64: Fix some races in CPU_ON PSCI call
+Date: Thu, 19 Aug 2021 09:18:49 +0100
+Message-Id: <162936111407.541676.11774865845630227247.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210818202133.1106786-1-oupton@google.com>
+References: <20210818202133.1106786-1-oupton@google.com>
 MIME-Version: 1.0
-References: <20210818213205.598471-1-ricarkol@google.com>
- <CAOQ_QshVenuri8WdZdEis4szCv03U0KRNt4CqDNtvUBsqBqUoA@mail.gmail.com>
- <YR1/YEY8DX+r05nt@google.com>
- <CAOQ_Qsgy7d7pWc=0AHpR2LHO67Z=gCa-TV46NxXMsFP8yqOzTw@mail.gmail.com>
- <877dghsvvt.wl-maz@kernel.org>
-In-Reply-To: <877dghsvvt.wl-maz@kernel.org>
-From: Oliver Upton <oupton@google.com>
-Date: Thu, 19 Aug 2021 01:16:19 -0700
-Message-ID: <CAOQ_QsiwWHWM_p8KOdehtCFP_yUzsCp7uF0ePXn9EGmvfYD7Aw@mail.gmail.com>
-Subject: Re: [PATCH] KVM: arm64: vgic: drop WARN from vgic_get_irq
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, pshier@google.com,
- rananta@google.com, kvmarm@lists.cs.columbia.edu
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+ oupton@google.com, suzuki.poulose@arm.com, james.morse@arm.com,
+ ricarkol@google.com, alexandru.elisei@arm.com, drjones@redhat.com,
+ jingzhangos@google.com, rananta@google.com, pshier@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Peter Shier <pshier@google.com>, Raghavendra Rao Anata <rananta@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -97,96 +81,37 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Aug 19, 2021 at 1:04 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> On Thu, 19 Aug 2021 08:41:19 +0100,
-> Oliver Upton <oupton@google.com> wrote:
-> >
-> > On Wed, Aug 18, 2021 at 2:45 PM Ricardo Koller <ricarkol@google.com> wrote:
-> > >
-> > > On Wed, Aug 18, 2021 at 02:34:03PM -0700, Oliver Upton wrote:
-> > > > Hi Ricardo,
-> > > >
-> > > > On Wed, Aug 18, 2021 at 2:32 PM Ricardo Koller <ricarkol@google.com> wrote:
-> > > > >
-> > > > > vgic_get_irq(intid) is used all over the vgic code in order to get a
-> > > > > reference to a struct irq. It warns whenever intid is not a valid number
-> > > > > (like when it's a reserved IRQ number). The issue is that this warning
-> > > > > can be triggered from userspace (e.g., KVM_IRQ_LINE for intid 1020).
-> > > > >
-> > > > > Drop the WARN call from vgic_get_irq.
-> > > > >
-> > > > > Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> > > > > ---
-> > > > >  arch/arm64/kvm/vgic/vgic.c | 1 -
-> > > > >  1 file changed, 1 deletion(-)
-> > > > >
-> > > > > diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-> > > > > index 111bff47e471..81cec508d413 100644
-> > > > > --- a/arch/arm64/kvm/vgic/vgic.c
-> > > > > +++ b/arch/arm64/kvm/vgic/vgic.c
-> > > > > @@ -106,7 +106,6 @@ struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
-> > > > >         if (intid >= VGIC_MIN_LPI)
-> > > > >                 return vgic_get_lpi(kvm, intid);
-> > > > >
-> > > > > -       WARN(1, "Looking up struct vgic_irq for reserved INTID");
-> > > >
-> > > > Could we maybe downgrade the message to WARN_ONCE() (to get a stack)
-> > > > or pr_warn_ratelimited()? I agree it is problematic that userspace can
-> > > > cause this WARN to fire, but it'd be helpful for debugging too.
-> > > >
-> > >
-> > > Was thinking about that, until I found this in bug.h:
-> > >
-> > >         /*
-> > >          * WARN(), WARN_ON(), WARN_ON_ONCE, and so on can be used to report
-> > >          * significant kernel issues that need prompt attention if they should ever
-> > >          * appear at runtime.
-> > >          *
-> > >          * Do not use these macros when checking for invalid external inputs
-> > >          * (e.g. invalid system call arguments, or invalid data coming from
-> > >          * network/devices),
-> > >
-> > > Just in case, KVM_IRQ_LINE returns -EINVAL for an invalid intid (like
-> > > 1020). I think it's more appropriate for the vmm to log it. What do you
-> > > think?
-> >
-> > vgic_get_irq() is called in a bunch of other places though, right?
-> > IOW, intid doesn't necessarily come from userspace. In fact, I believe
-> > KVM_IRQ_LINE is the only place we pass a value from userspace to
-> > vgic_get_irq() (don't quote me on that).
-> >
-> > Perhaps instead the fix could be to explicitly check that the intid
-> > from userspace is valid and exit early rather than count on
-> > vgic_get_irq() to do the right thing.
->
-> vgic_get_irq() is designed to do the right thing. Returning NULL is
-> the way it reports an error, and this NULL value is already checked at
-> when directly provided either by the VMM or the guest. If we missed
-> any of those, that would be what needs addressing.  Obtaining a NULL
-> pointer is a good way to catch those.
->
-> In general, the kernel log is not how we report userspace errors (we
-> have been there before...). It is slow, noisy, unclear and ultimately
-> leaks information.
+On Wed, 18 Aug 2021 20:21:29 +0000, Oliver Upton wrote:
+> The CPU_ON PSCI call requires careful coordination between vCPUs in KVM,
+> as it allows callers to send a payload (pc, context id) to another vCPU
+> to start execution. There are a couple of races in the handling of
+> CPU_ON:
+> 
+>  - KVM uses the kvm->lock to serialize the write-side of a vCPU's reset
+>    state. However, kvm_vcpu_reset() doesn't take the lock on the
+>    read-size, meaning the vCPU could be reset with interleaved state
+>    from two separate CPU_ON calls.
+> 
+> [...]
 
-Absolutely. My comments were aimed at calls to vgic_get_irq() where
-intid is coming from the kernel, not userspace. That being said,
-probably no good reason to buy a full fat WARN() in a function such as
-this one.  I'm done waffling on this one liner now :)
+Applied to next, thanks!
 
-Reviewed-by: Oliver Upton <oupton@google.com>
+[1/4] KVM: arm64: Fix read-side race on updates to vcpu reset state
+      commit: 6654f9dfcb88fea3b9affc180dc3c04333d0f306
+[2/4] KVM: arm64: Handle PSCI resets before userspace touches vCPU state
+      commit: 6826c6849b46aaa91300201213701eb861af4ba0
+[3/4] KVM: arm64: Enforce reserved bits for PSCI target affinities
+      commit: e10ecb4d6c0761ca545b3946df1707a41f9f845e
+[4/4] selftests: KVM: Introduce psci_cpu_on_test
+      commit: cb97cf95c44021278b7637731bc0928026bc29ab
 
-> If you really want something, then a pr_debug is a
-> potential tool as it can be dynamically enabled with the right
-> configuration.
->
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+Cheers,
+
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
+
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
