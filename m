@@ -2,77 +2,80 @@ Return-Path: <SRS0=/4wP=NK=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDB7AC4338F
-	for <kvmarm@archiver.kernel.org>; Thu, 19 Aug 2021 22:36:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5CDCC432BE
+	for <kvmarm@archiver.kernel.org>; Thu, 19 Aug 2021 22:36:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6ECE3610CF
-	for <kvmarm@archiver.kernel.org>; Thu, 19 Aug 2021 22:36:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 6ECE3610CF
+	by mail.kernel.org (Postfix) with ESMTP id 56EDF6109E
+	for <kvmarm@archiver.kernel.org>; Thu, 19 Aug 2021 22:36:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 56EDF6109E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D6FF04B0D7;
-	Thu, 19 Aug 2021 18:36:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EFED34B116;
+	Thu, 19 Aug 2021 18:36:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id R4Ug1wYqFGYR; Thu, 19 Aug 2021 18:36:46 -0400 (EDT)
+	with ESMTP id CAvMhgwqc1we; Thu, 19 Aug 2021 18:36:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B00064B0E9;
-	Thu, 19 Aug 2021 18:36:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CBA954B11A;
+	Thu, 19 Aug 2021 18:36:47 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2727F4B0D7
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Aug 2021 18:36:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 613124B0EE
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Aug 2021 18:36:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XScPRf2ZSTXS for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 Aug 2021 18:36:44 -0400 (EDT)
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com
- [209.85.219.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 23ED84B087
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Aug 2021 18:36:44 -0400 (EDT)
-Received: by mail-yb1-f202.google.com with SMTP id
- j9-20020a2581490000b02905897d81c63fso7957042ybm.8
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Aug 2021 15:36:44 -0700 (PDT)
+ with ESMTP id 5nYfjvHjnspe for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 Aug 2021 18:36:45 -0400 (EDT)
+Received: from mail-ot1-f73.google.com (mail-ot1-f73.google.com
+ [209.85.210.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6C9044B0D7
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Aug 2021 18:36:45 -0400 (EDT)
+Received: by mail-ot1-f73.google.com with SMTP id
+ l16-20020a9d6a90000000b0051a232667abso3515944otq.15
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Aug 2021 15:36:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:message-id:mime-version:subject:from:to:cc;
- bh=hVLqpfJyik/aNFUVhgkn5ayQKvTB31kCk1HpemlZ0PQ=;
- b=GVin9ZIo8I4PynVJRsVMmAXOcqMyYaVqEzH+8z/eUNoXN8UG91sa6EC9fkjEn9xBre
- wLjfmlUSr8AV0SDnhLLG9ol7IzYBlmwUnaSNmrKYc1QMYSRym9e7tdOebKRJwJEbR7v2
- lGKnctauKMxPl/EOy2QEc5Z9H0574kKfbqEm34EZxFaTiZDXTN88HVvge8Fi0L+dNi+i
- Sjb+nyFuGATdY799YV0IcFKzfhmf9H7Z20kFjrJazV36ANC5jOYSF49koRxq71br307U
- y5u60XEsDL6BiTI0Ye/mugeKEYHrpvKyIkn2FfiAj9JWl5pjekralsIP9C+3TytPlQbV
- GeHA==
+ h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+ :cc; bh=t7LGVP554kQR/vFvXnoLO0aCqVqH2J9lOsbFtuSIcI4=;
+ b=DLI1eqQzEY0keU0Orx7pME9tox5Hvur8IuWHPfTx+TTKqi2uO/ML4CE9piZNe25md6
+ olqvrWP8NtlBAC71qgsBVDpcGssFvzk/ndE74qecXRzZvAGHOgBOEp3sWs6pwvrUpP4G
+ W+FaQHw5lkFoY7nkPYfpqLPNDmrIa4NaGwi99zBIzahLXGQQJJdusjc+BgbUHnnHfr6S
+ Ie/Ww2IOQr+yDkNlgH6Ww4iitlywmC9DIMUYmWqIju1KJT5Wquu/GkhkAuJ9pSxK193H
+ vLUZYmTsFJVDFm/Niydj1hZ9mWzk+HKshim0XBlmQNEsVIcyckgzsdTe6llZ4wNL6wVb
+ 6Eew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
- bh=hVLqpfJyik/aNFUVhgkn5ayQKvTB31kCk1HpemlZ0PQ=;
- b=K5mAeSNuLlpErdOYPV6amKPa8Vi/MtCia4kptnr5OKKFz3i8hoGWV9hpKvIYqYBLaF
- YD0WyBgttJU7VQh/f/KyUoYegmlfyz3ReWvQJwb+t90+O/1vVsKYazXc+GijnXgFjd0v
- Uf7H61lSWl7JbvPu9ep6hcEvLUXE7tj2XXpnk0Rdxc8o4WhoUSmwXiY3bbnrmIt547MJ
- +8NiA8XqjUL1cWs8Yxrzn3+DPRVm3gjjiHH1BdrNcq/13iQuxmLVox0kC0oAcML4Obd2
- 1l0jYtBPwhv0wcrrRnSxLjj3830jKYD94VfWJyJE+1KwfMzTjcMUGZjX2DvL9cUGThGf
- 5ZfA==
-X-Gm-Message-State: AOAM530nZBXtUyueuALqqsFdgxptKEYkbhfxz7y4gCj8czChTTy0OOhP
- sQJDXNaRIN1zFWcak94NjrQdZfhvuus=
-X-Google-Smtp-Source: ABdhPJwSrjQerrU1uikVnLI3vJ2z24wtkGEFdI8gQO/BHJSju1355boZQO0W8F52k/AIOIKPAb3ocFx1CF8=
+ h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+ :references:subject:from:to:cc;
+ bh=t7LGVP554kQR/vFvXnoLO0aCqVqH2J9lOsbFtuSIcI4=;
+ b=CMJIu4Xl5fL16JVqypWcYtADFVnS9g+dMZwD8eKsrrLE2g+ctp8tlOlaZYW+lH/NXc
+ C1v0LsQJ3xm87m0u8ZyoIDuWAaoNhe+Bx81b8G4x4RvKJhrxSFPqul33O6ccyuxN0I7u
+ 3DyWUjvdNBfmGfS4ZexH1+ycZI7YVYWLZqSqzcSlrTW+FiDM1YJ+GfyXXxL2GolLIXCN
+ 6Zq8rEFDk4viuuh7F8AjRepv4AFZmh3345ls8fFwS8/V5+zjoNrOSn24pFwfFLMM2FXE
+ 8i6SbXTeQp6AhsokjZc1h32otACEQ0Kxzk80CTosCnalKRQ+tQLslF5q+Kw+3PmCo6+U
+ vZRA==
+X-Gm-Message-State: AOAM532JEq1M9qzlFykhYeoQESIi+xDX6wlHn/BL3BMMnLlOyln2MbUk
+ 7suG3krd3SxiazIvUYN9BXPjVF4gA7c=
+X-Google-Smtp-Source: ABdhPJy6FTCFvhaf0mQy7xMNvESNDrcZSCkWNkPa6rAsPIGBY1VYRlZ/B+ES23ZKv0Zz9rtSfEUmMv83/Qg=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a25:dfd5:: with SMTP id
- w204mr18198187ybg.78.1629412603603; 
- Thu, 19 Aug 2021 15:36:43 -0700 (PDT)
-Date: Thu, 19 Aug 2021 22:36:34 +0000
-Message-Id: <20210819223640.3564975-1-oupton@google.com>
+ (user=oupton job=sendgmr) by 2002:a05:6830:1589:: with SMTP id
+ i9mr11062299otr.196.1629412604681; Thu, 19 Aug 2021 15:36:44 -0700 (PDT)
+Date: Thu, 19 Aug 2021 22:36:35 +0000
+In-Reply-To: <20210819223640.3564975-1-oupton@google.com>
+Message-Id: <20210819223640.3564975-2-oupton@google.com>
 Mime-Version: 1.0
+References: <20210819223640.3564975-1-oupton@google.com>
 X-Mailer: git-send-email 2.33.0.rc2.250.ged5fa647cd-goog
-Subject: [PATCH 0/6] KVM: arm64: Implement PSCI SYSTEM_SUSPEND support
+Subject: [PATCH 1/6] KVM: arm64: Drop unused vcpu param to
+ kvm_psci_valid_affinity()
 From: Oliver Upton <oupton@google.com>
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 Cc: Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
@@ -93,67 +96,46 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Certain VMMs/operators may wish to give their guests the ability to
-initiate a system suspend that could result in the VM being saved to
-persistent storage to be resumed at a later time. The PSCI v1.0
-specification describes an SMC, SYSTEM_SUSPEND, that allows a kernel to
-request a system suspend. This call is optional for v1.0, and KVM
-elected to not support the call in its v1.0 implementation.
+The helper function does not need a pointer to the vCPU, as it only
+consults a constant mask; drop the unused vcpu parameter.
 
-This series adds support for the SYSTEM_SUSPEND PSCI call to KVM/arm64.
-Since this is a system-scoped event, KVM cannot quiesce the VM on its
-own. We add a new system exit type in this series to clue in userspace
-that a suspend was requested. Per the KVM_EXIT_SYSTEM_EVENT ABI, a VMM
-that doesn't care about this event can simply resume the guest without
-issue (we set up the calling vCPU to come out of reset correctly on next
-KVM_RUN).
+Signed-off-by: Oliver Upton <oupton@google.com>
+---
+ arch/arm64/kvm/psci.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-Patch 1 is unrelated, and is a fix for "KVM: arm64: Enforce reserved
-bits for PSCI target affinities" on the kvmarm/next branch. Nothing
-particularly hairy, just an unused param.
-
-Patch 2 simplifies the function to check if KVM allows a particular PSCI
-function. We can generally disallow any PSCI function that sets the
-SMC64 bit in the PSCI function ID.
-
-Patch 3 wraps up the PSCI reset logic used for CPU_ON, which will be
-needed later to queue up a reset on the vCPU that requested the system
-suspend.
-
-Patch 4 brings in the new UAPI and PSCI call, guarded behind a VM
-capability for backwards compatibility.
-
-Patch 5 is indirectly related to this series, and avoids compiler
-reordering on PSCI calls in the selftest introduced by "selftests: KVM:
-Introduce psci_cpu_on_test".
-
-Finally, patch 6 extends the PSCI selftest to verify the
-SYSTEM_SUSPEND PSCI call behaves as intended.
-
-These patches apply cleanly to kvmarm/next at the following commit:
-
-f2267b87ecd5 ("Merge branch kvm-arm64/misc-5.15 into kvmarm-master/next")
-
-The series is intentionally based on kvmarm/next for the sake of fixing
-patches only present there in [1/6] and [5/6]. Tested on QEMU (ick)
-since my Mt. Jade box is out to lunch at the moment and for some unknown
-reason the toolchain on my work computer doesn't play nice with the FVP.
-
-Oliver Upton (6):
-  KVM: arm64: Drop unused vcpu param to kvm_psci_valid_affinity()
-  KVM: arm64: Clean up SMC64 PSCI filtering for AArch32 guests
-  KVM: arm64: Encapsulate reset request logic in a helper function
-  KVM: arm64: Add support for SYSTEM_SUSPEND PSCI call
-  selftests: KVM: Promote PSCI hypercalls to asm volatile
-  selftests: KVM: Test SYSTEM_SUSPEND PSCI call
-
- arch/arm64/include/asm/kvm_host.h             |   3 +
- arch/arm64/kvm/arm.c                          |   5 +
- arch/arm64/kvm/psci.c                         | 134 +++++++++++++-----
- include/uapi/linux/kvm.h                      |   2 +
- .../selftests/kvm/aarch64/psci_cpu_on_test.c  | 126 +++++++++++-----
- 5 files changed, 202 insertions(+), 68 deletions(-)
-
+diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
+index 74c47d420253..d46842f45b0a 100644
+--- a/arch/arm64/kvm/psci.c
++++ b/arch/arm64/kvm/psci.c
+@@ -59,8 +59,7 @@ static void kvm_psci_vcpu_off(struct kvm_vcpu *vcpu)
+ 	kvm_vcpu_kick(vcpu);
+ }
+ 
+-static inline bool kvm_psci_valid_affinity(struct kvm_vcpu *vcpu,
+-					   unsigned long affinity)
++static inline bool kvm_psci_valid_affinity(unsigned long affinity)
+ {
+ 	return !(affinity & ~MPIDR_HWID_BITMASK);
+ }
+@@ -73,7 +72,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+ 	unsigned long cpu_id;
+ 
+ 	cpu_id = smccc_get_arg1(source_vcpu);
+-	if (!kvm_psci_valid_affinity(source_vcpu, cpu_id))
++	if (!kvm_psci_valid_affinity(cpu_id))
+ 		return PSCI_RET_INVALID_PARAMS;
+ 
+ 	vcpu = kvm_mpidr_to_vcpu(kvm, cpu_id);
+@@ -132,7 +131,7 @@ static unsigned long kvm_psci_vcpu_affinity_info(struct kvm_vcpu *vcpu)
+ 	target_affinity = smccc_get_arg1(vcpu);
+ 	lowest_affinity_level = smccc_get_arg2(vcpu);
+ 
+-	if (!kvm_psci_valid_affinity(vcpu, target_affinity))
++	if (!kvm_psci_valid_affinity(target_affinity))
+ 		return PSCI_RET_INVALID_PARAMS;
+ 
+ 	/* Determine target affinity mask */
 -- 
 2.33.0.rc2.250.ged5fa647cd-goog
 
