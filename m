@@ -5,80 +5,82 @@ X-Spam-Level:
 X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0919DC432BE
-	for <kvmarm@archiver.kernel.org>; Thu, 19 Aug 2021 08:10:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E967BC4338F
+	for <kvmarm@archiver.kernel.org>; Thu, 19 Aug 2021 08:16:39 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 76A8961131
-	for <kvmarm@archiver.kernel.org>; Thu, 19 Aug 2021 08:10:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 76A8961131
+	by mail.kernel.org (Postfix) with ESMTP id 5A0556112E
+	for <kvmarm@archiver.kernel.org>; Thu, 19 Aug 2021 08:16:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 5A0556112E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E79934B103;
-	Thu, 19 Aug 2021 04:10:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D564B4B10B;
+	Thu, 19 Aug 2021 04:16:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id W1X8oG0As6b9; Thu, 19 Aug 2021 04:10:22 -0400 (EDT)
+	with ESMTP id USoIIizxN1yH; Thu, 19 Aug 2021 04:16:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 009104B108;
-	Thu, 19 Aug 2021 04:10:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E02FE4B10E;
+	Thu, 19 Aug 2021 04:16:34 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F63B4B105
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Aug 2021 04:10:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C59F74B10C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Aug 2021 04:16:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1oPCwihLqrxg for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 Aug 2021 04:10:19 -0400 (EDT)
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com
- [209.85.167.54])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D8A014B103
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Aug 2021 04:10:18 -0400 (EDT)
-Received: by mail-lf1-f54.google.com with SMTP id w20so10979328lfu.7
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Aug 2021 01:10:18 -0700 (PDT)
+ with ESMTP id Oez1VtKgBHvb for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 Aug 2021 04:16:32 -0400 (EDT)
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com
+ [209.85.167.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 769354B10B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Aug 2021 04:16:32 -0400 (EDT)
+Received: by mail-lf1-f49.google.com with SMTP id y34so10999121lfa.8
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Aug 2021 01:16:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=cPvH0LAivty+kbGWONu/jrOGMYsTsQGu9Ph+/kEuth0=;
- b=g5iwvH8XtD7qDEMB1qOF7bydpGwXpsD48tcbfS1oqQ1/AOUKJ58PaLfDH/Uf7ZvMxL
- 9slA7pl+LKesXBh9sAoUdK8o5t7/R5NlMqMlsMViU2NaAAcTiRSwM9+7In32BROIWMiO
- SLXjhlfNgiP3XulDo6rYqIecUgk3X+GLsp90ZdVudD00utjZ/I5aZxIXqeJgsjP9XKRk
- xZ9lJZVoq7lNj7IF4r7/R+A5/lprgvfHhUtkOsOjq8Bdz71XvbkC1TqNd33VIYEGH1AE
- Gr/YN0lpgkXlpvE3F/PsNvtpnxlN/ehBHKhLXsjjZbil2pQuuexGvvUKmhZKRpsm7Gj6
- tj0w==
+ :cc; bh=yIjfNruIRqoaZMP1dFgzuYg2bekGFWIjBtMbeKsjOv4=;
+ b=Uh1Rb4Tubmyt9cse91ISt5kDTlQA5cOUNtpTo3ndsgr8Ck+k+NFexFFUz7dyuM2H3t
+ m3kAPtmzO3DBlZuQbQOS1BGJjUv9r6yFgy0WnVgPSxucBCkqke5QvTkuTCy+8oy0eOTb
+ JkmkswyVt1D3ZoaYkI5dov/HLiOeTx2Mr0bQ2TJFhtusQPTrCpPomFM4IItSUMn8JFmy
+ Q9HWWiKPZA6ri/QVNnb34rhV/YDwcBDhhZlbiewsQu0Tsb8x3P4CosXJJGeXo3yOBl4Y
+ D8HnhI1tOhAnkfLZwT3K4kw7633qGlsmUBv1GFT8pq0ffBfsjvKvZ0yKkegYDWU7Uxxr
+ 5cGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=cPvH0LAivty+kbGWONu/jrOGMYsTsQGu9Ph+/kEuth0=;
- b=fzJ96uU2FHeSud0k2kEpwlWeqvMzojAQXzaNbZFUNo7MK9E6xlqvnZULl65U+WH4zr
- PI4uTXXxLdPZ2o15/y+mBsTGmEm0M/O/5ApYDnSisQfsYXOOBAb3hSlLZ7AYW4j2sBGL
- IL0cin7uIY5kmaTCZ/uLrajSl/bi2/msZNYLEa7k4Zn7La3ZbuG0hIiQVToWzqhilYRw
- j7oG2aVNBEFGOKt2epow4g1+lg7He5ee+ypHnR58EmsyLHL42pyuS4y5xVnt9MfHykjq
- dELpOjE6qAyj4aw5XsY8YQA2kr9kC+4S49HI9Z+llc6sL7w4pzuzoK5p0NXLxuL2m8lZ
- z4MQ==
-X-Gm-Message-State: AOAM533pWERGN555/Mz8igkAiV4/64//EdMot+pTzcS3nWHOECQj24Ib
- SzeaZ+YjiUNpRRmnWX2D9zchWDFB1dnOFgZ63CkxqA==
-X-Google-Smtp-Source: ABdhPJwRJHRfC6bp+yucaRYcXg+6U4jr3ewQU/A/l03h51iZvbtfcjZ1PlG9Cpe3GEnFknctx1QJD+vQf8rj5XBM0m8=
-X-Received: by 2002:a05:6512:3fa8:: with SMTP id
- x40mr9659895lfa.0.1629360617193; 
- Thu, 19 Aug 2021 01:10:17 -0700 (PDT)
+ bh=yIjfNruIRqoaZMP1dFgzuYg2bekGFWIjBtMbeKsjOv4=;
+ b=caIKGmr689Be1Hw/B5Z0kQC036RSyBIM8l2cwfRPv7DD48L5S6RsqLpHy0hGo9Pttr
+ Ys4inqkHenpmpwvk+3jEjG6c3e/6jh22f/fFs3aB26baDgjiDURb5M662CO+5PLHDFMF
+ pjwzXoCFs0o3kwEplHmFkMrEuPUM5MCV32DwtWiLYuN2xcKRsx1vIR7OCXY6HGTYmY9H
+ 4BUCVjRRBnjnNn2fCajEC4DqUuoxO9qKW1BFc3L2gpo1mhI2QuV+f/Mb/7imfmmkwNX6
+ 9pHb3mo2Bi2NcuUNP3qciQXtWyNXKUK6QszhNmSpvDvkJ2j/Vj2Bfb3kaxJ8A/mw/nbn
+ oAiw==
+X-Gm-Message-State: AOAM5334r2myjsVH3aosdRBRFarlb0pAKHHF+Ujf3yqyNpozmn6GqPxl
+ fez+KwfK5dz9FkUlw8zZhWyGiMZ9VWtT0DAQodJSqA==
+X-Google-Smtp-Source: ABdhPJwrWW9U4piKXkDbBKX+qAG8nI3LRbhJGUFw/CctYUBkZ/9YzEYznpDVd1/rjsXd1dFJ2yjXMXs2F+/onMOvPlM=
+X-Received: by 2002:a05:6512:4025:: with SMTP id
+ br37mr9473510lfb.23.1629360990837; 
+ Thu, 19 Aug 2021 01:16:30 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210817081134.2918285-1-tabba@google.com>
- <20210817081134.2918285-16-tabba@google.com>
-In-Reply-To: <20210817081134.2918285-16-tabba@google.com>
+References: <20210818213205.598471-1-ricarkol@google.com>
+ <CAOQ_QshVenuri8WdZdEis4szCv03U0KRNt4CqDNtvUBsqBqUoA@mail.gmail.com>
+ <YR1/YEY8DX+r05nt@google.com>
+ <CAOQ_Qsgy7d7pWc=0AHpR2LHO67Z=gCa-TV46NxXMsFP8yqOzTw@mail.gmail.com>
+ <877dghsvvt.wl-maz@kernel.org>
+In-Reply-To: <877dghsvvt.wl-maz@kernel.org>
 From: Oliver Upton <oupton@google.com>
-Date: Thu, 19 Aug 2021 01:10:06 -0700
-Message-ID: <CAOQ_QsgSfHVjJkSJku5DwUe0_=ds4GduPbJ7vC-t+4_=fPVFBQ@mail.gmail.com>
-Subject: Re: [PATCH v4 15/15] KVM: arm64: Handle protected guests at 32 bits
-To: Fuad Tabba <tabba@google.com>
-Cc: kernel-team@android.com, kvm@vger.kernel.org, maz@kernel.org,
- pbonzini@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Date: Thu, 19 Aug 2021 01:16:19 -0700
+Message-ID: <CAOQ_QsiwWHWM_p8KOdehtCFP_yUzsCp7uF0ePXn9EGmvfYD7Aw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: arm64: vgic: drop WARN from vgic_get_irq
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, pshier@google.com,
+ rananta@google.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -95,112 +97,96 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Fuad,
-
-On Tue, Aug 17, 2021 at 1:12 AM Fuad Tabba <tabba@google.com> wrote:
+On Thu, Aug 19, 2021 at 1:04 AM Marc Zyngier <maz@kernel.org> wrote:
 >
-> Protected KVM does not support protected AArch32 guests. However,
-> it is possible for the guest to force run AArch32, potentially
-> causing problems. Add an extra check so that if the hypervisor
-> catches the guest doing that, it can prevent the guest from
-> running again by resetting vcpu->arch.target and returning
-> ARM_EXCEPTION_IL.
+> On Thu, 19 Aug 2021 08:41:19 +0100,
+> Oliver Upton <oupton@google.com> wrote:
+> >
+> > On Wed, Aug 18, 2021 at 2:45 PM Ricardo Koller <ricarkol@google.com> wrote:
+> > >
+> > > On Wed, Aug 18, 2021 at 02:34:03PM -0700, Oliver Upton wrote:
+> > > > Hi Ricardo,
+> > > >
+> > > > On Wed, Aug 18, 2021 at 2:32 PM Ricardo Koller <ricarkol@google.com> wrote:
+> > > > >
+> > > > > vgic_get_irq(intid) is used all over the vgic code in order to get a
+> > > > > reference to a struct irq. It warns whenever intid is not a valid number
+> > > > > (like when it's a reserved IRQ number). The issue is that this warning
+> > > > > can be triggered from userspace (e.g., KVM_IRQ_LINE for intid 1020).
+> > > > >
+> > > > > Drop the WARN call from vgic_get_irq.
+> > > > >
+> > > > > Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> > > > > ---
+> > > > >  arch/arm64/kvm/vgic/vgic.c | 1 -
+> > > > >  1 file changed, 1 deletion(-)
+> > > > >
+> > > > > diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+> > > > > index 111bff47e471..81cec508d413 100644
+> > > > > --- a/arch/arm64/kvm/vgic/vgic.c
+> > > > > +++ b/arch/arm64/kvm/vgic/vgic.c
+> > > > > @@ -106,7 +106,6 @@ struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
+> > > > >         if (intid >= VGIC_MIN_LPI)
+> > > > >                 return vgic_get_lpi(kvm, intid);
+> > > > >
+> > > > > -       WARN(1, "Looking up struct vgic_irq for reserved INTID");
+> > > >
+> > > > Could we maybe downgrade the message to WARN_ONCE() (to get a stack)
+> > > > or pr_warn_ratelimited()? I agree it is problematic that userspace can
+> > > > cause this WARN to fire, but it'd be helpful for debugging too.
+> > > >
+> > >
+> > > Was thinking about that, until I found this in bug.h:
+> > >
+> > >         /*
+> > >          * WARN(), WARN_ON(), WARN_ON_ONCE, and so on can be used to report
+> > >          * significant kernel issues that need prompt attention if they should ever
+> > >          * appear at runtime.
+> > >          *
+> > >          * Do not use these macros when checking for invalid external inputs
+> > >          * (e.g. invalid system call arguments, or invalid data coming from
+> > >          * network/devices),
+> > >
+> > > Just in case, KVM_IRQ_LINE returns -EINVAL for an invalid intid (like
+> > > 1020). I think it's more appropriate for the vmm to log it. What do you
+> > > think?
+> >
+> > vgic_get_irq() is called in a bunch of other places though, right?
+> > IOW, intid doesn't necessarily come from userspace. In fact, I believe
+> > KVM_IRQ_LINE is the only place we pass a value from userspace to
+> > vgic_get_irq() (don't quote me on that).
+> >
+> > Perhaps instead the fix could be to explicitly check that the intid
+> > from userspace is valid and exit early rather than count on
+> > vgic_get_irq() to do the right thing.
 >
-> If this were to happen, The VMM can try and fix it by re-
-> initializing the vcpu with KVM_ARM_VCPU_INIT, however, this is
-> likely not possible for protected VMs.
+> vgic_get_irq() is designed to do the right thing. Returning NULL is
+> the way it reports an error, and this NULL value is already checked at
+> when directly provided either by the VMM or the guest. If we missed
+> any of those, that would be what needs addressing.  Obtaining a NULL
+> pointer is a good way to catch those.
 >
-> Adapted from commit 22f553842b14 ("KVM: arm64: Handle Asymmetric
-> AArch32 systems")
+> In general, the kernel log is not how we report userspace errors (we
+> have been there before...). It is slow, noisy, unclear and ultimately
+> leaks information.
+
+Absolutely. My comments were aimed at calls to vgic_get_irq() where
+intid is coming from the kernel, not userspace. That being said,
+probably no good reason to buy a full fat WARN() in a function such as
+this one.  I'm done waffling on this one liner now :)
+
+Reviewed-by: Oliver Upton <oupton@google.com>
+
+> If you really want something, then a pr_debug is a
+> potential tool as it can be dynamically enabled with the right
+> configuration.
 >
-> Signed-off-by: Fuad Tabba <tabba@google.com>
-> ---
->  arch/arm64/kvm/hyp/nvhe/switch.c | 37 ++++++++++++++++++++++++++++++++
->  1 file changed, 37 insertions(+)
+> Thanks,
 >
-> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-> index 398e62098898..0c24b7f473bf 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-> @@ -20,6 +20,7 @@
->  #include <asm/kprobes.h>
->  #include <asm/kvm_asm.h>
->  #include <asm/kvm_emulate.h>
-> +#include <asm/kvm_fixed_config.h>
->  #include <asm/kvm_hyp.h>
->  #include <asm/kvm_mmu.h>
->  #include <asm/fpsimd.h>
-> @@ -195,6 +196,39 @@ exit_handle_fn kvm_get_nvhe_exit_handler(struct kvm_vcpu *vcpu)
->                 return NULL;
->  }
->
-> +/*
-> + * Some guests (e.g., protected VMs) might not be allowed to run in AArch32. The
-> + * check below is based on the one in kvm_arch_vcpu_ioctl_run().
-> + * The ARMv8 architecture does not give the hypervisor a mechanism to prevent a
-> + * guest from dropping to AArch32 EL0 if implemented by the CPU. If the
-> + * hypervisor spots a guest in such a state ensure it is handled, and don't
-> + * trust the host to spot or fix it.
-> + *
-> + * Returns true if the check passed and the guest run loop can continue, or
-> + * false if the guest should exit to the host.
-> + */
-> +static bool check_aarch32_guest(struct kvm_vcpu *vcpu, u64 *exit_code)
-
-This does a bit more than just check & return, so maybe call it
-handle_aarch32_guest()?
-
-> +{
-> +       if (kvm_vm_is_protected(kern_hyp_va(vcpu->kvm)) &&
-
-maybe initialize a local with a hyp pointer to the kvm structure.
-
-> +           vcpu_mode_is_32bit(vcpu) &&
-> +           FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL0),
-> +                                        PVM_ID_AA64PFR0_RESTRICT_UNSIGNED) <
-> +               ID_AA64PFR0_ELx_32BIT_64BIT) {
-
-It may be more readable to initialize a local variable with this
-feature check, i.e:
-
-bool aarch32_allowed = FIELD_GET(...) == ID_AA64PFR0_ELx_32BIT_64BIT;
-
-and then:
-
-  if (kvm_vm_is_protected(kvm) && vcpu_mode_is_32bit(vcpu) &&
-!aarch32_allowed) {
-
-> +               /*
-> +                * As we have caught the guest red-handed, decide that it isn't
-> +                * fit for purpose anymore by making the vcpu invalid. The VMM
-> +                * can try and fix it by re-initializing the vcpu with
-> +                * KVM_ARM_VCPU_INIT, however, this is likely not possible for
-> +                * protected VMs.
-> +                */
-> +               vcpu->arch.target = -1;
-> +               *exit_code = ARM_EXCEPTION_IL;
-> +               return false;
-> +       }
-> +
-> +       return true;
-> +}
-> +
->  /* Switch to the guest for legacy non-VHE systems */
->  int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
->  {
-> @@ -255,6 +289,9 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
->                 /* Jump in the fire! */
->                 exit_code = __guest_enter(vcpu);
->
-> +               if (unlikely(!check_aarch32_guest(vcpu, &exit_code)))
-> +                       break;
-> +
->                 /* And we're baaack! */
->         } while (fixup_guest_exit(vcpu, &exit_code));
+>         M.
 >
 > --
-> 2.33.0.rc1.237.g0d66db33f3-goog
->
+> Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
