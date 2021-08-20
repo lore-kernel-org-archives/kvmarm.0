@@ -2,91 +2,74 @@ Return-Path: <SRS0=8enQ=NL=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50892C4338F
-	for <kvmarm@archiver.kernel.org>; Fri, 20 Aug 2021 09:09:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 518F7C4338F
+	for <kvmarm@archiver.kernel.org>; Fri, 20 Aug 2021 09:30:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C00E261155
-	for <kvmarm@archiver.kernel.org>; Fri, 20 Aug 2021 09:09:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org C00E261155
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id C00CE6112E
+	for <kvmarm@archiver.kernel.org>; Fri, 20 Aug 2021 09:30:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org C00CE6112E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B0FB4B0BE;
-	Fri, 20 Aug 2021 05:09:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A5C24B12A;
+	Fri, 20 Aug 2021 05:30:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id cXLGNJuk8I3g; Fri, 20 Aug 2021 05:09:09 -0400 (EDT)
+	with ESMTP id hEhE6tH3q4Zy; Fri, 20 Aug 2021 05:30:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B30104B0C1;
-	Fri, 20 Aug 2021 05:09:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 31A9E4B0C1;
+	Fri, 20 Aug 2021 05:30:00 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 558EA4B0B9
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Aug 2021 05:09:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 512284A126
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Aug 2021 05:29:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bW3PBaIxitPv for <kvmarm@lists.cs.columbia.edu>;
- Fri, 20 Aug 2021 05:09:03 -0400 (EDT)
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com
- [209.85.221.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B4EE249FB7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Aug 2021 05:09:03 -0400 (EDT)
-Received: by mail-wr1-f50.google.com with SMTP id x10so13162978wrt.8
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Aug 2021 02:09:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=homr7BhZfULKwJxsWSjpHLSXBNKoWFprBlqIBvyqEBs=;
- b=MC4qaWaJVo8zKFIO6THLrRaPic7q3pRfvJAQMscoWQf0c5NGL5eWXxaFCHUG8Gp6Fk
- 7d0wyudIxPLWXU7zOYig+uvWrIZ5lE4T5dNz7bmECVOo5sh6tL/Uqt6svUwgQwZVPBT8
- w4BCe7aG+vf5rpgHXJ36MWLGlj9V4zfRU87TQNrNWyBsMlmEcyemGtJoRLvjHWd7X0fX
- zAGBPkiaBSzlh3PCYtPQsZsBUmrDrravSv2zFyfTdWCZeE3cbTnY1fwVSFV7z0Zc2X3d
- i3bOPc9RdJY929xSzJx3KeD7US+IdvWBp5G4nb3skOud1jY9rMtjEQfiGhIZbIpAcuiH
- pg6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=homr7BhZfULKwJxsWSjpHLSXBNKoWFprBlqIBvyqEBs=;
- b=gMVbj8ALgaah/zwnb8B9u8s+xTPy49TFwEb30AGIx4+rKM32fCjCiZIGhu3IlJhYHj
- wlK4RpJ+5c2tCFQ0hUbW7czYUS9xIQTSF5/ib05KHgYzPJhWpgLTwOq62Srd3N/hio0H
- 6jPekS3vS9ihDbCauDAGQZ4T+fhojxt9ypBupCozJy9zD9RShkLNMl9pb03b3PFu1B+m
- nfeqqhNdebm+0C8Lc1cFgK5buWUtZoa6u1ysFI3qV7Gdfu81AyB8dbAdohtJG51feUJC
- Z3KdbYR6k5mNtPCtZsftkfiqrcZ5sJK90iHbvEMEUiMwc3B5qW5vENEBYMXZZYYQabRF
- Op1A==
-X-Gm-Message-State: AOAM530lSDtXAQ48MUHfK0z6AiDml6+7GWsSKWFOt6RtUw2us5RM88nm
- NXeq5e6ldOJ1qPWNViSBNs3Kag==
-X-Google-Smtp-Source: ABdhPJwhE5FQaIWpAGA3IIIMKo9FNG/bGjI0OpuiyGbVaM8+tx0NBClA4NGvau3RWS6MGdI3dsa45g==
-X-Received: by 2002:a5d:508e:: with SMTP id a14mr8787846wrt.306.1629450542713; 
- Fri, 20 Aug 2021 02:09:02 -0700 (PDT)
-Received: from google.com ([2a00:79e0:d:210:e4b3:2bb8:a25f:81c7])
- by smtp.gmail.com with ESMTPSA id 11sm920948wmi.15.2021.08.20.02.09.02
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 20 Aug 2021 02:09:02 -0700 (PDT)
-Date: Fri, 20 Aug 2021 10:08:56 +0100
-From: Quentin Perret <qperret@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 3/4] KVM: arm64: Convert the host S2 over to
- __load_guest_stage2()
-Message-ID: <YR9xKHYl7i2LN+/C@google.com>
-References: <20210806113109.2475-1-will@kernel.org>
- <20210806113109.2475-5-will@kernel.org>
- <YQ07sPoa4ACizYrp@google.com> <87tujkr1cq.wl-maz@kernel.org>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <87tujkr1cq.wl-maz@kernel.org>
-Cc: linux-arch@vger.kernel.org, Will Deacon <will@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>, kernel-team@android.com,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- Jade Alglave <jade.alglave@arm.com>
+ with ESMTP id hEQ3xztYrD2q for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 20 Aug 2021 05:29:56 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3F72849FE6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Aug 2021 05:29:56 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 532976112E;
+ Fri, 20 Aug 2021 09:29:55 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mH0qX-0069Z8-8X; Fri, 20 Aug 2021 10:29:53 +0100
+Date: Fri, 20 Aug 2021 10:29:52 +0100
+Message-ID: <87sfz4qx9r.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Subject: Re: [PATCH] KVM: arm64: Ratelimit error log during guest debug
+ exception
+In-Reply-To: <20210819223406.1132426-1-rananta@google.com>
+References: <20210819223406.1132426-1-rananta@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: rananta@google.com, alexandru.elisei@arm.com,
+ suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org,
+ pshier@google.com, ricarkol@google.com, oupton@google.com, reijiw@google.com,
+ jingzhangos@google.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
+ Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -103,92 +86,82 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Friday 20 Aug 2021 at 09:01:41 (+0100), Marc Zyngier wrote:
-> On Fri, 06 Aug 2021 14:40:00 +0100,
-> Quentin Perret <qperret@google.com> wrote:
-> > 
-> > On Friday 06 Aug 2021 at 12:31:07 (+0100), Will Deacon wrote:
-> > > From: Marc Zyngier <maz@kernel.org>
-> > > 
-> > > The protected mode relies on a separate helper to load the
-> > > S2 context. Move over to the __load_guest_stage2() helper
-> > > instead.
-> > > 
-> > > Cc: Catalin Marinas <catalin.marinas@arm.com>
-> > > Cc: Jade Alglave <jade.alglave@arm.com>
-> > > Cc: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > Signed-off-by: Will Deacon <will@kernel.org>
-> > > ---
-> > >  arch/arm64/include/asm/kvm_mmu.h              | 11 +++--------
-> > >  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  2 +-
-> > >  arch/arm64/kvm/hyp/nvhe/mem_protect.c         |  2 +-
-> > >  3 files changed, 5 insertions(+), 10 deletions(-)
-> > > 
-> > > diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> > > index 05e089653a1a..934ef0deff9f 100644
-> > > --- a/arch/arm64/include/asm/kvm_mmu.h
-> > > +++ b/arch/arm64/include/asm/kvm_mmu.h
-> > > @@ -267,9 +267,10 @@ static __always_inline u64 kvm_get_vttbr(struct kvm_s2_mmu *mmu)
-> > >   * Must be called from hyp code running at EL2 with an updated VTTBR
-> > >   * and interrupts disabled.
-> > >   */
-> > > -static __always_inline void __load_stage2(struct kvm_s2_mmu *mmu, unsigned long vtcr)
-> > > +static __always_inline void __load_guest_stage2(struct kvm_s2_mmu *mmu,
-> > > +						struct kvm_arch *arch)
-> > >  {
-> > > -	write_sysreg(vtcr, vtcr_el2);
-> > > +	write_sysreg(arch->vtcr, vtcr_el2);
-> > >  	write_sysreg(kvm_get_vttbr(mmu), vttbr_el2);
-> > >  
-> > >  	/*
-> > > @@ -280,12 +281,6 @@ static __always_inline void __load_stage2(struct kvm_s2_mmu *mmu, unsigned long
-> > >  	asm(ALTERNATIVE("nop", "isb", ARM64_WORKAROUND_SPECULATIVE_AT));
-> > >  }
-> > >  
-> > > -static __always_inline void __load_guest_stage2(struct kvm_s2_mmu *mmu,
-> > > -						struct kvm_arch *arch)
-> > > -{
-> > > -	__load_stage2(mmu, arch->vtcr);
-> > > -}
-> > > -
-> > >  static inline struct kvm *kvm_s2_mmu_to_kvm(struct kvm_s2_mmu *mmu)
-> > >  {
-> > >  	return container_of(mmu->arch, struct kvm, arch);
-> > > diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> > > index 9c227d87c36d..a910648bc71b 100644
-> > > --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> > > +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> > > @@ -29,7 +29,7 @@ void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt);
-> > >  static __always_inline void __load_host_stage2(void)
-> > >  {
-> > >  	if (static_branch_likely(&kvm_protected_mode_initialized))
-> > > -		__load_stage2(&host_kvm.arch.mmu, host_kvm.arch.vtcr);
-> > > +		__load_guest_stage2(&host_kvm.arch.mmu, &host_kvm.arch);
-> > >  	else
-> > >  		write_sysreg(0, vttbr_el2);
-> > >  }
-> > > diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > > index d938ce95d3bd..d4e74ca7f876 100644
-> > > --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > > +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > > @@ -126,7 +126,7 @@ int __pkvm_prot_finalize(void)
-> > >  	kvm_flush_dcache_to_poc(params, sizeof(*params));
-> > >  
-> > >  	write_sysreg(params->hcr_el2, hcr_el2);
-> > > -	__load_stage2(&host_kvm.arch.mmu, host_kvm.arch.vtcr);
-> > > +	__load_guest_stage2(&host_kvm.arch.mmu, &host_kvm.arch);
-> > 
-> > Nit: clearly we're not loading a guest stage-2 here, so maybe the
-> > function should take a more generic name?
+On Thu, 19 Aug 2021 23:34:06 +0100,
+Raghavendra Rao Ananta <rananta@google.com> wrote:
 > 
-> How about we rename __load_guest_stage2() to __load_stage2() instead,
-> with the same parameters?
+> Potentially, the guests could trigger a debug exception that's
+> outside the exception class range.
 
-Yep, that'd work for me.
+How? All the exception classes that lead to this functions are already
+handled in the switch/case statement.
+
+> This could lead to an excessive syslog flooding. Hence, ratelimit
+> the error message.
+> 
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> ---
+>  arch/arm64/kvm/handle_exit.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> index 04ebab299aa4..c7cec7ffe93c 100644
+> --- a/arch/arm64/kvm/handle_exit.c
+> +++ b/arch/arm64/kvm/handle_exit.c
+> @@ -134,7 +134,7 @@ static int kvm_handle_guest_debug(struct kvm_vcpu *vcpu)
+>  	case ESR_ELx_EC_BRK64:
+>  		break;
+>  	default:
+> -		kvm_err("%s: un-handled case esr: %#08x\n",
+> +		kvm_pr_unimpl("%s: un-handled case esr: %#08x\n",
+>  			__func__, (unsigned int) esr);
+>  		ret = -1;
+>  		break;
+
+My take on this is that this code isn't reachable, and that it could
+be better rewritten as:
+
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index 6f48336b1d86..ae7ec086827b 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -119,28 +119,14 @@ static int kvm_handle_guest_debug(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_run *run = vcpu->run;
+ 	u32 esr = kvm_vcpu_get_esr(vcpu);
+-	int ret = 0;
+ 
+ 	run->exit_reason = KVM_EXIT_DEBUG;
+ 	run->debug.arch.hsr = esr;
+ 
+-	switch (ESR_ELx_EC(esr)) {
+-	case ESR_ELx_EC_WATCHPT_LOW:
++	if (ESR_ELx_EC(esr) ==  ESR_ELx_EC_WATCHPT_LOW)
+ 		run->debug.arch.far = vcpu->arch.fault.far_el2;
+-		fallthrough;
+-	case ESR_ELx_EC_SOFTSTP_LOW:
+-	case ESR_ELx_EC_BREAKPT_LOW:
+-	case ESR_ELx_EC_BKPT32:
+-	case ESR_ELx_EC_BRK64:
+-		break;
+-	default:
+-		kvm_err("%s: un-handled case esr: %#08x\n",
+-			__func__, (unsigned int) esr);
+-		ret = -1;
+-		break;
+-	}
+ 
+-	return ret;
++	return 0;
+ }
+ 
+ static int kvm_handle_unknown_ec(struct kvm_vcpu *vcpu)
 
 Thanks,
-Quentin
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
